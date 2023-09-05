@@ -34,12 +34,9 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace IO
-{
-namespace DefToken
-{
+namespace TrenchBroom {
+namespace IO {
+namespace DefToken {
 using Type = unsigned int;
 static const Type Integer = 1 << 0;      // integer number
 static const Type Decimal = 1 << 1;      // decimal number
@@ -59,48 +56,56 @@ static const Type Minus = 1 << 15;       // minus sign: -
 static const Type Eof = 1 << 16;         // end of file
 } // namespace DefToken
 
-class DefTokenizer : public Tokenizer<DefToken::Type>
-{
+class DefTokenizer : public Tokenizer<DefToken::Type> {
 public:
-  explicit DefTokenizer(std::string_view str);
+    explicit DefTokenizer(std::string_view str);
 
 private:
-  static const std::string WordDelims;
-  Token emitToken() override;
+    static const std::string WordDelims;
+
+    Token emitToken() override;
 };
 
-class DefParser : public EntityDefinitionParser, public Parser<DefToken::Type>
-{
+class DefParser : public EntityDefinitionParser, public Parser<DefToken::Type> {
 private:
-  using Token = DefTokenizer::Token;
+    using Token = DefTokenizer::Token;
 
-  DefTokenizer m_tokenizer;
-  std::map<std::string, EntityDefinitionClassInfo> m_baseClasses;
+    DefTokenizer m_tokenizer;
+    std::map<std::string, EntityDefinitionClassInfo> m_baseClasses;
 
 public:
-  DefParser(std::string_view str, const Color& defaultEntityColor);
+    DefParser(std::string_view str, const Color &defaultEntityColor);
 
 private:
-  TokenNameMap tokenNames() const override;
-  std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus& status) override;
+    TokenNameMap tokenNames() const override;
 
-  std::optional<EntityDefinitionClassInfo> parseClassInfo(ParserStatus& status);
-  PropertyDefinitionPtr parseSpawnflags(ParserStatus& status);
-  void parseProperties(ParserStatus& status, EntityDefinitionClassInfo& classInfo);
-  bool parseProperty(ParserStatus& status, EntityDefinitionClassInfo& classInfo);
+    std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) override;
 
-  void parseDefaultProperty(ParserStatus& status);
-  std::string parseBaseProperty(ParserStatus& status);
-  PropertyDefinitionPtr parseChoicePropertyDefinition(ParserStatus& status);
-  Assets::ModelDefinition parseModelDefinition(ParserStatus& status);
+    std::optional<EntityDefinitionClassInfo> parseClassInfo(ParserStatus &status);
 
-  std::string parseDescription();
+    PropertyDefinitionPtr parseSpawnflags(ParserStatus &status);
 
-  vm::vec3 parseVector(ParserStatus& status);
-  vm::bbox3 parseBounds(ParserStatus& status);
-  Color parseColor(ParserStatus& status);
+    void parseProperties(ParserStatus &status, EntityDefinitionClassInfo &classInfo);
 
-  Token nextTokenIgnoringNewlines();
+    bool parseProperty(ParserStatus &status, EntityDefinitionClassInfo &classInfo);
+
+    void parseDefaultProperty(ParserStatus &status);
+
+    std::string parseBaseProperty(ParserStatus &status);
+
+    PropertyDefinitionPtr parseChoicePropertyDefinition(ParserStatus &status);
+
+    Assets::ModelDefinition parseModelDefinition(ParserStatus &status);
+
+    std::string parseDescription();
+
+    vm::vec3 parseVector(ParserStatus &status);
+
+    vm::bbox3 parseBounds(ParserStatus &status);
+
+    Color parseColor(ParserStatus &status);
+
+    Token nextTokenIgnoringNewlines();
 };
 } // namespace IO
 } // namespace TrenchBroom

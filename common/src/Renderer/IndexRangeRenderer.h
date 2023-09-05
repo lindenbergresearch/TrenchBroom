@@ -23,31 +23,28 @@
 #include "Renderer/IndexRangeMapBuilder.h"
 #include "Renderer/VertexArray.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class VboManager;
 
-class IndexRangeRenderer
-{
+class IndexRangeRenderer {
 private:
-  VertexArray m_vertexArray;
-  IndexRangeMap m_indexArray;
+    VertexArray m_vertexArray;
+    IndexRangeMap m_indexArray;
 
 public:
-  IndexRangeRenderer();
-  template <typename VertexSpec>
-  explicit IndexRangeRenderer(IndexRangeMapBuilder<VertexSpec>& builder)
-    : m_vertexArray(VertexArray::move(std::move(builder.vertices())))
-    , m_indexArray(std::move(builder.indices()))
-  {
-  }
+    IndexRangeRenderer();
 
-  IndexRangeRenderer(const VertexArray& vertexArray, const IndexRangeMap& indexArray);
+    template<typename VertexSpec>
+    explicit IndexRangeRenderer(IndexRangeMapBuilder<VertexSpec> &builder)
+        : m_vertexArray(VertexArray::move(std::move(builder.vertices()))), m_indexArray(std::move(builder.indices())) {
+    }
 
-  void prepare(VboManager& vboManager);
-  void render();
+    IndexRangeRenderer(const VertexArray &vertexArray, const IndexRangeMap &indexArray);
+
+    void prepare(VboManager &vboManager);
+
+    void render();
 };
 } // namespace Renderer
 } // namespace TrenchBroom

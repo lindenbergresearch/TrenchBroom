@@ -24,17 +24,14 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class LinkTargetValidator : public Validator
-{
+namespace TrenchBroom {
+namespace Model {
+class LinkTargetValidator : public Validator {
 public:
-  LinkTargetValidator();
+    LinkTargetValidator();
 
 private:
-  void doValidate(EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues)
+    void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues)
     const override;
 };
 } // namespace Model

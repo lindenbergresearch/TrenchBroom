@@ -582,7 +582,10 @@ TEST_CASE("octree.find_intersectors")
 {
   auto tree = octree<double, int>{32.0};
 
-  SECTION("empty tree") { CHECK(tree.find_intersectors({{0, 0, 0}, {1, 0, 0}}).empty()); }
+  SECTION("empty tree")
+  {
+    CHECK(tree.find_intersectors({{0, 0, 0}, {1, 0, 0}}).empty());
+  }
 
   SECTION("single node")
   {
@@ -619,7 +622,10 @@ TEST_CASE("octree.find_containers")
 {
   auto tree = octree<double, int>{32.0};
 
-  SECTION("empty tree") { CHECK(tree.find_containers({0, 0, 0}).empty()); }
+  SECTION("empty tree")
+  {
+    CHECK(tree.find_containers({0, 0, 0}).empty());
+  }
 
   SECTION("single node")
   {

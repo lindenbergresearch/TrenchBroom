@@ -1053,21 +1053,21 @@ if (NOT TB_SUPPRESS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
             <QVBoxLayout>
             <QWidget>
     )
-else()
+else ()
     message(STATUS "Not using precompiled headers")
-endif()
+endif ()
 
 # Organize files into IDE folders
 source_group(TREE "${COMMON_SOURCE_DIR}" FILES ${COMMON_SOURCE} ${COMMON_HEADER})
 
-if(WIN32)
+if (WIN32)
     target_link_libraries(common PRIVATE stackwalker)
-endif()
+endif ()
 
-if(APPLE)
+if (APPLE)
     # Silence macOS OpenGL deprecation warnings
     target_compile_definitions(common PUBLIC GL_SILENCE_DEPRECATION)
-endif()
+endif ()
 
 set_compiler_config(common)
 

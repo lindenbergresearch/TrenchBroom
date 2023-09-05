@@ -26,33 +26,31 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocumentCommandFacade;
 
-class UpdateLinkedGroupsCommandBase : public UndoableCommand
-{
+class UpdateLinkedGroupsCommandBase : public UndoableCommand {
 private:
-  UpdateLinkedGroupsHelper m_updateLinkedGroupsHelper;
+    UpdateLinkedGroupsHelper m_updateLinkedGroupsHelper;
 
 protected:
-  UpdateLinkedGroupsCommandBase(
-    std::string name,
-    bool updateModificationCount,
-    std::vector<Model::GroupNode*> changedLinkedGroups = {});
+    UpdateLinkedGroupsCommandBase(
+        std::string name,
+        bool updateModificationCount,
+        std::vector<Model::GroupNode *> changedLinkedGroups = {});
 
 public:
-  virtual ~UpdateLinkedGroupsCommandBase();
+    virtual ~UpdateLinkedGroupsCommandBase();
 
-  std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade* document) override;
-  std::unique_ptr<CommandResult> performUndo(MapDocumentCommandFacade* document) override;
+    std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document) override;
 
-  bool collateWith(UndoableCommand& command) override;
+    std::unique_ptr<CommandResult> performUndo(MapDocumentCommandFacade *document) override;
+
+    bool collateWith(UndoableCommand &command) override;
 
 private:
-  deleteCopyAndMove(UpdateLinkedGroupsCommandBase);
+deleteCopyAndMove(UpdateLinkedGroupsCommandBase);
 };
 } // namespace View
 } // namespace TrenchBroom

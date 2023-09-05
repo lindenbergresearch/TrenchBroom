@@ -22,65 +22,73 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class PickResult;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderBatch;
+
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class DragTracker;
+
 class DropTracker;
+
 class InputState;
+
 class ToolController;
 
-class ToolChain
-{
+class ToolChain {
 private:
-  std::unique_ptr<ToolController> m_tool;
-  std::unique_ptr<ToolChain> m_suffix;
+    std::unique_ptr<ToolController> m_tool;
+    std::unique_ptr<ToolChain> m_suffix;
 
 public:
-  ToolChain();
-  ~ToolChain();
+    ToolChain();
 
-  void append(std::unique_ptr<ToolController> controller);
+    ~ToolChain();
 
-  void pick(const InputState& inputState, Model::PickResult& pickResult);
+    void append(std::unique_ptr<ToolController> controller);
 
-  void modifierKeyChange(const InputState& inputState);
+    void pick(const InputState &inputState, Model::PickResult &pickResult);
 
-  void mouseDown(const InputState& inputState);
-  void mouseUp(const InputState& inputState);
-  bool mouseClick(const InputState& inputState);
-  bool mouseDoubleClick(const InputState& inputState);
-  void mouseScroll(const InputState& inputState);
-  void mouseMove(const InputState& inputState);
+    void modifierKeyChange(const InputState &inputState);
 
-  std::unique_ptr<DragTracker> startMouseDrag(const InputState& inputState);
-  std::unique_ptr<DropTracker> dragEnter(
-    const InputState& inputState, const std::string& payload);
+    void mouseDown(const InputState &inputState);
 
-  void setRenderOptions(
-    const InputState& inputState, Renderer::RenderContext& renderContext) const;
-  void render(
-    const InputState& inputState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch);
+    void mouseUp(const InputState &inputState);
 
-  bool cancel();
+    bool mouseClick(const InputState &inputState);
+
+    bool mouseDoubleClick(const InputState &inputState);
+
+    void mouseScroll(const InputState &inputState);
+
+    void mouseMove(const InputState &inputState);
+
+    std::unique_ptr<DragTracker> startMouseDrag(const InputState &inputState);
+
+    std::unique_ptr<DropTracker> dragEnter(
+        const InputState &inputState, const std::string &payload);
+
+    void setRenderOptions(
+        const InputState &inputState, Renderer::RenderContext &renderContext) const;
+
+    void render(
+        const InputState &inputState,
+        Renderer::RenderContext &renderContext,
+        Renderer::RenderBatch &renderBatch);
+
+    bool cancel();
 
 private:
-  bool checkInvariant() const;
-  bool chainEndsHere() const;
+    bool checkInvariant() const;
+
+    bool chainEndsHere() const;
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -27,24 +27,20 @@
 
 #include <filesystem>
 
-namespace TrenchBroom
-{
-namespace View
-{
-CurrentGameIndicator::CurrentGameIndicator(const std::string& gameName, QWidget* parent)
-  : DialogHeader{parent}
-{
-  auto& gameFactory = Model::GameFactory::instance();
+namespace TrenchBroom {
+namespace View {
+CurrentGameIndicator::CurrentGameIndicator(const std::string &gameName, QWidget *parent)
+    : DialogHeader{parent} {
+    auto &gameFactory = Model::GameFactory::instance();
 
-  const auto gamePath = gameFactory.gamePath(gameName);
-  auto iconPath = gameFactory.iconPath(gameName);
-  if (iconPath.empty())
-  {
-    iconPath = std::filesystem::path{"DefaultGameIcon.svg"};
-  }
+    const auto gamePath = gameFactory.gamePath(gameName);
+    auto iconPath = gameFactory.iconPath(gameName);
+    if (iconPath.empty()) {
+        iconPath = std::filesystem::path{"DefaultGameIcon.svg"};
+    }
 
-  const auto gameIcon = IO::loadPixmapResource(iconPath);
-  set(QString::fromStdString(gameName), gameIcon);
+    const auto gameIcon = IO::loadPixmapResource(iconPath);
+    set(QString::fromStdString(gameName), gameIcon);
 }
 } // namespace View
 } // namespace TrenchBroom

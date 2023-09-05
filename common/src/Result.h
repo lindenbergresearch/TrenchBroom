@@ -21,11 +21,9 @@
 
 #include <kdl/result_forward.h>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 struct Error;
 
-template <typename Value, typename FirstError = Error, typename... MoreErrors>
+template<typename Value, typename FirstError = Error, typename... MoreErrors>
 using Result = kdl::result<Value, FirstError, MoreErrors...>;
-
 } // namespace TrenchBroom

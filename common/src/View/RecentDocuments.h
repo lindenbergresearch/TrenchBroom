@@ -29,51 +29,59 @@
 
 class QMenu;
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 std::vector<std::filesystem::path> loadRecentDocuments(size_t max);
-void saveRecentDocuments(const std::vector<std::filesystem::path>& paths);
 
-class RecentDocuments : public QObject
-{
-  Q_OBJECT
+void saveRecentDocuments(const std::vector<std::filesystem::path> &paths);
+
+class RecentDocuments : public QObject {
+Q_OBJECT
 private:
-  using MenuList = std::vector<QMenu*>;
-  MenuList m_menus;
+    using MenuList = std::vector<QMenu *>;
+    MenuList m_menus;
 
-  size_t m_maxSize;
-  std::function<bool(std::filesystem::path)> m_filterPredicate;
-  std::vector<std::filesystem::path> m_recentDocuments;
-  std::vector<std::filesystem::path> m_filteredDocuments;
+    size_t m_maxSize;
+    std::function<bool(std::filesystem::path)> m_filterPredicate;
+    std::vector<std::filesystem::path> m_recentDocuments;
+    std::vector<std::filesystem::path> m_filteredDocuments;
 
 public:
-  RecentDocuments(
-    size_t maxSize,
-    std::function<bool(std::filesystem::path)> filterPredicate,
-    QObject* parent = nullptr);
+    RecentDocuments(
+        size_t maxSize,
+        std::function<bool(std::filesystem::path)> filterPredicate,
+        QObject *parent = nullptr);
 
-  const std::vector<std::filesystem::path>& recentDocuments() const;
+    const std::vector<std::filesystem::path> &recentDocuments() const;
 
-  void reload();
+    void reload();
 
-  void addMenu(QMenu& menu);
-  void removeMenu(QMenu& menu);
+    void addMenu(QMenu &menu);
 
-  void updatePath(const std::filesystem::path& path);
-  void removePath(const std::filesystem::path& path);
+    void removeMenu(QMenu &menu);
+
+    void updatePath(const std::filesystem::path &path);
+
+    void removePath(const std::filesystem::path &path);
 
 private:
-  void loadFromConfig();
-  void saveToConfig();
-  std::vector<std::filesystem::path> updateFilteredDocuments();
+    void loadFromConfig();
 
-  void insertPath(const std::filesystem::path& path);
+    void saveToConfig();
 
-  void updateMenus();
-  void clearMenu(QMenu& menu);
-  void createMenuItems(QMenu& menu);
+    std::vector<std::filesystem::path> updateFilteredDocuments();
+
+    void insertPath(const std::filesystem::path &path);
+
+    void updateMenus();
+
+    void clearMenu(QMenu &menu);
+
+    void createMenuItems(QMenu &menu);
+
 signals:
-  void loadDocument(const std::filesystem::path& path) const;
-  void didChange();
+
+    void loadDocument(const std::filesystem::path &path) const;
+
+    void didChange();
 };
 } // namespace TrenchBroom::View

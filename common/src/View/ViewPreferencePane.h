@@ -22,55 +22,71 @@
 #include "View/PreferencePane.h"
 
 class QCheckBox;
+
 class QComboBox;
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class SliderWithLabel;
 
-class ViewPreferencePane : public PreferencePane
-{
-  Q_OBJECT
+class ViewPreferencePane : public PreferencePane {
+Q_OBJECT
 private:
-  QComboBox* m_layoutCombo = nullptr;
-  QCheckBox* m_link2dCameras = nullptr;
-  SliderWithLabel* m_brightnessSlider = nullptr;
-  SliderWithLabel* m_gridAlphaSlider = nullptr;
-  SliderWithLabel* m_fovSlider = nullptr;
-  QCheckBox* m_showAxes = nullptr;
-  QComboBox* m_textureModeCombo = nullptr;
-  QCheckBox* m_enableMsaa = nullptr;
-  QComboBox* m_themeCombo = nullptr;
-  QComboBox* m_textureBrowserIconSizeCombo = nullptr;
-  QComboBox* m_rendererFontSizeCombo = nullptr;
+    QComboBox *m_layoutCombo = nullptr;
+    QCheckBox *m_link2dCameras = nullptr;
+    SliderWithLabel *m_brightnessSlider = nullptr;
+    SliderWithLabel *m_gridAlphaSlider = nullptr;
+    SliderWithLabel *m_fovSlider = nullptr;
+    QCheckBox *m_showAxes = nullptr;
+    QComboBox *m_textureModeCombo = nullptr;
+    QCheckBox *m_enableMsaa = nullptr;
+    QComboBox *m_themeCombo = nullptr;
+    QComboBox *m_textureBrowserIconSizeCombo = nullptr;
+    QComboBox *m_rendererFontSizeCombo = nullptr;
 
 public:
-  explicit ViewPreferencePane(QWidget* parent = nullptr);
+    explicit ViewPreferencePane(QWidget *parent = nullptr);
 
 private:
-  void createGui();
-  QWidget* createViewPreferences();
+    void createGui();
 
-  void bindEvents();
+    QWidget *createViewPreferences();
 
-  bool doCanResetToDefaults() override;
-  void doResetToDefaults() override;
-  void doUpdateControls() override;
-  bool doValidate() override;
+    void bindEvents();
 
-  size_t findTextureMode(int minFilter, int magFilter) const;
-  int findThemeIndex(const QString& theme);
+    bool doCanResetToDefaults() override;
+
+    void doResetToDefaults() override;
+
+    void doUpdateControls() override;
+
+    bool doValidate() override;
+
+    size_t findTextureMode(int minFilter, int magFilter) const;
+
+    int findThemeIndex(const QString &theme);
+
 private slots:
-  void layoutChanged(int index);
-  void link2dCamerasChanged(int state);
-  void brightnessChanged(int value);
-  void gridAlphaChanged(int value);
-  void fovChanged(int value);
-  void showAxesChanged(int state);
-  void enableMsaaChanged(int state);
-  void textureModeChanged(int index);
-  void themeChanged(int index);
-  void textureBrowserIconSizeChanged(int index);
-  void rendererFontSizeChanged(const QString& text);
+
+    void layoutChanged(int index);
+
+    void link2dCamerasChanged(int state);
+
+    void brightnessChanged(int value);
+
+    void gridAlphaChanged(int value);
+
+    void fovChanged(int value);
+
+    void showAxesChanged(int state);
+
+    void enableMsaaChanged(int state);
+
+    void textureModeChanged(int index);
+
+    void themeChanged(int index);
+
+    void textureBrowserIconSizeChanged(int index);
+
+    void rendererFontSizeChanged(const QString &text);
 };
 } // namespace TrenchBroom::View

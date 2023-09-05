@@ -24,9 +24,9 @@
 
 #include <string>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class File;
+
 class FileSystem;
 
 /**
@@ -35,6 +35,5 @@ class FileSystem;
  * be readily parsed and available as a virtual object file in the file system.
  */
 Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(
-  std::string shaderName, const File& file, const FileSystem& fs);
-
+    std::string shaderName, const File &file, const FileSystem &fs);
 } // namespace TrenchBroom::IO

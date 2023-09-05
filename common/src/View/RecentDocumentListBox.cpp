@@ -26,62 +26,52 @@
 
 #include <cassert>
 
-namespace TrenchBroom::View
-{
-RecentDocumentListBox::RecentDocumentListBox(QWidget* parent)
-  : ImageListBox{"No Recent Documents", true, parent}
-  , m_documentIcon{IO::loadPixmapResource("DocIcon.png")}
-{
-  auto& app = View::TrenchBroomApp::instance();
-  connect(
-    &app,
-    &TrenchBroomApp::recentDocumentsDidChange,
-    this,
-    &RecentDocumentListBox::recentDocumentsDidChange);
-  reload();
+namespace TrenchBroom::View {
+RecentDocumentListBox::RecentDocumentListBox(QWidget *parent)
+    : ImageListBox{"No Recent Documents", true, parent}, m_documentIcon{IO::loadPixmapResource("DocIcon.png")} {
+    auto &app = View::TrenchBroomApp::instance();
+    connect(
+        &app,
+        &TrenchBroomApp::recentDocumentsDidChange,
+        this,
+        &RecentDocumentListBox::recentDocumentsDidChange);
+    reload();
 }
 
-void RecentDocumentListBox::recentDocumentsDidChange()
-{
-  reload();
+void RecentDocumentListBox::recentDocumentsDidChange() {
+    reload();
 }
 
-size_t RecentDocumentListBox::itemCount() const
-{
-  const auto& app = View::TrenchBroomApp::instance();
-  return app.recentDocuments().size();
+size_t RecentDocumentListBox::itemCount() const {
+    const auto &app = View::TrenchBroomApp::instance();
+    return app.recentDocuments().size();
 }
 
-QPixmap RecentDocumentListBox::image(const size_t /* index */) const
-{
-  return m_documentIcon;
+QPixmap RecentDocumentListBox::image(const size_t /* index */) const {
+    return m_documentIcon;
 }
 
-QString RecentDocumentListBox::title(const size_t index) const
-{
-  const auto& app = View::TrenchBroomApp::instance();
-  const auto& recentDocuments = app.recentDocuments();
-  ensure(index < recentDocuments.size(), "index out of range");
-  return IO::pathAsQString(recentDocuments[index].filename());
+QString RecentDocumentListBox::title(const size_t index) const {
+    const auto &app = View::TrenchBroomApp::instance();
+    const auto &recentDocuments = app.recentDocuments();
+    ensure(index < recentDocuments.size(), "index out of range");
+    return IO::pathAsQString(recentDocuments[index].filename());
 }
 
-QString RecentDocumentListBox::subtitle(const size_t index) const
-{
-  const auto& app = View::TrenchBroomApp::instance();
-  const auto& recentDocuments = app.recentDocuments();
-  ensure(index < recentDocuments.size(), "index out of range");
-  return IO::pathAsQString(recentDocuments[index]);
+QString RecentDocumentListBox::subtitle(const size_t index) const {
+    const auto &app = View::TrenchBroomApp::instance();
+    const auto &recentDocuments = app.recentDocuments();
+    ensure(index < recentDocuments.size(), "index out of range");
+    return IO::pathAsQString(recentDocuments[index]);
 }
 
-void RecentDocumentListBox::doubleClicked(const size_t index)
-{
-  auto& app = View::TrenchBroomApp::instance();
-  const auto& recentDocuments = app.recentDocuments();
+void RecentDocumentListBox::doubleClicked(const size_t index) {
+    auto &app = View::TrenchBroomApp::instance();
+    const auto &recentDocuments = app.recentDocuments();
 
-  if (index < recentDocuments.size())
-  {
-    const auto& documentPath = recentDocuments[index];
-    emit loadRecentDocument(documentPath);
-  }
+    if (index < recentDocuments.size()) {
+        const auto &documentPath = recentDocuments[index];
+        emit loadRecentDocument(documentPath);
+    }
 }
 } // namespace TrenchBroom::View

@@ -23,18 +23,15 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class NonIntegerVerticesValidator : public Validator
-{
+namespace TrenchBroom {
+namespace Model {
+class NonIntegerVerticesValidator : public Validator {
 public:
-  NonIntegerVerticesValidator();
+    NonIntegerVerticesValidator();
 
 private:
-  void doValidate(
-    BrushNode& brushNode, std::vector<std::unique_ptr<Issue>>& issues) const override;
+    void doValidate(
+        BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

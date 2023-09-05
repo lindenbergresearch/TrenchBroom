@@ -28,97 +28,96 @@
 
 class QTimer;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class AnimationCurve
-{
+namespace TrenchBroom {
+namespace View {
+class AnimationCurve {
 public:
-  virtual ~AnimationCurve();
-  double apply(double progress) const;
+    virtual ~AnimationCurve();
+
+    double apply(double progress) const;
 
 private:
-  virtual double doApply(double progress) const = 0;
+    virtual double doApply(double progress) const = 0;
 };
 
-class FlatAnimationCurve : public AnimationCurve
-{
+class FlatAnimationCurve : public AnimationCurve {
 private:
-  double doApply(double progress) const override;
+    double doApply(double progress) const override;
 };
 
-class EaseInEaseOutAnimationCurve : public AnimationCurve
-{
+class EaseInEaseOutAnimationCurve : public AnimationCurve {
 private:
-  double m_threshold;
+    double m_threshold;
 
 public:
-  EaseInEaseOutAnimationCurve(double duration);
-  double doApply(double progress) const override;
+    EaseInEaseOutAnimationCurve(double duration);
+
+    double doApply(double progress) const override;
 };
 
-class Animation
-{
+class Animation {
 public:
-  using Type = int;
-  static const Type NoType = -1;
+    using Type = int;
+    static const Type NoType = -1;
 
-  enum class Curve
-  {
-    Flat,
-    EaseInEaseOut
-  };
+    enum class Curve {
+      Flat,
+      EaseInEaseOut
+    };
 
 private:
-  const Type m_type;
-  std::unique_ptr<AnimationCurve> m_curve;
+    const Type m_type;
+    std::unique_ptr<AnimationCurve> m_curve;
 
-  const double m_duration;
-  double m_elapsed;
-  double m_progress;
+    const double m_duration;
+    double m_elapsed;
+    double m_progress;
 
 public:
-  static Type freeType();
+    static Type freeType();
 
-  Animation(Type type, Curve curve, double duration);
-  virtual ~Animation();
+    Animation(Type type, Curve curve, double duration);
 
-  Type type() const;
-  /**
-   * Advances the animation by the given number of milliseconds.
-   * @return true if the animation is finished.
-   */
-  bool step(double deltaMilliseconds);
-  void update();
+    virtual ~Animation();
+
+    Type type() const;
+
+    /**
+     * Advances the animation by the given number of milliseconds.
+     * @return true if the animation is finished.
+     */
+    bool step(double deltaMilliseconds);
+
+    void update();
 
 private:
-  static std::unique_ptr<AnimationCurve> createAnimationCurve(
-    Curve curve, double duration);
-  virtual void doUpdate(double progress) = 0;
+    static std::unique_ptr<AnimationCurve> createAnimationCurve(
+        Curve curve, double duration);
+
+    virtual void doUpdate(double progress) = 0;
 };
 
-class AnimationManager : public QObject
-{
-  Q_OBJECT
+class AnimationManager : public QObject {
+Q_OBJECT
 private:
-  static const int AnimationUpdateRateHz;
+    static const int AnimationUpdateRateHz;
 
 private:
-  /**
-   * To measure how much time to run the animation for in onTimerTick()
-   */
-  QElapsedTimer m_elapsedTimer;
-  QTimer* m_timer;
+    /**
+     * To measure how much time to run the animation for in onTimerTick()
+     */
+    QElapsedTimer m_elapsedTimer;
+    QTimer *m_timer;
 
-  std::map<Animation::Type, std::vector<std::unique_ptr<Animation>>> m_animations;
+    std::map<Animation::Type, std::vector<std::unique_ptr<Animation>>> m_animations;
 
 public:
-  explicit AnimationManager(QObject* parent);
-  void runAnimation(std::unique_ptr<Animation> animation, bool replace);
+    explicit AnimationManager(QObject *parent);
+
+    void runAnimation(std::unique_ptr<Animation> animation, bool replace);
 
 private:
-  void onTimerTick();
+    void onTimerTick();
 };
 } // namespace View
 } // namespace TrenchBroom

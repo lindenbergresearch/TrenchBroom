@@ -24,158 +24,123 @@
 
 #include <algorithm>
 
-namespace TrenchBroom::View
-{
-MultiPaneMapView::MultiPaneMapView(QWidget* parent)
-  : MapViewContainer{parent}
-{
+namespace TrenchBroom::View {
+MultiPaneMapView::MultiPaneMapView(QWidget *parent)
+    : MapViewContainer{parent} {
 }
 
 MultiPaneMapView::~MultiPaneMapView() = default;
 
-void MultiPaneMapView::addMapView(MapView* mapView)
-{
-  ensure(mapView != nullptr, "mapView is nullptr");
-  m_mapViews.push_back(mapView);
-  mapView->setContainer(this);
+void MultiPaneMapView::addMapView(MapView *mapView) {
+    ensure(mapView != nullptr, "mapView is nullptr");
+    m_mapViews.push_back(mapView);
+    mapView->setContainer(this);
 }
 
-void MultiPaneMapView::doFlashSelection()
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->flashSelection();
-  }
+void MultiPaneMapView::doFlashSelection() {
+    for (auto *mapView: m_mapViews) {
+        mapView->flashSelection();
+    }
 }
 
 void MultiPaneMapView::doInstallActivationTracker(
-  MapViewActivationTracker& activationTracker)
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->installActivationTracker(activationTracker);
-  }
+    MapViewActivationTracker &activationTracker) {
+    for (auto *mapView: m_mapViews) {
+        mapView->installActivationTracker(activationTracker);
+    }
 }
 
-bool MultiPaneMapView::doGetIsCurrent() const
-{
-  return std::any_of(m_mapViews.begin(), m_mapViews.end(), [](auto* mapView) {
-    return mapView->isCurrent();
-  });
+bool MultiPaneMapView::doGetIsCurrent() const {
+    return std::any_of(m_mapViews.begin(), m_mapViews.end(), [](auto *mapView) {
+      return mapView->isCurrent();
+    });
 }
 
-MapViewBase* MultiPaneMapView::doGetFirstMapViewBase()
-{
-  ensure(!m_mapViews.empty(), "MultiPaneMapView empty in doGetFirstMapViewBase()");
-  return m_mapViews.front()->firstMapViewBase();
+MapViewBase *MultiPaneMapView::doGetFirstMapViewBase() {
+    ensure(!m_mapViews.empty(), "MultiPaneMapView empty in doGetFirstMapViewBase()");
+    return m_mapViews.front()->firstMapViewBase();
 }
 
-bool MultiPaneMapView::doCanSelectTall()
-{
-  return currentMapView() && currentMapView()->canSelectTall();
+bool MultiPaneMapView::doCanSelectTall() {
+    return currentMapView() && currentMapView()->canSelectTall();
 }
 
-void MultiPaneMapView::doSelectTall()
-{
-  if (currentMapView())
-  {
-    currentMapView()->selectTall();
-  }
+void MultiPaneMapView::doSelectTall() {
+    if (currentMapView()) {
+        currentMapView()->selectTall();
+    }
 }
 
 void MultiPaneMapView::doReset2dCameras(
-  const Renderer::Camera& masterCamera, const bool animate)
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->reset2dCameras(masterCamera, animate);
-  }
+    const Renderer::Camera &masterCamera, const bool animate) {
+    for (auto *mapView: m_mapViews) {
+        mapView->reset2dCameras(masterCamera, animate);
+    }
 }
 
-void MultiPaneMapView::doFocusCameraOnSelection(const bool animate)
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->focusCameraOnSelection(animate);
-  }
+void MultiPaneMapView::doFocusCameraOnSelection(const bool animate) {
+    for (auto *mapView: m_mapViews) {
+        mapView->focusCameraOnSelection(animate);
+    }
 }
 
 void MultiPaneMapView::doMoveCameraToPosition(
-  const vm::vec3f& position, const bool animate)
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->moveCameraToPosition(position, animate);
-  }
-}
-
-void MultiPaneMapView::doMoveCameraToCurrentTracePoint()
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->moveCameraToCurrentTracePoint();
-  }
-}
-
-bool MultiPaneMapView::doCanMaximizeCurrentView() const
-{
-  return m_maximizedView || currentMapView();
-}
-
-bool MultiPaneMapView::doCurrentViewMaximized() const
-{
-  return m_maximizedView;
-}
-
-void MultiPaneMapView::doToggleMaximizeCurrentView()
-{
-  if (m_maximizedView)
-  {
-    doRestoreViews();
-    m_maximizedView = nullptr;
-  }
-  else
-  {
-    m_maximizedView = currentMapView();
-    if (m_maximizedView)
-    {
-      doMaximizeView(m_maximizedView);
+    const vm::vec3f &position, const bool animate) {
+    for (auto *mapView: m_mapViews) {
+        mapView->moveCameraToPosition(position, animate);
     }
-  }
 }
 
-MapView* MultiPaneMapView::doGetCurrentMapView() const
-{
-  for (auto* mapView : m_mapViews)
-  {
-    if (mapView->isCurrent())
-    {
-      return mapView;
+void MultiPaneMapView::doMoveCameraToCurrentTracePoint() {
+    for (auto *mapView: m_mapViews) {
+        mapView->moveCameraToCurrentTracePoint();
     }
-  }
-  return nullptr;
 }
 
-void MultiPaneMapView::cycleChildMapView(MapView*)
-{
-  // only CyclingMapView support cycling
+bool MultiPaneMapView::doCanMaximizeCurrentView() const {
+    return m_maximizedView || currentMapView();
 }
 
-bool MultiPaneMapView::doCancelMouseDrag()
-{
-  auto result = false;
-  for (auto* mapView : m_mapViews)
-  {
-    result |= mapView->cancelMouseDrag();
-  }
-  return result;
+bool MultiPaneMapView::doCurrentViewMaximized() const {
+    return m_maximizedView;
 }
 
-void MultiPaneMapView::doRefreshViews()
-{
-  for (auto* mapView : m_mapViews)
-  {
-    mapView->refreshViews();
-  }
+void MultiPaneMapView::doToggleMaximizeCurrentView() {
+    if (m_maximizedView) {
+        doRestoreViews();
+        m_maximizedView = nullptr;
+    } else {
+        m_maximizedView = currentMapView();
+        if (m_maximizedView) {
+            doMaximizeView(m_maximizedView);
+        }
+    }
+}
+
+MapView *MultiPaneMapView::doGetCurrentMapView() const {
+    for (auto *mapView: m_mapViews) {
+        if (mapView->isCurrent()) {
+            return mapView;
+        }
+    }
+    return nullptr;
+}
+
+void MultiPaneMapView::cycleChildMapView(MapView *) {
+    // only CyclingMapView support cycling
+}
+
+bool MultiPaneMapView::doCancelMouseDrag() {
+    auto result = false;
+    for (auto *mapView: m_mapViews) {
+        result |= mapView->cancelMouseDrag();
+    }
+    return result;
+}
+
+void MultiPaneMapView::doRefreshViews() {
+    for (auto *mapView: m_mapViews) {
+        mapView->refreshViews();
+    }
 }
 } // namespace TrenchBroom::View

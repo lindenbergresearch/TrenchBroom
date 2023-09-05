@@ -25,55 +25,68 @@
 #include <vector>
 
 class QWidget;
+
 class QWidget;
 
-namespace TrenchBroom::View
-{
-class MultiPaneMapView : public MapViewContainer
-{
+namespace TrenchBroom::View {
+class MultiPaneMapView : public MapViewContainer {
 private:
-  using MapViewList = std::vector<MapView*>;
-  MapViewList m_mapViews;
-  MapView* m_maximizedView = nullptr;
+    using MapViewList = std::vector<MapView *>;
+    MapViewList m_mapViews;
+    MapView *m_maximizedView = nullptr;
 
 protected:
-  CameraLinkHelper m_linkHelper;
+    CameraLinkHelper m_linkHelper;
 
-  explicit MultiPaneMapView(QWidget* parent = nullptr);
+    explicit MultiPaneMapView(QWidget *parent = nullptr);
 
 public:
-  ~MultiPaneMapView() override;
+    ~MultiPaneMapView() override;
 
 protected:
-  void addMapView(MapView* mapView);
+    void addMapView(MapView *mapView);
 
 private: // implement ViewEffectsService interface
-  void doFlashSelection() override;
+    void doFlashSelection() override;
 
 private: // implement MapView interface
-  void doInstallActivationTracker(MapViewActivationTracker& activationTracker) override;
-  bool doGetIsCurrent() const override;
-  MapViewBase* doGetFirstMapViewBase() override;
-  bool doCanSelectTall() override;
-  void doSelectTall() override;
-  void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) override;
-  void doFocusCameraOnSelection(bool animate) override;
-  void doMoveCameraToPosition(const vm::vec3f& position, bool animate) override;
-  void doMoveCameraToCurrentTracePoint() override;
-  bool doCancelMouseDrag() override;
-  void doRefreshViews() override;
+    void doInstallActivationTracker(MapViewActivationTracker &activationTracker) override;
+
+    bool doGetIsCurrent() const override;
+
+    MapViewBase *doGetFirstMapViewBase() override;
+
+    bool doCanSelectTall() override;
+
+    void doSelectTall() override;
+
+    void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
+
+    void doFocusCameraOnSelection(bool animate) override;
+
+    void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
+
+    void doMoveCameraToCurrentTracePoint() override;
+
+    bool doCancelMouseDrag() override;
+
+    void doRefreshViews() override;
 
 private: // implement MapViewContainer interface
-  bool doCanMaximizeCurrentView() const override;
-  bool doCurrentViewMaximized() const override;
-  void doToggleMaximizeCurrentView() override;
-  MapView* doGetCurrentMapView() const override;
+    bool doCanMaximizeCurrentView() const override;
+
+    bool doCurrentViewMaximized() const override;
+
+    void doToggleMaximizeCurrentView() override;
+
+    MapView *doGetCurrentMapView() const override;
 
 public:
-  void cycleChildMapView(MapView* after) override;
+    void cycleChildMapView(MapView *after) override;
 
 private: // subclassing interface
-  virtual void doMaximizeView(MapView* view) = 0;
-  virtual void doRestoreViews() = 0;
+    virtual void doMaximizeView(MapView *view) = 0;
+
+    virtual void doRestoreViews() = 0;
 };
 } // namespace TrenchBroom::View

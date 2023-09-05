@@ -22,12 +22,9 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
-namespace ColorRange
-{
+namespace TrenchBroom {
+namespace Assets {
+namespace ColorRange {
 using Type = int;
 static const Type Unset = 0;
 static const Type Float = 1;
@@ -35,7 +32,8 @@ static const Type Byte = 2;
 static const Type Mixed = Float | Byte;
 } // namespace ColorRange
 
-ColorRange::Type detectColorRange(const std::string& str);
-ColorRange::Type detectColorRange(const std::vector<std::string>& components);
+ColorRange::Type detectColorRange(const std::string &str);
+
+ColorRange::Type detectColorRange(const std::vector<std::string> &components);
 } // namespace Assets
 } // namespace TrenchBroom

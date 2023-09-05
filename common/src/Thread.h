@@ -19,7 +19,6 @@
 
 #pragma once
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 bool isMainThread();
 }

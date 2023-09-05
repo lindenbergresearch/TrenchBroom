@@ -34,66 +34,62 @@ struct aiNode;
 struct aiScene;
 struct aiMesh;
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace IO
-{
+namespace IO {
 class FileSystem;
 
-struct AssimpFace
-{
+struct AssimpFace {
   size_t m_material;
   std::vector<size_t> m_vertices;
+
   AssimpFace(size_t material, std::vector<size_t> vertices)
-    : m_material{material}
-    , m_vertices{std::move(vertices)}
-  {
+      : m_material{material}, m_vertices{std::move(vertices)} {
   }
 };
 
-struct AssimpVertex
-{
+struct AssimpVertex {
   size_t m_position;
   vm::vec2f m_texcoords;
-  AssimpVertex(size_t position, const vm::vec2f& texcoords)
-    : m_position{position}
-    , m_texcoords{texcoords}
-  {
+
+  AssimpVertex(size_t position, const vm::vec2f &texcoords)
+      : m_position{position}, m_texcoords{texcoords} {
   }
 };
 
-class AssimpParser : public EntityModelParser
-{
+class AssimpParser : public EntityModelParser {
 private:
-  std::filesystem::path m_path;
-  const FileSystem& m_fs;
+    std::filesystem::path m_path;
+    const FileSystem &m_fs;
 
-  std::vector<vm::vec3f> m_positions;
-  std::vector<AssimpVertex> m_vertices;
-  std::vector<AssimpFace> m_faces;
-  std::vector<Assets::Texture> m_textures;
+    std::vector<vm::vec3f> m_positions;
+    std::vector<AssimpVertex> m_vertices;
+    std::vector<AssimpFace> m_faces;
+    std::vector<Assets::Texture> m_textures;
 
 public:
-  AssimpParser(std::filesystem::path path, const FileSystem& fs);
+    AssimpParser(std::filesystem::path path, const FileSystem &fs);
 
-  static bool canParse(const std::filesystem::path& path);
+    static bool canParse(const std::filesystem::path &path);
 
 private:
-  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger& logger) override;
-  void processNode(
-    const aiNode& node,
-    const aiScene& scene,
-    const aiMatrix4x4& transform,
-    const aiMatrix4x4& axisTransform);
-  void processMesh(
-    const aiMesh& mesh, const aiMatrix4x4& transform, const aiMatrix4x4& axisTransform);
-  void processMaterials(const aiScene& scene, Logger& logger);
-  static aiMatrix4x4 get_axis_transform(const aiScene& scene);
+    std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
+
+    void processNode(
+        const aiNode &node,
+        const aiScene &scene,
+        const aiMatrix4x4 &transform,
+        const aiMatrix4x4 &axisTransform);
+
+    void processMesh(
+        const aiMesh &mesh, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform);
+
+    void processMaterials(const aiScene &scene, Logger &logger);
+
+    static aiMatrix4x4 get_axis_transform(const aiScene &scene);
 };
 } // namespace IO
 } // namespace TrenchBroom

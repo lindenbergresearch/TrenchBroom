@@ -27,29 +27,32 @@
 #include <string>
 #include <unordered_map>
 
-namespace TrenchBroom::Renderer
-{
+namespace TrenchBroom::Renderer {
 class ShaderConfig;
 
-class ShaderManager
-{
+class ShaderManager {
 private:
-  friend class ShaderProgram;
-  using ShaderCache = std::unordered_map<std::string, Shader>;
-  using ShaderProgramCache = std::unordered_map<std::string, ShaderProgram>;
+    friend class ShaderProgram;
 
-  ShaderCache m_shaders;
-  ShaderProgramCache m_programs;
-  ShaderProgram* m_currentProgram{nullptr};
+    using ShaderCache = std::unordered_map<std::string, Shader>;
+    using ShaderProgramCache = std::unordered_map<std::string, ShaderProgram>;
+
+    ShaderCache m_shaders;
+    ShaderProgramCache m_programs;
+    ShaderProgram *m_currentProgram{nullptr};
 
 public:
-  Result<void> loadProgram(const ShaderConfig& config);
-  ShaderProgram& program(const ShaderConfig& config);
-  ShaderProgram* currentProgram();
+    Result<void> loadProgram(const ShaderConfig &config);
+
+    ShaderProgram &program(const ShaderConfig &config);
+
+    ShaderProgram *currentProgram();
 
 private:
-  void setCurrentProgram(ShaderProgram* program);
-  Result<ShaderProgram> createProgram(const ShaderConfig& config);
-  Result<std::reference_wrapper<Shader>> loadShader(const std::string& name, GLenum type);
+    void setCurrentProgram(ShaderProgram *program);
+
+    Result<ShaderProgram> createProgram(const ShaderConfig &config);
+
+    Result<std::reference_wrapper<Shader>> loadShader(const std::string &name, GLenum type);
 };
 } // namespace TrenchBroom::Renderer

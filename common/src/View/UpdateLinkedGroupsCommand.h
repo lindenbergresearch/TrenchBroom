@@ -26,27 +26,26 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class GroupNode;
+
 class Node;
 } // namespace Model
 
-namespace View
-{
-class UpdateLinkedGroupsCommand : public UpdateLinkedGroupsCommandBase
-{
+namespace View {
+class UpdateLinkedGroupsCommand : public UpdateLinkedGroupsCommandBase {
 public:
-  UpdateLinkedGroupsCommand(std::vector<Model::GroupNode*> changedLinkedGroups);
-  ~UpdateLinkedGroupsCommand();
+    UpdateLinkedGroupsCommand(std::vector<Model::GroupNode *> changedLinkedGroups);
 
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-  std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+    ~UpdateLinkedGroupsCommand();
 
-  deleteCopyAndMove(UpdateLinkedGroupsCommand);
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
+
+    std::unique_ptr<CommandResult> doPerformUndo(
+        MapDocumentCommandFacade *document) override;
+
+deleteCopyAndMove(UpdateLinkedGroupsCommand);
 };
 } // namespace View
 } // namespace TrenchBroom

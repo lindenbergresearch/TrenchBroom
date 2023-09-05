@@ -25,27 +25,32 @@
 
 #include <filesystem>
 
-namespace TrenchBroom::View
-{
-class RecentDocumentListBox : public ImageListBox
-{
-  Q_OBJECT
+namespace TrenchBroom::View {
+class RecentDocumentListBox : public ImageListBox {
+Q_OBJECT
 private:
-  QPixmap m_documentIcon;
+    QPixmap m_documentIcon;
 
 public:
-  explicit RecentDocumentListBox(QWidget* parent = nullptr);
+    explicit RecentDocumentListBox(QWidget *parent = nullptr);
+
 private slots:
-  void recentDocumentsDidChange();
+
+    void recentDocumentsDidChange();
 
 private:
-  size_t itemCount() const override;
-  QPixmap image(size_t index) const override;
-  QString title(size_t index) const override;
-  QString subtitle(size_t index) const override;
+    size_t itemCount() const override;
 
-  void doubleClicked(size_t index) override;
+    QPixmap image(size_t index) const override;
+
+    QString title(size_t index) const override;
+
+    QString subtitle(size_t index) const override;
+
+    void doubleClicked(size_t index) override;
+
 signals:
-  void loadRecentDocument(const std::filesystem::path& path);
+
+    void loadRecentDocument(const std::filesystem::path &path);
 };
 } // namespace TrenchBroom::View

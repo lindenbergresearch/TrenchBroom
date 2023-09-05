@@ -26,39 +26,39 @@
 #include <memory>
 
 class QAbstractButton;
+
 class QLineEdit;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
+
 class Selection;
 
-class MoveObjectsToolPage : public QWidget
-{
-  Q_OBJECT
+class MoveObjectsToolPage : public QWidget {
+Q_OBJECT
 private:
-  std::weak_ptr<MapDocument> m_document;
+    std::weak_ptr<MapDocument> m_document;
 
-  QLineEdit* m_offset;
-  QAbstractButton* m_button;
+    QLineEdit *m_offset;
+    QAbstractButton *m_button;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  explicit MoveObjectsToolPage(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+    explicit MoveObjectsToolPage(
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
-  void connectObservers();
+    void connectObservers();
 
-  void createGui();
-  void updateGui();
+    void createGui();
 
-  void selectionDidChange(const Selection& selection);
+    void updateGui();
 
-  void applyMove();
+    void selectionDidChange(const Selection &selection);
+
+    void applyMove();
 };
 } // namespace View
 } // namespace TrenchBroom

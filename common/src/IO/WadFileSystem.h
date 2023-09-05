@@ -24,17 +24,14 @@
 
 #include <filesystem>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class FileSystem;
 
-class WadFileSystem : public ImageFileSystem
-{
+class WadFileSystem : public ImageFileSystem {
 public:
-  using ImageFileSystem::ImageFileSystem;
+    using ImageFileSystem::ImageFileSystem;
 
 private:
-  Result<void> doReadDirectory() override;
+    Result<void> doReadDirectory() override;
 };
-
 } // namespace TrenchBroom::IO

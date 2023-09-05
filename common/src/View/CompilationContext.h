@@ -25,37 +25,36 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class MapDocument;
 
-class CompilationContext
-{
+class CompilationContext {
 private:
-  std::weak_ptr<MapDocument> m_document;
-  std::unique_ptr<EL::VariableStore> m_variables;
+    std::weak_ptr<MapDocument> m_document;
+    std::unique_ptr<EL::VariableStore> m_variables;
 
-  TextOutputAdapter m_output;
-  bool m_test;
+    TextOutputAdapter m_output;
+    bool m_test;
 
 public:
-  CompilationContext(
-    std::weak_ptr<MapDocument> document,
-    const EL::VariableStore& variables,
-    TextOutputAdapter output,
-    bool test);
+    CompilationContext(
+        std::weak_ptr<MapDocument> document,
+        const EL::VariableStore &variables,
+        TextOutputAdapter output,
+        bool test);
 
-  std::shared_ptr<MapDocument> document() const;
-  bool test() const;
+    std::shared_ptr<MapDocument> document() const;
 
-  std::string interpolate(const std::string& input) const;
-  std::string variableValue(const std::string& variableName) const;
+    bool test() const;
 
-  template <typename T>
-  CompilationContext& operator<<(const T& t)
-  {
-    m_output << t;
-    return *this;
-  }
+    std::string interpolate(const std::string &input) const;
+
+    std::string variableValue(const std::string &variableName) const;
+
+    template<typename T>
+    CompilationContext &operator<<(const T &t) {
+        m_output << t;
+        return *this;
+    }
 };
 } // namespace TrenchBroom::View

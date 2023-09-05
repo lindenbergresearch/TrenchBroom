@@ -22,70 +22,70 @@
 #include "View/RotateObjectsHandle.h"
 #include "View/ToolController.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class RenderBatch;
+
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class RotateObjectsTool;
 
-class RotateObjectsToolController : public ToolControllerGroup
-{
+class RotateObjectsToolController : public ToolControllerGroup {
 protected:
-  RotateObjectsTool& m_tool;
+    RotateObjectsTool &m_tool;
 
 protected:
-  explicit RotateObjectsToolController(RotateObjectsTool& tool);
+    explicit RotateObjectsToolController(RotateObjectsTool &tool);
 
 public:
-  ~RotateObjectsToolController() override;
+    ~RotateObjectsToolController() override;
 
 private:
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  void pick(const InputState& inputState, Model::PickResult& pickResult) override;
+    const Tool &tool() const override;
 
-  void setRenderOptions(
-    const InputState& inputState, Renderer::RenderContext& renderContext) const override;
-  void render(
-    const InputState& inputState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch) override;
+    void pick(const InputState &inputState, Model::PickResult &pickResult) override;
 
-  bool cancel() override;
+    void setRenderOptions(
+        const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+
+    void render(
+        const InputState &inputState,
+        Renderer::RenderContext &renderContext,
+        Renderer::RenderBatch &renderBatch) override;
+
+    bool cancel() override;
 
 private: // subclassing interface
-  virtual Model::Hit doPick(const InputState& inputState) = 0;
-  virtual void doRenderHandle(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) = 0;
+    virtual Model::Hit doPick(const InputState &inputState) = 0;
+
+    virtual void doRenderHandle(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) = 0;
 };
 
-class RotateObjectsToolController2D : public RotateObjectsToolController
-{
+class RotateObjectsToolController2D : public RotateObjectsToolController {
 public:
-  explicit RotateObjectsToolController2D(RotateObjectsTool& tool);
+    explicit RotateObjectsToolController2D(RotateObjectsTool &tool);
 
 private:
-  Model::Hit doPick(const InputState& inputState) override;
-  void doRenderHandle(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
+    Model::Hit doPick(const InputState &inputState) override;
+
+    void doRenderHandle(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 };
 
-class RotateObjectsToolController3D : public RotateObjectsToolController
-{
+class RotateObjectsToolController3D : public RotateObjectsToolController {
 public:
-  explicit RotateObjectsToolController3D(RotateObjectsTool& tool);
+    explicit RotateObjectsToolController3D(RotateObjectsTool &tool);
 
 private:
-  Model::Hit doPick(const InputState& inputState) override;
-  void doRenderHandle(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
+    Model::Hit doPick(const InputState &inputState) override;
+
+    void doRenderHandle(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 };
 } // namespace View
 } // namespace TrenchBroom

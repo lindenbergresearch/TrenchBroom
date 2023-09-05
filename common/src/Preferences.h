@@ -27,10 +27,8 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Preferences
-{
+namespace TrenchBroom {
+namespace Preferences {
 // NOTE: any QKeySequence preferences must be functions like CameraFly*
 // because QKeySequence docs specify that you can't create an instance before QApplication
 
@@ -40,7 +38,9 @@ namespace Preferences
 extern Preference<int> MapViewLayout;
 
 QString systemTheme();
+
 QString darkTheme();
+
 extern Preference<QString> Theme;
 
 extern Preference<bool> ShowAxes;
@@ -55,7 +55,7 @@ extern Preference<Color> PortalFileBorderColor;
 extern Preference<Color> PortalFileFillColor;
 extern Preference<bool> ShowFPS;
 
-Preference<Color>& axisColor(vm::axis::type axis);
+Preference<Color> &axisColor(vm::axis::type axis);
 
 extern Preference<Color> CompassBackgroundColor;
 extern Preference<Color> CompassBackgroundOutlineColor;
@@ -132,7 +132,8 @@ extern Preference<bool> EnableMSAA;
 extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
-Preference<std::filesystem::path>& RendererFontPath();
+Preference<std::filesystem::path> &RendererFontPath();
+
 extern Preference<int> RendererFontSize;
 
 extern Preference<int> BrowserFontSize;
@@ -165,12 +166,17 @@ extern Preference<float> CameraFlyMoveSpeed;
 
 extern Preference<bool> Link2DCameras;
 
-extern Preference<QKeySequence>& CameraFlyForward();
-extern Preference<QKeySequence>& CameraFlyBackward();
-extern Preference<QKeySequence>& CameraFlyLeft();
-extern Preference<QKeySequence>& CameraFlyRight();
-extern Preference<QKeySequence>& CameraFlyUp();
-extern Preference<QKeySequence>& CameraFlyDown();
+extern Preference<QKeySequence> &CameraFlyForward();
+
+extern Preference<QKeySequence> &CameraFlyBackward();
+
+extern Preference<QKeySequence> &CameraFlyLeft();
+
+extern Preference<QKeySequence> &CameraFlyRight();
+
+extern Preference<QKeySequence> &CameraFlyUp();
+
+extern Preference<QKeySequence> &CameraFlyDown();
 
 // Map view config
 extern Preference<bool> ShowEntityClassnames;
@@ -180,8 +186,11 @@ extern Preference<bool> ShowPointEntityBounds;
 extern Preference<bool> ShowPointEntityModels;
 
 QString faceRenderModeTextured();
+
 QString faceRenderModeFlat();
+
 QString faceRenderModeSkip();
+
 extern Preference<QString> FaceRenderMode;
 
 extern Preference<bool> ShadeFaces;
@@ -195,22 +204,28 @@ extern Preference<bool> ShowPointEntities;
 extern Preference<bool> ShowBrushes;
 
 QString entityLinkModeAll();
+
 QString entityLinkModeTransitive();
+
 QString entityLinkModeDirect();
+
 QString entityLinkModeNone();
+
 extern Preference<QString> EntityLinkMode;
 
 /**
  * Returns all Preferences declared in this file. Needed for migrating preference formats
  * or if we wanted to do a Path to Preference lookup.
  */
-const std::vector<PreferenceBase*>& staticPreferences();
-const std::map<std::filesystem::path, PreferenceBase*>& staticPreferencesMap();
+const std::vector<PreferenceBase *> &staticPreferences();
+
+const std::map<std::filesystem::path, PreferenceBase *> &staticPreferencesMap();
+
 /**
  * Returns the subset of staticPreferences() that are key sequences, used by
  * dump-shortcuts.
  */
-std::vector<Preference<QKeySequence>*> keyPreferences();
+std::vector<Preference<QKeySequence> *> keyPreferences();
 
 extern DynamicPreferencePattern<QString> GamesPath;
 extern DynamicPreferencePattern<QString> GamesToolPath;
@@ -221,6 +236,6 @@ extern DynamicPreferencePattern<QKeySequence> TagsDisable;
 extern DynamicPreferencePattern<QKeySequence> FiltersEntitiesToggleVisible;
 extern DynamicPreferencePattern<QKeySequence> EntitiesCreate;
 
-const std::vector<DynamicPreferencePatternBase*>& dynaimcPreferencePatterns();
+const std::vector<DynamicPreferencePatternBase *> &dynaimcPreferencePatterns();
 } // namespace Preferences
 } // namespace TrenchBroom

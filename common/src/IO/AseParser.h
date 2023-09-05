@@ -32,22 +32,19 @@
 #include <string_view>
 #include <vector>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class EntityModel;
+
 class Texture;
 } // namespace Assets
 
-namespace IO
-{
+namespace IO {
 class FileSystem;
 
-namespace AseToken
-{
+namespace AseToken {
 using Type = unsigned int;
 static const Type Directive = 1 << 0;    // Any directive, i.e. *SCENE
 static const Type OBrace = 1 << 1;       // opening brace: {
@@ -61,133 +58,151 @@ static const Type Colon = 1 << 8;        // colon: :
 static const Type Eof = 1 << 12;         // end of file
 } // namespace AseToken
 
-class AseTokenizer : public Tokenizer<AseToken::Type>
-{
+class AseTokenizer : public Tokenizer<AseToken::Type> {
 private:
-  static const std::string WordDelims;
+    static const std::string WordDelims;
 
 public:
-  explicit AseTokenizer(std::string_view str);
+    explicit AseTokenizer(std::string_view str);
 
 private:
-  Token emitToken() override;
+    Token emitToken() override;
 };
 
-class AseParser : public EntityModelParser, private Parser<AseToken::Type>
-{
+class AseParser : public EntityModelParser, private Parser<AseToken::Type> {
 private:
-  using Token = AseTokenizer::Token;
+    using Token = AseTokenizer::Token;
 
-  struct MeshFaceVertex
-  {
-    size_t vertexIndex = 0u;
-    size_t uvIndex = 0u;
-  };
+    struct MeshFaceVertex {
+      size_t vertexIndex = 0u;
+      size_t uvIndex = 0u;
+    };
 
-  struct MeshFace
-  {
-    std::array<MeshFaceVertex, 3> vertices;
-    size_t line = 0u;
-  };
+    struct MeshFace {
+      std::array<MeshFaceVertex, 3> vertices;
+      size_t line = 0u;
+    };
 
-  struct Mesh
-  {
-    std::vector<vm::vec3f> vertices;
-    std::vector<vm::vec2f> uv;
-    std::vector<MeshFace> faces;
-  };
+    struct Mesh {
+      std::vector<vm::vec3f> vertices;
+      std::vector<vm::vec2f> uv;
+      std::vector<MeshFace> faces;
+    };
 
-  struct GeomObject
-  {
-    std::string name;
-    Mesh mesh;
-    size_t materialIndex = 0u;
-    size_t line = 0u;
-  };
+    struct GeomObject {
+      std::string name;
+      Mesh mesh;
+      size_t materialIndex = 0u;
+      size_t line = 0u;
+    };
 
-  struct Scene
-  {
-    std::vector<std::filesystem::path> materialPaths;
-    std::vector<GeomObject> geomObjects;
-  };
+    struct Scene {
+      std::vector<std::filesystem::path> materialPaths;
+      std::vector<GeomObject> geomObjects;
+    };
 
-  std::string m_name;
-  AseTokenizer m_tokenizer;
-  const FileSystem& m_fs;
+    std::string m_name;
+    AseTokenizer m_tokenizer;
+    const FileSystem &m_fs;
 
 public:
-  /**
-   * Creates a new parser for ASE models.
-   *
-   * @param name the name of the model
-   * @param str the text to parse
-   * @param fs the file system used to load texture files
-   */
-  AseParser(std::string name, std::string_view str, const FileSystem& fs);
+    /**
+     * Creates a new parser for ASE models.
+     *
+     * @param name the name of the model
+     * @param str the text to parse
+     * @param fs the file system used to load texture files
+     */
+    AseParser(std::string name, std::string_view str, const FileSystem &fs);
 
-  static bool canParse(const std::filesystem::path& path);
+    static bool canParse(const std::filesystem::path &path);
 
 private:
-  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger& logger) override;
+    std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 
 private: // parsing
-  void parseAseFile(Logger& logger, Scene& scene);
+    void parseAseFile(Logger &logger, Scene &scene);
 
-  // SCENE
-  void parseScene(Logger& logger);
+    // SCENE
+    void parseScene(Logger &logger);
 
-  // MATERIALS
-  void parseMaterialList(Logger& logger, std::vector<std::filesystem::path>& paths);
-  void parseMaterialListMaterialCount(
-    Logger& logger, std::vector<std::filesystem::path>& paths);
-  void parseMaterialListMaterial(
-    Logger& logger, std::vector<std::filesystem::path>& paths);
-  void parseMaterialListMaterialName(Logger& logger, std::string& name);
-  void parseMaterialListMaterialMapDiffuse(Logger& logger, std::filesystem::path& path);
-  void parseMaterialListMaterialMapDiffuseBitmap(
-    Logger& logger, std::filesystem::path& path);
+    // MATERIALS
+    void parseMaterialList(Logger &logger, std::vector<std::filesystem::path> &paths);
 
-  void parseGeomObject(
-    Logger& logger,
-    GeomObject& geomObject,
-    const std::vector<std::filesystem::path>& materialPaths);
-  void parseGeomObjectNodeName(Logger& logger, GeomObject& geomObject);
-  void parseGeomObjectMaterialRef(
-    Logger& logger, GeomObject& geomObject, size_t materialCount);
-  void parseGeomObjectMesh(Logger& logger, Mesh& mesh);
-  void parseGeomObjectMeshNumVertex(Logger& logger, std::vector<vm::vec3f>& vertices);
-  void parseGeomObjectMeshVertexList(Logger& logger, std::vector<vm::vec3f>& vertices);
-  void parseGeomObjectMeshVertex(Logger& logger, std::vector<vm::vec3f>& vertices);
-  void parseGeomObjectMeshNumFaces(Logger& logger, std::vector<MeshFace>& faces);
-  void parseGeomObjectMeshFaceList(Logger& logger, std::vector<MeshFace>& faces);
-  void parseGeomObjectMeshFace(Logger& logger, std::vector<MeshFace>& faces);
-  void parseGeomObjectMeshNumTVertex(Logger& logger, std::vector<vm::vec2f>& uv);
-  void parseGeomObjectMeshTVertexList(Logger& logger, std::vector<vm::vec2f>& uv);
-  void parseGeomObjectMeshTVertex(Logger& logger, std::vector<vm::vec2f>& uv);
-  void parseGeomObjectMeshTFaceList(Logger& logger, std::vector<MeshFace>& faces);
-  void parseGeomObjectMeshTFace(Logger& logger, std::vector<MeshFace>& faces);
+    void parseMaterialListMaterialCount(
+        Logger &logger, std::vector<std::filesystem::path> &paths);
 
-  void parseBlock(const std::map<std::string, std::function<void(void)>>& handlers);
+    void parseMaterialListMaterial(
+        Logger &logger, std::vector<std::filesystem::path> &paths);
 
-  void expectDirective(const std::string& name);
-  void skipDirective(const std::string& name);
-  void skipDirective();
+    void parseMaterialListMaterialName(Logger &logger, std::string &name);
 
-  void expectArgumentName(const std::string& expected);
+    void parseMaterialListMaterialMapDiffuse(Logger &logger, std::filesystem::path &path);
 
-  void expectSizeArgument(size_t expected);
-  size_t parseSizeArgument();
-  vm::vec3f parseVecArgument();
+    void parseMaterialListMaterialMapDiffuseBitmap(
+        Logger &logger, std::filesystem::path &path);
 
-  TokenNameMap tokenNames() const override;
+    void parseGeomObject(
+        Logger &logger,
+        GeomObject &geomObject,
+        const std::vector<std::filesystem::path> &materialPaths);
+
+    void parseGeomObjectNodeName(Logger &logger, GeomObject &geomObject);
+
+    void parseGeomObjectMaterialRef(
+        Logger &logger, GeomObject &geomObject, size_t materialCount);
+
+    void parseGeomObjectMesh(Logger &logger, Mesh &mesh);
+
+    void parseGeomObjectMeshNumVertex(Logger &logger, std::vector<vm::vec3f> &vertices);
+
+    void parseGeomObjectMeshVertexList(Logger &logger, std::vector<vm::vec3f> &vertices);
+
+    void parseGeomObjectMeshVertex(Logger &logger, std::vector<vm::vec3f> &vertices);
+
+    void parseGeomObjectMeshNumFaces(Logger &logger, std::vector<MeshFace> &faces);
+
+    void parseGeomObjectMeshFaceList(Logger &logger, std::vector<MeshFace> &faces);
+
+    void parseGeomObjectMeshFace(Logger &logger, std::vector<MeshFace> &faces);
+
+    void parseGeomObjectMeshNumTVertex(Logger &logger, std::vector<vm::vec2f> &uv);
+
+    void parseGeomObjectMeshTVertexList(Logger &logger, std::vector<vm::vec2f> &uv);
+
+    void parseGeomObjectMeshTVertex(Logger &logger, std::vector<vm::vec2f> &uv);
+
+    void parseGeomObjectMeshTFaceList(Logger &logger, std::vector<MeshFace> &faces);
+
+    void parseGeomObjectMeshTFace(Logger &logger, std::vector<MeshFace> &faces);
+
+    void parseBlock(const std::map<std::string, std::function<void(void)>> &handlers);
+
+    void expectDirective(const std::string &name);
+
+    void skipDirective(const std::string &name);
+
+    void skipDirective();
+
+    void expectArgumentName(const std::string &expected);
+
+    void expectSizeArgument(size_t expected);
+
+    size_t parseSizeArgument();
+
+    vm::vec3f parseVecArgument();
+
+    TokenNameMap tokenNames() const override;
 
 private: // model construction
-  std::unique_ptr<Assets::EntityModel> buildModel(
-    Logger& logger, const Scene& scene) const;
-  bool checkIndices(Logger& logger, const MeshFace& face, const Mesh& mesh) const;
+    std::unique_ptr<Assets::EntityModel> buildModel(
+        Logger &logger, const Scene &scene) const;
 
-  Assets::Texture loadTexture(Logger& logger, const std::filesystem::path& path) const;
-  std::filesystem::path fixTexturePath(Logger& logger, std::filesystem::path path) const;
+    bool checkIndices(Logger &logger, const MeshFace &face, const Mesh &mesh) const;
+
+    Assets::Texture loadTexture(Logger &logger, const std::filesystem::path &path) const;
+
+    std::filesystem::path fixTexturePath(Logger &logger, std::filesystem::path path) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

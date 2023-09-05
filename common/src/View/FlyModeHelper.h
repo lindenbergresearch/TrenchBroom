@@ -25,48 +25,48 @@
 
 class QKeyEvent;
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Camera;
 }
 
-namespace View
-{
-class FlyModeHelper
-{
+namespace View {
+class FlyModeHelper {
 private:
-  Renderer::Camera& m_camera;
+    Renderer::Camera &m_camera;
 
-  bool m_forward;
-  bool m_backward;
-  bool m_left;
-  bool m_right;
-  bool m_up;
-  bool m_down;
-  bool m_fast;
-  bool m_slow;
+    bool m_forward;
+    bool m_backward;
+    bool m_left;
+    bool m_right;
+    bool m_up;
+    bool m_down;
+    bool m_fast;
+    bool m_slow;
 
-  int64_t m_lastPollTime;
+    int64_t m_lastPollTime;
 
 public:
-  explicit FlyModeHelper(Renderer::Camera& camera);
+    explicit FlyModeHelper(Renderer::Camera &camera);
 
-  void pollAndUpdate();
+    void pollAndUpdate();
 
 public:
-  void keyDown(QKeyEvent* event);
-  void keyUp(QKeyEvent* event);
-  /**
-   * Returns whether the camera is currently moving due to a fly key being held down.
-   */
-  bool anyKeyDown() const;
-  void resetKeys();
+    void keyDown(QKeyEvent *event);
+
+    void keyUp(QKeyEvent *event);
+
+    /**
+     * Returns whether the camera is currently moving due to a fly key being held down.
+     */
+    bool anyKeyDown() const;
+
+    void resetKeys();
 
 private:
-  vm::vec3f moveDelta(float time);
-  float moveSpeed() const;
+    vm::vec3f moveDelta(float time);
+
+    float moveSpeed() const;
 };
 } // namespace View
 } // namespace TrenchBroom

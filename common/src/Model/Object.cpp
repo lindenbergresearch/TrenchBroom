@@ -21,52 +21,43 @@
 
 #include "Model/GroupNode.h"
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 Object::Object() {}
+
 Object::~Object() {}
 
-Node* Object::container()
-{
-  return doGetContainer();
+Node *Object::container() {
+    return doGetContainer();
 }
 
-const Node* Object::container() const
-{
-  return const_cast<Object*>(this)->container();
+const Node *Object::container() const {
+    return const_cast<Object *>(this)->container();
 }
 
-LayerNode* Object::containingLayer()
-{
-  return doGetContainingLayer();
+LayerNode *Object::containingLayer() {
+    return doGetContainingLayer();
 }
 
-const LayerNode* Object::containingLayer() const
-{
-  return const_cast<Object*>(this)->containingLayer();
+const LayerNode *Object::containingLayer() const {
+    return const_cast<Object *>(this)->containingLayer();
 }
 
-GroupNode* Object::containingGroup()
-{
-  return doGetContainingGroup();
+GroupNode *Object::containingGroup() {
+    return doGetContainingGroup();
 }
 
-const GroupNode* Object::containingGroup() const
-{
-  return const_cast<Object*>(this)->containingGroup();
+const GroupNode *Object::containingGroup() const {
+    return const_cast<Object *>(this)->containingGroup();
 }
 
-bool Object::containedInGroup() const
-{
-  return containingGroup() != nullptr;
+bool Object::containedInGroup() const {
+    return containingGroup() != nullptr;
 }
 
-bool Object::containingGroupOpened() const
-{
-  const auto* group = containingGroup();
-  return group == nullptr || group->opened();
+bool Object::containingGroupOpened() const {
+    const auto *group = containingGroup();
+    return group == nullptr || group->opened();
 }
 } // namespace Model
 } // namespace TrenchBroom

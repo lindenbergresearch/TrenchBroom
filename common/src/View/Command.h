@@ -24,54 +24,52 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocumentCommandFacade;
 
-class CommandResult
-{
+class CommandResult {
 private:
-  bool m_success;
+    bool m_success;
 
 public:
-  explicit CommandResult(bool success);
-  virtual ~CommandResult();
+    explicit CommandResult(bool success);
 
-  bool success() const;
+    virtual ~CommandResult();
+
+    bool success() const;
 };
 
-class Command
-{
+class Command {
 public:
-  enum class CommandState
-  {
-    Default,
-    Doing,
-    Done,
-    Undoing
-  };
+    enum class CommandState {
+      Default,
+      Doing,
+      Done,
+      Undoing
+    };
 
 protected:
-  CommandState m_state;
-  std::string m_name;
+    CommandState m_state;
+    std::string m_name;
 
 public:
-  Command(std::string name);
-  virtual ~Command();
+    Command(std::string name);
+
+    virtual ~Command();
 
 public:
-  CommandState state() const;
-  const std::string& name() const;
+    CommandState state() const;
 
-  virtual std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade* document);
+    const std::string &name() const;
+
+    virtual std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document);
 
 private:
-  virtual std::unique_ptr<CommandResult> doPerformDo(
-    MapDocumentCommandFacade* document) = 0;
+    virtual std::unique_ptr<CommandResult> doPerformDo(
+        MapDocumentCommandFacade *document) = 0;
 
-  deleteCopyAndMove(Command);
+deleteCopyAndMove(Command);
 };
 } // namespace View
 } // namespace TrenchBroom

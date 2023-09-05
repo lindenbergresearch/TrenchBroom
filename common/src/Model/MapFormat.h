@@ -23,12 +23,9 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-enum class MapFormat
-{
+namespace TrenchBroom {
+namespace Model {
+enum class MapFormat {
   /**
    * Unknown map format.
    */
@@ -73,7 +70,7 @@ enum class MapFormat
   Quake3,
 };
 
-std::ostream& operator<<(std::ostream& lhs, MapFormat rhs);
+std::ostream &operator<<(std::ostream &lhs, MapFormat rhs);
 
 /**
  * Returns the map format enum value with the given name. If the given name is not
@@ -82,7 +79,7 @@ std::ostream& operator<<(std::ostream& lhs, MapFormat rhs);
  * @param formatName the name
  * @return the enum value
  */
-MapFormat formatFromName(const std::string& formatName);
+MapFormat formatFromName(const std::string &formatName);
 
 /**
  * Returns the name of the given map format enum value.
@@ -91,6 +88,7 @@ MapFormat formatFromName(const std::string& formatName);
  * @return the name
  */
 std::string formatName(MapFormat format);
+
 /**
  * Returns a vector starting with the given format, then the other formats which are
  * compatible with it.
@@ -99,6 +97,7 @@ std::string formatName(MapFormat format);
  * @return the preferred format, then the other compatible formats
  */
 std::vector<MapFormat> compatibleFormats(MapFormat format);
+
 bool isParallelTexCoordSystem(MapFormat format);
 } // namespace Model
 } // namespace TrenchBroom

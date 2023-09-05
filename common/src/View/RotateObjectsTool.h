@@ -28,79 +28,90 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Camera;
+
 class RenderBatch;
+
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class Grid;
+
 class MapDocument;
+
 class RotateObjectsToolPage;
 
-class RotateObjectsTool : public Tool
-{
+class RotateObjectsTool : public Tool {
 private:
-  std::weak_ptr<MapDocument> m_document;
-  RotateObjectsToolPage* m_toolPage;
-  RotateObjectsHandle m_handle;
-  double m_angle;
-  std::vector<vm::vec3> m_recentlyUsedCenters;
+    std::weak_ptr<MapDocument> m_document;
+    RotateObjectsToolPage *m_toolPage;
+    RotateObjectsHandle m_handle;
+    double m_angle;
+    std::vector<vm::vec3> m_recentlyUsedCenters;
 
 public:
-  explicit RotateObjectsTool(std::weak_ptr<MapDocument> document);
+    explicit RotateObjectsTool(std::weak_ptr<MapDocument> document);
 
-  bool doActivate() override;
+    bool doActivate() override;
 
-  const Grid& grid() const;
+    const Grid &grid() const;
 
-  void updateToolPageAxis(RotateObjectsHandle::HitArea area);
+    void updateToolPageAxis(RotateObjectsHandle::HitArea area);
 
-  double angle() const;
-  void setAngle(double angle);
+    double angle() const;
 
-  vm::vec3 rotationCenter() const;
-  void setRotationCenter(const vm::vec3& position);
-  void resetRotationCenter();
+    void setAngle(double angle);
 
-  FloatType majorHandleRadius(const Renderer::Camera& camera) const;
-  FloatType minorHandleRadius(const Renderer::Camera& camera) const;
+    vm::vec3 rotationCenter() const;
 
-  void beginRotation();
-  void commitRotation();
-  void cancelRotation();
+    void setRotationCenter(const vm::vec3 &position);
 
-  FloatType snapRotationAngle(FloatType angle) const;
-  void applyRotation(const vm::vec3& center, const vm::vec3& axis, FloatType angle);
+    void resetRotationCenter();
 
-  Model::Hit pick2D(const vm::ray3& pickRay, const Renderer::Camera& camera);
-  Model::Hit pick3D(const vm::ray3& pickRay, const Renderer::Camera& camera);
+    FloatType majorHandleRadius(const Renderer::Camera &camera) const;
 
-  vm::vec3 rotationAxis(RotateObjectsHandle::HitArea area) const;
+    FloatType minorHandleRadius(const Renderer::Camera &camera) const;
 
-  void renderHandle2D(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-  void renderHandle3D(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-  void renderHighlight2D(
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch,
-    RotateObjectsHandle::HitArea area);
-  void renderHighlight3D(
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch,
-    RotateObjectsHandle::HitArea area);
+    void beginRotation();
+
+    void commitRotation();
+
+    void cancelRotation();
+
+    FloatType snapRotationAngle(FloatType angle) const;
+
+    void applyRotation(const vm::vec3 &center, const vm::vec3 &axis, FloatType angle);
+
+    Model::Hit pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera);
+
+    Model::Hit pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera);
+
+    vm::vec3 rotationAxis(RotateObjectsHandle::HitArea area) const;
+
+    void renderHandle2D(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+
+    void renderHandle3D(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+
+    void renderHighlight2D(
+        Renderer::RenderContext &renderContext,
+        Renderer::RenderBatch &renderBatch,
+        RotateObjectsHandle::HitArea area);
+
+    void renderHighlight3D(
+        Renderer::RenderContext &renderContext,
+        Renderer::RenderBatch &renderBatch,
+        RotateObjectsHandle::HitArea area);
 
 private:
-  void updateRecentlyUsedCenters(const vm::vec3& center);
+    void updateRecentlyUsedCenters(const vm::vec3 &center);
 
 private:
-  QWidget* doCreatePage(QWidget* parent) override;
+    QWidget *doCreatePage(QWidget *parent) override;
 };
 } // namespace View
 } // namespace TrenchBroom

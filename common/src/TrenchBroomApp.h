@@ -29,84 +29,107 @@
 #include <vector>
 
 class QMenu;
+
 class QSettings;
+
 class QTimer;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace View
-{
+namespace View {
 class ExecutableEvent;
+
 class FrameManager;
+
 class RecentDocuments;
+
 class WelcomeWindow;
 
-class TrenchBroomApp : public QApplication
-{
-  Q_OBJECT
+class TrenchBroomApp : public QApplication {
+Q_OBJECT
 private:
-  std::unique_ptr<FrameManager> m_frameManager;
-  std::unique_ptr<RecentDocuments> m_recentDocuments;
-  std::unique_ptr<WelcomeWindow> m_welcomeWindow;
-  QTimer* m_recentDocumentsReloadTimer;
+    std::unique_ptr<FrameManager> m_frameManager;
+    std::unique_ptr<RecentDocuments> m_recentDocuments;
+    std::unique_ptr<WelcomeWindow> m_welcomeWindow;
+    QTimer *m_recentDocumentsReloadTimer;
 
 public:
-  static TrenchBroomApp& instance();
+    static TrenchBroomApp &instance();
 
-  TrenchBroomApp(int& argc, char** argv);
-  ~TrenchBroomApp() override;
+    TrenchBroomApp(int &argc, char **argv);
+
+    ~TrenchBroomApp() override;
 
 public:
-  void parseCommandLineAndShowFrame();
+    void parseCommandLineAndShowFrame();
 
-  FrameManager* frameManager();
+    FrameManager *frameManager();
 
 private:
-  static QPalette darkPalette();
-  bool loadStyleSheets();
-  void loadStyle();
+    static QPalette darkPalette();
+
+    bool loadStyleSheets();
+
+    void loadStyle();
 
 public:
-  const std::vector<std::filesystem::path>& recentDocuments() const;
-  void addRecentDocumentMenu(QMenu& menu);
-  void removeRecentDocumentMenu(QMenu& menu);
-  void updateRecentDocument(const std::filesystem::path& path);
+    const std::vector<std::filesystem::path> &recentDocuments() const;
 
-  bool openDocument(const std::filesystem::path& path);
-  void openPreferences();
-  void openAbout();
-  bool initializeGameFactory();
+    void addRecentDocumentMenu(QMenu &menu);
 
-  bool newDocument();
-  void openDocument();
-  void showManual();
-  void showPreferences();
-  void showAboutDialog();
-  void debugShowCrashReportDialog();
+    void removeRecentDocumentMenu(QMenu &menu);
 
-  bool notify(QObject* receiver, QEvent* event) override;
+    void updateRecentDocument(const std::filesystem::path &path);
+
+    bool openDocument(const std::filesystem::path &path);
+
+    void openPreferences();
+
+    void openAbout();
+
+    bool initializeGameFactory();
+
+    bool newDocument();
+
+    void openDocument();
+
+    void showManual();
+
+    void showPreferences();
+
+    void showAboutDialog();
+
+    void debugShowCrashReportDialog();
+
+    bool notify(QObject *receiver, QEvent *event) override;
 
 #ifdef __APPLE__
-  bool event(QEvent* event) override;
+
+    bool event(QEvent *event) override;
+
 #endif
-  void openFilesOrWelcomeFrame(const QStringList& fileNames);
+
+    void openFilesOrWelcomeFrame(const QStringList &fileNames);
 
 public:
-  void showWelcomeWindow();
-  void closeWelcomeWindow();
+    void showWelcomeWindow();
+
+    void closeWelcomeWindow();
 
 private:
-  static bool useSDI();
+    static bool useSDI();
+
 signals:
-  void recentDocumentsDidChange();
+
+    void recentDocumentsDidChange();
 };
 
 void setCrashReportGUIEnbled(bool guiEnabled);
-[[noreturn]] void reportCrashAndExit(
-  const std::string& stacktrace, const std::string& reason);
-bool isReportingCrash();
 
+[[noreturn]] void reportCrashAndExit(
+    const std::string &stacktrace, const std::string &reason);
+
+bool isReportingCrash();
 } // namespace View
 } // namespace TrenchBroom

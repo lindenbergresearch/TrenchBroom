@@ -26,15 +26,16 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 
 #ifndef NDEBUG
+
 // for debug builds, ensure is just an assertion
 void TrenchBroom::ensureFailed(
-  const char* /* file */,
-  const int /* line */,
-  const char* /* condition */,
-  const char* /* message */)
-{
-  assert(0);
+    const char * /* file */,
+    const int /* line */,
+    const char * /* condition */,
+    const char * /* message */) {
+    assert(0);
 }
+
 #else
 // for release builds, ensure generates a crash report
 void TrenchBroom::ensureFailed(

@@ -30,30 +30,35 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 
-class CompilationConfigParser : public ConfigParserBase
-{
+class CompilationConfigParser : public ConfigParserBase {
 public:
-  explicit CompilationConfigParser(std::string_view str, std::filesystem::path path = {});
+    explicit CompilationConfigParser(std::string_view str, std::filesystem::path path = {});
 
-  Model::CompilationConfig parse();
+    Model::CompilationConfig parse();
 
 private:
-  std::vector<Model::CompilationProfile> parseProfiles(const EL::Value& value) const;
-  Model::CompilationProfile parseProfile(const EL::Value& value) const;
-  std::vector<Model::CompilationTask> parseTasks(const EL::Value& value) const;
-  Model::CompilationTask parseTask(const EL::Value& value) const;
-  Model::CompilationExportMap parseExportTask(const EL::Value& value) const;
-  Model::CompilationCopyFiles parseCopyTask(const EL::Value& value) const;
-  Model::CompilationRenameFile parseRenameTask(const EL::Value& value) const;
-  Model::CompilationDeleteFiles parseDeleteTask(const EL::Value& value) const;
-  Model::CompilationRunTool parseToolTask(const EL::Value& value) const;
+    std::vector<Model::CompilationProfile> parseProfiles(const EL::Value &value) const;
 
-  deleteCopyAndMove(CompilationConfigParser);
+    Model::CompilationProfile parseProfile(const EL::Value &value) const;
+
+    std::vector<Model::CompilationTask> parseTasks(const EL::Value &value) const;
+
+    Model::CompilationTask parseTask(const EL::Value &value) const;
+
+    Model::CompilationExportMap parseExportTask(const EL::Value &value) const;
+
+    Model::CompilationCopyFiles parseCopyTask(const EL::Value &value) const;
+
+    Model::CompilationRenameFile parseRenameTask(const EL::Value &value) const;
+
+    Model::CompilationDeleteFiles parseDeleteTask(const EL::Value &value) const;
+
+    Model::CompilationRunTool parseToolTask(const EL::Value &value) const;
+
+deleteCopyAndMove(CompilationConfigParser);
 };
 } // namespace IO
 } // namespace TrenchBroom

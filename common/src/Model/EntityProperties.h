@@ -27,12 +27,9 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-namespace EntityPropertyKeys
-{
+namespace TrenchBroom {
+namespace Model {
+namespace EntityPropertyKeys {
 extern const std::string Classname;
 extern const std::string Origin;
 extern const std::string Wad;
@@ -66,8 +63,7 @@ extern const std::string ValveVersion;
 extern const std::string SoftMapBounds;
 } // namespace EntityPropertyKeys
 
-namespace EntityPropertyValues
-{
+namespace EntityPropertyValues {
 extern const std::string WorldspawnClassname;
 extern const std::string NoClassname;
 extern const std::string LayerClassname;
@@ -81,61 +77,70 @@ extern const std::string LayerHiddenValue;
 extern const std::string LayerOmitFromExportValue;
 } // namespace EntityPropertyValues
 
-struct EntityPropertyConfig
-{
+struct EntityPropertyConfig {
   std::optional<EL::Expression> defaultModelScaleExpression;
   bool setDefaultProperties{false};
   bool updateAnglePropertyAfterTransform{true};
 
   kdl_reflect_decl(
-    EntityPropertyConfig,
-    defaultModelScaleExpression,
-    setDefaultProperties,
-    updateAnglePropertyAfterTransform);
+      EntityPropertyConfig,
+      defaultModelScaleExpression,
+      setDefaultProperties,
+      updateAnglePropertyAfterTransform);
 };
 
 bool isNumberedProperty(std::string_view prefix, std::string_view key);
 
-class EntityProperty
-{
+class EntityProperty {
 private:
-  std::string m_key;
-  std::string m_value;
+    std::string m_key;
+    std::string m_value;
 
 public:
-  EntityProperty();
-  EntityProperty(std::string key, std::string value);
+    EntityProperty();
 
-  kdl_reflect_decl(EntityProperty, m_key, m_value);
+    EntityProperty(std::string key, std::string value);
 
-  const std::string& key() const;
-  const std::string& value() const;
+    kdl_reflect_decl(EntityProperty, m_key, m_value);
 
-  bool hasKey(std::string_view key) const;
-  bool hasValue(std::string_view value) const;
-  bool hasKeyAndValue(std::string_view key, std::string_view value) const;
-  bool hasPrefix(std::string_view prefix) const;
-  bool hasPrefixAndValue(std::string_view prefix, std::string_view value) const;
-  bool hasNumberedPrefix(std::string_view prefix) const;
-  bool hasNumberedPrefixAndValue(std::string_view prefix, std::string_view value) const;
+    const std::string &key() const;
 
-  void setKey(std::string key);
-  void setValue(std::string value);
+    const std::string &value() const;
+
+    bool hasKey(std::string_view key) const;
+
+    bool hasValue(std::string_view value) const;
+
+    bool hasKeyAndValue(std::string_view key, std::string_view value) const;
+
+    bool hasPrefix(std::string_view prefix) const;
+
+    bool hasPrefixAndValue(std::string_view prefix, std::string_view value) const;
+
+    bool hasNumberedPrefix(std::string_view prefix) const;
+
+    bool hasNumberedPrefixAndValue(std::string_view prefix, std::string_view value) const;
+
+    void setKey(std::string key);
+
+    void setValue(std::string value);
 };
 
-bool isLayer(const std::string& classname, const std::vector<EntityProperty>& properties);
-bool isGroup(const std::string& classname, const std::vector<EntityProperty>& properties);
-bool isWorldspawn(const std::string& classname);
+bool isLayer(const std::string &classname, const std::vector<EntityProperty> &properties);
+
+bool isGroup(const std::string &classname, const std::vector<EntityProperty> &properties);
+
+bool isWorldspawn(const std::string &classname);
 
 std::vector<EntityProperty>::const_iterator findEntityProperty(
-  const std::vector<EntityProperty>& properties, const std::string& key);
+    const std::vector<EntityProperty> &properties, const std::string &key);
+
 std::vector<EntityProperty>::iterator findEntityProperty(
-  std::vector<EntityProperty>& properties, const std::string& key);
+    std::vector<EntityProperty> &properties, const std::string &key);
 
-const std::string& findEntityPropertyOrDefault(
-  const std::vector<EntityProperty>& properties,
-  const std::string& key,
-  const std::string& defaultValue = EntityPropertyValues::DefaultValue);
-
+const std::string &findEntityPropertyOrDefault(
+    const std::vector<EntityProperty> &properties,
+    const std::string &key,
+    const std::string &defaultValue = EntityPropertyValues::DefaultValue);
 } // namespace Model
 } // namespace TrenchBroom

@@ -25,36 +25,36 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class DragTracker;
+
 class MapDocument;
+
 class UVViewHelper;
 
-class UVShearTool : public ToolController, public Tool
-{
+class UVShearTool : public ToolController, public Tool {
 private:
-  static const Model::HitType::Type XHandleHitType;
-  static const Model::HitType::Type YHandleHitType;
+    static const Model::HitType::Type XHandleHitType;
+    static const Model::HitType::Type YHandleHitType;
 
 private:
-  std::weak_ptr<MapDocument> m_document;
-  UVViewHelper& m_helper;
+    std::weak_ptr<MapDocument> m_document;
+    UVViewHelper &m_helper;
 
 public:
-  UVShearTool(std::weak_ptr<MapDocument> document, UVViewHelper& helper);
+    UVShearTool(std::weak_ptr<MapDocument> document, UVViewHelper &helper);
 
 private:
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  void pick(const InputState& inputState, Model::PickResult& pickResult) override;
+    const Tool &tool() const override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
+    void pick(const InputState &inputState, Model::PickResult &pickResult) override;
 
-  bool cancel() override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+
+    bool cancel() override;
 };
 } // namespace View
 } // namespace TrenchBroom

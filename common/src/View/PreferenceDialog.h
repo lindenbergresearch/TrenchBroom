@@ -24,51 +24,56 @@
 #include <memory>
 
 class QDialogButtonBox;
+
 class QStackedWidget;
+
 class QToolBar;
+
 class QWidget;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
+
 class PreferencePane;
 
-class PreferenceDialog : public QDialog
-{
-  Q_OBJECT
+class PreferenceDialog : public QDialog {
+Q_OBJECT
 private:
-  typedef enum
-  {
-    PrefPane_First = 0,
-    PrefPane_Games = 0,
-    PrefPane_View = 1,
-    PrefPane_Colors = 2,
-    PrefPane_Mouse = 3,
-    PrefPane_Keyboard = 4,
-    PrefPane_Last = 4
-  } PrefPane;
+    typedef enum {
+      PrefPane_First = 0,
+      PrefPane_Games = 0,
+      PrefPane_View = 1,
+      PrefPane_Colors = 2,
+      PrefPane_Mouse = 3,
+      PrefPane_Keyboard = 4,
+      PrefPane_Last = 4
+    } PrefPane;
 
-  std::shared_ptr<MapDocument> m_document;
-  QToolBar* m_toolBar;
-  QStackedWidget* m_stackedWidget;
-  QDialogButtonBox* m_buttonBox;
+    std::shared_ptr<MapDocument> m_document;
+    QToolBar *m_toolBar;
+    QStackedWidget *m_stackedWidget;
+    QDialogButtonBox *m_buttonBox;
 
 public:
-  explicit PreferenceDialog(
-    std::shared_ptr<MapDocument> document, QWidget* parent = nullptr);
+    explicit PreferenceDialog(
+        std::shared_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 protected: // QWidget overrides
-  void closeEvent(QCloseEvent* event) override;
-  bool eventFilter(QObject* o, QEvent* e) override;
+    void closeEvent(QCloseEvent *event) override;
+
+    bool eventFilter(QObject *o, QEvent *e) override;
 
 private:
-  void createGui();
-  void switchToPane(PrefPane pane);
-  PreferencePane* currentPane() const;
+    void createGui();
+
+    void switchToPane(PrefPane pane);
+
+    PreferencePane *currentPane() const;
+
 private slots:
-  void resetToDefaults();
+
+    void resetToDefaults();
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -24,35 +24,35 @@
 
 class QLabel;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class ElidedLabel : public QWidget
-{
+namespace TrenchBroom {
+namespace View {
+class ElidedLabel : public QWidget {
 private:
-  QLabel* m_label;
-  Qt::TextElideMode m_elideMode;
-  QString m_fullText;
-  QString m_elidedText;
+    QLabel *m_label;
+    Qt::TextElideMode m_elideMode;
+    QString m_fullText;
+    QString m_elidedText;
 
 public:
-  ElidedLabel(
-    const QString& text, Qt::TextElideMode elideMode, QWidget* parent = nullptr);
-  explicit ElidedLabel(Qt::TextElideMode elideMode, QWidget* parent = nullptr);
+    ElidedLabel(
+        const QString &text, Qt::TextElideMode elideMode, QWidget *parent = nullptr);
 
-  const QString& text() const;
+    explicit ElidedLabel(Qt::TextElideMode elideMode, QWidget *parent = nullptr);
+
+    const QString &text() const;
+
 public slots:
-  void setText(const QString& text);
+
+    void setText(const QString &text);
 
 private:
-  void updateElidedText(int width);
+    void updateElidedText(int width);
 
 public:
-  QSize minimumSizeHint() const override;
+    QSize minimumSizeHint() const override;
 
 protected:
-  void resizeEvent(QResizeEvent* event) override;
+    void resizeEvent(QResizeEvent *event) override;
 };
 } // namespace View
 } // namespace TrenchBroom

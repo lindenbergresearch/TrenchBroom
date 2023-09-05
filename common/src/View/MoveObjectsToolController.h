@@ -21,29 +21,29 @@
 
 #include "View/ToolController.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class DragTracker;
+
 class MoveObjectsTool;
 
-class MoveObjectsToolController : public ToolController
-{
+class MoveObjectsToolController : public ToolController {
 private:
-  MoveObjectsTool& m_tool;
+    MoveObjectsTool &m_tool;
 
 public:
-  MoveObjectsToolController(MoveObjectsTool& tool);
-  virtual ~MoveObjectsToolController() override;
+    MoveObjectsToolController(MoveObjectsTool &tool);
+
+    virtual ~MoveObjectsToolController() override;
 
 private:
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
+    const Tool &tool() const override;
 
-  bool cancel() override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+
+    bool cancel() override;
 };
 } // namespace View
 } // namespace TrenchBroom

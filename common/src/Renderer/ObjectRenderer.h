@@ -27,95 +27,110 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Color;
+
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class EntityModelManager;
 }
 
-namespace Model
-{
+namespace Model {
 class BrushNode;
+
 class EditorContext;
+
 class EntityNode;
+
 class GroupNode;
+
 class Node;
+
 class PatchNode;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class FontManager;
+
 class RenderBatch;
 
-class ObjectRenderer
-{
+class ObjectRenderer {
 private:
-  GroupRenderer m_groupRenderer;
-  EntityRenderer m_entityRenderer;
-  BrushRenderer m_brushRenderer;
-  PatchRenderer m_patchRenderer;
+    GroupRenderer m_groupRenderer;
+    EntityRenderer m_entityRenderer;
+    BrushRenderer m_brushRenderer;
+    PatchRenderer m_patchRenderer;
 
 public:
-  template <typename BrushFilterT>
-  ObjectRenderer(
-    Logger& logger,
-    Assets::EntityModelManager& entityModelManager,
-    const Model::EditorContext& editorContext,
-    const BrushFilterT& brushFilter)
-    : m_groupRenderer{editorContext}
-    , m_entityRenderer{logger, entityModelManager, editorContext}
-    , m_brushRenderer{brushFilter}
-    , m_patchRenderer{editorContext}
-  {
-  }
+    template<typename BrushFilterT>
+    ObjectRenderer(
+        Logger &logger,
+        Assets::EntityModelManager &entityModelManager,
+        const Model::EditorContext &editorContext,
+        const BrushFilterT &brushFilter)
+        : m_groupRenderer{editorContext}, m_entityRenderer{logger, entityModelManager, editorContext},
+          m_brushRenderer{brushFilter}, m_patchRenderer{editorContext} {
+    }
 
 public: // object management
-  void addNode(Model::Node* node);
-  void removeNode(Model::Node* node);
-  void invalidateNode(Model::Node* node);
-  void invalidate();
-  void clear();
-  void reloadModels();
+    void addNode(Model::Node *node);
+
+    void removeNode(Model::Node *node);
+
+    void invalidateNode(Model::Node *node);
+
+    void invalidate();
+
+    void clear();
+
+    void reloadModels();
 
 public: // configuration
-  void setShowOverlays(bool showOverlays);
-  void setEntityOverlayTextColor(const Color& overlayTextColor);
-  void setGroupOverlayTextColor(const Color& overlayTextColor);
-  void setOverlayBackgroundColor(const Color& overlayBackgroundColor);
+    void setShowOverlays(bool showOverlays);
 
-  void setTint(bool tint);
-  void setTintColor(const Color& tintColor);
+    void setEntityOverlayTextColor(const Color &overlayTextColor);
 
-  void setShowOccludedObjects(bool showOccludedObjects);
-  void setOccludedEdgeColor(const Color& occludedEdgeColor);
+    void setGroupOverlayTextColor(const Color &overlayTextColor);
 
-  void setTransparencyAlpha(float transparencyAlpha);
+    void setOverlayBackgroundColor(const Color &overlayBackgroundColor);
 
-  void setShowEntityAngles(bool showAngles);
-  void setEntityAngleColor(const Color& color);
+    void setTint(bool tint);
 
-  void setOverrideGroupColors(bool overrideGroupColors);
-  void setGroupBoundsColor(const Color& color);
+    void setTintColor(const Color &tintColor);
 
-  void setOverrideEntityBoundsColor(bool overrideEntityBoundsColor);
-  void setEntityBoundsColor(const Color& color);
+    void setShowOccludedObjects(bool showOccludedObjects);
 
-  void setShowBrushEdges(bool showBrushEdges);
-  void setBrushFaceColor(const Color& brushFaceColor);
-  void setBrushEdgeColor(const Color& brushEdgeColor);
+    void setOccludedEdgeColor(const Color &occludedEdgeColor);
 
-  void setShowHiddenObjects(bool showHiddenObjects);
+    void setTransparencyAlpha(float transparencyAlpha);
+
+    void setShowEntityAngles(bool showAngles);
+
+    void setEntityAngleColor(const Color &color);
+
+    void setOverrideGroupColors(bool overrideGroupColors);
+
+    void setGroupBoundsColor(const Color &color);
+
+    void setOverrideEntityBoundsColor(bool overrideEntityBoundsColor);
+
+    void setEntityBoundsColor(const Color &color);
+
+    void setShowBrushEdges(bool showBrushEdges);
+
+    void setBrushFaceColor(const Color &brushFaceColor);
+
+    void setBrushEdgeColor(const Color &brushEdgeColor);
+
+    void setShowHiddenObjects(bool showHiddenObjects);
 
 public: // rendering
-  void renderOpaque(RenderContext& renderContext, RenderBatch& renderBatch);
-  void renderTransparent(RenderContext& renderContext, RenderBatch& renderBatch);
+    void renderOpaque(RenderContext &renderContext, RenderBatch &renderBatch);
 
-  deleteCopy(ObjectRenderer);
+    void renderTransparent(RenderContext &renderContext, RenderBatch &renderBatch);
+
+deleteCopy(ObjectRenderer);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

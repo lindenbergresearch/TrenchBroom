@@ -25,47 +25,54 @@
 #include <vector>
 
 class QColor;
+
 class QWidget;
+
 class QPushButton;
+
 class QRadioButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class ColorButton;
+
 class ColorTable;
+
 class MapDocument;
 
-class SmartColorEditor : public SmartPropertyEditor
-{
-  Q_OBJECT
+class SmartColorEditor : public SmartPropertyEditor {
+Q_OBJECT
 private:
-  static const size_t ColorHistoryCellSize = 15;
-  using wxColorList = std::vector<QColor>;
+    static const size_t ColorHistoryCellSize = 15;
+    using wxColorList = std::vector<QColor>;
 
-  QRadioButton* m_floatRadio;
-  QRadioButton* m_byteRadio;
-  ColorButton* m_colorPicker;
-  ColorTable* m_colorHistory;
+    QRadioButton *m_floatRadio;
+    QRadioButton *m_byteRadio;
+    ColorButton *m_colorPicker;
+    ColorTable *m_colorHistory;
 
 public:
-  explicit SmartColorEditor(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+    explicit SmartColorEditor(
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
-  void createGui();
-  void doUpdateVisual(const std::vector<Model::EntityNodeBase*>& nodes) override;
+    void createGui();
 
-  void updateColorRange(const std::vector<Model::EntityNodeBase*>& nodes);
-  void updateColorHistory();
+    void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
 
-  void setColor(const QColor& wxColor) const;
+    void updateColorRange(const std::vector<Model::EntityNodeBase *> &nodes);
 
-  void floatRangeRadioButtonClicked();
-  void byteRangeRadioButtonClicked();
-  void colorPickerChanged(const QColor& color);
-  void colorTableSelected(QColor color);
+    void updateColorHistory();
+
+    void setColor(const QColor &wxColor) const;
+
+    void floatRangeRadioButtonClicked();
+
+    void byteRangeRadioButtonClicked();
+
+    void colorPickerChanged(const QColor &color);
+
+    void colorTableSelected(QColor color);
 };
 } // namespace View
 } // namespace TrenchBroom

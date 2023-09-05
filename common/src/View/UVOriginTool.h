@@ -24,53 +24,51 @@
 #include "View/Tool.h"
 #include "View/ToolController.h"
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class PickResult;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderBatch;
+
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class DragTracker;
+
 class UVViewHelper;
 
-class UVOriginTool : public ToolController, public Tool
-{
+class UVOriginTool : public ToolController, public Tool {
 public:
-  static const Model::HitType::Type XHandleHitType;
-  static const Model::HitType::Type YHandleHitType;
+    static const Model::HitType::Type XHandleHitType;
+    static const Model::HitType::Type YHandleHitType;
 
-  static const FloatType MaxPickDistance;
-  static const float OriginHandleRadius;
+    static const FloatType MaxPickDistance;
+    static const float OriginHandleRadius;
 
 private:
-  UVViewHelper& m_helper;
+    UVViewHelper &m_helper;
 
 public:
-  explicit UVOriginTool(UVViewHelper& helper);
+    explicit UVOriginTool(UVViewHelper &helper);
 
 private:
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  void pick(const InputState& inputState, Model::PickResult& pickResult) override;
+    const Tool &tool() const override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
+    void pick(const InputState &inputState, Model::PickResult &pickResult) override;
 
-  void render(
-    const InputState& inputState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  bool cancel() override;
+    void render(
+        const InputState &inputState,
+        Renderer::RenderContext &renderContext,
+        Renderer::RenderBatch &renderBatch) override;
+
+    bool cancel() override;
 };
 } // namespace View
 } // namespace TrenchBroom

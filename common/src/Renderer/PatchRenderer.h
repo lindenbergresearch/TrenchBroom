@@ -28,103 +28,110 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class EditorContext;
+
 class PatchNode;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderBatch;
+
 class RenderContext;
+
 class VboManager;
 
-class PatchRenderer : public IndexedRenderable
-{
+class PatchRenderer : public IndexedRenderable {
 private:
-  const Model::EditorContext& m_editorContext;
+    const Model::EditorContext &m_editorContext;
 
-  bool m_valid = true;
-  kdl::vector_set<const Model::PatchNode*> m_patchNodes;
+    bool m_valid = true;
+    kdl::vector_set<const Model::PatchNode *> m_patchNodes;
 
-  TexturedIndexArrayRenderer m_patchMeshRenderer;
-  DirectEdgeRenderer m_edgeRenderer;
+    TexturedIndexArrayRenderer m_patchMeshRenderer;
+    DirectEdgeRenderer m_edgeRenderer;
 
-  Color m_defaultColor;
-  bool m_grayscale;
-  bool m_tint;
-  Color m_tintColor;
-  float m_alpha;
+    Color m_defaultColor;
+    bool m_grayscale;
+    bool m_tint;
+    Color m_tintColor;
+    float m_alpha;
 
-  bool m_showEdges;
-  Color m_edgeColor;
-  bool m_showOccludedEdges;
-  Color m_occludedEdgeColor;
+    bool m_showEdges;
+    Color m_edgeColor;
+    bool m_showOccludedEdges;
+    Color m_occludedEdgeColor;
 
 public:
-  explicit PatchRenderer(const Model::EditorContext& editorContext);
+    explicit PatchRenderer(const Model::EditorContext &editorContext);
 
-  void setDefaultColor(const Color& faceColor);
-  void setGrayscale(bool grayscale);
-  void setTint(bool tint);
-  void setTintColor(const Color& color);
-  void setTransparencyAlpha(float alpha);
+    void setDefaultColor(const Color &faceColor);
 
-  /**
-   * Specifies whether or not patch edges should be rendered.
-   */
-  void setShowEdges(bool showEdges);
+    void setGrayscale(bool grayscale);
 
-  /**
-   * The color to render patch edges with.
-   */
-  void setEdgeColor(const Color& edgeColor);
+    void setTint(bool tint);
 
-  /**
-   * Specifies whether or not occluded edges should be visible.
-   */
-  void setShowOccludedEdges(bool showOccludedEdges);
+    void setTintColor(const Color &color);
 
-  /**
-   * The color to render occluded edges with.
-   */
-  void setOccludedEdgeColor(const Color& occludedEdgeColor);
+    void setTransparencyAlpha(float alpha);
 
-  /**
-   * Equivalent to invalidatePatch() on all added patches.
-   */
-  void invalidate();
-  /**
-   * Equivalent to removePatch() on all added patches.
-   */
-  void clear();
+    /**
+     * Specifies whether or not patch edges should be rendered.
+     */
+    void setShowEdges(bool showEdges);
 
-  /**
-   * Adds a patch. Calling with an already-added patch is allowed, but ignored (not
-   * guaranteed to invalidate it).
-   */
-  void addPatch(const Model::PatchNode* patchNode);
-  /**
-   * Removes a patch. Calling with an unknown patch is allowed, but ignored.
-   */
-  void removePatch(const Model::PatchNode* patchNode);
-  /**
-   * Causes cached renderer data to be rebuilt for the given patch (on the next render()
-   * call).
-   */
-  void invalidatePatch(const Model::PatchNode* patchNode);
+    /**
+     * The color to render patch edges with.
+     */
+    void setEdgeColor(const Color &edgeColor);
 
-  void render(RenderContext& renderContext, RenderBatch& renderBatch);
+    /**
+     * Specifies whether or not occluded edges should be visible.
+     */
+    void setShowOccludedEdges(bool showOccludedEdges);
+
+    /**
+     * The color to render occluded edges with.
+     */
+    void setOccludedEdgeColor(const Color &occludedEdgeColor);
+
+    /**
+     * Equivalent to invalidatePatch() on all added patches.
+     */
+    void invalidate();
+
+    /**
+     * Equivalent to removePatch() on all added patches.
+     */
+    void clear();
+
+    /**
+     * Adds a patch. Calling with an already-added patch is allowed, but ignored (not
+     * guaranteed to invalidate it).
+     */
+    void addPatch(const Model::PatchNode *patchNode);
+
+    /**
+     * Removes a patch. Calling with an unknown patch is allowed, but ignored.
+     */
+    void removePatch(const Model::PatchNode *patchNode);
+
+    /**
+     * Causes cached renderer data to be rebuilt for the given patch (on the next render()
+     * call).
+     */
+    void invalidatePatch(const Model::PatchNode *patchNode);
+
+    void render(RenderContext &renderContext, RenderBatch &renderBatch);
 
 private:
-  void validate();
+    void validate();
 
 private: // implement IndexedRenderable interface
-  void prepareVerticesAndIndices(VboManager& vboManager) override;
-  void doRender(RenderContext& renderContext) override;
+    void prepareVerticesAndIndices(VboManager &vboManager) override;
+
+    void doRender(RenderContext &renderContext) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

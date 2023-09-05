@@ -23,27 +23,25 @@
 
 class QToolButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class PopupWindow;
 
-class PopupButton : public QWidget
-{
-  Q_OBJECT
+class PopupButton : public QWidget {
+Q_OBJECT
 private:
-  QToolButton* m_button;
-  PopupWindow* m_window;
+    QToolButton *m_button;
+    PopupWindow *m_window;
 
 public:
-  explicit PopupButton(const QString& caption = "", QWidget* parent = nullptr);
+    explicit PopupButton(const QString &caption = "", QWidget *parent = nullptr);
 
-  QWidget* GetPopupWindow() const;
+    QWidget *GetPopupWindow() const;
 
 private:
-  void buttonClicked(bool checked);
-  void popupVisibilityChanged(bool visible);
+    void buttonClicked(bool checked);
+
+    void popupVisibilityChanged(bool visible);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -22,13 +22,13 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom::IO::SystemPaths
-{
+namespace TrenchBroom::IO::SystemPaths {
 /**
  * Returns the directory containing the TrenchBroom executable (this will be inside the
  * .app bundle on macOS).
  */
 std::filesystem::path appDirectory();
+
 /**
  * Returns the directory where configs should be written
  * e.g. `C:\\Users\\<user>\\AppData\\Roaming\\TrenchBroom`
@@ -37,11 +37,12 @@ std::filesystem::path userDataDirectory();
 
 std::filesystem::path logFilePath();
 
-std::filesystem::path findResourceFile(const std::filesystem::path& file);
+std::filesystem::path findResourceFile(const std::filesystem::path &file);
+
 /**
  * Returns the possible search paths for the requested directory name.
  * They may or may not exist.
  */
 std::vector<std::filesystem::path> findResourceDirectories(
-  const std::filesystem::path& directory);
+    const std::filesystem::path &directory);
 } // namespace TrenchBroom::IO::SystemPaths

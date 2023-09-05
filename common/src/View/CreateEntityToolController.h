@@ -23,55 +23,51 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class CreateEntityTool;
 
-class CreateEntityToolController : public ToolController
-{
+class CreateEntityToolController : public ToolController {
 protected:
-  CreateEntityTool& m_tool;
+    CreateEntityTool &m_tool;
 
 protected:
-  CreateEntityToolController(CreateEntityTool& tool);
+    CreateEntityToolController(CreateEntityTool &tool);
 
 public:
-  virtual ~CreateEntityToolController() override;
+    virtual ~CreateEntityToolController() override;
 
 private:
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  std::unique_ptr<DropTracker> acceptDrop(
-    const InputState& inputState, const std::string& payload) override;
+    const Tool &tool() const override;
 
-  bool cancel() override;
+    std::unique_ptr<DropTracker> acceptDrop(
+        const InputState &inputState, const std::string &payload) override;
+
+    bool cancel() override;
 
 private:
-  virtual std::unique_ptr<DropTracker> createDropTracker(
-    const InputState& inputState) const = 0;
+    virtual std::unique_ptr<DropTracker> createDropTracker(
+        const InputState &inputState) const = 0;
 };
 
-class CreateEntityToolController2D : public CreateEntityToolController
-{
+class CreateEntityToolController2D : public CreateEntityToolController {
 public:
-  CreateEntityToolController2D(CreateEntityTool& tool);
+    CreateEntityToolController2D(CreateEntityTool &tool);
 
 private:
-  std::unique_ptr<DropTracker> createDropTracker(
-    const InputState& inputState) const override;
+    std::unique_ptr<DropTracker> createDropTracker(
+        const InputState &inputState) const override;
 };
 
-class CreateEntityToolController3D : public CreateEntityToolController
-{
+class CreateEntityToolController3D : public CreateEntityToolController {
 public:
-  CreateEntityToolController3D(CreateEntityTool& tool);
+    CreateEntityToolController3D(CreateEntityTool &tool);
 
 private:
-  std::unique_ptr<DropTracker> createDropTracker(
-    const InputState& inputState) const override;
+    std::unique_ptr<DropTracker> createDropTracker(
+        const InputState &inputState) const override;
 };
 } // namespace View
 } // namespace TrenchBroom

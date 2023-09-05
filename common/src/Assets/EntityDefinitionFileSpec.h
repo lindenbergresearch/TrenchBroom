@@ -25,48 +25,51 @@
 #include <filesystem>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
-class EntityDefinitionFileSpec
-{
+namespace TrenchBroom {
+namespace Assets {
+class EntityDefinitionFileSpec {
 private:
-  enum class Type
-  {
-    Builtin,
-    External,
-    Unset
-  };
+    enum class Type {
+      Builtin,
+      External,
+      Unset
+    };
 
-  Type m_type;
-  std::filesystem::path m_path;
+    Type m_type;
+    std::filesystem::path m_path;
 
 public:
-  EntityDefinitionFileSpec();
+    EntityDefinitionFileSpec();
 
-  static EntityDefinitionFileSpec parse(const std::string& str);
-  static EntityDefinitionFileSpec builtin(const std::filesystem::path& path);
-  static EntityDefinitionFileSpec external(const std::filesystem::path& path);
-  static EntityDefinitionFileSpec unset();
+    static EntityDefinitionFileSpec parse(const std::string &str);
 
-  friend bool operator<(
-    const EntityDefinitionFileSpec& lhs, const EntityDefinitionFileSpec& rhs);
-  friend bool operator==(
-    const EntityDefinitionFileSpec& lhs, const EntityDefinitionFileSpec& rhs);
-  friend bool operator!=(
-    const EntityDefinitionFileSpec& lhs, const EntityDefinitionFileSpec& rhs);
+    static EntityDefinitionFileSpec builtin(const std::filesystem::path &path);
 
-  bool valid() const;
-  bool builtin() const;
-  bool external() const;
+    static EntityDefinitionFileSpec external(const std::filesystem::path &path);
 
-  const std::filesystem::path& path() const;
+    static EntityDefinitionFileSpec unset();
 
-  std::string asString() const;
+    friend bool operator<(
+        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+
+    friend bool operator==(
+        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+
+    friend bool operator!=(
+        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+
+    bool valid() const;
+
+    bool builtin() const;
+
+    bool external() const;
+
+    const std::filesystem::path &path() const;
+
+    std::string asString() const;
 
 private:
-  EntityDefinitionFileSpec(Type type, const std::filesystem::path& path);
+    EntityDefinitionFileSpec(Type type, const std::filesystem::path &path);
 };
 } // namespace Assets
 } // namespace TrenchBroom

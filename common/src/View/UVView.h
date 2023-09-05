@@ -35,30 +35,36 @@
 
 class QWidget;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushFaceHandle;
+
 class Node;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class ActiveShader;
+
 class RenderBatch;
+
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class MapDocument;
+
 class Selection;
+
 class UVRotateTool;
+
 class UVOriginTool;
+
 class UVScaleTool;
+
 class UVShearTool;
+
 class UVOffsetTool;
+
 class UVCameraTool;
 
 /**
@@ -66,68 +72,82 @@ class UVCameraTool;
  mouse. The user can change texture offsets, scaling factors and rotation. If supported by
  the map format, the user can manipulate the texture axes as well.
  */
-class UVView : public RenderView, public ToolBoxConnector
-{
-  Q_OBJECT
+class UVView : public RenderView, public ToolBoxConnector {
+Q_OBJECT
 public:
-  static const Model::HitType::Type FaceHitType;
+    static const Model::HitType::Type FaceHitType;
 
 private:
-  std::weak_ptr<MapDocument> m_document;
+    std::weak_ptr<MapDocument> m_document;
 
-  Renderer::OrthographicCamera m_camera;
-  UVViewHelper m_helper;
+    Renderer::OrthographicCamera m_camera;
+    UVViewHelper m_helper;
 
-  ToolBox m_toolBox;
+    ToolBox m_toolBox;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  UVView(std::weak_ptr<MapDocument> document, GLContextManager& contextManager);
+    UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-  void setSubDivisions(const vm::vec2i& subDivisions);
+    void setSubDivisions(const vm::vec2i &subDivisions);
 
-  bool event(QEvent* event) override;
+    bool event(QEvent *event) override;
 
 private:
-  void createTools();
+    void createTools();
 
-  void connectObservers();
+    void connectObservers();
 
-  void selectionDidChange(const Selection& selection);
-  void documentWasCleared(MapDocument* document);
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
-  void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& faces);
-  void gridDidChange();
-  void cameraDidChange(const Renderer::Camera* camera);
-  void preferenceDidChange(const std::filesystem::path& path);
+    void selectionDidChange(const Selection &selection);
 
-  void doUpdateViewport(int x, int y, int width, int height) override;
-  void doRender() override;
-  bool doShouldRenderFocusIndicator() const override;
-  const Color& getBackgroundColor() override;
+    void documentWasCleared(MapDocument *document);
 
-  void setupGL(Renderer::RenderContext& renderContext);
+    void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  class RenderTexture;
-  void renderTexture(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
+    void brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &faces);
 
-  void renderFace(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-  void renderTextureAxes(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-  void renderToolBox(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
+    void gridDidChange();
+
+    void cameraDidChange(const Renderer::Camera *camera);
+
+    void preferenceDidChange(const std::filesystem::path &path);
+
+    void doUpdateViewport(int x, int y, int width, int height) override;
+
+    void doRender() override;
+
+    bool doShouldRenderFocusIndicator() const override;
+
+    const Color &getBackgroundColor() override;
+
+    void setupGL(Renderer::RenderContext &renderContext);
+
+    class RenderTexture;
+
+    void renderTexture(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+
+    void renderFace(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+
+    void renderTextureAxes(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+
+    void renderToolBox(
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 public: // implement InputEventProcessor interface
-  void processEvent(const KeyEvent& event) override;
-  void processEvent(const MouseEvent& event) override;
-  void processEvent(const CancelEvent& event) override;
+    void processEvent(const KeyEvent &event) override;
+
+    void processEvent(const MouseEvent &event) override;
+
+    void processEvent(const CancelEvent &event) override;
 
 private:
-  PickRequest doGetPickRequest(float x, float y) const override;
-  Model::PickResult doPick(const vm::ray3& pickRay) const override;
+    PickRequest doGetPickRequest(float x, float y) const override;
+
+    Model::PickResult doPick(const vm::ray3 &pickRay) const override;
 };
 } // namespace View
 } // namespace TrenchBroom

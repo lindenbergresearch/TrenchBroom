@@ -26,19 +26,19 @@
 #include <memory>
 
 class QAbstractButton;
+
 class QPoint;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 struct CompilationProfile;
 }
 
-namespace View
-{
+namespace View {
 class CompilationProfileListBox;
+
 class CompilationProfileEditor;
+
 class MapDocument;
 
 /**
@@ -47,44 +47,55 @@ class MapDocument;
  * The UI updates our Model::CompilationConfig m_config; calling code can
  * read the modified config with `config()` and save it to disk.
  */
-class CompilationProfileManager : public QWidget
-{
-  Q_OBJECT
+class CompilationProfileManager : public QWidget {
+Q_OBJECT
 private:
-  Model::CompilationConfig m_config;
-  CompilationProfileListBox* m_profileList{nullptr};
-  CompilationProfileEditor* m_profileEditor{nullptr};
-  QAbstractButton* m_removeProfileButton{nullptr};
+    Model::CompilationConfig m_config;
+    CompilationProfileListBox *m_profileList{nullptr};
+    CompilationProfileEditor *m_profileEditor{nullptr};
+    QAbstractButton *m_removeProfileButton{nullptr};
 
 public:
-  CompilationProfileManager(
-    std::weak_ptr<MapDocument> document,
-    Model::CompilationConfig config,
-    QWidget* parent = nullptr);
+    CompilationProfileManager(
+        std::weak_ptr<MapDocument> document,
+        Model::CompilationConfig config,
+        QWidget *parent = nullptr);
 
-  const Model::CompilationProfile* selectedProfile() const;
-  const Model::CompilationConfig& config() const;
+    const Model::CompilationProfile *selectedProfile() const;
+
+    const Model::CompilationConfig &config() const;
 
 private:
-  void updateGui();
+    void updateGui();
+
 private slots:
-  void addProfile();
-  void removeProfile();
-  void removeProfile(size_t index);
-  void removeProfile(const Model::CompilationProfile& profile);
-  void duplicateProfile(const Model::CompilationProfile& profile);
-  void profileContextMenuRequested(
-    const QPoint& globalPos, Model::CompilationProfile& profile);
-  void profileSelectionChanged();
+
+    void addProfile();
+
+    void removeProfile();
+
+    void removeProfile(size_t index);
+
+    void removeProfile(const Model::CompilationProfile &profile);
+
+    void duplicateProfile(const Model::CompilationProfile &profile);
+
+    void profileContextMenuRequested(
+        const QPoint &globalPos, Model::CompilationProfile &profile);
+
+    void profileSelectionChanged();
+
 signals:
-  /**
-   * *Which* profile is selected changed.
-   */
-  void selectedProfileChanged();
-  /**
-   * An edit was made to a profile.
-   */
-  void profileChanged();
+
+    /**
+     * *Which* profile is selected changed.
+     */
+    void selectedProfileChanged();
+
+    /**
+     * An edit was made to a profile.
+     */
+    void profileChanged();
 };
 } // namespace View
 } // namespace TrenchBroom

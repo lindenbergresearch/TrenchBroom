@@ -23,17 +23,14 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class EmptyPropertyValueValidator : public Validator
-{
+namespace TrenchBroom {
+namespace Model {
+class EmptyPropertyValueValidator : public Validator {
 public:
-  EmptyPropertyValueValidator();
+    EmptyPropertyValueValidator();
 
 private:
-  void doValidate(EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues)
+    void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues)
     const override;
 };
 } // namespace Model

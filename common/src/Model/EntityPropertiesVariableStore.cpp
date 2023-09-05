@@ -25,46 +25,37 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-EntityPropertiesVariableStore::EntityPropertiesVariableStore(const Entity& entity)
-  : m_entity{entity}
-{
+namespace TrenchBroom {
+namespace Model {
+EntityPropertiesVariableStore::EntityPropertiesVariableStore(const Entity &entity)
+    : m_entity{entity} {
 }
 
-EL::VariableStore* EntityPropertiesVariableStore::clone() const
-{
-  return new EntityPropertiesVariableStore{m_entity};
+EL::VariableStore *EntityPropertiesVariableStore::clone() const {
+    return new EntityPropertiesVariableStore{m_entity};
 }
 
-size_t EntityPropertiesVariableStore::size() const
-{
-  return m_entity.properties().size();
+size_t EntityPropertiesVariableStore::size() const {
+    return m_entity.properties().size();
 }
 
-EL::Value EntityPropertiesVariableStore::value(const std::string& name) const
-{
-  const auto* value = m_entity.property(name);
-  return value ? EL::Value{*value} : EL::Value{""};
+EL::Value EntityPropertiesVariableStore::value(const std::string &name) const {
+    const auto *value = m_entity.property(name);
+    return value ? EL::Value{*value} : EL::Value{""};
 }
 
-std::vector<std::string> EntityPropertiesVariableStore::names() const
-{
-  return m_entity.propertyKeys();
+std::vector<std::string> EntityPropertiesVariableStore::names() const {
+    return m_entity.propertyKeys();
 }
 
 void EntityPropertiesVariableStore::declare(
-  const std::string& /* name */, const EL::Value& /* value */)
-{
-  throw EL::EvaluationError{"Declaring properties directly is unsafe"};
+    const std::string & /* name */, const EL::Value & /* value */) {
+    throw EL::EvaluationError{"Declaring properties directly is unsafe"};
 }
 
 void EntityPropertiesVariableStore::assign(
-  const std::string& /* name */, const EL::Value& /* value */)
-{
-  throw EL::EvaluationError{"Changing properties directly is unsafe"};
+    const std::string & /* name */, const EL::Value & /* value */) {
+    throw EL::EvaluationError{"Changing properties directly is unsafe"};
 }
 } // namespace Model
 } // namespace TrenchBroom

@@ -25,30 +25,30 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Issue;
+
 class MapFacade;
 
-class IssueQuickFix
-{
+class IssueQuickFix {
 private:
-  using SingleIssueFix = std::function<void(MapFacade&, const Issue&)>;
-  using MultiIssueFix = std::function<void(MapFacade&, const std::vector<const Issue*>&)>;
+    using SingleIssueFix = std::function<void(MapFacade &, const Issue &)>;
+    using MultiIssueFix = std::function<void(MapFacade &, const std::vector<const Issue *> &)>;
 
-  std::string m_description;
-  MultiIssueFix m_fix;
+    std::string m_description;
+    MultiIssueFix m_fix;
 
 public:
-  IssueQuickFix(std::string description, MultiIssueFix fix);
-  IssueQuickFix(IssueType issueType, std::string description, SingleIssueFix fix);
-  virtual ~IssueQuickFix();
+    IssueQuickFix(std::string description, MultiIssueFix fix);
 
-  const std::string& description() const;
+    IssueQuickFix(IssueType issueType, std::string description, SingleIssueFix fix);
 
-  void apply(MapFacade& facade, const std::vector<const Issue*>& issues) const;
+    virtual ~IssueQuickFix();
+
+    const std::string &description() const;
+
+    void apply(MapFacade &facade, const std::vector<const Issue *> &issues) const;
 };
 
 IssueQuickFix makeDeleteNodesQuickFix();
@@ -56,10 +56,9 @@ IssueQuickFix makeDeleteNodesQuickFix();
 IssueQuickFix makeRemoveEntityPropertiesQuickFix(IssueType type);
 
 IssueQuickFix makeTransformEntityPropertiesQuickFix(
-  IssueType type,
-  std::string description,
-  std::function<std::string(const std::string&)> keyTransform,
-  std::function<std::string(const std::string&)> valueTransform);
-
+    IssueType type,
+    std::string description,
+    std::function<std::string(const std::string &)> keyTransform,
+    std::function<std::string(const std::string &)> valueTransform);
 } // namespace Model
 } // namespace TrenchBroom

@@ -21,275 +21,212 @@
 
 #include "Renderer/Camera.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 RenderContext::RenderContext(
-  const RenderMode renderMode,
-  const Camera& camera,
-  FontManager& fontManager,
-  ShaderManager& shaderManager)
-  : m_renderMode(renderMode)
-  , m_camera(camera)
-  , m_transformation(m_camera.projectionMatrix(), m_camera.viewMatrix())
-  , m_fontManager(fontManager)
-  , m_shaderManager(shaderManager)
-  , m_showTextures(true)
-  , m_showFaces(true)
-  , m_showEdges(true)
-  , m_shadeFaces(true)
-  , m_showPointEntities(true)
-  , m_showPointEntityModels(true)
-  , m_showEntityClassnames(true)
-  , m_showGroupBounds(true)
-  , m_showBrushEntityBounds(true)
-  , m_showPointEntityBounds(true)
-  , m_showFog(false)
-  , m_showGrid(true)
-  , m_gridSize(4)
-  , m_hideSelection(false)
-  , m_tintSelection(true)
-  , m_showSelectionGuide(ShowSelectionGuide::Hide)
-{
+    const RenderMode renderMode,
+    const Camera &camera,
+    FontManager &fontManager,
+    ShaderManager &shaderManager)
+    : m_renderMode(renderMode), m_camera(camera), m_transformation(m_camera.projectionMatrix(), m_camera.viewMatrix()),
+      m_fontManager(fontManager), m_shaderManager(shaderManager), m_showTextures(true), m_showFaces(true),
+      m_showEdges(true), m_shadeFaces(true), m_showPointEntities(true), m_showPointEntityModels(true),
+      m_showEntityClassnames(true), m_showGroupBounds(true), m_showBrushEntityBounds(true),
+      m_showPointEntityBounds(true), m_showFog(false), m_showGrid(true), m_gridSize(4), m_hideSelection(false),
+      m_tintSelection(true), m_showSelectionGuide(ShowSelectionGuide::Hide) {
 }
 
-bool RenderContext::render2D() const
-{
-  return m_renderMode == RenderMode::Render2D;
+bool RenderContext::render2D() const {
+    return m_renderMode == RenderMode::Render2D;
 }
 
-bool RenderContext::render3D() const
-{
-  return m_renderMode == RenderMode::Render3D;
+bool RenderContext::render3D() const {
+    return m_renderMode == RenderMode::Render3D;
 }
 
-const Camera& RenderContext::camera() const
-{
-  return m_camera;
+const Camera &RenderContext::camera() const {
+    return m_camera;
 }
 
-Transformation& RenderContext::transformation()
-{
-  return m_transformation;
+Transformation &RenderContext::transformation() {
+    return m_transformation;
 }
 
-FontManager& RenderContext::fontManager()
-{
-  return m_fontManager;
+FontManager &RenderContext::fontManager() {
+    return m_fontManager;
 }
 
-ShaderManager& RenderContext::shaderManager()
-{
-  return m_shaderManager;
+ShaderManager &RenderContext::shaderManager() {
+    return m_shaderManager;
 }
 
-bool RenderContext::showTextures() const
-{
-  return m_showTextures;
+bool RenderContext::showTextures() const {
+    return m_showTextures;
 }
 
-void RenderContext::setShowTextures(const bool showTextures)
-{
-  m_showTextures = showTextures;
+void RenderContext::setShowTextures(const bool showTextures) {
+    m_showTextures = showTextures;
 }
 
-bool RenderContext::showFaces() const
-{
-  return m_renderMode == RenderMode::Render3D && m_showFaces;
+bool RenderContext::showFaces() const {
+    return m_renderMode == RenderMode::Render3D && m_showFaces;
 }
 
-void RenderContext::setShowFaces(const bool showFaces)
-{
-  m_showFaces = showFaces;
+void RenderContext::setShowFaces(const bool showFaces) {
+    m_showFaces = showFaces;
 }
 
-bool RenderContext::showEdges() const
-{
-  return m_renderMode == RenderMode::Render2D || m_showEdges;
+bool RenderContext::showEdges() const {
+    return m_renderMode == RenderMode::Render2D || m_showEdges;
 }
 
-void RenderContext::setShowEdges(const bool showEdges)
-{
-  m_showEdges = showEdges;
+void RenderContext::setShowEdges(const bool showEdges) {
+    m_showEdges = showEdges;
 }
 
-bool RenderContext::shadeFaces() const
-{
-  return m_shadeFaces;
+bool RenderContext::shadeFaces() const {
+    return m_shadeFaces;
 }
 
-void RenderContext::setShadeFaces(const bool shadeFaces)
-{
-  m_shadeFaces = shadeFaces;
+void RenderContext::setShadeFaces(const bool shadeFaces) {
+    m_shadeFaces = shadeFaces;
 }
 
-bool RenderContext::showPointEntities() const
-{
-  return m_showPointEntities;
+bool RenderContext::showPointEntities() const {
+    return m_showPointEntities;
 }
 
-void RenderContext::setShowPointEntities(const bool showPointEntities)
-{
-  m_showPointEntities = showPointEntities;
+void RenderContext::setShowPointEntities(const bool showPointEntities) {
+    m_showPointEntities = showPointEntities;
 }
 
-bool RenderContext::showPointEntityModels() const
-{
-  return m_showPointEntityModels;
+bool RenderContext::showPointEntityModels() const {
+    return m_showPointEntityModels;
 }
 
-void RenderContext::setShowPointEntityModels(const bool showPointEntityModels)
-{
-  m_showPointEntityModels = showPointEntityModels;
+void RenderContext::setShowPointEntityModels(const bool showPointEntityModels) {
+    m_showPointEntityModels = showPointEntityModels;
 }
 
-bool RenderContext::showEntityClassnames() const
-{
-  return m_showEntityClassnames;
+bool RenderContext::showEntityClassnames() const {
+    return m_showEntityClassnames;
 }
 
-void RenderContext::setShowEntityClassnames(const bool showEntityClassnames)
-{
-  m_showEntityClassnames = showEntityClassnames;
+void RenderContext::setShowEntityClassnames(const bool showEntityClassnames) {
+    m_showEntityClassnames = showEntityClassnames;
 }
 
-bool RenderContext::showGroupBounds() const
-{
-  return m_showGroupBounds;
+bool RenderContext::showGroupBounds() const {
+    return m_showGroupBounds;
 }
 
-void RenderContext::setShowGroupBounds(const bool showGroupBounds)
-{
-  m_showGroupBounds = showGroupBounds;
+void RenderContext::setShowGroupBounds(const bool showGroupBounds) {
+    m_showGroupBounds = showGroupBounds;
 }
 
-bool RenderContext::showBrushEntityBounds() const
-{
-  return m_showBrushEntityBounds;
+bool RenderContext::showBrushEntityBounds() const {
+    return m_showBrushEntityBounds;
 }
 
-void RenderContext::setShowBrushEntityBounds(const bool showBrushEntityBounds)
-{
-  m_showBrushEntityBounds = showBrushEntityBounds;
+void RenderContext::setShowBrushEntityBounds(const bool showBrushEntityBounds) {
+    m_showBrushEntityBounds = showBrushEntityBounds;
 }
 
-bool RenderContext::showPointEntityBounds() const
-{
-  return m_showPointEntityBounds;
+bool RenderContext::showPointEntityBounds() const {
+    return m_showPointEntityBounds;
 }
 
-void RenderContext::setShowPointEntityBounds(const bool showPointEntityBounds)
-{
-  m_showPointEntityBounds = showPointEntityBounds;
+void RenderContext::setShowPointEntityBounds(const bool showPointEntityBounds) {
+    m_showPointEntityBounds = showPointEntityBounds;
 }
 
-bool RenderContext::showFog() const
-{
-  return m_showFog;
+bool RenderContext::showFog() const {
+    return m_showFog;
 }
 
-void RenderContext::setShowFog(const bool showFog)
-{
-  m_showFog = showFog;
+void RenderContext::setShowFog(const bool showFog) {
+    m_showFog = showFog;
 }
 
-bool RenderContext::showGrid() const
-{
-  return m_showGrid;
+bool RenderContext::showGrid() const {
+    return m_showGrid;
 }
 
-void RenderContext::setShowGrid(const bool showGrid)
-{
-  m_showGrid = showGrid;
+void RenderContext::setShowGrid(const bool showGrid) {
+    m_showGrid = showGrid;
 }
 
-FloatType RenderContext::gridSize() const
-{
-  return m_gridSize;
+FloatType RenderContext::gridSize() const {
+    return m_gridSize;
 }
 
-void RenderContext::setGridSize(const FloatType gridSize)
-{
-  m_gridSize = gridSize;
+void RenderContext::setGridSize(const FloatType gridSize) {
+    m_gridSize = gridSize;
 }
 
-const vm::bbox3f& RenderContext::softMapBounds() const
-{
-  return m_sofMapBounds;
+const vm::bbox3f &RenderContext::softMapBounds() const {
+    return m_sofMapBounds;
 }
 
-void RenderContext::setSoftMapBounds(const vm::bbox3f& softMapBounds)
-{
-  m_sofMapBounds = softMapBounds;
+void RenderContext::setSoftMapBounds(const vm::bbox3f &softMapBounds) {
+    m_sofMapBounds = softMapBounds;
 }
 
-bool RenderContext::hideSelection() const
-{
-  return m_hideSelection;
+bool RenderContext::hideSelection() const {
+    return m_hideSelection;
 }
 
-void RenderContext::setHideSelection()
-{
-  m_hideSelection = true;
+void RenderContext::setHideSelection() {
+    m_hideSelection = true;
 }
 
-bool RenderContext::tintSelection() const
-{
-  return m_tintSelection;
+bool RenderContext::tintSelection() const {
+    return m_tintSelection;
 }
 
-void RenderContext::clearTintSelection()
-{
-  m_tintSelection = false;
+void RenderContext::clearTintSelection() {
+    m_tintSelection = false;
 }
 
-bool RenderContext::showSelectionGuide() const
-{
-  return m_showSelectionGuide == ShowSelectionGuide::Show
-         || m_showSelectionGuide == ShowSelectionGuide::ForceShow;
+bool RenderContext::showSelectionGuide() const {
+    return m_showSelectionGuide == ShowSelectionGuide::Show
+           || m_showSelectionGuide == ShowSelectionGuide::ForceShow;
 }
 
-void RenderContext::setShowSelectionGuide()
-{
-  setShowSelectionGuide(ShowSelectionGuide::Show);
+void RenderContext::setShowSelectionGuide() {
+    setShowSelectionGuide(ShowSelectionGuide::Show);
 }
 
-void RenderContext::setHideSelectionGuide()
-{
-  setShowSelectionGuide(ShowSelectionGuide::Hide);
+void RenderContext::setHideSelectionGuide() {
+    setShowSelectionGuide(ShowSelectionGuide::Hide);
 }
 
-void RenderContext::setForceShowSelectionGuide()
-{
-  setShowSelectionGuide(ShowSelectionGuide::ForceShow);
+void RenderContext::setForceShowSelectionGuide() {
+    setShowSelectionGuide(ShowSelectionGuide::ForceShow);
 }
 
-void RenderContext::setForceHideSelectionGuide()
-{
-  setShowSelectionGuide(ShowSelectionGuide::ForceHide);
+void RenderContext::setForceHideSelectionGuide() {
+    setShowSelectionGuide(ShowSelectionGuide::ForceHide);
 }
 
-void RenderContext::setShowSelectionGuide(const ShowSelectionGuide showSelectionGuide)
-{
-  switch (showSelectionGuide)
-  {
-  case ShowSelectionGuide::Show:
-    if (m_showSelectionGuide == ShowSelectionGuide::Hide)
-      m_showSelectionGuide = ShowSelectionGuide::Show;
-    break;
-  case ShowSelectionGuide::Hide:
-    if (m_showSelectionGuide == ShowSelectionGuide::Show)
-      m_showSelectionGuide = ShowSelectionGuide::Hide;
-    break;
-  case ShowSelectionGuide::ForceShow:
-    m_showSelectionGuide = ShowSelectionGuide::ForceShow;
-    break;
-  case ShowSelectionGuide::ForceHide:
-    if (m_showSelectionGuide != ShowSelectionGuide::ForceShow)
-      m_showSelectionGuide = ShowSelectionGuide::ForceHide;
-    break;
-  }
+void RenderContext::setShowSelectionGuide(const ShowSelectionGuide showSelectionGuide) {
+    switch (showSelectionGuide) {
+        case ShowSelectionGuide::Show:
+            if (m_showSelectionGuide == ShowSelectionGuide::Hide)
+                m_showSelectionGuide = ShowSelectionGuide::Show;
+            break;
+        case ShowSelectionGuide::Hide:
+            if (m_showSelectionGuide == ShowSelectionGuide::Show)
+                m_showSelectionGuide = ShowSelectionGuide::Hide;
+            break;
+        case ShowSelectionGuide::ForceShow:
+            m_showSelectionGuide = ShowSelectionGuide::ForceShow;
+            break;
+        case ShowSelectionGuide::ForceHide:
+            if (m_showSelectionGuide != ShowSelectionGuide::ForceShow)
+                m_showSelectionGuide = ShowSelectionGuide::ForceHide;
+            break;
+    }
 }
 } // namespace Renderer
 } // namespace TrenchBroom

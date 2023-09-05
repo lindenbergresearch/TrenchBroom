@@ -21,35 +21,34 @@
 
 #include "View/ToolController.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class CreateComplexBrushTool;
 
-class CreateComplexBrushToolController3D : public ToolControllerGroup
-{
+class CreateComplexBrushToolController3D : public ToolControllerGroup {
 private:
-  CreateComplexBrushTool& m_tool;
+    CreateComplexBrushTool &m_tool;
 
 public:
-  explicit CreateComplexBrushToolController3D(CreateComplexBrushTool& tool);
+    explicit CreateComplexBrushToolController3D(CreateComplexBrushTool &tool);
 
 private:
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  bool mouseClick(const InputState& inputState) override;
-  bool mouseDoubleClick(const InputState& inputState) override;
+    const Tool &tool() const override;
 
-  bool doShouldHandleMouseDrag(const InputState& inputState) const override;
+    bool mouseClick(const InputState &inputState) override;
 
-  void render(
-    const InputState& inputState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch) override;
+    bool mouseDoubleClick(const InputState &inputState) override;
 
-  bool cancel() override;
+    bool doShouldHandleMouseDrag(const InputState &inputState) const override;
+
+    void render(
+        const InputState &inputState,
+        Renderer::RenderContext &renderContext,
+        Renderer::RenderBatch &renderBatch) override;
+
+    bool cancel() override;
 };
 } // namespace View
 } // namespace TrenchBroom

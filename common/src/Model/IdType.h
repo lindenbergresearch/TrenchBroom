@@ -21,10 +21,8 @@
 
 #include <cstddef>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 using IdType = std::size_t;
 }
 } // namespace TrenchBroom

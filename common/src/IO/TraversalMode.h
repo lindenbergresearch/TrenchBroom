@@ -21,15 +21,12 @@
 
 #include <iosfwd>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-enum class TraversalMode
-{
+enum class TraversalMode {
   Flat,
   Recursive
 };
 
-std::ostream& operator<<(std::ostream& lhs, const TraversalMode& rhs);
-
+std::ostream &operator<<(std::ostream &lhs, const TraversalMode &rhs);
 } // namespace TrenchBroom::IO

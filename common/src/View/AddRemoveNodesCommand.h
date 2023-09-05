@@ -26,51 +26,51 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Node;
 } // namespace Model
 
-namespace View
-{
-class AddRemoveNodesCommand : public UpdateLinkedGroupsCommandBase
-{
+namespace View {
+class AddRemoveNodesCommand : public UpdateLinkedGroupsCommandBase {
 private:
-  enum class Action
-  {
-    Add,
-    Remove
-  };
+    enum class Action {
+      Add,
+      Remove
+    };
 
-  Action m_action;
-  std::map<Model::Node*, std::vector<Model::Node*>> m_nodesToAdd;
-  std::map<Model::Node*, std::vector<Model::Node*>> m_nodesToRemove;
+    Action m_action;
+    std::map<Model::Node *, std::vector<Model::Node *>> m_nodesToAdd;
+    std::map<Model::Node *, std::vector<Model::Node *>> m_nodesToRemove;
 
 public:
-  static std::unique_ptr<AddRemoveNodesCommand> add(
-    Model::Node* parent, const std::vector<Model::Node*>& children);
-  static std::unique_ptr<AddRemoveNodesCommand> add(
-    const std::map<Model::Node*, std::vector<Model::Node*>>& nodes);
-  static std::unique_ptr<AddRemoveNodesCommand> remove(
-    const std::map<Model::Node*, std::vector<Model::Node*>>& nodes);
+    static std::unique_ptr<AddRemoveNodesCommand> add(
+        Model::Node *parent, const std::vector<Model::Node *> &children);
 
-  AddRemoveNodesCommand(
-    Action action, const std::map<Model::Node*, std::vector<Model::Node*>>& nodes);
-  ~AddRemoveNodesCommand() override;
+    static std::unique_ptr<AddRemoveNodesCommand> add(
+        const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
+
+    static std::unique_ptr<AddRemoveNodesCommand> remove(
+        const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
+
+    AddRemoveNodesCommand(
+        Action action, const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
+
+    ~AddRemoveNodesCommand() override;
 
 private:
-  static std::string makeName(Action action);
+    static std::string makeName(Action action);
 
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-  std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-  void doAction(MapDocumentCommandFacade* document);
-  void undoAction(MapDocumentCommandFacade* document);
+    std::unique_ptr<CommandResult> doPerformUndo(
+        MapDocumentCommandFacade *document) override;
 
-  deleteCopyAndMove(AddRemoveNodesCommand);
+    void doAction(MapDocumentCommandFacade *document);
+
+    void undoAction(MapDocumentCommandFacade *document);
+
+deleteCopyAndMove(AddRemoveNodesCommand);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -26,43 +26,35 @@
 
 #include <cassert>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 ValidatorRegistry::~ValidatorRegistry() = default;
 
-std::vector<const Validator*> ValidatorRegistry::registeredValidators() const
-{
-  return kdl::vec_transform(m_validators, [](const auto& validator) {
-    return const_cast<const Validator*>(validator.get());
-  });
+std::vector<const Validator *> ValidatorRegistry::registeredValidators() const {
+    return kdl::vec_transform(m_validators, [](const auto &validator) {
+      return const_cast<const Validator *>(validator.get());
+    });
 }
 
-std::vector<const IssueQuickFix*> ValidatorRegistry::quickFixes(
-  const IssueType issueTypes) const
-{
-  auto result = std::vector<const IssueQuickFix*>{};
-  for (const auto& validator : m_validators)
-  {
-    if ((validator->type() & issueTypes) != 0)
-    {
-      result = kdl::vec_concat(std::move(result), validator->quickFixes());
+std::vector<const IssueQuickFix *> ValidatorRegistry::quickFixes(
+    const IssueType issueTypes) const {
+    auto result = std::vector<const IssueQuickFix *>{};
+    for (const auto &validator: m_validators) {
+        if ((validator->type() & issueTypes) != 0) {
+            result = kdl::vec_concat(std::move(result), validator->quickFixes());
+        }
     }
-  }
-  return result;
+    return result;
 }
 
-void ValidatorRegistry::registerValidator(std::unique_ptr<Validator> validator)
-{
-  ensure(validator != nullptr, "validator is null");
-  assert(!kdl::vec_contains(m_validators, validator));
-  m_validators.push_back(std::move(validator));
+void ValidatorRegistry::registerValidator(std::unique_ptr<Validator> validator) {
+    ensure(validator != nullptr, "validator is null");
+    assert(!kdl::vec_contains(m_validators, validator));
+    m_validators.push_back(std::move(validator));
 }
 
-void ValidatorRegistry::unregisterAllValidators()
-{
-  m_validators.clear();
+void ValidatorRegistry::unregisterAllValidators() {
+    m_validators.clear();
 }
 } // namespace Model
 } // namespace TrenchBroom

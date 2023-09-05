@@ -28,52 +28,53 @@
 #include <functional>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace IO
-{
-class TestEnvironment
-{
+namespace TrenchBroom {
+namespace IO {
+class TestEnvironment {
 private:
-  using SetupFunction = std::function<void(TestEnvironment&)>;
-  std::filesystem::path m_sandboxPath;
-  std::filesystem::path m_dir;
+    using SetupFunction = std::function<void(TestEnvironment &)>;
+    std::filesystem::path m_sandboxPath;
+    std::filesystem::path m_dir;
 
 public:
-  explicit TestEnvironment(
-    const std::string& dir, const SetupFunction& setup = [](TestEnvironment&) {});
-  explicit TestEnvironment(const SetupFunction& setup = [](TestEnvironment&) {});
-  ~TestEnvironment();
+    explicit TestEnvironment(
+        const std::string &dir, const SetupFunction &setup = [](TestEnvironment &) {});
 
-  const std::filesystem::path& dir() const;
+    explicit TestEnvironment(const SetupFunction &setup = [](TestEnvironment &) {});
+
+    ~TestEnvironment();
+
+    const std::filesystem::path &dir() const;
 
 public:
-  void createTestEnvironment(const SetupFunction& setup);
-  void createDirectory(const std::filesystem::path& path);
-  void createFile(const std::filesystem::path& path, const std::string& contents);
+    void createTestEnvironment(const SetupFunction &setup);
 
-  bool deleteTestEnvironment();
+    void createDirectory(const std::filesystem::path &path);
 
-  bool directoryExists(const std::filesystem::path& path) const;
-  bool fileExists(const std::filesystem::path& path) const;
+    void createFile(const std::filesystem::path &path, const std::string &contents);
 
-  std::string loadFile(const std::filesystem::path& path) const;
+    bool deleteTestEnvironment();
 
-  template <typename F>
-  auto withTempFile(const std::string& contents, const F& f)
-  {
-    const auto path = m_dir / generateUuid();
-    auto removeFile = kdl::invoke_later{[&]() {
-      // ignore errors
-      auto error = std::error_code{};
-      std::filesystem::remove(path, error);
-    }};
+    bool directoryExists(const std::filesystem::path &path) const;
 
-    Disk::withOutputStream(path, [&](auto& stream) {
-      stream << contents;
-    }).transform_error([](auto e) { throw std::runtime_error{e.msg}; });
-    return f(path);
-  }
+    bool fileExists(const std::filesystem::path &path) const;
+
+    std::string loadFile(const std::filesystem::path &path) const;
+
+    template<typename F>
+    auto withTempFile(const std::string &contents, const F &f) {
+        const auto path = m_dir / generateUuid();
+        auto removeFile = kdl::invoke_later{[&]() {
+          // ignore errors
+          auto error = std::error_code{};
+          std::filesystem::remove(path, error);
+        }};
+
+        Disk::withOutputStream(path, [&](auto &stream) {
+          stream << contents;
+        }).transform_error([](auto e) { throw std::runtime_error{e.msg}; });
+        return f(path);
+    }
 };
 } // namespace IO
 } // namespace TrenchBroom

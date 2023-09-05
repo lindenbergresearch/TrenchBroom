@@ -26,29 +26,24 @@
 #include <kdl/path_utils.h>
 #include <kdl/reflection_impl.h>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 std::string getTextureNameFromPathSuffix(
-  const std::filesystem::path& path, size_t prefixLength)
-{
-  return prefixLength < kdl::path_length(path)
+    const std::filesystem::path &path, size_t prefixLength) {
+    return prefixLength < kdl::path_length(path)
            ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength))
                .generic_string()
            : "";
 }
 
-bool checkTextureDimensions(size_t width, size_t height)
-{
-  return width <= 8192 && height <= 8192;
+bool checkTextureDimensions(size_t width, size_t height) {
+    return width <= 8192 && height <= 8192;
 }
 
-size_t mipSize(const size_t width, const size_t height, const size_t mipLevel)
-{
-  const auto size = Assets::sizeAtMipLevel(width, height, mipLevel);
-  return size.x() * size.y();
+size_t mipSize(const size_t width, const size_t height, const size_t mipLevel) {
+    const auto size = Assets::sizeAtMipLevel(width, height, mipLevel);
+    return size.x() * size.y();
 }
 
 kdl_reflect_impl(ReadTextureError);
-
 } // namespace TrenchBroom::IO

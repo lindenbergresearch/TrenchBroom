@@ -21,10 +21,8 @@
 
 #include <QUuid>
 
-namespace TrenchBroom
-{
-std::string generateUuid()
-{
-  return QUuid::createUuid().toString().toStdString();
+namespace TrenchBroom {
+std::string generateUuid() {
+    return QUuid::createUuid().toString().toStdString();
 }
 } // namespace TrenchBroom

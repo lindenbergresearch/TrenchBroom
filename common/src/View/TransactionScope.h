@@ -19,18 +19,14 @@
 
 #pragma once
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 
-enum class TransactionScope
-{
+enum class TransactionScope {
   /** A user my only observe the initial and final state of the transaction. */
   Oneshot,
   /** A user may observe intermediate states of the transaction. */
   LongRunning,
 };
-
 } // namespace View
 } // namespace TrenchBroom

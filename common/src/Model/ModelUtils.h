@@ -30,85 +30,99 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushFaceHandle;
+
 class EditorContext;
+
 class LayerNode;
+
 class Node;
 
 HitType::Type nodeHitType();
 
-LayerNode* findContainingLayer(Node* node);
+LayerNode *findContainingLayer(Node *node);
 
-std::vector<LayerNode*> findContainingLayersUserSorted(const std::vector<Node*>& nodes);
+std::vector<LayerNode *> findContainingLayersUserSorted(const std::vector<Node *> &nodes);
 
-GroupNode* findContainingGroup(Node* node);
-const GroupNode* findContainingGroup(const Node* node);
+GroupNode *findContainingGroup(Node *node);
 
-GroupNode* findContainingLinkedGroup(Node& node);
-const GroupNode* findContainingLinkedGroup(const Node& node);
+const GroupNode *findContainingGroup(const Node *node);
+
+GroupNode *findContainingLinkedGroup(Node &node);
+
+const GroupNode *findContainingLinkedGroup(const Node &node);
 
 /**
  * Searches the ancestor chain of `node` for the outermost closed group and returns
  * it if one is found, otherwise returns nullptr.
  */
-GroupNode* findOutermostClosedGroup(Node* node);
-const GroupNode* findOutermostClosedGroup(const Node* node);
+GroupNode *findOutermostClosedGroup(Node *node);
 
-std::vector<Model::GroupNode*> findLinkedGroups(
-  Model::WorldNode& worldNode, const std::string& linkedGroupId);
-std::vector<Model::GroupNode*> findAllLinkedGroups(Model::WorldNode& worldNode);
+const GroupNode *findOutermostClosedGroup(const Node *node);
+
+std::vector<Model::GroupNode *> findLinkedGroups(
+    Model::WorldNode &worldNode, const std::string &linkedGroupId);
+
+std::vector<Model::GroupNode *> findAllLinkedGroups(Model::WorldNode &worldNode);
 
 /**
  * Collect the linked group IDs of the given node and all of its ancestors.
  */
-std::vector<std::string> collectParentLinkedGroupIds(const Model::Node& parent);
+std::vector<std::string> collectParentLinkedGroupIds(const Model::Node &parent);
 
-std::vector<Node*> collectParents(const std::vector<Node*>& nodes);
-std::vector<Node*> collectParents(const std::map<Node*, std::vector<Node*>>& nodes);
-std::vector<Node*> collectParents(
-  const std::vector<std::pair<Model::Node*, std::vector<std::unique_ptr<Model::Node>>>>&
+std::vector<Node *> collectParents(const std::vector<Node *> &nodes);
+
+std::vector<Node *> collectParents(const std::map<Node *, std::vector<Node *>> &nodes);
+
+std::vector<Node *> collectParents(
+    const std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> &
     nodes);
 
-std::vector<Node*> collectChildren(const std::map<Node*, std::vector<Node*>>& nodes);
-std::vector<Node*> collectChildren(
-  const std::vector<std::pair<Model::Node*, std::vector<std::unique_ptr<Model::Node>>>>&
+std::vector<Node *> collectChildren(const std::map<Node *, std::vector<Node *>> &nodes);
+
+std::vector<Node *> collectChildren(
+    const std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> &
     nodes);
-std::vector<Node*> collectDescendants(const std::vector<Node*>& nodes);
-std::map<Node*, std::vector<Node*>> parentChildrenMap(const std::vector<Node*>& nodes);
 
-std::vector<Node*> collectNodes(const std::vector<Node*>& nodes);
+std::vector<Node *> collectDescendants(const std::vector<Node *> &nodes);
 
-std::vector<Node*> collectTouchingNodes(
-  const std::vector<Node*>& nodes, const std::vector<BrushNode*>& brushes);
-std::vector<Node*> collectContainedNodes(
-  const std::vector<Node*>& nodes, const std::vector<BrushNode*>& brushes);
+std::map<Node *, std::vector<Node *>> parentChildrenMap(const std::vector<Node *> &nodes);
 
-std::vector<Node*> collectSelectedNodes(const std::vector<Node*>& nodes);
+std::vector<Node *> collectNodes(const std::vector<Node *> &nodes);
 
-std::vector<Node*> collectSelectableNodes(
-  const std::vector<Node*>& nodes, const EditorContext& editorContext);
+std::vector<Node *> collectTouchingNodes(
+    const std::vector<Node *> &nodes, const std::vector<BrushNode *> &brushes);
 
-std::vector<BrushFaceHandle> collectBrushFaces(const std::vector<Node*>& nodes);
-std::vector<BrushFaceHandle> collectSelectedBrushFaces(const std::vector<Node*>& nodes);
+std::vector<Node *> collectContainedNodes(
+    const std::vector<Node *> &nodes, const std::vector<BrushNode *> &brushes);
+
+std::vector<Node *> collectSelectedNodes(const std::vector<Node *> &nodes);
+
+std::vector<Node *> collectSelectableNodes(
+    const std::vector<Node *> &nodes, const EditorContext &editorContext);
+
+std::vector<BrushFaceHandle> collectBrushFaces(const std::vector<Node *> &nodes);
+
+std::vector<BrushFaceHandle> collectSelectedBrushFaces(const std::vector<Node *> &nodes);
+
 std::vector<BrushFaceHandle> collectSelectableBrushFaces(
-  const std::vector<Node*>& nodes, const EditorContext& editorContext);
+    const std::vector<Node *> &nodes, const EditorContext &editorContext);
 
 vm::bbox3 computeLogicalBounds(
-  const std::vector<Node*>& nodes, const vm::bbox3& defaultBounds = vm::bbox3());
+    const std::vector<Node *> &nodes, const vm::bbox3 &defaultBounds = vm::bbox3());
+
 vm::bbox3 computePhysicalBounds(
-  const std::vector<Node*>& nodes, const vm::bbox3& defaultBounds = vm::bbox3());
+    const std::vector<Node *> &nodes, const vm::bbox3 &defaultBounds = vm::bbox3());
 
-std::vector<BrushNode*> filterBrushNodes(const std::vector<Node*>& nodes);
-std::vector<EntityNode*> filterEntityNodes(const std::vector<Node*>& nodes);
+std::vector<BrushNode *> filterBrushNodes(const std::vector<Node *> &nodes);
 
-struct SelectionResult
-{
-  std::vector<Model::Node*> nodesToSelect;
-  std::vector<Model::GroupNode*> groupsToLock;
+std::vector<EntityNode *> filterEntityNodes(const std::vector<Node *> &nodes);
+
+struct SelectionResult {
+  std::vector<Model::Node *> nodesToSelect;
+  std::vector<Model::GroupNode *> groupsToLock;
 };
 
 /**
@@ -126,12 +140,11 @@ struct SelectionResult
  * Note: no changes are made, just the proposed selection and locking is returned.
  */
 SelectionResult nodeSelectionWithLinkedGroupConstraints(
-  Model::WorldNode& world, const std::vector<Model::Node*>& nodes);
+    Model::WorldNode &world, const std::vector<Model::Node *> &nodes);
 
-struct FaceSelectionResult
-{
+struct FaceSelectionResult {
   std::vector<Model::BrushFaceHandle> facesToSelect;
-  std::vector<Model::GroupNode*> groupsToLock;
+  std::vector<Model::GroupNode *> groupsToLock;
 };
 
 /**
@@ -141,6 +154,6 @@ struct FaceSelectionResult
  * @see nodeSelectionWithLinkedGroupConstraints()
  */
 FaceSelectionResult faceSelectionWithLinkedGroupConstraints(
-  Model::WorldNode& world, const std::vector<Model::BrushFaceHandle>& faces);
+    Model::WorldNode &world, const std::vector<Model::BrushFaceHandle> &faces);
 } // namespace Model
 } // namespace TrenchBroom

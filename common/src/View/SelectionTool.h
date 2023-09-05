@@ -26,21 +26,18 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Node;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderContext;
 }
 
-namespace View
-{
+namespace View {
 class DragTracker;
+
 class MapDocument;
 
 /**
@@ -48,30 +45,32 @@ class MapDocument;
  * The order of the hits is preserved, but if multiple hits map to the same group, that
  * group will only be listed once in the output.
  */
-std::vector<Model::Node*> hitsToNodesWithGroupPicking(
-  const std::vector<Model::Hit>& hits);
+std::vector<Model::Node *> hitsToNodesWithGroupPicking(
+    const std::vector<Model::Hit> &hits);
 
-class SelectionTool : public ToolController, public Tool
-{
+class SelectionTool : public ToolController, public Tool {
 private:
-  std::weak_ptr<MapDocument> m_document;
+    std::weak_ptr<MapDocument> m_document;
 
 public:
-  explicit SelectionTool(std::weak_ptr<MapDocument> document);
+    explicit SelectionTool(std::weak_ptr<MapDocument> document);
 
-  Tool& tool() override;
-  const Tool& tool() const override;
+    Tool &tool() override;
 
-  bool mouseClick(const InputState& inputState) override;
-  bool mouseDoubleClick(const InputState& inputState) override;
-  void mouseScroll(const InputState& inputState) override;
+    const Tool &tool() const override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
+    bool mouseClick(const InputState &inputState) override;
 
-  void setRenderOptions(
-    const InputState& inputState, Renderer::RenderContext& renderContext) const override;
+    bool mouseDoubleClick(const InputState &inputState) override;
 
-  bool cancel() override;
+    void mouseScroll(const InputState &inputState) override;
+
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+
+    void setRenderOptions(
+        const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+
+    bool cancel() override;
 };
 } // namespace View
 } // namespace TrenchBroom

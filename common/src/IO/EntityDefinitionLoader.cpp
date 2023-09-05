@@ -23,13 +23,11 @@
 
 #include <kdl/result.h>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 EntityDefinitionLoader::~EntityDefinitionLoader() {}
 
-Result<std::vector<Assets::EntityDefinition*>> EntityDefinitionLoader::
-  loadEntityDefinitions(ParserStatus& status, const std::filesystem::path& path) const
-{
-  return doLoadEntityDefinitions(status, path);
+Result<std::vector<Assets::EntityDefinition *>> EntityDefinitionLoader::
+loadEntityDefinitions(ParserStatus &status, const std::filesystem::path &path) const {
+    return doLoadEntityDefinitions(status, path);
 }
 } // namespace TrenchBroom::IO

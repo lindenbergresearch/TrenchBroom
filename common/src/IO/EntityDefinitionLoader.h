@@ -24,24 +24,22 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class EntityDefinition;
 } // namespace TrenchBroom::Assets
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class ParserStatus;
 
-class EntityDefinitionLoader
-{
+class EntityDefinitionLoader {
 public:
-  virtual ~EntityDefinitionLoader();
-  Result<std::vector<Assets::EntityDefinition*>> loadEntityDefinitions(
-    ParserStatus& status, const std::filesystem::path& path) const;
+    virtual ~EntityDefinitionLoader();
+
+    Result<std::vector<Assets::EntityDefinition *>> loadEntityDefinitions(
+        ParserStatus &status, const std::filesystem::path &path) const;
 
 private:
-  virtual Result<std::vector<Assets::EntityDefinition*>> doLoadEntityDefinitions(
-    ParserStatus& status, const std::filesystem::path& path) const = 0;
+    virtual Result<std::vector<Assets::EntityDefinition *>> doLoadEntityDefinitions(
+        ParserStatus &status, const std::filesystem::path &path) const = 0;
 };
 } // namespace TrenchBroom::IO

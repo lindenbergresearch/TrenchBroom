@@ -22,81 +22,99 @@
 #include "View/PreferencePane.h"
 
 class QCheckBox;
+
 class QKeySequence;
 
-namespace TrenchBroom
-{
-template <typename T>
+namespace TrenchBroom {
+template<typename T>
 class Preference;
 
-namespace View
-{
+namespace View {
 class KeySequenceEdit;
+
 class SliderWithLabel;
 
-class MousePreferencePane : public PreferencePane
-{
+class MousePreferencePane : public PreferencePane {
 private:
-  SliderWithLabel* m_lookSpeedSlider;
-  QCheckBox* m_invertLookHAxisCheckBox;
-  QCheckBox* m_invertLookVAxisCheckBox;
-  SliderWithLabel* m_panSpeedSlider;
-  QCheckBox* m_invertPanHAxisCheckBox;
-  QCheckBox* m_invertPanVAxisCheckBox;
-  SliderWithLabel* m_moveSpeedSlider;
-  QCheckBox* m_invertMouseWheelCheckBox;
-  QCheckBox* m_enableAltMoveCheckBox;
-  QCheckBox* m_invertAltMoveAxisCheckBox;
-  QCheckBox* m_moveInCursorDirCheckBox;
+    SliderWithLabel *m_lookSpeedSlider;
+    QCheckBox *m_invertLookHAxisCheckBox;
+    QCheckBox *m_invertLookVAxisCheckBox;
+    SliderWithLabel *m_panSpeedSlider;
+    QCheckBox *m_invertPanHAxisCheckBox;
+    QCheckBox *m_invertPanVAxisCheckBox;
+    SliderWithLabel *m_moveSpeedSlider;
+    QCheckBox *m_invertMouseWheelCheckBox;
+    QCheckBox *m_enableAltMoveCheckBox;
+    QCheckBox *m_invertAltMoveAxisCheckBox;
+    QCheckBox *m_moveInCursorDirCheckBox;
 
-  KeySequenceEdit* m_forwardKeyEditor;
-  KeySequenceEdit* m_backwardKeyEditor;
-  KeySequenceEdit* m_leftKeyEditor;
-  KeySequenceEdit* m_rightKeyEditor;
-  KeySequenceEdit* m_upKeyEditor;
-  KeySequenceEdit* m_downKeyEditor;
-  SliderWithLabel* m_flyMoveSpeedSlider;
+    KeySequenceEdit *m_forwardKeyEditor;
+    KeySequenceEdit *m_backwardKeyEditor;
+    KeySequenceEdit *m_leftKeyEditor;
+    KeySequenceEdit *m_rightKeyEditor;
+    KeySequenceEdit *m_upKeyEditor;
+    KeySequenceEdit *m_downKeyEditor;
+    SliderWithLabel *m_flyMoveSpeedSlider;
 
 public:
-  explicit MousePreferencePane(QWidget* parent = nullptr);
+    explicit MousePreferencePane(QWidget *parent = nullptr);
 
 private:
-  void createGui();
+    void createGui();
 
-  void bindEvents();
+    void bindEvents();
 
-  bool doCanResetToDefaults() override;
-  void doResetToDefaults() override;
-  void doUpdateControls() override;
-  bool doValidate() override;
+    bool doCanResetToDefaults() override;
+
+    void doResetToDefaults() override;
+
+    void doUpdateControls() override;
+
+    bool doValidate() override;
+
 private slots:
-  void lookSpeedChanged(int value);
-  void invertLookHAxisChanged(int state);
-  void invertLookVAxisChanged(int state);
 
-  void panSpeedChanged(int value);
-  void invertPanHAxisChanged(int state);
-  void invertPanVAxisChanged(int state);
+    void lookSpeedChanged(int value);
 
-  void moveSpeedChanged(int value);
-  void invertMouseWheelChanged(int state);
-  void enableAltMoveChanged(int state);
-  void invertAltMoveAxisChanged(int state);
-  void moveInCursorDirChanged(int state);
+    void invertLookHAxisChanged(int state);
 
-  void forwardKeyChanged();
-  void backwardKeyChanged();
-  void leftKeyChanged();
-  void rightKeyChanged();
-  void upKeyChanged();
-  void downKeyChanged();
+    void invertLookVAxisChanged(int state);
 
-  void flyMoveSpeedChanged(int value);
+    void panSpeedChanged(int value);
+
+    void invertPanHAxisChanged(int state);
+
+    void invertPanVAxisChanged(int state);
+
+    void moveSpeedChanged(int value);
+
+    void invertMouseWheelChanged(int state);
+
+    void enableAltMoveChanged(int state);
+
+    void invertAltMoveAxisChanged(int state);
+
+    void moveInCursorDirChanged(int state);
+
+    void forwardKeyChanged();
+
+    void backwardKeyChanged();
+
+    void leftKeyChanged();
+
+    void rightKeyChanged();
+
+    void upKeyChanged();
+
+    void downKeyChanged();
+
+    void flyMoveSpeedChanged(int value);
 
 private:
-  void setKeySequence(KeySequenceEdit* editor, Preference<QKeySequence>& preference);
-  bool hasConflict(
-    const QKeySequence& keySequence, const Preference<QKeySequence>& preference) const;
+    void setKeySequence(KeySequenceEdit *editor, Preference<QKeySequence> &preference);
+
+    bool hasConflict(
+        const QKeySequence &keySequence, const Preference<QKeySequence> &preference) const;
 };
 } // namespace View
 } // namespace TrenchBroom

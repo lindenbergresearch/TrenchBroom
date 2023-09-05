@@ -25,10 +25,8 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace EL
-{
+namespace TrenchBroom {
+namespace EL {
 using BooleanType = bool;
 using StringType = std::string;
 using NumberType = double;
@@ -37,8 +35,7 @@ using ArrayType = std::vector<Value>;
 using MapType = std::map<std::string, Value>;
 using RangeType = std::vector<long>;
 
-enum class ValueType
-{
+enum class ValueType {
   Boolean,
   String,
   Number,
@@ -50,6 +47,7 @@ enum class ValueType
 };
 
 std::string typeName(ValueType type);
-ValueType typeForName(const std::string& type);
+
+ValueType typeForName(const std::string &type);
 } // namespace EL
 } // namespace TrenchBroom

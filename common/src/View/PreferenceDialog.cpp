@@ -41,148 +41,131 @@
 
 #include <filesystem>
 
-namespace TrenchBroom
-{
-namespace View
-{
-PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget* parent)
-  : QDialog(parent)
-  , m_document(std::move(document))
-  , m_toolBar(nullptr)
-  , m_stackedWidget(nullptr)
-  , m_buttonBox(nullptr)
-{
-  setWindowTitle("Preferences");
-  setWindowIconTB(this);
-  createGui();
-  switchToPane(PrefPane_First);
-  currentPane()->updateControls();
+namespace TrenchBroom {
+namespace View {
+PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent)
+    : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr),
+      m_buttonBox(nullptr) {
+    setWindowTitle("Preferences");
+    setWindowIconTB(this);
+    createGui();
+    switchToPane(PrefPane_First);
+    currentPane()->updateControls();
 }
 
-void PreferenceDialog::closeEvent(QCloseEvent* event)
-{
-  if (!currentPane()->validate())
-  {
-    event->ignore();
-    return;
-  }
+void PreferenceDialog::closeEvent(QCloseEvent *event) {
+    if (!currentPane()->validate()) {
+        event->ignore();
+        return;
+    }
 
-  auto& prefs = PreferenceManager::instance();
-  if (!prefs.saveInstantly())
-  {
-    prefs.discardChanges();
-  }
+    auto &prefs = PreferenceManager::instance();
+    if (!prefs.saveInstantly()) {
+        prefs.discardChanges();
+    }
 
-  event->accept();
+    event->accept();
 }
 
-void PreferenceDialog::createGui()
-{
-  const auto gamesImage = IO::loadSVGIcon("GeneralPreferences.svg");
-  const auto viewImage = IO::loadSVGIcon("ViewPreferences.svg");
-  const auto colorsImage = IO::loadSVGIcon("ColorPreferences.svg");
-  const auto mouseImage = IO::loadSVGIcon("MousePreferences.svg");
-  const auto keyboardImage = IO::loadSVGIcon("KeyboardPreferences.svg");
+void PreferenceDialog::createGui() {
+    const auto gamesImage = IO::loadSVGIcon("GeneralPreferences.svg");
+    const auto viewImage = IO::loadSVGIcon("ViewPreferences.svg");
+    const auto colorsImage = IO::loadSVGIcon("ColorPreferences.svg");
+    const auto mouseImage = IO::loadSVGIcon("MousePreferences.svg");
+    const auto keyboardImage = IO::loadSVGIcon("KeyboardPreferences.svg");
 
-  m_toolBar = new QToolBar();
-  m_toolBar->setFloatable(false);
-  m_toolBar->setMovable(false);
-  m_toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  m_toolBar->addAction(gamesImage, "Games", [this]() { switchToPane(PrefPane_Games); });
-  m_toolBar->addAction(viewImage, "View", [this]() { switchToPane(PrefPane_View); });
-  m_toolBar->addAction(
-    colorsImage, "Colors", [this]() { switchToPane(PrefPane_Colors); });
-  m_toolBar->addAction(mouseImage, "Mouse", [this]() { switchToPane(PrefPane_Mouse); });
-  m_toolBar->addAction(
-    keyboardImage, "Keyboard", [this]() { switchToPane(PrefPane_Keyboard); });
+    m_toolBar = new QToolBar();
+    m_toolBar->setFloatable(false);
+    m_toolBar->setMovable(false);
+    m_toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_toolBar->addAction(gamesImage, "Games", [this]() { switchToPane(PrefPane_Games); });
+    m_toolBar->addAction(viewImage, "View", [this]() { switchToPane(PrefPane_View); });
+    m_toolBar->addAction(
+        colorsImage, "Colors", [this]() { switchToPane(PrefPane_Colors); });
+    m_toolBar->addAction(mouseImage, "Mouse", [this]() { switchToPane(PrefPane_Mouse); });
+    m_toolBar->addAction(
+        keyboardImage, "Keyboard", [this]() { switchToPane(PrefPane_Keyboard); });
 
-  // Don't display tooltips for pane switcher buttons...
-  for (auto* button : m_toolBar->findChildren<QToolButton*>())
-  {
-    button->installEventFilter(this);
-  }
+    // Don't display tooltips for pane switcher buttons...
+    for (auto *button: m_toolBar->findChildren<QToolButton *>()) {
+        button->installEventFilter(this);
+    }
 
-  m_stackedWidget = new QStackedWidget();
-  m_stackedWidget->addWidget(new GamesPreferencePane(m_document.get()));
-  m_stackedWidget->addWidget(new ViewPreferencePane());
-  m_stackedWidget->addWidget(new ColorsPreferencePane());
-  m_stackedWidget->addWidget(new MousePreferencePane());
-  m_stackedWidget->addWidget(new KeyboardPreferencePane(m_document.get()));
+    m_stackedWidget = new QStackedWidget();
+    m_stackedWidget->addWidget(new GamesPreferencePane(m_document.get()));
+    m_stackedWidget->addWidget(new ViewPreferencePane());
+    m_stackedWidget->addWidget(new ColorsPreferencePane());
+    m_stackedWidget->addWidget(new MousePreferencePane());
+    m_stackedWidget->addWidget(new KeyboardPreferencePane(m_document.get()));
 
-  m_buttonBox = new QDialogButtonBox(
-    QDialogButtonBox::RestoreDefaults
+    m_buttonBox = new QDialogButtonBox(
+        QDialogButtonBox::RestoreDefaults
 #if !defined __APPLE__
-      | QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel
+        | QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel
 #endif
-    ,
-    this);
+        ,
+        this);
 
-  auto* resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
-  connect(resetButton, &QPushButton::clicked, this, &PreferenceDialog::resetToDefaults);
+    auto *resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
+    connect(resetButton, &QPushButton::clicked, this, &PreferenceDialog::resetToDefaults);
 
 #if !defined __APPLE__
-  connect(
-    m_buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, [this]() {
-      auto& prefs = PreferenceManager::instance();
-      prefs.saveChanges();
-      this->close();
-    });
-  connect(
-    m_buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, [this]() {
-      auto& prefs = PreferenceManager::instance();
-      prefs.saveChanges();
-    });
-  connect(
-    m_buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, [this]() {
-      this->close();
-    });
+    connect(
+      m_buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, [this]() {
+        auto& prefs = PreferenceManager::instance();
+        prefs.saveChanges();
+        this->close();
+      });
+    connect(
+      m_buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, [this]() {
+        auto& prefs = PreferenceManager::instance();
+        prefs.saveChanges();
+      });
+    connect(
+      m_buttonBox->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, [this]() {
+        this->close();
+      });
 #endif
 
-  auto* layout = new QVBoxLayout();
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->setSpacing(0);
-  setLayout(layout);
+    auto *layout = new QVBoxLayout();
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    setLayout(layout);
 
-  layout->setMenuBar(m_toolBar);
+    layout->setMenuBar(m_toolBar);
 #if !defined __APPLE__
-  layout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
+    layout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
 #endif
-  layout->addWidget(m_stackedWidget, 1);
-  layout->addLayout(wrapDialogButtonBox(m_buttonBox));
+    layout->addWidget(m_stackedWidget, 1);
+    layout->addLayout(wrapDialogButtonBox(m_buttonBox));
 }
 
-void PreferenceDialog::switchToPane(const PrefPane pane)
-{
-  if (!currentPane()->validate())
-  {
-    return;
-  }
+void PreferenceDialog::switchToPane(const PrefPane pane) {
+    if (!currentPane()->validate()) {
+        return;
+    }
 
-  m_stackedWidget->setCurrentIndex(pane);
-  currentPane()->updateControls();
+    m_stackedWidget->setCurrentIndex(pane);
+    currentPane()->updateControls();
 
-  auto* resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
-  resetButton->setEnabled(currentPane()->canResetToDefaults());
+    auto *resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
+    resetButton->setEnabled(currentPane()->canResetToDefaults());
 }
 
-PreferencePane* PreferenceDialog::currentPane() const
-{
-  return static_cast<PreferencePane*>(m_stackedWidget->currentWidget());
+PreferencePane *PreferenceDialog::currentPane() const {
+    return static_cast<PreferencePane *>(m_stackedWidget->currentWidget());
 }
 
-void PreferenceDialog::resetToDefaults()
-{
-  currentPane()->resetToDefaults();
+void PreferenceDialog::resetToDefaults() {
+    currentPane()->resetToDefaults();
 }
 
 // Don't display tooltips for pane switcher buttons...
-bool PreferenceDialog::eventFilter(QObject* o, QEvent* e)
-{
-  if (e->type() == QEvent::ToolTip)
-  {
-    return true;
-  }
-  return QDialog::eventFilter(o, e);
+bool PreferenceDialog::eventFilter(QObject *o, QEvent *e) {
+    if (e->type() == QEvent::ToolTip) {
+        return true;
+    }
+    return QDialog::eventFilter(o, e);
 }
 } // namespace View
 } // namespace TrenchBroom

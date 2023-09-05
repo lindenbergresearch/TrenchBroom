@@ -26,128 +26,104 @@
 
 #include <cstdio> // for FILE
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 File::File() = default;
 
 File::~File() = default;
 
 OwningBufferFile::OwningBufferFile(std::unique_ptr<char[]> buffer, const size_t size)
-  : m_buffer{std::move(buffer)}
-  , m_size{size}
-{
+    : m_buffer{std::move(buffer)}, m_size{size} {
 }
 
-Reader OwningBufferFile::reader() const
-{
-  return Reader::from(m_buffer.get(), m_buffer.get() + m_size);
+Reader OwningBufferFile::reader() const {
+    return Reader::from(m_buffer.get(), m_buffer.get() + m_size);
 }
 
-size_t OwningBufferFile::size() const
-{
-  return m_size;
+size_t OwningBufferFile::size() const {
+    return m_size;
 }
 
-namespace
-{
+namespace {
 Result<CFile::FilePtr> openPathAsFILE(
-  const std::filesystem::path& path, const std::string& mode)
-{
-  // Windows: fopen() doesn't handle UTF-8. We have to use the nonstandard _wfopen
-  // to open a Unicode path.
-  //
-  // All other platforms, just assume fopen() can handle UTF-8
-  //
-  // mode is assumed to be ASCII (one byte per char)
-  auto* file =
+    const std::filesystem::path &path, const std::string &mode) {
+    // Windows: fopen() doesn't handle UTF-8. We have to use the nonstandard _wfopen
+    // to open a Unicode path.
+    //
+    // All other platforms, just assume fopen() can handle UTF-8
+    //
+    // mode is assumed to be ASCII (one byte per char)
+    auto *file =
 #ifdef _WIN32
-    _wfopen(path.wstring().c_str(), std::wstring{mode.begin(), mode.end()}.c_str());
+        _wfopen(path.wstring().c_str(), std::wstring{mode.begin(), mode.end()}.c_str());
 #else
-    fopen(path.u8string().c_str(), mode.c_str());
+        fopen(path.u8string().c_str(), mode.c_str());
 #endif
 
-  if (!file)
-  {
-    return Error{"Cannot open file " + path.string()};
-  }
+    if (!file) {
+        return Error{"Cannot open file " + path.string()};
+    }
 
-  return std::unique_ptr<std::FILE, int (*)(std::FILE*)>{file, std::fclose};
+    return std::unique_ptr<std::FILE, int (*)(std::FILE *)>{file, std::fclose};
 }
 
-Result<size_t> fileSize(std::FILE* file)
-{
-  const auto pos = std::ftell(file);
-  if (pos < 0)
-  {
-    return Error{"ftell failed"};
-  }
+Result<size_t> fileSize(std::FILE *file) {
+    const auto pos = std::ftell(file);
+    if (pos < 0) {
+        return Error{"ftell failed"};
+    }
 
-  if (std::fseek(file, 0, SEEK_END) != 0)
-  {
-    return Error{"fseek failed"};
-  }
+    if (std::fseek(file, 0, SEEK_END) != 0) {
+        return Error{"fseek failed"};
+    }
 
-  const auto size = std::ftell(file);
-  if (size < 0)
-  {
-    return Error{"ftell failed"};
-  }
+    const auto size = std::ftell(file);
+    if (size < 0) {
+        return Error{"ftell failed"};
+    }
 
-  if (std::fseek(file, pos, SEEK_SET) != 0)
-  {
-    return Error{"fseek failed"};
-  }
+    if (std::fseek(file, pos, SEEK_SET) != 0) {
+        return Error{"fseek failed"};
+    }
 
-  return static_cast<size_t>(size);
+    return static_cast<size_t>(size);
 }
 } // namespace
 
 CFile::CFile(FilePtr filePtr, const size_t size)
-  : m_file{std::move(filePtr)}
-  , m_size{size}
-{
+    : m_file{std::move(filePtr)}, m_size{size} {
 }
 
-Reader CFile::reader() const
-{
-  return Reader::from(m_file.get(), m_size);
+Reader CFile::reader() const {
+    return Reader::from(m_file.get(), m_size);
 }
 
-size_t CFile::size() const
-{
-  return m_size;
+size_t CFile::size() const {
+    return m_size;
 }
 
-std::FILE* CFile::file() const
-{
-  return m_file.get();
+std::FILE *CFile::file() const {
+    return m_file.get();
 }
 
-Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path& path)
-{
-  return openPathAsFILE(path, "rb").and_then([](auto filePtr) {
-    return fileSize(filePtr.get()).transform([&](auto size) {
-      // NOLINTNEXTLINE
-      return std::shared_ptr<CFile>{new CFile{std::move(filePtr), size}};
+Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path) {
+    return openPathAsFILE(path, "rb").and_then([](auto filePtr) {
+      return fileSize(filePtr.get()).transform([&](auto size) {
+        // NOLINTNEXTLINE
+        return std::shared_ptr<CFile>{new CFile{std::move(filePtr), size}};
+      });
     });
-  });
 }
 
 FileView::FileView(std::shared_ptr<File> file, const size_t offset, const size_t length)
-  : m_file{std::move(file)}
-  , m_offset{offset}
-  , m_length{length}
-{
+    : m_file{std::move(file)}, m_offset{offset}, m_length{length} {
 }
 
-Reader FileView::reader() const
-{
-  return m_file->reader().subReaderFromBegin(m_offset, m_length);
+Reader FileView::reader() const {
+    return m_file->reader().subReaderFromBegin(m_offset, m_length);
 }
 
-size_t FileView::size() const
-{
-  return m_length;
+size_t FileView::size() const {
+    return m_length;
 }
 } // namespace TrenchBroom::IO

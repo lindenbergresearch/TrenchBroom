@@ -19,14 +19,14 @@
 
 #include "NodeVisitor.h"
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 NodeVisitor::NodeVisitor() {}
+
 NodeVisitor::~NodeVisitor() {}
 
 ConstNodeVisitor::ConstNodeVisitor() {}
+
 ConstNodeVisitor::~ConstNodeVisitor() {}
 } // namespace Model
 } // namespace TrenchBroom

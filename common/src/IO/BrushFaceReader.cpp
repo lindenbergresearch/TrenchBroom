@@ -29,41 +29,35 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 BrushFaceReader::BrushFaceReader(
-  const std::string& str, const Model::MapFormat sourceAndTargetMapFormat)
-  : MapReader(str, sourceAndTargetMapFormat, sourceAndTargetMapFormat, {}, {})
-{
+    const std::string &str, const Model::MapFormat sourceAndTargetMapFormat)
+    : MapReader(str, sourceAndTargetMapFormat, sourceAndTargetMapFormat, {}, {}) {
 }
 
 std::vector<Model::BrushFace> BrushFaceReader::read(
-  const vm::bbox3& worldBounds, ParserStatus& status)
-{
-  try
-  {
-    readBrushFaces(worldBounds, status);
-    return std::move(m_brushFaces);
-  }
-  catch (const ParserException&)
-  {
-    throw;
-  }
+    const vm::bbox3 &worldBounds, ParserStatus &status) {
+    try {
+        readBrushFaces(worldBounds, status);
+        return std::move(m_brushFaces);
+    }
+    catch (const ParserException &) {
+        throw;
+    }
 }
 
-Model::Node* BrushFaceReader::onWorldNode(
-  std::unique_ptr<Model::WorldNode>, ParserStatus&)
-{
-  return nullptr;
+Model::Node *BrushFaceReader::onWorldNode(
+    std::unique_ptr<Model::WorldNode>, ParserStatus &) {
+    return nullptr;
 }
-void BrushFaceReader::onLayerNode(std::unique_ptr<Model::Node>, ParserStatus&) {}
-void BrushFaceReader::onNode(Model::Node*, std::unique_ptr<Model::Node>, ParserStatus&) {}
 
-void BrushFaceReader::onBrushFace(Model::BrushFace face, ParserStatus& /* status */)
-{
-  m_brushFaces.push_back(std::move(face));
+void BrushFaceReader::onLayerNode(std::unique_ptr<Model::Node>, ParserStatus &) {}
+
+void BrushFaceReader::onNode(Model::Node *, std::unique_ptr<Model::Node>, ParserStatus &) {}
+
+void BrushFaceReader::onBrushFace(Model::BrushFace face, ParserStatus & /* status */) {
+    m_brushFaces.push_back(std::move(face));
 }
 } // namespace IO
 } // namespace TrenchBroom

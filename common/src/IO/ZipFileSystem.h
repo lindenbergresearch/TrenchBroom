@@ -27,21 +27,20 @@
 #include <filesystem>
 #include <memory>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-class ZipFileSystem : public ImageFileSystem
-{
+class ZipFileSystem : public ImageFileSystem {
 private:
-  mz_zip_archive m_archive;
+    mz_zip_archive m_archive;
 
 public:
-  using ImageFileSystem::ImageFileSystem;
-  ~ZipFileSystem() override;
+    using ImageFileSystem::ImageFileSystem;
+
+    ~ZipFileSystem() override;
 
 private:
-  Result<void> doReadDirectory() override;
+    Result<void> doReadDirectory() override;
 
-  std::string filename(mz_uint fileIndex);
+    std::string filename(mz_uint fileIndex);
 };
 } // namespace TrenchBroom::IO

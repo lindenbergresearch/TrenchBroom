@@ -38,161 +38,131 @@
 #include <stdexcept>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 LayerNode::LayerNode(Layer layer)
-  : m_layer(layer)
-  , m_boundsValid(false)
-{
+    : m_layer(layer), m_boundsValid(false) {
 }
 
-const Layer& LayerNode::layer() const
-{
-  return m_layer;
+const Layer &LayerNode::layer() const {
+    return m_layer;
 }
 
-Layer LayerNode::setLayer(Layer layer)
-{
-  ensure(layer.defaultLayer() == m_layer.defaultLayer(), "Set same layer type");
+Layer LayerNode::setLayer(Layer layer) {
+    ensure(layer.defaultLayer() == m_layer.defaultLayer(), "Set same layer type");
 
-  using std::swap;
-  swap(m_layer, layer);
-  return layer;
+    using std::swap;
+    swap(m_layer, layer);
+    return layer;
 }
 
-bool LayerNode::isDefaultLayer() const
-{
-  return m_layer.defaultLayer();
+bool LayerNode::isDefaultLayer() const {
+    return m_layer.defaultLayer();
 }
 
-void LayerNode::sortLayers(std::vector<LayerNode*>& layers)
-{
-  std::stable_sort(layers.begin(), layers.end(), [](LayerNode* a, LayerNode* b) {
-    return a->layer().sortIndex() < b->layer().sortIndex();
-  });
+void LayerNode::sortLayers(std::vector<LayerNode *> &layers) {
+    std::stable_sort(layers.begin(), layers.end(), [](LayerNode *a, LayerNode *b) {
+      return a->layer().sortIndex() < b->layer().sortIndex();
+    });
 }
 
-const std::optional<IdType>& LayerNode::persistentId() const
-{
-  return m_persistentId;
+const std::optional<IdType> &LayerNode::persistentId() const {
+    return m_persistentId;
 }
 
-void LayerNode::setPersistentId(const IdType persistentId)
-{
-  m_persistentId = persistentId;
+void LayerNode::setPersistentId(const IdType persistentId) {
+    m_persistentId = persistentId;
 }
 
-const std::string& LayerNode::doGetName() const
-{
-  return layer().name();
+const std::string &LayerNode::doGetName() const {
+    return layer().name();
 }
 
-const vm::bbox3& LayerNode::doGetLogicalBounds() const
-{
-  if (!m_boundsValid)
-  {
-    validateBounds();
-  }
-  return m_logicalBounds;
+const vm::bbox3 &LayerNode::doGetLogicalBounds() const {
+    if (!m_boundsValid) {
+        validateBounds();
+    }
+    return m_logicalBounds;
 }
 
-const vm::bbox3& LayerNode::doGetPhysicalBounds() const
-{
-  if (!m_boundsValid)
-  {
-    validateBounds();
-  }
-  return m_physicalBounds;
+const vm::bbox3 &LayerNode::doGetPhysicalBounds() const {
+    if (!m_boundsValid) {
+        validateBounds();
+    }
+    return m_physicalBounds;
 }
 
-FloatType LayerNode::doGetProjectedArea(const vm::axis::type) const
-{
-  return static_cast<FloatType>(0);
+FloatType LayerNode::doGetProjectedArea(const vm::axis::type) const {
+    return static_cast<FloatType>(0);
 }
 
-Node* LayerNode::doClone(const vm::bbox3&) const
-{
-  LayerNode* layerNode = new LayerNode(m_layer);
-  cloneAttributes(layerNode);
-  return layerNode;
+Node *LayerNode::doClone(const vm::bbox3 &) const {
+    LayerNode *layerNode = new LayerNode(m_layer);
+    cloneAttributes(layerNode);
+    return layerNode;
 }
 
-bool LayerNode::doCanAddChild(const Node* child) const
-{
-  return child->accept(kdl::overload(
-    [](const WorldNode*) { return false; },
-    [](const LayerNode*) { return false; },
-    [](const GroupNode*) { return true; },
-    [](const EntityNode*) { return true; },
-    [](const BrushNode*) { return true; },
-    [](const PatchNode*) { return true; }));
+bool LayerNode::doCanAddChild(const Node *child) const {
+    return child->accept(kdl::overload(
+        [](const WorldNode *) { return false; },
+        [](const LayerNode *) { return false; },
+        [](const GroupNode *) { return true; },
+        [](const EntityNode *) { return true; },
+        [](const BrushNode *) { return true; },
+        [](const PatchNode *) { return true; }));
 }
 
-bool LayerNode::doCanRemoveChild(const Node* /* child */) const
-{
-  return true;
+bool LayerNode::doCanRemoveChild(const Node * /* child */) const {
+    return true;
 }
 
-bool LayerNode::doRemoveIfEmpty() const
-{
-  return false;
+bool LayerNode::doRemoveIfEmpty() const {
+    return false;
 }
 
-bool LayerNode::doShouldAddToSpacialIndex() const
-{
-  return false;
+bool LayerNode::doShouldAddToSpacialIndex() const {
+    return false;
 }
 
-void LayerNode::doNodePhysicalBoundsDidChange()
-{
-  invalidateBounds();
+void LayerNode::doNodePhysicalBoundsDidChange() {
+    invalidateBounds();
 }
 
-bool LayerNode::doSelectable() const
-{
-  return false;
+bool LayerNode::doSelectable() const {
+    return false;
 }
 
-void LayerNode::doPick(const EditorContext&, const vm::ray3& /* ray */, PickResult&) {}
+void LayerNode::doPick(const EditorContext &, const vm::ray3 & /* ray */, PickResult &) {}
 
-void LayerNode::doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result)
-{
-  for (Node* child : Node::children())
-    child->findNodesContaining(point, result);
+void LayerNode::doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) {
+    for (Node *child: Node::children())
+        child->findNodesContaining(point, result);
 }
 
-void LayerNode::doAccept(NodeVisitor& visitor)
-{
-  visitor.visit(this);
+void LayerNode::doAccept(NodeVisitor &visitor) {
+    visitor.visit(this);
 }
 
-void LayerNode::doAccept(ConstNodeVisitor& visitor) const
-{
-  visitor.visit(this);
+void LayerNode::doAccept(ConstNodeVisitor &visitor) const {
+    visitor.visit(this);
 }
 
-void LayerNode::invalidateBounds()
-{
-  m_boundsValid = false;
+void LayerNode::invalidateBounds() {
+    m_boundsValid = false;
 }
 
-void LayerNode::validateBounds() const
-{
-  m_logicalBounds = computeLogicalBounds(children(), vm::bbox3(0.0));
-  m_physicalBounds = computePhysicalBounds(children(), vm::bbox3(0.0));
-  m_boundsValid = true;
+void LayerNode::validateBounds() const {
+    m_logicalBounds = computeLogicalBounds(children(), vm::bbox3(0.0));
+    m_physicalBounds = computePhysicalBounds(children(), vm::bbox3(0.0));
+    m_boundsValid = true;
 }
 
-void LayerNode::doAcceptTagVisitor(TagVisitor& visitor)
-{
-  visitor.visit(*this);
+void LayerNode::doAcceptTagVisitor(TagVisitor &visitor) {
+    visitor.visit(*this);
 }
 
-void LayerNode::doAcceptTagVisitor(ConstTagVisitor& visitor) const
-{
-  visitor.visit(*this);
+void LayerNode::doAcceptTagVisitor(ConstTagVisitor &visitor) const {
+    visitor.visit(*this);
 }
 } // namespace Model
 } // namespace TrenchBroom

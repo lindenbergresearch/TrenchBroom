@@ -28,41 +28,45 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class CompareHits;
+
 class HitQuery;
 
-class PickResult
-{
+class PickResult {
 private:
-  std::vector<Hit> m_hits;
-  std::shared_ptr<CompareHits> m_compare;
-  class CompareWrapper;
+    std::vector<Hit> m_hits;
+    std::shared_ptr<CompareHits> m_compare;
+
+    class CompareWrapper;
 
 public:
-  PickResult(std::shared_ptr<CompareHits> compare);
-  PickResult();
+    PickResult(std::shared_ptr<CompareHits> compare);
 
-  defineCopyAndMove(PickResult);
+    PickResult();
 
-  ~PickResult();
+defineCopyAndMove(PickResult);
 
-  static PickResult byDistance();
-  static PickResult bySize(vm::axis::type axis);
+    ~PickResult();
 
-  bool empty() const;
-  size_t size() const;
+    static PickResult byDistance();
 
-  void addHit(const Hit& hit);
+    static PickResult bySize(vm::axis::type axis);
 
-  const std::vector<Hit>& all() const;
-  const Hit& first(const HitFilter& filter) const;
-  std::vector<Hit> all(const HitFilter& filter) const;
+    bool empty() const;
 
-  void clear();
+    size_t size() const;
+
+    void addHit(const Hit &hit);
+
+    const std::vector<Hit> &all() const;
+
+    const Hit &first(const HitFilter &filter) const;
+
+    std::vector<Hit> all(const HitFilter &filter) const;
+
+    void clear();
 };
 } // namespace Model
 } // namespace TrenchBroom

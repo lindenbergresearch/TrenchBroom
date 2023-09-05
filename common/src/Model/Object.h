@@ -21,38 +21,43 @@
 
 #include "FloatType.h"
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class GroupNode;
+
 class LayerNode;
+
 class Node;
 
-class Object
-{
+class Object {
 protected:
-  Object();
+    Object();
 
 public:
-  virtual ~Object();
+    virtual ~Object();
 
-  Node* container();
-  const Node* container() const;
+    Node *container();
 
-  LayerNode* containingLayer();
-  const LayerNode* containingLayer() const;
+    const Node *container() const;
 
-  GroupNode* containingGroup();
-  const GroupNode* containingGroup() const;
+    LayerNode *containingLayer();
 
-  bool containedInGroup() const;
-  bool containingGroupOpened() const;
+    const LayerNode *containingLayer() const;
+
+    GroupNode *containingGroup();
+
+    const GroupNode *containingGroup() const;
+
+    bool containedInGroup() const;
+
+    bool containingGroupOpened() const;
 
 private: // subclassing interface
-  virtual Node* doGetContainer() = 0;
-  virtual LayerNode* doGetContainingLayer() = 0;
-  virtual GroupNode* doGetContainingGroup() = 0;
+    virtual Node *doGetContainer() = 0;
+
+    virtual LayerNode *doGetContainingLayer() = 0;
+
+    virtual GroupNode *doGetContainingGroup() = 0;
 };
 } // namespace Model
 } // namespace TrenchBroom

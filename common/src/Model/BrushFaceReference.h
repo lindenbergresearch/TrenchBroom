@@ -26,10 +26,8 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushNode;
 
 /**
@@ -41,33 +39,32 @@ class BrushNode;
  * the resolved face might not be the same as the face which the reference was created
  * with.
  */
-class BrushFaceReference
-{
+class BrushFaceReference {
 private:
-  BrushNode* m_node;
-  vm::plane3 m_facePlane;
+    BrushNode *m_node;
+    vm::plane3 m_facePlane;
 
 public:
-  /**
-   * Creates a new reference to the given face.
-   *
-   * @param node the containing brush node, must not be null
-   * @param face the face to reference
-   */
-  BrushFaceReference(Model::BrushNode* node, const Model::BrushFace& face);
+    /**
+     * Creates a new reference to the given face.
+     *
+     * @param node the containing brush node, must not be null
+     * @param face the face to reference
+     */
+    BrushFaceReference(Model::BrushNode *node, const Model::BrushFace &face);
 
-  /**
-   * Resolves the referenced brush face.
-   *
-   * @throws BrushFaceReferenceException if the face cannot be resolved
-   */
-  BrushFaceHandle resolve() const;
+    /**
+     * Resolves the referenced brush face.
+     *
+     * @throws BrushFaceReferenceException if the face cannot be resolved
+     */
+    BrushFaceHandle resolve() const;
 };
 
 /**
  * Returns a vector of brush face references for faces represented by the given handles.
  */
-std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle>& handles);
+std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &handles);
 
 /**
  * Returns a vector brush face handles representing the faces to which the given face
@@ -77,6 +74,6 @@ std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle>& h
  * resolved
  */
 std::vector<BrushFaceHandle> resolveAllRefs(
-  const std::vector<BrushFaceReference>& faceRefs);
+    const std::vector<BrushFaceReference> &faceRefs);
 } // namespace Model
 } // namespace TrenchBroom

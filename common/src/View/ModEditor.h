@@ -29,62 +29,76 @@
 #include <vector>
 
 class QLineEdit;
+
 class QListWidget;
+
 class QWidget;
+
 class QAbstractButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
 
-class ModEditor : public QWidget
-{
-  Q_OBJECT
+class ModEditor : public QWidget {
+Q_OBJECT
 private:
-  std::weak_ptr<MapDocument> m_document;
+    std::weak_ptr<MapDocument> m_document;
 
-  QListWidget* m_availableModList;
-  QListWidget* m_enabledModList;
-  QLineEdit* m_filterBox;
-  QAbstractButton* m_addModsButton;
-  QAbstractButton* m_removeModsButton;
-  QAbstractButton* m_moveModUpButton;
-  QAbstractButton* m_moveModDownButton;
+    QListWidget *m_availableModList;
+    QListWidget *m_enabledModList;
+    QLineEdit *m_filterBox;
+    QAbstractButton *m_addModsButton;
+    QAbstractButton *m_removeModsButton;
+    QAbstractButton *m_moveModUpButton;
+    QAbstractButton *m_moveModDownButton;
 
-  std::vector<std::string> m_availableMods;
+    std::vector<std::string> m_availableMods;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  explicit ModEditor(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+    explicit ModEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
-  void createGui();
+    void createGui();
+
 private slots:
-  void updateButtons();
+
+    void updateButtons();
 
 private:
-  void connectObservers();
+    void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
-  void documentWasLoaded(MapDocument* document);
-  void modsDidChange();
-  void preferenceDidChange(const std::filesystem::path& path);
+    void documentWasNewed(MapDocument *document);
 
-  void updateAvailableMods();
-  void updateMods();
+    void documentWasLoaded(MapDocument *document);
 
-  void addModClicked();
-  void removeModClicked();
-  void moveModUpClicked();
-  void moveModDownClicked();
-  bool canEnableAddButton() const;
-  bool canEnableRemoveButton() const;
-  bool canEnableMoveUpButton() const;
-  bool canEnableMoveDownButton() const;
-  void filterBoxChanged();
+    void modsDidChange();
+
+    void preferenceDidChange(const std::filesystem::path &path);
+
+    void updateAvailableMods();
+
+    void updateMods();
+
+    void addModClicked();
+
+    void removeModClicked();
+
+    void moveModUpClicked();
+
+    void moveModDownClicked();
+
+    bool canEnableAddButton() const;
+
+    bool canEnableRemoveButton() const;
+
+    bool canEnableMoveUpButton() const;
+
+    bool canEnableMoveDownButton() const;
+
+    void filterBoxChanged();
 };
 } // namespace View
 } // namespace TrenchBroom

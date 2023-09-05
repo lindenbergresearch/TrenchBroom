@@ -29,29 +29,23 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-namespace
-{
+namespace TrenchBroom {
+namespace Model {
+namespace {
 static const auto Type = freeIssueType();
 } // namespace
 
 MissingDefinitionValidator::MissingDefinitionValidator()
-  : Validator{Type, "Missing entity definition"}
-{
-  addQuickFix(makeDeleteNodesQuickFix());
+    : Validator{Type, "Missing entity definition"} {
+    addQuickFix(makeDeleteNodesQuickFix());
 }
 
 void MissingDefinitionValidator::doValidate(
-  EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues) const
-{
-  if (entityNode.entity().definition() == nullptr)
-  {
-    issues.push_back(std::make_unique<Issue>(
-      Type, entityNode, entityNode.name() + " not found in entity definitions"));
-  }
+    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+    if (entityNode.entity().definition() == nullptr) {
+        issues.push_back(std::make_unique<Issue>(
+            Type, entityNode, entityNode.name() + " not found in entity definitions"));
+    }
 }
 } // namespace Model
 } // namespace TrenchBroom

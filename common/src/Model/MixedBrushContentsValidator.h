@@ -23,18 +23,15 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class MixedBrushContentsValidator : public Validator
-{
+namespace TrenchBroom {
+namespace Model {
+class MixedBrushContentsValidator : public Validator {
 public:
-  MixedBrushContentsValidator();
+    MixedBrushContentsValidator();
 
 private:
-  void doValidate(
-    BrushNode& brushNode, std::vector<std::unique_ptr<Issue>>& issues) const override;
+    void doValidate(
+        BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

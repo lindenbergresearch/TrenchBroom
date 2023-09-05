@@ -27,55 +27,63 @@
 #include <vector>
 
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class EntityDefinitionLoader;
+
 class ParserStatus;
 } // namespace TrenchBroom::IO
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class EntityNodeBase;
 }
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class EntityDefinition;
+
 class EntityDefinitionGroup;
+
 enum class EntityDefinitionSortOrder;
 enum class EntityDefinitionType;
 
-class EntityDefinitionManager
-{
+class EntityDefinitionManager {
 private:
-  using Cache = std::map<std::string, EntityDefinition*>;
-  std::vector<EntityDefinition*> m_definitions;
-  std::vector<EntityDefinitionGroup> m_groups;
-  Cache m_cache;
+    using Cache = std::map<std::string, EntityDefinition *>;
+    std::vector<EntityDefinition *> m_definitions;
+    std::vector<EntityDefinitionGroup> m_groups;
+    Cache m_cache;
 
 public:
-  ~EntityDefinitionManager();
+    ~EntityDefinitionManager();
 
-  Result<void> loadDefinitions(
-    const std::filesystem::path& path,
-    const IO::EntityDefinitionLoader& loader,
-    IO::ParserStatus& status);
-  void setDefinitions(const std::vector<EntityDefinition*>& newDefinitions);
-  void clear();
+    Result<void> loadDefinitions(
+        const std::filesystem::path &path,
+        const IO::EntityDefinitionLoader &loader,
+        IO::ParserStatus &status);
 
-  EntityDefinition* definition(const Model::EntityNodeBase* node) const;
-  EntityDefinition* definition(const std::string& classname) const;
-  std::vector<EntityDefinition*> definitions(
-    EntityDefinitionType type, EntityDefinitionSortOrder order) const;
-  const std::vector<EntityDefinition*>& definitions() const;
+    void setDefinitions(const std::vector<EntityDefinition *> &newDefinitions);
 
-  const std::vector<EntityDefinitionGroup>& groups() const;
+    void clear();
+
+    EntityDefinition *definition(const Model::EntityNodeBase *node) const;
+
+    EntityDefinition *definition(const std::string &classname) const;
+
+    std::vector<EntityDefinition *> definitions(
+        EntityDefinitionType type, EntityDefinitionSortOrder order) const;
+
+    const std::vector<EntityDefinition *> &definitions() const;
+
+    const std::vector<EntityDefinitionGroup> &groups() const;
 
 private:
-  void updateIndices();
-  void updateGroups();
-  void updateCache();
-  void clearCache();
-  void clearGroups();
+    void updateIndices();
+
+    void updateGroups();
+
+    void updateCache();
+
+    void clearCache();
+
+    void clearGroups();
 };
 } // namespace TrenchBroom::Assets

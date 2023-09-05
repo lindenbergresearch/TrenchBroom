@@ -30,135 +30,117 @@
 
 #include <kdl/result.h>
 
-namespace TrenchBroom::IO
-{
-namespace MipLayout
-{
+namespace TrenchBroom::IO {
+namespace MipLayout {
 static constexpr size_t TextureNameLength = 16;
 }
 
-namespace
-{
+namespace {
 
-using GetMipPalette = std::function<Result<Assets::Palette>(Reader& reader)>;
+using GetMipPalette = std::function<Result<Assets::Palette>(Reader &reader)>;
 
-Result<Assets::Palette> readHlMipPalette(Reader& reader)
-{
-  reader.seekFromBegin(0);
-  reader.seekFromBegin(MipLayout::TextureNameLength);
-
-  const auto width = reader.readSize<int32_t>();
-  const auto height = reader.readSize<int32_t>();
-  const auto mip0Offset = reader.readSize<int32_t>();
-
-  // each texture has two bytes after the last mip and before the palette data starts
-  const auto start = mip0Offset + (width * height * 85 >> 6) + 2;
-  reader.seekFromBegin(start);
-
-  // each texture has two bytes of padding at the end
-  auto data = std::vector<unsigned char>(reader.size() - start - 2);
-  reader.read(data.data(), data.size());
-  return Assets::makePalette(data);
-}
-
-Result<Assets::Texture, ReadTextureError> readMipTexture(
-  std::string name, Reader& reader, const GetMipPalette& getMipPalette)
-{
-  static const auto MipLevels = size_t(4);
-
-  auto averageColor = Color{};
-  auto buffers = Assets::TextureBufferList{MipLevels};
-  size_t offset[MipLevels];
-
-  try
-  {
-    // This is unused, we use the one from the wad directory (they're usually the same,
-    // but could be different in broken .wad's.)
-    reader.readString(MipLayout::TextureNameLength);
+Result<Assets::Palette> readHlMipPalette(Reader &reader) {
+    reader.seekFromBegin(0);
+    reader.seekFromBegin(MipLayout::TextureNameLength);
 
     const auto width = reader.readSize<int32_t>();
     const auto height = reader.readSize<int32_t>();
+    const auto mip0Offset = reader.readSize<int32_t>();
 
-    if (!checkTextureDimensions(width, height))
-    {
-      return ReadTextureError{std::move(name), "Invalid texture dimeions"};
-    }
+    // each texture has two bytes after the last mip and before the palette data starts
+    const auto start = mip0Offset + (width * height * 85 >> 6) + 2;
+    reader.seekFromBegin(start);
 
-    for (size_t i = 0; i < MipLevels; ++i)
-    {
-      offset[i] = reader.readSize<int32_t>();
-    }
-
-    const auto transparent = (!name.empty() && name.at(0) == '{')
-                               ? Assets::PaletteTransparency::Index255Transparent
-                               : Assets::PaletteTransparency::Opaque;
-
-    Assets::setMipBufferSize(buffers, MipLevels, width, height, GL_RGBA);
-    return getMipPalette(reader)
-      .and_then([&](const auto& palette) {
-        for (size_t i = 0; i < MipLevels; ++i)
-        {
-          reader.seekFromBegin(offset[i]);
-          const auto size = mipSize(width, height, i);
-
-          auto tempColor = Color{};
-          palette.indexedToRgba(reader, size, buffers[i], transparent, tempColor);
-          if (i == 0)
-          {
-            averageColor = tempColor;
-          }
-        }
-
-        const auto type =
-          (transparent == Assets::PaletteTransparency::Index255Transparent)
-            ? Assets::TextureType::Masked
-            : Assets::TextureType::Opaque;
-
-        return Result<Assets::Texture>{Assets::Texture{
-          std::move(name),
-          width,
-          height,
-          averageColor,
-          std::move(buffers),
-          GL_RGBA,
-          type}};
-      })
-      .or_else([&](const auto& e) {
-        return Result<Assets::Texture, ReadTextureError>{
-          ReadTextureError{std::move(name), e.msg}};
-      });
-  }
-  catch (const ReaderException& e)
-  {
-    return ReadTextureError{std::move(name), e.what()};
-  }
+    // each texture has two bytes of padding at the end
+    auto data = std::vector<unsigned char>(reader.size() - start - 2);
+    reader.read(data.data(), data.size());
+    return Assets::makePalette(data);
 }
 
+Result<Assets::Texture, ReadTextureError> readMipTexture(
+    std::string name, Reader &reader, const GetMipPalette &getMipPalette) {
+    static const auto MipLevels = size_t(4);
+
+    auto averageColor = Color{};
+    auto buffers = Assets::TextureBufferList{MipLevels};
+    size_t offset[MipLevels];
+
+    try {
+        // This is unused, we use the one from the wad directory (they're usually the same,
+        // but could be different in broken .wad's.)
+        reader.readString(MipLayout::TextureNameLength);
+
+        const auto width = reader.readSize<int32_t>();
+        const auto height = reader.readSize<int32_t>();
+
+        if (!checkTextureDimensions(width, height)) {
+            return ReadTextureError{std::move(name), "Invalid texture dimeions"};
+        }
+
+        for (size_t i = 0; i < MipLevels; ++i) {
+            offset[i] = reader.readSize<int32_t>();
+        }
+
+        const auto transparent = (!name.empty() && name.at(0) == '{')
+                                 ? Assets::PaletteTransparency::Index255Transparent
+                                 : Assets::PaletteTransparency::Opaque;
+
+        Assets::setMipBufferSize(buffers, MipLevels, width, height, GL_RGBA);
+        return getMipPalette(reader)
+            .and_then([&](const auto &palette) {
+              for (size_t i = 0; i < MipLevels; ++i) {
+                  reader.seekFromBegin(offset[i]);
+                  const auto size = mipSize(width, height, i);
+
+                  auto tempColor = Color{};
+                  palette.indexedToRgba(reader, size, buffers[i], transparent, tempColor);
+                  if (i == 0) {
+                      averageColor = tempColor;
+                  }
+              }
+
+              const auto type =
+                  (transparent == Assets::PaletteTransparency::Index255Transparent)
+                  ? Assets::TextureType::Masked
+                  : Assets::TextureType::Opaque;
+
+              return Result<Assets::Texture>{Assets::Texture{
+                  std::move(name),
+                  width,
+                  height,
+                  averageColor,
+                  std::move(buffers),
+                  GL_RGBA,
+                  type}};
+            })
+            .or_else([&](const auto &e) {
+              return Result<Assets::Texture, ReadTextureError>{
+                  ReadTextureError{std::move(name), e.msg}};
+            });
+    }
+    catch (const ReaderException &e) {
+        return ReadTextureError{std::move(name), e.what()};
+    }
+}
 } // namespace
 
-std::string readMipTextureName(Reader& reader)
-{
-  try
-  {
-    auto nameReader = reader.buffer();
-    return nameReader.readString(MipLayout::TextureNameLength);
-  }
-  catch (const ReaderException&)
-  {
-    return "";
-  }
+std::string readMipTextureName(Reader &reader) {
+    try {
+        auto nameReader = reader.buffer();
+        return nameReader.readString(MipLayout::TextureNameLength);
+    }
+    catch (const ReaderException &) {
+        return "";
+    }
 }
 
 Result<Assets::Texture, ReadTextureError> readIdMipTexture(
-  std::string name, Reader& reader, const Assets::Palette& palette)
-{
-  return readMipTexture(std::move(name), reader, [&](Reader&) { return palette; });
+    std::string name, Reader &reader, const Assets::Palette &palette) {
+    return readMipTexture(std::move(name), reader, [&](Reader &) { return palette; });
 }
 
 Result<Assets::Texture, ReadTextureError> readHlMipTexture(
-  std::string name, Reader& reader)
-{
-  return readMipTexture(std::move(name), reader, readHlMipPalette);
+    std::string name, Reader &reader) {
+    return readMipTexture(std::move(name), reader, readHlMipPalette);
 }
-
 } // namespace TrenchBroom::IO

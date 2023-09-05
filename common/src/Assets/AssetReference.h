@@ -23,62 +23,51 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-namespace TrenchBroom
-{
-namespace Assets
-{
-template <typename T>
-class AssetReference
-{
+namespace TrenchBroom {
+namespace Assets {
+template<typename T>
+class AssetReference {
 private:
-  T* m_asset;
+    T *m_asset;
 
 public:
-  explicit AssetReference(T* asset = nullptr)
-    : m_asset(asset)
-  {
-    if (m_asset != nullptr)
-    {
-      m_asset->incUsageCount();
+    explicit AssetReference(T *asset = nullptr)
+        : m_asset(asset) {
+        if (m_asset != nullptr) {
+            m_asset->incUsageCount();
+        }
     }
-  }
 
-  AssetReference(const AssetReference& other) noexcept
-    : AssetReference(other.m_asset)
-  {
-  }
-
-  AssetReference(AssetReference&& other) noexcept
-    : m_asset(std::exchange(other.m_asset, nullptr))
-  {
-  }
-
-  ~AssetReference()
-  {
-    if (m_asset != nullptr)
-    {
-      m_asset->decUsageCount();
+    AssetReference(const AssetReference &other) noexcept
+        : AssetReference(other.m_asset) {
     }
-  }
 
-  AssetReference& operator=(AssetReference other) noexcept
-  {
-    using std::swap;
-    swap(*this, other);
-    return *this;
-  }
+    AssetReference(AssetReference &&other) noexcept
+        : m_asset(std::exchange(other.m_asset, nullptr)) {
+    }
 
-  friend void swap(AssetReference& lhs, AssetReference& rhs)
-  {
-    using std::swap;
-    swap(lhs.m_asset, rhs.m_asset);
-  }
+    ~AssetReference() {
+        if (m_asset != nullptr) {
+            m_asset->decUsageCount();
+        }
+    }
 
-  T* get() { return m_asset; }
+    AssetReference &operator=(AssetReference other) noexcept {
+        using std::swap;
+        swap(*this, other);
+        return *this;
+    }
 
-  const T* get() const { return m_asset; }
+    friend void swap(AssetReference &lhs, AssetReference &rhs) {
+        using std::swap;
+        swap(lhs.m_asset, rhs.m_asset);
+    }
 
-  kdl_reflect_inline(AssetReference<T>, m_asset);
+    T *get() { return m_asset; }
+
+    const T *get() const { return m_asset; }
+
+    kdl_reflect_inline(AssetReference<T>, m_asset);
 };
 } // namespace Assets
 } // namespace TrenchBroom

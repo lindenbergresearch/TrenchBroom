@@ -23,81 +23,78 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Model
-{
+namespace Model {
 class BrushNode;
+
 class BrushFace;
 } // namespace Model
 
-namespace Renderer
-{
-class BrushRendererBrushCache
-{
+namespace Renderer {
+class BrushRendererBrushCache {
 public:
-  using VertexSpec = Renderer::GLVertexTypes::P3NT2;
-  using Vertex = VertexSpec::Vertex;
+    using VertexSpec = Renderer::GLVertexTypes::P3NT2;
+    using Vertex = VertexSpec::Vertex;
 
-  struct CachedFace
-  {
-    const Assets::Texture* texture;
-    const Model::BrushFace* face;
-    size_t vertexCount;
-    size_t indexOfFirstVertexRelativeToBrush;
+    struct CachedFace {
+      const Assets::Texture *texture;
+      const Model::BrushFace *face;
+      size_t vertexCount;
+      size_t indexOfFirstVertexRelativeToBrush;
 
-    CachedFace(
-      const Model::BrushFace* i_face, size_t i_indexOfFirstVertexRelativeToBrush);
-  };
+      CachedFace(
+          const Model::BrushFace *i_face, size_t i_indexOfFirstVertexRelativeToBrush);
+    };
 
-  struct CachedEdge
-  {
-    const Model::BrushFace* face1;
-    const Model::BrushFace* face2;
-    size_t vertexIndex1RelativeToBrush;
-    size_t vertexIndex2RelativeToBrush;
+    struct CachedEdge {
+      const Model::BrushFace *face1;
+      const Model::BrushFace *face2;
+      size_t vertexIndex1RelativeToBrush;
+      size_t vertexIndex2RelativeToBrush;
 
-    CachedEdge(
-      const Model::BrushFace* i_face1,
-      const Model::BrushFace* i_face2,
-      size_t i_vertexIndex1RelativeToBrush,
-      size_t i_vertexIndex2RelativeToBrush);
-  };
+      CachedEdge(
+          const Model::BrushFace *i_face1,
+          const Model::BrushFace *i_face2,
+          size_t i_vertexIndex1RelativeToBrush,
+          size_t i_vertexIndex2RelativeToBrush);
+    };
 
 private:
-  std::vector<Vertex> m_cachedVertices;
-  std::vector<CachedEdge> m_cachedEdges;
-  std::vector<CachedFace> m_cachedFacesSortedByTexture;
-  bool m_rendererCacheValid;
+    std::vector<Vertex> m_cachedVertices;
+    std::vector<CachedEdge> m_cachedEdges;
+    std::vector<CachedFace> m_cachedFacesSortedByTexture;
+    bool m_rendererCacheValid;
 
 public:
-  BrushRendererBrushCache();
+    BrushRendererBrushCache();
 
-  /**
-   * Only exposed to be called by BrushFace
-   */
-  void invalidateVertexCache();
-  /**
-   * Call this before cachedVertices()/cachedFacesSortedByTexture()/cachedEdges()
-   *
-   * NOTE: The reason for having this cache is we often need to re-upload the brush to
-   * VBO's when the brush itself hasn't changed, but we're moving it between VBO's for
-   * different rendering styles (default/selected/locked), or need to re-evaluate the
-   * BrushRenderer::Filter to exclude certain faces/edges.
-   */
-  void validateVertexCache(const Model::BrushNode& brushNode);
+    /**
+     * Only exposed to be called by BrushFace
+     */
+    void invalidateVertexCache();
 
-  /**
-   * Returns all vertices for all faces of the brush.
-   */
-  const std::vector<Vertex>& cachedVertices() const;
-  const std::vector<CachedFace>& cachedFacesSortedByTexture() const;
-  const std::vector<CachedEdge>& cachedEdges() const;
+    /**
+     * Call this before cachedVertices()/cachedFacesSortedByTexture()/cachedEdges()
+     *
+     * NOTE: The reason for having this cache is we often need to re-upload the brush to
+     * VBO's when the brush itself hasn't changed, but we're moving it between VBO's for
+     * different rendering styles (default/selected/locked), or need to re-evaluate the
+     * BrushRenderer::Filter to exclude certain faces/edges.
+     */
+    void validateVertexCache(const Model::BrushNode &brushNode);
+
+    /**
+     * Returns all vertices for all faces of the brush.
+     */
+    const std::vector<Vertex> &cachedVertices() const;
+
+    const std::vector<CachedFace> &cachedFacesSortedByTexture() const;
+
+    const std::vector<CachedEdge> &cachedEdges() const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

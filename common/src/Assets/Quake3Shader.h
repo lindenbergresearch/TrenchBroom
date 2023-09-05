@@ -24,72 +24,72 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
-class Quake3ShaderStage
-{
+namespace TrenchBroom {
+namespace Assets {
+class Quake3ShaderStage {
 public:
-  struct BlendFunc
-  {
-    std::string srcFactor;
-    std::string destFactor;
+    struct BlendFunc {
+      std::string srcFactor;
+      std::string destFactor;
 
-    static const std::string One;
-    static const std::string Zero;
-    static const std::string SrcColor;
-    static const std::string DestColor;
-    static const std::string OneMinusSrcColor;
-    static const std::string OneMinusDestColor;
-    static const std::string SrcAlpha;
-    static const std::string DestAlpha;
-    static const std::string OneMinusSrcAlpha;
-    static const std::string OneMinusDestAlpha;
-    static const std::string SrcAlphaSaturate;
+      static const std::string One;
+      static const std::string Zero;
+      static const std::string SrcColor;
+      static const std::string DestColor;
+      static const std::string OneMinusSrcColor;
+      static const std::string OneMinusDestColor;
+      static const std::string SrcAlpha;
+      static const std::string DestAlpha;
+      static const std::string OneMinusSrcAlpha;
+      static const std::string OneMinusDestAlpha;
+      static const std::string SrcAlphaSaturate;
 
-    bool enable() const;
-    bool validateSrcFactor() const;
-    bool validateDestFactor() const;
-    void reset();
-  };
+      bool enable() const;
+
+      bool validateSrcFactor() const;
+
+      bool validateDestFactor() const;
+
+      void reset();
+    };
 
 public:
-  std::filesystem::path map;
-  BlendFunc blendFunc;
+    std::filesystem::path map;
+    BlendFunc blendFunc;
 };
 
 bool operator==(
-  const Quake3ShaderStage::BlendFunc& lhs, const Quake3ShaderStage::BlendFunc& rhs);
+    const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs);
+
 bool operator!=(
-  const Quake3ShaderStage::BlendFunc& lhs, const Quake3ShaderStage::BlendFunc& rhs);
+    const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs);
 
-bool operator==(const Quake3ShaderStage& lhs, const Quake3ShaderStage& rhs);
-bool operator!=(const Quake3ShaderStage& lhs, const Quake3ShaderStage& rhs);
+bool operator==(const Quake3ShaderStage &lhs, const Quake3ShaderStage &rhs);
 
-class Quake3Shader
-{
+bool operator!=(const Quake3ShaderStage &lhs, const Quake3ShaderStage &rhs);
+
+class Quake3Shader {
 public:
-  enum class Culling
-  {
-    Front,
-    Back,
-    None
-  };
-
-public:
-  std::filesystem::path shaderPath = {};
-  std::filesystem::path editorImage = {};
-  std::filesystem::path lightImage = {};
-  Culling culling = Culling::Front;
-  std::set<std::string> surfaceParms = {};
-  std::vector<Quake3ShaderStage> stages = {};
+    enum class Culling {
+      Front,
+      Back,
+      None
+    };
 
 public:
-  Quake3ShaderStage& addStage();
+    std::filesystem::path shaderPath = {};
+    std::filesystem::path editorImage = {};
+    std::filesystem::path lightImage = {};
+    Culling culling = Culling::Front;
+    std::set<std::string> surfaceParms = {};
+    std::vector<Quake3ShaderStage> stages = {};
+
+public:
+    Quake3ShaderStage &addStage();
 };
 
-bool operator==(const Quake3Shader& lhs, const Quake3Shader& rhs);
-bool operator!=(const Quake3Shader& lhs, const Quake3Shader& rhs);
+bool operator==(const Quake3Shader &lhs, const Quake3Shader &rhs);
+
+bool operator!=(const Quake3Shader &lhs, const Quake3Shader &rhs);
 } // namespace Assets
 } // namespace TrenchBroom

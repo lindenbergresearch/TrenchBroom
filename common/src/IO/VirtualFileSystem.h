@@ -26,84 +26,89 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-class VirtualMountPointId
-{
+class VirtualMountPointId {
 private:
-  size_t m_id;
+    size_t m_id;
 
-  VirtualMountPointId();
+    VirtualMountPointId();
 
 public:
-  friend bool operator==(const VirtualMountPointId& lhs, const VirtualMountPointId& rhs);
-  friend bool operator!=(const VirtualMountPointId& lhs, const VirtualMountPointId& rhs);
+    friend bool operator==(const VirtualMountPointId &lhs, const VirtualMountPointId &rhs);
 
-  friend class VirtualFileSystem;
+    friend bool operator!=(const VirtualMountPointId &lhs, const VirtualMountPointId &rhs);
+
+    friend class VirtualFileSystem;
 };
 
-struct VirtualMountPoint
-{
+struct VirtualMountPoint {
   VirtualMountPointId id;
   std::filesystem::path path;
   std::unique_ptr<FileSystem> mountedFileSystem;
 };
 
-class VirtualFileSystem : public FileSystem
-{
+class VirtualFileSystem : public FileSystem {
 private:
-  std::vector<VirtualMountPoint> m_mountPoints;
+    std::vector<VirtualMountPoint> m_mountPoints;
 
 public:
-  Result<std::filesystem::path> makeAbsolute(
-    const std::filesystem::path& path) const override;
-  PathInfo pathInfo(const std::filesystem::path& path) const override;
+    Result<std::filesystem::path> makeAbsolute(
+        const std::filesystem::path &path) const override;
 
-  VirtualMountPointId mount(
-    const std::filesystem::path& path, std::unique_ptr<FileSystem> fs);
-  bool unmount(const VirtualMountPointId& id);
-  void unmountAll();
+    PathInfo pathInfo(const std::filesystem::path &path) const override;
+
+    VirtualMountPointId mount(
+        const std::filesystem::path &path, std::unique_ptr<FileSystem> fs);
+
+    bool unmount(const VirtualMountPointId &id);
+
+    void unmountAll();
 
 protected:
-  Result<std::vector<std::filesystem::path>> doFind(
-    const std::filesystem::path& path, TraversalMode traversalMode) const override;
-  Result<std::shared_ptr<File>> doOpenFile(
-    const std::filesystem::path& path) const override;
+    Result<std::vector<std::filesystem::path>> doFind(
+        const std::filesystem::path &path, TraversalMode traversalMode) const override;
+
+    Result<std::shared_ptr<File>> doOpenFile(
+        const std::filesystem::path &path) const override;
 };
 
-class WritableVirtualFileSystem : public WritableFileSystem
-{
+class WritableVirtualFileSystem : public WritableFileSystem {
 private:
-  VirtualFileSystem m_virtualFs;
-  WritableFileSystem& m_writableFs;
+    VirtualFileSystem m_virtualFs;
+    WritableFileSystem &m_writableFs;
 
 public:
-  WritableVirtualFileSystem(
-    VirtualFileSystem virtualFs, std::unique_ptr<WritableFileSystem> writableFs);
+    WritableVirtualFileSystem(
+        VirtualFileSystem virtualFs, std::unique_ptr<WritableFileSystem> writableFs);
 
-  using FileSystem::find;
+    using FileSystem::find;
 
-  Result<std::filesystem::path> makeAbsolute(
-    const std::filesystem::path& path) const override;
-  PathInfo pathInfo(const std::filesystem::path& path) const override;
+    Result<std::filesystem::path> makeAbsolute(
+        const std::filesystem::path &path) const override;
+
+    PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 private:
-  Result<std::vector<std::filesystem::path>> doFind(
-    const std::filesystem::path& path, TraversalMode traversalMode) const override;
-  Result<std::shared_ptr<File>> doOpenFile(
-    const std::filesystem::path& path) const override;
+    Result<std::vector<std::filesystem::path>> doFind(
+        const std::filesystem::path &path, TraversalMode traversalMode) const override;
 
-  Result<void> doCreateFile(
-    const std::filesystem::path& path, const std::string& contents) override;
-  Result<bool> doCreateDirectory(const std::filesystem::path& path) override;
-  Result<bool> doDeleteFile(const std::filesystem::path& path) override;
-  Result<void> doCopyFile(
-    const std::filesystem::path& sourcePath,
-    const std::filesystem::path& destPath) override;
-  Result<void> doMoveFile(
-    const std::filesystem::path& sourcePath,
-    const std::filesystem::path& destPath) override;
+    Result<std::shared_ptr<File>> doOpenFile(
+        const std::filesystem::path &path) const override;
+
+    Result<void> doCreateFile(
+        const std::filesystem::path &path, const std::string &contents) override;
+
+    Result<bool> doCreateDirectory(const std::filesystem::path &path) override;
+
+    Result<bool> doDeleteFile(const std::filesystem::path &path) override;
+
+    Result<void> doCopyFile(
+        const std::filesystem::path &sourcePath,
+        const std::filesystem::path &destPath) override;
+
+    Result<void> doMoveFile(
+        const std::filesystem::path &sourcePath,
+        const std::filesystem::path &destPath) override;
 };
-
 } // namespace TrenchBroom::IO

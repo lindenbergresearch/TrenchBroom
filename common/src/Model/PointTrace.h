@@ -29,29 +29,31 @@
 #include <iosfwd>
 #include <vector>
 
-namespace TrenchBroom::Model
-{
-class PointTrace
-{
+namespace TrenchBroom::Model {
+class PointTrace {
 private:
-  std::vector<vm::vec3f> m_points;
-  size_t m_current;
+    std::vector<vm::vec3f> m_points;
+    size_t m_current;
 
 public:
-  explicit PointTrace(std::vector<vm::vec3f> points);
+    explicit PointTrace(std::vector<vm::vec3f> points);
 
-  bool hasNextPoint() const;
-  bool hasPreviousPoint() const;
+    bool hasNextPoint() const;
 
-  const std::vector<vm::vec3f>& points() const;
-  const vm::vec3f& currentPoint() const;
-  const vm::vec3f currentDirection() const;
+    bool hasPreviousPoint() const;
 
-  void advance();
-  void retreat();
+    const std::vector<vm::vec3f> &points() const;
 
-  kdl_reflect_decl(PointTrace, m_points, m_current);
+    const vm::vec3f &currentPoint() const;
+
+    const vm::vec3f currentDirection() const;
+
+    void advance();
+
+    void retreat();
+
+    kdl_reflect_decl(PointTrace, m_points, m_current);
 };
 
-Result<PointTrace> loadPointFile(std::istream& stream);
+Result<PointTrace> loadPointFile(std::istream &stream);
 } // namespace TrenchBroom::Model
