@@ -115,7 +115,7 @@ void TextRenderer::renderString(
             Entry(
                 vertices,
                 size,
-                offset,
+                floor(offset),
                 Color(textColor, alphaFactor * textColor.a()),
                 Color(backgroundColor, alphaFactor * backgroundColor.a())));
     else
@@ -124,7 +124,7 @@ void TextRenderer::renderString(
             Entry(
                 vertices,
                 size,
-                offset,
+                floor(offset),
                 Color(textColor, alphaFactor * textColor.a()),
                 Color(backgroundColor, alphaFactor * backgroundColor.a())));
 }
