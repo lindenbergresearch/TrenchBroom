@@ -139,6 +139,14 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_showAxes->setToolTip(
         "Toggle showing the coordinate system axes in the 3D editing view.");
 
+    m_showMetricConversation = new QCheckBox{};
+    m_showMetricConversation->setToolTip("Show metric conversation.");
+
+    m_metricConversationFactor = new QLineEdit{};
+    m_metricConversationFactor->setToolTip("Specifies how many units equal 1 meter.");
+    m_metricConversationFactor->setMaximumWidth(70);
+    m_metricConversationFactor->setValidator(new QDoubleValidator{1.0, 60.0, 4, m_metricConversationFactor});
+
     m_textureModeCombo = new QComboBox{};
     m_textureModeCombo->setToolTip("Sets the texture filtering mode in the editing views.");
     for (const auto &textureMode: TextureModes) {
@@ -165,11 +173,12 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_rendererFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15",
                                        "16", "17", "18", "19", "20", "22", "24", "26",
                                        "28", "32", "36", "40", "48", "56", "64", "72"});
-    m_rendererFontSizeCombo->setValidator(new QIntValidator{1, 96});
+    m_rendererFontSizeCombo->setValidator(new QIntValidator{1, 96, m_rendererFontSizeCombo});
 
     auto *layout = new FormWithSectionsLayout{};
-    layout->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, 0);
-    layout->setVerticalSpacing(2);
+    layout->setContentsMargins(0, LayoutConstants::MediumVMargin + 2, 0, 0);
+    layout->setVerticalSpacing(4);
+    layout->setHorizontalSpacing(4);
     // override the default to make the sliders take up maximum width
     layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
@@ -181,6 +190,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow("Brightness", m_brightnessSlider);
     layout->addRow("Grid", m_gridAlphaSlider);
     layout->addRow("FOV", m_fovSlider);
+    layout->addRow("Show metric", m_showMetricConversation);
+    layout->addRow("Metric conversation factor", m_metricConversationFactor);
     layout->addRow("Show axes", m_showAxes);
     layout->addRow("Texture mode", m_textureModeCombo);
     layout->addRow("Enable multisampling", m_enableMsaa);
@@ -220,8 +231,14 @@ void ViewPreferencePane::bindEvents() {
         &ViewPreferencePane::gridAlphaChanged);
     connect(
         m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
-    connect(
-        m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
+
+    connect(m_showMetricConversation, &QCheckBox::stateChanged, this,
+            &ViewPreferencePane::showMetricConversationChanged);
+    connect(m_metricConversationFactor, &QLineEdit::textChanged, this,
+            &ViewPreferencePane::metricConversationFactorChanged);
+
+    connect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
+
     connect(
         m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
     connect(
@@ -257,6 +274,8 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::Brightness);
     prefs.resetToDefault(Preferences::GridAlpha);
     prefs.resetToDefault(Preferences::CameraFov);
+    prefs.resetToDefault(Preferences::ShowMetricConversation);
+    prefs.resetToDefault(Preferences::MetricConversationFactor);
     prefs.resetToDefault(Preferences::ShowAxes);
     prefs.resetToDefault(Preferences::EnableMSAA);
     prefs.resetToDefault(Preferences::TextureMinFilter);
@@ -272,6 +291,10 @@ void ViewPreferencePane::doUpdateControls() {
     m_brightnessSlider->setValue(brightnessToUI(pref(Preferences::Brightness)));
     m_gridAlphaSlider->setRatio(pref(Preferences::GridAlpha));
     m_fovSlider->setValue(int(pref(Preferences::CameraFov)));
+
+    m_showMetricConversation->setChecked(pref(Preferences::ShowMetricConversation));
+    m_metricConversationFactor->setText(
+        QString::asprintf("%.4f", pref(Preferences::MetricConversationFactor)));
 
     const auto textureModeIndex = findTextureMode(
         pref(Preferences::TextureMinFilter), pref(Preferences::TextureMagFilter));
@@ -351,6 +374,22 @@ void ViewPreferencePane::gridAlphaChanged(const int /* value */) {
 void ViewPreferencePane::fovChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::CameraFov, float(value));
+}
+
+void ViewPreferencePane::showMetricConversationChanged(const int state) {
+    const auto value = state == Qt::Checked;
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::ShowMetricConversation, value);
+}
+
+void ViewPreferencePane::metricConversationFactorChanged(const QString &text) {
+    bool ok;
+    const auto value = text.toFloat(&ok);
+
+    if (ok) {
+        auto &prefs = PreferenceManager::instance();
+        prefs.set(Preferences::MetricConversationFactor, value);
+    }
 }
 
 void ViewPreferencePane::showAxesChanged(const int state) {

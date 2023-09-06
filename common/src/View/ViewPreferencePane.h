@@ -36,6 +36,8 @@ private:
     SliderWithLabel *m_brightnessSlider = nullptr;
     SliderWithLabel *m_gridAlphaSlider = nullptr;
     SliderWithLabel *m_fovSlider = nullptr;
+    QCheckBox *m_showMetricConversation = nullptr;
+    QLineEdit *m_metricConversationFactor = nullptr;
     QCheckBox *m_showAxes = nullptr;
     QComboBox *m_textureModeCombo = nullptr;
     QCheckBox *m_enableMsaa = nullptr;
@@ -78,6 +80,10 @@ private slots:
     void fovChanged(int value);
 
     void showAxesChanged(int state);
+
+    void showMetricConversationChanged(int state);
+
+    void metricConversationFactorChanged(const QString &text);
 
     void enableMsaaChanged(int state);
 
