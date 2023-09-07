@@ -186,7 +186,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     // find fonts folder
     auto fontsPath = IO::SystemPaths::findResourceDirectories(
-        std::filesystem::path("fonts")
+        std::filesystem::path("fonts").parent_path()
     );
 
     if (!fontsPath.empty()) {
@@ -196,7 +196,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
         // search compatible fonts
         auto res = m_fs->find(
-            ".",
+            "fonts",
             IO::TraversalMode::Recursive,
             IO::makeExtensionPathMatcher({".ttf", ".otf"})
         );
