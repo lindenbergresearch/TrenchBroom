@@ -127,7 +127,7 @@ void EntityBrowserView::doInitLayout(Layout &layout) {
 }
 
 void EntityBrowserView::doReloadLayout(Layout &layout) {
-    const auto &fontPath = pref(Preferences::RendererFontPath());
+    const auto &fontPath = pref(Preferences::RendererFontPath);
     const auto fontSize = pref(Preferences::BrowserFontSize);
     assert(fontSize > 0);
 
@@ -412,7 +412,7 @@ void EntityBrowserView::renderStrings(Layout &layout, const float y, const float
 EntityBrowserView::StringMap EntityBrowserView::collectStringVertices(
     Layout &layout, const float y, const float height) {
     auto defaultDescriptor = Renderer::FontDescriptor{
-        pref(Preferences::RendererFontPath()),
+        pref(Preferences::RendererFontPath),
         static_cast<size_t>(pref(Preferences::BrowserFontSize))};
 
     const auto textColor = std::vector<Color>{pref(Preferences::BrowserTextColor)};

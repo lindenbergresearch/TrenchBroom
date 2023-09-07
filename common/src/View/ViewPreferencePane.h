@@ -36,7 +36,7 @@ private:
     SliderWithLabel *m_brightnessSlider = nullptr;
     SliderWithLabel *m_gridAlphaSlider = nullptr;
     SliderWithLabel *m_fovSlider = nullptr;
-    QCheckBox *m_showMetricConversation = nullptr;
+    QComboBox *m_unitsDisplayType = nullptr;
     QLineEdit *m_metricConversationFactor = nullptr;
     QCheckBox *m_showAxes = nullptr;
     QComboBox *m_textureModeCombo = nullptr;
@@ -44,6 +44,8 @@ private:
     QComboBox *m_themeCombo = nullptr;
     QComboBox *m_textureBrowserIconSizeCombo = nullptr;
     QComboBox *m_rendererFontSizeCombo = nullptr;
+    QComboBox *m_rendererFontCombo = nullptr;
+    std::vector<std::filesystem::path> font_files;
 
 public:
     explicit ViewPreferencePane(QWidget *parent = nullptr);
@@ -81,7 +83,7 @@ private slots:
 
     void showAxesChanged(int state);
 
-    void showMetricConversationChanged(int state);
+    void unitsDisplayTypeIndexChanged(int index);
 
     void metricConversationFactorChanged(const QString &text);
 
@@ -94,5 +96,7 @@ private slots:
     void textureBrowserIconSizeChanged(int index);
 
     void rendererFontSizeChanged(const QString &text);
+
+    void renderFontFileChanged(int index);
 };
 } // namespace TrenchBroom::View

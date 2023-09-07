@@ -46,7 +46,7 @@ Renderer::FontDescriptor makeRenderServiceFont();
 
 Renderer::FontDescriptor makeRenderServiceFont() {
     return Renderer::FontDescriptor(
-        pref(Preferences::RendererFontPath()),
+        pref(Preferences::RendererFontPath),
         static_cast<size_t>(pref(Preferences::RendererFontSize)));
 }
 
