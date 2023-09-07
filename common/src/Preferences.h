@@ -35,6 +35,12 @@ namespace Preferences {
 // NOTE: When adding a new preference here, always update the staticPreferences()
 // implementation
 
+enum UnitsDisplay {
+  UNITS = 0,
+  METRIC,
+  BOTH
+};
+
 extern Preference<int> MapViewLayout;
 
 QString systemTheme();
@@ -54,6 +60,9 @@ extern Preference<Color> PointFileColor;
 extern Preference<Color> PortalFileBorderColor;
 extern Preference<Color> PortalFileFillColor;
 extern Preference<bool> ShowFPS;
+extern Preference<int> UnitsDisplayType;
+extern Preference<float> MetricConversationFactor;
+
 
 Preference<Color> &axisColor(vm::axis::type axis);
 
@@ -132,7 +141,7 @@ extern Preference<bool> EnableMSAA;
 extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
-Preference<std::filesystem::path> &RendererFontPath();
+extern Preference<std::filesystem::path> RendererFontPath;
 
 extern Preference<int> RendererFontSize;
 

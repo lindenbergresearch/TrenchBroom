@@ -59,6 +59,9 @@ Preference<Color> PortalFileFillColor(
     "Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
 Preference<bool> ShowFPS("Renderer/Show FPS", false);
 
+Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsDisplay::UNITS);
+Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor", 32.0f);
+
 Preference<Color> &axisColor(vm::axis::type axis) {
     switch (axis) {
         case vm::axis::x:
@@ -72,11 +75,11 @@ Preference<Color> &axisColor(vm::axis::type axis) {
 }
 
 Preference<Color> CompassBackgroundColor(
-    "Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 0.5f), true);
+    "Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 0.5f));
 Preference<Color> CompassBackgroundOutlineColor(
-    "Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 0.5f), true);
+    "Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> CompassAxisOutlineColor(
-    "Renderer/Colors/Compass axis outline", Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+    "Renderer/Colors/Compass axis outline", Color(1.0f, 1.0f, 1.0f, 1.0f));
 
 Preference<Color> CameraFrustumColor(
     "Renderer/Colors/Camera frustum", Color(0.0f, 1.0f, 1.0f, 1.0f));
@@ -187,11 +190,8 @@ Preference<bool> EnableMSAA("Renderer/Enable multisampling", true);
 Preference<bool> TextureLock("Editor/Texture lock", true);
 Preference<bool> UVLock("Editor/UV lock", false);
 
-Preference<std::filesystem::path> &RendererFontPath() {
-    static Preference<std::filesystem::path> fontPath(
-        "Renderer/Font name", "fonts/SourceSansPro-Regular.otf");
-    return fontPath;
-}
+
+Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/B612Mono-Bold.ttf");
 
 Preference<int> RendererFontSize("Renderer/Font size", 13);
 
@@ -322,6 +322,8 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &PortalFileBorderColor,
         &PortalFileFillColor,
         &ShowFPS,
+        &UnitsDisplayType,
+        &MetricConversationFactor,
         &CompassBackgroundColor,
         &CompassBackgroundOutlineColor,
         &CompassAxisOutlineColor,
@@ -377,7 +379,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &TextureMagFilter,
         &TextureLock,
         &UVLock,
-        &RendererFontPath(),
+        &RendererFontPath,
         &RendererFontSize,
         &BrowserFontSize,
         &BrowserTextColor,
