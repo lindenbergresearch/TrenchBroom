@@ -29,6 +29,7 @@
 #include <kdl/vector_utils.h>
 
 #include <optional>
+#include <unordered_map>
 
 namespace TrenchBroom::IO {
 
@@ -65,7 +66,8 @@ bool operator!=(const VirtualMountPointId &lhs, const VirtualMountPointId &rhs) 
 
 Result<std::filesystem::path> VirtualFileSystem::makeAbsolute(
     const std::filesystem::path &path) const {
-    for (const auto &mountPoint: m_mountPoints) {
+    for (auto it = m_mountPoints.rbegin(); it != m_mountPoints.rend(); ++it)
+  {const auto &mountPoint= *it;
         if (matches(mountPoint, path)) {
             const auto pathSuffix = suffix(mountPoint, path);
             const auto absPath = mountPoint.mountedFileSystem->makeAbsolute(pathSuffix);
@@ -81,7 +83,8 @@ Result<std::filesystem::path> VirtualFileSystem::makeAbsolute(
 }
 
 PathInfo VirtualFileSystem::pathInfo(const std::filesystem::path &path) const {
-    for (const auto &mountPoint: m_mountPoints) {
+    for (auto it = m_mountPoints.rbegin(); it != m_mountPoints.rend(); ++it)
+  {const auto &mountPoint= *it;
         if (matches(mountPoint, path)) {
             const auto pathSuffix = suffix(mountPoint, path);
             if (const auto pathInfo = mountPoint.mountedFileSystem->pathInfo(pathSuffix);
@@ -92,8 +95,8 @@ PathInfo VirtualFileSystem::pathInfo(const std::filesystem::path &path) const {
     }
 
     return std::any_of(
-        m_mountPoints.begin(),
-        m_mountPoints.end(),
+        m_mountPoints.rbegin(),
+        m_mountPoints.rend(),
         [&](const auto &mountPoint) {
           return kdl::path_has_prefix(
               kdl::path_to_lower(mountPoint.path), kdl::path_to_lower(path));
@@ -106,7 +109,7 @@ PathInfo VirtualFileSystem::pathInfo(const std::filesystem::path &path) const {
 VirtualMountPointId VirtualFileSystem::mount(
     const std::filesystem::path &path, std::unique_ptr<FileSystem> fs) {
     const auto id = VirtualMountPointId{};
-    m_mountPoints.insert(m_mountPoints.begin(), VirtualMountPoint{id, path, std::move(fs)});
+    m_mountPoints.push_back({id, path, std::move(fs)});
     return id;
 }
 
@@ -157,14 +160,47 @@ Result<std::vector<std::filesystem::path>> VirtualFileSystem::doFind(
               // path is unrelated to the mount point
               return std::vector<std::filesystem::path>{};
             }))
-        .transform([](auto nestedPaths) { return kdl::vec_flatten(std::move(nestedPaths)); })
-        .transform(
-            [](auto paths) { return kdl::vec_sort_and_remove_duplicates(std::move(paths)); });
+        .transform([](auto nestedPaths) {if (nestedPaths.empty())
+      {
+        return std::vector<std::filesystem::path>{};
+      }
+      if (nestedPaths.size() == 1)
+      {
+        return std::move(nestedPaths.front());
+        }
+            auto result = std::vector<std::filesystem::path>{};
+      auto lastOccurrence = std::unordered_map<std::string, size_t>{};
+
+      for (size_t i = 0; i < nestedPaths.size(); ++i)
+      {
+        const auto& paths = nestedPaths[i];
+        for (const auto& p : paths)
+        {
+          lastOccurrence[p.generic_string()] = i;
+        }
+      }
+
+      for (size_t i = 0; i < nestedPaths.size(); ++i)
+      {
+        auto& paths = nestedPaths[i];
+        for (auto& p : paths)
+        {
+          if (lastOccurrence[p.generic_string()] == i)
+          {
+            result.push_back(std::move(p));
+          }
+        }
+      }
+
+
+      return result;
+    });
 }
 
 Result<std::shared_ptr<File>> VirtualFileSystem::doOpenFile(
     const std::filesystem::path &path) const {
-    for (const auto &mountPoint: m_mountPoints) {
+    for (auto it = m_mountPoints.rbegin(); it != m_mountPoints.rend(); ++it)
+  {const auto &mountPoint= *it;
         if (matches(mountPoint, path)) {
             const auto pathSuffix = suffix(mountPoint, path);
             if (mountPoint.mountedFileSystem->pathInfo(pathSuffix) != PathInfo::Unknown) {

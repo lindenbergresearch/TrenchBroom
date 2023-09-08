@@ -99,20 +99,12 @@ bool Palette::indexedToRgba(
     return hasTransparency;
 }
 
-Result<Palette> makePalette(const std::vector<unsigned char> &data) {
-    if (data.size() != 768 && data.size() != 1024) {
-        return Error{
-            "Could not load palette, expected 768 or 1024 bytes, got "
-            + std::to_string(data.size())};
-    }
+Result<Palette> makePalette(const std::vector<unsigned char>& data)
+{
+  auto result = std::make_shared<PaletteData>();
 
-    auto result = std::make_shared<PaletteData>();
-
-    if (data.size() == 1024) {
-        // The data is already in RGBA format, don't process it
-        result->opaqueData = data;
-        result->index255TransparentData = data;
-    } else {
+    if (data.size() == 768) {
+        // transform data to RGBA
         result->opaqueData.reserve(1024);
 
         for (size_t i = 0; i < 256; ++i) {
@@ -130,6 +122,12 @@ Result<Palette> makePalette(const std::vector<unsigned char> &data) {
         result->index255TransparentData = result->opaqueData;
         result->index255TransparentData[1023] = 0;
     }
+  else
+  {
+    // The data is already in RGBA format, don't process it
+    result->opaqueData = data;
+    result->index255TransparentData = data;
+  }
 
     return Palette{std::move(result)};
 }
