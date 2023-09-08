@@ -158,18 +158,22 @@ void FaceRenderer::doRender(RenderContext &context) {
         shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
         shader.set("SoftMapBoundsMin", context.softMapBounds().min);
         shader.set("SoftMapBoundsMax", context.softMapBounds().max);
+
         shader.set(
             "SoftMapBoundsColor",
             vm::vec4f(
                 prefs.get(Preferences::SoftMapBoundsColor).r(),
                 prefs.get(Preferences::SoftMapBoundsColor).g(),
                 prefs.get(Preferences::SoftMapBoundsColor).b(),
-                0.1f));
+                0.1f)
+        );
 
         RenderFunc func(shader, applyTexture, m_faceColor);
+
         if (m_alpha < 1.0f) {
             glAssert(glDepthMask(GL_FALSE));
         }
+
         for (const auto &[texture, brushIndexHolderPtr]: *m_indexArrayMap) {
             if (!brushIndexHolderPtr->hasValidIndices()) {
                 continue;
@@ -187,9 +191,11 @@ void FaceRenderer::doRender(RenderContext &context) {
             brushIndexHolderPtr->cleanupIndices();
             func.after(texture);
         }
+
         if (m_alpha < 1.0f) {
             glAssert(glDepthMask(GL_TRUE));
         }
+
         m_vertexArray->cleanupVertices();
     }
 }

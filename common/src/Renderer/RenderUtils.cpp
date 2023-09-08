@@ -37,11 +37,8 @@ vm::vec3f gridColorForTexture(const Assets::Texture *texture) {
     if (texture == nullptr) {
         return vm::vec3f::fill(1.0f);
     }
-    if (
-        (texture->averageColor().r() + texture->averageColor().g()
-         + texture->averageColor().b())
-        / 3.0f
-        > 0.50f) {
+
+    if ((texture->averageColor().r() + texture->averageColor().g() + texture->averageColor().b()) / 3.0f > 0.50f) {
         // bright texture grid color
         return vm::vec3f::fill(0.0f);
     } else {
@@ -104,7 +101,8 @@ std::vector<vm::vec2f> circle2D(
     const float radius,
     const float startAngle,
     const float angleLength,
-    const size_t segments) {
+    const size_t segments
+) {
     assert(radius > 0.0f);
     assert(segments > 0);
     if (angleLength == 0.0f)
@@ -128,7 +126,8 @@ std::vector<vm::vec3f> circle2D(
     const vm::axis::type axis,
     const float startAngle,
     const float angleLength,
-    const size_t segments) {
+    const size_t segments
+) {
     assert(radius > 0.0f);
     assert(segments > 0);
     if (angleLength == 0.0f)
@@ -168,7 +167,8 @@ std::vector<vm::vec3f> circle2D(
 }
 
 std::pair<float, float> startAngleAndLength(
-    const vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis) {
+    const vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis
+) {
     float angle1, angle2, angleLength;
     switch (axis) {
         case vm::axis::x:
@@ -204,7 +204,8 @@ size_t roundedRect2DVertexCount(const size_t cornerSegments) {
 }
 
 std::vector<vm::vec2f> roundedRect2D(
-    const vm::vec2f &size, const float cornerRadius, const size_t cornerSegments) {
+    const vm::vec2f &size, const float cornerRadius, const size_t cornerSegments
+) {
     return roundedRect2D(size.x(), size.y(), cornerRadius, cornerSegments);
 }
 
@@ -212,7 +213,8 @@ std::vector<vm::vec2f> roundedRect2D(
     const float width,
     const float height,
     const float cornerRadius,
-    const size_t cornerSegments) {
+    const size_t cornerSegments
+) {
     assert(cornerSegments > 0);
     assert(cornerRadius <= width / 2.0f && cornerRadius <= height / 2.0f);
 
@@ -343,13 +345,15 @@ size_t midPoint(
     std::vector<vm::vec3f> &vertices,
     MidPointCache &cache,
     const size_t index1,
-    const size_t index2);
+    const size_t index2
+);
 
 size_t midPoint(
     std::vector<vm::vec3f> &vertices,
     MidPointCache &cache,
     const size_t index1,
-    const size_t index2) {
+    const size_t index2
+) {
     MidPointCache::iterator it = cache.find(MidPointIndex(index1, index2));
     if (it == std::end(cache)) {
         const vm::vec3f &vertex1 = vertices[index1];
