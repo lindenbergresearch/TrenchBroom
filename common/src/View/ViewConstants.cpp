@@ -22,16 +22,16 @@
 #include <QColor>
 #include <QDebug>
 #include <QFont>
-#include <QFontDatabase>
 #include <QWidget>
+#include "IO/SystemPaths.h"
 
 namespace TrenchBroom {
 namespace View {
 namespace Fonts {
 QFont fixedWidthFont() {
 #if defined __APPLE__
-    QFont font("Monaco");
-    font.setStyleHint(QFont::TypeWriter);
+    QFont font("Menlo", 13);
+    font.setStyleHint(QFont::Monospace);
     return font;
 #else
     return QFontDatabase::systemFont(QFontDatabase::FixedFont);
