@@ -39,16 +39,17 @@ namespace TrenchBroom {
 namespace Renderer {
 const float TextRenderer::DefaultMaxViewDistance = 768.0f;
 const float TextRenderer::DefaultMinZoomFactor = 0.5f;
-const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(4.0f, 4.0f);
-const size_t TextRenderer::RectCornerSegments = 3;
-const float TextRenderer::RectCornerRadius = 3.0f;
+const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(5.0f, 5.0f);
+const size_t TextRenderer::RectCornerSegments = 12;
+const float TextRenderer::RectCornerRadius = 6.0f;
 
 TextRenderer::Entry::Entry(
     std::vector<vm::vec2f> &i_vertices,
     const vm::vec2f &i_size,
     const vm::vec3f &i_offset,
     const Color &i_textColor,
-    const Color &i_backgroundColor)
+    const Color &i_backgroundColor
+)
     : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor) {
     using std::swap;
     swap(vertices, i_vertices);
@@ -62,7 +63,8 @@ TextRenderer::TextRenderer(
     const FontDescriptor &fontDescriptor,
     const float maxViewDistance,
     const float minZoomFactor,
-    const vm::vec2f &inset)
+    const vm::vec2f &inset
+)
     : m_fontDescriptor(fontDescriptor), m_maxViewDistance(maxViewDistance), m_minZoomFactor(minZoomFactor),
       m_inset(inset) {
 }
@@ -72,7 +74,8 @@ void TextRenderer::renderString(
     const Color &textColor,
     const Color &backgroundColor,
     const AttrString &string,
-    const TextAnchor &position) {
+    const TextAnchor &position
+) {
     renderString(renderContext, textColor, backgroundColor, string, position, false);
 }
 
@@ -81,7 +84,8 @@ void TextRenderer::renderStringOnTop(
     const Color &textColor,
     const Color &backgroundColor,
     const AttrString &string,
-    const TextAnchor &position) {
+    const TextAnchor &position
+) {
     renderString(renderContext, textColor, backgroundColor, string, position, true);
 }
 
@@ -91,7 +95,8 @@ void TextRenderer::renderString(
     const Color &backgroundColor,
     const AttrString &string,
     const TextAnchor &position,
-    const bool onTop) {
+    const bool onTop
+) {
 
     const Camera &camera = renderContext.camera();
     const float distance = camera.perpendicularDistanceTo(position.position(camera));
@@ -109,7 +114,7 @@ void TextRenderer::renderString(
     const vm::vec2f size = font.measure(string);
     const vm::vec3f offset = position.offset(camera, size);
 
-    if (onTop)
+    if (onTop) {
         addEntry(
             m_entriesOnTop,
             Entry(
@@ -117,8 +122,10 @@ void TextRenderer::renderString(
                 size,
                 floor(offset),
                 Color(textColor, alphaFactor * textColor.a()),
-                Color(backgroundColor, alphaFactor * backgroundColor.a())));
-    else
+                Color(backgroundColor, alphaFactor * backgroundColor.a())
+            )
+        );
+    } else {
         addEntry(
             m_entries,
             Entry(
@@ -126,7 +133,10 @@ void TextRenderer::renderString(
                 size,
                 floor(offset),
                 Color(textColor, alphaFactor * textColor.a()),
-                Color(backgroundColor, alphaFactor * backgroundColor.a())));
+                Color(backgroundColor, alphaFactor * backgroundColor.a())
+            )
+        );
+    }
 }
 
 bool TextRenderer::isVisible(
@@ -134,7 +144,8 @@ bool TextRenderer::isVisible(
     const AttrString &string,
     const TextAnchor &position,
     const float distance,
-    const bool onTop) const {
+    const bool onTop
+) const {
     if (!onTop) {
         if (renderContext.render3D() && distance > m_maxViewDistance)
             return false;
@@ -152,8 +163,7 @@ bool TextRenderer::isVisible(
     return viewport.contains(offset.x(), offset.y(), actualSize.x(), actualSize.y());
 }
 
-float TextRenderer::computeAlphaFactor(
-    const RenderContext &renderContext, const float distance, const bool onTop) const {
+float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const float distance, const bool onTop) const {
     if (onTop)
         return 1.0f;
 
@@ -178,7 +188,8 @@ void TextRenderer::addEntry(EntryCollection &collection, const Entry &entry) {
 }
 
 vm::vec2f TextRenderer::stringSize(
-    RenderContext &renderContext, const AttrString &string) const {
+    RenderContext &renderContext, const AttrString &string
+) const {
     FontManager &fontManager = renderContext.fontManager();
     TextureFont &font = fontManager.font(m_fontDescriptor);
     return round(font.measure(string));
@@ -190,7 +201,8 @@ void TextRenderer::doPrepareVertices(VboManager &vboManager) {
 }
 
 void TextRenderer::prepare(
-    EntryCollection &collection, const bool onTop, VboManager &vboManager) {
+    EntryCollection &collection, const bool onTop, VboManager &vboManager
+) {
     std::vector<TextVertex> textVertices;
     textVertices.reserve(collection.textVertexCount);
 
@@ -212,7 +224,8 @@ void TextRenderer::addEntry(
     const Entry &entry,
     const bool /* onTop */,
     std::vector<TextVertex> &textVertices,
-    std::vector<RectVertex> &rectVertices) {
+    std::vector<RectVertex> &rectVertices
+) {
     const std::vector<vm::vec2f> &stringVertices = entry.vertices;
     const vm::vec2f &stringSize = entry.size;
 
@@ -225,15 +238,18 @@ void TextRenderer::addEntry(
         const vm::vec2f &position2 = stringVertices[2 * i];
         const vm::vec2f &texCoords = stringVertices[2 * i + 1];
         textVertices.emplace_back(
-            vm::vec3f(position2 + offset.xy(), -offset.z()), texCoords, textColor);
+            vm::vec3f(position2 + offset.xy(), -offset.z()), texCoords, textColor
+        );
     }
 
     const std::vector<vm::vec2f> rect =
         roundedRect2D(stringSize + 2.0f * m_inset, RectCornerRadius, RectCornerSegments);
+
     for (size_t i = 0; i < rect.size(); ++i) {
         const vm::vec2f &vertex = rect[i];
         rectVertices.emplace_back(
-            vm::vec3f(vertex + offset.xy() + stringSize / 2.0f, -offset.z()), rectColor);
+            vm::vec3f(vertex + offset.xy() + stringSize / 2.0f, -offset.z()), rectColor
+        );
     }
 }
 
@@ -263,7 +279,8 @@ void TextRenderer::render(EntryCollection &collection, RenderContext &renderCont
     glAssert(glDisable(GL_TEXTURE_2D));
 
     ActiveShader backgroundShader(
-        renderContext.shaderManager(), Shaders::TextBackgroundShader);
+        renderContext.shaderManager(), Shaders::TextBackgroundShader
+    );
     collection.rectArray.render(PrimType::Triangles);
 
     glAssert(glEnable(GL_TEXTURE_2D));
