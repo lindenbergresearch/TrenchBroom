@@ -28,7 +28,8 @@
 namespace TrenchBroom {
 namespace Preferences {
 Preference<int> MapViewLayout(
-    "Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane));
+    "Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane)
+);
 
 QString systemTheme() {
     return QStringLiteral("System");
@@ -38,19 +39,23 @@ QString darkTheme() {
     return QStringLiteral("Dark");
 }
 
-Preference<QString> Theme("Theme", systemTheme());
+Preference<QString> Theme("Theme", darkTheme());
 
 Preference<bool> ShowAxes("Renderer/Show axes", true);
 Preference<Color> SoftMapBoundsColor(
-    "Renderer/Colors/Soft map bounds color", Color(241, 125, 37));
+    "Renderer/Colors/Soft map bounds color", Color(241, 125, 37)
+);
 Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38));
 Preference<float> AxisLength("Renderer/Axis length", 128.0f);
 Preference<Color> XAxisColor(
-    "Renderer/Colors/X axis", Color(0xFF, 0x3D, 0x00, 0.7f), true);
+    "Renderer/Colors/X axis", Color(0xFF, 0x3D, 0x00, 0.7f), true
+);
 Preference<Color> YAxisColor(
-    "Renderer/Colors/Y axis", Color(0x4B, 0x95, 0x00, 0.7f), true);
+    "Renderer/Colors/Y axis", Color(0x4B, 0x95, 0x00, 0.7f), true
+);
 Preference<Color> ZAxisColor(
-    "Renderer/Colors/Z axis", Color(0x10, 0x9C, 0xFF, 0.7f), true);
+    "Renderer/Colors/Z axis", Color(0x10, 0x9C, 0xFF, 0.7f), true
+);
 Preference<Color> PointFileColor(
     "Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
 Preference<Color> PortalFileBorderColor(
@@ -104,7 +109,8 @@ Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.9f, 0.9f, 0.9f, 1.0
 Preference<Color> SelectedEdgeColor(
     "Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<float> OccludedSelectedEdgeAlpha(
-    "Renderer/Colors/Occluded selected edge alpha", 0.4f);
+    "Renderer/Colors/Occluded selected edge alpha", 0.4f
+);
 Preference<Color> LockedEdgeColor(
     "Renderer/Colors/Locked edges", Color(0.13f, 0.3f, 1.0f, 1.0f));
 Preference<Color> UndefinedEntityColor(
@@ -120,7 +126,8 @@ Preference<Color> GroupInfoOverlayTextColor(
 Preference<Color> InfoOverlayBackgroundColor(
     "Renderer/Colors/Info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
 Preference<float> WeakInfoOverlayBackgroundAlpha(
-    "Renderer/Colors/Weak info overlay background alpha", 0.3f);
+    "Renderer/Colors/Weak info overlay background alpha", 0.3f
+);
 Preference<Color> SelectedInfoOverlayTextColor(
     "Renderer/Colors/Selected info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> SelectedInfoOverlayBackgroundColor(
@@ -194,22 +201,28 @@ Preference<bool> UVLock("Editor/UV lock", false);
 Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/B612Mono-Bold.ttf");
 
 Preference<int> RendererFontSize("Renderer/Font size", 13);
-
 Preference<int> BrowserFontSize("Browser/Font size", 13);
+
 Preference<Color> BrowserTextColor("Browser/Text color", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> BrowserSubTextColor(
-    "Browser/Sub text color", Color(0.65f, 0.65f, 0.65f, 1.0f));
+    "Browser/Sub text color", Color(0.65f, 0.65f, 0.65f, 1.0f)
+);
 Preference<Color> BrowserGroupBackgroundColor(
-    "Browser/Group background color", Color(0.1f, 0.1f, 0.1f, 0.8f));
+    "Browser/Group background color", Color(0.1f, 0.1f, 0.1f, 0.8f)
+);
 Preference<Color> BrowserBackgroundColor(
-    "Browser/Background color", Color(0.14f, 0.14f, 0.14f, 1.0f));
+    "Browser/Background color", Color(0.14f, 0.14f, 0.14f, 1.0f)
+);
 Preference<float> TextureBrowserIconSize("Texture Browser/Icon size", 1.0f);
 Preference<Color> TextureBrowserDefaultColor(
-    "Texture Browser/Default color", Color(0.0f, 0.0f, 0.0f, 0.0f));
+    "Texture Browser/Default color", Color(0.0f, 0.0f, 0.0f, 0.0f)
+);
 Preference<Color> TextureBrowserSelectedColor(
-    "Texture Browser/Selected color", Color(1.0f, 0.0f, 0.0f, 1.0f));
+    "Texture Browser/Selected color", Color(1.0f, 0.0f, 0.0f, 1.0f)
+);
 Preference<Color> TextureBrowserUsedColor(
-    "Texture Browser/Used color", Color(1.0f, 0.7f, 0.0f, 1.0f));
+    "Texture Browser/Used color", Color(1.0f, 0.7f, 0.0f, 1.0f)
+);
 
 Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
@@ -221,9 +234,11 @@ Preference<bool> CameraMouseWheelInvert("Controls/Camera/Invert mouse wheel", fa
 Preference<float> CameraMoveSpeed("Controls/Camera/Move speed", 0.3f);
 Preference<bool> CameraEnableAltMove("Controls/Camera/Use alt to move", false);
 Preference<bool> CameraAltMoveInvert(
-    "Controls/Camera/Invert zoom direction when using alt to move", false);
+    "Controls/Camera/Invert zoom direction when using alt to move", false
+);
 Preference<bool> CameraMoveInCursorDir(
-    "Controls/Camera/Move camera in cursor dir", false);
+    "Controls/Camera/Move camera in cursor dir", false
+);
 Preference<float> CameraFov("Controls/Camera/Field of vision", 90.0f);
 
 Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.5f);
@@ -459,7 +474,8 @@ DynamicPreferencePattern<QKeySequence> FiltersTagsToggle("Filters/Tags/*/Toggle 
 DynamicPreferencePattern<QKeySequence> TagsEnable("Tags/*/Enable");
 DynamicPreferencePattern<QKeySequence> TagsDisable("Tags/*/Disable");
 DynamicPreferencePattern<QKeySequence> FiltersEntitiesToggleVisible(
-    "Filters/Entities/*/Toggle Visible");
+    "Filters/Entities/*/Toggle Visible"
+);
 DynamicPreferencePattern<QKeySequence> EntitiesCreate("Entities/*/Create");
 
 const std::vector<DynamicPreferencePatternBase *> &dynaimcPreferencePatterns() {
