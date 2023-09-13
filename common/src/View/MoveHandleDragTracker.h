@@ -36,6 +36,7 @@
 #include <cassert>
 #include <memory>
 #include <type_traits>
+#include <fmt/format.h>
 
 namespace TrenchBroom {
 namespace View {
@@ -348,15 +349,42 @@ public:
                                                                                           : 1.0f,
             };
 
-            static const auto axisLabels = std::array<std::string, 3>{"X: ", "Y: ", "Z: "};
-
+            static const auto axisLabels = std::array<std::string, 3>{"x: ", "y: ", "z: "};
             auto lastPos = dragState.initialHandlePosition;
+            auto unitsDisplayType = (Preferences::UnitsDisplay) pref(Preferences::UnitsDisplayType);
+
             for (size_t i = 0; i < 3; ++i) {
                 const auto &stage = stages[i];
+
                 if (stage != vm::vec3::zero()) {
                     const auto curPos = lastPos + stage;
                     const auto midPoint = (lastPos + curPos) / 2.0;
-                    const auto str = axisLabels[i] + kdl::str_to_string(stage[i]);
+                    const auto axis_label = axisLabels[i];
+                    std::string units_str;
+
+                    switch (unitsDisplayType) {
+                        case Preferences::UNITS:
+                            units_str = fmt::format(
+                                "{}{}",
+                                axis_label,
+                                kdl::str_to_string(stage[i])
+                            );
+                            break;
+                        case Preferences::METRIC:
+                            units_str = fmt::format(
+                                "{}{:.1f}m",
+                                axis_label,
+                                stage[i] / pref(Preferences::MetricConversationFactor)
+                            );
+                            break;
+                        case Preferences::BOTH:
+                            units_str = fmt::format(
+                                "{}{}u ({:.1f}m)",
+                                axis_label,
+                                kdl::str_to_string(stage[i]),
+                                stage[i] / pref(Preferences::MetricConversationFactor)
+                            );
+                    }
 
                     renderService.setForegroundColor(colors[i]);
                     renderService.setLineWidth(lineWidths[i]);
@@ -364,7 +392,7 @@ public:
 
                     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
                     renderService.renderString(
-                        str,
+                        units_str,
                         Renderer::SimpleTextAnchor{
                             vm::vec3f{midPoint}, Renderer::TextAlignment::Bottom});
 

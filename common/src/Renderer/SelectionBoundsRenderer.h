@@ -54,6 +54,8 @@ private:
     void renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch);
 
     void renderMinMax(RenderContext &renderContext, RenderBatch &renderBatch);
+
+    const std::string getFormattedUnitsString(float value_units);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

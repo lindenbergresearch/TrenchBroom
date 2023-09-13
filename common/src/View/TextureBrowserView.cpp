@@ -140,7 +140,7 @@ void TextureBrowserView::doInitLayout(Layout &layout) {
 }
 
 void TextureBrowserView::doReloadLayout(Layout &layout) {
-    const auto &fontPath = pref(Preferences::RendererFontPath());
+    const auto &fontPath = pref(Preferences::RendererFontPath);
     int fontSize = pref(Preferences::BrowserFontSize);
     assert(fontSize > 0);
 
@@ -465,7 +465,7 @@ void TextureBrowserView::renderStrings(Layout &layout, const float y, const floa
 TextureBrowserView::StringMap TextureBrowserView::collectStringVertices(
     Layout &layout, const float y, const float height) {
     Renderer::FontDescriptor defaultDescriptor(
-        pref(Preferences::RendererFontPath()),
+        pref(Preferences::RendererFontPath),
         static_cast<size_t>(pref(Preferences::BrowserFontSize)));
 
     const std::vector<Color> textColor{pref(Preferences::BrowserTextColor)};

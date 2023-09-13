@@ -329,9 +329,29 @@ void SelectionBoundsRenderer::renderSize(
         renderSize3D(renderContext, renderBatch);
 }
 
+const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_units) {
+    auto unitsDisplayType = (Preferences::UnitsDisplay) pref(Preferences::UnitsDisplayType);
+    auto metricConversationFactor = pref(Preferences::MetricConversationFactor);
+    std::stringstream buffer;
+
+    switch (unitsDisplayType) {
+        case Preferences::UNITS:
+            buffer << value_units;
+            break;
+        case Preferences::METRIC:
+            buffer << value_units / metricConversationFactor << "m";
+            break;
+        case Preferences::BOTH:
+            buffer << value_units << "u [" << value_units / metricConversationFactor << "m]";
+            break;
+    }
+
+    return buffer.str();
+}
+
 void SelectionBoundsRenderer::renderSize2D(
     RenderContext &renderContext, RenderBatch &renderBatch) {
-    static const std::string labels[3] = {"X", "Y", "Z"};
+    static const std::string labels[3] = {"x", "y", "z"};
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
@@ -347,7 +367,7 @@ void SelectionBoundsRenderer::renderSize2D(
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
         if (direction[i] == 0.0f) {
-            buffer << labels[i] << ": " << boundsSize[i];
+            buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
             renderService.renderString(buffer.str(), SizeTextAnchor2D(m_bounds, i, camera));
             buffer.str("");
         }
@@ -356,7 +376,7 @@ void SelectionBoundsRenderer::renderSize2D(
 
 void SelectionBoundsRenderer::renderSize3D(
     RenderContext &renderContext, RenderBatch &renderBatch) {
-    static const std::string labels[3] = {"X", "Y", "Z"};
+    static const std::string labels[3] = {"x", "y", "z"};
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
@@ -368,7 +388,7 @@ void SelectionBoundsRenderer::renderSize3D(
 
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
-        buffer << labels[i] << ": " << boundsSize[i];
+        buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
 
         renderService.renderString(
             buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
