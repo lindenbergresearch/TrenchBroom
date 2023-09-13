@@ -48,8 +48,8 @@ namespace Renderer {
 const size_t Compass::m_segments = 32;
 const float Compass::m_shaftLength = 28.0f;
 const float Compass::m_shaftRadius = 1.2f;
-const float Compass::m_headLength = 7.0f;
-const float Compass::m_headRadius = 3.5f;
+const float Compass::m_headLength = 9.0f;
+const float Compass::m_headRadius = 3.0f;
 
 Compass::Compass()
     : m_prepared(false) {
@@ -208,11 +208,11 @@ void Compass::renderSolidAxis(
     RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color) {
     ActiveShader shader(renderContext.shaderManager(), Shaders::CompassShader);
     shader.set("CameraPosition", vm::vec3f(0.0f, 500.0f, 0.0f));
-    shader.set("LightDirection", vm::normalize(vm::vec3f(0.0f, 0.5f, 1.0f)));
+    shader.set("LightDirection", vm::normalize(vm::vec3f(0.0f, 0.3f, 0.8f)));
     shader.set("LightDiffuse", Color(1.0f, 1.0f, 1.0f, 1.0f));
     shader.set("LightSpecular", Color(0.3f, 0.3f, 0.3f, 1.0f));
     shader.set("GlobalAmbient", Color(0.2f, 0.2f, 0.2f, 1.0f));
-    shader.set("MaterialShininess", 32.0f);
+    shader.set("MaterialShininess", 90.0f);
 
     shader.set("MaterialDiffuse", color);
     shader.set("MaterialAmbient", color);
