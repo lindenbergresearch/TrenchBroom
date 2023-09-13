@@ -404,7 +404,7 @@ void MapFrame::createToolBar() {
     // 32x32. We expect them to be drawn at 24x24 logical pixels centered in a 32x32 box, as
     // is the case with non-highdpi icons. As a workaround, just lower the toolbar size to
     // 24x24 (we could alternatively render the icons at 32x32).
-    m_toolBar->setIconSize(QSize(22, 22));
+    m_toolBar->setIconSize(QSize(24, 24));
 
     ToolBarBuilder builder(
         *m_toolBar,
@@ -419,6 +419,7 @@ void MapFrame::createToolBar() {
     actionManager.visitToolBarActions(builder);
 
     m_gridChoice = new QComboBox();
+    m_gridChoice->setObjectName("ToolBar_GridChoice");
     for (int i = Grid::MinSize; i <= Grid::MaxSize; ++i) {
         const FloatType gridSize = Grid::actualSize(i);
         const QString gridSizeStr = tr("Grid %1").arg(QString::number(gridSize, 'g'));
