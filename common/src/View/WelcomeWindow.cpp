@@ -44,16 +44,18 @@ void WelcomeWindow::createGui() {
     setWindowTitle("Welcome to TrenchBroom");
 
     m_recentDocumentListBox = new RecentDocumentListBox{};
-    m_recentDocumentListBox->setToolTip("Double click on a file to open it");
-    m_recentDocumentListBox->setFixedWidth(300);
+    m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
+    m_recentDocumentListBox->setMaximumWidth(500);
     m_recentDocumentListBox->setSizePolicy(
-        QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+        QSizePolicy::Expanding, QSizePolicy::Expanding
+    );
 
     connect(
         m_recentDocumentListBox,
         &RecentDocumentListBox::loadRecentDocument,
         this,
-        &WelcomeWindow::openDocument);
+        &WelcomeWindow::openDocument
+    );
 
     auto *innerLayout = new QHBoxLayout{};
     innerLayout->setContentsMargins(QMargins{});
@@ -62,7 +64,6 @@ void WelcomeWindow::createGui() {
     auto *appPanel = createAppPanel();
 
     innerLayout->addWidget(appPanel, 0, Qt::AlignTop);
-    innerLayout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0);
     innerLayout->addWidget(m_recentDocumentListBox, 1);
 
     auto *container = new QWidget{};
@@ -76,7 +77,7 @@ void WelcomeWindow::createGui() {
     container->setLayout(outerLayout);
 
     setCentralWidget(container);
-    setFixedSize(700, 500);
+    setFixedSize(850, 500);
 }
 
 QWidget *WelcomeWindow::createAppPanel() {
@@ -92,12 +93,14 @@ QWidget *WelcomeWindow::createAppPanel() {
         m_createNewDocumentButton,
         &QPushButton::clicked,
         this,
-        &WelcomeWindow::createNewDocument);
+        &WelcomeWindow::createNewDocument
+    );
     connect(
         m_openOtherDocumentButton,
         &QPushButton::clicked,
         this,
-        &WelcomeWindow::openOtherDocument);
+        &WelcomeWindow::openOtherDocument
+    );
 
     auto *buttonLayout = new QHBoxLayout{};
     buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -131,7 +134,8 @@ void WelcomeWindow::openOtherDocument() {
         nullptr,
         tr("Open Map"),
         fileDialogDefaultDirectory(FileDialogDir::Map),
-        "Map files (*.map);;Any files (*.*)");
+        "Map files (*.map);;Any files (*.*)"
+    );
     const auto path = IO::pathFromQString(pathStr);
 
     if (!path.empty()) {
