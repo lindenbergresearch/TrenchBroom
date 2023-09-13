@@ -53,6 +53,7 @@ void OnePaneMapView::createGui(
     addMapView(m_mapView);
 
     auto *layout = new QGridLayout{};
+    layout->setMargin(0);
     layout->addWidget(m_mapView, 0, 0, 1, 1);
     setLayout(layout);
 }
