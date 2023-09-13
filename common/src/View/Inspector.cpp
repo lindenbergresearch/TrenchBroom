@@ -42,11 +42,11 @@ Inspector::Inspector(
     m_faceInspector = new FaceInspector(document, contextManager);
 
     m_tabBook->addPage(m_mapInspector, "Map");
-    m_tabBook->addPage(m_entityInspector, "Entity");
     m_tabBook->addPage(m_faceInspector, "Face");
+    m_tabBook->addPage(m_entityInspector, "Entity");
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
     layout->addWidget(m_tabBook);
     setLayout(layout);
 }
