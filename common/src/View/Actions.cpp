@@ -1718,7 +1718,7 @@ void ActionManager::createViewMenu() {
         [](ActionExecutionContext &context) { return context.hasDocument(); },
         [](ActionExecutionContext &context) {
           return context.hasDocument() && context.document()->grid().snap();
-        }
+        }, std::filesystem::path{"SnapToGrid.svg"}
     ));
     gridMenu.addItem(createMenuAction(
         std::filesystem::path{"Menu/View/Grid/Increase Grid Size"},
@@ -2160,17 +2160,21 @@ void ActionManager::createToolbar() {
     m_toolBar->addItem(existingAction(std::filesystem::path{"Controls/Map view/Flip objects horizontally"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Controls/Map view/Flip objects vertically"}));
 
-    m_toolBar->addSeparator();
-
-    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Show Grid"}));
 
     m_toolBar->addSeparator();
 
 
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Texture Lock"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/UV Lock"}));
+
     m_toolBar->addSeparator();
+
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Show Grid"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Snap to Grid"}));
+
 }
+
+
 
 const Action *ActionManager::existingAction(
     const std::filesystem::path &preferencePath
