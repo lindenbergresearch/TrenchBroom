@@ -91,9 +91,9 @@ std::ostream &operator<<(std::ostream &lhs, const TextureBlendFunc::Enable &rhs)
 std::ostream &operator<<(std::ostream &lhs, const GameData &rhs) {
     std::visit(
         kdl::overload(
-            [&](const std::monostate &) { lhs << "std::monostate"; },
-            [&](const auto &x) { lhs << x; }),
-        rhs);
+            [&](const std::monostate &) { lhs << "std::monostate"; }, [&](const auto &x) { lhs << x; }
+        ), rhs
+    );
     return lhs;
 }
 
@@ -102,18 +102,9 @@ kdl_reflect_impl(Q2Data);
 kdl_reflect_impl(Texture);
 
 Texture::Texture(
-    std::string name,
-    const size_t width,
-    const size_t height,
-    const Color &averageColor,
-    Buffer &&buffer,
-    const GLenum format,
-    const TextureType type,
-    GameData gameData)
-    : m_name{std::move(name)}, m_width{width}, m_height{height}, m_averageColor{averageColor}, m_usageCount{0u},
-      m_overridden{false}, m_format{format}, m_type{type}, m_culling{TextureCulling::Default},
-      m_blendFunc{TextureBlendFunc::Enable::UseDefault, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}, m_textureId{0},
-      m_gameData{std::move(gameData)} {
+    std::string name, const size_t width, const size_t height, const Color &averageColor, Buffer &&buffer, const GLenum format, const TextureType type, GameData gameData
+) : m_name{std::move(name)}, m_width{width}, m_height{height}, m_averageColor{averageColor}, m_usageCount{0u}, m_overridden{false}, m_format{format}, m_type{type}, m_culling{TextureCulling::Default},
+    m_blendFunc{TextureBlendFunc::Enable::UseDefault, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}, m_textureId{0}, m_gameData{std::move(gameData)} {
     assert(m_width > 0);
     assert(m_height > 0);
     assert(buffer.size() >= m_width * m_height * bytesPerPixelForFormat(format));
@@ -121,61 +112,35 @@ Texture::Texture(
 }
 
 Texture::Texture(
-    std::string name,
-    const size_t width,
-    const size_t height,
-    const Color &averageColor,
-    BufferList buffers,
-    const GLenum format,
-    const TextureType type,
-    GameData gameData)
-    : m_name{std::move(name)}, m_width{width}, m_height{height}, m_averageColor{averageColor}, m_usageCount{0u},
-      m_overridden{false}, m_format{format}, m_type{type}, m_culling{TextureCulling::Default},
-      m_blendFunc{TextureBlendFunc::Enable::UseDefault, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}, m_textureId(0),
-      m_buffers{std::move(buffers)}, m_gameData{std::move(gameData)} {
+    std::string name, const size_t width, const size_t height, const Color &averageColor, BufferList buffers, const GLenum format, const TextureType type, GameData gameData
+) : m_name{std::move(name)}, m_width{width}, m_height{height}, m_averageColor{averageColor}, m_usageCount{0u}, m_overridden{false}, m_format{format}, m_type{type}, m_culling{TextureCulling::Default},
+    m_blendFunc{TextureBlendFunc::Enable::UseDefault, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}, m_textureId(0), m_buffers{std::move(buffers)}, m_gameData{std::move(gameData)} {
     assert(m_width > 0);
     assert(m_height > 0);
 
     const auto compressed = isCompressedFormat(format);
-    [[maybe_unused]] const auto bytesPerPixel =
-        compressed ? 0U : bytesPerPixelForFormat(format);
+    [[maybe_unused]] const auto bytesPerPixel = compressed ? 0U : bytesPerPixelForFormat(format);
     [[maybe_unused]] const auto blockSize = compressed ? blockSizeForFormat(format) : 0U;
 
     for (size_t level = 0; level < m_buffers.size(); ++level) {
         [[maybe_unused]] const auto mipSize = sizeAtMipLevel(m_width, m_height, level);
-        [[maybe_unused]] const auto numBytes =
-            compressed ? (
-                blockSize * std::max(size_t(1), mipSize.x() / 4)
-                * std::max(size_t(1), mipSize.y() / 4))
-                       : (bytesPerPixel * mipSize.x() * mipSize.y());
+        [[maybe_unused]] const auto numBytes = compressed ? (blockSize * std::max(size_t(1), mipSize.x() / 4) * std::max(size_t(1), mipSize.y() / 4)) : (bytesPerPixel * mipSize.x() * mipSize.y());
         assert(m_buffers[level].size() >= numBytes);
     }
 }
 
 Texture::Texture(
-    std::string name,
-    const size_t width,
-    const size_t height,
-    const GLenum format,
-    const TextureType type,
-    GameData gameData)
-    : m_name{std::move(name)}, m_width{width}, m_height{height}, m_averageColor(Color(0.0f, 0.0f, 0.0f, 1.0f)),
-      m_usageCount{0u}, m_overridden{false}, m_format{format}, m_type{type}, m_culling{TextureCulling::Default},
-      m_blendFunc{TextureBlendFunc::Enable::UseDefault, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}, m_textureId{0},
-      m_gameData{std::move(gameData)} {
+    std::string name, const size_t width, const size_t height, const GLenum format, const TextureType type, GameData gameData
+) : m_name{std::move(name)}, m_width{width}, m_height{height}, m_averageColor(Color(0.0f, 0.0f, 0.0f, 1.0f)), m_usageCount{0u}, m_overridden{false}, m_format{format}, m_type{type}, m_culling{TextureCulling::Default},
+    m_blendFunc{TextureBlendFunc::Enable::UseDefault, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA}, m_textureId{0}, m_gameData{std::move(gameData)} {
 }
 
 Texture::~Texture() = default;
 
-Texture::Texture(Texture &&other)
-    : m_name{std::move(other.m_name)}, m_absolutePath{std::move(other.m_absolutePath)},
-      m_relativePath{std::move(other.m_relativePath)}, m_width{std::move(other.m_width)},
-      m_height{std::move(other.m_height)}, m_averageColor{std::move(other.m_averageColor)},
-      m_usageCount{static_cast<size_t>(other.m_usageCount)}, m_overridden{std::move(other.m_overridden)},
-      m_format{std::move(other.m_format)}, m_type{std::move(other.m_type)},
-      m_surfaceParms{std::move(other.m_surfaceParms)}, m_culling{std::move(other.m_culling)},
-      m_blendFunc{std::move(other.m_blendFunc)}, m_textureId{std::move(other.m_textureId)},
-      m_buffers{std::move(other.m_buffers)}, m_gameData{std::move(other.m_gameData)} {
+Texture::Texture(Texture &&other) : m_name{std::move(other.m_name)}, m_absolutePath{std::move(other.m_absolutePath)}, m_relativePath{std::move(other.m_relativePath)}, m_width{std::move(other.m_width)}, m_height{std::move(other.m_height)},
+                                    m_averageColor{std::move(other.m_averageColor)}, m_usageCount{static_cast<size_t>(other.m_usageCount)}, m_overridden{std::move(other.m_overridden)}, m_format{std::move(other.m_format)},
+                                    m_type{std::move(other.m_type)}, m_surfaceParms{std::move(other.m_surfaceParms)}, m_culling{std::move(other.m_culling)}, m_blendFunc{std::move(other.m_blendFunc)},
+                                    m_textureId{std::move(other.m_textureId)}, m_buffers{std::move(other.m_buffers)}, m_gameData{std::move(other.m_gameData)} {
 }
 
 Texture &Texture::operator=(Texture &&other) {
@@ -324,10 +289,12 @@ void Texture::prepare(const GLuint textureId, const int minFilter, const int mag
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE));
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        } else if (m_buffers.size() == 1) {
+        }
+        else if (m_buffers.size() == 1) {
             // generate mipmaps if we don't have any
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE));
-        } else {
+        }
+        else {
             glAssert(glTexParameteri(
                 GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(m_buffers.size() - 1)));
         }
@@ -343,25 +310,13 @@ void Texture::prepare(const GLuint textureId, const int minFilter, const int mag
                 const auto dataSize = static_cast<GLsizei>(m_buffers[j].size());
 
                 glAssert(glCompressedTexImage2D(
-                    GL_TEXTURE_2D,
-                    static_cast<GLint>(j),
-                    m_format,
-                    static_cast<GLsizei>(mipSize.x()),
-                    static_cast<GLsizei>(mipSize.y()),
-                    0,
-                    dataSize,
-                    data));
-            } else {
+                    GL_TEXTURE_2D, static_cast<GLint>(j), m_format, static_cast<GLsizei>(mipSize.x()), static_cast<GLsizei>(mipSize.y()), 0, dataSize, data
+                ));
+            }
+            else {
                 glAssert(glTexImage2D(
-                    GL_TEXTURE_2D,
-                    static_cast<GLint>(j),
-                    GL_RGBA,
-                    static_cast<GLsizei>(mipSize.x()),
-                    static_cast<GLsizei>(mipSize.y()),
-                    0,
-                    m_format,
-                    GL_UNSIGNED_BYTE,
-                    data));
+                    GL_TEXTURE_2D, static_cast<GLint>(j), GL_RGBA, static_cast<GLsizei>(mipSize.x()), static_cast<GLsizei>(mipSize.y()), 0, m_format, GL_UNSIGNED_BYTE, data
+                ));
             }
         }
 
@@ -377,7 +332,8 @@ void Texture::setMode(const int minFilter, const int magFilter) {
             // Force GL_NEAREST filtering for masked textures.
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        } else {
+        }
+        else {
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter));
             glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter));
         }
@@ -408,7 +364,8 @@ void Texture::activate() const {
             glAssert(glPushAttrib(GL_COLOR_BUFFER_BIT));
             if (m_blendFunc.enable == TextureBlendFunc::Enable::UseFactors) {
                 glAssert(glBlendFunc(m_blendFunc.srcFactor, m_blendFunc.destFactor));
-            } else {
+            }
+            else {
                 assert(m_blendFunc.enable == TextureBlendFunc::Enable::DisableBlend);
                 glAssert(glDisable(GL_BLEND));
             }

@@ -21,8 +21,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-Group::Group(std::string name)
-    : m_name(std::move(name)) {
+Group::Group(std::string name) : m_name(std::move(name)) {
 }
 
 const std::string &Group::name() const {
@@ -58,8 +57,7 @@ void Group::transform(const vm::mat4x4 &transformation) {
 }
 
 bool operator==(const Group &lhs, const Group &rhs) {
-    return lhs.m_name == rhs.m_name && lhs.m_linkedGroupId == rhs.m_linkedGroupId
-           && lhs.m_transformation == rhs.m_transformation;
+    return lhs.m_name == rhs.m_name && lhs.m_linkedGroupId == rhs.m_linkedGroupId && lhs.m_transformation == rhs.m_transformation;
 }
 
 bool operator!=(const Group &lhs, const Group &rhs) {

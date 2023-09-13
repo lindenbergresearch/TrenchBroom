@@ -67,15 +67,15 @@ public:
      * Called prior to a rendering pass.
      */
     virtual void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext) const;
+        const InputState &inputState, Renderer::RenderContext &renderContext
+    ) const;
 
     /**
      * Called once during every render pass.
      */
     virtual void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) const;
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) const;
 };
 } // namespace View
 } // namespace TrenchBroom

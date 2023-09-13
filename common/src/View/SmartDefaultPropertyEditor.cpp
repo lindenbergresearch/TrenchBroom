@@ -24,8 +24,8 @@
 namespace TrenchBroom {
 namespace View {
 SmartDefaultPropertyEditor::SmartDefaultPropertyEditor(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : SmartPropertyEditor(document, parent) {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : SmartPropertyEditor(document, parent) {
 }
 
 void SmartDefaultPropertyEditor::doUpdateVisual(

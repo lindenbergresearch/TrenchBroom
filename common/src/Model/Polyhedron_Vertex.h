@@ -26,17 +26,14 @@
 namespace TrenchBroom {
 namespace Model {
 template<typename T, typename FP, typename VP>
-kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &Polyhedron_GetVertexLink<
-    T,
-    FP,
-    VP>::operator()(Polyhedron_Vertex<T, FP, VP> *vertex) const {
+kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &Polyhedron_GetVertexLink<T, FP, VP>::operator()(Polyhedron_Vertex<T, FP, VP> *vertex) const {
     return vertex->m_link;
 }
 
 template<typename T, typename FP, typename VP>
-const kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &
-Polyhedron_GetVertexLink<T, FP, VP>::operator()(
-    const Polyhedron_Vertex<T, FP, VP> *vertex) const {
+const kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &Polyhedron_GetVertexLink<T, FP, VP>::operator()(
+    const Polyhedron_Vertex<T, FP, VP> *vertex
+) const {
     return vertex->m_link;
 }
 
@@ -68,8 +65,7 @@ void Polyhedron_Vertex<T, FP, VP>::setPosition(const vm::vec<T, 3> &position) {
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron_Vertex<T, FP, VP>::HalfEdge *Polyhedron_Vertex<T, FP, VP>::leaving()
-const {
+typename Polyhedron_Vertex<T, FP, VP>::HalfEdge *Polyhedron_Vertex<T, FP, VP>::leaving() const {
     return m_leaving;
 }
 

@@ -46,48 +46,35 @@ public:
     BrushBuilder(MapFormat mapFormat, const vm::bbox3 &worldBounds);
 
     BrushBuilder(
-        MapFormat mapFormat,
-        const vm::bbox3 &worldBounds,
-        const BrushFaceAttributes &defaultAttribs);
+        MapFormat mapFormat, const vm::bbox3 &worldBounds, const BrushFaceAttributes &defaultAttribs
+    );
 
     Result<Brush> createCube(FloatType size, const std::string &textureName) const;
 
     Result<Brush> createCube(
-        FloatType size,
-        const std::string &leftTexture,
-        const std::string &rightTexture,
-        const std::string &frontTexture,
-        const std::string &backTexture,
-        const std::string &topTexture,
-        const std::string &bottomTexture) const;
+        FloatType size, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture
+    ) const;
 
     Result<Brush> createCuboid(const vm::vec3 &size, const std::string &textureName) const;
 
     Result<Brush> createCuboid(
-        const vm::vec3 &size,
-        const std::string &leftTexture,
-        const std::string &rightTexture,
-        const std::string &frontTexture,
-        const std::string &backTexture,
-        const std::string &topTexture,
-        const std::string &bottomTexture) const;
+        const vm::vec3 &size, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture
+    ) const;
 
     Result<Brush> createCuboid(
-        const vm::bbox3 &bounds, const std::string &textureName) const;
+        const vm::bbox3 &bounds, const std::string &textureName
+    ) const;
 
     Result<Brush> createCuboid(
-        const vm::bbox3 &bounds,
-        const std::string &leftTexture,
-        const std::string &rightTexture,
-        const std::string &frontTexture,
-        const std::string &backTexture,
-        const std::string &topTexture,
-        const std::string &bottomTexture) const;
+        const vm::bbox3 &bounds, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture
+    ) const;
 
     Result<Brush> createBrush(
-        const std::vector<vm::vec3> &points, const std::string &textureName) const;
+        const std::vector<vm::vec3> &points, const std::string &textureName
+    ) const;
 
     Result<Brush> createBrush(
-        const Polyhedron3 &polyhedron, const std::string &textureName) const;
+        const Polyhedron3 &polyhedron, const std::string &textureName
+    ) const;
 };
 } // namespace TrenchBroom::Model

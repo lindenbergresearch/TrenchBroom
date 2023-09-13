@@ -40,9 +40,8 @@
 namespace TrenchBroom {
 namespace IO {
 static void doWriteNodes(
-    NodeSerializer &serializer,
-    const std::vector<Model::Node *> &nodes,
-    const Model::Node *parent = nullptr) {
+    NodeSerializer &serializer, const std::vector<Model::Node *> &nodes, const Model::Node *parent = nullptr
+) {
     auto parentStack = std::vector<const Model::Node *>{parent};
     const auto parentProperties = [&]() {
       assert(!parentStack.empty());
@@ -50,42 +49,38 @@ static void doWriteNodes(
     };
 
     for (const auto *node: nodes) {
-        node->accept(kdl::overload(
-            [](const Model::WorldNode *) {},
-            [](const Model::LayerNode *) {},
-            [&](auto &&thisLambda, const Model::GroupNode *group) {
-              serializer.group(group, parentProperties());
+        node->accept(
+            kdl::overload(
+                [](const Model::WorldNode *) {}, [](const Model::LayerNode *) {}, [&](auto &&thisLambda, const Model::GroupNode *group) {
+                  serializer.group(group, parentProperties());
 
-              parentStack.push_back(group);
-              group->visitChildren(thisLambda);
-              parentStack.pop_back();
-            },
-            [&](const Model::EntityNode *entityNode) {
-              auto extraProperties = parentProperties();
-              const auto &protectedProperties = entityNode->entity().protectedProperties();
-              if (!protectedProperties.empty()) {
-                  const auto escapedProperties = kdl::vec_transform(
-                      protectedProperties,
-                      [](const auto &key) { return kdl::str_escape(key, ";"); });
-                  extraProperties.emplace_back(
-                      Model::EntityPropertyKeys::ProtectedEntityProperties,
-                      kdl::str_join(escapedProperties, ";"));
-              }
-              serializer.entity(
-                  entityNode, entityNode->entity().properties(), extraProperties, entityNode);
-            },
-            [](const Model::BrushNode *) {},
-            [](const Model::PatchNode *) {}));
+                  parentStack.push_back(group);
+                  group->visitChildren(thisLambda);
+                  parentStack.pop_back();
+                }, [&](const Model::EntityNode *entityNode) {
+                  auto extraProperties = parentProperties();
+                  const auto &protectedProperties = entityNode->entity().protectedProperties();
+                  if (!protectedProperties.empty()) {
+                      const auto escapedProperties = kdl::vec_transform(
+                          protectedProperties, [](const auto &key) { return kdl::str_escape(key, ";"); }
+                      );
+                      extraProperties.emplace_back(
+                          Model::EntityPropertyKeys::ProtectedEntityProperties, kdl::str_join(escapedProperties, ";"));
+                  }
+                  serializer.entity(
+                      entityNode, entityNode->entity().properties(), extraProperties, entityNode
+                  );
+                }, [](const Model::BrushNode *) {}, [](const Model::PatchNode *) {}
+            ));
     }
 }
 
-NodeWriter::NodeWriter(const Model::WorldNode &world, std::ostream &stream)
-    : m_world(world), m_serializer(MapFileSerializer::create(m_world.mapFormat(), stream)) {
+NodeWriter::NodeWriter(const Model::WorldNode &world, std::ostream &stream) : m_world(world), m_serializer(MapFileSerializer::create(m_world.mapFormat(), stream)) {
 }
 
 NodeWriter::NodeWriter(
-    const Model::WorldNode &world, std::unique_ptr<NodeSerializer> serializer)
-    : m_world(world), m_serializer(std::move(serializer)) {
+    const Model::WorldNode &world, std::unique_ptr<NodeSerializer> serializer
+) : m_world(world), m_serializer(std::move(serializer)) {
 }
 
 NodeWriter::~NodeWriter() = default;
@@ -134,19 +129,17 @@ void NodeWriter::writeNodes(const std::vector<Model::Node *> &nodes) {
     EntityBrushesMap entityBrushes;
 
     for (auto *node: nodes) {
-        node->accept(kdl::overload(
-            [](Model::WorldNode *) {},
-            [](Model::LayerNode *) {},
-            [&](Model::GroupNode *group) { groups.push_back(group); },
-            [&](Model::EntityNode *entity) { entities.push_back(entity); },
-            [&](Model::BrushNode *brush) {
-              if (auto *entity = dynamic_cast<Model::EntityNode *>(brush->parent())) {
-                  entityBrushes[entity].push_back(brush);
-              } else {
-                  worldBrushes.push_back(brush);
-              }
-            },
-            [](Model::PatchNode *) {}));
+        node->accept(
+            kdl::overload(
+                [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { groups.push_back(group); }, [&](Model::EntityNode *entity) { entities.push_back(entity); }, [&](Model::BrushNode *brush) {
+                  if (auto *entity = dynamic_cast<Model::EntityNode *>(brush->parent())) {
+                      entityBrushes[entity].push_back(brush);
+                  }
+                  else {
+                      worldBrushes.push_back(brush);
+                  }
+                }, [](Model::PatchNode *) {}
+            ));
     }
 
     writeWorldBrushes(worldBrushes);

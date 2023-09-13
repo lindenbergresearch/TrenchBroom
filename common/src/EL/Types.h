@@ -36,14 +36,7 @@ using MapType = std::map<std::string, Value>;
 using RangeType = std::vector<long>;
 
 enum class ValueType {
-  Boolean,
-  String,
-  Number,
-  Array,
-  Map,
-  Range,
-  Null,
-  Undefined
+  Boolean, String, Number, Array, Map, Range, Null, Undefined
 };
 
 std::string typeName(ValueType type);

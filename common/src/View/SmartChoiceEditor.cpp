@@ -37,16 +37,14 @@
 
 namespace TrenchBroom {
 namespace View {
-SmartChoiceEditor::SmartChoiceEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : SmartPropertyEditor(std::move(document), parent), m_comboBox(nullptr), m_ignoreEditTextChanged(false) {
+SmartChoiceEditor::SmartChoiceEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor(std::move(document), parent), m_comboBox(nullptr), m_ignoreEditTextChanged(false) {
     createGui();
 }
 
 void SmartChoiceEditor::comboBoxActivated(const int /* index */) {
     const kdl::set_temp ignoreTextChanged(m_ignoreEditTextChanged);
 
-    const auto valueDescStr =
-        mapStringFromUnicode(document()->encoding(), m_comboBox->currentText());
+    const auto valueDescStr = mapStringFromUnicode(document()->encoding(), m_comboBox->currentText());
     const auto valueStr = valueDescStr.substr(0, valueDescStr.find_first_of(':') - 1);
     document()->setProperty(propertyKey(), valueStr);
 }
@@ -66,22 +64,16 @@ void SmartChoiceEditor::createGui() {
     m_comboBox = new QComboBox();
     m_comboBox->setEditable(true);
     connect(
-        m_comboBox,
-        QOverload<int>::of(&QComboBox::activated),
-        this,
-        &SmartChoiceEditor::comboBoxActivated);
+        m_comboBox, QOverload<int>::of(&QComboBox::activated), this, &SmartChoiceEditor::comboBoxActivated
+    );
     connect(
-        m_comboBox,
-        &QComboBox::editTextChanged,
-        this,
-        &SmartChoiceEditor::comboBoxEditTextChanged);
+        m_comboBox, &QComboBox::editTextChanged, this, &SmartChoiceEditor::comboBoxEditTextChanged
+    );
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(
-        LayoutConstants::WideHMargin,
-        LayoutConstants::WideVMargin,
-        LayoutConstants::WideHMargin,
-        LayoutConstants::WideVMargin);
+        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+    );
     layout->setSpacing(LayoutConstants::NarrowVMargin);
     layout->addWidget(infoText);
     layout->addWidget(m_comboBox);
@@ -97,18 +89,18 @@ void SmartChoiceEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *
     m_comboBox->clear();
 
     const auto *propDef = Model::selectPropertyDefinition(propertyKey(), nodes);
-    if (
-        propDef == nullptr
-        || propDef->type() != Assets::PropertyDefinitionType::ChoiceProperty) {
+    if (propDef == nullptr || propDef->type() != Assets::PropertyDefinitionType::ChoiceProperty) {
         m_comboBox->setDisabled(true);
-    } else {
+    }
+    else {
         m_comboBox->setDisabled(false);
         const auto *choiceDef = static_cast<const Assets::ChoicePropertyDefinition *>(propDef);
         const auto &options = choiceDef->options();
 
         for (const Assets::ChoicePropertyOption &option: options) {
-            m_comboBox->addItem(mapStringToUnicode(
-                document()->encoding(), option.value() + " : " + option.description()));
+            m_comboBox->addItem(
+                mapStringToUnicode(
+                    document()->encoding(), option.value() + " : " + option.description()));
         }
 
         const auto value = Model::selectPRopertyValue(propertyKey(), nodes);

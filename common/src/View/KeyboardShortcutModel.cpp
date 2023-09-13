@@ -36,12 +36,11 @@
 namespace TrenchBroom {
 namespace View {
 KeyboardShortcutModel::ActionInfo::ActionInfo(
-    const std::filesystem::path &i_displayPath, const Action &i_action)
-    : displayPath(i_displayPath), action(i_action) {
+    const std::filesystem::path &i_displayPath, const Action &i_action
+) : displayPath(i_displayPath), action(i_action) {
 }
 
-KeyboardShortcutModel::KeyboardShortcutModel(MapDocument *document, QObject *parent)
-    : QAbstractTableModel(parent), m_document(document) {
+KeyboardShortcutModel::KeyboardShortcutModel(MapDocument *document, QObject *parent) : QAbstractTableModel(parent), m_document(document) {
     initializeActions();
     updateConflicts();
 }
@@ -65,16 +64,20 @@ int KeyboardShortcutModel::columnCount(const QModelIndex & /* parent */) const {
 }
 
 QVariant KeyboardShortcutModel::headerData(
-    const int section, const Qt::Orientation orientation, const int role) const {
+    const int section, const Qt::Orientation orientation, const int role
+) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         if (section == 0) {
             return QString("Shortcut");
-        } else if (section == 1) {
+        }
+        else if (section == 1) {
             return QString("Context");
-        } else {
+        }
+        else {
             return QString("Description");
         }
-    } else {
+    }
+    else {
         return QVariant();
     }
 }
@@ -87,23 +90,28 @@ QVariant KeyboardShortcutModel::data(const QModelIndex &index, const int role) c
         const auto &actionInfo = this->actionInfo(index.row());
         if (index.column() == 0) {
             return actionInfo.action.keySequence();
-        } else if (index.column() == 1) {
+        }
+        else if (index.column() == 1) {
             return QString::fromStdString(actionContextName(actionInfo.action.actionContext()));
-        } else {
+        }
+        else {
             return QString::fromStdString(actionInfo.displayPath.generic_string());
         }
-    } else if (role == Qt::ForegroundRole) {
+    }
+    else if (role == Qt::ForegroundRole) {
         if (hasConflicts(index)) {
             return QBrush(Qt::red);
         }
         return QVariant();
-    } else {
+    }
+    else {
         return QVariant();
     }
 }
 
 bool KeyboardShortcutModel::setData(
-    const QModelIndex &index, const QVariant &value, const int role) {
+    const QModelIndex &index, const QVariant &value, const int role
+) {
     if (!checkIndex(index) || role != Qt::EditRole) {
         return false;
     }
@@ -124,7 +132,8 @@ Qt::ItemFlags KeyboardShortcutModel::flags(const QModelIndex &index) const {
     }
     if (index.column() == 0) {
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
-    } else {
+    }
+    else {
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
 }
@@ -156,8 +165,7 @@ private:
     std::filesystem::path m_currentPath;
 
 public:
-    explicit MenuActionVisitor(std::vector<ActionInfo> &actions)
-        : m_actions(actions) {
+    explicit MenuActionVisitor(std::vector<ActionInfo> &actions) : m_actions(actions) {
     }
 
     void visit(const Menu &menu) override {
@@ -182,24 +190,31 @@ void KeyboardShortcutModel::initializeMenuActions() {
 
 void KeyboardShortcutModel::initializeViewActions() {
     const auto &actionManager = ActionManager::instance();
-    actionManager.visitMapViewActions([this](const Action &action) {
-      m_actions.emplace_back("Map View" / IO::pathFromQString(action.label()), action);
-    });
+    actionManager.visitMapViewActions(
+        [this](const Action &action) {
+          m_actions.emplace_back("Map View" / IO::pathFromQString(action.label()), action);
+        }
+    );
 }
 
 void KeyboardShortcutModel::initializeTagActions() {
     assert(m_document != nullptr);
-    m_document->visitTagActions([this](const Action &action) {
-      m_actions.emplace_back("Tags" / IO::pathFromQString(action.label()), action);
-    });
+    m_document->visitTagActions(
+        [this](const Action &action) {
+          m_actions.emplace_back("Tags" / IO::pathFromQString(action.label()), action);
+        }
+    );
 }
 
 void KeyboardShortcutModel::initializeEntityDefinitionActions() {
     assert(m_document != nullptr);
-    m_document->visitEntityDefinitionActions([this](const Action &action) {
-      m_actions.emplace_back(
-          "Entity Definitions" / IO::pathFromQString(action.label()), action);
-    });
+    m_document->visitEntityDefinitionActions(
+        [this](const Action &action) {
+          m_actions.emplace_back(
+              "Entity Definitions" / IO::pathFromQString(action.label()), action
+          );
+        }
+    );
 }
 
 void KeyboardShortcutModel::updateConflicts() {
@@ -213,7 +228,8 @@ void KeyboardShortcutModel::updateConflicts() {
           const auto lhsKeySequence = lhsAction.keySequence();
           const auto rhsKeySequence = rhsAction.keySequence();
           return lhsKeySequence < rhsKeySequence;
-      } else {
+      }
+      else {
           // otherwise, we just compare by the action context
           return lhsAction.actionContext() < rhsAction.actionContext();
       }
@@ -244,7 +260,8 @@ void KeyboardShortcutModel::updateConflicts() {
 }
 
 const KeyboardShortcutModel::ActionInfo &KeyboardShortcutModel::actionInfo(
-    const int index) const {
+    const int index
+) const {
     assert(index < totalActionCount());
     return m_actions[static_cast<size_t>(index)];
 }

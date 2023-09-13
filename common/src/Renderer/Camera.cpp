@@ -27,13 +27,12 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-Camera::Viewport::Viewport()
-    : x(0), y(0), width(0), height(0) {
+Camera::Viewport::Viewport() : x(0), y(0), width(0), height(0) {
 }
 
 Camera::Viewport::Viewport(
-    const int i_x, const int i_y, const int i_width, const int i_height)
-    : x(i_x), y(i_y), width(i_width), height(i_height) {
+    const int i_x, const int i_y, const int i_width, const int i_height
+) : x(i_x), y(i_y), width(i_width), height(i_height) {
 }
 
 bool Camera::Viewport::operator==(const Viewport &other) const {
@@ -122,22 +121,8 @@ const vm::mat4x4f Camera::orthogonalBillboardMatrix() const {
     bbRight = vm::cross(bbUp, bbLook);
 
     return vm::mat4x4f(
-        bbRight.x(),
-        bbUp.x(),
-        bbLook.x(),
-        0.0f,
-        bbRight.y(),
-        bbUp.y(),
-        bbLook.y(),
-        0.0f,
-        bbRight.z(),
-        bbUp.z(),
-        bbLook.z(),
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f);
+        bbRight.x(), bbUp.x(), bbLook.x(), 0.0f, bbRight.y(), bbUp.y(), bbLook.y(), 0.0f, bbRight.z(), bbUp.z(), bbLook.z(), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+    );
 }
 
 const vm::mat4x4f Camera::verticalBillboardMatrix() const {
@@ -153,26 +138,13 @@ const vm::mat4x4f Camera::verticalBillboardMatrix() const {
     bbRight = vm::cross(bbUp, bbLook);
 
     return vm::mat4x4f(
-        bbRight.x(),
-        bbUp.x(),
-        bbLook.x(),
-        0.0f,
-        bbRight.y(),
-        bbUp.y(),
-        bbLook.y(),
-        0.0f,
-        bbRight.z(),
-        bbUp.z(),
-        bbLook.z(),
-        0.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f);
+        bbRight.x(), bbUp.x(), bbLook.x(), 0.0f, bbRight.y(), bbUp.y(), bbLook.y(), 0.0f, bbRight.z(), bbUp.z(), bbLook.z(), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+    );
 }
 
 void Camera::frustumPlanes(
-    vm::plane3f &top, vm::plane3f &right, vm::plane3f &bottom, vm::plane3f &left) const {
+    vm::plane3f &top, vm::plane3f &right, vm::plane3f &bottom, vm::plane3f &left
+) const {
     doComputeFrustumPlanes(top, right, bottom, left);
 }
 
@@ -233,12 +205,8 @@ vm::vec3f Camera::unproject(const float x, const float y, const float depth) con
         validateMatrices();
 
     vm::vec3f normalized;
-    normalized[0] =
-        2.0f * (x - static_cast<float>(m_viewport.x)) / static_cast<float>(m_viewport.width)
-        - 1.0f;
-    normalized[1] = 2.0f * (static_cast<float>(m_viewport.height - m_viewport.y) - y)
-                    / static_cast<float>(m_viewport.height)
-                    - 1.0f;
+    normalized[0] = 2.0f * (x - static_cast<float>(m_viewport.x)) / static_cast<float>(m_viewport.width) - 1.0f;
+    normalized[1] = 2.0f * (static_cast<float>(m_viewport.height - m_viewport.y) - y) / static_cast<float>(m_viewport.height) - 1.0f;
     normalized[2] = 2.0f * depth - 1.0f;
 
     return m_inverseMatrix * normalized;
@@ -305,7 +273,8 @@ void Camera::setDirection(const vm::vec3f &direction, const vm::vec3f &up) {
         // `direction` and `up` were colinear.
         const auto axis = vm::get_abs_max_component_axis(m_direction, 2u);
         m_right = vm::normalize(cross(m_direction, axis));
-    } else {
+    }
+    else {
         m_right = vm::normalize(rightUnnormalized);
     }
     m_up = vm::cross(m_right, m_direction);
@@ -342,8 +311,7 @@ void Camera::orbit(const vm::vec3f &center, const float horizontal, const float 
 }
 
 vm::quatf Camera::clampedRotationFromYawPitch(const float yaw, const float pitch) const {
-    const auto desiredRotation =
-        vm::quatf(vm::vec3f::pos_z(), yaw) * vm::quatf(m_right, pitch);
+    const auto desiredRotation = vm::quatf(vm::vec3f::pos_z(), yaw) * vm::quatf(m_right, pitch);
     return clampRotationToUpright(desiredRotation);
 }
 
@@ -369,16 +337,15 @@ vm::quatf Camera::clampRotationToUpright(const vm::quatf &rotation) const {
         const auto correction = vm::quatf(newRight, newDirection.z() > 0 ? -angle : angle);
 
         return correction * rotation;
-    } else {
+    }
+    else {
         return rotation;
     }
 }
 
 void Camera::renderFrustum(
-    RenderContext &renderContext,
-    VboManager &vboManager,
-    const float size,
-    const Color &color) const {
+    RenderContext &renderContext, VboManager &vboManager, const float size, const Color &color
+) const {
     doRenderFrustum(renderContext, vboManager, size, color);
 }
 
@@ -387,19 +354,17 @@ float Camera::pickFrustum(const float size, const vm::ray3f &ray) const {
 }
 
 FloatType Camera::pickPointHandle(
-    const vm::ray3 &pickRay,
-    const vm::vec3 &handlePosition,
-    const FloatType handleRadius) const {
-    const auto scaling =
-        static_cast<FloatType>(perspectiveScalingFactor(vm::vec3f(handlePosition)));
+    const vm::ray3 &pickRay, const vm::vec3 &handlePosition, const FloatType handleRadius
+) const {
+    const auto scaling = static_cast<FloatType>(perspectiveScalingFactor(vm::vec3f(handlePosition)));
     return vm::intersect_ray_sphere(
-        pickRay, handlePosition, FloatType(2.0) * handleRadius * scaling);
+        pickRay, handlePosition, FloatType(2.0) * handleRadius * scaling
+    );
 }
 
 FloatType Camera::pickLineSegmentHandle(
-    const vm::ray3 &pickRay,
-    const vm::segment3 &handlePosition,
-    const FloatType handleRadius) const {
+    const vm::ray3 &pickRay, const vm::segment3 &handlePosition, const FloatType handleRadius
+) const {
     const auto dist = distance(pickRay, handlePosition);
     if (dist.parallel) {
         return vm::nan<FloatType>();
@@ -409,21 +374,13 @@ FloatType Camera::pickLineSegmentHandle(
     return pickPointHandle(pickRay, pointHandlePosition, handleRadius);
 }
 
-Camera::Camera()
-    : m_nearPlane(1.0f), m_farPlane(65536.0f), m_viewport(Viewport(0, 0, 1024, 768)), m_zoom(1.0f),
-      m_position(vm::vec3f::zero()), m_valid(false) {
+Camera::Camera() : m_nearPlane(1.0f), m_farPlane(65536.0f), m_viewport(Viewport(0, 0, 1024, 768)), m_zoom(1.0f), m_position(vm::vec3f::zero()), m_valid(false) {
     setDirection(vm::vec3f::pos_x(), vm::vec3f::pos_z());
 }
 
 Camera::Camera(
-    const float nearPlane,
-    const float farPlane,
-    const Viewport &viewport,
-    const vm::vec3f &position,
-    const vm::vec3f &direction,
-    const vm::vec3f &up)
-    : m_nearPlane(nearPlane), m_farPlane(farPlane), m_viewport(viewport), m_zoom(1.0f), m_position(position),
-      m_valid(false) {
+    const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up
+) : m_nearPlane(nearPlane), m_farPlane(farPlane), m_viewport(viewport), m_zoom(1.0f), m_position(position), m_valid(false) {
     assert(m_nearPlane >= 0.0f);
     assert(m_farPlane > m_nearPlane);
     assert(vm::is_unit(direction, vm::Cf::almost_zero()));

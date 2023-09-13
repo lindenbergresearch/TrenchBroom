@@ -32,23 +32,24 @@
 namespace TrenchBroom {
 namespace IO {
 BrushFaceReader::BrushFaceReader(
-    const std::string &str, const Model::MapFormat sourceAndTargetMapFormat)
-    : MapReader(str, sourceAndTargetMapFormat, sourceAndTargetMapFormat, {}, {}) {
+    const std::string &str, const Model::MapFormat sourceAndTargetMapFormat
+) : MapReader(str, sourceAndTargetMapFormat, sourceAndTargetMapFormat, {}, {}) {
 }
 
 std::vector<Model::BrushFace> BrushFaceReader::read(
-    const vm::bbox3 &worldBounds, ParserStatus &status) {
+    const vm::bbox3 &worldBounds, ParserStatus &status
+) {
     try {
         readBrushFaces(worldBounds, status);
         return std::move(m_brushFaces);
-    }
-    catch (const ParserException &) {
+    } catch (const ParserException &) {
         throw;
     }
 }
 
 Model::Node *BrushFaceReader::onWorldNode(
-    std::unique_ptr<Model::WorldNode>, ParserStatus &) {
+    std::unique_ptr<Model::WorldNode>, ParserStatus &
+) {
     return nullptr;
 }
 

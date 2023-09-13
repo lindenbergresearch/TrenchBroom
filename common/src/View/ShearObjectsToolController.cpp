@@ -43,8 +43,8 @@
 namespace TrenchBroom {
 namespace View {
 ShearObjectsToolController::ShearObjectsToolController(
-    ShearObjectsTool &tool, std::weak_ptr<MapDocument> document)
-    : m_tool{tool}, m_document{std::move(document)} {
+    ShearObjectsTool &tool, std::weak_ptr<MapDocument> document
+) : m_tool{tool}, m_document{std::move(document)} {
 }
 
 ShearObjectsToolController::~ShearObjectsToolController() = default;
@@ -58,7 +58,8 @@ const Tool &ShearObjectsToolController::tool() const {
 }
 
 void ShearObjectsToolController::pick(
-    const InputState &inputState, Model::PickResult &pickResult) {
+    const InputState &inputState, Model::PickResult &pickResult
+) {
     if (m_tool.applies()) {
         // forward to either ShearObjectsTool::pick2D or ShearObjectsTool::pick3D
         doPick(inputState.pickRay(), inputState.camera(), pickResult);
@@ -66,11 +67,8 @@ void ShearObjectsToolController::pick(
 }
 
 static HandlePositionProposer makeHandlePositionProposer(
-    const InputState &inputState,
-    const Grid &grid,
-    const Model::Hit &dragStartHit,
-    const vm::bbox3 &bboxAtDragStart,
-    const vm::vec3 &handleOffset) {
+    const InputState &inputState, const Grid &grid, const Model::Hit &dragStartHit, const vm::bbox3 &bboxAtDragStart, const vm::vec3 &handleOffset
+) {
     const bool vertical = inputState.modifierKeysDown(ModifierKeys::MKAlt);
     const auto &camera = inputState.camera();
 
@@ -80,25 +78,21 @@ static HandlePositionProposer makeHandlePositionProposer(
     if (camera.perspectiveProjection()) {
         if (side.normal == vm::vec3::pos_z() || side.normal == vm::vec3::neg_z()) {
             return makeHandlePositionProposer(
-                makePlaneHandlePicker(vm::plane3{sideCenter, side.normal}, handleOffset),
-                makeRelativeHandleSnapper(grid));
+                makePlaneHandlePicker(vm::plane3{sideCenter, side.normal}, handleOffset), makeRelativeHandleSnapper(grid));
         }
 
         if (vertical) {
             const auto verticalLine = vm::line3{sideCenter, vm::vec3::pos_z()};
             return makeHandlePositionProposer(
-                makeLineHandlePicker(verticalLine, handleOffset),
-                makeRelativeHandleSnapper(grid));
+                makeLineHandlePicker(verticalLine, handleOffset), makeRelativeHandleSnapper(grid));
         }
 
-        const auto sideways =
-            vm::line3{sideCenter, vm::normalize(vm::cross(side.normal, vm::vec3::pos_z()))};
+        const auto sideways = vm::line3{sideCenter, vm::normalize(vm::cross(side.normal, vm::vec3::pos_z()))};
         return makeHandlePositionProposer(
             makeLineHandlePicker(sideways, handleOffset), makeRelativeHandleSnapper(grid));
     }
 
-    const auto sideways = vm::line3{
-        sideCenter, vm::normalize(vm::cross(side.normal, vm::vec3{camera.direction()}))};
+    const auto sideways = vm::line3{sideCenter, vm::normalize(vm::cross(side.normal, vm::vec3{camera.direction()}))};
     return makeHandlePositionProposer(
         makeLineHandlePicker(sideways, handleOffset), makeRelativeHandleSnapper(grid));
 }
@@ -115,24 +109,20 @@ private:
     ShearObjectsTool &m_tool;
 
 public:
-    ShearObjectsDragDelegate(ShearObjectsTool &tool)
-        : m_tool{tool} {
+    ShearObjectsDragDelegate(ShearObjectsTool &tool) : m_tool{tool} {
     }
 
     HandlePositionProposer start(
-        const InputState &inputState,
-        const vm::vec3 & /* initialHandlePosition */,
-        const vm::vec3 &handleOffset) override {
+        const InputState &inputState, const vm::vec3 & /* initialHandlePosition */, const vm::vec3 &handleOffset
+    ) override {
         return makeHandlePositionProposer(
-            inputState,
-            m_tool.grid(),
-            m_tool.dragStartHit(),
-            m_tool.bboxAtDragStart(),
-            handleOffset);
+            inputState, m_tool.grid(), m_tool.dragStartHit(), m_tool.bboxAtDragStart(), handleOffset
+        );
     }
 
     std::optional<UpdateDragConfig> modifierKeyChange(
-        const InputState &inputState, const DragState &dragState) override {
+        const InputState &inputState, const DragState &dragState
+    ) override {
         // Modifiers are only used for the perspective camera
         if (!inputState.camera().perspectiveProjection()) {
             return std::nullopt;
@@ -153,20 +143,14 @@ public:
         m_tool.refreshViews();
 
         m_tool.setConstrainVertical(vertical);
-        return UpdateDragConfig{
-            makeHandlePositionProposer(
-                inputState,
-                m_tool.grid(),
-                m_tool.dragStartHit(),
-                m_tool.bboxAtDragStart(),
-                dragState.handleOffset),
-            ResetInitialHandlePosition::Keep};
+        return UpdateDragConfig{makeHandlePositionProposer(
+            inputState, m_tool.grid(), m_tool.dragStartHit(), m_tool.bboxAtDragStart(), dragState.handleOffset
+        ), ResetInitialHandlePosition::Keep};
     }
 
     DragStatus drag(
-        const InputState &,
-        const DragState &dragState,
-        const vm::vec3 &proposedHandlePosition) override {
+        const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
+    ) override {
         const auto delta = proposedHandlePosition - dragState.currentHandlePosition;
         m_tool.shearByDelta(delta);
         return DragStatus::Continue;
@@ -184,7 +168,8 @@ public:
 } // namespace
 
 static std::tuple<vm::vec3, vm::vec3> getInitialHandlePositionAndHitPoint(
-    const vm::bbox3 &bounds, const Model::Hit &hit) {
+    const vm::bbox3 &bounds, const Model::Hit &hit
+) {
     assert(hit.isMatch());
     assert(hit.hasType(ShearObjectsTool::ShearToolSideHitType));
 
@@ -193,7 +178,8 @@ static std::tuple<vm::vec3, vm::vec3> getInitialHandlePositionAndHitPoint(
 }
 
 std::unique_ptr<DragTracker> ShearObjectsToolController::acceptMouseDrag(
-    const InputState &inputState) {
+    const InputState &inputState
+) {
     using namespace Model::HitFilters;
 
     const bool vertical = inputState.modifierKeysDown(ModifierKeys::MKAlt);
@@ -210,8 +196,7 @@ std::unique_ptr<DragTracker> ShearObjectsToolController::acceptMouseDrag(
 
     auto document = kdl::mem_lock(m_document);
 
-    const Model::Hit &hit =
-        inputState.pickResult().first(type(ShearObjectsTool::ShearToolSideHitType));
+    const Model::Hit &hit = inputState.pickResult().first(type(ShearObjectsTool::ShearToolSideHitType));
     if (!hit.isMatch()) {
         return nullptr;
     }
@@ -219,21 +204,21 @@ std::unique_ptr<DragTracker> ShearObjectsToolController::acceptMouseDrag(
     m_tool.startShearWithHit(hit);
     m_tool.setConstrainVertical(vertical);
 
-    const auto [handlePosition, hitPoint] =
-        getInitialHandlePositionAndHitPoint(m_tool.bounds(), hit);
+    const auto [handlePosition, hitPoint] = getInitialHandlePositionAndHitPoint(m_tool.bounds(), hit);
     return createHandleDragTracker(
-        ShearObjectsDragDelegate{m_tool}, inputState, handlePosition, hitPoint);
+        ShearObjectsDragDelegate{m_tool}, inputState, handlePosition, hitPoint
+    );
 }
 
 void ShearObjectsToolController::setRenderOptions(
-    const InputState &, Renderer::RenderContext &renderContext) const {
+    const InputState &, Renderer::RenderContext &renderContext
+) const {
     renderContext.setForceHideSelectionGuide();
 }
 
 void ShearObjectsToolController::render(
-    const InputState &,
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch) {
+    const InputState &, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     // render sheared box
     {
         auto renderService = Renderer::RenderService{renderContext, renderBatch};
@@ -275,24 +260,26 @@ bool ShearObjectsToolController::cancel() {
 // ShearObjectsToolController2D
 
 ShearObjectsToolController2D::ShearObjectsToolController2D(
-    ShearObjectsTool &tool, std::weak_ptr<MapDocument> document)
-    : ShearObjectsToolController{tool, std::move(document)} {
+    ShearObjectsTool &tool, std::weak_ptr<MapDocument> document
+) : ShearObjectsToolController{tool, std::move(document)} {
 }
 
 void ShearObjectsToolController2D::doPick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+) {
     m_tool.pick2D(pickRay, camera, pickResult);
 }
 
 // ShearObjectsToolController3D
 
 ShearObjectsToolController3D::ShearObjectsToolController3D(
-    ShearObjectsTool &tool, std::weak_ptr<MapDocument> document)
-    : ShearObjectsToolController{tool, std::move(document)} {
+    ShearObjectsTool &tool, std::weak_ptr<MapDocument> document
+) : ShearObjectsToolController{tool, std::move(document)} {
 }
 
 void ShearObjectsToolController3D::doPick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+) {
     m_tool.pick3D(pickRay, camera, pickResult);
 }
 } // namespace View

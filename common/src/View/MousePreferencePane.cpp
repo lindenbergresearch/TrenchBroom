@@ -34,13 +34,10 @@
 
 namespace TrenchBroom {
 namespace View {
-MousePreferencePane::MousePreferencePane(QWidget *parent)
-    : PreferencePane(parent), m_lookSpeedSlider(nullptr), m_invertLookHAxisCheckBox(nullptr),
-      m_invertLookVAxisCheckBox(nullptr), m_panSpeedSlider(nullptr), m_invertPanHAxisCheckBox(nullptr),
-      m_invertPanVAxisCheckBox(nullptr), m_moveSpeedSlider(nullptr), m_invertMouseWheelCheckBox(nullptr),
-      m_enableAltMoveCheckBox(nullptr), m_invertAltMoveAxisCheckBox(nullptr), m_moveInCursorDirCheckBox(nullptr),
-      m_forwardKeyEditor(nullptr), m_backwardKeyEditor(nullptr), m_leftKeyEditor(nullptr), m_rightKeyEditor(nullptr),
-      m_upKeyEditor(nullptr), m_downKeyEditor(nullptr), m_flyMoveSpeedSlider(nullptr) {
+MousePreferencePane::MousePreferencePane(QWidget *parent) : PreferencePane(parent), m_lookSpeedSlider(nullptr), m_invertLookHAxisCheckBox(nullptr), m_invertLookVAxisCheckBox(nullptr), m_panSpeedSlider(nullptr),
+                                                            m_invertPanHAxisCheckBox(nullptr), m_invertPanVAxisCheckBox(nullptr), m_moveSpeedSlider(nullptr), m_invertMouseWheelCheckBox(nullptr), m_enableAltMoveCheckBox(nullptr),
+                                                            m_invertAltMoveAxisCheckBox(nullptr), m_moveInCursorDirCheckBox(nullptr), m_forwardKeyEditor(nullptr), m_backwardKeyEditor(nullptr), m_leftKeyEditor(nullptr),
+                                                            m_rightKeyEditor(nullptr), m_upKeyEditor(nullptr), m_downKeyEditor(nullptr), m_flyMoveSpeedSlider(nullptr) {
     createGui();
     bindEvents();
 }
@@ -111,9 +108,11 @@ void MousePreferencePane::createGui() {
     layout->addRow("Down", m_downKeyEditor);
     layout->addRow("Speed", m_flyMoveSpeedSlider);
     layout->addRow(
-        "",
-        makeInfo(new QLabel("Turn mouse wheel while holding right mouse button in 3D view to "
-                            "adjust speed on the fly.")));
+        "", makeInfo(
+            new QLabel(
+                "Turn mouse wheel while holding right mouse button in 3D view to "
+                "adjust speed on the fly."
+            )));
 
     setLayout(layout);
     setMinimumWidth(400);
@@ -121,99 +120,63 @@ void MousePreferencePane::createGui() {
 
 void MousePreferencePane::bindEvents() {
     connect(
-        m_lookSpeedSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &MousePreferencePane::lookSpeedChanged);
+        m_lookSpeedSlider, &SliderWithLabel::valueChanged, this, &MousePreferencePane::lookSpeedChanged
+    );
     connect(
-        m_invertLookHAxisCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::invertLookHAxisChanged);
+        m_invertLookHAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertLookHAxisChanged
+    );
     connect(
-        m_invertLookVAxisCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::invertLookVAxisChanged);
+        m_invertLookVAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertLookVAxisChanged
+    );
 
     connect(
-        m_panSpeedSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &MousePreferencePane::panSpeedChanged);
+        m_panSpeedSlider, &SliderWithLabel::valueChanged, this, &MousePreferencePane::panSpeedChanged
+    );
     connect(
-        m_invertPanHAxisCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::invertPanHAxisChanged);
+        m_invertPanHAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertPanHAxisChanged
+    );
     connect(
-        m_invertPanVAxisCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::invertPanVAxisChanged);
+        m_invertPanVAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertPanVAxisChanged
+    );
 
     connect(
-        m_moveSpeedSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &MousePreferencePane::moveSpeedChanged);
+        m_moveSpeedSlider, &SliderWithLabel::valueChanged, this, &MousePreferencePane::moveSpeedChanged
+    );
     connect(
-        m_invertMouseWheelCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::invertMouseWheelChanged);
+        m_invertMouseWheelCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertMouseWheelChanged
+    );
     connect(
-        m_enableAltMoveCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::enableAltMoveChanged);
+        m_enableAltMoveCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::enableAltMoveChanged
+    );
     connect(
-        m_invertAltMoveAxisCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::invertAltMoveAxisChanged);
+        m_invertAltMoveAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertAltMoveAxisChanged
+    );
     connect(
-        m_moveInCursorDirCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        &MousePreferencePane::moveInCursorDirChanged);
+        m_moveInCursorDirCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::moveInCursorDirChanged
+    );
 
     connect(
-        m_forwardKeyEditor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &MousePreferencePane::forwardKeyChanged);
+        m_forwardKeyEditor, &KeySequenceEdit::editingFinished, this, &MousePreferencePane::forwardKeyChanged
+    );
     connect(
-        m_backwardKeyEditor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &MousePreferencePane::backwardKeyChanged);
+        m_backwardKeyEditor, &KeySequenceEdit::editingFinished, this, &MousePreferencePane::backwardKeyChanged
+    );
     connect(
-        m_leftKeyEditor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &MousePreferencePane::leftKeyChanged);
+        m_leftKeyEditor, &KeySequenceEdit::editingFinished, this, &MousePreferencePane::leftKeyChanged
+    );
     connect(
-        m_rightKeyEditor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &MousePreferencePane::rightKeyChanged);
+        m_rightKeyEditor, &KeySequenceEdit::editingFinished, this, &MousePreferencePane::rightKeyChanged
+    );
     connect(
-        m_upKeyEditor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &MousePreferencePane::upKeyChanged);
+        m_upKeyEditor, &KeySequenceEdit::editingFinished, this, &MousePreferencePane::upKeyChanged
+    );
     connect(
-        m_downKeyEditor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &MousePreferencePane::downKeyChanged);
+        m_downKeyEditor, &KeySequenceEdit::editingFinished, this, &MousePreferencePane::downKeyChanged
+    );
 
     connect(
-        m_flyMoveSpeedSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &MousePreferencePane::flyMoveSpeedChanged);
+        m_flyMoveSpeedSlider, &SliderWithLabel::valueChanged, this, &MousePreferencePane::flyMoveSpeedChanged
+    );
 }
 
 bool MousePreferencePane::doCanResetToDefaults() {
@@ -269,7 +232,8 @@ void MousePreferencePane::doUpdateControls() {
     m_downKeyEditor->setKeySequence(pref(Preferences::CameraFlyDown()));
 
     m_flyMoveSpeedSlider->setRatio(
-        pref(Preferences::CameraFlyMoveSpeed) / Preferences::MaxCameraFlyMoveSpeed);
+        pref(Preferences::CameraFlyMoveSpeed) / Preferences::MaxCameraFlyMoveSpeed
+    );
 }
 
 bool MousePreferencePane::doValidate() {
@@ -373,30 +337,29 @@ void MousePreferencePane::flyMoveSpeedChanged(const int /* value */) {
 }
 
 void MousePreferencePane::setKeySequence(
-    KeySequenceEdit *editor, Preference<QKeySequence> &preference) {
+    KeySequenceEdit *editor, Preference<QKeySequence> &preference
+) {
     const auto keySequence = editor->keySequence();
     PreferenceManager &prefs = PreferenceManager::instance();
     if (!hasConflict(keySequence, preference)) {
         prefs.set(preference, keySequence);
-    } else {
+    }
+    else {
         editor->setKeySequence(prefs.get(preference));
     }
 }
 
 bool MousePreferencePane::hasConflict(
-    const QKeySequence &keySequence, const Preference<QKeySequence> &preference) const {
-    const auto prefs = std::vector<Preference<QKeySequence> *>{
-        &Preferences::CameraFlyForward(),
-        &Preferences::CameraFlyBackward(),
-        &Preferences::CameraFlyLeft(),
-        &Preferences::CameraFlyRight(),
-        &Preferences::CameraFlyUp(),
-        &Preferences::CameraFlyDown()};
+    const QKeySequence &keySequence, const Preference<QKeySequence> &preference
+) const {
+    const auto prefs = std::vector<Preference<QKeySequence> *>{&Preferences::CameraFlyForward(), &Preferences::CameraFlyBackward(), &Preferences::CameraFlyLeft(), &Preferences::CameraFlyRight(), &Preferences::CameraFlyUp(),
+                                                               &Preferences::CameraFlyDown()};
 
     return std::any_of(
         std::begin(prefs), std::end(prefs), [&keySequence, &preference](auto *other) {
           return preference.path() != other->path() && pref(*other) == keySequence;
-        });
+        }
+    );
 }
 } // namespace View
 } // namespace TrenchBroom

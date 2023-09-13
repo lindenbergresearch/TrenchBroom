@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, QWidget *parent)
-    : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()) {
+SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, QWidget *parent) : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()) {
     const auto maxDigits = int(std::log10(m_slider->maximum())) + 1;
     const auto str = QString("").fill('9', maxDigits);
     const auto rect = m_label->fontMetrics().boundingRect(str);

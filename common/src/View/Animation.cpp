@@ -64,9 +64,7 @@ Animation::Type Animation::freeType() {
     return type++;
 }
 
-Animation::Animation(const Type type, const Curve curve, const double duration)
-    : m_type(type), m_curve(createAnimationCurve(curve, duration)), m_duration(duration), m_elapsed(0),
-      m_progress(0.0) {
+Animation::Animation(const Type type, const Curve curve, const double duration) : m_type(type), m_curve(createAnimationCurve(curve, duration)), m_duration(duration), m_elapsed(0), m_progress(0.0) {
     assert(m_duration > 0);
 }
 
@@ -87,7 +85,8 @@ void Animation::update() {
 }
 
 std::unique_ptr<AnimationCurve> Animation::createAnimationCurve(
-    const Curve curve, const double duration) {
+    const Curve curve, const double duration
+) {
     switch (curve) {
         case Curve::EaseInEaseOut:
             return std::make_unique<EaseInEaseOutAnimationCurve>(duration);
@@ -101,13 +100,13 @@ std::unique_ptr<AnimationCurve> Animation::createAnimationCurve(
 
 const int AnimationManager::AnimationUpdateRateHz = 60;
 
-AnimationManager::AnimationManager(QObject *parent)
-    : QObject(parent), m_timer(new QTimer(this)) {
+AnimationManager::AnimationManager(QObject *parent) : QObject(parent), m_timer(new QTimer(this)) {
     connect(m_timer, &QTimer::timeout, this, &AnimationManager::onTimerTick);
 }
 
 void AnimationManager::runAnimation(
-    std::unique_ptr<Animation> animation, const bool replace) {
+    std::unique_ptr<Animation> animation, const bool replace
+) {
     ensure(animation != nullptr, "animation is null");
 
     auto &list = m_animations[animation->type()];
@@ -142,14 +141,16 @@ void AnimationManager::onTimerTick() {
 
                 if (finished) {
                     listIt = list.erase(listIt);
-                } else {
+                }
+                else {
                     ++listIt;
                 }
             }
 
             if (list.empty()) {
                 m_animations.erase(mapIt++);
-            } else {
+            }
+            else {
                 ++mapIt;
             }
         }

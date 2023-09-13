@@ -38,9 +38,8 @@ namespace TrenchBroom::IO {
 FileSystem::~FileSystem() = default;
 
 Result<std::vector<std::filesystem::path>> FileSystem::find(
-    const std::filesystem::path &path,
-    const TraversalMode traversalMode,
-    const PathMatcher &pathMatcher) const {
+    const std::filesystem::path &path, const TraversalMode traversalMode, const PathMatcher &pathMatcher
+) const {
     if (path.is_absolute()) {
         return Error{"Path '" + path.string() + "' is absolute"};
     }
@@ -49,15 +48,20 @@ Result<std::vector<std::filesystem::path>> FileSystem::find(
         return Error{"Path does not denote a directory: '" + path.string() + "'"};
     }
 
-    return doFind(path, traversalMode).transform([&](auto paths) {
-      return kdl::vec_filter(std::move(paths), [&](const auto &p) {
-        return pathMatcher(p, [&](const auto &x) { return pathInfo(x); });
-      });
-    });
+    return doFind(path, traversalMode).transform(
+        [&](auto paths) {
+          return kdl::vec_filter(
+              std::move(paths), [&](const auto &p) {
+                return pathMatcher(p, [&](const auto &x) { return pathInfo(x); });
+              }
+          );
+        }
+    );
 }
 
 Result<std::shared_ptr<File>> FileSystem::openFile(
-    const std::filesystem::path &path) const {
+    const std::filesystem::path &path
+) const {
     if (path.is_absolute()) {
         return Error{"Path '" + path.string() + "' is absolute"};
     }
@@ -72,19 +76,23 @@ Result<std::shared_ptr<File>> FileSystem::openFile(
 WritableFileSystem::~WritableFileSystem() = default;
 
 Result<void> WritableFileSystem::createFileAtomic(
-    const std::filesystem::path &path, const std::string &contents) {
+    const std::filesystem::path &path, const std::string &contents
+) {
     if (path.is_absolute()) {
         return Error{"Path '" + path.string() + "' is absolute"};
     }
 
     const auto tmpPath = kdl::path_add_extension(path, "tmp");
-    return doCreateFile(tmpPath, contents).and_then([&]() {
-      return doMoveFile(tmpPath, path);
-    });
+    return doCreateFile(tmpPath, contents).and_then(
+        [&]() {
+          return doMoveFile(tmpPath, path);
+        }
+    );
 }
 
 Result<void> WritableFileSystem::createFile(
-    const std::filesystem::path &path, const std::string &contents) {
+    const std::filesystem::path &path, const std::string &contents
+) {
     if (path.is_absolute()) {
         return Error{"Path '" + path.string() + "' is absolute"};
     }
@@ -106,7 +114,8 @@ Result<bool> WritableFileSystem::deleteFile(const std::filesystem::path &path) {
 }
 
 Result<void> WritableFileSystem::copyFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) {
+    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath
+) {
     if (sourcePath.is_absolute()) {
         return Error{"'" + sourcePath.string() + "' is absolute"};
     }
@@ -117,7 +126,8 @@ Result<void> WritableFileSystem::copyFile(
 }
 
 Result<void> WritableFileSystem::moveFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) {
+    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath
+) {
     if (sourcePath.is_absolute()) {
         return Error{"'" + sourcePath.string() + "' is absolute"};
     }

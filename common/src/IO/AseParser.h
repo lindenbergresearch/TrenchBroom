@@ -130,27 +130,30 @@ private: // parsing
     void parseMaterialList(Logger &logger, std::vector<std::filesystem::path> &paths);
 
     void parseMaterialListMaterialCount(
-        Logger &logger, std::vector<std::filesystem::path> &paths);
+        Logger &logger, std::vector<std::filesystem::path> &paths
+    );
 
     void parseMaterialListMaterial(
-        Logger &logger, std::vector<std::filesystem::path> &paths);
+        Logger &logger, std::vector<std::filesystem::path> &paths
+    );
 
     void parseMaterialListMaterialName(Logger &logger, std::string &name);
 
     void parseMaterialListMaterialMapDiffuse(Logger &logger, std::filesystem::path &path);
 
     void parseMaterialListMaterialMapDiffuseBitmap(
-        Logger &logger, std::filesystem::path &path);
+        Logger &logger, std::filesystem::path &path
+    );
 
     void parseGeomObject(
-        Logger &logger,
-        GeomObject &geomObject,
-        const std::vector<std::filesystem::path> &materialPaths);
+        Logger &logger, GeomObject &geomObject, const std::vector<std::filesystem::path> &materialPaths
+    );
 
     void parseGeomObjectNodeName(Logger &logger, GeomObject &geomObject);
 
     void parseGeomObjectMaterialRef(
-        Logger &logger, GeomObject &geomObject, size_t materialCount);
+        Logger &logger, GeomObject &geomObject, size_t materialCount
+    );
 
     void parseGeomObjectMesh(Logger &logger, Mesh &mesh);
 
@@ -196,7 +199,8 @@ private: // parsing
 
 private: // model construction
     std::unique_ptr<Assets::EntityModel> buildModel(
-        Logger &logger, const Scene &scene) const;
+        Logger &logger, const Scene &scene
+    ) const;
 
     bool checkIndices(Logger &logger, const MeshFace &face, const Mesh &mesh) const;
 

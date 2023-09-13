@@ -27,11 +27,7 @@ class BorderPanel : public QWidget {
 Q_OBJECT
 public:
     enum Sides {
-      TopSide = 1,
-      RightSide = 2,
-      BottomSide = 4,
-      LeftSide = 8,
-      AllSides = TopSide | RightSide | BottomSide | LeftSide
+      TopSide = 1, RightSide = 2, BottomSide = 4, LeftSide = 8, AllSides = TopSide | RightSide | BottomSide | LeftSide
     };
 
 private:
@@ -40,7 +36,8 @@ private:
 
 public:
     explicit BorderPanel(
-        Sides borders = AllSides, int thickness = 1, QWidget *parent = nullptr);
+        Sides borders = AllSides, int thickness = 1, QWidget *parent = nullptr
+    );
 
 protected:
     void paintEvent(QPaintEvent *event) override;

@@ -29,8 +29,7 @@ namespace TrenchBroom {
 namespace View {
 class EdgeToolController::SelectEdgePart : public SelectPartBase<vm::segment3> {
 public:
-    SelectEdgePart(EdgeTool &tool)
-        : SelectPartBase(tool, EdgeHandleManager::HandleHitType) {
+    SelectEdgePart(EdgeTool &tool) : SelectPartBase(tool, EdgeHandleManager::HandleHitType) {
     }
 
 private:
@@ -41,13 +40,11 @@ private:
 
 class EdgeToolController::MoveEdgePart : public MovePartBase {
 public:
-    MoveEdgePart(EdgeTool &tool)
-        : MovePartBase(tool, EdgeHandleManager::HandleHitType) {
+    MoveEdgePart(EdgeTool &tool) : MovePartBase(tool, EdgeHandleManager::HandleHitType) {
     }
 };
 
-EdgeToolController::EdgeToolController(EdgeTool &tool)
-    : VertexToolControllerBase(tool) {
+EdgeToolController::EdgeToolController(EdgeTool &tool) : VertexToolControllerBase(tool) {
     addController(std::make_unique<MoveEdgePart>(tool));
     addController(std::make_unique<SelectEdgePart>(tool));
 }

@@ -135,10 +135,8 @@ private:
 
 public:
     ObjSerializer(
-        std::ostream &objStream,
-        std::ostream &mtlStream,
-        std::string mtlFilename,
-        ObjExportOptions options);
+        std::ostream &objStream, std::ostream &mtlStream, std::string mtlFilename, ObjExportOptions options
+    );
 
 private:
     void doBeginFile(const std::vector<const Model::Node *> &rootNodes) override;

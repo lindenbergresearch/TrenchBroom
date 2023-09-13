@@ -47,7 +47,8 @@ public:
 
 protected:
     virtual std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document) = 0;
+        MapDocumentCommandFacade *document
+    ) = 0;
 
     virtual bool doCollateWith(UndoableCommand &command);
 

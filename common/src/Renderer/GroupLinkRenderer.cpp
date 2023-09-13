@@ -31,8 +31,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-GroupLinkRenderer::GroupLinkRenderer(std::weak_ptr<View::MapDocument> document)
-    : m_document(document) {
+GroupLinkRenderer::GroupLinkRenderer(std::weak_ptr<View::MapDocument> document) : m_document(document) {
 }
 
 static vm::vec3f getLinkAnchorPosition(const Model::GroupNode &groupNode) {
@@ -56,8 +55,7 @@ std::vector<LinkRenderer::LineVertex> GroupLinkRenderer::getLinks() {
 
     if (groupNode != nullptr) {
         if (const auto linkedGroupId = groupNode->group().linkedGroupId()) {
-            const auto linkedGroupNodes =
-                Model::findLinkedGroups(*document->world(), *linkedGroupId);
+            const auto linkedGroupNodes = Model::findLinkedGroups(*document->world(), *linkedGroupId);
 
             const auto linkColor = pref(Preferences::LinkedGroupColor);
             const auto sourcePosition = getLinkAnchorPosition(*groupNode);

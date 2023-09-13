@@ -37,29 +37,23 @@
 
 namespace TrenchBroom {
 namespace Assets {
-ModelSpecification::ModelSpecification()
-    : path{""}, skinIndex{0}, frameIndex{0} {
+ModelSpecification::ModelSpecification() : path{""}, skinIndex{0}, frameIndex{0} {
 }
 
 ModelSpecification::ModelSpecification(
-    const std::filesystem::path &i_path,
-    const size_t i_skinIndex,
-    const size_t i_frameIndex)
-    : path{i_path}, skinIndex{i_skinIndex}, frameIndex{i_frameIndex} {
+    const std::filesystem::path &i_path, const size_t i_skinIndex, const size_t i_frameIndex
+) : path{i_path}, skinIndex{i_skinIndex}, frameIndex{i_frameIndex} {
 }
 
 kdl_reflect_impl(ModelSpecification);
 
-ModelDefinition::ModelDefinition()
-    : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
+ModelDefinition::ModelDefinition() : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
 }
 
-ModelDefinition::ModelDefinition(const size_t line, const size_t column)
-    : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
+ModelDefinition::ModelDefinition(const size_t line, const size_t column) : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
 }
 
-ModelDefinition::ModelDefinition(const EL::Expression &expression)
-    : m_expression{expression} {
+ModelDefinition::ModelDefinition(const EL::Expression &expression) : m_expression{expression} {
 }
 
 void ModelDefinition::append(const ModelDefinition &other) {
@@ -90,10 +84,7 @@ static size_t index(const EL::Value &value) {
 static ModelSpecification convertToModel(const EL::Value &value) {
     switch (value.type()) {
         case EL::ValueType::Map:
-            return ModelSpecification{
-                path(value[ModelSpecificationKeys::Path]),
-                index(value[ModelSpecificationKeys::Skin]),
-                index(value[ModelSpecificationKeys::Frame])};
+            return ModelSpecification{path(value[ModelSpecificationKeys::Path]), index(value[ModelSpecificationKeys::Skin]), index(value[ModelSpecificationKeys::Frame])};
         case EL::ValueType::String:
             return ModelSpecification{path(value), 0, 0};
         case EL::ValueType::Boolean:
@@ -109,7 +100,8 @@ static ModelSpecification convertToModel(const EL::Value &value) {
 }
 
 ModelSpecification ModelDefinition::modelSpecification(
-    const EL::VariableStore &variableStore) const {
+    const EL::VariableStore &variableStore
+) const {
     const auto context = EL::EvaluationContext{variableStore};
     return convertToModel(m_expression.evaluate(context));
 }
@@ -160,8 +152,8 @@ static std::optional<vm::vec3> convertToScale(const EL::Value &value) {
 }
 
 vm::vec3 ModelDefinition::scale(
-    const EL::VariableStore &variableStore,
-    const std::optional<EL::Expression> &defaultScaleExpression) const {
+    const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression
+) const {
     const auto context = EL::EvaluationContext{variableStore};
     const auto value = m_expression.evaluate(context);
 
@@ -192,13 +184,11 @@ vm::vec3 ModelDefinition::scale(
 kdl_reflect_impl(ModelDefinition);
 
 vm::vec3 safeGetModelScale(
-    const ModelDefinition &definition,
-    const EL::VariableStore &variableStore,
-    const std::optional<EL::Expression> &defaultScaleExpression) {
+    const ModelDefinition &definition, const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression
+) {
     try {
         return definition.scale(variableStore, defaultScaleExpression);
-    }
-    catch (const EL::Exception &) {
+    } catch (const EL::Exception &) {
         return vm::vec3{1, 1, 1};
     }
 }

@@ -41,7 +41,8 @@ vm::vec3f gridColorForTexture(const Assets::Texture *texture) {
     if ((texture->averageColor().r() + texture->averageColor().g() + texture->averageColor().b()) / 3.0f > 0.50f) {
         // bright texture grid color
         return vm::vec3f::fill(0.0f);
-    } else {
+    }
+    else {
         // dark texture grid color
         return vm::vec3f::fill(1.0f);
     }
@@ -98,10 +99,7 @@ std::vector<vm::vec2f> circle2D(const float radius, const size_t segments) {
 }
 
 std::vector<vm::vec2f> circle2D(
-    const float radius,
-    const float startAngle,
-    const float angleLength,
-    const size_t segments
+    const float radius, const float startAngle, const float angleLength, const size_t segments
 ) {
     assert(radius > 0.0f);
     assert(segments > 0);
@@ -122,11 +120,7 @@ std::vector<vm::vec2f> circle2D(
 }
 
 std::vector<vm::vec3f> circle2D(
-    const float radius,
-    const vm::axis::type axis,
-    const float startAngle,
-    const float angleLength,
-    const size_t segments
+    const float radius, const vm::axis::type axis, const float startAngle, const float angleLength, const size_t segments
 ) {
     assert(radius > 0.0f);
     assert(segments > 0);
@@ -175,22 +169,19 @@ std::pair<float, float> startAngleAndLength(
             angle1 = vm::measure_angle(startAxis, vm::vec3f::pos_y(), vm::vec3f::pos_x());
             angle2 = vm::measure_angle(endAxis, vm::vec3f::pos_y(), vm::vec3f::pos_x());
             angleLength = vm::min(
-                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_x()),
-                vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_x()));
+                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_x()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_x()));
             break;
         case vm::axis::y:
             angle1 = vm::measure_angle(startAxis, vm::vec3f::pos_z(), vm::vec3f::pos_y());
             angle2 = vm::measure_angle(endAxis, vm::vec3f::pos_z(), vm::vec3f::pos_y());
             angleLength = vm::min(
-                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_y()),
-                vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_y()));
+                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_y()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_y()));
             break;
         default:
             angle1 = vm::measure_angle(startAxis, vm::vec3f::pos_x(), vm::vec3f::pos_z());
             angle2 = vm::measure_angle(endAxis, vm::vec3f::pos_x(), vm::vec3f::pos_z());
             angleLength = vm::min(
-                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_z()),
-                vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_z()));
+                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_z()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_z()));
             break;
     }
     const float minAngle = vm::min(angle1, angle2);
@@ -210,10 +201,7 @@ std::vector<vm::vec2f> roundedRect2D(
 }
 
 std::vector<vm::vec2f> roundedRect2D(
-    const float width,
-    const float height,
-    const float cornerRadius,
-    const size_t cornerSegments
+    const float width, const float height, const float cornerRadius, const size_t cornerSegments
 ) {
     assert(cornerSegments > 0);
     assert(cornerRadius <= width / 2.0f && cornerRadius <= height / 2.0f);
@@ -243,8 +231,7 @@ std::vector<vm::vec2f> roundedRect2D(
     }
 
     // lower left corner
-    translation =
-        vm::vec2f(-(width / 2.0f - cornerRadius), -(height / 2.0f - cornerRadius));
+    translation = vm::vec2f(-(width / 2.0f - cornerRadius), -(height / 2.0f - cornerRadius));
     for (size_t i = 0; i < cornerSegments; ++i) {
         vertices[vertexIndex++] = center;
         vertices[vertexIndex++] = translation + vm::vec2f(x, y);
@@ -326,8 +313,7 @@ private:
     size_t m_index2;
 
 public:
-    MidPointIndex(size_t index1, size_t index2)
-        : m_index1(index1), m_index2(index2) {
+    MidPointIndex(size_t index1, size_t index2) : m_index1(index1), m_index2(index2) {
     }
 
     bool operator<(const MidPointIndex &other) const {
@@ -342,17 +328,11 @@ public:
 using MidPointCache = std::map<SphereBuilder::MidPointIndex, size_t>;
 
 size_t midPoint(
-    std::vector<vm::vec3f> &vertices,
-    MidPointCache &cache,
-    const size_t index1,
-    const size_t index2
+    std::vector<vm::vec3f> &vertices, MidPointCache &cache, const size_t index1, const size_t index2
 );
 
 size_t midPoint(
-    std::vector<vm::vec3f> &vertices,
-    MidPointCache &cache,
-    const size_t index1,
-    const size_t index2
+    std::vector<vm::vec3f> &vertices, MidPointCache &cache, const size_t index1, const size_t index2
 ) {
     MidPointCache::iterator it = cache.find(MidPointIndex(index1, index2));
     if (it == std::end(cache)) {
@@ -428,12 +408,9 @@ std::vector<vm::vec3f> sphere3D(const float radius, const size_t iterations) {
     for (size_t i = 0; i < iterations; ++i) {
         TriangleList newTriangles;
         for (SphereBuilder::Triangle &triangle: triangles) {
-            const size_t index1 =
-                SphereBuilder::midPoint(vertices, cache, triangle[0], triangle[1]);
-            const size_t index2 =
-                SphereBuilder::midPoint(vertices, cache, triangle[1], triangle[2]);
-            const size_t index3 =
-                SphereBuilder::midPoint(vertices, cache, triangle[2], triangle[0]);
+            const size_t index1 = SphereBuilder::midPoint(vertices, cache, triangle[0], triangle[1]);
+            const size_t index2 = SphereBuilder::midPoint(vertices, cache, triangle[1], triangle[2]);
+            const size_t index3 = SphereBuilder::midPoint(vertices, cache, triangle[2], triangle[0]);
             newTriangles.push_back(SphereBuilder::Triangle(triangle[0], index1, index3));
             newTriangles.push_back(SphereBuilder::Triangle(triangle[1], index2, index1));
             newTriangles.push_back(SphereBuilder::Triangle(triangle[2], index3, index2));
@@ -453,8 +430,7 @@ std::vector<vm::vec3f> sphere3D(const float radius, const size_t iterations) {
     return allVertices;
 }
 
-VertsAndNormals::VertsAndNormals(const size_t vertexCount)
-    : vertices(vertexCount), normals(vertexCount) {
+VertsAndNormals::VertsAndNormals(const size_t vertexCount) : vertices(vertexCount), normals(vertexCount) {
 }
 
 VertsAndNormals circle3D(const float radius, const size_t segments) {
@@ -519,8 +495,7 @@ VertsAndNormals cone3D(const float radius, const float length, const size_t segm
         result.vertices[3 * i + 1] = vm::vec3f(radius * lastS, radius * lastC, 0.0f);
         result.vertices[3 * i + 2] = vm::vec3f(radius * s, radius * c, 0.0f);
 
-        result.normals[3 * i + 0] =
-            normalize(vm::vec3f(std::sin(a - d / 2.0f), std::cos(a - d / 2.0f), n));
+        result.normals[3 * i + 0] = normalize(vm::vec3f(std::sin(a - d / 2.0f), std::cos(a - d / 2.0f), n));
         result.normals[3 * i + 1] = normalize(vm::vec3f(lastS, lastC, n));
         result.normals[3 * i + 2] = normalize(vm::vec3f(s, c, n));
 

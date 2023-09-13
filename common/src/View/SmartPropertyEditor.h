@@ -44,7 +44,8 @@ private:
 
 public:
     explicit SmartPropertyEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
     ~SmartPropertyEditor() override;
 

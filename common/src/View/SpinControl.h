@@ -42,7 +42,8 @@ public: // QDoubleSpinBox overrides
 
 public:
     void setIncrements(
-        double regularIncrement, double shiftIncrement, double ctrlIncrement);
+        double regularIncrement, double shiftIncrement, double ctrlIncrement
+    );
 
     void setDigits(int minDigits, int maxDigits);
 

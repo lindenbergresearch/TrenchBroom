@@ -60,8 +60,8 @@ public:
      * @param indexRangeSize the size of the index range map to expect
      */
     TexturedIndexRangeMapBuilder(
-        const size_t vertexCount, const TexturedIndexRangeMap::Size &indexRangeSize)
-        : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
+        const size_t vertexCount, const TexturedIndexRangeMap::Size &indexRangeSize
+    ) : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
     }
 
     /**
@@ -165,11 +165,10 @@ public:
      * @param v3 the position of the third corner
      */
     void addTriangle(
-        const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+        const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3
+    ) {
         add(
-            texture,
-            Renderer::PrimType::Triangles,
-            m_vertexListBuilder.addTriangle(v1, v2, v3));
+            texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangle(v1, v2, v3));
     }
 
     /**
@@ -192,9 +191,7 @@ public:
      */
     void addTriangleFan(const Texture *texture, const VertexList &vertices) {
         add(
-            texture,
-            Renderer::PrimType::TriangleFan,
-            m_vertexListBuilder.addTriangleFan(vertices));
+            texture, Renderer::PrimType::TriangleFan, m_vertexListBuilder.addTriangleFan(vertices));
     }
 
     /**
@@ -205,9 +202,7 @@ public:
      */
     void addTriangleStrip(const Texture *texture, const VertexList &vertices) {
         add(
-            texture,
-            Renderer::PrimType::TriangleStrip,
-            m_vertexListBuilder.addTriangleStrip(vertices));
+            texture, Renderer::PrimType::TriangleStrip, m_vertexListBuilder.addTriangleStrip(vertices));
     }
 
     /**
@@ -220,11 +215,8 @@ public:
      * @param v4 the position of the fourth corner
      */
     void addQuad(
-        const Texture *texture,
-        const Vertex &v1,
-        const Vertex &v2,
-        const Vertex &v3,
-        const Vertex &v4) {
+        const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3, const Vertex &v4
+    ) {
         add(texture, Renderer::PrimType::Quads, m_vertexListBuilder.addQuad(v1, v2, v3, v4));
     }
 

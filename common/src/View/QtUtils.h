@@ -90,12 +90,7 @@ public:
 };
 
 enum class FileDialogDir {
-  Map,
-  TextureCollection,
-  CompileTool,
-  Engine,
-  EntityDefinition,
-  GamePath
+  Map, TextureCollection, CompileTool, Engine, EntityDefinition, GamePath
 };
 
 /**
@@ -104,10 +99,12 @@ enum class FileDialogDir {
 QString fileDialogDefaultDirectory(FileDialogDir type);
 
 void updateFileDialogDefaultDirectoryWithFilename(
-    FileDialogDir type, const QString &filename);
+    FileDialogDir type, const QString &filename
+);
 
 void updateFileDialogDefaultDirectoryWithDirectory(
-    FileDialogDir type, const QString &newDefaultDirectory);
+    FileDialogDir type, const QString &newDefaultDirectory
+);
 
 QString windowSettingsPath(const QWidget *window, const QString &suffix = "");
 
@@ -143,13 +140,16 @@ class MapFrame;
 MapFrame *findMapFrame(QWidget *widget);
 
 QToolButton *createBitmapButton(
-    const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
+    const std::string &image, const QString &tooltip, QWidget *parent = nullptr
+);
 
 QToolButton *createBitmapButton(
-    const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr);
+    const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr
+);
 
 QToolButton *createBitmapToggleButton(
-    const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
+    const std::string &image, const QString &tooltip, QWidget *parent = nullptr
+);
 
 QWidget *createDefaultPage(const QString &message, QWidget *parent = nullptr);
 
@@ -184,7 +184,8 @@ template<typename... Rest>
 QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
     auto *layout = new QHBoxLayout{};
     layout->setContentsMargins(
-        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+    );
     layout->setSpacing(LayoutConstants::NarrowHMargin);
     addToMiniToolBarLayout(layout, first, rest...);
     layout->addStretch(1);
@@ -195,7 +196,8 @@ template<typename... Rest>
 QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
     auto *layout = new QHBoxLayout{};
     layout->setContentsMargins(
-        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+    );
     layout->setSpacing(LayoutConstants::NarrowHMargin);
     layout->addStretch(1);
     addToMiniToolBarLayout(layout, first, rest...);
@@ -253,9 +255,11 @@ void insertTitleBarSeparator(QVBoxLayout *layout);
 template<typename I>
 QStringList toQStringList(I cur, I end) {
     auto result = QStringList{};
-    std::transform(cur, end, std::back_inserter(result), [](const auto &str) {
-      return QString::fromStdString(str);
-    });
+    std::transform(
+        cur, end, std::back_inserter(result), [](const auto &str) {
+          return QString::fromStdString(str);
+        }
+    );
     return result;
 }
 

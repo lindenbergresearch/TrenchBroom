@@ -25,11 +25,8 @@
 namespace TrenchBroom::Renderer {
 
 ShaderConfig::ShaderConfig(
-    std::string name,
-    std::vector<std::string> vertexShaders,
-    std::vector<std::string> fragmentShaders)
-    : m_name{std::move(name)}, m_vertexShaders{std::move(vertexShaders)},
-      m_fragmentShaders{std::move(fragmentShaders)} {
+    std::string name, std::vector<std::string> vertexShaders, std::vector<std::string> fragmentShaders
+) : m_name{std::move(name)}, m_vertexShaders{std::move(vertexShaders)}, m_fragmentShaders{std::move(fragmentShaders)} {
 }
 
 const std::string &ShaderConfig::name() const {

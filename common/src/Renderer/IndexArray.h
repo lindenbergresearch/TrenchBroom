@@ -96,8 +96,7 @@ private:
         void cleanup() override { m_vbo->unbind(); }
 
     protected:
-        Holder(const size_t indexCount)
-            : m_vboManager{nullptr}, m_vbo{nullptr}, m_indexCount{indexCount} {
+        Holder(const size_t indexCount) : m_vboManager{nullptr}, m_vbo{nullptr}, m_indexCount{indexCount} {
         }
 
         virtual ~Holder() override {
@@ -112,10 +111,7 @@ private:
     private:
         void doRender(PrimType primType, size_t offset, size_t count) const override {
             glAssert(glDrawElements(
-                toGL(primType),
-                static_cast<GLsizei>(count),
-                GL_UNSIGNED_INT,
-                reinterpret_cast<void *>(offset * 4u)));
+                toGL(primType), static_cast<GLsizei>(count), GL_UNSIGNED_INT, reinterpret_cast<void *>(offset * 4u)));
         }
 
     private:
@@ -131,8 +127,7 @@ private:
         IndexList m_indices;
 
     public:
-        ByValueHolder(IndexList indices)
-            : Holder<Index>{indices.size()}, m_indices{std::move(indices)} {
+        ByValueHolder(IndexList indices) : Holder<Index>{indices.size()}, m_indices{std::move(indices)} {
         }
 
         void prepare(VboManager &vboManager) {
@@ -153,8 +148,7 @@ private:
         const IndexList &m_indices;
 
     public:
-        ByRefHolder(const IndexList &indices)
-            : Holder<Index>{indices.size()}, m_indices{indices} {
+        ByRefHolder(const IndexList &indices) : Holder<Index>{indices.size()}, m_indices{indices} {
         }
 
     private:

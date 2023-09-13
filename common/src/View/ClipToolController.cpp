@@ -56,8 +56,7 @@ protected:
     ClipTool &m_tool;
 
 public:
-    explicit PartDelegateBase(ClipTool &tool)
-        : m_tool{tool} {
+    explicit PartDelegateBase(ClipTool &tool) : m_tool{tool} {
     }
 
     virtual ~PartDelegateBase() = default;
@@ -85,23 +84,23 @@ public:
         if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
             m_tool.setFace(*faceHandle);
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
 
     virtual HandlePositionProposer makeHandlePositionProposer(
-        const InputState &inputState,
-        const vm::vec3 &initialHandlePosition,
-        const vm::vec3 &handleOffset) const = 0;
+        const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
+    ) const = 0;
 
     virtual std::vector<vm::vec3> getHelpVectors(
-        const InputState &inputState, const vm::vec3 &clipPoint) const = 0;
+        const InputState &inputState, const vm::vec3 &clipPoint
+    ) const = 0;
 
     void renderFeedback(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) {
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) {
         if (inputState.anyToolDragging()) {
             return;
         }
@@ -118,25 +117,21 @@ public:
     }
 
 private:
-    virtual std::optional<std::tuple<vm::vec3, vm::vec3>>
-    doGetNewClipPointPositionAndHitPoint(const InputState &inputState) const = 0;
+    virtual std::optional<std::tuple<vm::vec3, vm::vec3>> doGetNewClipPointPositionAndHitPoint(const InputState &inputState) const = 0;
 };
 
 class PartDelegate2D : public PartDelegateBase {
 public:
-    explicit PartDelegate2D(ClipTool &tool)
-        : PartDelegateBase{tool} {
+    explicit PartDelegate2D(ClipTool &tool) : PartDelegateBase{tool} {
     }
 
     HandlePositionProposer makeHandlePositionProposer(
-        const InputState &inputState,
-        const vm::vec3 &initialHandlePosition,
-        const vm::vec3 &handleOffset) const override {
+        const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
+    ) const override {
         return View::makeHandlePositionProposer(
             makePlaneHandlePicker(
-                vm::plane3{initialHandlePosition, vm::vec3{inputState.camera().direction()}},
-                handleOffset),
-            makeAbsoluteHandleSnapper(m_tool.grid()));
+                vm::plane3{initialHandlePosition, vm::vec3{inputState.camera().direction()}}, handleOffset
+            ), makeAbsoluteHandleSnapper(m_tool.grid()));
     }
 
     std::vector<vm::vec3> getHelpVectors(
@@ -145,14 +140,14 @@ public:
     }
 
     std::optional<std::tuple<vm::vec3, vm::vec3>> doGetNewClipPointPositionAndHitPoint(
-        const InputState &inputState) const override {
+        const InputState &inputState
+    ) const override {
         const auto &camera = inputState.camera();
         const auto viewDir = vm::get_abs_max_component_axis(vm::vec3(camera.direction()));
 
         const auto &pickRay = inputState.pickRay();
         const auto defaultPos = m_tool.defaultClipPointPos();
-        const auto distance =
-            vm::intersect_ray_plane(pickRay, vm::plane3(defaultPos, viewDir));
+        const auto distance = vm::intersect_ray_plane(pickRay, vm::plane3(defaultPos, viewDir));
         if (vm::is_nan(distance)) {
             return std::nullopt;
         }
@@ -164,9 +159,8 @@ public:
 };
 
 std::vector<const Model::BrushFace *> selectIncidentFaces(
-    const Model::BrushNode *brushNode,
-    const Model::BrushFace &face,
-    const vm::vec3 &hitPoint) {
+    const Model::BrushNode *brushNode, const Model::BrushFace &face, const vm::vec3 &hitPoint
+) {
     static const auto MaxDistance = vm::constants<FloatType>::almost_zero();
 
     // First, try to see if the clip point is almost equal to a vertex:
@@ -201,9 +195,7 @@ std::vector<const Model::BrushFace *> selectIncidentFaces(
         const auto secondFaceIndex = closestEdge->secondFace()->payload();
 
         if (firstFaceIndex && secondFaceIndex) {
-            return {
-                &brushNode->brush().face(*firstFaceIndex),
-                &brushNode->brush().face(*secondFaceIndex)};
+            return {&brushNode->brush().face(*firstFaceIndex), &brushNode->brush().face(*secondFaceIndex)};
         }
     }
 
@@ -211,12 +203,10 @@ std::vector<const Model::BrushFace *> selectIncidentFaces(
 }
 
 std::vector<vm::vec3> selectHelpVectors(
-    const Model::BrushNode *brushNode,
-    const Model::BrushFace &face,
-    const vm::vec3 &hitPoint) {
+    const Model::BrushNode *brushNode, const Model::BrushFace &face, const vm::vec3 &hitPoint
+) {
     auto result = std::vector<vm::vec3>{};
-    for (const Model::BrushFace *incidentFace:
-        selectIncidentFaces(brushNode, face, hitPoint)) {
+    for (const Model::BrushFace *incidentFace: selectIncidentFaces(brushNode, face, hitPoint)) {
         const vm::vec3 &normal = incidentFace->boundary().normal;
         result.push_back(vm::get_abs_max_component_axis(normal));
     }
@@ -226,22 +216,19 @@ std::vector<vm::vec3> selectHelpVectors(
 
 class PartDelegate3D : public PartDelegateBase {
 public:
-    explicit PartDelegate3D(ClipTool &tool)
-        : PartDelegateBase{tool} {
+    explicit PartDelegate3D(ClipTool &tool) : PartDelegateBase{tool} {
     }
 
     HandlePositionProposer makeHandlePositionProposer(
-        const InputState &,
-        const vm::vec3 & /* initialHandlePosition */,
-        const vm::vec3 & /* handleOffset */) const override {
+        const InputState &, const vm::vec3 & /* initialHandlePosition */, const vm::vec3 & /* handleOffset */) const override {
         return makeBrushFaceHandleProposer(m_tool.grid());
     }
 
     std::vector<vm::vec3> getHelpVectors(
-        const InputState &inputState, const vm::vec3 &clipPoint) const override {
+        const InputState &inputState, const vm::vec3 &clipPoint
+    ) const override {
         using namespace Model::HitFilters;
-        auto hit =
-            inputState.pickResult().first(type(Model::BrushNode::BrushHitType) && selected());
+        auto hit = inputState.pickResult().first(type(Model::BrushNode::BrushHitType) && selected());
         if (!hit.isMatch()) {
             hit = inputState.pickResult().first(type(Model::BrushNode::BrushHitType));
         }
@@ -252,7 +239,8 @@ public:
     }
 
     std::optional<std::tuple<vm::vec3, vm::vec3>> doGetNewClipPointPositionAndHitPoint(
-        const InputState &inputState) const override {
+        const InputState &inputState
+    ) const override {
         using namespace Model::HitFilters;
         const auto &hit = inputState.pickResult().first(type(Model::BrushNode::BrushHitType));
         if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
@@ -268,8 +256,7 @@ class PartBase {
 protected:
     std::unique_ptr<PartDelegateBase> m_delegate;
 
-    explicit PartBase(std::unique_ptr<PartDelegateBase> delegate)
-        : m_delegate{std::move(delegate)} {
+    explicit PartBase(std::unique_ptr<PartDelegateBase> delegate) : m_delegate{std::move(delegate)} {
         ensure(m_delegate != nullptr, "delegate is null");
     }
 
@@ -283,32 +270,30 @@ private:
     bool m_secondPointSet{false};
 
 public:
-    AddClipPointDragDelegate(PartDelegateBase &delegate)
-        : m_delegate{delegate} {
+    AddClipPointDragDelegate(PartDelegateBase &delegate) : m_delegate{delegate} {
     }
 
     HandlePositionProposer start(
-        const InputState &inputState,
-        const vm::vec3 &initialHandlePosition,
-        const vm::vec3 &handleOffset) override {
+        const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
+    ) override {
         return m_delegate.makeHandlePositionProposer(
-            inputState, initialHandlePosition, handleOffset);
+            inputState, initialHandlePosition, handleOffset
+        );
     }
 
     DragStatus drag(
-        const InputState &inputState,
-        const DragState &,
-        const vm::vec3 &proposedHandlePosition) override {
+        const InputState &inputState, const DragState &, const vm::vec3 &proposedHandlePosition
+    ) override {
         if (!m_secondPointSet) {
             if (m_delegate.addClipPoint(inputState)) {
                 m_delegate.tool().beginDragLastPoint();
                 m_secondPointSet = true;
                 return DragStatus::Continue;
             }
-        } else {
+        }
+        else {
             if (m_delegate.tool().dragPoint(
-                proposedHandlePosition,
-                m_delegate.getHelpVectors(inputState, proposedHandlePosition))) {
+                proposedHandlePosition, m_delegate.getHelpVectors(inputState, proposedHandlePosition))) {
                 return DragStatus::Continue;
             }
         }
@@ -332,8 +317,7 @@ public:
 
 class AddClipPointPart : public ToolController, protected PartBase {
 public:
-    explicit AddClipPointPart(std::unique_ptr<PartDelegateBase> delegate)
-        : PartBase{std::move(delegate)} {
+    explicit AddClipPointPart(std::unique_ptr<PartDelegateBase> delegate) : PartBase{std::move(delegate)} {
     }
 
 private:
@@ -342,9 +326,7 @@ private:
     const Tool &tool() const override { return m_delegate->tool(); }
 
     bool mouseClick(const InputState &inputState) override {
-        if (
-            !inputState.mouseButtonsPressed(MouseButtons::MBLeft)
-            || !inputState.modifierKeysPressed(ModifierKeys::MKNone)) {
+        if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft) || !inputState.modifierKeysPressed(ModifierKeys::MKNone)) {
             return false;
         }
 
@@ -352,18 +334,14 @@ private:
     }
 
     bool mouseDoubleClick(const InputState &inputState) override {
-        if (
-            !inputState.mouseButtonsPressed(MouseButtons::MBLeft)
-            || !inputState.modifierKeysPressed(ModifierKeys::MKNone)) {
+        if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft) || !inputState.modifierKeysPressed(ModifierKeys::MKNone)) {
             return false;
         }
         return m_delegate->setClipFace(inputState);
     }
 
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override {
-        if (
-            inputState.mouseButtons() != MouseButtons::MBLeft
-            || inputState.modifierKeys() != ModifierKeys::MKNone) {
+        if (inputState.mouseButtons() != MouseButtons::MBLeft || inputState.modifierKeys() != ModifierKeys::MKNone) {
             return nullptr;
         }
 
@@ -374,13 +352,13 @@ private:
 
         const auto [initialHandlePosition, hitPoint] = *initialHandlePositionAndHitPoint;
         return createHandleDragTracker(
-            AddClipPointDragDelegate{*m_delegate}, inputState, initialHandlePosition, hitPoint);
+            AddClipPointDragDelegate{*m_delegate}, inputState, initialHandlePosition, hitPoint
+        );
     }
 
     void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override {
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override {
         m_delegate->renderFeedback(inputState, renderContext, renderBatch);
     }
 
@@ -392,27 +370,25 @@ private:
     PartDelegateBase &m_delegate;
 
 public:
-    MoveClipPointDragDelegate(PartDelegateBase &delegate)
-        : m_delegate{delegate} {
+    MoveClipPointDragDelegate(PartDelegateBase &delegate) : m_delegate{delegate} {
     }
 
     HandlePositionProposer start(
-        const InputState &inputState,
-        const vm::vec3 &initialHandlePosition,
-        const vm::vec3 &handleOffset) override {
+        const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
+    ) override {
         return m_delegate.makeHandlePositionProposer(
-            inputState, initialHandlePosition, handleOffset);
+            inputState, initialHandlePosition, handleOffset
+        );
     }
 
     DragStatus drag(
-        const InputState &inputState,
-        const DragState &,
-        const vm::vec3 &proposedHandlePosition) override {
+        const InputState &inputState, const DragState &, const vm::vec3 &proposedHandlePosition
+    ) override {
         if (m_delegate.tool().dragPoint(
-            proposedHandlePosition,
-            m_delegate.getHelpVectors(inputState, proposedHandlePosition))) {
+            proposedHandlePosition, m_delegate.getHelpVectors(inputState, proposedHandlePosition))) {
             return DragStatus::Continue;
-        } else {
+        }
+        else {
             return DragStatus::Deny;
         }
     }
@@ -426,8 +402,7 @@ public:
 
 class MoveClipPointPart : public ToolController, protected PartBase {
 public:
-    explicit MoveClipPointPart(std::unique_ptr<PartDelegateBase> delegate)
-        : PartBase{std::move(delegate)} {
+    explicit MoveClipPointPart(std::unique_ptr<PartDelegateBase> delegate) : PartBase{std::move(delegate)} {
     }
 
 private:
@@ -436,32 +411,26 @@ private:
     const Tool &tool() const override { return m_delegate->tool(); }
 
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override {
-        if (
-            inputState.mouseButtons() != MouseButtons::MBLeft
-            || inputState.modifierKeys() != ModifierKeys::MKNone) {
+        if (inputState.mouseButtons() != MouseButtons::MBLeft || inputState.modifierKeys() != ModifierKeys::MKNone) {
             return nullptr;
         }
 
-        const auto initialHandlePositionAndHitPoint =
-            m_delegate->tool().beginDragPoint(inputState.pickResult());
+        const auto initialHandlePositionAndHitPoint = m_delegate->tool().beginDragPoint(inputState.pickResult());
         if (!initialHandlePositionAndHitPoint) {
             return nullptr;
         }
 
         const auto [initialHandlePosition, handleOffset] = *initialHandlePositionAndHitPoint;
         return createHandleDragTracker(
-            MoveClipPointDragDelegate{*m_delegate},
-            inputState,
-            initialHandlePosition,
-            handleOffset);
+            MoveClipPointDragDelegate{*m_delegate}, inputState, initialHandlePosition, handleOffset
+        );
     }
 
     bool cancel() override { return false; }
 };
 } // namespace
 
-ClipToolControllerBase::ClipToolControllerBase(ClipTool &tool)
-    : m_tool{tool} {
+ClipToolControllerBase::ClipToolControllerBase(ClipTool &tool) : m_tool{tool} {
 }
 
 ClipToolControllerBase::~ClipToolControllerBase() = default;
@@ -475,12 +444,14 @@ const Tool &ClipToolControllerBase::tool() const {
 }
 
 void ClipToolControllerBase::pick(
-    const InputState &inputState, Model::PickResult &pickResult) {
+    const InputState &inputState, Model::PickResult &pickResult
+) {
     m_tool.pick(inputState.pickRay(), inputState.camera(), pickResult);
 }
 
 void ClipToolControllerBase::setRenderOptions(
-    const InputState &, Renderer::RenderContext &renderContext) const {
+    const InputState &, Renderer::RenderContext &renderContext
+) const {
     if (m_tool.hasBrushes()) {
         renderContext.setHideSelection();
         renderContext.setForceHideSelectionGuide();
@@ -488,9 +459,8 @@ void ClipToolControllerBase::setRenderOptions(
 }
 
 void ClipToolControllerBase::render(
-    const InputState &inputState,
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch) {
+    const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     m_tool.render(renderContext, renderBatch, inputState.pickResult());
     ToolControllerGroup::render(inputState, renderContext, renderBatch);
 }
@@ -505,16 +475,14 @@ bool ClipToolControllerBase::cancel() {
     return false;
 }
 
-ClipToolController2D::ClipToolController2D(ClipTool &tool)
-    : ClipToolControllerBase{tool} {
+ClipToolController2D::ClipToolController2D(ClipTool &tool) : ClipToolControllerBase{tool} {
     addController(
         std::make_unique<AddClipPointPart>(std::make_unique<PartDelegate2D>(tool)));
     addController(
         std::make_unique<MoveClipPointPart>(std::make_unique<PartDelegate2D>(tool)));
 }
 
-ClipToolController3D::ClipToolController3D(ClipTool &tool)
-    : ClipToolControllerBase{tool} {
+ClipToolController3D::ClipToolController3D(ClipTool &tool) : ClipToolControllerBase{tool} {
     addController(
         std::make_unique<AddClipPointPart>(std::make_unique<PartDelegate3D>(tool)));
     addController(

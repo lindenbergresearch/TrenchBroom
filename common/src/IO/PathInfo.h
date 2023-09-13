@@ -24,9 +24,7 @@
 namespace TrenchBroom::IO {
 
 enum class PathInfo {
-  File,
-  Directory,
-  Unknown
+  File, Directory, Unknown
 };
 
 std::ostream &operator<<(std::ostream &lhs, const PathInfo &rhs);

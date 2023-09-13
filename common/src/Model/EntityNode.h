@@ -64,8 +64,8 @@ public:
     explicit EntityNode(Entity entity);
 
     EntityNode(
-        const Model::EntityPropertyConfig &entityPropertyConfig,
-        std::initializer_list<EntityProperty> properties);
+        const Model::EntityPropertyConfig &entityPropertyConfig, std::initializer_list<EntityProperty> properties
+    );
 
 public: // entity model
     const vm::bbox3 &modelBounds() const;
@@ -100,9 +100,8 @@ private: // implement Node interface
     bool doSelectable() const override;
 
     void doPick(
-        const EditorContext &editorContext,
-        const vm::ray3 &ray,
-        PickResult &pickResult) override;
+        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+    ) override;
 
     void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 

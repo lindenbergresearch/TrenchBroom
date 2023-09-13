@@ -46,12 +46,8 @@ private:
 
 public:
     CameraAnimation(
-        Renderer::Camera &camera,
-        const vm::vec3f &targetPosition,
-        const vm::vec3f &targetDirection,
-        const vm::vec3f &targetUp,
-        float targetZoom,
-        double duration);
+        Renderer::Camera &camera, const vm::vec3f &targetPosition, const vm::vec3f &targetDirection, const vm::vec3f &targetUp, float targetZoom, double duration
+    );
 
 private:
     void doUpdate(double progress) override;

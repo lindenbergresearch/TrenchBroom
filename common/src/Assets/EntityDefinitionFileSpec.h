@@ -30,9 +30,7 @@ namespace Assets {
 class EntityDefinitionFileSpec {
 private:
     enum class Type {
-      Builtin,
-      External,
-      Unset
+      Builtin, External, Unset
     };
 
     Type m_type;
@@ -50,13 +48,16 @@ public:
     static EntityDefinitionFileSpec unset();
 
     friend bool operator<(
-        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs
+    );
 
     friend bool operator==(
-        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs
+    );
 
     friend bool operator!=(
-        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs
+    );
 
     bool valid() const;
 

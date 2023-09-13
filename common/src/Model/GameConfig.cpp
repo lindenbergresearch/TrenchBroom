@@ -90,7 +90,8 @@ std::filesystem::path GameConfig::findInitialMap(const std::string &formatName) 
         if (format.format == formatName) {
             if (!format.initialMap.empty()) {
                 return findConfigFile(format.initialMap);
-            } else {
+            }
+            else {
                 break;
             }
         }
@@ -99,7 +100,8 @@ std::filesystem::path GameConfig::findInitialMap(const std::string &formatName) 
 }
 
 std::filesystem::path GameConfig::findConfigFile(
-    const std::filesystem::path &filePath) const {
+    const std::filesystem::path &filePath
+) const {
     return path.parent_path() / filePath;
 }
 } // namespace Model

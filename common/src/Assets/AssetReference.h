@@ -31,19 +31,16 @@ private:
     T *m_asset;
 
 public:
-    explicit AssetReference(T *asset = nullptr)
-        : m_asset(asset) {
+    explicit AssetReference(T *asset = nullptr) : m_asset(asset) {
         if (m_asset != nullptr) {
             m_asset->incUsageCount();
         }
     }
 
-    AssetReference(const AssetReference &other) noexcept
-        : AssetReference(other.m_asset) {
+    AssetReference(const AssetReference &other) noexcept: AssetReference(other.m_asset) {
     }
 
-    AssetReference(AssetReference &&other) noexcept
-        : m_asset(std::exchange(other.m_asset, nullptr)) {
+    AssetReference(AssetReference &&other) noexcept: m_asset(std::exchange(other.m_asset, nullptr)) {
     }
 
     ~AssetReference() {

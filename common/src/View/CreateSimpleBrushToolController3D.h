@@ -43,7 +43,8 @@ private:
 
 public:
     CreateSimpleBrushToolController3D(
-        CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document);
+        CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document
+    );
 
 private:
     Tool &tool() override;

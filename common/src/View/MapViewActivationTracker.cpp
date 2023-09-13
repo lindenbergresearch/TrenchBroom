@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-MapViewActivationTracker::MapViewActivationTracker()
-    : m_active(false) {
+MapViewActivationTracker::MapViewActivationTracker() : m_active(false) {
 }
 
 bool MapViewActivationTracker::active() const {
@@ -46,7 +45,8 @@ void MapViewActivationTracker::addWindow(MapViewBase *mapView) {
 
     if (m_active) {
         clearFocusCursor(mapView);
-    } else {
+    }
+    else {
         setFocusCursor(mapView);
     }
 }

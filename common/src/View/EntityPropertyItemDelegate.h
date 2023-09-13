@@ -40,15 +40,12 @@ private:
 
 public:
     EntityPropertyItemDelegate(
-        EntityPropertyTable *table,
-        const EntityPropertyModel *model,
-        const QSortFilterProxyModel *proxyModel,
-        QWidget *parent = nullptr);
+        EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent = nullptr
+    );
 
     QWidget *createEditor(
-        QWidget *parent,
-        const QStyleOptionViewItem &option,
-        const QModelIndex &index) const override;
+        QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index
+    ) const override;
 
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 

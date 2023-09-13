@@ -46,31 +46,31 @@ Result<void> ZipFileSystem::doReadDirectory() {
     for (mz_uint i = 0; i < numFiles; ++i) {
         if (!mz_zip_reader_is_file_a_directory(&m_archive, i)) {
             const auto path = std::filesystem::path{filename(i)};
-            addFile(path, [=]() -> Result<std::shared_ptr<File>> {
-              auto stat = mz_zip_archive_file_stat{};
-              if (!mz_zip_reader_file_stat(&m_archive, i, &stat)) {
-                  return Error{"mz_zip_reader_file_stat failed for " + path.string()};
-              }
+            addFile(
+                path, [=]() -> Result<std::shared_ptr<File>> {
+                  auto stat = mz_zip_archive_file_stat{};
+                  if (!mz_zip_reader_file_stat(&m_archive, i, &stat)) {
+                      return Error{"mz_zip_reader_file_stat failed for " + path.string()};
+                  }
 
-              const auto uncompressedSize = static_cast<size_t>(stat.m_uncomp_size);
-              auto data = std::make_unique<char[]>(uncompressedSize);
-              auto *begin = data.get();
+                  const auto uncompressedSize = static_cast<size_t>(stat.m_uncomp_size);
+                  auto data = std::make_unique<char[]>(uncompressedSize);
+                  auto *begin = data.get();
 
-              if (!mz_zip_reader_extract_to_mem(&m_archive, i, begin, uncompressedSize, 0)) {
-                  return Error{"mz_zip_reader_extract_to_mem failed for " + path.string()};
-              }
+                  if (!mz_zip_reader_extract_to_mem(&m_archive, i, begin, uncompressedSize, 0)) {
+                      return Error{"mz_zip_reader_extract_to_mem failed for " + path.string()};
+                  }
 
-              return std::static_pointer_cast<File>(
-                  std::make_shared<OwningBufferFile>(std::move(data), uncompressedSize));
-            });
+                  return std::static_pointer_cast<File>(
+                      std::make_shared<OwningBufferFile>(std::move(data), uncompressedSize));
+                }
+            );
         }
     }
 
     const auto err = mz_zip_get_last_error(&m_archive);
     if (err != MZ_ZIP_NO_ERROR) {
-        return Error{
-            std::string{"Error while reading compressed file: "}
-            + mz_zip_get_error_string(err)};
+        return Error{std::string{"Error while reading compressed file: "} + mz_zip_get_error_string(err)};
     }
 
     return kdl::void_success;

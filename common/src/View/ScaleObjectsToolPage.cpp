@@ -42,9 +42,8 @@
 namespace TrenchBroom {
 namespace View {
 ScaleObjectsToolPage::ScaleObjectsToolPage(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(std::move(document)), m_book(nullptr), m_sizeTextBox(nullptr),
-      m_factorsTextBox(nullptr), m_scaleFactorsOrSize(nullptr), m_button(nullptr) {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : QWidget(parent), m_document(std::move(document)), m_book(nullptr), m_sizeTextBox(nullptr), m_factorsTextBox(nullptr), m_scaleFactorsOrSize(nullptr), m_button(nullptr) {
     createGui();
     connectObservers();
     updateGui();
@@ -53,13 +52,13 @@ ScaleObjectsToolPage::ScaleObjectsToolPage(
 void ScaleObjectsToolPage::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &ScaleObjectsToolPage::selectionDidChange);
+        this, &ScaleObjectsToolPage::selectionDidChange
+    );
 }
 
 void ScaleObjectsToolPage::activate() {
     const auto document = kdl::mem_lock(m_document);
-    const auto suggestedSize =
-        document->hasSelectedNodes() ? document->selectionBounds().size() : vm::vec3::zero();
+    const auto suggestedSize = document->hasSelectedNodes() ? document->selectionBounds().size() : vm::vec3::zero();
 
     m_sizeTextBox->setText(QString::fromStdString(kdl::str_to_string(suggestedSize)));
     m_factorsTextBox->setText("1.0 1.0 1.0");
@@ -77,9 +76,11 @@ void ScaleObjectsToolPage::createGui() {
     m_book->addWidget(m_factorsTextBox);
 
     connect(
-        m_sizeTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale);
+        m_sizeTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale
+    );
     connect(
-        m_factorsTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale);
+        m_factorsTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale
+    );
 
     m_scaleFactorsOrSize = new QComboBox();
     m_scaleFactorsOrSize->addItem(tr("to size"));
@@ -87,10 +88,8 @@ void ScaleObjectsToolPage::createGui() {
 
     m_scaleFactorsOrSize->setCurrentIndex(0);
     connect(
-        m_scaleFactorsOrSize,
-        static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
-        m_book,
-        &QStackedLayout::setCurrentIndex);
+        m_scaleFactorsOrSize, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), m_book, &QStackedLayout::setCurrentIndex
+    );
 
     m_button = new QPushButton(tr("Apply"));
     connect(m_button, &QAbstractButton::clicked, this, &ScaleObjectsToolPage::applyScale);
@@ -121,9 +120,7 @@ std::optional<vm::vec3> ScaleObjectsToolPage::getScaleFactors() const {
     switch (m_scaleFactorsOrSize->currentIndex()) {
         case 0: {
             auto document = kdl::mem_lock(m_document);
-            if (
-                const auto desiredSize =
-                    vm::parse<FloatType, 3>(m_sizeTextBox->text().toStdString())) {
+            if (const auto desiredSize = vm::parse<FloatType, 3>(m_sizeTextBox->text().toStdString())) {
                 return *desiredSize / document->selectionBounds().size();
             }
             return std::nullopt;

@@ -37,10 +37,7 @@ using EntityNodeStringIndex = kdl::compact_trie<EntityNodeBase *>;
 class EntityNodeIndexQuery {
 public:
     typedef enum {
-      Type_Exact,
-      Type_Prefix,
-      Type_Numbered,
-      Type_Any
+      Type_Exact, Type_Prefix, Type_Numbered, Type_Any
     } Type;
 
 private:
@@ -81,13 +78,16 @@ public:
     void removeEntityNode(EntityNodeBase *node);
 
     void addProperty(
-        EntityNodeBase *node, const std::string &key, const std::string &value);
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    );
 
     void removeProperty(
-        EntityNodeBase *node, const std::string &key, const std::string &value);
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    );
 
     std::vector<EntityNodeBase *> findEntityNodes(
-        const EntityNodeIndexQuery &keyQuery, const std::string &value) const;
+        const EntityNodeIndexQuery &keyQuery, const std::string &value
+    ) const;
 
     std::vector<std::string> allKeys() const;
 

@@ -67,7 +67,8 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, int &out) const {
 }
 
 bool PreferenceSerializer::readFromJson(
-    const QJsonValue &in, std::filesystem::path &out) const {
+    const QJsonValue &in, std::filesystem::path &out
+) const {
     if (!in.isString()) {
         return false;
     }
@@ -100,7 +101,8 @@ QJsonValue PreferenceSerializer::writeToJson(const bool in) const {
 namespace {
 template<typename T, typename L>
 QJsonValue toJson(
-    const T &in, const L &serialize = [](QTextStream &lhs, const T &rhs) { lhs << rhs; }) {
+    const T &in, const L &serialize = [](QTextStream &lhs, const T &rhs) { lhs << rhs; }
+) {
     // NOTE: QTextStream's default locale is C, unlike QString::arg()
     auto string = QString{};
     auto stream = QTextStream{&string};
@@ -115,9 +117,11 @@ QJsonValue toJson(const T &in) {
 } // namespace
 
 QJsonValue PreferenceSerializer::writeToJson(const Color &in) const {
-    return toJson(in, [](QTextStream &lhs, const Color &rhs) {
-      lhs << rhs.r() << " " << rhs.g() << " " << rhs.b() << " " << rhs.a();
-    });
+    return toJson(
+        in, [](QTextStream &lhs, const Color &rhs) {
+          lhs << rhs.r() << " " << rhs.g() << " " << rhs.b() << " " << rhs.a();
+        }
+    );
 }
 
 QJsonValue PreferenceSerializer::writeToJson(const float in) const {

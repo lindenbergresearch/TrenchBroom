@@ -48,9 +48,8 @@ private:
 
 public:
     void pick(
-        const vm::ray3 &pickRay,
-        const Renderer::Camera &camera,
-        Model::PickResult &pickResult) const override;
+        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+    ) const override;
 
 public:
     FaceHandleManager &handleManager() override;
@@ -59,7 +58,8 @@ public:
 
 public:
     std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(
-        const std::vector<Model::Hit> &hits) const override;
+        const std::vector<Model::Hit> &hits
+    ) const override;
 
     MoveResult move(const vm::vec3 &delta) override;
 

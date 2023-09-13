@@ -43,7 +43,8 @@ public:
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
     std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document) override;
+        MapDocumentCommandFacade *document
+    ) override;
 
 deleteCopyAndMove(UpdateLinkedGroupsCommand);
 };

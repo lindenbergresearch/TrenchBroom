@@ -61,12 +61,12 @@ public:
 class IndexOutOfBoundsError : public EvaluationError {
 public:
     IndexOutOfBoundsError(
-        const Value &indexableValue, const Value &indexValue, size_t outOfBoundsIndex);
+        const Value &indexableValue, const Value &indexValue, size_t outOfBoundsIndex
+    );
 
     IndexOutOfBoundsError(
-        const Value &indexableValue,
-        const Value &indexValue,
-        const std::string &outOfBoundsIndex);
+        const Value &indexableValue, const Value &indexValue, const std::string &outOfBoundsIndex
+    );
 
     IndexOutOfBoundsError(const Value &indexableValue, size_t index);
 

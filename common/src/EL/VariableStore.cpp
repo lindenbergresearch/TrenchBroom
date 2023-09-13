@@ -54,10 +54,11 @@ std::ostream &operator<<(std::ostream &lhs, const VariableStore &rhs) {
 
 bool operator==(const VariableStore &lhs, const VariableStore &rhs) {
     const auto names = lhs.names();
-    return names == rhs.names()
-           && std::all_of(std::begin(names), std::end(names), [&](const auto &name) {
-      return lhs.value(name) == rhs.value(name);
-    });
+    return names == rhs.names() && std::all_of(
+        std::begin(names), std::end(names), [&](const auto &name) {
+          return lhs.value(name) == rhs.value(name);
+        }
+    );
 }
 
 bool operator!=(const VariableStore &lhs, const VariableStore &rhs) {
@@ -66,8 +67,7 @@ bool operator!=(const VariableStore &lhs, const VariableStore &rhs) {
 
 VariableTable::VariableTable() = default;
 
-VariableTable::VariableTable(Table variables)
-    : m_variables(std::move(variables)) {
+VariableTable::VariableTable(Table variables) : m_variables(std::move(variables)) {
 }
 
 VariableStore *VariableTable::clone() const {
@@ -82,7 +82,8 @@ Value VariableTable::value(const std::string &name) const {
     auto it = m_variables.find(name);
     if (it != std::end(m_variables)) {
         return it->second;
-    } else {
+    }
+    else {
         return Value::Undefined;
     }
 }
@@ -101,7 +102,8 @@ void VariableTable::assign(const std::string &name, const Value &value) {
     auto it = m_variables.find(name);
     if (it == std::end(m_variables)) {
         throw EvaluationError("Cannot assign to undeclared variable '" + name + "'");
-    } else {
+    }
+    else {
         it->second = value;
     }
 }

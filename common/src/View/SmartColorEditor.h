@@ -53,7 +53,8 @@ private:
 
 public:
     explicit SmartColorEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 private:
     void createGui();

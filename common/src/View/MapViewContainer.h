@@ -52,7 +52,8 @@ protected:
 
 private: // implement MapView interface
     vm::vec3 doGetPasteObjectsDelta(
-        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
+        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
+    ) const override;
 
 private: // subclassing interface
     virtual bool doCanMaximizeCurrentView() const = 0;

@@ -31,8 +31,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-TagAttribute::TagAttribute(const AttributeType type, const std::string &name)
-    : m_type(type), m_name(name) {
+TagAttribute::TagAttribute(const AttributeType type, const std::string &name) : m_type(type), m_name(name) {
 }
 
 TagAttribute::AttributeType TagAttribute::type() const {
@@ -56,18 +55,16 @@ bool operator<(const TagAttribute &lhs, const TagAttribute &rhs) {
 }
 
 std::ostream &operator<<(std::ostream &str, const TagAttribute &attr) {
-    kdl::struct_stream{str} << "TagAttribute"
-                            << "m_type" << attr.m_type << "m_name" << attr.m_name;
+    kdl::struct_stream{str} << "TagAttribute" << "m_type" << attr.m_type << "m_name" << attr.m_name;
     return str;
 }
 
 Tag::Tag(
-    const size_t index, const std::string &name, std::vector<TagAttribute> attributes)
-    : m_index(index), m_name(name), m_attributes(std::move(attributes)) {
+    const size_t index, const std::string &name, std::vector<TagAttribute> attributes
+) : m_index(index), m_name(name), m_attributes(std::move(attributes)) {
 }
 
-Tag::Tag(const std::string &name, std::vector<TagAttribute> attributes)
-    : Tag(0, name, std::move(attributes)) {
+Tag::Tag(const std::string &name, std::vector<TagAttribute> attributes) : Tag(0, name, std::move(attributes)) {
 }
 
 Tag::~Tag() = default;
@@ -113,9 +110,7 @@ bool operator<(const Tag &lhs, const Tag &rhs) {
 }
 
 void Tag::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "Tag"
-                            << "m_index" << m_index << "m_name" << m_name << "m_attributes"
-                            << m_attributes;
+    kdl::struct_stream{str} << "Tag" << "m_index" << m_index << "m_name" << m_name << "m_attributes" << m_attributes;
 }
 
 std::ostream &operator<<(std::ostream &str, const Tag &tag) {
@@ -123,8 +118,7 @@ std::ostream &operator<<(std::ostream &str, const Tag &tag) {
     return str;
 }
 
-TagReference::TagReference(const Tag &tag)
-    : m_tag(&tag) {
+TagReference::TagReference(const Tag &tag) : m_tag(&tag) {
 }
 
 const Tag &TagReference::tag() const {
@@ -143,8 +137,7 @@ bool operator<(const TagReference &lhs, const TagReference &rhs) {
     return *(lhs.m_tag) < *(rhs.m_tag);
 }
 
-Taggable::Taggable()
-    : m_tagMask(0), m_attributeMask(0) {
+Taggable::Taggable() : m_tagMask(0), m_attributeMask(0) {
 }
 
 void swap(Taggable &lhs, Taggable &rhs) noexcept {
@@ -175,7 +168,8 @@ TagType::Type Taggable::tagMask() const {
 bool Taggable::addTag(const Tag &tag) {
     if (hasTag(tag)) {
         return false;
-    } else {
+    }
+    else {
         m_tagMask |= tag.type();
         m_tags.emplace(tag);
 
@@ -261,14 +255,11 @@ std::ostream &operator<<(std::ostream &str, const TagMatcher &matcher) {
 }
 
 SmartTag::SmartTag(
-    const std::string &name,
-    std::vector<TagAttribute> attributes,
-    std::unique_ptr<TagMatcher> matcher)
-    : Tag(name, std::move(attributes)), m_matcher(std::move(matcher)) {
+    const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher
+) : Tag(name, std::move(attributes)), m_matcher(std::move(matcher)) {
 }
 
-SmartTag::SmartTag(const SmartTag &other)
-    : Tag(other.m_index, other.m_name, other.m_attributes), m_matcher(other.m_matcher->clone()) {
+SmartTag::SmartTag(const SmartTag &other) : Tag(other.m_index, other.m_name, other.m_attributes), m_matcher(other.m_matcher->clone()) {
 }
 
 SmartTag::SmartTag(SmartTag &&other) noexcept = default;
@@ -290,7 +281,8 @@ bool SmartTag::matches(const Taggable &taggable) const {
 void SmartTag::update(Taggable &taggable) const {
     if (matches(taggable)) {
         taggable.addTag(*this);
-    } else {
+    }
+    else {
         taggable.removeTag(*this);
     }
 }
@@ -312,9 +304,7 @@ bool SmartTag::canDisable() const {
 }
 
 void SmartTag::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "SmartTag"
-                            << "m_index" << m_index << "m_name" << m_name << "m_attributes"
-                            << m_attributes << "m_matcher" << *m_matcher;
+    kdl::struct_stream{str} << "SmartTag" << "m_index" << m_index << "m_name" << m_name << "m_attributes" << m_attributes << "m_matcher" << *m_matcher;
 }
 } // namespace Model
 } // namespace TrenchBroom

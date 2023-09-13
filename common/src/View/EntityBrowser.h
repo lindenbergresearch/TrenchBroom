@@ -62,9 +62,8 @@ private:
 
 public:
     EntityBrowser(
-        std::weak_ptr<MapDocument> document,
-        GLContextManager &contextManager,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
+    );
 
     void reload();
 

@@ -41,11 +41,11 @@ namespace IO {
 // WorldReaderException
 
 static std::string formatParserExceptions(
-    const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions) {
+    const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions
+) {
     std::stringstream result;
     for (const auto &[mapFormat, message]: parserExceptions) {
-        result << "Error parsing as " << Model::formatName(mapFormat) << ": " << message
-               << "\n";
+        result << "Error parsing as " << Model::formatName(mapFormat) << ": " << message << "\n";
     }
     return result.str();
 }
@@ -53,32 +53,26 @@ static std::string formatParserExceptions(
 WorldReaderException::WorldReaderException() = default;
 
 WorldReaderException::WorldReaderException(
-    const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions)
-    : Exception{formatParserExceptions(parserExceptions)} {
+    const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions
+) : Exception{formatParserExceptions(parserExceptions)} {
 }
 
 // WorldReader
 
 WorldReader::WorldReader(
-    std::string_view str,
-    const Model::MapFormat sourceAndTargetMapFormat,
-    const Model::EntityPropertyConfig &entityPropertyConfig)
-    : MapReader(
-    std::move(str),
-    sourceAndTargetMapFormat,
-    sourceAndTargetMapFormat,
-    entityPropertyConfig,
-    {}), m_world(std::make_unique<Model::WorldNode>(
-    entityPropertyConfig, Model::Entity{}, sourceAndTargetMapFormat)) {
+    std::string_view str, const Model::MapFormat sourceAndTargetMapFormat, const Model::EntityPropertyConfig &entityPropertyConfig
+) : MapReader(
+    std::move(str), sourceAndTargetMapFormat, sourceAndTargetMapFormat, entityPropertyConfig, {}
+), m_world(
+    std::make_unique<Model::WorldNode>(
+        entityPropertyConfig, Model::Entity{}, sourceAndTargetMapFormat
+    )) {
     m_world->disableNodeTreeUpdates();
 }
 
 std::unique_ptr<Model::WorldNode> WorldReader::tryRead(
-    std::string_view str,
-    const std::vector<Model::MapFormat> &mapFormatsToTry,
-    const vm::bbox3 &worldBounds,
-    const Model::EntityPropertyConfig &entityPropertyConfig,
-    ParserStatus &status) {
+    std::string_view str, const std::vector<Model::MapFormat> &mapFormatsToTry, const vm::bbox3 &worldBounds, const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status
+) {
     std::vector<std::tuple<Model::MapFormat, std::string>> parserExceptions;
 
     for (const auto mapFormat: mapFormatsToTry) {
@@ -89,8 +83,7 @@ std::unique_ptr<Model::WorldNode> WorldReader::tryRead(
         try {
             WorldReader reader{str, mapFormat, entityPropertyConfig};
             return reader.read(worldBounds, status);
-        }
-        catch (const ParserException &e) {
+        } catch (const ParserException &e) {
             parserExceptions.emplace_back(mapFormat, std::string{e.what()});
         }
     }
@@ -98,15 +91,18 @@ std::unique_ptr<Model::WorldNode> WorldReader::tryRead(
     if (!parserExceptions.empty()) {
         // No format parsed successfully. Just throw the parse error from the last one.
         throw WorldReaderException(parserExceptions);
-    } else {
+    }
+    else {
         // mapFormatsToTry was empty or all elements were Model::MapFormat::Unknown
         throw WorldReaderException(
-            {{Model::MapFormat::Unknown, "No valid formats to parse as"}});
+            {{Model::MapFormat::Unknown, "No valid formats to parse as"}}
+        );
     }
 }
 
 std::unique_ptr<Model::WorldNode> WorldReader::read(
-    const vm::bbox3 &worldBounds, ParserStatus &status) {
+    const vm::bbox3 &worldBounds, ParserStatus &status
+) {
     readEntities(worldBounds, status);
     sanitizeLayerSortIndicies(status);
     m_world->rebuildNodeTree();
@@ -151,8 +147,7 @@ void WorldReader::sanitizeLayerSortIndicies(ParserStatus & /* status */) {
     assert(invalidLayers.size() + validLayers.size() == customLayers.size());
 
     // Renumber the invalid layers
-    int nextValidLayerIndex =
-        (validLayers.empty() ? 0 : (validLayers.back()->layer().sortIndex() + 1));
+    int nextValidLayerIndex = (validLayers.empty() ? 0 : (validLayers.back()->layer().sortIndex() + 1));
     for (auto *layerNode: invalidLayers) {
         auto layer = layerNode->layer();
         layer.setSortIndex(nextValidLayerIndex++);
@@ -161,7 +156,8 @@ void WorldReader::sanitizeLayerSortIndicies(ParserStatus & /* status */) {
 }
 
 Model::Node *WorldReader::onWorldNode(
-    std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &) {
+    std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &
+) {
     // we transfer the properties and the configuration of the default layer, but don't use
     // the given node
     m_world->setEntity(worldNode->entity());
@@ -180,10 +176,12 @@ void WorldReader::onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStat
 }
 
 void WorldReader::onNode(
-    Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &) {
+    Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &
+) {
     if (parentNode != nullptr) {
         parentNode->addChild(node.release());
-    } else {
+    }
+    else {
         m_world->defaultLayer()->addChild(node.release());
     }
 }

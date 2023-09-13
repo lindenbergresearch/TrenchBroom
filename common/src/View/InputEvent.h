@@ -88,8 +88,7 @@ public:
       /**
        * A key was pressed.
        */
-      Down,
-      /**
+      Down, /**
        * A key was released.
        */
       Up
@@ -129,52 +128,37 @@ public:
       /**
        * A button was pressed.
        */
-      Down,
-      /**
+      Down, /**
        * A button was released.
        */
-      Up,
-      /**
+      Up, /**
        * A button was clicked.
        */
-      Click,
-      /**
+      Click, /**
        * A button was double clicked.
        */
-      DoubleClick,
-      /**
+      DoubleClick, /**
        * The mouse was moved.
        */
-      Motion,
-      /**
+      Motion, /**
        * The mouse wheel was scrolled.
        */
-      Scroll,
-      /**
+      Scroll, /**
        * A mouse drag was started.
        */
-      DragStart,
-      /**
+      DragStart, /**
        * The mouse was moved during a mouse drag.
        */
-      Drag,
-      /**
+      Drag, /**
        * The mouse drag ended.
        */
       DragEnd
     };
     enum class Button {
-      None,
-      Left,
-      Middle,
-      Right,
-      Aux1,
-      Aux2
+      None, Left, Middle, Right, Aux1, Aux2
     };
     enum class WheelAxis {
-      None,
-      Vertical,
-      Horizontal
+      None, Vertical, Horizontal
     };
 
 public:
@@ -199,12 +183,8 @@ public:
      * @param scrollDistance the distance by which the mouse wheel was scrolled, in lines
      */
     MouseEvent(
-        Type type,
-        Button button,
-        WheelAxis wheelAxis,
-        float posX,
-        float posY,
-        float scrollDistance);
+        Type type, Button button, WheelAxis wheelAxis, float posX, float posY, float scrollDistance
+    );
 
 public:
     /**

@@ -48,8 +48,7 @@ namespace TrenchBroom {
 namespace View {
 // MapInspector
 
-MapInspector::MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : TabBookPage(parent), m_mapPropertiesEditor(nullptr), m_modEditor(nullptr) {
+MapInspector::MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent) : TabBookPage(parent), m_mapPropertiesEditor(nullptr), m_modEditor(nullptr) {
     createGui(document);
 }
 
@@ -87,7 +86,8 @@ QWidget *MapInspector::createLayerEditor(std::weak_ptr<MapDocument> document) {
 }
 
 CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(
-    std::weak_ptr<MapDocument> document) {
+    std::weak_ptr<MapDocument> document
+) {
     CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Map Properties"));
     titledPanel->setObjectName("MapInspector_MapPropertiesPanel");
 
@@ -122,10 +122,9 @@ CollapsibleTitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument>
 // MapPropertiesEditor
 
 MapPropertiesEditor::MapPropertiesEditor(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_updatingGui(false), m_softBoundsDisabled(nullptr),
-      m_softBoundsFromGame(nullptr), m_softBoundsFromGameMinLabel(nullptr), m_softBoundsFromGameMaxLabel(nullptr),
-      m_softBoundsFromMap(nullptr), m_softBoundsFromMapMinEdit(nullptr), m_softBoundsFromMapMaxEdit(nullptr) {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : QWidget(parent), m_document(document), m_updatingGui(false), m_softBoundsDisabled(nullptr), m_softBoundsFromGame(nullptr), m_softBoundsFromGameMinLabel(nullptr), m_softBoundsFromGameMaxLabel(nullptr), m_softBoundsFromMap(nullptr),
+    m_softBoundsFromMapMinEdit(nullptr), m_softBoundsFromMapMaxEdit(nullptr) {
     createGui();
     connectObservers();
 }
@@ -134,9 +133,11 @@ static std::optional<vm::vec3> parseVec(const QString &qString) {
     const std::string string = qString.toStdString();
     if (const auto vec = vm::parse<double, 3u>(string)) {
         return *vec;
-    } else if (const auto val = vm::parse<double, 1u>(string)) {
+    }
+    else if (const auto val = vm::parse<double, 1u>(string)) {
         return vm::vec3::fill(val->x());
-    } else {
+    }
+    else {
         return std::nullopt;
     }
 }
@@ -211,10 +212,8 @@ void MapPropertiesEditor::createGui() {
 
     auto *gridLayout = new QGridLayout();
     gridLayout->setContentsMargins(
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::MediumVMargin,
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::MediumVMargin);
+        LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin
+    );
     gridLayout->setHorizontalSpacing(LayoutConstants::NarrowHMargin);
     gridLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
 
@@ -228,20 +227,14 @@ void MapPropertiesEditor::createGui() {
     setLayout(gridLayout);
 
     connect(
-        softBoundsDisabledLabel,
-        &ClickableLabel::clicked,
-        m_softBoundsDisabled,
-        &QAbstractButton::click);
+        softBoundsDisabledLabel, &ClickableLabel::clicked, m_softBoundsDisabled, &QAbstractButton::click
+    );
     connect(
-        softBoundsFromGameLabel,
-        &ClickableLabel::clicked,
-        m_softBoundsFromGame,
-        &QAbstractButton::click);
+        softBoundsFromGameLabel, &ClickableLabel::clicked, m_softBoundsFromGame, &QAbstractButton::click
+    );
     connect(
-        softBoundsFromMapLabel,
-        &ClickableLabel::clicked,
-        m_softBoundsFromMap,
-        &QAbstractButton::click);
+        softBoundsFromMapLabel, &ClickableLabel::clicked, m_softBoundsFromMap, &QAbstractButton::click
+    );
 
     connect(
         m_softBoundsDisabled, &QAbstractButton::clicked, this, [this](const bool checked) {
@@ -249,14 +242,16 @@ void MapPropertiesEditor::createGui() {
           if (checked) {
               document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, std::nullopt});
           }
-        });
+        }
+    );
     connect(
         m_softBoundsFromGame, &QAbstractButton::clicked, this, [this](const bool checked) {
           auto document = kdl::mem_lock(m_document);
           if (checked) {
               document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Game, std::nullopt});
           }
-        });
+        }
+    );
     connect(
         m_softBoundsFromMap, &QAbstractButton::clicked, this, [this](const bool checked) {
           auto document = kdl::mem_lock(m_document);
@@ -271,10 +266,12 @@ void MapPropertiesEditor::createGui() {
               // text fields have a valid value entered.
               if (parsed.has_value()) {
                   document->setSoftMapBounds(
-                      {Model::Game::SoftMapBoundsType::Map, parsed.value()});
+                      {Model::Game::SoftMapBoundsType::Map, parsed.value()}
+                  );
               }
           }
-        });
+        }
+    );
 
     const auto textEditingFinished = [this]() {
       // QLineEdit::editingFinished is emitted not just in response to user actions,
@@ -292,9 +289,11 @@ void MapPropertiesEditor::createGui() {
       }
     };
     connect(
-        m_softBoundsFromMapMinEdit, &QLineEdit::editingFinished, this, textEditingFinished);
+        m_softBoundsFromMapMinEdit, &QLineEdit::editingFinished, this, textEditingFinished
+    );
     connect(
-        m_softBoundsFromMapMaxEdit, &QLineEdit::editingFinished, this, textEditingFinished);
+        m_softBoundsFromMapMaxEdit, &QLineEdit::editingFinished, this, textEditingFinished
+    );
 
     updateGui();
 }
@@ -302,11 +301,12 @@ void MapPropertiesEditor::createGui() {
 void MapPropertiesEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &MapPropertiesEditor::documentWasNewed);
+        this, &MapPropertiesEditor::documentWasNewed
+    );
     m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &MapPropertiesEditor::documentWasLoaded);
-    m_notifierConnection +=
-        document->nodesDidChangeNotifier.connect(this, &MapPropertiesEditor::nodesDidChange);
+        this, &MapPropertiesEditor::documentWasLoaded
+    );
+    m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &MapPropertiesEditor::nodesDidChange);
 }
 
 void MapPropertiesEditor::documentWasNewed(MapDocument *) {
@@ -340,7 +340,8 @@ static QString formatVec(const std::optional<vm::bbox3> &bbox, const bool max) {
     if (vec.x() == vec.y() && vec.y() == vec.z()) {
         // Just print the first component to save space
         str << vec.x();
-    } else {
+    }
+    else {
         str << vec;
     }
     return QString::fromStdString(str.str());
@@ -373,7 +374,8 @@ void MapPropertiesEditor::updateGui() {
 
         m_softBoundsFromMapMinEdit->setEnabled(false);
         m_softBoundsFromMapMaxEdit->setEnabled(false);
-    } else if (bounds.source == Model::Game::SoftMapBoundsType::Map) {
+    }
+    else if (bounds.source == Model::Game::SoftMapBoundsType::Map) {
         m_softBoundsFromMap->setChecked(true);
 
         m_softBoundsFromMapMinEdit->setEnabled(true);
@@ -381,7 +383,8 @@ void MapPropertiesEditor::updateGui() {
 
         m_softBoundsFromMapMinEdit->setText(formatVec(bounds.bounds, false));
         m_softBoundsFromMapMaxEdit->setText(formatVec(bounds.bounds, true));
-    } else {
+    }
+    else {
         m_softBoundsFromGame->setChecked(true);
 
         m_softBoundsFromMapMinEdit->setEnabled(false);

@@ -41,38 +41,28 @@
 namespace TrenchBroom {
 namespace View {
 static bool shouldMove(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBNone)
-        && inputState.checkModifierKeys(MK_No, MK_No, MK_DontCare));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBNone) && inputState.checkModifierKeys(MK_No, MK_No, MK_DontCare));
 }
 
 static bool shouldLook(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBRight)
-        && inputState.modifierKeysPressed(ModifierKeys::MKNone));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBRight) && inputState.modifierKeysPressed(ModifierKeys::MKNone));
 }
 
 static bool shouldPan(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBMiddle)
-        &&
-        (inputState.modifierKeysPressed(ModifierKeys::MKNone) || inputState.modifierKeysPressed(ModifierKeys::MKAlt)));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBMiddle) && (inputState.modifierKeysPressed(ModifierKeys::MKNone) || inputState.modifierKeysPressed(ModifierKeys::MKAlt)));
 }
 
 static bool shouldOrbit(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBRight)
-        && inputState.modifierKeysPressed(ModifierKeys::MKAlt));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBRight) && inputState.modifierKeysPressed(ModifierKeys::MKAlt));
 }
 
 static bool shouldAdjustFlySpeed(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBRight)
-        && inputState.checkModifierKeys(MK_No, MK_No, MK_No));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBRight) && inputState.checkModifierKeys(MK_No, MK_No, MK_No));
 }
 
 static float adjustSpeedToZoom(
-    const Renderer::PerspectiveCamera &camera, const float speed) {
+    const Renderer::PerspectiveCamera &camera, const float speed
+) {
     return speed * vm::min(1.0f, camera.zoomedFov() / camera.fov());
 }
 
@@ -116,8 +106,7 @@ static float moveSpeed(const Renderer::PerspectiveCamera &camera, const bool alt
     return adjustSpeedToZoom(camera, speed);
 }
 
-CameraTool3D::CameraTool3D(Renderer::PerspectiveCamera &camera)
-    : ToolController{}, Tool{true}, m_camera{camera} {
+CameraTool3D::CameraTool3D(Renderer::PerspectiveCamera &camera) : ToolController{}, Tool{true}, m_camera{camera} {
 }
 
 Tool &CameraTool3D::tool() {
@@ -133,8 +122,7 @@ void CameraTool3D::mouseScroll(const InputState &inputState) {
     const bool zoom = inputState.modifierKeysPressed(ModifierKeys::MKShift);
     const float scrollDist =
 #ifdef __APPLE__
-        inputState.modifierKeysPressed(ModifierKeys::MKShift) ? inputState.scrollX()
-                                                              : inputState.scrollY();
+        inputState.modifierKeysPressed(ModifierKeys::MKShift) ? inputState.scrollX() : inputState.scrollY();
 #else
     inputState.scrollY();
 #endif
@@ -143,10 +131,9 @@ void CameraTool3D::mouseScroll(const InputState &inputState) {
         if (zoom) {
             const float zoomFactor = 1.0f + scrollDist / 50.0f * factor;
             m_camera.zoom(zoomFactor);
-        } else {
-            const auto moveDirection = pref(Preferences::CameraMoveInCursorDir)
-                                       ? vm::vec3f{inputState.pickRay().direction}
-                                       : m_camera.direction();
+        }
+        else {
+            const auto moveDirection = pref(Preferences::CameraMoveInCursorDir) ? vm::vec3f{inputState.pickRay().direction} : m_camera.direction();
             const float distance = scrollDist * moveSpeed(m_camera, false);
             m_camera.moveBy(factor * distance * moveDirection);
         }
@@ -169,8 +156,7 @@ private:
     vm::vec3f m_orbitCenter;
 
 public:
-    OrbitDragTracker(Renderer::PerspectiveCamera &camera, const vm::vec3f &orbitCenter)
-        : m_camera{camera}, m_orbitCenter{orbitCenter} {
+    OrbitDragTracker(Renderer::PerspectiveCamera &camera, const vm::vec3f &orbitCenter) : m_camera{camera}, m_orbitCenter{orbitCenter} {
     }
 
     void mouseScroll(const InputState &inputState) override {
@@ -178,10 +164,8 @@ public:
         const float scrollDist = inputState.scrollY();
 
         const auto orbitPlane = vm::plane3f{m_orbitCenter, m_camera.direction()};
-        const float maxDistance =
-            vm::max(vm::intersect_ray_plane(m_camera.viewRay(), orbitPlane) - 32.0f, 0.0f);
-        const float distance =
-            vm::min(factor * scrollDist * moveSpeed(m_camera, false), maxDistance);
+        const float maxDistance = vm::max(vm::intersect_ray_plane(m_camera.viewRay(), orbitPlane) - 32.0f, 0.0f);
+        const float distance = vm::min(factor * scrollDist * moveSpeed(m_camera, false), maxDistance);
 
         m_camera.moveBy(distance * m_camera.direction());
     }
@@ -203,8 +187,7 @@ private:
     Renderer::PerspectiveCamera &m_camera;
 
 public:
-    LookDragTracker(Renderer::PerspectiveCamera &camera)
-        : m_camera{camera} {
+    LookDragTracker(Renderer::PerspectiveCamera &camera) : m_camera{camera} {
     }
 
     void mouseScroll(const InputState &inputState) override {
@@ -216,9 +199,8 @@ public:
             // adjust speed by 5% of the current speed per scroll line
             const float deltaSpeed = factor * speed * 0.05f * scrollDist;
             const float newSpeed = vm::clamp(
-                speed + deltaSpeed,
-                Preferences::MinCameraFlyMoveSpeed,
-                Preferences::MaxCameraFlyMoveSpeed);
+                speed + deltaSpeed, Preferences::MinCameraFlyMoveSpeed, Preferences::MaxCameraFlyMoveSpeed
+            );
 
             // prefs are only changed when releasing RMB
             auto &prefs = PreferenceManager::instance();
@@ -243,27 +225,19 @@ private:
     Renderer::PerspectiveCamera &m_camera;
 
 public:
-    PanDragTracker(Renderer::PerspectiveCamera &camera)
-        : m_camera{camera} {
+    PanDragTracker(Renderer::PerspectiveCamera &camera) : m_camera{camera} {
     }
 
     bool drag(const InputState &inputState) override {
         const bool altMove = pref(Preferences::CameraEnableAltMove);
         auto delta = vm::vec3f{};
         if (altMove && inputState.modifierKeysPressed(ModifierKeys::MKAlt)) {
-            delta = delta
-                    + static_cast<float>(inputState.mouseDX()) * panSpeedH(m_camera)
-                      * m_camera.right();
-            delta = delta
-                    + static_cast<float>(inputState.mouseDY()) * -moveSpeed(m_camera, altMove)
-                      * m_camera.direction();
-        } else {
-            delta = delta
-                    + static_cast<float>(inputState.mouseDX()) * panSpeedH(m_camera)
-                      * m_camera.right();
-            delta =
-                delta
-                + static_cast<float>(inputState.mouseDY()) * panSpeedV(m_camera) * m_camera.up();
+            delta = delta + static_cast<float>(inputState.mouseDX()) * panSpeedH(m_camera) * m_camera.right();
+            delta = delta + static_cast<float>(inputState.mouseDY()) * -moveSpeed(m_camera, altMove) * m_camera.direction();
+        }
+        else {
+            delta = delta + static_cast<float>(inputState.mouseDX()) * panSpeedH(m_camera) * m_camera.right();
+            delta = delta + static_cast<float>(inputState.mouseDY()) * panSpeedV(m_camera) * m_camera.up();
         }
         m_camera.moveBy(delta);
         return true;
@@ -279,10 +253,8 @@ std::unique_ptr<DragTracker> CameraTool3D::acceptMouseDrag(const InputState &inp
     using namespace Model::HitFilters;
 
     if (shouldOrbit(inputState)) {
-        const auto &hit =
-            inputState.pickResult().first(type(Model::nodeHitType()) && minDistance(3.0));
-        const auto orbitCenter = vm::vec3f{
-            hit.isMatch() ? hit.hitPoint() : m_camera.defaultPoint(inputState.pickRay())};
+        const auto &hit = inputState.pickResult().first(type(Model::nodeHitType()) && minDistance(3.0));
+        const auto orbitCenter = vm::vec3f{hit.isMatch() ? hit.hitPoint() : m_camera.defaultPoint(inputState.pickRay())};
         return std::make_unique<OrbitDragTracker>(m_camera, orbitCenter);
     }
 

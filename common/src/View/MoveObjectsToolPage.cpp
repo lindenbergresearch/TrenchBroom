@@ -35,8 +35,8 @@
 namespace TrenchBroom {
 namespace View {
 MoveObjectsToolPage::MoveObjectsToolPage(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_offset(nullptr), m_button(nullptr) {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : QWidget(parent), m_document(document), m_offset(nullptr), m_button(nullptr) {
     createGui();
     connectObservers();
     updateGui();
@@ -45,7 +45,8 @@ MoveObjectsToolPage::MoveObjectsToolPage(
 void MoveObjectsToolPage::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &MoveObjectsToolPage::selectionDidChange);
+        this, &MoveObjectsToolPage::selectionDidChange
+    );
 }
 
 void MoveObjectsToolPage::createGui() {
@@ -57,7 +58,7 @@ void MoveObjectsToolPage::createGui() {
     connect(m_offset, &QLineEdit::returnPressed, this, &MoveObjectsToolPage::applyMove);
 
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 5);
     layout->setSpacing(LayoutConstants::MediumHMargin);
 
     layout->addWidget(text, 0, Qt::AlignVCenter);

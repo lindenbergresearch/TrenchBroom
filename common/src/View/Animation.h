@@ -61,8 +61,7 @@ public:
     static const Type NoType = -1;
 
     enum class Curve {
-      Flat,
-      EaseInEaseOut
+      Flat, EaseInEaseOut
     };
 
 private:
@@ -92,7 +91,8 @@ public:
 
 private:
     static std::unique_ptr<AnimationCurve> createAnimationCurve(
-        Curve curve, double duration);
+        Curve curve, double duration
+    );
 
     virtual void doUpdate(double progress) = 0;
 };

@@ -59,17 +59,18 @@ void EditorContext::setHiddenTags(const TagType::Type hiddenTags) {
 }
 
 bool EditorContext::entityDefinitionHidden(const Model::EntityNodeBase *entityNode) const {
-    return entityNode != nullptr
-           && entityDefinitionHidden(entityNode->entity().definition());
+    return entityNode != nullptr && entityDefinitionHidden(entityNode->entity().definition());
 }
 
 bool EditorContext::entityDefinitionHidden(
-    const Assets::EntityDefinition *definition) const {
+    const Assets::EntityDefinition *definition
+) const {
     return definition != nullptr && m_hiddenEntityDefinitions[definition->index()];
 }
 
 void EditorContext::setEntityDefinitionHidden(
-    const Assets::EntityDefinition *definition, const bool hidden) {
+    const Assets::EntityDefinition *definition, const bool hidden
+) {
     if (definition != nullptr && entityDefinitionHidden(definition) != hidden) {
         m_hiddenEntityDefinitions[definition->index()] = hidden;
         editorContextDidChangeNotifier();
@@ -112,13 +113,11 @@ void EditorContext::popGroup() {
 }
 
 bool EditorContext::visible(const Model::Node *node) const {
-    return node->accept(kdl::overload(
-        [&](const WorldNode *world) { return visible(world); },
-        [&](const LayerNode *layer) { return visible(layer); },
-        [&](const GroupNode *group) { return visible(group); },
-        [&](const EntityNode *entity) { return visible(entity); },
-        [&](const BrushNode *brush) { return visible(brush); },
-        [&](const PatchNode *patch) { return visible(patch); }));
+    return node->accept(
+        kdl::overload(
+            [&](const WorldNode *world) { return visible(world); }, [&](const LayerNode *layer) { return visible(layer); }, [&](const GroupNode *group) { return visible(group); }, [&](const EntityNode *entity) { return visible(entity); },
+            [&](const BrushNode *brush) { return visible(brush); }, [&](const PatchNode *patch) { return visible(patch); }
+        ));
 }
 
 bool EditorContext::visible(const Model::WorldNode *worldNode) const {
@@ -191,7 +190,8 @@ bool EditorContext::visible(const Model::BrushNode *brushNode) const {
 }
 
 bool EditorContext::visible(
-    const Model::BrushNode *brushNode, const Model::BrushFace &face) const {
+    const Model::BrushNode *brushNode, const Model::BrushFace &face
+) const {
     return visible(brushNode) && !face.hasTag(m_hiddenTags);
 }
 
@@ -209,9 +209,11 @@ bool EditorContext::visible(const Model::PatchNode *patchNode) const {
 
 bool EditorContext::anyChildVisible(const Model::Node *node) const {
     const auto &children = node->children();
-    return std::any_of(std::begin(children), std::end(children), [this](const Node *child) {
-      return visible(child);
-    });
+    return std::any_of(
+        std::begin(children), std::end(children), [this](const Node *child) {
+          return visible(child);
+        }
+    );
 }
 
 bool EditorContext::editable(const Model::Node *node) const {
@@ -219,18 +221,17 @@ bool EditorContext::editable(const Model::Node *node) const {
 }
 
 bool EditorContext::editable(
-    const Model::BrushNode *brushNode, const Model::BrushFace &) const {
+    const Model::BrushNode *brushNode, const Model::BrushFace &
+) const {
     return editable(brushNode);
 }
 
 bool EditorContext::selectable(const Model::Node *node) const {
-    return node->accept(kdl::overload(
-        [&](const WorldNode *world) { return selectable(world); },
-        [&](const LayerNode *layer) { return selectable(layer); },
-        [&](const GroupNode *group) { return selectable(group); },
-        [&](const EntityNode *entity) { return selectable(entity); },
-        [&](const BrushNode *brush) { return selectable(brush); },
-        [&](const PatchNode *patch) { return selectable(patch); }));
+    return node->accept(
+        kdl::overload(
+            [&](const WorldNode *world) { return selectable(world); }, [&](const LayerNode *layer) { return selectable(layer); }, [&](const GroupNode *group) { return selectable(group); },
+            [&](const EntityNode *entity) { return selectable(entity); }, [&](const BrushNode *brush) { return selectable(brush); }, [&](const PatchNode *patch) { return selectable(patch); }
+        ));
 }
 
 bool EditorContext::selectable(const Model::WorldNode *) const {
@@ -242,13 +243,11 @@ bool EditorContext::selectable(const Model::LayerNode *) const {
 }
 
 bool EditorContext::selectable(const Model::GroupNode *groupNode) const {
-    return visible(groupNode) && editable(groupNode) && !groupNode->opened()
-           && inOpenGroup(groupNode);
+    return visible(groupNode) && editable(groupNode) && !groupNode->opened() && inOpenGroup(groupNode);
 }
 
 bool EditorContext::selectable(const Model::EntityNode *entityNode) const {
-    return visible(entityNode) && editable(entityNode) && !entityNode->hasChildren()
-           && inOpenGroup(entityNode);
+    return visible(entityNode) && editable(entityNode) && !entityNode->hasChildren() && inOpenGroup(entityNode);
 }
 
 bool EditorContext::selectable(const Model::BrushNode *brushNode) const {
@@ -256,7 +255,8 @@ bool EditorContext::selectable(const Model::BrushNode *brushNode) const {
 }
 
 bool EditorContext::selectable(
-    const Model::BrushNode *brushNode, const Model::BrushFace &face) const {
+    const Model::BrushNode *brushNode, const Model::BrushFace &face
+) const {
     return visible(brushNode, face) && editable(brushNode, face);
 }
 

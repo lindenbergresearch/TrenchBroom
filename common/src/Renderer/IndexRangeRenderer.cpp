@@ -24,8 +24,8 @@ namespace Renderer {
 IndexRangeRenderer::IndexRangeRenderer() {}
 
 IndexRangeRenderer::IndexRangeRenderer(
-    const VertexArray &vertexArray, const IndexRangeMap &indexArray)
-    : m_vertexArray(vertexArray), m_indexArray(indexArray) {
+    const VertexArray &vertexArray, const IndexRangeMap &indexArray
+) : m_vertexArray(vertexArray), m_indexArray(indexArray) {
 }
 
 void IndexRangeRenderer::prepare(VboManager &vboManager) {

@@ -50,9 +50,7 @@
 
 namespace TrenchBroom {
 namespace View {
-GamesPreferencePane::GamesPreferencePane(MapDocument *document, QWidget *parent)
-    : PreferencePane(parent), m_document{document}, m_gameListBox(nullptr), m_stackedWidget(nullptr),
-      m_defaultPage(nullptr), m_currentGamePage(nullptr) {
+GamesPreferencePane::GamesPreferencePane(MapDocument *document, QWidget *parent) : PreferencePane(parent), m_document{document}, m_gameListBox(nullptr), m_stackedWidget(nullptr), m_defaultPage(nullptr), m_currentGamePage(nullptr) {
     createGui();
     updateControls();
     m_gameListBox->setFocus();
@@ -69,13 +67,10 @@ void GamesPreferencePane::createGui() {
     m_stackedWidget = new QStackedWidget();
     m_stackedWidget->addWidget(m_defaultPage);
 
-    auto *showUserConfigDirButton =
-        createBitmapButton("Folder.svg", tr("Open custom game configurations folder"));
+    auto *showUserConfigDirButton = createBitmapButton("Folder.svg", tr("Open custom game configurations folder"));
     connect(
-        showUserConfigDirButton,
-        &QAbstractButton::clicked,
-        this,
-        &GamesPreferencePane::showUserConfigDirClicked);
+        showUserConfigDirButton, &QAbstractButton::clicked, this, &GamesPreferencePane::showUserConfigDirClicked
+    );
 
     auto *buttonLayout = createMiniToolBarLayoutRightAligned(showUserConfigDirButton);
 
@@ -97,25 +92,29 @@ void GamesPreferencePane::createGui() {
     setMinimumWidth(600);
 
     connect(
-        m_gameListBox, &GameListBox::currentGameChanged, this, [&]() { updateControls(); });
+        m_gameListBox, &GameListBox::currentGameChanged, this, [&]() { updateControls(); }
+    );
 }
 
 void GamesPreferencePane::showUserConfigDirClicked() {
     auto &gameFactory = Model::GameFactory::instance();
     auto path = gameFactory.userGameConfigsPath().lexically_normal();
 
-    IO::Disk::createDirectory(path)
-        .transform([&](auto) {
+    IO::Disk::createDirectory(path).transform(
+        [&](auto) {
           const auto url = QUrl::fromLocalFile(IO::pathAsQString(path));
           QDesktopServices::openUrl(url);
-        })
-        .transform_error([&](auto e) {
+        }
+    ).transform_error(
+        [&](auto e) {
           if (m_document) {
               m_document->error() << e.msg;
-          } else {
+          }
+          else {
               FileLogger::instance().error() << e.msg;
           }
-        });
+        }
+    );
 }
 
 bool GamesPreferencePane::doCanResetToDefaults() {
@@ -130,10 +129,12 @@ void GamesPreferencePane::doUpdateControls() {
     const std::string desiredGame = m_gameListBox->selectedGameName();
     if (desiredGame.empty()) {
         m_stackedWidget->setCurrentWidget(m_defaultPage);
-    } else if (m_currentGamePage != nullptr && m_currentGamePage->gameName() == desiredGame) {
+    }
+    else if (m_currentGamePage != nullptr && m_currentGamePage->gameName() == desiredGame) {
         // refresh the current page
         m_currentGamePage->updateControls();
-    } else {
+    }
+    else {
         // build a new current page
         delete m_currentGamePage;
         m_currentGamePage = new GamePreferencePane(desiredGame);
@@ -142,10 +143,8 @@ void GamesPreferencePane::doUpdateControls() {
         m_stackedWidget->setCurrentWidget(m_currentGamePage);
 
         connect(
-            m_currentGamePage,
-            &GamePreferencePane::requestUpdate,
-            this,
-            &GamesPreferencePane::updateControls);
+            m_currentGamePage, &GamePreferencePane::requestUpdate, this, &GamesPreferencePane::updateControls
+        );
     }
 }
 
@@ -155,47 +154,43 @@ bool GamesPreferencePane::doValidate() {
 
 // GamePreferencePane
 
-GamePreferencePane::GamePreferencePane(const std::string &gameName, QWidget *parent)
-    : QWidget(parent), m_gameName(gameName), m_gamePathText(nullptr), m_chooseGamePathButton(nullptr) {
+GamePreferencePane::GamePreferencePane(const std::string &gameName, QWidget *parent) : QWidget(parent), m_gameName(gameName), m_gamePathText(nullptr), m_chooseGamePathButton(nullptr) {
     createGui();
 }
 
 void GamePreferencePane::createGui() {
     m_gamePathText = new QLineEdit();
     m_gamePathText->setPlaceholderText(tr("Click on the button to change..."));
-    connect(m_gamePathText, &QLineEdit::editingFinished, this, [this]() {
-      updateGamePath(this->m_gamePathText->text());
-    });
+    connect(
+        m_gamePathText, &QLineEdit::editingFinished, this, [this]() {
+          updateGamePath(this->m_gamePathText->text());
+        }
+    );
 
     auto *validDirectoryIcon = new QAction(m_gamePathText);
     m_gamePathText->addAction(validDirectoryIcon, QLineEdit::TrailingPosition);
     connect(
-        m_gamePathText,
-        &QLineEdit::textChanged,
-        this,
-        [validDirectoryIcon](const QString &text) {
+        m_gamePathText, &QLineEdit::textChanged, this, [validDirectoryIcon](const QString &text) {
           if (text.isEmpty() || QDir(text).exists()) {
               validDirectoryIcon->setToolTip("");
               validDirectoryIcon->setIcon(QIcon());
-          } else {
+          }
+          else {
               validDirectoryIcon->setToolTip(tr("Directory not found"));
               validDirectoryIcon->setIcon(IO::loadSVGIcon("IssueBrowser.svg"));
           }
-        });
+        }
+    );
 
     auto *chooseGamePathButton = new QPushButton(tr("..."));
     connect(
-        chooseGamePathButton,
-        &QPushButton::clicked,
-        this,
-        &GamePreferencePane::chooseGamePathClicked);
+        chooseGamePathButton, &QPushButton::clicked, this, &GamePreferencePane::chooseGamePathClicked
+    );
 
     auto *configureEnginesButton = new QPushButton(tr("Configure engines..."));
     connect(
-        configureEnginesButton,
-        &QPushButton::clicked,
-        this,
-        &GamePreferencePane::configureEnginesClicked);
+        configureEnginesButton, &QPushButton::clicked, this, &GamePreferencePane::configureEnginesClicked
+    );
 
     auto *gamePathLayout = new QHBoxLayout();
     gamePathLayout->setContentsMargins(QMargins());
@@ -225,26 +220,28 @@ void GamePreferencePane::createGui() {
         if (tool.description) {
             edit->setToolTip(QString::fromStdString(*tool.description));
         }
-        connect(edit, &QLineEdit::editingFinished, this, [=]() {
-          Model::GameFactory::instance().setCompilationToolPath(
-              m_gameName, toolName, IO::pathFromQString(edit->text()));
-        });
+        connect(
+            edit, &QLineEdit::editingFinished, this, [=]() {
+              Model::GameFactory::instance().setCompilationToolPath(
+                  m_gameName, toolName, IO::pathFromQString(edit->text()));
+            }
+        );
 
         auto *browseButton = new QPushButton("...");
-        connect(browseButton, &QPushButton::clicked, this, [=]() {
-          const QString pathStr = QFileDialog::getOpenFileName(
-              this,
-              tr("%1 Path").arg(QString::fromStdString(toolName)),
-              fileDialogDefaultDirectory(FileDialogDir::CompileTool));
-          if (pathStr.isEmpty()) {
-              return;
-          }
-          edit->setText(pathStr);
-          if (Model::GameFactory::instance().setCompilationToolPath(
-              m_gameName, toolName, IO::pathFromQString(pathStr))) {
-              emit requestUpdate();
-          }
-        });
+        connect(
+            browseButton, &QPushButton::clicked, this, [=]() {
+              const QString pathStr = QFileDialog::getOpenFileName(
+                  this, tr("%1 Path").arg(QString::fromStdString(toolName)), fileDialogDefaultDirectory(FileDialogDir::CompileTool));
+              if (pathStr.isEmpty()) {
+                  return;
+              }
+              edit->setText(pathStr);
+              if (Model::GameFactory::instance().setCompilationToolPath(
+                  m_gameName, toolName, IO::pathFromQString(pathStr))) {
+                  emit requestUpdate();
+              }
+            }
+        );
 
         auto *rowLayout = new QHBoxLayout();
         rowLayout->setContentsMargins(QMargins());

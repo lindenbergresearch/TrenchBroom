@@ -414,9 +414,7 @@ static std::unordered_map<int, int> qtKeyToWxMap() {
 }
 
 int qtKeyToWx(const int qtKey) {
-    ensure(
-        qApp->thread() == QThread::currentThread(),
-        "qtKeyToWx() can only be used on the main thread");
+    ensure(qApp->thread() == QThread::currentThread(), "qtKeyToWx() can only be used on the main thread");
 
     static std::unordered_map<int, int> qtToWx;
     if (qtToWx.empty()) {

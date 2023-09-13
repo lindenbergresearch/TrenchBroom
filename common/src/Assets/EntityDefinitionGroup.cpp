@@ -28,8 +28,8 @@
 namespace TrenchBroom {
 namespace Assets {
 EntityDefinitionGroup::EntityDefinitionGroup(
-    const std::string &name, std::vector<EntityDefinition *> definitions)
-    : m_name(name), m_definitions(std::move(definitions)) {
+    const std::string &name, std::vector<EntityDefinition *> definitions
+) : m_name(name), m_definitions(std::move(definitions)) {
 }
 
 const std::string &EntityDefinitionGroup::name() const {
@@ -47,7 +47,8 @@ const std::vector<EntityDefinition *> &EntityDefinitionGroup::definitions() cons
 }
 
 std::vector<EntityDefinition *> EntityDefinitionGroup::definitions(
-    const EntityDefinitionType type, const EntityDefinitionSortOrder order) const {
+    const EntityDefinitionType type, const EntityDefinitionSortOrder order
+) const {
     return EntityDefinition::filterAndSort(m_definitions, type, order);
 }
 } // namespace Assets

@@ -46,9 +46,7 @@
 
 namespace TrenchBroom {
 namespace View {
-IssueBrowserView::IssueBrowserView(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)}, m_hiddenIssueTypes{0}, m_showHiddenIssues{false},
-      m_valid{false} {
+IssueBrowserView::IssueBrowserView(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget{parent}, m_document{std::move(document)}, m_hiddenIssueTypes{0}, m_showHiddenIssues{false}, m_valid{false} {
     createGui();
     bindEvents();
 }
@@ -122,37 +120,34 @@ void IssueBrowserView::updateIssues() {
         auto issues = std::vector<const Model::Issue *>{};
         const auto collectIssues = [&](auto *node) {
           for (auto *issue: node->issues(validators)) {
-              if (
-                  m_showHiddenIssues
-                  || (!issue->hidden() && (issue->type() & m_hiddenIssueTypes) == 0)) {
+              if (m_showHiddenIssues || (!issue->hidden() && (issue->type() & m_hiddenIssueTypes) == 0)) {
                   issues.push_back(issue);
               }
           }
         };
 
-        document->world()->accept(kdl::overload(
-            [&](auto &&thisLambda, Model::WorldNode *world) {
-              collectIssues(world);
-              world->visitChildren(thisLambda);
-            },
-            [&](auto &&thisLambda, Model::LayerNode *layer) {
-              collectIssues(layer);
-              layer->visitChildren(thisLambda);
-            },
-            [&](auto &&thisLambda, Model::GroupNode *group) {
-              collectIssues(group);
-              group->visitChildren(thisLambda);
-            },
-            [&](auto &&thisLambda, Model::EntityNode *entity) {
-              collectIssues(entity);
-              entity->visitChildren(thisLambda);
-            },
-            [&](Model::BrushNode *brush) { collectIssues(brush); },
-            [&](Model::PatchNode *patch) { collectIssues(patch); }));
+        document->world()->accept(
+            kdl::overload(
+                [&](auto &&thisLambda, Model::WorldNode *world) {
+                  collectIssues(world);
+                  world->visitChildren(thisLambda);
+                }, [&](auto &&thisLambda, Model::LayerNode *layer) {
+                  collectIssues(layer);
+                  layer->visitChildren(thisLambda);
+                }, [&](auto &&thisLambda, Model::GroupNode *group) {
+                  collectIssues(group);
+                  group->visitChildren(thisLambda);
+                }, [&](auto &&thisLambda, Model::EntityNode *entity) {
+                  collectIssues(entity);
+                  entity->visitChildren(thisLambda);
+                }, [&](Model::BrushNode *brush) { collectIssues(brush); }, [&](Model::PatchNode *patch) { collectIssues(patch); }
+            ));
 
-        issues = kdl::vec_sort(std::move(issues), [](const auto *lhs, const auto *rhs) {
-          return lhs->seqId() > rhs->seqId();
-        });
+        issues = kdl::vec_sort(
+            std::move(issues), [](const auto *lhs, const auto *rhs) {
+              return lhs->seqId() > rhs->seqId();
+            }
+        );
         m_tableModel->setIssues(std::move(issues));
     }
 }
@@ -161,15 +156,15 @@ void IssueBrowserView::applyQuickFix(const Model::IssueQuickFix &quickFix) {
     auto document = kdl::mem_lock(m_document);
     const auto issues = collectIssues(getSelection());
 
-    auto transaction =
-        Transaction{document, "Apply Quick Fix (" + quickFix.description() + ")"};
+    auto transaction = Transaction{document, "Apply Quick Fix (" + quickFix.description() + ")"};
     updateSelection();
     quickFix.apply(*document, issues);
     transaction.commit();
 }
 
 std::vector<const Model::Issue *> IssueBrowserView::collectIssues(
-    const QList<QModelIndex> &indices) const {
+    const QList<QModelIndex> &indices
+) const {
     // Use a vector_set to filter out duplicates.
     // The QModelIndex list returned by getSelection() contains duplicates
     // (not sure why, current row and selected row?)
@@ -185,7 +180,8 @@ std::vector<const Model::Issue *> IssueBrowserView::collectIssues(
 }
 
 std::vector<const Model::IssueQuickFix *> IssueBrowserView::collectQuickFixes(
-    const QList<QModelIndex> &indices) const {
+    const QList<QModelIndex> &indices
+) const {
     if (indices.empty()) {
         return {};
     }
@@ -228,16 +224,12 @@ QList<QModelIndex> IssueBrowserView::getSelection() const {
 void IssueBrowserView::bindEvents() {
     m_tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(
-        m_tableView,
-        &QWidget::customContextMenuRequested,
-        this,
-        &IssueBrowserView::itemRightClicked);
+        m_tableView, &QWidget::customContextMenuRequested, this, &IssueBrowserView::itemRightClicked
+    );
 
     connect(
-        m_tableView->selectionModel(),
-        &QItemSelectionModel::selectionChanged,
-        this,
-        &IssueBrowserView::itemSelectionChanged);
+        m_tableView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &IssueBrowserView::itemSelectionChanged
+    );
 }
 
 void IssueBrowserView::itemRightClicked(const QPoint &pos) {
@@ -259,7 +251,8 @@ void IssueBrowserView::itemRightClicked(const QPoint &pos) {
             quickFixMenu->addAction(
                 QString::fromStdString(quickFix->description()), this, [=]() {
                   this->applyQuickFix(*quickFix);
-                });
+                }
+            );
         }
 
         popupMenu->addSeparator();
@@ -299,8 +292,7 @@ void IssueBrowserView::validate() {
 
 // IssueBrowserModel
 
-IssueBrowserModel::IssueBrowserModel(QObject *parent)
-    : QAbstractTableModel{parent} {
+IssueBrowserModel::IssueBrowserModel(QObject *parent) : QAbstractTableModel{parent} {
 }
 
 void IssueBrowserModel::setIssues(std::vector<const Model::Issue *> issues) {
@@ -322,10 +314,7 @@ int IssueBrowserModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant IssueBrowserModel::data(const QModelIndex &index, const int role) const {
-    if (
-        !index.isValid() || index.row() < 0
-        || index.row() >= static_cast<int>(m_issues.size()) || index.column() < 0
-        || index.column() >= 2) {
+    if (!index.isValid() || index.row() < 0 || index.row() >= static_cast<int>(m_issues.size()) || index.column() < 0 || index.column() >= 2) {
         return QVariant{};
     }
 
@@ -336,10 +325,12 @@ QVariant IssueBrowserModel::data(const QModelIndex &index, const int role) const
             if (issue->lineNumber() > 0) {
                 return QVariant::fromValue<size_t>(issue->lineNumber());
             }
-        } else {
+        }
+        else {
             return QVariant{QString::fromStdString(issue->description())};
         }
-    } else if (role == Qt::FontRole) {
+    }
+    else if (role == Qt::FontRole) {
         if (issue->hidden()) {
             // hidden issues are italic
             auto italicFont = QFont{};
@@ -352,7 +343,8 @@ QVariant IssueBrowserModel::data(const QModelIndex &index, const int role) const
 }
 
 QVariant IssueBrowserModel::headerData(
-    const int section, const Qt::Orientation orientation, const int role) const {
+    const int section, const Qt::Orientation orientation, const int role
+) const {
     if (role != Qt::DisplayRole) {
         return QVariant{};
     }

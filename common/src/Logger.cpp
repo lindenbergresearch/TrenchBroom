@@ -24,8 +24,7 @@
 #include <string>
 
 namespace TrenchBroom {
-Logger::stream::stream(Logger *logger, const LogLevel logLevel)
-    : m_logger(logger), m_logLevel(logLevel) {
+Logger::stream::stream(Logger *logger, const LogLevel logLevel) : m_logger(logger), m_logLevel(logLevel) {
 }
 
 Logger::stream::~stream() {

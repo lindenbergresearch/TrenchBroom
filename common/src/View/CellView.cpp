@@ -65,19 +65,14 @@ void CellView::validate() {
         reloadLayout();
 }
 
-CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar)
-    : RenderView(contextManager), m_layoutInitialized(false), m_valid(false), m_scrollBar(scrollBar) {
+CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar) : RenderView(contextManager), m_layoutInitialized(false), m_valid(false), m_scrollBar(scrollBar) {
     if (m_scrollBar != nullptr) {
         connect(
-            m_scrollBar,
-            &QAbstractSlider::actionTriggered,
-            this,
-            &CellView::onScrollBarActionTriggered);
+            m_scrollBar, &QAbstractSlider::actionTriggered, this, &CellView::onScrollBarActionTriggered
+        );
         connect(
-            m_scrollBar,
-            &QAbstractSlider::valueChanged,
-            this,
-            &CellView::onScrollBarValueChanged);
+            m_scrollBar, &QAbstractSlider::valueChanged, this, &CellView::onScrollBarValueChanged
+        );
     }
 }
 
@@ -109,9 +104,7 @@ void CellView::scrollToCellInternal(const Cell &cell) {
     }
 
     const int rowMargin = static_cast<int>(m_layout.rowMargin());
-    const auto newPosition = top < visibleRect.top()
-                             ? top - rowMargin
-                             : visibleRect.top() + bottom - visibleRect.bottom();
+    const auto newPosition = top < visibleRect.top() ? top - rowMargin : visibleRect.top() + bottom - visibleRect.bottom();
 
     QPropertyAnimation *animation = new QPropertyAnimation(m_scrollBar, "sliderPosition");
     animation->setDuration(300);
@@ -164,7 +157,8 @@ void CellView::mousePressEvent(QMouseEvent *event) {
     validate();
     if (event->button() == Qt::LeftButton) {
         m_potentialDrag = true;
-    } else if (event->button() == Qt::RightButton) {
+    }
+    else if (event->button() == Qt::RightButton) {
         if (event->modifiers() & Qt::AltModifier) {
             m_lastMousePos = event->pos();
         }
@@ -188,7 +182,8 @@ void CellView::mouseMoveEvent(QMouseEvent *event) {
             startDrag(event);
             m_potentialDrag = false;
         }
-    } else if ((event->buttons() & Qt::RightButton) && (event->modifiers() & Qt::AltModifier)) {
+    }
+    else if ((event->buttons() & Qt::RightButton) && (event->modifiers() & Qt::AltModifier)) {
         scroll(event);
     }
 
@@ -201,7 +196,8 @@ void CellView::wheelEvent(QWheelEvent *event) {
 
     if (!pixelDelta.isNull()) {
         scrollBy(pixelDelta.y());
-    } else if (!angleDelta.isNull()) {
+    }
+    else if (!angleDelta.isNull()) {
         scrollBy(angleDelta.y());
     }
     event->accept();
@@ -273,7 +269,8 @@ bool CellView::updateTooltip(QHelpEvent *event) {
     // see: https://doc.qt.io/qt-5/qtwidgets-widgets-tooltips-example.html
     if (const LayoutCell *cell = m_layout.cellAt(x, y)) {
         QToolTip::showText(event->globalPos(), tooltip(*cell));
-    } else {
+    }
+    else {
         QToolTip::hideText();
         event->ignore();
     }
@@ -310,7 +307,8 @@ void CellView::doRender() {
 void CellView::setupGL() {
     if (pref(Preferences::EnableMSAA)) {
         glAssert(glEnable(GL_MULTISAMPLE));
-    } else {
+    }
+    else {
         glAssert(glDisable(GL_MULTISAMPLE));
     }
     glAssert(glEnable(GL_BLEND));

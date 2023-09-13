@@ -33,14 +33,8 @@
 namespace TrenchBroom {
 namespace Renderer {
 TextureFont::TextureFont(
-    std::unique_ptr<FontTexture> texture,
-    const std::vector<FontGlyph> &glyphs,
-    const int lineHeight,
-    const unsigned char firstChar,
-    const unsigned char charCount
-)
-    : m_texture(std::move(texture)), m_glyphs(glyphs), m_lineHeight(lineHeight), m_firstChar(firstChar),
-      m_charCount(charCount) {
+    std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, const int lineHeight, const unsigned char firstChar, const unsigned char charCount
+) : m_texture(std::move(texture)), m_glyphs(glyphs), m_lineHeight(lineHeight), m_firstChar(firstChar), m_charCount(charCount) {
 }
 
 TextureFont::~TextureFont() = default;
@@ -51,8 +45,7 @@ private:
     vm::vec2f m_size;
 
 public:
-    explicit MeasureString(const TextureFont &font)
-        : m_font(font) {
+    explicit MeasureString(const TextureFont &font) : m_font(font) {
     }
 
     const vm::vec2f &size() const { return m_size; }
@@ -77,8 +70,7 @@ private:
     std::vector<vm::vec2f> m_sizes;
 
 public:
-    explicit MeasureLines(const TextureFont &font)
-        : m_font(font) {
+    explicit MeasureLines(const TextureFont &font) : m_font(font) {
     }
 
     const std::vector<vm::vec2f> &sizes() const { return m_sizes; }
@@ -109,12 +101,8 @@ private:
 
 public:
     MakeQuads(
-        const TextureFont &font,
-        const bool clockwise,
-        const vm::vec2f &offset,
-        const std::vector<vm::vec2f> &sizes
-    )
-        : m_font(font), m_clockwise(clockwise), m_offset(offset), m_sizes(sizes), m_index(0), m_y(0.0f) {
+        const TextureFont &font, const bool clockwise, const vm::vec2f &offset, const std::vector<vm::vec2f> &sizes
+    ) : m_font(font), m_clockwise(clockwise), m_offset(offset), m_sizes(sizes), m_index(0), m_y(0.0f) {
         for (size_t i = 0; i < m_sizes.size(); ++i) {
             m_maxSize = max(m_maxSize, m_sizes[i]);
             m_y += m_sizes[i].y();
@@ -139,8 +127,7 @@ private:
 
     void makeQuads(const std::string &str, const float x) {
         const auto offset = m_offset + vm::vec2f(x, m_y);
-        m_vertices =
-            kdl::vec_concat(std::move(m_vertices), m_font.quads(str, m_clockwise, offset));
+        m_vertices = kdl::vec_concat(std::move(m_vertices), m_font.quads(str, m_clockwise, offset));
 
         m_y -= m_sizes[m_index].y();
         m_index++;

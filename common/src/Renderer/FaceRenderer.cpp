@@ -40,8 +40,8 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
   const Color &defaultColor;
 
   RenderFunc(
-      ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor)
-      : shader(i_shader), applyTexture(i_applyTexture), defaultColor(i_defaultColor) {
+      ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor
+  ) : shader(i_shader), applyTexture(i_applyTexture), defaultColor(i_defaultColor) {
   }
 
   void before(const Assets::Texture *texture) override {
@@ -49,7 +49,8 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
           texture->activate();
           shader.set("ApplyTexture", applyTexture);
           shader.set("Color", texture->averageColor());
-      } else {
+      }
+      else {
           shader.set("ApplyTexture", false);
           shader.set("Color", defaultColor);
       }
@@ -62,22 +63,16 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
   }
 };
 
-FaceRenderer::FaceRenderer()
-    : m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+FaceRenderer::FaceRenderer() : m_grayscale(false), m_tint(false), m_alpha(1.0f) {
 }
 
 FaceRenderer::FaceRenderer(
-    std::shared_ptr<BrushVertexArray> vertexArray,
-    std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
-    const Color &faceColor)
-    : m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor),
-      m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+    std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor
+) : m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor), m_grayscale(false), m_tint(false), m_alpha(1.0f) {
 }
 
-FaceRenderer::FaceRenderer(const FaceRenderer &other)
-    : IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap),
-      m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint),
-      m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
+FaceRenderer::FaceRenderer(const FaceRenderer &other) : IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap), m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale),
+                                                        m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
 }
 
 FaceRenderer &FaceRenderer::operator=(FaceRenderer other) {
@@ -160,13 +155,9 @@ void FaceRenderer::doRender(RenderContext &context) {
         shader.set("SoftMapBoundsMax", context.softMapBounds().max);
 
         shader.set(
-            "SoftMapBoundsColor",
-            vm::vec4f(
-                prefs.get(Preferences::SoftMapBoundsColor).r(),
-                prefs.get(Preferences::SoftMapBoundsColor).g(),
-                prefs.get(Preferences::SoftMapBoundsColor).b(),
-                0.1f)
-        );
+            "SoftMapBoundsColor", vm::vec4f(
+                prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f
+            ));
 
         RenderFunc func(shader, applyTexture, m_faceColor);
 

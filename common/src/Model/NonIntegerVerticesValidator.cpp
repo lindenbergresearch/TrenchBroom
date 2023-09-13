@@ -40,17 +40,19 @@ IssueQuickFix makeSnapVerticesQuickFix() {
 }
 } // namespace
 
-NonIntegerVerticesValidator::NonIntegerVerticesValidator()
-    : Validator(Type, "Non-integer vertices") {
+NonIntegerVerticesValidator::NonIntegerVerticesValidator() : Validator(Type, "Non-integer vertices") {
     addQuickFix(makeSnapVerticesQuickFix());
 }
 
 void NonIntegerVerticesValidator::doValidate(
-    BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+    BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues
+) const {
     const auto &vertices = brushNode.brush().vertices();
-    if (!std::all_of(vertices.begin(), vertices.end(), [](const auto *vertex) {
-      return vm::is_integral(vertex->position());
-    })) {
+    if (!std::all_of(
+        vertices.begin(), vertices.end(), [](const auto *vertex) {
+          return vm::is_integral(vertex->position());
+        }
+    )) {
         issues.push_back(
             std::make_unique<Issue>(Type, brushNode, "Brush has non-integer vertices"));
     }

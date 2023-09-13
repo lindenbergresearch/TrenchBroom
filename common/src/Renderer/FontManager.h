@@ -46,10 +46,8 @@ public:
     TextureFont &font(const FontDescriptor &fontDescriptor);
 
     FontDescriptor selectFontSize(
-        const FontDescriptor &fontDescriptor,
-        const std::string &string,
-        float maxWidth,
-        size_t minFontSize);
+        const FontDescriptor &fontDescriptor, const std::string &string, float maxWidth, size_t minFontSize
+    );
 
     void clearCache();
 

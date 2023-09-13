@@ -29,23 +29,32 @@ namespace Model {
 MapFormat formatFromName(const std::string &formatName) {
     if (formatName == "Standard") {
         return MapFormat::Standard;
-    } else if (formatName == "Quake2") {
+    }
+    else if (formatName == "Quake2") {
         return MapFormat::Quake2;
-    } else if (formatName == "Quake2 (Valve)") {
+    }
+    else if (formatName == "Quake2 (Valve)") {
         return MapFormat::Quake2_Valve;
-    } else if (formatName == "Valve") {
+    }
+    else if (formatName == "Valve") {
         return MapFormat::Valve;
-    } else if (formatName == "Hexen2") {
+    }
+    else if (formatName == "Hexen2") {
         return MapFormat::Hexen2;
-    } else if (formatName == "Daikatana") {
+    }
+    else if (formatName == "Daikatana") {
         return MapFormat::Daikatana;
-    } else if (formatName == "Quake3 (legacy)") {
+    }
+    else if (formatName == "Quake3 (legacy)") {
         return MapFormat::Quake3_Legacy;
-    } else if (formatName == "Quake3 (Valve)") {
+    }
+    else if (formatName == "Quake3 (Valve)") {
         return MapFormat::Quake3_Valve;
-    } else if (formatName == "Quake3") {
+    }
+    else if (formatName == "Quake3") {
         return MapFormat::Quake3;
-    } else {
+    }
+    else {
         return MapFormat::Unknown;
     }
 }

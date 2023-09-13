@@ -38,7 +38,8 @@ private:
 
 public:
     FlashSelectionAnimation(
-        Renderer::MapRenderer &renderer, QWidget *view, double duration);
+        Renderer::MapRenderer &renderer, QWidget *view, double duration
+    );
 
 private:
     void doUpdate(double progress) override;

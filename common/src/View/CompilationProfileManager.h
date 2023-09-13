@@ -57,9 +57,8 @@ private:
 
 public:
     CompilationProfileManager(
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationConfig config,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::CompilationConfig config, QWidget *parent = nullptr
+    );
 
     const Model::CompilationProfile *selectedProfile() const;
 
@@ -81,7 +80,8 @@ private slots:
     void duplicateProfile(const Model::CompilationProfile &profile);
 
     void profileContextMenuRequested(
-        const QPoint &globalPos, Model::CompilationProfile &profile);
+        const QPoint &globalPos, Model::CompilationProfile &profile
+    );
 
     void profileSelectionChanged();
 

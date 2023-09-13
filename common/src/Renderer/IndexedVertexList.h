@@ -40,12 +40,10 @@ private:
     CountArray m_counts;
 
 public:
-    IndexedVertexList()
-        : m_allowDynamicGrowth(true), m_primStart(0), m_vertices(0), m_indices(0), m_counts(0) {
+    IndexedVertexList() : m_allowDynamicGrowth(true), m_primStart(0), m_vertices(0), m_indices(0), m_counts(0) {
     }
 
-    IndexedVertexList(const size_t vertexCount, const size_t primCount)
-        : m_allowDynamicGrowth(false), m_primStart(0), m_vertices(0), m_indices(0), m_counts(0) {
+    IndexedVertexList(const size_t vertexCount, const size_t primCount) : m_allowDynamicGrowth(false), m_primStart(0), m_vertices(0), m_indices(0), m_counts(0) {
         reserve(vertexCount, primCount);
     }
 
@@ -61,9 +59,7 @@ public:
     }
 
     void addVertices(const typename T::Vertex::List &vertices) {
-        assert(
-            m_allowDynamicGrowth
-            || vertices.size() <= m_vertices.capacity() - m_vertices.size());
+        assert(m_allowDynamicGrowth || vertices.size() <= m_vertices.capacity() - m_vertices.size());
         m_vertices = kdl::vec_concat(std::move(m_vertices), vertices);
     }
 
@@ -73,15 +69,9 @@ public:
     }
 
     void addPrimitives(const IndexedVertexList &primitives) {
-        assert(
-            m_allowDynamicGrowth
-            || primitives.vertices().size() <= m_vertices.capacity() - m_vertices.size());
-        assert(
-            m_allowDynamicGrowth
-            || primitives.indices().size() <= m_indices.capacity() - m_indices.size());
-        assert(
-            m_allowDynamicGrowth
-            || primitives.counts().size() <= m_counts.capacity() - m_counts.size());
+        assert(m_allowDynamicGrowth || primitives.vertices().size() <= m_vertices.capacity() - m_vertices.size());
+        assert(m_allowDynamicGrowth || primitives.indices().size() <= m_indices.capacity() - m_indices.size());
+        assert(m_allowDynamicGrowth || primitives.counts().size() <= m_counts.capacity() - m_counts.size());
         m_vertices = kdl::vec_concat(std::move(m_vertices), primitives.vertices());
         m_indices = kdl::vec_concat(std::move(m_indices), primitives.indices());
         m_counts = kdl::vec_concat(std::move(m_counts), primitives.counts());

@@ -23,20 +23,20 @@ namespace TrenchBroom {
 namespace detail {
 namespace {
 [[maybe_unused]] bool is_valid_address(
-    const int16_t x, const int16_t y, const int16_t z, const uint16_t size) {
+    const int16_t x, const int16_t y, const int16_t z, const uint16_t size
+) {
     const auto a_size = (1 << size);
 
     const auto is_root = [&](const auto n) { return n == -a_size / 2; };
     const auto is_valid = [&](const auto n) { return n == (n / a_size) * a_size; };
 
-    return (is_root(x) && is_root(y) && is_root(z))
-           || (is_valid(x) && is_valid(y) && is_valid(z));
+    return (is_root(x) && is_root(y) && is_root(z)) || (is_valid(x) && is_valid(y) && is_valid(z));
 }
 } // namespace
 
 node_address::node_address(
-    const int16_t i_x, const int16_t i_y, const int16_t i_z, const uint16_t i_size)
-    : x{i_x}, y{i_y}, z{i_z}, size{i_size} {
+    const int16_t i_x, const int16_t i_y, const int16_t i_z, const uint16_t i_size
+) : x{i_x}, y{i_y}, z{i_z}, size{i_size} {
     assert(is_valid_address(x, y, z, size));
 }
 
@@ -57,11 +57,7 @@ kdl_reflect_impl(node_address);
 
 node_address get_parent(const node_address &a) {
     const auto p_s = 1 << (a.size + 1);
-    return {
-        int16_t(((a.x >= 0 ? a.x : a.x - p_s + 1) / p_s) * p_s),
-        int16_t(((a.y >= 0 ? a.y : a.y - p_s + 1) / p_s) * p_s),
-        int16_t(((a.z >= 0 ? a.z : a.z - p_s + 1) / p_s) * p_s),
-        uint16_t(a.size + 1)};
+    return {int16_t(((a.x >= 0 ? a.x : a.x - p_s + 1) / p_s) * p_s), int16_t(((a.y >= 0 ? a.y : a.y - p_s + 1) / p_s) * p_s), int16_t(((a.z >= 0 ? a.z : a.z - p_s + 1) / p_s) * p_s), uint16_t(a.size + 1)};
 }
 
 std::optional<size_t> get_quadrant(const node_address &outer, const node_address &inner) {
@@ -77,19 +73,14 @@ std::optional<size_t> get_quadrant(const node_address &outer, const node_address
         return std::nullopt;
     }
 
-    return (inner.max().x() <= half.x() ? 0 : 1) | (inner.max().y() <= half.y() ? 0 : 2)
-           | (inner.max().z() <= half.z() ? 0 : 4);
+    return (inner.max().x() <= half.x() ? 0 : 1) | (inner.max().y() <= half.y() ? 0 : 2) | (inner.max().z() <= half.z() ? 0 : 4);
 }
 
 node_address get_child(const node_address &a, const size_t quadrant) {
     assert(quadrant < 8);
     assert(a.size > 0);
 
-    return {
-        int16_t(a.x + ((quadrant & 1) ? (1 << (a.size - 1)) : 0)),
-        int16_t(a.y + ((quadrant & 2) ? (1 << (a.size - 1)) : 0)),
-        int16_t(a.z + ((quadrant & 4) ? (1 << (a.size - 1)) : 0)),
-        uint16_t(a.size - 1)};
+    return {int16_t(a.x + ((quadrant & 1) ? (1 << (a.size - 1)) : 0)), int16_t(a.y + ((quadrant & 2) ? (1 << (a.size - 1)) : 0)), int16_t(a.z + ((quadrant & 4) ? (1 << (a.size - 1)) : 0)), uint16_t(a.size - 1)};
 }
 
 bool is_root(const node_address &a) {

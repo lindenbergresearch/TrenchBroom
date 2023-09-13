@@ -41,13 +41,7 @@ class PreferenceDialog : public QDialog {
 Q_OBJECT
 private:
     typedef enum {
-      PrefPane_First = 0,
-      PrefPane_Games = 0,
-      PrefPane_View = 1,
-      PrefPane_Colors = 2,
-      PrefPane_Mouse = 3,
-      PrefPane_Keyboard = 4,
-      PrefPane_Last = 4
+      PrefPane_First = 0, PrefPane_Games = 0, PrefPane_View = 1, PrefPane_Colors = 2, PrefPane_Mouse = 3, PrefPane_Keyboard = 4, PrefPane_Last = 4
     } PrefPane;
 
     std::shared_ptr<MapDocument> m_document;
@@ -57,7 +51,8 @@ private:
 
 public:
     explicit PreferenceDialog(
-        std::shared_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::shared_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 protected: // QWidget overrides
     void closeEvent(QCloseEvent *event) override;

@@ -78,10 +78,12 @@ struct GLVertexType<AttrType, AttrTypeRest...> {
      * @param offset the offset of the vertex buffer pointer to be set up here
      */
     static void doSetup(
-        ShaderProgram *program, const size_t index, const size_t stride, const size_t offset) {
+        ShaderProgram *program, const size_t index, const size_t stride, const size_t offset
+    ) {
         AttrType::setup(program, index, stride, offset);
         GLVertexType<AttrTypeRest...>::doSetup(
-            program, index + 1, stride, offset + AttrType::Size);
+            program, index + 1, stride, offset + AttrType::Size
+        );
     }
 
     /**
@@ -144,7 +146,8 @@ struct GLVertexType<AttrType> {
      * @param offset the offset of the vertex buffer pointer to be set up here
      */
     static void doSetup(
-        ShaderProgram *program, const size_t index, const size_t stride, const size_t offset) {
+        ShaderProgram *program, const size_t index, const size_t stride, const size_t offset
+    ) {
         AttrType::setup(program, index, stride, offset);
     }
 
@@ -172,23 +175,11 @@ using P2C4 = GLVertexType<GLVertexAttributeTypes::P2, GLVertexAttributeTypes::C4
 using P3C4 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::C4>;
 using P2T2 = GLVertexType<GLVertexAttributeTypes::P2, GLVertexAttributeTypes::T02>;
 using P3T2 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::T02>;
-using P2T2C4 = GLVertexType<
-    GLVertexAttributeTypes::P2,
-    GLVertexAttributeTypes::T02,
-    GLVertexAttributeTypes::C4>;
-using P3T2C4 = GLVertexType<
-    GLVertexAttributeTypes::P3,
-    GLVertexAttributeTypes::T02,
-    GLVertexAttributeTypes::C4>;
+using P2T2C4 = GLVertexType<GLVertexAttributeTypes::P2, GLVertexAttributeTypes::T02, GLVertexAttributeTypes::C4>;
+using P3T2C4 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::T02, GLVertexAttributeTypes::C4>;
 using P3N = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N>;
-using P3NC4 = GLVertexType<
-    GLVertexAttributeTypes::P3,
-    GLVertexAttributeTypes::N,
-    GLVertexAttributeTypes::C4>;
-using P3NT2 = GLVertexType<
-    GLVertexAttributeTypes::P3,
-    GLVertexAttributeTypes::N,
-    GLVertexAttributeTypes::T02>;
+using P3NC4 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N, GLVertexAttributeTypes::C4>;
+using P3NT2 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N, GLVertexAttributeTypes::T02>;
 } // namespace GLVertexTypes
 } // namespace Renderer
 } // namespace TrenchBroom

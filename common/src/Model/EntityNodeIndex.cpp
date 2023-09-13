@@ -51,7 +51,8 @@ EntityNodeIndexQuery EntityNodeIndexQuery::any() {
 }
 
 std::set<EntityNodeBase *> EntityNodeIndexQuery::execute(
-    const EntityNodeStringIndex &index) const {
+    const EntityNodeStringIndex &index
+) const {
     std::set<EntityNodeBase *> result;
     switch (m_type) {
         case Type_Exact:
@@ -71,7 +72,8 @@ std::set<EntityNodeBase *> EntityNodeIndexQuery::execute(
 }
 
 bool EntityNodeIndexQuery::execute(
-    const EntityNodeBase *node, const std::string &value) const {
+    const EntityNodeBase *node, const std::string &value
+) const {
     switch (m_type) {
         case Type_Exact:
             return node->entity().hasProperty(m_pattern, value);
@@ -86,7 +88,8 @@ bool EntityNodeIndexQuery::execute(
 }
 
 std::vector<Model::EntityProperty> EntityNodeIndexQuery::execute(
-    const EntityNodeBase *node) const {
+    const EntityNodeBase *node
+) const {
     const auto &entity = node->entity();
     switch (m_type) {
         case Type_Exact:
@@ -101,12 +104,10 @@ std::vector<Model::EntityProperty> EntityNodeIndexQuery::execute(
     }
 }
 
-EntityNodeIndexQuery::EntityNodeIndexQuery(const Type type, const std::string &pattern)
-    : m_type(type), m_pattern(pattern) {
+EntityNodeIndexQuery::EntityNodeIndexQuery(const Type type, const std::string &pattern) : m_type(type), m_pattern(pattern) {
 }
 
-EntityNodeIndex::EntityNodeIndex()
-    : m_keyIndex(std::make_unique<EntityNodeStringIndex>()), m_valueIndex(std::make_unique<EntityNodeStringIndex>()) {
+EntityNodeIndex::EntityNodeIndex() : m_keyIndex(std::make_unique<EntityNodeStringIndex>()), m_valueIndex(std::make_unique<EntityNodeStringIndex>()) {
 }
 
 EntityNodeIndex::~EntityNodeIndex() = default;
@@ -122,19 +123,22 @@ void EntityNodeIndex::removeEntityNode(EntityNodeBase *node) {
 }
 
 void EntityNodeIndex::addProperty(
-    EntityNodeBase *node, const std::string &key, const std::string &value) {
+    EntityNodeBase *node, const std::string &key, const std::string &value
+) {
     m_keyIndex->insert(key, node);
     m_valueIndex->insert(value, node);
 }
 
 void EntityNodeIndex::removeProperty(
-    EntityNodeBase *node, const std::string &key, const std::string &value) {
+    EntityNodeBase *node, const std::string &key, const std::string &value
+) {
     m_keyIndex->remove(key, node);
     m_valueIndex->remove(value, node);
 }
 
 std::vector<EntityNodeBase *> EntityNodeIndex::findEntityNodes(
-    const EntityNodeIndexQuery &keyQuery, const std::string &value) const {
+    const EntityNodeIndexQuery &keyQuery, const std::string &value
+) const {
     // first, find Nodes which have `value` as the value for any key
     std::vector<EntityNodeBase *> result;
     m_valueIndex->find_matches(value, std::back_inserter(result));
@@ -164,7 +168,8 @@ std::vector<std::string> EntityNodeIndex::allKeys() const {
 }
 
 std::vector<std::string> EntityNodeIndex::allValuesForKeys(
-    const EntityNodeIndexQuery &keyQuery) const {
+    const EntityNodeIndexQuery &keyQuery
+) const {
     std::vector<std::string> result;
 
     const std::set<EntityNodeBase *> nameResult = keyQuery.execute(*m_keyIndex);

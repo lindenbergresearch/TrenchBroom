@@ -39,7 +39,8 @@ void ToolChain::append(std::unique_ptr<ToolController> tool) {
         assert(m_suffix == nullptr);
         m_tool = std::move(tool);
         m_suffix = std::make_unique<ToolChain>();
-    } else {
+    }
+    else {
         ensure(m_suffix != nullptr, "suffix is null");
         m_suffix->append(std::move(tool));
     }
@@ -142,7 +143,8 @@ std::unique_ptr<DragTracker> ToolChain::startMouseDrag(const InputState &inputSt
 }
 
 std::unique_ptr<DropTracker> ToolChain::dragEnter(
-    const InputState &inputState, const std::string &payload) {
+    const InputState &inputState, const std::string &payload
+) {
     assert(checkInvariant());
     if (chainEndsHere()) {
         return nullptr;
@@ -156,7 +158,8 @@ std::unique_ptr<DropTracker> ToolChain::dragEnter(
 }
 
 void ToolChain::setRenderOptions(
-    const InputState &inputState, Renderer::RenderContext &renderContext) const {
+    const InputState &inputState, Renderer::RenderContext &renderContext
+) const {
     assert(checkInvariant());
     if (!chainEndsHere()) {
         if (m_tool->toolActive()) {
@@ -167,9 +170,8 @@ void ToolChain::setRenderOptions(
 }
 
 void ToolChain::render(
-    const InputState &inputState,
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch) {
+    const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     assert(checkInvariant());
     if (!chainEndsHere()) {
         if (m_tool->toolActive()) {

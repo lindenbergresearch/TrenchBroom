@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace View {
-PopupButton::PopupButton(const QString &caption, QWidget *parent)
-    : QWidget(parent) {
+PopupButton::PopupButton(const QString &caption, QWidget *parent) : QWidget(parent) {
     m_button = new QToolButton();
     m_button->setText(caption);
     m_button->setCheckable(true);
@@ -43,10 +42,8 @@ PopupButton::PopupButton(const QString &caption, QWidget *parent)
 
     connect(m_button, &QAbstractButton::clicked, this, &PopupButton::buttonClicked);
     connect(
-        m_window,
-        &PopupWindow::visibilityChanged,
-        this,
-        &PopupButton::popupVisibilityChanged);
+        m_window, &PopupWindow::visibilityChanged, this, &PopupButton::popupVisibilityChanged
+    );
 }
 
 QWidget *PopupButton::GetPopupWindow() const {
@@ -61,7 +58,8 @@ void PopupButton::buttonClicked(bool checked) {
         // able to move it without any flicker. Need to confirm on other OS'es.
         m_window->show();
         m_window->positionTouchingWidget(this);
-    } else {
+    }
+    else {
         m_window->close();
     }
 }

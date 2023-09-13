@@ -48,11 +48,8 @@ public:
       Params(float i_width, double i_offset, bool i_onTop, const Color &i_color);
 
       Params(
-          float i_width,
-          double i_offset,
-          bool i_onTop,
-          bool i_useColor,
-          const Color &i_color);
+          float i_width, double i_offset, bool i_onTop, bool i_useColor, const Color &i_color
+      );
     };
 
     class RenderBase {
@@ -77,40 +74,26 @@ public:
     void render(RenderBatch &renderBatch, float width = 1.0f, double offset = 0.0);
 
     void render(
-        RenderBatch &renderBatch,
-        const Color &color,
-        float width = 1.0f,
-        double offset = 0.0);
+        RenderBatch &renderBatch, const Color &color, float width = 1.0f, double offset = 0.0
+    );
 
     void render(
-        RenderBatch &renderBatch,
-        bool useColor,
-        const Color &color,
-        float width = 1.0f,
-        double offset = 0.0);
+        RenderBatch &renderBatch, bool useColor, const Color &color, float width = 1.0f, double offset = 0.0
+    );
 
     void renderOnTop(RenderBatch &renderBatch, float width = 1.0f, double offset = 0.2);
 
     void renderOnTop(
-        RenderBatch &renderBatch,
-        const Color &color,
-        float width = 1.0f,
-        double offset = 0.2);
+        RenderBatch &renderBatch, const Color &color, float width = 1.0f, double offset = 0.2
+    );
 
     void renderOnTop(
-        RenderBatch &renderBatch,
-        bool useColor,
-        const Color &color,
-        float width = 1.0f,
-        double offset = 0.2);
+        RenderBatch &renderBatch, bool useColor, const Color &color, float width = 1.0f, double offset = 0.2
+    );
 
     void render(
-        RenderBatch &renderBatch,
-        bool useColor,
-        const Color &color,
-        bool onTop,
-        float width,
-        double offset);
+        RenderBatch &renderBatch, bool useColor, const Color &color, bool onTop, float width, double offset
+    );
 
 private:
     virtual void doRender(RenderBatch &renderBatch, const Params &params) = 0;
@@ -158,9 +141,8 @@ private:
 
     public:
         Render(
-            const Params &params,
-            std::shared_ptr<BrushVertexArray> vertexArray,
-            std::shared_ptr<BrushIndexArray> indexArray);
+            const Params &params, std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<BrushIndexArray> indexArray
+        );
 
     private:
         void prepareVerticesAndIndices(VboManager &vboManager) override;
@@ -178,8 +160,8 @@ public:
     IndexedEdgeRenderer();
 
     IndexedEdgeRenderer(
-        std::shared_ptr<BrushVertexArray> vertexArray,
-        std::shared_ptr<BrushIndexArray> indexArray);
+        std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<BrushIndexArray> indexArray
+    );
 
 private:
     void doRender(RenderBatch &renderBatch, const EdgeRenderer::Params &params) override;

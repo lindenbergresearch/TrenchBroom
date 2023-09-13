@@ -114,7 +114,8 @@ private:
     void setKeySequence(KeySequenceEdit *editor, Preference<QKeySequence> &preference);
 
     bool hasConflict(
-        const QKeySequence &keySequence, const Preference<QKeySequence> &preference) const;
+        const QKeySequence &keySequence, const Preference<QKeySequence> &preference
+    ) const;
 };
 } // namespace View
 } // namespace TrenchBroom

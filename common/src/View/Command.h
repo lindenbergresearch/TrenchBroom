@@ -43,10 +43,7 @@ public:
 class Command {
 public:
     enum class CommandState {
-      Default,
-      Doing,
-      Done,
-      Undoing
+      Default, Doing, Done, Undoing
     };
 
 protected:
@@ -67,7 +64,8 @@ public:
 
 private:
     virtual std::unique_ptr<CommandResult> doPerformDo(
-        MapDocumentCommandFacade *document) = 0;
+        MapDocumentCommandFacade *document
+    ) = 0;
 
 deleteCopyAndMove(Command);
 };

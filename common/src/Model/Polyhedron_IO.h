@@ -43,13 +43,15 @@ template<typename T, typename FP, typename VP>
 std::ostream &operator<<(std::ostream &stream, const Polyhedron_Edge<T, FP, VP> &edge) {
     if (edge.firstEdge() != nullptr) {
         stream << *edge.firstEdge()->origin();
-    } else {
+    }
+    else {
         stream << "NULL";
     }
     stream << " <--> ";
     if (edge.secondEdge() != nullptr) {
         stream << *edge.secondEdge()->origin();
-    } else {
+    }
+    else {
         stream << "NULL";
     }
     return stream;
@@ -63,7 +65,8 @@ std::ostream &operator<<(std::ostream &stream, const Polyhedron_HalfEdge<T, FP, 
     stream << *edge.origin() << " --> ";
     if (edge.destination() != nullptr) {
         stream << *edge.destination();
-    } else {
+    }
+    else {
         stream << "NULL";
     }
     return stream;

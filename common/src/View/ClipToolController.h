@@ -62,12 +62,12 @@ private:
     void pick(const InputState &inputState, Model::PickResult &pickResult) override;
 
     void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+        const InputState &inputState, Renderer::RenderContext &renderContext
+    ) const override;
 
     void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override;
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     bool cancel() override;
 };

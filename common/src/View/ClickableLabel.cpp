@@ -21,8 +21,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ClickableLabel::ClickableLabel(const QString &text, QWidget *parent)
-    : QLabel(text, parent) {
+ClickableLabel::ClickableLabel(const QString &text, QWidget *parent) : QLabel(text, parent) {
 }
 
 void ClickableLabel::mousePressEvent(QMouseEvent *) {

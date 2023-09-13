@@ -42,8 +42,7 @@ struct PaletteData;
 class TextureBuffer;
 
 enum class PaletteTransparency {
-  Opaque,
-  Index255Transparent
+  Opaque, Index255Transparent
 };
 
 class Palette {
@@ -72,11 +71,8 @@ public:
      * @throws ReaderException if reader doesn't have pixelCount bytes available
      */
     bool indexedToRgba(
-        IO::Reader &reader,
-        size_t pixelCount,
-        TextureBuffer &rgbaImage,
-        PaletteTransparency transparency,
-        Color &averageColor) const;
+        IO::Reader &reader, size_t pixelCount, TextureBuffer &rgbaImage, PaletteTransparency transparency, Color &averageColor
+    ) const;
 };
 
 Result<Palette> makePalette(const std::vector<unsigned char> &data);

@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-FlagsEditor::FlagsEditor(size_t numCols, QWidget *parent)
-    : QWidget(parent), m_numCols(numCols) {
+FlagsEditor::FlagsEditor(size_t numCols, QWidget *parent) : QWidget(parent), m_numCols(numCols) {
     assert(m_numCols > 0);
 }
 
@@ -46,7 +45,8 @@ void FlagsEditor::setFlags(const QStringList &labels, const QStringList &tooltip
 }
 
 void FlagsEditor::setFlags(
-    const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
+    const QList<int> &values, const QStringList &labels, const QStringList &tooltips
+) {
     const auto count = static_cast<size_t>(values.size());
     const size_t numRows = (count + (m_numCols - 1)) / m_numCols;
     ensure(numRows * m_numCols >= count, "didn't allocate enough grid cells");
@@ -79,11 +79,14 @@ void FlagsEditor::setFlags(
                 m_checkBoxes[index]->setText(
                     indexInt < labels.size() ? labels[indexInt] : QString::number(value));
                 m_checkBoxes[index]->setToolTip(
-                    indexInt < tooltips.size() ? tooltips[indexInt] : "");
-                connect(m_checkBoxes[index], &QCheckBox::clicked, this, [index, value, this]() {
-                  emit flagChanged(
-                    index, value, this->getSetFlagValue(), this->getMixedFlagValue());
-                });
+                    indexInt < tooltips.size() ? tooltips[indexInt] : ""
+                );
+                connect(
+                    m_checkBoxes[index], &QCheckBox::clicked, this, [index, value, this]() {
+                      emit flagChanged(
+                        index, value, this->getSetFlagValue(), this->getMixedFlagValue());
+                    }
+                );
 
                 layout->addWidget(m_checkBoxes[index], rowInt, colInt);
             }
@@ -105,9 +108,11 @@ void FlagsEditor::setFlagValue(const int on, const int mixed) {
         const bool isChecked = (on & value) != 0;
         if (isMixed) {
             checkBox->setCheckState(Qt::PartiallyChecked);
-        } else if (isChecked) {
+        }
+        else if (isChecked) {
             checkBox->setCheckState(Qt::Checked);
-        } else {
+        }
+        else {
             checkBox->setCheckState(Qt::Unchecked);
         }
     }

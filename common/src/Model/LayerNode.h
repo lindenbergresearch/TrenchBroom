@@ -90,9 +90,8 @@ private: // implement Node interface
     bool doSelectable() const override;
 
     void doPick(
-        const EditorContext &editorContext,
-        const vm::ray3 &ray,
-        PickResult &pickResult) override;
+        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+    ) override;
 
     void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 

@@ -44,16 +44,12 @@ namespace Model {
 class Entity;
 
 enum class SetDefaultPropertyMode {
-  SetExisting,
-  SetMissing,
-  SetAll
+  SetExisting, SetMissing, SetAll
 };
 
 void setDefaultProperties(
-    const EntityPropertyConfig &propertyConfig,
-    const Assets::EntityDefinition &entityDefinition,
-    Entity &entity,
-    SetDefaultPropertyMode mode);
+    const EntityPropertyConfig &propertyConfig, const Assets::EntityDefinition &entityDefinition, Entity &entity, SetDefaultPropertyMode mode
+);
 
 /**
  * An entity is essentially a collection of key / value pairs called properties.
@@ -115,11 +111,12 @@ public:
     Entity();
 
     Entity(
-        const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties);
+        const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties
+    );
 
     Entity(
-        const EntityPropertyConfig &propertyConfig,
-        std::initializer_list<EntityProperty> properties);
+        const EntityPropertyConfig &propertyConfig, std::initializer_list<EntityProperty> properties
+    );
 
     Entity(const Entity &other);
 
@@ -134,7 +131,8 @@ public:
     const std::vector<EntityProperty> &properties() const;
 
     void setProperties(
-        const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties);
+        const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties
+    );
 
     /**
      * Sets the protected property keys of this entity.
@@ -158,12 +156,14 @@ public:
     const vm::bbox3 &definitionBounds() const;
 
     void setDefinition(
-        const EntityPropertyConfig &propertyConfig, Assets::EntityDefinition *definition);
+        const EntityPropertyConfig &propertyConfig, Assets::EntityDefinition *definition
+    );
 
     const Assets::EntityModelFrame *model() const;
 
     void setModel(
-        const EntityPropertyConfig &propertyConfig, const Assets::EntityModelFrame *model);
+        const EntityPropertyConfig &propertyConfig, const Assets::EntityModelFrame *model
+    );
 
     Assets::ModelSpecification modelSpecification() const;
 
@@ -172,20 +172,18 @@ public:
     void unsetEntityDefinitionAndModel();
 
     void addOrUpdateProperty(
-        const EntityPropertyConfig &propertyConfig,
-        std::string key,
-        std::string value,
-        bool defaultToProtected = false);
+        const EntityPropertyConfig &propertyConfig, std::string key, std::string value, bool defaultToProtected = false
+    );
 
     void renameProperty(
-        const EntityPropertyConfig &propertyConfig,
-        const std::string &oldKey,
-        std::string newKey);
+        const EntityPropertyConfig &propertyConfig, const std::string &oldKey, std::string newKey
+    );
 
     void removeProperty(const EntityPropertyConfig &propertyConfig, const std::string &key);
 
     void removeNumberedProperty(
-        const EntityPropertyConfig &propertyConfig, const std::string &prefix);
+        const EntityPropertyConfig &propertyConfig, const std::string &prefix
+    );
 
     bool hasProperty(const std::string &key) const;
 
@@ -202,7 +200,8 @@ public:
     const std::string &classname() const;
 
     void setClassname(
-        const EntityPropertyConfig &propertyConfig, const std::string &classname);
+        const EntityPropertyConfig &propertyConfig, const std::string &classname
+    );
 
     const vm::vec3 &origin() const;
 
@@ -217,11 +216,13 @@ public:
     std::vector<EntityProperty> numberedProperties(const std::string &property) const;
 
     void transform(
-        const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation);
+        const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation
+    );
 
 private:
     void applyRotation(
-        const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &rotation);
+        const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &rotation
+    );
 
     void updateCachedProperties(const EntityPropertyConfig &propertyConfig);
 };

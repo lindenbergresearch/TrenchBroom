@@ -29,42 +29,33 @@ enum class MapFormat {
   /**
    * Unknown map format.
    */
-  Unknown,
-  /**
+  Unknown, /**
    * Standard Quake 1 map format.
    */
-  Standard,
-  /**
+  Standard, /**
    * Quake 2 map format.
    */
-  Quake2,
-  /**
+  Quake2, /**
    * Quake 2 with Valve 220 format texturing, supported by
    * https://github.com/qbism/q2tools-220
    */
-  Quake2_Valve,
-  /**
+  Quake2_Valve, /**
    * Valve 220 map format.
    */
-  Valve,
-  /**
+  Valve, /**
    * Hexen 2 map format.
    */
-  Hexen2,
-  /**
+  Hexen2, /**
    * Daikatana map format.
    */
-  Daikatana,
-  /**
+  Daikatana, /**
    * Quake 3 legacy format (like Quake 2, no brush primitives)
    */
-  Quake3_Legacy,
-  /**
+  Quake3_Legacy, /**
    * Quake 3 with Valve 220 format texturing, supported by
    * https://github.com/Garux/netradiant-custom/tree/master/tools/quake3/q3map2
    */
-  Quake3_Valve,
-  /**
+  Quake3_Valve, /**
    * Quake 3 with brush primitives, also allows Quake 2 brushes
    */
   Quake3,

@@ -47,10 +47,8 @@ private:
 
 public:
     ChoosePathTypeDialog(
-        QWidget *parent,
-        std::filesystem::path absPath,
-        const std::filesystem::path &docPath,
-        const std::filesystem::path &gamePath);
+        QWidget *parent, std::filesystem::path absPath, const std::filesystem::path &docPath, const std::filesystem::path &gamePath
+    );
 
     const std::filesystem::path &path() const;
 };

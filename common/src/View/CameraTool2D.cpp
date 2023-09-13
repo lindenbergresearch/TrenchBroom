@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-CameraTool2D::CameraTool2D(Renderer::OrthographicCamera &camera)
-    : ToolController{}, Tool{true}, m_camera{camera} {
+CameraTool2D::CameraTool2D(Renderer::OrthographicCamera &camera) : ToolController{}, Tool{true}, m_camera{camera} {
 }
 
 Tool &CameraTool2D::tool() {
@@ -43,13 +42,12 @@ const Tool &CameraTool2D::tool() const {
 }
 
 static bool shouldZoom(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBNone)
-        && inputState.modifierKeysPressed(ModifierKeys::MKNone));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBNone) && inputState.modifierKeysPressed(ModifierKeys::MKNone));
 }
 
 static void zoom(
-    Renderer::OrthographicCamera &camera, const vm::vec2f &mousePos, const float factor) {
+    Renderer::OrthographicCamera &camera, const vm::vec2f &mousePos, const float factor
+) {
     const auto oldWorldPos = camera.unproject(mousePos.x(), mousePos.y(), 0.0f);
 
     camera.zoom(factor);
@@ -80,16 +78,13 @@ private:
     vm::vec2f m_lastMousePos;
 
 public:
-    PanDragTracker(Renderer::OrthographicCamera &camera, const vm::vec2f &lastMousePos)
-        : m_camera{camera}, m_lastMousePos{lastMousePos} {
+    PanDragTracker(Renderer::OrthographicCamera &camera, const vm::vec2f &lastMousePos) : m_camera{camera}, m_lastMousePos{lastMousePos} {
     }
 
     bool drag(const InputState &inputState) override {
         const auto currentMousePos = vm::vec2f{inputState.mouseX(), inputState.mouseY()};
-        const auto lastWorldPos =
-            m_camera.unproject(m_lastMousePos.x(), m_lastMousePos.y(), 0.0f);
-        const auto currentWorldPos =
-            m_camera.unproject(currentMousePos.x(), currentMousePos.y(), 0.0f);
+        const auto lastWorldPos = m_camera.unproject(m_lastMousePos.x(), m_lastMousePos.y(), 0.0f);
+        const auto currentWorldPos = m_camera.unproject(currentMousePos.x(), currentMousePos.y(), 0.0f);
         const auto delta = currentWorldPos - lastWorldPos;
         m_camera.moveBy(-delta);
         m_lastMousePos = currentMousePos;
@@ -107,8 +102,7 @@ private:
     vm::vec2f m_lastMousePos;
 
 public:
-    ZoomDragTracker(Renderer::OrthographicCamera &camera, const vm::vec2f &lastMousePos)
-        : m_camera{camera}, m_lastMousePos{lastMousePos} {
+    ZoomDragTracker(Renderer::OrthographicCamera &camera, const vm::vec2f &lastMousePos) : m_camera{camera}, m_lastMousePos{lastMousePos} {
     }
 
     bool drag(const InputState &inputState) override {
@@ -125,16 +119,11 @@ public:
 } // namespace
 
 static bool shouldPan(const InputState &inputState) {
-    return (
-        inputState.mouseButtonsPressed(MouseButtons::MBRight)
-        || (inputState.mouseButtonsPressed(MouseButtons::MBMiddle) && !pref(Preferences::CameraEnableAltMove)));
+    return (inputState.mouseButtonsPressed(MouseButtons::MBRight) || (inputState.mouseButtonsPressed(MouseButtons::MBMiddle) && !pref(Preferences::CameraEnableAltMove)));
 }
 
 static bool shouldDragZoom(const InputState &inputState) {
-    return (
-        pref(Preferences::CameraEnableAltMove)
-        && inputState.mouseButtonsPressed(MouseButtons::MBMiddle)
-        && inputState.modifierKeysPressed(ModifierKeys::MKAlt));
+    return (pref(Preferences::CameraEnableAltMove) && inputState.mouseButtonsPressed(MouseButtons::MBMiddle) && inputState.modifierKeysPressed(ModifierKeys::MKAlt));
 }
 
 std::unique_ptr<DragTracker> CameraTool2D::acceptMouseDrag(const InputState &inputState) {

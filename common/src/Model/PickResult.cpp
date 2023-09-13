@@ -39,8 +39,7 @@ private:
     const CompareHits *m_compare;
 
 public:
-    CompareWrapper(const CompareHits *compare)
-        : m_compare(compare) {
+    CompareWrapper(const CompareHits *compare) : m_compare(compare) {
     }
 
     bool operator()(const Hit &lhs, const Hit &rhs) const {
@@ -48,19 +47,18 @@ public:
     }
 };
 
-PickResult::PickResult(std::shared_ptr<CompareHits> compare)
-    : m_compare(std::move(compare)) {
+PickResult::PickResult(std::shared_ptr<CompareHits> compare) : m_compare(std::move(compare)) {
 }
 
-PickResult::PickResult()
-    : m_compare(std::make_shared<CompareHitsByDistance>()) {
+PickResult::PickResult() : m_compare(std::make_shared<CompareHitsByDistance>()) {
 }
 
 PickResult::~PickResult() = default;
 
 PickResult PickResult::byDistance() {
-    return PickResult(std::make_shared<CombineCompareHits>(
-        std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
+    return PickResult(
+        std::make_shared<CombineCompareHits>(
+            std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
 }
 
 PickResult PickResult::bySize(const vm::axis::type axis) {
@@ -112,7 +110,8 @@ const Hit &PickResult::first(const HitFilter &filter) const {
                         bestMatch = it;
                         bestMatchError = hit.error();
                     }
-                } else if (!occluder(hit)) {
+                }
+                else if (!occluder(hit)) {
                     bestOccluderError = vm::min(bestOccluderError, hit.error());
                     containsOccluder = true;
                 }

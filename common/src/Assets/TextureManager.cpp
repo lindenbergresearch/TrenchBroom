@@ -40,22 +40,24 @@
 namespace TrenchBroom {
 namespace Assets {
 
-TextureManager::TextureManager(int magFilter, int minFilter, Logger &logger)
-    : m_logger{logger}, m_minFilter{minFilter}, m_magFilter{magFilter} {
+TextureManager::TextureManager(int magFilter, int minFilter, Logger &logger) : m_logger{logger}, m_minFilter{minFilter}, m_magFilter{magFilter} {
 }
 
 TextureManager::~TextureManager() = default;
 
 void TextureManager::reload(
-    const IO::FileSystem &fs, const Model::TextureConfig &textureConfig) {
-    findTextureCollections(fs, textureConfig)
-        .transform([&](auto textureCollections) {
+    const IO::FileSystem &fs, const Model::TextureConfig &textureConfig
+) {
+    findTextureCollections(fs, textureConfig).transform(
+        [&](auto textureCollections) {
           setTextureCollections(std::move(textureCollections), fs, textureConfig);
-        })
-        .transform_error([&](auto e) {
+        }
+    ).transform_error(
+        [&](auto e) {
           m_logger.error() << "Could not reload texture collections: " + e.msg;
           setTextureCollections({}, fs, textureConfig);
-        });
+        }
+    );
 }
 
 void TextureManager::setTextureCollections(std::vector<TextureCollection> collections) {
@@ -66,34 +68,36 @@ void TextureManager::setTextureCollections(std::vector<TextureCollection> collec
 }
 
 void TextureManager::setTextureCollections(
-    const std::vector<std::filesystem::path> &paths,
-    const IO::FileSystem &fs,
-    const Model::TextureConfig &textureConfig) {
+    const std::vector<std::filesystem::path> &paths, const IO::FileSystem &fs, const Model::TextureConfig &textureConfig
+) {
     auto collections = std::move(m_collections);
     clear();
 
     for (const auto &path: paths) {
-        const auto it =
-            std::find_if(collections.begin(), collections.end(), [&](const auto &c) {
+        const auto it = std::find_if(
+            collections.begin(), collections.end(), [&](const auto &c) {
               return c.path() == path;
-            });
+            }
+        );
 
         if (it == collections.end() || !it->loaded()) {
-            IO::loadTextureCollection(path, fs, textureConfig, m_logger)
-                .transform_error([&](const auto &error) {
+            IO::loadTextureCollection(path, fs, textureConfig, m_logger).transform_error(
+                [&](const auto &error) {
                   if (it == collections.end()) {
-                      m_logger.error() << "Could not load texture collection '" << path
-                                       << "': " << error.msg;
+                      m_logger.error() << "Could not load texture collection '" << path << "': " << error.msg;
                   }
                   return Assets::TextureCollection{path};
-                })
-                .transform([&](auto collection) {
+                }
+            ).transform(
+                [&](auto collection) {
                   if (!collection.textures().empty()) {
                       m_logger.info() << "Loaded texture collection '" << path << "'";
                   }
                   addTextureCollection(std::move(collection));
-                });
-        } else {
+                }
+            );
+        }
+        else {
             addTextureCollection(std::move(*it));
         }
 
@@ -186,15 +190,18 @@ void TextureManager::updateTextures() {
             if (mIt != m_texturesByName.end()) {
                 mIt->second->setOverridden(true);
                 mIt->second = &texture;
-            } else {
+            }
+            else {
                 m_texturesByName.insert(std::make_pair(key, &texture));
             }
         }
     }
 
-    m_textures = kdl::vec_transform(kdl::map_values(m_texturesByName), [](auto *t) {
-      return const_cast<const Texture *>(t);
-    });
+    m_textures = kdl::vec_transform(
+        kdl::map_values(m_texturesByName), [](auto *t) {
+          return const_cast<const Texture *>(t);
+        }
+    );
 }
 } // namespace Assets
 } // namespace TrenchBroom

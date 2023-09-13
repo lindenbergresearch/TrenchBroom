@@ -36,15 +36,15 @@ namespace IO {
 class FileSystem;
 
 Assets::Texture loadSkin(
-    const std::filesystem::path &path, const FileSystem &fs, Logger &logger);
+    const std::filesystem::path &path, const FileSystem &fs, Logger &logger
+);
 
 Assets::Texture loadSkin(
-    const std::filesystem::path &path,
-    const FileSystem &fs,
-    const std::optional<Assets::Palette> &palette,
-    Logger &logger);
+    const std::filesystem::path &path, const FileSystem &fs, const std::optional<Assets::Palette> &palette, Logger &logger
+);
 
 Assets::Texture loadShader(
-    const std::filesystem::path &path, const FileSystem &fs, Logger &logger);
+    const std::filesystem::path &path, const FileSystem &fs, Logger &logger
+);
 } // namespace IO
 } // namespace TrenchBroom

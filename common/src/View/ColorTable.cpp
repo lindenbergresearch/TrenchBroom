@@ -29,8 +29,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ColorTable::ColorTable(const int cellSize, QWidget *parent)
-    : QWidget(parent), m_cellSize(cellSize), m_cellSpacing(2) {
+ColorTable::ColorTable(const int cellSize, QWidget *parent) : QWidget(parent), m_cellSize(cellSize), m_cellSpacing(2) {
     assert(m_cellSize > 0);
 
     auto sizePolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -67,9 +66,7 @@ void ColorTable::paintEvent(QPaintEvent * /* event */) {
             if (it != std::end(m_colors)) {
                 const auto &color = *it;
 
-                if (
-                    std::find(std::begin(m_selectedColors), std::end(m_selectedColors), color)
-                    != std::end(m_selectedColors)) {
+                if (std::find(std::begin(m_selectedColors), std::end(m_selectedColors), color) != std::end(m_selectedColors)) {
                     dc.setPen(QColor(Qt::red));
                     dc.setBrush(QColor(Qt::red));
                     dc.drawRect(x - 1, y - 1, m_cellSize + 2, m_cellSize + 2);
@@ -121,7 +118,8 @@ int ColorTable::computeCols(const int width) const {
 int ColorTable::computeRows(const int cols) const {
     if (cols == 0) {
         return 0;
-    } else {
+    }
+    else {
         return (static_cast<int>(m_colors.size()) + cols - 1) / cols;
     }
 }

@@ -109,14 +109,10 @@
 namespace TrenchBroom {
 namespace View {
 MapFrame::MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> document)
-    : QMainWindow(), m_frameManager(frameManager), m_document(std::move(document)),
-      m_lastInputTime(std::chrono::system_clock::now()), m_autosaver(std::make_unique<Autosaver>(m_document)),
-      m_autosaveTimer(nullptr), m_toolBar(nullptr), m_hSplitter(nullptr), m_vSplitter(nullptr),
-      m_contextManager(std::make_unique<GLContextManager>()), m_mapView(nullptr), m_currentMapView(nullptr),
-      m_infoPanel(nullptr), m_console(nullptr), m_inspector(nullptr), m_gridChoice(nullptr), m_statusBarLabel(nullptr),
-      m_compilationDialog(nullptr), m_recentDocumentsMenu(nullptr), m_undoAction(nullptr), m_redoAction(nullptr),
-      m_updateTitleSignalDelayer{new SignalDelayer{this}}, m_updateActionStateSignalDelayer{new SignalDelayer{this}},
-      m_updateStatusBarSignalDelayer{new SignalDelayer{this}} {
+    : QMainWindow(), m_frameManager(frameManager), m_document(std::move(document)), m_lastInputTime(std::chrono::system_clock::now()), m_autosaver(std::make_unique<Autosaver>(m_document)), m_autosaveTimer(nullptr), m_toolBar(nullptr),
+      m_hSplitter(nullptr), m_vSplitter(nullptr), m_contextManager(std::make_unique<GLContextManager>()), m_mapView(nullptr), m_currentMapView(nullptr), m_infoPanel(nullptr), m_console(nullptr), m_inspector(nullptr), m_gridChoice(nullptr),
+      m_statusBarLabel(nullptr), m_compilationDialog(nullptr), m_recentDocumentsMenu(nullptr), m_undoAction(nullptr), m_redoAction(nullptr), m_updateTitleSignalDelayer{new SignalDelayer{this}},
+      m_updateActionStateSignalDelayer{new SignalDelayer{this}}, m_updateStatusBarSignalDelayer{new SignalDelayer{this}} {
     ensure(m_frameManager != nullptr, "frameManager is null");
     ensure(m_document != nullptr, "document is null");
 
@@ -227,10 +223,11 @@ void MapFrame::updateTitleDelayed() {
 }
 
 void MapFrame::createMenus() {
-    MainMenuBuilder menuBuilder(*menuBar(), m_actionMap, [this](const Action &action) {
-                                  ActionExecutionContext context(this, currentMapViewBase());
-                                  action.execute(context);
-                                }
+    MainMenuBuilder menuBuilder(
+        *menuBar(), m_actionMap, [this](const Action &action) {
+          ActionExecutionContext context(this, currentMapViewBase());
+          action.execute(context);
+        }
     );
 
     const auto &actionManager = ActionManager::instance();
@@ -274,7 +271,8 @@ void MapFrame::updateUndoRedoActions() {
             const auto text = "Undo " + document->undoCommandName();
             m_undoAction->setText(QString::fromStdString(text));
             m_undoAction->setEnabled(true);
-        } else {
+        }
+        else {
             m_undoAction->setText("Undo");
             m_undoAction->setEnabled(false);
         }
@@ -284,7 +282,8 @@ void MapFrame::updateUndoRedoActions() {
             const auto text = "Redo " + document->redoCommandName();
             m_redoAction->setText(QString::fromStdString(text));
             m_redoAction->setEnabled(true);
-        } else {
+        }
+        else {
             m_redoAction->setText("Redo");
             m_redoAction->setEnabled(false);
         }
@@ -325,9 +324,7 @@ void MapFrame::createGui() {
 
     m_mapView = new SwitchableMapViewContainer(m_console, m_document, *m_contextManager);
     m_currentMapView = m_mapView->firstMapViewBase();
-    ensure(
-        m_currentMapView != nullptr,
-        "SwitchableMapViewContainer should have constructed a MapViewBase");
+    ensure(m_currentMapView != nullptr, "SwitchableMapViewContainer should have constructed a MapViewBase");
 
     m_inspector = new Inspector(m_document, *m_contextManager);
 
@@ -380,8 +377,7 @@ private:
 public:
     explicit ToolBarBuilder(
         QToolBar &toolBar, ActionMap &actions, const TriggerFn &triggerFn
-    )
-        : MenuBuilderBase(actions, triggerFn), m_toolBar(toolBar) {
+    ) : MenuBuilderBase(actions, triggerFn), m_toolBar(toolBar) {
     }
 
     void visit(const Menu &menu) override { menu.visitEntries(*this); }
@@ -407,9 +403,7 @@ void MapFrame::createToolBar() {
     m_toolBar->setIconSize(QSize(24, 24));
 
     ToolBarBuilder builder(
-        *m_toolBar,
-        m_actionMap,
-        [this](const Action &action) {
+        *m_toolBar, m_actionMap, [this](const Action &action) {
           ActionExecutionContext context(this, currentMapViewBase());
           action.execute(context);
         }
@@ -456,7 +450,8 @@ static Model::EntityNodeBase *commonEntityForNodeList(const std::vector<T *> &li
 
     if (multipleEntities) {
         return nullptr;
-    } else {
+    }
+    else {
         return firstEntity;
     }
 }
@@ -478,7 +473,8 @@ static std::string commonClassnameForEntityList(
 
     if (multipleClassnames) {
         return "";
-    } else {
+    }
+    else {
         return firstClassname;
     }
 }
@@ -494,15 +490,12 @@ static QString describeSelection(const MapDocument *document) {
 
     QStringList pipeSeparatedSections;
 
-    pipeSeparatedSections << QString::fromStdString(document->game()->gameName())
-                          << QString::fromStdString(
-                              Model::formatName(document->world()->mapFormat()))
-                          << QString::fromStdString(document->currentLayer()->name());
+    pipeSeparatedSections << QString::fromStdString(document->game()->gameName()) << QString::fromStdString(
+        Model::formatName(document->world()->mapFormat())) << QString::fromStdString(document->currentLayer()->name());
 
     // open groups
     std::vector<Model::GroupNode *> groups;
-    for (Model::GroupNode *group = document->currentGroup(); group != nullptr;
-         group = group->containingGroup()) {
+    for (Model::GroupNode *group = document->currentGroup(); group != nullptr; group = group->containingGroup()) {
         groups.push_back(group);
     }
     if (!groups.empty()) {
@@ -514,8 +507,7 @@ static QString describeSelection(const MapDocument *document) {
             openGroups << QString::fromStdString(group->name());
         }
 
-        const QString openGroupsString =
-            QObject::tr("Open groups: %1").arg(openGroups.join(Arrow));
+        const QString openGroupsString = QObject::tr("Open groups: %1").arg(openGroups.join(Arrow));
         pipeSeparatedSections << openGroupsString;
     }
 
@@ -526,15 +518,14 @@ static QString describeSelection(const MapDocument *document) {
 
     // selected brushes
     if (!selectedNodes.brushes().empty()) {
-        Model::EntityNodeBase *commonEntityNode =
-            commonEntityForNodeList(selectedNodes.brushes());
+        Model::EntityNodeBase *commonEntityNode = commonEntityForNodeList(selectedNodes.brushes());
 
         // if all selected brushes are from the same entity, print the entity name
-        std::string token =
-            numberWithSuffix(selectedNodes.brushes().size(), "brush", "brushes");
+        std::string token = numberWithSuffix(selectedNodes.brushes().size(), "brush", "brushes");
         if (commonEntityNode) {
             token += " (" + commonEntityNode->entity().classname() + ")";
-        } else {
+        }
+        else {
             token += " (multiple entities)";
         }
         tokens.push_back(token);
@@ -542,15 +533,14 @@ static QString describeSelection(const MapDocument *document) {
 
     // selected patches
     if (!selectedNodes.patches().empty()) {
-        Model::EntityNodeBase *commonEntityNode =
-            commonEntityForNodeList(selectedNodes.patches());
+        Model::EntityNodeBase *commonEntityNode = commonEntityForNodeList(selectedNodes.patches());
 
         // if all selected patches are from the same entity, print the entity name
-        std::string token =
-            numberWithSuffix(selectedNodes.patches().size(), "patch", "patches");
+        std::string token = numberWithSuffix(selectedNodes.patches().size(), "patch", "patches");
         if (commonEntityNode) {
             token += " (" + commonEntityNode->entity().classname() + ")";
-        } else {
+        }
+        else {
             token += " (multiple entities)";
         }
         tokens.push_back(token);
@@ -558,8 +548,7 @@ static QString describeSelection(const MapDocument *document) {
 
     // selected brush faces
     if (document->hasSelectedBrushFaces()) {
-        const auto token =
-            numberWithSuffix(document->selectedBrushFaces().size(), "face", "faces");
+        const auto token = numberWithSuffix(document->selectedBrushFaces().size(), "face", "faces");
         tokens.push_back(token);
     }
 
@@ -567,11 +556,11 @@ static QString describeSelection(const MapDocument *document) {
     if (!selectedNodes.entities().empty()) {
         std::string commonClassname = commonClassnameForEntityList(selectedNodes.entities());
 
-        std::string token =
-            numberWithSuffix(selectedNodes.entities().size(), "entity", "entities");
+        std::string token = numberWithSuffix(selectedNodes.entities().size(), "entity", "entities");
         if (commonClassname != "") {
             token += " (" + commonClassname + ")";
-        } else {
+        }
+        else {
             token += " (multiple classnames)";
         }
         tokens.push_back(token);
@@ -583,23 +572,21 @@ static QString describeSelection(const MapDocument *document) {
     }
 
     // get the layers of the selected nodes
-    const std::vector<Model::LayerNode *> selectedObjectLayers =
-        Model::findContainingLayersUserSorted(selectedNodes.nodes());
+    const std::vector<Model::LayerNode *> selectedObjectLayers = Model::findContainingLayersUserSorted(selectedNodes.nodes());
     QString layersDescription;
     if (selectedObjectLayers.size() == 1) {
         Model::LayerNode *layer = selectedObjectLayers[0];
-        layersDescription =
-            QObject::tr(" in layer \"%1\"").arg(QString::fromStdString(layer->name()));
-    } else if (selectedObjectLayers.size() > 1) {
+        layersDescription = QObject::tr(" in layer \"%1\"").arg(QString::fromStdString(layer->name()));
+    }
+    else if (selectedObjectLayers.size() > 1) {
         layersDescription = QObject::tr(" in %1 layers").arg(selectedObjectLayers.size());
     }
 
     // now, turn `tokens` into a comma-separated string
     if (!tokens.empty()) {
-        pipeSeparatedSections << QObject::tr("%1%2 selected")
-            .arg(QString::fromStdString(
-                kdl::str_join(tokens, ", ", ", and ", " and ")))
-            .arg(layersDescription);
+        pipeSeparatedSections << QObject::tr("%1%2 selected").arg(
+            QString::fromStdString(
+                kdl::str_join(tokens, ", ", ", and ", " and "))).arg(layersDescription);
     }
 
     // count hidden objects
@@ -609,36 +596,32 @@ static QString describeSelection(const MapDocument *document) {
     size_t hiddenPatches = 0u;
 
     const auto &editorContext = document->editorContext();
-    document->world()->accept(kdl::overload(
-        [](auto &&thisLambda, const Model::WorldNode *world) {
-          world->visitChildren(thisLambda);
-        },
-        [](auto &&thisLambda, const Model::LayerNode *layer) {
-          layer->visitChildren(thisLambda);
-        },
-        [&](auto &&thisLambda, const Model::GroupNode *group) {
-          if (!editorContext.visible(group)) {
-              ++hiddenGroups;
-          }
-          group->visitChildren(thisLambda);
-        },
-        [&](auto &&thisLambda, const Model::EntityNode *entity) {
-          if (!editorContext.visible(entity)) {
-              ++hiddenEntities;
-          }
-          entity->visitChildren(thisLambda);
-        },
-        [&](const Model::BrushNode *brush) {
-          if (!editorContext.visible(brush)) {
-              ++hiddenBrushes;
-          }
-        },
-        [&](const Model::PatchNode *patch) {
-          if (!editorContext.visible(patch)) {
-              ++hiddenPatches;
-          }
-        }
-    ));
+    document->world()->accept(
+        kdl::overload(
+            [](auto &&thisLambda, const Model::WorldNode *world) {
+              world->visitChildren(thisLambda);
+            }, [](auto &&thisLambda, const Model::LayerNode *layer) {
+              layer->visitChildren(thisLambda);
+            }, [&](auto &&thisLambda, const Model::GroupNode *group) {
+              if (!editorContext.visible(group)) {
+                  ++hiddenGroups;
+              }
+              group->visitChildren(thisLambda);
+            }, [&](auto &&thisLambda, const Model::EntityNode *entity) {
+              if (!editorContext.visible(entity)) {
+                  ++hiddenEntities;
+              }
+              entity->visitChildren(thisLambda);
+            }, [&](const Model::BrushNode *brush) {
+              if (!editorContext.visible(brush)) {
+                  ++hiddenBrushes;
+              }
+            }, [&](const Model::PatchNode *patch) {
+              if (!editorContext.visible(patch)) {
+                  ++hiddenPatches;
+              }
+            }
+        ));
 
     // print hidden objects
     if (hiddenGroups > 0 || hiddenEntities > 0 || hiddenBrushes > 0) {
@@ -657,14 +640,14 @@ static QString describeSelection(const MapDocument *document) {
             hiddenDescriptors.push_back(numberWithSuffix(hiddenPatches, "patch", "patches"));
         }
 
-        pipeSeparatedSections << QObject::tr("%1 hidden")
-            .arg(QString::fromStdString(kdl::str_join(
-                hiddenDescriptors, ", ", ", and ", " and "
-            )));
+        pipeSeparatedSections << QObject::tr("%1 hidden").arg(
+            QString::fromStdString(
+                kdl::str_join(
+                    hiddenDescriptors, ", ", ", and ", " and "
+                )));
     }
 
-    return QString::fromLatin1("   ")
-           + pipeSeparatedSections.join(QLatin1String("   |   "));
+    return QString::fromLatin1("   ") + pipeSeparatedSections.join(QLatin1String("   |   "));
 }
 
 void MapFrame::updateStatusBar() {
@@ -677,52 +660,38 @@ void MapFrame::updateStatusBarDelayed() {
 
 void MapFrame::connectObservers() {
     PreferenceManager &prefs = PreferenceManager::instance();
-    m_notifierConnection +=
-        prefs.preferenceDidChangeNotifier.connect(this, &MapFrame::preferenceDidChange);
+    m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &MapFrame::preferenceDidChange);
 
-    m_notifierConnection +=
-        m_document->documentWasClearedNotifier.connect(this, &MapFrame::documentWasCleared);
-    m_notifierConnection +=
-        m_document->documentWasNewedNotifier.connect(this, &MapFrame::documentDidChange);
-    m_notifierConnection +=
-        m_document->documentWasLoadedNotifier.connect(this, &MapFrame::documentDidChange);
-    m_notifierConnection +=
-        m_document->documentWasSavedNotifier.connect(this, &MapFrame::documentDidChange);
+    m_notifierConnection += m_document->documentWasClearedNotifier.connect(this, &MapFrame::documentWasCleared);
+    m_notifierConnection += m_document->documentWasNewedNotifier.connect(this, &MapFrame::documentDidChange);
+    m_notifierConnection += m_document->documentWasLoadedNotifier.connect(this, &MapFrame::documentDidChange);
+    m_notifierConnection += m_document->documentWasSavedNotifier.connect(this, &MapFrame::documentDidChange);
     m_notifierConnection += m_document->documentModificationStateDidChangeNotifier.connect(
         this, &MapFrame::documentModificationStateDidChange
     );
-    m_notifierConnection +=
-        m_document->transactionDoneNotifier.connect(this, &MapFrame::transactionDone);
-    m_notifierConnection +=
-        m_document->transactionUndoneNotifier.connect(this, &MapFrame::transactionUndone);
-    m_notifierConnection +=
-        m_document->selectionDidChangeNotifier.connect(this, &MapFrame::selectionDidChange);
+    m_notifierConnection += m_document->transactionDoneNotifier.connect(this, &MapFrame::transactionDone);
+    m_notifierConnection += m_document->transactionUndoneNotifier.connect(this, &MapFrame::transactionUndone);
+    m_notifierConnection += m_document->selectionDidChangeNotifier.connect(this, &MapFrame::selectionDidChange);
     m_notifierConnection += m_document->currentLayerDidChangeNotifier.connect(
         this, &MapFrame::currentLayerDidChange
     );
-    m_notifierConnection +=
-        m_document->groupWasOpenedNotifier.connect(this, &MapFrame::groupWasOpened);
-    m_notifierConnection +=
-        m_document->groupWasClosedNotifier.connect(this, &MapFrame::groupWasClosed);
+    m_notifierConnection += m_document->groupWasOpenedNotifier.connect(this, &MapFrame::groupWasOpened);
+    m_notifierConnection += m_document->groupWasClosedNotifier.connect(this, &MapFrame::groupWasClosed);
     m_notifierConnection += m_document->nodeVisibilityDidChangeNotifier.connect(
         this, &MapFrame::nodeVisibilityDidChange
     );
     m_notifierConnection += m_document->editorContextDidChangeNotifier.connect(
         this, &MapFrame::editorContextDidChange
     );
-    m_notifierConnection +=
-        m_document->pointFileWasLoadedNotifier.connect(this, &MapFrame::pointFileDidChange);
-    m_notifierConnection +=
-        m_document->pointFileWasUnloadedNotifier.connect(this, &MapFrame::pointFileDidChange);
-    m_notifierConnection +=
-        m_document->portalFileWasLoadedNotifier.connect(this, &MapFrame::portalFileDidChange);
+    m_notifierConnection += m_document->pointFileWasLoadedNotifier.connect(this, &MapFrame::pointFileDidChange);
+    m_notifierConnection += m_document->pointFileWasUnloadedNotifier.connect(this, &MapFrame::pointFileDidChange);
+    m_notifierConnection += m_document->portalFileWasLoadedNotifier.connect(this, &MapFrame::portalFileDidChange);
     m_notifierConnection += m_document->portalFileWasUnloadedNotifier.connect(
         this, &MapFrame::portalFileDidChange
     );
 
     Grid &grid = m_document->grid();
-    m_notifierConnection +=
-        grid.gridDidChangeNotifier.connect(this, &MapFrame::gridDidChange);
+    m_notifierConnection += grid.gridDidChangeNotifier.connect(this, &MapFrame::gridDidChange);
 
     m_notifierConnection += m_mapView->mapViewToolBox().toolActivatedNotifier.connect(
         this, &MapFrame::toolActivated
@@ -730,10 +699,9 @@ void MapFrame::connectObservers() {
     m_notifierConnection += m_mapView->mapViewToolBox().toolDeactivatedNotifier.connect(
         this, &MapFrame::toolDeactivated
     );
-    m_notifierConnection +=
-        m_mapView->mapViewToolBox().toolHandleSelectionChangedNotifier.connect(
-            this, &MapFrame::toolHandleSelectionChanged
-        );
+    m_notifierConnection += m_mapView->mapViewToolBox().toolHandleSelectionChangedNotifier.connect(
+        this, &MapFrame::toolHandleSelectionChanged
+    );
 }
 
 void MapFrame::documentWasCleared(View::MapDocument *) {
@@ -754,24 +722,26 @@ void MapFrame::documentModificationStateDidChange() {
 }
 
 void MapFrame::transactionDone(const std::string & /* name */) {
-    QTimer::singleShot(0, this, [this]() {
-                         // FIXME: Delaying this with QTimer::singleShot is a hack to work around the lack of
-                         // a notification that's called _after_ the CommandProcessor undo/redo stacks are
-                         // modified.
-                         //
-                         // The current transactionDoneNotifier is called after the transaction executes, but
-                         // before it's pushed onto the undo stack, but we need to read the undo stack in
-                         // updateUndoRedoActions(), so this QTimer::singleShot is needed for now.
-                         updateUndoRedoActions();
-                       }
+    QTimer::singleShot(
+        0, this, [this]() {
+          // FIXME: Delaying this with QTimer::singleShot is a hack to work around the lack of
+          // a notification that's called _after_ the CommandProcessor undo/redo stacks are
+          // modified.
+          //
+          // The current transactionDoneNotifier is called after the transaction executes, but
+          // before it's pushed onto the undo stack, but we need to read the undo stack in
+          // updateUndoRedoActions(), so this QTimer::singleShot is needed for now.
+          updateUndoRedoActions();
+        }
     );
 }
 
 void MapFrame::transactionUndone(const std::string & /* name */) {
-    QTimer::singleShot(0, this, [this]() {
-                         // FIXME: see MapFrame::transactionDone
-                         updateUndoRedoActions();
-                       }
+    QTimer::singleShot(
+        0, this, [this]() {
+          // FIXME: see MapFrame::transactionDone
+          updateUndoRedoActions();
+        }
     );
 }
 
@@ -840,15 +810,13 @@ void MapFrame::bindEvents() {
     connect(m_autosaveTimer, &QTimer::timeout, this, &MapFrame::triggerAutosave);
     connect(qApp, &QApplication::focusChanged, this, &MapFrame::focusChange);
     connect(
-        m_gridChoice,
-        QOverload<int>::of(&QComboBox::activated),
-        this,
-        [this](const int index) { setGridSize(index + Grid::MinSize); }
+        m_gridChoice, QOverload<int>::of(&QComboBox::activated), this, [this](const int index) { setGridSize(index + Grid::MinSize); }
     );
-    connect(QApplication::clipboard(), &QClipboard::dataChanged, this, [this]() {
-              // update the "Paste" menu items
-              this->updateActionState();
-            }
+    connect(
+        QApplication::clipboard(), &QClipboard::dataChanged, this, [this]() {
+          // update the "Paste" menu items
+          this->updateActionState();
+        }
     );
     connect(
         m_toolBar, &QToolBar::visibilityChanged, this, [this](const bool /* visible */) {
@@ -858,22 +826,13 @@ void MapFrame::bindEvents() {
     );
 
     connect(
-        m_updateTitleSignalDelayer,
-        &SignalDelayer::processSignal,
-        this,
-        &MapFrame::updateTitle
+        m_updateTitleSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateTitle
     );
     connect(
-        m_updateActionStateSignalDelayer,
-        &SignalDelayer::processSignal,
-        this,
-        &MapFrame::updateActionState
+        m_updateActionStateSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateActionState
     );
     connect(
-        m_updateStatusBarSignalDelayer,
-        &SignalDelayer::processSignal,
-        this,
-        &MapFrame::updateStatusBar
+        m_updateStatusBarSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateStatusBar
     );
 }
 
@@ -883,33 +842,27 @@ Result<bool> MapFrame::newDocument(
     if (!confirmOrDiscardChanges() || !closeCompileDialog()) {
         return false;
     }
-    return m_document->newDocument(mapFormat, MapDocument::DefaultWorldBounds, game)
-                     .transform([]() { return true; });
+    return m_document->newDocument(mapFormat, MapDocument::DefaultWorldBounds, game).transform([]() { return true; });
 }
 
 Result<bool> MapFrame::openDocument(
-    std::shared_ptr<Model::Game> game,
-    const Model::MapFormat mapFormat,
-    const std::filesystem::path &path
+    std::shared_ptr<Model::Game> game, const Model::MapFormat mapFormat, const std::filesystem::path &path
 ) {
     if (!confirmOrDiscardChanges() || !closeCompileDialog()) {
         return false;
     }
     const auto startTime = std::chrono::high_resolution_clock::now();
-    return m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path)
-                     .transform([&]() {
-                                  const auto endTime = std::chrono::high_resolution_clock::now();
+    return m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform(
+        [&]() {
+          const auto endTime = std::chrono::high_resolution_clock::now();
 
-                                  logger().info() << "Loaded " << m_document->path() << " in "
-                                                  << std::chrono::duration_cast<std::chrono::milliseconds>(
-                                                      endTime - startTime
-                                                  )
-                                                      .count()
-                                                  << "ms";
+          logger().info() << "Loaded " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(
+              endTime - startTime
+          ).count() << "ms";
 
-                                  return true;
-                                }
-                     );
+          return true;
+        }
+    );
 }
 
 bool MapFrame::saveDocument() {
@@ -919,23 +872,17 @@ bool MapFrame::saveDocument() {
             m_document->saveDocument();
             const auto endTime = std::chrono::high_resolution_clock::now();
 
-            logger().info() << "Saved " << m_document->path() << " in "
-                            << std::chrono::duration_cast<std::chrono::milliseconds>(
-                                endTime - startTime
-                            )
-                                .count()
-                            << "ms";
+            logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(
+                endTime - startTime
+            ).count() << "ms";
             return true;
-        } else {
+        }
+        else {
             return saveDocumentAs();
         }
-    }
-    catch (...) {
+    } catch (...) {
         QMessageBox::critical(
-            this,
-            "",
-            QString::fromStdString("Unknown error while saving " + m_document->path().string()),
-            QMessageBox::Ok
+            this, "", QString::fromStdString("Unknown error while saving " + m_document->path().string()), QMessageBox::Ok
         );
         return false;
     }
@@ -960,20 +907,13 @@ bool MapFrame::saveDocumentAs() {
         m_document->saveDocumentAs(path);
         const auto endTime = std::chrono::high_resolution_clock::now();
 
-        logger().info() << "Saved " << m_document->path() << " in "
-                        << std::chrono::duration_cast<std::chrono::milliseconds>(
-                            endTime - startTime
-                        )
-                            .count()
-                        << "ms";
+        logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(
+            endTime - startTime
+        ).count() << "ms";
         return true;
-    }
-    catch (...) {
+    } catch (...) {
         QMessageBox::critical(
-            this,
-            "",
-            QString::fromStdString("Unknown error while saving " + m_document->filename()),
-            QMessageBox::Ok
+            this, "", QString::fromStdString("Unknown error while saving " + m_document->filename()), QMessageBox::Ok
         );
         return false;
     }
@@ -984,10 +924,9 @@ void MapFrame::revertDocument() {
         const auto mapFormat = m_document->world()->mapFormat();
         const auto game = m_document->game();
         const auto path = m_document->path();
-        m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path)
-                  .transform_error(
-                      [&](auto e) { m_document->error() << "Failed to rever document: " << e.msg; }
-                  );
+        m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform_error(
+            [&](auto e) { m_document->error() << "Failed to rever document: " << e.msg; }
+        );
     }
 }
 
@@ -1019,28 +958,26 @@ bool MapFrame::exportDocument(const IO::ExportOptions &options) {
 
     if (exportPath == m_document->path()) {
         QMessageBox::critical(
-            this,
-            "",
-            tr("You can't overwrite the current document.\nPlease choose a different file name "
-               "to export "
-               "to."
+            this, "", tr(
+                "You can't overwrite the current document.\nPlease choose a different file name "
+                "to export "
+                "to."
             ));
         return false;
     }
 
-    return m_document->exportDocumentAs(options)
-                     .transform([&]() {
-                                  logger().info() << "Exported " << exportPath;
-                                  return true;
-                                }
-                     )
-                     .transform_error([&](auto e) {
-                                        logger().error() << "Could not export '" << exportPath << "': " + e.msg;
-                                        QMessageBox::critical(this, "", QString::fromStdString(e.msg));
-                                        return false;
-                                      }
-                     )
-                     .value();
+    return m_document->exportDocumentAs(options).transform(
+        [&]() {
+          logger().info() << "Exported " << exportPath;
+          return true;
+        }
+    ).transform_error(
+        [&](auto e) {
+          logger().error() << "Could not export '" << exportPath << "': " + e.msg;
+          QMessageBox::critical(this, "", QString::fromStdString(e.msg));
+          return false;
+        }
+    ).value();
 }
 
 /**
@@ -1050,12 +987,9 @@ bool MapFrame::confirmOrDiscardChanges() {
     if (!m_document->modified())
         return true;
     const QMessageBox::StandardButton result = QMessageBox::question(
-        this,
-        "TrenchBroom",
-        QString::fromStdString(
+        this, "TrenchBroom", QString::fromStdString(
             m_document->filename() + " has been modified. Do you want to save the changes?"
-        ),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+        ), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
     );
 
 #ifdef __clang__
@@ -1086,9 +1020,8 @@ bool MapFrame::confirmRevertDocument() {
     QMessageBox messageBox(this);
     messageBox.setWindowTitle("TrenchBroom");
     messageBox.setIcon(QMessageBox::Question);
-    messageBox.setText(tr("Revert %1 to %2?")
-                           .arg(QString::fromStdString(m_document->filename()))
-                           .arg(IO::pathAsQString(m_document->path())));
+    messageBox.setText(
+        tr("Revert %1 to %2?").arg(QString::fromStdString(m_document->filename())).arg(IO::pathAsQString(m_document->path())));
     messageBox.setInformativeText(
         tr("This will discard all unsaved changes and reload the document from disk."));
 
@@ -1108,10 +1041,7 @@ void MapFrame::loadPointFile() {
     }
 
     const QString fileName = QFileDialog::getOpenFileName(
-        this,
-        tr("Load Point File"),
-        defaultDir,
-        "Point files (*.pts *.lin);;Any files (*.*)"
+        this, tr("Load Point File"), defaultDir, "Point files (*.pts *.lin);;Any files (*.*)"
     );
 
     if (!fileName.isEmpty()) {
@@ -1242,7 +1172,8 @@ void MapFrame::copyToClipboard() {
     std::string str;
     if (m_document->hasSelectedNodes()) {
         str = m_document->serializeSelectedNodes();
-    } else if (m_document->hasSelectedBrushFaces()) {
+    }
+    else if (m_document->hasSelectedBrushFaces()) {
         str = m_document->serializeSelectedBrushFaces();
     }
 
@@ -1250,13 +1181,11 @@ void MapFrame::copyToClipboard() {
 }
 
 bool MapFrame::canCutSelection() const {
-    return widgetOrChildHasFocus(m_mapView) && m_document->hasSelectedNodes()
-           && !m_mapView->anyToolActive();
+    return widgetOrChildHasFocus(m_mapView) && m_document->hasSelectedNodes() && !m_mapView->anyToolActive();
 }
 
 bool MapFrame::canCopySelection() const {
-    return widgetOrChildHasFocus(m_mapView)
-           && (m_document->hasSelectedNodes() || m_document->hasSelectedBrushFaces());
+    return widgetOrChildHasFocus(m_mapView) && (m_document->hasSelectedNodes() || m_document->hasSelectedBrushFaces());
 }
 
 void MapFrame::pasteAtCursorPosition() {
@@ -1348,13 +1277,17 @@ void MapFrame::deleteSelection() {
 bool MapFrame::canDeleteSelection() const {
     if (m_mapView->clipToolActive()) {
         return m_mapView->clipTool().canRemoveLastPoint();
-    } else if (m_mapView->vertexToolActive()) {
+    }
+    else if (m_mapView->vertexToolActive()) {
         return m_mapView->vertexTool().canRemoveSelection();
-    } else if (m_mapView->edgeToolActive()) {
+    }
+    else if (m_mapView->edgeToolActive()) {
         return m_mapView->edgeTool().canRemoveSelection();
-    } else if (m_mapView->faceToolActive()) {
+    }
+    else if (m_mapView->faceToolActive()) {
         return m_mapView->faceTool().canRemoveSelection();
-    } else {
+    }
+    else {
         return canCutSelection();
     }
 }
@@ -1392,9 +1325,7 @@ void MapFrame::selectTall() {
 void MapFrame::selectByLineNumber() {
     if (canSelect()) {
         const auto string = QInputDialog::getText(
-            this,
-            "Select by Line Numbers",
-            "Enter a comma- or space separated list of line numbers."
+            this, "Select by Line Numbers", "Enter a comma- or space separated list of line numbers."
         );
         if (string.isEmpty()) {
             return;
@@ -1438,8 +1369,7 @@ bool MapFrame::canSelectByBrush() const {
 }
 
 bool MapFrame::canSelectTall() const {
-    return canChangeSelection() && m_document->selectedNodes().hasOnlyBrushes()
-           && m_mapView->canSelectTall();
+    return canChangeSelection() && m_document->selectedNodes().hasOnlyBrushes() && m_mapView->canSelectTall();
 }
 
 bool MapFrame::canDeselect() const {
@@ -1624,23 +1554,23 @@ void MapFrame::csgConvexMerge() {
     if (canDoCsgConvexMerge()) {
         if (m_mapView->vertexToolActive() && m_mapView->vertexTool().canDoCsgConvexMerge()) {
             m_mapView->vertexTool().csgConvexMerge();
-        } else if (m_mapView->edgeToolActive() && m_mapView->edgeTool().canDoCsgConvexMerge()) {
+        }
+        else if (m_mapView->edgeToolActive() && m_mapView->edgeTool().canDoCsgConvexMerge()) {
             m_mapView->edgeTool().csgConvexMerge();
-        } else if (m_mapView->faceToolActive() && m_mapView->faceTool().canDoCsgConvexMerge()) {
+        }
+        else if (m_mapView->faceToolActive() && m_mapView->faceTool().canDoCsgConvexMerge()) {
             m_mapView->faceTool().csgConvexMerge();
-        } else {
+        }
+        else {
             m_document->csgConvexMerge();
         }
     }
 }
 
 bool MapFrame::canDoCsgConvexMerge() const {
-    return (m_document->hasSelectedBrushFaces()
-            && m_document->selectedBrushFaces().size() > 1)
-           || (m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() > 1)
-           || (m_mapView->vertexToolActive() && m_mapView->vertexTool().canDoCsgConvexMerge())
-           || (m_mapView->edgeToolActive() && m_mapView->edgeTool().canDoCsgConvexMerge())
-           || (m_mapView->faceToolActive() && m_mapView->faceTool().canDoCsgConvexMerge());
+    return (m_document->hasSelectedBrushFaces() && m_document->selectedBrushFaces().size() > 1) || (m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() > 1) ||
+           (m_mapView->vertexToolActive() && m_mapView->vertexTool().canDoCsgConvexMerge()) || (m_mapView->edgeToolActive() && m_mapView->edgeTool().canDoCsgConvexMerge()) ||
+           (m_mapView->faceToolActive() && m_mapView->faceTool().canDoCsgConvexMerge());
 }
 
 void MapFrame::csgSubtract() {
@@ -1650,8 +1580,7 @@ void MapFrame::csgSubtract() {
 }
 
 bool MapFrame::canDoCsgSubtract() const {
-    return m_document->selectedNodes().hasOnlyBrushes()
-           && m_document->selectedNodes().brushCount() >= 1;
+    return m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() >= 1;
 }
 
 void MapFrame::csgHollow() {
@@ -1661,8 +1590,7 @@ void MapFrame::csgHollow() {
 }
 
 bool MapFrame::canDoCsgHollow() const {
-    return m_document->selectedNodes().hasOnlyBrushes()
-           && m_document->selectedNodes().brushCount() >= 1;
+    return m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() >= 1;
 }
 
 void MapFrame::csgIntersect() {
@@ -1672,8 +1600,7 @@ void MapFrame::csgIntersect() {
 }
 
 bool MapFrame::canDoCsgIntersect() const {
-    return m_document->selectedNodes().hasOnlyBrushes()
-           && m_document->selectedNodes().brushCount() > 1;
+    return m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() > 1;
 }
 
 void MapFrame::snapVerticesToInteger() {
@@ -1771,12 +1698,7 @@ bool MapFrame::canFocusCamera() const {
 void MapFrame::moveCameraToPosition() {
     bool ok = false;
     const QString str = QInputDialog::getText(
-        this,
-        "Move Camera",
-        "Enter a position (x y z) for the camera.",
-        QLineEdit::Normal,
-        "0.0 0.0 0.0",
-        &ok
+        this, "Move Camera", "Enter a position (x y z) for the camera.", QLineEdit::Normal, "0.0 0.0 0.0", &ok
     );
     if (ok) {
         if (const auto position = vm::parse<float, 3>(str.toStdString())) {
@@ -1904,12 +1826,7 @@ void MapFrame::debugPrintVertices() {
 void MapFrame::debugCreateBrush() {
     bool ok = false;
     const QString str = QInputDialog::getText(
-        this,
-        "Create Brush",
-        "Enter a list of at least 4 points (x y z) (x y z) ...",
-        QLineEdit::Normal,
-        "",
-        &ok
+        this, "Create Brush", "Enter a list of at least 4 points (x y z) (x y z) ...", QLineEdit::Normal, "", &ok
     );
     if (ok) {
         std::vector<vm::vec3> positions;
@@ -1935,12 +1852,7 @@ void MapFrame::debugCreateCube() {
 void MapFrame::debugClipBrush() {
     bool ok = false;
     const QString str = QInputDialog::getText(
-        this,
-        "Clip Brush",
-        "Enter face points ( x y z ) ( x y z ) ( x y z )",
-        QLineEdit::Normal,
-        "",
-        &ok
+        this, "Clip Brush", "Enter face points ( x y z ) ( x y z ) ( x y z )", QLineEdit::Normal, "", &ok
     );
     if (ok) {
         std::vector<vm::vec3> points;
@@ -1972,17 +1884,16 @@ static void debugSegfault() {
 
 void MapFrame::debugCrash() {
     QStringList items;
-    items << "Null pointer dereference"
-          << "Unhandled exception";
+    items << "Null pointer dereference" << "Unhandled exception";
 
     bool ok;
-    const QString item =
-        QInputDialog::getItem(this, "Crash", "Choose a crash type", items, 0, false, &ok);
+    const QString item = QInputDialog::getItem(this, "Crash", "Choose a crash type", items, 0, false, &ok);
     if (ok) {
         const int idx = items.indexOf(item);
         if (idx == 0) {
             debugSegfault();
-        } else if (idx == 1) {
+        }
+        else if (idx == 1) {
             debugException();
         }
     }
@@ -2022,9 +1933,7 @@ MapViewBase *MapFrame::currentMapViewBase() {
     if (!m_currentMapView) {
         // This happens when the current map view is deleted (e.g. 4-pane to 1-pane layout)
         m_currentMapView = m_mapView->firstMapViewBase();
-        ensure(
-            m_currentMapView != nullptr,
-            "SwitchableMapViewContainer should have constructed a MapViewBase");
+        ensure(m_currentMapView != nullptr, "SwitchableMapViewContainer should have constructed a MapViewBase");
     }
     return m_currentMapView;
 }
@@ -2046,11 +1955,13 @@ void MapFrame::changeEvent(QEvent *) {
 void MapFrame::closeEvent(QCloseEvent *event) {
     if (!closeCompileDialog()) {
         event->ignore();
-    } else {
+    }
+    else {
         ensure(m_frameManager != nullptr, "frameManager is null");
         if (!confirmOrDiscardChanges()) {
             event->ignore();
-        } else {
+        }
+        else {
             saveWindowGeometry(this);
             saveWindowState(this);
             saveWindowState(m_hSplitter);
@@ -2072,18 +1983,17 @@ static void applyRecursively(QObject *object, const F &f) {
 }
 
 bool MapFrame::eventFilter(QObject *target, QEvent *event) {
-    if (
-        event->type() == QEvent::MouseButtonPress
-        || event->type() == QEvent::MouseButtonRelease
-        || event->type() == QEvent::MouseButtonDblClick || event->type() == QEvent::MouseMove
-        || event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+    if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::MouseButtonDblClick || event->type() == QEvent::MouseMove || event->type() == QEvent::KeyPress ||
+        event->type() == QEvent::KeyRelease) {
         m_lastInputTime = std::chrono::system_clock::now();
-    } else if (event->type() == QEvent::ChildAdded) {
+    }
+    else if (event->type() == QEvent::ChildAdded) {
         auto *childEvent = static_cast<QChildEvent *>(event);
         applyRecursively(
             childEvent->child(), [&](auto *object) { object->installEventFilter(this); }
         );
-    } else if (event->type() == QEvent::ChildRemoved) {
+    }
+    else if (event->type() == QEvent::ChildRemoved) {
         auto *childEvent = static_cast<QChildEvent *>(event);
         applyRecursively(
             childEvent->child(), [&](auto *object) { object->removeEventFilter(this); }
@@ -2094,41 +2004,28 @@ bool MapFrame::eventFilter(QObject *target, QEvent *event) {
 
 void MapFrame::triggerAutosave() {
     using namespace std::chrono_literals;
-    if (
-        QGuiApplication::mouseButtons() == Qt::NoButton
-        && std::chrono::system_clock::now() - m_lastInputTime > 2s) {
+    if (QGuiApplication::mouseButtons() == Qt::NoButton && std::chrono::system_clock::now() - m_lastInputTime > 2s) {
         m_autosaver->triggerAutosave(logger());
     }
 }
 
 // DebugPaletteWindow
 
-DebugPaletteWindow::DebugPaletteWindow(QWidget *parent)
-    : QDialog(parent) {
+DebugPaletteWindow::DebugPaletteWindow(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Palette"));
 
-    const auto roles = std::vector<std::pair<QPalette::ColorRole, QString>>
-        {
-            {QPalette::Window, "Window"}, {QPalette::WindowText, "WindowText"},
-            {QPalette::Base, "Base"}, {QPalette::AlternateBase, "AlternateBase"},
-            {QPalette::ToolTipBase, "ToolTipBase"}, {QPalette::ToolTipText, "ToolTipText"},
+    const auto roles = std::vector<std::pair<QPalette::ColorRole, QString>>{{QPalette::Window, "Window"}, {QPalette::WindowText, "WindowText"}, {QPalette::Base, "Base"}, {QPalette::AlternateBase, "AlternateBase"},
+                                                                            {QPalette::ToolTipBase, "ToolTipBase"}, {QPalette::ToolTipText, "ToolTipText"},
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-            {QPalette::PlaceholderText, "PlaceholderText"},
+                                                                            {QPalette::PlaceholderText, "PlaceholderText"},
 #endif
-            {QPalette::Text, "Text"}, {QPalette::Button, "Button"},
-            {QPalette::ButtonText, "ButtonText"}, {QPalette::BrightText, "BrightText"},
-            {QPalette::Light, "Light"}, {QPalette::Midlight, "Midlight"},
-            {QPalette::Dark, "Dark"}, {QPalette::Mid, "Mid"}, {QPalette::Shadow, "Shadow"},
-            {QPalette::Highlight, "Highlight"},
-            {
-                QPalette::HighlightedText, "HighlightedText"
-            }
-        };
+                                                                            {QPalette::Text, "Text"}, {QPalette::Button, "Button"}, {QPalette::ButtonText, "ButtonText"}, {QPalette::BrightText, "BrightText"}, {QPalette::Light, "Light"},
+                                                                            {QPalette::Midlight, "Midlight"}, {QPalette::Dark, "Dark"}, {QPalette::Mid, "Mid"}, {QPalette::Shadow, "Shadow"}, {QPalette::Highlight, "Highlight"},
+                                                                            {QPalette::HighlightedText, "HighlightedText"}};
 
-    const auto groups = std::vector<std::pair<QPalette::ColorGroup, QString>>{
-        {QPalette::Disabled, "Disabled"},
-        {QPalette::Active,   "Active"},
-        {QPalette::Inactive, "Inactive"}};
+    const auto groups = std::vector<std::pair<QPalette::ColorGroup, QString>>{{QPalette::Disabled, "Disabled"},
+                                                                              {QPalette::Active,   "Active"},
+                                                                              {QPalette::Inactive, "Inactive"}};
 
     QStringList verticalHeaderLabels;
     for (const auto &[role, roleLabel]: roles) {
@@ -2140,8 +2037,7 @@ DebugPaletteWindow::DebugPaletteWindow(QWidget *parent)
         horizontalHeaderLabels.append(groupLabel);
     }
 
-    auto *table =
-        new QTableWidget(static_cast<int>(roles.size()), static_cast<int>(groups.size()));
+    auto *table = new QTableWidget(static_cast<int>(roles.size()), static_cast<int>(groups.size()));
     table->setHorizontalHeaderLabels(horizontalHeaderLabels);
     table->setVerticalHeaderLabels(verticalHeaderLabels);
 
@@ -2155,11 +2051,12 @@ DebugPaletteWindow::DebugPaletteWindow(QWidget *parent)
 
             button->setColor(qApp->palette().color(group, role));
 
-            connect(button, &ColorButton::colorChangedByUser, this, [=](const QColor &color) {
-                      QPalette palette = qApp->palette();
-                      palette.setColor(group, role, color);
-                      qApp->setPalette(palette);
-                    }
+            connect(
+                button, &ColorButton::colorChangedByUser, this, [=](const QColor &color) {
+                  QPalette palette = qApp->palette();
+                  palette.setColor(group, role, color);
+                  qApp->setPalette(palette);
+                }
             );
         }
     }

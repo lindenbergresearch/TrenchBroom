@@ -46,7 +46,8 @@ private:
 
 public:
     CombineCompareHits(
-        std::unique_ptr<CompareHits> first, std::unique_ptr<CompareHits> second);
+        std::unique_ptr<CompareHits> first, std::unique_ptr<CompareHits> second
+    );
 
 private:
     int doCompare(const Hit &lhs, const Hit &rhs) const override;

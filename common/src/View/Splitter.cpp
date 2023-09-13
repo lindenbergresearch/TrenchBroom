@@ -25,8 +25,7 @@
 
 namespace TrenchBroom {
 namespace View {
-SplitterHandle::SplitterHandle(const Qt::Orientation orientation, QSplitter *parent)
-    : QSplitterHandle(orientation, parent) {
+SplitterHandle::SplitterHandle(const Qt::Orientation orientation, QSplitter *parent) : QSplitterHandle(orientation, parent) {
 }
 
 //QSize SplitterHandle::sizeHint() const {
@@ -39,15 +38,13 @@ SplitterHandle::SplitterHandle(const Qt::Orientation orientation, QSplitter *par
 //  //  painter.fillRect(event->rect(), QBrush(palette().color(QPalette::Mid)));
 //}
 
-Splitter::Splitter(const Qt::Orientation orientation, QWidget *parent)
-    : QSplitter(orientation, parent) {
+Splitter::Splitter(const Qt::Orientation orientation, QWidget *parent) : QSplitter(orientation, parent) {
 #ifdef __APPLE__
     connect(this, &QSplitter::splitterMoved, this, &Splitter::doSplitterMoved);
 #endif
 }
 
-Splitter::Splitter(QWidget *parent)
-    : QSplitter(parent) {
+Splitter::Splitter(QWidget *parent) : QSplitter(parent) {
 #ifdef __APPLE__
     connect(this, &QSplitter::splitterMoved, this, &Splitter::doSplitterMoved);
 #endif

@@ -56,9 +56,8 @@ public:
     ~EntityDefinitionManager();
 
     Result<void> loadDefinitions(
-        const std::filesystem::path &path,
-        const IO::EntityDefinitionLoader &loader,
-        IO::ParserStatus &status);
+        const std::filesystem::path &path, const IO::EntityDefinitionLoader &loader, IO::ParserStatus &status
+    );
 
     void setDefinitions(const std::vector<EntityDefinition *> &newDefinitions);
 
@@ -69,7 +68,8 @@ public:
     EntityDefinition *definition(const std::string &classname) const;
 
     std::vector<EntityDefinition *> definitions(
-        EntityDefinitionType type, EntityDefinitionSortOrder order) const;
+        EntityDefinitionType type, EntityDefinitionSortOrder order
+    ) const;
 
     const std::vector<EntityDefinition *> &definitions() const;
 

@@ -23,12 +23,10 @@
 
 namespace TrenchBroom {
 namespace IO {
-ImageLoader::ImageLoader(const Format format, const std::filesystem::path &path)
-    : m_impl(new ImageLoaderImpl(format, path)) {
+ImageLoader::ImageLoader(const Format format, const std::filesystem::path &path) : m_impl(new ImageLoaderImpl(format, path)) {
 }
 
-ImageLoader::ImageLoader(const Format format, const char *begin, const char *end)
-    : m_impl(new ImageLoaderImpl(format, begin, end)) {
+ImageLoader::ImageLoader(const Format format, const char *begin, const char *end) : m_impl(new ImageLoaderImpl(format, begin, end)) {
 }
 
 ImageLoader::~ImageLoader() = default;

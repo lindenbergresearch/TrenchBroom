@@ -68,7 +68,8 @@ void ToolController::setRenderOptions(const InputState &, Renderer::RenderContex
 }
 
 void ToolController::render(
-    const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) {
+    const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &
+) {
 }
 
 bool ToolController::cancel() {
@@ -94,7 +95,8 @@ void ToolControllerGroup::addController(std::unique_ptr<ToolController> controll
 }
 
 void ToolControllerGroup::pick(
-    const InputState &inputState, Model::PickResult &pickResult) {
+    const InputState &inputState, Model::PickResult &pickResult
+) {
     m_chain.pick(inputState, pickResult);
 }
 
@@ -127,7 +129,8 @@ void ToolControllerGroup::mouseScroll(const InputState &inputState) {
 }
 
 std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(
-    const InputState &inputState) {
+    const InputState &inputState
+) {
     if (!doShouldHandleMouseDrag(inputState)) {
         return nullptr;
     }
@@ -136,7 +139,8 @@ std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(
 }
 
 std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(
-    const InputState &inputState, const std::string &payload) {
+    const InputState &inputState, const std::string &payload
+) {
     if (!doShouldHandleDrop(inputState, payload)) {
         return nullptr;
     }
@@ -144,14 +148,14 @@ std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(
 }
 
 void ToolControllerGroup::setRenderOptions(
-    const InputState &inputState, Renderer::RenderContext &renderContext) const {
+    const InputState &inputState, Renderer::RenderContext &renderContext
+) const {
     m_chain.setRenderOptions(inputState, renderContext);
 }
 
 void ToolControllerGroup::render(
-    const InputState &inputState,
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch) {
+    const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     m_chain.render(inputState, renderContext, renderBatch);
 }
 

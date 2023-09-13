@@ -44,8 +44,7 @@ class FaceRenderer : public IndexedRenderable {
 private:
     struct RenderFunc;
 
-    using TextureToBrushIndicesMap =
-        const std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
+    using TextureToBrushIndicesMap = const std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
 
     std::shared_ptr<BrushVertexArray> m_vertexArray;
     std::shared_ptr<TextureToBrushIndicesMap> m_indexArrayMap;
@@ -59,9 +58,8 @@ public:
     FaceRenderer();
 
     FaceRenderer(
-        std::shared_ptr<BrushVertexArray> vertexArray,
-        std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
-        const Color &faceColor);
+        std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor
+    );
 
     FaceRenderer(const FaceRenderer &other);
 

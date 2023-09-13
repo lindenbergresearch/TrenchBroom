@@ -54,8 +54,8 @@
 namespace TrenchBroom {
 namespace View {
 EntityPropertyGrid::EntityPropertyGrid(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)} {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : QWidget{parent}, m_document{std::move(document)} {
     createGui(m_document);
     connectObservers();
 }
@@ -69,9 +69,7 @@ void EntityPropertyGrid::backupSelection() {
         const auto propertyKey = m_model->propertyKey(sourceIndex.row());
         m_selectionBackup.push_back({propertyKey, sourceIndex.column()});
 
-        GRID_LOG(
-            qDebug() << "Backup selection: " << QString::fromStdString(propertyKey) << ","
-                     << sourceIndex.column());
+        GRID_LOG(qDebug() << "Backup selection: " << QString::fromStdString(propertyKey) << "," << sourceIndex.column());
     }
 }
 
@@ -82,9 +80,7 @@ void EntityPropertyGrid::restoreSelection() {
     for (const auto &selection: m_selectionBackup) {
         const auto row = m_model->rowForPropertyKey(selection.propertyKey);
         if (row == -1) {
-            GRID_LOG(
-                qDebug() << "Restore selection: couldn't find "
-                         << QString::fromStdString(selection.propertyKey));
+            GRID_LOG(qDebug() << "Restore selection: couldn't find " << QString::fromStdString(selection.propertyKey));
             continue;
         }
         const auto sourceIndex = m_model->index(row, selection.column);
@@ -92,19 +88,14 @@ void EntityPropertyGrid::restoreSelection() {
         m_table->selectionModel()->select(proxyIndex, QItemSelectionModel::Select);
         m_table->selectionModel()->setCurrentIndex(proxyIndex, QItemSelectionModel::Current);
 
-        GRID_LOG(
-            qDebug() << "Restore selection: " << QString::fromStdString(selection.propertyKey)
-                     << "," << selection.column);
+        GRID_LOG(qDebug() << "Restore selection: " << QString::fromStdString(selection.propertyKey) << "," << selection.column);
     }
-    GRID_LOG(
-        qDebug() << "Restore selection: current is "
-                 << QString::fromStdString(selectedRowName()));
+    GRID_LOG(qDebug() << "Restore selection: current is " << QString::fromStdString(selectedRowName()));
 }
 
 void EntityPropertyGrid::addProperty(const bool defaultToProtected) {
     auto document = kdl::mem_lock(m_document);
-    const auto newPropertyKey =
-        PropertyRow::newPropertyKeyForEntityNodes(document->allSelectedEntityNodes());
+    const auto newPropertyKey = PropertyRow::newPropertyKeyForEntityNodes(document->allSelectedEntityNodes());
 
     if (!document->setProperty(newPropertyKey, "", defaultToProtected)) {
         // Setting a property can fail if a linked group update would be inconsistent
@@ -119,8 +110,7 @@ void EntityPropertyGrid::addProperty(const bool defaultToProtected) {
     ensure(row != -1, "row should have been inserted");
 
     // Select the newly inserted property key
-    const auto mappedIndex =
-        m_proxyModel->mapFromSource(m_model->index(row, EntityPropertyModel::ColumnKey));
+    const auto mappedIndex = m_proxyModel->mapFromSource(m_model->index(row, EntityPropertyModel::ColumnKey));
 
     m_table->clearSelection();
     m_table->setCurrentIndex(mappedIndex);
@@ -134,13 +124,13 @@ void EntityPropertyGrid::removeSelectedProperties() {
 
     const auto selectedRows = selectedRowsAndCursorRow();
     const auto propertyKeys = kdl::vec_transform(
-        selectedRows, [&](const auto row) { return m_model->propertyKey(row); });
+        selectedRows, [&](const auto row) { return m_model->propertyKey(row); }
+    );
 
     const auto numRows = propertyKeys.size();
     auto document = kdl::mem_lock(m_document);
 
-    auto transaction = Transaction{
-        document, kdl::str_plural(numRows, "Remove Property", "Remove Properties")};
+    auto transaction = Transaction{document, kdl::str_plural(numRows, "Remove Property", "Remove Properties")};
 
     for (const auto &propertyKey: propertyKeys) {
         if (!document->removeProperty(propertyKey)) {
@@ -154,9 +144,11 @@ void EntityPropertyGrid::removeSelectedProperties() {
 
 bool EntityPropertyGrid::canRemoveSelectedProperties() const {
     const auto rows = selectedRowsAndCursorRow();
-    return !rows.empty() && std::all_of(rows.begin(), rows.end(), [&](const auto row) {
-      return m_model->canRemove(row);
-    });
+    return !rows.empty() && std::all_of(
+        rows.begin(), rows.end(), [&](const auto row) {
+          return m_model->canRemove(row);
+        }
+    );
 }
 
 /**
@@ -186,8 +178,7 @@ std::vector<int> EntityPropertyGrid::selectedRowsAndCursorRow() const {
 
 class EntitySortFilterProxyModel : public QSortFilterProxyModel {
 public:
-    explicit EntitySortFilterProxyModel(QObject *parent = nullptr)
-        : QSortFilterProxyModel{parent} {
+    explicit EntitySortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel{parent} {
     }
 
 protected:
@@ -216,87 +207,85 @@ void EntityPropertyGrid::createGui(std::weak_ptr<MapDocument> document) {
     m_table->setModel(m_proxyModel);
 
     m_table->setItemDelegate(
-        new EntityPropertyItemDelegate{m_table, m_model, m_proxyModel, m_table});
+        new EntityPropertyItemDelegate{m_table, m_model, m_proxyModel, m_table}
+    );
 
     autoResizeRows(m_table);
 
     m_table->verticalHeader()->setVisible(false);
     m_table->horizontalHeader()->setSectionResizeMode(
-        EntityPropertyModel::ColumnProtected, QHeaderView::ResizeToContents);
+        EntityPropertyModel::ColumnProtected, QHeaderView::ResizeToContents
+    );
     m_table->horizontalHeader()->setSectionResizeMode(
-        EntityPropertyModel::ColumnKey, QHeaderView::ResizeToContents);
+        EntityPropertyModel::ColumnKey, QHeaderView::ResizeToContents
+    );
     m_table->horizontalHeader()->setSectionResizeMode(
-        EntityPropertyModel::ColumnValue, QHeaderView::Stretch);
+        EntityPropertyModel::ColumnValue, QHeaderView::Stretch
+    );
     m_table->horizontalHeader()->setSectionsClickable(false);
     m_table->setSelectionBehavior(QAbstractItemView::SelectItems);
 
     m_addPropertyButton = createBitmapButton(
-        "Add.svg",
-        tr("Add a new property (%1)").arg(EntityPropertyTable::insertRowShortcutString()),
-        this);
+        "Add.svg", tr("Add a new property (%1)").arg(EntityPropertyTable::insertRowShortcutString()), this
+    );
     connect(
         m_addPropertyButton, &QAbstractButton::clicked, this, [=](const bool /* checked */) {
           addProperty(false);
-        });
+        }
+    );
 
-    m_addProtectedPropertyButton =
-        createBitmapButton("AddProtected.svg", tr("Add a new protected property"), this);
+    m_addProtectedPropertyButton = createBitmapButton("AddProtected.svg", tr("Add a new protected property"), this);
     connect(
-        m_addProtectedPropertyButton,
-        &QAbstractButton::clicked,
-        this,
-        [=](const bool /* checked */) { addProperty(true); });
+        m_addProtectedPropertyButton, &QAbstractButton::clicked, this, [=](const bool /* checked */) { addProperty(true); }
+    );
 
     m_removePropertiesButton = createBitmapButton(
-        "Remove.svg",
-        tr("Remove the selected properties (%1)")
-            .arg(EntityPropertyTable::removeRowShortcutString()),
-        this);
+        "Remove.svg", tr("Remove the selected properties (%1)").arg(EntityPropertyTable::removeRowShortcutString()), this
+    );
     connect(
-        m_removePropertiesButton,
-        &QAbstractButton::clicked,
-        this,
-        [=](const bool /* checked */) { removeSelectedProperties(); });
+        m_removePropertiesButton, &QAbstractButton::clicked, this, [=](const bool /* checked */) { removeSelectedProperties(); }
+    );
 
     auto *setDefaultPropertiesMenu = new QMenu{this};
-    setDefaultPropertiesMenu->addAction(tr("Set existing default properties"), this, [=]() {
-      kdl::mem_lock(m_document)
-          ->setDefaultProperties(Model::SetDefaultPropertyMode::SetExisting);
-    });
-    setDefaultPropertiesMenu->addAction(tr("Set missing default properties"), this, [=]() {
-      kdl::mem_lock(m_document)
-          ->setDefaultProperties(Model::SetDefaultPropertyMode::SetMissing);
-    });
-    setDefaultPropertiesMenu->addAction(tr("Set all default properties"), this, [=]() {
-      kdl::mem_lock(m_document)
-          ->setDefaultProperties(Model::SetDefaultPropertyMode::SetMissing);
-    });
+    setDefaultPropertiesMenu->addAction(
+        tr("Set existing default properties"), this, [=]() {
+          kdl::mem_lock(m_document)->setDefaultProperties(Model::SetDefaultPropertyMode::SetExisting);
+        }
+    );
+    setDefaultPropertiesMenu->addAction(
+        tr("Set missing default properties"), this, [=]() {
+          kdl::mem_lock(m_document)->setDefaultProperties(Model::SetDefaultPropertyMode::SetMissing);
+        }
+    );
+    setDefaultPropertiesMenu->addAction(
+        tr("Set all default properties"), this, [=]() {
+          kdl::mem_lock(m_document)->setDefaultProperties(Model::SetDefaultPropertyMode::SetMissing);
+        }
+    );
 
-    m_setDefaultPropertiesButton =
-        createBitmapButton("SetDefaultProperties.svg", tr("Set default properties"), this);
+    m_setDefaultPropertiesButton = createBitmapButton("SetDefaultProperties.svg", tr("Set default properties"), this);
     m_setDefaultPropertiesButton->setPopupMode(QToolButton::InstantPopup);
     m_setDefaultPropertiesButton->setMenu(setDefaultPropertiesMenu);
 
     m_showDefaultPropertiesCheckBox = new QCheckBox{tr("Show default properties")};
     connect(
-        m_showDefaultPropertiesCheckBox,
-        &QCheckBox::stateChanged,
-        this,
-        [=](const int state) { m_model->setShowDefaultRows(state == Qt::Checked); });
+        m_showDefaultPropertiesCheckBox, &QCheckBox::stateChanged, this, [=](const int state) { m_model->setShowDefaultRows(state == Qt::Checked); }
+    );
     m_showDefaultPropertiesCheckBox->setChecked(m_model->showDefaultRows());
 
-    connect(m_table, &EntityPropertyTable::addRowShortcutTriggered, this, [=]() {
-      addProperty(false);
-    });
-    connect(m_table, &EntityPropertyTable::removeRowsShortcutTriggered, this, [=]() {
-      removeSelectedProperties();
-    });
+    connect(
+        m_table, &EntityPropertyTable::addRowShortcutTriggered, this, [=]() {
+          addProperty(false);
+        }
+    );
+    connect(
+        m_table, &EntityPropertyTable::removeRowsShortcutTriggered, this, [=]() {
+          removeSelectedProperties();
+        }
+    );
 
     connect(
-        m_table->selectionModel(),
-        &QItemSelectionModel::currentChanged,
-        this,
-        [=](const QModelIndex &current, const QModelIndex &previous) {
+        m_table->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &current, const QModelIndex &previous) {
           unused(current);
           unused(previous);
           // NOTE: when we get this signal, the selection hasn't been updated yet.
@@ -307,38 +296,40 @@ void EntityPropertyGrid::createGui(std::weak_ptr<MapDocument> document) {
           updateControlsEnabled();
           ensureSelectionVisible();
           emit currentRowChanged();
-        });
+        }
+    );
 
-    connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() {
-      if (!m_table->selectionModel()->selectedIndexes().empty()) {
-          backupSelection();
-      }
-      updateControlsEnabled();
-      emit currentRowChanged();
-    });
+    connect(
+        m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this, [=]() {
+          if (!m_table->selectionModel()->selectedIndexes().empty()) {
+              backupSelection();
+          }
+          updateControlsEnabled();
+          emit currentRowChanged();
+        }
+    );
 
     // e.g. handles setting a value of a default property so it becomes non-default
-    connect(m_proxyModel, &QAbstractItemModel::dataChanged, this, [=]() {
-      updateControlsEnabled();
-      emit currentRowChanged();
-    });
+    connect(
+        m_proxyModel, &QAbstractItemModel::dataChanged, this, [=]() {
+          updateControlsEnabled();
+          emit currentRowChanged();
+        }
+    );
 
     // e.g. handles deleting 2 rows
-    connect(m_proxyModel, &QAbstractItemModel::modelReset, this, [=]() {
-      updateControlsEnabled();
-      emit currentRowChanged();
-    });
+    connect(
+        m_proxyModel, &QAbstractItemModel::modelReset, this, [=]() {
+          updateControlsEnabled();
+          emit currentRowChanged();
+        }
+    );
 
     // Shortcuts
 
     auto *toolBar = createMiniToolBarLayout(
-        m_addPropertyButton,
-        m_addProtectedPropertyButton,
-        m_removePropertiesButton,
-        LayoutConstants::WideHMargin,
-        m_setDefaultPropertiesButton,
-        LayoutConstants::WideHMargin,
-        m_showDefaultPropertiesCheckBox);
+        m_addPropertyButton, m_addProtectedPropertyButton, m_removePropertiesButton, LayoutConstants::WideHMargin, m_setDefaultPropertiesButton, LayoutConstants::WideHMargin, m_showDefaultPropertiesCheckBox
+    );
 
     auto *layout = new QVBoxLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
@@ -352,21 +343,25 @@ void EntityPropertyGrid::createGui(std::weak_ptr<MapDocument> document) {
     // EntityPropertyTable::mousePressEvent() implements its own version.
     // See: https://github.com/TrenchBroom/TrenchBroom/issues/3582
     m_table->setEditTriggers(
-        QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
+        QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed
+    );
 }
 
 void EntityPropertyGrid::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &EntityPropertyGrid::documentWasNewed);
+        this, &EntityPropertyGrid::documentWasNewed
+    );
     m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &EntityPropertyGrid::documentWasLoaded);
-    m_notifierConnection +=
-        document->nodesDidChangeNotifier.connect(this, &EntityPropertyGrid::nodesDidChange);
+        this, &EntityPropertyGrid::documentWasLoaded
+    );
+    m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &EntityPropertyGrid::nodesDidChange);
     m_notifierConnection += document->selectionWillChangeNotifier.connect(
-        this, &EntityPropertyGrid::selectionWillChange);
+        this, &EntityPropertyGrid::selectionWillChange
+    );
     m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &EntityPropertyGrid::selectionDidChange);
+        this, &EntityPropertyGrid::selectionDidChange
+    );
 }
 
 void EntityPropertyGrid::documentWasNewed(MapDocument *) {
@@ -393,19 +388,22 @@ void EntityPropertyGrid::updateControls() {
     // rebuilt based on that intermediate state. Everything is fine except you lose the
     // selected row in the table, unless it's a key name that exists in worldspawn. To avoid
     // that problem, make a delayed call to update the table.
-    QTimer::singleShot(0, this, [&]() {
-      m_model->updateFromMapDocument();
+    QTimer::singleShot(
+        0, this, [&]() {
+          m_model->updateFromMapDocument();
 
-      if (m_table->selectionModel()->selectedIndexes().empty()) {
-          restoreSelection();
-      }
-      ensureSelectionVisible();
+          if (m_table->selectionModel()->selectedIndexes().empty()) {
+              restoreSelection();
+          }
+          ensureSelectionVisible();
 
-      const auto shouldShowProtectedProperties = m_model->shouldShowProtectedProperties();
-      m_table->setColumnHidden(
-          EntityPropertyModel::ColumnProtected, !shouldShowProtectedProperties);
-      m_addProtectedPropertyButton->setHidden(!shouldShowProtectedProperties);
-    });
+          const auto shouldShowProtectedProperties = m_model->shouldShowProtectedProperties();
+          m_table->setColumnHidden(
+              EntityPropertyModel::ColumnProtected, !shouldShowProtectedProperties
+          );
+          m_addProtectedPropertyButton->setHidden(!shouldShowProtectedProperties);
+        }
+    );
     updateControlsEnabled();
 }
 
@@ -416,8 +414,7 @@ void EntityPropertyGrid::ensureSelectionVisible() {
 void EntityPropertyGrid::updateControlsEnabled() {
     auto document = kdl::mem_lock(m_document);
     const auto nodes = document->allSelectedEntityNodes();
-    const auto canUpdateLinkedGroups =
-        document->canUpdateLinkedGroups(kdl::vec_element_cast<Model::Node *>(nodes));
+    const auto canUpdateLinkedGroups = document->canUpdateLinkedGroups(kdl::vec_element_cast<Model::Node *>(nodes));
     m_table->setEnabled(!nodes.empty() && canUpdateLinkedGroups);
     m_addPropertyButton->setEnabled(!nodes.empty() && canUpdateLinkedGroups);
     m_removePropertiesButton->setEnabled(

@@ -32,8 +32,7 @@ File::File() = default;
 
 File::~File() = default;
 
-OwningBufferFile::OwningBufferFile(std::unique_ptr<char[]> buffer, const size_t size)
-    : m_buffer{std::move(buffer)}, m_size{size} {
+OwningBufferFile::OwningBufferFile(std::unique_ptr<char[]> buffer, const size_t size) : m_buffer{std::move(buffer)}, m_size{size} {
 }
 
 Reader OwningBufferFile::reader() const {
@@ -46,7 +45,8 @@ size_t OwningBufferFile::size() const {
 
 namespace {
 Result<CFile::FilePtr> openPathAsFILE(
-    const std::filesystem::path &path, const std::string &mode) {
+    const std::filesystem::path &path, const std::string &mode
+) {
     // Windows: fopen() doesn't handle UTF-8. We have to use the nonstandard _wfopen
     // to open a Unicode path.
     //
@@ -90,8 +90,7 @@ Result<size_t> fileSize(std::FILE *file) {
 }
 } // namespace
 
-CFile::CFile(FilePtr filePtr, const size_t size)
-    : m_file{std::move(filePtr)}, m_size{size} {
+CFile::CFile(FilePtr filePtr, const size_t size) : m_file{std::move(filePtr)}, m_size{size} {
 }
 
 Reader CFile::reader() const {
@@ -107,16 +106,19 @@ std::FILE *CFile::file() const {
 }
 
 Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path) {
-    return openPathAsFILE(path, "rb").and_then([](auto filePtr) {
-      return fileSize(filePtr.get()).transform([&](auto size) {
-        // NOLINTNEXTLINE
-        return std::shared_ptr<CFile>{new CFile{std::move(filePtr), size}};
-      });
-    });
+    return openPathAsFILE(path, "rb").and_then(
+        [](auto filePtr) {
+          return fileSize(filePtr.get()).transform(
+              [&](auto size) {
+                // NOLINTNEXTLINE
+                return std::shared_ptr<CFile>{new CFile{std::move(filePtr), size}};
+              }
+          );
+        }
+    );
 }
 
-FileView::FileView(std::shared_ptr<File> file, const size_t offset, const size_t length)
-    : m_file{std::move(file)}, m_offset{offset}, m_length{length} {
+FileView::FileView(std::shared_ptr<File> file, const size_t offset, const size_t length) : m_file{std::move(file)}, m_offset{offset}, m_length{length} {
 }
 
 Reader FileView::reader() const {

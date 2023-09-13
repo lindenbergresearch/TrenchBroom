@@ -78,7 +78,8 @@ private:
 
 public:
     CompilationExportMapTaskRunner(
-        CompilationContext &context, Model::CompilationExportMap task);
+        CompilationContext &context, Model::CompilationExportMap task
+    );
 
     ~CompilationExportMapTaskRunner() override;
 
@@ -97,7 +98,8 @@ private:
 
 public:
     CompilationCopyFilesTaskRunner(
-        CompilationContext &context, Model::CompilationCopyFiles task);
+        CompilationContext &context, Model::CompilationCopyFiles task
+    );
 
     ~CompilationCopyFilesTaskRunner() override;
 
@@ -116,7 +118,8 @@ private:
 
 public:
     CompilationRenameFileTaskRunner(
-        CompilationContext &context, Model::CompilationRenameFile task);
+        CompilationContext &context, Model::CompilationRenameFile task
+    );
 
     ~CompilationRenameFileTaskRunner() override;
 
@@ -135,7 +138,8 @@ private:
 
 public:
     CompilationDeleteFilesTaskRunner(
-        CompilationContext &context, Model::CompilationDeleteFiles task);
+        CompilationContext &context, Model::CompilationDeleteFiles task
+    );
 
     ~CompilationDeleteFilesTaskRunner() override;
 
@@ -156,7 +160,8 @@ private:
 
 public:
     CompilationRunToolTaskRunner(
-        CompilationContext &context, Model::CompilationRunTool task);
+        CompilationContext &context, Model::CompilationRunTool task
+    );
 
     ~CompilationRunToolTaskRunner() override;
 
@@ -194,15 +199,15 @@ private:
 
 public:
     CompilationRunner(
-        CompilationContext context,
-        const Model::CompilationProfile &profile,
-        QObject *parent = nullptr);
+        CompilationContext context, const Model::CompilationProfile &profile, QObject *parent = nullptr
+    );
 
     ~CompilationRunner() override;
 
 private:
     static TaskRunnerList createTaskRunners(
-        CompilationContext &context, const Model::CompilationProfile &profile);
+        CompilationContext &context, const Model::CompilationProfile &profile
+    );
 
 public:
     void execute();

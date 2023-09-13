@@ -60,9 +60,8 @@ private:
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
     void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override;
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     bool cancel() override;
 
@@ -72,7 +71,8 @@ private:
     virtual bool doHandleInput(const InputState &inputState) const = 0;
 
     virtual Model::Hit doPick(
-        const vm::ray3 &pickRay, const Model::PickResult &pickResult) = 0;
+        const vm::ray3 &pickRay, const Model::PickResult &pickResult
+    ) = 0;
 };
 
 class ExtrudeToolController2D : public ExtrudeToolController {
@@ -81,7 +81,8 @@ public:
 
 private:
     Model::Hit doPick(
-        const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
+        const vm::ray3 &pickRay, const Model::PickResult &pickResult
+    ) override;
 
     bool doHandleInput(const InputState &inputState) const override;
 };
@@ -92,7 +93,8 @@ public:
 
 private:
     Model::Hit doPick(
-        const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
+        const vm::ray3 &pickRay, const Model::PickResult &pickResult
+    ) override;
 
     bool doHandleInput(const InputState &inputState) const override;
 };

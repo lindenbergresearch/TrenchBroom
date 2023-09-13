@@ -39,7 +39,8 @@ private:
 
 public:
     explicit GameEngineProfileItemRenderer(
-        Model::GameEngineProfile &profile, QWidget *parent = nullptr);
+        Model::GameEngineProfile &profile, QWidget *parent = nullptr
+    );
 
     void updateItem() override;
 
@@ -60,7 +61,8 @@ private:
 
 public:
     explicit GameEngineProfileListBox(
-        Model::GameEngineConfig &config, QWidget *parent = nullptr);
+        Model::GameEngineConfig &config, QWidget *parent = nullptr
+    );
 
     Model::GameEngineProfile *selectedProfile();
 

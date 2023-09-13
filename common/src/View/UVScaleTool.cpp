@@ -53,8 +53,7 @@ namespace View {
 const Model::HitType::Type UVScaleTool::XHandleHitType = Model::HitType::freeType();
 const Model::HitType::Type UVScaleTool::YHandleHitType = Model::HitType::freeType();
 
-UVScaleTool::UVScaleTool(std::weak_ptr<MapDocument> document, UVViewHelper &helper)
-    : ToolController{}, Tool{true}, m_document{std::move(document)}, m_helper{helper} {
+UVScaleTool::UVScaleTool(std::weak_ptr<MapDocument> document, UVViewHelper &helper) : ToolController{}, Tool{true}, m_document{std::move(document)}, m_helper{helper} {
 }
 
 Tool &UVScaleTool::tool() {
@@ -92,39 +91,35 @@ static vm::vec2f getHitPoint(const UVViewHelper &helper, const vm::ray3 &pickRay
     const auto facePointDist = vm::intersect_ray_plane(pickRay, boundary);
     const auto facePoint = vm::point_at_distance(pickRay, facePointDist);
 
-    const auto toTex =
-        helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
+    const auto toTex = helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
     return vm::vec2f{toTex * facePoint};
 }
 
 static vm::vec2f getScaledTranslatedHandlePos(
-    const UVViewHelper &helper, const vm::vec2i handle) {
+    const UVViewHelper &helper, const vm::vec2i handle
+) {
     return vm::vec2f{handle} * vm::vec2f{helper.stripeSize()};
 }
 
 static vm::vec2f getHandlePos(const UVViewHelper &helper, const vm::vec2i handle) {
     const auto toWorld = helper.face()->fromTexCoordSystemMatrix(
-        helper.face()->attributes().offset(), helper.face()->attributes().scale(), true);
-    const auto toTex =
-        helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
+        helper.face()->attributes().offset(), helper.face()->attributes().scale(), true
+    );
+    const auto toTex = helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
 
-    return vm::vec2f{
-        toTex * toWorld * vm::vec3{getScaledTranslatedHandlePos(helper, handle)}};
+    return vm::vec2f{toTex * toWorld * vm::vec3{getScaledTranslatedHandlePos(helper, handle)}};
 }
 
 static vm::vec2f snap(const UVViewHelper &helper, const vm::vec2f &position) {
-    const auto toTex =
-        helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
+    const auto toTex = helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
 
     const auto vertices = helper.face()->vertices();
     auto distance = std::accumulate(
-        std::begin(vertices),
-        std::end(vertices),
-        vm::vec2f::max(),
-        [&](const vm::vec2f &current, const Model::BrushVertex *vertex) {
+        std::begin(vertices), std::end(vertices), vm::vec2f::max(), [&](const vm::vec2f &current, const Model::BrushVertex *vertex) {
           const auto vertex2 = vm::vec2f{toTex * vertex->position()};
           return vm::abs_min(current, position - vertex2);
-        });
+        }
+    );
 
     for (size_t i = 0; i < 2; ++i) {
         if (vm::abs(distance[i]) > 4.0f / helper.cameraZoom()) {
@@ -138,7 +133,8 @@ static vm::vec2f snap(const UVViewHelper &helper, const vm::vec2f &position) {
 using EdgeVertex = Renderer::GLVertexTypes::P3::Vertex;
 
 static std::vector<EdgeVertex> getHandleVertices(
-    const UVViewHelper &helper, const vm::vec2i &handle, const vm::vec2b &selector) {
+    const UVViewHelper &helper, const vm::vec2i &handle, const vm::vec2b &selector
+) {
     const auto stripeSize = helper.stripeSize();
     const auto pos = stripeSize * vm::vec2{handle};
 
@@ -162,15 +158,11 @@ static std::vector<EdgeVertex> getHandleVertices(
 }
 
 static void renderHighlight(
-    const UVViewHelper &helper,
-    const vm::vec2i &handle,
-    const vm::vec2b &selector,
-    Renderer::RenderBatch &renderBatch) {
+    const UVViewHelper &helper, const vm::vec2i &handle, const vm::vec2b &selector, Renderer::RenderBatch &renderBatch
+) {
     static const auto color = Color{1.0f, 0.0f, 0.0f, 1.0f};
 
-    auto handleRenderer = Renderer::DirectEdgeRenderer{
-        Renderer::VertexArray::move(getHandleVertices(helper, handle, selector)),
-        Renderer::PrimType::Lines};
+    auto handleRenderer = Renderer::DirectEdgeRenderer{Renderer::VertexArray::move(getHandleVertices(helper, handle, selector)), Renderer::PrimType::Lines};
     handleRenderer.render(renderBatch, color, 0.5f);
 }
 
@@ -184,13 +176,8 @@ private:
     vm::vec2f m_lastHitPoint; // in non-scaled, non-translated texture coordinates
 public:
     UVScaleDragTracker(
-        MapDocument &document,
-        const UVViewHelper &helper,
-        const vm::vec2i &handle,
-        const vm::vec2b &selector,
-        const vm::vec2f &initialHitPoint)
-        : m_document{document}, m_helper{helper}, m_handle{handle}, m_selector{selector},
-          m_lastHitPoint{initialHitPoint} {
+        MapDocument &document, const UVViewHelper &helper, const vm::vec2i &handle, const vm::vec2b &selector, const vm::vec2f &initialHitPoint
+    ) : m_document{document}, m_helper{helper}, m_handle{handle}, m_selector{selector}, m_lastHitPoint{initialHitPoint} {
         document.startTransaction("Scale Texture", TransactionScope::LongRunning);
     }
 
@@ -199,8 +186,7 @@ public:
         const auto dragDeltaFaceCoords = curPoint - m_lastHitPoint;
 
         const auto curHandlePosTexCoords = getScaledTranslatedHandlePos(m_helper, m_handle);
-        const auto newHandlePosFaceCoords =
-            getHandlePos(m_helper, m_handle) + dragDeltaFaceCoords;
+        const auto newHandlePosFaceCoords = getHandlePos(m_helper, m_handle) + dragDeltaFaceCoords;
         const auto newHandlePosSnapped = snap(m_helper, newHandlePosFaceCoords);
 
         const auto originHandlePosFaceCoords = m_helper.originInFaceCoords();
@@ -231,9 +217,7 @@ public:
         request.addOffset(originDelta);
         m_document.setFaceAttributes(request);
 
-        m_lastHitPoint =
-            m_lastHitPoint
-            + (dragDeltaFaceCoords - newHandlePosFaceCoords + newHandlePosSnapped);
+        m_lastHitPoint = m_lastHitPoint + (dragDeltaFaceCoords - newHandlePosFaceCoords + newHandlePosSnapped);
         return true;
     }
 
@@ -242,9 +226,8 @@ public:
     void cancel() override { m_document.cancelTransaction(); }
 
     void render(
-        const InputState &,
-        Renderer::RenderContext &,
-        Renderer::RenderBatch &renderBatch) const override {
+        const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &renderBatch
+    ) const override {
         renderHighlight(m_helper, m_handle, m_selector, renderBatch);
     }
 };
@@ -255,9 +238,7 @@ std::unique_ptr<DragTracker> UVScaleTool::acceptMouseDrag(const InputState &inpu
 
     assert(m_helper.valid());
 
-    if (
-        !inputState.modifierKeysPressed(ModifierKeys::MKNone)
-        || !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
+    if (!inputState.modifierKeysPressed(ModifierKeys::MKNone) || !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
         return nullptr;
     }
 
@@ -273,26 +254,23 @@ std::unique_ptr<DragTracker> UVScaleTool::acceptMouseDrag(const InputState &inpu
     const auto initialHitPoint = getHitPoint(m_helper, inputState.pickRay());
 
     return std::make_unique<UVScaleDragTracker>(
-        *kdl::mem_lock(m_document), m_helper, handle, selector, initialHitPoint);
+        *kdl::mem_lock(m_document), m_helper, handle, selector, initialHitPoint
+    );
 }
 
 void UVScaleTool::render(
-    const InputState &inputState,
-    Renderer::RenderContext &,
-    Renderer::RenderBatch &renderBatch) {
+    const InputState &inputState, Renderer::RenderContext &, Renderer::RenderBatch &renderBatch
+) {
     using namespace Model::HitFilters;
 
-    if (
-        inputState.anyToolDragging() || !m_helper.valid()
-        || !m_helper.face()->attributes().valid()) {
+    if (inputState.anyToolDragging() || !m_helper.valid() || !m_helper.face()->attributes().valid()) {
         return;
     }
 
     const auto &pickResult = inputState.pickResult();
 
     // don't overdraw the origin handles
-    const auto &handleHit =
-        pickResult.first(type(UVOriginTool::XHandleHitType | UVOriginTool::YHandleHitType));
+    const auto &handleHit = pickResult.first(type(UVOriginTool::XHandleHitType | UVOriginTool::YHandleHitType));
     if (handleHit.isMatch()) {
         return;
     }

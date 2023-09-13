@@ -50,15 +50,7 @@ public:
 
 class Value {
 private:
-    using VariantType = std::variant<
-        BooleanType,
-        StringType,
-        NumberType,
-        ArrayType,
-        MapType,
-        RangeType,
-        NullType,
-        UndefinedType>;
+    using VariantType = std::variant<BooleanType, StringType, NumberType, ArrayType, MapType, RangeType, NullType, UndefinedType>;
     std::shared_ptr<VariantType> m_value;
     std::optional<Expression> m_expression;
 
@@ -91,7 +83,8 @@ public:
     explicit Value(NullType value, std::optional<Expression> expression = std::nullopt);
 
     explicit Value(
-        UndefinedType value, std::optional<Expression> expression = std::nullopt);
+        UndefinedType value, std::optional<Expression> expression = std::nullopt
+    );
 
     Value(Value value, std::optional<Expression> expression);
 
@@ -143,7 +136,8 @@ public:
     std::string asString(bool multiline = false) const;
 
     void appendToStream(
-        std::ostream &str, bool multiline = true, const std::string &indent = "") const;
+        std::ostream &str, bool multiline = true, const std::string &indent = ""
+    ) const;
 
     bool contains(const Value &indexValue) const;
 

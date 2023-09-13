@@ -59,7 +59,8 @@ private:
 
 public:
     static std::unique_ptr<NodeSerializer> create(
-        Model::MapFormat format, std::ostream &stream);
+        Model::MapFormat format, std::ostream &stream
+    );
 
 protected:
     explicit MapFileSerializer(std::ostream &stream);
@@ -88,7 +89,8 @@ private:
 
 private: // threadsafe
     virtual void doWriteBrushFace(
-        std::ostream &stream, const Model::BrushFace &face) const = 0;
+        std::ostream &stream, const Model::BrushFace &face
+    ) const = 0;
 
     PrecomputedString writeBrushFaces(const Model::Brush &brush) const;
 

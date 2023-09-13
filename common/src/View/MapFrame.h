@@ -246,9 +246,8 @@ public:
     Result<bool> newDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat);
 
     Result<bool> openDocument(
-        std::shared_ptr<Model::Game> game,
-        Model::MapFormat mapFormat,
-        const std::filesystem::path &path);
+        std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat, const std::filesystem::path &path
+    );
 
     bool saveDocument();
 

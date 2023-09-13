@@ -64,8 +64,7 @@ public:
     using EdgeList = BrushEdgeList;
 
 private:
-    mutable std::unique_ptr<Renderer::BrushRendererBrushCache>
-        m_brushRendererBrushCache; // unique_ptr for breaking header dependencies
+    mutable std::unique_ptr<Renderer::BrushRendererBrushCache> m_brushRendererBrushCache; // unique_ptr for breaking header dependencies
     Brush m_brush;               // must be destroyed before the brush renderer cache
     size_t m_selectedFaceCount = 0u;
 
@@ -131,9 +130,8 @@ private: // implement Node interface
 
 private: // implement Object interface
     void doPick(
-        const EditorContext &editorContext,
-        const vm::ray3 &ray,
-        PickResult &pickResult) override;
+        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+    ) override;
 
     void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 

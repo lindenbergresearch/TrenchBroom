@@ -48,7 +48,8 @@ class File;
 class FileSystem;
 
 std::string getTextureNameFromPathSuffix(
-    const std::filesystem::path &path, size_t prefixLength);
+    const std::filesystem::path &path, size_t prefixLength
+);
 
 bool checkTextureDimensions(size_t width, size_t height);
 
@@ -66,10 +67,10 @@ inline auto makeReadTextureErrorHandler(const FileSystem &fs, Logger &logger) {
         [&](Error e) {
           logger.error() << "Could not open texture file: " << e.msg;
           return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
-        },
-        [&](ReadTextureError e) {
+        }, [&](ReadTextureError e) {
           logger.error() << "Could not read texture '" << e.textureName << "': " << e.msg;
           return Result<Assets::Texture>{loadDefaultTexture(fs, e.textureName, logger)};
-        });
+        }
+    );
 }
 } // namespace TrenchBroom::IO

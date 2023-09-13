@@ -43,16 +43,13 @@ enum class ValueType {
    * No entities have this key set; the provided value is the default from the entity
    * definition
    */
-  Unset,
-  /**
+  Unset, /**
    * All entities have the same value set for this key
    */
-  SingleValue,
-  /**
+  SingleValue, /**
    * 1+ entities have this key unset, the rest have the same value set
    */
-  SingleValueAndUnset,
-  /**
+  SingleValueAndUnset, /**
    * Two or more entities have different values for this key
    */
   MultipleValues
@@ -61,10 +58,7 @@ enum class ValueType {
 std::ostream &operator<<(std::ostream &lhs, const ValueType &rhs);
 
 enum class PropertyProtection {
-  NotProtectable,
-  Protected,
-  NotProtected,
-  Mixed
+  NotProtectable, Protected, NotProtected, Mixed
 };
 
 std::ostream &operator<<(std::ostream &lhs, const PropertyProtection &rhs);
@@ -109,33 +103,25 @@ public:
     bool subset() const;
 
     static PropertyRow rowForEntityNodes(
-        const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes);
+        const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes
+    );
 
     static std::vector<std::string> allKeys(
-        const std::vector<Model::EntityNodeBase *> &nodes,
-        bool showDefaultRows,
-        bool showPreservedProperties);
+        const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties
+    );
 
     static std::map<std::string, PropertyRow> rowsForEntityNodes(
-        const std::vector<Model::EntityNodeBase *> &nodes,
-        bool showDefaultRows,
-        bool showPreservedProperties);
+        const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties
+    );
 
     /**
      * Suggests a new, unused property name of the form "property X".
      */
     static std::string newPropertyKeyForEntityNodes(
-        const std::vector<Model::EntityNodeBase *> &nodes);
+        const std::vector<Model::EntityNodeBase *> &nodes
+    );
 
-    kdl_reflect_decl(
-        PropertyRow,
-        m_key,
-        m_value,
-        m_valueType,
-        m_keyMutable,
-        m_valueMutable,
-        m_protected,
-        m_tooltip);
+    kdl_reflect_decl(PropertyRow, m_key, m_value, m_valueType, m_keyMutable, m_valueMutable, m_protected, m_tooltip);
 };
 
 /**
@@ -194,7 +180,8 @@ private: // autocompletion helpers
     std::vector<std::string> getAllPropertyKeys() const;
 
     std::vector<std::string> getAllValuesForPropertyKeys(
-        const std::vector<std::string> &propertyKeys) const;
+        const std::vector<std::string> &propertyKeys
+    ) const;
 
     std::vector<std::string> getAllClassnames() const;
 
@@ -219,14 +206,12 @@ private: // helpers
     bool hasRowWithPropertyKey(const std::string &propertyKey) const;
 
     bool renameProperty(
-        size_t rowIndex,
-        const std::string &newKey,
-        const std::vector<Model::EntityNodeBase *> &nodes);
+        size_t rowIndex, const std::string &newKey, const std::vector<Model::EntityNodeBase *> &nodes
+    );
 
     bool updateProperty(
-        size_t rowIndex,
-        const std::string &newValue,
-        const std::vector<Model::EntityNodeBase *> &nodes);
+        size_t rowIndex, const std::string &newValue, const std::vector<Model::EntityNodeBase *> &nodes
+    );
 
     bool setProtectedProperty(size_t rowIndex, bool newValue);
 

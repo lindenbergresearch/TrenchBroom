@@ -29,12 +29,8 @@
 namespace TrenchBroom {
 namespace View {
 TitleBar::TitleBar(
-    const QString &title,
-    QWidget *parent,
-    const int hMargin,
-    const int vMargin,
-    const bool boldTitle)
-    : QWidget(parent), m_titleText(nullptr) {
+    const QString &title, QWidget *parent, const int hMargin, const int vMargin, const bool boldTitle
+) : QWidget(parent), m_titleText(nullptr) {
     m_titleText = new QLabel(title);
 
     // Tell ControlListBox to not update the title label's color when the selection changes,
@@ -53,8 +49,8 @@ TitleBar::TitleBar(
 }
 
 TitleBar::TitleBar(
-    const QString &title, const int hMargin, const int vMargin, const bool boldTitle)
-    : TitleBar(title, nullptr, hMargin, vMargin, boldTitle) {
+    const QString &title, const int hMargin, const int vMargin, const bool boldTitle
+) : TitleBar(title, nullptr, hMargin, vMargin, boldTitle) {
 }
 } // namespace View
 } // namespace TrenchBroom

@@ -29,11 +29,9 @@
 namespace TrenchBroom::IO {
 
 std::string getTextureNameFromPathSuffix(
-    const std::filesystem::path &path, size_t prefixLength) {
-    return prefixLength < kdl::path_length(path)
-           ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength))
-               .generic_string()
-           : "";
+    const std::filesystem::path &path, size_t prefixLength
+) {
+    return prefixLength < kdl::path_length(path) ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength)).generic_string() : "";
 }
 
 bool checkTextureDimensions(size_t width, size_t height) {

@@ -50,8 +50,7 @@ namespace TrenchBroom {
 namespace IO {
 class QuakeFileSerializer : public MapFileSerializer {
 public:
-    explicit QuakeFileSerializer(std::ostream &stream)
-        : MapFileSerializer(stream) {
+    explicit QuakeFileSerializer(std::ostream &stream) : MapFileSerializer(stream) {
     }
 
 private:
@@ -66,22 +65,11 @@ protected:
         const Model::BrushFace::Points &points = face.points();
 
         fmt::format_to(
-            std::ostreambuf_iterator<char>(stream),
-            "( {} {} {} ) ( {} {} {} ) ( {} {} {} )",
-            points[0].x(),
-            points[0].y(),
-            points[0].z(),
-            points[1].x(),
-            points[1].y(),
-            points[1].z(),
-            points[2].x(),
-            points[2].y(),
-            points[2].z());
+            std::ostreambuf_iterator<char>(stream), "( {} {} {} ) ( {} {} {} ) ( {} {} {} )", points[0].x(), points[0].y(), points[0].z(), points[1].x(), points[1].y(), points[1].z(), points[2].x(), points[2].y(), points[2].z());
     }
 
     static bool shouldQuoteTextureName(const std::string &textureName) {
-        return textureName.empty()
-               || textureName.find_first_of("\"\\ \t") != std::string::npos;
+        return textureName.empty() || textureName.find_first_of("\"\\ \t") != std::string::npos;
     }
 
     static std::string quoteTextureName(const std::string &textureName) {
@@ -89,53 +77,32 @@ protected:
     }
 
     void writeTextureInfo(std::ostream &stream, const Model::BrushFace &face) const {
-        const std::string &textureName = face.attributes().textureName().empty()
-                                         ? Model::BrushFaceAttributes::NoTextureName
-                                         : face.attributes().textureName();
+        const std::string &textureName = face.attributes().textureName().empty() ? Model::BrushFaceAttributes::NoTextureName : face.attributes().textureName();
 
         fmt::format_to(
-            std::ostreambuf_iterator<char>(stream),
-            " {} {} {} {} {} {}",
-            shouldQuoteTextureName(textureName) ? quoteTextureName(textureName) : textureName,
-            face.attributes().xOffset(),
-            face.attributes().yOffset(),
-            face.attributes().rotation(),
-            face.attributes().xScale(),
-            face.attributes().yScale());
+            std::ostreambuf_iterator<char>(stream), " {} {} {} {} {} {}", shouldQuoteTextureName(textureName) ? quoteTextureName(textureName) : textureName, face.attributes().xOffset(), face.attributes().yOffset(),
+            face.attributes().rotation(), face.attributes().xScale(), face.attributes().yScale());
     }
 
     void writeValveTextureInfo(std::ostream &stream, const Model::BrushFace &face) const {
-        const std::string &textureName = face.attributes().textureName().empty()
-                                         ? Model::BrushFaceAttributes::NoTextureName
-                                         : face.attributes().textureName();
+        const std::string &textureName = face.attributes().textureName().empty() ? Model::BrushFaceAttributes::NoTextureName : face.attributes().textureName();
         const vm::vec3 xAxis = face.textureXAxis();
         const vm::vec3 yAxis = face.textureYAxis();
 
         fmt::format_to(
-            std::ostreambuf_iterator<char>(stream),
-            " {} [ {} {} {} {} ] [ {} {} {} {} ] {} {} {}",
-            shouldQuoteTextureName(textureName) ? quoteTextureName(textureName) : textureName,
+            std::ostreambuf_iterator<char>(stream), " {} [ {} {} {} {} ] [ {} {} {} {} ] {} {} {}", shouldQuoteTextureName(textureName) ? quoteTextureName(textureName) : textureName,
 
-            xAxis.x(),
-            xAxis.y(),
-            xAxis.z(),
-            face.attributes().xOffset(),
+            xAxis.x(), xAxis.y(), xAxis.z(), face.attributes().xOffset(),
 
-            yAxis.x(),
-            yAxis.y(),
-            yAxis.z(),
-            face.attributes().yOffset(),
+            yAxis.x(), yAxis.y(), yAxis.z(), face.attributes().yOffset(),
 
-            face.attributes().rotation(),
-            face.attributes().xScale(),
-            face.attributes().yScale());
+            face.attributes().rotation(), face.attributes().xScale(), face.attributes().yScale());
     }
 };
 
 class Quake2FileSerializer : public QuakeFileSerializer {
 public:
-    explicit Quake2FileSerializer(std::ostream &stream)
-        : QuakeFileSerializer(stream) {
+    explicit Quake2FileSerializer(std::ostream &stream) : QuakeFileSerializer(stream) {
     }
 
 private:
@@ -153,18 +120,13 @@ private:
 protected:
     void writeSurfaceAttributes(std::ostream &stream, const Model::BrushFace &face) const {
         fmt::format_to(
-            std::ostreambuf_iterator<char>(stream),
-            " {} {} {}",
-            face.resolvedSurfaceContents(),
-            face.resolvedSurfaceFlags(),
-            face.resolvedSurfaceValue());
+            std::ostreambuf_iterator<char>(stream), " {} {} {}", face.resolvedSurfaceContents(), face.resolvedSurfaceFlags(), face.resolvedSurfaceValue());
     }
 };
 
 class Quake2ValveFileSerializer : public Quake2FileSerializer {
 public:
-    explicit Quake2ValveFileSerializer(std::ostream &stream)
-        : Quake2FileSerializer(stream) {
+    explicit Quake2ValveFileSerializer(std::ostream &stream) : Quake2FileSerializer(stream) {
     }
 
 private:
@@ -185,8 +147,7 @@ private:
     std::string SurfaceColorFormat;
 
 public:
-    explicit DaikatanaFileSerializer(std::ostream &stream)
-        : Quake2FileSerializer(stream), SurfaceColorFormat(" %d %d %d") {
+    explicit DaikatanaFileSerializer(std::ostream &stream) : Quake2FileSerializer(stream), SurfaceColorFormat(" %d %d %d") {
     }
 
 private:
@@ -207,18 +168,13 @@ private:
 protected:
     void writeSurfaceColor(std::ostream &stream, const Model::BrushFace &face) const {
         fmt::format_to(
-            std::ostreambuf_iterator<char>(stream),
-            " {} {} {}",
-            static_cast<int>(face.resolvedColor().r()),
-            static_cast<int>(face.resolvedColor().g()),
-            static_cast<int>(face.resolvedColor().b()));
+            std::ostreambuf_iterator<char>(stream), " {} {} {}", static_cast<int>(face.resolvedColor().r()), static_cast<int>(face.resolvedColor().g()), static_cast<int>(face.resolvedColor().b()));
     }
 };
 
 class Hexen2FileSerializer : public QuakeFileSerializer {
 public:
-    explicit Hexen2FileSerializer(std::ostream &stream)
-        : QuakeFileSerializer(stream) {
+    explicit Hexen2FileSerializer(std::ostream &stream) : QuakeFileSerializer(stream) {
     }
 
 private:
@@ -226,14 +182,14 @@ private:
         writeFacePoints(stream, face);
         writeTextureInfo(stream, face);
         fmt::format_to(
-            std::ostreambuf_iterator<char>(stream), " 0\n"); // extra value written here
+            std::ostreambuf_iterator<char>(stream), " 0\n"
+        ); // extra value written here
     }
 };
 
 class ValveFileSerializer : public QuakeFileSerializer {
 public:
-    explicit ValveFileSerializer(std::ostream &stream)
-        : QuakeFileSerializer(stream) {
+    explicit ValveFileSerializer(std::ostream &stream) : QuakeFileSerializer(stream) {
     }
 
 private:
@@ -245,7 +201,8 @@ private:
 };
 
 std::unique_ptr<NodeSerializer> MapFileSerializer::create(
-    const Model::MapFormat format, std::ostream &stream) {
+    const Model::MapFormat format, std::ostream &stream
+) {
     switch (format) {
         case Model::MapFormat::Standard:
             return std::make_unique<QuakeFileSerializer>(stream);
@@ -269,50 +226,44 @@ std::unique_ptr<NodeSerializer> MapFileSerializer::create(
     }
 }
 
-MapFileSerializer::MapFileSerializer(std::ostream &stream)
-    : m_line(1), m_stream(stream) {
+MapFileSerializer::MapFileSerializer(std::ostream &stream) : m_line(1), m_stream(stream) {
 }
 
 void MapFileSerializer::doBeginFile(const std::vector<const Model::Node *> &rootNodes) {
     ensure(m_nodeToPrecomputedString.empty(), "MapFileSerializer may not be reused");
 
     // collect nodes
-    std::vector<std::variant<const Model::BrushNode *, const Model::PatchNode *>>
-        nodesToSerialize;
+    std::vector<std::variant<const Model::BrushNode *, const Model::PatchNode *>> nodesToSerialize;
     nodesToSerialize.reserve(rootNodes.size());
 
     Model::Node::visitAll(
-        rootNodes,
-        kdl::overload(
+        rootNodes, kdl::overload(
             [](auto &&thisLambda, const Model::WorldNode *world) {
               world->visitChildren(thisLambda);
-            },
-            [](auto &&thisLambda, const Model::LayerNode *layer) {
+            }, [](auto &&thisLambda, const Model::LayerNode *layer) {
               layer->visitChildren(thisLambda);
-            },
-            [](auto &&thisLambda, const Model::GroupNode *group) {
+            }, [](auto &&thisLambda, const Model::GroupNode *group) {
               group->visitChildren(thisLambda);
-            },
-            [](auto &&thisLambda, const Model::EntityNode *entity) {
+            }, [](auto &&thisLambda, const Model::EntityNode *entity) {
               entity->visitChildren(thisLambda);
-            },
-            [&](const Model::BrushNode *brush) { nodesToSerialize.push_back(brush); },
-            [&](const Model::PatchNode *patchNode) { nodesToSerialize.push_back(patchNode); }));
+            }, [&](const Model::BrushNode *brush) { nodesToSerialize.push_back(brush); }, [&](const Model::PatchNode *patchNode) { nodesToSerialize.push_back(patchNode); }
+        ));
 
     // serialize brushes to strings in parallel
     using Entry = std::pair<const Model::Node *, PrecomputedString>;
-    std::vector<Entry> result =
-        kdl::vec_parallel_transform(std::move(nodesToSerialize), [&](const auto &node) {
+    std::vector<Entry> result = kdl::vec_parallel_transform(
+        std::move(nodesToSerialize), [&](const auto &node) {
           return std::visit(
               kdl::overload(
                   [&](const Model::BrushNode *brushNode) {
                     return Entry{brushNode, writeBrushFaces(brushNode->brush())};
-                  },
-                  [&](const Model::PatchNode *patchNode) {
+                  }, [&](const Model::PatchNode *patchNode) {
                     return Entry{patchNode, writePatch(patchNode->patch())};
-                  }),
-              node);
-        });
+                  }
+              ), node
+          );
+        }
+    );
 
     // move strings into a map
     for (auto &entry: result) {
@@ -338,10 +289,7 @@ void MapFileSerializer::doEndEntity(const Model::Node *node) {
 
 void MapFileSerializer::doEntityProperty(const Model::EntityProperty &attribute) {
     fmt::format_to(
-        std::ostreambuf_iterator<char>(m_stream),
-        "\"{}\" \"{}\"\n",
-        escapeEntityProperties(attribute.key()),
-        escapeEntityProperties(attribute.value()));
+        std::ostreambuf_iterator<char>(m_stream), "\"{}\" \"{}\"\n", escapeEntityProperties(attribute.key()), escapeEntityProperties(attribute.value()));
     ++m_line;
 }
 
@@ -354,9 +302,7 @@ void MapFileSerializer::doBrush(const Model::BrushNode *brush) {
 
     // write pre-serialized brush faces
     auto it = m_nodeToPrecomputedString.find(brush);
-    ensure(
-        it != std::end(m_nodeToPrecomputedString),
-        "attempted to serialize a brush which was not passed to doBeginFile");
+    ensure(it != std::end(m_nodeToPrecomputedString), "attempted to serialize a brush which was not passed to doBeginFile");
     const PrecomputedString &precomputedString = it->second;
     m_stream << precomputedString.string;
     m_line += precomputedString.lineCount;
@@ -380,9 +326,7 @@ void MapFileSerializer::doPatch(const Model::PatchNode *patchNode) {
 
     // write pre-serialized patch
     auto it = m_nodeToPrecomputedString.find(patchNode);
-    ensure(
-        it != std::end(m_nodeToPrecomputedString),
-        "attempted to serialize a patch which was not passed to doBeginFile");
+    ensure(it != std::end(m_nodeToPrecomputedString), "attempted to serialize a patch which was not passed to doBeginFile");
     const PrecomputedString &precomputedString = it->second;
     m_stream << precomputedString.string;
     m_line += precomputedString.lineCount;
@@ -406,7 +350,8 @@ size_t MapFileSerializer::startLine() {
  * Threadsafe
  */
 MapFileSerializer::PrecomputedString MapFileSerializer::writeBrushFaces(
-    const Model::Brush &brush) const {
+    const Model::Brush &brush
+) const {
     std::stringstream stream;
     for (const Model::BrushFace &face: brush.faces()) {
         doWriteBrushFace(stream, face);
@@ -415,7 +360,8 @@ MapFileSerializer::PrecomputedString MapFileSerializer::writeBrushFaces(
 }
 
 MapFileSerializer::PrecomputedString MapFileSerializer::writePatch(
-    const Model::BezierPatch &patch) const {
+    const Model::BezierPatch &patch
+) const {
     size_t lineCount = 0u;
     std::stringstream stream;
 
@@ -428,10 +374,7 @@ MapFileSerializer::PrecomputedString MapFileSerializer::writePatch(
     fmt::format_to(std::ostreambuf_iterator<char>(stream), "{}\n", patch.textureName());
     ++lineCount;
     fmt::format_to(
-        std::ostreambuf_iterator<char>(stream),
-        "( {} {} 0 0 0 )\n",
-        patch.pointRowCount(),
-        patch.pointColumnCount());
+        std::ostreambuf_iterator<char>(stream), "( {} {} 0 0 0 )\n", patch.pointRowCount(), patch.pointColumnCount());
     ++lineCount;
     fmt::format_to(std::ostreambuf_iterator<char>(stream), "(\n");
     ++lineCount;
@@ -441,13 +384,8 @@ MapFileSerializer::PrecomputedString MapFileSerializer::writePatch(
         for (size_t col = 0u; col < patch.pointColumnCount(); ++col) {
             const auto &p = patch.controlPoint(row, col);
             fmt::format_to(
-                std::ostreambuf_iterator<char>(stream),
-                "( {} {} {} {} {} ) ",
-                p[0],
-                p[1],
-                p[2],
-                p[3],
-                p[4]);
+                std::ostreambuf_iterator<char>(stream), "( {} {} {} {} {} ) ", p[0], p[1], p[2], p[3], p[4]
+            );
         }
         fmt::format_to(std::ostreambuf_iterator<char>(stream), ")\n");
         ++lineCount;

@@ -23,8 +23,7 @@
 
 namespace TrenchBroom {
 namespace View {
-CommandResult::CommandResult(const bool success)
-    : m_success{success} {
+CommandResult::CommandResult(const bool success) : m_success{success} {
 }
 
 CommandResult::~CommandResult() = default;
@@ -33,8 +32,7 @@ bool CommandResult::success() const {
     return m_success;
 }
 
-Command::Command(std::string name)
-    : m_state{CommandState::Default}, m_name{std::move(name)} {
+Command::Command(std::string name) : m_state{CommandState::Default}, m_name{std::move(name)} {
 }
 
 Command::~Command() = default;
@@ -52,7 +50,8 @@ std::unique_ptr<CommandResult> Command::performDo(MapDocumentCommandFacade *docu
     auto result = doPerformDo(document);
     if (result->success()) {
         m_state = CommandState::Done;
-    } else {
+    }
+    else {
         m_state = CommandState::Default;
     }
     return result;

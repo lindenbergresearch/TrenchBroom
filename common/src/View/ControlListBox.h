@@ -64,7 +64,8 @@ private:
 
 public:
     explicit ControlListBoxItemRendererWrapper(
-        ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr);
+        ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr
+    );
 
     ControlListBoxItemRenderer *renderer();
 
@@ -74,8 +75,7 @@ public:
 class ControlListBox : public QWidget {
 Q_OBJECT
 public:
-    static constexpr auto LabelColorShouldNotUpdateWhenSelected =
-        "LabelColorShouldNotUpdateWhenSelected";
+    static constexpr auto LabelColorShouldNotUpdateWhenSelected = "LabelColorShouldNotUpdateWhenSelected";
 
 private:
     QListWidget *m_listWidget;
@@ -86,10 +86,8 @@ private:
 
 public:
     ControlListBox(
-        const QString &emptyText,
-        const QMargins &itemMargins,
-        bool showSeparator,
-        QWidget *parent = nullptr);
+        const QString &emptyText, const QMargins &itemMargins, bool showSeparator, QWidget *parent = nullptr
+    );
 
     ControlListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
@@ -134,7 +132,8 @@ private:
     virtual size_t itemCount() const = 0;
 
     virtual ControlListBoxItemRenderer *createItemRenderer(
-        QWidget *parent, size_t index) = 0;
+        QWidget *parent, size_t index
+    ) = 0;
 
     virtual void selectedRowChanged(int index);
 

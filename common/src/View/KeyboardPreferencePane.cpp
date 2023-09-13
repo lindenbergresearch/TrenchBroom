@@ -38,8 +38,7 @@
 
 namespace TrenchBroom {
 namespace View {
-KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *parent)
-    : PreferencePane(parent), m_table(nullptr), m_model(nullptr), m_proxy(nullptr) {
+KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *parent) : PreferencePane(parent), m_table(nullptr), m_model(nullptr), m_proxy(nullptr) {
     m_model = new KeyboardShortcutModel(document, this);
     m_proxy = new QSortFilterProxyModel(this);
     m_proxy->setSourceModel(m_model);
@@ -53,20 +52,21 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
     m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
     m_table->horizontalHeader()->resizeSection(0, 150);
     m_table->horizontalHeader()->setSectionResizeMode(
-        1, QHeaderView::ResizeMode::ResizeToContents);
+        1, QHeaderView::ResizeMode::ResizeToContents
+    );
     m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
 
     // Tighter than default vertical row height, without the overhead of autoresizing
     m_table->verticalHeader()->setDefaultSectionSize(
-        m_table->fontMetrics().lineSpacing() + 2);
+        m_table->fontMetrics().lineSpacing() + 2
+    );
 
     m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
 
     m_table->setEditTriggers(
-        QAbstractItemView::EditTrigger::SelectedClicked
-        | QAbstractItemView::EditTrigger::DoubleClicked
-        | QAbstractItemView::EditTrigger::EditKeyPressed);
+        QAbstractItemView::EditTrigger::SelectedClicked | QAbstractItemView::EditTrigger::DoubleClicked | QAbstractItemView::EditTrigger::EditKeyPressed
+    );
     m_table->setItemDelegate(new KeyboardShortcutItemDelegate());
 
     QLineEdit *searchBox = createSearchBox();
@@ -78,10 +78,8 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
 
     auto *infoAndSearchLayout = new QHBoxLayout();
     infoAndSearchLayout->setContentsMargins(
-        LayoutConstants::WideHMargin,
-        LayoutConstants::MediumVMargin,
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::MediumVMargin);
+        LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin
+    );
     infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
     infoAndSearchLayout->addWidget(infoLabel, 1);
     infoAndSearchLayout->addWidget(searchBox);
@@ -95,9 +93,11 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
 
     setMinimumSize(900, 550);
 
-    connect(searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
-      m_proxy->setFilterFixedString(newText);
-    });
+    connect(
+        searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
+          m_proxy->setFilterFixedString(newText);
+        }
+    );
 }
 
 bool KeyboardPreferencePane::doCanResetToDefaults() {
@@ -117,9 +117,11 @@ void KeyboardPreferencePane::doUpdateControls() {
 bool KeyboardPreferencePane::doValidate() {
     if (m_model->hasConflicts()) {
         QMessageBox::warning(
-            this, "Conflicts", "Please fix all conflicting shortcuts (highlighted in red).");
+            this, "Conflicts", "Please fix all conflicting shortcuts (highlighted in red)."
+        );
         return false;
-    } else {
+    }
+    else {
         return true;
     }
 }

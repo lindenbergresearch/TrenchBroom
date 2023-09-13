@@ -36,8 +36,7 @@
 
 namespace TrenchBroom::Model {
 
-PointTrace::PointTrace(std::vector<vm::vec3f> points)
-    : m_points{std::move(points)}, m_current{0} {
+PointTrace::PointTrace(std::vector<vm::vec3f> points) : m_points{std::move(points)}, m_current{0} {
     ensure(!m_points.empty(), "Point trace is not empty");
 }
 
@@ -60,9 +59,11 @@ const vm::vec3f &PointTrace::currentPoint() const {
 const vm::vec3f PointTrace::currentDirection() const {
     if (m_points.size() <= 1) {
         return vm::vec3f::pos_x();
-    } else if (m_current >= m_points.size() - 1) {
+    }
+    else if (m_current >= m_points.size() - 1) {
         return vm::normalize(m_points[m_points.size() - 1] - m_points[m_points.size() - 2]);
-    } else {
+    }
+    else {
         return vm::normalize(m_points[m_current + 1] - m_points[m_current]);
     }
 }
@@ -86,10 +87,11 @@ std::vector<vm::vec3f> smoothPoints(const std::vector<vm::vec3f> &points) {
 
     auto result = std::vector<vm::vec3f>{points[0]};
 
-    auto it =
-        std::find_if(std::next(std::begin(points)), std::end(points), [&](const auto &p) {
+    auto it = std::find_if(
+        std::next(std::begin(points)), std::end(points), [&](const auto &p) {
           return p != points[0];
-        });
+        }
+    );
 
     if (it == std::end(points)) {
         return result;
@@ -105,7 +107,8 @@ std::vector<vm::vec3f> smoothPoints(const std::vector<vm::vec3f> &points) {
         if (dist > 1.0f) {
             ray = vm::ray3f{result.back(), vm::normalize(cur - result.back())};
             result.push_back(cur);
-        } else {
+        }
+        else {
             result.back() = cur;
         }
         ++it;

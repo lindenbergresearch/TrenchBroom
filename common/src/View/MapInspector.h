@@ -89,7 +89,8 @@ private:
 
 public:
     explicit MapPropertiesEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 private:
     std::optional<vm::bbox3> parseLineEdits();

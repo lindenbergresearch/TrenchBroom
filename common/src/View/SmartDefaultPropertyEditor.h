@@ -35,7 +35,8 @@ class SmartDefaultPropertyEditor : public SmartPropertyEditor {
 Q_OBJECT
 public:
     explicit SmartDefaultPropertyEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 private:
     void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;

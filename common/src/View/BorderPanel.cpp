@@ -26,8 +26,7 @@
 
 namespace TrenchBroom {
 namespace View {
-BorderPanel::BorderPanel(const Sides borders, const int thickness, QWidget *parent)
-    : QWidget(parent), m_borders(borders), m_thickness(thickness) {
+BorderPanel::BorderPanel(const Sides borders, const int thickness, QWidget *parent) : QWidget(parent), m_borders(borders), m_thickness(thickness) {
     setForegroundRole(QPalette::Mid);
 }
 

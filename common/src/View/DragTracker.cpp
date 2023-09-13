@@ -37,7 +37,8 @@ void DragTracker::mouseScroll(const InputState &) {}
 void DragTracker::setRenderOptions(const InputState &, Renderer::RenderContext &) const {}
 
 void DragTracker::render(
-    const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) const {
+    const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &
+) const {
 }
 } // namespace View
 } // namespace TrenchBroom

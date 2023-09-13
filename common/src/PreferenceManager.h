@@ -87,9 +87,7 @@ public:
         const auto &prefPtr = it->second;
         auto *prefBase = prefPtr.get();
         auto *pref = dynamic_cast<Preference<T> *>(prefBase);
-        ensure(
-            pref != nullptr,
-            ("Preference " + path.string() + " must be of the expected type").c_str());
+        ensure(pref != nullptr, ("Preference " + path.string() + " must be of the expected type").c_str());
         return *pref;
     }
 
@@ -146,8 +144,7 @@ class AppPreferenceManager : public PreferenceManager {
 Q_OBJECT
 private:
     using UnsavedPreferences = kdl::vector_set<PreferenceBase *>;
-    using DynamicPreferences =
-        std::map<std::filesystem::path, std::unique_ptr<PreferenceBase>>;
+    using DynamicPreferences = std::map<std::filesystem::path, std::unique_ptr<PreferenceBase>>;
 
     QString m_preferencesFilePath;
     bool m_saveInstantly;
@@ -232,8 +229,7 @@ private:
     T m_originalValue;
 
 public:
-    TemporarilySetPref(Preference<T> &preference, const T &value)
-        : m_preference{preference}, m_originalValue{pref(m_preference)} {
+    TemporarilySetPref(Preference<T> &preference, const T &value) : m_preference{preference}, m_originalValue{pref(m_preference)} {
         setPref(m_preference, value);
     }
 
@@ -243,8 +239,7 @@ public:
 /**
  * Deduction guide.
  */
-template<typename T>
-TemporarilySetPref(Preference<T> &preference, const T &value) -> TemporarilySetPref<T>;
+template<typename T> TemporarilySetPref(Preference<T> &preference, const T &value) -> TemporarilySetPref<T>;
 
 /**
  * Toggles a bool preference, and saves the change immediately.
@@ -273,15 +268,10 @@ struct LockFileError {
 };
 } // namespace PreferenceErrors
 
-using ReadPreferencesResult = Result<
-    std::map<std::filesystem::path, QJsonValue>, // Success case
-    PreferenceErrors::NoFilePresent,
-    PreferenceErrors::JsonParseError,
-    PreferenceErrors::FileAccessError,
-    PreferenceErrors::LockFileError>;
+using ReadPreferencesResult = Result<std::map<std::filesystem::path, QJsonValue>, // Success case
+    PreferenceErrors::NoFilePresent, PreferenceErrors::JsonParseError, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
 
-using WritePreferencesResult =
-    Result<void, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
+using WritePreferencesResult = Result<void, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
 
 QString preferenceFilePath();
 
@@ -290,10 +280,12 @@ ReadPreferencesResult readPreferencesFromFile(const QString &path);
 ReadPreferencesResult readPreferences();
 
 WritePreferencesResult writePreferencesToFile(
-    const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs);
+    const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs
+);
 
 ReadPreferencesResult parsePreferencesFromJson(const QByteArray &jsonData);
 
 QByteArray writePreferencesToJson(
-    const std::map<std::filesystem::path, QJsonValue> &prefs);
+    const std::map<std::filesystem::path, QJsonValue> &prefs
+);
 } // namespace TrenchBroom

@@ -34,9 +34,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-PointHandleRenderer::PointHandleRenderer()
-    : m_handle(pref(Preferences::HandleRadius), 16, true),
-      m_highlight(2.0f * pref(Preferences::HandleRadius), 16, false) {
+PointHandleRenderer::PointHandleRenderer() : m_handle(pref(Preferences::HandleRadius), 16, true), m_highlight(2.0f * pref(Preferences::HandleRadius), 16, false) {
 }
 
 void PointHandleRenderer::addPoint(const Color &color, const vm::vec3f &position) {
@@ -56,12 +54,7 @@ void PointHandleRenderer::doRender(RenderContext &renderContext) {
     const Camera &camera = renderContext.camera();
     const Camera::Viewport &viewport = camera.viewport();
     const vm::mat4x4f projection = vm::ortho_matrix(
-        0.0f,
-        1.0f,
-        static_cast<float>(viewport.x),
-        static_cast<float>(viewport.height),
-        static_cast<float>(viewport.width),
-        static_cast<float>(viewport.y));
+        0.0f, 1.0f, static_cast<float>(viewport.x), static_cast<float>(viewport.height), static_cast<float>(viewport.width), static_cast<float>(viewport.y));
     const vm::mat4x4f view = vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y());
     ReplaceTransformation ortho(renderContext.transformation(), projection, view);
 
@@ -75,7 +68,8 @@ void PointHandleRenderer::doRender(RenderContext &renderContext) {
         renderHandles(renderContext, m_pointHandles, m_handle, 0.33f);
         renderHandles(renderContext, m_highlights, m_highlight, 0.33f);
         glAssert(glEnable(GL_DEPTH_TEST));
-    } else {
+    }
+    else {
         // In 2D views, render fully opaque without depth test
         glAssert(glDisable(GL_DEPTH_TEST));
         renderHandles(renderContext, m_pointHandles, m_handle, 1.0f);
@@ -87,7 +81,8 @@ void PointHandleRenderer::doRender(RenderContext &renderContext) {
 }
 
 void PointHandleRenderer::renderHandles(
-    RenderContext &renderContext, const HandleMap &map, Circle &circle, const float opacity) {
+    RenderContext &renderContext, const HandleMap &map, Circle &circle, const float opacity
+) {
     const Camera &camera = renderContext.camera();
     ActiveShader shader(renderContext.shaderManager(), Shaders::HandleShader);
 
@@ -100,12 +95,10 @@ void PointHandleRenderer::renderHandles(
             // In 3D view, nudge towards camera by the handle radius, to prevent lines (brush
             // edges, etc.) from clipping into the handle
             if (renderContext.render3D()) {
-                nudgeTowardsCamera =
-                    vm::normalize(camera.position() - position) * pref(Preferences::HandleRadius);
+                nudgeTowardsCamera = vm::normalize(camera.position() - position) * pref(Preferences::HandleRadius);
             }
 
-            const vm::vec3f offset =
-                camera.project(position + nudgeTowardsCamera) * vm::vec3f(1.0f, 1.0f, -1.0f);
+            const vm::vec3f offset = camera.project(position + nudgeTowardsCamera) * vm::vec3f(1.0f, 1.0f, -1.0f);
             MultiplyModelMatrix translate(
                 renderContext.transformation(), vm::translation_matrix(offset));
             circle.render();

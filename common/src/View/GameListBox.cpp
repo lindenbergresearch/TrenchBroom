@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-GameListBox::GameListBox(QWidget *parent)
-    : ImageListBox("No Games Found", true, parent) {
+GameListBox::GameListBox(QWidget *parent) : ImageListBox("No Games Found", true, parent) {
     reloadGameInfos();
 }
 
@@ -42,7 +41,8 @@ std::string GameListBox::selectedGameName() const {
     const int index = currentRow();
     if (index < 0 || index >= static_cast<int>(gameList.size())) {
         return "";
-    } else {
+    }
+    else {
         return gameList[static_cast<size_t>(index)];
     }
 }
@@ -88,12 +88,8 @@ GameListBox::Info GameListBox::makeGameInfo(const std::string &gameName) const {
     }
     const auto experimental = gameFactory.gameConfig(gameName).experimental;
 
-    return Info{
-        gameName,
-        IO::loadPixmapResource(iconPath),
-        QString::fromStdString(gameName + (experimental ? " (experimental)" : "")),
-        QString::fromStdString(
-            gamePath.empty() ? std::string("Game not found") : gamePath.string())};
+    return Info{gameName, IO::loadPixmapResource(iconPath), QString::fromStdString(gameName + (experimental ? " (experimental)" : "")), QString::fromStdString(
+        gamePath.empty() ? std::string("Game not found") : gamePath.string())};
 }
 
 size_t GameListBox::itemCount() const {

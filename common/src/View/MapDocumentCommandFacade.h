@@ -84,27 +84,31 @@ public: // adding and removing nodes
 
     void performRemoveNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
 
-    std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>
-    performReplaceChildren(
-        std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>
-        nodes);
+    std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> performReplaceChildren(
+        std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> nodes
+    );
 
 public: // swapping node contents
     void performSwapNodeContents(
-        std::vector<std::pair<Model::Node *, Model::NodeContents>> &nodesToSwap);
+        std::vector<std::pair<Model::Node *, Model::NodeContents>> &nodesToSwap
+    );
 
 public: // Node Visibility
     std::map<Model::Node *, Model::VisibilityState> setVisibilityState(
-        const std::vector<Model::Node *> &nodes, Model::VisibilityState visibilityState);
+        const std::vector<Model::Node *> &nodes, Model::VisibilityState visibilityState
+    );
 
     std::map<Model::Node *, Model::VisibilityState> setVisibilityEnsured(
-        const std::vector<Model::Node *> &nodes);
+        const std::vector<Model::Node *> &nodes
+    );
 
     void restoreVisibilityState(
-        const std::map<Model::Node *, Model::VisibilityState> &nodes);
+        const std::map<Model::Node *, Model::VisibilityState> &nodes
+    );
 
     std::map<Model::Node *, Model::LockState> setLockState(
-        const std::vector<Model::Node *> &nodes, Model::LockState lockState);
+        const std::vector<Model::Node *> &nodes, Model::LockState lockState
+    );
 
     void restoreLockState(const std::map<Model::Node *, Model::LockState> &nodes);
 
@@ -157,7 +161,8 @@ private: // implement MapDocument interface
     std::unique_ptr<CommandResult> doExecute(std::unique_ptr<Command> command) override;
 
     std::unique_ptr<CommandResult> doExecuteAndStore(
-        std::unique_ptr<UndoableCommand> command) override;
+        std::unique_ptr<UndoableCommand> command
+    ) override;
 };
 } // namespace View
 } // namespace TrenchBroom

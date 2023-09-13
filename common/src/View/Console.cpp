@@ -31,8 +31,7 @@
 
 namespace TrenchBroom {
 namespace View {
-Console::Console(QWidget *parent)
-    : TabBookPage(parent) {
+Console::Console(QWidget *parent) : TabBookPage(parent) {
     m_textView = new QTextEdit();
     m_textView->setReadOnly(true);
     m_textView->setWordWrapMode(QTextOption::NoWrap);

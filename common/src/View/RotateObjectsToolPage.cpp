@@ -47,10 +47,9 @@
 namespace TrenchBroom {
 namespace View {
 RotateObjectsToolPage::RotateObjectsToolPage(
-    std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)}, m_tool{tool}, m_recentlyUsedCentersList{nullptr},
-      m_resetCenterButton{nullptr}, m_angle{nullptr}, m_axis{nullptr}, m_rotateButton{nullptr},
-      m_updateAnglePropertyAfterTransformCheckBox{nullptr} {
+    std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent
+) : QWidget{parent}, m_document{std::move(document)}, m_tool{tool}, m_recentlyUsedCentersList{nullptr}, m_resetCenterButton{nullptr}, m_angle{nullptr}, m_axis{nullptr}, m_rotateButton{nullptr},
+    m_updateAnglePropertyAfterTransformCheckBox{nullptr} {
     createGui();
     connectObservers();
     m_angle->setValue(vm::to_degrees(m_tool.angle()));
@@ -59,11 +58,14 @@ RotateObjectsToolPage::RotateObjectsToolPage(
 void RotateObjectsToolPage::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &RotateObjectsToolPage::selectionDidChange);
+        this, &RotateObjectsToolPage::selectionDidChange
+    );
     m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &RotateObjectsToolPage::documentWasNewedOrLoaded);
+        this, &RotateObjectsToolPage::documentWasNewedOrLoaded
+    );
     m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &RotateObjectsToolPage::documentWasNewedOrLoaded);
+        this, &RotateObjectsToolPage::documentWasNewedOrLoaded
+    );
 }
 
 void RotateObjectsToolPage::setAxis(const vm::axis::type axis) {
@@ -94,8 +96,10 @@ void RotateObjectsToolPage::createGui() {
     m_recentlyUsedCentersList->setEditable(true);
 
     m_resetCenterButton = new QPushButton{tr("Reset")};
-    m_resetCenterButton->setToolTip(tr(
-        "Reset the position of the rotate handle to the center of the current selection."));
+    m_resetCenterButton->setToolTip(
+        tr(
+            "Reset the position of the rotate handle to the center of the current selection."
+        ));
 
     auto *text1 = new QLabel{tr("Rotate objects")};
     auto *text2 = new QLabel{tr("degs about")};
@@ -112,34 +116,23 @@ void RotateObjectsToolPage::createGui() {
 
     m_rotateButton = new QPushButton{tr("Apply")};
 
-    m_updateAnglePropertyAfterTransformCheckBox =
-        new QCheckBox{tr("Update entity properties")};
+    m_updateAnglePropertyAfterTransformCheckBox = new QCheckBox{tr("Update entity properties")};
 
     connect(
-        m_recentlyUsedCentersList,
-        QOverload<const QString &>::of(&QComboBox::activated),
-        this,
-        &RotateObjectsToolPage::centerChanged);
+        m_recentlyUsedCentersList, QOverload<const QString &>::of(&QComboBox::activated), this, &RotateObjectsToolPage::centerChanged
+    );
     connect(
-        m_resetCenterButton,
-        &QAbstractButton::clicked,
-        this,
-        &RotateObjectsToolPage::resetCenterClicked);
+        m_resetCenterButton, &QAbstractButton::clicked, this, &RotateObjectsToolPage::resetCenterClicked
+    );
     connect(
-        m_angle,
-        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-        this,
-        &RotateObjectsToolPage::angleChanged);
+        m_angle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &RotateObjectsToolPage::angleChanged
+    );
     connect(
-        m_rotateButton,
-        &QAbstractButton::clicked,
-        this,
-        &RotateObjectsToolPage::rotateClicked);
+        m_rotateButton, &QAbstractButton::clicked, this, &RotateObjectsToolPage::rotateClicked
+    );
     connect(
-        m_updateAnglePropertyAfterTransformCheckBox,
-        &QCheckBox::clicked,
-        this,
-        &RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked);
+        m_updateAnglePropertyAfterTransformCheckBox, &QCheckBox::clicked, this, &RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked
+    );
 
     auto *layout = new QHBoxLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
@@ -184,7 +177,8 @@ void RotateObjectsToolPage::updateGui() {
 
     if (const auto *worldNode = document->world()) {
         m_updateAnglePropertyAfterTransformCheckBox->setChecked(
-            worldNode->entityPropertyConfig().updateAnglePropertyAfterTransform);
+            worldNode->entityPropertyConfig().updateAnglePropertyAfterTransform
+        );
     }
 }
 
@@ -197,9 +191,7 @@ void RotateObjectsToolPage::documentWasNewedOrLoaded(MapDocument *) {
 }
 
 void RotateObjectsToolPage::centerChanged() {
-    if (
-        const auto center =
-            vm::parse<FloatType, 3>(m_recentlyUsedCentersList->currentText().toStdString())) {
+    if (const auto center = vm::parse<FloatType, 3>(m_recentlyUsedCentersList->currentText().toStdString())) {
         m_tool.setRotationCenter(*center);
     }
 }
@@ -225,8 +217,7 @@ void RotateObjectsToolPage::rotateClicked() {
 
 void RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked() {
     auto document = kdl::mem_lock(m_document);
-    document->world()->entityPropertyConfig().updateAnglePropertyAfterTransform =
-        m_updateAnglePropertyAfterTransformCheckBox->isChecked();
+    document->world()->entityPropertyConfig().updateAnglePropertyAfterTransform = m_updateAnglePropertyAfterTransformCheckBox->isChecked();
 }
 
 vm::vec3 RotateObjectsToolPage::getAxis() const {

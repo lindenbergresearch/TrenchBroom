@@ -86,15 +86,16 @@ public:
     virtual std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState);
 
     virtual std::unique_ptr<DropTracker> acceptDrop(
-        const InputState &inputState, const std::string &payload);
+        const InputState &inputState, const std::string &payload
+    );
 
     virtual void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext) const;
+        const InputState &inputState, Renderer::RenderContext &renderContext
+    ) const;
 
     virtual void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch);
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    );
 
     virtual bool cancel();
 
@@ -134,15 +135,16 @@ public:
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
     std::unique_ptr<DropTracker> acceptDrop(
-        const InputState &inputState, const std::string &payload) override;
+        const InputState &inputState, const std::string &payload
+    ) override;
 
     void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+        const InputState &inputState, Renderer::RenderContext &renderContext
+    ) const override;
 
     void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override;
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     bool cancel() override;
 
@@ -150,7 +152,8 @@ private: // subclassing interface
     virtual bool doShouldHandleMouseDrag(const InputState &inputState) const;
 
     virtual bool doShouldHandleDrop(
-        const InputState &inputState, const std::string &payload) const;
+        const InputState &inputState, const std::string &payload
+    ) const;
 };
 } // namespace View
 } // namespace TrenchBroom

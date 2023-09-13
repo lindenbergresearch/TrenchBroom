@@ -32,9 +32,8 @@ private:
 
 public:
     ShaderConfig(
-        std::string name,
-        std::vector<std::string> vertexShaders,
-        std::vector<std::string> fragmentShaders);
+        std::string name, std::vector<std::string> vertexShaders, std::vector<std::string> fragmentShaders
+    );
 
 public:
     const std::string &name() const;

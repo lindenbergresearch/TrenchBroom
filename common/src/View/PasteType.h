@@ -22,9 +22,7 @@
 namespace TrenchBroom {
 namespace View {
 enum class PasteType {
-  Node,
-  BrushFace,
-  Failed
+  Node, BrushFace, Failed
 };
 } // namespace View
 } // namespace TrenchBroom

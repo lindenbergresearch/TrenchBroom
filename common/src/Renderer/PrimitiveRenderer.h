@@ -36,14 +36,11 @@ class IndexRangeMapBuilder;
 class IndexRangeRenderer;
 
 enum class PrimitiveRendererOcclusionPolicy {
-  Hide,
-  Show,
-  Transparent
+  Hide, Show, Transparent
 };
 
 enum class PrimitiveRendererCullingPolicy {
-  CullBackfaces,
-  ShowBackfaces
+  CullBackfaces, ShowBackfaces
 };
 
 class PrimitiveRenderer : public DirectRenderable {
@@ -59,9 +56,8 @@ private:
 
     public:
         LineRenderAttributes(
-            const Color &color,
-            float lineWidth,
-            PrimitiveRendererOcclusionPolicy occlusionPolicy);
+            const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy
+        );
 
         bool operator<(const LineRenderAttributes &other) const;
 
@@ -82,17 +78,15 @@ private:
 
     public:
         TriangleRenderAttributes(
-            const Color &color,
-            PrimitiveRendererOcclusionPolicy occlusionPolicy,
-            PrimitiveRendererCullingPolicy cullingPolicy);
+            const Color &color, PrimitiveRendererOcclusionPolicy occlusionPolicy, PrimitiveRendererCullingPolicy cullingPolicy
+        );
 
         bool operator<(const TriangleRenderAttributes &other) const;
 
         void render(IndexRangeRenderer &renderer, ActiveShader &shader) const;
     };
 
-    using TriangleMeshMap =
-        std::map<TriangleRenderAttributes, IndexRangeMapBuilder<Vertex::Type>>;
+    using TriangleMeshMap = std::map<TriangleRenderAttributes, IndexRangeMapBuilder<Vertex::Type>>;
     TriangleMeshMap m_triangleMeshes;
 
     using TriangleMeshRendererMap = std::map<TriangleRenderAttributes, IndexRangeRenderer>;
@@ -100,73 +94,44 @@ private:
 
 public:
     void renderLine(
-        const Color &color,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const vm::vec3f &start,
-        const vm::vec3f &end);
+        const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::vec3f &start, const vm::vec3f &end
+    );
 
     void renderLines(
-        const Color &color,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const std::vector<vm::vec3f> &positions);
+        const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions
+    );
 
     void renderLineStrip(
-        const Color &color,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const std::vector<vm::vec3f> &positions);
+        const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions
+    );
 
     void renderCoordinateSystemXY(
-        const Color &x,
-        const Color &y,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const vm::bbox3f &bounds);
+        const Color &x, const Color &y, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+    );
 
     void renderCoordinateSystemXZ(
-        const Color &x,
-        const Color &z,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const vm::bbox3f &bounds);
+        const Color &x, const Color &z, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+    );
 
     void renderCoordinateSystemYZ(
-        const Color &y,
-        const Color &z,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const vm::bbox3f &bounds);
+        const Color &y, const Color &z, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+    );
 
     void renderCoordinateSystem3D(
-        const Color &x,
-        const Color &y,
-        const Color &z,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const vm::bbox3f &bounds);
+        const Color &x, const Color &y, const Color &z, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+    );
 
     void renderPolygon(
-        const Color &color,
-        float lineWidth,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        const std::vector<vm::vec3f> &positions);
+        const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions
+    );
 
     void renderFilledPolygon(
-        const Color &color,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        PrimitiveRendererCullingPolicy cullingPolicy,
-        const std::vector<vm::vec3f> &positions);
+        const Color &color, PrimitiveRendererOcclusionPolicy occlusionPolicy, PrimitiveRendererCullingPolicy cullingPolicy, const std::vector<vm::vec3f> &positions
+    );
 
     void renderCylinder(
-        const Color &color,
-        float radius,
-        size_t segments,
-        PrimitiveRendererOcclusionPolicy occlusionPolicy,
-        PrimitiveRendererCullingPolicy cullingPolicy,
-        const vm::vec3f &start,
-        const vm::vec3f &end);
+        const Color &color, float radius, size_t segments, PrimitiveRendererOcclusionPolicy occlusionPolicy, PrimitiveRendererCullingPolicy cullingPolicy, const vm::vec3f &start, const vm::vec3f &end
+    );
 
 private:
     void doPrepareVertices(VboManager &vboManager) override;

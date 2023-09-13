@@ -32,8 +32,8 @@ namespace View {
 // GameEngineProfileItemRenderer
 
 GameEngineProfileItemRenderer::GameEngineProfileItemRenderer(
-    Model::GameEngineProfile &profile, QWidget *parent)
-    : ControlListBoxItemRenderer{parent}, m_profile{&profile} {
+    Model::GameEngineProfile &profile, QWidget *parent
+) : ControlListBoxItemRenderer{parent}, m_profile{&profile} {
     createGui();
     refresh();
 }
@@ -73,15 +73,13 @@ void GameEngineProfileItemRenderer::profileDidChange() {
 // GameEngineProfileListBox
 
 GameEngineProfileListBox::GameEngineProfileListBox(
-    Model::GameEngineConfig &config, QWidget *parent)
-    : ControlListBox{"Click the '+' button to create a game engine profile.", true, parent}, m_config{&config} {
+    Model::GameEngineConfig &config, QWidget *parent
+) : ControlListBox{"Click the '+' button to create a game engine profile.", true, parent}, m_config{&config} {
     reload();
 }
 
 Model::GameEngineProfile *GameEngineProfileListBox::selectedProfile() {
-    return (currentRow() >= 0 && size_t(currentRow()) < m_config->profiles.size())
-           ? &m_config->profiles[size_t(currentRow())]
-           : nullptr;
+    return (currentRow() >= 0 && size_t(currentRow()) < m_config->profiles.size()) ? &m_config->profiles[size_t(currentRow())] : nullptr;
 }
 
 void GameEngineProfileListBox::setConfig(Model::GameEngineConfig &config) {
@@ -102,13 +100,13 @@ size_t GameEngineProfileListBox::itemCount() const {
 }
 
 ControlListBoxItemRenderer *GameEngineProfileListBox::createItemRenderer(
-    QWidget *parent, const size_t index) {
+    QWidget *parent, const size_t index
+) {
     return new GameEngineProfileItemRenderer{m_config->profiles[index], parent};
 }
 
 void GameEngineProfileListBox::selectedRowChanged(const int index) {
-    emit currentProfileChanged(
-        (index >= 0 && index < count()) ? &m_config->profiles[size_t(index)] : nullptr);
+    emit currentProfileChanged((index >= 0 && index < count()) ? &m_config->profiles[size_t(index)] : nullptr);
 }
 
 void GameEngineProfileListBox::doubleClicked(const size_t index) {

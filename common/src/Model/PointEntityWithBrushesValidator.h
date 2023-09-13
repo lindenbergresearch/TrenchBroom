@@ -31,7 +31,8 @@ public:
 
 private:
     void doValidate(
-        EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
+        EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues
+    ) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

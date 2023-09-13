@@ -90,13 +90,15 @@ private:
     void allocateBlock(VboManager &vboManager) {
         if (m_vboManager != nullptr) {
             assert(m_vboManager == &vboManager);
-        } else {
+        }
+        else {
             m_vboManager = &vboManager;
         }
         assert(m_vbo == nullptr);
 
         m_vbo = m_vboManager->allocateVbo(
-            m_type, m_snapshot.size() * sizeof(T), VboUsage::DynamicDraw);
+            m_type, m_snapshot.size() * sizeof(T), VboUsage::DynamicDraw
+        );
         assert(m_vbo != nullptr);
 
         m_vbo->writeElements(0, m_snapshot);
@@ -107,15 +109,13 @@ private:
     }
 
 public:
-    explicit VboHolder(const VboType type)
-        : m_type(type), m_snapshot(), m_dirtyRange(0), m_vboManager(nullptr), m_vbo(nullptr) {
+    explicit VboHolder(const VboType type) : m_type(type), m_snapshot(), m_dirtyRange(0), m_vboManager(nullptr), m_vbo(nullptr) {
     }
 
     /**
      * NOTE: This destructively moves the contents of `elements` into the Holder.
      */
-    VboHolder(const VboType type, std::vector<T> &elements)
-        : m_type(type), m_snapshot(), m_dirtyRange(elements.size()), m_vboManager(nullptr), m_vbo(nullptr) {
+    VboHolder(const VboType type, std::vector<T> &elements) : m_type(type), m_snapshot(), m_dirtyRange(elements.size()), m_vboManager(nullptr), m_vbo(nullptr) {
 
         const size_t elementsCount = elements.size();
         m_dirtyRange.markDirty(0, elementsCount);
@@ -142,7 +142,8 @@ public:
     }
 
     T *getPointerToWriteElementsTo(
-        const size_t offsetWithinBlock, const size_t elementCount) {
+        const size_t offsetWithinBlock, const size_t elementCount
+    ) {
         assert(offsetWithinBlock + elementCount <= m_snapshot.size());
 
         // mark dirty range
@@ -250,7 +251,8 @@ public:
      * `elementCount` GLuint's.
      */
     std::pair<AllocationTracker::Block *, GLuint *> getPointerToInsertElementsAt(
-        size_t elementCount);
+        size_t elementCount
+    );
 
     /**
      * Deletes indices for the given brush and marks the allocation as free.
@@ -282,23 +284,20 @@ public:
 template<typename V>
 class VertexHolder : public VboHolder<V>, public VertexArrayInterface {
 public:
-    VertexHolder()
-        : VboHolder<V>(VboType::ArrayBuffer) {
+    VertexHolder() : VboHolder<V>(VboType::ArrayBuffer) {
     }
 
     /**
      * NOTE: This destructively moves the contents of `elements` into the Holder.
      */
-    explicit VertexHolder(std::vector<V> &elements)
-        : VboHolder<V>(elements) {
+    explicit VertexHolder(std::vector<V> &elements) : VboHolder<V>(elements) {
     }
 
     bool setupVertices() override {
         ensure(VboHolder<V>::m_vbo != nullptr, "block is null");
         VboHolder<V>::m_vbo->bind();
         V::Type::setup(
-            this->m_vboManager->shaderManager().currentProgram(),
-            VboHolder<V>::m_vbo->offset());
+            this->m_vboManager->shaderManager().currentProgram(), VboHolder<V>::m_vbo->offset());
         return true;
     }
 
@@ -341,7 +340,8 @@ public:
      * `elementCount` Vertex objects.
      */
     std::pair<AllocationTracker::Block *, Vertex *> getPointerToInsertVerticesAt(
-        size_t vertexCount);
+        size_t vertexCount
+    );
 
     void deleteVerticesWithKey(AllocationTracker::Block *key);
 

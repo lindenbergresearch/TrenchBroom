@@ -31,13 +31,15 @@
 namespace TrenchBroom {
 namespace Model {
 const Assets::EntityDefinition *selectEntityDefinition(
-    const std::vector<EntityNodeBase *> &nodes) {
+    const std::vector<EntityNodeBase *> &nodes
+) {
     const Assets::EntityDefinition *definition = nullptr;
 
     for (EntityNodeBase *node: nodes) {
         if (definition == nullptr) {
             definition = node->entity().definition();
-        } else if (definition != node->entity().definition()) {
+        }
+        else if (definition != node->entity().definition()) {
             definition = nullptr;
             break;
         }
@@ -47,13 +49,15 @@ const Assets::EntityDefinition *selectEntityDefinition(
 }
 
 const Assets::PropertyDefinition *propertyDefinition(
-    const EntityNodeBase *node, const std::string &key) {
+    const EntityNodeBase *node, const std::string &key
+) {
     const auto *definition = node->entity().definition();
     return definition ? definition->propertyDefinition(key) : nullptr;
 }
 
 const Assets::PropertyDefinition *selectPropertyDefinition(
-    const std::string &key, const std::vector<EntityNodeBase *> &nodes) {
+    const std::string &key, const std::vector<EntityNodeBase *> &nodes
+) {
     std::vector<EntityNodeBase *>::const_iterator it = std::begin(nodes);
     std::vector<EntityNodeBase *>::const_iterator end = std::end(nodes);
     if (it == end)
@@ -78,7 +82,8 @@ const Assets::PropertyDefinition *selectPropertyDefinition(
 }
 
 std::string selectPRopertyValue(
-    const std::string &key, const std::vector<EntityNodeBase *> &nodes) {
+    const std::string &key, const std::vector<EntityNodeBase *> &nodes
+) {
     std::vector<EntityNodeBase *>::const_iterator it = std::begin(nodes);
     std::vector<EntityNodeBase *>::const_iterator end = std::end(nodes);
     if (it == end)
@@ -101,8 +106,7 @@ std::string selectPRopertyValue(
     return *value;
 }
 
-EntityNodeBase::EntityNodeBase(Entity entity)
-    : m_entity(std::move(entity)) {
+EntityNodeBase::EntityNodeBase(Entity entity) : m_entity(std::move(entity)) {
 }
 
 EntityNodeBase::~EntityNodeBase() = default;
@@ -129,8 +133,7 @@ void EntityNodeBase::setDefinition(Assets::EntityDefinition *definition) {
     m_entity.setDefinition(entityPropertyConfig(), definition);
 }
 
-EntityNodeBase::NotifyPropertyChange::NotifyPropertyChange(EntityNodeBase &node)
-    : m_nodeChange{node}, m_node{node}, m_oldPhysicalBounds{node.physicalBounds()} {
+EntityNodeBase::NotifyPropertyChange::NotifyPropertyChange(EntityNodeBase &node) : m_nodeChange{node}, m_node{node}, m_oldPhysicalBounds{node.physicalBounds()} {
     m_node.propertiesWillChange();
 }
 
@@ -153,8 +156,8 @@ void EntityNodeBase::updateIndexAndLinks(const std::vector<EntityProperty> &newP
 }
 
 void EntityNodeBase::updatePropertyIndex(
-    const std::vector<EntityProperty> &oldProperties,
-    const std::vector<EntityProperty> &newProperties) {
+    const std::vector<EntityProperty> &oldProperties, const std::vector<EntityProperty> &newProperties
+) {
     auto oldIt = std::begin(oldProperties);
     auto oldEnd = std::end(oldProperties);
     auto newIt = std::begin(newProperties);
@@ -167,10 +170,12 @@ void EntityNodeBase::updatePropertyIndex(
         if (oldProp < newProp) {
             removePropertyFromIndex(oldProp.key(), oldProp.value());
             ++oldIt;
-        } else if (oldProp > newProp) {
+        }
+        else if (oldProp > newProp) {
             addPropertyToIndex(newProp.key(), newProp.value());
             ++newIt;
-        } else {
+        }
+        else {
             updatePropertyIndex(oldProp.key(), oldProp.value(), newProp.key(), newProp.value());
             ++oldIt;
             ++newIt;
@@ -191,8 +196,8 @@ void EntityNodeBase::updatePropertyIndex(
 }
 
 void EntityNodeBase::updateLinks(
-    const std::vector<EntityProperty> &oldProperties,
-    const std::vector<EntityProperty> &newProperties) {
+    const std::vector<EntityProperty> &oldProperties, const std::vector<EntityProperty> &newProperties
+) {
     auto oldIt = std::begin(oldProperties);
     auto oldEnd = std::end(oldProperties);
     auto newIt = std::begin(newProperties);
@@ -205,10 +210,12 @@ void EntityNodeBase::updateLinks(
         if (oldProp < newProp) {
             removeLinks(oldProp.key(), oldProp.value());
             ++oldIt;
-        } else if (oldProp > newProp) {
+        }
+        else if (oldProp > newProp) {
             addLinks(newProp.key(), newProp.value());
             ++newIt;
-        } else {
+        }
+        else {
             updateLinks(oldProp.key(), oldProp.value(), newProp.key(), newProp.value());
             ++oldIt;
             ++newIt;
@@ -243,15 +250,14 @@ void EntityNodeBase::addPropertyToIndex(const std::string &key, const std::strin
 }
 
 void EntityNodeBase::removePropertyFromIndex(
-    const std::string &key, const std::string &value) {
+    const std::string &key, const std::string &value
+) {
     removeFromIndex(this, key, value);
 }
 
 void EntityNodeBase::updatePropertyIndex(
-    const std::string &oldKey,
-    const std::string &oldValue,
-    const std::string &newKey,
-    const std::string &newValue) {
+    const std::string &oldKey, const std::string &oldValue, const std::string &newKey, const std::string &newValue
+) {
     if (oldKey == newKey && oldValue == newValue) {
         return;
     }
@@ -284,9 +290,7 @@ vm::vec3 EntityNodeBase::linkTargetAnchor() const {
 }
 
 bool EntityNodeBase::hasMissingSources() const {
-    return (
-        m_linkSources.empty() && m_killSources.empty()
-        && m_entity.hasProperty(EntityPropertyKeys::Targetname));
+    return (m_linkSources.empty() && m_killSources.empty() && m_entity.hasProperty(EntityPropertyKeys::Targetname));
 }
 
 std::vector<std::string> EntityNodeBase::findMissingLinkTargets() const {
@@ -302,15 +306,18 @@ std::vector<std::string> EntityNodeBase::findMissingKillTargets() const {
 }
 
 void EntityNodeBase::findMissingTargets(
-    const std::string &prefix, std::vector<std::string> &result) const {
+    const std::string &prefix, std::vector<std::string> &result
+) const {
     for (const EntityProperty &property: m_entity.numberedProperties(prefix)) {
         const std::string &targetname = property.value();
         if (targetname.empty()) {
             result.push_back(property.key());
-        } else {
+        }
+        else {
             std::vector<EntityNodeBase *> linkTargets;
             findEntityNodesWithProperty(
-                EntityPropertyKeys::Targetname, targetname, linkTargets);
+                EntityPropertyKeys::Targetname, targetname, linkTargets
+            );
             if (linkTargets.empty())
                 result.push_back(property.key());
         }
@@ -320,9 +327,11 @@ void EntityNodeBase::findMissingTargets(
 void EntityNodeBase::addLinks(const std::string &name, const std::string &value) {
     if (isNumberedProperty(EntityPropertyKeys::Target, name)) {
         addLinkTargets(value);
-    } else if (isNumberedProperty(EntityPropertyKeys::Killtarget, name)) {
+    }
+    else if (isNumberedProperty(EntityPropertyKeys::Killtarget, name)) {
         addKillTargets(value);
-    } else if (name == EntityPropertyKeys::Targetname) {
+    }
+    else if (name == EntityPropertyKeys::Targetname) {
         addAllLinkSources(value);
         addAllKillSources(value);
     }
@@ -331,19 +340,19 @@ void EntityNodeBase::addLinks(const std::string &name, const std::string &value)
 void EntityNodeBase::removeLinks(const std::string &name, const std::string &value) {
     if (isNumberedProperty(EntityPropertyKeys::Target, name)) {
         removeLinkTargets(value);
-    } else if (isNumberedProperty(EntityPropertyKeys::Killtarget, name)) {
+    }
+    else if (isNumberedProperty(EntityPropertyKeys::Killtarget, name)) {
         removeKillTargets(value);
-    } else if (name == EntityPropertyKeys::Targetname) {
+    }
+    else if (name == EntityPropertyKeys::Targetname) {
         removeAllLinkSources();
         removeAllKillSources();
     }
 }
 
 void EntityNodeBase::updateLinks(
-    const std::string &oldName,
-    const std::string &oldValue,
-    const std::string &newName,
-    const std::string &newValue) {
+    const std::string &oldName, const std::string &oldValue, const std::string &newName, const std::string &newValue
+) {
     if (oldName == newName && oldValue == newValue) {
         return;
     }
@@ -373,13 +382,13 @@ void EntityNodeBase::removeLinkTargets(const std::string &targetname) {
         std::vector<EntityNodeBase *>::iterator it = std::begin(m_linkTargets);
         while (it != rem) {
             EntityNodeBase *target = *it;
-            const auto *targetTargetname =
-                target->entity().property(EntityPropertyKeys::Targetname);
+            const auto *targetTargetname = target->entity().property(EntityPropertyKeys::Targetname);
             if (targetTargetname && *targetTargetname == targetname) {
                 target->removeLinkSource(this);
                 --rem;
                 std::iter_swap(it, rem);
-            } else {
+            }
+            else {
                 ++it;
             }
         }
@@ -393,13 +402,13 @@ void EntityNodeBase::removeKillTargets(const std::string &targetname) {
         std::vector<EntityNodeBase *>::iterator it = std::begin(m_killTargets);
         while (it != rem) {
             EntityNodeBase *target = *it;
-            const auto *targetTargetname =
-                target->entity().property(EntityPropertyKeys::Targetname);
+            const auto *targetTargetname = target->entity().property(EntityPropertyKeys::Targetname);
             if (targetTargetname && *targetTargetname == targetname) {
                 target->removeKillSource(this);
                 --rem;
                 std::iter_swap(it, rem);
-            } else {
+            }
+            else {
                 ++it;
             }
         }
@@ -411,19 +420,20 @@ void EntityNodeBase::addAllLinkSources(const std::string &targetname) {
     if (!targetname.empty()) {
         std::vector<EntityNodeBase *> linkSources;
         findEntityNodesWithNumberedProperty(
-            EntityPropertyKeys::Target, targetname, linkSources);
+            EntityPropertyKeys::Target, targetname, linkSources
+        );
         addLinkSources(linkSources);
     }
 }
 
 void EntityNodeBase::addAllLinkTargets() {
-    for (const EntityProperty &property:
-        m_entity.numberedProperties(EntityPropertyKeys::Target)) {
+    for (const EntityProperty &property: m_entity.numberedProperties(EntityPropertyKeys::Target)) {
         const std::string &targetname = property.value();
         if (!targetname.empty()) {
             std::vector<EntityNodeBase *> linkTargets;
             findEntityNodesWithProperty(
-                EntityPropertyKeys::Targetname, targetname, linkTargets);
+                EntityPropertyKeys::Targetname, targetname, linkTargets
+            );
             addLinkTargets(linkTargets);
         }
     }
@@ -433,19 +443,20 @@ void EntityNodeBase::addAllKillSources(const std::string &targetname) {
     if (!targetname.empty()) {
         std::vector<EntityNodeBase *> killSources;
         findEntityNodesWithNumberedProperty(
-            EntityPropertyKeys::Killtarget, targetname, killSources);
+            EntityPropertyKeys::Killtarget, targetname, killSources
+        );
         addKillSources(killSources);
     }
 }
 
 void EntityNodeBase::addAllKillTargets() {
-    for (const EntityProperty &property:
-        m_entity.numberedProperties(EntityPropertyKeys::Killtarget)) {
+    for (const EntityProperty &property: m_entity.numberedProperties(EntityPropertyKeys::Killtarget)) {
         const std::string &targetname = property.value();
         if (!targetname.empty()) {
             std::vector<EntityNodeBase *> killTargets;
             findEntityNodesWithProperty(
-                EntityPropertyKeys::Targetname, targetname, killTargets);
+                EntityPropertyKeys::Targetname, targetname, killTargets
+            );
             addKillTargets(killTargets);
         }
     }
@@ -585,8 +596,7 @@ void EntityNodeBase::removeKillSource(EntityNodeBase *node) {
     invalidateIssues();
 }
 
-EntityNodeBase::EntityNodeBase()
-    : Node() {
+EntityNodeBase::EntityNodeBase() : Node() {
 }
 
 const std::string &EntityNodeBase::doGetName() const {

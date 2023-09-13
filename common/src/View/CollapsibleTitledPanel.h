@@ -36,7 +36,8 @@ private:
 
 public:
     CollapsibleTitleBar(
-        const QString &title, const QString &stateText, QWidget *parent = nullptr);
+        const QString &title, const QString &stateText, QWidget *parent = nullptr
+    );
 
     void setStateText(const QString &stateText);
 
@@ -58,7 +59,8 @@ private:
 
 public:
     explicit CollapsibleTitledPanel(
-        const QString &title, bool initiallyExpanded = true, QWidget *parent = nullptr);
+        const QString &title, bool initiallyExpanded = true, QWidget *parent = nullptr
+    );
 
     QWidget *getPanel() const;
 

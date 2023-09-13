@@ -27,9 +27,7 @@ namespace Renderer {
 class AttrString {
 private:
     enum class Justify {
-      Left,
-      Right,
-      Center
+      Left, Right, Center
     };
 
 public:

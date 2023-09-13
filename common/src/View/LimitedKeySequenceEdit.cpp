@@ -23,15 +23,14 @@
 
 namespace TrenchBroom {
 namespace View {
-LimitedKeySequenceEdit::LimitedKeySequenceEdit(QWidget *parent)
-    : LimitedKeySequenceEdit(MaxCount, parent) {
+LimitedKeySequenceEdit::LimitedKeySequenceEdit(QWidget *parent) : LimitedKeySequenceEdit(MaxCount, parent) {
 }
 
-LimitedKeySequenceEdit::LimitedKeySequenceEdit(const size_t maxCount, QWidget *parent)
-    : QKeySequenceEdit(parent), m_maxCount(maxCount), m_count(0) {
+LimitedKeySequenceEdit::LimitedKeySequenceEdit(const size_t maxCount, QWidget *parent) : QKeySequenceEdit(parent), m_maxCount(maxCount), m_count(0) {
     Q_ASSERT(m_maxCount <= MaxCount);
     connect(
-        this, &QKeySequenceEdit::editingFinished, this, &LimitedKeySequenceEdit::resetCount);
+        this, &QKeySequenceEdit::editingFinished, this, &LimitedKeySequenceEdit::resetCount
+    );
 }
 
 void LimitedKeySequenceEdit::keyPressEvent(QKeyEvent *event) {

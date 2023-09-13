@@ -43,19 +43,13 @@ class EntityProperty;
 struct EntityPropertyConfig;
 
 enum class EntityRotationType {
-  None,
-  Angle,
-  AngleUpDown,
-  Euler,
-  Euler_PositivePitchDown,
-  Mangle
+  None, Angle, AngleUpDown, Euler, Euler_PositivePitchDown, Mangle
 };
 
 std::ostream &operator<<(std::ostream &lhs, const EntityRotationType &rhs);
 
 enum class EntityRotationUsage {
-  Allowed,
-  BlockRotation
+  Allowed, BlockRotation
 };
 
 std::ostream &operator<<(std::ostream &lhs, const EntityRotationUsage &rhs);
@@ -71,20 +65,19 @@ struct EntityRotationInfo {
 EntityRotationInfo entityRotationInfo(const Entity &entity);
 
 vm::mat4x4 entityRotation(
-    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info);
+    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info
+);
 
 vm::mat4x4 entityRotation(const Entity &entity);
 
 vm::vec3 entityYawPitchRoll(const vm::mat4x4 &transformation, const vm::mat4x4 &rotation);
 
 std::optional<EntityProperty> applyEntityRotation(
-    const std::vector<EntityProperty> &properties,
-    const EntityRotationInfo &info,
-    const vm::mat4x4 &transformation);
+    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info, const vm::mat4x4 &transformation
+);
 
 void applyEntityRotation(
-    Entity &entity,
-    const EntityPropertyConfig &propertyConfig,
-    const vm::mat4x4 &transformation);
+    Entity &entity, const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation
+);
 } // namespace Model
 } // namespace TrenchBroom

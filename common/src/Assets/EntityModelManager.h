@@ -57,8 +57,7 @@ private:
     using ModelMismatches = kdl::vector_set<std::filesystem::path>;
     using ModelList = std::vector<EntityModel *>;
 
-    using RendererCache =
-        std::map<ModelSpecification, std::unique_ptr<Renderer::TexturedRenderer>>;
+    using RendererCache = std::map<ModelSpecification, std::unique_ptr<Renderer::TexturedRenderer>>;
     using RendererMismatches = kdl::vector_set<ModelSpecification>;
     using RendererList = std::vector<Renderer::TexturedRenderer *>;
 

@@ -44,40 +44,33 @@ private:
 
 public:
     void initialize(
-        const GameConfig &config,
-        const std::filesystem::path &gamePath,
-        const std::vector<std::filesystem::path> &additionalSearchPaths,
-        Logger &logger);
+        const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger
+    );
 
     Result<void> reloadShaders();
 
     void reloadWads(
-        const std::filesystem::path &rootPath,
-        const std::vector<std::filesystem::path> &wadSearchPaths,
-        const std::vector<std::filesystem::path> &wadPaths,
-        Logger &logger);
+        const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths, const std::vector<std::filesystem::path> &wadPaths, Logger &logger
+    );
 
 private:
     void addDefaultAssetPaths(const GameConfig &config, Logger &logger);
 
     void addGameFileSystems(
-        const GameConfig &config,
-        const std::filesystem::path &gamePath,
-        const std::vector<std::filesystem::path> &additionalSearchPaths,
-        Logger &logger);
+        const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger
+    );
 
     void addShaderFileSystem(const GameConfig &config, Logger &logger);
 
     void addFileSystemPath(const std::filesystem::path &path, Logger &logger);
 
     void addFileSystemPackages(
-        const GameConfig &config, const std::filesystem::path &searchPath, Logger &logger);
+        const GameConfig &config, const std::filesystem::path &searchPath, Logger &logger
+    );
 
     void mountWads(
-        const std::filesystem::path &rootPath,
-        const std::vector<std::filesystem::path> &wadSearchPaths,
-        const std::vector<std::filesystem::path> &wadPaths,
-        Logger &logger);
+        const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths, const std::vector<std::filesystem::path> &wadPaths, Logger &logger
+    );
 
     void unmountWads();
 };

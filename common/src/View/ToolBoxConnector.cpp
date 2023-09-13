@@ -32,9 +32,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ToolBoxConnector::ToolBoxConnector()
-    : m_toolBox(nullptr), m_toolChain(new ToolChain()), m_lastMouseX(0.0f), m_lastMouseY(0.0f),
-      m_ignoreNextDrag(false) {
+ToolBoxConnector::ToolBoxConnector() : m_toolBox(nullptr), m_toolChain(new ToolChain()), m_lastMouseX(0.0f), m_lastMouseY(0.0f), m_ignoreNextDrag(false) {
 }
 
 ToolBoxConnector::~ToolBoxConnector() {
@@ -93,7 +91,8 @@ void ToolBoxConnector::dragLeave() {
 }
 
 bool ToolBoxConnector::dragDrop(
-    const float /* x */, const float /* y */, const std::string &text) {
+    const float /* x */, const float /* y */, const std::string &text
+) {
     ensure(m_toolBox != nullptr, "toolBox is null");
 
     updatePickResult();
@@ -114,7 +113,8 @@ void ToolBoxConnector::setRenderOptions(Renderer::RenderContext &renderContext) 
 }
 
 void ToolBoxConnector::renderTools(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     ensure(m_toolBox != nullptr, "toolBox is null");
     m_inputState.setAnyToolDragging(m_toolBox->dragging());
     m_toolBox->renderTools(m_toolChain, m_inputState, renderContext, renderBatch);
@@ -150,7 +150,8 @@ bool ToolBoxConnector::setModifierKeys() {
     if (keys != m_inputState.modifierKeys()) {
         m_inputState.setModifierKeys(keys);
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -163,7 +164,8 @@ bool ToolBoxConnector::clearModifierKeys() {
         updatePickResult();
         m_toolBox->modifierKeyChange(m_toolChain, m_inputState);
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -269,7 +271,8 @@ void ToolBoxConnector::processScroll(const MouseEvent &event) {
     updateModifierKeys();
     if (event.wheelAxis == MouseEvent::WheelAxis::Horizontal) {
         m_inputState.scroll(event.scrollDistance, 0.0f);
-    } else if (event.wheelAxis == MouseEvent::WheelAxis::Vertical) {
+    }
+    else if (event.wheelAxis == MouseEvent::WheelAxis::Vertical) {
         m_inputState.scroll(0.0f, event.scrollDistance);
     }
     m_toolBox->mouseScroll(m_toolChain, m_inputState);
@@ -332,7 +335,8 @@ bool ToolBoxConnector::cancelDrag() {
     if (m_toolBox->dragging()) {
         m_toolBox->cancelMouseDrag();
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }

@@ -57,8 +57,7 @@ bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode *> &changedLin
 class UpdateLinkedGroupsHelper {
 private:
     using ChangedLinkedGroups = std::vector<Model::GroupNode *>;
-    using LinkedGroupUpdates =
-        std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>;
+    using LinkedGroupUpdates = std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>;
     std::variant<ChangedLinkedGroups, LinkedGroupUpdates> m_state;
 
 public:
@@ -76,7 +75,8 @@ private:
     Result<void> computeLinkedGroupUpdates(MapDocumentCommandFacade &document);
 
     static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(
-        const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document);
+        const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document
+    );
 
     void doApplyOrUndoLinkedGroupUpdates(MapDocumentCommandFacade &document);
 };

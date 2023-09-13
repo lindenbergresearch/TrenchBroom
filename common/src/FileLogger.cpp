@@ -31,18 +31,18 @@
 namespace TrenchBroom {
 namespace {
 std::ofstream openLogFile(const std::filesystem::path &path) {
-    return IO::Disk::createDirectory(path.parent_path())
-        .transform([&](auto) {
+    return IO::Disk::createDirectory(path.parent_path()).transform(
+        [&](auto) {
           return std::ofstream{path, std::ios::out};
-        })
-        .if_error([](const auto &e) {
+        }
+    ).if_error(
+        [](const auto &e) {
           throw std::runtime_error{"Could not open log file: " + e.msg};
-        })
-        .value();
+        }
+    ).value();
 }
 } // namespace
-FileLogger::FileLogger(const std::filesystem::path &filePath)
-    : m_stream{openLogFile(filePath)} {
+FileLogger::FileLogger(const std::filesystem::path &filePath) : m_stream{openLogFile(filePath)} {
     ensure(m_stream, "log file could not be opened");
 }
 

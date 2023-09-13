@@ -35,8 +35,7 @@ void CameraLinkHelper::addCamera(Renderer::Camera *camera) {
     ensure(camera != nullptr, "camera is null");
     assert(!kdl::vec_contains(m_cameras, camera));
     m_cameras.push_back(camera);
-    m_notifierConnection +=
-        camera->cameraDidChangeNotifier.connect(this, &CameraLinkHelper::cameraDidChange);
+    m_notifierConnection += camera->cameraDidChangeNotifier.connect(this, &CameraLinkHelper::cameraDidChange);
 }
 
 void CameraLinkHelper::updateCameras(const Renderer::Camera *masterCamera) {
@@ -45,10 +44,8 @@ void CameraLinkHelper::updateCameras(const Renderer::Camera *masterCamera) {
             camera->setZoom(masterCamera->zoom());
 
             const auto oldPosition = camera->position();
-            const auto factors =
-                vm::vec3f::one() - abs(masterCamera->direction()) - abs(camera->direction());
-            const auto newPosition =
-                (vm::vec3f::one() - factors) * oldPosition + factors * masterCamera->position();
+            const auto factors = vm::vec3f::one() - abs(masterCamera->direction()) - abs(camera->direction());
+            const auto newPosition = (vm::vec3f::one() - factors) * oldPosition + factors * masterCamera->position();
             camera->moveTo(newPosition);
         }
     }

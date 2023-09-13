@@ -33,8 +33,7 @@ public:
       size_t index;
       size_t count;
 
-      Range(const size_t i_index, const size_t i_count)
-          : index(i_index), count(i_count) {
+      Range(const size_t i_index, const size_t i_count) : index(i_index), count(i_count) {
       }
     };
 
@@ -47,13 +46,11 @@ private:
     bool m_dynamicGrowth;
 
 public:
-    explicit VertexListBuilder(const size_t capacity)
-        : m_vertices(), m_dynamicGrowth(false) {
+    explicit VertexListBuilder(const size_t capacity) : m_vertices(), m_dynamicGrowth(false) {
         m_vertices.reserve(capacity);
     }
 
-    VertexListBuilder()
-        : m_dynamicGrowth(true) {
+    VertexListBuilder() : m_dynamicGrowth(true) {
     }
 
     size_t vertexCount() const { return m_vertices.size(); }

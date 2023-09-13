@@ -55,19 +55,13 @@ struct TextureMode {
   int magFilter;
   std::string name;
 
-  TextureMode(const int i_minFilter, const int i_magFilter, std::string i_name)
-      : minFilter{i_minFilter}, magFilter{i_magFilter}, name{std::move(i_name)} {
+  TextureMode(const int i_minFilter, const int i_magFilter, std::string i_name) : minFilter{i_minFilter}, magFilter{i_magFilter}, name{std::move(i_name)} {
   }
 };
 
-const auto TextureModes = std::array<TextureMode, 6>{
-    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"},
-    TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"},
-    TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"},
-    TextureMode{GL_LINEAR, GL_LINEAR, "Linear"},
-    TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"},
-    TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
-};
+const auto TextureModes = std::array<TextureMode, 6>{TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"},
+                                                     TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"}, TextureMode{GL_LINEAR, GL_LINEAR, "Linear"},
+                                                     TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"}, TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},};
 
 constexpr int brightnessToUI(const float value) {
     return int(vm::round(100.0f * (value - 1.0f)));
@@ -80,8 +74,7 @@ constexpr float brightnessFromUI(const int value) {
 static_assert(0 == brightnessToUI(brightnessFromUI(0)));
 } // namespace
 
-ViewPreferencePane::ViewPreferencePane(QWidget *parent)
-    : PreferencePane{parent} {
+ViewPreferencePane::ViewPreferencePane(QWidget *parent) : PreferencePane{parent} {
     createGui();
     bindEvents();
 }
@@ -186,20 +179,15 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     // find fonts folder
     auto fontsPath = IO::SystemPaths::findResourceDirectories(
-        std::filesystem::path("fonts").parent_path()
-    );
+        std::filesystem::path("fonts").parent_path());
 
     if (!fontsPath.empty()) {
         auto m_fs = std::make_unique<IO::DiskFileSystem>(
-            fontsPath.back()
-        );
+            fontsPath.back());
 
         // search compatible fonts
         auto res = m_fs->find(
-            "fonts",
-            IO::TraversalMode::Recursive,
-            IO::makeExtensionPathMatcher({".ttf", ".otf"})
-        );
+            "fonts", IO::TraversalMode::Recursive, IO::makeExtensionPathMatcher({".ttf", ".otf"}));
 
         if (res.is_success()) {
             for (const auto &item: res.value()) {
@@ -207,7 +195,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
                 m_rendererFontCombo->addItem(filename);
                 font_files.push_back(item);
             }
-        } else {
+        }
+        else {
             m_rendererFontCombo->addItem("no fonts found.");
         }
     }
@@ -216,11 +205,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_rendererFontSizeCombo->setEditable(true);
     m_rendererFontSizeCombo->setToolTip("Sets the font size for various labels in the editing views.");
     m_rendererFontSizeCombo->addItems(
-        {
-            "8", "9", "10", "11", "12", "13", "14", "15",
-            "16", "17", "18", "19", "20", "22", "24", "26",
-            "28", "32", "36", "40", "48", "56", "64", "72"
-        }
+        {"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"}
     );
 
     m_rendererFontSizeCombo->setValidator(new QIntValidator{1, 96, m_rendererFontSizeCombo});
@@ -262,96 +247,57 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
 void ViewPreferencePane::bindEvents() {
     connect(
-        m_layoutCombo,
-        QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this,
-        &ViewPreferencePane::layoutChanged
+        m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged
     );
 
     connect(
-        m_link2dCameras,
-        &QCheckBox::stateChanged,
-        this,
-        &ViewPreferencePane::link2dCamerasChanged
+        m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged
     );
 
     connect(
-        m_brightnessSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &ViewPreferencePane::brightnessChanged
+        m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged
     );
 
     connect(
-        m_gridAlphaSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &ViewPreferencePane::gridAlphaChanged
+        m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged
     );
 
     connect(
-        m_fovSlider,
-        &SliderWithLabel::valueChanged,
-        this,
-        &ViewPreferencePane::fovChanged
+        m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged
     );
 
     connect(
-        m_unitsDisplayType,
-        QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this,
-        &ViewPreferencePane::unitsDisplayTypeIndexChanged
+        m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged
     );
 
     connect(
-        m_metricConversationFactor,
-        &QLineEdit::textChanged,
-        this,
-        &ViewPreferencePane::metricConversationFactorChanged
+        m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged
     );
 
     connect(
-        m_rendererFontCombo,
-        QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this,
-        &ViewPreferencePane::renderFontFileChanged
+        m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged
     );
 
     connect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
 
     connect(
-        m_enableMsaa,
-        &QCheckBox::stateChanged,
-        this,
-        &ViewPreferencePane::enableMsaaChanged
+        m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged
     );
 
     connect(
-        m_themeCombo,
-        QOverload<int>::of(&QComboBox::activated),
-        this,
-        &ViewPreferencePane::themeChanged
+        m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged
     );
 
     connect(
-        m_textureModeCombo,
-        QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this,
-        &ViewPreferencePane::textureModeChanged
+        m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged
     );
 
     connect(
-        m_textureBrowserIconSizeCombo,
-        QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this,
-        &ViewPreferencePane::textureBrowserIconSizeChanged
+        m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged
     );
 
     connect(
-        m_rendererFontSizeCombo,
-        &QComboBox::currentTextChanged,
-        this,
-        &ViewPreferencePane::rendererFontSizeChanged
+        m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged
     );
 }
 
@@ -397,23 +343,28 @@ void ViewPreferencePane::doUpdateControls() {
     const auto textureBrowserIconSize = pref(Preferences::TextureBrowserIconSize);
     if (textureBrowserIconSize == 0.25f) {
         m_textureBrowserIconSizeCombo->setCurrentIndex(0);
-    } else if (textureBrowserIconSize == 0.5f) {
+    }
+    else if (textureBrowserIconSize == 0.5f) {
         m_textureBrowserIconSizeCombo->setCurrentIndex(1);
-    } else if (textureBrowserIconSize == 1.5f) {
+    }
+    else if (textureBrowserIconSize == 1.5f) {
         m_textureBrowserIconSizeCombo->setCurrentIndex(3);
-    } else if (textureBrowserIconSize == 2.0f) {
+    }
+    else if (textureBrowserIconSize == 2.0f) {
         m_textureBrowserIconSizeCombo->setCurrentIndex(4);
-    } else if (textureBrowserIconSize == 2.5f) {
+    }
+    else if (textureBrowserIconSize == 2.5f) {
         m_textureBrowserIconSizeCombo->setCurrentIndex(5);
-    } else if (textureBrowserIconSize == 3.0f) {
+    }
+    else if (textureBrowserIconSize == 3.0f) {
         m_textureBrowserIconSizeCombo->setCurrentIndex(6);
-    } else {
+    }
+    else {
         m_textureBrowserIconSizeCombo->setCurrentIndex(2);
     }
 
     m_rendererFontSizeCombo->setCurrentText(
-        QString::asprintf("%i", pref(Preferences::RendererFontSize))
-    );
+        QString::asprintf("%i", pref(Preferences::RendererFontSize)));
 
     auto current_font = pref(Preferences::RendererFontPath);
     auto found = std::find(font_files.begin(), font_files.end(), current_font);

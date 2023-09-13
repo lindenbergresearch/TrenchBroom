@@ -33,8 +33,7 @@
 
 namespace TrenchBroom {
 namespace View {
-RotateObjectsTool::RotateObjectsTool(std::weak_ptr<MapDocument> document)
-    : Tool(false), m_document(document), m_toolPage(nullptr), m_handle(), m_angle(vm::to_radians(15.0)) {
+RotateObjectsTool::RotateObjectsTool(std::weak_ptr<MapDocument> document) : Tool(false), m_document(document), m_toolPage(nullptr), m_handle(), m_angle(vm::to_radians(15.0)) {
 }
 
 bool RotateObjectsTool::doActivate() {
@@ -49,9 +48,11 @@ const Grid &RotateObjectsTool::grid() const {
 void RotateObjectsTool::updateToolPageAxis(const RotateObjectsHandle::HitArea area) {
     if (area == RotateObjectsHandle::HitArea::XAxis) {
         m_toolPage->setAxis(vm::axis::x);
-    } else if (area == RotateObjectsHandle::HitArea::YAxis) {
+    }
+    else if (area == RotateObjectsHandle::HitArea::YAxis) {
         m_toolPage->setAxis(vm::axis::y);
-    } else if (area == RotateObjectsHandle::HitArea::ZAxis) {
+    }
+    else if (area == RotateObjectsHandle::HitArea::ZAxis) {
         m_toolPage->setAxis(vm::axis::z);
     }
 }
@@ -111,19 +112,22 @@ FloatType RotateObjectsTool::snapRotationAngle(const FloatType angle) const {
 }
 
 void RotateObjectsTool::applyRotation(
-    const vm::vec3 &center, const vm::vec3 &axis, const FloatType angle) {
+    const vm::vec3 &center, const vm::vec3 &axis, const FloatType angle
+) {
     auto document = kdl::mem_lock(m_document);
     document->rollbackTransaction();
     document->rotateObjects(center, axis, angle);
 }
 
 Model::Hit RotateObjectsTool::pick2D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) {
     return m_handle.pick2D(pickRay, camera);
 }
 
 Model::Hit RotateObjectsTool::pick3D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) {
     return m_handle.pick3D(pickRay, camera);
 }
 
@@ -132,26 +136,26 @@ vm::vec3 RotateObjectsTool::rotationAxis(const RotateObjectsHandle::HitArea area
 }
 
 void RotateObjectsTool::renderHandle2D(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     m_handle.renderHandle2D(renderContext, renderBatch);
 }
 
 void RotateObjectsTool::renderHandle3D(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     m_handle.renderHandle3D(renderContext, renderBatch);
 }
 
 void RotateObjectsTool::renderHighlight2D(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const RotateObjectsHandle::HitArea area) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const RotateObjectsHandle::HitArea area
+) {
     m_handle.renderHighlight2D(renderContext, renderBatch, area);
 }
 
 void RotateObjectsTool::renderHighlight3D(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const RotateObjectsHandle::HitArea area) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const RotateObjectsHandle::HitArea area
+) {
     m_handle.renderHighlight3D(renderContext, renderBatch, area);
 }
 

@@ -179,9 +179,7 @@ bool Polyhedron<T, FP, VP>::checkConvex() const {
 
     for (const Face *face: m_faces) {
         for (const Vertex *vertex: m_vertices) {
-            if (
-                face->pointStatus(vertex->position(), vm::constants<T>::point_status_epsilon())
-                == vm::plane_status::above) {
+            if (face->pointStatus(vertex->position(), vm::constants<T>::point_status_epsilon()) == vm::plane_status::above) {
                 return false;
             }
         }
@@ -199,9 +197,11 @@ bool Polyhedron<T, FP, VP>::checkClosed() const {
     for (const Edge *edge: m_edges) {
         if (!edge->fullySpecified()) {
             return false;
-        } else if (!m_faces.contains(edge->firstFace())) {
+        }
+        else if (!m_faces.contains(edge->firstFace())) {
             return false;
-        } else if (!m_faces.contains(edge->secondFace())) {
+        }
+        else if (!m_faces.contains(edge->secondFace())) {
             return false;
         }
     }

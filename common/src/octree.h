@@ -69,11 +69,7 @@ struct node_address {
 
 template<typename T>
 node_address get_address(const vm::vec<T, 3> &point, const T min_size) {
-    return {
-        int16_t(std::floor(point.x() / min_size)),
-        int16_t(std::floor(point.y() / min_size)),
-        int16_t(std::floor(point.z() / min_size)),
-        0};
+    return {int16_t(std::floor(point.x() / min_size)), int16_t(std::floor(point.y() / min_size)), int16_t(std::floor(point.z() / min_size)), 0};
 }
 
 node_address get_parent(const node_address &a);
@@ -94,8 +90,7 @@ node_address get_container(const vm::bbox<T, 3> &bounds, const T min_size) {
     const auto sum_of_signs = vm::sign(bounds.min) + vm::sign(bounds.max);
     if (sum_of_signs.x() == T(0) || sum_of_signs.y() == T(0) || sum_of_signs.z() == T(0)) {
         // The returned address denotes a bounding box that centers around 0,0,0.
-        const auto abs_max =
-            vm::abs(vm::get_abs_max_component(vm::abs_max(bounds.min, bounds.max)));
+        const auto abs_max = vm::abs(vm::get_abs_max_component(vm::abs_max(bounds.min, bounds.max)));
         const auto len = T(2) * abs_max;
         const auto n = std::max(T(2), len / min_size);
         const auto size = std::ceil(std::log2(n));
@@ -147,25 +142,14 @@ public:
       std::vector<node> children;
 
       inner_node(
-          const detail::node_address i_address,
-          std::vector<U> i_data,
-          std::vector<node> i_children)
-          : address{i_address}, data{std::move(i_data)}, children{std::move(i_children)} {
+          const detail::node_address i_address, std::vector<U> i_data, std::vector<node> i_children
+      ) : address{i_address}, data{std::move(i_data)}, children{std::move(i_children)} {
       }
 
-      inner_node(const detail::node_address i_address, std::vector<U> i_data)
-          : inner_node{
-          i_address,
-          std::move(i_data),
-          kdl::vec_from(
-              node{leaf_node{get_child(i_address, 0), {}}},
-              node{leaf_node{get_child(i_address, 1), {}}},
-              node{leaf_node{get_child(i_address, 2), {}}},
-              node{leaf_node{get_child(i_address, 3), {}}},
-              node{leaf_node{get_child(i_address, 4), {}}},
-              node{leaf_node{get_child(i_address, 5), {}}},
-              node{leaf_node{get_child(i_address, 6), {}}},
-              node{leaf_node{get_child(i_address, 7), {}}})} {
+      inner_node(const detail::node_address i_address, std::vector<U> i_data) : inner_node{i_address, std::move(i_data), kdl::vec_from(
+          node{leaf_node{get_child(i_address, 0), {}}}, node{leaf_node{get_child(i_address, 1), {}}}, node{leaf_node{get_child(i_address, 2), {}}}, node{leaf_node{get_child(i_address, 3), {}}}, node{leaf_node{get_child(i_address, 4), {}}},
+          node{leaf_node{get_child(i_address, 5), {}}}, node{leaf_node{get_child(i_address, 6), {}}}, node{leaf_node{get_child(i_address, 7), {}}}
+      )} {
       }
 
       inner_node(const inner_node &) = delete;
@@ -199,8 +183,9 @@ private:
     static bool is_inner_node(const node &node) {
         return std::visit(
             kdl::overload(
-                [](const inner_node &) { return true; }, [](const leaf_node &) { return false; }),
-            node);
+                [](const inner_node &) { return true; }, [](const leaf_node &) { return false; }
+            ), node
+        );
     }
 
     static bool is_leaf_node(const node &node) { return !is_inner_node(node); }
@@ -209,19 +194,20 @@ private:
         return std::visit(
             kdl::overload(
                 [](const inner_node &i) {
-                  return i.data.empty()
-                         && std::all_of(
+                  return i.data.empty() && std::all_of(
                       i.children.begin(), i.children.end(), [](const auto &child) {
                         return is_leaf_node(child) && is_empty(child);
-                      });
-                },
-                [](const leaf_node &l) { return l.data.empty(); }),
-            node);
+                      }
+                  );
+                }, [](const leaf_node &l) { return l.data.empty(); }
+            ), node
+        );
     }
 
     template<typename Predicate, typename Visitor>
     static void visit_node_if(
-        const node &node, const Visitor &visitor, const Predicate &predicate) {
+        const node &node, const Visitor &visitor, const Predicate &predicate
+    ) {
         if (predicate(node)) {
             visitor(node);
             std::visit(
@@ -230,16 +216,15 @@ private:
                       for (const auto &child: inner_node.children) {
                           visit_node_if(child, visitor, predicate);
                       }
-                    },
-                    [&](const leaf_node &) {}),
-                node);
+                    }, [&](const leaf_node &) {}
+                ), node
+            );
         }
     }
 
     static void update_root_address(
-        node &root,
-        const detail::node_address &address,
-        std::unordered_map<U, detail::node_address> &node_address_for_data) {
+        node &root, const detail::node_address &address, std::unordered_map<U, detail::node_address> &node_address_for_data
+    ) {
         assert(is_root(address));
         assert(address.contains(get_address(root)));
         get_address(root) = address;
@@ -266,18 +251,20 @@ private:
                 kdl::overload(
                     [&](inner_node &i) {
                       insert_into_node(i.children[*quadrant], address, std::move(data));
-                    },
-                    [&](leaf_node &l) {
+                    }, [&](leaf_node &l) {
                       if (l.data.empty()) {
                           l.address = address;
                           l.data.push_back(std::move(data));
-                      } else {
+                      }
+                      else {
                           node = inner_node{l.address, std::move(l.data)};
                           insert_into_node(node, address, std::move(data));
                       }
-                    }),
-                node);
-        } else {
+                    }
+                ), node
+            );
+        }
+        else {
             get_data(node).push_back(std::move(data));
         }
     }
@@ -288,7 +275,8 @@ private:
                 [&](inner_node &i) {
                   if (const auto quadrant = get_quadrant(i.address, address)) {
                       remove_from_node(i.children[*quadrant], address, data);
-                  } else {
+                  }
+                  else {
                       const auto i_data = std::find(i.data.begin(), i.data.end(), data);
                       assert(i_data != i.data.end());
                       i.data.erase(i_data);
@@ -298,26 +286,25 @@ private:
                       const auto is_non_empty_child = [](const auto &c) {
                         return is_inner_node(c) || !get_data(c).empty();
                       };
-                      const auto num_non_empty_children =
-                          std::count_if(i.children.begin(), i.children.end(), is_non_empty_child);
+                      const auto num_non_empty_children = std::count_if(i.children.begin(), i.children.end(), is_non_empty_child);
                       if (num_non_empty_children == 0) {
                           node = leaf_node{i.address, std::move(i.data)};
-                      } else if (num_non_empty_children == 1 && i.data.empty()) {
-                          const auto i_non_empty_child =
-                              std::find_if(i.children.begin(), i.children.end(), is_non_empty_child);
+                      }
+                      else if (num_non_empty_children == 1 && i.data.empty()) {
+                          const auto i_non_empty_child = std::find_if(i.children.begin(), i.children.end(), is_non_empty_child);
                           assert(i_non_empty_child != i.children.end());
 
                           auto child = std::move(*i_non_empty_child);
                           node = std::move(child);
                       }
                   }
-                },
-                [&](leaf_node &l) {
+                }, [&](leaf_node &l) {
                   const auto i_data = std::find(l.data.begin(), l.data.end(), data);
                   assert(i_data != l.data.end());
                   l.data.erase(i_data);
-                }),
-            node);
+                }
+            ), node
+        );
     }
 
 private:
@@ -326,12 +313,10 @@ private:
     std::unordered_map<U, detail::node_address> m_node_address_for_data;
 
 public:
-    explicit octree(const T min_size)
-        : m_min_size{min_size} {
+    explicit octree(const T min_size) : m_min_size{min_size} {
     }
 
-    octree(const T min_size, node root)
-        : m_root{std::move(root)}, m_min_size{min_size} {
+    octree(const T min_size, node root) : m_root{std::move(root)}, m_min_size{min_size} {
         auto visitor = kdl::overload(
             [&](auto &&self, const inner_node &node) -> void {
               for (const auto &data: node.data) {
@@ -340,12 +325,12 @@ public:
               for (const auto &child: node.children) {
                   std::visit([&](const auto &c) { self(self, c); }, child);
               }
-            },
-            [&](auto &&, const leaf_node &node) -> void {
+            }, [&](auto &&, const leaf_node &node) -> void {
               for (const auto &data: node.data) {
                   m_node_address_for_data.emplace(data, node.address);
               }
-            });
+            }
+        );
 
         if (m_root) {
             std::visit([&](const auto &node) { visitor(visitor, node); }, *m_root);
@@ -371,16 +356,19 @@ public:
         if (is_root(address)) {
             if (!m_root) {
                 m_root = leaf_node{address, {}};
-            } else if (!get_address(*m_root).contains(address)) {
+            }
+            else if (!get_address(*m_root).contains(address)) {
                 update_root_address(*m_root, address, m_node_address_for_data);
             }
 
             get_data(*m_root).push_back(std::move(data));
             m_node_address_for_data.emplace(data, get_address(*m_root));
-        } else {
+        }
+        else {
             if (!m_root) {
                 m_root = inner_node{get_root(address), {}};
-            } else if (!get_address(*m_root).contains(address)) {
+            }
+            else if (!get_address(*m_root).contains(address)) {
                 update_root_address(*m_root, get_root(address), m_node_address_for_data);
             }
 
@@ -469,16 +457,14 @@ public:
     void find_intersectors(const vm::ray<T, 3> &ray, O out) const {
         if (m_root) {
             visit_node_if(
-                *m_root,
-                [&](const auto &node) {
+                *m_root, [&](const auto &node) {
                   const auto &data = get_data(node);
                   std::copy(data.begin(), data.end(), out);
-                },
-                [&](const auto &node) {
+                }, [&](const auto &node) {
                   const auto bounds = get_address(node).to_bounds(m_min_size);
-                  return bounds.contains(ray.origin)
-                         || !vm::is_nan(vm::intersect_ray_bbox(ray, bounds));
-                });
+                  return bounds.contains(ray.origin) || !vm::is_nan(vm::intersect_ray_bbox(ray, bounds));
+                }
+            );
         }
     }
 
@@ -507,14 +493,13 @@ public:
     void find_containers(const vm::vec<T, 3> &point, O out) const {
         if (m_root) {
             visit_node_if(
-                *m_root,
-                [&](const auto &node) {
+                *m_root, [&](const auto &node) {
                   const auto &data = get_data(node);
                   std::copy(data.begin(), data.end(), out);
-                },
-                [&](const auto &node) {
+                }, [&](const auto &node) {
                   return get_address(node).to_bounds(m_min_size).contains(point);
-                });
+                }
+            );
         }
     }
 

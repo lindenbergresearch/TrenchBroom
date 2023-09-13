@@ -39,13 +39,15 @@ namespace TrenchBroom {
 namespace Model {
 template<typename T, typename FP, typename VP>
 const vm::vec<T, 3> &Polyhedron<T, FP, VP>::GetVertexPosition::operator()(
-    const Vertex *vertex) const {
+    const Vertex *vertex
+) const {
     return vertex->position();
 }
 
 template<typename T, typename FP, typename VP>
 const vm::vec<T, 3> &Polyhedron<T, FP, VP>::GetVertexPosition::operator()(
-    const HalfEdge *halfEdge) const {
+    const HalfEdge *halfEdge
+) const {
     return halfEdge->origin()->position();
 }
 
@@ -213,27 +215,27 @@ Polyhedron<T, FP, VP>::Polyhedron(const Polyhedron<T, FP, VP> &other) {
 
 template<typename T, typename FP, typename VP>
 Polyhedron<T, FP, VP>::Polyhedron(
-    const Polyhedron<T, FP, VP> &other, const CopyCallback &callback) {
+    const Polyhedron<T, FP, VP> &other, const CopyCallback &callback
+) {
     Copy copy(other.faces(), other.edges(), other.vertices(), *this, callback);
 }
 
 template<typename T, typename FP, typename VP>
 Polyhedron<T, FP, VP>::Polyhedron(Polyhedron<T, FP, VP> &&other) noexcept
-    : m_vertices(std::move(other.m_vertices)), m_edges(std::move(other.m_edges)), m_faces(std::move(other.m_faces)),
-      m_bounds(std::move(other.m_bounds)) {
+    : m_vertices(std::move(other.m_vertices)), m_edges(std::move(other.m_edges)), m_faces(std::move(other.m_faces)), m_bounds(std::move(other.m_bounds)) {
 }
 
 template<typename T, typename FP, typename VP>
 Polyhedron<T, FP, VP> &Polyhedron<T, FP, VP>::operator=(
-    const Polyhedron<T, FP, VP> &other) {
+    const Polyhedron<T, FP, VP> &other
+) {
     Polyhedron<T, FP, VP> copy(other);
     swap(*this, copy);
     return *this;
 }
 
 template<typename T, typename FP, typename VP>
-Polyhedron<T, FP, VP> &Polyhedron<T, FP, VP>::operator=(Polyhedron<T, FP, VP> &&other) =
-default;
+Polyhedron<T, FP, VP> &Polyhedron<T, FP, VP>::operator=(Polyhedron<T, FP, VP> &&other) = default;
 
 /**
  * Copies a polyhedron.
@@ -290,12 +292,8 @@ public:
      * @param callback the callback to call for every created face or vertex             *
      */
     Copy(
-        const FaceList &originalFaces,
-        const EdgeList &originalEdges,
-        const VertexList &originalVertices,
-        Polyhedron &destination,
-        const CopyCallback &callback)
-        : m_destination(destination) {
+        const FaceList &originalFaces, const EdgeList &originalEdges, const VertexList &originalVertices, Polyhedron &destination, const CopyCallback &callback
+    ) : m_destination(destination) {
         copyVertices(originalVertices, callback);
         copyFaces(originalFaces, callback);
         copyEdges(originalEdges);
@@ -372,7 +370,8 @@ private:
             HalfEdge *copy = new HalfEdge(myOrigin);
             m_halfEdgeMap.insert(std::make_pair(original, copy));
             return copy;
-        } else {
+        }
+        else {
             return it->second;
         }
     }
@@ -406,7 +405,8 @@ bool Polyhedron<T, FP, VP>::operator==(const Polyhedron &other) const {
 
     for (const Edge *current: m_edges) {
         if (!other.hasEdge(
-            current->firstVertex()->position(), current->secondVertex()->position(), 0.0)) {
+            current->firstVertex()->position(), current->secondVertex()->position(), 0.0
+        )) {
             return false;
         }
     }
@@ -457,7 +457,8 @@ const typename Polyhedron<T, FP, VP>::EdgeList &Polyhedron<T, FP, VP>::edges() c
 
 template<typename T, typename FP, typename VP>
 bool Polyhedron<T, FP, VP>::hasEdge(
-    const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, const T epsilon) const {
+    const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, const T epsilon
+) const {
     return findEdgeByPositions(pos1, pos2, epsilon) != nullptr;
 }
 
@@ -478,7 +479,8 @@ typename Polyhedron<T, FP, VP>::FaceList &Polyhedron<T, FP, VP>::faces() {
 
 template<typename T, typename FP, typename VP>
 bool Polyhedron<T, FP, VP>::hasFace(
-    const std::vector<vm::vec<T, 3>> &positions, const T epsilon) const {
+    const std::vector<vm::vec<T, 3>> &positions, const T epsilon
+) const {
     return findFaceByPositions(positions, epsilon) != nullptr;
 }
 
@@ -542,7 +544,8 @@ bool Polyhedron<T, FP, VP>::FaceHit::isMatch() const {
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::FaceHit Polyhedron<T, FP, VP>::pickFace(
-    const vm::ray<T, 3> &ray) const {
+    const vm::ray<T, 3> &ray
+) const {
     const auto side = polygon() ? vm::side::both : vm::side::front;
     auto *firstFace = m_faces.front();
     auto *currentFace = firstFace;
@@ -558,13 +561,15 @@ typename Polyhedron<T, FP, VP>::FaceHit Polyhedron<T, FP, VP>::pickFace(
 
 template<typename T, typename FP, typename VP>
 bool Polyhedron<T, FP, VP>::hasVertex(
-    const vm::vec<T, 3> &position, const T epsilon) const {
+    const vm::vec<T, 3> &position, const T epsilon
+) const {
     return findVertexByPosition(position, epsilon) != nullptr;
 }
 
 template<typename T, typename FP, typename VP>
 bool Polyhedron<T, FP, VP>::hasAnyVertex(
-    const std::vector<vm::vec<T, 3>> &positions, const T epsilon) const {
+    const std::vector<vm::vec<T, 3>> &positions, const T epsilon
+) const {
     for (const vm::vec<T, 3> &position: positions) {
         if (hasVertex(position, epsilon)) {
             return true;
@@ -575,7 +580,8 @@ bool Polyhedron<T, FP, VP>::hasAnyVertex(
 
 template<typename T, typename FP, typename VP>
 bool Polyhedron<T, FP, VP>::hasAllVertices(
-    const std::vector<vm::vec<T, 3>> &positions, const T epsilon) const {
+    const std::vector<vm::vec<T, 3>> &positions, const T epsilon
+) const {
     if (positions.size() != vertexCount()) {
         return false;
     }
@@ -589,7 +595,8 @@ bool Polyhedron<T, FP, VP>::hasAllVertices(
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::findVertexByPosition(
-    const vm::vec<T, 3> &position, const T epsilon) const {
+    const vm::vec<T, 3> &position, const T epsilon
+) const {
     if (m_vertices.empty()) {
         return nullptr;
     }
@@ -607,7 +614,8 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::findVertexByPosit
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::findClosestVertex(
-    const vm::vec<T, 3> &position, const T maxDistance) const {
+    const vm::vec<T, 3> &position, const T maxDistance
+) const {
     if (m_vertices.empty()) {
         return nullptr;
     }
@@ -630,7 +638,8 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::findClosestVertex
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::Edge *Polyhedron<T, FP, VP>::findEdgeByPositions(
-    const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, const T epsilon) const {
+    const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, const T epsilon
+) const {
     if (m_edges.empty()) {
         return nullptr;
     }
@@ -648,7 +657,8 @@ typename Polyhedron<T, FP, VP>::Edge *Polyhedron<T, FP, VP>::findEdgeByPositions
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::Edge *Polyhedron<T, FP, VP>::findClosestEdge(
-    const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, const T maxDistance) const {
+    const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, const T maxDistance
+) const {
     if (m_edges.empty()) {
         return nullptr;
     }
@@ -671,7 +681,8 @@ typename Polyhedron<T, FP, VP>::Edge *Polyhedron<T, FP, VP>::findClosestEdge(
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::Face *Polyhedron<T, FP, VP>::findFaceByPositions(
-    const std::vector<vm::vec<T, 3>> &positions, const T epsilon) const {
+    const std::vector<vm::vec<T, 3>> &positions, const T epsilon
+) const {
     Face *firstFace = m_faces.front();
     Face *currentFace = firstFace;
     do {
@@ -685,7 +696,8 @@ typename Polyhedron<T, FP, VP>::Face *Polyhedron<T, FP, VP>::findFaceByPositions
 
 template<typename T, typename FP, typename VP>
 typename Polyhedron<T, FP, VP>::Face *Polyhedron<T, FP, VP>::findClosestFace(
-    const std::vector<vm::vec<T, 3>> &positions, const T maxDistance) {
+    const std::vector<vm::vec<T, 3>> &positions, const T maxDistance
+) {
     auto closestDistance = maxDistance;
     Face *closestFace = nullptr;
 
@@ -709,7 +721,8 @@ void Polyhedron<T, FP, VP>::updateBounds() {
 
     if (!builder.initialized()) {
         m_bounds.min = m_bounds.max = vm::vec<T, 3>::nan();
-    } else {
+    }
+    else {
         m_bounds = builder.bounds();
     }
 }
@@ -735,8 +748,7 @@ bool Polyhedron<T, FP, VP>::healEdges(const T minLength) {
       return nullptr;
     };
 
-    for (auto *edge = findShortEdge(); edge != nullptr && polyhedron();
-         edge = findShortEdge()) {
+    for (auto *edge = findShortEdge(); edge != nullptr && polyhedron(); edge = findShortEdge()) {
         if (removeEdge(edge) == nullptr) {
             return false;
         }
@@ -795,17 +807,13 @@ typename Polyhedron<T, FP, VP>::Edge *Polyhedron<T, FP, VP>::removeEdge(Edge *ed
     };
 
     // merge f1 into n1:
-    if (
-        edge->firstFace()->vertexCount() == 3u
-        && !mergeNeighbours(edge->firstEdge()->next()->twin(), validEdge)) {
+    if (edge->firstFace()->vertexCount() == 3u && !mergeNeighbours(edge->firstEdge()->next()->twin(), validEdge)) {
         return nullptr;
     }
 
     // merge f2 into n2 if necessary:
     if (!v2WasRemoved()) {
-        if (
-            edge->secondFace()->vertexCount() == 3u
-            && !mergeNeighbours(edge->secondEdge()->previous()->twin(), validEdge)) {
+        if (edge->secondFace()->vertexCount() == 3u && !mergeNeighbours(edge->secondEdge()->previous()->twin(), validEdge)) {
             return nullptr;
         }
 
@@ -818,7 +826,8 @@ typename Polyhedron<T, FP, VP>::Edge *Polyhedron<T, FP, VP>::removeEdge(Edge *ed
                 leaving->setOrigin(v1);
                 if (newLeaving->origin() == v2) {
                     v2->setLeaving(newLeaving);
-                } else {
+                }
+                else {
                     v2->setLeaving(nullptr);
                 }
             }
@@ -907,16 +916,14 @@ bool Polyhedron<T, FP, VP>::mergeNeighbours(HalfEdge *borderFirst, Edge *&validE
     Face *neighbour = borderFirst->twin()->face();
 
     // find the entire border between the two faces
-    while (borderFirst->previous()->face() == face
-           && borderFirst->previous()->twin()->face() == neighbour) {
+    while (borderFirst->previous()->face() == face && borderFirst->previous()->twin()->face() == neighbour) {
         borderFirst = borderFirst->previous();
     }
 
     HalfEdge *twinLast = borderFirst->twin();
     HalfEdge *borderLast = borderFirst;
 
-    while (borderLast->next()->face() == face
-           && borderLast->next()->twin()->face() == neighbour) {
+    while (borderLast->next()->face() == face && borderLast->next()->twin()->face() == neighbour) {
         borderLast = borderLast->next();
     }
 
@@ -933,8 +940,7 @@ bool Polyhedron<T, FP, VP>::mergeNeighbours(HalfEdge *borderFirst, Edge *&validE
     HalfEdge *remainingLast = twinFirst->previous();
 
     HalfEdgeList edgesToRemove = neighbour->removeFromBoundary(twinFirst, twinLast);
-    HalfEdgeList remainingEdges =
-        neighbour->removeFromBoundary(remainingFirst, remainingLast);
+    HalfEdgeList remainingEdges = neighbour->removeFromBoundary(remainingFirst, remainingLast);
     assert(neighbour->boundary().empty());
 
     // the replaced edges are deleted
@@ -987,7 +993,8 @@ bool Polyhedron<T, FP, VP>::mergeNeighbours(HalfEdge *borderFirst, Edge *&validE
                   borderEdge = borderEdge->twin();
               }
               return mergeNeighbours(borderEdge, validEdge);
-          } else {
+          }
+          else {
               assert(face1->vertexCount() > 3u && face2->vertexCount() > 3u);
               if (validEdge == vertex->leaving()->edge()) {
                   validEdge = validEdge->next();
@@ -1068,7 +1075,8 @@ std::string Polyhedron<T, FP, VP>::exportObj() const {
 
 template<typename T, typename FP, typename VP>
 std::string Polyhedron<T, FP, VP>::exportObjSelectedFaces(
-    const std::vector<const Face *> &faces) const {
+    const std::vector<const Face *> &faces
+) const {
     std::stringstream ss;
     std::vector<const Vertex *> vertices;
 

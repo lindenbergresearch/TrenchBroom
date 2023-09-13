@@ -143,11 +143,7 @@ private:
 };
 
 enum class UnaryOperator {
-  Plus,
-  Minus,
-  LogicalNegation,
-  BitwiseNegation,
-  Group
+  Plus, Minus, LogicalNegation, BitwiseNegation, Group
 };
 
 class UnaryExpression : public ExpressionImpl {
@@ -171,26 +167,7 @@ private:
 };
 
 enum class BinaryOperator {
-  Addition,
-  Subtraction,
-  Multiplication,
-  Division,
-  Modulus,
-  LogicalAnd,
-  LogicalOr,
-  BitwiseAnd,
-  BitwiseXOr,
-  BitwiseOr,
-  BitwiseShiftLeft,
-  BitwiseShiftRight,
-  Less,
-  LessOrEqual,
-  Greater,
-  GreaterOrEqual,
-  Equal,
-  NotEqual,
-  Range,
-  Case,
+  Addition, Subtraction, Multiplication, Division, Modulus, LogicalAnd, LogicalOr, BitwiseAnd, BitwiseXOr, BitwiseOr, BitwiseShiftLeft, BitwiseShiftRight, Less, LessOrEqual, Greater, GreaterOrEqual, Equal, NotEqual, Range, Case,
 };
 
 class BinaryExpression : public ExpressionImpl {
@@ -204,13 +181,16 @@ private:
 
 public:
     BinaryExpression(
-        BinaryOperator i_operator, Expression leftOperand, Expression rightOperand);
+        BinaryOperator i_operator, Expression leftOperand, Expression rightOperand
+    );
 
     static Expression createAutoRangeWithRightOperand(
-        Expression rightOperand, size_t line, size_t column);
+        Expression rightOperand, size_t line, size_t column
+    );
 
     static Expression createAutoRangeWithLeftOperand(
-        Expression leftOperand, size_t line, size_t column);
+        Expression leftOperand, size_t line, size_t column
+    );
 
     Value evaluate(const EvaluationContext &context) const override;
 

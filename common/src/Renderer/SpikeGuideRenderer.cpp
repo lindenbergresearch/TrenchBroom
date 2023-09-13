@@ -39,8 +39,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-SpikeGuideRenderer::SpikeGuideRenderer()
-    : m_valid(false) {
+SpikeGuideRenderer::SpikeGuideRenderer() : m_valid(false) {
 }
 
 void SpikeGuideRenderer::setColor(const Color &color) {
@@ -49,20 +48,19 @@ void SpikeGuideRenderer::setColor(const Color &color) {
 }
 
 void SpikeGuideRenderer::add(
-    const vm::ray3 &ray,
-    const FloatType length,
-    std::shared_ptr<View::MapDocument> document) {
+    const vm::ray3 &ray, const FloatType length, std::shared_ptr<View::MapDocument> document
+) {
     Model::PickResult pickResult = Model::PickResult::byDistance();
     document->pick(ray, pickResult);
 
     using namespace Model::HitFilters;
-    const auto &hit =
-        pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
+    const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
     if (hit.isMatch()) {
         if (hit.distance() <= length)
             addPoint(vm::point_at_distance(ray, hit.distance() - 0.01));
         addSpike(ray, vm::min(length, hit.distance()), length);
-    } else {
+    }
+    else {
         addSpike(ray, length, length);
     }
     m_valid = false;
@@ -97,7 +95,8 @@ void SpikeGuideRenderer::addPoint(const vm::vec3 &position) {
 }
 
 void SpikeGuideRenderer::addSpike(
-    const vm::ray3 &ray, const FloatType length, const FloatType maxLength) {
+    const vm::ray3 &ray, const FloatType length, const FloatType maxLength
+) {
     const auto mix = static_cast<float>(maxLength / length / 2.0);
 
     m_spikeVertices.emplace_back(vm::vec3f(ray.origin), m_color);

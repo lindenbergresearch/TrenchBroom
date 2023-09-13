@@ -80,9 +80,7 @@ template<typename H>
 class VertexToolBase : public Tool {
 public:
     enum class MoveResult {
-      Continue,
-      Deny,
-      Cancel
+      Continue, Deny, Cancel
     };
 
 protected:
@@ -98,9 +96,7 @@ protected:
     bool m_dragging;
 
 protected:
-    explicit VertexToolBase(std::weak_ptr<MapDocument> document)
-        : Tool(false), m_document(std::move(document)), m_changeCount(0), m_ignoreChangeNotifications(0u),
-          m_dragging(false) {
+    explicit VertexToolBase(std::weak_ptr<MapDocument> document) : Tool(false), m_document(std::move(document)), m_changeCount(0), m_ignoreChangeNotifications(0u), m_dragging(false) {
     }
 
 public:
@@ -117,7 +113,8 @@ public:
 public:
     template<typename M, typename I>
     std::map<typename M::Handle, std::vector<Model::BrushNode *>> buildBrushMap(
-        const M &manager, I cur, I end) const {
+        const M &manager, I cur, I end
+    ) const {
         using H2 = typename M::Handle;
         std::map<H2, std::vector<Model::BrushNode *>> result;
         while (cur != end) {
@@ -130,7 +127,8 @@ public:
     // FIXME: use vector_set
     template<typename M, typename H2>
     std::vector<Model::BrushNode *> findIncidentBrushes(
-        const M &manager, const H2 &handle) const {
+        const M &manager, const H2 &handle
+    ) const {
         const std::vector<Model::BrushNode *> &brushes = selectedBrushes();
         return manager.findIncidentBrushes(handle, std::begin(brushes), std::end(brushes));
     }
@@ -152,9 +150,8 @@ public:
     }
 
     virtual void pick(
-        const vm::ray3 &pickRay,
-        const Renderer::Camera &camera,
-        Model::PickResult &pickResult) const = 0;
+        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+    ) const = 0;
 
 public: // Handle selection
     bool select(const std::vector<Model::Hit> &hits, const bool addToSelection) {
@@ -176,7 +173,8 @@ public: // Handle selection
                 for (const auto &hit: hits) {
                     handleManager().select(hit.target<H>());
                 }
-            } else if (addToSelection) {
+            }
+            else if (addToSelection) {
                 // The user meant to deselect a selected handle.
                 for (const auto &hit: hits) {
                     handleManager().deselect(hit.target<H>());
@@ -227,7 +225,8 @@ public:
 
 public: // performing moves
     virtual std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(
-        const std::vector<Model::Hit> &hits) const = 0;
+        const std::vector<Model::Hit> &hits
+    ) const = 0;
 
     virtual bool startMove(const std::vector<Model::Hit> &hits) {
         assert(!hits.empty());
@@ -296,12 +295,9 @@ public: // csg convex merge
         auto document = kdl::mem_lock(m_document);
         auto game = document->game();
 
-        const auto builder = Model::BrushBuilder{
-            document->world()->mapFormat(),
-            document->worldBounds(),
-            game->defaultFaceAttribs()};
-        builder.createBrush(polyhedron, document->currentTextureName())
-            .transform([&](auto b) {
+        const auto builder = Model::BrushBuilder{document->world()->mapFormat(), document->worldBounds(), game->defaultFaceAttribs()};
+        builder.createBrush(polyhedron, document->currentTextureName()).transform(
+            [&](auto b) {
               for (const auto *selectedBrushNode: document->selectedNodes().brushes()) {
                   b.cloneFaceAttributesFrom(selectedBrushNode->brush());
               }
@@ -309,15 +305,15 @@ public: // csg convex merge
               auto *newParent = document->parentForNodes(document->selectedNodes().nodes());
               auto transaction = Transaction{document, "CSG Convex Merge"};
               deselectAll();
-              if (document->addNodes({{newParent, {new Model::BrushNode{std::move(b)}}}})
-                  .empty()) {
+              if (document->addNodes({{newParent, {new Model::BrushNode{std::move(b)}}}}).empty()) {
                   transaction.cancel();
                   return;
               }
               transaction.commit();
-            })
-            .transform_error(
-                [&](auto e) { document->error() << "Could not create brush: " << e.msg; });
+            }
+        ).transform_error(
+            [&](auto e) { document->error() << "Could not create brush: " << e.msg; }
+        );
     }
 
     virtual H getHandlePosition(const Model::Hit &hit) const {
@@ -341,64 +337,57 @@ public:
 
 public: // rendering
     void renderHandles(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) const {
         Renderer::RenderService renderService(renderContext, renderBatch);
         if (!handleManager().allSelected()) {
             renderHandles(
-                handleManager().unselectedHandles(),
-                renderService,
-                pref(Preferences::HandleColor));
+                handleManager().unselectedHandles(), renderService, pref(Preferences::HandleColor));
         }
         if (handleManager().anySelected()) {
             renderHandles(
-                handleManager().selectedHandles(),
-                renderService,
-                pref(Preferences::SelectedHandleColor));
+                handleManager().selectedHandles(), renderService, pref(Preferences::SelectedHandleColor));
         }
     }
 
     void renderDragHandle(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) const {
         renderHandle(
-            renderContext,
-            renderBatch,
-            m_dragHandlePosition,
-            pref(Preferences::SelectedHandleColor));
+            renderContext, renderBatch, m_dragHandlePosition, pref(Preferences::SelectedHandleColor));
     }
 
     template<typename HH>
     void renderHandle(
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch,
-        const HH &handle) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const HH &handle
+    ) const {
         renderHandle(renderContext, renderBatch, handle, pref(Preferences::HandleColor));
     }
 
     void renderDragHighlight(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) const {
         renderHighlight(renderContext, renderBatch, m_dragHandlePosition);
     }
 
     void renderDragGuide(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) const {
         renderGuide(renderContext, renderBatch, m_dragHandlePosition);
     }
 
     template<typename HH>
     void renderHandles(
-        const std::vector<HH> &handles,
-        Renderer::RenderService &renderService,
-        const Color &color) const {
+        const std::vector<HH> &handles, Renderer::RenderService &renderService, const Color &color
+    ) const {
         renderService.setForegroundColor(color);
         renderService.renderHandles(kdl::vec_element_cast<typename HH::float_type>(handles));
     }
 
     template<typename HH>
     void renderHandle(
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch,
-        const HH &handle,
-        const Color &color) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const HH &handle, const Color &color
+    ) const {
         Renderer::RenderService renderService(renderContext, renderBatch);
         renderService.setForegroundColor(color);
         renderService.renderHandle(typename HH::float_type(handle));
@@ -406,18 +395,16 @@ public: // rendering
 
     template<typename HH>
     void renderHighlight(
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch,
-        const HH &handle) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const HH &handle
+    ) const {
         Renderer::RenderService renderService(renderContext, renderBatch);
         renderService.setForegroundColor(pref(Preferences::SelectedHandleColor));
         renderService.renderHandleHighlight(typename HH::float_type(handle));
     }
 
     void renderHighlight(
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch,
-        const vm::vec3 &handle) const {
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &handle
+    ) const {
         Renderer::RenderService renderService(renderContext, renderBatch);
         renderService.setForegroundColor(pref(Preferences::SelectedHandleColor));
         renderService.renderHandleHighlight(vm::vec3f(handle));
@@ -434,9 +421,7 @@ public: // rendering
     }
 
     virtual void renderGuide(
-        Renderer::RenderContext &,
-        Renderer::RenderBatch &,
-        const vm::vec3 & /* position */) const {
+        Renderer::RenderContext &, Renderer::RenderBatch &, const vm::vec3 & /* position */) const {
     }
 
 protected: // Tool interface
@@ -461,23 +446,18 @@ private: // Observers and state management
     void connectObservers() {
         auto document = kdl::mem_lock(m_document);
         m_notifierConnection += document->selectionDidChangeNotifier.connect(
-            this, &VertexToolBase::selectionDidChange);
-        m_notifierConnection +=
-            document->nodesWillChangeNotifier.connect(this, &VertexToolBase::nodesWillChange);
-        m_notifierConnection +=
-            document->nodesDidChangeNotifier.connect(this, &VertexToolBase::nodesDidChange);
-        m_notifierConnection +=
-            document->commandDoNotifier.connect(this, &VertexToolBase::commandDo);
-        m_notifierConnection +=
-            document->commandDoneNotifier.connect(this, &VertexToolBase::commandDone);
-        m_notifierConnection +=
-            document->commandDoFailedNotifier.connect(this, &VertexToolBase::commandDoFailed);
-        m_notifierConnection +=
-            document->commandUndoNotifier.connect(this, &VertexToolBase::commandUndo);
-        m_notifierConnection +=
-            document->commandUndoneNotifier.connect(this, &VertexToolBase::commandUndone);
+            this, &VertexToolBase::selectionDidChange
+        );
+        m_notifierConnection += document->nodesWillChangeNotifier.connect(this, &VertexToolBase::nodesWillChange);
+        m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &VertexToolBase::nodesDidChange);
+        m_notifierConnection += document->commandDoNotifier.connect(this, &VertexToolBase::commandDo);
+        m_notifierConnection += document->commandDoneNotifier.connect(this, &VertexToolBase::commandDone);
+        m_notifierConnection += document->commandDoFailedNotifier.connect(this, &VertexToolBase::commandDoFailed);
+        m_notifierConnection += document->commandUndoNotifier.connect(this, &VertexToolBase::commandUndo);
+        m_notifierConnection += document->commandUndoneNotifier.connect(this, &VertexToolBase::commandUndone);
         m_notifierConnection += document->commandUndoFailedNotifier.connect(
-            this, &VertexToolBase::commandUndoFailed);
+            this, &VertexToolBase::commandUndoFailed
+        );
     }
 
     void commandDo(Command &command) { commandDoOrUndo(command); }
@@ -523,16 +503,14 @@ private: // Observers and state management
 
     void nodesWillChange(const std::vector<Model::Node *> &nodes) {
         if (m_ignoreChangeNotifications == 0u) {
-            const auto selectedNodes =
-                kdl::vec_filter(nodes, [](const auto *node) { return node->selected(); });
+            const auto selectedNodes = kdl::vec_filter(nodes, [](const auto *node) { return node->selected(); });
             removeHandles(selectedNodes);
         }
     }
 
     void nodesDidChange(const std::vector<Model::Node *> &nodes) {
         if (m_ignoreChangeNotifications == 0u) {
-            const auto selectedNodes =
-                kdl::vec_filter(nodes, [](const auto *node) { return node->selected(); });
+            const auto selectedNodes = kdl::vec_filter(nodes, [](const auto *node) { return node->selected(); });
             addHandles(selectedNodes);
         }
     }
@@ -558,29 +536,27 @@ protected:
 
     template<typename HT>
     void addHandles(
-        const std::vector<Model::Node *> &nodes, VertexHandleManagerBaseT<HT> &handleManager) {
+        const std::vector<Model::Node *> &nodes, VertexHandleManagerBaseT<HT> &handleManager
+    ) {
         for (const auto *node: nodes) {
-            node->accept(kdl::overload(
-                [](const Model::WorldNode *) {},
-                [](const Model::LayerNode *) {},
-                [](const Model::GroupNode *) {},
-                [](const Model::EntityNode *) {},
-                [&](const Model::BrushNode *brush) { handleManager.addHandles(brush); },
-                [](const Model::PatchNode *) {}));
+            node->accept(
+                kdl::overload(
+                    [](const Model::WorldNode *) {}, [](const Model::LayerNode *) {}, [](const Model::GroupNode *) {}, [](const Model::EntityNode *) {}, [&](const Model::BrushNode *brush) { handleManager.addHandles(brush); },
+                    [](const Model::PatchNode *) {}
+                ));
         }
     }
 
     template<typename HT>
     void removeHandles(
-        const std::vector<Model::Node *> &nodes, VertexHandleManagerBaseT<HT> &handleManager) {
+        const std::vector<Model::Node *> &nodes, VertexHandleManagerBaseT<HT> &handleManager
+    ) {
         for (const auto *node: nodes) {
-            node->accept(kdl::overload(
-                [](const Model::WorldNode *) {},
-                [](const Model::LayerNode *) {},
-                [](const Model::GroupNode *) {},
-                [](const Model::EntityNode *) {},
-                [&](const Model::BrushNode *brush) { handleManager.removeHandles(brush); },
-                [](const Model::PatchNode *) {}));
+            node->accept(
+                kdl::overload(
+                    [](const Model::WorldNode *) {}, [](const Model::LayerNode *) {}, [](const Model::GroupNode *) {}, [](const Model::EntityNode *) {}, [&](const Model::BrushNode *brush) { handleManager.removeHandles(brush); },
+                    [](const Model::PatchNode *) {}
+                ));
         }
     }
 

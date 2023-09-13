@@ -29,8 +29,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-LinkRenderer::LinkRenderer()
-    : m_valid(false) {
+LinkRenderer::LinkRenderer() : m_valid(false) {
 }
 
 void LinkRenderer::render(RenderContext &, RenderBatch &renderBatch) {
@@ -88,10 +87,8 @@ void LinkRenderer::renderArrows(RenderContext &renderContext) {
 }
 
 static void addArrow(
-    std::vector<LinkRenderer::ArrowVertex> &arrows,
-    const vm::vec4f &color,
-    const vm::vec3f &arrowPosition,
-    const vm::vec3f &lineDir) {
+    std::vector<LinkRenderer::ArrowVertex> &arrows, const vm::vec4f &color, const vm::vec3f &arrowPosition, const vm::vec3f &lineDir
+) {
     arrows.emplace_back(vm::vec3f{0, 3, 0}, color, arrowPosition, lineDir);
     arrows.emplace_back(vm::vec3f{9, 0, 0}, color, arrowPosition, lineDir);
 
@@ -100,38 +97,34 @@ static void addArrow(
 }
 
 static std::vector<LinkRenderer::ArrowVertex> getArrows(
-    const std::vector<LinkRenderer::LineVertex> &links) {
+    const std::vector<LinkRenderer::LineVertex> &links
+) {
     assert((links.size() % 2) == 0);
     auto arrows = std::vector<LinkRenderer::ArrowVertex>{};
     for (size_t i = 0; i < links.size(); i += 2) {
         const LinkRenderer::LineVertex &startVertex = links[i];
         const LinkRenderer::LineVertex &endVertex = links[i + 1];
 
-        const vm::vec3f lineVec =
-            (getVertexComponent<0>(endVertex) - getVertexComponent<0>(startVertex));
+        const vm::vec3f lineVec = (getVertexComponent<0>(endVertex) - getVertexComponent<0>(startVertex));
         const float lineLength = length(lineVec);
         const vm::vec3f lineDir = lineVec / lineLength;
         const vm::vec4f color = getVertexComponent<1>(startVertex);
 
         if (lineLength < 512) {
-            const vm::vec3f arrowPosition =
-                getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
+            const vm::vec3f arrowPosition = getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
             addArrow(arrows, color, arrowPosition, lineDir);
-        } else if (lineLength < 1024) {
-            const vm::vec3f arrowPosition1 =
-                getVertexComponent<0>(startVertex) + (lineVec * 0.2f);
-            const vm::vec3f arrowPosition2 =
-                getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
+        }
+        else if (lineLength < 1024) {
+            const vm::vec3f arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec * 0.2f);
+            const vm::vec3f arrowPosition2 = getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
 
             addArrow(arrows, color, arrowPosition1, lineDir);
             addArrow(arrows, color, arrowPosition2, lineDir);
-        } else {
-            const vm::vec3f arrowPosition1 =
-                getVertexComponent<0>(startVertex) + (lineVec * 0.1f);
-            const vm::vec3f arrowPosition2 =
-                getVertexComponent<0>(startVertex) + (lineVec * 0.4f);
-            const vm::vec3f arrowPosition3 =
-                getVertexComponent<0>(startVertex) + (lineVec * 0.7f);
+        }
+        else {
+            const vm::vec3f arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec * 0.1f);
+            const vm::vec3f arrowPosition2 = getVertexComponent<0>(startVertex) + (lineVec * 0.4f);
+            const vm::vec3f arrowPosition3 = getVertexComponent<0>(startVertex) + (lineVec * 0.7f);
 
             addArrow(arrows, color, arrowPosition1, lineDir);
             addArrow(arrows, color, arrowPosition2, lineDir);

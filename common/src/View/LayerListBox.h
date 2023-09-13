@@ -55,9 +55,8 @@ private:
 
 public:
     LayerListBoxWidget(
-        std::weak_ptr<MapDocument> document,
-        Model::LayerNode *layer,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent = nullptr
+    );
 
     void updateItem() override;
 

@@ -79,8 +79,7 @@ private:
 
     struct MdxMesh {
       enum Type {
-        Fan,
-        Strip
+        Fan, Strip
       };
 
       Type type;
@@ -105,7 +104,8 @@ private:
     std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 
     void doLoadFrame(
-        size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+        size_t frameIndex, Assets::EntityModel &model, Logger &logger
+    ) override;
 
     MdxSkinList parseSkins(Reader reader, size_t skinCount);
 
@@ -114,17 +114,16 @@ private:
     MdxMeshList parseMeshes(Reader reader, size_t commandCount);
 
     void loadSkins(
-        Assets::EntityModelSurface &surface, const MdxSkinList &skins, Logger &logger);
+        Assets::EntityModelSurface &surface, const MdxSkinList &skins, Logger &logger
+    );
 
     void buildFrame(
-        Assets::EntityModel &model,
-        Assets::EntityModelSurface &surface,
-        size_t frameIndex,
-        const MdxFrame &frame,
-        const MdxMeshList &meshes);
+        Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const MdxFrame &frame, const MdxMeshList &meshes
+    );
 
     std::vector<Assets::EntityModelVertex> getVertices(
-        const MdxFrame &frame, const MdxMeshVertexList &meshVertices) const;
+        const MdxFrame &frame, const MdxMeshVertexList &meshVertices
+    ) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

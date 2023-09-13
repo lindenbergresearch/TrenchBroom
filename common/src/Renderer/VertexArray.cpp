@@ -27,8 +27,7 @@ namespace TrenchBroom {
 namespace Renderer {
 VertexArray::BaseHolder::~BaseHolder() = default;
 
-VertexArray::VertexArray()
-    : m_prepared(false), m_setup(false) {
+VertexArray::VertexArray() : m_prepared(false), m_setup(false) {
 }
 
 bool VertexArray::empty() const {
@@ -84,16 +83,15 @@ void VertexArray::render(const PrimType primType, const GLint index, const GLsiz
             glAssert(glDrawArrays(toGL(primType), index, count));
             cleanup();
         }
-    } else {
+    }
+    else {
         glAssert(glDrawArrays(toGL(primType), index, count));
     }
 }
 
 void VertexArray::render(
-    const PrimType primType,
-    const GLIndices &indices,
-    const GLCounts &counts,
-    const GLint primCount) {
+    const PrimType primType, const GLIndices &indices, const GLCounts &counts, const GLint primCount
+) {
     assert(prepared());
     if (!m_setup) {
         if (setup()) {
@@ -102,7 +100,8 @@ void VertexArray::render(
             glAssert(glMultiDrawArrays(toGL(primType), indexArray, countArray, primCount));
             cleanup();
         }
-    } else {
+    }
+    else {
         const auto *indexArray = indices.data();
         const auto *countArray = counts.data();
         glAssert(glMultiDrawArrays(toGL(primType), indexArray, countArray, primCount));
@@ -110,7 +109,8 @@ void VertexArray::render(
 }
 
 void VertexArray::render(
-    const PrimType primType, const GLIndices &indices, const GLsizei count) {
+    const PrimType primType, const GLIndices &indices, const GLsizei count
+) {
     assert(prepared());
     if (!m_setup) {
         if (setup()) {
@@ -118,14 +118,14 @@ void VertexArray::render(
             glAssert(glDrawElements(toGL(primType), count, GL_UNSIGNED_INT, indexArray));
             cleanup();
         }
-    } else {
+    }
+    else {
         const auto *indexArray = indices.data();
         glAssert(glDrawElements(toGL(primType), count, GL_UNSIGNED_INT, indexArray));
     }
 }
 
-VertexArray::VertexArray(std::shared_ptr<BaseHolder> holder)
-    : m_holder(std::move(holder)), m_prepared(false), m_setup(false) {
+VertexArray::VertexArray(std::shared_ptr<BaseHolder> holder) : m_holder(std::move(holder)), m_prepared(false), m_setup(false) {
 }
 } // namespace Renderer
 } // namespace TrenchBroom

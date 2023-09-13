@@ -41,7 +41,8 @@ private:
 
 public:
     explicit CompilationProfileItemRenderer(
-        Model::CompilationProfile &profile, QWidget *parent = nullptr);
+        Model::CompilationProfile &profile, QWidget *parent = nullptr
+    );
 
     ~CompilationProfileItemRenderer() override;
 
@@ -56,7 +57,8 @@ private:
 
 public:
     explicit CompilationProfileListBox(
-        Model::CompilationConfig &config, QWidget *parent = nullptr);
+        Model::CompilationConfig &config, QWidget *parent = nullptr
+    );
 
 public:
     void reloadProfiles();
@@ -71,7 +73,8 @@ private:
 signals:
 
     void profileContextMenuRequested(
-        const QPoint &globalPos, Model::CompilationProfile &profile);
+        const QPoint &globalPos, Model::CompilationProfile &profile
+    );
 };
 } // namespace View
 } // namespace TrenchBroom

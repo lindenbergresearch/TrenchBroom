@@ -82,11 +82,7 @@ struct EntityPropertyConfig {
   bool setDefaultProperties{false};
   bool updateAnglePropertyAfterTransform{true};
 
-  kdl_reflect_decl(
-      EntityPropertyConfig,
-      defaultModelScaleExpression,
-      setDefaultProperties,
-      updateAnglePropertyAfterTransform);
+  kdl_reflect_decl(EntityPropertyConfig, defaultModelScaleExpression, setDefaultProperties, updateAnglePropertyAfterTransform);
 };
 
 bool isNumberedProperty(std::string_view prefix, std::string_view key);
@@ -133,14 +129,15 @@ bool isGroup(const std::string &classname, const std::vector<EntityProperty> &pr
 bool isWorldspawn(const std::string &classname);
 
 std::vector<EntityProperty>::const_iterator findEntityProperty(
-    const std::vector<EntityProperty> &properties, const std::string &key);
+    const std::vector<EntityProperty> &properties, const std::string &key
+);
 
 std::vector<EntityProperty>::iterator findEntityProperty(
-    std::vector<EntityProperty> &properties, const std::string &key);
+    std::vector<EntityProperty> &properties, const std::string &key
+);
 
 const std::string &findEntityPropertyOrDefault(
-    const std::vector<EntityProperty> &properties,
-    const std::string &key,
-    const std::string &defaultValue = EntityPropertyValues::DefaultValue);
+    const std::vector<EntityProperty> &properties, const std::string &key, const std::string &defaultValue = EntityPropertyValues::DefaultValue
+);
 } // namespace Model
 } // namespace TrenchBroom

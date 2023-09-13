@@ -37,8 +37,7 @@
 namespace TrenchBroom::Assets {
 
 enum class TextureType {
-  Opaque,
-  /**
+  Opaque, /**
    * Modifies texture uploading to support mask textures.
    */
   Masked
@@ -47,11 +46,7 @@ enum class TextureType {
 std::ostream &operator<<(std::ostream &lhs, const TextureType &rhs);
 
 enum class TextureCulling {
-  Default,
-  None,
-  Front,
-  Back,
-  Both
+  Default, None, Front, Back, Both
 };
 
 std::ostream &operator<<(std::ostream &lhs, const TextureCulling &rhs);
@@ -61,12 +56,10 @@ struct TextureBlendFunc {
     /**
      * Don't change GL_BLEND and don't change the blend function.
      */
-    UseDefault,
-    /**
+    UseDefault, /**
      * Don't change GL_BLEND, but set the blend function.
      */
-    UseFactors,
-    /**
+    UseFactors, /**
      * Set GL_BLEND to off.
      */
     DisableBlend
@@ -129,51 +122,20 @@ private:
 
     GameData m_gameData;
 
-    kdl_reflect_decl(
-        Texture,
-        m_name,
-        m_absolutePath,
-        m_relativePath,
-        m_width,
-        m_height,
-        m_averageColor,
-        m_usageCount,
-        m_overridden,
-        m_format,
-        m_type,
-        m_surfaceParms,
-        m_culling,
-        m_blendFunc,
-        m_gameData);
+    kdl_reflect_decl(Texture, m_name, m_absolutePath, m_relativePath, m_width, m_height, m_averageColor, m_usageCount, m_overridden, m_format, m_type, m_surfaceParms, m_culling, m_blendFunc, m_gameData);
 
 public:
     Texture(
-        std::string name,
-        size_t width,
-        size_t height,
-        const Color &averageColor,
-        Buffer &&buffer,
-        GLenum format,
-        TextureType type,
-        GameData gameData = std::monostate{});
+        std::string name, size_t width, size_t height, const Color &averageColor, Buffer &&buffer, GLenum format, TextureType type, GameData gameData = std::monostate{}
+    );
 
     Texture(
-        std::string name,
-        size_t width,
-        size_t height,
-        const Color &averageColor,
-        BufferList buffers,
-        GLenum format,
-        TextureType type,
-        GameData gameData = std::monostate{});
+        std::string name, size_t width, size_t height, const Color &averageColor, BufferList buffers, GLenum format, TextureType type, GameData gameData = std::monostate{}
+    );
 
     Texture(
-        std::string name,
-        size_t width,
-        size_t height,
-        GLenum format = GL_RGB,
-        TextureType type = TextureType::Opaque,
-        GameData gameData = std::monostate{});
+        std::string name, size_t width, size_t height, GLenum format = GL_RGB, TextureType type = TextureType::Opaque, GameData gameData = std::monostate{}
+    );
 
     Texture(const Texture &) = delete;
 

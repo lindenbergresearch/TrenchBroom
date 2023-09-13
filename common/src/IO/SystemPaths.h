@@ -44,5 +44,6 @@ std::filesystem::path findResourceFile(const std::filesystem::path &file);
  * They may or may not exist.
  */
 std::vector<std::filesystem::path> findResourceDirectories(
-    const std::filesystem::path &directory);
+    const std::filesystem::path &directory
+);
 } // namespace TrenchBroom::IO::SystemPaths

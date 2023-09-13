@@ -47,9 +47,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ModEditor::ModEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_availableModList(nullptr), m_enabledModList(nullptr),
-      m_filterBox(nullptr) {
+ModEditor::ModEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_availableModList(nullptr), m_enabledModList(nullptr), m_filterBox(nullptr) {
     createGui();
     connectObservers();
 }
@@ -95,11 +93,8 @@ void ModEditor::createGui() {
     m_moveModDownButton = createBitmapButton("Down.svg", tr("Move the selected mod down"));
 
     auto *toolBar = createMiniToolBarLayout(
-        m_addModsButton,
-        m_removeModsButton,
-        LayoutConstants::WideHMargin,
-        m_moveModUpButton,
-        m_moveModDownButton);
+        m_addModsButton, m_removeModsButton, LayoutConstants::WideHMargin, m_moveModUpButton, m_moveModDownButton
+    );
 
     auto *layout = new QGridLayout();
     layout->setContentsMargins(0, 0, 0, 0);
@@ -114,31 +109,29 @@ void ModEditor::createGui() {
     setLayout(layout);
 
     connect(
-        m_availableModList, &QListWidget::itemDoubleClicked, this, &ModEditor::addModClicked);
+        m_availableModList, &QListWidget::itemDoubleClicked, this, &ModEditor::addModClicked
+    );
     connect(
-        m_enabledModList,
-        &QListWidget::itemDoubleClicked,
-        this,
-        &ModEditor::removeModClicked);
+        m_enabledModList, &QListWidget::itemDoubleClicked, this, &ModEditor::removeModClicked
+    );
     connect(m_filterBox, &QLineEdit::textEdited, this, &ModEditor::filterBoxChanged);
     connect(m_addModsButton, &QAbstractButton::clicked, this, &ModEditor::addModClicked);
     connect(
-        m_removeModsButton, &QAbstractButton::clicked, this, &ModEditor::removeModClicked);
+        m_removeModsButton, &QAbstractButton::clicked, this, &ModEditor::removeModClicked
+    );
     connect(
-        m_moveModUpButton, &QAbstractButton::clicked, this, &ModEditor::moveModUpClicked);
+        m_moveModUpButton, &QAbstractButton::clicked, this, &ModEditor::moveModUpClicked
+    );
     connect(
-        m_moveModDownButton, &QAbstractButton::clicked, this, &ModEditor::moveModDownClicked);
+        m_moveModDownButton, &QAbstractButton::clicked, this, &ModEditor::moveModDownClicked
+    );
 
     connect(
-        m_availableModList,
-        &QListWidget::itemSelectionChanged,
-        this,
-        &ModEditor::updateButtons);
+        m_availableModList, &QListWidget::itemSelectionChanged, this, &ModEditor::updateButtons
+    );
     connect(
-        m_enabledModList,
-        &QListWidget::itemSelectionChanged,
-        this,
-        &ModEditor::updateButtons);
+        m_enabledModList, &QListWidget::itemSelectionChanged, this, &ModEditor::updateButtons
+    );
 
     updateButtons();
 }
@@ -152,16 +145,12 @@ void ModEditor::updateButtons() {
 
 void ModEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
-    m_notifierConnection +=
-        document->documentWasNewedNotifier.connect(this, &ModEditor::documentWasNewed);
-    m_notifierConnection +=
-        document->documentWasLoadedNotifier.connect(this, &ModEditor::documentWasLoaded);
-    m_notifierConnection +=
-        document->modsDidChangeNotifier.connect(this, &ModEditor::modsDidChange);
+    m_notifierConnection += document->documentWasNewedNotifier.connect(this, &ModEditor::documentWasNewed);
+    m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &ModEditor::documentWasLoaded);
+    m_notifierConnection += document->modsDidChangeNotifier.connect(this, &ModEditor::modsDidChange);
 
     auto &prefs = PreferenceManager::instance();
-    m_notifierConnection +=
-        prefs.preferenceDidChangeNotifier.connect(this, &ModEditor::preferenceDidChange);
+    m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &ModEditor::preferenceDidChange);
 }
 
 void ModEditor::documentWasNewed(MapDocument *) {
@@ -188,15 +177,16 @@ void ModEditor::preferenceDidChange(const std::filesystem::path &path) {
 
 void ModEditor::updateAvailableMods() {
     auto document = kdl::mem_lock(m_document);
-    document->game()
-        ->availableMods()
-        .transform([&](auto availableMods) {
+    document->game()->availableMods().transform(
+        [&](auto availableMods) {
           m_availableMods = kdl::col_sort(std::move(availableMods), kdl::ci::string_less{});
-        })
-        .transform_error([&](auto e) {
+        }
+    ).transform_error(
+        [&](auto e) {
           m_availableMods.clear();
           document->error() << "Could not update available mods: " << e.msg;
-        });
+        }
+    );
 }
 
 void ModEditor::updateMods() {
@@ -300,16 +290,13 @@ bool ModEditor::canEnableRemoveButton() const {
 }
 
 bool ModEditor::canEnableMoveUpButton() const {
-    return m_enabledModList->selectedItems().size() == 1
-           && m_enabledModList->row(m_enabledModList->selectedItems().front()) > 0;
+    return m_enabledModList->selectedItems().size() == 1 && m_enabledModList->row(m_enabledModList->selectedItems().front()) > 0;
 }
 
 bool ModEditor::canEnableMoveDownButton() const {
     const auto enabledModCount = m_enabledModList->count();
 
-    return m_enabledModList->selectedItems().size() == 1
-           && m_enabledModList->row(m_enabledModList->selectedItems().front())
-              < enabledModCount - 1;
+    return m_enabledModList->selectedItems().size() == 1 && m_enabledModList->row(m_enabledModList->selectedItems().front()) < enabledModCount - 1;
 }
 
 void ModEditor::filterBoxChanged() {

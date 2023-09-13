@@ -55,7 +55,8 @@ public:
     void updateEntityPosition2D(const vm::ray3 &pickRay);
 
     void updateEntityPosition3D(
-        const vm::ray3 &pickRay, const Model::PickResult &pickResult);
+        const vm::ray3 &pickRay, const Model::PickResult &pickResult
+    );
 };
 } // namespace View
 } // namespace TrenchBroom

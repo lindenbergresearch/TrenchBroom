@@ -24,9 +24,8 @@ namespace Renderer {
 TexturedIndexArrayRenderer::TexturedIndexArrayRenderer() {}
 
 TexturedIndexArrayRenderer::TexturedIndexArrayRenderer(
-    VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap)
-    : m_vertexArray{std::move(vertexArray)}, m_indexArray{std::move(indexArray)},
-      m_indexRanges{std::move(indexArrayMap)} {
+    VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap
+) : m_vertexArray{std::move(vertexArray)}, m_indexArray{std::move(indexArray)}, m_indexRanges{std::move(indexArrayMap)} {
 }
 
 bool TexturedIndexArrayRenderer::empty() const {

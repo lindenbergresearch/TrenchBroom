@@ -38,7 +38,8 @@ private:
 
 public:
     ImageListBoxItemRenderer(
-        const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent);
+        const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent
+    );
 
     void updateItem() override;
 };
@@ -47,7 +48,8 @@ class ImageListBox : public ControlListBox {
 Q_OBJECT
 public:
     explicit ImageListBox(
-        const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
+        const QString &emptyText, bool showSeparator, QWidget *parent = nullptr
+    );
 
 private:
     ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;

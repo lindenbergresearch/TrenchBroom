@@ -48,21 +48,15 @@ struct PaletteData {
   std::vector<unsigned char> index255TransparentData;
 };
 
-Palette::Palette(std::shared_ptr<PaletteData> data)
-    : m_data{std::move(data)} {
+Palette::Palette(std::shared_ptr<PaletteData> data) : m_data{std::move(data)} {
 }
 
 bool Palette::indexedToRgba(
-    IO::Reader &reader,
-    const size_t pixelCount,
-    TextureBuffer &rgbaImage,
-    const PaletteTransparency transparency,
-    Color &averageColor) const {
+    IO::Reader &reader, const size_t pixelCount, TextureBuffer &rgbaImage, const PaletteTransparency transparency, Color &averageColor
+) const {
     ensure(rgbaImage.size() == 4 * pixelCount, "incorrect destination buffer size");
 
-    const unsigned char *paletteData = (transparency == PaletteTransparency::Opaque)
-                                       ? m_data->opaqueData.data()
-                                       : m_data->index255TransparentData.data();
+    const unsigned char *paletteData = (transparency == PaletteTransparency::Opaque) ? m_data->opaqueData.data() : m_data->index255TransparentData.data();
 
     // Write rgba pixels
     auto *const rgbaData = rgbaImage.data();
@@ -79,11 +73,7 @@ bool Palette::indexedToRgba(
         colorSum[1] += uint32_t(rgbaData[(i * 4) + 1]);
         colorSum[2] += uint32_t(rgbaData[(i * 4) + 2]);
     }
-    averageColor = Color{
-        float(colorSum[0]) / (255.0f * float(pixelCount)),
-        float(colorSum[1]) / (255.0f * float(pixelCount)),
-        float(colorSum[2]) / (255.0f * float(pixelCount)),
-        1.0f};
+    averageColor = Color{float(colorSum[0]) / (255.0f * float(pixelCount)), float(colorSum[1]) / (255.0f * float(pixelCount)), float(colorSum[2]) / (255.0f * float(pixelCount)), 1.0f};
 
     // Check for transparency
     auto hasTransparency = false;
@@ -99,9 +89,8 @@ bool Palette::indexedToRgba(
     return hasTransparency;
 }
 
-Result<Palette> makePalette(const std::vector<unsigned char>& data)
-{
-  auto result = std::make_shared<PaletteData>();
+Result<Palette> makePalette(const std::vector<unsigned char> &data) {
+    auto result = std::make_shared<PaletteData>();
 
     if (data.size() == 768) {
         // transform data to RGBA
@@ -122,12 +111,11 @@ Result<Palette> makePalette(const std::vector<unsigned char>& data)
         result->index255TransparentData = result->opaqueData;
         result->index255TransparentData[1023] = 0;
     }
-  else
-  {
-    // The data is already in RGBA format, don't process it
-    result->opaqueData = data;
-    result->index255TransparentData = data;
-  }
+    else {
+        // The data is already in RGBA format, don't process it
+        result->opaqueData = data;
+        result->index255TransparentData = data;
+    }
 
     return Palette{std::move(result)};
 }
@@ -149,10 +137,8 @@ Result<Palette> loadPcx(IO::Reader &reader) {
 
 Result<Palette> loadBmp(IO::Reader &reader) {
     auto bufferedReader = reader.buffer();
-    auto imageLoader =
-        IO::ImageLoader{IO::ImageLoader::BMP, bufferedReader.begin(), bufferedReader.end()};
-    auto data = imageLoader.hasPalette() ? imageLoader.loadPalette()
-                                         : imageLoader.loadPixels(IO::ImageLoader::RGB);
+    auto imageLoader = IO::ImageLoader{IO::ImageLoader::BMP, bufferedReader.begin(), bufferedReader.end()};
+    auto data = imageLoader.hasPalette() ? imageLoader.loadPalette() : imageLoader.loadPixels(IO::ImageLoader::RGB);
     return makePalette(data);
 }
 } // namespace
@@ -173,10 +159,8 @@ Result<Palette> loadPalette(const IO::File &file, const std::filesystem::path &p
             return loadBmp(reader);
         }
 
-        return Error{
-            "Could not load palette file '" + path.string() + "': Unknown palette format"};
-    }
-    catch (const Exception &e) {
+        return Error{"Could not load palette file '" + path.string() + "': Unknown palette format"};
+    } catch (const Exception &e) {
         return Error{"Could not load palette file '" + path.string() + "': " + e.what()};
     }
 }
@@ -186,8 +170,7 @@ Result<Palette> loadPalette(IO::Reader &reader) {
         auto data = std::vector<unsigned char>(reader.size());
         reader.read(data.data(), data.size());
         return makePalette(data);
-    }
-    catch (const Exception &e) {
+    } catch (const Exception &e) {
         using namespace std::string_literals;
         return Error{"Could not load palette: "s + e.what()};
     }

@@ -58,7 +58,8 @@ private:
     void doRender(RenderContext &renderContext) override;
 
     void renderHandles(
-        RenderContext &renderContext, const HandleMap &map, Circle &circle, float opacity);
+        RenderContext &renderContext, const HandleMap &map, Circle &circle, float opacity
+    );
 
     void clear();
 };

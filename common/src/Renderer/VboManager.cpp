@@ -52,8 +52,7 @@ static GLenum usageToOpenGL(const VboUsage usage) {
 
 // VboManager
 
-VboManager::VboManager(ShaderManager *shaderManager)
-    : m_peakVboCount(0u), m_currentVboCount(0u), m_currentVboSize(0u), m_shaderManager(shaderManager) {
+VboManager::VboManager(ShaderManager *shaderManager) : m_peakVboCount(0u), m_currentVboCount(0u), m_currentVboSize(0u), m_shaderManager(shaderManager) {
 }
 
 Vbo *VboManager::allocateVbo(VboType type, const size_t capacity, const VboUsage usage) {

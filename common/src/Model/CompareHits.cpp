@@ -38,8 +38,8 @@ int CompareHits::compare(const Hit &lhs, const Hit &rhs) const {
 }
 
 CombineCompareHits::CombineCompareHits(
-    std::unique_ptr<CompareHits> first, std::unique_ptr<CompareHits> second)
-    : m_first(std::move(first)), m_second(std::move(second)) {
+    std::unique_ptr<CompareHits> first, std::unique_ptr<CompareHits> second
+) : m_first(std::move(first)), m_second(std::move(second)) {
     ensure(m_first != nullptr, "first is null");
     ensure(m_second != nullptr, "second is null");
 }
@@ -67,8 +67,7 @@ int CompareHitsByDistance::doCompare(const Hit &lhs, const Hit &rhs) const {
     return 0;
 }
 
-CompareHitsBySize::CompareHitsBySize(const vm::axis::type axis)
-    : m_axis(axis) {
+CompareHitsBySize::CompareHitsBySize(const vm::axis::type axis) : m_axis(axis) {
 }
 
 int CompareHitsBySize::doCompare(const Hit &lhs, const Hit &rhs) const {
@@ -84,9 +83,11 @@ int CompareHitsBySize::doCompare(const Hit &lhs, const Hit &rhs) const {
 FloatType CompareHitsBySize::getSize(const Hit &hit) const {
     if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
         return faceHandle->face().projectedArea(m_axis);
-    } else if (const auto *node = hitToNode(hit)) {
+    }
+    else if (const auto *node = hitToNode(hit)) {
         return node->projectedArea(m_axis);
-    } else {
+    }
+    else {
         return 0.0;
     }
 }

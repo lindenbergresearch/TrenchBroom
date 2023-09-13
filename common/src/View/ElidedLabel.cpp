@@ -26,15 +26,14 @@
 namespace TrenchBroom {
 namespace View {
 ElidedLabel::ElidedLabel(
-    const QString &text, const Qt::TextElideMode elideMode, QWidget *parent)
-    : QWidget(parent), m_label(new QLabel(this)), m_elideMode(elideMode) {
+    const QString &text, const Qt::TextElideMode elideMode, QWidget *parent
+) : QWidget(parent), m_label(new QLabel(this)), m_elideMode(elideMode) {
     setContentsMargins(0, 0, 0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     setText(text);
 }
 
-ElidedLabel::ElidedLabel(const Qt::TextElideMode elideMode, QWidget *parent)
-    : ElidedLabel("", elideMode, parent) {
+ElidedLabel::ElidedLabel(const Qt::TextElideMode elideMode, QWidget *parent) : ElidedLabel("", elideMode, parent) {
 }
 
 const QString &ElidedLabel::text() const {
@@ -51,7 +50,8 @@ void ElidedLabel::updateElidedText(const int width) {
     m_label->setText(m_elidedText);
     if (m_elidedText.length() < m_fullText.length()) {
         m_label->setToolTip(m_fullText);
-    } else {
+    }
+    else {
         m_label->setToolTip("");
     }
 }

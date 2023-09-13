@@ -37,16 +37,20 @@ class EntityDefinition;
 
 namespace Model {
 const Assets::EntityDefinition *selectEntityDefinition(
-    const std::vector<EntityNodeBase *> &nodes);
+    const std::vector<EntityNodeBase *> &nodes
+);
 
 const Assets::PropertyDefinition *propertyDefinition(
-    const EntityNodeBase *node, const std::string &key);
+    const EntityNodeBase *node, const std::string &key
+);
 
 const Assets::PropertyDefinition *selectPropertyDefinition(
-    const std::string &key, const std::vector<EntityNodeBase *> &nodes);
+    const std::string &key, const std::vector<EntityNodeBase *> &nodes
+);
 
 std::string selectPRopertyValue(
-    const std::string &key, const std::vector<EntityNodeBase *> &nodes);
+    const std::string &key, const std::vector<EntityNodeBase *> &nodes
+);
 
 class EntityNodeBase : public Node {
 protected:
@@ -91,12 +95,12 @@ private: // bulk update after property changes
     void updateIndexAndLinks(const std::vector<EntityProperty> &newProperties);
 
     void updatePropertyIndex(
-        const std::vector<EntityProperty> &oldProperties,
-        const std::vector<EntityProperty> &newProperties);
+        const std::vector<EntityProperty> &oldProperties, const std::vector<EntityProperty> &newProperties
+    );
 
     void updateLinks(
-        const std::vector<EntityProperty> &oldProperties,
-        const std::vector<EntityProperty> &newProperties);
+        const std::vector<EntityProperty> &oldProperties, const std::vector<EntityProperty> &newProperties
+    );
 
 private: // search index management
     void addPropertiesToIndex();
@@ -108,10 +112,8 @@ private: // search index management
     void removePropertyFromIndex(const std::string &key, const std::string &value);
 
     void updatePropertyIndex(
-        const std::string &oldKey,
-        const std::string &oldValue,
-        const std::string &newKey,
-        const std::string &newValue);
+        const std::string &oldKey, const std::string &oldValue, const std::string &newKey, const std::string &newValue
+    );
 
 public: // link management
     const std::vector<EntityNodeBase *> &linkSources() const;
@@ -134,17 +136,16 @@ public: // link management
 
 private: // link management internals
     void findMissingTargets(
-        const std::string &prefix, std::vector<std::string> &result) const;
+        const std::string &prefix, std::vector<std::string> &result
+    ) const;
 
     void addLinks(const std::string &name, const std::string &value);
 
     void removeLinks(const std::string &name, const std::string &value);
 
     void updateLinks(
-        const std::string &oldName,
-        const std::string &oldValue,
-        const std::string &newName,
-        const std::string &newValue);
+        const std::string &oldName, const std::string &oldValue, const std::string &newName, const std::string &newValue
+    );
 
     void addLinkTargets(const std::string &targetname);
 

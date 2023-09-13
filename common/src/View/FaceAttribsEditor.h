@@ -94,9 +94,8 @@ private:
 
 public:
     FaceAttribsEditor(
-        std::weak_ptr<MapDocument> document,
-        GLContextManager &contextManager,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
+    );
 
     bool cancelMouseDrag();
 

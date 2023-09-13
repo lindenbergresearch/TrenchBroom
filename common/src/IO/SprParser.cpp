@@ -39,8 +39,8 @@
 namespace TrenchBroom {
 namespace IO {
 SprParser::SprParser(
-    std::string name, const Reader &reader, const Assets::Palette &palette)
-    : m_name{std::move(name)}, m_reader{reader}, m_palette{palette} {
+    std::string name, const Reader &reader, const Assets::Palette &palette
+) : m_name{std::move(name)}, m_reader{reader}, m_palette{palette} {
 }
 
 bool SprParser::canParse(const std::filesystem::path &path, Reader reader) {
@@ -71,24 +71,10 @@ static SprPicture parsePicture(Reader &reader, const Assets::Palette &palette) {
     Assets::TextureBuffer rgbaImage(4 * width * height);
     auto averageColor = Color{};
     palette.indexedToRgba(
-        reader,
-        width * height,
-        rgbaImage,
-        Assets::PaletteTransparency::Index255Transparent,
-        averageColor);
+        reader, width * height, rgbaImage, Assets::PaletteTransparency::Index255Transparent, averageColor
+    );
 
-    return SprPicture{
-        {"",
-         width,
-         height,
-         averageColor,
-         std::move(rgbaImage),
-         GL_RGBA,
-         Assets::TextureType::Masked},
-        xOffset,
-        yOffset,
-        width,
-        height};
+    return SprPicture{{"", width, height, averageColor, std::move(rgbaImage), GL_RGBA, Assets::TextureType::Masked}, xOffset, yOffset, width, height};
 }
 
 static void skipPicture(Reader &reader) {
@@ -133,12 +119,9 @@ static Assets::Orientation parseSpriteOrientationType(Reader &reader) {
  */
 enum class RenderMode : int32_t {
   /** No alpha channel, just plain RGB */
-  Normal = 0,
-  /** Normal but also R+G+B/3 is the alpha channel */
-  Additive = 1,
-  /** Index 255 is the colour, R+G+B/3 is the alpha channel */
-  IndexAlpha = 2,
-  /** Standard Quake behaviour, Palette index 255 = transparent */
+  Normal = 0, /** Normal but also R+G+B/3 is the alpha channel */
+  Additive = 1, /** Index 255 is the colour, R+G+B/3 is the alpha channel */
+  IndexAlpha = 2, /** Standard Quake behaviour, Palette index 255 = transparent */
   AlphaTest = 3
 };
 
@@ -152,7 +135,8 @@ static RenderMode parseSpriteRenderMode(Reader &reader) {
 }
 
 static std::vector<unsigned char> processGoldsourcePalette(
-    const RenderMode mode, const std::vector<unsigned char> &data) {
+    const RenderMode mode, const std::vector<unsigned char> &data
+) {
     // Convert the data into a Goldsource palette
     auto processed = std::vector<unsigned char>{};
     processed.reserve(1024);
@@ -167,7 +151,8 @@ static std::vector<unsigned char> processGoldsourcePalette(
             processed.push_back(data[0xFF * 3 + 0]);
             processed.push_back(data[0xFF * 3 + 1]);
             processed.push_back(data[0xFF * 3 + 2]);
-        } else {
+        }
+        else {
             processed.push_back(r);
             processed.push_back(g);
             processed.push_back(b);
@@ -196,15 +181,12 @@ static std::vector<unsigned char> processGoldsourcePalette(
 static Assets::Palette parseEmbeddedPalette(Reader &reader, const RenderMode renderMode) {
     const auto paletteSize = reader.readSize<int16_t>();
     if (paletteSize != 256) {
-        throw AssetException{
-            "Incorrect SPR palette size: expected 256, got " + std::to_string(paletteSize)};
+        throw AssetException{"Incorrect SPR palette size: expected 256, got " + std::to_string(paletteSize)};
     }
     auto data = std::vector<unsigned char>(paletteSize * 3);
     reader.read(data.data(), data.size());
     data = processGoldsourcePalette(renderMode, data);
-    return Assets::makePalette(data)
-        .if_error([](const auto &e) { throw AssetException{e.msg.c_str()}; })
-        .value();
+    return Assets::makePalette(data).if_error([](const auto &e) { throw AssetException{e.msg.c_str()}; }).value();
 }
 
 std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* logger */) {
@@ -248,7 +230,8 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
     }
 
     auto model = std::make_unique<Assets::EntityModel>(
-        m_name, Assets::PitchType::Normal, orientationType);
+        m_name, Assets::PitchType::Normal, orientationType
+    );
     for (size_t i = 0; i < frameCount; ++i) {
         auto &frame = model->addFrame();
         frame.setSkinOffset(i);
@@ -274,27 +257,20 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
         const auto bboxMax = vm::vec3f{vm::max(x1, x2), vm::max(x1, x2), vm::max(y1, y2)};
         auto &modelFrame = model->loadFrame(i, std::to_string(i), {bboxMin, bboxMax});
 
-        const auto triangles = std::vector<Assets::EntityModelVertex>{
-            Assets::EntityModelVertex{{x1, y1, 0},
-                                      {0,  1}},
-            Assets::EntityModelVertex{{x1, y2, 0},
-                                      {0,  0}},
-            Assets::EntityModelVertex{{x2, y2, 0},
-                                      {1,  0}},
+        const auto triangles = std::vector<Assets::EntityModelVertex>{Assets::EntityModelVertex{{x1, y1, 0},
+                                                                                                {0,  1}}, Assets::EntityModelVertex{{x1, y2, 0},
+                                                                                                                                    {0,  0}}, Assets::EntityModelVertex{{x2, y2, 0},
+                                                                                                                                                                        {1,  0}},
 
-            Assets::EntityModelVertex{{x2, y2, 0},
-                                      {1,  0}},
-            Assets::EntityModelVertex{{x2, y1, 0},
-                                      {1,  1}},
-            Assets::EntityModelVertex{{x1, y1, 0},
-                                      {0,  1}},
-        };
+                                                                      Assets::EntityModelVertex{{x2, y2, 0},
+                                                                                                {1,  0}}, Assets::EntityModelVertex{{x2, y1, 0},
+                                                                                                                                    {1,  1}}, Assets::EntityModelVertex{{x1, y1, 0},
+                                                                                                                                                                        {0,  1}},};
 
         auto size = Renderer::IndexRangeMap::Size{};
         size.inc(Renderer::PrimType::Triangles, 2);
 
-        auto builder =
-            Renderer::IndexRangeMapBuilder<Assets::EntityModelVertex::Type>{6, size};
+        auto builder = Renderer::IndexRangeMapBuilder<Assets::EntityModelVertex::Type>{6, size};
         builder.addTriangles(triangles);
 
         surface.addIndexedMesh(modelFrame, builder.vertices(), builder.indices());

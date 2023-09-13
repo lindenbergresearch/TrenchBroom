@@ -26,14 +26,14 @@
 
 namespace TrenchBroom {
 namespace View {
-UndoableCommand::UndoableCommand(std::string name, const bool updateModificationCount)
-    : Command{std::move(name)}, m_modificationCount{updateModificationCount ? 1u : 0u} {
+UndoableCommand::UndoableCommand(std::string name, const bool updateModificationCount) : Command{std::move(name)}, m_modificationCount{updateModificationCount ? 1u : 0u} {
 }
 
 UndoableCommand::~UndoableCommand() {}
 
 std::unique_ptr<CommandResult> UndoableCommand::performDo(
-    MapDocumentCommandFacade *document) {
+    MapDocumentCommandFacade *document
+) {
     auto result = Command::performDo(document);
     if (result->success()) {
         setModificationCount(document);
@@ -42,13 +42,15 @@ std::unique_ptr<CommandResult> UndoableCommand::performDo(
 }
 
 std::unique_ptr<CommandResult> UndoableCommand::performUndo(
-    MapDocumentCommandFacade *document) {
+    MapDocumentCommandFacade *document
+) {
     m_state = CommandState::Undoing;
     auto result = doPerformUndo(document);
     if (result->success()) {
         resetModificationCount(document);
         m_state = CommandState::Default;
-    } else {
+    }
+    else {
         m_state = CommandState::Done;
     }
     return result;

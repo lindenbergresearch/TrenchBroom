@@ -29,9 +29,7 @@
 
 namespace TrenchBroom {
 namespace View {
-SpinControl::SpinControl(QWidget *parent)
-    : QDoubleSpinBox(parent), m_regularIncrement(1.0), m_shiftIncrement(2.0), m_ctrlIncrement(4.0), m_minDigits(0),
-      m_maxDigits(6) {
+SpinControl::SpinControl(QWidget *parent) : QDoubleSpinBox(parent), m_regularIncrement(1.0), m_shiftIncrement(2.0), m_ctrlIncrement(4.0), m_minDigits(0), m_maxDigits(6) {
     setKeyboardTracking(false);
     updateTooltip();
 }
@@ -39,11 +37,13 @@ SpinControl::SpinControl(QWidget *parent)
 void SpinControl::stepBy(int steps) {
     if (QGuiApplication::keyboardModifiers() & Qt::ShiftModifier) {
         setSingleStep(m_shiftIncrement);
-    } else if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) {
+    }
+    else if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) {
         setSingleStep(m_ctrlIncrement);
         // QAbstractSpinBox steps by +/-10 if control is held (on most platforms; see #3373)
         steps = (steps > 0) ? 1 : -1;
-    } else {
+    }
+    else {
         setSingleStep(m_regularIncrement);
     }
 
@@ -69,7 +69,8 @@ QString SpinControl::textFromValue(const double val) const {
 }
 
 void SpinControl::setIncrements(
-    const double regularIncrement, const double shiftIncrement, const double ctrlIncrement) {
+    const double regularIncrement, const double shiftIncrement, const double ctrlIncrement
+) {
     m_regularIncrement = regularIncrement;
     m_shiftIncrement = shiftIncrement;
     m_ctrlIncrement = ctrlIncrement;
@@ -81,12 +82,9 @@ void SpinControl::setDigits(const int /* minDigits */, const int maxDigits) {
 }
 
 void SpinControl::updateTooltip() {
-    setToolTip(tr("Increment: %1 (%2: %3, %4: %5)")
-                   .arg(QString::fromStdString(kdl::str_to_string(m_regularIncrement)))
-                   .arg(nativeModifierLabel(Qt::SHIFT))
-                   .arg(QString::fromStdString(kdl::str_to_string(m_shiftIncrement)))
-                   .arg(nativeModifierLabel(Qt::CTRL))
-                   .arg(QString::fromStdString(kdl::str_to_string(m_ctrlIncrement))));
+    setToolTip(
+        tr("Increment: %1 (%2: %3, %4: %5)").arg(QString::fromStdString(kdl::str_to_string(m_regularIncrement))).arg(nativeModifierLabel(Qt::SHIFT)).arg(QString::fromStdString(kdl::str_to_string(m_shiftIncrement))).arg(
+            nativeModifierLabel(Qt::CTRL)).arg(QString::fromStdString(kdl::str_to_string(m_ctrlIncrement))));
 }
 } // namespace View
 } // namespace TrenchBroom

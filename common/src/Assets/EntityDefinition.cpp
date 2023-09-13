@@ -82,57 +82,54 @@ const FlagsPropertyDefinition *EntityDefinition::spawnflags() const {
     return safeGetFlagsPropertyDefinition(this, Model::EntityPropertyKeys::Spawnflags);
 }
 
-const std::vector<std::shared_ptr<PropertyDefinition>> &EntityDefinition::
-propertyDefinitions() const {
+const std::vector<std::shared_ptr<PropertyDefinition>> &EntityDefinition::propertyDefinitions() const {
     return m_propertyDefinitions;
 }
 
 const PropertyDefinition *EntityDefinition::propertyDefinition(
-    const std::string &propertyKey) const {
+    const std::string &propertyKey
+) const {
     return safeGetPropertyDefinition(this, propertyKey);
 }
 
 const PropertyDefinition *EntityDefinition::safeGetPropertyDefinition(
-    const EntityDefinition *entityDefinition, const std::string &propertyKey) {
+    const EntityDefinition *entityDefinition, const std::string &propertyKey
+) {
     if (entityDefinition == nullptr) {
         return nullptr;
     }
 
     const auto &propertyDefinitions = entityDefinition->propertyDefinitions();
     const auto it = std::find_if(
-        propertyDefinitions.begin(),
-        propertyDefinitions.end(),
-        [&](const auto &propertyDefinition) {
+        propertyDefinitions.begin(), propertyDefinitions.end(), [&](const auto &propertyDefinition) {
           return propertyDefinition->key() == propertyKey;
-        });
+        }
+    );
     return it != propertyDefinitions.end() ? it->get() : nullptr;
 }
 
 const FlagsPropertyDefinition *EntityDefinition::safeGetFlagsPropertyDefinition(
-    const EntityDefinition *entityDefinition, const std::string &propertyKey) {
+    const EntityDefinition *entityDefinition, const std::string &propertyKey
+) {
     if (entityDefinition == nullptr) {
         return nullptr;
     }
 
     const auto &propertyDefinitions = entityDefinition->propertyDefinitions();
     const auto it = std::find_if(
-        propertyDefinitions.begin(),
-        propertyDefinitions.end(),
-        [&](const auto &propertyDefinition) {
-          return propertyDefinition->type() == PropertyDefinitionType::FlagsProperty
-                 && propertyDefinition->key() == propertyKey;
-        });
-    return it != propertyDefinitions.end()
-           ? static_cast<FlagsPropertyDefinition *>(it->get())
-           : nullptr;
+        propertyDefinitions.begin(), propertyDefinitions.end(), [&](const auto &propertyDefinition) {
+          return propertyDefinition->type() == PropertyDefinitionType::FlagsProperty && propertyDefinition->key() == propertyKey;
+        }
+    );
+    return it != propertyDefinitions.end() ? static_cast<FlagsPropertyDefinition *>(it->get()) : nullptr;
 }
 
 std::vector<EntityDefinition *> EntityDefinition::filterAndSort(
-    const std::vector<EntityDefinition *> &definitions,
-    const EntityDefinitionType type,
-    const EntityDefinitionSortOrder order) {
+    const std::vector<EntityDefinition *> &definitions, const EntityDefinitionType type, const EntityDefinitionSortOrder order
+) {
     auto result = kdl::vec_filter(
-        definitions, [&](const auto &definition) { return definition->type() == type; });
+        definitions, [&](const auto &definition) { return definition->type() == type; }
+    );
 
     const auto compareNames = [](const auto &lhs, const auto &rhs) {
       return kdl::ci::str_compare(lhs->name(), rhs->name()) < 0;
@@ -151,23 +148,13 @@ std::vector<EntityDefinition *> EntityDefinition::filterAndSort(
 }
 
 EntityDefinition::EntityDefinition(
-    std::string name,
-    const Color &color,
-    std::string description,
-    std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions)
-    : m_index{0}, m_name{std::move(name)}, m_color{color}, m_description{std::move(description)}, m_usageCount{0},
-      m_propertyDefinitions{std::move(propertyDefinitions)} {
+    std::string name, const Color &color, std::string description, std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions
+) : m_index{0}, m_name{std::move(name)}, m_color{color}, m_description{std::move(description)}, m_usageCount{0}, m_propertyDefinitions{std::move(propertyDefinitions)} {
 }
 
 PointEntityDefinition::PointEntityDefinition(
-    std::string name,
-    const Color &color,
-    const vm::bbox3 &bounds,
-    std::string description,
-    std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions,
-    ModelDefinition modelDefinition)
-    : EntityDefinition{std::move(name), color, std::move(description), std::move(propertyDefinitions)},
-      m_bounds{bounds}, m_modelDefinition{std::move(modelDefinition)} {
+    std::string name, const Color &color, const vm::bbox3 &bounds, std::string description, std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions, ModelDefinition modelDefinition
+) : EntityDefinition{std::move(name), color, std::move(description), std::move(propertyDefinitions)}, m_bounds{bounds}, m_modelDefinition{std::move(modelDefinition)} {
 }
 
 EntityDefinitionType PointEntityDefinition::type() const {
@@ -183,12 +170,8 @@ const ModelDefinition &PointEntityDefinition::modelDefinition() const {
 }
 
 BrushEntityDefinition::BrushEntityDefinition(
-    std::string name,
-    const Color &color,
-    std::string description,
-    std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions)
-    : EntityDefinition{
-    std::move(name), color, std::move(description), std::move(propertyDefinitions)} {
+    std::string name, const Color &color, std::string description, std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions
+) : EntityDefinition{std::move(name), color, std::move(description), std::move(propertyDefinitions)} {
 }
 
 EntityDefinitionType BrushEntityDefinition::type() const {

@@ -80,10 +80,8 @@ private:
 
 public:
     SwitchableMapViewContainer(
-        Logger *logger,
-        std::weak_ptr<MapDocument> document,
-        GLContextManager &contextManager,
-        QWidget *parent = nullptr);
+        Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
+    );
 
     ~SwitchableMapViewContainer() override;
 
@@ -186,7 +184,8 @@ private: // implement MapView interface
     void doSelectTall() override;
 
     vm::vec3 doGetPasteObjectsDelta(
-        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
+        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
+    ) const override;
 
     void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
 

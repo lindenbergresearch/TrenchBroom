@@ -45,15 +45,16 @@ protected:
 
 public:
     SwapNodeContentsCommand(
-        const std::string &name,
-        std::vector<std::pair<Model::Node *, Model::NodeContents>> nodes);
+        const std::string &name, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodes
+    );
 
     ~SwapNodeContentsCommand();
 
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
     std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document) override;
+        MapDocumentCommandFacade *document
+    ) override;
 
     bool doCollateWith(UndoableCommand &command) override;
 

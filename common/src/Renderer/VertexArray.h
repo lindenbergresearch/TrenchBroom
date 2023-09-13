@@ -94,8 +94,7 @@ private:
         }
 
     protected:
-        Holder(const size_t vertexCount)
-            : m_vboManager(nullptr), m_vbo(nullptr), m_vertexCount(vertexCount) {
+        Holder(const size_t vertexCount) : m_vboManager(nullptr), m_vbo(nullptr), m_vertexCount(vertexCount) {
         }
 
         ~Holder() override {
@@ -122,12 +121,10 @@ private:
         VertexList m_vertices;
 
     public:
-        ByValueHolder(const VertexList &vertices)
-            : Holder<VertexSpec>(vertices.size()), m_vertices(vertices) {
+        ByValueHolder(const VertexList &vertices) : Holder<VertexSpec>(vertices.size()), m_vertices(vertices) {
         }
 
-        ByValueHolder(VertexList &&vertices)
-            : Holder<VertexSpec>(vertices.size()), m_vertices(std::move(vertices)) {
+        ByValueHolder(VertexList &&vertices) : Holder<VertexSpec>(vertices.size()), m_vertices(std::move(vertices)) {
         }
 
         void prepare(VboManager &vboManager) override {
@@ -148,8 +145,7 @@ private:
         const VertexList &m_vertices;
 
     public:
-        ByRefHolder(const VertexList &vertices)
-            : Holder<VertexSpec>(vertices.size()), m_vertices(vertices) {
+        ByRefHolder(const VertexList &vertices) : Holder<VertexSpec>(vertices.size()), m_vertices(vertices) {
         }
 
     private:
@@ -190,8 +186,9 @@ public:
      */
     template<typename... Attrs>
     static VertexArray move(std::vector<GLVertex<Attrs...>> &&vertices) {
-        return VertexArray(std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(
-            std::move(vertices)));
+        return VertexArray(
+            std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(
+                std::move(vertices)));
     }
 
     /**
@@ -294,7 +291,8 @@ public:
      * @param primCount the number of ranges to render
      */
     void render(
-        PrimType primType, const GLIndices &indices, const GLCounts &counts, GLint primCount);
+        PrimType primType, const GLIndices &indices, const GLCounts &counts, GLint primCount
+    );
 
     /**
      * Renders a number of primitives of the given type, the vertices of which are indicates

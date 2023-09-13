@@ -51,11 +51,8 @@ private:
 
 public:
     MapView3D(
-        std::weak_ptr<MapDocument> document,
-        MapViewToolBox &toolBox,
-        Renderer::MapRenderer &renderer,
-        GLContextManager &contextManager,
-        Logger *logger);
+        std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, Logger *logger
+    );
 
     ~MapView3D() override;
 
@@ -101,7 +98,8 @@ private: // implement RenderView interface
 
 private: // implement MapView interface
     vm::vec3 doGetPasteObjectsDelta(
-        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
+        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
+    ) const override;
 
     bool doCanSelectTall() override;
 
@@ -116,11 +114,8 @@ private: // implement MapView interface
     void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
 
     void animateCamera(
-        const vm::vec3f &position,
-        const vm::vec3f &direction,
-        const vm::vec3f &up,
-        float zoom,
-        int duration = DefaultCameraAnimationDuration);
+        const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up, float zoom, int duration = DefaultCameraAnimationDuration
+    );
 
     void doMoveCameraToCurrentTracePoint() override;
 
@@ -144,20 +139,20 @@ private: // implement MapViewBase interface
     void doPreRender() override;
 
     void doRenderGrid(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     void doRenderMap(
-        Renderer::MapRenderer &renderer,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override;
+        Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     void doRenderTools(
-        MapViewToolBox &toolBox,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override;
+        MapViewToolBox &toolBox, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     void doRenderSoftWorldBounds(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override;
 
     bool doBeforePopupMenu() override;
 

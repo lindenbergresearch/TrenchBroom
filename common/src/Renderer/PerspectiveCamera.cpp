@@ -40,19 +40,12 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-PerspectiveCamera::PerspectiveCamera()
-    : Camera(), m_fov(90.0) {
+PerspectiveCamera::PerspectiveCamera() : Camera(), m_fov(90.0) {
 }
 
 PerspectiveCamera::PerspectiveCamera(
-    const float fov,
-    const float nearPlane,
-    const float farPlane,
-    const Viewport &viewport,
-    const vm::vec3f &position,
-    const vm::vec3f &direction,
-    const vm::vec3f &up)
-    : Camera(nearPlane, farPlane, viewport, position, direction, up), m_fov(fov) {
+    const float fov, const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up
+) : Camera(nearPlane, farPlane, viewport, position, direction, up), m_fov(fov) {
     assert(m_fov > 0.0f);
 }
 
@@ -88,9 +81,11 @@ float PerspectiveCamera::computeZoomedFov(const float zoom, const float fov) {
     float z;
     if (zoom < 0.7f) {
         z = f1;
-    } else if (zoom < 1.2f) {
+    }
+    else if (zoom < 1.2f) {
         z = vm::mix(f1, f2, 2.0f * (zoom - 0.7f));
-    } else {
+    }
+    else {
         z = f2;
     }
 
@@ -102,18 +97,18 @@ Camera::ProjectionType PerspectiveCamera::doGetProjectionType() const {
 }
 
 void PerspectiveCamera::doValidateMatrices(
-    vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix) const {
+    vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix
+) const {
     const Viewport &viewport = this->viewport();
     projectionMatrix = vm::perspective_matrix(
-        zoomedFov(), nearPlane(), farPlane(), viewport.width, viewport.height);
+        zoomedFov(), nearPlane(), farPlane(), viewport.width, viewport.height
+    );
     viewMatrix = vm::view_matrix(direction(), up()) * vm::translation_matrix(-position());
 }
 
 void PerspectiveCamera::doComputeFrustumPlanes(
-    vm::plane3f &topPlane,
-    vm::plane3f &rightPlane,
-    vm::plane3f &bottomPlane,
-    vm::plane3f &leftPlane) const {
+    vm::plane3f &topPlane, vm::plane3f &rightPlane, vm::plane3f &bottomPlane, vm::plane3f &leftPlane
+) const {
     const vm::vec2f frustum = getFrustum();
     const vm::vec3f center = position() + direction() * nearPlane();
 
@@ -131,10 +126,8 @@ void PerspectiveCamera::doComputeFrustumPlanes(
 }
 
 void PerspectiveCamera::doRenderFrustum(
-    RenderContext &renderContext,
-    VboManager &vboManager,
-    const float size,
-    const Color &color) const {
+    RenderContext &renderContext, VboManager &vboManager, const float size, const Color &color
+) const {
     using Vertex = GLVertexTypes::P3C4::Vertex;
     std::vector<Vertex> triangleVertices;
     std::vector<Vertex> lineVertices;
@@ -177,8 +170,7 @@ float PerspectiveCamera::doPickFrustum(const float size, const vm::ray3f &ray) c
 
     auto minDistance = std::numeric_limits<float>::max();
     for (size_t i = 0; i < 4; ++i) {
-        const auto distance =
-            vm::intersect_ray_triangle(ray, position(), verts[i], verts[vm::succ(i, 4)]);
+        const auto distance = vm::intersect_ray_triangle(ray, position(), verts[i], verts[vm::succ(i, 4)]);
         if (!vm::is_nan(distance)) {
             minDistance = vm::min(distance, minDistance);
         }
@@ -189,25 +181,16 @@ float PerspectiveCamera::doPickFrustum(const float size, const vm::ray3f &ray) c
 void PerspectiveCamera::getFrustumVertices(const float size, vm::vec3f (&verts)[4]) const {
     const auto frustum = getFrustum();
 
-    verts[0] = position()
-               + (direction() * nearPlane() + frustum.y() * up() - frustum.x() * right())
-                 / nearPlane() * size; // top left
-    verts[1] = position()
-               + (direction() * nearPlane() + frustum.y() * up() + frustum.x() * right())
-                 / nearPlane() * size; // top right
-    verts[2] = position()
-               + (direction() * nearPlane() - frustum.y() * up() + frustum.x() * right())
-                 / nearPlane() * size; // bottom right
-    verts[3] = position()
-               + (direction() * nearPlane() - frustum.y() * up() - frustum.x() * right())
-                 / nearPlane() * size; // bottom left
+    verts[0] = position() + (direction() * nearPlane() + frustum.y() * up() - frustum.x() * right()) / nearPlane() * size; // top left
+    verts[1] = position() + (direction() * nearPlane() + frustum.y() * up() + frustum.x() * right()) / nearPlane() * size; // top right
+    verts[2] = position() + (direction() * nearPlane() - frustum.y() * up() + frustum.x() * right()) / nearPlane() * size; // bottom right
+    verts[3] = position() + (direction() * nearPlane() - frustum.y() * up() - frustum.x() * right()) / nearPlane() * size; // bottom left
 }
 
 vm::vec2f PerspectiveCamera::getFrustum() const {
     const auto &viewport = this->viewport();
     const auto v = std::tan(vm::to_radians(zoomedFov()) / 2.0f) * 0.75f * nearPlane();
-    const auto h =
-        v * static_cast<float>(viewport.width) / static_cast<float>(viewport.height);
+    const auto h = v * static_cast<float>(viewport.width) / static_cast<float>(viewport.height);
     return vm::vec2f(h, v);
 }
 

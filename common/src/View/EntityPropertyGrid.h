@@ -81,7 +81,8 @@ private:
 
 public:
     explicit EntityPropertyGrid(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 private:
     void backupSelection();

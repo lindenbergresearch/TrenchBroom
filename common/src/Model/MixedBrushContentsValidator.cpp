@@ -33,12 +33,12 @@ namespace {
 static const auto Type = freeIssueType();
 } // namespace
 
-MixedBrushContentsValidator::MixedBrushContentsValidator()
-    : Validator{Type, "Mixed brush content flags"} {
+MixedBrushContentsValidator::MixedBrushContentsValidator() : Validator{Type, "Mixed brush content flags"} {
 }
 
 void MixedBrushContentsValidator::doValidate(
-    BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+    BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues
+) const {
     const auto &brush = brushNode.brush();
     const auto &faces = brush.faces();
     auto it = std::begin(faces);

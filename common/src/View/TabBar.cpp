@@ -32,11 +32,11 @@ namespace TrenchBroom {
 namespace View {
 // TabBarButton
 
-TabBarButton::TabBarButton(const QString &label, QWidget *parent)
-    : QWidget(parent), m_label(new QLabel(label, this)), m_indicator(new QWidget(this)), m_pressed(false) {
+TabBarButton::TabBarButton(const QString &label, QWidget *parent) : QWidget(parent), m_label(new QLabel(label, this)), m_indicator(new QWidget(this)), m_pressed(false) {
     auto *labelLayout = new QHBoxLayout();
     labelLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
+        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0
+    );
     labelLayout->addWidget(m_label);
 
     auto *outerLayout = new QVBoxLayout();
@@ -69,15 +69,15 @@ void TabBarButton::updateState() {
     QPalette pal;
     if (m_pressed) {
         m_indicator->setBackgroundRole(QPalette::Highlight);
-    } else {
+    }
+    else {
         m_indicator->setBackgroundRole(QPalette::NoRole);
     }
 }
 
 // TabBar
 
-TabBar::TabBar(TabBook *tabBook)
-    : ContainerBar(BorderPanel::BottomSide, tabBook), m_tabBook(tabBook), m_barBook(new QStackedLayout()) {
+TabBar::TabBar(TabBook *tabBook) : ContainerBar(BorderPanel::BottomSide, tabBook), m_tabBook(tabBook), m_barBook(new QStackedLayout()) {
     ensure(m_tabBook != nullptr, "tabBook is null");
     connect(m_tabBook, &TabBook::pageChanged, this, &TabBar::tabBookPageChanged);
 

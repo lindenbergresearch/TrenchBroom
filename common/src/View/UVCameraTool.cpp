@@ -27,8 +27,7 @@
 
 namespace TrenchBroom {
 namespace View {
-UVCameraTool::UVCameraTool(Renderer::OrthographicCamera &camera)
-    : ToolController{}, Tool{true}, m_camera{camera} {
+UVCameraTool::UVCameraTool(Renderer::OrthographicCamera &camera) : ToolController{}, Tool{true}, m_camera{camera} {
 }
 
 Tool &UVCameraTool::tool() {
@@ -40,8 +39,7 @@ const Tool &UVCameraTool::tool() const {
 }
 
 void UVCameraTool::mouseScroll(const InputState &inputState) {
-    const auto oldWorldPos =
-        m_camera.unproject(float(inputState.mouseX()), float(inputState.mouseY()), 0.0f);
+    const auto oldWorldPos = m_camera.unproject(float(inputState.mouseX()), float(inputState.mouseY()), 0.0f);
 
     // NOTE: some events will have scrollY() == 0, and have horizontal scorlling. We only
     // care about scrollY().
@@ -58,8 +56,7 @@ void UVCameraTool::mouseScroll(const InputState &inputState) {
         }
     }
 
-    const auto newWorldPos =
-        m_camera.unproject(float(inputState.mouseX()), float(inputState.mouseY()), 0.0f);
+    const auto newWorldPos = m_camera.unproject(float(inputState.mouseX()), float(inputState.mouseY()), 0.0f);
     const auto delta = oldWorldPos - newWorldPos;
     m_camera.moveBy(delta);
 }
@@ -70,8 +67,7 @@ private:
     Renderer::Camera &m_camera;
 
 public:
-    UVCameraToolDragTracker(Renderer::Camera &camera)
-        : m_camera{camera} {
+    UVCameraToolDragTracker(Renderer::Camera &camera) : m_camera{camera} {
     }
 
     bool drag(const InputState &inputState) {
@@ -79,8 +75,7 @@ public:
         const auto oldY = inputState.mouseY() - inputState.mouseDY();
 
         const auto oldWorldPos = m_camera.unproject(float(oldX), float(oldY), 0.0f);
-        const auto newWorldPos =
-            m_camera.unproject(float(inputState.mouseX()), float(inputState.mouseY()), 0.0f);
+        const auto newWorldPos = m_camera.unproject(float(inputState.mouseX()), float(inputState.mouseY()), 0.0f);
         const auto delta = oldWorldPos - newWorldPos;
         m_camera.moveBy(delta);
         return true;
@@ -93,9 +88,7 @@ public:
 } // namespace
 
 std::unique_ptr<DragTracker> UVCameraTool::acceptMouseDrag(const InputState &inputState) {
-    if (
-        !inputState.mouseButtonsPressed(MouseButtons::MBRight)
-        && !inputState.mouseButtonsPressed(MouseButtons::MBMiddle)) {
+    if (!inputState.mouseButtonsPressed(MouseButtons::MBRight) && !inputState.mouseButtonsPressed(MouseButtons::MBMiddle)) {
         return nullptr;
     }
 

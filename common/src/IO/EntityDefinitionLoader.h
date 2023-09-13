@@ -36,10 +36,12 @@ public:
     virtual ~EntityDefinitionLoader();
 
     Result<std::vector<Assets::EntityDefinition *>> loadEntityDefinitions(
-        ParserStatus &status, const std::filesystem::path &path) const;
+        ParserStatus &status, const std::filesystem::path &path
+    ) const;
 
 private:
     virtual Result<std::vector<Assets::EntityDefinition *>> doLoadEntityDefinitions(
-        ParserStatus &status, const std::filesystem::path &path) const = 0;
+        ParserStatus &status, const std::filesystem::path &path
+    ) const = 0;
 };
 } // namespace TrenchBroom::IO

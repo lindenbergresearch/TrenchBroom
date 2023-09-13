@@ -134,7 +134,8 @@ public:
      * @param vertexCount the number of vertices in the range
      */
     TexturedIndexRangeMap(
-        const Texture *texture, PrimType primType, size_t index, size_t vertexCount);
+        const Texture *texture, PrimType primType, size_t index, size_t vertexCount
+    );
 
     /**
      * Records a range of primitives at the given index with the given length and using the
@@ -187,8 +188,8 @@ public:
      * @param func the function to invoke
      */
     void forEachPrimitive(
-        std::function<void(const Texture *texture, PrimType, size_t index, size_t count)>
-        func) const;
+        std::function<void(const Texture *texture, PrimType, size_t index, size_t count)> func
+    ) const;
 
 private:
     IndexRangeMap &findCurrent(const Texture *texture);

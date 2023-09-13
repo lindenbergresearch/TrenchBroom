@@ -35,8 +35,7 @@ static const Type RotateTool = 1u << 5u;
 static const Type ScaleTool = 1u << 6u;
 static const Type ShearTool = 1u << 7u;
 static const Type AnyVertexTool = 1u << 8u;
-static const Type AnyTool =
-    AnyVertexTool | CreateComplexBrushTool | ClipTool | RotateTool | ScaleTool | ShearTool;
+static const Type AnyTool = AnyVertexTool | CreateComplexBrushTool | ClipTool | RotateTool | ScaleTool | ShearTool;
 static const Type AnyOrNoTool = AnyTool | NoTool;
 static const Type NoSelection = 1u << 9u;
 static const Type NodeSelection = 1u << 10u;
@@ -49,13 +48,13 @@ static const Type Any = AnyView | AnyOrNoSelection | AnyOrNoTool;
 bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs);
 
 bool actionContextMatches(
-    ActionContext::Type lhs, ActionContext::Type rhs, ActionContext::Type mask);
+    ActionContext::Type lhs, ActionContext::Type rhs, ActionContext::Type mask
+);
 
 std::string actionContextName(ActionContext::Type actionContext);
 
 typedef enum {
-  ActionView_Map2D = 0,
-  ActionView_Map3D = 1
+  ActionView_Map2D = 0, ActionView_Map3D = 1
 } ActionView;
 
 static const size_t NumActionViews = 2;

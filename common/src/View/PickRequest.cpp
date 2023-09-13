@@ -24,12 +24,10 @@
 
 namespace TrenchBroom {
 namespace View {
-PickRequest::PickRequest()
-    : m_camera(nullptr) {
+PickRequest::PickRequest() : m_camera(nullptr) {
 }
 
-PickRequest::PickRequest(const vm::ray3 &pickRay, const Renderer::Camera &camera)
-    : m_pickRay(pickRay), m_camera(&camera) {
+PickRequest::PickRequest(const vm::ray3 &pickRay, const Renderer::Camera &camera) : m_pickRay(pickRay), m_camera(&camera) {
 }
 
 const vm::ray3 &PickRequest::pickRay() const {

@@ -59,8 +59,7 @@ namespace TrenchBroom {
 namespace View {
 const Model::HitType::Type UVView::FaceHitType = Model::HitType::freeType();
 
-UVView::UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager)
-    : RenderView{contextManager}, m_document{std::move(document)}, m_helper{m_camera} {
+UVView::UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) : RenderView{contextManager}, m_document{std::move(document)}, m_helper{m_camera} {
     setToolBox(m_toolBox);
     createTools();
     m_toolBox.disable();
@@ -91,23 +90,16 @@ void UVView::createTools() {
 
 void UVView::connectObservers() {
     auto document = kdl::mem_lock(m_document);
-    m_notifierConnection +=
-        document->documentWasClearedNotifier.connect(this, &UVView::documentWasCleared);
-    m_notifierConnection +=
-        document->nodesDidChangeNotifier.connect(this, &UVView::nodesDidChange);
-    m_notifierConnection +=
-        document->brushFacesDidChangeNotifier.connect(this, &UVView::brushFacesDidChange);
-    m_notifierConnection +=
-        document->selectionDidChangeNotifier.connect(this, &UVView::selectionDidChange);
-    m_notifierConnection +=
-        document->grid().gridDidChangeNotifier.connect(this, &UVView::gridDidChange);
+    m_notifierConnection += document->documentWasClearedNotifier.connect(this, &UVView::documentWasCleared);
+    m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &UVView::nodesDidChange);
+    m_notifierConnection += document->brushFacesDidChangeNotifier.connect(this, &UVView::brushFacesDidChange);
+    m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &UVView::selectionDidChange);
+    m_notifierConnection += document->grid().gridDidChangeNotifier.connect(this, &UVView::gridDidChange);
 
     PreferenceManager &prefs = PreferenceManager::instance();
-    m_notifierConnection +=
-        prefs.preferenceDidChangeNotifier.connect(this, &UVView::preferenceDidChange);
+    m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &UVView::preferenceDidChange);
 
-    m_notifierConnection +=
-        m_camera.cameraDidChangeNotifier.connect(this, &UVView::cameraDidChange);
+    m_notifierConnection += m_camera.cameraDidChangeNotifier.connect(this, &UVView::cameraDidChange);
 }
 
 void UVView::selectionDidChange(const Selection &) {
@@ -115,13 +107,15 @@ void UVView::selectionDidChange(const Selection &) {
     const auto faces = document->selectedBrushFaces();
     if (faces.size() != 1) {
         m_helper.setFaceHandle(std::nullopt);
-    } else {
+    }
+    else {
         m_helper.setFaceHandle(faces.back());
     }
 
     if (m_helper.valid()) {
         m_toolBox.enable();
-    } else {
+    }
+    else {
         m_toolBox.disable();
     }
 
@@ -199,7 +193,8 @@ void UVView::setupGL(Renderer::RenderContext &renderContext) {
 
     if (pref(Preferences::EnableMSAA)) {
         glAssert(glEnable(GL_MULTISAMPLE));
-    } else {
+    }
+    else {
         glAssert(glDisable(GL_MULTISAMPLE));
     }
     glAssert(glEnable(GL_BLEND));
@@ -216,8 +211,7 @@ private:
     Renderer::VertexArray m_vertexArray;
 
 public:
-    explicit RenderTexture(const UVViewHelper &helper)
-        : m_helper{helper}, m_vertexArray{Renderer::VertexArray::move(getVertices())} {
+    explicit RenderTexture(const UVViewHelper &helper) : m_helper{helper}, m_vertexArray{Renderer::VertexArray::move(getVertices())} {
     }
 
 private:
@@ -238,11 +232,8 @@ private:
         const auto pos3 = +w2 * r - h2 * u + p;
         const auto pos4 = -w2 * r - h2 * u + p;
 
-        return {
-            Vertex(pos1, normal, m_helper.face()->textureCoords(vm::vec3(pos1))),
-            Vertex(pos2, normal, m_helper.face()->textureCoords(vm::vec3(pos2))),
-            Vertex(pos3, normal, m_helper.face()->textureCoords(vm::vec3(pos3))),
-            Vertex(pos4, normal, m_helper.face()->textureCoords(vm::vec3(pos4)))};
+        return {Vertex(pos1, normal, m_helper.face()->textureCoords(vm::vec3(pos1))), Vertex(pos2, normal, m_helper.face()->textureCoords(vm::vec3(pos2))), Vertex(pos3, normal, m_helper.face()->textureCoords(vm::vec3(pos3))),
+                Vertex(pos4, normal, m_helper.face()->textureCoords(vm::vec3(pos4)))};
     }
 
 private:
@@ -261,16 +252,17 @@ private:
         texture->activate();
 
         Renderer::ActiveShader shader(
-            renderContext.shaderManager(), Renderer::Shaders::UVViewShader);
+            renderContext.shaderManager(), Renderer::Shaders::UVViewShader
+        );
         shader.set("ApplyTexture", true);
         shader.set("Color", texture->averageColor());
         shader.set("Brightness", pref(Preferences::Brightness));
         shader.set("RenderGrid", true);
         shader.set("GridSizes", vm::vec2f(texture->width(), texture->height()));
         shader.set(
-            "GridColor",
-            vm::vec4f(
-                Renderer::gridColorForTexture(texture), 0.6f)); // TODO: make this a preference
+            "GridColor", vm::vec4f(
+                Renderer::gridColorForTexture(texture), 0.6f
+            )); // TODO: make this a preference
         shader.set("GridScales", scale);
         shader.set("GridMatrix", vm::mat4x4f(toTex));
         shader.set("GridDivider", vm::vec2f(m_helper.subDivisions()));
@@ -307,42 +299,43 @@ void UVView::renderFace(Renderer::RenderContext &, Renderer::RenderBatch &render
     const Color edgeColor(1.0f, 1.0f, 1.0f, 1.0f); // TODO: make this a preference
 
     Renderer::DirectEdgeRenderer edgeRenderer(
-        Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop);
+        Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop
+    );
     edgeRenderer.renderOnTop(renderBatch, edgeColor, 2.5f);
 }
 
 void UVView::renderTextureAxes(
-    Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &, Renderer::RenderBatch &renderBatch
+) {
     assert(m_helper.valid());
 
     const auto &normal = m_helper.face()->boundary().normal;
 
     const auto xAxis = vm::vec3f(
-        m_helper.face()->textureXAxis()
-        - dot(m_helper.face()->textureXAxis(), normal) * normal);
+        m_helper.face()->textureXAxis() - dot(m_helper.face()->textureXAxis(), normal) * normal
+    );
     const auto yAxis = vm::vec3f(
-        m_helper.face()->textureYAxis()
-        - dot(m_helper.face()->textureYAxis(), normal) * normal);
+        m_helper.face()->textureYAxis() - dot(m_helper.face()->textureYAxis(), normal) * normal
+    );
     const auto center = vm::vec3f(m_helper.face()->boundsCenter());
 
     const auto length = 32.0f / m_helper.cameraZoom();
 
     using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
     Renderer::DirectEdgeRenderer edgeRenderer(
-        Renderer::VertexArray::move(std::vector<Vertex>({
-                                                            Vertex(center, pref(Preferences::XAxisColor)),
-                                                            Vertex(center + length * xAxis,
-                                                                   pref(Preferences::XAxisColor)),
-                                                            Vertex(center, pref(Preferences::YAxisColor)),
-                                                            Vertex(center + length * yAxis,
-                                                                   pref(Preferences::YAxisColor)),
-                                                        })),
-        Renderer::PrimType::Lines);
+        Renderer::VertexArray::move(
+            std::vector<Vertex>(
+                {Vertex(center, pref(Preferences::XAxisColor)), Vertex(
+                    center + length * xAxis, pref(Preferences::XAxisColor)), Vertex(center, pref(Preferences::YAxisColor)), Vertex(
+                    center + length * yAxis, pref(Preferences::YAxisColor)),}
+            )), Renderer::PrimType::Lines
+    );
     edgeRenderer.renderOnTop(renderBatch, 2.0f);
 }
 
 void UVView::renderToolBox(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     renderTools(renderContext, renderBatch);
 }
 

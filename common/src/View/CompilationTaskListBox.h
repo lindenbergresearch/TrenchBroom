@@ -62,11 +62,8 @@ protected:
 
 protected:
     CompilationTaskEditorBase(
-        QString title,
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationProfile &profile,
-        Model::CompilationTask &task,
-        QWidget *parent);
+        QString title, std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent
+    );
 
 protected:
     void setupCompleter(MultiCompletionLineEdit *lineEdit);
@@ -87,10 +84,8 @@ private:
 
 public:
     CompilationExportMapTaskEditor(
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationProfile &profile,
-        Model::CompilationTask &task,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    );
 
 private:
     void updateItem() override;
@@ -110,10 +105,8 @@ private:
 
 public:
     CompilationCopyFilesTaskEditor(
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationProfile &profile,
-        Model::CompilationTask &task,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    );
 
 private:
     void updateItem() override;
@@ -135,10 +128,8 @@ private:
 
 public:
     CompilationRenameFileTaskEditor(
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationProfile &profile,
-        Model::CompilationTask &task,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    );
 
 private:
     void updateItem() override;
@@ -159,10 +150,8 @@ private:
 
 public:
     CompilationDeleteFilesTaskEditor(
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationProfile &profile,
-        Model::CompilationTask &task,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    );
 
 private:
     void updateItem() override;
@@ -183,10 +172,8 @@ private:
 
 public:
     CompilationRunToolTaskEditor(
-        std::weak_ptr<MapDocument> document,
-        Model::CompilationProfile &profile,
-        Model::CompilationTask &task,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    );
 
 private:
     void updateItem() override;
@@ -212,7 +199,8 @@ private:
 
 public:
     explicit CompilationTaskListBox(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
     void setProfile(Model::CompilationProfile *profile);
 

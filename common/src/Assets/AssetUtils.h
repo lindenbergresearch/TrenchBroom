@@ -41,13 +41,12 @@ namespace Assets {
  */
 template<typename GetModelSpec>
 ModelSpecification safeGetModelSpecification(
-    Logger &logger, std::string_view classname, GetModelSpec getModelSpec) {
+    Logger &logger, std::string_view classname, GetModelSpec getModelSpec
+) {
     try {
         return getModelSpec();
-    }
-    catch (const EL::Exception &e) {
-        logger.error() << "Could not get entity model for entity '" << classname
-                       << "': " << e.what();
+    } catch (const EL::Exception &e) {
+        logger.error() << "Could not get entity model for entity '" << classname << "': " << e.what();
         return ModelSpecification();
     }
 }

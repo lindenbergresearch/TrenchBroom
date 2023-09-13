@@ -62,7 +62,8 @@ public:
     void setColor(const Color &color);
 
     void add(
-        const vm::ray3 &ray, FloatType length, std::shared_ptr<View::MapDocument> document);
+        const vm::ray3 &ray, FloatType length, std::shared_ptr<View::MapDocument> document
+    );
 
     void clear();
 

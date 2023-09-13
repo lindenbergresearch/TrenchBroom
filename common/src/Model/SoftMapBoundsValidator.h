@@ -45,13 +45,16 @@ public:
 
 private:
     void doValidate(
-        EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
+        EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues
+    ) const override;
 
     void doValidate(
-        BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
+        BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues
+    ) const override;
 
     void doValidate(
-        PatchNode &patchNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
+        PatchNode &patchNode, std::vector<std::unique_ptr<Issue>> &issues
+    ) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

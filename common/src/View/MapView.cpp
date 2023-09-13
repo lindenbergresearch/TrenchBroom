@@ -52,7 +52,8 @@ void MapView::selectTall() {
 }
 
 vm::vec3 MapView::pasteObjectsDelta(
-    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
+    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
+) const {
     return doGetPasteObjectsDelta(bounds, referenceBounds);
 }
 

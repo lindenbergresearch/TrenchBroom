@@ -31,14 +31,12 @@ protected:
 
 public:
     TitleBar(
-        const QString &title,
-        QWidget *parent,
-        int hMargin = 0,
-        int vMargin = 0,
-        bool boldTitle = true);
+        const QString &title, QWidget *parent, int hMargin = 0, int vMargin = 0, bool boldTitle = true
+    );
 
     explicit TitleBar(
-        const QString &title, int hMargin = 0, int vMargin = 0, bool boldTitle = true);
+        const QString &title, int hMargin = 0, int vMargin = 0, bool boldTitle = true
+    );
 };
 } // namespace View
 } // namespace TrenchBroom

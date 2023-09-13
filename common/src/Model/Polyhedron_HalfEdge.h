@@ -24,17 +24,14 @@
 namespace TrenchBroom {
 namespace Model {
 template<typename T, typename FP, typename VP>
-kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &Polyhedron_GetHalfEdgeLink<
-    T,
-    FP,
-    VP>::operator()(Polyhedron_HalfEdge<T, FP, VP> *halfEdge) const {
+kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &Polyhedron_GetHalfEdgeLink<T, FP, VP>::operator()(Polyhedron_HalfEdge<T, FP, VP> *halfEdge) const {
     return halfEdge->m_link;
 }
 
 template<typename T, typename FP, typename VP>
-const kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &
-Polyhedron_GetHalfEdgeLink<T, FP, VP>::operator()(
-    const Polyhedron_HalfEdge<T, FP, VP> *halfEdge) const {
+const kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &Polyhedron_GetHalfEdgeLink<T, FP, VP>::operator()(
+    const Polyhedron_HalfEdge<T, FP, VP> *halfEdge
+) const {
     return halfEdge->m_link;
 }
 
@@ -57,26 +54,22 @@ Polyhedron_HalfEdge<T, FP, VP>::Polyhedron_HalfEdge(Vertex *origin)
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron_HalfEdge<T, FP, VP>::Vertex *Polyhedron_HalfEdge<T, FP, VP>::origin()
-const {
+typename Polyhedron_HalfEdge<T, FP, VP>::Vertex *Polyhedron_HalfEdge<T, FP, VP>::origin() const {
     return m_origin;
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron_HalfEdge<T, FP, VP>::Vertex *Polyhedron_HalfEdge<T, FP, VP>::
-destination() const {
+typename Polyhedron_HalfEdge<T, FP, VP>::Vertex *Polyhedron_HalfEdge<T, FP, VP>::destination() const {
     return next()->origin();
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron_HalfEdge<T, FP, VP>::Edge *Polyhedron_HalfEdge<T, FP, VP>::edge()
-const {
+typename Polyhedron_HalfEdge<T, FP, VP>::Edge *Polyhedron_HalfEdge<T, FP, VP>::edge() const {
     return m_edge;
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron_HalfEdge<T, FP, VP>::Face *Polyhedron_HalfEdge<T, FP, VP>::face()
-const {
+typename Polyhedron_HalfEdge<T, FP, VP>::Face *Polyhedron_HalfEdge<T, FP, VP>::face() const {
     return m_face;
 }
 
@@ -113,7 +106,8 @@ Polyhedron_HalfEdge<T, FP, VP> *Polyhedron_HalfEdge<T, FP, VP>::previousIncident
 
 template<typename T, typename FP, typename VP>
 bool Polyhedron_HalfEdge<T, FP, VP>::hasOrigins(
-    const std::vector<vm::vec<T, 3>> &origins, const T epsilon) const {
+    const std::vector<vm::vec<T, 3>> &origins, const T epsilon
+) const {
     const HalfEdge *edge = this;
     for (const vm::vec<T, 3> &origin: origins) {
         if (!vm::is_equal(edge->origin()->position(), origin, epsilon)) {
@@ -126,7 +120,8 @@ bool Polyhedron_HalfEdge<T, FP, VP>::hasOrigins(
 
 template<typename T, typename FP, typename VP>
 vm::plane_status Polyhedron_HalfEdge<T, FP, VP>::pointStatus(
-    const vm::vec<T, 3> &normal, const vm::vec<T, 3> &point, const T epsilon) const {
+    const vm::vec<T, 3> &normal, const vm::vec<T, 3> &point, const T epsilon
+) const {
     const auto planeNormal = vm::normalize(vm::cross(vm::normalize(vector()), normal));
     const auto plane = vm::plane<T, 3>(origin()->position(), planeNormal);
     return plane.point_status(point, epsilon);

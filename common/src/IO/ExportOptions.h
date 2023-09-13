@@ -34,8 +34,7 @@ struct MapExportOptions {
 };
 
 enum class ObjMtlPathMode {
-  RelativeToGamePath,
-  RelativeToExportPath
+  RelativeToGamePath, RelativeToExportPath
 };
 
 std::ostream &operator<<(std::ostream &lhs, ObjMtlPathMode rhs);

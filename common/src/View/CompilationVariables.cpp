@@ -56,13 +56,12 @@ CommonVariables::CommonVariables(std::shared_ptr<MapDocument> document) {
     declare(MAP_BASE_NAME, EL::Value{kdl::path_remove_extension(filename).string()});
     declare(GAME_DIR_PATH, EL::Value{gamePath.string()});
     declare(
-        MODS,
-        EL::Value{kdl::vec_transform(mods, [](const auto &mod) { return EL::Value{mod}; })});
+        MODS, EL::Value{kdl::vec_transform(mods, [](const auto &mod) { return EL::Value{mod}; })}
+    );
 
     const auto &factory = Model::GameFactory::instance();
     for (const auto &tool: document->game()->compilationTools()) {
-        const auto toolPath =
-            factory.compilationToolPath(document->game()->gameName(), tool.name);
+        const auto toolPath = factory.compilationToolPath(document->game()->gameName(), tool.name);
         // e.g. variable name might be "qbsp", and the value is the path to the user's local
         // qbsp executable
         declare(tool.name, EL::Value{toolPath.string()});
@@ -70,8 +69,8 @@ CommonVariables::CommonVariables(std::shared_ptr<MapDocument> document) {
 }
 
 CommonCompilationVariables::CommonCompilationVariables(
-    std::shared_ptr<MapDocument> document)
-    : CommonVariables{document} {
+    std::shared_ptr<MapDocument> document
+) : CommonVariables{document} {
     const auto filename = document->path().filename();
     const auto filePath = document->path().parent_path();
     const auto appPath = IO::SystemPaths::appDirectory();
@@ -83,13 +82,13 @@ CommonCompilationVariables::CommonCompilationVariables(
 }
 
 CompilationWorkDirVariables::CompilationWorkDirVariables(
-    std::shared_ptr<MapDocument> document)
-    : CommonCompilationVariables{std::move(document)} {
+    std::shared_ptr<MapDocument> document
+) : CommonCompilationVariables{std::move(document)} {
 }
 
 CompilationVariables::CompilationVariables(
-    std::shared_ptr<MapDocument> document, const std::string &workDir)
-    : CommonCompilationVariables{std::move(document)} {
+    std::shared_ptr<MapDocument> document, const std::string &workDir
+) : CommonCompilationVariables{std::move(document)} {
     const auto cpuCount = size_t(std::max(std::thread::hardware_concurrency(), 1u));
 
     using namespace CompilationVariableNames;
@@ -98,8 +97,8 @@ CompilationVariables::CompilationVariables(
 }
 
 LaunchGameEngineVariables::LaunchGameEngineVariables(
-    std::shared_ptr<MapDocument> document)
-    : CommonVariables{std::move(document)} {
+    std::shared_ptr<MapDocument> document
+) : CommonVariables{std::move(document)} {
 }
 } // namespace View
 } // namespace TrenchBroom

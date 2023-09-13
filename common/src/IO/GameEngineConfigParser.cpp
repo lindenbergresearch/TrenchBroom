@@ -35,8 +35,8 @@
 namespace TrenchBroom {
 namespace IO {
 GameEngineConfigParser::GameEngineConfigParser(
-    std::string_view str, std::filesystem::path path)
-    : ConfigParserBase{std::move(str), std::move(path)} {
+    std::string_view str, std::filesystem::path path
+) : ConfigParserBase{std::move(str), std::move(path)} {
 }
 
 Model::GameEngineConfig GameEngineConfigParser::parse() {
@@ -53,7 +53,8 @@ Model::GameEngineConfig GameEngineConfigParser::parse() {
 }
 
 std::vector<Model::GameEngineProfile> GameEngineConfigParser::parseProfiles(
-    const EL::Value &value) const {
+    const EL::Value &value
+) const {
     auto result = std::vector<Model::GameEngineProfile>{};
     result.reserve(value.length());
 
@@ -64,14 +65,13 @@ std::vector<Model::GameEngineProfile> GameEngineConfigParser::parseProfiles(
 }
 
 Model::GameEngineProfile GameEngineConfigParser::parseProfile(
-    const EL::Value &value) const {
+    const EL::Value &value
+) const {
     expectStructure(
-        value, "[ {'name': 'String', 'path': 'String'}, { 'parameters': 'String' } ]");
+        value, "[ {'name': 'String', 'path': 'String'}, { 'parameters': 'String' } ]"
+    );
 
-    return {
-        value["name"].stringValue(),
-        std::filesystem::path{value["path"].stringValue()},
-        value["parameters"].stringValue()};
+    return {value["name"].stringValue(), std::filesystem::path{value["path"].stringValue()}, value["parameters"].stringValue()};
 }
 } // namespace IO
 } // namespace TrenchBroom

@@ -114,17 +114,20 @@ static bool isMultiClick(const InputState &inputState) {
 }
 
 static const Model::Hit &firstHit(
-    const InputState &inputState, const Model::HitFilter &hitFilter) {
+    const InputState &inputState, const Model::HitFilter &hitFilter
+) {
     return inputState.pickResult().first(hitFilter);
 }
 
 static std::vector<Model::Node *> collectSelectableChildren(
-    const Model::EditorContext &editorContext, const Model::Node *node) {
+    const Model::EditorContext &editorContext, const Model::Node *node
+) {
     return Model::collectSelectableNodes(node->children(), editorContext);
 }
 
 static bool handleClick(
-    const InputState &inputState, const Model::EditorContext &editorContext) {
+    const InputState &inputState, const Model::EditorContext &editorContext
+) {
     if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
         return false;
     }
@@ -135,8 +138,7 @@ static bool handleClick(
     return editorContext.canChangeSelection();
 }
 
-SelectionTool::SelectionTool(std::weak_ptr<MapDocument> document)
-    : ToolController{}, Tool{true}, m_document{std::move(document)} {
+SelectionTool::SelectionTool(std::weak_ptr<MapDocument> document) : ToolController{}, Tool{true}, m_document{std::move(document)} {
 }
 
 Tool &SelectionTool::tool() {
@@ -168,39 +170,45 @@ bool SelectionTool::mouseClick(const InputState &inputState) {
                     if (objects) {
                         if (brush->selected()) {
                             document->deselectBrushFaces({*faceHandle});
-                        } else {
+                        }
+                        else {
                             auto transaction = Transaction{document, "Select Brush Face"};
                             document->convertToFaceSelection();
                             document->selectBrushFaces({*faceHandle});
                             transaction.commit();
                         }
-                    } else {
+                    }
+                    else {
                         if (face.selected()) {
                             document->deselectBrushFaces({*faceHandle});
-                        } else {
+                        }
+                        else {
                             document->selectBrushFaces({*faceHandle});
                         }
                     }
-                } else {
+                }
+                else {
                     auto transaction = Transaction{document, "Select Brush Face"};
                     document->deselectAll();
                     document->selectBrushFaces({*faceHandle});
                     transaction.commit();
                 }
             }
-        } else {
+        }
+        else {
             document->deselectAll();
         }
-    } else {
-        const auto &hit =
-            firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
+    }
+    else {
+        const auto &hit = firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
         if (hit.isMatch()) {
             auto *node = findOutermostClosedGroupOrNode(Model::hitToNode(hit));
             if (editorContext.selectable(node)) {
                 if (isMultiClick(inputState)) {
                     if (node->selected()) {
                         document->deselectNodes({node});
-                    } else {
+                    }
+                    else {
                         auto transaction = Transaction{document, "Select Object"};
                         if (document->hasSelectedBrushFaces()) {
                             document->deselectAll();
@@ -208,14 +216,16 @@ bool SelectionTool::mouseClick(const InputState &inputState) {
                         document->selectNodes({node});
                         transaction.commit();
                     }
-                } else {
+                }
+                else {
                     auto transaction = Transaction{document, "Select Object"};
                     document->deselectAll();
                     document->selectNodes({node});
                     transaction.commit();
                 }
             }
-        } else {
+        }
+        else {
             document->deselectAll();
         }
     }
@@ -244,7 +254,8 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
                         document->convertToFaceSelection();
                     }
                     document->selectBrushFaces(Model::toHandles(brush));
-                } else {
+                }
+                else {
                     auto transaction = Transaction{document, "Select Brush Faces"};
                     document->deselectAll();
                     document->selectBrushFaces(Model::toHandles(brush));
@@ -252,13 +263,12 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
                 }
             }
         }
-    } else {
+    }
+    else {
         const auto inGroup = document->currentGroup() != nullptr;
-        const auto &hit =
-            firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
+        const auto &hit = firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
         if (hit.isMatch()) {
-            const auto hitInGroup =
-                inGroup && Model::hitToNode(hit)->isDescendantOf(document->currentGroup());
+            const auto hitInGroup = inGroup && Model::hitToNode(hit)->isDescendantOf(document->currentGroup());
             if (!inGroup || hitInGroup) {
                 // If the hit node is inside a closed group, treat it as a hit on the group insted
                 auto *group = findOutermostClosedGroup(Model::hitToNode(hit));
@@ -266,7 +276,8 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
                     if (editorContext.selectable(group)) {
                         document->openGroup(group);
                     }
-                } else {
+                }
+                else {
                     const auto *node = Model::hitToNode(hit);
                     if (editorContext.selectable(node)) {
                         const auto *container = node->parent();
@@ -276,7 +287,8 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
                                 document->deselectAll();
                             }
                             document->selectNodes(siblings);
-                        } else {
+                        }
+                        else {
                             auto transaction = Transaction{document, "Select Brushes"};
                             document->deselectAll();
                             document->selectNodes(siblings);
@@ -284,10 +296,12 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
                         }
                     }
                 }
-            } else if (inGroup) {
+            }
+            else if (inGroup) {
                 document->closeGroup();
             }
-        } else if (inGroup) {
+        }
+        else if (inGroup) {
             document->closeGroup();
         }
     }
@@ -299,7 +313,8 @@ static void adjustGrid(const InputState &inputState, Grid &grid) {
     const auto factor = pref(Preferences::CameraMouseWheelInvert) ? -1.0f : 1.0f;
     if (factor * inputState.scrollY() < 0.0f) {
         grid.incSize();
-    } else if (factor * inputState.scrollY() > 0.0f) {
+    }
+    else if (factor * inputState.scrollY() > 0.0f) {
         grid.decSize();
     }
 }
@@ -311,8 +326,7 @@ static void adjustGrid(const InputState &inputState, Grid &grid) {
  */
 template<typename I>
 static std::pair<Model::Node *, Model::Node *> findSelectionPair(I it, I end) {
-    const auto first =
-        std::find_if(it, end, [](const auto *node) { return node->selected(); });
+    const auto first = std::find_if(it, end, [](const auto *node) { return node->selected(); });
     if (first == end) {
         return {nullptr, nullptr};
     }
@@ -338,11 +352,8 @@ static void drillSelection(const InputState &inputState, MapDocument &document) 
     // hits on the same Group need to be collapsed.
     const std::vector<Model::Node *> hitNodes = hitsToNodesWithGroupPicking(hits);
 
-    const auto forward =
-        (inputState.scrollY() > 0.0f) != (pref(Preferences::CameraMouseWheelInvert));
-    const auto nodePair = forward
-                          ? findSelectionPair(std::begin(hitNodes), std::end(hitNodes))
-                          : findSelectionPair(std::rbegin(hitNodes), std::rend(hitNodes));
+    const auto forward = (inputState.scrollY() > 0.0f) != (pref(Preferences::CameraMouseWheelInvert));
+    const auto nodePair = forward ? findSelectionPair(std::begin(hitNodes), std::end(hitNodes)) : findSelectionPair(std::rbegin(hitNodes), std::rend(hitNodes));
 
     auto *selectedNode = nodePair.first;
     auto *nextNode = nodePair.second;
@@ -360,7 +371,8 @@ void SelectionTool::mouseScroll(const InputState &inputState) {
 
     if (inputState.checkModifierKeys(MK_Yes, MK_Yes, MK_No)) {
         adjustGrid(inputState, document->grid());
-    } else if (inputState.checkModifierKeys(MK_Yes, MK_No, MK_No)) {
+    }
+    else if (inputState.checkModifierKeys(MK_Yes, MK_No, MK_No)) {
         drillSelection(inputState, *document);
     }
 }
@@ -371,8 +383,7 @@ private:
     std::shared_ptr<MapDocument> m_document;
 
 public:
-    PaintSelectionDragTracker(std::shared_ptr<MapDocument> document)
-        : m_document{std::move(document)} {
+    PaintSelectionDragTracker(std::shared_ptr<MapDocument> document) : m_document{std::move(document)} {
     }
 
     bool drag(const InputState &inputState) override {
@@ -388,7 +399,8 @@ public:
                     m_document->selectBrushFaces({*faceHandle});
                 }
             }
-        } else {
+        }
+        else {
             assert(m_document->hasSelectedNodes());
             const auto &hit = firstHit(
                 inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
@@ -425,7 +437,8 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
             const auto &face = faceHandle->face();
             if (editorContext.selectable(brush, face)) {
                 document->startTransaction(
-                    "Drag Select Brush Faces", TransactionScope::LongRunning);
+                    "Drag Select Brush Faces", TransactionScope::LongRunning
+                );
                 if (document->hasSelection() && !document->hasSelectedBrushFaces()) {
                     document->deselectAll();
                 }
@@ -436,9 +449,9 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
                 return std::make_unique<PaintSelectionDragTracker>(std::move(document));
             }
         }
-    } else {
-        const auto &hit =
-            firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
+    }
+    else {
+        const auto &hit = firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
         if (!hit.isMatch()) {
             return nullptr;
         }
@@ -461,7 +474,8 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
 }
 
 void SelectionTool::setRenderOptions(
-    const InputState &inputState, Renderer::RenderContext &renderContext) const {
+    const InputState &inputState, Renderer::RenderContext &renderContext
+) const {
     using namespace Model::HitFilters;
 
     auto document = kdl::mem_lock(m_document);

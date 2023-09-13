@@ -29,7 +29,8 @@
 namespace TrenchBroom {
 namespace Renderer {
 Transformation::Transformation(
-    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
+    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model
+) {
     pushTransformation(projection, view, model);
 }
 
@@ -61,7 +62,8 @@ Transformation Transformation::slice() const {
 }
 
 void Transformation::pushTransformation(
-    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
+    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model
+) {
     m_projectionStack.push_back(projection);
     m_viewStack.push_back(view);
     m_modelStack.push_back(model);
@@ -110,11 +112,8 @@ void Transformation::loadModelViewMatrix(const vm::mat4x4f &matrix) {
 }
 
 ReplaceTransformation::ReplaceTransformation(
-    Transformation &transformation,
-    const vm::mat4x4f &projectionMatrix,
-    const vm::mat4x4f &viewMatrix,
-    const vm::mat4x4f &modelMatrix)
-    : m_transformation(transformation) {
+    Transformation &transformation, const vm::mat4x4f &projectionMatrix, const vm::mat4x4f &viewMatrix, const vm::mat4x4f &modelMatrix
+) : m_transformation(transformation) {
     m_transformation.pushTransformation(projectionMatrix, viewMatrix, modelMatrix);
 }
 
@@ -123,8 +122,8 @@ ReplaceTransformation::~ReplaceTransformation() {
 }
 
 MultiplyModelMatrix::MultiplyModelMatrix(
-    Transformation &transformation, const vm::mat4x4f &modelMatrix)
-    : m_transformation(transformation) {
+    Transformation &transformation, const vm::mat4x4f &modelMatrix
+) : m_transformation(transformation) {
     m_transformation.pushModelMatrix(modelMatrix);
 }
 
@@ -133,8 +132,8 @@ MultiplyModelMatrix::~MultiplyModelMatrix() {
 }
 
 ReplaceModelMatrix::ReplaceModelMatrix(
-    Transformation &transformation, const vm::mat4x4f &modelMatrix)
-    : m_transformation(transformation) {
+    Transformation &transformation, const vm::mat4x4f &modelMatrix
+) : m_transformation(transformation) {
     m_transformation.replaceAndPushModelMatrix(modelMatrix);
 }
 

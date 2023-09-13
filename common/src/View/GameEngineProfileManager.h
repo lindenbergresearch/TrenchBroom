@@ -48,7 +48,8 @@ private:
 
 public:
     explicit GameEngineProfileManager(
-        Model::GameEngineConfig config, QWidget *parent = nullptr);
+        Model::GameEngineConfig config, QWidget *parent = nullptr
+    );
 
     const Model::GameEngineConfig &config() const;
 

@@ -29,8 +29,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-AllocationTracker::Range::Range(Index p, Index s)
-    : pos(p), size(s) {
+AllocationTracker::Range::Range(Index p, Index s) : pos(p), size(s) {
 }
 
 bool AllocationTracker::Range::operator==(const Range &other) const {
@@ -47,12 +46,11 @@ bool AllocationTracker::Range::operator<(const Range &other) const {
 }
 
 static std::vector<AllocationTracker::Block *>::iterator findFirstLargerOrEqualBin(
-    std::vector<AllocationTracker::Block *> &bins, const size_t desiredSize) {
+    std::vector<AllocationTracker::Block *> &bins, const size_t desiredSize
+) {
     return std::lower_bound(
-        bins.begin(),
-        bins.end(),
-        desiredSize,
-        [](const AllocationTracker::Block *a, const size_t b) { return a->size < b; });
+        bins.begin(), bins.end(), desiredSize, [](const AllocationTracker::Block *a, const size_t b) { return a->size < b; }
+    );
 }
 
 void AllocationTracker::unlinkFromBinList(Block *block) {
@@ -71,12 +69,14 @@ void AllocationTracker::unlinkFromBinList(Block *block) {
         if (block->nextOfSameSize == nullptr) {
             // NOTE: O(n) in the number of bins
             m_freeBlockSizeBins.erase(it);
-        } else {
+        }
+        else {
             *it = block->nextOfSameSize;
             block->nextOfSameSize->prevOfSameSize = nullptr;
             block->nextOfSameSize = nullptr;
         }
-    } else {
+    }
+    else {
         // "regular" case, not the head of a size bin list.
 
         // handle the "previous" side
@@ -108,7 +108,8 @@ void AllocationTracker::linkToBinList(Block *block) {
     if (it == m_freeBlockSizeBins.end()) {
         // All existing bins too small; insert at end.
         m_freeBlockSizeBins.insert(it, block);
-    } else if ((*it)->size == block->size) {
+    }
+    else if ((*it)->size == block->size) {
         // There is an existing exact match for the bin size, so we don't need to resize the
         // vector.
         Block *previousListHead = *it;
@@ -122,7 +123,8 @@ void AllocationTracker::linkToBinList(Block *block) {
 
         // NOTE: inserts into the map
         *it = block;
-    } else {
+    }
+    else {
         // Slow case: insert a new bin, before `it`.
         m_freeBlockSizeBins.insert(it, block);
     }
@@ -166,7 +168,8 @@ AllocationTracker::Block *AllocationTracker::allocate(const size_t needed) {
         Block *blockAfter = block->nextOfSameSize;
         if (blockAfter == nullptr) {
             m_freeBlockSizeBins.erase(it);
-        } else {
+        }
+        else {
             *it = blockAfter;
             blockAfter->prevOfSameSize = nullptr;
         }
@@ -202,7 +205,8 @@ AllocationTracker::Block *AllocationTracker::allocate(const size_t needed) {
         // update m_leftmostBlock
         assert(m_leftmostBlock == block);
         m_leftmostBlock = newBlock;
-    } else {
+    }
+    else {
         block->left->right = newBlock;
     }
 
@@ -317,16 +321,14 @@ void AllocationTracker::free(Block *block) {
     checkInvariants();
 }
 
-AllocationTracker::AllocationTracker(const Index initial_capacity)
-    : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr), m_recycledBlockList(nullptr) {
+AllocationTracker::AllocationTracker(const Index initial_capacity) : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr), m_recycledBlockList(nullptr) {
     if (initial_capacity > 0) {
         expand(initial_capacity);
         checkInvariants();
     }
 }
 
-AllocationTracker::AllocationTracker()
-    : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr), m_recycledBlockList(nullptr) {
+AllocationTracker::AllocationTracker() : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr), m_recycledBlockList(nullptr) {
 }
 
 AllocationTracker::~AllocationTracker() {
@@ -386,7 +388,8 @@ void AllocationTracker::expand(const Index newCapacity) {
         lastBlock->size += increase;
 
         linkToBinList(lastBlock);
-    } else {
+    }
+    else {
         // the current buffer ends in a used block.
         // create a new free block
 

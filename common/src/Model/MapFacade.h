@@ -143,7 +143,8 @@ public: // selection
 
 public: // adding, removing, reparenting, and duplicating nodes
     virtual std::vector<Node *> addNodes(
-        const std::map<Node *, std::vector<Node *>> &nodes) = 0;
+        const std::map<Node *, std::vector<Node *>> &nodes
+    ) = 0;
 
     virtual void removeNodes(const std::vector<Node *> &nodes) = 0;
 
@@ -155,10 +156,12 @@ public: // adding, removing, reparenting, and duplicating nodes
 
 public: // entity management
     virtual Model::EntityNode *createPointEntity(
-        const Assets::PointEntityDefinition *definition, const vm::vec3 &delta) = 0;
+        const Assets::PointEntityDefinition *definition, const vm::vec3 &delta
+    ) = 0;
 
     virtual Model::EntityNode *createBrushEntity(
-        const Assets::BrushEntityDefinition *definition) = 0;
+        const Assets::BrushEntityDefinition *definition
+    ) = 0;
 
 public:                                            // modifying transient node attributes
     virtual void hide(std::vector<Node *> nodes) = 0; // Don't take the nodes by reference!
@@ -176,47 +179,53 @@ public: // modifying objects
     virtual bool translateObjects(const vm::vec3 &delta) = 0;
 
     virtual bool rotateObjects(
-        const vm::vec3 &center, const vm::vec3 &axis, FloatType angle) = 0;
+        const vm::vec3 &center, const vm::vec3 &axis, FloatType angle
+    ) = 0;
 
     virtual bool scaleObjects(const vm::bbox3 &oldBBox, const vm::bbox3 &newBBox) = 0;
 
     virtual bool scaleObjects(const vm::vec3 &center, const vm::vec3 &scaleFactors) = 0;
 
     virtual bool shearObjects(
-        const vm::bbox3 &box, const vm::vec3 &sideToShear, const vm::vec3 &delta) = 0;
+        const vm::bbox3 &box, const vm::vec3 &sideToShear, const vm::vec3 &delta
+    ) = 0;
 
     virtual bool flipObjects(const vm::vec3 &center, vm::axis::type axis) = 0;
 
 public: // modifying entity properties
     virtual bool setProperty(
-        const std::string &key,
-        const std::string &value,
-        bool defaultToProtected = false) = 0;
+        const std::string &key, const std::string &value, bool defaultToProtected = false
+    ) = 0;
 
     virtual bool renameProperty(const std::string &oldKey, const std::string &newKey) = 0;
 
     virtual bool removeProperty(const std::string &key) = 0;
 
     virtual bool convertEntityColorRange(
-        const std::string &name, Assets::ColorRange::Type range) = 0;
+        const std::string &name, Assets::ColorRange::Type range
+    ) = 0;
 
     virtual bool updateSpawnflag(
-        const std::string &name, size_t flagIndex, bool setFlag) = 0;
+        const std::string &name, size_t flagIndex, bool setFlag
+    ) = 0;
 
 public: // brush extrusion
     virtual bool extrudeBrushes(
-        const std::vector<vm::polygon3> &faces, const vm::vec3 &delta) = 0;
+        const std::vector<vm::polygon3> &faces, const vm::vec3 &delta
+    ) = 0;
 
 public: // modifying face attributes
     virtual bool setFaceAttributes(const BrushFaceAttributes &attributes) = 0;
 
     virtual bool setFaceAttributesExceptContentFlags(
-        const BrushFaceAttributes &attributes) = 0;
+        const BrushFaceAttributes &attributes
+    ) = 0;
 
     virtual bool setFaceAttributes(const ChangeBrushFaceAttributesRequest &request) = 0;
 
     virtual bool moveTextures(
-        const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, const vm::vec2f &delta) = 0;
+        const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, const vm::vec2f &delta
+    ) = 0;
 
     virtual bool rotateTextures(float angle) = 0;
 
@@ -233,13 +242,16 @@ public: // modifying vertices
     };
 
     virtual MoveVerticesResult moveVertices(
-        std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta) = 0;
+        std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta
+    ) = 0;
 
     virtual bool moveEdges(
-        std::vector<vm::segment3> edgePositions, const vm::vec3 &delta) = 0;
+        std::vector<vm::segment3> edgePositions, const vm::vec3 &delta
+    ) = 0;
 
     virtual bool moveFaces(
-        std::vector<vm::polygon3> facePositions, const vm::vec3 &delta) = 0;
+        std::vector<vm::polygon3> facePositions, const vm::vec3 &delta
+    ) = 0;
 
 public: // search paths and mods
     virtual std::vector<std::string> mods() const = 0;

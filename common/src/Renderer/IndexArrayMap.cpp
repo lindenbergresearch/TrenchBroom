@@ -24,8 +24,8 @@
 namespace TrenchBroom {
 namespace Renderer {
 IndexArrayMap::IndexArrayRange::IndexArrayRange(
-    const size_t i_offset, const size_t i_capacity)
-    : offset{i_offset}, capacity{i_capacity}, count{0u} {
+    const size_t i_offset, const size_t i_capacity
+) : offset{i_offset}, capacity{i_capacity}, count{0u} {
 }
 
 size_t IndexArrayMap::IndexArrayRange::add(const size_t i_count) {
@@ -35,13 +35,11 @@ size_t IndexArrayMap::IndexArrayRange::add(const size_t i_count) {
     return result;
 }
 
-IndexArrayMap::Size::Size()
-    : m_indexCount{0u} {
+IndexArrayMap::Size::Size() : m_indexCount{0u} {
 }
 
 void IndexArrayMap::Size::inc(const PrimType primType, const size_t count) {
-    m_sizes[primType] +=
-        count; // unknown map values are value constructed, which initializes to 0 for size_t
+    m_sizes[primType] += count; // unknown map values are value constructed, which initializes to 0 for size_t
     m_indexCount += count;
 }
 
@@ -56,7 +54,8 @@ size_t IndexArrayMap::Size::indexCount() const {
 }
 
 void IndexArrayMap::Size::initialize(
-    PrimTypeToRangeMap &data, const size_t baseOffset) const {
+    PrimTypeToRangeMap &data, const size_t baseOffset
+) const {
     auto offset = baseOffset;
     for (const auto &[primType, size]: m_sizes) {
         data.emplace(primType, IndexArrayRange{offset, size});
@@ -64,8 +63,7 @@ void IndexArrayMap::Size::initialize(
     }
 }
 
-IndexArrayMap::IndexArrayMap(const Size &size)
-    : IndexArrayMap{size, 0u} {
+IndexArrayMap::IndexArrayMap(const Size &size) : IndexArrayMap{size, 0u} {
 }
 
 IndexArrayMap::IndexArrayMap(const Size &size, const size_t baseOffset) {

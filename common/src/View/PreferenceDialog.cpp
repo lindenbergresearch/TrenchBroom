@@ -43,9 +43,7 @@
 
 namespace TrenchBroom {
 namespace View {
-PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent)
-    : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr),
-      m_buttonBox(nullptr) {
+PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent) : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr), m_buttonBox(nullptr) {
     setWindowTitle("Preferences");
     setWindowIconTB(this);
     createGui();
@@ -81,10 +79,12 @@ void PreferenceDialog::createGui() {
     m_toolBar->addAction(gamesImage, "Games", [this]() { switchToPane(PrefPane_Games); });
     m_toolBar->addAction(viewImage, "View", [this]() { switchToPane(PrefPane_View); });
     m_toolBar->addAction(
-        colorsImage, "Colors", [this]() { switchToPane(PrefPane_Colors); });
+        colorsImage, "Colors", [this]() { switchToPane(PrefPane_Colors); }
+    );
     m_toolBar->addAction(mouseImage, "Mouse", [this]() { switchToPane(PrefPane_Mouse); });
     m_toolBar->addAction(
-        keyboardImage, "Keyboard", [this]() { switchToPane(PrefPane_Keyboard); });
+        keyboardImage, "Keyboard", [this]() { switchToPane(PrefPane_Keyboard); }
+    );
 
     // Don't display tooltips for pane switcher buttons...
     for (auto *button: m_toolBar->findChildren<QToolButton *>()) {
@@ -103,8 +103,8 @@ void PreferenceDialog::createGui() {
 #if !defined __APPLE__
         | QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel
 #endif
-        ,
-        this);
+        , this
+    );
 
     auto *resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
     connect(resetButton, &QPushButton::clicked, this, &PreferenceDialog::resetToDefaults);

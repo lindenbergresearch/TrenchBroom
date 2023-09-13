@@ -36,25 +36,25 @@
 
 namespace TrenchBroom {
 namespace View {
-ToolBox::ToolBox()
-    : m_modalTool(nullptr), m_enabled(true) {
+ToolBox::ToolBox() : m_modalTool(nullptr), m_enabled(true) {
 }
 
 ToolBox::~ToolBox() = default;
 
 void ToolBox::addTool(Tool &tool) {
     m_notifierConnection += tool.refreshViewsNotifier.connect(refreshViewsNotifier);
-    m_notifierConnection +=
-        tool.toolHandleSelectionChangedNotifier.connect(toolHandleSelectionChangedNotifier);
+    m_notifierConnection += tool.toolHandleSelectionChangedNotifier.connect(toolHandleSelectionChangedNotifier);
 }
 
 void ToolBox::pick(
-    ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult) {
+    ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult
+) {
     chain->pick(inputState, pickResult);
 }
 
 bool ToolBox::dragEnter(
-    ToolChain *chain, const InputState &inputState, const std::string &text) {
+    ToolChain *chain, const InputState &inputState, const std::string &text
+) {
     if (!m_enabled) {
         return false;
     }
@@ -177,7 +177,8 @@ void ToolBox::mouseScroll(ToolChain *chain, const InputState &inputState) {
     }
     if (m_dragTracker) {
         m_dragTracker->mouseScroll(inputState);
-    } else {
+    }
+    else {
         chain->mouseScroll(inputState);
     }
 }
@@ -212,7 +213,8 @@ void ToolBox::toggleTool(Tool &tool) {
     if (&tool == m_modalTool) {
         Tool *previousModalTool = std::exchange(m_modalTool, nullptr);
         deactivateTool(*previousModalTool);
-    } else {
+    }
+    else {
         if (m_modalTool != nullptr) {
             Tool *previousModalTool = std::exchange(m_modalTool, nullptr);
             deactivateTool(*previousModalTool);
@@ -244,7 +246,8 @@ void ToolBox::disable() {
 }
 
 void ToolBox::setRenderOptions(
-    ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext) {
+    ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext
+) {
     chain->setRenderOptions(inputState, renderContext);
     if (m_dragTracker) {
         m_dragTracker->setRenderOptions(inputState, renderContext);
@@ -252,10 +255,8 @@ void ToolBox::setRenderOptions(
 }
 
 void ToolBox::renderTools(
-    ToolChain *chain,
-    const InputState &inputState,
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch) {
+    ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     /* if (m_modalTool != nullptr)
         m_modalTool->renderOnly(m_inputState, renderContext);
     else */

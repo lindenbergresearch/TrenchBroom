@@ -36,28 +36,24 @@ namespace {
 static const auto Type = freeIssueType();
 } // namespace
 
-PropertyKeyWithDoubleQuotationMarksValidator::
-PropertyKeyWithDoubleQuotationMarksValidator()
-    : Validator{Type, "Invalid entity property keys"} {
+PropertyKeyWithDoubleQuotationMarksValidator::PropertyKeyWithDoubleQuotationMarksValidator() : Validator{Type, "Invalid entity property keys"} {
     addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
-    addQuickFix(makeTransformEntityPropertiesQuickFix(
-        Type,
-        "Replace \" with '",
-        [](const std::string &key) { return kdl::str_replace_every(key, "\"", "'"); },
-        [](const std::string &value) { return value; }));
+    addQuickFix(
+        makeTransformEntityPropertiesQuickFix(
+            Type, "Replace \" with '", [](const std::string &key) { return kdl::str_replace_every(key, "\"", "'"); }, [](const std::string &value) { return value; }
+        ));
 }
 
 void PropertyKeyWithDoubleQuotationMarksValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues
+) const {
     for (const auto &property: entityNode.entity().properties()) {
         const auto &propertyKey = property.key();
         if (propertyKey.find('"') != std::string::npos) {
-            issues.push_back(std::make_unique<EntityPropertyIssue>(
-                Type,
-                entityNode,
-                propertyKey,
-                "Property key '" + propertyKey + "' of " + entityNode.name()
-                + " contains double quotation marks."));
+            issues.push_back(
+                std::make_unique<EntityPropertyIssue>(
+                    Type, entityNode, propertyKey, "Property key '" + propertyKey + "' of " + entityNode.name() + " contains double quotation marks."
+                ));
         }
     }
 }

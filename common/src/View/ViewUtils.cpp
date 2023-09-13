@@ -41,7 +41,8 @@
 namespace TrenchBroom {
 namespace View {
 void combineFlags(
-    const size_t numFlags, const int newFlagValue, int &setFlags, int &mixedFlags) {
+    const size_t numFlags, const int newFlagValue, int &setFlags, int &mixedFlags
+) {
     for (size_t i = 0; i < numFlags; ++i) {
         const bool alreadySet = (newFlagValue & (1 << i)) != 0;
         const bool willBeSet = (setFlags & (1 << i)) != 0;
@@ -54,12 +55,14 @@ void combineFlags(
 }
 
 bool loadEntityDefinitionFile(
-    std::weak_ptr<MapDocument> document, QWidget *parent, const QString &path) {
+    std::weak_ptr<MapDocument> document, QWidget *parent, const QString &path
+) {
     return loadEntityDefinitionFile(document, parent, QStringList{path}) == 0;
 }
 
 size_t loadEntityDefinitionFile(
-    std::weak_ptr<MapDocument> i_document, QWidget *parent, const QStringList &pathStrs) {
+    std::weak_ptr<MapDocument> i_document, QWidget *parent, const QStringList &pathStrs
+) {
     if (pathStrs.empty()) {
         return 0;
     }
@@ -77,15 +80,13 @@ size_t loadEntityDefinitionFile(
             if (game->isEntityDefinitionFile(absPath)) {
                 ChoosePathTypeDialog pathDialog(parent->window(), absPath, docPath, gamePath);
                 if (pathDialog.exec() == QDialog::Accepted) {
-                    const Assets::EntityDefinitionFileSpec spec =
-                        Assets::EntityDefinitionFileSpec::external(pathDialog.path());
+                    const Assets::EntityDefinitionFileSpec spec = Assets::EntityDefinitionFileSpec::external(pathDialog.path());
                     document->setEntityDefinitionFile(spec);
                     return static_cast<size_t>(i);
                 }
             }
         }
-    }
-    catch (...) {
+    } catch (...) {
         throw;
     }
 
@@ -93,45 +94,33 @@ size_t loadEntityDefinitionFile(
 }
 
 static std::string queryObjectName(
-    QWidget *parent, const QString &objectType, const std::string &suggestion) {
+    QWidget *parent, const QString &objectType, const std::string &suggestion
+) {
     while (true) {
         bool ok = false;
         const std::string name = QInputDialog::getText(
-            parent,
-            "Enter a name",
-            QObject::tr("%1 Name").arg(objectType),
-            QLineEdit::Normal,
-            QString::fromStdString(suggestion),
-            &ok)
-            .toStdString();
+            parent, "Enter a name", QObject::tr("%1 Name").arg(objectType), QLineEdit::Normal, QString::fromStdString(suggestion), &ok
+        ).toStdString();
 
         if (!ok) {
             return "";
         }
 
         if (kdl::str_is_blank(name)) {
-            if (
-                QMessageBox::warning(
-                    parent,
-                    "Error",
-                    QObject::tr("%1 names cannot be blank.").arg(objectType),
-                    QMessageBox::Ok | QMessageBox::Cancel,
-                    QMessageBox::Ok)
-                != QMessageBox::Ok) {
+            if (QMessageBox::warning(
+                parent, "Error", QObject::tr("%1 names cannot be blank.").arg(objectType), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok
+            ) != QMessageBox::Ok) {
                 return "";
             }
-        } else if (kdl::ci::str_contains(name, "\"")) {
-            if (
-                QMessageBox::warning(
-                    parent,
-                    "Error",
-                    QObject::tr("%1 names cannot contain double quotes.").arg(objectType),
-                    QMessageBox::Ok | QMessageBox::Cancel,
-                    QMessageBox::Ok)
-                != QMessageBox::Ok) {
+        }
+        else if (kdl::ci::str_contains(name, "\"")) {
+            if (QMessageBox::warning(
+                parent, "Error", QObject::tr("%1 names cannot contain double quotes.").arg(objectType), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok
+            ) != QMessageBox::Ok) {
                 return "";
             }
-        } else {
+        }
+        else {
             return name;
         }
     }

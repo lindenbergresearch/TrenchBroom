@@ -64,18 +64,8 @@ private:
 
 public:
     LayoutCell(
-        float x,
-        float y,
-        float itemWidth,
-        float itemHeight,
-        float titleWidth,
-        float titleHeight,
-        float titleMargin,
-        float maxUpScale,
-        float minWidth,
-        float maxWidth,
-        float minHeight,
-        float maxHeight);
+        float x, float y, float itemWidth, float itemHeight, float titleWidth, float titleHeight, float titleMargin, float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight
+    );
 
     std::any &item();
 
@@ -105,11 +95,13 @@ public:
     bool hitTest(float x, float y) const;
 
     void updateLayout(
-        float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight);
+        float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight
+    );
 
 private:
     void doLayout(
-        float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight);
+        float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight
+    );
 };
 
 class LayoutRow {
@@ -129,17 +121,8 @@ private:
 
 public:
     LayoutRow(
-        float x,
-        float y,
-        float cellMargin,
-        float titleMargin,
-        float maxWidth,
-        size_t maxCells,
-        float maxUpScale,
-        float minCellWidth,
-        float maxCellWidth,
-        float minCellHeight,
-        float maxCellHeight);
+        float x, float y, float cellMargin, float titleMargin, float maxWidth, size_t maxCells, float maxUpScale, float minCellWidth, float maxCellWidth, float minCellHeight, float maxCellHeight
+    );
 
     const LayoutBounds &bounds() const;
 
@@ -150,14 +133,12 @@ public:
     bool intersectsY(float y, float height) const;
 
     bool canAddItem(
-        float itemWidth, float itemHeight, float titleWidth, float titleHeight) const;
+        float itemWidth, float itemHeight, float titleWidth, float titleHeight
+    ) const;
 
     void addItem(
-        std::any item,
-        float itemWidth,
-        float itemHeight,
-        float titleWidth,
-        float titleHeight);
+        std::any item, float itemWidth, float itemHeight, float titleWidth, float titleHeight
+    );
 
 private:
     void readjustItems();
@@ -182,34 +163,13 @@ private:
 
 public:
     LayoutGroup(
-        std::string item,
-        float x,
-        float y,
-        float cellMargin,
-        float titleMargin,
-        float rowMargin,
-        float titleHeight,
-        float width,
-        size_t maxCellsPerRow,
-        float maxUpScale,
-        float minCellWidth,
-        float maxCellWidth,
-        float minCellHeight,
-        float maxCellHeight);
+        std::string item, float x, float y, float cellMargin, float titleMargin, float rowMargin, float titleHeight, float width, size_t maxCellsPerRow, float maxUpScale, float minCellWidth, float maxCellWidth, float minCellHeight,
+        float maxCellHeight
+    );
 
     LayoutGroup(
-        float x,
-        float y,
-        float cellMargin,
-        float titleMargin,
-        float rowMargin,
-        float width,
-        size_t maxCellsPerRow,
-        float maxUpScale,
-        float minCellWidth,
-        float maxCellWidth,
-        float minCellHeight,
-        float maxCellHeight);
+        float x, float y, float cellMargin, float titleMargin, float rowMargin, float width, size_t maxCellsPerRow, float maxUpScale, float minCellWidth, float maxCellWidth, float minCellHeight, float maxCellHeight
+    );
 
     const std::string &item() const;
 
@@ -232,11 +192,8 @@ public:
     bool intersectsY(float y, float height) const;
 
     void addItem(
-        std::any item,
-        float itemWidth,
-        float itemHeight,
-        float titleWidth,
-        float titleHeight);
+        std::any item, float itemWidth, float itemHeight, float titleWidth, float titleHeight
+    );
 };
 
 class CellLayout {
@@ -302,7 +259,8 @@ public:
     float height();
 
     LayoutBounds titleBoundsForVisibleRect(
-        const LayoutGroup &group, float y, float height) const;
+        const LayoutGroup &group, float y, float height
+    ) const;
 
     float rowPosition(float y, int offset);
 
@@ -317,11 +275,8 @@ public:
     void addGroup(std::string groupItem, float titleHeight);
 
     void addItem(
-        std::any item,
-        float itemWidth,
-        float itemHeight,
-        float titleWidth,
-        float titleHeight);
+        std::any item, float itemWidth, float itemHeight, float titleWidth, float titleHeight
+    );
 
     void clear();
 

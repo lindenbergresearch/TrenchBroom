@@ -70,8 +70,7 @@ struct TextureConfig {
   // Glob patterns used to match texture names for exclusion
   std::vector<std::string> excludes;
 
-  kdl_reflect_decl(
-      TextureConfig, root, extensions, palette, property, shaderSearchPath, excludes);
+  kdl_reflect_decl(TextureConfig, root, extensions, palette, property, shaderSearchPath, excludes);
 };
 
 struct EntityConfig {
@@ -80,8 +79,7 @@ struct EntityConfig {
   std::optional<EL::Expression> scaleExpression;
   bool setDefaultProperties;
 
-  kdl_reflect_decl(
-      EntityConfig, defFilePaths, defaultColor, scaleExpression, setDefaultProperties);
+  kdl_reflect_decl(EntityConfig, defFilePaths, defaultColor, scaleExpression, setDefaultProperties);
 };
 
 struct FlagConfig {
@@ -140,25 +138,8 @@ struct GameConfig {
 
   size_t maxPropertyLength{1023};
 
-  kdl_reflect_decl(
-      GameConfig,
-      name,
-      path,
-      icon,
-      experimental,
-      fileFormats,
-      fileSystemConfig,
-      textureConfig,
-      entityConfig,
-      faceAttribsConfig,
-      smartTags,
-      softMapBounds,
-      compilationTools,
-      compilationConfig,
-      gameEngineConfig,
-      compilationConfigParseFailed,
-      gameEngineConfigParseFailed,
-      maxPropertyLength);
+  kdl_reflect_decl(GameConfig, name, path, icon, experimental, fileFormats, fileSystemConfig, textureConfig, entityConfig, faceAttribsConfig, smartTags, softMapBounds, compilationTools, compilationConfig, gameEngineConfig,
+                   compilationConfigParseFailed, gameEngineConfigParseFailed, maxPropertyLength);
 
   std::filesystem::path findInitialMap(const std::string &formatName) const;
 

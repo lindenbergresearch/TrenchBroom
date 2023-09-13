@@ -35,8 +35,7 @@
 
 namespace TrenchBroom {
 namespace View {
-GameEngineDialog::GameEngineDialog(const std::string &gameName, QWidget *parent)
-    : QDialog(parent), m_gameName(gameName), m_profileManager(nullptr) {
+GameEngineDialog::GameEngineDialog(const std::string &gameName, QWidget *parent) : QDialog(parent), m_gameName(gameName), m_profileManager(nullptr) {
     setWindowTitle("Game Engines");
     setWindowIconTB(this);
     createGui();

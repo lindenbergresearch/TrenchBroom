@@ -44,58 +44,34 @@ const size_t TextRenderer::RectCornerSegments = 12;
 const float TextRenderer::RectCornerRadius = 6.0f;
 
 TextRenderer::Entry::Entry(
-    std::vector<vm::vec2f> &i_vertices,
-    const vm::vec2f &i_size,
-    const vm::vec3f &i_offset,
-    const Color &i_textColor,
-    const Color &i_backgroundColor
-)
-    : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor) {
+    std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor, const Color &i_backgroundColor
+) : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor) {
     using std::swap;
     swap(vertices, i_vertices);
 }
 
-TextRenderer::EntryCollection::EntryCollection()
-    : textVertexCount(0), rectVertexCount(0) {
+TextRenderer::EntryCollection::EntryCollection() : textVertexCount(0), rectVertexCount(0) {
 }
 
 TextRenderer::TextRenderer(
-    const FontDescriptor &fontDescriptor,
-    const float maxViewDistance,
-    const float minZoomFactor,
-    const vm::vec2f &inset
-)
-    : m_fontDescriptor(fontDescriptor), m_maxViewDistance(maxViewDistance), m_minZoomFactor(minZoomFactor),
-      m_inset(inset) {
+    const FontDescriptor &fontDescriptor, const float maxViewDistance, const float minZoomFactor, const vm::vec2f &inset
+) : m_fontDescriptor(fontDescriptor), m_maxViewDistance(maxViewDistance), m_minZoomFactor(minZoomFactor), m_inset(inset) {
 }
 
 void TextRenderer::renderString(
-    RenderContext &renderContext,
-    const Color &textColor,
-    const Color &backgroundColor,
-    const AttrString &string,
-    const TextAnchor &position
+    RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position
 ) {
     renderString(renderContext, textColor, backgroundColor, string, position, false);
 }
 
 void TextRenderer::renderStringOnTop(
-    RenderContext &renderContext,
-    const Color &textColor,
-    const Color &backgroundColor,
-    const AttrString &string,
-    const TextAnchor &position
+    RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position
 ) {
     renderString(renderContext, textColor, backgroundColor, string, position, true);
 }
 
 void TextRenderer::renderString(
-    RenderContext &renderContext,
-    const Color &textColor,
-    const Color &backgroundColor,
-    const AttrString &string,
-    const TextAnchor &position,
-    const bool onTop
+    RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position, const bool onTop
 ) {
 
     const Camera &camera = renderContext.camera();
@@ -116,35 +92,18 @@ void TextRenderer::renderString(
 
     if (onTop) {
         addEntry(
-            m_entriesOnTop,
-            Entry(
-                vertices,
-                size,
-                floor(offset),
-                Color(textColor, alphaFactor * textColor.a()),
-                Color(backgroundColor, alphaFactor * backgroundColor.a())
-            )
-        );
-    } else {
+            m_entriesOnTop, Entry(
+                vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a())));
+    }
+    else {
         addEntry(
-            m_entries,
-            Entry(
-                vertices,
-                size,
-                floor(offset),
-                Color(textColor, alphaFactor * textColor.a()),
-                Color(backgroundColor, alphaFactor * backgroundColor.a())
-            )
-        );
+            m_entries, Entry(
+                vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a())));
     }
 }
 
 bool TextRenderer::isVisible(
-    RenderContext &renderContext,
-    const AttrString &string,
-    const TextAnchor &position,
-    const float distance,
-    const bool onTop
+    RenderContext &renderContext, const AttrString &string, const TextAnchor &position, const float distance, const bool onTop
 ) const {
     if (!onTop) {
         if (renderContext.render3D() && distance > m_maxViewDistance)
@@ -172,7 +131,8 @@ float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const
         if (a > 128.0f)
             return 1.0f;
         return a / 128.0f;
-    } else {
+    }
+    else {
         const float z = renderContext.camera().zoom();
         const float d = z - m_minZoomFactor;
         if (d > 0.3f)
@@ -221,10 +181,7 @@ void TextRenderer::prepare(
 }
 
 void TextRenderer::addEntry(
-    const Entry &entry,
-    const bool /* onTop */,
-    std::vector<TextVertex> &textVertices,
-    std::vector<RectVertex> &rectVertices
+    const Entry &entry, const bool /* onTop */, std::vector<TextVertex> &textVertices, std::vector<RectVertex> &rectVertices
 ) {
     const std::vector<vm::vec2f> &stringVertices = entry.vertices;
     const vm::vec2f &stringSize = entry.size;
@@ -242,8 +199,7 @@ void TextRenderer::addEntry(
         );
     }
 
-    const std::vector<vm::vec2f> rect =
-        roundedRect2D(stringSize + 2.0f * m_inset, RectCornerRadius, RectCornerSegments);
+    const std::vector<vm::vec2f> rect = roundedRect2D(stringSize + 2.0f * m_inset, RectCornerRadius, RectCornerSegments);
 
     for (size_t i = 0; i < rect.size(); ++i) {
         const vm::vec2f &vertex = rect[i];
@@ -256,12 +212,7 @@ void TextRenderer::addEntry(
 void TextRenderer::doRender(RenderContext &renderContext) {
     const Camera::Viewport &viewport = renderContext.camera().viewport();
     const vm::mat4x4f projection = vm::ortho_matrix(
-        0.0f,
-        1.0f,
-        static_cast<float>(viewport.x),
-        static_cast<float>(viewport.height),
-        static_cast<float>(viewport.width),
-        static_cast<float>(viewport.y));
+        0.0f, 1.0f, static_cast<float>(viewport.x), static_cast<float>(viewport.height), static_cast<float>(viewport.width), static_cast<float>(viewport.y));
     const vm::mat4x4f view = vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y());
     ReplaceTransformation ortho(renderContext.transformation(), projection, view);
 

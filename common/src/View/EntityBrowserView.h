@@ -98,17 +98,15 @@ private:
 
 public:
     EntityBrowserView(
-        QScrollBar *scrollBar,
-        GLContextManager &contextManager,
-        Assets::EntityDefinitionManager &entityDefinitionManager,
-        Assets::EntityModelManager &entityModelManager,
-        Logger &logger);
+        QScrollBar *scrollBar, GLContextManager &contextManager, Assets::EntityDefinitionManager &entityDefinitionManager, Assets::EntityModelManager &entityModelManager, Logger &logger
+    );
 
     ~EntityBrowserView() override;
 
 public:
     void setDefaultModelScaleExpression(
-        std::optional<EL::Expression> defaultModelScaleExpression);
+        std::optional<EL::Expression> defaultModelScaleExpression
+    );
 
     void setSortOrder(Assets::EntityDefinitionSortOrder sortOrder);
 
@@ -128,14 +126,12 @@ private:
     QString dndData(const Cell &cell) override;
 
     void addEntitiesToLayout(
-        Layout &layout,
-        const std::vector<Assets::EntityDefinition *> &definitions,
-        const Renderer::FontDescriptor &font);
+        Layout &layout, const std::vector<Assets::EntityDefinition *> &definitions, const Renderer::FontDescriptor &font
+    );
 
     void addEntityToLayout(
-        Layout &layout,
-        const Assets::PointEntityDefinition *definition,
-        const Renderer::FontDescriptor &font);
+        Layout &layout, const Assets::PointEntityDefinition *definition, const Renderer::FontDescriptor &font
+    );
 
     void doClear() override;
 
@@ -150,7 +146,8 @@ private:
     class MeshFunc;
 
     void renderModels(
-        Layout &layout, float y, float height, Renderer::Transformation &transformation);
+        Layout &layout, float y, float height, Renderer::Transformation &transformation
+    );
 
     void renderNames(Layout &layout, float y, float height, const vm::mat4x4f &projection);
 
@@ -161,7 +158,8 @@ private:
     StringMap collectStringVertices(Layout &layout, float y, float height);
 
     vm::mat4x4f itemTransformation(
-        const Cell &cell, float y, float height, bool applyModelScale) const;
+        const Cell &cell, float y, float height, bool applyModelScale
+    ) const;
 
     QString tooltip(const Cell &cell) override;
 

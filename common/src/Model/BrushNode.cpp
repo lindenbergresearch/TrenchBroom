@@ -66,8 +66,7 @@ namespace TrenchBroom {
 namespace Model {
 const HitType::Type BrushNode::BrushHitType = HitType::freeType();
 
-BrushNode::BrushNode(Brush brush)
-    : m_brushRendererBrushCache(std::make_unique<Renderer::BrushRendererBrushCache>()), m_brush(std::move(brush)) {
+BrushNode::BrushNode(Brush brush) : m_brushRendererBrushCache(std::make_unique<Renderer::BrushRendererBrushCache>()), m_brush(std::move(brush)) {
     clearSelectedFaces();
 }
 
@@ -80,21 +79,16 @@ BrushNode *BrushNode::clone(const vm::bbox3 &worldBounds) const {
 const EntityNodeBase *BrushNode::entity() const {
     return visitParent(
         kdl::overload(
-            [](const WorldNode *world) -> const EntityNodeBase * { return world; },
-            [](const EntityNode *entity) -> const EntityNodeBase * { return entity; },
-            [](auto &&thisLambda, const LayerNode *layer) -> const EntityNodeBase * {
+            [](const WorldNode *world) -> const EntityNodeBase * { return world; }, [](const EntityNode *entity) -> const EntityNodeBase * { return entity; }, [](auto &&thisLambda, const LayerNode *layer) -> const EntityNodeBase * {
               return layer->visitParent(thisLambda).value_or(nullptr);
-            },
-            [](auto &&thisLambda, const GroupNode *group) -> const EntityNodeBase * {
+            }, [](auto &&thisLambda, const GroupNode *group) -> const EntityNodeBase * {
               return group->visitParent(thisLambda).value_or(nullptr);
-            },
-            [](auto &&thisLambda, const BrushNode *brush) -> const EntityNodeBase * {
+            }, [](auto &&thisLambda, const BrushNode *brush) -> const EntityNodeBase * {
               return brush->visitParent(thisLambda).value_or(nullptr);
-            },
-            [](auto &&thisLambda, const PatchNode *patch) -> const EntityNodeBase * {
+            }, [](auto &&thisLambda, const PatchNode *patch) -> const EntityNodeBase * {
               return patch->visitParent(thisLambda).value_or(nullptr);
-            }))
-        .value_or(nullptr);
+            }
+        )).value_or(nullptr);
 }
 
 EntityNodeBase *BrushNode::entity() {
@@ -159,17 +153,17 @@ static bool containsPatch(const Brush &brush, const PatchGrid &grid) {
 }
 
 bool BrushNode::contains(const Node *node) const {
-    return node->accept(kdl::overload(
-        [](const WorldNode *) { return false; },
-        [](const LayerNode *) { return false; },
-        [&](const GroupNode *group) { return m_brush.contains(group->logicalBounds()); },
-        [&](const EntityNode *entity) { return m_brush.contains(entity->logicalBounds()); },
-        [&](const BrushNode *brush) { return m_brush.contains(brush->brush()); },
-        [&](const PatchNode *patch) { return containsPatch(m_brush, patch->grid()); }));
+    return node->accept(
+        kdl::overload(
+            [](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [&](const GroupNode *group) { return m_brush.contains(group->logicalBounds()); },
+            [&](const EntityNode *entity) { return m_brush.contains(entity->logicalBounds()); }, [&](const BrushNode *brush) { return m_brush.contains(brush->brush()); },
+            [&](const PatchNode *patch) { return containsPatch(m_brush, patch->grid()); }
+        ));
 }
 
 static bool faceIntersectsEdge(
-    const BrushFace &face, const vm::vec3 &p0, const vm::vec3 &p1) {
+    const BrushFace &face, const vm::vec3 &p0, const vm::vec3 &p1
+) {
     const auto ray = vm::ray3{p0, p1 - p0}; // not normalized
     if (const auto dist = face.intersectWithRay(ray); !vm::is_nan(dist)) {
         // dist is scaled by inverse of vm::length(p1 - p0)
@@ -219,13 +213,12 @@ static bool intersectsPatch(const Brush &brush, const PatchGrid &grid) {
 }
 
 bool BrushNode::intersects(const Node *node) const {
-    return node->accept(kdl::overload(
-        [](const WorldNode *) { return false; },
-        [](const LayerNode *) { return false; },
-        [&](const GroupNode *group) { return m_brush.intersects(group->logicalBounds()); },
-        [&](const EntityNode *entity) { return m_brush.intersects(entity->logicalBounds()); },
-        [&](const BrushNode *brush) { return m_brush.intersects(brush->brush()); },
-        [&](const PatchNode *patch) { return intersectsPatch(m_brush, patch->grid()); }));
+    return node->accept(
+        kdl::overload(
+            [](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [&](const GroupNode *group) { return m_brush.intersects(group->logicalBounds()); },
+            [&](const EntityNode *entity) { return m_brush.intersects(entity->logicalBounds()); }, [&](const BrushNode *brush) { return m_brush.intersects(brush->brush()); },
+            [&](const PatchNode *patch) { return intersectsPatch(m_brush, patch->grid()); }
+        ));
 }
 
 void BrushNode::clearSelectedFaces() {
@@ -308,7 +301,8 @@ void BrushNode::doAccept(ConstNodeVisitor &visitor) const {
 }
 
 void BrushNode::doPick(
-    const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
+    const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+) {
     if (editorContext.visible(this)) {
         if (const auto hit = findFaceHit(ray)) {
             const auto [distance, faceIndex] = *hit;
@@ -327,7 +321,8 @@ void BrushNode::doFindNodesContaining(const vm::vec3 &point, std::vector<Node *>
 }
 
 std::optional<std::tuple<FloatType, size_t>> BrushNode::findFaceHit(
-    const vm::ray3 &ray) const {
+    const vm::ray3 &ray
+) const {
     if (!vm::is_nan(vm::intersect_ray_bbox(ray, logicalBounds()))) {
         for (size_t i = 0u; i < m_brush.faceCount(); ++i) {
             const auto &face = m_brush.face(i);

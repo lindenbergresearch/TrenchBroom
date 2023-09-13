@@ -73,15 +73,16 @@ public:
     std::unique_ptr<DragTracker> startMouseDrag(const InputState &inputState);
 
     std::unique_ptr<DropTracker> dragEnter(
-        const InputState &inputState, const std::string &payload);
+        const InputState &inputState, const std::string &payload
+    );
 
     void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext) const;
+        const InputState &inputState, Renderer::RenderContext &renderContext
+    ) const;
 
     void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch);
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    );
 
     bool cancel();
 

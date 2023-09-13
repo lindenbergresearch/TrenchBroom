@@ -54,9 +54,7 @@ class Selection;
 class VertexTool : public VertexToolBase<vm::vec3> {
 private:
     enum class Mode {
-      Move,
-      SplitEdge,
-      SplitFace
+      Move, SplitEdge, SplitFace
     };
 
     Mode m_mode;
@@ -82,9 +80,8 @@ private:
 
 public:
     void pick(
-        const vm::ray3 &pickRay,
-        const Renderer::Camera &camera,
-        Model::PickResult &pickResult) const override;
+        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+    ) const override;
 
 public: // Handle selection
     bool deselectAll() override;
@@ -96,7 +93,8 @@ public:
 
 public: // Vertex moving
     std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(
-        const std::vector<Model::Hit> &hits) const override;
+        const std::vector<Model::Hit> &hits
+    ) const override;
 
     bool startMove(const std::vector<Model::Hit> &hits) override;
 
@@ -116,9 +114,8 @@ public: // Vertex moving
 
 public: // Rendering
     void renderGuide(
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch,
-        const vm::vec3 &position) const override;
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &position
+    ) const override;
 
 private: // Tool interface
     bool doActivate() override;

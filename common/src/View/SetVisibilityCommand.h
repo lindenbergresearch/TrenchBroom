@@ -38,10 +38,7 @@ namespace View {
 class SetVisibilityCommand : public UndoableCommand {
 private:
     enum class Action {
-      Reset,
-      Hide,
-      Show,
-      Ensure
+      Reset, Hide, Show, Ensure
     };
 
     std::vector<Model::Node *> m_nodes;
@@ -54,7 +51,8 @@ public:
     static std::unique_ptr<SetVisibilityCommand> hide(std::vector<Model::Node *> nodes);
 
     static std::unique_ptr<SetVisibilityCommand> ensureVisible(
-        std::vector<Model::Node *> nodes);
+        std::vector<Model::Node *> nodes
+    );
 
     static std::unique_ptr<SetVisibilityCommand> reset(std::vector<Model::Node *> nodes);
 
@@ -66,7 +64,8 @@ private:
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
     std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document) override;
+        MapDocumentCommandFacade *document
+    ) override;
 
 deleteCopyAndMove(SetVisibilityCommand);
 };

@@ -77,10 +77,12 @@ struct GLVertex<AttrType, AttrTypeRest...> {
 
   // Assignment operators
   GLVertex<AttrType, AttrTypeRest...> &operator=(
-      const GLVertex<AttrType, AttrTypeRest...> &other) = default;
+      const GLVertex<AttrType, AttrTypeRest...> &other
+  ) = default;
 
   GLVertex<AttrType, AttrTypeRest...> &operator=(
-      GLVertex<AttrType, AttrTypeRest...> &&other) noexcept = default;
+      GLVertex<AttrType, AttrTypeRest...> &&other
+  ) noexcept = default;
 
   // explicitly declare the following two constructors instead of using type deduction
   // with an rvalue reference to avoid any clashes with the copy / move constructors
@@ -92,9 +94,8 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    * @param i_rest the values of the remaining attributes
    */
   explicit GLVertex(
-      typename AttrType::ElementType &&i_attr,
-      typename AttrTypeRest::ElementType &&... i_rest)
-      : attr(std::move(i_attr)), rest(std::move(i_rest)...) {
+      typename AttrType::ElementType &&i_attr, typename AttrTypeRest::ElementType &&... i_rest
+  ) : attr(std::move(i_attr)), rest(std::move(i_rest)...) {
   }
 
   /**
@@ -104,9 +105,8 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    * @param i_rest the value of the remaining attributes
    */
   explicit GLVertex(
-      const typename AttrType::ElementType &i_attr,
-      const typename AttrTypeRest::ElementType &... i_rest)
-      : attr(i_attr), rest(i_rest...) {
+      const typename AttrType::ElementType &i_attr, const typename AttrTypeRest::ElementType &... i_rest
+  ) : attr(i_attr), rest(i_rest...) {
   }
 
   /**
@@ -122,10 +122,11 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    */
   template<typename... I>
   static std::vector<GLVertex<AttrType, AttrTypeRest...>> toList(
-      const size_t count, I... cur) {
+      const size_t count, I... cur
+  ) {
       static_assert(
-          sizeof...(I) == sizeof...(AttrTypeRest) + 1,
-          "number of iterators must match number of vertex attributes");
+          sizeof...(I) == sizeof...(AttrTypeRest) + 1, "number of iterators must match number of vertex attributes"
+      );
       std::vector<GLVertex<AttrType, AttrTypeRest...>> result;
       result.reserve(count);
       for (size_t i = 0; i < count; ++i) {
@@ -171,8 +172,7 @@ struct GLVertex<AttrType> {
    *
    * @param i_attr the value of the first attribute
    */
-  explicit GLVertex(typename AttrType::ElementType &&i_attr)
-      : attr(std::move(i_attr)) {
+  explicit GLVertex(typename AttrType::ElementType &&i_attr) : attr(std::move(i_attr)) {
   }
 
   /**
@@ -180,8 +180,7 @@ struct GLVertex<AttrType> {
    *
    * @param i_attr the value of the first attribute
    */
-  explicit GLVertex(const typename AttrType::ElementType &i_attr)
-      : attr(i_attr) {
+  explicit GLVertex(const typename AttrType::ElementType &i_attr) : attr(i_attr) {
   }
 
   /**

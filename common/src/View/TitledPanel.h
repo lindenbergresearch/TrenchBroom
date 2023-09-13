@@ -33,13 +33,12 @@ private:
 
 public:
     TitledPanel(
-        const QString &title,
-        QWidget *parent,
-        bool showDivider = true,
-        bool boldTitle = true);
+        const QString &title, QWidget *parent, bool showDivider = true, bool boldTitle = true
+    );
 
     explicit TitledPanel(
-        const QString &title, bool showDivider = true, bool boldTitle = true);
+        const QString &title, bool showDivider = true, bool boldTitle = true
+    );
 
     TitleBar *getTitleBar() const;
 

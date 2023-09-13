@@ -37,44 +37,40 @@ namespace View {
  * the inherited findDraggableHandle method.
  */
 Model::Hit VertexToolController::findHandleHit(
-    const InputState &inputState, const VertexToolController::PartBase &base) {
+    const InputState &inputState, const VertexToolController::PartBase &base
+) {
     using namespace Model::HitFilters;
 
-    const auto vertexHit =
-        base.findDraggableHandle(inputState, VertexHandleManager::HandleHitType);
+    const auto vertexHit = base.findDraggableHandle(inputState, VertexHandleManager::HandleHitType);
     if (vertexHit.isMatch())
         return vertexHit;
-    if (
-        inputState.modifierKeysDown(ModifierKeys::MKShift)
-        && !inputState.pickResult().empty()) {
+    if (inputState.modifierKeysDown(ModifierKeys::MKShift) && !inputState.pickResult().empty()) {
         const auto &anyHit = inputState.pickResult().all().front();
         if (anyHit.hasType(
-            EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType))
+            EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType
+        ))
             return anyHit;
     }
     return Model::Hit::NoHit;
 }
 
 std::vector<Model::Hit> VertexToolController::findHandleHits(
-    const InputState &inputState, const VertexToolController::PartBase &base) {
+    const InputState &inputState, const VertexToolController::PartBase &base
+) {
     using namespace Model::HitFilters;
 
-    const auto vertexHits =
-        base.findDraggableHandles(inputState, VertexHandleManager::HandleHitType);
+    const auto vertexHits = base.findDraggableHandles(inputState, VertexHandleManager::HandleHitType);
     if (!vertexHits.empty())
         return vertexHits;
-    if (
-        inputState.modifierKeysDown(ModifierKeys::MKShift)
-        && !inputState.pickResult().empty()) {
+    if (inputState.modifierKeysDown(ModifierKeys::MKShift) && !inputState.pickResult().empty()) {
         const auto &anyHit = inputState.pickResult().all().front();
         if (anyHit.hasType(EdgeHandleManager::HandleHitType)) {
-            const auto edgeHits =
-                inputState.pickResult().all(type(EdgeHandleManager::HandleHitType));
+            const auto edgeHits = inputState.pickResult().all(type(EdgeHandleManager::HandleHitType));
             if (!edgeHits.empty())
                 return edgeHits;
-        } else if (anyHit.hasType(FaceHandleManager::HandleHitType)) {
-            const auto faceHits =
-                inputState.pickResult().all(type(FaceHandleManager::HandleHitType));
+        }
+        else if (anyHit.hasType(FaceHandleManager::HandleHitType)) {
+            const auto faceHits = inputState.pickResult().all(type(FaceHandleManager::HandleHitType));
             if (!faceHits.empty())
                 return faceHits;
         }
@@ -84,8 +80,7 @@ std::vector<Model::Hit> VertexToolController::findHandleHits(
 
 class VertexToolController::SelectVertexPart : public SelectPartBase<vm::vec3> {
 public:
-    explicit SelectVertexPart(VertexTool &tool)
-        : SelectPartBase(tool, VertexHandleManager::HandleHitType) {
+    explicit SelectVertexPart(VertexTool &tool) : SelectPartBase(tool, VertexHandleManager::HandleHitType) {
     }
 
 private:
@@ -94,7 +89,8 @@ private:
     }
 
     std::vector<Model::Hit> doFindDraggableHandles(
-        const InputState &inputState) const override {
+        const InputState &inputState
+    ) const override {
         return VertexToolController::findHandleHits(inputState, *this);
     }
 
@@ -105,16 +101,12 @@ private:
 
 class VertexToolController::MoveVertexPart : public MovePartBase {
 public:
-    explicit MoveVertexPart(VertexTool &tool)
-        : MovePartBase(tool, VertexHandleManager::HandleHitType) {
+    explicit MoveVertexPart(VertexTool &tool) : MovePartBase(tool, VertexHandleManager::HandleHitType) {
     }
 
 private:
     bool mouseClick(const InputState &inputState) override {
-        if (
-            inputState.mouseButtonsPressed(MouseButtons::MBLeft)
-            && inputState.modifierKeysPressed(ModifierKeys::MKAlt | ModifierKeys::MKShift)
-            && m_tool.handleManager().selectedHandleCount() == 1) {
+        if (inputState.mouseButtonsPressed(MouseButtons::MBLeft) && inputState.modifierKeysPressed(ModifierKeys::MKAlt | ModifierKeys::MKShift) && m_tool.handleManager().selectedHandleCount() == 1) {
 
             const Model::Hit hit = VertexToolController::findHandleHit(inputState, *this);
             if (hit.hasType(VertexHandleManager::HandleHitType)) {
@@ -130,36 +122,37 @@ private:
     }
 
     bool shouldStartMove(const InputState &inputState) const override {
-        return (
-            inputState.mouseButtonsPressed(MouseButtons::MBLeft) &&
-            (inputState.modifierKeysPressed(ModifierKeys::MKNone) ||    // horizontal movement
-             inputState.modifierKeysPressed(ModifierKeys::MKAlt) ||     // vertical movement
-             inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd) || // horizontal absolute snap
-             inputState.modifierKeysPressed(
-                 ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt) || // vertical absolute snap
-             inputState.modifierKeysPressed(
-                 ModifierKeys::MKShift) || // add new vertex and horizontal movement
-             inputState.modifierKeysPressed(
-                 ModifierKeys::MKShift | ModifierKeys::MKAlt) || // add new vertex and vertical movement
-             inputState.modifierKeysPressed(
-                 ModifierKeys::MKShift |
-                 ModifierKeys::MKCtrlCmd) || // add new vertex and horizontal movement with absolute snap
-             inputState.modifierKeysPressed(
-                 ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd |
-                 ModifierKeys::MKAlt) // add new vertex and vertical movement with absolute snap
-            ));
+        return (inputState.mouseButtonsPressed(MouseButtons::MBLeft) && (inputState.modifierKeysPressed(ModifierKeys::MKNone) ||    // horizontal movement
+                                                                         inputState.modifierKeysPressed(ModifierKeys::MKAlt) ||     // vertical movement
+                                                                         inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd) || // horizontal absolute snap
+                                                                         inputState.modifierKeysPressed(
+                                                                             ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt
+                                                                         ) || // vertical absolute snap
+                                                                         inputState.modifierKeysPressed(
+                                                                             ModifierKeys::MKShift
+                                                                         ) || // add new vertex and horizontal movement
+                                                                         inputState.modifierKeysPressed(
+                                                                             ModifierKeys::MKShift | ModifierKeys::MKAlt
+                                                                         ) || // add new vertex and vertical movement
+                                                                         inputState.modifierKeysPressed(
+                                                                             ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd
+                                                                         ) || // add new vertex and horizontal movement with absolute snap
+                                                                         inputState.modifierKeysPressed(
+                                                                             ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt
+                                                                         ) // add new vertex and vertical movement with absolute snap
+        ));
     }
 
     void render(
-        const InputState &inputState,
-        Renderer::RenderContext &renderContext,
-        Renderer::RenderBatch &renderBatch) override {
+        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    ) override {
         MovePartBase::render(inputState, renderContext, renderBatch);
 
         if (!inputState.anyToolDragging()) {
             const Model::Hit hit = findDraggableHandle(inputState);
             if (hit.hasType(
-                EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType)) {
+                EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType
+            )) {
                 const vm::vec3 handle = m_tool.getHandlePosition(hit);
                 if (inputState.mouseButtonsPressed(MouseButtons::MBLeft))
                     m_tool.renderHandle(
@@ -177,13 +170,13 @@ private:
     }
 
     std::vector<Model::Hit> doFindDraggableHandles(
-        const InputState &inputState) const override {
+        const InputState &inputState
+    ) const override {
         return VertexToolController::findHandleHits(inputState, *this);
     }
 };
 
-VertexToolController::VertexToolController(VertexTool &tool)
-    : VertexToolControllerBase(tool) {
+VertexToolController::VertexToolController(VertexTool &tool) : VertexToolControllerBase(tool) {
     addController(std::make_unique<MoveVertexPart>(tool));
     addController(std::make_unique<SelectVertexPart>(tool));
 }

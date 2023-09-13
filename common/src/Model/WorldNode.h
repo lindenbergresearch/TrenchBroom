@@ -66,12 +66,12 @@ private:
 
 public:
     WorldNode(
-        EntityPropertyConfig entityPropertyConfig, Entity entity, MapFormat mapFormat);
+        EntityPropertyConfig entityPropertyConfig, Entity entity, MapFormat mapFormat
+    );
 
     WorldNode(
-        EntityPropertyConfig entityPropertyConfig,
-        std::initializer_list<EntityProperty> properties,
-        MapFormat mapFormat);
+        EntityPropertyConfig entityPropertyConfig, std::initializer_list<EntityProperty> properties, MapFormat mapFormat
+    );
 
     ~WorldNode() override;
 
@@ -183,9 +183,8 @@ private: // implement Node interface
     bool doSelectable() const override;
 
     void doPick(
-        const EditorContext &editorContext,
-        const vm::ray3 &ray,
-        PickResult &pickResult) override;
+        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+    ) override;
 
     void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
@@ -196,20 +195,20 @@ private: // implement Node interface
     const EntityPropertyConfig &doGetEntityPropertyConfig() const override;
 
     void doFindEntityNodesWithProperty(
-        const std::string &name,
-        const std::string &value,
-        std::vector<EntityNodeBase *> &result) const override;
+        const std::string &name, const std::string &value, std::vector<EntityNodeBase *> &result
+    ) const override;
 
     void doFindEntityNodesWithNumberedProperty(
-        const std::string &prefix,
-        const std::string &value,
-        std::vector<EntityNodeBase *> &result) const override;
+        const std::string &prefix, const std::string &value, std::vector<EntityNodeBase *> &result
+    ) const override;
 
     void doAddToIndex(
-        EntityNodeBase *node, const std::string &key, const std::string &value) override;
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    ) override;
 
     void doRemoveFromIndex(
-        EntityNodeBase *node, const std::string &key, const std::string &value) override;
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    ) override;
 
 private: // implement EntityNodeBase interface
     void doPropertiesDidChange(const vm::bbox3 &oldBounds) override;

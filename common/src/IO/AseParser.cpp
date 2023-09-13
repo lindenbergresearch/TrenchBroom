@@ -40,8 +40,7 @@
 
 namespace TrenchBroom {
 namespace IO {
-AseTokenizer::AseTokenizer(const std::string_view str)
-    : Tokenizer{str, "", 0} {
+AseTokenizer::AseTokenizer(const std::string_view str) : Tokenizer{str, "", 0} {
 }
 
 const std::string AseTokenizer::WordDelims = " \t\n\r:";
@@ -99,20 +98,19 @@ Tokenizer<unsigned int>::Token AseTokenizer::emitToken() {
                         // we don't return the colon as a separate token in this case
                         advance();
                         return Token{AseToken::ArgumentName, c, e, offset(c), startLine, startColumn};
-                    } else {
+                    }
+                    else {
                         return Token{AseToken::Keyword, c, e, offset(c), startLine, startColumn};
                     }
                 }
-                throw ParserException{
-                    startLine, startColumn, "Unexpected character: '" + std::string(c, 1) + "'"};
+                throw ParserException{startLine, startColumn, "Unexpected character: '" + std::string(c, 1) + "'"};
             }
         }
     }
     return Token{AseToken::Eof, nullptr, nullptr, length(), line(), column()};
 }
 
-AseParser::AseParser(std::string name, const std::string_view str, const FileSystem &fs)
-    : m_name{std::move(name)}, m_tokenizer{str}, m_fs{fs} {
+AseParser::AseParser(std::string name, const std::string_view str, const FileSystem &fs) : m_name{std::move(name)}, m_tokenizer{str}, m_fs{fs} {
 }
 
 bool AseParser::canParse(const std::filesystem::path &path) {
@@ -146,32 +144,28 @@ void AseParser::parseScene(Logger & /* logger */) {
 }
 
 void AseParser::parseMaterialList(
-    Logger &logger, std::vector<std::filesystem::path> &paths) {
+    Logger &logger, std::vector<std::filesystem::path> &paths
+) {
     expectDirective("MATERIAL_LIST");
 
     parseBlock(
-        {{"MATERIAL_COUNT",
-             std::bind(
-                 &AseParser::parseMaterialListMaterialCount,
-                 this,
-                 std::ref(logger),
-                 std::ref(paths))},
-         {"MATERIAL",
-             std::bind(
-                 &AseParser::parseMaterialListMaterial,
-                 this,
-                 std::ref(logger),
-                 std::ref(paths))}});
+        {{"MATERIAL_COUNT", std::bind(
+            &AseParser::parseMaterialListMaterialCount, this, std::ref(logger), std::ref(paths))},
+         {"MATERIAL",       std::bind(
+             &AseParser::parseMaterialListMaterial, this, std::ref(logger), std::ref(paths))}}
+    );
 }
 
 void AseParser::parseMaterialListMaterialCount(
-    Logger & /* logger */, std::vector<std::filesystem::path> &paths) {
+    Logger & /* logger */, std::vector<std::filesystem::path> &paths
+) {
     expectDirective("MATERIAL_COUNT");
     paths.resize(parseSizeArgument());
 }
 
 void AseParser::parseMaterialListMaterial(
-    Logger &logger, std::vector<std::filesystem::path> &paths) {
+    Logger &logger, std::vector<std::filesystem::path> &paths
+) {
     expectDirective("MATERIAL");
     const auto index = parseSizeArgument();
     if (index < paths.size()) {
@@ -179,26 +173,18 @@ void AseParser::parseMaterialListMaterial(
         auto &path = paths[index];
 
         parseBlock(
-            {{"MAP_DIFFUSE",
-                 std::bind(
-                     &AseParser::parseMaterialListMaterialMapDiffuse,
-                     this,
-                     std::ref(logger),
-                     std::ref(path))},
-             {"MATERIAL_NAME",
-                 std::bind(
-                     &AseParser::parseMaterialListMaterialName,
-                     this,
-                     std::ref(logger),
-                     std::ref(name))}});
+            {{"MAP_DIFFUSE",   std::bind(
+                &AseParser::parseMaterialListMaterialMapDiffuse, this, std::ref(logger), std::ref(path))},
+             {"MATERIAL_NAME", std::bind(
+                 &AseParser::parseMaterialListMaterialName, this, std::ref(logger), std::ref(name))}}
+        );
 
         if (path.empty()) {
-            logger.warn() << "Material " << index
-                          << " is missing a 'BITMAP' directive, falling back to material name '"
-                          << name << "'";
+            logger.warn() << "Material " << index << " is missing a 'BITMAP' directive, falling back to material name '" << name << "'";
             path = std::filesystem::path(name);
         }
-    } else {
+    }
+    else {
         logger.warn() << "Material index " << index << " is out of bounds.";
         parseBlock({});
     }
@@ -211,51 +197,37 @@ void AseParser::parseMaterialListMaterialName(Logger &, std::string &name) {
 }
 
 void AseParser::parseMaterialListMaterialMapDiffuse(
-    Logger &logger, std::filesystem::path &path) {
+    Logger &logger, std::filesystem::path &path
+) {
     expectDirective("MAP_DIFFUSE");
 
     parseBlock(
-        {{"BITMAP",
-          std::bind(
-              &AseParser::parseMaterialListMaterialMapDiffuseBitmap,
-              this,
-              std::ref(logger),
-              std::ref(path))}});
+        {{"BITMAP", std::bind(
+            &AseParser::parseMaterialListMaterialMapDiffuseBitmap, this, std::ref(logger), std::ref(path))}}
+    );
 }
 
 void AseParser::parseMaterialListMaterialMapDiffuseBitmap(
-    Logger & /* logger */, std::filesystem::path &path) {
+    Logger & /* logger */, std::filesystem::path &path
+) {
     expectDirective("BITMAP");
     const auto token = expect(AseToken::String, m_tokenizer.nextToken());
     path = std::filesystem::path(token.data());
 }
 
 void AseParser::parseGeomObject(
-    Logger &logger,
-    GeomObject &geomObject,
-    const std::vector<std::filesystem::path> &materialPaths) {
+    Logger &logger, GeomObject &geomObject, const std::vector<std::filesystem::path> &materialPaths
+) {
     expectDirective("GEOMOBJECT");
 
     parseBlock(
-        {{"NODE_NAME",
-             std::bind(
-                 &AseParser::parseGeomObjectNodeName,
-                 this,
-                 std::ref(logger),
-                 std::ref(geomObject))},
-         {"MATERIAL_REF",
-             std::bind(
-                 &AseParser::parseGeomObjectMaterialRef,
-                 this,
-                 std::ref(logger),
-                 std::ref(geomObject),
-                 materialPaths.size())},
-         {"MESH",
-             std::bind(
-                 &AseParser::parseGeomObjectMesh,
-                 this,
-                 std::ref(logger),
-                 std::ref(geomObject.mesh))}});
+        {{"NODE_NAME",    std::bind(
+            &AseParser::parseGeomObjectNodeName, this, std::ref(logger), std::ref(geomObject))},
+         {"MATERIAL_REF", std::bind(
+             &AseParser::parseGeomObjectMaterialRef, this, std::ref(logger), std::ref(geomObject), materialPaths.size())},
+         {"MESH",         std::bind(
+             &AseParser::parseGeomObjectMesh, this, std::ref(logger), std::ref(geomObject.mesh))}}
+    );
 }
 
 void AseParser::parseGeomObjectNodeName(Logger & /* logger */, GeomObject &geomObject) {
@@ -265,96 +237,67 @@ void AseParser::parseGeomObjectNodeName(Logger & /* logger */, GeomObject &geomO
 }
 
 void AseParser::parseGeomObjectMaterialRef(
-    Logger &logger, GeomObject &geomObject, const size_t materialCount) {
+    Logger &logger, GeomObject &geomObject, const size_t materialCount
+) {
     expectDirective("MATERIAL_REF");
     const auto token = m_tokenizer.peekToken();
     geomObject.materialIndex = parseSizeArgument();
     if (geomObject.materialIndex >= materialCount) {
-        logger.warn() << "Line " << token.line() << ": Material index "
-                      << geomObject.materialIndex
-                      << " is out of bounds (material count: " << materialCount << ")";
+        logger.warn() << "Line " << token.line() << ": Material index " << geomObject.materialIndex << " is out of bounds (material count: " << materialCount << ")";
     }
 }
 
 void AseParser::parseGeomObjectMesh(Logger &logger, Mesh &mesh) {
     expectDirective("MESH");
 
-    parseBlock({
-                   {"MESH_NUMVERTEX",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshNumVertex,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.vertices))},
-                   {"MESH_VERTEX_LIST",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshVertexList,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.vertices))},
-                   {"MESH_NUMFACES",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshNumFaces,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.faces))},
-                   {"MESH_FACE_LIST",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshFaceList,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.faces))},
-                   {"MESH_NUMTVERTEX",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshNumTVertex,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.uv))},
-                   {"MESH_TVERTLIST",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshTVertexList,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.uv))},
-                   {"MESH_TFACELIST",
-                       std::bind(
-                           &AseParser::parseGeomObjectMeshTFaceList,
-                           this,
-                           std::ref(logger),
-                           std::ref(mesh.faces))},
-               });
+    parseBlock(
+        {{"MESH_NUMVERTEX",   std::bind(
+            &AseParser::parseGeomObjectMeshNumVertex, this, std::ref(logger), std::ref(mesh.vertices))},
+         {"MESH_VERTEX_LIST", std::bind(
+             &AseParser::parseGeomObjectMeshVertexList, this, std::ref(logger), std::ref(mesh.vertices))},
+         {"MESH_NUMFACES",    std::bind(
+             &AseParser::parseGeomObjectMeshNumFaces, this, std::ref(logger), std::ref(mesh.faces))},
+         {"MESH_FACE_LIST",   std::bind(
+             &AseParser::parseGeomObjectMeshFaceList, this, std::ref(logger), std::ref(mesh.faces))},
+         {"MESH_NUMTVERTEX",  std::bind(
+             &AseParser::parseGeomObjectMeshNumTVertex, this, std::ref(logger), std::ref(mesh.uv))},
+         {"MESH_TVERTLIST",   std::bind(
+             &AseParser::parseGeomObjectMeshTVertexList, this, std::ref(logger), std::ref(mesh.uv))},
+         {"MESH_TFACELIST",   std::bind(
+             &AseParser::parseGeomObjectMeshTFaceList, this, std::ref(logger), std::ref(mesh.faces))},}
+    );
 }
 
 void AseParser::parseGeomObjectMeshNumVertex(
-    Logger & /* logger */, std::vector<vm::vec3f> &vertices) {
+    Logger & /* logger */, std::vector<vm::vec3f> &vertices
+) {
     expectDirective("MESH_NUMVERTEX");
     const auto vertexCount = parseSizeArgument();
     vertices.reserve(vertexCount);
 }
 
 void AseParser::parseGeomObjectMeshVertexList(
-    Logger &logger, std::vector<vm::vec3f> &vertices) {
+    Logger &logger, std::vector<vm::vec3f> &vertices
+) {
     expectDirective("MESH_VERTEX_LIST");
 
-    parseBlock({
-                   {"MESH_VERTEX",
-                    std::bind(
-                        &AseParser::parseGeomObjectMeshVertex,
-                        this,
-                        std::ref(logger),
-                        std::ref(vertices))},
-               });
+    parseBlock(
+        {{"MESH_VERTEX", std::bind(
+            &AseParser::parseGeomObjectMeshVertex, this, std::ref(logger), std::ref(vertices))},}
+    );
 }
 
 void AseParser::parseGeomObjectMeshVertex(
-    Logger & /* logger */, std::vector<vm::vec3f> &vertices) {
+    Logger & /* logger */, std::vector<vm::vec3f> &vertices
+) {
     expectDirective("MESH_VERTEX");
     expectSizeArgument(vertices.size());
     vertices.emplace_back(parseVecArgument());
 }
 
 void AseParser::parseGeomObjectMeshNumFaces(
-    Logger & /* logger */, std::vector<MeshFace> &faces) {
+    Logger & /* logger */, std::vector<MeshFace> &faces
+) {
     expectDirective("MESH_NUMFACES");
     const auto faceCount = parseSizeArgument();
     faces.reserve(faceCount);
@@ -363,15 +306,15 @@ void AseParser::parseGeomObjectMeshNumFaces(
 void AseParser::parseGeomObjectMeshFaceList(Logger &logger, std::vector<MeshFace> &faces) {
     expectDirective("MESH_FACE_LIST");
 
-    parseBlock({
-                   {"MESH_FACE",
-                    std::bind(
-                        &AseParser::parseGeomObjectMeshFace, this, std::ref(logger), std::ref(faces))},
-               });
+    parseBlock(
+        {{"MESH_FACE", std::bind(
+            &AseParser::parseGeomObjectMeshFace, this, std::ref(logger), std::ref(faces))},}
+    );
 }
 
 void AseParser::parseGeomObjectMeshFace(
-    Logger & /* logger */, std::vector<MeshFace> &faces) {
+    Logger & /* logger */, std::vector<MeshFace> &faces
+) {
     expectDirective("MESH_FACE");
     expectSizeArgument(faces.size());
 
@@ -406,15 +349,14 @@ void AseParser::parseGeomObjectMeshFace(
     expectDirective("MESH_MTLID");
     expect(AseToken::Integer, m_tokenizer.nextToken());
 
-    faces.emplace_back(MeshFace{
-        {MeshFaceVertex{vertexIndexA, 0},
-         MeshFaceVertex{vertexIndexB, 0},
-         MeshFaceVertex{vertexIndexC, 0}},
-        line});
+    faces.emplace_back(
+        MeshFace{{MeshFaceVertex{vertexIndexA, 0}, MeshFaceVertex{vertexIndexB, 0}, MeshFaceVertex{vertexIndexC, 0}}, line}
+    );
 }
 
 void AseParser::parseGeomObjectMeshNumTVertex(
-    Logger & /* logger */, std::vector<vm::vec2f> &uv) {
+    Logger & /* logger */, std::vector<vm::vec2f> &uv
+) {
     expectDirective("MESH_NUMTVERTEX");
     const auto uvCount = parseSizeArgument();
     uv.reserve(uvCount);
@@ -423,15 +365,15 @@ void AseParser::parseGeomObjectMeshNumTVertex(
 void AseParser::parseGeomObjectMeshTVertexList(Logger &logger, std::vector<vm::vec2f> &uv) {
     expectDirective("MESH_TVERTLIST");
 
-    parseBlock({
-                   {"MESH_TVERT",
-                    std::bind(
-                        &AseParser::parseGeomObjectMeshTVertex, this, std::ref(logger), std::ref(uv))},
-               });
+    parseBlock(
+        {{"MESH_TVERT", std::bind(
+            &AseParser::parseGeomObjectMeshTVertex, this, std::ref(logger), std::ref(uv))},}
+    );
 }
 
 void AseParser::parseGeomObjectMeshTVertex(
-    Logger & /* logger */, std::vector<vm::vec2f> &uv) {
+    Logger & /* logger */, std::vector<vm::vec2f> &uv
+) {
     expectDirective("MESH_TVERT");
     expectSizeArgument(uv.size());
     const auto tmp = parseVecArgument();
@@ -441,15 +383,15 @@ void AseParser::parseGeomObjectMeshTVertex(
 void AseParser::parseGeomObjectMeshTFaceList(Logger &logger, std::vector<MeshFace> &faces) {
     expectDirective("MESH_TFACELIST");
 
-    parseBlock({
-                   {"MESH_TFACE",
-                    std::bind(
-                        &AseParser::parseGeomObjectMeshTFace, this, std::ref(logger), std::ref(faces))},
-               });
+    parseBlock(
+        {{"MESH_TFACE", std::bind(
+            &AseParser::parseGeomObjectMeshTFace, this, std::ref(logger), std::ref(faces))},}
+    );
 }
 
 void AseParser::parseGeomObjectMeshTFace(
-    Logger & /* logger */, std::vector<MeshFace> &faces) {
+    Logger & /* logger */, std::vector<MeshFace> &faces
+) {
     expectDirective("MESH_TFACE");
     const auto token = m_tokenizer.peekToken();
     const auto index = parseSizeArgument();
@@ -464,14 +406,16 @@ void AseParser::parseGeomObjectMeshTFace(
 }
 
 void AseParser::parseBlock(
-    const std::map<std::string, std::function<void(void)>> &handlers) {
+    const std::map<std::string, std::function<void(void)>> &handlers
+) {
     expect(AseToken::OBrace, m_tokenizer.nextToken());
     auto token = m_tokenizer.peekToken();
     while (token.hasType(AseToken::Directive)) {
         if (const auto it = handlers.find(token.data()); it != handlers.end()) {
             auto &handler = it->second;
             handler();
-        } else {
+        }
+        else {
             skipDirective();
         }
         token = m_tokenizer.peekToken();
@@ -510,7 +454,8 @@ void AseParser::skipDirective() {
 
     // skip arguments
     while (!m_tokenizer.peekToken().hasType(
-        AseToken::OBrace | AseToken::CBrace | AseToken::Directive)) {
+        AseToken::OBrace | AseToken::CBrace | AseToken::Directive
+    )) {
         m_tokenizer.nextToken();
     }
 
@@ -528,10 +473,7 @@ void AseParser::expectArgumentName(const std::string &expected) {
     const auto token = expect(AseToken::ArgumentName, m_tokenizer.nextToken());
     const auto &actual = token.data();
     if (actual != expected) {
-        throw ParserException{
-            token.line(),
-            token.column(),
-            "Expected argument name '" + expected + "', but got '" + actual + "'"};
+        throw ParserException{token.line(), token.column(), "Expected argument name '" + expected + "', but got '" + actual + "'"};
     }
 }
 
@@ -539,11 +481,7 @@ void AseParser::expectSizeArgument(const size_t expected) {
     const auto token = m_tokenizer.peekToken();
     const auto actual = parseSizeArgument();
     if (actual != expected) {
-        throw ParserException{
-            token.line(),
-            token.column(),
-            "Expected value '" + std::to_string(expected) + "', but got '"
-            + std::to_string(actual) + "'"};
+        throw ParserException{token.line(), token.column(), "Expected value '" + std::to_string(expected) + "', but got '" + std::to_string(actual) + "'"};
     }
 }
 
@@ -551,20 +489,15 @@ size_t AseParser::parseSizeArgument() {
     const auto token = expect(AseToken::Integer, m_tokenizer.nextToken());
     auto i = token.toInteger<int>();
     if (i < 0) {
-        throw ParserException{
-            token.line(),
-            token.column(),
-            "Expected positive integer, but got '" + token.data() + "'"};
-    } else {
+        throw ParserException{token.line(), token.column(), "Expected positive integer, but got '" + token.data() + "'"};
+    }
+    else {
         return static_cast<size_t>(i);
     }
 }
 
 vm::vec3f AseParser::parseVecArgument() {
-    return {
-        expect(AseToken::Decimal, m_tokenizer.nextToken()).toFloat<float>(),
-        expect(AseToken::Decimal, m_tokenizer.nextToken()).toFloat<float>(),
-        expect(AseToken::Decimal, m_tokenizer.nextToken()).toFloat<float>()};
+    return {expect(AseToken::Decimal, m_tokenizer.nextToken()).toFloat<float>(), expect(AseToken::Decimal, m_tokenizer.nextToken()).toFloat<float>(), expect(AseToken::Decimal, m_tokenizer.nextToken()).toFloat<float>()};
 }
 
 AseParser::TokenNameMap AseParser::tokenNames() const {
@@ -583,11 +516,13 @@ AseParser::TokenNameMap AseParser::tokenNames() const {
 }
 
 std::unique_ptr<Assets::EntityModel> AseParser::buildModel(
-    Logger &logger, const Scene &scene) const {
+    Logger &logger, const Scene &scene
+) const {
     using Vertex = Assets::EntityModelVertex;
 
     auto model = std::make_unique<Assets::EntityModel>(
-        m_name, Assets::PitchType::Normal, Assets::Orientation::Oriented);
+        m_name, Assets::PitchType::Normal, Assets::Orientation::Oriented
+    );
     model->addFrame();
     auto &surface = model->addSurface(m_name);
 
@@ -625,14 +560,12 @@ std::unique_ptr<Assets::EntityModel> AseParser::buildModel(
     auto &frame = model->loadFrame(0, m_name, bounds.bounds());
 
     // Collect vertex data
-    auto builder =
-        Renderer::TexturedIndexRangeMapBuilder<Vertex::Type>{totalVertexCount, size};
+    auto builder = Renderer::TexturedIndexRangeMapBuilder<Vertex::Type>{totalVertexCount, size};
     for (const auto &geomObject: scene.geomObjects) {
         const auto &mesh = geomObject.mesh;
 
         const auto textureIndex = geomObject.materialIndex;
-        const auto *texture =
-            textureIndex < surface.skinCount() ? surface.skin(textureIndex) : nullptr;
+        const auto *texture = textureIndex < surface.skinCount() ? surface.skin(textureIndex) : nullptr;
 
         for (const auto &face: mesh.faces) {
             if (!checkIndices(logger, face, mesh)) {
@@ -647,12 +580,9 @@ std::unique_ptr<Assets::EntityModel> AseParser::buildModel(
             const auto v1 = mesh.vertices[fv1.vertexIndex];
             const auto v2 = mesh.vertices[fv2.vertexIndex];
 
-            const auto uv0 =
-                fv0.uvIndex == 0u && mesh.uv.empty() ? vm::vec2f::zero() : mesh.uv[fv0.uvIndex];
-            const auto uv1 =
-                fv1.uvIndex == 0u && mesh.uv.empty() ? vm::vec2f::zero() : mesh.uv[fv1.uvIndex];
-            const auto uv2 =
-                fv2.uvIndex == 0u && mesh.uv.empty() ? vm::vec2f::zero() : mesh.uv[fv2.uvIndex];
+            const auto uv0 = fv0.uvIndex == 0u && mesh.uv.empty() ? vm::vec2f::zero() : mesh.uv[fv0.uvIndex];
+            const auto uv1 = fv1.uvIndex == 0u && mesh.uv.empty() ? vm::vec2f::zero() : mesh.uv[fv1.uvIndex];
+            const auto uv2 = fv2.uvIndex == 0u && mesh.uv.empty() ? vm::vec2f::zero() : mesh.uv[fv2.uvIndex];
 
             builder.addTriangle(texture, Vertex{v2, uv2}, Vertex{v1, uv1}, Vertex{v0, uv0});
         }
@@ -667,13 +597,11 @@ bool AseParser::checkIndices(Logger &logger, const MeshFace &face, const Mesh &m
     for (std::size_t i = 0u; i < 3u; ++i) {
         const auto &faceVertex = face.vertices[i];
         if (faceVertex.vertexIndex >= mesh.vertices.size()) {
-            logger.warn() << "Line " << face.line << ": Vertex index " << faceVertex.vertexIndex
-                          << " is out of bounds, skipping face";
+            logger.warn() << "Line " << face.line << ": Vertex index " << faceVertex.vertexIndex << " is out of bounds, skipping face";
             return false;
         }
         if (!mesh.uv.empty() && faceVertex.uvIndex >= mesh.uv.size()) {
-            logger.warn() << "Line " << face.line << ": UV index " << faceVertex.uvIndex
-                          << " is out of bounds, skipping face";
+            logger.warn() << "Line " << face.line << ": UV index " << faceVertex.uvIndex << " is out of bounds, skipping face";
             return false;
         }
     }
@@ -681,13 +609,15 @@ bool AseParser::checkIndices(Logger &logger, const MeshFace &face, const Mesh &m
 }
 
 Assets::Texture AseParser::loadTexture(
-    Logger &logger, const std::filesystem::path &path) const {
+    Logger &logger, const std::filesystem::path &path
+) const {
     const auto actualPath = fixTexturePath(logger, path);
     return loadShader(actualPath, m_fs, logger);
 }
 
 std::filesystem::path AseParser::fixTexturePath(
-    Logger & /* logger */, std::filesystem::path path) const {
+    Logger & /* logger */, std::filesystem::path path
+) const {
     if (!path.is_absolute()) {
         // usually the paths appear to be relative to the map file, but this will just yield a
         // valid path if we kick off the ".." parts

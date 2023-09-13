@@ -69,7 +69,8 @@ private:
 
 public:
     explicit EntityPropertyEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
     ~EntityPropertyEditor() override;
 

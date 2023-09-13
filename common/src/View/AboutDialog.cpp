@@ -33,7 +33,8 @@ void AboutDialog::showAboutDialog() {
     if (!AboutDialog::instance) {
         AboutDialog::instance = new AboutDialog{};
         AboutDialog::instance->show();
-    } else {
+    }
+    else {
         AboutDialog::instance->show();
         AboutDialog::instance->raise();
     }
@@ -56,7 +57,8 @@ AboutDialog::AboutDialog() {
 }
 
 void AboutDialog::createGui() {
-    const QString creditsString = tr(R"(
+    const QString creditsString = tr(
+        R"(
 github.com/TrenchBroom/TrenchBroom<br />
 <br />
 <b>Developers</b><br />
@@ -102,7 +104,8 @@ CMake (Cross platform build manager)<br />
 Vcpkg (C/C++ dependency manager)<br />
 Pandoc (Universal document converter)<br />
 Source Sans Pro (Font)<br />
-Font Awesome 5 Free (Icons)<br />)");
+Font Awesome 5 Free (Icons)<br />)"
+    );
     setWindowIconTB(this);
 
     auto *infoPanel = new AppInfoPanel{};

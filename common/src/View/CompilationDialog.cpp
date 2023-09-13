@@ -44,8 +44,7 @@
 
 namespace TrenchBroom {
 namespace View {
-CompilationDialog::CompilationDialog(MapFrame *mapFrame)
-    : QDialog{mapFrame}, m_mapFrame{mapFrame} {
+CompilationDialog::CompilationDialog(MapFrame *mapFrame) : QDialog{mapFrame}, m_mapFrame{mapFrame} {
     ensure(mapFrame != nullptr, "must have a map frame");
     createGui();
     setMinimumSize(600, 300);
@@ -108,35 +107,31 @@ void CompilationDialog::createGui() {
     m_compileButton->setDefault(true);
 
     connect(
-        &m_run,
-        &CompilationRun::compilationStarted,
-        this,
-        &CompilationDialog::compilationStarted);
+        &m_run, &CompilationRun::compilationStarted, this, &CompilationDialog::compilationStarted
+    );
     connect(
-        &m_run,
-        &CompilationRun::compilationEnded,
-        this,
-        &CompilationDialog::compilationEnded);
+        &m_run, &CompilationRun::compilationEnded, this, &CompilationDialog::compilationEnded
+    );
     connect(
-        m_profileManager,
-        &CompilationProfileManager::selectedProfileChanged,
-        this,
-        &CompilationDialog::selectedProfileChanged);
+        m_profileManager, &CompilationProfileManager::selectedProfileChanged, this, &CompilationDialog::selectedProfileChanged
+    );
     connect(
-        m_profileManager,
-        &CompilationProfileManager::profileChanged,
-        this,
-        &CompilationDialog::profileChanged);
+        m_profileManager, &CompilationProfileManager::profileChanged, this, &CompilationDialog::profileChanged
+    );
 
     connect(
-        m_compileButton, &QPushButton::clicked, this, [&]() { startCompilation(false); });
+        m_compileButton, &QPushButton::clicked, this, [&]() { startCompilation(false); }
+    );
     connect(
-        m_testCompileButton, &QPushButton::clicked, this, [&]() { startCompilation(true); });
+        m_testCompileButton, &QPushButton::clicked, this, [&]() { startCompilation(true); }
+    );
     connect(m_stopCompileButton, &QPushButton::clicked, this, [&]() { stopCompilation(); });
-    connect(m_launchButton, &QPushButton::clicked, this, [&]() {
-      LaunchGameEngineDialog dialog(m_mapFrame->document(), this);
-      dialog.exec();
-    });
+    connect(
+        m_launchButton, &QPushButton::clicked, this, [&]() {
+          LaunchGameEngineDialog dialog(m_mapFrame->document(), this);
+          dialog.exec();
+        }
+    );
     connect(m_closeButton, &QPushButton::clicked, this, &CompilationDialog::close);
 }
 
@@ -163,14 +158,16 @@ void CompilationDialog::startCompilation(const bool test) {
     saveProfile();
     if (m_run.running()) {
         m_run.terminate();
-    } else {
+    }
+    else {
         const auto *profile = m_profileManager->selectedProfile();
         ensure(profile != nullptr, "profile is null");
         ensure(!profile->tasks.empty(), "profile has no tasks");
 
         if (test) {
             m_run.test(*profile, m_mapFrame->document(), m_output);
-        } else {
+        }
+        else {
             m_run.run(*profile, m_mapFrame->document(), m_output);
         }
     }
@@ -185,11 +182,8 @@ void CompilationDialog::stopCompilation() {
 void CompilationDialog::closeEvent(QCloseEvent *event) {
     if (m_run.running()) {
         const auto result = QMessageBox::warning(
-            this,
-            "Warning",
-            "Closing this dialog will stop the running compilation. Are you sure?",
-            QMessageBox::Yes | QMessageBox::No,
-            QMessageBox::Yes);
+            this, "Warning", "Closing this dialog will stop the running compilation. Are you sure?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
+        );
 
         if (result != QMessageBox::Yes) {
             event->ignore();

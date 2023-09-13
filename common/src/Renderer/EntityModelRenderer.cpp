@@ -46,11 +46,8 @@
 namespace TrenchBroom {
 namespace Renderer {
 EntityModelRenderer::EntityModelRenderer(
-    Logger &logger,
-    Assets::EntityModelManager &entityModelManager,
-    const Model::EditorContext &editorContext)
-    : m_logger{logger}, m_entityModelManager{entityModelManager}, m_editorContext{editorContext}, m_applyTinting{false},
-      m_showHiddenEntities{false} {
+    Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext
+) : m_logger{logger}, m_entityModelManager{entityModelManager}, m_editorContext{editorContext}, m_applyTinting{false}, m_showHiddenEntities{false} {
 }
 
 EntityModelRenderer::~EntityModelRenderer() {
@@ -58,10 +55,11 @@ EntityModelRenderer::~EntityModelRenderer() {
 }
 
 void EntityModelRenderer::addEntity(const Model::EntityNode *entityNode) {
-    const auto modelSpec =
-        Assets::safeGetModelSpecification(m_logger, entityNode->entity().classname(), [&]() {
+    const auto modelSpec = Assets::safeGetModelSpecification(
+        m_logger, entityNode->entity().classname(), [&]() {
           return entityNode->entity().modelSpecification();
-        });
+        }
+    );
 
     auto *renderer = m_entityModelManager.renderer(modelSpec);
     if (renderer != nullptr) {
@@ -74,10 +72,11 @@ void EntityModelRenderer::removeEntity(const Model::EntityNode *entityNode) {
 }
 
 void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
-    const auto modelSpec =
-        Assets::safeGetModelSpecification(m_logger, entityNode->entity().classname(), [&]() {
+    const auto modelSpec = Assets::safeGetModelSpecification(
+        m_logger, entityNode->entity().classname(), [&]() {
           return entityNode->entity().modelSpecification();
-        });
+        }
+    );
 
     auto *renderer = m_entityModelManager.renderer(modelSpec);
     auto it = m_entities.find(entityNode);
@@ -88,10 +87,12 @@ void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
 
     if (it == std::end(m_entities)) {
         m_entities.emplace(entityNode, renderer);
-    } else {
+    }
+    else {
         if (renderer == nullptr) {
             m_entities.erase(it);
-        } else if (it->second != renderer) {
+        }
+        else if (it->second != renderer) {
             it->second = renderer;
         }
     }
@@ -149,12 +150,8 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
     shader.set("SoftMapBoundsMin", renderContext.softMapBounds().min);
     shader.set("SoftMapBoundsMax", renderContext.softMapBounds().max);
     shader.set(
-        "SoftMapBoundsColor",
-        vm::vec4f{
-            prefs.get(Preferences::SoftMapBoundsColor).r(),
-            prefs.get(Preferences::SoftMapBoundsColor).g(),
-            prefs.get(Preferences::SoftMapBoundsColor).b(),
-            0.1f});
+        "SoftMapBoundsColor", vm::vec4f{prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f}
+    );
 
     shader.set("CameraPosition", renderContext.camera().position());
     shader.set("CameraDirection", renderContext.camera().direction());
@@ -175,8 +172,7 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
         shader.set("Orientation", static_cast<int>(model->orientation()));
 
         const auto transformation = vm::mat4x4f{entityNode->entity().modelTransformation()};
-        const auto multMatrix =
-            MultiplyModelMatrix{renderContext.transformation(), transformation};
+        const auto multMatrix = MultiplyModelMatrix{renderContext.transformation(), transformation};
 
         shader.set("ModelMatrix", transformation);
 

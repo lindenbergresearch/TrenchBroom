@@ -23,8 +23,7 @@
 
 namespace TrenchBroom {
 namespace View {
-BorderLine::BorderLine(const Direction direction, const int thickness, QWidget *parent)
-    : QFrame(parent) {
+BorderLine::BorderLine(const Direction direction, const int thickness, QWidget *parent) : QFrame(parent) {
     setObjectName("borderLine");
     setContentsMargins(0, 0, 0, 0);
     setFrameShadow(QFrame::Plain);
@@ -36,7 +35,8 @@ BorderLine::BorderLine(const Direction direction, const int thickness, QWidget *
         setFixedHeight(
           thickness); // necessary to remove extra space around the horizontal line
 #endif
-    } else {
+    }
+    else {
         setFrameShape(QFrame::VLine);
 #if !defined __APPLE__
         setFixedWidth(thickness); // this makes the vertical line disappear on macOS

@@ -39,8 +39,7 @@ private:
     const Model::GroupNode *m_group;
 
 public:
-    GroupNameAnchor(const Model::GroupNode *group)
-        : m_group(group) {
+    GroupNameAnchor(const Model::GroupNode *group) : m_group(group) {
     }
 
 private:
@@ -54,9 +53,7 @@ private:
     TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
 };
 
-GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext)
-    : m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false), m_showOverlays(true),
-      m_showOccludedOverlays(false), m_showOccludedBounds(false) {
+GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext) : m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false), m_showOverlays(true), m_showOccludedOverlays(false), m_showOccludedBounds(false) {
 }
 
 void GroupRenderer::invalidate() {
@@ -156,7 +153,8 @@ void GroupRenderer::renderNames(RenderContext &renderContext, RenderBatch &rende
                 const GroupNameAnchor anchor(group);
                 if (m_showOccludedOverlays) {
                     renderService.setShowOccludedObjects();
-                } else {
+                }
+                else {
                     renderService.setHideOccludedObjects();
                 }
                 renderService.renderString(groupString(group), anchor);
@@ -176,31 +174,34 @@ void GroupRenderer::validateBounds() {
 
         for (const Model::GroupNode *group: m_groups) {
             if (shouldRenderGroup(group)) {
-                group->logicalBounds().for_each_edge([&](const vm::vec3 &v1, const vm::vec3 &v2) {
-                  vertices.emplace_back(vm::vec3f(v1));
-                  vertices.emplace_back(vm::vec3f(v2));
-                });
+                group->logicalBounds().for_each_edge(
+                    [&](const vm::vec3 &v1, const vm::vec3 &v2) {
+                      vertices.emplace_back(vm::vec3f(v1));
+                      vertices.emplace_back(vm::vec3f(v2));
+                    }
+                );
             }
         }
 
-        m_boundsRenderer =
-            DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
-    } else {
+        m_boundsRenderer = DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
+    }
+    else {
         std::vector<GLVertexTypes::P3C4::Vertex> vertices;
         vertices.reserve(24 * m_groups.size());
 
         for (const Model::GroupNode *group: m_groups) {
             if (shouldRenderGroup(group)) {
                 const auto color = groupColor(group);
-                group->logicalBounds().for_each_edge([&](const vm::vec3 &v1, const vm::vec3 &v2) {
-                  vertices.emplace_back(vm::vec3f(v1), color);
-                  vertices.emplace_back(vm::vec3f(v2), color);
-                });
+                group->logicalBounds().for_each_edge(
+                    [&](const vm::vec3 &v1, const vm::vec3 &v2) {
+                      vertices.emplace_back(vm::vec3f(v1), color);
+                      vertices.emplace_back(vm::vec3f(v2), color);
+                    }
+                );
             }
         }
 
-        m_boundsRenderer =
-            DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
+        m_boundsRenderer = DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
     }
 
     m_boundsValid = true;
@@ -215,14 +216,14 @@ bool GroupRenderer::shouldRenderGroup(const Model::GroupNode *group) const {
 AttrString GroupRenderer::groupString(const Model::GroupNode *groupNode) const {
     if (groupNode->group().linkedGroupId()) {
         return groupNode->name() + " (linked)";
-    } else {
+    }
+    else {
         return groupNode->name();
     }
 }
 
 Color GroupRenderer::groupColor(const Model::GroupNode *groupNode) const {
-    return groupNode->group().linkedGroupId() ? pref(Preferences::LinkedGroupColor)
-                                              : pref(Preferences::DefaultGroupColor);
+    return groupNode->group().linkedGroupId() ? pref(Preferences::LinkedGroupColor) : pref(Preferences::DefaultGroupColor);
 }
 } // namespace Renderer
 } // namespace TrenchBroom

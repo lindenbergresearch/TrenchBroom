@@ -27,8 +27,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-EntityPropertiesVariableStore::EntityPropertiesVariableStore(const Entity &entity)
-    : m_entity{entity} {
+EntityPropertiesVariableStore::EntityPropertiesVariableStore(const Entity &entity) : m_entity{entity} {
 }
 
 EL::VariableStore *EntityPropertiesVariableStore::clone() const {

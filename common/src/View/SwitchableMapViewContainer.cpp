@@ -44,15 +44,9 @@
 
 namespace TrenchBroom::View {
 SwitchableMapViewContainer::SwitchableMapViewContainer(
-    Logger *logger,
-    std::weak_ptr<MapDocument> document,
-    GLContextManager &contextManager,
-    QWidget *parent)
-    : QWidget{parent}, m_logger{logger}, m_document{std::move(document)}, m_contextManager{contextManager},
-      m_mapViewBar{new MapViewBar(m_document)},
-      m_toolBox{std::make_unique<MapViewToolBox>(m_document, m_mapViewBar->toolBook())},
-      m_mapRenderer{std::make_unique<Renderer::MapRenderer>(m_document)},
-      m_activationTracker{std::make_unique<MapViewActivationTracker>()} {
+    Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
+) : QWidget{parent}, m_logger{logger}, m_document{std::move(document)}, m_contextManager{contextManager}, m_mapViewBar{new MapViewBar(m_document)}, m_toolBox{std::make_unique<MapViewToolBox>(m_document, m_mapViewBar->toolBook())},
+    m_mapRenderer{std::make_unique<Renderer::MapRenderer>(m_document)}, m_activationTracker{std::make_unique<MapViewActivationTracker>()} {
     setObjectName("SwitchableMapViewContainer");
     switchToMapView(static_cast<MapViewLayout>(pref(Preferences::MapViewLayout)));
     connectObservers();
@@ -88,20 +82,16 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
 
     switch (viewId) {
         case MapViewLayout::OnePane:
-            m_mapView = new OnePaneMapView{
-                m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            m_mapView = new OnePaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
             break;
         case MapViewLayout::TwoPanes:
-            m_mapView = new TwoPaneMapView{
-                m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            m_mapView = new TwoPaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
             break;
         case MapViewLayout::ThreePanes:
-            m_mapView = new ThreePaneMapView{
-                m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            m_mapView = new ThreePaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
             break;
         case MapViewLayout::FourPanes:
-            m_mapView = new FourPaneMapView{
-                m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            m_mapView = new FourPaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
             break;
             switchDefault();
     }
@@ -120,8 +110,7 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
 }
 
 bool SwitchableMapViewContainer::anyToolActive() const {
-    return createComplexBrushToolActive() || clipToolActive() || rotateObjectsToolActive()
-           || scaleObjectsToolActive() || shearObjectsToolActive() || anyVertexToolActive();
+    return createComplexBrushToolActive() || clipToolActive() || rotateObjectsToolActive() || scaleObjectsToolActive() || shearObjectsToolActive() || anyVertexToolActive();
 }
 
 void SwitchableMapViewContainer::deactivateTool() {
@@ -198,8 +187,7 @@ void SwitchableMapViewContainer::toggleShearObjectsTool() {
 }
 
 bool SwitchableMapViewContainer::canToggleVertexTools() const {
-    return vertexToolActive() || edgeToolActive() || faceToolActive()
-           || kdl::mem_lock(m_document)->selectedNodes().hasOnlyBrushes();
+    return vertexToolActive() || edgeToolActive() || faceToolActive() || kdl::mem_lock(m_document)->selectedNodes().hasOnlyBrushes();
 }
 
 bool SwitchableMapViewContainer::anyVertexToolActive() const {
@@ -299,7 +287,8 @@ void SwitchableMapViewContainer::toggleMaximizeCurrentView() {
 
 void SwitchableMapViewContainer::connectObservers() {
     m_notifierConnection += m_toolBox->refreshViewsNotifier.connect(
-        this, &SwitchableMapViewContainer::refreshViews);
+        this, &SwitchableMapViewContainer::refreshViews
+    );
 }
 
 void SwitchableMapViewContainer::refreshViews(Tool &) {
@@ -310,7 +299,8 @@ void SwitchableMapViewContainer::refreshViews(Tool &) {
 }
 
 void SwitchableMapViewContainer::doInstallActivationTracker(
-    MapViewActivationTracker &activationTracker) {
+    MapViewActivationTracker &activationTracker
+) {
     m_mapView->installActivationTracker(activationTracker);
 }
 
@@ -331,12 +321,14 @@ void SwitchableMapViewContainer::doSelectTall() {
 }
 
 vm::vec3 SwitchableMapViewContainer::doGetPasteObjectsDelta(
-    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
+    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
+) const {
     return m_mapView->pasteObjectsDelta(bounds, referenceBounds);
 }
 
 void SwitchableMapViewContainer::doReset2dCameras(
-    const Renderer::Camera &masterCamera, const bool animate) {
+    const Renderer::Camera &masterCamera, const bool animate
+) {
     m_mapView->reset2dCameras(masterCamera, animate);
 }
 
@@ -345,7 +337,8 @@ void SwitchableMapViewContainer::doFocusCameraOnSelection(const bool animate) {
 }
 
 void SwitchableMapViewContainer::doMoveCameraToPosition(
-    const vm::vec3f &position, const bool animate) {
+    const vm::vec3f &position, const bool animate
+) {
     m_mapView->moveCameraToPosition(position, animate);
 }
 

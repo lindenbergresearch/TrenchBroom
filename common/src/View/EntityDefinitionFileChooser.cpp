@@ -43,12 +43,12 @@ namespace TrenchBroom {
 namespace View {
 // SingleSelectionListWidget
 
-SingleSelectionListWidget::SingleSelectionListWidget(QWidget *parent)
-    : QListWidget(parent), m_allowDeselectAll(true) {
+SingleSelectionListWidget::SingleSelectionListWidget(QWidget *parent) : QListWidget(parent), m_allowDeselectAll(true) {
 }
 
 void SingleSelectionListWidget::selectionChanged(
-    const QItemSelection &selected, const QItemSelection &deselected) {
+    const QItemSelection &selected, const QItemSelection &deselected
+) {
     QListWidget::selectionChanged(selected, deselected);
 
     if (!m_allowDeselectAll) {
@@ -70,8 +70,8 @@ bool SingleSelectionListWidget::allowDeselectAll() const {
 // EntityDefinitionFileChooser
 
 EntityDefinitionFileChooser::EntityDefinitionFileChooser(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document) {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : QWidget(parent), m_document(document) {
     createGui();
     bindEvents();
     connectObservers();
@@ -121,30 +121,27 @@ void EntityDefinitionFileChooser::createGui() {
 
 void EntityDefinitionFileChooser::bindEvents() {
     connect(
-        m_builtin,
-        &QListWidget::itemSelectionChanged,
-        this,
-        &EntityDefinitionFileChooser::builtinSelectionChanged);
+        m_builtin, &QListWidget::itemSelectionChanged, this, &EntityDefinitionFileChooser::builtinSelectionChanged
+    );
     connect(
-        m_chooseExternal,
-        &QAbstractButton::clicked,
-        this,
-        &EntityDefinitionFileChooser::chooseExternalClicked);
+        m_chooseExternal, &QAbstractButton::clicked, this, &EntityDefinitionFileChooser::chooseExternalClicked
+    );
     connect(
-        m_reloadExternal,
-        &QAbstractButton::clicked,
-        this,
-        &EntityDefinitionFileChooser::reloadExternalClicked);
+        m_reloadExternal, &QAbstractButton::clicked, this, &EntityDefinitionFileChooser::reloadExternalClicked
+    );
 }
 
 void EntityDefinitionFileChooser::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &EntityDefinitionFileChooser::documentWasNewed);
+        this, &EntityDefinitionFileChooser::documentWasNewed
+    );
     m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &EntityDefinitionFileChooser::documentWasLoaded);
+        this, &EntityDefinitionFileChooser::documentWasLoaded
+    );
     m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(
-        this, &EntityDefinitionFileChooser::entityDefinitionsDidChange);
+        this, &EntityDefinitionFileChooser::entityDefinitionsDidChange
+    );
 }
 
 void EntityDefinitionFileChooser::documentWasNewed(MapDocument *) {
@@ -194,7 +191,8 @@ void EntityDefinitionFileChooser::updateControls() {
         QFont font = m_external->font();
         font.setStyle(QFont::StyleOblique);
         m_external->setFont(font);
-    } else {
+    }
+    else {
         m_builtin->clearSelection();
         m_external->setText(IO::pathAsQString(spec.path()));
 
@@ -227,13 +225,11 @@ void EntityDefinitionFileChooser::builtinSelectionChanged() {
 
 void EntityDefinitionFileChooser::chooseExternalClicked() {
     const QString fileName = QFileDialog::getOpenFileName(
-        nullptr,
-        tr("Load Entity Definition File"),
-        fileDialogDefaultDirectory(FileDialogDir::EntityDefinition),
-        "All supported entity definition files (*.fgd *.def *.ent);;"
-        "Worldcraft / Hammer files (*.fgd);;"
-        "QuakeC files (*.def);;"
-        "Radiant XML files (*.ent)");
+        nullptr, tr("Load Entity Definition File"), fileDialogDefaultDirectory(FileDialogDir::EntityDefinition), "All supported entity definition files (*.fgd *.def *.ent);;"
+                                                                                                                 "Worldcraft / Hammer files (*.fgd);;"
+                                                                                                                 "QuakeC files (*.def);;"
+                                                                                                                 "Radiant XML files (*.ent)"
+    );
 
     if (fileName.isEmpty())
         return;

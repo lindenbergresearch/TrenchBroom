@@ -31,13 +31,8 @@
 
 namespace TrenchBroom::View {
 ThreePaneMapView::ThreePaneMapView(
-    std::weak_ptr<MapDocument> document,
-    MapViewToolBox &toolBox,
-    Renderer::MapRenderer &mapRenderer,
-    GLContextManager &contextManager,
-    Logger *logger,
-    QWidget *parent)
-    : MultiPaneMapView(parent), m_logger{logger}, m_document{std::move(document)} {
+    std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger, QWidget *parent
+) : MultiPaneMapView(parent), m_logger{logger}, m_document{std::move(document)} {
     createGui(toolBox, mapRenderer, contextManager);
 }
 
@@ -47,9 +42,8 @@ ThreePaneMapView::~ThreePaneMapView() {
 }
 
 void ThreePaneMapView::createGui(
-    MapViewToolBox &toolBox,
-    Renderer::MapRenderer &mapRenderer,
-    GLContextManager &contextManager) {
+    MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager
+) {
     m_hSplitter = new Splitter{};
     m_hSplitter->setObjectName("ThreePaneMapView_HorizontalSplitter");
 
@@ -57,10 +51,8 @@ void ThreePaneMapView::createGui(
     m_vSplitter->setObjectName("ThreePaneMapView_VerticalSplitter");
 
     m_mapView3D = new MapView3D{m_document, toolBox, mapRenderer, contextManager, m_logger};
-    m_mapViewXY = new MapView2D{
-        m_document, toolBox, mapRenderer, contextManager, MapView2D::ViewPlane_XY, m_logger};
-    m_mapViewZZ = new CyclingMapView{
-        m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_ZZ, m_logger};
+    m_mapViewXY = new MapView2D{m_document, toolBox, mapRenderer, contextManager, MapView2D::ViewPlane_XY, m_logger};
+    m_mapViewZZ = new CyclingMapView{m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_ZZ, m_logger};
 
     m_mapView3D->linkCamera(m_linkHelper);
     m_mapViewXY->linkCamera(m_linkHelper);
@@ -100,10 +92,12 @@ void ThreePaneMapView::doMaximizeView(MapView *view) {
     assert(view == m_mapView3D || view == m_mapViewXY || view == m_mapViewZZ);
     if (view == m_mapView3D) {
         m_vSplitter->hide();
-    } else if (view == m_mapViewXY) {
+    }
+    else if (view == m_mapViewXY) {
         m_mapViewZZ->hide();
         m_mapView3D->hide();
-    } else if (view == m_mapViewZZ) {
+    }
+    else if (view == m_mapViewZZ) {
         m_mapViewXY->hide();
         m_mapView3D->hide();
     }

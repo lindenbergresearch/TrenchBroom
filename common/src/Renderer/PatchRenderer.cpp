@@ -45,8 +45,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-PatchRenderer::PatchRenderer(const Model::EditorContext &editorContext)
-    : m_editorContext{editorContext}, m_grayscale{false}, m_tint{false}, m_alpha{1.0f} {
+PatchRenderer::PatchRenderer(const Model::EditorContext &editorContext) : m_editorContext{editorContext}, m_grayscale{false}, m_tint{false}, m_alpha{1.0f} {
 }
 
 void PatchRenderer::setDefaultColor(const Color &faceColor) {
@@ -129,8 +128,8 @@ void PatchRenderer::render(RenderContext &renderContext, RenderBatch &renderBatc
 }
 
 static TexturedIndexArrayRenderer buildMeshRenderer(
-    const std::vector<const Model::PatchNode *> &patchNodes,
-    const Model::EditorContext &editorContext) {
+    const std::vector<const Model::PatchNode *> &patchNodes, const Model::EditorContext &editorContext
+) {
     size_t vertexCount = 0u;
     auto indexArrayMapSize = TexturedIndexArrayMap::Size{};
 
@@ -139,8 +138,7 @@ static TexturedIndexArrayRenderer buildMeshRenderer(
             vertexCount += patchNode->grid().pointRowCount * patchNode->grid().pointColumnCount;
 
             const auto *texture = patchNode->patch().texture();
-            const auto quadCount =
-                patchNode->grid().quadRowCount() * patchNode->grid().quadColumnCount();
+            const auto quadCount = patchNode->grid().quadRowCount() * patchNode->grid().quadColumnCount();
             indexArrayMapSize.inc(texture, PrimType::Triangles, 6u * quadCount);
         }
     }
@@ -157,9 +155,11 @@ static TexturedIndexArrayRenderer buildMeshRenderer(
             const auto vertexOffset = vertices.size();
 
             const auto &grid = patchNode->grid();
-            auto gridVertices = kdl::vec_transform(grid.points, [](const auto &p) {
-              return Vertex{vm::vec3f{p.position}, vm::vec3f{p.normal}, vm::vec2f{p.texCoords}};
-            });
+            auto gridVertices = kdl::vec_transform(
+                grid.points, [](const auto &p) {
+                  return Vertex{vm::vec3f{p.position}, vm::vec3f{p.normal}, vm::vec2f{p.texCoords}};
+                }
+            );
             vertices = kdl::vec_concat(std::move(vertices), std::move(gridVertices));
 
             const auto *texture = patchNode->patch().texture();
@@ -173,15 +173,9 @@ static TexturedIndexArrayRenderer buildMeshRenderer(
                     const auto i3 = vertexOffset + (row + 1u) * pointsPerRow + col;
 
                     indexArrayMapBuilder.addTriangle(
-                        texture,
-                        static_cast<Index>(i0),
-                        static_cast<Index>(i1),
-                        static_cast<Index>(i2));
+                        texture, static_cast<Index>(i0), static_cast<Index>(i1), static_cast<Index>(i2));
                     indexArrayMapBuilder.addTriangle(
-                        texture,
-                        static_cast<Index>(i2),
-                        static_cast<Index>(i3),
-                        static_cast<Index>(i0));
+                        texture, static_cast<Index>(i2), static_cast<Index>(i3), static_cast<Index>(i0));
                 }
             }
         }
@@ -189,28 +183,23 @@ static TexturedIndexArrayRenderer buildMeshRenderer(
 
     auto vertexArray = VertexArray::move(std::move(vertices));
     auto indexArray = IndexArray::move(std::move(indexArrayMapBuilder.indices()));
-    return TexturedIndexArrayRenderer{
-        std::move(vertexArray),
-        std::move(indexArray),
-        std::move(indexArrayMapBuilder.ranges())};
+    return TexturedIndexArrayRenderer{std::move(vertexArray), std::move(indexArray), std::move(indexArrayMapBuilder.ranges())};
 }
 
 static DirectEdgeRenderer buildEdgeRenderer(
-    const std::vector<const Model::PatchNode *> &patchNodes,
-    const Model::EditorContext &editorContext) {
+    const std::vector<const Model::PatchNode *> &patchNodes, const Model::EditorContext &editorContext
+) {
     size_t vertexCount = 0u;
     auto indexRangeMapSize = IndexRangeMap::Size{};
 
     for (const auto *patchNode: patchNodes) {
         if (editorContext.visible(patchNode)) {
-            vertexCount +=
-                (patchNode->grid().pointRowCount + patchNode->grid().pointColumnCount - 2u) * 2u;
+            vertexCount += (patchNode->grid().pointRowCount + patchNode->grid().pointColumnCount - 2u) * 2u;
             indexRangeMapSize.inc(PrimType::LineLoop, vertexCount);
         }
     }
 
-    auto indexRangeMapBuilder =
-        IndexRangeMapBuilder<GLVertexTypes::P3>{vertexCount, indexRangeMapSize};
+    auto indexRangeMapBuilder = IndexRangeMapBuilder<GLVertexTypes::P3>{vertexCount, indexRangeMapSize};
 
     for (const auto *patchNode: patchNodes) {
         if (editorContext.visible(patchNode)) {
@@ -279,8 +268,8 @@ struct RenderFunc : public TextureRenderFunc {
   const Color &defaultColor;
 
   RenderFunc(
-      ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor)
-      : shader{i_shader}, applyTexture{i_applyTexture}, defaultColor{i_defaultColor} {
+      ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor
+  ) : shader{i_shader}, applyTexture{i_applyTexture}, defaultColor{i_defaultColor} {
   }
 
   void before(const Assets::Texture *texture) override {
@@ -289,7 +278,8 @@ struct RenderFunc : public TextureRenderFunc {
           texture->activate();
           shader.set("ApplyTexture", applyTexture);
           shader.set("Color", texture->averageColor());
-      } else {
+      }
+      else {
           shader.set("ApplyTexture", false);
           shader.set("Color", defaultColor);
       }
@@ -334,12 +324,8 @@ void PatchRenderer::doRender(RenderContext &context) {
     shader.set("SoftMapBoundsMin", context.softMapBounds().min);
     shader.set("SoftMapBoundsMax", context.softMapBounds().max);
     shader.set(
-        "SoftMapBoundsColor",
-        vm::vec4f{
-            prefs.get(Preferences::SoftMapBoundsColor).r(),
-            prefs.get(Preferences::SoftMapBoundsColor).g(),
-            prefs.get(Preferences::SoftMapBoundsColor).b(),
-            0.1f});
+        "SoftMapBoundsColor", vm::vec4f{prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f}
+    );
 
     auto func = RenderFunc{shader, applyTexture, m_defaultColor};
     /*

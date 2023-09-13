@@ -64,9 +64,8 @@ struct PatchGrid {
 
 // public for testing
 std::vector<vm::vec3> computeGridNormals(
-    const std::vector<BezierPatch::Point> patchGrid,
-    const size_t pointRowCount,
-    const size_t pointColumnCount);
+    const std::vector<BezierPatch::Point> patchGrid, const size_t pointRowCount, const size_t pointColumnCount
+);
 
 // public for testing
 PatchGrid makePatchGrid(const BezierPatch &patch, size_t subdivisionsPerSurface);
@@ -116,9 +115,8 @@ private: // implement Node interface
     bool doSelectable() const override;
 
     void doPick(
-        const EditorContext &editorContext,
-        const vm::ray3 &ray,
-        PickResult &pickResult) override;
+        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+    ) override;
 
     void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 

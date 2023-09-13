@@ -24,11 +24,8 @@
 namespace TrenchBroom {
 namespace Renderer {
 FontDescriptor::FontDescriptor(
-    const std::filesystem::path &path,
-    const size_t size,
-    const unsigned char minChar,
-    const unsigned char maxChar)
-    : m_path(path), m_size(size), m_minChar(minChar), m_maxChar(maxChar) {
+    const std::filesystem::path &path, const size_t size, const unsigned char minChar, const unsigned char maxChar
+) : m_path(path), m_size(size), m_minChar(minChar), m_maxChar(maxChar) {
     assert(m_minChar <= m_maxChar);
 }
 

@@ -164,7 +164,8 @@ public:
      * @param func the function to invoke
      */
     void forEachPrimitive(
-        std::function<void(PrimType, size_t index, size_t count)> func) const;
+        std::function<void(PrimType, size_t index, size_t count)> func
+    ) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

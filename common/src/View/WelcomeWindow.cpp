@@ -33,8 +33,7 @@
 #include "View/ViewConstants.h"
 
 namespace TrenchBroom::View {
-WelcomeWindow::WelcomeWindow()
-    : QMainWindow{nullptr, Qt::Dialog} // Qt::Dialog flag centers window on Ubuntu
+WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::Dialog} // Qt::Dialog flag centers window on Ubuntu
     , m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
     createGui();
 }
@@ -51,10 +50,7 @@ void WelcomeWindow::createGui() {
     );
 
     connect(
-        m_recentDocumentListBox,
-        &RecentDocumentListBox::loadRecentDocument,
-        this,
-        &WelcomeWindow::openDocument
+        m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument
     );
 
     auto *innerLayout = new QHBoxLayout{};
@@ -90,16 +86,10 @@ QWidget *WelcomeWindow::createAppPanel() {
     m_openOtherDocumentButton->setToolTip("Open an existing map document");
 
     connect(
-        m_createNewDocumentButton,
-        &QPushButton::clicked,
-        this,
-        &WelcomeWindow::createNewDocument
+        m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument
     );
     connect(
-        m_openOtherDocumentButton,
-        &QPushButton::clicked,
-        this,
-        &WelcomeWindow::openOtherDocument
+        m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument
     );
 
     auto *buttonLayout = new QHBoxLayout{};
@@ -131,10 +121,7 @@ void WelcomeWindow::createNewDocument() {
 
 void WelcomeWindow::openOtherDocument() {
     const auto pathStr = QFileDialog::getOpenFileName(
-        nullptr,
-        tr("Open Map"),
-        fileDialogDefaultDirectory(FileDialogDir::Map),
-        "Map files (*.map);;Any files (*.*)"
+        nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map), "Map files (*.map);;Any files (*.*)"
     );
     const auto path = IO::pathFromQString(pathStr);
 

@@ -46,9 +46,7 @@
 
 namespace TrenchBroom {
 namespace View {
-SmartColorEditor::SmartColorEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : SmartPropertyEditor(document, parent), m_floatRadio(nullptr), m_byteRadio(nullptr), m_colorPicker(nullptr),
-      m_colorHistory(nullptr) {
+SmartColorEditor::SmartColorEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor(document, parent), m_floatRadio(nullptr), m_byteRadio(nullptr), m_colorPicker(nullptr), m_colorHistory(nullptr) {
     createGui();
 }
 
@@ -90,25 +88,17 @@ void SmartColorEditor::createGui() {
     setLayout(outerLayout);
 
     connect(
-        m_floatRadio,
-        &QAbstractButton::clicked,
-        this,
-        &SmartColorEditor::floatRangeRadioButtonClicked);
+        m_floatRadio, &QAbstractButton::clicked, this, &SmartColorEditor::floatRangeRadioButtonClicked
+    );
     connect(
-        m_byteRadio,
-        &QAbstractButton::clicked,
-        this,
-        &SmartColorEditor::byteRangeRadioButtonClicked);
+        m_byteRadio, &QAbstractButton::clicked, this, &SmartColorEditor::byteRangeRadioButtonClicked
+    );
     connect(
-        m_colorPicker,
-        &ColorButton::colorChangedByUser,
-        this,
-        &SmartColorEditor::colorPickerChanged);
+        m_colorPicker, &ColorButton::colorChangedByUser, this, &SmartColorEditor::colorPickerChanged
+    );
     connect(
-        m_colorHistory,
-        &ColorTable::colorTableSelected,
-        this,
-        &SmartColorEditor::colorTableSelected);
+        m_colorHistory, &ColorTable::colorTableSelected, this, &SmartColorEditor::colorTableSelected
+    );
 }
 
 void SmartColorEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) {
@@ -126,10 +116,12 @@ void SmartColorEditor::updateColorRange(const std::vector<Model::EntityNodeBase 
     if (range == Assets::ColorRange::Float) {
         m_floatRadio->setChecked(true);
         m_byteRadio->setChecked(false);
-    } else if (range == Assets::ColorRange::Byte) {
+    }
+    else if (range == Assets::ColorRange::Byte) {
         m_floatRadio->setChecked(false);
         m_byteRadio->setChecked(true);
-    } else {
+    }
+    else {
         m_floatRadio->setChecked(false);
         m_byteRadio->setChecked(false);
     }
@@ -137,7 +129,8 @@ void SmartColorEditor::updateColorRange(const std::vector<Model::EntityNodeBase 
 
 template<typename Node>
 static std::vector<QColor> collectColors(
-    const std::vector<Node *> &nodes, const std::string &propertyKey) {
+    const std::vector<Node *> &nodes, const std::string &propertyKey
+) {
     struct ColorCmp {
       bool operator()(const QColor &lhs, const QColor &rhs) const {
           const auto lr = static_cast<float>(lhs.red()) / 255.0f;
@@ -153,15 +146,20 @@ static std::vector<QColor> collectColors(
 
           if (lh < rh) {
               return true;
-          } else if (lh > rh) {
+          }
+          else if (lh > rh) {
               return false;
-          } else if (ls < rs) {
+          }
+          else if (ls < rs) {
               return true;
-          } else if (ls > rs) {
+          }
+          else if (ls > rs) {
               return false;
-          } else if (lbr < rbr) {
+          }
+          else if (lbr < rbr) {
               return true;
-          } else {
+          }
+          else {
               return false;
           }
       }
@@ -176,20 +174,17 @@ static std::vector<QColor> collectColors(
     };
 
     for (const auto *node: nodes) {
-        node->accept(kdl::overload(
-            [&](auto &&thisLambda, const Model::WorldNode *world) {
-              world->visitChildren(thisLambda);
-              visitEntityNode(world);
-            },
-            [](auto &&thisLambda, const Model::LayerNode *layer) {
-              layer->visitChildren(thisLambda);
-            },
-            [](auto &&thisLambda, const Model::GroupNode *group) {
-              group->visitChildren(thisLambda);
-            },
-            [&](const Model::EntityNode *entity) { visitEntityNode(entity); },
-            [](const Model::BrushNode *) {},
-            [](const Model::PatchNode *) {}));
+        node->accept(
+            kdl::overload(
+                [&](auto &&thisLambda, const Model::WorldNode *world) {
+                  world->visitChildren(thisLambda);
+                  visitEntityNode(world);
+                }, [](auto &&thisLambda, const Model::LayerNode *layer) {
+                  layer->visitChildren(thisLambda);
+                }, [](auto &&thisLambda, const Model::GroupNode *group) {
+                  group->visitChildren(thisLambda);
+                }, [&](const Model::EntityNode *entity) { visitEntityNode(entity); }, [](const Model::BrushNode *) {}, [](const Model::PatchNode *) {}
+            ));
     }
 
     return colors.get_data();
@@ -199,16 +194,14 @@ void SmartColorEditor::updateColorHistory() {
     m_colorHistory->setColors(
         collectColors(std::vector<Model::Node *>{document()->world()}, propertyKey()));
 
-    const auto selectedColors =
-        collectColors(document()->allSelectedEntityNodes(), propertyKey());
+    const auto selectedColors = collectColors(document()->allSelectedEntityNodes(), propertyKey());
     m_colorHistory->setSelection(selectedColors);
     m_colorPicker->setColor(
         !selectedColors.empty() ? selectedColors.back() : QColor(Qt::black));
 }
 
 void SmartColorEditor::setColor(const QColor &color) const {
-    const auto colorRange =
-        m_floatRadio->isChecked() ? Assets::ColorRange::Float : Assets::ColorRange::Byte;
+    const auto colorRange = m_floatRadio->isChecked() ? Assets::ColorRange::Float : Assets::ColorRange::Byte;
     const auto value = Model::entityColorAsString(fromQColor(color), colorRange);
     document()->setProperty(propertyKey(), value);
 }

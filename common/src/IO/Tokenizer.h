@@ -55,14 +55,8 @@ protected:
 
 public:
     TokenizerBase(
-        const char *begin,
-        const char *end,
-        std::string_view escapableChars,
-        const char escapeChar,
-        const size_t line,
-        const size_t column)
-        : m_begin(begin), m_end(end), m_escapableChars(escapableChars), m_escapeChar(escapeChar),
-          m_state{begin, line, column, false} {
+        const char *begin, const char *end, std::string_view escapableChars, const char escapeChar, const size_t line, const size_t column
+    ) : m_begin(begin), m_end(end), m_escapableChars(escapableChars), m_escapeChar(escapeChar), m_state{begin, line, column, false} {
     }
 
     void replaceState(std::string_view str) {
@@ -91,14 +85,14 @@ protected:
     char lookAhead(size_t offset = 1) const {
         if (eof(m_state.cur + offset)) {
             return 0;
-        } else {
+        }
+        else {
             return *(m_state.cur + offset);
         }
     }
 
     bool escaped() const {
-        return !eof() && m_state.escaped
-               && m_escapableChars.find(curChar()) != std::string::npos;
+        return !eof() && m_state.escaped && m_escapableChars.find(curChar()) != std::string::npos;
     }
 
     std::string unescape(std::string_view str) const {
@@ -141,7 +135,8 @@ protected:
                 ++m_state.column;
                 if (curChar() == m_escapeChar) {
                     m_state.escaped = !m_state.escaped;
-                } else {
+                }
+                else {
                     m_state.escaped = false;
                 }
                 break;
@@ -197,8 +192,7 @@ private:
         TokenizerState m_snapshot;
 
     public:
-        explicit SaveAndRestoreState(TokenizerState &target)
-            : m_target(target), m_snapshot(target) {
+        explicit SaveAndRestoreState(TokenizerState &target) : m_target(target), m_snapshot(target) {
         }
 
         ~SaveAndRestoreState() { m_target = m_snapshot; }
@@ -212,13 +206,8 @@ public:
 
 public:
     Tokenizer(
-        std::string_view str,
-        std::string_view escapableChars,
-        const char escapeChar,
-        const size_t line = 1,
-        const size_t column = 1)
-        : TokenizerBase{
-        str.data(), str.data() + str.size(), escapableChars, escapeChar, line, column} {
+        std::string_view str, std::string_view escapableChars, const char escapeChar, const size_t line = 1, const size_t column = 1
+    ) : TokenizerBase{str.data(), str.data() + str.size(), escapableChars, escapeChar, line, column} {
     }
 
     virtual ~Tokenizer() = default;
@@ -402,9 +391,7 @@ protected:
         while (!eof() && (curChar() != delim || isEscaped())) {
             // This is a hack to handle paths with trailing backslashes that get misinterpreted
             // as escaped double quotation marks.
-            if (
-                !hackDelims.empty() && curChar() == '"' && isEscaped()
-                && hackDelims.find(lookAhead()) != std::string_view::npos) {
+            if (!hackDelims.empty() && curChar() == '"' && isEscaped() && hackDelims.find(lookAhead()) != std::string_view::npos) {
                 resetEscaped();
                 break;
             }

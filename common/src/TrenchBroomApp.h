@@ -128,7 +128,8 @@ signals:
 void setCrashReportGUIEnbled(bool guiEnabled);
 
 [[noreturn]] void reportCrashAndExit(
-    const std::string &stacktrace, const std::string &reason);
+    const std::string &stacktrace, const std::string &reason
+);
 
 bool isReportingCrash();
 } // namespace View

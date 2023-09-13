@@ -88,8 +88,7 @@ struct ExtrudeDragState {
   /** The total drag distance so far. */
   vm::vec3 totalDelta = {0, 0, 0};
 
-  kdl_reflect_decl(
-      ExtrudeDragState, initialDragHandles, currentDragFaces, splitBrushes, totalDelta);
+  kdl_reflect_decl(ExtrudeDragState, initialDragHandles, currentDragFaces, splitBrushes, totalDelta);
 };
 
 struct ExtrudeHitData {
@@ -146,7 +145,8 @@ public:
     void updateProposedDragHandles(const Model::PickResult &pickResult);
 
     static std::vector<Model::BrushFaceHandle> getDragFaces(
-        const std::vector<ExtrudeDragHandle> &dragHandles);
+        const std::vector<ExtrudeDragHandle> &dragHandles
+    );
 
     void beginExtrude();
 

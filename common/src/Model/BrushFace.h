@@ -125,11 +125,8 @@ public:
      * The returned face has a TexCoordSystem matching the given format.
      */
     static Result<BrushFace> create(
-        const vm::vec3 &point0,
-        const vm::vec3 &point1,
-        const vm::vec3 &point2,
-        const BrushFaceAttributes &attributes,
-        MapFormat mapFormat);
+        const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, MapFormat mapFormat
+    );
 
     /**
      * Creates a face from a Standard texture projection, converting it to Valve if
@@ -140,11 +137,8 @@ public:
      * The returned face has a TexCoordSystem matching the given format.
      */
     static Result<BrushFace> createFromStandard(
-        const vm::vec3 &point0,
-        const vm::vec3 &point1,
-        const vm::vec3 &point2,
-        const BrushFaceAttributes &attributes,
-        MapFormat mapFormat);
+        const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, MapFormat mapFormat
+    );
 
     /**
      * Creates a face from a Valve texture projection, converting it to Standard if
@@ -155,26 +149,16 @@ public:
      * The returned face has a TexCoordSystem matching the given format.
      */
     static Result<BrushFace> createFromValve(
-        const vm::vec3 &point1,
-        const vm::vec3 &point2,
-        const vm::vec3 &point3,
-        const BrushFaceAttributes &attributes,
-        const vm::vec3 &texAxisX,
-        const vm::vec3 &texAxisY,
-        MapFormat mapFormat);
+        const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const BrushFaceAttributes &attributes, const vm::vec3 &texAxisX, const vm::vec3 &texAxisY, MapFormat mapFormat
+    );
 
     static Result<BrushFace> create(
-        const vm::vec3 &point0,
-        const vm::vec3 &point1,
-        const vm::vec3 &point2,
-        const BrushFaceAttributes &attributes,
-        std::unique_ptr<TexCoordSystem> texCoordSystem);
+        const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem
+    );
 
     BrushFace(
-        const BrushFace::Points &points,
-        const vm::plane3 &boundary,
-        const BrushFaceAttributes &attributes,
-        std::unique_ptr<TexCoordSystem> texCoordSystem);
+        const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem
+    );
 
     static void sortFaces(std::vector<BrushFace> &faces);
 
@@ -183,10 +167,8 @@ public:
     void restoreTexCoordSystemSnapshot(const TexCoordSystemSnapshot &coordSystemSnapshot);
 
     void copyTexCoordSystemFromFace(
-        const TexCoordSystemSnapshot &coordSystemSnapshot,
-        const BrushFaceAttributes &attributes,
-        const vm::plane3 &sourceFacePlane,
-        WrapStyle wrapStyle);
+        const TexCoordSystemSnapshot &coordSystemSnapshot, const BrushFaceAttributes &attributes, const vm::plane3 &sourceFacePlane, WrapStyle wrapStyle
+    );
 
     const BrushFace::Points &points() const;
 
@@ -249,9 +231,8 @@ public:
     void shearTexture(const vm::vec2f &factors);
 
     void flipTexture(
-        const vm::vec3 &cameraUp,
-        const vm::vec3 &cameraRight,
-        vm::direction cameraRelativeFlipDirection);
+        const vm::vec3 &cameraUp, const vm::vec3 &cameraRight, vm::direction cameraRelativeFlipDirection
+    );
 
     Result<void> transform(const vm::mat4x4 &transform, bool lockTexture);
 
@@ -262,10 +243,12 @@ public:
     vm::mat4x4 projectToBoundaryMatrix() const;
 
     vm::mat4x4 toTexCoordSystemMatrix(
-        const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
+        const vm::vec2f &offset, const vm::vec2f &scale, bool project
+    ) const;
 
     vm::mat4x4 fromTexCoordSystemMatrix(
-        const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
+        const vm::vec2f &offset, const vm::vec2f &scale, bool project
+    ) const;
 
     float measureTextureAngle(const vm::vec2f &center, const vm::vec2f &point) const;
 
@@ -303,7 +286,8 @@ public:
 
 private:
     Result<void> setPoints(
-        const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2);
+        const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2
+    );
 
     void correctPoints();
 

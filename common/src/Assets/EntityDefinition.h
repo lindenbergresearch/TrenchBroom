@@ -39,13 +39,11 @@ class FlagsPropertyDefinition;
 class FlagsPropertyOption;
 
 enum class EntityDefinitionType {
-  PointEntity,
-  BrushEntity
+  PointEntity, BrushEntity
 };
 
 enum class EntityDefinitionSortOrder {
-  Name,
-  Usage
+  Name, Usage
 };
 
 class EntityDefinition {
@@ -89,22 +87,21 @@ public:
     const PropertyDefinition *propertyDefinition(const std::string &propertyKey) const;
 
     static const PropertyDefinition *safeGetPropertyDefinition(
-        const EntityDefinition *entityDefinition, const std::string &propertyKey);
+        const EntityDefinition *entityDefinition, const std::string &propertyKey
+    );
 
     static const FlagsPropertyDefinition *safeGetFlagsPropertyDefinition(
-        const EntityDefinition *entityDefinition, const std::string &propertyKey);
+        const EntityDefinition *entityDefinition, const std::string &propertyKey
+    );
 
     static std::vector<EntityDefinition *> filterAndSort(
-        const std::vector<EntityDefinition *> &definitions,
-        EntityDefinitionType type,
-        EntityDefinitionSortOrder prder = EntityDefinitionSortOrder::Name);
+        const std::vector<EntityDefinition *> &definitions, EntityDefinitionType type, EntityDefinitionSortOrder prder = EntityDefinitionSortOrder::Name
+    );
 
 protected:
     EntityDefinition(
-        std::string name,
-        const Color &color,
-        std::string description,
-        std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions);
+        std::string name, const Color &color, std::string description, std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions
+    );
 };
 
 class PointEntityDefinition : public EntityDefinition {
@@ -114,12 +111,8 @@ private:
 
 public:
     PointEntityDefinition(
-        std::string name,
-        const Color &color,
-        const vm::bbox3 &bounds,
-        std::string description,
-        std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions,
-        ModelDefinition modelDefinition);
+        std::string name, const Color &color, const vm::bbox3 &bounds, std::string description, std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions, ModelDefinition modelDefinition
+    );
 
     EntityDefinitionType type() const override;
 
@@ -131,10 +124,8 @@ public:
 class BrushEntityDefinition : public EntityDefinition {
 public:
     BrushEntityDefinition(
-        std::string name,
-        const Color &color,
-        std::string description,
-        std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions);
+        std::string name, const Color &color, std::string description, std::vector<std::shared_ptr<PropertyDefinition>> propertyDefinitions
+    );
 
     EntityDefinitionType type() const override;
 };

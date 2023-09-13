@@ -27,20 +27,18 @@
 namespace TrenchBroom {
 namespace View {
 MenuBuilderBase::MenuBuilderBase(
-    MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn)
-    : m_actions(actions), m_triggerFn(triggerFn) {
+    MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn
+) : m_actions(actions), m_triggerFn(triggerFn) {
 }
 
 MenuBuilderBase::~MenuBuilderBase() = default;
 
 void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tAction) {
     if (!tAction->keySequence().isEmpty()) {
-        const QString tooltip =
-            QObject::tr("%1 (%2)")
-                .arg(tAction->label())
-                .arg(tAction->keySequence().toString(QKeySequence::NativeText));
+        const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label()).arg(tAction->keySequence().toString(QKeySequence::NativeText));
         qAction->setToolTip(tooltip);
-    } else {
+    }
+    else {
         qAction->setToolTip(tAction->label());
     }
 
@@ -72,9 +70,8 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
 }
 
 MainMenuBuilder::MainMenuBuilder(
-    QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn)
-    : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr),
-      undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
+    QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn
+) : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr), undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
 }
 
 void MainMenuBuilder::visit(const Menu &menu) {
@@ -82,7 +79,8 @@ void MainMenuBuilder::visit(const Menu &menu) {
     if (m_currentMenu == nullptr) {
         // top level menu
         m_currentMenu = m_menuBar.addMenu(QString::fromStdString(menu.name()));
-    } else {
+    }
+    else {
         m_currentMenu = m_currentMenu->addMenu(QString::fromStdString(menu.name()));
     }
 
@@ -107,11 +105,14 @@ void MainMenuBuilder::visit(const MenuActionItem &item) {
 
     if (item.entryType() == MenuEntryType::Menu_Undo) {
         undoAction = qAction;
-    } else if (item.entryType() == MenuEntryType::Menu_Redo) {
+    }
+    else if (item.entryType() == MenuEntryType::Menu_Redo) {
         redoAction = qAction;
-    } else if (item.entryType() == MenuEntryType::Menu_Paste) {
+    }
+    else if (item.entryType() == MenuEntryType::Menu_Paste) {
         pasteAction = qAction;
-    } else if (item.entryType() == MenuEntryType::Menu_PasteAtOriginalPosition) {
+    }
+    else if (item.entryType() == MenuEntryType::Menu_PasteAtOriginalPosition) {
         pasteAtOriginalPositionAction = qAction;
     }
 }

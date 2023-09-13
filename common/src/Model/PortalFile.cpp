@@ -34,8 +34,7 @@
 
 namespace TrenchBroom::Model {
 
-PortalFile::PortalFile(std::vector<vm::polygon3f> portals)
-    : m_portals{std::move(portals)} {
+PortalFile::PortalFile(std::vector<vm::polygon3f> portals) : m_portals{std::move(portals)} {
 }
 
 const std::vector<vm::polygon3f> &PortalFile::portals() const {
@@ -44,9 +43,8 @@ const std::vector<vm::polygon3f> &PortalFile::portals() const {
 
 bool canLoadPortalFile(const std::filesystem::path &path) {
     return IO::Disk::withInputStream(
-        path, [](auto &stream) { return stream.is_open() && stream.good(); })
-        .transform_error([](const auto &) { return false; })
-        .value();
+        path, [](auto &stream) { return stream.is_open() && stream.good(); }
+    ).transform_error([](const auto &) { return false; }).value();
 }
 
 Result<PortalFile> loadPortalFile(std::istream &stream) {
@@ -72,20 +70,24 @@ Result<PortalFile> loadPortalFile(std::istream &stream) {
         const auto componentsCheck = kdl::str_split(line, lineSplitter);
         if (componentsCheck.size() == 1) {
             prt1ForQ3 = true;
-        } else {
+        }
+        else {
             stream.seekg(mark);
         }
-    } else if (formatCode == "PRT2") {
+    }
+    else if (formatCode == "PRT2") {
         std::getline(stream, line); // number of leafs (ignored)
         std::getline(stream, line); // number of clusters (ignored)
         std::getline(stream, line); // number of portals
         numPortals = std::stoul(line);
-    } else if (formatCode == "PRT1-AM") {
+    }
+    else if (formatCode == "PRT1-AM") {
         std::getline(stream, line); // number of clusters (ignored)
         std::getline(stream, line); // number of portals
         numPortals = std::stoul(line);
         std::getline(stream, line); // number of leafs (ignored)
-    } else {
+    }
+    else {
         return Error{"Unknown portal format: " + formatCode};
     }
 
@@ -114,9 +116,7 @@ Result<PortalFile> loadPortalFile(std::istream &stream) {
             }
 
             verts.emplace_back(
-                std::stof(components.at(ptr)),
-                std::stof(components.at(ptr + 1)),
-                std::stof(components.at(ptr + 2)));
+                std::stof(components.at(ptr)), std::stof(components.at(ptr + 1)), std::stof(components.at(ptr + 2)));
             ptr += 3;
         }
 

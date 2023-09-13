@@ -41,8 +41,7 @@ class GameDialog : public QDialog {
 Q_OBJECT
 private:
     enum class DialogType {
-      Open,
-      New
+      Open, New
     };
 
 protected:
@@ -57,10 +56,12 @@ protected:
 public:
     // FIXME: return a tuple instead of taking in/out parameters
     static bool showNewDocumentDialog(
-        QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat);
+        QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat
+    );
 
     static bool showOpenDocumentDialog(
-        QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat);
+        QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat
+    );
 
     std::string currentGameName() const;
 
@@ -76,15 +77,14 @@ private slots:
 
 protected:
     GameDialog(
-        const QString &title,
-        const QString &infoText,
-        DialogType type,
-        QWidget *parent = nullptr);
+        const QString &title, const QString &infoText, DialogType type, QWidget *parent = nullptr
+    );
 
     void createGui(const QString &title, const QString &infoText);
 
     QWidget *createInfoPanel(
-        QWidget *parent, const QString &title, const QString &infoText);
+        QWidget *parent, const QString &title, const QString &infoText
+    );
 
     QWidget *createSelectionPanel(QWidget *parent);
 

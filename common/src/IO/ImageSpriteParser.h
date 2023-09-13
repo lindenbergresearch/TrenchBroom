@@ -46,7 +46,8 @@ private:
     std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 
     void doLoadFrame(
-        size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+        size_t frameIndex, Assets::EntityModel &model, Logger &logger
+    ) override;
 };
 } // namespace IO
 } // namespace TrenchBroom

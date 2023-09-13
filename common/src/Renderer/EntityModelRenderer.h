@@ -60,9 +60,8 @@ private:
 
 public:
     EntityModelRenderer(
-        Logger &logger,
-        Assets::EntityModelManager &entityModelManager,
-        const Model::EditorContext &editorContext);
+        Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext
+    );
 
     ~EntityModelRenderer() override;
 

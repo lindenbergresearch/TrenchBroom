@@ -47,11 +47,7 @@ private:
 
 public:
     TextureFont(
-        std::unique_ptr<FontTexture> texture,
-        const std::vector<FontGlyph> &glyphs,
-        int lineHeight,
-        unsigned char firstChar,
-        unsigned char charCount
+        std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, int lineHeight, unsigned char firstChar, unsigned char charCount
     );
 
     ~TextureFont();

@@ -26,8 +26,7 @@
 
 namespace TrenchBroom {
 namespace Assets {
-EntityDefinitionFileSpec::EntityDefinitionFileSpec()
-    : m_type(Type::Unset), m_path("") {
+EntityDefinitionFileSpec::EntityDefinitionFileSpec() : m_type(Type::Unset), m_path("") {
 }
 
 EntityDefinitionFileSpec EntityDefinitionFileSpec::parse(const std::string &str) {
@@ -42,17 +41,18 @@ EntityDefinitionFileSpec EntityDefinitionFileSpec::parse(const std::string &str)
     // If the location spec is missing, we assume that an absolute path indicates an
     // external file spec, and a relative path indicates a builtin file spec.
     const auto path = std::filesystem::path{str};
-    return path.is_absolute() ? EntityDefinitionFileSpec::external(path)
-                              : EntityDefinitionFileSpec::builtin(path);
+    return path.is_absolute() ? EntityDefinitionFileSpec::external(path) : EntityDefinitionFileSpec::builtin(path);
 }
 
 EntityDefinitionFileSpec EntityDefinitionFileSpec::builtin(
-    const std::filesystem::path &path) {
+    const std::filesystem::path &path
+) {
     return EntityDefinitionFileSpec(Type::Builtin, path);
 }
 
 EntityDefinitionFileSpec EntityDefinitionFileSpec::external(
-    const std::filesystem::path &path) {
+    const std::filesystem::path &path
+) {
     return EntityDefinitionFileSpec(Type::External, path);
 }
 
@@ -105,8 +105,8 @@ std::string EntityDefinitionFileSpec::asString() const {
 }
 
 EntityDefinitionFileSpec::EntityDefinitionFileSpec(
-    const Type type, const std::filesystem::path &path)
-    : m_type(type), m_path(path) {
+    const Type type, const std::filesystem::path &path
+) : m_type(type), m_path(path) {
     assert(valid());
     assert(!path.empty());
 }

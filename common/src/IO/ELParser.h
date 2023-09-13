@@ -77,14 +77,11 @@ static const Type DoubleCBrace = Type(1) << 36;
 static const Type Null = Type(1) << 37;
 static const Type Eof = Type(1) << 38;
 static const Type Literal = String | Number | Boolean | Null;
-static const Type UnaryOperator =
-    Addition | Subtraction | LogicalNegation | BitwiseNegation;
-static const Type SimpleTerm =
-    Name | Literal | OParen | OBracket | OBrace | UnaryOperator;
+static const Type UnaryOperator = Addition | Subtraction | LogicalNegation | BitwiseNegation;
+static const Type SimpleTerm = Name | Literal | OParen | OBracket | OBrace | UnaryOperator;
 static const Type CompoundTerm =
-    Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr
-    | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd
-    | BitwiseXOr | BitwiseOr | BitwiseShiftLeft | BitwiseShiftRight;
+    Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd | BitwiseXOr | BitwiseOr | BitwiseShiftLeft |
+    BitwiseShiftRight;
 } // namespace ELToken
 
 class ELTokenizer : public Tokenizer<ELToken::Type> {
@@ -106,8 +103,7 @@ private:
 class ELParser : public Parser<ELToken::Type> {
 public:
     enum class Mode {
-      Strict,
-      Lenient
+      Strict, Lenient
     };
 
 protected:

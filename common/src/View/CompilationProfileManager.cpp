@@ -35,16 +35,15 @@
 namespace TrenchBroom {
 namespace View {
 CompilationProfileManager::CompilationProfileManager(
-    std::weak_ptr<MapDocument> document, Model::CompilationConfig config, QWidget *parent)
-    : QWidget{parent}, m_config{std::move(config)} {
+    std::weak_ptr<MapDocument> document, Model::CompilationConfig config, QWidget *parent
+) : QWidget{parent}, m_config{std::move(config)} {
     setBaseWindowColor(this);
 
     auto *listPanel = new TitledPanel{"Profiles"};
     auto *editorPanel = new TitledPanel{"Details"};
 
     m_profileList = new CompilationProfileListBox{m_config, listPanel->getPanel()};
-    m_profileEditor =
-        new CompilationProfileEditor{std::move(document), editorPanel->getPanel()};
+    m_profileEditor = new CompilationProfileEditor{std::move(document), editorPanel->getPanel()};
 
     auto *addProfileButton = createBitmapButton("Add.svg", "Add profile");
     m_removeProfileButton = createBitmapButton("Remove.svg", "Remove the selected profile");
@@ -75,30 +74,23 @@ CompilationProfileManager::CompilationProfileManager(
     listPanel->setMinimumSize(200, 200);
 
     connect(
-        m_profileList,
-        &ControlListBox::itemSelectionChanged,
-        this,
-        &CompilationProfileManager::profileSelectionChanged);
+        m_profileList, &ControlListBox::itemSelectionChanged, this, &CompilationProfileManager::profileSelectionChanged
+    );
     connect(
-        m_profileList,
-        &CompilationProfileListBox::profileContextMenuRequested,
-        this,
-        &CompilationProfileManager::profileContextMenuRequested);
-    connect(m_profileEditor, &CompilationProfileEditor::profileChanged, this, [&]() {
-      // update the list box item labels
-      m_profileList->updateProfiles();
-      emit profileChanged();
-    });
+        m_profileList, &CompilationProfileListBox::profileContextMenuRequested, this, &CompilationProfileManager::profileContextMenuRequested
+    );
     connect(
-        addProfileButton,
-        &QAbstractButton::clicked,
-        this,
-        &CompilationProfileManager::addProfile);
+        m_profileEditor, &CompilationProfileEditor::profileChanged, this, [&]() {
+          // update the list box item labels
+          m_profileList->updateProfiles();
+          emit profileChanged();
+        }
+    );
     connect(
-        m_removeProfileButton,
-        &QAbstractButton::clicked,
-        this,
-        qOverload<>(&CompilationProfileManager::removeProfile));
+        addProfileButton, &QAbstractButton::clicked, this, &CompilationProfileManager::addProfile
+    );
+    connect(
+        m_removeProfileButton, &QAbstractButton::clicked, this, qOverload<>(&CompilationProfileManager::removeProfile));
 
     if (m_profileList->count() > 0) {
         m_profileList->setCurrentRow(0);
@@ -116,7 +108,8 @@ const Model::CompilationConfig &CompilationProfileManager::config() const {
 
 void CompilationProfileManager::addProfile() {
     m_config.profiles.push_back(
-        Model::CompilationProfile{"unnamed", "${MAP_DIR_PATH}", {}});
+        Model::CompilationProfile{"unnamed", "${MAP_DIR_PATH}", {}}
+    );
     m_profileList->reloadProfiles();
     m_profileList->setCurrentRow(int(m_config.profiles.size() - 1));
 }
@@ -148,7 +141,8 @@ void CompilationProfileManager::duplicateProfile(const Model::CompilationProfile
 }
 
 void CompilationProfileManager::profileContextMenuRequested(
-    const QPoint &globalPos, Model::CompilationProfile &profile) {
+    const QPoint &globalPos, Model::CompilationProfile &profile
+) {
     auto menu = QMenu{this};
     menu.addAction(tr("Duplicate"), this, [&]() { duplicateProfile(profile); });
     menu.addAction(tr("Remove"), this, [&]() { removeProfile(profile); });
@@ -161,7 +155,8 @@ void CompilationProfileManager::profileSelectionChanged() {
         auto &profile = m_config.profiles[size_t(selection)];
         m_profileEditor->setProfile(&profile);
         m_removeProfileButton->setEnabled(true);
-    } else {
+    }
+    else {
         m_profileEditor->setProfile(nullptr);
         m_removeProfileButton->setEnabled(false);
     }

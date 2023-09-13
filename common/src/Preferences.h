@@ -36,9 +36,7 @@ namespace Preferences {
 // implementation
 
 enum UnitsDisplay {
-  UNITS = 0,
-  METRIC,
-  BOTH
+  UNITS = 0, METRIC, BOTH
 };
 
 extern Preference<int> MapViewLayout;

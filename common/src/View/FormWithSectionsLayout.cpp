@@ -38,7 +38,8 @@ void FormWithSectionsLayout::addSection(const QString &title, const QString &inf
 
     auto *titleLayout = new QVBoxLayout();
     titleLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
+        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0
+    );
     titleLayout->setSpacing(0);
     titleLayout->addWidget(makeEmphasized(new QLabel(title)));
 
@@ -107,19 +108,22 @@ void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QLayout *f
 }
 
 void FormWithSectionsLayout::insertRow(
-    const int row, const QString &labelText, QWidget *field) {
+    const int row, const QString &labelText, QWidget *field
+) {
     insertRow(row, new QLabel(labelText), field);
 }
 
 void FormWithSectionsLayout::insertRow(
-    const int row, const QString &labelText, QLayout *field) {
+    const int row, const QString &labelText, QLayout *field
+) {
     insertRow(row, new QLabel(labelText), field);
 }
 
 void FormWithSectionsLayout::insertRow(int row, QWidget *field) {
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(
-        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
+        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0
+    );
     layout->addWidget(field);
     QFormLayout::insertRow(row, layout);
 }
@@ -127,7 +131,8 @@ void FormWithSectionsLayout::insertRow(int row, QWidget *field) {
 void FormWithSectionsLayout::insertRow(int row, QLayout *field) {
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(
-        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
+        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0
+    );
     layout->addLayout(field);
     QFormLayout::insertRow(row, layout);
 }

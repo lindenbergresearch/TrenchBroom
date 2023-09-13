@@ -38,10 +38,8 @@ private:
 
 public:
     CompilationContext(
-        std::weak_ptr<MapDocument> document,
-        const EL::VariableStore &variables,
-        TextOutputAdapter output,
-        bool test);
+        std::weak_ptr<MapDocument> document, const EL::VariableStore &variables, TextOutputAdapter output, bool test
+    );
 
     std::shared_ptr<MapDocument> document() const;
 

@@ -56,13 +56,11 @@ size_t blockSizeForFormat(GLenum format);
 size_t bytesPerPixelForFormat(GLenum format);
 
 void setMipBufferSize(
-    TextureBufferList &buffers,
-    size_t mipLevels,
-    size_t width,
-    size_t height,
-    GLenum format);
+    TextureBufferList &buffers, size_t mipLevels, size_t width, size_t height, GLenum format
+);
 
 void resizeMips(
-    TextureBufferList &buffers, const vm::vec2s &oldSize, const vm::vec2s &newSize);
+    TextureBufferList &buffers, const vm::vec2s &oldSize, const vm::vec2s &newSize
+);
 } // namespace Assets
 } // namespace TrenchBroom

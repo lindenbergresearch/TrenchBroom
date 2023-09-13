@@ -51,16 +51,12 @@ public:
 
       template<typename T>
       bool contains(const T i_x, const T i_y, const T i_w, const T i_h) const {
-          return (
-              i_x + i_w >= static_cast<T>(0) && i_x <= static_cast<T>(width)
-              && i_y + i_h >= static_cast<T>(0) && i_y <= static_cast<T>(height));
+          return (i_x + i_w >= static_cast<T>(0) && i_x <= static_cast<T>(width) && i_y + i_h >= static_cast<T>(0) && i_y <= static_cast<T>(height));
       }
 
       template<typename T>
       bool contains(const T i_x, const T i_y) const {
-          return (
-              i_x >= static_cast<T>(0) && i_x <= static_cast<T>(width)
-              && i_y >= static_cast<T>(0) && i_y <= static_cast<T>(height));
+          return (i_x >= static_cast<T>(0) && i_x <= static_cast<T>(width) && i_y >= static_cast<T>(0) && i_y <= static_cast<T>(height));
       }
 
       int minDimension() const { return width < height ? width : height; }
@@ -86,8 +82,7 @@ private:
 
 protected:
     typedef enum {
-      Projection_Orthographic,
-      Projection_Perspective
+      Projection_Orthographic, Projection_Perspective
     } ProjectionType;
     mutable bool m_valid;
 
@@ -129,10 +124,8 @@ public:
     const vm::mat4x4f verticalBillboardMatrix() const;
 
     void frustumPlanes(
-        vm::plane3f &topPlane,
-        vm::plane3f &rightPlane,
-        vm::plane3f &bottomPlane,
-        vm::plane3f &leftPlane) const;
+        vm::plane3f &topPlane, vm::plane3f &rightPlane, vm::plane3f &bottomPlane, vm::plane3f &leftPlane
+    ) const;
 
     vm::ray3f viewRay() const;
 
@@ -201,33 +194,25 @@ public:
     vm::quatf clampRotationToUpright(const vm::quatf &rotation) const;
 
     void renderFrustum(
-        RenderContext &renderContext,
-        VboManager &vboManager,
-        float size,
-        const Color &color) const;
+        RenderContext &renderContext, VboManager &vboManager, float size, const Color &color
+    ) const;
 
     float pickFrustum(float size, const vm::ray3f &ray) const;
 
     FloatType pickPointHandle(
-        const vm::ray3 &pickRay,
-        const vm::vec3 &handlePosition,
-        FloatType handleRadius) const;
+        const vm::ray3 &pickRay, const vm::vec3 &handlePosition, FloatType handleRadius
+    ) const;
 
     FloatType pickLineSegmentHandle(
-        const vm::ray3 &pickRay,
-        const vm::segment3 &handlePosition,
-        FloatType handleRadius) const;
+        const vm::ray3 &pickRay, const vm::segment3 &handlePosition, FloatType handleRadius
+    ) const;
 
 protected:
     Camera();
 
     Camera(
-        float nearPlane,
-        float farPlane,
-        const Viewport &viewport,
-        const vm::vec3f &position,
-        const vm::vec3f &direction,
-        const vm::vec3f &up);
+        float nearPlane, float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up
+    );
 
 private:
     ProjectionType projectionType() const;
@@ -238,21 +223,18 @@ private:
     virtual ProjectionType doGetProjectionType() const = 0;
 
     virtual void doValidateMatrices(
-        vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix) const = 0;
+        vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix
+    ) const = 0;
 
     virtual vm::ray3f doGetPickRay(const vm::vec3f &point) const = 0;
 
     virtual void doComputeFrustumPlanes(
-        vm::plane3f &topPlane,
-        vm::plane3f &rightPlane,
-        vm::plane3f &bottomPlane,
-        vm::plane3f &leftPlane) const = 0;
+        vm::plane3f &topPlane, vm::plane3f &rightPlane, vm::plane3f &bottomPlane, vm::plane3f &leftPlane
+    ) const = 0;
 
     virtual void doRenderFrustum(
-        RenderContext &renderContext,
-        VboManager &vboManager,
-        float size,
-        const Color &color) const = 0;
+        RenderContext &renderContext, VboManager &vboManager, float size, const Color &color
+    ) const = 0;
 
     virtual float doPickFrustum(float size, const vm::ray3f &ray) const = 0;
 

@@ -28,15 +28,13 @@
 
 namespace TrenchBroom {
 namespace Assets {
-TextureBuffer::TextureBuffer()
-    : m_buffer(), m_size(0) {
+TextureBuffer::TextureBuffer() : m_buffer(), m_size(0) {
 }
 
 /**
  * Note, buffer is created defult-initialized (i.e., uninitialized) on purpose.
  */
-TextureBuffer::TextureBuffer(const size_t size)
-    : m_buffer(new unsigned char[size]), m_size(size) {
+TextureBuffer::TextureBuffer(const size_t size) : m_buffer(new unsigned char[size]), m_size(size) {
 }
 
 const unsigned char *TextureBuffer::data() const {
@@ -62,8 +60,7 @@ vm::vec2s sizeAtMipLevel(const size_t width, const size_t height, const size_t l
 }
 
 bool isCompressedFormat(const GLenum format) {
-    return format >= GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
-           && format <= GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+    return format >= GL_COMPRESSED_RGBA_S3TC_DXT1_EXT && format <= GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 }
 
 size_t blockSizeForFormat(const GLenum format) {
@@ -92,11 +89,8 @@ size_t bytesPerPixelForFormat(const GLenum format) {
 }
 
 void setMipBufferSize(
-    TextureBufferList &buffers,
-    const size_t mipLevels,
-    const size_t width,
-    const size_t height,
-    const GLenum format) {
+    TextureBufferList &buffers, const size_t mipLevels, const size_t width, const size_t height, const GLenum format
+) {
     const bool compressed = isCompressedFormat(format);
     const size_t bytesPerPixel = compressed ? 0U : bytesPerPixelForFormat(format);
     const size_t blockSize = compressed ? blockSizeForFormat(format) : 0U;
@@ -104,16 +98,14 @@ void setMipBufferSize(
     buffers.resize(mipLevels);
     for (size_t level = 0u; level < buffers.size(); ++level) {
         const auto mipSize = sizeAtMipLevel(width, height, level);
-        const auto numBytes = compressed ? (
-            blockSize * std::max(size_t(1), mipSize.x() / 4)
-            * std::max(size_t(1), mipSize.y() / 4))
-                                         : (bytesPerPixel * mipSize.x() * mipSize.y());
+        const auto numBytes = compressed ? (blockSize * std::max(size_t(1), mipSize.x() / 4) * std::max(size_t(1), mipSize.y() / 4)) : (bytesPerPixel * mipSize.x() * mipSize.y());
         buffers[level] = TextureBuffer(numBytes);
     }
 }
 
 void resizeMips(
-    TextureBufferList &buffers, const vm::vec2s &oldSize, const vm::vec2s &newSize) {
+    TextureBufferList &buffers, const vm::vec2s &oldSize, const vm::vec2s &newSize
+) {
     if (oldSize == newSize)
         return;
 
@@ -125,7 +117,8 @@ void resizeMips(
         auto *oldPtr = buffers[i].data();
 
         auto *oldBitmap = FreeImage_ConvertFromRawBits(
-            oldPtr, oldWidth, oldHeight, oldPitch, 24, 0xFF0000, 0x00FF00, 0x0000FF, true);
+            oldPtr, oldWidth, oldHeight, oldPitch, 24, 0xFF0000, 0x00FF00, 0x0000FF, true
+        );
         ensure(oldBitmap != nullptr, "oldBitmap is null");
 
         const auto newWidth = static_cast<int>(newSize.x() / div);
@@ -138,7 +131,8 @@ void resizeMips(
         auto *newPtr = buffers[i].data();
 
         FreeImage_ConvertToRawBits(
-            newPtr, newBitmap, newPitch, 24, 0xFF0000, 0x00FF00, 0x0000FF, true);
+            newPtr, newBitmap, newPitch, 24, 0xFF0000, 0x00FF00, 0x0000FF, true
+        );
         FreeImage_Unload(oldBitmap);
         FreeImage_Unload(newBitmap);
     }

@@ -27,8 +27,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-FontManager::FontManager()
-    : m_factory(std::make_unique<FreeTypeFontFactory>()) {
+FontManager::FontManager() : m_factory(std::make_unique<FreeTypeFontFactory>()) {
 }
 
 FontManager::~FontManager() = default;
@@ -47,15 +46,12 @@ TextureFont &FontManager::font(const FontDescriptor &fontDescriptor) {
 }
 
 FontDescriptor FontManager::selectFontSize(
-    const FontDescriptor &fontDescriptor,
-    const std::string &string,
-    const float maxWidth,
-    const size_t minFontSize) {
+    const FontDescriptor &fontDescriptor, const std::string &string, const float maxWidth, const size_t minFontSize
+) {
     FontDescriptor actualDescriptor = fontDescriptor;
     vm::vec2f actualBounds = font(actualDescriptor).measure(string);
     while (actualBounds.x() > maxWidth && actualDescriptor.size() > minFontSize) {
-        actualDescriptor =
-            FontDescriptor(actualDescriptor.path(), actualDescriptor.size() - 1);
+        actualDescriptor = FontDescriptor(actualDescriptor.path(), actualDescriptor.size() - 1);
         actualBounds = font(actualDescriptor).measure(string);
     }
     return actualDescriptor;

@@ -78,9 +78,8 @@ private:
 
 public:
     EntityRenderer(
-        Logger &logger,
-        Assets::EntityModelManager &entityModelManager,
-        const Model::EditorContext &editorContext);
+        Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext
+    );
 
     /**
      * Equivalent to invalidateEntity() on all added entities.

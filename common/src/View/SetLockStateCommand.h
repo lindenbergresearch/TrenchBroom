@@ -43,13 +43,16 @@ private:
 
 public:
     static std::unique_ptr<SetLockStateCommand> lock(
-        const std::vector<Model::Node *> &nodes);
+        const std::vector<Model::Node *> &nodes
+    );
 
     static std::unique_ptr<SetLockStateCommand> unlock(
-        const std::vector<Model::Node *> &nodes);
+        const std::vector<Model::Node *> &nodes
+    );
 
     static std::unique_ptr<SetLockStateCommand> reset(
-        const std::vector<Model::Node *> &nodes);
+        const std::vector<Model::Node *> &nodes
+    );
 
     SetLockStateCommand(const std::vector<Model::Node *> &nodes, Model::LockState lockState);
 
@@ -59,7 +62,8 @@ private:
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
     std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document) override;
+        MapDocumentCommandFacade *document
+    ) override;
 
 deleteCopyAndMove(SetLockStateCommand);
 };

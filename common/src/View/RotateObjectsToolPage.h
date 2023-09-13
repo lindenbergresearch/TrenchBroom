@@ -63,9 +63,8 @@ private:
 
 public:
     RotateObjectsToolPage(
-        std::weak_ptr<MapDocument> document,
-        RotateObjectsTool &tool,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent = nullptr
+    );
 
     void setAxis(vm::axis::type axis);
 

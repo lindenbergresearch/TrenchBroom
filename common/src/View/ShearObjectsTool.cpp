@@ -45,12 +45,9 @@
 
 namespace TrenchBroom {
 namespace View {
-const Model::HitType::Type ShearObjectsTool::ShearToolSideHitType =
-    Model::HitType::freeType();
+const Model::HitType::Type ShearObjectsTool::ShearToolSideHitType = Model::HitType::freeType();
 
-ShearObjectsTool::ShearObjectsTool(std::weak_ptr<MapDocument> document)
-    : Tool(false), m_document(std::move(document)), m_resizing(false), m_constrainVertical(false),
-      m_dragStartHit(Model::Hit::NoHit) {
+ShearObjectsTool::ShearObjectsTool(std::weak_ptr<MapDocument> document) : Tool(false), m_document(std::move(document)), m_resizing(false), m_constrainVertical(false), m_dragStartHit(Model::Hit::NoHit) {
 }
 
 ShearObjectsTool::~ShearObjectsTool() = default;
@@ -65,7 +62,8 @@ bool ShearObjectsTool::applies() const {
 }
 
 void ShearObjectsTool::pickBackSides(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+) {
     // select back sides. Used for both 2D and 3D.
     if (pickResult.empty()) {
         const auto result = pickBackSideOfBox(pickRay, camera, bounds());
@@ -74,16 +72,16 @@ void ShearObjectsTool::pickBackSides(
         // For face dragging, we'll project the pick ray onto the line through this point and
         // having the face normal.
         assert(result.pickedSideNormal != vm::vec3::zero());
-        pickResult.addHit(Model::Hit(
-            ShearToolSideHitType,
-            result.distAlongRay,
-            vm::point_at_distance(pickRay, result.distAlongRay),
-            BBoxSide{result.pickedSideNormal}));
+        pickResult.addHit(
+            Model::Hit(
+                ShearToolSideHitType, result.distAlongRay, vm::point_at_distance(pickRay, result.distAlongRay), BBoxSide{result.pickedSideNormal}
+            ));
     }
 }
 
 void ShearObjectsTool::pick2D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+) {
     using namespace Model::HitFilters;
 
     const vm::bbox3 &myBounds = bounds();
@@ -103,7 +101,8 @@ void ShearObjectsTool::pick2D(
 }
 
 void ShearObjectsTool::pick3D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
+) {
     using namespace Model::HitFilters;
 
     const auto &myBounds = bounds();
@@ -122,11 +121,12 @@ void ShearObjectsTool::pick3D(
     for (const auto &side: allSides()) {
         const auto poly = polygonForBBoxSide(myBounds, side);
 
-        const auto dist =
-            vm::intersect_ray_polygon(pickRay, std::begin(poly), std::end(poly));
+        const auto dist = vm::intersect_ray_polygon(pickRay, std::begin(poly), std::end(poly));
         if (!vm::is_nan(dist)) {
-            localPickResult.addHit(Model::Hit(
-                ShearToolSideHitType, dist, vm::point_at_distance(pickRay, dist), side));
+            localPickResult.addHit(
+                Model::Hit(
+                    ShearToolSideHitType, dist, vm::point_at_distance(pickRay, dist), side
+                ));
         }
     }
 
@@ -161,7 +161,8 @@ vm::polygon3f ShearObjectsTool::dragPolygon() const {
 vm::bbox3 ShearObjectsTool::bboxAtDragStart() const {
     if (m_resizing) {
         return m_bboxAtDragStart;
-    } else {
+    }
+    else {
         return bounds();
     }
 }
@@ -186,7 +187,8 @@ void ShearObjectsTool::commitShear() {
     auto document = kdl::mem_lock(m_document);
     if (vm::is_zero(m_dragCumulativeDelta, vm::C::almost_zero())) {
         document->cancelTransaction();
-    } else {
+    }
+    else {
         document->commitTransaction();
     }
     m_resizing = false;

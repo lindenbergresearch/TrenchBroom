@@ -44,9 +44,8 @@
 namespace TrenchBroom {
 namespace View {
 ReplaceTextureDialog::ReplaceTextureDialog(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
-    : QDialog(parent), m_document(document), m_subjectBrowser(nullptr), m_replacementBrowser(nullptr),
-      m_replaceButton(nullptr) {
+    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
+) : QDialog(parent), m_document(document), m_subjectBrowser(nullptr), m_replacementBrowser(nullptr), m_replaceButton(nullptr) {
     createGui(contextManager);
 }
 
@@ -62,9 +61,7 @@ void ReplaceTextureDialog::accept() {
 
     if (faces.empty()) {
         QMessageBox::warning(
-            this,
-            tr("Replace Failed"),
-            tr("None of the selected faces has the selected texture"));
+            this, tr("Replace Failed"), tr("None of the selected faces has the selected texture"));
         return;
     }
 
@@ -80,8 +77,7 @@ void ReplaceTextureDialog::accept() {
     transaction.commit();
 
     auto msg = std::stringstream{};
-    msg << "Replaced texture '" << subject->name() << "' with '" << replacement->name()
-        << "' on " << faces.size() << " faces.";
+    msg << "Replaced texture '" << subject->name() << "' with '" << replacement->name() << "' on " << faces.size() << " faces.";
 
     QMessageBox::information(
         this, tr("Replace Succeeded"), QString::fromStdString(msg.str()));
@@ -98,7 +94,8 @@ std::vector<Model::BrushFaceHandle> ReplaceTextureDialog::getApplicableFaces() c
     }
 
     return kdl::vec_filter(
-        faces, [&](const auto &handle) { return handle.face().texture() == subject; });
+        faces, [&](const auto &handle) { return handle.face().texture() == subject; }
+    );
 }
 
 void ReplaceTextureDialog::createGui(GLContextManager &contextManager) {
@@ -109,10 +106,8 @@ void ReplaceTextureDialog::createGui(GLContextManager &contextManager) {
     m_subjectBrowser = new TextureBrowser(m_document, contextManager);
     m_subjectBrowser->setHideUnused(true);
     connect(
-        m_subjectBrowser,
-        &TextureBrowser::textureSelected,
-        this,
-        &ReplaceTextureDialog::subjectSelected);
+        m_subjectBrowser, &TextureBrowser::textureSelected, this, &ReplaceTextureDialog::subjectSelected
+    );
 
     auto *subjectPanelLayout = new QVBoxLayout();
     subjectPanelLayout->setContentsMargins(QMargins());
@@ -124,10 +119,8 @@ void ReplaceTextureDialog::createGui(GLContextManager &contextManager) {
     m_replacementBrowser = new TextureBrowser(m_document, contextManager);
     m_replacementBrowser->setSelectedTexture(nullptr); // Override the current texture.
     connect(
-        m_replacementBrowser,
-        &TextureBrowser::textureSelected,
-        this,
-        &ReplaceTextureDialog::replacementSelected);
+        m_replacementBrowser, &TextureBrowser::textureSelected, this, &ReplaceTextureDialog::replacementSelected
+    );
 
     auto *replacementPanelLayout = new QVBoxLayout();
     replacementPanelLayout->setContentsMargins(QMargins());

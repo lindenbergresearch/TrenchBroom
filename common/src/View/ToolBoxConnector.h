@@ -92,7 +92,8 @@ protected: // rendering
     void setRenderOptions(Renderer::RenderContext &renderContext);
 
     void renderTools(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+    );
 
 private:
     ModifierKeyState modifierKeys();

@@ -33,17 +33,13 @@ class FontManager;
 class ShaderManager;
 
 enum class RenderMode {
-  Render3D,
-  Render2D
+  Render3D, Render2D
 };
 
 class RenderContext {
 private:
     enum class ShowSelectionGuide {
-      Show,
-      Hide,
-      ForceShow,
-      ForceHide
+      Show, Hide, ForceShow, ForceHide
     };
 
     // general context for any rendering view
@@ -80,10 +76,8 @@ private:
 
 public:
     RenderContext(
-        RenderMode renderMode,
-        const Camera &camera,
-        FontManager &fontManager,
-        ShaderManager &shaderManager);
+        RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager
+    );
 
     bool render2D() const;
 

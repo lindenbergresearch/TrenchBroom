@@ -74,6 +74,7 @@ std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &h
  * resolved
  */
 std::vector<BrushFaceHandle> resolveAllRefs(
-    const std::vector<BrushFaceReference> &faceRefs);
+    const std::vector<BrushFaceReference> &faceRefs
+);
 } // namespace Model
 } // namespace TrenchBroom

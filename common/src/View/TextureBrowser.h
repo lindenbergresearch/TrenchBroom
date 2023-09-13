@@ -71,9 +71,8 @@ private:
 
 public:
     TextureBrowser(
-        std::weak_ptr<MapDocument> document,
-        GLContextManager &contextManager,
-        QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
+    );
 
     const Assets::Texture *selectedTexture() const;
 

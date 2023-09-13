@@ -38,8 +38,8 @@ void InitFreeImage::initialize() {
 }
 
 ImageLoaderImpl::ImageLoaderImpl(
-    const ImageLoader::Format format, const std::filesystem::path &path)
-    : m_stream(nullptr), m_bitmap(nullptr) {
+    const ImageLoader::Format format, const std::filesystem::path &path
+) : m_stream(nullptr), m_bitmap(nullptr) {
     InitFreeImage::initialize();
     const FREE_IMAGE_FORMAT fifFormat = translateFormat(format);
     if (fifFormat == FIF_UNKNOWN) {
@@ -50,8 +50,8 @@ ImageLoaderImpl::ImageLoaderImpl(
 }
 
 ImageLoaderImpl::ImageLoaderImpl(
-    const ImageLoader::Format format, const char *begin, const char *end)
-    : m_stream(nullptr), m_bitmap(nullptr) {
+    const ImageLoader::Format format, const char *begin, const char *end
+) : m_stream(nullptr), m_bitmap(nullptr) {
     InitFreeImage::initialize();
     const FREE_IMAGE_FORMAT fifFormat = translateFormat(format);
     if (fifFormat == FIF_UNKNOWN) {
@@ -147,12 +147,14 @@ std::vector<unsigned char> ImageLoaderImpl::loadIndices() const {
 }
 
 std::vector<unsigned char> ImageLoaderImpl::loadPixels(
-    const ImageLoader::PixelFormat format) const {
+    const ImageLoader::PixelFormat format
+) const {
     assert(hasPixels());
     const size_t pSize = pixelSize(format);
     if (hasIndices()) {
         return loadIndexedPixels(pSize);
-    } else {
+    }
+    else {
         return loadPixels(pSize);
     }
 }

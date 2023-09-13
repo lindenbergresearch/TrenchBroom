@@ -44,8 +44,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-MatchVisitor::MatchVisitor()
-    : m_matches(false) {
+MatchVisitor::MatchVisitor() : m_matches(false) {
 }
 
 bool MatchVisitor::matches() const {
@@ -74,26 +73,26 @@ void TextureTagMatcher::enable(TagMatcherCallback &callback, MapFacade &facade) 
     auto matchingTextures = std::vector<const Assets::Texture *>{};
 
     std::copy_if(
-        std::begin(allTextures),
-        std::end(allTextures),
-        std::back_inserter(matchingTextures),
-        [this](auto *texture) { return matchesTexture(texture); });
+        std::begin(allTextures), std::end(allTextures), std::back_inserter(matchingTextures), [this](auto *texture) { return matchesTexture(texture); }
+    );
 
     std::sort(
-        std::begin(matchingTextures),
-        std::end(matchingTextures),
-        [](const auto *lhs, const auto *rhs) {
+        std::begin(matchingTextures), std::end(matchingTextures), [](const auto *lhs, const auto *rhs) {
           return kdl::ci::str_compare(lhs->name(), rhs->name()) < 0;
-        });
+        }
+    );
 
     const Assets::Texture *texture = nullptr;
     if (matchingTextures.empty()) {
         return;
-    } else if (matchingTextures.size() == 1) {
+    }
+    else if (matchingTextures.size() == 1) {
         texture = matchingTextures.front();
-    } else {
+    }
+    else {
         const auto options = kdl::vec_transform(
-            matchingTextures, [](const auto *current) { return current->name(); });
+            matchingTextures, [](const auto *current) { return current->name(); }
+        );
         const auto index = callback.selectOption(options);
         if (index >= matchingTextures.size()) {
             return;
@@ -116,8 +115,7 @@ void TextureTagMatcher::appendToStream(std::ostream &str) const {
     kdl::struct_stream{str} << "TextureTagMatcher";
 }
 
-TextureNameTagMatcher::TextureNameTagMatcher(const std::string &pattern)
-    : m_pattern(pattern) {
+TextureNameTagMatcher::TextureNameTagMatcher(const std::string &pattern) : m_pattern(pattern) {
 }
 
 std::unique_ptr<TagMatcher> TextureNameTagMatcher::clone() const {
@@ -125,17 +123,18 @@ std::unique_ptr<TagMatcher> TextureNameTagMatcher::clone() const {
 }
 
 bool TextureNameTagMatcher::matches(const Taggable &taggable) const {
-    BrushFaceMatchVisitor visitor([this](const BrushFace &face) {
-      return matchesTextureName(face.attributes().textureName());
-    });
+    BrushFaceMatchVisitor visitor(
+        [this](const BrushFace &face) {
+          return matchesTextureName(face.attributes().textureName());
+        }
+    );
 
     taggable.accept(visitor);
     return visitor.matches();
 }
 
 void TextureNameTagMatcher::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "TextureNameTagMatcher"
-                            << "m_pattern" << m_pattern;
+    kdl::struct_stream{str} << "TextureNameTagMatcher" << "m_pattern" << m_pattern;
 }
 
 bool TextureNameTagMatcher::matchesTexture(const Assets::Texture *texture) const {
@@ -158,13 +157,12 @@ bool TextureNameTagMatcher::matchesTextureName(std::string_view textureName) con
     return kdl::ci::str_matches_glob(textureName, m_pattern);
 }
 
-SurfaceParmTagMatcher::SurfaceParmTagMatcher(const std::string &parameter)
-    : m_parameters({parameter}) {
+SurfaceParmTagMatcher::SurfaceParmTagMatcher(const std::string &parameter) : m_parameters({parameter}) {
 }
 
 SurfaceParmTagMatcher::SurfaceParmTagMatcher(
-    const kdl::vector_set<std::string> &parameters)
-    : m_parameters(parameters) {
+    const kdl::vector_set<std::string> &parameters
+) : m_parameters(parameters) {
 }
 
 std::unique_ptr<TagMatcher> SurfaceParmTagMatcher::clone() const {
@@ -173,15 +171,15 @@ std::unique_ptr<TagMatcher> SurfaceParmTagMatcher::clone() const {
 
 bool SurfaceParmTagMatcher::matches(const Taggable &taggable) const {
     BrushFaceMatchVisitor visitor(
-        [this](const BrushFace &face) { return matchesTexture(face.texture()); });
+        [this](const BrushFace &face) { return matchesTexture(face.texture()); }
+    );
 
     taggable.accept(visitor);
     return visitor.matches();
 }
 
 void SurfaceParmTagMatcher::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "SurfaceParmTagMatcher"
-                            << "m_parameters" << m_parameters;
+    kdl::struct_stream{str} << "SurfaceParmTagMatcher" << "m_parameters" << m_parameters;
 }
 
 bool SurfaceParmTagMatcher::matchesTexture(const Assets::Texture *texture) const {
@@ -196,9 +194,11 @@ bool SurfaceParmTagMatcher::matchesTexture(const Assets::Texture *texture) const
     while (texParams != texParamsEnd && tagParams != tagParamsEnd) {
         if (*texParams < *tagParams) {
             ++texParams;
-        } else if (*tagParams < *texParams) {
+        }
+        else if (*tagParams < *texParams) {
             ++tagParams;
-        } else {
+        }
+        else {
             return true;
         }
     }
@@ -206,18 +206,14 @@ bool SurfaceParmTagMatcher::matchesTexture(const Assets::Texture *texture) const
 }
 
 FlagsTagMatcher::FlagsTagMatcher(
-    const int flags,
-    GetFlags getFlags,
-    SetFlags setFlags,
-    SetFlags unsetFlags,
-    GetFlagNames getFlagNames)
-    : m_flags(flags), m_getFlags(std::move(getFlags)), m_setFlags(std::move(setFlags)),
-      m_unsetFlags(std::move(unsetFlags)), m_getFlagNames(std::move(getFlagNames)) {
+    const int flags, GetFlags getFlags, SetFlags setFlags, SetFlags unsetFlags, GetFlagNames getFlagNames
+) : m_flags(flags), m_getFlags(std::move(getFlags)), m_setFlags(std::move(setFlags)), m_unsetFlags(std::move(unsetFlags)), m_getFlagNames(std::move(getFlagNames)) {
 }
 
 bool FlagsTagMatcher::matches(const Taggable &taggable) const {
     BrushFaceMatchVisitor visitor(
-        [this](const BrushFace &face) { return (m_getFlags(face) & m_flags) != 0; });
+        [this](const BrushFace &face) { return (m_getFlags(face) & m_flags) != 0; }
+    );
 
     taggable.accept(visitor);
     return visitor.matches();
@@ -236,9 +232,11 @@ void FlagsTagMatcher::enable(TagMatcherCallback &callback, MapFacade &facade) co
     int flagToSet = 0;
     if (flagIndices.empty()) {
         return;
-    } else if (flagIndices.size() == 1) {
+    }
+    else if (flagIndices.size() == 1) {
         flagToSet = m_flags;
-    } else {
+    }
+    else {
         const auto options = m_getFlagNames(*facade.game(), m_flags);
         const auto selectedOptionIndex = callback.selectOption(options);
         if (selectedOptionIndex == options.size()) {
@@ -280,40 +278,33 @@ bool FlagsTagMatcher::canDisable() const {
 }
 
 void FlagsTagMatcher::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "FlagsTagMatcher"
-                            << "m_flags" << m_flags;
+    kdl::struct_stream{str} << "FlagsTagMatcher" << "m_flags" << m_flags;
 }
 
-ContentFlagsTagMatcher::ContentFlagsTagMatcher(const int i_flags)
-    : FlagsTagMatcher(
-    i_flags,
-    [](const BrushFace &face) { return face.resolvedSurfaceContents(); },
-    [](ChangeBrushFaceAttributesRequest &request, const int flags) {
+ContentFlagsTagMatcher::ContentFlagsTagMatcher(const int i_flags) : FlagsTagMatcher(
+    i_flags, [](const BrushFace &face) { return face.resolvedSurfaceContents(); }, [](ChangeBrushFaceAttributesRequest &request, const int flags) {
       request.setContentFlags(flags);
-    },
-    [](ChangeBrushFaceAttributesRequest &request, const int flags) {
+    }, [](ChangeBrushFaceAttributesRequest &request, const int flags) {
       request.unsetContentFlags(flags);
-    },
-    [](
-        const Game &game, const int flags) { return game.contentFlags().flagNames(flags); }) {
+    }, [](
+        const Game &game, const int flags
+    ) { return game.contentFlags().flagNames(flags); }
+) {
 }
 
 std::unique_ptr<TagMatcher> ContentFlagsTagMatcher::clone() const {
     return std::make_unique<ContentFlagsTagMatcher>(m_flags);
 }
 
-SurfaceFlagsTagMatcher::SurfaceFlagsTagMatcher(const int i_flags)
-    : FlagsTagMatcher(
-    i_flags,
-    [](const BrushFace &face) { return face.resolvedSurfaceFlags(); },
-    [](ChangeBrushFaceAttributesRequest &request, const int flags) {
+SurfaceFlagsTagMatcher::SurfaceFlagsTagMatcher(const int i_flags) : FlagsTagMatcher(
+    i_flags, [](const BrushFace &face) { return face.resolvedSurfaceFlags(); }, [](ChangeBrushFaceAttributesRequest &request, const int flags) {
       request.setSurfaceFlags(flags);
-    },
-    [](ChangeBrushFaceAttributesRequest &request, const int flags) {
+    }, [](ChangeBrushFaceAttributesRequest &request, const int flags) {
       request.unsetSurfaceFlags(flags);
-    },
-    [](
-        const Game &game, const int flags) { return game.surfaceFlags().flagNames(flags); }) {
+    }, [](
+        const Game &game, const int flags
+    ) { return game.surfaceFlags().flagNames(flags); }
+) {
 }
 
 std::unique_ptr<TagMatcher> SurfaceFlagsTagMatcher::clone() const {
@@ -321,8 +312,8 @@ std::unique_ptr<TagMatcher> SurfaceFlagsTagMatcher::clone() const {
 }
 
 EntityClassNameTagMatcher::EntityClassNameTagMatcher(
-    const std::string &pattern, const std::string &texture)
-    : m_pattern(pattern), m_texture(texture) {
+    const std::string &pattern, const std::string &texture
+) : m_pattern(pattern), m_texture(texture) {
 }
 
 std::unique_ptr<TagMatcher> EntityClassNameTagMatcher::clone() const {
@@ -330,20 +321,24 @@ std::unique_ptr<TagMatcher> EntityClassNameTagMatcher::clone() const {
 }
 
 bool EntityClassNameTagMatcher::matches(const Taggable &taggable) const {
-    BrushMatchVisitor visitor([this](const BrushNode &brush) {
-      if (const auto *entityNode = brush.entity()) {
-          return matchesClassname(entityNode->entity().classname());
-      } else {
-          return false;
-      }
-    });
+    BrushMatchVisitor visitor(
+        [this](const BrushNode &brush) {
+          if (const auto *entityNode = brush.entity()) {
+              return matchesClassname(entityNode->entity().classname());
+          }
+          else {
+              return false;
+          }
+        }
+    );
 
     taggable.accept(visitor);
     return visitor.matches();
 }
 
 void EntityClassNameTagMatcher::enable(
-    TagMatcherCallback &callback, MapFacade &facade) const {
+    TagMatcherCallback &callback, MapFacade &facade
+) const {
     if (!facade.selectedNodes().hasOnlyBrushes()) {
         return;
     }
@@ -353,29 +348,28 @@ void EntityClassNameTagMatcher::enable(
     auto matchingDefinitions = std::vector<Assets::EntityDefinition *>{};
 
     std::copy_if(
-        std::begin(allDefinitions),
-        std::end(allDefinitions),
-        std::back_inserter(matchingDefinitions),
-        [this](const auto *definition) {
-          return definition->type() == Assets::EntityDefinitionType::BrushEntity
-                 && matchesClassname(definition->name());
-        });
+        std::begin(allDefinitions), std::end(allDefinitions), std::back_inserter(matchingDefinitions), [this](const auto *definition) {
+          return definition->type() == Assets::EntityDefinitionType::BrushEntity && matchesClassname(definition->name());
+        }
+    );
 
     std::sort(
-        std::begin(matchingDefinitions),
-        std::end(matchingDefinitions),
-        [](const auto *lhs, const auto *rhs) {
+        std::begin(matchingDefinitions), std::end(matchingDefinitions), [](const auto *lhs, const auto *rhs) {
           return kdl::ci::str_compare(lhs->name(), rhs->name()) < 0;
-        });
+        }
+    );
 
     const Assets::EntityDefinition *definition = nullptr;
     if (matchingDefinitions.empty()) {
         return;
-    } else if (matchingDefinitions.size() == 1) {
+    }
+    else if (matchingDefinitions.size() == 1) {
         definition = matchingDefinitions.front();
-    } else {
+    }
+    else {
         const auto options = kdl::vec_transform(
-            matchingDefinitions, [](const auto *current) { return current->name(); });
+            matchingDefinitions, [](const auto *current) { return current->name(); }
+        );
         const auto index = callback.selectOption(options);
         if (index >= matchingDefinitions.size()) {
             return;
@@ -394,7 +388,8 @@ void EntityClassNameTagMatcher::enable(
 }
 
 void EntityClassNameTagMatcher::disable(
-    TagMatcherCallback & /* callback */, MapFacade &facade) const {
+    TagMatcherCallback & /* callback */, MapFacade &facade
+) const {
     // entities will be removed automatically when they become empty
 
     const auto selectedBrushes = facade.selectedNodes().nodes();
@@ -423,8 +418,7 @@ bool EntityClassNameTagMatcher::canDisable() const {
 }
 
 void EntityClassNameTagMatcher::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "EntityClassNameMatcher"
-                            << "m_pattern" << m_pattern << "m_texture" << m_texture;
+    kdl::struct_stream{str} << "EntityClassNameMatcher" << "m_pattern" << m_pattern << "m_texture" << m_texture;
 }
 
 bool EntityClassNameTagMatcher::matchesClassname(const std::string &classname) const {

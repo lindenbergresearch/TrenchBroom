@@ -43,8 +43,7 @@ class Selection;
 
 class SmartPropertyEditor;
 
-using SmartPropertyEditorMatcher =
-    std::function<bool(const std::string &, const std::vector<Model::EntityNodeBase *> &)>;
+using SmartPropertyEditorMatcher = std::function<bool(const std::string &, const std::vector<Model::EntityNodeBase *> &)>;
 
 class SmartPropertyEditorManager : public QWidget {
 private:
@@ -58,10 +57,12 @@ private:
 
 public:
     explicit SmartPropertyEditorManager(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
     void switchEditor(
-        const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes);
+        const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes
+    );
 
     bool isDefaultEditorActive() const;
 
@@ -77,8 +78,8 @@ private:
     void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
     SmartPropertyEditor *selectEditor(
-        const std::string &propertyKey,
-        const std::vector<Model::EntityNodeBase *> &nodes) const;
+        const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes
+    ) const;
 
     SmartPropertyEditor *defaultEditor() const;
 

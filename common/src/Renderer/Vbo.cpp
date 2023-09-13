@@ -25,8 +25,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-Vbo::Vbo(GLenum type, const size_t capacity, const GLenum usage)
-    : m_type(type), m_capacity(capacity) {
+Vbo::Vbo(GLenum type, const size_t capacity, const GLenum usage) : m_type(type), m_capacity(capacity) {
     assert(m_type == GL_ELEMENT_ARRAY_BUFFER || m_type == GL_ARRAY_BUFFER);
 
     glAssert(glGenBuffers(1, &m_bufferId));

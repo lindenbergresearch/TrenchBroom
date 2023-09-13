@@ -60,7 +60,8 @@ private:
 
 public:
     explicit CompilationProfileEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 private:
     QWidget *createEditorPage(QWidget *parent);

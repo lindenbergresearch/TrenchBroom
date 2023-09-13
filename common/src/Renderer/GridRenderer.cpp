@@ -34,12 +34,12 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-GridRenderer::GridRenderer(const OrthographicCamera &camera, const vm::bbox3 &worldBounds)
-    : m_vertexArray(VertexArray::move(vertices(camera, worldBounds))) {
+GridRenderer::GridRenderer(const OrthographicCamera &camera, const vm::bbox3 &worldBounds) : m_vertexArray(VertexArray::move(vertices(camera, worldBounds))) {
 }
 
 std::vector<GridRenderer::Vertex> GridRenderer::vertices(
-    const OrthographicCamera &camera, const vm::bbox3 &worldBounds) {
+    const OrthographicCamera &camera, const vm::bbox3 &worldBounds
+) {
     const auto &viewport = camera.zoomedViewport();
     const auto w = float(viewport.width) / 2.0f;
     const auto h = float(viewport.height) / 2.0f;
@@ -47,23 +47,14 @@ std::vector<GridRenderer::Vertex> GridRenderer::vertices(
     const auto &p = camera.position();
     switch (vm::find_abs_max_component(camera.direction())) {
         case vm::axis::x:
-            return {
-                Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() - w, p.z() - h)),
-                Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() - w, p.z() + h)),
-                Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() + w, p.z() + h)),
-                Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() + w, p.z() - h))};
+            return {Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() - w, p.z() - h)), Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() - w, p.z() + h)), Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() + w, p.z() + h)),
+                    Vertex(vm::vec3f(float(worldBounds.min.x()), p.y() + w, p.z() - h))};
         case vm::axis::y:
-            return {
-                Vertex(vm::vec3f(p.x() - w, float(worldBounds.max.y()), p.z() - h)),
-                Vertex(vm::vec3f(p.x() - w, float(worldBounds.max.y()), p.z() + h)),
-                Vertex(vm::vec3f(p.x() + w, float(worldBounds.max.y()), p.z() + h)),
-                Vertex(vm::vec3f(p.x() + w, float(worldBounds.max.y()), p.z() - h))};
+            return {Vertex(vm::vec3f(p.x() - w, float(worldBounds.max.y()), p.z() - h)), Vertex(vm::vec3f(p.x() - w, float(worldBounds.max.y()), p.z() + h)), Vertex(vm::vec3f(p.x() + w, float(worldBounds.max.y()), p.z() + h)),
+                    Vertex(vm::vec3f(p.x() + w, float(worldBounds.max.y()), p.z() - h))};
         case vm::axis::z:
-            return {
-                Vertex(vm::vec3f(p.x() - w, p.y() - h, float(worldBounds.min.z()))),
-                Vertex(vm::vec3f(p.x() - w, p.y() + h, float(worldBounds.min.z()))),
-                Vertex(vm::vec3f(p.x() + w, p.y() + h, float(worldBounds.min.z()))),
-                Vertex(vm::vec3f(p.x() + w, p.y() - h, float(worldBounds.min.z())))};
+            return {Vertex(vm::vec3f(p.x() - w, p.y() - h, float(worldBounds.min.z()))), Vertex(vm::vec3f(p.x() - w, p.y() + h, float(worldBounds.min.z()))), Vertex(vm::vec3f(p.x() + w, p.y() + h, float(worldBounds.min.z()))),
+                    Vertex(vm::vec3f(p.x() + w, p.y() - h, float(worldBounds.min.z())))};
         default:
             // Should not happen.
             return {};

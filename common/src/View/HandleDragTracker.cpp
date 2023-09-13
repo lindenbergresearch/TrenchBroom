@@ -44,26 +44,27 @@ namespace View {
 kdl_reflect_impl(DragState);
 
 std::optional<UpdateDragConfig> HandleDragTrackerDelegate::modifierKeyChange(
-    const InputState &, const DragState &) {
+    const InputState &, const DragState &
+) {
     return std::nullopt;
 }
 
 void HandleDragTrackerDelegate::mouseScroll(const InputState &, const DragState &) {}
 
 void HandleDragTrackerDelegate::setRenderOptions(
-    const InputState &, Renderer::RenderContext &) const {
+    const InputState &, Renderer::RenderContext &
+) const {
 }
 
 void HandleDragTrackerDelegate::render(
-    const InputState &,
-    const DragState &,
-    Renderer::RenderContext &,
-    Renderer::RenderBatch &) const {
+    const InputState &, const DragState &, Renderer::RenderContext &, Renderer::RenderBatch &
+) const {
 }
 
 DragHandlePicker makeLineHandlePicker(const vm::line3 &line, const vm::vec3 &handleOffset) {
-    return [line = vm::line3{line.point - handleOffset, line.direction},
-        handleOffset](const InputState &inputState) -> std::optional<vm::vec3> {
+    return [
+        line = vm::line3{line.point - handleOffset, line.direction}, handleOffset
+    ](const InputState &inputState) -> std::optional<vm::vec3> {
       const auto dist = vm::distance(inputState.pickRay(), line);
       if (dist.parallel) {
           return std::nullopt;
@@ -73,9 +74,11 @@ DragHandlePicker makeLineHandlePicker(const vm::line3 &line, const vm::vec3 &han
 }
 
 DragHandlePicker makePlaneHandlePicker(
-    const vm::plane3 &plane, const vm::vec3 &handleOffset) {
-    return [plane = vm::plane3{plane.anchor() - handleOffset, plane.normal},
-        handleOffset](const InputState &inputState) -> std::optional<vm::vec3> {
+    const vm::plane3 &plane, const vm::vec3 &handleOffset
+) {
+    return [
+        plane = vm::plane3{plane.anchor() - handleOffset, plane.normal}, handleOffset
+    ](const InputState &inputState) -> std::optional<vm::vec3> {
       const auto distance = vm::intersect_ray_plane(inputState.pickRay(), plane);
       if (vm::is_nan(distance)) {
           return std::nullopt;
@@ -85,12 +88,11 @@ DragHandlePicker makePlaneHandlePicker(
 }
 
 DragHandlePicker makeCircleHandlePicker(
-    const vm::vec3 &center,
-    const vm::vec3 &normal,
-    const FloatType radius,
-    const vm::vec3 &handleOffset) {
+    const vm::vec3 &center, const vm::vec3 &normal, const FloatType radius, const vm::vec3 &handleOffset
+) {
     return [center = center - handleOffset, normal, radius, handleOffset](
-        const InputState &inputState) -> std::optional<vm::vec3> {
+        const InputState &inputState
+    ) -> std::optional<vm::vec3> {
       const auto plane = vm::plane3{center, normal};
       const auto distance = vm::intersect_ray_plane(inputState.pickRay(), plane);
       if (vm::is_nan(distance)) {
@@ -104,9 +106,11 @@ DragHandlePicker makeCircleHandlePicker(
 }
 
 DragHandlePicker makeSurfaceHandlePicker(
-    Model::HitFilter filter, const vm::vec3 &handleOffset) {
-    return [filter = std::move(filter),
-        handleOffset](const InputState &inputState) -> std::optional<vm::vec3> {
+    Model::HitFilter filter, const vm::vec3 &handleOffset
+) {
+    return [
+        filter = std::move(filter), handleOffset
+    ](const InputState &inputState) -> std::optional<vm::vec3> {
       const auto &hit = inputState.pickResult().first(filter);
       if (!hit.isMatch()) {
           return std::nullopt;
@@ -123,30 +127,24 @@ DragHandleSnapper makeIdentityHandleSnapper() {
 
 DragHandleSnapper makeRelativeHandleSnapper(const Grid &grid) {
     return [&grid](
-        const InputState &,
-        const DragState &dragState,
-        const vm::vec3 &proposedHandlePosition) {
-      return dragState.initialHandlePosition
-             + grid.snap(proposedHandlePosition - dragState.initialHandlePosition);
+        const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
+    ) {
+      return dragState.initialHandlePosition + grid.snap(proposedHandlePosition - dragState.initialHandlePosition);
     };
 }
 
 DragHandleSnapper makeAbsoluteHandleSnapper(const Grid &grid) {
-    return
-        [&grid](const InputState &, const DragState &, const vm::vec3 &proposedHandlePosition) {
-          return grid.snap(proposedHandlePosition);
-        };
+    return [&grid](const InputState &, const DragState &, const vm::vec3 &proposedHandlePosition) {
+      return grid.snap(proposedHandlePosition);
+    };
 }
 
 DragHandleSnapper makeRelativeLineHandleSnapper(const Grid &grid, const vm::line3 &line) {
     return [&grid, line](
-        const InputState &,
-        const DragState &dragState,
-        const vm::vec3 &proposedHandlePosition) {
-      const auto initialDistanceOnLine =
-          vm::dot(dragState.initialHandlePosition - line.point, line.direction);
-      const auto proposedDistanceOnLine =
-          vm::dot(proposedHandlePosition - line.point, line.direction);
+        const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
+    ) {
+      const auto initialDistanceOnLine = vm::dot(dragState.initialHandlePosition - line.point, line.direction);
+      const auto proposedDistanceOnLine = vm::dot(proposedHandlePosition - line.point, line.direction);
       const auto delta = grid.snap(proposedDistanceOnLine - initialDistanceOnLine);
       return vm::point_at_distance(line, initialDistanceOnLine + delta);
     };
@@ -154,21 +152,18 @@ DragHandleSnapper makeRelativeLineHandleSnapper(const Grid &grid, const vm::line
 
 DragHandleSnapper makeAbsoluteLineHandleSnapper(const Grid &grid, const vm::line3 &line) {
     return [&grid, line](
-        const InputState &, const DragState &, const vm::vec3 &proposedHandlePosition) {
+        const InputState &, const DragState &, const vm::vec3 &proposedHandlePosition
+    ) {
       return grid.snap(proposedHandlePosition, line);
     };
 }
 
 DragHandleSnapper makeCircleHandleSnapper(
-    const Grid &grid,
-    FloatType snapAngle,
-    const vm::vec3 &center,
-    const vm::vec3 &normal,
-    const FloatType radius) {
+    const Grid &grid, FloatType snapAngle, const vm::vec3 &center, const vm::vec3 &normal, const FloatType radius
+) {
     return [&grid, snapAngle, center, normal, radius](
-        const InputState &,
-        const DragState &dragState,
-        const vm::vec3 &proposedHandlePosition) -> std::optional<vm::vec3> {
+        const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
+    ) -> std::optional<vm::vec3> {
       if (proposedHandlePosition == center) {
           return std::nullopt;
       }
@@ -185,7 +180,8 @@ DragHandleSnapper makeCircleHandleSnapper(
 
 HandlePositionProposer makeBrushFaceHandleProposer(const Grid &grid) {
     return [&grid](
-        const InputState &inputState, const DragState &) -> std::optional<vm::vec3> {
+        const InputState &inputState, const DragState &
+    ) -> std::optional<vm::vec3> {
       using namespace Model::HitFilters;
 
       const auto &hit = inputState.pickResult().first(type(Model::BrushNode::BrushHitType));
@@ -201,11 +197,13 @@ HandlePositionProposer makeBrushFaceHandleProposer(const Grid &grid) {
 }
 
 HandlePositionProposer makeHandlePositionProposer(
-    DragHandlePicker pickHandlePosition, DragHandleSnapper snapHandlePosition) {
-    return [pickHandlePosition = std::move(pickHandlePosition),
-        snapHandlePosition = std::move(snapHandlePosition)](
-        const InputState &inputState,
-        const DragState &dragState) -> std::optional<vm::vec3> {
+    DragHandlePicker pickHandlePosition, DragHandleSnapper snapHandlePosition
+) {
+    return [
+        pickHandlePosition = std::move(pickHandlePosition), snapHandlePosition = std::move(snapHandlePosition)
+    ](
+        const InputState &inputState, const DragState &dragState
+    ) -> std::optional<vm::vec3> {
       if (const auto handlePosition = pickHandlePosition(inputState)) {
           return snapHandlePosition(inputState, dragState, *handlePosition);
       }

@@ -40,7 +40,8 @@ std::vector<std::filesystem::path> loadRecentDocuments(const size_t max) {
         const auto value = settings.value(key);
         if (value.isValid()) {
             result.push_back(IO::pathFromQString(value.toString()));
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -60,10 +61,8 @@ void saveRecentDocuments(const std::vector<std::filesystem::path> &paths) {
 }
 
 RecentDocuments::RecentDocuments(
-    const size_t maxSize,
-    std::function<bool(std::filesystem::path)> filterPredicate,
-    QObject *parent)
-    : QObject{parent}, m_maxSize{maxSize}, m_filterPredicate{std::move(filterPredicate)} {
+    const size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent
+) : QObject{parent}, m_maxSize{maxSize}, m_filterPredicate{std::move(filterPredicate)} {
     assert(m_maxSize > 0);
 }
 
@@ -130,8 +129,7 @@ std::vector<std::filesystem::path> RecentDocuments::updateFilteredDocuments() {
 
 void RecentDocuments::insertPath(const std::filesystem::path &path) {
     const auto canonPath = path.lexically_normal();
-    auto it =
-        std::find(std::begin(m_recentDocuments), std::end(m_recentDocuments), canonPath);
+    auto it = std::find(std::begin(m_recentDocuments), std::end(m_recentDocuments), canonPath);
     if (it != std::end(m_recentDocuments)) {
         m_recentDocuments.erase(it);
     }
@@ -156,7 +154,8 @@ void RecentDocuments::clearMenu(QMenu &menu) {
 void RecentDocuments::createMenuItems(QMenu &menu) {
     for (const auto &path: m_filteredDocuments) {
         menu.addAction(
-            IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); });
+            IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); }
+        );
     }
 }
 } // namespace TrenchBroom::View

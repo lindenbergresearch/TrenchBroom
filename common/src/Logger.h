@@ -26,10 +26,7 @@ class QString;
 
 namespace TrenchBroom {
 enum class LogLevel {
-  Debug,
-  Info,
-  Warn,
-  Error
+  Debug, Info, Warn, Error
 };
 
 class Logger {

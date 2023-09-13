@@ -71,10 +71,7 @@ private:
     std::unique_ptr<GroupLinkRenderer> m_groupLinkRenderer;
 
     enum class Renderer {
-      Default = 1,
-      Selection = 2,
-      Locked = 4,
-      All = Default | Selection | Locked
+      Default = 1, Selection = 2, Locked = 4, All = Default | Selection | Locked
     };
 
     std::unordered_map<Model::Node *, int> m_trackedNodes;
@@ -90,13 +87,16 @@ deleteCopyAndMove(MapRenderer);
 
 private:
     static std::unique_ptr<ObjectRenderer> createDefaultRenderer(
-        std::weak_ptr<View::MapDocument> document);
+        std::weak_ptr<View::MapDocument> document
+    );
 
     static std::unique_ptr<ObjectRenderer> createSelectionRenderer(
-        std::weak_ptr<View::MapDocument> document);
+        std::weak_ptr<View::MapDocument> document
+    );
 
     static std::unique_ptr<ObjectRenderer> createLockRenderer(
-        std::weak_ptr<View::MapDocument> document);
+        std::weak_ptr<View::MapDocument> document
+    );
 
     void clear();
 

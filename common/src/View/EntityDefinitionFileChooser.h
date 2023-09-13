@@ -49,7 +49,8 @@ public:
 
 protected: // QAbstractItemView overrides
     void selectionChanged(
-        const QItemSelection &selected, const QItemSelection &deselected) override;
+        const QItemSelection &selected, const QItemSelection &deselected
+    ) override;
     // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
     // QEvent* event) const override;
 };
@@ -68,7 +69,8 @@ private:
 
 public:
     explicit EntityDefinitionFileChooser(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
+    );
 
 private:
     void createGui();

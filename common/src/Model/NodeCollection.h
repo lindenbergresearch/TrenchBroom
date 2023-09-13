@@ -48,8 +48,7 @@ private:
     std::vector<PatchNode *> m_patches;
 
 public:
-    kdl_reflect_decl(
-        NodeCollection, m_nodes, m_layers, m_groups, m_entities, m_brushes, m_patches);
+    kdl_reflect_decl(NodeCollection, m_nodes, m_layers, m_groups, m_entities, m_brushes, m_patches);
 
     NodeCollection();
 

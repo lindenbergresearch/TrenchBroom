@@ -43,17 +43,13 @@ private:
 
 public:
     explicit FlagsPopupEditor(
-        size_t numCols,
-        QWidget *parent = nullptr,
-        const QString &buttonLabel = "...",
-        bool showFlagsText = true);
+        size_t numCols, QWidget *parent = nullptr, const QString &buttonLabel = "...", bool showFlagsText = true
+    );
 
     void setFlags(const QStringList &labels, const QStringList &tooltips = QStringList());
 
     void setFlags(
-        const QList<int> &values,
-        const QStringList &labels,
-        const QStringList &tooltips = QStringList());
+        const QList<int> &values, const QStringList &labels, const QStringList &tooltips = QStringList());
 
     void setFlagValue(int set, int mixed = 0);
 

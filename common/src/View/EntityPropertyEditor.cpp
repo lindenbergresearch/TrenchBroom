@@ -41,9 +41,8 @@
 namespace TrenchBroom {
 namespace View {
 EntityPropertyEditor::EntityPropertyEditor(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)}, m_splitter{nullptr}, m_propertyGrid{nullptr},
-      m_smartEditorManager{nullptr}, m_documentationText{nullptr}, m_currentDefinition{nullptr} {
+    std::weak_ptr<MapDocument> document, QWidget *parent
+) : QWidget{parent}, m_document{std::move(document)}, m_splitter{nullptr}, m_propertyGrid{nullptr}, m_smartEditorManager{nullptr}, m_documentationText{nullptr}, m_currentDefinition{nullptr} {
     createGui(m_document);
     connectObservers();
 }
@@ -59,9 +58,9 @@ void EntityPropertyEditor::OnCurrentRowChanged() {
 void EntityPropertyEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &EntityPropertyEditor::selectionDidChange);
-    m_notifierConnection +=
-        document->nodesDidChangeNotifier.connect(this, &EntityPropertyEditor::nodesDidChange);
+        this, &EntityPropertyEditor::selectionDidChange
+    );
+    m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &EntityPropertyEditor::nodesDidChange);
 }
 
 void EntityPropertyEditor::selectionDidChange(const Selection &) {
@@ -74,8 +73,7 @@ void EntityPropertyEditor::nodesDidChange(const std::vector<Model::Node *> &) {
 
 void EntityPropertyEditor::updateIfSelectedEntityDefinitionChanged() {
     auto document = kdl::mem_lock(m_document);
-    const auto *entityDefinition =
-        Model::selectEntityDefinition(document->allSelectedEntityNodes());
+    const auto *entityDefinition = Model::selectEntityDefinition(document->allSelectedEntityNodes());
 
     if (entityDefinition != m_currentDefinition) {
         m_currentDefinition = entityDefinition;
@@ -99,13 +97,13 @@ void EntityPropertyEditor::updateDocumentationAndSmartEditor() {
 }
 
 QString EntityPropertyEditor::optionDescriptions(
-    const Assets::PropertyDefinition &definition) {
+    const Assets::PropertyDefinition &definition
+) {
     static const auto bullet = QString{" "} + QChar{0x2022} + QString{" "};
 
     switch (definition.type()) {
         case Assets::PropertyDefinitionType::ChoiceProperty: {
-            const auto &choiceDef =
-                dynamic_cast<const Assets::ChoicePropertyDefinition &>(definition);
+            const auto &choiceDef = dynamic_cast<const Assets::ChoicePropertyDefinition &>(definition);
 
             auto result = QString{};
             auto stream = QTextStream{&result};
@@ -119,8 +117,7 @@ QString EntityPropertyEditor::optionDescriptions(
             return result;
         }
         case Assets::PropertyDefinitionType::FlagsProperty: {
-            const auto &flagsDef =
-                dynamic_cast<const Assets::FlagsPropertyDefinition &>(definition);
+            const auto &flagsDef = dynamic_cast<const Assets::FlagsPropertyDefinition &>(definition);
 
             // The options are not necessarily sorted by value, so we sort the descriptions here
             // by inserting into a map sorted by the flag value.
@@ -158,27 +155,21 @@ void EntityPropertyEditor::updateDocumentation(const std::string &propertyKey) {
     m_documentationText->clear();
 
     auto document = kdl::mem_lock(m_document);
-    if (
-        const auto *entityDefinition =
-            Model::selectEntityDefinition(document->allSelectedEntityNodes())) {
+    if (const auto *entityDefinition = Model::selectEntityDefinition(document->allSelectedEntityNodes())) {
         auto normalFormat = QTextCharFormat{};
         auto boldFormat = QTextCharFormat{};
         boldFormat.setFontWeight(QFont::Bold);
 
         // add property documentation, if available
-        if (
-            const auto *propertyDefinition = entityDefinition->propertyDefinition(propertyKey)) {
+        if (const auto *propertyDefinition = entityDefinition->propertyDefinition(propertyKey)) {
             const auto optionsDescription = optionDescriptions(*propertyDefinition);
 
-            const auto propertyHasDocs = !propertyDefinition->longDescription().empty()
-                                         || !propertyDefinition->shortDescription().empty()
-                                         || !optionsDescription.isEmpty();
+            const auto propertyHasDocs = !propertyDefinition->longDescription().empty() || !propertyDefinition->shortDescription().empty() || !optionsDescription.isEmpty();
 
             if (propertyHasDocs) {
                 // e.g. "Property "delay" (Attenuation formula)", in bold
                 {
-                    auto title =
-                        tr("Property \"%1\"").arg(QString::fromStdString(propertyDefinition->key()));
+                    auto title = tr("Property \"%1\"").arg(QString::fromStdString(propertyDefinition->key()));
                     if (!propertyDefinition->shortDescription().empty()) {
                         title += tr(" (%1)").arg(
                             QString::fromStdString(propertyDefinition->shortDescription()));
@@ -269,10 +260,8 @@ void EntityPropertyEditor::createGui(std::weak_ptr<MapDocument> document) {
     setLayout(layout);
 
     connect(
-        m_propertyGrid,
-        &EntityPropertyGrid::currentRowChanged,
-        this,
-        &EntityPropertyEditor::OnCurrentRowChanged);
+        m_propertyGrid, &EntityPropertyGrid::currentRowChanged, this, &EntityPropertyEditor::OnCurrentRowChanged
+    );
 }
 
 void EntityPropertyEditor::updateMinimumSize() {

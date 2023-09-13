@@ -29,8 +29,7 @@
 
 namespace TrenchBroom {
 namespace View {
-CurrentGameIndicator::CurrentGameIndicator(const std::string &gameName, QWidget *parent)
-    : DialogHeader{parent} {
+CurrentGameIndicator::CurrentGameIndicator(const std::string &gameName, QWidget *parent) : DialogHeader{parent} {
     auto &gameFactory = Model::GameFactory::instance();
 
     const auto gamePath = gameFactory.gamePath(gameName);

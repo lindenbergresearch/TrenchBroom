@@ -44,7 +44,8 @@ Polyhedron<T, FP, VP> Polyhedron<T, FP, VP>::intersect(Polyhedron other) const {
 
 template<typename T, typename FP, typename VP>
 std::vector<Polyhedron<T, FP, VP>> Polyhedron<T, FP, VP>::subtract(
-    const Polyhedron &subtrahend) const {
+    const Polyhedron &subtrahend
+) const {
     Subtract subtract(*this, subtrahend);
     return subtract.result();
 }
@@ -61,11 +62,11 @@ private:
     using PlaneList = std::vector<vm::plane<T, 3>>;
 
 public:
-    Subtract(const Polyhedron &minuend, const Polyhedron &subtrahend)
-        : m_minuend(minuend), m_subtrahend(subtrahend) {
+    Subtract(const Polyhedron &minuend, const Polyhedron &subtrahend) : m_minuend(minuend), m_subtrahend(subtrahend) {
         if (clipSubtrahend()) {
             subtract();
-        } else {
+        }
+        else {
             // minuend and subtrahend are disjoint
             m_fragments = {minuend};
         }
@@ -117,25 +118,21 @@ private:
     static PlaneList sortPlanes(PlaneList planes) {
         auto it = std::begin(planes);
         it = sortPlanes(
-            it,
-            std::end(planes),
-            {vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_z()});
+            it, std::end(planes), {vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_z()}
+        );
         it = sortPlanes(
-            it,
-            std::end(planes),
-            {vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_z()});
+            it, std::end(planes), {vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_z()}
+        );
         sortPlanes(
-            it,
-            std::end(planes),
-            {vm::vec<T, 3>::pos_z(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y()});
+            it, std::end(planes), {vm::vec<T, 3>::pos_z(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y()}
+        );
 
         return planes;
     }
 
     static typename PlaneList::iterator sortPlanes(
-        typename PlaneList::iterator begin,
-        typename PlaneList::iterator end,
-        const std::vector<vm::vec<T, 3>> &axes) {
+        typename PlaneList::iterator begin, typename PlaneList::iterator end, const std::vector<vm::vec<T, 3>> &axes
+    ) {
         if (begin == end) {
             return end;
         }
@@ -153,9 +150,8 @@ private:
     }
 
     static typename PlaneList::iterator selectPlanes(
-        typename PlaneList::iterator begin,
-        typename PlaneList::iterator end,
-        const std::vector<vm::vec<T, 3>> &axes) {
+        typename PlaneList::iterator begin, typename PlaneList::iterator end, const std::vector<vm::vec<T, 3>> &axes
+    ) {
         assert(begin != end);
         assert(!axes.empty());
 
@@ -165,9 +161,7 @@ private:
             auto newBestIt = selectPlane(it, bestIt, end, axis);
 
             // Resolve ambiguities if necessary.
-            for (auto axIt = std::next(std::begin(axes)), axEnd = std::end(axes);
-                 newBestIt == end && axIt != axEnd;
-                 ++axIt) {
+            for (auto axIt = std::next(std::begin(axes)), axEnd = std::end(axes); newBestIt == end && axIt != axEnd; ++axIt) {
                 const vm::vec<T, 3> &altAxis = *axIt;
                 newBestIt = selectPlane(it, bestIt, end, altAxis);
                 if (newBestIt != end) {
@@ -223,10 +217,8 @@ private:
      * @return an iterator to the new best plane
      */
     static typename PlaneList::iterator selectPlane(
-        typename PlaneList::iterator curIt,
-        typename PlaneList::iterator bestIt,
-        typename PlaneList::iterator end,
-        const vm::vec<T, 3> &axis) {
+        typename PlaneList::iterator curIt, typename PlaneList::iterator bestIt, typename PlaneList::iterator end, const vm::vec<T, 3> &axis
+    ) {
         const T curDot = vm::dot(curIt->normal, axis);
         if (curDot == 0.0) {
             return bestIt;
@@ -238,9 +230,11 @@ private:
         const T bestDot = bestIt != end ? vm::dot(bestIt->normal, axis) : 0.0;
         if (vm::abs(curDot) > vm::abs(bestDot)) {
             return curIt;
-        } else if (vm::abs(curDot) < vm::abs(bestDot)) {
+        }
+        else if (vm::abs(curDot) < vm::abs(bestDot)) {
             return bestIt; // implies bestIt != end
-        } else {
+        }
+        else {
             // vm::abs(curDot) == vm::abs(bestDot), resolve ambiguities.
 
             assert(bestIt != end); // Because curDot != 0.0, the same is true for bestDot!
@@ -256,9 +250,8 @@ private:
     }
 
     void doSubtract(
-        const Fragments &fragments,
-        typename PlaneList::const_iterator curPlaneIt,
-        typename PlaneList::const_iterator endPlaneIt) {
+        const Fragments &fragments, typename PlaneList::const_iterator curPlaneIt, typename PlaneList::const_iterator endPlaneIt
+    ) {
         if (fragments.empty() || curPlaneIt == endPlaneIt) {
             // no more fragments to process or all of `minutendFragments`
             // are now behind all of subtrahendPlanes so they can be discarded.

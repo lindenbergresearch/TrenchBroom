@@ -28,7 +28,7 @@ Q_OBJECT
 public:
     explicit SplitterHandle(Qt::Orientation orientation, QSplitter *parent = nullptr);
 
-  //  QSize sizeHint() const override;
+    //  QSize sizeHint() const override;
 
 protected:
     //void paintEvent(QPaintEvent *event) override;

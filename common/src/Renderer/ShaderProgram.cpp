@@ -36,13 +36,11 @@
 
 namespace TrenchBroom::Renderer {
 
-ShaderProgram::ShaderProgram(std::string name, const GLuint programId)
-    : m_name{std::move(name)}, m_programId{programId} {
+ShaderProgram::ShaderProgram(std::string name, const GLuint programId) : m_name{std::move(name)}, m_programId{programId} {
     assert(m_programId != 0);
 }
 
-ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept
-    : m_name{std::move(other.m_name)}, m_programId{std::exchange(other.m_programId, 0)} {
+ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept: m_name{std::move(other.m_name)}, m_programId{std::exchange(other.m_programId, 0)} {
 }
 
 ShaderProgram &ShaderProgram::operator=(ShaderProgram &&other) noexcept {
@@ -72,8 +70,7 @@ std::string getInfoLog(const GLuint programId) {
         auto infoLog = std::string{};
         infoLog.resize(size_t(infoLogLength));
 
-        glAssert(
-            glGetProgramInfoLog(programId, infoLogLength, &infoLogLength, infoLog.data()));
+        glAssert(glGetProgramInfoLog(programId, infoLogLength, &infoLogLength, infoLog.data()));
         return infoLog;
     }
 
@@ -88,8 +85,7 @@ Result<void> ShaderProgram::link() {
     glAssert(glGetProgramiv(m_programId, GL_LINK_STATUS, &linkStatus));
 
     if (linkStatus == 0) {
-        return Error{
-            "Could not link shader program '" + m_name + "': " + getInfoLog(m_programId)};
+        return Error{"Could not link shader program '" + m_name + "': " + getInfoLog(m_programId)};
     }
 
     return kdl::void_success;
@@ -146,8 +142,7 @@ void ShaderProgram::set(const std::string &name, const vm::vec3f &value) {
 
 void ShaderProgram::set(const std::string &name, const vm::vec4f &value) {
     assert(checkActive());
-    glAssert(
-        glUniform4f(findUniformLocation(name), value.x(), value.y(), value.z(), value.w()));
+    glAssert(glUniform4f(findUniformLocation(name), value.x(), value.y(), value.z(), value.w()));
 }
 
 void ShaderProgram::set(const std::string &name, const vm::mat2x2f &value) {

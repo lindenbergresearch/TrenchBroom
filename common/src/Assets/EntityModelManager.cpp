@@ -31,8 +31,8 @@
 namespace TrenchBroom {
 namespace Assets {
 EntityModelManager::EntityModelManager(
-    const int magFilter, const int minFilter, Logger &logger)
-    : m_logger(logger), m_loader(nullptr), m_minFilter(minFilter), m_magFilter(magFilter), m_resetTextureMode(false) {
+    const int magFilter, const int minFilter, Logger &logger
+) : m_logger(logger), m_loader(nullptr), m_minFilter(minFilter), m_magFilter(magFilter), m_resetTextureMode(false) {
 }
 
 EntityModelManager::~EntityModelManager() {
@@ -63,7 +63,8 @@ void EntityModelManager::setLoader(const IO::EntityModelLoader *loader) {
 }
 
 Renderer::TexturedRenderer *EntityModelManager::renderer(
-    const Assets::ModelSpecification &spec) const {
+    const Assets::ModelSpecification &spec
+) const {
     auto *entityModel = safeGetModel(spec.path);
 
     if (entityModel == nullptr) {
@@ -89,22 +90,25 @@ Renderer::TexturedRenderer *EntityModelManager::renderer(
         m_unpreparedRenderers.push_back(result);
         m_logger.debug() << "Constructed entity model renderer for " << spec;
         return result;
-    } else {
+    }
+    else {
         m_rendererMismatches.insert(spec);
-        m_logger.error() << "Failed to construct entity model renderer for " << spec
-                         << ", check the skin and frame indices";
+        m_logger.error() << "Failed to construct entity model renderer for " << spec << ", check the skin and frame indices";
         return nullptr;
     }
 }
 
 const EntityModelFrame *EntityModelManager::frame(
-    const Assets::ModelSpecification &spec) const {
+    const Assets::ModelSpecification &spec
+) const {
     auto *model = this->safeGetModel(spec.path);
     if (model == nullptr) {
         return nullptr;
-    } else if (spec.frameIndex >= model->frameCount()) {
+    }
+    else if (spec.frameIndex >= model->frameCount()) {
         return nullptr;
-    } else {
+    }
+    else {
         if (!model->frame(spec.frameIndex)->loaded()) {
             loadFrame(spec, *model);
         }
@@ -137,8 +141,7 @@ EntityModel *EntityModelManager::model(const std::filesystem::path &path) const 
         m_logger.debug() << "Loaded entity model " << path;
 
         return model;
-    }
-    catch (const GameException &e) {
+    } catch (const GameException &e) {
         m_logger.error() << e.what();
         m_modelMismatches.insert(path);
         throw;
@@ -148,25 +151,25 @@ EntityModel *EntityModelManager::model(const std::filesystem::path &path) const 
 EntityModel *EntityModelManager::safeGetModel(const std::filesystem::path &path) const {
     try {
         return model(path);
-    }
-    catch (const GameException &) {
+    } catch (const GameException &) {
         return nullptr;
     }
 }
 
 std::unique_ptr<EntityModel> EntityModelManager::loadModel(
-    const std::filesystem::path &path) const {
+    const std::filesystem::path &path
+) const {
     ensure(m_loader != nullptr, "loader is null");
     return m_loader->initializeModel(path, m_logger);
 }
 
 void EntityModelManager::loadFrame(
-    const Assets::ModelSpecification &spec, Assets::EntityModel &model) const {
+    const Assets::ModelSpecification &spec, Assets::EntityModel &model
+) const {
     try {
         ensure(m_loader != nullptr, "loader is null");
         m_loader->loadFrame(spec.path, spec.frameIndex, model, m_logger);
-    }
-    catch (const Exception &e) {
+    } catch (const Exception &e) {
         // FIXME: be specific about which exceptions to catch here
         m_logger.error() << "Could not load entity model frame " << spec << ": " << e.what();
     }

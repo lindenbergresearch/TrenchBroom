@@ -64,16 +64,10 @@ struct CompilationRunTool {
   std::string parameterSpec;
   bool treatNonZeroResultCodeAsError;
 
-  kdl_reflect_decl(
-      CompilationRunTool, enabled, toolSpec, parameterSpec, treatNonZeroResultCodeAsError);
+  kdl_reflect_decl(CompilationRunTool, enabled, toolSpec, parameterSpec, treatNonZeroResultCodeAsError);
 };
 
-using CompilationTask = std::variant<
-    CompilationExportMap,
-    CompilationCopyFiles,
-    CompilationRenameFile,
-    CompilationDeleteFiles,
-    CompilationRunTool>;
+using CompilationTask = std::variant<CompilationExportMap, CompilationCopyFiles, CompilationRenameFile, CompilationDeleteFiles, CompilationRunTool>;
 
 std::ostream &operator<<(std::ostream &lhs, const CompilationTask &rhs);
 } // namespace Model

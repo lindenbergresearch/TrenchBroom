@@ -42,8 +42,7 @@ void AttrString::LineFunc::process(const std::string &str, const Justify justify
     }
 }
 
-AttrString::Line::Line(const std::string &i_string, Justify i_justify)
-    : string(i_string), justify(i_justify) {
+AttrString::Line::Line(const std::string &i_string, Justify i_justify) : string(i_string), justify(i_justify) {
 }
 
 AttrString::AttrString() {}

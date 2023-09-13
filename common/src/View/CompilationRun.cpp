@@ -45,16 +45,14 @@ bool CompilationRun::running() const {
 }
 
 void CompilationRun::run(
-    const Model::CompilationProfile &profile,
-    std::shared_ptr<MapDocument> document,
-    QTextEdit *currentOutput) {
+    const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput
+) {
     run(profile, std::move(document), currentOutput, false);
 }
 
 void CompilationRun::test(
-    const Model::CompilationProfile &profile,
-    std::shared_ptr<MapDocument> document,
-    QTextEdit *currentOutput) {
+    const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput
+) {
     run(profile, std::move(document), currentOutput, true);
 }
 
@@ -69,10 +67,8 @@ bool CompilationRun::doIsRunning() const {
 }
 
 void CompilationRun::run(
-    const Model::CompilationProfile &profile,
-    std::shared_ptr<MapDocument> document,
-    QTextEdit *currentOutput,
-    const bool test) {
+    const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput, const bool test
+) {
     ensure(!profile.tasks.empty(), "profile has no tasks");
     ensure(document != nullptr, "document is null");
     ensure(currentOutput != nullptr, "currentOutput is null");
@@ -82,29 +78,28 @@ void CompilationRun::run(
 
     auto variables = CompilationVariables{document, buildWorkDir(profile, document)};
 
-    auto compilationContext =
-        CompilationContext{document, variables, TextOutputAdapter{currentOutput}, test};
+    auto compilationContext = CompilationContext{document, variables, TextOutputAdapter{currentOutput}, test};
     m_currentRun = new CompilationRunner{std::move(compilationContext), profile, this};
     connect(
-        m_currentRun,
-        &CompilationRunner::compilationStarted,
-        this,
-        &CompilationRun::compilationStarted);
-    connect(m_currentRun, &CompilationRunner::compilationEnded, this, [&]() {
-      cleanup();
-      emit compilationEnded();
-    });
+        m_currentRun, &CompilationRunner::compilationStarted, this, &CompilationRun::compilationStarted
+    );
+    connect(
+        m_currentRun, &CompilationRunner::compilationEnded, this, [&]() {
+          cleanup();
+          emit compilationEnded();
+        }
+    );
     m_currentRun->execute();
 }
 
 std::string CompilationRun::buildWorkDir(
-    const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document) {
+    const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document
+) {
     try {
         return EL::interpolate(
-            profile.workDirSpec,
-            EL::EvaluationContext{CompilationWorkDirVariables{std::move(document)}});
-    }
-    catch (const Exception &) {
+            profile.workDirSpec, EL::EvaluationContext{CompilationWorkDirVariables{std::move(document)}}
+        );
+    } catch (const Exception &) {
         return "";
     }
 }

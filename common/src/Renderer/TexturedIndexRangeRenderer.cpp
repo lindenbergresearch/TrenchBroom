@@ -26,15 +26,13 @@ TexturedRenderer::~TexturedRenderer() = default;
 TexturedIndexRangeRenderer::TexturedIndexRangeRenderer() {}
 
 TexturedIndexRangeRenderer::TexturedIndexRangeRenderer(
-    const VertexArray &vertexArray, const TexturedIndexRangeMap &indexRange)
-    : m_vertexArray(vertexArray), m_indexRange(indexRange) {
+    const VertexArray &vertexArray, const TexturedIndexRangeMap &indexRange
+) : m_vertexArray(vertexArray), m_indexRange(indexRange) {
 }
 
 TexturedIndexRangeRenderer::TexturedIndexRangeRenderer(
-    const VertexArray &vertexArray,
-    const Assets::Texture *texture,
-    const IndexRangeMap &indexRange)
-    : m_vertexArray(vertexArray), m_indexRange(texture, indexRange) {
+    const VertexArray &vertexArray, const Assets::Texture *texture, const IndexRangeMap &indexRange
+) : m_vertexArray(vertexArray), m_indexRange(texture, indexRange) {
 }
 
 TexturedIndexRangeRenderer::~TexturedIndexRangeRenderer() = default;
@@ -62,8 +60,8 @@ void TexturedIndexRangeRenderer::render(TextureRenderFunc &func) {
 }
 
 MultiTexturedIndexRangeRenderer::MultiTexturedIndexRangeRenderer(
-    std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers)
-    : m_renderers(std::move(renderers)) {
+    std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers
+) : m_renderers(std::move(renderers)) {
 }
 
 MultiTexturedIndexRangeRenderer::~MultiTexturedIndexRangeRenderer() = default;

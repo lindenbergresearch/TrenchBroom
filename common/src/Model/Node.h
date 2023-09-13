@@ -145,10 +145,12 @@ protected:
     void cloneAttributes(Node *node) const;
 
     static std::vector<Node *> clone(
-        const vm::bbox3 &worldBounds, const std::vector<Node *> &nodes);
+        const vm::bbox3 &worldBounds, const std::vector<Node *> &nodes
+    );
 
     static std::vector<Node *> cloneRecursively(
-        const vm::bbox3 &worldBounds, const std::vector<Node *> &nodes);
+        const vm::bbox3 &worldBounds, const std::vector<Node *> &nodes
+    );
 
     template<typename I, typename O>
     static void clone(const vm::bbox3 &worldBounds, I cur, I end, O result) {
@@ -216,7 +218,8 @@ public:
     Node &addChild(Node *child);
 
     std::vector<std::unique_ptr<Node>> replaceChildren(
-        std::vector<std::unique_ptr<Node>> newChildren);
+        std::vector<std::unique_ptr<Node>> newChildren
+    );
 
     template<typename I>
     void removeChildren(I cur, I end) {
@@ -477,10 +480,12 @@ public: // visitors
             using R = typename NodeLambdaVisitorResult<L>::R;
             if (auto *parent = this->parent()) {
                 return std::optional<R>{parent->accept(lambda)};
-            } else {
+            }
+            else {
                 return std::optional<R>{};
             }
-        } else {
+        }
+        else {
             if (auto *parent = this->parent()) {
                 parent->accept(lambda);
             }
@@ -502,10 +507,12 @@ public: // visitors
             using R = typename NodeLambdaVisitorResult<L>::R;
             if (const auto *parent = this->parent()) {
                 return std::optional<R>{parent->accept(lambda)};
-            } else {
+            }
+            else {
                 return std::optional<R>{};
             }
-        } else {
+        }
+        else {
             if (const auto *parent = this->parent()) {
                 parent->accept(lambda);
             }
@@ -543,19 +550,18 @@ public: // entity property configuration access
 
 protected: // index management
     void findEntityNodesWithProperty(
-        const std::string &key,
-        const std::string &value,
-        std::vector<EntityNodeBase *> &result) const;
+        const std::string &key, const std::string &value, std::vector<EntityNodeBase *> &result
+    ) const;
 
     void findEntityNodesWithNumberedProperty(
-        const std::string &prefix,
-        const std::string &value,
-        std::vector<EntityNodeBase *> &result) const;
+        const std::string &prefix, const std::string &value, std::vector<EntityNodeBase *> &result
+    ) const;
 
     void addToIndex(EntityNodeBase *node, const std::string &key, const std::string &value);
 
     void removeFromIndex(
-        EntityNodeBase *node, const std::string &key, const std::string &value);
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    );
 
 private: // subclassing interface
     virtual const std::string &doGetName() const = 0;
@@ -619,10 +625,12 @@ private: // subclassing interface
     virtual bool doSelectable() const = 0;
 
     virtual void doPick(
-        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) = 0;
+        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
+    ) = 0;
 
     virtual void doFindNodesContaining(
-        const vm::vec3 &point, std::vector<Node *> &result) = 0;
+        const vm::vec3 &point, std::vector<Node *> &result
+    ) = 0;
 
     virtual void doAccept(NodeVisitor &visitor) = 0;
 
@@ -631,20 +639,20 @@ private: // subclassing interface
     virtual const EntityPropertyConfig &doGetEntityPropertyConfig() const;
 
     virtual void doFindEntityNodesWithProperty(
-        const std::string &key,
-        const std::string &value,
-        std::vector<EntityNodeBase *> &result) const;
+        const std::string &key, const std::string &value, std::vector<EntityNodeBase *> &result
+    ) const;
 
     virtual void doFindEntityNodesWithNumberedProperty(
-        const std::string &prefix,
-        const std::string &value,
-        std::vector<EntityNodeBase *> &result) const;
+        const std::string &prefix, const std::string &value, std::vector<EntityNodeBase *> &result
+    ) const;
 
     virtual void doAddToIndex(
-        EntityNodeBase *node, const std::string &key, const std::string &value);
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    );
 
     virtual void doRemoveFromIndex(
-        EntityNodeBase *node, const std::string &key, const std::string &value);
+        EntityNodeBase *node, const std::string &key, const std::string &value
+    );
 };
 } // namespace Model
 } // namespace TrenchBroom

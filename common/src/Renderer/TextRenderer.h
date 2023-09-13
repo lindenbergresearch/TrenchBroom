@@ -54,11 +54,8 @@ private:
       Color backgroundColor;
 
       Entry(
-          std::vector<vm::vec2f> &i_vertices,
-          const vm::vec2f &i_size,
-          const vm::vec3f &i_offset,
-          const Color &i_textColor,
-          const Color &i_backgroundColor);
+          std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor, const Color &i_backgroundColor
+      );
     };
 
     using EntryList = std::vector<Entry>;
@@ -87,43 +84,29 @@ private:
 
 public:
     explicit TextRenderer(
-        const FontDescriptor &fontDescriptor,
-        float maxViewDistance = DefaultMaxViewDistance,
-        float minZoomFactor = DefaultMinZoomFactor,
-        const vm::vec2f &inset = DefaultInset);
+        const FontDescriptor &fontDescriptor, float maxViewDistance = DefaultMaxViewDistance, float minZoomFactor = DefaultMinZoomFactor, const vm::vec2f &inset = DefaultInset
+    );
 
     void renderString(
-        RenderContext &renderContext,
-        const Color &textColor,
-        const Color &backgroundColor,
-        const AttrString &string,
-        const TextAnchor &position);
+        RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position
+    );
 
     void renderStringOnTop(
-        RenderContext &renderContext,
-        const Color &textColor,
-        const Color &backgroundColor,
-        const AttrString &string,
-        const TextAnchor &position);
+        RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position
+    );
 
 private:
     void renderString(
-        RenderContext &renderContext,
-        const Color &textColor,
-        const Color &backgroundColor,
-        const AttrString &string,
-        const TextAnchor &position,
-        bool onTop);
+        RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position, bool onTop
+    );
 
     bool isVisible(
-        RenderContext &renderContext,
-        const AttrString &string,
-        const TextAnchor &position,
-        float distance,
-        bool onTop) const;
+        RenderContext &renderContext, const AttrString &string, const TextAnchor &position, float distance, bool onTop
+    ) const;
 
     float computeAlphaFactor(
-        const RenderContext &renderContext, float distance, bool onTop) const;
+        const RenderContext &renderContext, float distance, bool onTop
+    ) const;
 
     void addEntry(EntryCollection &collection, const Entry &entry);
 
@@ -135,10 +118,8 @@ private:
     void prepare(EntryCollection &collection, bool onTop, VboManager &vboManager);
 
     void addEntry(
-        const Entry &entry,
-        bool onTop,
-        std::vector<TextVertex> &textVertices,
-        std::vector<RectVertex> &rectVertices);
+        const Entry &entry, bool onTop, std::vector<TextVertex> &textVertices, std::vector<RectVertex> &rectVertices
+    );
 
     void doRender(RenderContext &renderContext) override;
 

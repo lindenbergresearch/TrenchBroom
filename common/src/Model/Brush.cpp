@@ -53,18 +53,17 @@ namespace TrenchBroom::Model {
 class Brush::CopyCallback : public BrushGeometry::CopyCallback {
 public:
     void faceWasCopied(
-        const BrushFaceGeometry *original, BrushFaceGeometry *copy) const override {
+        const BrushFaceGeometry *original, BrushFaceGeometry *copy
+    ) const override {
         copy->setPayload(original->payload());
     }
 };
 
 Brush::Brush() {}
 
-Brush::Brush(const Brush &other)
-    : m_faces(other.m_faces), m_geometry(
-    other.m_geometry
-    ? std::make_unique<BrushGeometry>(*other.m_geometry, CopyCallback())
-    : nullptr) {
+Brush::Brush(const Brush &other) : m_faces(other.m_faces), m_geometry(
+    other.m_geometry ? std::make_unique<BrushGeometry>(*other.m_geometry, CopyCallback()) : nullptr
+) {
     if (m_geometry) {
         for (BrushFaceGeometry *faceGeometry: m_geometry->faces()) {
             if (const auto faceIndex = faceGeometry->payload()) {
@@ -75,8 +74,7 @@ Brush::Brush(const Brush &other)
     }
 }
 
-Brush::Brush(Brush &&other) noexcept
-    : m_faces(std::move(other.m_faces)), m_geometry(std::move(other.m_geometry)) {
+Brush::Brush(Brush &&other) noexcept: m_faces(std::move(other.m_faces)), m_geometry(std::move(other.m_geometry)) {
 }
 
 Brush &Brush::operator=(Brush other) noexcept {
@@ -93,15 +91,16 @@ void swap(Brush &lhs, Brush &rhs) noexcept {
 
 Brush::~Brush() = default;
 
-Brush::Brush(std::vector<BrushFace> faces)
-    : m_faces(std::move(faces)) {
+Brush::Brush(std::vector<BrushFace> faces) : m_faces(std::move(faces)) {
 }
 
 Result<Brush> Brush::create(const vm::bbox3 &worldBounds, std::vector<BrushFace> faces) {
     Brush brush(std::move(faces));
-    return brush.updateGeometryFromFaces(worldBounds).transform([&]() {
-      return std::move(brush);
-    });
+    return brush.updateGeometryFromFaces(worldBounds).transform(
+        [&]() {
+          return std::move(brush);
+        }
+    );
 }
 
 Result<void> Brush::updateGeometryFromFaces(const vm::bbox3 &worldBounds) {
@@ -117,7 +116,8 @@ Result<void> Brush::updateGeometryFromFaces(const vm::bbox3 &worldBounds) {
             BrushFaceGeometry *faceGeometry = result.face();
             face.setGeometry(faceGeometry);
             faceGeometry->setPayload(i);
-        } else if (result.empty()) {
+        }
+        else if (result.empty()) {
             return Error{"Brush is empty"};
         }
     }
@@ -136,7 +136,8 @@ Result<void> Brush::updateGeometryFromFaces(const vm::bbox3 &worldBounds) {
         if (const auto faceIndex = faceGeometry->payload()) {
             remainingFaces.push_back(std::move(m_faces[*faceIndex]));
             faceGeometry->setPayload(remainingFaces.size() - 1u);
-        } else {
+        }
+        else {
             return Error{"Brush is incomplete"};
         }
     }
@@ -155,31 +156,40 @@ const vm::bbox3 &Brush::bounds() const {
 }
 
 std::optional<size_t> Brush::findFace(const std::string &textureName) const {
-    return kdl::vec_index_of(m_faces, [&](const BrushFace &face) {
-      return face.attributes().textureName() == textureName;
-    });
+    return kdl::vec_index_of(
+        m_faces, [&](const BrushFace &face) {
+          return face.attributes().textureName() == textureName;
+        }
+    );
 }
 
 std::optional<size_t> Brush::findFace(const vm::vec3 &normal) const {
-    return kdl::vec_index_of(m_faces, [&](const BrushFace &face) {
-      return vm::is_equal(face.boundary().normal, normal, vm::C::almost_zero());
-    });
+    return kdl::vec_index_of(
+        m_faces, [&](const BrushFace &face) {
+          return vm::is_equal(face.boundary().normal, normal, vm::C::almost_zero());
+        }
+    );
 }
 
 std::optional<size_t> Brush::findFace(const vm::plane3 &boundary) const {
-    return kdl::vec_index_of(m_faces, [&](const BrushFace &face) {
-      return vm::is_equal(face.boundary(), boundary, vm::C::almost_zero());
-    });
-}
-
-std::optional<size_t> Brush::findFace(
-    const vm::polygon3 &vertices, const FloatType epsilon) const {
     return kdl::vec_index_of(
-        m_faces, [&](const BrushFace &face) { return face.hasVertices(vertices, epsilon); });
+        m_faces, [&](const BrushFace &face) {
+          return vm::is_equal(face.boundary(), boundary, vm::C::almost_zero());
+        }
+    );
 }
 
 std::optional<size_t> Brush::findFace(
-    const std::vector<vm::polygon3> &candidates, const FloatType epsilon) const {
+    const vm::polygon3 &vertices, const FloatType epsilon
+) const {
+    return kdl::vec_index_of(
+        m_faces, [&](const BrushFace &face) { return face.hasVertices(vertices, epsilon); }
+    );
+}
+
+std::optional<size_t> Brush::findFace(
+    const std::vector<vm::polygon3> &candidates, const FloatType epsilon
+) const {
     for (const auto &candidate: candidates) {
         if (const auto faceIndex = findFace(candidate, epsilon)) {
             return faceIndex;
@@ -235,31 +245,32 @@ void Brush::cloneFaceAttributesFrom(const Brush &brush) {
             auto snapshot = source.takeTexCoordSystemSnapshot();
             if (snapshot != nullptr) {
                 destination.copyTexCoordSystemFromFace(
-                    *snapshot, source.attributes(), source.boundary(), WrapStyle::Projection);
+                    *snapshot, source.attributes(), source.boundary(), WrapStyle::Projection
+                );
             }
         }
     }
 }
 
 static const BrushFace *findBestMatchingFace(
-    const BrushFace &face, const std::vector<const BrushFace *> &candidates) {
+    const BrushFace &face, const std::vector<const BrushFace *> &candidates
+) {
     if (candidates.empty()) {
         return nullptr;
     }
 
     // First, look for coplanar candidates
     const auto coplanarCandidates = kdl::vec_filter(
-        candidates,
-        [&](const BrushFace *candidate) { return candidate->coplanarWith(face.boundary()); });;
+        candidates, [&](const BrushFace *candidate) { return candidate->coplanarWith(face.boundary()); }
+    );;
 
     if (!coplanarCandidates.empty()) {
         // Return the largest coplanar face
         return *std::max_element(
-            std::begin(coplanarCandidates),
-            std::end(coplanarCandidates),
-            [](const BrushFace *lhs, const BrushFace *rhs) {
+            std::begin(coplanarCandidates), std::end(coplanarCandidates), [](const BrushFace *lhs, const BrushFace *rhs) {
               return lhs->area() < rhs->area();
-            });
+            }
+        );
     }
 
     // No coplanar faces. Return the one with the smallest "face center off reference plane"
@@ -269,11 +280,10 @@ static const BrushFace *findBestMatchingFace(
     };
 
     return *std::min_element(
-        std::begin(candidates),
-        std::end(candidates),
-        [&](const BrushFace *lhs, const BrushFace *rhs) {
+        std::begin(candidates), std::end(candidates), [&](const BrushFace *lhs, const BrushFace *rhs) {
           return faceCenterOffPlaneDist(lhs) < faceCenterOffPlaneDist(rhs);
-        });
+        }
+    );
 }
 
 void Brush::cloneFaceAttributesFrom(const std::vector<const Brush *> &brushes) {
@@ -291,7 +301,8 @@ void Brush::cloneFaceAttributesFrom(const std::vector<const Brush *> &brushes) {
             auto snapshot = bestMatch->takeTexCoordSystemSnapshot();
             if (snapshot != nullptr) {
                 face.copyTexCoordSystemFromFace(
-                    *snapshot, bestMatch->attributes(), face.boundary(), WrapStyle::Projection);
+                    *snapshot, bestMatch->attributes(), face.boundary(), WrapStyle::Projection
+                );
             }
         }
     }
@@ -307,7 +318,8 @@ void Brush::cloneInvertedFaceAttributesFrom(const Brush &brush) {
             auto snapshot = source.takeTexCoordSystemSnapshot();
             if (snapshot != nullptr) {
                 destination.copyTexCoordSystemFromFace(
-                    *snapshot, source.attributes(), destination.boundary(), WrapStyle::Projection);
+                    *snapshot, source.attributes(), destination.boundary(), WrapStyle::Projection
+                );
             }
         }
     }
@@ -319,19 +331,16 @@ Result<void> Brush::clip(const vm::bbox3 &worldBounds, BrushFace face) {
 }
 
 Result<void> Brush::moveBoundary(
-    const vm::bbox3 &worldBounds,
-    const size_t faceIndex,
-    const vm::vec3 &delta,
-    const bool lockTexture) {
+    const vm::bbox3 &worldBounds, const size_t faceIndex, const vm::vec3 &delta, const bool lockTexture
+) {
     assert(faceIndex < faceCount());
 
-    return m_faces[faceIndex]
-        .transform(vm::translation_matrix(delta), lockTexture)
-        .and_then([&]() { return updateGeometryFromFaces(worldBounds); });
+    return m_faces[faceIndex].transform(vm::translation_matrix(delta), lockTexture).and_then([&]() { return updateGeometryFromFaces(worldBounds); });
 }
 
 Result<void> Brush::expand(
-    const vm::bbox3 &worldBounds, const FloatType delta, const bool lockTexture) {
+    const vm::bbox3 &worldBounds, const FloatType delta, const bool lockTexture
+) {
     for (auto &face: m_faces) {
         const vm::vec3 moveAmount = face.boundary().normal * delta;
         if (!face.transform(vm::translation_matrix(moveAmount), lockTexture).is_success()) {
@@ -368,7 +377,8 @@ vm::vec3 Brush::findClosestVertexPosition(const vm::vec3 &position) const {
 }
 
 std::vector<vm::vec3> Brush::findClosestVertexPositions(
-    const std::vector<vm::vec3> &positions) const {
+    const std::vector<vm::vec3> &positions
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
 
     std::vector<vm::vec3> result;
@@ -385,7 +395,8 @@ std::vector<vm::vec3> Brush::findClosestVertexPositions(
 }
 
 std::vector<vm::segment3> Brush::findClosestEdgePositions(
-    const std::vector<vm::segment3> &positions) const {
+    const std::vector<vm::segment3> &positions
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
 
     std::vector<vm::segment3> result;
@@ -393,10 +404,12 @@ std::vector<vm::segment3> Brush::findClosestEdgePositions(
 
     for (const auto &edgePosition: positions) {
         const auto *newEdge = m_geometry->findClosestEdge(
-            edgePosition.start(), edgePosition.end(), CloseVertexEpsilon);
+            edgePosition.start(), edgePosition.end(), CloseVertexEpsilon
+        );
         if (newEdge != nullptr) {
-            result.push_back(vm::segment3(
-                newEdge->firstVertex()->position(), newEdge->secondVertex()->position()));
+            result.push_back(
+                vm::segment3(
+                    newEdge->firstVertex()->position(), newEdge->secondVertex()->position()));
         }
     }
 
@@ -404,15 +417,15 @@ std::vector<vm::segment3> Brush::findClosestEdgePositions(
 }
 
 std::vector<vm::polygon3> Brush::findClosestFacePositions(
-    const std::vector<vm::polygon3> &positions) const {
+    const std::vector<vm::polygon3> &positions
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
 
     std::vector<vm::polygon3> result;
     result.reserve(positions.size());
 
     for (const auto &facePosition: positions) {
-        const auto *newFace =
-            m_geometry->findClosestFace(facePosition.vertices(), CloseVertexEpsilon);
+        const auto *newFace = m_geometry->findClosestFace(facePosition.vertices(), CloseVertexEpsilon);
         if (newFace != nullptr) {
             result.push_back(vm::polygon3(newFace->vertexPositions()));
         }
@@ -444,7 +457,8 @@ const Brush::EdgeList &Brush::edges() const {
 bool Brush::containsPoint(const vm::vec3 &point) const {
     if (!bounds().contains(point)) {
         return false;
-    } else {
+    }
+    else {
         for (const auto &face: m_faces) {
             if (face.boundary().point_status(point) == vm::plane_status::above) {
                 return false;
@@ -471,17 +485,14 @@ std::vector<const BrushFace *> Brush::incidentFaces(const BrushVertex *vertex) c
 }
 
 bool Brush::canMoveVertices(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::vec3> &vertices,
-    const vm::vec3 &delta) const {
+    const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertices, const vm::vec3 &delta
+) const {
     return doCanMoveVertices(worldBounds, vertices, delta, true).success;
 }
 
 Result<void> Brush::moveVertices(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::vec3> &vertexPositions,
-    const vm::vec3 &delta,
-    const bool uvLock) {
+    const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, const bool uvLock
+) {
     return doMoveVertices(worldBounds, vertexPositions, delta, uvLock);
 }
 
@@ -506,7 +517,8 @@ Result<void> Brush::addVertex(const vm::bbox3 &worldBounds, const vm::vec3 &posi
 }
 
 static BrushGeometry removeVerticesFromGeometry(
-    const BrushGeometry &geometry, const std::vector<vm::vec3> &vertexPositions) {
+    const BrushGeometry &geometry, const std::vector<vm::vec3> &vertexPositions
+) {
     std::vector<vm::vec3> points;
     points.reserve(geometry.vertexCount());
 
@@ -521,7 +533,8 @@ static BrushGeometry removeVerticesFromGeometry(
 }
 
 bool Brush::canRemoveVertices(
-    const vm::bbox3 & /* worldBounds */, const std::vector<vm::vec3> &vertexPositions) const {
+    const vm::bbox3 & /* worldBounds */, const std::vector<vm::vec3> &vertexPositions
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
     ensure(!vertexPositions.empty(), "no vertex positions");
 
@@ -529,19 +542,20 @@ bool Brush::canRemoveVertices(
 }
 
 Result<void> Brush::removeVertices(
-    const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions) {
+    const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions
+) {
     ensure(m_geometry != nullptr, "geometry is null");
     ensure(!vertexPositions.empty(), "no vertex positions");
     assert(canRemoveVertices(worldBounds, vertexPositions));
 
-    const BrushGeometry newGeometry =
-        removeVerticesFromGeometry(*m_geometry, vertexPositions);
+    const BrushGeometry newGeometry = removeVerticesFromGeometry(*m_geometry, vertexPositions);
     const PolyhedronMatcher<BrushGeometry> matcher(*m_geometry, newGeometry);
     return updateFacesFromGeometry(worldBounds, matcher, newGeometry);
 }
 
 static BrushGeometry snappedGeometry(
-    const BrushGeometry &geometry, const FloatType snapToF) {
+    const BrushGeometry &geometry, const FloatType snapToF
+) {
     std::vector<vm::vec3> points;
     points.reserve(geometry.vertexCount());
 
@@ -553,13 +567,15 @@ static BrushGeometry snappedGeometry(
 }
 
 bool Brush::canSnapVertices(
-    const vm::bbox3 & /* worldBounds */, const FloatType snapToF) const {
+    const vm::bbox3 & /* worldBounds */, const FloatType snapToF
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
     return snappedGeometry(*m_geometry, snapToF).polyhedron();
 }
 
 Result<void> Brush::snapVertices(
-    const vm::bbox3 &worldBounds, const FloatType snapToF, const bool uvLock) {
+    const vm::bbox3 &worldBounds, const FloatType snapToF, const bool uvLock
+) {
     ensure(m_geometry != nullptr, "geometry is null");
 
     const BrushGeometry newGeometry = snappedGeometry(*m_geometry, snapToF);
@@ -578,17 +594,14 @@ Result<void> Brush::snapVertices(
 }
 
 bool Brush::canMoveEdges(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::segment3> &edgePositions,
-    const vm::vec3 &delta) const {
+    const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::vec3 &delta
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
     ensure(!edgePositions.empty(), "no edge positions");
 
     std::vector<vm::vec3> vertexPositions;
     vm::segment3::get_vertices(
-        std::begin(edgePositions),
-        std::end(edgePositions),
-        std::back_inserter(vertexPositions));
+        std::begin(edgePositions), std::end(edgePositions), std::back_inserter(vertexPositions));
     const auto result = doCanMoveVertices(worldBounds, vertexPositions, delta, false);
 
     if (!result.success) {
@@ -605,32 +618,25 @@ bool Brush::canMoveEdges(
 }
 
 Result<void> Brush::moveEdges(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::segment3> &edgePositions,
-    const vm::vec3 &delta,
-    const bool uvLock) {
+    const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::vec3 &delta, const bool uvLock
+) {
     assert(canMoveEdges(worldBounds, edgePositions, delta));
 
     std::vector<vm::vec3> vertexPositions;
     vm::segment3::get_vertices(
-        std::begin(edgePositions),
-        std::end(edgePositions),
-        std::back_inserter(vertexPositions));
+        std::begin(edgePositions), std::end(edgePositions), std::back_inserter(vertexPositions));
     return doMoveVertices(worldBounds, vertexPositions, delta, uvLock);
 }
 
 bool Brush::canMoveFaces(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::polygon3> &facePositions,
-    const vm::vec3 &delta) const {
+    const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta
+) const {
     ensure(m_geometry != nullptr, "geometry is null");
     ensure(!facePositions.empty(), "no face positions");
 
     std::vector<vm::vec3> vertexPositions;
     vm::polygon3::get_vertices(
-        std::begin(facePositions),
-        std::end(facePositions),
-        std::back_inserter(vertexPositions));
+        std::begin(facePositions), std::end(facePositions), std::back_inserter(vertexPositions));
     const auto result = doCanMoveVertices(worldBounds, vertexPositions, delta, false);
 
     if (!result.success) {
@@ -647,22 +653,17 @@ bool Brush::canMoveFaces(
 }
 
 Result<void> Brush::moveFaces(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::polygon3> &facePositions,
-    const vm::vec3 &delta,
-    const bool uvLock) {
+    const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta, const bool uvLock
+) {
     assert(canMoveFaces(worldBounds, facePositions, delta));
 
     std::vector<vm::vec3> vertexPositions;
     vm::polygon3::get_vertices(
-        std::begin(facePositions),
-        std::end(facePositions),
-        std::back_inserter(vertexPositions));
+        std::begin(facePositions), std::end(facePositions), std::back_inserter(vertexPositions));
     return doMoveVertices(worldBounds, vertexPositions, delta, uvLock);
 }
 
-Brush::CanMoveVerticesResult::CanMoveVerticesResult(const bool s, BrushGeometry &&g)
-    : success(s), geometry(std::make_unique<BrushGeometry>(std::move(g))) {
+Brush::CanMoveVerticesResult::CanMoveVerticesResult(const bool s, BrushGeometry &&g) : success(s), geometry(std::make_unique<BrushGeometry>(std::move(g))) {
 }
 
 Brush::CanMoveVerticesResult Brush::CanMoveVerticesResult::rejectVertexMove() {
@@ -670,7 +671,8 @@ Brush::CanMoveVerticesResult Brush::CanMoveVerticesResult::rejectVertexMove() {
 }
 
 Brush::CanMoveVerticesResult Brush::CanMoveVerticesResult::acceptVertexMove(
-    BrushGeometry &&result) {
+    BrushGeometry &&result
+) {
     return CanMoveVerticesResult(true, std::move(result));
 }
 
@@ -706,17 +708,14 @@ Brush::CanMoveVerticesResult Brush::CanMoveVerticesResult::acceptVertexMove(
 
  */
 Brush::CanMoveVerticesResult Brush::doCanMoveVertices(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::vec3> &vertexPositions,
-    vm::vec3 delta,
-    const bool allowVertexRemoval) const {
+    const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, vm::vec3 delta, const bool allowVertexRemoval
+) const {
     // Should never occur, takes care of the first row.
     if (vertexPositions.empty() || vm::is_zero(delta, vm::C::almost_zero())) {
         return CanMoveVerticesResult::rejectVertexMove();
     }
 
-    const auto vertexSet =
-        std::set<vm::vec3>(std::begin(vertexPositions), std::end(vertexPositions));
+    const auto vertexSet = std::set<vm::vec3>(std::begin(vertexPositions), std::end(vertexPositions));
 
     std::vector<vm::vec3> remainingPoints;
     remainingPoints.reserve(vertexCount());
@@ -733,7 +732,8 @@ Brush::CanMoveVerticesResult Brush::doCanMoveVertices(
             // the vertex is not moving
             remainingPoints.push_back(position);
             resultPoints.push_back(position);
-        } else {
+        }
+        else {
             // the vertex is moving
             movingPoints.push_back(position);
             resultPoints.push_back(position + delta);
@@ -775,8 +775,7 @@ Brush::CanMoveVerticesResult Brush::doCanMoveVertices(
     }
 
     // Invert if necessary.
-    if (
-        remaining.point() || remaining.edge() || (remaining.polygon() && moving.polyhedron())) {
+    if (remaining.point() || remaining.edge() || (remaining.polygon() && moving.polyhedron())) {
         using std::swap;
         swap(remaining, moving);
         delta = -delta;
@@ -789,11 +788,7 @@ Brush::CanMoveVerticesResult Brush::doCanMoveVertices(
         const auto newPos = oldPos + delta;
 
         for (const auto *face: remaining.faces()) {
-            if (
-                face->pointStatus(oldPos, vm::constants<FloatType>::point_status_epsilon())
-                == vm::plane_status::below
-                && face->pointStatus(newPos, vm::constants<FloatType>::point_status_epsilon())
-                   == vm::plane_status::above) {
+            if (face->pointStatus(oldPos, vm::constants<FloatType>::point_status_epsilon()) == vm::plane_status::below && face->pointStatus(newPos, vm::constants<FloatType>::point_status_epsilon()) == vm::plane_status::above) {
                 const auto ray = vm::ray3(oldPos, normalize(newPos - oldPos));
                 const auto distance = face->intersectWithRay(ray, vm::side::back);
                 if (!vm::is_nan(distance)) {
@@ -807,10 +802,8 @@ Brush::CanMoveVerticesResult Brush::doCanMoveVertices(
 }
 
 Result<void> Brush::doMoveVertices(
-    const vm::bbox3 &worldBounds,
-    const std::vector<vm::vec3> &vertexPositions,
-    const vm::vec3 &delta,
-    const bool uvLock) {
+    const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, const bool uvLock
+) {
     ensure(m_geometry != nullptr, "geometry is null");
     ensure(!vertexPositions.empty(), "no vertex positions");
     assert(canMoveVertices(worldBounds, vertexPositions, delta));
@@ -822,7 +815,8 @@ Result<void> Brush::doMoveVertices(
         const auto &position = vertex->position();
         if (kdl::vec_contains(vertexPositions, position)) {
             newVertices.push_back(position + delta);
-        } else {
+        }
+        else {
             newVertices.push_back(position);
         }
     }
@@ -835,8 +829,7 @@ Result<void> Brush::doMoveVertices(
         const auto &oldPosition = oldVertex->position();
         const auto moved = kdl::vec_contains(vertexPositions, oldPosition);
         const auto newPosition = moved ? oldPosition + delta : oldPosition;
-        const auto *newVertex =
-            newGeometry.findClosestVertex(newPosition, CloseVertexEpsilon);
+        const auto *newVertex = newGeometry.findClosestVertex(newPosition, CloseVertexEpsilon);
         if (newVertex != nullptr) {
             vertexMapping.insert(std::make_pair(oldPosition, newVertex->position()));
         }
@@ -847,9 +840,8 @@ Result<void> Brush::doMoveVertices(
 }
 
 std::tuple<bool, vm::mat4x4> Brush::findTransformForUVLock(
-    const PolyhedronMatcher<BrushGeometry> &matcher,
-    BrushFaceGeometry *left,
-    BrushFaceGeometry *right) {
+    const PolyhedronMatcher<BrushGeometry> &matcher, BrushFaceGeometry *left, BrushFaceGeometry *right
+) {
     std::vector<vm::vec3> unmovedVerts;
     std::vector<std::pair<vm::vec3, vm::vec3>> movedVerts;
 
@@ -861,10 +853,12 @@ std::tuple<bool, vm::mat4x4> Brush::findTransformForUVLock(
           if (vm::is_equal(
               leftPosition, rightPosition, vm::constants<FloatType>::almost_zero())) {
               unmovedVerts.push_back(leftPosition);
-          } else {
+          }
+          else {
               movedVerts.emplace_back(leftPosition, rightPosition);
           }
-        });
+        }
+    );
 
     // If 3 or more are unmoving, give up.
     // (Picture a square with one corner being moved, we can't possibly lock the UV's of all
@@ -891,12 +885,8 @@ std::tuple<bool, vm::mat4x4> Brush::findTransformForUVLock(
     }
 
     const auto M = vm::points_transformation_matrix(
-        referenceVerts[0].first,
-        referenceVerts[1].first,
-        referenceVerts[2].first,
-        referenceVerts[0].second,
-        referenceVerts[1].second,
-        referenceVerts[2].second);
+        referenceVerts[0].first, referenceVerts[1].first, referenceVerts[2].first, referenceVerts[0].second, referenceVerts[1].second, referenceVerts[2].second
+    );
 
     if (!(M == M)) {
         // Transform contains nan
@@ -907,11 +897,9 @@ std::tuple<bool, vm::mat4x4> Brush::findTransformForUVLock(
 }
 
 void Brush::applyUVLock(
-    const PolyhedronMatcher<BrushGeometry> &matcher,
-    const BrushFace &leftFace,
-    BrushFace &rightFace) {
-    const auto [success, M] =
-        findTransformForUVLock(matcher, leftFace.geometry(), rightFace.geometry());
+    const PolyhedronMatcher<BrushGeometry> &matcher, const BrushFace &leftFace, BrushFace &rightFace
+) {
+    const auto [success, M] = findTransformForUVLock(matcher, leftFace.geometry(), rightFace.geometry());
     if (!success) {
         return;
     }
@@ -922,52 +910,56 @@ void Brush::applyUVLock(
     // then copy the texture settings from the transformed clone (which should have an
     // identical plane to `rightFace` within FP error) to `rightFace`.
     BrushFace leftClone = leftFace;
-    leftClone.transform(M, true)
-        .transform([&]() {
-          auto snapshot =
-              std::unique_ptr<TexCoordSystemSnapshot>(leftClone.takeTexCoordSystemSnapshot());
+    leftClone.transform(M, true).transform(
+        [&]() {
+          auto snapshot = std::unique_ptr<TexCoordSystemSnapshot>(leftClone.takeTexCoordSystemSnapshot());
           rightFace.setAttributes(leftClone.attributes());
           if (snapshot) {
               // Note, the wrap style doesn't matter because the source and destination faces
               // should have the same plane
               rightFace.copyTexCoordSystemFromFace(
-                  *snapshot, leftClone.attributes(), leftClone.boundary(), WrapStyle::Rotation);
+                  *snapshot, leftClone.attributes(), leftClone.boundary(), WrapStyle::Rotation
+              );
           }
           rightFace.resetTexCoordSystemCache();
-        })
-        .transform_error([](auto) {
+        }
+    ).transform_error(
+        [](auto) {
           // do nothing
-        });
+        }
+    );
 }
 
 Result<void> Brush::updateFacesFromGeometry(
-    const vm::bbox3 &worldBounds,
-    const PolyhedronMatcher<BrushGeometry> &matcher,
-    const BrushGeometry &newGeometry,
-    const bool uvLock) {
+    const vm::bbox3 &worldBounds, const PolyhedronMatcher<BrushGeometry> &matcher, const BrushGeometry &newGeometry, const bool uvLock
+) {
     std::vector<BrushFace> newFaces;
     newFaces.reserve(newGeometry.faces().size());
 
     auto error = std::optional<Error>{};
-    matcher.processRightFaces([&](BrushFaceGeometry *left, BrushFaceGeometry *right) {
-      if (const auto leftFaceIndex = left->payload()) {
-          const auto &leftFace = m_faces[*leftFaceIndex];
-          auto &rightFace = newFaces.emplace_back(leftFace);
+    matcher.processRightFaces(
+        [&](BrushFaceGeometry *left, BrushFaceGeometry *right) {
+          if (const auto leftFaceIndex = left->payload()) {
+              const auto &leftFace = m_faces[*leftFaceIndex];
+              auto &rightFace = newFaces.emplace_back(leftFace);
 
-          rightFace.setGeometry(right);
-          rightFace.updatePointsFromVertices()
-              .transform([&]() {
-                if (uvLock) {
-                    applyUVLock(matcher, leftFace, rightFace);
-                }
-              })
-              .transform_error([&](auto e) {
-                if (!error) {
-                    error = e;
-                }
-              });
-      }
-    });
+              rightFace.setGeometry(right);
+              rightFace.updatePointsFromVertices().transform(
+                  [&]() {
+                    if (uvLock) {
+                        applyUVLock(matcher, leftFace, rightFace);
+                    }
+                  }
+              ).transform_error(
+                  [&](auto e) {
+                    if (!error) {
+                        error = e;
+                    }
+                  }
+              );
+          }
+        }
+    );
 
     if (error) {
         return *error;
@@ -978,10 +970,8 @@ Result<void> Brush::updateFacesFromGeometry(
 }
 
 std::vector<Result<Brush>> Brush::subtract(
-    const MapFormat mapFormat,
-    const vm::bbox3 &worldBounds,
-    const std::string &defaultTextureName,
-    const std::vector<const Brush *> &subtrahends) const {
+    const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const std::vector<const Brush *> &subtrahends
+) const {
     auto result = std::vector<BrushGeometry>{*m_geometry};
 
     for (const auto *subtrahend: subtrahends) {
@@ -995,18 +985,19 @@ std::vector<Result<Brush>> Brush::subtract(
         result = std::move(nextResults);
     }
 
-    return kdl::vec_transform(result, [&](const auto &geometry) {
-      return createBrush(mapFormat, worldBounds, defaultTextureName, geometry, subtrahends);
-    });
+    return kdl::vec_transform(
+        result, [&](const auto &geometry) {
+          return createBrush(mapFormat, worldBounds, defaultTextureName, geometry, subtrahends);
+        }
+    );
 }
 
 std::vector<Result<Brush>> Brush::subtract(
-    const MapFormat mapFormat,
-    const vm::bbox3 &worldBounds,
-    const std::string &defaultTextureName,
-    const Brush &subtrahend) const {
+    const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const Brush &subtrahend
+) const {
     return subtract(
-        mapFormat, worldBounds, defaultTextureName, std::vector<const Brush *>{&subtrahend});
+        mapFormat, worldBounds, defaultTextureName, std::vector<const Brush *>{&subtrahend}
+    );
 }
 
 Result<void> Brush::intersect(const vm::bbox3 &worldBounds, const Brush &brush) {
@@ -1015,7 +1006,8 @@ Result<void> Brush::intersect(const vm::bbox3 &worldBounds, const Brush &brush) 
 }
 
 Result<void> Brush::transform(
-    const vm::bbox3 &worldBounds, const vm::mat4x4 &transformation, const bool lockTextures) {
+    const vm::bbox3 &worldBounds, const vm::mat4x4 &transformation, const bool lockTextures
+) {
     for (auto &face: m_faces) {
         if (!face.transform(transformation, lockTextures).is_success()) {
             return Error{"Brush has invalid face"};
@@ -1052,15 +1044,11 @@ bool Brush::intersects(const Brush &brush) const {
 }
 
 Result<Brush> Brush::createBrush(
-    const MapFormat mapFormat,
-    const vm::bbox3 &worldBounds,
-    const std::string &defaultTextureName,
-    const BrushGeometry &geometry,
-    const std::vector<const Brush *> &subtrahends) const {
+    const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const BrushGeometry &geometry, const std::vector<const Brush *> &subtrahends
+) const {
     return kdl::fold_results(
         kdl::vec_transform(
-            geometry.faces(),
-            [&](const auto *face) {
+            geometry.faces(), [&](const auto *face) {
               const auto *h1 = face->boundary().front();
               const auto *h0 = h1->next();
               const auto *h2 = h0->next();
@@ -1070,19 +1058,23 @@ Result<Brush> Brush::createBrush(
               const auto &p2 = h2->origin()->position();
 
               return BrushFace::create(
-                  p0, p1, p2, BrushFaceAttributes(defaultTextureName), mapFormat);
-            }))
-        .and_then([&](std::vector<BrushFace> &&faces) {
+                  p0, p1, p2, BrushFaceAttributes(defaultTextureName), mapFormat
+              );
+            }
+        )).and_then(
+        [&](std::vector<BrushFace> &&faces) {
           return Brush::create(worldBounds, std::move(faces));
-        })
-        .transform([&](Brush &&brush) {
+        }
+    ).transform(
+        [&](Brush &&brush) {
           brush.cloneFaceAttributesFrom(*this);
           for (const auto *subtrahend: subtrahends) {
               brush.cloneFaceAttributesFrom(*subtrahend);
               brush.cloneInvertedFaceAttributesFrom(*subtrahend);
           }
           return std::move(brush);
-        });
+        }
+    );
 }
 
 Brush Brush::convertToParaxial() const {
@@ -1120,7 +1112,8 @@ bool Brush::checkFaceLinks() const {
             if (*faceIndex >= m_faces.size()) {
                 return false;
             }
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -1141,7 +1134,8 @@ bool Brush::checkFaceLinks() const {
             if (&m_faces[*faceIndex] != &face) {
                 return false;
             }
-        } else {
+        }
+        else {
             return false;
         }
         if (!faceGeometries.insert(faceGeometry).second) {

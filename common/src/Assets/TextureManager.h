@@ -70,9 +70,8 @@ public:
 
 private:
     void setTextureCollections(
-        const std::vector<std::filesystem::path> &paths,
-        const IO::FileSystem &fs,
-        const Model::TextureConfig &textureConfig);
+        const std::vector<std::filesystem::path> &paths, const IO::FileSystem &fs, const Model::TextureConfig &textureConfig
+    );
 
     void addTextureCollection(Assets::TextureCollection collection);
 

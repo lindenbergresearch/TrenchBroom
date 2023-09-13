@@ -44,13 +44,15 @@ namespace TrenchBroom {
 namespace View {
 template<typename T>
 std::tuple<vm::vec<T, 3>, vm::vec<T, 3>, vm::vec<T, 3>> computeAxes(
-    const vm::vec3 &handlePos, const vm::vec<T, 3> &cameraPos) {
+    const vm::vec3 &handlePos, const vm::vec<T, 3> &cameraPos
+) {
     vm::vec<T, 3> xAxis, yAxis, zAxis;
     const auto viewDir = vm::normalize(vm::vec<T, 3>(handlePos) - cameraPos);
     if (vm::is_equal(std::abs(viewDir.z()), T(1.0), vm::constants<T>::almost_zero())) {
         xAxis = vm::vec<T, 3>::pos_x();
         yAxis = vm::vec<T, 3>::pos_y();
-    } else {
+    }
+    else {
         xAxis = viewDir.x() > T(0.0) ? vm::vec<T, 3>::neg_x() : vm::vec<T, 3>::pos_x();
         yAxis = viewDir.y() > T(0.0) ? vm::vec<T, 3>::neg_y() : vm::vec<T, 3>::pos_y();
     }
@@ -59,11 +61,9 @@ std::tuple<vm::vec<T, 3>, vm::vec<T, 3>, vm::vec<T, 3>> computeAxes(
     return {xAxis, yAxis, zAxis};
 }
 
-const Model::HitType::Type RotateObjectsHandle::HandleHitType =
-    Model::HitType::freeType();
+const Model::HitType::Type RotateObjectsHandle::HandleHitType = Model::HitType::freeType();
 
-RotateObjectsHandle::Handle::Handle(const vm::vec3 &position)
-    : m_position(position) {
+RotateObjectsHandle::Handle::Handle(const vm::vec3 &position) : m_position(position) {
 }
 
 RotateObjectsHandle::Handle::~Handle() = default;
@@ -81,19 +81,23 @@ FloatType RotateObjectsHandle::Handle::minorRadius() {
 }
 
 Model::Hit RotateObjectsHandle::Handle::pickCenterHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) const {
     const FloatType distance = camera.pickPointHandle(
         pickRay, m_position, static_cast<FloatType>(pref(Preferences::HandleRadius)));
     if (vm::is_nan(distance)) {
         return Model::Hit::NoHit;
-    } else {
+    }
+    else {
         return Model::Hit(
-            HandleHitType, distance, vm::point_at_distance(pickRay, distance), HitArea::Center);
+            HandleHitType, distance, vm::point_at_distance(pickRay, distance), HitArea::Center
+        );
     }
 }
 
 Model::Hit RotateObjectsHandle::Handle::pickRotateHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, const HitArea area) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, const HitArea area
+) const {
     const auto transform = handleTransform(camera, area);
 
     const auto [invertible, inverse] = vm::invert(transform);
@@ -107,8 +111,7 @@ Model::Hit RotateObjectsHandle::Handle::pickRotateHandle(
         const auto transformedDistance = vm::intersect_ray_torus(
             transformedRay, transformedPosition, majorRadius(), minorRadius());
         if (!vm::is_nan(transformedDistance)) {
-            const auto transformedHitPoint =
-                vm::point_at_distance(transformedRay, transformedDistance);
+            const auto transformedHitPoint = vm::point_at_distance(transformedRay, transformedDistance);
             const auto hitPoint = transform * transformedHitPoint;
             const auto distance = vm::dot(hitPoint - pickRay.origin, pickRay.direction);
             return Model::Hit(HandleHitType, distance, hitPoint, area);
@@ -119,14 +122,14 @@ Model::Hit RotateObjectsHandle::Handle::pickRotateHandle(
 }
 
 vm::mat4x4 RotateObjectsHandle::Handle::handleTransform(
-    const Renderer::Camera &camera, const HitArea area) const {
+    const Renderer::Camera &camera, const HitArea area
+) const {
     const auto scalingFactor = this->scalingFactor(camera);
     if (scalingFactor <= FloatType(0.0)) {
         return vm::mat4x4::zero();
     }
 
-    const auto scalingMatrix =
-        vm::scaling_matrix(vm::vec3(scalingFactor, scalingFactor, scalingFactor));
+    const auto scalingMatrix = vm::scaling_matrix(vm::vec3(scalingFactor, scalingFactor, scalingFactor));
     switch (area) {
         case HitArea::XAxis:
             return vm::mat4x4::rot_90_y_ccw() * scalingMatrix;
@@ -141,25 +144,24 @@ vm::mat4x4 RotateObjectsHandle::Handle::handleTransform(
 }
 
 Model::Hit RotateObjectsHandle::Handle2D::pick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) const {
     switch (vm::find_abs_max_component(camera.direction())) {
         case vm::axis::x:
             return Model::selectClosest(
-                pickCenterHandle(pickRay, camera),
-                pickRotateHandle(pickRay, camera, HitArea::XAxis));
+                pickCenterHandle(pickRay, camera), pickRotateHandle(pickRay, camera, HitArea::XAxis));
         case vm::axis::y:
             return Model::selectClosest(
-                pickCenterHandle(pickRay, camera),
-                pickRotateHandle(pickRay, camera, HitArea::YAxis));
+                pickCenterHandle(pickRay, camera), pickRotateHandle(pickRay, camera, HitArea::YAxis));
         default:
             return Model::selectClosest(
-                pickCenterHandle(pickRay, camera),
-                pickRotateHandle(pickRay, camera, HitArea::ZAxis));
+                pickCenterHandle(pickRay, camera), pickRotateHandle(pickRay, camera, HitArea::ZAxis));
     }
 }
 
 Model::Hit RotateObjectsHandle::Handle2D::pickRotateHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, const HitArea area) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, const HitArea area
+) const {
     // Work around imprecision caused by 2D cameras being positioned at map bounds
     // by placing the ray origin on the same plane as the handle itself.
     // Fixes erratic handle selection behaviour at high zoom
@@ -190,10 +192,10 @@ Model::Hit RotateObjectsHandle::Handle2D::pickRotateHandle(
 }
 
 void RotateObjectsHandle::Handle2D::renderHandle(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) const {
     const auto &camera = renderContext.camera();
-    const auto radius =
-        static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
+    const auto radius = static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
     if (radius <= 0.0f) {
         return;
     }
@@ -205,18 +207,17 @@ void RotateObjectsHandle::Handle2D::renderHandle(
     renderService.setForegroundColor(
         pref(Preferences::axisColor(vm::find_abs_max_component(camera.direction()))));
     renderService.renderCircle(
-        vm::vec3f(m_position), vm::find_abs_max_component(camera.direction()), 64, radius);
+        vm::vec3f(m_position), vm::find_abs_max_component(camera.direction()), 64, radius
+    );
 
     renderService.setForegroundColor(pref(Preferences::HandleColor));
     renderService.renderHandle(vm::vec3f(m_position));
 }
 
 void RotateObjectsHandle::Handle2D::renderHighlight(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    RotateObjectsHandle::HitArea area) const {
-    const auto radius =
-        static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area
+) const {
+    const auto radius = static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
     if (radius <= 0.0f) {
         return;
     }
@@ -238,7 +239,8 @@ void RotateObjectsHandle::Handle2D::renderHighlight(
             renderService.setForegroundColor(
                 pref(Preferences::axisColor(vm::find_abs_max_component(camera.direction()))));
             renderService.renderCircle(
-                vm::vec3f(m_position), vm::find_abs_max_component(camera.direction()), 64, radius);
+                vm::vec3f(m_position), vm::find_abs_max_component(camera.direction()), 64, radius
+            );
             break;
         case HitArea::None:
             break;
@@ -247,24 +249,21 @@ void RotateObjectsHandle::Handle2D::renderHighlight(
 }
 
 Model::Hit RotateObjectsHandle::Handle3D::pick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) const {
     return Model::selectClosest(
-        pickCenterHandle(pickRay, camera),
-        pickRotateHandle(pickRay, camera, HitArea::XAxis),
-        pickRotateHandle(pickRay, camera, HitArea::YAxis),
-        pickRotateHandle(pickRay, camera, HitArea::ZAxis));
+        pickCenterHandle(pickRay, camera), pickRotateHandle(pickRay, camera, HitArea::XAxis), pickRotateHandle(pickRay, camera, HitArea::YAxis), pickRotateHandle(pickRay, camera, HitArea::ZAxis));
 }
 
 void RotateObjectsHandle::Handle3D::renderHandle(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const {
-    const auto radius =
-        static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) const {
+    const auto radius = static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
     if (radius <= 0.0f) {
         return;
     }
 
-    const auto [xAxis, yAxis, zAxis] =
-        computeAxes(m_position, renderContext.camera().position());
+    const auto [xAxis, yAxis, zAxis] = computeAxes(m_position, renderContext.camera().position());
 
     Renderer::RenderService renderService(renderContext, renderBatch);
     renderService.setShowOccludedObjects();
@@ -275,30 +274,30 @@ void RotateObjectsHandle::Handle3D::renderHandle(
     renderService.setLineWidth(2.0f);
     renderService.setForegroundColor(pref(Preferences::XAxisColor));
     renderService.renderCircle(
-        vm::vec3f(m_position), vm::axis::x, 64, radius, zAxis, yAxis);
+        vm::vec3f(m_position), vm::axis::x, 64, radius, zAxis, yAxis
+    );
     renderService.setForegroundColor(pref(Preferences::YAxisColor));
     renderService.renderCircle(
-        vm::vec3f(m_position), vm::axis::y, 64, radius, xAxis, zAxis);
+        vm::vec3f(m_position), vm::axis::y, 64, radius, xAxis, zAxis
+    );
     renderService.setForegroundColor(pref(Preferences::ZAxisColor));
     renderService.renderCircle(
-        vm::vec3f(m_position), vm::axis::z, 64, radius, xAxis, yAxis);
+        vm::vec3f(m_position), vm::axis::z, 64, radius, xAxis, yAxis
+    );
 
     renderService.setForegroundColor(pref(Preferences::HandleColor));
     renderService.renderHandle(vm::vec3f(m_position));
 }
 
 void RotateObjectsHandle::Handle3D::renderHighlight(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    RotateObjectsHandle::HitArea area) const {
-    const auto radius =
-        static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area
+) const {
+    const auto radius = static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
     if (radius <= 0.0f) {
         return;
     }
 
-    const auto [xAxis, yAxis, zAxis] =
-        computeAxes(m_position, renderContext.camera().position());
+    const auto [xAxis, yAxis, zAxis] = computeAxes(m_position, renderContext.camera().position());
 
     Renderer::RenderService renderService(renderContext, renderBatch);
     renderService.setShowOccludedObjects();
@@ -315,19 +314,22 @@ void RotateObjectsHandle::Handle3D::renderHighlight(
             renderService.setForegroundColor(pref(Preferences::XAxisColor));
             renderService.setLineWidth(3.0f);
             renderService.renderCircle(
-                vm::vec3f(m_position), vm::axis::x, 64, radius, zAxis, yAxis);
+                vm::vec3f(m_position), vm::axis::x, 64, radius, zAxis, yAxis
+            );
             break;
         case HitArea::YAxis:
             renderService.setForegroundColor(pref(Preferences::YAxisColor));
             renderService.setLineWidth(3.0f);
             renderService.renderCircle(
-                vm::vec3f(m_position), vm::axis::y, 64, radius, xAxis, zAxis);
+                vm::vec3f(m_position), vm::axis::y, 64, radius, xAxis, zAxis
+            );
             break;
         case HitArea::ZAxis:
             renderService.setForegroundColor(pref(Preferences::ZAxisColor));
             renderService.setLineWidth(3.0f);
             renderService.renderCircle(
-                vm::vec3f(m_position), vm::axis::z, 64, radius, xAxis, yAxis);
+                vm::vec3f(m_position), vm::axis::z, 64, radius, xAxis, yAxis
+            );
             break;
         case HitArea::None:
             break;
@@ -336,15 +338,14 @@ void RotateObjectsHandle::Handle3D::renderHighlight(
 }
 
 Model::Hit RotateObjectsHandle::Handle3D::pickRotateHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, const HitArea area) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera, const HitArea area
+) const {
     const auto hit = Handle::pickRotateHandle(pickRay, camera, area);
     if (hit.isMatch()) {
         const auto hitVector = hit.hitPoint() - m_position;
 
         const auto [xAxis, yAxis, zAxis] = computeAxes(m_position, pickRay.origin);
-        if (
-            vm::dot(hitVector, xAxis) >= 0.0 && vm::dot(hitVector, yAxis) >= 0.0
-            && vm::dot(hitVector, zAxis) >= 0.0) {
+        if (vm::dot(hitVector, xAxis) >= 0.0 && vm::dot(hitVector, yAxis) >= 0.0 && vm::dot(hitVector, zAxis) >= 0.0) {
             return hit;
         }
     }
@@ -352,8 +353,7 @@ Model::Hit RotateObjectsHandle::Handle3D::pickRotateHandle(
     return Model::Hit::NoHit;
 }
 
-RotateObjectsHandle::RotateObjectsHandle()
-    : m_handle2D(m_position), m_handle3D(m_position) {
+RotateObjectsHandle::RotateObjectsHandle() : m_handle2D(m_position), m_handle3D(m_position) {
 }
 
 const vm::vec3 &RotateObjectsHandle::position() const {
@@ -365,12 +365,14 @@ void RotateObjectsHandle::setPosition(const vm::vec3 &position) {
 }
 
 Model::Hit RotateObjectsHandle::pick2D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) const {
     return m_handle2D.pick(pickRay, camera);
 }
 
 Model::Hit RotateObjectsHandle::pick3D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera) const {
+    const vm::ray3 &pickRay, const Renderer::Camera &camera
+) const {
     return m_handle3D.pick(pickRay, camera);
 }
 
@@ -398,26 +400,26 @@ vm::vec3 RotateObjectsHandle::rotationAxis(const HitArea area) const {
 }
 
 void RotateObjectsHandle::renderHandle2D(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     m_handle2D.renderHandle(renderContext, renderBatch);
 }
 
 void RotateObjectsHandle::renderHandle3D(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
+) {
     m_handle3D.renderHandle(renderContext, renderBatch);
 }
 
 void RotateObjectsHandle::renderHighlight2D(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const HitArea area) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const HitArea area
+) {
     m_handle2D.renderHighlight(renderContext, renderBatch, area);
 }
 
 void RotateObjectsHandle::renderHighlight3D(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const HitArea area) {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const HitArea area
+) {
     m_handle3D.renderHighlight(renderContext, renderBatch, area);
 }
 } // namespace View

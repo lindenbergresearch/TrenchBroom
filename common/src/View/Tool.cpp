@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace View {
-Tool::Tool(const bool initiallyActive)
-    : m_active(initiallyActive), m_book(nullptr), m_pageIndex(0) {
+Tool::Tool(const bool initiallyActive) : m_active(initiallyActive), m_book(nullptr), m_pageIndex(0) {
 }
 
 Tool::~Tool() {}

@@ -27,8 +27,8 @@
 namespace TrenchBroom {
 namespace Renderer {
 TexturedIndexArrayMapBuilder::TexturedIndexArrayMapBuilder(
-    const TexturedIndexArrayMap::Size &size)
-    : m_ranges{size} {
+    const TexturedIndexArrayMap::Size &size
+) : m_ranges{size} {
     m_indices.resize(size.indexCount());
 }
 
@@ -46,25 +46,29 @@ void TexturedIndexArrayMapBuilder::addPoint(const Texture *texture, const Index 
 }
 
 void TexturedIndexArrayMapBuilder::addPoints(
-    const Texture *texture, const IndexList &indices) {
+    const Texture *texture, const IndexList &indices
+) {
     add(texture, PrimType::Points, indices);
 }
 
 void TexturedIndexArrayMapBuilder::addLine(
-    const Texture *texture, const Index i1, const Index i2) {
+    const Texture *texture, const Index i1, const Index i2
+) {
     const size_t offset = m_ranges.add(texture, PrimType::Lines, 2);
     m_indices[offset + 0] = i1;
     m_indices[offset + 1] = i2;
 }
 
 void TexturedIndexArrayMapBuilder::addLines(
-    const Texture *texture, const IndexList &indices) {
+    const Texture *texture, const IndexList &indices
+) {
     assert(indices.size() % 2 == 0);
     add(texture, PrimType::Lines, indices);
 }
 
 void TexturedIndexArrayMapBuilder::addTriangle(
-    const Texture *texture, const Index i1, const Index i2, const Index i3) {
+    const Texture *texture, const Index i1, const Index i2, const Index i3
+) {
     const size_t offset = m_ranges.add(texture, PrimType::Triangles, 3);
     m_indices[offset + 0] = i1;
     m_indices[offset + 1] = i2;
@@ -72,18 +76,15 @@ void TexturedIndexArrayMapBuilder::addTriangle(
 }
 
 void TexturedIndexArrayMapBuilder::addTriangles(
-    const Texture *texture, const IndexList &indices) {
+    const Texture *texture, const IndexList &indices
+) {
     assert(indices.size() % 3 == 0);
     add(texture, PrimType::Triangles, indices);
 }
 
 void TexturedIndexArrayMapBuilder::addQuad(
-    const Texture *texture,
-    const Index,
-    const Index i1,
-    const Index i2,
-    const Index i3,
-    const Index i4) {
+    const Texture *texture, const Index, const Index i1, const Index i2, const Index i3, const Index i4
+) {
     const size_t offset = m_ranges.add(texture, PrimType::Quads, 4);
     m_indices[offset + 0] = i1;
     m_indices[offset + 1] = i2;
@@ -92,13 +93,15 @@ void TexturedIndexArrayMapBuilder::addQuad(
 }
 
 void TexturedIndexArrayMapBuilder::addQuads(
-    const Texture *texture, const IndexList &indices) {
+    const Texture *texture, const IndexList &indices
+) {
     assert(indices.size() % 4 == 0);
     add(texture, PrimType::Quads, indices);
 }
 
 void TexturedIndexArrayMapBuilder::addQuads(
-    const Texture *texture, const Index baseIndex, const size_t vertexCount) {
+    const Texture *texture, const Index baseIndex, const size_t vertexCount
+) {
     assert(vertexCount % 4 == 0);
     IndexList indices(vertexCount);
 
@@ -110,7 +113,8 @@ void TexturedIndexArrayMapBuilder::addQuads(
 }
 
 void TexturedIndexArrayMapBuilder::addPolygon(
-    const Texture *texture, const IndexList &indices) {
+    const Texture *texture, const IndexList &indices
+) {
     const size_t count = indices.size();
 
     auto polyIndices = IndexList{};
@@ -126,7 +130,8 @@ void TexturedIndexArrayMapBuilder::addPolygon(
 }
 
 void TexturedIndexArrayMapBuilder::addPolygon(
-    const Texture *texture, const Index baseIndex, const size_t vertexCount) {
+    const Texture *texture, const Index baseIndex, const size_t vertexCount
+) {
     auto polyIndices = IndexList{};
     polyIndices.reserve(3 * (vertexCount - 2));
 
@@ -140,7 +145,8 @@ void TexturedIndexArrayMapBuilder::addPolygon(
 }
 
 void TexturedIndexArrayMapBuilder::add(
-    const Texture *texture, const PrimType primType, const IndexList &indices) {
+    const Texture *texture, const PrimType primType, const IndexList &indices
+) {
     const size_t offset = m_ranges.add(texture, primType, indices.size());
     auto dest = std::begin(m_indices);
     std::advance(dest, static_cast<IndexList::iterator::difference_type>(offset));

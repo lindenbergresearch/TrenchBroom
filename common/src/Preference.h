@@ -102,7 +102,8 @@ public: // private to PreferenceManager
     virtual void setValid(bool _valid) = 0;
 
     virtual bool loadFromJson(
-        const PreferenceSerializer &format, const QJsonValue &value) = 0;
+        const PreferenceSerializer &format, const QJsonValue &value
+    ) = 0;
 
     virtual QJsonValue writeToJson(const PreferenceSerializer &format) const = 0;
 
@@ -122,8 +123,7 @@ private:
     std::filesystem::path m_pathPattern;
 
 public:
-    explicit DynamicPreferencePattern(std::filesystem::path pathPattern)
-        : m_pathPattern{std::move(pathPattern)} {
+    explicit DynamicPreferencePattern(std::filesystem::path pathPattern) : m_pathPattern{std::move(pathPattern)} {
     }
 
     const std::filesystem::path &pathPattern() const override { return m_pathPattern; }
@@ -144,9 +144,8 @@ private:
 
 public:
     Preference(
-        std::filesystem::path path, const T &defaultValue, const bool readOnly = false)
-        : m_path{std::move(path)}, m_defaultValue{defaultValue}, m_value{m_defaultValue}, m_valid{false},
-          m_readOnly{readOnly} {
+        std::filesystem::path path, const T &defaultValue, const bool readOnly = false
+    ) : m_path{std::move(path)}, m_defaultValue{defaultValue}, m_value{m_defaultValue}, m_valid{false}, m_readOnly{readOnly} {
     }
 
     Preference(const Preference &other) = default;

@@ -31,10 +31,10 @@ namespace View {
 // CollapsibleTitleBar
 
 CollapsibleTitleBar::CollapsibleTitleBar(
-    const QString &title, const QString &stateText, QWidget *parent)
-    : TitleBar(
-    title, parent, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, true),
-      m_stateText(new QLabel(stateText)) {
+    const QString &title, const QString &stateText, QWidget *parent
+) : TitleBar(
+    title, parent, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, true
+), m_stateText(new QLabel(stateText)) {
     m_stateText->setFont(m_titleText->font());
     makeInfo(m_stateText);
 
@@ -52,10 +52,8 @@ void CollapsibleTitleBar::mousePressEvent(QMouseEvent * /* event */) {
 // CollapsibleTitledPanel
 
 CollapsibleTitledPanel::CollapsibleTitledPanel(
-    const QString &title, const bool initiallyExpanded, QWidget *parent)
-    : QWidget(parent), m_titleBar(new CollapsibleTitleBar(title, "hide")),
-      m_divider(new BorderLine(BorderLine::Direction::Horizontal)), m_panel(new QWidget()),
-      m_expanded(initiallyExpanded) {
+    const QString &title, const bool initiallyExpanded, QWidget *parent
+) : QWidget(parent), m_titleBar(new CollapsibleTitleBar(title, "hide")), m_divider(new BorderLine(BorderLine::Direction::Horizontal)), m_panel(new QWidget()), m_expanded(initiallyExpanded) {
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);
     sizer->setSpacing(0);
@@ -64,9 +62,11 @@ CollapsibleTitledPanel::CollapsibleTitledPanel(
     sizer->addWidget(m_panel, 1);
     setLayout(sizer);
 
-    connect(m_titleBar, &CollapsibleTitleBar::titleBarClicked, this, [=]() {
-      setExpanded(!m_expanded);
-    });
+    connect(
+        m_titleBar, &CollapsibleTitleBar::titleBarClicked, this, [=]() {
+          setExpanded(!m_expanded);
+        }
+    );
 
     updateExpanded();
 }
@@ -121,7 +121,8 @@ void CollapsibleTitledPanel::updateExpanded() {
         m_divider->show();
         m_panel->show();
         m_titleBar->setStateText(tr("hide"));
-    } else {
+    }
+    else {
         m_divider->hide();
         m_panel->hide();
         m_titleBar->setStateText(tr("show"));

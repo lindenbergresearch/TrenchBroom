@@ -64,12 +64,12 @@ Result<void> IdPakFileSystem::doReadDirectory() {
             addFile(
                 entryPath, [entryFile = std::move(entryFile)]() -> Result<std::shared_ptr<File>> {
                   return entryFile;
-                });
+                }
+            );
         }
 
         return kdl::void_success;
-    }
-    catch (const ReaderException &e) {
+    } catch (const ReaderException &e) {
         return Error{e.what()};
     }
 }

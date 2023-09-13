@@ -104,8 +104,8 @@ public:
      * @param document the document to pass to commands, may be null
      */
     explicit CommandProcessor(
-        MapDocumentCommandFacade *document,
-        std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000});
+        MapDocumentCommandFacade *document, std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000}
+    );
 
     ~CommandProcessor();
 
@@ -244,7 +244,8 @@ public:
      * @return the result of executing the given command
      */
     std::unique_ptr<CommandResult> executeAndStore(
-        std::unique_ptr<UndoableCommand> command);
+        std::unique_ptr<UndoableCommand> command
+    );
 
     /**
      * Undoes the most recently executed command by calling its `performUndo` method and
@@ -289,7 +290,8 @@ private:
      * indicating whether the given command was stored on the undo stack
      */
     SubmitAndStoreResult executeAndStoreCommand(
-        std::unique_ptr<UndoableCommand> command, bool collate);
+        std::unique_ptr<UndoableCommand> command, bool collate
+    );
 
     /**
      * Executes the given command by calling its `performDo` method and triggers the
@@ -353,7 +355,8 @@ private:
      * @return the newly created command
      */
     std::unique_ptr<UndoableCommand> createTransaction(
-        std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands);
+        std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands
+    );
 
     /**
      * Pushes the given command onto the undo stack, unless it can be collated with the

@@ -30,8 +30,7 @@
 #include <filesystem>
 
 namespace TrenchBroom::View {
-ColorModel::ColorModel(QObject *parent)
-    : QAbstractTableModel(parent), m_colorsCount(0) {
+ColorModel::ColorModel(QObject *parent) : QAbstractTableModel(parent), m_colorsCount(0) {
     initialize();
 }
 
@@ -65,7 +64,8 @@ int ColorModel::columnCount(const QModelIndex & /* parent */) const {
 }
 
 QVariant ColorModel::headerData(
-    const int section, const Qt::Orientation orientation, const int role) const {
+    const int section, const Qt::Orientation orientation, const int role
+) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
             case 0:
@@ -114,7 +114,8 @@ QVariant ColorModel::data(const QModelIndex &index, const int role) const {
 }
 
 bool ColorModel::setData(
-    const QModelIndex &index, const QVariant &value, const int /*role*/) {
+    const QModelIndex &index, const QVariant &value, const int /*role*/
+) {
     if (!checkIndex(index) || index.column() != 0) {
         return false;
     }
@@ -151,7 +152,8 @@ void ColorModel::pickColor(const QModelIndex &mi) {
 
     // Show dialog
     auto newColor = QColorDialog::getColor(
-        color, nullptr, "Select new color", QColorDialog::DontUseNativeDialog);
+        color, nullptr, "Select new color", QColorDialog::DontUseNativeDialog
+    );
 
     // Apply color (QColorDialog::getColor() returns an invalid color if the user cancels
     // the dialog)

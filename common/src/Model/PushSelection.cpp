@@ -26,13 +26,11 @@
 
 namespace TrenchBroom {
 namespace Model {
-PushSelection::PushSelection(MapFacade *facade)
-    : m_facade(nullptr) {
+PushSelection::PushSelection(MapFacade *facade) : m_facade(nullptr) {
     initialize(facade);
 }
 
-PushSelection::PushSelection(MapFacade &facade)
-    : PushSelection(&facade) {
+PushSelection::PushSelection(MapFacade &facade) : PushSelection(&facade) {
 }
 
 PushSelection::~PushSelection() {

@@ -35,15 +35,13 @@
 namespace TrenchBroom {
 namespace View {
 EntityPropertyItemDelegate::EntityPropertyItemDelegate(
-    EntityPropertyTable *table,
-    const EntityPropertyModel *model,
-    const QSortFilterProxyModel *proxyModel,
-    QWidget *parent)
-    : QStyledItemDelegate(parent), m_table(table), m_model(model), m_proxyModel(proxyModel) {
+    EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent
+) : QStyledItemDelegate(parent), m_table(table), m_model(model), m_proxyModel(proxyModel) {
 }
 
 QWidget *EntityPropertyItemDelegate::createEditor(
-    QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+    QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index
+) const {
     auto *editor = QStyledItemDelegate::createEditor(parent, option, index);
     auto *lineEdit = dynamic_cast<QLineEdit *>(editor);
     if (lineEdit != nullptr) {
@@ -53,7 +51,8 @@ QWidget *EntityPropertyItemDelegate::createEditor(
 }
 
 void EntityPropertyItemDelegate::setEditorData(
-    QWidget *editor, const QModelIndex &index) const {
+    QWidget *editor, const QModelIndex &index
+) const {
     QStyledItemDelegate::setEditorData(editor, index);
 
     // show the completions immediately when the editor is opened if the editor's text is
@@ -65,37 +64,40 @@ void EntityPropertyItemDelegate::setEditorData(
         // cell editor, when setEditorData() runs, the letter has not been inserted into the
         // QLineEdit yet. Opening the completion popup and then typing the letter causes the
         // editor to close, which is issue #3082 and quite annoying. Only happens on Linux.
-        QTimer::singleShot(0, lineEdit, [lineEdit]() {
-          const QString text = lineEdit->text();
-          if (text.isEmpty()) {
-              QCompleter *completer = lineEdit->completer();
-              if (completer != nullptr) {
-                  completer->setCompletionPrefix("");
-                  completer->complete();
+        QTimer::singleShot(
+            0, lineEdit, [lineEdit]() {
+              const QString text = lineEdit->text();
+              if (text.isEmpty()) {
+                  QCompleter *completer = lineEdit->completer();
+                  if (completer != nullptr) {
+                      completer->setCompletionPrefix("");
+                      completer->complete();
+                  }
               }
-          }
-        });
+            }
+        );
     }
 }
 
 void EntityPropertyItemDelegate::setupCompletions(
-    QLineEdit *lineEdit, const QModelIndex &index) const {
+    QLineEdit *lineEdit, const QModelIndex &index
+) const {
     auto *completer = new QCompleter(getCompletions(index), lineEdit);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
     lineEdit->setCompleter(completer);
 
     connect(
-        completer,
-        QOverload<const QString &>::of(&QCompleter::activated),
-        this,
-        [this, lineEdit](const QString & /* value */) { m_table->finishEditing(lineEdit); });
+        completer, QOverload<const QString &>::of(&QCompleter::activated), this, [this, lineEdit](const QString & /* value */) { m_table->finishEditing(lineEdit); }
+    );
 
-    connect(lineEdit, &QLineEdit::returnPressed, this, [this, lineEdit, completer]() {
-      if (completer->popup()->isVisible()) {
-          m_table->finishEditing(lineEdit);
-      }
-    });
+    connect(
+        lineEdit, &QLineEdit::returnPressed, this, [this, lineEdit, completer]() {
+          if (completer->popup()->isVisible()) {
+              m_table->finishEditing(lineEdit);
+          }
+        }
+    );
 }
 
 QStringList EntityPropertyItemDelegate::getCompletions(const QModelIndex &index) const {

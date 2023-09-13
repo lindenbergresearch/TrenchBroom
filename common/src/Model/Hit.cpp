@@ -58,7 +58,8 @@ Hit selectClosest(const Hit &first, const Hit &second) {
     }
     if (first.distance() <= second.distance()) {
         return first;
-    } else {
+    }
+    else {
         return second;
     }
 }

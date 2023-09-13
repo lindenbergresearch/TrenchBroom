@@ -44,7 +44,8 @@ public:
 
 private:
     static std::vector<Vertex> vertices(
-        const OrthographicCamera &camera, const vm::bbox3 &worldBounds);
+        const OrthographicCamera &camera, const vm::bbox3 &worldBounds
+    );
 
     void doPrepareVertices(VboManager &vboManager) override;
 

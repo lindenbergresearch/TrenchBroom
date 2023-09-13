@@ -62,16 +62,7 @@ public:
 
     BrushFaceAttributes &operator=(BrushFaceAttributes other);
 
-    kdl_reflect_decl(
-        BrushFaceAttributes,
-        m_textureName,
-        m_offset,
-        m_scale,
-        m_rotation,
-        m_surfaceContents,
-        m_surfaceFlags,
-        m_surfaceValue,
-        m_color);
+    kdl_reflect_decl(BrushFaceAttributes, m_textureName, m_offset, m_scale, m_rotation, m_surfaceContents, m_surfaceFlags, m_surfaceValue, m_color);
 
     friend void swap(BrushFaceAttributes &lhs, BrushFaceAttributes &rhs);
 

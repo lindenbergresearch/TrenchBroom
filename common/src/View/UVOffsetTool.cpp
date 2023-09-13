@@ -42,8 +42,8 @@
 namespace TrenchBroom {
 namespace View {
 UVOffsetTool::UVOffsetTool(
-    std::weak_ptr<MapDocument> document, const UVViewHelper &helper)
-    : ToolController{}, Tool{true}, m_document{std::move(document)}, m_helper{helper} {
+    std::weak_ptr<MapDocument> document, const UVViewHelper &helper
+) : ToolController{}, Tool{true}, m_document{std::move(document)}, m_helper{helper} {
 }
 
 Tool &UVOffsetTool::tool() {
@@ -60,7 +60,8 @@ static vm::vec2f computeHitPoint(const UVViewHelper &helper, const vm::ray3 &ray
     const auto hitPoint = vm::point_at_distance(ray, distance);
 
     const auto transform = helper.face()->toTexCoordSystemMatrix(
-        vm::vec2f::zero(), helper.face()->attributes().scale(), true);
+        vm::vec2f::zero(), helper.face()->attributes().scale(), true
+    );
     return vm::vec2f{transform * hitPoint};
 }
 
@@ -73,14 +74,12 @@ static vm::vec2f snapDelta(const UVViewHelper &helper, const vm::vec2f &delta) {
     }
 
     const auto transform = helper.face()->toTexCoordSystemMatrix(
-        helper.face()->attributes().offset() - delta,
-        helper.face()->attributes().scale(),
-        true);
+        helper.face()->attributes().offset() - delta, helper.face()->attributes().scale(), true
+    );
 
     auto distance = vm::vec2f::max();
     for (const Model::BrushVertex *vertex: helper.face()->vertices()) {
-        const auto temp =
-            helper.computeDistanceFromTextureGrid(transform * vertex->position());
+        const auto temp = helper.computeDistanceFromTextureGrid(transform * vertex->position());
         distance = vm::abs_min(distance, temp);
     }
 
@@ -96,8 +95,8 @@ private:
 
 public:
     UVOffsetDragTracker(
-        MapDocument &document, const UVViewHelper &helper, const InputState &inputState)
-        : m_document{document}, m_helper{helper}, m_lastPoint{computeHitPoint(m_helper, inputState.pickRay())} {
+        MapDocument &document, const UVViewHelper &helper, const InputState &inputState
+    ) : m_document{document}, m_helper{helper}, m_lastPoint{computeHitPoint(m_helper, inputState.pickRay())} {
         m_document.startTransaction("Move Texture", TransactionScope::LongRunning);
     }
 
@@ -108,8 +107,7 @@ public:
         const auto delta = curPoint - m_lastPoint;
         const auto snapped = snapDelta(m_helper, delta);
 
-        const auto corrected =
-            vm::correct(m_helper.face()->attributes().offset() - snapped, 4, 0.0f);
+        const auto corrected = vm::correct(m_helper.face()->attributes().offset() - snapped, 4, 0.0f);
 
         if (corrected == m_helper.face()->attributes().offset()) {
             return true;
@@ -133,14 +131,13 @@ public:
 std::unique_ptr<DragTracker> UVOffsetTool::acceptMouseDrag(const InputState &inputState) {
     assert(m_helper.valid());
 
-    if (
-        !inputState.modifierKeysPressed(ModifierKeys::MKNone)
-        || !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
+    if (!inputState.modifierKeysPressed(ModifierKeys::MKNone) || !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
         return nullptr;
     }
 
     return std::make_unique<UVOffsetDragTracker>(
-        *kdl::mem_lock(m_document), m_helper, inputState);
+        *kdl::mem_lock(m_document), m_helper, inputState
+    );
 }
 
 bool UVOffsetTool::cancel() {

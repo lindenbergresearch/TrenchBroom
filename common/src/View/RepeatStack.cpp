@@ -27,8 +27,7 @@
 
 namespace TrenchBroom {
 namespace View {
-RepeatStack::RepeatStack()
-    : m_clearOnNextPush{false}, m_repeating{false} {
+RepeatStack::RepeatStack() : m_clearOnNextPush{false}, m_repeating{false} {
 }
 
 size_t RepeatStack::size() const {
@@ -44,7 +43,8 @@ void RepeatStack::push(RepeatableAction repeatableAction) {
             }
 
             m_stack.push_back(std::move(repeatableAction));
-        } else {
+        }
+        else {
             auto &openTransaction = m_openTransactionsStack.back();
             openTransaction.push_back(std::move(repeatableAction));
         }

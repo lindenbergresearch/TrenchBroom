@@ -102,9 +102,8 @@ public:
      * @param gameEngineConfig new config to save
      */
     void saveGameEngineConfig(
-        const std::string &gameName,
-        const GameEngineConfig &gameEngineConfig,
-        Logger &logger);
+        const std::string &gameName, const GameEngineConfig &gameEngineConfig, Logger &logger
+    );
 
     /**
      * Saves the compilation configurations for the game with the given name.
@@ -114,9 +113,8 @@ public:
      * @param logger the logger
      */
     void saveCompilationConfig(
-        const std::string &gameName,
-        const CompilationConfig &compilationConfig,
-        Logger &logger);
+        const std::string &gameName, const CompilationConfig &compilationConfig, Logger &logger
+    );
 
     const std::vector<std::string> &gameList() const;
 
@@ -133,15 +131,16 @@ public:
     bool setGamePath(const std::string &gameName, const std::filesystem::path &gamePath);
 
     bool isGamePathPreference(
-        const std::string &gameName, const std::filesystem::path &prefPath) const;
+        const std::string &gameName, const std::filesystem::path &prefPath
+    ) const;
 
     std::filesystem::path compilationToolPath(
-        const std::string &gameName, const std::string &toolName) const;
+        const std::string &gameName, const std::string &toolName
+    ) const;
 
     bool setCompilationToolPath(
-        const std::string &gameName,
-        const std::string &toolName,
-        const std::filesystem::path &gamePath);
+        const std::string &gameName, const std::string &toolName, const std::filesystem::path &gamePath
+    );
 
     GameConfig &gameConfig(const std::string &gameName);
 
@@ -156,7 +155,8 @@ public:
      * MapFormat::Unknown is returned as the map format.
      */
     Result<std::pair<std::string, MapFormat>> detectGame(
-        const std::filesystem::path &path) const;
+        const std::filesystem::path &path
+    ) const;
 
     /**
      * Returns the directory for user game configurations.
@@ -180,9 +180,11 @@ private:
     void loadGameEngineConfig(GameConfig &gameConfig);
 
     void writeCompilationConfig(
-        GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger);
+        GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger
+    );
 
     void writeGameEngineConfig(
-        GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger);
+        GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger
+    );
 };
 } // namespace TrenchBroom::Model

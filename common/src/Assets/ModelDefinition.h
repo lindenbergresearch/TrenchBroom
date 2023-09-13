@@ -48,7 +48,8 @@ struct ModelSpecification {
   ModelSpecification();
 
   ModelSpecification(
-      const std::filesystem::path &path, size_t skinIndex, size_t frameIndex);
+      const std::filesystem::path &path, size_t skinIndex, size_t frameIndex
+  );
 
   kdl_reflect_decl(ModelSpecification, path, skinIndex, frameIndex);
 };
@@ -95,8 +96,8 @@ public:
      * @throws EL::Exception if the expression could not be evaluated
      */
     vm::vec3 scale(
-        const EL::VariableStore &variableStore,
-        const std::optional<EL::Expression> &defaultScaleExpression) const;
+        const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression
+    ) const;
 
     kdl_reflect_decl(ModelDefinition, m_expression);
 };
@@ -106,8 +107,7 @@ public:
  * an error occurs.
  */
 vm::vec3 safeGetModelScale(
-    const ModelDefinition &definition,
-    const EL::VariableStore &variableStore,
-    const std::optional<EL::Expression> &defaultScaleExpression);
+    const ModelDefinition &definition, const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression
+);
 } // namespace Assets
 } // namespace TrenchBroom

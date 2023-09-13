@@ -62,8 +62,7 @@ private:
     std::function<bool(const BrushFace &)> m_matcher;
 
 public:
-    explicit BrushFaceMatchVisitor(std::function<bool(const BrushFace &)> matcher)
-        : m_matcher(std::move(matcher)) {
+    explicit BrushFaceMatchVisitor(std::function<bool(const BrushFace &)> matcher) : m_matcher(std::move(matcher)) {
     }
 
     void visit(const BrushFace &face) override;
@@ -74,8 +73,7 @@ private:
     std::function<bool(const BrushNode &)> m_matcher;
 
 public:
-    explicit BrushMatchVisitor(std::function<bool(const BrushNode &)> matcher)
-        : m_matcher(std::move(matcher)) {
+    explicit BrushMatchVisitor(std::function<bool(const BrushNode &)> matcher) : m_matcher(std::move(matcher)) {
     }
 
     void visit(const BrushNode &brush) override;
@@ -146,11 +144,8 @@ protected:
 
 protected:
     FlagsTagMatcher(
-        int flags,
-        GetFlags getFlags,
-        SetFlags setFlags,
-        SetFlags unsetFlags,
-        GetFlagNames getFlagNames);
+        int flags, GetFlags getFlags, SetFlags setFlags, SetFlags unsetFlags, GetFlagNames getFlagNames
+    );
 
 public:
     bool matches(const Taggable &taggable) const override;

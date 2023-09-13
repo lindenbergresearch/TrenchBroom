@@ -26,8 +26,7 @@
 namespace TrenchBroom::IO {
 EntityDefinitionLoader::~EntityDefinitionLoader() {}
 
-Result<std::vector<Assets::EntityDefinition *>> EntityDefinitionLoader::
-loadEntityDefinitions(ParserStatus &status, const std::filesystem::path &path) const {
+Result<std::vector<Assets::EntityDefinition *>> EntityDefinitionLoader::loadEntityDefinitions(ParserStatus &status, const std::filesystem::path &path) const {
     return doLoadEntityDefinitions(status, path);
 }
 } // namespace TrenchBroom::IO

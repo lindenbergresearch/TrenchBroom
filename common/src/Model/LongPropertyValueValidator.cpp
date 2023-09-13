@@ -54,24 +54,22 @@ IssueQuickFix makeTruncatePropertyValueQuickFix(const size_t maxLength) {
 }
 } // namespace
 
-LongPropertyValueValidator::LongPropertyValueValidator(const size_t maxLength)
-    : Validator{Type, "Long entity property value"}, m_maxLength{maxLength} {
+LongPropertyValueValidator::LongPropertyValueValidator(const size_t maxLength) : Validator{Type, "Long entity property value"}, m_maxLength{maxLength} {
     addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
     addQuickFix(makeTruncatePropertyValueQuickFix(m_maxLength));
 }
 
 void LongPropertyValueValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues
+) const {
     for (const auto &property: entityNode.entity().properties()) {
         const auto &propertyKey = property.key();
         const auto &propertyValue = property.value();
         if (propertyValue.size() >= m_maxLength) {
-            issues.push_back(std::make_unique<EntityPropertyIssue>(
-                Type,
-                entityNode,
-                propertyKey,
-                "Property value '" + propertyKey + "...' of " + entityNode.name()
-                + " is too long."));
+            issues.push_back(
+                std::make_unique<EntityPropertyIssue>(
+                    Type, entityNode, propertyKey, "Property value '" + propertyKey + "...' of " + entityNode.name() + " is too long."
+                ));
         }
     }
 }

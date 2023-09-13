@@ -38,13 +38,16 @@ void glSetEdgeOffset(double f);
 void glResetEdgeOffset();
 
 void coordinateSystemVerticesX(
-    const vm::bbox3f &bounds, vm::vec3f &start, vm::vec3f &end);
+    const vm::bbox3f &bounds, vm::vec3f &start, vm::vec3f &end
+);
 
 void coordinateSystemVerticesY(
-    const vm::bbox3f &bounds, vm::vec3f &start, vm::vec3f &end);
+    const vm::bbox3f &bounds, vm::vec3f &start, vm::vec3f &end
+);
 
 void coordinateSystemVerticesZ(
-    const vm::bbox3f &bounds, vm::vec3f &start, vm::vec3f &end);
+    const vm::bbox3f &bounds, vm::vec3f &start, vm::vec3f &end
+);
 
 class TextureRenderFunc {
 public:
@@ -65,25 +68,26 @@ public:
 std::vector<vm::vec2f> circle2D(float radius, size_t segments);
 
 std::vector<vm::vec2f> circle2D(
-    float radius, float startAngle, float angleLength, size_t segments);
+    float radius, float startAngle, float angleLength, size_t segments
+);
 
 std::vector<vm::vec3f> circle2D(
-    float radius,
-    vm::axis::type axis,
-    float startAngle,
-    float angleLength,
-    size_t segments);
+    float radius, vm::axis::type axis, float startAngle, float angleLength, size_t segments
+);
 
 std::pair<float, float> startAngleAndLength(
-    vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis);
+    vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis
+);
 
 size_t roundedRect2DVertexCount(size_t cornerSegments);
 
 std::vector<vm::vec2f> roundedRect2D(
-    const vm::vec2f &size, float cornerRadius, size_t cornerSegments);
+    const vm::vec2f &size, float cornerRadius, size_t cornerSegments
+);
 
 std::vector<vm::vec2f> roundedRect2D(
-    float width, float height, float cornerRadius, size_t cornerSegments);
+    float width, float height, float cornerRadius, size_t cornerSegments
+);
 
 struct VertsAndNormals {
   std::vector<vm::vec3f> vertices;
