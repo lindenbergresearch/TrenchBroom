@@ -29,15 +29,15 @@ SplitterHandle::SplitterHandle(const Qt::Orientation orientation, QSplitter *par
     : QSplitterHandle(orientation, parent) {
 }
 
-QSize SplitterHandle::sizeHint() const {
-    return QSize(3, 3);
-}
+//QSize SplitterHandle::sizeHint() const {
+//    return QSize(6, 6);
+//}
 
-void SplitterHandle::paintEvent(QPaintEvent *event) {
-    QPainter painter(this);
-    painter.setPen(Qt::NoPen);
-    painter.fillRect(event->rect(), QBrush(palette().color(QPalette::Mid)));
-}
+//void SplitterHandle::paintEvent(QPaintEvent *event) {
+//    QPainter painter(this);
+////    painter.setPen(Qt::NoPen);
+//  //  painter.fillRect(event->rect(), QBrush(palette().color(QPalette::Mid)));
+//}
 
 Splitter::Splitter(const Qt::Orientation orientation, QWidget *parent)
     : QSplitter(orientation, parent) {
