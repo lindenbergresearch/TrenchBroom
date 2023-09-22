@@ -173,10 +173,11 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     auto *menuBar = new QMenuBar{};
     auto actionMap = std::map<const Action *, QAction *>{};
 
-    auto menuBuilder = MainMenuBuilder{*menuBar, actionMap, [](const Action &action) {
-      auto context = ActionExecutionContext{nullptr, nullptr};
-      action.execute(context);
-    }};
+    auto menuBuilder = MainMenuBuilder{
+        *menuBar, actionMap, [](const Action &action) {
+          auto context = ActionExecutionContext{nullptr, nullptr};
+          action.execute(context);
+        }};
 
     const auto &actionManager = ActionManager::instance();
     actionManager.visitMainMenu(menuBuilder);
@@ -209,45 +210,50 @@ FrameManager *TrenchBroomApp::frameManager() {
 }
 
 QPalette TrenchBroomApp::darkPalette() {
-    const auto br = 0.9;
-    const auto r = br * 0.867;
-    const auto g = br * 0.937;
-    const auto b = br * 1.0;
+    const auto br = 1.0f;
+    const auto contrast = pref(Preferences::UIContrast);
+//    const auto r = br * 0.867;
+//    const auto g = br * 0.937;
+//    const auto b = br * 1.0;
 
-    const auto button = QColor{int(35 * r), int(35 * g), int(35 * b)};
-    const auto text = QColor{200, 200, 200};
-    const auto highlight = QColor{int(52 * r), int(102 * g), int(196 * b)};
+    const auto hl_color = pref(Preferences::UIHighlightColor);
+    const auto tint_color = pref(Preferences::UIWindowTintColor);
+    const auto text_color = pref(Preferences::UITextColor);
+
+    const auto button = toQColor(Color{br * tint_color.r(), br * tint_color.g(), br * tint_color.b()});
+    const auto text = toQColor(text_color);
+    const auto highlight = toQColor(hl_color);
 
     // Build an initial palette based on the button color
     auto palette = QPalette{button};
 
     // Window colors
-    palette.setColor(QPalette::Active, QPalette::Window, QColor{int(50 * r), int(50 * g), int(50 * b)});
-    palette.setColor(QPalette::Inactive, QPalette::Window, QColor{int(40 * r), int(40 * g), int(40 * b)});
-    palette.setColor(QPalette::Disabled, QPalette::Window, QColor{int(50 * r), int(50 * g), int(50 * b)}.darker(200));
+    palette.setColor(QPalette::Active, QPalette::Window, button.lighter(int(130.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::Window, button.lighter(int(70.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::Window, button.darker(int(200.f * contrast)));
 
     // List box backgrounds, text entry backgrounds, menu backgrounds
-    palette.setColor(QPalette::Base, button.darker(130));
+    palette.setColor(QPalette::Base, button.darker(int(100.f * contrast)));
 
     // Button text
     palette.setColor(QPalette::Active, QPalette::ButtonText, text);
     palette.setColor(QPalette::Inactive, QPalette::ButtonText, text);
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, text.darker(200));
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, text.darker(int(200.f * contrast)));
 
     // WindowText is supposed to be against QPalette::Window
     palette.setColor(QPalette::Active, QPalette::WindowText, text);
     palette.setColor(QPalette::Inactive, QPalette::WindowText, text);
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, text.darker(200));
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, text.darker(int(200.f * contrast)));
 
     // Menu text, text edit text, table cell text
-    palette.setColor(QPalette::Active, QPalette::Text, text.darker(115));
-    palette.setColor(QPalette::Inactive, QPalette::Text, text.darker(115));
+    palette.setColor(QPalette::Active, QPalette::Text, text.darker(int(115.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::Text, text.darker(int(115.f * contrast)));
 
     // Disabled menu item text color
-    palette.setColor(QPalette::Disabled, QPalette::Text, QColor{int(100 * r), int(100 * g), int(100 * b)});
+    palette.setColor(QPalette::Disabled, QPalette::Text, button.darker(int(200.f * contrast)));
 
     // Disabled menu item text shadow
-    palette.setColor(QPalette::Disabled, QPalette::Light, button.darker(200));
+    palette.setColor(QPalette::Disabled, QPalette::Light, button.darker(int(200.f * contrast)));
 
     // Highlight (selected list box row, selected grid cell background, selected tab text
     palette.setColor(QPalette::Active, QPalette::Highlight, highlight);
@@ -563,6 +569,11 @@ bool TrenchBroomApp::useSDI() {
 #else
     return false;
 #endif
+}
+
+void TrenchBroomApp::reloadStyle() {
+    //loadStyleSheets();
+    loadStyle();
 }
 
 

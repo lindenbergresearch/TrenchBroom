@@ -74,6 +74,8 @@ private:
     void loadStyle();
 
 public:
+    void reloadStyle();
+
     const std::vector<std::filesystem::path> &recentDocuments() const;
 
     void addRecentDocumentMenu(QMenu &menu);
