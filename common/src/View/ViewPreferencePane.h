@@ -34,7 +34,7 @@ private:
     QComboBox *m_layoutCombo = nullptr;
     QCheckBox *m_link2dCameras = nullptr;
     SliderWithLabel *m_brightnessSlider = nullptr;
-    SliderWithLabel *m_contrastSlider = nullptr;
+    SliderWithLabel *m_UIBrightnessSlider = nullptr;
     SliderWithLabel *m_gridAlphaSlider = nullptr;
     SliderWithLabel *m_fovSlider = nullptr;
     QComboBox *m_unitsDisplayType = nullptr;
@@ -53,6 +53,8 @@ public:
 
 private:
     void createGui();
+
+    void reloadUIStyle();
 
     QWidget *createViewPreferences();
 
@@ -78,7 +80,7 @@ private slots:
 
     void brightnessChanged(int value);
 
-    void contrastChanged(int value);
+    void UIBrightnessChanged(int value);
 
     void gridAlphaChanged(int value);
 

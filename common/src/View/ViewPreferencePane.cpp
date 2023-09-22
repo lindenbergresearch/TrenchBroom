@@ -43,6 +43,7 @@
 
 #include <kdl/overload.h>
 #include <vecmath/scalar.h>
+#include <TrenchBroomApp.h>
 
 #include <array>
 #include <string>
@@ -63,14 +64,6 @@ const auto TextureModes = std::array<TextureMode, 6>{
     TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"}, TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"},
     TextureMode{GL_LINEAR, GL_LINEAR, "Linear"}, TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"}, TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
 };
-
-constexpr int contrastToUI(const float value) {
-    return int(vm::round(100.0f * (value - 1.f)));
-}
-
-constexpr float contrastFromUI(const int value) {
-    return (float(value) / 100.0f) + 1.0f;
-}
 
 constexpr int brightnessToUI(const float value) {
     return int(vm::round(100.0f * (value - 1.0f)));
@@ -141,9 +134,9 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     );
 
 
-    m_contrastSlider = new SliderWithLabel{contrastToUI(0.5f), contrastToUI(1.5f)};
-    m_contrastSlider->setMaximumWidth(400);
-    m_contrastSlider->setToolTip(
+    m_UIBrightnessSlider = new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f)};
+    m_UIBrightnessSlider->setMaximumWidth(400);
+    m_UIBrightnessSlider->setToolTip(
         "Sets the contrast for UI controls"
     );
 
@@ -237,7 +230,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     layout->addSection("User Interface");
     layout->addRow("Theme", themeLayout);
-    layout->addRow("Contrast", m_contrastSlider);
+    layout->addRow("Brightness", m_UIBrightnessSlider);
 
     layout->addSection("Map Views");
     layout->addRow("Layout", viewLayoutLayout);
@@ -278,7 +271,7 @@ void ViewPreferencePane::bindEvents() {
     );
 
     connect(
-        m_contrastSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::contrastChanged
+        m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged
     );
 
 
@@ -351,7 +344,7 @@ void ViewPreferencePane::doUpdateControls() {
     m_layoutCombo->setCurrentIndex(pref(Preferences::MapViewLayout));
     m_link2dCameras->setChecked(pref(Preferences::Link2DCameras));
     m_brightnessSlider->setValue(brightnessToUI(pref(Preferences::Brightness)));
-    m_contrastSlider->setValue(contrastToUI(pref(Preferences::UIContrast)));
+    m_UIBrightnessSlider->setValue(brightnessToUI(pref(Preferences::UIBrightness)));
     m_gridAlphaSlider->setRatio(pref(Preferences::GridAlpha));
     m_fovSlider->setValue(int(pref(Preferences::CameraFov)));
 
@@ -440,9 +433,10 @@ void ViewPreferencePane::brightnessChanged(const int value) {
     prefs.set(Preferences::Brightness, brightnessFromUI(value));
 }
 
-void ViewPreferencePane::contrastChanged(const int value) {
+void ViewPreferencePane::UIBrightnessChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
-    prefs.set(Preferences::UIContrast, contrastFromUI(value));
+    prefs.set(Preferences::UIBrightness, brightnessFromUI(value));
+    reloadUIStyle();
 }
 
 void ViewPreferencePane::gridAlphaChanged(const int /* value */) {
@@ -541,5 +535,11 @@ void ViewPreferencePane::renderFontFileChanged(const int index) {
 
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::RendererFontPath, font_files[size_t(index)]);
+}
+
+void ViewPreferencePane::reloadUIStyle() {
+    TrenchBroomApp &app = TrenchBroomApp::instance();
+
+    app.reloadStyle();
 }
 } // namespace TrenchBroom::View

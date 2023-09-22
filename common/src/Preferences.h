@@ -156,7 +156,7 @@ extern Preference<Color> TextureBrowserUsedColor;
 extern Preference<Color> UIHighlightColor;
 extern Preference<Color> UIWindowTintColor;
 extern Preference<Color> UITextColor;
-extern Preference<float> UIContrast;
+extern Preference<float> UIBrightness;
 
 
 extern Preference<float> CameraLookSpeed;
