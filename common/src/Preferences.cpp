@@ -216,6 +216,16 @@ Preference<Color> TextureBrowserSelectedColor(
 Preference<Color> TextureBrowserUsedColor(
     "Texture Browser/Used color", Color(1.0f, 0.7f, 0.0f, 1.0f));
 
+Preference<Color> UIHighlightColor(
+    "Editor/Colors/UI Highlight Color", Color(0.121f, 0.3359f, 0.6875f));
+Preference<Color> UIWindowTintColor(
+    "Editor/Colors/UI Window Color Tint", Color(0.107f, 0.117f, 0.125f));
+Preference<Color> UITextColor(
+    "Editor/Colors/UI Text Color", Color(0.76f, 0.76f, 0.76f));
+
+Preference<float> UIContrast("Editor/Colors/UI Contrast", 1.0f);
+
+
 Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
 Preference<bool> CameraLookInvertV("Controls/Camera/Invert vertical look", false);
@@ -324,7 +334,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &HandleColor, &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor,
         &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness,
         &GridAlpha, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &RendererFontSize, &BrowserFontSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
-        &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &CameraLookSpeed, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
+        &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor,&UIHighlightColor,&UITextColor,&UIWindowTintColor, &UIContrast, &CameraLookSpeed, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(),
         &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode,
         &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes, &EntityLinkMode
