@@ -115,11 +115,11 @@ ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(ControlList
 ) : QWidget(parent), m_renderer(renderer) {
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(2);
+    layout->setSpacing(LayoutConstants::NarrowVMargin);
     layout->addWidget(m_renderer);
 
     if (showSeparator) {
-        auto borderline = new BorderLine(BorderLine::Direction::Horizontal, 2, this);
+        auto borderline = new BorderLine(BorderLine::Direction::Horizontal, LayoutConstants::MediumHMargin, this);
         layout->addWidget(borderline);
     }
 
