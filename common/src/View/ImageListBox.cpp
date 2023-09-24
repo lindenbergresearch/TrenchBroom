@@ -40,7 +40,7 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(
     makeInfo(m_subtitleLabel);
 
     auto *imageAndTextLayout = new QHBoxLayout();
-    imageAndTextLayout->setContentsMargins(0, 4, 0, 0);
+    imageAndTextLayout->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::NarrowVMargin);
     imageAndTextLayout->setSpacing(LayoutConstants::MediumHMargin);
     setLayout(imageAndTextLayout);
 
@@ -49,8 +49,8 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(
     m_imageLabel->setPixmap(image);
 
     auto *textLayout = new QVBoxLayout();
-    textLayout->setContentsMargins(0, 2, 0, 2);
-    textLayout->setSpacing(2);
+    textLayout->setContentsMargins(0, 0, 0, LayoutConstants::NarrowVMargin);
+    textLayout->setSpacing(LayoutConstants::NarrowVMargin);
     textLayout->addWidget(m_titleLabel);
     textLayout->addWidget(m_subtitleLabel);
 
