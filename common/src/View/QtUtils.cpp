@@ -53,6 +53,8 @@
 #include "View/MapFrame.h"
 #include "View/MapTextEncoding.h"
 #include "View/ViewConstants.h"
+#include <TrenchBroomApp.h>
+
 
 // QDesktopWidget was deprecated in Qt 5.10 and we should use QGuiApplication::screenAt
 // in 5.10 and above Used in centerOnScreen
@@ -205,12 +207,16 @@ void centerOnScreen(QWidget *window) {
 }
 
 QWidget *makeDefault(QWidget *widget) {
+    const auto &app = TrenchBroomApp::instance();
     widget->setFont(QFont{});
-    widget->setPalette(QPalette{});
+    widget->setPalette(app.palette());
     return widget;
 }
 
 QWidget *makeEmphasized(QWidget *widget) {
+    const auto &app = TrenchBroomApp::instance();
+    widget->setPalette(app.palette());
+
     auto font = widget->font();
     font.setBold(true);
     widget->setFont(font);
@@ -224,23 +230,27 @@ QWidget *makeUnemphasized(QWidget *widget) {
 
 QWidget *makeInfo(QWidget *widget) {
     makeDefault(widget);
-
     widget = makeSmall(widget);
 
-    const auto defaultPalette = QPalette{};
-    auto palette = widget->palette();
-    // Set all color groups (active, inactive, disabled) to use the disabled color, so it's
-    // dimmer
-    palette.setColor(
-        QPalette::WindowText, defaultPalette.color(QPalette::Disabled, QPalette::WindowText));
-    palette.setColor(
-        QPalette::Text, defaultPalette.color(QPalette::Disabled, QPalette::Text));
-    widget->setPalette(palette);
     return widget;
 }
 
 QWidget *makeSmall(QWidget *widget) {
-    widget->setAttribute(Qt::WA_MacSmallSize);
+    auto font = widget->font();
+    font.setPointSize(font.pointSize()-2);
+    widget->setFont(font);
+
+    return widget;
+}
+
+QWidget *makeTitle(QWidget *widget) {
+    auto font = widget->font();
+    font.setPointSize(font.pointSize()+1);
+    font.setBold(true);
+    font.setUnderline(true);
+
+    widget->setFont(font);
+
     return widget;
 }
 
@@ -251,6 +261,7 @@ QWidget *makeHeader(QWidget *widget) {
     font.setPointSize(2 * font.pointSize());
     font.setBold(true);
     widget->setFont(font);
+
     return widget;
 }
 
@@ -259,6 +270,7 @@ QWidget *makeError(QWidget *widget) {
     palette.setColor(QPalette::Normal, QPalette::WindowText, Qt::red);
     palette.setColor(QPalette::Normal, QPalette::Text, Qt::red);
     widget->setPalette(palette);
+
     return widget;
 }
 

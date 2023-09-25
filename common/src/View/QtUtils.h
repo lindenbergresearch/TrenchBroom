@@ -218,6 +218,8 @@ QWidget *makeInfo(QWidget *widget);
 
 QWidget *makeSmall(QWidget *widget);
 
+QWidget *makeTitle(QWidget *widget);
+
 QWidget *makeHeader(QWidget *widget);
 
 QWidget *makeError(QWidget *widget);
