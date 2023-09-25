@@ -158,6 +158,10 @@ extern Preference<Color> UIWindowTintColor;
 extern Preference<Color> UITextColor;
 extern Preference<float> UIBrightness;
 
+extern Preference<Color> LogDebugColor;
+extern Preference<Color> LogInfoColor;
+extern Preference<Color> LogWarningColor;
+extern Preference<Color> LogErrorColor;
 
 extern Preference<float> CameraLookSpeed;
 extern Preference<bool> CameraLookInvertH;

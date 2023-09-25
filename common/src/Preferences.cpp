@@ -221,10 +221,13 @@ Preference<Color> UIHighlightColor(
 Preference<Color> UIWindowTintColor(
     "Editor/Colors/UI Window Color Tint", Color(0.107f, 0.117f, 0.125f));
 Preference<Color> UITextColor(
-    "Editor/Colors/UI Text Color", Color(0.76f, 0.76f, 0.76f));
-
+    "Editor/Colors/UI Text Color", Color(0.7f, 0.7f, 0.7f));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
 
+Preference<float> LogDebugColor("Editor/Colors/UI Brightness", 1.0f);
+Preference<float> LogInfoColor("Editor/Colors/UI Brightness", 1.0f);
+Preference<float> LogWarningColor("Editor/Colors/UI Brightness", 1.0f);
+Preference<float> LogErrorColor("Editor/Colors/UI Brightness", 1.0f);
 
 Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
@@ -334,7 +337,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &HandleColor, &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor,
         &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness,
         &GridAlpha, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &RendererFontSize, &BrowserFontSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
-        &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &CameraLookSpeed, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
+        &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(),
         &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode,
         &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes, &EntityLinkMode
