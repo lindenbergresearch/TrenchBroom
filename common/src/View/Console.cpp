@@ -26,6 +26,9 @@
 
 #include "FileLogger.h"
 #include "View/ViewConstants.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
+#include "View/QtUtils.h"
 
 #include <string>
 
@@ -64,17 +67,16 @@ void Console::logToConsole(const LogLevel level, const QString &message) {
     QTextCharFormat format;
     switch (level) {
         case LogLevel::Debug:
-            format.setForeground(
-                QBrush(m_textView->palette().color(QPalette::Disabled, QPalette::Text)));
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogDebugColor))));
             break;
         case LogLevel::Info:
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogInfoColor))));
             break;
         case LogLevel::Warn:
-            format.setForeground(
-                QBrush(m_textView->palette().color(QPalette::Active, QPalette::Text)));
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogWarningColor))));
             break;
         case LogLevel::Error:
-            format.setForeground(QBrush(QColor(250, 30, 60)));
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
             break;
     }
     format.setFont(Fonts::fixedWidthFont());
