@@ -224,10 +224,10 @@ Preference<Color> UITextColor(
     "Editor/Colors/UI Text Color", Color(0.7f, 0.7f, 0.7f));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
 
-Preference<float> LogDebugColor("Editor/Colors/UI Brightness", 1.0f);
-Preference<float> LogInfoColor("Editor/Colors/UI Brightness", 1.0f);
-Preference<float> LogWarningColor("Editor/Colors/UI Brightness", 1.0f);
-Preference<float> LogErrorColor("Editor/Colors/UI Brightness", 1.0f);
+Preference<Color> LogDebugColor("Editor/Colors/LogLevel Debug", Color(0.0f, 0.6f, 0.68f));
+Preference<Color> LogInfoColor("Editor/Colors/LogLevel Info", Color(0.8f, 0.8f, 0.8f));
+Preference<Color> LogWarningColor("Editor/Colors/LogLevel Warning", Color(0.78f, 0.72f, 0.1f));
+Preference<Color> LogErrorColor("Editor/Colors/LogLevel Error", Color(0.98f, 0.12f, 0.23f));
 
 Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
