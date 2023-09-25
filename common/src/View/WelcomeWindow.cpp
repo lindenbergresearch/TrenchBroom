@@ -84,12 +84,17 @@ QWidget *WelcomeWindow::createAppPanel() {
     m_createNewDocumentButton->setToolTip("Create a new map document");
     m_openOtherDocumentButton = new QPushButton{"Browse..."};
     m_openOtherDocumentButton->setToolTip("Open an existing map document");
+    m_quitApplicationButton = new QPushButton{"Quit"};
+    m_quitApplicationButton->setToolTip("Quit Trenchbroom");
 
     connect(
         m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument
     );
     connect(
         m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument
+    );
+    connect(
+        m_quitApplicationButton, &QPushButton::clicked, this, &WelcomeWindow::quitApplication
     );
 
     auto *buttonLayout = new QHBoxLayout{};
@@ -98,6 +103,7 @@ QWidget *WelcomeWindow::createAppPanel() {
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_createNewDocumentButton);
     buttonLayout->addWidget(m_openOtherDocumentButton);
+    buttonLayout->addWidget(m_quitApplicationButton);
     buttonLayout->addStretch();
 
     auto *outerLayout = new QVBoxLayout{};
@@ -136,5 +142,8 @@ void WelcomeWindow::openDocument(const std::filesystem::path &path) {
     if (!app.openDocument(path)) {
         show();
     }
+}
+
+void WelcomeWindow::quitApplication() {
 }
 } // namespace TrenchBroom::View
