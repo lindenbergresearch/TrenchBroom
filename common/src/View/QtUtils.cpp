@@ -290,8 +290,9 @@ Color fromQColor(const QColor &color) {
     return Color(static_cast<float>(color.redF()), static_cast<float>(color.greenF()), static_cast<float>(color.blueF()), static_cast<float>(color.alphaF()));
 }
 
-QColor toQColor(const Color &color) {
-    return QColor::fromRgb(int(color.r() * 255.0f), int(color.g() * 255.0f), int(color.b() * 255.0f), int(color.a() * 255.0f));
+QColor toQColor(const Color &color, const float multiplier) {
+    // return QColor::fromRgb(int(color.r() * 255.0f * multiplier), int(color.g() * 255.0f * multiplier), int(color.b() * 255.0f * multiplier), int(color.a() * 255.0f));
+    return QColor::fromRgbF(color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
 }
 
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
@@ -354,8 +355,7 @@ void setSliderRatio(QSlider *slider, float ratio) {
 
 QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
     auto *innerLayout = new QHBoxLayout{};
-    innerLayout->setContentsMargins(
-        LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin
+    innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin
     );
     innerLayout->setSpacing(0);
     innerLayout->addWidget(buttonBox);
@@ -371,8 +371,7 @@ QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
 
 QLayout *wrapDialogButtonBox(QLayout *buttonBox) {
     auto *innerLayout = new QHBoxLayout{};
-    innerLayout->setContentsMargins(
-        LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin
+    innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin
     );
     innerLayout->setSpacing(0);
     innerLayout->addLayout(buttonBox);

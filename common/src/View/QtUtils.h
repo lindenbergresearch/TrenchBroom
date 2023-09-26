@@ -232,7 +232,7 @@ QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette);
 
 Color fromQColor(const QColor &color);
 
-QColor toQColor(const Color &color);
+QColor toQColor(const Color &color, float multiplier = 1.0f);
 
 void setWindowIconTB(QWidget *window);
 
