@@ -53,6 +53,8 @@
 #include "View/MapFrame.h"
 #include "View/MapTextEncoding.h"
 #include "View/ViewConstants.h"
+#include <Preferences.h>
+#include <PreferenceManager.h>
 #include <TrenchBroomApp.h>
 
 
@@ -70,8 +72,7 @@
 namespace TrenchBroom {
 namespace View {
 
-SyncHeightEventFilter::SyncHeightEventFilter(
-    QWidget *primary, QWidget *secondary, QObject *parent
+SyncHeightEventFilter::SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent
 ) : QObject{parent}, m_primary{primary}, m_secondary{secondary} {
     ensure(m_primary != nullptr, "primary is not null");
     ensure(m_secondary != nullptr, "secondary is not null");
@@ -129,16 +130,14 @@ QString fileDialogDefaultDirectory(const FileDialogDir dir) {
     return defaultDir;
 }
 
-void updateFileDialogDefaultDirectoryWithFilename(
-    FileDialogDir type, const QString &filename
+void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename
 ) {
     const auto dirQDir = QFileInfo(filename).absoluteDir();
     const auto dirString = dirQDir.absolutePath();
     updateFileDialogDefaultDirectoryWithDirectory(type, dirString);
 }
 
-void updateFileDialogDefaultDirectoryWithDirectory(
-    FileDialogDir type, const QString &newDefaultDirectory
+void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory
 ) {
     const auto key = fileDialogDefaultDirectorySettingsPath(type);
 
@@ -200,10 +199,13 @@ void centerOnScreen(QWidget *window) {
 #else
     const auto screenGeometry = QApplication::desktop()->availableGeometry(window);
 #endif
-    window->setGeometry(
-        QStyle::alignedRect(
-            Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry
-        ));
+    window->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry
+    ));
+}
+
+int getCommonFieldHeight() {
+    auto fontsize = pref(Preferences::UIFontSize);
+    return fontsize + 2 * LayoutConstants::MediumVMargin;
 }
 
 QWidget *makeDefault(QWidget *widget) {
@@ -219,6 +221,7 @@ QWidget *makeEmphasized(QWidget *widget) {
 
     auto font = widget->font();
     font.setBold(true);
+    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
     widget->setFont(font);
     return widget;
 }
@@ -231,37 +234,31 @@ QWidget *makeUnemphasized(QWidget *widget) {
 QWidget *makeInfo(QWidget *widget) {
     makeDefault(widget);
     widget = makeSmall(widget);
-
     return widget;
 }
 
 QWidget *makeSmall(QWidget *widget) {
     auto font = widget->font();
-    font.setPointSize(font.pointSize()-2);
+    font.setPointSize(font.pointSize() - 1);
     widget->setFont(font);
-
     return widget;
 }
 
 QWidget *makeTitle(QWidget *widget) {
     auto font = widget->font();
-    font.setPointSize(font.pointSize()+1);
+    font.setPointSize(font.pointSize() + 1);
     font.setBold(true);
-    font.setUnderline(true);
-
+    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
     widget->setFont(font);
-
     return widget;
 }
 
 QWidget *makeHeader(QWidget *widget) {
     makeDefault(widget);
-
     auto font = widget->font();
-    font.setPointSize(2 * font.pointSize());
+    font.setPointSize(font.pointSize());
     font.setBold(true);
     widget->setFont(font);
-
     return widget;
 }
 
@@ -270,49 +267,38 @@ QWidget *makeError(QWidget *widget) {
     palette.setColor(QPalette::Normal, QPalette::WindowText, Qt::red);
     palette.setColor(QPalette::Normal, QPalette::Text, Qt::red);
     widget->setPalette(palette);
-
     return widget;
 }
 
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette) {
     auto palette = widget->palette();
-    palette.setColor(
-        QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
-    palette.setColor(
-        QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+    palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+    palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
     widget->setPalette(palette);
     return widget;
 }
 
 QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette) {
     auto palette = widget->palette();
-    palette.setColor(
-        QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::WindowText));
-    palette.setColor(
-        QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::Text));
+    palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::WindowText));
+    palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::Text));
     widget->setPalette(palette);
     return widget;
 }
 
 Color fromQColor(const QColor &color) {
-    return Color(
-        static_cast<float>(color.redF()), static_cast<float>(color.greenF()), static_cast<float>(color.blueF()), static_cast<float>(color.alphaF()));
+    return Color(static_cast<float>(color.redF()), static_cast<float>(color.greenF()), static_cast<float>(color.blueF()), static_cast<float>(color.alphaF()));
 }
 
 QColor toQColor(const Color &color) {
-    return QColor::fromRgb(
-        int(color.r() * 255.0f), int(color.g() * 255.0f), int(color.b() * 255.0f), int(color.a() * 255.0f));
+    return QColor::fromRgb(int(color.r() * 255.0f), int(color.g() * 255.0f), int(color.b() * 255.0f), int(color.a() * 255.0f));
 }
 
-QToolButton *createBitmapButton(
-    const std::string &image, const QString &tooltip, QWidget *parent
-) {
+QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
     return createBitmapButton(IO::loadSVGIcon(image), tooltip, parent);
 }
 
-QToolButton *createBitmapButton(
-    const QIcon &icon, const QString &tooltip, QWidget *parent
-) {
+QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent) {
     // NOTE: QIcon::availableSizes() is not high-dpi friendly, it returns pixels when we
     // want logical sizes. We rely on the fact that loadIconResourceQt inserts pixmaps in
     // the order 1x then 2x, so the first pixmap has the logical size.
@@ -329,9 +315,7 @@ QToolButton *createBitmapButton(
     return button;
 }
 
-QToolButton *createBitmapToggleButton(
-    const std::string &image, const QString &tooltip, QWidget *parent
-) {
+QToolButton *createBitmapToggleButton(const std::string &image, const QString &tooltip, QWidget *parent) {
     auto *button = createBitmapButton(image, tooltip, parent);
     button->setCheckable(true);
     return button;
@@ -353,7 +337,7 @@ QSlider *createSlider(const int min, const int max) {
     auto *slider = new QSlider{};
     slider->setMinimum(min);
     slider->setMaximum(max);
-    slider->setTickPosition(QSlider::TicksBelow);
+    slider->setTickPosition(QSlider::NoTicks);
     slider->setTracking(true);
     slider->setOrientation(Qt::Horizontal);
     return slider;

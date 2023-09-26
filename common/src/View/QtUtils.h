@@ -208,6 +208,8 @@ void setHint(QLineEdit *ctrl, const char *hint);
 
 void centerOnScreen(QWidget *window);
 
+int getCommonFieldHeight();
+
 QWidget *makeDefault(QWidget *widget);
 
 QWidget *makeEmphasized(QWidget *widget);
