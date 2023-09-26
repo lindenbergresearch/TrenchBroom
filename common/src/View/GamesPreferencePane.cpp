@@ -59,7 +59,7 @@ GamesPreferencePane::GamesPreferencePane(MapDocument *document, QWidget *parent)
 void GamesPreferencePane::createGui() {
     m_gameListBox = new GameListBox();
     m_gameListBox->selectGame(0);
-    m_gameListBox->setMaximumWidth(220);
+    m_gameListBox->setMaximumWidth(300);
     m_gameListBox->setMinimumHeight(300);
 
     m_defaultPage = createDefaultPage(tr("Select a game."));
@@ -77,6 +77,7 @@ void GamesPreferencePane::createGui() {
     auto *glbLayout = new QVBoxLayout();
     glbLayout->addWidget(m_gameListBox);
     glbLayout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
+    buttonLayout->setContentsMargins(0, LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin);
     glbLayout->addLayout(buttonLayout);
 
     auto *layout = new QHBoxLayout();
@@ -89,7 +90,7 @@ void GamesPreferencePane::createGui() {
     layout->addSpacing(LayoutConstants::MediumVMargin);
     layout->addWidget(m_stackedWidget, 1, Qt::AlignTop);
 
-    setMinimumWidth(600);
+    setMinimumWidth(500);
 
     connect(
         m_gameListBox, &GameListBox::currentGameChanged, this, [&]() { updateControls(); }
