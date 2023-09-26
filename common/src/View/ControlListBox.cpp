@@ -60,19 +60,20 @@ void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWid
 ) {
     const auto &app = TrenchBroomApp::instance();
 
-    QPalette backgroundPalette;
-    backgroundPalette.setColor(QPalette::Active, QPalette::Highlight, listWidget->palette().color(QPalette::Active, QPalette::Highlight));
-    backgroundPalette.setColor(QPalette::Inactive, QPalette::Highlight, listWidget->palette().color(QPalette::Inactive, QPalette::Highlight));
-    backgroundPalette.setColor(QPalette::Disabled, QPalette::Highlight, listWidget->palette().color(QPalette::Disabled, QPalette::Highlight));
-
-    backgroundPalette.setColor(QPalette::Active, QPalette::Base, listWidget->palette().color(QPalette::Active, QPalette::Base));
-    backgroundPalette.setColor(QPalette::Inactive, QPalette::Base, listWidget->palette().color(QPalette::Inactive, QPalette::Base));
-    backgroundPalette.setColor(QPalette::Disabled, QPalette::Base, listWidget->palette().color(QPalette::Disabled, QPalette::Base));
-    setPalette(backgroundPalette);
-    // macOS: we'd prefer setPalette(listWidget->palette()); but this doesn't work, whereas
-    // the above does.
-    // FIXME: the above setPalette call should be removed once we stop using QListWidget and
-    // make ControlListBox a standalone widget.
+//    QPalette backgroundPalette;
+//    backgroundPalette.setColor(QPalette::Active, QPalette::Highlight, listWidget->palette().color(QPalette::Active, QPalette::Highlight));
+//    backgroundPalette.setColor(QPalette::Inactive, QPalette::Highlight, listWidget->palette().color(QPalette::Inactive, QPalette::Highlight));
+//    backgroundPalette.setColor(QPalette::Disabled, QPalette::Highlight, listWidget->palette().color(QPalette::Disabled, QPalette::Highlight));
+//
+//    backgroundPalette.setColor(QPalette::Active, QPalette::Base, listWidget->palette().color(QPalette::Active, QPalette::Base));
+//    backgroundPalette.setColor(QPalette::Inactive, QPalette::Base, listWidget->palette().color(QPalette::Inactive, QPalette::Base));
+//    backgroundPalette.setColor(QPalette::Disabled, QPalette::Base, listWidget->palette().color(QPalette::Disabled, QPalette::Base));
+//    setPalette(backgroundPalette);
+//
+//    // macOS: we'd prefer setPalette(listWidget->palette()); but this doesn't work, whereas
+//    // the above does.
+//    // FIXME: the above setPalette call should be removed once we stop using QListWidget and
+//    // make ControlListBox a standalone widget.
 
     setBackgroundRole(selected ? QPalette::Highlight : QPalette::Base);
 
@@ -115,11 +116,11 @@ ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(ControlList
 ) : QWidget(parent), m_renderer(renderer) {
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(LayoutConstants::NarrowVMargin);
-    layout->addWidget(m_renderer);
+    layout->setSpacing(0);
+    layout->addWidget(m_renderer, 1);
 
     if (showSeparator) {
-        auto borderline = new BorderLine(BorderLine::Direction::Horizontal, LayoutConstants::MediumHMargin, this);
+        auto borderline = new BorderLine(BorderLine::Direction::Horizontal, 1, this);
         layout->addWidget(borderline);
     }
 

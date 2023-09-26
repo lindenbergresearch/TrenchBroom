@@ -30,9 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ImageListBoxItemRenderer::ImageListBoxItemRenderer(
-    const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent
-) : ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
+ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent) : ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
     m_titleLabel = new ElidedLabel(title, Qt::ElideRight);
     makeEmphasized(m_titleLabel);
 
@@ -40,21 +38,21 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(
     makeInfo(m_subtitleLabel);
 
     auto *imageAndTextLayout = new QHBoxLayout();
-    imageAndTextLayout->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::NarrowVMargin);
-    imageAndTextLayout->setSpacing(LayoutConstants::MediumHMargin);
-    setLayout(imageAndTextLayout);
+    imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
+    imageAndTextLayout->setSpacing(0);
 
-    m_imageLabel = new QLabel(this);
+    m_imageLabel = new QLabel();
     imageAndTextLayout->addWidget(m_imageLabel);
     m_imageLabel->setPixmap(image);
 
     auto *textLayout = new QVBoxLayout();
-    textLayout->setContentsMargins(0, 0, 0, LayoutConstants::NarrowVMargin);
-    textLayout->setSpacing(LayoutConstants::NarrowVMargin);
+    textLayout->setContentsMargins(0, 0, 0, 0);
+    textLayout->setSpacing(0);
     textLayout->addWidget(m_titleLabel);
     textLayout->addWidget(m_subtitleLabel);
 
-    imageAndTextLayout->addLayout(textLayout, 1);
+    imageAndTextLayout->addLayout(textLayout);
+    setLayout(imageAndTextLayout);
 }
 
 void ImageListBoxItemRenderer::updateItem() {
@@ -74,11 +72,9 @@ void ImageListBoxItemRenderer::updateItem() {
 ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, showSeparator, parent) {
 }
 
-ControlListBoxItemRenderer *ImageListBox::createItemRenderer(
-    QWidget *parent, const size_t index
+ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, const size_t index
 ) {
-    return new ImageListBoxItemRenderer(
-        title(index), subtitle(index), image(index), parent
+    return new ImageListBoxItemRenderer(title(index), subtitle(index), image(index), parent
     );
 }
 
