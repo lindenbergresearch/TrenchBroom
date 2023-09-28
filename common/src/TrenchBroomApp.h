@@ -74,7 +74,9 @@ private:
     void loadStyle();
 
 public:
-    void reloadStyle();
+    void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
+
+    void setupUIFont();
 
     const std::vector<std::filesystem::path> &recentDocuments() const;
 
