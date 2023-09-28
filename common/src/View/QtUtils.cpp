@@ -221,7 +221,7 @@ QWidget *makeEmphasized(QWidget *widget) {
 
     auto font = widget->font();
     font.setBold(true);
-    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
+//    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
     widget->setFont(font);
     return widget;
 }
@@ -239,7 +239,7 @@ QWidget *makeInfo(QWidget *widget) {
 
 QWidget *makeSmall(QWidget *widget) {
     auto font = widget->font();
-    font.setPointSize(font.pointSize() - 1);
+    font.setPointSize(font.pointSize() - 2);
     widget->setFont(font);
     return widget;
 }
@@ -248,7 +248,7 @@ QWidget *makeTitle(QWidget *widget) {
     auto font = widget->font();
     font.setPointSize(font.pointSize() + 1);
     font.setBold(true);
-    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
+//    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
     widget->setFont(font);
     return widget;
 }
@@ -256,7 +256,7 @@ QWidget *makeTitle(QWidget *widget) {
 QWidget *makeHeader(QWidget *widget) {
     makeDefault(widget);
     auto font = widget->font();
-    font.setPointSize(font.pointSize());
+    font.setPointSize(font.pointSize()*2);
     font.setBold(true);
     widget->setFont(font);
     return widget;
