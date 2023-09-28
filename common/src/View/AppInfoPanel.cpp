@@ -46,6 +46,7 @@ void AppInfoPanel::createGui() {
     makeHeader(appName);
 
     BorderLine *appLine = new BorderLine{BorderLine::Direction::Horizontal};
+    appLine->setLineWidth(2);
     QLabel *appClaim = new QLabel{tr("Level Editor")};
 
     ClickableLabel *version = new ClickableLabel{tr("Version ") % getBuildVersion()};
@@ -68,7 +69,7 @@ void AppInfoPanel::createGui() {
 
     auto *layout = new QVBoxLayout{};
     layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(2);
+    layout->setSpacing(5);
     layout->addStretch();
     layout->addWidget(appIcon, 0, Qt::AlignHCenter);
     layout->addWidget(appName, 0, Qt::AlignHCenter);
