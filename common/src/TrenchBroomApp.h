@@ -27,6 +27,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <chrono>
 
 class QMenu;
 
@@ -45,6 +46,23 @@ class FrameManager;
 class RecentDocuments;
 
 class WelcomeWindow;
+
+class Timer {
+public:
+    static const Timer appstart;
+
+    Timer() : m_start(t_highres_clock::now()) {}
+
+    void reset();
+
+    double elapsed() const;
+
+private:
+    typedef std::chrono::high_resolution_clock t_highres_clock;
+    typedef std::chrono::duration<double, std::ratio<1> > t_duration_second;
+    std::chrono::time_point<t_highres_clock> m_start;
+};
+
 
 class TrenchBroomApp : public QApplication {
 Q_OBJECT
@@ -131,8 +149,7 @@ signals:
 
 void setCrashReportGUIEnbled(bool guiEnabled);
 
-[[noreturn]] void reportCrashAndExit(
-    const std::string &stacktrace, const std::string &reason
+[[noreturn]] void reportCrashAndExit(const std::string &stacktrace, const std::string &reason
 );
 
 bool isReportingCrash();
