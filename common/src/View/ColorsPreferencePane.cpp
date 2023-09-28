@@ -42,7 +42,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
 
     m_table->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
     m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
-    m_table->horizontalHeader()->resizeSection(0, 80);
+    m_table->horizontalHeader()->resizeSection(0, 60);
     m_table->horizontalHeader()->setSectionResizeMode(
         1, QHeaderView::ResizeMode::ResizeToContents
     );
@@ -50,7 +50,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
 
     // Tighter than default vertical row height, without the overhead of autoresizing
     m_table->verticalHeader()->setDefaultSectionSize(
-        m_table->fontMetrics().lineSpacing() + 2
+        m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin
     );
 
     m_table->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
@@ -58,22 +58,22 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     QLineEdit *searchBox = createSearchBox();
     makeSmall(searchBox);
 
-    auto *infoLabel = new QLabel(tr("Double-click a color to begin editing it."));
+    auto *infoLabel = new QLabel(tr("Click on a color to begin editing it."));
     makeInfo(infoLabel);
 
     auto *infoAndSearchLayout = new QHBoxLayout();
     infoAndSearchLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin
+        0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin
     );
     infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
     infoAndSearchLayout->addWidget(infoLabel, 1);
     infoAndSearchLayout->addWidget(searchBox);
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin);
     layout->setSpacing(0);
-    layout->addWidget(m_table, 1);
     layout->addLayout(infoAndSearchLayout);
+    layout->addWidget(m_table, 1);
     setLayout(layout);
 
     setMinimumSize(900, 550);
@@ -85,7 +85,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     );
 
     connect(
-        m_table, &QTableView::doubleClicked, this, [&](const QModelIndex &index) {
+        m_table, &QTableView::clicked, this, [&](const QModelIndex &index) {
           m_model->pickColor(m_proxy->mapToSource(index));
         }
     );

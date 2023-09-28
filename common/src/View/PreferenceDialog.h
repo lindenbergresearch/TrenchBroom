@@ -22,6 +22,7 @@
 #include <QDialog>
 
 #include <memory>
+#include <map>
 
 class QDialogButtonBox;
 
@@ -44,10 +45,14 @@ private:
       PrefPane_First = 0, PrefPane_Games = 0, PrefPane_View = 1, PrefPane_Colors = 2, PrefPane_Mouse = 3, PrefPane_Keyboard = 4, PrefPane_Last = 4
     } PrefPane;
 
+    static const QString WINDOW_TITLE;
+    static const QSize ICON_SIZE;
+
     std::shared_ptr<MapDocument> m_document;
     QToolBar *m_toolBar;
     QStackedWidget *m_stackedWidget;
     QDialogButtonBox *m_buttonBox;
+    std::map<QString, QAction*> m_toolButtonActions;
 
 public:
     explicit PreferenceDialog(
@@ -63,6 +68,8 @@ private:
     void createGui();
 
     void switchToPane(PrefPane pane);
+
+    void highlightToolButton(QString buttonName, bool highlited = true);
 
     PreferencePane *currentPane() const;
 

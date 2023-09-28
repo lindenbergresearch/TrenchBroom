@@ -29,6 +29,7 @@
 
 #include "IO/ResourceUtils.h"
 #include "PreferenceManager.h"
+#include "TrenchBroomApp.h"
 #include "Preferences.h"
 #include "View/BorderLine.h"
 #include "View/ColorsPreferencePane.h"
@@ -43,8 +44,11 @@
 
 namespace TrenchBroom {
 namespace View {
+const QString PreferenceDialog::WINDOW_TITLE = "Preferences";
+const QSize PreferenceDialog::ICON_SIZE = QSize{32, 32};
+
 PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent) : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr), m_buttonBox(nullptr) {
-    setWindowTitle("Preferences");
+    setWindowTitle(WINDOW_TITLE);
     setWindowIconTB(this);
     createGui();
     switchToPane(PrefPane_First);
@@ -75,16 +79,38 @@ void PreferenceDialog::createGui() {
     m_toolBar = new QToolBar();
     m_toolBar->setFloatable(false);
     m_toolBar->setMovable(false);
-    m_toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    m_toolBar->addAction(gamesImage, "Games", [this]() { switchToPane(PrefPane_Games); });
-    m_toolBar->addAction(viewImage, "View", [this]() { switchToPane(PrefPane_View); });
-    m_toolBar->addAction(
-        colorsImage, "Colors", [this]() { switchToPane(PrefPane_Colors); }
+    m_toolBar->setIconSize(QSize{32, 32});
+    m_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+    // store actions
+    m_toolButtonActions["Games"] = m_toolBar->addAction(gamesImage, "Games", [this]() {
+          switchToPane(PrefPane_Games);
+          highlightToolButton("Games");
+        }
     );
-    m_toolBar->addAction(mouseImage, "Mouse", [this]() { switchToPane(PrefPane_Mouse); });
-    m_toolBar->addAction(
-        keyboardImage, "Keyboard", [this]() { switchToPane(PrefPane_Keyboard); }
+
+    m_toolButtonActions["View"] = m_toolBar->addAction(viewImage, "View", [this]() {
+          switchToPane(PrefPane_View);
+          highlightToolButton("View");
+        }
     );
+    m_toolButtonActions["Colors"] = m_toolBar->addAction(colorsImage, "Colors", [this]() {
+          switchToPane(PrefPane_Colors);
+          highlightToolButton("Colors");
+        }
+    );
+    m_toolButtonActions["Mouse"] = m_toolBar->addAction(mouseImage, "Mouse", [this]() {
+          switchToPane(PrefPane_Mouse);
+          highlightToolButton("Mouse");
+        }
+    );
+    m_toolButtonActions["Keyboard"] = m_toolBar->addAction(keyboardImage, "Keyboard", [this]() {
+          switchToPane(PrefPane_Keyboard);
+          highlightToolButton("Keyboard");
+        }
+    );
+
+    highlightToolButton("Games");
 
     // Don't display tooltips for pane switcher buttons...
     for (auto *button: m_toolBar->findChildren<QToolButton *>()) {
@@ -98,8 +124,7 @@ void PreferenceDialog::createGui() {
     m_stackedWidget->addWidget(new MousePreferencePane());
     m_stackedWidget->addWidget(new KeyboardPreferencePane(m_document.get()));
 
-    m_buttonBox = new QDialogButtonBox(
-        QDialogButtonBox::RestoreDefaults
+    m_buttonBox = new QDialogButtonBox(QDialogButtonBox::RestoreDefaults
 #if !defined __APPLE__
         | QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel
 #endif
@@ -133,9 +158,7 @@ void PreferenceDialog::createGui() {
     setLayout(layout);
 
     layout->setMenuBar(m_toolBar);
-#if !defined __APPLE__
     layout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
-#endif
     layout->addWidget(m_stackedWidget, 1);
     layout->addLayout(wrapDialogButtonBox(m_buttonBox));
 }
@@ -165,7 +188,40 @@ bool PreferenceDialog::eventFilter(QObject *o, QEvent *e) {
     if (e->type() == QEvent::ToolTip) {
         return true;
     }
+
     return QDialog::eventFilter(o, e);
+}
+
+void PreferenceDialog::highlightToolButton(QString buttonName, bool highlighted) {
+    auto palette = QPalette{};
+
+    // reset
+    for (std::pair<const QString, QAction *> item: m_toolButtonActions) {
+        palette.setColor(QPalette::Active, QPalette::ButtonText, toQColor(pref(Preferences::UITextColor)));
+        QToolButton *toolButton = dynamic_cast<QToolButton *>(m_toolBar->widgetForAction(item.second));
+
+        if (toolButton) {
+            makeDefault(toolButton);
+            toolButton->setMinimumWidth(ICON_SIZE.width()*2);
+        }
+    }
+
+    QToolButton *toolButton = dynamic_cast<QToolButton *>(m_toolBar->widgetForAction(m_toolButtonActions[buttonName]));
+    if (toolButton) {
+        if (highlighted) {
+//            palette.setColor(QPalette::Active, QPalette::ButtonText, toQColor(pref(Preferences::UIHighlightColor)));
+            //   palette.setColor(QPalette::Active, QPalette::ButtonText, QPalette::Light);
+            //       toolButton->setForegroundRole(QPalette::Highlight);
+            setWindowTitle(WINDOW_TITLE + " - " + buttonName);
+            makeEmphasized(toolButton);
+        }
+        else {
+            palette.setColor(QPalette::Active, QPalette::ButtonText, toQColor(pref(Preferences::UITextColor)));
+            makeDefault(toolButton);
+        }
+
+        toolButton->setPalette(palette);
+    }
 }
 } // namespace View
 } // namespace TrenchBroom

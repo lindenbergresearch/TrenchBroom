@@ -44,17 +44,17 @@ MousePreferencePane::MousePreferencePane(QWidget *parent) : PreferencePane(paren
 
 void MousePreferencePane::createGui() {
     m_lookSpeedSlider = new SliderWithLabel(1, 100);
-    m_lookSpeedSlider->setMaximumWidth(400);
+    m_lookSpeedSlider->setMaximumWidth(350);
     m_invertLookHAxisCheckBox = new QCheckBox("Invert X axis");
     m_invertLookVAxisCheckBox = new QCheckBox("Invert Y axis");
 
     m_panSpeedSlider = new SliderWithLabel(1, 100);
-    m_panSpeedSlider->setMaximumWidth(400);
+    m_panSpeedSlider->setMaximumWidth(350);
     m_invertPanHAxisCheckBox = new QCheckBox("Invert X axis");
     m_invertPanVAxisCheckBox = new QCheckBox("Invert Y axis");
 
     m_moveSpeedSlider = new SliderWithLabel(1, 100);
-    m_moveSpeedSlider->setMaximumWidth(400);
+    m_moveSpeedSlider->setMaximumWidth(350);
     m_invertMouseWheelCheckBox = new QCheckBox("Invert mouse wheel");
     m_enableAltMoveCheckBox = new QCheckBox("Alt + middle mouse drag to move camera");
     m_invertAltMoveAxisCheckBox = new QCheckBox("Invert Z axis in Alt + middle mouse drag");
@@ -77,8 +77,10 @@ void MousePreferencePane::createGui() {
     m_flyMoveSpeedSlider->setMaximumWidth(400);
 
     auto *layout = new FormWithSectionsLayout();
-    layout->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, 0);
-    layout->setVerticalSpacing(2);
+    layout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, 0, 0);
+    layout->setVerticalSpacing(LayoutConstants::MediumVMargin);
+    layout->setHorizontalSpacing(LayoutConstants::WideHMargin * 2);
+
     // override the default to make the sliders take up maximum width
     layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 

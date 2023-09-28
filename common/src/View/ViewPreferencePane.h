@@ -46,6 +46,8 @@ private:
     QComboBox *m_textureBrowserIconSizeCombo = nullptr;
     QComboBox *m_rendererFontSizeCombo = nullptr;
     QComboBox *m_rendererFontCombo = nullptr;
+    QComboBox *m_UIFontSizeCombo = nullptr;
+    QComboBox *m_UIFontCombo = nullptr;
     std::vector<std::filesystem::path> font_files;
 
 public:
@@ -54,11 +56,12 @@ public:
 private:
     void createGui();
 
-    void reloadUIStyle();
+    void reloadUIStyle(bool reloadFonts = true);
 
     QWidget *createViewPreferences();
 
     void bindEvents();
+    void unBindEvents();
 
     bool doCanResetToDefaults() override;
 
@@ -103,5 +106,10 @@ private slots:
     void rendererFontSizeChanged(const QString &text);
 
     void renderFontFileChanged(int index);
+
+    void editorUIFontSizeChanged(const QString &text);
+
+    void editorUIFontFileChanged(int index);
+
 };
 } // namespace TrenchBroom::View

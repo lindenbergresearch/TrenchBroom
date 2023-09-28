@@ -78,17 +78,17 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
 
     auto *infoAndSearchLayout = new QHBoxLayout();
     infoAndSearchLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin
+        0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin
     );
     infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
     infoAndSearchLayout->addWidget(infoLabel, 1);
     infoAndSearchLayout->addWidget(searchBox);
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin);
     layout->setSpacing(0);
-    layout->addWidget(m_table, 1);
     layout->addLayout(infoAndSearchLayout);
+    layout->addWidget(m_table, 1);
     setLayout(layout);
 
     setMinimumSize(900, 550);
