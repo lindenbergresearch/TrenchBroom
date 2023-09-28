@@ -81,7 +81,7 @@ void GamesPreferencePane::createGui() {
     glbLayout->addLayout(buttonLayout);
 
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(QMargins());
+    layout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::MediumHMargin*3, 0, 0);
     layout->setSpacing(0);
     setLayout(layout);
 
