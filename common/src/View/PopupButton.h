@@ -32,11 +32,13 @@ Q_OBJECT
 private:
     QToolButton *m_button;
     PopupWindow *m_window;
+    QIcon checkedIcon, unCheckedIcon;
 
 public:
-    explicit PopupButton(const QString &caption = "", QWidget *parent = nullptr);
-
+    explicit PopupButton(const QString &caption = "", QWidget *parent = nullptr, const QIcon &icon = QIcon{});
     QWidget *GetPopupWindow() const;
+
+    void setIcon(const std::string &iconName);
 
 private:
     void buttonClicked(bool checked);
