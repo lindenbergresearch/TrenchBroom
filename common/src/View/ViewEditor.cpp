@@ -647,6 +647,7 @@ void ViewEditor::restoreDefaultsClicked() {
 
 ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_button(nullptr), m_editor(nullptr) {
     m_button = new PopupButton(tr("View Options"));
+    m_button->setIcon("ArrowDown");
     m_button->setToolTip(tr("Click to edit view settings"));
 
     auto *editorContainer = new BorderPanel();
