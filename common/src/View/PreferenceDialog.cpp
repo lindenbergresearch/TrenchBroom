@@ -154,7 +154,8 @@ void PreferenceDialog::createGui() {
 #endif
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setAlignment(layout, Qt::AlignVCenter);
     layout->setSpacing(0);
     setLayout(layout);
 
