@@ -256,7 +256,7 @@ QWidget *makeTitle(QWidget *widget) {
 QWidget *makeHeader(QWidget *widget) {
     makeDefault(widget);
     auto font = widget->font();
-    font.setPointSize(font.pointSize()*2);
+    font.setPointSize(font.pointSize() * 2);
     font.setBold(true);
     widget->setFont(font);
     return widget;
@@ -293,6 +293,11 @@ Color fromQColor(const QColor &color) {
 QColor toQColor(const Color &color, const float multiplier) {
     // return QColor::fromRgb(int(color.r() * 255.0f * multiplier), int(color.g() * 255.0f * multiplier), int(color.b() * 255.0f * multiplier), int(color.a() * 255.0f));
     return QColor::fromRgbF(color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
+}
+
+QString toStyleSheetColor(const char *prefix, QColor color) {
+    auto sheet = QString::asprintf("%s: rgba(%d, %d, %d, %d); ", prefix, color.red(), color.green(), color.blue(), color.alpha());
+    return sheet;
 }
 
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
