@@ -44,7 +44,7 @@ void WelcomeWindow::createGui() {
 
     m_recentDocumentListBox = new RecentDocumentListBox{};
     m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
-    m_recentDocumentListBox->setMaximumWidth(500);
+    m_recentDocumentListBox->setMaximumWidth(400);
     m_recentDocumentListBox->setSizePolicy(
         QSizePolicy::Expanding, QSizePolicy::Expanding
     );
@@ -73,19 +73,22 @@ void WelcomeWindow::createGui() {
     container->setLayout(outerLayout);
 
     setCentralWidget(container);
-    setFixedSize(850, 500);
+    setFixedSize(800, 500);
 }
 
 QWidget *WelcomeWindow::createAppPanel() {
     auto *appPanel = new QWidget{};
     auto *infoPanel = new AppInfoPanel{appPanel};
 
-    m_createNewDocumentButton = new QPushButton{"New map..."};
-    m_createNewDocumentButton->setToolTip("Create a new map document");
-    m_openOtherDocumentButton = new QPushButton{"Browse..."};
-    m_openOtherDocumentButton->setToolTip("Open an existing map document");
+    m_createNewDocumentButton = new QPushButton{"New..."};
+    m_createNewDocumentButton->setToolTip("Create a new map document.");
+    m_openOtherDocumentButton = new QPushButton{"Open..."};
+    m_openOtherDocumentButton->setToolTip("Open an existing map document.");
+
+    m_openSettingsButton = new QPushButton{"Settings"};
+    m_openSettingsButton->setToolTip("Setup Trenchbroom.");
     m_quitApplicationButton = new QPushButton{"Quit"};
-    m_quitApplicationButton->setToolTip("Quit Trenchbroom");
+    m_quitApplicationButton->setToolTip("Quit Trenchbroom.");
 
     connect(
         m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument
@@ -96,13 +99,17 @@ QWidget *WelcomeWindow::createAppPanel() {
     connect(
         m_quitApplicationButton, &QPushButton::clicked, this, &WelcomeWindow::quitApplication
     );
+    connect(
+        m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings
+    );
 
     auto *buttonLayout = new QHBoxLayout{};
     buttonLayout->setContentsMargins(0, 0, 0, 0);
-    buttonLayout->setSpacing(LayoutConstants::WideHMargin);
+    buttonLayout->setSpacing(LayoutConstants::NarrowHMargin);
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_createNewDocumentButton);
     buttonLayout->addWidget(m_openOtherDocumentButton);
+    buttonLayout->addWidget(m_openSettingsButton);
     buttonLayout->addWidget(m_quitApplicationButton);
     buttonLayout->addStretch();
 
@@ -145,5 +152,12 @@ void WelcomeWindow::openDocument(const std::filesystem::path &path) {
 }
 
 void WelcomeWindow::quitApplication() {
+    auto &app = TrenchBroomApp::instance();
+    app.quit();
+}
+
+void WelcomeWindow::openSettings() {
+    auto &app = TrenchBroomApp::instance();
+    app.openPreferences();
 }
 } // namespace TrenchBroom::View

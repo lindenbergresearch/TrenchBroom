@@ -35,6 +35,7 @@ private:
     RecentDocumentListBox *m_recentDocumentListBox;
     QPushButton *m_createNewDocumentButton;
     QPushButton *m_openOtherDocumentButton;
+    QPushButton *m_openSettingsButton;
     QPushButton *m_quitApplicationButton;
 
 public:
@@ -52,6 +53,8 @@ private slots:
     void openOtherDocument();
 
     void quitApplication();
+
+    void openSettings();
 
     void openDocument(const std::filesystem::path &path);
 };
