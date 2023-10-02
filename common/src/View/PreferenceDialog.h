@@ -47,6 +47,7 @@ private:
 
     static const QString WINDOW_TITLE;
     static const QSize ICON_SIZE;
+    static const int ICON_WIDTH;
 
     std::shared_ptr<MapDocument> m_document;
     QToolBar *m_toolBar;

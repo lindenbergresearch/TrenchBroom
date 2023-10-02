@@ -45,7 +45,8 @@
 namespace TrenchBroom {
 namespace View {
 const QString PreferenceDialog::WINDOW_TITLE = "Preferences";
-const QSize PreferenceDialog::ICON_SIZE = QSize{32, 32};
+const QSize PreferenceDialog::ICON_SIZE = QSize{30, 30};
+const int PreferenceDialog::ICON_WIDTH = int(float(ICON_SIZE.width()) * 2.3f);
 
 PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent) : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr), m_buttonBox(nullptr) {
     setWindowTitle(WINDOW_TITLE);
@@ -79,7 +80,7 @@ void PreferenceDialog::createGui() {
     m_toolBar = new QToolBar();
     m_toolBar->setFloatable(false);
     m_toolBar->setMovable(false);
-    m_toolBar->setIconSize(QSize{32, 32});
+    m_toolBar->setIconSize(ICON_SIZE);
     m_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     // store actions
@@ -153,7 +154,7 @@ void PreferenceDialog::createGui() {
 #endif
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, 0);
     layout->setSpacing(0);
     setLayout(layout);
 
@@ -201,26 +202,23 @@ void PreferenceDialog::highlightToolButton(QString buttonName, bool highlighted)
         QToolButton *toolButton = dynamic_cast<QToolButton *>(m_toolBar->widgetForAction(item.second));
 
         if (toolButton) {
-            makeDefault(toolButton);
-            toolButton->setMinimumWidth(ICON_SIZE.width()*2);
+            toolButton->setCheckable(true);
+            toolButton->setChecked(false);
+            auto qss = toStyleSheetColor("background-color", palette.color(QPalette::Button));
+            toolButton->setStyleSheet(qss);
+            toolButton->setMinimumWidth(ICON_WIDTH);
         }
     }
 
     QToolButton *toolButton = dynamic_cast<QToolButton *>(m_toolBar->widgetForAction(m_toolButtonActions[buttonName]));
     if (toolButton) {
         if (highlighted) {
-//            palette.setColor(QPalette::Active, QPalette::ButtonText, toQColor(pref(Preferences::UIHighlightColor)));
-            //   palette.setColor(QPalette::Active, QPalette::ButtonText, QPalette::Light);
-            //       toolButton->setForegroundRole(QPalette::Highlight);
+            toolButton->setCheckable(true);
+            toolButton->setChecked(true);
+            auto qss = toStyleSheetColor("background-color", palette.color(QPalette::Button).darker(150));
+            toolButton->setStyleSheet(qss);
             setWindowTitle(WINDOW_TITLE + " - " + buttonName);
-            makeEmphasized(toolButton);
         }
-        else {
-            palette.setColor(QPalette::Active, QPalette::ButtonText, toQColor(pref(Preferences::UITextColor)));
-            makeDefault(toolButton);
-        }
-
-        toolButton->setPalette(palette);
     }
 }
 } // namespace View
