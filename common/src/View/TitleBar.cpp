@@ -38,7 +38,7 @@ TitleBar::TitleBar(
     m_titleText->setProperty(ControlListBox::LabelColorShouldNotUpdateWhenSelected, true);
 
     if (boldTitle) {
-        makeEmphasized(m_titleText);
+        makeItalic(m_titleText);
     }
 
     auto *layout = new QHBoxLayout();
