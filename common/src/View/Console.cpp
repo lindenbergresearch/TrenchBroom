@@ -29,7 +29,7 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "View/QtUtils.h"
-
+#include "TrenchBroomApp.h"
 #include <string>
 
 namespace TrenchBroom {
@@ -58,7 +58,7 @@ void Console::doLog(const LogLevel level, const QString &message) {
 }
 
 void Console::logToDebugOut(const LogLevel /* level */, const QString &message) {
-    qDebug("%s", message.toStdString().c_str());
+    qDebug("[%8.4f] %s", Timer::appstart.elapsed(), message.toStdString().c_str());
 }
 
 void Console::logToConsole(const LogLevel level, const QString &message) {
@@ -79,7 +79,8 @@ void Console::logToConsole(const LogLevel level, const QString &message) {
             format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
             break;
     }
-    format.setFont(Fonts::fixedWidthFont());
+
+    format.setFont(TrenchBroomApp::instance().getConsoleFont());
 
     QTextCursor cursor(m_textView->document());
     cursor.movePosition(QTextCursor::MoveOperation::End);
