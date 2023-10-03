@@ -34,6 +34,8 @@
 
 #include <string>
 
+#define COLOR_ROLE(name) QPalette{}.color(QPalette::name)
+
 class QButtonGroup;
 
 class QColor;
@@ -235,7 +237,10 @@ Color fromQColor(const QColor &color);
 QColor toQColor(const Color &color, float multiplier = 1.0f);
 
 QString toStyleSheetColor(const char *prefix, const QColor &color);
+
 QString toStyleSheetRGBA(const QColor &color);
+
+void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type = "solid");
 
 void setWindowIconTB(QWidget *window);
 

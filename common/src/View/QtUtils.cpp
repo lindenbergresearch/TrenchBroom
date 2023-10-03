@@ -304,6 +304,12 @@ QString toStyleSheetRGBA(const QColor &color) {
     return QString::asprintf("rgba(%d, %d, %d, %d)", color.red(), color.green(), color.blue(), color.alpha());
 }
 
+void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type) {
+    auto qss = QString::asprintf("border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
+    widget->setStyleSheet(qss);
+}
+
+
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
     return createBitmapButton(IO::loadSVGIcon(image), tooltip, parent);
 }
