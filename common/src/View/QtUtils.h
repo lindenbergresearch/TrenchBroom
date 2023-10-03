@@ -234,7 +234,8 @@ Color fromQColor(const QColor &color);
 
 QColor toQColor(const Color &color, float multiplier = 1.0f);
 
-QString toStyleSheetColor(const char *prefix, QColor color);
+QString toStyleSheetColor(const char *prefix, const QColor &color);
+QString toStyleSheetRGBA(const QColor &color);
 
 void setWindowIconTB(QWidget *window);
 

@@ -295,9 +295,13 @@ QColor toQColor(const Color &color, const float multiplier) {
     return QColor::fromRgbF(color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
 }
 
-QString toStyleSheetColor(const char *prefix, QColor color) {
+QString toStyleSheetColor(const char *prefix, const QColor &color) {
     auto sheet = QString::asprintf("%s: rgba(%d, %d, %d, %d); ", prefix, color.red(), color.green(), color.blue(), color.alpha());
     return sheet;
+}
+
+QString toStyleSheetRGBA(const QColor &color) {
+    return QString::asprintf("rgba(%d, %d, %d, %d)", color.red(), color.green(), color.blue(), color.alpha());
 }
 
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
