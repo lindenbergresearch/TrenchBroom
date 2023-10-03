@@ -195,11 +195,16 @@ Preference<bool> EnableMSAA("Renderer/Enable multisampling", true);
 Preference<bool> TextureLock("Editor/Texture lock", true);
 Preference<bool> UVLock("Editor/UV lock", false);
 
-
 Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/B612Mono-Bold.ttf");
+Preference<std::filesystem::path> UIFontPath("Editor/UI Font name", "fonts/JetBrainsMono-Regular.ttf");
+Preference<std::filesystem::path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono-Regular.ttf");
 
 Preference<int> RendererFontSize("Renderer/Font size", 13);
 Preference<int> BrowserFontSize("Browser/Font size", 13);
+Preference<int> UIFontSize("Editor/UI Font size", 13);
+Preference<int> ConsoleFontSize("Editor/Console Font size", 14);
+
+Preference<int> ToolBarIconsSize("Editor/Toolbar Icon Size", 24);
 
 Preference<Color> BrowserTextColor("Browser/Text color", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> BrowserSubTextColor(
@@ -336,7 +341,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance,
         &HandleColor, &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor,
         &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness,
-        &GridAlpha, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &RendererFontSize, &BrowserFontSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
+        &GridAlpha, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath,&ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize,&BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
         &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(),
         &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode,

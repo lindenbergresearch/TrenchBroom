@@ -140,10 +140,16 @@ extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
 extern Preference<std::filesystem::path> RendererFontPath;
+extern Preference<std::filesystem::path> UIFontPath;
+extern Preference<std::filesystem::path> ConsoleFontPath;
 
 extern Preference<int> RendererFontSize;
-
 extern Preference<int> BrowserFontSize;
+extern Preference<int> UIFontSize;
+extern Preference<int> ConsoleFontSize;
+
+extern Preference<int> ToolBarIconsSize;
+
 extern Preference<Color> BrowserTextColor;
 extern Preference<Color> BrowserSubTextColor;
 extern Preference<Color> BrowserBackgroundColor;
