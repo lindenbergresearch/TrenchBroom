@@ -38,7 +38,7 @@ class TabBook;
 class InfoPanel : public QWidget {
 Q_OBJECT
 private:
-    TabBook *m_tabBook;
+ //   TabBook *m_tabBook;
     Console *m_console;
     IssueBrowser *m_issueBrowser;
 
