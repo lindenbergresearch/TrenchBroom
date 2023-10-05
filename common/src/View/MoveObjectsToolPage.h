@@ -42,6 +42,7 @@ private:
 
     QLineEdit *m_offset;
     QAbstractButton *m_button;
+    QLabel *m_label;
 
     NotifierConnection m_notifierConnection;
 
