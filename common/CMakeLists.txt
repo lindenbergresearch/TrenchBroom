@@ -995,6 +995,8 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/ViewPreferencePane.h
         ${COMMON_SOURCE_DIR}/View/ViewUtils.h
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.h
+        src/QSSBuilder.cpp
+        src/QSSBuilder.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
