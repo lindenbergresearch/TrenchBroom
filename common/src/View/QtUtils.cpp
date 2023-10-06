@@ -216,12 +216,8 @@ QWidget *makeDefault(QWidget *widget) {
 }
 
 QWidget *makeEmphasized(QWidget *widget) {
-    const auto &app = TrenchBroomApp::instance();
-    widget->setPalette(app.palette());
-
     auto font = widget->font();
     font.setBold(true);
-//    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
     widget->setFont(font);
     return widget;
 }
@@ -248,7 +244,6 @@ QWidget *makeTitle(QWidget *widget) {
     auto font = widget->font();
     font.setPointSize(font.pointSize() + 1);
     font.setBold(true);
-//    font.setLetterSpacing(QFont::AbsoluteSpacing, -0.5);
     widget->setFont(font);
     return widget;
 }
@@ -258,6 +253,21 @@ QWidget *makeHeader(QWidget *widget) {
     auto font = widget->font();
     font.setPointSize(font.pointSize() * 2);
     font.setBold(true);
+    widget->setFont(font);
+    return widget;
+}
+
+QWidget *makeSubTitle(QWidget *widget) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, QPalette::WindowText, palette.color(QPalette::Text).lighter(250));
+    palette.setColor(QPalette::Normal, QPalette::Text, palette.color(QPalette::Text).lighter(250));
+    palette.setColor(QPalette::Normal, QPalette::Window, palette.color(QPalette::Dark));
+    palette.setColor(QPalette::Normal, QPalette::Base, palette.color(QPalette::Dark));
+    widget->setPalette(palette);
+
+    auto font = widget->font();
+    font.setBold(true);
+    font.setItalic(true);
     widget->setFont(font);
     return widget;
 }
@@ -300,9 +310,21 @@ QString toStyleSheetColor(const char *prefix, const QColor &color) {
     return sheet;
 }
 
-QString toStyleSheetRGBA(const QColor &color) {
-    return QString::asprintf("rgba(%d, %d, %d, %d)", color.red(), color.green(), color.blue(), color.alpha());
+QString toStyleSheetRGBA(const QColor &color, int adjustment) {
+    auto tmp_color = adjustment < 0 ? color.darker(-adjustment) : color.lighter(adjustment);
+    return QString::asprintf("rgba(%d, %d, %d, %d)", tmp_color.red(), tmp_color.green(), tmp_color.blue(), tmp_color.alpha());
 }
+
+QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, QPalette::ColorGroup group, int adjustment) {
+    auto color = palette.color(group, role);
+    return toStyleSheetRGBA(color, adjustment);
+}
+
+QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, int adjustment) {
+    auto color = palette.color(QPalette::ColorGroup::Active, role);
+    return toStyleSheetRGBA(color, adjustment);
+}
+
 
 void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type) {
     auto qss = QString::asprintf("border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());

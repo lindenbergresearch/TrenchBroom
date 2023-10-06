@@ -100,12 +100,10 @@ enum class FileDialogDir {
  */
 QString fileDialogDefaultDirectory(FileDialogDir type);
 
-void updateFileDialogDefaultDirectoryWithFilename(
-    FileDialogDir type, const QString &filename
+void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename
 );
 
-void updateFileDialogDefaultDirectoryWithDirectory(
-    FileDialogDir type, const QString &newDefaultDirectory
+void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory
 );
 
 QString windowSettingsPath(const QWidget *window, const QString &suffix = "");
@@ -141,16 +139,13 @@ class MapFrame;
 
 MapFrame *findMapFrame(QWidget *widget);
 
-QToolButton *createBitmapButton(
-    const std::string &image, const QString &tooltip, QWidget *parent = nullptr
+QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr
 );
 
-QToolButton *createBitmapButton(
-    const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr
+QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr
 );
 
-QToolButton *createBitmapToggleButton(
-    const std::string &image, const QString &tooltip, QWidget *parent = nullptr
+QToolButton *createBitmapToggleButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr
 );
 
 QWidget *createDefaultPage(const QString &message, QWidget *parent = nullptr);
@@ -185,8 +180,7 @@ void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
 template<typename... Rest>
 QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
     auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(
-        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
     );
     layout->setSpacing(LayoutConstants::NarrowHMargin);
     addToMiniToolBarLayout(layout, first, rest...);
@@ -197,8 +191,7 @@ QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
 template<typename... Rest>
 QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
     auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(
-        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
     );
     layout->setSpacing(LayoutConstants::NarrowHMargin);
     layout->addStretch(1);
@@ -226,6 +219,9 @@ QWidget *makeTitle(QWidget *widget);
 
 QWidget *makeHeader(QWidget *widget);
 
+QWidget *makeSubTitle(QWidget *widget);
+
+
 QWidget *makeError(QWidget *widget);
 
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
@@ -238,7 +234,11 @@ QColor toQColor(const Color &color, float multiplier = 1.0f);
 
 QString toStyleSheetColor(const char *prefix, const QColor &color);
 
-QString toStyleSheetRGBA(const QColor &color);
+QString toStyleSheetRGBA(const QColor &color, int adjustment = 0);
+
+QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, QPalette::ColorGroup group, int adjustment = 0);
+
+QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, int adjustment = 0);
 
 void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type = "solid");
 
@@ -267,8 +267,7 @@ void insertTitleBarSeparator(QVBoxLayout *layout);
 template<typename I>
 QStringList toQStringList(I cur, I end) {
     auto result = QStringList{};
-    std::transform(
-        cur, end, std::back_inserter(result), [](const auto &str) {
+    std::transform(cur, end, std::back_inserter(result), [](const auto &str) {
           return QString::fromStdString(str);
         }
     );
