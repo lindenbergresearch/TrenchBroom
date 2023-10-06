@@ -40,11 +40,9 @@ void QSSBuilder::update() {
         auto replacement = repl();
 
         if (!replacement.isEmpty()) {
-            printf("%s -> %s\n", source.toStdString().c_str(), replacement.toStdString().c_str());
             renderedText.replace(source, replacement);
         }
     }
-    printf("%s\n", renderedText.toStdString().c_str());
 }
 
 void QSSBuilder::addReplacement(QString symbol, std::function<QString()> repl_f) {
