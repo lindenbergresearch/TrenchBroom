@@ -28,25 +28,44 @@
 #include "View/QtUtils.h"
 #include "View/TabBar.h"
 #include "View/TabBook.h"
+#include "QTabWidget"
+#include "QTabBar.h"
+#include "IO/ResourceUtils.h"
 
 namespace TrenchBroom {
 namespace View {
-Inspector::Inspector(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
+Inspector::Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
 ) : QWidget(parent), m_tabBook(nullptr), m_mapInspector(nullptr), m_entityInspector(nullptr), m_faceInspector(nullptr), m_syncTabBarEventFilter(nullptr) {
+//    m_tabBook = new TabBook();
+//
+//    m_mapInspector = new MapInspector(document);
+//    m_entityInspector = new EntityInspector(document, contextManager);
+//    m_faceInspector = new FaceInspector(document, contextManager);
+//
+//    m_tabBook->addPage(m_mapInspector, "Map");
+//    m_tabBook->addPage(m_faceInspector, "Face");
+//    m_tabBook->addPage(m_entityInspector, "Entity");
+//
+//    auto *layout = new QVBoxLayout();
+//    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+//    layout->addWidget(m_tabBook);
+//    setLayout(layout);
+
+
     m_tabBook = new TabBook();
 
+    auto tabs = new QTabWidget(this);
     m_mapInspector = new MapInspector(document);
     m_entityInspector = new EntityInspector(document, contextManager);
     m_faceInspector = new FaceInspector(document, contextManager);
 
-    m_tabBook->addPage(m_mapInspector, "Map");
-    m_tabBook->addPage(m_faceInspector, "Face");
-    m_tabBook->addPage(m_entityInspector, "Entity");
+    tabs->addTab(m_mapInspector, "Map");
+    tabs->addTab(m_faceInspector, "Face");
+    tabs->addTab(m_entityInspector, "Entity");
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
-    layout->addWidget(m_tabBook);
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::MediumVMargin+2, 0, LayoutConstants::NarrowHMargin);
+    layout->addWidget(tabs);
     setLayout(layout);
 }
 

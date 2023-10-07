@@ -20,9 +20,9 @@
 #include "InfoPanel.h"
 
 #include <QVBoxLayout>
+#include <QTabWidget>
 #include "View/Console.h"
 #include "View/IssueBrowser.h"
-#include "View/AColoredTabWidget.h"
 
 namespace TrenchBroom {
 namespace View {
@@ -30,11 +30,12 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
     m_console = new Console();
     m_issueBrowser = new IssueBrowser(document);
 
-    auto tabs = new TabWidget(this);
+    auto tabs = new QTabWidget(this);
+    tabs->setObjectName("InfoPanel_TabWidget");
     tabs->addTab(m_console, "Console");
     tabs->addTab(m_issueBrowser, "Issues");
 
-    tabs->setTabPosition(QTabWidget::TabPosition::South);
+    tabs->setTabPosition(QTabWidget::TabPosition::North);
 
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);
