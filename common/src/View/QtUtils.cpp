@@ -248,6 +248,14 @@ QWidget *makeTitle(QWidget *widget) {
     return widget;
 }
 
+QWidget *makeSubTitle(QWidget *widget) {
+    auto font = widget->font();
+    font.setPointSize(font.pointSize() - 2);
+    //font.setItalic(true);
+    widget->setFont(font);
+    return widget;
+}
+
 QWidget *makeHeader(QWidget *widget) {
     makeDefault(widget);
     auto font = widget->font();
@@ -257,7 +265,7 @@ QWidget *makeHeader(QWidget *widget) {
     return widget;
 }
 
-QWidget *makeSubTitle(QWidget *widget) {
+QWidget *makePanelTitle(QWidget *widget) {
     auto palette = widget->palette();
     palette.setColor(QPalette::Normal, QPalette::WindowText, palette.color(QPalette::Text).lighter(250));
     palette.setColor(QPalette::Normal, QPalette::Text, palette.color(QPalette::Text).lighter(250));
@@ -266,8 +274,6 @@ QWidget *makeSubTitle(QWidget *widget) {
     widget->setPalette(palette);
 
     auto font = widget->font();
-    font.setBold(true);
-    font.setItalic(true);
     widget->setFont(font);
     return widget;
 }

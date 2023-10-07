@@ -217,9 +217,11 @@ QWidget *makeSmall(QWidget *widget);
 
 QWidget *makeTitle(QWidget *widget);
 
+QWidget *makeSubTitle(QWidget *widget);
+
 QWidget *makeHeader(QWidget *widget);
 
-QWidget *makeSubTitle(QWidget *widget);
+QWidget *makePanelTitle(QWidget *widget);
 
 
 QWidget *makeError(QWidget *widget);
