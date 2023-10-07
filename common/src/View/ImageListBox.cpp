@@ -30,15 +30,16 @@
 
 namespace TrenchBroom {
 namespace View {
-ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent) : ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
-    m_titleLabel = new ElidedLabel(title, Qt::ElideRight);
+ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent) :
+ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
+    m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
     makeEmphasized(m_titleLabel);
 
     m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
-    makeInfo(m_subtitleLabel);
+    makeSubTitle(m_subtitleLabel);
 
     auto *imageAndTextLayout = new QHBoxLayout();
-    imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
+    imageAndTextLayout->setContentsMargins(0, LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin);
     imageAndTextLayout->setSpacing(0);
 
     m_imageLabel = new QLabel();
@@ -46,7 +47,7 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const Q
     m_imageLabel->setPixmap(image);
 
     auto *textLayout = new QVBoxLayout();
-    textLayout->setContentsMargins(0, 0, 0, 0);
+    textLayout->setContentsMargins(LayoutConstants::MediumHMargin, 0, 0, 1);
     textLayout->setSpacing(0);
     textLayout->addWidget(m_titleLabel);
     textLayout->addWidget(m_subtitleLabel);
@@ -69,7 +70,7 @@ void ImageListBoxItemRenderer::updateItem() {
     }
 }
 
-ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, showSeparator, parent) {
+ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, false, parent) {
 }
 
 ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, const size_t index
