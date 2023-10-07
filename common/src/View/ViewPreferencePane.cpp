@@ -181,6 +181,9 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_UIFontCombo = new QComboBox;
     m_UIFontCombo->setEditable(false);
 
+    m_ConsoleFontCombo = new QComboBox;
+    m_ConsoleFontCombo->setEditable(false);
+
     // find fonts folder
     auto fontsPath = IO::SystemPaths::findResourceDirectories(std::filesystem::path("fonts").parent_path());
 
@@ -196,30 +199,43 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         QFont font;
         m_rendererFontCombo->addItem("[system: " + font.defaultFamily() + "]");
         m_UIFontCombo->addItem("[system: " + font.defaultFamily() + "]");
+        m_ConsoleFontCombo->addItem("[system: " + font.defaultFamily() + "]");
         font_files.push_back(font.defaultFamily().toStdString());
-
-        // installed fonts
-        QFontDatabase database;
-        for (auto family: database.families()) {
-            m_rendererFontCombo->addItem("[" + family + "]");
-            m_UIFontCombo->addItem("[" + family + "]");
-            font_files.push_back(family.toStdString().c_str());
-        }
 
         // search compatible fonts
         auto res = m_fs->find("fonts", IO::TraversalMode::Recursive, IO::makeExtensionPathMatcher({".ttf", ".otf"}));
 
+        auto tmp_files = std::vector<std::filesystem::path>();
+
         if (res.is_success()) {
             for (const auto &item: res.value()) {
-                auto filename = QString::fromStdString(item.filename());
+                tmp_files.push_back(item);
+            }
+
+            std::sort(tmp_files.begin(), tmp_files.end());
+
+            for (const auto &item: tmp_files) {
+                auto filename = "[" + QString::fromStdString(item.filename()) + "]";
                 m_rendererFontCombo->addItem(filename);
                 m_UIFontCombo->addItem(filename);
+                m_ConsoleFontCombo->addItem(filename);
                 font_files.push_back(item);
             }
         }
-        else {
-            m_rendererFontCombo->addItem("no fonts found.");
-            m_UIFontCombo->addItem("no fonts found.");
+
+        // installed fonts
+        QFontDatabase database;
+        for (auto family: database.families()) {
+            m_rendererFontCombo->addItem(family);
+            m_UIFontCombo->addItem(family);
+            m_ConsoleFontCombo->addItem(family);
+            font_files.push_back(family.toStdString().c_str());
+        }
+
+        if (font_files.empty()) {
+            m_rendererFontCombo->addItem("no local fonts found.");
+            m_UIFontCombo->addItem("no local fonts found.");
+            m_ConsoleFontCombo->addItem("no fonts found.");
         }
     }
 
@@ -235,6 +251,20 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_UIFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"});
     m_UIFontSizeCombo->setValidator(new QIntValidator{1, 20, m_UIFontSizeCombo});
 
+    m_ConsoleFontSizeCombo = new QComboBox{};
+    m_ConsoleFontSizeCombo->setEditable(true);
+    m_ConsoleFontSizeCombo->setToolTip("Sets the font size for the console panel.");
+    m_ConsoleFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"});
+    m_ConsoleFontSizeCombo->setValidator(new QIntValidator{1, 96, m_ConsoleFontSizeCombo});
+
+
+    m_ToolbarIconSizeCombo = new QComboBox{};
+    m_ToolbarIconSizeCombo->setEditable(false);
+    m_ToolbarIconSizeCombo->setToolTip("Sets the icon size for the main toolbar.");
+    m_ToolbarIconSizeCombo->addItems({"14x14", "16x16", "18x18", "20x20", "22x22", "24x24", "26x26", "28x28", "30x30", "32x32"});
+
+    /*************************************************************************************************************************/
+
     auto *layout = new FormWithSectionsLayout{};
     layout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, 0, 0);
     layout->setVerticalSpacing(LayoutConstants::MediumVMargin);
@@ -245,8 +275,12 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addSection("User Interface");
     layout->addRow("Theme", themeLayout);
     layout->addRow("Brightness", m_UIBrightnessSlider);
-    layout->addRow("UI Font", m_UIFontCombo);
-    layout->addRow("Font Size", m_UIFontSizeCombo);
+    layout->addRow("Toolbar Icon-Size", m_ToolbarIconSizeCombo);
+
+    layout->addSection("Fonts");
+    layout->addRow("UI Font", m_UIFontCombo, m_UIFontSizeCombo);
+    layout->addRow("Console Font", m_ConsoleFontCombo, m_ConsoleFontSizeCombo);
+    layout->addRow("Renderer Font", m_rendererFontCombo, m_rendererFontSizeCombo);
 
     layout->addSection("Map Views");
     layout->addRow("Layout", viewLayoutLayout);
@@ -262,9 +296,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addSection("Texture Browser");
     layout->addRow("Icon size", m_textureBrowserIconSizeCombo);
 
-    layout->addSection("Fonts");
-    layout->addRow("Renderer Font", m_rendererFontCombo);
-    layout->addRow("Font Size", m_rendererFontSizeCombo);
 
     viewBox->setMinimumWidth(550);
     viewBox->setLayout(layout);
@@ -281,15 +312,22 @@ void ViewPreferencePane::bindEvents() {
     connect(m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
     connect(m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged);
     connect(m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged);
-    connect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
-    connect(m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged);
     connect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
     connect(m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     connect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     connect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
+
+    connect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
     connect(m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged);
+
+    connect(m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged);
     connect(m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged);
+
+    connect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
+    connect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
+
+    connect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
 }
 
 void ViewPreferencePane::unBindEvents() {
@@ -301,15 +339,22 @@ void ViewPreferencePane::unBindEvents() {
     disconnect(m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
     disconnect(m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged);
     disconnect(m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged);
-    disconnect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
-    disconnect(m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged);
     disconnect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
     disconnect(m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
     disconnect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     disconnect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     disconnect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
+
+    disconnect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
     disconnect(m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged);
+
+    disconnect(m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged);
     disconnect(m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged);
+
+    disconnect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
+    disconnect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
+
+    disconnect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
 }
 
 bool ViewPreferencePane::doCanResetToDefaults() {
@@ -384,8 +429,12 @@ void ViewPreferencePane::doUpdateControls() {
         m_textureBrowserIconSizeCombo->setCurrentIndex(2);
     }
 
+    auto iconSize = (pref(Preferences::ToolBarIconsSize) - 14) / 2;
+    m_ToolbarIconSizeCombo->setCurrentIndex(iconSize);
+
     m_rendererFontSizeCombo->setCurrentText(QString::asprintf("%i", pref(Preferences::RendererFontSize)));
     m_UIFontSizeCombo->setCurrentText(QString::asprintf("%i", pref(Preferences::UIFontSize)));
+    m_ConsoleFontSizeCombo->setCurrentText(QString::asprintf("%i", pref(Preferences::ConsoleFontSize)));
 
     auto render_font = pref(Preferences::RendererFontPath);
     auto render_font_found = std::find(font_files.begin(), font_files.end(), render_font);
@@ -403,7 +452,15 @@ void ViewPreferencePane::doUpdateControls() {
         m_UIFontCombo->setCurrentIndex(int(index));
     }
 
-   bindEvents();
+    auto console_font = pref(Preferences::ConsoleFontPath);
+    auto console_font_found = std::find(font_files.begin(), font_files.end(), console_font);
+
+    if (console_font_found != font_files.end()) {
+        auto index = console_font_found - font_files.begin();
+        m_ConsoleFontCombo->setCurrentIndex(int(index));
+    }
+
+    bindEvents();
 }
 
 bool ViewPreferencePane::doValidate() {
@@ -559,7 +616,7 @@ void ViewPreferencePane::renderFontFileChanged(const int index) {
 }
 
 void ViewPreferencePane::reloadUIStyle(bool reloadFonts) {
-    TrenchBroomApp::instance().reloadStyle(reloadFonts, false);
+    TrenchBroomApp::instance().reloadStyle(reloadFonts, true);
 }
 
 void ViewPreferencePane::editorUIFontSizeChanged(const QString &text) {
@@ -588,6 +645,45 @@ void ViewPreferencePane::editorUIFontFileChanged(const int index) {
     else {
         prefs.set(Preferences::UIFontPath, font_files[size_t(index)]);
     }
+
+    reloadUIStyle();
+}
+
+void ViewPreferencePane::editorConsoleFontSizeChanged(const QString &text) {
+    bool ok;
+    const auto value = text.toInt(&ok);
+
+    if (ok) {
+        auto &prefs = PreferenceManager::instance();
+        prefs.set(Preferences::ConsoleFontSize, value);
+    }
+
+    reloadUIStyle();
+}
+
+void ViewPreferencePane::editorConsoleFontFileChanged(int index) {
+    assert(index >= 0 && size_t(index) < font_files.size());
+
+    auto &prefs = PreferenceManager::instance();
+
+    // default
+    if (index == 0) {
+        prefs.resetToDefault(Preferences::ConsoleFontPath);
+        prefs.resetToDefault(Preferences::ConsoleFontSize);
+    }
+    else {
+        prefs.set(Preferences::ConsoleFontPath, font_files[size_t(index)]);
+    }
+
+    reloadUIStyle();
+}
+
+void ViewPreferencePane::editorToolbarIconSizeChanged(int index) {
+    auto &prefs = PreferenceManager::instance();
+
+    // start at font-size 14px
+    auto size = 14 + index * 2;
+    prefs.set(Preferences::ToolBarIconsSize, size);
 
     reloadUIStyle();
 }

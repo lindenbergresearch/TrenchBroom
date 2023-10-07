@@ -48,6 +48,10 @@ private:
     QComboBox *m_rendererFontCombo = nullptr;
     QComboBox *m_UIFontSizeCombo = nullptr;
     QComboBox *m_UIFontCombo = nullptr;
+    QComboBox *m_ConsoleFontSizeCombo = nullptr;
+    QComboBox *m_ConsoleFontCombo = nullptr;
+    QComboBox *m_ToolbarIconSizeCombo = nullptr;
+
     std::vector<std::filesystem::path> font_files;
 
 public:
@@ -110,6 +114,12 @@ private slots:
     void editorUIFontSizeChanged(const QString &text);
 
     void editorUIFontFileChanged(int index);
+
+    void editorConsoleFontSizeChanged(const QString &text);
+
+    void editorConsoleFontFileChanged(int index);
+
+    void editorToolbarIconSizeChanged(int index);
 
 };
 } // namespace TrenchBroom::View
