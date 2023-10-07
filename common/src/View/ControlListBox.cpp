@@ -84,27 +84,6 @@ void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWid
         if (dontUpdate.isValid() && dontUpdate.canConvert(QMetaType::Bool) && dontUpdate.toBool()) {
             continue;
         }
-
-        // The label colorRole automatically updates from QPalette::Text to
-        // QPalette::HighlightedText. However the macOS palette is different on listWidget and
-        // the app default QPalette, so we need to transfer the listWidget palette to the
-        // QLabel for good contrast.
-
-        QPalette labelPalette;
-        labelPalette.setColor(QPalette::Active, QPalette::HighlightedText, listWidget->palette().color(QPalette::Active, QPalette::HighlightedText));
-        labelPalette.setColor(QPalette::Inactive, QPalette::HighlightedText, listWidget->palette().color(QPalette::Inactive, QPalette::HighlightedText));
-        labelPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, listWidget->palette().color(QPalette::Disabled, QPalette::HighlightedText));
-
-        labelPalette.setColor(QPalette::Active, QPalette::Text, listWidget->palette().color(QPalette::Active, QPalette::Text));
-        labelPalette.setColor(QPalette::Inactive, QPalette::Text, listWidget->palette().color(QPalette::Inactive, QPalette::Text));
-        labelPalette.setColor(QPalette::Disabled, QPalette::Text, listWidget->palette().color(QPalette::Disabled, QPalette::Text));
-        child->setPalette(labelPalette);
-        // macOS: we'd prefer child->setPalette(listWidget->palette()); but this doesn't work,
-        // whereas the above does.
-        // FIXME: the above setPalette call should be removed once we stop using QListWidget
-        // and make ControlListBox a standalone widget.
-
-        child->setPalette(app.palette());
     }
 
     setPalette(app.palette());
@@ -166,7 +145,7 @@ ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMar
 
 ControlListBox::ControlListBox(const QString &emptyText, const bool showSeparator, QWidget *parent
 ) : ControlListBox(emptyText, QMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin
-                   ), showSeparator, parent
+    ), showSeparator, parent
 ) {
 }
 
