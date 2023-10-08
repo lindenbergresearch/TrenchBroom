@@ -12,10 +12,16 @@ QSSBuilder *QSSBuilder::fromFile(const std::filesystem::path &path) {
 
         // closed automatically by destructor
         file.open(QFile::ReadOnly | QFile::Text);
-        builder->text = QTextStream{&file}.readAll();
+        builder->setText(QTextStream{&file}.readAll());
 
-        return builder;
+        if (!builder->text.isNull() || !builder->text.isEmpty()) {
+            qInfo() << "Created builder from file: " << path.c_str();
+            return builder;
+        }
     }
+
+    qWarning() << "Unable to create builder from file: " << path.c_str();
+    return nullptr;
 }
 
 const QString &QSSBuilder::getText() const {
