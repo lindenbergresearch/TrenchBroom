@@ -265,7 +265,7 @@ QWidget *makeHeader(QWidget *widget) {
     return widget;
 }
 
-QWidget *makePanelTitle(QWidget *widget) {
+QWidget *makePanelTitle(QWidget *widget, bool bold) {
     auto palette = widget->palette();
     palette.setColor(QPalette::Normal, QPalette::WindowText, palette.color(QPalette::Text).lighter(250));
     palette.setColor(QPalette::Normal, QPalette::Text, palette.color(QPalette::Text).lighter(250));
@@ -274,6 +274,9 @@ QWidget *makePanelTitle(QWidget *widget) {
     widget->setPalette(palette);
 
     auto font = widget->font();
+
+    if (bold) font.setBold(true);
+
     widget->setFont(font);
     return widget;
 }
