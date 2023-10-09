@@ -38,7 +38,7 @@ AppInfoPanel::AppInfoPanel(QWidget *parent) : QWidget{parent} {
 }
 
 void AppInfoPanel::createGui() {
-    QPixmap appIconImage = IO::loadPixmapResource("AppIcon.png");
+    QPixmap appIconImage = IO::loadPixmapResource("AppIcon_Shadow.png");
     QLabel *appIcon = new QLabel{};
     appIcon->setPixmap(appIconImage);
 
@@ -46,8 +46,9 @@ void AppInfoPanel::createGui() {
     makeHeader(appName);
 
     BorderLine *appLine = new BorderLine{BorderLine::Direction::Horizontal};
-    appLine->setLineWidth(2);
+    appLine->setLineWidth(3);
     QLabel *appClaim = new QLabel{tr("Level Editor")};
+    makeEmphasized(appClaim);
 
     ClickableLabel *version = new ClickableLabel{tr("Version ") % getBuildVersion()};
     ClickableLabel *build = new ClickableLabel{tr("Build ") % getBuildIdStr()};
