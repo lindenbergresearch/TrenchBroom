@@ -221,8 +221,7 @@ QWidget *makeSubTitle(QWidget *widget);
 
 QWidget *makeHeader(QWidget *widget);
 
-QWidget *makePanelTitle(QWidget *widget, bool bold = false);
-
+QWidget *makePanelTitle(QWidget *widget, bool bold = false, bool isSubTitle = false);
 
 QWidget *makeError(QWidget *widget);
 

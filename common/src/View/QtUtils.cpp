@@ -250,7 +250,7 @@ QWidget *makeTitle(QWidget *widget) {
 
 QWidget *makeSubTitle(QWidget *widget) {
     auto font = widget->font();
-    font.setPointSize(font.pointSize() - 2);
+    font.setPointSize(font.pointSize() - 1);
     //font.setItalic(true);
     widget->setFont(font);
     return widget;
@@ -265,17 +265,16 @@ QWidget *makeHeader(QWidget *widget) {
     return widget;
 }
 
-QWidget *makePanelTitle(QWidget *widget, bool bold) {
-    auto palette = widget->palette();
-    palette.setColor(QPalette::Normal, QPalette::WindowText, palette.color(QPalette::Text).lighter(250));
-    palette.setColor(QPalette::Normal, QPalette::Text, palette.color(QPalette::Text).lighter(250));
-    palette.setColor(QPalette::Normal, QPalette::Window, palette.color(QPalette::Dark));
-    palette.setColor(QPalette::Normal, QPalette::Base, palette.color(QPalette::Dark));
-    widget->setPalette(palette);
+QWidget *makePanelTitle(QWidget *widget, bool bold, bool isSubTitle) {
 
+    widget->setForegroundRole(QPalette::HighlightedText);
     auto font = widget->font();
 
     if (bold) font.setBold(true);
+    //font.setItalic(true);
+
+    if (isSubTitle)
+        font.setPointSize(font.pointSize() - 1);
 
     widget->setFont(font);
     return widget;
