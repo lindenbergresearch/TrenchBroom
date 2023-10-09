@@ -29,28 +29,35 @@
 namespace TrenchBroom {
 namespace View {
 TitleBar::TitleBar(
-    const QString &title, QWidget *parent, const int hMargin, const int vMargin, const bool boldTitle
+    const QString &title, QWidget *parent, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle
 ) : QWidget(parent), m_titleText(nullptr) {
     m_titleText = new QLabel(title);
+    m_titleText->setAlignment(Qt::AlignCenter);
 
+    if (!subtitle) {
+        setAutoFillBackground(true);
+        setBackgroundRole(QPalette::Midlight);
+    }
     // Tell ControlListBox to not update the title label's color when the selection changes,
     // in case this widget is used inside of a ControlListBox.
     m_titleText->setProperty(ControlListBox::LabelColorShouldNotUpdateWhenSelected, true);
 
     if (boldTitle) {
-        makeItalic(m_titleText);
+        makePanelTitle(m_titleText, false, subtitle);
+    } else {
+        makePanelTitle(m_titleText, true, subtitle);
     }
 
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(hMargin, vMargin, hMargin, vMargin);
     layout->setSpacing(LayoutConstants::WideHMargin);
-    layout->addWidget(m_titleText, 1);
+    layout->addWidget(m_titleText, Qt::AlignCenter);
     setLayout(layout);
 }
 
 TitleBar::TitleBar(
-    const QString &title, const int hMargin, const int vMargin, const bool boldTitle
-) : TitleBar(title, nullptr, hMargin, vMargin, boldTitle) {
+    const QString &title, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle
+) : TitleBar(title, nullptr, hMargin, vMargin, boldTitle, subtitle) {
 }
 } // namespace View
 } // namespace TrenchBroom
