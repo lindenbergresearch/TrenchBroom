@@ -28,10 +28,10 @@
 namespace TrenchBroom {
 namespace View {
 TitledPanel::TitledPanel(
-    const QString &title, QWidget *parent, bool showDivider, bool boldTitle
+    const QString &title, QWidget *parent, bool showDivider, bool boldTitle, bool subtitle
 ) : QWidget(parent), m_titleBar(nullptr), m_panel(nullptr) {
     m_titleBar = new TitleBar(
-        title, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, boldTitle
+        title, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, boldTitle, subtitle
     );
     m_panel = new QWidget();
 
@@ -47,8 +47,8 @@ TitledPanel::TitledPanel(
 }
 
 TitledPanel::TitledPanel(
-    const QString &title, const bool showDivider, const bool boldTitle
-) : TitledPanel(title, nullptr, showDivider, boldTitle) {
+    const QString &title, const bool showDivider, const bool boldTitle, bool subtitle
+) : TitledPanel(title, nullptr, showDivider, boldTitle, subtitle) {
 }
 
 TitleBar *TitledPanel::getTitleBar() const {
