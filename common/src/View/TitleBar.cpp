@@ -37,6 +37,7 @@ TitleBar::TitleBar(
     if (!subtitle) {
         setAutoFillBackground(true);
         setBackgroundRole(QPalette::Midlight);
+        setForegroundRole(QPalette::BrightText);
     }
     // Tell ControlListBox to not update the title label's color when the selection changes,
     // in case this widget is used inside of a ControlListBox.
