@@ -56,25 +56,7 @@ void ControlListBoxItemRenderer::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void ControlListBoxItemRenderer::updateItem() {}
 
-void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWidget *listWidget
-) {
-    const auto &app = TrenchBroomApp::instance();
-
-//    QPalette backgroundPalette;
-//    backgroundPalette.setColor(QPalette::Active, QPalette::Highlight, listWidget->palette().color(QPalette::Active, QPalette::Highlight));
-//    backgroundPalette.setColor(QPalette::Inactive, QPalette::Highlight, listWidget->palette().color(QPalette::Inactive, QPalette::Highlight));
-//    backgroundPalette.setColor(QPalette::Disabled, QPalette::Highlight, listWidget->palette().color(QPalette::Disabled, QPalette::Highlight));
-//
-//    backgroundPalette.setColor(QPalette::Active, QPalette::Base, listWidget->palette().color(QPalette::Active, QPalette::Base));
-//    backgroundPalette.setColor(QPalette::Inactive, QPalette::Base, listWidget->palette().color(QPalette::Inactive, QPalette::Base));
-//    backgroundPalette.setColor(QPalette::Disabled, QPalette::Base, listWidget->palette().color(QPalette::Disabled, QPalette::Base));
-//    setPalette(backgroundPalette);
-//
-//    // macOS: we'd prefer setPalette(listWidget->palette()); but this doesn't work, whereas
-//    // the above does.
-//    // FIXME: the above setPalette call should be removed once we stop using QListWidget and
-//    // make ControlListBox a standalone widget.
-
+void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWidget *listWidget) {
     setBackgroundRole(selected ? QPalette::Highlight : QPalette::Base);
 
     // by default, we just change the appearance of all labels
@@ -85,8 +67,6 @@ void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWid
             continue;
         }
     }
-
-    setPalette(app.palette());
 }
 
 // ControlListBoxItemRendererWrapper

@@ -34,12 +34,13 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const Q
 ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
     m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
     makeEmphasized(m_titleLabel);
+    m_titleLabel->setStyleSheet("color: palette(BrightText);");
 
     m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
     makeSubTitle(m_subtitleLabel);
 
     auto *imageAndTextLayout = new QHBoxLayout();
-    imageAndTextLayout->setContentsMargins(0, LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin);
+    imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
     imageAndTextLayout->setSpacing(0);
 
     m_imageLabel = new QLabel();
@@ -47,7 +48,7 @@ ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullp
     m_imageLabel->setPixmap(image);
 
     auto *textLayout = new QVBoxLayout();
-    textLayout->setContentsMargins(LayoutConstants::MediumHMargin, 0, 0, 1);
+    textLayout->setContentsMargins(LayoutConstants::NarrowVMargin, 0, 0, 0);
     textLayout->setSpacing(0);
     textLayout->addWidget(m_titleLabel);
     textLayout->addWidget(m_subtitleLabel);
