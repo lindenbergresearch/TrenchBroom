@@ -131,6 +131,8 @@ Preference<Color> AngleIndicatorColor("Renderer/Colors/Angle indicator", Color(1
 Preference<Color> TextureSeamColor("Renderer/Colors/Texture seam", Color(1.0f, 1.0f, 0.0f, 1.0f));
 
 Preference<float> Brightness("Renderer/Brightness", 1.4f);
+Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 0);
+Preference<float> GridLineWidth("Renderer/Grid/With", 1.0);
 Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.5f);
 Preference<Color> GridColor2D("Renderer/Grid/Color2D", Color(0.8f, 0.8f, 0.8f, 0.8f));
 
