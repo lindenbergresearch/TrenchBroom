@@ -129,6 +129,8 @@ extern Preference<Color> AngleIndicatorColor;
 extern Preference<Color> TextureSeamColor;
 
 extern Preference<float> Brightness;
+extern Preference<int> FaceAutoBrightness;
+extern Preference<float> GridLineWidth;
 extern Preference<float> GridAlpha;
 extern Preference<Color> GridColor2D;
 
