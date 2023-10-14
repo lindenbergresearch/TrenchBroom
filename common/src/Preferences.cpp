@@ -291,7 +291,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
                                                     &ShearFillColor, &ShearOutlineColor, &MoveTraceColor,
                                                     &OccludedMoveTraceColor, &MoveIndicatorOutlineColor,
                                                     &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor,
-                                                    &Brightness, &GridAlpha, &GridColor2D, &TextureMinFilter,
+                                                    &Brightness,&FaceAutoBrightness,&GridLineWidth, &GridAlpha, &GridColor2D, &TextureMinFilter,
                                                     &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath,
                                                     &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize,
                                                     &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor,
