@@ -32,13 +32,17 @@ Q_OBJECT
 private:
     QSlider *m_slider;
     QLabel *m_label;
+    float m_factor;
+    QString m_format;
 
 public:
-    SliderWithLabel(int minimum, int maximum, QWidget *parent = nullptr);
+    SliderWithLabel(int minimum, int maximum, const float factor = 0.0, const QString &format = "%d", const int maxSliderWidth = 0, QWidget *parent = nullptr);
 
     int value() const;
 
     float ratio() const;
+
+    void setMaximumSliderWidth(const int width);
 
 public slots:
 
@@ -50,9 +54,11 @@ private slots:
 
     void valueChangedInternal(int value);
 
+     QString getValueLabel(int value);
+
 signals:
 
-    void valueChanged(int value);
+    void valueChanged(const int value);
 };
 } // namespace View
 } // namespace TrenchBroom
