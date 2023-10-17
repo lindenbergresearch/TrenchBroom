@@ -271,7 +271,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{&MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength,
                                                     &XAxisColor, &YAxisColor, &ZAxisColor, &PointFileColor,
                                                     &PortalFileBorderColor, &PortalFileFillColor, &ShowFPS,
-                                                    &UnitsDisplayType, &MetricConversationFactor,
+                                                    &UnitsDisplayType, &MetricConversationFactor,&SoftMapBoundsColor,
                                                     &CompassBackgroundColor, &CompassBackgroundOutlineColor,
                                                     &CompassAxisOutlineColor, &CameraFrustumColor, &DefaultGroupColor,
                                                     &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor,
