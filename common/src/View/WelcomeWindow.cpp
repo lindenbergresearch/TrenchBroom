@@ -31,9 +31,11 @@
 #include "View/QtUtils.h"
 #include "View/RecentDocumentListBox.h"
 #include "View/ViewConstants.h"
+#include "View/TitledPanel.h"
+#include "View/TitleBar.h"
 
 namespace TrenchBroom::View {
-WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::Dialog} // Qt::Dialog flag centers window on Ubuntu
+WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::SplashScreen}
     , m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
     createGui();
 }
@@ -53,6 +55,11 @@ void WelcomeWindow::createGui() {
         m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument
     );
 
+    auto panelLayout = new QVBoxLayout;
+    panelLayout->setContentsMargins(0,0,0,0);
+    panelLayout->setSpacing(0);
+    panelLayout->addWidget(m_recentDocumentListBox);
+
     auto *innerLayout = new QHBoxLayout{};
     innerLayout->setContentsMargins(QMargins{});
     innerLayout->setSpacing(0);
@@ -60,20 +67,26 @@ void WelcomeWindow::createGui() {
     auto *appPanel = createAppPanel();
 
     innerLayout->addWidget(appPanel, 0, Qt::AlignTop);
-    innerLayout->addWidget(m_recentDocumentListBox, 1);
+    innerLayout->addWidget(m_recentDocumentListBox);
 
     auto *container = new QWidget{};
     auto *outerLayout = new QVBoxLayout{};
     outerLayout->setContentsMargins(QMargins{});
     outerLayout->setSpacing(0);
 
+    auto titledPanel = new TitledPanel("Welcome to TrenchBroom", false);
+    titledPanel->getPanel()->setLayout(innerLayout);
+    titledPanel->getTitleBar()->setBackgroundRole(QPalette::Mid);
+    titledPanel->getTitleBar()->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::MediumHMargin);
+
+    outerLayout->addWidget(titledPanel);
     outerLayout->addLayout(innerLayout);
     insertTitleBarSeparator(outerLayout);
 
     container->setLayout(outerLayout);
 
     setCentralWidget(container);
-    setFixedSize(800, 500);
+    setMinimumSize(800, 500);
 }
 
 QWidget *WelcomeWindow::createAppPanel() {
