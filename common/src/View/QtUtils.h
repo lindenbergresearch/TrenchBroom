@@ -28,6 +28,7 @@
 #include <QString>
 #include <QStringList>
 #include <QWidget>
+#include <QSlider>
 
 #include "Ensure.h"
 #include "View/ViewConstants.h"
@@ -150,7 +151,8 @@ QToolButton *createBitmapToggleButton(const std::string &image, const QString &t
 
 QWidget *createDefaultPage(const QString &message, QWidget *parent = nullptr);
 
-QSlider *createSlider(int min, int max);
+QSlider *createSlider(const int min, const int max);
+
 
 float getSliderRatio(const QSlider *slider);
 
@@ -226,6 +228,8 @@ QWidget *makePanelTitle(QWidget *widget, bool bold = false, bool isSubTitle = fa
 QWidget *makeError(QWidget *widget);
 
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
+
+QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette);
 
 QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette);
 

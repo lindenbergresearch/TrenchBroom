@@ -72,6 +72,7 @@
 namespace TrenchBroom {
 namespace View {
 
+
 SyncHeightEventFilter::SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent
 ) : QObject{parent}, m_primary{primary}, m_secondary{secondary} {
     ensure(m_primary != nullptr, "primary is not null");
@@ -296,6 +297,14 @@ QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette) {
     return widget;
 }
 
+QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, QPalette::Button, defaultPalette.color(QPalette::Normal, QPalette::Midlight));
+//    palette.setColor(QPalette::Normal, QPalette::Base, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+    widget->setPalette(palette);
+    return widget;
+}
+
 QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette) {
     auto palette = widget->palette();
     palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::WindowText));
@@ -386,6 +395,8 @@ QSlider *createSlider(const int min, const int max) {
     slider->setTickPosition(QSlider::NoTicks);
     slider->setTracking(true);
     slider->setOrientation(Qt::Horizontal);
+    makeBright(slider, QPalette{});
+
     return slider;
 }
 
