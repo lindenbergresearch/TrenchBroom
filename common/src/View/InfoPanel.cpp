@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QTabWidget>
 #include "View/Console.h"
+#include "View/QtUtils.h"
 #include "View/IssueBrowser.h"
 
 namespace TrenchBroom {
@@ -31,6 +32,7 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
     m_issueBrowser = new IssueBrowser(document);
 
     auto tabs = new QTabWidget(this);
+    makeSubTitle(tabs);
     tabs->setObjectName("InfoPanel_TabWidget");
     tabs->addTab(m_console, "Console");
     tabs->addTab(m_issueBrowser, "Issues");
@@ -38,7 +40,7 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
     tabs->setTabPosition(QTabWidget::TabPosition::North);
 
     auto *sizer = new QVBoxLayout();
-    sizer->setContentsMargins(0, 0, 0, 0);
+    sizer->setContentsMargins(0, LayoutConstants::WideVMargin, 0, 0);
     sizer->addWidget(tabs);
     setLayout(sizer);
 }
