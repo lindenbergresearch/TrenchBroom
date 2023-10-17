@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QTabWidget>
 
 #include <memory>
 
@@ -48,7 +49,7 @@ enum class InspectorPage {
 class Inspector : public QWidget {
 Q_OBJECT
 private:
-    TabBook *m_tabBook;
+    QTabWidget *m_tabs;
     MapInspector *m_mapInspector;
     EntityInspector *m_entityInspector;
     FaceInspector *m_faceInspector;
