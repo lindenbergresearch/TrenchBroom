@@ -42,7 +42,8 @@ TitledPanel::TitledPanel(
     if (showDivider) {
         layout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
     }
-    layout->addWidget(m_panel, 1);
+
+    layout->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
     setLayout(layout);
 }
 
