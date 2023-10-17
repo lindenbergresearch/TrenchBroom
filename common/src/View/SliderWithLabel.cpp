@@ -30,19 +30,19 @@
 
 namespace TrenchBroom {
 namespace View {
-SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, const float factor, const QString &format, const int maxSliderWidth, QWidget *parent)
+SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, const float factor, const QString &format, const int maxSliderWidth, const int minLabelWidth, QWidget *parent)
     : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()), m_factor(factor), m_format(format) {
     // get maximum label bounding
     const auto min_size = m_label->fontMetrics().boundingRect(getValueLabel(minimum));
     const auto max_size = m_label->fontMetrics().boundingRect(getValueLabel(maximum));
-    const auto max_width = std::max(min_size.width(), max_size.width()) + 1;
+    const auto max_width = std::max(std::max(min_size.width(), max_size.width()) + 1, minLabelWidth);
 
     m_label->setMinimumWidth(max_width);
     m_label->setAlignment(Qt::AlignRight);
     m_label->setText(getValueLabel(m_slider->value()));
 
     if (maxSliderWidth > 0) {
-        setMinimumWidth(maxSliderWidth + LayoutConstants::MediumHMargin + max_width);
+        setMaximumSliderWidth(maxSliderWidth);
     }
 
     auto *layout = new QHBoxLayout();
