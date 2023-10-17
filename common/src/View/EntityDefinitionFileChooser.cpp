@@ -79,8 +79,6 @@ EntityDefinitionFileChooser::EntityDefinitionFileChooser(
 
 void EntityDefinitionFileChooser::createGui() {
     TitledPanel *builtinContainer = new TitledPanel(tr("Builtin"), false, true);
-    builtinContainer->setBackgroundRole(QPalette::Base);
-    builtinContainer->setAutoFillBackground(true);
 
     m_builtin = new SingleSelectionListWidget();
     m_builtin->setAllowDeselectAll(false);
@@ -92,13 +90,22 @@ void EntityDefinitionFileChooser::createGui() {
     builtinContainer->getPanel()->setLayout(builtinSizer);
 
     TitledPanel *externalContainer = new TitledPanel(tr("External"), false, true);
-    externalContainer->setBackgroundRole(QPalette::Base);
-    externalContainer->setAutoFillBackground(true);
 
     m_external = new QLabel(tr("use builtin"));
     m_chooseExternal = new QPushButton(tr("Browse..."));
+    m_chooseExternal->setStyleSheet("  padding: 3px 3px 3px 1px;\n"
+                                "    min-width: 65px;\n"
+                                "    min-height: 18px;"
+    );
+    makeSmall(m_chooseExternal);
     m_chooseExternal->setToolTip(tr("Click to browse for an entity definition file"));
+
     m_reloadExternal = new QPushButton(tr("Reload"));
+    m_reloadExternal->setStyleSheet("  padding: 3px 3px 3px 1px;\n"
+                                "    min-width: 50px;\n"
+                                "    min-height: 18px;"
+    );
+    makeSmall(m_reloadExternal);
     m_reloadExternal->setToolTip(tr("Reload the currently loaded entity definition file"));
 
     auto *externalSizer = new QHBoxLayout();
