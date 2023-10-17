@@ -23,6 +23,7 @@
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#include "TrenchBroomApp.h"
 #include "QtUtils.h"
 
 #include <kdl/path_utils.h>
@@ -130,6 +131,10 @@ bool ColorModel::setData(
     prefs.set(*colorPreference, fromQColor(newColor));
 
     emit dataChanged(index, index);
+
+    // update style
+    TrenchBroomApp::instance().reloadStyle(false, false);
+
     return true;
 }
 
