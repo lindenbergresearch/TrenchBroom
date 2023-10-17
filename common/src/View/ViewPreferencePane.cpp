@@ -127,19 +127,19 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     viewLayoutLayout->addWidget(m_link2dCameras);
     viewLayoutLayout->setContentsMargins(0, 0, 0, 0);
 
-    m_brightnessSlider = new SliderWithLabel{brightnessToUI(0.0f), brightnessToUI(2.0f)};
-    m_brightnessSlider->setMaximumWidth(350);
+    m_brightnessSlider = new SliderWithLabel{brightnessToUI(0.0f), brightnessToUI(2.0f), 0, "%d%%", 350, 45};
     m_brightnessSlider->setToolTip("Sets the brightness for textures and model skins in the 3D editing view.");
 
-    m_UIBrightnessSlider = new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f)};
-    m_UIBrightnessSlider->setMaximumWidth(350);
+    m_UIBrightnessSlider = new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f), 0, "%d%%", 350, 45};
     m_UIBrightnessSlider->setToolTip("Sets the contrast for UI controls");
 
-    m_gridAlphaSlider = new SliderWithLabel{-50, +50};
-    m_gridAlphaSlider->setMaximumWidth(350);
+    m_gridAlphaSlider = new SliderWithLabel{-50, +50, 0, "%d%%", 350, 45};
     m_gridAlphaSlider->setToolTip("Sets the visibility of the grid lines in the 3D editing view.");
-    m_fovSlider = new SliderWithLabel{50, 150};
-    m_fovSlider->setMaximumWidth(350);
+
+    m_gridWidthSlider = new SliderWithLabel{25, 400, 10e-3f,"%.1f px", 350, 45};
+    m_gridWidthSlider->setToolTip("Sets the thickness of the grid-lines.");
+
+    m_fovSlider = new SliderWithLabel{50, 150, 0, "%d°", 350, 45};
     m_fovSlider->setToolTip("Sets the field of vision in the 3D editing view.");
 
     m_showAxes = new QCheckBox{};
@@ -154,7 +154,22 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_metricConversationFactor = new QLineEdit{};
     m_metricConversationFactor->setToolTip("Specifies how many units equal 1 meter.");
     m_metricConversationFactor->setMaximumWidth(70);
+    m_metricConversationFactor->setAlignment(Qt::AlignRight);
     m_metricConversationFactor->setValidator(new QDoubleValidator{1.0, 60.0, 4, m_metricConversationFactor});
+
+    auto *unitsFactorLayout = new QHBoxLayout{};
+    auto unitLabel = new QLabel{"units/meter"};
+    makeSmall(unitLabel);
+    unitsFactorLayout->setContentsMargins(0, 0, 0, 0);
+    unitsFactorLayout->addWidget(m_metricConversationFactor);
+    unitsFactorLayout->addSpacing(0);
+    unitsFactorLayout->addWidget(unitLabel);
+
+    m_autoBrightnessTypeCombo = new QComboBox;
+    m_autoBrightnessTypeCombo->setToolTip("Sets how color tinting on objects should behave.");
+    m_autoBrightnessTypeCombo->addItem("as is");
+    m_autoBrightnessTypeCombo->addItem("average");
+    m_autoBrightnessTypeCombo->addItem("peak");
 
     m_textureModeCombo = new QComboBox{};
     m_textureModeCombo->setToolTip("Sets the texture filtering mode in the editing views.");
@@ -193,6 +208,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         // default font configured
         m_rendererFontCombo->addItem("[default]");
         m_UIFontCombo->addItem("[default]");
+        m_ConsoleFontCombo->addItem("[default]");
         font_files.push_back("[default]");
 
         // default system font
@@ -284,17 +300,19 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     layout->addSection("Map Views");
     layout->addRow("Layout", viewLayoutLayout);
-    layout->addRow("Brightness", m_brightnessSlider);
-    layout->addRow("Grid", m_gridAlphaSlider);
+    layout->addRow("View Brightness", m_brightnessSlider);
+    layout->addRow("Tint Brightness", m_autoBrightnessTypeCombo);
+    layout->addRow("Grid Alpha", m_gridAlphaSlider);
+    layout->addRow("Grid Width", m_gridWidthSlider);
     layout->addRow("FOV", m_fovSlider);
-    layout->addRow("Show metric", m_unitsDisplayType);
-    layout->addRow("Metric conversation factor", m_metricConversationFactor);
-    layout->addRow("Show axes", m_showAxes);
-    layout->addRow("Texture mode", m_textureModeCombo);
-    layout->addRow("Enable multisampling", m_enableMsaa);
+    layout->addRow("Unit Labeling", m_unitsDisplayType);
+    layout->addRow("Metric Conversation Factor", unitsFactorLayout);
+    layout->addRow("Show Axes", m_showAxes);
+    layout->addRow("Texture Mode", m_textureModeCombo);
+    layout->addRow("Enable Multisampling", m_enableMsaa);
 
     layout->addSection("Texture Browser");
-    layout->addRow("Icon size", m_textureBrowserIconSizeCombo);
+    layout->addRow("Icon-Size", m_textureBrowserIconSizeCombo);
 
 
     viewBox->setMinimumWidth(550);
@@ -317,6 +335,9 @@ void ViewPreferencePane::bindEvents() {
     connect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     connect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     connect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
+
+    connect(m_autoBrightnessTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorFaceAutoBrightnessChanged);
+    connect(m_gridWidthSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorGridWithChanged);
 
     connect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
     connect(m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged);
@@ -345,6 +366,9 @@ void ViewPreferencePane::unBindEvents() {
     disconnect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     disconnect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
 
+    disconnect(m_autoBrightnessTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorFaceAutoBrightnessChanged);
+    disconnect(m_gridWidthSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorGridWithChanged);
+
     disconnect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
     disconnect(m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged);
 
@@ -368,6 +392,8 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::MapViewLayout);
     prefs.resetToDefault(Preferences::Link2DCameras);
     prefs.resetToDefault(Preferences::Brightness);
+    prefs.resetToDefault(Preferences::GridLineWidth);
+    prefs.resetToDefault(Preferences::FaceAutoBrightness);
     prefs.resetToDefault(Preferences::GridAlpha);
     prefs.resetToDefault(Preferences::CameraFov);
     prefs.resetToDefault(Preferences::UnitsDisplayType);
@@ -398,6 +424,9 @@ void ViewPreferencePane::doUpdateControls() {
 
     m_unitsDisplayType->setCurrentIndex(pref(Preferences::UnitsDisplayType));
     m_metricConversationFactor->setText(QString::asprintf("%.4f", pref(Preferences::MetricConversationFactor)));
+
+    m_gridWidthSlider->setValue(int(pref(Preferences::GridLineWidth) * 100));
+    m_autoBrightnessTypeCombo->setCurrentIndex(pref(Preferences::FaceAutoBrightness));
 
     const auto textureModeIndex = findTextureMode(pref(Preferences::TextureMinFilter), pref(Preferences::TextureMagFilter));
     m_textureModeCombo->setCurrentIndex(int(textureModeIndex));
@@ -686,5 +715,15 @@ void ViewPreferencePane::editorToolbarIconSizeChanged(int index) {
     prefs.set(Preferences::ToolBarIconsSize, size);
 
     reloadUIStyle();
+}
+
+void ViewPreferencePane::editorFaceAutoBrightnessChanged(int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::FaceAutoBrightness, value);
+}
+
+void ViewPreferencePane::editorGridWithChanged(int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::GridLineWidth, float(value) / 100.0f);
 }
 } // namespace TrenchBroom::View
