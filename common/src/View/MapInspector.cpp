@@ -50,6 +50,7 @@ namespace View {
 
 MapInspector::MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent) : TabBookPage(parent), m_mapPropertiesEditor(nullptr), m_modEditor(nullptr) {
     createGui(document);
+    setObjectName("MapInspector_Widget");
 }
 
 MapInspector::~MapInspector() {
@@ -66,9 +67,13 @@ void MapInspector::createGui(std::weak_ptr<MapDocument> document) {
     sizer->setSpacing(0);
 
     sizer->addWidget(createLayerEditor(document), 1);
+
     sizer->addWidget(new BorderLine(BorderLine::Direction::Horizontal), 0);
+
     sizer->addWidget(m_mapPropertiesEditor, 0);
+
     sizer->addWidget(new BorderLine(BorderLine::Direction::Horizontal), 0);
+
     sizer->addWidget(m_modEditor, 0);
     setLayout(sizer);
 }
