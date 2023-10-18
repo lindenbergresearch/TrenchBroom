@@ -129,6 +129,9 @@ void FaceRenderer::doRender(RenderContext &context) {
         ActiveShader shader(shaderManager, Shaders::FaceShader);
         PreferenceManager &prefs = PreferenceManager::instance();
 
+        float gridLineWidth = pref(Preferences::GridLineWidth);
+        int autoBrightnessType = pref(Preferences::FaceAutoBrightness);
+
         const bool applyTexture = context.showTextures();
         const bool shadeFaces = context.shadeFaces();
         const bool showFog = context.showFog();
@@ -138,12 +141,16 @@ void FaceRenderer::doRender(RenderContext &context) {
         shader.set("Brightness", prefs.get(Preferences::Brightness));
         shader.set("RenderGrid", context.showGrid());
         shader.set("GridSize", static_cast<float>(context.gridSize()));
+        shader.set("GridLineWidth", gridLineWidth);
         shader.set("GridAlpha", prefs.get(Preferences::GridAlpha));
         shader.set("ApplyTexture", applyTexture);
         shader.set("Texture", 0);
+        shader.set("AutoBrightnessType", autoBrightnessType);
         shader.set("ApplyTinting", m_tint);
+
         if (m_tint)
             shader.set("TintColor", m_tintColor);
+
         shader.set("GrayScale", m_grayscale);
         shader.set("CameraPosition", context.camera().position());
         shader.set("ShadeFaces", shadeFaces);
