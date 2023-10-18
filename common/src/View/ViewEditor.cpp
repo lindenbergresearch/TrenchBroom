@@ -41,6 +41,7 @@
 #include "View/PopupButton.h"
 #include "View/QtUtils.h"
 #include "View/TitledPanel.h"
+#include "View/SliderWithLabel.h"
 #include "View/ViewConstants.h"
 
 #include <kdl/memory_utils.h>
@@ -181,9 +182,12 @@ void EntityDefinitionCheckBoxList::createGui() {
     scrollArea->setWidget(scrollWidget);
 
     auto *showAllButton = new QPushButton(tr("Show all"));
-    makeEmphasized(showAllButton);
+    showAllButton->setObjectName("ViewEditor_smallPushButton");
+    makeSmall(showAllButton);
+
     auto *hideAllButton = new QPushButton(tr("Hide all"));
-    makeEmphasized(hideAllButton);
+    hideAllButton->setObjectName("ViewEditor_smallPushButton");
+    makeSmall(hideAllButton);
 
     connect(
         showAllButton, &QAbstractButton::clicked, this, &EntityDefinitionCheckBoxList::showAllClicked
@@ -441,7 +445,10 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     m_showSoftBoundsCheckBox = new QCheckBox(tr("Show soft bounds"));
 
     auto *restoreDefualtsButton = new QPushButton(tr("Restore Defaults"));
-    makeEmphasized(restoreDefualtsButton);
+    restoreDefualtsButton->setContentsMargins(LayoutConstants::NarrowHMargin,LayoutConstants::NarrowHMargin,LayoutConstants::NarrowHMargin,LayoutConstants::NarrowHMargin);
+    restoreDefualtsButton->setObjectName("ViewEditor_smallPushButton");
+    makeSmall(restoreDefualtsButton);
+
 
     connect(
         m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged
