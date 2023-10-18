@@ -136,7 +136,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_gridAlphaSlider = new SliderWithLabel{-50, +50, 0, "%d%%", 350, 45};
     m_gridAlphaSlider->setToolTip("Sets the visibility of the grid lines in the 3D editing view.");
 
-    m_gridWidthSlider = new SliderWithLabel{25, 400, 10e-3f,"%.1f px", 350, 45};
+    m_gridWidthSlider = new SliderWithLabel{10, 300, 10e-3f,"%.1f px", 350, 45};
     m_gridWidthSlider->setToolTip("Sets the thickness of the grid-lines.");
 
     m_fovSlider = new SliderWithLabel{50, 150, 0, "%d°", 350, 45};
