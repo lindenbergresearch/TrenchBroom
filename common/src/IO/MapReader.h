@@ -126,8 +126,8 @@ protected:
      * @param linkedGroupsToKeep the IDs of linked groups which should not be unlinked even
      * if orphaned
      */
-    MapReader(
-        std::string_view str, Model::MapFormat sourceMapFormat, Model::MapFormat targetMapFormat, Model::EntityPropertyConfig entityPropertyConfig, std::vector<std::string> linkedGroupsToKeep
+    MapReader(std::string_view str, Model::MapFormat sourceMapFormat, Model::MapFormat targetMapFormat, Model::EntityPropertyConfig entityPropertyConfig,
+        std::vector<std::string> linkedGroupsToKeep
     );
 
     /**
@@ -152,9 +152,7 @@ protected:
     void readBrushFaces(const vm::bbox3 &worldBounds, ParserStatus &status);
 
 protected: // implement MapParser interface
-    void onBeginEntity(
-        size_t line, std::vector<Model::EntityProperty> properties, ParserStatus &status
-    ) override;
+    void onBeginEntity(size_t line, std::vector<Model::EntityProperty> properties, ParserStatus &status) override;
 
     void onEndEntity(size_t startLine, size_t lineCount, ParserStatus &status) override;
 
@@ -162,17 +160,16 @@ protected: // implement MapParser interface
 
     void onEndBrush(size_t startLine, size_t lineCount, ParserStatus &status) override;
 
-    void onStandardBrushFace(
-        size_t line, Model::MapFormat targetMapFormat, const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const Model::BrushFaceAttributes &attribs, ParserStatus &status
+    void onStandardBrushFace(size_t line, Model::MapFormat targetMapFormat, const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3,
+        const Model::BrushFaceAttributes &attribs, ParserStatus &status
     ) override;
 
-    void onValveBrushFace(
-        size_t line, Model::MapFormat targetMapFormat, const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const Model::BrushFaceAttributes &attribs, const vm::vec3 &texAxisX, const vm::vec3 &texAxisY,
-        ParserStatus &status
+    void onValveBrushFace(size_t line, Model::MapFormat targetMapFormat, const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3,
+        const Model::BrushFaceAttributes &attribs, const vm::vec3 &texAxisX, const vm::vec3 &texAxisY, ParserStatus &status
     ) override;
 
-    void onPatch(
-        size_t startLine, size_t lineCount, Model::MapFormat targetMapFormat, size_t rowCount, size_t columnCount, std::vector<vm::vec<FloatType, 5>> controlPoints, std::string textureName, ParserStatus &status
+    void onPatch(size_t startLine, size_t lineCount, Model::MapFormat targetMapFormat, size_t rowCount, size_t columnCount,
+        std::vector<vm::vec<FloatType, 5>> controlPoints, std::string textureName, ParserStatus &status
     ) override;
 
 private: // helper methods
@@ -190,23 +187,17 @@ private: // subclassing interface - these will be called in the order that nodes
      * Returns a pointer to a node which should become the parent of any node that belongs
      * to the world. This could be the default layer of the world node, or a dummy entity.
      */
-    virtual Model::Node *onWorldNode(
-        std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status
-    ) = 0;
+    virtual Model::Node *onWorldNode(std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) = 0;
 
     /**
      * Called for each custom layer.
      */
-    virtual void onLayerNode(
-        std::unique_ptr<Model::Node> layerNode, ParserStatus &status
-    ) = 0;
+    virtual void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &status) = 0;
 
     /**
      * Called for each group, entity entity or brush node. The given parent can be null.
      */
-    virtual void onNode(
-        Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status
-    ) = 0;
+    virtual void onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status) = 0;
 
     /**
      * Called for each brush face.

@@ -245,9 +245,7 @@ private: // menu event handlers
 public:
     Result<bool> newDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat);
 
-    Result<bool> openDocument(
-        std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat, const std::filesystem::path &path
-    );
+    Result<bool> openDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat, const std::filesystem::path &path);
 
     bool saveDocument();
 

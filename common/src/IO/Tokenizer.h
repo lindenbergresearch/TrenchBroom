@@ -54,9 +54,11 @@ protected:
     TokenizerState m_state;
 
 public:
-    TokenizerBase(
-        const char *begin, const char *end, std::string_view escapableChars, const char escapeChar, const size_t line, const size_t column
-    ) : m_begin(begin), m_end(end), m_escapableChars(escapableChars), m_escapeChar(escapeChar), m_state{begin, line, column, false} {
+    TokenizerBase(const char *begin, const char *end, std::string_view escapableChars, const char escapeChar, const size_t line, const size_t column) : m_begin(
+        begin
+    ), m_end(end), m_escapableChars(escapableChars), m_escapeChar(escapeChar), m_state{
+        begin, line, column, false
+    } {
     }
 
     void replaceState(std::string_view str) {
@@ -205,9 +207,9 @@ public:
     }
 
 public:
-    Tokenizer(
-        std::string_view str, std::string_view escapableChars, const char escapeChar, const size_t line = 1, const size_t column = 1
-    ) : TokenizerBase{str.data(), str.data() + str.size(), escapableChars, escapeChar, line, column} {
+    Tokenizer(std::string_view str, std::string_view escapableChars, const char escapeChar, const size_t line = 1, const size_t column = 1) : TokenizerBase{
+        str.data(), str.data() + str.size(), escapableChars, escapeChar, line, column
+    } {
     }
 
     virtual ~Tokenizer() = default;
@@ -386,8 +388,7 @@ protected:
         return curPos();
     }
 
-    const char *readQuotedString(
-        const char delim = '"', std::string_view hackDelims = std::string_view()) {
+    const char *readQuotedString(const char delim = '"', std::string_view hackDelims = std::string_view()) {
         while (!eof() && (curChar() != delim || isEscaped())) {
             // This is a hack to handle paths with trailing backslashes that get misinterpreted
             // as escaped double quotation marks.

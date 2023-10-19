@@ -26,27 +26,24 @@
 namespace TrenchBroom {
 namespace Renderer {
 void ObjectRenderer::addNode(Model::Node *node) {
-    node->accept(
-        kdl::overload(
-            [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { m_groupRenderer.addGroup(group); }, [&](Model::EntityNode *entity) { m_entityRenderer.addEntity(entity); },
-            [&](Model::BrushNode *brush) { m_brushRenderer.addBrush(brush); }, [&](Model::PatchNode *patch) { m_patchRenderer.addPatch(patch); }
-        ));
+    node->accept(kdl::overload([](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { m_groupRenderer.addGroup(group); },
+        [&](Model::EntityNode *entity) { m_entityRenderer.addEntity(entity); }, [&](Model::BrushNode *brush) { m_brushRenderer.addBrush(brush); },
+        [&](Model::PatchNode *patch) { m_patchRenderer.addPatch(patch); }
+    ));
 }
 
 void ObjectRenderer::removeNode(Model::Node *node) {
-    node->accept(
-        kdl::overload(
-            [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { m_groupRenderer.removeGroup(group); }, [&](Model::EntityNode *entity) { m_entityRenderer.removeEntity(entity); },
-            [&](Model::BrushNode *brush) { m_brushRenderer.removeBrush(brush); }, [&](Model::PatchNode *patch) { m_patchRenderer.removePatch(patch); }
-        ));
+    node->accept(kdl::overload([](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { m_groupRenderer.removeGroup(group); },
+        [&](Model::EntityNode *entity) { m_entityRenderer.removeEntity(entity); }, [&](Model::BrushNode *brush) { m_brushRenderer.removeBrush(brush); },
+        [&](Model::PatchNode *patch) { m_patchRenderer.removePatch(patch); }
+    ));
 }
 
 void ObjectRenderer::invalidateNode(Model::Node *node) {
-    node->accept(
-        kdl::overload(
-            [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { m_groupRenderer.invalidateGroup(group); }, [&](Model::EntityNode *entity) { m_entityRenderer.invalidateEntity(entity); },
-            [&](Model::BrushNode *brush) { m_brushRenderer.invalidateBrush(brush); }, [&](Model::PatchNode *patch) { m_patchRenderer.invalidatePatch(patch); }
-        ));
+    node->accept(kdl::overload([](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) { m_groupRenderer.invalidateGroup(group); },
+        [&](Model::EntityNode *entity) { m_entityRenderer.invalidateEntity(entity); }, [&](Model::BrushNode *brush) { m_brushRenderer.invalidateBrush(brush); },
+        [&](Model::PatchNode *patch) { m_patchRenderer.invalidatePatch(patch); }
+    ));
 }
 
 void ObjectRenderer::invalidate() {
@@ -169,9 +166,7 @@ void ObjectRenderer::renderOpaque(RenderContext &renderContext, RenderBatch &ren
     m_groupRenderer.render(renderContext, renderBatch);
 }
 
-void ObjectRenderer::renderTransparent(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void ObjectRenderer::renderTransparent(RenderContext &renderContext, RenderBatch &renderBatch) {
     m_brushRenderer.renderTransparent(renderContext, renderBatch);
 }
 } // namespace Renderer

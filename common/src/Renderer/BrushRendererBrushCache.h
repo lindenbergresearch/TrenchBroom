@@ -46,9 +46,7 @@ public:
       size_t vertexCount;
       size_t indexOfFirstVertexRelativeToBrush;
 
-      CachedFace(
-          const Model::BrushFace *i_face, size_t i_indexOfFirstVertexRelativeToBrush
-      );
+      CachedFace(const Model::BrushFace *i_face, size_t i_indexOfFirstVertexRelativeToBrush);
     };
 
     struct CachedEdge {
@@ -57,9 +55,7 @@ public:
       size_t vertexIndex1RelativeToBrush;
       size_t vertexIndex2RelativeToBrush;
 
-      CachedEdge(
-          const Model::BrushFace *i_face1, const Model::BrushFace *i_face2, size_t i_vertexIndex1RelativeToBrush, size_t i_vertexIndex2RelativeToBrush
-      );
+      CachedEdge(const Model::BrushFace *i_face1, const Model::BrushFace *i_face2, size_t i_vertexIndex1RelativeToBrush, size_t i_vertexIndex2RelativeToBrush);
     };
 
 private:

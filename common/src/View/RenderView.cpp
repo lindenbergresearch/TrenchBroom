@@ -80,7 +80,8 @@
 
 namespace TrenchBroom {
 namespace View {
-RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpenGLWidget(parent), m_glContext(&contextManager), m_framesRendered(0), m_maxFrameTimeMsecs(0), m_lastFPSCounterUpdate(0) {
+RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpenGLWidget(parent), m_glContext(&contextManager), m_framesRendered(0),
+                                                                            m_maxFrameTimeMsecs(0), m_lastFPSCounterUpdate(0) {
     QPalette pal;
     const QColor color = pal.color(QPalette::Highlight);
     m_focusColor = fromQColor(color);
@@ -88,8 +89,7 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpe
     // FPS counter
     QTimer *fpsCounter = new QTimer(this);
 
-    connect(
-        fpsCounter, &QTimer::timeout, [&]() {
+    connect(fpsCounter, &QTimer::timeout, [&]() {
           const int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
           const int framesRenderedInPeriod = m_framesRendered;
           const int maxFrameTime = m_maxFrameTimeMsecs;
@@ -100,8 +100,10 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpe
           m_maxFrameTimeMsecs = 0;
           m_lastFPSCounterUpdate = currentTime;
 
-          m_currentFPS = std::string("Avg FPS: ") + std::to_string(avgFps) + " Max time between frames: " + std::to_string(maxFrameTime) + "ms. " + std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" +
-                         std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
+          m_currentFPS = std::string("Avg FPS: ") + std::to_string(avgFps) + " Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +
+                         std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" +
+                         std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " +
+                         std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
         }
     );
 
@@ -123,15 +125,12 @@ void RenderView::keyReleaseEvent(QKeyEvent *event) {
     update();
 }
 
-static auto mouseEventWithFullPrecisionLocalPos(
-    const QWidget *widget, const QMouseEvent *event
-) {
+static auto mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
     // The localPos of a Qt mouse event is only in integer coordinates, but window pos
     // and screen pos have full precision. We can't directly map the windowPos because
     // mapTo takes QPoint, so we just map the origin and subtract that.
     const auto localPos = event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
-    return QMouseEvent(
-        event->type(), localPos, event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
+    return QMouseEvent(event->type(), localPos, event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
 }
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -223,8 +222,7 @@ void RenderView::processInput() {
 void RenderView::clearBackground() {
     const auto backgroundColor = getBackgroundColor();
 
-    glAssert(glClearColor(
-        backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.a()));
+    glAssert(glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.a()));
     glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
@@ -246,27 +244,29 @@ void RenderView::renderFocusIndicator() {
 
     const auto t = 1.0f;
 
-    const auto projection = vm::ortho_matrix(
-        -1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
+    const auto projection = vm::ortho_matrix(-1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
     Renderer::Transformation transformation(projection, vm::mat4x4f::identity());
 
     glAssert(glDisable(GL_DEPTH_TEST));
 
     using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
-    auto array = Renderer::VertexArray::move(
-        std::vector<Vertex>(
-            {// top
-                Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w - t, t, 0.0f), inner), Vertex(vm::vec3f(t, t, 0.0f), inner),
+    auto array = Renderer::VertexArray::move(std::vector<Vertex>({// top
+            Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+            Vertex(vm::vec3f(t, t, 0.0f), inner),
 
-                // right
-                Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner), Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+            // right
+            Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+            Vertex(vm::vec3f(w - t, t, 0.0f), inner),
 
-                // bottom
-                Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(t, h - t, 0.0f), inner), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+            // bottom
+            Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(t, h - t, 0.0f), inner),
+            Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
 
-                // left
-                Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(t, t, 0.0f), inner), Vertex(vm::vec3f(t, h - t, 0.0f), inner)}
-        ));
+            // left
+            Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(t, t, 0.0f), inner),
+            Vertex(vm::vec3f(t, h - t, 0.0f), inner)
+        }
+    ));
 
     array.prepare(vboManager());
     array.render(Renderer::PrimType::Quads);
@@ -277,9 +277,7 @@ bool RenderView::doInitializeGL() {
     return m_glContext->initialize();
 }
 
-void RenderView::doUpdateViewport(
-    const int /* x */, const int /* y */, const int /* width */, const int /* height */
-) {
+void RenderView::doUpdateViewport(const int /* x */, const int /* y */, const int /* width */, const int /* height */) {
 }
 } // namespace View
 } // namespace TrenchBroom

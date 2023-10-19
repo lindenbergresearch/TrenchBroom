@@ -30,9 +30,10 @@
 
 namespace TrenchBroom {
 namespace View {
-FlagsPopupEditor::FlagsPopupEditor(
-    size_t numCols, QWidget *parent, const QString &buttonLabel, const bool showFlagsText
-) : QWidget(parent), m_flagsTxt(nullptr), m_button(nullptr), m_editor(nullptr) {
+FlagsPopupEditor::FlagsPopupEditor(size_t numCols, QWidget *parent, const QString &buttonLabel, const bool showFlagsText) : QWidget(parent),
+                                                                                                                            m_flagsTxt(nullptr),
+                                                                                                                            m_button(nullptr),
+                                                                                                                            m_editor(nullptr) {
     QFrame *flagsFrame = nullptr;
     if (showFlagsText) {
         m_flagsTxt = new ElidedLabel(Qt::ElideRight);
@@ -41,9 +42,7 @@ FlagsPopupEditor::FlagsPopupEditor(
         flagsFrame->setFrameShape(QFrame::QFrame::StyledPanel);
 
         auto *layout = new QHBoxLayout();
-        layout->setContentsMargins(
-            LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
-        );
+        layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
         layout->setSpacing(0);
         layout->addWidget(m_flagsTxt);
         flagsFrame->setLayout(layout);
@@ -78,10 +77,8 @@ FlagsPopupEditor::FlagsPopupEditor(
     layout->addWidget(m_button, 0, Qt::AlignVCenter);
     setLayout(layout);
 
-    connect(
-        m_editor, &FlagsEditor::flagChanged, this, [this](
-            const size_t /* index */, const int /* value */, const int /* setFlag */, const int /* mixedFlag */
-        ) { updateFlagsText(); }
+    connect(m_editor, &FlagsEditor::flagChanged, this,
+        [this](const size_t /* index */, const int /* value */, const int /* setFlag */, const int /* mixedFlag */) { updateFlagsText(); }
     );
     // forward this signal
     connect(m_editor, &FlagsEditor::flagChanged, this, &FlagsPopupEditor::flagChanged);
@@ -92,9 +89,7 @@ void FlagsPopupEditor::setFlags(const QStringList &labels, const QStringList &to
     updateFlagsText();
 }
 
-void FlagsPopupEditor::setFlags(
-    const QList<int> &values, const QStringList &labels, const QStringList &tooltips
-) {
+void FlagsPopupEditor::setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
     m_editor->setFlags(values, labels, tooltips);
     updateFlagsText();
 }

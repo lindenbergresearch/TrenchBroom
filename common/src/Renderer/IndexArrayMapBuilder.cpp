@@ -72,9 +72,7 @@ void IndexArrayMapBuilder::addTriangles(const IndexList &indices) {
     add(PrimType::Triangles, indices);
 }
 
-void IndexArrayMapBuilder::addQuad(
-    const Index, const Index i1, const Index i2, const Index i3, const Index i4
-) {
+void IndexArrayMapBuilder::addQuad(const Index, const Index i1, const Index i2, const Index i3, const Index i4) {
     const size_t offset = m_ranges.add(PrimType::Quads, 4);
     m_indices[offset + 0] = i1;
     m_indices[offset + 1] = i2;

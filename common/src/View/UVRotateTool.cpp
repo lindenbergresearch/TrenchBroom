@@ -83,9 +83,7 @@ void UVRotateTool::pick(const InputState &inputState, Model::PickResult &pickRes
     if (!vm::is_nan(distanceToFace)) {
         const auto hitPoint = vm::point_at_distance(pickRay, distanceToFace);
 
-        const auto fromFace = m_helper.face()->fromTexCoordSystemMatrix(
-            vm::vec2f::zero(), vm::vec2f::one(), true
-        );
+        const auto fromFace = m_helper.face()->fromTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
         const auto toPlane = vm::plane_projection_matrix(boundary.distance, boundary.normal);
 
         const auto originOnPlane = toPlane * fromFace * vm::vec3{m_helper.originInFaceCoords()};
@@ -94,9 +92,7 @@ void UVRotateTool::pick(const InputState &inputState, Model::PickResult &pickRes
         const auto zoom = static_cast<FloatType>(m_helper.cameraZoom());
         const auto error = vm::abs(RotateHandleRadius / zoom - vm::distance(hitPointOnPlane, originOnPlane));
         if (error <= RotateHandleWidth / zoom) {
-            pickResult.addHit(
-                Model::Hit{AngleHandleHitType, distanceToFace, hitPoint, 0, error}
-            );
+            pickResult.addHit(Model::Hit{AngleHandleHitType, distanceToFace, hitPoint, 0, error});
         }
     }
 }
@@ -107,16 +103,16 @@ static float measureAngle(const UVViewHelper &helper, const vm::vec2f &point) {
 }
 
 static float snapAngle(const UVViewHelper &helper, const float angle) {
-    const float angles[] = {vm::mod(angle + 0.0f, 360.0f), vm::mod(angle + 90.0f, 360.0f), vm::mod(angle + 180.0f, 360.0f), vm::mod(angle + 270.0f, 360.0f),};
+    const float angles[] = {
+        vm::mod(angle + 0.0f, 360.0f), vm::mod(angle + 90.0f, 360.0f), vm::mod(angle + 180.0f, 360.0f), vm::mod(angle + 270.0f, 360.0f),
+    };
     auto minDelta = std::numeric_limits<float>::max();
 
     const auto toFace = helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
     for (const auto *edge: helper.face()->edges()) {
         const auto startInFaceCoords = vm::vec2f{toFace * edge->firstVertex()->position()};
         const auto endInFaceCoords = vm::vec2f{toFace * edge->secondVertex()->position()};
-        const auto edgeAngle = vm::mod(
-            helper.face()->measureTextureAngle(startInFaceCoords, endInFaceCoords), 360.0f
-        );
+        const auto edgeAngle = vm::mod(helper.face()->measureTextureAngle(startInFaceCoords, endInFaceCoords), 360.0f);
 
         for (size_t i = 0; i < 4; ++i) {
             if (std::abs(angles[i] - edgeAngle) < std::abs(minDelta)) {
@@ -140,15 +136,16 @@ private:
     Renderer::Circle m_outer;
 
 public:
-    Render(
-        const UVViewHelper &helper, const float centerRadius, const float outerRadius, const bool highlight
-    ) : m_helper{helper}, m_highlight{highlight}, m_center{makeCircle(helper, centerRadius, 10, true)}, m_outer{makeCircle(helper, outerRadius, 32, false)} {
+    Render(const UVViewHelper &helper, const float centerRadius, const float outerRadius, const bool highlight) : m_helper{helper}, m_highlight{highlight},
+                                                                                                                  m_center{
+                                                                                                                      makeCircle(helper, centerRadius, 10, true)
+                                                                                                                  }, m_outer{
+            makeCircle(helper, outerRadius, 32, false)
+        } {
     }
 
 private:
-    static Renderer::Circle makeCircle(
-        const UVViewHelper &helper, const float radius, const size_t segments, const bool fill
-    ) {
+    static Renderer::Circle makeCircle(const UVViewHelper &helper, const float radius, const size_t segments, const bool fill) {
         const auto zoom = helper.cameraZoom();
         return Renderer::Circle{radius / zoom, segments, fill};
     }
@@ -160,9 +157,7 @@ private:
     }
 
     void doRender(Renderer::RenderContext &renderContext) override {
-        const auto fromFace = m_helper.face()->fromTexCoordSystemMatrix(
-            vm::vec2f::zero(), vm::vec2f::one(), true
-        );
+        const auto fromFace = m_helper.face()->fromTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
 
         const auto &boundary = m_helper.face()->boundary();
         const auto toPlane = vm::plane_projection_matrix(boundary.distance, boundary.normal);
@@ -206,9 +201,9 @@ private:
     float m_initialAngle;
 
 public:
-    UVRotateDragTracker(
-        MapDocument &document, const UVViewHelper &helper, const float initialAngle
-    ) : m_document{document}, m_helper{helper}, m_initialAngle{initialAngle} {
+    UVRotateDragTracker(MapDocument &document, const UVViewHelper &helper, const float initialAngle) : m_document{
+        document
+    }, m_helper{helper}, m_initialAngle{initialAngle} {
         document.startTransaction("Rotate Texture", TransactionScope::LongRunning);
     }
 
@@ -221,9 +216,7 @@ public:
         const auto curPoint = vm::point_at_distance(pickRay, curPointDistance);
 
         const auto toFaceOld = m_helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
-        const auto toWorld = m_helper.face()->fromTexCoordSystemMatrix(
-            vm::vec2f::zero(), vm::vec2f::one(), true
-        );
+        const auto toWorld = m_helper.face()->fromTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
 
         const auto curPointInFaceCoords = vm::vec2f{toFaceOld * curPoint};
         const auto curAngle = measureAngle(m_helper, curPointInFaceCoords);
@@ -256,19 +249,16 @@ public:
 
     void cancel() override { m_document.cancelTransaction(); }
 
-    void render(
-        const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &renderBatch
-    ) const override {
-        renderBatch.addOneShot(
-            new Render{m_helper, static_cast<float>(CenterHandleRadius), static_cast<float>(RotateHandleRadius), true}
+    void render(const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) const override {
+        renderBatch.addOneShot(new Render{
+                m_helper, static_cast<float>(CenterHandleRadius), static_cast<float>(RotateHandleRadius), true
+            }
         );
     }
 };
 } // namespace
 
-static std::optional<float> computeInitialAngle(
-    const UVViewHelper &helper, const InputState &inputState
-) {
+static std::optional<float> computeInitialAngle(const UVViewHelper &helper, const InputState &inputState) {
     using namespace Model::HitFilters;
 
     const auto toFace = helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), vm::vec2f::one(), true);
@@ -299,7 +289,8 @@ static std::optional<float> computeInitialAngle(
 std::unique_ptr<DragTracker> UVRotateTool::acceptMouseDrag(const InputState &inputState) {
     assert(m_helper.valid());
 
-    if (!(inputState.modifierKeysPressed(ModifierKeys::MKNone) || inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd)) || !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
+    if (!(inputState.modifierKeysPressed(ModifierKeys::MKNone) || inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd)) ||
+        !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
         return nullptr;
     }
 
@@ -312,14 +303,10 @@ std::unique_ptr<DragTracker> UVRotateTool::acceptMouseDrag(const InputState &inp
         return nullptr;
     }
 
-    return std::make_unique<UVRotateDragTracker>(
-        *kdl::mem_lock(m_document), m_helper, *initialAngle
-    );
+    return std::make_unique<UVRotateDragTracker>(*kdl::mem_lock(m_document), m_helper, *initialAngle);
 }
 
-void UVRotateTool::render(
-    const InputState &inputState, Renderer::RenderContext &, Renderer::RenderBatch &renderBatch
-) {
+void UVRotateTool::render(const InputState &inputState, Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
     using namespace Model::HitFilters;
 
     if (inputState.anyToolDragging() || !m_helper.valid() || !m_helper.face()->attributes().valid()) {
@@ -327,8 +314,9 @@ void UVRotateTool::render(
     }
 
     const auto highlight = inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd) || inputState.pickResult().first(type(AngleHandleHitType)).isMatch();
-    renderBatch.addOneShot(
-        new Render{m_helper, static_cast<float>(CenterHandleRadius), static_cast<float>(RotateHandleRadius), highlight}
+    renderBatch.addOneShot(new Render{
+            m_helper, static_cast<float>(CenterHandleRadius), static_cast<float>(RotateHandleRadius), highlight
+        }
     );
 }
 

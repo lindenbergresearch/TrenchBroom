@@ -77,17 +77,11 @@ public:
 
     void removeEntityNode(EntityNodeBase *node);
 
-    void addProperty(
-        EntityNodeBase *node, const std::string &key, const std::string &value
-    );
+    void addProperty(EntityNodeBase *node, const std::string &key, const std::string &value);
 
-    void removeProperty(
-        EntityNodeBase *node, const std::string &key, const std::string &value
-    );
+    void removeProperty(EntityNodeBase *node, const std::string &key, const std::string &value);
 
-    std::vector<EntityNodeBase *> findEntityNodes(
-        const EntityNodeIndexQuery &keyQuery, const std::string &value
-    ) const;
+    std::vector<EntityNodeBase *> findEntityNodes(const EntityNodeIndexQuery &keyQuery, const std::string &value) const;
 
     std::vector<std::string> allKeys() const;
 

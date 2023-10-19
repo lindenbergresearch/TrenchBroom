@@ -64,10 +64,10 @@ private:
 
 public:
     template<typename BrushFilterT>
-    ObjectRenderer(
-        Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext, const BrushFilterT &brushFilter
-    )
-        : m_groupRenderer{editorContext}, m_entityRenderer{logger, entityModelManager, editorContext}, m_brushRenderer{brushFilter}, m_patchRenderer{editorContext} {
+    ObjectRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext, const BrushFilterT &brushFilter)
+        : m_groupRenderer{editorContext}, m_entityRenderer{logger, entityModelManager, editorContext}, m_brushRenderer{
+        brushFilter
+    }, m_patchRenderer{editorContext} {
     }
 
 public: // object management

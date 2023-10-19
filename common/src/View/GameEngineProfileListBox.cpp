@@ -31,9 +31,8 @@ namespace TrenchBroom {
 namespace View {
 // GameEngineProfileItemRenderer
 
-GameEngineProfileItemRenderer::GameEngineProfileItemRenderer(
-    Model::GameEngineProfile &profile, QWidget *parent
-) : ControlListBoxItemRenderer{parent}, m_profile{&profile} {
+GameEngineProfileItemRenderer::GameEngineProfileItemRenderer(Model::GameEngineProfile &profile, QWidget *parent) : ControlListBoxItemRenderer{parent},
+                                                                                                                   m_profile{&profile} {
     createGui();
     refresh();
 }
@@ -72,9 +71,9 @@ void GameEngineProfileItemRenderer::profileDidChange() {
 
 // GameEngineProfileListBox
 
-GameEngineProfileListBox::GameEngineProfileListBox(
-    Model::GameEngineConfig &config, QWidget *parent
-) : ControlListBox{"Click the '+' button to create a game engine profile.", true, parent}, m_config{&config} {
+GameEngineProfileListBox::GameEngineProfileListBox(Model::GameEngineConfig &config, QWidget *parent) : ControlListBox{
+    "Click the '+' button to create a game engine profile.", true, parent
+}, m_config{&config} {
     reload();
 }
 
@@ -99,9 +98,7 @@ size_t GameEngineProfileListBox::itemCount() const {
     return m_config->profiles.size();
 }
 
-ControlListBoxItemRenderer *GameEngineProfileListBox::createItemRenderer(
-    QWidget *parent, const size_t index
-) {
+ControlListBoxItemRenderer *GameEngineProfileListBox::createItemRenderer(QWidget *parent, const size_t index) {
     return new GameEngineProfileItemRenderer{m_config->profiles[index], parent};
 }
 

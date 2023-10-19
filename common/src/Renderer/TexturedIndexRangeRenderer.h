@@ -56,13 +56,9 @@ private:
 public:
     TexturedIndexRangeRenderer();
 
-    TexturedIndexRangeRenderer(
-        const VertexArray &vertexArray, const TexturedIndexRangeMap &indexRange
-    );
+    TexturedIndexRangeRenderer(const VertexArray &vertexArray, const TexturedIndexRangeMap &indexRange);
 
-    TexturedIndexRangeRenderer(
-        const VertexArray &vertexArray, const Assets::Texture *texture, const IndexRangeMap &indexRange
-    );
+    TexturedIndexRangeRenderer(const VertexArray &vertexArray, const Assets::Texture *texture, const IndexRangeMap &indexRange);
 
     ~TexturedIndexRangeRenderer() override;
 
@@ -80,9 +76,7 @@ private:
     std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> m_renderers;
 
 public:
-    MultiTexturedIndexRangeRenderer(
-        std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers
-    );
+    MultiTexturedIndexRangeRenderer(std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers);
 
     ~MultiTexturedIndexRangeRenderer() override;
 

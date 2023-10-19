@@ -102,9 +102,7 @@ public:
 private:
     std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 
-    void doLoadFrame(
-        size_t frameIndex, Assets::EntityModel &model, Logger &logger
-    ) override;
+    void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 
     DkmSkinList parseSkins(Reader reader, size_t skinCount);
 
@@ -112,19 +110,13 @@ private:
 
     DkmMeshList parseMeshes(Reader reader, size_t commandCount);
 
-    void loadSkins(
-        Assets::EntityModelSurface &surface, const DkmSkinList &skins, Logger &logger
-    );
+    void loadSkins(Assets::EntityModelSurface &surface, const DkmSkinList &skins, Logger &logger);
 
     std::filesystem::path findSkin(const std::string &skin) const;
 
-    void buildFrame(
-        Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const DkmFrame &frame, const DkmMeshList &meshes
-    );
+    void buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const DkmFrame &frame, const DkmMeshList &meshes);
 
-    std::vector<Assets::EntityModelVertex> getVertices(
-        const DkmFrame &frame, const DkmMeshVertexList &meshVertices
-    ) const;
+    std::vector<Assets::EntityModelVertex> getVertices(const DkmFrame &frame, const DkmMeshVertexList &meshVertices) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

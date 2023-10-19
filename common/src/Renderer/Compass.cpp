@@ -77,19 +77,14 @@ void Compass::doRender(RenderContext &renderContext) {
     const auto viewWidth = static_cast<float>(viewport.width);
     const auto viewHeight = static_cast<float>(viewport.height);
 
-    const auto projection = vm::ortho_matrix(
-        0.0f, 1000.0f, -viewWidth / 2.0f, viewHeight / 2.0f, viewWidth / 2.0f, -viewHeight / 2.0f
-    );
+    const auto projection = vm::ortho_matrix(0.0f, 1000.0f, -viewWidth / 2.0f, viewHeight / 2.0f, viewWidth / 2.0f, -viewHeight / 2.0f);
     const auto view = vm::view_matrix(vm::vec3f::pos_y(), vm::vec3f::pos_z()) * vm::translation_matrix(500.0f * vm::vec3f::pos_y());
     const ReplaceTransformation ortho(renderContext.transformation(), projection, view);
 
-    const auto translation = vm::translation_matrix(
-        vm::vec3f(-viewWidth / 2.0f + 55.0f, 0.0f, -viewHeight / 2.0f + 55.0f));
+    const auto translation = vm::translation_matrix(vm::vec3f(-viewWidth / 2.0f + 55.0f, 0.0f, -viewHeight / 2.0f + 55.0f));
     const auto scaling = vm::scaling_matrix(vm::vec3f::fill(2.0f));
     const auto compassTransformation = translation * scaling;
-    const MultiplyModelMatrix compass(
-        renderContext.transformation(), compassTransformation
-    );
+    const MultiplyModelMatrix compass(renderContext.transformation(), compassTransformation);
     const auto cameraTransformation = cameraRotationMatrix(camera);
 
     glAssert(glClear(GL_DEPTH_BUFFER_BIT));
@@ -125,14 +120,10 @@ void Compass::makeArrows() {
     }
 
     using Vertex = GLVertexTypes::P3N::Vertex;
-    std::vector<Vertex> shaftVertices = Vertex::toList(
-        shaft.vertices.size(), std::begin(shaft.vertices), std::begin(shaft.normals));
-    std::vector<Vertex> headVertices = Vertex::toList(
-        head.vertices.size(), std::begin(head.vertices), std::begin(head.normals));
-    std::vector<Vertex> shaftCapVertices = Vertex::toList(
-        shaftCap.vertices.size(), std::begin(shaftCap.vertices), std::begin(shaftCap.normals));
-    std::vector<Vertex> headCapVertices = Vertex::toList(
-        headCap.vertices.size(), std::begin(headCap.vertices), std::begin(headCap.normals));
+    std::vector<Vertex> shaftVertices = Vertex::toList(shaft.vertices.size(), std::begin(shaft.vertices), std::begin(shaft.normals));
+    std::vector<Vertex> headVertices = Vertex::toList(head.vertices.size(), std::begin(head.vertices), std::begin(head.normals));
+    std::vector<Vertex> shaftCapVertices = Vertex::toList(shaftCap.vertices.size(), std::begin(shaftCap.vertices), std::begin(shaftCap.normals));
+    std::vector<Vertex> headCapVertices = Vertex::toList(headCap.vertices.size(), std::begin(headCap.vertices), std::begin(headCap.normals));
 
     const size_t vertexCount = shaftVertices.size() + headVertices.size() + shaftCapVertices.size() + headCapVertices.size();
     IndexRangeMap::Size indexArraySize;
@@ -186,8 +177,7 @@ vm::mat4x4f Compass::cameraRotationMatrix(const Camera &camera) const {
 void Compass::renderBackground(RenderContext &renderContext) {
     PreferenceManager &prefs = PreferenceManager::instance();
 
-    const MultiplyModelMatrix rotate(
-        renderContext.transformation(), vm::mat4x4f::rot_90_x_ccw());
+    const MultiplyModelMatrix rotate(renderContext.transformation(), vm::mat4x4f::rot_90_x_ccw());
     ActiveShader shader(renderContext.shaderManager(), Shaders::CompassBackgroundShader);
     shader.set("Color", prefs.get(Preferences::CompassBackgroundColor));
     m_backgroundRenderer.render();
@@ -195,9 +185,7 @@ void Compass::renderBackground(RenderContext &renderContext) {
     m_backgroundOutlineRenderer.render();
 }
 
-void Compass::renderSolidAxis(
-    RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color
-) {
+void Compass::renderSolidAxis(RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color) {
     ActiveShader shader(renderContext.shaderManager(), Shaders::CompassShader);
     shader.set("CameraPosition", vm::vec3f(0.0f, 500.0f, 0.0f));
     shader.set("LightDirection", vm::normalize(vm::vec3f(0.0f, 0.3f, 0.8f)));
@@ -213,9 +201,7 @@ void Compass::renderSolidAxis(
     renderAxis(renderContext, transformation);
 }
 
-void Compass::renderAxisOutline(
-    RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color
-) {
+void Compass::renderAxisOutline(RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color) {
     glAssert(glDepthMask(GL_FALSE));
     glAssert(glLineWidth(3.0f));
     glAssert(glPolygonMode(GL_FRONT, GL_LINE));

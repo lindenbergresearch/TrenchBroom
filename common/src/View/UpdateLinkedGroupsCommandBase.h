@@ -35,9 +35,7 @@ private:
     UpdateLinkedGroupsHelper m_updateLinkedGroupsHelper;
 
 protected:
-    UpdateLinkedGroupsCommandBase(
-        std::string name, bool updateModificationCount, std::vector<Model::GroupNode *> changedLinkedGroups = {}
-    );
+    UpdateLinkedGroupsCommandBase(std::string name, bool updateModificationCount, std::vector<Model::GroupNode *> changedLinkedGroups = {});
 
 public:
     virtual ~UpdateLinkedGroupsCommandBase();

@@ -42,16 +42,12 @@ private:
 
     const Tool &tool() const override;
 
-    std::unique_ptr<DropTracker> acceptDrop(
-        const InputState &inputState, const std::string &payload
-    ) override;
+    std::unique_ptr<DropTracker> acceptDrop(const InputState &inputState, const std::string &payload) override;
 
     bool cancel() override;
 
 private:
-    virtual std::unique_ptr<DropTracker> createDropTracker(
-        const InputState &inputState
-    ) const = 0;
+    virtual std::unique_ptr<DropTracker> createDropTracker(const InputState &inputState) const = 0;
 };
 
 class CreateEntityToolController2D : public CreateEntityToolController {
@@ -59,9 +55,7 @@ public:
     CreateEntityToolController2D(CreateEntityTool &tool);
 
 private:
-    std::unique_ptr<DropTracker> createDropTracker(
-        const InputState &inputState
-    ) const override;
+    std::unique_ptr<DropTracker> createDropTracker(const InputState &inputState) const override;
 };
 
 class CreateEntityToolController3D : public CreateEntityToolController {
@@ -69,9 +63,7 @@ public:
     CreateEntityToolController3D(CreateEntityTool &tool);
 
 private:
-    std::unique_ptr<DropTracker> createDropTracker(
-        const InputState &inputState
-    ) const override;
+    std::unique_ptr<DropTracker> createDropTracker(const InputState &inputState) const override;
 };
 } // namespace View
 } // namespace TrenchBroom

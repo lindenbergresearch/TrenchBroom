@@ -26,9 +26,7 @@
 
 namespace TrenchBroom {
 namespace View {
-MenuBuilderBase::MenuBuilderBase(
-    MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn
-) : m_actions(actions), m_triggerFn(triggerFn) {
+MenuBuilderBase::MenuBuilderBase(MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn) : m_actions(actions), m_triggerFn(triggerFn) {
 }
 
 MenuBuilderBase::~MenuBuilderBase() = default;
@@ -69,9 +67,11 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
     return qAction;
 }
 
-MainMenuBuilder::MainMenuBuilder(
-    QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn
-) : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr), undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
+MainMenuBuilder::MainMenuBuilder(QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn) : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar),
+                                                                                                      m_currentMenu(nullptr), recentDocumentsMenu(nullptr),
+                                                                                                      undoAction(nullptr), redoAction(nullptr),
+                                                                                                      pasteAction(nullptr),
+                                                                                                      pasteAtOriginalPositionAction(nullptr) {
 }
 
 void MainMenuBuilder::visit(const Menu &menu) {

@@ -86,9 +86,7 @@ void LinkRenderer::renderArrows(RenderContext &renderContext) {
     m_arrows.render(PrimType::Lines);
 }
 
-static void addArrow(
-    std::vector<LinkRenderer::ArrowVertex> &arrows, const vm::vec4f &color, const vm::vec3f &arrowPosition, const vm::vec3f &lineDir
-) {
+static void addArrow(std::vector<LinkRenderer::ArrowVertex> &arrows, const vm::vec4f &color, const vm::vec3f &arrowPosition, const vm::vec3f &lineDir) {
     arrows.emplace_back(vm::vec3f{0, 3, 0}, color, arrowPosition, lineDir);
     arrows.emplace_back(vm::vec3f{9, 0, 0}, color, arrowPosition, lineDir);
 
@@ -96,9 +94,7 @@ static void addArrow(
     arrows.emplace_back(vm::vec3f{0, -3, 0}, color, arrowPosition, lineDir);
 }
 
-static std::vector<LinkRenderer::ArrowVertex> getArrows(
-    const std::vector<LinkRenderer::LineVertex> &links
-) {
+static std::vector<LinkRenderer::ArrowVertex> getArrows(const std::vector<LinkRenderer::LineVertex> &links) {
     assert((links.size() % 2) == 0);
     auto arrows = std::vector<LinkRenderer::ArrowVertex>{};
     for (size_t i = 0; i < links.size(); i += 2) {

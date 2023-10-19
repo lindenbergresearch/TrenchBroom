@@ -213,8 +213,7 @@ public:
     HandleList allHandles() const {
         HandleList result;
         result.reserve(totalHandleCount());
-        collectHandles(
-            [](const HandleInfo & /* info */) { return true; }, std::back_inserter(result));
+        collectHandles([](const HandleInfo & /* info */) { return true; }, std::back_inserter(result));
         return result;
     }
 
@@ -226,8 +225,7 @@ public:
     HandleList selectedHandles() const {
         HandleList result;
         result.reserve(selectedHandleCount());
-        collectHandles(
-            [](const HandleInfo &info) { return info.selected; }, std::back_inserter(result));
+        collectHandles([](const HandleInfo &info) { return info.selected; }, std::back_inserter(result));
         return result;
     }
 
@@ -239,8 +237,7 @@ public:
     HandleList unselectedHandles() const {
         HandleList result;
         result.reserve(unselectedHandleCount());
-        collectHandles(
-            [](const HandleInfo &info) { return !info.selected; }, std::back_inserter(result));
+        collectHandles([](const HandleInfo &info) { return !info.selected; }, std::back_inserter(result));
         return result;
     }
 
@@ -485,9 +482,7 @@ public:
      * @return a set of all brushes that are incident to the given handle
      */
     template<typename I>
-    std::vector<Model::BrushNode *> findIncidentBrushes(
-        const Handle &handle, I begin, I end
-    ) const {
+    std::vector<Model::BrushNode *> findIncidentBrushes(const Handle &handle, I begin, I end) const {
         kdl::vector_set<Model::BrushNode *> result;
         findIncidentBrushes(handle, begin, end, std::inserter(result, result.end()));
         return result.release_data();
@@ -506,9 +501,7 @@ public:
      * @return a set containing all incident brushes
      */
     template<typename I1, typename I2>
-    std::vector<Model::BrushNode *> findIncidentBrushes(
-        I1 hBegin, I1 hEnd, I2 bBegin, I2 bEnd
-    ) const {
+    std::vector<Model::BrushNode *> findIncidentBrushes(I1 hBegin, I1 hEnd, I2 bBegin, I2 bEnd) const {
         kdl::vector_set<Model::BrushNode *> result;
         auto out = std::inserter(result, std::end(result));
         for (auto hCur = hBegin; hCur != hEnd; ++hCur) {
@@ -544,9 +537,7 @@ private:
      * @param brushNode the brush to check
      * @return true if and only if the given brush is incident to the given handle
      */
-    virtual bool isIncident(
-        const Handle &handle, const Model::BrushNode *brushNode
-    ) const = 0;
+    virtual bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const = 0;
 };
 
 /**
@@ -569,9 +560,7 @@ public:
      * @param camera the camera
      * @param pickResult the picking result to add the hits to
      */
-    void pick(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-    ) const;
+    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
     void addHandles(const Model::BrushNode *brushNode) override;
@@ -613,9 +602,7 @@ public:
      * @param grid the current grid
      * @param pickResult the picking result to add the hits to
      */
-    void pickGridHandle(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult
-    ) const;
+    void pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const;
 
     /**
      * Picks the center point of the edge handles contained in this manager.
@@ -624,9 +611,7 @@ public:
      * @param camera the camera
      * @param pickResult the picking result to add the hits to
      */
-    void pickCenterHandle(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-    ) const;
+    void pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
     void addHandles(const Model::BrushNode *brushNode) override;
@@ -668,9 +653,7 @@ public:
      * @param grid the current grid
      * @param pickResult the picking result to add the hits to
      */
-    void pickGridHandle(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult
-    ) const;
+    void pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const;
 
     /**
      * Picks the center point of the face handles contained in this manager.
@@ -679,9 +662,7 @@ public:
      * @param camera the camera
      * @param pickResult the picking result to add the hits to
      */
-    void pickCenterHandle(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-    ) const;
+    void pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
     void addHandles(const Model::BrushNode *brushNode) override;

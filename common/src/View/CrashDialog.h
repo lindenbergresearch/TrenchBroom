@@ -29,14 +29,11 @@ namespace View {
 class CrashDialog : public QDialog {
 Q_OBJECT
 public:
-    CrashDialog(
-        const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath
-    );
+    CrashDialog(const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath);
 
 private:
-    void createGui(
-        const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath
-    );
+    void
+    createGui(const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -34,12 +34,16 @@
 
 namespace TrenchBroom::Renderer {
 
-Shader::Shader(std::string name, const GLenum type, const GLuint shaderId) : m_name{std::move(name)}, m_type{type}, m_shaderId{shaderId} {
+Shader::Shader(std::string name, const GLenum type, const GLuint shaderId) : m_name{std::move(name)}, m_type{
+    type
+}, m_shaderId{shaderId} {
     assert(m_type == GL_VERTEX_SHADER || m_type == GL_FRAGMENT_SHADER);
     assert(m_shaderId != 0);
 }
 
-Shader::Shader(Shader &&other) noexcept: m_name{std::move(other.m_name)}, m_type{other.m_type}, m_shaderId{std::exchange(other.m_shaderId, 0)} {
+Shader::Shader(Shader &&other) noexcept: m_name{std::move(other.m_name)}, m_type{other.m_type}, m_shaderId{
+    std::exchange(other.m_shaderId, 0)
+} {
 }
 
 Shader &Shader::operator=(Shader &&other) noexcept {
@@ -64,8 +68,7 @@ void Shader::attach(const GLuint programId) const {
 namespace {
 
 Result<std::vector<std::string>> loadSource(const std::filesystem::path &path) {
-    return IO::Disk::withInputStream(
-        path, [](auto &stream) {
+    return IO::Disk::withInputStream(path, [](auto &stream) {
           std::string line;
           std::vector<std::string> lines;
 
@@ -103,8 +106,7 @@ Result<Shader> loadShader(const std::filesystem::path &path, const GLenum type) 
         return Error{"Could not create shader " + name};
     }
 
-    return loadSource(path).and_then(
-        [&](const auto &source) -> Result<Shader> {
+    return loadSource(path).and_then([&](const auto &source) -> Result<Shader> {
           const auto linePtrs = kdl::vec_transform(source, [](const auto &line) { return line.c_str(); });
 
           glAssert(glShaderSource(shaderId, GLsizei(linePtrs.size()), linePtrs.data(), nullptr));

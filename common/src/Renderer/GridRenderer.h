@@ -43,9 +43,7 @@ public:
     GridRenderer(const OrthographicCamera &camera, const vm::bbox3 &worldBounds);
 
 private:
-    static std::vector<Vertex> vertices(
-        const OrthographicCamera &camera, const vm::bbox3 &worldBounds
-    );
+    static std::vector<Vertex> vertices(const OrthographicCamera &camera, const vm::bbox3 &worldBounds);
 
     void doPrepareVertices(VboManager &vboManager) override;
 

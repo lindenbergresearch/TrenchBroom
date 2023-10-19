@@ -89,9 +89,7 @@ void VertexArray::render(const PrimType primType, const GLint index, const GLsiz
     }
 }
 
-void VertexArray::render(
-    const PrimType primType, const GLIndices &indices, const GLCounts &counts, const GLint primCount
-) {
+void VertexArray::render(const PrimType primType, const GLIndices &indices, const GLCounts &counts, const GLint primCount) {
     assert(prepared());
     if (!m_setup) {
         if (setup()) {
@@ -108,9 +106,7 @@ void VertexArray::render(
     }
 }
 
-void VertexArray::render(
-    const PrimType primType, const GLIndices &indices, const GLsizei count
-) {
+void VertexArray::render(const PrimType primType, const GLIndices &indices, const GLsizei count) {
     assert(prepared());
     if (!m_setup) {
         if (setup()) {

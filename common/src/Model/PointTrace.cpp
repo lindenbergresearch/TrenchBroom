@@ -87,8 +87,7 @@ std::vector<vm::vec3f> smoothPoints(const std::vector<vm::vec3f> &points) {
 
     auto result = std::vector<vm::vec3f>{points[0]};
 
-    auto it = std::find_if(
-        std::next(std::begin(points)), std::end(points), [&](const auto &p) {
+    auto it = std::find_if(std::next(std::begin(points)), std::end(points), [&](const auto &p) {
           return p != points[0];
         }
     );

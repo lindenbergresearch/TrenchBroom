@@ -59,9 +59,7 @@ public:
      * @param vertexCount the total number of vertices to expect
      * @param indexRangeSize the size of the index range map to expect
      */
-    IndexRangeMapBuilder(
-        const size_t vertexCount, const IndexRangeMap::Size &indexRangeSize
-    ) : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
+    IndexRangeMapBuilder(const size_t vertexCount, const IndexRangeMap::Size &indexRangeSize) : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
     }
 
     /**
@@ -184,8 +182,7 @@ public:
      * @param vertices the vertex positions
      */
     void addTriangleStrip(const VertexList &vertices) {
-        add(
-            Renderer::PrimType::TriangleStrip, m_vertexListBuilder.addTriangleStrip(vertices));
+        add(Renderer::PrimType::TriangleStrip, m_vertexListBuilder.addTriangleStrip(vertices));
     }
 
     /**

@@ -43,8 +43,11 @@
 
 namespace TrenchBroom {
 namespace View {
-ObjExportDialog::ObjExportDialog(MapFrame *mapFrame) : QDialog{mapFrame}, m_mapFrame{mapFrame}, m_exportPathEdit{nullptr}, m_browseExportPathButton{nullptr}, m_relativeToGamePathRadioButton{nullptr},
-                                                       m_relativeToExportPathRadioButton{nullptr}, m_exportButton{nullptr}, m_closeButton{nullptr} {
+ObjExportDialog::ObjExportDialog(MapFrame *mapFrame) : QDialog{mapFrame}, m_mapFrame{mapFrame}, m_exportPathEdit{
+    nullptr
+}, m_browseExportPathButton{nullptr}, m_relativeToGamePathRadioButton{
+    nullptr
+}, m_relativeToExportPathRadioButton{nullptr}, m_exportButton{nullptr}, m_closeButton{nullptr} {
     ensure(m_mapFrame != nullptr, "Map frame is not null");
     createGui();
     resize(500, 0);
@@ -79,8 +82,7 @@ void ObjExportDialog::createGui() {
 
     formLayout->addRow("Path", exportPathLayout);
 
-    formLayout->addSection(
-        tr("Texture Paths"), tr("Controls how the texture paths in the generated material file are computed."));
+    formLayout->addSection(tr("Texture Paths"), tr("Controls how the texture paths in the generated material file are computed."));
 
     m_relativeToGamePathRadioButton = new QRadioButton{};
     m_relativeToGamePathRadioButton->setText(tr("Relative to game path"));
@@ -122,18 +124,14 @@ void ObjExportDialog::createGui() {
     setLayout(outerLayout);
 
     connect(m_closeButton, &QPushButton::clicked, this, &ObjExportDialog::close);
-    connect(
-        m_browseExportPathButton, &QPushButton::clicked, this, [&]() {
-          const QString newFileName = QFileDialog::getSaveFileName(
-              this, tr("Export Wavefront OBJ file"), m_exportPathEdit->text(), "Wavefront OBJ files (*.obj)"
-          );
+    connect(m_browseExportPathButton, &QPushButton::clicked, this, [&]() {
+          const QString newFileName = QFileDialog::getSaveFileName(this, tr("Export Wavefront OBJ file"), m_exportPathEdit->text(), "Wavefront OBJ files (*.obj)");
           if (!newFileName.isEmpty()) {
               m_exportPathEdit->setText(newFileName);
           }
         }
     );
-    connect(
-        m_exportButton, &QPushButton::clicked, this, [&]() {
+    connect(m_exportButton, &QPushButton::clicked, this, [&]() {
           IO::ObjExportOptions options;
           options.exportPath = IO::pathFromQString(m_exportPathEdit->text());
           options.mtlPathMode = m_relativeToGamePathRadioButton->isChecked() ? IO::ObjMtlPathMode::RelativeToGamePath : IO::ObjMtlPathMode::RelativeToExportPath;

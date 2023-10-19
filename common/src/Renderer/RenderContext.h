@@ -75,9 +75,7 @@ private:
     vm::bbox3f m_sofMapBounds;
 
 public:
-    RenderContext(
-        RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager
-    );
+    RenderContext(RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager);
 
     bool render2D() const;
 

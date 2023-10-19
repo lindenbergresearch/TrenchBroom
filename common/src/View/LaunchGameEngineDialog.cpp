@@ -52,9 +52,9 @@
 
 namespace TrenchBroom {
 namespace View {
-LaunchGameEngineDialog::LaunchGameEngineDialog(
-    std::weak_ptr<MapDocument> document, QWidget *parent
-) : QDialog{parent}, m_document{std::move(document)} {
+LaunchGameEngineDialog::LaunchGameEngineDialog(std::weak_ptr<MapDocument> document, QWidget *parent) : QDialog{
+    parent
+}, m_document{std::move(document)} {
     createGui();
 }
 
@@ -72,15 +72,15 @@ void LaunchGameEngineDialog::createGui() {
     const auto &gameConfig = gameFactory.gameConfig(gameName);
     m_config = gameConfig.gameEngineConfig;
     m_gameEngineList = new GameEngineProfileListBox{m_config};
-    m_gameEngineList->setEmptyText(
-        R"(Click the 'Configure engines...' button to create a game engine profile.)"
-    );
+    m_gameEngineList->setEmptyText(R"(Click the 'Configure engines...' button to create a game engine profile.)");
     m_gameEngineList->setMinimumSize(250, 280);
 
     auto *header = new QLabel{"Launch Engine"};
     makeHeader(header);
 
-    auto *message = new QLabel{R"(Select a game engine from the list on the right and edit the commandline parameters in the text box below. You can use variables to refer to the map name and other values.)"};
+    auto *message = new QLabel{
+        R"(Select a game engine from the list on the right and edit the commandline parameters in the text box below. You can use variables to refer to the map name and other values.)"
+    };
     message->setWordWrap(true);
 
     auto *openPreferencesButton = new QPushButton{"Configure engines..."};
@@ -91,9 +91,7 @@ void LaunchGameEngineDialog::createGui() {
     m_parameterText = new MultiCompletionLineEdit{};
     m_parameterText->setFont(Fonts::fixedWidthFont());
     m_parameterText->setMultiCompleter(new QCompleter{new VariableStoreModel{variables()}});
-    m_parameterText->setWordDelimiters(
-        QRegularExpression{"\\$"}, QRegularExpression{"\\}"}
-    );
+    m_parameterText->setWordDelimiters(QRegularExpression{"\\$"}, QRegularExpression{"\\}"});
 
     auto *midLeftLayout = new QVBoxLayout{};
     midLeftLayout->setContentsMargins(0, 0, 0, 0);
@@ -137,28 +135,16 @@ void LaunchGameEngineDialog::createGui() {
     m_parameterText->setEnabled(false);
     m_launchButton->setEnabled(false);
 
-    connect(
-        openPreferencesButton, &QPushButton::clicked, this, &LaunchGameEngineDialog::editGameEngines
-    );
+    connect(openPreferencesButton, &QPushButton::clicked, this, &LaunchGameEngineDialog::editGameEngines);
 
-    connect(
-        m_parameterText, &QLineEdit::textChanged, this, &LaunchGameEngineDialog::parametersChanged
-    );
-    connect(
-        m_parameterText, &QLineEdit::returnPressed, this, &LaunchGameEngineDialog::launchEngine
-    );
+    connect(m_parameterText, &QLineEdit::textChanged, this, &LaunchGameEngineDialog::parametersChanged);
+    connect(m_parameterText, &QLineEdit::returnPressed, this, &LaunchGameEngineDialog::launchEngine);
 
-    connect(
-        m_launchButton, &QPushButton::clicked, this, &LaunchGameEngineDialog::launchEngine
-    );
+    connect(m_launchButton, &QPushButton::clicked, this, &LaunchGameEngineDialog::launchEngine);
     connect(closeButton, &QPushButton::clicked, this, &LaunchGameEngineDialog::close);
 
-    connect(
-        m_gameEngineList, &GameEngineProfileListBox::currentProfileChanged, this, &LaunchGameEngineDialog::gameEngineProfileChanged
-    );
-    connect(
-        m_gameEngineList, &GameEngineProfileListBox::profileSelected, this, &LaunchGameEngineDialog::launchEngine
-    );
+    connect(m_gameEngineList, &GameEngineProfileListBox::currentProfileChanged, this, &LaunchGameEngineDialog::gameEngineProfileChanged);
+    connect(m_gameEngineList, &GameEngineProfileListBox::profileSelected, this, &LaunchGameEngineDialog::launchEngine);
 
     if (m_gameEngineList->count() > 0) {
         m_gameEngineList->setCurrentRow(0);
@@ -182,9 +168,7 @@ LaunchGameEngineVariables LaunchGameEngineDialog::variables() const {
 
 void LaunchGameEngineDialog::gameEngineProfileChanged() {
     m_lastProfile = m_gameEngineList->selectedProfile();
-    m_parameterText->setText(
-        m_lastProfile ? QString::fromStdString(m_lastProfile->parameterSpec) : ""
-    );
+    m_parameterText->setText(m_lastProfile ? QString::fromStdString(m_lastProfile->parameterSpec) : "");
     m_parameterText->setEnabled(m_lastProfile != nullptr);
     m_launchButton->setEnabled(m_lastProfile != nullptr);
 }
@@ -223,7 +207,9 @@ void LaunchGameEngineDialog::launchEngine() {
 #ifdef __APPLE__
         // We have to launch apps via the 'open' command so that we can properly pass
         // parameters.
-        const auto arguments = QStringList{"-a", IO::pathAsQString(profile->path), "--args", QString::fromStdString(parameters)};
+        const auto arguments = QStringList{
+            "-a", IO::pathAsQString(profile->path), "--args", QString::fromStdString(parameters)
+        };
 
         if (!QProcess::startDetached("/usr/bin/open", arguments, workDir)) {
             throw Exception("Unknown error");
@@ -247,9 +233,7 @@ void LaunchGameEngineDialog::launchEngine() {
         accept();
     } catch (const Exception &e) {
         const auto message = kdl::str_to_string("Could not launch game engine: ", e.what());
-        QMessageBox::critical(
-            this, "TrenchBroom", QString::fromStdString(message), QMessageBox::Ok
-        );
+        QMessageBox::critical(this, "TrenchBroom", QString::fromStdString(message), QMessageBox::Ok);
     }
 }
 

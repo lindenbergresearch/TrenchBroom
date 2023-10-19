@@ -29,14 +29,11 @@ std::unique_ptr<Assets::EntityModel> EntityModelParser::initializeModel(Logger &
     return doInitializeModel(logger);
 }
 
-void EntityModelParser::loadFrame(
-    const size_t frameIndex, Assets::EntityModel &model, Logger &logger
-) {
+void EntityModelParser::loadFrame(const size_t frameIndex, Assets::EntityModel &model, Logger &logger) {
     return doLoadFrame(frameIndex, model, logger);
 }
 
-void EntityModelParser::doLoadFrame(
-    const size_t /* frameIndex */, Assets::EntityModel & /* model */, Logger & /* logger */) {
+void EntityModelParser::doLoadFrame(const size_t /* frameIndex */, Assets::EntityModel & /* model */, Logger & /* logger */) {
 }
 } // namespace IO
 } // namespace TrenchBroom

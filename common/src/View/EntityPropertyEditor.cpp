@@ -40,9 +40,11 @@
 
 namespace TrenchBroom {
 namespace View {
-EntityPropertyEditor::EntityPropertyEditor(
-    std::weak_ptr<MapDocument> document, QWidget *parent
-) : QWidget{parent}, m_document{std::move(document)}, m_splitter{nullptr}, m_propertyGrid{nullptr}, m_smartEditorManager{nullptr}, m_documentationText{nullptr}, m_currentDefinition{nullptr} {
+EntityPropertyEditor::EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget{
+    parent
+}, m_document{std::move(document)}, m_splitter{nullptr}, m_propertyGrid{nullptr}, m_smartEditorManager{
+    nullptr
+}, m_documentationText{nullptr}, m_currentDefinition{nullptr} {
     createGui(m_document);
     connectObservers();
 }
@@ -57,9 +59,7 @@ void EntityPropertyEditor::OnCurrentRowChanged() {
 
 void EntityPropertyEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
-    m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &EntityPropertyEditor::selectionDidChange
-    );
+    m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &EntityPropertyEditor::selectionDidChange);
     m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &EntityPropertyEditor::nodesDidChange);
 }
 
@@ -96,9 +96,7 @@ void EntityPropertyEditor::updateDocumentationAndSmartEditor() {
     updateMinimumSize();
 }
 
-QString EntityPropertyEditor::optionDescriptions(
-    const Assets::PropertyDefinition &definition
-) {
+QString EntityPropertyEditor::optionDescriptions(const Assets::PropertyDefinition &definition) {
     static const auto bullet = QString{" "} + QChar{0x2022} + QString{" "};
 
     switch (definition.type()) {
@@ -164,15 +162,15 @@ void EntityPropertyEditor::updateDocumentation(const std::string &propertyKey) {
         if (const auto *propertyDefinition = entityDefinition->propertyDefinition(propertyKey)) {
             const auto optionsDescription = optionDescriptions(*propertyDefinition);
 
-            const auto propertyHasDocs = !propertyDefinition->longDescription().empty() || !propertyDefinition->shortDescription().empty() || !optionsDescription.isEmpty();
+            const auto propertyHasDocs =
+                !propertyDefinition->longDescription().empty() || !propertyDefinition->shortDescription().empty() || !optionsDescription.isEmpty();
 
             if (propertyHasDocs) {
                 // e.g. "Property "delay" (Attenuation formula)", in bold
                 {
                     auto title = tr("Property \"%1\"").arg(QString::fromStdString(propertyDefinition->key()));
                     if (!propertyDefinition->shortDescription().empty()) {
-                        title += tr(" (%1)").arg(
-                            QString::fromStdString(propertyDefinition->shortDescription()));
+                        title += tr(" (%1)").arg(QString::fromStdString(propertyDefinition->shortDescription()));
                     }
 
                     m_documentationText->setCurrentCharFormat(boldFormat);
@@ -203,8 +201,7 @@ void EntityPropertyEditor::updateDocumentation(const std::string &propertyKey) {
             // e.g. "Class "func_door"", in bold
             {
                 m_documentationText->setCurrentCharFormat(boldFormat);
-                m_documentationText->append(
-                    tr("Class \"%1\"").arg(QString::fromStdString(entityDefinition->name())));
+                m_documentationText->append(tr("Class \"%1\"").arg(QString::fromStdString(entityDefinition->name())));
                 m_documentationText->setCurrentCharFormat(normalFormat);
             }
 
@@ -259,9 +256,7 @@ void EntityPropertyEditor::createGui(std::weak_ptr<MapDocument> document) {
     layout->addWidget(m_splitter, 1);
     setLayout(layout);
 
-    connect(
-        m_propertyGrid, &EntityPropertyGrid::currentRowChanged, this, &EntityPropertyEditor::OnCurrentRowChanged
-    );
+    connect(m_propertyGrid, &EntityPropertyGrid::currentRowChanged, this, &EntityPropertyEditor::OnCurrentRowChanged);
 }
 
 void EntityPropertyEditor::updateMinimumSize() {

@@ -117,9 +117,7 @@ bool EntityProperty::hasPrefix(const std::string_view prefix) const {
     return kdl::cs::str_is_prefix(m_key, prefix);
 }
 
-bool EntityProperty::hasPrefixAndValue(
-    const std::string_view prefix, const std::string_view value
-) const {
+bool EntityProperty::hasPrefixAndValue(const std::string_view prefix, const std::string_view value) const {
     return hasPrefix(prefix) && hasValue(value);
 }
 
@@ -127,9 +125,7 @@ bool EntityProperty::hasNumberedPrefix(const std::string_view prefix) const {
     return isNumberedProperty(prefix, m_key);
 }
 
-bool EntityProperty::hasNumberedPrefixAndValue(
-    const std::string_view prefix, const std::string_view value
-) const {
+bool EntityProperty::hasNumberedPrefixAndValue(const std::string_view prefix, const std::string_view value) const {
     return hasNumberedPrefix(prefix) && hasValue(value);
 }
 
@@ -165,29 +161,21 @@ bool isWorldspawn(const std::string &classname) {
     return classname == EntityPropertyValues::WorldspawnClassname;
 }
 
-std::vector<EntityProperty>::const_iterator findEntityProperty(
-    const std::vector<EntityProperty> &properties, const std::string &key
-) {
-    return std::find_if(
-        std::begin(properties), std::end(properties), [&](const auto &property) {
+std::vector<EntityProperty>::const_iterator findEntityProperty(const std::vector<EntityProperty> &properties, const std::string &key) {
+    return std::find_if(std::begin(properties), std::end(properties), [&](const auto &property) {
           return property.hasKey(key);
         }
     );
 }
 
-std::vector<EntityProperty>::iterator findEntityProperty(
-    std::vector<EntityProperty> &properties, const std::string &key
-) {
-    return std::find_if(
-        std::begin(properties), std::end(properties), [&](const auto &property) {
+std::vector<EntityProperty>::iterator findEntityProperty(std::vector<EntityProperty> &properties, const std::string &key) {
+    return std::find_if(std::begin(properties), std::end(properties), [&](const auto &property) {
           return property.hasKey(key);
         }
     );
 }
 
-const std::string &findEntityPropertyOrDefault(
-    const std::vector<EntityProperty> &properties, const std::string &key, const std::string &defaultValue
-) {
+const std::string &findEntityPropertyOrDefault(const std::vector<EntityProperty> &properties, const std::string &key, const std::string &defaultValue) {
     const auto it = findEntityProperty(properties, key);
     return it != std::end(properties) ? it->value() : defaultValue;
 }

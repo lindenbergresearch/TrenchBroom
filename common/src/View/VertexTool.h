@@ -79,9 +79,7 @@ private:
     using VertexToolBase::findIncidentBrushes;
 
 public:
-    void pick(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-    ) const override;
+    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const override;
 
 public: // Handle selection
     bool deselectAll() override;
@@ -92,9 +90,7 @@ public:
     const VertexHandleManager &handleManager() const override;
 
 public: // Vertex moving
-    std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(
-        const std::vector<Model::Hit> &hits
-    ) const override;
+    std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const override;
 
     bool startMove(const std::vector<Model::Hit> &hits) override;
 
@@ -113,9 +109,7 @@ public: // Vertex moving
     void removeSelection();
 
 public: // Rendering
-    void renderGuide(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &position
-    ) const override;
+    void renderGuide(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &position) const override;
 
 private: // Tool interface
     bool doActivate() override;

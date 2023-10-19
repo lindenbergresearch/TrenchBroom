@@ -39,9 +39,7 @@ struct EntityDefinitionClassInfo;
 class ParserStatus;
 
 // exposed for testing
-std::vector<EntityDefinitionClassInfo> resolveInheritance(
-    ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos
-);
+std::vector<EntityDefinitionClassInfo> resolveInheritance(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos);
 
 class EntityDefinitionParser {
 private:
@@ -61,17 +59,11 @@ public:
     EntityDefinitionList parseDefinitions(ParserStatus &status);
 
 private:
-    std::unique_ptr<Assets::EntityDefinition> createDefinition(
-        const EntityDefinitionClassInfo &classInfo
-    ) const;
+    std::unique_ptr<Assets::EntityDefinition> createDefinition(const EntityDefinitionClassInfo &classInfo) const;
 
-    std::vector<Assets::EntityDefinition *> createDefinitions(
-        ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos
-    ) const;
+    std::vector<Assets::EntityDefinition *> createDefinitions(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos) const;
 
-    virtual std::vector<EntityDefinitionClassInfo> parseClassInfos(
-        ParserStatus &status
-    ) = 0;
+    virtual std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) = 0;
 };
 } // namespace IO
 } // namespace TrenchBroom

@@ -268,50 +268,27 @@ QString entityLinkModeNone() {
 Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 
 const std::vector<PreferenceBase *> &staticPreferences() {
-    static const std::vector<PreferenceBase *> list{&MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength,
-                                                    &XAxisColor, &YAxisColor, &ZAxisColor, &PointFileColor,
-                                                    &PortalFileBorderColor, &PortalFileFillColor, &ShowFPS,
-                                                    &UnitsDisplayType, &MetricConversationFactor,&SoftMapBoundsColor,
-                                                    &CompassBackgroundColor, &CompassBackgroundOutlineColor,
-                                                    &CompassAxisOutlineColor, &CameraFrustumColor, &DefaultGroupColor,
-                                                    &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor,
-                                                    &FaceColor, &SelectedFaceColor, &LockedFaceColor,
-                                                    &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
-                                                    &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
-                                                    &SelectionBoundsColor, &InfoOverlayTextColor,
-                                                    &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor,
-                                                    &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor,
-                                                    &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor,
-                                                    &LockedInfoOverlayBackgroundColor, &HandleRadius,
-                                                    &MaximumHandleDistance, &HandleColor, &OccludedHandleColor,
-                                                    &SelectedHandleColor, &OccludedSelectedHandleColor,
-                                                    &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor,
-                                                    &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor,
-                                                    &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha,
-                                                    &ShearFillColor, &ShearOutlineColor, &MoveTraceColor,
-                                                    &OccludedMoveTraceColor, &MoveIndicatorOutlineColor,
-                                                    &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor,
-                                                    &Brightness,&FaceAutoBrightness,&GridLineWidth, &GridAlpha, &GridColor2D, &TextureMinFilter,
-                                                    &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath,
-                                                    &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize,
-                                                    &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor,
-                                                    &BrowserSubTextColor, &BrowserBackgroundColor,
-                                                    &BrowserGroupBackgroundColor, &TextureBrowserIconSize,
-                                                    &TextureBrowserDefaultColor, &TextureBrowserSelectedColor,
-                                                    &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
-                                                    &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor,
-                                                    &LogWarningColor, &LogErrorColor, &CameraLookSpeed,
-                                                    &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
-                                                    &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert,
-                                                    &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert,
-                                                    &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed,
-                                                    &Link2DCameras, &CameraFlyForward(), &CameraFlyBackward(),
-                                                    &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(),
-                                                    &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds,
-                                                    &ShowBrushEntityBounds, &ShowPointEntityBounds,
-                                                    &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog,
-                                                    &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
-                                                    &EntityLinkMode};
+    static const std::vector<PreferenceBase *> list{
+        &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor, &PointFileColor, &PortalFileBorderColor,
+        &PortalFileFillColor, &ShowFPS, &UnitsDisplayType, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
+        &CompassBackgroundOutlineColor, &CompassAxisOutlineColor, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
+        &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
+        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor, &InfoOverlayTextColor, &GroupInfoOverlayTextColor,
+        &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor,
+        &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor, &OccludedHandleColor,
+        &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor,
+        &ScaleHandleColor, &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor,
+        &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness,
+        &GridLineWidth, &GridAlpha, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath,
+        &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
+        &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor,
+        &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed,
+        &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed, &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed,
+        &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(),
+        &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds,
+        &ShowBrushEntityBounds, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds,
+        &ShowPointEntities, &ShowBrushes, &EntityLinkMode
+    };
 
     return list;
 }
@@ -351,9 +328,9 @@ DynamicPreferencePattern<QKeySequence> FiltersEntitiesToggleVisible("Filters/Ent
 DynamicPreferencePattern<QKeySequence> EntitiesCreate("Entities/*/Create");
 
 const std::vector<DynamicPreferencePatternBase *> &dynaimcPreferencePatterns() {
-    static const std::vector<DynamicPreferencePatternBase *> list{&GamesPath, &GamesToolPath, &GamesDefaultEngine,
-                                                                  &FiltersTagsToggle, &TagsEnable, &TagsDisable,
-                                                                  &FiltersEntitiesToggleVisible, &EntitiesCreate};
+    static const std::vector<DynamicPreferencePatternBase *> list{
+        &GamesPath, &GamesToolPath, &GamesDefaultEngine, &FiltersTagsToggle, &TagsEnable, &TagsDisable, &FiltersEntitiesToggleVisible, &EntitiesCreate
+    };
     return list;
 }
 } // namespace Preferences

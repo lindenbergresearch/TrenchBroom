@@ -59,24 +59,16 @@ public:
     }
 
 private:
-    bool selects(
-        const vm::vec3 &point, const vm::plane3 &plane, const vm::bbox2 &box
-    ) const;
+    bool selects(const vm::vec3 &point, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-    bool selects(
-        const vm::segment3 &edge, const vm::plane3 &plane, const vm::bbox2 &box
-    ) const;
+    bool selects(const vm::segment3 &edge, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-    bool selects(
-        const vm::polygon3 &polygon, const vm::plane3 &plane, const vm::bbox2 &box
-    ) const;
+    bool selects(const vm::polygon3 &polygon, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
     vm::vec3 project(const vm::vec3 &point, const vm::plane3 &plane) const;
 
 public:
-    void render(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) const;
+    void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
 
 private:
     vm::plane3 getPlane() const;

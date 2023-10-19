@@ -30,9 +30,7 @@ namespace Renderer {
 Camera::Viewport::Viewport() : x(0), y(0), width(0), height(0) {
 }
 
-Camera::Viewport::Viewport(
-    const int i_x, const int i_y, const int i_width, const int i_height
-) : x(i_x), y(i_y), width(i_width), height(i_height) {
+Camera::Viewport::Viewport(const int i_x, const int i_y, const int i_width, const int i_height) : x(i_x), y(i_y), width(i_width), height(i_height) {
 }
 
 bool Camera::Viewport::operator==(const Viewport &other) const {
@@ -120,8 +118,8 @@ const vm::mat4x4f Camera::orthogonalBillboardMatrix() const {
     bbUp = m_up;
     bbRight = vm::cross(bbUp, bbLook);
 
-    return vm::mat4x4f(
-        bbRight.x(), bbUp.x(), bbLook.x(), 0.0f, bbRight.y(), bbUp.y(), bbLook.y(), 0.0f, bbRight.z(), bbUp.z(), bbLook.z(), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+    return vm::mat4x4f(bbRight.x(), bbUp.x(), bbLook.x(), 0.0f, bbRight.y(), bbUp.y(), bbLook.y(), 0.0f, bbRight.z(), bbUp.z(), bbLook.z(), 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f
     );
 }
 
@@ -137,14 +135,12 @@ const vm::mat4x4f Camera::verticalBillboardMatrix() const {
     bbUp = vm::vec3f::pos_z();
     bbRight = vm::cross(bbUp, bbLook);
 
-    return vm::mat4x4f(
-        bbRight.x(), bbUp.x(), bbLook.x(), 0.0f, bbRight.y(), bbUp.y(), bbLook.y(), 0.0f, bbRight.z(), bbUp.z(), bbLook.z(), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+    return vm::mat4x4f(bbRight.x(), bbUp.x(), bbLook.x(), 0.0f, bbRight.y(), bbUp.y(), bbLook.y(), 0.0f, bbRight.z(), bbUp.z(), bbLook.z(), 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f
     );
 }
 
-void Camera::frustumPlanes(
-    vm::plane3f &top, vm::plane3f &right, vm::plane3f &bottom, vm::plane3f &left
-) const {
+void Camera::frustumPlanes(vm::plane3f &top, vm::plane3f &right, vm::plane3f &bottom, vm::plane3f &left) const {
     doComputeFrustumPlanes(top, right, bottom, left);
 }
 
@@ -343,9 +339,7 @@ vm::quatf Camera::clampRotationToUpright(const vm::quatf &rotation) const {
     }
 }
 
-void Camera::renderFrustum(
-    RenderContext &renderContext, VboManager &vboManager, const float size, const Color &color
-) const {
+void Camera::renderFrustum(RenderContext &renderContext, VboManager &vboManager, const float size, const Color &color) const {
     doRenderFrustum(renderContext, vboManager, size, color);
 }
 
@@ -353,18 +347,12 @@ float Camera::pickFrustum(const float size, const vm::ray3f &ray) const {
     return doPickFrustum(size, ray);
 }
 
-FloatType Camera::pickPointHandle(
-    const vm::ray3 &pickRay, const vm::vec3 &handlePosition, const FloatType handleRadius
-) const {
+FloatType Camera::pickPointHandle(const vm::ray3 &pickRay, const vm::vec3 &handlePosition, const FloatType handleRadius) const {
     const auto scaling = static_cast<FloatType>(perspectiveScalingFactor(vm::vec3f(handlePosition)));
-    return vm::intersect_ray_sphere(
-        pickRay, handlePosition, FloatType(2.0) * handleRadius * scaling
-    );
+    return vm::intersect_ray_sphere(pickRay, handlePosition, FloatType(2.0) * handleRadius * scaling);
 }
 
-FloatType Camera::pickLineSegmentHandle(
-    const vm::ray3 &pickRay, const vm::segment3 &handlePosition, const FloatType handleRadius
-) const {
+FloatType Camera::pickLineSegmentHandle(const vm::ray3 &pickRay, const vm::segment3 &handlePosition, const FloatType handleRadius) const {
     const auto dist = distance(pickRay, handlePosition);
     if (dist.parallel) {
         return vm::nan<FloatType>();
@@ -378,8 +366,8 @@ Camera::Camera() : m_nearPlane(1.0f), m_farPlane(65536.0f), m_viewport(Viewport(
     setDirection(vm::vec3f::pos_x(), vm::vec3f::pos_z());
 }
 
-Camera::Camera(
-    const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up
+Camera::Camera(const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction,
+    const vm::vec3f &up
 ) : m_nearPlane(nearPlane), m_farPlane(farPlane), m_viewport(viewport), m_zoom(1.0f), m_position(position), m_valid(false) {
     assert(m_nearPlane >= 0.0f);
     assert(m_farPlane > m_nearPlane);

@@ -68,9 +68,12 @@ static bool isPropertyKeyMutable(const Model::Entity &entity, const std::string 
     assert(!Model::isLayer(entity.classname(), entity.properties()));
 
     if (Model::isWorldspawn(entity.classname())) {
-        return !(key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions || key == Model::EntityPropertyKeys::Wad ||
-                 key == Model::EntityPropertyKeys::Textures || key == Model::EntityPropertyKeys::SoftMapBounds || key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked ||
-                 key == Model::EntityPropertyKeys::LayerHidden || key == Model::EntityPropertyKeys::LayerOmitFromExport);
+        return !(
+            key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions ||
+            key == Model::EntityPropertyKeys::Wad || key == Model::EntityPropertyKeys::Textures || key == Model::EntityPropertyKeys::SoftMapBounds ||
+            key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked || key == Model::EntityPropertyKeys::LayerHidden ||
+            key == Model::EntityPropertyKeys::LayerOmitFromExport
+        );
     }
 
     return true;
@@ -81,23 +84,22 @@ static bool isPropertyValueMutable(const Model::Entity &entity, const std::strin
     assert(!Model::isLayer(entity.classname(), entity.properties()));
 
     if (Model::isWorldspawn(entity.classname())) {
-        return !(key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions || key == Model::EntityPropertyKeys::Wad ||
-                 key == Model::EntityPropertyKeys::Textures || key == Model::EntityPropertyKeys::SoftMapBounds || key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked ||
-                 key == Model::EntityPropertyKeys::LayerHidden || key == Model::EntityPropertyKeys::LayerOmitFromExport);
+        return !(
+            key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions ||
+            key == Model::EntityPropertyKeys::Wad || key == Model::EntityPropertyKeys::Textures || key == Model::EntityPropertyKeys::SoftMapBounds ||
+            key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked || key == Model::EntityPropertyKeys::LayerHidden ||
+            key == Model::EntityPropertyKeys::LayerOmitFromExport
+        );
     }
 
     return true;
 }
 
-static bool isPropertyProtectable(
-    const Model::EntityNodeBase &entityNode, const std::string &key
-) {
+static bool isPropertyProtectable(const Model::EntityNodeBase &entityNode, const std::string &key) {
     return Model::findContainingLinkedGroup(entityNode) != nullptr && key != Model::EntityPropertyKeys::Origin;
 }
 
-static PropertyProtection isPropertyProtected(
-    const Model::EntityNodeBase &entityNode, const std::string &key
-) {
+static PropertyProtection isPropertyProtected(const Model::EntityNodeBase &entityNode, const std::string &key) {
     if (isPropertyProtectable(entityNode, key)) {
         for (const auto &protectedKey: entityNode.entity().protectedProperties()) {
             if (Model::isNumberedProperty(protectedKey, key)) {
@@ -137,7 +139,9 @@ std::ostream &operator<<(std::ostream &lhs, const PropertyProtection &rhs) {
     }
 }
 
-PropertyRow::PropertyRow() : m_valueType{ValueType::Unset}, m_keyMutable{true}, m_valueMutable{true}, m_protected{PropertyProtection::NotProtectable} {
+PropertyRow::PropertyRow() : m_valueType{ValueType::Unset}, m_keyMutable{true}, m_valueMutable{true}, m_protected{
+    PropertyProtection::NotProtectable
+} {
 }
 
 PropertyRow::PropertyRow(std::string key, const Model::EntityNodeBase *node) : m_key{std::move(key)} {
@@ -242,22 +246,20 @@ bool PropertyRow::subset() const {
     return m_valueType == ValueType::SingleValueAndUnset;
 }
 
-PropertyRow PropertyRow::rowForEntityNodes(
-    const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes
-) {
+PropertyRow PropertyRow::rowForEntityNodes(const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes) {
     ensure(!nodes.empty(), "rowForEntityNodes requries a non-empty node list");
 
-    return std::accumulate(
-        std::next(nodes.begin()), nodes.end(), PropertyRow{key, nodes.front()}, [](PropertyRow &lhs, const Model::EntityNodeBase *rhs) {
+    return std::accumulate(std::next(nodes.begin()), nodes.end(), PropertyRow{
+            key, nodes.front()
+        }, [](PropertyRow &lhs, const Model::EntityNodeBase *rhs) {
           lhs.merge(rhs);
           return lhs;
         }
     );
 }
 
-std::vector<std::string> PropertyRow::allKeys(
-    const std::vector<Model::EntityNodeBase *> &nodes, const bool showDefaultRows, const bool showProtectedProperties
-) {
+std::vector<std::string>
+PropertyRow::allKeys(const std::vector<Model::EntityNodeBase *> &nodes, const bool showDefaultRows, const bool showProtectedProperties) {
     auto result = kdl::vector_set<std::string>{};
 
     for (const auto *node: nodes) {
@@ -286,9 +288,8 @@ std::vector<std::string> PropertyRow::allKeys(
     return result.release_data();
 }
 
-std::map<std::string, PropertyRow> PropertyRow::rowsForEntityNodes(
-    const std::vector<Model::EntityNodeBase *> &nodes, const bool showDefaultRows, const bool showProtectedProperties
-) {
+std::map<std::string, PropertyRow>
+PropertyRow::rowsForEntityNodes(const std::vector<Model::EntityNodeBase *> &nodes, const bool showDefaultRows, const bool showProtectedProperties) {
     auto result = std::map<std::string, PropertyRow>{};
     for (const auto &key: allKeys(nodes, showDefaultRows, showProtectedProperties)) {
         result[key] = rowForEntityNodes(key, nodes);
@@ -296,9 +297,7 @@ std::map<std::string, PropertyRow> PropertyRow::rowsForEntityNodes(
     return result;
 }
 
-std::string PropertyRow::newPropertyKeyForEntityNodes(
-    const std::vector<Model::EntityNodeBase *> &nodes
-) {
+std::string PropertyRow::newPropertyKeyForEntityNodes(const std::vector<Model::EntityNodeBase *> &nodes) {
     const auto rows = rowsForEntityNodes(nodes, true, false);
 
     for (int i = 1;; ++i) {
@@ -314,9 +313,9 @@ kdl_reflect_impl(PropertyRow);
 
 // EntityPropertyModel
 
-EntityPropertyModel::EntityPropertyModel(
-    std::weak_ptr<MapDocument> document, QObject *parent
-) : QAbstractTableModel{parent}, m_showDefaultRows{true}, m_shouldShowProtectedProperties{false}, m_document{std::move(document)} {
+EntityPropertyModel::EntityPropertyModel(std::weak_ptr<MapDocument> document, QObject *parent) : QAbstractTableModel{
+    parent
+}, m_showDefaultRows{true}, m_shouldShowProtectedProperties{false}, m_document{std::move(document)} {
     updateFromMapDocument();
 }
 
@@ -335,9 +334,7 @@ struct KeyDiff {
   std::vector<std::string> unchanged;
 };
 
-static KeyDiff comparePropertyMaps(
-    const std::map<std::string, PropertyRow> &oldRows, const std::map<std::string, PropertyRow> &newRows
-) {
+static KeyDiff comparePropertyMaps(const std::map<std::string, PropertyRow> &oldRows, const std::map<std::string, PropertyRow> &newRows) {
     auto result = KeyDiff{};
     result.removed.reserve(oldRows.size());
     result.added.reserve(newRows.size());
@@ -405,7 +402,8 @@ void EntityPropertyModel::setRows(const std::map<std::string, PropertyRow> &newR
         const auto &oldDeletion = oldRowMap.at(diff.removed[0]);
         const auto &newAddition = newRowMap.at(diff.added[0]);
 
-        MODEL_LOG(qDebug() << "EntityPropertyModel::setRows: one row changed: " << mapStringToUnicode(document->encoding(), oldDeletion.key()) << " -> " << mapStringToUnicode(document->encoding(), newAddition.key()));
+        MODEL_LOG(qDebug() << "EntityPropertyModel::setRows: one row changed: " << mapStringToUnicode(document->encoding(), oldDeletion.key()) << " -> "
+                           << mapStringToUnicode(document->encoding(), newAddition.key()));
 
         const auto oldIndex = kdl::vec_index_of(m_rows, oldDeletion);
         ensure(oldIndex, "deleted row must be found");
@@ -477,8 +475,7 @@ const PropertyRow *EntityPropertyModel::dataForModelIndex(const QModelIndex &ind
 }
 
 int EntityPropertyModel::rowForPropertyKey(const std::string &propertyKey) const {
-    const auto it = std::find_if(
-        m_rows.begin(), m_rows.end(), [&](const auto &row) {
+    const auto it = std::find_if(m_rows.begin(), m_rows.end(), [&](const auto &row) {
           return row.key() == propertyKey;
         }
     );
@@ -497,8 +494,9 @@ QStringList EntityPropertyModel::getCompletions(const QModelIndex &index) const 
             result = getAllValuesForPropertyKeys({Model::EntityPropertyKeys::Targetname});
         }
         else if (key == Model::EntityPropertyKeys::Targetname) {
-            result = getAllValuesForPropertyKeys(
-                {Model::EntityPropertyKeys::Target, Model::EntityPropertyKeys::Killtarget}
+            result = getAllValuesForPropertyKeys({
+                    Model::EntityPropertyKeys::Target, Model::EntityPropertyKeys::Killtarget
+                }
             );
         }
         else if (key == Model::EntityPropertyKeys::Classname) {
@@ -518,9 +516,7 @@ std::string EntityPropertyModel::propertyKey(const int row) const {
     }
 }
 
-std::vector<std::string> EntityPropertyModel::propertyKeys(
-    const int row, const int count
-) const {
+std::vector<std::string> EntityPropertyModel::propertyKeys(const int row, const int count) const {
     auto result = std::vector<std::string>{};
     result.reserve(static_cast<std::size_t>(count));
 
@@ -547,9 +543,7 @@ std::vector<std::string> EntityPropertyModel::getAllPropertyKeys() const {
     return result.release_data();
 }
 
-std::vector<std::string> EntityPropertyModel::getAllValuesForPropertyKeys(
-    const std::vector<std::string> &propertyKeys
-) const {
+std::vector<std::string> EntityPropertyModel::getAllValuesForPropertyKeys(const std::vector<std::string> &propertyKeys) const {
     auto document = kdl::mem_lock(m_document);
     const auto &index = document->world()->entityNodeIndex();
 
@@ -585,9 +579,7 @@ std::vector<std::string> EntityPropertyModel::getAllClassnames() const {
     return result;
 }
 
-static bool computeShouldShowProtectedProperties(
-    const std::vector<Model::EntityNodeBase *> &entityNodes
-) {
+static bool computeShouldShowProtectedProperties(const std::vector<Model::EntityNodeBase *> &entityNodes) {
     if (entityNodes.empty()) {
         return false;
     }
@@ -744,9 +736,7 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
     return QVariant{};
 }
 
-bool EntityPropertyModel::setData(
-    const QModelIndex &index, const QVariant &value, const int role
-) {
+bool EntityPropertyModel::setData(const QModelIndex &index, const QVariant &value, const int role) {
     const auto &propertyRow = m_rows.at(static_cast<size_t>(index.row()));
     unused(propertyRow);
 
@@ -774,9 +764,7 @@ bool EntityPropertyModel::setData(
     else if (index.column() == ColumnValue && role == Qt::EditRole) {
         MODEL_LOG(qDebug() << "tried to set " << mapStringToUnicode(document->encoding(), propertyRow.key()) << " to " << value.toString());
 
-        if (updateProperty(
-            rowIndex, mapStringFromUnicode(document->encoding(), value.toString()), nodes
-        )) {
+        if (updateProperty(rowIndex, mapStringFromUnicode(document->encoding(), value.toString()), nodes)) {
             return true;
         }
     }
@@ -794,9 +782,7 @@ bool EntityPropertyModel::setData(
     return false;
 }
 
-QVariant EntityPropertyModel::headerData(
-    const int section, const Qt::Orientation orientation, const int role
-) const {
+QVariant EntityPropertyModel::headerData(const int section, const Qt::Orientation orientation, const int role) const {
     if (role == Qt::DisplayRole) {
         if (orientation == Qt::Horizontal) {
             if (section == ColumnKey) {
@@ -837,8 +823,7 @@ bool EntityPropertyModel::hasRowWithPropertyKey(const std::string &propertyKey) 
     return rowForPropertyKey(propertyKey) != -1;
 }
 
-bool EntityPropertyModel::renameProperty(
-    const size_t rowIndex, const std::string &newKey, const std::vector<Model::EntityNodeBase *> & /* nodes */) {
+bool EntityPropertyModel::renameProperty(const size_t rowIndex, const std::string &newKey, const std::vector<Model::EntityNodeBase *> & /* nodes */) {
     ensure(rowIndex < m_rows.size(), "row index out of bounds");
 
     auto document = kdl::mem_lock(m_document);
@@ -862,8 +847,7 @@ bool EntityPropertyModel::renameProperty(
 
         auto msgBox = QMessageBox{};
         msgBox.setWindowTitle(tr("Error"));
-        msgBox.setText(
-            tr("A property with key '%1' already exists.\n\n Do you wish to overwrite it?").arg(mapStringToUnicode(document->encoding(), newKey)));
+        msgBox.setText(tr("A property with key '%1' already exists.\n\n Do you wish to overwrite it?").arg(mapStringToUnicode(document->encoding(), newKey)));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         if (msgBox.exec() == QMessageBox::No) {
@@ -874,9 +858,7 @@ bool EntityPropertyModel::renameProperty(
     return document->renameProperty(oldKey, newKey);
 }
 
-bool EntityPropertyModel::updateProperty(
-    const size_t rowIndex, const std::string &newValue, const std::vector<Model::EntityNodeBase *> &nodes
-) {
+bool EntityPropertyModel::updateProperty(const size_t rowIndex, const std::string &newValue, const std::vector<Model::EntityNodeBase *> &nodes) {
     ensure(rowIndex < m_rows.size(), "row index out of bounds");
 
     auto hasChange = false;

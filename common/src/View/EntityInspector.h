@@ -46,9 +46,7 @@ private:
     CollapsibleTitledPanel *m_entityDefinitionFileChooser;
 
 public:
-    EntityInspector(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    EntityInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     ~EntityInspector() override;
 
@@ -57,13 +55,9 @@ private:
 
     QWidget *createAttributeEditor(QWidget *parent, std::weak_ptr<MapDocument> document);
 
-    QWidget *createEntityBrowser(
-        QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager
-    );
+    QWidget *createEntityBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-    CollapsibleTitledPanel *createEntityDefinitionFileChooser(
-        QWidget *parent, std::weak_ptr<MapDocument> document
-    );
+    CollapsibleTitledPanel *createEntityDefinitionFileChooser(QWidget *parent, std::weak_ptr<MapDocument> document);
 };
 } // namespace View
 } // namespace TrenchBroom

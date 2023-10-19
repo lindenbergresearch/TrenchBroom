@@ -53,12 +53,10 @@ private:
     QToolBar *m_toolBar;
     QStackedWidget *m_stackedWidget;
     QDialogButtonBox *m_buttonBox;
-    std::map<QString, QAction*> m_toolButtonActions;
+    std::map<QString, QAction *> m_toolButtonActions;
 
 public:
-    explicit PreferenceDialog(
-        std::shared_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 protected: // QWidget overrides
     void closeEvent(QCloseEvent *event) override;

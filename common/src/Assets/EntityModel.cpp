@@ -57,9 +57,11 @@ void EntityModelFrame::setSkinOffset(const size_t skinOffset) {
 
 // EntityModel::LoadedFrame
 
-EntityModelLoadedFrame::EntityModelLoadedFrame(
-    const size_t index, const std::string &name, const vm::bbox3f &bounds, const PitchType pitchType, const Orientation orientation
-) : EntityModelFrame{index}, m_name{name}, m_bounds{bounds}, m_pitchType{pitchType}, m_orientation{orientation}, m_spacialTree{std::make_unique<SpacialTree>(16.0f)} {
+EntityModelLoadedFrame::EntityModelLoadedFrame(const size_t index, const std::string &name, const vm::bbox3f &bounds, const PitchType pitchType,
+    const Orientation orientation
+) : EntityModelFrame{index}, m_name{name}, m_bounds{bounds}, m_pitchType{pitchType}, m_orientation{
+    orientation
+}, m_spacialTree{std::make_unique<SpacialTree>(16.0f)} {
 }
 
 EntityModelLoadedFrame::~EntityModelLoadedFrame() = default;
@@ -98,8 +100,8 @@ float EntityModelLoadedFrame::intersect(const vm::ray3f &ray) const {
     return closestDistance;
 }
 
-void EntityModelLoadedFrame::addToSpacialTree(
-    const std::vector<EntityModelVertex> &vertices, const Renderer::PrimType primType, const size_t index, const size_t count
+void EntityModelLoadedFrame::addToSpacialTree(const std::vector<EntityModelVertex> &vertices, const Renderer::PrimType primType, const size_t index,
+    const size_t count
 ) {
     switch (primType) {
         case Renderer::PrimType::Points:
@@ -256,9 +258,7 @@ private:
      * @param vertices the vertices associated with this mesh
      * @return the renderer
      */
-    virtual std::unique_ptr<Renderer::TexturedIndexRangeRenderer> doBuildRenderer(
-        const Texture *skin, const Renderer::VertexArray &vertices
-    ) = 0;
+    virtual std::unique_ptr<Renderer::TexturedIndexRangeRenderer> doBuildRenderer(const Texture *skin, const Renderer::VertexArray &vertices) = 0;
 };
 
 // EntityModel::IndexedMesh
@@ -278,24 +278,19 @@ public:
      * @param vertices the vertices
      * @param indices the indices
      */
-    EntityModelIndexedMesh(
-        EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices
-    ) : EntityModelMesh{std::move(vertices)}, m_indices{std::move(indices)} {
-        m_indices.forEachPrimitive(
-            [&](const Renderer::PrimType primType, const size_t index, const size_t count) {
+    EntityModelIndexedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices) : EntityModelMesh{
+        std::move(vertices)
+    }, m_indices{std::move(indices)} {
+        m_indices.forEachPrimitive([&](const Renderer::PrimType primType, const size_t index, const size_t count) {
               frame.addToSpacialTree(m_vertices, primType, index, count);
             }
         );
     }
 
 private:
-    std::unique_ptr<Renderer::TexturedIndexRangeRenderer> doBuildRenderer(
-        const Texture *skin, const Renderer::VertexArray &vertices
-    ) override {
+    std::unique_ptr<Renderer::TexturedIndexRangeRenderer> doBuildRenderer(const Texture *skin, const Renderer::VertexArray &vertices) override {
         const Renderer::TexturedIndexRangeMap texturedIndices(skin, m_indices);
-        return std::make_unique<Renderer::TexturedIndexRangeRenderer>(
-            vertices, texturedIndices
-        );
+        return std::make_unique<Renderer::TexturedIndexRangeRenderer>(vertices, texturedIndices);
     }
 };
 
@@ -317,29 +312,26 @@ public:
      * @param vertices the vertices
      * @param indices the per texture indices
      */
-    EntityModelTexturedMesh(
-        EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices
-    ) : EntityModelMesh{std::move(vertices)}, m_indices{std::move(indices)} {
-        m_indices.forEachPrimitive(
-            [&](
-                const Texture * /* texture */, const Renderer::PrimType primType, const size_t index, const size_t count
-            ) {
+    EntityModelTexturedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices) : EntityModelMesh{
+        std::move(vertices)
+    }, m_indices{std::move(indices)} {
+        m_indices.forEachPrimitive([&](const Texture * /* texture */, const Renderer::PrimType primType, const size_t index, const size_t count) {
               frame.addToSpacialTree(m_vertices, primType, index, count);
             }
         );
     }
 
 private:
-    std::unique_ptr<Renderer::TexturedIndexRangeRenderer> doBuildRenderer(
-        const Texture * /* skin */, const Renderer::VertexArray &vertices
-    ) override {
+    std::unique_ptr<Renderer::TexturedIndexRangeRenderer> doBuildRenderer(const Texture * /* skin */, const Renderer::VertexArray &vertices) override {
         return std::make_unique<Renderer::TexturedIndexRangeRenderer>(vertices, m_indices);
     }
 };
 
 // EntityModel::Surface
 
-EntityModelSurface::EntityModelSurface(std::string name, const size_t frameCount) : m_name{std::move(name)}, m_meshes{frameCount}, m_skins{std::make_unique<TextureCollection>()} {
+EntityModelSurface::EntityModelSurface(std::string name, const size_t frameCount) : m_name{std::move(name)}, m_meshes{
+    frameCount
+}, m_skins{std::make_unique<TextureCollection>()} {
 }
 
 EntityModelSurface::~EntityModelSurface() = default;
@@ -356,20 +348,14 @@ void EntityModelSurface::setTextureMode(const int minFilter, const int magFilter
     m_skins->setTextureMode(minFilter, magFilter);
 }
 
-void EntityModelSurface::addIndexedMesh(
-    EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices
-) {
+void EntityModelSurface::addIndexedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices) {
     assert(frame.index() < frameCount());
-    m_meshes[frame.index()] = std::make_unique<EntityModelIndexedMesh>(
-        frame, std::move(vertices), std::move(indices));
+    m_meshes[frame.index()] = std::make_unique<EntityModelIndexedMesh>(frame, std::move(vertices), std::move(indices));
 }
 
-void EntityModelSurface::addTexturedMesh(
-    EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices
-) {
+void EntityModelSurface::addTexturedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices) {
     assert(frame.index() < frameCount());
-    m_meshes[frame.index()] = std::make_unique<EntityModelTexturedMesh>(
-        frame, std::move(vertices), std::move(indices));
+    m_meshes[frame.index()] = std::make_unique<EntityModelTexturedMesh>(frame, std::move(vertices), std::move(indices));
 }
 
 void EntityModelSurface::setSkins(std::vector<Texture> skins) {
@@ -392,9 +378,7 @@ const Texture *EntityModelSurface::skin(const size_t index) const {
     return m_skins->textureByIndex(index);
 }
 
-std::unique_ptr<Renderer::TexturedIndexRangeRenderer> EntityModelSurface::buildRenderer(
-    const size_t skinIndex, const size_t frameIndex
-) {
+std::unique_ptr<Renderer::TexturedIndexRangeRenderer> EntityModelSurface::buildRenderer(const size_t skinIndex, const size_t frameIndex) {
     assert(frameIndex < frameCount());
     assert(skinIndex < skinCount());
 
@@ -409,14 +393,12 @@ std::unique_ptr<Renderer::TexturedIndexRangeRenderer> EntityModelSurface::buildR
 
 // EntityModel
 
-EntityModel::EntityModel(
-    std::string name, const PitchType pitchType, const Orientation orientation
-) : m_name{std::move(name)}, m_prepared{false}, m_pitchType{pitchType}, m_orientation{orientation} {
+EntityModel::EntityModel(std::string name, const PitchType pitchType, const Orientation orientation) : m_name{
+    std::move(name)
+}, m_prepared{false}, m_pitchType{pitchType}, m_orientation{orientation} {
 }
 
-std::unique_ptr<Renderer::TexturedRenderer> EntityModel::buildRenderer(
-    const size_t skinIndex, const size_t frameIndex
-) const {
+std::unique_ptr<Renderer::TexturedRenderer> EntityModel::buildRenderer(const size_t skinIndex, const size_t frameIndex) const {
     std::vector<std::unique_ptr<Renderer::TexturedIndexRangeRenderer>> renderers;
     if (frameIndex >= frameCount()) {
         return nullptr;
@@ -435,8 +417,7 @@ std::unique_ptr<Renderer::TexturedRenderer> EntityModel::buildRenderer(
         return nullptr;
     }
     else {
-        return std::make_unique<Renderer::MultiTexturedIndexRangeRenderer>(
-            std::move(renderers));
+        return std::make_unique<Renderer::MultiTexturedIndexRangeRenderer>(std::move(renderers));
     }
 }
 
@@ -473,18 +454,12 @@ EntityModelFrame &EntityModel::addFrame() {
     return *m_frames.back();
 }
 
-EntityModelLoadedFrame &EntityModel::loadFrame(
-    const size_t frameIndex, const std::string &name, const vm::bbox3f &bounds
-) {
+EntityModelLoadedFrame &EntityModel::loadFrame(const size_t frameIndex, const std::string &name, const vm::bbox3f &bounds) {
     if (frameIndex >= frameCount()) {
-        throw AssetException(
-            "Frame index " + std::to_string(frameIndex) + " is out of bounds (frame count = " + std::to_string(frameCount()) + ")"
-        );
+        throw AssetException("Frame index " + std::to_string(frameIndex) + " is out of bounds (frame count = " + std::to_string(frameCount()) + ")");
     }
 
-    auto frame = std::make_unique<EntityModelLoadedFrame>(
-        frameIndex, name, bounds, m_pitchType, m_orientation
-    );
+    auto frame = std::make_unique<EntityModelLoadedFrame>(frameIndex, name, bounds, m_pitchType, m_orientation);
     frame->setSkinOffset(m_frames[frameIndex]->skinOffset());
 
     auto &result = *frame;
@@ -493,8 +468,7 @@ EntityModelLoadedFrame &EntityModel::loadFrame(
 }
 
 EntityModelSurface &EntityModel::addSurface(std::string name) {
-    m_surfaces.push_back(
-        std::make_unique<EntityModelSurface>(std::move(name), frameCount()));
+    m_surfaces.push_back(std::make_unique<EntityModelSurface>(std::move(name), frameCount()));
     return *m_surfaces.back();
 }
 
@@ -507,8 +481,7 @@ size_t EntityModel::surfaceCount() const {
 }
 
 std::vector<const EntityModelFrame *> EntityModel::frames() const {
-    return kdl::vec_transform(
-        m_frames, [](const auto &frame) {
+    return kdl::vec_transform(m_frames, [](const auto &frame) {
           return const_cast<const EntityModelFrame *>(frame.get());
         }
     );
@@ -519,8 +492,7 @@ std::vector<EntityModelFrame *> EntityModel::frames() {
 }
 
 std::vector<const EntityModelSurface *> EntityModel::surfaces() const {
-    return kdl::vec_transform(
-        m_surfaces, [](const auto &surface) {
+    return kdl::vec_transform(m_surfaces, [](const auto &surface) {
           return const_cast<const EntityModelSurface *>(surface.get());
         }
     );

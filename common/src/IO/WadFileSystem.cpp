@@ -85,9 +85,7 @@ Result<void> WadFileSystem::doReadDirectory() {
             const auto entrySize = reader.readSize<int32_t>();
 
             if (m_file->size() < entryAddress + entrySize) {
-                return Error{kdl::str_to_string(
-                    "File entry at address ", entryAddress, " is out of bounds"
-                )};
+                return Error{kdl::str_to_string("File entry at address ", entryAddress, " is out of bounds")};
             }
 
             reader.seekForward(WadLayout::DirEntryTypeOffset);
@@ -99,10 +97,8 @@ Result<void> WadFileSystem::doReadDirectory() {
             }
 
             const auto path = std::filesystem::path{entryName + "." + entryType};
-            auto file = std::static_pointer_cast<File>(
-                std::make_shared<FileView>(m_file, entryAddress, entrySize));
-            addFile(
-                path, [file = std::move(file)]() -> Result<std::shared_ptr<File>> {
+            auto file = std::static_pointer_cast<File>(std::make_shared<FileView>(m_file, entryAddress, entrySize));
+            addFile(path, [file = std::move(file)]() -> Result<std::shared_ptr<File>> {
                   return file;
                 }
             );

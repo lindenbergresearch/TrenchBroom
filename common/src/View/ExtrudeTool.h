@@ -144,9 +144,7 @@ public:
      */
     void updateProposedDragHandles(const Model::PickResult &pickResult);
 
-    static std::vector<Model::BrushFaceHandle> getDragFaces(
-        const std::vector<ExtrudeDragHandle> &dragHandles
-    );
+    static std::vector<Model::BrushFaceHandle> getDragFaces(const std::vector<ExtrudeDragHandle> &dragHandles);
 
     void beginExtrude();
 

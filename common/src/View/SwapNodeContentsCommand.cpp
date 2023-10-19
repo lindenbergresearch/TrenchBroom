@@ -29,23 +29,18 @@
 
 namespace TrenchBroom {
 namespace View {
-SwapNodeContentsCommand::SwapNodeContentsCommand(
-    const std::string &name, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodes
-) : UpdateLinkedGroupsCommandBase(name, true), m_nodes(std::move(nodes)) {
+SwapNodeContentsCommand::SwapNodeContentsCommand(const std::string &name, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodes)
+    : UpdateLinkedGroupsCommandBase(name, true), m_nodes(std::move(nodes)) {
 }
 
 SwapNodeContentsCommand::~SwapNodeContentsCommand() = default;
 
-std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformDo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformDo(MapDocumentCommandFacade *document) {
     document->performSwapNodeContents(m_nodes);
     return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformUndo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformUndo(MapDocumentCommandFacade *document) {
     document->performSwapNodeContents(m_nodes);
     return std::make_unique<CommandResult>(true);
 }

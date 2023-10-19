@@ -36,7 +36,8 @@ static qint64 msecsSinceReference() {
     return timer.msecsSinceReference();
 }
 
-FlyModeHelper::FlyModeHelper(Renderer::Camera &camera) : m_camera(camera), m_forward(false), m_backward(false), m_left(false), m_right(false), m_up(false), m_down(false), m_fast(false), m_slow(false), m_lastPollTime(msecsSinceReference()) {
+FlyModeHelper::FlyModeHelper(Renderer::Camera &camera) : m_camera(camera), m_forward(false), m_backward(false), m_left(false), m_right(false), m_up(false),
+                                                         m_down(false), m_fast(false), m_slow(false), m_lastPollTime(msecsSinceReference()) {
 }
 
 void FlyModeHelper::pollAndUpdate() {

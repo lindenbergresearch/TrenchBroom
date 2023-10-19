@@ -40,20 +40,15 @@ private:
     std::map<Model::Node *, std::vector<Model::Node *>> m_nodesToRemove;
 
 public:
-    static std::unique_ptr<ReparentNodesCommand> reparent(
-        std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove
-    );
+    static std::unique_ptr<ReparentNodesCommand>
+    reparent(std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove);
 
-    ReparentNodesCommand(
-        std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove
-    );
+    ReparentNodesCommand(std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove);
 
 private:
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-    std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document
-    ) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
 deleteCopyAndMove(ReparentNodesCommand);
 };

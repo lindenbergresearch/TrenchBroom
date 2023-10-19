@@ -37,72 +37,45 @@
 
 namespace TrenchBroom {
 namespace View {
-std::unique_ptr<SelectionCommand> SelectionCommand::select(
-    const std::vector<Model::Node *> &nodes
-) {
-    return std::make_unique<SelectionCommand>(
-        Action::SelectNodes, nodes, std::vector<Model::BrushFaceHandle>{}
-    );
+std::unique_ptr<SelectionCommand> SelectionCommand::select(const std::vector<Model::Node *> &nodes) {
+    return std::make_unique<SelectionCommand>(Action::SelectNodes, nodes, std::vector<Model::BrushFaceHandle>{});
 }
 
-std::unique_ptr<SelectionCommand> SelectionCommand::select(
-    const std::vector<Model::BrushFaceHandle> &faces
-) {
-    return std::make_unique<SelectionCommand>(
-        Action::SelectFaces, std::vector<Model::Node *>{}, faces
-    );
+std::unique_ptr<SelectionCommand> SelectionCommand::select(const std::vector<Model::BrushFaceHandle> &faces) {
+    return std::make_unique<SelectionCommand>(Action::SelectFaces, std::vector<Model::Node *>{}, faces);
 }
 
 std::unique_ptr<SelectionCommand> SelectionCommand::convertToFaces() {
-    return std::make_unique<SelectionCommand>(
-        Action::ConvertToFaces, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{}
-    );
+    return std::make_unique<SelectionCommand>(Action::ConvertToFaces, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{});
 }
 
 std::unique_ptr<SelectionCommand> SelectionCommand::selectAllNodes() {
-    return std::make_unique<SelectionCommand>(
-        Action::SelectAllNodes, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{}
-    );
+    return std::make_unique<SelectionCommand>(Action::SelectAllNodes, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{});
 }
 
 std::unique_ptr<SelectionCommand> SelectionCommand::selectAllFaces() {
-    return std::make_unique<SelectionCommand>(
-        Action::SelectAllFaces, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{}
-    );
+    return std::make_unique<SelectionCommand>(Action::SelectAllFaces, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{});
 }
 
-std::unique_ptr<SelectionCommand> SelectionCommand::deselect(
-    const std::vector<Model::Node *> &nodes
-) {
-    return std::make_unique<SelectionCommand>(
-        Action::DeselectNodes, nodes, std::vector<Model::BrushFaceHandle>{}
-    );
+std::unique_ptr<SelectionCommand> SelectionCommand::deselect(const std::vector<Model::Node *> &nodes) {
+    return std::make_unique<SelectionCommand>(Action::DeselectNodes, nodes, std::vector<Model::BrushFaceHandle>{});
 }
 
-std::unique_ptr<SelectionCommand> SelectionCommand::deselect(
-    const std::vector<Model::BrushFaceHandle> &faces
-) {
-    return std::make_unique<SelectionCommand>(
-        Action::DeselectFaces, std::vector<Model::Node *>{}, faces
-    );
+std::unique_ptr<SelectionCommand> SelectionCommand::deselect(const std::vector<Model::BrushFaceHandle> &faces) {
+    return std::make_unique<SelectionCommand>(Action::DeselectFaces, std::vector<Model::Node *>{}, faces);
 }
 
 std::unique_ptr<SelectionCommand> SelectionCommand::deselectAll() {
-    return std::make_unique<SelectionCommand>(
-        Action::DeselectAll, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{}
-    );
+    return std::make_unique<SelectionCommand>(Action::DeselectAll, std::vector<Model::Node *>{}, std::vector<Model::BrushFaceHandle>{});
 }
 
-SelectionCommand::SelectionCommand(
-    const Action action, const std::vector<Model::Node *> &nodes, const std::vector<Model::BrushFaceHandle> &faces
-) : UndoableCommand(makeName(action, nodes.size(), faces.size()), false), m_action(action), m_nodes(nodes), m_faceRefs(Model::createRefs(faces)) {
+SelectionCommand::SelectionCommand(const Action action, const std::vector<Model::Node *> &nodes, const std::vector<Model::BrushFaceHandle> &faces)
+    : UndoableCommand(makeName(action, nodes.size(), faces.size()), false), m_action(action), m_nodes(nodes), m_faceRefs(Model::createRefs(faces)) {
 }
 
 SelectionCommand::~SelectionCommand() = default;
 
-std::string SelectionCommand::makeName(
-    const Action action, const size_t nodeCount, const size_t faceCount
-) {
+std::string SelectionCommand::makeName(const Action action, const size_t nodeCount, const size_t faceCount) {
     std::stringstream result;
     switch (action) {
         case Action::SelectNodes:
@@ -133,9 +106,7 @@ std::string SelectionCommand::makeName(
     return result.str();
 }
 
-std::unique_ptr<CommandResult> SelectionCommand::doPerformDo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> SelectionCommand::doPerformDo(MapDocumentCommandFacade *document) {
     m_previouslySelectedNodes = document->selectedNodes().nodes();
     m_previouslySelectedFaceRefs = Model::createRefs(document->selectedBrushFaces());
 
@@ -168,9 +139,7 @@ std::unique_ptr<CommandResult> SelectionCommand::doPerformDo(
     return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> SelectionCommand::doPerformUndo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> SelectionCommand::doPerformUndo(MapDocumentCommandFacade *document) {
     document->performDeselectAll();
     if (!m_previouslySelectedNodes.empty()) {
         document->performSelect(m_previouslySelectedNodes);

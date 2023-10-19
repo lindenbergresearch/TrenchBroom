@@ -35,32 +35,26 @@
 
 namespace TrenchBroom {
 namespace Model {
-Assets::ColorRange::Type detectColorRange(
-    const std::string &propertyKey, const std::vector<EntityNodeBase *> &nodes
-) {
+Assets::ColorRange::Type detectColorRange(const std::string &propertyKey, const std::vector<EntityNodeBase *> &nodes) {
     auto result = Assets::ColorRange::Unset;
     for (auto *node: nodes) {
-        node->accept(
-            kdl::overload(
-                [&](const EntityNodeBase *entityNode) {
-                  if (const auto *value = entityNode->entity().property(propertyKey)) {
-                      const auto range = Assets::detectColorRange(*value);
-                      if (result == Assets::ColorRange::Unset) {
-                          result = range;
-                      }
-                      else if (result != range) {
-                          result = Assets::ColorRange::Mixed;
-                      }
+        node->accept(kdl::overload([&](const EntityNodeBase *entityNode) {
+              if (const auto *value = entityNode->entity().property(propertyKey)) {
+                  const auto range = Assets::detectColorRange(*value);
+                  if (result == Assets::ColorRange::Unset) {
+                      result = range;
                   }
-                }, [](const LayerNode *) {}, [](const GroupNode *) {}, [](const BrushNode *) {}, [](const PatchNode *) {}
-            ));
+                  else if (result != range) {
+                      result = Assets::ColorRange::Mixed;
+                  }
+              }
+            }, [](const LayerNode *) {}, [](const GroupNode *) {}, [](const BrushNode *) {}, [](const PatchNode *) {}
+        ));
     }
     return result;
 }
 
-const std::string convertEntityColor(
-    const std::string &str, const Assets::ColorRange::Type colorRange
-) {
+const std::string convertEntityColor(const std::string &str, const Assets::ColorRange::Type colorRange) {
     const auto color = parseEntityColor(str);
     return entityColorAsString(color, colorRange);
 }
@@ -85,9 +79,7 @@ Color parseEntityColor(const std::string &str) {
     return Color(r, g, b);
 }
 
-std::string entityColorAsString(
-    const Color &color, const Assets::ColorRange::Type colorRange
-) {
+std::string entityColorAsString(const Color &color, const Assets::ColorRange::Type colorRange) {
     std::stringstream result;
     if (colorRange == Assets::ColorRange::Byte) {
         result << int(color.r() * 255.0f) << " " << int(color.g() * 255.0f) << " " << int(color.b() * 255.0f);

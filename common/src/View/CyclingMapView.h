@@ -65,14 +65,12 @@ private:
     QStackedLayout *m_layout;
 
 public:
-    CyclingMapView(
-        std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, int views, Logger *logger, QWidget *parent = nullptr
+    CyclingMapView(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager,
+        int views, Logger *logger, QWidget *parent = nullptr
     );
 
 private:
-    void createGui(
-        MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, int views
-    );
+    void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, int views);
 
     void addMapView(MapViewBase *mapView);
 

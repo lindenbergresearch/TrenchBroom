@@ -37,9 +37,8 @@ int CompareHits::compare(const Hit &lhs, const Hit &rhs) const {
     return doCompare(lhs, rhs);
 }
 
-CombineCompareHits::CombineCompareHits(
-    std::unique_ptr<CompareHits> first, std::unique_ptr<CompareHits> second
-) : m_first(std::move(first)), m_second(std::move(second)) {
+CombineCompareHits::CombineCompareHits(std::unique_ptr<CompareHits> first, std::unique_ptr<CompareHits> second) : m_first(std::move(first)),
+                                                                                                                  m_second(std::move(second)) {
     ensure(m_first != nullptr, "first is null");
     ensure(m_second != nullptr, "second is null");
 }

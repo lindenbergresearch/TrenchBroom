@@ -35,13 +35,15 @@ void FormWithSectionsLayout::addSection(const QString &title, const QString &inf
         auto *lineLayout = new QVBoxLayout();
         auto border = new BorderLine(BorderLine::Direction::Horizontal, 2);
         border->setForegroundRole(QPalette::Midlight);
-        lineLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin);
+        lineLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::WideHMargin,
+            LayoutConstants::MediumVMargin
+        );
         lineLayout->addWidget(border);
         QFormLayout::addRow(lineLayout);
     }
 
     auto *titleLayout = new QVBoxLayout();
-    titleLayout->setContentsMargins(LayoutConstants::WideHMargin+ LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin, 0);
+    titleLayout->setContentsMargins(LayoutConstants::WideHMargin + LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin, 0);
     titleLayout->setSpacing(0);
 
     auto titlew = makeTitle(new QLabel(title));

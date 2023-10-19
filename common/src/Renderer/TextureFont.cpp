@@ -32,8 +32,8 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-TextureFont::TextureFont(
-    std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, const int lineHeight, const unsigned char firstChar, const unsigned char charCount
+TextureFont::TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, const int lineHeight, const unsigned char firstChar,
+    const unsigned char charCount
 ) : m_texture(std::move(texture)), m_glyphs(glyphs), m_lineHeight(lineHeight), m_firstChar(firstChar), m_charCount(charCount) {
 }
 
@@ -100,9 +100,10 @@ private:
     std::vector<vm::vec2f> m_vertices;
 
 public:
-    MakeQuads(
-        const TextureFont &font, const bool clockwise, const vm::vec2f &offset, const std::vector<vm::vec2f> &sizes
-    ) : m_font(font), m_clockwise(clockwise), m_offset(offset), m_sizes(sizes), m_index(0), m_y(0.0f) {
+    MakeQuads(const TextureFont &font, const bool clockwise, const vm::vec2f &offset, const std::vector<vm::vec2f> &sizes) : m_font(font),
+                                                                                                                             m_clockwise(clockwise),
+                                                                                                                             m_offset(offset), m_sizes(sizes),
+                                                                                                                             m_index(0), m_y(0.0f) {
         for (size_t i = 0; i < m_sizes.size(); ++i) {
             m_maxSize = max(m_maxSize, m_sizes[i]);
             m_y += m_sizes[i].y();

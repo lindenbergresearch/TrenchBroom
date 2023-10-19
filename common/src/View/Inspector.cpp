@@ -34,8 +34,11 @@
 
 namespace TrenchBroom {
 namespace View {
-Inspector::Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
-) : QWidget(parent), m_tabs(nullptr), m_mapInspector(nullptr), m_entityInspector(nullptr), m_faceInspector(nullptr), m_syncTabBarEventFilter(nullptr) {
+Inspector::Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : QWidget(parent), m_tabs(nullptr),
+                                                                                                               m_mapInspector(nullptr),
+                                                                                                               m_entityInspector(nullptr),
+                                                                                                               m_faceInspector(nullptr),
+                                                                                                               m_syncTabBarEventFilter(nullptr) {
     setObjectName("Inspector_Widget");
 
     m_tabs = new QTabWidget(this);

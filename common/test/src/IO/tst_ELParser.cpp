@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace IO {
-static auto evaluate(
-    const std::string &str, const EL::EvaluationContext &context = EL::EvaluationContext()) {
+static auto evaluate(const std::string &str, const EL::EvaluationContext &context = EL::EvaluationContext()) {
     return ELParser::parseStrict(str).evaluate(context);
 }
 
@@ -85,18 +84,14 @@ TEST_CASE("ELParserTest.parseArrayLiteral")
     CHECK(evaluate("[]") == EL::Value(EL::ArrayType()));
     CHECK(evaluate("[ 1.0 , \"test\",[ true] ]") == EL::Value(array));
 
-    CHECK(
-        evaluate("[1..3]")
-        == EL::Value(EL::ArrayType({EL::Value(1.0), EL::Value(2.0), EL::Value(3.0)})));
-    CHECK(
-        evaluate("[3..1]")
-        == EL::Value(EL::ArrayType({EL::Value(3.0), EL::Value(2.0), EL::Value(1.0)})));
+    CHECK(evaluate("[1..3]") == EL::Value(EL::ArrayType({EL::Value(1.0), EL::Value(2.0), EL::Value(3.0)})));
+    CHECK(evaluate("[3..1]") == EL::Value(EL::ArrayType({EL::Value(3.0), EL::Value(2.0), EL::Value(1.0)})));
     CHECK(evaluate("[1..1]") == EL::Value(EL::ArrayType({EL::Value(1.0)})));
     CHECK(evaluate("[1..0]") == EL::Value(EL::ArrayType({EL::Value(1.0), EL::Value(0.0)})));
-    CHECK(
-        evaluate("[-2..1]")
-        == EL::Value(
-            EL::ArrayType({EL::Value(-2.0), EL::Value(-1.0), EL::Value(0.0), EL::Value(1.0)})));
+    CHECK(evaluate("[-2..1]") == EL::Value(EL::ArrayType({
+            EL::Value(-2.0), EL::Value(-1.0), EL::Value(0.0), EL::Value(1.0)
+        }
+    )));
 }
 
 TEST_CASE("ELParserTest.parseMapLiteral")
@@ -108,10 +103,7 @@ TEST_CASE("ELParserTest.parseMapLiteral")
     map.insert(std::make_pair("testkey3", EL::Value(nestedMap)));
 
     CHECK(evaluate("{}") == EL::Value(EL::MapType()));
-    CHECK(
-        evaluate(
-            " { \"testkey1\": 1, \"testkey2\"   :\"asdf\", \"testkey3\":{\"nestedKey\":true} }")
-        == EL::Value(map));
+    CHECK(evaluate(" { \"testkey1\": 1, \"testkey2\"   :\"asdf\", \"testkey3\":{\"nestedKey\":true} }") == EL::Value(map));
 }
 
 TEST_CASE("ELParserTest.parseMapLiteralNestedInArray")
@@ -137,20 +129,17 @@ TEST_CASE("ELParserTest.parseMapLiteralNestedInArrayNestedInMap")
     outer.insert(std::make_pair("outerkey1", EL::Value(array)));
     outer.insert(std::make_pair("outerkey2", EL::Value("asdf")));
 
-    CHECK(
-        evaluate(R"({ "outerkey1": [ { "key": "value" } ], "outerkey2": "asdf" })")
-        == EL::Value(outer));
+    CHECK(evaluate(R"({ "outerkey1": [ { "key": "value" } ], "outerkey2": "asdf" })") == EL::Value(outer));
 }
 
 TEST_CASE("ELParserTest.parseMapLiteralWithTrailingGarbage")
 {
-    CHECK_THROWS_AS(
-        evaluate("{\n"
-                 "\t\"profiles\": [],\n"
-                 "\t\"version\": 1\n"
-                 "}\n"
-                 "asdf"),
-        ParserException);
+    CHECK_THROWS_AS(evaluate("{\n"
+                             "\t\"profiles\": [],\n"
+                             "\t\"version\": 1\n"
+                             "}\n"
+                             "asdf"
+    ), ParserException);
 }
 
 TEST_CASE("ELParserTest.parseVariable")
@@ -276,40 +265,34 @@ TEST_CASE("ELParserTest.parseSubscript")
 
     CHECK(evaluate("[ 1.0, 2.0, \"test\" ][1 + 1]") == EL::Value("test"));
 
-    CHECK(
-        evaluate("{ \"key1\":1, \"key2\":2, \"key3\":\"test\"}[\"key1\"]") == EL::Value(1.0));
-    CHECK(
-        evaluate("{ \"key1\":1, \"key2\":2, \"key3\":\"test\"}[\"key2\"]") == EL::Value(2.0));
-    CHECK(
-        evaluate("{ \"key1\":1, \"key2\":2, \"key3\":\"test\"}[\"key3\"]")
-        == EL::Value("test"));
+    CHECK(evaluate("{ \"key1\":1, \"key2\":2, \"key3\":\"test\"}[\"key1\"]") == EL::Value(1.0));
+    CHECK(evaluate("{ \"key1\":1, \"key2\":2, \"key3\":\"test\"}[\"key2\"]") == EL::Value(2.0));
+    CHECK(evaluate("{ \"key1\":1, \"key2\":2, \"key3\":\"test\"}[\"key3\"]") == EL::Value("test"));
 
     CHECK(evaluate("[ 1.0, [ 2.0, \"test\"] ][0]") == EL::Value(1.0));
     CHECK(evaluate("[ 1.0, [ 2.0, \"test\"] ][1][0]") == EL::Value(2.0));
     CHECK(evaluate("[ 1.0, [ 2.0, \"test\"] ][1][1]") == EL::Value("test"));
 
-    CHECK(
-        evaluate("{ \"key1\":1, \"key2\":2, \"key3\":[ 1, 2]}[\"key3\"][1]")
-        == EL::Value(2.0));
+    CHECK(evaluate("{ \"key1\":1, \"key2\":2, \"key3\":[ 1, 2]}[\"key3\"][1]") == EL::Value(2.0));
 
-    CHECK(
-        evaluate("[ 1.0, 2.0, \"test\" ][0,1,2]")
-        == EL::Value(EL::ArrayType({EL::Value(1.0), EL::Value(2.0), EL::Value("test")})));
-    CHECK(
-        evaluate("[ 1.0, 2.0, \"test\" ][0..2]")
-        == EL::Value(EL::ArrayType({EL::Value(1.0), EL::Value(2.0), EL::Value("test")})));
-    CHECK(
-        evaluate("[ 1.0, 2.0, \"test\" ][2..0]")
-        == EL::Value(EL::ArrayType({EL::Value("test"), EL::Value(2.0), EL::Value(1.0)})));
-    CHECK(
-        evaluate("[ 1.0, 2.0, \"test\" ][0,1..2]")
-        == EL::Value(EL::ArrayType({EL::Value(1.0), EL::Value(2.0), EL::Value("test")})));
-    CHECK(
-        evaluate("[ 1.0, 2.0, \"test\" ][1..]")
-        == EL::Value(EL::ArrayType({EL::Value(2.0), EL::Value("test")})));
-    CHECK(
-        evaluate("[ 1.0, 2.0, \"test\" ][..1]")
-        == EL::Value(EL::ArrayType({EL::Value("test"), EL::Value(2.0)})));
+    CHECK(evaluate("[ 1.0, 2.0, \"test\" ][0,1,2]") == EL::Value(EL::ArrayType({
+            EL::Value(1.0), EL::Value(2.0), EL::Value("test")
+        }
+    )));
+    CHECK(evaluate("[ 1.0, 2.0, \"test\" ][0..2]") == EL::Value(EL::ArrayType({
+            EL::Value(1.0), EL::Value(2.0), EL::Value("test")
+        }
+    )));
+    CHECK(evaluate("[ 1.0, 2.0, \"test\" ][2..0]") == EL::Value(EL::ArrayType({
+            EL::Value("test"), EL::Value(2.0), EL::Value(1.0)
+        }
+    )));
+    CHECK(evaluate("[ 1.0, 2.0, \"test\" ][0,1..2]") == EL::Value(EL::ArrayType({
+            EL::Value(1.0), EL::Value(2.0), EL::Value("test")
+        }
+    )));
+    CHECK(evaluate("[ 1.0, 2.0, \"test\" ][1..]") == EL::Value(EL::ArrayType({EL::Value(2.0), EL::Value("test")})));
+    CHECK(evaluate("[ 1.0, 2.0, \"test\" ][..1]") == EL::Value(EL::ArrayType({EL::Value("test"), EL::Value(2.0)})));
 
     CHECK(evaluate("\"test\"[3,2,1,0]") == EL::Value("tset"));
     CHECK(evaluate("\"test\"[2,1,0]") == EL::Value("set"));
@@ -369,8 +352,7 @@ TEST_CASE("ELParserTest.testOperatorPrecedence")
     CHECK(evaluate("7 + 2 / 3 + 2 * 2") == evaluate("2 / 3 + 7 + 2 * 2"));
 
     CHECK(evaluate("3 + 2 < 3 + 3") == evaluate("(3 + 2) < (3 + 3)"));
-    CHECK(
-        evaluate("3 + 2 < 3 + 3 + 0 && true") == evaluate("((3 + 2) < (3 + 3 + 0)) && true"));
+    CHECK(evaluate("3 + 2 < 3 + 3 + 0 && true") == evaluate("((3 + 2) < (3 + 3 + 0)) && true"));
     CHECK(evaluate("false && false || true") == EL::Value(true));
     CHECK(evaluate("false && (false || true)") == EL::Value(false));
 }

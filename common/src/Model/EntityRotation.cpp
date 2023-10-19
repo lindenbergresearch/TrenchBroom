@@ -81,9 +81,8 @@ std::ostream &operator<<(std::ostream &lhs, const EntityRotationUsage &rhs) {
 kdl_reflect_impl(EntityRotationInfo);
 
 namespace {
-std::optional<std::tuple<std::string, EntityRotationType>> selectEntityRotationType(
-    const Entity &entity, const std::vector<std::tuple<std::string, EntityRotationType>> &propertyToEntityRotationTypeMapping
-) {
+std::optional<std::tuple<std::string, EntityRotationType>>
+selectEntityRotationType(const Entity &entity, const std::vector<std::tuple<std::string, EntityRotationType>> &propertyToEntityRotationTypeMapping) {
     for (const auto &[propertyKey, entityRotationType]: propertyToEntityRotationTypeMapping) {
         if (entity.hasProperty(propertyKey)) {
             return {{propertyKey, entityRotationType}};
@@ -108,7 +107,9 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
 
     const auto *model = entity.model();
     const auto pitchType = model ? model->pitchType() : Assets::PitchType::Normal;
-    const EntityRotationType eulerType = (pitchType == Assets::PitchType::MdlInverted ? EntityRotationType::Euler : EntityRotationType::Euler_PositivePitchDown);
+    const EntityRotationType eulerType = (
+        pitchType == Assets::PitchType::MdlInverted ? EntityRotationType::Euler : EntityRotationType::Euler_PositivePitchDown
+    );
 
     // determine the type of rotation to apply to this entity
     const auto classname = entity.classname();
@@ -142,10 +143,9 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
 
             if (!entity.pointEntity()) {
                 // brush entity
-                std::tie(propertyKey, type) = selectEntityRotationType(
-                    entity, {{EntityPropertyKeys::Angles, eulerType},
-                             {EntityPropertyKeys::Mangle, eulerType},
-                             {EntityPropertyKeys::Angle,  EntityRotationType::AngleUpDown}}
+                std::tie(propertyKey, type) = selectEntityRotationType(entity, {{EntityPropertyKeys::Angles, eulerType},
+                                                                                {EntityPropertyKeys::Mangle, eulerType},
+                                                                                {EntityPropertyKeys::Angle,  EntityRotationType::AngleUpDown}}
                 ).value_or(std::make_tuple(propertyKey, type));
             }
             else {
@@ -159,14 +159,10 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
                     usage = EntityRotationUsage::BlockRotation;
                 }
 
-                std::tie(propertyKey, type) = selectEntityRotationType(
-                    entity, {{EntityPropertyKeys::Angles, eulerType},
-                             {EntityPropertyKeys::Mangle, eulerType},
-                             {EntityPropertyKeys::Angle,  EntityRotationType::AngleUpDown}}
-                ).value_or(
-                    std::make_tuple(
-                        EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown
-                    ));
+                std::tie(propertyKey, type) = selectEntityRotationType(entity, {{EntityPropertyKeys::Angles, eulerType},
+                                                                                {EntityPropertyKeys::Mangle, eulerType},
+                                                                                {EntityPropertyKeys::Angle,  EntityRotationType::AngleUpDown}}
+                ).value_or(std::make_tuple(EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown));
             }
         }
     }
@@ -174,9 +170,7 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
     return EntityRotationInfo{type, propertyKey, usage};
 }
 
-vm::mat4x4 entityRotation(
-    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info
-) {
+vm::mat4x4 entityRotation(const std::vector<EntityProperty> &properties, const EntityRotationInfo &info) {
     switch (info.type) {
         case EntityRotationType::Angle: {
             const auto it = findEntityProperty(properties, info.propertyKey);
@@ -267,8 +261,7 @@ vm::vec3 entityYawPitchRoll(const vm::mat4x4 &transformation, const vm::mat4x4 &
 
     const auto rollPitchYaw = vm::rotation_matrix_to_euler_angles(rotMat);
 
-    return vm::vec3(
-        vm::to_degrees(rollPitchYaw[2]), vm::to_degrees(rollPitchYaw[1]), vm::to_degrees(rollPitchYaw[0]));
+    return vm::vec3(vm::to_degrees(rollPitchYaw[2]), vm::to_degrees(rollPitchYaw[1]), vm::to_degrees(rollPitchYaw[0]));
 }
 
 namespace {
@@ -284,17 +277,14 @@ FloatType getEntityRotationAngle(vm::vec3 direction) {
     return angle;
 }
 
-EntityProperty setEntityRotationAngle(
-    const std::string &propertyKey, const vm::vec3 &direction
-) {
+EntityProperty setEntityRotationAngle(const std::string &propertyKey, const vm::vec3 &direction) {
     const auto angle = getEntityRotationAngle(direction);
     return {propertyKey, kdl::str_to_string(vm::round(angle))};
 }
 } // namespace
 
-std::optional<EntityProperty> applyEntityRotation(
-    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info, const vm::mat4x4 &transformation
-) {
+std::optional<EntityProperty>
+applyEntityRotation(const std::vector<EntityProperty> &properties, const EntityRotationInfo &info, const vm::mat4x4 &transformation) {
     if (info.usage == EntityRotationUsage::BlockRotation) {
         return std::nullopt;
     }
@@ -336,14 +326,11 @@ std::optional<EntityProperty> applyEntityRotation(
     }
 }
 
-void applyEntityRotation(
-    Entity &entity, const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation
-) {
+void applyEntityRotation(Entity &entity, const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation) {
     const auto info = entityRotationInfo(entity);
 
     if (const auto entityProperty = applyEntityRotation(entity.properties(), info, transformation)) {
-        entity.addOrUpdateProperty(
-            propertyConfig, entityProperty->key(), entityProperty->value());
+        entity.addOrUpdateProperty(propertyConfig, entityProperty->key(), entityProperty->value());
     }
 }
 } // namespace Model

@@ -28,14 +28,17 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-FontGlyphBuilder::FontGlyphBuilder(
-    const size_t maxAscend, size_t cellSize, const size_t margin, FontTexture &texture
-) : m_maxAscend(maxAscend), m_cellSize(cellSize), m_margin(margin), m_textureSize(texture.m_size), m_textureBuffer(texture.m_buffer), m_x(m_margin), m_y(m_margin) {
+FontGlyphBuilder::FontGlyphBuilder(const size_t maxAscend, size_t cellSize, const size_t margin, FontTexture &texture) : m_maxAscend(maxAscend),
+                                                                                                                         m_cellSize(cellSize), m_margin(margin),
+                                                                                                                         m_textureSize(texture.m_size),
+                                                                                                                         m_textureBuffer(texture.m_buffer),
+                                                                                                                         m_x(m_margin), m_y(m_margin) {
     ensure(m_textureBuffer != nullptr, "textureBuffer is null");
 }
 
-FontGlyph FontGlyphBuilder::createGlyph(
-    const size_t left, const size_t top, const size_t width, const size_t height, const size_t advance, const char *glyphBuffer, const size_t pitch
+FontGlyph
+FontGlyphBuilder::createGlyph(const size_t left, const size_t top, const size_t width, const size_t height, const size_t advance, const char *glyphBuffer,
+    const size_t pitch
 ) {
 
     if (m_x + m_cellSize + m_margin > m_textureSize) {
@@ -49,9 +52,7 @@ FontGlyph FontGlyphBuilder::createGlyph(
     return glyph;
 }
 
-void FontGlyphBuilder::drawGlyph(
-    const size_t left, const size_t top, const size_t width, const size_t height, const char *glyphBuffer, const size_t pitch
-) {
+void FontGlyphBuilder::drawGlyph(const size_t left, const size_t top, const size_t width, const size_t height, const char *glyphBuffer, const size_t pitch) {
     const size_t x = m_x + left;
     const size_t y = m_y + m_maxAscend - top;
 

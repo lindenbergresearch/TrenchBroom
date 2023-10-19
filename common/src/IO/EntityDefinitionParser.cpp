@@ -41,14 +41,14 @@ EntityDefinitionParser::EntityDefinitionParser(const Color &defaultEntityColor) 
 
 EntityDefinitionParser::~EntityDefinitionParser() {}
 
-static std::shared_ptr<Assets::PropertyDefinition> mergeAttributes(
-    const Assets::PropertyDefinition &inheritingClassAttribute, const Assets::PropertyDefinition &superClassAttribute
-) {
+static std::shared_ptr<Assets::PropertyDefinition>
+mergeAttributes(const Assets::PropertyDefinition &inheritingClassAttribute, const Assets::PropertyDefinition &superClassAttribute) {
     assert(inheritingClassAttribute.key() == superClassAttribute.key());
 
     // for now, only merge spawnflags
-    if (superClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty && inheritingClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty && superClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags &&
-        inheritingClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags) {
+    if (superClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty &&
+        inheritingClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty &&
+        superClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags && inheritingClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags) {
 
         const auto &name = inheritingClassAttribute.key();
         auto result = std::make_shared<Assets::FlagsPropertyDefinition>(name);
@@ -61,12 +61,10 @@ static std::shared_ptr<Assets::PropertyDefinition> mergeAttributes(
             const auto *classFlag = classFlags.option(static_cast<int>(1 << i));
 
             if (baseclassFlag != nullptr && classFlag == nullptr) {
-                result->addOption(
-                    baseclassFlag->value(), baseclassFlag->shortDescription(), baseclassFlag->longDescription(), baseclassFlag->isDefault());
+                result->addOption(baseclassFlag->value(), baseclassFlag->shortDescription(), baseclassFlag->longDescription(), baseclassFlag->isDefault());
             }
             else if (classFlag != nullptr) {
-                result->addOption(
-                    classFlag->value(), classFlag->shortDescription(), classFlag->longDescription(), classFlag->isDefault());
+                result->addOption(classFlag->value(), classFlag->shortDescription(), classFlag->longDescription(), classFlag->isDefault());
             }
         }
 
@@ -84,9 +82,7 @@ static std::shared_ptr<Assets::PropertyDefinition> mergeAttributes(
  * - spawnflags are merged together
  * - model definitions are merged together
  */
-static void inheritAttributes(
-    EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass
-) {
+static void inheritAttributes(EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass) {
     if (!inheritingClass.description) {
         inheritingClass.description = superClass.description;
     }
@@ -98,8 +94,8 @@ static void inheritAttributes(
     }
 
     for (const auto &attribute: superClass.propertyDefinitions) {
-        auto it = std::find_if(
-            std::begin(inheritingClass.propertyDefinitions), std::end(inheritingClass.propertyDefinitions), [&](const auto &a) { return a->key() == attribute->key(); }
+        auto it = std::find_if(std::begin(inheritingClass.propertyDefinitions), std::end(inheritingClass.propertyDefinitions),
+            [&](const auto &a) { return a->key() == attribute->key(); }
         );
         if (it == std::end(inheritingClass.propertyDefinitions)) {
             inheritingClass.propertyDefinitions.push_back(attribute);
@@ -154,20 +150,17 @@ static void inheritAttributes(
  *
  */
 template<typename F>
-static void inheritFromAndRecurse(
-    ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass, const F &findClassInfos, std::unordered_set<std::string> &visited
+static void
+inheritFromAndRecurse(ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass, const F &findClassInfos,
+    std::unordered_set<std::string> &visited
 ) {
     if (!visited.insert(superClass.name).second) {
-        status.error(
-            inheritingClass.line, inheritingClass.column, "Entity definition class hierarchy contains a cycle"
-        );
+        status.error(inheritingClass.line, inheritingClass.column, "Entity definition class hierarchy contains a cycle");
         return;
     }
 
     inheritAttributes(inheritingClass, superClass);
-    findSuperClassesAndInheritFrom(
-        status, inheritingClass, superClass, findClassInfos, visited
-    );
+    findSuperClassesAndInheritFrom(status, inheritingClass, superClass, findClassInfos, visited);
 
     visited.erase(superClass.name);
 }
@@ -209,8 +202,9 @@ static void inheritFromAndRecurse(
  * from the inheriting class to the given super class
  */
 template<typename F>
-static void findSuperClassesAndInheritFrom(
-    ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &classWithSuperClasses, const F &findClassInfos, std::unordered_set<std::string> &visited
+static void
+findSuperClassesAndInheritFrom(ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &classWithSuperClasses,
+    const F &findClassInfos, std::unordered_set<std::string> &visited
 ) {
     const auto selectSuperClass = [&](const auto &potentialSuperClasses) -> const EntityDefinitionClassInfo * {
       if (potentialSuperClasses.size() == 1u) {
@@ -240,14 +234,10 @@ static void findSuperClassesAndInheritFrom(
     for (const auto &nextSuperClassName: classWithSuperClasses.superClasses) {
         const auto *nextSuperClass = selectSuperClass(findClassInfos(nextSuperClassName));
         if (nextSuperClass == nullptr) {
-            status.error(
-                classWithSuperClasses.line, classWithSuperClasses.column, "No matching super class found for '" + nextSuperClassName + "'"
-            );
+            status.error(classWithSuperClasses.line, classWithSuperClasses.column, "No matching super class found for '" + nextSuperClassName + "'");
         }
         else {
-            inheritFromAndRecurse(
-                status, inheritingClass, *nextSuperClass, findClassInfos, visited
-            );
+            inheritFromAndRecurse(status, inheritingClass, *nextSuperClass, findClassInfos, visited);
         }
     }
 }
@@ -269,13 +259,9 @@ static void findSuperClassesAndInheritFrom(
  * super classes added
  */
 template<typename F>
-static EntityDefinitionClassInfo resolveInheritance(
-    ParserStatus &status, EntityDefinitionClassInfo inheritingClass, const F &findClassInfos
-) {
+static EntityDefinitionClassInfo resolveInheritance(ParserStatus &status, EntityDefinitionClassInfo inheritingClass, const F &findClassInfos) {
     auto visited = std::unordered_set < std::string > ();
-    findSuperClassesAndInheritFrom(
-        status, inheritingClass, inheritingClass, findClassInfos, visited
-    );
+    findSuperClassesAndInheritFrom(status, inheritingClass, inheritingClass, findClassInfos, visited);
     return inheritingClass;
 }
 
@@ -285,9 +271,7 @@ static EntityDefinitionClassInfo resolveInheritance(
  * types point and brush each. That is, any duplicate is redundant with the exception of
  * overloaded point and brush classes.
  */
-static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(
-    ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos
-) {
+static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos) {
     std::vector<EntityDefinitionClassInfo> result;
     result.reserve(classInfos.size());
 
@@ -301,14 +285,10 @@ static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(
         const auto classMask = getMask(classInfo.type);
 
         if (classMask & seenMask) {
-            status.warn(
-                classInfo.line, classInfo.column, "Duplicate class info '" + classInfo.name + "'"
-            );
+            status.warn(classInfo.line, classInfo.column, "Duplicate class info '" + classInfo.name + "'");
         }
         else if ((seenMask & baseClassMask) || (seenMask != 0 && (classMask & baseClassMask))) {
-            status.warn(
-                classInfo.line, classInfo.column, "Redundant class info '" + classInfo.name + "'"
-            );
+            status.warn(classInfo.line, classInfo.column, "Redundant class info '" + classInfo.name + "'");
         }
         else {
             result.push_back(classInfo);
@@ -326,9 +306,7 @@ static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(
  *
  * Exposed for testing.
  */
-std::vector<EntityDefinitionClassInfo> resolveInheritance(
-    ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos
-) {
+std::vector<EntityDefinitionClassInfo> resolveInheritance(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos) {
     const auto filteredClassInfos = filterRedundantClasses(status, classInfos);
     const auto findClassInfos = [&](const auto &name) -> std::vector<const EntityDefinitionClassInfo *> {
       std::vector<const EntityDefinitionClassInfo *> result;
@@ -349,9 +327,7 @@ std::vector<EntityDefinitionClassInfo> resolveInheritance(
     return result;
 }
 
-std::unique_ptr<Assets::EntityDefinition> EntityDefinitionParser::createDefinition(
-    const EntityDefinitionClassInfo &classInfo
-) const {
+std::unique_ptr<Assets::EntityDefinition> EntityDefinitionParser::createDefinition(const EntityDefinitionClassInfo &classInfo) const {
     const auto &name = classInfo.name;
     const auto color = classInfo.color.value_or(m_defaultEntityColor);
     const auto size = classInfo.size.value_or(DefaultSize);
@@ -361,20 +337,18 @@ std::unique_ptr<Assets::EntityDefinition> EntityDefinitionParser::createDefiniti
 
     switch (classInfo.type) {
         case EntityDefinitionClassType::PointClass:
-            return std::make_unique<Assets::PointEntityDefinition>(
-                name, color, size, std::move(description), std::move(attributes), std::move(modelDefinition));
+            return std::make_unique<Assets::PointEntityDefinition>(name, color, size, std::move(description), std::move(attributes),
+                std::move(modelDefinition));
         case EntityDefinitionClassType::BrushClass:
-            return std::make_unique<Assets::BrushEntityDefinition>(
-                name, color, std::move(description), std::move(attributes));
+            return std::make_unique<Assets::BrushEntityDefinition>(name, color, std::move(description), std::move(attributes));
         case EntityDefinitionClassType::BaseClass:
             return nullptr;
             switchDefault();
     };
 }
 
-std::vector<Assets::EntityDefinition *> EntityDefinitionParser::createDefinitions(
-    ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos
-) const {
+std::vector<Assets::EntityDefinition *>
+EntityDefinitionParser::createDefinitions(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos) const {
     const auto resolvedClasses = resolveInheritance(status, filterRedundantClasses(status, classInfos));
 
     std::vector<Assets::EntityDefinition *> result;
@@ -387,9 +361,7 @@ std::vector<Assets::EntityDefinition *> EntityDefinitionParser::createDefinition
     return result;
 }
 
-EntityDefinitionParser::EntityDefinitionList EntityDefinitionParser::parseDefinitions(
-    ParserStatus &status
-) {
+EntityDefinitionParser::EntityDefinitionList EntityDefinitionParser::parseDefinitions(ParserStatus &status) {
     auto classInfos = parseClassInfos(status);
     return createDefinitions(status, std::move(classInfos));
 }

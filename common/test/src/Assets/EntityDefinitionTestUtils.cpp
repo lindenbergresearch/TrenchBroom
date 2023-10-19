@@ -35,50 +35,33 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace Assets
-{
-void assertModelDefinition(
-  const ModelSpecification& expected,
-  IO::EntityDefinitionParser& parser,
-  const std::string& entityPropertiesStr)
-{
-  IO::TestParserStatus status;
-  std::vector<EntityDefinition*> definitions = parser.parseDefinitions(status);
-  CHECK(definitions.size() == 1u);
+namespace TrenchBroom {
+namespace Assets {
+void assertModelDefinition(const ModelSpecification &expected, IO::EntityDefinitionParser &parser, const std::string &entityPropertiesStr) {
+    IO::TestParserStatus status;
+    std::vector<EntityDefinition *> definitions = parser.parseDefinitions(status);
+    CHECK(definitions.size() == 1u);
 
-  EntityDefinition* definition = definitions[0];
-  CHECK(definition->type() == EntityDefinitionType::PointEntity);
+    EntityDefinition *definition = definitions[0];
+    CHECK(definition->type() == EntityDefinitionType::PointEntity);
 
-  assertModelDefinition(expected, definition, entityPropertiesStr);
+    assertModelDefinition(expected, definition, entityPropertiesStr);
 
-  kdl::vec_clear_and_delete(definitions);
+    kdl::vec_clear_and_delete(definitions);
 }
 
-void assertModelDefinition(
-  const ModelSpecification& expected,
-  const EntityDefinition* definition,
-  const std::string& entityPropertiesStr)
-{
-  assert(definition->type() == EntityDefinitionType::PointEntity);
+void assertModelDefinition(const ModelSpecification &expected, const EntityDefinition *definition, const std::string &entityPropertiesStr) {
+    assert(definition->type() == EntityDefinitionType::PointEntity);
 
-  const PointEntityDefinition* pointDefinition =
-    static_cast<const PointEntityDefinition*>(definition);
-  const ModelDefinition& modelDefinition = pointDefinition->modelDefinition();
-  assertModelDefinition(expected, modelDefinition, entityPropertiesStr);
+    const PointEntityDefinition *pointDefinition = static_cast<const PointEntityDefinition *>(definition);
+    const ModelDefinition &modelDefinition = pointDefinition->modelDefinition();
+    assertModelDefinition(expected, modelDefinition, entityPropertiesStr);
 }
 
-void assertModelDefinition(
-  const ModelSpecification& expected,
-  const ModelDefinition& actual,
-  const std::string& entityPropertiesStr)
-{
-  const auto entityPropertiesMap = IO::ELParser::parseStrict(entityPropertiesStr)
-                                     .evaluate(EL::EvaluationContext())
-                                     .mapValue();
-  const auto variableStore = EL::VariableTable(entityPropertiesMap);
-  CHECK(actual.modelSpecification(variableStore) == expected);
+void assertModelDefinition(const ModelSpecification &expected, const ModelDefinition &actual, const std::string &entityPropertiesStr) {
+    const auto entityPropertiesMap = IO::ELParser::parseStrict(entityPropertiesStr).evaluate(EL::EvaluationContext()).mapValue();
+    const auto variableStore = EL::VariableTable(entityPropertiesMap);
+    CHECK(actual.modelSpecification(variableStore) == expected);
 }
 } // namespace Assets
 } // namespace TrenchBroom

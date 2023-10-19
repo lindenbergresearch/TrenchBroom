@@ -39,9 +39,14 @@ namespace TrenchBroom {
 namespace View {
 // LayerListBoxWidget
 
-LayerListBoxWidget::LayerListBoxWidget(
-    std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent
-) : ControlListBoxItemRenderer(parent), m_document(std::move(document)), m_layer(layer), m_activeButton(nullptr), m_nameText(nullptr), m_infoText(nullptr), m_omitFromExportButton(nullptr), m_hiddenButton(nullptr), m_lockButton(nullptr) {
+LayerListBoxWidget::LayerListBoxWidget(std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent) : ControlListBoxItemRenderer(parent),
+                                                                                                                        m_document(std::move(document)),
+                                                                                                                        m_layer(layer), m_activeButton(nullptr),
+                                                                                                                        m_nameText(nullptr),
+                                                                                                                        m_infoText(nullptr),
+                                                                                                                        m_omitFromExportButton(nullptr),
+                                                                                                                        m_hiddenButton(nullptr),
+                                                                                                                        m_lockButton(nullptr) {
     m_nameText = new QLabel(QString::fromStdString(m_layer->name()));
     // Ignore the label's minimum width, this prevents a horizontal scroll bar from
     // appearing on the list widget, and instead just cuts off the label for long layer
@@ -56,23 +61,19 @@ LayerListBoxWidget::LayerListBoxWidget(
     m_lockButton = createBitmapToggleButton("Lock.svg", tr("Toggle locked state"));
 
     auto documentS = kdl::mem_lock(m_document);
-    connect(
-        m_omitFromExportButton, &QAbstractButton::clicked, this, [this]() {
+    connect(m_omitFromExportButton, &QAbstractButton::clicked, this, [this]() {
           emit layerOmitFromExportToggled(m_layer);
         }
     );
-    connect(
-        m_activeButton, &QAbstractButton::clicked, this, [this]() {
+    connect(m_activeButton, &QAbstractButton::clicked, this, [this]() {
           emit layerActiveClicked(m_layer);
         }
     );
-    connect(
-        m_hiddenButton, &QAbstractButton::clicked, this, [this]() {
+    connect(m_hiddenButton, &QAbstractButton::clicked, this, [this]() {
           emit layerVisibilityToggled(m_layer);
         }
     );
-    connect(
-        m_lockButton, &QAbstractButton::clicked, this, [this]() {
+    connect(m_lockButton, &QAbstractButton::clicked, this, [this]() {
           emit layerLockToggled(m_layer);
         }
     );
@@ -82,9 +83,7 @@ LayerListBoxWidget::LayerListBoxWidget(
     m_infoText->installEventFilter(this);
 
     auto *textLayout = new QVBoxLayout();
-    textLayout->setContentsMargins(
-        0, LayoutConstants::NarrowVMargin, 0, LayoutConstants::NarrowVMargin
-    );
+    textLayout->setContentsMargins(0, LayoutConstants::NarrowVMargin, 0, LayoutConstants::NarrowVMargin);
     textLayout->setSpacing(LayoutConstants::NarrowVMargin);
     textLayout->addWidget(m_nameText, 1);
     textLayout->addWidget(m_infoText, 1);
@@ -180,15 +179,11 @@ void LayerListBox::connectObservers() {
     m_notifierConnection += document->documentWasNewedNotifier.connect(this, &LayerListBox::documentDidChange);
     m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &LayerListBox::documentDidChange);
     m_notifierConnection += document->documentWasClearedNotifier.connect(this, &LayerListBox::documentDidChange);
-    m_notifierConnection += document->currentLayerDidChangeNotifier.connect(
-        this, &LayerListBox::currentLayerDidChange
-    );
+    m_notifierConnection += document->currentLayerDidChangeNotifier.connect(this, &LayerListBox::currentLayerDidChange);
     m_notifierConnection += document->nodesWereAddedNotifier.connect(this, &LayerListBox::nodesDidChange);
     m_notifierConnection += document->nodesWereRemovedNotifier.connect(this, &LayerListBox::nodesDidChange);
     m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &LayerListBox::nodesDidChange);
-    m_notifierConnection += document->nodeVisibilityDidChangeNotifier.connect(
-        this, &LayerListBox::nodesDidChange
-    );
+    m_notifierConnection += document->nodeVisibilityDidChangeNotifier.connect(this, &LayerListBox::nodesDidChange);
     m_notifierConnection += document->nodeLockingDidChangeNotifier.connect(this, &LayerListBox::nodesDidChange);
 }
 
@@ -223,9 +218,7 @@ size_t LayerListBox::itemCount() const {
     return world->allLayers().size();
 }
 
-ControlListBoxItemRenderer *LayerListBox::createItemRenderer(
-    QWidget *parent, const size_t index
-) {
+ControlListBoxItemRenderer *LayerListBox::createItemRenderer(QWidget *parent, const size_t index) {
     auto document = kdl::mem_lock(m_document);
     auto *world = document->world();
 
@@ -237,24 +230,12 @@ ControlListBoxItemRenderer *LayerListBox::createItemRenderer(
         layer = world->customLayersUserSorted().at(index - 1);
     }
     auto *renderer = new LayerListBoxWidget(document, layer, parent);
-    connect(
-        renderer, &LayerListBoxWidget::layerActiveClicked, this, &LayerListBox::layerSetCurrent
-    );
-    connect(
-        renderer, &LayerListBoxWidget::layerDoubleClicked, this, &LayerListBox::layerSetCurrent
-    );
-    connect(
-        renderer, &LayerListBoxWidget::layerRightClicked, this, &LayerListBox::layerRightClicked
-    );
-    connect(
-        renderer, &LayerListBoxWidget::layerOmitFromExportToggled, this, &LayerListBox::layerOmitFromExportToggled
-    );
-    connect(
-        renderer, &LayerListBoxWidget::layerVisibilityToggled, this, &LayerListBox::layerVisibilityToggled
-    );
-    connect(
-        renderer, &LayerListBoxWidget::layerLockToggled, this, &LayerListBox::layerLockToggled
-    );
+    connect(renderer, &LayerListBoxWidget::layerActiveClicked, this, &LayerListBox::layerSetCurrent);
+    connect(renderer, &LayerListBoxWidget::layerDoubleClicked, this, &LayerListBox::layerSetCurrent);
+    connect(renderer, &LayerListBoxWidget::layerRightClicked, this, &LayerListBox::layerRightClicked);
+    connect(renderer, &LayerListBoxWidget::layerOmitFromExportToggled, this, &LayerListBox::layerOmitFromExportToggled);
+    connect(renderer, &LayerListBoxWidget::layerVisibilityToggled, this, &LayerListBox::layerVisibilityToggled);
+    connect(renderer, &LayerListBoxWidget::layerLockToggled, this, &LayerListBox::layerLockToggled);
     return renderer;
 }
 

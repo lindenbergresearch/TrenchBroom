@@ -55,8 +55,8 @@ IssueQuickFix makeDeleteNodesQuickFix();
 
 IssueQuickFix makeRemoveEntityPropertiesQuickFix(IssueType type);
 
-IssueQuickFix makeTransformEntityPropertiesQuickFix(
-    IssueType type, std::string description, std::function<std::string(const std::string &)> keyTransform, std::function<std::string(const std::string &)> valueTransform
+IssueQuickFix makeTransformEntityPropertiesQuickFix(IssueType type, std::string description, std::function<std::string(const std::string &)> keyTransform,
+    std::function<std::string(const std::string &)> valueTransform
 );
 } // namespace Model
 } // namespace TrenchBroom

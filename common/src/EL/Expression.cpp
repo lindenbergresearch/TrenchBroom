@@ -28,44 +28,49 @@
 
 namespace TrenchBroom {
 namespace EL {
-Expression::Expression(
-    std::unique_ptr<ExpressionImpl> expression, const size_t line, const size_t column
-) : m_expression{std::move(expression)}, m_line{line}, m_column{column} {
+Expression::Expression(std::unique_ptr<ExpressionImpl> expression, const size_t line, const size_t column) : m_expression{std::move(expression)}, m_line{line},
+                                                                                                             m_column{column} {
 }
 
-Expression::Expression(
-    LiteralExpression expression, const size_t line, const size_t column
-) : m_expression{std::make_shared<LiteralExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(LiteralExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<LiteralExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
-Expression::Expression(
-    VariableExpression expression, const size_t line, const size_t column
-) : m_expression{std::make_shared<VariableExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(VariableExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<VariableExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
-Expression::Expression(ArrayExpression expression, const size_t line, const size_t column) : m_expression{std::make_shared<ArrayExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(ArrayExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<ArrayExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
-Expression::Expression(MapExpression expression, const size_t line, const size_t column) : m_expression{std::make_shared<MapExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(MapExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<MapExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
-Expression::Expression(UnaryExpression expression, const size_t line, const size_t column) : m_expression{std::make_shared<UnaryExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(UnaryExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<UnaryExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
-Expression::Expression(
-    BinaryExpression expression, const size_t line, const size_t column
-) : m_expression{std::make_shared<BinaryExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(BinaryExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<BinaryExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
     rebalanceByPrecedence();
 }
 
-Expression::Expression(
-    SubscriptExpression expression, const size_t line, const size_t column
-) : m_expression{std::make_shared<SubscriptExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(SubscriptExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<SubscriptExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
-Expression::Expression(
-    SwitchExpression expression, const size_t line, const size_t column
-) : m_expression{std::make_shared<SwitchExpression>(std::move(expression))}, m_line{line}, m_column{column} {
+Expression::Expression(SwitchExpression expression, const size_t line, const size_t column) : m_expression{
+    std::make_shared<SwitchExpression>(std::move(expression))
+}, m_line{line}, m_column{column} {
 }
 
 Value Expression::evaluate(const EvaluationContext &context) const {

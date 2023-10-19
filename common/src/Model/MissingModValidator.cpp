@@ -47,15 +47,17 @@ private:
     std::string m_mod;
 
 public:
-    MissingModIssue(EntityNodeBase &entityNode, std::string mod, std::string description) : Issue{Type, entityNode, std::move(description)}, m_mod{std::move(mod)} {
+    MissingModIssue(EntityNodeBase &entityNode, std::string mod, std::string description) : Issue{
+        Type, entityNode, std::move(description)
+    }, m_mod{
+        std::move(mod)
+    } {
     }
 
     const std::string &mod() const { return m_mod; }
 };
 
-std::vector<std::string> removeMissingMods(
-    std::vector<std::string> mods, const std::vector<const Issue *> &issues
-) {
+std::vector<std::string> removeMissingMods(std::vector<std::string> mods, const std::vector<const Issue *> &issues) {
     for (const auto *issue: issues) {
         if (issue->type() == Type) {
             const auto *modIssue = static_cast<const MissingModIssue *>(issue);
@@ -67,26 +69,27 @@ std::vector<std::string> removeMissingMods(
 }
 
 IssueQuickFix makeRemoveModsQuickFix() {
-    return {"Remove Mod", [](MapFacade &facade, const std::vector<const Issue *> &issues) {
-      const auto pushSelection = PushSelection{facade};
+    return {
+        "Remove Mod", [](MapFacade &facade, const std::vector<const Issue *> &issues) {
+          const auto pushSelection = PushSelection{facade};
 
-      // If nothing is selected, property changes will affect only world.
-      facade.deselectAll();
+          // If nothing is selected, property changes will affect only world.
+          facade.deselectAll();
 
-      const auto oldMods = facade.mods();
-      const auto newMods = removeMissingMods(oldMods, issues);
-      facade.setMods(newMods);
-    }};
+          const auto oldMods = facade.mods();
+          const auto newMods = removeMissingMods(oldMods, issues);
+          facade.setMods(newMods);
+        }};
 }
 } // namespace
 
-MissingModValidator::MissingModValidator(std::weak_ptr<Game> game) : Validator{Type, "Missing mod directory"}, m_game{std::move(game)} {
+MissingModValidator::MissingModValidator(std::weak_ptr<Game> game) : Validator{Type, "Missing mod directory"}, m_game{
+    std::move(game)
+} {
     addQuickFix(makeRemoveModsQuickFix());
 }
 
-void MissingModValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues
-) const {
+void MissingModValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
     if (entityNode.entity().classname() != EntityPropertyValues::WorldspawnClassname) {
         return;
     }
@@ -102,15 +105,15 @@ void MissingModValidator::doValidate(
         return;
     }
 
-    const auto additionalSearchPaths = kdl::vec_transform(mods, [](const auto &mod) { return std::filesystem::path{mod}; });
+    const auto additionalSearchPaths = kdl::vec_transform(mods, [](const auto &mod) {
+          return std::filesystem::path{mod};
+        }
+    );
     const auto errors = game->checkAdditionalSearchPaths(additionalSearchPaths);
 
     for (const auto &[searchPath, message]: errors) {
         const auto mod = searchPath.string();
-        issues.push_back(
-            std::make_unique<MissingModIssue>(
-                entityNode, mod, "Mod '" + mod + "' could not be used: " + message
-            ));
+        issues.push_back(std::make_unique<MissingModIssue>(entityNode, mod, "Mod '" + mod + "' could not be used: " + message));
     }
 
     m_lastMods = std::move(mods);

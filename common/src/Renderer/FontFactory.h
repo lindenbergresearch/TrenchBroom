@@ -41,9 +41,7 @@ public:
     std::unique_ptr<TextureFont> createFont(const FontDescriptor &fontDescriptor);
 
 private:
-    virtual std::unique_ptr<TextureFont> doCreateFont(
-        const FontDescriptor &fontDescriptor
-    ) = 0;
+    virtual std::unique_ptr<TextureFont> doCreateFont(const FontDescriptor &fontDescriptor) = 0;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

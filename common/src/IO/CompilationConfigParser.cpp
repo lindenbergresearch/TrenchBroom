@@ -32,9 +32,7 @@
 
 namespace TrenchBroom {
 namespace IO {
-CompilationConfigParser::CompilationConfigParser(
-    const std::string_view str, std::filesystem::path path
-) : ConfigParserBase{str, std::move(path)} {
+CompilationConfigParser::CompilationConfigParser(const std::string_view str, std::filesystem::path path) : ConfigParserBase{str, std::move(path)} {
 }
 
 Model::CompilationConfig CompilationConfigParser::parse() {
@@ -50,9 +48,7 @@ Model::CompilationConfig CompilationConfigParser::parse() {
     return Model::CompilationConfig{parseProfiles(root["profiles"])};
 }
 
-std::vector<Model::CompilationProfile> CompilationConfigParser::parseProfiles(
-    const EL::Value &value
-) const {
+std::vector<Model::CompilationProfile> CompilationConfigParser::parseProfiles(const EL::Value &value) const {
     auto result = std::vector<Model::CompilationProfile>{};
     result.reserve(value.length());
 
@@ -62,19 +58,13 @@ std::vector<Model::CompilationProfile> CompilationConfigParser::parseProfiles(
     return result;
 }
 
-Model::CompilationProfile CompilationConfigParser::parseProfile(
-    const EL::Value &value
-) const {
-    expectStructure(
-        value, "[ {'name': 'String', 'workdir': 'String', 'tasks': 'Array'}, {} ]"
-    );
+Model::CompilationProfile CompilationConfigParser::parseProfile(const EL::Value &value) const {
+    expectStructure(value, "[ {'name': 'String', 'workdir': 'String', 'tasks': 'Array'}, {} ]");
 
     return {value["name"].stringValue(), value["workdir"].stringValue(), parseTasks(value["tasks"])};
 }
 
-std::vector<Model::CompilationTask> CompilationConfigParser::parseTasks(
-    const EL::Value &value
-) const {
+std::vector<Model::CompilationTask> CompilationConfigParser::parseTasks(const EL::Value &value) const {
     auto result = std::vector<Model::CompilationTask>{};
     result.reserve(value.length());
 
@@ -107,58 +97,41 @@ Model::CompilationTask CompilationConfigParser::parseTask(const EL::Value &value
     throw ParserException{"Unknown compilation task type '" + typeName + "'"};
 }
 
-Model::CompilationExportMap CompilationConfigParser::parseExportTask(
-    const EL::Value &value
-) const {
-    expectStructure(
-        value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]"
-    );
+Model::CompilationExportMap CompilationConfigParser::parseExportTask(const EL::Value &value) const {
+    expectStructure(value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]");
 
     const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
     return {enabled, value["target"].stringValue()};
 }
 
-Model::CompilationCopyFiles CompilationConfigParser::parseCopyTask(
-    const EL::Value &value
-) const {
-    expectStructure(
-        value, "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
-               "'Boolean' } ]"
+Model::CompilationCopyFiles CompilationConfigParser::parseCopyTask(const EL::Value &value) const {
+    expectStructure(value, "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
+                           "'Boolean' } ]"
     );
 
     const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
     return {enabled, value["source"].stringValue(), value["target"].stringValue()};
 }
 
-Model::CompilationRenameFile CompilationConfigParser::parseRenameTask(
-    const EL::Value &value
-) const {
-    expectStructure(
-        value, "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
-               "'Boolean' } ]"
+Model::CompilationRenameFile CompilationConfigParser::parseRenameTask(const EL::Value &value) const {
+    expectStructure(value, "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
+                           "'Boolean' } ]"
     );
 
     const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
     return {enabled, value["source"].stringValue(), value["target"].stringValue()};
 }
 
-Model::CompilationDeleteFiles CompilationConfigParser::parseDeleteTask(
-    const EL::Value &value
-) const {
-    expectStructure(
-        value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]"
-    );
+Model::CompilationDeleteFiles CompilationConfigParser::parseDeleteTask(const EL::Value &value) const {
+    expectStructure(value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]");
 
     const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
     return {enabled, value["target"].stringValue()};
 }
 
-Model::CompilationRunTool CompilationConfigParser::parseToolTask(
-    const EL::Value &value
-) const {
-    expectStructure(
-        value, "[ {'type': 'String', 'tool': 'String', 'parameters': 'String'}, { 'enabled': "
-               "'Boolean', 'treatNonZeroResultCodeAsError': 'Boolean' } ]"
+Model::CompilationRunTool CompilationConfigParser::parseToolTask(const EL::Value &value) const {
+    expectStructure(value, "[ {'type': 'String', 'tool': 'String', 'parameters': 'String'}, { 'enabled': "
+                           "'Boolean', 'treatNonZeroResultCodeAsError': 'Boolean' } ]"
     );
 
     const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;

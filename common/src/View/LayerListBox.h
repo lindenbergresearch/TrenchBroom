@@ -54,9 +54,7 @@ private:
     QAbstractButton *m_lockButton;
 
 public:
-    LayerListBoxWidget(
-        std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent = nullptr
-    );
+    LayerListBoxWidget(std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent = nullptr);
 
     void updateItem() override;
 

@@ -38,9 +38,7 @@ private:
     ElidedLabel *m_pathLabel{nullptr};
 
 public:
-    explicit GameEngineProfileItemRenderer(
-        Model::GameEngineProfile &profile, QWidget *parent = nullptr
-    );
+    explicit GameEngineProfileItemRenderer(Model::GameEngineProfile &profile, QWidget *parent = nullptr);
 
     void updateItem() override;
 
@@ -60,9 +58,7 @@ private:
     Model::GameEngineConfig *m_config;
 
 public:
-    explicit GameEngineProfileListBox(
-        Model::GameEngineConfig &config, QWidget *parent = nullptr
-    );
+    explicit GameEngineProfileListBox(Model::GameEngineConfig &config, QWidget *parent = nullptr);
 
     Model::GameEngineProfile *selectedProfile();
 

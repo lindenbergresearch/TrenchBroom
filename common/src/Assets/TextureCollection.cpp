@@ -39,15 +39,14 @@ TextureCollection::TextureCollection(std::vector<Texture> textures) : m_textures
 TextureCollection::TextureCollection(std::filesystem::path path) : m_path{std::move(path)} {
 }
 
-TextureCollection::TextureCollection(
-    std::filesystem::path path, std::vector<Texture> textures
-) : m_path{std::move(path)}, m_textures{std::move(textures)}, m_loaded{true} {
+TextureCollection::TextureCollection(std::filesystem::path path, std::vector<Texture> textures) : m_path{
+    std::move(path)
+}, m_textures{std::move(textures)}, m_loaded{true} {
 }
 
 TextureCollection::~TextureCollection() {
     if (!m_textureIds.empty()) {
-        glAssert(glDeleteTextures(
-            static_cast<GLsizei>(m_textureIds.size()), static_cast<GLuint *>(&m_textureIds.front())));
+        glAssert(glDeleteTextures(static_cast<GLsizei>(m_textureIds.size()), static_cast<GLuint *>(&m_textureIds.front())));
         m_textureIds.clear();
     }
 }
@@ -86,8 +85,7 @@ Texture *TextureCollection::textureByIndex(const size_t index) {
 }
 
 const Texture *TextureCollection::textureByName(const std::string &name) const {
-    const auto it = std::find_if(
-        m_textures.begin(), m_textures.end(), [&](const auto &texture) {
+    const auto it = std::find_if(m_textures.begin(), m_textures.end(), [&](const auto &texture) {
           return texture.name() == name;
         }
     );
@@ -108,8 +106,7 @@ void TextureCollection::prepare(const int minFilter, const int magFilter) {
 
     m_textureIds.resize(textureCount());
     if (textureCount() != 0u) {
-        glAssert(glGenTextures(
-            static_cast<GLsizei>(textureCount()), static_cast<GLuint *>(&m_textureIds.front())));
+        glAssert(glGenTextures(static_cast<GLsizei>(textureCount()), static_cast<GLuint *>(&m_textureIds.front())));
 
         for (size_t i = 0; i < textureCount(); ++i) {
             auto &texture = m_textures[i];

@@ -39,12 +39,9 @@ MissingClassnameValidator::MissingClassnameValidator() : Validator{Type, "Missin
     addQuickFix(makeDeleteNodesQuickFix());
 }
 
-void MissingClassnameValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues
-) const {
+void MissingClassnameValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
     if (!entityNode.entity().hasProperty(EntityPropertyKeys::Classname)) {
-        issues.push_back(
-            std::make_unique<Issue>(Type, entityNode, "Entity has no classname property"));
+        issues.push_back(std::make_unique<Issue>(Type, entityNode, "Entity has no classname property"));
     }
 }
 } // namespace Model

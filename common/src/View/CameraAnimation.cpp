@@ -27,10 +27,15 @@
 namespace TrenchBroom::View {
 const Animation::Type CameraAnimation::AnimationType = Animation::freeType();
 
-CameraAnimation::CameraAnimation(
-    Renderer::Camera &camera, const vm::vec3f &targetPosition, const vm::vec3f &targetDirection, const vm::vec3f &targetUp, const float targetZoom, const double duration
-) : Animation{AnimationType, Curve::EaseInEaseOut, duration}, m_camera{camera}, m_startPosition{m_camera.position()}, m_startDirection{m_camera.direction()}, m_startUp{m_camera.up()}, m_startZoom{m_camera.zoom()},
-    m_targetPosition{targetPosition}, m_targetDirection{targetDirection}, m_targetUp{targetUp}, m_targetZoom{targetZoom} {
+CameraAnimation::CameraAnimation(Renderer::Camera &camera, const vm::vec3f &targetPosition, const vm::vec3f &targetDirection, const vm::vec3f &targetUp,
+    const float targetZoom, const double duration
+) : Animation{AnimationType, Curve::EaseInEaseOut, duration}, m_camera{camera}, m_startPosition{
+    m_camera.position()
+}, m_startDirection{m_camera.direction()}, m_startUp{m_camera.up()}, m_startZoom{
+    m_camera.zoom()
+}, m_targetPosition{targetPosition}, m_targetDirection{targetDirection}, m_targetUp{
+    targetUp
+}, m_targetZoom{targetZoom} {
 }
 
 void CameraAnimation::doUpdate(const double progress) {

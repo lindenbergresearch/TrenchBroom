@@ -74,9 +74,10 @@ vm::vec2f SimpleTextAnchor::extraOffsets(const TextAlignment::Type /* a */) cons
     return m_extraOffsets;
 }
 
-SimpleTextAnchor::SimpleTextAnchor(
-    const vm::vec3f &position, const TextAlignment::Type alignment, const vm::vec2f &extraOffsets
-) : m_position(position), m_alignment(alignment), m_extraOffsets(extraOffsets) {
+SimpleTextAnchor::SimpleTextAnchor(const vm::vec3f &position, const TextAlignment::Type alignment, const vm::vec2f &extraOffsets) : m_position(position),
+                                                                                                                                    m_alignment(alignment),
+                                                                                                                                    m_extraOffsets(extraOffsets
+                                                                                                                                    ) {
 }
 } // namespace Renderer
 } // namespace TrenchBroom

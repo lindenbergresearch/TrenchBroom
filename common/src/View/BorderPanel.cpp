@@ -51,12 +51,10 @@ void BorderPanel::paintEvent(QPaintEvent * /*event*/) {
         painter.drawRect(QRectF(r.topLeft(), QSizeF(r.width(), thickness)));
     }
     if ((m_borders & RightSide) != 0) {
-        painter.drawRect(
-            QRectF(r.topRight() - QPointF(thickness, 0.0), QSizeF(thickness, r.height())));
+        painter.drawRect(QRectF(r.topRight() - QPointF(thickness, 0.0), QSizeF(thickness, r.height())));
     }
     if ((m_borders & BottomSide) != 0) {
-        painter.drawRect(
-            QRectF(r.bottomLeft() - QPointF(0.0, thickness), QSizeF(r.width(), thickness)));
+        painter.drawRect(QRectF(r.bottomLeft() - QPointF(0.0, thickness), QSizeF(r.width(), thickness)));
     }
 }
 } // namespace View

@@ -41,9 +41,8 @@
 #include <vector>
 
 namespace TrenchBroom::View {
-FaceInspector::FaceInspector(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
-) : TabBookPage{parent}, m_document{std::move(document)} {
+FaceInspector::FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : TabBookPage{parent},
+                                                                                                                       m_document{std::move(document)} {
     createGui(m_document, contextManager);
 }
 
@@ -60,9 +59,7 @@ void FaceInspector::revealTexture(const Assets::Texture *texture) {
     m_textureBrowser->setSelectedTexture(texture);
 }
 
-void FaceInspector::createGui(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager
-) {
+void FaceInspector::createGui(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
     m_splitter = new Splitter{Qt::Vertical};
     m_splitter->setObjectName("FaceInspector_Splitter");
 
@@ -79,23 +76,17 @@ void FaceInspector::createGui(
     layout->addWidget(m_splitter, 1);
     setLayout(layout);
 
-    connect(
-        m_textureBrowser, &TextureBrowser::textureSelected, this, &FaceInspector::textureSelected
-    );
+    connect(m_textureBrowser, &TextureBrowser::textureSelected, this, &FaceInspector::textureSelected);
 
     restoreWindowState(m_splitter);
 }
 
-QWidget *FaceInspector::createFaceAttribsEditor(
-    QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager
-) {
+QWidget *FaceInspector::createFaceAttribsEditor(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
     m_faceAttribsEditor = new FaceAttribsEditor{std::move(document), contextManager, parent};
     return m_faceAttribsEditor;
 }
 
-QWidget *FaceInspector::createTextureBrowser(
-    QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager
-) {
+QWidget *FaceInspector::createTextureBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
     auto *panel = new TitledPanel{tr("Texture Browser"), parent};
     m_textureBrowser = new TextureBrowser{std::move(document), contextManager};
 
@@ -108,11 +99,8 @@ QWidget *FaceInspector::createTextureBrowser(
     return panel;
 }
 
-static bool allFacesHaveTexture(
-    const std::vector<Model::BrushFaceHandle> &faceHandles, const Assets::Texture *texture
-) {
-    return std::all_of(
-        faceHandles.begin(), faceHandles.end(), [&](const auto &faceHandle) {
+static bool allFacesHaveTexture(const std::vector<Model::BrushFaceHandle> &faceHandles, const Assets::Texture *texture) {
+    return std::all_of(faceHandles.begin(), faceHandles.end(), [&](const auto &faceHandle) {
           return faceHandle.face().texture() == texture;
         }
     );
@@ -132,9 +120,7 @@ void FaceInspector::textureSelected(const Assets::Texture *texture) {
             document->setFaceAttributes(request);
         }
         else {
-            document->setCurrentTextureName(
-                document->currentTextureName() != texture->name() ? texture->name() : Model::BrushFaceAttributes::NoTextureName
-            );
+            document->setCurrentTextureName(document->currentTextureName() != texture->name() ? texture->name() : Model::BrushFaceAttributes::NoTextureName);
         }
     }
 }

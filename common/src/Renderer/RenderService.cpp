@@ -45,8 +45,7 @@ namespace Renderer {
 Renderer::FontDescriptor makeRenderServiceFont();
 
 Renderer::FontDescriptor makeRenderServiceFont() {
-    return Renderer::FontDescriptor(
-        pref(Preferences::RendererFontPath), static_cast<size_t>(pref(Preferences::RendererFontSize)));
+    return Renderer::FontDescriptor(pref(Preferences::RendererFontPath), static_cast<size_t>(pref(Preferences::RendererFontSize)));
 }
 
 class RenderService::HeadsUpTextAnchor : public TextAnchor {
@@ -67,10 +66,14 @@ private:
     }
 };
 
-RenderService::RenderService(RenderContext &renderContext, RenderBatch &renderBatch) : m_renderContext(renderContext), m_renderBatch(renderBatch), m_textRenderer(std::make_unique<TextRenderer>(makeRenderServiceFont())),
-                                                                                       m_pointHandleRenderer(std::make_unique<PointHandleRenderer>()), m_primitiveRenderer(std::make_unique<PrimitiveRenderer>()),
-                                                                                       m_foregroundColor(1.0f, 1.0f, 1.0f, 1.0f), m_backgroundColor(0.0f, 0.0f, 0.0f, 1.0f), m_lineWidth(1.0f),
-                                                                                       m_occlusionPolicy(PrimitiveRendererOcclusionPolicy::Transparent), m_cullingPolicy(PrimitiveRendererCullingPolicy::CullBackfaces) {
+RenderService::RenderService(RenderContext &renderContext, RenderBatch &renderBatch) : m_renderContext(renderContext), m_renderBatch(renderBatch),
+                                                                                       m_textRenderer(std::make_unique<TextRenderer>(makeRenderServiceFont())),
+                                                                                       m_pointHandleRenderer(std::make_unique<PointHandleRenderer>()),
+                                                                                       m_primitiveRenderer(std::make_unique<PrimitiveRenderer>()),
+                                                                                       m_foregroundColor(1.0f, 1.0f, 1.0f, 1.0f),
+                                                                                       m_backgroundColor(0.0f, 0.0f, 0.0f, 1.0f), m_lineWidth(1.0f),
+                                                                                       m_occlusionPolicy(PrimitiveRendererOcclusionPolicy::Transparent),
+                                                                                       m_cullingPolicy(PrimitiveRendererCullingPolicy::CullBackfaces) {
 }
 
 RenderService::~RenderService() {
@@ -110,26 +113,20 @@ void RenderService::setCullBackfaces() {
 }
 
 void RenderService::renderString(const AttrString &string, const vm::vec3f &position) {
-    renderString(
-        string, SimpleTextAnchor(position, TextAlignment::Bottom, vm::vec2f(0.0f, 16.0f)));
+    renderString(string, SimpleTextAnchor(position, TextAlignment::Bottom, vm::vec2f(0.0f, 16.0f)));
 }
 
 void RenderService::renderString(const AttrString &string, const TextAnchor &position) {
     if (m_occlusionPolicy != PrimitiveRendererOcclusionPolicy::Hide) {
-        m_textRenderer->renderStringOnTop(
-            m_renderContext, m_foregroundColor, m_backgroundColor, string, position
-        );
+        m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, position);
     }
     else {
-        m_textRenderer->renderString(
-            m_renderContext, m_foregroundColor, m_backgroundColor, string, position
-        );
+        m_textRenderer->renderString(m_renderContext, m_foregroundColor, m_backgroundColor, string, position);
     }
 }
 
 void RenderService::renderHeadsUp(const AttrString &string) {
-    m_textRenderer->renderStringOnTop(
-        m_renderContext, m_foregroundColor, m_backgroundColor, string, HeadsUpTextAnchor());
+    m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, HeadsUpTextAnchor());
 }
 
 void RenderService::renderString(const std::string &string, const vm::vec3f &position) {
@@ -163,14 +160,12 @@ void RenderService::renderHandles(const std::vector<vm::segment3f> &positions) {
 }
 
 void RenderService::renderHandle(const vm::segment3f &position) {
-    m_primitiveRenderer->renderLine(
-        m_foregroundColor, m_lineWidth, m_occlusionPolicy, position.start(), position.end());
+    m_primitiveRenderer->renderLine(m_foregroundColor, m_lineWidth, m_occlusionPolicy, position.start(), position.end());
     renderHandle(position.center());
 }
 
 void RenderService::renderHandleHighlight(const vm::segment3f &position) {
-    m_primitiveRenderer->renderLine(
-        m_foregroundColor, 2.0f * m_lineWidth, m_occlusionPolicy, position.start(), position.end());
+    m_primitiveRenderer->renderLine(m_foregroundColor, 2.0f * m_lineWidth, m_occlusionPolicy, position.start(), position.end());
     renderHandleHighlight(position.center());
 }
 
@@ -181,34 +176,26 @@ void RenderService::renderHandles(const std::vector<vm::polygon3f> &positions) {
 
 void RenderService::renderHandle(const vm::polygon3f &position) {
     setShowBackfaces();
-    m_primitiveRenderer->renderFilledPolygon(
-        mixAlpha(m_foregroundColor, 0.07f), m_occlusionPolicy, m_cullingPolicy, position.vertices());
+    m_primitiveRenderer->renderFilledPolygon(mixAlpha(m_foregroundColor, 0.07f), m_occlusionPolicy, m_cullingPolicy, position.vertices());
     renderHandle(position.center());
     setCullBackfaces();
 }
 
 void RenderService::renderHandleHighlight(const vm::polygon3f &position) {
-    m_primitiveRenderer->renderPolygon(
-        m_foregroundColor, 2.0f * m_lineWidth, m_occlusionPolicy, position.vertices());
+    m_primitiveRenderer->renderPolygon(m_foregroundColor, 2.0f * m_lineWidth, m_occlusionPolicy, position.vertices());
     renderHandleHighlight(position.center());
 }
 
 void RenderService::renderLine(const vm::vec3f &start, const vm::vec3f &end) {
-    m_primitiveRenderer->renderLine(
-        m_foregroundColor, m_lineWidth, m_occlusionPolicy, start, end
-    );
+    m_primitiveRenderer->renderLine(m_foregroundColor, m_lineWidth, m_occlusionPolicy, start, end);
 }
 
 void RenderService::renderLines(const std::vector<vm::vec3f> &positions) {
-    m_primitiveRenderer->renderLines(
-        m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions
-    );
+    m_primitiveRenderer->renderLines(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
 
 void RenderService::renderLineStrip(const std::vector<vm::vec3f> &positions) {
-    m_primitiveRenderer->renderLineStrip(
-        m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions
-    );
+    m_primitiveRenderer->renderLineStrip(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
 
 void RenderService::renderCoordinateSystem(const vm::bbox3f &bounds) {
@@ -220,39 +207,27 @@ void RenderService::renderCoordinateSystem(const vm::bbox3f &bounds) {
         const Camera &camera = m_renderContext.camera();
         switch (vm::find_abs_max_component(camera.direction())) {
             case vm::axis::x:
-                m_primitiveRenderer->renderCoordinateSystemYZ(
-                    y, z, m_lineWidth, m_occlusionPolicy, bounds
-                );
+                m_primitiveRenderer->renderCoordinateSystemYZ(y, z, m_lineWidth, m_occlusionPolicy, bounds);
                 break;
             case vm::axis::y:
-                m_primitiveRenderer->renderCoordinateSystemXZ(
-                    x, z, m_lineWidth, m_occlusionPolicy, bounds
-                );
+                m_primitiveRenderer->renderCoordinateSystemXZ(x, z, m_lineWidth, m_occlusionPolicy, bounds);
                 break;
             default:
-                m_primitiveRenderer->renderCoordinateSystemXY(
-                    x, y, m_lineWidth, m_occlusionPolicy, bounds
-                );
+                m_primitiveRenderer->renderCoordinateSystemXY(x, y, m_lineWidth, m_occlusionPolicy, bounds);
                 break;
         }
     }
     else {
-        m_primitiveRenderer->renderCoordinateSystem3D(
-            x, y, z, m_lineWidth, m_occlusionPolicy, bounds
-        );
+        m_primitiveRenderer->renderCoordinateSystem3D(x, y, z, m_lineWidth, m_occlusionPolicy, bounds);
     }
 }
 
 void RenderService::renderPolygonOutline(const std::vector<vm::vec3f> &positions) {
-    m_primitiveRenderer->renderPolygon(
-        m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions
-    );
+    m_primitiveRenderer->renderPolygon(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
 
 void RenderService::renderFilledPolygon(const std::vector<vm::vec3f> &positions) {
-    m_primitiveRenderer->renderFilledPolygon(
-        m_foregroundColor, m_occlusionPolicy, m_cullingPolicy, positions
-    );
+    m_primitiveRenderer->renderFilledPolygon(m_foregroundColor, m_occlusionPolicy, m_cullingPolicy, positions);
 }
 
 void RenderService::renderBounds(const vm::bbox3f &bounds) {
@@ -295,36 +270,34 @@ void RenderService::renderBounds(const vm::bbox3f &bounds) {
     renderLines(positions);
 }
 
-void RenderService::renderCircle(
-    const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const vm::vec3f &startAxis, const vm::vec3f &endAxis
+void RenderService::renderCircle(const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const vm::vec3f &startAxis,
+    const vm::vec3f &endAxis
 ) {
     const std::pair<float, float> angles = startAngleAndLength(normal, startAxis, endAxis);
     renderCircle(position, normal, segments, radius, angles.first, angles.second);
 }
 
-void RenderService::renderCircle(
-    const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const float startAngle, const float angleLength
+void RenderService::renderCircle(const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const float startAngle,
+    const float angleLength
 ) {
     const std::vector<vm::vec3f> positions = circle2D(radius, normal, startAngle, angleLength, segments) + position;
-    m_primitiveRenderer->renderLineStrip(
-        m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions
-    );
+    m_primitiveRenderer->renderLineStrip(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
 
-void RenderService::renderFilledCircle(
-    const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const vm::vec3f &startAxis, const vm::vec3f &endAxis
+void
+RenderService::renderFilledCircle(const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const vm::vec3f &startAxis,
+    const vm::vec3f &endAxis
 ) {
     const std::pair<float, float> angles = startAngleAndLength(normal, startAxis, endAxis);
     renderFilledCircle(position, normal, segments, radius, angles.first, angles.second);
 }
 
-void RenderService::renderFilledCircle(
-    const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const float startAngle, const float angleLength
+void
+RenderService::renderFilledCircle(const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const float startAngle,
+    const float angleLength
 ) {
     const std::vector<vm::vec3f> positions = circle2D(radius, normal, startAngle, angleLength, segments) + position;
-    m_primitiveRenderer->renderFilledPolygon(
-        m_foregroundColor, m_occlusionPolicy, m_cullingPolicy, positions
-    );
+    m_primitiveRenderer->renderFilledPolygon(m_foregroundColor, m_occlusionPolicy, m_cullingPolicy, positions);
 }
 
 void RenderService::flush() {

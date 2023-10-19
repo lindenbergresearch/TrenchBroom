@@ -85,17 +85,11 @@ public:
 
     virtual std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState);
 
-    virtual std::unique_ptr<DropTracker> acceptDrop(
-        const InputState &inputState, const std::string &payload
-    );
+    virtual std::unique_ptr<DropTracker> acceptDrop(const InputState &inputState, const std::string &payload);
 
-    virtual void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext
-    ) const;
+    virtual void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
 
-    virtual void render(
-        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    virtual void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
     virtual bool cancel();
 
@@ -134,26 +128,18 @@ public:
 
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-    std::unique_ptr<DropTracker> acceptDrop(
-        const InputState &inputState, const std::string &payload
-    ) override;
+    std::unique_ptr<DropTracker> acceptDrop(const InputState &inputState, const std::string &payload) override;
 
-    void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext
-    ) const override;
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
 
-    void render(
-        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
     bool cancel() override;
 
 private: // subclassing interface
     virtual bool doShouldHandleMouseDrag(const InputState &inputState) const;
 
-    virtual bool doShouldHandleDrop(
-        const InputState &inputState, const std::string &payload
-    ) const;
+    virtual bool doShouldHandleDrop(const InputState &inputState, const std::string &payload) const;
 };
 } // namespace View
 } // namespace TrenchBroom

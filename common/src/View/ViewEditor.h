@@ -64,9 +64,7 @@ private:
     CheckBoxList m_defCheckBoxes;
 
 public:
-    EntityDefinitionCheckBoxList(
-        Assets::EntityDefinitionManager &entityDefinitionManager, Model::EditorContext &editorContext, QWidget *parent = nullptr
-    );
+    EntityDefinitionCheckBoxList(Assets::EntityDefinitionManager &entityDefinitionManager, Model::EditorContext &editorContext, QWidget *parent = nullptr);
 
     void refresh();
 
@@ -196,9 +194,7 @@ private:
     ViewEditor *m_editor;
 
 public:
-    explicit ViewPopupEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 };
 } // namespace View
 } // namespace TrenchBroom

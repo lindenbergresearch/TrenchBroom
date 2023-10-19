@@ -59,9 +59,8 @@ std::ostream &operator<<(std::ostream &str, const TagAttribute &attr) {
     return str;
 }
 
-Tag::Tag(
-    const size_t index, const std::string &name, std::vector<TagAttribute> attributes
-) : m_index(index), m_name(name), m_attributes(std::move(attributes)) {
+Tag::Tag(const size_t index, const std::string &name, std::vector<TagAttribute> attributes) : m_index(index), m_name(name),
+                                                                                              m_attributes(std::move(attributes)) {
 }
 
 Tag::Tag(const std::string &name, std::vector<TagAttribute> attributes) : Tag(0, name, std::move(attributes)) {
@@ -237,8 +236,7 @@ TagMatcher::~TagMatcher() = default;
 void TagMatcher::enable(TagMatcherCallback & /* callback */, MapFacade & /* facade */) const {
 }
 
-void TagMatcher::disable(
-    TagMatcherCallback & /* callback */, MapFacade & /* facade */) const {
+void TagMatcher::disable(TagMatcherCallback & /* callback */, MapFacade & /* facade */) const {
 }
 
 bool TagMatcher::canEnable() const {
@@ -254,9 +252,8 @@ std::ostream &operator<<(std::ostream &str, const TagMatcher &matcher) {
     return str;
 }
 
-SmartTag::SmartTag(
-    const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher
-) : Tag(name, std::move(attributes)), m_matcher(std::move(matcher)) {
+SmartTag::SmartTag(const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher) : Tag(name, std::move(attributes)),
+                                                                                                                         m_matcher(std::move(matcher)) {
 }
 
 SmartTag::SmartTag(const SmartTag &other) : Tag(other.m_index, other.m_name, other.m_attributes), m_matcher(other.m_matcher->clone()) {
@@ -304,7 +301,9 @@ bool SmartTag::canDisable() const {
 }
 
 void SmartTag::appendToStream(std::ostream &str) const {
-    kdl::struct_stream{str} << "SmartTag" << "m_index" << m_index << "m_name" << m_name << "m_attributes" << m_attributes << "m_matcher" << *m_matcher;
+    kdl::struct_stream{
+        str
+    } << "SmartTag" << "m_index" << m_index << "m_name" << m_name << "m_attributes" << m_attributes << "m_matcher" << *m_matcher;
 }
 } // namespace Model
 } // namespace TrenchBroom

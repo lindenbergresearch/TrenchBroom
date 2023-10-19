@@ -34,7 +34,8 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-PointHandleRenderer::PointHandleRenderer() : m_handle(pref(Preferences::HandleRadius), 16, true), m_highlight(2.0f * pref(Preferences::HandleRadius), 16, false) {
+PointHandleRenderer::PointHandleRenderer() : m_handle(pref(Preferences::HandleRadius), 16, true),
+                                             m_highlight(2.0f * pref(Preferences::HandleRadius), 16, false) {
 }
 
 void PointHandleRenderer::addPoint(const Color &color, const vm::vec3f &position) {
@@ -53,8 +54,8 @@ void PointHandleRenderer::doPrepareVertices(VboManager &vboManager) {
 void PointHandleRenderer::doRender(RenderContext &renderContext) {
     const Camera &camera = renderContext.camera();
     const Camera::Viewport &viewport = camera.viewport();
-    const vm::mat4x4f projection = vm::ortho_matrix(
-        0.0f, 1.0f, static_cast<float>(viewport.x), static_cast<float>(viewport.height), static_cast<float>(viewport.width), static_cast<float>(viewport.y));
+    const vm::mat4x4f projection = vm::ortho_matrix(0.0f, 1.0f, static_cast<float>(viewport.x), static_cast<float>(viewport.height),
+        static_cast<float>(viewport.width), static_cast<float>(viewport.y));
     const vm::mat4x4f view = vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y());
     ReplaceTransformation ortho(renderContext.transformation(), projection, view);
 
@@ -80,9 +81,7 @@ void PointHandleRenderer::doRender(RenderContext &renderContext) {
     clear();
 }
 
-void PointHandleRenderer::renderHandles(
-    RenderContext &renderContext, const HandleMap &map, Circle &circle, const float opacity
-) {
+void PointHandleRenderer::renderHandles(RenderContext &renderContext, const HandleMap &map, Circle &circle, const float opacity) {
     const Camera &camera = renderContext.camera();
     ActiveShader shader(renderContext.shaderManager(), Shaders::HandleShader);
 
@@ -99,8 +98,7 @@ void PointHandleRenderer::renderHandles(
             }
 
             const vm::vec3f offset = camera.project(position + nudgeTowardsCamera) * vm::vec3f(1.0f, 1.0f, -1.0f);
-            MultiplyModelMatrix translate(
-                renderContext.transformation(), vm::translation_matrix(offset));
+            MultiplyModelMatrix translate(renderContext.transformation(), vm::translation_matrix(offset));
             circle.render();
         }
     }

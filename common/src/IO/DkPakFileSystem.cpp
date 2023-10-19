@@ -40,9 +40,7 @@ static const std::string HeaderMagic = "PACK";
 } // namespace DkPakLayout
 
 namespace {
-Result<std::unique_ptr<char[]>> decompress(
-    std::shared_ptr<File> file, const size_t uncompressedSize
-) {
+Result<std::unique_ptr<char[]>> decompress(std::shared_ptr<File> file, const size_t uncompressedSize) {
     try {
         auto reader = file->reader().buffer();
 
@@ -121,14 +119,9 @@ Result<void> DkPakFileSystem::doReadDirectory() {
             auto entryFile = std::make_shared<FileView>(m_file, entryAddress, entrySize);
 
             if (compressed) {
-                addFile(
-                    entryPath, [
-                        entryFile = std::move(entryFile), uncompressedSize
-                    ]() -> Result<std::shared_ptr<File>> {
-                      return decompress(entryFile, uncompressedSize).transform(
-                          [&](auto data) {
-                            return std::static_pointer_cast<File>(
-                                std::make_shared<OwningBufferFile>(std::move(data), uncompressedSize));
+                addFile(entryPath, [entryFile = std::move(entryFile), uncompressedSize]() -> Result<std::shared_ptr<File>> {
+                      return decompress(entryFile, uncompressedSize).transform([&](auto data) {
+                            return std::static_pointer_cast<File>(std::make_shared<OwningBufferFile>(std::move(data), uncompressedSize));
                           }
                       );
                     }

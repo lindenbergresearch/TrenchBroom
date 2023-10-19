@@ -29,15 +29,11 @@ namespace View {
 FaceTool::FaceTool(std::weak_ptr<MapDocument> document) : VertexToolBase(document), m_faceHandles(std::make_unique<FaceHandleManager>()) {
 }
 
-std::vector<Model::BrushNode *> FaceTool::findIncidentBrushes(
-    const vm::polygon3 &handle
-) const {
+std::vector<Model::BrushNode *> FaceTool::findIncidentBrushes(const vm::polygon3 &handle) const {
     return findIncidentBrushes(*m_faceHandles, handle);
 }
 
-void FaceTool::pick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-) const {
+void FaceTool::pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const {
     m_faceHandles->pickCenterHandle(pickRay, camera, pickResult);
 }
 
@@ -49,9 +45,7 @@ const FaceHandleManager &FaceTool::handleManager() const {
     return *m_faceHandles;
 }
 
-std::tuple<vm::vec3, vm::vec3> FaceTool::handlePositionAndHitPoint(
-    const std::vector<Model::Hit> &hits
-) const {
+std::tuple<vm::vec3, vm::vec3> FaceTool::handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const {
     assert(!hits.empty());
 
     const auto &hit = hits.front();
@@ -78,8 +72,7 @@ std::string FaceTool::actionName() const {
 void FaceTool::removeSelection() {
     const auto handles = m_faceHandles->selectedHandles();
     auto vertexPositions = std::vector<vm::vec3>{};
-    vm::polygon3::get_vertices(
-        std::begin(handles), std::end(handles), std::back_inserter(vertexPositions));
+    vm::polygon3::get_vertices(std::begin(handles), std::end(handles), std::back_inserter(vertexPositions));
 
     const auto commandName = kdl::str_plural(handles.size(), "Remove Brush Face", "Remove Brush Faces");
     kdl::mem_lock(m_document)->removeVertices(commandName, std::move(vertexPositions));

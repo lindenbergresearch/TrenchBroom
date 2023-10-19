@@ -72,8 +72,8 @@
 
 namespace TrenchBroom {
 namespace View {
-MapView2D::MapView2D(
-    std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, ViewPlane viewPlane, Logger *logger
+MapView2D::MapView2D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager,
+    ViewPlane viewPlane, Logger *logger
 ) : MapViewBase(logger, document, toolBox, renderer, contextManager), m_camera(std::make_unique<Renderer::OrthographicCamera>()) {
     connectObservers();
     initializeCamera(viewPlane);
@@ -123,14 +123,8 @@ void MapView2D::initializeToolChain(MapViewToolBox &toolBox) {
     addTool(std::make_unique<CameraTool2D>(*m_camera));
     addTool(std::make_unique<MoveObjectsToolController>(toolBox.moveObjectsTool()));
     addTool(std::make_unique<RotateObjectsToolController2D>(toolBox.rotateObjectsTool()));
-    addTool(
-        std::make_unique<ScaleObjectsToolController2D>(
-            toolBox.scaleObjectsTool(), m_document
-        ));
-    addTool(
-        std::make_unique<ShearObjectsToolController2D>(
-            toolBox.shearObjectsTool(), m_document
-        ));
+    addTool(std::make_unique<ScaleObjectsToolController2D>(toolBox.scaleObjectsTool(), m_document));
+    addTool(std::make_unique<ShearObjectsToolController2D>(toolBox.shearObjectsTool(), m_document));
     addTool(std::make_unique<ExtrudeToolController2D>(toolBox.extrudeTool()));
     addTool(std::make_unique<ClipToolController2D>(toolBox.clipTool()));
     addTool(std::make_unique<VertexToolController>(toolBox.vertexTool()));
@@ -138,10 +132,7 @@ void MapView2D::initializeToolChain(MapViewToolBox &toolBox) {
     addTool(std::make_unique<FaceToolController>(toolBox.faceTool()));
     addTool(std::make_unique<CreateEntityToolController2D>(toolBox.createEntityTool()));
     addTool(std::make_unique<SelectionTool>(m_document));
-    addTool(
-        std::make_unique<CreateSimpleBrushToolController2D>(
-            toolBox.createSimpleBrushTool(), m_document
-        ));
+    addTool(std::make_unique<CreateSimpleBrushToolController2D>(toolBox.createSimpleBrushTool(), m_document));
 }
 
 void MapView2D::connectObservers() {
@@ -171,15 +162,11 @@ void MapView2D::initializeGL() {
     setCompass(std::make_unique<Renderer::Compass2D>());
 }
 
-void MapView2D::doUpdateViewport(
-    const int x, const int y, const int width, const int height
-) {
+void MapView2D::doUpdateViewport(const int x, const int y, const int width, const int height) {
     m_camera->setViewport(Renderer::Camera::Viewport(x, y, width, height));
 }
 
-vm::vec3 MapView2D::doGetPasteObjectsDelta(
-    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
-) const {
+vm::vec3 MapView2D::doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
     auto document = kdl::mem_lock(m_document);
     const auto &grid = document->grid();
     const auto &worldBounds = document->worldBounds();
@@ -217,8 +204,7 @@ void MapView2D::doReset2dCameras(const Renderer::Camera &masterCamera, const boo
     m_camera->moveTo(newPosition);
 
     if (animate) {
-        animateCamera(
-            newPosition, m_camera->direction(), m_camera->up(), masterCamera.zoom());
+        animateCamera(newPosition, m_camera->direction(), m_camera->up(), masterCamera.zoom());
     }
     else {
         m_camera->moveTo(newPosition);
@@ -243,13 +229,10 @@ void MapView2D::doMoveCameraToPosition(const vm::vec3f &position, const bool ani
     }
 }
 
-void MapView2D::animateCamera(
-    const vm::vec3f &position, const vm::vec3f & /* direction */, const vm::vec3f & /* up */, const float zoom, const int duration
-) {
-    const auto actualPosition = dot(position, m_camera->up()) * m_camera->up() + dot(position, m_camera->right()) * m_camera->right() + dot(m_camera->position(), m_camera->direction()) * m_camera->direction();
-    auto animation = std::make_unique<CameraAnimation>(
-        *m_camera, actualPosition, m_camera->direction(), m_camera->up(), zoom, duration
-    );
+void MapView2D::animateCamera(const vm::vec3f &position, const vm::vec3f & /* direction */, const vm::vec3f & /* up */, const float zoom, const int duration) {
+    const auto actualPosition = dot(position, m_camera->up()) * m_camera->up() + dot(position, m_camera->right()) * m_camera->right() +
+                                dot(m_camera->position(), m_camera->direction()) * m_camera->direction();
+    auto animation = std::make_unique<CameraAnimation>(*m_camera, actualPosition, m_camera->direction(), m_camera->up(), zoom, duration);
     m_animationManager->runAnimation(std::move(animation), true);
 }
 
@@ -357,9 +340,7 @@ void MapView2D::doRenderGrid(Renderer::RenderContext &, Renderer::RenderBatch &r
     renderBatch.addOneShot(new Renderer::GridRenderer(*m_camera, document->worldBounds()));
 }
 
-void MapView2D::doRenderMap(
-    Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void MapView2D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     renderer.render(renderContext, renderBatch);
 
     auto document = kdl::mem_lock(m_document);
@@ -370,17 +351,13 @@ void MapView2D::doRenderMap(
     }
 }
 
-void MapView2D::doRenderTools(
-    MapViewToolBox & /* toolBox */, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void MapView2D::doRenderTools(MapViewToolBox & /* toolBox */, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     renderTools(renderContext, renderBatch);
 }
 
 void MapView2D::doRenderExtras(Renderer::RenderContext &, Renderer::RenderBatch &) {}
 
-void MapView2D::doRenderSoftWorldBounds(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void MapView2D::doRenderSoftWorldBounds(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     if (!renderContext.softMapBounds().is_empty()) {
         auto document = kdl::mem_lock(m_document);
 

@@ -51,33 +51,26 @@ protected:
 
     const Token &expect(const TokenType typeMask, const Token &token) const {
         if (!check(typeMask, token)) {
-            throw ParserException(
-                token.line(), token.column(), expectString(tokenName(typeMask), token));
+            throw ParserException(token.line(), token.column(), expectString(tokenName(typeMask), token));
         }
         return token;
     }
 
-    const Token &expect(
-        ParserStatus &status, const TokenType typeMask, const Token &token
-    ) const {
+    const Token &expect(ParserStatus &status, const TokenType typeMask, const Token &token) const {
         if (!check(typeMask, token)) {
             expect(status, tokenName(typeMask), token);
         }
         return token;
     }
 
-    void expect(
-        ParserStatus & /* status */, const std::string &typeName, const Token &token
-    ) const {
+    void expect(ParserStatus & /* status */, const std::string &typeName, const Token &token) const {
         const std::string msg = expectString(typeName, token);
         throw ParserException(token.line(), token.column(), msg);
     }
 
     void expect(const std::string &expected, const Token &token) const {
         if (token.data() != expected) {
-            throw ParserException(
-                token.line(), token.column(), "Expected string '" + expected + "', but got '" + token.data() + "'"
-            );
+            throw ParserException(token.line(), token.column(), "Expected string '" + expected + "', but got '" + token.data() + "'");
         }
     }
 
@@ -87,8 +80,8 @@ protected:
                 return;
             }
         }
-        throw ParserException(
-            token.line(), token.column(), "Expected string '" + kdl::str_join(expected, "', '", "', or '", "' or '") + "', but got '" + token.data() + "'"
+        throw ParserException(token.line(), token.column(),
+            "Expected string '" + kdl::str_join(expected, "', '", "', or '", "' or '") + "', but got '" + token.data() + "'"
         );
     }
 

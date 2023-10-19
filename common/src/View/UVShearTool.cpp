@@ -58,9 +58,7 @@ void UVShearTool::pick(const InputState &inputState, Model::PickResult &pickResu
     }
 }
 
-static vm::vec2f getHit(
-    const UVViewHelper &helper, const vm::vec3 &xAxis, const vm::vec3 &yAxis, const vm::ray3 &pickRay
-) {
+static vm::vec2f getHit(const UVViewHelper &helper, const vm::vec3 &xAxis, const vm::vec3 &yAxis, const vm::ray3 &pickRay) {
     const auto &boundary = helper.face()->boundary();
     const auto hitPointDist = vm::intersect_ray_plane(pickRay, boundary);
     const auto hitPoint = vm::point_at_distance(pickRay, hitPointDist);
@@ -81,9 +79,11 @@ private:
     vm::vec2f m_lastHit;
 
 public:
-    UVShearDragTracker(
-        MapDocument &document, const UVViewHelper &helper, const vm::vec2b &selector, const vm::vec3 &xAxis, const vm::vec3 &yAxis, const vm::vec2f &initialHit
-    ) : m_document{document}, m_helper{helper}, m_selector{selector}, m_xAxis{xAxis}, m_yAxis{yAxis}, m_initialHit{initialHit}, m_lastHit{initialHit} {
+    UVShearDragTracker(MapDocument &document, const UVViewHelper &helper, const vm::vec2b &selector, const vm::vec3 &xAxis, const vm::vec3 &yAxis,
+        const vm::vec2f &initialHit
+    ) : m_document{document}, m_helper{helper}, m_selector{selector}, m_xAxis{xAxis}, m_yAxis{yAxis}, m_initialHit{
+        initialHit
+    }, m_lastHit{initialHit} {
         m_document.startTransaction("Shear Texture", TransactionScope::LongRunning);
     }
 
@@ -92,9 +92,9 @@ public:
         const auto delta = currentHit - m_lastHit;
 
         const auto origin = m_helper.origin();
-        const auto oldCoords = vm::vec2f{m_helper.face()->toTexCoordSystemMatrix(
-            vm::vec2f::zero(), m_helper.face()->attributes().scale(), true
-        ) * origin};
+        const auto oldCoords = vm::vec2f{
+            m_helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), m_helper.face()->attributes().scale(), true) * origin
+        };
 
         if (m_selector[0]) {
             const auto factors = vm::vec2f{-delta.y() / m_initialHit.x(), 0.0f};
@@ -109,9 +109,9 @@ public:
             }
         }
 
-        const auto newCoords = vm::vec2f{m_helper.face()->toTexCoordSystemMatrix(
-            vm::vec2f::zero(), m_helper.face()->attributes().scale(), true
-        ) * origin};
+        const auto newCoords = vm::vec2f{
+            m_helper.face()->toTexCoordSystemMatrix(vm::vec2f::zero(), m_helper.face()->attributes().scale(), true) * origin
+        };
         const auto newOffset = m_helper.face()->attributes().offset() + oldCoords - newCoords;
 
         auto request = Model::ChangeBrushFaceAttributesRequest{};
@@ -160,9 +160,7 @@ std::unique_ptr<DragTracker> UVShearTool::acceptMouseDrag(const InputState &inpu
         return nullptr;
     }
 
-    return std::make_unique<UVShearDragTracker>(
-        *kdl::mem_lock(m_document), m_helper, selector, xAxis, yAxis, initialHit
-    );
+    return std::make_unique<UVShearDragTracker>(*kdl::mem_lock(m_document), m_helper, selector, xAxis, yAxis, initialHit);
 }
 
 bool UVShearTool::cancel() {

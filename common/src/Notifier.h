@@ -62,7 +62,9 @@ private:
       size_t id;
       bool pendingRemove;
 
-      Observer(Callback i_callback, const size_t i_id) : callback{std::move(i_callback)}, id{i_id}, pendingRemove{false} {
+      Observer(Callback i_callback, const size_t i_id) : callback{std::move(i_callback)}, id{i_id}, pendingRemove{
+          false
+      } {
       }
     };
 
@@ -128,11 +130,8 @@ private:
         }
 
     private:
-        typename std::vector<Observer>::iterator findObserver(
-            std::vector<Observer> &observers, const size_t id
-        ) {
-            return std::find_if(
-                std::begin(observers), std::end(observers), [&](const auto &observer) {
+        typename std::vector<Observer>::iterator findObserver(std::vector<Observer> &observers, const size_t id) {
+            return std::find_if(std::begin(observers), std::end(observers), [&](const auto &observer) {
                   return observer.id == id;
                 }
             );
@@ -197,8 +196,7 @@ public:
      */
     template<typename R, typename MemberCallback>
     [[nodiscard]] NotifierConnection connect(R *receiver, MemberCallback callback) {
-        return connect(
-            [receiver = receiver, callback = std::move(callback)](auto &&... args) {
+        return connect([receiver = receiver, callback = std::move(callback)](auto &&... args) {
               std::invoke(callback, receiver, std::forward<decltype(args)>(args)...);
             }
         );
@@ -300,9 +298,7 @@ public:
      * @param a the arguments to pass to either notifier
      */
     template<typename... NA>
-    NotifyBeforeAndAfter(
-        const bool notify, Notifier<A...> &before, Notifier<A...> &after, NA &&... a
-    )
+    NotifyBeforeAndAfter(const bool notify, Notifier<A...> &before, Notifier<A...> &after, NA &&... a)
         : NotifyAfter<A...>{notify, after, std::forward<NA>(a)...} {
         NotifyAfter<A...>::m_notify(before);
     }

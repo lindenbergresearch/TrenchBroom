@@ -50,8 +50,7 @@ const Model::PickResult &ToolBoxConnector::pickResult() const {
 void ToolBoxConnector::updatePickResult() {
     ensure(m_toolBox != nullptr, "toolBox is null");
 
-    m_inputState.setPickRequest(
-        doGetPickRequest(m_inputState.mouseX(), m_inputState.mouseY()));
+    m_inputState.setPickRequest(doGetPickRequest(m_inputState.mouseX(), m_inputState.mouseY()));
     Model::PickResult pickResult = doPick(m_inputState.pickRay());
     m_toolBox->pick(m_toolChain, m_inputState, pickResult);
     m_inputState.setPickResult(std::move(pickResult));
@@ -90,9 +89,7 @@ void ToolBoxConnector::dragLeave() {
     m_toolBox->dragLeave(m_toolChain, m_inputState);
 }
 
-bool ToolBoxConnector::dragDrop(
-    const float /* x */, const float /* y */, const std::string &text
-) {
+bool ToolBoxConnector::dragDrop(const float /* x */, const float /* y */, const std::string &text) {
     ensure(m_toolBox != nullptr, "toolBox is null");
 
     updatePickResult();
@@ -112,9 +109,7 @@ void ToolBoxConnector::setRenderOptions(Renderer::RenderContext &renderContext) 
     m_toolBox->setRenderOptions(m_toolChain, m_inputState, renderContext);
 }
 
-void ToolBoxConnector::renderTools(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void ToolBoxConnector::renderTools(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     ensure(m_toolBox != nullptr, "toolBox is null");
     m_inputState.setAnyToolDragging(m_toolBox->dragging());
     m_toolBox->renderTools(m_toolChain, m_inputState, renderContext, renderBatch);

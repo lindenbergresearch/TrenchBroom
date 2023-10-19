@@ -41,14 +41,11 @@ Q_DECLARE_METATYPE(TrenchBroom::Model::MapFormat)
 
 namespace TrenchBroom {
 namespace View {
-bool GameDialog::showNewDocumentDialog(
-    QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat
-) {
-    GameDialog dialog(
-        "Select Game", "Select a game from the list on the right, then click OK. Once the new document is "
-                       "created, "
-                       "you can set up mod directories, entity definitions and textures by going to the map "
-                       "inspector, the entity inspector and the face inspector, respectively.", GameDialog::DialogType::New, parent
+bool GameDialog::showNewDocumentDialog(QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat) {
+    GameDialog dialog("Select Game", "Select a game from the list on the right, then click OK. Once the new document is "
+                                     "created, "
+                                     "you can set up mod directories, entity definitions and textures by going to the map "
+                                     "inspector, the entity inspector and the face inspector, respectively.", GameDialog::DialogType::New, parent
     );
     if (dialog.exec() == QDialog::Rejected) {
         return false;
@@ -60,13 +57,10 @@ bool GameDialog::showNewDocumentDialog(
     }
 }
 
-bool GameDialog::showOpenDocumentDialog(
-    QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat
-) {
-    GameDialog dialog(
-        "Select Game", "TrenchBroom was unable to detect the game for the map document. Please choose a "
-                       "game in the "
-                       "game list and click OK.", GameDialog::DialogType::Open, parent
+bool GameDialog::showOpenDocumentDialog(QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat) {
+    GameDialog dialog("Select Game", "TrenchBroom was unable to detect the game for the map document. Please choose a "
+                                     "game in the "
+                                     "game list and click OK.", GameDialog::DialogType::Open, parent
     );
     if (dialog.exec() == QDialog::Rejected) {
         return false;
@@ -115,9 +109,11 @@ void GameDialog::openPreferencesClicked() {
     app.openPreferences();
 }
 
-GameDialog::GameDialog(
-    const QString &title, const QString &infoText, const DialogType type, QWidget *parent
-) : QDialog(parent), m_dialogType(type), m_gameListBox(nullptr), m_mapFormatComboBox(nullptr), m_openPreferencesButton(nullptr), m_okButton(nullptr) {
+GameDialog::GameDialog(const QString &title, const QString &infoText, const DialogType type, QWidget *parent) : QDialog(parent), m_dialogType(type),
+                                                                                                                m_gameListBox(nullptr),
+                                                                                                                m_mapFormatComboBox(nullptr),
+                                                                                                                m_openPreferencesButton(nullptr),
+                                                                                                                m_okButton(nullptr) {
     createGui(title, infoText);
     updateMapFormats("");
     connectObservers();
@@ -155,9 +151,7 @@ void GameDialog::createGui(const QString &title, const QString &infoText) {
     setLayout(outerLayout);
 }
 
-QWidget *GameDialog::createInfoPanel(
-    QWidget *parent, const QString &title, const QString &infoText
-) {
+QWidget *GameDialog::createInfoPanel(QWidget *parent, const QString &title, const QString &infoText) {
     auto *infoPanel = new QWidget(parent);
 
     auto *header = new QLabel(title);
@@ -166,16 +160,13 @@ QWidget *GameDialog::createInfoPanel(
     auto *info = new QLabel(infoText);
     info->setWordWrap(true);
 
-    auto *setupMsg = new QLabel(
-        "To set up the game paths, click on the button below to open the preferences "
-        "dialog."
+    auto *setupMsg = new QLabel("To set up the game paths, click on the button below to open the preferences "
+                                "dialog."
     );
     setupMsg->setWordWrap(true);
 
     m_openPreferencesButton = new QPushButton("Open preferences...");
-    m_openPreferencesButton->setToolTip(
-        "Open the preferences dialog to manage game paths,"
-    );
+    m_openPreferencesButton->setToolTip("Open the preferences dialog to manage game paths,");
 
     auto *layout = new QVBoxLayout();
     layout->setSpacing(0);
@@ -191,9 +182,7 @@ QWidget *GameDialog::createInfoPanel(
     infoPanel->setLayout(layout);
     infoPanel->setMaximumWidth(350);
 
-    connect(
-        m_openPreferencesButton, &QPushButton::clicked, this, &GameDialog::openPreferencesClicked
-    );
+    connect(m_openPreferencesButton, &QPushButton::clicked, this, &GameDialog::openPreferencesClicked);
 
     return infoPanel;
 }
@@ -211,8 +200,8 @@ QWidget *GameDialog::createSelectionPanel(QWidget *parent) {
     m_mapFormatComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     auto *mapFormatLayout = new QHBoxLayout();
-    mapFormatLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::WideHMargin, LayoutConstants::NarrowVMargin
+    mapFormatLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::WideHMargin,
+        LayoutConstants::NarrowVMargin
     );
     mapFormatLayout->setSpacing(LayoutConstants::WideHMargin);
     mapFormatLayout->addWidget(label, 0, Qt::AlignRight | Qt::AlignVCenter);
@@ -226,12 +215,8 @@ QWidget *GameDialog::createSelectionPanel(QWidget *parent) {
     outerSizer->addLayout(mapFormatLayout);
     panel->setLayout(outerSizer);
 
-    connect(
-        m_gameListBox, &GameListBox::currentGameChanged, this, &GameDialog::currentGameChanged
-    );
-    connect(
-        m_gameListBox, &GameListBox::selectCurrentGame, this, &GameDialog::gameSelected
-    );
+    connect(m_gameListBox, &GameListBox::currentGameChanged, this, &GameDialog::currentGameChanged);
+    connect(m_gameListBox, &GameListBox::selectCurrentGame, this, &GameDialog::gameSelected);
 
     return panel;
 }
@@ -242,13 +227,11 @@ void GameDialog::updateMapFormats(const std::string &gameName) {
 
     m_mapFormatComboBox->clear();
     if (m_dialogType == DialogType::Open) {
-        m_mapFormatComboBox->addItem(
-            tr("Autodetect"), formatToUserData(Model::MapFormat::Unknown));
+        m_mapFormatComboBox->addItem(tr("Autodetect"), formatToUserData(Model::MapFormat::Unknown));
     }
     for (const auto &fileFormat: fileFormats) {
         const Model::MapFormat mapFormat = Model::formatFromName(fileFormat);
-        m_mapFormatComboBox->addItem(
-            QString::fromStdString(fileFormat), formatToUserData(mapFormat));
+        m_mapFormatComboBox->addItem(QString::fromStdString(fileFormat), formatToUserData(mapFormat));
     }
 
     m_mapFormatComboBox->setEnabled(m_mapFormatComboBox->count() > 1);

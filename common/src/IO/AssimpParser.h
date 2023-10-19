@@ -76,13 +76,9 @@ public:
 private:
     std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 
-    void processNode(
-        const aiNode &node, const aiScene &scene, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform
-    );
+    void processNode(const aiNode &node, const aiScene &scene, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform);
 
-    void processMesh(
-        const aiMesh &mesh, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform
-    );
+    void processMesh(const aiMesh &mesh, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform);
 
     void processMaterials(const aiScene &scene, Logger &logger);
 

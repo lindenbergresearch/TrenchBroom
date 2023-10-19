@@ -76,9 +76,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    TextureBrowserView(
-        QScrollBar *scrollBar, GLContextManager &contextManager, std::weak_ptr<MapDocument> document
-    );
+    TextureBrowserView(QScrollBar *scrollBar, GLContextManager &contextManager, std::weak_ptr<MapDocument> document);
 
     ~TextureBrowserView() override;
 
@@ -103,9 +101,7 @@ private:
 
     void doReloadLayout(Layout &layout) override;
 
-    void addTextureToLayout(
-        Layout &layout, const Assets::Texture *texture, const std::string &groupName, const Renderer::FontDescriptor &font
-    );
+    void addTextureToLayout(Layout &layout, const Assets::Texture *texture, const std::string &groupName, const Renderer::FontDescriptor &font);
 
     struct CompareByUsageCount;
     struct CompareByName;
@@ -114,9 +110,7 @@ private:
 
     const std::vector<Assets::TextureCollection> &getCollections() const;
 
-    std::vector<const Assets::Texture *> getTextures(
-        const Assets::TextureCollection &collection
-    ) const;
+    std::vector<const Assets::Texture *> getTextures(const Assets::TextureCollection &collection) const;
 
     std::vector<const Assets::Texture *> getTextures() const;
 

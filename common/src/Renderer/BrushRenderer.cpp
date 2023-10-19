@@ -58,15 +58,11 @@ bool BrushRenderer::DefaultFilter::visible(const Model::BrushNode &brush) const 
     return m_context.visible(&brush);
 }
 
-bool BrushRenderer::DefaultFilter::visible(
-    const Model::BrushNode &brush, const Model::BrushFace &face
-) const {
+bool BrushRenderer::DefaultFilter::visible(const Model::BrushNode &brush, const Model::BrushFace &face) const {
     return m_context.visible(&brush, face);
 }
 
-bool BrushRenderer::DefaultFilter::visible(
-    const Model::BrushNode &brushNode, const Model::BrushEdge &edge
-) const {
+bool BrushRenderer::DefaultFilter::visible(const Model::BrushNode &brushNode, const Model::BrushEdge &edge) const {
     const auto &brush = brushNode.brush();
     const auto firstFaceIndex = edge.firstFace()->payload();
     const auto secondFaceIndex = edge.secondFace()->payload();
@@ -82,9 +78,7 @@ bool BrushRenderer::DefaultFilter::editable(const Model::BrushNode &brush) const
     return m_context.editable(&brush);
 }
 
-bool BrushRenderer::DefaultFilter::editable(
-    const Model::BrushNode &brush, const Model::BrushFace &face
-) const {
+bool BrushRenderer::DefaultFilter::editable(const Model::BrushNode &brush, const Model::BrushFace &face) const {
     return m_context.editable(&brush, face);
 }
 
@@ -92,15 +86,11 @@ bool BrushRenderer::DefaultFilter::selected(const Model::BrushNode &brush) const
     return brush.selected() || brush.parentSelected();
 }
 
-bool BrushRenderer::DefaultFilter::selected(
-    const Model::BrushNode &, const Model::BrushFace &face
-) const {
+bool BrushRenderer::DefaultFilter::selected(const Model::BrushNode &, const Model::BrushFace &face) const {
     return face.selected();
 }
 
-bool BrushRenderer::DefaultFilter::selected(
-    const Model::BrushNode &brushNode, const Model::BrushEdge &edge
-) const {
+bool BrushRenderer::DefaultFilter::selected(const Model::BrushNode &brushNode, const Model::BrushEdge &edge) const {
     const auto &brush = brushNode.brush();
     const auto firstFaceIndex = edge.firstFace()->payload();
     const auto secondFaceIndex = edge.secondFace()->payload();
@@ -118,9 +108,7 @@ bool BrushRenderer::DefaultFilter::hasSelectedFaces(const Model::BrushNode &brus
 
 // NoFilter
 
-BrushRenderer::Filter::RenderSettings BrushRenderer::NoFilter::markFaces(
-    const Model::BrushNode &brushNode
-) const {
+BrushRenderer::Filter::RenderSettings BrushRenderer::NoFilter::markFaces(const Model::BrushNode &brushNode) const {
     const auto &brush = brushNode.brush();
     for (const auto &face: brush.faces()) {
         face.setMarked(true);
@@ -130,7 +118,11 @@ BrushRenderer::Filter::RenderSettings BrushRenderer::NoFilter::markFaces(
 
 // BrushRenderer
 
-BrushRenderer::BrushRenderer() : m_filter{std::make_unique<NoFilter>()}, m_showEdges{false}, m_grayscale{false}, m_tint{false}, m_showOccludedEdges{false}, m_forceTransparent{false}, m_transparencyAlpha{1.0f}, m_showHiddenBrushes{false} {
+BrushRenderer::BrushRenderer() : m_filter{std::make_unique<NoFilter>()}, m_showEdges{false}, m_grayscale{false}, m_tint{
+    false
+}, m_showOccludedEdges{false}, m_forceTransparent{false}, m_transparencyAlpha{1.0f}, m_showHiddenBrushes{
+    false
+} {
     clear();
 }
 
@@ -251,9 +243,7 @@ void BrushRenderer::renderOpaque(RenderContext &renderContext, RenderBatch &rend
     }
 }
 
-void BrushRenderer::renderTransparent(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void BrushRenderer::renderTransparent(RenderContext &renderContext, RenderBatch &renderBatch) {
     if (!m_allBrushes.empty()) {
         if (!valid()) {
             validate();
@@ -302,7 +292,9 @@ private:
     }
 
 public:
-    FilterWrapper(const Filter &filter, const bool showHiddenBrushes) : m_filter{filter}, m_showHiddenBrushes{showHiddenBrushes} {
+    FilterWrapper(const Filter &filter, const bool showHiddenBrushes) : m_filter{filter}, m_showHiddenBrushes{
+        showHiddenBrushes
+    } {
     }
 
     RenderSettings markFaces(const Model::BrushNode &brush) const override {
@@ -330,9 +322,7 @@ static size_t triIndicesCountForPolygon(const size_t vertexCount) {
     return indexCount;
 }
 
-static void addTriIndicesForPolygon(
-    GLuint *dest, const GLuint baseIndex, const size_t vertexCount
-) {
+static void addTriIndicesForPolygon(GLuint *dest, const GLuint baseIndex, const size_t vertexCount) {
     assert(vertexCount >= 3);
     for (size_t i = 0; i < vertexCount - 2; ++i) {
         *(dest++) = baseIndex;
@@ -341,9 +331,7 @@ static void addTriIndicesForPolygon(
     }
 }
 
-static inline bool shouldRenderEdge(
-    const BrushRendererBrushCache::CachedEdge &edge, const BrushRenderer::Filter::EdgeRenderPolicy policy
-) {
+static inline bool shouldRenderEdge(const BrushRendererBrushCache::CachedEdge &edge, const BrushRenderer::Filter::EdgeRenderPolicy policy) {
     using EdgeRenderPolicy = BrushRenderer::Filter::EdgeRenderPolicy;
 
     switch (policy) {
@@ -359,9 +347,7 @@ static inline bool shouldRenderEdge(
     }
 }
 
-static size_t countMarkedEdgeIndices(
-    const Model::BrushNode &brushNode, const BrushRenderer::Filter::EdgeRenderPolicy policy
-) {
+static size_t countMarkedEdgeIndices(const Model::BrushNode &brushNode, const BrushRenderer::Filter::EdgeRenderPolicy policy) {
     using EdgeRenderPolicy = BrushRenderer::Filter::EdgeRenderPolicy;
 
     if (policy == EdgeRenderPolicy::RenderNone) {
@@ -377,8 +363,8 @@ static size_t countMarkedEdgeIndices(
     return indexCount;
 }
 
-static void getMarkedEdgeIndices(
-    const Model::BrushNode &brushNode, const BrushRenderer::Filter::EdgeRenderPolicy policy, const GLuint brushVerticesStartIndex, GLuint *dest
+static void getMarkedEdgeIndices(const Model::BrushNode &brushNode, const BrushRenderer::Filter::EdgeRenderPolicy policy, const GLuint brushVerticesStartIndex,
+    GLuint *dest
 ) {
     using EdgeRenderPolicy = BrushRenderer::Filter::EdgeRenderPolicy;
 
@@ -395,9 +381,7 @@ static void getMarkedEdgeIndices(
     }
 }
 
-bool BrushRenderer::shouldDrawFaceInTransparentPass(
-    const Model::BrushNode &brushNode, const Model::BrushFace &face
-) const {
+bool BrushRenderer::shouldDrawFaceInTransparentPass(const Model::BrushNode &brushNode, const Model::BrushFace &face) const {
     if (m_transparencyAlpha >= 1.0f) {
         // In this case, draw everything in the opaque pass
         // see: https://github.com/TrenchBroom/TrenchBroom/issues/2848
@@ -509,9 +493,8 @@ void BrushRenderer::validateBrush(const Model::BrushNode &brushNode) {
             for (size_t j = i; j < nextI; ++j) {
                 const auto &cache = facesSortedByTex[j];
                 if (cache.face->isMarked() && shouldDrawFaceInTransparentPass(brushNode, *cache.face)) {
-                    addTriIndicesForPolygon(
-                        currentDest, static_cast<GLuint>(
-                            brushVerticesStartIndex + cache.indexOfFirstVertexRelativeToBrush), cache.vertexCount
+                    addTriIndicesForPolygon(currentDest, static_cast<GLuint>(
+                        brushVerticesStartIndex + cache.indexOfFirstVertexRelativeToBrush), cache.vertexCount
                     );
 
                     currentDest += triIndicesCountForPolygon(cache.vertexCount);
@@ -536,9 +519,8 @@ void BrushRenderer::validateBrush(const Model::BrushNode &brushNode) {
             for (size_t j = i; j < nextI; ++j) {
                 const auto &cache = facesSortedByTex[j];
                 if (cache.face->isMarked() && !shouldDrawFaceInTransparentPass(brushNode, *cache.face)) {
-                    addTriIndicesForPolygon(
-                        currentDest, static_cast<GLuint>(
-                            brushVerticesStartIndex + cache.indexOfFirstVertexRelativeToBrush), cache.vertexCount
+                    addTriIndicesForPolygon(currentDest, static_cast<GLuint>(
+                        brushVerticesStartIndex + cache.indexOfFirstVertexRelativeToBrush), cache.vertexCount
                     );
 
                     currentDest += triIndicesCountForPolygon(cache.vertexCount);

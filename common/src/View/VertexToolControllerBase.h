@@ -72,16 +72,12 @@ protected:
             return findDraggableHandle(inputState, m_hitType);
         }
 
-        virtual std::vector<Model::Hit> doFindDraggableHandles(
-            const InputState &inputState
-        ) const {
+        virtual std::vector<Model::Hit> doFindDraggableHandles(const InputState &inputState) const {
             return findDraggableHandles(inputState, m_hitType);
         }
 
     public:
-        Model::Hit findDraggableHandle(
-            const InputState &inputState, const Model::HitType::Type hitType
-        ) const {
+        Model::Hit findDraggableHandle(const InputState &inputState, const Model::HitType::Type hitType) const {
             using namespace Model::HitFilters;
 
             const auto hits = inputState.pickResult().all(type(hitType));
@@ -96,9 +92,7 @@ protected:
             return Model::Hit::NoHit;
         }
 
-        std::vector<Model::Hit> findDraggableHandles(
-            const InputState &inputState, const Model::HitType::Type hitType
-        ) const {
+        std::vector<Model::Hit> findDraggableHandles(const InputState &inputState, const Model::HitType::Type hitType) const {
             using namespace Model::HitFilters;
             return inputState.pickResult().all(type(hitType));
         }
@@ -116,20 +110,15 @@ protected:
         LassoDragDelegate(T &tool) : m_tool{tool} {
         }
 
-        HandlePositionProposer start(
-            const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
-        ) override {
+        HandlePositionProposer start(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset) override {
             const auto &camera = inputState.camera();
             m_lasso = std::make_unique<Lasso>(camera, LassoDistance, initialHandlePosition);
 
             const auto plane = vm::orthogonal_plane(initialHandlePosition, vm::vec3{camera.direction()});
-            return makeHandlePositionProposer(
-                makePlaneHandlePicker(plane, handleOffset), makeIdentityHandleSnapper());
+            return makeHandlePositionProposer(makePlaneHandlePicker(plane, handleOffset), makeIdentityHandleSnapper());
         }
 
-        DragStatus drag(
-            const InputState &, const DragState &, const vm::vec3 &proposedHandlePosition
-        ) override {
+        DragStatus drag(const InputState &, const DragState &, const vm::vec3 &proposedHandlePosition) override {
             m_lasso->update(proposedHandlePosition);
             return DragStatus::Continue;
         }
@@ -140,9 +129,7 @@ protected:
 
         void cancel(const DragState &) override {}
 
-        void render(
-            const InputState &, const DragState &, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-        ) const override {
+        void render(const InputState &, const DragState &, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const override {
             m_lasso->render(renderContext, renderBatch);
         }
     };
@@ -191,29 +178,25 @@ protected:
             }
 
             const auto &camera = inputState.camera();
-            const auto plane = vm::orthogonal_plane(
-                vm::vec3{camera.defaultPoint(static_cast<float>(LassoDragDelegate::LassoDistance))}, vm::vec3{camera.direction()}
+            const auto plane = vm::orthogonal_plane(vm::vec3{
+                    camera.defaultPoint(static_cast<float>(LassoDragDelegate::LassoDistance))
+                }, vm::vec3{
+                    camera.direction()
+                }
             );
-            const auto initialPoint = vm::point_at_distance(
-                inputState.pickRay(), vm::intersect_ray_plane(inputState.pickRay(), plane));
+            const auto initialPoint = vm::point_at_distance(inputState.pickRay(), vm::intersect_ray_plane(inputState.pickRay(), plane));
 
-            return createHandleDragTracker(
-                LassoDragDelegate{m_tool}, inputState, initialPoint, initialPoint
-            );
+            return createHandleDragTracker(LassoDragDelegate{m_tool}, inputState, initialPoint, initialPoint);
         }
 
         bool cancel() override { return m_tool.deselectAll(); }
 
     protected:
-        void setRenderOptions(
-            const InputState &, Renderer::RenderContext &renderContext
-        ) const override {
+        void setRenderOptions(const InputState &, Renderer::RenderContext &renderContext) const override {
             renderContext.setForceHideSelectionGuide();
         }
 
-        void render(
-            const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-        ) override {
+        void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override {
             m_tool.renderHandles(renderContext, renderBatch);
             if (!inputState.anyToolDragging()) {
                 const auto hit = findDraggableHandle(inputState);
@@ -233,7 +216,7 @@ protected:
             using namespace Model::HitFilters;
 
             auto result = std::vector<Model::Hit>{};
-            auto visitedBrushes = std::unordered_set < Model::BrushNode * > {};
+            auto visitedBrushes = std::unordered_set<Model::BrushNode *>{};
 
             const Model::Hit &first = pickResult.first(type(m_hitType));
             if (first.isMatch()) {
@@ -254,9 +237,7 @@ protected:
             return result;
         }
 
-        bool allIncidentBrushesVisited(
-            const H &handle, std::unordered_set<Model::BrushNode *> &visitedBrushes
-        ) const {
+        bool allIncidentBrushesVisited(const H &handle, std::unordered_set<Model::BrushNode *> &visitedBrushes) const {
             bool result = true;
             for (auto brush: m_tool.findIncidentBrushes(handle)) {
                 const bool unvisited = visitedBrushes.insert(brush).second;
@@ -280,9 +261,7 @@ protected:
         MoveDragDelegate(T &tool) : m_tool{tool} {
         }
 
-        DragStatus move(
-            const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
-        ) override {
+        DragStatus move(const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition) override {
             switch (m_tool.move(proposedHandlePosition - dragState.currentHandlePosition)) {
                 case T::MoveResult::Continue:
                     return DragStatus::Continue;
@@ -298,17 +277,13 @@ protected:
 
         void cancel(const DragState &) override { m_tool.cancelMove(); }
 
-        void render(
-            const InputState &, const DragState &, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-        ) const override {
+        void render(const InputState &, const DragState &, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const override {
             m_tool.renderDragHandle(renderContext, renderBatch);
             m_tool.renderDragHighlight(renderContext, renderBatch);
             m_tool.renderDragGuide(renderContext, renderBatch);
         }
 
-        DragHandleSnapper makeDragHandleSnapper(
-            const InputState &, const SnapMode snapMode
-        ) const override {
+        DragHandleSnapper makeDragHandleSnapper(const InputState &, const SnapMode snapMode) const override {
             if (m_tool.allowAbsoluteSnapping()) {
                 return makeDragHandleSnapperFromSnapMode(m_tool.grid(), snapMode);
             }
@@ -350,17 +325,16 @@ protected:
 
             const auto [initialHandlePosition, hitPoint] = m_tool.handlePositionAndHitPoint(hits);
 
-            return createMoveHandleDragTracker(
-                MoveDragDelegate{m_tool}, inputState, initialHandlePosition, hitPoint
-            );
+            return createMoveHandleDragTracker(MoveDragDelegate{m_tool}, inputState, initialHandlePosition, hitPoint);
         }
 
         bool cancel() override { return m_tool.deselectAll(); }
 
         // Overridden in vertex tool controller to handle special cases for vertex moving.
         virtual bool shouldStartMove(const InputState &inputState) const {
-            return inputState.mouseButtonsPressed(MouseButtons::MBLeft) && (inputState.modifierKeysPressed(ModifierKeys::MKNone)     // horizontal movement
-                                                                            || inputState.modifierKeysPressed(ModifierKeys::MKAlt)); // vertical movement
+            return inputState.mouseButtonsPressed(MouseButtons::MBLeft) && (
+                inputState.modifierKeysPressed(ModifierKeys::MKNone)     // horizontal movement
+                || inputState.modifierKeysPressed(ModifierKeys::MKAlt)); // vertical movement
         }
     };
 

@@ -98,9 +98,7 @@ std::vector<vm::vec2f> circle2D(const float radius, const size_t segments) {
     return vertices;
 }
 
-std::vector<vm::vec2f> circle2D(
-    const float radius, const float startAngle, const float angleLength, const size_t segments
-) {
+std::vector<vm::vec2f> circle2D(const float radius, const float startAngle, const float angleLength, const size_t segments) {
     assert(radius > 0.0f);
     assert(segments > 0);
     if (angleLength == 0.0f)
@@ -119,9 +117,7 @@ std::vector<vm::vec2f> circle2D(
     return vertices;
 }
 
-std::vector<vm::vec3f> circle2D(
-    const float radius, const vm::axis::type axis, const float startAngle, const float angleLength, const size_t segments
-) {
+std::vector<vm::vec3f> circle2D(const float radius, const vm::axis::type axis, const float startAngle, const float angleLength, const size_t segments) {
     assert(radius > 0.0f);
     assert(segments > 0);
     if (angleLength == 0.0f)
@@ -160,28 +156,23 @@ std::vector<vm::vec3f> circle2D(
     return vertices;
 }
 
-std::pair<float, float> startAngleAndLength(
-    const vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis
-) {
+std::pair<float, float> startAngleAndLength(const vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis) {
     float angle1, angle2, angleLength;
     switch (axis) {
         case vm::axis::x:
             angle1 = vm::measure_angle(startAxis, vm::vec3f::pos_y(), vm::vec3f::pos_x());
             angle2 = vm::measure_angle(endAxis, vm::vec3f::pos_y(), vm::vec3f::pos_x());
-            angleLength = vm::min(
-                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_x()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_x()));
+            angleLength = vm::min(vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_x()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_x()));
             break;
         case vm::axis::y:
             angle1 = vm::measure_angle(startAxis, vm::vec3f::pos_z(), vm::vec3f::pos_y());
             angle2 = vm::measure_angle(endAxis, vm::vec3f::pos_z(), vm::vec3f::pos_y());
-            angleLength = vm::min(
-                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_y()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_y()));
+            angleLength = vm::min(vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_y()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_y()));
             break;
         default:
             angle1 = vm::measure_angle(startAxis, vm::vec3f::pos_x(), vm::vec3f::pos_z());
             angle2 = vm::measure_angle(endAxis, vm::vec3f::pos_x(), vm::vec3f::pos_z());
-            angleLength = vm::min(
-                vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_z()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_z()));
+            angleLength = vm::min(vm::measure_angle(startAxis, endAxis, vm::vec3f::pos_z()), vm::measure_angle(endAxis, startAxis, vm::vec3f::pos_z()));
             break;
     }
     const float minAngle = vm::min(angle1, angle2);
@@ -194,15 +185,11 @@ size_t roundedRect2DVertexCount(const size_t cornerSegments) {
     return 4 * (3 * cornerSegments + 3);
 }
 
-std::vector<vm::vec2f> roundedRect2D(
-    const vm::vec2f &size, const float cornerRadius, const size_t cornerSegments
-) {
+std::vector<vm::vec2f> roundedRect2D(const vm::vec2f &size, const float cornerRadius, const size_t cornerSegments) {
     return roundedRect2D(size.x(), size.y(), cornerRadius, cornerSegments);
 }
 
-std::vector<vm::vec2f> roundedRect2D(
-    const float width, const float height, const float cornerRadius, const size_t cornerSegments
-) {
+std::vector<vm::vec2f> roundedRect2D(const float width, const float height, const float cornerRadius, const size_t cornerSegments) {
     assert(cornerSegments > 0);
     assert(cornerRadius <= width / 2.0f && cornerRadius <= height / 2.0f);
 
@@ -327,13 +314,9 @@ public:
 
 using MidPointCache = std::map<SphereBuilder::MidPointIndex, size_t>;
 
-size_t midPoint(
-    std::vector<vm::vec3f> &vertices, MidPointCache &cache, const size_t index1, const size_t index2
-);
+size_t midPoint(std::vector<vm::vec3f> &vertices, MidPointCache &cache, const size_t index1, const size_t index2);
 
-size_t midPoint(
-    std::vector<vm::vec3f> &vertices, MidPointCache &cache, const size_t index1, const size_t index2
-) {
+size_t midPoint(std::vector<vm::vec3f> &vertices, MidPointCache &cache, const size_t index1, const size_t index2) {
     MidPointCache::iterator it = cache.find(MidPointIndex(index1, index2));
     if (it == std::end(cache)) {
         const vm::vec3f &vertex1 = vertices[index1];

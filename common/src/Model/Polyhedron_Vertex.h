@@ -31,9 +31,8 @@ kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &Polyhedron_GetVertex
 }
 
 template<typename T, typename FP, typename VP>
-const kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &Polyhedron_GetVertexLink<T, FP, VP>::operator()(
-    const Polyhedron_Vertex<T, FP, VP> *vertex
-) const {
+const kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &
+Polyhedron_GetVertexLink<T, FP, VP>::operator()(const Polyhedron_Vertex<T, FP, VP> *vertex) const {
     return vertex->m_link;
 }
 

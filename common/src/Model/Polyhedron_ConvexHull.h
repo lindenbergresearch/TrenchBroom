@@ -60,9 +60,7 @@ void Polyhedron<T, FP, VP>::addPoints(std::vector<vm::vec<T, 3>> points) {
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPoint(
-    const vm::vec<T, 3> &position, const T planeEpsilon
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPoint(const vm::vec<T, 3> &position, const T planeEpsilon) {
     assert(checkInvariant());
 
     // quick test to discard vertices which would yield short edges
@@ -98,9 +96,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPoint(
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFirstPoint(
-    const vm::vec<T, 3> &position
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFirstPoint(const vm::vec<T, 3> &position) {
     assert(empty());
     Vertex *newVertex = new Vertex(position);
     m_vertices.push_back(newVertex);
@@ -108,9 +104,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFirstPoint(
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addSecondPoint(
-    const vm::vec<T, 3> &position
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addSecondPoint(const vm::vec<T, 3> &position) {
     assert(point());
 
     Vertex *onlyVertex = *std::begin(m_vertices);
@@ -130,9 +124,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addSecondPoint(
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addThirdPoint(
-    const vm::vec<T, 3> &position
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addThirdPoint(const vm::vec<T, 3> &position) {
     assert(edge());
 
     Vertex *v1 = m_vertices.front();
@@ -147,9 +139,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addThirdPoint(
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addColinearThirdPoint(
-    const vm::vec<T, 3> &position
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addColinearThirdPoint(const vm::vec<T, 3> &position) {
     assert(edge());
 
     auto *v1 = m_vertices.front();
@@ -171,9 +161,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addColinearThirdP
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addNonColinearThirdPoint(
-    const vm::vec<T, 3> &position
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addNonColinearThirdPoint(const vm::vec<T, 3> &position) {
     assert(edge());
 
     Vertex *v1 = m_vertices.front();
@@ -218,9 +206,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addNonColinearThi
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFurtherPoint(
-    const vm::vec<T, 3> &position, const T planeEpsilon
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFurtherPoint(const vm::vec<T, 3> &position, const T planeEpsilon) {
     assert(faceCount() > 0u);
     if (faceCount() == 1u) {
         return addFurtherPointToPolygon(position, planeEpsilon);
@@ -231,9 +217,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFurtherPoint(
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFurtherPointToPolygon(
-    const vm::vec<T, 3> &position, const T planeEpsilon
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFurtherPointToPolygon(const vm::vec<T, 3> &position, const T planeEpsilon) {
     Face *face = m_faces.front();
     const vm::plane_status status = face->pointStatus(position, planeEpsilon);
     switch (status) {
@@ -250,9 +234,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addFurtherPointTo
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPointToPolygon(
-    const vm::vec<T, 3> &position, const T planeEpsilon
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPointToPolygon(const vm::vec<T, 3> &position, const T planeEpsilon) {
     assert(polygon());
 
     Face *face = m_faces.front();
@@ -269,8 +251,8 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPointToPolygon
         const vm::plane_status nextStatus = nextEdge->pointStatus(facePlane.normal, position, planeEpsilon);
 
         // If the current edge contains the point, it will not be added anyway.
-        if (curStatus == vm::plane_status::inside && vm::segment<T, 3>(
-            curEdge->origin()->position(), curEdge->destination()->position()).contains(position, vm::constants<T>::almost_zero())) {
+        if (curStatus == vm::plane_status::inside &&
+            vm::segment<T, 3>(curEdge->origin()->position(), curEdge->destination()->position()).contains(position, vm::constants<T>::almost_zero())) {
             return nullptr;
         }
 
@@ -327,9 +309,7 @@ typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::addPointToPolygon
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::makePolyhedron(
-    const vm::vec<T, 3> &position, const T planeEpsilon
-) {
+typename Polyhedron<T, FP, VP>::Vertex *Polyhedron<T, FP, VP>::makePolyhedron(const vm::vec<T, 3> &position, const T planeEpsilon) {
     assert(polygon());
 
     Seam seam;
@@ -424,9 +404,7 @@ public:
      * @param end end end of the range of edges to replace
      * @param replacement the replacemenet edge, must not be null
      */
-    void replace(
-        typename List::iterator first, typename List::iterator end, Edge *replacement
-    ) {
+    void replace(typename List::iterator first, typename List::iterator end, Edge *replacement) {
         m_edges.erase(first, end);
         m_edges.insert(end, replacement);
         assert(check());
@@ -588,25 +566,21 @@ std::optional<typename Polyhedron<T, FP, VP>::Seam> Polyhedron<T, FP, VP>::creat
     Seam seam;
 
     std::unordered_set<Face *> visitedFaces{initialVisibleFace};
-    visitFace(
-        position, initialVisibleFace->boundary().front(), visitedFaces, seam, planeEpsilon
-    );
+    visitFace(position, initialVisibleFace->boundary().front(), visitedFaces, seam, planeEpsilon);
 
     return seam;
 }
 
 template<typename T, typename FP, typename VP>
-void Polyhedron<T, FP, VP>::visitFace(
-    const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, const T planeEpsilon
+void Polyhedron<T, FP, VP>::visitFace(const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam,
+    const T planeEpsilon
 ) {
     HalfEdge *currentBoundaryEdge = initialBoundaryEdge;
     do {
         Face *neighbour = currentBoundaryEdge->twin()->face();
         if (neighbour->plane().point_status(position, planeEpsilon) != vm::plane_status::below) {
             if (visitedFaces.insert(neighbour).second) {
-                visitFace(
-                    position, currentBoundaryEdge->twin(), visitedFaces, seam, planeEpsilon
-                );
+                visitFace(position, currentBoundaryEdge->twin(), visitedFaces, seam, planeEpsilon);
             }
         }
         else {
@@ -652,9 +626,7 @@ void Polyhedron<T, FP, VP>::split(const Seam &seam) {
 
 template<typename T, typename FP, typename VP>
 template<typename FaceSet>
-void Polyhedron<T, FP, VP>::deleteFaces(
-    HalfEdge *first, FaceSet &visitedFaces, VertexList &verticesToDelete
-) {
+void Polyhedron<T, FP, VP>::deleteFaces(HalfEdge *first, FaceSet &visitedFaces, VertexList &verticesToDelete) {
     Face *face = first->face();
 
     // Have we already visited this face?
@@ -697,9 +669,7 @@ void Polyhedron<T, FP, VP>::deleteFaces(
         if (origin->leaving() == current) {
             // We expect that the vertices on the seam have had a remaining edge
             // set as their leaving edge before the call to this function.
-            verticesToDelete.splice_back(
-                m_vertices, VertexList::iter(origin), std::next(VertexList::iter(origin)), 1u
-            );
+            verticesToDelete.splice_back(m_vertices, VertexList::iter(origin), std::next(VertexList::iter(origin)), 1u);
         }
         current = current->next();
     } while (current != first);
@@ -708,9 +678,7 @@ void Polyhedron<T, FP, VP>::deleteFaces(
 }
 
 template<typename T, typename FP, typename VP>
-typename Polyhedron<T, FP, VP>::Face *Polyhedron<T, FP, VP>::sealWithSinglePolygon(
-    const Seam &seam, const vm::plane<T, 3> &plane
-) {
+typename Polyhedron<T, FP, VP>::Face *Polyhedron<T, FP, VP>::sealWithSinglePolygon(const Seam &seam, const vm::plane<T, 3> &plane) {
     assert(seam.size() >= 3);
     assert(!seam.hasMultipleLoops());
     assert(!empty() && !point() && !edge() && !polygon());
@@ -731,9 +699,7 @@ typename Polyhedron<T, FP, VP>::Face *Polyhedron<T, FP, VP>::sealWithSinglePolyg
 }
 
 template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::checkSeamForWeaving(
-    const Seam &seam, const vm::vec<T, 3> &position
-) const {
+bool Polyhedron<T, FP, VP>::checkSeamForWeaving(const Seam &seam, const vm::vec<T, 3> &position) const {
     assert(seam.size() >= 3);
     assert(!seam.hasMultipleLoops());
     assert(!empty() && !point() && !edge());
@@ -825,9 +791,7 @@ void Polyhedron<T, FP, VP>::sealWithCone(WeaveConeResult cone, const Seam &seam)
 }
 
 template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::mergeCoplanarIncidentFaces(
-    Vertex *vertex, const T planeEpsilon
-) {
+bool Polyhedron<T, FP, VP>::mergeCoplanarIncidentFaces(Vertex *vertex, const T planeEpsilon) {
     assert(vertex != nullptr);
     assert(checkInvariant());
 

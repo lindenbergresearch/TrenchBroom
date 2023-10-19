@@ -36,11 +36,15 @@
 
 namespace TrenchBroom::Renderer {
 
-ShaderProgram::ShaderProgram(std::string name, const GLuint programId) : m_name{std::move(name)}, m_programId{programId} {
+ShaderProgram::ShaderProgram(std::string name, const GLuint programId) : m_name{std::move(name)}, m_programId{
+    programId
+} {
     assert(m_programId != 0);
 }
 
-ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept: m_name{std::move(other.m_name)}, m_programId{std::exchange(other.m_programId, 0)} {
+ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept: m_name{std::move(other.m_name)}, m_programId{
+    std::exchange(other.m_programId, 0)
+} {
 }
 
 ShaderProgram &ShaderProgram::operator=(ShaderProgram &&other) noexcept {
@@ -147,20 +151,17 @@ void ShaderProgram::set(const std::string &name, const vm::vec4f &value) {
 
 void ShaderProgram::set(const std::string &name, const vm::mat2x2f &value) {
     assert(checkActive());
-    glAssert(glUniformMatrix2fv(
-        findUniformLocation(name), 1, false, reinterpret_cast<const float *>(value.v)));
+    glAssert(glUniformMatrix2fv(findUniformLocation(name), 1, false, reinterpret_cast<const float *>(value.v)));
 }
 
 void ShaderProgram::set(const std::string &name, const vm::mat3x3f &value) {
     assert(checkActive());
-    glAssert(glUniformMatrix3fv(
-        findUniformLocation(name), 1, false, reinterpret_cast<const float *>(value.v)));
+    glAssert(glUniformMatrix3fv(findUniformLocation(name), 1, false, reinterpret_cast<const float *>(value.v)));
 }
 
 void ShaderProgram::set(const std::string &name, const vm::mat4x4f &value) {
     assert(checkActive());
-    glAssert(glUniformMatrix4fv(
-        findUniformLocation(name), 1, false, reinterpret_cast<const float *>(value.v)));
+    glAssert(glUniformMatrix4fv(findUniformLocation(name), 1, false, reinterpret_cast<const float *>(value.v)));
 }
 
 GLint ShaderProgram::findAttributeLocation(const std::string &name) const {

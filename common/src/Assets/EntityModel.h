@@ -169,9 +169,7 @@ public:
      * @param pitchType the pitch type
      * @param orientation the orientation
      */
-    EntityModelLoadedFrame(
-        size_t index, const std::string &name, const vm::bbox3f &bounds, PitchType pitchType, Orientation orientation
-    );
+    EntityModelLoadedFrame(size_t index, const std::string &name, const vm::bbox3f &bounds, PitchType pitchType, Orientation orientation);
 
     ~EntityModelLoadedFrame();
 
@@ -196,9 +194,7 @@ public:
      * array
      * @param count the number of vertices that make up the primitive(s)
      */
-    void addToSpacialTree(
-        const std::vector<EntityModelVertex> &vertices, Renderer::PrimType primType, size_t index, size_t count
-    );
+    void addToSpacialTree(const std::vector<EntityModelVertex> &vertices, Renderer::PrimType primType, size_t index, size_t count);
 };
 
 class EntityModelMesh;
@@ -263,9 +259,7 @@ public:
      * @param vertices the mesh vertices
      * @param indices the vertex indices
      */
-    void addIndexedMesh(
-        EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices
-    );
+    void addIndexedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices);
 
     /**
      * Adds a new multitextured mesh to this surface.
@@ -274,9 +268,7 @@ public:
      * @param vertices the mesh vertices
      * @param indices the per texture vertex indices
      */
-    void addTexturedMesh(
-        EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices
-    );
+    void addTexturedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices);
 
     /**
      * Sets the given textures as skins to this surface.
@@ -316,9 +308,7 @@ public:
      */
     const Texture *skin(size_t index) const;
 
-    std::unique_ptr<Renderer::TexturedIndexRangeRenderer> buildRenderer(
-        size_t skinIndex, size_t frameIndex
-    );
+    std::unique_ptr<Renderer::TexturedIndexRangeRenderer> buildRenderer(size_t skinIndex, size_t frameIndex);
 };
 
 /**
@@ -354,9 +344,7 @@ public:
      * @param frameIndex the index of the frame to render
      * @return the renderer
      */
-    std::unique_ptr<Renderer::TexturedRenderer> buildRenderer(
-        size_t skinIndex, size_t frameIndex
-    ) const;
+    std::unique_ptr<Renderer::TexturedRenderer> buildRenderer(size_t skinIndex, size_t frameIndex) const;
 
     /**
      * Returns the bounds of the given frame of this model.
@@ -404,9 +392,7 @@ public:
      *
      * @throws AssetException if the given frame index is out of bounds
      */
-    EntityModelLoadedFrame &loadFrame(
-        size_t frameIndex, const std::string &name, const vm::bbox3f &bounds
-    );
+    EntityModelLoadedFrame &loadFrame(size_t frameIndex, const std::string &name, const vm::bbox3f &bounds);
 
     /**
      * Adds a surface with the given name.

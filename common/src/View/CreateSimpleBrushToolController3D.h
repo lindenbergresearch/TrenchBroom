@@ -42,9 +42,7 @@ private:
     vm::vec3 m_initialPoint;
 
 public:
-    CreateSimpleBrushToolController3D(
-        CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document
-    );
+    CreateSimpleBrushToolController3D(CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document);
 
 private:
     Tool &tool() override;

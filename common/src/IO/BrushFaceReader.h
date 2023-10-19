@@ -55,15 +55,11 @@ public:
     std::vector<Model::BrushFace> read(const vm::bbox3 &worldBounds, ParserStatus &status);
 
 private: // implement MapReader interface
-    Model::Node *onWorldNode(
-        std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status
-    ) override;
+    Model::Node *onWorldNode(std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) override;
 
     void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &status) override;
 
-    void onNode(
-        Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status
-    ) override;
+    void onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status) override;
 
     void onBrushFace(Model::BrushFace face, ParserStatus &status) override;
 };

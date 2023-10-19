@@ -37,12 +37,10 @@
 
 namespace TrenchBroom::View {
 bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode *> &changedLinkedGroups) {
-    const auto linkedGroupIds = kdl::vec_sort(
-        kdl::vec_transform(
-            changedLinkedGroups, [](const auto *groupNode) {
-              return groupNode->group().linkedGroupId();
-            }
-        ));
+    const auto linkedGroupIds = kdl::vec_sort(kdl::vec_transform(changedLinkedGroups, [](const auto *groupNode) {
+          return groupNode->group().linkedGroupId();
+        }
+    ));
 
     return std::adjacent_find(std::begin(linkedGroupIds), std::end(linkedGroupIds)) == std::end(linkedGroupIds);
 }
@@ -52,19 +50,15 @@ const auto compareByAncestry = [](const auto *lhs, const auto *rhs) {
   return rhs->isAncestorOf(lhs);
 };
 
-UpdateLinkedGroupsHelper::UpdateLinkedGroupsHelper(
-    ChangedLinkedGroups changedLinkedGroups
-) : m_state{kdl::vec_sort(std::move(changedLinkedGroups), compareByAncestry)} {
+UpdateLinkedGroupsHelper::UpdateLinkedGroupsHelper(ChangedLinkedGroups changedLinkedGroups) : m_state{
+    kdl::vec_sort(std::move(changedLinkedGroups), compareByAncestry)
+} {
 }
 
 UpdateLinkedGroupsHelper::~UpdateLinkedGroupsHelper() = default;
 
-Result<void> UpdateLinkedGroupsHelper::applyLinkedGroupUpdates(
-    MapDocumentCommandFacade &document
-) {
-    return computeLinkedGroupUpdates(document).transform(
-        [&]() { doApplyOrUndoLinkedGroupUpdates(document); }
-    );
+Result<void> UpdateLinkedGroupsHelper::applyLinkedGroupUpdates(MapDocumentCommandFacade &document) {
+    return computeLinkedGroupUpdates(document).transform([&]() { doApplyOrUndoLinkedGroupUpdates(document); });
 }
 
 void UpdateLinkedGroupsHelper::undoLinkedGroupUpdates(MapDocumentCommandFacade &document) {
@@ -89,26 +83,20 @@ void UpdateLinkedGroupsHelper::collateWith(UpdateLinkedGroupsHelper &other) {
     auto &theirLinkedGroupUpdates = std::get<LinkedGroupUpdates>(other.m_state);
 
     for (auto &[theirGroupNodeToUpdate, theirOldChildren]: theirLinkedGroupUpdates) {
-        const auto myIt = std::find_if(
-            std::begin(myLinkedGroupUpdates), std::end(myLinkedGroupUpdates), [theirGroupNodeToUpdate = theirGroupNodeToUpdate](const auto &p) {
+        const auto myIt = std::find_if(std::begin(myLinkedGroupUpdates), std::end(myLinkedGroupUpdates),
+            [theirGroupNodeToUpdate = theirGroupNodeToUpdate](const auto &p) {
               return p.first == theirGroupNodeToUpdate;
             }
         );
         if (myIt == std::end(myLinkedGroupUpdates)) {
-            myLinkedGroupUpdates.emplace_back(
-                theirGroupNodeToUpdate, std::move(theirOldChildren));
+            myLinkedGroupUpdates.emplace_back(theirGroupNodeToUpdate, std::move(theirOldChildren));
         }
     }
 }
 
-Result<void> UpdateLinkedGroupsHelper::computeLinkedGroupUpdates(
-    MapDocumentCommandFacade &document
-) {
-    return std::visit(
-        kdl::overload(
-            [&](const ChangedLinkedGroups &changedLinkedGroups) {
-              return computeLinkedGroupUpdates(changedLinkedGroups, document).transform(
-                  [&](auto &&linkedGroupUpdates) {
+Result<void> UpdateLinkedGroupsHelper::computeLinkedGroupUpdates(MapDocumentCommandFacade &document) {
+    return std::visit(kdl::overload([&](const ChangedLinkedGroups &changedLinkedGroups) {
+              return computeLinkedGroupUpdates(changedLinkedGroups, document).transform([&](auto &&linkedGroupUpdates) {
                     m_state = std::forward<decltype(linkedGroupUpdates)>(linkedGroupUpdates);
                   }
               );
@@ -117,41 +105,28 @@ Result<void> UpdateLinkedGroupsHelper::computeLinkedGroupUpdates(
     );
 }
 
-Result<UpdateLinkedGroupsHelper::LinkedGroupUpdates> UpdateLinkedGroupsHelper::computeLinkedGroupUpdates(
-    const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document
-) {
+Result<UpdateLinkedGroupsHelper::LinkedGroupUpdates>
+UpdateLinkedGroupsHelper::computeLinkedGroupUpdates(const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document) {
     if (!checkLinkedGroupsToUpdate(changedLinkedGroups)) {
         return Error{"Cannot update multiple members of the same link set"};
     }
 
     const auto &worldBounds = document.worldBounds();
-    return kdl::fold_results(
-        kdl::vec_transform(
-            changedLinkedGroups, [&](const auto *groupNode) {
-              const auto groupNodesToUpdate = kdl::vec_erase(
-                  Model::findLinkedGroups(
-                      *document.world(), *groupNode->group().linkedGroupId()), groupNode
-              );
+    return kdl::fold_results(kdl::vec_transform(changedLinkedGroups, [&](const auto *groupNode) {
+          const auto groupNodesToUpdate = kdl::vec_erase(Model::findLinkedGroups(*document.world(), *groupNode->group().linkedGroupId()), groupNode);
 
-              return Model::updateLinkedGroups(
-                  *groupNode, groupNodesToUpdate, worldBounds
-              );
-            }
-        )).and_then(
-        [&](auto &&nestedUpdateLists) -> Result<LinkedGroupUpdates> {
+          return Model::updateLinkedGroups(*groupNode, groupNodesToUpdate, worldBounds);
+        }
+    )).and_then([&](auto &&nestedUpdateLists) -> Result<LinkedGroupUpdates> {
           return kdl::vec_flatten(std::move(nestedUpdateLists));
         }
     );
 }
 
-void UpdateLinkedGroupsHelper::doApplyOrUndoLinkedGroupUpdates(
-    MapDocumentCommandFacade &document
-) {
-    std::visit(
-        kdl::overload(
-            [](const ChangedLinkedGroups &) {}, [&](LinkedGroupUpdates &&linkedGroupUpdates) {
-              m_state = document.performReplaceChildren(std::move(linkedGroupUpdates));
-            }
-        ), std::move(m_state));
+void UpdateLinkedGroupsHelper::doApplyOrUndoLinkedGroupUpdates(MapDocumentCommandFacade &document) {
+    std::visit(kdl::overload([](const ChangedLinkedGroups &) {}, [&](LinkedGroupUpdates &&linkedGroupUpdates) {
+          m_state = document.performReplaceChildren(std::move(linkedGroupUpdates));
+        }
+    ), std::move(m_state));
 }
 } // namespace TrenchBroom::View

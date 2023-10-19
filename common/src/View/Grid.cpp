@@ -100,7 +100,9 @@ FloatType Grid::intersectWithRay(const vm::ray3 &ray, const size_t skip) const {
     vm::vec3 planeAnchor;
 
     for (size_t i = 0; i < 3; ++i) {
-        planeAnchor[i] = ray.direction[i] > 0.0 ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize() : snapDown(ray.origin[i], true) - static_cast<FloatType>(skip) * actualSize();
+        planeAnchor[i] = ray.direction[i] > 0.0 ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize() : snapDown(ray.origin[i], true) -
+                                                                                                                              static_cast<FloatType>(skip) *
+                                                                                                                              actualSize();
     }
 
     const auto distX = vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_x()));
@@ -149,9 +151,7 @@ vm::vec3 Grid::moveDeltaForPoint(const vm::vec3 &point, const vm::vec3 &delta) c
  * an entity from the entity browser onto the map, the mouse is always grabbing the edge
  * of the entity bbox that's closest to the camera.
  */
-vm::vec3 Grid::moveDeltaForBounds(
-    const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */, const vm::ray3 &ray
-) const {
+vm::vec3 Grid::moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */, const vm::ray3 &ray) const {
     // First, find the ray/plane intersection, and snap it to grid.
     // This will become one of the corners of our resulting bbox.
     // Note that this means we might let the box clip into the plane somewhat.
@@ -165,8 +165,7 @@ vm::vec3 Grid::moveDeltaForBounds(
     const size_t localY = vm::find_abs_max_component(targetPlane.normal, 2);
 
     vm::vec3 firstCorner = snapTowards(hitPoint, -ray.direction);
-    if (vm::is_equal(
-        targetPlane.normal, vm::get_abs_max_component_axis(targetPlane.normal), vm::C::almost_zero())) {
+    if (vm::is_equal(targetPlane.normal, vm::get_abs_max_component_axis(targetPlane.normal), vm::C::almost_zero())) {
         // targetPlane is axial. As a special case, only snap X and Y
         firstCorner[localZ] = hitPoint[localZ];
     }
@@ -222,9 +221,7 @@ FloatType Grid::snapToGridPlane(const vm::line3 &line, const FloatType distance)
     return snappedDistance;
 }
 
-FloatType Grid::snapMoveDistanceForFace(
-    const Model::BrushFace &face, const FloatType moveDistance
-) const {
+FloatType Grid::snapMoveDistanceForFace(const Model::BrushFace &face, const FloatType moveDistance) const {
     const auto isBoundaryEdge = [&](const Model::BrushEdge *edge) {
       return edge->firstFace() == face.geometry() || edge->secondFace() == face.geometry();
     };

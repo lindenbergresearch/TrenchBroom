@@ -41,8 +41,7 @@ std::filesystem::path userDataDirectory() {
     // Compatibility with wxWidgets
     return IO::pathFromQString(QDir::homePath()) / ".TrenchBroom";
 #else
-    return IO::pathFromQString(
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    return IO::pathFromQString(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 #endif
 }
 
@@ -64,24 +63,18 @@ std::filesystem::path findResourceFile(const std::filesystem::path &file) {
         return inUserDataDir;
     }
 
-    return IO::pathFromQString(
-        QStandardPaths::locate(
-            QStandardPaths::AppDataLocation, IO::pathAsQString(file), QStandardPaths::LocateOption::LocateFile
-        ));
+    return IO::pathFromQString(QStandardPaths::locate(QStandardPaths::AppDataLocation, IO::pathAsQString(file), QStandardPaths::LocateOption::LocateFile));
 }
 
-std::vector<std::filesystem::path> findResourceDirectories(
-    const std::filesystem::path &directory
-) {
+std::vector<std::filesystem::path> findResourceDirectories(const std::filesystem::path &directory) {
     auto result = std::vector<std::filesystem::path>{
         // Special case for running debug builds on Linux
         appDirectory() / directory,
         // Compatibility with wxWidgets
-        userDataDirectory() / directory,};
+        userDataDirectory() / directory,
+    };
 
-    const auto dirs = QStandardPaths::locateAll(
-        QStandardPaths::AppDataLocation, IO::pathAsQString(directory), QStandardPaths::LocateOption::LocateDirectory
-    );
+    const auto dirs = QStandardPaths::locateAll(QStandardPaths::AppDataLocation, IO::pathAsQString(directory), QStandardPaths::LocateOption::LocateDirectory);
 
     for (const auto &dir: dirs) {
         const auto path = IO::pathFromQString(dir);

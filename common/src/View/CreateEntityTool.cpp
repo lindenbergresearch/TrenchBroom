@@ -45,7 +45,9 @@
 
 namespace TrenchBroom {
 namespace View {
-CreateEntityTool::CreateEntityTool(std::weak_ptr<MapDocument> document) : Tool{true(initiallyActive)}, m_document{std::move(document)}, m_entity{nullptr} {
+CreateEntityTool::CreateEntityTool(std::weak_ptr<MapDocument> document) : Tool{true(initiallyActive)}, m_document{
+    std::move(document)
+}, m_entity{nullptr} {
 }
 
 bool CreateEntityTool::createEntity(const std::string &classname) {
@@ -58,12 +60,8 @@ bool CreateEntityTool::createEntity(const std::string &classname) {
 
     m_referenceBounds = document->referenceBounds();
 
-    document->startTransaction(
-        "Create '" + definition->name() + "'", TransactionScope::LongRunning
-    );
-    m_entity = document->createPointEntity(
-        static_cast<Assets::PointEntityDefinition *>(definition), {0, 0, 0}
-    );
+    document->startTransaction("Create '" + definition->name() + "'", TransactionScope::LongRunning);
+    m_entity = document->createPointEntity(static_cast<Assets::PointEntityDefinition *>(definition), {0, 0, 0});
 
     return m_entity != nullptr;
 }
@@ -96,9 +94,7 @@ void CreateEntityTool::updateEntityPosition2D(const vm::ray3 &pickRay) {
     if (!vm::is_nan(distance)) {
 
         const auto &grid = document->grid();
-        const auto delta = grid.moveDeltaForBounds(
-            dragPlane, m_entity->logicalBounds(), document->worldBounds(), pickRay
-        );
+        const auto delta = grid.moveDeltaForBounds(dragPlane, m_entity->logicalBounds(), document->worldBounds(), pickRay);
 
         if (!vm::is_zero(delta, vm::C::almost_zero())) {
             document->translateObjects(delta);
@@ -106,9 +102,7 @@ void CreateEntityTool::updateEntityPosition2D(const vm::ray3 &pickRay) {
     }
 }
 
-void CreateEntityTool::updateEntityPosition3D(
-    const vm::ray3 &pickRay, const Model::PickResult &pickResult
-) {
+void CreateEntityTool::updateEntityPosition3D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) {
     using namespace Model::HitFilters;
 
     ensure(m_entity != nullptr, "entity is null");
@@ -120,13 +114,10 @@ void CreateEntityTool::updateEntityPosition3D(
     const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType));
     if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
         const auto &face = faceHandle->face();
-        delta = grid.moveDeltaForBounds(
-            face.boundary(), m_entity->logicalBounds(), document->worldBounds(), pickRay
-        );
+        delta = grid.moveDeltaForBounds(face.boundary(), m_entity->logicalBounds(), document->worldBounds(), pickRay);
     }
     else {
-        const auto newPosition = vm::point_at_distance(
-            pickRay, static_cast<FloatType>(Renderer::Camera::DefaultPointDistance));
+        const auto newPosition = vm::point_at_distance(pickRay, static_cast<FloatType>(Renderer::Camera::DefaultPointDistance));
         const auto boundsCenter = m_entity->logicalBounds().center();
         delta = grid.moveDeltaForPoint(boundsCenter, newPosition - boundsCenter);
     }

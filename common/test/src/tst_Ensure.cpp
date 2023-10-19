@@ -22,13 +22,11 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace Ensure
-{
+namespace TrenchBroom {
+namespace Ensure {
 TEST_CASE("EnsureTest.successfulEnsure")
 {
-  CHECK_NOTHROW([]() { ensure(true, "this shouldn't fail"); }());
+    CHECK_NOTHROW([]() { ensure(true, "this shouldn't fail"); }());
 }
 
 // Disable a clang warning when using ASSERT_DEATH
@@ -39,8 +37,8 @@ TEST_CASE("EnsureTest.successfulEnsure")
 
 TEST_CASE("EnsureTest.failingEnsure")
 {
-  // FIXME: not with catch2
-  // ASSERT_DEATH(ensure(false, "this should fail"), "");
+    // FIXME: not with catch2
+    // ASSERT_DEATH(ensure(false, "this should fail"), "");
 }
 
 #ifdef __clang__

@@ -47,9 +47,7 @@ static const Type Any = AnyView | AnyOrNoSelection | AnyOrNoTool;
 
 bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs);
 
-bool actionContextMatches(
-    ActionContext::Type lhs, ActionContext::Type rhs, ActionContext::Type mask
-);
+bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs, ActionContext::Type mask);
 
 std::string actionContextName(ActionContext::Type actionContext);
 

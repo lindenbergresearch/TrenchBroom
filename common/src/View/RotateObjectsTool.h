@@ -91,21 +91,13 @@ public:
 
     vm::vec3 rotationAxis(RotateObjectsHandle::HitArea area) const;
 
-    void renderHandle2D(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderHandle2D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderHandle3D(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderHandle3D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderHighlight2D(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area
-    );
+    void renderHighlight2D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area);
 
-    void renderHighlight3D(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area
-    );
+    void renderHighlight3D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area);
 
 private:
     void updateRecentlyUsedCenters(const vm::vec3 &center);

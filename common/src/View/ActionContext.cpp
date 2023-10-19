@@ -27,12 +27,11 @@
 namespace TrenchBroom {
 namespace View {
 bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs) {
-    return actionContextMatches(lhs, rhs, ActionContext::AnyView) && actionContextMatches(lhs, rhs, ActionContext::AnyOrNoTool) && actionContextMatches(lhs, rhs, ActionContext::AnyOrNoSelection);
+    return actionContextMatches(lhs, rhs, ActionContext::AnyView) && actionContextMatches(lhs, rhs, ActionContext::AnyOrNoTool) &&
+           actionContextMatches(lhs, rhs, ActionContext::AnyOrNoSelection);
 }
 
-bool actionContextMatches(
-    const ActionContext::Type lhs, const ActionContext::Type rhs, const ActionContext::Type mask
-) {
+bool actionContextMatches(const ActionContext::Type lhs, const ActionContext::Type rhs, const ActionContext::Type mask) {
     return (lhs & rhs & mask) != 0;
 }
 

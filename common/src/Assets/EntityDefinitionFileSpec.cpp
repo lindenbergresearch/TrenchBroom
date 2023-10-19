@@ -44,15 +44,11 @@ EntityDefinitionFileSpec EntityDefinitionFileSpec::parse(const std::string &str)
     return path.is_absolute() ? EntityDefinitionFileSpec::external(path) : EntityDefinitionFileSpec::builtin(path);
 }
 
-EntityDefinitionFileSpec EntityDefinitionFileSpec::builtin(
-    const std::filesystem::path &path
-) {
+EntityDefinitionFileSpec EntityDefinitionFileSpec::builtin(const std::filesystem::path &path) {
     return EntityDefinitionFileSpec(Type::Builtin, path);
 }
 
-EntityDefinitionFileSpec EntityDefinitionFileSpec::external(
-    const std::filesystem::path &path
-) {
+EntityDefinitionFileSpec EntityDefinitionFileSpec::external(const std::filesystem::path &path) {
     return EntityDefinitionFileSpec(Type::External, path);
 }
 
@@ -104,9 +100,7 @@ std::string EntityDefinitionFileSpec::asString() const {
     return "external:" + m_path.string();
 }
 
-EntityDefinitionFileSpec::EntityDefinitionFileSpec(
-    const Type type, const std::filesystem::path &path
-) : m_type(type), m_path(path) {
+EntityDefinitionFileSpec::EntityDefinitionFileSpec(const Type type, const std::filesystem::path &path) : m_type(type), m_path(path) {
     assert(valid());
     assert(!path.empty());
 }

@@ -110,8 +110,7 @@ private:
 
     private:
         void doRender(PrimType primType, size_t offset, size_t count) const override {
-            glAssert(glDrawElements(
-                toGL(primType), static_cast<GLsizei>(count), GL_UNSIGNED_INT, reinterpret_cast<void *>(offset * 4u)));
+            glAssert(glDrawElements(toGL(primType), static_cast<GLsizei>(count), GL_UNSIGNED_INT, reinterpret_cast<void *>(offset * 4u)));
         }
 
     private:

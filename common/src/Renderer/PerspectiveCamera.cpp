@@ -43,8 +43,8 @@ namespace Renderer {
 PerspectiveCamera::PerspectiveCamera() : Camera(), m_fov(90.0) {
 }
 
-PerspectiveCamera::PerspectiveCamera(
-    const float fov, const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up
+PerspectiveCamera::PerspectiveCamera(const float fov, const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position,
+    const vm::vec3f &direction, const vm::vec3f &up
 ) : Camera(nearPlane, farPlane, viewport, position, direction, up), m_fov(fov) {
     assert(m_fov > 0.0f);
 }
@@ -96,19 +96,13 @@ Camera::ProjectionType PerspectiveCamera::doGetProjectionType() const {
     return Projection_Perspective;
 }
 
-void PerspectiveCamera::doValidateMatrices(
-    vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix
-) const {
+void PerspectiveCamera::doValidateMatrices(vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix) const {
     const Viewport &viewport = this->viewport();
-    projectionMatrix = vm::perspective_matrix(
-        zoomedFov(), nearPlane(), farPlane(), viewport.width, viewport.height
-    );
+    projectionMatrix = vm::perspective_matrix(zoomedFov(), nearPlane(), farPlane(), viewport.width, viewport.height);
     viewMatrix = vm::view_matrix(direction(), up()) * vm::translation_matrix(-position());
 }
 
-void PerspectiveCamera::doComputeFrustumPlanes(
-    vm::plane3f &topPlane, vm::plane3f &rightPlane, vm::plane3f &bottomPlane, vm::plane3f &leftPlane
-) const {
+void PerspectiveCamera::doComputeFrustumPlanes(vm::plane3f &topPlane, vm::plane3f &rightPlane, vm::plane3f &bottomPlane, vm::plane3f &leftPlane) const {
     const vm::vec2f frustum = getFrustum();
     const vm::vec3f center = position() + direction() * nearPlane();
 
@@ -125,9 +119,7 @@ void PerspectiveCamera::doComputeFrustumPlanes(
     leftPlane = vm::plane3f(position(), normalize(cross(up(), d)));
 }
 
-void PerspectiveCamera::doRenderFrustum(
-    RenderContext &renderContext, VboManager &vboManager, const float size, const Color &color
-) const {
+void PerspectiveCamera::doRenderFrustum(RenderContext &renderContext, VboManager &vboManager, const float size, const Color &color) const {
     using Vertex = GLVertexTypes::P3C4::Vertex;
     std::vector<Vertex> triangleVertices;
     std::vector<Vertex> lineVertices;

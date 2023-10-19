@@ -98,18 +98,14 @@ private:
     const FileSystem &m_fs;
 
 public:
-    Md2Parser(
-        const std::string &name, const Reader &reader, const Assets::Palette &palette, const FileSystem &fs
-    );
+    Md2Parser(const std::string &name, const Reader &reader, const Assets::Palette &palette, const FileSystem &fs);
 
     static bool canParse(const std::filesystem::path &path, Reader reader);
 
 private:
     std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 
-    void doLoadFrame(
-        size_t frameIndex, Assets::EntityModel &model, Logger &logger
-    ) override;
+    void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 
     Md2SkinList parseSkins(Reader reader, size_t skinCount);
 
@@ -117,17 +113,11 @@ private:
 
     Md2MeshList parseMeshes(Reader reader, size_t commandCount);
 
-    void loadSkins(
-        Assets::EntityModelSurface &surface, const Md2SkinList &skins, Logger &logger
-    );
+    void loadSkins(Assets::EntityModelSurface &surface, const Md2SkinList &skins, Logger &logger);
 
-    void buildFrame(
-        Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const Md2Frame &frame, const Md2MeshList &meshes
-    );
+    void buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const Md2Frame &frame, const Md2MeshList &meshes);
 
-    std::vector<Assets::EntityModelVertex> getVertices(
-        const Md2Frame &frame, const Md2MeshVertexList &meshVertices
-    ) const;
+    std::vector<Assets::EntityModelVertex> getVertices(const Md2Frame &frame, const Md2MeshVertexList &meshVertices) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

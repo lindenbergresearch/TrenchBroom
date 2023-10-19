@@ -59,9 +59,8 @@ public:
      * @param vertexCount the total number of vertices to expect
      * @param indexRangeSize the size of the index range map to expect
      */
-    TexturedIndexRangeMapBuilder(
-        const size_t vertexCount, const TexturedIndexRangeMap::Size &indexRangeSize
-    ) : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
+    TexturedIndexRangeMapBuilder(const size_t vertexCount, const TexturedIndexRangeMap::Size &indexRangeSize) : m_vertexListBuilder(vertexCount),
+                                                                                                                m_indexRange(indexRangeSize) {
     }
 
     /**
@@ -142,8 +141,7 @@ public:
      * @param vertices the end points of the lines to add
      */
     void addLineStrip(const Texture *texture, const VertexList &vertices) {
-        add(
-            texture, Renderer::PrimType::LineStrip, m_vertexListBuilder.addLineStrip(vertices));
+        add(texture, Renderer::PrimType::LineStrip, m_vertexListBuilder.addLineStrip(vertices));
     }
 
     /**
@@ -164,11 +162,8 @@ public:
      * @param v2 the position of the second corner
      * @param v3 the position of the third corner
      */
-    void addTriangle(
-        const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3
-    ) {
-        add(
-            texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangle(v1, v2, v3));
+    void addTriangle(const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+        add(texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangle(v1, v2, v3));
     }
 
     /**
@@ -179,8 +174,7 @@ public:
      * @param vertices the corner positions
      */
     void addTriangles(const Texture *texture, const VertexList &vertices) {
-        add(
-            texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangles(vertices));
+        add(texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangles(vertices));
     }
 
     /**
@@ -190,8 +184,7 @@ public:
      * @param vertices the vertex positions
      */
     void addTriangleFan(const Texture *texture, const VertexList &vertices) {
-        add(
-            texture, Renderer::PrimType::TriangleFan, m_vertexListBuilder.addTriangleFan(vertices));
+        add(texture, Renderer::PrimType::TriangleFan, m_vertexListBuilder.addTriangleFan(vertices));
     }
 
     /**
@@ -201,8 +194,7 @@ public:
      * @param vertices the vertex positions
      */
     void addTriangleStrip(const Texture *texture, const VertexList &vertices) {
-        add(
-            texture, Renderer::PrimType::TriangleStrip, m_vertexListBuilder.addTriangleStrip(vertices));
+        add(texture, Renderer::PrimType::TriangleStrip, m_vertexListBuilder.addTriangleStrip(vertices));
     }
 
     /**
@@ -214,9 +206,7 @@ public:
      * @param v3 the position of the third corner
      * @param v4 the position of the fourth corner
      */
-    void addQuad(
-        const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3, const Vertex &v4
-    ) {
+    void addQuad(const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3, const Vertex &v4) {
         add(texture, Renderer::PrimType::Quads, m_vertexListBuilder.addQuad(v1, v2, v3, v4));
     }
 
@@ -238,8 +228,7 @@ public:
      * @param vertices the vertex positions
      */
     void addQuadStrip(const Texture *texture, const VertexList &vertices) {
-        add(
-            texture, Renderer::PrimType::QuadStrip, m_vertexListBuilder.addQuadStrip(vertices));
+        add(texture, Renderer::PrimType::QuadStrip, m_vertexListBuilder.addQuadStrip(vertices));
     }
 
     /**

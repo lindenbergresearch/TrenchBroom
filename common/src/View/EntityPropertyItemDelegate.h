@@ -39,13 +39,10 @@ private:
     const QSortFilterProxyModel *m_proxyModel;
 
 public:
-    EntityPropertyItemDelegate(
-        EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent = nullptr
+    EntityPropertyItemDelegate(EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent = nullptr
     );
 
-    QWidget *createEditor(
-        QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index
-    ) const override;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 

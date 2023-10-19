@@ -45,9 +45,7 @@ class MapDocument;
  * The order of the hits is preserved, but if multiple hits map to the same group, that
  * group will only be listed once in the output.
  */
-std::vector<Model::Node *> hitsToNodesWithGroupPicking(
-    const std::vector<Model::Hit> &hits
-);
+std::vector<Model::Node *> hitsToNodesWithGroupPicking(const std::vector<Model::Hit> &hits);
 
 class SelectionTool : public ToolController, public Tool {
 private:
@@ -68,9 +66,7 @@ public:
 
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-    void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext
-    ) const override;
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
 
     bool cancel() override;
 };

@@ -52,26 +52,26 @@
 #include <string>
 
 namespace TrenchBroom::Model {
-const BrushVertex *BrushFace::TransformHalfEdgeToVertex::operator()(
-    const BrushHalfEdge *halfEdge
-) const {
+const BrushVertex *BrushFace::TransformHalfEdgeToVertex::operator()(const BrushHalfEdge *halfEdge) const {
     return halfEdge->origin();
 }
 
-const BrushEdge *BrushFace::TransformHalfEdgeToEdge::operator()(
-    const BrushHalfEdge *halfEdge
-) const {
+const BrushEdge *BrushFace::TransformHalfEdgeToEdge::operator()(const BrushHalfEdge *halfEdge) const {
     return halfEdge->edge();
 }
 
-BrushFace::BrushFace(const BrushFace &other) : Taggable(other), m_points(other.m_points), m_boundary(other.m_boundary), m_attributes(other.m_attributes), m_textureReference(other.m_textureReference),
-                                               m_texCoordSystem(other.m_texCoordSystem ? other.m_texCoordSystem->clone() : nullptr), m_geometry(nullptr), m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount),
-                                               m_selected(other.m_selected), m_markedToRenderFace(false) {
+BrushFace::BrushFace(const BrushFace &other) : Taggable(other), m_points(other.m_points), m_boundary(other.m_boundary), m_attributes(other.m_attributes),
+                                               m_textureReference(other.m_textureReference),
+                                               m_texCoordSystem(other.m_texCoordSystem ? other.m_texCoordSystem->clone() : nullptr), m_geometry(nullptr),
+                                               m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount), m_selected(other.m_selected),
+                                               m_markedToRenderFace(false) {
 }
 
-BrushFace::BrushFace(BrushFace &&other) noexcept: Taggable(other), m_points(std::move(other.m_points)), m_boundary(std::move(other.m_boundary)), m_attributes(std::move(other.m_attributes)),
-                                                  m_textureReference(std::move(other.m_textureReference)), m_texCoordSystem(std::move(other.m_texCoordSystem)), m_geometry(other.m_geometry), m_lineNumber(other.m_lineNumber),
-                                                  m_lineCount(other.m_lineCount), m_selected(other.m_selected), m_markedToRenderFace(false) {
+BrushFace::BrushFace(BrushFace &&other) noexcept: Taggable(other), m_points(std::move(other.m_points)), m_boundary(std::move(other.m_boundary)),
+                                                  m_attributes(std::move(other.m_attributes)), m_textureReference(std::move(other.m_textureReference)),
+                                                  m_texCoordSystem(std::move(other.m_texCoordSystem)), m_geometry(other.m_geometry),
+                                                  m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount), m_selected(other.m_selected),
+                                                  m_markedToRenderFace(false) {
 }
 
 BrushFace &BrushFace::operator=(BrushFace other) noexcept {
@@ -99,18 +99,15 @@ BrushFace::~BrushFace() = default;
 
 kdl_reflect_impl(BrushFace);
 
-Result<BrushFace> BrushFace::create(
-    const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, const MapFormat mapFormat
-) {
-    return Model::isParallelTexCoordSystem(mapFormat) ? BrushFace::create(
-        point0, point1, point2, attributes, std::make_unique<ParallelTexCoordSystem>(point0, point1, point2, attributes)) : BrushFace::create(
-        point0, point1, point2, attributes, std::make_unique<ParaxialTexCoordSystem>(
-            point0, point1, point2, attributes
-        ));
+Result<BrushFace>
+BrushFace::create(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, const MapFormat mapFormat) {
+    return Model::isParallelTexCoordSystem(mapFormat) ? BrushFace::create(point0, point1, point2, attributes,
+        std::make_unique<ParallelTexCoordSystem>(point0, point1, point2, attributes)) : BrushFace::create(point0, point1, point2, attributes,
+        std::make_unique<ParaxialTexCoordSystem>(point0, point1, point2, attributes));
 }
 
-Result<BrushFace> BrushFace::createFromStandard(
-    const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &inputAttribs, const MapFormat mapFormat
+Result<BrushFace> BrushFace::createFromStandard(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &inputAttribs,
+    const MapFormat mapFormat
 ) {
     assert(mapFormat != MapFormat::Unknown);
 
@@ -130,8 +127,8 @@ Result<BrushFace> BrushFace::createFromStandard(
     return BrushFace::create(point0, point1, point2, attribs, std::move(texCoordSystem));
 }
 
-Result<BrushFace> BrushFace::createFromValve(
-    const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const BrushFaceAttributes &inputAttribs, const vm::vec3 &texAxisX, const vm::vec3 &texAxisY, MapFormat mapFormat
+Result<BrushFace> BrushFace::createFromValve(const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const BrushFaceAttributes &inputAttribs,
+    const vm::vec3 &texAxisX, const vm::vec3 &texAxisY, MapFormat mapFormat
 ) {
     assert(mapFormat != MapFormat::Unknown);
 
@@ -145,16 +142,14 @@ Result<BrushFace> BrushFace::createFromValve(
     }
     else {
         // Convert parallel to paraxial
-        std::tie(texCoordSystem, attribs) = ParaxialTexCoordSystem::fromParallel(
-            point1, point2, point3, inputAttribs, texAxisX, texAxisY
-        );
+        std::tie(texCoordSystem, attribs) = ParaxialTexCoordSystem::fromParallel(point1, point2, point3, inputAttribs, texAxisX, texAxisY);
     }
 
     return BrushFace::create(point1, point2, point3, attribs, std::move(texCoordSystem));
 }
 
-Result<BrushFace> BrushFace::create(
-    const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem
+Result<BrushFace> BrushFace::create(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes,
+    std::unique_ptr<TexCoordSystem> texCoordSystem
 ) {
     Points points = {{vm::correct(point0), vm::correct(point1), vm::correct(point2)}};
     const auto [result, plane] = vm::from_points(points[0], points[1], points[2]);
@@ -166,9 +161,10 @@ Result<BrushFace> BrushFace::create(
     }
 }
 
-BrushFace::BrushFace(
-    const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem
-) : m_points(points), m_boundary(boundary), m_attributes(attributes), m_texCoordSystem(std::move(texCoordSystem)), m_geometry(nullptr), m_lineNumber(0), m_lineCount(0), m_selected(false), m_markedToRenderFace(false) {
+BrushFace::BrushFace(const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes,
+    std::unique_ptr<TexCoordSystem> texCoordSystem
+) : m_points(points), m_boundary(boundary), m_attributes(attributes), m_texCoordSystem(std::move(texCoordSystem)), m_geometry(nullptr), m_lineNumber(0),
+    m_lineCount(0), m_selected(false), m_markedToRenderFace(false) {
     ensure(m_texCoordSystem != nullptr, "texCoordSystem is null");
 }
 
@@ -178,8 +174,7 @@ void BrushFace::sortFaces(std::vector<BrushFace> &faces) {
     // which the faces are added to the brush, so I chose to just sort the faces by their
     // normals.
 
-    std::sort(
-        std::begin(faces), std::end(faces), [](const auto &lhs, const auto &rhs) {
+    std::sort(std::begin(faces), std::end(faces), [](const auto &lhs, const auto &rhs) {
           const auto &lhsBoundary = lhs.boundary();
           const auto &rhsBoundary = rhs.boundary();
 
@@ -202,14 +197,12 @@ std::unique_ptr<TexCoordSystemSnapshot> BrushFace::takeTexCoordSystemSnapshot() 
     return m_texCoordSystem->takeSnapshot();
 }
 
-void BrushFace::restoreTexCoordSystemSnapshot(
-    const TexCoordSystemSnapshot &coordSystemSnapshot
-) {
+void BrushFace::restoreTexCoordSystemSnapshot(const TexCoordSystemSnapshot &coordSystemSnapshot) {
     coordSystemSnapshot.restore(*m_texCoordSystem);
 }
 
-void BrushFace::copyTexCoordSystemFromFace(
-    const TexCoordSystemSnapshot &coordSystemSnapshot, const BrushFaceAttributes &attributes, const vm::plane3 &sourceFacePlane, const WrapStyle wrapStyle
+void BrushFace::copyTexCoordSystemFromFace(const TexCoordSystemSnapshot &coordSystemSnapshot, const BrushFaceAttributes &attributes,
+    const vm::plane3 &sourceFacePlane, const WrapStyle wrapStyle
 ) {
     // Get a line, and a reference point, that are on both the source face's plane and our
     // plane
@@ -222,9 +215,7 @@ void BrushFace::copyTexCoordSystemFromFace(
     // system
     const auto desriedCoords = m_texCoordSystem->getTexCoords(refPoint, attributes, vm::vec2f::one());
 
-    m_texCoordSystem->updateNormal(
-        sourceFacePlane.normal, m_boundary.normal, m_attributes, wrapStyle
-    );
+    m_texCoordSystem->updateNormal(sourceFacePlane.normal, m_boundary.normal, m_attributes, wrapStyle);
 
     // Adjust the offset on this face so that the texture coordinates at the refPoint stay
     // the same
@@ -250,8 +241,7 @@ const vm::vec3 &BrushFace::normal() const {
 vm::vec3 BrushFace::center() const {
     ensure(m_geometry != nullptr, "geometry is null");
     const BrushHalfEdgeList &boundary = m_geometry->boundary();
-    return vm::average(
-        std::begin(boundary), std::end(boundary), BrushGeometry::GetVertexPosition());
+    return vm::average(std::begin(boundary), std::end(boundary), BrushGeometry::GetVertexPosition());
 }
 
 vm::vec3 BrushFace::boundsCenter() const {
@@ -309,9 +299,7 @@ FloatType BrushFace::area() const {
 
 bool BrushFace::coplanarWith(const vm::plane3d &plane) const {
     // Test if the face's center lies on the reference plane within an epsilon.
-    if (!vm::is_zero(
-        plane.point_distance(center()), vm::constants<FloatType>::almost_zero() * 10.0
-    )) {
+    if (!vm::is_zero(plane.point_distance(center()), vm::constants<FloatType>::almost_zero() * 10.0)) {
         return false;
     }
 
@@ -452,9 +440,7 @@ void BrushFace::convertToParallel() {
     m_texCoordSystem = std::move(newTexCoordSystem);
 }
 
-void BrushFace::moveTexture(
-    const vm::vec3 &up, const vm::vec3 &right, const vm::vec2f &offset
-) {
+void BrushFace::moveTexture(const vm::vec3 &up, const vm::vec3 &right, const vm::vec2f &offset) {
     m_texCoordSystem->moveTexture(m_boundary.normal, up, right, offset, m_attributes);
 }
 
@@ -468,9 +454,7 @@ void BrushFace::shearTexture(const vm::vec2f &factors) {
     m_texCoordSystem->shearTexture(m_boundary.normal, factors);
 }
 
-void BrushFace::flipTexture(
-    const vm::vec3 & /* cameraUp */, const vm::vec3 &cameraRight, const vm::direction cameraRelativeFlipDirection
-) {
+void BrushFace::flipTexture(const vm::vec3 & /* cameraUp */, const vm::vec3 &cameraRight, const vm::direction cameraRelativeFlipDirection) {
     const vm::mat4x4 texToWorld = m_texCoordSystem->fromMatrix(vm::vec2f::zero(), vm::vec2f::one());
 
     const vm::vec3 texUAxisInWorld = vm::normalize((texToWorld * vm::vec4d(1, 0, 0, 0)).xyz());
@@ -479,11 +463,9 @@ void BrushFace::flipTexture(
     // Get the cos(angle) between cameraRight and the texUAxisInWorld _line_ (so, take the
     // smaller of the angles among -texUAxisInWorld and texUAxisInWorld). Note that larger
     // cos(angle) means smaller angle.
-    const FloatType UAxisCosAngle = vm::max(
-        vm::dot(texUAxisInWorld, cameraRight), vm::dot(-texUAxisInWorld, cameraRight));
+    const FloatType UAxisCosAngle = vm::max(vm::dot(texUAxisInWorld, cameraRight), vm::dot(-texUAxisInWorld, cameraRight));
 
-    const FloatType VAxisCosAngle = vm::max(
-        vm::dot(texVAxisInWorld, cameraRight), vm::dot(-texVAxisInWorld, cameraRight));
+    const FloatType VAxisCosAngle = vm::max(vm::dot(texVAxisInWorld, cameraRight), vm::dot(-texVAxisInWorld, cameraRight));
 
     // If this is true, it means the texture's V axis is closer to the camera's right vector
     // than the texture's U axis is (i.e. we're looking at the texture sideways), so we
@@ -519,11 +501,8 @@ Result<void> BrushFace::transform(const vm::mat4x4 &transform, const bool lockTe
         swap(m_points[1], m_points[2]);
     }
 
-    return setPoints(m_points[0], m_points[1], m_points[2]).transform(
-        [&]() {
-          m_texCoordSystem->transform(
-              oldBoundary, m_boundary, transform, m_attributes, textureSize(), lockTexture, invariant
-          );
+    return setPoints(m_points[0], m_points[1], m_points[2]).transform([&]() {
+          m_texCoordSystem->transform(oldBoundary, m_boundary, transform, m_attributes, textureSize(), lockTexture, invariant);
         }
     );
 }
@@ -540,9 +519,7 @@ Result<void> BrushFace::updatePointsFromVertices() {
 
     const auto *first = m_geometry->boundary().front();
     const auto oldPlane = m_boundary;
-    return setPoints(
-        first->next()->origin()->position(), first->origin()->position(), first->previous()->origin()->position()).transform(
-        [&]() {
+    return setPoints(first->next()->origin()->position(), first->origin()->position(), first->previous()->origin()->position()).transform([&]() {
           // Get a line, and a reference point, that are on both the old plane
           // (before moving the face) and after moving the face.
           const auto seam = vm::intersect_plane_plane(oldPlane, m_boundary);
@@ -553,16 +530,13 @@ Result<void> BrushFace::updatePointsFromVertices() {
               // system
               const auto desriedCoords = m_texCoordSystem->getTexCoords(refPoint, m_attributes, vm::vec2f::one());
 
-              m_texCoordSystem->updateNormal(
-                  oldPlane.normal, m_boundary.normal, m_attributes, WrapStyle::Projection
-              );
+              m_texCoordSystem->updateNormal(oldPlane.normal, m_boundary.normal, m_attributes, WrapStyle::Projection);
 
               // Adjust the offset on this face so that the texture coordinates at the refPoint
               // stay the same
               const auto currentCoords = m_texCoordSystem->getTexCoords(refPoint, m_attributes, vm::vec2f::one());
               const auto offsetChange = desriedCoords - currentCoords;
-              m_attributes.setOffset(
-                  correct(modOffset(m_attributes.offset() + offsetChange), 4));
+              m_attributes.setOffset(correct(modOffset(m_attributes.offset() + offsetChange), 4));
           }
         }
     );
@@ -577,9 +551,7 @@ vm::mat4x4 BrushFace::projectToBoundaryMatrix() const {
     return planeToWorldMatrix * vm::mat4x4::zero_out<2>() * worldToPlaneMatrix;
 }
 
-vm::mat4x4 BrushFace::toTexCoordSystemMatrix(
-    const vm::vec2f &offset, const vm::vec2f &scale, const bool project
-) const {
+vm::mat4x4 BrushFace::toTexCoordSystemMatrix(const vm::vec2f &offset, const vm::vec2f &scale, const bool project) const {
     if (project) {
         return vm::mat4x4::zero_out<2>() * m_texCoordSystem->toMatrix(offset, scale);
     }
@@ -588,9 +560,7 @@ vm::mat4x4 BrushFace::toTexCoordSystemMatrix(
     }
 }
 
-vm::mat4x4 BrushFace::fromTexCoordSystemMatrix(
-    const vm::vec2f &offset, const vm::vec2f &scale, const bool project
-) const {
+vm::mat4x4 BrushFace::fromTexCoordSystemMatrix(const vm::vec2f &offset, const vm::vec2f &scale, const bool project) const {
     if (project) {
         return projectToBoundaryMatrix() * m_texCoordSystem->fromMatrix(offset, scale);
     }
@@ -599,9 +569,7 @@ vm::mat4x4 BrushFace::fromTexCoordSystemMatrix(
     }
 }
 
-float BrushFace::measureTextureAngle(
-    const vm::vec2f &center, const vm::vec2f &point
-) const {
+float BrushFace::measureTextureAngle(const vm::vec2f &center, const vm::vec2f &point) const {
     return m_texCoordSystem->measureAngle(m_attributes.rotation(), center, point);
 }
 
@@ -678,14 +646,11 @@ FloatType BrushFace::intersectWithRay(const vm::ray3 &ray) const {
         return vm::nan<FloatType>();
     }
     else {
-        return vm::intersect_ray_polygon(
-            ray, m_boundary, m_geometry->boundary().begin(), m_geometry->boundary().end(), BrushGeometry::GetVertexPosition());
+        return vm::intersect_ray_polygon(ray, m_boundary, m_geometry->boundary().begin(), m_geometry->boundary().end(), BrushGeometry::GetVertexPosition());
     }
 }
 
-Result<void> BrushFace::setPoints(
-    const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2
-) {
+Result<void> BrushFace::setPoints(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2) {
     m_points[0] = point0;
     m_points[1] = point1;
     m_points[2] = point2;

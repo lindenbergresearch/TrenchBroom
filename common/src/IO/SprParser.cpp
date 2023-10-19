@@ -38,9 +38,9 @@
 
 namespace TrenchBroom {
 namespace IO {
-SprParser::SprParser(
-    std::string name, const Reader &reader, const Assets::Palette &palette
-) : m_name{std::move(name)}, m_reader{reader}, m_palette{palette} {
+SprParser::SprParser(std::string name, const Reader &reader, const Assets::Palette &palette) : m_name{
+    std::move(name)
+}, m_reader{reader}, m_palette{palette} {
 }
 
 bool SprParser::canParse(const std::filesystem::path &path, Reader reader) {
@@ -70,9 +70,7 @@ static SprPicture parsePicture(Reader &reader, const Assets::Palette &palette) {
 
     Assets::TextureBuffer rgbaImage(4 * width * height);
     auto averageColor = Color{};
-    palette.indexedToRgba(
-        reader, width * height, rgbaImage, Assets::PaletteTransparency::Index255Transparent, averageColor
-    );
+    palette.indexedToRgba(reader, width * height, rgbaImage, Assets::PaletteTransparency::Index255Transparent, averageColor);
 
     return SprPicture{{"", width, height, averageColor, std::move(rgbaImage), GL_RGBA, Assets::TextureType::Masked}, xOffset, yOffset, width, height};
 }
@@ -134,9 +132,7 @@ static RenderMode parseSpriteRenderMode(Reader &reader) {
     return static_cast<RenderMode>(mode);
 }
 
-static std::vector<unsigned char> processGoldsourcePalette(
-    const RenderMode mode, const std::vector<unsigned char> &data
-) {
+static std::vector<unsigned char> processGoldsourcePalette(const RenderMode mode, const std::vector<unsigned char> &data) {
     // Convert the data into a Goldsource palette
     auto processed = std::vector<unsigned char>{};
     processed.reserve(1024);
@@ -229,9 +225,7 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
         palette = parseEmbeddedPalette(reader, renderMode);
     }
 
-    auto model = std::make_unique<Assets::EntityModel>(
-        m_name, Assets::PitchType::Normal, orientationType
-    );
+    auto model = std::make_unique<Assets::EntityModel>(m_name, Assets::PitchType::Normal, orientationType);
     for (size_t i = 0; i < frameCount; ++i) {
         auto &frame = model->addFrame();
         frame.setSkinOffset(i);
@@ -257,15 +251,17 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
         const auto bboxMax = vm::vec3f{vm::max(x1, x2), vm::max(x1, x2), vm::max(y1, y2)};
         auto &modelFrame = model->loadFrame(i, std::to_string(i), {bboxMin, bboxMax});
 
-        const auto triangles = std::vector<Assets::EntityModelVertex>{Assets::EntityModelVertex{{x1, y1, 0},
-                                                                                                {0,  1}}, Assets::EntityModelVertex{{x1, y2, 0},
-                                                                                                                                    {0,  0}}, Assets::EntityModelVertex{{x2, y2, 0},
-                                                                                                                                                                        {1,  0}},
+        const auto triangles = std::vector<Assets::EntityModelVertex>{
+            Assets::EntityModelVertex{{x1, y1, 0},
+                                      {0,  1}}, Assets::EntityModelVertex{{x1, y2, 0},
+                                                                          {0,  0}}, Assets::EntityModelVertex{{x2, y2, 0},
+                                                                                                              {1,  0}},
 
-                                                                      Assets::EntityModelVertex{{x2, y2, 0},
-                                                                                                {1,  0}}, Assets::EntityModelVertex{{x2, y1, 0},
-                                                                                                                                    {1,  1}}, Assets::EntityModelVertex{{x1, y1, 0},
-                                                                                                                                                                        {0,  1}},};
+            Assets::EntityModelVertex{{x2, y2, 0},
+                                      {1,  0}}, Assets::EntityModelVertex{{x2, y1, 0},
+                                                                          {1,  1}}, Assets::EntityModelVertex{{x1, y1, 0},
+                                                                                                              {0,  1}},
+        };
 
         auto size = Renderer::IndexRangeMap::Size{};
         size.inc(Renderer::PrimType::Triangles, 2);
@@ -281,8 +277,7 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
     return model;
 }
 
-void SprParser::doLoadFrame(
-    const size_t /* frameIndex */, Assets::EntityModel & /* model */, Logger & /* logger */) {
+void SprParser::doLoadFrame(const size_t /* frameIndex */, Assets::EntityModel & /* model */, Logger & /* logger */) {
     // already loaded everything in doInitializeModel
 }
 } // namespace IO

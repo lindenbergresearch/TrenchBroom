@@ -49,16 +49,12 @@ bool MoveObjectsTool::startMove(const InputState &inputState) {
         return false;
     }
 
-    document->startTransaction(
-        duplicateObjects(inputState) ? "Duplicate Objects" : "Move Objects", TransactionScope::LongRunning
-    );
+    document->startTransaction(duplicateObjects(inputState) ? "Duplicate Objects" : "Move Objects", TransactionScope::LongRunning);
     m_duplicateObjects = duplicateObjects(inputState);
     return true;
 }
 
-MoveObjectsTool::MoveResult MoveObjectsTool::move(
-    const InputState &, const vm::vec3 &delta
-) {
+MoveObjectsTool::MoveResult MoveObjectsTool::move(const InputState &, const vm::vec3 &delta) {
     auto document = kdl::mem_lock(m_document);
     const auto &worldBounds = document->worldBounds();
     const auto bounds = document->selectionBounds();

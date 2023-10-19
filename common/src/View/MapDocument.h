@@ -278,8 +278,7 @@ public:
      *
      * Otherwise, returns the current group if one is open, otherwise the current layer.
      */
-    Model::Node *parentForNodes(
-        const std::vector<Model::Node *> &referenceNodes = std::vector<Model::Node *>()) const override;
+    Model::Node *parentForNodes(const std::vector<Model::Node *> &referenceNodes = std::vector<Model::Node *>()) const override;
 
     Model::EditorContext &editorContext() const;
 
@@ -323,13 +322,9 @@ private: // tag and entity definition actions
     void createEntityDefinitionActions();
 
 public: // new, load, save document
-    Result<void> newDocument(
-        Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game
-    );
+    Result<void> newDocument(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game);
 
-    Result<void> loadDocument(
-        Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path
-    );
+    Result<void> loadDocument(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path);
 
     void saveDocument();
 
@@ -484,36 +479,24 @@ private:
 
 public: // adding, removing, reparenting, and duplicating nodes, declared in MapFacade
     // interface
-    std::vector<Model::Node *> addNodes(
-        const std::map<Model::Node *, std::vector<Model::Node *>> &nodes
-    ) override;
+    std::vector<Model::Node *> addNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) override;
 
     void removeNodes(const std::vector<Model::Node *> &nodes) override;
 
 private:
-    std::map<Model::Node *, std::vector<Model::Node *>> collectRemovableParents(
-        const std::map<Model::Node *, std::vector<Model::Node *>> &nodes
-    ) const;
+    std::map<Model::Node *, std::vector<Model::Node *>> collectRemovableParents(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) const;
 
     struct CompareByAncestry;
 
-    std::vector<Model::Node *> removeImplicitelyRemovedNodes(
-        std::vector<Model::Node *> nodes
-    ) const;
+    std::vector<Model::Node *> removeImplicitelyRemovedNodes(std::vector<Model::Node *> nodes) const;
 
-    void closeRemovedGroups(
-        const std::map<Model::Node *, std::vector<Model::Node *>> &toRemove
-    );
+    void closeRemovedGroups(const std::map<Model::Node *, std::vector<Model::Node *>> &toRemove);
 
 public:
-    bool reparentNodes(
-        const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd
-    ) override;
+    bool reparentNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd) override;
 
 private:
-    bool checkReparenting(
-        const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd
-    ) const;
+    bool checkReparenting(const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd) const;
 
 public:
     void deleteObjects() override;
@@ -521,13 +504,9 @@ public:
     void duplicateObjects() override;
 
 public: // entity management
-    Model::EntityNode *createPointEntity(
-        const Assets::PointEntityDefinition *definition, const vm::vec3 &delta
-    ) override;
+    Model::EntityNode *createPointEntity(const Assets::PointEntityDefinition *definition, const vm::vec3 &delta) override;
 
-    Model::EntityNode *createBrushEntity(
-        const Assets::BrushEntityDefinition *definition
-    ) override;
+    Model::EntityNode *createBrushEntity(const Assets::BrushEntityDefinition *definition) override;
 
 public: // group management
     Model::GroupNode *groupSelection(const std::string &name);
@@ -582,9 +561,7 @@ public:
     bool canUpdateLinkedGroups(const std::vector<Model::Node *> &nodes) const;
 
 protected:
-    void setHasPendingChanges(
-        const std::vector<Model::GroupNode *> &groupNodes, bool hasPendingChanges
-    );
+    void setHasPendingChanges(const std::vector<Model::GroupNode *> &groupNodes, bool hasPendingChanges);
 
     bool updateLinkedGroups();
 
@@ -627,9 +604,7 @@ public:
 public: // modifying transient node attributes, declared in MapFacade interface
     void isolate();
 
-    void hide(
-        std::vector<Model::Node *> nodes
-    ) override; // Don't take the nodes by reference!
+    void hide(std::vector<Model::Node *> nodes) override; // Don't take the nodes by reference!
     void hideSelection();
 
     void show(const std::vector<Model::Node *> &nodes) override;
@@ -654,29 +629,23 @@ private:
     void downgradeUnlockedToInherit(const std::vector<Model::Node *> &nodes);
 
 public: // modifying objects, declared in MapFacade interface
-    bool swapNodeContents(
-        const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap, std::vector<Model::GroupNode *> changedLinkedGroups
+    bool swapNodeContents(const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap,
+        std::vector<Model::GroupNode *> changedLinkedGroups
     );
 
-    bool swapNodeContents(
-        const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap
-    );
+    bool swapNodeContents(const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap);
 
     bool transformObjects(const std::string &commandName, const vm::mat4x4 &transformation);
 
     bool translateObjects(const vm::vec3 &delta) override;
 
-    bool rotateObjects(
-        const vm::vec3 &center, const vm::vec3 &axis, FloatType angle
-    ) override;
+    bool rotateObjects(const vm::vec3 &center, const vm::vec3 &axis, FloatType angle) override;
 
     bool scaleObjects(const vm::bbox3 &oldBBox, const vm::bbox3 &newBBox) override;
 
     bool scaleObjects(const vm::vec3 &center, const vm::vec3 &scaleFactors) override;
 
-    bool shearObjects(
-        const vm::bbox3 &box, const vm::vec3 &sideToShear, const vm::vec3 &delta
-    ) override;
+    bool shearObjects(const vm::bbox3 &box, const vm::vec3 &sideToShear, const vm::vec3 &delta) override;
 
     bool flipObjects(const vm::vec3 &center, vm::axis::type axis) override;
 
@@ -695,17 +664,13 @@ public: // Clipping operations, declared in MapFacade interface
     bool clipBrushes(const vm::vec3 &p1, const vm::vec3 &p2, const vm::vec3 &p3);
 
 public: // modifying entity properties, declared in MapFacade interface
-    bool setProperty(
-        const std::string &key, const std::string &value, bool defaultToProtected = false
-    ) override;
+    bool setProperty(const std::string &key, const std::string &value, bool defaultToProtected = false) override;
 
     bool renameProperty(const std::string &oldKey, const std::string &newKey) override;
 
     bool removeProperty(const std::string &key) override;
 
-    bool convertEntityColorRange(
-        const std::string &key, Assets::ColorRange::Type range
-    ) override;
+    bool convertEntityColorRange(const std::string &key, Assets::ColorRange::Type range) override;
 
     bool updateSpawnflag(const std::string &key, size_t flagIndex, bool setFlag) override;
 
@@ -718,41 +683,31 @@ public: // modifying entity properties, declared in MapFacade interface
     void setDefaultProperties(Model::SetDefaultPropertyMode mode);
 
 public: // brush resizing, declared in MapFacade interface
-    bool extrudeBrushes(
-        const std::vector<vm::polygon3> &faces, const vm::vec3 &delta
-    ) override;
+    bool extrudeBrushes(const std::vector<vm::polygon3> &faces, const vm::vec3 &delta) override;
 
 public:
     bool setFaceAttributes(const Model::BrushFaceAttributes &attributes) override;
 
-    bool setFaceAttributesExceptContentFlags(
-        const Model::BrushFaceAttributes &attributes
-    ) override;
+    bool setFaceAttributesExceptContentFlags(const Model::BrushFaceAttributes &attributes) override;
 
     bool setFaceAttributes(const Model::ChangeBrushFaceAttributesRequest &request) override;
 
-    bool copyTexCoordSystemFromFace(
-        const Model::TexCoordSystemSnapshot &coordSystemSnapshot, const Model::BrushFaceAttributes &attribs, const vm::plane3 &sourceFacePlane, Model::WrapStyle wrapStyle
+    bool copyTexCoordSystemFromFace(const Model::TexCoordSystemSnapshot &coordSystemSnapshot, const Model::BrushFaceAttributes &attribs,
+        const vm::plane3 &sourceFacePlane, Model::WrapStyle wrapStyle
     );
 
-    bool moveTextures(
-        const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, const vm::vec2f &delta
-    ) override;
+    bool moveTextures(const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, const vm::vec2f &delta) override;
 
     bool rotateTextures(float angle) override;
 
     bool shearTextures(const vm::vec2f &factors) override;
 
-    bool flipTextures(
-        const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, vm::direction cameraRelativeFlipDirection
-    );
+    bool flipTextures(const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, vm::direction cameraRelativeFlipDirection);
 
 public: // modifying vertices, declared in MapFacade interface
     bool snapVertices(FloatType snapTo) override;
 
-    MoveVerticesResult moveVertices(
-        std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta
-    ) override;
+    MoveVerticesResult moveVertices(std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta) override;
 
     bool moveEdges(std::vector<vm::segment3> edgePositions, const vm::vec3 &delta) override;
 
@@ -760,9 +715,7 @@ public: // modifying vertices, declared in MapFacade interface
 
     bool addVertex(const vm::vec3 &vertexPosition);
 
-    bool removeVertices(
-        const std::string &commandName, std::vector<vm::vec3> vertexPositions
-    );
+    bool removeVertices(const std::string &commandName, std::vector<vm::vec3> vertexPositions);
 
 public: // debug commands
     void printVertices();
@@ -802,9 +755,7 @@ public: // transactions
 private:
     std::unique_ptr<CommandResult> execute(std::unique_ptr<Command> &&command);
 
-    std::unique_ptr<CommandResult> executeAndStore(
-        std::unique_ptr<UndoableCommand> &&command
-    );
+    std::unique_ptr<CommandResult> executeAndStore(std::unique_ptr<UndoableCommand> &&command);
 
 private: // subclassing interface for command processing
     virtual bool doCanUndoCommand() const = 0;
@@ -829,9 +780,7 @@ private: // subclassing interface for command processing
 
     virtual std::unique_ptr<CommandResult> doExecute(std::unique_ptr<Command> command) = 0;
 
-    virtual std::unique_ptr<CommandResult> doExecuteAndStore(
-        std::unique_ptr<UndoableCommand> command
-    ) = 0;
+    virtual std::unique_ptr<CommandResult> doExecuteAndStore(std::unique_ptr<UndoableCommand> command) = 0;
 
 public: // asset state management
     void commitPendingAssets();
@@ -842,13 +791,9 @@ public: // picking
     std::vector<Model::Node *> findNodesContaining(const vm::vec3 &point) const;
 
 private: // world management
-    Result<void> createWorld(
-        Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game
-    );
+    Result<void> createWorld(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game);
 
-    Result<void> loadWorld(
-        Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path
-    );
+    Result<void> loadWorld(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path);
 
     void clearWorld();
 

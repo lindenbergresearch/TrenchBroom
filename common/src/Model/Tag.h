@@ -394,9 +394,7 @@ public:
      * @param attributes the attributes of this tag
      * @param matcher the matcher that decides whether to apply this tag to a given taggable
      */
-    SmartTag(
-        const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher
-    );
+    SmartTag(const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher);
 
     SmartTag(const SmartTag &other);
 

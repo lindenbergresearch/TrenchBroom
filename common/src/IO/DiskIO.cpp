@@ -51,8 +51,9 @@ std::filesystem::path fixCase(const std::filesystem::path &path) {
 
         while (!remainder.empty()) {
             const auto nameToFind = kdl::path_front(remainder);
-            const auto entryIt = std::find_if(
-                std::filesystem::directory_iterator{result}, std::filesystem::directory_iterator{}, [&](const auto &entry) {
+            const auto entryIt = std::find_if(std::filesystem::directory_iterator{
+                    result
+                }, std::filesystem::directory_iterator{}, [&](const auto &entry) {
                   return nameToFind == kdl::path_to_lower(entry.path().filename());
                 }
             );
@@ -83,24 +84,25 @@ std::filesystem::path fixPath(const std::filesystem::path &path) {
 PathInfo pathInfo(const std::filesystem::path &path) {
     auto error = std::error_code{};
     const auto f = fixPath(path);
-    return std::filesystem::is_directory(f, error) && !error ? PathInfo::Directory : std::filesystem::is_regular_file(f, error) && !error ? PathInfo::File : PathInfo::Unknown;
+    return std::filesystem::is_directory(f, error) && !error ? PathInfo::Directory : std::filesystem::is_regular_file(f, error) && !error ? PathInfo::File
+                                                                                                                                          : PathInfo::Unknown;
 }
 
-Result<std::vector<std::filesystem::path>> find(
-    const std::filesystem::path &path, const TraversalMode traversalMode, const PathMatcher &pathMatcher
-) {
+Result<std::vector<std::filesystem::path>> find(const std::filesystem::path &path, const TraversalMode traversalMode, const PathMatcher &pathMatcher) {
     const auto fixedPath = fixPath(path);
     auto error = std::error_code{};
     auto result = std::vector<std::filesystem::path>{};
     switch (traversalMode) {
         case TraversalMode::Flat:
-            std::transform(
-                std::filesystem::directory_iterator{fixedPath, error}, std::filesystem::directory_iterator{}, std::back_inserter(result), [&](const auto &entry) { return entry.path(); }
+            std::transform(std::filesystem::directory_iterator{
+                    fixedPath, error
+                }, std::filesystem::directory_iterator{}, std::back_inserter(result), [&](const auto &entry) { return entry.path(); }
             );
             break;
         case TraversalMode::Recursive:
-            std::transform(
-                std::filesystem::recursive_directory_iterator{fixedPath, error}, std::filesystem::recursive_directory_iterator{}, std::back_inserter(result), [&](const auto &entry) { return entry.path(); }
+            std::transform(std::filesystem::recursive_directory_iterator{
+                    fixedPath, error
+                }, std::filesystem::recursive_directory_iterator{}, std::back_inserter(result), [&](const auto &entry) { return entry.path(); }
             );
             break;
     }
@@ -151,9 +153,7 @@ Result<bool> deleteFile(const std::filesystem::path &path) {
     }
 }
 
-Result<void> copyFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath
-) {
+Result<void> copyFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) {
     const auto fixedSourcePath = fixPath(sourcePath);
     auto fixedDestPath = fixPath(destPath);
 
@@ -162,18 +162,16 @@ Result<void> copyFile(
     }
 
     auto error = std::error_code{};
-    if (!std::filesystem::copy_file(
-        fixedSourcePath, fixedDestPath, std::filesystem::copy_options::overwrite_existing, error
-    ) || error) {
-        return Error{"Failed to copy '" + fixedSourcePath.string() + "' to '" + fixedDestPath.string() + "': " + error.message()};
+    if (!std::filesystem::copy_file(fixedSourcePath, fixedDestPath, std::filesystem::copy_options::overwrite_existing, error) || error) {
+        return Error{
+            "Failed to copy '" + fixedSourcePath.string() + "' to '" + fixedDestPath.string() + "': " + error.message()
+        };
     }
 
     return kdl::void_success;
 }
 
-Result<void> moveFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath
-) {
+Result<void> moveFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) {
     const auto fixedSourcePath = fixPath(sourcePath);
     if (pathInfo(fixedSourcePath) == PathInfo::Directory) {
         return Error{"Failed to move '" + fixedSourcePath.string() + "': path denotes a directory"};
@@ -187,15 +185,15 @@ Result<void> moveFile(
     auto error = std::error_code{};
     std::filesystem::rename(fixedSourcePath, fixedDestPath, error);
     if (error) {
-        return Error{"Failed to move '" + fixedSourcePath.string() + "' to '" + fixedDestPath.string() + "': " + error.message()};
+        return Error{
+            "Failed to move '" + fixedSourcePath.string() + "' to '" + fixedDestPath.string() + "': " + error.message()
+        };
     }
 
     return kdl::void_success;
 }
 
-std::filesystem::path resolvePath(
-    const std::vector<std::filesystem::path> &searchPaths, const std::filesystem::path &path
-) {
+std::filesystem::path resolvePath(const std::vector<std::filesystem::path> &searchPaths, const std::filesystem::path &path) {
     if (path.is_absolute()) {
         if (pathInfo(path) != PathInfo::Unknown) {
             return path;

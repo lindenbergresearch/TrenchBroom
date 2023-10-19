@@ -57,9 +57,7 @@ private:
     IssueBrowserModel *m_tableModel;
 
 public:
-    explicit IssueBrowserView(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit IssueBrowserView(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     void createGui();
@@ -80,9 +78,7 @@ private:
 
     std::vector<const Model::Issue *> collectIssues(const QList<QModelIndex> &indices) const;
 
-    std::vector<const Model::IssueQuickFix *> collectQuickFixes(
-        const QList<QModelIndex> &indices
-    ) const;
+    std::vector<const Model::IssueQuickFix *> collectQuickFixes(const QList<QModelIndex> &indices) const;
 
     Model::IssueType issueTypeMask() const;
 

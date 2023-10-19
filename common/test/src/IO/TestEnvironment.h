@@ -37,8 +37,7 @@ private:
     std::filesystem::path m_dir;
 
 public:
-    explicit TestEnvironment(
-        const std::string &dir, const SetupFunction &setup = [](TestEnvironment &) {});
+    explicit TestEnvironment(const std::string &dir, const SetupFunction &setup = [](TestEnvironment &) {});
 
     explicit TestEnvironment(const SetupFunction &setup = [](TestEnvironment &) {});
 
@@ -64,15 +63,17 @@ public:
     template<typename F>
     auto withTempFile(const std::string &contents, const F &f) {
         const auto path = m_dir / generateUuid();
-        auto removeFile = kdl::invoke_later{[&]() {
-          // ignore errors
-          auto error = std::error_code{};
-          std::filesystem::remove(path, error);
-        }};
+        auto removeFile = kdl::invoke_later{
+            [&]() {
+              // ignore errors
+              auto error = std::error_code{};
+              std::filesystem::remove(path, error);
+            }};
 
         Disk::withOutputStream(path, [&](auto &stream) {
-          stream << contents;
-        }).transform_error([](auto e) { throw std::runtime_error{e.msg}; });
+              stream << contents;
+            }
+        ).transform_error([](auto e) { throw std::runtime_error{e.msg}; });
         return f(path);
     }
 };

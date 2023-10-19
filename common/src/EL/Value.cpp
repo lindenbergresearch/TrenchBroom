@@ -51,50 +51,76 @@ const Value Value::Undefined = Value{UndefinedType::Value};
 Value::Value() : m_value{std::make_shared<VariantType>(NullType::Value)} {
 }
 
-Value::Value(const BooleanType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(value)}, m_expression{std::move(expression)} {
+Value::Value(const BooleanType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(value)
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(StringType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(std::move(value))}, m_expression{std::move(expression)} {
+Value::Value(StringType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(std::move(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(const char *value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(StringType(value))}, m_expression{std::move(expression)} {
+Value::Value(const char *value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(StringType(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(const NumberType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(value)}, m_expression{std::move(expression)} {
+Value::Value(const NumberType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(value)
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(const int value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(static_cast<NumberType>(value))}, m_expression{std::move(expression)} {
+Value::Value(const int value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(static_cast<NumberType>(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(const long value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(static_cast<NumberType>(value))}, m_expression{std::move(expression)} {
+Value::Value(const long value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(static_cast<NumberType>(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(const size_t value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(static_cast<NumberType>(value))}, m_expression{std::move(expression)} {
+Value::Value(const size_t value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(static_cast<NumberType>(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(ArrayType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(std::move(value))}, m_expression{std::move(expression)} {
+Value::Value(ArrayType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(std::move(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(MapType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(std::move(value))}, m_expression{std::move(expression)} {
+Value::Value(MapType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(std::move(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(RangeType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(std::move(value))}, m_expression{std::move(expression)} {
+Value::Value(RangeType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(std::move(value))
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(NullType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(value)}, m_expression{std::move(expression)} {
+Value::Value(NullType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(value)
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(UndefinedType value, std::optional<Expression> expression) : m_value{std::make_shared<VariantType>(value)}, m_expression{std::move(expression)} {
+Value::Value(UndefinedType value, std::optional<Expression> expression) : m_value{
+    std::make_shared<VariantType>(value)
+}, m_expression{std::move(expression)} {
 }
 
-Value::Value(Value value, std::optional<Expression> expression) : m_value{std::move(value.m_value)}, m_expression{std::move(expression)} {
+Value::Value(Value value, std::optional<Expression> expression) : m_value{std::move(value.m_value)}, m_expression{
+    std::move(expression)
+} {
 }
 
 ValueType Value::type() const {
-    return std::visit(
-        kdl::overload(
-            [](const BooleanType &) { return ValueType::Boolean; }, [](const StringType &) { return ValueType::String; }, [](const NumberType &) { return ValueType::Number; }, [](const ArrayType &) { return ValueType::Array; },
-            [](const MapType &) { return ValueType::Map; }, [](const RangeType &) { return ValueType::Range; }, [](const NullType &) { return ValueType::Null; }, [](const UndefinedType &) { return ValueType::Undefined; }
+    return std::visit(kdl::overload([](const BooleanType &) { return ValueType::Boolean; }, [](const StringType &) { return ValueType::String; },
+            [](const NumberType &) { return ValueType::Number; }, [](const ArrayType &) { return ValueType::Array; },
+            [](const MapType &) { return ValueType::Map; }, [](const RangeType &) { return ValueType::Range; }, [](const NullType &) { return ValueType::Null; },
+            [](const UndefinedType &) { return ValueType::Undefined; }
         ), *m_value
     );
 }
@@ -124,9 +150,7 @@ size_t Value::column() const {
 }
 
 const BooleanType &Value::booleanValue() const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &b) -> const BooleanType & { return b; }, [&](const StringType &) -> const BooleanType & {
+    return std::visit(kdl::overload([&](const BooleanType &b) -> const BooleanType & { return b; }, [&](const StringType &) -> const BooleanType & {
               throw DereferenceError{describe(), type(), ValueType::String};
             }, [&](const NumberType &) -> const BooleanType & {
               throw DereferenceError{describe(), type(), ValueType::Number};
@@ -147,9 +171,7 @@ const BooleanType &Value::booleanValue() const {
 }
 
 const StringType &Value::stringValue() const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &) -> const StringType & {
+    return std::visit(kdl::overload([&](const BooleanType &) -> const StringType & {
               throw DereferenceError{describe(), type(), ValueType::Boolean};
             }, [&](const StringType &s) -> const StringType & { return s; }, [&](const NumberType &) -> const StringType & {
               throw DereferenceError{describe(), type(), ValueType::Number};
@@ -170,9 +192,7 @@ const StringType &Value::stringValue() const {
 }
 
 const NumberType &Value::numberValue() const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &) -> const NumberType & {
+    return std::visit(kdl::overload([&](const BooleanType &) -> const NumberType & {
               throw DereferenceError{describe(), type(), ValueType::Boolean};
             }, [&](const StringType &) -> const NumberType & {
               throw DereferenceError{describe(), type(), ValueType::String};
@@ -197,9 +217,7 @@ IntegerType Value::integerValue() const {
 }
 
 const ArrayType &Value::arrayValue() const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &) -> const ArrayType & {
+    return std::visit(kdl::overload([&](const BooleanType &) -> const ArrayType & {
               throw DereferenceError{describe(), type(), ValueType::Boolean};
             }, [&](const StringType &) -> const ArrayType & {
               throw DereferenceError{describe(), type(), ValueType::String};
@@ -220,9 +238,7 @@ const ArrayType &Value::arrayValue() const {
 }
 
 const MapType &Value::mapValue() const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &) -> const MapType & {
+    return std::visit(kdl::overload([&](const BooleanType &) -> const MapType & {
               throw DereferenceError{describe(), type(), ValueType::Boolean};
             }, [&](const StringType &) -> const MapType & {
               throw DereferenceError{describe(), type(), ValueType::String};
@@ -243,9 +259,7 @@ const MapType &Value::mapValue() const {
 }
 
 const RangeType &Value::rangeValue() const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &) -> const RangeType & {
+    return std::visit(kdl::overload([&](const BooleanType &) -> const RangeType & {
               throw DereferenceError{describe(), type(), ValueType::Boolean};
             }, [&](const StringType &) -> const RangeType & {
               throw DereferenceError{describe(), type(), ValueType::String};
@@ -288,18 +302,16 @@ const std::vector<std::string> Value::asStringSet() const {
 }
 
 size_t Value::length() const {
-    return std::visit(
-        kdl::overload(
-            [](const BooleanType &) -> size_t { return 1u; }, [](const StringType &s) -> size_t { return s.length(); }, [](const NumberType &) -> size_t { return 1u; }, [](const ArrayType &a) -> size_t { return a.size(); },
-            [](const MapType &m) -> size_t { return m.size(); }, [](const RangeType &r) -> size_t { return r.size(); }, [](const NullType &) -> size_t { return 0u; }, [](const UndefinedType &) -> size_t { return 0u; }
+    return std::visit(kdl::overload([](const BooleanType &) -> size_t { return 1u; }, [](const StringType &s) -> size_t { return s.length(); },
+            [](const NumberType &) -> size_t { return 1u; }, [](const ArrayType &a) -> size_t { return a.size(); },
+            [](const MapType &m) -> size_t { return m.size(); }, [](const RangeType &r) -> size_t { return r.size(); },
+            [](const NullType &) -> size_t { return 0u; }, [](const UndefinedType &) -> size_t { return 0u; }
         ), *m_value
     );
 }
 
 bool Value::convertibleTo(const ValueType toType) const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &) {
+    return std::visit(kdl::overload([&](const BooleanType &) {
               switch (toType) {
                   case ValueType::Boolean:
                   case ValueType::String:
@@ -436,9 +448,7 @@ bool Value::convertibleTo(const ValueType toType) const {
 }
 
 Value Value::convertTo(const ValueType toType) const {
-    return std::visit(
-        kdl::overload(
-            [&](const BooleanType &b) -> Value {
+    return std::visit(kdl::overload([&](const BooleanType &b) -> Value {
               switch (toType) {
                   case ValueType::Boolean:
                       return *this;
@@ -598,12 +608,8 @@ std::string Value::asString(const bool multiline) const {
     return str.str();
 }
 
-void Value::appendToStream(
-    std::ostream &str, const bool multiline, const std::string &indent
-) const {
-    std::visit(
-        kdl::overload(
-            [&](const BooleanType &b) { str << (b ? "true" : "false"); }, [&](const StringType &s) {
+void Value::appendToStream(std::ostream &str, const bool multiline, const std::string &indent) const {
+    std::visit(kdl::overload([&](const BooleanType &b) { str << (b ? "true" : "false"); }, [&](const StringType &s) {
               // Unescaping happens in IO::ELParser::parseLiteral
               str << "\"" << kdl::str_escape(s, "\\\"") << "\"";
             }, [&](const NumberType &n) {
@@ -712,14 +718,10 @@ static size_t computeIndex(const long index, const size_t indexableSize) {
 }
 
 static size_t computeIndex(const Value &indexValue, const size_t indexableSize) {
-    return computeIndex(
-        static_cast<long>(indexValue.convertTo(ValueType::Number).numberValue()), indexableSize
-    );
+    return computeIndex(static_cast<long>(indexValue.convertTo(ValueType::Number).numberValue()), indexableSize);
 }
 
-static void computeIndexArray(
-    const Value &indexValue, const size_t indexableSize, std::vector<size_t> &result
-) {
+static void computeIndexArray(const Value &indexValue, const size_t indexableSize, std::vector<size_t> &result) {
     switch (indexValue.type()) {
         case ValueType::Array: {
             const ArrayType &indexArray = indexValue.arrayValue();
@@ -748,9 +750,7 @@ static void computeIndexArray(
     }
 }
 
-static std::vector<size_t> computeIndexArray(
-    const Value &indexValue, const size_t indexableSize
-) {
+static std::vector<size_t> computeIndexArray(const Value &indexValue, const size_t indexableSize) {
     auto result = std::vector<size_t>{};
     computeIndexArray(indexValue, indexableSize, result);
     return result;
@@ -1057,9 +1057,7 @@ Value Value::operator[](const char *key) const {
 }
 
 bool operator==(const Value &lhs, const Value &rhs) {
-    return std::visit(
-        kdl::overload(
-            [](const BooleanType &lhsBool, const BooleanType &rhsBool) {
+    return std::visit(kdl::overload([](const BooleanType &lhsBool, const BooleanType &rhsBool) {
               return lhsBool == rhsBool;
             }, [](const StringType &lhsString, const StringType &rhsString) {
               return lhsString == rhsString;
@@ -1069,7 +1067,8 @@ bool operator==(const Value &lhs, const Value &rhs) {
               return lhsArray == rhsArray;
             }, [](const MapType &lhsMap, const MapType &rhsMap) { return lhsMap == rhsMap; }, [](const RangeType &lhsRange, const RangeType &rhsRange) {
               return lhsRange == rhsRange;
-            }, [](const NullType &, const NullType &) { return true; }, [](const UndefinedType &, const UndefinedType &) { return true; }, [](const auto &, const auto &) { return false; }
+            }, [](const NullType &, const NullType &) { return true; }, [](const UndefinedType &, const UndefinedType &) { return true; },
+            [](const auto &, const auto &) { return false; }
         ), *lhs.m_value, *rhs.m_value
     );
 }

@@ -62,8 +62,8 @@ struct EntityDefinitionClassInfo {
   kdl_reflect_decl(EntityDefinitionClassInfo, type, line, column, name, description, color, size, modelDefinition, propertyDefinitions, superClasses);
 };
 
-bool addPropertyDefinition(
-    std::vector<std::shared_ptr<Assets::PropertyDefinition>> &propertyDefinitions, std::shared_ptr<Assets::PropertyDefinition> propertyDefinition
+bool addPropertyDefinition(std::vector<std::shared_ptr<Assets::PropertyDefinition>> &propertyDefinitions,
+    std::shared_ptr<Assets::PropertyDefinition> propertyDefinition
 );
 } // namespace IO
 } // namespace TrenchBroom

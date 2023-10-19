@@ -27,33 +27,51 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
-TEST_CASE("ObjParserTest.loadValidObj")
-{
-  NullLogger logger;
+namespace TrenchBroom {
+namespace IO {
+TEST_CASE("ObjParserTest.loadValidObj") {
+NullLogger logger;
 
-  const auto basePath = std::filesystem::current_path() / "fixture/test/IO/Obj";
-  DiskFileSystem fs(basePath);
+const auto basePath = std::filesystem::current_path() / "fixture/test/IO/Obj";
+DiskFileSystem fs(basePath);
 
-  const auto mdlPath = "pointyship.obj";
-  const auto mdlFile = fs.openFile(mdlPath).value();
+const auto mdlPath = "pointyship.obj";
+const auto mdlFile = fs.openFile(mdlPath).value();
 
-  auto reader = mdlFile->reader().buffer();
-  auto parser = NvObjParser(mdlPath, reader.stringView(), fs);
-  auto model = parser.initializeModel(logger);
-  parser.loadFrame(0, *model, logger);
+auto reader = mdlFile->reader().buffer();
+auto parser = NvObjParser(mdlPath, reader.stringView(), fs);
+auto model = parser.initializeModel(logger);
+parser.loadFrame(0, *model, logger);
 
-  CHECK(model != nullptr);
-  CHECK(model->surfaceCount() == 1u);
-  CHECK(model->frameCount() == 1u);
+CHECK(model
+!= nullptr);
+CHECK(model
+->
 
-  const auto surfaces = model->surfaces();
-  const auto& surface = *surfaces.front();
-  CHECK(surface.skinCount() == 1u);
-  CHECK(surface.frameCount() == 1u);
+surfaceCount()
+
+== 1u);
+CHECK(model
+->
+
+frameCount()
+
+== 1u);
+
+const auto surfaces = model->surfaces();
+const auto &surface = *surfaces.front();
+CHECK(surface
+.
+
+skinCount()
+
+== 1u);
+CHECK(surface
+.
+
+frameCount()
+
+== 1u);
 }
 } // namespace IO
 } // namespace TrenchBroom

@@ -45,9 +45,11 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-EntityModelRenderer::EntityModelRenderer(
-    Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext
-) : m_logger{logger}, m_entityModelManager{entityModelManager}, m_editorContext{editorContext}, m_applyTinting{false}, m_showHiddenEntities{false} {
+EntityModelRenderer::EntityModelRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext) : m_logger{
+    logger
+}, m_entityModelManager{entityModelManager}, m_editorContext{editorContext}, m_applyTinting{
+    false
+}, m_showHiddenEntities{false} {
 }
 
 EntityModelRenderer::~EntityModelRenderer() {
@@ -55,8 +57,7 @@ EntityModelRenderer::~EntityModelRenderer() {
 }
 
 void EntityModelRenderer::addEntity(const Model::EntityNode *entityNode) {
-    const auto modelSpec = Assets::safeGetModelSpecification(
-        m_logger, entityNode->entity().classname(), [&]() {
+    const auto modelSpec = Assets::safeGetModelSpecification(m_logger, entityNode->entity().classname(), [&]() {
           return entityNode->entity().modelSpecification();
         }
     );
@@ -72,8 +73,7 @@ void EntityModelRenderer::removeEntity(const Model::EntityNode *entityNode) {
 }
 
 void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
-    const auto modelSpec = Assets::safeGetModelSpecification(
-        m_logger, entityNode->entity().classname(), [&]() {
+    const auto modelSpec = Assets::safeGetModelSpecification(m_logger, entityNode->entity().classname(), [&]() {
           return entityNode->entity().modelSpecification();
         }
     );
@@ -149,8 +149,9 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
     shader.set("ShowSoftMapBounds", !renderContext.softMapBounds().is_empty());
     shader.set("SoftMapBoundsMin", renderContext.softMapBounds().min);
     shader.set("SoftMapBoundsMax", renderContext.softMapBounds().max);
-    shader.set(
-        "SoftMapBoundsColor", vm::vec4f{prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f}
+    shader.set("SoftMapBoundsColor", vm::vec4f{
+            prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f
+        }
     );
 
     shader.set("CameraPosition", renderContext.camera().position());

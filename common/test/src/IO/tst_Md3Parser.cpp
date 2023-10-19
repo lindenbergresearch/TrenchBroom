@@ -45,15 +45,8 @@ TEST_CASE("Md3ParserTest.loadValidMd3")
     const auto shaderSearchPath = "scripts";
     const auto textureSearchPaths = std::vector<std::filesystem::path>{"models"};
     auto fs = VirtualFileSystem{};
-    fs.mount(
-        "",
-        std::make_unique<DiskFileSystem>(
-            std::filesystem::current_path() / "fixture/test/IO/Md3/bfg"));
-    fs.mount(
-        "",
-        createImageFileSystem<Quake3ShaderFileSystem>(
-            fs, shaderSearchPath, textureSearchPaths, logger)
-            .value());
+    fs.mount("", std::make_unique<DiskFileSystem>(std::filesystem::current_path() / "fixture/test/IO/Md3/bfg"));
+    fs.mount("", createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger).value());
 
     const auto md3Path = "models/weapons2/bfg/bfg.md3";
     const auto md3File = fs.openFile(md3Path).value();
@@ -70,12 +63,7 @@ TEST_CASE("Md3ParserTest.loadValidMd3")
 
     const auto *frame = model->frame("MilkShape 3D");
     CHECK(frame != nullptr);
-    CHECK(vm::is_equal(
-        vm::bbox3f(
-            vm::vec3f(-10.234375, -10.765625, -9.4375),
-            vm::vec3f(30.34375, 10.765625, 11.609375)),
-        frame->bounds(),
-        0.01f));
+    CHECK(vm::is_equal(vm::bbox3f(vm::vec3f(-10.234375, -10.765625, -9.4375), vm::vec3f(30.34375, 10.765625, 11.609375)), frame->bounds(), 0.01f));
 
     const auto *surface1 = model->surface("x_bfg");
     CHECK(surface1 != nullptr);

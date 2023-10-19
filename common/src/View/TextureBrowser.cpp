@@ -42,8 +42,13 @@ Q_DECLARE_METATYPE(TrenchBroom::View::TextureSortOrder)
 
 namespace TrenchBroom {
 namespace View {
-TextureBrowser::TextureBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent
-) : QWidget(parent), m_document(std::move(document)), m_sortOrderChoice(nullptr), m_groupButton(nullptr), m_usedButton(nullptr), m_filterBox(nullptr), m_scrollBar(nullptr), m_view(nullptr) {
+TextureBrowser::TextureBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : QWidget(parent),
+                                                                                                                         m_document(std::move(document)),
+                                                                                                                         m_sortOrderChoice(nullptr),
+                                                                                                                         m_groupButton(nullptr),
+                                                                                                                         m_usedButton(nullptr),
+                                                                                                                         m_filterBox(nullptr),
+                                                                                                                         m_scrollBar(nullptr), m_view(nullptr) {
     createGui(contextManager);
     bindEvents();
     connectObservers();
@@ -149,7 +154,8 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
     );
 
     auto *controlSizer = new QHBoxLayout();
-    controlSizer->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin
+    controlSizer->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowVMargin
     );
     controlSizer->setSpacing(LayoutConstants::NarrowHMargin);
     controlSizer->addWidget(m_sortOrderChoice);
@@ -167,8 +173,7 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
 }
 
 void TextureBrowser::bindEvents() {
-    connect(m_view, &TextureBrowserView::textureSelected, this, &TextureBrowser::textureSelected
-    );
+    connect(m_view, &TextureBrowserView::textureSelected, this, &TextureBrowser::textureSelected);
 }
 
 void TextureBrowser::connectObservers() {
@@ -178,12 +183,9 @@ void TextureBrowser::connectObservers() {
     m_notifierConnection += document->nodesWereAddedNotifier.connect(this, &TextureBrowser::nodesWereAdded);
     m_notifierConnection += document->nodesWereRemovedNotifier.connect(this, &TextureBrowser::nodesWereRemoved);
     m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &TextureBrowser::nodesDidChange);
-    m_notifierConnection += document->brushFacesDidChangeNotifier.connect(this, &TextureBrowser::brushFacesDidChange
-    );
-    m_notifierConnection += document->textureCollectionsDidChangeNotifier.connect(this, &TextureBrowser::textureCollectionsDidChange
-    );
-    m_notifierConnection += document->currentTextureNameDidChangeNotifier.connect(this, &TextureBrowser::currentTextureNameDidChange
-    );
+    m_notifierConnection += document->brushFacesDidChangeNotifier.connect(this, &TextureBrowser::brushFacesDidChange);
+    m_notifierConnection += document->textureCollectionsDidChangeNotifier.connect(this, &TextureBrowser::textureCollectionsDidChange);
+    m_notifierConnection += document->currentTextureNameDidChangeNotifier.connect(this, &TextureBrowser::currentTextureNameDidChange);
 
     PreferenceManager &prefs = PreferenceManager::instance();
     m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &TextureBrowser::preferenceDidChange);

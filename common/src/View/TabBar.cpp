@@ -32,11 +32,10 @@ namespace TrenchBroom {
 namespace View {
 // TabBarButton
 
-TabBarButton::TabBarButton(const QString &label, QWidget *parent) : QWidget(parent), m_label(new QLabel(label, this)), m_indicator(new QWidget(this)), m_pressed(false) {
+TabBarButton::TabBarButton(const QString &label, QWidget *parent) : QWidget(parent), m_label(new QLabel(label, this)), m_indicator(new QWidget(this)),
+                                                                    m_pressed(false) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0
-    );
+    labelLayout->setContentsMargins(LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
     labelLayout->addWidget(m_label);
 
     auto *outerLayout = new QVBoxLayout();

@@ -68,9 +68,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    explicit EntityPropertyEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
     ~EntityPropertyEditor() override;
 

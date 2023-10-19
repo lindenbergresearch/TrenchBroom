@@ -38,14 +38,9 @@ EmptyGroupValidator::EmptyGroupValidator() : Validator{Type, "Empty group"} {
     addQuickFix(makeDeleteNodesQuickFix());
 }
 
-void EmptyGroupValidator::doValidate(
-    GroupNode &groupNode, std::vector<std::unique_ptr<Issue>> &issues
-) const {
+void EmptyGroupValidator::doValidate(GroupNode &groupNode, std::vector<std::unique_ptr<Issue>> &issues) const {
     if (!groupNode.hasChildren()) {
-        issues.push_back(
-            std::make_unique<Issue>(
-                Type, groupNode, "Group '" + groupNode.name() + "' is empty"
-            ));
+        issues.push_back(std::make_unique<Issue>(Type, groupNode, "Group '" + groupNode.name() + "' is empty"));
     }
 }
 } // namespace Model

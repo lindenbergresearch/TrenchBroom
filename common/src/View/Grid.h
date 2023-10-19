@@ -204,9 +204,7 @@ public: // Snap vectors.
 
 private:
     template<typename T, size_t S>
-    vm::vec<T, S> snap(
-        const vm::vec<T, S> &p, const SnapDir snapDir, const bool skip = false
-    ) const {
+    vm::vec<T, S> snap(const vm::vec<T, S> &p, const SnapDir snapDir, const bool skip = false) const {
         if (!snap()) {
             return p;
         }
@@ -219,9 +217,7 @@ private:
 
 public: // Snap towards an arbitrary direction.
     template<typename T, size_t S>
-    vm::vec<T, S> snapTowards(
-        const vm::vec<T, S> &p, const vm::vec<T, S> &d, const bool skip = false
-    ) const {
+    vm::vec<T, S> snapTowards(const vm::vec<T, S> &p, const vm::vec<T, S> &d, const bool skip = false) const {
         if (!snap()) {
             return p;
         }
@@ -247,23 +243,17 @@ public: // Snapping on a plane.
     }
 
     template<typename T>
-    vm::vec<T, 3> snapUp(
-        const vm::vec<T, 3> &p, const vm::plane<T, 3> &onPlane, const bool skip = false
-    ) const {
+    vm::vec<T, 3> snapUp(const vm::vec<T, 3> &p, const vm::plane<T, 3> &onPlane, const bool skip = false) const {
         return snap(p, onPlane, SnapDir_Up, skip);
     }
 
     template<typename T>
-    vm::vec<T, 3> snapDown(
-        const vm::vec<T, 3> &p, const vm::plane<T, 3> &onPlane, const bool skip = false
-    ) const {
+    vm::vec<T, 3> snapDown(const vm::vec<T, 3> &p, const vm::plane<T, 3> &onPlane, const bool skip = false) const {
         return snap(p, onPlane, SnapDir_Down, skip);
     }
 
     template<typename T, size_t S>
-    vm::vec<T, S> snapTowards(
-        const vm::vec<T, S> &p, const vm::plane<T, 3> &onPlane, const vm::vec<T, S> &d, const bool skip = false
-    ) const {
+    vm::vec<T, S> snapTowards(const vm::vec<T, S> &p, const vm::plane<T, 3> &onPlane, const vm::vec<T, S> &d, const bool skip = false) const {
 
         SnapDir snapDirs[S];
         for (size_t i = 0; i < S; ++i) {
@@ -275,9 +265,7 @@ public: // Snapping on a plane.
 
 private:
     template<typename T, size_t S>
-    vm::vec<T, 3> snap(
-        const vm::vec<T, S> &p, const vm::plane<T, S> &onPlane, const SnapDir snapDir, const bool skip = false
-    ) const {
+    vm::vec<T, 3> snap(const vm::vec<T, S> &p, const vm::plane<T, S> &onPlane, const SnapDir snapDir, const bool skip = false) const {
         SnapDir snapDirs[S];
         for (size_t i = 0; i < S; ++i) {
             snapDirs[i] = snapDir;
@@ -292,9 +280,7 @@ private:
      * be on the plane and have two axes snapped to grid.
      */
     template<typename T, size_t S>
-    vm::vec<T, S> snap(
-        const vm::vec<T, S> &p, const vm::plane<T, 3> &onPlane, const SnapDir snapDirs[], const bool skip = false
-    ) const {
+    vm::vec<T, S> snap(const vm::vec<T, S> &p, const vm::plane<T, 3> &onPlane, const SnapDir snapDirs[], const bool skip = false) const {
 
         vm::vec<T, 3> result;
         switch (vm::find_abs_max_component(onPlane.normal)) {
@@ -366,17 +352,14 @@ public:
     }
 
     template<typename T>
-    vm::vec<T, 3> snap(
-        const vm::vec<T, 3> &p, const vm::polygon<T, 3> &polygon, const vm::vec<T, 3> &normal
-    ) const {
+    vm::vec<T, 3> snap(const vm::vec<T, 3> &p, const vm::polygon<T, 3> &polygon, const vm::vec<T, 3> &normal) const {
         ensure(polygon.vertexCount() >= 3, "polygon has too few vertices");
 
         const auto plane = vm::plane<T, 3>(polygon.vertices().front(), normal);
         auto ps = snap(p, plane);
         auto err = vm::squared_length(p - ps);
 
-        if (!vm::polygon_contains_point(
-            ps, plane.normal, std::begin(polygon), std::end(polygon))) {
+        if (!vm::polygon_contains_point(ps, plane.normal, std::begin(polygon), std::end(polygon))) {
             ps = vm::vec<T, 3>::nan();
             err = std::numeric_limits<T>::max();
         }
@@ -412,9 +395,7 @@ public:
      */
     vm::vec3 moveDeltaForPoint(const vm::vec3 &point, const vm::vec3 &delta) const;
 
-    vm::vec3 moveDeltaForBounds(
-        const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 &worldBounds, const vm::ray3 &ray
-    ) const;
+    vm::vec3 moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 &worldBounds, const vm::ray3 &ray) const;
 
     /**
      * Given a line and a point X on the line (via the distance from the line's origin),
@@ -424,9 +405,7 @@ public:
      */
     FloatType snapToGridPlane(const vm::line3 &line, FloatType distance) const;
 
-    FloatType snapMoveDistanceForFace(
-        const Model::BrushFace &face, FloatType moveDistance
-    ) const;
+    FloatType snapMoveDistanceForFace(const Model::BrushFace &face, FloatType moveDistance) const;
 
     vm::vec3 referencePoint(const vm::bbox3 &bounds) const;
 };

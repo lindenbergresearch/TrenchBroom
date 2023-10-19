@@ -40,16 +40,12 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 
-namespace
-{
+namespace {
 
-struct TextureInfo
-{
+struct TextureInfo {
   std::string name;
   size_t width;
   size_t height;
@@ -57,167 +53,85 @@ struct TextureInfo
   kdl_reflect_inline(TextureInfo, name, width, height);
 };
 
-struct TextureCollectionInfo
-{
+struct TextureCollectionInfo {
   std::filesystem::path path;
   std::vector<TextureInfo> textures;
 
   kdl_reflect_inline(TextureCollectionInfo, path, textures);
 };
 
-std::optional<TextureCollectionInfo> makeInfo(
-  const Result<Assets::TextureCollection>& result)
-{
-  return result
-    .transform([](const auto& textureCollection) -> std::optional<TextureCollectionInfo> {
-      return TextureCollectionInfo{
-        textureCollection.path(),
-        kdl::vec_transform(textureCollection.textures(), [](const auto& texture) {
-          return TextureInfo{
-            texture.name(),
-            texture.width(),
-            texture.height(),
+std::optional<TextureCollectionInfo> makeInfo(const Result<Assets::TextureCollection> &result) {
+    return result.transform([](const auto &textureCollection) -> std::optional<TextureCollectionInfo> {
+          return TextureCollectionInfo{
+              textureCollection.path(), kdl::vec_transform(textureCollection.textures(), [](const auto &texture) {
+                    return TextureInfo{texture.name(), texture.width(), texture.height(),};
+                  }
+              )
           };
-        })};
-    })
-    .value_or(std::nullopt);
+        }
+    ).value_or(std::nullopt);
 }
-
 } // namespace
 
 TEST_CASE("loadTextureCollection")
 {
-  auto fs = VirtualFileSystem{};
-  fs.mount("", std::make_unique<DiskFileSystem>(std::filesystem::current_path()));
+    auto fs = VirtualFileSystem{};
+    fs.mount("", std::make_unique<DiskFileSystem>(std::filesystem::current_path()));
 
-  const auto wadPath =
-    std::filesystem::current_path() / "fixture/test/IO/Wad/cr8_czg.wad";
-  fs.mount("textures" / wadPath.filename(), openFS<WadFileSystem>(wadPath));
+    const auto wadPath = std::filesystem::current_path() / "fixture/test/IO/Wad/cr8_czg.wad";
+    fs.mount("textures" / wadPath.filename(), openFS<WadFileSystem>(wadPath));
 
-  auto logger = NullLogger{};
+    auto logger = NullLogger{};
 
-  SECTION("invalid path")
-  {
-    const auto textureConfig = Model::TextureConfig{
-      "textures",
-      {".D"},
-      "fixture/test/palette.lmp",
-      "wad",
-      "",
-      {},
-    };
+    SECTION("invalid path")
+    {
+        const auto textureConfig = Model::TextureConfig{"textures", {".D"}, "fixture/test/palette.lmp", "wad", "", {},};
 
-    CHECK(loadTextureCollection("textures/missing.wad", fs, textureConfig, logger)
-            .is_error());
-  }
+        CHECK(loadTextureCollection("textures/missing.wad", fs, textureConfig, logger).is_error());
+    }
 
-  SECTION("missing palette")
-  {
-    const auto textureConfig = Model::TextureConfig{
-      "textures",
-      {".D"},
-      "fixture/test/missing.lmp",
-      "wad",
-      "",
-      {},
-    };
+    SECTION("missing palette")
+    {
+        const auto textureConfig = Model::TextureConfig{"textures", {".D"}, "fixture/test/missing.lmp", "wad", "", {},};
 
-    CHECK(
-      makeInfo(loadTextureCollection("textures/cr8_czg.wad", fs, textureConfig, logger))
-      == TextureCollectionInfo{
-        "textures/cr8_czg.wad",
-        {
-          {"cr8_czg_1", 32, 32},       {"cr8_czg_2", 32, 32},
-          {"cr8_czg_3", 32, 32},       {"cr8_czg_4", 32, 32},
-          {"cr8_czg_5", 32, 32},       {"speedM_1", 32, 32},
-          {"cap4can-o-jam", 32, 32},   {"can-o-jam", 32, 32},
-          {"eat_me", 32, 32},          {"coffin1", 32, 32},
-          {"coffin2", 32, 32},         {"czg_fronthole", 32, 32},
-          {"czg_backhole", 32, 32},    {"u_get_this", 32, 32},
-          {"for_sux-m-ass", 32, 32},   {"dex_5", 32, 32},
-          {"polished_turd", 32, 32},   {"crackpipes", 32, 32},
-          {"bongs2", 32, 32},          {"blowjob_machine", 32, 32},
-          {"lasthopeofhuman", 32, 32},
-        },
-      });
-  }
+        CHECK(makeInfo(loadTextureCollection("textures/cr8_czg.wad", fs, textureConfig, logger)) == TextureCollectionInfo{
+            "textures/cr8_czg.wad",
+            {{"cr8_czg_1", 32, 32}, {"cr8_czg_2", 32, 32}, {"cr8_czg_3", 32, 32}, {"cr8_czg_4", 32, 32}, {"cr8_czg_5", 32, 32}, {"speedM_1", 32, 32},
+             {"cap4can-o-jam", 32, 32}, {"can-o-jam", 32, 32}, {"eat_me", 32, 32}, {"coffin1", 32, 32}, {"coffin2", 32, 32}, {"czg_fronthole", 32, 32},
+             {"czg_backhole", 32, 32}, {"u_get_this", 32, 32}, {"for_sux-m-ass", 32, 32}, {"dex_5", 32, 32}, {"polished_turd", 32, 32}, {"crackpipes", 32, 32},
+             {"bongs2", 32, 32}, {"blowjob_machine", 32, 32}, {"lasthopeofhuman", 32, 32},
+            },
+        });
+    }
 
-  SECTION("loading all textures")
-  {
-    const auto textureConfig = Model::TextureConfig{
-      "textures",
-      {".D"},
-      "fixture/test/palette.lmp",
-      "wad",
-      "",
-      {},
-    };
+    SECTION("loading all textures")
+    {
+        const auto textureConfig = Model::TextureConfig{"textures", {".D"}, "fixture/test/palette.lmp", "wad", "", {},};
 
-    CHECK(
-      makeInfo(loadTextureCollection("textures/cr8_czg.wad", fs, textureConfig, logger))
-      == TextureCollectionInfo{
-        "textures/cr8_czg.wad",
-        {
-          {"cr8_czg_1", 64, 64},
-          {"cr8_czg_2", 64, 64},
-          {"cr8_czg_3", 64, 128},
-          {"cr8_czg_4", 64, 128},
-          {"cr8_czg_5", 64, 128},
-          {"speedM_1", 128, 128},
-          {"cap4can-o-jam", 64, 64},
-          {"can-o-jam", 64, 64},
-          {"eat_me", 64, 64},
-          {"coffin1", 128, 128},
-          {"coffin2", 128, 128},
-          {"czg_fronthole", 128, 128},
-          {"czg_backhole", 128, 128},
-          {"u_get_this", 64, 64},
-          {"for_sux-m-ass", 64, 64},
-          {"dex_5", 128, 128},
-          {"polished_turd", 64, 64},
-          {"crackpipes", 128, 128},
-          {"bongs2", 128, 128},
-          {"blowjob_machine", 128, 128},
-          {"lasthopeofhuman", 128, 128},
-        },
-      });
-  }
+        CHECK(makeInfo(loadTextureCollection("textures/cr8_czg.wad", fs, textureConfig, logger)) == TextureCollectionInfo{
+            "textures/cr8_czg.wad",
+            {{"cr8_czg_1", 64, 64}, {"cr8_czg_2", 64, 64}, {"cr8_czg_3", 64, 128}, {"cr8_czg_4", 64, 128}, {"cr8_czg_5", 64, 128}, {"speedM_1", 128, 128},
+             {"cap4can-o-jam", 64, 64}, {"can-o-jam", 64, 64}, {"eat_me", 64, 64}, {"coffin1", 128, 128}, {"coffin2", 128, 128}, {"czg_fronthole", 128, 128},
+             {"czg_backhole", 128, 128}, {"u_get_this", 64, 64}, {"for_sux-m-ass", 64, 64}, {"dex_5", 128, 128}, {"polished_turd", 64, 64},
+             {"crackpipes", 128, 128}, {"bongs2", 128, 128}, {"blowjob_machine", 128, 128}, {"lasthopeofhuman", 128, 128},
+            },
+        });
+    }
 
-  SECTION("loading with texture exclusions")
-  {
-    const auto textureConfig = Model::TextureConfig{
-      "textures",
-      {".D"},
-      "fixture/test/palette.lmp",
-      "wad",
-      "",
-      {"*-jam", "coffin2", "czg_*"},
-    };
+    SECTION("loading with texture exclusions")
+    {
+        const auto textureConfig = Model::TextureConfig{
+            "textures", {".D"}, "fixture/test/palette.lmp", "wad", "", {"*-jam", "coffin2", "czg_*"},
+        };
 
-    CHECK(
-      makeInfo(loadTextureCollection("textures/cr8_czg.wad", fs, textureConfig, logger))
-      == TextureCollectionInfo{
-        "textures/cr8_czg.wad",
-        {
-          {"cr8_czg_1", 64, 64},
-          {"cr8_czg_2", 64, 64},
-          {"cr8_czg_3", 64, 128},
-          {"cr8_czg_4", 64, 128},
-          {"cr8_czg_5", 64, 128},
-          {"speedM_1", 128, 128},
-          {"eat_me", 64, 64},
-          {"coffin1", 128, 128},
-          {"u_get_this", 64, 64},
-          {"for_sux-m-ass", 64, 64},
-          {"dex_5", 128, 128},
-          {"polished_turd", 64, 64},
-          {"crackpipes", 128, 128},
-          {"bongs2", 128, 128},
-          {"blowjob_machine", 128, 128},
-          {"lasthopeofhuman", 128, 128},
-        },
-      });
-  }
+        CHECK(makeInfo(loadTextureCollection("textures/cr8_czg.wad", fs, textureConfig, logger)) == TextureCollectionInfo{
+            "textures/cr8_czg.wad",
+            {{"cr8_czg_1", 64, 64}, {"cr8_czg_2", 64, 64}, {"cr8_czg_3", 64, 128}, {"cr8_czg_4", 64, 128}, {"cr8_czg_5", 64, 128}, {"speedM_1", 128, 128},
+             {"eat_me", 64, 64}, {"coffin1", 128, 128}, {"u_get_this", 64, 64}, {"for_sux-m-ass", 64, 64}, {"dex_5", 128, 128}, {"polished_turd", 64, 64},
+             {"crackpipes", 128, 128}, {"bongs2", 128, 128}, {"blowjob_machine", 128, 128}, {"lasthopeofhuman", 128, 128},
+            },
+        });
+    }
 }
 } // namespace IO
 } // namespace TrenchBroom

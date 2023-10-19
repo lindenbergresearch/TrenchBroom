@@ -72,9 +72,7 @@ private:
     size_t m_faceIndex;
 
 public:
-    BrushFaceIssue(
-        IssueType type, BrushNode &node, size_t faceIndex, std::string description
-    );
+    BrushFaceIssue(IssueType type, BrushNode &node, size_t faceIndex, std::string description);
 
     ~BrushFaceIssue() override;
 
@@ -91,9 +89,7 @@ private:
     std::string m_propertyKey;
 
 public:
-    EntityPropertyIssue(
-        IssueType type, EntityNodeBase &entityNode, std::string propertyKey, std::string description
-    );
+    EntityPropertyIssue(IssueType type, EntityNodeBase &entityNode, std::string propertyKey, std::string description);
 
     ~EntityPropertyIssue() override;
 

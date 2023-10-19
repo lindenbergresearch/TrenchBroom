@@ -29,51 +29,49 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 
 TEST_CASE_METHOD(MapDocumentTest, "UpdateLinkedGroupsCommandTest.collateWith")
 {
-  const auto createLinkedGroup = [&]() {
-    auto* brushNode = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brushNode}}});
-    document->selectNodes({brushNode});
+    const auto createLinkedGroup = [&]() {
+      auto *brushNode = createBrushNode();
+      document->addNodes({{document->parentForNodes(), {brushNode}}});
+      document->selectNodes({brushNode});
 
-    auto* groupNode = document->groupSelection("group");
-    document->selectNodes({groupNode});
+      auto *groupNode = document->groupSelection("group");
+      document->selectNodes({groupNode});
 
-    auto* linkedGroupNode = document->createLinkedDuplicate();
-    document->deselectAll();
+      auto *linkedGroupNode = document->createLinkedDuplicate();
+      document->deselectAll();
 
-    return std::make_tuple(groupNode, linkedGroupNode);
-  };
+      return std::make_tuple(groupNode, linkedGroupNode);
+    };
 
-  auto [groupNode1, linkedGroupNode1] = createLinkedGroup();
-  auto [groupNode2, linkedGroupNode2] = createLinkedGroup();
+    auto [groupNode1, linkedGroupNode1] = createLinkedGroup();
+    auto [groupNode2, linkedGroupNode2] = createLinkedGroup();
 
-  SECTION("Collate two UpdateLinkedGroupCommand instances")
-  {
-    auto firstCommand = UpdateLinkedGroupsCommand{{groupNode1}};
-    auto secondCommand = UpdateLinkedGroupsCommand{{groupNode1, groupNode2}};
+    SECTION("Collate two UpdateLinkedGroupCommand instances")
+    {
+        auto firstCommand = UpdateLinkedGroupsCommand{{groupNode1}};
+        auto secondCommand = UpdateLinkedGroupsCommand{{groupNode1, groupNode2}};
 
-    firstCommand.performDo(static_cast<MapDocumentCommandFacade*>(document.get()));
-    secondCommand.performDo(static_cast<MapDocumentCommandFacade*>(document.get()));
+        firstCommand.performDo(static_cast<MapDocumentCommandFacade *>(document.get()));
+        secondCommand.performDo(static_cast<MapDocumentCommandFacade *>(document.get()));
 
-    CHECK(firstCommand.collateWith(secondCommand));
-  }
+        CHECK(firstCommand.collateWith(secondCommand));
+    }
 
-  SECTION("Collate UpdateLinkedGroupCommand with another command")
-  {
-    auto firstCommand = UpdateLinkedGroupsCommand{{groupNode1}};
-    auto secondCommand = CurrentGroupCommand{groupNode2};
+    SECTION("Collate UpdateLinkedGroupCommand with another command")
+    {
+        auto firstCommand = UpdateLinkedGroupsCommand{{groupNode1}};
+        auto secondCommand = CurrentGroupCommand{groupNode2};
 
-    firstCommand.performDo(static_cast<MapDocumentCommandFacade*>(document.get()));
-    secondCommand.performDo(static_cast<MapDocumentCommandFacade*>(document.get()));
+        firstCommand.performDo(static_cast<MapDocumentCommandFacade *>(document.get()));
+        secondCommand.performDo(static_cast<MapDocumentCommandFacade *>(document.get()));
 
-    CHECK_FALSE(firstCommand.collateWith(secondCommand));
-  }
+        CHECK_FALSE(firstCommand.collateWith(secondCommand));
+    }
 }
 } // namespace View
 } // namespace TrenchBroom

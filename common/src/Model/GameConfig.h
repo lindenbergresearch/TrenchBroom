@@ -138,8 +138,8 @@ struct GameConfig {
 
   size_t maxPropertyLength{1023};
 
-  kdl_reflect_decl(GameConfig, name, path, icon, experimental, fileFormats, fileSystemConfig, textureConfig, entityConfig, faceAttribsConfig, smartTags, softMapBounds, compilationTools, compilationConfig, gameEngineConfig,
-                   compilationConfigParseFailed, gameEngineConfigParseFailed, maxPropertyLength);
+  kdl_reflect_decl(GameConfig, name, path, icon, experimental, fileFormats, fileSystemConfig, textureConfig, entityConfig, faceAttribsConfig, smartTags,
+      softMapBounds, compilationTools, compilationConfig, gameEngineConfig, compilationConfigParseFailed, gameEngineConfigParseFailed, maxPropertyLength);
 
   std::filesystem::path findInitialMap(const std::string &formatName) const;
 

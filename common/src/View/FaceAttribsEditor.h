@@ -93,9 +93,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    FaceAttribsEditor(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    FaceAttribsEditor(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     bool cancelMouseDrag();
 

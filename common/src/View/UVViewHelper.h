@@ -94,25 +94,18 @@ public:
 
     float cameraZoom() const;
 
-    void pickTextureGrid(
-        const vm::ray3 &ray, const Model::HitType::Type hitTypes[2], Model::PickResult &pickResult
-    ) const;
+    void pickTextureGrid(const vm::ray3 &ray, const Model::HitType::Type hitTypes[2], Model::PickResult &pickResult) const;
 
     vm::vec2f snapDelta(const vm::vec2f &delta, const vm::vec2f &distance) const;
 
     vm::vec2f computeDistanceFromTextureGrid(const vm::vec3 &position) const;
 
-    void computeOriginHandleVertices(
-        vm::vec3 &x1, vm::vec3 &x2, vm::vec3 &y1, vm::vec3 &y2
-    ) const;
+    void computeOriginHandleVertices(vm::vec3 &x1, vm::vec3 &x2, vm::vec3 &y1, vm::vec3 &y2) const;
 
-    void computeScaleHandleVertices(
-        const vm::vec2 &pos, vm::vec3 &x1, vm::vec3 &x2, vm::vec3 &y1, vm::vec3 &y2
-    ) const;
+    void computeScaleHandleVertices(const vm::vec2 &pos, vm::vec3 &x1, vm::vec3 &x2, vm::vec3 &y1, vm::vec3 &y2) const;
 
-    void computeLineVertices(
-        const vm::vec2 &pos, vm::vec3 &x1, vm::vec3 &x2, vm::vec3 &y1, vm::vec3 &y2, const vm::mat4x4 &toTex, const vm::mat4x4 &toWorld
-    ) const;
+    void
+    computeLineVertices(const vm::vec2 &pos, vm::vec3 &x1, vm::vec3 &x2, vm::vec3 &y1, vm::vec3 &y2, const vm::mat4x4 &toTex, const vm::mat4x4 &toWorld) const;
 
     /**
      * Converts texture space to view space (pixels in the UV viewport).

@@ -64,18 +64,15 @@ private:
 public:
     explicit TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix = {"/"});
 
-    Result<std::filesystem::path> makeAbsolute(
-        const std::filesystem::path &path) const override;
+    Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
     PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 private:
     const Entry *findEntry(std::filesystem::path path) const;
 
-    Result<std::vector<std::filesystem::path>> doFind(
-        const std::filesystem::path &path, TraversalMode traversalMode) const override;
+    Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
 
-    Result<std::shared_ptr<File>> doOpenFile(
-        const std::filesystem::path &path) const override;
+    Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
 };
 } // namespace TrenchBroom::IO

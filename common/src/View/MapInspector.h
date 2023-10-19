@@ -88,9 +88,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    explicit MapPropertiesEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit MapPropertiesEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     std::optional<vm::bbox3> parseLineEdits();

@@ -128,12 +128,8 @@ public:
         std::memcpy(val, m_begin + position, size);
     }
 
-    std::shared_ptr<ReaderSource> subSource(
-        const size_t offset, const size_t length
-    ) const override {
-        return std::make_shared<BufferReaderSource>(
-            m_begin + offset, m_begin + offset + length
-        );
+    std::shared_ptr<ReaderSource> subSource(const size_t offset, const size_t length) const override {
+        return std::make_shared<BufferReaderSource>(m_begin + offset, m_begin + offset + length);
     }
 
     std::shared_ptr<BufferReaderSource> buffer() const override {
@@ -154,7 +150,11 @@ private:
     BufferType m_buffer;
 
 public:
-    OwningBufferReaderSource(BufferType buffer, const char *begin, const char *end) : BufferReaderSource{begin, end}, m_buffer{std::move(buffer)} {
+    OwningBufferReaderSource(BufferType buffer, const char *begin, const char *end) : BufferReaderSource{
+        begin, end
+    }, m_buffer{
+        std::move(buffer)
+    } {
     }
 
     std::shared_ptr<BufferReaderSource> buffer() const override {
@@ -182,7 +182,9 @@ public:
      * @param offset the offset into the file at which this reader source should begin
      * @param length the length of this reader source
      */
-    FileReaderSource(std::FILE *file, const size_t offset, const size_t length) : m_file{file}, m_offset{offset}, m_length{length} {
+    FileReaderSource(std::FILE *file, const size_t offset, const size_t length) : m_file{file}, m_offset{
+        offset
+    }, m_length{length} {
         assert(m_file != nullptr);
         std::rewind(m_file);
     }
@@ -205,9 +207,7 @@ public:
         }
     }
 
-    std::shared_ptr<ReaderSource> subSource(
-        const size_t offset, const size_t length
-    ) const override {
+    std::shared_ptr<ReaderSource> subSource(const size_t offset, const size_t length) const override {
         return std::make_shared<FileReaderSource>(m_file, m_offset + offset, length);
     }
 
@@ -283,7 +283,9 @@ void Reader::seekForward(const size_t offset) {
 
 void Reader::seekBackward(const size_t offset) {
     if (offset > position()) {
-        throw ReaderException{"Cannot seek beyond start of reader at position " + std::to_string(position()) + " with offset " + std::to_string(offset)};
+        throw ReaderException{
+            "Cannot seek beyond start of reader at position " + std::to_string(position()) + " with offset " + std::to_string(offset)
+        };
     }
     seekFromBegin(position() - offset);
 }
@@ -331,7 +333,9 @@ std::string Reader::readString(const size_t size) {
 
 void Reader::ensurePosition(const size_t position) const {
     if (position > size()) {
-        throw ReaderException{"Position " + std::to_string(position) + " is out of bounds for reader of size " + std::to_string(size())};
+        throw ReaderException{
+            "Position " + std::to_string(position) + " is out of bounds for reader of size " + std::to_string(size())
+        };
     }
 }
 

@@ -36,6 +36,7 @@ private:
 
 public:
     explicit PopupButton(const QString &caption = "", QWidget *parent = nullptr, const QIcon &icon = QIcon{});
+
     QWidget *GetPopupWindow() const;
 
     void setIcon(const std::string &iconName);

@@ -33,91 +33,76 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 
-template <typename M, typename T, typename... E>
-class ResultMatcher : public Catch::MatcherBase<kdl::result<T, E...>>
-{
-  kdl::result<T, E...> m_expected;
+template<typename M, typename T, typename... E>
+class ResultMatcher : public Catch::MatcherBase<kdl::result<T, E...>> {
+    kdl::result<T, E...> m_expected;
 
 public:
-  explicit ResultMatcher(kdl::result<T, E...> expected)
-    : m_expected{std::move(expected)}
-  {
-  }
+    explicit ResultMatcher(kdl::result<T, E...> expected) : m_expected{std::move(expected)} {
+    }
 
-  bool match(const kdl::result<T, E...>& in) const override
-  {
-    return m_expected.visit(kdl::overload(
-      [&](const T& lhs) {
-        return in.visit(kdl::overload(
-          [&](const T& rhs) { return M{lhs}.match(rhs); },
-          [](const auto&) { return false; }));
-      },
-      (
-        [&](const E& lhs) {
-          return in.visit(kdl::overload(
-            [&](const E& rhs) { return lhs == rhs; }, [](const auto&) { return false; }));
-        },
-        ...)));
-  }
+    bool match(const kdl::result<T, E...> &in) const override {
+        return m_expected.visit(kdl::overload([&](const T &lhs) {
+          return in.visit(kdl::overload([&](const T &rhs) {
+                return M{lhs}.match(rhs);
+              }, [](const auto &) { return false; }
+          ));
+        }, (
+            [&](const E &lhs) {
+              return in.visit(kdl::overload([&](const E &rhs) { return lhs == rhs; }, [](const auto &) { return false; }));
+            }, ...)));
+    }
 
-  std::string describe() const override
-  {
-    auto str = std::stringstream{};
-    str << "matches " << m_expected;
-    return str.str();
-  }
+    std::string describe() const override {
+        auto str = std::stringstream{};
+        str << "matches " << m_expected;
+        return str.str();
+    }
 };
 
-template <typename M, typename T, typename... E>
-auto MatchesResult(kdl::result<T, E...> expected)
-{
-  return ResultMatcher<M, T, E...>{std::move(expected)};
+template<typename M, typename T, typename... E>
+auto MatchesResult(kdl::result<T, E...> expected) {
+    return ResultMatcher<M, T, E...>{std::move(expected)};
 }
 
-inline auto MatchesPathsResult(std::vector<std::filesystem::path> paths)
-{
-  return MatchesResult<decltype(Catch::UnorderedEquals(paths))>(
-    Result<std::vector<std::filesystem::path>>{std::move(paths)});
+inline auto MatchesPathsResult(std::vector<std::filesystem::path> paths) {
+    return MatchesResult<decltype(Catch::UnorderedEquals(paths))>(Result<std::vector<std::filesystem::path>>{
+            std::move(paths)
+        }
+    );
 }
 
-template <typename T>
-class AnyOfMatcher : public Catch::MatcherBase<T>
-{
-  std::vector<T> m_expected;
+template<typename T>
+class AnyOfMatcher : public Catch::MatcherBase<T> {
+    std::vector<T> m_expected;
 
 public:
-  explicit AnyOfMatcher(std::vector<T> expected)
-    : m_expected{std::move(expected)}
-  {
-  }
+    explicit AnyOfMatcher(std::vector<T> expected) : m_expected{std::move(expected)} {
+    }
 
-  bool match(const T& in) const override
-  {
-    return std::any_of(
-      m_expected.begin(), m_expected.end(), [&](const auto& e) { return in == e; });
-  }
+    bool match(const T &in) const override {
+        return std::any_of(m_expected.begin(), m_expected.end(), [&](const auto &e) { return in == e; });
+    }
 
-  std::string describe() const override
-  {
-    auto str = std::stringstream{};
-    str << "matches any of " << kdl::make_streamable(m_expected);
-    return str.str();
-  }
+    std::string describe() const override {
+        auto str = std::stringstream{};
+        str << "matches any of " << kdl::make_streamable(m_expected);
+        return str.str();
+    }
 };
 
-template <typename T>
-AnyOfMatcher<T> MatchesAnyOf(std::vector<T> expected)
-{
-  return AnyOfMatcher<T>{std::move(expected)};
+template<typename T>
+AnyOfMatcher<T> MatchesAnyOf(std::vector<T> expected) {
+    return AnyOfMatcher < T > {std::move(expected)};
 }
 
-template <typename T>
-AnyOfMatcher<T> MatchesAnyOf(std::initializer_list<T> expected)
-{
-  return AnyOfMatcher<T>(std::vector<T>{expected});
+template<typename T> AnyOfMatcher<T> MatchesAnyOf(std::initializer_list<T>
+expected) {
+return
+AnyOfMatcher<T>(std::vector<T>{expected}
+);
 }
 
 } // namespace TrenchBroom

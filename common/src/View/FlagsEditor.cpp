@@ -44,9 +44,7 @@ void FlagsEditor::setFlags(const QStringList &labels, const QStringList &tooltip
     setFlags(values, labels, tooltips);
 }
 
-void FlagsEditor::setFlags(
-    const QList<int> &values, const QStringList &labels, const QStringList &tooltips
-) {
+void FlagsEditor::setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
     const auto count = static_cast<size_t>(values.size());
     const size_t numRows = (count + (m_numCols - 1)) / m_numCols;
     ensure(numRows * m_numCols >= count, "didn't allocate enough grid cells");
@@ -76,15 +74,10 @@ void FlagsEditor::setFlags(
                 m_checkBoxes[index] = new QCheckBox();
                 m_values[index] = value;
 
-                m_checkBoxes[index]->setText(
-                    indexInt < labels.size() ? labels[indexInt] : QString::number(value));
-                m_checkBoxes[index]->setToolTip(
-                    indexInt < tooltips.size() ? tooltips[indexInt] : ""
-                );
-                connect(
-                    m_checkBoxes[index], &QCheckBox::clicked, this, [index, value, this]() {
-                      emit flagChanged(
-                        index, value, this->getSetFlagValue(), this->getMixedFlagValue());
+                m_checkBoxes[index]->setText(indexInt < labels.size() ? labels[indexInt] : QString::number(value));
+                m_checkBoxes[index]->setToolTip(indexInt < tooltips.size() ? tooltips[indexInt] : "");
+                connect(m_checkBoxes[index], &QCheckBox::clicked, this, [index, value, this]() {
+                      emit flagChanged(index, value, this->getSetFlagValue(), this->getMixedFlagValue());
                     }
                 );
 

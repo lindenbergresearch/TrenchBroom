@@ -61,9 +61,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    explicit ScaleObjectsToolPage(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit ScaleObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
     void activate();
 

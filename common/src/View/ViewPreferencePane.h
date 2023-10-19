@@ -67,6 +67,7 @@ private:
     QWidget *createViewPreferences();
 
     void bindEvents();
+
     void unBindEvents();
 
     bool doCanResetToDefaults() override;
@@ -90,7 +91,9 @@ private slots:
     void brightnessChanged(int value);
 
     void UIBrightnessChanged(int value);
+
     void editorFaceAutoBrightnessChanged(int value);
+
     void editorGridWithChanged(int value);
 
 
@@ -125,6 +128,5 @@ private slots:
     void editorConsoleFontFileChanged(int index);
 
     void editorToolbarIconSizeChanged(int index);
-
 };
 } // namespace TrenchBroom::View

@@ -41,13 +41,10 @@ size_t getMountPointId() {
 }
 
 bool matches(const VirtualMountPoint &mountPoint, const std::filesystem::path &path) {
-    return kdl::path_has_prefix(
-        kdl::path_to_lower(path), kdl::path_to_lower(mountPoint.path));
+    return kdl::path_has_prefix(kdl::path_to_lower(path), kdl::path_to_lower(mountPoint.path));
 }
 
-std::filesystem::path suffix(
-    const VirtualMountPoint &mountPoint, const std::filesystem::path &path
-) {
+std::filesystem::path suffix(const VirtualMountPoint &mountPoint, const std::filesystem::path &path) {
     assert(matches(mountPoint, path));
     return kdl::path_clip(path, kdl::path_length(mountPoint.path));
 }
@@ -64,9 +61,7 @@ bool operator!=(const VirtualMountPointId &lhs, const VirtualMountPointId &rhs) 
     return !(lhs == rhs);
 }
 
-Result<std::filesystem::path> VirtualFileSystem::makeAbsolute(
-    const std::filesystem::path &path
-) const {
+Result<std::filesystem::path> VirtualFileSystem::makeAbsolute(const std::filesystem::path &path) const {
     for (auto it = m_mountPoints.rbegin(); it != m_mountPoints.rend(); ++it) {
         const auto &mountPoint = *it;
         if (matches(mountPoint, path)) {
@@ -93,27 +88,21 @@ PathInfo VirtualFileSystem::pathInfo(const std::filesystem::path &path) const {
         }
     }
 
-    return std::any_of(
-        m_mountPoints.rbegin(), m_mountPoints.rend(), [&](const auto &mountPoint) {
-          return kdl::path_has_prefix(
-              kdl::path_to_lower(mountPoint.path), kdl::path_to_lower(path));
+    return std::any_of(m_mountPoints.rbegin(), m_mountPoints.rend(), [&](const auto &mountPoint) {
+          return kdl::path_has_prefix(kdl::path_to_lower(mountPoint.path), kdl::path_to_lower(path));
         }
     ) ? PathInfo::Directory : PathInfo::Unknown;
 }
 
 
-VirtualMountPointId VirtualFileSystem::mount(
-    const std::filesystem::path &path, std::unique_ptr<FileSystem> fs
-) {
+VirtualMountPointId VirtualFileSystem::mount(const std::filesystem::path &path, std::unique_ptr<FileSystem> fs) {
     const auto id = VirtualMountPointId{};
     m_mountPoints.push_back({id, path, std::move(fs)});
     return id;
 }
 
 bool VirtualFileSystem::unmount(const VirtualMountPointId &id) {
-    if (const auto it = std::find_if(
-            m_mountPoints.begin(), m_mountPoints.end(), [&](const auto &mountPoint) { return mountPoint.id == id; }
-        );
+    if (const auto it = std::find_if(m_mountPoints.begin(), m_mountPoints.end(), [&](const auto &mountPoint) { return mountPoint.id == id; });
         it != m_mountPoints.end()) {
         m_mountPoints.erase(it);
         return true;
@@ -125,36 +114,27 @@ void VirtualFileSystem::unmountAll() {
     m_mountPoints.clear();
 }
 
-Result<std::vector<std::filesystem::path>> VirtualFileSystem::doFind(
-    const std::filesystem::path &path, const TraversalMode traversalMode
-) const {
-    return kdl::fold_results(
-        kdl::vec_transform(
-            m_mountPoints, [&](const auto &mountPoint) -> Result<std::vector<std::filesystem::path>> {
-              if (kdl::path_has_prefix(
-                  kdl::path_to_lower(path), kdl::path_to_lower(mountPoint.path))) {
-                  // path points into the mounted filesystem, search there
-                  const auto pathSuffix = kdl::path_clip(path, kdl::path_length(mountPoint.path));
-                  if (mountPoint.mountedFileSystem->pathInfo(pathSuffix) == PathInfo::Directory) {
-                      return mountPoint.mountedFileSystem->find(pathSuffix, traversalMode).transform(
-                          [&](auto paths) {
-                            return kdl::vec_transform(
-                                std::move(paths), [&](auto p) { return mountPoint.path / p; }
-                            );
-                          }
-                      );
-                  }
+Result<std::vector<std::filesystem::path>> VirtualFileSystem::doFind(const std::filesystem::path &path, const TraversalMode traversalMode) const {
+    return kdl::fold_results(kdl::vec_transform(m_mountPoints, [&](const auto &mountPoint) -> Result<std::vector<std::filesystem::path>> {
+          if (kdl::path_has_prefix(kdl::path_to_lower(path), kdl::path_to_lower(mountPoint.path))) {
+              // path points into the mounted filesystem, search there
+              const auto pathSuffix = kdl::path_clip(path, kdl::path_length(mountPoint.path));
+              if (mountPoint.mountedFileSystem->pathInfo(pathSuffix) == PathInfo::Directory) {
+                  return mountPoint.mountedFileSystem->find(pathSuffix, traversalMode).transform([&](auto paths) {
+                        return kdl::vec_transform(std::move(paths), [&](auto p) { return mountPoint.path / p; });
+                      }
+                  );
               }
-              else if (kdl::path_length(path) < kdl::path_length(mountPoint.path) && kdl::path_has_prefix(
-                  kdl::path_to_lower(mountPoint.path), kdl::path_to_lower(path))) {
-                  // path is a prefix of the mount point path, treat as a match
-                  return std::vector<std::filesystem::path>{kdl::path_clip(mountPoint.path, 0, kdl::path_length(path) + 1)};
-              }
-              // path is unrelated to the mount point
-              return std::vector<std::filesystem::path>{};
-            }
-        )).transform(
-        [](auto nestedPaths) {
+          }
+          else if (kdl::path_length(path) < kdl::path_length(mountPoint.path) &&
+                   kdl::path_has_prefix(kdl::path_to_lower(mountPoint.path), kdl::path_to_lower(path))) {
+              // path is a prefix of the mount point path, treat as a match
+              return std::vector<std::filesystem::path>{kdl::path_clip(mountPoint.path, 0, kdl::path_length(path) + 1)};
+          }
+          // path is unrelated to the mount point
+          return std::vector<std::filesystem::path>{};
+        }
+    )).transform([](auto nestedPaths) {
           if (nestedPaths.empty()) {
               return std::vector<std::filesystem::path>{};
           }
@@ -186,9 +166,7 @@ Result<std::vector<std::filesystem::path>> VirtualFileSystem::doFind(
     );
 }
 
-Result<std::shared_ptr<File>> VirtualFileSystem::doOpenFile(
-    const std::filesystem::path &path
-) const {
+Result<std::shared_ptr<File>> VirtualFileSystem::doOpenFile(const std::filesystem::path &path) const {
     for (auto it = m_mountPoints.rbegin(); it != m_mountPoints.rend(); ++it) {
         const auto &mountPoint = *it;
         if (matches(mountPoint, path)) {
@@ -202,15 +180,13 @@ Result<std::shared_ptr<File>> VirtualFileSystem::doOpenFile(
     return Error{"'" + path.string() + "' not found"};
 }
 
-WritableVirtualFileSystem::WritableVirtualFileSystem(
-    VirtualFileSystem virtualFs, std::unique_ptr<WritableFileSystem> writableFs
-) : m_virtualFs{std::move(virtualFs)}, m_writableFs{*writableFs} {
+WritableVirtualFileSystem::WritableVirtualFileSystem(VirtualFileSystem virtualFs, std::unique_ptr<WritableFileSystem> writableFs) : m_virtualFs{
+    std::move(virtualFs)
+}, m_writableFs{*writableFs} {
     m_virtualFs.mount(std::filesystem::path{}, std::move(writableFs));
 }
 
-Result<std::filesystem::path> WritableVirtualFileSystem::makeAbsolute(
-    const std::filesystem::path &path
-) const {
+Result<std::filesystem::path> WritableVirtualFileSystem::makeAbsolute(const std::filesystem::path &path) const {
     return m_virtualFs.makeAbsolute(path);
 }
 
@@ -218,27 +194,19 @@ PathInfo WritableVirtualFileSystem::pathInfo(const std::filesystem::path &path) 
     return m_virtualFs.pathInfo(path);
 }
 
-Result<std::vector<std::filesystem::path>> WritableVirtualFileSystem::doFind(
-    const std::filesystem::path &path, const TraversalMode traversalMode
-) const {
+Result<std::vector<std::filesystem::path>> WritableVirtualFileSystem::doFind(const std::filesystem::path &path, const TraversalMode traversalMode) const {
     return m_virtualFs.find(path, traversalMode);
 }
 
-Result<std::shared_ptr<File>> WritableVirtualFileSystem::doOpenFile(
-    const std::filesystem::path &path
-) const {
+Result<std::shared_ptr<File>> WritableVirtualFileSystem::doOpenFile(const std::filesystem::path &path) const {
     return m_virtualFs.openFile(path);
 }
 
-Result<void> WritableVirtualFileSystem::doCreateFile(
-    const std::filesystem::path &path, const std::string &contents
-) {
+Result<void> WritableVirtualFileSystem::doCreateFile(const std::filesystem::path &path, const std::string &contents) {
     return m_writableFs.createFile(path, contents);
 }
 
-Result<bool> WritableVirtualFileSystem::doCreateDirectory(
-    const std::filesystem::path &path
-) {
+Result<bool> WritableVirtualFileSystem::doCreateDirectory(const std::filesystem::path &path) {
     return m_writableFs.createDirectory(path);
 }
 
@@ -246,15 +214,11 @@ Result<bool> WritableVirtualFileSystem::doDeleteFile(const std::filesystem::path
     return m_writableFs.deleteFile(path);
 }
 
-Result<void> WritableVirtualFileSystem::doCopyFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath
-) {
+Result<void> WritableVirtualFileSystem::doCopyFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) {
     return m_writableFs.copyFile(sourcePath, destPath);
 }
 
-Result<void> WritableVirtualFileSystem::doMoveFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath
-) {
+Result<void> WritableVirtualFileSystem::doMoveFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) {
     return m_writableFs.moveFile(sourcePath, destPath);
 }
 } // namespace TrenchBroom::IO

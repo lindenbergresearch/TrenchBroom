@@ -35,9 +35,7 @@ private:
     std::vector<EntityDefinition *> m_definitions;
 
 public:
-    EntityDefinitionGroup(
-        const std::string &name, std::vector<EntityDefinition *> definitions
-    );
+    EntityDefinitionGroup(const std::string &name, std::vector<EntityDefinition *> definitions);
 
     size_t index() const;
 
@@ -47,9 +45,7 @@ public:
 
     const std::vector<EntityDefinition *> &definitions() const;
 
-    std::vector<EntityDefinition *> definitions(
-        EntityDefinitionType type, EntityDefinitionSortOrder order
-    ) const;
+    std::vector<EntityDefinition *> definitions(EntityDefinitionType type, EntityDefinitionSortOrder order) const;
 };
 } // namespace Assets
 } // namespace TrenchBroom

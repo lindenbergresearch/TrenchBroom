@@ -28,8 +28,10 @@ enum class PrimType {
 };
 
 constexpr std::size_t PrimTypeCount = 10u;
-constexpr PrimType PrimTypeValues[PrimTypeCount] = {PrimType::Points, PrimType::Lines, PrimType::Triangles, PrimType::Quads, PrimType::LineStrip, PrimType::LineLoop, PrimType::TriangleFan, PrimType::TriangleStrip, PrimType::QuadStrip,
-                                                    PrimType::Polygon};
+constexpr PrimType PrimTypeValues[PrimTypeCount] = {
+    PrimType::Points, PrimType::Lines, PrimType::Triangles, PrimType::Quads, PrimType::LineStrip, PrimType::LineLoop, PrimType::TriangleFan,
+    PrimType::TriangleStrip, PrimType::QuadStrip, PrimType::Polygon
+};
 
 /**
  * Maps the given primitive type to its corresponding OpenGL enum.

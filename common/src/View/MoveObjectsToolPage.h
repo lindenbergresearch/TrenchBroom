@@ -47,9 +47,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    explicit MoveObjectsToolPage(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit MoveObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     void connectObservers();

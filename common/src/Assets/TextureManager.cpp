@@ -40,20 +40,18 @@
 namespace TrenchBroom {
 namespace Assets {
 
-TextureManager::TextureManager(int magFilter, int minFilter, Logger &logger) : m_logger{logger}, m_minFilter{minFilter}, m_magFilter{magFilter} {
+TextureManager::TextureManager(int magFilter, int minFilter, Logger &logger) : m_logger{logger}, m_minFilter{
+    minFilter
+}, m_magFilter{magFilter} {
 }
 
 TextureManager::~TextureManager() = default;
 
-void TextureManager::reload(
-    const IO::FileSystem &fs, const Model::TextureConfig &textureConfig
-) {
-    findTextureCollections(fs, textureConfig).transform(
-        [&](auto textureCollections) {
+void TextureManager::reload(const IO::FileSystem &fs, const Model::TextureConfig &textureConfig) {
+    findTextureCollections(fs, textureConfig).transform([&](auto textureCollections) {
           setTextureCollections(std::move(textureCollections), fs, textureConfig);
         }
-    ).transform_error(
-        [&](auto e) {
+    ).transform_error([&](auto e) {
           m_logger.error() << "Could not reload texture collections: " + e.msg;
           setTextureCollections({}, fs, textureConfig);
         }
@@ -67,29 +65,25 @@ void TextureManager::setTextureCollections(std::vector<TextureCollection> collec
     updateTextures();
 }
 
-void TextureManager::setTextureCollections(
-    const std::vector<std::filesystem::path> &paths, const IO::FileSystem &fs, const Model::TextureConfig &textureConfig
-) {
+void
+TextureManager::setTextureCollections(const std::vector<std::filesystem::path> &paths, const IO::FileSystem &fs, const Model::TextureConfig &textureConfig) {
     auto collections = std::move(m_collections);
     clear();
 
     for (const auto &path: paths) {
-        const auto it = std::find_if(
-            collections.begin(), collections.end(), [&](const auto &c) {
+        const auto it = std::find_if(collections.begin(), collections.end(), [&](const auto &c) {
               return c.path() == path;
             }
         );
 
         if (it == collections.end() || !it->loaded()) {
-            IO::loadTextureCollection(path, fs, textureConfig, m_logger).transform_error(
-                [&](const auto &error) {
+            IO::loadTextureCollection(path, fs, textureConfig, m_logger).transform_error([&](const auto &error) {
                   if (it == collections.end()) {
                       m_logger.error() << "Could not load texture collection '" << path << "': " << error.msg;
                   }
                   return Assets::TextureCollection{path};
                 }
-            ).transform(
-                [&](auto collection) {
+            ).transform([&](auto collection) {
                   if (!collection.textures().empty()) {
                       m_logger.info() << "Loaded texture collection '" << path << "'";
                   }
@@ -197,8 +191,7 @@ void TextureManager::updateTextures() {
         }
     }
 
-    m_textures = kdl::vec_transform(
-        kdl::map_values(m_texturesByName), [](auto *t) {
+    m_textures = kdl::vec_transform(kdl::map_values(m_texturesByName), [](auto *t) {
           return const_cast<const Texture *>(t);
         }
     );

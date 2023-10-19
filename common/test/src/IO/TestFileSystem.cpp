@@ -45,22 +45,21 @@ PathInfo getEntryType(const Entry &entry) {
 }
 
 const Entry *getChild(const Entry &entry, const std::string &name) {
-    return std::visit(
-        kdl::overload(
-            [&](const DirectoryEntry &d) -> const Entry * {
-              const auto it =
-                  std::find_if(d.entries.begin(), d.entries.end(), [&](const auto &child) {
+    return std::visit(kdl::overload([&](const DirectoryEntry &d) -> const Entry * {
+              const auto it = std::find_if(d.entries.begin(), d.entries.end(), [&](const auto &child) {
                     return getEntryName(child) == name;
-                  });
+                  }
+              );
               return it != d.entries.end() ? &*it : nullptr;
-            },
-            [](const auto &) -> const Entry * { return nullptr; }),
-        entry);
+            }, [](const auto &) -> const Entry * { return nullptr; }
+        ), entry
+    );
 }
 } // namespace
 
-TestFileSystem::TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix)
-    : m_root{std::move(root)}, m_absolutePathPrefix{std::move(absolutePathPrefix)} {
+TestFileSystem::TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix) : m_root{
+    std::move(root)
+}, m_absolutePathPrefix{std::move(absolutePathPrefix)} {
 }
 
 const Entry *TestFileSystem::findEntry(std::filesystem::path path) const {
@@ -77,20 +76,13 @@ PathInfo TestFileSystem::pathInfo(const std::filesystem::path &path) const {
     return entry ? getEntryType(*entry) : PathInfo::Unknown;
 }
 
-Result<std::filesystem::path> TestFileSystem::makeAbsolute(
-    const std::filesystem::path &path) const {
+Result<std::filesystem::path> TestFileSystem::makeAbsolute(const std::filesystem::path &path) const {
     return m_absolutePathPrefix / path;
 }
 
 namespace {
-void doFindImpl(
-    const Entry &entry,
-    const std::filesystem::path &entryPath,
-    const TraversalMode traversalMode,
-    std::vector<std::filesystem::path> &result) {
-    std::visit(
-        kdl::overload(
-            [&](const DirectoryEntry &d) {
+void doFindImpl(const Entry &entry, const std::filesystem::path &entryPath, const TraversalMode traversalMode, std::vector<std::filesystem::path> &result) {
+    std::visit(kdl::overload([&](const DirectoryEntry &d) {
               for (const auto &child: d.entries) {
                   const auto childPath = entryPath / getEntryName(child);
                   result.push_back(childPath);
@@ -98,14 +90,13 @@ void doFindImpl(
                       doFindImpl(child, childPath, traversalMode, result);
                   }
               }
-            },
-            [](const auto &) {}),
-        entry);
+            }, [](const auto &) {}
+        ), entry
+    );
 }
 } // namespace
 
-Result<std::vector<std::filesystem::path>> TestFileSystem::doFind(
-    const std::filesystem::path &path, const TraversalMode traversalMode) const {
+Result<std::vector<std::filesystem::path>> TestFileSystem::doFind(const std::filesystem::path &path, const TraversalMode traversalMode) const {
     auto result = std::vector<std::filesystem::path>{};
     if (const auto *entry = findEntry(path)) {
         doFindImpl(*entry, path, traversalMode, result);
@@ -113,8 +104,7 @@ Result<std::vector<std::filesystem::path>> TestFileSystem::doFind(
     return result;
 }
 
-Result<std::shared_ptr<File>> TestFileSystem::doOpenFile(
-    const std::filesystem::path &path) const {
+Result<std::shared_ptr<File>> TestFileSystem::doOpenFile(const std::filesystem::path &path) const {
     if (const auto *fileEntry = std::get_if<FileEntry>(findEntry(path))) {
         return fileEntry->file;
     }

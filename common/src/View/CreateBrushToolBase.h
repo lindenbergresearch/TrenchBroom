@@ -65,9 +65,7 @@ public:
     void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 private:
-    void renderBrush(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderBrush(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 protected:
     void updateBrush(Model::BrushNode *brush);

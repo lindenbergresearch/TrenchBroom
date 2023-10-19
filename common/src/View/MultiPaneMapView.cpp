@@ -42,17 +42,14 @@ void MultiPaneMapView::doFlashSelection() {
     }
 }
 
-void MultiPaneMapView::doInstallActivationTracker(
-    MapViewActivationTracker &activationTracker
-) {
+void MultiPaneMapView::doInstallActivationTracker(MapViewActivationTracker &activationTracker) {
     for (auto *mapView: m_mapViews) {
         mapView->installActivationTracker(activationTracker);
     }
 }
 
 bool MultiPaneMapView::doGetIsCurrent() const {
-    return std::any_of(
-        m_mapViews.begin(), m_mapViews.end(), [](auto *mapView) {
+    return std::any_of(m_mapViews.begin(), m_mapViews.end(), [](auto *mapView) {
           return mapView->isCurrent();
         }
     );
@@ -73,9 +70,7 @@ void MultiPaneMapView::doSelectTall() {
     }
 }
 
-void MultiPaneMapView::doReset2dCameras(
-    const Renderer::Camera &masterCamera, const bool animate
-) {
+void MultiPaneMapView::doReset2dCameras(const Renderer::Camera &masterCamera, const bool animate) {
     for (auto *mapView: m_mapViews) {
         mapView->reset2dCameras(masterCamera, animate);
     }
@@ -87,9 +82,7 @@ void MultiPaneMapView::doFocusCameraOnSelection(const bool animate) {
     }
 }
 
-void MultiPaneMapView::doMoveCameraToPosition(
-    const vm::vec3f &position, const bool animate
-) {
+void MultiPaneMapView::doMoveCameraToPosition(const vm::vec3f &position, const bool animate) {
     for (auto *mapView: m_mapViews) {
         mapView->moveCameraToPosition(position, animate);
     }

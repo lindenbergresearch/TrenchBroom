@@ -46,15 +46,14 @@ public:
     static const size_t Size = sizeof(ElementType);
     static const bool Normalize = N;
 
-    static void setup(
-        ShaderProgram *program, const size_t /* index */, const size_t stride, const size_t offset
-    ) {
+    static void setup(ShaderProgram *program, const size_t /* index */, const size_t stride, const size_t offset) {
         ensure(program != nullptr, "must have a program bound to use generic attributes");
 
         const GLint attributeIndex = program->findAttributeLocation(A::name);
         glAssert(glEnableVertexAttribArray(static_cast<GLuint>(attributeIndex)));
-        glAssert(glVertexAttribPointer(
-            static_cast<GLuint>(attributeIndex), static_cast<GLint>(S), D, Normalize ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
+        glAssert(
+            glVertexAttribPointer(static_cast<GLuint>(attributeIndex), static_cast<GLint>(S), D, Normalize ? GL_TRUE : GL_FALSE, static_cast<GLsizei>(stride),
+                reinterpret_cast<GLvoid *>(offset)));
     }
 
     static void cleanup(ShaderProgram *program, const size_t /* index */) {
@@ -83,12 +82,9 @@ public:
     using ElementType = vm::vec<ComponentType, S>;
     static const size_t Size = sizeof(ElementType);
 
-    static void setup(
-        ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset
-    ) {
+    static void setup(ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset) {
         glAssert(glEnableClientState(GL_VERTEX_ARRAY));
-        glAssert(glVertexPointer(
-            static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
+        glAssert(glVertexPointer(static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
     }
 
     static void cleanup(ShaderProgram * /* program */, const size_t /* index */) {
@@ -114,13 +110,10 @@ public:
     using ElementType = vm::vec<ComponentType, S>;
     static const size_t Size = sizeof(ElementType);
 
-    static void setup(
-        ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset
-    ) {
+    static void setup(ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset) {
         assert(S == 3);
         glAssert(glEnableClientState(GL_NORMAL_ARRAY));
-        glAssert(glNormalPointer(
-            D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
+        glAssert(glNormalPointer(D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
     }
 
     static void cleanup(ShaderProgram * /* program */, const size_t /* index */) {
@@ -146,12 +139,9 @@ public:
     using ElementType = vm::vec<ComponentType, S>;
     static const size_t Size = sizeof(ElementType);
 
-    static void setup(
-        ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset
-    ) {
+    static void setup(ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset) {
         glAssert(glEnableClientState(GL_COLOR_ARRAY));
-        glAssert(glColorPointer(
-            static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
+        glAssert(glColorPointer(static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
     }
 
     static void cleanup(ShaderProgram * /* program */, const size_t /* index */) {
@@ -177,13 +167,10 @@ public:
     using ElementType = vm::vec<ComponentType, S>;
     static const size_t Size = sizeof(ElementType);
 
-    static void setup(
-        ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset
-    ) {
+    static void setup(ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset) {
         glAssert(glClientActiveTexture(GL_TEXTURE0));
         glAssert(glEnableClientState(GL_TEXTURE_COORD_ARRAY));
-        glAssert(glTexCoordPointer(
-            static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
+        glAssert(glTexCoordPointer(static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
     }
 
     static void cleanup(ShaderProgram * /* program */, const size_t /* index */) {

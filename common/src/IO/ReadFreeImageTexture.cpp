@@ -73,9 +73,7 @@ Color getAverageColor(const Assets::TextureBuffer &buffer, const GLenum format) 
     return average;
 }
 
-Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(
-    std::string name, const uint8_t *begin, const size_t size
-) {
+Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(std::string name, const uint8_t *begin, const size_t size) {
     try {
         InitFreeImage::initialize();
 
@@ -119,22 +117,20 @@ Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(
         auto *outBytes = buffers.at(0).data();
         const auto outBytesPerRow = int(imageWidth * 4);
 
-        FreeImage_ConvertToRawBits(
-            outBytes, image, outBytesPerRow, 32, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE
-        );
+        FreeImage_ConvertToRawBits(outBytes, image, outBytesPerRow, 32, FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
 
         const auto textureType = Assets::Texture::selectTextureType(masked);
         const auto averageColor = getAverageColor(buffers.at(0), format);
 
-        return Assets::Texture{std::move(name), imageWidth, imageHeight, averageColor, std::move(buffers), format, textureType};
+        return Assets::Texture{
+            std::move(name), imageWidth, imageHeight, averageColor, std::move(buffers), format, textureType
+        };
     } catch (const std::exception &e) {
         return ReadTextureError{std::move(name), e.what()};
     }
 }
 
-Result<Assets::Texture, ReadTextureError> readFreeImageTexture(
-    std::string name, Reader &reader
-) {
+Result<Assets::Texture, ReadTextureError> readFreeImageTexture(std::string name, Reader &reader) {
     auto bufferedReader = reader.buffer();
     const auto *begin = bufferedReader.begin();
     const auto *end = bufferedReader.end();

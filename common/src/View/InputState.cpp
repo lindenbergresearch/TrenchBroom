@@ -30,14 +30,16 @@
 
 namespace TrenchBroom {
 namespace View {
-InputState::InputState() : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(0.0f), m_mouseY(0.0f), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
+InputState::InputState() : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(0.0f), m_mouseY(0.0f), m_mouseDX(0.0f),
+                           m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
     const QPoint mouseState = QCursor::pos();
     m_mouseX = static_cast<float>(mouseState.x());
     m_mouseY = static_cast<float>(mouseState.y());
 }
 
-InputState::InputState(const float mouseX, const float mouseY) : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(mouseX), m_mouseY(mouseY), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f),
-                                                                 m_scrollY(0.0f), m_anyToolDragging(false) {
+InputState::InputState(const float mouseX, const float mouseY) : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(mouseX),
+                                                                 m_mouseY(mouseY), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f),
+                                                                 m_anyToolDragging(false) {
 }
 
 InputState::~InputState() {}
@@ -54,9 +56,7 @@ bool InputState::modifierKeysPressed(const ModifierKeyState keys) const {
     return modifierKeys() == keys;
 }
 
-bool InputState::checkModifierKeys(
-    const ModifierKeyState key1, const ModifierKeyState key2, const ModifierKeyState key3, const ModifierKeyState key4
-) const {
+bool InputState::checkModifierKeys(const ModifierKeyState key1, const ModifierKeyState key2, const ModifierKeyState key3, const ModifierKeyState key4) const {
     assert(key1 != ModifierKeys::MKDontCare);
     if (modifierKeysPressed(key1))
         return true;
@@ -69,9 +69,7 @@ bool InputState::checkModifierKeys(
     return false;
 }
 
-bool InputState::checkModifierKeys(
-    const ModifierKeyPressed ctrl, const ModifierKeyPressed alt, const ModifierKeyPressed shift
-) const {
+bool InputState::checkModifierKeys(const ModifierKeyPressed ctrl, const ModifierKeyPressed alt, const ModifierKeyPressed shift) const {
     return (checkModifierKey(ctrl, ModifierKeys::MKCtrlCmd) && checkModifierKey(alt, ModifierKeys::MKAlt) && checkModifierKey(shift, ModifierKeys::MKShift));
 }
 
@@ -143,9 +141,7 @@ void InputState::clearMouseButtons() {
     m_mouseButtons = MouseButtons::MBNone;
 }
 
-void InputState::mouseMove(
-    const float mouseX, const float mouseY, const float mouseDX, const float mouseDY
-) {
+void InputState::mouseMove(const float mouseX, const float mouseY, const float mouseDX, const float mouseDY) {
     m_mouseX = mouseX;
     m_mouseY = mouseY;
     m_mouseDX = mouseDX;

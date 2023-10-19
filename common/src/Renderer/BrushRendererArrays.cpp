@@ -111,9 +111,7 @@ std::pair<AllocationTracker::Block *, GLuint *> BrushIndexArray::getPointerToIns
     }
 
     // retry
-    const size_t newSize = std::max(
-        2 * m_allocationTracker.capacity(), m_allocationTracker.capacity() + elementCount
-    );
+    const size_t newSize = std::max(2 * m_allocationTracker.capacity(), m_allocationTracker.capacity() + elementCount);
     m_allocationTracker.expand(newSize);
     m_indexHolder.resize(newSize);
 
@@ -168,9 +166,7 @@ std::pair<AllocationTracker::Block *, BrushVertexArray::Vertex *> BrushVertexArr
     }
 
     // retry
-    const size_t newSize = std::max(
-        2 * m_allocationTracker.capacity(), m_allocationTracker.capacity() + vertexCount
-    );
+    const size_t newSize = std::max(2 * m_allocationTracker.capacity(), m_allocationTracker.capacity() + vertexCount);
     m_allocationTracker.expand(newSize);
     m_vertexHolder.resize(newSize);
 

@@ -59,8 +59,8 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    MapView2D(
-        std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, ViewPlane viewPlane, Logger *logger
+    MapView2D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager,
+        ViewPlane viewPlane, Logger *logger
     );
 
 private:
@@ -85,9 +85,7 @@ private: // implement RenderView interface
     void doUpdateViewport(int x, int y, int width, int height) override;
 
 private: // implement MapView interface
-    vm::vec3 doGetPasteObjectsDelta(
-        const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
-    ) const override;
+    vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
 
     bool doCanSelectTall() override;
 
@@ -99,9 +97,8 @@ private: // implement MapView interface
 
     void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
 
-    void animateCamera(
-        const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up, float zoom, const int duration = DefaultCameraAnimationDuration
-    );
+    void
+    animateCamera(const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up, float zoom, const int duration = DefaultCameraAnimationDuration);
 
     void doMoveCameraToCurrentTracePoint() override;
 
@@ -122,25 +119,15 @@ private: // implement MapViewBase interface
 
     Renderer::Camera &doGetCamera() override;
 
-    void doRenderGrid(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderGrid(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
-    void doRenderMap(
-        Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
-    void doRenderTools(
-        MapViewToolBox &toolBox, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderTools(MapViewToolBox &toolBox, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
-    void doRenderExtras(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderExtras(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
-    void doRenderSoftWorldBounds(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderSoftWorldBounds(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
 public: // implement CameraLinkableView interface
     void linkCamera(CameraLinkHelper &linkHelper) override;

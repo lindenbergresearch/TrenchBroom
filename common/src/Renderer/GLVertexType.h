@@ -77,13 +77,9 @@ struct GLVertexType<AttrType, AttrTypeRest...> {
      * @param stride the stride of the vertex buffer pointer to be set up here
      * @param offset the offset of the vertex buffer pointer to be set up here
      */
-    static void doSetup(
-        ShaderProgram *program, const size_t index, const size_t stride, const size_t offset
-    ) {
+    static void doSetup(ShaderProgram *program, const size_t index, const size_t stride, const size_t offset) {
         AttrType::setup(program, index, stride, offset);
-        GLVertexType<AttrTypeRest...>::doSetup(
-            program, index + 1, stride, offset + AttrType::Size
-        );
+        GLVertexType<AttrTypeRest...>::doSetup(program, index + 1, stride, offset + AttrType::Size);
     }
 
     /**
@@ -145,9 +141,7 @@ struct GLVertexType<AttrType> {
      * @param stride the stride of the vertex buffer pointer to be set up here
      * @param offset the offset of the vertex buffer pointer to be set up here
      */
-    static void doSetup(
-        ShaderProgram *program, const size_t index, const size_t stride, const size_t offset
-    ) {
+    static void doSetup(ShaderProgram *program, const size_t index, const size_t stride, const size_t offset) {
         AttrType::setup(program, index, stride, offset);
     }
 

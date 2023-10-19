@@ -40,7 +40,9 @@ private:
     QString m_format;
 
 public:
-    SliderWithLabel(int minimum, int maximum, const float factor = 0.0, const QString &format = "%d", const int maxSliderWidth = 0, const int minLabelWidth = 0, QWidget *parent = nullptr);
+    SliderWithLabel(int minimum, int maximum, const float factor = 0.0, const QString &format = "%d", const int maxSliderWidth = 0, const int minLabelWidth = 0,
+        QWidget *parent = nullptr
+    );
 
     int value() const;
 
@@ -58,7 +60,7 @@ private slots:
 
     void valueChangedInternal(int value);
 
-     QString getValueLabel(int value);
+    QString getValueLabel(int value);
 
 signals:
 

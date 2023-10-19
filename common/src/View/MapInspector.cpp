@@ -90,9 +90,7 @@ QWidget *MapInspector::createLayerEditor(std::weak_ptr<MapDocument> document) {
     return titledPanel;
 }
 
-CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(
-    std::weak_ptr<MapDocument> document
-) {
+CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(std::weak_ptr<MapDocument> document) {
     CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Map Properties"));
     titledPanel->setObjectName("MapInspector_MapPropertiesPanel");
 
@@ -126,10 +124,13 @@ CollapsibleTitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument>
 
 // MapPropertiesEditor
 
-MapPropertiesEditor::MapPropertiesEditor(
-    std::weak_ptr<MapDocument> document, QWidget *parent
-) : QWidget(parent), m_document(document), m_updatingGui(false), m_softBoundsDisabled(nullptr), m_softBoundsFromGame(nullptr), m_softBoundsFromGameMinLabel(nullptr), m_softBoundsFromGameMaxLabel(nullptr), m_softBoundsFromMap(nullptr),
-    m_softBoundsFromMapMinEdit(nullptr), m_softBoundsFromMapMaxEdit(nullptr) {
+MapPropertiesEditor::MapPropertiesEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_updatingGui(false),
+                                                                                                 m_softBoundsDisabled(nullptr), m_softBoundsFromGame(nullptr),
+                                                                                                 m_softBoundsFromGameMinLabel(nullptr),
+                                                                                                 m_softBoundsFromGameMaxLabel(nullptr),
+                                                                                                 m_softBoundsFromMap(nullptr),
+                                                                                                 m_softBoundsFromMapMinEdit(nullptr),
+                                                                                                 m_softBoundsFromMapMaxEdit(nullptr) {
     createGui();
     connectObservers();
 }
@@ -216,8 +217,8 @@ void MapPropertiesEditor::createGui() {
     softBoundsFromMapLayout->addLayout(softBoundsFromMapValueLayout);
 
     auto *gridLayout = new QGridLayout();
-    gridLayout->setContentsMargins(
-        LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin
+    gridLayout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin,
+        LayoutConstants::MediumVMargin
     );
     gridLayout->setHorizontalSpacing(LayoutConstants::NarrowHMargin);
     gridLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
@@ -231,34 +232,25 @@ void MapPropertiesEditor::createGui() {
 
     setLayout(gridLayout);
 
-    connect(
-        softBoundsDisabledLabel, &ClickableLabel::clicked, m_softBoundsDisabled, &QAbstractButton::click
-    );
-    connect(
-        softBoundsFromGameLabel, &ClickableLabel::clicked, m_softBoundsFromGame, &QAbstractButton::click
-    );
-    connect(
-        softBoundsFromMapLabel, &ClickableLabel::clicked, m_softBoundsFromMap, &QAbstractButton::click
-    );
+    connect(softBoundsDisabledLabel, &ClickableLabel::clicked, m_softBoundsDisabled, &QAbstractButton::click);
+    connect(softBoundsFromGameLabel, &ClickableLabel::clicked, m_softBoundsFromGame, &QAbstractButton::click);
+    connect(softBoundsFromMapLabel, &ClickableLabel::clicked, m_softBoundsFromMap, &QAbstractButton::click);
 
-    connect(
-        m_softBoundsDisabled, &QAbstractButton::clicked, this, [this](const bool checked) {
+    connect(m_softBoundsDisabled, &QAbstractButton::clicked, this, [this](const bool checked) {
           auto document = kdl::mem_lock(m_document);
           if (checked) {
               document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, std::nullopt});
           }
         }
     );
-    connect(
-        m_softBoundsFromGame, &QAbstractButton::clicked, this, [this](const bool checked) {
+    connect(m_softBoundsFromGame, &QAbstractButton::clicked, this, [this](const bool checked) {
           auto document = kdl::mem_lock(m_document);
           if (checked) {
               document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Game, std::nullopt});
           }
         }
     );
-    connect(
-        m_softBoundsFromMap, &QAbstractButton::clicked, this, [this](const bool checked) {
+    connect(m_softBoundsFromMap, &QAbstractButton::clicked, this, [this](const bool checked) {
           auto document = kdl::mem_lock(m_document);
 
           m_softBoundsFromMapMinEdit->setEnabled(true);
@@ -270,9 +262,7 @@ void MapPropertiesEditor::createGui() {
               // parsed. Otherwise, it will be committed below in textEditingFinished once both
               // text fields have a valid value entered.
               if (parsed.has_value()) {
-                  document->setSoftMapBounds(
-                      {Model::Game::SoftMapBoundsType::Map, parsed.value()}
-                  );
+                  document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, parsed.value()});
               }
           }
         }
@@ -293,24 +283,16 @@ void MapPropertiesEditor::createGui() {
           document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, parsed.value()});
       }
     };
-    connect(
-        m_softBoundsFromMapMinEdit, &QLineEdit::editingFinished, this, textEditingFinished
-    );
-    connect(
-        m_softBoundsFromMapMaxEdit, &QLineEdit::editingFinished, this, textEditingFinished
-    );
+    connect(m_softBoundsFromMapMinEdit, &QLineEdit::editingFinished, this, textEditingFinished);
+    connect(m_softBoundsFromMapMaxEdit, &QLineEdit::editingFinished, this, textEditingFinished);
 
     updateGui();
 }
 
 void MapPropertiesEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
-    m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &MapPropertiesEditor::documentWasNewed
-    );
-    m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &MapPropertiesEditor::documentWasLoaded
-    );
+    m_notifierConnection += document->documentWasNewedNotifier.connect(this, &MapPropertiesEditor::documentWasNewed);
+    m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &MapPropertiesEditor::documentWasLoaded);
     m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &MapPropertiesEditor::nodesDidChange);
 }
 

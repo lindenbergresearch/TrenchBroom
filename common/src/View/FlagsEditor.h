@@ -43,8 +43,7 @@ public:
 
     void setFlags(const QStringList &labels, const QStringList &tooltips = QStringList());
 
-    void setFlags(
-        const QList<int> &values, const QStringList &labels, const QStringList &tooltips = QStringList());
+    void setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips = QStringList());
 
     void setFlagValue(int set, int mixed = 0);
 

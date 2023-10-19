@@ -58,9 +58,7 @@ private:
     std::unordered_map<const Model::Node *, PrecomputedString> m_nodeToPrecomputedString;
 
 public:
-    static std::unique_ptr<NodeSerializer> create(
-        Model::MapFormat format, std::ostream &stream
-    );
+    static std::unique_ptr<NodeSerializer> create(Model::MapFormat format, std::ostream &stream);
 
 protected:
     explicit MapFileSerializer(std::ostream &stream);
@@ -88,9 +86,7 @@ private:
     size_t startLine();
 
 private: // threadsafe
-    virtual void doWriteBrushFace(
-        std::ostream &stream, const Model::BrushFace &face
-    ) const = 0;
+    virtual void doWriteBrushFace(std::ostream &stream, const Model::BrushFace &face) const = 0;
 
     PrecomputedString writeBrushFaces(const Model::Brush &brush) const;
 

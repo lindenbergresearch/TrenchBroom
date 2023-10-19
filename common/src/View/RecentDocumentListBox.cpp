@@ -27,11 +27,13 @@
 #include <cassert>
 
 namespace TrenchBroom::View {
-RecentDocumentListBox::RecentDocumentListBox(QWidget *parent) : ImageListBox{"No Recent Documents", true, parent}, m_documentIcon{IO::loadPixmapResource("DocIcon.png")} {
+RecentDocumentListBox::RecentDocumentListBox(QWidget *parent) : ImageListBox{
+    "No Recent Documents", true, parent
+}, m_documentIcon{
+    IO::loadPixmapResource("DocIcon.png")
+} {
     auto &app = View::TrenchBroomApp::instance();
-    connect(
-        &app, &TrenchBroomApp::recentDocumentsDidChange, this, &RecentDocumentListBox::recentDocumentsDidChange
-    );
+    connect(&app, &TrenchBroomApp::recentDocumentsDidChange, this, &RecentDocumentListBox::recentDocumentsDidChange);
     reload();
 }
 

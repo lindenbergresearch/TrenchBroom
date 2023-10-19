@@ -35,9 +35,7 @@ private:
     int m_thickness;
 
 public:
-    explicit BorderPanel(
-        Sides borders = AllSides, int thickness = 1, QWidget *parent = nullptr
-    );
+    explicit BorderPanel(Sides borders = AllSides, int thickness = 1, QWidget *parent = nullptr);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

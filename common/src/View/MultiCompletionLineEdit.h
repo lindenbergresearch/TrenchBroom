@@ -42,9 +42,7 @@ public:
 public:
     void setWordDelimiter(const QRegularExpression &leftDelimiter);
 
-    void setWordDelimiters(
-        const QRegularExpression &leftDelimiter, const QRegularExpression &rightDelimiter
-    );
+    void setWordDelimiters(const QRegularExpression &leftDelimiter, const QRegularExpression &rightDelimiter);
 
     void setMultiCompleter(QCompleter *completer);
 

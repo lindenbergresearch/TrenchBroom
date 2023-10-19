@@ -106,28 +106,15 @@ void CompilationDialog::createGui() {
 
     m_compileButton->setDefault(true);
 
-    connect(
-        &m_run, &CompilationRun::compilationStarted, this, &CompilationDialog::compilationStarted
-    );
-    connect(
-        &m_run, &CompilationRun::compilationEnded, this, &CompilationDialog::compilationEnded
-    );
-    connect(
-        m_profileManager, &CompilationProfileManager::selectedProfileChanged, this, &CompilationDialog::selectedProfileChanged
-    );
-    connect(
-        m_profileManager, &CompilationProfileManager::profileChanged, this, &CompilationDialog::profileChanged
-    );
+    connect(&m_run, &CompilationRun::compilationStarted, this, &CompilationDialog::compilationStarted);
+    connect(&m_run, &CompilationRun::compilationEnded, this, &CompilationDialog::compilationEnded);
+    connect(m_profileManager, &CompilationProfileManager::selectedProfileChanged, this, &CompilationDialog::selectedProfileChanged);
+    connect(m_profileManager, &CompilationProfileManager::profileChanged, this, &CompilationDialog::profileChanged);
 
-    connect(
-        m_compileButton, &QPushButton::clicked, this, [&]() { startCompilation(false); }
-    );
-    connect(
-        m_testCompileButton, &QPushButton::clicked, this, [&]() { startCompilation(true); }
-    );
+    connect(m_compileButton, &QPushButton::clicked, this, [&]() { startCompilation(false); });
+    connect(m_testCompileButton, &QPushButton::clicked, this, [&]() { startCompilation(true); });
     connect(m_stopCompileButton, &QPushButton::clicked, this, [&]() { stopCompilation(); });
-    connect(
-        m_launchButton, &QPushButton::clicked, this, [&]() {
+    connect(m_launchButton, &QPushButton::clicked, this, [&]() {
           LaunchGameEngineDialog dialog(m_mapFrame->document(), this);
           dialog.exec();
         }
@@ -181,8 +168,8 @@ void CompilationDialog::stopCompilation() {
 
 void CompilationDialog::closeEvent(QCloseEvent *event) {
     if (m_run.running()) {
-        const auto result = QMessageBox::warning(
-            this, "Warning", "Closing this dialog will stop the running compilation. Are you sure?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
+        const auto result = QMessageBox::warning(this, "Warning", "Closing this dialog will stop the running compilation. Are you sure?",
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
         );
 
         if (result != QMessageBox::Yes) {
@@ -223,8 +210,7 @@ void CompilationDialog::saveProfile() {
     auto document = m_mapFrame->document();
     const auto &gameName = document->game()->gameName();
     auto &gameFactory = Model::GameFactory::instance();
-    gameFactory.saveCompilationConfig(
-        gameName, m_profileManager->config(), m_mapFrame->logger());
+    gameFactory.saveCompilationConfig(gameName, m_profileManager->config(), m_mapFrame->logger());
 }
 } // namespace View
 } // namespace TrenchBroom

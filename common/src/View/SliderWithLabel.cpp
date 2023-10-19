@@ -30,8 +30,9 @@
 
 namespace TrenchBroom {
 namespace View {
-SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, const float factor, const QString &format, const int maxSliderWidth, const int minLabelWidth, QWidget *parent)
-    : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()), m_factor(factor), m_format(format) {
+SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, const float factor, const QString &format, const int maxSliderWidth,
+    const int minLabelWidth, QWidget *parent
+) : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()), m_factor(factor), m_format(format) {
     // get maximum label bounding
     const auto min_size = m_label->fontMetrics().boundingRect(getValueLabel(minimum));
     const auto max_size = m_label->fontMetrics().boundingRect(getValueLabel(maximum));
@@ -84,7 +85,8 @@ QString SliderWithLabel::getValueLabel(const int value) {
         float factorized = float(value) * m_factor;
         QString fmt = m_format.isEmpty() ? "%.2f" : m_format;
         labelText = labelText.sprintf(fmt.toStdString().c_str(), factorized);
-    } else {
+    }
+    else {
         // use int by default, if factor == zero
         QString fmt = m_format.isEmpty() ? "%d" : m_format;
         labelText = labelText.sprintf(fmt.toStdString().c_str(), value);;

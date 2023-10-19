@@ -69,7 +69,9 @@ struct node_address {
 
 template<typename T>
 node_address get_address(const vm::vec<T, 3> &point, const T min_size) {
-    return {int16_t(std::floor(point.x() / min_size)), int16_t(std::floor(point.y() / min_size)), int16_t(std::floor(point.z() / min_size)), 0};
+    return {
+        int16_t(std::floor(point.x() / min_size)), int16_t(std::floor(point.y() / min_size)), int16_t(std::floor(point.z() / min_size)), 0
+    };
 }
 
 node_address get_parent(const node_address &a);
@@ -141,15 +143,31 @@ public:
       std::vector<U> data;
       std::vector<node> children;
 
-      inner_node(
-          const detail::node_address i_address, std::vector<U> i_data, std::vector<node> i_children
-      ) : address{i_address}, data{std::move(i_data)}, children{std::move(i_children)} {
+      inner_node(const detail::node_address i_address, std::vector<U> i_data, std::vector<node> i_children) : address{
+          i_address
+      }, data{std::move(i_data)}, children{std::move(i_children)} {
       }
 
-      inner_node(const detail::node_address i_address, std::vector<U> i_data) : inner_node{i_address, std::move(i_data), kdl::vec_from(
-          node{leaf_node{get_child(i_address, 0), {}}}, node{leaf_node{get_child(i_address, 1), {}}}, node{leaf_node{get_child(i_address, 2), {}}}, node{leaf_node{get_child(i_address, 3), {}}}, node{leaf_node{get_child(i_address, 4), {}}},
-          node{leaf_node{get_child(i_address, 5), {}}}, node{leaf_node{get_child(i_address, 6), {}}}, node{leaf_node{get_child(i_address, 7), {}}}
-      )} {
+      inner_node(const detail::node_address i_address, std::vector<U> i_data) : inner_node{
+          i_address, std::move(i_data), kdl::vec_from(node{
+              leaf_node{
+                  get_child(i_address, 0), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 1), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 2), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 3), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 4), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 5), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 6), {}}}, node{
+              leaf_node{
+                  get_child(i_address, 7), {}}}
+          )
+      } {
       }
 
       inner_node(const inner_node &) = delete;
@@ -181,21 +199,14 @@ private:
     }
 
     static bool is_inner_node(const node &node) {
-        return std::visit(
-            kdl::overload(
-                [](const inner_node &) { return true; }, [](const leaf_node &) { return false; }
-            ), node
-        );
+        return std::visit(kdl::overload([](const inner_node &) { return true; }, [](const leaf_node &) { return false; }), node);
     }
 
     static bool is_leaf_node(const node &node) { return !is_inner_node(node); }
 
     static bool is_empty(const node &node) {
-        return std::visit(
-            kdl::overload(
-                [](const inner_node &i) {
-                  return i.data.empty() && std::all_of(
-                      i.children.begin(), i.children.end(), [](const auto &child) {
+        return std::visit(kdl::overload([](const inner_node &i) {
+                  return i.data.empty() && std::all_of(i.children.begin(), i.children.end(), [](const auto &child) {
                         return is_leaf_node(child) && is_empty(child);
                       }
                   );
@@ -205,14 +216,10 @@ private:
     }
 
     template<typename Predicate, typename Visitor>
-    static void visit_node_if(
-        const node &node, const Visitor &visitor, const Predicate &predicate
-    ) {
+    static void visit_node_if(const node &node, const Visitor &visitor, const Predicate &predicate) {
         if (predicate(node)) {
             visitor(node);
-            std::visit(
-                kdl::overload(
-                    [&](const inner_node &inner_node) {
+            std::visit(kdl::overload([&](const inner_node &inner_node) {
                       for (const auto &child: inner_node.children) {
                           visit_node_if(child, visitor, predicate);
                       }
@@ -222,9 +229,7 @@ private:
         }
     }
 
-    static void update_root_address(
-        node &root, const detail::node_address &address, std::unordered_map<U, detail::node_address> &node_address_for_data
-    ) {
+    static void update_root_address(node &root, const detail::node_address &address, std::unordered_map<U, detail::node_address> &node_address_for_data) {
         assert(is_root(address));
         assert(address.contains(get_address(root)));
         get_address(root) = address;
@@ -247,9 +252,7 @@ private:
 
         assert(get_address(node).contains(address));
         if (const auto quadrant = get_quadrant(get_address(node), address)) {
-            std::visit(
-                kdl::overload(
-                    [&](inner_node &i) {
+            std::visit(kdl::overload([&](inner_node &i) {
                       insert_into_node(i.children[*quadrant], address, std::move(data));
                     }, [&](leaf_node &l) {
                       if (l.data.empty()) {
@@ -270,9 +273,7 @@ private:
     }
 
     void remove_from_node(node &node, const detail::node_address &address, const U &data) {
-        std::visit(
-            kdl::overload(
-                [&](inner_node &i) {
+        std::visit(kdl::overload([&](inner_node &i) {
                   if (const auto quadrant = get_quadrant(i.address, address)) {
                       remove_from_node(i.children[*quadrant], address, data);
                   }
@@ -317,8 +318,7 @@ public:
     }
 
     octree(const T min_size, node root) : m_root{std::move(root)}, m_min_size{min_size} {
-        auto visitor = kdl::overload(
-            [&](auto &&self, const inner_node &node) -> void {
+        auto visitor = kdl::overload([&](auto &&self, const inner_node &node) -> void {
               for (const auto &data: node.data) {
                   m_node_address_for_data.emplace(data, node.address);
               }
@@ -456,8 +456,7 @@ public:
     template<typename O>
     void find_intersectors(const vm::ray<T, 3> &ray, O out) const {
         if (m_root) {
-            visit_node_if(
-                *m_root, [&](const auto &node) {
+            visit_node_if(*m_root, [&](const auto &node) {
                   const auto &data = get_data(node);
                   std::copy(data.begin(), data.end(), out);
                 }, [&](const auto &node) {
@@ -492,8 +491,7 @@ public:
     template<typename O>
     void find_containers(const vm::vec<T, 3> &point, O out) const {
         if (m_root) {
-            visit_node_if(
-                *m_root, [&](const auto &node) {
+            visit_node_if(*m_root, [&](const auto &node) {
                   const auto &data = get_data(node);
                   std::copy(data.begin(), data.end(), out);
                 }, [&](const auto &node) {

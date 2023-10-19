@@ -30,9 +30,7 @@ public:
     EmptyBrushEntityValidator();
 
 private:
-    void doValidate(
-        EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues
-    ) const override;
+    void doValidate(EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

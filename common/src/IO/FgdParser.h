@@ -81,9 +81,7 @@ private:
     FgdTokenizer m_tokenizer;
 
 public:
-    FgdParser(
-        std::string_view str, const Color &defaultEntityColor, const std::filesystem::path &path
-    );
+    FgdParser(std::string_view str, const Color &defaultEntityColor, const std::filesystem::path &path);
 
     FgdParser(std::string_view str, const Color &defaultEntityColor);
 
@@ -105,9 +103,7 @@ private:
 
     std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) override;
 
-    void parseClassInfoOrInclude(
-        ParserStatus &status, std::vector<EntityDefinitionClassInfo> &classInfos
-    );
+    void parseClassInfoOrInclude(ParserStatus &status, std::vector<EntityDefinitionClassInfo> &classInfos);
 
     std::optional<EntityDefinitionClassInfo> parseClassInfo(ParserStatus &status);
 
@@ -117,9 +113,7 @@ private:
 
     EntityDefinitionClassInfo parseBaseClassInfo(ParserStatus &status);
 
-    EntityDefinitionClassInfo parseClassInfo(
-        ParserStatus &status, EntityDefinitionClassType classType
-    );
+    EntityDefinitionClassInfo parseClassInfo(ParserStatus &status, EntityDefinitionClassType classType);
 
     void skipMainClass(ParserStatus &status);
 
@@ -133,41 +127,24 @@ private:
 
     PropertyDefinitionList parsePropertyDefinitions(ParserStatus &status);
 
-    PropertyDefinitionPtr parsePropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey, const std::string &typeName, size_t line, size_t column
-    );
+    PropertyDefinitionPtr
+    parsePropertyDefinition(ParserStatus &status, const std::string &propertyKey, const std::string &typeName, size_t line, size_t column);
 
-    PropertyDefinitionPtr parseTargetSourcePropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseTargetSourcePropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseTargetDestinationPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseTargetDestinationPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseStringPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseStringPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseIntegerPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseIntegerPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseFloatPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseFloatPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseChoicesPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseChoicesPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseFlagsPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseFlagsPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
-    PropertyDefinitionPtr parseUnknownPropertyDefinition(
-        ParserStatus &status, const std::string &propertyKey
-    );
+    PropertyDefinitionPtr parseUnknownPropertyDefinition(ParserStatus &status, const std::string &propertyKey);
 
     bool parseReadOnlyFlag(ParserStatus &status);
 
@@ -191,9 +168,7 @@ private:
 
     std::vector<EntityDefinitionClassInfo> parseInclude(ParserStatus &status);
 
-    std::vector<EntityDefinitionClassInfo> handleInclude(
-        ParserStatus &status, const std::filesystem::path &path
-    );
+    std::vector<EntityDefinitionClassInfo> handleInclude(ParserStatus &status, const std::filesystem::path &path);
 };
 } // namespace IO
 } // namespace TrenchBroom

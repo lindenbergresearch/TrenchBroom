@@ -47,9 +47,7 @@ private:
     QAbstractButton *m_removeProfileButton{nullptr};
 
 public:
-    explicit GameEngineProfileManager(
-        Model::GameEngineConfig config, QWidget *parent = nullptr
-    );
+    explicit GameEngineProfileManager(Model::GameEngineConfig config, QWidget *parent = nullptr);
 
     const Model::GameEngineConfig &config() const;
 

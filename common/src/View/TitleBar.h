@@ -30,13 +30,9 @@ protected:
     QLabel *m_titleText;
 
 public:
-    TitleBar(
-        const QString &title, QWidget *parent, int hMargin = 0, int vMargin = 4, bool boldTitle = true, bool subtitle = false
-    );
+    TitleBar(const QString &title, QWidget *parent, int hMargin = 0, int vMargin = 4, bool boldTitle = true, bool subtitle = false);
 
-    explicit TitleBar(
-        const QString &title, int hMargin = 0, int vMargin = 4, bool boldTitle = true, bool subtitle = false
-    );
+    explicit TitleBar(const QString &title, int hMargin = 0, int vMargin = 4, bool boldTitle = true, bool subtitle = false);
 };
 } // namespace View
 } // namespace TrenchBroom

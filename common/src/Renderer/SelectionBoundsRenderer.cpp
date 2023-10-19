@@ -43,9 +43,7 @@ private:
     const Camera &m_camera;
 
 public:
-    SizeTextAnchor2D(
-        const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera
-    ) : m_bounds(bounds), m_axis(axis), m_camera(camera) {
+    SizeTextAnchor2D(const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera) : m_bounds(bounds), m_axis(axis), m_camera(camera) {
     }
 
 private:
@@ -93,9 +91,7 @@ private:
     const Camera &m_camera;
 
 public:
-    SizeTextAnchor3D(
-        const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera
-    ) : m_bounds(bounds), m_axis(axis), m_camera(camera) {
+    SizeTextAnchor3D(const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera) : m_bounds(bounds), m_axis(axis), m_camera(camera) {
     }
 
 private:
@@ -106,19 +102,23 @@ private:
         const auto half = m_bounds.size() / 2.0;
 
         if (m_axis == vm::axis::z) {
-            if ((camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::less) || (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::within)) {
+            if ((camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::less) ||
+                (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::within)) {
                 pos[0] = m_bounds.min.x();
                 pos[1] = m_bounds.max.y();
             }
-            else if ((camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::greater) || (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::greater)) {
+            else if ((camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::greater) ||
+                     (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::greater)) {
                 pos[0] = m_bounds.max.x();
                 pos[1] = m_bounds.max.y();
             }
-            else if ((camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::greater) || (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::within)) {
+            else if ((camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::greater) ||
+                     (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::within)) {
                 pos[0] = m_bounds.max.x();
                 pos[1] = m_bounds.min.y();
             }
-            else if ((camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::less) || (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::less)) {
+            else if ((camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::less) ||
+                     (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::less)) {
                 pos[0] = m_bounds.min.x();
                 pos[1] = m_bounds.min.y();
             }
@@ -242,9 +242,8 @@ private:
     const Renderer::Camera &m_camera;
 
 public:
-    MinMaxTextAnchor3D(
-        const vm::bbox3 &bounds, const vm::bbox3::Corner minMax, const Renderer::Camera &camera
-    ) : m_bounds(bounds), m_minMax(minMax), m_camera(camera) {
+    MinMaxTextAnchor3D(const vm::bbox3 &bounds, const vm::bbox3::Corner minMax, const Renderer::Camera &camera) : m_bounds(bounds), m_minMax(minMax),
+                                                                                                                  m_camera(camera) {
     }
 
 private:
@@ -292,25 +291,19 @@ private:
 SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3 &bounds) : m_bounds(bounds) {
 }
 
-void SelectionBoundsRenderer::render(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void SelectionBoundsRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
     renderBounds(renderContext, renderBatch);
     renderSize(renderContext, renderBatch);
     // renderMinMax(renderContext, renderBatch);
 }
 
-void SelectionBoundsRenderer::renderBounds(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void SelectionBoundsRenderer::renderBounds(RenderContext &renderContext, RenderBatch &renderBatch) {
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::SelectionBoundsColor));
     renderService.renderBounds(vm::bbox3f(m_bounds));
 }
 
-void SelectionBoundsRenderer::renderSize(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void SelectionBoundsRenderer::renderSize(RenderContext &renderContext, RenderBatch &renderBatch) {
     if (renderContext.render2D())
         renderSize2D(renderContext, renderBatch);
     else
@@ -337,17 +330,13 @@ const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_u
     return buffer.str();
 }
 
-void SelectionBoundsRenderer::renderSize2D(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderBatch &renderBatch) {
     static const std::string labels[3] = {"x", "y", "z"};
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-    renderService.setBackgroundColor(
-        Color(
-            pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
+    renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();
 
     const Camera &camera = renderContext.camera();
@@ -363,50 +352,39 @@ void SelectionBoundsRenderer::renderSize2D(
     }
 }
 
-void SelectionBoundsRenderer::renderSize3D(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch) {
     static const std::string labels[3] = {"x", "y", "z"};
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-    renderService.setBackgroundColor(
-        Color(
-            pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
+    renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();
 
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
         buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
 
-        renderService.renderString(
-            buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
+        renderService.renderString(buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
 
         buffer.str("");
     }
 }
 
-void SelectionBoundsRenderer::renderMinMax(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void SelectionBoundsRenderer::renderMinMax(RenderContext &renderContext, RenderBatch &renderBatch) {
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-    renderService.setBackgroundColor(
-        Color(
-            pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
+    renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();
 
     buffer << "Min: " << vm::correct(m_bounds.min);
-    renderService.renderString(
-        buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::min, renderContext.camera()));
+    renderService.renderString(buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::min, renderContext.camera()));
     buffer.str("");
 
     buffer << "Max: " << vm::correct(m_bounds.max);
-    renderService.renderString(
-        buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::max, renderContext.camera()));
+    renderService.renderString(buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::max, renderContext.camera()));
 }
 } // namespace Renderer
 } // namespace TrenchBroom

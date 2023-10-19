@@ -53,7 +53,8 @@ private:
     TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
 };
 
-GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext) : m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false), m_showOverlays(true), m_showOccludedOverlays(false), m_showOccludedBounds(false) {
+GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext) : m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false),
+                                                                          m_showOverlays(true), m_showOccludedOverlays(false), m_showOccludedBounds(false) {
 }
 
 void GroupRenderer::invalidate() {
@@ -174,8 +175,7 @@ void GroupRenderer::validateBounds() {
 
         for (const Model::GroupNode *group: m_groups) {
             if (shouldRenderGroup(group)) {
-                group->logicalBounds().for_each_edge(
-                    [&](const vm::vec3 &v1, const vm::vec3 &v2) {
+                group->logicalBounds().for_each_edge([&](const vm::vec3 &v1, const vm::vec3 &v2) {
                       vertices.emplace_back(vm::vec3f(v1));
                       vertices.emplace_back(vm::vec3f(v2));
                     }
@@ -192,8 +192,7 @@ void GroupRenderer::validateBounds() {
         for (const Model::GroupNode *group: m_groups) {
             if (shouldRenderGroup(group)) {
                 const auto color = groupColor(group);
-                group->logicalBounds().for_each_edge(
-                    [&](const vm::vec3 &v1, const vm::vec3 &v2) {
+                group->logicalBounds().for_each_edge([&](const vm::vec3 &v1, const vm::vec3 &v2) {
                       vertices.emplace_back(vm::vec3f(v1), color);
                       vertices.emplace_back(vm::vec3f(v2), color);
                     }

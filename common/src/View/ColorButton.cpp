@@ -31,8 +31,7 @@ ColorButton::ColorButton(QWidget *parent) : QWidget(parent), m_colorIndicator(nu
     m_colorIndicator = new QWidget();
     m_button = new QPushButton("...");
 
-    m_colorIndicator->setSizePolicy(
-        QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
+    m_colorIndicator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
     m_colorIndicator->setMinimumSize(20, 15);
 
     auto *layout = new QHBoxLayout();
@@ -43,8 +42,7 @@ ColorButton::ColorButton(QWidget *parent) : QWidget(parent), m_colorIndicator(nu
     layout->addStretch();
     setLayout(layout);
 
-    connect(
-        m_button, &QPushButton::clicked, this, [this]() {
+    connect(m_button, &QPushButton::clicked, this, [this]() {
           const QColor color = QColorDialog::getColor(m_color, this);
           if (color.isValid()) {
               setColor(color);

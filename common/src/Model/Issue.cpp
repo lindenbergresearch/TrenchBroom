@@ -36,7 +36,9 @@
 
 namespace TrenchBroom {
 namespace Model {
-Issue::Issue(const IssueType type, Node &node, std::string description) : m_seqId{nextSeqId()}, m_type{type}, m_node{node}, m_description{std::move(description)} {
+Issue::Issue(const IssueType type, Node &node, std::string description) : m_seqId{nextSeqId()}, m_type{type}, m_node{
+    node
+}, m_description{std::move(description)} {
 }
 
 Issue::~Issue() = default;
@@ -67,8 +69,7 @@ bool Issue::addSelectableNodes(std::vector<Model::Node *> &nodes) const {
     }
 
     m_node.accept(
-        kdl::overload(
-            [](WorldNode *) {}, [](LayerNode *) {}, [&](GroupNode *group) { nodes.push_back(group); }, [&](auto &&thisLambda, EntityNode *entity) {
+        kdl::overload([](WorldNode *) {}, [](LayerNode *) {}, [&](GroupNode *group) { nodes.push_back(group); }, [&](auto &&thisLambda, EntityNode *entity) {
               if (!entity->hasChildren()) {
                   nodes.push_back(entity);
               }
@@ -94,9 +95,9 @@ size_t Issue::doGetLineNumber() const {
     return m_node.lineNumber();
 }
 
-BrushFaceIssue::BrushFaceIssue(
-    const IssueType type, BrushNode &node, const size_t faceIndex, std::string description
-) : Issue{type, node, std::move(description)}, m_faceIndex{faceIndex} {
+BrushFaceIssue::BrushFaceIssue(const IssueType type, BrushNode &node, const size_t faceIndex, std::string description) : Issue{
+    type, node, std::move(description)
+}, m_faceIndex{faceIndex} {
 }
 
 BrushFaceIssue::~BrushFaceIssue() = default;
@@ -115,9 +116,9 @@ size_t BrushFaceIssue::doGetLineNumber() const {
     return face().lineNumber();
 }
 
-EntityPropertyIssue::EntityPropertyIssue(
-    const IssueType type, EntityNodeBase &entityNode, std::string propertyKey, std::string description
-) : Issue{type, entityNode, std::move(description)}, m_propertyKey{std::move(propertyKey)} {
+EntityPropertyIssue::EntityPropertyIssue(const IssueType type, EntityNodeBase &entityNode, std::string propertyKey, std::string description) : Issue{
+    type, entityNode, std::move(description)
+}, m_propertyKey{std::move(propertyKey)} {
 }
 
 EntityPropertyIssue::~EntityPropertyIssue() = default;

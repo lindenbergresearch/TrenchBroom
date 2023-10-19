@@ -59,7 +59,9 @@ namespace TrenchBroom {
 namespace View {
 const Model::HitType::Type UVView::FaceHitType = Model::HitType::freeType();
 
-UVView::UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) : RenderView{contextManager}, m_document{std::move(document)}, m_helper{m_camera} {
+UVView::UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) : RenderView{
+    contextManager
+}, m_document{std::move(document)}, m_helper{m_camera} {
     setToolBox(m_toolBox);
     createTools();
     m_toolBox.disable();
@@ -159,8 +161,7 @@ void UVView::doRender() {
         auto document = kdl::mem_lock(m_document);
         document->commitPendingAssets();
 
-        Renderer::RenderContext renderContext(
-            Renderer::RenderMode::Render2D, m_camera, fontManager(), shaderManager());
+        Renderer::RenderContext renderContext(Renderer::RenderMode::Render2D, m_camera, fontManager(), shaderManager());
         Renderer::RenderBatch renderBatch(vboManager());
 
         setupGL(renderContext);
@@ -211,7 +212,9 @@ private:
     Renderer::VertexArray m_vertexArray;
 
 public:
-    explicit RenderTexture(const UVViewHelper &helper) : m_helper{helper}, m_vertexArray{Renderer::VertexArray::move(getVertices())} {
+    explicit RenderTexture(const UVViewHelper &helper) : m_helper{helper}, m_vertexArray{
+        Renderer::VertexArray::move(getVertices())
+    } {
     }
 
 private:
@@ -232,8 +235,10 @@ private:
         const auto pos3 = +w2 * r - h2 * u + p;
         const auto pos4 = -w2 * r - h2 * u + p;
 
-        return {Vertex(pos1, normal, m_helper.face()->textureCoords(vm::vec3(pos1))), Vertex(pos2, normal, m_helper.face()->textureCoords(vm::vec3(pos2))), Vertex(pos3, normal, m_helper.face()->textureCoords(vm::vec3(pos3))),
-                Vertex(pos4, normal, m_helper.face()->textureCoords(vm::vec3(pos4)))};
+        return {
+            Vertex(pos1, normal, m_helper.face()->textureCoords(vm::vec3(pos1))), Vertex(pos2, normal, m_helper.face()->textureCoords(vm::vec3(pos2))),
+            Vertex(pos3, normal, m_helper.face()->textureCoords(vm::vec3(pos3))), Vertex(pos4, normal, m_helper.face()->textureCoords(vm::vec3(pos4)))
+        };
     }
 
 private:
@@ -251,18 +256,13 @@ private:
 
         texture->activate();
 
-        Renderer::ActiveShader shader(
-            renderContext.shaderManager(), Renderer::Shaders::UVViewShader
-        );
+        Renderer::ActiveShader shader(renderContext.shaderManager(), Renderer::Shaders::UVViewShader);
         shader.set("ApplyTexture", true);
         shader.set("Color", texture->averageColor());
         shader.set("Brightness", pref(Preferences::Brightness));
         shader.set("RenderGrid", true);
         shader.set("GridSizes", vm::vec2f(texture->width(), texture->height()));
-        shader.set(
-            "GridColor", vm::vec4f(
-                Renderer::gridColorForTexture(texture), 0.6f
-            )); // TODO: make this a preference
+        shader.set("GridColor", vm::vec4f(Renderer::gridColorForTexture(texture), 0.6f)); // TODO: make this a preference
         shader.set("GridScales", scale);
         shader.set("GridMatrix", vm::mat4x4f(toTex));
         shader.set("GridDivider", vm::vec2f(m_helper.subDivisions()));
@@ -298,44 +298,32 @@ void UVView::renderFace(Renderer::RenderContext &, Renderer::RenderBatch &render
 
     const Color edgeColor(1.0f, 1.0f, 1.0f, 1.0f); // TODO: make this a preference
 
-    Renderer::DirectEdgeRenderer edgeRenderer(
-        Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop
-    );
+    Renderer::DirectEdgeRenderer edgeRenderer(Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop);
     edgeRenderer.renderOnTop(renderBatch, edgeColor, 2.5f);
 }
 
-void UVView::renderTextureAxes(
-    Renderer::RenderContext &, Renderer::RenderBatch &renderBatch
-) {
+void UVView::renderTextureAxes(Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
     assert(m_helper.valid());
 
     const auto &normal = m_helper.face()->boundary().normal;
 
-    const auto xAxis = vm::vec3f(
-        m_helper.face()->textureXAxis() - dot(m_helper.face()->textureXAxis(), normal) * normal
-    );
-    const auto yAxis = vm::vec3f(
-        m_helper.face()->textureYAxis() - dot(m_helper.face()->textureYAxis(), normal) * normal
-    );
+    const auto xAxis = vm::vec3f(m_helper.face()->textureXAxis() - dot(m_helper.face()->textureXAxis(), normal) * normal);
+    const auto yAxis = vm::vec3f(m_helper.face()->textureYAxis() - dot(m_helper.face()->textureYAxis(), normal) * normal);
     const auto center = vm::vec3f(m_helper.face()->boundsCenter());
 
     const auto length = 32.0f / m_helper.cameraZoom();
 
     using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
-    Renderer::DirectEdgeRenderer edgeRenderer(
-        Renderer::VertexArray::move(
-            std::vector<Vertex>(
-                {Vertex(center, pref(Preferences::XAxisColor)), Vertex(
-                    center + length * xAxis, pref(Preferences::XAxisColor)), Vertex(center, pref(Preferences::YAxisColor)), Vertex(
-                    center + length * yAxis, pref(Preferences::YAxisColor)),}
-            )), Renderer::PrimType::Lines
+    Renderer::DirectEdgeRenderer edgeRenderer(Renderer::VertexArray::move(std::vector<Vertex>({
+                Vertex(center, pref(Preferences::XAxisColor)), Vertex(center + length * xAxis, pref(Preferences::XAxisColor)),
+                Vertex(center, pref(Preferences::YAxisColor)), Vertex(center + length * yAxis, pref(Preferences::YAxisColor)),
+            }
+        )), Renderer::PrimType::Lines
     );
     edgeRenderer.renderOnTop(renderBatch, 2.0f);
 }
 
-void UVView::renderToolBox(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void UVView::renderToolBox(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     renderTools(renderContext, renderBatch);
 }
 
@@ -363,8 +351,7 @@ Model::PickResult UVView::doPick(const vm::ray3 &pickRay) const {
     const FloatType distance = m_helper.face()->intersectWithRay(pickRay);
     if (!vm::is_nan(distance)) {
         const vm::vec3 hitPoint = vm::point_at_distance(pickRay, distance);
-        pickResult.addHit(
-            Model::Hit(UVView::FaceHitType, distance, hitPoint, m_helper.face()));
+        pickResult.addHit(Model::Hit(UVView::FaceHitType, distance, hitPoint, m_helper.face()));
     }
     return pickResult;
 }

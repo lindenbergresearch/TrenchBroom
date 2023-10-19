@@ -28,9 +28,8 @@
 
 namespace TrenchBroom {
 namespace View {
-TitleBar::TitleBar(
-    const QString &title, QWidget *parent, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle
-) : QWidget(parent), m_titleText(nullptr) {
+TitleBar::TitleBar(const QString &title, QWidget *parent, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle) : QWidget(parent),
+                                                                                                                                       m_titleText(nullptr) {
     m_titleText = new QLabel(title);
     m_titleText->setAlignment(Qt::AlignCenter);
 
@@ -45,7 +44,8 @@ TitleBar::TitleBar(
 
     if (boldTitle) {
         makePanelTitle(m_titleText, false, subtitle);
-    } else {
+    }
+    else {
         makePanelTitle(m_titleText, true, subtitle);
     }
 
@@ -56,9 +56,9 @@ TitleBar::TitleBar(
     setLayout(layout);
 }
 
-TitleBar::TitleBar(
-    const QString &title, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle
-) : TitleBar(title, nullptr, hMargin, vMargin, boldTitle, subtitle) {
+TitleBar::TitleBar(const QString &title, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle) : TitleBar(title, nullptr, hMargin, vMargin,
+    boldTitle, subtitle
+) {
 }
 } // namespace View
 } // namespace TrenchBroom

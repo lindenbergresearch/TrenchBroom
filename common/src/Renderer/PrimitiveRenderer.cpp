@@ -35,14 +35,11 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-PrimitiveRenderer::LineRenderAttributes::LineRenderAttributes(
-    const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy
-) : m_color(color), m_lineWidth(lineWidth), m_occlusionPolicy(occlusionPolicy) {
+PrimitiveRenderer::LineRenderAttributes::LineRenderAttributes(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy)
+    : m_color(color), m_lineWidth(lineWidth), m_occlusionPolicy(occlusionPolicy) {
 }
 
-bool PrimitiveRenderer::LineRenderAttributes::operator<(
-    const LineRenderAttributes &other
-) const {
+bool PrimitiveRenderer::LineRenderAttributes::operator<(const LineRenderAttributes &other) const {
     // As a special exception, sort by descending alpha so opaque batches render first.
     if (m_color.a() < other.m_color.a())
         return false;
@@ -65,9 +62,7 @@ bool PrimitiveRenderer::LineRenderAttributes::operator<(
     return false;
 }
 
-void PrimitiveRenderer::LineRenderAttributes::render(
-    IndexRangeRenderer &renderer, ActiveShader &shader
-) const {
+void PrimitiveRenderer::LineRenderAttributes::render(IndexRangeRenderer &renderer, ActiveShader &shader) const {
     glAssert(glLineWidth(m_lineWidth));
     switch (m_occlusionPolicy) {
         case PrimitiveRendererOcclusionPolicy::Hide:
@@ -91,14 +86,12 @@ void PrimitiveRenderer::LineRenderAttributes::render(
     }
 }
 
-PrimitiveRenderer::TriangleRenderAttributes::TriangleRenderAttributes(
-    const Color &color, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const PrimitiveRendererCullingPolicy cullingPolicy
+PrimitiveRenderer::TriangleRenderAttributes::TriangleRenderAttributes(const Color &color, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const PrimitiveRendererCullingPolicy cullingPolicy
 ) : m_color(color), m_occlusionPolicy(occlusionPolicy), m_cullingPolicy(cullingPolicy) {
 }
 
-bool PrimitiveRenderer::TriangleRenderAttributes::operator<(
-    const TriangleRenderAttributes &other
-) const {
+bool PrimitiveRenderer::TriangleRenderAttributes::operator<(const TriangleRenderAttributes &other) const {
     // As a special exception, sort by descending alpha so opaque batches render first.
     if (m_color.a() < other.m_color.a())
         return false;
@@ -121,9 +114,7 @@ bool PrimitiveRenderer::TriangleRenderAttributes::operator<(
     return false;
 }
 
-void PrimitiveRenderer::TriangleRenderAttributes::render(
-    IndexRangeRenderer &renderer, ActiveShader &shader
-) const {
+void PrimitiveRenderer::TriangleRenderAttributes::render(IndexRangeRenderer &renderer, ActiveShader &shader) const {
     if (m_cullingPolicy == PrimitiveRendererCullingPolicy::ShowBackfaces) {
         glAssert(glPushAttrib(GL_POLYGON_BIT));
         glAssert(glDisable(GL_CULL_FACE));
@@ -165,29 +156,26 @@ void PrimitiveRenderer::TriangleRenderAttributes::render(
     }
 }
 
-void PrimitiveRenderer::renderLine(
-    const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::vec3f &start, const vm::vec3f &end
+void PrimitiveRenderer::renderLine(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::vec3f &start,
+    const vm::vec3f &end
 ) {
-    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLine(
-        Vertex(start), Vertex(end));
+    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLine(Vertex(start), Vertex(end));
 }
 
-void PrimitiveRenderer::renderLines(
-    const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions
+void PrimitiveRenderer::renderLines(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const std::vector<vm::vec3f> &positions
 ) {
-    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLines(
-        Vertex::toList(positions.size(), std::begin(positions)));
+    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLines(Vertex::toList(positions.size(), std::begin(positions)));
 }
 
-void PrimitiveRenderer::renderLineStrip(
-    const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions
+void PrimitiveRenderer::renderLineStrip(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const std::vector<vm::vec3f> &positions
 ) {
-    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLineStrip(
-        Vertex::toList(positions.size(), std::begin(positions)));
+    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLineStrip(Vertex::toList(positions.size(), std::begin(positions)));
 }
 
-void PrimitiveRenderer::renderCoordinateSystemXY(
-    const Color &x, const Color &y, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+void PrimitiveRenderer::renderCoordinateSystemXY(const Color &x, const Color &y, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const vm::bbox3f &bounds
 ) {
     vm::vec3f start, end;
 
@@ -198,8 +186,8 @@ void PrimitiveRenderer::renderCoordinateSystemXY(
     renderLine(y, lineWidth, occlusionPolicy, start, end);
 }
 
-void PrimitiveRenderer::renderCoordinateSystemXZ(
-    const Color &x, const Color &z, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+void PrimitiveRenderer::renderCoordinateSystemXZ(const Color &x, const Color &z, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const vm::bbox3f &bounds
 ) {
     vm::vec3f start, end;
 
@@ -210,8 +198,8 @@ void PrimitiveRenderer::renderCoordinateSystemXZ(
     renderLine(z, lineWidth, occlusionPolicy, start, end);
 }
 
-void PrimitiveRenderer::renderCoordinateSystemYZ(
-    const Color &y, const Color &z, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+void PrimitiveRenderer::renderCoordinateSystemYZ(const Color &y, const Color &z, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const vm::bbox3f &bounds
 ) {
     vm::vec3f start, end;
 
@@ -222,8 +210,8 @@ void PrimitiveRenderer::renderCoordinateSystemYZ(
     renderLine(z, lineWidth, occlusionPolicy, start, end);
 }
 
-void PrimitiveRenderer::renderCoordinateSystem3D(
-    const Color &x, const Color &y, const Color &z, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
+void PrimitiveRenderer::renderCoordinateSystem3D(const Color &x, const Color &y, const Color &z, const float lineWidth,
+    const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
 ) {
     vm::vec3f start, end;
 
@@ -237,21 +225,20 @@ void PrimitiveRenderer::renderCoordinateSystem3D(
     renderLine(z, lineWidth, occlusionPolicy, start, end);
 }
 
-void PrimitiveRenderer::renderPolygon(
-    const Color &color, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions
+void PrimitiveRenderer::renderPolygon(const Color &color, float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const std::vector<vm::vec3f> &positions
 ) {
-    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLineLoop(
-        Vertex::toList(positions.size(), std::begin(positions)));
+    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLineLoop(Vertex::toList(positions.size(), std::begin(positions)));
 }
 
-void PrimitiveRenderer::renderFilledPolygon(
-    const Color &color, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const PrimitiveRendererCullingPolicy cullingPolicy, const std::vector<vm::vec3f> &positions
+void PrimitiveRenderer::renderFilledPolygon(const Color &color, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const PrimitiveRendererCullingPolicy cullingPolicy, const std::vector<vm::vec3f> &positions
 ) {
     m_triangleMeshes[TriangleRenderAttributes(color, occlusionPolicy, cullingPolicy)].addTriangleFan(Vertex::toList(positions.size(), std::begin(positions)));
 }
 
-void PrimitiveRenderer::renderCylinder(
-    const Color &color, const float radius, const size_t segments, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const PrimitiveRendererCullingPolicy cullingPolicy, const vm::vec3f &start, const vm::vec3f &end
+void PrimitiveRenderer::renderCylinder(const Color &color, const float radius, const size_t segments, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const PrimitiveRendererCullingPolicy cullingPolicy, const vm::vec3f &start, const vm::vec3f &end
 ) {
     assert(radius > 0.0f);
     assert(segments > 2);

@@ -35,19 +35,17 @@
 
 namespace TrenchBroom {
 namespace IO {
-NodeReader::NodeReader(
-    std::string_view str, const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat, const Model::EntityPropertyConfig &entityPropertyConfig, std::vector<std::string> linkedGroupsToKeep
+NodeReader::NodeReader(std::string_view str, const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat,
+    const Model::EntityPropertyConfig &entityPropertyConfig, std::vector<std::string> linkedGroupsToKeep
 ) : MapReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig, std::move(linkedGroupsToKeep)} {
 }
 
-std::vector<Model::Node *> NodeReader::read(
-    const std::string &str, const Model::MapFormat preferredMapFormat, const vm::bbox3 &worldBounds, const Model::EntityPropertyConfig &entityPropertyConfig, const std::vector<std::string> &linkedGroupsToKeep, ParserStatus &status
+std::vector<Model::Node *> NodeReader::read(const std::string &str, const Model::MapFormat preferredMapFormat, const vm::bbox3 &worldBounds,
+    const Model::EntityPropertyConfig &entityPropertyConfig, const std::vector<std::string> &linkedGroupsToKeep, ParserStatus &status
 ) {
     // Try preferred format first
     for (const auto compatibleMapFormat: Model::compatibleFormats(preferredMapFormat)) {
-        if (auto result = readAsFormat(
-                compatibleMapFormat, preferredMapFormat, str, worldBounds, entityPropertyConfig, linkedGroupsToKeep, status
-            );
+        if (auto result = readAsFormat(compatibleMapFormat, preferredMapFormat, str, worldBounds, entityPropertyConfig, linkedGroupsToKeep, status);
             !result.empty()) {
             return result;
         }
@@ -66,21 +64,18 @@ std::vector<Model::Node *> NodeReader::read(
  *
  * @returns the parsed nodes; caller is responsible for freeing them.
  */
-std::vector<Model::Node *> NodeReader::readAsFormat(
-    const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat, const std::string &str, const vm::bbox3 &worldBounds, const Model::EntityPropertyConfig &entityPropertyConfig,
-    const std::vector<std::string> &linkedGroupsToKeep, ParserStatus &status
+std::vector<Model::Node *>
+NodeReader::readAsFormat(const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat, const std::string &str, const vm::bbox3 &worldBounds,
+    const Model::EntityPropertyConfig &entityPropertyConfig, const std::vector<std::string> &linkedGroupsToKeep, ParserStatus &status
 ) {
     {
         auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig, linkedGroupsToKeep};
         try {
             reader.readEntities(worldBounds, status);
-            status.info(
-                "Parsed successfully as " + Model::formatName(sourceMapFormat) + " entities"
-            );
+            status.info("Parsed successfully as " + Model::formatName(sourceMapFormat) + " entities");
             return reader.m_nodes;
         } catch (const ParserException &e) {
-            status.info(
-                "Couldn't parse as " + Model::formatName(sourceMapFormat) + " entities: " + e.what());
+            status.info("Couldn't parse as " + Model::formatName(sourceMapFormat) + " entities: " + e.what());
             kdl::vec_clear_and_delete(reader.m_nodes);
         }
     }
@@ -89,13 +84,10 @@ std::vector<Model::Node *> NodeReader::readAsFormat(
         auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig, linkedGroupsToKeep};
         try {
             reader.readBrushes(worldBounds, status);
-            status.info(
-                "Parsed successfully as " + Model::formatName(sourceMapFormat) + " brushes"
-            );
+            status.info("Parsed successfully as " + Model::formatName(sourceMapFormat) + " brushes");
             return reader.m_nodes;
         } catch (const ParserException &e) {
-            status.info(
-                "Couldn't parse as " + Model::formatName(sourceMapFormat) + " brushes: " + e.what());
+            status.info("Couldn't parse as " + Model::formatName(sourceMapFormat) + " brushes: " + e.what());
             kdl::vec_clear_and_delete(reader.m_nodes);
         }
     }
@@ -114,9 +106,7 @@ void NodeReader::onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatu
     m_nodes.push_back(layerNode.release());
 }
 
-void NodeReader::onNode(
-    Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &
-) {
+void NodeReader::onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &) {
     if (parentNode != nullptr) {
         parentNode->addChild(node.release());
     }

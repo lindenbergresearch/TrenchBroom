@@ -83,9 +83,7 @@ kdl_reflect_impl(PatchGrid);
  * quadrants (e.g. the corner points have only one). If the grid points of two opposing
  * sides of the grid coincide, we treat them as one grid point and average their normals.
  */
-std::vector<vm::vec3> computeGridNormals(
-    const std::vector<BezierPatch::Point> patchGrid, const size_t pointRowCount, const size_t pointColumnCount
-) {
+std::vector<vm::vec3> computeGridNormals(const std::vector<BezierPatch::Point> patchGrid, const size_t pointRowCount, const size_t pointColumnCount) {
     /* Returns the index of a grid point with the given coordinates. */
     const auto index = [&](const size_t row, const size_t col) {
       return row * pointColumnCount + col;
@@ -116,9 +114,7 @@ std::vector<vm::vec3> computeGridNormals(
      * right of the grid point, and so on. We determine the incident grid points necessary
      * to compute the normals (via cross product). The returned normal is not normalized.
      */
-    const auto normalForQuadrant = [&](
-        const size_t row, const size_t col, const RowOffset rowOffset, const ColOffset colOffset
-    ) {
+    const auto normalForQuadrant = [&](const size_t row, const size_t col, const RowOffset rowOffset, const ColOffset colOffset) {
       const auto point = gridPoint(row, col);
       switch (rowOffset) {
           case RowOffset::Above: {
@@ -175,21 +171,31 @@ std::vector<vm::vec3> computeGridNormals(
 
     // top and bottom row normals, excluding corners
     for (size_t col = 1u; col < r; ++col) {
-        normals[index(t, col)] = (normalForQuadrant(t, col, RowOffset::Below, ColOffset::Left) + normalForQuadrant(t, col, RowOffset::Below, ColOffset::Right)) / static_cast<FloatType>(2);
-        normals[index(b, col)] = (normalForQuadrant(b, col, RowOffset::Above, ColOffset::Left) + normalForQuadrant(b, col, RowOffset::Above, ColOffset::Right)) / static_cast<FloatType>(2);
+        normals[index(t, col)] =
+            (normalForQuadrant(t, col, RowOffset::Below, ColOffset::Left) + normalForQuadrant(t, col, RowOffset::Below, ColOffset::Right)) /
+            static_cast<FloatType>(2);
+        normals[index(b, col)] =
+            (normalForQuadrant(b, col, RowOffset::Above, ColOffset::Left) + normalForQuadrant(b, col, RowOffset::Above, ColOffset::Right)) /
+            static_cast<FloatType>(2);
     }
 
     // left and right column normals, excluding corners
     for (size_t row = 1u; row < b; ++row) {
-        normals[index(row, l)] = (normalForQuadrant(row, l, RowOffset::Above, ColOffset::Right) + normalForQuadrant(row, l, RowOffset::Below, ColOffset::Right)) / static_cast<FloatType>(2);
-        normals[index(row, r)] = (normalForQuadrant(row, r, RowOffset::Above, ColOffset::Left) + normalForQuadrant(row, r, RowOffset::Below, ColOffset::Left)) / static_cast<FloatType>(2);
+        normals[index(row, l)] =
+            (normalForQuadrant(row, l, RowOffset::Above, ColOffset::Right) + normalForQuadrant(row, l, RowOffset::Below, ColOffset::Right)) /
+            static_cast<FloatType>(2);
+        normals[index(row, r)] = (normalForQuadrant(row, r, RowOffset::Above, ColOffset::Left) + normalForQuadrant(row, r, RowOffset::Below, ColOffset::Left)) /
+                                 static_cast<FloatType>(2);
     }
 
     // inner point normals
     for (size_t row = 1u; row < b; ++row) {
         for (size_t col = 1u; col < r; ++col) {
-            normals[index(row, col)] = (normalForQuadrant(row, col, RowOffset::Above, ColOffset::Left) + normalForQuadrant(row, col, RowOffset::Above, ColOffset::Right) + normalForQuadrant(row, col, RowOffset::Below, ColOffset::Left) +
-                                        normalForQuadrant(row, col, RowOffset::Below, ColOffset::Right)) / static_cast<FloatType>(4);
+            normals[index(row, col)] = (
+                                           normalForQuadrant(row, col, RowOffset::Above, ColOffset::Left) +
+                                           normalForQuadrant(row, col, RowOffset::Above, ColOffset::Right) +
+                                           normalForQuadrant(row, col, RowOffset::Below, ColOffset::Left) +
+                                           normalForQuadrant(row, col, RowOffset::Below, ColOffset::Right)) / static_cast<FloatType>(4);
         }
     }
 
@@ -242,22 +248,23 @@ PatchGrid makePatchGrid(const BezierPatch &patch, const size_t subdivisionsPerSu
 
 const HitType::Type PatchNode::PatchHitType = HitType::freeType();
 
-PatchNode::PatchNode(BezierPatch patch) : m_patch{std::move(patch)}, m_grid{makePatchGrid(m_patch, DefaultSubdivisionsPerSurface)} {
+PatchNode::PatchNode(BezierPatch patch) : m_patch{std::move(patch)}, m_grid{
+    makePatchGrid(m_patch, DefaultSubdivisionsPerSurface)
+} {
 }
 
 const EntityNodeBase *PatchNode::entity() const {
-    return visitParent(
-        kdl::overload(
-            [](const WorldNode *world) -> const EntityNodeBase * { return world; }, [](const EntityNode *entity) -> const EntityNodeBase * { return entity; }, [](auto &&thisLambda, const LayerNode *layer) -> const EntityNodeBase * {
-              return layer->visitParent(thisLambda).value_or(nullptr);
-            }, [](auto &&thisLambda, const GroupNode *group) -> const EntityNodeBase * {
-              return group->visitParent(thisLambda).value_or(nullptr);
-            }, [](auto &&thisLambda, const BrushNode *brush) -> const EntityNodeBase * {
-              return brush->visitParent(thisLambda).value_or(nullptr);
-            }, [](auto &&thisLambda, const PatchNode *patch) -> const EntityNodeBase * {
-              return patch->visitParent(thisLambda).value_or(nullptr);
-            }
-        )).value_or(nullptr);
+    return visitParent(kdl::overload([](const WorldNode *world) -> const EntityNodeBase * { return world; },
+        [](const EntityNode *entity) -> const EntityNodeBase * { return entity; }, [](auto &&thisLambda, const LayerNode *layer) -> const EntityNodeBase * {
+          return layer->visitParent(thisLambda).value_or(nullptr);
+        }, [](auto &&thisLambda, const GroupNode *group) -> const EntityNodeBase * {
+          return group->visitParent(thisLambda).value_or(nullptr);
+        }, [](auto &&thisLambda, const BrushNode *brush) -> const EntityNodeBase * {
+          return brush->visitParent(thisLambda).value_or(nullptr);
+        }, [](auto &&thisLambda, const PatchNode *patch) -> const EntityNodeBase * {
+          return patch->visitParent(thisLambda).value_or(nullptr);
+        }
+    )).value_or(nullptr);
 }
 
 EntityNodeBase *PatchNode::entity() {
@@ -337,9 +344,7 @@ bool PatchNode::doSelectable() const {
     return true;
 }
 
-void PatchNode::doPick(
-    const EditorContext &editorContext, const vm::ray3 &pickRay, PickResult &pickResult
-) {
+void PatchNode::doPick(const EditorContext &editorContext, const vm::ray3 &pickRay, PickResult &pickResult) {
     if (!editorContext.visible(this)) {
         return;
     }

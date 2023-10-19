@@ -28,9 +28,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-Transformation::Transformation(
-    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model
-) {
+Transformation::Transformation(const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
     pushTransformation(projection, view, model);
 }
 
@@ -57,13 +55,10 @@ const vm::mat4x4f &Transformation::modelMatrix() const {
 }
 
 Transformation Transformation::slice() const {
-    return Transformation(
-        m_projectionStack.back(), m_viewStack.back(), m_modelStack.back());
+    return Transformation(m_projectionStack.back(), m_viewStack.back(), m_modelStack.back());
 }
 
-void Transformation::pushTransformation(
-    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model
-) {
+void Transformation::pushTransformation(const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
     m_projectionStack.push_back(projection);
     m_viewStack.push_back(view);
     m_modelStack.push_back(model);
@@ -111,8 +106,8 @@ void Transformation::loadModelViewMatrix(const vm::mat4x4f &matrix) {
     glAssert(glLoadMatrixf(reinterpret_cast<const float *>(matrix.v)));
 }
 
-ReplaceTransformation::ReplaceTransformation(
-    Transformation &transformation, const vm::mat4x4f &projectionMatrix, const vm::mat4x4f &viewMatrix, const vm::mat4x4f &modelMatrix
+ReplaceTransformation::ReplaceTransformation(Transformation &transformation, const vm::mat4x4f &projectionMatrix, const vm::mat4x4f &viewMatrix,
+    const vm::mat4x4f &modelMatrix
 ) : m_transformation(transformation) {
     m_transformation.pushTransformation(projectionMatrix, viewMatrix, modelMatrix);
 }
@@ -121,9 +116,7 @@ ReplaceTransformation::~ReplaceTransformation() {
     m_transformation.popTransformation();
 }
 
-MultiplyModelMatrix::MultiplyModelMatrix(
-    Transformation &transformation, const vm::mat4x4f &modelMatrix
-) : m_transformation(transformation) {
+MultiplyModelMatrix::MultiplyModelMatrix(Transformation &transformation, const vm::mat4x4f &modelMatrix) : m_transformation(transformation) {
     m_transformation.pushModelMatrix(modelMatrix);
 }
 
@@ -131,9 +124,7 @@ MultiplyModelMatrix::~MultiplyModelMatrix() {
     m_transformation.popModelMatrix();
 }
 
-ReplaceModelMatrix::ReplaceModelMatrix(
-    Transformation &transformation, const vm::mat4x4f &modelMatrix
-) : m_transformation(transformation) {
+ReplaceModelMatrix::ReplaceModelMatrix(Transformation &transformation, const vm::mat4x4f &modelMatrix) : m_transformation(transformation) {
     m_transformation.replaceAndPushModelMatrix(modelMatrix);
 }
 

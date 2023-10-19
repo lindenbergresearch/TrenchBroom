@@ -77,9 +77,7 @@ private:
     bool m_showHiddenEntities;
 
 public:
-    EntityRenderer(
-        Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext
-    );
+    EntityRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext);
 
     /**
      * Equivalent to invalidateEntity() on all added entities.

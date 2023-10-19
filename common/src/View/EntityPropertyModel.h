@@ -102,24 +102,17 @@ public:
 
     bool subset() const;
 
-    static PropertyRow rowForEntityNodes(
-        const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes
-    );
+    static PropertyRow rowForEntityNodes(const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes);
 
-    static std::vector<std::string> allKeys(
-        const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties
-    );
+    static std::vector<std::string> allKeys(const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties);
 
-    static std::map<std::string, PropertyRow> rowsForEntityNodes(
-        const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties
-    );
+    static std::map<std::string, PropertyRow>
+    rowsForEntityNodes(const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties);
 
     /**
      * Suggests a new, unused property name of the form "property X".
      */
-    static std::string newPropertyKeyForEntityNodes(
-        const std::vector<Model::EntityNodeBase *> &nodes
-    );
+    static std::string newPropertyKeyForEntityNodes(const std::vector<Model::EntityNodeBase *> &nodes);
 
     kdl_reflect_decl(PropertyRow, m_key, m_value, m_valueType, m_keyMutable, m_valueMutable, m_protected, m_tooltip);
 };
@@ -179,9 +172,7 @@ private: // autocompletion helpers
 
     std::vector<std::string> getAllPropertyKeys() const;
 
-    std::vector<std::string> getAllValuesForPropertyKeys(
-        const std::vector<std::string> &propertyKeys
-    ) const;
+    std::vector<std::string> getAllValuesForPropertyKeys(const std::vector<std::string> &propertyKeys) const;
 
     std::vector<std::string> getAllClassnames() const;
 
@@ -205,13 +196,9 @@ public: // QAbstractTableModel overrides
 private: // helpers
     bool hasRowWithPropertyKey(const std::string &propertyKey) const;
 
-    bool renameProperty(
-        size_t rowIndex, const std::string &newKey, const std::vector<Model::EntityNodeBase *> &nodes
-    );
+    bool renameProperty(size_t rowIndex, const std::string &newKey, const std::vector<Model::EntityNodeBase *> &nodes);
 
-    bool updateProperty(
-        size_t rowIndex, const std::string &newValue, const std::vector<Model::EntityNodeBase *> &nodes
-    );
+    bool updateProperty(size_t rowIndex, const std::string &newValue, const std::vector<Model::EntityNodeBase *> &nodes);
 
     bool setProtectedProperty(size_t rowIndex, bool newValue);
 

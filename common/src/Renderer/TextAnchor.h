@@ -70,8 +70,7 @@ private:
     vm::vec2f m_extraOffsets;
 
 public:
-    SimpleTextAnchor(
-        const vm::vec3f &position, const TextAlignment::Type alignment, const vm::vec2f &extraOffsets = vm::vec2f::zero());
+    SimpleTextAnchor(const vm::vec3f &position, const TextAlignment::Type alignment, const vm::vec2f &extraOffsets = vm::vec2f::zero());
 
 private:
     vm::vec3f basePosition() const override;

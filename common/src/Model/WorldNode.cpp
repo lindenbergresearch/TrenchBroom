@@ -44,21 +44,22 @@
 
 namespace TrenchBroom {
 namespace Model {
-WorldNode::WorldNode(
-    EntityPropertyConfig entityPropertyConfig, Entity entity, const MapFormat mapFormat
-) : m_entityPropertyConfig{std::move(entityPropertyConfig)}, m_mapFormat{mapFormat}, m_defaultLayer{nullptr}, m_entityNodeIndex{std::make_unique<EntityNodeIndex>()}, m_validatorRegistry{std::make_unique<ValidatorRegistry>()},
-    m_nodeTree{std::make_unique<NodeTree>(256.0)}, m_updateNodeTree{true} {
-    entity.addOrUpdateProperty(
-        m_entityPropertyConfig, EntityPropertyKeys::Classname, EntityPropertyValues::WorldspawnClassname
-    );
+WorldNode::WorldNode(EntityPropertyConfig entityPropertyConfig, Entity entity, const MapFormat mapFormat) : m_entityPropertyConfig{
+    std::move(entityPropertyConfig)
+}, m_mapFormat{mapFormat}, m_defaultLayer{
+    nullptr
+}, m_entityNodeIndex{std::make_unique<EntityNodeIndex>()}, m_validatorRegistry{
+    std::make_unique<ValidatorRegistry>()
+}, m_nodeTree{std::make_unique<NodeTree>(256.0)}, m_updateNodeTree{true} {
+    entity.addOrUpdateProperty(m_entityPropertyConfig, EntityPropertyKeys::Classname, EntityPropertyValues::WorldspawnClassname);
     entity.setPointEntity(m_entityPropertyConfig, false);
     setEntity(std::move(entity));
     createDefaultLayer();
 }
 
-WorldNode::WorldNode(
-    EntityPropertyConfig entityPropertyConfig, std::initializer_list<EntityProperty> properties, const MapFormat mapFormat
-) : WorldNode{entityPropertyConfig, Entity{entityPropertyConfig, std::move(properties)}, mapFormat} {
+WorldNode::WorldNode(EntityPropertyConfig entityPropertyConfig, std::initializer_list<EntityProperty> properties, const MapFormat mapFormat) : WorldNode{
+    entityPropertyConfig, Entity{entityPropertyConfig, std::move(properties)}, mapFormat
+} {
 }
 
 WorldNode::~WorldNode() = default;
@@ -88,16 +89,14 @@ const LayerNode *WorldNode::defaultLayer() const {
 std::vector<LayerNode *> WorldNode::allLayers() {
     auto layers = std::vector<LayerNode *>{};
     visitChildren(
-        kdl::overload(
-            [](WorldNode *) {}, [&](LayerNode *layer) { layers.push_back(layer); }, [](GroupNode *) {}, [](EntityNode *) {}, [](BrushNode *) {}, [](PatchNode *) {}
+        kdl::overload([](WorldNode *) {}, [&](LayerNode *layer) { layers.push_back(layer); }, [](GroupNode *) {}, [](EntityNode *) {}, [](BrushNode *) {},
+            [](PatchNode *) {}
         ));
     return layers;
 }
 
 std::vector<const LayerNode *> WorldNode::allLayers() const {
-    return kdl::vec_transform(
-        const_cast<WorldNode *>(this)->allLayers(), [](const auto *l) { return l; }
-    );
+    return kdl::vec_transform(const_cast<WorldNode *>(this)->allLayers(), [](const auto *l) { return l; });
 }
 
 std::vector<LayerNode *> WorldNode::customLayers() {
@@ -106,8 +105,8 @@ std::vector<LayerNode *> WorldNode::customLayers() {
     const auto &children = Node::children();
     for (auto it = std::next(std::begin(children)); it != std::end(children); ++it) {
         (*it)->accept(
-            kdl::overload(
-                [](WorldNode *) {}, [&](LayerNode *layer) { layers.push_back(layer); }, [](GroupNode *) {}, [](EntityNode *) {}, [](BrushNode *) {}, [](PatchNode *) {}
+            kdl::overload([](WorldNode *) {}, [&](LayerNode *layer) { layers.push_back(layer); }, [](GroupNode *) {}, [](EntityNode *) {}, [](BrushNode *) {},
+                [](PatchNode *) {}
             ));
     }
 
@@ -115,9 +114,7 @@ std::vector<LayerNode *> WorldNode::customLayers() {
 }
 
 std::vector<const LayerNode *> WorldNode::customLayers() const {
-    return kdl::vec_transform(
-        const_cast<WorldNode *>(this)->customLayers(), [](const auto *l) { return l; }
-    );
+    return kdl::vec_transform(const_cast<WorldNode *>(this)->customLayers(), [](const auto *l) { return l; });
 }
 
 std::vector<LayerNode *> WorldNode::allLayersUserSorted() {
@@ -127,9 +124,7 @@ std::vector<LayerNode *> WorldNode::allLayersUserSorted() {
 }
 
 std::vector<const LayerNode *> WorldNode::allLayersUserSorted() const {
-    return kdl::vec_transform(
-        const_cast<WorldNode *>(this)->allLayersUserSorted(), [](const auto *l) { return l; }
-    );
+    return kdl::vec_transform(const_cast<WorldNode *>(this)->allLayersUserSorted(), [](const auto *l) { return l; });
 }
 
 std::vector<LayerNode *> WorldNode::customLayersUserSorted() {
@@ -139,9 +134,7 @@ std::vector<LayerNode *> WorldNode::customLayersUserSorted() {
 }
 
 std::vector<const LayerNode *> WorldNode::customLayersUserSorted() const {
-    return kdl::vec_transform(
-        const_cast<WorldNode *>(this)->customLayersUserSorted(), [](const auto *l) { return l; }
-    );
+    return kdl::vec_transform(const_cast<WorldNode *>(this)->customLayersUserSorted(), [](const auto *l) { return l; });
 }
 
 void WorldNode::createDefaultLayer() {
@@ -188,22 +181,20 @@ void WorldNode::rebuildNodeTree() {
       }
     };
 
-    accept(
-        kdl::overload(
-            [&](auto &&thisLambda, WorldNode *world) {
-              addNode(world);
-              world->visitChildren(thisLambda);
-            }, [&](auto &&thisLambda, LayerNode *layer) {
-              addNode(layer);
-              layer->visitChildren(thisLambda);
-            }, [&](auto &&thisLambda, GroupNode *group) {
-              addNode(group);
-              group->visitChildren(thisLambda);
-            }, [&](auto &&thisLambda, EntityNode *entity) {
-              addNode(entity);
-              entity->visitChildren(thisLambda);
-            }, [&](BrushNode *brush) { addNode(brush); }, [&](PatchNode *patch) { addNode(patch); }
-        ));
+    accept(kdl::overload([&](auto &&thisLambda, WorldNode *world) {
+          addNode(world);
+          world->visitChildren(thisLambda);
+        }, [&](auto &&thisLambda, LayerNode *layer) {
+          addNode(layer);
+          layer->visitChildren(thisLambda);
+        }, [&](auto &&thisLambda, GroupNode *group) {
+          addNode(group);
+          group->visitChildren(thisLambda);
+        }, [&](auto &&thisLambda, EntityNode *entity) {
+          addNode(entity);
+          entity->visitChildren(thisLambda);
+        }, [&](BrushNode *brush) { addNode(brush); }, [&](PatchNode *patch) { addNode(patch); }
+    ));
 
     m_nodeTree->clear();
     for (auto *node: nodes) {
@@ -212,8 +203,7 @@ void WorldNode::rebuildNodeTree() {
 }
 
 void WorldNode::invalidateAllIssues() {
-    accept(
-        [](auto &&thisLambda, Node *node) {
+    accept([](auto &&thisLambda, Node *node) {
           node->invalidateIssues();
           node->visitChildren(thisLambda);
         }
@@ -246,14 +236,12 @@ Node *WorldNode::doCloneRecursively(const vm::bbox3 &worldBounds) const {
     assert(myChildren[0] == m_defaultLayer);
 
     auto *worldNode = static_cast<WorldNode *>(clone(worldBounds));
-    worldNode->defaultLayer()->addChildren(
-        cloneRecursively(worldBounds, m_defaultLayer->children()));
+    worldNode->defaultLayer()->addChildren(cloneRecursively(worldBounds, m_defaultLayer->children()));
 
     if (myChildren.size() > 1) {
         auto childClones = std::vector<Node *>{};
         childClones.reserve(myChildren.size() - 1);
-        cloneRecursively(
-            worldBounds, std::next(std::begin(myChildren)), std::end(myChildren), std::back_inserter(childClones));
+        cloneRecursively(worldBounds, std::next(std::begin(myChildren)), std::end(myChildren), std::back_inserter(childClones));
         worldNode->addChildren(childClones);
     }
 
@@ -261,19 +249,16 @@ Node *WorldNode::doCloneRecursively(const vm::bbox3 &worldBounds) const {
 }
 
 bool WorldNode::doCanAddChild(const Node *child) const {
-    return child->accept(
-        kdl::overload(
-            [](const WorldNode *) { return false; }, [](const LayerNode *) { return true; }, [](const GroupNode *) { return false; }, [](const EntityNode *) { return false; }, [](const BrushNode *) { return false; },
-            [](const PatchNode *) { return false; }
-        ));
+    return child->accept(kdl::overload([](const WorldNode *) { return false; }, [](const LayerNode *) { return true; }, [](const GroupNode *) { return false; },
+        [](const EntityNode *) { return false; }, [](const BrushNode *) { return false; }, [](const PatchNode *) { return false; }
+    ));
 }
 
 bool WorldNode::doCanRemoveChild(const Node *child) const {
-    return child->accept(
-        kdl::overload(
-            [](const WorldNode *) { return false; }, [&](const LayerNode *layer) { return (layer != defaultLayer()); }, [](const GroupNode *) { return false; }, [](const EntityNode *) { return false; },
-            [](const BrushNode *) { return false; }, [](const PatchNode *) { return false; }
-        ));
+    return child->accept(kdl::overload([](const WorldNode *) { return false; }, [&](const LayerNode *layer) { return (layer != defaultLayer()); },
+        [](const GroupNode *) { return false; }, [](const EntityNode *) { return false; }, [](const BrushNode *) { return false; },
+        [](const PatchNode *) { return false; }
+    ));
 }
 
 bool WorldNode::doRemoveIfEmpty() const {
@@ -290,14 +275,14 @@ void WorldNode::doDescendantWasAdded(Node *node, const size_t /* depth */) {
     // index, but some of its descendants may be. We need to recursively search the `node`
     // being connected and add it or any descendants that need to be added.
     if (m_updateNodeTree) {
-        node->accept(
-            kdl::overload(
-                [&](auto &&thisLambda, WorldNode *world) { world->visitChildren(thisLambda); }, [&](auto &&thisLambda, LayerNode *layer) { layer->visitChildren(thisLambda); },
-                [&](auto &&thisLambda, GroupNode *group) { group->visitChildren(thisLambda); }, [&](auto &&thisLambda, EntityNode *entity) {
-                  m_nodeTree->insert(entity->physicalBounds(), entity);
-                  entity->visitChildren(thisLambda);
-                }, [&](BrushNode *brush) { m_nodeTree->insert(brush->physicalBounds(), brush); }, [&](PatchNode *patch) { m_nodeTree->insert(patch->physicalBounds(), patch); }
-            ));
+        node->accept(kdl::overload([&](auto &&thisLambda, WorldNode *world) { world->visitChildren(thisLambda); },
+            [&](auto &&thisLambda, LayerNode *layer) { layer->visitChildren(thisLambda); },
+            [&](auto &&thisLambda, GroupNode *group) { group->visitChildren(thisLambda); }, [&](auto &&thisLambda, EntityNode *entity) {
+              m_nodeTree->insert(entity->physicalBounds(), entity);
+              entity->visitChildren(thisLambda);
+            }, [&](BrushNode *brush) { m_nodeTree->insert(brush->physicalBounds(), brush); },
+            [&](PatchNode *patch) { m_nodeTree->insert(patch->physicalBounds(), patch); }
+        ));
     }
 
     const auto updatePersistentId = [&](auto *persistentNode) {
@@ -310,18 +295,16 @@ void WorldNode::doDescendantWasAdded(Node *node, const size_t /* depth */) {
       }
     };
 
-    node->accept(
-        kdl::overload(
-            [&](auto &&thisLambda, WorldNode *world) { world->visitChildren(thisLambda); }, [&](auto &&thisLambda, LayerNode *layer) {
-              layer->visitChildren(thisLambda);
-              if (layer != defaultLayer()) {
-                  updatePersistentId(layer);
-              }
-            }, [&](auto &&thisLambda, GroupNode *group) {
-              group->visitChildren(thisLambda);
-              updatePersistentId(group);
-            }, [&](EntityNode *) {}, [&](BrushNode *) {}, [&](PatchNode *) {}
-        ));
+    node->accept(kdl::overload([&](auto &&thisLambda, WorldNode *world) { world->visitChildren(thisLambda); }, [&](auto &&thisLambda, LayerNode *layer) {
+          layer->visitChildren(thisLambda);
+          if (layer != defaultLayer()) {
+              updatePersistentId(layer);
+          }
+        }, [&](auto &&thisLambda, GroupNode *group) {
+          group->visitChildren(thisLambda);
+          updatePersistentId(group);
+        }, [&](EntityNode *) {}, [&](BrushNode *) {}, [&](PatchNode *) {}
+    ));
 }
 
 void WorldNode::doDescendantWillBeRemoved(Node *node, const size_t /* depth */) {
@@ -334,24 +317,23 @@ void WorldNode::doDescendantWillBeRemoved(Node *node, const size_t /* depth */) 
           }
         };
 
-        node->accept(
-            kdl::overload(
-                [&](auto &&thisLambda, WorldNode *world) { world->visitChildren(thisLambda); }, [&](auto &&thisLambda, LayerNode *layer) { layer->visitChildren(thisLambda); },
-                [&](auto &&thisLambda, GroupNode *group) { group->visitChildren(thisLambda); }, [&](auto &&thisLambda, EntityNode *entity) {
-                  doRemove(entity);
-                  entity->visitChildren(thisLambda);
-                }, [&](BrushNode *brush) { doRemove(brush); }, [&](PatchNode *patch) { doRemove(patch); }
-            ));
+        node->accept(kdl::overload([&](auto &&thisLambda, WorldNode *world) { world->visitChildren(thisLambda); },
+            [&](auto &&thisLambda, LayerNode *layer) { layer->visitChildren(thisLambda); },
+            [&](auto &&thisLambda, GroupNode *group) { group->visitChildren(thisLambda); }, [&](auto &&thisLambda, EntityNode *entity) {
+              doRemove(entity);
+              entity->visitChildren(thisLambda);
+            }, [&](BrushNode *brush) { doRemove(brush); }, [&](PatchNode *patch) { doRemove(patch); }
+        ));
     }
 }
 
 void WorldNode::doDescendantPhysicalBoundsDidChange(Node *node) {
     if (m_updateNodeTree) {
-        node->accept(
-            kdl::overload(
-                [](WorldNode *) {}, [](LayerNode *) {}, [](GroupNode *) {}, [&](EntityNode *entity) { m_nodeTree->update(entity->physicalBounds(), entity); }, [&](BrushNode *brush) { m_nodeTree->update(brush->physicalBounds(), brush); },
-                [&](PatchNode *patch) { m_nodeTree->update(patch->physicalBounds(), patch); }
-            ));
+        node->accept(kdl::overload([](WorldNode *) {}, [](LayerNode *) {}, [](GroupNode *) {},
+            [&](EntityNode *entity) { m_nodeTree->update(entity->physicalBounds(), entity); },
+            [&](BrushNode *brush) { m_nodeTree->update(brush->physicalBounds(), brush); },
+            [&](PatchNode *patch) { m_nodeTree->update(patch->physicalBounds(), patch); }
+        ));
     }
 }
 
@@ -359,9 +341,7 @@ bool WorldNode::doSelectable() const {
     return false;
 }
 
-void WorldNode::doPick(
-    const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
-) {
+void WorldNode::doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
     for (auto *node: m_nodeTree->find_intersectors(ray)) {
         node->pick(editorContext, ray, pickResult);
     }
@@ -385,29 +365,19 @@ const EntityPropertyConfig &WorldNode::doGetEntityPropertyConfig() const {
     return m_entityPropertyConfig;
 }
 
-void WorldNode::doFindEntityNodesWithProperty(
-    const std::string &name, const std::string &value, std::vector<Model::EntityNodeBase *> &result
-) const {
-    result = kdl::vec_concat(
-        std::move(result), m_entityNodeIndex->findEntityNodes(EntityNodeIndexQuery::exact(name), value));
+void WorldNode::doFindEntityNodesWithProperty(const std::string &name, const std::string &value, std::vector<Model::EntityNodeBase *> &result) const {
+    result = kdl::vec_concat(std::move(result), m_entityNodeIndex->findEntityNodes(EntityNodeIndexQuery::exact(name), value));
 }
 
-void WorldNode::doFindEntityNodesWithNumberedProperty(
-    const std::string &prefix, const std::string &value, std::vector<Model::EntityNodeBase *> &result
-) const {
-    result = kdl::vec_concat(
-        std::move(result), m_entityNodeIndex->findEntityNodes(EntityNodeIndexQuery::numbered(prefix), value));
+void WorldNode::doFindEntityNodesWithNumberedProperty(const std::string &prefix, const std::string &value, std::vector<Model::EntityNodeBase *> &result) const {
+    result = kdl::vec_concat(std::move(result), m_entityNodeIndex->findEntityNodes(EntityNodeIndexQuery::numbered(prefix), value));
 }
 
-void WorldNode::doAddToIndex(
-    EntityNodeBase *node, const std::string &key, const std::string &value
-) {
+void WorldNode::doAddToIndex(EntityNodeBase *node, const std::string &key, const std::string &value) {
     m_entityNodeIndex->addProperty(node, key, value);
 }
 
-void WorldNode::doRemoveFromIndex(
-    EntityNodeBase *node, const std::string &key, const std::string &value
-) {
+void WorldNode::doRemoveFromIndex(EntityNodeBase *node, const std::string &key, const std::string &value) {
     m_entityNodeIndex->removeProperty(node, key, value);
 }
 

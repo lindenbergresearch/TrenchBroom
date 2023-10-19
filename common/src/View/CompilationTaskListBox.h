@@ -61,8 +61,8 @@ protected:
     std::vector<QCompleter *> m_completers;
 
 protected:
-    CompilationTaskEditorBase(
-        QString title, std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent
+    CompilationTaskEditorBase(QString title, std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task,
+        QWidget *parent
     );
 
 protected:
@@ -83,8 +83,8 @@ private:
     MultiCompletionLineEdit *m_targetEditor = nullptr;
 
 public:
-    CompilationExportMapTaskEditor(
-        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    CompilationExportMapTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task,
+        QWidget *parent = nullptr
     );
 
 private:
@@ -104,8 +104,8 @@ private:
     MultiCompletionLineEdit *m_targetEditor = nullptr;
 
 public:
-    CompilationCopyFilesTaskEditor(
-        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    CompilationCopyFilesTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task,
+        QWidget *parent = nullptr
     );
 
 private:
@@ -127,8 +127,8 @@ private:
     MultiCompletionLineEdit *m_targetEditor = nullptr;
 
 public:
-    CompilationRenameFileTaskEditor(
-        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    CompilationRenameFileTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task,
+        QWidget *parent = nullptr
     );
 
 private:
@@ -149,8 +149,8 @@ private:
     MultiCompletionLineEdit *m_targetEditor = nullptr;
 
 public:
-    CompilationDeleteFilesTaskEditor(
-        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    CompilationDeleteFilesTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task,
+        QWidget *parent = nullptr
     );
 
 private:
@@ -171,8 +171,8 @@ private:
     QCheckBox *m_treatNonZeroResultCodeAsError = nullptr;
 
 public:
-    CompilationRunToolTaskEditor(
-        std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent = nullptr
+    CompilationRunToolTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task,
+        QWidget *parent = nullptr
     );
 
 private:
@@ -198,9 +198,7 @@ private:
     Model::CompilationProfile *m_profile = nullptr;
 
 public:
-    explicit CompilationTaskListBox(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit CompilationTaskListBox(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
     void setProfile(Model::CompilationProfile *profile);
 

@@ -35,9 +35,8 @@
 
 namespace TrenchBroom {
 namespace View {
-KeyboardShortcutModel::ActionInfo::ActionInfo(
-    const std::filesystem::path &i_displayPath, const Action &i_action
-) : displayPath(i_displayPath), action(i_action) {
+KeyboardShortcutModel::ActionInfo::ActionInfo(const std::filesystem::path &i_displayPath, const Action &i_action) : displayPath(i_displayPath),
+                                                                                                                    action(i_action) {
 }
 
 KeyboardShortcutModel::KeyboardShortcutModel(MapDocument *document, QObject *parent) : QAbstractTableModel(parent), m_document(document) {
@@ -63,9 +62,7 @@ int KeyboardShortcutModel::columnCount(const QModelIndex & /* parent */) const {
     return 3;
 }
 
-QVariant KeyboardShortcutModel::headerData(
-    const int section, const Qt::Orientation orientation, const int role
-) const {
+QVariant KeyboardShortcutModel::headerData(const int section, const Qt::Orientation orientation, const int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         if (section == 0) {
             return QString("Shortcut");
@@ -109,9 +106,7 @@ QVariant KeyboardShortcutModel::data(const QModelIndex &index, const int role) c
     }
 }
 
-bool KeyboardShortcutModel::setData(
-    const QModelIndex &index, const QVariant &value, const int role
-) {
+bool KeyboardShortcutModel::setData(const QModelIndex &index, const QVariant &value, const int role) {
     if (!checkIndex(index) || role != Qt::EditRole) {
         return false;
     }
@@ -177,8 +172,7 @@ public:
     void visit(const MenuSeparatorItem &) override {}
 
     void visit(const MenuActionItem &item) override {
-        m_actions.emplace_back(
-            m_currentPath / IO::pathFromQString(item.label()), item.action());
+        m_actions.emplace_back(m_currentPath / IO::pathFromQString(item.label()), item.action());
     }
 };
 
@@ -190,8 +184,7 @@ void KeyboardShortcutModel::initializeMenuActions() {
 
 void KeyboardShortcutModel::initializeViewActions() {
     const auto &actionManager = ActionManager::instance();
-    actionManager.visitMapViewActions(
-        [this](const Action &action) {
+    actionManager.visitMapViewActions([this](const Action &action) {
           m_actions.emplace_back("Map View" / IO::pathFromQString(action.label()), action);
         }
     );
@@ -199,8 +192,7 @@ void KeyboardShortcutModel::initializeViewActions() {
 
 void KeyboardShortcutModel::initializeTagActions() {
     assert(m_document != nullptr);
-    m_document->visitTagActions(
-        [this](const Action &action) {
+    m_document->visitTagActions([this](const Action &action) {
           m_actions.emplace_back("Tags" / IO::pathFromQString(action.label()), action);
         }
     );
@@ -208,11 +200,8 @@ void KeyboardShortcutModel::initializeTagActions() {
 
 void KeyboardShortcutModel::initializeEntityDefinitionActions() {
     assert(m_document != nullptr);
-    m_document->visitEntityDefinitionActions(
-        [this](const Action &action) {
-          m_actions.emplace_back(
-              "Entity Definitions" / IO::pathFromQString(action.label()), action
-          );
+    m_document->visitEntityDefinitionActions([this](const Action &action) {
+          m_actions.emplace_back("Entity Definitions" / IO::pathFromQString(action.label()), action);
         }
     );
 }
@@ -259,9 +248,7 @@ void KeyboardShortcutModel::updateConflicts() {
     }
 }
 
-const KeyboardShortcutModel::ActionInfo &KeyboardShortcutModel::actionInfo(
-    const int index
-) const {
+const KeyboardShortcutModel::ActionInfo &KeyboardShortcutModel::actionInfo(const int index) const {
     assert(index < totalActionCount());
     return m_actions[static_cast<size_t>(index)];
 }

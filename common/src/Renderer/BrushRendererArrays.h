@@ -96,9 +96,7 @@ private:
         }
         assert(m_vbo == nullptr);
 
-        m_vbo = m_vboManager->allocateVbo(
-            m_type, m_snapshot.size() * sizeof(T), VboUsage::DynamicDraw
-        );
+        m_vbo = m_vboManager->allocateVbo(m_type, m_snapshot.size() * sizeof(T), VboUsage::DynamicDraw);
         assert(m_vbo != nullptr);
 
         m_vbo->writeElements(0, m_snapshot);
@@ -141,9 +139,7 @@ public:
         m_dirtyRange.expand(newSize);
     }
 
-    T *getPointerToWriteElementsTo(
-        const size_t offsetWithinBlock, const size_t elementCount
-    ) {
+    T *getPointerToWriteElementsTo(const size_t offsetWithinBlock, const size_t elementCount) {
         assert(offsetWithinBlock + elementCount <= m_snapshot.size());
 
         // mark dirty range
@@ -250,9 +246,7 @@ public:
      * zeroElementsWithKey(), and also a GLuint pointer where the caller should write
      * `elementCount` GLuint's.
      */
-    std::pair<AllocationTracker::Block *, GLuint *> getPointerToInsertElementsAt(
-        size_t elementCount
-    );
+    std::pair<AllocationTracker::Block *, GLuint *> getPointerToInsertElementsAt(size_t elementCount);
 
     /**
      * Deletes indices for the given brush and marks the allocation as free.
@@ -296,8 +290,7 @@ public:
     bool setupVertices() override {
         ensure(VboHolder<V>::m_vbo != nullptr, "block is null");
         VboHolder<V>::m_vbo->bind();
-        V::Type::setup(
-            this->m_vboManager->shaderManager().currentProgram(), VboHolder<V>::m_vbo->offset());
+        V::Type::setup(this->m_vboManager->shaderManager().currentProgram(), VboHolder<V>::m_vbo->offset());
         return true;
     }
 
@@ -339,9 +332,7 @@ public:
      * deleteVerticesWithKey(), and also a Vertex pointer where the caller should write
      * `elementCount` Vertex objects.
      */
-    std::pair<AllocationTracker::Block *, Vertex *> getPointerToInsertVerticesAt(
-        size_t vertexCount
-    );
+    std::pair<AllocationTracker::Block *, Vertex *> getPointerToInsertVerticesAt(size_t vertexCount);
 
     void deleteVerticesWithKey(AllocationTracker::Block *key);
 

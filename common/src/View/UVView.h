@@ -125,21 +125,13 @@ private:
 
     class RenderTexture;
 
-    void renderTexture(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderTexture(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderFace(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderFace(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderTextureAxes(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderTextureAxes(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderToolBox(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderToolBox(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 public: // implement InputEventProcessor interface
     void processEvent(const KeyEvent &event) override;

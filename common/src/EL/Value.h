@@ -82,9 +82,7 @@ public:
 
     explicit Value(NullType value, std::optional<Expression> expression = std::nullopt);
 
-    explicit Value(
-        UndefinedType value, std::optional<Expression> expression = std::nullopt
-    );
+    explicit Value(UndefinedType value, std::optional<Expression> expression = std::nullopt);
 
     Value(Value value, std::optional<Expression> expression);
 
@@ -135,9 +133,7 @@ public:
 
     std::string asString(bool multiline = false) const;
 
-    void appendToStream(
-        std::ostream &str, bool multiline = true, const std::string &indent = ""
-    ) const;
+    void appendToStream(std::ostream &str, bool multiline = true, const std::string &indent = "") const;
 
     bool contains(const Value &indexValue) const;
 

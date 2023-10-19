@@ -61,24 +61,16 @@ QWidget *GameEngineProfileEditor::createEditorPage() {
 
     auto *button = new QPushButton{"..."};
 
-    connect(
-        m_nameEdit, &QLineEdit::textEdited, this, &GameEngineProfileEditor::nameChanged
-    );
-    connect(
-        m_pathEdit, &QLineEdit::editingFinished, this, &GameEngineProfileEditor::pathChanged
-    );
-    connect(
-        button, &QPushButton::clicked, this, &GameEngineProfileEditor::changePathClicked
-    );
+    connect(m_nameEdit, &QLineEdit::textEdited, this, &GameEngineProfileEditor::nameChanged);
+    connect(m_pathEdit, &QLineEdit::editingFinished, this, &GameEngineProfileEditor::pathChanged);
+    connect(button, &QPushButton::clicked, this, &GameEngineProfileEditor::changePathClicked);
 
     auto *pathLayout = new QHBoxLayout{};
     pathLayout->addWidget(m_pathEdit, 1);
     pathLayout->addWidget(button);
 
     auto *formLayout = new QFormLayout{};
-    formLayout->setContentsMargins(
-        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
-    );
+    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
     formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     container->setLayout(formLayout);
@@ -146,8 +138,7 @@ void GameEngineProfileEditor::pathChanged() {
 }
 
 void GameEngineProfileEditor::changePathClicked() {
-    const auto pathStr = QFileDialog::getOpenFileName(
-        this, tr("Choose Engine"), fileDialogDefaultDirectory(FileDialogDir::Engine));
+    const auto pathStr = QFileDialog::getOpenFileName(this, tr("Choose Engine"), fileDialogDefaultDirectory(FileDialogDir::Engine));
     if (!pathStr.isEmpty()) {
         updateFileDialogDefaultDirectoryWithFilename(FileDialogDir::Engine, pathStr);
         updatePath(pathStr);

@@ -70,9 +70,8 @@ std::string CompilationTaskRunner::interpolate(const std::string &spec) {
     }
 }
 
-CompilationExportMapTaskRunner::CompilationExportMapTaskRunner(
-    CompilationContext &context, Model::CompilationExportMap task
-) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationExportMapTaskRunner::CompilationExportMapTaskRunner(CompilationContext &context, Model::CompilationExportMap task) : CompilationTaskRunner{context},
+                                                                                                                                m_task{std::move(task)} {
 }
 
 CompilationExportMapTaskRunner::~CompilationExportMapTaskRunner() = default;
@@ -84,14 +83,12 @@ void CompilationExportMapTaskRunner::doExecute() {
     m_context << "#### Exporting map file '" << IO::pathAsQString(targetPath) << "'\n";
 
     if (!m_context.test()) {
-        IO::Disk::createDirectory(targetPath.parent_path()).and_then(
-            [&](auto) {
+        IO::Disk::createDirectory(targetPath.parent_path()).and_then([&](auto) {
               const auto options = IO::MapExportOptions{targetPath};
               const auto document = m_context.document();
               return document->exportDocumentAs(options);
             }
-        ).transform([&]() { emit end(); }).transform_error(
-            [&](auto e) {
+        ).transform([&]() { emit end(); }).transform_error([&](auto e) {
               m_context << "#### Could not export map file '" << IO::pathAsQString(targetPath) << "': " << QString::fromStdString(e.msg) << "\n";
               emit error();
             }
@@ -104,9 +101,8 @@ void CompilationExportMapTaskRunner::doExecute() {
 
 void CompilationExportMapTaskRunner::doTerminate() {}
 
-CompilationCopyFilesTaskRunner::CompilationCopyFilesTaskRunner(
-    CompilationContext &context, Model::CompilationCopyFiles task
-) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationCopyFilesTaskRunner::CompilationCopyFilesTaskRunner(CompilationContext &context, Model::CompilationCopyFiles task) : CompilationTaskRunner{context},
+                                                                                                                                m_task{std::move(task)} {
 }
 
 CompilationCopyFilesTaskRunner::~CompilationCopyFilesTaskRunner() = default;
@@ -118,33 +114,27 @@ void CompilationCopyFilesTaskRunner::doExecute() {
     const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
 
     const auto sourceDirPath = sourcePath.parent_path();
-    const auto sourcePathMatcher = kdl::lift_and(
-        IO::makePathInfoPathMatcher({IO::PathInfo::File}), IO::makeFilenamePathMatcher(sourcePath.filename().string()));
+    const auto sourcePathMatcher = kdl::lift_and(IO::makePathInfoPathMatcher({IO::PathInfo::File}),
+        IO::makeFilenamePathMatcher(sourcePath.filename().string()));
 
-    IO::Disk::find(sourceDirPath, IO::TraversalMode::Flat, sourcePathMatcher).and_then(
-        [&](const auto &pathsToCopy) {
-          const auto pathStrsToCopy = kdl::vec_transform(
-              pathsToCopy, [](const auto &path) { return "'" + path.string() + "'"; }
-          );
+    IO::Disk::find(sourceDirPath, IO::TraversalMode::Flat, sourcePathMatcher).and_then([&](const auto &pathsToCopy) {
+          const auto pathStrsToCopy = kdl::vec_transform(pathsToCopy, [](const auto &path) { return "'" + path.string() + "'"; });
 
           m_context << "#### Copying to '" << IO::pathAsQString(targetPath) << "/': " << QString::fromStdString(kdl::str_join(pathStrsToCopy, ", ")) << "\n";
           if (!m_context.test()) {
-              return IO::Disk::createDirectory(targetPath).and_then(
-                  [&](auto) {
-                    return kdl::fold_results(
-                        kdl::vec_transform(
-                            pathsToCopy, [&](const auto &pathToCopy) {
-                              return IO::Disk::copyFile(pathToCopy, targetPath);
-                            }
-                        ));
+              return IO::Disk::createDirectory(targetPath).and_then([&](auto) {
+                    return kdl::fold_results(kdl::vec_transform(pathsToCopy, [&](const auto &pathToCopy) {
+                          return IO::Disk::copyFile(pathToCopy, targetPath);
+                        }
+                    ));
                   }
               );
           }
           return Result<void>{};
         }
-    ).transform([&]() { emit end(); }).transform_error(
-        [&](auto e) {
-          m_context << "#### Could not copy '" << IO::pathAsQString(sourcePath) << "' to '" << IO::pathAsQString(targetPath) << "': " << QString::fromStdString(e.msg) << "\n";
+    ).transform([&]() { emit end(); }).transform_error([&](auto e) {
+          m_context << "#### Could not copy '" << IO::pathAsQString(sourcePath) << "' to '" << IO::pathAsQString(targetPath) << "': "
+                    << QString::fromStdString(e.msg) << "\n";
           emit error();
         }
     );
@@ -152,9 +142,9 @@ void CompilationCopyFilesTaskRunner::doExecute() {
 
 void CompilationCopyFilesTaskRunner::doTerminate() {}
 
-CompilationRenameFileTaskRunner::CompilationRenameFileTaskRunner(
-    CompilationContext &context, Model::CompilationRenameFile task
-) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationRenameFileTaskRunner::CompilationRenameFileTaskRunner(CompilationContext &context, Model::CompilationRenameFile task) : CompilationTaskRunner{
+    context
+}, m_task{std::move(task)} {
 }
 
 CompilationRenameFileTaskRunner::~CompilationRenameFileTaskRunner() = default;
@@ -167,9 +157,11 @@ void CompilationRenameFileTaskRunner::doExecute() {
 
     m_context << "#### Renaming '" << IO::pathAsQString(sourcePath) << "' to '" << IO::pathAsQString(targetPath) << "'\n";
     if (!m_context.test()) {
-        IO::Disk::createDirectory(targetPath.parent_path()).and_then([&](auto) { return IO::Disk::moveFile(sourcePath, targetPath); }).transform([&]() { emit end(); }).transform_error(
-            [&](auto e) {
-              m_context << "#### Could not rename '" << IO::pathAsQString(sourcePath) << "' to '" << IO::pathAsQString(targetPath) << "': " << QString::fromStdString(e.msg) << "\n";
+        IO::Disk::createDirectory(targetPath.parent_path()).and_then([&](auto) { return IO::Disk::moveFile(sourcePath, targetPath); }).transform(
+            [&]() { emit end(); }
+        ).transform_error([&](auto e) {
+              m_context << "#### Could not rename '" << IO::pathAsQString(sourcePath) << "' to '" << IO::pathAsQString(targetPath) << "': "
+                        << QString::fromStdString(e.msg) << "\n";
               emit error();
             }
         );
@@ -181,9 +173,9 @@ void CompilationRenameFileTaskRunner::doExecute() {
 
 void CompilationRenameFileTaskRunner::doTerminate() {}
 
-CompilationDeleteFilesTaskRunner::CompilationDeleteFilesTaskRunner(
-    CompilationContext &context, Model::CompilationDeleteFiles task
-) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationDeleteFilesTaskRunner::CompilationDeleteFilesTaskRunner(CompilationContext &context, Model::CompilationDeleteFiles task) : CompilationTaskRunner{
+    context
+}, m_task{std::move(task)} {
 }
 
 CompilationDeleteFilesTaskRunner::~CompilationDeleteFilesTaskRunner() = default;
@@ -193,14 +185,11 @@ void CompilationDeleteFilesTaskRunner::doExecute() {
 
     const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
     const auto targetDirPath = targetPath.parent_path();
-    const auto targetPathMatcher = kdl::lift_and(
-        IO::makePathInfoPathMatcher({IO::PathInfo::File}), IO::makeFilenamePathMatcher(targetPath.filename().string()));
+    const auto targetPathMatcher = kdl::lift_and(IO::makePathInfoPathMatcher({IO::PathInfo::File}),
+        IO::makeFilenamePathMatcher(targetPath.filename().string()));
 
-    IO::Disk::find(targetDirPath, IO::TraversalMode::Recursive, targetPathMatcher).transform(
-        [&](const auto &pathsToDelete) {
-          const auto pathStrsToDelete = kdl::vec_transform(
-              pathsToDelete, [](const auto &path) { return "'" + path.string() + "'"; }
-          );
+    IO::Disk::find(targetDirPath, IO::TraversalMode::Recursive, targetPathMatcher).transform([&](const auto &pathsToDelete) {
+          const auto pathStrsToDelete = kdl::vec_transform(pathsToDelete, [](const auto &path) { return "'" + path.string() + "'"; });
           m_context << "#### Deleting: " << QString::fromStdString(kdl::str_join(pathStrsToDelete, ", ")) << "\n";
 
           if (!m_context.test()) {
@@ -208,8 +197,7 @@ void CompilationDeleteFilesTaskRunner::doExecute() {
           }
           return Result<std::vector<bool>>{std::vector<bool>{}};
         }
-    ).transform([&](auto) { emit end(); }).transform_error(
-        [&](auto e) {
+    ).transform([&](auto) { emit end(); }).transform_error([&](auto e) {
           m_context << "#### Could not delete '" << IO::pathAsQString(targetPath) << "': " << QString::fromStdString(e.msg) << "\n";
           emit error();
         }
@@ -218,9 +206,8 @@ void CompilationDeleteFilesTaskRunner::doExecute() {
 
 void CompilationDeleteFilesTaskRunner::doTerminate() {}
 
-CompilationRunToolTaskRunner::CompilationRunToolTaskRunner(
-    CompilationContext &context, Model::CompilationRunTool task
-) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationRunToolTaskRunner::CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task) : CompilationTaskRunner{context},
+                                                                                                                          m_task{std::move(task)} {
 }
 
 CompilationRunToolTaskRunner::~CompilationRunToolTaskRunner() = default;
@@ -231,12 +218,8 @@ void CompilationRunToolTaskRunner::doExecute() {
 
 void CompilationRunToolTaskRunner::doTerminate() {
     if (m_process) {
-        disconnect(
-            m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred
-        );
-        disconnect(
-            m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished
-        );
+        disconnect(m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred);
+        disconnect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished);
         m_process->kill();
         m_context << "\n\n#### Terminated\n";
     }
@@ -254,18 +237,10 @@ void CompilationRunToolTaskRunner::startProcess() {
 
         if (!m_context.test()) {
             m_process = new QProcess{this};
-            connect(
-                m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred
-            );
-            connect(
-                m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished
-            );
-            connect(
-                m_process, &QProcess::readyReadStandardError, this, &CompilationRunToolTaskRunner::processReadyReadStandardError
-            );
-            connect(
-                m_process, &QProcess::readyReadStandardOutput, this, &CompilationRunToolTaskRunner::processReadyReadStandardOutput
-            );
+            connect(m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred);
+            connect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished);
+            connect(m_process, &QProcess::readyReadStandardError, this, &CompilationRunToolTaskRunner::processReadyReadStandardError);
+            connect(m_process, &QProcess::readyReadStandardOutput, this, &CompilationRunToolTaskRunner::processReadyReadStandardOutput);
 
             m_process->setProcessEnvironment(QProcessEnvironment::systemEnvironment());
             m_process->setWorkingDirectory(QString::fromStdString(workDir));
@@ -296,16 +271,12 @@ std::string CompilationRunToolTaskRunner::cmd() {
     }
 }
 
-void CompilationRunToolTaskRunner::processErrorOccurred(
-    const QProcess::ProcessError processError
-) {
+void CompilationRunToolTaskRunner::processErrorOccurred(const QProcess::ProcessError processError) {
     m_context << "#### Error '" << QMetaEnum::fromType<QProcess::ProcessError>().valueToKey(processError) << "' occurred when communicating with process\n\n";
     emit error();
 }
 
-void CompilationRunToolTaskRunner::processFinished(
-    const int exitCode, const QProcess::ExitStatus exitStatus
-) {
+void CompilationRunToolTaskRunner::processFinished(const int exitCode, const QProcess::ExitStatus exitStatus) {
     switch (exitStatus) {
         case QProcess::NormalExit:
             m_context << "#### Finished with exit code " << exitCode << "\n\n";
@@ -337,44 +308,41 @@ void CompilationRunToolTaskRunner::processReadyReadStandardOutput() {
     }
 }
 
-CompilationRunner::CompilationRunner(
-    CompilationContext context, const Model::CompilationProfile &profile, QObject *parent
-) : QObject{parent}, m_context{std::move(context)}, m_taskRunners{createTaskRunners(m_context, profile)}, m_currentTask{std::end(m_taskRunners)} {
+CompilationRunner::CompilationRunner(CompilationContext context, const Model::CompilationProfile &profile, QObject *parent) : QObject{parent},
+                                                                                                                              m_context{std::move(context)},
+                                                                                                                              m_taskRunners{
+                                                                                                                                  createTaskRunners(m_context,
+                                                                                                                                      profile
+                                                                                                                                  )
+                                                                                                                              }, m_currentTask{
+        std::end(m_taskRunners)
+    } {
 }
 
 CompilationRunner::~CompilationRunner() = default;
 
-CompilationRunner::TaskRunnerList CompilationRunner::createTaskRunners(
-    CompilationContext &context, const Model::CompilationProfile &profile
-) {
+CompilationRunner::TaskRunnerList CompilationRunner::createTaskRunners(CompilationContext &context, const Model::CompilationProfile &profile) {
     auto result = TaskRunnerList{};
     for (const auto &task: profile.tasks) {
-        std::visit(
-            kdl::overload(
-                [&](const Model::CompilationExportMap &exportMap) {
+        std::visit(kdl::overload([&](const Model::CompilationExportMap &exportMap) {
                   if (exportMap.enabled) {
-                      result.push_back(
-                          std::make_unique<CompilationExportMapTaskRunner>(context, exportMap));
+                      result.push_back(std::make_unique<CompilationExportMapTaskRunner>(context, exportMap));
                   }
                 }, [&](const Model::CompilationCopyFiles &copyFiles) {
                   if (copyFiles.enabled) {
-                      result.push_back(
-                          std::make_unique<CompilationCopyFilesTaskRunner>(context, copyFiles));
+                      result.push_back(std::make_unique<CompilationCopyFilesTaskRunner>(context, copyFiles));
                   }
                 }, [&](const Model::CompilationRenameFile &renameFile) {
                   if (renameFile.enabled) {
-                      result.push_back(
-                          std::make_unique<CompilationRenameFileTaskRunner>(context, renameFile));
+                      result.push_back(std::make_unique<CompilationRenameFileTaskRunner>(context, renameFile));
                   }
                 }, [&](const Model::CompilationDeleteFiles &deleteFiles) {
                   if (deleteFiles.enabled) {
-                      result.push_back(
-                          std::make_unique<CompilationDeleteFilesTaskRunner>(context, deleteFiles));
+                      result.push_back(std::make_unique<CompilationDeleteFilesTaskRunner>(context, deleteFiles));
                   }
                 }, [&](const Model::CompilationRunTool &runTool) {
                   if (runTool.enabled) {
-                      result.push_back(
-                          std::make_unique<CompilationRunToolTaskRunner>(context, runTool));
+                      result.push_back(std::make_unique<CompilationRunToolTaskRunner>(context, runTool));
                   }
                 }
             ), task
@@ -394,8 +362,7 @@ void CompilationRunner::execute() {
 
     emit compilationStarted();
 
-    const auto workDir = QString::fromStdString(
-        m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH));
+    const auto workDir = QString::fromStdString(m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH));
     if (!QDir{workDir}.exists()) {
         m_context << "#### Error: working directory '" << workDir << "' does not exist\n";
     }

@@ -168,7 +168,11 @@ private:
 public:
     template<typename FilterT>
     explicit BrushRenderer(const FilterT &filter)
-        : m_filter{std::make_unique<FilterT>(filter)}, m_showEdges{false}, m_grayscale{false}, m_tint{false}, m_showOccludedEdges{false}, m_forceTransparent{false}, m_transparencyAlpha{1.0f}, m_showHiddenBrushes{false} {
+        : m_filter{std::make_unique<FilterT>(filter)}, m_showEdges{false}, m_grayscale{false}, m_tint{
+        false
+    }, m_showOccludedEdges{false}, m_forceTransparent{false}, m_transparencyAlpha{1.0f}, m_showHiddenBrushes{
+        false
+    } {
         clear();
     }
 
@@ -287,9 +291,7 @@ public:
     void validate();
 
 private:
-    bool shouldDrawFaceInTransparentPass(
-        const Model::BrushNode &brushNode, const Model::BrushFace &face
-    ) const;
+    bool shouldDrawFaceInTransparentPass(const Model::BrushNode &brushNode, const Model::BrushFace &face) const;
 
     void validateBrush(const Model::BrushNode &brushNode);
 

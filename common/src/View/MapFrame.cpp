@@ -112,9 +112,13 @@
 namespace TrenchBroom {
 namespace View {
 MapFrame::MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> document)
-    : QMainWindow(), m_frameManager(frameManager), m_document(std::move(document)), m_lastInputTime(std::chrono::system_clock::now()), m_autosaver(std::make_unique<Autosaver>(m_document)), m_autosaveTimer(nullptr), m_toolBar(nullptr), m_hSplitter(nullptr), m_vSplitter(nullptr),
-      m_contextManager(std::make_unique<GLContextManager>()), m_mapView(nullptr), m_currentMapView(nullptr), m_infoPanel(nullptr), m_console(nullptr), m_inspector(nullptr), m_gridChoice(nullptr), m_statusBarLabel(nullptr), m_compilationDialog(nullptr), m_recentDocumentsMenu(nullptr),
-      m_undoAction(nullptr), m_redoAction(nullptr), m_updateTitleSignalDelayer{new SignalDelayer{this}}, m_updateActionStateSignalDelayer{new SignalDelayer{this}}, m_updateStatusBarSignalDelayer{new SignalDelayer{this}} {
+    : QMainWindow(), m_frameManager(frameManager), m_document(std::move(document)), m_lastInputTime(std::chrono::system_clock::now()),
+      m_autosaver(std::make_unique<Autosaver>(m_document)), m_autosaveTimer(nullptr), m_toolBar(nullptr), m_hSplitter(nullptr), m_vSplitter(nullptr),
+      m_contextManager(std::make_unique<GLContextManager>()), m_mapView(nullptr), m_currentMapView(nullptr), m_infoPanel(nullptr), m_console(nullptr),
+      m_inspector(nullptr), m_gridChoice(nullptr), m_statusBarLabel(nullptr), m_compilationDialog(nullptr), m_recentDocumentsMenu(nullptr),
+      m_undoAction(nullptr), m_redoAction(nullptr), m_updateTitleSignalDelayer{
+        new SignalDelayer{this}}, m_updateActionStateSignalDelayer{new SignalDelayer{this}}, m_updateStatusBarSignalDelayer{
+        new SignalDelayer{this}} {
     ensure(m_frameManager != nullptr, "frameManager is null");
     ensure(m_document != nullptr, "document is null");
 
@@ -363,7 +367,9 @@ void MapFrame::createGui() {
     auto *layoutWrapper = new QWidget();
     layoutWrapper->setLayout(frameLayout);
     layoutWrapper->setObjectName("layoutWrapper");
-    layoutWrapper->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
+    layoutWrapper->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     setCentralWidget(layoutWrapper);
 
     restoreWindowState(m_hSplitter);
@@ -375,8 +381,7 @@ private:
     QToolBar &m_toolBar;
 
 public:
-    explicit ToolBarBuilder(QToolBar &toolBar, ActionMap &actions, const TriggerFn &triggerFn
-    ) : MenuBuilderBase(actions, triggerFn), m_toolBar(toolBar) {
+    explicit ToolBarBuilder(QToolBar &toolBar, ActionMap &actions, const TriggerFn &triggerFn) : MenuBuilderBase(actions, triggerFn), m_toolBar(toolBar) {
     }
 
     void visit(const Menu &menu) override { menu.visitEntries(*this); }
@@ -455,8 +460,7 @@ static Model::EntityNodeBase *commonEntityForNodeList(const std::vector<T *> &li
     }
 }
 
-static std::string commonClassnameForEntityList(const std::vector<Model::EntityNode *> &list
-) {
+static std::string commonClassnameForEntityList(const std::vector<Model::EntityNode *> &list) {
     if (list.empty())
         return "";
 
@@ -477,8 +481,7 @@ static std::string commonClassnameForEntityList(const std::vector<Model::EntityN
     }
 }
 
-static std::string numberWithSuffix(size_t count, const std::string &singular, const std::string &plural
-) {
+static std::string numberWithSuffix(size_t count, const std::string &singular, const std::string &plural) {
     return std::to_string(count) + " " + kdl::str_plural(count, singular, plural);
 }
 
@@ -487,7 +490,8 @@ static QString describeSelection(const MapDocument *document) {
 
     QStringList pipeSeparatedSections;
 
-    pipeSeparatedSections << QString::fromStdString(document->game()->gameName()) << QString::fromStdString(Model::formatName(document->world()->mapFormat())) << QString::fromStdString(document->currentLayer()->name());
+    pipeSeparatedSections << QString::fromStdString(document->game()->gameName()) << QString::fromStdString(Model::formatName(document->world()->mapFormat()))
+                          << QString::fromStdString(document->currentLayer()->name());
 
     // open groups
     std::vector<Model::GroupNode *> groups;
@@ -580,7 +584,8 @@ static QString describeSelection(const MapDocument *document) {
 
     // now, turn `tokens` into a comma-separated string
     if (!tokens.empty()) {
-        pipeSeparatedSections << QObject::tr("%1%2 selected").arg(QString::fromStdString(kdl::str_join(tokens, ", ", ", and ", " and "))).arg(layersDescription);
+        pipeSeparatedSections
+            << QObject::tr("%1%2 selected").arg(QString::fromStdString(kdl::str_join(tokens, ", ", ", and ", " and "))).arg(layersDescription);
     }
 
     // count hidden objects
@@ -632,8 +637,7 @@ static QString describeSelection(const MapDocument *document) {
             hiddenDescriptors.push_back(numberWithSuffix(hiddenPatches, "patch", "patches"));
         }
 
-        pipeSeparatedSections << QObject::tr("%1 hidden").arg(QString::fromStdString(kdl::str_join(hiddenDescriptors, ", ", ", and ", " and "
-        )));
+        pipeSeparatedSections << QObject::tr("%1 hidden").arg(QString::fromStdString(kdl::str_join(hiddenDescriptors, ", ", ", and ", " and ")));
     }
 
     return QString::fromLatin1("   ") + pipeSeparatedSections.join(QLatin1String("   |   "));
@@ -655,34 +659,26 @@ void MapFrame::connectObservers() {
     m_notifierConnection += m_document->documentWasNewedNotifier.connect(this, &MapFrame::documentDidChange);
     m_notifierConnection += m_document->documentWasLoadedNotifier.connect(this, &MapFrame::documentDidChange);
     m_notifierConnection += m_document->documentWasSavedNotifier.connect(this, &MapFrame::documentDidChange);
-    m_notifierConnection += m_document->documentModificationStateDidChangeNotifier.connect(this, &MapFrame::documentModificationStateDidChange
-    );
+    m_notifierConnection += m_document->documentModificationStateDidChangeNotifier.connect(this, &MapFrame::documentModificationStateDidChange);
     m_notifierConnection += m_document->transactionDoneNotifier.connect(this, &MapFrame::transactionDone);
     m_notifierConnection += m_document->transactionUndoneNotifier.connect(this, &MapFrame::transactionUndone);
     m_notifierConnection += m_document->selectionDidChangeNotifier.connect(this, &MapFrame::selectionDidChange);
-    m_notifierConnection += m_document->currentLayerDidChangeNotifier.connect(this, &MapFrame::currentLayerDidChange
-    );
+    m_notifierConnection += m_document->currentLayerDidChangeNotifier.connect(this, &MapFrame::currentLayerDidChange);
     m_notifierConnection += m_document->groupWasOpenedNotifier.connect(this, &MapFrame::groupWasOpened);
     m_notifierConnection += m_document->groupWasClosedNotifier.connect(this, &MapFrame::groupWasClosed);
-    m_notifierConnection += m_document->nodeVisibilityDidChangeNotifier.connect(this, &MapFrame::nodeVisibilityDidChange
-    );
-    m_notifierConnection += m_document->editorContextDidChangeNotifier.connect(this, &MapFrame::editorContextDidChange
-    );
+    m_notifierConnection += m_document->nodeVisibilityDidChangeNotifier.connect(this, &MapFrame::nodeVisibilityDidChange);
+    m_notifierConnection += m_document->editorContextDidChangeNotifier.connect(this, &MapFrame::editorContextDidChange);
     m_notifierConnection += m_document->pointFileWasLoadedNotifier.connect(this, &MapFrame::pointFileDidChange);
     m_notifierConnection += m_document->pointFileWasUnloadedNotifier.connect(this, &MapFrame::pointFileDidChange);
     m_notifierConnection += m_document->portalFileWasLoadedNotifier.connect(this, &MapFrame::portalFileDidChange);
-    m_notifierConnection += m_document->portalFileWasUnloadedNotifier.connect(this, &MapFrame::portalFileDidChange
-    );
+    m_notifierConnection += m_document->portalFileWasUnloadedNotifier.connect(this, &MapFrame::portalFileDidChange);
 
     Grid &grid = m_document->grid();
     m_notifierConnection += grid.gridDidChangeNotifier.connect(this, &MapFrame::gridDidChange);
 
-    m_notifierConnection += m_mapView->mapViewToolBox().toolActivatedNotifier.connect(this, &MapFrame::toolActivated
-    );
-    m_notifierConnection += m_mapView->mapViewToolBox().toolDeactivatedNotifier.connect(this, &MapFrame::toolDeactivated
-    );
-    m_notifierConnection += m_mapView->mapViewToolBox().toolHandleSelectionChangedNotifier.connect(this, &MapFrame::toolHandleSelectionChanged
-    );
+    m_notifierConnection += m_mapView->mapViewToolBox().toolActivatedNotifier.connect(this, &MapFrame::toolActivated);
+    m_notifierConnection += m_mapView->mapViewToolBox().toolDeactivatedNotifier.connect(this, &MapFrame::toolDeactivated);
+    m_notifierConnection += m_mapView->mapViewToolBox().toolHandleSelectionChangedNotifier.connect(this, &MapFrame::toolHandleSelectionChanged);
 }
 
 void MapFrame::documentWasCleared(View::MapDocument *) {
@@ -787,8 +783,7 @@ void MapFrame::portalFileDidChange() {
 void MapFrame::bindEvents() {
     connect(m_autosaveTimer, &QTimer::timeout, this, &MapFrame::triggerAutosave);
     connect(qApp, &QApplication::focusChanged, this, &MapFrame::focusChange);
-    connect(m_gridChoice, QOverload<int>::of(&QComboBox::activated), this, [this](const int index) { setGridSize(index + Grid::MinSize); }
-    );
+    connect(m_gridChoice, QOverload<int>::of(&QComboBox::activated), this, [this](const int index) { setGridSize(index + Grid::MinSize); });
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, [this]() {
           // update the "Paste" menu items
           this->updateActionState();
@@ -800,24 +795,19 @@ void MapFrame::bindEvents() {
         }
     );
 
-    connect(m_updateTitleSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateTitle
-    );
-    connect(m_updateActionStateSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateActionState
-    );
-    connect(m_updateStatusBarSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateStatusBar
-    );
+    connect(m_updateTitleSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateTitle);
+    connect(m_updateActionStateSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateActionState);
+    connect(m_updateStatusBarSignalDelayer, &SignalDelayer::processSignal, this, &MapFrame::updateStatusBar);
 }
 
-Result<bool> MapFrame::newDocument(std::shared_ptr<Model::Game> game, const Model::MapFormat mapFormat
-) {
+Result<bool> MapFrame::newDocument(std::shared_ptr<Model::Game> game, const Model::MapFormat mapFormat) {
     if (!confirmOrDiscardChanges() || !closeCompileDialog()) {
         return false;
     }
     return m_document->newDocument(mapFormat, MapDocument::DefaultWorldBounds, game).transform([]() { return true; });
 }
 
-Result<bool> MapFrame::openDocument(std::shared_ptr<Model::Game> game, const Model::MapFormat mapFormat, const std::filesystem::path &path
-) {
+Result<bool> MapFrame::openDocument(std::shared_ptr<Model::Game> game, const Model::MapFormat mapFormat, const std::filesystem::path &path) {
     if (!confirmOrDiscardChanges() || !closeCompileDialog()) {
         return false;
     }
@@ -825,8 +815,8 @@ Result<bool> MapFrame::openDocument(std::shared_ptr<Model::Game> game, const Mod
     return m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform([&]() {
           const auto endTime = std::chrono::high_resolution_clock::now();
 
-          logger().info() << "Loaded " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime
-          ).count() << "ms";
+          logger().info() << "Loaded " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()
+                          << "ms";
 
           return true;
         }
@@ -840,16 +830,15 @@ bool MapFrame::saveDocument() {
             m_document->saveDocument();
             const auto endTime = std::chrono::high_resolution_clock::now();
 
-            logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime
-            ).count() << "ms";
+            logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()
+                            << "ms";
             return true;
         }
         else {
             return saveDocumentAs();
         }
     } catch (...) {
-        QMessageBox::critical(this, "", QString::fromStdString("Unknown error while saving " + m_document->path().string()), QMessageBox::Ok
-        );
+        QMessageBox::critical(this, "", QString::fromStdString("Unknown error while saving " + m_document->path().string()), QMessageBox::Ok);
         return false;
     }
 }
@@ -860,8 +849,7 @@ bool MapFrame::saveDocumentAs() {
         const auto directory = originalPath.parent_path();
         const auto fileName = originalPath.filename();
 
-        const QString newFileName = QFileDialog::getSaveFileName(this, tr("Save map file"), IO::pathAsQString(originalPath), "Map files (*.map)"
-        );
+        const QString newFileName = QFileDialog::getSaveFileName(this, tr("Save map file"), IO::pathAsQString(originalPath), "Map files (*.map)");
         if (newFileName.isEmpty()) {
             return false;
         }
@@ -872,12 +860,11 @@ bool MapFrame::saveDocumentAs() {
         m_document->saveDocumentAs(path);
         const auto endTime = std::chrono::high_resolution_clock::now();
 
-        logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime
-        ).count() << "ms";
+        logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()
+                        << "ms";
         return true;
     } catch (...) {
-        QMessageBox::critical(this, "", QString::fromStdString("Unknown error while saving " + m_document->filename()), QMessageBox::Ok
-        );
+        QMessageBox::critical(this, "", QString::fromStdString("Unknown error while saving " + m_document->filename()), QMessageBox::Ok);
         return false;
     }
 }
@@ -887,7 +874,8 @@ void MapFrame::revertDocument() {
         const auto mapFormat = m_document->world()->mapFormat();
         const auto game = m_document->game();
         const auto path = m_document->path();
-        m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform_error([&](auto e) { m_document->error() << "Failed to rever document: " << e.msg; }
+        m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform_error(
+            [&](auto e) { m_document->error() << "Failed to rever document: " << e.msg; }
         );
     }
 }
@@ -904,8 +892,7 @@ bool MapFrame::exportDocumentAsObj() {
 bool MapFrame::exportDocumentAsMap() {
     const auto &originalPath = m_document->path();
 
-    const QString newFileName = QFileDialog::getSaveFileName(this, tr("Export Map file"), IO::pathAsQString(originalPath), "Map files (*.map)"
-    );
+    const QString newFileName = QFileDialog::getSaveFileName(this, tr("Export Map file"), IO::pathAsQString(originalPath), "Map files (*.map)");
     if (newFileName.isEmpty()) {
         return false;
     }
@@ -943,8 +930,9 @@ bool MapFrame::exportDocument(const IO::ExportOptions &options) {
 bool MapFrame::confirmOrDiscardChanges() {
     if (!m_document->modified())
         return true;
-    const QMessageBox::StandardButton result = QMessageBox::question(this, "TrenchBroom", QString::fromStdString(m_document->filename() + " has been modified. Do you want to save the changes?"
-        ), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+    const QMessageBox::StandardButton result = QMessageBox::question(this, "TrenchBroom",
+        QString::fromStdString(m_document->filename() + " has been modified. Do you want to save the changes?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
     );
 
 #ifdef __clang__
@@ -993,8 +981,7 @@ void MapFrame::loadPointFile() {
         defaultDir = IO::pathAsQString(m_document->path().parent_path());
     }
 
-    const QString fileName = QFileDialog::getOpenFileName(this, tr("Load Point File"), defaultDir, "Point files (*.pts *.lin);;Any files (*.*)"
-    );
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Load Point File"), defaultDir, "Point files (*.pts *.lin);;Any files (*.*)");
 
     if (!fileName.isEmpty()) {
         m_document->loadPointFile(IO::pathFromQString(fileName));
@@ -1026,8 +1013,7 @@ void MapFrame::loadPortalFile() {
         defaultDir = IO::pathAsQString(m_document->path().parent_path());
     }
 
-    const QString fileName = QFileDialog::getOpenFileName(this, tr("Load Portal File"), defaultDir, "Portal files (*.prt);;Any files (*.*)"
-    );
+    const QString fileName = QFileDialog::getOpenFileName(this, tr("Load Portal File"), defaultDir, "Portal files (*.prt);;Any files (*.*)");
 
     if (!fileName.isEmpty()) {
         m_document->loadPortalFile(IO::pathFromQString(fileName));
@@ -1275,8 +1261,7 @@ void MapFrame::selectTall() {
 
 void MapFrame::selectByLineNumber() {
     if (canSelect()) {
-        const auto string = QInputDialog::getText(this, "Select by Line Numbers", "Enter a comma- or space separated list of line numbers."
-        );
+        const auto string = QInputDialog::getText(this, "Select by Line Numbers", "Enter a comma- or space separated list of line numbers.");
         if (string.isEmpty()) {
             return;
         }
@@ -1518,8 +1503,11 @@ void MapFrame::csgConvexMerge() {
 }
 
 bool MapFrame::canDoCsgConvexMerge() const {
-    return (m_document->hasSelectedBrushFaces() && m_document->selectedBrushFaces().size() > 1) || (m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() > 1) || (m_mapView->vertexToolActive() && m_mapView->vertexTool().canDoCsgConvexMerge()) ||
-           (m_mapView->edgeToolActive() && m_mapView->edgeTool().canDoCsgConvexMerge()) || (m_mapView->faceToolActive() && m_mapView->faceTool().canDoCsgConvexMerge());
+    return (m_document->hasSelectedBrushFaces() && m_document->selectedBrushFaces().size() > 1) ||
+           (m_document->selectedNodes().hasOnlyBrushes() && m_document->selectedNodes().brushCount() > 1) ||
+           (m_mapView->vertexToolActive() && m_mapView->vertexTool().canDoCsgConvexMerge()) ||
+           (m_mapView->edgeToolActive() && m_mapView->edgeTool().canDoCsgConvexMerge()) ||
+           (m_mapView->faceToolActive() && m_mapView->faceTool().canDoCsgConvexMerge());
 }
 
 void MapFrame::csgSubtract() {
@@ -1646,8 +1634,7 @@ bool MapFrame::canFocusCamera() const {
 
 void MapFrame::moveCameraToPosition() {
     bool ok = false;
-    const QString str = QInputDialog::getText(this, "Move Camera", "Enter a position (x y z) for the camera.", QLineEdit::Normal, "0.0 0.0 0.0", &ok
-    );
+    const QString str = QInputDialog::getText(this, "Move Camera", "Enter a position (x y z) for the camera.", QLineEdit::Normal, "0.0 0.0 0.0", &ok);
     if (ok) {
         if (const auto position = vm::parse<float, 3>(str.toStdString())) {
             m_mapView->moveCameraToPosition(*position, true);
@@ -1773,8 +1760,7 @@ void MapFrame::debugPrintVertices() {
 
 void MapFrame::debugCreateBrush() {
     bool ok = false;
-    const QString str = QInputDialog::getText(this, "Create Brush", "Enter a list of at least 4 points (x y z) (x y z) ...", QLineEdit::Normal, "", &ok
-    );
+    const QString str = QInputDialog::getText(this, "Create Brush", "Enter a list of at least 4 points (x y z) (x y z) ...", QLineEdit::Normal, "", &ok);
     if (ok) {
         std::vector<vm::vec3> positions;
         vm::parse_all<FloatType, 3>(str.toStdString(), std::back_inserter(positions));
@@ -1784,8 +1770,7 @@ void MapFrame::debugCreateBrush() {
 
 void MapFrame::debugCreateCube() {
     bool ok = false;
-    const QString str = QInputDialog::getText(this, "Create Cube", "Enter bounding box size", QLineEdit::Normal, "", &ok
-    );
+    const QString str = QInputDialog::getText(this, "Create Cube", "Enter bounding box size", QLineEdit::Normal, "", &ok);
     if (ok) {
         const double size = str.toDouble();
         const vm::bbox3 bounds(size / 2.0);
@@ -1797,8 +1782,7 @@ void MapFrame::debugCreateCube() {
 
 void MapFrame::debugClipBrush() {
     bool ok = false;
-    const QString str = QInputDialog::getText(this, "Clip Brush", "Enter face points ( x y z ) ( x y z ) ( x y z )", QLineEdit::Normal, "", &ok
-    );
+    const QString str = QInputDialog::getText(this, "Clip Brush", "Enter face points ( x y z ) ( x y z ) ( x y z )", QLineEdit::Normal, "", &ok);
     if (ok) {
         std::vector<vm::vec3> points;
         vm::parse_all<FloatType, 3>(str.toStdString(), std::back_inserter(points));
@@ -1850,8 +1834,7 @@ void MapFrame::debugThrowExceptionDuringCommand() {
 
 void MapFrame::debugSetWindowSize() {
     bool ok = false;
-    const QString str = QInputDialog::getText(this, "Window Size", "Enter Size (W H)", QLineEdit::Normal, "1920 1080", &ok
-    );
+    const QString str = QInputDialog::getText(this, "Window Size", "Enter Size (W H)", QLineEdit::Normal, "1920 1080", &ok);
     if (ok) {
         if (const auto size = vm::parse<int, 2>(str.toStdString())) {
             resize(size->x(), size->y());
@@ -1927,18 +1910,17 @@ static void applyRecursively(QObject *object, const F &f) {
 }
 
 bool MapFrame::eventFilter(QObject *target, QEvent *event) {
-    if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::MouseButtonDblClick || event->type() == QEvent::MouseMove || event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+    if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::MouseButtonDblClick ||
+        event->type() == QEvent::MouseMove || event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
         m_lastInputTime = std::chrono::system_clock::now();
     }
     else if (event->type() == QEvent::ChildAdded) {
         auto *childEvent = static_cast<QChildEvent *>(event);
-        applyRecursively(childEvent->child(), [&](auto *object) { object->installEventFilter(this); }
-        );
+        applyRecursively(childEvent->child(), [&](auto *object) { object->installEventFilter(this); });
     }
     else if (event->type() == QEvent::ChildRemoved) {
         auto *childEvent = static_cast<QChildEvent *>(event);
-        applyRecursively(childEvent->child(), [&](auto *object) { object->removeEventFilter(this); }
-        );
+        applyRecursively(childEvent->child(), [&](auto *object) { object->removeEventFilter(this); });
     }
     return QMainWindow::eventFilter(target, event);
 }
@@ -1955,12 +1937,21 @@ void MapFrame::triggerAutosave() {
 DebugPaletteWindow::DebugPaletteWindow(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Palette"));
 
-    const auto roles = std::vector<std::pair<QPalette::ColorRole, QString>>{{QPalette::Window, "Window"}, {QPalette::WindowText, "WindowText"}, {QPalette::Base, "Base"}, {QPalette::AlternateBase, "AlternateBase"}, {QPalette::ToolTipBase, "ToolTipBase"}, {QPalette::ToolTipText, "ToolTipText"},
+    const auto roles = std::vector<std::pair<QPalette::ColorRole, QString>>{{QPalette::Window, "Window"}, {QPalette::WindowText, "WindowText"},
+                                                                            {QPalette::Base, "Base"}, {QPalette::AlternateBase, "AlternateBase"},
+                                                                            {QPalette::ToolTipBase, "ToolTipBase"}, {QPalette::ToolTipText, "ToolTipText"},
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-                                                                            {QPalette::PlaceholderText, "PlaceholderText"},
+                                                                            {
+                                                                                QPalette::PlaceholderText, "PlaceholderText"
+                                                                            },
 #endif
-                                                                            {QPalette::Text, "Text"}, {QPalette::Button, "Button"}, {QPalette::ButtonText, "ButtonText"}, {QPalette::BrightText, "BrightText"}, {QPalette::Light, "Light"}, {QPalette::Midlight, "Midlight"}, {QPalette::Dark, "Dark"},
-                                                                            {QPalette::Mid, "Mid"}, {QPalette::Shadow, "Shadow"}, {QPalette::Highlight, "Highlight"}, {QPalette::HighlightedText, "HighlightedText"}};
+                                                                            {QPalette::Text, "Text"}, {QPalette::Button, "Button"},
+                                                                            {QPalette::ButtonText, "ButtonText"}, {QPalette::BrightText, "BrightText"},
+                                                                            {QPalette::Light, "Light"}, {QPalette::Midlight, "Midlight"},
+                                                                            {QPalette::Dark, "Dark"}, {QPalette::Mid, "Mid"}, {QPalette::Shadow, "Shadow"},
+                                                                            {QPalette::Highlight, "Highlight"}, {
+                                                                                QPalette::HighlightedText, "HighlightedText"
+                                                                            }};
 
     const auto groups = std::vector<std::pair<QPalette::ColorGroup, QString>>{{QPalette::Disabled, "Disabled"},
                                                                               {QPalette::Active,   "Active"},

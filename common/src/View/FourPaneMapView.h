@@ -60,16 +60,14 @@ private:
     MapView2D *m_mapViewYZ = nullptr;
 
 public:
-    FourPaneMapView(
-        std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger, QWidget *parent = nullptr
+    FourPaneMapView(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager,
+        Logger *logger, QWidget *parent = nullptr
     );
 
     ~FourPaneMapView() override;
 
 private:
-    void createGui(
-        MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager
-    );
+    void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager);
 
 private: // event handlers
     void onSplitterMoved(int pos, int index);

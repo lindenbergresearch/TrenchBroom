@@ -123,14 +123,23 @@ public:
         // Render all edges if only one face is visible.
         renderEdges |= anyFaceVisible;
 
-        return {renderFaces ? FaceRenderPolicy::RenderMarked : FaceRenderPolicy::RenderNone, renderEdges ? EdgeRenderPolicy::RenderAll : EdgeRenderPolicy::RenderNone};
+        return {
+            renderFaces ? FaceRenderPolicy::RenderMarked : FaceRenderPolicy::RenderNone,
+            renderEdges ? EdgeRenderPolicy::RenderAll : EdgeRenderPolicy::RenderNone
+        };
     }
 };
 } // namespace
 
-MapRenderer::MapRenderer(std::weak_ptr<View::MapDocument> document) : m_document{std::move(document)}, m_defaultRenderer{createDefaultRenderer(m_document)}, m_selectionRenderer{createSelectionRenderer(m_document)},
-                                                                      m_lockedRenderer{createLockRenderer(m_document)}, m_entityLinkRenderer{std::make_unique<EntityLinkRenderer>(m_document)},
-                                                                      m_groupLinkRenderer{std::make_unique<GroupLinkRenderer>(m_document)} {
+MapRenderer::MapRenderer(std::weak_ptr<View::MapDocument> document) : m_document{
+    std::move(document)
+}, m_defaultRenderer{createDefaultRenderer(m_document)}, m_selectionRenderer{
+    createSelectionRenderer(m_document)
+}, m_lockedRenderer{createLockRenderer(m_document)}, m_entityLinkRenderer{
+    std::make_unique<EntityLinkRenderer>(m_document)
+}, m_groupLinkRenderer{
+    std::make_unique<GroupLinkRenderer>(m_document)
+} {
     connectObservers();
     setupRenderers();
 }
@@ -139,27 +148,27 @@ MapRenderer::~MapRenderer() {
     clear();
 }
 
-std::unique_ptr<ObjectRenderer> MapRenderer::createDefaultRenderer(
-    std::weak_ptr<View::MapDocument> document
-) {
-    return std::make_unique<ObjectRenderer>(
-        *kdl::mem_lock(document), kdl::mem_lock(document)->entityModelManager(), kdl::mem_lock(document)->editorContext(), UnselectedBrushRendererFilter{kdl::mem_lock(document)->editorContext()}
+std::unique_ptr<ObjectRenderer> MapRenderer::createDefaultRenderer(std::weak_ptr<View::MapDocument> document) {
+    return std::make_unique<ObjectRenderer>(*kdl::mem_lock(document), kdl::mem_lock(document)->entityModelManager(), kdl::mem_lock(document)->editorContext(),
+        UnselectedBrushRendererFilter{
+            kdl::mem_lock(document)->editorContext()
+        }
     );
 }
 
-std::unique_ptr<ObjectRenderer> MapRenderer::createSelectionRenderer(
-    std::weak_ptr<View::MapDocument> document
-) {
-    return std::make_unique<ObjectRenderer>(
-        *kdl::mem_lock(document), kdl::mem_lock(document)->entityModelManager(), kdl::mem_lock(document)->editorContext(), SelectedBrushRendererFilter{kdl::mem_lock(document)->editorContext()}
+std::unique_ptr<ObjectRenderer> MapRenderer::createSelectionRenderer(std::weak_ptr<View::MapDocument> document) {
+    return std::make_unique<ObjectRenderer>(*kdl::mem_lock(document), kdl::mem_lock(document)->entityModelManager(), kdl::mem_lock(document)->editorContext(),
+        SelectedBrushRendererFilter{
+            kdl::mem_lock(document)->editorContext()
+        }
     );
 }
 
-std::unique_ptr<ObjectRenderer> MapRenderer::createLockRenderer(
-    std::weak_ptr<View::MapDocument> document
-) {
-    return std::make_unique<ObjectRenderer>(
-        *kdl::mem_lock(document), kdl::mem_lock(document)->entityModelManager(), kdl::mem_lock(document)->editorContext(), LockedBrushRendererFilter{kdl::mem_lock(document)->editorContext()}
+std::unique_ptr<ObjectRenderer> MapRenderer::createLockRenderer(std::weak_ptr<View::MapDocument> document) {
+    return std::make_unique<ObjectRenderer>(*kdl::mem_lock(document), kdl::mem_lock(document)->entityModelManager(), kdl::mem_lock(document)->editorContext(),
+        LockedBrushRendererFilter{
+            kdl::mem_lock(document)->editorContext()
+        }
     );
 }
 
@@ -222,53 +231,39 @@ void MapRenderer::setupGL(RenderBatch &renderBatch) {
     renderBatch.addOneShot(new SetupGL{});
 }
 
-void MapRenderer::renderDefaultOpaque(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderDefaultOpaque(RenderContext &renderContext, RenderBatch &renderBatch) {
     m_defaultRenderer->setShowOverlays(renderContext.render3D());
     m_defaultRenderer->renderOpaque(renderContext, renderBatch);
 }
 
-void MapRenderer::renderDefaultTransparent(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderDefaultTransparent(RenderContext &renderContext, RenderBatch &renderBatch) {
     m_defaultRenderer->setShowOverlays(renderContext.render3D());
     m_defaultRenderer->renderTransparent(renderContext, renderBatch);
 }
 
-void MapRenderer::renderSelectionOpaque(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderSelectionOpaque(RenderContext &renderContext, RenderBatch &renderBatch) {
     if (!renderContext.hideSelection()) {
         m_selectionRenderer->renderOpaque(renderContext, renderBatch);
     }
 }
 
-void MapRenderer::renderSelectionTransparent(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderSelectionTransparent(RenderContext &renderContext, RenderBatch &renderBatch) {
     if (!renderContext.hideSelection()) {
         m_selectionRenderer->renderTransparent(renderContext, renderBatch);
     }
 }
 
-void MapRenderer::renderLockedOpaque(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderLockedOpaque(RenderContext &renderContext, RenderBatch &renderBatch) {
     m_lockedRenderer->setShowOverlays(renderContext.render3D());
     m_lockedRenderer->renderOpaque(renderContext, renderBatch);
 }
 
-void MapRenderer::renderLockedTransparent(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderLockedTransparent(RenderContext &renderContext, RenderBatch &renderBatch) {
     m_lockedRenderer->setShowOverlays(renderContext.render3D());
     m_lockedRenderer->renderTransparent(renderContext, renderBatch);
 }
 
-void MapRenderer::renderEntityLinks(
-    RenderContext &renderContext, RenderBatch &renderBatch
-) {
+void MapRenderer::renderEntityLinks(RenderContext &renderContext, RenderBatch &renderBatch) {
     m_entityLinkRenderer->render(renderContext, renderBatch);
 }
 
@@ -299,13 +294,10 @@ void MapRenderer::setupDefaultRenderer(ObjectRenderer &renderer) {
 void MapRenderer::setupSelectionRenderer(ObjectRenderer &renderer) {
     renderer.setEntityOverlayTextColor(pref(Preferences::SelectedInfoOverlayTextColor));
     renderer.setGroupOverlayTextColor(pref(Preferences::SelectedInfoOverlayTextColor));
-    renderer.setOverlayBackgroundColor(
-        pref(Preferences::SelectedInfoOverlayBackgroundColor));
+    renderer.setOverlayBackgroundColor(pref(Preferences::SelectedInfoOverlayBackgroundColor));
     renderer.setShowBrushEdges(true);
     renderer.setShowOccludedObjects(true);
-    renderer.setOccludedEdgeColor(
-        Color(
-            pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
+    renderer.setOccludedEdgeColor(Color(pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
     renderer.setTint(true);
     renderer.setTintColor(pref(Preferences::SelectedFaceColor));
 
@@ -348,50 +340,48 @@ static bool selected(const Model::Node *node) {
 int MapRenderer::determineDesiredRenderers(Model::Node *node) {
     int result = 0;
 
-    node->accept(
-        kdl::overload(
-            [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) {
-              if (group->locked()) {
-                  result = static_cast<int>(Renderer::Locked);
-              }
-              else if (selected(group) || group->opened()) {
-                  result = static_cast<int>(Renderer::Selection);
-              }
-              else {
-                  result = static_cast<int>(Renderer::Default);
-              }
-            }, [&](Model::EntityNode *entity) {
-              if (entity->locked()) {
-                  result = static_cast<int>(Renderer::Locked);
-              }
-              else if (selected(entity)) {
-                  result = static_cast<int>(Renderer::Selection);
-              }
-              else {
-                  result = static_cast<int>(Renderer::Default);
-              }
-            }, [&](Model::BrushNode *brush) {
-              if (brush->locked()) {
-                  result = static_cast<int>(Renderer::Locked);
-              }
-              else if (selected(brush) || brush->hasSelectedFaces()) {
-                  result = static_cast<int>(Renderer::Selection);
-              }
-              if (!brush->selected() && !brush->parentSelected() && !brush->locked()) {
-                  result |= static_cast<int>(Renderer::Default);
-              }
-            }, [&](Model::PatchNode *patchNode) {
-              if (patchNode->locked()) {
-                  result = static_cast<int>(Renderer::Locked);
-              }
-              else if (selected(patchNode)) {
-                  result = static_cast<int>(Renderer::Selection);
-              }
-              if (!patchNode->selected() && !patchNode->parentSelected() && !patchNode->locked()) {
-                  result |= static_cast<int>(Renderer::Default);
-              }
-            }
-        ));
+    node->accept(kdl::overload([](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [&](Model::GroupNode *group) {
+          if (group->locked()) {
+              result = static_cast<int>(Renderer::Locked);
+          }
+          else if (selected(group) || group->opened()) {
+              result = static_cast<int>(Renderer::Selection);
+          }
+          else {
+              result = static_cast<int>(Renderer::Default);
+          }
+        }, [&](Model::EntityNode *entity) {
+          if (entity->locked()) {
+              result = static_cast<int>(Renderer::Locked);
+          }
+          else if (selected(entity)) {
+              result = static_cast<int>(Renderer::Selection);
+          }
+          else {
+              result = static_cast<int>(Renderer::Default);
+          }
+        }, [&](Model::BrushNode *brush) {
+          if (brush->locked()) {
+              result = static_cast<int>(Renderer::Locked);
+          }
+          else if (selected(brush) || brush->hasSelectedFaces()) {
+              result = static_cast<int>(Renderer::Selection);
+          }
+          if (!brush->selected() && !brush->parentSelected() && !brush->locked()) {
+              result |= static_cast<int>(Renderer::Default);
+          }
+        }, [&](Model::PatchNode *patchNode) {
+          if (patchNode->locked()) {
+              result = static_cast<int>(Renderer::Locked);
+          }
+          else if (selected(patchNode)) {
+              result = static_cast<int>(Renderer::Selection);
+          }
+          if (!patchNode->selected() && !patchNode->parentSelected() && !patchNode->locked()) {
+              result |= static_cast<int>(Renderer::Default);
+          }
+        }
+    ));
     return result;
 }
 
@@ -433,16 +423,15 @@ void MapRenderer::updateAndInvalidateNode(Model::Node *node) {
 }
 
 void MapRenderer::updateAndInvalidateNodeRecursive(Model::Node *node) {
-    node->accept(
-        kdl::overload(
-            [](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); }, [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); }, [&](auto &&thisLambda, Model::GroupNode *group) {
-              updateAndInvalidateNode(group);
-              group->visitChildren(thisLambda);
-            }, [&](auto &&thisLambda, Model::EntityNode *entity) {
-              updateAndInvalidateNode(entity);
-              entity->visitChildren(thisLambda);
-            }, [&](Model::BrushNode *brush) { updateAndInvalidateNode(brush); }, [&](Model::PatchNode *patchNode) { updateAndInvalidateNode(patchNode); }
-        ));
+    node->accept(kdl::overload([](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); },
+        [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); }, [&](auto &&thisLambda, Model::GroupNode *group) {
+          updateAndInvalidateNode(group);
+          group->visitChildren(thisLambda);
+        }, [&](auto &&thisLambda, Model::EntityNode *entity) {
+          updateAndInvalidateNode(entity);
+          entity->visitChildren(thisLambda);
+        }, [&](Model::BrushNode *brush) { updateAndInvalidateNode(brush); }, [&](Model::PatchNode *patchNode) { updateAndInvalidateNode(patchNode); }
+    ));
 
     // Due to the definition of `selected()` above, we also need to update the parent.
     // (not recursively, though, so this has little performance impact.)
@@ -476,16 +465,15 @@ void MapRenderer::removeNode(Model::Node *node) {
 }
 
 void MapRenderer::removeNodeRecursive(Model::Node *node) {
-    node->accept(
-        kdl::overload(
-            [](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); }, [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); }, [&](auto &&thisLambda, Model::GroupNode *group) {
-              removeNode(group);
-              group->visitChildren(thisLambda);
-            }, [&](auto &&thisLambda, Model::EntityNode *entity) {
-              removeNode(entity);
-              entity->visitChildren(thisLambda);
-            }, [&](Model::BrushNode *brush) { removeNode(brush); }, [&](Model::PatchNode *patchNode) { removeNode(patchNode); }
-        ));
+    node->accept(kdl::overload([](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); },
+        [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); }, [&](auto &&thisLambda, Model::GroupNode *group) {
+          removeNode(group);
+          group->visitChildren(thisLambda);
+        }, [&](auto &&thisLambda, Model::EntityNode *entity) {
+          removeNode(entity);
+          entity->visitChildren(thisLambda);
+        }, [&](Model::BrushNode *brush) { removeNode(brush); }, [&](Model::PatchNode *patchNode) { removeNode(patchNode); }
+    ));
 }
 
 /**
@@ -531,37 +519,21 @@ void MapRenderer::connectObservers() {
     auto document = kdl::mem_lock(m_document);
 
     m_notifierConnection += document->documentWasClearedNotifier.connect(this, &MapRenderer::documentWasCleared);
-    m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &MapRenderer::documentWasNewedOrLoaded
-    );
-    m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &MapRenderer::documentWasNewedOrLoaded
-    );
+    m_notifierConnection += document->documentWasNewedNotifier.connect(this, &MapRenderer::documentWasNewedOrLoaded);
+    m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &MapRenderer::documentWasNewedOrLoaded);
     m_notifierConnection += document->nodesWereAddedNotifier.connect(this, &MapRenderer::nodesWereAdded);
     m_notifierConnection += document->nodesWereRemovedNotifier.connect(this, &MapRenderer::nodesWereRemoved);
     m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &MapRenderer::nodesDidChange);
-    m_notifierConnection += document->nodeVisibilityDidChangeNotifier.connect(
-        this, &MapRenderer::nodeVisibilityDidChange
-    );
-    m_notifierConnection += document->nodeLockingDidChangeNotifier.connect(
-        this, &MapRenderer::nodeLockingDidChange
-    );
+    m_notifierConnection += document->nodeVisibilityDidChangeNotifier.connect(this, &MapRenderer::nodeVisibilityDidChange);
+    m_notifierConnection += document->nodeLockingDidChangeNotifier.connect(this, &MapRenderer::nodeLockingDidChange);
     m_notifierConnection += document->groupWasOpenedNotifier.connect(this, &MapRenderer::groupWasOpened);
     m_notifierConnection += document->groupWasClosedNotifier.connect(this, &MapRenderer::groupWasClosed);
-    m_notifierConnection += document->brushFacesDidChangeNotifier.connect(
-        this, &MapRenderer::brushFacesDidChange
-    );
+    m_notifierConnection += document->brushFacesDidChangeNotifier.connect(this, &MapRenderer::brushFacesDidChange);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &MapRenderer::selectionDidChange);
-    m_notifierConnection += document->textureCollectionsWillChangeNotifier.connect(
-        this, &MapRenderer::textureCollectionsWillChange
-    );
-    m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(
-        this, &MapRenderer::entityDefinitionsDidChange
-    );
+    m_notifierConnection += document->textureCollectionsWillChangeNotifier.connect(this, &MapRenderer::textureCollectionsWillChange);
+    m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(this, &MapRenderer::entityDefinitionsDidChange);
     m_notifierConnection += document->modsDidChangeNotifier.connect(this, &MapRenderer::modsDidChange);
-    m_notifierConnection += document->editorContextDidChangeNotifier.connect(
-        this, &MapRenderer::editorContextDidChange
-    );
+    m_notifierConnection += document->editorContextDidChangeNotifier.connect(this, &MapRenderer::editorContextDidChange);
 
     auto &prefs = PreferenceManager::instance();
     m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &MapRenderer::preferenceDidChange);

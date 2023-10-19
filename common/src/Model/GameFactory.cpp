@@ -58,11 +58,8 @@ GameFactory &GameFactory::instance() {
     return instance;
 }
 
-Result<std::vector<std::string>> GameFactory::initialize(
-    const GamePathConfig &gamePathConfig
-) {
-    return initializeFileSystem(gamePathConfig).and_then(
-        [&]() {
+Result<std::vector<std::string>> GameFactory::initialize(const GamePathConfig &gamePathConfig) {
+    return initializeFileSystem(gamePathConfig).and_then([&]() {
           return loadGameConfigs();
         }
     );
@@ -78,16 +75,12 @@ void GameFactory::reset() {
     m_defaultEngines.clear();
 }
 
-void GameFactory::saveGameEngineConfig(
-    const std::string &gameName, const GameEngineConfig &gameEngineConfig, Logger &logger
-) {
+void GameFactory::saveGameEngineConfig(const std::string &gameName, const GameEngineConfig &gameEngineConfig, Logger &logger) {
     auto &config = gameConfig(gameName);
     writeGameEngineConfig(config, gameEngineConfig, logger);
 }
 
-void GameFactory::saveCompilationConfig(
-    const std::string &gameName, const CompilationConfig &compilationConfig, Logger &logger
-) {
+void GameFactory::saveCompilationConfig(const std::string &gameName, const CompilationConfig &compilationConfig, Logger &logger) {
     auto &config = gameConfig(gameName);
     writeCompilationConfig(config, compilationConfig, logger);
 }
@@ -105,9 +98,7 @@ std::shared_ptr<Game> GameFactory::createGame(const std::string &gameName, Logge
 }
 
 std::vector<std::string> GameFactory::fileFormats(const std::string &gameName) const {
-    return kdl::vec_transform(
-        gameConfig(gameName).fileFormats, [](const auto &format) { return format.format; }
-    );
+    return kdl::vec_transform(gameConfig(gameName).fileFormats, [](const auto &format) { return format.format; });
 }
 
 std::filesystem::path GameFactory::iconPath(const std::string &gameName) const {
@@ -124,9 +115,7 @@ std::filesystem::path GameFactory::gamePath(const std::string &gameName) const {
     return PreferenceManager::instance().get(pref);
 }
 
-bool GameFactory::setGamePath(
-    const std::string &gameName, const std::filesystem::path &gamePath
-) {
+bool GameFactory::setGamePath(const std::string &gameName, const std::filesystem::path &gamePath) {
     const auto it = m_gamePaths.find(gameName);
     if (it == std::end(m_gamePaths)) {
         throw GameException{"Unknown game: " + gameName};
@@ -135,9 +124,7 @@ bool GameFactory::setGamePath(
     return PreferenceManager::instance().set(pref, gamePath);
 }
 
-bool GameFactory::isGamePathPreference(
-    const std::string &gameName, const std::filesystem::path &prefPath
-) const {
+bool GameFactory::isGamePathPreference(const std::string &gameName, const std::filesystem::path &prefPath) const {
     const auto it = m_gamePaths.find(gameName);
     if (it == std::end(m_gamePaths)) {
         throw GameException{"Unknown game: " + gameName};
@@ -146,28 +133,21 @@ bool GameFactory::isGamePathPreference(
     return pref.path() == prefPath;
 }
 
-static Preference<std::filesystem::path> &compilationToolPathPref(
-    const std::string &gameName, const std::string &toolName
-) {
+static Preference<std::filesystem::path> &compilationToolPathPref(const std::string &gameName, const std::string &toolName) {
     auto &prefs = PreferenceManager::instance();
-    auto &pref = prefs.dynamicPreference(
-        std::filesystem::path{"Games"} / gameName / "Tool Path" / toolName, std::filesystem::path{}
+    auto &pref = prefs.dynamicPreference(std::filesystem::path{
+            "Games"
+        } / gameName / "Tool Path" / toolName, std::filesystem::path{}
     );
     return pref;
 }
 
-std::filesystem::path GameFactory::compilationToolPath(
-    const std::string &gameName, const std::string &toolName
-) const {
+std::filesystem::path GameFactory::compilationToolPath(const std::string &gameName, const std::string &toolName) const {
     return PreferenceManager::instance().get(compilationToolPathPref(gameName, toolName));
 }
 
-bool GameFactory::setCompilationToolPath(
-    const std::string &gameName, const std::string &toolName, const std::filesystem::path &gamePath
-) {
-    return PreferenceManager::instance().set(
-        compilationToolPathPref(gameName, toolName), gamePath
-    );
+bool GameFactory::setCompilationToolPath(const std::string &gameName, const std::string &toolName, const std::filesystem::path &gamePath) {
+    return PreferenceManager::instance().set(compilationToolPathPref(gameName, toolName), gamePath);
 }
 
 GameConfig &GameFactory::gameConfig(const std::string &name) {
@@ -209,11 +189,8 @@ std::string readInfoComment(std::istream &stream, const std::string &name) {
 }
 } // namespace
 
-Result<std::pair<std::string, MapFormat>> GameFactory::detectGame(
-    const std::filesystem::path &path
-) const {
-    return IO::Disk::withInputStream(
-        path, [&](auto &stream) {
+Result<std::pair<std::string, MapFormat>> GameFactory::detectGame(const std::filesystem::path &path) const {
+    return IO::Disk::withInputStream(path, [&](auto &stream) {
           auto gameName = readInfoComment(stream, "Game");
           if (m_configs.find(gameName) == std::end(m_configs)) {
               gameName = "";
@@ -248,26 +225,18 @@ Result<void> GameFactory::initializeFileSystem(const GamePathConfig &gamePathCon
     }
 
     m_userGameDir = userGameDir;
-    return IO::Disk::createDirectory(m_userGameDir).transform(
-        [&](auto) {
-          m_configFs = std::make_unique<IO::WritableVirtualFileSystem>(
-              std::move(virtualFs), std::make_unique<IO::WritableDiskFileSystem>(m_userGameDir));
+    return IO::Disk::createDirectory(m_userGameDir).transform([&](auto) {
+          m_configFs = std::make_unique<IO::WritableVirtualFileSystem>(std::move(virtualFs), std::make_unique<IO::WritableDiskFileSystem>(m_userGameDir));
         }
     );
 }
 
 Result<std::vector<std::string>> GameFactory::loadGameConfigs() {
-    return m_configFs->find(
-        {}, IO::TraversalMode::Recursive, IO::makeFilenamePathMatcher("GameConfig.cfg")).transform(
-        [&](auto configFiles) {
+    return m_configFs->find({}, IO::TraversalMode::Recursive, IO::makeFilenamePathMatcher("GameConfig.cfg")).transform([&](auto configFiles) {
           auto errors = std::vector<std::string>{};
-          kdl::vec_transform(
-              configFiles, [&](const auto &configFilePath) {
-                return loadGameConfig(configFilePath).transform_error(
-                    [&](auto e) {
-                      errors.push_back(
-                          "Failed to load game configuration file '" + configFilePath.string() + "': " + e.msg
-                      );
+          kdl::vec_transform(configFiles, [&](const auto &configFilePath) {
+                return loadGameConfig(configFilePath).transform_error([&](auto e) {
+                      errors.push_back("Failed to load game configuration file '" + configFilePath.string() + "': " + e.msg);
                     }
                 );
               }
@@ -278,8 +247,7 @@ Result<std::vector<std::string>> GameFactory::loadGameConfigs() {
 }
 
 Result<void> GameFactory::loadGameConfig(const std::filesystem::path &path) {
-    return m_configFs->openFile(path).join(m_configFs->makeAbsolute(path)).and_then(
-        [&](auto configFile, auto absolutePath) -> Result<void> {
+    return m_configFs->openFile(path).join(m_configFs->makeAbsolute(path)).and_then([&](auto configFile, auto absolutePath) -> Result<void> {
           auto reader = configFile->reader().buffer();
           auto parser = IO::GameConfigParser{reader.stringView(), absolutePath};
           try {
@@ -293,14 +261,10 @@ Result<void> GameFactory::loadGameConfig(const std::filesystem::path &path) {
               kdl::wrap_set(m_names).insert(configName);
 
               const auto gamePathPrefPath = std::filesystem::path{"Games"} / configName / "Path";
-              m_gamePaths.emplace(
-                  configName, Preference<std::filesystem::path>{gamePathPrefPath, {}}
-              );
+              m_gamePaths.emplace(configName, Preference<std::filesystem::path>{gamePathPrefPath, {}});
 
               const auto defaultEnginePrefPath = std::filesystem::path{"Games"} / configName / "Default Engine";
-              m_defaultEngines.emplace(
-                  configName, Preference<std::filesystem::path>{defaultEnginePrefPath, {}}
-              );
+              m_defaultEngines.emplace(configName, Preference<std::filesystem::path>{defaultEnginePrefPath, {}});
 
               return Result<void>{};
           } catch (const ParserException &e) {
@@ -314,15 +278,13 @@ void GameFactory::loadCompilationConfig(GameConfig &gameConfig) {
     const auto path = std::filesystem::path{gameConfig.name} / "CompilationProfiles.cfg";
     try {
         if (m_configFs->pathInfo(path) == IO::PathInfo::File) {
-            m_configFs->openFile(path).join(m_configFs->makeAbsolute(path)).transform(
-                [&](auto profilesFile, auto absolutePath) {
+            m_configFs->openFile(path).join(m_configFs->makeAbsolute(path)).transform([&](auto profilesFile, auto absolutePath) {
                   auto reader = profilesFile->reader().buffer();
                   auto parser = IO::CompilationConfigParser{reader.stringView(), absolutePath};
                   gameConfig.compilationConfig = parser.parse();
                   gameConfig.compilationConfigParseFailed = false;
                 }
-            ).transform_error(
-                [&](auto e) {
+            ).transform_error([&](auto e) {
                   std::cerr << "Could not load compilation configuration '" << path << "': " << e.msg << "\n";
                   gameConfig.compilationConfigParseFailed = true;
                 }
@@ -338,15 +300,13 @@ void GameFactory::loadGameEngineConfig(GameConfig &gameConfig) {
     const auto path = std::filesystem::path{gameConfig.name} / "GameEngineProfiles.cfg";
     try {
         if (m_configFs->pathInfo(path) == IO::PathInfo::File) {
-            m_configFs->openFile(path).join(m_configFs->makeAbsolute(path)).transform(
-                [&](auto profilesFile, auto absolutePath) {
+            m_configFs->openFile(path).join(m_configFs->makeAbsolute(path)).transform([&](auto profilesFile, auto absolutePath) {
                   auto reader = profilesFile->reader().buffer();
                   auto parser = IO::GameEngineConfigParser{reader.stringView(), absolutePath};
                   gameConfig.gameEngineConfig = parser.parse();
                   gameConfig.gameEngineConfigParseFailed = false;
                 }
-            ).transform_error(
-                [&](auto e) {
+            ).transform_error([&](auto e) {
                   std::cerr << "Could not load game engine configuration '" << path << "': " << e.msg << "\n";
                   gameConfig.gameEngineConfigParseFailed = true;
                 }
@@ -358,16 +318,12 @@ void GameFactory::loadGameEngineConfig(GameConfig &gameConfig) {
     }
 }
 
-static Result<std::filesystem::path> backupFile(
-    IO::WritableFileSystem &fs, const std::filesystem::path &path
-) {
+static Result<std::filesystem::path> backupFile(IO::WritableFileSystem &fs, const std::filesystem::path &path) {
     const auto backupPath = kdl::path_add_extension(path, ".bak");
     return fs.copyFile(path, backupPath).transform([&]() { return backupPath; });
 }
 
-void GameFactory::writeCompilationConfig(
-    GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger
-) {
+void GameFactory::writeCompilationConfig(GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger) {
     if (!gameConfig.compilationConfigParseFailed && gameConfig.compilationConfig == compilationConfig) {
         // NOTE: this is not just an optimization, but important for ensuring that
         // we don't clobber data saved by a newer version of TB, unless we actually make
@@ -383,16 +339,13 @@ void GameFactory::writeCompilationConfig(
 
     const auto profilesPath = std::filesystem::path{gameConfig.name} / "CompilationProfiles.cfg";
     if (gameConfig.compilationConfigParseFailed) {
-        backupFile(*m_configFs, profilesPath).and_then(
-            [&](auto backupPath) {
-              return m_configFs->makeAbsolute(profilesPath).join(m_configFs->makeAbsolute(backupPath)).transform(
-                  [&](auto absProfilesPath, auto absBackupPath) {
+        backupFile(*m_configFs, profilesPath).and_then([&](auto backupPath) {
+              return m_configFs->makeAbsolute(profilesPath).join(m_configFs->makeAbsolute(backupPath)).transform([&](auto absProfilesPath, auto absBackupPath) {
                     logger.warn() << "Backed up malformed compilation config " << absProfilesPath << " to " << absBackupPath;
                   }
               );
             }
-        ).transform_error(
-            [&](auto) {
+        ).transform_error([&](auto) {
               logger.error() << "Could not back up malformed compilation config";
             }
         );
@@ -400,32 +353,25 @@ void GameFactory::writeCompilationConfig(
         gameConfig.compilationConfigParseFailed = false;
     }
 
-    m_configFs->createDirectory(profilesPath.parent_path()).and_then(
-        [&](auto) { return m_configFs->createFileAtomic(profilesPath, stream.str()); }
-    ).transform(
+    m_configFs->createDirectory(profilesPath.parent_path()).and_then([&](auto) { return m_configFs->createFileAtomic(profilesPath, stream.str()); }).transform(
         [&]() {
           gameConfig.compilationConfig = std::move(compilationConfig);
 
-          m_configFs->makeAbsolute(profilesPath).transform(
-              [&](auto absProfilesPath) {
+          m_configFs->makeAbsolute(profilesPath).transform([&](auto absProfilesPath) {
                 logger.debug() << "Wrote compilation config to " << absProfilesPath;
               }
-          ).transform_error(
-              [](auto) {
+          ).transform_error([](auto) {
                 // Can't really do anything
               }
           );
         }
-    ).transform_error(
-        [&](const auto &e) {
+    ).transform_error([&](const auto &e) {
           logger.error() << "Could not write compilation config: " << e.msg;
         }
     );
 }
 
-void GameFactory::writeGameEngineConfig(
-    GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger
-) {
+void GameFactory::writeGameEngineConfig(GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger) {
     if (!gameConfig.gameEngineConfigParseFailed && gameConfig.gameEngineConfig == gameEngineConfig) {
         logger.debug() << "Skipping writing unchanged game engine config for " << gameConfig.name;
         return;
@@ -437,16 +383,13 @@ void GameFactory::writeGameEngineConfig(
 
     const auto profilesPath = std::filesystem::path{gameConfig.name} / "GameEngineProfiles.cfg";
     if (gameConfig.gameEngineConfigParseFailed) {
-        backupFile(*m_configFs, profilesPath).and_then(
-            [&](auto backupPath) {
-              return m_configFs->makeAbsolute(profilesPath).join(m_configFs->makeAbsolute(backupPath)).transform(
-                  [&](auto absProfilesPath, auto absBackupPath) {
+        backupFile(*m_configFs, profilesPath).and_then([&](auto backupPath) {
+              return m_configFs->makeAbsolute(profilesPath).join(m_configFs->makeAbsolute(backupPath)).transform([&](auto absProfilesPath, auto absBackupPath) {
                     logger.warn() << "Backed up malformed game engine config " << absProfilesPath << " to " << absBackupPath;
                   }
               );
             }
-        ).transform_error(
-            [&](auto) {
+        ).transform_error([&](auto) {
               logger.error() << "Could not back up malformed game engine config";
             }
         );
@@ -454,23 +397,18 @@ void GameFactory::writeGameEngineConfig(
         gameConfig.gameEngineConfigParseFailed = false;
     }
 
-    m_configFs->createDirectory(profilesPath.parent_path()).and_then(
-        [&](auto) { return m_configFs->createFileAtomic(profilesPath, stream.str()); }
-    ).transform(
+    m_configFs->createDirectory(profilesPath.parent_path()).and_then([&](auto) { return m_configFs->createFileAtomic(profilesPath, stream.str()); }).transform(
         [&]() {
           gameConfig.gameEngineConfig = std::move(gameEngineConfig);
-          m_configFs->makeAbsolute(profilesPath).transform(
-              [&](auto absProfilesPath) {
+          m_configFs->makeAbsolute(profilesPath).transform([&](auto absProfilesPath) {
                 logger.debug() << "Wrote game engine config to " << absProfilesPath;
               }
-          ).transform_error(
-              [](auto) {
+          ).transform_error([](auto) {
                 // Can't really do anything
               }
           );
         }
-    ).transform_error(
-        [&](const auto &e) {
+    ).transform_error([&](const auto &e) {
           logger.error() << "Could not write game engine config: " << e.msg;
         }
     );

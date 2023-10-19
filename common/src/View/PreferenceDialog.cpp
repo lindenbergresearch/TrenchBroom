@@ -48,7 +48,9 @@ const QString PreferenceDialog::WINDOW_TITLE = "Preferences";
 const QSize PreferenceDialog::ICON_SIZE = QSize{30, 30};
 const int PreferenceDialog::ICON_WIDTH = int(float(ICON_SIZE.width()) * 2.3f);
 
-PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent) : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr), m_buttonBox(nullptr) {
+PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent) : QDialog(parent), m_document(std::move(document)),
+                                                                                             m_toolBar(nullptr), m_stackedWidget(nullptr),
+                                                                                             m_buttonBox(nullptr) {
     setWindowTitle(WINDOW_TITLE);
     setWindowIconTB(this);
     createGui();

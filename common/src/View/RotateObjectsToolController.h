@@ -49,22 +49,16 @@ private:
 
     void pick(const InputState &inputState, Model::PickResult &pickResult) override;
 
-    void setRenderOptions(
-        const InputState &inputState, Renderer::RenderContext &renderContext
-    ) const override;
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
 
-    void render(
-        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
     bool cancel() override;
 
 private: // subclassing interface
     virtual Model::Hit doPick(const InputState &inputState) = 0;
 
-    virtual void doRenderHandle(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) = 0;
+    virtual void doRenderHandle(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) = 0;
 };
 
 class RotateObjectsToolController2D : public RotateObjectsToolController {
@@ -74,9 +68,7 @@ public:
 private:
     Model::Hit doPick(const InputState &inputState) override;
 
-    void doRenderHandle(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderHandle(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 };
 
 class RotateObjectsToolController3D : public RotateObjectsToolController {
@@ -86,9 +78,7 @@ public:
 private:
     Model::Hit doPick(const InputState &inputState) override;
 
-    void doRenderHandle(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void doRenderHandle(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 };
 } // namespace View
 } // namespace TrenchBroom

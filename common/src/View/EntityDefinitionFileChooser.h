@@ -48,9 +48,7 @@ public:
     bool allowDeselectAll() const;
 
 protected: // QAbstractItemView overrides
-    void selectionChanged(
-        const QItemSelection &selected, const QItemSelection &deselected
-    ) override;
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
     // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
     // QEvent* event) const override;
 };
@@ -68,9 +66,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    explicit EntityDefinitionFileChooser(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit EntityDefinitionFileChooser(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     void createGui();

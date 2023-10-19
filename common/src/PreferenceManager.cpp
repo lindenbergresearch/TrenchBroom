@@ -69,10 +69,11 @@ bool shouldSaveInstantly() {
 }
 } // namespace
 
-AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_fileSystemWatcher{nullptr}, m_fileReadWriteDisabled{false} {
+AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_fileSystemWatcher{
+    nullptr
+}, m_fileReadWriteDisabled{false} {
     m_saveTimer.setSingleShot(true);
-    connect(
-        &m_saveTimer, &QTimer::timeout, this, [this] {
+    connect(&m_saveTimer, &QTimer::timeout, this, [this] {
           qDebug() << "Saving preferences";
           saveChangesImmediately();
         }
@@ -93,8 +94,7 @@ void AppPreferenceManager::initialize() {
 
     m_fileSystemWatcher = new QFileSystemWatcher{this};
     if (m_fileSystemWatcher->addPath(m_preferencesFilePath)) {
-        connect(
-            m_fileSystemWatcher, &QFileSystemWatcher::QFileSystemWatcher::fileChanged, this, [this]() {
+        connect(m_fileSystemWatcher, &QFileSystemWatcher::QFileSystemWatcher::fileChanged, this, [this]() {
               qDebug() << "Reloading preferences after file change";
               loadCacheFromDisk();
             }
@@ -132,50 +132,39 @@ void AppPreferenceManager::discardChanges() {
 }
 
 void AppPreferenceManager::saveChangesImmediately() {
-    writePreferencesToFile(m_preferencesFilePath, m_cache).transform_error(
-        kdl::overload(
-            [&](const PreferenceErrors::FileAccessError &) {
-              // This happens e.g. if you don't have read permissions for
-              // m_preferencesFilePath
-              showErrorAndDisableFileReadWrite(
-                  tr("A file IO error occurred while attempting to write the preference file:"), tr("ensure the file is writable"));
-            }, [&](const PreferenceErrors::LockFileError &) {
-              // This happens if the lock file couldn't be acquired
-              showErrorAndDisableFileReadWrite(
-                  tr("Could not acquire lock file for reading the preference file:"), tr("check for stale lock files"));
-            }
-        ));
+    writePreferencesToFile(m_preferencesFilePath, m_cache).transform_error(kdl::overload([&](const PreferenceErrors::FileAccessError &) {
+          // This happens e.g. if you don't have read permissions for
+          // m_preferencesFilePath
+          showErrorAndDisableFileReadWrite(tr("A file IO error occurred while attempting to write the preference file:"), tr("ensure the file is writable"));
+        }, [&](const PreferenceErrors::LockFileError &) {
+          // This happens if the lock file couldn't be acquired
+          showErrorAndDisableFileReadWrite(tr("Could not acquire lock file for reading the preference file:"), tr("check for stale lock files"));
+        }
+    ));
 }
 
 void AppPreferenceManager::markAsUnsaved(PreferenceBase &preference) {
     m_unsavedPreferences.insert(&preference);
 }
 
-void AppPreferenceManager::showErrorAndDisableFileReadWrite(
-    const QString &reason, const QString &suggestion
-) {
+void AppPreferenceManager::showErrorAndDisableFileReadWrite(const QString &reason, const QString &suggestion) {
     m_fileReadWriteDisabled = true;
 
-    const auto message = tr(
-        "%1\n\n"
-        "%2\n\nPlease correct the problem (%3) and restart TrenchBroom.\n"
-        "Further settings changes will not be saved this session."
+    const auto message = tr("%1\n\n"
+                            "%2\n\nPlease correct the problem (%3) and restart TrenchBroom.\n"
+                            "Further settings changes will not be saved this session."
     ).arg(reason).arg(m_preferencesFilePath).arg(suggestion);
 
-    QTimer::singleShot(
-        0, [=] {
-          auto dialog = QMessageBox(
-              QMessageBox::Icon::Critical, tr("TrenchBroom"), message, QMessageBox::Ok
-          );
+    QTimer::singleShot(0, [=] {
+          auto dialog = QMessageBox(QMessageBox::Icon::Critical, tr("TrenchBroom"), message, QMessageBox::Ok);
           dialog.exec();
         }
     );
 }
 
 namespace {
-std::vector<std::filesystem::path> changedKeysForMapDiff(
-    const std::map<std::filesystem::path, QJsonValue> &before, const std::map<std::filesystem::path, QJsonValue> &after
-) {
+std::vector<std::filesystem::path>
+changedKeysForMapDiff(const std::map<std::filesystem::path, QJsonValue> &before, const std::map<std::filesystem::path, QJsonValue> &after) {
     auto result = kdl::vector_set<std::filesystem::path>{};
 
     // removes
@@ -219,26 +208,21 @@ void AppPreferenceManager::loadCacheFromDisk() {
     const auto oldPrefs = m_cache;
 
     // Reload m_cache
-    readPreferencesFromFile(m_preferencesFilePath).transform(
-        [&](std::map<std::filesystem::path, QJsonValue> &&prefs) {
+    readPreferencesFromFile(m_preferencesFilePath).transform([&](std::map<std::filesystem::path, QJsonValue> &&prefs) {
           m_cache = std::move(prefs);
         }
-    ).transform_error(
-        kdl::overload(
-            [&](const PreferenceErrors::FileAccessError &) {
-              // This happens e.g. if you don't have read permissions for
-              // m_preferencesFilePath
-              showErrorAndDisableFileReadWrite(
-                  tr("A file IO error occurred while attempting to read the preference file:"), tr("ensure the file is readable"));
-            }, [&](const PreferenceErrors::LockFileError &) {
-              // This happens if the lock file couldn't be acquired
-              showErrorAndDisableFileReadWrite(
-                  tr("Could not acquire lock file for reading the preference file:"), tr("check for stale lock files"));
-            }, [&](const PreferenceErrors::JsonParseError &) {
-              showErrorAndDisableFileReadWrite(
-                  tr("A JSON parsing error occurred while reading the preference file:"), tr("fix the JSON, or backup and delete the file"));
-            }, [&](const PreferenceErrors::NoFilePresent &) { m_cache = {}; }
-        ));
+    ).transform_error(kdl::overload([&](const PreferenceErrors::FileAccessError &) {
+          // This happens e.g. if you don't have read permissions for
+          // m_preferencesFilePath
+          showErrorAndDisableFileReadWrite(tr("A file IO error occurred while attempting to read the preference file:"), tr("ensure the file is readable"));
+        }, [&](const PreferenceErrors::LockFileError &) {
+          // This happens if the lock file couldn't be acquired
+          showErrorAndDisableFileReadWrite(tr("Could not acquire lock file for reading the preference file:"), tr("check for stale lock files"));
+        }, [&](const PreferenceErrors::JsonParseError &) {
+          showErrorAndDisableFileReadWrite(tr("A JSON parsing error occurred while reading the preference file:"),
+              tr("fix the JSON, or backup and delete the file"));
+        }, [&](const PreferenceErrors::NoFilePresent &) { m_cache = {}; }
+    ));
 
     invalidatePreferences();
 
@@ -280,7 +264,8 @@ void AppPreferenceManager::loadPreferenceFromCache(PreferenceBase &pref) {
     if (!pref.loadFromJson(format, jsonValue)) {
         // FIXME: Log to TB console
         const auto variantValue = jsonValue.toVariant();
-        qDebug() << "Failed to load preference " << IO::pathAsGenericQString(pref.path()) << " from JSON value: " << variantValue.toString() << " (" << variantValue.typeName() << ")";
+        qDebug() << "Failed to load preference " << IO::pathAsGenericQString(pref.path()) << " from JSON value: " << variantValue.toString() << " ("
+                 << variantValue.typeName() << ")";
 
         pref.resetToDefault();
 
@@ -365,9 +350,7 @@ ReadPreferencesResult readPreferencesFromFile(const QString &path) {
     return parsePreferencesFromJson(contents);
 }
 
-WritePreferencesResult writePreferencesToFile(
-    const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs
-) {
+WritePreferencesResult writePreferencesToFile(const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs) {
     const auto serialized = writePreferencesToJson(prefs);
 
     const auto dirPath = QFileInfo{path}.path();
@@ -417,9 +400,7 @@ ReadPreferencesResult parsePreferencesFromJson(const QByteArray &jsonData) {
     return result;
 }
 
-QByteArray writePreferencesToJson(
-    const std::map<std::filesystem::path, QJsonValue> &prefs
-) {
+QByteArray writePreferencesToJson(const std::map<std::filesystem::path, QJsonValue> &prefs) {
     auto rootObject = QJsonObject{};
     for (auto [key, val]: prefs) {
         rootObject[IO::pathAsGenericQString(key)] = val;

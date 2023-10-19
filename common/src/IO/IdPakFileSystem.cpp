@@ -59,10 +59,8 @@ Result<void> IdPakFileSystem::doReadDirectory() {
             const auto entrySize = reader.readSize<int32_t>();
 
             const auto entryPath = std::filesystem::path{kdl::str_to_lower(entryName)};
-            auto entryFile = std::static_pointer_cast<File>(
-                std::make_shared<FileView>(m_file, entryAddress, entrySize));
-            addFile(
-                entryPath, [entryFile = std::move(entryFile)]() -> Result<std::shared_ptr<File>> {
+            auto entryFile = std::static_pointer_cast<File>(std::make_shared<FileView>(m_file, entryAddress, entrySize));
+            addFile(entryPath, [entryFile = std::move(entryFile)]() -> Result<std::shared_ptr<File>> {
                   return entryFile;
                 }
             );

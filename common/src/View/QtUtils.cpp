@@ -73,8 +73,9 @@ namespace TrenchBroom {
 namespace View {
 
 
-SyncHeightEventFilter::SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent
-) : QObject{parent}, m_primary{primary}, m_secondary{secondary} {
+SyncHeightEventFilter::SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent) : QObject{
+    parent
+}, m_primary{primary}, m_secondary{secondary} {
     ensure(m_primary != nullptr, "primary is not null");
     ensure(m_secondary != nullptr, "secondary is not null");
 
@@ -131,15 +132,13 @@ QString fileDialogDefaultDirectory(const FileDialogDir dir) {
     return defaultDir;
 }
 
-void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename
-) {
+void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename) {
     const auto dirQDir = QFileInfo(filename).absoluteDir();
     const auto dirString = dirQDir.absolutePath();
     updateFileDialogDefaultDirectoryWithDirectory(type, dirString);
 }
 
-void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory
-) {
+void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory) {
     const auto key = fileDialogDefaultDirectorySettingsPath(type);
 
     auto settings = QSettings{};
@@ -200,8 +199,7 @@ void centerOnScreen(QWidget *window) {
 #else
     const auto screenGeometry = QApplication::desktop()->availableGeometry(window);
 #endif
-    window->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry
-    ));
+    window->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry));
 }
 
 int getCommonFieldHeight() {
@@ -411,7 +409,8 @@ void setSliderRatio(QSlider *slider, float ratio) {
 
 QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
     auto *innerLayout = new QHBoxLayout{};
-    innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin
+    innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin,
+        LayoutConstants::DialogButtonBottomMargin
     );
     innerLayout->setSpacing(0);
     innerLayout->addWidget(buttonBox);
@@ -427,7 +426,8 @@ QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
 
 QLayout *wrapDialogButtonBox(QLayout *buttonBox) {
     auto *innerLayout = new QHBoxLayout{};
-    innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin
+    innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin,
+        LayoutConstants::DialogButtonBottomMargin
     );
     innerLayout->setSpacing(0);
     innerLayout->addLayout(buttonBox);
@@ -503,7 +503,9 @@ void insertTitleBarSeparator(QVBoxLayout *layout) {
     unused(layout);
 }
 
-AutoResizeRowsEventFilter::AutoResizeRowsEventFilter(QTableView *tableView) : QObject{tableView}, m_tableView{tableView} {
+AutoResizeRowsEventFilter::AutoResizeRowsEventFilter(QTableView *tableView) : QObject{tableView}, m_tableView{
+    tableView
+} {
     m_tableView->installEventFilter(this);
 }
 

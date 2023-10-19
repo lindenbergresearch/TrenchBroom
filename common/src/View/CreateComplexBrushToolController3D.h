@@ -43,9 +43,7 @@ private:
 
     bool doShouldHandleMouseDrag(const InputState &inputState) const override;
 
-    void render(
-        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
     bool cancel() override;
 };

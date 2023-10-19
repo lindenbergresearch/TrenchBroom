@@ -29,8 +29,8 @@
 #include "View/Splitter.h"
 
 namespace TrenchBroom::View {
-TwoPaneMapView::TwoPaneMapView(
-    std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger, QWidget *parent
+TwoPaneMapView::TwoPaneMapView(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer,
+    GLContextManager &contextManager, Logger *logger, QWidget *parent
 ) : MultiPaneMapView{parent}, m_logger{logger}, m_document(std::move(document)) {
     createGui(toolBox, mapRenderer, contextManager);
 }
@@ -39,9 +39,7 @@ TwoPaneMapView::~TwoPaneMapView() {
     saveWindowState(m_splitter);
 }
 
-void TwoPaneMapView::createGui(
-    MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager
-) {
+void TwoPaneMapView::createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager) {
 
     // See comment in CyclingMapView::createGui
     m_splitter = new Splitter{};
@@ -54,7 +52,9 @@ void TwoPaneMapView::createGui(
     layout->addWidget(m_splitter);
 
     m_mapView3D = new MapView3D{m_document, toolBox, mapRenderer, contextManager, m_logger};
-    m_mapView2D = new CyclingMapView{m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_2D, m_logger};
+    m_mapView2D = new CyclingMapView{
+        m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_2D, m_logger
+    };
 
     m_mapView3D->linkCamera(m_linkHelper);
     m_mapView2D->linkCamera(m_linkHelper);

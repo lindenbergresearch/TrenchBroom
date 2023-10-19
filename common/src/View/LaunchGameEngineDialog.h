@@ -55,9 +55,7 @@ private:
     Model::GameEngineConfig m_config;
 
 public:
-    explicit LaunchGameEngineDialog(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit LaunchGameEngineDialog(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     void createGui();

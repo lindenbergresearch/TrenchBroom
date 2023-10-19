@@ -65,14 +65,11 @@ void CellView::validate() {
         reloadLayout();
 }
 
-CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar) : RenderView(contextManager), m_layoutInitialized(false), m_valid(false), m_scrollBar(scrollBar) {
+CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar) : RenderView(contextManager), m_layoutInitialized(false), m_valid(false),
+                                                                              m_scrollBar(scrollBar) {
     if (m_scrollBar != nullptr) {
-        connect(
-            m_scrollBar, &QAbstractSlider::actionTriggered, this, &CellView::onScrollBarActionTriggered
-        );
-        connect(
-            m_scrollBar, &QAbstractSlider::valueChanged, this, &CellView::onScrollBarValueChanged
-        );
+        connect(m_scrollBar, &QAbstractSlider::actionTriggered, this, &CellView::onScrollBarActionTriggered);
+        connect(m_scrollBar, &QAbstractSlider::valueChanged, this, &CellView::onScrollBarValueChanged);
     }
 }
 
@@ -131,20 +128,16 @@ void CellView::onScrollBarActionTriggered(int action) {
     // see: https://doc.qt.io/archives/qt-4.8/qabstractslider.html#actionTriggered
     switch (action) {
         case QAbstractSlider::SliderSingleStepAdd:
-            m_scrollBar->setSliderPosition(
-                static_cast<int>(m_layout.rowPosition(top, 1))); // line down
+            m_scrollBar->setSliderPosition(static_cast<int>(m_layout.rowPosition(top, 1))); // line down
             break;
         case QAbstractSlider::SliderSingleStepSub:
-            m_scrollBar->setSliderPosition(
-                static_cast<int>(m_layout.rowPosition(top, -1))); // line up
+            m_scrollBar->setSliderPosition(static_cast<int>(m_layout.rowPosition(top, -1))); // line up
             break;
         case QAbstractSlider::SliderPageStepAdd:
-            m_scrollBar->setSliderPosition(
-                static_cast<int>(m_layout.rowPosition(top + height, 0))); // page down
+            m_scrollBar->setSliderPosition(static_cast<int>(m_layout.rowPosition(top + height, 0))); // page down
             break;
         case QAbstractSlider::SliderPageStepSub:
-            m_scrollBar->setSliderPosition(
-                static_cast<int>(m_layout.rowPosition(top - height, 0))); // page up
+            m_scrollBar->setSliderPosition(static_cast<int>(m_layout.rowPosition(top - height, 0))); // page up
             break;
         default:
             break;
@@ -323,8 +316,7 @@ void CellView::doClear() {}
 
 void CellView::doLeftClick(Layout & /* layout */, float /* x */, float /* y */) {}
 
-void CellView::doContextMenu(
-    Layout & /* layout */, float /* x */, float /* y */, QContextMenuEvent * /* event */) {
+void CellView::doContextMenu(Layout & /* layout */, float /* x */, float /* y */, QContextMenuEvent * /* event */) {
 }
 
 bool CellView::dndEnabled() {

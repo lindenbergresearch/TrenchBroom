@@ -44,19 +44,14 @@ BrushFaceHandle BrushFaceReference::resolve() const {
 }
 
 std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &handles) {
-    return kdl::vec_transform(
-        handles, [](const auto &handle) {
+    return kdl::vec_transform(handles, [](const auto &handle) {
           return BrushFaceReference(handle.node(), handle.face());
         }
     );
 }
 
-std::vector<BrushFaceHandle> resolveAllRefs(
-    const std::vector<BrushFaceReference> &faceRefs
-) {
-    return kdl::vec_transform(
-        faceRefs, [](const auto &faceRef) { return faceRef.resolve(); }
-    );
+std::vector<BrushFaceHandle> resolveAllRefs(const std::vector<BrushFaceReference> &faceRefs) {
+    return kdl::vec_transform(faceRefs, [](const auto &faceRef) { return faceRef.resolve(); });
 }
 } // namespace Model
 } // namespace TrenchBroom

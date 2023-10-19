@@ -71,8 +71,8 @@ private:
     size_t m_lastModificationCount;
 
 public:
-    explicit Autosaver(
-        std::weak_ptr<MapDocument> document, std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000), size_t maxBackups = 50
+    explicit Autosaver(std::weak_ptr<MapDocument> document, std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000),
+        size_t maxBackups = 50
     );
 
     void triggerAutosave(Logger &logger);
@@ -80,24 +80,15 @@ public:
 private:
     void autosave(Logger &logger, std::shared_ptr<View::MapDocument> document);
 
-    Result<IO::WritableDiskFileSystem> createBackupFileSystem(
-        const std::filesystem::path &mapPath
-    ) const;
+    Result<IO::WritableDiskFileSystem> createBackupFileSystem(const std::filesystem::path &mapPath) const;
 
-    Result<std::vector<std::filesystem::path>> collectBackups(
-        const IO::FileSystem &fs, const std::filesystem::path &mapBasename
-    ) const;
+    Result<std::vector<std::filesystem::path>> collectBackups(const IO::FileSystem &fs, const std::filesystem::path &mapBasename) const;
 
-    Result<std::vector<std::filesystem::path>> thinBackups(
-        Logger &logger, IO::WritableDiskFileSystem &fs, const std::vector<std::filesystem::path> &backups
-    ) const;
+    Result<std::vector<std::filesystem::path>>
+    thinBackups(Logger &logger, IO::WritableDiskFileSystem &fs, const std::vector<std::filesystem::path> &backups) const;
 
-    Result<void> cleanBackups(
-        IO::WritableDiskFileSystem &fs, std::vector<std::filesystem::path> &backups, const std::filesystem::path &mapBasename
-    ) const;
+    Result<void> cleanBackups(IO::WritableDiskFileSystem &fs, std::vector<std::filesystem::path> &backups, const std::filesystem::path &mapBasename) const;
 
-    std::filesystem::path makeBackupName(
-        const std::filesystem::path &mapBasename, size_t index
-    ) const;
+    std::filesystem::path makeBackupName(const std::filesystem::path &mapBasename, size_t index) const;
 };
 } // namespace TrenchBroom::View

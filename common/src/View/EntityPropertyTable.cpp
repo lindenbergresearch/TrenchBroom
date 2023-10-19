@@ -48,7 +48,11 @@ QString EntityPropertyTable::insertRowShortcutString() {
  * Just for generating tooltips, keep in sync with isRemoveRowsShortcut
  */
 QString EntityPropertyTable::removeRowShortcutString() {
-    return QObject::tr("%1 or %2").arg(QKeySequence{Qt::Key_Delete}.toString(QKeySequence::NativeText)).arg(QKeySequence{Qt::Key_Backspace}.toString(QKeySequence::NativeText));
+    return QObject::tr("%1 or %2").arg(QKeySequence{
+        Qt::Key_Delete
+    }.toString(QKeySequence::NativeText)).arg(QKeySequence{
+        Qt::Key_Backspace
+    }.toString(QKeySequence::NativeText));
 }
 
 static bool isInsertRowShortcut(QKeyEvent *event) {
@@ -97,7 +101,8 @@ void EntityPropertyTable::keyPressEvent(QKeyEvent *event) {
 
     // Set up Qt::Key_Return to open the editor. Doing this binding via a QShortcut makes it
     // so you can't close an open editor, so do it this way.
-    if (event->key() == Qt::Key_Return && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier) && state() != QAbstractItemView::EditingState) {
+    if (event->key() == Qt::Key_Return && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier) &&
+        state() != QAbstractItemView::EditingState) {
 
         // open the editor
         TABLE_LOG(qDebug("opening editor..."));

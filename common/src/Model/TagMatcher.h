@@ -143,9 +143,7 @@ protected:
     GetFlagNames m_getFlagNames;
 
 protected:
-    FlagsTagMatcher(
-        int flags, GetFlags getFlags, SetFlags setFlags, SetFlags unsetFlags, GetFlagNames getFlagNames
-    );
+    FlagsTagMatcher(int flags, GetFlags getFlags, SetFlags setFlags, SetFlags unsetFlags, GetFlagNames getFlagNames);
 
 public:
     bool matches(const Taggable &taggable) const override;

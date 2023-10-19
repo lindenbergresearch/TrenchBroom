@@ -61,20 +61,18 @@ Color::Color(const float r, const float g, const float b, const float a) : vec<f
 Color::Color(const Color &color, const float a) : vec<float, 4>(color.r(), color.g(), color.b(), a) {
 }
 
-Color::Color(
-    const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a
-) : vec<float, 4>(
-    static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f
+Color::Color(const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a) : vec<float, 4>(static_cast<float>(r) / 255.0f,
+    static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f
 ) {
 }
 
-Color::Color(const int r, const int g, const int b, const int a) : vec<float, 4>(
-    static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f
+Color::Color(const int r, const int g, const int b, const int a) : vec<float, 4>(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f,
+    static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f
 ) {
 }
 
-Color::Color(const int r, const int g, const int b, const float a) : vec<float, 4>(
-    static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, a
+Color::Color(const int r, const int g, const int b, const float a) : vec<float, 4>(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f,
+    static_cast<float>(b) / 255.0f, a
 ) {
 }
 
@@ -94,9 +92,7 @@ float Color::a() const {
     return w();
 }
 
-void Color::rgbToHSB(
-    const float r, const float g, const float b, float &h, float &s, float &br
-) {
+void Color::rgbToHSB(const float r, const float g, const float b, float &h, float &s, float &br) {
     assert(r >= 0.0f && r <= 1.0f);
     assert(g >= 0.0f && g <= 1.0f);
     assert(b >= 0.0f && b <= 1.0f);

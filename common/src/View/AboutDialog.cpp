@@ -57,8 +57,7 @@ AboutDialog::AboutDialog() {
 }
 
 void AboutDialog::createGui() {
-    const QString creditsString = tr(
-        R"(
+    const QString creditsString = tr(R"(
 github.com/TrenchBroom/TrenchBroom<br />
 <br />
 <b>Developers</b><br />

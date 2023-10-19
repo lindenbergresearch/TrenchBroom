@@ -57,13 +57,22 @@ struct TextureMode {
   int magFilter;
   std::string name;
 
-  TextureMode(const int i_minFilter, const int i_magFilter, std::string i_name) : minFilter{i_minFilter}, magFilter{i_magFilter}, name{std::move(i_name)} {
+  TextureMode(const int i_minFilter, const int i_magFilter, std::string i_name) : minFilter{i_minFilter}, magFilter{
+      i_magFilter
+  }, name{std::move(i_name)} {
   }
 };
 
 const auto TextureModes = std::array<TextureMode, 6>{
-    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"}, TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"}, TextureMode{GL_LINEAR, GL_LINEAR, "Linear"},
-    TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"}, TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
+    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{
+        GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"
+    }, TextureMode{
+        GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"
+    }, TextureMode{GL_LINEAR, GL_LINEAR, "Linear"}, TextureMode{
+        GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"
+    }, TextureMode{
+        GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"
+    },
 };
 
 constexpr int brightnessToUI(const float value) {
@@ -136,7 +145,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_gridAlphaSlider = new SliderWithLabel{-50, +50, 0, "%d%%", 350, 45};
     m_gridAlphaSlider->setToolTip("Sets the visibility of the grid lines in the 3D editing view.");
 
-    m_gridWidthSlider = new SliderWithLabel{10, 300, 10e-3f,"%.1f px", 350, 45};
+    m_gridWidthSlider = new SliderWithLabel{10, 300, 10e-3f, "%.1f px", 350, 45};
     m_gridWidthSlider->setToolTip("Sets the thickness of the grid-lines.");
 
     m_fovSlider = new SliderWithLabel{50, 150, 0, "%d°", 350, 45};
@@ -258,7 +267,10 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_rendererFontSizeCombo = new QComboBox{};
     m_rendererFontSizeCombo->setEditable(true);
     m_rendererFontSizeCombo->setToolTip("Sets the font size for various labels in the editing views.");
-    m_rendererFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"});
+    m_rendererFontSizeCombo->addItems({
+            "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"
+        }
+    );
     m_rendererFontSizeCombo->setValidator(new QIntValidator{1, 96, m_rendererFontSizeCombo});
 
     m_UIFontSizeCombo = new QComboBox{};
@@ -270,14 +282,20 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_ConsoleFontSizeCombo = new QComboBox{};
     m_ConsoleFontSizeCombo->setEditable(true);
     m_ConsoleFontSizeCombo->setToolTip("Sets the font size for the console panel.");
-    m_ConsoleFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"});
+    m_ConsoleFontSizeCombo->addItems({
+            "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"
+        }
+    );
     m_ConsoleFontSizeCombo->setValidator(new QIntValidator{1, 96, m_ConsoleFontSizeCombo});
 
 
     m_ToolbarIconSizeCombo = new QComboBox{};
     m_ToolbarIconSizeCombo->setEditable(false);
     m_ToolbarIconSizeCombo->setToolTip("Sets the icon size for the main toolbar.");
-    m_ToolbarIconSizeCombo->addItems({"14x14", "16x16", "18x18", "20x20", "22x22", "24x24", "26x26", "28x28", "30x30", "32x32"});
+    m_ToolbarIconSizeCombo->addItems({
+            "14x14", "16x16", "18x18", "20x20", "22x22", "24x24", "26x26", "28x28", "30x30", "32x32"
+        }
+    );
 
     /*************************************************************************************************************************/
 

@@ -38,4 +38,5 @@
 #include <vecmath/vec_io.h>
 
 #define CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS 1
+
 #include <catch2/catch.hpp>

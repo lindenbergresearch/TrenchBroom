@@ -44,9 +44,7 @@ MapView *MapViewContainer::currentMapView() const {
     return doGetCurrentMapView();
 }
 
-vm::vec3 MapViewContainer::doGetPasteObjectsDelta(
-    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds
-) const {
+vm::vec3 MapViewContainer::doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
     auto *current = currentMapView();
     ensure(current != nullptr, "current is nullptr");
     return current->pasteObjectsDelta(bounds, referenceBounds);

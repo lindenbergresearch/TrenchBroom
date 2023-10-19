@@ -64,9 +64,7 @@ int ColorModel::columnCount(const QModelIndex & /* parent */) const {
     return 3; // Color, Context, Description
 }
 
-QVariant ColorModel::headerData(
-    const int section, const Qt::Orientation orientation, const int role
-) const {
+QVariant ColorModel::headerData(const int section, const Qt::Orientation orientation, const int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
             case 0:
@@ -96,8 +94,7 @@ QVariant ColorModel::data(const QModelIndex &index, const int role) const {
             case 1:
                 return QString::fromStdString(kdl::path_front(colorPreference->path()).string());
             case 2:
-                return QString::fromStdString(
-                    kdl::path_pop_front(colorPreference->path()).generic_string());
+                return QString::fromStdString(kdl::path_pop_front(colorPreference->path()).generic_string());
                 switchDefault();
         }
     }
@@ -114,9 +111,7 @@ QVariant ColorModel::data(const QModelIndex &index, const int role) const {
     return QVariant();
 }
 
-bool ColorModel::setData(
-    const QModelIndex &index, const QVariant &value, const int /*role*/
-) {
+bool ColorModel::setData(const QModelIndex &index, const QVariant &value, const int /*role*/) {
     if (!checkIndex(index) || index.column() != 0) {
         return false;
     }
@@ -156,9 +151,7 @@ void ColorModel::pickColor(const QModelIndex &mi) {
     auto color = toQColor(pref(*colorPreference));
 
     // Show dialog
-    auto newColor = QColorDialog::getColor(
-        color, nullptr, "Select new color", QColorDialog::DontUseNativeDialog
-    );
+    auto newColor = QColorDialog::getColor(color, nullptr, "Select new color", QColorDialog::DontUseNativeDialog);
 
     // Apply color (QColorDialog::getColor() returns an invalid color if the user cancels
     // the dialog)

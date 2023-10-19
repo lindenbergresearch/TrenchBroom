@@ -42,9 +42,8 @@ const std::vector<vm::polygon3f> &PortalFile::portals() const {
 }
 
 bool canLoadPortalFile(const std::filesystem::path &path) {
-    return IO::Disk::withInputStream(
-        path, [](auto &stream) { return stream.is_open() && stream.good(); }
-    ).transform_error([](const auto &) { return false; }).value();
+    return IO::Disk::withInputStream(path, [](auto &stream) { return stream.is_open() && stream.good(); }).transform_error([](const auto &) { return false; }
+    ).value();
 }
 
 Result<PortalFile> loadPortalFile(std::istream &stream) {
@@ -115,8 +114,7 @@ Result<PortalFile> loadPortalFile(std::istream &stream) {
                 return Error{"Error reading portal"};
             }
 
-            verts.emplace_back(
-                std::stof(components.at(ptr)), std::stof(components.at(ptr + 1)), std::stof(components.at(ptr + 2)));
+            verts.emplace_back(std::stof(components.at(ptr)), std::stof(components.at(ptr + 1)), std::stof(components.at(ptr + 2)));
             ptr += 3;
         }
 

@@ -32,9 +32,7 @@
 
 namespace TrenchBroom {
 namespace View {
-std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(
-    Model::Node *parent, const std::vector<Model::Node *> &children
-) {
+std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(Model::Node *parent, const std::vector<Model::Node *> &children) {
     ensure(parent != nullptr, "parent is null");
     auto nodes = std::map<Model::Node *, std::vector<Model::Node *>>{};
     nodes[parent] = children;
@@ -42,15 +40,11 @@ std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(
     return add(nodes);
 }
 
-std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(
-    const std::map<Model::Node *, std::vector<Model::Node *>> &nodes
-) {
+std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) {
     return std::make_unique<AddRemoveNodesCommand>(Action::Add, nodes);
 }
 
-std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::remove(
-    const std::map<Model::Node *, std::vector<Model::Node *>> &nodes
-) {
+std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::remove(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) {
     return std::make_unique<AddRemoveNodesCommand>(Action::Remove, nodes);
 }
 
@@ -58,9 +52,8 @@ AddRemoveNodesCommand::~AddRemoveNodesCommand() {
     kdl::map_clear_and_delete(m_nodesToAdd);
 }
 
-AddRemoveNodesCommand::AddRemoveNodesCommand(
-    const Action action, const std::map<Model::Node *, std::vector<Model::Node *>> &nodes
-) : UpdateLinkedGroupsCommandBase{makeName(action), true}, m_action{action} {
+AddRemoveNodesCommand::AddRemoveNodesCommand(const Action action, const std::map<Model::Node *, std::vector<Model::Node *>> &nodes)
+    : UpdateLinkedGroupsCommandBase{makeName(action), true}, m_action{action} {
     switch (m_action) {
         case Action::Add:
             m_nodesToAdd = nodes;
@@ -82,16 +75,12 @@ std::string AddRemoveNodesCommand::makeName(const Action action) {
     }
 }
 
-std::unique_ptr<CommandResult> AddRemoveNodesCommand::doPerformDo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> AddRemoveNodesCommand::doPerformDo(MapDocumentCommandFacade *document) {
     doAction(document);
     return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> AddRemoveNodesCommand::doPerformUndo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> AddRemoveNodesCommand::doPerformUndo(MapDocumentCommandFacade *document) {
     undoAction(document);
     return std::make_unique<CommandResult>(true);
 }

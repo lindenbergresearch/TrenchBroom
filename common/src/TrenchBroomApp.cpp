@@ -299,7 +299,9 @@ bool TrenchBroomApp::loadStyleSheets() {
             return false;
 
         builder->addReplacement("TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::WindowText); });
-        builder->addReplacement("DISABLED_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::WindowText, QPalette::ColorGroup::Disabled); });
+        builder->addReplacement("DISABLED_TEXT_COLOR",
+            []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::WindowText, QPalette::ColorGroup::Disabled); }
+        );
         builder->addReplacement("HIGHLIGHTED_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::HighlightedText); });
         builder->addReplacement("BRIGHT_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::BrightText); });
         builder->addReplacement("PLACEHOLDER_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::PlaceholderText); });
@@ -318,7 +320,9 @@ bool TrenchBroomApp::loadStyleSheets() {
         builder->addReplacement("BRIGHT_HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, 130); });
         builder->addReplacement("HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight); });
         builder->addReplacement("MID_HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, -130); });
-        builder->addReplacement("DARK_HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, QPalette::ColorGroup::Disabled); });
+        builder->addReplacement("DARK_HIGHLIGHT_COLOR",
+            []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, QPalette::ColorGroup::Disabled); }
+        );
 
         builder->addReplacement("NARROW_V_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::NarrowVMargin); });
         builder->addReplacement("NARROW_H_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin); });
@@ -401,7 +405,8 @@ void TrenchBroomApp::updateRecentDocument(const std::filesystem::path &path) {
 
 bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
     const auto checkFileExists = [&]() {
-      return IO::Disk::pathInfo(path) == IO::PathInfo::File ? Result<void>{} : Result<void>{Error{"'" + path.string() + "' not found"}};
+      return IO::Disk::pathInfo(path) == IO::PathInfo::File ? Result<void>{} : Result<void>{
+          Error{"'" + path.string() + "' not found"}};
     };
 
     auto *frame = static_cast<MapFrame *>(nullptr);
@@ -460,7 +465,9 @@ void TrenchBroomApp::openAbout() {
 }
 
 bool TrenchBroomApp::initializeGameFactory() {
-    const auto gamePathConfig = Model::GamePathConfig{IO::SystemPaths::findResourceDirectories("games"), IO::SystemPaths::userDataDirectory() / "games",};
+    const auto gamePathConfig = Model::GamePathConfig{
+        IO::SystemPaths::findResourceDirectories("games"), IO::SystemPaths::userDataDirectory() / "games",
+    };
     auto &gameFactory = Model::GameFactory::instance();
     return gameFactory.initialize(gamePathConfig).transform([](auto errors) {
           if (!errors.empty()) {
@@ -468,8 +475,7 @@ bool TrenchBroomApp::initializeGameFactory() {
 
 {})", kdl::str_join(errors, "\n\n"));
 
-              QMessageBox::critical(nullptr, "TrenchBroom", QString::fromStdString(msg), QMessageBox::Ok
-              );
+              QMessageBox::critical(nullptr, "TrenchBroom", QString::fromStdString(msg), QMessageBox::Ok);
           }
         }
     ).if_error([](auto e) { qCritical() << QString::fromStdString(e.msg); }).is_success();
@@ -509,7 +515,8 @@ bool TrenchBroomApp::newDocument() {
 }
 
 void TrenchBroomApp::openDocument() {
-    const auto pathStr = QFileDialog::getOpenFileName(nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map), "Map files (*.map);;Any files (*.*)"
+    const auto pathStr = QFileDialog::getOpenFileName(nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map),
+        "Map files (*.map);;Any files (*.*)"
     );
 
     if (const auto path = IO::pathFromQString(pathStr); !path.empty()) {
@@ -763,8 +770,8 @@ std::filesystem::path savedMapPath() {
 
 std::filesystem::path crashReportBasePath() {
     const auto mapPath = savedMapPath();
-    const auto crashLogPath = !mapPath.empty() ? mapPath.parent_path() / mapPath.stem() += "-crash.txt" : IO::pathFromQString(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation
-    )) / "trenchbroom-crash.txt";
+    const auto crashLogPath = !mapPath.empty() ? mapPath.parent_path() / mapPath.stem() += "-crash.txt" :
+                              IO::pathFromQString(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)) / "trenchbroom-crash.txt";
 
     // ensure it doesn't exist
     auto index = 0;
@@ -863,8 +870,7 @@ LONG WINAPI TrenchBroomUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionPt
 #else
 
 static void CrashHandler(int /* signum */) {
-    TrenchBroom::View::reportCrashAndExit(TrenchBroom::TrenchBroomStackWalker::getStackTrace(), "SIGSEGV"
-    );
+    TrenchBroom::View::reportCrashAndExit(TrenchBroom::TrenchBroomStackWalker::getStackTrace(), "SIGSEGV");
 }
 
 #endif

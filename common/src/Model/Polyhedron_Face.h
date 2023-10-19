@@ -45,9 +45,7 @@ const kdl::intrusive_circular_link<Polyhedron_Face<T, FP, VP>> &Polyhedron_GetFa
 }
 
 template<typename T, typename FP, typename VP>
-Polyhedron_Face<T, FP, VP>::Polyhedron_Face(
-    HalfEdgeList &&boundary, const vm::plane<T, 3> &plane
-)
+Polyhedron_Face<T, FP, VP>::Polyhedron_Face(HalfEdgeList &&boundary, const vm::plane<T, 3> &plane)
     : m_boundary(std::move(boundary)), m_plane(plane), m_payload(FP::defaultValue()),
 #ifdef _MSC_VER
     // MSVC throws a warning because we're passing this to the FaceLink constructor, but it's
@@ -120,9 +118,8 @@ const typename Polyhedron_Face<T, FP, VP>::HalfEdge *Polyhedron_Face<T, FP, VP>:
 }
 
 template<typename T, typename FP, typename VP>
-const typename Polyhedron_Face<T, FP, VP>::Edge *Polyhedron_Face<T, FP, VP>::findEdge(
-    const vm::vec<T, 3> &first, const vm::vec<T, 3> &second, const T epsilon
-) const {
+const typename Polyhedron_Face<T, FP, VP>::Edge *
+Polyhedron_Face<T, FP, VP>::findEdge(const vm::vec<T, 3> &first, const vm::vec<T, 3> &second, const T epsilon) const {
     const HalfEdge *halfEdge = findHalfEdge(first, epsilon);
     if (halfEdge == nullptr) {
         return nullptr;
@@ -157,9 +154,7 @@ std::vector<vm::vec<T, 3>> Polyhedron_Face<T, FP, VP>::vertexPositions() const {
 }
 
 template<typename T, typename FP, typename VP>
-bool Polyhedron_Face<T, FP, VP>::hasVertexPosition(
-    const vm::vec<T, 3> &position, const T epsilon
-) const {
+bool Polyhedron_Face<T, FP, VP>::hasVertexPosition(const vm::vec<T, 3> &position, const T epsilon) const {
     for (const HalfEdge *halfEdge: m_boundary) {
         if (vm::is_equal(halfEdge->origin()->position(), position, epsilon)) {
             return true;
@@ -169,9 +164,7 @@ bool Polyhedron_Face<T, FP, VP>::hasVertexPosition(
 }
 
 template<typename T, typename FP, typename VP>
-bool Polyhedron_Face<T, FP, VP>::hasVertexPositions(
-    const std::vector<vm::vec<T, 3>> &positions, const T epsilon
-) const {
+bool Polyhedron_Face<T, FP, VP>::hasVertexPositions(const std::vector<vm::vec<T, 3>> &positions, const T epsilon) const {
     if (positions.size() != vertexCount()) {
         return false;
     }
@@ -186,9 +179,7 @@ bool Polyhedron_Face<T, FP, VP>::hasVertexPositions(
 }
 
 template<typename T, typename FP, typename VP>
-T Polyhedron_Face<T, FP, VP>::distanceTo(
-    const std::vector<vm::vec<T, 3>> &positions, const T maxDistance
-) const {
+T Polyhedron_Face<T, FP, VP>::distanceTo(const std::vector<vm::vec<T, 3>> &positions, const T maxDistance) const {
     if (positions.size() != vertexCount()) {
         return maxDistance;
     }
@@ -241,17 +232,14 @@ vm::vec<T, 3> Polyhedron_Face<T, FP, VP>::normal() const {
 
 template<typename T, typename FP, typename VP>
 vm::vec<T, 3> Polyhedron_Face<T, FP, VP>::center() const {
-    return vm::average(
-        std::begin(m_boundary), std::end(m_boundary), [](const HalfEdge *e) {
+    return vm::average(std::begin(m_boundary), std::end(m_boundary), [](const HalfEdge *e) {
           return e->origin()->position();
         }
     );
 }
 
 template<typename T, typename FP, typename VP>
-T Polyhedron_Face<T, FP, VP>::intersectWithRay(
-    const vm::ray<T, 3> &ray, const vm::side side
-) const {
+T Polyhedron_Face<T, FP, VP>::intersectWithRay(const vm::ray<T, 3> &ray, const vm::side side) const {
     const RayIntersection result = intersectWithRay(ray);
     if (result.none()) {
         return result.distance();
@@ -269,9 +257,7 @@ T Polyhedron_Face<T, FP, VP>::intersectWithRay(
 }
 
 template<typename T, typename FP, typename VP>
-vm::plane_status Polyhedron_Face<T, FP, VP>::pointStatus(
-    const vm::vec<T, 3> &point, const T epsilon
-) const {
+vm::plane_status Polyhedron_Face<T, FP, VP>::pointStatus(const vm::vec<T, 3> &point, const T epsilon) const {
     const auto norm = normal();
     const auto distance = vm::dot(point - origin(), norm);
     if (distance > epsilon) {
@@ -299,15 +285,12 @@ bool Polyhedron_Face<T, FP, VP>::coplanar(const Face *other, const T epsilon) co
         return false;
     }
 
-    const vm::plane<T, 3> otherPlane(
-        other->boundary().front()->origin()->position(), other->normal());
+    const vm::plane<T, 3> otherPlane(other->boundary().front()->origin()->position(), other->normal());
     return verticesOnPlane(otherPlane, epsilon);
 }
 
 template<typename T, typename FP, typename VP>
-bool Polyhedron_Face<T, FP, VP>::verticesOnPlane(
-    const vm::plane<T, 3> &plane, const T epsilon
-) const {
+bool Polyhedron_Face<T, FP, VP>::verticesOnPlane(const vm::plane<T, 3> &plane, const T epsilon) const {
     for (const HalfEdge *halfEdge: m_boundary) {
         const auto *vertex = halfEdge->origin();
         if (plane.point_status(vertex->position(), epsilon) != vm::plane_status::inside) {
@@ -353,9 +336,7 @@ typename Polyhedron_Face<T, FP, VP>::HalfEdgeList Polyhedron_Face<T, FP, VP>::re
     assert(to->face() == this);
 
     const auto removeCount = countAndUnsetFace(from, to);
-    return m_boundary.remove(
-        HalfEdgeList::iter(from), std::next(HalfEdgeList::iter(to)), removeCount
-    );
+    return m_boundary.remove(HalfEdgeList::iter(from), std::next(HalfEdgeList::iter(to)), removeCount);
 }
 
 template<typename T, typename FP, typename VP>
@@ -373,14 +354,11 @@ typename Polyhedron_Face<T, FP, VP>::HalfEdgeList Polyhedron_Face<T, FP, VP>::re
 
     const auto removeCount = countAndUnsetFace(from, to);
     countAndSetFace(with.front(), with.back(), this);
-    return m_boundary.splice_replace(
-        HalfEdgeList::iter(from), std::next(HalfEdgeList::iter(to)), removeCount, std::forward<H>(with));
+    return m_boundary.splice_replace(HalfEdgeList::iter(from), std::next(HalfEdgeList::iter(to)), removeCount, std::forward<H>(with));
 }
 
 template<typename T, typename FP, typename VP>
-size_t Polyhedron_Face<T, FP, VP>::countAndSetFace(
-    HalfEdge *from, HalfEdge *to, Face *face
-) {
+size_t Polyhedron_Face<T, FP, VP>::countAndSetFace(HalfEdge *from, HalfEdge *to, Face *face) {
     size_t count = 0u;
     auto *cur = from;
     do {
@@ -466,8 +444,7 @@ typename Polyhedron_Face<T, FP, VP>::RayIntersection Polyhedron_Face<T, FP, VP>:
         return RayIntersection::None();
     }
 
-    const auto distance = vm::intersect_ray_polygon(
-        ray, plane, std::begin(m_boundary), std::end(m_boundary), [](const HalfEdge *e) {
+    const auto distance = vm::intersect_ray_polygon(ray, plane, std::begin(m_boundary), std::end(m_boundary), [](const HalfEdge *e) {
           return e->origin()->position();
         }
     );

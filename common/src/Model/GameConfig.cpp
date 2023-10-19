@@ -99,9 +99,7 @@ std::filesystem::path GameConfig::findInitialMap(const std::string &formatName) 
     return std::filesystem::path{};
 }
 
-std::filesystem::path GameConfig::findConfigFile(
-    const std::filesystem::path &filePath
-) const {
+std::filesystem::path GameConfig::findConfigFile(const std::filesystem::path &filePath) const {
     return path.parent_path() / filePath;
 }
 } // namespace Model

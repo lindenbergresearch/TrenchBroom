@@ -48,19 +48,17 @@ private:
     std::filesystem::perms m_permissions;
 
 public:
-    explicit SetPermissions(
-        std::filesystem::path path, const std::filesystem::perms permissions)
-        : m_path{std::move(path)}, m_permissions{std::filesystem::status(m_path).permissions()} {
+    explicit SetPermissions(std::filesystem::path path, const std::filesystem::perms permissions) : m_path{
+        std::move(path)
+    }, m_permissions{std::filesystem::status(m_path).permissions()} {
         std::filesystem::permissions(m_path, permissions);
     }
 
     ~SetPermissions() {
         try {
             std::filesystem::permissions(m_path, m_permissions);
-        }
-        catch (const std::filesystem::filesystem_error &e) {
-            std::cout << "Could not reset file permissions for " << m_path << ": " << e.what()
-                      << "\n";
+        } catch (const std::filesystem::filesystem_error &e) {
+            std::cout << "Could not reset file permissions for " << m_path << ": " << e.what() << "\n";
         }
     }
 };
@@ -69,9 +67,7 @@ TestEnvironment makeTestEnvironment() {
     // have a non-ASCII character in the directory name to help catch
     // filename encoding bugs
     const auto hiraganaLetterSmallA = QString(static_cast<QChar>(0x3041));
-    const auto dir = (QString::fromStdString(Catch::getResultCapture().getCurrentTestName())
-                      + hiraganaLetterSmallA)
-        .toStdString();
+    const auto dir = (QString::fromStdString(Catch::getResultCapture().getCurrentTestName()) + hiraganaLetterSmallA).toStdString();
 
     return TestEnvironment{
         dir, [](TestEnvironment &env) {
@@ -88,8 +84,7 @@ TestEnvironment makeTestEnvironment() {
 }
 
 const auto readAll = [](auto &stream) {
-  return std::string{
-      std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
+  return std::string{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
 };
 } // namespace
 
@@ -104,9 +99,7 @@ TEST_CASE("DiskIO")
 
         if (Disk::isCaseSensitive()) {
             CHECK(Disk::fixPath(env.dir() / "TEST.txt") == env.dir() / "test.txt");
-            CHECK(
-                Disk::fixPath(env.dir() / "anotHERDIR/./SUBdirTEST/../SubdirTesT/TesT2.MAP")
-                == env.dir() / "anotherDir/subDirTest/test2.map");
+            CHECK(Disk::fixPath(env.dir() / "anotHERDIR/./SUBdirTEST/../SubdirTesT/TesT2.MAP") == env.dir() / "anotherDir/subDirTest/test2.map");
         }
     }
 
@@ -122,89 +115,83 @@ TEST_CASE("DiskIO")
 
         CHECK(Disk::pathInfo(env.dir() / "anotherDir/test3.map") == PathInfo::File);
         CHECK(Disk::pathInfo(env.dir() / "anotherDir/TEST3.map") == PathInfo::File);
-        CHECK(
-            Disk::pathInfo(env.dir() / "anotherDir/subDirTest/test2.map") == PathInfo::File);
+        CHECK(Disk::pathInfo(env.dir() / "anotherDir/subDirTest/test2.map") == PathInfo::File);
     }
 
     SECTION("find")
     {
-        CHECK_THAT(
-            Disk::find("asdf/bleh", TraversalMode::Flat),
-            MatchesAnyOf({
-                             // macOS
-                             Result<std::vector<std::filesystem::path>>{
-                                 Error{"Failed to open 'asdf/bleh': No such file or directory"}},
-                             // Windows
-                             Result<std::vector<std::filesystem::path>>{Error{
-                                 "Failed to open 'asdf\\bleh': The system cannot find the path specified."}},
-                         }));
-        CHECK_THAT(
-            Disk::find(env.dir() / "does/not/exist", TraversalMode::Flat),
-            MatchesAnyOf({
-                             // macOS
-                             Result<std::vector<std::filesystem::path>>{Error{
-                                 "Failed to open '" + (env.dir() / "does/not/exist").string()
-                                 + "': No such file or directory"}},
-                             // Windows
-                             Result<std::vector<std::filesystem::path>>{Error{
-                                 "Failed to open '" + (env.dir() / "does\\not\\exist").string()
-                                 + "': The system cannot find the path specified."}},
-                         }));
+        CHECK_THAT(Disk::find("asdf/bleh", TraversalMode::Flat), MatchesAnyOf({
+                // macOS
+                Result<std::vector<std::filesystem::path>>{
+                    Error{
+                        "Failed to open 'asdf/bleh': No such file or directory"
+                    }},
+                // Windows
+                Result<std::vector<std::filesystem::path>>{
+                    Error{
+                        "Failed to open 'asdf\\bleh': The system cannot find the path specified."
+                    }},
+            }
+        ));
+        CHECK_THAT(Disk::find(env.dir() / "does/not/exist", TraversalMode::Flat), MatchesAnyOf({
+                // macOS
+                Result<std::vector<std::filesystem::path>>{
+                    Error{
+                        "Failed to open '" + (env.dir() / "does/not/exist").string() + "': No such file or directory"
+                    }},
+                // Windows
+                Result<std::vector<std::filesystem::path>>{
+                    Error{
+                        "Failed to open '" + (env.dir() / "does\\not\\exist").string() + "': The system cannot find the path specified."
+                    }},
+            }
+        ));
 
-        CHECK_THAT(
-            Disk::find(env.dir(), TraversalMode::Flat).value(),
-            Catch::UnorderedEquals(std::vector<std::filesystem::path>{
-                env.dir() / "dir1",
-                env.dir() / "dir2",
-                env.dir() / "anotherDir",
-                env.dir() / "test.txt",
-                env.dir() / "test2.map",
-            }));
+        CHECK_THAT(Disk::find(env.dir(), TraversalMode::Flat).value(), Catch::UnorderedEquals(std::vector<std::filesystem::path>{
+                env.dir() / "dir1", env.dir() / "dir2", env.dir() / "anotherDir", env.dir() / "test.txt", env.dir() / "test2.map",
+            }
+        ));
 
-        CHECK_THAT(
-            Disk::find(env.dir(), TraversalMode::Recursive).value(),
-            Catch::UnorderedEquals(std::vector<std::filesystem::path>{
-                env.dir() / "dir1",
-                env.dir() / "dir2",
-                env.dir() / "anotherDir",
-                env.dir() / "anotherDir/subDirTest",
-                env.dir() / "anotherDir/subDirTest/test2.map",
-                env.dir() / "anotherDir/test3.map",
-                env.dir() / "test.txt",
-                env.dir() / "test2.map",
-            }));
+        CHECK_THAT(Disk::find(env.dir(), TraversalMode::Recursive).value(), Catch::UnorderedEquals(std::vector<std::filesystem::path>{
+                env.dir() / "dir1", env.dir() / "dir2", env.dir() / "anotherDir", env.dir() / "anotherDir/subDirTest",
+                env.dir() / "anotherDir/subDirTest/test2.map", env.dir() / "anotherDir/test3.map", env.dir() / "test.txt", env.dir() / "test2.map",
+            }
+        ));
     }
 
     SECTION("openFile")
     {
 
-        CHECK_THAT(
-            Disk::openFile("asdf/bleh"),
-            MatchesAnyOf({
-                             // macOS / Linux
-                             Result<std::shared_ptr<CFile>>{
-                                 Error{"Failed to open 'asdf/bleh': path does not denote a file"}},
-                             // Windows
-                             Result<std::shared_ptr<CFile>>{
-                                 Error{"Failed to open 'asdf\\bleh': path does not denote a file"}},
-                         }));
-        CHECK_THAT(
-            Disk::openFile(env.dir() / "does/not/exist"),
-            MatchesAnyOf({
-                             // macOS / Linux
-                             Result<std::shared_ptr<CFile>>{Error{
-                                 "Failed to open '" + (env.dir() / "does/not/exist").string()
-                                 + "': path does not denote a file"}},
-                             // Windows
-                             Result<std::shared_ptr<CFile>>{Error{
-                                 "Failed to open '" + (env.dir() / "does\\not\\exist").string()
-                                 + "': path does not denote a file"}},
-                         }));
-        CHECK(
-            Disk::openFile(env.dir() / "does_not_exist.txt")
-            == Result<std::shared_ptr<CFile>>{Error{
-                "Failed to open '" + (env.dir() / "does_not_exist.txt").string()
-                + "': path does not denote a file"}});
+        CHECK_THAT(Disk::openFile("asdf/bleh"), MatchesAnyOf({
+                // macOS / Linux
+                Result<std::shared_ptr<CFile>>{
+                    Error{
+                        "Failed to open 'asdf/bleh': path does not denote a file"
+                    }},
+                // Windows
+                Result<std::shared_ptr<CFile>>{
+                    Error{
+                        "Failed to open 'asdf\\bleh': path does not denote a file"
+                    }},
+            }
+        ));
+        CHECK_THAT(Disk::openFile(env.dir() / "does/not/exist"), MatchesAnyOf({
+                // macOS / Linux
+                Result<std::shared_ptr<CFile>>{
+                    Error{
+                        "Failed to open '" + (env.dir() / "does/not/exist").string() + "': path does not denote a file"
+                    }},
+                // Windows
+                Result<std::shared_ptr<CFile>>{
+                    Error{
+                        "Failed to open '" + (env.dir() / "does\\not\\exist").string() + "': path does not denote a file"
+                    }},
+            }
+        ));
+        CHECK(Disk::openFile(env.dir() / "does_not_exist.txt") == Result<std::shared_ptr<CFile>>{
+            Error{
+                "Failed to open '" + (env.dir() / "does_not_exist.txt").string() + "': path does not denote a file"
+            }});
 
         auto file = Disk::openFile(env.dir() / "test.txt");
         CHECK(file.is_success());
@@ -217,32 +204,24 @@ TEST_CASE("DiskIO")
     {
         SECTION("withInputStream")
         {
-            CHECK(
-                Disk::withInputStream(env.dir() / "does not exist.txt", readAll)
-                == Error{
-                    "Could not open stream for file '" + (env.dir() / "does not exist.txt").string()
-                    + "'"});
+            CHECK(Disk::withInputStream(env.dir() / "does not exist.txt", readAll) == Error{
+                "Could not open stream for file '" + (env.dir() / "does not exist.txt").string() + "'"
+            });
 
             CHECK(Disk::withInputStream(env.dir() / "test.txt", readAll) == "some content");
         }
 
         SECTION("withOutputStream")
         {
-            REQUIRE(Disk::withOutputStream(
-                env.dir() / "test.txt",
-                std::ios::out | std::ios::app,
-                [](auto &stream) { stream << "\nmore content"; })
-                        .is_success());
-            CHECK(
-                Disk::withInputStream(env.dir() / "test.txt", readAll)
-                == "some content\nmore content");
+            REQUIRE(
+                Disk::withOutputStream(env.dir() / "test.txt", std::ios::out | std::ios::app, [](auto &stream) { stream << "\nmore content"; }).is_success());
+            CHECK(Disk::withInputStream(env.dir() / "test.txt", readAll) == "some content\nmore content");
 
             REQUIRE(Disk::withOutputStream(env.dir() / "some_other_name.txt", [](auto &stream) {
-              stream << "some text...";
-            }).is_success());
-            CHECK(
-                Disk::withInputStream(env.dir() / "some_other_name.txt", readAll)
-                == "some text...");
+                  stream << "some text...";
+                }
+            ).is_success());
+            CHECK(Disk::withInputStream(env.dir() / "some_other_name.txt", readAll) == "some text...");
         }
     }
 
@@ -253,36 +232,33 @@ TEST_CASE("DiskIO")
         CHECK(Disk::createDirectory(env.dir() / "yetAnotherDir") == Result<bool>{true});
         CHECK(std::filesystem::exists(env.dir() / "yetAnotherDir"));
 
-        CHECK(
-            Disk::createDirectory(env.dir() / "yetAnotherDir/and/a/nested/directory")
-            == Result<bool>{true});
+        CHECK(Disk::createDirectory(env.dir() / "yetAnotherDir/and/a/nested/directory") == Result<bool>{true});
         CHECK(std::filesystem::exists(env.dir() / "yetAnotherDir/and/a/nested/directory"));
 
-        CHECK_THAT(
-            Disk::createDirectory(env.dir() / "test.txt"),
-            MatchesAnyOf({
-                             // macOS
-                             Result<bool>{Error{
-                                 "Failed to create '" + (env.dir() / "test.txt").string() + "': File exists"}},
-                             // Linux
-                             Result<bool>{Error{
-                                 "Failed to create '" + (env.dir() / "test.txt").string()
-                                 + "': Not a directory"}},
-                             // Windows
-                             Result<bool>{Error{
-                                 "Failed to create '" + (env.dir() / "test.txt").string()
-                                 + "': Cannot create a file when that file already exists."}},
-                         }));
+        CHECK_THAT(Disk::createDirectory(env.dir() / "test.txt"), MatchesAnyOf({
+                // macOS
+                Result<bool>{
+                    Error{
+                        "Failed to create '" + (env.dir() / "test.txt").string() + "': File exists"
+                    }},
+                // Linux
+                Result<bool>{
+                    Error{
+                        "Failed to create '" + (env.dir() / "test.txt").string() + "': Not a directory"
+                    }},
+                // Windows
+                Result<bool>{
+                    Error{
+                        "Failed to create '" + (env.dir() / "test.txt").string() + "': Cannot create a file when that file already exists."
+                    }},
+            }
+        ));
 
 #ifndef _WIN32
         // These tests don't work on Windows due to differences in permissions
-        const auto setPermissions =
-            SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_read};
-        CHECK(
-            Disk::createDirectory(env.dir() / "anotherDir/nestedDir")
-            == Result<bool>{Error{
-                "Failed to create '" + (env.dir() / "anotherDir/nestedDir").string()
-                + "': Permission denied"}});
+        const auto setPermissions = SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_read};
+        CHECK(Disk::createDirectory(env.dir() / "anotherDir/nestedDir") == Result<bool>{
+            Error{"Failed to create '" + (env.dir() / "anotherDir/nestedDir").string() + "': Permission denied"}});
 #endif
     }
 
@@ -292,24 +268,17 @@ TEST_CASE("DiskIO")
         CHECK(Disk::deleteFile(env.dir() / "test.txt") == Result<bool>{true});
         CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::Unknown);
 
-        CHECK(
-            Disk::deleteFile(env.dir() / "anotherDir")
-            == Result<bool>{Error{
-                "Failed to delete '" + (env.dir() / "anotherDir").string()
-                + "': path denotes a directory"}});
+        CHECK(Disk::deleteFile(env.dir() / "anotherDir") == Result<bool>{
+            Error{"Failed to delete '" + (env.dir() / "anotherDir").string() + "': path denotes a directory"}});
         CHECK(Disk::deleteFile(env.dir() / "does_not_exist") == Result<bool>{false});
 
 #ifndef _WIN32
         // These tests don't work on Windows due to differences in permissions
-        const auto setPermissions =
-            SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_exec};
+        const auto setPermissions = SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_exec};
 
         REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/test3.map") == PathInfo::File);
-        CHECK(
-            Disk::deleteFile(env.dir() / "anotherDir/test3.map")
-            == Result<bool>{Error{
-                "Failed to delete '" + (env.dir() / "anotherDir/test3.map").string()
-                + "': Permission denied"}});
+        CHECK(Disk::deleteFile(env.dir() / "anotherDir/test3.map") == Result<bool>{
+            Error{"Failed to delete '" + (env.dir() / "anotherDir/test3.map").string() + "': Permission denied"}});
 #endif
     }
 
@@ -319,42 +288,46 @@ TEST_CASE("DiskIO")
         {
             REQUIRE(Disk::pathInfo(env.dir() / "does_not_exist.txt") == PathInfo::Unknown);
 
-            CHECK_THAT(
-                Disk::copyFile(env.dir() / "does_not_exist.txt", env.dir() / "dir1"),
-                MatchesAnyOf({
-                                 // macOS / Linux
-                                 Result<void>{Error{
-                                     "Failed to copy '" + (env.dir() / "does_not_exist.txt").string() + "' to '"
-                                     + (env.dir() / "dir1/does_not_exist.txt").string()
-                                     + "': No such file or directory"}},
-                                 // Windows
-                                 Result<void>{Error{
-                                     "Failed to copy '" + (env.dir() / "does_not_exist.txt").string() + "' to '"
-                                     + (env.dir() / "dir1\\does_not_exist.txt").string()
-                                     + "': The system cannot find the file specified."}},
-                             }));
+            CHECK_THAT(Disk::copyFile(env.dir() / "does_not_exist.txt", env.dir() / "dir1"), MatchesAnyOf({
+                    // macOS / Linux
+                    Result<void>{
+                        Error{
+                            "Failed to copy '" + (env.dir() / "does_not_exist.txt").string() + "' to '" + (env.dir() / "dir1/does_not_exist.txt").string() +
+                            "': No such file or directory"
+                        }},
+                    // Windows
+                    Result<void>{
+                        Error{
+                            "Failed to copy '" + (env.dir() / "does_not_exist.txt").string() + "' to '" + (env.dir() / "dir1\\does_not_exist.txt").string() +
+                            "': The system cannot find the file specified."
+                        }},
+                }
+            ));
         }
 
         SECTION("copy directory")
         {
             REQUIRE(Disk::pathInfo(env.dir() / "anotherDir") == PathInfo::Directory);
 
-            CHECK_THAT(
-                Disk::copyFile(env.dir() / "anotherDir", env.dir() / "dir1"),
-                MatchesAnyOf({
-                                 // macOS
-                                 kdl::result<void, Error>{Error{
-                                     "Failed to copy '" + (env.dir() / "anotherDir").string() + "' to '"
-                                     + (env.dir() / "dir1/anotherDir").string() + "': Operation not supported"}},
-                                 // Linux
-                                 kdl::result<void, Error>{Error{
-                                     "Failed to copy '" + (env.dir() / "anotherDir").string() + "' to '"
-                                     + (env.dir() / "dir1/anotherDir").string() + "': Invalid argument"}},
-                                 // Windows
-                                 Result<void>{Error{
-                                     "Failed to copy '" + (env.dir() / "anotherDir").string() + "' to '"
-                                     + (env.dir() / "dir1\\anotherDir").string() + "': Access is denied."}},
-                             }));
+            CHECK_THAT(Disk::copyFile(env.dir() / "anotherDir", env.dir() / "dir1"), MatchesAnyOf({
+                    // macOS
+                    kdl::result<void, Error>{
+                        Error{
+                            "Failed to copy '" + (env.dir() / "anotherDir").string() + "' to '" + (env.dir() / "dir1/anotherDir").string() +
+                            "': Operation not supported"
+                        }},
+                    // Linux
+                    kdl::result<void, Error>{
+                        Error{
+                            "Failed to copy '" + (env.dir() / "anotherDir").string() + "' to '" + (env.dir() / "dir1/anotherDir").string() + "': Invalid argument"
+                        }},
+                    // Windows
+                    Result<void>{
+                        Error{
+                            "Failed to copy '" + (env.dir() / "anotherDir").string() + "' to '" + (env.dir() / "dir1\\anotherDir").string() + "': Access is denied."
+                        }},
+                }
+            ));
         }
 
         SECTION("copy file into directory")
@@ -362,9 +335,7 @@ TEST_CASE("DiskIO")
             REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
             REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/test.txt") == PathInfo::Unknown);
 
-            CHECK(
-                Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir")
-                == Result<void>{});
+            CHECK(Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir") == Result<void>{});
 
             CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
             CHECK(Disk::pathInfo(env.dir() / "anotherDir/test.txt") == PathInfo::File);
@@ -377,9 +348,7 @@ TEST_CASE("DiskIO")
                 REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
                 REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/asdf.txt") == PathInfo::Unknown);
 
-                CHECK(
-                    Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt")
-                    == Result<void>{});
+                CHECK(Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt") == Result<void>{});
 
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
                 CHECK(Disk::pathInfo(env.dir() / "anotherDir/asdf.txt") == PathInfo::File);
@@ -392,14 +361,15 @@ TEST_CASE("DiskIO")
                 REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
                 REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/asdf.txt") == PathInfo::Unknown);
 
-                const auto setPermissions =
-                    SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_exec};
+                const auto setPermissions = SetPermissions{
+                    env.dir() / "anotherDir", std::filesystem::perms::owner_exec
+                };
 
-                CHECK(
-                    Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt")
-                    == Result<void>{Error{
-                        "Failed to copy '" + (env.dir() / "test.txt").string() + "' to '"
-                        + (env.dir() / "anotherDir/asdf.txt").string() + "': Permission denied"}});
+                CHECK(Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt") == Result<void>{
+                    Error{
+                        "Failed to copy '" + (env.dir() / "test.txt").string() + "' to '" + (env.dir() / "anotherDir/asdf.txt").string() +
+                        "': Permission denied"
+                    }});
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
 #endif
             }
@@ -409,21 +379,15 @@ TEST_CASE("DiskIO")
         {
             REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
             REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/test3.map") == PathInfo::File);
-            REQUIRE(
-                Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll)
-                != "some content");
+            REQUIRE(Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll) != "some content");
 
             SECTION("when the file can be overwritten")
             {
-                CHECK(
-                    Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map")
-                    == Result<void>{});
+                CHECK(Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map") == Result<void>{});
 
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
                 CHECK(Disk::pathInfo(env.dir() / "anotherDir/test3.map") == PathInfo::File);
-                CHECK(
-                    Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll)
-                    == "some content");
+                CHECK(Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll) == "some content");
             }
 
             SECTION("when file cannot be overwritte")
@@ -431,13 +395,14 @@ TEST_CASE("DiskIO")
 #ifndef _WIN32
                 // These tests don't work on Windows due to differences in permissions
                 const auto setPermissions = SetPermissions{
-                    env.dir() / "anotherDir/test3.map", std::filesystem::perms::none};
+                    env.dir() / "anotherDir/test3.map", std::filesystem::perms::none
+                };
 
-                CHECK(
-                    Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map")
-                    == Result<void>{Error{
-                        "Failed to copy '" + (env.dir() / "test.txt").string() + "' to '"
-                        + (env.dir() / "anotherDir/test3.map").string() + "': Permission denied"}});
+                CHECK(Disk::copyFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map") == Result<void>{
+                    Error{
+                        "Failed to copy '" + (env.dir() / "test.txt").string() + "' to '" + (env.dir() / "anotherDir/test3.map").string() +
+                        "': Permission denied"
+                    }});
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
 #endif
             }
@@ -450,31 +415,29 @@ TEST_CASE("DiskIO")
         {
             REQUIRE(Disk::pathInfo(env.dir() / "does_not_exist.txt") == PathInfo::Unknown);
 
-            CHECK_THAT(
-                Disk::moveFile(env.dir() / "does_not_exist.txt", env.dir() / "dir1"),
-                MatchesAnyOf({
-                                 // macOS / Linux
-                                 Result<void>{Error{
-                                     "Failed to move '" + (env.dir() / "does_not_exist.txt").string() + "' to '"
-                                     + (env.dir() / "dir1/does_not_exist.txt").string()
-                                     + "': No such file or directory"}},
-                                 // Windows
-                                 Result<void>{Error{
-                                     "Failed to move '" + (env.dir() / "does_not_exist.txt").string() + "' to '"
-                                     + (env.dir() / "dir1\\does_not_exist.txt").string()
-                                     + "': The system cannot find the file specified."}},
-                             }));
+            CHECK_THAT(Disk::moveFile(env.dir() / "does_not_exist.txt", env.dir() / "dir1"), MatchesAnyOf({
+                    // macOS / Linux
+                    Result<void>{
+                        Error{
+                            "Failed to move '" + (env.dir() / "does_not_exist.txt").string() + "' to '" + (env.dir() / "dir1/does_not_exist.txt").string() +
+                            "': No such file or directory"
+                        }},
+                    // Windows
+                    Result<void>{
+                        Error{
+                            "Failed to move '" + (env.dir() / "does_not_exist.txt").string() + "' to '" + (env.dir() / "dir1\\does_not_exist.txt").string() +
+                            "': The system cannot find the file specified."
+                        }},
+                }
+            ));
         }
 
         SECTION("move directory")
         {
             REQUIRE(Disk::pathInfo(env.dir() / "anotherDir") == PathInfo::Directory);
 
-            CHECK(
-                Disk::moveFile(env.dir() / "anotherDir", env.dir() / "dir1")
-                == Result<void>{Error{
-                    "Failed to move '" + (env.dir() / "anotherDir").string()
-                    + "': path denotes a directory"}});
+            CHECK(Disk::moveFile(env.dir() / "anotherDir", env.dir() / "dir1") == Result<void>{
+                Error{"Failed to move '" + (env.dir() / "anotherDir").string() + "': path denotes a directory"}});
             CHECK(Disk::pathInfo(env.dir() / "anotherDir") == PathInfo::Directory);
         }
 
@@ -483,9 +446,7 @@ TEST_CASE("DiskIO")
             REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
             REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/test.txt") == PathInfo::Unknown);
 
-            CHECK(
-                Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir")
-                == Result<void>{});
+            CHECK(Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir") == Result<void>{});
 
             CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::Unknown);
             CHECK(Disk::pathInfo(env.dir() / "anotherDir/test.txt") == PathInfo::File);
@@ -498,9 +459,7 @@ TEST_CASE("DiskIO")
                 REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
                 REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/asdf.txt") == PathInfo::Unknown);
 
-                CHECK(
-                    Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt")
-                    == Result<void>{});
+                CHECK(Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt") == Result<void>{});
 
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::Unknown);
                 CHECK(Disk::pathInfo(env.dir() / "anotherDir/asdf.txt") == PathInfo::File);
@@ -513,14 +472,15 @@ TEST_CASE("DiskIO")
                 REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
                 REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/asdf.txt") == PathInfo::Unknown);
 
-                const auto setPermissions =
-                    SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_exec};
+                const auto setPermissions = SetPermissions{
+                    env.dir() / "anotherDir", std::filesystem::perms::owner_exec
+                };
 
-                CHECK(
-                    Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt")
-                    == Result<void>{Error{
-                        "Failed to move '" + (env.dir() / "test.txt").string() + "' to '"
-                        + (env.dir() / "anotherDir/asdf.txt").string() + "': Permission denied"}});
+                CHECK(Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/asdf.txt") == Result<void>{
+                    Error{
+                        "Failed to move '" + (env.dir() / "test.txt").string() + "' to '" + (env.dir() / "anotherDir/asdf.txt").string() +
+                        "': Permission denied"
+                    }});
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
 #endif
             }
@@ -530,35 +490,30 @@ TEST_CASE("DiskIO")
         {
             REQUIRE(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
             REQUIRE(Disk::pathInfo(env.dir() / "anotherDir/test3.map") == PathInfo::File);
-            REQUIRE(
-                Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll)
-                != "some content");
+            REQUIRE(Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll) != "some content");
 
             SECTION("when the file can be overwritten")
             {
-                CHECK(
-                    Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map")
-                    == Result<void>{});
+                CHECK(Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map") == Result<void>{});
 
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::Unknown);
                 CHECK(Disk::pathInfo(env.dir() / "anotherDir/test3.map") == PathInfo::File);
-                CHECK(
-                    Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll)
-                    == "some content");
+                CHECK(Disk::withInputStream(env.dir() / "anotherDir/test3.map", readAll) == "some content");
             }
 
             SECTION("when the file cannot be overwritten")
             {
 #ifndef _WIN32
                 // These tests don't work on Windows due to differences in permissions
-                const auto setPermissions =
-                    SetPermissions{env.dir() / "anotherDir", std::filesystem::perms::owner_exec};
+                const auto setPermissions = SetPermissions{
+                    env.dir() / "anotherDir", std::filesystem::perms::owner_exec
+                };
 
-                CHECK(
-                    Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map")
-                    == Result<void>{Error{
-                        "Failed to move '" + (env.dir() / "test.txt").string() + "' to '"
-                        + (env.dir() / "anotherDir/test3.map").string() + "': Permission denied"}});
+                CHECK(Disk::moveFile(env.dir() / "test.txt", env.dir() / "anotherDir/test3.map") == Result<void>{
+                    Error{
+                        "Failed to move '" + (env.dir() / "test.txt").string() + "' to '" + (env.dir() / "anotherDir/test3.map").string() +
+                        "': Permission denied"
+                    }});
                 CHECK(Disk::pathInfo(env.dir() / "test.txt") == PathInfo::File);
 #endif
             }
@@ -567,15 +522,11 @@ TEST_CASE("DiskIO")
 
     SECTION("resolvePath")
     {
-        const auto rootPaths =
-            std::vector<std::filesystem::path>{env.dir(), env.dir() / "anotherDir"};
+        const auto rootPaths = std::vector<std::filesystem::path>{env.dir(), env.dir() / "anotherDir"};
 
         CHECK(Disk::resolvePath(rootPaths, "test.txt") == env.dir() / "test.txt");
-        CHECK(
-            Disk::resolvePath(rootPaths, "test3.map") == env.dir() / "anotherDir/test3.map");
-        CHECK(
-            Disk::resolvePath(rootPaths, "subDirTest/test2.map")
-            == env.dir() / "anotherDir/subDirTest/test2.map");
+        CHECK(Disk::resolvePath(rootPaths, "test3.map") == env.dir() / "anotherDir/test3.map");
+        CHECK(Disk::resolvePath(rootPaths, "subDirTest/test2.map") == env.dir() / "anotherDir/subDirTest/test2.map");
         CHECK(Disk::resolvePath(rootPaths, "/asfd/blah") == "");
         CHECK(Disk::resolvePath(rootPaths, "adk3kdk/bhb") == "");
     }

@@ -52,8 +52,8 @@ namespace TrenchBroom {
 namespace View {
 // EntityDefinitionCheckBoxList
 
-EntityDefinitionCheckBoxList::EntityDefinitionCheckBoxList(
-    Assets::EntityDefinitionManager &entityDefinitionManager, Model::EditorContext &editorContext, QWidget *parent
+EntityDefinitionCheckBoxList::EntityDefinitionCheckBoxList(Assets::EntityDefinitionManager &entityDefinitionManager, Model::EditorContext &editorContext,
+    QWidget *parent
 ) : QWidget(parent), m_entityDefinitionManager(entityDefinitionManager), m_editorContext(editorContext) {
     createGui();
     refresh();
@@ -102,9 +102,7 @@ void EntityDefinitionCheckBoxList::groupCheckBoxChanged(size_t groupIndex, bool 
     refresh();
 }
 
-void EntityDefinitionCheckBoxList::defCheckBoxChanged(
-    const Assets::EntityDefinition *definition, bool checked
-) {
+void EntityDefinitionCheckBoxList::defCheckBoxChanged(const Assets::EntityDefinition *definition, bool checked) {
     m_editorContext.setEntityDefinitionHidden(definition, !checked);
     refresh();
 }
@@ -144,8 +142,7 @@ void EntityDefinitionCheckBoxList::createGui() {
         // Checkbox for the prefix, e.g. "func"
         auto *groupCB = new QCheckBox(QString::fromStdString(groupName));
         makeEmphasized(groupCB);
-        connect(
-            groupCB, &QAbstractButton::clicked, this, [this, i](bool checked) {
+        connect(groupCB, &QAbstractButton::clicked, this, [this, i](bool checked) {
               this->groupCheckBoxChanged(i, checked);
             }
         );
@@ -160,8 +157,7 @@ void EntityDefinitionCheckBoxList::createGui() {
             auto *defCB = new QCheckBox(QString::fromStdString(defName));
             defCB->setObjectName("entityDefinition_checkboxWidget");
 
-            connect(
-                defCB, &QAbstractButton::clicked, this, [this, definition](bool checked) {
+            connect(defCB, &QAbstractButton::clicked, this, [this, definition](bool checked) {
                   this->defCheckBoxChanged(definition, checked);
                 }
             );
@@ -189,12 +185,8 @@ void EntityDefinitionCheckBoxList::createGui() {
     hideAllButton->setObjectName("ViewEditor_smallPushButton");
     makeSmall(hideAllButton);
 
-    connect(
-        showAllButton, &QAbstractButton::clicked, this, &EntityDefinitionCheckBoxList::showAllClicked
-    );
-    connect(
-        hideAllButton, &QAbstractButton::clicked, this, &EntityDefinitionCheckBoxList::hideAllClicked
-    );
+    connect(showAllButton, &QAbstractButton::clicked, this, &EntityDefinitionCheckBoxList::showAllClicked);
+    connect(hideAllButton, &QAbstractButton::clicked, this, &EntityDefinitionCheckBoxList::hideAllClicked);
 
     auto *buttonLayout = new QHBoxLayout();
     buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -214,27 +206,24 @@ void EntityDefinitionCheckBoxList::createGui() {
 
 // ViewEditor
 
-ViewEditor::ViewEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(std::move(document)), m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr),
-                                                                               m_showBrushEntityBoundsCheckBox(nullptr), m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr),
-                                                                               m_showPointEntityModelsCheckBox(nullptr), m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr), m_renderModeRadioGroup(nullptr),
-                                                                               m_shadeFacesCheckBox(nullptr), m_showFogCheckBox(nullptr), m_showEdgesCheckBox(nullptr), m_entityLinkRadioGroup(nullptr), m_showSoftBoundsCheckBox(nullptr) {
+ViewEditor::ViewEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(std::move(document)),
+                                                                               m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr),
+                                                                               m_showBrushEntityBoundsCheckBox(nullptr),
+                                                                               m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr),
+                                                                               m_showPointEntityModelsCheckBox(nullptr),
+                                                                               m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr),
+                                                                               m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr),
+                                                                               m_showFogCheckBox(nullptr), m_showEdgesCheckBox(nullptr),
+                                                                               m_entityLinkRadioGroup(nullptr), m_showSoftBoundsCheckBox(nullptr) {
     connectObservers();
 }
 
 void ViewEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
-    m_notifierConnection += document->documentWasNewedNotifier.connect(
-        this, &ViewEditor::documentWasNewedOrLoaded
-    );
-    m_notifierConnection += document->documentWasLoadedNotifier.connect(
-        this, &ViewEditor::documentWasNewedOrLoaded
-    );
-    m_notifierConnection += document->editorContextDidChangeNotifier.connect(
-        this, &ViewEditor::editorContextDidChange
-    );
-    m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(
-        this, &ViewEditor::entityDefinitionsDidChange
-    );
+    m_notifierConnection += document->documentWasNewedNotifier.connect(this, &ViewEditor::documentWasNewedOrLoaded);
+    m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &ViewEditor::documentWasNewedOrLoaded);
+    m_notifierConnection += document->editorContextDidChangeNotifier.connect(this, &ViewEditor::editorContextDidChange);
+    m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(this, &ViewEditor::entityDefinitionsDidChange);
 
     PreferenceManager &prefs = PreferenceManager::instance();
     m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &ViewEditor::preferenceDidChange);
@@ -262,9 +251,7 @@ void ViewEditor::createGui() {
     deleteChildWidgetsLaterAndDeleteLayout(this);
 
     auto *sizer = new QGridLayout();
-    sizer->setContentsMargins(
-        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
-    );
+    sizer->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
     sizer->setHorizontalSpacing(LayoutConstants::WideHMargin);
     sizer->setVerticalSpacing(LayoutConstants::WideVMargin);
     sizer->addWidget(createEntityDefinitionsPanel(this), 0, 0, 3, 1);
@@ -305,24 +292,12 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
     m_showPointEntitiesCheckBox = new QCheckBox(tr("Show point entities"));
     m_showPointEntityModelsCheckBox = new QCheckBox(tr("Show point entity models"));
 
-    connect(
-        m_showEntityClassnamesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEntityClassnamesChanged
-    );
-    connect(
-        m_showGroupBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showGroupBoundsChanged
-    );
-    connect(
-        m_showBrushEntityBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushEntityBoundsChanged
-    );
-    connect(
-        m_showPointEntityBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntityBoundsChanged
-    );
-    connect(
-        m_showPointEntitiesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntitiesChanged
-    );
-    connect(
-        m_showPointEntityModelsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntityModelsChanged
-    );
+    connect(m_showEntityClassnamesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEntityClassnamesChanged);
+    connect(m_showGroupBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showGroupBoundsChanged);
+    connect(m_showBrushEntityBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushEntityBoundsChanged);
+    connect(m_showPointEntityBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntityBoundsChanged);
+    connect(m_showPointEntitiesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntitiesChanged);
+    connect(m_showPointEntityModelsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntityModelsChanged);
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
@@ -344,9 +319,7 @@ QWidget *ViewEditor::createBrushesPanel(QWidget *parent) {
     createTagFilter(inner);
 
     m_showBrushesCheckBox = new QCheckBox(tr("Show brushes"));
-    connect(
-        m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged
-    );
+    connect(m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged);
 
     auto *innerLayout = qobject_cast<QBoxLayout *>(inner->layout());
     ensure(innerLayout != nullptr, "inner sizer is null");
@@ -373,18 +346,14 @@ void ViewEditor::createEmptyTagFilter(QWidget *parent) {
     makeInfo(msg);
 
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(
-        0, LayoutConstants::WideVMargin, 0, LayoutConstants::WideVMargin
-    );
+    layout->setContentsMargins(0, LayoutConstants::WideVMargin, 0, LayoutConstants::WideVMargin);
     layout->setSpacing(0);
     layout->addWidget(msg);
 
     parent->setLayout(layout);
 }
 
-void ViewEditor::createTagFilter(
-    QWidget *parent, const std::vector<Model::SmartTag> &tags
-) {
+void ViewEditor::createTagFilter(QWidget *parent, const std::vector<Model::SmartTag> &tags) {
     assert(!tags.empty());
 
     auto *layout = new QVBoxLayout();
@@ -400,8 +369,7 @@ void ViewEditor::createTagFilter(
         m_tagCheckBoxes.emplace_back(tagType, checkBox);
 
         layout->addWidget(checkBox);
-        connect(
-            checkBox, &QAbstractButton::clicked, this, [this, tagType](const bool checked) {
+        connect(checkBox, &QAbstractButton::clicked, this, [this, tagType](const bool checked) {
               showTagChanged(checked, tagType);
             }
         );
@@ -414,7 +382,9 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     QWidget *inner = panel->getPanel();
 
     const QList<QString> FaceRenderModes = {"Show textures", "Hide textures", "Hide faces"};
-    const QList<QString> FaceRenderModesPrefValues = {Preferences::faceRenderModeTextured(), Preferences::faceRenderModeFlat(), Preferences::faceRenderModeSkip()};
+    const QList<QString> FaceRenderModesPrefValues = {
+        Preferences::faceRenderModeTextured(), Preferences::faceRenderModeFlat(), Preferences::faceRenderModeSkip()
+    };
 
     m_renderModeRadioGroup = new QButtonGroup(this);
     for (int i = 0; i < FaceRenderModes.length(); ++i) {
@@ -430,8 +400,12 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     m_showFogCheckBox = new QCheckBox(tr("Use fog"));
     m_showEdgesCheckBox = new QCheckBox(tr("Show edges"));
 
-    const QList<QString> EntityLinkModes = {"Show all entity links", "Show transitively selected entity links", "Show directly selected entity links", "Hide entity links"};
-    const QList<QString> EntityLinkModesPrefValues = {Preferences::entityLinkModeAll(), Preferences::entityLinkModeTransitive(), Preferences::entityLinkModeDirect(), Preferences::entityLinkModeNone()};
+    const QList<QString> EntityLinkModes = {
+        "Show all entity links", "Show transitively selected entity links", "Show directly selected entity links", "Hide entity links"
+    };
+    const QList<QString> EntityLinkModesPrefValues = {
+        Preferences::entityLinkModeAll(), Preferences::entityLinkModeTransitive(), Preferences::entityLinkModeDirect(), Preferences::entityLinkModeNone()
+    };
     m_entityLinkRadioGroup = new QButtonGroup(this);
     for (int i = 0; i < EntityLinkModes.length(); ++i) {
         const QString &label = EntityLinkModes.at(i);
@@ -445,34 +419,22 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     m_showSoftBoundsCheckBox = new QCheckBox(tr("Show soft bounds"));
 
     auto *restoreDefualtsButton = new QPushButton(tr("Restore Defaults"));
-    restoreDefualtsButton->setContentsMargins(LayoutConstants::NarrowHMargin,LayoutConstants::NarrowHMargin,LayoutConstants::NarrowHMargin,LayoutConstants::NarrowHMargin);
+    restoreDefualtsButton->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     restoreDefualtsButton->setObjectName("ViewEditor_smallPushButton");
     makeSmall(restoreDefualtsButton);
 
 
-    connect(
-        m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged
-    );
-    connect(
-        m_showFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogChanged
-    );
-    connect(
-        m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged
-    );
+    connect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
+    connect(m_showFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogChanged);
+    connect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
 
-    connect(
-        m_renderModeRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::faceRenderModeChanged
-    );
-    connect(
-        m_entityLinkRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::entityLinkModeChanged
-    );
+    connect(m_renderModeRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::faceRenderModeChanged);
+    connect(m_entityLinkRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::entityLinkModeChanged);
 
-    connect(
-        m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged
-    );
-    connect(
-        restoreDefualtsButton, &QAbstractButton::clicked, this, &ViewEditor::restoreDefaultsClicked
-    );
+    connect(m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged);
+    connect(restoreDefualtsButton, &QAbstractButton::clicked, this, &ViewEditor::restoreDefaultsClicked);
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);

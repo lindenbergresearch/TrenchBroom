@@ -73,8 +73,6 @@ std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &h
  * @throws BrushFAceReferenceException if any of the given face references cannot be
  * resolved
  */
-std::vector<BrushFaceHandle> resolveAllRefs(
-    const std::vector<BrushFaceReference> &faceRefs
-);
+std::vector<BrushFaceHandle> resolveAllRefs(const std::vector<BrushFaceReference> &faceRefs);
 } // namespace Model
 } // namespace TrenchBroom

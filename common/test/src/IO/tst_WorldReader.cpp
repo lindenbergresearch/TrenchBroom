@@ -171,8 +171,7 @@ TEST_CASE("WorldReaderTest.parseMapWithWorldspawnAndOneMoreEntity")
     CHECK(defaultLayerNode->childCount() == 1u);
     CHECK(defaultLayerNode->layer().sortIndex() == Model::Layer::defaultLayerSortIndex());
 
-    auto *entityNode =
-        static_cast<Model::EntityNode *>(defaultLayerNode->children().front());
+    auto *entityNode = static_cast<Model::EntityNode *>(defaultLayerNode->children().front());
     CHECK(entityNode->entity().hasProperty("classname"));
     CHECK(*entityNode->entity().property("classname") == "info_player_deathmatch");
     CHECK(entityNode->entity().hasProperty("origin"));
@@ -211,11 +210,10 @@ TEST_CASE("WorldReaderTest.parseMapWithWorldspawnAndOneBrush")
     const auto &faces = brushNode->brush().faces();
     CHECK(faces.size() == 6u);
 
-    const auto *face1 = findFaceByPoints(
-        faces,
-        vm::vec3{0.0, 0.0, -16.0},
-        vm::vec3{0.0, 0.0, 0.0},
-        vm::vec3{64.0, 0.0, -16.0});
+    const auto *face1 = findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{0.0, 0.0, 0.0}, vm::vec3{
+            64.0, 0.0, -16.0
+        }
+    );
     CHECK(face1 != nullptr);
     CHECK(face1->attributes().textureName() == "tex1");
     CHECK(face1->attributes().xOffset() == 1.0);
@@ -224,41 +222,26 @@ TEST_CASE("WorldReaderTest.parseMapWithWorldspawnAndOneBrush")
     CHECK(face1->attributes().xScale() == 4.0);
     CHECK(face1->attributes().yScale() == 5.0);
 
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{0.0, 0.0, -16.0},
-            vm::vec3{0.0, 64.0, -16.0},
-            vm::vec3{0.0, 0.0, 0.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{0.0, 0.0, -16.0},
-            vm::vec3{64.0, 0.0, -16.0},
-            vm::vec3{0.0, 64.0, -16.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{64.0, 64.0, 0.0},
-            vm::vec3{0.0, 64.0, 0.0},
-            vm::vec3{64.0, 64.0, -16.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{64.0, 64.0, 0.0},
-            vm::vec3{64.0, 64.0, -16.0},
-            vm::vec3{64.0, 0.0, 0.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{64.0, 64.0, 0.0},
-            vm::vec3{64.0, 0.0, 0.0},
-            vm::vec3{0.0, 64.0, 0.0})
-        != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{0.0, 64.0, -16.0}, vm::vec3{
+            0.0, 0.0, 0.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{64.0, 0.0, -16.0}, vm::vec3{
+            0.0, 64.0, -16.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{64.0, 64.0, 0.0}, vm::vec3{0.0, 64.0, 0.0}, vm::vec3{
+            64.0, 64.0, -16.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{64.0, 64.0, 0.0}, vm::vec3{64.0, 64.0, -16.0}, vm::vec3{
+            64.0, 0.0, 0.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{64.0, 64.0, 0.0}, vm::vec3{64.0, 0.0, 0.0}, vm::vec3{
+            0.0, 64.0, 0.0
+        }
+    ) != nullptr);
 }
 
 TEST_CASE("WorldReaderTest.parseMapAndCheckFaceFlags")
@@ -291,11 +274,10 @@ TEST_CASE("WorldReaderTest.parseMapAndCheckFaceFlags")
     const auto &faces = brushNode->brush().faces();
     CHECK(faces.size() == 6u);
 
-    const auto *face = findFaceByPoints(
-        faces,
-        vm::vec3{0.0, 0.0, -16.0},
-        vm::vec3{0.0, 0.0, 0.0},
-        vm::vec3{64.0, 0.0, -16.0});
+    const auto *face = findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{0.0, 0.0, 0.0}, vm::vec3{
+            64.0, 0.0, -16.0
+        }
+    );
     CHECK(face != nullptr);
     CHECK(face->attributes().xOffset() == 22.0f);
     CHECK(face->attributes().xOffset() == 22.0f);
@@ -334,48 +316,30 @@ TEST_CASE("WorldReaderTest.parseBrushWithCurlyBraceInTextureName")
     const auto &faces = brushNode->brush().faces();
     CHECK(faces.size() == 6u);
 
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{0.0, 0.0, -16.0},
-            vm::vec3{0.0, 0.0, 0.0},
-            vm::vec3{64.0, 0.0, -16.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{0.0, 0.0, -16.0},
-            vm::vec3{0.0, 64.0, -16.0},
-            vm::vec3{0.0, 0.0, 0.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{0.0, 0.0, -16.0},
-            vm::vec3{64.0, 0.0, -16.0},
-            vm::vec3{0.0, 64.0, -16.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{64.0, 64.0, 0.0},
-            vm::vec3{0.0, 64.0, 0.0},
-            vm::vec3{64.0, 64.0, -16.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{64.0, 64.0, 0.0},
-            vm::vec3{64.0, 64.0, -16.0},
-            vm::vec3{64.0, 0.0, 0.0})
-        != nullptr);
-    CHECK(
-        findFaceByPoints(
-            faces,
-            vm::vec3{64.0, 64.0, 0.0},
-            vm::vec3{64.0, 0.0, 0.0},
-            vm::vec3{0.0, 64.0, 0.0})
-        != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{0.0, 0.0, 0.0}, vm::vec3{
+            64.0, 0.0, -16.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{0.0, 64.0, -16.0}, vm::vec3{
+            0.0, 0.0, 0.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{0.0, 0.0, -16.0}, vm::vec3{64.0, 0.0, -16.0}, vm::vec3{
+            0.0, 64.0, -16.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{64.0, 64.0, 0.0}, vm::vec3{0.0, 64.0, 0.0}, vm::vec3{
+            64.0, 64.0, -16.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{64.0, 64.0, 0.0}, vm::vec3{64.0, 64.0, -16.0}, vm::vec3{
+            64.0, 0.0, 0.0
+        }
+    ) != nullptr);
+    CHECK(findFaceByPoints(faces, vm::vec3{64.0, 64.0, 0.0}, vm::vec3{64.0, 0.0, 0.0}, vm::vec3{
+            0.0, 64.0, 0.0
+        }
+    ) != nullptr);
 }
 
 TEST_CASE("WorldReaderTest.parseValveBrush")
@@ -560,8 +524,7 @@ TEST_CASE("WorldReaderTest.parseDaikatanaBrush")
     auto *defaultLayer = world->children().front();
     CHECK(defaultLayer->childCount() == 1u);
 
-    const auto *brushNode =
-        static_cast<Model::BrushNode *>(defaultLayer->children().front());
+    const auto *brushNode = static_cast<Model::BrushNode *>(defaultLayer->children().front());
     checkBrushTexCoordSystem(brushNode, false);
     const auto &brush = brushNode->brush();
 
@@ -572,13 +535,11 @@ TEST_CASE("WorldReaderTest.parseDaikatanaBrush")
     REQUIRE(b_rc_v16w_index);
     REQUIRE(c_mf_v3cww_index);
 
-    CHECK(vm::is_equal(
-        Color(5, 6, 7), *brush.face(*c_mf_v3cw_index).attributes().color(), 0.1f));
+    CHECK(vm::is_equal(Color(5, 6, 7), *brush.face(*c_mf_v3cw_index).attributes().color(), 0.1f));
     CHECK(brush.face(*b_rc_v16w_index).attributes().surfaceContents() == 1);
     CHECK(brush.face(*b_rc_v16w_index).attributes().surfaceFlags() == 2);
     CHECK(brush.face(*b_rc_v16w_index).attributes().surfaceValue() == 3.0);
-    CHECK(vm::is_equal(
-        Color(8, 9, 10), *brush.face(*b_rc_v16w_index).attributes().color(), 0.1f));
+    CHECK(vm::is_equal(Color(8, 9, 10), *brush.face(*b_rc_v16w_index).attributes().color(), 0.1f));
     CHECK_FALSE(brush.face(*c_mf_v3cww_index).attributes().hasColor());
 }
 
@@ -1113,8 +1074,7 @@ TEST_CASE("WorldReaderTest.parseLayersAndGroupsAndRetainIds")
     REQUIRE(customLayerNode != nullptr);
 
     auto *groupNode1 = dynamic_cast<Model::GroupNode *>(customLayerNode->children().front());
-    auto *groupNode2 =
-        dynamic_cast<Model::GroupNode *>(defaultLayerNode->children().front());
+    auto *groupNode2 = dynamic_cast<Model::GroupNode *>(defaultLayerNode->children().front());
 
     REQUIRE(groupNode1 != nullptr);
     REQUIRE(groupNode2 != nullptr);
@@ -1220,8 +1180,7 @@ common/caulk
 
     CHECK(world->defaultLayer()->childCount() == 1u);
 
-    const auto *patchNode =
-        dynamic_cast<Model::PatchNode *>(world->defaultLayer()->children().front());
+    const auto *patchNode = dynamic_cast<Model::PatchNode *>(world->defaultLayer()->children().front());
     CHECK(patchNode != nullptr);
 
     const auto &patch = patchNode->patch();
@@ -1229,25 +1188,23 @@ common/caulk
     CHECK(patch.pointRowCount() == 5);
     CHECK(patch.pointColumnCount() == 3);
 
-    CHECK_THAT(
-        patch.controlPoints(),
-        Catch::Equals(std::vector<Model::BezierPatch::Point>{
-            {-64, -64, 4, 0,   0},
-            {-64, 0,   4, 0,   -0.25},
-            {-64, 64,  4, 0,   -0.5},
-            {0,   -64, 4, 0.2, 0},
-            {0,   0,   4, 0.2, -0.25},
-            {0,   64,  4, 0.2, -0.5},
-            {64,  -64, 4, 0.4, 0},
-            {64,  0,   4, 0.4, -0.25},
-            {64,  64,  4, 0.4, -0.5},
-            {128, -64, 4, 0.6, 0},
-            {128, 0,   4, 0.6, -0.25},
-            {128, 64,  4, 0.6, -0.5},
-            {192, -64, 4, 0.8, 0},
-            {192, 0,   4, 0.8, -0.25},
-            {192, 64,  4, 0.8, -0.5},
-        }));
+    CHECK_THAT(patch.controlPoints(), Catch::Equals(std::vector<Model::BezierPatch::Point>{{-64, -64, 4, 0,   0},
+                                                                                           {-64, 0,   4, 0,   -0.25},
+                                                                                           {-64, 64,  4, 0,   -0.5},
+                                                                                           {0,   -64, 4, 0.2, 0},
+                                                                                           {0,   0,   4, 0.2, -0.25},
+                                                                                           {0,   64,  4, 0.2, -0.5},
+                                                                                           {64,  -64, 4, 0.4, 0},
+                                                                                           {64,  0,   4, 0.4, -0.25},
+                                                                                           {64,  64,  4, 0.4, -0.5},
+                                                                                           {128, -64, 4, 0.6, 0},
+                                                                                           {128, 0,   4, 0.6, -0.25},
+                                                                                           {128, 64,  4, 0.6, -0.5},
+                                                                                           {192, -64, 4, 0.8, 0},
+                                                                                           {192, 0,   4, 0.8, -0.25},
+                                                                                           {192, 64,  4, 0.8, -0.5},
+        }
+    ));
 }
 
 TEST_CASE("WorldReaderTest.parseMultipleClassnames")
@@ -1433,8 +1390,7 @@ doBrushContentTypes()).WillOnce(ReturnRef(Model::BrushContentType::EmptyList));
 
 TEST_CASE("WorldReaderTest.parseHeretic2QuarkMap")
 {
-    const auto mapPath =
-        std::filesystem::current_path() / "fixture/test/IO/Map/Heretic2Quark.map";
+    const auto mapPath = std::filesystem::current_path() / "fixture/test/IO/Map/Heretic2Quark.map";
     const auto file = Disk::openFile(mapPath).value();
     auto fileReader = file->reader().buffer();
 
@@ -1505,20 +1461,18 @@ TEST_CASE("WorldReaderTest.parseQuotedTextureNames")
     using NameInfo = std::tuple<std::string, std::string>;
 
     // clang-format off
-    const auto
-        [textureName, expectedName] = GENERATE(values<NameInfo>({
-                                                                    {R"(some_name)",    R"(some_name)"},
-                                                                    {R"("some name")",  R"(some name)"},
-                                                                    {R"("some\\name")", R"(some\name)"},
-                                                                    {R"("some\"name")", R"(some"name)"},
-                                                                    {R"("")",           R"()"},
-                                                                }));
+    const auto [textureName, expectedName] = GENERATE(values<NameInfo>({{R"(some_name)",    R"(some_name)"},
+                                                                        {R"("some name")",  R"(some name)"},
+                                                                        {R"("some\\name")", R"(some\name)"},
+                                                                        {R"("some\"name")", R"(some"name)"},
+                                                                        {R"("")",           R"()"},
+        }
+    ));
     // clang-format on
 
     CAPTURE(textureName, expectedName);
 
-    const auto data = fmt::format(
-        R"(
+    const auto data = fmt::format(R"(
 // entity 0
 {{
 "classname" "worldspawn"
@@ -1531,8 +1485,8 @@ TEST_CASE("WorldReaderTest.parseQuotedTextureNames")
 ( 64 64 16 ) ( 65 64 16 ) ( 64 64 17 ) {0} 0 0 0 1 1
 ( 64 64 16 ) ( 64 64 17 ) ( 64 65 16 ) {0} 0 0 0 1 1
 }}
-}})",
-        textureName);
+}})", textureName
+    );
 
     const auto worldBounds = vm::bbox3{8192.0};
 
@@ -1543,13 +1497,11 @@ TEST_CASE("WorldReaderTest.parseQuotedTextureNames")
     REQUIRE(worldNode != nullptr);
     REQUIRE(worldNode->childCount() == 1u);
 
-    const auto *defaultLayerNode =
-        dynamic_cast<Model::LayerNode *>(worldNode->children().front());
+    const auto *defaultLayerNode = dynamic_cast<Model::LayerNode *>(worldNode->children().front());
     REQUIRE(defaultLayerNode != nullptr);
     REQUIRE(defaultLayerNode->childCount() == 1u);
 
-    const auto *brushNode =
-        dynamic_cast<Model::BrushNode *>(defaultLayerNode->children().front());
+    const auto *brushNode = dynamic_cast<Model::BrushNode *>(defaultLayerNode->children().front());
     REQUIRE(brushNode != nullptr);
 
     CHECK(brushNode->brush().face(0).attributes().textureName() == expectedName);
@@ -1588,10 +1540,8 @@ TEST_CASE("WorldReaderTest.parseLinkedGroups")
     REQUIRE(world != nullptr);
     CHECK(world->defaultLayer()->childCount() == 2u);
 
-    auto *groupNode1 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().front());
-    auto *groupNode2 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().back());
+    auto *groupNode1 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().front());
+    auto *groupNode2 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().back());
 
     CHECK(groupNode1 != nullptr);
     CHECK(groupNode2 != nullptr);
@@ -1599,12 +1549,8 @@ TEST_CASE("WorldReaderTest.parseLinkedGroups")
     CHECK(groupNode1->group().linkedGroupId() == "abcd");
     CHECK(groupNode2->group().linkedGroupId() == "abcd");
 
-    CHECK(
-        groupNode1->group().transformation()
-        == vm::translation_matrix(vm::vec3{32.0, 0.0, 0.0}));
-    CHECK(
-        groupNode2->group().transformation()
-        == vm::translation_matrix(vm::vec3{32.0, 16.0, 0.0}));
+    CHECK(groupNode1->group().transformation() == vm::translation_matrix(vm::vec3{32.0, 0.0, 0.0}));
+    CHECK(groupNode2->group().transformation() == vm::translation_matrix(vm::vec3{32.0, 16.0, 0.0}));
 }
 
 TEST_CASE("WorldReaderTest.parseOrphanedLinkedGroups")
@@ -1632,8 +1578,7 @@ TEST_CASE("WorldReaderTest.parseOrphanedLinkedGroups")
     REQUIRE(world != nullptr);
     CHECK(world->defaultLayer()->childCount() == 1);
 
-    auto *groupNode =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().front());
+    auto *groupNode = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().front());
 
     CHECK(groupNode != nullptr);
     CHECK(groupNode->group().linkedGroupId() == std::nullopt);
@@ -1680,12 +1625,9 @@ TEST_CASE("WorldReaderTest.parseLinkedGroupsWithMissingTransformation")
     REQUIRE(world != nullptr);
     CHECK(world->defaultLayer()->childCount() == 3u);
 
-    auto *groupNode1 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[0]);
-    auto *groupNode2 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[1]);
-    auto *groupNode3 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[2]);
+    auto *groupNode1 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[0]);
+    auto *groupNode2 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[1]);
+    auto *groupNode3 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[2]);
 
     CHECK(groupNode1 != nullptr);
     CHECK(groupNode2 != nullptr);
@@ -1696,12 +1638,8 @@ TEST_CASE("WorldReaderTest.parseLinkedGroupsWithMissingTransformation")
     CHECK(groupNode3->group().linkedGroupId() == "1");
 
     CHECK(groupNode1->group().transformation() == vm::mat4x4d::identity());
-    CHECK(
-        groupNode2->group().transformation()
-        == vm::translation_matrix(vm::vec3{32.0, 16.0, 0.0}));
-    CHECK(
-        groupNode3->group().transformation()
-        == vm::translation_matrix(vm::vec3{32.0, 16.0, 0.0}));
+    CHECK(groupNode2->group().transformation() == vm::translation_matrix(vm::vec3{32.0, 16.0, 0.0}));
+    CHECK(groupNode3->group().transformation() == vm::translation_matrix(vm::vec3{32.0, 16.0, 0.0}));
 }
 
 TEST_CASE("WorldReaderTest.parseGroupWithUnnecessaryTransformation")
@@ -1728,8 +1666,7 @@ TEST_CASE("WorldReaderTest.parseGroupWithUnnecessaryTransformation")
     REQUIRE(world != nullptr);
     CHECK(world->defaultLayer()->childCount() == 1u);
 
-    auto *groupNode =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().front());
+    auto *groupNode = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children().front());
     CHECK(groupNode != nullptr);
 
     CHECK(groupNode->group().linkedGroupId() == std::nullopt);
@@ -1819,33 +1756,25 @@ TEST_CASE("WorldReaderTest.parseRecursiveLinkedGroups")
     REQUIRE(world != nullptr);
     CHECK(world->defaultLayer()->childCount() == 4u);
 
-    const auto *groupNode1 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[0]);
+    const auto *groupNode1 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[0]);
 
     CHECK(groupNode1->childCount() == 1u);
-    const auto *groupNode2 =
-        dynamic_cast<Model::GroupNode *>(groupNode1->children().front());
+    const auto *groupNode2 = dynamic_cast<Model::GroupNode *>(groupNode1->children().front());
 
-    const auto *groupNode3 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[1]);
+    const auto *groupNode3 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[1]);
 
     CHECK(groupNode3->childCount() == 1u);
-    const auto *groupNode4 =
-        dynamic_cast<Model::GroupNode *>(groupNode3->children().front());
+    const auto *groupNode4 = dynamic_cast<Model::GroupNode *>(groupNode3->children().front());
 
-    const auto *groupNode5 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[2]);
+    const auto *groupNode5 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[2]);
 
-    const auto *groupNode6 =
-        dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[3]);
+    const auto *groupNode6 = dynamic_cast<Model::GroupNode *>(world->defaultLayer()->children()[3]);
 
     CHECK(groupNode6->childCount() == 1u);
-    const auto *groupNode7 =
-        dynamic_cast<Model::GroupNode *>(groupNode6->children().front());
+    const auto *groupNode7 = dynamic_cast<Model::GroupNode *>(groupNode6->children().front());
 
     CHECK(groupNode7->childCount() == 1u);
-    const auto *groupNode8 =
-        dynamic_cast<Model::GroupNode *>(groupNode7->children().front());
+    const auto *groupNode8 = dynamic_cast<Model::GroupNode *>(groupNode7->children().front());
 
     CHECK(groupNode1->group().linkedGroupId() == std::nullopt);
     CHECK(groupNode1->group().transformation() == vm::mat4x4::identity());
@@ -1898,35 +1827,32 @@ TEST_CASE("WorldReaderTest.parseProtectedEntityProperties")
 
     SECTION("Empty list")
     {
-        auto *entityNode =
-            dynamic_cast<Model::EntityNode *>(world->defaultLayer()->children()[0]);
+        auto *entityNode = dynamic_cast<Model::EntityNode *>(world->defaultLayer()->children()[0]);
         REQUIRE(entityNode != nullptr);
 
-        CHECK_THAT(
-            entityNode->entity().protectedProperties(),
-            Catch::UnorderedEquals(std::vector<std::string>{}));
+        CHECK_THAT(entityNode->entity().protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{}));
     }
 
     SECTION("Two protected properties")
     {
-        auto *entityNode =
-            dynamic_cast<Model::EntityNode *>(world->defaultLayer()->children()[1]);
+        auto *entityNode = dynamic_cast<Model::EntityNode *>(world->defaultLayer()->children()[1]);
         REQUIRE(entityNode != nullptr);
 
-        CHECK_THAT(
-            entityNode->entity().protectedProperties(),
-            Catch::UnorderedEquals(std::vector<std::string>{"origin", "target"}));
+        CHECK_THAT(entityNode->entity().protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+                "origin", "target"
+            }
+        ));
     }
 
     SECTION("Escaped semicolon")
     {
-        auto *entityNode =
-            dynamic_cast<Model::EntityNode *>(world->defaultLayer()->children()[2]);
+        auto *entityNode = dynamic_cast<Model::EntityNode *>(world->defaultLayer()->children()[2]);
         REQUIRE(entityNode != nullptr);
 
-        CHECK_THAT(
-            entityNode->entity().protectedProperties(),
-            Catch::UnorderedEquals(std::vector<std::string>{"with;semicolon"}));
+        CHECK_THAT(entityNode->entity().protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+                "with;semicolon"
+            }
+        ));
     }
 }
 
@@ -1941,8 +1867,10 @@ TEST_CASE("WorldReaderTest.parseUnknownFormatEmptyMap")
     const auto worldBounds = vm::bbox3{8192.0};
 
     auto status = TestParserStatus{};
-    auto world = WorldReader::tryRead(
-        data, {Model::MapFormat::Standard, Model::MapFormat::Valve}, worldBounds, {}, status);
+    auto world = WorldReader::tryRead(data, {
+            Model::MapFormat::Standard, Model::MapFormat::Valve
+        }, worldBounds, {}, status
+    );
     REQUIRE(world != nullptr);
     CHECK(world->mapFormat() == Model::MapFormat::Standard);
 }

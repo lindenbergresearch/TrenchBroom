@@ -63,9 +63,7 @@ private:
     ControlListBoxItemRenderer *m_renderer;
 
 public:
-    explicit ControlListBoxItemRendererWrapper(
-        ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr
-    );
+    explicit ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr);
 
     ControlListBoxItemRenderer *renderer();
 
@@ -85,9 +83,7 @@ private:
     bool m_showSeparator;
 
 public:
-    ControlListBox(
-        const QString &emptyText, const QMargins &itemMargins, bool showSeparator, QWidget *parent = nullptr
-    );
+    ControlListBox(const QString &emptyText, const QMargins &itemMargins, bool showSeparator, QWidget *parent = nullptr);
 
     ControlListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
@@ -131,9 +127,7 @@ private:
 private:
     virtual size_t itemCount() const = 0;
 
-    virtual ControlListBoxItemRenderer *createItemRenderer(
-        QWidget *parent, size_t index
-    ) = 0;
+    virtual ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) = 0;
 
     virtual void selectedRowChanged(int index);
 

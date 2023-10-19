@@ -26,9 +26,8 @@
 #include <kdl/memory_utils.h>
 
 namespace TrenchBroom::View {
-CompilationContext::CompilationContext(
-    std::weak_ptr<MapDocument> document, const EL::VariableStore &variables, TextOutputAdapter output, bool test
-) : m_document{std::move(document)}, m_variables{variables.clone()}, m_output{std::move(output)}, m_test{test} {
+CompilationContext::CompilationContext(std::weak_ptr<MapDocument> document, const EL::VariableStore &variables, TextOutputAdapter output, bool test)
+    : m_document{std::move(document)}, m_variables{variables.clone()}, m_output{std::move(output)}, m_test{test} {
 }
 
 std::shared_ptr<MapDocument> CompilationContext::document() const {

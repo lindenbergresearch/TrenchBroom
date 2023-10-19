@@ -27,9 +27,7 @@ namespace TrenchBroom {
 void glCheckError(const std::string &msg) {
     const GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-        throw RenderException(
-            "OpenGL error: " + std::to_string(error) + " (" + glGetErrorMessage(error) + ") " + msg
-        );
+        throw RenderException("OpenGL error: " + std::to_string(error) + " (" + glGetErrorMessage(error) + ") " + msg);
     }
 }
 

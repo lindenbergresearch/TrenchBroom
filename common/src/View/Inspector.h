@@ -57,9 +57,7 @@ private:
     SyncHeightEventFilter *m_syncTabBarEventFilter;
 
 public:
-    Inspector(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     void connectTopWidgets(MapViewBar *mapViewBar);
 

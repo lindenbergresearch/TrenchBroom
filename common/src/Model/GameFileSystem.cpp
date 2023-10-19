@@ -42,8 +42,9 @@
 
 namespace TrenchBroom::Model {
 
-void GameFileSystem::initialize(
-    const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger
+void
+GameFileSystem::initialize(const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths,
+    Logger &logger
 ) {
     unmountAll();
     m_shaderFS = nullptr;
@@ -60,8 +61,8 @@ Result<void> GameFileSystem::reloadShaders() {
     return m_shaderFS ? m_shaderFS->reload() : Result<void>{};
 }
 
-void GameFileSystem::reloadWads(
-    const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths, const std::vector<std::filesystem::path> &wadPaths, Logger &logger
+void GameFileSystem::reloadWads(const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths,
+    const std::vector<std::filesystem::path> &wadPaths, Logger &logger
 ) {
     unmountWads();
     mountWads(rootPath, wadSearchPaths, wadPaths, logger);
@@ -85,8 +86,8 @@ void GameFileSystem::addDefaultAssetPaths(const GameConfig &config, Logger &logg
     }
 }
 
-void GameFileSystem::addGameFileSystems(
-    const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger
+void GameFileSystem::addGameFileSystems(const GameConfig &config, const std::filesystem::path &gamePath,
+    const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger
 ) {
     const auto &fileSystemConfig = config.fileSystemConfig;
     addFileSystemPath(gamePath / fileSystemConfig.searchPath, logger);
@@ -104,26 +105,21 @@ void GameFileSystem::addFileSystemPath(const std::filesystem::path &path, Logger
 }
 
 namespace {
-Result<std::unique_ptr<IO::FileSystem>> createImageFileSystem(
-    const std::string &packageFormat, std::filesystem::path path
-) {
+Result<std::unique_ptr<IO::FileSystem>> createImageFileSystem(const std::string &packageFormat, std::filesystem::path path) {
     if (kdl::ci::str_is_equal(packageFormat, "idpak")) {
-        return IO::Disk::openFile(path).and_then(
-            [](auto file) {
+        return IO::Disk::openFile(path).and_then([](auto file) {
               return IO::createImageFileSystem<IO::IdPakFileSystem>(std::move(file));
             }
         ).transform([](auto fs) { return std::unique_ptr<IO::FileSystem>{std::move(fs)}; });
     }
     else if (kdl::ci::str_is_equal(packageFormat, "dkpak")) {
-        return IO::Disk::openFile(path).and_then(
-            [](auto file) {
+        return IO::Disk::openFile(path).and_then([](auto file) {
               return IO::createImageFileSystem<IO::DkPakFileSystem>(std::move(file));
             }
         ).transform([](auto fs) { return std::unique_ptr<IO::FileSystem>{std::move(fs)}; });
     }
     else if (kdl::ci::str_is_equal(packageFormat, "zip")) {
-        return IO::Disk::openFile(path).and_then(
-            [](auto file) {
+        return IO::Disk::openFile(path).and_then([](auto file) {
               return IO::createImageFileSystem<IO::ZipFileSystem>(std::move(file));
             }
         ).transform([](auto fs) { return std::unique_ptr<IO::FileSystem>{std::move(fs)}; });
@@ -132,9 +128,7 @@ Result<std::unique_ptr<IO::FileSystem>> createImageFileSystem(
 }
 } // namespace
 
-void GameFileSystem::addFileSystemPackages(
-    const GameConfig &config, const std::filesystem::path &searchPath, Logger &logger
-) {
+void GameFileSystem::addFileSystemPackages(const GameConfig &config, const std::filesystem::path &searchPath, Logger &logger) {
     const auto &fileSystemConfig = config.fileSystemConfig;
     const auto &packageFormatConfig = fileSystemConfig.packageFormat;
 
@@ -143,27 +137,20 @@ void GameFileSystem::addFileSystemPackages(
 
     if (IO::Disk::pathInfo(searchPath) == IO::PathInfo::Directory) {
         const auto diskFS = IO::DiskFileSystem{searchPath};
-        diskFS.find(
-            std::filesystem::path{}, IO::TraversalMode::Flat, IO::makeExtensionPathMatcher(packageExtensions)).and_then(
-            [&](auto packagePaths) {
-              return kdl::fold_results(
-                  kdl::vec_transform(
-                      std::move(packagePaths), [&](auto packagePath) {
-                        return diskFS.makeAbsolute(packagePath).and_then(
-                            [&](const auto &absPackagePath) {
-                              return createImageFileSystem(packageFormat, absPackagePath);
-                            }
-                        ).transform(
-                            [&](auto fs) {
-                              logger.info() << "Adding file system package " << packagePath;
-                              mount("", std::move(fs));
-                            }
-                        );
-                      }
-                  ));
+        diskFS.find(std::filesystem::path{}, IO::TraversalMode::Flat, IO::makeExtensionPathMatcher(packageExtensions)).and_then([&](auto packagePaths) {
+              return kdl::fold_results(kdl::vec_transform(std::move(packagePaths), [&](auto packagePath) {
+                    return diskFS.makeAbsolute(packagePath).and_then([&](const auto &absPackagePath) {
+                          return createImageFileSystem(packageFormat, absPackagePath);
+                        }
+                    ).transform([&](auto fs) {
+                          logger.info() << "Adding file system package " << packagePath;
+                          mount("", std::move(fs));
+                        }
+                    );
+                  }
+              ));
             }
-        ).transform_error(
-            [&](auto e) {
+        ).transform_error([&](auto e) {
               logger.error() << "Could not add file system packages: " << e.msg;
             }
         );
@@ -179,28 +166,23 @@ void GameFileSystem::addShaderFileSystem(const GameConfig &config, Logger &logge
         auto shaderSearchPath = textureConfig.shaderSearchPath;
         auto textureSearchPaths = std::vector<std::filesystem::path>{textureConfig.root, "models"};
 
-        auto shaderFs = IO::createImageFileSystem<IO::Quake3ShaderFileSystem>(
-            *this, std::move(shaderSearchPath), std::move(textureSearchPaths), logger
+        auto shaderFs = IO::createImageFileSystem<IO::Quake3ShaderFileSystem>(*this, std::move(shaderSearchPath), std::move(textureSearchPaths), logger
         ).value();
         m_shaderFS = shaderFs.get();
         mount(std::filesystem::path{}, std::move(shaderFs));
     }
 }
 
-void GameFileSystem::mountWads(
-    const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths, const std::vector<std::filesystem::path> &wadPaths, Logger &logger
+void GameFileSystem::mountWads(const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths,
+    const std::vector<std::filesystem::path> &wadPaths, Logger &logger
 ) {
     for (const auto &wadPath: wadPaths) {
         const auto mountPath = rootPath / wadPath.filename();
         const auto resolvedWadPath = IO::Disk::resolvePath(wadSearchPaths, wadPath);
-        IO::Disk::openFile(resolvedWadPath).and_then(
-            [](auto file) {
+        IO::Disk::openFile(resolvedWadPath).and_then([](auto file) {
               return IO::createImageFileSystem<IO::WadFileSystem>(std::move(file));
             }
-        ).transform(
-            [&](auto fs) { m_wadMountPoints.push_back(mount(mountPath, std::move(fs))); }
-        ).transform_error(
-            [&](auto e) {
+        ).transform([&](auto fs) { m_wadMountPoints.push_back(mount(mountPath, std::move(fs))); }).transform_error([&](auto e) {
               logger.error() << "Could not load wad file at '" << wadPath << "': " << e.msg;
             }
         );

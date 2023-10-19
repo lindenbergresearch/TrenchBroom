@@ -173,8 +173,7 @@ public:
      */
     template<typename... Attrs>
     static VertexArray copy(const std::vector<GLVertex<Attrs...>> &vertices) {
-        return VertexArray(
-            std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(vertices));
+        return VertexArray(std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(vertices));
     }
 
     /**
@@ -186,9 +185,7 @@ public:
      */
     template<typename... Attrs>
     static VertexArray move(std::vector<GLVertex<Attrs...>> &&vertices) {
-        return VertexArray(
-            std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(
-                std::move(vertices)));
+        return VertexArray(std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(std::move(vertices)));
     }
 
     /**
@@ -206,8 +203,7 @@ public:
      */
     template<typename... Attrs>
     static VertexArray ref(const std::vector<GLVertex<Attrs...>> &vertices) {
-        return VertexArray(
-            std::make_shared<ByRefHolder<typename GLVertex<Attrs...>::Type>>(vertices));
+        return VertexArray(std::make_shared<ByRefHolder<typename GLVertex<Attrs...>::Type>>(vertices));
     }
 
     /**
@@ -290,9 +286,7 @@ public:
      * @param counts the lengths of the ranges to render
      * @param primCount the number of ranges to render
      */
-    void render(
-        PrimType primType, const GLIndices &indices, const GLCounts &counts, GLint primCount
-    );
+    void render(PrimType primType, const GLIndices &indices, const GLCounts &counts, GLint primCount);
 
     /**
      * Renders a number of primitives of the given type, the vertices of which are indicates

@@ -25,9 +25,8 @@
 
 namespace TrenchBroom {
 namespace View {
-ElidedLabel::ElidedLabel(
-    const QString &text, const Qt::TextElideMode elideMode, QWidget *parent
-) : QWidget(parent), m_label(new QLabel(this)), m_elideMode(elideMode) {
+ElidedLabel::ElidedLabel(const QString &text, const Qt::TextElideMode elideMode, QWidget *parent) : QWidget(parent), m_label(new QLabel(this)),
+                                                                                                    m_elideMode(elideMode) {
     setContentsMargins(0, 0, 0, 0);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     setText(text);

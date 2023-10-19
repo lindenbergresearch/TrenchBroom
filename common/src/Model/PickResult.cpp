@@ -56,9 +56,7 @@ PickResult::PickResult() : m_compare(std::make_shared<CompareHitsByDistance>()) 
 PickResult::~PickResult() = default;
 
 PickResult PickResult::byDistance() {
-    return PickResult(
-        std::make_shared<CombineCompareHits>(
-            std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
+    return PickResult(std::make_shared<CombineCompareHits>(std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
 }
 
 PickResult PickResult::bySize(const vm::axis::type axis) {
@@ -80,8 +78,7 @@ void PickResult::addHit(const Hit &hit) {
         return;
     }
     ensure(m_compare.get() != nullptr, "compare is null");
-    auto pos = std::upper_bound(
-        std::begin(m_hits), std::end(m_hits), hit, CompareWrapper(m_compare.get()));
+    auto pos = std::upper_bound(std::begin(m_hits), std::end(m_hits), hit, CompareWrapper(m_compare.get()));
     m_hits.insert(pos, hit);
 }
 

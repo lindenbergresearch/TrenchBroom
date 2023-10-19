@@ -27,10 +27,7 @@
 
 namespace TrenchBroom {
 namespace EL {
-static void interpolateAndCheck(
-    const std::string &expression,
-    const std::string &expected,
-    const EvaluationContext &context = EvaluationContext()) {
+static void interpolateAndCheck(const std::string &expression, const std::string &expected, const EvaluationContext &context = EvaluationContext()) {
     CHECK(Interpolator(expression).interpolate(context) == expected);
 }
 
@@ -56,9 +53,7 @@ TEST_CASE("ELInterpolatorTest.interpolateStringWithSimpleExpression")
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithNestedExpression")
 {
-    interpolateAndCheck(
-        " asdfasdf ${ 'nested ${TEST} expression' }  sdf ",
-        " asdfasdf nested ${TEST} expression  sdf ");
+    interpolateAndCheck(" asdfasdf ${ 'nested ${TEST} expression' }  sdf ", " asdfasdf nested ${TEST} expression  sdf ");
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithVariable")
@@ -72,8 +67,7 @@ TEST_CASE("ELInterpolatorTest.interpolateStringWithBackslashAndVariable")
 {
     EvaluationContext context;
     context.declareVariable("TEST", Value("interesting"));
-    interpolateAndCheck(
-        " an \\${TEST} expression", " an \\interesting expression", context);
+    interpolateAndCheck(" an \\${TEST} expression", " an \\interesting expression", context);
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithUnknownVariable")

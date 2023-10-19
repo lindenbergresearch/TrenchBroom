@@ -52,9 +52,7 @@ private:
     QPushButton *m_replaceButton;
 
 public:
-    ReplaceTextureDialog(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    ReplaceTextureDialog(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
 private:
     virtual void accept() override;

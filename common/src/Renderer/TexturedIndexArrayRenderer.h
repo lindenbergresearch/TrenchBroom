@@ -42,9 +42,7 @@ private:
 public:
     TexturedIndexArrayRenderer();
 
-    TexturedIndexArrayRenderer(
-        VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap
-    );
+    TexturedIndexArrayRenderer(VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap);
 
     bool empty() const;
 

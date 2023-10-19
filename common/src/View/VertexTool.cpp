@@ -38,31 +38,25 @@
 
 namespace TrenchBroom {
 namespace View {
-VertexTool::VertexTool(const std::weak_ptr<MapDocument> &document) : VertexToolBase(document), m_mode(Mode::Move), m_vertexHandles(std::make_unique<VertexHandleManager>()), m_edgeHandles(std::make_unique<EdgeHandleManager>()),
+VertexTool::VertexTool(const std::weak_ptr<MapDocument> &document) : VertexToolBase(document), m_mode(Mode::Move),
+                                                                     m_vertexHandles(std::make_unique<VertexHandleManager>()),
+                                                                     m_edgeHandles(std::make_unique<EdgeHandleManager>()),
                                                                      m_faceHandles(std::make_unique<FaceHandleManager>()), m_guideRenderer(document) {
 }
 
-std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(
-    const vm::vec3 &handle
-) const {
+std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(const vm::vec3 &handle) const {
     return findIncidentBrushes(*m_vertexHandles, handle);
 }
 
-std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(
-    const vm::segment3 &handle
-) const {
+std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(const vm::segment3 &handle) const {
     return findIncidentBrushes(*m_edgeHandles, handle);
 }
 
-std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(
-    const vm::polygon3 &handle
-) const {
+std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(const vm::polygon3 &handle) const {
     return findIncidentBrushes(*m_faceHandles, handle);
 }
 
-void VertexTool::pick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-) const {
+void VertexTool::pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const {
     auto document = kdl::mem_lock(m_document);
     const Grid &grid = document->grid();
 
@@ -87,18 +81,15 @@ const VertexHandleManager &VertexTool::handleManager() const {
     return *m_vertexHandles;
 }
 
-std::tuple<vm::vec3, vm::vec3> VertexTool::handlePositionAndHitPoint(
-    const std::vector<Model::Hit> &hits
-) const {
+std::tuple<vm::vec3, vm::vec3> VertexTool::handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const {
     assert(!hits.empty());
 
     const auto &hit = hits.front();
-    assert(hit.hasType(
-        VertexHandleManager::HandleHitType | EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType
-    ));
+    assert(hit.hasType(VertexHandleManager::HandleHitType | EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType));
 
-    const auto position = hit.hasType(VertexHandleManager::HandleHitType) ? hit.target<vm::vec3>() : hit.hasType(EdgeHandleManager::HandleHitType) ? std::get<1>(hit.target<EdgeHandleManager::HitType>()) : std::get<1>(
-        hit.target<FaceHandleManager::HitType>());
+    const auto position = hit.hasType(VertexHandleManager::HandleHitType) ? hit.target<vm::vec3>() : hit.hasType(EdgeHandleManager::HandleHitType)
+                                                                                                     ? std::get<1>(hit.target<EdgeHandleManager::HitType>())
+                                                                                                     : std::get<1>(hit.target<FaceHandleManager::HitType>());
 
     return {position, hit.hitPoint()};
 }
@@ -204,9 +195,7 @@ bool VertexTool::allowAbsoluteSnapping() const {
 
 vm::vec3 VertexTool::getHandlePosition(const Model::Hit &hit) const {
     assert(hit.isMatch());
-    assert(hit.hasType(
-        VertexHandleManager::HandleHitType | EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType
-    ));
+    assert(hit.hasType(VertexHandleManager::HandleHitType | EdgeHandleManager::HandleHitType | FaceHandleManager::HandleHitType));
 
     if (hit.hasType(VertexHandleManager::HandleHitType)) {
         return hit.target<vm::vec3>();
@@ -222,9 +211,7 @@ vm::vec3 VertexTool::getHandlePosition(const Model::Hit &hit) const {
 std::string VertexTool::actionName() const {
     switch (m_mode) {
         case Mode::Move:
-            return kdl::str_plural(
-                m_vertexHandles->selectedHandleCount(), "Move Vertex", "Move Vertices"
-            );
+            return kdl::str_plural(m_vertexHandles->selectedHandleCount(), "Move Vertex", "Move Vertices");
         case Mode::SplitEdge:
             return "Split Edge";
         case Mode::SplitFace:
@@ -241,9 +228,7 @@ void VertexTool::removeSelection() {
     kdl::mem_lock(m_document)->removeVertices(commandName, std::move(handles));
 }
 
-void VertexTool::renderGuide(
-    Renderer::RenderContext &, Renderer::RenderBatch &renderBatch, const vm::vec3 &position
-) const {
+void VertexTool::renderGuide(Renderer::RenderContext &, Renderer::RenderBatch &renderBatch, const vm::vec3 &position) const {
     m_guideRenderer.setPosition(position);
     m_guideRenderer.setColor(Color(pref(Preferences::HandleColor), 0.5f));
     renderBatch.add(&m_guideRenderer);

@@ -84,8 +84,7 @@ private:
     }
 
 public:
-    SimpleTokenizer(std::string_view str)
-        : Tokenizer<SimpleToken::Type>(std::move(str), "", 0) {
+    SimpleTokenizer(std::string_view str) : Tokenizer<SimpleToken::Type>(std::move(str), "", 0) {
     }
 };
 
@@ -105,9 +104,9 @@ TEST_CASE("TokenizerTest.simpleLanguageBlankString")
 
 TEST_CASE("TokenizerTest.simpleLanguageEmptyBlock")
 {
-    const std::string testString(
-        "{"
-        "}");
+    const std::string testString("{"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     CHECK(tokenizer.nextToken().type() == SimpleToken::OBrace);
@@ -117,9 +116,9 @@ TEST_CASE("TokenizerTest.simpleLanguageEmptyBlock")
 
 TEST_CASE("TokenizerTest.simpleLanguagePushPeekPopToken")
 {
-    const std::string testString(
-        "{\n"
-        "}");
+    const std::string testString("{\n"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;
@@ -133,9 +132,9 @@ TEST_CASE("TokenizerTest.simpleLanguagePushPeekPopToken")
 
 TEST_CASE("TokenizerTest.simpleLanguageEmptyBlockWithLeadingAndTrailingWhitespace")
 {
-    const std::string testString(
-        " \t{"
-        " }  ");
+    const std::string testString(" \t{"
+                                 " }  "
+    );
 
     SimpleTokenizer tokenizer(testString);
     CHECK(tokenizer.nextToken().type() == SimpleToken::OBrace);
@@ -145,10 +144,10 @@ TEST_CASE("TokenizerTest.simpleLanguageEmptyBlockWithLeadingAndTrailingWhitespac
 
 TEST_CASE("TokenizerTest.simpleLanguageBlockWithStringAttribute")
 {
-    const std::string testString(
-        "{\n"
-        "    attribute =value;\n"
-        "}\n");
+    const std::string testString("{\n"
+                                 "    attribute =value;\n"
+                                 "}\n"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;
@@ -167,10 +166,10 @@ TEST_CASE("TokenizerTest.simpleLanguageBlockWithStringAttribute")
 
 TEST_CASE("TokenizerTest.simpleLanguageBlockWithIntegerAttribute")
 {
-    const std::string testString(
-        "{"
-        "    attribute =  12328;"
-        "}");
+    const std::string testString("{"
+                                 "    attribute =  12328;"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;
@@ -187,10 +186,10 @@ TEST_CASE("TokenizerTest.simpleLanguageBlockWithIntegerAttribute")
 
 TEST_CASE("TokenizerTest.simpleLanguageBlockWithNegativeIntegerAttribute")
 {
-    const std::string testString(
-        "{"
-        "    attribute =  -12328;"
-        "}");
+    const std::string testString("{"
+                                 "    attribute =  -12328;"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;
@@ -207,10 +206,10 @@ TEST_CASE("TokenizerTest.simpleLanguageBlockWithNegativeIntegerAttribute")
 
 TEST_CASE("TokenizerTest.simpleLanguageBlockWithDecimalAttribute")
 {
-    const std::string testString(
-        "{"
-        "    attribute =  12328.38283;"
-        "}");
+    const std::string testString("{"
+                                 "    attribute =  12328.38283;"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;
@@ -227,10 +226,10 @@ TEST_CASE("TokenizerTest.simpleLanguageBlockWithDecimalAttribute")
 
 TEST_CASE("TokenizerTest.simpleLanguageBlockWithDecimalAttributeStartingWithDot")
 {
-    const std::string testString(
-        "{"
-        "    attribute =  .38283;"
-        "}");
+    const std::string testString("{"
+                                 "    attribute =  .38283;"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;
@@ -247,10 +246,10 @@ TEST_CASE("TokenizerTest.simpleLanguageBlockWithDecimalAttributeStartingWithDot"
 
 TEST_CASE("TokenizerTest.simpleLanguageBlockWithNegativeDecimalAttribute")
 {
-    const std::string testString(
-        "{"
-        "    attribute =  -343.38283;"
-        "}");
+    const std::string testString("{"
+                                 "    attribute =  -343.38283;"
+                                 "}"
+    );
 
     SimpleTokenizer tokenizer(testString);
     SimpleTokenizer::Token token;

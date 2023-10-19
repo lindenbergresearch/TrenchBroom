@@ -86,17 +86,11 @@ public:
 deleteCopyAndMove(MapRenderer);
 
 private:
-    static std::unique_ptr<ObjectRenderer> createDefaultRenderer(
-        std::weak_ptr<View::MapDocument> document
-    );
+    static std::unique_ptr<ObjectRenderer> createDefaultRenderer(std::weak_ptr<View::MapDocument> document);
 
-    static std::unique_ptr<ObjectRenderer> createSelectionRenderer(
-        std::weak_ptr<View::MapDocument> document
-    );
+    static std::unique_ptr<ObjectRenderer> createSelectionRenderer(std::weak_ptr<View::MapDocument> document);
 
-    static std::unique_ptr<ObjectRenderer> createLockRenderer(
-        std::weak_ptr<View::MapDocument> document
-    );
+    static std::unique_ptr<ObjectRenderer> createLockRenderer(std::weak_ptr<View::MapDocument> document);
 
     void clear();
 

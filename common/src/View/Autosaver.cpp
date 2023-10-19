@@ -43,27 +43,29 @@
 
 namespace TrenchBroom::View {
 IO::PathMatcher makeBackupPathMatcher(std::filesystem::path mapBasename) {
-    return [mapBasename = std::move(mapBasename)](
-        const std::filesystem::path &path, const IO::GetPathInfo &getPathInfo
-    ) {
+    return [mapBasename = std::move(mapBasename)](const std::filesystem::path &path, const IO::GetPathInfo &getPathInfo) {
       const auto backupName = path.stem();
       const auto backupBasename = backupName.stem();
       const auto backupExtension = backupName.extension().string();
       const auto backupNum = backupExtension.empty() ? "" : backupExtension.substr(1);
 
-      return getPathInfo(path) == IO::PathInfo::File && kdl::ci::str_is_equal(path.extension().string(), ".map") && backupBasename == mapBasename && kdl::str_is_numeric(backupNum) && kdl::str_to_size(backupNum).value_or(0u) > 0u;
+      return getPathInfo(path) == IO::PathInfo::File && kdl::ci::str_is_equal(path.extension().string(), ".map") && backupBasename == mapBasename &&
+             kdl::str_is_numeric(backupNum) && kdl::str_to_size(backupNum).value_or(0u) > 0u;
     };
 }
 
-Autosaver::Autosaver(
-    std::weak_ptr<MapDocument> document, const std::chrono::milliseconds saveInterval, const size_t maxBackups
-) : m_document{std::move(document)}, m_saveInterval{saveInterval}, m_maxBackups{maxBackups}, m_lastSaveTime{Clock::now()}, m_lastModificationCount{kdl::mem_lock(m_document)->modificationCount()} {
+Autosaver::Autosaver(std::weak_ptr<MapDocument> document, const std::chrono::milliseconds saveInterval, const size_t maxBackups) : m_document{
+    std::move(document)
+}, m_saveInterval{saveInterval}, m_maxBackups{maxBackups}, m_lastSaveTime{
+    Clock::now()
+}, m_lastModificationCount{kdl::mem_lock(m_document)->modificationCount()} {
 }
 
 void Autosaver::triggerAutosave(Logger &logger) {
     if (!kdl::mem_expired(m_document)) {
         auto document = kdl::mem_lock(m_document);
-        if (document->modified() && document->modificationCount() != m_lastModificationCount && Clock::now() - m_lastSaveTime >= m_saveInterval && document->persistent()) {
+        if (document->modified() && document->modificationCount() != m_lastModificationCount && Clock::now() - m_lastSaveTime >= m_saveInterval &&
+            document->persistent()) {
             autosave(logger, document);
         }
     }
@@ -76,12 +78,9 @@ void Autosaver::autosave(Logger &logger, std::shared_ptr<MapDocument> document) 
     const auto mapFilename = mapPath.filename();
     const auto mapBasename = mapPath.stem();
 
-    createBackupFileSystem(mapPath).and_then(
-        [&](auto fs) {
-          return collectBackups(fs, mapBasename).and_then([&](auto backups) { return thinBackups(logger, fs, backups); }).and_then(
-              [&](auto remainingBackups) {
-                return cleanBackups(fs, remainingBackups, mapBasename).and_then(
-                    [&]() {
+    createBackupFileSystem(mapPath).and_then([&](auto fs) {
+          return collectBackups(fs, mapBasename).and_then([&](auto backups) { return thinBackups(logger, fs, backups); }).and_then([&](auto remainingBackups) {
+                return cleanBackups(fs, remainingBackups, mapBasename).and_then([&]() {
                       assert(remainingBackups.size() < m_maxBackups);
                       const auto backupNo = remainingBackups.size() + 1;
                       return fs.makeAbsolute(makeBackupName(mapBasename, backupNo));
@@ -90,8 +89,7 @@ void Autosaver::autosave(Logger &logger, std::shared_ptr<MapDocument> document) 
               }
           );
         }
-    ).transform(
-        [&](const auto &backupFilePath) {
+    ).transform([&](const auto &backupFilePath) {
           m_lastSaveTime = Clock::now();
           m_lastModificationCount = document->modificationCount();
           document->saveDocumentTo(backupFilePath);
@@ -101,64 +99,52 @@ void Autosaver::autosave(Logger &logger, std::shared_ptr<MapDocument> document) 
     ).transform_error([&](auto e) { logger.error() << "Aborting autosave: " << e.msg; });
 }
 
-Result<IO::WritableDiskFileSystem> Autosaver::createBackupFileSystem(
-    const std::filesystem::path &mapPath
-) const {
+Result<IO::WritableDiskFileSystem> Autosaver::createBackupFileSystem(const std::filesystem::path &mapPath) const {
     const auto basePath = mapPath.parent_path();
     const auto autosavePath = basePath / "autosave";
 
-    return IO::Disk::createDirectory(autosavePath).transform(
-        [&](auto) {
+    return IO::Disk::createDirectory(autosavePath).transform([&](auto) {
           return IO::WritableDiskFileSystem{autosavePath};
         }
     );
 }
 
-Result<std::vector<std::filesystem::path>> Autosaver::collectBackups(
-    const IO::FileSystem &fs, const std::filesystem::path &mapBasename
-) const {
-    return fs.find({}, IO::TraversalMode::Flat, makeBackupPathMatcher(mapBasename)).transform([](auto backupPaths) { return kdl::vec_sort(std::move(backupPaths)); });
+Result<std::vector<std::filesystem::path>> Autosaver::collectBackups(const IO::FileSystem &fs, const std::filesystem::path &mapBasename) const {
+    return fs.find({}, IO::TraversalMode::Flat, makeBackupPathMatcher(mapBasename)).transform(
+        [](auto backupPaths) { return kdl::vec_sort(std::move(backupPaths)); }
+    );
 }
 
-Result<std::vector<std::filesystem::path>> Autosaver::thinBackups(
-    Logger &logger, IO::WritableDiskFileSystem &fs, const std::vector<std::filesystem::path> &backups
-) const {
+Result<std::vector<std::filesystem::path>>
+Autosaver::thinBackups(Logger &logger, IO::WritableDiskFileSystem &fs, const std::vector<std::filesystem::path> &backups) const {
     if (backups.size() < m_maxBackups) {
         return backups;
     }
 
     const auto toDelete = kdl::vec_slice_suffix(backups, backups.size() - m_maxBackups + 1);
-    return kdl::fold_results(
-        kdl::vec_transform(
-            toDelete, [&](auto filename) {
-              return fs.deleteFile(filename).transform(
-                  [&](const auto deleted) {
-                    if (deleted) {
-                        logger.debug() << "Deleted autosave backup " << filename;
-                    }
-                  }
-              );
-            }
-        )).transform([&]() { return kdl::vec_slice_prefix(backups, m_maxBackups - 1); });
+    return kdl::fold_results(kdl::vec_transform(toDelete, [&](auto filename) {
+          return fs.deleteFile(filename).transform([&](const auto deleted) {
+                if (deleted) {
+                    logger.debug() << "Deleted autosave backup " << filename;
+                }
+              }
+          );
+        }
+    )).transform([&]() { return kdl::vec_slice_prefix(backups, m_maxBackups - 1); });
 }
 
-Result<void> Autosaver::cleanBackups(
-    IO::WritableDiskFileSystem &fs, std::vector<std::filesystem::path> &backups, const std::filesystem::path &mapBasename
-) const {
-    return kdl::fold_results(
-        kdl::vec_transform(
-            backups, [&](const std::filesystem::path &backup, const size_t i) {
-              const auto &oldName = backup.filename();
-              const auto newName = makeBackupName(mapBasename, i + 1);
+Result<void>
+Autosaver::cleanBackups(IO::WritableDiskFileSystem &fs, std::vector<std::filesystem::path> &backups, const std::filesystem::path &mapBasename) const {
+    return kdl::fold_results(kdl::vec_transform(backups, [&](const std::filesystem::path &backup, const size_t i) {
+          const auto &oldName = backup.filename();
+          const auto newName = makeBackupName(mapBasename, i + 1);
 
-              return oldName != newName ? fs.moveFile(oldName, newName) : Result<void>{};
-            }
-        ));
+          return oldName != newName ? fs.moveFile(oldName, newName) : Result<void>{};
+        }
+    ));
 }
 
-std::filesystem::path Autosaver::makeBackupName(
-    const std::filesystem::path &mapBasename, const size_t index
-) const {
+std::filesystem::path Autosaver::makeBackupName(const std::filesystem::path &mapBasename, const size_t index) const {
     return kdl::path_add_extension(mapBasename, "." + kdl::str_to_string(index) + ".map");
 }
 } // namespace TrenchBroom::View

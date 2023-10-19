@@ -40,8 +40,7 @@ CreateSimpleBrushTool::CreateSimpleBrushTool(std::weak_ptr<MapDocument> document
 void CreateSimpleBrushTool::update(const vm::bbox3 &bounds) {
     auto document = kdl::mem_lock(m_document);
     const auto game = document->game();
-    const auto builder = Model::BrushBuilder(
-        document->world()->mapFormat(), document->worldBounds(), game->defaultFaceAttribs());
+    const auto builder = Model::BrushBuilder(document->world()->mapFormat(), document->worldBounds(), game->defaultFaceAttribs());
 
     builder.createCuboid(bounds, document->currentTextureName()).transform([&](auto b) { updateBrush(new Model::BrushNode(std::move(b))); }).transform_error(
         [&](auto e) {

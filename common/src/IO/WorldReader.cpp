@@ -40,9 +40,7 @@ namespace TrenchBroom {
 namespace IO {
 // WorldReaderException
 
-static std::string formatParserExceptions(
-    const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions
-) {
+static std::string formatParserExceptions(const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions) {
     std::stringstream result;
     for (const auto &[mapFormat, message]: parserExceptions) {
         result << "Error parsing as " << Model::formatName(mapFormat) << ": " << message << "\n";
@@ -52,26 +50,21 @@ static std::string formatParserExceptions(
 
 WorldReaderException::WorldReaderException() = default;
 
-WorldReaderException::WorldReaderException(
-    const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions
-) : Exception{formatParserExceptions(parserExceptions)} {
+WorldReaderException::WorldReaderException(const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions) : Exception{
+    formatParserExceptions(parserExceptions)
+} {
 }
 
 // WorldReader
 
-WorldReader::WorldReader(
-    std::string_view str, const Model::MapFormat sourceAndTargetMapFormat, const Model::EntityPropertyConfig &entityPropertyConfig
-) : MapReader(
-    std::move(str), sourceAndTargetMapFormat, sourceAndTargetMapFormat, entityPropertyConfig, {}
-), m_world(
-    std::make_unique<Model::WorldNode>(
-        entityPropertyConfig, Model::Entity{}, sourceAndTargetMapFormat
-    )) {
+WorldReader::WorldReader(std::string_view str, const Model::MapFormat sourceAndTargetMapFormat, const Model::EntityPropertyConfig &entityPropertyConfig)
+    : MapReader(std::move(str), sourceAndTargetMapFormat, sourceAndTargetMapFormat, entityPropertyConfig, {}),
+      m_world(std::make_unique<Model::WorldNode>(entityPropertyConfig, Model::Entity{}, sourceAndTargetMapFormat)) {
     m_world->disableNodeTreeUpdates();
 }
 
-std::unique_ptr<Model::WorldNode> WorldReader::tryRead(
-    std::string_view str, const std::vector<Model::MapFormat> &mapFormatsToTry, const vm::bbox3 &worldBounds, const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status
+std::unique_ptr<Model::WorldNode> WorldReader::tryRead(std::string_view str, const std::vector<Model::MapFormat> &mapFormatsToTry, const vm::bbox3 &worldBounds,
+    const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status
 ) {
     std::vector<std::tuple<Model::MapFormat, std::string>> parserExceptions;
 
@@ -94,15 +87,11 @@ std::unique_ptr<Model::WorldNode> WorldReader::tryRead(
     }
     else {
         // mapFormatsToTry was empty or all elements were Model::MapFormat::Unknown
-        throw WorldReaderException(
-            {{Model::MapFormat::Unknown, "No valid formats to parse as"}}
-        );
+        throw WorldReaderException({{Model::MapFormat::Unknown, "No valid formats to parse as"}});
     }
 }
 
-std::unique_ptr<Model::WorldNode> WorldReader::read(
-    const vm::bbox3 &worldBounds, ParserStatus &status
-) {
+std::unique_ptr<Model::WorldNode> WorldReader::read(const vm::bbox3 &worldBounds, ParserStatus &status) {
     readEntities(worldBounds, status);
     sanitizeLayerSortIndicies(status);
     m_world->rebuildNodeTree();
@@ -155,9 +144,7 @@ void WorldReader::sanitizeLayerSortIndicies(ParserStatus & /* status */) {
     }
 }
 
-Model::Node *WorldReader::onWorldNode(
-    std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &
-) {
+Model::Node *WorldReader::onWorldNode(std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &) {
     // we transfer the properties and the configuration of the default layer, but don't use
     // the given node
     m_world->setEntity(worldNode->entity());
@@ -175,9 +162,7 @@ void WorldReader::onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStat
     m_world->addChild(layerNode.release());
 }
 
-void WorldReader::onNode(
-    Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &
-) {
+void WorldReader::onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &) {
     if (parentNode != nullptr) {
         parentNode->addChild(node.release());
     }

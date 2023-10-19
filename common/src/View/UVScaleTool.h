@@ -65,9 +65,7 @@ private:
 
     std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-    void render(
-        const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) override;
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
     bool cancel() override;
 };

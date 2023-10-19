@@ -106,15 +106,11 @@ void Quake3ShaderStage::BlendFunc::reset() {
     srcFactor = destFactor = "";
 }
 
-bool operator==(
-    const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs
-) {
+bool operator==(const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs) {
     return lhs.srcFactor == rhs.srcFactor && lhs.destFactor == rhs.destFactor;
 }
 
-bool operator!=(
-    const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs
-) {
+bool operator!=(const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs) {
     return !(lhs == rhs);
 }
 
@@ -132,7 +128,8 @@ Quake3ShaderStage &Quake3Shader::addStage() {
 }
 
 bool operator==(const Quake3Shader &lhs, const Quake3Shader &rhs) {
-    return lhs.shaderPath == rhs.shaderPath && lhs.editorImage == rhs.editorImage && lhs.lightImage == rhs.lightImage && lhs.culling == rhs.culling && lhs.surfaceParms == rhs.surfaceParms && lhs.stages == rhs.stages;
+    return lhs.shaderPath == rhs.shaderPath && lhs.editorImage == rhs.editorImage && lhs.lightImage == rhs.lightImage && lhs.culling == rhs.culling &&
+           lhs.surfaceParms == rhs.surfaceParms && lhs.stages == rhs.stages;
 }
 
 bool operator!=(const Quake3Shader &lhs, const Quake3Shader &rhs) {

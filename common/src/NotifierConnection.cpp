@@ -26,9 +26,7 @@
 namespace TrenchBroom {
 NotifierConnection::NotifierConnection() = default;
 
-NotifierConnection::NotifierConnection(
-    std::weak_ptr<NotifierStateBase> notifier, const size_t id
-) : m_connections{{std::move(notifier), id}} {
+NotifierConnection::NotifierConnection(std::weak_ptr<NotifierStateBase> notifier, const size_t id) : m_connections{{std::move(notifier), id}} {
 }
 
 NotifierConnection::NotifierConnection(NotifierConnection &&) noexcept = default;
@@ -40,8 +38,7 @@ NotifierConnection::~NotifierConnection() {
 }
 
 NotifierConnection &NotifierConnection::operator+=(NotifierConnection &&other) {
-    m_connections.insert(
-        std::end(m_connections), std::begin(other.m_connections), std::end(other.m_connections));
+    m_connections.insert(std::end(m_connections), std::begin(other.m_connections), std::end(other.m_connections));
     other.m_connections.clear();
     return *this;
 }

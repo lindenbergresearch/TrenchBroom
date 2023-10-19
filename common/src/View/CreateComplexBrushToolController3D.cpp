@@ -72,23 +72,20 @@ private:
     const Model::Polyhedron3 m_oldPolyhedron;
 
 public:
-    DrawFaceDragDelegate(CreateComplexBrushTool &tool, const vm::plane3 plane) : m_tool{tool}, m_plane{plane}, m_oldPolyhedron{m_tool.polyhedron()} {
+    DrawFaceDragDelegate(CreateComplexBrushTool &tool, const vm::plane3 plane) : m_tool{tool}, m_plane{
+        plane
+    }, m_oldPolyhedron{m_tool.polyhedron()} {
     }
 
-    HandlePositionProposer start(
-        const InputState &, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
-    ) {
+    HandlePositionProposer start(const InputState &, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset) {
         using namespace Model::HitFilters;
 
         updatePolyhedron(initialHandlePosition, initialHandlePosition);
 
-        return makeHandlePositionProposer(
-            makeSurfaceHandlePicker(type(Model::BrushNode::BrushHitType), handleOffset), makeIdentityHandleSnapper());
+        return makeHandlePositionProposer(makeSurfaceHandlePicker(type(Model::BrushNode::BrushHitType), handleOffset), makeIdentityHandleSnapper());
     }
 
-    DragStatus drag(
-        const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
-    ) {
+    DragStatus drag(const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition) {
         updatePolyhedron(dragState.initialHandlePosition, proposedHandlePosition);
         return DragStatus::Continue;
     }
@@ -98,31 +95,26 @@ public:
     void cancel(const DragState &) { m_tool.update(m_oldPolyhedron); }
 
 private:
-    void updatePolyhedron(
-        const vm::vec3 &initialHandlePosition, const vm::vec3 &currentHandlePosition
-    ) {
+    void updatePolyhedron(const vm::vec3 &initialHandlePosition, const vm::vec3 &currentHandlePosition) {
         const auto &grid = m_tool.grid();
 
         const auto axis = vm::find_abs_max_component(m_plane.normal);
         const auto swizzledPlane = vm::plane3{vm::swizzle(m_plane.anchor(), axis), vm::swizzle(m_plane.normal, axis)};
-        const auto theMin = vm::swizzle(
-            grid.snapDown(vm::min(initialHandlePosition, currentHandlePosition)), axis
-        );
-        const auto theMax = vm::swizzle(
-            grid.snapUp(vm::max(initialHandlePosition, currentHandlePosition)), axis
-        );
+        const auto theMin = vm::swizzle(grid.snapDown(vm::min(initialHandlePosition, currentHandlePosition)), axis);
+        const auto theMax = vm::swizzle(grid.snapUp(vm::max(initialHandlePosition, currentHandlePosition)), axis);
 
         const auto topLeft2 = vm::vec2{theMin.x(), theMin.y()};
         const auto topRight2 = vm::vec2{theMax.x(), theMin.y()};
         const auto bottomLeft2 = vm::vec2{theMin.x(), theMax.y()};
         const auto bottomRight2 = vm::vec2{theMax.x(), theMax.y()};
 
-        const auto newVertices = std::vector<vm::vec3>{vm::unswizzle(vm::vec3{topLeft2, swizzledPlane.zAt(topLeft2)}, axis), vm::unswizzle(vm::vec3{topRight2, swizzledPlane.zAt(topRight2)}, axis),
-                                                       vm::unswizzle(vm::vec3{bottomLeft2, swizzledPlane.zAt(bottomLeft2)}, axis), vm::unswizzle(vm::vec3{bottomRight2, swizzledPlane.zAt(bottomRight2)}, axis)};
+        const auto newVertices = std::vector<vm::vec3>{
+            vm::unswizzle(vm::vec3{topLeft2, swizzledPlane.zAt(topLeft2)}, axis), vm::unswizzle(vm::vec3{topRight2, swizzledPlane.zAt(topRight2)}, axis),
+            vm::unswizzle(vm::vec3{bottomLeft2, swizzledPlane.zAt(bottomLeft2)}, axis),
+            vm::unswizzle(vm::vec3{bottomRight2, swizzledPlane.zAt(bottomRight2)}, axis)
+        };
 
-        m_tool.update(
-            Model::Polyhedron3{kdl::vec_concat(newVertices, m_oldPolyhedron.vertexPositions())}
-        );
+        m_tool.update(Model::Polyhedron3{kdl::vec_concat(newVertices, m_oldPolyhedron.vertexPositions())});
     }
 };
 
@@ -155,8 +147,9 @@ private:
 
         const auto initialHandlePosition = hit.hitPoint();
         const auto plane = faceHandle->face().boundary();
-        return createHandleDragTracker(
-            DrawFaceDragDelegate{m_tool, plane}, inputState, initialHandlePosition, initialHandlePosition
+        return createHandleDragTracker(DrawFaceDragDelegate{
+                m_tool, plane
+            }, inputState, initialHandlePosition, initialHandlePosition
         );
     }
 
@@ -170,22 +163,19 @@ private:
     const Model::Polyhedron3 m_oldPolyhedron;
 
 public:
-    DuplicateFaceDragDelegate(CreateComplexBrushTool &tool, const vm::vec3 dragDir) : m_tool{tool}, m_dragDir{dragDir}, m_oldPolyhedron{m_tool.polyhedron()} {
+    DuplicateFaceDragDelegate(CreateComplexBrushTool &tool, const vm::vec3 dragDir) : m_tool{tool}, m_dragDir{
+        dragDir
+    }, m_oldPolyhedron{m_tool.polyhedron()} {
     }
 
-    HandlePositionProposer start(
-        const InputState &, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset
-    ) {
+    HandlePositionProposer start(const InputState &, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset) {
         using namespace Model::HitFilters;
 
         const auto line = vm::line3{initialHandlePosition, m_dragDir};
-        return makeHandlePositionProposer(
-            makeLineHandlePicker(line, handleOffset), makeRelativeLineHandleSnapper(m_tool.grid(), line));
+        return makeHandlePositionProposer(makeLineHandlePicker(line, handleOffset), makeRelativeLineHandleSnapper(m_tool.grid(), line));
     }
 
-    DragStatus drag(
-        const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition
-    ) {
+    DragStatus drag(const InputState &, const DragState &dragState, const vm::vec3 &proposedHandlePosition) {
         auto polyhedron = m_oldPolyhedron;
         assert(polyhedron.polygon());
 
@@ -194,9 +184,7 @@ public:
         const auto *face = m_oldPolyhedron.faces().front();
         const auto points = face->vertexPositions() + delta;
 
-        m_tool.update(
-            Model::Polyhedron3{kdl::vec_concat(points, m_oldPolyhedron.vertexPositions())}
-        );
+        m_tool.update(Model::Polyhedron3{kdl::vec_concat(points, m_oldPolyhedron.vertexPositions())});
 
         return DragStatus::Continue;
     }
@@ -238,8 +226,9 @@ private:
         const vm::vec3 initialHandlePosition = vm::point_at_distance(inputState.pickRay(), hit.distance);
         const vm::vec3 normal = hit.face->normal();
 
-        return createHandleDragTracker(
-            DuplicateFaceDragDelegate{m_tool, normal}, inputState, initialHandlePosition, initialHandlePosition
+        return createHandleDragTracker(DuplicateFaceDragDelegate{
+                m_tool, normal
+            }, inputState, initialHandlePosition, initialHandlePosition
         );
     }
 
@@ -247,9 +236,7 @@ private:
 };
 } // namespace
 
-CreateComplexBrushToolController3D::CreateComplexBrushToolController3D(
-    CreateComplexBrushTool &tool
-) : m_tool{tool} {
+CreateComplexBrushToolController3D::CreateComplexBrushToolController3D(CreateComplexBrushTool &tool) : m_tool{tool} {
     addController(std::make_unique<DrawFacePart>(m_tool));
     addController(std::make_unique<DuplicateFacePart>(m_tool));
 }
@@ -278,9 +265,9 @@ bool CreateComplexBrushToolController3D::mouseClick(const InputState &inputState
         const Model::BrushFace &face = faceHandle->face();
         const vm::vec3 snapped = grid.snap(hit.hitPoint(), face.boundary());
 
-        m_tool.update(
-            Model::Polyhedron3{kdl::vec_concat(
-                std::vector<vm::vec3>({snapped}), m_tool.polyhedron().vertexPositions())}
+        m_tool.update(Model::Polyhedron3{
+                kdl::vec_concat(std::vector<vm::vec3>({snapped}), m_tool.polyhedron().vertexPositions())
+            }
         );
 
         return true;
@@ -303,8 +290,9 @@ bool CreateComplexBrushToolController3D::mouseDoubleClick(const InputState &inpu
     if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
         const Model::BrushFace &face = faceHandle->face();
 
-        m_tool.update(
-            Model::Polyhedron3{kdl::vec_concat(face.vertexPositions(), m_tool.polyhedron().vertexPositions())}
+        m_tool.update(Model::Polyhedron3{
+                kdl::vec_concat(face.vertexPositions(), m_tool.polyhedron().vertexPositions())
+            }
         );
 
         return true;
@@ -314,9 +302,7 @@ bool CreateComplexBrushToolController3D::mouseDoubleClick(const InputState &inpu
     }
 }
 
-bool CreateComplexBrushToolController3D::doShouldHandleMouseDrag(
-    const InputState &inputState
-) const {
+bool CreateComplexBrushToolController3D::doShouldHandleMouseDrag(const InputState &inputState) const {
     if (!inputState.mouseButtonsDown(MouseButtons::MBLeft)) {
         return false;
     }
@@ -327,9 +313,7 @@ bool CreateComplexBrushToolController3D::doShouldHandleMouseDrag(
     return true;
 }
 
-void CreateComplexBrushToolController3D::render(
-    const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void CreateComplexBrushToolController3D::render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     m_tool.render(renderContext, renderBatch);
 
     const Model::Polyhedron3 &polyhedron = m_tool.polyhedron();
@@ -339,8 +323,7 @@ void CreateComplexBrushToolController3D::render(
         renderService.setLineWidth(2.0f);
 
         for (const auto *edge: polyhedron.edges()) {
-            renderService.renderLine(
-                vm::vec3f(edge->firstVertex()->position()), vm::vec3f(edge->secondVertex()->position()));
+            renderService.renderLine(vm::vec3f(edge->firstVertex()->position()), vm::vec3f(edge->secondVertex()->position()));
         }
 
         for (const auto *vertex: polyhedron.vertices()) {

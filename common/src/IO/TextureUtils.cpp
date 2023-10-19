@@ -28,9 +28,7 @@
 
 namespace TrenchBroom::IO {
 
-std::string getTextureNameFromPathSuffix(
-    const std::filesystem::path &path, size_t prefixLength
-) {
+std::string getTextureNameFromPathSuffix(const std::filesystem::path &path, size_t prefixLength) {
     return prefixLength < kdl::path_length(path) ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength)).generic_string() : "";
 }
 

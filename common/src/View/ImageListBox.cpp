@@ -30,8 +30,8 @@
 
 namespace TrenchBroom {
 namespace View {
-ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent) :
-ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
+ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent)
+    : ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
     m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
     makeEmphasized(m_titleLabel);
     m_titleLabel->setStyleSheet("color: palette(BrightText);");
@@ -74,10 +74,8 @@ void ImageListBoxItemRenderer::updateItem() {
 ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, false, parent) {
 }
 
-ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, const size_t index
-) {
-    return new ImageListBoxItemRenderer(title(index), subtitle(index), image(index), parent
-    );
+ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, const size_t index) {
+    return new ImageListBoxItemRenderer(title(index), subtitle(index), image(index), parent);
 }
 
 QPixmap ImageListBox::image(const size_t /* index */) const {

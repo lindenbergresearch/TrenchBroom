@@ -71,8 +71,9 @@ void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWid
 
 // ControlListBoxItemRendererWrapper
 
-ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, const bool showSeparator, QWidget *parent
-) : QWidget(parent), m_renderer(renderer) {
+ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, const bool showSeparator, QWidget *parent) : QWidget(
+    parent
+), m_renderer(renderer) {
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -96,15 +97,23 @@ const ControlListBoxItemRenderer *ControlListBoxItemRendererWrapper::renderer() 
 
 // ControlListBox
 
-ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMargins, const bool showSeparator, QWidget *parent
-) : QWidget(parent), m_listWidget(new QListWidget()), m_emptyTextContainer(new QWidget()), m_emptyTextLabel(new QLabel(emptyText)), m_itemMargins(itemMargins), m_showSeparator(showSeparator) {
+ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMargins, const bool showSeparator, QWidget *parent) : QWidget(parent),
+                                                                                                                                   m_listWidget(
+                                                                                                                                       new QListWidget()),
+                                                                                                                                   m_emptyTextContainer(
+                                                                                                                                       new QWidget()),
+                                                                                                                                   m_emptyTextLabel(
+                                                                                                                                       new QLabel(emptyText)),
+                                                                                                                                   m_itemMargins(itemMargins),
+                                                                                                                                   m_showSeparator(
+                                                                                                                                       showSeparator
+                                                                                                                                   ) {
     m_listWidget->setObjectName("controlListBox_listWidget");
     m_listWidget->hide();
     m_listWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
     // m_listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    connect(m_listWidget, &QListWidget::itemSelectionChanged, this, &ControlListBox::listItemSelectionChanged
-    );
+    connect(m_listWidget, &QListWidget::itemSelectionChanged, this, &ControlListBox::listItemSelectionChanged);
 
     m_emptyTextLabel->setWordWrap(true);
     m_emptyTextLabel->setDisabled(true);
@@ -123,9 +132,9 @@ ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMar
     emptyTextLayout->addWidget(m_emptyTextLabel);
 }
 
-ControlListBox::ControlListBox(const QString &emptyText, const bool showSeparator, QWidget *parent
-) : ControlListBox(emptyText, QMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin
-    ), showSeparator, parent
+ControlListBox::ControlListBox(const QString &emptyText, const bool showSeparator, QWidget *parent) : ControlListBox(emptyText,
+    QMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin), showSeparator,
+    parent
 ) {
 }
 
@@ -223,8 +232,7 @@ void ControlListBox::addItemRenderer(ControlListBoxItemRenderer *renderer) {
     const auto index = count();
     renderer->setIndex(static_cast<size_t>(index));
     renderer->setContentsMargins(m_itemMargins);
-    connect(renderer, &ControlListBoxItemRenderer::doubleClicked, this, &ControlListBox::doubleClicked
-    );
+    connect(renderer, &ControlListBoxItemRenderer::doubleClicked, this, &ControlListBox::doubleClicked);
 
     auto *widgetItem = new QListWidgetItem(m_listWidget);
     m_listWidget->addItem(widgetItem);

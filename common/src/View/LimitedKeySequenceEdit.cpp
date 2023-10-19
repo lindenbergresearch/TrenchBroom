@@ -28,9 +28,7 @@ LimitedKeySequenceEdit::LimitedKeySequenceEdit(QWidget *parent) : LimitedKeySequ
 
 LimitedKeySequenceEdit::LimitedKeySequenceEdit(const size_t maxCount, QWidget *parent) : QKeySequenceEdit(parent), m_maxCount(maxCount), m_count(0) {
     Q_ASSERT(m_maxCount <= MaxCount);
-    connect(
-        this, &QKeySequenceEdit::editingFinished, this, &LimitedKeySequenceEdit::resetCount
-    );
+    connect(this, &QKeySequenceEdit::editingFinished, this, &LimitedKeySequenceEdit::resetCount);
 }
 
 void LimitedKeySequenceEdit::keyPressEvent(QKeyEvent *event) {

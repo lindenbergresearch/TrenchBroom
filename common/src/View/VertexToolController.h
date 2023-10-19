@@ -31,13 +31,9 @@ class VertexTool;
 
 class VertexToolController : public VertexToolControllerBase<VertexTool> {
 protected:
-    static Model::Hit findHandleHit(
-        const InputState &inputState, const VertexToolController::PartBase &base
-    );
+    static Model::Hit findHandleHit(const InputState &inputState, const VertexToolController::PartBase &base);
 
-    static std::vector<Model::Hit> findHandleHits(
-        const InputState &inputState, const VertexToolController::PartBase &base
-    );
+    static std::vector<Model::Hit> findHandleHits(const InputState &inputState, const VertexToolController::PartBase &base);
 
 private:
     class SelectVertexPart;

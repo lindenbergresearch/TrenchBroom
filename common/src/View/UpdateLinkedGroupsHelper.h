@@ -74,9 +74,7 @@ public:
 private:
     Result<void> computeLinkedGroupUpdates(MapDocumentCommandFacade &document);
 
-    static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(
-        const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document
-    );
+    static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document);
 
     void doApplyOrUndoLinkedGroupUpdates(MapDocumentCommandFacade &document);
 };

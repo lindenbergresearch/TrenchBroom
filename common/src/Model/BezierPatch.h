@@ -51,9 +51,7 @@ private:
     Assets::AssetReference<Assets::Texture> m_textureReference;
 
 public:
-    BezierPatch(
-        size_t pointRowCount, size_t pointColumnCount, std::vector<Point> controlPoints, std::string textureName
-    );
+    BezierPatch(size_t pointRowCount, size_t pointColumnCount, std::vector<Point> controlPoints, std::string textureName);
 
     ~BezierPatch();
 

@@ -63,9 +63,7 @@ public:
      * @param textureSearchPaths the paths at which to search for texture images
      * @param logger the logger to use
      */
-    Quake3ShaderFileSystem(
-        const FileSystem &fs, std::filesystem::path shaderSearchPath, std::vector<std::filesystem::path> textureSearchPaths, Logger &logger
-    );
+    Quake3ShaderFileSystem(const FileSystem &fs, std::filesystem::path shaderSearchPath, std::vector<std::filesystem::path> textureSearchPaths, Logger &logger);
 
 private:
     Result<void> doReadDirectory() override;
@@ -74,9 +72,7 @@ private:
 
     Result<void> linkShaders(std::vector<Assets::Quake3Shader> &shaders);
 
-    void linkTextures(
-        const std::vector<std::filesystem::path> &textures, std::vector<Assets::Quake3Shader> &shaders
-    );
+    void linkTextures(const std::vector<std::filesystem::path> &textures, std::vector<Assets::Quake3Shader> &shaders);
 
     void linkStandaloneShaders(std::vector<Assets::Quake3Shader> &shaders);
 };

@@ -59,9 +59,7 @@ private:
 public:
     static std::unique_ptr<SelectionCommand> select(const std::vector<Model::Node *> &nodes);
 
-    static std::unique_ptr<SelectionCommand> select(
-        const std::vector<Model::BrushFaceHandle> &faces
-    );
+    static std::unique_ptr<SelectionCommand> select(const std::vector<Model::BrushFaceHandle> &faces);
 
     static std::unique_ptr<SelectionCommand> convertToFaces();
 
@@ -69,19 +67,13 @@ public:
 
     static std::unique_ptr<SelectionCommand> selectAllFaces();
 
-    static std::unique_ptr<SelectionCommand> deselect(
-        const std::vector<Model::Node *> &nodes
-    );
+    static std::unique_ptr<SelectionCommand> deselect(const std::vector<Model::Node *> &nodes);
 
-    static std::unique_ptr<SelectionCommand> deselect(
-        const std::vector<Model::BrushFaceHandle> &faces
-    );
+    static std::unique_ptr<SelectionCommand> deselect(const std::vector<Model::BrushFaceHandle> &faces);
 
     static std::unique_ptr<SelectionCommand> deselectAll();
 
-    SelectionCommand(
-        Action action, const std::vector<Model::Node *> &nodes, const std::vector<Model::BrushFaceHandle> &faces
-    );
+    SelectionCommand(Action action, const std::vector<Model::Node *> &nodes, const std::vector<Model::BrushFaceHandle> &faces);
 
     ~SelectionCommand() override;
 
@@ -90,9 +82,7 @@ private:
 
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-    std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document
-    ) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
 deleteCopyAndMove(SelectionCommand);
 };

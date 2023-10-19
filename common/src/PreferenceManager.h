@@ -78,8 +78,7 @@ public:
         auto it = m_dynamicPreferences.find(path);
         if (it == std::end(m_dynamicPreferences)) {
             bool success = false;
-            std::tie(it, success) = m_dynamicPreferences.emplace(
-                path, std::make_unique<Preference<T>>(path, std::forward<T>(defaultValue)));
+            std::tie(it, success) = m_dynamicPreferences.emplace(path, std::make_unique<Preference<T>>(path, std::forward<T>(defaultValue)));
             assert(success);
             unused(success);
         }
@@ -229,7 +228,9 @@ private:
     T m_originalValue;
 
 public:
-    TemporarilySetPref(Preference<T> &preference, const T &value) : m_preference{preference}, m_originalValue{pref(m_preference)} {
+    TemporarilySetPref(Preference<T> &preference, const T &value) : m_preference{preference}, m_originalValue{
+        pref(m_preference)
+    } {
         setPref(m_preference, value);
     }
 
@@ -279,13 +280,9 @@ ReadPreferencesResult readPreferencesFromFile(const QString &path);
 
 ReadPreferencesResult readPreferences();
 
-WritePreferencesResult writePreferencesToFile(
-    const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs
-);
+WritePreferencesResult writePreferencesToFile(const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs);
 
 ReadPreferencesResult parsePreferencesFromJson(const QByteArray &jsonData);
 
-QByteArray writePreferencesToJson(
-    const std::map<std::filesystem::path, QJsonValue> &prefs
-);
+QByteArray writePreferencesToJson(const std::map<std::filesystem::path, QJsonValue> &prefs);
 } // namespace TrenchBroom

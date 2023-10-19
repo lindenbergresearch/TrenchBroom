@@ -55,9 +55,7 @@ DefTokenizer::Token DefTokenizer::emitToken() {
                     do {
                         advance();
                     } while (!eof() && !isWhitespace(curChar()));
-                    return Token(
-                        DefToken::ODefinition, c, curPos(), offset(c), startLine, startColumn
-                    );
+                    return Token(DefToken::ODefinition, c, curPos(), offset(c), startLine, startColumn);
                 }
                 else if (lookAhead() == '/') {
                     discardUntil("\n\r");
@@ -69,9 +67,7 @@ DefTokenizer::Token DefTokenizer::emitToken() {
             case '*': {
                 if (lookAhead() == '/') {
                     advance();
-                    return Token(
-                        DefToken::CDefinition, c, curPos(), offset(c), startLine, startColumn
-                    );
+                    return Token(DefToken::CDefinition, c, curPos(), offset(c), startLine, startColumn);
                 }
                 // fall through and try to read as word
                 switchFallthrough();
@@ -133,8 +129,7 @@ DefTokenizer::Token DefTokenizer::emitToken() {
                     return Token(DefToken::Decimal, c, e, offset(c), startLine, startColumn);
                 e = readUntil(WordDelims);
                 if (e == nullptr)
-                    throw ParserException(
-                        startLine, startColumn, "Unexpected character: " + std::string(c, 1));
+                    throw ParserException(startLine, startColumn, "Unexpected character: " + std::string(c, 1));
                 return Token(DefToken::Word, c, e, offset(c), startLine, startColumn);
             }
         }
@@ -142,7 +137,8 @@ DefTokenizer::Token DefTokenizer::emitToken() {
     return Token(DefToken::Eof, nullptr, nullptr, length(), line(), column());
 }
 
-DefParser::DefParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser(defaultEntityColor), m_tokenizer(DefTokenizer(std::move(str))) {
+DefParser::DefParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser(defaultEntityColor),
+                                                                              m_tokenizer(DefTokenizer(std::move(str))) {
 }
 
 DefParser::TokenNameMap DefParser::tokenNames() const {
@@ -219,9 +215,7 @@ std::optional<EntityDefinitionClassInfo> DefParser::parseClassInfo(ParserStatus 
         token = m_tokenizer.peekToken();
         if (token.hasType(DefToken::Word | DefToken::Minus)) {
             if (!addPropertyDefinition(classInfo.propertyDefinitions, parseSpawnflags(status))) {
-                status.warn(
-                    token.line(), token.column(), "Skipping duplicate spawnflags property definition"
-                );
+                status.warn(token.line(), token.column(), "Skipping duplicate spawnflags property definition");
             }
         }
     }
@@ -237,9 +231,7 @@ std::optional<EntityDefinitionClassInfo> DefParser::parseClassInfo(ParserStatus 
 }
 
 DefParser::PropertyDefinitionPtr DefParser::parseSpawnflags(ParserStatus & /* status */) {
-    auto definition = std::make_shared<Assets::FlagsPropertyDefinition>(
-        Model::EntityPropertyKeys::Spawnflags
-    );
+    auto definition = std::make_shared<Assets::FlagsPropertyDefinition>(Model::EntityPropertyKeys::Spawnflags);
     size_t numOptions = 0;
 
     Token token = m_tokenizer.peekToken();
@@ -254,9 +246,7 @@ DefParser::PropertyDefinitionPtr DefParser::parseSpawnflags(ParserStatus & /* st
     return definition;
 }
 
-void DefParser::parseProperties(
-    ParserStatus &status, EntityDefinitionClassInfo &classInfo
-) {
+void DefParser::parseProperties(ParserStatus &status, EntityDefinitionClassInfo &classInfo) {
     if (m_tokenizer.peekToken().type() == DefToken::OBrace) {
         m_tokenizer.nextToken();
         while (parseProperty(status, classInfo));
@@ -282,8 +272,7 @@ bool DefParser::parseProperty(ParserStatus &status, EntityDefinitionClassInfo &c
     else if (typeName == "choice") {
         auto propertyDefinition = parseChoicePropertyDefinition(status);
         if (!addPropertyDefinition(classInfo.propertyDefinitions, propertyDefinition)) {
-            status.warn(
-                line, column, "Skipping duplicate property definition: " + propertyDefinition->key());
+            status.warn(line, column, "Skipping duplicate property definition: " + propertyDefinition->key());
         }
     }
     else if (typeName == "model") {
@@ -314,9 +303,7 @@ std::string DefParser::parseBaseProperty(ParserStatus &status) {
     return basename;
 }
 
-DefParser::PropertyDefinitionPtr DefParser::parseChoicePropertyDefinition(
-    ParserStatus &status
-) {
+DefParser::PropertyDefinitionPtr DefParser::parseChoicePropertyDefinition(ParserStatus &status) {
     Token token = expect(status, DefToken::QuotedString, m_tokenizer.nextToken());
     const std::string propertyKey = token.data();
 
@@ -338,8 +325,7 @@ DefParser::PropertyDefinitionPtr DefParser::parseChoicePropertyDefinition(
 
     expect(status, DefToken::CParenthesis, token);
 
-    return DefParser::PropertyDefinitionPtr(
-        new Assets::ChoicePropertyDefinition(propertyKey, "", "", options, false));
+    return DefParser::PropertyDefinitionPtr(new Assets::ChoicePropertyDefinition(propertyKey, "", "", options, false));
 }
 
 Assets::ModelDefinition DefParser::parseModelDefinition(ParserStatus &status) {
@@ -371,9 +357,7 @@ Assets::ModelDefinition DefParser::parseModelDefinition(ParserStatus &status) {
             expect(status, DefToken::CParenthesis, m_tokenizer.nextToken());
 
             expression.optimize();
-            status.warn(
-                line, column, "Legacy model expressions are deprecated, replace with '" + expression.asString() + "'"
-            );
+            status.warn(line, column, "Legacy model expressions are deprecated, replace with '" + expression.asString() + "'");
             return Assets::ModelDefinition(expression);
         } catch (const ParserException &) {
             m_tokenizer.restore(snapshot);

@@ -81,9 +81,7 @@ void TextOutputAdapter::appendString(const QString &string) {
             // This means a CR was previously used. We need to select
             // the same number of characters as we're inserting, so the
             // text is overwritten.
-            m_insertionCursor.movePosition(
-                QTextCursor::NextCharacter, QTextCursor::KeepAnchor, insertionSize
-            );
+            m_insertionCursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, insertionSize);
         }
         m_insertionCursor.insertText(substring);
         i = lastToInsert;

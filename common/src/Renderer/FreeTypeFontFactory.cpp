@@ -52,9 +52,7 @@ FreeTypeFontFactory::~FreeTypeFontFactory() {
     }
 }
 
-std::unique_ptr<TextureFont> FreeTypeFontFactory::doCreateFont(
-    const FontDescriptor &fontDescriptor
-) {
+std::unique_ptr<TextureFont> FreeTypeFontFactory::doCreateFont(const FontDescriptor &fontDescriptor) {
     auto [face, bufferedReader] = loadFont(fontDescriptor);
     auto font = buildFont(face, fontDescriptor.minChar(), fontDescriptor.charCount());
     FT_Done_Face(face);
@@ -66,19 +64,14 @@ std::unique_ptr<TextureFont> FreeTypeFontFactory::doCreateFont(
     return font;
 }
 
-std::pair<FT_Face, IO::BufferedReader> FreeTypeFontFactory::loadFont(
-    const FontDescriptor &fontDescriptor
-) {
+std::pair<FT_Face, IO::BufferedReader> FreeTypeFontFactory::loadFont(const FontDescriptor &fontDescriptor) {
     const auto fontPath = fontDescriptor.path().is_absolute() ? fontDescriptor.path() : IO::SystemPaths::findResourceFile(fontDescriptor.path());
 
-    return IO::Disk::openFile(fontPath).and_then(
-        [&](auto file) -> Result<std::pair<FT_Face, IO::BufferedReader>> {
+    return IO::Disk::openFile(fontPath).and_then([&](auto file) -> Result<std::pair<FT_Face, IO::BufferedReader>> {
           auto reader = file->reader().buffer();
 
           auto face = FT_Face{};
-          const auto error = FT_New_Memory_Face(
-              m_library, reinterpret_cast<const FT_Byte *>(reader.begin()), FT_Long(reader.size()), 0, &face
-          );
+          const auto error = FT_New_Memory_Face(m_library, reinterpret_cast<const FT_Byte *>(reader.begin()), FT_Long(reader.size()), 0, &face);
           if (error) {
               return Error{"FT_New_Memory_Face returned " + std::to_string(error)};
           }
@@ -86,16 +79,13 @@ std::pair<FT_Face, IO::BufferedReader> FreeTypeFontFactory::loadFont(
           FT_Set_Pixel_Sizes(face, 0, FT_UInt(fontDescriptor.size()));
           return std::pair{face, std::move(reader)};
         }
-    ).if_error(
-        [&](auto e) {
+    ).if_error([&](auto e) {
           throw RenderException{"Error loading font '" + fontDescriptor.name() + "': " + e.msg};
         }
     ).value();
 }
 
-std::unique_ptr<TextureFont> FreeTypeFontFactory::buildFont(
-    FT_Face face, const unsigned char firstChar, const unsigned char charCount
-) {
+std::unique_ptr<TextureFont> FreeTypeFontFactory::buildFont(FT_Face face, const unsigned char firstChar, const unsigned char charCount) {
     const Metrics metrics = computeMetrics(face, firstChar, charCount);
 
     std::unique_ptr<FontTexture> texture = std::make_unique<FontTexture>(charCount, metrics.cellSize, metrics.lineHeight);
@@ -109,21 +99,16 @@ std::unique_ptr<TextureFont> FreeTypeFontFactory::buildFont(
             glyphs.push_back(FontGlyph(0, 0, 0, 0, 0));
         }
         else {
-            glyphs.push_back(
-                glyphBuilder.createGlyph(
-                    static_cast<size_t>(glyph->bitmap_left), static_cast<size_t>(glyph->bitmap_top), static_cast<size_t>(glyph->bitmap.width), static_cast<size_t>(glyph->bitmap.rows), static_cast<size_t>(glyph->advance.x >> 6),
-                    reinterpret_cast<char *>(glyph->bitmap.buffer), static_cast<size_t>(glyph->bitmap.pitch)));
+            glyphs.push_back(glyphBuilder.createGlyph(static_cast<size_t>(glyph->bitmap_left), static_cast<size_t>(glyph->bitmap_top),
+                static_cast<size_t>(glyph->bitmap.width), static_cast<size_t>(glyph->bitmap.rows), static_cast<size_t>(glyph->advance.x >> 6),
+                reinterpret_cast<char *>(glyph->bitmap.buffer), static_cast<size_t>(glyph->bitmap.pitch)));
         }
     }
 
-    return std::make_unique<TextureFont>(
-        std::move(texture), glyphs, static_cast<int>(metrics.lineHeight), firstChar, charCount
-    );
+    return std::make_unique<TextureFont>(std::move(texture), glyphs, static_cast<int>(metrics.lineHeight), firstChar, charCount);
 }
 
-FreeTypeFontFactory::Metrics FreeTypeFontFactory::computeMetrics(
-    FT_Face face, const unsigned char firstChar, const unsigned char charCount
-) const {
+FreeTypeFontFactory::Metrics FreeTypeFontFactory::computeMetrics(FT_Face face, const unsigned char firstChar, const unsigned char charCount) const {
     FT_GlyphSlot glyph = face->glyph;
 
     int maxWidth = 0;

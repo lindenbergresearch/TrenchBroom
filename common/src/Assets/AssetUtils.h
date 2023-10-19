@@ -40,9 +40,7 @@ namespace Assets {
  * if the lambda throws an EL exception
  */
 template<typename GetModelSpec>
-ModelSpecification safeGetModelSpecification(
-    Logger &logger, std::string_view classname, GetModelSpec getModelSpec
-) {
+ModelSpecification safeGetModelSpecification(Logger &logger, std::string_view classname, GetModelSpec getModelSpec) {
     try {
         return getModelSpec();
     } catch (const EL::Exception &e) {

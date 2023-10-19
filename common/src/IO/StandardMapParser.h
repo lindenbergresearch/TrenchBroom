@@ -92,9 +92,7 @@ public:
      * @param sourceMapFormat the expected format of the given string
      * @param targetMapFormat the format to convert the created objects to
      */
-    StandardMapParser(
-        std::string_view str, Model::MapFormat sourceMapFormat, Model::MapFormat targetMapFormat
-    );
+    StandardMapParser(std::string_view str, Model::MapFormat sourceMapFormat, Model::MapFormat targetMapFormat);
 
     ~StandardMapParser() override;
 
@@ -110,9 +108,7 @@ protected:
 private:
     void parseEntity(ParserStatus &status);
 
-    void parseEntityProperty(
-        std::vector<Model::EntityProperty> &properties, EntityPropertyKeys &keys, ParserStatus &status
-    );
+    void parseEntityProperty(std::vector<Model::EntityProperty> &properties, EntityPropertyKeys &keys, ParserStatus &status);
 
     void parseBrushOrBrushPrimitiveOrPatch(ParserStatus &status);
 
@@ -142,9 +138,7 @@ private:
 
     std::string parseTextureName(ParserStatus &status);
 
-    std::tuple<vm::vec3, float, vm::vec3, float> parseValveTextureAxes(
-        ParserStatus &status
-    );
+    std::tuple<vm::vec3, float, vm::vec3, float> parseValveTextureAxes(ParserStatus &status);
 
     std::tuple<vm::vec3, vm::vec3> parsePrimitiveTextureAxes(ParserStatus &status);
 

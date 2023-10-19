@@ -152,17 +152,14 @@ private:
     template<typename N>
     void doVisit(N *node) {
         constexpr bool invokableWithAnyPointerType = std::is_invocable_v<L, int *> || std::is_invocable_v<L, const L &, int *>;
-        static_assert(
-            !invokableWithAnyPointerType, "Don't use auto* to generate node visitors, this can lead to hard to detect "
-                                          "errors."
+        static_assert(!invokableWithAnyPointerType, "Don't use auto* to generate node visitors, this can lead to hard to detect "
+                                                    "errors."
         );
 
         constexpr bool invokableWithLambdaAndNode = std::is_invocable_v<L, const L &, N *>;
         constexpr bool invokableWithNode = std::is_invocable_v<L, N *>;
 
-        static_assert(
-            !(invokableWithNode && invokableWithLambdaAndNode), "Visitor implements both lambda and non-lambda overloads for the given node type"
-        );
+        static_assert(!(invokableWithNode && invokableWithLambdaAndNode), "Visitor implements both lambda and non-lambda overloads for the given node type");
 
         if constexpr (invokableWithLambdaAndNode) {
             if constexpr (NodeLambdaHasResult_v<L>) {
@@ -184,7 +181,8 @@ private:
 };
 
 template<typename L>
-class ConstNodeLambdaVisitor : public ConstNodeVisitor, public std::conditional_t<NodeLambdaHasResult_v<L>, NodeLambdaVisitorResult<L>, NodeLambdaVisitorNoResult> {
+class ConstNodeLambdaVisitor
+    : public ConstNodeVisitor, public std::conditional_t<NodeLambdaHasResult_v<L>, NodeLambdaVisitorResult<L>, NodeLambdaVisitorNoResult> {
 private:
     const L &m_lambda;
 
@@ -208,17 +206,14 @@ private:
     template<typename N>
     void doVisit(const N *node) {
         constexpr bool invokableWithAnyPointerType = std::is_invocable_v<L, int *> || std::is_invocable_v<L, const L &, int *>;
-        static_assert(
-            !invokableWithAnyPointerType, "Don't use auto* to generate node visitors, this can lead to hard to detect "
-                                          "errors."
+        static_assert(!invokableWithAnyPointerType, "Don't use auto* to generate node visitors, this can lead to hard to detect "
+                                                    "errors."
         );
 
         constexpr bool invokableWithLambdaAndNode = std::is_invocable_v<L, const L &, const N *>;
         constexpr bool invokableWithNode = std::is_invocable_v<L, const N *>;
 
-        static_assert(
-            !(invokableWithNode && invokableWithLambdaAndNode), "Visitor implements both lambda and non-lambda overloads for the given node type"
-        );
+        static_assert(!(invokableWithNode && invokableWithLambdaAndNode), "Visitor implements both lambda and non-lambda overloads for the given node type");
 
         if constexpr (invokableWithLambdaAndNode) {
             if constexpr (NodeLambdaHasResult_v<L>) {

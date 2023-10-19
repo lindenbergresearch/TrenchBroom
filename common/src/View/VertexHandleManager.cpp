@@ -37,12 +37,9 @@ VertexHandleManagerBase::~VertexHandleManagerBase() {}
 
 const Model::HitType::Type VertexHandleManager::HandleHitType = Model::HitType::freeType();
 
-void VertexHandleManager::pick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-) const {
+void VertexHandleManager::pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const {
     for (const auto &[position, info]: m_handles) {
-        const auto distance = camera.pickPointHandle(
-            pickRay, position, static_cast<FloatType>(pref(Preferences::HandleRadius)));
+        const auto distance = camera.pickPointHandle(pickRay, position, static_cast<FloatType>(pref(Preferences::HandleRadius)));
         if (!vm::is_nan(distance)) {
             const auto hitPoint = vm::point_at_distance(pickRay, distance);
             const auto error = vm::squared_distance(pickRay, position).distance;
@@ -69,42 +66,32 @@ Model::HitType::Type VertexHandleManager::hitType() const {
     return HandleHitType;
 }
 
-bool VertexHandleManager::isIncident(
-    const Handle &handle, const Model::BrushNode *brushNode
-) const {
+bool VertexHandleManager::isIncident(const Handle &handle, const Model::BrushNode *brushNode) const {
     const Model::Brush &brush = brushNode->brush();
     return brush.hasVertex(handle);
 }
 
 const Model::HitType::Type EdgeHandleManager::HandleHitType = Model::HitType::freeType();
 
-void EdgeHandleManager::pickGridHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult
-) const {
+void EdgeHandleManager::pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const {
     for (const auto &[position, info]: m_handles) {
-        const FloatType edgeDist = camera.pickLineSegmentHandle(
-            pickRay, position, static_cast<FloatType>(pref(Preferences::HandleRadius)));
+        const FloatType edgeDist = camera.pickLineSegmentHandle(pickRay, position, static_cast<FloatType>(pref(Preferences::HandleRadius)));
         if (!vm::is_nan(edgeDist)) {
             const vm::vec3 pointHandle = grid.snap(vm::point_at_distance(pickRay, edgeDist), position);
-            const FloatType pointDist = camera.pickPointHandle(
-                pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
+            const FloatType pointDist = camera.pickPointHandle(pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
             if (!vm::is_nan(pointDist)) {
                 const vm::vec3 hitPoint = vm::point_at_distance(pickRay, pointDist);
-                pickResult.addHit(
-                    Model::Hit(HandleHitType, pointDist, hitPoint, HitType(position, pointHandle)));
+                pickResult.addHit(Model::Hit(HandleHitType, pointDist, hitPoint, HitType(position, pointHandle)));
             }
         }
     }
 }
 
-void EdgeHandleManager::pickCenterHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-) const {
+void EdgeHandleManager::pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const {
     for (const auto &[position, info]: m_handles) {
         const vm::vec3 pointHandle = position.center();
 
-        const FloatType pointDist = camera.pickPointHandle(
-            pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
+        const FloatType pointDist = camera.pickPointHandle(pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
         if (!vm::is_nan(pointDist)) {
             const vm::vec3 hitPoint = vm::point_at_distance(pickRay, pointDist);
             pickResult.addHit(Model::Hit(HandleHitType, pointDist, hitPoint, position));
@@ -122,8 +109,7 @@ void EdgeHandleManager::addHandles(const Model::BrushNode *brushNode) {
 void EdgeHandleManager::removeHandles(const Model::BrushNode *brushNode) {
     const Model::Brush &brush = brushNode->brush();
     for (const Model::BrushEdge *edge: brush.edges()) {
-        assertResult(remove(
-            vm::segment3(edge->firstVertex()->position(), edge->secondVertex()->position())));
+        assertResult(remove(vm::segment3(edge->firstVertex()->position(), edge->secondVertex()->position())));
     }
 }
 
@@ -131,18 +117,14 @@ Model::HitType::Type EdgeHandleManager::hitType() const {
     return HandleHitType;
 }
 
-bool EdgeHandleManager::isIncident(
-    const Handle &handle, const Model::BrushNode *brushNode
-) const {
+bool EdgeHandleManager::isIncident(const Handle &handle, const Model::BrushNode *brushNode) const {
     const Model::Brush &brush = brushNode->brush();
     return brush.hasEdge(handle);
 }
 
 const Model::HitType::Type FaceHandleManager::HandleHitType = Model::HitType::freeType();
 
-void FaceHandleManager::pickGridHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult
-) const {
+void FaceHandleManager::pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const {
     for (const auto &[position, info]: m_handles) {
         const auto [valid, plane] = vm::from_points(std::begin(position), std::end(position));
         if (!valid) {
@@ -153,25 +135,20 @@ void FaceHandleManager::pickGridHandle(
         if (!vm::is_nan(distance)) {
             const auto pointHandle = grid.snap(vm::point_at_distance(pickRay, distance), plane);
 
-            const auto pointDist = camera.pickPointHandle(
-                pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
+            const auto pointDist = camera.pickPointHandle(pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
             if (!vm::is_nan(pointDist)) {
                 const auto hitPoint = vm::point_at_distance(pickRay, pointDist);
-                pickResult.addHit(
-                    Model::Hit(HandleHitType, pointDist, hitPoint, HitType(position, pointHandle)));
+                pickResult.addHit(Model::Hit(HandleHitType, pointDist, hitPoint, HitType(position, pointHandle)));
             }
         }
     }
 }
 
-void FaceHandleManager::pickCenterHandle(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-) const {
+void FaceHandleManager::pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const {
     for (const auto &[position, info]: m_handles) {
         const auto pointHandle = position.center();
 
-        const auto pointDist = camera.pickPointHandle(
-            pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
+        const auto pointDist = camera.pickPointHandle(pickRay, pointHandle, static_cast<FloatType>(pref(Preferences::HandleRadius)));
         if (!vm::is_nan(pointDist)) {
             const auto hitPoint = vm::point_at_distance(pickRay, pointDist);
             pickResult.addHit(Model::Hit(HandleHitType, pointDist, hitPoint, position));
@@ -197,9 +174,7 @@ Model::HitType::Type FaceHandleManager::hitType() const {
     return HandleHitType;
 }
 
-bool FaceHandleManager::isIncident(
-    const Handle &handle, const Model::BrushNode *brushNode
-) const {
+bool FaceHandleManager::isIncident(const Handle &handle, const Model::BrushNode *brushNode) const {
     const Model::Brush &brush = brushNode->brush();
     return brush.hasFace(handle);
 }

@@ -92,9 +92,7 @@ std::unique_ptr<Assets::EntityModel> Md3Parser::doInitializeModel(Logger &logger
     /* const auto tagOffset = */ reader.readSize<int32_t>();
     const auto surfaceOffset = reader.readSize<int32_t>();
 
-    auto model = std::make_unique<Assets::EntityModel>(
-        m_name, Assets::PitchType::Normal, Assets::Orientation::Oriented
-    );
+    auto model = std::make_unique<Assets::EntityModel>(m_name, Assets::PitchType::Normal, Assets::Orientation::Oriented);
     for (size_t i = 0; i < frameCount; ++i) {
         model->addFrame();
     }
@@ -104,8 +102,7 @@ std::unique_ptr<Assets::EntityModel> Md3Parser::doInitializeModel(Logger &logger
     return model;
 }
 
-void Md3Parser::doLoadFrame(
-    const size_t frameIndex, Assets::EntityModel &model, Logger & /* logger */) {
+void Md3Parser::doLoadFrame(const size_t frameIndex, Assets::EntityModel &model, Logger & /* logger */) {
     auto reader = m_reader;
 
     const auto ident = reader.readInt<int32_t>();
@@ -130,17 +127,11 @@ void Md3Parser::doLoadFrame(
     /* const auto tagOffset = */ reader.readSize<int32_t>();
     const auto surfaceOffset = reader.readSize<int32_t>();
 
-    auto &frame = parseFrame(
-        reader.subReaderFromBegin(
-            frameOffset + frameIndex * Md3Layout::FrameLength, Md3Layout::FrameLength
-        ), frameIndex, model
-    );
+    auto &frame = parseFrame(reader.subReaderFromBegin(frameOffset + frameIndex * Md3Layout::FrameLength, Md3Layout::FrameLength), frameIndex, model);
     parseFrameSurfaces(reader.subReaderFromBegin(surfaceOffset), frame, model);
 }
 
-void Md3Parser::parseSurfaces(
-    Reader reader, const size_t surfaceCount, Assets::EntityModel &model, Logger &logger
-) {
+void Md3Parser::parseSurfaces(Reader reader, const size_t surfaceCount, Assets::EntityModel &model, Logger &logger) {
     for (size_t i = 0; i < surfaceCount; ++i) {
         const auto ident = reader.readInt<int32_t>();
 
@@ -161,9 +152,7 @@ void Md3Parser::parseSurfaces(
         /* const auto vertexOffset = */ reader.readSize<int32_t>(); // all vertices for all frames are stored there!
         const auto endOffset = reader.readSize<int32_t>();
 
-        const auto shaders = parseShaders(
-            reader.subReaderFromBegin(shaderOffset, shaderCount * Md3Layout::ShaderLength), shaderCount
-        );
+        const auto shaders = parseShaders(reader.subReaderFromBegin(shaderOffset, shaderCount * Md3Layout::ShaderLength), shaderCount);
 
         auto &surface = model.addSurface(surfaceName);
         loadSurfaceSkins(surface, shaders, logger);
@@ -172,9 +161,7 @@ void Md3Parser::parseSurfaces(
     }
 }
 
-Assets::EntityModelLoadedFrame &Md3Parser::parseFrame(
-    Reader reader, const size_t frameIndex, Assets::EntityModel &model
-) {
+Assets::EntityModelLoadedFrame &Md3Parser::parseFrame(Reader reader, const size_t frameIndex, Assets::EntityModel &model) {
     const auto minBounds = reader.readVec<float, 3>();
     const auto maxBounds = reader.readVec<float, 3>();
     /* const auto localOrigin = */ reader.readVec<float, 3>();
@@ -184,9 +171,7 @@ Assets::EntityModelLoadedFrame &Md3Parser::parseFrame(
     return model.loadFrame(frameIndex, frameName, vm::bbox3f(minBounds, maxBounds));
 }
 
-void Md3Parser::parseFrameSurfaces(
-    Reader reader, Assets::EntityModelLoadedFrame &frame, Assets::EntityModel &model
-) {
+void Md3Parser::parseFrameSurfaces(Reader reader, Assets::EntityModelLoadedFrame &frame, Assets::EntityModel &model) {
     for (size_t i = 0; i < model.surfaceCount(); ++i) {
         const auto ident = reader.readInt<int32_t>();
 
@@ -211,21 +196,11 @@ void Md3Parser::parseFrameSurfaces(
             const auto frameVertexLength = vertexCount * Md3Layout::VertexLength;
             const auto frameVertexOffset = vertexOffset + frame.index() * frameVertexLength;
 
-            const auto vertexPositions = parseVertexPositions(
-                reader.subReaderFromBegin(frameVertexOffset, frameVertexLength), vertexCount
-            );
-            const auto texCoords = parseTexCoords(
-                reader.subReaderFromBegin(
-                    texCoordOffset, vertexCount * Md3Layout::TexCoordLength
-                ), vertexCount
-            );
+            const auto vertexPositions = parseVertexPositions(reader.subReaderFromBegin(frameVertexOffset, frameVertexLength), vertexCount);
+            const auto texCoords = parseTexCoords(reader.subReaderFromBegin(texCoordOffset, vertexCount * Md3Layout::TexCoordLength), vertexCount);
             const auto vertices = buildVertices(vertexPositions, texCoords);
 
-            const auto triangles = parseTriangles(
-                reader.subReaderFromBegin(
-                    triangleOffset, triangleCount * Md3Layout::TriangleLength
-                ), triangleCount
-            );
+            const auto triangles = parseTriangles(reader.subReaderFromBegin(triangleOffset, triangleCount * Md3Layout::TriangleLength), triangleCount);
 
             auto &surface = model.surface(i);
             buildFrameSurface(frame, surface, triangles, vertices);
@@ -235,9 +210,7 @@ void Md3Parser::parseFrameSurfaces(
     }
 }
 
-std::vector<Md3Parser::Md3Triangle> Md3Parser::parseTriangles(
-    Reader reader, const size_t triangleCount
-) {
+std::vector<Md3Parser::Md3Triangle> Md3Parser::parseTriangles(Reader reader, const size_t triangleCount) {
     std::vector<Md3Triangle> result;
     result.reserve(triangleCount);
     for (size_t i = 0; i < triangleCount; ++i) {
@@ -249,9 +222,7 @@ std::vector<Md3Parser::Md3Triangle> Md3Parser::parseTriangles(
     return result;
 }
 
-std::vector<std::filesystem::path> Md3Parser::parseShaders(
-    Reader reader, const size_t shaderCount
-) {
+std::vector<std::filesystem::path> Md3Parser::parseShaders(Reader reader, const size_t shaderCount) {
     std::vector<std::filesystem::path> result;
     result.reserve(shaderCount);
     for (size_t i = 0; i < shaderCount; ++i) {
@@ -262,9 +233,7 @@ std::vector<std::filesystem::path> Md3Parser::parseShaders(
     return result;
 }
 
-std::vector<vm::vec3f> Md3Parser::parseVertexPositions(
-    Reader reader, const size_t vertexCount
-) {
+std::vector<vm::vec3f> Md3Parser::parseVertexPositions(Reader reader, const size_t vertexCount) {
     std::vector<vm::vec3f> result;
     result.reserve(vertexCount);
     for (size_t i = 0; i < vertexCount; ++i) {
@@ -288,9 +257,7 @@ std::vector<vm::vec2f> Md3Parser::parseTexCoords(Reader reader, const size_t ver
     return result;
 }
 
-std::vector<Assets::EntityModelVertex> Md3Parser::buildVertices(
-    const std::vector<vm::vec3f> &positions, const std::vector<vm::vec2f> &texCoords
-) {
+std::vector<Assets::EntityModelVertex> Md3Parser::buildVertices(const std::vector<vm::vec3f> &positions, const std::vector<vm::vec2f> &texCoords) {
     assert(positions.size() == texCoords.size());
     const auto vertexCount = positions.size();
 
@@ -305,9 +272,7 @@ std::vector<Assets::EntityModelVertex> Md3Parser::buildVertices(
     return result;
 }
 
-void Md3Parser::loadSurfaceSkins(
-    Assets::EntityModelSurface &surface, const std::vector<std::filesystem::path> &shaders, Logger &logger
-) {
+void Md3Parser::loadSurfaceSkins(Assets::EntityModelSurface &surface, const std::vector<std::filesystem::path> &shaders, Logger &logger) {
     std::vector<Assets::Texture> textures;
     textures.reserve(shaders.size());
 
@@ -318,15 +283,14 @@ void Md3Parser::loadSurfaceSkins(
     surface.setSkins(std::move(textures));
 }
 
-Assets::Texture Md3Parser::loadShader(
-    Logger &logger, const std::filesystem::path &path
-) const {
+Assets::Texture Md3Parser::loadShader(Logger &logger, const std::filesystem::path &path) const {
     const auto shaderPath = kdl::path_remove_extension(path);
     return IO::loadShader(shaderPath, m_fs, logger);
 }
 
-void Md3Parser::buildFrameSurface(
-    Assets::EntityModelLoadedFrame &frame, Assets::EntityModelSurface &surface, const std::vector<Md3Parser::Md3Triangle> &triangles, const std::vector<Assets::EntityModelVertex> &vertices
+void
+Md3Parser::buildFrameSurface(Assets::EntityModelLoadedFrame &frame, Assets::EntityModelSurface &surface, const std::vector<Md3Parser::Md3Triangle> &triangles,
+    const std::vector<Assets::EntityModelVertex> &vertices
 ) {
     using Vertex = Assets::EntityModelVertex;
 

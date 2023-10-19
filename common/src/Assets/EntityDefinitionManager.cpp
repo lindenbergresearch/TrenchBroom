@@ -39,17 +39,11 @@ EntityDefinitionManager::~EntityDefinitionManager() {
     clear();
 }
 
-Result<void> EntityDefinitionManager::loadDefinitions(
-    const std::filesystem::path &path, const IO::EntityDefinitionLoader &loader, IO::ParserStatus &status
-) {
-    return loader.loadEntityDefinitions(status, path).transform(
-        [&](auto entityDefinitions) { setDefinitions(std::move(entityDefinitions)); }
-    );
+Result<void> EntityDefinitionManager::loadDefinitions(const std::filesystem::path &path, const IO::EntityDefinitionLoader &loader, IO::ParserStatus &status) {
+    return loader.loadEntityDefinitions(status, path).transform([&](auto entityDefinitions) { setDefinitions(std::move(entityDefinitions)); });
 }
 
-void EntityDefinitionManager::setDefinitions(
-    const std::vector<EntityDefinition *> &newDefinitions
-) {
+void EntityDefinitionManager::setDefinitions(const std::vector<EntityDefinition *> &newDefinitions) {
     clear();
 
     m_definitions = newDefinitions;
@@ -65,9 +59,7 @@ void EntityDefinitionManager::clear() {
     kdl::vec_clear_and_delete(m_definitions);
 }
 
-EntityDefinition *EntityDefinitionManager::definition(
-    const Model::EntityNodeBase *node
-) const {
+EntityDefinition *EntityDefinitionManager::definition(const Model::EntityNodeBase *node) const {
     ensure(node != nullptr, "node is null");
     return definition(node->entity().classname());
 }
@@ -82,9 +74,7 @@ EntityDefinition *EntityDefinitionManager::definition(const std::string &classna
     }
 }
 
-std::vector<EntityDefinition *> EntityDefinitionManager::definitions(
-    const EntityDefinitionType type, const EntityDefinitionSortOrder order
-) const {
+std::vector<EntityDefinition *> EntityDefinitionManager::definitions(const EntityDefinitionType type, const EntityDefinitionSortOrder order) const {
     return EntityDefinition::filterAndSort(m_definitions, type, order);
 }
 

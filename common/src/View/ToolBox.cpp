@@ -46,15 +46,11 @@ void ToolBox::addTool(Tool &tool) {
     m_notifierConnection += tool.toolHandleSelectionChangedNotifier.connect(toolHandleSelectionChangedNotifier);
 }
 
-void ToolBox::pick(
-    ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult
-) {
+void ToolBox::pick(ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult) {
     chain->pick(inputState, pickResult);
 }
 
-bool ToolBox::dragEnter(
-    ToolChain *chain, const InputState &inputState, const std::string &text
-) {
+bool ToolBox::dragEnter(ToolChain *chain, const InputState &inputState, const std::string &text) {
     if (!m_enabled) {
         return false;
     }
@@ -68,8 +64,7 @@ bool ToolBox::dragEnter(
     return m_dropTracker != nullptr;
 }
 
-bool ToolBox::dragMove(
-    ToolChain * /* chain */, const InputState &inputState, const std::string & /* text */) {
+bool ToolBox::dragMove(ToolChain * /* chain */, const InputState &inputState, const std::string & /* text */) {
     if (!m_enabled || m_dropTracker == nullptr) {
         return false;
     }
@@ -87,8 +82,7 @@ void ToolBox::dragLeave(ToolChain * /* chain */, const InputState &inputState) {
     m_dropTracker = nullptr;
 }
 
-bool ToolBox::dragDrop(
-    ToolChain * /* chain */, const InputState &inputState, const std::string & /* text */) {
+bool ToolBox::dragDrop(ToolChain * /* chain */, const InputState &inputState, const std::string & /* text */) {
     if (!m_enabled || m_dropTracker == nullptr) {
         return false;
     }
@@ -245,18 +239,14 @@ void ToolBox::disable() {
     m_enabled = false;
 }
 
-void ToolBox::setRenderOptions(
-    ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext
-) {
+void ToolBox::setRenderOptions(ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext) {
     chain->setRenderOptions(inputState, renderContext);
     if (m_dragTracker) {
         m_dragTracker->setRenderOptions(inputState, renderContext);
     }
 }
 
-void ToolBox::renderTools(
-    ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void ToolBox::renderTools(ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     /* if (m_modalTool != nullptr)
         m_modalTool->renderOnly(m_inputState, renderContext);
     else */

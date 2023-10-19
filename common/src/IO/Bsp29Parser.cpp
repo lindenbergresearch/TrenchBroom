@@ -74,9 +74,8 @@ static const size_t ModelFaceIndex = 0x38;
 // static const size_t ModelFaceCount        = 0x3c;
 } // namespace BspLayout
 
-Bsp29Parser::Bsp29Parser(
-    std::string name, const Reader &reader, Assets::Palette palette, const FileSystem &fs
-) : m_name{std::move(name)}, m_reader{reader}, m_palette{std::move(palette)}, m_fs{fs} {
+Bsp29Parser::Bsp29Parser(std::string name, const Reader &reader, Assets::Palette palette, const FileSystem &fs) : m_name{std::move(name)}, m_reader{reader},
+                                                                                                                  m_palette{std::move(palette)}, m_fs{fs} {
 }
 
 bool Bsp29Parser::canParse(const std::filesystem::path &path, Reader reader) {
@@ -105,9 +104,7 @@ std::unique_ptr<Assets::EntityModel> Bsp29Parser::doInitializeModel(Logger &logg
 
     auto textures = parseTextures(reader.subReaderFromBegin(textureOffset), logger);
 
-    auto model = std::make_unique<Assets::EntityModel>(
-        m_name, Assets::PitchType::Normal, Assets::Orientation::Oriented
-    );
+    auto model = std::make_unique<Assets::EntityModel>(m_name, Assets::PitchType::Normal, Assets::Orientation::Oriented);
     for (size_t i = 0; i < frameCount; ++i) {
         model->addFrame();
     }
@@ -118,8 +115,7 @@ std::unique_ptr<Assets::EntityModel> Bsp29Parser::doInitializeModel(Logger &logg
     return model;
 }
 
-void Bsp29Parser::doLoadFrame(
-    const size_t frameIndex, Assets::EntityModel &model, Logger & /* logger */) {
+void Bsp29Parser::doLoadFrame(const size_t frameIndex, Assets::EntityModel &model, Logger & /* logger */) {
     auto reader = m_reader;
     const auto version = reader.readInt<int32_t>();
     if (version != 29) {
@@ -164,10 +160,8 @@ void Bsp29Parser::doLoadFrame(
     const auto faceInfos = parseFaceInfos(reader.subReaderFromBegin(faceInfoOffset), faceInfoCount);
     const auto faceEdges = parseFaceEdges(reader.subReaderFromBegin(faceEdgesOffset), faceEdgesCount);
 
-    parseFrame(
-        reader.subReaderFromBegin(
-            modelsOffset + frameIndex * BspLayout::ModelSize, BspLayout::ModelSize
-        ), frameIndex, model, textureInfos, vertices, edgeInfos, faceInfos, faceEdges
+    parseFrame(reader.subReaderFromBegin(modelsOffset + frameIndex * BspLayout::ModelSize, BspLayout::ModelSize), frameIndex, model, textureInfos, vertices,
+        edgeInfos, faceInfos, faceEdges
     );
 }
 
@@ -187,16 +181,13 @@ std::vector<Assets::Texture> Bsp29Parser::parseTextures(Reader reader, Logger &l
         const auto textureName = readMipTextureName(reader);
         auto textureReader = reader.subReaderFromBegin(size_t(textureOffset)).buffer();
 
-        result.push_back(
-            readIdMipTexture(textureName, textureReader, m_palette).or_else(makeReadTextureErrorHandler(m_fs, logger)).value());
+        result.push_back(readIdMipTexture(textureName, textureReader, m_palette).or_else(makeReadTextureErrorHandler(m_fs, logger)).value());
     }
 
     return result;
 }
 
-Bsp29Parser::TextureInfoList Bsp29Parser::parseTextureInfos(
-    Reader reader, const size_t textureInfoCount
-) {
+Bsp29Parser::TextureInfoList Bsp29Parser::parseTextureInfos(Reader reader, const size_t textureInfoCount) {
     auto result = TextureInfoList(textureInfoCount);
     for (size_t i = 0; i < textureInfoCount; ++i) {
         result[i].sAxis = reader.readVec<float, 3>();
@@ -217,9 +208,7 @@ std::vector<vm::vec3f> Bsp29Parser::parseVertices(Reader reader, const size_t ve
     return result;
 }
 
-Bsp29Parser::EdgeInfoList Bsp29Parser::parseEdgeInfos(
-    Reader reader, const size_t edgeInfoCount
-) {
+Bsp29Parser::EdgeInfoList Bsp29Parser::parseEdgeInfos(Reader reader, const size_t edgeInfoCount) {
     auto result = EdgeInfoList(edgeInfoCount);
     for (size_t i = 0; i < edgeInfoCount; ++i) {
         result[i].vertexIndex1 = reader.readSize<uint16_t>();
@@ -228,9 +217,7 @@ Bsp29Parser::EdgeInfoList Bsp29Parser::parseEdgeInfos(
     return result;
 }
 
-Bsp29Parser::FaceInfoList Bsp29Parser::parseFaceInfos(
-    Reader reader, const size_t faceInfoCount
-) {
+Bsp29Parser::FaceInfoList Bsp29Parser::parseFaceInfos(Reader reader, const size_t faceInfoCount) {
     auto result = FaceInfoList(faceInfoCount);
     for (size_t i = 0; i < faceInfoCount; ++i) {
         reader.seekForward(BspLayout::FaceEdgeIndex);
@@ -242,9 +229,7 @@ Bsp29Parser::FaceInfoList Bsp29Parser::parseFaceInfos(
     return result;
 }
 
-Bsp29Parser::FaceEdgeIndexList Bsp29Parser::parseFaceEdges(
-    Reader reader, const size_t faceEdgeCount
-) {
+Bsp29Parser::FaceEdgeIndexList Bsp29Parser::parseFaceEdges(Reader reader, const size_t faceEdgeCount) {
     auto result = FaceEdgeIndexList(faceEdgeCount);
     for (size_t i = 0; i < faceEdgeCount; ++i) {
         result[i] = reader.readInt<int32_t>();
@@ -252,9 +237,8 @@ Bsp29Parser::FaceEdgeIndexList Bsp29Parser::parseFaceEdges(
     return result;
 }
 
-void Bsp29Parser::parseFrame(
-    Reader reader, const size_t frameIndex, Assets::EntityModel &model, const TextureInfoList &textureInfos, const std::vector<vm::vec3f> &vertices, const EdgeInfoList &edgeInfos, const FaceInfoList &faceInfos,
-    const FaceEdgeIndexList &faceEdges
+void Bsp29Parser::parseFrame(Reader reader, const size_t frameIndex, Assets::EntityModel &model, const TextureInfoList &textureInfos,
+    const std::vector<vm::vec3f> &vertices, const EdgeInfoList &edgeInfos, const FaceInfoList &faceInfos, const FaceEdgeIndexList &faceEdges
 ) {
     using Vertex = Assets::EntityModelVertex;
     using VertexList = std::vector<Vertex>;
@@ -307,14 +291,14 @@ void Bsp29Parser::parseFrame(
 
     const auto frameName = fmt::format("{}_{}", m_name, frameIndex);
     auto &frame = model.loadFrame(frameIndex, frameName, bounds.bounds());
-    surface.addTexturedMesh(
-        frame, std::move(builder.vertices()), std::move(builder.indices()));
+    surface.addTexturedMesh(frame, std::move(builder.vertices()), std::move(builder.indices()));
 }
 
-vm::vec2f Bsp29Parser::textureCoords(
-    const vm::vec3f &vertex, const TextureInfo &textureInfo, const Assets::Texture *texture
-) const {
-    return texture ? vm::vec2f{(vm::dot(vertex, textureInfo.sAxis) + textureInfo.sOffset) / float(texture->width()), (vm::dot(vertex, textureInfo.tAxis) + textureInfo.tOffset) / float(texture->height())} : vm::vec2f::zero();
+vm::vec2f Bsp29Parser::textureCoords(const vm::vec3f &vertex, const TextureInfo &textureInfo, const Assets::Texture *texture) const {
+    return texture ? vm::vec2f{
+        (vm::dot(vertex, textureInfo.sAxis) + textureInfo.sOffset) / float(texture->width()),
+        (vm::dot(vertex, textureInfo.tAxis) + textureInfo.tOffset) / float(texture->height())
+    } : vm::vec2f::zero();
 }
 } // namespace IO
 } // namespace TrenchBroom

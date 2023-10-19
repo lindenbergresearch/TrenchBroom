@@ -38,7 +38,8 @@
 
 namespace TrenchBroom {
 namespace View {
-KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *parent) : PreferencePane(parent), m_table(nullptr), m_model(nullptr), m_proxy(nullptr) {
+KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *parent) : PreferencePane(parent), m_table(nullptr), m_model(nullptr),
+                                                                                         m_proxy(nullptr) {
     m_model = new KeyboardShortcutModel(document, this);
     m_proxy = new QSortFilterProxyModel(this);
     m_proxy->setSourceModel(m_model);
@@ -51,15 +52,11 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
     m_table->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
     m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
     m_table->horizontalHeader()->resizeSection(0, 150);
-    m_table->horizontalHeader()->setSectionResizeMode(
-        1, QHeaderView::ResizeMode::ResizeToContents
-    );
+    m_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
     m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
 
     // Tighter than default vertical row height, without the overhead of autoresizing
-    m_table->verticalHeader()->setDefaultSectionSize(
-        m_table->fontMetrics().lineSpacing() + 2
-    );
+    m_table->verticalHeader()->setDefaultSectionSize(m_table->fontMetrics().lineSpacing() + 2);
 
     m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
@@ -72,14 +69,11 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
     QLineEdit *searchBox = createSearchBox();
     makeSmall(searchBox);
 
-    auto *infoLabel = new QLabel(
-        tr("Double-click an item to begin editing it. Click anywhere else to end editing."));
+    auto *infoLabel = new QLabel(tr("Double-click an item to begin editing it. Click anywhere else to end editing."));
     makeInfo(infoLabel);
 
     auto *infoAndSearchLayout = new QHBoxLayout();
-    infoAndSearchLayout->setContentsMargins(
-        0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin
-    );
+    infoAndSearchLayout->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);
     infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
     infoAndSearchLayout->addWidget(infoLabel, 1);
     infoAndSearchLayout->addWidget(searchBox);
@@ -93,8 +87,7 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
 
     setMinimumSize(900, 550);
 
-    connect(
-        searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
+    connect(searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
           m_proxy->setFilterFixedString(newText);
         }
     );
@@ -116,9 +109,7 @@ void KeyboardPreferencePane::doUpdateControls() {
 
 bool KeyboardPreferencePane::doValidate() {
     if (m_model->hasConflicts()) {
-        QMessageBox::warning(
-            this, "Conflicts", "Please fix all conflicting shortcuts (highlighted in red)."
-        );
+        QMessageBox::warning(this, "Conflicts", "Please fix all conflicting shortcuts (highlighted in red).");
         return false;
     }
     else {

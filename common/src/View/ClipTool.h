@@ -70,17 +70,11 @@ private:
     public:
         virtual ~ClipStrategy();
 
-        void pick(
-            const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-        ) const;
+        void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
-        void render(
-            Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult
-        );
+        void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
 
-        void renderFeedback(
-            Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point
-        ) const;
+        void renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const;
 
         bool computeThirdPoint(vm::vec3 &point) const;
 
@@ -96,9 +90,7 @@ private:
 
         void removeLastPoint();
 
-        std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(
-            const Model::PickResult &pickResult
-        ) const;
+        std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(const Model::PickResult &pickResult) const;
 
         void beginDragPoint(const Model::PickResult &pickResult);
 
@@ -117,17 +109,11 @@ private:
         size_t getPoints(vm::vec3 &point1, vm::vec3 &point2, vm::vec3 &point3) const;
 
     private:
-        virtual void doPick(
-            const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-        ) const = 0;
+        virtual void doPick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const = 0;
 
-        virtual void doRender(
-            Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult
-        ) = 0;
+        virtual void doRender(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult) = 0;
 
-        virtual void doRenderFeedback(
-            Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point
-        ) const = 0;
+        virtual void doRenderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const = 0;
 
         virtual bool doComputeThirdPoint(vm::vec3 &point) const = 0;
 
@@ -137,25 +123,19 @@ private:
 
         virtual bool doCanAddPoint(const vm::vec3 &point) const = 0;
 
-        virtual void doAddPoint(
-            const vm::vec3 &point, const std::vector<vm::vec3> &helpVectors
-        ) = 0;
+        virtual void doAddPoint(const vm::vec3 &point, const std::vector<vm::vec3> &helpVectors) = 0;
 
         virtual bool doCanRemoveLastPoint() const = 0;
 
         virtual void doRemoveLastPoint() = 0;
 
-        virtual std::optional<std::tuple<vm::vec3, vm::vec3>> doCanDragPoint(
-            const Model::PickResult &pickResult
-        ) const = 0;
+        virtual std::optional<std::tuple<vm::vec3, vm::vec3>> doCanDragPoint(const Model::PickResult &pickResult) const = 0;
 
         virtual void doBeginDragPoint(const Model::PickResult &pickResult) = 0;
 
         virtual void doBeginDragLastPoint() = 0;
 
-        virtual bool doDragPoint(
-            const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors
-        ) = 0;
+        virtual bool doDragPoint(const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) = 0;
 
         virtual void doEndDragPoint() = 0;
 
@@ -165,9 +145,7 @@ private:
 
         virtual void doReset() = 0;
 
-        virtual size_t doGetPoints(
-            vm::vec3 &point1, vm::vec3 &point2, vm::vec3 &point3
-        ) const = 0;
+        virtual size_t doGetPoints(vm::vec3 &point1, vm::vec3 &point2, vm::vec3 &point3) const = 0;
     };
 
     class PointClipStrategy;
@@ -200,27 +178,17 @@ public:
 
     void toggleSide();
 
-    void pick(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-    );
+    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
 
-    void render(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult
-    );
+    void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
 
 private:
-    void renderBrushes(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderBrushes(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderStrategy(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult
-    );
+    void renderStrategy(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
 
 public:
-    void renderFeedback(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point
-    ) const;
+    void renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const;
 
 public:
     bool hasBrushes() const;
@@ -245,9 +213,7 @@ public:
 
     bool removeLastPoint();
 
-    std::optional<std::tuple<vm::vec3, vm::vec3>> beginDragPoint(
-        const Model::PickResult &pickResult
-    );
+    std::optional<std::tuple<vm::vec3, vm::vec3>> beginDragPoint(const Model::PickResult &pickResult);
 
     void beginDragLastPoint();
 
@@ -270,17 +236,13 @@ private:
 
     void updateBrushes();
 
-    void setFaceAttributes(
-        const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet
-    ) const;
+    void setFaceAttributes(const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet) const;
 
     void clearRenderers();
 
     void updateRenderers();
 
-    void addBrushesToRenderer(
-        const std::map<Model::Node *, std::vector<Model::Node *>> &map, Renderer::BrushRenderer &renderer
-    );
+    void addBrushesToRenderer(const std::map<Model::Node *, std::vector<Model::Node *>> &map, Renderer::BrushRenderer &renderer);
 
     bool keepFrontBrushes() const;
 

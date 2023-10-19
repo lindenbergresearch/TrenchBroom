@@ -55,9 +55,9 @@ struct CommandProcessor::SubmitAndStoreResult {
   std::unique_ptr<CommandResult> commandResult;
   bool commandStored;
 
-  SubmitAndStoreResult(
-      std::unique_ptr<CommandResult> i_commandResult, const bool i_commandStored
-  ) : commandResult{std::move(i_commandResult)}, commandStored{i_commandStored} {
+  SubmitAndStoreResult(std::unique_ptr<CommandResult> i_commandResult, const bool i_commandStored) : commandResult{
+      std::move(i_commandResult)
+  }, commandStored{i_commandStored} {
   }
 };
 
@@ -71,11 +71,13 @@ private:
     Notifier<UndoableCommand &> &m_commandUndoneNotifier;
 
 public:
-    TransactionCommand(
-        std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands, Notifier<Command &> &i_commandDoNotifier, Notifier<Command &> &i_commandDoneNotifier, Notifier<UndoableCommand &> &i_commandUndoNotifier,
-        Notifier<UndoableCommand &> &i_commandUndoneNotifier
-    ) : UndoableCommand(std::move(name), false), m_commands{std::move(commands)}, m_commandDoNotifier{i_commandDoNotifier}, m_commandDoneNotifier{i_commandDoneNotifier}, m_commandUndoNotifier{i_commandUndoNotifier},
-        m_commandUndoneNotifier{i_commandUndoneNotifier} {
+    TransactionCommand(std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands, Notifier<Command &> &i_commandDoNotifier,
+        Notifier<Command &> &i_commandDoneNotifier, Notifier<UndoableCommand &> &i_commandUndoNotifier, Notifier<UndoableCommand &> &i_commandUndoneNotifier
+    ) : UndoableCommand(std::move(name), false), m_commands{std::move(commands)}, m_commandDoNotifier{
+        i_commandDoNotifier
+    }, m_commandDoneNotifier{i_commandDoneNotifier}, m_commandUndoNotifier{
+        i_commandUndoNotifier
+    }, m_commandUndoneNotifier{i_commandUndoneNotifier} {
     }
 
 private:
@@ -90,9 +92,7 @@ private:
         return std::make_unique<CommandResult>(true);
     }
 
-    std::unique_ptr<CommandResult> doPerformUndo(
-        MapDocumentCommandFacade *document
-    ) override {
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override {
         for (auto it = m_commands.rbegin(), end = m_commands.rend(); it != end; ++it) {
             auto &command = *it;
             notifyCommandIfNotType<TransactionCommand>(m_commandUndoNotifier, *command);
@@ -116,8 +116,7 @@ private:
 
             auto it = std::begin(transactionCommand->m_commands);
             if (m_commands.back()->collateWith(**it)) {
-                std::move(
-                    std::next(it), std::end(transactionCommand->m_commands), std::back_inserter(m_commands));
+                std::move(std::next(it), std::end(transactionCommand->m_commands), std::back_inserter(m_commands));
                 return true;
             }
         }
@@ -126,9 +125,11 @@ private:
     }
 };
 
-CommandProcessor::CommandProcessor(
-    MapDocumentCommandFacade *document, const std::chrono::milliseconds collationInterval
-) : m_document{document}, m_collationInterval{collationInterval}, m_lastCommandTimestamp{std::chrono::time_point<std::chrono::system_clock>{}} {
+CommandProcessor::CommandProcessor(MapDocumentCommandFacade *document, const std::chrono::milliseconds collationInterval) : m_document{document},
+                                                                                                                            m_collationInterval{
+                                                                                                                                collationInterval
+                                                                                                                            }, m_lastCommandTimestamp{
+        std::chrono::time_point<std::chrono::system_clock>{}} {
 }
 
 CommandProcessor::~CommandProcessor() = default;
@@ -197,9 +198,7 @@ std::unique_ptr<CommandResult> CommandProcessor::execute(std::unique_ptr<Command
     return result;
 }
 
-std::unique_ptr<CommandResult> CommandProcessor::executeAndStore(
-    std::unique_ptr<UndoableCommand> command
-) {
+std::unique_ptr<CommandResult> CommandProcessor::executeAndStore(std::unique_ptr<UndoableCommand> command) {
     return executeAndStoreCommand(std::move(command), true).commandResult;
 }
 
@@ -247,9 +246,7 @@ void CommandProcessor::clear() {
     m_lastCommandTimestamp = std::chrono::time_point<std::chrono::system_clock>();
 }
 
-CommandProcessor::SubmitAndStoreResult CommandProcessor::executeAndStoreCommand(
-    std::unique_ptr<UndoableCommand> command, const bool collate
-) {
+CommandProcessor::SubmitAndStoreResult CommandProcessor::executeAndStoreCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
     auto commandResult = executeCommand(*command);
     if (!commandResult->success()) {
         return SubmitAndStoreResult(std::move(commandResult), false);
@@ -287,9 +284,7 @@ std::unique_ptr<CommandResult> CommandProcessor::undoCommand(UndoableCommand &co
     return result;
 }
 
-bool CommandProcessor::storeCommand(
-    std::unique_ptr<UndoableCommand> command, const bool collate
-) {
+bool CommandProcessor::storeCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
     if (m_transactionStack.empty()) {
         return pushToUndoStack(std::move(command), collate);
     }
@@ -298,9 +293,7 @@ bool CommandProcessor::storeCommand(
     }
 }
 
-bool CommandProcessor::pushTransactionCommand(
-    std::unique_ptr<UndoableCommand> command, const bool collate
-) {
+bool CommandProcessor::pushTransactionCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
     assert(!m_transactionStack.empty());
     auto &transaction = m_transactionStack.back();
     if (!transaction.commands.empty()) {
@@ -334,17 +327,13 @@ void CommandProcessor::createAndStoreTransaction() {
     }
 }
 
-std::unique_ptr<UndoableCommand> CommandProcessor::createTransaction(
-    std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands
-) {
-    return std::make_unique<TransactionCommand>(
-        std::move(name), std::move(commands), commandDoNotifier, commandDoneNotifier, commandUndoNotifier, commandUndoneNotifier
+std::unique_ptr<UndoableCommand> CommandProcessor::createTransaction(std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands) {
+    return std::make_unique<TransactionCommand>(std::move(name), std::move(commands), commandDoNotifier, commandDoneNotifier, commandUndoNotifier,
+        commandUndoneNotifier
     );
 }
 
-bool CommandProcessor::pushToUndoStack(
-    std::unique_ptr<UndoableCommand> command, const bool collate
-) {
+bool CommandProcessor::pushToUndoStack(std::unique_ptr<UndoableCommand> command, const bool collate) {
     assert(m_transactionStack.empty());
 
     const auto timestamp = std::chrono::system_clock::now();
@@ -368,9 +357,7 @@ std::unique_ptr<UndoableCommand> CommandProcessor::popFromUndoStack() {
     return kdl::vec_pop_back(m_undoStack);
 }
 
-bool CommandProcessor::collatable(
-    const bool collate, const std::chrono::system_clock::time_point timestamp
-) const {
+bool CommandProcessor::collatable(const bool collate, const std::chrono::system_clock::time_point timestamp) const {
     return collate && !m_undoStack.empty() && timestamp - m_lastCommandTimestamp <= m_collationInterval;
 }
 

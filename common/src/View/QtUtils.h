@@ -101,11 +101,9 @@ enum class FileDialogDir {
  */
 QString fileDialogDefaultDirectory(FileDialogDir type);
 
-void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename
-);
+void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename);
 
-void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory
-);
+void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory);
 
 QString windowSettingsPath(const QWidget *window, const QString &suffix = "");
 
@@ -140,14 +138,11 @@ class MapFrame;
 
 MapFrame *findMapFrame(QWidget *widget);
 
-QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr
-);
+QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
 
-QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr
-);
+QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr);
 
-QToolButton *createBitmapToggleButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr
-);
+QToolButton *createBitmapToggleButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
 
 QWidget *createDefaultPage(const QString &message, QWidget *parent = nullptr);
 
@@ -182,8 +177,7 @@ void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
 template<typename... Rest>
 QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
     auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
-    );
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
     layout->setSpacing(LayoutConstants::NarrowHMargin);
     addToMiniToolBarLayout(layout, first, rest...);
     layout->addStretch(1);
@@ -193,8 +187,7 @@ QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
 template<typename... Rest>
 QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
     auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
-    );
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
     layout->setSpacing(LayoutConstants::NarrowHMargin);
     layout->addStretch(1);
     addToMiniToolBarLayout(layout, first, rest...);

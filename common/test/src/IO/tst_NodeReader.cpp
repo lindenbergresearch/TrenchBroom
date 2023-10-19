@@ -35,14 +35,14 @@ TEST_CASE("NodeReaderTest.parseFaceAsNode")
 {
     const std::string data(R"(
 ( -64 -64 -16 ) ( -64 -63 -16 ) ( -64 -64 -15 ) __TB_empty [ 0 -1 0 0 ] [ 0 0 -1 0 ] 0 1 1
-)");
+)"
+    );
 
     const vm::bbox3 worldBounds(4096.0);
 
     IO::TestParserStatus status;
 
-    CHECK(
-        IO::NodeReader::read(data, MapFormat::Valve, worldBounds, {}, {}, status).empty());
+    CHECK(IO::NodeReader::read(data, MapFormat::Valve, worldBounds, {}, {}, status).empty());
 }
 
 TEST_CASE("NodeReaderTest.convertValveToStandardMapFormat")
@@ -62,21 +62,19 @@ TEST_CASE("NodeReaderTest.convertValveToStandardMapFormat")
 ( 64 64 16 ) ( 64 64 17 ) ( 64 65 16 ) __TB_empty [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 1 1
 }
 }
-)");
+)"
+    );
 
     const vm::bbox3 worldBounds(4096.0);
 
     IO::TestParserStatus status;
 
-    std::vector<Node *> nodes =
-        IO::NodeReader::read(data, MapFormat::Standard, worldBounds, {}, {}, status);
+    std::vector<Node *> nodes = IO::NodeReader::read(data, MapFormat::Standard, worldBounds, {}, {}, status);
     auto *brushNode = dynamic_cast<BrushNode *>(nodes.at(0)->children().at(0));
     REQUIRE(brushNode != nullptr);
 
     Brush brush = brushNode->brush();
-    CHECK(
-        dynamic_cast<const ParaxialTexCoordSystem *>(&brush.face(0).texCoordSystem())
-        != nullptr);
+    CHECK(dynamic_cast<const ParaxialTexCoordSystem *>(&brush.face(0).texCoordSystem()) != nullptr);
 }
 
 TEST_CASE("NodeReaderTest.convertValveToStandardMapFormatInGroups")
@@ -98,14 +96,14 @@ TEST_CASE("NodeReaderTest.convertValveToStandardMapFormatInGroups")
 ( 64 64 16 ) ( 64 64 17 ) ( 64 65 16 ) __TB_empty [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 1 1
 }
 }
-)");
+)"
+    );
 
     const vm::bbox3 worldBounds(4096.0);
 
     IO::TestParserStatus status;
 
-    std::vector<Node *> nodes =
-        IO::NodeReader::read(data, MapFormat::Standard, worldBounds, {}, {}, status);
+    std::vector<Node *> nodes = IO::NodeReader::read(data, MapFormat::Standard, worldBounds, {}, {}, status);
 
     auto *groupNode = dynamic_cast<GroupNode *>(nodes.at(0));
     REQUIRE(groupNode != nullptr);
@@ -114,9 +112,7 @@ TEST_CASE("NodeReaderTest.convertValveToStandardMapFormatInGroups")
     REQUIRE(brushNode != nullptr);
 
     const Brush brush = brushNode->brush();
-    CHECK(
-        dynamic_cast<const ParaxialTexCoordSystem *>(&brush.face(0).texCoordSystem())
-        != nullptr);
+    CHECK(dynamic_cast<const ParaxialTexCoordSystem *>(&brush.face(0).texCoordSystem()) != nullptr);
 }
 
 TEST_CASE("NodeReaderTest.readScientificNotation")

@@ -51,8 +51,7 @@ struct PaletteData {
 Palette::Palette(std::shared_ptr<PaletteData> data) : m_data{std::move(data)} {
 }
 
-bool Palette::indexedToRgba(
-    IO::Reader &reader, const size_t pixelCount, TextureBuffer &rgbaImage, const PaletteTransparency transparency, Color &averageColor
+bool Palette::indexedToRgba(IO::Reader &reader, const size_t pixelCount, TextureBuffer &rgbaImage, const PaletteTransparency transparency, Color &averageColor
 ) const {
     ensure(rgbaImage.size() == 4 * pixelCount, "incorrect destination buffer size");
 
@@ -73,7 +72,10 @@ bool Palette::indexedToRgba(
         colorSum[1] += uint32_t(rgbaData[(i * 4) + 1]);
         colorSum[2] += uint32_t(rgbaData[(i * 4) + 2]);
     }
-    averageColor = Color{float(colorSum[0]) / (255.0f * float(pixelCount)), float(colorSum[1]) / (255.0f * float(pixelCount)), float(colorSum[2]) / (255.0f * float(pixelCount)), 1.0f};
+    averageColor = Color{
+        float(colorSum[0]) / (255.0f * float(pixelCount)), float(colorSum[1]) / (255.0f * float(pixelCount)), float(colorSum[2]) / (255.0f * float(pixelCount)),
+        1.0f
+    };
 
     // Check for transparency
     auto hasTransparency = false;

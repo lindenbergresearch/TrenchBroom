@@ -65,9 +65,8 @@ using UpdateLinkedGroupsResult = std::vector<std::pair<Node *, std::vector<std::
  * the target node that should be updated, and the new children that should replace the
  * target node's children.
  */
-Result<UpdateLinkedGroupsResult> updateLinkedGroups(
-    const GroupNode &sourceGroupNode, const std::vector<Model::GroupNode *> &targetGroupNodes, const vm::bbox3 &worldBounds
-);
+Result<UpdateLinkedGroupsResult>
+updateLinkedGroups(const GroupNode &sourceGroupNode, const std::vector<Model::GroupNode *> &targetGroupNodes, const vm::bbox3 &worldBounds);
 
 /**
  * A group of nodes that can be edited as one.
@@ -162,9 +161,7 @@ private: // implement methods inherited from Node
 
     bool doSelectable() const override;
 
-    void doPick(
-        const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
-    ) override;
+    void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
 
     void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 

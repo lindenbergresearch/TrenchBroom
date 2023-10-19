@@ -47,13 +47,11 @@ std::vector<std::string> EntityPropertiesVariableStore::names() const {
     return m_entity.propertyKeys();
 }
 
-void EntityPropertiesVariableStore::declare(
-    const std::string & /* name */, const EL::Value & /* value */) {
+void EntityPropertiesVariableStore::declare(const std::string & /* name */, const EL::Value & /* value */) {
     throw EL::EvaluationError{"Declaring properties directly is unsafe"};
 }
 
-void EntityPropertiesVariableStore::assign(
-    const std::string & /* name */, const EL::Value & /* value */) {
+void EntityPropertiesVariableStore::assign(const std::string & /* name */, const EL::Value & /* value */) {
     throw EL::EvaluationError{"Changing properties directly is unsafe"};
 }
 } // namespace Model

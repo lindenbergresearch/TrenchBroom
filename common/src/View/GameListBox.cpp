@@ -88,8 +88,10 @@ GameListBox::Info GameListBox::makeGameInfo(const std::string &gameName) const {
     }
     const auto experimental = gameFactory.gameConfig(gameName).experimental;
 
-    return Info{gameName, IO::loadPixmapResource(iconPath), QString::fromStdString(gameName + (experimental ? " (experimental)" : "")), QString::fromStdString(
-        gamePath.empty() ? std::string("Game not found") : gamePath.string())};
+    return Info{
+        gameName, IO::loadPixmapResource(iconPath), QString::fromStdString(gameName + (experimental ? " (experimental)" : "")),
+        QString::fromStdString(gamePath.empty() ? std::string("Game not found") : gamePath.string())
+    };
 }
 
 size_t GameListBox::itemCount() const {
@@ -113,8 +115,7 @@ QString GameListBox::subtitle(const size_t n) const {
 
 void GameListBox::selectedRowChanged(const int index) {
     if (index >= 0 && index < count()) {
-        emit currentGameChanged(
-            QString::fromStdString(m_gameInfos[static_cast<size_t>(index)].name));
+        emit currentGameChanged(QString::fromStdString(m_gameInfos[static_cast<size_t>(index)].name));
     }
 }
 

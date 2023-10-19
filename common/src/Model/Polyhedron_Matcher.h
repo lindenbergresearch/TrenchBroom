@@ -83,12 +83,12 @@ public:
     PolyhedronMatcher(const P &left, const P &right) : m_left(left), m_right(right), m_vertexRelation(buildVertexRelation(m_left, m_right)) {
     }
 
-    PolyhedronMatcher(
-        const P &left, const P &right, const std::vector<V> &vertices, const V &delta
-    ) : m_left(left), m_right(right), m_vertexRelation(buildVertexRelation(m_left, m_right, vertices, delta)) {
+    PolyhedronMatcher(const P &left, const P &right, const std::vector<V> &vertices, const V &delta) : m_left(left), m_right(right), m_vertexRelation(
+        buildVertexRelation(m_left, m_right, vertices, delta)) {
     }
 
-    PolyhedronMatcher(const P &left, const P &right, const VMap &vertexMap) : m_left(left), m_right(right), m_vertexRelation(buildVertexRelation(m_left, m_right, vertexMap)) {
+    PolyhedronMatcher(const P &left, const P &right, const VMap &vertexMap) : m_left(left), m_right(right),
+                                                                              m_vertexRelation(buildVertexRelation(m_left, m_right, vertexMap)) {
     }
 
 public:
@@ -232,9 +232,7 @@ private:
         }
 
         size_t result = 0;
-        visitMatchingVertexPairs(
-            leftFace, rightFace, [&result](Vertex * /* leftVertex */, Vertex * /* rightVertex */) { ++result; }
-        );
+        visitMatchingVertexPairs(leftFace, rightFace, [&result](Vertex * /* leftVertex */, Vertex * /* rightVertex */) { ++result; });
         return result;
     }
 
@@ -284,9 +282,7 @@ private:
      * @param delta the move delta
      * @return the vertex relation
      */
-    static VertexRelation buildVertexRelation(
-        const P &left, const P &right, const std::vector<V> &vertices, const V &delta
-    ) {
+    static VertexRelation buildVertexRelation(const P &left, const P &right, const std::vector<V> &vertices, const V &delta) {
         VMap vertexMap;
         const auto vertexSet = kdl::vector_set<V>::create(vertices);
 
@@ -321,9 +317,7 @@ private:
      * @param vertexMap a set of corresponding vertices for which to build the relation
      * @return the vertex relation
      */
-    static VertexRelation buildVertexRelation(
-        const P &left, const P &right, const VMap &vertexMap
-    ) {
+    static VertexRelation buildVertexRelation(const P &left, const P &right, const VMap &vertexMap) {
         VertexRelation result;
 
         for (const auto &[leftPosition, rightPosition]: vertexMap) {
@@ -349,9 +343,7 @@ private:
      * @param initialRelation the initial vertex relation
      * @return the expanded vertex relation
      */
-    static VertexRelation expandVertexRelation(
-        const P &left, const P &right, const VertexRelation &initialRelation
-    ) {
+    static VertexRelation expandVertexRelation(const P &left, const P &right, const VertexRelation &initialRelation) {
         auto result = initialRelation;
         result.insert(addedVertexRelation(right, initialRelation));
         result.insert(removedVertexRelation(left, initialRelation));
@@ -374,9 +366,7 @@ private:
      * @param initialRelation the initial vertex relation
      * @return a vertex relation containing only the newly discovered related vertices
      */
-    static VertexRelation addedVertexRelation(
-        const P &right, const VertexRelation &initialRelation
-    ) {
+    static VertexRelation addedVertexRelation(const P &right, const VertexRelation &initialRelation) {
         const auto addedVertices = findAddedVertices(right, initialRelation);
 
         auto result = initialRelation;
@@ -414,9 +404,7 @@ private:
      * @param initialRelation the initial vertex relation
      * @return a vertex relation containing only the newly discovered related vertices
      */
-    static VertexRelation removedVertexRelation(
-        const P &left, const VertexRelation &initialRelation
-    ) {
+    static VertexRelation removedVertexRelation(const P &left, const VertexRelation &initialRelation) {
         const auto removedVertices = findRemovedVertices(left, initialRelation);
 
         auto result = initialRelation;
@@ -471,9 +459,7 @@ private:
      * @param vertexRelation the vertex relation
      * @return the removed vertices
      */
-    static VertexSet findRemovedVertices(
-        const P &left, const VertexRelation &vertexRelation
-    ) {
+    static VertexSet findRemovedVertices(const P &left, const VertexRelation &vertexRelation) {
         VertexSet result;
 
         const auto &leftVertices = left.vertices();

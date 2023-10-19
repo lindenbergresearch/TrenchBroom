@@ -46,9 +46,7 @@ private:
     unsigned char m_charCount;
 
 public:
-    TextureFont(
-        std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, int lineHeight, unsigned char firstChar, unsigned char charCount
-    );
+    TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, int lineHeight, unsigned char firstChar, unsigned char charCount);
 
     ~TextureFont();
 

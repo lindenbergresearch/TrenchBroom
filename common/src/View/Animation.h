@@ -90,9 +90,7 @@ public:
     void update();
 
 private:
-    static std::unique_ptr<AnimationCurve> createAnimationCurve(
-        Curve curve, double duration
-    );
+    static std::unique_ptr<AnimationCurve> createAnimationCurve(Curve curve, double duration);
 
     virtual void doUpdate(double progress) = 0;
 };

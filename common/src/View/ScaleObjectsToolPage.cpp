@@ -41,9 +41,10 @@
 
 namespace TrenchBroom {
 namespace View {
-ScaleObjectsToolPage::ScaleObjectsToolPage(
-    std::weak_ptr<MapDocument> document, QWidget *parent
-) : QWidget(parent), m_document(std::move(document)), m_book(nullptr), m_sizeTextBox(nullptr), m_factorsTextBox(nullptr), m_scaleFactorsOrSize(nullptr), m_button(nullptr) {
+ScaleObjectsToolPage::ScaleObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(std::move(document)),
+                                                                                                   m_book(nullptr), m_sizeTextBox(nullptr),
+                                                                                                   m_factorsTextBox(nullptr), m_scaleFactorsOrSize(nullptr),
+                                                                                                   m_button(nullptr) {
     createGui();
     connectObservers();
     updateGui();
@@ -51,9 +52,7 @@ ScaleObjectsToolPage::ScaleObjectsToolPage(
 
 void ScaleObjectsToolPage::connectObservers() {
     auto document = kdl::mem_lock(m_document);
-    m_notifierConnection += document->selectionDidChangeNotifier.connect(
-        this, &ScaleObjectsToolPage::selectionDidChange
-    );
+    m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &ScaleObjectsToolPage::selectionDidChange);
 }
 
 void ScaleObjectsToolPage::activate() {
@@ -75,21 +74,15 @@ void ScaleObjectsToolPage::createGui() {
     m_book->addWidget(m_sizeTextBox);
     m_book->addWidget(m_factorsTextBox);
 
-    connect(
-        m_sizeTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale
-    );
-    connect(
-        m_factorsTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale
-    );
+    connect(m_sizeTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale);
+    connect(m_factorsTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale);
 
     m_scaleFactorsOrSize = new QComboBox();
     m_scaleFactorsOrSize->addItem(tr("to size"));
     m_scaleFactorsOrSize->addItem(tr("by factors"));
 
     m_scaleFactorsOrSize->setCurrentIndex(0);
-    connect(
-        m_scaleFactorsOrSize, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), m_book, &QStackedLayout::setCurrentIndex
-    );
+    connect(m_scaleFactorsOrSize, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), m_book, &QStackedLayout::setCurrentIndex);
 
     m_button = new QPushButton(tr("Apply"));
     connect(m_button, &QAbstractButton::clicked, this, &ScaleObjectsToolPage::applyScale);

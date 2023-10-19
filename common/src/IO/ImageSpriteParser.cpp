@@ -38,9 +38,9 @@
 
 namespace TrenchBroom {
 namespace IO {
-ImageSpriteParser::ImageSpriteParser(
-    std::string name, std::shared_ptr<File> file, const FileSystem &fs
-) : m_name{std::move(name)}, m_file{std::move(file)}, m_fs{fs} {
+ImageSpriteParser::ImageSpriteParser(std::string name, std::shared_ptr<File> file, const FileSystem &fs) : m_name{
+    std::move(name)
+}, m_file{std::move(file)}, m_fs{fs} {
 }
 
 bool ImageSpriteParser::canParse(const std::filesystem::path &path) {
@@ -51,12 +51,9 @@ std::unique_ptr<Assets::EntityModel> ImageSpriteParser::doInitializeModel(Logger
     auto textures = std::vector<Assets::Texture>{};
 
     auto reader = m_file->reader().buffer();
-    textures.push_back(
-        readFreeImageTexture(m_name, reader).or_else(makeReadTextureErrorHandler(m_fs, logger)).value());
+    textures.push_back(readFreeImageTexture(m_name, reader).or_else(makeReadTextureErrorHandler(m_fs, logger)).value());
 
-    auto model = std::make_unique<Assets::EntityModel>(
-        m_name, Assets::PitchType::Normal, Assets::Orientation::ViewPlaneParallel
-    );
+    auto model = std::make_unique<Assets::EntityModel>(m_name, Assets::PitchType::Normal, Assets::Orientation::ViewPlaneParallel);
     model->addFrame();
 
     auto &surface = model->addSurface(m_name);
@@ -65,9 +62,7 @@ std::unique_ptr<Assets::EntityModel> ImageSpriteParser::doInitializeModel(Logger
     return model;
 }
 
-void ImageSpriteParser::doLoadFrame(
-    const size_t frameIndex, Assets::EntityModel &model, Logger &
-) {
+void ImageSpriteParser::doLoadFrame(const size_t frameIndex, Assets::EntityModel &model, Logger &) {
     auto &surface = model.surface(0);
 
     if (const auto *texture = surface.skin(0)) {
@@ -83,15 +78,17 @@ void ImageSpriteParser::doLoadFrame(
         const auto bboxMax = vm::vec3f{vm::max(x1, x2), vm::max(x1, x2), vm::max(y1, y2)};
         auto &frame = model.loadFrame(frameIndex, m_name, {bboxMin, bboxMax});
 
-        const auto triangles = std::vector<Assets::EntityModelVertex>{Assets::EntityModelVertex{{x1, y1, 0},
-                                                                                                {0,  1}}, Assets::EntityModelVertex{{x1, y2, 0},
-                                                                                                                                    {0,  0}}, Assets::EntityModelVertex{{x2, y2, 0},
-                                                                                                                                                                        {1,  0}},
+        const auto triangles = std::vector<Assets::EntityModelVertex>{
+            Assets::EntityModelVertex{{x1, y1, 0},
+                                      {0,  1}}, Assets::EntityModelVertex{{x1, y2, 0},
+                                                                          {0,  0}}, Assets::EntityModelVertex{{x2, y2, 0},
+                                                                                                              {1,  0}},
 
-                                                                      Assets::EntityModelVertex{{x2, y2, 0},
-                                                                                                {1,  0}}, Assets::EntityModelVertex{{x2, y1, 0},
-                                                                                                                                    {1,  1}}, Assets::EntityModelVertex{{x1, y1, 0},
-                                                                                                                                                                        {0,  1}},};
+            Assets::EntityModelVertex{{x2, y2, 0},
+                                      {1,  0}}, Assets::EntityModelVertex{{x2, y1, 0},
+                                                                          {1,  1}}, Assets::EntityModelVertex{{x1, y1, 0},
+                                                                                                              {0,  1}},
+        };
 
         auto size = Renderer::IndexRangeMap::Size{};
         size.inc(Renderer::PrimType::Triangles, 2);

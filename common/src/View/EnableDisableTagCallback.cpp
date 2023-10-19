@@ -30,9 +30,7 @@ size_t EnableDisableTagCallback::selectOption(const std::vector<std::string> &op
     QMenu menu;
     for (size_t i = 0; i < options.size(); ++i) {
         const auto &option = options[i];
-        menu.addAction(
-            QString::fromStdString(option), this, [this, i]() { m_selectedOption = i; }
-        );
+        menu.addAction(QString::fromStdString(option), this, [this, i]() { m_selectedOption = i; });
     }
 
     m_selectedOption = options.size();

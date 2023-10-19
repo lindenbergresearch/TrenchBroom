@@ -30,9 +30,9 @@
 
 namespace TrenchBroom {
 namespace View {
-CreateBrushToolBase::CreateBrushToolBase(
-    const bool initiallyActive, std::weak_ptr<MapDocument> document
-) : Tool(initiallyActive), m_document(document), m_brush(nullptr), m_brushRenderer(new Renderer::BrushRenderer()) {
+CreateBrushToolBase::CreateBrushToolBase(const bool initiallyActive, std::weak_ptr<MapDocument> document) : Tool(initiallyActive), m_document(document),
+                                                                                                            m_brush(nullptr),
+                                                                                                            m_brushRenderer(new Renderer::BrushRenderer()) {
 }
 
 CreateBrushToolBase::~CreateBrushToolBase() {
@@ -64,26 +64,20 @@ void CreateBrushToolBase::cancel() {
     m_brush = nullptr;
 }
 
-void CreateBrushToolBase::render(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void CreateBrushToolBase::render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     if (m_brush != nullptr) {
         renderBrush(renderContext, renderBatch);
     }
 }
 
-void CreateBrushToolBase::renderBrush(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void CreateBrushToolBase::renderBrush(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     ensure(m_brush != nullptr, "brush is null");
 
     m_brushRenderer->setFaceColor(pref(Preferences::FaceColor));
     m_brushRenderer->setEdgeColor(pref(Preferences::SelectedEdgeColor));
     m_brushRenderer->setShowEdges(true);
     m_brushRenderer->setShowOccludedEdges(true);
-    m_brushRenderer->setOccludedEdgeColor(
-        Color(
-            pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
+    m_brushRenderer->setOccludedEdgeColor(Color(pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
     m_brushRenderer->setTint(true);
     m_brushRenderer->setTintColor(pref(Preferences::SelectedFaceColor));
     m_brushRenderer->setForceTransparent(true);

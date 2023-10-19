@@ -47,9 +47,7 @@ class File;
 
 class FileSystem;
 
-std::string getTextureNameFromPathSuffix(
-    const std::filesystem::path &path, size_t prefixLength
-);
+std::string getTextureNameFromPathSuffix(const std::filesystem::path &path, size_t prefixLength);
 
 bool checkTextureDimensions(size_t width, size_t height);
 
@@ -63,8 +61,7 @@ struct ReadTextureError {
 };
 
 inline auto makeReadTextureErrorHandler(const FileSystem &fs, Logger &logger) {
-    return kdl::overload(
-        [&](Error e) {
+    return kdl::overload([&](Error e) {
           logger.error() << "Could not open texture file: " << e.msg;
           return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
         }, [&](ReadTextureError e) {

@@ -35,18 +35,12 @@ KeySequenceEdit::KeySequenceEdit(QWidget *parent) : KeySequenceEdit(LimitedKeySe
 KeySequenceEdit::KeySequenceEdit(const size_t maxCount, QWidget *parent) : QWidget(parent), m_keySequenceEdit(nullptr), m_clearButton(nullptr) {
     m_keySequenceEdit = new LimitedKeySequenceEdit(maxCount);
     m_keySequenceEdit->setToolTip("Click to start editing, then press the shortcut keys");
-    m_clearButton = createBitmapButton(
-        style()->standardIcon(QStyle::SP_LineEditClearButton), "Clear shortcut"
-    );
+    m_clearButton = createBitmapButton(style()->standardIcon(QStyle::SP_LineEditClearButton), "Clear shortcut");
 
     setFocusProxy(m_keySequenceEdit);
 
-    connect(
-        m_keySequenceEdit, &LimitedKeySequenceEdit::editingFinished, this, &KeySequenceEdit::editingFinished
-    );
-    connect(
-        m_keySequenceEdit, &LimitedKeySequenceEdit::keySequenceChanged, this, &KeySequenceEdit::keySequenceChanged
-    );
+    connect(m_keySequenceEdit, &LimitedKeySequenceEdit::editingFinished, this, &KeySequenceEdit::editingFinished);
+    connect(m_keySequenceEdit, &LimitedKeySequenceEdit::keySequenceChanged, this, &KeySequenceEdit::keySequenceChanged);
     connect(m_clearButton, &QAbstractButton::clicked, this, &KeySequenceEdit::clear);
 
     auto *layout = new QHBoxLayout();

@@ -43,9 +43,7 @@ DuplicateNodesCommand::~DuplicateNodesCommand() {
     }
 }
 
-std::unique_ptr<CommandResult> DuplicateNodesCommand::doPerformDo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> DuplicateNodesCommand::doPerformDo(MapDocumentCommandFacade *document) {
     if (m_firstExecution) {
         std::map<Model::Node *, Model::Node *> newParentMap;
 
@@ -93,9 +91,7 @@ std::unique_ptr<CommandResult> DuplicateNodesCommand::doPerformDo(
     return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> DuplicateNodesCommand::doPerformUndo(
-    MapDocumentCommandFacade *document
-) {
+std::unique_ptr<CommandResult> DuplicateNodesCommand::doPerformUndo(MapDocumentCommandFacade *document) {
     document->performDeselectAll();
     document->performRemoveNodes(m_addedNodes);
     document->performSelect(m_previouslySelectedNodes);
@@ -108,14 +104,10 @@ std::unique_ptr<CommandResult> DuplicateNodesCommand::doPerformUndo(
  *
  * Applies when duplicating a brush inside a brush entity.
  */
-bool DuplicateNodesCommand::shouldCloneParentWhenCloningNode(
-    const Model::Node *node
-) const {
-    return node->parent()->accept(
-        kdl::overload(
-            [](const Model::WorldNode *) { return false; }, [](const Model::LayerNode *) { return false; }, [](const Model::GroupNode *) { return false; }, [&](const Model::EntityNode *) { return true; },
-            [](const Model::BrushNode *) { return false; }
-        ));
+bool DuplicateNodesCommand::shouldCloneParentWhenCloningNode(const Model::Node *node) const {
+    return node->parent()->accept(kdl::overload([](const Model::WorldNode *) { return false; }, [](const Model::LayerNode *) { return false; },
+        [](const Model::GroupNode *) { return false; }, [&](const Model::EntityNode *) { return true; }, [](const Model::BrushNode *) { return false; }
+    ));
 }
 } // namespace View
 } // namespace TrenchBroom

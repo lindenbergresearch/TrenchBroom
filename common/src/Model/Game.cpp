@@ -49,15 +49,11 @@ void Game::setGamePath(const std::filesystem::path &gamePath, Logger &logger) {
     doSetGamePath(gamePath, logger);
 }
 
-void Game::setAdditionalSearchPaths(
-    const std::vector<std::filesystem::path> &searchPaths, Logger &logger
-) {
+void Game::setAdditionalSearchPaths(const std::vector<std::filesystem::path> &searchPaths, Logger &logger) {
     doSetAdditionalSearchPaths(searchPaths, logger);
 }
 
-Game::PathErrors Game::checkAdditionalSearchPaths(
-    const std::vector<std::filesystem::path> &searchPaths
-) const {
+Game::PathErrors Game::checkAdditionalSearchPaths(const std::vector<std::filesystem::path> &searchPaths) const {
     return doCheckAdditionalSearchPaths(searchPaths);
 }
 
@@ -81,15 +77,12 @@ Game::SoftMapBounds Game::extractSoftMapBounds(const Entity &entity) const {
     return doExtractSoftMapBounds(entity);
 }
 
-Result<std::unique_ptr<WorldNode>> Game::newMap(
-    const MapFormat format, const vm::bbox3 &worldBounds, Logger &logger
-) const {
+Result<std::unique_ptr<WorldNode>> Game::newMap(const MapFormat format, const vm::bbox3 &worldBounds, Logger &logger) const {
     return doNewMap(format, worldBounds, logger);
 }
 
-Result<std::unique_ptr<WorldNode>> Game::loadMap(
-    const MapFormat format, const vm::bbox3 &worldBounds, const std::filesystem::path &path, Logger &logger
-) const {
+Result<std::unique_ptr<WorldNode>>
+Game::loadMap(const MapFormat format, const vm::bbox3 &worldBounds, const std::filesystem::path &path, Logger &logger) const {
     return doLoadMap(format, worldBounds, path, logger);
 }
 
@@ -101,27 +94,22 @@ Result<void> Game::exportMap(WorldNode &world, const IO::ExportOptions &options)
     return doExportMap(world, options);
 }
 
-std::vector<Node *> Game::parseNodes(
-    const std::string &str, const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::vector<std::string> &linkedGroupsToKeep, Logger &logger
+std::vector<Node *>
+Game::parseNodes(const std::string &str, const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::vector<std::string> &linkedGroupsToKeep,
+    Logger &logger
 ) const {
     return doParseNodes(str, mapFormat, worldBounds, linkedGroupsToKeep, logger);
 }
 
-std::vector<BrushFace> Game::parseBrushFaces(
-    const std::string &str, const MapFormat mapFormat, const vm::bbox3 &worldBounds, Logger &logger
-) const {
+std::vector<BrushFace> Game::parseBrushFaces(const std::string &str, const MapFormat mapFormat, const vm::bbox3 &worldBounds, Logger &logger) const {
     return doParseBrushFaces(str, mapFormat, worldBounds, logger);
 }
 
-void Game::writeNodesToStream(
-    WorldNode &world, const std::vector<Node *> &nodes, std::ostream &stream
-) const {
+void Game::writeNodesToStream(WorldNode &world, const std::vector<Node *> &nodes, std::ostream &stream) const {
     doWriteNodesToStream(world, nodes, stream);
 }
 
-void Game::writeBrushFacesToStream(
-    WorldNode &world, const std::vector<BrushFace> &faces, std::ostream &stream
-) const {
+void Game::writeBrushFacesToStream(WorldNode &world, const std::vector<BrushFace> &faces, std::ostream &stream) const {
     doWriteBrushFacesToStream(world, faces, stream);
 }
 
@@ -129,9 +117,7 @@ void Game::loadTextureCollections(Assets::TextureManager &textureManager) const 
     doLoadTextureCollections(textureManager);
 }
 
-void Game::reloadWads(
-    const std::filesystem::path &documentPath, const std::vector<std::filesystem::path> &wadPaths, Logger &logger
-) {
+void Game::reloadWads(const std::filesystem::path &documentPath, const std::vector<std::filesystem::path> &wadPaths, Logger &logger) {
     doReloadWads(documentPath, wadPaths, logger);
 }
 
@@ -147,15 +133,12 @@ std::vector<Assets::EntityDefinitionFileSpec> Game::allEntityDefinitionFiles() c
     return doAllEntityDefinitionFiles();
 }
 
-Assets::EntityDefinitionFileSpec Game::extractEntityDefinitionFile(
-    const Entity &entity
-) const {
+Assets::EntityDefinitionFileSpec Game::extractEntityDefinitionFile(const Entity &entity) const {
     return doExtractEntityDefinitionFile(entity);
 }
 
-std::filesystem::path Game::findEntityDefinitionFile(
-    const Assets::EntityDefinitionFileSpec &spec, const std::vector<std::filesystem::path> &searchPaths
-) const {
+std::filesystem::path
+Game::findEntityDefinitionFile(const Assets::EntityDefinitionFileSpec &spec, const std::vector<std::filesystem::path> &searchPaths) const {
     return doFindEntityDefinitionFile(spec, searchPaths);
 }
 

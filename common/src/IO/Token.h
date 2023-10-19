@@ -40,9 +40,12 @@ public:
     TokenTemplate() : m_type(0), m_begin(nullptr), m_end(nullptr), m_position(0), m_line(0), m_column(0) {
     }
 
-    TokenTemplate(
-        const Type type, const char *begin, const char *end, const size_t position, const size_t line, const size_t column
-    ) : m_type(type), m_begin(begin), m_end(end), m_position(position), m_line(line), m_column(column) {
+    TokenTemplate(const Type type, const char *begin, const char *end, const size_t position, const size_t line, const size_t column) : m_type(type),
+                                                                                                                                        m_begin(begin),
+                                                                                                                                        m_end(end),
+                                                                                                                                        m_position(position),
+                                                                                                                                        m_line(line),
+                                                                                                                                        m_column(column) {
         assert(end >= begin);
     }
 

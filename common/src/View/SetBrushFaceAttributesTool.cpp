@@ -42,9 +42,7 @@ namespace TrenchBroom {
 namespace View {
 static const std::string TransferFaceAttributesTransactionName = "Transfer Face Attributes";
 
-SetBrushFaceAttributesTool::SetBrushFaceAttributesTool(
-    std::weak_ptr<MapDocument> document
-) : ToolController{}, Tool{true}, m_document{document} {
+SetBrushFaceAttributesTool::SetBrushFaceAttributesTool(std::weak_ptr<MapDocument> document) : ToolController{}, Tool{true}, m_document{document} {
 }
 
 Tool &SetBrushFaceAttributesTool::tool() {
@@ -111,8 +109,8 @@ static bool applies(const InputState &inputState) {
     return inputState.mouseButtonsPressed(MouseButtons::MBLeft) && (textureOnly || projection || rotation);
 }
 
-static void transferFaceAttributes(
-    MapDocument &document, const InputState &inputState, const Model::BrushFaceHandle &sourceFaceHandle, const std::vector<Model::BrushFaceHandle> &targetFaceHandles, const Model::BrushFaceHandle &faceToSelectAfter
+static void transferFaceAttributes(MapDocument &document, const InputState &inputState, const Model::BrushFaceHandle &sourceFaceHandle,
+    const std::vector<Model::BrushFaceHandle> &targetFaceHandles, const Model::BrushFaceHandle &faceToSelectAfter
 ) {
     const auto style = copyTextureAttribsRotationModifiersDown(inputState) ? Model::WrapStyle::Rotation : Model::WrapStyle::Projection;
 
@@ -129,9 +127,7 @@ static void transferFaceAttributes(
         auto snapshot = sourceFaceHandle.face().takeTexCoordSystemSnapshot();
         document.setFaceAttributesExceptContentFlags(sourceFaceHandle.face().attributes());
         if (snapshot != nullptr) {
-            document.copyTexCoordSystemFromFace(
-                *snapshot, sourceFaceHandle.face().attributes(), sourceFaceHandle.face().boundary(), style
-            );
+            document.copyTexCoordSystemFromFace(*snapshot, sourceFaceHandle.face().attributes(), sourceFaceHandle.face().boundary(), style);
         }
     }
 
@@ -149,9 +145,10 @@ private:
     std::optional<Model::BrushFaceHandle> m_targetFaceHandle;
 
 public:
-    SetBrushFaceAttributesDragTracker(
-        MapDocument &document, Model::BrushFaceHandle initialSelectedFaceHandle
-    ) : m_document{document}, m_initialSelectedFaceHandle{std::move(initialSelectedFaceHandle)} {
+    SetBrushFaceAttributesDragTracker(MapDocument &document, Model::BrushFaceHandle initialSelectedFaceHandle) : m_document{document},
+                                                                                                                 m_initialSelectedFaceHandle{
+                                                                                                                     std::move(initialSelectedFaceHandle)
+                                                                                                                 } {
     }
 
     bool drag(const InputState &inputState) {
@@ -180,8 +177,9 @@ public:
             m_targetFaceHandle = faceHandle;
         }
 
-        transferFaceAttributes(
-            m_document, inputState, *m_sourceFaceHandle, {*m_targetFaceHandle}, m_initialSelectedFaceHandle
+        transferFaceAttributes(m_document, inputState, *m_sourceFaceHandle, {
+                *m_targetFaceHandle
+            }, m_initialSelectedFaceHandle
         );
 
         return true;
@@ -193,9 +191,7 @@ public:
 };
 } // namespace
 
-std::unique_ptr<DragTracker> SetBrushFaceAttributesTool::acceptMouseDrag(
-    const InputState &inputState
-) {
+std::unique_ptr<DragTracker> SetBrushFaceAttributesTool::acceptMouseDrag(const InputState &inputState) {
     if (!applies(inputState)) {
         return nullptr;
     }
@@ -210,17 +206,14 @@ std::unique_ptr<DragTracker> SetBrushFaceAttributesTool::acceptMouseDrag(
 
     document->startTransaction("Drag Apply Face Attributes", TransactionScope::LongRunning);
 
-    return std::make_unique<SetBrushFaceAttributesDragTracker>(
-        *kdl::mem_lock(m_document), selectedFaces.front());
+    return std::make_unique<SetBrushFaceAttributesDragTracker>(*kdl::mem_lock(m_document), selectedFaces.front());
 }
 
 bool SetBrushFaceAttributesTool::cancel() {
     return false;
 }
 
-void SetBrushFaceAttributesTool::copyAttributesFromSelection(
-    const InputState &inputState, const bool applyToBrush
-) {
+void SetBrushFaceAttributesTool::copyAttributesFromSelection(const InputState &inputState, const bool applyToBrush) {
     using namespace Model::HitFilters;
 
     assert(canCopyAttributesFromSelection(inputState));
@@ -233,17 +226,15 @@ void SetBrushFaceAttributesTool::copyAttributesFromSelection(
     const Model::Hit &hit = inputState.pickResult().first(type(Model::BrushNode::BrushHitType));
     if (const auto targetFaceHandle = Model::hitToFaceHandle(hit)) {
         const auto sourceFaceHandle = selectedFaces.front();
-        const auto targetList = applyToBrush ? Model::toHandles(targetFaceHandle->node()) : std::vector<Model::BrushFaceHandle>{*targetFaceHandle};
+        const auto targetList = applyToBrush ? Model::toHandles(targetFaceHandle->node()) : std::vector<Model::BrushFaceHandle>{
+            *targetFaceHandle
+        };
 
-        transferFaceAttributes(
-            *document, inputState, sourceFaceHandle, targetList, sourceFaceHandle
-        );
+        transferFaceAttributes(*document, inputState, sourceFaceHandle, targetList, sourceFaceHandle);
     }
 }
 
-bool SetBrushFaceAttributesTool::canCopyAttributesFromSelection(
-    const InputState &inputState
-) const {
+bool SetBrushFaceAttributesTool::canCopyAttributesFromSelection(const InputState &inputState) const {
     using namespace Model::HitFilters;
 
     if (!applies(inputState)) {

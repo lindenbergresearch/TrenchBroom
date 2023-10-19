@@ -148,9 +148,7 @@ TEST_CASE("ELTest.subscriptOperator")
     CHECK(Value("test")[Value(ArrayType({Value(0), Value(1)}))] == Value("te"));
     CHECK(Value("test")[Value(ArrayType({Value(1), Value(2)}))] == Value("es"));
     CHECK(Value("test")[Value(ArrayType({Value(0), Value(3)}))] == Value("tt"));
-    CHECK(
-        Value("test")[Value(ArrayType({Value(0), Value(1), Value(2), Value(3)}))]
-        == Value("test"));
+    CHECK(Value("test")[Value(ArrayType({Value(0), Value(1), Value(2), Value(3)}))] == Value("test"));
     CHECK(Value("test")[Value(ArrayType({Value(4)}))] == Value(""));
     CHECK(Value("test")[Value(ArrayType({Value(0), Value(4)}))] == Value("t"));
 
@@ -168,14 +166,11 @@ TEST_CASE("ELTest.subscriptOperator")
 
     CHECK(arrayValue[Value(ArrayType({Value(0)}))] == Value(ArrayType({Value(1.0)})));
     CHECK(arrayValue[Value(ArrayType({Value(1)}))] == Value(ArrayType({Value("test")})));
-    CHECK(
-        arrayValue[Value(ArrayType({Value(0), Value(1)}))]
-        == Value(ArrayType({Value(1.0), Value("test")})));
+    CHECK(arrayValue[Value(ArrayType({Value(0), Value(1)}))] == Value(ArrayType({Value(1.0), Value("test")})));
     CHECK_THROWS_AS(arrayValue[Value(ArrayType({Value(2)}))], EvaluationError);
     CHECK_THROWS_AS(arrayValue[Value(ArrayType({Value(1), Value(2)}))], EvaluationError);
     CHECK_THROWS_AS(arrayValue[Value(ArrayType({Value("test")}))], ConversionError);
-    CHECK_THROWS_AS(
-        arrayValue[Value(ArrayType({Value(0), Value("test")}))], ConversionError);
+    CHECK_THROWS_AS(arrayValue[Value(ArrayType({Value(0), Value("test")}))], ConversionError);
 
     MapType map;
     map["test"] = Value(1.0);

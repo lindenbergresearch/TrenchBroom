@@ -61,9 +61,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    EntityBrowser(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    EntityBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     void reload();
 

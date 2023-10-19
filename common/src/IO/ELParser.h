@@ -80,8 +80,8 @@ static const Type Literal = String | Number | Boolean | Null;
 static const Type UnaryOperator = Addition | Subtraction | LogicalNegation | BitwiseNegation;
 static const Type SimpleTerm = Name | Literal | OParen | OBracket | OBrace | UnaryOperator;
 static const Type CompoundTerm =
-    Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd | BitwiseXOr | BitwiseOr | BitwiseShiftLeft |
-    BitwiseShiftRight;
+    Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater |
+    Case | BitwiseAnd | BitwiseXOr | BitwiseOr | BitwiseShiftLeft | BitwiseShiftRight;
 } // namespace ELToken
 
 class ELTokenizer : public Tokenizer<ELToken::Type> {

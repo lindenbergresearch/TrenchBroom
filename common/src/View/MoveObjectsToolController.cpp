@@ -53,9 +53,7 @@ public:
     MoveObjectsDragDelegate(MoveObjectsTool &tool) : m_tool{tool} {
     }
 
-    DragStatus move(
-        const InputState &inputState, const DragState &dragState, const vm::vec3 &proposedHandlePosition
-    ) override {
+    DragStatus move(const InputState &inputState, const DragState &dragState, const vm::vec3 &proposedHandlePosition) override {
         switch (m_tool.move(inputState, proposedHandlePosition - dragState.currentHandlePosition)) {
             case MoveObjectsTool::MR_Continue:
                 return DragStatus::Continue;
@@ -73,27 +71,21 @@ public:
 
     void cancel(const DragState &) override { m_tool.cancelMove(); }
 
-    void setRenderOptions(
-        const InputState &, Renderer::RenderContext &renderContext
-    ) const override {
+    void setRenderOptions(const InputState &, Renderer::RenderContext &renderContext) const override {
         renderContext.setForceShowSelectionGuide();
     }
 
-    DragHandleSnapper makeDragHandleSnapper(
-        const InputState &, const SnapMode
-    ) const override {
+    DragHandleSnapper makeDragHandleSnapper(const InputState &, const SnapMode) const override {
         return makeRelativeHandleSnapper(m_tool.grid());
     }
 };
 } // namespace
 
-std::unique_ptr<DragTracker> MoveObjectsToolController::acceptMouseDrag(
-    const InputState &inputState
-) {
+std::unique_ptr<DragTracker> MoveObjectsToolController::acceptMouseDrag(const InputState &inputState) {
     using namespace Model::HitFilters;
 
-    if (!inputState.modifierKeysPressed(ModifierKeys::MKNone) && !inputState.modifierKeysPressed(ModifierKeys::MKAlt) && !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd) &&
-        !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt)) {
+    if (!inputState.modifierKeysPressed(ModifierKeys::MKNone) && !inputState.modifierKeysPressed(ModifierKeys::MKAlt) &&
+        !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd) && !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt)) {
         return nullptr;
     }
 
@@ -109,8 +101,7 @@ std::unique_ptr<DragTracker> MoveObjectsToolController::acceptMouseDrag(
         return nullptr;
     }
 
-    return createMoveHandleDragTracker(
-        MoveObjectsDragDelegate{m_tool}, inputState, hit.hitPoint(), hit.hitPoint());
+    return createMoveHandleDragTracker(MoveObjectsDragDelegate{m_tool}, inputState, hit.hitPoint(), hit.hitPoint());
 }
 
 bool MoveObjectsToolController::cancel() {

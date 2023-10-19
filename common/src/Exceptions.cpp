@@ -31,17 +31,13 @@ const char *Exception::what() const noexcept {
     return m_msg.c_str();
 }
 
-ParserException::ParserException(
-    const size_t line, const size_t column, const std::string &str
-) : Exception(buildMessage(line, column, str)) {
+ParserException::ParserException(const size_t line, const size_t column, const std::string &str) : Exception(buildMessage(line, column, str)) {
 }
 
 ParserException::ParserException(const size_t line, const std::string &str) : Exception(buildMessage(line, str)) {
 }
 
-std::string ParserException::buildMessage(
-    const size_t line, const size_t column, const std::string &str
-) {
+std::string ParserException::buildMessage(const size_t line, const size_t column, const std::string &str) {
     auto msg = std::stringstream();
     msg << "At line " << line << ", column " << column << ":";
     if (!str.empty()) {

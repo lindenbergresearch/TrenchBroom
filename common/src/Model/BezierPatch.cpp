@@ -40,9 +40,10 @@ static vm::bbox3 computeBounds(const std::vector<BezierPatch::Point> &points) {
     return builder.bounds();
 }
 
-BezierPatch::BezierPatch(
-    const size_t pointRowCount, const size_t pointColumnCount, std::vector<Point> controlPoints, std::string textureName
-) : m_pointRowCount{pointRowCount}, m_pointColumnCount{pointColumnCount}, m_controlPoints{std::move(controlPoints)}, m_bounds(computeBounds(m_controlPoints)), m_textureName{std::move(textureName)} {
+BezierPatch::BezierPatch(const size_t pointRowCount, const size_t pointColumnCount, std::vector<Point> controlPoints, std::string textureName)
+    : m_pointRowCount{pointRowCount}, m_pointColumnCount{pointColumnCount}, m_controlPoints{
+    std::move(controlPoints)
+}, m_bounds(computeBounds(m_controlPoints)), m_textureName{std::move(textureName)} {
     ensure(m_pointRowCount > 2 && m_pointColumnCount > 2, "Bezier patch must have at least 3*3 control points");
     ensure(m_pointRowCount % 2 == 1 && m_pointColumnCount % 2 == 1, "Bezier patch must have odd number of control points per column and per row");
     ensure(m_controlPoints.size() == m_pointRowCount * m_pointColumnCount, "Invalid Bezier patch control points");
@@ -86,9 +87,7 @@ const std::vector<BezierPatch::Point> &BezierPatch::controlPoints() const {
     return m_controlPoints;
 }
 
-const BezierPatch::Point &BezierPatch::controlPoint(
-    const size_t row, const size_t col
-) const {
+const BezierPatch::Point &BezierPatch::controlPoint(const size_t row, const size_t col) const {
     assert(row < m_pointRowCount);
     assert(col < m_pointColumnCount);
     return m_controlPoints[row * m_pointColumnCount + col];
@@ -137,8 +136,9 @@ void BezierPatch::transform(const vm::mat4x4 &transformation) {
 
 using SurfaceControlPoints = std::array<std::array<BezierPatch::Point, 3u>, 3u>;
 
-static SurfaceControlPoints collectSurfaceControlPoints(
-    const std::vector<BezierPatch::Point> &controlPoints, const size_t pointColumnCount, const size_t surfaceRow, const size_t surfaceCol
+static SurfaceControlPoints
+collectSurfaceControlPoints(const std::vector<BezierPatch::Point> &controlPoints, const size_t pointColumnCount, const size_t surfaceRow,
+    const size_t surfaceCol
 ) {
     // at which column and row do we need to start collecting control points for the
     // surface?
@@ -155,9 +155,8 @@ static SurfaceControlPoints collectSurfaceControlPoints(
     return result;
 }
 
-static std::vector<SurfaceControlPoints> collectAllSurfaceControlPoints(
-    const std::vector<BezierPatch::Point> &controlPoints, const size_t pointRowCount, const size_t pointColumnCount
-) {
+static std::vector<SurfaceControlPoints>
+collectAllSurfaceControlPoints(const std::vector<BezierPatch::Point> &controlPoints, const size_t pointRowCount, const size_t pointColumnCount) {
     // determine how many 3*3 surfaces the patch has in each direction
     const size_t surfaceRowCount = (pointRowCount - 1u) / 2u;
     const size_t surfaceColumnCount = (pointColumnCount - 1u) / 2u;
@@ -168,19 +167,14 @@ static std::vector<SurfaceControlPoints> collectAllSurfaceControlPoints(
 
     for (size_t surfaceRow = 0u; surfaceRow < surfaceRowCount; ++surfaceRow) {
         for (size_t surfaceCol = 0u; surfaceCol < surfaceColumnCount; ++surfaceCol) {
-            result.push_back(
-                collectSurfaceControlPoints(
-                    controlPoints, pointColumnCount, surfaceRow, surfaceCol
-                ));
+            result.push_back(collectSurfaceControlPoints(controlPoints, pointColumnCount, surfaceRow, surfaceCol));
         }
     }
     return result;
 }
 
 template<typename O>
-void evaluateSurface(
-    const SurfaceControlPoints &surfaceControlPoints, const size_t subdivisionsPerSurface, const bool isLastCol, const bool isLastRow, O out
-) {
+void evaluateSurface(const SurfaceControlPoints &surfaceControlPoints, const size_t subdivisionsPerSurface, const bool isLastCol, const bool isLastRow, O out) {
     const auto maxRow = isLastRow ? subdivisionsPerSurface + 1u : subdivisionsPerSurface;
     const auto maxCol = isLastCol ? subdivisionsPerSurface + 1u : subdivisionsPerSurface;
 
@@ -193,9 +187,7 @@ void evaluateSurface(
     }
 }
 
-std::vector<BezierPatch::Point> BezierPatch::evaluate(
-    const size_t subdivisionsPerSurface
-) const {
+std::vector<BezierPatch::Point> BezierPatch::evaluate(const size_t subdivisionsPerSurface) const {
     // collect the control points for each surface in this patch
     const auto allSurfaceControlPoints = collectAllSurfaceControlPoints(m_controlPoints, m_pointRowCount, m_pointColumnCount);
 

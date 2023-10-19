@@ -63,9 +63,7 @@ public:
     virtual std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document);
 
 private:
-    virtual std::unique_ptr<CommandResult> doPerformDo(
-        MapDocumentCommandFacade *document
-    ) = 0;
+    virtual std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) = 0;
 
 deleteCopyAndMove(Command);
 };

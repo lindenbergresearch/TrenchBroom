@@ -45,12 +45,8 @@ bool AllocationTracker::Range::operator<(const Range &other) const {
     return size < other.size;
 }
 
-static std::vector<AllocationTracker::Block *>::iterator findFirstLargerOrEqualBin(
-    std::vector<AllocationTracker::Block *> &bins, const size_t desiredSize
-) {
-    return std::lower_bound(
-        bins.begin(), bins.end(), desiredSize, [](const AllocationTracker::Block *a, const size_t b) { return a->size < b; }
-    );
+static std::vector<AllocationTracker::Block *>::iterator findFirstLargerOrEqualBin(std::vector<AllocationTracker::Block *> &bins, const size_t desiredSize) {
+    return std::lower_bound(bins.begin(), bins.end(), desiredSize, [](const AllocationTracker::Block *a, const size_t b) { return a->size < b; });
 }
 
 void AllocationTracker::unlinkFromBinList(Block *block) {
@@ -321,7 +317,8 @@ void AllocationTracker::free(Block *block) {
     checkInvariants();
 }
 
-AllocationTracker::AllocationTracker(const Index initial_capacity) : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr), m_recycledBlockList(nullptr) {
+AllocationTracker::AllocationTracker(const Index initial_capacity) : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr),
+                                                                     m_recycledBlockList(nullptr) {
     if (initial_capacity > 0) {
         expand(initial_capacity);
         checkInvariants();

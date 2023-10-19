@@ -57,9 +57,7 @@ private:
 public:
     FaceRenderer();
 
-    FaceRenderer(
-        std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor
-    );
+    FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor);
 
     FaceRenderer(const FaceRenderer &other);
 

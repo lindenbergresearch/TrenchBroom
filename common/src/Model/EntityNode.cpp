@@ -54,9 +54,8 @@ const vm::bbox3 EntityNode::DefaultBounds(8.0);
 EntityNode::EntityNode(Entity entity) : EntityNodeBase(std::move(entity)), Object() {
 }
 
-EntityNode::EntityNode(
-    const Model::EntityPropertyConfig &entityPropertyConfig, std::initializer_list<EntityProperty> properties
-) : EntityNode{Entity{entityPropertyConfig, std::move(properties)}} {
+EntityNode::EntityNode(const Model::EntityPropertyConfig &entityPropertyConfig, std::initializer_list<EntityProperty> properties) : EntityNode{
+    Entity{entityPropertyConfig, std::move(properties)}} {
 }
 
 const vm::bbox3 &EntityNode::modelBounds() const {
@@ -101,9 +100,8 @@ Node *EntityNode::doClone(const vm::bbox3 & /* worldBounds */) const {
 
 bool EntityNode::doCanAddChild(const Node *child) const {
     return child->accept(
-        kdl::overload(
-            [](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [](const GroupNode *) { return false; }, [](const EntityNode *) { return false; }, [](const BrushNode *) { return true; },
-            [](const PatchNode *) { return true; }
+        kdl::overload([](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [](const GroupNode *) { return false; },
+            [](const EntityNode *) { return false; }, [](const BrushNode *) { return true; }, [](const PatchNode *) { return true; }
         ));
 }
 
@@ -142,9 +140,7 @@ bool EntityNode::doSelectable() const {
     return !hasChildren();
 }
 
-void EntityNode::doPick(
-    const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult
-) {
+void EntityNode::doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
     if (!hasChildren() && editorContext.visible(this)) {
         const vm::bbox3 &myBounds = logicalBounds();
         if (!myBounds.contains(ray.origin)) {
@@ -168,8 +164,7 @@ void EntityNode::doPick(
                     // transform back to world space
                     const auto transformedHitPoint = vm::vec3(point_at_distance(transformedRay, distance));
                     const auto hitPoint = transform * transformedHitPoint;
-                    pickResult.addHit(
-                        Hit(EntityHitType, static_cast<FloatType>(distance), hitPoint, this));
+                    pickResult.addHit(Hit(EntityHitType, static_cast<FloatType>(distance), hitPoint, this));
                     return;
                 }
             }

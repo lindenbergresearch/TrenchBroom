@@ -52,9 +52,7 @@ private:
     TextureBrowser *m_textureBrowser{nullptr};
 
 public:
-    FaceInspector(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     ~FaceInspector() override;
 
@@ -65,13 +63,9 @@ public:
 private:
     void createGui(std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-    QWidget *createFaceAttribsEditor(
-        QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager
-    );
+    QWidget *createFaceAttribsEditor(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-    QWidget *createTextureBrowser(
-        QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager
-    );
+    QWidget *createTextureBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
     void textureSelected(const Assets::Texture *texture);
 };

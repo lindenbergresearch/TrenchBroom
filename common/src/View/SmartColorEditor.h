@@ -52,9 +52,7 @@ private:
     ColorTable *m_colorHistory;
 
 public:
-    explicit SmartColorEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit SmartColorEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     void createGui();

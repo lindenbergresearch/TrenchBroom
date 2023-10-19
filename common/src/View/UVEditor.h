@@ -60,9 +60,7 @@ private:
     NotifierConnection m_notifierConnection;
 
 public:
-    explicit UVEditor(
-        std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr
-    );
+    explicit UVEditor(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     bool cancelMouseDrag();
 

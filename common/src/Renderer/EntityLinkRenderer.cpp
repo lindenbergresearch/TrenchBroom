@@ -40,7 +40,8 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-EntityLinkRenderer::EntityLinkRenderer(std::weak_ptr<View::MapDocument> document) : m_document(document), m_defaultColor(0.5f, 1.0f, 0.5f, 1.0f), m_selectedColor(1.0f, 0.0f, 0.0f, 1.0f) {
+EntityLinkRenderer::EntityLinkRenderer(std::weak_ptr<View::MapDocument> document) : m_document(document), m_defaultColor(0.5f, 1.0f, 0.5f, 1.0f),
+                                                                                    m_selectedColor(1.0f, 0.0f, 0.0f, 1.0f) {
 }
 
 void EntityLinkRenderer::setDefaultColor(const Color &color) {
@@ -66,8 +67,8 @@ protected:
     std::vector<LinkRenderer::LineVertex> &m_links;
 
 protected:
-    CollectLinksVisitor(
-        const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
+    CollectLinksVisitor(const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor,
+        std::vector<LinkRenderer::LineVertex> &links
     ) : m_editorContext(editorContext), m_defaultColor(defaultColor), m_selectedColor(selectedColor), m_links(links) {
     }
 
@@ -89,8 +90,8 @@ protected:
 
 class CollectAllLinksVisitor : public CollectLinksVisitor {
 public:
-    CollectAllLinksVisitor(
-        const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
+    CollectAllLinksVisitor(const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor,
+        std::vector<LinkRenderer::LineVertex> &links
     ) : CollectLinksVisitor(editorContext, defaultColor, selectedColor, links) {
     }
 
@@ -102,9 +103,7 @@ public:
     }
 
 private:
-    void addTargets(
-        Model::EntityNodeBase *source, const std::vector<Model::EntityNodeBase *> &targets
-    ) {
+    void addTargets(Model::EntityNodeBase *source, const std::vector<Model::EntityNodeBase *> &targets) {
         for (const Model::EntityNodeBase *target: targets) {
             if (m_editorContext.visible(target))
                 addLink(source, target);
@@ -117,8 +116,8 @@ private:
     std::unordered_set<Model::Node *> m_visited;
 
 public:
-    CollectTransitiveSelectedLinksVisitor(
-        const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
+    CollectTransitiveSelectedLinksVisitor(const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor,
+        std::vector<LinkRenderer::LineVertex> &links
     ) : CollectLinksVisitor(editorContext, defaultColor, selectedColor, links) {
     }
 
@@ -135,9 +134,7 @@ public:
     }
 
 private:
-    void addSources(
-        const std::vector<Model::EntityNodeBase *> &sources, Model::EntityNodeBase *target
-    ) {
+    void addSources(const std::vector<Model::EntityNodeBase *> &sources, Model::EntityNodeBase *target) {
         for (Model::EntityNodeBase *source: sources) {
             if (m_editorContext.visible(source)) {
                 addLink(source, target);
@@ -146,9 +143,7 @@ private:
         }
     }
 
-    void addTargets(
-        Model::EntityNodeBase *source, const std::vector<Model::EntityNodeBase *> &targets
-    ) {
+    void addTargets(Model::EntityNodeBase *source, const std::vector<Model::EntityNodeBase *> &targets) {
         for (Model::EntityNodeBase *target: targets) {
             if (m_editorContext.visible(target)) {
                 addLink(source, target);
@@ -160,8 +155,8 @@ private:
 
 struct CollectDirectSelectedLinksVisitor : public CollectLinksVisitor {
 public:
-    CollectDirectSelectedLinksVisitor(
-        const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
+    CollectDirectSelectedLinksVisitor(const Model::EditorContext &editorContext, const Color &defaultColor, const Color &selectedColor,
+        std::vector<LinkRenderer::LineVertex> &links
     ) : CollectLinksVisitor(editorContext, defaultColor, selectedColor, links) {
     }
 
@@ -175,18 +170,14 @@ public:
     }
 
 private:
-    void addSources(
-        const std::vector<Model::EntityNodeBase *> &sources, Model::EntityNodeBase *target
-    ) {
+    void addSources(const std::vector<Model::EntityNodeBase *> &sources, Model::EntityNodeBase *target) {
         for (const Model::EntityNodeBase *source: sources) {
             if (!source->selected() && !source->descendantSelected() && m_editorContext.visible(source))
                 addLink(source, target);
         }
     }
 
-    void addTargets(
-        Model::EntityNodeBase *source, const std::vector<Model::EntityNodeBase *> &targets
-    ) {
+    void addTargets(Model::EntityNodeBase *source, const std::vector<Model::EntityNodeBase *> &targets) {
         for (const Model::EntityNodeBase *target: targets) {
             if (m_editorContext.visible(target))
                 addLink(source, target);
@@ -195,65 +186,47 @@ private:
 };
 } // namespace
 
-static void collectSelectedLinks(
-    const Model::NodeCollection &selectedNodes, CollectLinksVisitor &collectLinks
-) {
+static void collectSelectedLinks(const Model::NodeCollection &selectedNodes, CollectLinksVisitor &collectLinks) {
     for (auto *node: selectedNodes) {
-        node->accept(
-            kdl::overload(
-                [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {}, [&](Model::EntityNode *entity) { collectLinks.visit(entity); }, [](auto &&thisLambda, Model::BrushNode *brush) {
-                  brush->parent()->accept(thisLambda);
-                }, [](Model::PatchNode *) {}
-            ));
+        node->accept(kdl::overload([](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {},
+            [&](Model::EntityNode *entity) { collectLinks.visit(entity); }, [](auto &&thisLambda, Model::BrushNode *brush) {
+              brush->parent()->accept(thisLambda);
+            }, [](Model::PatchNode *) {}
+        ));
     }
 }
 
-static void getAllLinks(
-    View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
-) {
+static void getAllLinks(View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links) {
     const Model::EditorContext &editorContext = document.editorContext();
 
     CollectAllLinksVisitor collectLinks(editorContext, defaultColor, selectedColor, links);
 
     if (document.world() != nullptr) {
-        document.world()->accept(
-            kdl::overload(
-                [](
-                    auto &&thisLambda, Model::WorldNode *world
-                ) { world->visitChildren(thisLambda); }, [](
-                    auto &&thisLambda, Model::LayerNode *layer
-                ) { layer->visitChildren(thisLambda); }, [](
-                    auto &&thisLambda, Model::GroupNode *group
-                ) { group->visitChildren(thisLambda); }, [&](Model::EntityNode *entity) { collectLinks.visit(entity); }, [](Model::BrushNode *) {}, [](Model::PatchNode *) {}
-            ));
+        document.world()->accept(kdl::overload([](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); },
+            [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); },
+            [](auto &&thisLambda, Model::GroupNode *group) { group->visitChildren(thisLambda); },
+            [&](Model::EntityNode *entity) { collectLinks.visit(entity); }, [](Model::BrushNode *) {}, [](Model::PatchNode *) {}
+        ));
     }
 }
 
-static void getTransitiveSelectedLinks(
-    View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
-) {
+static void
+getTransitiveSelectedLinks(View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links) {
     const Model::EditorContext &editorContext = document.editorContext();
 
-    CollectTransitiveSelectedLinksVisitor collectLinks(
-        editorContext, defaultColor, selectedColor, links
-    );
+    CollectTransitiveSelectedLinksVisitor collectLinks(editorContext, defaultColor, selectedColor, links);
     collectSelectedLinks(document.selectedNodes(), collectLinks);
 }
 
-static void getDirectSelectedLinks(
-    View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
-) {
+static void
+getDirectSelectedLinks(View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links) {
     const Model::EditorContext &editorContext = document.editorContext();
 
-    CollectDirectSelectedLinksVisitor collectLinks(
-        editorContext, defaultColor, selectedColor, links
-    );
+    CollectDirectSelectedLinksVisitor collectLinks(editorContext, defaultColor, selectedColor, links);
     collectSelectedLinks(document.selectedNodes(), collectLinks);
 }
 
-static void getLinks(
-    View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links
-) {
+static void getLinks(View::MapDocument &document, const Color &defaultColor, const Color &selectedColor, std::vector<LinkRenderer::LineVertex> &links) {
     const QString entityLinkMode = pref(Preferences::EntityLinkMode);
 
     if (entityLinkMode == Preferences::entityLinkModeAll()) {

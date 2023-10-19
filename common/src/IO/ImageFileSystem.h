@@ -60,9 +60,7 @@ protected:
 public:
     ~ImageFileSystemBase() override;
 
-    Result<std::filesystem::path> makeAbsolute(
-        const std::filesystem::path &path
-    ) const override;
+    Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
     /**
      * Reload this file system.
@@ -75,13 +73,9 @@ protected:
     PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 private:
-    Result<std::vector<std::filesystem::path>> doFind(
-        const std::filesystem::path &path, TraversalMode traversalMode
-    ) const override;
+    Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
 
-    Result<std::shared_ptr<File>> doOpenFile(
-        const std::filesystem::path &path
-    ) const override;
+    Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
 
     virtual Result<void> doReadDirectory() = 0;
 };

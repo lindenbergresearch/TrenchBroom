@@ -41,17 +41,16 @@
 namespace TrenchBroom {
 namespace Model {
 
-void setDefaultProperties(
-    const EntityPropertyConfig &propertyConfig, const Assets::EntityDefinition &entityDefinition, Entity &entity, const SetDefaultPropertyMode mode
+void setDefaultProperties(const EntityPropertyConfig &propertyConfig, const Assets::EntityDefinition &entityDefinition, Entity &entity,
+    const SetDefaultPropertyMode mode
 ) {
     for (const auto &propertyDefinition: entityDefinition.propertyDefinitions()) {
         if (const auto defaultValue = Assets::PropertyDefinition::defaultValue(*propertyDefinition);
             !defaultValue.empty()) {
             const auto hasProperty = entity.hasProperty(propertyDefinition->key());
-            if (mode == SetDefaultPropertyMode::SetAll || (mode == SetDefaultPropertyMode::SetExisting && hasProperty) || (mode == SetDefaultPropertyMode::SetMissing && !hasProperty)) {
-                entity.addOrUpdateProperty(
-                    propertyConfig, propertyDefinition->key(), defaultValue
-                );
+            if (mode == SetDefaultPropertyMode::SetAll || (mode == SetDefaultPropertyMode::SetExisting && hasProperty) ||
+                (mode == SetDefaultPropertyMode::SetMissing && !hasProperty)) {
+                entity.addOrUpdateProperty(propertyConfig, propertyDefinition->key(), defaultValue);
             }
         }
     }
@@ -59,18 +58,18 @@ void setDefaultProperties(
 
 const vm::bbox3 Entity::DefaultBounds = vm::bbox3{8.0};
 
-Entity::Entity() : m_pointEntity{true}, m_model{nullptr}, m_cachedProperties{EntityPropertyValues::NoClassname, vm::vec3{}, vm::mat4x4{}, vm::mat4x4{}} {
+Entity::Entity() : m_pointEntity{true}, m_model{nullptr}, m_cachedProperties{
+    EntityPropertyValues::NoClassname, vm::vec3{}, vm::mat4x4{}, vm::mat4x4{}} {
 }
 
-Entity::Entity(
-    const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties
-) : m_properties{std::move(properties)}, m_pointEntity{true}, m_model{nullptr} {
+Entity::Entity(const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties) : m_properties{
+    std::move(properties)
+}, m_pointEntity{true}, m_model{nullptr} {
     updateCachedProperties(propertyConfig);
 }
 
-Entity::Entity(
-    const EntityPropertyConfig &propertyConfig, std::initializer_list<EntityProperty> properties
-) : m_properties{std::move(properties)}, m_pointEntity{true}, m_model{nullptr} {
+Entity::Entity(const EntityPropertyConfig &propertyConfig, std::initializer_list<EntityProperty> properties) : m_properties{std::move(properties)},
+                                                                                                               m_pointEntity{true}, m_model{nullptr} {
     updateCachedProperties(propertyConfig);
 }
 
@@ -88,9 +87,7 @@ Entity &Entity::operator=(Entity &&other) = default;
 
 Entity::~Entity() = default;
 
-void Entity::setProperties(
-    const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties
-) {
+void Entity::setProperties(const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties) {
     m_properties = std::move(properties);
     updateCachedProperties(propertyConfig);
 }
@@ -107,9 +104,7 @@ bool Entity::pointEntity() const {
     return m_pointEntity;
 }
 
-void Entity::setPointEntity(
-    const EntityPropertyConfig &propertyConfig, const bool pointEntity
-) {
+void Entity::setPointEntity(const EntityPropertyConfig &propertyConfig, const bool pointEntity) {
     if (m_pointEntity == pointEntity) {
         return;
     }
@@ -127,12 +122,11 @@ const Assets::EntityDefinition *Entity::definition() const {
 }
 
 const vm::bbox3 &Entity::definitionBounds() const {
-    return definition() && definition()->type() == Assets::EntityDefinitionType::PointEntity ? static_cast<const Assets::PointEntityDefinition *>(definition())->bounds() : DefaultBounds;
+    return definition() && definition()->type() == Assets::EntityDefinitionType::PointEntity
+           ? static_cast<const Assets::PointEntityDefinition *>(definition())->bounds() : DefaultBounds;
 }
 
-void Entity::setDefinition(
-    const EntityPropertyConfig &propertyConfig, Assets::EntityDefinition *definition
-) {
+void Entity::setDefinition(const EntityPropertyConfig &propertyConfig, Assets::EntityDefinition *definition) {
     if (m_definition.get() == definition) {
         return;
     }
@@ -145,9 +139,7 @@ const Assets::EntityModelFrame *Entity::model() const {
     return m_model;
 }
 
-void Entity::setModel(
-    const EntityPropertyConfig &propertyConfig, const Assets::EntityModelFrame *model
-) {
+void Entity::setModel(const EntityPropertyConfig &propertyConfig, const Assets::EntityModelFrame *model) {
     if (m_model == model) {
         return;
     }
@@ -181,9 +173,7 @@ void Entity::unsetEntityDefinitionAndModel() {
     m_cachedProperties.modelTransformation = vm::mat4x4::identity();
 }
 
-void Entity::addOrUpdateProperty(
-    const EntityPropertyConfig &propertyConfig, std::string key, std::string value, const bool defaultToProtected
-) {
+void Entity::addOrUpdateProperty(const EntityPropertyConfig &propertyConfig, std::string key, std::string value, const bool defaultToProtected) {
     auto it = findEntityProperty(m_properties, key);
     if (it != std::end(m_properties)) {
         it->setValue(std::move(value));
@@ -198,18 +188,14 @@ void Entity::addOrUpdateProperty(
     updateCachedProperties(propertyConfig);
 }
 
-void Entity::renameProperty(
-    const EntityPropertyConfig &propertyConfig, const std::string &oldKey, std::string newKey
-) {
+void Entity::renameProperty(const EntityPropertyConfig &propertyConfig, const std::string &oldKey, std::string newKey) {
     if (oldKey == newKey) {
         return;
     }
 
     const auto oldIt = findEntityProperty(m_properties, oldKey);
     if (oldIt != std::end(m_properties)) {
-        if (const auto protIt = std::find(
-                std::begin(m_protectedProperties), std::end(m_protectedProperties), oldKey
-            );
+        if (const auto protIt = std::find(std::begin(m_protectedProperties), std::end(m_protectedProperties), oldKey);
             protIt != std::end(m_protectedProperties)) {
             m_protectedProperties.erase(protIt);
             m_protectedProperties.push_back(newKey);
@@ -225,9 +211,7 @@ void Entity::renameProperty(
     }
 }
 
-void Entity::removeProperty(
-    const EntityPropertyConfig &propertyConfig, const std::string &key
-) {
+void Entity::removeProperty(const EntityPropertyConfig &propertyConfig, const std::string &key) {
     const auto it = findEntityProperty(m_properties, key);
     if (it != std::end(m_properties)) {
         m_properties.erase(it);
@@ -235,9 +219,7 @@ void Entity::removeProperty(
     }
 }
 
-void Entity::removeNumberedProperty(
-    const EntityPropertyConfig &propertyConfig, const std::string &prefix
-) {
+void Entity::removeNumberedProperty(const EntityPropertyConfig &propertyConfig, const std::string &prefix) {
     auto it = std::begin(m_properties);
     while (it != std::end(m_properties)) {
         if (it->hasNumberedPrefix(prefix)) {
@@ -259,21 +241,15 @@ bool Entity::hasProperty(const std::string &key, const std::string &value) const
     return it != std::end(m_properties) && it->hasValue(value);
 }
 
-bool Entity::hasPropertyWithPrefix(
-    const std::string &prefix, const std::string &value
-) const {
-    return std::any_of(
-        std::begin(m_properties), std::end(m_properties), [&](const auto &property) {
+bool Entity::hasPropertyWithPrefix(const std::string &prefix, const std::string &value) const {
+    return std::any_of(std::begin(m_properties), std::end(m_properties), [&](const auto &property) {
           return property.hasPrefixAndValue(prefix, value);
         }
     );
 }
 
-bool Entity::hasNumberedProperty(
-    const std::string &prefix, const std::string &value
-) const {
-    return std::any_of(
-        std::begin(m_properties), std::end(m_properties), [&](const auto &property) {
+bool Entity::hasNumberedProperty(const std::string &prefix, const std::string &value) const {
+    return std::any_of(std::begin(m_properties), std::end(m_properties), [&](const auto &property) {
           return property.hasNumberedPrefixAndValue(prefix, value);
         }
     );
@@ -285,18 +261,14 @@ const std::string *Entity::property(const std::string &key) const {
 }
 
 std::vector<std::string> Entity::propertyKeys() const {
-    return kdl::vec_transform(
-        m_properties, [](const auto &property) { return property.key(); }
-    );
+    return kdl::vec_transform(m_properties, [](const auto &property) { return property.key(); });
 }
 
 const std::string &Entity::classname() const {
     return m_cachedProperties.classname;
 }
 
-void Entity::setClassname(
-    const EntityPropertyConfig &propertyConfig, const std::string &classname
-) {
+void Entity::setClassname(const EntityPropertyConfig &propertyConfig, const std::string &classname) {
     addOrUpdateProperty(propertyConfig, EntityPropertyKeys::Classname, classname);
 }
 
@@ -305,8 +277,7 @@ const vm::vec3 &Entity::origin() const {
 }
 
 void Entity::setOrigin(const EntityPropertyConfig &propertyConfig, const vm::vec3 &origin) {
-    addOrUpdateProperty(
-        propertyConfig, EntityPropertyKeys::Origin, kdl::str_to_string(vm::correct(origin)));
+    addOrUpdateProperty(propertyConfig, EntityPropertyKeys::Origin, kdl::str_to_string(vm::correct(origin)));
 }
 
 const vm::mat4x4 &Entity::rotation() const {
@@ -314,28 +285,21 @@ const vm::mat4x4 &Entity::rotation() const {
 }
 
 std::vector<EntityProperty> Entity::propertiesWithKey(const std::string &key) const {
-    return kdl::vec_filter(
-        m_properties, [&](const auto &property) { return property.hasKey(key); }
-    );
+    return kdl::vec_filter(m_properties, [&](const auto &property) { return property.hasKey(key); });
 }
 
 std::vector<EntityProperty> Entity::propertiesWithPrefix(const std::string &prefix) const {
-    return kdl::vec_filter(
-        m_properties, [&](const auto &property) { return property.hasPrefix(prefix); }
-    );
+    return kdl::vec_filter(m_properties, [&](const auto &property) { return property.hasPrefix(prefix); });
 }
 
 std::vector<EntityProperty> Entity::numberedProperties(const std::string &prefix) const {
-    return kdl::vec_filter(
-        m_properties, [&](const auto &property) {
+    return kdl::vec_filter(m_properties, [&](const auto &property) {
           return property.hasNumberedPrefix(prefix);
         }
     );
 }
 
-void Entity::transform(
-    const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation
-) {
+void Entity::transform(const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation) {
     if (m_pointEntity) {
         const auto offset = definitionBounds().center();
         const auto center = origin() + offset;
@@ -355,9 +319,7 @@ void Entity::transform(
     }
 }
 
-void Entity::applyRotation(
-    const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &rotation
-) {
+void Entity::applyRotation(const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &rotation) {
     if (propertyConfig.updateAnglePropertyAfterTransform) {
         applyEntityRotation(*this, propertyConfig, rotation);
     }
@@ -374,9 +336,7 @@ void Entity::updateCachedProperties(const EntityPropertyConfig &propertyConfig) 
 
     if (const auto *pointDefinition = dynamic_cast<const Assets::PointEntityDefinition *>(m_definition.get())) {
         const auto variableStore = EntityPropertiesVariableStore{*this};
-        const auto scale = Assets::safeGetModelScale(
-            pointDefinition->modelDefinition(), variableStore, propertyConfig.defaultModelScaleExpression
-        );
+        const auto scale = Assets::safeGetModelScale(pointDefinition->modelDefinition(), variableStore, propertyConfig.defaultModelScaleExpression);
         m_cachedProperties.modelTransformation = vm::translation_matrix(origin()) * rotation() * vm::scaling_matrix(scale);
     }
     else {

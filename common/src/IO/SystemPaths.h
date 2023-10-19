@@ -43,7 +43,5 @@ std::filesystem::path findResourceFile(const std::filesystem::path &file);
  * Returns the possible search paths for the requested directory name.
  * They may or may not exist.
  */
-std::vector<std::filesystem::path> findResourceDirectories(
-    const std::filesystem::path &directory
-);
+std::vector<std::filesystem::path> findResourceDirectories(const std::filesystem::path &directory);
 } // namespace TrenchBroom::IO::SystemPaths

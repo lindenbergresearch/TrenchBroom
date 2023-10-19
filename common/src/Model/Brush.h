@@ -84,11 +84,9 @@ public: // face management:
 
     std::optional<size_t> findFace(const vm::plane3 &boundary) const;
 
-    std::optional<size_t> findFace(
-        const vm::polygon3 &vertices, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+    std::optional<size_t> findFace(const vm::polygon3 &vertices, FloatType epsilon = static_cast<FloatType>(0.0)) const;
 
-    std::optional<size_t> findFace(
-        const std::vector<vm::polygon3> &candidates, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+    std::optional<size_t> findFace(const std::vector<vm::polygon3> &candidates, FloatType epsilon = static_cast<FloatType>(0.0)) const;
 
     const BrushFace &face(size_t index) const;
 
@@ -127,9 +125,7 @@ public: // move face along normal
      *
      * @return a void result or an error
      */
-    Result<void> moveBoundary(
-        const vm::bbox3 &worldBounds, size_t faceIndex, const vm::vec3 &delta, bool lockTexture
-    );
+    Result<void> moveBoundary(const vm::bbox3 &worldBounds, size_t faceIndex, const vm::vec3 &delta, bool lockTexture);
 
     /**
      * Moves all faces by `delta` units along their normals; negative values shrink the
@@ -153,26 +149,17 @@ public:
 
     vm::vec3 findClosestVertexPosition(const vm::vec3 &position) const;
 
-    std::vector<vm::vec3> findClosestVertexPositions(
-        const std::vector<vm::vec3> &positions
-    ) const;
+    std::vector<vm::vec3> findClosestVertexPositions(const std::vector<vm::vec3> &positions) const;
 
-    std::vector<vm::segment3> findClosestEdgePositions(
-        const std::vector<vm::segment3> &positions
-    ) const;
+    std::vector<vm::segment3> findClosestEdgePositions(const std::vector<vm::segment3> &positions) const;
 
-    std::vector<vm::polygon3> findClosestFacePositions(
-        const std::vector<vm::polygon3> &positions
-    ) const;
+    std::vector<vm::polygon3> findClosestFacePositions(const std::vector<vm::polygon3> &positions) const;
 
-    bool hasVertex(
-        const vm::vec3 &position, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+    bool hasVertex(const vm::vec3 &position, FloatType epsilon = static_cast<FloatType>(0.0)) const;
 
-    bool hasEdge(
-        const vm::segment3 &edge, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+    bool hasEdge(const vm::segment3 &edge, FloatType epsilon = static_cast<FloatType>(0.0)) const;
 
-    bool hasFace(
-        const vm::polygon3 &face, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+    bool hasFace(const vm::polygon3 &face, FloatType epsilon = static_cast<FloatType>(0.0)) const;
 
     size_t edgeCount() const;
 
@@ -183,49 +170,31 @@ public:
     std::vector<const BrushFace *> incidentFaces(const BrushVertex *vertex) const;
 
     // vertex operations
-    bool canMoveVertices(
-        const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertices, const vm::vec3 &delta
-    ) const;
+    bool canMoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertices, const vm::vec3 &delta) const;
 
-    Result<void> moveVertices(
-        const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, bool uvLock = false
-    );
+    Result<void> moveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, bool uvLock = false);
 
     bool canAddVertex(const vm::bbox3 &worldBounds, const vm::vec3 &position) const;
 
     Result<void> addVertex(const vm::bbox3 &worldBounds, const vm::vec3 &position);
 
-    bool canRemoveVertices(
-        const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions
-    ) const;
+    bool canRemoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions) const;
 
-    Result<void> removeVertices(
-        const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions
-    );
+    Result<void> removeVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions);
 
     bool canSnapVertices(const vm::bbox3 &worldBounds, FloatType snapTo) const;
 
-    Result<void> snapVertices(
-        const vm::bbox3 &worldBounds, FloatType snapTo, bool uvLock = false
-    );
+    Result<void> snapVertices(const vm::bbox3 &worldBounds, FloatType snapTo, bool uvLock = false);
 
     // edge operations
-    bool canMoveEdges(
-        const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::vec3 &delta
-    ) const;
+    bool canMoveEdges(const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::vec3 &delta) const;
 
-    Result<void> moveEdges(
-        const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::vec3 &delta, bool uvLock = false
-    );
+    Result<void> moveEdges(const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::vec3 &delta, bool uvLock = false);
 
     // face operations
-    bool canMoveFaces(
-        const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta
-    ) const;
+    bool canMoveFaces(const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta) const;
 
-    Result<void> moveFaces(
-        const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta, bool uvLock = false
-    );
+    Result<void> moveFaces(const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta, bool uvLock = false);
 
 private:
     struct CanMoveVerticesResult {
@@ -242,13 +211,10 @@ private:
         static CanMoveVerticesResult acceptVertexMove(BrushGeometry &&result);
     };
 
-    CanMoveVerticesResult doCanMoveVertices(
-        const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, vm::vec3 delta, bool allowVertexRemoval
-    ) const;
+    CanMoveVerticesResult
+    doCanMoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, vm::vec3 delta, bool allowVertexRemoval) const;
 
-    Result<void> doMoveVertices(
-        const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, bool lockTexture
-    );
+    Result<void> doMoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, bool lockTexture);
 
     /**
      * Tries to find 3 vertices in `left` and `right` that are related according to the
@@ -261,9 +227,8 @@ private:
      * @return {true, transform} if a transform could be found, otherwise {false,
      * unspecified}
      */
-    static std::tuple<bool, vm::mat4x4> findTransformForUVLock(
-        const PolyhedronMatcher<BrushGeometry> &matcher, BrushFaceGeometry *left, BrushFaceGeometry *right
-    );
+    static std::tuple<bool, vm::mat4x4>
+    findTransformForUVLock(const PolyhedronMatcher<BrushGeometry> &matcher, BrushFaceGeometry *left, BrushFaceGeometry *right);
 
     /**
      * Helper function to apply UV lock to the face `right`.
@@ -284,12 +249,10 @@ private:
      * @param leftFace the face of the left polyhedron
      * @param rightFace the face of the right polyhedron
      */
-    static void applyUVLock(
-        const PolyhedronMatcher<BrushGeometry> &matcher, const BrushFace &leftFace, BrushFace &rightFace
-    );
+    static void applyUVLock(const PolyhedronMatcher<BrushGeometry> &matcher, const BrushFace &leftFace, BrushFace &rightFace);
 
-    Result<void> updateFacesFromGeometry(
-        const vm::bbox3 &worldBounds, const PolyhedronMatcher<BrushGeometry> &matcher, const BrushGeometry &newGeometry, bool uvLock = false
+    Result<void> updateFacesFromGeometry(const vm::bbox3 &worldBounds, const PolyhedronMatcher<BrushGeometry> &matcher, const BrushGeometry &newGeometry,
+        bool uvLock = false
     );
 
 public:
@@ -305,13 +268,11 @@ public:
      * Errors are returned. It's a hint to the user to double check the result, and
      * potentially report a bug.
      */
-    std::vector<Result<Brush>> subtract(
-        MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const std::vector<const Brush *> &subtrahends
-    ) const;
+    std::vector<Result<Brush>>
+    subtract(MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const std::vector<const Brush *> &subtrahends) const;
 
-    std::vector<Result<Brush>> subtract(
-        MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const Brush &subtrahend
-    ) const;
+    std::vector<Result<Brush>>
+    subtract(MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const Brush &subtrahend) const;
 
     /**
      * Intersects this brush with the given brush.
@@ -334,9 +295,7 @@ public:
      * @param lockTextures whether textures should be locked
      * @return a void result or an error if the operation fails
      */
-    Result<void> transform(
-        const vm::bbox3 &worldBounds, const vm::mat4x4 &transformation, bool lockTextures
-    );
+    Result<void> transform(const vm::bbox3 &worldBounds, const vm::mat4x4 &transformation, bool lockTextures);
 
 public:
     bool contains(const vm::bbox3 &bounds) const;
@@ -360,8 +319,8 @@ private:
      * @param subtrahends used as a source of texture alignment only
      * @return the newly created brush
      */
-    Result<Brush> createBrush(
-        MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const BrushGeometry &geometry, const std::vector<const Brush *> &subtrahends
+    Result<Brush> createBrush(MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const BrushGeometry &geometry,
+        const std::vector<const Brush *> &subtrahends
     ) const;
 
 public: // texture format conversion

@@ -182,9 +182,7 @@ public:
      * @param posY the current Y position of the mouse pointer
      * @param scrollDistance the distance by which the mouse wheel was scrolled, in lines
      */
-    MouseEvent(
-        Type type, Button button, WheelAxis wheelAxis, float posX, float posY, float scrollDistance
-    );
+    MouseEvent(Type type, Button button, WheelAxis wheelAxis, float posX, float posY, float scrollDistance);
 
 public:
     /**

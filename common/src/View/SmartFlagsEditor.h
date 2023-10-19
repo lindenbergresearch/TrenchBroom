@@ -47,9 +47,7 @@ private:
     bool m_ignoreUpdates;
 
 public:
-    explicit SmartFlagsEditor(
-        std::weak_ptr<MapDocument> document, QWidget *parent = nullptr
-    );
+    explicit SmartFlagsEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
     void createGui();
@@ -58,13 +56,9 @@ private:
 
     void resetScrollPos();
 
-    void getFlags(
-        const std::vector<Model::EntityNodeBase *> &nodes, QStringList &labels, QStringList &tooltips
-    ) const;
+    void getFlags(const std::vector<Model::EntityNodeBase *> &nodes, QStringList &labels, QStringList &tooltips) const;
 
-    void getFlagValues(
-        const std::vector<Model::EntityNodeBase *> &nodes, int &setFlags, int &mixedFlags
-    ) const;
+    void getFlagValues(const std::vector<Model::EntityNodeBase *> &nodes, int &setFlags, int &mixedFlags) const;
 
     int getFlagValue(const Model::EntityNodeBase *node) const;
 

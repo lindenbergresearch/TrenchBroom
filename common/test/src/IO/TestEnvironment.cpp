@@ -29,13 +29,15 @@
 
 namespace TrenchBroom {
 namespace IO {
-TestEnvironment::TestEnvironment(const std::string &dir, const SetupFunction &setup)
-    : m_sandboxPath{std::filesystem::current_path() / generateUuid()}, m_dir{m_sandboxPath / dir} {
+TestEnvironment::TestEnvironment(const std::string &dir, const SetupFunction &setup) : m_sandboxPath{
+    std::filesystem::current_path() / generateUuid()
+}, m_dir{m_sandboxPath / dir} {
     createTestEnvironment(setup);
 }
 
-TestEnvironment::TestEnvironment(const SetupFunction &setup)
-    : TestEnvironment{Catch::getResultCapture().getCurrentTestName(), setup} {
+TestEnvironment::TestEnvironment(const SetupFunction &setup) : TestEnvironment{
+    Catch::getResultCapture().getCurrentTestName(), setup
+} {
 }
 
 TestEnvironment::~TestEnvironment() {
@@ -56,8 +58,7 @@ void TestEnvironment::createDirectory(const std::filesystem::path &path) {
     std::filesystem::create_directories(m_dir / path);
 }
 
-void TestEnvironment::createFile(
-    const std::filesystem::path &path, const std::string &contents) {
+void TestEnvironment::createFile(const std::filesystem::path &path, const std::string &contents) {
     auto stream = std::ofstream{m_dir / path, std::ios::out};
     stream << contents;
 }

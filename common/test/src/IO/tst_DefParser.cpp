@@ -38,8 +38,7 @@ namespace IO {
 TEST_CASE("DefParserTest.parseIncludedDefFiles")
 {
     const auto basePath = std::filesystem::current_path() / "fixture/games/";
-    const auto cfgFiles =
-        Disk::find(basePath, TraversalMode::Flat, makeExtensionPathMatcher({".def"})).value();
+    const auto cfgFiles = Disk::find(basePath, TraversalMode::Flat, makeExtensionPathMatcher({".def"})).value();
 
     for (const auto &path: cfgFiles) {
         CAPTURE(path);
@@ -74,9 +73,7 @@ TEST_CASE("DefParserTest.parseIncludedDefFiles")
 TEST_CASE("DefParserTest.parseExtraDefFiles")
 {
     const auto basePath = std::filesystem::current_path() / "fixture/test/IO/Def";
-    const auto cfgFiles =
-        Disk::find(basePath, TraversalMode::Recursive, makeExtensionPathMatcher({".def"}))
-            .value();
+    const auto cfgFiles = Disk::find(basePath, TraversalMode::Recursive, makeExtensionPathMatcher({".def"})).value();
 
     for (const auto &path: cfgFiles) {
         auto file = Disk::openFile(path).value();
@@ -187,15 +184,11 @@ TEST_CASE("DefParserTest.parsePointClass")
     CHECK(definition->type() == Assets::EntityDefinitionType::PointEntity);
     CHECK(definition->name() == "monster_zombie");
     CHECK(definition->color() == Color{1.0f, 0.0f, 0.0f, 1.0f});
-    CHECK(
-        definition->description()
-        == R"(If crucified, stick the bounding box 12 pixels back into a wall to look right.)");
+    CHECK(definition->description() == R"(If crucified, stick the bounding box 12 pixels back into a wall to look right.)");
 
-    const auto *pointDefinition =
-        static_cast<const Assets::PointEntityDefinition *>(definition);
-    CHECK(
-        pointDefinition->bounds() == vm::bbox3{{-16.0, -16.0, -24.0},
-                                               {16.0,  16.0,  32.0}});
+    const auto *pointDefinition = static_cast<const Assets::PointEntityDefinition *>(definition);
+    CHECK(pointDefinition->bounds() == vm::bbox3{{-16.0, -16.0, -24.0},
+                                                 {16.0,  16.0,  32.0}});
 
     const auto &properties = definition->propertyDefinitions();
     CHECK(properties.size() == 1u); // spawnflags
@@ -207,12 +200,9 @@ TEST_CASE("DefParserTest.parsePointClass")
     CHECK(spawnflags != nullptr);
     CHECK(spawnflags->defaultValue() == 0);
 
-    CHECK(
-        spawnflags->options()
-        == std::vector<Assets::FlagsPropertyOption>{
-            {1, "Crucified", "", false},
-            {2, "ambush",    "", false},
-        });
+    CHECK(spawnflags->options() == std::vector<Assets::FlagsPropertyOption>{{1, "Crucified", "", false},
+                                                                            {2, "ambush",    "", false},
+    });
 
     kdl::vec_clear_and_delete(definitions);
 }
@@ -236,11 +226,9 @@ TEST_CASE("DefParserTest.parseSpawnflagWithSkip")
     CHECK(definition->color() == Color{0.3f, 0.3f, 1.0f, 1.0f});
     CHECK(definition->description() == "some desc");
 
-    const auto *pointDefinition =
-        static_cast<const Assets::PointEntityDefinition *>(definition);
-    CHECK(
-        pointDefinition->bounds() == vm::bbox3{{-16.0, -16.0, -16.0},
-                                               {16.0,  16.0,  16.0}});
+    const auto *pointDefinition = static_cast<const Assets::PointEntityDefinition *>(definition);
+    CHECK(pointDefinition->bounds() == vm::bbox3{{-16.0, -16.0, -16.0},
+                                                 {16.0,  16.0,  16.0}});
 
     const auto &properties = definition->propertyDefinitions();
     CHECK(properties.size() == 1u); // spawnflags
@@ -252,15 +240,12 @@ TEST_CASE("DefParserTest.parseSpawnflagWithSkip")
     CHECK(spawnflags != nullptr);
     CHECK(spawnflags->defaultValue() == 0);
 
-    CHECK(
-        spawnflags->options()
-        == std::vector<Assets::FlagsPropertyOption>{
-            {1,  "",          "", false},
-            {2,  "SUSPENDED", "", false},
-            {4,  "SPIN",      "", false},
-            {8,  "",          "", false},
-            {16, "RESPAWN",   "", false},
-        });
+    CHECK(spawnflags->options() == std::vector<Assets::FlagsPropertyOption>{{1,  "",          "", false},
+                                                                            {2,  "SUSPENDED", "", false},
+                                                                            {4,  "SPIN",      "", false},
+                                                                            {8,  "",          "", false},
+                                                                            {16, "RESPAWN",   "", false},
+    });
 
     kdl::vec_clear_and_delete(definitions);
 }
@@ -294,14 +279,11 @@ TEST_CASE("DefParserTest.parseBrushEntityWithMissingBBoxAndNoQuestionMark")
     CHECK(spawnflags != nullptr);
     CHECK(spawnflags->defaultValue() == 0);
 
-    CHECK(
-        spawnflags->options()
-        == std::vector<Assets::FlagsPropertyOption>{
-            {1, "SUSPENDED", "", false},
-            {2, "SPIN",      "", false},
-            {4, "",          "", false},
-            {8, "RESPAWN",   "", false},
-        });
+    CHECK(spawnflags->options() == std::vector<Assets::FlagsPropertyOption>{{1, "SUSPENDED", "", false},
+                                                                            {2, "SPIN",      "", false},
+                                                                            {4, "",          "", false},
+                                                                            {8, "RESPAWN",   "", false},
+    });
 
     kdl::vec_clear_and_delete(definitions);
 }
@@ -354,36 +336,28 @@ TEST_CASE("DefParserTest.parsePointClassWithBaseClasses")
     const auto *stylePropertyDefinition = definition->propertyDefinition("style");
     CHECK(stylePropertyDefinition != nullptr);
     CHECK(stylePropertyDefinition->key() == "style");
-    CHECK(
-        stylePropertyDefinition->type() == Assets::PropertyDefinitionType::ChoiceProperty);
+    CHECK(stylePropertyDefinition->type() == Assets::PropertyDefinitionType::ChoiceProperty);
 
-    const auto *spawnflagsPropertyDefinition =
-        definition->propertyDefinition(Model::EntityPropertyKeys::Spawnflags);
+    const auto *spawnflagsPropertyDefinition = definition->propertyDefinition(Model::EntityPropertyKeys::Spawnflags);
     CHECK(spawnflagsPropertyDefinition != nullptr);
     CHECK(spawnflagsPropertyDefinition->key() == Model::EntityPropertyKeys::Spawnflags);
-    CHECK(
-        spawnflagsPropertyDefinition->type()
-        == Assets::PropertyDefinitionType::FlagsProperty);
+    CHECK(spawnflagsPropertyDefinition->type() == Assets::PropertyDefinitionType::FlagsProperty);
 
-    const auto *choice =
-        static_cast<const Assets::ChoicePropertyDefinition *>(stylePropertyDefinition);
+    const auto *choice = static_cast<const Assets::ChoicePropertyDefinition *>(stylePropertyDefinition);
 
-    CHECK(
-        choice->options()
-        == std::vector<Assets::ChoicePropertyOption>{
-            {"0",  "normal"},
-            {"1",  "flicker (first variety)"},
-            {"2",  "slow strong pulse"},
-            {"3",  "candle (first variety)"},
-            {"4",  "fast strobe"},
-            {"5",  "gentle pulse 1"},
-            {"6",  "flicker (second variety)"},
-            {"7",  "candle (second variety)"},
-            {"8",  "candle (third variety)"},
-            {"9",  "slow strobe (fourth variety)"},
-            {"10", "fluorescent flicker"},
-            {"11", "slow pulse not fade to black"},
-        });
+    CHECK(choice->options() == std::vector<Assets::ChoicePropertyOption>{{"0",  "normal"},
+                                                                         {"1",  "flicker (first variety)"},
+                                                                         {"2",  "slow strong pulse"},
+                                                                         {"3",  "candle (first variety)"},
+                                                                         {"4",  "fast strobe"},
+                                                                         {"5",  "gentle pulse 1"},
+                                                                         {"6",  "flicker (second variety)"},
+                                                                         {"7",  "candle (second variety)"},
+                                                                         {"8",  "candle (third variety)"},
+                                                                         {"9",  "slow strobe (fourth variety)"},
+                                                                         {"10", "fluorescent flicker"},
+                                                                         {"11", "slow pulse not fade to black"},
+    });
 
     kdl::vec_clear_and_delete(definitions);
 }
@@ -399,46 +373,40 @@ using Assets::assertModelDefinition;
 
 TEST_CASE("DefParserTest.parseLegacyStaticModelDefinition")
 {
-    static const auto ModelDefinition =
-        R"(":maps/b_shell0.bsp", ":maps/b_shell1.bsp" spawnflags = 1)";
+    static const auto ModelDefinition = R"(":maps/b_shell0.bsp", ":maps/b_shell1.bsp" spawnflags = 1)";
 
-    assertModelDefinition<DefParser>(
-        Assets::ModelSpecification{"maps/b_shell0.bsp", 0, 0},
-        ModelDefinition,
-        DefModelDefinitionTemplate);
-    assertModelDefinition<DefParser>(
-        Assets::ModelSpecification{"maps/b_shell1.bsp", 0, 0},
-        ModelDefinition,
-        DefModelDefinitionTemplate,
-        "{ 'spawnflags': 1 }");
+    assertModelDefinition<DefParser>(Assets::ModelSpecification{
+            "maps/b_shell0.bsp", 0, 0
+        }, ModelDefinition, DefModelDefinitionTemplate
+    );
+    assertModelDefinition<DefParser>(Assets::ModelSpecification{
+            "maps/b_shell1.bsp", 0, 0
+        }, ModelDefinition, DefModelDefinitionTemplate, "{ 'spawnflags': 1 }"
+    );
 }
 
 TEST_CASE("DefParserTest.parseLegacyDynamicModelDefinition")
 {
-    static const auto ModelDefinition =
-        R"(pathKey = "model" skinKey = "skin" frameKey = "frame")";
+    static const auto ModelDefinition = R"(pathKey = "model" skinKey = "skin" frameKey = "frame")";
 
-    assertModelDefinition<DefParser>(
-        Assets::ModelSpecification{"maps/b_shell1.bsp", 0, 0},
-        ModelDefinition,
-        DefModelDefinitionTemplate,
-        "{ 'model': 'maps/b_shell1.bsp' }");
-    assertModelDefinition<DefParser>(
-        Assets::ModelSpecification{"maps/b_shell1.bsp", 1, 2},
-        ModelDefinition,
-        DefModelDefinitionTemplate,
-        "{ 'model': 'maps/b_shell1.bsp', 'skin': 1, 'frame': 2 }");
+    assertModelDefinition<DefParser>(Assets::ModelSpecification{
+            "maps/b_shell1.bsp", 0, 0
+        }, ModelDefinition, DefModelDefinitionTemplate, "{ 'model': 'maps/b_shell1.bsp' }"
+    );
+    assertModelDefinition<DefParser>(Assets::ModelSpecification{
+            "maps/b_shell1.bsp", 1, 2
+        }, ModelDefinition, DefModelDefinitionTemplate, "{ 'model': 'maps/b_shell1.bsp', 'skin': 1, 'frame': 2 }"
+    );
 }
 
 TEST_CASE("DefParserTest.parseELModelDefinition")
 {
-    static const std::string ModelDefinition =
-        R"({{ spawnflags == 1 -> 'maps/b_shell1.bsp', 'maps/b_shell0.bsp' }})";
+    static const std::string ModelDefinition = R"({{ spawnflags == 1 -> 'maps/b_shell1.bsp', 'maps/b_shell0.bsp' }})";
 
-    assertModelDefinition<DefParser>(
-        Assets::ModelSpecification{"maps/b_shell0.bsp", 0, 0},
-        ModelDefinition,
-        DefModelDefinitionTemplate);
+    assertModelDefinition<DefParser>(Assets::ModelSpecification{
+            "maps/b_shell0.bsp", 0, 0
+        }, ModelDefinition, DefModelDefinitionTemplate
+    );
 }
 
 TEST_CASE("DefParserTest.parseInvalidBounds")

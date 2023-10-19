@@ -47,17 +47,11 @@ public:
 
     static EntityDefinitionFileSpec unset();
 
-    friend bool operator<(
-        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs
-    );
+    friend bool operator<(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
 
-    friend bool operator==(
-        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs
-    );
+    friend bool operator==(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
 
-    friend bool operator!=(
-        const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs
-    );
+    friend bool operator!=(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
 
     bool valid() const;
 

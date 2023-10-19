@@ -35,8 +35,9 @@
 #include "View/TitleBar.h"
 
 namespace TrenchBroom::View {
-WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::SplashScreen}
-    , m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
+WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::SplashScreen}, m_recentDocumentListBox{
+    nullptr
+}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
     createGui();
 }
 
@@ -47,16 +48,12 @@ void WelcomeWindow::createGui() {
     m_recentDocumentListBox = new RecentDocumentListBox{};
     m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
     m_recentDocumentListBox->setMaximumWidth(400);
-    m_recentDocumentListBox->setSizePolicy(
-        QSizePolicy::Expanding, QSizePolicy::Expanding
-    );
+    m_recentDocumentListBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    connect(
-        m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument
-    );
+    connect(m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument);
 
     auto panelLayout = new QVBoxLayout;
-    panelLayout->setContentsMargins(0,0,0,0);
+    panelLayout->setContentsMargins(0, 0, 0, 0);
     panelLayout->setSpacing(0);
     panelLayout->addWidget(m_recentDocumentListBox);
 
@@ -103,18 +100,10 @@ QWidget *WelcomeWindow::createAppPanel() {
     m_quitApplicationButton = new QPushButton{"Quit"};
     m_quitApplicationButton->setToolTip("Quit Trenchbroom.");
 
-    connect(
-        m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument
-    );
-    connect(
-        m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument
-    );
-    connect(
-        m_quitApplicationButton, &QPushButton::clicked, this, &WelcomeWindow::quitApplication
-    );
-    connect(
-        m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings
-    );
+    connect(m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument);
+    connect(m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument);
+    connect(m_quitApplicationButton, &QPushButton::clicked, this, &WelcomeWindow::quitApplication);
+    connect(m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings);
 
     auto *buttonLayout = new QHBoxLayout{};
     buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -146,8 +135,8 @@ void WelcomeWindow::createNewDocument() {
 }
 
 void WelcomeWindow::openOtherDocument() {
-    const auto pathStr = QFileDialog::getOpenFileName(
-        nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map), "Map files (*.map);;Any files (*.*)"
+    const auto pathStr = QFileDialog::getOpenFileName(nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map),
+        "Map files (*.map);;Any files (*.*)"
     );
     const auto path = IO::pathFromQString(pathStr);
 

@@ -105,22 +105,18 @@ public:
 
     void customLayer(const Model::LayerNode *layer);
 
-    void group(
-        const Model::GroupNode *group, const std::vector<Model::EntityProperty> &parentProperties
+    void group(const Model::GroupNode *group, const std::vector<Model::EntityProperty> &parentProperties);
+
+    void entity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties,
+        const Model::Node *brushParent
     );
 
-    void entity(
-        const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties, const Model::Node *brushParent
-    );
-
-    void entity(
-        const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties, const std::vector<Model::BrushNode *> &entityBrushes
+    void entity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties,
+        const std::vector<Model::BrushNode *> &entityBrushes
     );
 
 private:
-    void beginEntity(
-        const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &extraAttributes
-    );
+    void beginEntity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &extraAttributes);
 
     void beginEntity(const Model::Node *node);
 

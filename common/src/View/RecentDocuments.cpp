@@ -60,9 +60,13 @@ void saveRecentDocuments(const std::vector<std::filesystem::path> &paths) {
     }
 }
 
-RecentDocuments::RecentDocuments(
-    const size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent
-) : QObject{parent}, m_maxSize{maxSize}, m_filterPredicate{std::move(filterPredicate)} {
+RecentDocuments::RecentDocuments(const size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent) : QObject{parent},
+                                                                                                                                      m_maxSize{maxSize},
+                                                                                                                                      m_filterPredicate{
+                                                                                                                                          std::move(
+                                                                                                                                              filterPredicate
+                                                                                                                                          )
+                                                                                                                                      } {
     assert(m_maxSize > 0);
 }
 
@@ -123,8 +127,7 @@ void RecentDocuments::saveToConfig() {
 }
 
 std::vector<std::filesystem::path> RecentDocuments::updateFilteredDocuments() {
-    return std::exchange(
-        m_filteredDocuments, kdl::vec_filter(m_recentDocuments, m_filterPredicate));
+    return std::exchange(m_filteredDocuments, kdl::vec_filter(m_recentDocuments, m_filterPredicate));
 }
 
 void RecentDocuments::insertPath(const std::filesystem::path &path) {
@@ -153,9 +156,7 @@ void RecentDocuments::clearMenu(QMenu &menu) {
 
 void RecentDocuments::createMenuItems(QMenu &menu) {
     for (const auto &path: m_filteredDocuments) {
-        menu.addAction(
-            IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); }
-        );
+        menu.addAction(IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); });
     }
 }
 } // namespace TrenchBroom::View

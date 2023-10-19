@@ -54,9 +54,7 @@ private:
     using VertexToolBase::findIncidentBrushes;
 
 public:
-    void pick(
-        const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult
-    ) const override;
+    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const override;
 
 public:
     EdgeHandleManager &handleManager() override;
@@ -64,9 +62,7 @@ public:
     const EdgeHandleManager &handleManager() const override;
 
 public:
-    std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(
-        const std::vector<Model::Hit> &hits
-    ) const override;
+    std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const override;
 
     MoveResult move(const vm::vec3 &delta) override;
 

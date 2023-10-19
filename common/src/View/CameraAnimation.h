@@ -45,8 +45,8 @@ private:
     const float m_targetZoom;
 
 public:
-    CameraAnimation(
-        Renderer::Camera &camera, const vm::vec3f &targetPosition, const vm::vec3f &targetDirection, const vm::vec3f &targetUp, float targetZoom, double duration
+    CameraAnimation(Renderer::Camera &camera, const vm::vec3f &targetPosition, const vm::vec3f &targetDirection, const vm::vec3f &targetUp, float targetZoom,
+        double duration
     );
 
 private:

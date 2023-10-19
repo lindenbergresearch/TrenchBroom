@@ -40,8 +40,7 @@ void SignalDelayer::queueSignal() {
 
     m_isQueued = true;
 
-    QTimer::singleShot(
-        0, this, [&]() {
+    QTimer::singleShot(0, this, [&]() {
           m_isQueued = false;
 
           emit processSignal();

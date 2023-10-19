@@ -43,15 +43,11 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     m_table->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
     m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
     m_table->horizontalHeader()->resizeSection(0, 60);
-    m_table->horizontalHeader()->setSectionResizeMode(
-        1, QHeaderView::ResizeMode::ResizeToContents
-    );
+    m_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
     m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
 
     // Tighter than default vertical row height, without the overhead of autoresizing
-    m_table->verticalHeader()->setDefaultSectionSize(
-        m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin
-    );
+    m_table->verticalHeader()->setDefaultSectionSize(m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin);
 
     m_table->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
 
@@ -62,9 +58,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     makeInfo(infoLabel);
 
     auto *infoAndSearchLayout = new QHBoxLayout();
-    infoAndSearchLayout->setContentsMargins(
-        0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin
-    );
+    infoAndSearchLayout->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);
     infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
     infoAndSearchLayout->addWidget(infoLabel, 1);
     infoAndSearchLayout->addWidget(searchBox);
@@ -78,14 +72,12 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
 
     setMinimumSize(900, 550);
 
-    connect(
-        searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
+    connect(searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
           m_proxy->setFilterFixedString(newText);
         }
     );
 
-    connect(
-        m_table, &QTableView::clicked, this, [&](const QModelIndex &index) {
+    connect(m_table, &QTableView::clicked, this, [&](const QModelIndex &index) {
           m_model->pickColor(m_proxy->mapToSource(index));
         }
     );

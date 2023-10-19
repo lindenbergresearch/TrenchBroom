@@ -46,9 +46,7 @@ private:
     std::vector<std::filesystem::path> m_filteredDocuments;
 
 public:
-    RecentDocuments(
-        size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent = nullptr
-    );
+    RecentDocuments(size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent = nullptr);
 
     const std::vector<std::filesystem::path> &recentDocuments() const;
 

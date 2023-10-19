@@ -31,9 +31,7 @@ public:
     };
 
 public:
-    explicit BorderLine(
-        Direction direction = Direction::Horizontal, int thickness = 1, QWidget *parent = nullptr
-    );
+    explicit BorderLine(Direction direction = Direction::Horizontal, int thickness = 1, QWidget *parent = nullptr);
 };
 } // namespace View
 } // namespace TrenchBroom

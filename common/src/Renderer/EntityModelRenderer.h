@@ -59,9 +59,7 @@ private:
     bool m_showHiddenEntities;
 
 public:
-    EntityModelRenderer(
-        Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext
-    );
+    EntityModelRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext);
 
     ~EntityModelRenderer() override;
 

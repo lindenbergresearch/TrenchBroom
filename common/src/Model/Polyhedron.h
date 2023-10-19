@@ -48,13 +48,9 @@ namespace Model {
  */
 template<typename T, typename FP, typename VP>
 struct Polyhedron_GetVertexLink {
-  kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &operator()(
-      Polyhedron_Vertex<T, FP, VP> *vertex
-  ) const;
+  kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &operator()(Polyhedron_Vertex<T, FP, VP> *vertex) const;
 
-  const kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &operator()(
-      const Polyhedron_Vertex<T, FP, VP> *vertex
-  ) const;
+  const kdl::intrusive_circular_link<Polyhedron_Vertex<T, FP, VP>> &operator()(const Polyhedron_Vertex<T, FP, VP> *vertex) const;
 };
 
 /**
@@ -185,8 +181,7 @@ public:
      * @param decimals the number of decimals to retain
      * @param epsilon an epsilon value
      */
-    void correctPosition(
-        const size_t decimals = 0, const T epsilon = vm::constants<T>::correct_epsilon());
+    void correctPosition(const size_t decimals = 0, const T epsilon = vm::constants<T>::correct_epsilon());
 };
 
 /* ====================== Implementation in Polyhedron_Edge.h ====================== */
@@ -197,13 +192,9 @@ public:
  */
 template<typename T, typename FP, typename VP>
 struct Polyhedron_GetEdgeLink {
-  kdl::intrusive_circular_link<Polyhedron_Edge<T, FP, VP>> &operator()(
-      Polyhedron_Edge<T, FP, VP> *edge
-  ) const;
+  kdl::intrusive_circular_link<Polyhedron_Edge<T, FP, VP>> &operator()(Polyhedron_Edge<T, FP, VP> *edge) const;
 
-  const kdl::intrusive_circular_link<Polyhedron_Edge<T, FP, VP>> &operator()(
-      const Polyhedron_Edge<T, FP, VP> *edge
-  ) const;
+  const kdl::intrusive_circular_link<Polyhedron_Edge<T, FP, VP>> &operator()(const Polyhedron_Edge<T, FP, VP> *edge) const;
 };
 
 /**
@@ -360,8 +351,7 @@ public:
      * @return true if this edge has both of the given positions for its first and second
      * vertex and false otherwise
      */
-    bool hasPositions(
-        const vm::vec<T, 3> &position1, const vm::vec<T, 3> &position2, T epsilon = static_cast<T>(0.0)) const;
+    bool hasPositions(const vm::vec<T, 3> &position1, const vm::vec<T, 3> &position2, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Computes the maximum of the minimal distances of each of the positions this edge's
@@ -508,13 +498,9 @@ private:
  */
 template<typename T, typename FP, typename VP>
 struct Polyhedron_GetHalfEdgeLink {
-  kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &operator()(
-      Polyhedron_HalfEdge<T, FP, VP> *halfEdge
-  ) const;
+  kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &operator()(Polyhedron_HalfEdge<T, FP, VP> *halfEdge) const;
 
-  const kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &operator()(
-      const Polyhedron_HalfEdge<T, FP, VP> *halfEdge
-  ) const;
+  const kdl::intrusive_circular_link<Polyhedron_HalfEdge<T, FP, VP>> &operator()(const Polyhedron_HalfEdge<T, FP, VP> *halfEdge) const;
 };
 
 /**
@@ -666,8 +652,7 @@ public:
      * @return true if the given positions match the positions of the origin vertices, and
      * false otherwise
      */
-    bool hasOrigins(
-        const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
+    bool hasOrigins(const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
 
 private:
     /**
@@ -683,9 +668,7 @@ private:
      * @param epsilon value to use for point status checks
      * @return the relative location of the given point and the plane p
      */
-    vm::plane_status pointStatus(
-        const vm::vec<T, 3> &normal, const vm::vec<T, 3> &point, T epsilon
-    ) const;
+    vm::plane_status pointStatus(const vm::vec<T, 3> &normal, const vm::vec<T, 3> &point, T epsilon) const;
 
     /**
      * Determines whether this half edge is colinear to the given half edge, which is
@@ -747,13 +730,9 @@ private:
  */
 template<typename T, typename FP, typename VP>
 struct Polyhedron_GetFaceLink {
-  kdl::intrusive_circular_link<Polyhedron_Face<T, FP, VP>> &operator()(
-      Polyhedron_Face<T, FP, VP> *face
-  ) const;
+  kdl::intrusive_circular_link<Polyhedron_Face<T, FP, VP>> &operator()(Polyhedron_Face<T, FP, VP> *face) const;
 
-  const kdl::intrusive_circular_link<Polyhedron_Face<T, FP, VP>> &operator()(
-      const Polyhedron_Face<T, FP, VP> *face
-  ) const;
+  const kdl::intrusive_circular_link<Polyhedron_Face<T, FP, VP>> &operator()(const Polyhedron_Face<T, FP, VP> *face) const;
 };
 
 /**
@@ -877,8 +856,7 @@ public:
      * @return the half edge whose origin has the given position, or null if no such half
      * edge exists in this face's boundary
      */
-    const HalfEdge *findHalfEdge(
-        const vm::vec<T, 3> &origin, T epsilon = static_cast<T>(0.0)) const;
+    const HalfEdge *findHalfEdge(const vm::vec<T, 3> &origin, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Finds an edge that is adjacent to this face whose first and second vertex have the
@@ -890,8 +868,7 @@ public:
      * @return the edge whose vertices have the given positions, or null if no such edge is
      * adjacent to this face
      */
-    const Edge *findEdge(
-        const vm::vec<T, 3> &first, const vm::vec<T, 3> &second, T epsilon = static_cast<T>(0.0)) const;
+    const Edge *findEdge(const vm::vec<T, 3> &first, const vm::vec<T, 3> &second, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Returns the position of the origin of the first half edge in this face's boundary.
@@ -911,8 +888,7 @@ public:
      * @param epsilon the epsilon value to use for comparison
      * @return true if this face has a vertex with the given position and false otherwise
      */
-    bool hasVertexPosition(
-        const vm::vec<T, 3> &position, T epsilon = static_cast<T>(0.0)) const;
+    bool hasVertexPosition(const vm::vec<T, 3> &position, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Indicates whether this face has the given vertex positions. Thereby, the first given
@@ -923,8 +899,7 @@ public:
      * @param epsilon the epsilon value to use for comparison
      * @return true if this face has the given vertex positions and false otherwise
      */
-    bool hasVertexPositions(
-        const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
+    bool hasVertexPositions(const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Returns the maximum distance between this face's vertices and the given positions.
@@ -942,8 +917,7 @@ public:
      * @param maxDistance the max distance
      * @return the maximum distance as computed
      */
-    T distanceTo(
-        const std::vector<vm::vec<T, 3>> &positions, T maxDistance = std::numeric_limits<T>::max()) const;
+    T distanceTo(const std::vector<vm::vec<T, 3>> &positions, T maxDistance = std::numeric_limits<T>::max()) const;
 
     /**
      * Returns the normal of this face. The normal is computed by finding three non colinear
@@ -1322,8 +1296,7 @@ public: // Accessors
      * @param epsilon the epsilon value to use for comparison
      * @return true if this polyhedron has an edge with the given vertex positions
      */
-    bool hasEdge(
-        const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, T epsilon = static_cast<T>(0.0)) const;
+    bool hasEdge(const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Returns the number of faces of this polyhedron.
@@ -1348,8 +1321,7 @@ public: // Accessors
      * @param epsilon the epsilon value to use for comparison
      * @return true if this polyhedron has a face with the given vertex positions
      */
-    bool hasFace(
-        const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
+    bool hasFace(const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Returns the bounds of this polyhedron.
@@ -1463,8 +1435,7 @@ public: // General purpose methods
      * @return true if any of the given positions has a corresponding vertex of this
      * polyhedron and false otherwise
      */
-    bool hasAnyVertex(
-        const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
+    bool hasAnyVertex(const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Checks whether all of the given positions corresponds to the position of a vertex of
@@ -1475,8 +1446,7 @@ public: // General purpose methods
      * @return true if all of the given positions have a corresponding vertex of this
      * polyhedron and false otherwise
      */
-    bool hasAllVertices(
-        const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
+    bool hasAllVertices(const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Finds a vertex with the given position.
@@ -1486,8 +1456,7 @@ public: // General purpose methods
      * @return a vertex whose position compares equal to the given position or null if no
      * such vertex exists in this polyhedron
      */
-    Vertex *findVertexByPosition(
-        const vm::vec<T, 3> &position, T epsilon = static_cast<T>(0.0)) const;
+    Vertex *findVertexByPosition(const vm::vec<T, 3> &position, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Finds a vertex such that
@@ -1499,8 +1468,7 @@ public: // General purpose methods
      * @param maxDistance the maximum distance at which a vertex is considered
      * @return a vertex or null if no vertex satisfies the criteria listed above
      */
-    Vertex *findClosestVertex(
-        const vm::vec<T, 3> &position, T maxDistance = std::numeric_limits<T>::max()) const;
+    Vertex *findClosestVertex(const vm::vec<T, 3> &position, T maxDistance = std::numeric_limits<T>::max()) const;
 
     /**
      * Finds an edge with the given vertex positions. An edge is considered a match if
@@ -1512,8 +1480,7 @@ public: // General purpose methods
      * @return an edge with the given vertex positions or null if no such edge exists in
      * this polyhedron
      */
-    Edge *findEdgeByPositions(
-        const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, T epsilon = static_cast<T>(0.0)) const;
+    Edge *findEdgeByPositions(const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Finds an edge such that
@@ -1528,8 +1495,7 @@ public: // General purpose methods
      * @param maxDistance the maximum distance at which an edge is considered
      * @return an edge or null if no edge satisfies the criteria listed above
      */
-    Edge *findClosestEdge(
-        const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, T maxDistance = std::numeric_limits<T>::max()) const;
+    Edge *findClosestEdge(const vm::vec<T, 3> &pos1, const vm::vec<T, 3> &pos2, T maxDistance = std::numeric_limits<T>::max()) const;
 
     /**
      * Finds a face with the given vertex positions. A face is considered a match if
@@ -1540,8 +1506,7 @@ public: // General purpose methods
      * @return a face with the given vertex positions or null if no such face exists in this
      * polyhedron
      */
-    Face *findFaceByPositions(
-        const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
+    Face *findFaceByPositions(const std::vector<vm::vec<T, 3>> &positions, T epsilon = static_cast<T>(0.0)) const;
 
     /**
      * Finds a face such that
@@ -1555,8 +1520,7 @@ public: // General purpose methods
      * @param maxDistance the maximum distance at which a face is considered
      * @return a face or null if no face satisfies the criteria listed above
      */
-    Face *findClosestFace(
-        const std::vector<vm::vec<T, 3>> &positions, T maxDistance = std::numeric_limits<T>::max());
+    Face *findClosestFace(const std::vector<vm::vec<T, 3>> &positions, T maxDistance = std::numeric_limits<T>::max());
 
 private:
     /**
@@ -1578,8 +1542,7 @@ public: // Vertex correction and edge healing
      * @param decimals the number of decimals to retain
      * @param epsilon an epsilon value
      */
-    void correctVertexPositions(
-        const size_t decimals = 0, const T epsilon = vm::constants<T>::correct_epsilon());
+    void correctVertexPositions(const size_t decimals = 0, const T epsilon = vm::constants<T>::correct_epsilon());
 
     /**
      * Heals short edges by removing all edges shorter than the given minimum length. If
@@ -1895,9 +1858,7 @@ private:
      */
     std::optional<Seam> createSeamForHorizon(const vm::vec<T, 3> &position, T planeEpsilon);
 
-    void visitFace(
-        const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, T planeEpsilon
-    );
+    void visitFace(const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, T planeEpsilon);
 
     /**
      * Splits this polyhedron along the given seam. The edges of the seam must be oriented
@@ -1991,9 +1952,7 @@ private:
      * @return the components of the newly created cone or an empty optional if the
      * operation fails
      */
-    static std::optional<WeaveConeResult> weaveCone(
-        const Seam &seam, const vm::vec<T, 3> &position
-    );
+    static std::optional<WeaveConeResult> weaveCone(const Seam &seam, const vm::vec<T, 3> &position);
 
     /**
      * Seal this polyhedron with the given cone along the given seam.
@@ -2097,9 +2056,7 @@ private:
      * @return a failure reason if clipping with the given plane would likely fail, or an
      * empty optional otherwise
      */
-    std::optional<typename ClipResult::FailureReason> checkIntersects(
-        const vm::plane<T, 3> &plane
-    ) const;
+    std::optional<typename ClipResult::FailureReason> checkIntersects(const vm::plane<T, 3> &plane) const;
 
     class NoSeamException;
 
@@ -2185,9 +2142,7 @@ private:
      * @return a half edge as specified in the description above and a bool indicating if a
      * face was split, i.e. whether case 3. occurred
      */
-    std::tuple<HalfEdge *, bool> intersectWithPlane(
-        HalfEdge *firstBoundaryEdge, const vm::plane<T, 3> &plane
-    );
+    std::tuple<HalfEdge *, bool> intersectWithPlane(HalfEdge *firstBoundaryEdge, const vm::plane<T, 3> &plane);
 
     /**
      * Splits a face in two, creating a new face and a new edge. Expects that both given
@@ -2247,9 +2202,7 @@ private:
      * @return a half edge that is intersected by the given plane and that is different from
      * the given half edge's twin, or null if no such half edge could be found
      */
-    HalfEdge *findNextIntersectingEdge(
-        HalfEdge *searchFrom, const vm::plane<T, 3> &plane
-    ) const;
+    HalfEdge *findNextIntersectingEdge(HalfEdge *searchFrom, const vm::plane<T, 3> &plane) const;
 
     /* ====================== Implementation in Polyhedron_CSG.h ====================== */
 public: // Intersection
@@ -2351,9 +2304,7 @@ private: // helper functions for all cases of polygon / polygon intersection
 
     static bool polyhedronIntersectsPolygon(const Polyhedron &lhs, const Polyhedron &rhs);
 
-    static bool polyhedronIntersectsPolyhedron(
-        const Polyhedron &lhs, const Polyhedron &rhs
-    );
+    static bool polyhedronIntersectsPolyhedron(const Polyhedron &lhs, const Polyhedron &rhs);
 
     /**
      * Checks whether there is a face among the given faces such that all of the given
@@ -2377,9 +2328,7 @@ private: // helper functions for all cases of polygon / polygon intersection
      * @param vertices the vertices to check
      * @return the relative position of the given points to the given plane
      */
-    static vm::plane_status pointStatus(
-        const vm::plane<T, 3> &plane, const VertexList &vertices
-    );
+    static vm::plane_status pointStatus(const vm::plane<T, 3> &plane, const VertexList &vertices);
 
     /* ====================== Implementation in Polyhedron_Checks.h ======================
      */

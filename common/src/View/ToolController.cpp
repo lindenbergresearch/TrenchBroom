@@ -67,9 +67,7 @@ std::unique_ptr<DragTracker> ToolController::acceptMouseDrag(const InputState &)
 void ToolController::setRenderOptions(const InputState &, Renderer::RenderContext &) const {
 }
 
-void ToolController::render(
-    const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &
-) {
+void ToolController::render(const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) {
 }
 
 bool ToolController::cancel() {
@@ -80,8 +78,7 @@ void ToolController::refreshViews() {
     tool().refreshViews();
 }
 
-std::unique_ptr<DropTracker> ToolController::acceptDrop(
-    const InputState &, const std::string & /* payload */) {
+std::unique_ptr<DropTracker> ToolController::acceptDrop(const InputState &, const std::string & /* payload */) {
     return nullptr;
 }
 
@@ -94,9 +91,7 @@ void ToolControllerGroup::addController(std::unique_ptr<ToolController> controll
     m_chain.append(std::move(controller));
 }
 
-void ToolControllerGroup::pick(
-    const InputState &inputState, Model::PickResult &pickResult
-) {
+void ToolControllerGroup::pick(const InputState &inputState, Model::PickResult &pickResult) {
     m_chain.pick(inputState, pickResult);
 }
 
@@ -128,9 +123,7 @@ void ToolControllerGroup::mouseScroll(const InputState &inputState) {
     m_chain.mouseScroll(inputState);
 }
 
-std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(
-    const InputState &inputState
-) {
+std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(const InputState &inputState) {
     if (!doShouldHandleMouseDrag(inputState)) {
         return nullptr;
     }
@@ -138,24 +131,18 @@ std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(
     return m_chain.startMouseDrag(inputState);
 }
 
-std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(
-    const InputState &inputState, const std::string &payload
-) {
+std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(const InputState &inputState, const std::string &payload) {
     if (!doShouldHandleDrop(inputState, payload)) {
         return nullptr;
     }
     return m_chain.dragEnter(inputState, payload);
 }
 
-void ToolControllerGroup::setRenderOptions(
-    const InputState &inputState, Renderer::RenderContext &renderContext
-) const {
+void ToolControllerGroup::setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const {
     m_chain.setRenderOptions(inputState, renderContext);
 }
 
-void ToolControllerGroup::render(
-    const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-) {
+void ToolControllerGroup::render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     m_chain.render(inputState, renderContext, renderBatch);
 }
 
@@ -167,8 +154,7 @@ bool ToolControllerGroup::doShouldHandleMouseDrag(const InputState &) const {
     return true;
 }
 
-bool ToolControllerGroup::doShouldHandleDrop(
-    const InputState &, const std::string & /* payload */) const {
+bool ToolControllerGroup::doShouldHandleDrop(const InputState &, const std::string & /* payload */) const {
     return true;
 }
 } // namespace View

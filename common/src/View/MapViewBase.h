@@ -128,8 +128,7 @@ private: // shortcuts
     std::vector<std::pair<QShortcut *, const Action *>> m_shortcuts;
 
 protected:
-    MapViewBase(
-        Logger *logger, std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager
+    MapViewBase(Logger *logger, std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager
     );
 
     void setCompass(std::unique_ptr<Renderer::Compass> compass);
@@ -271,9 +270,7 @@ public: // reparenting objects
 
     void mergeSelectedGroups();
 
-    Model::GroupNode *findGroupToMergeGroupsInto(
-        const Model::NodeCollection &selectedNodes
-    ) const;
+    Model::GroupNode *findGroupToMergeGroupsInto(const Model::NodeCollection &selectedNodes) const;
 
     /**
      * Checks whether the given node can be reparented under the given new parent.
@@ -287,13 +284,9 @@ public: // reparenting objects
 
     void moveSelectedBrushesToEntity();
 
-    Model::Node *findNewParentEntityForBrushes(
-        const std::vector<Model::Node *> &nodes
-    ) const;
+    Model::Node *findNewParentEntityForBrushes(const std::vector<Model::Node *> &nodes) const;
 
-    bool canReparentNodes(
-        const std::vector<Model::Node *> &nodes, const Model::Node *newParent
-    ) const;
+    bool canReparentNodes(const std::vector<Model::Node *> &nodes, const Model::Node *newParent) const;
 
     /**
      * Reparents nodes, and deselects everything as a side effect.
@@ -304,21 +297,15 @@ public: // reparenting objects
      * the whole entity and all brushes it contains are also reparented. if false, only the
      * brushes listed in `nodes` are reparented, not any parent entities.
      */
-    void reparentNodes(
-        const std::vector<Model::Node *> &nodes, Model::Node *newParent, bool preserveEntities
-    );
+    void reparentNodes(const std::vector<Model::Node *> &nodes, Model::Node *newParent, bool preserveEntities);
 
-    std::vector<Model::Node *> collectReparentableNodes(
-        const std::vector<Model::Node *> &nodes, const Model::Node *newParent
-    ) const;
+    std::vector<Model::Node *> collectReparentableNodes(const std::vector<Model::Node *> &nodes, const Model::Node *newParent) const;
 
     void createPointEntity();
 
     void createBrushEntity();
 
-    Assets::EntityDefinition *findEntityDefinition(
-        Assets::EntityDefinitionType type, size_t index
-    ) const;
+    Assets::EntityDefinition *findEntityDefinition(Assets::EntityDefinitionType type, size_t index) const;
 
     void createPointEntity(const Assets::PointEntityDefinition *definition);
 
@@ -409,21 +396,13 @@ private: // implement RenderView interface
 
     void setupGL(Renderer::RenderContext &renderContext);
 
-    void renderCoordinateSystem(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderCoordinateSystem(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderSoftMapBounds(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderSoftMapBounds(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderPointFile(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderPointFile(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    void renderPortalFile(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderPortalFile(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
     void invalidatePortalFileRenderer();
 
@@ -431,9 +410,7 @@ private: // implement RenderView interface
 
     void renderCompass(Renderer::RenderBatch &renderBatch);
 
-    void renderFPS(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    void renderFPS(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 public: // implement InputEventProcessor interface
     void processEvent(const KeyEvent &event) override;
@@ -484,25 +461,15 @@ private: // subclassing interface
 
     virtual void doPreRender();
 
-    virtual void doRenderGrid(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) = 0;
+    virtual void doRenderGrid(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) = 0;
 
-    virtual void doRenderMap(
-        Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) = 0;
+    virtual void doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) = 0;
 
-    virtual void doRenderTools(
-        MapViewToolBox &toolBox, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) = 0;
+    virtual void doRenderTools(MapViewToolBox &toolBox, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) = 0;
 
-    virtual void doRenderExtras(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    );
+    virtual void doRenderExtras(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-    virtual void doRenderSoftWorldBounds(
-        Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-    ) = 0;
+    virtual void doRenderSoftWorldBounds(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) = 0;
 
     virtual bool doBeforePopupMenu();
 

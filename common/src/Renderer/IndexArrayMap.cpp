@@ -23,9 +23,9 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-IndexArrayMap::IndexArrayRange::IndexArrayRange(
-    const size_t i_offset, const size_t i_capacity
-) : offset{i_offset}, capacity{i_capacity}, count{0u} {
+IndexArrayMap::IndexArrayRange::IndexArrayRange(const size_t i_offset, const size_t i_capacity) : offset{
+    i_offset
+}, capacity{i_capacity}, count{0u} {
 }
 
 size_t IndexArrayMap::IndexArrayRange::add(const size_t i_count) {
@@ -53,9 +53,7 @@ size_t IndexArrayMap::Size::indexCount() const {
     return m_indexCount;
 }
 
-void IndexArrayMap::Size::initialize(
-    PrimTypeToRangeMap &data, const size_t baseOffset
-) const {
+void IndexArrayMap::Size::initialize(PrimTypeToRangeMap &data, const size_t baseOffset) const {
     auto offset = baseOffset;
     for (const auto &[primType, size]: m_sizes) {
         data.emplace(primType, IndexArrayRange{offset, size});
