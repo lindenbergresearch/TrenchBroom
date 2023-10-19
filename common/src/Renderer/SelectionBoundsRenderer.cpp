@@ -243,7 +243,7 @@ private:
 
 public:
     MinMaxTextAnchor3D(const vm::bbox3 &bounds, const vm::bbox3::Corner minMax, const Renderer::Camera &camera) : m_bounds(bounds), m_minMax(minMax),
-                                                                                                                  m_camera(camera) {
+        m_camera(camera) {
     }
 
 private:

@@ -26,25 +26,13 @@ namespace Renderer {
 RenderContext::RenderContext(const RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager) : m_renderMode(
     renderMode
 ), m_camera(camera), m_transformation(m_camera.projectionMatrix(), m_camera.viewMatrix()), m_fontManager(fontManager), m_shaderManager(shaderManager),
-                                                                                                                                          m_showTextures(true),
-                                                                                                                                          m_showFaces(true),
-                                                                                                                                          m_showEdges(true),
-                                                                                                                                          m_shadeFaces(true),
-                                                                                                                                          m_showPointEntities(
-                                                                                                                                              true
-                                                                                                                                          ),
-                                                                                                                                          m_showPointEntityModels(
-                                                                                                                                              true
-                                                                                                                                          ),
-                                                                                                                                          m_showEntityClassnames(
-                                                                                                                                              true
-                                                                                                                                          ), m_showGroupBounds(
-        true
+    m_showTextures(true), m_showFaces(true), m_showEdges(true), m_shadeFaces(true), m_showPointEntities(true
+    ), m_showPointEntityModels(true
+    ), m_showEntityClassnames(true
+    ), m_showGroupBounds(true
     ), m_showBrushEntityBounds(true), m_showPointEntityBounds(true), m_showFog(false), m_showGrid(true), m_gridSize(4), m_hideSelection(false),
-                                                                                                                                          m_tintSelection(true),
-                                                                                                                                          m_showSelectionGuide(
-                                                                                                                                              ShowSelectionGuide::Hide
-                                                                                                                                          ) {
+    m_tintSelection(true), m_showSelectionGuide(ShowSelectionGuide::Hide
+    ) {
 }
 
 bool RenderContext::render2D() const {

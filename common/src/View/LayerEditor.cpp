@@ -50,8 +50,7 @@
 namespace TrenchBroom {
 namespace View {
 LayerEditor::LayerEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_layerList(nullptr),
-                                                                                 m_addLayerButton(nullptr), m_removeLayerButton(nullptr),
-                                                                                 m_moveLayerUpButton(nullptr), m_moveLayerDownButton(nullptr) {
+    m_addLayerButton(nullptr), m_removeLayerButton(nullptr), m_moveLayerUpButton(nullptr), m_moveLayerDownButton(nullptr) {
     createGui();
 
     updateButtons();

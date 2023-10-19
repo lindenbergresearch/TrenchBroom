@@ -35,7 +35,7 @@
 namespace TrenchBroom {
 namespace Renderer {
 PointHandleRenderer::PointHandleRenderer() : m_handle(pref(Preferences::HandleRadius), 16, true),
-                                             m_highlight(2.0f * pref(Preferences::HandleRadius), 16, false) {
+    m_highlight(2.0f * pref(Preferences::HandleRadius), 16, false) {
 }
 
 void PointHandleRenderer::addPoint(const Color &color, const vm::vec3f &position) {

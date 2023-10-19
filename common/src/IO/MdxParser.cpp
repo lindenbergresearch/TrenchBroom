@@ -108,8 +108,7 @@ const vm::vec3f &MdxParser::MdxFrame::normal(const size_t index) const {
 }
 
 MdxParser::MdxMesh::MdxMesh(const int i_vertexCount) : type(i_vertexCount < 0 ? Fan : Strip),
-                                                       vertexCount(static_cast<size_t>(i_vertexCount < 0 ? -i_vertexCount : i_vertexCount)),
-                                                       vertices(vertexCount) {
+    vertexCount(static_cast<size_t>(i_vertexCount < 0 ? -i_vertexCount : i_vertexCount)), vertices(vertexCount) {
 }
 
 MdxParser::MdxParser(const std::string &name, const Reader &reader, const FileSystem &fs) : m_name(name), m_reader(reader), m_fs(fs) {
@@ -264,8 +263,8 @@ void MdxParser::loadSkins(Assets::EntityModelSurface &surface, const MdxSkinList
     surface.setSkins(std::move(textures));
 }
 
-void MdxParser::buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, const size_t frameIndex, const MdxFrame &frame,
-    const MdxMeshList &meshes
+void
+MdxParser::buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, const size_t frameIndex, const MdxFrame &frame, const MdxMeshList &meshes
 ) {
     size_t vertexCount = 0;
     Renderer::IndexRangeMap::Size size;

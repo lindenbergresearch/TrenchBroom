@@ -38,7 +38,7 @@
 namespace TrenchBroom {
 namespace View {
 SmartChoiceEditor::SmartChoiceEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor(std::move(document), parent),
-                                                                                             m_comboBox(nullptr), m_ignoreEditTextChanged(false) {
+    m_comboBox(nullptr), m_ignoreEditTextChanged(false) {
     createGui();
 }
 

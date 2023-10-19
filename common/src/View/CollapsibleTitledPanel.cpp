@@ -31,7 +31,7 @@ namespace View {
 // CollapsibleTitleBar
 
 CollapsibleTitleBar::CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent) : TitleBar(title, parent),
-                                                                                                            m_stateText(new QLabel(stateText)) {
+    m_stateText(new QLabel(stateText)) {
     m_stateText->setFont(m_titleText->font());
     makeInfo(m_stateText);
 
@@ -47,9 +47,9 @@ void CollapsibleTitleBar::mousePressEvent(QMouseEvent * /* event */) {
 }
 
 // CollapsibleTitledPanel
-CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool initiallyExpanded, QWidget *parent) : QWidget(parent), m_titleBar(
-    new CollapsibleTitleBar(title, "hide")), m_divider(new BorderLine(BorderLine::Direction::Horizontal, 4)), m_panel(new QWidget()),
-                                                                                                                      m_expanded(initiallyExpanded) {
+CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool initiallyExpanded, QWidget *parent) : QWidget(parent),
+    m_titleBar(new CollapsibleTitleBar(title, "hide")), m_divider(new BorderLine(BorderLine::Direction::Horizontal, 4)), m_panel(new QWidget()),
+    m_expanded(initiallyExpanded) {
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);
     sizer->setSpacing(0);

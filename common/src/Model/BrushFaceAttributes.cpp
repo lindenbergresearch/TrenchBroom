@@ -33,21 +33,17 @@ namespace Model {
 const std::string BrushFaceAttributes::NoTextureName = "__TB_empty";
 
 BrushFaceAttributes::BrushFaceAttributes(std::string_view textureName) : m_textureName(textureName), m_offset(vm::vec2f::zero()),
-                                                                         m_scale(vm::vec2f(1.0f, 1.0f)), m_rotation(0.0f) {
+    m_scale(vm::vec2f(1.0f, 1.0f)), m_rotation(0.0f) {
 }
 
 BrushFaceAttributes::BrushFaceAttributes(const BrushFaceAttributes &other) : m_textureName(other.m_textureName), m_offset(other.m_offset),
-                                                                             m_scale(other.m_scale), m_rotation(other.m_rotation),
-                                                                             m_surfaceContents(other.m_surfaceContents), m_surfaceFlags(other.m_surfaceFlags),
-                                                                             m_surfaceValue(other.m_surfaceValue), m_color(other.m_color) {
+    m_scale(other.m_scale), m_rotation(other.m_rotation), m_surfaceContents(other.m_surfaceContents), m_surfaceFlags(other.m_surfaceFlags),
+    m_surfaceValue(other.m_surfaceValue), m_color(other.m_color) {
 }
 
 BrushFaceAttributes::BrushFaceAttributes(std::string_view textureName, const BrushFaceAttributes &other) : m_textureName(textureName), m_offset(other.m_offset),
-                                                                                                           m_scale(other.m_scale), m_rotation(other.m_rotation),
-                                                                                                           m_surfaceContents(other.m_surfaceContents),
-                                                                                                           m_surfaceFlags(other.m_surfaceFlags),
-                                                                                                           m_surfaceValue(other.m_surfaceValue),
-                                                                                                           m_color(other.m_color) {
+    m_scale(other.m_scale), m_rotation(other.m_rotation), m_surfaceContents(other.m_surfaceContents), m_surfaceFlags(other.m_surfaceFlags),
+    m_surfaceValue(other.m_surfaceValue), m_color(other.m_color) {
 }
 
 BrushFaceAttributes &BrushFaceAttributes::operator=(BrushFaceAttributes other) {

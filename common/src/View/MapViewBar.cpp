@@ -33,7 +33,7 @@
 namespace TrenchBroom {
 namespace View {
 MapViewBar::MapViewBar(std::weak_ptr<MapDocument> document, QWidget *parent) : ContainerBar(Sides::BottomSide, parent), m_document(document),
-                                                                               m_toolBook(nullptr), m_viewEditor(nullptr) {
+    m_toolBook(nullptr), m_viewEditor(nullptr) {
     createGui(document);
 }
 

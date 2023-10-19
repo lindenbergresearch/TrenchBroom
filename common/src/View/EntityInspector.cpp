@@ -34,12 +34,8 @@
 namespace TrenchBroom {
 namespace View {
 EntityInspector::EntityInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : TabBookPage(parent),
-                                                                                                                           m_splitter(nullptr),
-                                                                                                                           m_attributeEditor(nullptr),
-                                                                                                                           m_entityBrowser(nullptr),
-                                                                                                                           m_entityDefinitionFileChooser(
-                                                                                                                               nullptr
-                                                                                                                           ) {
+    m_splitter(nullptr), m_attributeEditor(nullptr), m_entityBrowser(nullptr), m_entityDefinitionFileChooser(nullptr
+    ) {
     createGui(std::move(document), contextManager);
 }
 

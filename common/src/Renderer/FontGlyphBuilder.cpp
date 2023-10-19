@@ -29,10 +29,7 @@
 namespace TrenchBroom {
 namespace Renderer {
 FontGlyphBuilder::FontGlyphBuilder(const size_t maxAscend, size_t cellSize, const size_t margin, FontTexture &texture) : m_maxAscend(maxAscend),
-                                                                                                                         m_cellSize(cellSize), m_margin(margin),
-                                                                                                                         m_textureSize(texture.m_size),
-                                                                                                                         m_textureBuffer(texture.m_buffer),
-                                                                                                                         m_x(m_margin), m_y(m_margin) {
+    m_cellSize(cellSize), m_margin(margin), m_textureSize(texture.m_size), m_textureBuffer(texture.m_buffer), m_x(m_margin), m_y(m_margin) {
     ensure(m_textureBuffer != nullptr, "textureBuffer is null");
 }
 

@@ -59,7 +59,7 @@ WorldReaderException::WorldReaderException(const std::vector<std::tuple<Model::M
 
 WorldReader::WorldReader(std::string_view str, const Model::MapFormat sourceAndTargetMapFormat, const Model::EntityPropertyConfig &entityPropertyConfig)
     : MapReader(std::move(str), sourceAndTargetMapFormat, sourceAndTargetMapFormat, entityPropertyConfig, {}),
-      m_world(std::make_unique<Model::WorldNode>(entityPropertyConfig, Model::Entity{}, sourceAndTargetMapFormat)) {
+    m_world(std::make_unique<Model::WorldNode>(entityPropertyConfig, Model::Entity{}, sourceAndTargetMapFormat)) {
     m_world->disableNodeTreeUpdates();
 }
 

@@ -47,7 +47,7 @@ namespace View {
 ActionExecutionContext::ActionExecutionContext(MapFrame *mapFrame, MapViewBase *mapView) : m_actionContext(
     mapView != nullptr ? mapView->actionContext() : ActionContext::Any
 ), // cache here for performance reasons
-                                                                                           m_frame(mapFrame), m_mapView(mapView) {
+    m_frame(mapFrame), m_mapView(mapView) {
     if (m_frame != nullptr) {
         assert(m_mapView != nullptr);
     }

@@ -56,8 +56,7 @@ void ColorButton::setColor(const QColor &color) {
     const auto borderColor = palette().color(QPalette::Active, QPalette::Mid);
     if (color != m_color) {
         m_color = color;
-        m_colorIndicator->setStyleSheet(
-            "QWidget { background-color: " + m_color.name() + "; border-radius: 3px; border: 1px solid " + borderColor.name() + ";}"
+        m_colorIndicator->setStyleSheet("QWidget { background-color: " + m_color.name() + "; border-radius: 3px; border: 1px solid " + borderColor.name() + ";}"
         );
 
         update();

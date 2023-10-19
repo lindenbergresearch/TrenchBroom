@@ -41,8 +41,7 @@ ModelSpecification::ModelSpecification() : path{""}, skinIndex{0}, frameIndex{0}
 }
 
 ModelSpecification::ModelSpecification(const std::filesystem::path &i_path, const size_t i_skinIndex, const size_t i_frameIndex) : path{i_path},
-                                                                                                                                   skinIndex{i_skinIndex},
-                                                                                                                                   frameIndex{i_frameIndex} {
+    skinIndex{i_skinIndex}, frameIndex{i_frameIndex} {
 }
 
 kdl_reflect_impl(ModelSpecification);

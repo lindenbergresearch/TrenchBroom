@@ -71,7 +71,7 @@ std::string CompilationTaskRunner::interpolate(const std::string &spec) {
 }
 
 CompilationExportMapTaskRunner::CompilationExportMapTaskRunner(CompilationContext &context, Model::CompilationExportMap task) : CompilationTaskRunner{context},
-                                                                                                                                m_task{std::move(task)} {
+    m_task{std::move(task)} {
 }
 
 CompilationExportMapTaskRunner::~CompilationExportMapTaskRunner() = default;
@@ -102,7 +102,7 @@ void CompilationExportMapTaskRunner::doExecute() {
 void CompilationExportMapTaskRunner::doTerminate() {}
 
 CompilationCopyFilesTaskRunner::CompilationCopyFilesTaskRunner(CompilationContext &context, Model::CompilationCopyFiles task) : CompilationTaskRunner{context},
-                                                                                                                                m_task{std::move(task)} {
+    m_task{std::move(task)} {
 }
 
 CompilationCopyFilesTaskRunner::~CompilationCopyFilesTaskRunner() = default;
@@ -207,7 +207,7 @@ void CompilationDeleteFilesTaskRunner::doExecute() {
 void CompilationDeleteFilesTaskRunner::doTerminate() {}
 
 CompilationRunToolTaskRunner::CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task) : CompilationTaskRunner{context},
-                                                                                                                          m_task{std::move(task)} {
+    m_task{std::move(task)} {
 }
 
 CompilationRunToolTaskRunner::~CompilationRunToolTaskRunner() = default;
@@ -309,12 +309,10 @@ void CompilationRunToolTaskRunner::processReadyReadStandardOutput() {
 }
 
 CompilationRunner::CompilationRunner(CompilationContext context, const Model::CompilationProfile &profile, QObject *parent) : QObject{parent},
-                                                                                                                              m_context{std::move(context)},
-                                                                                                                              m_taskRunners{
-                                                                                                                                  createTaskRunners(m_context,
-                                                                                                                                      profile
-                                                                                                                                  )
-                                                                                                                              }, m_currentTask{
+    m_context{std::move(context)}, m_taskRunners{
+        createTaskRunners(m_context, profile
+        )
+    }, m_currentTask{
         std::end(m_taskRunners)
     } {
 }

@@ -24,8 +24,8 @@
 
 namespace TrenchBroom {
 namespace View {
-std::unique_ptr<ReparentNodesCommand> ReparentNodesCommand::reparent(std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd,
-    std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove
+std::unique_ptr<ReparentNodesCommand>
+ReparentNodesCommand::reparent(std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove
 ) {
     return std::make_unique<ReparentNodesCommand>(std::move(nodesToAdd), std::move(nodesToRemove));
 }

@@ -29,7 +29,7 @@
 namespace TrenchBroom {
 namespace View {
 TitleBar::TitleBar(const QString &title, QWidget *parent, const int hMargin, const int vMargin, const bool boldTitle, bool subtitle) : QWidget(parent),
-                                                                                                                                       m_titleText(nullptr) {
+    m_titleText(nullptr) {
     m_titleText = new QLabel(title);
     m_titleText->setAlignment(Qt::AlignCenter);
 

@@ -48,7 +48,7 @@ namespace View {
 const Model::HitType::Type ShearObjectsTool::ShearToolSideHitType = Model::HitType::freeType();
 
 ShearObjectsTool::ShearObjectsTool(std::weak_ptr<MapDocument> document) : Tool(false), m_document(std::move(document)), m_resizing(false),
-                                                                          m_constrainVertical(false), m_dragStartHit(Model::Hit::NoHit) {
+    m_constrainVertical(false), m_dragStartHit(Model::Hit::NoHit) {
 }
 
 ShearObjectsTool::~ShearObjectsTool() = default;

@@ -38,7 +38,7 @@ ParallelTexCoordSystemSnapshot::ParallelTexCoordSystemSnapshot(const vm::vec3 &x
 }
 
 ParallelTexCoordSystemSnapshot::ParallelTexCoordSystemSnapshot(const ParallelTexCoordSystem *coordSystem) : m_xAxis(coordSystem->xAxis()),
-                                                                                                            m_yAxis(coordSystem->yAxis()) {
+    m_yAxis(coordSystem->yAxis()) {
 }
 
 std::unique_ptr<TexCoordSystemSnapshot> ParallelTexCoordSystemSnapshot::doClone() const {

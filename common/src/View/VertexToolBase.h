@@ -97,7 +97,7 @@ protected:
 
 protected:
     explicit VertexToolBase(std::weak_ptr<MapDocument> document) : Tool(false), m_document(std::move(document)), m_changeCount(0),
-                                                                   m_ignoreChangeNotifications(0u), m_dragging(false) {
+        m_ignoreChangeNotifications(0u), m_dragging(false) {
     }
 
 public:

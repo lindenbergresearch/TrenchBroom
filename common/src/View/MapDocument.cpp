@@ -240,8 +240,7 @@ static std::optional<std::vector<std::pair<Model::Node *, Model::NodeContents>>>
  */
 template<typename N, typename L>
 static bool
-applyAndSwap(MapDocument &document, const std::string &commandName, const std::vector<N *> &nodes, std::vector<Model::GroupNode *> changedLinkedGroups,
-    L lambda
+applyAndSwap(MapDocument &document, const std::string &commandName, const std::vector<N *> &nodes, std::vector<Model::GroupNode *> changedLinkedGroups, L lambda
 ) {
     if (nodes.empty()) {
         return true;
@@ -314,13 +313,13 @@ const vm::bbox3 MapDocument::DefaultWorldBounds(-32768.0, 32768.0);
 const std::string MapDocument::DefaultDocumentName("unnamed.map");
 
 MapDocument::MapDocument() : m_worldBounds(DefaultWorldBounds), m_world(nullptr),
-                             m_entityDefinitionManager(std::make_unique<Assets::EntityDefinitionManager>()), m_entityModelManager(
-        std::make_unique<Assets::EntityModelManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())), m_textureManager(
-        std::make_unique<Assets::TextureManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())),
-                             m_tagManager(std::make_unique<Model::TagManager>()), m_editorContext(std::make_unique<Model::EditorContext>()),
-                             m_grid(std::make_unique<Grid>(4)), m_path(DefaultDocumentName), m_lastSaveModificationCount(0), m_modificationCount(0),
-                             m_currentLayer(nullptr), m_currentTextureName(Model::BrushFaceAttributes::NoTextureName), m_lastSelectionBounds(0.0, 32.0),
-                             m_selectionBoundsValid(true), m_viewEffectsService(nullptr), m_repeatStack(std::make_unique<RepeatStack>()) {
+    m_entityDefinitionManager(std::make_unique<Assets::EntityDefinitionManager>()),
+    m_entityModelManager(std::make_unique<Assets::EntityModelManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())),
+    m_textureManager(std::make_unique<Assets::TextureManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())),
+    m_tagManager(std::make_unique<Model::TagManager>()), m_editorContext(std::make_unique<Model::EditorContext>()), m_grid(std::make_unique<Grid>(4)),
+    m_path(DefaultDocumentName), m_lastSaveModificationCount(0), m_modificationCount(0), m_currentLayer(nullptr),
+    m_currentTextureName(Model::BrushFaceAttributes::NoTextureName), m_lastSelectionBounds(0.0, 32.0), m_selectionBoundsValid(true),
+    m_viewEffectsService(nullptr), m_repeatStack(std::make_unique<RepeatStack>()) {
     connectObservers();
 }
 
@@ -492,8 +491,8 @@ Result<void> MapDocument::newDocument(const Model::MapFormat mapFormat, const vm
     );
 }
 
-Result<void> MapDocument::loadDocument(const Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game,
-    const std::filesystem::path &path
+Result<void>
+MapDocument::loadDocument(const Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path
 ) {
     info("Loading document from " + path.string());
 
@@ -1380,8 +1379,7 @@ bool MapDocument::reparentNodes(const std::map<Model::Node *, std::vector<Model:
     for (auto &[newParent, nodes]: nodesToAdd) {
         auto *newParentLayer = Model::findContainingLayer(newParent);
 
-        const auto nodesToDowngrade = kdl::vec_filter(Model::collectNodes(nodes),
-            [&](auto *node) { return Model::findContainingLayer(node) != newParentLayer; }
+        const auto nodesToDowngrade = kdl::vec_filter(Model::collectNodes(nodes), [&](auto *node) { return Model::findContainingLayer(node) != newParentLayer; }
         );
 
         downgradeUnlockedToInherit(nodesToDowngrade);
@@ -1965,7 +1963,7 @@ bool MapDocument::moveLayerByOne(Model::LayerNode *layerNode, MoveDirection dire
     layer.setSortIndex(neighbourSortIndex);
     neighbourLayer.setSortIndex(layerSortIndex);
 
-    swapNodeContents("Swap Layer Positions", {{layerNode, Model::NodeContents(std::move(layer))},
+    swapNodeContents("Swap Layer Positions", {{layerNode,     Model::NodeContents(std::move(layer))},
                                               {neighbourNode, Model::NodeContents(std::move(neighbourLayer))}}, {}
     );
 

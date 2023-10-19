@@ -146,9 +146,9 @@ private:
 
 public:
     SetBrushFaceAttributesDragTracker(MapDocument &document, Model::BrushFaceHandle initialSelectedFaceHandle) : m_document{document},
-                                                                                                                 m_initialSelectedFaceHandle{
-                                                                                                                     std::move(initialSelectedFaceHandle)
-                                                                                                                 } {
+        m_initialSelectedFaceHandle{
+            std::move(initialSelectedFaceHandle)
+        } {
     }
 
     bool drag(const InputState &inputState) {

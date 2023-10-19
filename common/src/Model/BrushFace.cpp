@@ -61,17 +61,13 @@ const BrushEdge *BrushFace::TransformHalfEdgeToEdge::operator()(const BrushHalfE
 }
 
 BrushFace::BrushFace(const BrushFace &other) : Taggable(other), m_points(other.m_points), m_boundary(other.m_boundary), m_attributes(other.m_attributes),
-                                               m_textureReference(other.m_textureReference),
-                                               m_texCoordSystem(other.m_texCoordSystem ? other.m_texCoordSystem->clone() : nullptr), m_geometry(nullptr),
-                                               m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount), m_selected(other.m_selected),
-                                               m_markedToRenderFace(false) {
+    m_textureReference(other.m_textureReference), m_texCoordSystem(other.m_texCoordSystem ? other.m_texCoordSystem->clone() : nullptr), m_geometry(nullptr),
+    m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount), m_selected(other.m_selected), m_markedToRenderFace(false) {
 }
 
 BrushFace::BrushFace(BrushFace &&other) noexcept: Taggable(other), m_points(std::move(other.m_points)), m_boundary(std::move(other.m_boundary)),
-                                                  m_attributes(std::move(other.m_attributes)), m_textureReference(std::move(other.m_textureReference)),
-                                                  m_texCoordSystem(std::move(other.m_texCoordSystem)), m_geometry(other.m_geometry),
-                                                  m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount), m_selected(other.m_selected),
-                                                  m_markedToRenderFace(false) {
+    m_attributes(std::move(other.m_attributes)), m_textureReference(std::move(other.m_textureReference)), m_texCoordSystem(std::move(other.m_texCoordSystem)),
+    m_geometry(other.m_geometry), m_lineNumber(other.m_lineNumber), m_lineCount(other.m_lineCount), m_selected(other.m_selected), m_markedToRenderFace(false) {
 }
 
 BrushFace &BrushFace::operator=(BrushFace other) noexcept {

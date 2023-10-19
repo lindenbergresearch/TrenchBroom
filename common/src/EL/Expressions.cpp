@@ -389,8 +389,7 @@ void UnaryExpression::appendToStream(std::ostream &str) const {
 }
 
 BinaryExpression::BinaryExpression(const BinaryOperator i_operator, Expression leftOperand, Expression rightOperand) : m_operator{i_operator},
-                                                                                                                       m_leftOperand{std::move(leftOperand)},
-                                                                                                                       m_rightOperand{std::move(rightOperand)} {
+    m_leftOperand{std::move(leftOperand)}, m_rightOperand{std::move(rightOperand)} {
 }
 
 Expression BinaryExpression::createAutoRangeWithRightOperand(Expression rightOperand, const size_t line, const size_t column) {

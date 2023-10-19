@@ -135,7 +135,7 @@ FgdTokenizer::Token FgdTokenizer::emitToken() {
 }
 
 FgdParser::FgdParser(std::string_view str, const Color &defaultEntityColor, const std::filesystem::path &path) : EntityDefinitionParser{defaultEntityColor},
-                                                                                                                 m_tokenizer{FgdTokenizer{std::move(str)}} {
+    m_tokenizer{FgdTokenizer{std::move(str)}} {
     if (!path.empty() && path.is_absolute()) {
         m_fs = std::make_unique<DiskFileSystem>(path.parent_path());
         pushIncludePath(path.filename());

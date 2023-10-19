@@ -448,9 +448,8 @@ vm::bbox3 moveBBoxForHit(const vm::bbox3 &bboxAtDragStart, const Model::Hit &dra
 // ScaleObjectsTool
 
 ScaleObjectsTool::ScaleObjectsTool(std::weak_ptr<MapDocument> document) : Tool(false), m_document(std::move(document)), m_toolPage(nullptr), m_resizing(false),
-                                                                          m_anchorPos(AnchorPos::Opposite), m_bboxAtDragStart(),
-                                                                          m_dragStartHit(Model::Hit::NoHit), m_dragCumulativeDelta(vm::vec3::zero()),
-                                                                          m_proportionalAxes(ProportionalAxes::None()) {
+    m_anchorPos(AnchorPos::Opposite), m_bboxAtDragStart(), m_dragStartHit(Model::Hit::NoHit), m_dragCumulativeDelta(vm::vec3::zero()),
+    m_proportionalAxes(ProportionalAxes::None()) {
 }
 
 ScaleObjectsTool::~ScaleObjectsTool() = default;

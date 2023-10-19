@@ -75,7 +75,7 @@ static const size_t ModelFaceIndex = 0x38;
 } // namespace BspLayout
 
 Bsp29Parser::Bsp29Parser(std::string name, const Reader &reader, Assets::Palette palette, const FileSystem &fs) : m_name{std::move(name)}, m_reader{reader},
-                                                                                                                  m_palette{std::move(palette)}, m_fs{fs} {
+    m_palette{std::move(palette)}, m_fs{fs} {
 }
 
 bool Bsp29Parser::canParse(const std::filesystem::path &path, Reader reader) {

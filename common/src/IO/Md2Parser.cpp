@@ -109,12 +109,11 @@ const vm::vec3f &Md2Parser::Md2Frame::normal(const size_t index) const {
 }
 
 Md2Parser::Md2Mesh::Md2Mesh(const int i_vertexCount) : type(i_vertexCount < 0 ? Fan : Strip),
-                                                       vertexCount(static_cast<size_t>(i_vertexCount < 0 ? -i_vertexCount : i_vertexCount)),
-                                                       vertices(vertexCount) {
+    vertexCount(static_cast<size_t>(i_vertexCount < 0 ? -i_vertexCount : i_vertexCount)), vertices(vertexCount) {
 }
 
 Md2Parser::Md2Parser(const std::string &name, const Reader &reader, const Assets::Palette &palette, const FileSystem &fs) : m_name(name), m_reader(reader),
-                                                                                                                            m_palette(palette), m_fs(fs) {
+    m_palette(palette), m_fs(fs) {
 }
 
 bool Md2Parser::canParse(const std::filesystem::path &path, Reader reader) {
@@ -256,8 +255,8 @@ void Md2Parser::loadSkins(Assets::EntityModelSurface &surface, const Md2SkinList
     surface.setSkins(std::move(textures));
 }
 
-void Md2Parser::buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, const size_t frameIndex, const Md2Frame &frame,
-    const Md2MeshList &meshes
+void
+Md2Parser::buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, const size_t frameIndex, const Md2Frame &frame, const Md2MeshList &meshes
 ) {
     size_t vertexCount = 0;
     Renderer::IndexRangeMap::Size size;

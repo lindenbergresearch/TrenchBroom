@@ -55,7 +55,7 @@ Polyhedron_Face<T, FP, VP>::Polyhedron_Face(HalfEdgeList &&boundary, const vm::p
       m_link(this)
 #pragma warning(pop)
 #else
-      m_link(this)
+    m_link(this)
 #endif
 {
     assert(m_boundary.size() >= 3);

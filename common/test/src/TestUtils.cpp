@@ -381,8 +381,8 @@ int getComponentOfPixel(const Assets::Texture &texture, const std::size_t x, con
         mip0Data[(texture.width() * 4u * y) + (x * 4u) + componentIndex]);
 }
 
-void checkColor(const Assets::Texture &texture, const std::size_t x, const std::size_t y, const int r, const int g, const int b, const int a,
-    const ColorMatch match
+void
+checkColor(const Assets::Texture &texture, const std::size_t x, const std::size_t y, const int r, const int g, const int b, const int a, const ColorMatch match
 ) {
 
     const auto actualR = getComponentOfPixel(texture, x, y, Component::R);

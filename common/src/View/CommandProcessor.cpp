@@ -126,9 +126,9 @@ private:
 };
 
 CommandProcessor::CommandProcessor(MapDocumentCommandFacade *document, const std::chrono::milliseconds collationInterval) : m_document{document},
-                                                                                                                            m_collationInterval{
-                                                                                                                                collationInterval
-                                                                                                                            }, m_lastCommandTimestamp{
+    m_collationInterval{
+        collationInterval
+    }, m_lastCommandTimestamp{
         std::chrono::time_point<std::chrono::system_clock>{}} {
 }
 

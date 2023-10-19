@@ -51,7 +51,7 @@ Polyhedron_Edge<T, FP, VP>::Polyhedron_Edge(HalfEdge *first, HalfEdge *second)
       m_link(this)
 #pragma warning(pop)
 #else
-      m_link(this)
+    m_link(this)
 #endif
 {
     assert(m_first != nullptr);

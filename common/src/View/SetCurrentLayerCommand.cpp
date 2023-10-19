@@ -28,7 +28,7 @@ std::unique_ptr<SetCurrentLayerCommand> SetCurrentLayerCommand::set(Model::Layer
 }
 
 SetCurrentLayerCommand::SetCurrentLayerCommand(Model::LayerNode *layer) : UndoableCommand("Set Current Layer", false), m_currentLayer(layer),
-                                                                          m_oldCurrentLayer(nullptr) {
+    m_oldCurrentLayer(nullptr) {
 }
 
 std::unique_ptr<CommandResult> SetCurrentLayerCommand::doPerformDo(MapDocumentCommandFacade *document) {

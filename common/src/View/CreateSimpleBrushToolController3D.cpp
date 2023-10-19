@@ -45,7 +45,7 @@
 namespace TrenchBroom {
 namespace View {
 CreateSimpleBrushToolController3D::CreateSimpleBrushToolController3D(CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document) : m_tool{tool},
-                                                                                                                                         m_document{document} {
+    m_document{document} {
 }
 
 Tool &CreateSimpleBrushToolController3D::tool() {
@@ -109,8 +109,8 @@ public:
     }
 
 private:
-    bool updateBounds(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &lastHandlePosition,
-        const vm::vec3 &currentHandlePosition
+    bool
+    updateBounds(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &lastHandlePosition, const vm::vec3 &currentHandlePosition
     ) {
         const auto lastBounds = makeBounds(inputState, initialHandlePosition, lastHandlePosition);
         const auto currentBounds = makeBounds(inputState, initialHandlePosition, currentHandlePosition);

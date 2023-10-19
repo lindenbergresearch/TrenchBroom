@@ -48,7 +48,7 @@
 namespace TrenchBroom {
 namespace View {
 ModEditor::ModEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_availableModList(nullptr),
-                                                                             m_enabledModList(nullptr), m_filterBox(nullptr) {
+    m_enabledModList(nullptr), m_filterBox(nullptr) {
     createGui();
     connectObservers();
 }

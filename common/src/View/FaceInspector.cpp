@@ -42,7 +42,7 @@
 
 namespace TrenchBroom::View {
 FaceInspector::FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : TabBookPage{parent},
-                                                                                                                       m_document{std::move(document)} {
+    m_document{std::move(document)} {
     createGui(m_document, contextManager);
 }
 

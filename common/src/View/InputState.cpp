@@ -31,15 +31,14 @@
 namespace TrenchBroom {
 namespace View {
 InputState::InputState() : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(0.0f), m_mouseY(0.0f), m_mouseDX(0.0f),
-                           m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
+    m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
     const QPoint mouseState = QCursor::pos();
     m_mouseX = static_cast<float>(mouseState.x());
     m_mouseY = static_cast<float>(mouseState.y());
 }
 
 InputState::InputState(const float mouseX, const float mouseY) : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(mouseX),
-                                                                 m_mouseY(mouseY), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f),
-                                                                 m_anyToolDragging(false) {
+    m_mouseY(mouseY), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
 }
 
 InputState::~InputState() {}

@@ -60,7 +60,7 @@ std::ostream &operator<<(std::ostream &str, const TagAttribute &attr) {
 }
 
 Tag::Tag(const size_t index, const std::string &name, std::vector<TagAttribute> attributes) : m_index(index), m_name(name),
-                                                                                              m_attributes(std::move(attributes)) {
+    m_attributes(std::move(attributes)) {
 }
 
 Tag::Tag(const std::string &name, std::vector<TagAttribute> attributes) : Tag(0, name, std::move(attributes)) {
@@ -253,7 +253,7 @@ std::ostream &operator<<(std::ostream &str, const TagMatcher &matcher) {
 }
 
 SmartTag::SmartTag(const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher) : Tag(name, std::move(attributes)),
-                                                                                                                         m_matcher(std::move(matcher)) {
+    m_matcher(std::move(matcher)) {
 }
 
 SmartTag::SmartTag(const SmartTag &other) : Tag(other.m_index, other.m_name, other.m_attributes), m_matcher(other.m_matcher->clone()) {

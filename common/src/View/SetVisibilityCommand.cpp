@@ -44,7 +44,7 @@ std::unique_ptr<SetVisibilityCommand> SetVisibilityCommand::reset(std::vector<Mo
 }
 
 SetVisibilityCommand::SetVisibilityCommand(std::vector<Model::Node *> nodes, const Action action) : UndoableCommand(makeName(action), false),
-                                                                                                    m_nodes{std::move(nodes)}, m_action{action} {
+    m_nodes{std::move(nodes)}, m_action{action} {
 }
 
 std::string SetVisibilityCommand::makeName(const Action action) {

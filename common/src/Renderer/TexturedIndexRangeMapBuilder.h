@@ -60,7 +60,7 @@ public:
      * @param indexRangeSize the size of the index range map to expect
      */
     TexturedIndexRangeMapBuilder(const size_t vertexCount, const TexturedIndexRangeMap::Size &indexRangeSize) : m_vertexListBuilder(vertexCount),
-                                                                                                                m_indexRange(indexRangeSize) {
+        m_indexRange(indexRangeSize) {
     }
 
     /**

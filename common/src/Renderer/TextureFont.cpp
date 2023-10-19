@@ -101,9 +101,7 @@ private:
 
 public:
     MakeQuads(const TextureFont &font, const bool clockwise, const vm::vec2f &offset, const std::vector<vm::vec2f> &sizes) : m_font(font),
-                                                                                                                             m_clockwise(clockwise),
-                                                                                                                             m_offset(offset), m_sizes(sizes),
-                                                                                                                             m_index(0), m_y(0.0f) {
+        m_clockwise(clockwise), m_offset(offset), m_sizes(sizes), m_index(0), m_y(0.0f) {
         for (size_t i = 0; i < m_sizes.size(); ++i) {
             m_maxSize = max(m_maxSize, m_sizes[i]);
             m_y += m_sizes[i].y();

@@ -96,11 +96,10 @@ private:
 
 public:
     RotateObjectsDragDelegate(RotateObjectsTool &tool, const RotateObjectsHandle::HitArea area, RenderHighlight renderHighlight) : m_tool{tool}, m_area{area},
-                                                                                                                                   m_renderHighlight{
-                                                                                                                                       std::move(
-                                                                                                                                           renderHighlight
-                                                                                                                                       )
-                                                                                                                                   } {
+        m_renderHighlight{
+            std::move(renderHighlight
+            )
+        } {
     }
 
     HandlePositionProposer start(const InputState &inputState, const vm::vec3 & /* initialHandlePosition */, const vm::vec3 &handleOffset) override {

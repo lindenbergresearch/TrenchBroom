@@ -46,7 +46,7 @@ Polyhedron_HalfEdge<T, FP, VP>::Polyhedron_HalfEdge(Vertex *origin)
       m_link(this)
 #pragma warning(pop)
 #else
-      m_link(this)
+    m_link(this)
 #endif
 {
     assert(m_origin != nullptr);

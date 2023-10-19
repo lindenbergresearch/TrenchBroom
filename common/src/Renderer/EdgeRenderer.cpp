@@ -38,16 +38,13 @@ EdgeRenderer::Params::Params(const float i_width, const double i_offset, const b
 }
 
 EdgeRenderer::Params::Params(const float i_width, const double i_offset, const bool i_onTop, const Color &i_color) : width{i_width}, offset{i_offset},
-                                                                                                                     onTop{i_onTop}, useColor{true},
-                                                                                                                     color{i_color} {
+    onTop{i_onTop}, useColor{true}, color{i_color} {
 }
 
 EdgeRenderer::Params::Params(const float i_width, const double i_offset, const bool i_onTop, const bool i_useColor, const Color &i_color) : width{i_width},
-                                                                                                                                            offset{i_offset},
-                                                                                                                                            onTop{i_onTop},
-                                                                                                                                            useColor{
-                                                                                                                                                i_useColor
-                                                                                                                                            }, color{i_color} {
+    offset{i_offset}, onTop{i_onTop}, useColor{
+        i_useColor
+    }, color{i_color} {
 }
 
 EdgeRenderer::RenderBase::RenderBase(const Params &params) : m_params{params} {
@@ -126,8 +123,7 @@ void EdgeRenderer::render(RenderBatch &renderBatch, const bool useColor, const C
 }
 
 DirectEdgeRenderer::Render::Render(const EdgeRenderer::Params &params, VertexArray &vertexArray, IndexRangeMap &indexRanges) : RenderBase{params},
-                                                                                                                               m_vertexArray{vertexArray},
-                                                                                                                               m_indexRanges{indexRanges} {
+    m_vertexArray{vertexArray}, m_indexRanges{indexRanges} {
 }
 
 void DirectEdgeRenderer::Render::doPrepareVertices(VboManager &vboManager) {

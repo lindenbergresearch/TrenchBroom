@@ -66,7 +66,7 @@ void CellView::validate() {
 }
 
 CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar) : RenderView(contextManager), m_layoutInitialized(false), m_valid(false),
-                                                                              m_scrollBar(scrollBar) {
+    m_scrollBar(scrollBar) {
     if (m_scrollBar != nullptr) {
         connect(m_scrollBar, &QAbstractSlider::actionTriggered, this, &CellView::onScrollBarActionTriggered);
         connect(m_scrollBar, &QAbstractSlider::valueChanged, this, &CellView::onScrollBarValueChanged);

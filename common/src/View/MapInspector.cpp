@@ -125,12 +125,8 @@ CollapsibleTitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument>
 // MapPropertiesEditor
 
 MapPropertiesEditor::MapPropertiesEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_updatingGui(false),
-                                                                                                 m_softBoundsDisabled(nullptr), m_softBoundsFromGame(nullptr),
-                                                                                                 m_softBoundsFromGameMinLabel(nullptr),
-                                                                                                 m_softBoundsFromGameMaxLabel(nullptr),
-                                                                                                 m_softBoundsFromMap(nullptr),
-                                                                                                 m_softBoundsFromMapMinEdit(nullptr),
-                                                                                                 m_softBoundsFromMapMaxEdit(nullptr) {
+    m_softBoundsDisabled(nullptr), m_softBoundsFromGame(nullptr), m_softBoundsFromGameMinLabel(nullptr), m_softBoundsFromGameMaxLabel(nullptr),
+    m_softBoundsFromMap(nullptr), m_softBoundsFromMapMinEdit(nullptr), m_softBoundsFromMapMaxEdit(nullptr) {
     createGui();
     connectObservers();
 }

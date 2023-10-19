@@ -275,8 +275,7 @@ public:
      * @param destination the destination polyhedron that will become a copy
      * @param callback the callback to call for every created face or vertex             *
      */
-    Copy(const FaceList &originalFaces, const EdgeList &originalEdges, const VertexList &originalVertices, Polyhedron &destination,
-        const CopyCallback &callback
+    Copy(const FaceList &originalFaces, const EdgeList &originalEdges, const VertexList &originalVertices, Polyhedron &destination, const CopyCallback &callback
     ) : m_destination(destination) {
         copyVertices(originalVertices, callback);
         copyFaces(originalFaces, callback);

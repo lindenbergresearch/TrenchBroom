@@ -35,11 +35,10 @@
 namespace TrenchBroom {
 namespace View {
 CompilationProfileManager::CompilationProfileManager(std::weak_ptr<MapDocument> document, Model::CompilationConfig config, QWidget *parent) : QWidget{parent},
-                                                                                                                                              m_config{
-                                                                                                                                                  std::move(
-                                                                                                                                                      config
-                                                                                                                                                  )
-                                                                                                                                              } {
+    m_config{
+        std::move(config
+        )
+    } {
     setBaseWindowColor(this);
 
     auto *listPanel = new TitledPanel{"Profiles"};

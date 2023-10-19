@@ -43,7 +43,7 @@
 namespace TrenchBroom {
 namespace IO {
 EntParser::EntParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser(defaultEntityColor), m_begin(str.data()),
-                                                                              m_end(str.data() + str.size()) {
+    m_end(str.data() + str.size()) {
 }
 
 std::vector<EntityDefinitionClassInfo> EntParser::parseClassInfos(ParserStatus &status) {

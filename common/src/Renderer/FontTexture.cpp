@@ -32,7 +32,7 @@ FontTexture::FontTexture() : m_size(0), m_buffer(nullptr), m_textureId(0) {
 }
 
 FontTexture::FontTexture(const size_t cellCount, const size_t cellSize, const size_t margin) : m_size(computeTextureSize(cellCount, cellSize, margin)),
-                                                                                               m_buffer(nullptr), m_textureId(0) {
+    m_buffer(nullptr), m_textureId(0) {
     m_buffer = new char[m_size * m_size];
     std::memset(m_buffer, 0, m_size * m_size);
 }
@@ -73,9 +73,9 @@ void FontTexture::activate() {
         glAssert(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         glAssert(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         glAssert(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        glAssert(glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, static_cast<GLsizei>(m_size), static_cast<GLsizei>(m_size), 0, GL_LUMINANCE, GL_UNSIGNED_BYTE,
-            m_buffer
-        ));
+        glAssert(
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, static_cast<GLsizei>(m_size), static_cast<GLsizei>(m_size), 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, m_buffer
+            ));
         delete[] m_buffer;
         m_buffer = nullptr;
     }

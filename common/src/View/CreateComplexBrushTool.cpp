@@ -35,7 +35,7 @@
 namespace TrenchBroom {
 namespace View {
 CreateComplexBrushTool::CreateComplexBrushTool(std::weak_ptr<MapDocument> document) : CreateBrushToolBase(false, document),
-                                                                                      m_polyhedron(std::make_unique<Model::Polyhedron3>()) {
+    m_polyhedron(std::make_unique<Model::Polyhedron3>()) {
 }
 
 const Model::Polyhedron3 &CreateComplexBrushTool::polyhedron() const {

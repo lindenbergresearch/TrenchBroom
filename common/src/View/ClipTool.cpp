@@ -514,9 +514,8 @@ private:
 };
 
 ClipTool::ClipTool(std::weak_ptr<MapDocument> document) : Tool(false), m_document(std::move(document)), m_clipSide(ClipSide_Front), m_strategy(nullptr),
-                                                          m_remainingBrushRenderer(std::make_unique<Renderer::BrushRenderer>()),
-                                                          m_clippedBrushRenderer(std::make_unique<Renderer::BrushRenderer>()), m_ignoreNotifications(false),
-                                                          m_dragging(false) {
+    m_remainingBrushRenderer(std::make_unique<Renderer::BrushRenderer>()), m_clippedBrushRenderer(std::make_unique<Renderer::BrushRenderer>()),
+    m_ignoreNotifications(false), m_dragging(false) {
 }
 
 ClipTool::~ClipTool() {

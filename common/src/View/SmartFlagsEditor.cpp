@@ -42,7 +42,7 @@ namespace View {
 class MapDocument;
 
 SmartFlagsEditor::SmartFlagsEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor(document, parent), m_scrolledWindow(nullptr),
-                                                                                           m_flagsEditor(nullptr), m_ignoreUpdates(false) {
+    m_flagsEditor(nullptr), m_ignoreUpdates(false) {
     createGui();
 }
 

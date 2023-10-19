@@ -183,8 +183,7 @@ void InputEventQueue::processEvents(InputEventProcessor &processor) {
 }
 
 InputEventRecorder::InputEventRecorder() : m_dragging(false), m_anyMouseButtonDown(false), m_lastClickX(0.0f), m_lastClickY(0.0f),
-                                           m_lastClickTime(std::chrono::high_resolution_clock::now()), m_nextMouseUpIsRMB(false),
-                                           m_nextMouseUpIsDblClick(false) {
+    m_lastClickTime(std::chrono::high_resolution_clock::now()), m_nextMouseUpIsRMB(false), m_nextMouseUpIsDblClick(false) {
 }
 
 void InputEventRecorder::recordEvent(const QKeyEvent &qEvent) {

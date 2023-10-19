@@ -36,7 +36,7 @@
 namespace TrenchBroom {
 namespace View {
 CreateSimpleBrushToolController2D::CreateSimpleBrushToolController2D(CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document) : m_tool{tool},
-                                                                                                                                         m_document{document} {
+    m_document{document} {
 }
 
 Tool &CreateSimpleBrushToolController2D::tool() {
@@ -56,10 +56,9 @@ private:
 
 public:
     CreateSimpleBrushDragDelegate(CreateSimpleBrushTool &tool, const vm::bbox3 &worldBounds, const vm::bbox3 &referenceBounds) : m_tool{tool},
-                                                                                                                                 m_worldBounds{worldBounds},
-                                                                                                                                 m_referenceBounds{
-                                                                                                                                     referenceBounds
-                                                                                                                                 } {
+        m_worldBounds{worldBounds}, m_referenceBounds{
+            referenceBounds
+        } {
     }
 
     HandlePositionProposer start(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset) override {
@@ -90,8 +89,8 @@ public:
     }
 
 private:
-    bool updateBounds(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &lastHandlePosition,
-        const vm::vec3 &currentHandlePosition
+    bool
+    updateBounds(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &lastHandlePosition, const vm::vec3 &currentHandlePosition
     ) {
         const auto lastBounds = makeBounds(inputState, initialHandlePosition, lastHandlePosition);
         const auto currentBounds = makeBounds(inputState, initialHandlePosition, currentHandlePosition);

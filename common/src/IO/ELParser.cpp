@@ -231,7 +231,7 @@ ELTokenizer::Token ELTokenizer::emitToken() {
 }
 
 ELParser::ELParser(const ELParser::Mode mode, std::string_view str, const size_t line, const size_t column) : m_mode(mode),
-                                                                                                              m_tokenizer{std::move(str), line, column} {
+    m_tokenizer{std::move(str), line, column} {
 }
 
 TokenizerState ELParser::tokenizerState() const {

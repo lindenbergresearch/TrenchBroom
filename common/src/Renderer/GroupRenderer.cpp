@@ -54,7 +54,7 @@ private:
 };
 
 GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext) : m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false),
-                                                                          m_showOverlays(true), m_showOccludedOverlays(false), m_showOccludedBounds(false) {
+    m_showOverlays(true), m_showOccludedOverlays(false), m_showOccludedBounds(false) {
 }
 
 void GroupRenderer::invalidate() {

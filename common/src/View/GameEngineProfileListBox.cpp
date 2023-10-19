@@ -32,7 +32,7 @@ namespace View {
 // GameEngineProfileItemRenderer
 
 GameEngineProfileItemRenderer::GameEngineProfileItemRenderer(Model::GameEngineProfile &profile, QWidget *parent) : ControlListBoxItemRenderer{parent},
-                                                                                                                   m_profile{&profile} {
+    m_profile{&profile} {
     createGui();
     refresh();
 }

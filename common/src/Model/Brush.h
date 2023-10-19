@@ -251,8 +251,8 @@ private:
      */
     static void applyUVLock(const PolyhedronMatcher<BrushGeometry> &matcher, const BrushFace &leftFace, BrushFace &rightFace);
 
-    Result<void> updateFacesFromGeometry(const vm::bbox3 &worldBounds, const PolyhedronMatcher<BrushGeometry> &matcher, const BrushGeometry &newGeometry,
-        bool uvLock = false
+    Result<void>
+    updateFacesFromGeometry(const vm::bbox3 &worldBounds, const PolyhedronMatcher<BrushGeometry> &matcher, const BrushGeometry &newGeometry, bool uvLock = false
     );
 
 public:

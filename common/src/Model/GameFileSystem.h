@@ -43,8 +43,8 @@ private:
     std::vector<IO::VirtualMountPointId> m_wadMountPoints;
 
 public:
-    void initialize(const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths,
-        Logger &logger
+    void
+    initialize(const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger
     );
 
     Result<void> reloadShaders();

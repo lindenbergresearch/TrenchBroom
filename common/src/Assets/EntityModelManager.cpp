@@ -31,7 +31,7 @@
 namespace TrenchBroom {
 namespace Assets {
 EntityModelManager::EntityModelManager(const int magFilter, const int minFilter, Logger &logger) : m_logger(logger), m_loader(nullptr), m_minFilter(minFilter),
-                                                                                                   m_magFilter(magFilter), m_resetTextureMode(false) {
+    m_magFilter(magFilter), m_resetTextureMode(false) {
 }
 
 EntityModelManager::~EntityModelManager() {

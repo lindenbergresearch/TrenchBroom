@@ -29,7 +29,7 @@
 namespace TrenchBroom {
 namespace EL {
 Expression::Expression(std::unique_ptr<ExpressionImpl> expression, const size_t line, const size_t column) : m_expression{std::move(expression)}, m_line{line},
-                                                                                                             m_column{column} {
+    m_column{column} {
 }
 
 Expression::Expression(LiteralExpression expression, const size_t line, const size_t column) : m_expression{

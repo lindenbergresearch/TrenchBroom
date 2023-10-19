@@ -48,9 +48,9 @@ Polyhedron_Vertex<T, FP, VP>::Polyhedron_Vertex(const vm::vec<T, 3> &position)
       ,
 #pragma warning(pop)
 #else
-      m_link(this),
+    m_link(this),
 #endif
-      m_payload(VP::defaultValue()) {
+    m_payload(VP::defaultValue()) {
 }
 
 template<typename T, typename FP, typename VP>

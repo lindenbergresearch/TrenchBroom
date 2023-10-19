@@ -65,7 +65,7 @@ Animation::Type Animation::freeType() {
 }
 
 Animation::Animation(const Type type, const Curve curve, const double duration) : m_type(type), m_curve(createAnimationCurve(curve, duration)),
-                                                                                  m_duration(duration), m_elapsed(0), m_progress(0.0) {
+    m_duration(duration), m_elapsed(0), m_progress(0.0) {
     assert(m_duration > 0);
 }
 

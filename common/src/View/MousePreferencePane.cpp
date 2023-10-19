@@ -35,12 +35,10 @@
 namespace TrenchBroom {
 namespace View {
 MousePreferencePane::MousePreferencePane(QWidget *parent) : PreferencePane(parent), m_lookSpeedSlider(nullptr), m_invertLookHAxisCheckBox(nullptr),
-                                                            m_invertLookVAxisCheckBox(nullptr), m_panSpeedSlider(nullptr), m_invertPanHAxisCheckBox(nullptr),
-                                                            m_invertPanVAxisCheckBox(nullptr), m_moveSpeedSlider(nullptr), m_invertMouseWheelCheckBox(nullptr),
-                                                            m_enableAltMoveCheckBox(nullptr), m_invertAltMoveAxisCheckBox(nullptr),
-                                                            m_moveInCursorDirCheckBox(nullptr), m_forwardKeyEditor(nullptr), m_backwardKeyEditor(nullptr),
-                                                            m_leftKeyEditor(nullptr), m_rightKeyEditor(nullptr), m_upKeyEditor(nullptr),
-                                                            m_downKeyEditor(nullptr), m_flyMoveSpeedSlider(nullptr) {
+    m_invertLookVAxisCheckBox(nullptr), m_panSpeedSlider(nullptr), m_invertPanHAxisCheckBox(nullptr), m_invertPanVAxisCheckBox(nullptr),
+    m_moveSpeedSlider(nullptr), m_invertMouseWheelCheckBox(nullptr), m_enableAltMoveCheckBox(nullptr), m_invertAltMoveAxisCheckBox(nullptr),
+    m_moveInCursorDirCheckBox(nullptr), m_forwardKeyEditor(nullptr), m_backwardKeyEditor(nullptr), m_leftKeyEditor(nullptr), m_rightKeyEditor(nullptr),
+    m_upKeyEditor(nullptr), m_downKeyEditor(nullptr), m_flyMoveSpeedSlider(nullptr) {
     createGui();
     bindEvents();
 }

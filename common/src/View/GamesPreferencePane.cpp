@@ -150,7 +150,7 @@ bool GamesPreferencePane::doValidate() {
 // GamePreferencePane
 
 GamePreferencePane::GamePreferencePane(const std::string &gameName, QWidget *parent) : QWidget(parent), m_gameName(gameName), m_gamePathText(nullptr),
-                                                                                       m_chooseGamePathButton(nullptr) {
+    m_chooseGamePathButton(nullptr) {
     createGui();
 }
 

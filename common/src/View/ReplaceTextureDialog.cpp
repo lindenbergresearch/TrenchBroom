@@ -44,12 +44,8 @@
 namespace TrenchBroom {
 namespace View {
 ReplaceTextureDialog::ReplaceTextureDialog(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : QDialog(parent),
-                                                                                                                                     m_document(document),
-                                                                                                                                     m_subjectBrowser(nullptr),
-                                                                                                                                     m_replacementBrowser(
-                                                                                                                                         nullptr
-                                                                                                                                     ),
-                                                                                                                                     m_replaceButton(nullptr) {
+    m_document(document), m_subjectBrowser(nullptr), m_replacementBrowser(nullptr
+    ), m_replaceButton(nullptr) {
     createGui(contextManager);
 }
 

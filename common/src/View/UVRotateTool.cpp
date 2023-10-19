@@ -137,9 +137,9 @@ private:
 
 public:
     Render(const UVViewHelper &helper, const float centerRadius, const float outerRadius, const bool highlight) : m_helper{helper}, m_highlight{highlight},
-                                                                                                                  m_center{
-                                                                                                                      makeCircle(helper, centerRadius, 10, true)
-                                                                                                                  }, m_outer{
+        m_center{
+            makeCircle(helper, centerRadius, 10, true)
+        }, m_outer{
             makeCircle(helper, outerRadius, 32, false)
         } {
     }

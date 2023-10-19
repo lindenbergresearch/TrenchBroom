@@ -30,7 +30,7 @@ IndexRangeMap::IndicesAndCounts::IndicesAndCounts() : indices(), counts() {
 }
 
 IndexRangeMap::IndicesAndCounts::IndicesAndCounts(const size_t index, const size_t count) : indices(1, static_cast<GLint>(index)),
-                                                                                            counts(1, static_cast<GLsizei>(count)) {
+    counts(1, static_cast<GLsizei>(count)) {
 }
 
 bool IndexRangeMap::IndicesAndCounts::empty() const {

@@ -83,12 +83,12 @@ public:
     PolyhedronMatcher(const P &left, const P &right) : m_left(left), m_right(right), m_vertexRelation(buildVertexRelation(m_left, m_right)) {
     }
 
-    PolyhedronMatcher(const P &left, const P &right, const std::vector<V> &vertices, const V &delta) : m_left(left), m_right(right), m_vertexRelation(
-        buildVertexRelation(m_left, m_right, vertices, delta)) {
+    PolyhedronMatcher(const P &left, const P &right, const std::vector<V> &vertices, const V &delta) : m_left(left), m_right(right),
+        m_vertexRelation(buildVertexRelation(m_left, m_right, vertices, delta)) {
     }
 
     PolyhedronMatcher(const P &left, const P &right, const VMap &vertexMap) : m_left(left), m_right(right),
-                                                                              m_vertexRelation(buildVertexRelation(m_left, m_right, vertexMap)) {
+        m_vertexRelation(buildVertexRelation(m_left, m_right, vertexMap)) {
     }
 
 public:

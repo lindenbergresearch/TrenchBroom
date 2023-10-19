@@ -42,9 +42,7 @@
 namespace TrenchBroom {
 namespace View {
 ScaleObjectsToolPage::ScaleObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(std::move(document)),
-                                                                                                   m_book(nullptr), m_sizeTextBox(nullptr),
-                                                                                                   m_factorsTextBox(nullptr), m_scaleFactorsOrSize(nullptr),
-                                                                                                   m_button(nullptr) {
+    m_book(nullptr), m_sizeTextBox(nullptr), m_factorsTextBox(nullptr), m_scaleFactorsOrSize(nullptr), m_button(nullptr) {
     createGui();
     connectObservers();
     updateGui();

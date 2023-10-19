@@ -90,7 +90,7 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    * @param i_rest the values of the remaining attributes
    */
   explicit GLVertex(typename AttrType::ElementType &&i_attr, typename AttrTypeRest::ElementType &&... i_rest) : attr(std::move(i_attr)),
-                                                                                                                rest(std::move(i_rest)...) {
+      rest(std::move(i_rest)...) {
   }
 
   /**

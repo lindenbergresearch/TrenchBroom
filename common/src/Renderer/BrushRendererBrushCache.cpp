@@ -29,8 +29,7 @@
 namespace TrenchBroom {
 namespace Renderer {
 BrushRendererBrushCache::CachedFace::CachedFace(const Model::BrushFace *i_face, const size_t i_indexOfFirstVertexRelativeToBrush) : texture(i_face->texture()),
-                                                                                                                                    face(i_face), vertexCount(
-        i_face->vertexCount()), indexOfFirstVertexRelativeToBrush(i_indexOfFirstVertexRelativeToBrush) {
+    face(i_face), vertexCount(i_face->vertexCount()), indexOfFirstVertexRelativeToBrush(i_indexOfFirstVertexRelativeToBrush) {
 }
 
 BrushRendererBrushCache::CachedEdge::CachedEdge(const Model::BrushFace *i_face1, const Model::BrushFace *i_face2, const size_t i_vertexIndex1RelativeToBrush,

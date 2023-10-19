@@ -36,14 +36,12 @@
 
 namespace TrenchBroom::Model {
 BrushBuilder::BrushBuilder(const MapFormat mapFormat, const vm::bbox3 &worldBounds) : m_mapFormat(mapFormat), m_worldBounds(worldBounds),
-                                                                                      m_defaultAttribs(BrushFaceAttributes::NoTextureName) {
+    m_defaultAttribs(BrushFaceAttributes::NoTextureName) {
 }
 
 BrushBuilder::BrushBuilder(const MapFormat mapFormat, const vm::bbox3 &worldBounds, const BrushFaceAttributes &defaultAttribs) : m_mapFormat(mapFormat),
-                                                                                                                                 m_worldBounds(worldBounds),
-                                                                                                                                 m_defaultAttribs(
-                                                                                                                                     defaultAttribs
-                                                                                                                                 ) {
+    m_worldBounds(worldBounds), m_defaultAttribs(defaultAttribs
+    ) {
 }
 
 Result<Brush> BrushBuilder::createCube(const FloatType size, const std::string &textureName) const {

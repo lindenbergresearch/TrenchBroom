@@ -41,7 +41,7 @@
 namespace TrenchBroom {
 namespace Renderer {
 EntityLinkRenderer::EntityLinkRenderer(std::weak_ptr<View::MapDocument> document) : m_document(document), m_defaultColor(0.5f, 1.0f, 0.5f, 1.0f),
-                                                                                    m_selectedColor(1.0f, 0.0f, 0.0f, 1.0f) {
+    m_selectedColor(1.0f, 0.0f, 0.0f, 1.0f) {
 }
 
 void EntityLinkRenderer::setDefaultColor(const Color &color) {

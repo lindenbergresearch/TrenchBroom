@@ -47,18 +47,13 @@
 namespace TrenchBroom {
 namespace View {
 RotateObjectsToolPage::RotateObjectsToolPage(std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent) : QWidget{parent},
-                                                                                                                              m_document{std::move(document)},
-                                                                                                                              m_tool{tool},
-                                                                                                                              m_recentlyUsedCentersList{
-                                                                                                                                  nullptr
-                                                                                                                              }, m_resetCenterButton{nullptr},
-                                                                                                                              m_angle{nullptr}, m_axis{nullptr},
-                                                                                                                              m_rotateButton{
-                                                                                                                                  nullptr
-                                                                                                                              },
-                                                                                                                              m_updateAnglePropertyAfterTransformCheckBox{
-                                                                                                                                  nullptr
-                                                                                                                              } {
+    m_document{std::move(document)}, m_tool{tool}, m_recentlyUsedCentersList{
+        nullptr
+    }, m_resetCenterButton{nullptr}, m_angle{nullptr}, m_axis{nullptr}, m_rotateButton{
+        nullptr
+    }, m_updateAnglePropertyAfterTransformCheckBox{
+        nullptr
+    } {
     createGui();
     connectObservers();
     m_angle->setValue(vm::to_degrees(m_tool.angle()));

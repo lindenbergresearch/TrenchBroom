@@ -30,7 +30,7 @@
 namespace TrenchBroom {
 namespace View {
 SpinControl::SpinControl(QWidget *parent) : QDoubleSpinBox(parent), m_regularIncrement(1.0), m_shiftIncrement(2.0), m_ctrlIncrement(4.0), m_minDigits(0),
-                                            m_maxDigits(6) {
+    m_maxDigits(6) {
     setKeyboardTracking(false);
     updateTooltip();
 }

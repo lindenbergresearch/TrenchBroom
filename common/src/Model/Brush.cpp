@@ -60,7 +60,7 @@ public:
 Brush::Brush() {}
 
 Brush::Brush(const Brush &other) : m_faces(other.m_faces),
-                                   m_geometry(other.m_geometry ? std::make_unique<BrushGeometry>(*other.m_geometry, CopyCallback()) : nullptr) {
+    m_geometry(other.m_geometry ? std::make_unique<BrushGeometry>(*other.m_geometry, CopyCallback()) : nullptr) {
     if (m_geometry) {
         for (BrushFaceGeometry *faceGeometry: m_geometry->faces()) {
             if (const auto faceIndex = faceGeometry->payload()) {
@@ -883,8 +883,8 @@ Result<void> Brush::updateFacesFromGeometry(const vm::bbox3 &worldBounds, const 
     return updateGeometryFromFaces(worldBounds);
 }
 
-std::vector<Result<Brush>> Brush::subtract(const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName,
-    const std::vector<const Brush *> &subtrahends
+std::vector<Result<Brush>>
+Brush::subtract(const MapFormat mapFormat, const vm::bbox3 &worldBounds, const std::string &defaultTextureName, const std::vector<const Brush *> &subtrahends
 ) const {
     auto result = std::vector<BrushGeometry>{*m_geometry};
 

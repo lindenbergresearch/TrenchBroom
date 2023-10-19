@@ -81,7 +81,7 @@
 namespace TrenchBroom {
 namespace View {
 RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpenGLWidget(parent), m_glContext(&contextManager), m_framesRendered(0),
-                                                                            m_maxFrameTimeMsecs(0), m_lastFPSCounterUpdate(0) {
+    m_maxFrameTimeMsecs(0), m_lastFPSCounterUpdate(0) {
     QPalette pal;
     const QColor color = pal.color(QPalette::Highlight);
     m_focusColor = fromQColor(color);

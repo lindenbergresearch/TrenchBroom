@@ -117,8 +117,7 @@ const vm::vec3f &DkmParser::DkmFrame::normal(const size_t index) const {
 }
 
 DkmParser::DkmMesh::DkmMesh(const int i_vertexCount) : type(i_vertexCount < 0 ? Fan : Strip),
-                                                       vertexCount(static_cast<size_t>(i_vertexCount < 0 ? -i_vertexCount : i_vertexCount)),
-                                                       vertices(vertexCount) {
+    vertexCount(static_cast<size_t>(i_vertexCount < 0 ? -i_vertexCount : i_vertexCount)), vertices(vertexCount) {
 }
 
 DkmParser::DkmParser(const std::string &name, const Reader &reader, const FileSystem &fs) : m_name(name), m_reader(reader), m_fs(fs) {
@@ -326,8 +325,8 @@ std::filesystem::path DkmParser::findSkin(const std::string &skin) const {
     ).value();
 }
 
-void DkmParser::buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, const size_t frameIndex, const DkmFrame &frame,
-    const DkmMeshList &meshes
+void
+DkmParser::buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, const size_t frameIndex, const DkmFrame &frame, const DkmMeshList &meshes
 ) {
     size_t vertexCount = 0;
     Renderer::IndexRangeMap::Size size;

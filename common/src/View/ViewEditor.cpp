@@ -207,14 +207,10 @@ void EntityDefinitionCheckBoxList::createGui() {
 // ViewEditor
 
 ViewEditor::ViewEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(std::move(document)),
-                                                                               m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr),
-                                                                               m_showBrushEntityBoundsCheckBox(nullptr),
-                                                                               m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr),
-                                                                               m_showPointEntityModelsCheckBox(nullptr),
-                                                                               m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr),
-                                                                               m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr),
-                                                                               m_showFogCheckBox(nullptr), m_showEdgesCheckBox(nullptr),
-                                                                               m_entityLinkRadioGroup(nullptr), m_showSoftBoundsCheckBox(nullptr) {
+    m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr), m_showBrushEntityBoundsCheckBox(nullptr),
+    m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr), m_showPointEntityModelsCheckBox(nullptr),
+    m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr), m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr),
+    m_showFogCheckBox(nullptr), m_showEdgesCheckBox(nullptr), m_entityLinkRadioGroup(nullptr), m_showSoftBoundsCheckBox(nullptr) {
     connectObservers();
 }
 

@@ -98,16 +98,9 @@ const ControlListBoxItemRenderer *ControlListBoxItemRendererWrapper::renderer() 
 // ControlListBox
 
 ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMargins, const bool showSeparator, QWidget *parent) : QWidget(parent),
-                                                                                                                                   m_listWidget(
-                                                                                                                                       new QListWidget()),
-                                                                                                                                   m_emptyTextContainer(
-                                                                                                                                       new QWidget()),
-                                                                                                                                   m_emptyTextLabel(
-                                                                                                                                       new QLabel(emptyText)),
-                                                                                                                                   m_itemMargins(itemMargins),
-                                                                                                                                   m_showSeparator(
-                                                                                                                                       showSeparator
-                                                                                                                                   ) {
+    m_listWidget(new QListWidget()), m_emptyTextContainer(new QWidget()), m_emptyTextLabel(new QLabel(emptyText)), m_itemMargins(itemMargins),
+    m_showSeparator(showSeparator
+    ) {
     m_listWidget->setObjectName("controlListBox_listWidget");
     m_listWidget->hide();
     m_listWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);

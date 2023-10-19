@@ -67,8 +67,8 @@ private:
 
 EntityRenderer::EntityRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext)
     : m_entityModelManager(entityModelManager), m_editorContext(editorContext), m_modelRenderer(logger, m_entityModelManager, m_editorContext),
-      m_boundsValid(false), m_showOverlays(true), m_showOccludedOverlays(false), m_tint(false), m_overrideBoundsColor(false), m_showOccludedBounds(false),
-      m_showAngles(false), m_showHiddenEntities(false) {
+    m_boundsValid(false), m_showOverlays(true), m_showOccludedOverlays(false), m_tint(false), m_overrideBoundsColor(false), m_showOccludedBounds(false),
+    m_showAngles(false), m_showHiddenEntities(false) {
 }
 
 void EntityRenderer::invalidate() {

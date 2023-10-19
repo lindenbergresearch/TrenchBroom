@@ -113,10 +113,10 @@ namespace TrenchBroom {
 namespace View {
 MapFrame::MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> document)
     : QMainWindow(), m_frameManager(frameManager), m_document(std::move(document)), m_lastInputTime(std::chrono::system_clock::now()),
-      m_autosaver(std::make_unique<Autosaver>(m_document)), m_autosaveTimer(nullptr), m_toolBar(nullptr), m_hSplitter(nullptr), m_vSplitter(nullptr),
-      m_contextManager(std::make_unique<GLContextManager>()), m_mapView(nullptr), m_currentMapView(nullptr), m_infoPanel(nullptr), m_console(nullptr),
-      m_inspector(nullptr), m_gridChoice(nullptr), m_statusBarLabel(nullptr), m_compilationDialog(nullptr), m_recentDocumentsMenu(nullptr),
-      m_undoAction(nullptr), m_redoAction(nullptr), m_updateTitleSignalDelayer{
+    m_autosaver(std::make_unique<Autosaver>(m_document)), m_autosaveTimer(nullptr), m_toolBar(nullptr), m_hSplitter(nullptr), m_vSplitter(nullptr),
+    m_contextManager(std::make_unique<GLContextManager>()), m_mapView(nullptr), m_currentMapView(nullptr), m_infoPanel(nullptr), m_console(nullptr),
+    m_inspector(nullptr), m_gridChoice(nullptr), m_statusBarLabel(nullptr), m_compilationDialog(nullptr), m_recentDocumentsMenu(nullptr), m_undoAction(nullptr),
+    m_redoAction(nullptr), m_updateTitleSignalDelayer{
         new SignalDelayer{this}}, m_updateActionStateSignalDelayer{new SignalDelayer{this}}, m_updateStatusBarSignalDelayer{
         new SignalDelayer{this}} {
     ensure(m_frameManager != nullptr, "frameManager is null");

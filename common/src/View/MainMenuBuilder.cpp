@@ -68,10 +68,8 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
 }
 
 MainMenuBuilder::MainMenuBuilder(QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn) : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar),
-                                                                                                      m_currentMenu(nullptr), recentDocumentsMenu(nullptr),
-                                                                                                      undoAction(nullptr), redoAction(nullptr),
-                                                                                                      pasteAction(nullptr),
-                                                                                                      pasteAtOriginalPositionAction(nullptr) {
+    m_currentMenu(nullptr), recentDocumentsMenu(nullptr), undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr),
+    pasteAtOriginalPositionAction(nullptr) {
 }
 
 void MainMenuBuilder::visit(const Menu &menu) {

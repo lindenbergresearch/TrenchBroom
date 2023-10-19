@@ -40,13 +40,8 @@ namespace View {
 // LayerListBoxWidget
 
 LayerListBoxWidget::LayerListBoxWidget(std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent) : ControlListBoxItemRenderer(parent),
-                                                                                                                        m_document(std::move(document)),
-                                                                                                                        m_layer(layer), m_activeButton(nullptr),
-                                                                                                                        m_nameText(nullptr),
-                                                                                                                        m_infoText(nullptr),
-                                                                                                                        m_omitFromExportButton(nullptr),
-                                                                                                                        m_hiddenButton(nullptr),
-                                                                                                                        m_lockButton(nullptr) {
+    m_document(std::move(document)), m_layer(layer), m_activeButton(nullptr), m_nameText(nullptr), m_infoText(nullptr), m_omitFromExportButton(nullptr),
+    m_hiddenButton(nullptr), m_lockButton(nullptr) {
     m_nameText = new QLabel(QString::fromStdString(m_layer->name()));
     // Ignore the label's minimum width, this prevents a horizontal scroll bar from
     // appearing on the list widget, and instead just cuts off the label for long layer

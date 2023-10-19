@@ -110,10 +110,7 @@ void GameDialog::openPreferencesClicked() {
 }
 
 GameDialog::GameDialog(const QString &title, const QString &infoText, const DialogType type, QWidget *parent) : QDialog(parent), m_dialogType(type),
-                                                                                                                m_gameListBox(nullptr),
-                                                                                                                m_mapFormatComboBox(nullptr),
-                                                                                                                m_openPreferencesButton(nullptr),
-                                                                                                                m_okButton(nullptr) {
+    m_gameListBox(nullptr), m_mapFormatComboBox(nullptr), m_openPreferencesButton(nullptr), m_okButton(nullptr) {
     createGui(title, infoText);
     updateMapFormats("");
     connectObservers();

@@ -47,8 +47,8 @@ static T evaluateValueOp(const T oldValue, const T newValue, const ChangeBrushFa
 }
 
 template<typename T>
-static std::optional<T> evaluateValueOp(const std::optional<T> &oldValue, const T oldValueFallback, const std::optional<T> &newValue,
-    const ChangeBrushFaceAttributesRequest::ValueOp op
+static std::optional<T>
+evaluateValueOp(const std::optional<T> &oldValue, const T oldValueFallback, const std::optional<T> &newValue, const ChangeBrushFaceAttributesRequest::ValueOp op
 ) {
     switch (op) {
         case ChangeBrushFaceAttributesRequest::ValueOp_Set:
@@ -79,8 +79,8 @@ static T evaluateFlagOp(const T oldValue, const T newValue, const ChangeBrushFac
 }
 
 template<typename T>
-static std::optional<T> evaluateFlagOp(const std::optional<T> &oldValue, const T oldValueFallback, const std::optional<T> &newValue,
-    const ChangeBrushFaceAttributesRequest::FlagOp op
+static std::optional<T>
+evaluateFlagOp(const std::optional<T> &oldValue, const T oldValueFallback, const std::optional<T> &newValue, const ChangeBrushFaceAttributesRequest::FlagOp op
 ) {
     switch (op) {
         case ChangeBrushFaceAttributesRequest::FlagOp_Replace:
@@ -96,11 +96,9 @@ static std::optional<T> evaluateFlagOp(const std::optional<T> &oldValue, const T
 }
 
 ChangeBrushFaceAttributesRequest::ChangeBrushFaceAttributesRequest() : m_xOffset(0.0f), m_yOffset(0.0f), m_rotation(0.0f), m_xScale(0.0f), m_yScale(0.0f),
-                                                                       m_surfaceFlags(0), m_contentFlags(0), m_surfaceValue(0.0f), m_textureOp(TextureOp_None),
-                                                                       m_axisOp(AxisOp_None), m_xOffsetOp(ValueOp_None), m_yOffsetOp(ValueOp_None),
-                                                                       m_rotationOp(ValueOp_None), m_xScaleOp(ValueOp_None), m_yScaleOp(ValueOp_None),
-                                                                       m_surfaceFlagsOp(FlagOp_None), m_contentFlagsOp(FlagOp_None),
-                                                                       m_surfaceValueOp(ValueOp_None), m_colorValueOp(ValueOp_None) {
+    m_surfaceFlags(0), m_contentFlags(0), m_surfaceValue(0.0f), m_textureOp(TextureOp_None), m_axisOp(AxisOp_None), m_xOffsetOp(ValueOp_None),
+    m_yOffsetOp(ValueOp_None), m_rotationOp(ValueOp_None), m_xScaleOp(ValueOp_None), m_yScaleOp(ValueOp_None), m_surfaceFlagsOp(FlagOp_None),
+    m_contentFlagsOp(FlagOp_None), m_surfaceValueOp(ValueOp_None), m_colorValueOp(ValueOp_None) {
 }
 
 void ChangeBrushFaceAttributesRequest::clear() {

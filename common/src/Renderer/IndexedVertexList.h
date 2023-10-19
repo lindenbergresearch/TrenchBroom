@@ -44,7 +44,7 @@ public:
     }
 
     IndexedVertexList(const size_t vertexCount, const size_t primCount) : m_allowDynamicGrowth(false), m_primStart(0), m_vertices(0), m_indices(0),
-                                                                          m_counts(0) {
+        m_counts(0) {
         reserve(vertexCount, primCount);
     }
 

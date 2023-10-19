@@ -72,7 +72,7 @@ TexturedIndexRangeMap::TexturedIndexRangeMap(const Size &size) : m_data(new Text
 }
 
 TexturedIndexRangeMap::TexturedIndexRangeMap(const Texture *texture, IndexRangeMap primitives) : m_data(new TextureToIndexRangeMap()),
-                                                                                                 m_current(m_data->end()) {
+    m_current(m_data->end()) {
     add(texture, std::move(primitives));
 }
 

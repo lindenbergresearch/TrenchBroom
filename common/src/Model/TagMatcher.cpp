@@ -72,8 +72,7 @@ void TextureTagMatcher::enable(TagMatcherCallback &callback, MapFacade &facade) 
     const auto &allTextures = textureManager.textures();
     auto matchingTextures = std::vector<const Assets::Texture *>{};
 
-    std::copy_if(std::begin(allTextures), std::end(allTextures), std::back_inserter(matchingTextures),
-        [this](auto *texture) { return matchesTexture(texture); }
+    std::copy_if(std::begin(allTextures), std::end(allTextures), std::back_inserter(matchingTextures), [this](auto *texture) { return matchesTexture(texture); }
     );
 
     std::sort(std::begin(matchingTextures), std::end(matchingTextures), [](const auto *lhs, const auto *rhs) {
@@ -198,10 +197,8 @@ bool SurfaceParmTagMatcher::matchesTexture(const Assets::Texture *texture) const
 }
 
 FlagsTagMatcher::FlagsTagMatcher(const int flags, GetFlags getFlags, SetFlags setFlags, SetFlags unsetFlags, GetFlagNames getFlagNames) : m_flags(flags),
-                                                                                                                                          m_getFlags(std::move(
-                                                                                                                                              getFlags
-                                                                                                                                          )), m_setFlags(
-        std::move(setFlags)), m_unsetFlags(std::move(unsetFlags)), m_getFlagNames(std::move(getFlagNames)) {
+    m_getFlags(std::move(getFlags
+    )), m_setFlags(std::move(setFlags)), m_unsetFlags(std::move(unsetFlags)), m_getFlagNames(std::move(getFlagNames)) {
 }
 
 bool FlagsTagMatcher::matches(const Taggable &taggable) const {

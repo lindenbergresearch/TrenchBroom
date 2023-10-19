@@ -40,7 +40,7 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
   const Color &defaultColor;
 
   RenderFunc(ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor) : shader(i_shader), applyTexture(i_applyTexture),
-                                                                                               defaultColor(i_defaultColor) {
+      defaultColor(i_defaultColor) {
   }
 
   void before(const Assets::Texture *texture) override {
@@ -67,12 +67,11 @@ FaceRenderer::FaceRenderer() : m_grayscale(false), m_tint(false), m_alpha(1.0f) 
 
 FaceRenderer::FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor)
     : m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor), m_grayscale(false), m_tint(false),
-      m_alpha(1.0f) {
+    m_alpha(1.0f) {
 }
 
 FaceRenderer::FaceRenderer(const FaceRenderer &other) : IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap),
-                                                        m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint),
-                                                        m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
+    m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
 }
 
 FaceRenderer &FaceRenderer::operator=(FaceRenderer other) {

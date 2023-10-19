@@ -48,7 +48,7 @@ void validateInternal(const std::shared_ptr<Game> &game, const WorldNode &worldN
 } // namespace
 
 SoftMapBoundsValidator::SoftMapBoundsValidator(std::weak_ptr<Game> game, const WorldNode &world) : Validator(Type, "Objects out of soft map bounds"),
-                                                                                                   m_game{game}, m_world{world} {
+    m_game{game}, m_world{world} {
     addQuickFix(makeDeleteNodesQuickFix());
 }
 

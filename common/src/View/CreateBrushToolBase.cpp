@@ -31,8 +31,7 @@
 namespace TrenchBroom {
 namespace View {
 CreateBrushToolBase::CreateBrushToolBase(const bool initiallyActive, std::weak_ptr<MapDocument> document) : Tool(initiallyActive), m_document(document),
-                                                                                                            m_brush(nullptr),
-                                                                                                            m_brushRenderer(new Renderer::BrushRenderer()) {
+    m_brush(nullptr), m_brushRenderer(new Renderer::BrushRenderer()) {
 }
 
 CreateBrushToolBase::~CreateBrushToolBase() {

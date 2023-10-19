@@ -190,8 +190,8 @@ void RotateObjectsHandle::Handle2D::renderHandle(Renderer::RenderContext &render
     renderService.renderHandle(vm::vec3f(m_position));
 }
 
-void RotateObjectsHandle::Handle2D::renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch,
-    RotateObjectsHandle::HitArea area
+void
+RotateObjectsHandle::Handle2D::renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area
 ) const {
     const auto radius = static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
     if (radius <= 0.0f) {
@@ -251,8 +251,8 @@ void RotateObjectsHandle::Handle3D::renderHandle(Renderer::RenderContext &render
     renderService.renderHandle(vm::vec3f(m_position));
 }
 
-void RotateObjectsHandle::Handle3D::renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch,
-    RotateObjectsHandle::HitArea area
+void
+RotateObjectsHandle::Handle3D::renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area
 ) const {
     const auto radius = static_cast<float>(majorRadius() * scalingFactor(renderContext.camera()));
     if (radius <= 0.0f) {

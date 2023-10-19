@@ -366,8 +366,7 @@ Camera::Camera() : m_nearPlane(1.0f), m_farPlane(65536.0f), m_viewport(Viewport(
     setDirection(vm::vec3f::pos_x(), vm::vec3f::pos_z());
 }
 
-Camera::Camera(const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction,
-    const vm::vec3f &up
+Camera::Camera(const float nearPlane, const float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up
 ) : m_nearPlane(nearPlane), m_farPlane(farPlane), m_viewport(viewport), m_zoom(1.0f), m_position(position), m_valid(false) {
     assert(m_nearPlane >= 0.0f);
     assert(m_farPlane > m_nearPlane);

@@ -34,7 +34,7 @@
 namespace TrenchBroom {
 namespace View {
 RotateObjectsTool::RotateObjectsTool(std::weak_ptr<MapDocument> document) : Tool(false), m_document(document), m_toolPage(nullptr), m_handle(),
-                                                                            m_angle(vm::to_radians(15.0)) {
+    m_angle(vm::to_radians(15.0)) {
 }
 
 bool RotateObjectsTool::doActivate() {

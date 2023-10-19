@@ -36,7 +36,7 @@
 namespace TrenchBroom {
 namespace View {
 KeyboardShortcutModel::ActionInfo::ActionInfo(const std::filesystem::path &i_displayPath, const Action &i_action) : displayPath(i_displayPath),
-                                                                                                                    action(i_action) {
+    action(i_action) {
 }
 
 KeyboardShortcutModel::KeyboardShortcutModel(MapDocument *document, QObject *parent) : QAbstractTableModel(parent), m_document(document) {

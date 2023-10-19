@@ -31,9 +31,7 @@
 namespace TrenchBroom {
 namespace View {
 FlagsPopupEditor::FlagsPopupEditor(size_t numCols, QWidget *parent, const QString &buttonLabel, const bool showFlagsText) : QWidget(parent),
-                                                                                                                            m_flagsTxt(nullptr),
-                                                                                                                            m_button(nullptr),
-                                                                                                                            m_editor(nullptr) {
+    m_flagsTxt(nullptr), m_button(nullptr), m_editor(nullptr) {
     QFrame *flagsFrame = nullptr;
     if (showFlagsText) {
         m_flagsTxt = new ElidedLabel(Qt::ElideRight);

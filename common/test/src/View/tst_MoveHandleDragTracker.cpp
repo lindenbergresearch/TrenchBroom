@@ -86,8 +86,7 @@ struct TestDelegate : public MoveHandleDragTrackerDelegate {
   MakeHandleSnapper m_makeDragHandleSnapper;
 
   TestDelegate(Move i_move, End i_end, Cancel i_cancel, Render i_render, MakeHandleSnapper i_makeDragHandleSnapper) : m_move{std::move(i_move)},
-                                                                                                                      m_end{std::move(i_end)},
-                                                                                                                      m_cancel{std::move(i_cancel)}, m_render{
+      m_end{std::move(i_end)}, m_cancel{std::move(i_cancel)}, m_render{
           std::move(i_render)
       }, m_makeDragHandleSnapper{std::move(i_makeDragHandleSnapper)} {
   }

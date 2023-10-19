@@ -24,7 +24,7 @@ namespace Model {
 MapFacade::~MapFacade() = default;
 
 MapFacade::MoveVerticesResult::MoveVerticesResult(const bool i_success, const bool i_hasRemainingVertices) : success(i_success),
-                                                                                                             hasRemainingVertices(i_hasRemainingVertices) {
+    hasRemainingVertices(i_hasRemainingVertices) {
 }
 } // namespace Model
 } // namespace TrenchBroom

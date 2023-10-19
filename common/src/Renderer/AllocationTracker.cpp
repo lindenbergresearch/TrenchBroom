@@ -318,7 +318,7 @@ void AllocationTracker::free(Block *block) {
 }
 
 AllocationTracker::AllocationTracker(const Index initial_capacity) : m_capacity(0), m_leftmostBlock(nullptr), m_rightmostBlock(nullptr),
-                                                                     m_recycledBlockList(nullptr) {
+    m_recycledBlockList(nullptr) {
     if (initial_capacity > 0) {
         expand(initial_capacity);
         checkInvariants();

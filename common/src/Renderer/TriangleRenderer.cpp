@@ -31,12 +31,11 @@ TriangleRenderer::TriangleRenderer() : m_useColor(false), m_applyTinting(false) 
 }
 
 TriangleRenderer::TriangleRenderer(const VertexArray &vertexArray, const IndexRangeMap &indexArray) : m_vertexArray(vertexArray), m_indexArray(indexArray),
-                                                                                                      m_useColor(false), m_applyTinting(false) {
+    m_useColor(false), m_applyTinting(false) {
 }
 
 TriangleRenderer::TriangleRenderer(const VertexArray &vertexArray, const PrimType primType) : m_vertexArray(vertexArray),
-                                                                                              m_indexArray(primType, 0, m_vertexArray.vertexCount()),
-                                                                                              m_useColor(false), m_applyTinting(false) {
+    m_indexArray(primType, 0, m_vertexArray.vertexCount()), m_useColor(false), m_applyTinting(false) {
 }
 
 void TriangleRenderer::setUseColor(const bool useColor) {

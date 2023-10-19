@@ -26,7 +26,7 @@ TexturedRenderer::~TexturedRenderer() = default;
 TexturedIndexRangeRenderer::TexturedIndexRangeRenderer() {}
 
 TexturedIndexRangeRenderer::TexturedIndexRangeRenderer(const VertexArray &vertexArray, const TexturedIndexRangeMap &indexRange) : m_vertexArray(vertexArray),
-                                                                                                                                  m_indexRange(indexRange) {
+    m_indexRange(indexRange) {
 }
 
 TexturedIndexRangeRenderer::TexturedIndexRangeRenderer(const VertexArray &vertexArray, const Assets::Texture *texture, const IndexRangeMap &indexRange)

@@ -43,8 +43,7 @@ std::string GLContextManager::GLRenderer = "unknown";
 std::string GLContextManager::GLVersion = "unknown";
 
 GLContextManager::GLContextManager() : m_initialized(false), m_shaderManager(std::make_unique<Renderer::ShaderManager>()),
-                                       m_vboManager(std::make_unique<Renderer::VboManager>(m_shaderManager.get())),
-                                       m_fontManager(std::make_unique<Renderer::FontManager>()) {
+    m_vboManager(std::make_unique<Renderer::VboManager>(m_shaderManager.get())), m_fontManager(std::make_unique<Renderer::FontManager>()) {
 }
 
 GLContextManager::~GLContextManager() = default;

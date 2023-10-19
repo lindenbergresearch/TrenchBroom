@@ -61,12 +61,10 @@ void saveRecentDocuments(const std::vector<std::filesystem::path> &paths) {
 }
 
 RecentDocuments::RecentDocuments(const size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent) : QObject{parent},
-                                                                                                                                      m_maxSize{maxSize},
-                                                                                                                                      m_filterPredicate{
-                                                                                                                                          std::move(
-                                                                                                                                              filterPredicate
-                                                                                                                                          )
-                                                                                                                                      } {
+    m_maxSize{maxSize}, m_filterPredicate{
+        std::move(filterPredicate
+        )
+    } {
     assert(m_maxSize > 0);
 }
 

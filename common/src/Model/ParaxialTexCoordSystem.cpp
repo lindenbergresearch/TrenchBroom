@@ -53,7 +53,7 @@ ParaxialTexCoordSystem::ParaxialTexCoordSystem(const vm::vec3 &normal, const Bru
 }
 
 ParaxialTexCoordSystem::ParaxialTexCoordSystem(const size_t index, const vm::vec3 &xAxis, const vm::vec3 &yAxis) : m_index(index), m_xAxis(xAxis),
-                                                                                                                   m_yAxis(yAxis) {
+    m_yAxis(yAxis) {
 }
 
 size_t ParaxialTexCoordSystem::planeNormalIndex(const vm::vec3 &normal) {

@@ -155,8 +155,7 @@ public:
         std::unique_ptr<TexCoordSystem> texCoordSystem
     );
 
-    BrushFace(const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes,
-        std::unique_ptr<TexCoordSystem> texCoordSystem
+    BrushFace(const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem
     );
 
     static void sortFaces(std::vector<BrushFace> &faces);

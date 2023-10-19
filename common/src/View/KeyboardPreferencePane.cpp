@@ -39,7 +39,7 @@
 namespace TrenchBroom {
 namespace View {
 KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *parent) : PreferencePane(parent), m_table(nullptr), m_model(nullptr),
-                                                                                         m_proxy(nullptr) {
+    m_proxy(nullptr) {
     m_model = new KeyboardShortcutModel(document, this);
     m_proxy = new QSortFilterProxyModel(this);
     m_proxy->setSourceModel(m_model);

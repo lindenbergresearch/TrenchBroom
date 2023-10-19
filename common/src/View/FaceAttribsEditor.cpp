@@ -58,9 +58,8 @@
 namespace TrenchBroom {
 namespace View {
 FaceAttribsEditor::FaceAttribsEditor(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : QWidget{parent},
-                                                                                                                               m_document{std::move(document)},
-                                                                                                                               m_updateControlsSignalDelayer{
-                                                                                                                                   new SignalDelayer{this}} {
+    m_document{std::move(document)}, m_updateControlsSignalDelayer{
+        new SignalDelayer{this}} {
     createGui(contextManager);
     bindEvents();
     connectObservers();

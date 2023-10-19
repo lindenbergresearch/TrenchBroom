@@ -69,7 +69,7 @@ Entity::Entity(const EntityPropertyConfig &propertyConfig, std::vector<EntityPro
 }
 
 Entity::Entity(const EntityPropertyConfig &propertyConfig, std::initializer_list<EntityProperty> properties) : m_properties{std::move(properties)},
-                                                                                                               m_pointEntity{true}, m_model{nullptr} {
+    m_pointEntity{true}, m_model{nullptr} {
     updateCachedProperties(propertyConfig);
 }
 

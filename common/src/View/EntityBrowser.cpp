@@ -44,12 +44,8 @@ Q_DECLARE_METATYPE(TrenchBroom::Assets::EntityDefinitionSortOrder)
 namespace TrenchBroom {
 namespace View {
 EntityBrowser::EntityBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : QWidget(parent),
-                                                                                                                       m_document(std::move(document)),
-                                                                                                                       m_sortOrderChoice(nullptr),
-                                                                                                                       m_groupButton(nullptr),
-                                                                                                                       m_usedButton(nullptr),
-                                                                                                                       m_filterBox(nullptr),
-                                                                                                                       m_scrollBar(nullptr), m_view(nullptr) {
+    m_document(std::move(document)), m_sortOrderChoice(nullptr), m_groupButton(nullptr), m_usedButton(nullptr), m_filterBox(nullptr), m_scrollBar(nullptr),
+    m_view(nullptr) {
     createGui(contextManager);
     connectObservers();
 }

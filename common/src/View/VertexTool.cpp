@@ -39,9 +39,8 @@
 namespace TrenchBroom {
 namespace View {
 VertexTool::VertexTool(const std::weak_ptr<MapDocument> &document) : VertexToolBase(document), m_mode(Mode::Move),
-                                                                     m_vertexHandles(std::make_unique<VertexHandleManager>()),
-                                                                     m_edgeHandles(std::make_unique<EdgeHandleManager>()),
-                                                                     m_faceHandles(std::make_unique<FaceHandleManager>()), m_guideRenderer(document) {
+    m_vertexHandles(std::make_unique<VertexHandleManager>()), m_edgeHandles(std::make_unique<EdgeHandleManager>()),
+    m_faceHandles(std::make_unique<FaceHandleManager>()), m_guideRenderer(document) {
 }
 
 std::vector<Model::BrushNode *> VertexTool::findIncidentBrushes(const vm::vec3 &handle) const {

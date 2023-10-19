@@ -43,7 +43,7 @@
 namespace TrenchBroom {
 namespace View {
 ShearObjectsToolController::ShearObjectsToolController(ShearObjectsTool &tool, std::weak_ptr<MapDocument> document) : m_tool{tool},
-                                                                                                                      m_document{std::move(document)} {
+    m_document{std::move(document)} {
 }
 
 ShearObjectsToolController::~ShearObjectsToolController() = default;
@@ -239,10 +239,9 @@ bool ShearObjectsToolController::cancel() {
 
 // ShearObjectsToolController2D
 
-ShearObjectsToolController2D::ShearObjectsToolController2D(ShearObjectsTool &tool, std::weak_ptr<MapDocument> document) : ShearObjectsToolController{tool,
-                                                                                                                                                     std::move(
-                                                                                                                                                         document
-                                                                                                                                                     )
+ShearObjectsToolController2D::ShearObjectsToolController2D(ShearObjectsTool &tool, std::weak_ptr<MapDocument> document) : ShearObjectsToolController{
+    tool, std::move(document
+    )
 } {
 }
 
@@ -252,10 +251,9 @@ void ShearObjectsToolController2D::doPick(const vm::ray3 &pickRay, const Rendere
 
 // ShearObjectsToolController3D
 
-ShearObjectsToolController3D::ShearObjectsToolController3D(ShearObjectsTool &tool, std::weak_ptr<MapDocument> document) : ShearObjectsToolController{tool,
-                                                                                                                                                     std::move(
-                                                                                                                                                         document
-                                                                                                                                                     )
+ShearObjectsToolController3D::ShearObjectsToolController3D(ShearObjectsTool &tool, std::weak_ptr<MapDocument> document) : ShearObjectsToolController{
+    tool, std::move(document
+    )
 } {
 }
 

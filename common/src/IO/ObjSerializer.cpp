@@ -77,12 +77,10 @@ std::ostream &operator<<(std::ostream &str, const ObjSerializer::Object &object)
 }
 
 ObjSerializer::ObjSerializer(std::ostream &objStream, std::ostream &mtlStream, std::string mtlFilename, IO::ObjExportOptions options) : m_objStream{objStream},
-                                                                                                                                        m_mtlStream{mtlStream},
-                                                                                                                                        m_mtlFilename{
-                                                                                                                                            std::move(
-                                                                                                                                                mtlFilename
-                                                                                                                                            )
-                                                                                                                                        }, m_options{
+    m_mtlStream{mtlStream}, m_mtlFilename{
+        std::move(mtlFilename
+        )
+    }, m_options{
         std::move(options)
     } {
     ensure(m_objStream.good(), "obj stream is good");

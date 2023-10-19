@@ -31,7 +31,7 @@ namespace View {
 // CompilationProfileItemRenderer
 
 CompilationProfileItemRenderer::CompilationProfileItemRenderer(Model::CompilationProfile &profile, QWidget *parent) : ControlListBoxItemRenderer{parent},
-                                                                                                                      m_profile{profile} {
+    m_profile{profile} {
     // request customContextMenuRequested() to be emitted
     setContextMenuPolicy(Qt::CustomContextMenu);
 

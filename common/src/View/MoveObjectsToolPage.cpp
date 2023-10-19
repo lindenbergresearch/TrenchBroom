@@ -35,7 +35,7 @@
 namespace TrenchBroom {
 namespace View {
 MoveObjectsToolPage::MoveObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_offset(nullptr),
-                                                                                                 m_button(nullptr) {
+    m_button(nullptr) {
     createGui();
     connectObservers();
     updateGui();

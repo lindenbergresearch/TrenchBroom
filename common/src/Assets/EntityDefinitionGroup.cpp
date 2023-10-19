@@ -28,7 +28,7 @@
 namespace TrenchBroom {
 namespace Assets {
 EntityDefinitionGroup::EntityDefinitionGroup(const std::string &name, std::vector<EntityDefinition *> definitions) : m_name(name),
-                                                                                                                     m_definitions(std::move(definitions)) {
+    m_definitions(std::move(definitions)) {
 }
 
 const std::string &EntityDefinitionGroup::name() const {

@@ -363,8 +363,8 @@ static size_t countMarkedEdgeIndices(const Model::BrushNode &brushNode, const Br
     return indexCount;
 }
 
-static void getMarkedEdgeIndices(const Model::BrushNode &brushNode, const BrushRenderer::Filter::EdgeRenderPolicy policy, const GLuint brushVerticesStartIndex,
-    GLuint *dest
+static void
+getMarkedEdgeIndices(const Model::BrushNode &brushNode, const BrushRenderer::Filter::EdgeRenderPolicy policy, const GLuint brushVerticesStartIndex, GLuint *dest
 ) {
     using EdgeRenderPolicy = BrushRenderer::Filter::EdgeRenderPolicy;
 

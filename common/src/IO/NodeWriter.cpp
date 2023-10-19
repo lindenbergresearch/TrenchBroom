@@ -67,7 +67,7 @@ static void doWriteNodes(NodeSerializer &serializer, const std::vector<Model::No
 }
 
 NodeWriter::NodeWriter(const Model::WorldNode &world, std::ostream &stream) : m_world(world),
-                                                                              m_serializer(MapFileSerializer::create(m_world.mapFormat(), stream)) {
+    m_serializer(MapFileSerializer::create(m_world.mapFormat(), stream)) {
 }
 
 NodeWriter::NodeWriter(const Model::WorldNode &world, std::unique_ptr<NodeSerializer> serializer) : m_world(world), m_serializer(std::move(serializer)) {
