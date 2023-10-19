@@ -185,7 +185,7 @@ static void printActionShortcuts(QTextStream& out)
 
   const auto& actionManager = ActionManager::instance();
   ToolbarVisitor visitor;
-  actionManager.visitToolBarActions(visitor);
+    actionManager.visitToolBarActions(visitor);
   for (const Action* action : visitor.toolbarActions)
   {
     printPref(action->preferencePath(), action->keySequence());
