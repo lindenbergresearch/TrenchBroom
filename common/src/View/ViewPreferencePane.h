@@ -37,7 +37,9 @@ private:
     SliderWithLabel *m_UIBrightnessSlider = nullptr;
     SliderWithLabel *m_gridAlphaSlider = nullptr;
     SliderWithLabel *m_fovSlider = nullptr;
+    SliderWithLabel *m_gridWidthSlider = nullptr;
     QComboBox *m_unitsDisplayType = nullptr;
+    QComboBox *m_autoBrightnessTypeCombo = nullptr;
     QLineEdit *m_metricConversationFactor = nullptr;
     QCheckBox *m_showAxes = nullptr;
     QComboBox *m_textureModeCombo = nullptr;
@@ -88,6 +90,9 @@ private slots:
     void brightnessChanged(int value);
 
     void UIBrightnessChanged(int value);
+    void editorFaceAutoBrightnessChanged(int value);
+    void editorGridWithChanged(int value);
+
 
     void gridAlphaChanged(int value);
 
