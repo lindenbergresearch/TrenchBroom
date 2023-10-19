@@ -56,11 +56,11 @@ void MapViewBar::createGui(std::weak_ptr<MapDocument> document) {
 
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(
-        LayoutConstants::WideHMargin, vMargin, LayoutConstants::WideHMargin, vMargin
+        LayoutConstants::MediumVMargin, vMargin, LayoutConstants::MediumVMargin, vMargin
     );
     layout->setSpacing(LayoutConstants::WideHMargin);
     layout->addLayout(m_toolBook, 1);
-    layout->addWidget(m_viewEditor, 0, Qt::AlignVCenter);
+    layout->addWidget(m_viewEditor, 0, Qt::AlignRight);
 
     setLayout(layout);
 }
