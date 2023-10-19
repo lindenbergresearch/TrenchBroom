@@ -46,6 +46,7 @@
 #include "View/RecentDocuments.h"
 #include "View/WelcomeWindow.h"
 #include "View/Console.h"
+#include "QSSBuilder.h"
 
 #ifdef __APPLE__
 
@@ -159,9 +160,10 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
         return;
     }
 
-    loadStyleSheets();
     loadStyle();
+    loadStyleSheets();
     setupUIFont();
+    setupConsoleFont();
 
     // these must be initialized here and not earlier
     m_frameManager = std::make_unique<FrameManager>(useSDI());
@@ -224,87 +226,124 @@ QPalette TrenchBroomApp::darkPalette() {
     const auto tint_color = pref(Preferences::UIWindowTintColor);
     const auto text_color = pref(Preferences::UITextColor);
 
-    const auto button = toQColor(tint_color, brightness);
-    const auto text = toQColor(text_color, brightness);
-    const auto highlight = toQColor(hl_color, brightness);
+    const auto windowColor = toQColor(tint_color, brightness);
+    const auto textColor = toQColor(text_color, brightness);
+    const auto highlightColor = toQColor(hl_color, brightness);
 
     // Build an initial palette based on the button color
-    auto palette = QPalette{button};
+    auto palette = QPalette{windowColor};
 
     // Window colors
-    palette.setColor(QPalette::Active, QPalette::Window, button.lighter(int(130.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::Window, button.lighter(int(130.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Window, button.darker(int(260.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::Window, windowColor.lighter(int(130.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::Window, windowColor.lighter(int(130.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::Window, windowColor.darker(int(260.f * contrast)));
 
     // List box backgrounds, text entry backgrounds, menu backgrounds
-    palette.setColor(QPalette::Base, button.darker(int(125.f * contrast)));
-    palette.setColor(QPalette::AlternateBase, button.darker(int(110.f * contrast)));
-    palette.setColor(QPalette::PlaceholderText, text.darker(int(80.f * contrast)));
+    palette.setColor(QPalette::Base, windowColor.darker(int(125.f * contrast)));
+    palette.setColor(QPalette::AlternateBase, windowColor.darker(int(160.f * contrast)));
+    palette.setColor(QPalette::PlaceholderText, textColor.darker(int(120.f * contrast)));
 
     // Button text
-    palette.setColor(QPalette::Active, QPalette::ButtonText, text);
-    palette.setColor(QPalette::Inactive, QPalette::ButtonText, text);
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, text.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::ButtonText, textColor);
+    palette.setColor(QPalette::Inactive, QPalette::ButtonText, textColor);
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, textColor.darker(int(200.f * contrast)));
 
     // Button
-    palette.setColor(QPalette::Active, QPalette::Button, button.darker(100));
-    palette.setColor(QPalette::Inactive, QPalette::Button, button.darker(100));
-    palette.setColor(QPalette::Disabled, QPalette::Button, button.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::Button, windowColor.lighter(int(130.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::Button, windowColor.lighter(int(130.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::Button, windowColor.darker(int(100.f * contrast)));
 
     // WindowText is supposed to be against QPalette::Window
-    palette.setColor(QPalette::Active, QPalette::WindowText, text);
-    palette.setColor(QPalette::Inactive, QPalette::WindowText, text);
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, text.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::WindowText, textColor);
+    palette.setColor(QPalette::Inactive, QPalette::WindowText, textColor);
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, textColor.darker(int(200.f * contrast)));
 
     // Menu text, text edit text, table cell text
-    palette.setColor(QPalette::Active, QPalette::Text, text.darker(int(100.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::Text, text.darker(int(100.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Text, button.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::Text, textColor.darker(int(100.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::Text, textColor.darker(int(100.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::Text, textColor.darker(int(200.f * contrast)));
 
-    palette.setColor(QPalette::Active, QPalette::BrightText, text.lighter(int(100.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::BrightText, text.lighter(int(100.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::BrightText, text.darker(int(100.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::BrightText, textColor.lighter(int(200.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::BrightText, textColor.lighter(int(200.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::BrightText, textColor.darker(int(100.f * contrast)));
 
     // Disabled menu item text shadow
-    palette.setColor(QPalette::Light, button.lighter(int(350.f * contrast)));
-    palette.setColor(QPalette::Midlight, button.lighter(int(190.f * contrast)));
-    palette.setColor(QPalette::Mid, button);
-    palette.setColor(QPalette::Dark, button.darker(int(200.f * contrast)));
-    palette.setColor(QPalette::Shadow, button.darker(int(650.f * contrast)));
+    palette.setColor(QPalette::Light, windowColor.lighter(int(450.f * contrast)));
+    palette.setColor(QPalette::Midlight, windowColor.lighter(int(190.f * contrast)));
+    palette.setColor(QPalette::Mid, windowColor);
+    palette.setColor(QPalette::Dark, windowColor.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Shadow, windowColor.darker(int(650.f * contrast)));
 
     // Highlight (selected list box row, selected grid cell background, selected tab text)
-    palette.setColor(QPalette::Active, QPalette::Highlight, highlight);
-    palette.setColor(QPalette::Inactive, QPalette::Highlight, highlight.darker(int(100.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Highlight, highlight.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::Highlight, highlightColor);
+    palette.setColor(QPalette::Inactive, QPalette::Highlight, highlightColor.darker(int(100.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::Highlight, highlightColor.darker(int(200.f * contrast)));
 
     // Text of highlighted elements
-    palette.setColor(QPalette::Active, QPalette::HighlightedText, text.lighter(int(150.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::HighlightedText, text.lighter(int(150.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::HighlightedText, text.darker(int(130.f * contrast)));
-
-    // Tooltip background
-    palette.setColor(QPalette::Active, QPalette::ToolTipBase, QColor(200, 0, 0, 255));
-    palette.setColor(QPalette::Inactive, QPalette::ToolTipBase, button.darker(int(850.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::ToolTipBase, button.darker(int(850.f * contrast)));
-
-    // Tooltip text
-    palette.setColor(QPalette::Active, QPalette::ToolTipText, QColor(0, 255, 0, 255));
-    palette.setColor(QPalette::Inactive, QPalette::ToolTipText, text);
-    palette.setColor(QPalette::Disabled, QPalette::ToolTipText, text.darker(int(130.f * contrast)));
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, textColor.lighter(int(150.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::HighlightedText, textColor.lighter(int(150.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::HighlightedText, textColor.darker(int(130.f * contrast)));
 
     return palette;
 }
 
 bool TrenchBroomApp::loadStyleSheets() {
     const auto path = IO::SystemPaths::findResourceFile("stylesheets/base.qss");
-    if (auto file = QFile{IO::pathAsQString(path)}; file.exists()) {
-        // closed automatically by destructor
-        file.open(QFile::ReadOnly | QFile::Text);
-        qApp->setStyleSheet(QTextStream{&file}.readAll());
 
-        return true;
+    qInfo() << "Loading StyleSheets from: " << path.string().c_str();
+
+    if (!builder) {
+        builder = QSSBuilder::fromFile(path);
+
+        if (!builder)
+            return false;
+
+        builder->addReplacement("TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::WindowText); });
+        builder->addReplacement("DISABLED_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::WindowText, QPalette::ColorGroup::Disabled); });
+        builder->addReplacement("HIGHLIGHTED_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::HighlightedText); });
+        builder->addReplacement("BRIGHT_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::BrightText); });
+        builder->addReplacement("PLACEHOLDER_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::PlaceholderText); });
+        builder->addReplacement("WINDOW_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Window); });
+        builder->addReplacement("BUTTON_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Button); });
+        builder->addReplacement("BUTTON_TEXT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::ButtonText); });
+        builder->addReplacement("BASE_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Base); });
+        builder->addReplacement("ALTERNATE_BASE_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::AlternateBase); });
+
+        builder->addReplacement("LIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Light); });
+        builder->addReplacement("MIDLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Midlight); });
+        builder->addReplacement("MID_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Mid); });
+        builder->addReplacement("DARK_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Dark); });
+        builder->addReplacement("SHADOW_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Shadow); });
+
+        builder->addReplacement("BRIGHT_HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, 130); });
+        builder->addReplacement("HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight); });
+        builder->addReplacement("MID_HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, -130); });
+        builder->addReplacement("DARK_HIGHLIGHT_COLOR", []() { return toStyleSheetRGBA(QPalette{}, QPalette::ColorRole::Highlight, QPalette::ColorGroup::Disabled); });
+
+        builder->addReplacement("NARROW_V_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::NarrowVMargin); });
+        builder->addReplacement("NARROW_H_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin); });
+
+        builder->addReplacement("MEDIUM_V_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::MediumVMargin); });
+        builder->addReplacement("MEDIUM_H_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::MediumHMargin); });
+
+        builder->addReplacement("WIDE_V_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::WideVMargin); });
+        builder->addReplacement("WIDE_H_MARGIN", []() { return QString::asprintf("%dpx", LayoutConstants::WideHMargin); });
+
+        builder->addReplacement("UI_FONT_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::UIFontSize)); });
+        builder->addReplacement("UI_MID_FONT_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::UIFontSize) - 1); });
+        builder->addReplacement("UI_SMALL_FONT_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::UIFontSize) - 2); });
+        builder->addReplacement("UI_TITLE_FONT_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::UIFontSize) + 1); });
+        builder->addReplacement("RENDER_FONT_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::RendererFontSize)); });
+        builder->addReplacement("CONSOLE_FONT_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::ConsoleFontSize)); });
+        builder->addReplacement("TOOLBAR_ICON_SIZE", []() { return QString::asprintf("%dpx", pref(Preferences::ToolBarIconsSize)); });
     }
-    return false;
+
+    builder->update();
+
+    qInfo() << "Setting DynamicStyleSheets to main application...";
+    qApp->setStyleSheet(builder->getRenderedText());
+
+    return true;
 }
 
 void TrenchBroomApp::loadStyle() {
@@ -318,6 +357,7 @@ void TrenchBroomApp::loadStyle() {
     // menu bar (https://github.com/TrenchBroom/TrenchBroom/issues/3140), so the following
     // QProxyStyle disables that completely.
 
+    qInfo() << "Setup Style and Palette...";
     class TrenchBroomProxyStyle : public QProxyStyle {
     public:
         explicit TrenchBroomProxyStyle(const QString &key) : QProxyStyle{key} {
@@ -603,10 +643,12 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
 
     if (reloadFonts) {
         setupUIFont();
+        setupConsoleFont();
     }
         foreach (QWidget *widget, QApplication::allWidgets()) {
             widget->update();
         }
+
     QCoreApplication::processEvents();
 }
 
@@ -621,6 +663,8 @@ void TrenchBroomApp::setupUIFont() {
         font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
         font.setStyleStrategy(QFont::PreferQuality);
         font.setStyleHint(QFont::StyleHint::SansSerif);
+
+        m_UI_Font = font;
         QApplication::setFont(font);
         return;
     }
@@ -645,6 +689,53 @@ void TrenchBroomApp::setupUIFont() {
     font.setStyleStrategy(QFont::PreferQuality);
     font.setStyleHint(QFont::StyleHint::SansSerif);
     QApplication::setFont(font);
+}
+
+void TrenchBroomApp::setupConsoleFont() {
+    auto path = pref(Preferences::ConsoleFontPath);
+    auto file = IO::SystemPaths::findResourceFile(path);
+
+    QFontDatabase database;
+    if (database.hasFamily(path.string().c_str())) {
+        qInfo() << "use internal Console font: " << path.string().c_str();
+        QFont font(path.string().c_str(), pref(Preferences::UIFontSize));
+        font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
+        font.setStyleStrategy(QFont::PreferQuality);
+        font.setStyleHint(QFont::StyleHint::Monospace);
+
+        m_ConsoleFont = font;
+        return;
+    }
+
+    qInfo() << "loading Console font: " << path.string().c_str();
+
+    if (!exists(file)) {
+        qWarning() << "Console font does not exist: " << path.string().c_str();
+        return;
+    }
+
+    int font_id = database.addApplicationFont(file.c_str());
+    auto font_family = database.applicationFontFamilies(font_id);
+
+    if (font_family.empty()) {
+        qWarning() << "Unable to load Console font: " << path.string().c_str();
+        return;
+    }
+
+    QFont font(font_family[0], pref(Preferences::ConsoleFontSize));
+    font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
+    font.setStyleStrategy(QFont::PreferQuality);
+    font.setStyleHint(QFont::StyleHint::Monospace);
+
+    m_ConsoleFont = font;
+}
+
+const QFont &TrenchBroomApp::getUIFont() const {
+    return m_UI_Font;
+}
+
+const QFont &TrenchBroomApp::getConsoleFont() const {
+    return m_ConsoleFont;
 }
 
 

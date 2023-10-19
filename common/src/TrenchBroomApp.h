@@ -22,6 +22,7 @@
 #include <QApplication>
 
 #include "Notifier.h"
+#include "QSSBuilder.h"
 
 #include <filesystem>
 #include <memory>
@@ -71,18 +72,24 @@ private:
     std::unique_ptr<RecentDocuments> m_recentDocuments;
     std::unique_ptr<WelcomeWindow> m_welcomeWindow;
     QTimer *m_recentDocumentsReloadTimer;
-
+    QFont m_UI_Font, m_ConsoleFont;
+    QSSBuilder *builder = nullptr;
 public:
-    static TrenchBroomApp &instance();
 
     TrenchBroomApp(int &argc, char **argv);
 
     ~TrenchBroomApp() override;
 
-public:
+    const QFont &getUIFont() const;
+
+    const QFont &getConsoleFont() const;
+
+    static TrenchBroomApp &instance();
+
     void parseCommandLineAndShowFrame();
 
     FrameManager *frameManager();
+
 
 private:
     static QPalette darkPalette();
@@ -95,6 +102,8 @@ public:
     void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
 
     void setupUIFont();
+
+    void setupConsoleFont();
 
     const std::vector<std::filesystem::path> &recentDocuments() const;
 
