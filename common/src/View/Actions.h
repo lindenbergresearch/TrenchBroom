@@ -260,7 +260,7 @@ private:
     std::vector<std::unique_ptr<Menu>> m_mainMenu;
 
     /**
-     * The toolbar for the map editing window. Stored as a menu to allow for separators.
+     * The toolbars for the map editing window. Stored as a menu to allow for separators.
      * These will hold pointers to the actions in m_actions.
      */
     std::unique_ptr<Menu> m_toolBar;
@@ -324,6 +324,7 @@ private:
     Menu &createMainMenu(const std::string &name);
 
     void createToolbar();
+
 
     const Action *existingAction(const std::filesystem::path &preferencePath) const;
 

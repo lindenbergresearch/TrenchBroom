@@ -929,7 +929,7 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
 #endif
             ), [](ActionExecutionContext &context) { context.frame()->deleteSelection(); }, [](ActionExecutionContext &context) {
               return context.hasDocument() && context.frame()->canDeleteSelection();
-            }
+            }, std::filesystem::path{"Delete.svg"}
         ));
     editMenu.addSeparator();
     editMenu.addItem(
@@ -1123,7 +1123,7 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
             std::filesystem::path{"Controls/Map view/Deactivate current tool"}, QObject::tr("Deactivate Current Tool"), Qt::CTRL + Qt::Key_Escape, [](ActionExecutionContext &context) { context.view()->deactivateTool(); },
             [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
               return context.hasDocument() && !context.frame()->anyToolActive();
-            }, std::filesystem::path{"NoTool.svg"}
+            }, std::filesystem::path{"Pointer.svg"}
         ));
 
     auto &csgMenu = editMenu.addMenu("CSG");
@@ -1388,6 +1388,40 @@ void ActionManager::createViewMenu() {
               return context.hasDocument() && context.frame()->infoPanelVisible();
             }
         ));
+
+    viewMenu.addSeparator();
+
+   /* viewMenu.addItem(
+        createMenuAction(
+            std::filesystem::path{"Menu/View/Set single pane layout"}, QObject::tr("Single Pane Layout"), Qt::ALT + Qt::Key_1, [](ActionExecutionContext &context) { context.frame()->setLayoutViewsCount(0); },
+            [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+              return context.hasDocument()&& pref(Preferences::MapViewLayout) == 0;
+            }
+        ));
+    viewMenu.addItem(
+        createMenuAction(
+            std::filesystem::path{"Menu/View/Set two pane layout"}, QObject::tr("Two Pane Layout"), Qt::ALT + Qt::Key_2, [](ActionExecutionContext &context) { context.frame()->setLayoutViewsCount(1); },
+            [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+              return context.hasDocument() && pref(Preferences::MapViewLayout) == 1;
+            }
+        ));
+    viewMenu.addItem(
+        createMenuAction(
+            std::filesystem::path{"Menu/View/Set three pane layout"}, QObject::tr("Three Pane Layout"), Qt::ALT + Qt::Key_3, [](ActionExecutionContext &context) { context.frame()->setLayoutViewsCount(2); },
+            [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+              return context.hasDocument() && pref(Preferences::MapViewLayout) == 2;
+            }
+        ));
+    viewMenu.addItem(
+        createMenuAction(
+            std::filesystem::path{"Menu/View/Set four pane layout"}, QObject::tr("Four Pane Layout"), Qt::ALT + Qt::Key_4, [](ActionExecutionContext &context) { context.frame()->setLayoutViewsCount(3); },
+            [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+              return context.hasDocument() && pref(Preferences::MapViewLayout) == 3;
+            }
+        ));*/
+
+    viewMenu.addSeparator();
+
     viewMenu.addItem(
         createMenuAction(
             std::filesystem::path{"Menu/View/Toggle Inspector"}, QObject::tr("Toggle Inspector"), Qt::CTRL + Qt::Key_5, [](ActionExecutionContext &context) { context.frame()->toggleInspector(); },
@@ -1510,26 +1544,29 @@ Menu &ActionManager::createMainMenu(const std::string &name) {
 }
 
 void ActionManager::createToolbar() {
-    m_toolBar = std::make_unique<Menu>("Toolbar", MenuEntryType::Menu_None);
+    m_toolBar = std::make_unique<Menu>("Tools Toolbar", MenuEntryType::Menu_None);
     m_toolBar->addItem(existingAction(std::filesystem::path{"Controls/Map view/Deactivate current tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Brush Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Clip Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Vertex Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Edge Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Face Tool"}));
+
+    m_toolBar->addSeparator();
+
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Rotate Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Scale Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Shear Tool"}));
 
     m_toolBar->addSeparator();
 
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Delete"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Duplicate"}));
+
     m_toolBar->addItem(existingAction(std::filesystem::path{"Controls/Map view/Flip objects horizontally"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Controls/Map view/Flip objects vertically"}));
 
-
     m_toolBar->addSeparator();
-
 
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Texture Lock"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/UV Lock"}));
@@ -1548,5 +1585,6 @@ const Action *ActionManager::existingAction(
     ensure(it != m_actions.end(), "couldn't find action");
     return it->second.get();
 }
+
 } // namespace View
 } // namespace TrenchBroom
