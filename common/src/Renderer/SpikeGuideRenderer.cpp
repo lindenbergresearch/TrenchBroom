@@ -83,7 +83,7 @@ void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
     ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
     m_spikeArray.render(PrimType::Lines);
 
-    glAssert(glPointSize(3.0f));
+    glAssert(glPointSize(6.0f));
     m_pointArray.render(PrimType::Points);
     glAssert(glPointSize(1.0f));
 }
