@@ -460,7 +460,7 @@ void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderCon
         Renderer::BoundsGuideRenderer *guideRenderer = new Renderer::BoundsGuideRenderer(m_document);
 
         // draw guides half transparent
-        auto guideColor = modifyAlpha(pref(Preferences::SelectionBoundsColor), 0.5f);
+        auto guideColor = modifyAlpha(pref(Preferences::SelectionBoundsColor), pref(Preferences::SelectionBoundsAlpha));
         guideRenderer->setColor(guideColor);
 
         guideRenderer->setBounds(bounds);
