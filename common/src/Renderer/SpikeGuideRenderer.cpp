@@ -81,9 +81,13 @@ void SpikeGuideRenderer::doPrepareVertices(VboManager &vboManager) {
 
 void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
     ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
+    glAssert(glEnable(GL_LINE_STIPPLE));
+    glAssert(glLineStipple(4, 0x5555));
+    glAssert(glLineWidth(1.5f));
     m_spikeArray.render(PrimType::Lines);
+    glAssert(glDisable(GL_LINE_STIPPLE));
 
-    glAssert(glPointSize(6.0f));
+    glAssert(glPointSize(10.0f));
     m_pointArray.render(PrimType::Points);
     glAssert(glPointSize(1.0f));
 }
