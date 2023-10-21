@@ -87,6 +87,10 @@ extern Preference<Color> LockedEdgeColor;
 extern Preference<Color> UndefinedEntityColor;
 
 extern Preference<Color> SelectionBoundsColor;
+extern Preference<float> SelectionBoundsAlpha;
+extern Preference<float> SelectionBoundsLineWidth;
+extern Preference<int> SelectionBoundsPattern;
+
 
 extern Preference<Color> InfoOverlayTextColor;
 extern Preference<Color> GroupInfoOverlayTextColor;
