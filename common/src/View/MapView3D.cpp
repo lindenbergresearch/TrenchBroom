@@ -458,7 +458,11 @@ void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderCon
         boundsRenderer.render(renderContext, renderBatch);
 
         Renderer::BoundsGuideRenderer *guideRenderer = new Renderer::BoundsGuideRenderer(m_document);
-        guideRenderer->setColor(pref(Preferences::SelectionBoundsColor));
+
+        // draw guides half transparent
+        auto guideColor = modifyAlpha(pref(Preferences::SelectionBoundsColor), 0.5f);
+        guideRenderer->setColor(guideColor);
+
         guideRenderer->setBounds(bounds);
         renderBatch.addOneShot(guideRenderer);
     }
