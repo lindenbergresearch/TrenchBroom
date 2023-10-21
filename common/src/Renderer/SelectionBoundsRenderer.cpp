@@ -292,7 +292,7 @@ SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3 &bounds) : m_bo
 }
 
 void SelectionBoundsRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
-    renderBounds(renderContext, renderBatch);
+   // renderBounds(renderContext, renderBatch);
     renderSize(renderContext, renderBatch);
     // renderMinMax(renderContext, renderBatch);
 }
