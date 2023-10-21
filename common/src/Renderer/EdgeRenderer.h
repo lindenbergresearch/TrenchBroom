@@ -34,7 +34,7 @@ class BrushVertexArray;
 
 class RenderBatch;
 
-static const float EDGE_LINE_WIDTH = 1.5f;
+static const float EDGE_LINE_WIDTH = 1.9f;
 
 class EdgeRenderer {
 public:
