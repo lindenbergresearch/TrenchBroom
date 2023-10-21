@@ -320,6 +320,15 @@ QColor toQColor(const Color &color, const float multiplier) {
     return QColor::fromRgbF(color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
 }
 
+Color modifyAlpha(const Color &color, float alpha) {
+    return Color{color.r(), color.g(), color.b(), alpha};
+}
+
+Color modifyColor(const Color &color, float r, float g, float b, float a) {
+    return Color{color.r() * r, color.g() * g, color.b() * b, color.a() * a};
+}
+
+
 QString toStyleSheetColor(const char *prefix, const QColor &color) {
     auto sheet = QString::asprintf("%s: rgba(%d, %d, %d, %d); ", prefix, color.red(), color.green(), color.blue(), color.alpha());
     return sheet;

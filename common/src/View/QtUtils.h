@@ -228,6 +228,10 @@ QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette);
 
 Color fromQColor(const QColor &color);
 
+Color modifyColor(const Color &color, float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+
+Color modifyAlpha(const Color &color, float alpha);
+
 QColor toQColor(const Color &color, float multiplier = 1.0f);
 
 QString toStyleSheetColor(const char *prefix, const QColor &color);
