@@ -30,6 +30,8 @@
 #include "Renderer/Shaders.h"
 #include "Renderer/VboManager.h"
 #include "View/MapDocument.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 #include <vecmath/forward.h>
 #include <vecmath/ray.h>
@@ -82,8 +84,8 @@ void SpikeGuideRenderer::doPrepareVertices(VboManager &vboManager) {
 void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
     ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
     glAssert(glEnable(GL_LINE_STIPPLE));
-    glAssert(glLineStipple(4, 0x5555));
-    glAssert(glLineWidth(1.5f));
+    glAssert(glLineStipple(4, (GLushort) pref(Preferences::SelectionBoundsPattern)));
+    glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
     m_spikeArray.render(PrimType::Lines);
     glAssert(glDisable(GL_LINE_STIPPLE));
 
