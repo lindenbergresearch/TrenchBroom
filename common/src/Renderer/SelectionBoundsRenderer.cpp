@@ -335,18 +335,22 @@ const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_u
 
 void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderBatch &renderBatch) {
     static const std::string labels[3] = {"x", "y", "z"};
+    Color colors[3];
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-    renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();
+
+    colors[0] = Color(pref(Preferences::XAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
+    colors[1] = Color(pref(Preferences::YAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
 
     const Camera &camera = renderContext.camera();
     const vm::vec3f &direction = camera.direction();
 
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
+        renderService.setBackgroundColor(colors[i]);
         if (direction[i] == 0.0f) {
             buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
             renderService.renderString(buffer.str(), SizeTextAnchor2D(m_bounds, i, camera));
