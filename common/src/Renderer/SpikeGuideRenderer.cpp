@@ -60,7 +60,7 @@ void SpikeGuideRenderer::add(const vm::ray3 &ray, const FloatType length, std::s
             addPoint(vm::point_at_distance(ray, hit.distance() - 0.01));
         addSpike(ray, vm::min(length, hit.distance()), length);
     }
-    else {
+    else if (!pref(Preferences::SelectionBoundsIntersectionMode)) {
         addSpike(ray, length, length);
     }
     m_valid = false;
