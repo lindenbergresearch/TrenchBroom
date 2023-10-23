@@ -292,7 +292,7 @@ SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3 &bounds) : m_bo
 }
 
 void SelectionBoundsRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
-   // renderBounds(renderContext, renderBatch);
+    // renderBounds(renderContext, renderBatch);
     renderSize(renderContext, renderBatch);
     // renderMinMax(renderContext, renderBatch);
 }
@@ -315,15 +315,18 @@ const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_u
     auto metricConversationFactor = pref(Preferences::MetricConversationFactor);
     std::stringstream buffer;
 
+    auto units_str = formatDimension(value_units).toStdString();
+    auto metric_str = formatDimension(value_units / metricConversationFactor, 1, "m").toStdString();
+
     switch (unitsDisplayType) {
         case Preferences::UNITS:
-            buffer << value_units;
+            buffer << units_str;
             break;
         case Preferences::METRIC:
-            buffer << value_units / metricConversationFactor << "m";
+            buffer << metric_str;
             break;
         case Preferences::BOTH:
-            buffer << value_units << "u [" << value_units / metricConversationFactor << "m]";
+            buffer << units_str << " [" << metric_str << "]";
             break;
     }
 
@@ -385,6 +388,22 @@ void SelectionBoundsRenderer::renderMinMax(RenderContext &renderContext, RenderB
 
     buffer << "Max: " << vm::correct(m_bounds.max);
     renderService.renderString(buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::max, renderContext.camera()));
+}
+
+QString SelectionBoundsRenderer::formatDimension(const float value, const int digits, const QString &suffix) {
+    auto isInt = (value - std::trunc(value) == 0);
+    QString str = "";
+
+    if (isInt) {
+        str = (new QString)->sprintf("%d%s", (int) value, suffix.toStdString().c_str());
+    }
+    else {
+        const char *raw_format_str = "%%.%df%%s";
+        auto format_str = (new QString)->sprintf(raw_format_str, digits).toStdString();
+        str = (new QString)->sprintf(format_str.c_str(), value, suffix.toStdString().c_str());
+    }
+
+    return str;
 }
 } // namespace Renderer
 } // namespace TrenchBroom

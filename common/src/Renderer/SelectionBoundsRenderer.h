@@ -39,6 +39,8 @@ private:
 
     class MinMaxTextAnchor3D;
 
+    QString formatDimension(const float value, const int digits = 2, const QString &suffix = "");
+
 public:
     SelectionBoundsRenderer(const vm::bbox3 &bounds);
 
