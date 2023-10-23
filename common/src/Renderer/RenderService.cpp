@@ -33,6 +33,7 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/TextAnchor.h"
 #include "Renderer/TextRenderer.h"
+#include "View/QtUtils.h"
 
 #include <vecmath/forward.h>
 #include <vecmath/polygon.h>
@@ -195,9 +196,11 @@ void RenderService::renderLineStrip(const std::vector<vm::vec3f> &positions) {
 }
 
 void RenderService::renderCoordinateSystem(const vm::bbox3f &bounds) {
-    const Color &x = pref(Preferences::XAxisColor);
-    const Color &y = pref(Preferences::YAxisColor);
-    const Color &z = pref(Preferences::ZAxisColor);
+    const Color &x = View::modifyAlpha(pref(Preferences::XAxisColor), 0.75f);
+    const Color &y = View::modifyAlpha(pref(Preferences::YAxisColor), 0.75f);
+    const Color &z =View::modifyAlpha(pref(Preferences::ZAxisColor), 0.75f);
+
+    m_lineWidth = 2.0f;
 
     if (m_renderContext.render2D()) {
         const Camera &camera = m_renderContext.camera();
