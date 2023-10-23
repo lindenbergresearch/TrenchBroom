@@ -357,19 +357,22 @@ void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderB
 
 void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch) {
     static const std::string labels[3] = {"x", "y", "z"};
+    Color colors[3];
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-    renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();
+
+    colors[0] = Color(pref(Preferences::XAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
+    colors[1] = Color(pref(Preferences::YAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
+    colors[2] = Color(pref(Preferences::ZAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
 
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
+        renderService.setBackgroundColor(colors[i]);
         buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
-
         renderService.renderString(buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
-
         buffer.str("");
     }
 }
