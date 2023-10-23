@@ -88,10 +88,10 @@ Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected e
 Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.13f, 0.3f, 1.0f, 1.0f));
 Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.5f, 0.5f, 0.5f, 1.0f));
 
-Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.0f, 0.0f, 0.0f, 0.5f));
-Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 0.7f);
-Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.2f);
-Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x7777);
+Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.0f, 0.0f, 0.0f, 1.0f));
+Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
+Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.5f);
+Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x5555);
 
 Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
