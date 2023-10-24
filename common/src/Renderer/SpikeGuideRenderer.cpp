@@ -83,13 +83,20 @@ void SpikeGuideRenderer::doPrepareVertices(VboManager &vboManager) {
 
 void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
     ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
-    glAssert(glEnable(GL_LINE_STIPPLE));
-    glAssert(glLineStipple(4, (GLushort) pref(Preferences::SelectionBoundsPattern)));
+
+    if (pref(Preferences::SelectionBoundsDashedLines)) {
+        glAssert(glEnable(GL_LINE_STIPPLE));
+        glAssert(glLineStipple(4, (GLushort) pref(Preferences::SelectionBoundsPattern)));
+    }
+
     glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
     m_spikeArray.render(PrimType::Lines);
-    glAssert(glDisable(GL_LINE_STIPPLE));
 
-    glAssert(glPointSize(10.0f));
+    if (pref(Preferences::SelectionBoundsDashedLines)) {
+        glAssert(glDisable(GL_LINE_STIPPLE));
+    }
+
+    glAssert(glPointSize(pref(Preferences::SelectionBoundsPointSize)));
     m_pointArray.render(PrimType::Points);
     glAssert(glPointSize(1.0f));
 }
