@@ -90,9 +90,9 @@ Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color
 
 Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
-Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.5f);
+Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.4f);
 Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 10.0f);
-Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.4f, 0.0f, 1.0f));
+Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.1f, 0.3f, 1.0f));
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);
@@ -141,7 +141,7 @@ Preference<float> Brightness("Renderer/Brightness", 1.4f);
 Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 0);
 Preference<float> GridLineWidth("Renderer/Grid/With", 1.0);
 Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.5f);
-Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 64.0f);
+Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 128.0f);
 Preference<Color> GridColor2D("Renderer/Grid/Color2D", Color(0.8f, 0.8f, 0.8f, 0.8f));
 
 Preference<int> TextureMinFilter("Renderer/Texture mode min filter", 0x2700);
