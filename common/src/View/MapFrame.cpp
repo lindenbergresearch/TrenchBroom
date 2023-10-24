@@ -1596,6 +1596,27 @@ void MapFrame::setGridSize(const int size) {
     m_document->grid().setSize(size);
 }
 
+void MapFrame::setMajorGridDivision(int size) {
+    float gridDivSize = 0;
+
+    if (size > 0) {
+        gridDivSize = 32.0f * float(size + 1);
+    }
+
+    setPref(Preferences::GridMajorDivisionSize, gridDivSize);
+    m_document->grid().gridDidChangeNotifier();
+}
+
+bool MapFrame::isMajorGridDivisionVisible(int size) {
+    float gridDivSize = 0;
+
+    if (size > 0) {
+        gridDivSize = 32.0f * float(size + 1);
+    }
+
+    return pref(Preferences::GridMajorDivisionSize) == gridDivSize;
+}
+
 void MapFrame::moveCameraToNextPoint() {
     if (canMoveCameraToNextPoint()) {
         m_mapView->moveCameraToNextTracePoint();

@@ -467,6 +467,10 @@ public:
 
     void setGridSize(int size);
 
+    void setMajorGridDivision(int size);
+
+    bool isMajorGridDivisionVisible(int size);
+
     void moveCameraToNextPoint();
 
     bool canMoveCameraToNextPoint() const;
