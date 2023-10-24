@@ -91,6 +91,7 @@ Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color
 Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
 Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.5f);
+Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 10.0f);
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);

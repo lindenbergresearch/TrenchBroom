@@ -89,6 +89,7 @@ extern Preference<Color> UndefinedEntityColor;
 extern Preference<Color> SelectionBoundsColor;
 extern Preference<float> SelectionBoundsAlpha;
 extern Preference<float> SelectionBoundsLineWidth;
+extern Preference<float> SelectionBoundsPointSize;
 extern Preference<int> SelectionBoundsPattern;
 extern Preference<bool> SelectionBoundsIntersectionMode;
 extern Preference<bool> SelectionBoundsDashedLines;
