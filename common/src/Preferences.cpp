@@ -92,6 +92,7 @@ Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
 Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.5f);
 Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 10.0f);
+Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.4f, 0.0f, 1.0f));
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);
@@ -279,7 +280,8 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &PortalFileFillColor, &ShowFPS, &UnitsDisplayType, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
         &CompassBackgroundOutlineColor, &CompassAxisOutlineColor, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
-        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor, &InfoOverlayTextColor, &GroupInfoOverlayTextColor,
+        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor,&SelectionBoundsPointColor,&SelectionBoundsPointSize,&SelectionBoundsDashedLines,
+        &InfoOverlayTextColor,&SelectionBoundsIntersectionMode,&SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
         &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor,
         &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor, &OccludedHandleColor,
         &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor,
