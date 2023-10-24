@@ -140,6 +140,7 @@ extern Preference<float> Brightness;
 extern Preference<int> FaceAutoBrightness;
 extern Preference<float> GridLineWidth;
 extern Preference<float> GridAlpha;
+extern Preference<float> GridMajorDivisionSize;
 extern Preference<Color> GridColor2D;
 
 extern Preference<int> TextureMinFilter;

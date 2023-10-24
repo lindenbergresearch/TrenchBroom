@@ -141,6 +141,7 @@ Preference<float> Brightness("Renderer/Brightness", 1.4f);
 Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 0);
 Preference<float> GridLineWidth("Renderer/Grid/With", 1.0);
 Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.5f);
+Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 64.0f);
 Preference<Color> GridColor2D("Renderer/Grid/Color2D", Color(0.8f, 0.8f, 0.8f, 0.8f));
 
 Preference<int> TextureMinFilter("Renderer/Texture mode min filter", 0x2700);
@@ -287,7 +288,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor,
         &ScaleHandleColor, &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor,
         &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness,
-        &GridLineWidth, &GridAlpha, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath,
+        &GridLineWidth, &GridAlpha,&GridMajorDivisionSize, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath,
         &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
         &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor,
         &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed,
