@@ -92,18 +92,19 @@ Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
 Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.5f);
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
+Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);
 
 Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
 Preference<Color> InfoOverlayBackgroundColor("Renderer/Colors/Info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
-Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 0.3f);
+Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 0.75f);
 Preference<Color> SelectedInfoOverlayTextColor("Renderer/Colors/Selected info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> SelectedInfoOverlayBackgroundColor("Renderer/Colors/Selected info overlay background", Color(1.0f, 0.0f, 0.0f, 0.6f));
 Preference<Color> LockedInfoOverlayTextColor("Renderer/Colors/Locked info overlay text", Color(0.35f, 0.35f, 0.6f, 1.0f));
 Preference<Color> LockedInfoOverlayBackgroundColor("Renderer/Colors/Locked info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
 
-Preference<float> HandleRadius("Controls/Handle radius", 3.0f);
+Preference<float> HandleRadius("Controls/Handle radius", 6.0f);
 Preference<float> MaximumHandleDistance("Controls/Maximum handle distance", 1000.0f);
 Preference<Color> HandleColor("Renderer/Colors/Handle", Color(248, 230, 60, 1.0f));
 Preference<Color> OccludedHandleColor("Renderer/Colors/Occluded handle", Color(248, 230, 60, 0.4f));
@@ -147,8 +148,8 @@ Preference<bool> EnableMSAA("Renderer/Enable multisampling", true);
 Preference<bool> TextureLock("Editor/Texture lock", true);
 Preference<bool> UVLock("Editor/UV lock", false);
 
-Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/B612Mono-Bold.ttf");
-Preference<std::filesystem::path> UIFontPath("Editor/UI Font name", "fonts/JetBrainsMono-Regular.ttf");
+Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/Inter-SemiBold.otf");
+Preference<std::filesystem::path> UIFontPath("Editor/UI Font name", "fonts/Inter-Regular.otf");
 Preference<std::filesystem::path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono-Regular.ttf");
 
 Preference<int> RendererFontSize("Renderer/Font size", 13);

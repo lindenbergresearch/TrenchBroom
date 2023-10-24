@@ -91,6 +91,7 @@ extern Preference<float> SelectionBoundsAlpha;
 extern Preference<float> SelectionBoundsLineWidth;
 extern Preference<int> SelectionBoundsPattern;
 extern Preference<bool> SelectionBoundsIntersectionMode;
+extern Preference<bool> SelectionBoundsDashedLines;
 
 
 extern Preference<Color> InfoOverlayTextColor;
