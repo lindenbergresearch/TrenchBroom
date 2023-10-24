@@ -52,12 +52,13 @@ void SpikeGuideRenderer::setColor(const Color &color) {
 void SpikeGuideRenderer::add(const vm::ray3 &ray, const FloatType length, std::shared_ptr<View::MapDocument> document) {
     Model::PickResult pickResult = Model::PickResult::byDistance();
     document->pick(ray, pickResult);
+    auto offset = 1.0f;
 
     using namespace Model::HitFilters;
     const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
     if (hit.isMatch()) {
         if (hit.distance() <= length)
-            addPoint(vm::point_at_distance(ray, hit.distance() - 0.01));
+            addPoint(vm::point_at_distance(ray, hit.distance() - offset));
         addSpike(ray, vm::min(length, hit.distance()), length);
     }
     else if (!pref(Preferences::SelectionBoundsIntersectionMode)) {
@@ -97,8 +98,11 @@ void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
     }
 
     glAssert(glPointSize(pref(Preferences::SelectionBoundsPointSize)));
+    shader.set("ApplyTinting", true);
+    shader.set("TintColor", pref(Preferences::SelectionBoundsPointColor));
     m_pointArray.render(PrimType::Points);
     glAssert(glPointSize(1.0f));
+    shader.set("ApplyTinting", false);
 }
 
 void SpikeGuideRenderer::addPoint(const vm::vec3 &position) {
