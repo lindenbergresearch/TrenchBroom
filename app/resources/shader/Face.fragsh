@@ -30,6 +30,7 @@ uniform bool GrayScale;
 uniform bool RenderGrid;
 uniform float GridSize;
 uniform float GridAlpha;
+uniform float MajorDivisionSize;
 uniform vec3 GridColor;
 uniform bool ShadeFaces;
 uniform bool ShowFog;
@@ -116,7 +117,7 @@ void main() {
         // apply the Nyquist theorem to get the smallest grid size that would make sense to render for this fragment
         float minGridSize = 2.0 * maxWorldSpaceChange;
 
-        float gridValue = grid(coords, modelNormal.xyz, GridSize, minGridSize, GridLineWidth, 64.0);
+        float gridValue = grid(coords, modelNormal.xyz, GridSize, minGridSize, GridLineWidth, MajorDivisionSize);
         gl_FragColor.rgb = mix(gl_FragColor.rgb, GridColor, gridValue * GridAlpha);
 	}
 
