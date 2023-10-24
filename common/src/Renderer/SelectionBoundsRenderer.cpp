@@ -352,7 +352,7 @@ void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderB
     for (size_t i = 0; i < 3; ++i) {
         renderService.setBackgroundColor(colors[i]);
         if (direction[i] == 0.0f) {
-            buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
+            buffer << labels[i] << "=" << getFormattedUnitsString(float(boundsSize[i]));
             renderService.renderString(buffer.str(), SizeTextAnchor2D(m_bounds, i, camera));
             buffer.str("");
         }
@@ -375,7 +375,7 @@ void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderB
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
         renderService.setBackgroundColor(colors[i]);
-        buffer << labels[i] << ": " << getFormattedUnitsString(float(boundsSize[i]));
+        buffer << labels[i] << "=" << getFormattedUnitsString(float(boundsSize[i]));
         renderService.renderString(buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
         buffer.str("");
     }
