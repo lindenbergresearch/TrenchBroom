@@ -80,6 +80,7 @@ void GridRenderer::doRender(RenderContext &renderContext) {
         shader.set("GridAlpha", pref(Preferences::GridAlpha) * 0.5f);
         shader.set("GridColor", pref(Preferences::GridColor2D));
         shader.set("GridWidth", pref(Preferences::GridLineWidth));
+        shader.set("MajorDivisionSize", pref(Preferences::GridMajorDivisionSize));
         shader.set("CameraZoom", camera.zoom());
 
         m_vertexArray.render(PrimType::Quads);

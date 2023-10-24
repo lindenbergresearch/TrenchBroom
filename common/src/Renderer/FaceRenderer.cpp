@@ -142,6 +142,7 @@ void FaceRenderer::doRender(RenderContext &context) {
         shader.set("GridSize", static_cast<float>(context.gridSize()));
         shader.set("GridLineWidth", gridLineWidth);
         shader.set("GridAlpha", prefs.get(Preferences::GridAlpha));
+        shader.set("MajorDivisionSize", pref(Preferences::GridMajorDivisionSize));
         shader.set("ApplyTexture", applyTexture);
         shader.set("Texture", 0);
         shader.set("AutoBrightnessType", autoBrightnessType);
