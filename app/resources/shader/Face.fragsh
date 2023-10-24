@@ -41,7 +41,7 @@ varying vec3 modelNormal;
 varying vec4 faceColor;
 varying vec3 viewVector;
 
-float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor);
+float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorLineFactor);
 vec3 applySoftMapBoundsTint(vec3 inputFragColor, vec3 worldCoords);
 
 void main() {
@@ -116,7 +116,7 @@ void main() {
         // apply the Nyquist theorem to get the smallest grid size that would make sense to render for this fragment
         float minGridSize = 2.0 * maxWorldSpaceChange;
 
-        float gridValue = grid(coords, modelNormal.xyz, GridSize, minGridSize, GridLineWidth);
+        float gridValue = grid(coords, modelNormal.xyz, GridSize, minGridSize, GridLineWidth, 64.0);
         gl_FragColor.rgb = mix(gl_FragColor.rgb, GridColor, gridValue * GridAlpha);
 	}
 
