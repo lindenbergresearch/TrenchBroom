@@ -162,8 +162,10 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     loadStyle();
     loadStyleSheets();
-    setupUIFont();
-    setupConsoleFont();
+
+    m_UI_Font = loadFont(pref(Preferences::UIFontPath), pref(Preferences::UIFontSize));
+    m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
+    m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
 
     // these must be initialized here and not earlier
     m_frameManager = std::make_unique<FrameManager>(useSDI());
@@ -649,8 +651,9 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
     loadStyle();
 
     if (reloadFonts) {
-        setupUIFont();
-        setupConsoleFont();
+        m_UI_Font = loadFont(pref(Preferences::UIFontPath), pref(Preferences::UIFontSize));
+        m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
+        m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
     }
         foreach (QWidget *widget, QApplication::allWidgets()) {
             widget->update();
@@ -659,90 +662,54 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
     QCoreApplication::processEvents();
 }
 
-void TrenchBroomApp::setupUIFont() {
-    auto path = pref(Preferences::UIFontPath);
-    auto file = IO::SystemPaths::findResourceFile(path);
-
-    QFontDatabase database;
-    if (database.hasFamily(path.string().c_str())) {
-        qInfo() << "use internal UI font: " << path.string().c_str();
-        QFont font(path.string().c_str(), pref(Preferences::UIFontSize));
-        font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
-        font.setStyleStrategy(QFont::PreferQuality);
-        font.setStyleHint(QFont::StyleHint::SansSerif);
-
-        m_UI_Font = font;
-        QApplication::setFont(font);
-        return;
-    }
-
-    qInfo() << "loading UI font: " << path.string().c_str();
-
-    if (!exists(file)) {
-        qWarning() << "UI font does not exist: " << path.string().c_str();
-        return;
-    }
-
-    int font_id = database.addApplicationFont(file.c_str());
-    auto font_family = database.applicationFontFamilies(font_id);
-
-    if (font_family.empty()) {
-        qWarning() << "Unable to load UI font: " << path.string().c_str();
-        return;
-    }
-
-    QFont font(font_family[0], pref(Preferences::UIFontSize));
-    font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
-    font.setStyleStrategy(QFont::PreferQuality);
-    font.setStyleHint(QFont::StyleHint::SansSerif);
-    QApplication::setFont(font);
-}
-
-void TrenchBroomApp::setupConsoleFont() {
-    auto path = pref(Preferences::ConsoleFontPath);
-    auto file = IO::SystemPaths::findResourceFile(path);
-
-    QFontDatabase database;
-    if (database.hasFamily(path.string().c_str())) {
-        qInfo() << "use internal Console font: " << path.string().c_str();
-        QFont font(path.string().c_str(), pref(Preferences::UIFontSize));
-        font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
-        font.setStyleStrategy(QFont::PreferQuality);
-        font.setStyleHint(QFont::StyleHint::Monospace);
-
-        m_ConsoleFont = font;
-        return;
-    }
-
-    qInfo() << "loading Console font: " << path.string().c_str();
-
-    if (!exists(file)) {
-        qWarning() << "Console font does not exist: " << path.string().c_str();
-        return;
-    }
-
-    int font_id = database.addApplicationFont(file.c_str());
-    auto font_family = database.applicationFontFamilies(font_id);
-
-    if (font_family.empty()) {
-        qWarning() << "Unable to load Console font: " << path.string().c_str();
-        return;
-    }
-
-    QFont font(font_family[0], pref(Preferences::ConsoleFontSize));
-    font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
-    font.setStyleStrategy(QFont::PreferQuality);
-    font.setStyleHint(QFont::StyleHint::Monospace);
-
-    m_ConsoleFont = font;
-}
-
 const QFont &TrenchBroomApp::getUIFont() const {
     return m_UI_Font;
 }
 
 const QFont &TrenchBroomApp::getConsoleFont() const {
     return m_ConsoleFont;
+}
+
+const QFont &TrenchBroomApp::getRenderFont() const {
+    return m_RenderFont;
+}
+
+QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const size_t size) {
+    auto file = IO::SystemPaths::findResourceFile(path);
+
+    QFontDatabase database;
+    if (database.hasFamily(path.string().c_str())) {
+        qInfo() << "use internal font: " << path.string().c_str();
+        QFont font(path.string().c_str(), size);
+        font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
+        font.setStyleStrategy(QFont::PreferQuality);
+        font.setStyleHint(QFont::StyleHint::Monospace);
+
+        m_ConsoleFont = font;
+        return QFont{};
+    }
+
+    qInfo() << "loading font: " << path.string().c_str();
+
+    if (!exists(file)) {
+        qWarning() << "Font does not exist: " << path.string().c_str();
+        return QFont{};
+    }
+
+    int font_id = database.addApplicationFont(file.c_str());
+    auto font_family = database.applicationFontFamilies(font_id);
+
+    if (font_family.empty()) {
+        qWarning() << "Unable to load font: " << path.string().c_str();
+        return QFont{};
+    }
+
+    QFont font(font_family[0], size);
+    font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
+    font.setStyleStrategy(QFont::PreferQuality);
+    font.setStyleHint(QFont::StyleHint::Monospace);
+
+    return font;
 }
 
 

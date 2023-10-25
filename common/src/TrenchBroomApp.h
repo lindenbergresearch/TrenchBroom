@@ -72,7 +72,7 @@ private:
     std::unique_ptr<RecentDocuments> m_recentDocuments;
     std::unique_ptr<WelcomeWindow> m_welcomeWindow;
     QTimer *m_recentDocumentsReloadTimer;
-    QFont m_UI_Font, m_ConsoleFont;
+    QFont m_UI_Font, m_ConsoleFont, m_RenderFont;
     QSSBuilder *builder = nullptr;
 public:
 
@@ -83,6 +83,8 @@ public:
     const QFont &getUIFont() const;
 
     const QFont &getConsoleFont() const;
+
+    const QFont &getRenderFont() const;
 
     static TrenchBroomApp &instance();
 
@@ -101,9 +103,7 @@ private:
 public:
     void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
 
-    void setupUIFont();
-
-    void setupConsoleFont();
+    QFont loadFont(const std::filesystem::path &path, const size_t size);
 
     const std::vector<std::filesystem::path> &recentDocuments() const;
 
