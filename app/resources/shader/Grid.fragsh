@@ -27,7 +27,7 @@ float getSoftStripes(float value, float gridSize, float stripeSize, float majorD
     // major line shading, currently set to place a major line every 64 units
     float mValue = 1.0 / (majorDivisionSize * gridSize);
     float triMajor = abs(2.0 * fract(mainVal * mValue) - 1.0);
-    float isMajor = step(1.0 - mValue, triMajor);
+    float isMajor = majorDivisionSize > 0 ? step(1.0 - mValue, triMajor) : 0;
 
     float outIntensity = isMajor * 1.0 + 0.85; // tweak intensities here
     float sSize = stripeSize;
