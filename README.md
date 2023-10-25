@@ -11,6 +11,28 @@ TrenchBroom is a modern cross-platform level editor for Quake-engine based games
 - Video Tutorial Series:  https://www.youtube.com/playlist?list=PLgDKRPte5Y0AZ_K_PZbWbgBAEt5xf74aE
 - Manual:    https://trenchbroom.github.io/manual/latest
 
+## Added/Adapted Features
+- reworked and improved UI design
+- customizable UI colors:
+	- windows tint
+	- highlight color
+	- text color
+	- console colors
+- adjustable UI brightness
+- customizable fonts (and font-sizes) for: 
+	- UI
+	- Console	
+	- Map Rendering
+- added support for metric labels to work with Qodot and TBLoader  
+     (with configurable factor) 
+- extended tool-bar with configurable icon size
+- extended welcome windows
+- colored dimension labels (colored depending on axis: X,Y,Z)
+- configurable grid color for 2D **and** 3D and it's line-width
+- dashed selection-bounds with intersection-only-mode to improve ???
+- dimension labels colored by axis
+
+
 ## Features
 * **General**
 	- Full support for editing in 3D and in up to three 2D views
