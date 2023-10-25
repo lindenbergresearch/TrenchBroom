@@ -907,21 +907,21 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
                 "Menu/Edit/Undo"
             }, QObject::tr("Undo"), QKeySequence::Undo, [](ActionExecutionContext &context) { context.frame()->undo(); }, [](ActionExecutionContext &context) {
               return context.hasDocument() && context.frame()->canUndo();
-            }
+            }, std::filesystem::path{"Undo.svg"}
         ), MenuEntryType::Menu_Undo
     );
     editMenu.addItem(createMenuAction(std::filesystem::path{
                 "Menu/Edit/Redo"
             }, QObject::tr("Redo"), QKeySequence::Redo, [](ActionExecutionContext &context) { context.frame()->redo(); }, [](ActionExecutionContext &context) {
               return context.hasDocument() && context.frame()->canRedo();
-            }
+            }, std::filesystem::path{"Redo.svg"}
         ), MenuEntryType::Menu_Redo
     );
     editMenu.addSeparator();
     editMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Edit/Repeat"
         }, QObject::tr("Repeat Last Commands"), Qt::CTRL + Qt::Key_R, [](ActionExecutionContext &context) { context.frame()->repeatLastCommands(); },
-        [](ActionExecutionContext &context) { return context.hasDocument(); }
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, std::filesystem::path{"RepeatCommand.svg"}
     ));
     editMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Edit/Clear Repeatable Commands"
@@ -1190,28 +1190,28 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
         }, QObject::tr("Convex Merge"), Qt::CTRL + Qt::Key_J, [](ActionExecutionContext &context) { context.frame()->csgConvexMerge(); },
         [](ActionExecutionContext &context) {
           return context.hasDocument() && context.frame()->canDoCsgConvexMerge();
-        }
+        }, std::filesystem::path{"ConvexMerge.svg"}
     ));
     csgMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Edit/CSG/Subtract"
         }, QObject::tr("Subtract"), Qt::CTRL + Qt::Key_K, [](ActionExecutionContext &context) { context.frame()->csgSubtract(); },
         [](ActionExecutionContext &context) {
           return context.hasDocument() && context.frame()->canDoCsgSubtract();
-        }
+        }, std::filesystem::path{"Subtract.svg"}
     ));
     csgMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Edit/CSG/Hollow"
         }, QObject::tr("Hollow"), Qt::CTRL + Qt::SHIFT + Qt::Key_K, [](ActionExecutionContext &context) { context.frame()->csgHollow(); },
         [](ActionExecutionContext &context) {
           return context.hasDocument() && context.frame()->canDoCsgHollow();
-        }
+        }, std::filesystem::path{"Hollow.svg"}
     ));
     csgMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Edit/CSG/Intersect"
         }, QObject::tr("Intersect"), Qt::CTRL + Qt::Key_L, [](ActionExecutionContext &context) { context.frame()->csgIntersect(); },
         [](ActionExecutionContext &context) {
           return context.hasDocument() && context.frame()->canDoCsgIntersect();
-        }
+        }, std::filesystem::path{"Intersect.svg"}
     ));
 
     editMenu.addSeparator();
@@ -1285,6 +1285,40 @@ void ActionManager::createViewMenu() {
           return context.hasDocument() && context.frame()->canDecGridSize();
         }
     ));
+
+    gridMenu.addSeparator();
+    gridMenu.addItem(createMenuAction(std::filesystem::path{
+            "Menu/View/Grid/Hide Major Grid Division"
+        }, QObject::tr("Hide Major Grid Division"), 0, [](ActionExecutionContext &context) { context.frame()->setMajorGridDivision(0); },
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+          return context.hasDocument() && context.frame()->isMajorGridDivisionVisible(0);
+        }, std::filesystem::path{"Dummy.svg"}
+    ));
+
+    gridMenu.addItem(createMenuAction(std::filesystem::path{
+            "Menu/View/Grid/Small Major Grid Division"
+        }, QObject::tr("Small Major Grid Division"), 0, [](ActionExecutionContext &context) { context.frame()->setMajorGridDivision(1); },
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+          return context.hasDocument() && context.frame()->isMajorGridDivisionVisible(1);
+        }, std::filesystem::path{"Dummy.svg"}
+    ));
+
+    gridMenu.addItem(createMenuAction(std::filesystem::path{
+            "Menu/View/Grid/Normal Major Grid Division"
+        }, QObject::tr("Normal Major Grid Division"), 0, [](ActionExecutionContext &context) { context.frame()->setMajorGridDivision(2); },
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+          return context.hasDocument() && context.frame()->isMajorGridDivisionVisible(2);
+        }, std::filesystem::path{"Dummy.svg"}
+    ));
+
+    gridMenu.addItem(createMenuAction(std::filesystem::path{
+            "Menu/View/Grid/Wide Major Grid Division"
+        }, QObject::tr("Wide Major Grid Division"), 0, [](ActionExecutionContext &context) { context.frame()->setMajorGridDivision(3); },
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, [](ActionExecutionContext &context) {
+          return context.hasDocument() && context.frame()->isMajorGridDivisionVisible(3);
+        }, std::filesystem::path{"Dummy.svg"}
+    ));
+
     gridMenu.addSeparator();
     gridMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/View/Grid/Set Grid Size 0.125"
@@ -1629,6 +1663,12 @@ void ActionManager::createToolbar() {
 
     m_toolBar->addSeparator();
 
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Undo"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Redo"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Repeat"}));
+
+    m_toolBar->addSeparator();
+
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Rotate Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Scale Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Shear Tool"}));
@@ -1643,6 +1683,13 @@ void ActionManager::createToolbar() {
 
     m_toolBar->addSeparator();
 
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/CSG/Hollow"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/CSG/Subtract"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/CSG/Intersect"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/CSG/Convex Merge"}));
+
+    m_toolBar->addSeparator();
+
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Texture Lock"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/UV Lock"}));
 
@@ -1650,6 +1697,12 @@ void ActionManager::createToolbar() {
 
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Show Grid"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Snap to Grid"}));
+
+//    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Hide Major Grid Division"}));
+//    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Small Major Grid Division"}));
+//    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Normal Major Grid Division"}));
+//    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Wide Major Grid Division"}));
+
 }
 
 
