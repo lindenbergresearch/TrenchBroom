@@ -30,6 +30,8 @@ class RenderBatch;
 class RenderContext;
 
 class SelectionBoundsRenderer {
+    static const float AXIS_LABEL_DIM_FACTOR;
+
 private:
     const vm::bbox3 m_bounds;
 
