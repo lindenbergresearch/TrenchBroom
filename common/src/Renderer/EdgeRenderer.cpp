@@ -57,7 +57,7 @@ void EdgeRenderer::RenderBase::renderEdges(RenderContext &renderContext) {
         glSetEdgeOffset(m_params.offset);
     }
 
-    if (m_params.width != 1.0f) {
+    if (m_params.width != 1.0f && renderContext.render3D()) {
         glAssert(glLineWidth(m_params.width));
     }
 
