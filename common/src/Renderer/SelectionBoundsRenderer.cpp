@@ -36,6 +36,9 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+
+const float SelectionBoundsRenderer::AXIS_LABEL_DIM_FACTOR = 0.7f;
+
 class SelectionBoundsRenderer::SizeTextAnchor2D : public TextAnchor3D {
 private:
     const vm::bbox3 &m_bounds;
@@ -341,9 +344,10 @@ void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderB
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
     renderService.setShowOccludedObjects();
+    auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
 
-    colors[0] = Color(pref(Preferences::XAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
-    colors[1] = Color(pref(Preferences::YAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
+    colors[0] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::XAxisColor), alpha);
+    colors[1] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::YAxisColor), alpha);
 
     const Camera &camera = renderContext.camera();
     const vm::vec3f &direction = camera.direction();
@@ -367,10 +371,11 @@ void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderB
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
     renderService.setShowOccludedObjects();
+    auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
 
-    colors[0] = Color(pref(Preferences::XAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
-    colors[1] = Color(pref(Preferences::YAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
-    colors[2] = Color(pref(Preferences::ZAxisColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha));
+    colors[0] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::XAxisColor), alpha);
+    colors[1] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::YAxisColor), alpha);
+    colors[2] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::ZAxisColor), alpha);
 
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
