@@ -42,10 +42,12 @@ Preference<QString> Theme("Theme", darkTheme());
 Preference<bool> ShowAxes("Renderer/Show axes", true);
 Preference<Color> SoftMapBoundsColor("Renderer/Colors/Soft map bounds color", Color(241, 125, 37));
 Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38));
+
 Preference<float> AxisLength("Renderer/Axis length", 128.0f);
-Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0xFF, 0x3D, 0x00, 0.7f), true);
-Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0x4B, 0x95, 0x00, 0.7f), true);
-Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0x10, 0x9C, 0xFF, 0.7f), true);
+Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.8f, 0.1f, 0.2f, 1.0f));
+Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.8f, 0.1f, 1.0f));
+Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1.0f));
+
 Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
 Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
@@ -100,7 +102,7 @@ Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds inte
 Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
 Preference<Color> InfoOverlayBackgroundColor("Renderer/Colors/Info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
-Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 0.75f);
+Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 1.0f);
 Preference<Color> SelectedInfoOverlayTextColor("Renderer/Colors/Selected info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> SelectedInfoOverlayBackgroundColor("Renderer/Colors/Selected info overlay background", Color(1.0f, 0.0f, 0.0f, 0.6f));
 Preference<Color> LockedInfoOverlayTextColor("Renderer/Colors/Locked info overlay text", Color(0.35f, 0.35f, 0.6f, 1.0f));

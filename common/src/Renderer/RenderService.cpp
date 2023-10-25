@@ -196,11 +196,11 @@ void RenderService::renderLineStrip(const std::vector<vm::vec3f> &positions) {
 }
 
 void RenderService::renderCoordinateSystem(const vm::bbox3f &bounds) {
-    const Color &x = View::modifyAlpha(pref(Preferences::XAxisColor), 0.75f);
-    const Color &y = View::modifyAlpha(pref(Preferences::YAxisColor), 0.75f);
-    const Color &z =View::modifyAlpha(pref(Preferences::ZAxisColor), 0.75f);
+    const Color &x = View::modifyAlpha(pref(Preferences::XAxisColor), 0.5f);
+    const Color &y = View::modifyAlpha(pref(Preferences::YAxisColor), 0.5f);
+    const Color &z =View::modifyAlpha(pref(Preferences::ZAxisColor), 0.5f);
 
-    m_lineWidth = 2.0f;
+    m_lineWidth = 1.5f;
 
     if (m_renderContext.render2D()) {
         const Camera &camera = m_renderContext.camera();
