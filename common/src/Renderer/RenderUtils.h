@@ -24,6 +24,7 @@
 
 #include <utility>
 #include <vector>
+#include "Color.h"
 
 namespace TrenchBroom {
 namespace Assets {
@@ -31,6 +32,10 @@ class Texture;
 }
 
 namespace Renderer {
+Color modifyColor(const Color &color, float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+
+Color modifyAlpha(const Color &color, float alpha);
+
 vm::vec3f gridColorForTexture(const Assets::Texture *texture);
 
 void glSetEdgeOffset(double f);

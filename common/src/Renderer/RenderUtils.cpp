@@ -33,6 +33,14 @@ namespace TrenchBroom {
 namespace Renderer {
 static const double EdgeOffset = 0.0001;
 
+Color modifyAlpha(const Color &color, float alpha) {
+    return Color{color.r(), color.g(), color.b(), alpha};
+}
+
+Color modifyColor(const Color &color, float r, float g, float b, float a) {
+    return Color{color.r() * r, color.g() * g, color.b() * b, color.a() * a};
+}
+
 vm::vec3f gridColorForTexture(const Assets::Texture *texture) {
     if (texture == nullptr) {
         return vm::vec3f::fill(1.0f);
