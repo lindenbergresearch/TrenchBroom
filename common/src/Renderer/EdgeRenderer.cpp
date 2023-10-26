@@ -63,6 +63,10 @@ void EdgeRenderer::RenderBase::renderEdges(RenderContext &renderContext) {
 
     if (m_params.onTop) {
         glAssert(glDisable(GL_DEPTH_TEST));
+
+        if (pref(Preferences::ShowHiddenSelectionBounds)) {
+            glAssert(glClear(GL_DEPTH_BUFFER_BIT));
+        }
     }
 
     {
