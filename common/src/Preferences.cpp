@@ -70,8 +70,8 @@ Preference<Color> &axisColor(vm::axis::type axis) {
 
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 1.0f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 1.0f));
-Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.3f);
-Preference<float> CompassScale("Renderer/Colors/Compass scale", 2.0f);
+Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.95f);
+Preference<float> CompassScale("Renderer/Colors/Compass scale", 1.5f);
 
 Preference<Color> CameraFrustumColor("Renderer/Colors/Camera frustum", Color(0.0f, 1.0f, 1.0f, 1.0f));
 
