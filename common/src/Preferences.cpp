@@ -283,7 +283,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
         &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor, &PointFileColor, &PortalFileBorderColor,
         &PortalFileFillColor, &ShowFPS, &UnitsDisplayType, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
-        &CompassBackgroundOutlineColor, &CompassTransparency, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
+        &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
         &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
         &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
