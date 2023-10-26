@@ -43,6 +43,7 @@
 #include "Renderer/RenderBatch.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/SelectionBoundsRenderer.h"
+#include "Renderer/RenderUtils.h"
 #include "View/CameraAnimation.h"
 #include "View/CameraTool3D.h"
 #include "View/ClipToolController.h"
@@ -460,7 +461,7 @@ void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderCon
         Renderer::BoundsGuideRenderer *guideRenderer = new Renderer::BoundsGuideRenderer(m_document);
 
         // draw guides half transparent
-        auto guideColor = modifyAlpha(pref(Preferences::SelectionBoundsColor), pref(Preferences::SelectionBoundsAlpha));
+        auto guideColor = Renderer::modifyAlpha(pref(Preferences::SelectionBoundsColor), pref(Preferences::SelectionBoundsAlpha));
         guideRenderer->setColor(guideColor);
 
         guideRenderer->setBounds(bounds);
