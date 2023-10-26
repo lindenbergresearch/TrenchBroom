@@ -43,5 +43,5 @@ void main(void) {
     float NdotHV = max(-dot(normal, halfVector), 0.0);
     vec4 specular = MaterialSpecular * LightSpecular * pow(NdotHV, MaterialShininess);
 
-	gl_FrontColor = vec4((diffuse + ambient + specular).xyz, 1.0);
+	gl_FrontColor = (diffuse + ambient + specular);
 }
