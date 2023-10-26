@@ -47,9 +47,9 @@ namespace TrenchBroom {
 namespace Renderer {
 const size_t Compass::m_segments = 32;
 const float Compass::m_shaftLength = 28.0f;
-const float Compass::m_shaftRadius = 0.75f;
+const float Compass::m_shaftRadius = 1.15f;
 const float Compass::m_headLength = 7.0f;
-const float Compass::m_headRadius = 3.0f;
+const float Compass::m_headRadius = 3.5f;
 
 Compass::Compass() : m_prepared(false) {
     makeArrows();
@@ -176,8 +176,6 @@ vm::mat4x4f Compass::cameraRotationMatrix(const Camera &camera) const {
 }
 
 void Compass::renderBackground(RenderContext &renderContext) {
-    PreferenceManager &prefs = PreferenceManager::instance();
-
     const MultiplyModelMatrix rotate(renderContext.transformation(), vm::mat4x4f::rot_90_x_ccw());
     ActiveShader shader(renderContext.shaderManager(), Shaders::CompassBackgroundShader);
 
