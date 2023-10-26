@@ -70,7 +70,7 @@ Preference<Color> &axisColor(vm::axis::type axis) {
 
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 0.5f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 0.5f));
-Preference<Color> CompassAxisOutlineColor("Renderer/Colors/Compass axis outline", Color(1.0f, 1.0f, 1.0f, 1.0f));
+Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.3f);
 Preference<float> CompassScale("Renderer/Colors/Compass scale", 2.5f);
 
 Preference<Color> CameraFrustumColor("Renderer/Colors/Camera frustum", Color(0.0f, 1.0f, 1.0f, 1.0f));
@@ -283,16 +283,16 @@ const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
         &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor, &PointFileColor, &PortalFileBorderColor,
         &PortalFileFillColor, &ShowFPS, &UnitsDisplayType, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
-        &CompassBackgroundOutlineColor, &CompassAxisOutlineColor, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
+        &CompassBackgroundOutlineColor, &CompassTransparency, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
-        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor,&SelectionBoundsPointColor,&SelectionBoundsPointSize,&SelectionBoundsDashedLines,&ShowHiddenSelectionBounds,
-        &InfoOverlayTextColor,&SelectionBoundsIntersectionMode,&SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
+        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
+        &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
         &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor,
         &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor, &OccludedHandleColor,
         &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor,
         &ScaleHandleColor, &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor,
         &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness,
-        &GridLineWidth, &GridAlpha,&GridMajorDivisionSize, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath,
+        &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath,
         &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor,
         &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor,
         &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed,

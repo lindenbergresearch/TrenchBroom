@@ -66,7 +66,7 @@ Preference<Color> &axisColor(vm::axis::type axis);
 
 extern Preference<Color> CompassBackgroundColor;
 extern Preference<Color> CompassBackgroundOutlineColor;
-extern Preference<Color> CompassAxisOutlineColor;
+extern Preference<float> CompassTransparency;
 extern Preference<float> CompassScale;
 
 extern Preference<Color> CameraFrustumColor;
