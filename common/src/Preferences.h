@@ -67,6 +67,7 @@ Preference<Color> &axisColor(vm::axis::type axis);
 extern Preference<Color> CompassBackgroundColor;
 extern Preference<Color> CompassBackgroundOutlineColor;
 extern Preference<Color> CompassAxisOutlineColor;
+extern Preference<float> CompassScale;
 
 extern Preference<Color> CameraFrustumColor;
 
@@ -94,6 +95,8 @@ extern Preference<float> SelectionBoundsPointSize;
 extern Preference<int> SelectionBoundsPattern;
 extern Preference<bool> SelectionBoundsIntersectionMode;
 extern Preference<bool> SelectionBoundsDashedLines;
+extern Preference<bool> ShowHiddenSelectionBounds;
+
 
 
 extern Preference<Color> InfoOverlayTextColor;

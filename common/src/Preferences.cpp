@@ -71,6 +71,7 @@ Preference<Color> &axisColor(vm::axis::type axis) {
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 0.5f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> CompassAxisOutlineColor("Renderer/Colors/Compass axis outline", Color(1.0f, 1.0f, 1.0f, 1.0f));
+Preference<float> CompassScale("Renderer/Colors/Compass scale", 2.5f);
 
 Preference<Color> CameraFrustumColor("Renderer/Colors/Camera frustum", Color(0.0f, 1.0f, 1.0f, 1.0f));
 
@@ -98,6 +99,7 @@ Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point col
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);
+Preference<bool> ShowHiddenSelectionBounds("Renderer/Selection bounds show hidden bounds", true);
 
 Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
@@ -283,7 +285,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &PortalFileFillColor, &ShowFPS, &UnitsDisplayType, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
         &CompassBackgroundOutlineColor, &CompassAxisOutlineColor, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
-        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor,&SelectionBoundsPointColor,&SelectionBoundsPointSize,&SelectionBoundsDashedLines,
+        &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor,&SelectionBoundsPointColor,&SelectionBoundsPointSize,&SelectionBoundsDashedLines,&ShowHiddenSelectionBounds,
         &InfoOverlayTextColor,&SelectionBoundsIntersectionMode,&SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
         &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor,
         &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor, &OccludedHandleColor,
