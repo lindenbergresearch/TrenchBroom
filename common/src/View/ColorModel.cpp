@@ -151,7 +151,7 @@ void ColorModel::pickColor(const QModelIndex &mi) {
     auto color = toQColor(pref(*colorPreference));
 
     // Show dialog
-    auto newColor = QColorDialog::getColor(color, nullptr, "Select new color", QColorDialog::DontUseNativeDialog);
+    auto newColor = QColorDialog::getColor(color, nullptr, "Select new color", QColorDialog::DontUseNativeDialog | QColorDialog::ShowAlphaChannel);
 
     // Apply color (QColorDialog::getColor() returns an invalid color if the user cancels
     // the dialog)
