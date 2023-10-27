@@ -45,6 +45,8 @@ public:
 
     Color(int r, int g, int b, int a = 0xFF);
 
+    Color(QColor qColor);
+
     float r() const;
 
     float g() const;

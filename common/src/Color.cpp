@@ -125,4 +125,7 @@ void Color::rgbToHSB(const float r, const float g, const float b, float &h, floa
             h = h + 1.0f;
     }
 }
+
+Color::Color(QColor qColor) : vec<float, 4>(qColor.redF(), qColor.greenF(), qColor.blueF(), qColor.alphaF()) {
+}
 } // namespace TrenchBroom
