@@ -40,6 +40,8 @@ QString darkTheme() {
 Preference<QString> Theme("Theme", darkTheme());
 
 Preference<bool> ShowAxes("Renderer/Show axes", true);
+Preference<bool> ShowFocusIndicator("Renderer/Show focus indicator", true);
+Preference<float> ViewFrameWidth("Renderer/View frame width", 2.0f);
 Preference<Color> SoftMapBoundsColor("Renderer/Colors/Soft map bounds color", Color(241, 125, 37));
 Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38));
 
@@ -51,7 +53,7 @@ Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1
 Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
 Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
-Preference<bool> ShowFPS("Renderer/Show FPS", false);
+Preference<bool> ShowFPS("Renderer/Show FPS", true);
 
 Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsDisplay::UNITS);
 Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor", 32.0f);

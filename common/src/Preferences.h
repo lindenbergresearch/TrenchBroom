@@ -48,6 +48,8 @@ QString darkTheme();
 extern Preference<QString> Theme;
 
 extern Preference<bool> ShowAxes;
+extern Preference<bool> ShowFocusIndicator;
+extern Preference<float> ViewFrameWidth;
 extern Preference<Color> SoftMapBoundsColor;
 extern Preference<Color> BackgroundColor;
 extern Preference<float> AxisLength;
@@ -96,8 +98,6 @@ extern Preference<int> SelectionBoundsPattern;
 extern Preference<bool> SelectionBoundsIntersectionMode;
 extern Preference<bool> SelectionBoundsDashedLines;
 extern Preference<bool> ShowHiddenSelectionBounds;
-
-
 
 extern Preference<Color> InfoOverlayTextColor;
 extern Preference<Color> GroupInfoOverlayTextColor;
