@@ -82,9 +82,10 @@ namespace TrenchBroom {
 namespace View {
 RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpenGLWidget(parent), m_glContext(&contextManager), m_framesRendered(0),
     m_maxFrameTimeMsecs(0), m_lastFPSCounterUpdate(0) {
-    QPalette pal;
-    const QColor color = pal.color(QPalette::Highlight);
-    m_focusColor = fromQColor(color);
+
+    auto palette = QPalette{};
+    m_focusColor = palette.color(QPalette::Highlight);
+    m_frameColor = palette.color(QPalette::Midlight);
 
     // FPS counter
     QTimer *fpsCounter = new QTimer(this);
@@ -231,18 +232,20 @@ const Color &RenderView::getBackgroundColor() {
 }
 
 void RenderView::renderFocusIndicator() {
-    if (!doShouldRenderFocusIndicator() || !hasFocus())
+    if (!doShouldRenderFocusIndicator())
         return;
 
-    const Color &outer = m_focusColor;
-    const Color &inner = m_focusColor;
+    const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator);
+    const Color &outer = Color(drawFocus ? m_focusColor : m_frameColor);
+    const Color &inner = Color(drawFocus ? m_focusColor : m_frameColor);
 
     const qreal r = devicePixelRatioF();
     const auto w = static_cast<float>(width() * r);
     const auto h = static_cast<float>(height() * r);
     glAssert(glViewport(0, 0, static_cast<int>(w), static_cast<int>(h)));
 
-    const auto t = 1.0f;
+    const auto t = pref(Preferences::ViewFrameWidth);
+//    const auto t = hasFocus() ? 1.0f : 2.0f;
 
     const auto projection = vm::ortho_matrix(-1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
     Renderer::Transformation transformation(projection, vm::mat4x4f::identity());
@@ -250,7 +253,8 @@ void RenderView::renderFocusIndicator() {
     glAssert(glDisable(GL_DEPTH_TEST));
 
     using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
-    auto array = Renderer::VertexArray::move(std::vector<Vertex>({// top
+    auto array = Renderer::VertexArray::move(std::vector<Vertex>({
+            // top
             Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w - t, t, 0.0f), inner),
             Vertex(vm::vec3f(t, t, 0.0f), inner),
 

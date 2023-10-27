@@ -49,7 +49,7 @@ class GLContextManager;
 class RenderView : public QOpenGLWidget, public InputEventProcessor {
 Q_OBJECT
 private:
-    Color m_focusColor;
+    Color m_focusColor, m_frameColor;
     GLContextManager *m_glContext;
     InputEventRecorder m_eventRecorder;
 
