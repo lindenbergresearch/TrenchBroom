@@ -32,6 +32,10 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+
+static const float DEFAULT_EDGE_LINE_WIDTH = 1.0f;
+static const float DEFAULT_2D_EDGE_LINE_FACTOR = 1.f / 3.f;
+
 EdgeRenderer::Params::Params(const float i_width, const double i_offset, const bool i_onTop) : width{i_width}, offset{
     i_offset
 }, onTop{i_onTop}, useColor{false} {
@@ -52,18 +56,27 @@ EdgeRenderer::RenderBase::RenderBase(const Params &params) : m_params{params} {
 
 EdgeRenderer::RenderBase::~RenderBase() = default;
 
+
 void EdgeRenderer::RenderBase::renderEdges(RenderContext &renderContext) {
     if (m_params.offset != 0.0) {
         glSetEdgeOffset(m_params.offset);
     }
 
-    if (m_params.width != 1.0f && renderContext.render3D()) {
-        glAssert(glLineWidth(m_params.width));
+    if (m_params.width != DEFAULT_EDGE_LINE_WIDTH) {
+        if (renderContext.render3D()) {
+            glAssert(glLineWidth(m_params.width));
+        }
+        else {
+            auto lineWidth = std::max(m_params.width * DEFAULT_2D_EDGE_LINE_FACTOR, DEFAULT_EDGE_LINE_WIDTH);
+            // use thinner lines in 2D view which looks better
+            glAssert(glLineWidth(lineWidth));
+        }
     }
 
     if (m_params.onTop) {
         glAssert(glDisable(GL_DEPTH_TEST));
 
+        // show selection bounds which are covered by a brush
         if (pref(Preferences::ShowHiddenSelectionBounds)) {
             glAssert(glClear(GL_DEPTH_BUFFER_BIT));
         }
@@ -87,8 +100,8 @@ void EdgeRenderer::RenderBase::renderEdges(RenderContext &renderContext) {
         glAssert(glEnable(GL_DEPTH_TEST));
     }
 
-    if (m_params.width != 1.0f) {
-        glAssert(glLineWidth(1.0f));
+    if (m_params.width != DEFAULT_EDGE_LINE_WIDTH) {
+        glAssert(glLineWidth(DEFAULT_EDGE_LINE_WIDTH));
     }
 
     if (m_params.offset != 0.0) {

@@ -23,6 +23,8 @@
 #include "Renderer/IndexRangeMap.h"
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 #include <memory>
 
@@ -33,8 +35,6 @@ class BrushIndexArray;
 class BrushVertexArray;
 
 class RenderBatch;
-
-static const float EDGE_LINE_WIDTH = 1.9f;
 
 class EdgeRenderer {
 public:
@@ -71,17 +71,17 @@ public:
 public:
     virtual ~EdgeRenderer();
 
-    void render(RenderBatch &renderBatch, float width = EDGE_LINE_WIDTH, double offset = 0.0);
+    void render(RenderBatch &renderBatch, float width = pref(Preferences::EdgeLineWidth), double offset = 0.0);
 
-    void render(RenderBatch &renderBatch, const Color &color, float width = EDGE_LINE_WIDTH, double offset = 0.0);
+    void render(RenderBatch &renderBatch, const Color &color, float width = pref(Preferences::EdgeLineWidth), double offset = 0.0);
 
-    void render(RenderBatch &renderBatch, bool useColor, const Color &color, float width = EDGE_LINE_WIDTH, double offset = 0.0);
+    void render(RenderBatch &renderBatch, bool useColor, const Color &color, float width = pref(Preferences::EdgeLineWidth), double offset = 0.0);
 
-    void renderOnTop(RenderBatch &renderBatch, float width = EDGE_LINE_WIDTH, double offset = 0.2);
+    void renderOnTop(RenderBatch &renderBatch, float width = pref(Preferences::EdgeLineWidth), double offset = 0.2);
 
-    void renderOnTop(RenderBatch &renderBatch, const Color &color, float width = EDGE_LINE_WIDTH, double offset = 0.2);
+    void renderOnTop(RenderBatch &renderBatch, const Color &color, float width = pref(Preferences::EdgeLineWidth), double offset = 0.2);
 
-    void renderOnTop(RenderBatch &renderBatch, bool useColor, const Color &color, float width = EDGE_LINE_WIDTH, double offset = 0.2);
+    void renderOnTop(RenderBatch &renderBatch, bool useColor, const Color &color, float width = pref(Preferences::EdgeLineWidth), double offset = 0.2);
 
     void render(RenderBatch &renderBatch, bool useColor, const Color &color, bool onTop, float width, double offset);
 
