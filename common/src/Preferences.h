@@ -83,8 +83,12 @@ extern Preference<Color> FaceColor;
 extern Preference<Color> SelectedFaceColor;
 extern Preference<Color> LockedFaceColor;
 extern Preference<float> TransparentFaceAlpha;
+
 extern Preference<Color> EdgeColor;
 extern Preference<Color> SelectedEdgeColor;
+extern Preference<float> EdgeLineWidth;
+extern Preference<float> EdgeSelectedLineWidth;
+
 extern Preference<float> OccludedSelectedEdgeAlpha;
 extern Preference<Color> LockedEdgeColor;
 extern Preference<Color> UndefinedEntityColor;

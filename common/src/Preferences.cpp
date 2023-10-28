@@ -87,8 +87,12 @@ Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.2f, 0.2f, 0.2f, 1.0
 Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.0f, 0.85f, 0.85f, 1.0f));
 Preference<Color> LockedFaceColor("Renderer/Colors/Locked faces", Color(0.85f, 0.85f, 1.0f, 1.0f));
 Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.4f);
+
 Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.9f, 0.9f, 0.9f, 1.0f));
 Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 1.0f));
+Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.0f);
+Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.4f);
+
 Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.4f);
 Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.13f, 0.3f, 1.0f, 1.0f));
 Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.5f, 0.5f, 0.5f, 1.0f));
