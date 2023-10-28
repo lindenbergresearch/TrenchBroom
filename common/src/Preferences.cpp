@@ -27,7 +27,6 @@
 
 namespace TrenchBroom {
 namespace Preferences {
-Preference<int> MapViewLayout("Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane));
 
 QString systemTheme() {
     return QStringLiteral("System");
@@ -37,27 +36,24 @@ QString darkTheme() {
     return QStringLiteral("Dark");
 }
 
+/* --- VIEW ------------------------------------------ */
 Preference<QString> Theme("Theme", darkTheme());
-
-Preference<bool> ShowAxes("Renderer/Show axes", true);
+Preference<int> MapViewLayout("Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane));
 Preference<bool> ShowFocusIndicator("Renderer/Show focus indicator", true);
 Preference<float> ViewFrameWidth("Renderer/View frame width", 2.0f);
 Preference<Color> SoftMapBoundsColor("Renderer/Colors/Soft map bounds color", Color(241, 125, 37));
 Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38));
-
-Preference<float> AxisLength("Renderer/Axis length", 128.0f);
-Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.8f, 0.1f, 0.2f, 1.0f));
-Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.8f, 0.1f, 1.0f));
-Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1.0f));
-
 Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
 Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
 Preference<bool> ShowFPS("Renderer/Show FPS", true);
 
-Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsDisplay::UNITS);
-Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor", 32.0f);
-
+/* --- AXIS ------------------------------------------ */
+Preference<bool> ShowAxes("Renderer/Show axes", true);
+Preference<float> AxisLength("Renderer/Axis length", 128.0f);
+Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.8f, 0.1f, 0.2f, 1.0f));
+Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.8f, 0.1f, 1.0f));
+Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1.0f));
 Preference<Color> &axisColor(vm::axis::type axis) {
     switch (axis) {
         case vm::axis::x:
@@ -70,6 +66,11 @@ Preference<Color> &axisColor(vm::axis::type axis) {
     }
 }
 
+/* --- UNITS CONVERSATION ---------------------------- */
+Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsDisplay::UNITS);
+Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor", 32.0f);
+
+/* --- COMPASS---------------------------------------- */
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 1.0f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.95f);
@@ -83,20 +84,23 @@ Preference<Color> LinkedGroupColor("Renderer/Colors/Linked Groups", Color(1.0f, 
 Preference<Color> TutorialOverlayTextColor("Renderer/Colors/Tutorial overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> TutorialOverlayBackgroundColor("Renderer/Colors/Tutorial overlay background", Color(1.0f, 0.5f, 0.0f, 0.6f));
 
+/* --- FACES ----------------------------------------- */
 Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.2f, 0.2f, 0.2f, 1.0f));
 Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.0f, 0.85f, 0.85f, 1.0f));
 Preference<Color> LockedFaceColor("Renderer/Colors/Locked faces", Color(0.85f, 0.85f, 1.0f, 1.0f));
 Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.4f);
 
+/* --- EDGES ----------------------------------------- */
 Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.9f, 0.9f, 0.9f, 1.0f));
 Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.0f);
 Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.4f);
-
 Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.4f);
 Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.13f, 0.3f, 1.0f, 1.0f));
+
 Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.5f, 0.5f, 0.5f, 1.0f));
 
+/* --- SELECTION BOUNDS ------------------------------ */
 Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
 Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.4f);
@@ -149,6 +153,8 @@ Preference<Color> TextureSeamColor("Renderer/Colors/Texture seam", Color(1.0f, 1
 
 Preference<float> Brightness("Renderer/Brightness", 1.4f);
 Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 0);
+
+/* --- GRID ------------------------------------------ */
 Preference<float> GridLineWidth("Renderer/Grid/With", 1.0);
 Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.5f);
 Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 128.0f);
@@ -161,10 +167,10 @@ Preference<bool> EnableMSAA("Renderer/Enable multisampling", true);
 Preference<bool> TextureLock("Editor/Texture lock", true);
 Preference<bool> UVLock("Editor/UV lock", false);
 
+/* --- FONTS ----------------------------------------- */
 Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/Inter-SemiBold.otf");
 Preference<std::filesystem::path> UIFontPath("Editor/UI Font name", "fonts/Inter-Regular.otf");
 Preference<std::filesystem::path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono-Regular.ttf");
-
 Preference<int> RendererFontSize("Renderer/Font size", 13);
 Preference<int> BrowserFontSize("Browser/Font size", 13);
 Preference<int> UIFontSize("Editor/UI Font size", 13);
@@ -181,16 +187,19 @@ Preference<Color> TextureBrowserDefaultColor("Texture Browser/Default color", Co
 Preference<Color> TextureBrowserSelectedColor("Texture Browser/Selected color", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<Color> TextureBrowserUsedColor("Texture Browser/Used color", Color(1.0f, 0.7f, 0.0f, 1.0f));
 
+/* --- UI COLORS  ------------------------------------ */
 Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.121f, 0.3359f, 0.6875f));
 Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f, 0.117f, 0.125f));
 Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color(0.7f, 0.7f, 0.7f));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
 
+/* --- LOGGING COLORS -------------------------------- */
 Preference<Color> LogDebugColor("Editor/Colors/LogLevel Debug", Color(0.0f, 0.6f, 0.68f));
 Preference<Color> LogInfoColor("Editor/Colors/LogLevel Info", Color(0.8f, 0.8f, 0.8f));
 Preference<Color> LogWarningColor("Editor/Colors/LogLevel Warning", Color(0.78f, 0.72f, 0.1f));
 Preference<Color> LogErrorColor("Editor/Colors/LogLevel Error", Color(0.98f, 0.12f, 0.23f));
 
+/* --- CAMERA ---------------------------------------- */
 Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
 Preference<bool> CameraLookInvertV("Controls/Camera/Invert vertical look", false);
@@ -203,9 +212,7 @@ Preference<bool> CameraEnableAltMove("Controls/Camera/Use alt to move", false);
 Preference<bool> CameraAltMoveInvert("Controls/Camera/Invert zoom direction when using alt to move", false);
 Preference<bool> CameraMoveInCursorDir("Controls/Camera/Move camera in cursor dir", false);
 Preference<float> CameraFov("Controls/Camera/Field of vision", 90.0f);
-
 Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.5f);
-
 Preference<bool> Link2DCameras("Controls/Camera/Link 2D cameras", true);
 
 Preference<QKeySequence> &CameraFlyForward() {
@@ -238,6 +245,7 @@ Preference<QKeySequence> &CameraFlyDown() {
     return pref;
 }
 
+/* --- MAP VIEW--------------------------------------- */
 Preference<bool> ShowEntityClassnames("Map view/Show entity classnames", true);
 Preference<bool> ShowGroupBounds("Map view/Show group bounds", true);
 Preference<bool> ShowBrushEntityBounds("Map view/Show brush entity bounds", true);
@@ -257,13 +265,10 @@ QString faceRenderModeSkip() {
 }
 
 Preference<QString> FaceRenderMode("Map view/Face render mode", "textured");
-
 Preference<bool> ShadeFaces("Map view/Shade faces", true);
 Preference<bool> ShowFog("Map view/Show fog", false);
 Preference<bool> ShowEdges("Map view/Show edges", true);
-
 Preference<bool> ShowSoftMapBounds("Map view/Show soft map bounds", true);
-
 Preference<bool> ShowPointEntities("Map view/Show point entities", true);
 Preference<bool> ShowBrushes("Map view/Show brushes", true);
 
