@@ -37,6 +37,7 @@
 #include "View/KeyboardPreferencePane.h"
 #include "View/MousePreferencePane.h"
 #include "View/PreferencePane.h"
+#include "View/PreferencesPreferencePane.h"
 #include "View/QtUtils.h"
 #include "View/ViewPreferencePane.h"
 
@@ -77,6 +78,7 @@ void PreferenceDialog::createGui() {
     const auto colorsImage = IO::loadSVGIcon("ColorPreferences.svg");
     const auto mouseImage = IO::loadSVGIcon("MousePreferences.svg");
     const auto keyboardImage = IO::loadSVGIcon("KeyboardPreferences.svg");
+    const auto preferencesImage = IO::loadSVGIcon("KeyboardPreferences.svg");
 
     m_toolBar = new QToolBar();
     m_toolBar->setFloatable(false);
@@ -112,6 +114,12 @@ void PreferenceDialog::createGui() {
         }
     );
 
+    m_toolButtonActions["Advanced"] = m_toolBar->addAction(keyboardImage, "Advanced", [this]() {
+          switchToPane(PrefPane_Advanced);
+          highlightToolButton("Advanced");
+        }
+    );
+
     highlightToolButton("Games");
 
     // Don't display tooltips for pane switcher buttons...
@@ -125,6 +133,7 @@ void PreferenceDialog::createGui() {
     m_stackedWidget->addWidget(new ColorsPreferencePane());
     m_stackedWidget->addWidget(new MousePreferencePane());
     m_stackedWidget->addWidget(new KeyboardPreferencePane(m_document.get()));
+    m_stackedWidget->addWidget(new PreferencesPreferencePane());
 
     m_buttonBox = new QDialogButtonBox(QDialogButtonBox::RestoreDefaults
 #if !defined __APPLE__

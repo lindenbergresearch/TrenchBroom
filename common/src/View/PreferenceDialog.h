@@ -48,7 +48,8 @@ private:
       PrefPane_Colors = 2,
       PrefPane_Mouse = 3,
       PrefPane_Keyboard = 4,
-      PrefPane_Last = 4
+      PrefPane_Advanced = 5,
+      PrefPane_Last = 6
     };
 
     static const QString WINDOW_TITLE;
