@@ -41,9 +41,15 @@ class PreferencePane;
 class PreferenceDialog : public QDialog {
 Q_OBJECT
 private:
-    typedef enum {
-      PrefPane_First = 0, PrefPane_Games = 0, PrefPane_View = 1, PrefPane_Colors = 2, PrefPane_Mouse = 3, PrefPane_Keyboard = 4, PrefPane_Last = 4
-    } PrefPane;
+    enum PrefPane {
+      PrefPane_First = 0,
+      PrefPane_Games = 0,
+      PrefPane_View = 1,
+      PrefPane_Colors = 2,
+      PrefPane_Mouse = 3,
+      PrefPane_Keyboard = 4,
+      PrefPane_Last = 4
+    };
 
     static const QString WINDOW_TITLE;
     static const QSize ICON_SIZE;
