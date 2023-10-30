@@ -1655,7 +1655,7 @@ bool MapFrame::canFocusCamera() const {
 
 void MapFrame::moveCameraToPosition() {
     bool ok = false;
-    const QString str = QInputDialog::getText(this, "Move Camera", "Enter a position (x y z) for the camera.", QLineEdit::Normal, "0.0 0.0 0.0", &ok);
+    const QString str = QInputDialog::getText(this, "Move Camera", "Enter a position (x y z) for the camera.", QLineEdit::Normal, "0.0 0.0 0.0", &ok, Qt::Tool);
     if (ok) {
         if (const auto position = vm::parse<float, 3>(str.toStdString())) {
             m_mapView->moveCameraToPosition(*position, true);
