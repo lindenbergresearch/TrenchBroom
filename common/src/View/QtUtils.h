@@ -230,6 +230,8 @@ Color fromQColor(const QColor &color);
 
 QColor toQColor(const Color &color, float multiplier = 1.0f);
 
+float getQColorBrightnessFactor(const QColor& color);
+
 QString toStyleSheetColor(const char *prefix, const QColor &color);
 
 QString toStyleSheetRGBA(const QColor &color, int adjustment = 0);

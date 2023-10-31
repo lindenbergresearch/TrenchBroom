@@ -96,8 +96,7 @@ bool SyncHeightEventFilter::eventFilter(QObject *target, QEvent *event) {
             m_secondary->setFixedHeight(height);
         }
         return false;
-    }
-    else {
+    } else {
         return QObject::eventFilter(target, event);
     }
 }
@@ -318,6 +317,10 @@ Color fromQColor(const QColor &color) {
 QColor toQColor(const Color &color, const float multiplier) {
     // return QColor::fromRgb(int(color.r() * 255.0f * multiplier), int(color.g() * 255.0f * multiplier), int(color.b() * 255.0f * multiplier), int(color.a() * 255.0f));
     return QColor::fromRgbF(color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
+}
+
+float getQColorBrightnessFactor(const QColor &color) {
+    return float(std::max(std::max(color.redF(), color.greenF()), color.blueF()) * color.alphaF());
 }
 
 QString toStyleSheetColor(const char *prefix, const QColor &color) {
