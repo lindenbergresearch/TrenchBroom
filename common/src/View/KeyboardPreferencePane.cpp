@@ -55,8 +55,8 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *p
     m_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
     m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
 
-    // Tighter than default vertical row height, without the overhead of autoresizing
-    m_table->verticalHeader()->setDefaultSectionSize(m_table->fontMetrics().lineSpacing() + 2);
+    // Tighter than default vertical row height, without the overhead of authorizing
+    m_table->verticalHeader()->setDefaultSectionSize(m_table->fontMetrics().lineSpacing() + LayoutConstants::MediumVMargin);
 
     m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
     m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
