@@ -30,32 +30,34 @@
 
 namespace TrenchBroom {
 namespace View {
+
+using namespace LayoutConstants;
+
 void FormWithSectionsLayout::addSection(const QString &title, const QString &info) {
     if (rowCount() > 0) {
         auto *lineLayout = new QVBoxLayout();
         auto border = new BorderLine(BorderLine::Direction::Horizontal, 2);
         border->setForegroundRole(QPalette::Midlight);
-        lineLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::WideHMargin,
-            LayoutConstants::MediumVMargin
-        );
+
+        lineLayout->setContentsMargins(WideHMargin, MediumVMargin, WideHMargin, MediumVMargin);
         lineLayout->addWidget(border);
         QFormLayout::addRow(lineLayout);
     }
 
     auto *titleLayout = new QVBoxLayout();
-    titleLayout->setContentsMargins(LayoutConstants::WideHMargin + LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin, 0);
-    titleLayout->setSpacing(0);
+    titleLayout->setContentsMargins(WideHMargin + MediumHMargin, NoMargin, WideHMargin, NoMargin);
+    titleLayout->setSpacing(NoMargin);
 
-    auto titlew = makeTitle(new QLabel(title));
-    titlew->setForegroundRole(QPalette::HighlightedText);
-    titleLayout->addWidget(titlew);
+    auto titleLabel = makeTitle(new QLabel(title));
+    titleLabel->setForegroundRole(QPalette::HighlightedText);
+    titleLayout->addWidget(titleLabel);
 
     if (!info.isEmpty()) {
         auto *infoLabel = new QLabel{info};
         infoLabel->setWordWrap(true);
         makeInfo(infoLabel);
 
-        titleLayout->addSpacing(LayoutConstants::NarrowVMargin);
+        titleLayout->addSpacing(NarrowVMargin);
         titleLayout->addWidget(infoLabel);
     }
 
@@ -89,12 +91,12 @@ void FormWithSectionsLayout::addRow(QLayout *field) {
 
 void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QWidget *field, QWidget *additional) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(LayoutConstants::WideHMargin + LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin * 2, 0);
+    labelLayout->setContentsMargins(WideHMargin + MediumHMargin, NoMargin, WideHMargin * 2, NoMargin);
     labelLayout->addWidget(label);
 
     auto *fieldLayout = new QHBoxLayout();
-    fieldLayout->setContentsMargins(0, 0, LayoutConstants::WideHMargin, 0);
-    fieldLayout->setSpacing(LayoutConstants::WideHMargin);
+    fieldLayout->setContentsMargins(NoMargin, NoMargin, WideHMargin, NoMargin);
+    fieldLayout->setSpacing(WideHMargin);
     fieldLayout->addWidget(field);
     if (additional) fieldLayout->addWidget(additional);
 
@@ -107,12 +109,12 @@ void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QWidget *f
 
 void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QLayout *field, QLayout *additional) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(LayoutConstants::WideHMargin + LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin * 2, 0);
+    labelLayout->setContentsMargins(WideHMargin + MediumHMargin, NoMargin, WideHMargin * 2, NoMargin);
     labelLayout->addWidget(label);
 
     auto *fieldLayout = new QHBoxLayout();
-    fieldLayout->setContentsMargins(0, 0, LayoutConstants::WideHMargin, 0);
-    fieldLayout->setSpacing(LayoutConstants::WideHMargin);
+    fieldLayout->setContentsMargins(NoMargin, NoMargin, WideHMargin, NoMargin);
+    fieldLayout->setSpacing(WideHMargin);
     fieldLayout->addLayout(field);
     if (additional) fieldLayout->addLayout(additional);
     label->setMinimumHeight(getCommonFieldHeight());
@@ -131,7 +133,7 @@ void FormWithSectionsLayout::insertRow(const int row, const QString &labelText, 
 
 void FormWithSectionsLayout::insertRow(int row, QWidget *field, QWidget *additional) {
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(LayoutConstants::WideHMargin * 2, 0, LayoutConstants::WideHMargin * 2, 0);
+    layout->setContentsMargins(WideHMargin * 2, NoMargin, WideHMargin * 2, NoMargin);
     layout->addWidget(field);
     if (additional) layout->addWidget(additional);
     QFormLayout::insertRow(row, layout);
@@ -139,7 +141,7 @@ void FormWithSectionsLayout::insertRow(int row, QWidget *field, QWidget *additio
 
 void FormWithSectionsLayout::insertRow(int row, QLayout *field, QLayout *additional) {
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(LayoutConstants::WideHMargin * 2, 0, LayoutConstants::WideHMargin * 2, 0);
+    layout->setContentsMargins(WideHMargin * 2, NoMargin, WideHMargin * 2, NoMargin);
     layout->addLayout(field);
     if (additional) layout->addLayout(additional);
     QFormLayout::insertRow(row, layout);
