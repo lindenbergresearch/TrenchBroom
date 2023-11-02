@@ -35,7 +35,7 @@
 #include "View/TitleBar.h"
 
 namespace TrenchBroom::View {
-WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::SplashScreen}, m_recentDocumentListBox{
+WelcomeWindow::WelcomeWindow() : QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{
     nullptr
 }, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
     createGui();
@@ -57,6 +57,11 @@ void WelcomeWindow::createGui() {
     panelLayout->setSpacing(0);
     panelLayout->addWidget(m_recentDocumentListBox);
 
+//    auto titledPanel = new TitledPanel("Recent Maps", true);
+//    titledPanel->getPanel()->setLayout(panelLayout);
+//    titledPanel->getTitleBar()->setBackgroundRole(QPalette::Mid);
+//    titledPanel->getTitleBar()->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::MediumHMargin);
+
     auto *innerLayout = new QHBoxLayout{};
     innerLayout->setContentsMargins(QMargins{});
     innerLayout->setSpacing(0);
@@ -64,19 +69,13 @@ void WelcomeWindow::createGui() {
     auto *appPanel = createAppPanel();
 
     innerLayout->addWidget(appPanel, 0, Qt::AlignTop);
-    innerLayout->addWidget(m_recentDocumentListBox);
+    innerLayout->addLayout(panelLayout);
 
     auto *container = new QWidget{};
     auto *outerLayout = new QVBoxLayout{};
     outerLayout->setContentsMargins(QMargins{});
     outerLayout->setSpacing(0);
 
-    auto titledPanel = new TitledPanel("Welcome to TrenchBroom", false);
-    titledPanel->getPanel()->setLayout(innerLayout);
-    titledPanel->getTitleBar()->setBackgroundRole(QPalette::Mid);
-    titledPanel->getTitleBar()->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::MediumHMargin);
-
-    outerLayout->addWidget(titledPanel);
     outerLayout->addLayout(innerLayout);
     insertTitleBarSeparator(outerLayout);
 
