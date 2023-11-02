@@ -92,6 +92,7 @@ static const int TextBoxInnerMargin = 2;
 static const int TabBarBarLeftMargin = 10;
 static const int ToggleButtonStyle = 0;
 #endif
+static const int NoMargin = 0;
 static const int MinPreferenceLabelWidth = 100;
 static const int HighlightBoxMargin = 5;
 } // namespace LayoutConstants
