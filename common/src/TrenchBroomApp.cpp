@@ -167,6 +167,8 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
     m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
 
+    QApplication::setFont(m_UI_Font);
+
     // these must be initialized here and not earlier
     m_frameManager = std::make_unique<FrameManager>(useSDI());
 
@@ -382,8 +384,7 @@ void TrenchBroomApp::loadStyle() {
     if (pref(Preferences::Theme) == Preferences::darkTheme()) {
         setStyle(new TrenchBroomProxyStyle{"Fusion"});
         setPalette(darkPalette());
-    }
-    else {
+    } else {
         // System
         setStyle(new TrenchBroomProxyStyle{});
     }
@@ -590,8 +591,7 @@ bool TrenchBroomApp::event(QEvent *event) {
             return true;
         }
         return false;
-    }
-    else if (event->type() == QEvent::ApplicationActivate) {
+    } else if (event->type() == QEvent::ApplicationActivate) {
         if (m_frameManager && m_frameManager->allFramesClosed()) {
             showWelcomeWindow();
         }
@@ -608,8 +608,7 @@ void TrenchBroomApp::openFilesOrWelcomeFrame(const QStringList &fileNames) {
             const auto path = IO::pathFromQString(fileNames.at(0));
             anyDocumentOpened = !path.empty() && openDocument(path);
         }
-    }
-    else {
+    } else {
         for (const auto &fileName: fileNames) {
             const auto path = IO::pathFromQString(fileName);
             anyDocumentOpened = anyDocumentOpened | (!path.empty() && openDocument(path));
@@ -655,9 +654,12 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
         m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
         m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
     }
-        foreach (QWidget *widget, QApplication::allWidgets()) {
-            widget->update();
-        }
+
+    QApplication::setFont(m_UI_Font);
+
+    for (const auto &widget: QApplication::allWidgets()) {
+        widget->update();
+    }
 
     QCoreApplication::processEvents();
 }
@@ -674,12 +676,12 @@ const QFont &TrenchBroomApp::getRenderFont() const {
     return m_RenderFont;
 }
 
-QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const size_t size) {
+QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const int size) {
     auto file = IO::SystemPaths::findResourceFile(path);
 
     QFontDatabase database;
     if (database.hasFamily(path.string().c_str())) {
-        qInfo() << "use internal font: " << path.string().c_str();
+        qInfo() << "Using system font: " << path.string().c_str();
         QFont font(path.string().c_str(), size);
         font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
         font.setStyleStrategy(QFont::PreferQuality);
@@ -689,10 +691,11 @@ QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const size_t s
         return QFont{};
     }
 
-    qInfo() << "loading font: " << path.string().c_str();
+    qInfo() << "Loading font: " << path.string().c_str();
 
     if (!exists(file)) {
         qWarning() << "Font does not exist: " << path.string().c_str();
+        qWarning() << "Falling back to default font: " << QFont{}.rawName();
         return QFont{};
     }
 
@@ -701,6 +704,7 @@ QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const size_t s
 
     if (font_family.empty()) {
         qWarning() << "Unable to load font: " << path.string().c_str();
+        qWarning() << "Falling back to default font: " << QFont{}.rawName();
         return QFont{};
     }
 
@@ -795,8 +799,7 @@ void reportCrashAndExit(const std::string &stacktrace, const std::string &reason
           if (doc.get()) {
               doc->saveDocumentTo(mapPath);
               std::cerr << "wrote map to " << mapPath.string() << std::endl;
-          }
-          else {
+          } else {
               mapPath = std::filesystem::path{};
           }
 

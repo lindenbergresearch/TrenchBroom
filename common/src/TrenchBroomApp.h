@@ -103,7 +103,7 @@ private:
 public:
     void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
 
-    QFont loadFont(const std::filesystem::path &path, const size_t size);
+    QFont loadFont(const std::filesystem::path &path, const int size);
 
     const std::vector<std::filesystem::path> &recentDocuments() const;
 
