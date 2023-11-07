@@ -93,7 +93,7 @@ public:
 };
 
 enum class FileDialogDir {
-  Map, TextureCollection, CompileTool, Engine, EntityDefinition, GamePath
+  Map, TextureCollection, CompileTool, Engine, EntityDefinition, GamePath, Resources
 };
 
 /**
@@ -220,6 +220,10 @@ QWidget *makePanelTitle(QWidget *widget, bool bold = false, bool isSubTitle = fa
 
 QWidget *makeError(QWidget *widget);
 
+QWidget *makeMono(QWidget *widget, int size);
+
+QWidget *coloriseWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role = QPalette::ColorRole::Text);
+
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
 
 QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette);
@@ -230,7 +234,7 @@ Color fromQColor(const QColor &color);
 
 QColor toQColor(const Color &color, float multiplier = 1.0f);
 
-float getQColorBrightnessFactor(const QColor& color);
+float getQColorBrightnessFactor(const QColor &color);
 
 QString toStyleSheetColor(const char *prefix, const QColor &color);
 

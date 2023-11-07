@@ -115,6 +115,8 @@ static QString fileDialogDirToString(const FileDialogDir dir) {
             return "EntityDefinition";
         case FileDialogDir::GamePath:
             return "GamePath";
+        case FileDialogDir::Resources:
+            return "Resources";
             switchDefault();
     }
 }
@@ -286,10 +288,25 @@ QWidget *makeError(QWidget *widget) {
     return widget;
 }
 
+
+QWidget *makeMono(QWidget *widget, int size) {
+    auto font = TrenchBroomApp::instance().getConsoleFont();
+    font.setPointSize(size);
+    widget->setFont(font);
+    return widget;
+}
+
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette) {
     auto palette = widget->palette();
     palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
     palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+    widget->setPalette(palette);
+    return widget;
+}
+
+QWidget *coloriseWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, role, color);
     widget->setPalette(palette);
     return widget;
 }
