@@ -303,11 +303,9 @@ void MapViewBase::triggerAmbiguousAction(const QString &label) {
 void MapViewBase::move(const vm::direction direction) {
     if ((actionContext() & ActionContext::RotateTool) != 0) {
         moveRotationCenter(direction);
-    }
-    else if ((actionContext() & ActionContext::AnyVertexTool) != 0) {
+    } else if ((actionContext() & ActionContext::AnyVertexTool) != 0) {
         moveVertices(direction);
-    }
-    else if ((actionContext() & ActionContext::NodeSelection) != 0) {
+    } else if ((actionContext() & ActionContext::NodeSelection) != 0) {
         moveObjects(direction);
     }
 }
@@ -527,8 +525,7 @@ void MapViewBase::cancel() {
     auto document = kdl::mem_lock(m_document);
     if (document->hasSelection()) {
         document->deselectAll();
-    }
-    else if (document->currentGroup() != nullptr) {
+    } else if (document->currentGroup() != nullptr) {
         document->closeGroup();
     }
 }
@@ -665,8 +662,7 @@ void MapViewBase::createEntity(const Assets::EntityDefinition *definition) {
     auto document = kdl::mem_lock(m_document);
     if (definition->type() == Assets::EntityDefinitionType::PointEntity) {
         createPointEntity(static_cast<const Assets::PointEntityDefinition *>(definition));
-    }
-    else if (canCreateBrushEntity()) {
+    } else if (canCreateBrushEntity()) {
         createBrushEntity(static_cast<const Assets::BrushEntityDefinition *>(definition));
     }
 }
@@ -809,10 +805,10 @@ void MapViewBase::doRefreshViews() {
 
 void MapViewBase::initializeGL() {
     if (doInitializeGL()) {
-        m_logger->info() << "Renderer info: " << GLContextManager::GLRenderer << " version " << GLContextManager::GLVersion << " from "
+        m_logger->info() << "Renderer info      : " << GLContextManager::GLRenderer << " Version: " << GLContextManager::GLVersion << " from "
                          << GLContextManager::GLVendor;
-        m_logger->info() << "Depth buffer bits: " << depthBits();
-        m_logger->info() << "Multisampling " << kdl::str_select(multisample(), "enabled", "disabled");
+        m_logger->info() << "Depth buffer bits  : " << depthBits();
+        m_logger->info() << "Multisampling      : " << kdl::str_select(multisample(), "enabled", "disabled");
     }
 }
 
@@ -1045,8 +1041,7 @@ void MapViewBase::showPopupMenuLater() {
             [=]() { document->setCurrentLayer(layerNode); }
         );
         action->setEnabled(document->canSetCurrentLayer(layerNode));
-    }
-    else {
+    } else {
         auto *makeLayerActive = menu.addMenu(tr("Make Layer Active"));
         for (auto *layerNode: selectedObjectLayers) {
             auto *action = makeLayerActive->addAction(QString::fromStdString(layerNode->name()), this, [=]() {
@@ -1337,8 +1332,7 @@ static std::vector<Model::Node *> collectEntitiesForNodes(const std::vector<Mode
     const auto addNode = [&](auto &&thisLambda, auto *node) {
       if (node->entity() == world) {
           result.push_back(node);
-      }
-      else {
+      } else {
           node->visitParent(thisLambda);
       }
     };
