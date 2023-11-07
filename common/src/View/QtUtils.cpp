@@ -304,7 +304,7 @@ QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette) {
     return widget;
 }
 
-QWidget *coloriseWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role) {
+QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role) {
     auto palette = widget->palette();
     palette.setColor(QPalette::Normal, role, color);
     widget->setPalette(palette);

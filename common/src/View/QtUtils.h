@@ -222,7 +222,7 @@ QWidget *makeError(QWidget *widget);
 
 QWidget *makeMono(QWidget *widget, int size);
 
-QWidget *coloriseWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role = QPalette::ColorRole::Text);
+QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role = QPalette::ColorRole::Text);
 
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
 
