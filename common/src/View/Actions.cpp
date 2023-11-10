@@ -1563,13 +1563,13 @@ void ActionManager::createRunMenu() {
     auto &runMenu = createMainMenu("Run");
     runMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Run/Compile..."
-        }, QObject::tr("Compile Map..."), 0, [](ActionExecutionContext &context) { context.frame()->showCompileDialog(); },
-        [](ActionExecutionContext &context) { return context.hasDocument(); }
+        }, QObject::tr("Compile Map..."), Qt::META + Qt::Key_C, [](ActionExecutionContext &context) { context.frame()->showCompileDialog(); },
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, std::filesystem::path{"Compile.svg"}
     ));
     runMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/Run/Launch..."
-        }, QObject::tr("Launch Engine..."), 0, [](ActionExecutionContext &context) { context.frame()->showLaunchEngineDialog(); },
-        [](ActionExecutionContext &context) { return context.hasDocument(); }
+        }, QObject::tr("Launch Engine..."), Qt::META + Qt::Key_L, [](ActionExecutionContext &context) { context.frame()->showLaunchEngineDialog(); },
+        [](ActionExecutionContext &context) { return context.hasDocument(); }, std::filesystem::path{"Launch.svg"}
     ));
 }
 
@@ -1697,6 +1697,11 @@ void ActionManager::createToolbar() {
 
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Show Grid"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Snap to Grid"}));
+
+    m_toolBar->addSeparator();
+
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Run/Compile..."}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Run/Launch..."}));
 
 //    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Hide Major Grid Division"}));
 //    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/View/Grid/Small Major Grid Division"}));
