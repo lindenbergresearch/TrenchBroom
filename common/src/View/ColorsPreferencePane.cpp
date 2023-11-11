@@ -18,6 +18,7 @@
  */
 
 #include "ColorsPreferencePane.h"
+#include "TrenchBroomApp.h"
 
 #include <QHeaderView>
 #include <QLabel>
@@ -41,21 +42,31 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     m_table->setModel(m_proxy);
 
     m_table->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
-    m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
-    m_table->horizontalHeader()->resizeSection(0, 60);
-    m_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::ResizeToContents);
-    m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+    m_table->horizontalHeader()->setSectionResizeMode(ColorModel::Columns::Value, QHeaderView::ResizeMode::Fixed);
+    m_table->horizontalHeader()->setSectionResizeMode(ColorModel::Columns::Default, QHeaderView::ResizeMode::Fixed);
+    m_table->horizontalHeader()->setSectionResizeMode(ColorModel::Columns::Context, QHeaderView::ResizeMode::ResizeToContents);
+    m_table->horizontalHeader()->setSectionResizeMode(ColorModel::Columns::Path, QHeaderView::ResizeMode::Stretch);
+    m_table->horizontalHeader()->resizeSection(ColorModel::Columns::Value, 80);
+    m_table->horizontalHeader()->resizeSection(ColorModel::Columns::Default, 80);
 
     // Tighter than default vertical row height, without the overhead of autoresizing
     m_table->verticalHeader()->setDefaultSectionSize(m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin);
 
-    m_table->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
+    m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
+
+    m_table->setSortingEnabled(true);
+    m_table->sortByColumn(ColorModel::Columns::Context, Qt::AscendingOrder);
+    m_table->hideColumn(ColorModel::Columns::Index);
 
     QLineEdit *searchBox = createSearchBox();
     makeSmall(searchBox);
 
-    auto *infoLabel = new QLabel(tr("Click on a color to begin editing it."));
+    auto *infoLabel = new QLabel(tr("Double-Click on a color to begin editing it."));
     makeInfo(infoLabel);
+
+    m_table->setSortingEnabled(true);
+    m_table->sortByColumn(0);
 
     auto *infoAndSearchLayout = new QHBoxLayout();
     infoAndSearchLayout->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);
@@ -77,7 +88,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
         }
     );
 
-    connect(m_table, &QTableView::clicked, this, [&](const QModelIndex &index) {
+    connect(m_table, &QTableView::doubleClicked, this, [&](const QModelIndex &index) {
           m_model->pickColor(m_proxy->mapToSource(index));
         }
     );

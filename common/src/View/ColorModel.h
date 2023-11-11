@@ -27,6 +27,20 @@
 namespace TrenchBroom::View {
 class ColorModel : public QAbstractTableModel {
 Q_OBJECT
+public:
+    enum Columns {
+      Index,
+      Context,
+      Path,
+      Value,
+      Default,
+      count,
+    };
+
+    QString columnNames[Columns::count]{
+        "Index", "Context", "Path", "Value", "Default"
+    };
+
 private:
     std::vector<Preference<Color> *> m_colors;
     int m_colorsCount;

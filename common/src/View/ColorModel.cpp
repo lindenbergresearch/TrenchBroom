@@ -31,6 +31,10 @@
 #include <filesystem>
 
 namespace TrenchBroom::View {
+
+// threshold for using inverted text label to optimize visibility with colored background
+static const float BRIGHTNESS_THRESHOLD = 0.65f;
+
 ColorModel::ColorModel(QObject *parent) : QAbstractTableModel(parent), m_colorsCount(0) {
     initialize();
 }
@@ -61,20 +65,12 @@ int ColorModel::rowCount(const QModelIndex & /* parent */) const {
 }
 
 int ColorModel::columnCount(const QModelIndex & /* parent */) const {
-    return 3; // Color, Context, Description
+    return Columns::count; // Color, Context, Description
 }
 
 QVariant ColorModel::headerData(const int section, const Qt::Orientation orientation, const int role) const {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        switch (section) {
-            case 0:
-                return QString("Color");
-            case 1:
-                return QString("Context");
-            case 2:
-                return QString("Description");
-                switchDefault();
-        }
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < count) {
+        return columnNames[section];
     }
 
     return QVariant();
@@ -85,27 +81,77 @@ QVariant ColorModel::data(const QModelIndex &index, const int role) const {
         return QVariant();
     }
 
-    if (role == Qt::DisplayRole) {
-        const auto *colorPreference = getColorPreference(index.row());
+    auto preference = getColorPreference(index.row());
 
+    if (role == Qt::DisplayRole) {
         switch (index.column()) {
-            case 0:
-                return QVariant(); // Leave first cell empty
-            case 1:
-                return QString::fromStdString(kdl::path_front(colorPreference->path()).string());
-            case 2:
-                return QString::fromStdString(kdl::path_pop_front(colorPreference->path()).generic_string());
+            case Columns::Index:
+                return index.row();
+            case Columns::Context:
+                return QString::fromStdString(kdl::path_front(preference->path()).string());
+            case Columns::Path:
+                return QString::fromStdString(kdl::path_pop_front(preference->path()).generic_string());
+            case Columns::Default:
+                return toQColor(preference->defaultValue()).name().toUpper();
+            case Columns::Value:
+                return toQColor(preference->value()).name().toUpper();
                 switchDefault();
         }
     }
 
-    // Colorize the first cell background with the associated preference color
-    if (role == Qt::BackgroundRole && index.column() == 0) {
-        auto *colorPreference = getColorPreference(index.row());
-        auto color = toQColor(pref(*colorPreference));
-        color.setAlpha(255); // Ignore alpha
+    auto valueColor = toQColor(pref(*preference));
+    auto defaultColor = toQColor(preference->defaultValue());
 
-        return QBrush(color);
+
+    // background role
+    if (role == Qt::BackgroundRole) {
+        // coloring
+        if (preference->valid() && index.column() == Value) {
+            return QBrush(valueColor);
+        }
+
+        if (preference->valid() && index.column() == Default) {
+            return QBrush(defaultColor);
+        }
+    }
+
+    // font role
+    if (role == Qt::FontRole) {
+        // default
+        if (index.column() == Value || index.column() == Default) {
+            auto font = TrenchBroomApp::instance().getConsoleFont();
+            font.setPointSize(QFont{}.pointSize());
+            return font;
+        }
+    }
+
+    // set foreground color
+    if (role == Qt::ForegroundRole) {
+
+        // auto coloring text
+        if (preference->valid() && index.column() == Value) {
+            auto maxValue = getQColorBrightnessFactor(valueColor);
+            return QBrush(
+                maxValue > BRIGHTNESS_THRESHOLD ?
+                COLOR_ROLE(Dark) :
+                COLOR_ROLE(BrightText)
+            );
+        }
+
+        if (preference->valid() && index.column() == Default) {
+            auto maxValue = getQColorBrightnessFactor(defaultColor);
+            return QBrush(
+                maxValue > BRIGHTNESS_THRESHOLD ?
+                COLOR_ROLE(Dark) :
+                COLOR_ROLE(BrightText)
+            );
+        }
+
+        // default value was overwritten
+        if (preference->valid() && !preference->isDefault() && index.column() == Value) {
+            auto highlightColor = COLOR_ROLE(Highlight);
+            return QBrush{highlightColor};
+        }
     }
 
     return QVariant();
@@ -117,10 +163,10 @@ bool ColorModel::setData(const QModelIndex &index, const QVariant &value, const 
     }
 
     auto *colorPreference = getColorPreference(index.row());
-    const auto color = toQColor(pref(*colorPreference));
+    // const auto color = toQColor(pref(*colorPreference));
 
     auto newColor = value.value<QColor>();
-    newColor.setAlpha(color.alpha()); // Keep initial alpha...
+    //newColor.setAlpha(color.alpha()); // Keep initial alpha...
 
     auto &prefs = PreferenceManager::instance();
     prefs.set(*colorPreference, fromQColor(newColor));
@@ -128,17 +174,17 @@ bool ColorModel::setData(const QModelIndex &index, const QVariant &value, const 
     emit dataChanged(index, index);
 
     // update style
-    TrenchBroomApp::instance().reloadStyle(false, false);
+    TrenchBroomApp::instance().reloadStyle(false);
 
     return true;
 }
 
 Qt::ItemFlags ColorModel::flags(const QModelIndex &index) const {
-    if (checkIndex(index) && index.column() == 0) {
+    if (checkIndex(index) && index.column() < Columns::Value) {
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
 
-    return Qt::ItemIsEnabled;
+    return Qt::NoItemFlags;
 }
 
 void ColorModel::pickColor(const QModelIndex &mi) {
@@ -168,6 +214,6 @@ Preference<Color> *ColorModel::getColorPreference(const int index) const {
 }
 
 bool ColorModel::checkIndex(const QModelIndex &index) const {
-    return index.isValid() && index.column() < 3 && index.row() < m_colorsCount;
+    return index.isValid() && index.column() < Columns::count && index.row() < m_colorsCount;
 }
 } // namespace TrenchBroom::View
