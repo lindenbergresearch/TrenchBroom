@@ -93,8 +93,7 @@ void CompilationExportMapTaskRunner::doExecute() {
               emit error();
             }
         );
-    }
-    else {
+    } else {
         emit end();
     }
 }
@@ -165,8 +164,7 @@ void CompilationRenameFileTaskRunner::doExecute() {
               emit error();
             }
         );
-    }
-    else {
+    } else {
         emit end();
     }
 }
@@ -221,7 +219,7 @@ void CompilationRunToolTaskRunner::doTerminate() {
         disconnect(m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred);
         disconnect(m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished);
         m_process->kill();
-        m_context << "\n\n#### Terminated\n";
+        m_context.pushSystemMessage("\n\n#### Terminated\n");
     }
 }
 
@@ -233,7 +231,7 @@ void CompilationRunToolTaskRunner::startProcess() {
         const auto workDir = m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH);
         const auto cmd = this->cmd();
 
-        m_context << "#### Executing '" << QString::fromStdString(cmd) << "'\n";
+        m_context.pushSystemMessage("#### Executing '" + QString::fromStdString(cmd) + "'\n");
 
         if (!m_context.test()) {
             m_process = new QProcess{this};
@@ -248,8 +246,7 @@ void CompilationRunToolTaskRunner::startProcess() {
             if (!m_process->waitForStarted()) {
                 emit error();
             }
-        }
-        else {
+        } else {
             emit end();
         }
     } catch (const Exception &) {
@@ -262,11 +259,9 @@ std::string CompilationRunToolTaskRunner::cmd() {
     const auto parameters = interpolate(m_task.parameterSpec);
     if (parameters.empty()) {
         return "\"" + toolPath.string() + "\"";
-    }
-    else if (toolPath.empty()) {
+    } else if (toolPath.empty()) {
         return "";
-    }
-    else {
+    } else {
         return "\"" + toolPath.string() + "\" " + parameters;
     }
 }
@@ -279,16 +274,15 @@ void CompilationRunToolTaskRunner::processErrorOccurred(const QProcess::ProcessE
 void CompilationRunToolTaskRunner::processFinished(const int exitCode, const QProcess::ExitStatus exitStatus) {
     switch (exitStatus) {
         case QProcess::NormalExit:
-            m_context << "#### Finished with exit code " << exitCode << "\n\n";
+            m_context.pushSystemMessage("#### Finished with exit code " + QString::fromStdString(std::to_string(exitCode)) + "\n\n");
             if (exitCode == 0 || !m_task.treatNonZeroResultCodeAsError) {
                 emit end();
-            }
-            else {
+            } else {
                 emit error();
             }
             break;
         case QProcess::CrashExit:
-            m_context << "#### Crashed with exit code " << exitCode << "\n\n";
+            m_context.pushSystemMessage("#### Crashed with exit code " + QString::fromStdString(std::to_string(exitCode)) + "\n\n");
             emit error();
             break;
     }
@@ -362,10 +356,9 @@ void CompilationRunner::execute() {
 
     const auto workDir = QString::fromStdString(m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH));
     if (!QDir{workDir}.exists()) {
-        m_context << "#### Error: working directory '" << workDir << "' does not exist\n";
-    }
-    else {
-        m_context << "#### Using working directory '" << workDir << "'\n";
+        m_context.pushSystemMessage("#### Error: working directory '" + workDir + "' does not exist\n");
+    } else {
+        m_context.pushSystemMessage("#### Using working directory '" + workDir + "'\n");
     }
     m_currentTask->get()->execute();
 }
@@ -407,8 +400,7 @@ void CompilationRunner::taskEnd() {
         if (m_currentTask != std::end(m_taskRunners)) {
             bindEvents(*m_currentTask->get());
             m_currentTask->get()->execute();
-        }
-        else {
+        } else {
             emit compilationEnded();
         }
     }

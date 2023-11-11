@@ -48,6 +48,12 @@ public:
     std::string variableValue(const std::string &variableName) const;
 
     template<typename T>
+    void pushSystemMessage(const T &t) {
+        m_output.pushSystemMessage(t);
+        return;
+    }
+
+    template<typename T>
     CompilationContext &operator<<(const T &t) {
         m_output << t;
         return *this;

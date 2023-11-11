@@ -28,6 +28,7 @@
 #include <QTextEdit>
 
 #include "Ensure.h"
+#include "TrenchBroomApp.h"
 #include "Model/CompilationProfile.h"
 #include "Model/Game.h"
 #include "Model/GameFactory.h"
@@ -47,8 +48,8 @@ namespace View {
 CompilationDialog::CompilationDialog(MapFrame *mapFrame) : QDialog{mapFrame}, m_mapFrame{mapFrame} {
     ensure(mapFrame != nullptr, "must have a map frame");
     createGui();
-    setMinimumSize(600, 300);
-    resize(800, 600);
+    setMinimumSize(700, 600);
+    resize(1000, 700);
     updateCompileButtons();
 }
 
@@ -75,8 +76,8 @@ void CompilationDialog::createGui() {
 
     auto *splitter = new Splitter{Qt::Vertical};
     splitter->addWidget(m_profileManager);
-    splitter->addWidget(m_output);
-    splitter->setSizes({2, 1});
+    splitter->addWidget(outputPanel);
+    splitter->setSizes({1, 1});
 
     auto *buttonBox = new QDialogButtonBox{};
     m_launchButton = buttonBox->addButton("Launch...", QDialogButtonBox::NoRole);

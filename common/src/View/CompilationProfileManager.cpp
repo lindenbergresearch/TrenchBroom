@@ -66,14 +66,19 @@ CompilationProfileManager::CompilationProfileManager(std::weak_ptr<MapDocument> 
     editorPanel->getPanel()->setLayout(editorLayout);
 
     auto *outerLayout = new QHBoxLayout{};
-    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowVMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowVMargin
+    );
     outerLayout->setSpacing(0);
     outerLayout->addWidget(listPanel);
     outerLayout->addWidget(new BorderLine{BorderLine::Direction::Vertical});
     outerLayout->addWidget(editorPanel, 1);
     setLayout(outerLayout);
 
-    listPanel->setMinimumSize(200, 200);
+    listPanel->setMinimumSize(130, 200);
 
     connect(m_profileList, &ControlListBox::itemSelectionChanged, this, &CompilationProfileManager::profileSelectionChanged);
     connect(m_profileList, &CompilationProfileListBox::profileContextMenuRequested, this, &CompilationProfileManager::profileContextMenuRequested);
@@ -145,8 +150,7 @@ void CompilationProfileManager::profileSelectionChanged() {
         auto &profile = m_config.profiles[size_t(selection)];
         m_profileEditor->setProfile(&profile);
         m_removeProfileButton->setEnabled(true);
-    }
-    else {
+    } else {
         m_profileEditor->setProfile(nullptr);
         m_removeProfileButton->setEnabled(false);
     }
