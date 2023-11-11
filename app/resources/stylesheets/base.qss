@@ -51,75 +51,6 @@ QScrollBar:horizontal {
     margin: 0px 40px 0 0px;
 }
 
-/* QScrollBar:vertical {*/
-/*     border: 2px solid grey;*/
-/*     background: #32CC99;*/
-/*     width: 15px;*/
-/*     margin: 22px 0 22px 0;*/
-/* }*/
-/* QScrollBar::handle:vertical {*/
-/*     background: white;*/
-/*     min-height: 20px;*/
-/* }*/
-/* QScrollBar::add-line:vertical {*/
-/*     border: 2px solid grey;*/
-/*     background: #32CC99;*/
-/*     height: 20px;*/
-/*     subcontrol-position: bottom;*/
-/*     subcontrol-origin: margin;*/
-/* }*/
-
-/* QScrollBar::sub-line:vertical {*/
-/*     border: 2px solid grey;*/
-/*     background: #32CC99;*/
-/*     height: 20px;*/
-/*     subcontrol-position: top;*/
-/*     subcontrol-origin: margin;*/
-/* }*/
-/* QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {*/
-/*     border: 2px solid grey;*/
-/*     width: 3px;*/
-/*     height: 3px;*/
-/*     background: white;*/
-/* }*/
-
-/* QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {*/
-/*     background: none;*/
-/* }*/
-
-/*QScrollBar::handle:horizontal {*/
-/*    background: gray;*/
-/*    min-width: 20px;*/
-/*}*/
-
-/*QScrollBar::add-line:horizontal {*/
-/*    background: blue;*/
-/*    width: 16px;*/
-/*    subcontrol-position: right;*/
-/*    subcontrol-origin: margin;*/
-/*    border: 2px solid black;*/
-/*}*/
-
-/*QScrollBar::sub-line:horizontal {*/
-/*    background: magenta;*/
-/*    width: 16px;*/
-/*    subcontrol-position: top right;*/
-/*    subcontrol-origin: margin;*/
-/*    border: 2px solid black;*/
-/*    position: absolute;*/
-/*    right: 20px;*/
-/*}*/
-
-/*QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {*/
-/*    width: 3px;*/
-/*    height: 3px;*/
-/*    background: pink;*/
-/*}*/
-
-/*QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {*/
-/*    background: none;*/
-/*}*/
-
 /* --- COMBO-BOX -------------------------------------------------------------------- */
 
 
@@ -155,6 +86,10 @@ QToolBar {
 QToolBar::separator {
     width:  30px;
     height:  $TOOLBAR_ICON_SIZE$;
+}
+
+QToolBar#ToolBar_PreferenceDialog {
+     font-size: $UI_SMALL_FONT_SIZE$;
 }
 
 /* --- TOOLTIP ---------------------------------------------------------------------- */
@@ -229,6 +164,17 @@ QPushButton#TextureBrowser_smallPushButton {
 QPushButton#ViewEditor_smallPushButton {
     padding: 3px  $MEDIUM_V_MARGIN$ 3px  $MEDIUM_V_MARGIN$;
     min-width: 65px;
+    min-height: 18px;
+}
+
+QPushButton#PreferencesPreferencePane_smallPushButton {
+    padding: 3px  $MEDIUM_V_MARGIN$ 3px  $MEDIUM_V_MARGIN$;
+    min-height: 18px;
+}
+
+QPushButton#PreferenceEditDialog_toolButton {
+    padding: 3px  $MEDIUM_V_MARGIN$ 3px  $MEDIUM_V_MARGIN$;
+    min-width: 50px;
     min-height: 18px;
 }
 
