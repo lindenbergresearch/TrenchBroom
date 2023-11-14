@@ -57,6 +57,9 @@ extern Preference<Color> PortalFileBorderColor;
 extern Preference<Color> PortalFileFillColor;
 extern Preference<bool> ShowFPS;
 
+extern Preference<float> TextRendererMaxDistance;
+extern Preference<float> TextRendererFadeOutFactor;
+
 /* --- AXIS ------------------------------------------ */
 extern Preference<bool> ShowAxes;
 extern Preference<float> AxisLength;

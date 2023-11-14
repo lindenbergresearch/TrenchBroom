@@ -48,12 +48,16 @@ Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Co
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
 Preference<bool> ShowFPS("Renderer/Show FPS", true);
 
+Preference<float> TextRendererMaxDistance("Renderer/Maximum text visibility", 400.f);
+Preference<float> TextRendererFadeOutFactor("Renderer/Text fadeout factor", 0.2f);
+
 /* --- AXIS ------------------------------------------ */
 Preference<bool> ShowAxes("Renderer/Show axes", true);
 Preference<float> AxisLength("Renderer/Axis length", 128.0f);
 Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.8f, 0.1f, 0.2f, 1.0f));
 Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.8f, 0.1f, 1.0f));
 Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1.0f));
+
 Preference<Color> &axisColor(vm::axis::type axis) {
     switch (axis) {
         case vm::axis::x:
@@ -72,7 +76,8 @@ Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor"
 
 /* --- COMPASS---------------------------------------- */
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 1.0f));
-Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline", Color(1.0f, 1.0f, 1.0f, 1.0f));
+Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline",
+    Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.95f);
 Preference<float> CompassScale("Renderer/Colors/Compass scale", 1.5f);
 
@@ -82,7 +87,8 @@ Preference<Color> DefaultGroupColor("Renderer/Colors/Groups", Color(0.7f, 0.4f, 
 Preference<Color> LinkedGroupColor("Renderer/Colors/Linked Groups", Color(1.0f, 0.35f, 0.87f, 1.0f));
 
 Preference<Color> TutorialOverlayTextColor("Renderer/Colors/Tutorial overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
-Preference<Color> TutorialOverlayBackgroundColor("Renderer/Colors/Tutorial overlay background", Color(1.0f, 0.5f, 0.0f, 0.6f));
+Preference<Color> TutorialOverlayBackgroundColor("Renderer/Colors/Tutorial overlay background",
+    Color(1.0f, 0.5f, 0.0f, 0.6f));
 
 /* --- FACES ----------------------------------------- */
 Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.2f, 0.2f, 0.2f, 1.0f));
@@ -93,8 +99,8 @@ Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.4f
 /* --- EDGES ----------------------------------------- */
 Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.9f, 0.9f, 0.9f, 1.0f));
 Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 1.0f));
-Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.0f);
-Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.4f);
+Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.25f);
+Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.5f);
 Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.4f);
 Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.13f, 0.3f, 1.0f, 1.0f));
 
@@ -115,17 +121,22 @@ Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Colo
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
 Preference<Color> InfoOverlayBackgroundColor("Renderer/Colors/Info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
 Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 1.0f);
-Preference<Color> SelectedInfoOverlayTextColor("Renderer/Colors/Selected info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
-Preference<Color> SelectedInfoOverlayBackgroundColor("Renderer/Colors/Selected info overlay background", Color(1.0f, 0.0f, 0.0f, 0.6f));
-Preference<Color> LockedInfoOverlayTextColor("Renderer/Colors/Locked info overlay text", Color(0.35f, 0.35f, 0.6f, 1.0f));
-Preference<Color> LockedInfoOverlayBackgroundColor("Renderer/Colors/Locked info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
+Preference<Color> SelectedInfoOverlayTextColor("Renderer/Colors/Selected info overlay text",
+    Color(1.0f, 1.0f, 1.0f, 1.0f));
+Preference<Color> SelectedInfoOverlayBackgroundColor("Renderer/Colors/Selected info overlay background",
+    Color(1.0f, 0.0f, 0.0f, 0.6f));
+Preference<Color> LockedInfoOverlayTextColor("Renderer/Colors/Locked info overlay text",
+    Color(0.35f, 0.35f, 0.6f, 1.0f));
+Preference<Color> LockedInfoOverlayBackgroundColor("Renderer/Colors/Locked info overlay background",
+    Color(0.0f, 0.0f, 0.0f, 0.6f));
 
 Preference<float> HandleRadius("Controls/Handle radius", 6.0f);
 Preference<float> MaximumHandleDistance("Controls/Maximum handle distance", 1000.0f);
 Preference<Color> HandleColor("Renderer/Colors/Handle", Color(248, 230, 60, 1.0f));
 Preference<Color> OccludedHandleColor("Renderer/Colors/Occluded handle", Color(248, 230, 60, 0.4f));
 Preference<Color> SelectedHandleColor("Renderer/Colors/Selected handle", Color(1.0f, 0.0f, 0.0f, 1.0f));
-Preference<Color> OccludedSelectedHandleColor("Renderer/Colors/Occluded selected handle", Color(1.0f, 0.0f, 0.0f, 0.4f));
+Preference<Color> OccludedSelectedHandleColor("Renderer/Colors/Occluded selected handle",
+    Color(1.0f, 0.0f, 0.0f, 0.4f));
 
 Preference<Color> ClipHandleColor("Renderer/Colors/Clip handle", Color(1.0f, 0.5f, 0.0f, 1.0f));
 Preference<Color> ClipFaceColor("Renderer/Colors/Clip face", Color(0.6f, 0.4f, 0.0f, 0.35f));
@@ -292,26 +303,46 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
-        &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor, &PointFileColor, &PortalFileBorderColor,
-        &PortalFileFillColor, &ShowFPS, &UnitsDisplayType, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
-        &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor,
-        &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &SelectedEdgeColor,
-        &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor,
-        &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds, &InfoOverlayTextColor,
-        &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha,
-        &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius,
-        &MaximumHandleDistance, &HandleColor, &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor,
-        &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha,
-        &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor,
-        &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D,
-        &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize,
-        &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor, &BrowserGroupBackgroundColor,
-        &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
-        &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookInvertH,
-        &CameraLookInvertV, &CameraPanSpeed, &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove,
-        &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(), &CameraFlyBackward(),
-        &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds,
-        &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities,
+        &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
+        &PointFileColor, &PortalFileBorderColor,
+        &PortalFileFillColor, &ShowFPS, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &UnitsDisplayType,
+        &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
+        &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
+        &TutorialOverlayTextColor,
+        &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha,
+        &EdgeColor, &SelectedEdgeColor,
+        &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
+        &SelectionBoundsColor,
+        &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
+        &InfoOverlayTextColor,
+        &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
+        &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha,
+        &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor,
+        &LockedInfoOverlayBackgroundColor, &HandleRadius,
+        &MaximumHandleDistance, &HandleColor, &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor,
+        &ClipHandleColor, &ClipFaceColor,
+        &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor,
+        &ScaleOutlineColor, &ScaleOutlineDimAlpha,
+        &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor,
+        &MoveIndicatorFillColor,
+        &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha,
+        &GridMajorDivisionSize, &GridColor2D,
+        &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath,
+        &RendererFontSize, &BrowserFontSize,
+        &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
+        &BrowserBackgroundColor, &BrowserGroupBackgroundColor,
+        &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor,
+        &UIHighlightColor, &UITextColor,
+        &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor,
+        &CameraLookSpeed, &CameraLookInvertH,
+        &CameraLookInvertV, &CameraPanSpeed, &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert,
+        &CameraMoveSpeed, &CameraEnableAltMove,
+        &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,
+        &CameraFlyForward(), &CameraFlyBackward(),
+        &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds,
+        &ShowBrushEntityBounds,
+        &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges,
+        &ShowSoftMapBounds, &ShowPointEntities,
         &ShowBrushes, &EntityLinkMode
     };
 
@@ -354,7 +385,8 @@ DynamicPreferencePattern<QKeySequence> EntitiesCreate("Entities/*/Create");
 
 const std::vector<DynamicPreferencePatternBase *> &dynaimcPreferencePatterns() {
     static const std::vector<DynamicPreferencePatternBase *> list{
-        &GamesPath, &GamesToolPath, &GamesDefaultEngine, &FiltersTagsToggle, &TagsEnable, &TagsDisable, &FiltersEntitiesToggleVisible, &EntitiesCreate
+        &GamesPath, &GamesToolPath, &GamesDefaultEngine, &FiltersTagsToggle, &TagsEnable, &TagsDisable,
+        &FiltersEntitiesToggleVisible, &EntitiesCreate
     };
     return list;
 }
