@@ -47,7 +47,8 @@
 namespace TrenchBroom::View {
 // CompilationTaskEditorBase
 
-CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile,
+CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_ptr<MapDocument> document,
+    Model::CompilationProfile &profile,
     Model::CompilationTask &task, QWidget *parent
 ) : ControlListBoxItemRenderer{parent}, m_title{std::move(title)}, m_document{std::move(document)}, m_profile{
     profile
@@ -114,22 +115,23 @@ void CompilationTaskEditorBase::updateCompleter(QCompleter *completer) {
 
 // CompilationExportMapTaskEditor
 
-CompilationExportMapTaskEditor::CompilationExportMapTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile,
+CompilationExportMapTaskEditor::CompilationExportMapTaskEditor(std::weak_ptr<MapDocument> document,
+    Model::CompilationProfile &profile,
     Model::CompilationTask &task, QWidget *parent
 ) : CompilationTaskEditorBase{"Export Map", std::move(document), profile, task, parent} {
     assert(std::holds_alternative<Model::CompilationExportMap>(task));
 
     auto *formLayout = new QFormLayout{};
-    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
+    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
+        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+    );
     formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 
     m_targetEditor = new MultiCompletionLineEdit{};
     m_targetEditor->setFont(Fonts::fixedWidthFont());
-    m_targetEditor->setToolTip(R"(The path of the exported file.
-Variables are allowed.)"
-    );
+    m_targetEditor->setToolTip(R"(The path of the exported file.Variables are allowed.)");
     setupCompleter(m_targetEditor);
     formLayout->addRow("File Path", m_targetEditor);
 
@@ -155,13 +157,16 @@ void CompilationExportMapTaskEditor::targetSpecChanged(const QString &text) {
     task().targetSpec = text.toStdString();
 }
 
-CompilationCopyFilesTaskEditor::CompilationCopyFilesTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile,
+CompilationCopyFilesTaskEditor::CompilationCopyFilesTaskEditor(std::weak_ptr<MapDocument> document,
+    Model::CompilationProfile &profile,
     Model::CompilationTask &task, QWidget *parent
 ) : CompilationTaskEditorBase{"Copy Files", std::move(document), profile, task, parent} {
     assert(std::holds_alternative<Model::CompilationCopyFiles>(task));
 
     auto *formLayout = new QFormLayout{};
-    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
+    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
+        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+    );
     formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
@@ -219,13 +224,16 @@ void CompilationCopyFilesTaskEditor::targetSpecChanged(const QString &text) {
     task().targetSpec = text.toStdString();
 }
 
-CompilationRenameFileTaskEditor::CompilationRenameFileTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile,
+CompilationRenameFileTaskEditor::CompilationRenameFileTaskEditor(std::weak_ptr<MapDocument> document,
+    Model::CompilationProfile &profile,
     Model::CompilationTask &task, QWidget *parent
 ) : CompilationTaskEditorBase{"Rename File", std::move(document), profile, task, parent} {
     assert(std::holds_alternative<Model::CompilationRenameFile>(task));
 
     auto *formLayout = new QFormLayout{};
-    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
+    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
+        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+    );
     formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
@@ -284,13 +292,16 @@ void CompilationRenameFileTaskEditor::targetSpecChanged(const QString &text) {
     task().targetSpec = text.toStdString();
 }
 
-CompilationDeleteFilesTaskEditor::CompilationDeleteFilesTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile,
+CompilationDeleteFilesTaskEditor::CompilationDeleteFilesTaskEditor(std::weak_ptr<MapDocument> document,
+    Model::CompilationProfile &profile,
     Model::CompilationTask &task, QWidget *parent
 ) : CompilationTaskEditorBase{"Delete Files", std::move(document), profile, task, parent} {
     assert(std::holds_alternative<Model::CompilationDeleteFiles>(task));
 
     auto *formLayout = new QFormLayout{};
-    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
+    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
+        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+    );
     formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
@@ -329,13 +340,16 @@ void CompilationDeleteFilesTaskEditor::targetSpecChanged(const QString &text) {
 
 // CompilationRunToolTaskEditor
 
-CompilationRunToolTaskEditor::CompilationRunToolTaskEditor(std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile,
+CompilationRunToolTaskEditor::CompilationRunToolTaskEditor(std::weak_ptr<MapDocument> document,
+    Model::CompilationProfile &profile,
     Model::CompilationTask &task, QWidget *parent
 ) : CompilationTaskEditorBase{"Run Tool", std::move(document), profile, task, parent} {
     assert(std::holds_alternative<Model::CompilationRunTool>(task));
 
     auto *formLayout = new QFormLayout{};
-    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
+    formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
+        LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+    );
     formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
@@ -376,7 +390,9 @@ Variables are allowed.)"
     connect(m_toolEditor, &QLineEdit::textChanged, this, &CompilationRunToolTaskEditor::toolSpecChanged);
     connect(browseToolButton, &QPushButton::clicked, this, &CompilationRunToolTaskEditor::browseTool);
     connect(m_parametersEditor, &QLineEdit::textChanged, this, &CompilationRunToolTaskEditor::parameterSpecChanged);
-    connect(m_treatNonZeroResultCodeAsError, &QCheckBox::stateChanged, this, &CompilationRunToolTaskEditor::treatNonZeroResultCodeAsErrorChanged);
+    connect(m_treatNonZeroResultCodeAsError, &QCheckBox::stateChanged, this,
+        &CompilationRunToolTaskEditor::treatNonZeroResultCodeAsErrorChanged
+    );
 }
 
 void CompilationRunToolTaskEditor::updateItem() {
@@ -393,7 +409,9 @@ void CompilationRunToolTaskEditor::updateItem() {
     }
 
     if (m_treatNonZeroResultCodeAsError->isChecked() != task().treatNonZeroResultCodeAsError) {
-        m_treatNonZeroResultCodeAsError->setCheckState(task().treatNonZeroResultCodeAsError ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+        m_treatNonZeroResultCodeAsError->setCheckState(
+            task().treatNonZeroResultCodeAsError ? Qt::CheckState::Checked : Qt::CheckState::Unchecked
+        );
     }
 }
 
@@ -404,7 +422,8 @@ Model::CompilationRunTool &CompilationRunToolTaskEditor::task() {
 }
 
 void CompilationRunToolTaskEditor::browseTool() {
-    const QString toolSpec = QFileDialog::getOpenFileName(this, tr("Select Tool"), fileDialogDefaultDirectory(FileDialogDir::CompileTool));
+    const QString toolSpec = QFileDialog::getOpenFileName(this, tr("Select Tool"),
+        fileDialogDefaultDirectory(FileDialogDir::CompileTool));
     if (!toolSpec.isEmpty()) {
         updateFileDialogDefaultDirectoryWithFilename(FileDialogDir::CompileTool, toolSpec);
 
