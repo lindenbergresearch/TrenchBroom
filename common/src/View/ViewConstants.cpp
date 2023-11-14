@@ -18,6 +18,7 @@
  */
 
 #include "ViewConstants.h"
+#include "TrenchBroomApp.h"
 
 #include <QColor>
 #include <QDebug>
@@ -29,13 +30,7 @@ namespace TrenchBroom {
 namespace View {
 namespace Fonts {
 QFont fixedWidthFont() {
-#if defined __APPLE__
-    QFont font("Menlo", 13);
-    font.setStyleHint(QFont::Monospace);
-    return font;
-#else
-    return QFontDatabase::systemFont(QFontDatabase::FixedFont);
-#endif
+    return TrenchBroomApp::instance().getConsoleFont();
 }
 } // namespace Fonts
 
