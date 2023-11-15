@@ -81,6 +81,7 @@ ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(ControlList
 
     if (showSeparator) {
         auto borderline = new BorderLine(BorderLine::Direction::Horizontal, 1, this);
+        borderline->setContentsMargins(0, LayoutConstants::NarrowVMargin, 0, 0);
         layout->addWidget(borderline);
     }
 
