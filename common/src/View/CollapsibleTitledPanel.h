@@ -51,7 +51,6 @@ class CollapsibleTitledPanel : public QWidget {
 Q_OBJECT
 private:
     CollapsibleTitleBar *m_titleBar;
-    BorderLine *m_divider;
     QWidget *m_panel;
     bool m_expanded;
 

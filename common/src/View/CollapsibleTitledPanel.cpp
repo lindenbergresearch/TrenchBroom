@@ -54,7 +54,6 @@ CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool 
     sizer->setContentsMargins(0, 0, 0, 0);
     sizer->setSpacing(0);
     sizer->addWidget(m_titleBar, 0);
-    sizer->addWidget(m_divider, 0);
     sizer->addWidget(m_panel, 1);
     setLayout(sizer);
 
@@ -113,12 +112,10 @@ bool CollapsibleTitledPanel::restoreState(const QByteArray &state) {
 
 void CollapsibleTitledPanel::updateExpanded() {
     if (m_expanded) {
-        m_divider->show();
         m_panel->show();
         m_titleBar->setStateText(tr("hide"));
     }
     else {
-        m_divider->hide();
         m_panel->hide();
         m_titleBar->setStateText(tr("show"));
     }
