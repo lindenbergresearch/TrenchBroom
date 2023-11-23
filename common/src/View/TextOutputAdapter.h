@@ -23,10 +23,29 @@
 #include <QTextCursor>
 #include <QTextStream>
 
+#include <TrenchBroomApp.h>
+
 class QTextEdit;
 
 namespace TrenchBroom {
 namespace View {
+
+namespace Ascii {
+static QChar ESC = 0x1b;   // Escape character
+static QChar BEL = 0x07;   // Terminal bell
+static QChar BS = 0x08;    // Backspace
+static QChar HT = 0x09;    // Horizontal TAB
+static QChar LF = 0x0A;    // Linefeed (newline)
+static QChar VT = 0x0B;    // Vertical TAB
+static QChar FF = 0x0C;    // Form-feed (also: New page NP)
+static QChar CR = 0x0D;    // Carriage return
+static QChar DEL = 0x7F;   // Delete character
+
+// start and end indicator bytes
+static QChar SCREEN_CMD_START = '[';
+static QChar SCREEN_CMD_END = 'm';
+}
+
 /**
  * Helper for displaying the output of a command line tool in QTextEdit.
  *
@@ -40,6 +59,21 @@ private:
 
 public:
     explicit TextOutputAdapter(QTextEdit *textEdit);
+
+    template<typename T>
+    void pushSystemMessage(const T &t) {
+        QString string;
+        QTextStream stream(&string);
+        stream << t;
+
+        auto format = QTextCharFormat{};
+        auto font = TrenchBroomApp::instance().getUIFont();
+        font.setBold(true);
+        format.setFont(font);
+        format.setFontPointSize(TrenchBroomApp::instance().getConsoleFont().pointSize());
+        format.setForeground(QBrush{QColor{"#FFFFFF"}});
+        m_insertionCursor.insertText(string, format);
+    }
 
     /**
      * Appends the given value to the text widget.
@@ -56,6 +90,8 @@ public:
 
 private:
     void appendString(const QString &string);
+
+    QTextCharFormat &decodeVT100Command(const QString &string, QTextCharFormat &format);
 };
 } // namespace View
 } // namespace TrenchBroom
