@@ -55,6 +55,7 @@ private:
 
 private: // FPS counter
     // stats since the last counter update
+    long framesc = 0;
     int m_framesRendered;
     int m_maxFrameTimeMsecs;
     // other

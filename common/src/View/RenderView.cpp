@@ -95,20 +95,20 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpe
           const int framesRenderedInPeriod = m_framesRendered;
           const int maxFrameTime = m_maxFrameTimeMsecs;
           const int64_t fpsCounterPeriod = currentTime - m_lastFPSCounterUpdate;
-          const double avgFps = static_cast<double>(framesRenderedInPeriod) / (static_cast<double>(fpsCounterPeriod) / 1000.0);
+          const double avgFps = static_cast<double>(framesRenderedInPeriod) / (static_cast<double>(fpsCounterPeriod) / 250.0);
 
           m_framesRendered = 0;
           m_maxFrameTimeMsecs = 0;
           m_lastFPSCounterUpdate = currentTime;
 
-          m_currentFPS = std::string("Avg FPS: ") + std::to_string(avgFps) + " Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +
+          m_currentFPS = std::string("Avg FPS: ") + std::to_string(int(avgFps)) + " frames: " + std::to_string(framesc)  + " Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +
                          std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" +
                          std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " +
                          std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
         }
     );
 
-    fpsCounter->start(1000);
+    fpsCounter->start(250);
 
     setMouseTracking(true); // request mouse move events even when no button is held down
     setFocusPolicy(Qt::StrongFocus); // accept focus by clicking or tab
@@ -166,7 +166,7 @@ void RenderView::paintGL() {
     render();
 
     // Update stats
-    m_framesRendered++;
+    m_framesRendered++;framesc++;
     if (m_timeSinceLastFrame.isValid()) {
         int frameTime = static_cast<int>(m_timeSinceLastFrame.restart());
         if (frameTime > m_maxFrameTimeMsecs) {
@@ -236,7 +236,7 @@ void RenderView::renderFocusIndicator() {
         return;
 
     const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator);
-    const Color &outer = Color(drawFocus ? m_focusColor : m_frameColor);
+    const Color &outer = Color(/*drawFocus ? m_focusColor :*/ m_frameColor);
     const Color &inner = Color(drawFocus ? m_focusColor : m_frameColor);
 
     const qreal r = devicePixelRatioF();
