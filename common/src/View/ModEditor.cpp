@@ -54,7 +54,7 @@ ModEditor::ModEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
 }
 
 void ModEditor::createGui() {
-    auto *availableModContainer = new TitledPanel("Available", false, true, true);
+    auto *availableModContainer = new TitledPanel("Available", true, true);
     availableModContainer->setBackgroundRole(QPalette::Base);
     availableModContainer->setAutoFillBackground(true);
 
@@ -75,7 +75,7 @@ void ModEditor::createGui() {
     filterBoxSizer->setSpacing(0);
     filterBoxSizer->addWidget(m_filterBox, 1);
 
-    auto *enabledModContainer = new TitledPanel("Enabled", false, true, true);
+    auto *enabledModContainer = new TitledPanel("Enabled", true, true);
     enabledModContainer->setBackgroundRole(QPalette::Base);
     enabledModContainer->setAutoFillBackground(true);
 

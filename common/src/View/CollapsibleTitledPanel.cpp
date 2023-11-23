@@ -30,10 +30,14 @@ namespace TrenchBroom {
 namespace View {
 // CollapsibleTitleBar
 
-CollapsibleTitleBar::CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent) : TitleBar(title, parent),
+CollapsibleTitleBar::CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent) : TitleBar(
+    title, parent
+),
     m_stateText(new QLabel(stateText)) {
+    setObjectName("CollapsibleTitleBar");
     m_stateText->setFont(m_titleText->font());
     makeInfo(m_stateText);
+    m_stateText->setContentsMargins(0, 0, LayoutConstants::MediumHMargin, 0);
 
     layout()->addWidget(m_stateText);
 }
@@ -47,14 +51,19 @@ void CollapsibleTitleBar::mousePressEvent(QMouseEvent * /* event */) {
 }
 
 // CollapsibleTitledPanel
-CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool initiallyExpanded, QWidget *parent) : QWidget(parent),
-    m_titleBar(new CollapsibleTitleBar(title, "hide")), m_divider(new BorderLine(BorderLine::Direction::Horizontal, 4)), m_panel(new QWidget()),
+CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool initiallyExpanded, QWidget *parent)
+    : QWidget(parent),
+    m_titleBar(new CollapsibleTitleBar(title, "hide")), m_panel(new QWidget()),
     m_expanded(initiallyExpanded) {
+
+    m_panel->setAutoFillBackground(true);
+    m_panel->setBackgroundRole(QPalette::Window);
+
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);
     sizer->setSpacing(0);
     sizer->addWidget(m_titleBar, 0);
-    sizer->addWidget(m_panel, 1);
+    sizer->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
     setLayout(sizer);
 
     connect(m_titleBar, &CollapsibleTitleBar::titleBarClicked, this, [=]() {
@@ -114,8 +123,7 @@ void CollapsibleTitledPanel::updateExpanded() {
     if (m_expanded) {
         m_panel->show();
         m_titleBar->setStateText(tr("hide"));
-    }
-    else {
+    } else {
         m_panel->hide();
         m_titleBar->setStateText(tr("show"));
     }
