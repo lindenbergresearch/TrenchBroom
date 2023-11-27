@@ -3389,9 +3389,9 @@ void MapDocument::loadEntityDefinitions() {
     const auto spec = entityDefinitionFile();
     const auto path = m_game->findEntityDefinitionFile(spec, externalSearchPaths());
     auto status = IO::SimpleParserStatus{logger()};
-
+    info("Try to load entity definition file: " + path.filename().string());
     m_entityDefinitionManager->loadDefinitions(path, *m_game, status).transform([&]() {
-          info("Loaded entity definition file " + path.filename().string());
+          info("Loaded entity definition file: " + path.filename().string());
           createEntityDefinitionActions();
         }
     ).transform_error([&](auto e) {
