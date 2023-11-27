@@ -47,8 +47,7 @@ void WelcomeWindow::createGui() {
 
     m_recentDocumentListBox = new RecentDocumentListBox{};
     m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
-    m_recentDocumentListBox->setMaximumWidth(400);
-    m_recentDocumentListBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  //  m_recentDocumentListBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     connect(m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument);
 
@@ -57,18 +56,13 @@ void WelcomeWindow::createGui() {
     panelLayout->setSpacing(0);
     panelLayout->addWidget(m_recentDocumentListBox);
 
-//    auto titledPanel = new TitledPanel("Recent Maps", true);
-//    titledPanel->getPanel()->setLayout(panelLayout);
-//    titledPanel->getTitleBar()->setBackgroundRole(QPalette::Mid);
-//    titledPanel->getTitleBar()->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::MediumHMargin);
-
     auto *innerLayout = new QHBoxLayout{};
     innerLayout->setContentsMargins(QMargins{});
     innerLayout->setSpacing(0);
 
     auto *appPanel = createAppPanel();
 
-    innerLayout->addWidget(appPanel, 0, Qt::AlignTop);
+    innerLayout->addWidget(appPanel);
     innerLayout->addLayout(panelLayout);
 
     auto *container = new QWidget{};
@@ -117,11 +111,12 @@ QWidget *WelcomeWindow::createAppPanel() {
     auto *outerLayout = new QVBoxLayout{};
     outerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->setSpacing(0);
-    outerLayout->addWidget(infoPanel, 0, Qt::AlignHCenter);
+    outerLayout->addWidget(infoPanel);
     outerLayout->addSpacing(20);
     outerLayout->addLayout(buttonLayout);
     outerLayout->addSpacing(20);
     appPanel->setLayout(outerLayout);
+    appPanel->setFixedWidth(400);
 
     return appPanel;
 }
