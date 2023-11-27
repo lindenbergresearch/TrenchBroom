@@ -24,13 +24,14 @@
 #include <QDebug>
 #include <QFont>
 #include <QWidget>
-#include "IO/SystemPaths.h"
 
 namespace TrenchBroom {
 namespace View {
 namespace Fonts {
 QFont fixedWidthFont() {
-    return TrenchBroomApp::instance().getConsoleFont();
+    auto font = TrenchBroomApp::instance().getConsoleFont();
+    font.setPointSize(TrenchBroomApp::instance().getUIFont().pointSize());
+    return font;
 }
 } // namespace Fonts
 
