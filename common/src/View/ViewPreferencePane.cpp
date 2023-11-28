@@ -109,16 +109,16 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     auto *viewPrefsHeader = new QLabel{"Map Views"};
     makeEmphasized(viewPrefsHeader);
 
-    m_themeCombo = new QComboBox{};
-    m_themeCombo->addItems({Preferences::systemTheme(), Preferences::darkTheme()});
-    auto *themeInfo = new QLabel{};
-    themeInfo->setText(tr("Requires restart after changing"));
-    makeInfo(themeInfo);
-    auto *themeLayout = new QHBoxLayout{};
-    themeLayout->addWidget(m_themeCombo);
-    themeLayout->addSpacing(LayoutConstants::NarrowHMargin);
-    themeLayout->addWidget(themeInfo);
-    themeLayout->setContentsMargins(0, 0, 0, 0);
+//    m_themeCombo = new QComboBox{};
+//    m_themeCombo->addItems({Preferences::systemTheme(), Preferences::darkTheme()});
+//    auto *themeInfo = new QLabel{};
+//    themeInfo->setText(tr("Requires restart after changing"));
+//    makeInfo(themeInfo);
+//    auto *themeLayout = new QHBoxLayout{};
+//    themeLayout->addWidget(m_themeCombo);
+//    themeLayout->addSpacing(LayoutConstants::NarrowHMargin);
+//    themeLayout->addWidget(themeInfo);
+//    themeLayout->setContentsMargins(0, 0, 0, 0);
 
     m_layoutCombo = new QComboBox{};
     m_layoutCombo->setToolTip("Sets the layout of the editing views.");
@@ -307,7 +307,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
     layout->addSection("User Interface");
-    layout->addRow("Theme", themeLayout);
+   // layout->addRow("Theme", themeLayout);
     layout->addRow("Brightness", m_UIBrightnessSlider);
     layout->addRow("Toolbar Icon-Size", m_ToolbarIconSizeCombo);
 
@@ -340,7 +340,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 }
 
 void ViewPreferencePane::bindEvents() {
-    connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
+    //connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
     connect(m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged);
     connect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged);
     connect(m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged);
@@ -370,7 +370,7 @@ void ViewPreferencePane::bindEvents() {
 }
 
 void ViewPreferencePane::unBindEvents() {
-    disconnect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
+    //disconnect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
     disconnect(m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged);
     disconnect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged);
     disconnect(m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged);
@@ -420,7 +420,7 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::EnableMSAA);
     prefs.resetToDefault(Preferences::TextureMinFilter);
     prefs.resetToDefault(Preferences::TextureMagFilter);
-    prefs.resetToDefault(Preferences::Theme);
+   // prefs.resetToDefault(Preferences::Theme);
     prefs.resetToDefault(Preferences::TextureBrowserIconSize);
     prefs.resetToDefault(Preferences::RendererFontSize);
     prefs.resetToDefault(Preferences::UIFontSize);
@@ -451,7 +451,7 @@ void ViewPreferencePane::doUpdateControls() {
 
     m_showAxes->setChecked(pref(Preferences::ShowAxes));
     m_enableMsaa->setChecked(pref(Preferences::EnableMSAA));
-    m_themeCombo->setCurrentIndex(findThemeIndex(pref(Preferences::Theme)));
+   // m_themeCombo->setCurrentIndex(findThemeIndex(pref(Preferences::Theme)));
 
     const auto textureBrowserIconSize = pref(Preferences::TextureBrowserIconSize);
     if (textureBrowserIconSize == 0.25f) {
@@ -732,7 +732,11 @@ void ViewPreferencePane::editorToolbarIconSizeChanged(int index) {
     auto size = 14 + index * 2;
     prefs.set(Preferences::ToolBarIconsSize, size);
 
-    reloadUIStyle();
+    if (TrenchBroomApp::instance().getCurrentMapFrame()) {
+        TrenchBroomApp::instance().getCurrentMapFrame()->reCreateToolBar();
+    }
+
+    reloadUIStyle(true);
 }
 
 void ViewPreferencePane::editorFaceAutoBrightnessChanged(int value) {
