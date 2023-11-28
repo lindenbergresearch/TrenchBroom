@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QTabWidget>
 
 #include <memory>
 
@@ -40,6 +41,7 @@ Q_OBJECT
 private:
     //   TabBook *m_tabBook;
     Console *m_console;
+    QTabWidget *m_tabs;
     IssueBrowser *m_issueBrowser;
 
 public:
