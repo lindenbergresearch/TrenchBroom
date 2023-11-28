@@ -204,6 +204,8 @@ QWidget *makeDefault(QWidget *widget);
 
 QWidget *makeEmphasized(QWidget *widget);
 
+QWidget *makeItalic(QWidget *widget);
+
 QWidget *makeUnemphasized(QWidget *widget);
 
 QWidget *makeInfo(QWidget *widget);

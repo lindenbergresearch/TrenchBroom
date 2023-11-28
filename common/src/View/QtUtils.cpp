@@ -222,6 +222,13 @@ QWidget *makeEmphasized(QWidget *widget) {
     return widget;
 }
 
+QWidget *makeItalic(QWidget *widget) {
+    auto font = widget->font();
+    font.setItalic(true);
+    widget->setFont(font);
+    return widget;
+}
+
 QWidget *makeUnemphasized(QWidget *widget) {
     widget->setFont(QFont{});
     return widget;
