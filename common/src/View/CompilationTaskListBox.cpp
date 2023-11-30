@@ -56,14 +56,13 @@ CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_pt
     // request customContextMenuRequested() to be emitted
     setContextMenuPolicy(Qt::CustomContextMenu);
 
-    auto *panel = new TitledPanel{m_title};
-
-    auto *layout = new QVBoxLayout{};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(panel);
-    layout->addWidget(new BorderLine{});
-    setLayout(layout);
+//    auto *panel = new TitledPanel{m_title, false, false, true};
+//
+//    auto *layout = new QVBoxLayout{};
+//    layout->setContentsMargins(0, 0, 0, 0);
+//    layout->setSpacing(0);
+//    layout->addWidget(panel);
+//    layout->addWidget(new BorderLine{});
 
     m_enabledCheckbox = new QCheckBox{};
     m_enabledCheckbox->setToolTip(tr("Whether to include this task when running the compile profile"));
@@ -73,8 +72,24 @@ CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_pt
     m_taskLayout->addSpacing(LayoutConstants::NarrowHMargin);
     m_taskLayout->addWidget(m_enabledCheckbox, 0, Qt::AlignVCenter);
     m_taskLayout->addSpacing(LayoutConstants::NarrowHMargin);
-    // subclasses call addMainLayout() to add their contents after the checkbox
-    panel->getPanel()->setLayout(m_taskLayout);
+    //subclasses call addMainLayout() to add their contents after the checkbox
+    //panel->getPanel()->setLayout(m_taskLayout);
+
+    auto layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    layout->addWidget(new BorderLine);
+    auto titleLabel = new QLabel{m_title};
+    makeBright(titleLabel, QPalette{});
+    titleLabel->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
+
+    layout->addWidget(titleLabel);
+    layout->addLayout(m_taskLayout);
+    layout->addWidget(new BorderLine);
+
+    setLayout(layout);
+    setBaseWindowColor(this);
+    setBaseWindowColor(titleLabel);
 
     connect(m_enabledCheckbox, &QCheckBox::clicked, this, [&](const bool checked) {
           std::visit([&](auto &t) { t.enabled = checked; }, m_task);
@@ -125,13 +140,15 @@ CompilationExportMapTaskEditor::CompilationExportMapTaskEditor(std::weak_ptr<Map
     formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
         LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
     );
-    formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
+    formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 
     m_targetEditor = new MultiCompletionLineEdit{};
     m_targetEditor->setFont(Fonts::fixedWidthFont());
-    m_targetEditor->setToolTip(R"(The path of the exported file.Variables are allowed.)");
+    m_targetEditor->setToolTip(R"(The path of the exported file.
+Variables are allowed.)"
+    );
     setupCompleter(m_targetEditor);
     formLayout->addRow("File Path", m_targetEditor);
 
@@ -167,7 +184,7 @@ CompilationCopyFilesTaskEditor::CompilationCopyFilesTaskEditor(std::weak_ptr<Map
     formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
         LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
     );
-    formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
+    formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 
@@ -234,7 +251,7 @@ CompilationRenameFileTaskEditor::CompilationRenameFileTaskEditor(std::weak_ptr<M
     formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
         LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
     );
-    formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
+    formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 
@@ -302,7 +319,7 @@ CompilationDeleteFilesTaskEditor::CompilationDeleteFilesTaskEditor(std::weak_ptr
     formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
         LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
     );
-    formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
+    formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 
@@ -350,7 +367,7 @@ CompilationRunToolTaskEditor::CompilationRunToolTaskEditor(std::weak_ptr<MapDocu
     formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin,
         LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
     );
-    formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
+    formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 

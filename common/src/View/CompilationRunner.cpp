@@ -339,14 +339,14 @@ void CompilationRunToolTaskRunner::processFinished(const int exitCode, const QPr
 void CompilationRunToolTaskRunner::processReadyReadStandardError() {
     if (m_process != nullptr) {
         const QByteArray bytes = m_process->readAllStandardError();
-        m_context.pushSystemMessage(QString::fromLocal8Bit(bytes));
+        m_context << QString::fromLocal8Bit(bytes);
     }
 }
 
 void CompilationRunToolTaskRunner::processReadyReadStandardOutput() {
     if (m_process != nullptr) {
         const QByteArray bytes = m_process->readAllStandardOutput();
-        m_context.pushSystemMessage(QString::fromLocal8Bit(bytes));
+        m_context << QString::fromLocal8Bit(bytes);
     }
 }
 
