@@ -87,7 +87,7 @@ void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
 
     if (pref(Preferences::SelectionBoundsDashedLines)) {
         glAssert(glEnable(GL_LINE_STIPPLE));
-        glAssert(glLineStipple(4, (GLushort) pref(Preferences::SelectionBoundsPattern)));
+        glAssert(glLineStipple(pref(Preferences::SelectionBoundsDashedSize), (GLushort) pref(Preferences::SelectionBoundsPattern)));
     }
 
     glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
