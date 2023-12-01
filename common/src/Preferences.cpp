@@ -73,6 +73,7 @@ Preference<Color> &axisColor(vm::axis::type axis) {
 /* --- UNITS CONVERSATION ---------------------------- */
 Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsDisplay::UNITS);
 Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor", 32.0f);
+Preference<int> UnitsMaxDigits("Renderer/Units Maximum Digits", 2);
 
 /* --- COMPASS---------------------------------------- */
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 1.0f));
@@ -116,6 +117,10 @@ Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x66
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);
 Preference<bool> ShowHiddenSelectionBounds("Renderer/Selection bounds show hidden bounds", true);
+Preference<bool> AlwaysShowSelectionBounds("Renderer/Selection bounds always show bounds", false);
+Preference<bool> ShowObjectBoundsSelectionBounds("Renderer/Selection bounds show object bounds", true);
+Preference<bool> SelectionBoundsShowMinMax("Renderer/Selection bounds show min max values", false);
+Preference<int> SelectionBoundsDashedSize("Renderer/Selection bounds line dashes size", 4);
 
 Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
@@ -304,7 +309,8 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
         &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
-        &PointFileColor, &PortalFileBorderColor,
+        &UnitsMaxDigits,
+        &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds,
         &PortalFileFillColor, &ShowFPS, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &UnitsDisplayType,
         &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor,
         &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
@@ -312,10 +318,10 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha,
         &EdgeColor, &SelectedEdgeColor,
         &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
-        &SelectionBoundsColor,
+        &SelectionBoundsColor, &AlwaysShowSelectionBounds,&SelectionBoundsDashedSize,
         &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
         &InfoOverlayTextColor,
-        &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &GroupInfoOverlayTextColor,
+        &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth,&SelectionBoundsShowMinMax, &GroupInfoOverlayTextColor,
         &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha,
         &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor,
         &LockedInfoOverlayBackgroundColor, &HandleRadius,

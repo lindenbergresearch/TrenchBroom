@@ -71,6 +71,7 @@ Preference<Color> &axisColor(vm::axis::type axis);
 /* --- UNITS CONVERSATION ---------------------------- */
 extern Preference<int> UnitsDisplayType;
 extern Preference<float> MetricConversationFactor;
+extern Preference<int> UnitsMaxDigits;
 
 /* --- COMPASS---------------------------------------- */
 extern Preference<Color> CompassBackgroundColor;
@@ -110,6 +111,12 @@ extern Preference<int> SelectionBoundsPattern;
 extern Preference<bool> SelectionBoundsIntersectionMode;
 extern Preference<bool> SelectionBoundsDashedLines;
 extern Preference<bool> ShowHiddenSelectionBounds;
+extern Preference<bool> AlwaysShowSelectionBounds;
+extern Preference<bool> ShowObjectBoundsSelectionBounds;
+extern Preference<bool> SelectionBoundsShowMinMax;
+extern Preference<int> SelectionBoundsDashedSize;
+
+
 
 extern Preference<Color> InfoOverlayTextColor;
 extern Preference<Color> GroupInfoOverlayTextColor;
