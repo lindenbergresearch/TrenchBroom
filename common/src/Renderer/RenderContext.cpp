@@ -18,6 +18,8 @@
  */
 
 #include "RenderContext.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 #include "Renderer/Camera.h"
 
@@ -188,7 +190,10 @@ void RenderContext::clearTintSelection() {
 }
 
 bool RenderContext::showSelectionGuide() const {
-    return m_showSelectionGuide == ShowSelectionGuide::Show || m_showSelectionGuide == ShowSelectionGuide::ForceShow;
+    return
+    m_showSelectionGuide == ShowSelectionGuide::Show ||
+    m_showSelectionGuide == ShowSelectionGuide::ForceShow ||
+    pref(Preferences::AlwaysShowSelectionBounds);
 }
 
 void RenderContext::setShowSelectionGuide() {
