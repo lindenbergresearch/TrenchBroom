@@ -35,9 +35,10 @@ namespace Preferences {
 // NOTE: When adding a new preference here, always update the staticPreferences()
 // implementation
 
-enum UnitsDisplay {
+enum UnitsSystem {
   UNITS = 0, METRIC, BOTH
 };
+
 
 extern Preference<int> MapViewLayout;
 
@@ -117,7 +118,6 @@ extern Preference<bool> SelectionBoundsShowMinMax;
 extern Preference<int> SelectionBoundsDashedSize;
 
 
-
 extern Preference<Color> InfoOverlayTextColor;
 extern Preference<Color> GroupInfoOverlayTextColor;
 extern Preference<Color> InfoOverlayBackgroundColor;
@@ -165,6 +165,7 @@ extern Preference<int> FaceAutoBrightness;
 extern Preference<float> GridLineWidth;
 extern Preference<float> GridAlpha;
 extern Preference<float> GridMajorDivisionSize;
+extern Preference<int> GridUnitSystem;
 extern Preference<Color> GridColor2D;
 
 extern Preference<int> TextureMinFilter;

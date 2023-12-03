@@ -71,7 +71,7 @@ Preference<Color> &axisColor(vm::axis::type axis) {
 }
 
 /* --- UNITS CONVERSATION ---------------------------- */
-Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsDisplay::UNITS);
+Preference<int> UnitsDisplayType("Renderer/Units Display Type", UnitsSystem::UNITS);
 Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor", 32.0f);
 Preference<int> UnitsMaxDigits("Renderer/Units Maximum Digits", 2);
 
@@ -174,6 +174,7 @@ Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 0);
 Preference<float> GridLineWidth("Renderer/Grid/With", 1.0);
 Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.5f);
 Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 128.0f);
+Preference<int> GridUnitSystem("Renderer/Grid/Major division size", UnitsSystem::UNITS);
 Preference<Color> GridColor2D("Renderer/Grid/Color2D", Color(0.8f, 0.8f, 0.8f, 0.8f));
 
 Preference<int> TextureMinFilter("Renderer/Texture mode min filter", 0x2700);
