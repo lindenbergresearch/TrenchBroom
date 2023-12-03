@@ -35,8 +35,10 @@ namespace Preferences {
 // NOTE: When adding a new preference here, always update the staticPreferences()
 // implementation
 
-enum UnitsSystem {
-  UNITS = 0, METRIC, BOTH
+enum LengthUnitDisplay {
+  Units,    /* common units used by Quake (standard) */
+  Metric,   /* metric system used for interfacing 3rd party systems and engines */
+  Combined  /* combined */
 };
 
 
@@ -70,7 +72,7 @@ extern Preference<Color> ZAxisColor;
 Preference<Color> &axisColor(vm::axis::type axis);
 
 /* --- UNITS CONVERSATION ---------------------------- */
-extern Preference<int> UnitsDisplayType;
+extern Preference<int> LengthUnitSystem;
 extern Preference<float> MetricConversationFactor;
 extern Preference<int> UnitsMaxDigits;
 
