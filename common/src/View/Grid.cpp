@@ -31,6 +31,9 @@
 #include <vecmath/scalar.h>
 #include <vecmath/vec.h>
 
+#include <Preferences.h>
+#include <PreferenceManager.h>
+
 #include <cmath>
 
 namespace TrenchBroom {
@@ -39,7 +42,15 @@ Grid::Grid(const int size) : m_size(size), m_snap(true), m_visible(true) {
 }
 
 FloatType Grid::actualSize(const int size) {
-    return std::exp2(size);
+    Preferences::LengthUnitDisplay lengthUnitDisplay =
+        (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
+
+    auto factor =
+        lengthUnitDisplay == Preferences::Units ?
+        1.0f :
+        pref(Preferences::MetricConversationFactor) / 10.f; // use smaller units section for grid
+
+    return std::exp2(float(size)) * factor;
 }
 
 int Grid::size() const {
@@ -100,9 +111,11 @@ FloatType Grid::intersectWithRay(const vm::ray3 &ray, const size_t skip) const {
     vm::vec3 planeAnchor;
 
     for (size_t i = 0; i < 3; ++i) {
-        planeAnchor[i] = ray.direction[i] > 0.0 ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize() : snapDown(ray.origin[i], true) -
-                                                                                                                              static_cast<FloatType>(skip) *
-                                                                                                                              actualSize();
+        planeAnchor[i] =
+            ray.direction[i] > 0.0 ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize() :
+            snapDown(ray.origin[i], true) -
+            static_cast<FloatType>(skip) *
+            actualSize();
     }
 
     const auto distX = vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_x()));
@@ -151,7 +164,10 @@ vm::vec3 Grid::moveDeltaForPoint(const vm::vec3 &point, const vm::vec3 &delta) c
  * an entity from the entity browser onto the map, the mouse is always grabbing the edge
  * of the entity bbox that's closest to the camera.
  */
-vm::vec3 Grid::moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */, const vm::ray3 &ray) const {
+vm::vec3
+Grid::moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */,
+    const vm::ray3 &ray
+) const {
     // First, find the ray/plane intersection, and snap it to grid.
     // This will become one of the corners of our resulting bbox.
     // Note that this means we might let the box clip into the plane somewhat.
