@@ -23,6 +23,8 @@
 #include <memory>
 #include <string>
 
+#define DISABLE_RECOLORING_ICON
+
 class QIcon;
 
 class QPixmap;

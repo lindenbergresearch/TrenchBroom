@@ -137,7 +137,7 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
     }
 
     const auto darkTheme =
-#ifdef DISABLE_RECOLORING_QICON
+#ifdef DISABLE_RECOLORING_ICON
         false;
 #else
         const auto palette = QPalette{};
