@@ -97,19 +97,22 @@ static QImage createDisabledState(const QImage &image) {
     return disabledImage;
 }
 
-static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio) {
+static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio, int size) {
     if (!svgSource.isValid()) {
         return;
     }
 
     auto image = QImage{
-        int(svgSource.defaultSize().width() * devicePixelRatio), int(svgSource.defaultSize().height() * devicePixelRatio), QImage::Format_ARGB32_Premultiplied
+        int(size * devicePixelRatio), int(size * devicePixelRatio), QImage::Format_ARGB32_Premultiplied
     };
+
     image.fill(Qt::transparent);
+
     {
         auto paint = QPainter{&image};
         svgSource.render(&paint);
     }
+
     image.setDevicePixelRatio(devicePixelRatio);
 
     if (invert && image.isGrayscale()) {
@@ -120,7 +123,7 @@ static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::S
     icon.addPixmap(QPixmap::fromImage(createDisabledState(image)), QIcon::Disabled, state);
 }
 
-QIcon loadSVGIcon(const std::filesystem::path &imagePath) {
+QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
     // Simple caching layer.
     // Without it, the .svg files would be read from disk and decoded each time this is
     // called, which is slow. We never evict from the cache which is assumed to be OK
@@ -139,6 +142,7 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath) {
 
     // Cache miss, load the icon
     auto result = QIcon{};
+
     if (!imagePath.empty()) {
         const auto onPath = imagePathToString(imagePath.parent_path() / imagePath.stem() += "_on.svg");
         const auto offPath = imagePathToString(imagePath.parent_path() / imagePath.stem() += "_off.svg");
@@ -155,10 +159,10 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath) {
                 qWarning() << "Failed to load SVG " << offPath;
             }
 
-            renderSvgToIcon(onRenderer, result, QIcon::On, darkTheme, 1.0);
-            renderSvgToIcon(onRenderer, result, QIcon::On, darkTheme, 2.0);
-            renderSvgToIcon(offRenderer, result, QIcon::Off, darkTheme, 1.0);
-            renderSvgToIcon(offRenderer, result, QIcon::Off, darkTheme, 2.0);
+            renderSvgToIcon(onRenderer, result, QIcon::On, darkTheme, 1.0, size);
+            renderSvgToIcon(onRenderer, result, QIcon::On, darkTheme, 2.0, size);
+            renderSvgToIcon(offRenderer, result, QIcon::Off, darkTheme, 1.0, size);
+            renderSvgToIcon(offRenderer, result, QIcon::Off, darkTheme, 2.0, size);
         }
         else if (!imagePathString.isEmpty()) {
             auto renderer = QSvgRenderer{imagePathString};
@@ -166,8 +170,9 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath) {
                 qWarning() << "Failed to load SVG " << imagePathString;
             }
 
-            renderSvgToIcon(renderer, result, QIcon::Off, darkTheme, 1.0);
-            renderSvgToIcon(renderer, result, QIcon::Off, darkTheme, 2.0);
+            renderSvgToIcon(renderer, result, QIcon::Off, darkTheme, 1.0, size);
+            renderSvgToIcon(renderer, result, QIcon::Off, darkTheme, 2.0, size);
+
         }
         else {
             qWarning() << "Couldn't find image for path: " << pathAsQString(imagePath);
