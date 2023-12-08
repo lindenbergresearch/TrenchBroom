@@ -375,7 +375,7 @@ void setStyledBorder(QWidget *widget, int width, const QColor &color, const char
 
 
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
-    return createBitmapButton(IO::loadSVGIcon(image), tooltip, parent);
+    return createBitmapButton(IO::loadSVGIcon(image, 16), tooltip, parent);
 }
 
 QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent) {
@@ -503,7 +503,7 @@ QLineEdit *createSearchBox() {
     widget->setClearButtonEnabled(true);
     widget->setPlaceholderText(QLineEdit::tr("Search..."));
 
-    const auto icon = IO::loadSVGIcon("Search.svg");
+    const auto icon = IO::loadSVGIcon("Search.svg", 16);
     widget->addAction(icon, QLineEdit::LeadingPosition);
     return widget;
 }
