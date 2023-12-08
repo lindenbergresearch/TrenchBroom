@@ -136,9 +136,14 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
         return it->second;
     }
 
-    const auto palette = QPalette{};
-    const auto windowColor = palette.color(QPalette::Active, QPalette::Window);
-    const auto darkTheme = windowColor.lightness() <= 127;
+    const auto darkTheme =
+#ifdef DISABLE_RECOLORING_QICON
+        false;
+#else
+        const auto palette = QPalette{};
+        const auto windowColor = palette.color(QPalette::Active, QPalette::Window);
+        windowColor.lightness() <= 127;
+#endif
 
     // Cache miss, load the icon
     auto result = QIcon{};
