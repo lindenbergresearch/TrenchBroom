@@ -340,7 +340,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 }
 
 void ViewPreferencePane::bindEvents() {
-    //connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
+    connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
     connect(m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged);
     connect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged);
     connect(m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged);
@@ -350,7 +350,7 @@ void ViewPreferencePane::bindEvents() {
     connect(m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged);
     connect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
     connect(m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
-    connect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
+  //  connect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     connect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     connect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
 
@@ -370,7 +370,7 @@ void ViewPreferencePane::bindEvents() {
 }
 
 void ViewPreferencePane::unBindEvents() {
-    //disconnect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
+    disconnect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
     disconnect(m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged);
     disconnect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged);
     disconnect(m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged);
@@ -380,7 +380,7 @@ void ViewPreferencePane::unBindEvents() {
     disconnect(m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged);
     disconnect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
     disconnect(m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
-    disconnect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
+ //   disconnect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     disconnect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     disconnect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
 
@@ -414,7 +414,7 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::FaceAutoBrightness);
     prefs.resetToDefault(Preferences::GridAlpha);
     prefs.resetToDefault(Preferences::CameraFov);
-    prefs.resetToDefault(Preferences::UnitsDisplayType);
+    prefs.resetToDefault(Preferences::LengthUnitSystem);
     prefs.resetToDefault(Preferences::MetricConversationFactor);
     prefs.resetToDefault(Preferences::ShowAxes);
     prefs.resetToDefault(Preferences::EnableMSAA);
@@ -440,7 +440,7 @@ void ViewPreferencePane::doUpdateControls() {
     m_gridAlphaSlider->setRatio(pref(Preferences::GridAlpha));
     m_fovSlider->setValue(int(pref(Preferences::CameraFov)));
 
-    m_unitsDisplayType->setCurrentIndex(pref(Preferences::UnitsDisplayType));
+    m_unitsDisplayType->setCurrentIndex(pref(Preferences::LengthUnitSystem));
     m_metricConversationFactor->setText(QString::asprintf("%.4f", pref(Preferences::MetricConversationFactor)));
 
     m_gridWidthSlider->setValue(int(pref(Preferences::GridLineWidth) * 100));
@@ -569,7 +569,7 @@ void ViewPreferencePane::fovChanged(const int value) {
 
 void ViewPreferencePane::unitsDisplayTypeIndexChanged(const int index) {
     auto &prefs = PreferenceManager::instance();
-    prefs.set(Preferences::UnitsDisplayType, index);
+    prefs.set(Preferences::LengthUnitSystem, index);
 }
 
 void ViewPreferencePane::metricConversationFactorChanged(const QString &text) {
