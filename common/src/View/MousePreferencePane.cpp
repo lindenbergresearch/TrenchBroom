@@ -204,6 +204,7 @@ bool MousePreferencePane::doValidate() {
 
 void MousePreferencePane::lookSpeedChanged(const int /* value */) {
     const auto ratio = m_lookSpeedSlider->ratio();
+   // printf("%.5f\n", ratio);
     PreferenceManager &prefs = PreferenceManager::instance();
     prefs.set(Preferences::CameraLookSpeed, ratio);
 }
