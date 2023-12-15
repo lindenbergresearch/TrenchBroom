@@ -210,6 +210,7 @@ extern Preference<Color> LogErrorColor;
 
 /* --- CAMERA ---------------------------------------- */
 extern Preference<float> CameraLookSpeed;
+extern Preference<int> CameraLookSmoothing;
 extern Preference<bool> CameraLookInvertH;
 extern Preference<bool> CameraLookInvertV;
 extern Preference<float> CameraPanSpeed;

@@ -37,6 +37,7 @@ class SliderWithLabel;
 class MousePreferencePane : public PreferencePane {
 private:
     SliderWithLabel *m_lookSpeedSlider;
+    SliderWithLabel *m_mouseSmoothingSlider;
     QCheckBox *m_invertLookHAxisCheckBox;
     QCheckBox *m_invertLookVAxisCheckBox;
     SliderWithLabel *m_panSpeedSlider;
@@ -75,6 +76,8 @@ private:
 private slots:
 
     void lookSpeedChanged(int value);
+
+    void mouseSmoothingChanged(int value);
 
     void invertLookHAxisChanged(int state);
 

@@ -79,7 +79,7 @@ Preference<int> UnitsMaxDigits("Renderer/Units Maximum Digits", 2);
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 1.0f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline",
     Color(1.0f, 1.0f, 1.0f, 1.0f));
-Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.95f);
+Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.75f);
 Preference<float> CompassScale("Renderer/Colors/Compass scale", 1.5f);
 
 Preference<Color> CameraFrustumColor("Renderer/Colors/Camera frustum", Color(0.0f, 1.0f, 1.0f, 1.0f));
@@ -218,6 +218,7 @@ Preference<Color> LogErrorColor("Editor/Colors/LogLevel Error", Color(0.98f, 0.1
 
 /* --- CAMERA ---------------------------------------- */
 Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
+Preference<int> CameraLookSmoothing("Controls/Camera/Look smoothing", 4);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
 Preference<bool> CameraLookInvertV("Controls/Camera/Invert vertical look", false);
 Preference<float> CameraPanSpeed("Controls/Camera/Pan speed", 0.5f);
@@ -341,7 +342,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor,
         &UIHighlightColor, &UITextColor,
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor,
-        &CameraLookSpeed, &CameraLookInvertH,
+        &CameraLookSpeed,&CameraLookSmoothing, &CameraLookInvertH,
         &CameraLookInvertV, &CameraPanSpeed, &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert,
         &CameraMoveSpeed, &CameraEnableAltMove,
         &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,

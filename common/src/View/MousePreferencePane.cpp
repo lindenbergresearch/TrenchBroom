@@ -34,28 +34,31 @@
 
 namespace TrenchBroom {
 namespace View {
-MousePreferencePane::MousePreferencePane(QWidget *parent) : PreferencePane(parent), m_lookSpeedSlider(nullptr), m_invertLookHAxisCheckBox(nullptr),
-    m_invertLookVAxisCheckBox(nullptr), m_panSpeedSlider(nullptr), m_invertPanHAxisCheckBox(nullptr), m_invertPanVAxisCheckBox(nullptr),
-    m_moveSpeedSlider(nullptr), m_invertMouseWheelCheckBox(nullptr), m_enableAltMoveCheckBox(nullptr), m_invertAltMoveAxisCheckBox(nullptr),
-    m_moveInCursorDirCheckBox(nullptr), m_forwardKeyEditor(nullptr), m_backwardKeyEditor(nullptr), m_leftKeyEditor(nullptr), m_rightKeyEditor(nullptr),
-    m_upKeyEditor(nullptr), m_downKeyEditor(nullptr), m_flyMoveSpeedSlider(nullptr) {
+MousePreferencePane::MousePreferencePane(QWidget *parent)
+    : PreferencePane(parent), m_lookSpeedSlider(nullptr), m_invertLookHAxisCheckBox(nullptr), m_invertLookVAxisCheckBox(nullptr), m_panSpeedSlider(nullptr), m_invertPanHAxisCheckBox(nullptr), m_invertPanVAxisCheckBox(nullptr), m_moveSpeedSlider(nullptr), m_invertMouseWheelCheckBox(nullptr), m_enableAltMoveCheckBox(nullptr), m_invertAltMoveAxisCheckBox(nullptr), m_moveInCursorDirCheckBox(nullptr), m_forwardKeyEditor(nullptr), m_backwardKeyEditor(nullptr), m_leftKeyEditor(nullptr), m_rightKeyEditor(nullptr), m_upKeyEditor(nullptr), m_downKeyEditor(nullptr), m_flyMoveSpeedSlider(nullptr) {
     createGui();
     bindEvents();
 }
 
 void MousePreferencePane::createGui() {
-    m_lookSpeedSlider = new SliderWithLabel(1, 100);
-    m_lookSpeedSlider->setMaximumWidth(350);
+    m_lookSpeedSlider = new SliderWithLabel(1, 100, 0, "%d", 350, 25);
+    m_lookSpeedSlider->setToolTip("Sets the mouse sensitivity for look-around.");
+
+    m_mouseSmoothingSlider = new SliderWithLabel(1, 10, 0, "%dx", 350, 25);
+    m_mouseSmoothingSlider->setToolTip("Sets the mouse smoothing factor.");
+
     m_invertLookHAxisCheckBox = new QCheckBox("Invert X axis");
     m_invertLookVAxisCheckBox = new QCheckBox("Invert Y axis");
 
-    m_panSpeedSlider = new SliderWithLabel(1, 100);
-    m_panSpeedSlider->setMaximumWidth(350);
+    m_panSpeedSlider = new SliderWithLabel(1, 100, 0, "%d", 350, 25);
+    m_panSpeedSlider->setToolTip("Sets the");
+
     m_invertPanHAxisCheckBox = new QCheckBox("Invert X axis");
     m_invertPanVAxisCheckBox = new QCheckBox("Invert Y axis");
 
-    m_moveSpeedSlider = new SliderWithLabel(1, 100);
-    m_moveSpeedSlider->setMaximumWidth(350);
+    m_moveSpeedSlider = new SliderWithLabel(1, 100, 0, "%d", 350, 25);
+    m_moveSpeedSlider->setToolTip("Sets");
+
     m_invertMouseWheelCheckBox = new QCheckBox("Invert mouse wheel");
     m_enableAltMoveCheckBox = new QCheckBox("Alt + middle mouse drag to move camera");
     m_invertAltMoveAxisCheckBox = new QCheckBox("Invert Z axis in Alt + middle mouse drag");
@@ -74,8 +77,8 @@ void MousePreferencePane::createGui() {
     m_downKeyEditor = new KeySequenceEdit(1);
     m_downKeyEditor->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    m_flyMoveSpeedSlider = new SliderWithLabel(0, 100);
-    m_flyMoveSpeedSlider->setMaximumWidth(400);
+    m_flyMoveSpeedSlider = new SliderWithLabel(0, 100, 0, "%d", 350, 45);
+    m_flyMoveSpeedSlider->setToolTip("Sets the camera navigation speed.");
 
     auto *layout = new FormWithSectionsLayout();
     layout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, 0, 0);
@@ -87,6 +90,7 @@ void MousePreferencePane::createGui() {
 
     layout->addSection("Mouse Look");
     layout->addRow("Sensitivity", m_lookSpeedSlider);
+    layout->addRow("Smoothing", m_mouseSmoothingSlider);
     layout->addRow("", m_invertLookHAxisCheckBox);
     layout->addRow("", m_invertLookVAxisCheckBox);
 
@@ -111,8 +115,7 @@ void MousePreferencePane::createGui() {
     layout->addRow("Down", m_downKeyEditor);
     layout->addRow("Speed", m_flyMoveSpeedSlider);
     layout->addRow("", makeInfo(new QLabel("Turn mouse wheel while holding right mouse button in 3D view to "
-                                           "adjust speed on the fly."
-    )));
+                                           "adjust speed on the fly.")));
 
     setLayout(layout);
     setMinimumWidth(400);
@@ -120,6 +123,7 @@ void MousePreferencePane::createGui() {
 
 void MousePreferencePane::bindEvents() {
     connect(m_lookSpeedSlider, &SliderWithLabel::valueChanged, this, &MousePreferencePane::lookSpeedChanged);
+    connect(m_mouseSmoothingSlider, &SliderWithLabel::valueChanged, this, &MousePreferencePane::mouseSmoothingChanged);
     connect(m_invertLookHAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertLookHAxisChanged);
     connect(m_invertLookVAxisCheckBox, &QCheckBox::stateChanged, this, &MousePreferencePane::invertLookVAxisChanged);
 
@@ -150,6 +154,7 @@ bool MousePreferencePane::doCanResetToDefaults() {
 void MousePreferencePane::doResetToDefaults() {
     PreferenceManager &prefs = PreferenceManager::instance();
     prefs.resetToDefault(Preferences::CameraLookSpeed);
+    prefs.resetToDefault(Preferences::CameraLookSmoothing);
     prefs.resetToDefault(Preferences::CameraLookInvertH);
     prefs.resetToDefault(Preferences::CameraLookInvertV);
 
@@ -175,6 +180,7 @@ void MousePreferencePane::doResetToDefaults() {
 
 void MousePreferencePane::doUpdateControls() {
     m_lookSpeedSlider->setRatio(pref(Preferences::CameraLookSpeed));
+    m_mouseSmoothingSlider->setValue(pref(Preferences::CameraLookSmoothing));
     m_invertLookHAxisCheckBox->setChecked(pref(Preferences::CameraLookInvertH));
     m_invertLookVAxisCheckBox->setChecked(pref(Preferences::CameraLookInvertV));
 
@@ -204,9 +210,13 @@ bool MousePreferencePane::doValidate() {
 
 void MousePreferencePane::lookSpeedChanged(const int /* value */) {
     const auto ratio = m_lookSpeedSlider->ratio();
-   // printf("%.5f\n", ratio);
     PreferenceManager &prefs = PreferenceManager::instance();
     prefs.set(Preferences::CameraLookSpeed, ratio);
+}
+
+void MousePreferencePane::mouseSmoothingChanged(int value) {
+    PreferenceManager &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::CameraLookSmoothing, value);
 }
 
 void MousePreferencePane::invertLookHAxisChanged(const int state) {
@@ -304,22 +314,22 @@ void MousePreferencePane::setKeySequence(KeySequenceEdit *editor, Preference<QKe
     PreferenceManager &prefs = PreferenceManager::instance();
     if (!hasConflict(keySequence, preference)) {
         prefs.set(preference, keySequence);
-    }
-    else {
+    } else {
         editor->setKeySequence(prefs.get(preference));
     }
 }
 
 bool MousePreferencePane::hasConflict(const QKeySequence &keySequence, const Preference<QKeySequence> &preference) const {
-    const auto prefs = std::vector<Preference<QKeySequence> *>{
-        &Preferences::CameraFlyForward(), &Preferences::CameraFlyBackward(), &Preferences::CameraFlyLeft(), &Preferences::CameraFlyRight(),
-        &Preferences::CameraFlyUp(), &Preferences::CameraFlyDown()
-    };
+    const auto prefs = std::vector<Preference<QKeySequence> *>{&Preferences::CameraFlyForward(),
+                                                               &Preferences::CameraFlyBackward(),
+                                                               &Preferences::CameraFlyLeft(),
+                                                               &Preferences::CameraFlyRight(),
+                                                               &Preferences::CameraFlyUp(),
+                                                               &Preferences::CameraFlyDown()};
 
     return std::any_of(std::begin(prefs), std::end(prefs), [&keySequence, &preference](auto *other) {
-          return preference.path() != other->path() && pref(*other) == keySequence;
-        }
-    );
+      return preference.path() != other->path() && pref(*other) == keySequence;
+    });
 }
 } // namespace View
 } // namespace TrenchBroom
