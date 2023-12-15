@@ -217,7 +217,7 @@ Preference<Color> LogWarningColor("Editor/Colors/LogLevel Warning", Color(0.78f,
 Preference<Color> LogErrorColor("Editor/Colors/LogLevel Error", Color(0.98f, 0.12f, 0.23f));
 
 /* --- CAMERA ---------------------------------------- */
-Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.5f);
+Preference<float> CameraLookSpeed("Controls/Camera/Look speed", 0.65f);
 Preference<int> CameraLookSmoothing("Controls/Camera/Look smoothing", 4);
 Preference<bool> CameraLookInvertH("Controls/Camera/Invert horizontal look", false);
 Preference<bool> CameraLookInvertV("Controls/Camera/Invert vertical look", false);
@@ -230,7 +230,7 @@ Preference<bool> CameraEnableAltMove("Controls/Camera/Use alt to move", false);
 Preference<bool> CameraAltMoveInvert("Controls/Camera/Invert zoom direction when using alt to move", false);
 Preference<bool> CameraMoveInCursorDir("Controls/Camera/Move camera in cursor dir", false);
 Preference<float> CameraFov("Controls/Camera/Field of vision", 90.0f);
-Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.5f);
+Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.15f);
 Preference<bool> Link2DCameras("Controls/Camera/Link 2D cameras", true);
 
 Preference<QKeySequence> &CameraFlyForward() {
