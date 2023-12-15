@@ -20,9 +20,13 @@
 #pragma once
 
 #include <QFormLayout>
+#include "View/ViewConstants.h"
 
 namespace TrenchBroom {
 namespace View {
+
+static const int RowIndent = LayoutConstants::WideHMargin;
+
 class FormWithSectionsLayout : public QFormLayout {
 public:
     using QFormLayout::QFormLayout;
