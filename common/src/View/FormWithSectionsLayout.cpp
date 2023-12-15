@@ -91,7 +91,7 @@ void FormWithSectionsLayout::addRow(QLayout *field) {
 
 void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QWidget *field, QWidget *additional) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(WideHMargin + MediumHMargin, NoMargin, WideHMargin * 2, NoMargin);
+    labelLayout->setContentsMargins(WideHMargin + MediumHMargin+RowIndent, NoMargin, WideHMargin * 2, NoMargin);
     labelLayout->addWidget(label);
 
     auto *fieldLayout = new QHBoxLayout();
@@ -109,7 +109,7 @@ void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QWidget *f
 
 void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QLayout *field, QLayout *additional) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(WideHMargin + MediumHMargin, NoMargin, WideHMargin * 2, NoMargin);
+    labelLayout->setContentsMargins(WideHMargin + MediumHMargin+RowIndent, NoMargin, WideHMargin * 2, NoMargin);
     labelLayout->addWidget(label);
 
     auto *fieldLayout = new QHBoxLayout();
