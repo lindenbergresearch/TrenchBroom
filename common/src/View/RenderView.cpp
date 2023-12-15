@@ -80,8 +80,8 @@
 
 namespace TrenchBroom {
 namespace View {
-RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpenGLWidget(parent), m_glContext(&contextManager), m_framesRendered(0),
-    m_maxFrameTimeMsecs(0), m_lastFPSCounterUpdate(0) {
+RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
+    : QOpenGLWidget(parent), m_glContext(&contextManager), boxFilter(32), m_framesRendered(0) {
 
     auto palette = QPalette{};
     m_focusColor = palette.color(QPalette::Highlight);
@@ -91,25 +91,15 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpe
     QTimer *fpsCounter = new QTimer(this);
 
     connect(fpsCounter, &QTimer::timeout, [&]() {
-          const int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
-          const int framesRenderedInPeriod = m_framesRendered;
-          const int maxFrameTime = m_maxFrameTimeMsecs;
-          const int64_t fpsCounterPeriod = currentTime - m_lastFPSCounterUpdate;
-          const double avgFps = static_cast<double>(framesRenderedInPeriod) / (static_cast<double>(fpsCounterPeriod) / 250.0);
+      const double avgFps = m_framesRendered;
+      m_framesRendered = 0;
 
-          m_framesRendered = 0;
-          m_maxFrameTimeMsecs = 0;
-          m_lastFPSCounterUpdate = currentTime;
+      m_currentFPS = std::string("Avg FPS: ") + std::to_string(int(avgFps)) + " frames: " + std::to_string(m_totalFrames) + /*" Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +*/
+                     std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
+    });
 
-          m_currentFPS = std::string("Avg FPS: ") + std::to_string(int(avgFps)) + " frames: " + std::to_string(framesc)  + " Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +
-                         std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" +
-                         std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " +
-                         std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
-        }
-    );
-
-    fpsCounter->start(250);
-
+    fpsCounter->start(1000);
+    boxFilter.length = (size_t) pref(Preferences::CameraLookSmoothing);
     setMouseTracking(true); // request mouse move events even when no button is held down
     setFocusPolicy(Qt::StrongFocus); // accept focus by clicking or tab
 }
@@ -126,12 +116,15 @@ void RenderView::keyReleaseEvent(QKeyEvent *event) {
     update();
 }
 
-static auto mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
+QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
     // The localPos of a Qt mouse event is only in integer coordinates, but window pos
     // and screen pos have full precision. We can't directly map the windowPos because
     // mapTo takes QPoint, so we just map the origin and subtract that.
-    const auto localPos = event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
-    return QMouseEvent(event->type(), localPos, event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
+    QPointF localPos = event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
+
+    boxFilter.add(new QPointF(localPos.x(), localPos.y()));
+
+    return QMouseEvent(event->type(), boxFilter.average(), event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
 }
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -166,16 +159,8 @@ void RenderView::paintGL() {
     render();
 
     // Update stats
-    m_framesRendered++;framesc++;
-    if (m_timeSinceLastFrame.isValid()) {
-        int frameTime = static_cast<int>(m_timeSinceLastFrame.restart());
-        if (frameTime > m_maxFrameTimeMsecs) {
-            m_maxFrameTimeMsecs = frameTime;
-        }
-    }
-    else {
-        m_timeSinceLastFrame.start();
-    }
+    m_framesRendered++;
+    m_totalFrames++;
 }
 
 Renderer::VboManager &RenderView::vboManager() {
@@ -224,7 +209,7 @@ void RenderView::clearBackground() {
     const auto backgroundColor = getBackgroundColor();
 
     glAssert(glClearColor(backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.a()));
-    glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
 
 const Color &RenderView::getBackgroundColor() {
@@ -244,8 +229,8 @@ void RenderView::renderFocusIndicator() {
     const auto h = static_cast<float>(height() * r);
     glAssert(glViewport(0, 0, static_cast<int>(w), static_cast<int>(h)));
 
-    const auto t = pref(Preferences::ViewFrameWidth);
-//    const auto t = hasFocus() ? 1.0f : 2.0f;
+    // const auto t = pref(Preferences::ViewFrameWidth);
+    const auto t = hasFocus() ? 1.0f : 2.0f;
 
     const auto projection = vm::ortho_matrix(-1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
     Renderer::Transformation transformation(projection, vm::mat4x4f::identity());
@@ -254,23 +239,29 @@ void RenderView::renderFocusIndicator() {
 
     using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
     auto array = Renderer::VertexArray::move(std::vector<Vertex>({
-            // top
-            Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w - t, t, 0.0f), inner),
-            Vertex(vm::vec3f(t, t, 0.0f), inner),
+                                                                     // top
+                                                                     Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+                                                                     Vertex(vm::vec3f(t, t, 0.0f), inner),
 
-            // right
-            Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
-            Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+                                                                     // right
+                                                                     Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(w, h, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+                                                                     Vertex(vm::vec3f(w - t, t, 0.0f), inner),
 
-            // bottom
-            Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(t, h - t, 0.0f), inner),
-            Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+                                                                     // bottom
+                                                                     Vertex(vm::vec3f(w, h, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(t, h - t, 0.0f), inner),
+                                                                     Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
 
-            // left
-            Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(t, t, 0.0f), inner),
-            Vertex(vm::vec3f(t, h - t, 0.0f), inner)
-        }
-    ));
+                                                                     // left
+                                                                     Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
+                                                                     Vertex(vm::vec3f(t, t, 0.0f), inner),
+                                                                     Vertex(vm::vec3f(t, h - t, 0.0f), inner)}));
 
     array.prepare(vboManager());
     array.render(Renderer::PrimType::Quads);
@@ -282,6 +273,42 @@ bool RenderView::doInitializeGL() {
 }
 
 void RenderView::doUpdateViewport(const int /* x */, const int /* y */, const int /* width */, const int /* height */) {
+}
+
+void RenderView::updateEvent() {
+    update();
+}
+
+QPointF BoxFilter::average() {
+    int c = 0;
+    QPointF sum = QPointF(0, 0);
+
+    for (QPointF *item: samples) {
+        if (item != nullptr) {
+            sum = QPointF(sum.x() + item->x(), sum.y() + item->y());
+            c++;
+        }
+    }
+
+    return c == 0 ? QPoint(0, 0) : QPointF(sum.x() / c, sum.y() / c);
+}
+
+void BoxFilter::reset() {
+    samples.clear();
+    for (size_t i = 0; i < size; ++i) {
+        samples.push_back(nullptr);
+    }
+}
+
+void BoxFilter::add(QPointF *point) {
+    if (++index >= length) {
+        index = 0;
+    }
+
+    if (samples[index] != nullptr)
+        delete samples[index];
+
+    samples[index] = point;
 }
 } // namespace View
 } // namespace TrenchBroom

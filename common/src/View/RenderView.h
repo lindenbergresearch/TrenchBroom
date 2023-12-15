@@ -22,6 +22,7 @@
 #include <GL/glew.h> // must be included here, before QOpenGLWidget
 
 #include <QElapsedTimer>
+#include <QTimer>
 #include <QOpenGLWidget>
 
 #include "Color.h"
@@ -46,21 +47,39 @@ class VboManager;
 namespace View {
 class GLContextManager;
 
+
+struct BoxFilter {
+  std::vector<QPointF *> samples;
+  size_t size, length;
+  size_t index;
+
+  explicit BoxFilter(size_t size, size_t length = 0) : size(size) {
+      samples.resize(size);
+      index = 0;
+
+      this->length = length <= 0 ? size : length;
+      reset();
+  }
+
+  QPointF average();
+
+  void reset();
+
+  void add(QPointF *point);
+};
+
 class RenderView : public QOpenGLWidget, public InputEventProcessor {
 Q_OBJECT
 private:
     Color m_focusColor, m_frameColor;
     GLContextManager *m_glContext;
     InputEventRecorder m_eventRecorder;
-
+    BoxFilter boxFilter;
+    QTimer m_timer; // Timer to control the frame rate
 private: // FPS counter
     // stats since the last counter update
-    long framesc = 0;
+    long m_totalFrames = 0;
     int m_framesRendered;
-    int m_maxFrameTimeMsecs;
-    // other
-    int64_t m_lastFPSCounterUpdate;
-    QElapsedTimer m_timeSinceLastFrame;
 
 protected:
     std::string m_currentFPS;
@@ -85,6 +104,10 @@ protected: // QWindow overrides
     void mouseReleaseEvent(QMouseEvent *event) override;
 
     void wheelEvent(QWheelEvent *event) override;
+
+    void updateEvent();
+
+    QMouseEvent mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event);
 
 protected:
     Renderer::VboManager &vboManager();
