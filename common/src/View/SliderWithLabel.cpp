@@ -39,7 +39,7 @@ SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, const flo
     const auto max_width = std::max(std::max(min_size.width(), max_size.width()) + 1, minLabelWidth);
 
     m_label->setMinimumWidth(max_width);
-    m_label->setAlignment(Qt::AlignRight);
+    m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     m_label->setText(getValueLabel(m_slider->value()));
 
     if (maxSliderWidth > 0) {
