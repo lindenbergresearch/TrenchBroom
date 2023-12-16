@@ -99,7 +99,6 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
     });
 
     fpsCounter->start(1000);
-    boxFilter.length = (size_t) pref(Preferences::CameraLookSmoothing);
     setMouseTracking(true); // request mouse move events even when no button is held down
     setFocusPolicy(Qt::StrongFocus); // accept focus by clicking or tab
 }
@@ -133,6 +132,13 @@ void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
 void RenderView::mouseMoveEvent(QMouseEvent *event) {
+    auto length = (size_t) pref(Preferences::CameraLookSmoothing);
+
+    if (boxFilter.length != length) {
+        boxFilter.reset();
+        boxFilter.length = length;
+    }
+
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
     update();
 }
