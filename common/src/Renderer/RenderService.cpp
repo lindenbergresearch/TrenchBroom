@@ -46,7 +46,8 @@ namespace Renderer {
 Renderer::FontDescriptor makeRenderServiceFont();
 
 Renderer::FontDescriptor makeRenderServiceFont() {
-    return Renderer::FontDescriptor(pref(Preferences::RendererFontPath), static_cast<size_t>(pref(Preferences::RendererFontSize)));
+    return Renderer::FontDescriptor(pref(Preferences::RendererFontPath),
+        static_cast<size_t>(pref(Preferences::RendererFontSize)));
 }
 
 class RenderService::HeadsUpTextAnchor : public TextAnchor {
@@ -63,14 +64,21 @@ private:
     vm::vec3f getOffset(const Camera &camera) const {
         const auto w = static_cast<float>(camera.viewport().width);
         const auto h = static_cast<float>(camera.viewport().height);
-        return vm::vec3f(w / 2.0f, h - 20.0f, 0.0f);
+        return vm::vec3f(w / 2.0f, h - 20.0f, 0.f);
     }
 };
 
-RenderService::RenderService(RenderContext &renderContext, RenderBatch &renderBatch) : m_renderContext(renderContext), m_renderBatch(renderBatch),
-    m_textRenderer(std::make_unique<TextRenderer>(makeRenderServiceFont())), m_pointHandleRenderer(std::make_unique<PointHandleRenderer>()),
-    m_primitiveRenderer(std::make_unique<PrimitiveRenderer>()), m_foregroundColor(1.0f, 1.0f, 1.0f, 1.0f), m_backgroundColor(0.0f, 0.0f, 0.0f, 1.0f),
-    m_lineWidth(1.0f), m_occlusionPolicy(PrimitiveRendererOcclusionPolicy::Transparent), m_cullingPolicy(PrimitiveRendererCullingPolicy::CullBackfaces) {
+RenderService::RenderService(RenderContext &renderContext, RenderBatch &renderBatch)
+    : m_renderContext(renderContext),
+      m_renderBatch(renderBatch),
+      m_textRenderer(std::make_unique<TextRenderer>(makeRenderServiceFont())),
+      m_pointHandleRenderer(std::make_unique<PointHandleRenderer>()),
+      m_primitiveRenderer(std::make_unique<PrimitiveRenderer>()),
+      m_foregroundColor(1.0f, 1.0f, 1.0f, 1.0f),
+      m_backgroundColor(0.0f, 0.0f, 0.0f, 1.0f),
+      m_lineWidth(1.0f),
+      m_occlusionPolicy(PrimitiveRendererOcclusionPolicy::Transparent),
+      m_cullingPolicy(PrimitiveRendererCullingPolicy::CullBackfaces) {
 }
 
 RenderService::~RenderService() {
@@ -116,14 +124,17 @@ void RenderService::renderString(const AttrString &string, const vm::vec3f &posi
 void RenderService::renderString(const AttrString &string, const TextAnchor &position) {
     if (m_occlusionPolicy != PrimitiveRendererOcclusionPolicy::Hide) {
         m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, position);
-    }
-    else {
+    } else {
         m_textRenderer->renderString(m_renderContext, m_foregroundColor, m_backgroundColor, string, position);
     }
 }
 
 void RenderService::renderHeadsUp(const AttrString &string) {
-    m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, HeadsUpTextAnchor());
+    m_textRenderer->renderStringOnTop(m_renderContext,
+        m_foregroundColor,
+        m_backgroundColor,
+        string,
+        HeadsUpTextAnchor());
 }
 
 void RenderService::renderString(const std::string &string, const vm::vec3f &position) {
@@ -157,12 +168,20 @@ void RenderService::renderHandles(const std::vector<vm::segment3f> &positions) {
 }
 
 void RenderService::renderHandle(const vm::segment3f &position) {
-    m_primitiveRenderer->renderLine(m_foregroundColor, m_lineWidth, m_occlusionPolicy, position.start(), position.end());
+    m_primitiveRenderer->renderLine(m_foregroundColor,
+        m_lineWidth,
+        m_occlusionPolicy,
+        position.start(),
+        position.end());
     renderHandle(position.center());
 }
 
 void RenderService::renderHandleHighlight(const vm::segment3f &position) {
-    m_primitiveRenderer->renderLine(m_foregroundColor, 2.0f * m_lineWidth, m_occlusionPolicy, position.start(), position.end());
+    m_primitiveRenderer->renderLine(m_foregroundColor,
+        2.0f * m_lineWidth,
+        m_occlusionPolicy,
+        position.start(),
+        position.end());
     renderHandleHighlight(position.center());
 }
 
@@ -173,7 +192,10 @@ void RenderService::renderHandles(const std::vector<vm::polygon3f> &positions) {
 
 void RenderService::renderHandle(const vm::polygon3f &position) {
     setShowBackfaces();
-    m_primitiveRenderer->renderFilledPolygon(mixAlpha(m_foregroundColor, 0.07f), m_occlusionPolicy, m_cullingPolicy, position.vertices());
+    m_primitiveRenderer->renderFilledPolygon(mixAlpha(m_foregroundColor, 0.07f),
+        m_occlusionPolicy,
+        m_cullingPolicy,
+        position.vertices());
     renderHandle(position.center());
     setCullBackfaces();
 }
@@ -215,8 +237,7 @@ void RenderService::renderCoordinateSystem(const vm::bbox3f &bounds) {
                 m_primitiveRenderer->renderCoordinateSystemXY(x, y, m_lineWidth, m_occlusionPolicy, bounds);
                 break;
         }
-    }
-    else {
+    } else {
         m_primitiveRenderer->renderCoordinateSystem3D(x, y, z, m_lineWidth, m_occlusionPolicy, bounds);
     }
 }
