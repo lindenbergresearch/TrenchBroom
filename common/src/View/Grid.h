@@ -57,6 +57,8 @@ public:
 
     static FloatType actualSize(int size);
 
+    static float getScaleFactor();
+
     int size() const;
 
     void setSize(int size);
@@ -65,7 +67,11 @@ public:
 
     void decSize();
 
+    static bool isMetric();
+
     FloatType actualSize() const;
+
+    static const QString asString(const int size);
 
     /**
      * Snap increment in radians for angle snapping

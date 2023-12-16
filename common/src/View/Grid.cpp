@@ -42,15 +42,33 @@ Grid::Grid(const int size) : m_size(size), m_snap(true), m_visible(true) {
 }
 
 FloatType Grid::actualSize(const int size) {
+    return std::exp2(float(size)) * getScaleFactor();
+}
+
+
+const QString Grid::asString(const int size) {
+    auto gridSize = actualSize(size) / getScaleFactor();
+    auto suffix = isMetric() ? "m" : "";
+    QString str;
+    str = str.sprintf("%.1f%s", gridSize, suffix);
+
+    return str;
+}
+
+bool Grid::isMetric() {
     Preferences::LengthUnitDisplay lengthUnitDisplay =
         (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
 
-    auto factor =
-        lengthUnitDisplay == Preferences::Units ?
-        1.0f :
-        pref(Preferences::MetricConversationFactor) / 10.f; // use smaller units section for grid
+    return lengthUnitDisplay != Preferences::Units;
+}
 
-    return std::exp2(float(size)) * factor;
+float Grid::getScaleFactor() {
+    Preferences::LengthUnitDisplay lengthUnitDisplay =
+        (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
+
+    return lengthUnitDisplay == Preferences::Units
+           ? 1.0f
+           : pref(Preferences::MetricConversationFactor);
 }
 
 int Grid::size() const {
@@ -112,10 +130,9 @@ FloatType Grid::intersectWithRay(const vm::ray3 &ray, const size_t skip) const {
 
     for (size_t i = 0; i < 3; ++i) {
         planeAnchor[i] =
-            ray.direction[i] > 0.0 ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize() :
-            snapDown(ray.origin[i], true) -
-            static_cast<FloatType>(skip) *
-            actualSize();
+            ray.direction[i] > 0.0
+            ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize()
+            : snapDown(ray.origin[i], true) - static_cast<FloatType>(skip) * actualSize();
     }
 
     const auto distX = vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_x()));
@@ -164,10 +181,7 @@ vm::vec3 Grid::moveDeltaForPoint(const vm::vec3 &point, const vm::vec3 &delta) c
  * an entity from the entity browser onto the map, the mouse is always grabbing the edge
  * of the entity bbox that's closest to the camera.
  */
-vm::vec3
-Grid::moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */,
-    const vm::ray3 &ray
-) const {
+vm::vec3 Grid::moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */, const vm::ray3 &ray) const {
     // First, find the ray/plane intersection, and snap it to grid.
     // This will become one of the corners of our resulting bbox.
     // Note that this means we might let the box clip into the plane somewhat.
