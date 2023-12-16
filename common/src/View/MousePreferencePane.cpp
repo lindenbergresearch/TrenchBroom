@@ -44,7 +44,7 @@ void MousePreferencePane::createGui() {
     m_lookSpeedSlider = new SliderWithLabel(1, 100, 0, "%d", 350, 25);
     m_lookSpeedSlider->setToolTip("Sets the mouse sensitivity for look-around.");
 
-    m_mouseSmoothingSlider = new SliderWithLabel(1, 10, 0, "%dx", 350, 25);
+    m_mouseSmoothingSlider = new SliderWithLabel(1, 20, 0, "%dx", 350, 25);
     m_mouseSmoothingSlider->setToolTip("Sets the mouse smoothing factor.");
 
     m_invertLookHAxisCheckBox = new QCheckBox("Invert X axis");
@@ -77,7 +77,7 @@ void MousePreferencePane::createGui() {
     m_downKeyEditor = new KeySequenceEdit(1);
     m_downKeyEditor->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    m_flyMoveSpeedSlider = new SliderWithLabel(0, 100, 0, "%d", 350, 45);
+    m_flyMoveSpeedSlider = new SliderWithLabel(0, 100, 0, "%d", 350, 25);
     m_flyMoveSpeedSlider->setToolTip("Sets the camera navigation speed.");
 
     auto *layout = new FormWithSectionsLayout();
@@ -306,7 +306,7 @@ void MousePreferencePane::downKeyChanged() {
 void MousePreferencePane::flyMoveSpeedChanged(const int /* value */) {
     const auto ratio = Preferences::MaxCameraFlyMoveSpeed * m_flyMoveSpeedSlider->ratio();
     PreferenceManager &prefs = PreferenceManager::instance();
-    prefs.set(Preferences::CameraFlyMoveSpeed, ratio);
+    prefs.set(Preferences::CameraFlyMoveSpeed, std::max(ratio, Preferences::MinCameraFlyMoveSpeed));
 }
 
 void MousePreferencePane::setKeySequence(KeySequenceEdit *editor, Preference<QKeySequence> &preference) {
