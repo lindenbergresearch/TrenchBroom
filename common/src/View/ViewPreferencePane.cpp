@@ -109,17 +109,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     auto *viewPrefsHeader = new QLabel{"Map Views"};
     makeEmphasized(viewPrefsHeader);
 
-//    m_themeCombo = new QComboBox{};
-//    m_themeCombo->addItems({Preferences::systemTheme(), Preferences::darkTheme()});
-//    auto *themeInfo = new QLabel{};
-//    themeInfo->setText(tr("Requires restart after changing"));
-//    makeInfo(themeInfo);
-//    auto *themeLayout = new QHBoxLayout{};
-//    themeLayout->addWidget(m_themeCombo);
-//    themeLayout->addSpacing(LayoutConstants::NarrowHMargin);
-//    themeLayout->addWidget(themeInfo);
-//    themeLayout->setContentsMargins(0, 0, 0, 0);
-
     m_layoutCombo = new QComboBox{};
     m_layoutCombo->setToolTip("Sets the layout of the editing views.");
     m_layoutCombo->addItem("One Pane");
@@ -158,7 +147,12 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_unitsDisplayType->addItem("Units");
     m_unitsDisplayType->addItem("Meters");
     m_unitsDisplayType->addItem("Both");
-    m_unitsDisplayType->setToolTip("How to display units.");
+    m_unitsDisplayType->setToolTip("How to display length units.");
+
+    m_unitsGridType = new QComboBox{};
+    m_unitsGridType->addItem("Units");
+    m_unitsGridType->addItem("Meters");
+    m_unitsGridType->setToolTip("How to display grid size units.");
 
     m_metricConversationFactor = new QLineEdit{};
     m_metricConversationFactor->setToolTip("Specifies how many units equal 1 meter.");
@@ -251,7 +245,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         // installed fonts
         QFontDatabase database;
         for (auto family: database.families()) {
-            m_rendererFontCombo->addItem(family);
+            //   m_rendererFontCombo->addItem(family);
             m_UIFontCombo->addItem(family);
             m_ConsoleFontCombo->addItem(family);
             font_files.push_back(family.toStdString().c_str());
@@ -323,7 +317,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow("Grid Alpha", m_gridAlphaSlider);
     layout->addRow("Grid Width", m_gridWidthSlider);
     layout->addRow("FOV", m_fovSlider);
-    layout->addRow("Unit Labeling", m_unitsDisplayType);
+    layout->addRow("Length Label Unit", m_unitsDisplayType);
+    layout->addRow("Grid-Size Unit", m_unitsGridType);
     layout->addRow("Metric Conversation Factor", unitsFactorLayout);
     layout->addRow("Show Axes", m_showAxes);
     layout->addRow("Texture Mode", m_textureModeCombo);
@@ -347,25 +342,23 @@ void ViewPreferencePane::bindEvents() {
     connect(m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged);
     connect(m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
     connect(m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged);
+    connect(m_unitsGridType,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &ViewPreferencePane::unitsGridTypeIndexChanged);
     connect(m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged);
     connect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
     connect(m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
-  //  connect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     connect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     connect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
-
     connect(m_autoBrightnessTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorFaceAutoBrightnessChanged);
     connect(m_gridWidthSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorGridWithChanged);
-
     connect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
     connect(m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged);
-
     connect(m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged);
     connect(m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged);
-
     connect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
     connect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
-
     connect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
 }
 
@@ -377,25 +370,23 @@ void ViewPreferencePane::unBindEvents() {
     disconnect(m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged);
     disconnect(m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
     disconnect(m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged);
+    disconnect(m_unitsGridType,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &ViewPreferencePane::unitsGridTypeIndexChanged);
     disconnect(m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged);
     disconnect(m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
     disconnect(m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
- //   disconnect(m_themeCombo, QOverload<int>::of(&QComboBox::activated), this, &ViewPreferencePane::themeChanged);
     disconnect(m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged);
     disconnect(m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged);
-
     disconnect(m_autoBrightnessTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorFaceAutoBrightnessChanged);
     disconnect(m_gridWidthSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorGridWithChanged);
-
     disconnect(m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged);
     disconnect(m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged);
-
     disconnect(m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged);
     disconnect(m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged);
-
     disconnect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
     disconnect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
-
     disconnect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
 }
 
@@ -415,12 +406,12 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::GridAlpha);
     prefs.resetToDefault(Preferences::CameraFov);
     prefs.resetToDefault(Preferences::LengthUnitSystem);
+    prefs.resetToDefault(Preferences::GridUnitSystem);
     prefs.resetToDefault(Preferences::MetricConversationFactor);
     prefs.resetToDefault(Preferences::ShowAxes);
     prefs.resetToDefault(Preferences::EnableMSAA);
     prefs.resetToDefault(Preferences::TextureMinFilter);
     prefs.resetToDefault(Preferences::TextureMagFilter);
-   // prefs.resetToDefault(Preferences::Theme);
     prefs.resetToDefault(Preferences::TextureBrowserIconSize);
     prefs.resetToDefault(Preferences::RendererFontSize);
     prefs.resetToDefault(Preferences::UIFontSize);
@@ -441,6 +432,7 @@ void ViewPreferencePane::doUpdateControls() {
     m_fovSlider->setValue(int(pref(Preferences::CameraFov)));
 
     m_unitsDisplayType->setCurrentIndex(pref(Preferences::LengthUnitSystem));
+    m_unitsGridType->setCurrentIndex(pref(Preferences::GridUnitSystem));
     m_metricConversationFactor->setText(QString::asprintf("%.4f", pref(Preferences::MetricConversationFactor)));
 
     m_gridWidthSlider->setValue(int(pref(Preferences::GridLineWidth) * 100));
@@ -572,6 +564,15 @@ void ViewPreferencePane::unitsDisplayTypeIndexChanged(const int index) {
     prefs.set(Preferences::LengthUnitSystem, index);
 }
 
+void ViewPreferencePane::unitsGridTypeIndexChanged(const int index) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::GridUnitSystem, index);
+
+    if (TrenchBroomApp::instance().getCurrentMapFrame()) {
+        TrenchBroomApp::instance().getCurrentMapFrame()->updateGridSizeComboBox();
+    }
+}
+
 void ViewPreferencePane::metricConversationFactorChanged(const QString &text) {
     bool ok;
     const auto value = text.toFloat(&ok);
@@ -579,6 +580,10 @@ void ViewPreferencePane::metricConversationFactorChanged(const QString &text) {
     if (ok) {
         auto &prefs = PreferenceManager::instance();
         prefs.set(Preferences::MetricConversationFactor, value);
+
+        if (TrenchBroomApp::instance().getCurrentMapFrame()) {
+            TrenchBroomApp::instance().getCurrentMapFrame()->updateGridSizeComboBox();
+        }
     }
 }
 
@@ -733,7 +738,7 @@ void ViewPreferencePane::editorToolbarIconSizeChanged(int index) {
     prefs.set(Preferences::ToolBarIconsSize, size);
 
     if (TrenchBroomApp::instance().getCurrentMapFrame()) {
-        TrenchBroomApp::instance().getCurrentMapFrame()->reCreateToolBar();
+        TrenchBroomApp::instance().getCurrentMapFrame()->updateToolbar();
     }
 
     reloadUIStyle(true);

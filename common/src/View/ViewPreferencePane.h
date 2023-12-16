@@ -39,6 +39,7 @@ private:
     SliderWithLabel *m_fovSlider = nullptr;
     SliderWithLabel *m_gridWidthSlider = nullptr;
     QComboBox *m_unitsDisplayType = nullptr;
+    QComboBox *m_unitsGridType = nullptr;
     QComboBox *m_autoBrightnessTypeCombo = nullptr;
     QLineEdit *m_metricConversationFactor = nullptr;
     QCheckBox *m_showAxes = nullptr;
@@ -104,6 +105,8 @@ private slots:
     void showAxesChanged(int state);
 
     void unitsDisplayTypeIndexChanged(int index);
+
+    void unitsGridTypeIndexChanged(int index);
 
     void metricConversationFactorChanged(const QString &text);
 
