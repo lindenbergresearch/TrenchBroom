@@ -94,8 +94,12 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
       const double avgFps = m_framesRendered;
       m_framesRendered = 0;
 
-      m_currentFPS = std::string("Avg FPS: ") + std::to_string(int(avgFps)) + " frames: " + std::to_string(m_totalFrames) + /*" Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +*/
-                     std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
+      m_currentFPS =
+          std::string("Avg FPS: ") + std::to_string(int(avgFps)) + " frames: " + std::to_string(m_totalFrames) + /*" Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +*/
+          std::to_string(m_glContext->vboManager()
+              .currentVboCount()) + " current VBOs (" + std::to_string(m_glContext->vboManager()
+              .peakVboCount()) + " peak) totalling " + std::to_string(m_glContext->vboManager()
+                                                                          .currentVboSize() / 1024u) + " KiB";
     });
 
     fpsCounter->start(1000);
@@ -123,7 +127,14 @@ QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widge
 
     boxFilter.add(new QPointF(localPos.x(), localPos.y()));
 
-    return QMouseEvent(event->type(), boxFilter.average(), event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
+    return QMouseEvent(event->type(),
+        boxFilter.average(),
+        event->windowPos(),
+        event->screenPos(),
+        event->button(),
+        event->buttons(),
+        event->modifiers(),
+        event->source());
 }
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -245,29 +256,29 @@ void RenderView::renderFocusIndicator() {
 
     using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
     auto array = Renderer::VertexArray::move(std::vector<Vertex>({
-                                                                     // top
-                                                                     Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(w - t, t, 0.0f), inner),
-                                                                     Vertex(vm::vec3f(t, t, 0.0f), inner),
+        // top
+        Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
+        Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
+        Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+        Vertex(vm::vec3f(t, t, 0.0f), inner),
 
-                                                                     // right
-                                                                     Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(w, h, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
-                                                                     Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+        // right
+        Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
+        Vertex(vm::vec3f(w, h, 0.0f), outer),
+        Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+        Vertex(vm::vec3f(w - t, t, 0.0f), inner),
 
-                                                                     // bottom
-                                                                     Vertex(vm::vec3f(w, h, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(t, h - t, 0.0f), inner),
-                                                                     Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+        // bottom
+        Vertex(vm::vec3f(w, h, 0.0f), outer),
+        Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
+        Vertex(vm::vec3f(t, h - t, 0.0f), inner),
+        Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
 
-                                                                     // left
-                                                                     Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
-                                                                     Vertex(vm::vec3f(t, t, 0.0f), inner),
-                                                                     Vertex(vm::vec3f(t, h - t, 0.0f), inner)}));
+        // left
+        Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
+        Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
+        Vertex(vm::vec3f(t, t, 0.0f), inner),
+        Vertex(vm::vec3f(t, h - t, 0.0f), inner)}));
 
     array.prepare(vboManager());
     array.render(Renderer::PrimType::Quads);
