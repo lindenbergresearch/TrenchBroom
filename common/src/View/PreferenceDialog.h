@@ -75,7 +75,7 @@ private:
 
     void switchToPane(PrefPane pane);
 
-    void highlightToolButton(QString buttonName, bool highlited = true);
+    void highlightToolButton(QString buttonName, bool highlighted = true);
 
     PreferencePane *currentPane() const;
 
