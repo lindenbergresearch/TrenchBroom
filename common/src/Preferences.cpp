@@ -230,7 +230,7 @@ Preference<bool> CameraEnableAltMove("Controls/Camera/Use alt to move", false);
 Preference<bool> CameraAltMoveInvert("Controls/Camera/Invert zoom direction when using alt to move", false);
 Preference<bool> CameraMoveInCursorDir("Controls/Camera/Move camera in cursor dir", false);
 Preference<float> CameraFov("Controls/Camera/Field of vision", 90.0f);
-Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.15f);
+Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.2f);
 Preference<bool> Link2DCameras("Controls/Camera/Link 2D cameras", true);
 
 Preference<QKeySequence> &CameraFlyForward() {
