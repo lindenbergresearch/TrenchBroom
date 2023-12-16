@@ -18,6 +18,8 @@
  */
 
 #include "MainMenuBuilder.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 #include <QMenuBar>
 
@@ -55,7 +57,8 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
     auto *qAction = new QAction(tAction->label());
     qAction->setCheckable(tAction->checkable());
     if (tAction->hasIcon()) {
-        qAction->setIcon(IO::loadSVGIcon(tAction->iconPath()));
+        auto size = pref(Preferences::ToolBarIconsSize);
+        qAction->setIcon(IO::loadSVGIcon(tAction->iconPath(), size));
     }
     qAction->setStatusTip(tAction->statusTip());
     updateActionKeySeqeunce(qAction, tAction);
