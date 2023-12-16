@@ -39,13 +39,13 @@ void FormWithSectionsLayout::addSection(const QString &title, const QString &inf
         auto border = new BorderLine(BorderLine::Direction::Horizontal, 2);
         border->setForegroundRole(QPalette::Midlight);
 
-        lineLayout->setContentsMargins(WideHMargin, MediumVMargin, WideHMargin, MediumVMargin);
+        lineLayout->setContentsMargins(WideHMargin, WideHMargin, WideHMargin, NoMargin);
         lineLayout->addWidget(border);
         QFormLayout::addRow(lineLayout);
     }
 
     auto *titleLayout = new QVBoxLayout();
-    titleLayout->setContentsMargins(WideHMargin + MediumHMargin, NoMargin, WideHMargin, NoMargin);
+    titleLayout->setContentsMargins(WideHMargin + MediumHMargin, WideHMargin, WideHMargin, MediumVMargin);
     titleLayout->setSpacing(NoMargin);
 
     auto titleLabel = makeTitle(new QLabel(title));
@@ -91,7 +91,7 @@ void FormWithSectionsLayout::addRow(QLayout *field) {
 
 void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QWidget *field, QWidget *additional) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(WideHMargin + MediumHMargin+RowIndent, NoMargin, WideHMargin * 2, NoMargin);
+    labelLayout->setContentsMargins(WideHMargin + MediumHMargin + RowIndent, NoMargin, WideHMargin * 2, NoMargin);
     labelLayout->addWidget(label);
 
     auto *fieldLayout = new QHBoxLayout();
@@ -109,7 +109,7 @@ void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QWidget *f
 
 void FormWithSectionsLayout::insertRow(const int row, QWidget *label, QLayout *field, QLayout *additional) {
     auto *labelLayout = new QHBoxLayout();
-    labelLayout->setContentsMargins(WideHMargin + MediumHMargin+RowIndent, NoMargin, WideHMargin * 2, NoMargin);
+    labelLayout->setContentsMargins(WideHMargin + MediumHMargin + RowIndent, NoMargin, WideHMargin * 2, NoMargin);
     labelLayout->addWidget(label);
 
     auto *fieldLayout = new QHBoxLayout();

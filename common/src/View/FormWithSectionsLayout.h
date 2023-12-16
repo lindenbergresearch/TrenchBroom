@@ -25,7 +25,7 @@
 namespace TrenchBroom {
 namespace View {
 
-static const int RowIndent = LayoutConstants::WideHMargin;
+static const int RowIndent = LayoutConstants::NoMargin;
 
 class FormWithSectionsLayout : public QFormLayout {
 public:
