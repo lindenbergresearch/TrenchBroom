@@ -99,6 +99,7 @@ Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.4f
 
 /* --- EDGES ----------------------------------------- */
 Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.9f, 0.9f, 0.9f, 1.0f));
+Preference<Color> OccludedEdgeColor("Renderer/Colors/Occluded Edges", Color(0.2f, 0.3f, 0.5f, 1.0f));
 Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.25f);
 Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.5f);
@@ -318,7 +319,9 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
         &TutorialOverlayTextColor,
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha,
-        &EdgeColor, &SelectedEdgeColor,
+        &EdgeColor,
+        &OccludedEdgeColor,
+        &SelectedEdgeColor,
         &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
         &SelectionBoundsColor, &AlwaysShowSelectionBounds,&SelectionBoundsDashedSize,
         &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,

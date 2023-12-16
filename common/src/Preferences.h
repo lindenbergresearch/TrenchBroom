@@ -98,6 +98,7 @@ extern Preference<float> TransparentFaceAlpha;
 /* --- EDGES ----------------------------------------- */
 extern Preference<Color> EdgeColor;
 extern Preference<Color> SelectedEdgeColor;
+extern Preference<Color> OccludedSelectedEdgeColor;
 extern Preference<float> EdgeLineWidth;
 extern Preference<float> EdgeSelectedLineWidth;
 extern Preference<Color> LockedEdgeColor;
