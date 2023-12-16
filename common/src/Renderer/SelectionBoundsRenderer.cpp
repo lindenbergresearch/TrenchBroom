@@ -38,6 +38,8 @@ namespace TrenchBroom {
 namespace Renderer {
 
 const float SelectionBoundsRenderer::AXIS_LABEL_DIM_FACTOR = 0.7f;
+static const std::string AXIS_LABELS[3] = {"x", "y", "z"};
+static const std::string AXIS_LABEL_DELIMITER = ": ";
 
 class SelectionBoundsRenderer::SizeTextAnchor2D : public TextAnchor3D {
 private:
@@ -300,7 +302,7 @@ void SelectionBoundsRenderer::renderSize(RenderContext &renderContext, RenderBat
 }
 
 const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_units) {
-    auto unitsDisplayType = (Preferences::UnitsDisplay) pref(Preferences::UnitsDisplayType);
+    auto unitsDisplayType = (Preferences::LengthUnitDisplay) pref(Preferences::LengthUnitSystem);
     auto metricConversationFactor = pref(Preferences::MetricConversationFactor);
     auto unitsMaxDigits = pref(Preferences::UnitsMaxDigits);
     std::stringstream buffer;
@@ -309,13 +311,13 @@ const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_u
     auto metric_str = formatDimension(value_units / metricConversationFactor, unitsMaxDigits, "m").toStdString();
 
     switch (unitsDisplayType) {
-        case Preferences::UNITS:
+        case Preferences::Units:
             buffer << units_str;
             break;
-        case Preferences::METRIC:
+        case Preferences::Metric:
             buffer << metric_str;
             break;
-        case Preferences::BOTH:
+        case Preferences::Combined:
             buffer << units_str << " [" << metric_str << "]";
             break;
     }
@@ -324,7 +326,6 @@ const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_u
 }
 
 void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderBatch &renderBatch) {
-    static const std::string labels[3] = {"x", "y", "z"};
     Color colors[3];
     std::stringstream buffer;
 
@@ -343,7 +344,7 @@ void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderB
     for (size_t i = 0; i < 3; ++i) {
         renderService.setBackgroundColor(colors[i]);
         if (direction[i] == 0.0f) {
-            buffer << labels[i] << "=" << getFormattedUnitsString(float(boundsSize[i]));
+            buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER << getFormattedUnitsString(float(boundsSize[i]));
             renderService.renderString(buffer.str(), SizeTextAnchor2D(m_bounds, i, camera));
             buffer.str("");
         }
@@ -351,7 +352,6 @@ void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderB
 }
 
 void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch) {
-    static const std::string labels[3] = {"x", "y", "z"};
     Color colors[3];
     std::stringstream buffer;
 
@@ -367,7 +367,7 @@ void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderB
     const vm::vec3 boundsSize = correct(m_bounds.size());
     for (size_t i = 0; i < 3; ++i) {
         renderService.setBackgroundColor(colors[i]);
-        buffer << labels[i] << "=" << getFormattedUnitsString(float(boundsSize[i]));
+        buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER << getFormattedUnitsString(float(boundsSize[i]));
         renderService.renderString(buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
         buffer.str("");
     }
