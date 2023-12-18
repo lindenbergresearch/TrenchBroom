@@ -283,9 +283,20 @@ QString faceRenderModeSkip() {
     return "skip";
 }
 
-Preference<QString> FaceRenderMode("Map view/Face render mode", "textured");
+// shade
 Preference<bool> ShadeFaces("Map view/Shade faces", true);
+Preference<float> ShadeLevel("Map view/Shade Level", 0.3f);
+
+// fog settings
 Preference<bool> ShowFog("Map view/Show fog", false);
+Preference<Color> FogColor("Map view/Show fog", Color{190, 190, 190});
+Preference<float> FogMaxAmount("Map view/Fog Max Amount", 0.15f);
+Preference<float> FogMinDistance("Map view/Fog Min Distance", 512.0f);
+Preference<float> FogScale("Map view/Fog Scale", 0.00075f);
+Preference<float> FogBias("Map view/Fog Bias", 0.0f);
+Preference<int> FogType("Map view/Fog Type", 0);
+
+Preference<QString> FaceRenderMode("Map view/Face render mode", "textured");
 Preference<bool> ShowEdges("Map view/Show edges", true);
 Preference<bool> ShowSoftMapBounds("Map view/Show soft map bounds", true);
 Preference<bool> ShowPointEntities("Map view/Show point entities", true);
@@ -321,7 +332,14 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha,
         &EdgeColor,
         &OccludedSelectedEdgeColor,
+        &FogColor,
+        &FogBias,
+        &FogMaxAmount,
+        &FogMinDistance,
+        &FogType,
+        &FogScale,
         &SelectedEdgeColor,
+        &ShadeLevel,
         &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
         &SelectionBoundsColor, &AlwaysShowSelectionBounds,&SelectionBoundsDashedSize,
         &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,

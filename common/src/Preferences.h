@@ -254,9 +254,28 @@ QString faceRenderModeFlat();
 
 QString faceRenderModeSkip();
 
-extern Preference<QString> FaceRenderMode;
 extern Preference<bool> ShadeFaces;
+extern Preference<float> ShadeLevel;
+
 extern Preference<bool> ShowFog;
+extern Preference<Color> FogColor;
+extern Preference<float> FogMaxAmount;
+extern Preference<float> FogMinDistance;
+extern Preference<float> FogScale;
+extern Preference<float> FogBias;
+extern Preference<int> FogType;
+
+
+/*
+ * uniform vec3 FogColor;
+uniform float FogMaxAmount;
+uniform float FogMinDistance;
+uniform float FogScale;
+uniform float FogBias;
+ *
+ * */
+
+extern Preference<QString> FaceRenderMode;
 extern Preference<bool> ShowEdges;
 extern Preference<bool> ShowSoftMapBounds;
 
