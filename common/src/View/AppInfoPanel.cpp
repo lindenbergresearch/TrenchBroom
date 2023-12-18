@@ -38,17 +38,22 @@ AppInfoPanel::AppInfoPanel(QWidget *parent) : QWidget{parent} {
 }
 
 void AppInfoPanel::createGui() {
-    QPixmap appIconImage = IO::loadPixmapResource("AppIcon_Shadow.png");
+    QPixmap appIconImage = IO::loadPixmapResource("AppIcon_Glow.png");
     QLabel *appIcon = new QLabel{};
     appIcon->setPixmap(appIconImage);
 
-    QLabel *appName = new QLabel{tr("TrenchBroom")};
+    QLabel *appName = new QLabel{tr("TrenchBroom Nova")};
     makeHeader(appName);
+    makeItalic(appName);
+    appName->setForegroundRole(QPalette::HighlightedText);
 
     BorderLine *appLine = new BorderLine{BorderLine::Direction::Horizontal};
     appLine->setLineWidth(3);
     QLabel *appClaim = new QLabel{tr("Level Editor")};
     makeEmphasized(appClaim);
+
+    QLabel *appHint = new QLabel{tr("eXperimental Version")};
+    makeEmphasized(appHint);
 
     ClickableLabel *version = new ClickableLabel{tr("Version ") % getBuildVersion()};
     ClickableLabel *build = new ClickableLabel{tr("Build ") % getBuildIdStr()};
@@ -70,15 +75,16 @@ void AppInfoPanel::createGui() {
 
     auto *layout = new QVBoxLayout{};
     layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(5);
+    layout->setSpacing(LayoutConstants::MediumVMargin);
     layout->addStretch();
-    layout->addWidget(appIcon, 0, Qt::AlignHCenter);
-    layout->addWidget(appName, 0, Qt::AlignHCenter);
+    layout->addWidget(appIcon, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    layout->addWidget(appName, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    layout->addWidget(appHint, 0, Qt::AlignHCenter | Qt::AlignVCenter);
     layout->addWidget(appLine);
-    layout->addWidget(appClaim, 0, Qt::AlignHCenter);
-    layout->addWidget(version, 0, Qt::AlignHCenter);
-    layout->addWidget(build, 0, Qt::AlignHCenter);
-    layout->addWidget(qtVersion, 0, Qt::AlignHCenter);
+    layout->addWidget(appClaim, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    layout->addWidget(version, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    layout->addWidget(build, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    layout->addWidget(qtVersion, 0, Qt::AlignHCenter | Qt::AlignVCenter);
     layout->addStretch();
 
     setLayout(layout);
