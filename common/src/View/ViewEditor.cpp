@@ -130,7 +130,7 @@ void EntityDefinitionCheckBoxList::hideAll(const bool hidden) {
 void EntityDefinitionCheckBoxList::createGui() {
     auto *scrollWidgetLayout = new QVBoxLayout();
     scrollWidgetLayout->setContentsMargins(0, 0, 0, 0);
-    scrollWidgetLayout->setSpacing(0);
+    scrollWidgetLayout->setSpacing(1);
     scrollWidgetLayout->addSpacing(1);
 
     const std::vector<Assets::EntityDefinitionGroup> &groups = m_entityDefinitionManager.groups();
@@ -141,13 +141,17 @@ void EntityDefinitionCheckBoxList::createGui() {
 
         // Checkbox for the prefix, e.g. "func"
         auto *groupCB = new QCheckBox(QString::fromStdString(groupName));
+        groupCB->setObjectName("entityDefinition_groupCheckboxWidget");
         makeEmphasized(groupCB);
+        makeSmall(groupCB);
+        groupCB->setForegroundRole(QPalette::HighlightedText);
+
         connect(groupCB, &QAbstractButton::clicked, this, [this, i](bool checked) {
               this->groupCheckBoxChanged(i, checked);
             }
         );
-        m_groupCheckBoxes.push_back(groupCB);
 
+        m_groupCheckBoxes.push_back(groupCB);
         scrollWidgetLayout->addWidget(groupCB);
 
         for (auto defIt = std::begin(definitions), defEnd = std::end(definitions); defIt != defEnd; ++defIt) {
@@ -156,6 +160,7 @@ void EntityDefinitionCheckBoxList::createGui() {
 
             auto *defCB = new QCheckBox(QString::fromStdString(defName));
             defCB->setObjectName("entityDefinition_checkboxWidget");
+            makeSmall(defCB);
 
             connect(defCB, &QAbstractButton::clicked, this, [this, definition](bool checked) {
                   this->defCheckBoxChanged(definition, checked);
@@ -170,9 +175,14 @@ void EntityDefinitionCheckBoxList::createGui() {
     scrollWidgetLayout->addSpacing(1);
 
     auto *scrollWidget = new QWidget();
+    scrollWidget->setContentsMargins(LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin);
     scrollWidget->setLayout(scrollWidgetLayout);
 
     auto *scrollArea = new QScrollArea();
+    scrollArea->setContentsMargins(0, 0, 0, 0);
     scrollArea->setBackgroundRole(QPalette::Base);
     scrollArea->setAutoFillBackground(true);
     scrollArea->setWidget(scrollWidget);
@@ -225,6 +235,81 @@ void ViewEditor::connectObservers() {
     m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &ViewEditor::preferenceDidChange);
 }
 
+void ViewEditor::bindEvents() {
+    connect(m_showEntityClassnamesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEntityClassnamesChanged);
+    connect(m_showGroupBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showGroupBoundsChanged);
+    connect(m_showBrushEntityBoundsCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showBrushEntityBoundsChanged);
+    connect(m_showPointEntityBoundsCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showPointEntityBoundsChanged);
+    connect(m_showPointEntitiesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntitiesChanged);
+    connect(m_showPointEntityModelsCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showPointEntityModelsChanged);
+    connect(m_showFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogChanged);
+    connect(m_showAlternateFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogType);
+    connect(m_fogMaxAmountSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogMaxAmount);
+    connect(m_fogMinDistanceSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogMinDistance);
+    connect(m_fogScaleSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogScale);
+    connect(m_fogBiasSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogBias);
+    connect(m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged);
+    connect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
+    connect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
+    connect(m_renderModeRadioGroup,
+        static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
+        this,
+        &ViewEditor::faceRenderModeChanged);
+    connect(m_entityLinkRadioGroup,
+        static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
+        this,
+        &ViewEditor::entityLinkModeChanged);
+    connect(m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged);
+}
+
+void ViewEditor::unBindEvents() {
+    disconnect(m_showEntityClassnamesCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showEntityClassnamesChanged);
+    disconnect(m_showGroupBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showGroupBoundsChanged);
+    disconnect(m_showBrushEntityBoundsCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showBrushEntityBoundsChanged);
+    disconnect(m_showPointEntityBoundsCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showPointEntityBoundsChanged);
+    disconnect(m_showPointEntitiesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntitiesChanged);
+    disconnect(m_showPointEntityModelsCheckBox,
+        &QAbstractButton::clicked,
+        this,
+        &ViewEditor::showPointEntityModelsChanged);
+    disconnect(m_showFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogChanged);
+    disconnect(m_showAlternateFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogType);
+    disconnect(m_fogMaxAmountSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogMaxAmount);
+    disconnect(m_fogMinDistanceSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogMinDistance);
+    disconnect(m_fogScaleSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogScale);
+    disconnect(m_fogBiasSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::showFogBias);
+    disconnect(m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged);
+    disconnect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
+    disconnect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
+    disconnect(m_renderModeRadioGroup,
+        static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
+        this,
+        &ViewEditor::faceRenderModeChanged);
+    disconnect(m_entityLinkRadioGroup,
+        static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
+        this,
+        &ViewEditor::entityLinkModeChanged);
+    disconnect(m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged);
+}
+
 void ViewEditor::documentWasNewedOrLoaded(MapDocument *) {
     createGui();
     refreshGui();
@@ -247,13 +332,20 @@ void ViewEditor::createGui() {
     deleteChildWidgetsLaterAndDeleteLayout(this);
 
     auto *sizer = new QGridLayout();
-    sizer->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
-    sizer->setHorizontalSpacing(LayoutConstants::WideHMargin);
-    sizer->setVerticalSpacing(LayoutConstants::WideVMargin);
+    sizer->setContentsMargins(
+        LayoutConstants::MediumHMargin,
+        LayoutConstants::MediumVMargin,
+        LayoutConstants::MediumHMargin,
+        LayoutConstants::MediumVMargin
+    );
+    sizer->setHorizontalSpacing(LayoutConstants::MediumHMargin);
+    sizer->setVerticalSpacing(LayoutConstants::MediumVMargin);
+
     sizer->addWidget(createEntityDefinitionsPanel(this), 0, 0, 3, 1);
     sizer->addWidget(createEntitiesPanel(this), 0, 1);
     sizer->addWidget(createBrushesPanel(this), 1, 1);
     sizer->addWidget(createRendererPanel(this), 2, 1);
+    sizer->addWidget(createFogPanel(this), 0, 2, 3, 1);
 
     setLayout(sizer);
 }
@@ -268,10 +360,24 @@ QWidget *ViewEditor::createEntityDefinitionsPanel(QWidget *parent) {
     m_entityDefinitionCheckBoxList = new EntityDefinitionCheckBoxList(entityDefinitionManager, editorContext);
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin
+    );
+    m_entityDefinitionCheckBoxList->setContentsMargins(
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin
+    );
+
     layout->setSpacing(0);
     layout->addWidget(m_entityDefinitionCheckBoxList, 1);
     m_entityDefinitionCheckBoxList->setMinimumWidth(250);
+
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     panel->getPanel()->setLayout(layout);
 
     return panel;
@@ -288,15 +394,15 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
     m_showPointEntitiesCheckBox = new QCheckBox(tr("Show point entities"));
     m_showPointEntityModelsCheckBox = new QCheckBox(tr("Show point entity models"));
 
-    connect(m_showEntityClassnamesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEntityClassnamesChanged);
-    connect(m_showGroupBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showGroupBoundsChanged);
-    connect(m_showBrushEntityBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushEntityBoundsChanged);
-    connect(m_showPointEntityBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntityBoundsChanged);
-    connect(m_showPointEntitiesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntitiesChanged);
-    connect(m_showPointEntityModelsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showPointEntityModelsChanged);
+
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     layout->setSpacing(0);
     layout->addWidget(m_showEntityClassnamesCheckBox);
     layout->addWidget(m_showGroupBoundsCheckBox);
@@ -304,8 +410,58 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
     layout->addWidget(m_showPointEntityBoundsCheckBox);
     layout->addWidget(m_showPointEntitiesCheckBox);
     layout->addWidget(m_showPointEntityModelsCheckBox);
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     panel->getPanel()->setLayout(layout);
+    return panel;
+}
+
+QWidget *ViewEditor::createFogPanel(QWidget *parent) {
+    TitledPanel *panel = new TitledPanel("Fog", parent, false);
+    panel->setMinimumWidth(250);
+
+    m_showFogCheckBox = new QCheckBox(tr("Enable fog"));
+
+    m_showAlternateFogCheckBox = new QCheckBox(tr("Alternate Fog Algorithm"));
+
+    m_fogMaxAmountSlider = new SliderWithLabel(1, 100, 0.0f, "%d%", 220, 15, this);
+    m_fogMinDistanceSlider = new SliderWithLabel(16, 2048, 0.0f, "%d", 220, 15, this);
+    m_fogScaleSlider = new SliderWithLabel(1, 100, 0.0f, "%d", 220, 15, this);
+    m_fogBiasSlider = new SliderWithLabel(0, 100, 0.0f, "%d", 220, 15, this);
+
+    auto *layout = new QVBoxLayout();
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
+    layout->setSpacing(0);
+    layout->addWidget(m_showFogCheckBox);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{"Maximum amount"});
+    layout->addWidget(m_fogMaxAmountSlider);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{"Minimum distance"});
+    layout->addWidget(m_fogMinDistanceSlider);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{"Scale"});
+    layout->addWidget(m_fogScaleSlider);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{"Bias"});
+    layout->addWidget(m_fogBiasSlider);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(m_showAlternateFogCheckBox);
+
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    panel->getPanel()->setLayout(layout);
+
+
     return panel;
 }
 
@@ -315,7 +471,6 @@ QWidget *ViewEditor::createBrushesPanel(QWidget *parent) {
     createTagFilter(inner);
 
     m_showBrushesCheckBox = new QCheckBox(tr("Show brushes"));
-    connect(m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged);
 
     auto *innerLayout = qobject_cast<QBoxLayout *>(inner->layout());
     ensure(innerLayout != nullptr, "inner sizer is null");
@@ -329,6 +484,7 @@ void ViewEditor::createTagFilter(QWidget *parent) {
 
     auto document = kdl::mem_lock(m_document);
     const auto &tags = document->smartTags();
+
     if (tags.empty()) {
         createEmptyTagFilter(parent);
     }
@@ -345,6 +501,7 @@ void ViewEditor::createEmptyTagFilter(QWidget *parent) {
     layout->setContentsMargins(0, LayoutConstants::WideVMargin, 0, LayoutConstants::WideVMargin);
     layout->setSpacing(0);
     layout->addWidget(msg);
+    layout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
     parent->setLayout(layout);
 }
@@ -353,7 +510,12 @@ void ViewEditor::createTagFilter(QWidget *parent, const std::vector<Model::Smart
     assert(!tags.empty());
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     layout->setSpacing(0);
 
     for (const auto &tag: tags) {
@@ -370,6 +532,8 @@ void ViewEditor::createTagFilter(QWidget *parent, const std::vector<Model::Smart
             }
         );
     }
+
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     parent->setLayout(layout);
 }
 
@@ -377,7 +541,12 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Renderer", parent, false);
     QWidget *inner = panel->getPanel();
 
-    const QList<QString> FaceRenderModes = {"Show textures", "Hide textures", "Hide faces"};
+    const QList<QString> FaceRenderModes = {
+        "Show textures",
+        "Hide textures",
+        "Hide faces"
+    };
+
     const QList<QString> FaceRenderModesPrefValues = {
         Preferences::faceRenderModeTextured(), Preferences::faceRenderModeFlat(), Preferences::faceRenderModeSkip()
     };
@@ -393,15 +562,19 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     m_shadeFacesCheckBox = new QCheckBox(tr("Shade faces"));
-    m_showFogCheckBox = new QCheckBox(tr("Use fog"));
     m_showEdgesCheckBox = new QCheckBox(tr("Show edges"));
 
     const QList<QString> EntityLinkModes = {
-        "Show all entity links", "Show transitively selected entity links", "Show directly selected entity links", "Hide entity links"
+        "Show all entity links",
+        "Show transitively selected entity links",
+        "Show directly selected entity links",
+        "Hide entity links"
     };
+
     const QList<QString> EntityLinkModesPrefValues = {
         Preferences::entityLinkModeAll(), Preferences::entityLinkModeTransitive(), Preferences::entityLinkModeDirect(), Preferences::entityLinkModeNone()
     };
+
     m_entityLinkRadioGroup = new QButtonGroup(this);
     for (int i = 0; i < EntityLinkModes.length(); ++i) {
         const QString &label = EntityLinkModes.at(i);
@@ -421,19 +594,15 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     restoreDefualtsButton->setObjectName("ViewEditor_smallPushButton");
     makeSmall(restoreDefualtsButton);
 
-
-    connect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
-    connect(m_showFogCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showFogChanged);
-    connect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
-
-    connect(m_renderModeRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::faceRenderModeChanged);
-    connect(m_entityLinkRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::entityLinkModeChanged);
-
-    connect(m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged);
     connect(restoreDefualtsButton, &QAbstractButton::clicked, this, &ViewEditor::restoreDefaultsClicked);
 
     auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     layout->setSpacing(0);
 
     for (auto *button: m_renderModeRadioGroup->buttons()) {
@@ -441,7 +610,6 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     layout->addWidget(m_shadeFacesCheckBox);
-    layout->addWidget(m_showFogCheckBox);
     layout->addWidget(m_showEdgesCheckBox);
 
     for (auto *button: m_entityLinkRadioGroup->buttons()) {
@@ -451,16 +619,21 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     layout->addWidget(m_showSoftBoundsCheckBox);
     layout->addSpacing(LayoutConstants::MediumVMargin);
     layout->addWidget(restoreDefualtsButton, 0, Qt::AlignHCenter);
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     inner->setLayout(layout);
     return panel;
 }
 
 void ViewEditor::refreshGui() {
+    unBindEvents();
+
     refreshEntityDefinitionsPanel();
     refreshEntitiesPanel();
     refreshBrushesPanel();
     refreshRendererPanel();
+
+    bindEvents();
 }
 
 void ViewEditor::refreshEntityDefinitionsPanel() {
@@ -498,6 +671,20 @@ void ViewEditor::refreshRendererPanel() {
     m_showEdgesCheckBox->setChecked(pref(Preferences::ShowEdges));
     checkButtonInGroup(m_entityLinkRadioGroup, pref(Preferences::EntityLinkMode), true);
     m_showSoftBoundsCheckBox->setChecked(pref(Preferences::ShowSoftMapBounds));
+
+    m_showAlternateFogCheckBox->setChecked(pref(Preferences::FogType) == 1);
+
+    auto minDist = pref(Preferences::FogMinDistance);
+    m_fogMinDistanceSlider->setValue(static_cast<int>(minDist));
+
+    auto maxAmount = pref(Preferences::FogMaxAmount) * 100;
+    m_fogMaxAmountSlider->setValue(static_cast<int>(maxAmount));
+
+    auto scale = pref(Preferences::FogScale) * 10000;
+    m_fogScaleSlider->setValue(static_cast<int>(scale));
+
+    auto bias = pref(Preferences::FogBias) * 100;
+    m_fogBiasSlider->setValue(static_cast<int>(bias));
 }
 
 void ViewEditor::showEntityClassnamesChanged(const bool checked) {
@@ -602,6 +789,11 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::FaceRenderMode);
     prefs.resetToDefault(Preferences::ShadeFaces);
     prefs.resetToDefault(Preferences::ShowFog);
+    prefs.resetToDefault(Preferences::FogBias);
+    prefs.resetToDefault(Preferences::FogType);
+    prefs.resetToDefault(Preferences::FogScale);
+    prefs.resetToDefault(Preferences::FogMaxAmount);
+    prefs.resetToDefault(Preferences::FogMinDistance);
     prefs.resetToDefault(Preferences::ShowEdges);
     prefs.resetToDefault(Preferences::ShowSoftMapBounds);
     prefs.resetToDefault(Preferences::ShowPointEntities);
@@ -610,8 +802,34 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.saveChanges();
 }
 
+void ViewEditor::showFogMinDistance(const int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::FogMinDistance, float(value));
+}
+
+void ViewEditor::showFogScale(const int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::FogScale, float(value) / 10000.f);
+}
+
+void ViewEditor::showFogMaxAmount(const int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::FogMaxAmount, float(value) / 100.f);
+}
+
+void ViewEditor::showFogType(const bool checked) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::FogType, checked ? 1 : 0);
+}
+
+void ViewEditor::showFogBias(const int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::FogBias, float(value) / 100.f);
+}
+
+
 ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_button(nullptr), m_editor(nullptr) {
-    m_button = new PopupButton(tr("View Options"));
+    m_button = new PopupButton(tr("View Settings"));
     m_button->setIcon("ArrowDown");
     m_button->setToolTip(tr("Click to edit view settings"));
 
@@ -629,8 +847,11 @@ ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *p
     m_button->GetPopupWindow()->setLayout(popupSizer);
 
     auto *sizer = new QHBoxLayout();
-    sizer->setContentsMargins(0, 0, 0, 0);
-    sizer->addWidget(m_button, Qt::AlignVCenter);
+    sizer->setContentsMargins(LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin);
+    sizer->addWidget(m_button, Qt::AlignVCenter | Qt::AlignHCenter);
 
     setLayout(sizer);
 }

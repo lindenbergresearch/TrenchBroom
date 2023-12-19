@@ -22,6 +22,7 @@
 #include <QWidget>
 
 #include "Model/TagType.h"
+#include "View/SliderWithLabel.h"
 #include "NotifierConnection.h"
 
 #include <filesystem>
@@ -107,8 +108,15 @@ private:
 
     QButtonGroup *m_renderModeRadioGroup;
     QCheckBox *m_shadeFacesCheckBox;
-    QCheckBox *m_showFogCheckBox;
     QCheckBox *m_showEdgesCheckBox;
+
+    QCheckBox *m_showFogCheckBox;
+    QCheckBox *m_showAlternateFogCheckBox;
+    SliderWithLabel *m_fogScaleSlider;
+    SliderWithLabel *m_fogMaxAmountSlider;
+    SliderWithLabel *m_fogMinDistanceSlider;
+    SliderWithLabel *m_fogBiasSlider;
+
 
     QButtonGroup *m_entityLinkRadioGroup;
 
@@ -121,6 +129,10 @@ public:
 
 private:
     void connectObservers();
+
+    void bindEvents();
+
+    void unBindEvents();
 
     void documentWasNewedOrLoaded(MapDocument *document);
 
@@ -137,6 +149,8 @@ private:
     QWidget *createEntitiesPanel(QWidget *parent);
 
     QWidget *createBrushesPanel(QWidget *parent);
+
+    QWidget *createFogPanel(QWidget *parent);
 
     void createTagFilter(QWidget *parent);
 
@@ -169,6 +183,16 @@ private:
     void showPointEntityModelsChanged(bool checked);
 
     void showBrushesChanged(bool checked);
+
+    void showFogMinDistance(int value);
+
+    void showFogScale(int value);
+
+    void showFogBias(int value);
+
+    void showFogMaxAmount(int value);
+
+    void showFogType(bool checked);
 
     void showTagChanged(bool checked, Model::TagType::Type tagType);
 
