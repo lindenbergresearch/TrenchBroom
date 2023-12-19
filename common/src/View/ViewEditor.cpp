@@ -220,7 +220,10 @@ ViewEditor::ViewEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : Q
     m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr), m_showBrushEntityBoundsCheckBox(nullptr),
     m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr), m_showPointEntityModelsCheckBox(nullptr),
     m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr), m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr),
-    m_showFogCheckBox(nullptr), m_showEdgesCheckBox(nullptr), m_entityLinkRadioGroup(nullptr), m_showSoftBoundsCheckBox(nullptr) {
+                                                                               m_showEdgesCheckBox(nullptr),
+                                                                               m_showFogCheckBox(nullptr),
+                                                                               m_entityLinkRadioGroup(nullptr),
+                                                                               m_showSoftBoundsCheckBox(nullptr) {
     connectObservers();
 }
 
@@ -260,6 +263,7 @@ void ViewEditor::bindEvents() {
     connect(m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged);
     connect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
     connect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
+    connect(m_shadeAmount, &SliderWithLabel::valueChanged, this, &ViewEditor::shadeLevelChanged);
     connect(m_renderModeRadioGroup,
         static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this,
@@ -299,6 +303,7 @@ void ViewEditor::unBindEvents() {
     disconnect(m_showBrushesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showBrushesChanged);
     disconnect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
     disconnect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
+    disconnect(m_shadeAmount, &SliderWithLabel::valueChanged, this, &ViewEditor::shadeLevelChanged);
     disconnect(m_renderModeRadioGroup,
         static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this,
@@ -562,6 +567,9 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     m_shadeFacesCheckBox = new QCheckBox(tr("Shade faces"));
+    m_shadeAmount = new SliderWithLabel(1, 100, 0.0f, "%d%", 220, 15, this);
+
+
     m_showEdgesCheckBox = new QCheckBox(tr("Show edges"));
 
     const QList<QString> EntityLinkModes = {
@@ -610,6 +618,10 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     layout->addWidget(m_shadeFacesCheckBox);
+
+    layout->addWidget(new QLabel{"Shade amount"});
+    layout->addWidget(m_shadeAmount);
+
     layout->addWidget(m_showEdgesCheckBox);
 
     for (auto *button: m_entityLinkRadioGroup->buttons()) {
@@ -626,6 +638,7 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
 }
 
 void ViewEditor::refreshGui() {
+    printf("refresh\n");
     unBindEvents();
 
     refreshEntityDefinitionsPanel();
@@ -685,6 +698,9 @@ void ViewEditor::refreshRendererPanel() {
 
     auto bias = pref(Preferences::FogBias) * 100;
     m_fogBiasSlider->setValue(static_cast<int>(bias));
+
+    auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
+    m_shadeAmount->setValue(static_cast<int>(shadeAmount));
 }
 
 void ViewEditor::showEntityClassnamesChanged(const bool checked) {
@@ -788,6 +804,7 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::ShowPointEntityModels);
     prefs.resetToDefault(Preferences::FaceRenderMode);
     prefs.resetToDefault(Preferences::ShadeFaces);
+    prefs.resetToDefault(Preferences::ShadeLevel);
     prefs.resetToDefault(Preferences::ShowFog);
     prefs.resetToDefault(Preferences::FogBias);
     prefs.resetToDefault(Preferences::FogType);
@@ -827,6 +844,10 @@ void ViewEditor::showFogBias(const int value) {
     prefs.set(Preferences::FogBias, float(value) / 100.f);
 }
 
+void ViewEditor::shadeLevelChanged(const int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::ShadeLevel, float(value) / 100.f);
+}
 
 ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_button(nullptr), m_editor(nullptr) {
     m_button = new PopupButton(tr("View Settings"));
