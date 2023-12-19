@@ -34,12 +34,12 @@ TitleBar::TitleBar(const QString &title, QWidget *parent, const bool boldTitle, 
 
     setObjectName("TitleBar");
     m_titleText = new QLabel(title);
-    m_titleText->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    m_titleText->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     m_titleText->setContentsMargins(
         LayoutConstants::MediumHMargin,
-        LayoutConstants::NarrowVMargin,
         LayoutConstants::NoMargin,
-        LayoutConstants::NarrowHMargin
+        LayoutConstants::NoMargin,
+        LayoutConstants::NoMargin
     );
 
     if (!subtitle) {
@@ -61,7 +61,7 @@ TitleBar::TitleBar(const QString &title, QWidget *parent, const bool boldTitle, 
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_titleText, 1);
     setLayout(layout);
-    setMinimumHeight(24);
+    setMinimumHeight(22);
 }
 
 TitleBar::TitleBar(const QString &title, const bool boldTitle, bool subtitle)
