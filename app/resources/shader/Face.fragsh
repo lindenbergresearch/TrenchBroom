@@ -39,7 +39,7 @@ uniform float ShadeLevel;
 
 // fog parameter
 uniform bool ShowFog;
-uniform vec3 FogColor;
+uniform vec4 FogColor;
 uniform float FogMaxAmount;
 uniform float FogMinDistance;
 uniform float FogScale;
@@ -105,7 +105,7 @@ void main() {
 	if (ShowFog) {
         float distance = length(viewVector);
 
-        vec3 fogColor = FogColor;
+        vec3 fogColor = FogColor.rgb;
         float maxFogAmount = FogMaxAmount;
         float fogBias = FogBias;
         float fogScale = FogScale;
