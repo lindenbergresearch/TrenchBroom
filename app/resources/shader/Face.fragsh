@@ -32,11 +32,22 @@ uniform float GridSize;
 uniform float GridAlpha;
 uniform float MajorDivisionSize;
 uniform vec3 GridColor;
+
+// shading
 uniform bool ShadeFaces;
+uniform float ShadeLevel;
+
+// fog parameter
 uniform bool ShowFog;
+uniform vec3 FogColor;
+uniform float FogMaxAmount;
+uniform float FogMinDistance;
+uniform float FogScale;
+uniform float FogBias;
+uniform int FogType;
+
 uniform int AutoBrightnessType;
 uniform float GridLineWidth;
-
 varying vec4 modelCoordinates;
 varying vec3 modelNormal;
 varying vec4 faceColor;
@@ -85,8 +96,7 @@ void main() {
 
 	if (ShadeFaces) {
 		// angular dimming ( can be controlled with dimStrength )
-		// TODO: make view option
-		float dimStrength = 0.25;
+        float dimStrength = clamp(ShadeLevel, 0.0, 1.0);
 		float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0 - dimStrength);
 
 		gl_FragColor.rgb *= angleDim;
@@ -95,17 +105,20 @@ void main() {
 	if (ShowFog) {
         float distance = length(viewVector);
 
-		// TODO: make view options
-		vec3 fogColor = vec3(0.5, 0.5, 0.5);
-		float maxFogAmount = 0.15;
-		float fogBias = 0.0;
-        float fogScale = 0.00075;
-        float fogMinDistance = 512.0;
+        vec3 fogColor = FogColor;
+        float maxFogAmount = FogMaxAmount;
+        float fogBias = FogBias;
+        float fogScale = FogScale;
+        float fogMinDistance = FogMinDistance;
 
         float fogFactor = max(distance - fogMinDistance, 0.0) * fogScale;
 
-	//	gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, clamp(( gl_FragCoord.z / gl_FragCoord.w ) * fogScale + fogBias, 0.0, maxFogAmount ));
-		gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp(fogFactor + fogBias, 0.0, maxFogAmount));
+        if (FogType>0) {
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp((gl_FragCoord.z / gl_FragCoord.w) * fogScale + fogBias, 0.0, maxFogAmount));
+        }
+        else {
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp(fogFactor + fogBias, 0.0, maxFogAmount));
+        }
 	}
 
 	if (RenderGrid && GridAlpha > 0.0) {

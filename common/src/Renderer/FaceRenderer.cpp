@@ -135,6 +135,14 @@ void FaceRenderer::doRender(RenderContext &context) {
         const bool shadeFaces = context.shadeFaces();
         const bool showFog = context.showFog();
 
+        const float shadeLevel = pref(Preferences::ShadeLevel);
+        const Color fogColor = pref(Preferences::FogColor);
+        const float fogScale = pref(Preferences::FogScale);
+        const float fogBias = pref(Preferences::FogBias);
+        const float fogMaxAmount = pref(Preferences::FogMaxAmount);
+        const float fogMinDistance = pref(Preferences::FogMinDistance);
+        const int fogType = pref(Preferences::FogType);
+
         glAssert(glEnable(GL_TEXTURE_2D));
         glAssert(glActiveTexture(GL_TEXTURE0));
         shader.set("Brightness", prefs.get(Preferences::Brightness));
@@ -153,8 +161,18 @@ void FaceRenderer::doRender(RenderContext &context) {
 
         shader.set("GrayScale", m_grayscale);
         shader.set("CameraPosition", context.camera().position());
+
         shader.set("ShadeFaces", shadeFaces);
+        shader.set("ShadeLevel", shadeLevel);
+
         shader.set("ShowFog", showFog);
+        shader.set("FogColor", fogColor);
+        shader.set("FogMaxAmount", fogMaxAmount);
+        shader.set("FogScale", fogScale);
+        shader.set("FogBias", fogBias);
+        shader.set("FogMinDistance", fogMinDistance);
+        shader.set("FogType", fogType);
+
         shader.set("Alpha", m_alpha);
         shader.set("EnableMasked", false);
         shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
