@@ -330,7 +330,9 @@ void ViewEditor::entityDefinitionsDidChange() {
 }
 
 void ViewEditor::preferenceDidChange(const std::filesystem::path &) {
-    refreshGui();
+    // remove to avoid double loading
+    // no refresh on external preferences change (who needs?)
+    // refreshGui();
 }
 
 void ViewEditor::createGui() {
