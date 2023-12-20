@@ -640,7 +640,6 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
 }
 
 void ViewEditor::refreshGui() {
-    printf("refresh\n");
     unBindEvents();
 
     refreshEntityDefinitionsPanel();
@@ -819,6 +818,7 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::ShowBrushes);
     prefs.resetToDefault(Preferences::EntityLinkMode);
     prefs.saveChanges();
+    refreshGui();
 }
 
 void ViewEditor::showFogMinDistance(const int value) {
