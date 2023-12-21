@@ -118,6 +118,7 @@ private:
     SliderWithLabel *m_fogBiasSlider;
 
     SliderWithLabel *m_shadeAmount;
+    SliderWithLabel *m_brightnessSlider;
 
 
     QButtonGroup *m_entityLinkRadioGroup;
@@ -201,6 +202,8 @@ private:
     void faceRenderModeChanged(int id);
 
     void shadeFacesChanged(bool checked);
+
+    void brightnessChanged(int value);
 
     void shadeLevelChanged(int value);
 

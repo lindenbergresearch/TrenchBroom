@@ -264,6 +264,7 @@ void ViewEditor::bindEvents() {
     connect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
     connect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
     connect(m_shadeAmount, &SliderWithLabel::valueChanged, this, &ViewEditor::shadeLevelChanged);
+    connect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::brightnessChanged);
     connect(m_renderModeRadioGroup,
         static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this,
@@ -304,6 +305,7 @@ void ViewEditor::unBindEvents() {
     disconnect(m_shadeFacesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::shadeFacesChanged);
     disconnect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
     disconnect(m_shadeAmount, &SliderWithLabel::valueChanged, this, &ViewEditor::shadeLevelChanged);
+    disconnect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::brightnessChanged);
     disconnect(m_renderModeRadioGroup,
         static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this,
@@ -401,8 +403,6 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
     m_showPointEntitiesCheckBox = new QCheckBox(tr("Show point entities"));
     m_showPointEntityModelsCheckBox = new QCheckBox(tr("Show point entity models"));
 
-
-
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(
         LayoutConstants::NarrowHMargin,
@@ -467,7 +467,6 @@ QWidget *ViewEditor::createFogPanel(QWidget *parent) {
 
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     panel->getPanel()->setLayout(layout);
-
 
     return panel;
 }
@@ -571,6 +570,8 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     m_shadeFacesCheckBox = new QCheckBox(tr("Shade faces"));
     m_shadeAmount = new SliderWithLabel(1, 100, 0.0f, "%d%", 220, 15, this);
 
+    m_brightnessSlider = new SliderWithLabel{25, 300, 0, "%d%%", 220, 15};
+    m_brightnessSlider->setToolTip("Sets the brightness for textures and model skins in the 3D editing view.");
 
     m_showEdgesCheckBox = new QCheckBox(tr("Show edges"));
 
@@ -614,6 +615,9 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
         LayoutConstants::NarrowHMargin
     );
     layout->setSpacing(0);
+
+    layout->addWidget(new QLabel{"Brightness"});
+    layout->addWidget(m_brightnessSlider);
 
     for (auto *button: m_renderModeRadioGroup->buttons()) {
         layout->addWidget(button);
@@ -702,6 +706,9 @@ void ViewEditor::refreshRendererPanel() {
 
     auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
     m_shadeAmount->setValue(static_cast<int>(shadeAmount));
+
+    auto brightness = int(vm::round(100.0f * (pref(Preferences::Brightness) - 1.0f)));
+    m_brightnessSlider->setValue(brightness);
 }
 
 void ViewEditor::showEntityClassnamesChanged(const bool checked) {
@@ -798,6 +805,7 @@ void ViewEditor::showSoftMapBoundsChanged(const bool checked) {
 
 void ViewEditor::restoreDefaultsClicked() {
     PreferenceManager &prefs = PreferenceManager::instance();
+    prefs.resetToDefault(Preferences::Brightness);
     prefs.resetToDefault(Preferences::ShowEntityClassnames);
     prefs.resetToDefault(Preferences::ShowGroupBounds);
     prefs.resetToDefault(Preferences::ShowBrushEntityBounds);
@@ -849,6 +857,11 @@ void ViewEditor::showFogBias(const int value) {
 void ViewEditor::shadeLevelChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::ShadeLevel, float(value) / 100.f);
+}
+
+void ViewEditor::brightnessChanged(const int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::Brightness, (float(value) / 100.0f) + 1.0f);
 }
 
 ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_button(nullptr), m_editor(nullptr) {
