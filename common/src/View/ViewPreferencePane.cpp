@@ -125,9 +125,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     viewLayoutLayout->addWidget(m_link2dCameras);
     viewLayoutLayout->setContentsMargins(0, 0, 0, 0);
 
-    m_brightnessSlider = new SliderWithLabel{brightnessToUI(0.0f), brightnessToUI(2.0f), 0, "%d%%", 350, 45};
-    m_brightnessSlider->setToolTip("Sets the brightness for textures and model skins in the 3D editing view.");
-
     m_UIBrightnessSlider = new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f), 0, "%d%%", 350, 45};
     m_UIBrightnessSlider->setToolTip("Sets the contrast for UI controls");
 
@@ -301,7 +298,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
     layout->addSection("User Interface");
-   // layout->addRow("Theme", themeLayout);
     layout->addRow("Brightness", m_UIBrightnessSlider);
     layout->addRow("Toolbar Icon-Size", m_ToolbarIconSizeCombo);
 
@@ -312,7 +308,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     layout->addSection("Map Views");
     layout->addRow("Layout", viewLayoutLayout);
-    layout->addRow("View Brightness", m_brightnessSlider);
     layout->addRow("Tint Brightness", m_autoBrightnessTypeCombo);
     layout->addRow("Grid Alpha", m_gridAlphaSlider);
     layout->addRow("Grid Width", m_gridWidthSlider);
@@ -327,7 +322,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addSection("Texture Browser");
     layout->addRow("Icon-Size", m_textureBrowserIconSizeCombo);
 
-
     viewBox->setMinimumWidth(550);
     viewBox->setLayout(layout);
 
@@ -337,7 +331,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 void ViewPreferencePane::bindEvents() {
     connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
     connect(m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged);
-    connect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged);
     connect(m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged);
     connect(m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged);
     connect(m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
@@ -365,7 +358,6 @@ void ViewPreferencePane::bindEvents() {
 void ViewPreferencePane::unBindEvents() {
     disconnect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
     disconnect(m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged);
-    disconnect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::brightnessChanged);
     disconnect(m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged);
     disconnect(m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged);
     disconnect(m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
@@ -426,7 +418,6 @@ void ViewPreferencePane::doUpdateControls() {
 
     m_layoutCombo->setCurrentIndex(pref(Preferences::MapViewLayout));
     m_link2dCameras->setChecked(pref(Preferences::Link2DCameras));
-    m_brightnessSlider->setValue(brightnessToUI(pref(Preferences::Brightness)));
     m_UIBrightnessSlider->setValue(brightnessToUI(pref(Preferences::UIBrightness)));
     m_gridAlphaSlider->setRatio(pref(Preferences::GridAlpha));
     m_fovSlider->setValue(int(pref(Preferences::CameraFov)));
@@ -515,15 +506,6 @@ size_t ViewPreferencePane::findTextureMode(const int minFilter, const int magFil
     return TextureModes.size();
 }
 
-int ViewPreferencePane::findThemeIndex(const QString &theme) {
-    for (int i = 0; i < m_themeCombo->count(); ++i) {
-        if (m_themeCombo->itemText(i) == theme) {
-            return i;
-        }
-    }
-    return 0;
-}
-
 void ViewPreferencePane::layoutChanged(const int index) {
     assert(index >= 0 && index < 4);
 
@@ -535,11 +517,6 @@ void ViewPreferencePane::link2dCamerasChanged(const int state) {
     const auto value = state == Qt::Checked;
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::Link2DCameras, value);
-}
-
-void ViewPreferencePane::brightnessChanged(const int value) {
-    auto &prefs = PreferenceManager::instance();
-    prefs.set(Preferences::Brightness, brightnessFromUI(value));
 }
 
 void ViewPreferencePane::UIBrightnessChanged(const int value) {
@@ -608,11 +585,6 @@ void ViewPreferencePane::textureModeChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::TextureMinFilter, minFilter);
     prefs.set(Preferences::TextureMagFilter, magFilter);
-}
-
-void ViewPreferencePane::themeChanged(int /*index*/) {
-    auto &prefs = PreferenceManager::instance();
-    prefs.set(Preferences::Theme, m_themeCombo->currentText());
 }
 
 void ViewPreferencePane::textureBrowserIconSizeChanged(const int index) {

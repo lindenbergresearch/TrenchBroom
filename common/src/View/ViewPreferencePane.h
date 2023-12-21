@@ -33,7 +33,6 @@ Q_OBJECT
 private:
     QComboBox *m_layoutCombo = nullptr;
     QCheckBox *m_link2dCameras = nullptr;
-    SliderWithLabel *m_brightnessSlider = nullptr;
     SliderWithLabel *m_UIBrightnessSlider = nullptr;
     SliderWithLabel *m_gridAlphaSlider = nullptr;
     SliderWithLabel *m_fovSlider = nullptr;
@@ -45,7 +44,6 @@ private:
     QCheckBox *m_showAxes = nullptr;
     QComboBox *m_textureModeCombo = nullptr;
     QCheckBox *m_enableMsaa = nullptr;
-    QComboBox *m_themeCombo = nullptr;
     QComboBox *m_textureBrowserIconSizeCombo = nullptr;
     QComboBox *m_rendererFontSizeCombo = nullptr;
     QComboBox *m_rendererFontCombo = nullptr;
@@ -81,15 +79,11 @@ private:
 
     size_t findTextureMode(int minFilter, int magFilter) const;
 
-    int findThemeIndex(const QString &theme);
-
 private slots:
 
     void layoutChanged(int index);
 
     void link2dCamerasChanged(int state);
-
-    void brightnessChanged(int value);
 
     void UIBrightnessChanged(int value);
 
@@ -113,8 +107,6 @@ private slots:
     void enableMsaaChanged(int state);
 
     void textureModeChanged(int index);
-
-    void themeChanged(int index);
 
     void textureBrowserIconSizeChanged(int index);
 
