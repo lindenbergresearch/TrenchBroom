@@ -32,7 +32,6 @@
 
 #include "Assets/Texture.h"
 #include "Ensure.h"
-#include "Error.h"
 #include "IO/File.h"
 #include "IO/FileSystem.h"
 #include "IO/PathQt.h"
@@ -40,7 +39,6 @@
 #include "IO/SystemPaths.h"
 #include "Logger.h"
 
-#include <kdl/result.h>
 #include <kdl/set_temp.h>
 
 #include <map>
@@ -97,13 +95,13 @@ static QImage createDisabledState(const QImage &image) {
     return disabledImage;
 }
 
-static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio, int size, float opacity = 0.7f) {
+static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio, int size, float opacity = DefaultIconAlpha) {
     if (!svgSource.isValid()) {
         return;
     }
 
     auto image = QImage{
-        int(size * devicePixelRatio), int(size * devicePixelRatio), QImage::Format_ARGB32_Premultiplied
+        int(size * devicePixelRatio*OverSampleFactor), int(size * devicePixelRatio*OverSampleFactor), QImage::Format_ARGB32_Premultiplied
     };
 
     image.fill(Qt::transparent);
@@ -120,8 +118,8 @@ static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::S
         image.invertPixels();
     }
 
-    icon.addPixmap(QPixmap::fromImage(image), QIcon::Normal, state);
-    icon.addPixmap(QPixmap::fromImage(createDisabledState(image)), QIcon::Disabled, state);
+    icon.addPixmap(QPixmap::fromImage(image).scaled(size , size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), QIcon::Normal, state);
+    icon.addPixmap(QPixmap::fromImage(createDisabledState(image)).scaled(size , size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), QIcon::Disabled, state);
 }
 
 QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
@@ -129,7 +127,6 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
     // Without it, the .svg files would be read from disk and decoded each time this is
     // called, which is slow. We never evict from the cache which is assumed to be OK
     // because this is just used for icons and there's a relatively small set of them.
-
     ensure(qApp->thread() == QThread::currentThread(), "loadIconResourceQt can only be used on the main thread");
 
     static auto cache = std::map<std::filesystem::path, QIcon>{};
@@ -137,7 +134,7 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
         return it->second;
     }
 
-    const auto darkTheme =
+    const auto invert =
 #ifdef DISABLE_RECOLORING_ICON
         false;
 #else
@@ -165,10 +162,10 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
                 qWarning() << "Failed to load SVG " << offPath;
             }
 
-            renderSvgToIcon(onRenderer, result, QIcon::On, darkTheme, 1.0, size);
-            renderSvgToIcon(onRenderer, result, QIcon::On, darkTheme, 2.0, size);
-            renderSvgToIcon(offRenderer, result, QIcon::Off, darkTheme, 1.0, size);
-            renderSvgToIcon(offRenderer, result, QIcon::Off, darkTheme, 2.0, size);
+            renderSvgToIcon(onRenderer, result, QIcon::On, invert, 1.0, size);
+            renderSvgToIcon(onRenderer, result, QIcon::On, invert, 2.0, size);
+            renderSvgToIcon(offRenderer, result, QIcon::Off, invert, 1.0, size);
+            renderSvgToIcon(offRenderer, result, QIcon::Off, invert, 2.0, size);
         }
         else if (!imagePathString.isEmpty()) {
             auto renderer = QSvgRenderer{imagePathString};
@@ -176,8 +173,8 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
                 qWarning() << "Failed to load SVG " << imagePathString;
             }
 
-            renderSvgToIcon(renderer, result, QIcon::Off, darkTheme, 1.0, size);
-            renderSvgToIcon(renderer, result, QIcon::Off, darkTheme, 2.0, size);
+            renderSvgToIcon(renderer, result, QIcon::Off, invert, 1.0, size);
+            renderSvgToIcon(renderer, result, QIcon::Off, invert, 2.0, size);
 
         }
         else {
@@ -186,7 +183,6 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
     }
 
     cache[imagePath] = result;
-
     return result;
 }
 } // namespace IO

@@ -39,6 +39,12 @@ class Texture;
 namespace IO {
 class FileSystem;
 
+// Svg render oversampling for quality improvement
+static const int OverSampleFactor = 4;
+
+// icon blending
+static const float DefaultIconAlpha = 0.7f;
+
 /**
  * Loads a default texture file from the given file system. If the default texture cannot
  * be found or opened, an empty texture is returned.
