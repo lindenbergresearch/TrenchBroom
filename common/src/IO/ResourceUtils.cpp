@@ -97,7 +97,7 @@ static QImage createDisabledState(const QImage &image) {
     return disabledImage;
 }
 
-static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio, int size) {
+static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio, int size, float opacity = 0.7f) {
     if (!svgSource.isValid()) {
         return;
     }
@@ -110,6 +110,7 @@ static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::S
 
     {
         auto paint = QPainter{&image};
+        paint.setOpacity(opacity);
         svgSource.render(&paint);
     }
 
