@@ -20,6 +20,8 @@
 #include "TextRenderer.h"
 
 #include "AttrString.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 #include "Renderer/ActiveShader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/FontManager.h"
@@ -37,20 +39,63 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-const float TextRenderer::DefaultMaxViewDistance = 768.0f;
 const float TextRenderer::DefaultMinZoomFactor = 0.5f;
 const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(5.0f, 2.0f);
 const size_t TextRenderer::RectCornerSegments = 6;
 const float TextRenderer::RectCornerRadius = 4.0f;
 
-TextRenderer::Entry::Entry(std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor,
-    const Color &i_backgroundColor
-) : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor) {
+TextRenderer::Entry::Entry(std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor, const Color &i_backgroundColor, const AttrString &i_string
+) : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor), string(i_string) {
     using std::swap;
     swap(vertices, i_vertices);
 }
 
+bool TextRenderer::Entry::valueInRange(float value, float min, float max) {
+    return (value >= min) && (value <= max);
+}
+
+bool TextRenderer::Entry::overlapsWith(const TextRenderer::Entry &entry) {
+    bool xOverlap =
+        valueInRange(offset.x(), entry.offset.x(), entry.offset.x() + entry.size.x()) ||
+        valueInRange(entry.offset.x(), offset.x(), offset.x() + size.x());
+
+    bool yOverlap =
+        valueInRange(offset.y(), entry.offset.y(), entry.offset.y() + entry.size.y()) ||
+        valueInRange(entry.offset.y(), offset.y(), offset.y() + size.y());
+
+    return xOverlap && yOverlap;
+}
+
 TextRenderer::EntryCollection::EntryCollection() : textVertexCount(0), rectVertexCount(0) {
+}
+
+bool TextRenderer::EntryCollection::overlaps(TextRenderer::Entry &entry) {
+    for (const Entry &e: entries) {
+        // don't compare it to self
+        if (&e == &entry) {
+            continue;
+        }
+
+        if (entry.overlapsWith(e)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void TextRenderer::EntryCollection::addEntry(TextRenderer::Entry &entry) {
+    entries.push_back(entry);
+    updateLayout();
+}
+
+void TextRenderer::EntryCollection::updateLayout() {
+    auto correctionShift = vm::vec3f(0.f, 5.f, 0.f);
+    Entry &last = entries.back();
+
+    while (overlaps(last)) {
+        last.offset = last.offset + correctionShift;
+    }
 }
 
 TextRenderer::TextRenderer(const FontDescriptor &fontDescriptor, const float maxViewDistance, const float minZoomFactor, const vm::vec2f &inset)
@@ -73,6 +118,7 @@ void TextRenderer::renderString(RenderContext &renderContext, const Color &textC
     const TextAnchor &position, const bool onTop
 ) {
 
+    m_maxViewDistance = pref(Preferences::TextRendererMaxDistance);
     const Camera &camera = renderContext.camera();
     const float distance = camera.perpendicularDistanceTo(position.position(camera));
     if (distance <= 0.0f)
@@ -91,11 +137,11 @@ void TextRenderer::renderString(RenderContext &renderContext, const Color &textC
 
     if (onTop) {
         addEntry(m_entriesOnTop,
-            Entry(vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a())));
+            Entry(vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a()),string));
     }
     else {
         addEntry(m_entries,
-            Entry(vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a())));
+            Entry(vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a()), string));
     }
 }
 
@@ -121,11 +167,13 @@ float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const
     if (onTop)
         return 1.0f;
 
+    auto fadeoutPos = pref(Preferences::TextRendererFadeOutFactor) * m_maxViewDistance;
+
     if (renderContext.render3D()) {
         const float a = m_maxViewDistance - distance;
-        if (a > 128.0f)
+        if (a > fadeoutPos)
             return 1.0f;
-        return a / 128.0f;
+        return a / fadeoutPos;
     }
     else {
         const float z = renderContext.camera().zoom();
@@ -137,7 +185,9 @@ float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const
 }
 
 void TextRenderer::addEntry(EntryCollection &collection, const Entry &entry) {
-    collection.entries.push_back(entry);
+   // collection.entries.push_back(entry);
+    collection.addEntry(const_cast<Entry &>(entry));
+
     collection.textVertexCount += entry.vertices.size();
     collection.rectVertexCount += roundedRect2DVertexCount(RectCornerSegments);
 }
