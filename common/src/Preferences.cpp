@@ -288,10 +288,10 @@ Preference<bool> ShadeFaces("Map view/Shade faces", true);
 Preference<float> ShadeLevel("Map view/Shade Level", 0.3f);
 
 // fog settings
-Preference<bool> ShowFog("Map view/Show fog", false);
-Preference<Color> FogColor("Map view/Show fog", Color{190, 190, 190});
-Preference<float> FogMaxAmount("Map view/Fog Max Amount", 0.15f);
-Preference<float> FogMinDistance("Map view/Fog Min Distance", 512.0f);
+Preference<bool> ShowFog("Map view/Show Fog", true);
+Preference<Color> FogColor("Map view/Fog Color", Color{155, 155, 155, 255});
+Preference<float> FogMaxAmount("Map view/Fog Max Amount", 0.45f);
+Preference<float> FogMinDistance("Map view/Fog Min Distance", 128.0f);
 Preference<float> FogScale("Map view/Fog Scale", 0.00075f);
 Preference<float> FogBias("Map view/Fog Bias", 0.0f);
 Preference<int> FogType("Map view/Fog Type", 0);
