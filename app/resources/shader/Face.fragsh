@@ -68,8 +68,8 @@ void main() {
         discard;
     }
 
-    gl_FragColor = vec4(vec3(Brightness / 2.0 * gl_FragColor), gl_FragColor.a);
-    gl_FragColor = clamp(2.0 * gl_FragColor, 0.0, 1.0);
+    gl_FragColor = vec4(vec3(Brightness * gl_FragColor), gl_FragColor.a);
+    gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
     gl_FragColor.a = Alpha;
 
     if (GrayScale) {
