@@ -153,6 +153,10 @@ float getSliderRatio(const QSlider *slider);
 
 void setSliderRatio(QSlider *slider, float ratio);
 
+float getSliderRange(QSlider *slider, float length, float offset = 0.f);
+
+void setSliderRange(QSlider *slider, float length, float value, float offset = 0.f);
+
 QLayout *wrapDialogButtonBox(QWidget *buttonBox);
 
 QLayout *wrapDialogButtonBox(QLayout *buttonBox);

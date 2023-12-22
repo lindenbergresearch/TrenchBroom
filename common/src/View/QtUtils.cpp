@@ -434,6 +434,16 @@ void setSliderRatio(QSlider *slider, float ratio) {
     slider->setValue(int(value));
 }
 
+float getSliderRange(QSlider *slider, float length, float offset) {
+    auto ratio = getSliderRatio(slider);
+    return ratio * length + offset;
+}
+
+void setSliderRange(QSlider *slider, float length, float value, float offset) {
+    auto ratio = (value - offset) / length;
+    setSliderRatio(slider, ratio);
+}
+
 QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
     auto *innerLayout = new QHBoxLayout{};
     innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin,
