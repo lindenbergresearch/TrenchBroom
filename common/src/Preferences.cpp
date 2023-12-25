@@ -49,11 +49,11 @@ Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(
 Preference<bool> ShowFPS("Renderer/Show FPS", true);
 
 Preference<float> TextRendererMaxDistance("Renderer/Maximum text visibility", 400.f);
-Preference<float> TextRendererFadeOutFactor("Renderer/Text fadeout factor", 0.2f);
+Preference<float> TextRendererFadeOutFactor("Renderer/Text fadeout factor", 0.9f);
 
 /* --- AXIS ------------------------------------------ */
 Preference<bool> ShowAxes("Renderer/Show axes", true);
-Preference<float> AxisLength("Renderer/Axis length", 128.0f);
+Preference<float> AxisLength("Renderer/Axis length", 999999999.0f);
 Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.8f, 0.1f, 0.2f, 1.0f));
 Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.8f, 0.1f, 1.0f));
 Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1.0f));
@@ -76,9 +76,9 @@ Preference<float> MetricConversationFactor("Renderer/Metric Conversation Factor"
 Preference<int> UnitsMaxDigits("Renderer/Units Maximum Digits", 2);
 
 /* --- COMPASS---------------------------------------- */
-Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 1.0f));
+Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.5f, 0.5f, 0.5f, 0.2f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline",
-    Color(1.0f, 1.0f, 1.0f, 1.0f));
+    Color(1.0f, 1.0f, 1.0f, 0.4f));
 Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.75f);
 Preference<float> CompassScale("Renderer/Colors/Compass scale", 1.5f);
 
@@ -92,41 +92,40 @@ Preference<Color> TutorialOverlayBackgroundColor("Renderer/Colors/Tutorial overl
     Color(1.0f, 0.5f, 0.0f, 0.6f));
 
 /* --- FACES ----------------------------------------- */
-Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.2f, 0.2f, 0.2f, 1.0f));
-Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.0f, 0.85f, 0.85f, 1.0f));
-Preference<Color> LockedFaceColor("Renderer/Colors/Locked faces", Color(0.85f, 0.85f, 1.0f, 1.0f));
-Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.4f);
+Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.1f, 0.11f, 0.12f, 1.0f));
+Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.0f, 0.1f, 0.11f, 1.0f));
+Preference<Color> LockedFaceColor("Renderer/Colors/Locked faces", Color(0.5f, 0.6f, 0.1f, 1.0f));
+Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.75f);
 
 /* --- EDGES ----------------------------------------- */
-Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.9f, 0.9f, 0.9f, 1.0f));
-Preference<Color> OccludedSelectedEdgeColor("Renderer/Colors/Occluded Selected Edges", Color(0.9f, 0.2f, 0.2f, 1.0f));
-Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 1.0f));
-Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.25f);
-Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.5f);
-Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.4f);
-Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.13f, 0.3f, 1.0f, 1.0f));
-
-Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.5f, 0.5f, 0.5f, 1.0f));
+Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(1.0f, 1.0f, 1.0f, 0.35f));
+Preference<Color> OccludedSelectedEdgeColor("Renderer/Colors/Occluded Selected Edges", Color(1.0f, 0.4f, 0.2f, 1.0f));
+Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 0.6f));
+Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.15f);
+Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.3f);
+Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.3f);
+Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.7f, 0.7f, 0.7f, 0.7f));
+Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.9f, 0.0f, 0.0f, 1.0f));
 
 /* --- SELECTION BOUNDS ------------------------------ */
-Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.0f, 0.0f, 0.0f, 1.0f));
-Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 1.0f);
-Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.4f);
-Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 10.0f);
-Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.1f, 0.3f, 1.0f));
+Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(0.0f, 0.8f, 0.9f, 0.75f));
+Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 0.6f);
+Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.3f);
+Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 26.0f);
+Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.0f, 0.0f, 1.0f));
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
 Preference<bool> SelectionBoundsIntersectionMode("Renderer/Selection bounds intersection mode", true);
-Preference<bool> ShowHiddenSelectionBounds("Renderer/Selection bounds show hidden bounds", true);
-Preference<bool> AlwaysShowSelectionBounds("Renderer/Selection bounds always show bounds", false);
+Preference<bool> ShowHiddenSelectionBounds("Renderer/Selection bounds show hidden bounds", false);
+Preference<bool> AlwaysShowSelectionBounds("Renderer/Selection bounds always show bounds", true);
 Preference<bool> ShowObjectBoundsSelectionBounds("Renderer/Selection bounds show object bounds", true);
 Preference<bool> SelectionBoundsShowMinMax("Renderer/Selection bounds show min max values", false);
-Preference<int> SelectionBoundsDashedSize("Renderer/Selection bounds line dashes size", 4);
+Preference<int> SelectionBoundsDashedSize("Renderer/Selection bounds line dashes size", 2);
 
 Preference<Color> InfoOverlayTextColor("Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> GroupInfoOverlayTextColor("Renderer/Colors/Group info overlay text", Color(0.7f, 0.4f, 1.0f, 1.0f));
 Preference<Color> InfoOverlayBackgroundColor("Renderer/Colors/Info overlay background", Color(0.0f, 0.0f, 0.0f, 0.6f));
-Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 1.0f);
+Preference<float> WeakInfoOverlayBackgroundAlpha("Renderer/Colors/Weak info overlay background alpha", 0.6f);
 Preference<Color> SelectedInfoOverlayTextColor("Renderer/Colors/Selected info overlay text",
     Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> SelectedInfoOverlayBackgroundColor("Renderer/Colors/Selected info overlay background",
@@ -168,15 +167,15 @@ Preference<Color> AngleIndicatorColor("Renderer/Colors/Angle indicator", Color(1
 
 Preference<Color> TextureSeamColor("Renderer/Colors/Texture seam", Color(1.0f, 1.0f, 0.0f, 1.0f));
 
-Preference<float> Brightness("Renderer/Brightness", 1.4f);
-Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 0);
+Preference<float> Brightness("Renderer/Brightness", 2.0f);
+Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 2);
 
 /* --- GRID ------------------------------------------ */
-Preference<float> GridLineWidth("Renderer/Grid/With", 1.0);
-Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.5f);
+Preference<float> GridLineWidth("Renderer/Grid/With", 0.5);
+Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.6f);
 Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 128.0f);
 Preference<int> GridUnitSystem("Renderer/Grid/Units system", LengthUnitDisplay::Units);
-Preference<Color> GridColor2D("Renderer/Grid/Color2D", Color(0.8f, 0.8f, 0.8f, 0.8f));
+Preference<Color> GridColor2D("Renderer/Grid/Color2D", Color(0.7f, 0.8f, 0.9f, 1.0f));
 
 Preference<int> TextureMinFilter("Renderer/Texture mode min filter", 0x2700);
 Preference<int> TextureMagFilter("Renderer/Texture mode mag filter", 0x2600);
@@ -189,12 +188,12 @@ Preference<bool> UVLock("Editor/UV lock", false);
 Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/Inter-SemiBold.otf");
 Preference<std::filesystem::path> UIFontPath("Editor/UI Font name", "fonts/Inter-Regular.otf");
 Preference<std::filesystem::path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono-Regular.ttf");
-Preference<int> RendererFontSize("Renderer/Font size", 13);
-Preference<int> BrowserFontSize("Browser/Font size", 13);
+Preference<int> RendererFontSize("Renderer/Font size", 12);
+Preference<int> BrowserFontSize("Browser/Font size", 12);
 Preference<int> UIFontSize("Editor/UI Font size", 13);
-Preference<int> ConsoleFontSize("Editor/Console Font size", 14);
+Preference<int> ConsoleFontSize("Editor/Console Font size", 12);
 
-Preference<int> ToolBarIconsSize("Editor/Toolbar Icon Size", 24);
+Preference<int> ToolBarIconsSize("Editor/Toolbar Icon Size", 22);
 
 Preference<Color> BrowserTextColor("Browser/Text color", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> BrowserSubTextColor("Browser/Sub text color", Color(0.65f, 0.65f, 0.65f, 1.0f));
@@ -202,11 +201,11 @@ Preference<Color> BrowserGroupBackgroundColor("Browser/Group background color", 
 Preference<Color> BrowserBackgroundColor("Browser/Background color", Color(0.14f, 0.14f, 0.14f, 1.0f));
 Preference<float> TextureBrowserIconSize("Texture Browser/Icon size", 1.0f);
 Preference<Color> TextureBrowserDefaultColor("Texture Browser/Default color", Color(0.0f, 0.0f, 0.0f, 0.0f));
-Preference<Color> TextureBrowserSelectedColor("Texture Browser/Selected color", Color(1.0f, 0.0f, 0.0f, 1.0f));
-Preference<Color> TextureBrowserUsedColor("Texture Browser/Used color", Color(1.0f, 0.7f, 0.0f, 1.0f));
+Preference<Color> TextureBrowserSelectedColor("Texture Browser/Selected color", Color(1.0f, 1.0f, 0.0f, 1.0f));
+Preference<Color> TextureBrowserUsedColor("Texture Browser/Used color", Color(1.0f, 0.7f, 0.7f, 0.7f));
 
 /* --- UI COLORS  ------------------------------------ */
-Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.121f, 0.3359f, 0.6875f));
+Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.221f, 0.4359f, 0.7875f));
 Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f, 0.117f, 0.125f));
 Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color(0.7f, 0.7f, 0.7f));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
@@ -290,8 +289,8 @@ Preference<float> ShadeLevel("Map view/Shade Level", 0.3f);
 // fog settings
 Preference<bool> ShowFog("Map view/Show Fog", true);
 Preference<Color> FogColor("Map view/Fog Color", Color{155, 155, 155, 255});
-Preference<float> FogMaxAmount("Map view/Fog Max Amount", 0.45f);
-Preference<float> FogMinDistance("Map view/Fog Min Distance", 128.0f);
+Preference<float> FogMaxAmount("Map view/Fog Max Amount", 0.10f);
+Preference<float> FogMinDistance("Map view/Fog Min Distance", 512.0f);
 Preference<float> FogScale("Map view/Fog Scale", 0.00075f);
 Preference<float> FogBias("Map view/Fog Bias", 0.0f);
 Preference<int> FogType("Map view/Fog Type", 0);
