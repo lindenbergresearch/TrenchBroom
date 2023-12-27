@@ -314,7 +314,7 @@ public:
 
             static const auto axisLabels = std::array<std::string, 3>{"x: ", "y: ", "z: "};
             auto lastPos = dragState.initialHandlePosition;
-            auto unitsDisplayType = (Preferences::UnitsDisplay) pref(Preferences::UnitsDisplayType);
+            auto unitsDisplayType = (Preferences::LengthUnitDisplay) pref(Preferences::LengthUnitSystem);
 
             for (size_t i = 0; i < 3; ++i) {
                 const auto &stage = stages[i];
@@ -326,13 +326,13 @@ public:
                     std::string units_str;
 
                     switch (unitsDisplayType) {
-                        case Preferences::UNITS:
+                        case Preferences::Units:
                             units_str = fmt::format("{}{}", axis_label, kdl::str_to_string(stage[i]));
                             break;
-                        case Preferences::METRIC:
+                        case Preferences::Metric:
                             units_str = fmt::format("{}{:.1f}m", axis_label, stage[i] / pref(Preferences::MetricConversationFactor));
                             break;
-                        case Preferences::BOTH:
+                        case Preferences::Combined:
                             units_str = fmt::format("{}{}u ({:.1f}m)", axis_label, kdl::str_to_string(stage[i]),
                                 stage[i] / pref(Preferences::MetricConversationFactor));
                     }
