@@ -660,12 +660,12 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
         // lock icon
         if (index.column() == ColumnKey) {
             if (!row.keyMutable()) {
-                return QVariant{IO::loadSVGIcon("Locked_small.svg")};
+                return QVariant{IO::loadSVGIcon("Locked_small.svg",16)};
             }
         }
         else if (index.column() == ColumnValue) {
             if (!row.valueMutable()) {
-                return QVariant{IO::loadSVGIcon("Locked_small.svg")};
+                return QVariant{IO::loadSVGIcon("Locked_small.svg",16)};
             }
         }
         return QVariant{};
@@ -795,7 +795,7 @@ QVariant EntityPropertyModel::headerData(const int section, const Qt::Orientatio
     }
     else if (role == Qt::DecorationRole) {
         if (section == ColumnProtected) {
-            return QVariant{IO::loadSVGIcon("Protected_small.svg")};
+            return QVariant{IO::loadSVGIcon("Protected_small.svg",16)};
         }
     }
     else if (role == Qt::ToolTipRole) {
