@@ -247,7 +247,9 @@ public:
 
     Result<bool> openDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat, const std::filesystem::path &path);
 
-    void reCreateToolBar();
+    void updateToolbar();
+
+    void updateGridSizeComboBox();
 
     bool saveDocument();
 

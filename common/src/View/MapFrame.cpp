@@ -411,6 +411,7 @@ void MapFrame::createToolBar() {
     m_toolBar->setObjectName("MapFrameToolBar");
     m_toolBar->setFloatable(false);
     m_toolBar->setMovable(false);
+    m_toolBar->setAutoFillBackground(true);
 
     // macOS Qt bug: with the 32x32 default icon size, 24x24 high-dpi icons get scaled up to
     // 32x32. We expect them to be drawn at 24x24 logical pixels centered in a 32x32 box, as
@@ -418,7 +419,7 @@ void MapFrame::createToolBar() {
     // 24x24 (we could alternatively render the icons at 32x32).
     auto size = pref(Preferences::ToolBarIconsSize);
     m_toolBar->setIconSize(QSize(size, size));
-    makeSmall(m_toolBar);
+ //   makeSmall(m_toolBar);
 
     ToolBarBuilder toolsBuilder(*m_toolBar, m_actionMap, [this](const Action &action) {
           ActionExecutionContext context(this, currentMapViewBase());
@@ -429,17 +430,26 @@ void MapFrame::createToolBar() {
     auto &actionManager = ActionManager::instance();
     actionManager.visitToolBarActions(toolsBuilder);
 
-    m_gridChoice = new QComboBox();
+    updateGridSizeComboBox();
+    m_toolBar->addWidget(m_gridChoice);
+}
+
+void MapFrame::updateGridSizeComboBox()  {
+    if (!m_gridChoice) {
+        m_gridChoice = new QComboBox();
+    } else {
+        m_gridChoice->clear();
+    }
+
     m_gridChoice->setObjectName("ToolBar_GridChoice");
     for (int i = Grid::MinSize; i <= Grid::MaxSize; ++i) {
-        const FloatType gridSize = Grid::actualSize(i);
-        const QString gridSizeStr = tr("Grid %1").arg(QString::number(gridSize, 'g'));
+        const QString gridSizeStr = tr("Grid ") + Grid::asString(i);
         m_gridChoice->addItem(gridSizeStr, QVariant(i));
     }
 }
 
 
-void MapFrame::reCreateToolBar() {
+void MapFrame::updateToolbar() {
     if (m_toolBar) {
         removeToolBar(m_toolBar);
         createToolBar();
