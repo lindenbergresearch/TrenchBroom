@@ -171,7 +171,7 @@ void GamePreferencePane::createGui() {
           }
           else {
               validDirectoryIcon->setToolTip(tr("Directory not found"));
-              validDirectoryIcon->setIcon(IO::loadSVGIcon("IssueBrowser.svg"));
+              validDirectoryIcon->setIcon(IO::loadSVGIcon("IssueBrowser.svg",16));
           }
         }
     );
