@@ -422,7 +422,9 @@ void MapFrame::createToolBar() {
     //   makeSmall(m_toolBar);
 
     ToolBarBuilder toolsBuilder(*m_toolBar, m_actionMap, [this](const Action &action) {
-                                  ActionExecutionContext context(this, currentMapViewBase());
+                                  ActionExecutionContext context(
+                                    this,
+                                    currentMapViewBase());
                                   action.execute(context);
                                 }
       );
