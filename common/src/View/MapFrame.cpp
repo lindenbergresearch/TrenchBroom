@@ -419,13 +419,13 @@ void MapFrame::createToolBar() {
     // 24x24 (we could alternatively render the icons at 32x32).
     auto size = pref(Preferences::ToolBarIconsSize);
     m_toolBar->setIconSize(QSize(size, size));
- //   makeSmall(m_toolBar);
+    //   makeSmall(m_toolBar);
 
     ToolBarBuilder toolsBuilder(*m_toolBar, m_actionMap, [this](const Action &action) {
-          ActionExecutionContext context(this, currentMapViewBase());
-          action.execute(context);
-        }
-    );
+                                  ActionExecutionContext context(this, currentMapViewBase());
+                                  action.execute(context);
+                                }
+      );
 
     auto &actionManager = ActionManager::instance();
     actionManager.visitToolBarActions(toolsBuilder);
@@ -434,17 +434,20 @@ void MapFrame::createToolBar() {
     m_toolBar->addWidget(m_gridChoice);
 }
 
-void MapFrame::updateGridSizeComboBox()  {
-    if (!m_gridChoice) {
-        m_gridChoice = new QComboBox();
+void MapFrame::updateGridSizeComboBox()
+{
+  if (!m_gridChoice)
+  {
+    m_gridChoice = new QComboBox();
     } else {
         m_gridChoice->clear();
     }
 
     m_gridChoice->setObjectName("ToolBar_GridChoice");
-    for (int i = Grid::MinSize; i <= Grid::MaxSize; ++i) {
-        const QString gridSizeStr = tr("Grid ") + Grid::asString(i);
-        m_gridChoice->addItem(gridSizeStr, QVariant(i));
+  for (int i = Grid::MinSize; i <= Grid::MaxSize; ++i)
+  {
+    const QString gridSizeStr = tr("Grid ") + Grid::asString(i);
+    m_gridChoice->addItem(gridSizeStr, QVariant(i));
     }
 }
 
