@@ -27,6 +27,8 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 #include <vecmath/mat.h>
 #include <vecmath/mat_ext.h>
@@ -35,8 +37,8 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-PrimitiveRenderer::LineRenderAttributes::LineRenderAttributes(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy)
-    : m_color(color), m_lineWidth(lineWidth), m_occlusionPolicy(occlusionPolicy) {
+PrimitiveRenderer::LineRenderAttributes::LineRenderAttributes(const Color &color, const float lineWidth,const PrimitiveRendererOcclusionPolicy occlusionPolicy, int dashSize, unsigned short pattern, bool dashed)
+    : m_color(color), m_lineWidth(lineWidth), m_dashSize(dashSize), m_pattern(pattern), m_dashed(dashed), m_occlusionPolicy(occlusionPolicy) {
 }
 
 bool PrimitiveRenderer::LineRenderAttributes::operator<(const LineRenderAttributes &other) const {
@@ -63,7 +65,15 @@ bool PrimitiveRenderer::LineRenderAttributes::operator<(const LineRenderAttribut
 }
 
 void PrimitiveRenderer::LineRenderAttributes::render(IndexRangeRenderer &renderer, ActiveShader &shader) const {
+    // setup line-attribute
+
     glAssert(glLineWidth(m_lineWidth));
+
+    if (m_dashed) {
+        glAssert(glEnable(GL_LINE_STIPPLE));
+        glAssert(glLineStipple(m_dashSize, m_pattern));
+    }
+
     switch (m_occlusionPolicy) {
         case PrimitiveRendererOcclusionPolicy::Hide:
             shader.set("Color", m_color);
@@ -84,6 +94,14 @@ void PrimitiveRenderer::LineRenderAttributes::render(IndexRangeRenderer &rendere
             renderer.render();
             break;
     }
+
+    // reset line-attribute
+
+    if (m_dashed) {
+        glAssert(glDisable(GL_LINE_STIPPLE));
+    }
+
+    glAssert(glLineWidth(1.0f));
 }
 
 PrimitiveRenderer::TriangleRenderAttributes::TriangleRenderAttributes(const Color &color, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
@@ -166,6 +184,12 @@ void PrimitiveRenderer::renderLines(const Color &color, const float lineWidth, c
     const std::vector<vm::vec3f> &positions
 ) {
     m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy)].addLines(Vertex::toList(positions.size(), std::begin(positions)));
+}
+
+void PrimitiveRenderer::renderDashedLines(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,
+    const std::vector<vm::vec3f> &positions, int factor, unsigned short pattern
+) {
+    m_lineMeshes[LineRenderAttributes(color, lineWidth, occlusionPolicy, factor, pattern, true)].addLines(Vertex::toList(positions.size(), std::begin(positions)));
 }
 
 void PrimitiveRenderer::renderLineStrip(const Color &color, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy,

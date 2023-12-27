@@ -52,10 +52,13 @@ private:
     private:
         Color m_color;
         float m_lineWidth;
+        int m_dashSize;
+        unsigned short m_pattern;
+        bool m_dashed;
         PrimitiveRendererOcclusionPolicy m_occlusionPolicy;
 
     public:
-        LineRenderAttributes(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy);
+        LineRenderAttributes(const Color &color, float lineWidth,PrimitiveRendererOcclusionPolicy occlusionPolicy, int dashSize = 1, unsigned short pattern = 0x0000, bool dashed = false);
 
         bool operator<(const LineRenderAttributes &other) const;
 
@@ -92,6 +95,8 @@ public:
     void renderLine(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::vec3f &start, const vm::vec3f &end);
 
     void renderLines(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions);
+
+    void renderDashedLines(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions, int factor, unsigned short pattern);
 
     void renderLineStrip(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions);
 
