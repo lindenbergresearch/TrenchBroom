@@ -213,6 +213,10 @@ void RenderService::renderLines(const std::vector<vm::vec3f> &positions) {
     m_primitiveRenderer->renderLines(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
 
+void RenderService::renderDashedLines(const std::vector<vm::vec3f> &positions, int factor, unsigned short pattern) {
+    m_primitiveRenderer->renderDashedLines(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions, factor, pattern);
+}
+
 void RenderService::renderLineStrip(const std::vector<vm::vec3f> &positions) {
     m_primitiveRenderer->renderLineStrip(m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
@@ -287,7 +291,11 @@ void RenderService::renderBounds(const vm::bbox3f &bounds) {
     positions.push_back(p7);
     positions.push_back(p8);
 
-    renderLines(positions);
+    if (pref(Preferences::SelectionBoundsDashedLines)) {
+        renderDashedLines(positions, pref(Preferences::SelectionBoundsDashedSize), (GLushort) pref(Preferences::SelectionBoundsPattern));
+    } else {
+        renderLines(positions);
+    }
 }
 
 void RenderService::renderCircle(const vm::vec3f &position, const vm::axis::type normal, const size_t segments, const float radius, const vm::vec3f &startAxis,

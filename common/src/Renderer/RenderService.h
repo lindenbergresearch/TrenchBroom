@@ -124,6 +124,8 @@ deleteCopyAndMove(RenderService);
 
     void renderLines(const std::vector<vm::vec3f> &positions);
 
+    void renderDashedLines(const std::vector<vm::vec3f> &positions, int factor = 4, unsigned short pattern = 0x3333);
+
     void renderLineStrip(const std::vector<vm::vec3f> &positions);
 
     void renderCoordinateSystem(const vm::bbox3f &bounds);
