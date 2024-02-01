@@ -61,17 +61,17 @@ public:
     explicit TextOutputAdapter(QTextEdit *textEdit);
 
     template<typename T>
-    void pushSystemMessage(const T &t) {
+    void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
         QString string;
         QTextStream stream(&string);
         stream << t;
 
         auto format = QTextCharFormat{};
-        auto font = TrenchBroomApp::instance().getUIFont();
+        auto font = TrenchBroomApp::instance().getConsoleFont();
         font.setBold(true);
         format.setFont(font);
         format.setFontPointSize(TrenchBroomApp::instance().getConsoleFont().pointSize());
-        format.setForeground(QBrush{QColor{"#FFFFFF"}});
+        format.setForeground(QBrush{color});
         m_insertionCursor.insertText(string, format);
     }
 

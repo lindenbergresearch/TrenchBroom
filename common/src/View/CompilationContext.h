@@ -48,8 +48,8 @@ public:
     std::string variableValue(const std::string &variableName) const;
 
     template<typename T>
-    void pushSystemMessage(const T &t) {
-        m_output.pushSystemMessage(t);
+    void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
+        m_output.pushSystemMessage(t, color);
         return;
     }
 
