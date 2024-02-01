@@ -121,6 +121,8 @@ void TextOutputAdapter::appendString(const QString &string) {
         i = lastToInsert;
     }
 
+    scrollBar->setValue(scrollBar->maximum());
+
     if (wasAtBottom) {
         m_textEdit->verticalScrollBar()->setValue(m_textEdit->verticalScrollBar()->maximum());
     }
