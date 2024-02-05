@@ -76,20 +76,39 @@ CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_pt
     //panel->getPanel()->setLayout(m_taskLayout);
 
     auto layout = new QVBoxLayout;
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(
+        LayoutConstants::NoMargin,
+        LayoutConstants::NarrowVMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowVMargin
+    );
 
-    layout->addWidget(new BorderLine);
+//    layout->addWidget(new BorderLine);
     auto titleLabel = new QLabel{m_title};
-    makeBright(titleLabel, QPalette{});
-    titleLabel->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
+    makeSmall(titleLabel);
+    makeEmphasized(titleLabel);
+
+    titleLabel->setAutoFillBackground(true);
+    titleLabel->setBackgroundRole(QPalette::ColorRole::Midlight);
+    titleLabel->setContentsMargins(
+        LayoutConstants::MediumHMargin,
+        LayoutConstants::NarrowVMargin,
+        LayoutConstants::NoMargin,
+        LayoutConstants::NarrowVMargin
+    );
 
     layout->addWidget(titleLabel);
     layout->addLayout(m_taskLayout);
-    layout->addWidget(new BorderLine);
+   // layout->addWidget(new BorderLine);
+
+    auto pal = QPalette{};
+    auto highlight = pal.color(QPalette::ColorRole::Highlight);
+
+    colorizeWidget(this, highlight.darker(250), QPalette::ColorRole::Highlight);
 
     setLayout(layout);
-    setBaseWindowColor(this);
-    setBaseWindowColor(titleLabel);
+//    setBaseWindowColor(this);
+    //setBaseWindowColor(titleLabel);
 
     connect(m_enabledCheckbox, &QCheckBox::clicked, this, [&](const bool checked) {
           std::visit([&](auto &t) { t.enabled = checked; }, m_task);
@@ -401,6 +420,7 @@ Variables are allowed.)"
     formLayout->addRow("Parameters", m_parametersEditor);
 
     m_treatNonZeroResultCodeAsError = new QCheckBox{"Stop on nonzero error code"};
+    makeSmall(m_treatNonZeroResultCodeAsError);
     m_treatNonZeroResultCodeAsError->setToolTip(tr("Stop compilation if the tool returns a nonzero error code"));
     formLayout->addRow("", m_treatNonZeroResultCodeAsError);
 
@@ -467,6 +487,7 @@ void CompilationRunToolTaskEditor::treatNonZeroResultCodeAsErrorChanged(const in
 CompilationTaskListBox::CompilationTaskListBox(std::weak_ptr<MapDocument> document, QWidget *parent) : ControlListBox{
     "Click the '+' button to create a task.", QMargins{}, false, parent
 }, m_document{std::move(document)} {
+
 }
 
 void CompilationTaskListBox::setProfile(Model::CompilationProfile *profile) {
