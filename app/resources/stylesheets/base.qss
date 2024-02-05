@@ -98,8 +98,8 @@ QWidget#ToolBar_GridChoice {
 QToolBar {
     border: none;
     border-bottom: 1px solid $MIDLIGHT_COLOR$;
-    margin: 0px;
-    padding: 2px;
+    margin: 2px 5px 0px 5px;
+    padding: 4px;
 }
 
 QToolBar::separator {
@@ -347,12 +347,12 @@ QScrollBar::sub-line:vertical {
 
 QToolButton {
   color: $TEXT_COLOR$;
-  border-radius: 3px;
-  padding: 3px 2px 2px 3px;
+  border-radius: 5px;
+  padding: 2px 2px 2px 2px;
   outline: none;
   border: none;
-  margin-left: 1px;
-  margin-right: 1px;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 QToolButton:disabled {
@@ -382,12 +382,10 @@ QToolButton:selected {
 }
 
 QToolButton[popupMode="0"] {
-   Only for DelayedPopup
   padding-right: 2px;
 }
 
 QToolButton[popupMode="1"] {
-   Only for MenuButtonPopup
   padding-right: 20px;
 }
 
@@ -396,7 +394,6 @@ QToolButton[popupMode="1"]::menu-button {
 }
 
 QToolButton[popupMode="2"] {
-   Only for InstantPopup
   padding-right: 2px;
 }
 
@@ -474,6 +471,6 @@ QPushButton:pressed {
 }
 
 QPushButton:selected {
-    border: 2px solid $HIGHLIGHT$;
+    border: 2px solid $HIGHLIGHT_COLOR$;
     color: $TEXT_COLOR$;
 }
