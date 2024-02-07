@@ -52,13 +52,12 @@ void SpikeGuideRenderer::setColor(const Color &color) {
 void SpikeGuideRenderer::add(const vm::ray3 &ray, const FloatType length, std::shared_ptr<View::MapDocument> document) {
     Model::PickResult pickResult = Model::PickResult::byDistance();
     document->pick(ray, pickResult);
-    auto offset = 1.0f;
 
     using namespace Model::HitFilters;
     const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
     if (hit.isMatch()) {
         if (hit.distance() <= length)
-            addPoint(vm::point_at_distance(ray, hit.distance() - offset));
+            addPoint(vm::point_at_distance(ray, hit.distance()));
         addSpike(ray, vm::min(length, hit.distance()), length);
     }
     else if (!pref(Preferences::SelectionBoundsIntersectionMode)) {
