@@ -182,10 +182,10 @@ void Compass::renderBackground(RenderContext &renderContext) {
     auto outlineColor = modifyAlpha(pref(Preferences::CompassBackgroundOutlineColor), pref(Preferences::CompassTransparency));
     auto backgroundColor = modifyAlpha(pref(Preferences::CompassBackgroundColor), pref(Preferences::CompassTransparency));
 
-    shader.set("Color", outlineColor);
+    shader.set("Color", backgroundColor);
     m_backgroundRenderer.render();
 
-    shader.set("Color", backgroundColor);
+    shader.set("Color", outlineColor);
     m_backgroundOutlineRenderer.render();
 }
 
