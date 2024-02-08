@@ -1429,7 +1429,7 @@ void ActionManager::createViewMenu() {
     ));
     cameraMenu.addItem(createMenuAction(std::filesystem::path{
             "Menu/View/Camera/Focus on Selection"
-        }, QObject::tr("Focus Camera on Selection"), Qt::CTRL + Qt::Key_U, [](ActionExecutionContext &context) { context.frame()->focusCameraOnSelection(); },
+        }, QObject::tr("Focus Camera on Selection"), Qt::Key_Slash, [](ActionExecutionContext &context) { context.frame()->focusCameraOnSelection(); },
         [](ActionExecutionContext &context) {
           return context.hasDocument() && context.frame()->canFocusCamera();
         }
@@ -1651,6 +1651,15 @@ Menu &ActionManager::createMainMenu(const std::string &name) {
     m_mainMenu.emplace_back(std::move(menu));
     return *result;
 }
+
+void ActionManager::createRenderViewToolbar(QToolBar *toolBar)  {
+    if (toolBar) {
+
+
+
+    }
+}
+
 
 void ActionManager::createToolbar() {
     m_toolBar = std::make_unique<Menu>("Tools Toolbar", MenuEntryType::Menu_None);
