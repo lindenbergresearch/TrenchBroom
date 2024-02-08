@@ -316,7 +316,7 @@ MapDocument::MapDocument() : m_worldBounds(DefaultWorldBounds), m_world(nullptr)
     m_entityDefinitionManager(std::make_unique<Assets::EntityDefinitionManager>()),
     m_entityModelManager(std::make_unique<Assets::EntityModelManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())),
     m_textureManager(std::make_unique<Assets::TextureManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())),
-    m_tagManager(std::make_unique<Model::TagManager>()), m_editorContext(std::make_unique<Model::EditorContext>()), m_grid(std::make_unique<Grid>(4)),
+    m_tagManager(std::make_unique<Model::TagManager>()), m_editorContext(std::make_unique<Model::EditorContext>()), m_grid(std::make_unique<Grid>(2)),
     m_path(DefaultDocumentName), m_lastSaveModificationCount(0), m_modificationCount(0), m_currentLayer(nullptr),
     m_currentTextureName(Model::BrushFaceAttributes::NoTextureName), m_lastSelectionBounds(0.0, 32.0), m_selectionBoundsValid(true),
     m_viewEffectsService(nullptr), m_repeatStack(std::make_unique<RepeatStack>()) {
