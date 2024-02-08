@@ -25,6 +25,7 @@ uniform sampler2D Texture;
 uniform bool RenderGrid;
 uniform vec2 GridSizes;
 uniform vec4 GridColor;
+uniform float GridWidth;
 uniform vec2 GridScales;
 uniform mat4 GridMatrix;
 uniform vec2 GridDivider;
@@ -58,7 +59,7 @@ float getSoftStripes(float coord, float gridDivider, float gridSize, float strip
 
 void gridLinesSoft(vec2 inCoords) {
     // the width of the grid lines, corrected by the texture scaling factors and the camera zoom level
-    vec2 lineWidths = abs(0.8 / GridScales / CameraZoom);
+    vec2 lineWidths = abs(GridWidth / GridScales / CameraZoom);
     // the widths of each grid stripe
     vec2 stripeWidths = GridSizes / GridDivider;
     // ratio of the line widths and the stripe widths
