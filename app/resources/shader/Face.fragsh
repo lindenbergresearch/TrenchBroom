@@ -19,6 +19,20 @@
  along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
  */
 
+struct PointLight {
+    vec3 Intensity;
+    vec3 Position;
+    float AttenuationConstant;
+    float AttenuationLinear;
+    float AttenuationQuadratic;
+};
+
+const int maxLights = 8;
+uniform int NumLights;
+uniform PointLight lights[maxLights];
+uniform vec3 AmbientLight;
+uniform bool EnableLighting;
+
 uniform float Brightness;
 uniform float Alpha;
 uniform bool EnableMasked;
@@ -32,6 +46,7 @@ uniform float GridSize;
 uniform float GridAlpha;
 uniform float MajorDivisionSize;
 uniform vec3 GridColor;
+uniform vec3 CameraPosition;
 
 // shading
 uniform bool ShadeFaces;
@@ -53,14 +68,15 @@ varying vec3 modelNormal;
 varying vec4 faceColor;
 varying vec3 viewVector;
 
+
 float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorLineFactor);
 vec3 applySoftMapBoundsTint(vec3 inputFragColor, vec3 worldCoords);
 
 void main() {
-	if (ApplyTexture)
-		gl_FragColor = texture2D(Texture, gl_TexCoord[0].st);
-	else
-		gl_FragColor = faceColor;
+    if (ApplyTexture)
+    gl_FragColor = texture2D(Texture, gl_TexCoord[0].st);
+    else
+    gl_FragColor = faceColor;
 
     // Assume alpha masked or opaque.
     // TODO: Make this optional if we gain support for translucent textures
@@ -78,7 +94,7 @@ void main() {
     }
 
     if (ApplyTinting) {
-        gl_FragColor = vec4(gl_FragColor.rgb * TintColor.rgb * TintColor.a, gl_FragColor.a);
+        gl_FragColor = vec4((gl_FragColor.rgb + TintColor.rgb * TintColor.a)*0.5f, gl_FragColor.a);
         float brightnessCorrection = 1.0;
 
         // average color brightness
@@ -94,15 +110,15 @@ void main() {
         gl_FragColor = clamp(brightnessCorrection * gl_FragColor, 0.0, 1.0);
     }
 
-	if (ShadeFaces) {
-		// angular dimming ( can be controlled with dimStrength )
+    if (ShadeFaces) {
+        // angular dimming ( can be controlled with dimStrength )
         float dimStrength = clamp(ShadeLevel, 0.0, 1.0);
-		float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0 - dimStrength);
+        float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0 - dimStrength);
 
-		gl_FragColor.rgb *= angleDim;
-	}
+        gl_FragColor.rgb *= angleDim;
+    }
 
-	if (ShowFog) {
+    if (ShowFog) {
         float distance = length(viewVector);
 
         vec3 fogColor = FogColor.rgb;
@@ -119,9 +135,9 @@ void main() {
         else {
             gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp(fogFactor + fogBias, 0.0, maxFogAmount));
         }
-	}
+    }
 
-	if (RenderGrid && GridAlpha > 0.0) {
+    if (RenderGrid && GridAlpha > 0.0) {
         vec3 coords = modelCoordinates.xyz;
 
         // get the maximum distance in world space between this and the neighbouring fragments
@@ -132,7 +148,37 @@ void main() {
 
         float gridValue = grid(coords, modelNormal.xyz, GridSize, minGridSize, GridLineWidth, MajorDivisionSize);
         gl_FragColor.rgb = mix(gl_FragColor.rgb, GridColor, gridValue * GridAlpha);
-	}
+    }
+
+    if (EnableLighting) {
+        for (int i=0; i < NumLights; i++) {
+            PointLight light = lights[i];
+
+            // light parts
+            vec3 Ia = AmbientLight;
+            vec3 Id = vec3(0, 0, 0);
+            vec3 Is = vec3(0, 0, 0);
+
+            vec3 N = normalize(modelNormal.xyz);
+            vec3 L = normalize(light.Position - modelCoordinates.xyz);
+            vec3 R = normalize(reflect(-L, N));
+            vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
+
+            float Distance = length(light.Position - modelCoordinates.xyz);
+            float linearAttenuation = light.AttenuationLinear * Distance;
+            float quadraticAttenuation = light.AttenuationLinear * Distance* Distance;
+            float Attenuation = 1.0f / (light.AttenuationConstant + linearAttenuation + quadraticAttenuation);
+
+            // diffuse Intensity
+            Id = Id + light.Intensity * max(0, dot(N, L)) * Attenuation;
+            // specular intensity
+            Is = Is + light.Intensity * max(0, pow(max(0, dot(R, V)), max(1, 1))) * Attenuation;
+            // final fragment color
+            vec3 color = (Ia + Id) + Is;
+
+            gl_FragColor.rgb = gl_FragColor.rgb * clamp(color, 0, 1);
+        }
+    }
 
     gl_FragColor.rgb = applySoftMapBoundsTint(gl_FragColor.rgb, modelCoordinates.xyz);
 }

@@ -31,6 +31,8 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
+#include "Model/EntityNode.h"
+#include "StringUtils.h"
 
 namespace TrenchBroom {
 namespace Renderer {
@@ -40,7 +42,7 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
   const Color &defaultColor;
 
   RenderFunc(ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor) : shader(i_shader), applyTexture(i_applyTexture),
-      defaultColor(i_defaultColor) {
+                                                                                               defaultColor(i_defaultColor) {
   }
 
   void before(const Assets::Texture *texture) override {
@@ -48,8 +50,7 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
           texture->activate();
           shader.set("ApplyTexture", applyTexture);
           shader.set("Color", texture->averageColor());
-      }
-      else {
+      } else {
           shader.set("ApplyTexture", false);
           shader.set("Color", defaultColor);
       }
@@ -67,11 +68,11 @@ FaceRenderer::FaceRenderer() : m_grayscale(false), m_tint(false), m_alpha(1.0f) 
 
 FaceRenderer::FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor)
     : m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor), m_grayscale(false), m_tint(false),
-    m_alpha(1.0f) {
+      m_alpha(1.0f) {
 }
 
 FaceRenderer::FaceRenderer(const FaceRenderer &other) : IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap),
-    m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
+                                                        m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
 }
 
 FaceRenderer &FaceRenderer::operator=(FaceRenderer other) {
@@ -145,6 +146,42 @@ void FaceRenderer::doRender(RenderContext &context) {
 
         glAssert(glEnable(GL_TEXTURE_2D));
         glAssert(glActiveTexture(GL_TEXTURE0));
+//
+//        auto light1 = PointLight();
+//        light1.Position = context.camera().position();
+//        light1.Intensity = vm::vec3f(15000, 15000, 15000);
+
+//        auto light2 = PointLight();
+//        light2.Position = vm::vec3f(-152, -112, 80);
+//        light2.Intensity = vm::vec3f(500,500,5000);
+//
+//        auto light3 = PointLight();
+//        light3.Position = vm::vec3f(-168, 32, 80);
+//        light3.Intensity = vm::vec3f(500,500,5000);
+
+//        lightSources.clear();
+//        lightSources.push_back(light1);
+//        lightSources.push_back(light2);
+//        lightSources.push_back(light3);
+
+//        for (size_t i = 0; i < lightSources.size(); i++) {
+//            std::string _Position_name = stringf("lights[%d].Position", i);
+//            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
+//            std::string _AttenuationConstant_name = stringf("lights[%d].AttenuationConstant", i);
+//            std::string _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
+//            std::string _AttenuationQuadratic_name = stringf("lights[%d].AttenuationQuadratic", i);
+//
+//            shader.set(_Position_name, lightSources[i].Position);
+//            shader.set(_Intensity_name, lightSources[i].Intensity);
+//            shader.set(_AttenuationConstant_name, lightSources[i].AttenuationConstant);
+//            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
+//            shader.set(_AttenuationQuadratic_name, lightSources[i].AttenuationQuadratic);
+//        }
+
+        shader.set("AmbientLight", vm::vec3f(0.1, 0.1, 0.1));
+        shader.set("NumLights", lightSources.size());
+        shader.set("EnableLighting", false);
+        shader.set("CameraPosition", context.camera().position());
         shader.set("Brightness", prefs.get(Preferences::Brightness));
         shader.set("RenderGrid", context.showGrid());
         shader.set("GridSize", static_cast<float>(context.gridSize()));

@@ -21,7 +21,7 @@
 
 #include "Color.h"
 #include "Renderer/Renderable.h"
-
+#include "Model/EditorContext.h"
 #include <vecmath/forward.h>
 #include <vecmath/vec.h>
 
@@ -40,6 +40,15 @@ class BrushVertexArray;
 
 class RenderBatch;
 
+struct PointLight {
+  vm::vec3f Intensity;
+  vm::vec3f Position;
+  float AttenuationConstant = 1.0f;
+  float AttenuationLinear = 0.1f;
+  float AttenuationQuadratic = 0.1f;
+};
+
+
 class FaceRenderer : public IndexedRenderable {
 private:
     struct RenderFunc;
@@ -48,6 +57,7 @@ private:
 
     std::shared_ptr<BrushVertexArray> m_vertexArray;
     std::shared_ptr<TextureToBrushIndicesMap> m_indexArrayMap;
+    std::vector<PointLight> lightSources;
     Color m_faceColor;
     bool m_grayscale;
     bool m_tint;
