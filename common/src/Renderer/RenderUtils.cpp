@@ -46,7 +46,8 @@ vm::vec3f gridColorForTexture(const Assets::Texture *texture) {
         return vm::vec3f::fill(1.0f);
     }
 
-    if ((texture->averageColor().r() + texture->averageColor().g() + texture->averageColor().b()) / 3.0f > 0.50f) {
+    auto peakColor = std::max(std::max(texture->averageColor().r(), texture->averageColor().g()),texture->averageColor().b());
+    if (peakColor > 0.25f) {
         // bright texture grid color
         return vm::vec3f::fill(0.0f);
     }
