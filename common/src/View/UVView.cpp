@@ -109,15 +109,13 @@ void UVView::selectionDidChange(const Selection &) {
     const auto faces = document->selectedBrushFaces();
     if (faces.size() != 1) {
         m_helper.setFaceHandle(std::nullopt);
-    }
-    else {
+    } else {
         m_helper.setFaceHandle(faces.back());
     }
 
     if (m_helper.valid()) {
         m_toolBox.enable();
-    }
-    else {
+    } else {
         m_toolBox.disable();
     }
 
@@ -194,8 +192,7 @@ void UVView::setupGL(Renderer::RenderContext &renderContext) {
 
     if (pref(Preferences::EnableMSAA)) {
         glAssert(glEnable(GL_MULTISAMPLE));
-    }
-    else {
+    } else {
         glAssert(glDisable(GL_MULTISAMPLE));
     }
     glAssert(glEnable(GL_BLEND));
@@ -256,14 +253,17 @@ private:
 
         texture->activate();
 
+        auto gridWidth = m_helper.cameraZoom() * 1.3f;
+
         Renderer::ActiveShader shader(renderContext.shaderManager(), Renderer::Shaders::UVViewShader);
         shader.set("ApplyTexture", true);
         shader.set("Color", texture->averageColor());
         shader.set("Brightness", pref(Preferences::Brightness));
         shader.set("RenderGrid", true);
         shader.set("GridSizes", vm::vec2f(texture->width(), texture->height()));
-        shader.set("GridColor", vm::vec4f(Renderer::gridColorForTexture(texture), 0.6f)); // TODO: make this a preference
+        shader.set("GridColor", vm::vec4f(Renderer::gridColorForTexture(texture), 0.65f)); // TODO: make this a preference
         shader.set("GridScales", scale);
+        shader.set("GridWidth", gridWidth);
         shader.set("GridMatrix", vm::mat4x4f(toTex));
         shader.set("GridDivider", vm::vec2f(m_helper.subDivisions()));
         shader.set("CameraZoom", m_helper.cameraZoom());
@@ -295,11 +295,12 @@ void UVView::renderFace(Renderer::RenderContext &, Renderer::RenderBatch &render
     for (const auto *vertex: faceVertices) {
         edgeVertices.push_back(Vertex(vm::vec3f(vertex->position())));
     }
-
-    const Color edgeColor(1.0f, 1.0f, 1.0f, 1.0f); // TODO: make this a preference
+    auto gridWidth = m_helper.cameraZoom() * 10.0f;
+    const Color edgeColor = pref(Preferences::SelectedEdgeColor);
+    const float edgeLineWidth = pref(Preferences::EdgeSelectedLineWidth)*gridWidth;
 
     Renderer::DirectEdgeRenderer edgeRenderer(Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop);
-    edgeRenderer.renderOnTop(renderBatch, edgeColor, 2.5f);
+    edgeRenderer.renderOnTop(renderBatch, edgeColor, edgeLineWidth);
 }
 
 void UVView::renderTextureAxes(Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
