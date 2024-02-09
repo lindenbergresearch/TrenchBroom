@@ -96,7 +96,6 @@ MapView3D::MapView3D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBo
 MapView3D::~MapView3D() = default;
 
 void MapView3D::initializeCamera() {
-    //TODO: set camera to player start entity OR save camera state
     m_camera->moveTo(vm::vec3f(-180.0f, -128.0f, 196.0f));
     m_camera->lookAt(vm::vec3f::zero(), vm::vec3f::pos_z());
 }
@@ -124,6 +123,10 @@ void MapView3D::connectObservers() {
 
     PreferenceManager &prefs = PreferenceManager::instance();
     m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &MapView3D::preferenceDidChange);
+
+    auto document = kdl::mem_lock(m_document);
+    m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &MapView3D::documentWasLoaded);
+    m_notifierConnection += document->documentWasSavedNotifier.connect(this, &MapView3D::documentWasSaved);
 }
 
 void MapView3D::cameraDidChange(const Renderer::Camera * /* camera */) {
@@ -131,6 +134,47 @@ void MapView3D::cameraDidChange(const Renderer::Camera * /* camera */) {
         // Don't refresh if the camera was changed in doPreRender!
         update();
     }
+}
+
+void MapView3D::saveCameraState(MapDocument *document) {
+    auto mapNamePos = std::filesystem::path{"Map/"} / document->path().filename() / "Camera" / "Position";
+    auto mapNameDir = std::filesystem::path{"Map/"} / document->path().filename() / "Camera" / "Direction";
+    auto mapUp = std::filesystem::path{"Map/"} / document->path().filename() / "Camera" / "Up";
+
+    auto &prefs = PreferenceManager::instance();
+    auto &prefPos = prefs.dynamicPreference(mapNamePos, vm::vec3f{0, 0, 0});
+    auto &prefDir = prefs.dynamicPreference(mapNameDir, vm::vec3f{0, 0, 0});
+    auto &prefUp = prefs.dynamicPreference(mapUp, vm::vec3f{0, 0, 0});
+
+    PreferenceManager::instance().set(prefPos, camera().position());
+    PreferenceManager::instance().set(prefDir, camera().direction());
+    PreferenceManager::instance().set(prefUp, camera().up());
+}
+
+void MapView3D::loadCameraState(MapDocument *document) {
+    auto mapNamePos = std::filesystem::path{"Map/"} / document->path().filename() / "Camera" / "Position";
+    auto mapNameDir = std::filesystem::path{"Map/"} / document->path().filename() / "Camera" / "Direction";
+    auto mapNameUp = std::filesystem::path{"Map/"} / document->path().filename() / "Camera" / "Up";
+
+    auto &prefs = PreferenceManager::instance();
+    auto &prefPos = prefs.dynamicPreference(mapNamePos, vm::vec3f(-180.0f, -128.0f, 196.0f));
+    auto &prefDir = prefs.dynamicPreference(mapNameDir, vm::vec3f::pos_x());
+    auto &prefUp = prefs.dynamicPreference(mapNameUp, vm::vec3f::pos_z());
+
+    vm::vec3f cameraPos = PreferenceManager::instance().get(prefPos);
+    vm::vec3f cameraDir = PreferenceManager::instance().get(prefDir);
+    vm::vec3f cameraUp = PreferenceManager::instance().get(prefUp);
+
+    camera().moveTo(cameraPos);
+    camera().setDirection(cameraDir, cameraUp);
+}
+
+void MapView3D::documentWasSaved(MapDocument *document) {
+    saveCameraState(document);
+}
+
+void MapView3D::documentWasLoaded(MapDocument *document) {
+    loadCameraState(document);
 }
 
 void MapView3D::preferenceDidChange(const std::filesystem::path &path) {
