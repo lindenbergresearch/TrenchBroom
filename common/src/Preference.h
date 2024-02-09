@@ -25,6 +25,7 @@
 
 #include "Macros.h"
 #include "View/KeyboardShortcut.h"
+#include "vecmath/forward.h"
 
 #include <filesystem>
 #include <optional>
@@ -49,6 +50,8 @@ public:
 
     bool readFromJson(const QJsonValue &in, Color &out) const;
 
+    bool readFromJson(const QJsonValue &in, vm::vec3f &out) const;
+
     bool readFromJson(const QJsonValue &in, float &out) const;
 
     bool readFromJson(const QJsonValue &in, int &out) const;
@@ -62,6 +65,8 @@ public:
     QJsonValue writeToJson(bool in) const;
 
     QJsonValue writeToJson(const Color &in) const;
+
+    QJsonValue writeToJson(const vm::vec3f &in) const;
 
     QJsonValue writeToJson(float in) const;
 

@@ -22,9 +22,11 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QKeySequence>
+#include <sstream>
 
 #include "Color.h"
 #include "IO/PathQt.h"
+#include "vecmath/forward.h"
 
 namespace TrenchBroom {
 // PreferenceSerializer
@@ -48,6 +50,23 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, Color &out) const 
     }
 
     return false;
+}
+
+bool PreferenceSerializer::readFromJson(const QJsonValue &in, vm::vec3f &out) const {
+    if (!in.isString()) {
+        return false;
+    }
+
+    std::stringstream iss(in.toString().toStdString());
+    float number;
+    std::vector<float> myNumbers;
+
+    while (iss >> number)
+        myNumbers.push_back(number);
+
+    out = vm::vec3f(myNumbers[0], myNumbers[1], myNumbers[2]);
+
+    return true;
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, float &out) const {
@@ -115,6 +134,13 @@ QJsonValue toJson(const T &in) {
 QJsonValue PreferenceSerializer::writeToJson(const Color &in) const {
     return toJson(in, [](QTextStream &lhs, const Color &rhs) {
           lhs << rhs.r() << " " << rhs.g() << " " << rhs.b() << " " << rhs.a();
+        }
+    );
+}
+
+QJsonValue PreferenceSerializer::writeToJson(const vm::vec3f &in) const {
+    return toJson(in, [](QTextStream &lhs, const vm::vec3f &rhs) {
+          lhs << rhs.x() << " " << rhs.y() << " " << rhs.z();
         }
     );
 }
