@@ -64,7 +64,16 @@ private: // notification
 
     void cameraDidChange(const Renderer::Camera *camera);
 
+    void saveCameraState(MapDocument *document);
+
+    void loadCameraState(MapDocument *document);
+
+
     void preferenceDidChange(const std::filesystem::path &path);
+
+    void documentWasLoaded(MapDocument *);
+
+    void documentWasSaved(MapDocument *);
 
 protected: // QWidget overrides
     void keyPressEvent(QKeyEvent *event) override;
