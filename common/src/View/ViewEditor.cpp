@@ -37,6 +37,7 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "View/BorderPanel.h"
+#include "View/BorderLine.h"
 #include "View/MapDocument.h"
 #include "View/PopupButton.h"
 #include "View/QtUtils.h"
@@ -80,8 +81,7 @@ void EntityDefinitionCheckBoxList::refresh() {
             else
                 m_groupCheckBoxes[i]->setChecked(!firstHidden);
             m_groupCheckBoxes[i]->setEnabled(true);
-        }
-        else {
+        } else {
             m_groupCheckBoxes[i]->setChecked(true);
             m_groupCheckBoxes[i]->setEnabled(false);
         }
@@ -210,6 +210,7 @@ void EntityDefinitionCheckBoxList::createGui() {
     outerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->setSpacing(LayoutConstants::MediumVMargin);
     outerLayout->addWidget(scrollArea, 1);
+    outerLayout->addWidget(new BorderLine);
     outerLayout->addLayout(buttonLayout);
     setLayout(outerLayout);
 }
@@ -217,9 +218,9 @@ void EntityDefinitionCheckBoxList::createGui() {
 // ViewEditor
 
 ViewEditor::ViewEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(std::move(document)),
-    m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr), m_showBrushEntityBoundsCheckBox(nullptr),
-    m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr), m_showPointEntityModelsCheckBox(nullptr),
-    m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr), m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr),
+                                                                               m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr), m_showBrushEntityBoundsCheckBox(nullptr),
+                                                                               m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr), m_showPointEntityModelsCheckBox(nullptr),
+                                                                               m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr), m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr),
                                                                                m_showEdgesCheckBox(nullptr),
                                                                                m_showFogCheckBox(nullptr),
                                                                                m_entityLinkRadioGroup(nullptr),
@@ -265,6 +266,16 @@ void ViewEditor::bindEvents() {
     connect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
     connect(m_shadeAmount, &SliderWithLabel::valueChanged, this, &ViewEditor::shadeLevelChanged);
     connect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::brightnessChanged);
+
+    connect(m_selectionBoundsShowObjectBounds, &QAbstractButton::clicked, this, &ViewEditor::showObjectBoundsChanged);
+    connect(m_selectionBoundsIntersectionMode, &QAbstractButton::clicked, this, &ViewEditor::showIntersectionModeChanged);
+    connect(m_selectionBoundsAlwaysShowOnSelected,&QAbstractButton::clicked, this, &ViewEditor::showAlwaysShowBoundsChanged);
+    connect(m_selectionBoundsUseDashedBounds, &QAbstractButton::clicked, this, &ViewEditor::dashedBoundsChanged);
+
+    connect(m_selectionBoundsWidth, &SliderWithLabel::valueChanged, this, &ViewEditor::selectionBoundsLineWithChanged);
+    connect(m_selectionBoundsDashSize, &SliderWithLabel::valueChanged, this, &ViewEditor::dashSizeChanged);
+    connect(m_selectionBoundsIntersectionSize, &SliderWithLabel::valueChanged, this, &ViewEditor::intersectionMarkerSizeChanged);
+
     connect(m_renderModeRadioGroup,
         static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this,
@@ -306,6 +317,16 @@ void ViewEditor::unBindEvents() {
     disconnect(m_showEdgesCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showEdgesChanged);
     disconnect(m_shadeAmount, &SliderWithLabel::valueChanged, this, &ViewEditor::shadeLevelChanged);
     disconnect(m_brightnessSlider, &SliderWithLabel::valueChanged, this, &ViewEditor::brightnessChanged);
+
+    disconnect(m_selectionBoundsShowObjectBounds, &QAbstractButton::clicked, this, &ViewEditor::showObjectBoundsChanged);
+    disconnect(m_selectionBoundsIntersectionMode, &QAbstractButton::clicked, this, &ViewEditor::showIntersectionModeChanged);
+    disconnect(m_selectionBoundsAlwaysShowOnSelected,&QAbstractButton::clicked, this, &ViewEditor::showAlwaysShowBoundsChanged);
+    disconnect(m_selectionBoundsUseDashedBounds, &QAbstractButton::clicked, this, &ViewEditor::dashedBoundsChanged);
+
+    disconnect(m_selectionBoundsWidth, &SliderWithLabel::valueChanged, this, &ViewEditor::selectionBoundsLineWithChanged);
+    disconnect(m_selectionBoundsDashSize, &SliderWithLabel::valueChanged, this, &ViewEditor::dashSizeChanged);
+    disconnect(m_selectionBoundsIntersectionSize, &SliderWithLabel::valueChanged, this, &ViewEditor::intersectionMarkerSizeChanged);
+    
     disconnect(m_renderModeRadioGroup,
         static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
         this,
@@ -334,7 +355,7 @@ void ViewEditor::entityDefinitionsDidChange() {
 void ViewEditor::preferenceDidChange(const std::filesystem::path &) {
     // remove to avoid double loading
     // no refresh on external preferences change (who needs?)
-    // refreshGui();
+     refreshGui();
 }
 
 void ViewEditor::createGui() {
@@ -355,6 +376,7 @@ void ViewEditor::createGui() {
     sizer->addWidget(createBrushesPanel(this), 1, 1);
     sizer->addWidget(createRendererPanel(this), 2, 1);
     sizer->addWidget(createFogPanel(this), 0, 2, 3, 1);
+    sizer->addWidget(createSelectionBoundsPanel(this), 2, 2, 3, 1);
 
     setLayout(sizer);
 }
@@ -375,6 +397,7 @@ QWidget *ViewEditor::createEntityDefinitionsPanel(QWidget *parent) {
         LayoutConstants::NoMargin,
         LayoutConstants::NoMargin
     );
+
     m_entityDefinitionCheckBoxList->setContentsMargins(
         LayoutConstants::NoMargin,
         LayoutConstants::NoMargin,
@@ -410,6 +433,7 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
         LayoutConstants::NarrowHMargin,
         LayoutConstants::NarrowHMargin
     );
+
     layout->setSpacing(0);
     layout->addWidget(m_showEntityClassnamesCheckBox);
     layout->addWidget(m_showGroupBoundsCheckBox);
@@ -420,6 +444,59 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     panel->getPanel()->setLayout(layout);
+    return panel;
+}
+
+QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
+    TitledPanel *panel = new TitledPanel("Selection Bounds", parent, false);
+    panel->setMinimumWidth(250);
+
+    auto *layout = new QVBoxLayout();
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
+
+    layout->setSpacing(0);
+
+    m_selectionBoundsAlwaysShowOnSelected = new QCheckBox(tr("Always show selection bounds"));
+    m_selectionBoundsAlwaysShowOnSelected->setToolTip(tr("Always show the selected objects selection bounds (else only show on mouse-over)."));
+
+    m_selectionBoundsIntersectionMode = new QCheckBox(tr("Show only intersections"));
+    m_selectionBoundsIntersectionMode->setToolTip(tr("Only show helper lines if they hit an object."));
+
+    m_selectionBoundsUseDashedBounds = new QCheckBox(tr("Use dashed bounds"));
+    m_selectionBoundsUseDashedBounds->setToolTip(tr("Use dashed bounds to better distinguish from normal edges."));
+
+    m_selectionBoundsShowObjectBounds = new QCheckBox(tr("Show object bounds"));
+    m_selectionBoundsShowObjectBounds->setToolTip(tr("Show the objects bounding box."));
+
+    layout->addWidget(m_selectionBoundsAlwaysShowOnSelected);
+    layout->addWidget(m_selectionBoundsIntersectionMode);
+    layout->addWidget(m_selectionBoundsUseDashedBounds);
+    layout->addWidget(m_selectionBoundsShowObjectBounds);
+
+    m_selectionBoundsDashSize = new SliderWithLabel(2, 10, 0.0f, "%dpx", 220, 15, this);
+    m_selectionBoundsIntersectionSize = new SliderWithLabel(2, 20, 0.0f, "%dpx", 220, 15, this);
+    m_selectionBoundsWidth = new SliderWithLabel(10, 300, 10e-3f, "%.1f px", 220, 15, this);
+
+    layout->addWidget(new QLabel{"Dash size"});
+    layout->addWidget(m_selectionBoundsDashSize);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{"Intersection marker size"});
+    layout->addWidget(m_selectionBoundsIntersectionSize);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{"Selection bounds line-with"});
+    layout->addWidget(m_selectionBoundsWidth);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    panel->getPanel()->setLayout(layout);
+
     return panel;
 }
 
@@ -463,8 +540,6 @@ QWidget *ViewEditor::createFogPanel(QWidget *parent) {
     layout->addWidget(m_fogBiasSlider);
     layout->addSpacing(LayoutConstants::WideVMargin);
 
-    layout->addWidget(m_showAlternateFogCheckBox);
-
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     panel->getPanel()->setLayout(layout);
 
@@ -493,8 +568,7 @@ void ViewEditor::createTagFilter(QWidget *parent) {
 
     if (tags.empty()) {
         createEmptyTagFilter(parent);
-    }
-    else {
+    } else {
         createTagFilter(parent, tags);
     }
 }
@@ -545,7 +619,7 @@ void ViewEditor::createTagFilter(QWidget *parent, const std::vector<Model::Smart
 
 QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Renderer", parent, false);
-    QWidget *inner = panel->getPanel();
+    QWidget * inner = panel->getPanel();
 
     const QList<QString> FaceRenderModes = {
         "Show textures",
@@ -635,7 +709,8 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     layout->addWidget(m_showSoftBoundsCheckBox);
-    layout->addSpacing(LayoutConstants::MediumVMargin);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addWidget(new BorderLine);
     layout->addWidget(restoreDefualtsButton, 0, Qt::AlignHCenter);
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
@@ -650,6 +725,8 @@ void ViewEditor::refreshGui() {
     refreshEntitiesPanel();
     refreshBrushesPanel();
     refreshRendererPanel();
+    refreshFogPanel();
+    refreshSelectionBoundsPanel();
 
     bindEvents();
 }
@@ -685,11 +762,19 @@ void ViewEditor::refreshBrushesPanel() {
 void ViewEditor::refreshRendererPanel() {
     checkButtonInGroup(m_renderModeRadioGroup, pref(Preferences::FaceRenderMode), true);
     m_shadeFacesCheckBox->setChecked(pref(Preferences::ShadeFaces));
-    m_showFogCheckBox->setChecked(pref(Preferences::ShowFog));
     m_showEdgesCheckBox->setChecked(pref(Preferences::ShowEdges));
     checkButtonInGroup(m_entityLinkRadioGroup, pref(Preferences::EntityLinkMode), true);
     m_showSoftBoundsCheckBox->setChecked(pref(Preferences::ShowSoftMapBounds));
 
+    auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
+    m_shadeAmount->setValue(static_cast<int>(shadeAmount));
+
+    auto brightness = int(vm::round(100.0f * (pref(Preferences::Brightness) - 1.0f)));
+    m_brightnessSlider->setValue(brightness);
+}
+
+void ViewEditor::refreshFogPanel() {
+    m_showFogCheckBox->setChecked(pref(Preferences::ShowFog));
     m_showAlternateFogCheckBox->setChecked(pref(Preferences::FogType) == 1);
 
     auto minDist = pref(Preferences::FogMinDistance);
@@ -703,12 +788,22 @@ void ViewEditor::refreshRendererPanel() {
 
     auto bias = pref(Preferences::FogBias) * 100;
     m_fogBiasSlider->setValue(static_cast<int>(bias));
+}
 
-    auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
-    m_shadeAmount->setValue(static_cast<int>(shadeAmount));
 
-    auto brightness = int(vm::round(100.0f * (pref(Preferences::Brightness) - 1.0f)));
-    m_brightnessSlider->setValue(brightness);
+void ViewEditor::refreshSelectionBoundsPanel() {
+    m_selectionBoundsShowObjectBounds->setChecked(pref(Preferences::ShowObjectBoundsSelectionBounds));
+    m_selectionBoundsIntersectionMode->setChecked(pref(Preferences::SelectionBoundsIntersectionMode));
+    m_selectionBoundsUseDashedBounds->setChecked(pref(Preferences::SelectionBoundsDashedLines));
+    m_selectionBoundsAlwaysShowOnSelected->setChecked(pref(Preferences::AlwaysShowSelectionBounds));
+
+    auto dashSize = pref(Preferences::SelectionBoundsDashedSize);
+    m_selectionBoundsDashSize->setValue(static_cast<int>(dashSize));
+
+    auto intersectionSize = pref(Preferences::SelectionBoundsPointSize);
+    m_selectionBoundsIntersectionSize->setValue(static_cast<int>(intersectionSize));
+
+    m_selectionBoundsWidth->setValue(int(pref(Preferences::SelectionBoundsLineWidth) * 100));;
 }
 
 void ViewEditor::showEntityClassnamesChanged(const bool checked) {
@@ -747,8 +842,7 @@ void ViewEditor::showTagChanged(const bool checked, const Model::TagType::Type t
     if (checked) {
         // Unhide tagType
         hiddenTags &= ~tagType;
-    }
-    else {
+    } else {
         // Hide tagType
         hiddenTags |= tagType;
     }
@@ -863,6 +957,38 @@ void ViewEditor::brightnessChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::Brightness, (float(value) / 100.0f) + 1.0f);
 }
+
+void ViewEditor::dashedBoundsChanged(bool checked) {
+    setPref(Preferences::SelectionBoundsDashedLines, checked);
+}
+
+void ViewEditor::showObjectBoundsChanged(bool checked) {
+    setPref(Preferences::ShowObjectBoundsSelectionBounds, checked);
+}
+
+void ViewEditor::showAlwaysShowBoundsChanged(bool checked) {
+    setPref(Preferences::AlwaysShowSelectionBounds, checked);
+}
+
+void ViewEditor::showIntersectionModeChanged(bool checked) {
+    setPref(Preferences::SelectionBoundsIntersectionMode, checked);
+}
+
+void ViewEditor::intersectionMarkerSizeChanged(int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::SelectionBoundsPointSize, float(value));
+}
+
+void ViewEditor::dashSizeChanged(int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::SelectionBoundsDashedSize, value);
+}
+
+void ViewEditor::selectionBoundsLineWithChanged(int value) {
+    auto &prefs = PreferenceManager::instance();
+    prefs.set(Preferences::SelectionBoundsLineWidth, float(value) / 100.0f);
+}
+
 
 ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_button(nullptr), m_editor(nullptr) {
     m_button = new PopupButton(tr("View Settings"));

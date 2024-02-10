@@ -117,9 +117,16 @@ private:
     SliderWithLabel *m_fogMinDistanceSlider;
     SliderWithLabel *m_fogBiasSlider;
 
+    QCheckBox *m_selectionBoundsUseDashedBounds;
+    QCheckBox *m_selectionBoundsAlwaysShowOnSelected;
+    QCheckBox *m_selectionBoundsIntersectionMode;
+    QCheckBox *m_selectionBoundsShowObjectBounds;
+    SliderWithLabel *m_selectionBoundsDashSize;
+    SliderWithLabel *m_selectionBoundsWidth;
+    SliderWithLabel *m_selectionBoundsIntersectionSize;
+
     SliderWithLabel *m_shadeAmount;
     SliderWithLabel *m_brightnessSlider;
-
 
     QButtonGroup *m_entityLinkRadioGroup;
 
@@ -155,6 +162,8 @@ private:
 
     QWidget *createFogPanel(QWidget *parent);
 
+    QWidget *createSelectionBoundsPanel(QWidget *parent);
+
     void createTagFilter(QWidget *parent);
 
     void createEmptyTagFilter(QWidget *parent);
@@ -172,6 +181,10 @@ private:
     void refreshBrushesPanel();
 
     void refreshRendererPanel();
+
+    void refreshFogPanel();
+
+    void refreshSelectionBoundsPanel();
 
     void showEntityClassnamesChanged(bool checked);
 
@@ -208,6 +221,15 @@ private:
     void shadeLevelChanged(int value);
 
     void showFogChanged(bool checked);
+
+    void dashedBoundsChanged(bool checked);
+    void showObjectBoundsChanged(bool checked);
+    void showAlwaysShowBoundsChanged(bool checked);
+    void showIntersectionModeChanged(bool checked);
+
+    void dashSizeChanged(int value);
+    void selectionBoundsLineWithChanged(int value);
+    void intersectionMarkerSizeChanged(int value);
 
     void showEdgesChanged(bool checked);
 
