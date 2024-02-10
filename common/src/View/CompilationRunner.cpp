@@ -66,7 +66,7 @@ std::string CompilationTaskRunner::interpolate(const std::string &spec) {
         return m_context.interpolate(spec);
     } catch (const Exception &e) {
         m_context.pushSystemMessage(
-            "==> Could not interpolate expression '" + QString::fromStdString(spec) + "': " + e.what() + "\n",QColor{"#ff3824"}
+            "==> Could not interpolate expression '" + QString::fromStdString(spec) + "': " + e.what() + "\n", QColor{"#ff3824"}
         );
         throw;
     }
@@ -94,7 +94,7 @@ void CompilationExportMapTaskRunner::doExecute() {
             }
         ).transform([&]() { emit end(); }).transform_error([&](auto e) {
               m_context.pushSystemMessage("==> Could not export map file '" + IO::pathAsQString(targetPath) + "': " +
-                                          QString::fromStdString(e.msg) + "\n",QColor{"#ff3824"}
+                                          QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"}
               );
               emit error();
             }
@@ -146,7 +146,7 @@ void CompilationCopyFilesTaskRunner::doExecute() {
     ).transform([&]() { emit end(); }).transform_error([&](auto e) {
           m_context.pushSystemMessage(
               "==> Could not copy '" + IO::pathAsQString(sourcePath) + "' to '" + IO::pathAsQString(targetPath) + "': "
-              + QString::fromStdString(e.msg) + "\n",QColor{"#ff3824"}
+              + QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"}
           );
           emit error();
         }
@@ -182,7 +182,7 @@ void CompilationRenameFileTaskRunner::doExecute() {
               m_context.pushSystemMessage(
                   "==> Could not rename '" + IO::pathAsQString(sourcePath) + "' to '" + IO::pathAsQString(targetPath) +
                   "': "
-                  + QString::fromStdString(e.msg) + "\n",QColor{"#ff3824"}
+                  + QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"}
               );
               emit error();
             }
@@ -227,7 +227,7 @@ void CompilationDeleteFilesTaskRunner::doExecute() {
         }
     ).transform([&](auto) { emit end(); }).transform_error([&](auto e) {
           m_context.pushSystemMessage(
-              "==> Could not delete '" + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n",QColor{"#ff3824"}
+              "==> Could not delete '" + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"}
           );
           emit error();
         }
@@ -238,7 +238,7 @@ void CompilationDeleteFilesTaskRunner::doTerminate() {}
 
 CompilationRunToolTaskRunner::CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task)
     : CompilationTaskRunner{context},
-    m_task{std::move(task)} {
+      m_task{std::move(task)} {
 }
 
 CompilationRunToolTaskRunner::~CompilationRunToolTaskRunner() = default;
@@ -266,7 +266,7 @@ void CompilationRunToolTaskRunner::startProcess() {
         const auto workDir = m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH);
         const auto cmd = this->cmd();
 
-        m_context.pushSystemMessage("==> Executing '" + QString::fromStdString(cmd) + "'\n",QColor{"#0eceef"});
+        m_context.pushSystemMessage("==> Executing: " + QString::fromStdString(cmd) + "\n", QColor{"#0eceef"});
 
         if (!m_context.test()) {
             m_process = new QProcess{this};
@@ -318,19 +318,31 @@ void CompilationRunToolTaskRunner::processErrorOccurred(const QProcess::ProcessE
 void CompilationRunToolTaskRunner::processFinished(const int exitCode, const QProcess::ExitStatus exitStatus) {
     switch (exitStatus) {
         case QProcess::NormalExit:
-            m_context.pushSystemMessage(
-                "==> Successfully finished with exit code: " + QString::fromStdString(std::to_string(exitCode)) + "\n\n",
-                QColor{"#00FF00"}
-            );
-            if (exitCode == 0 || !m_task.treatNonZeroResultCodeAsError) {
+            if (exitCode == 0) {
+                m_context.pushSystemMessage(
+                    "==> Successfully finished execution. \n\n",
+                    QColor{"#00FF00"}
+                );
                 emit end();
             } else {
-                emit error();
+                m_context.pushSystemMessage(
+                    "==> Finished execution with exit code: " + QString::fromStdString(std::to_string(exitCode)) + "!\n",
+                    QColor{"#CCCD00"}
+                );
+                if (m_task.treatNonZeroResultCodeAsError) {
+                    m_context.pushSystemMessage(
+                        "==> Aborting execution due to errors!\n\n",
+                        QColor{"#ff3824"}
+                    );
+                    emit error();
+                } else {
+                    emit end();
+                }
             }
             break;
         case QProcess::CrashExit:
             m_context.pushSystemMessage(
-                "==> Crashed with exit code " + QString::fromStdString(std::to_string(exitCode)) + "\n\n",
+                "==> Crashed with exit code: " + QString::fromStdString(std::to_string(exitCode)) + "\n\n",
                 QColor{"#ff3824"}
             );
             emit error();
@@ -409,9 +421,9 @@ void CompilationRunner::execute() {
 
     const auto workDir = QString::fromStdString(m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH));
     if (!QDir{workDir}.exists()) {
-        m_context.pushSystemMessage("==> Error: working directory '" + workDir + "' does not exist\n",QColor{"#ff3824"});
+        m_context.pushSystemMessage("==> Error: working directory '" + workDir + "' does not exist\n", QColor{"#ff3824"});
     } else {
-        m_context.pushSystemMessage("==> Using working directory '" + workDir + "'\n",QColor{"#f0ff26"});
+        m_context.pushSystemMessage("==> Using working directory '" + workDir + "'\n", QColor{"#f0ff26"});
     }
     m_currentTask->get()->execute();
 }
