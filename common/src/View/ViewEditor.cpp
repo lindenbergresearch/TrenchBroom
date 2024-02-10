@@ -172,13 +172,15 @@ void EntityDefinitionCheckBoxList::createGui() {
         }
     }
 
-    scrollWidgetLayout->addSpacing(1);
+    scrollWidgetLayout->addSpacing(0);
 
     auto *scrollWidget = new QWidget();
-    scrollWidget->setContentsMargins(LayoutConstants::NarrowHMargin,
+    scrollWidget->setContentsMargins(
         LayoutConstants::NarrowHMargin,
         LayoutConstants::NarrowHMargin,
-        LayoutConstants::NarrowHMargin);
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     scrollWidget->setLayout(scrollWidgetLayout);
 
     auto *scrollArea = new QScrollArea();
@@ -199,7 +201,12 @@ void EntityDefinitionCheckBoxList::createGui() {
     connect(hideAllButton, &QAbstractButton::clicked, this, &EntityDefinitionCheckBoxList::hideAllClicked);
 
     auto *buttonLayout = new QHBoxLayout();
-    buttonLayout->setContentsMargins(0, 0, 0, 0);
+    buttonLayout->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
     buttonLayout->setSpacing(LayoutConstants::NarrowHMargin);
     buttonLayout->addStretch(1);
     buttonLayout->addWidget(showAllButton);
@@ -208,7 +215,7 @@ void EntityDefinitionCheckBoxList::createGui() {
 
     auto *outerLayout = new QVBoxLayout();
     outerLayout->setContentsMargins(0, 0, 0, 0);
-    outerLayout->setSpacing(LayoutConstants::MediumVMargin);
+    outerLayout->setSpacing(LayoutConstants::NarrowHMargin);
     outerLayout->addWidget(scrollArea, 1);
     outerLayout->addWidget(new BorderLine);
     outerLayout->addLayout(buttonLayout);
@@ -375,8 +382,8 @@ void ViewEditor::createGui() {
     sizer->addWidget(createEntitiesPanel(this), 0, 1);
     sizer->addWidget(createBrushesPanel(this), 1, 1);
     sizer->addWidget(createRendererPanel(this), 2, 1);
-    sizer->addWidget(createFogPanel(this), 0, 2, 3, 1);
-    sizer->addWidget(createSelectionBoundsPanel(this), 2, 2, 3, 1);
+    sizer->addWidget(createFogPanel(this), 0, 2 );
+    sizer->addWidget(createSelectionBoundsPanel(this), 2, 2);
 
     setLayout(sizer);
 }
@@ -450,6 +457,7 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
 QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Selection Bounds", parent, false);
     panel->setMinimumWidth(250);
+    panel->setMinimumHeight(350);
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(
@@ -460,6 +468,18 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
     );
 
     layout->setSpacing(0);
+
+    auto *restoreDefaultButton = new QPushButton(tr("Restore Defaults"));
+    restoreDefaultButton->setContentsMargins(
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin,
+        LayoutConstants::NarrowHMargin
+    );
+    restoreDefaultButton->setObjectName("ViewEditor_smallPushButton");
+    makeSmall(restoreDefaultButton);
+
+    connect(restoreDefaultButton, &QAbstractButton::clicked, this, &ViewEditor::restoreDefaultsClicked);
 
     m_selectionBoundsAlwaysShowOnSelected = new QCheckBox(tr("Always show selection bounds"));
     m_selectionBoundsAlwaysShowOnSelected->setToolTip(tr("Always show the selected objects selection bounds (else only show on mouse-over)."));
@@ -472,11 +492,12 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
 
     m_selectionBoundsShowObjectBounds = new QCheckBox(tr("Show object bounds"));
     m_selectionBoundsShowObjectBounds->setToolTip(tr("Show the objects bounding box."));
-
     layout->addWidget(m_selectionBoundsAlwaysShowOnSelected);
     layout->addWidget(m_selectionBoundsIntersectionMode);
     layout->addWidget(m_selectionBoundsUseDashedBounds);
     layout->addWidget(m_selectionBoundsShowObjectBounds);
+
+    layout->addSpacing(LayoutConstants::WideVMargin);
 
     m_selectionBoundsDashSize = new SliderWithLabel(2, 10, 0.0f, "%dpx", 220, 15, this);
     m_selectionBoundsIntersectionSize = new SliderWithLabel(2, 20, 0.0f, "%dpx", 220, 15, this);
@@ -492,11 +513,13 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
 
     layout->addWidget(new QLabel{"Selection bounds line-with"});
     layout->addWidget(m_selectionBoundsWidth);
-    layout->addSpacing(LayoutConstants::WideVMargin);
 
+    layout->addStretch(3);
+    layout->addWidget(new BorderLine);
+    layout->addWidget(restoreDefaultButton, 1, Qt::AlignHCenter | Qt::AlignBottom);
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    panel->getPanel()->setLayout(layout);
 
+    panel->getPanel()->setLayout(layout);
     return panel;
 }
 
@@ -505,7 +528,6 @@ QWidget *ViewEditor::createFogPanel(QWidget *parent) {
     panel->setMinimumWidth(250);
 
     m_showFogCheckBox = new QCheckBox(tr("Enable fog"));
-
     m_showAlternateFogCheckBox = new QCheckBox(tr("Alternate Fog Algorithm"));
 
     m_fogMaxAmountSlider = new SliderWithLabel(1, 100, 0.0f, "%d%", 220, 15, this);
@@ -520,25 +542,26 @@ QWidget *ViewEditor::createFogPanel(QWidget *parent) {
         LayoutConstants::NarrowHMargin,
         LayoutConstants::NarrowHMargin
     );
+
     layout->setSpacing(0);
     layout->addWidget(m_showFogCheckBox);
-    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addSpacing(LayoutConstants::MediumVMargin);
 
     layout->addWidget(new QLabel{"Maximum amount"});
     layout->addWidget(m_fogMaxAmountSlider);
-    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addSpacing(LayoutConstants::MediumVMargin);
 
     layout->addWidget(new QLabel{"Minimum distance"});
     layout->addWidget(m_fogMinDistanceSlider);
-    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addSpacing(LayoutConstants::MediumVMargin);
 
     layout->addWidget(new QLabel{"Scale"});
     layout->addWidget(m_fogScaleSlider);
-    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addSpacing(LayoutConstants::MediumVMargin);
 
     layout->addWidget(new QLabel{"Bias"});
     layout->addWidget(m_fogBiasSlider);
-    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addSpacing(LayoutConstants::MediumVMargin);
 
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     panel->getPanel()->setLayout(layout);
@@ -620,6 +643,7 @@ void ViewEditor::createTagFilter(QWidget *parent, const std::vector<Model::Smart
 QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Renderer", parent, false);
     QWidget * inner = panel->getPanel();
+    panel->setMinimumHeight(350);
 
     const QList<QString> FaceRenderModes = {
         "Show textures",
@@ -672,15 +696,6 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
 
     m_showSoftBoundsCheckBox = new QCheckBox(tr("Show soft bounds"));
 
-    auto *restoreDefualtsButton = new QPushButton(tr("Restore Defaults"));
-    restoreDefualtsButton->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin,
-        LayoutConstants::NarrowHMargin
-    );
-    restoreDefualtsButton->setObjectName("ViewEditor_smallPushButton");
-    makeSmall(restoreDefualtsButton);
-
-    connect(restoreDefualtsButton, &QAbstractButton::clicked, this, &ViewEditor::restoreDefaultsClicked);
-
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(
         LayoutConstants::NarrowHMargin,
@@ -701,7 +716,6 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
 
     layout->addWidget(new QLabel{"Shade amount"});
     layout->addWidget(m_shadeAmount);
-
     layout->addWidget(m_showEdgesCheckBox);
 
     for (auto *button: m_entityLinkRadioGroup->buttons()) {
@@ -709,9 +723,9 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     layout->addWidget(m_showSoftBoundsCheckBox);
-    layout->addSpacing(LayoutConstants::WideVMargin);
+    layout->addSpacing(LayoutConstants::MediumVMargin);
+    layout->addSpacing(1);
     layout->addWidget(new BorderLine);
-    layout->addWidget(restoreDefualtsButton, 0, Qt::AlignHCenter);
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     inner->setLayout(layout);
@@ -988,7 +1002,6 @@ void ViewEditor::selectionBoundsLineWithChanged(int value) {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::SelectionBoundsLineWidth, float(value) / 100.0f);
 }
-
 
 ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_button(nullptr), m_editor(nullptr) {
     m_button = new PopupButton(tr("View Settings"));
