@@ -92,6 +92,8 @@ float Color::a() const {
     return w();
 }
 
+
+
 void Color::rgbToHSB(const float r, const float g, const float b, float &h, float &s, float &br) {
     assert(r >= 0.0f && r <= 1.0f);
     assert(g >= 0.0f && g <= 1.0f);

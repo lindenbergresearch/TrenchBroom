@@ -55,6 +55,22 @@ public:
 
     float a() const;
 
+    Color &darker(const float n = 0.25f) {
+        const auto factor = 1.0f - n;
+        for (size_t i = 0; i < 3; i++) {
+            v[i] = v[i] * factor;
+        }
+        return *this;
+    }
+
+    Color &brighter(const float n = 0.25f) {
+        const auto factor = 1.0f + n;
+        for (size_t i = 0; i < 3; i++) {
+            v[i] = v[i] * factor;
+        }
+        return *this;
+    }
+
     template<typename T>
     Color &mix(const Color &other, const T f) {
         const float c = static_cast<float>(vm::max(static_cast<T>(0.0), vm::min(static_cast<T>(1.0), f)));
