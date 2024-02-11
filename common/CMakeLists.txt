@@ -473,6 +473,10 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/ViewPreferencePane.cpp
         ${COMMON_SOURCE_DIR}/View/ViewUtils.cpp
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.cpp
+        ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
+        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.cpp
+        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.cpp
+        ${COMMON_SOURCE_DIR}/QSSBuilder.cpp
 )
 
 set(COMMON_HEADER
@@ -995,8 +999,10 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/ViewPreferencePane.h
         ${COMMON_SOURCE_DIR}/View/ViewUtils.h
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.h
-        src/QSSBuilder.cpp
-        src/QSSBuilder.h
+        ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
+        ${COMMON_SOURCE_DIR}/QSSBuilder.h
+        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.h
+        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
