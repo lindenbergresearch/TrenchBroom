@@ -26,9 +26,10 @@ varying vec4 vertexColor;
 
 void main() {
     gl_FragColor = vertexColor;
-    
+
     if (ApplyTinting) {
-        gl_FragColor = vec4(gl_FragColor.rgb * TintColor.rgb * TintColor.a, gl_FragColor.a);
-        gl_FragColor = clamp(2.0 * gl_FragColor, 0.0, 1.0);
+        gl_FragColor = vec4((gl_FragColor.rgb + TintColor.rgb * TintColor.a) * 0.5f, gl_FragColor.a);
+        //gl_FragColor = vec4(gl_FragColor.rgb * TintColor.rgb * TintColor.a, gl_FragColor.a);
+        gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
     }
 }
