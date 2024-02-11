@@ -40,9 +40,9 @@
 namespace TrenchBroom {
 namespace Renderer {
 const float TextRenderer::DefaultMinZoomFactor = 0.5f;
-const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(5.0f, 2.0f);
+const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(3.0f, 1.0f);
 const size_t TextRenderer::RectCornerSegments = 6;
-const float TextRenderer::RectCornerRadius = 4.0f;
+const float TextRenderer::RectCornerRadius = 2.0f;
 
 TextRenderer::Entry::Entry(std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor, const Color &i_backgroundColor, const AttrString &i_string
 ) : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor), string(i_string) {
@@ -90,7 +90,7 @@ void TextRenderer::EntryCollection::addEntry(TextRenderer::Entry &entry) {
 }
 
 void TextRenderer::EntryCollection::updateLayout() {
-    auto correctionShift = vm::vec3f(0.f, 5.f, 0.f);
+    auto correctionShift = vm::vec3f(3.f, 5.f, 0.f);
     Entry &last = entries.back();
 
     while (overlaps(last)) {
@@ -174,8 +174,7 @@ float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const
         if (a > fadeoutPos)
             return 1.0f;
         return a / fadeoutPos;
-    }
-    else {
+    } else {
         const float z = renderContext.camera().zoom();
         const float d = z - m_minZoomFactor;
         if (d > 0.3f)
