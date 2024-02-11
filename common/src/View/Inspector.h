@@ -43,7 +43,7 @@ class SyncHeightEventFilter;
 class TabBook;
 
 enum class InspectorPage {
-  Map = 0, Entity = 1, Face = 2
+  Map = 0, Face = 1, Entity = 2
 };
 
 class Inspector : public QWidget {
