@@ -994,7 +994,7 @@ void MapViewBase::showPopupMenuLater() {
     addMainMenuAction("Menu/Edit/Group");
     addMainMenuAction("Menu/Edit/Ungroup");
 
-    auto *mergeGroupAction = menu.addAction(mergeGroup ? tr("Merge Groups into %1").arg(QString::fromStdString(mergeGroup->name())) : tr("Merge Groups"), this,
+    auto *mergeGroupAction = menu.addAction(mergeGroup ? tr("Merge Groups into '%1'").arg(QString::fromStdString(mergeGroup->name())) : tr("Merge Groups"), this,
         &MapViewBase::mergeSelectedGroups
     );
     mergeGroupAction->setEnabled(canMergeGroups());
@@ -1003,10 +1003,10 @@ void MapViewBase::showPopupMenuLater() {
     renameAction->setEnabled(mapFrame->canRenameSelectedGroups());
 
     if (newGroup && canReparentNodes(nodes, newGroup)) {
-        menu.addAction(tr("Add Objects to Group %1").arg(QString::fromStdString(newGroup->name())), this, &MapViewBase::addSelectedObjectsToGroup);
+        menu.addAction(tr("Add Objects to Group '%1'").arg(QString::fromStdString(newGroup->name())), this, &MapViewBase::addSelectedObjectsToGroup);
     }
     if (currentGroup && !document->selectedNodes().empty()) {
-        menu.addAction(tr("Remove Objects from Group %1").arg(QString::fromStdString(currentGroup->name())), this, &MapViewBase::removeSelectedObjectsFromGroup
+        menu.addAction(tr("Remove Objects from Group '%1'").arg(QString::fromStdString(currentGroup->name())), this, &MapViewBase::removeSelectedObjectsFromGroup
         );
     }
     menu.addSeparator();
@@ -1037,7 +1037,7 @@ void MapViewBase::showPopupMenuLater() {
 
     if (selectedObjectLayers.size() == 1u) {
         auto *layerNode = selectedObjectLayers[0];
-        auto *action = menu.addAction(tr("Make Layer %1 Active").arg(QString::fromStdString(layerNode->name())), this,
+        auto *action = menu.addAction(tr("Make Layer '%1' Active").arg(QString::fromStdString(layerNode->name())), this,
             [=]() { document->setCurrentLayer(layerNode); }
         );
         action->setEnabled(document->canSetCurrentLayer(layerNode));
@@ -1078,7 +1078,7 @@ void MapViewBase::showPopupMenuLater() {
             ));
 
         if (isEntity) {
-            menu.addAction(tr("Move Brushes to Entity %1").arg(QString::fromStdString(newBrushParent->name())), this, &MapViewBase::moveSelectedBrushesToEntity
+            menu.addAction(tr("Move Brushes to Entity '%1'").arg(QString::fromStdString(newBrushParent->name())), this, &MapViewBase::moveSelectedBrushesToEntity
             );
         }
     }
@@ -1090,7 +1090,7 @@ void MapViewBase::showPopupMenuLater() {
     const auto faceHandle = Model::hitToFaceHandle(hit);
     if (faceHandle) {
         const auto *texture = faceHandle->face().texture();
-        menu.addAction(tr("Reveal %1 in Texture Browser").arg(QString::fromStdString(faceHandle->face().attributes().textureName())), mapFrame,
+        menu.addAction(tr("Reveal '%1' in Texture Browser").arg(QString::fromStdString(faceHandle->face().attributes().textureName())), mapFrame,
             [=] { mapFrame->revealTexture(texture); }
         );
 
