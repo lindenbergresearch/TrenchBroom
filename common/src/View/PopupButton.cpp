@@ -34,12 +34,12 @@ PopupButton::PopupButton(const QString &caption, QWidget *parent, const QIcon &i
     m_button->setText(caption);
     m_button->setCheckable(true);
     m_button->setIconSize(QSize{12, 12});
-    makeSmall(m_button);
+    makeSubTitle(m_button);
     m_button->setObjectName("toolButton_borderless");
     m_window = new PopupWindow(this);
 
     auto *sizer = new QHBoxLayout();
-    sizer->setContentsMargins(0, 0, 0, 0);
+    sizer->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
     sizer->addWidget(m_button);
     setLayout(sizer);
 
@@ -72,8 +72,8 @@ void PopupButton::popupVisibilityChanged(bool visible) {
 
 void PopupButton::setIcon(const std::string &iconName) {
 
-    checkedIcon = IO::loadSVGIcon(iconName + "_on.svg");
-    unCheckedIcon = IO::loadSVGIcon(iconName + "_off.svg");
+    checkedIcon = IO::loadSVGIcon(iconName + "_on.svg", 12);
+    unCheckedIcon = IO::loadSVGIcon(iconName + "_off.svg", 12);
 
     if (!unCheckedIcon.isNull()) {
         m_button->setIcon(unCheckedIcon);
