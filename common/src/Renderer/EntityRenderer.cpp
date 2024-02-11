@@ -28,6 +28,7 @@
 #include "Model/EntityNode.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#include "StringUtils.h"
 #include "Renderer/Camera.h"
 #include "Renderer/GLVertexType.h"
 #include "Renderer/PrimType.h"
@@ -56,19 +57,18 @@ public:
 
 private:
     vm::vec3f basePosition() const override {
-        auto position = vm::vec3f(m_entity->logicalBounds().center());
-        position[2] = float(m_entity->logicalBounds().max.z());
-        position[2] += 2.0f;
+        auto f = vm::vec3f(0.0, 0.0, m_entity->logicalBounds().size().z()*0.3);
+        auto position = vm::vec3f(m_entity->logicalBounds().center())+f;
         return position;
     }
 
-    TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
+    TextAlignment::Type alignment() const override { return TextAlignment::Center; }
 };
 
 EntityRenderer::EntityRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext)
     : m_entityModelManager(entityModelManager), m_editorContext(editorContext), m_modelRenderer(logger, m_entityModelManager, m_editorContext),
-    m_boundsValid(false), m_showOverlays(true), m_showOccludedOverlays(false), m_tint(false), m_overrideBoundsColor(false), m_showOccludedBounds(false),
-    m_showAngles(false), m_showHiddenEntities(false) {
+      m_boundsValid(false), m_showOverlays(true), m_showOccludedOverlays(false), m_tint(false), m_overrideBoundsColor(false), m_showOccludedBounds(false),
+      m_showAngles(false), m_showHiddenEntities(false) {
 }
 
 void EntityRenderer::invalidate() {
@@ -358,8 +358,7 @@ void EntityRenderer::validateBounds() {
                 const bool pointEntity = !entityNode->hasChildren();
                 if (pointEntity) {
                     entityNode->logicalBounds().for_each_edge(pointEntityWireframeBoundsBuilder);
-                }
-                else {
+                } else {
                     entityNode->logicalBounds().for_each_edge(brushEntityWireframeBoundsBuilder);
                 }
 
@@ -372,8 +371,7 @@ void EntityRenderer::validateBounds() {
 
         m_pointEntityWireframeBoundsRenderer = DirectEdgeRenderer(VertexArray::move(std::move(pointEntityWireframeVertices)), PrimType::Lines);
         m_brushEntityWireframeBoundsRenderer = DirectEdgeRenderer(VertexArray::move(std::move(brushEntityWireframeVertices)), PrimType::Lines);
-    }
-    else {
+    } else {
         using Vertex = GLVertexTypes::P3C4::Vertex;
         std::vector<Vertex> pointEntityWireframeVertices;
         std::vector<Vertex> brushEntityWireframeVertices;
@@ -388,15 +386,13 @@ void EntityRenderer::validateBounds() {
                 if (pointEntity && entityNode->entity().model() == nullptr) {
                     BuildColoredSolidBoundsVertices solidBoundsBuilder(solidVertices, boundsColor(entityNode));
                     entityNode->logicalBounds().for_each_face(solidBoundsBuilder);
-                }
-                else {
+                } else {
                     BuildColoredWireframeBoundsVertices pointEntityWireframeBoundsBuilder(pointEntityWireframeVertices, boundsColor(entityNode));
                     BuildColoredWireframeBoundsVertices brushEntityWireframeBoundsBuilder(brushEntityWireframeVertices, boundsColor(entityNode));
 
                     if (pointEntity) {
                         entityNode->logicalBounds().for_each_edge(pointEntityWireframeBoundsBuilder);
-                    }
-                    else {
+                    } else {
                         entityNode->logicalBounds().for_each_edge(brushEntityWireframeBoundsBuilder);
                     }
                 }
@@ -412,14 +408,12 @@ void EntityRenderer::validateBounds() {
 }
 
 AttrString EntityRenderer::entityString(const Model::EntityNode *entityNode) const {
-    const auto &classname = entityNode->entity().classname();
-    // const Model::AttributeValue& targetname =
-    // entity->attribute(Model::AttributeNames::Targetname);
+    const auto &classname = "<" + entityNode->entity().classname() + ">";
+    // const auto center = entityNode->logicalBounds().center();
 
     AttrString str;
     str.appendCentered(classname);
-    // if (!targetname.empty())
-    // str.appendCentered(targetname);
+    // str.appendCentered(stringf("[%.0f %.0f %.0f]", center.x(), center.y(), center.z()));
     return str;
 }
 
@@ -427,8 +421,7 @@ const Color &EntityRenderer::boundsColor(const Model::EntityNode *entityNode) co
     const Assets::EntityDefinition *definition = entityNode->entity().definition();
     if (definition == nullptr) {
         return m_boundsColor;
-    }
-    else {
+    } else {
         return definition->color();
     }
 }
