@@ -37,9 +37,9 @@
 namespace TrenchBroom {
 namespace Renderer {
 
-const float SelectionBoundsRenderer::AXIS_LABEL_DIM_FACTOR = 0.7f;
-static const std::string AXIS_LABELS[3] = {"x", "y", "z"};
-static const std::string AXIS_LABEL_DELIMITER = ": ";
+const float SelectionBoundsRenderer::AXIS_LABEL_DIM_FACTOR = 1.0f;
+static const std::string AXIS_LABELS[3] = {"X", "Y", "Z"};
+static const std::string AXIS_LABEL_DELIMITER = "=";
 
 class SelectionBoundsRenderer::SizeTextAnchor2D : public TextAnchor3D {
 private:
@@ -227,7 +227,7 @@ private:
 public:
     MinMaxTextAnchor3D(const vm::bbox3 &bounds, const vm::bbox3::Corner minMax, const Renderer::Camera &camera)
         : m_bounds(bounds), m_minMax(minMax),
-        m_camera(camera) {
+          m_camera(camera) {
     }
 
 private:
@@ -378,8 +378,7 @@ void SelectionBoundsRenderer::renderMinMax(RenderContext &renderContext, RenderB
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-    renderService.setBackgroundColor(
-        Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
+    renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();
 
     buffer << "Min: " << vm::correct(m_bounds.min);

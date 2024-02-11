@@ -22,6 +22,11 @@
 #include "FloatType.h"
 
 #include <vecmath/bbox.h>
+#include "Color.h"
+#include "FloatType.h"
+#include "Renderer/GLVertexType.h"
+#include "Renderer/Renderable.h"
+#include "Renderer/VertexArray.h"
 
 namespace TrenchBroom {
 namespace Renderer {
