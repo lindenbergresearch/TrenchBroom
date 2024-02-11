@@ -31,6 +31,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <QToolBar>
 
 namespace TrenchBroom {
 namespace Assets {
@@ -283,6 +284,8 @@ deleteCopyAndMove(ActionManager);
     void visitMainMenu(MenuVisitor &visitor) const;
 
     void visitToolBarActions(MenuVisitor &visitor) const;
+
+    void createRenderViewToolbar(QToolBar *toolBar);
 
     /**
      * Visits actions not used in the menu or toolbar.
