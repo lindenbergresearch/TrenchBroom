@@ -91,7 +91,7 @@ void TextOutputAdapter::appendString(const QString &string) {
 
             if (string[i] != Ascii::SCREEN_CMD_END) {
                 // no valid or supported ESC sequence
-                printf("!!! %s < %d %d\n", cmd.toStdString().c_str(), i, j);
+                printf("invalid escape sequence: '%s'!\n", cmd.toStdString().c_str());
                 continue;
             }
 
@@ -141,42 +141,55 @@ QTextCharFormat &TextOutputAdapter::decodeVT100Command(const QString &string, QT
     }
 
     match_foreground("30", "#000000");
-    match_foreground("31", "#AA0000");
+    match_foreground("31", "#991011");
     match_foreground("32", "#00AA00");
-    match_foreground("33", "#AAAA00");
-    match_foreground("34", "#0000AA");
+    match_foreground("33", "#CCAA00");
+    match_foreground("34", "#1234AA");
     match_foreground("35", "#8800AA");
-    match_foreground("36", "#00AAAA");
+    match_foreground("36", "#00AABB");
     match_foreground("37", "#AAAAAA");
 
     match_background("40", "#000000");
-    match_background("41", "#AA0000");
+    match_background("41", "#991011");
     match_background("42", "#00AA00");
-    match_background("43", "#AAAA00");
-    match_background("44", "#0000AA");
+    match_background("43", "#CCAA00");
+    match_background("44", "#1234AA");
     match_background("45", "#8800AA");
-    match_background("46", "#00AAAA");
+    match_background("46", "#00AABB");
     match_background("47", "#AAAAAA");
 
     match_foreground("90", "#666666");
-    match_foreground("91", "#FF0000");
+    match_foreground("91", "#FF1234");
     match_foreground("92", "#00FF00");
     match_foreground("93", "#FFFF00");
-    match_foreground("94", "#0000FF");
+    match_foreground("94", "#2345FF");
     match_foreground("95", "#AA00FF");
-    match_foreground("96", "#00FFFF");
+    match_foreground("96", "#44FFFF");
     match_foreground("97", "#FFFFFF");
 
     match_background("100", "#666666");
-    match_background("101", "#FF0000");
+    match_background("101", "#FF1234");
     match_background("102", "#00FF00");
     match_background("103", "#FFFF00");
-    match_background("104", "#0000FF");
+    match_background("104", "#2345FF");
     match_background("105", "#AA00FF");
-    match_background("106", "#00FFFF");
+    match_background("106", "#44FFFF");
     match_background("107", "#FFFFFF");
 
-    printf("unknown esc: '%s'", string.toStdString().c_str());
+    // support for 24bit color codes
+    if(string.startsWith("38;2;")) {
+        auto rgb = string.mid(5).split(";");;
+
+        if (rgb.size() == 3) {
+            auto color = QColor(rgb[0].toShort(),rgb[1].toShort(),rgb[2].toShort());
+            format.setForeground(QBrush{color});
+        }
+
+        return format;
+    }
+
+    printf("unknown escape sequence found: '%s'\n!", string.toStdString().c_str());
+    format = QTextCharFormat{};
 
     return format;
 }
