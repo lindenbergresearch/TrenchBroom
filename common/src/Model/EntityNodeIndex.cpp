@@ -126,6 +126,32 @@ void EntityNodeIndex::removeProperty(EntityNodeBase *node, const std::string &ke
     m_valueIndex->remove(value, node);
 }
 
+std::vector<EntityNodeBase *> EntityNodeIndex::findEntity(const EntityNodeIndexQuery &keyQuery, const std::string &value) const {
+    // first, find Nodes which have `value` as the value for any key
+    std::vector<EntityNodeBase *> result;
+
+    m_keyIndex->find_matches(value, std::back_inserter(result));
+
+  //  m_valueIndex->find_matches(value, std::back_inserter(result));
+    if (result.empty()) {
+        return {};
+    }
+
+   // result = kdl::vec_sort_and_remove_duplicates(std::move(result));
+
+    // next, remove results from the result set that don't match `keyQuery`
+    auto it = std::begin(result);
+    while (it != std::end(result)) {
+        const EntityNodeBase *node = *it;
+        if (!keyQuery.execute(node, value))
+            it = result.erase(it);
+        else
+            ++it;
+    }
+
+    return result;
+}
+
 std::vector<EntityNodeBase *> EntityNodeIndex::findEntityNodes(const EntityNodeIndexQuery &keyQuery, const std::string &value) const {
     // first, find Nodes which have `value` as the value for any key
     std::vector<EntityNodeBase *> result;

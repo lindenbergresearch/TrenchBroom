@@ -83,6 +83,8 @@ public:
 
     std::vector<EntityNodeBase *> findEntityNodes(const EntityNodeIndexQuery &keyQuery, const std::string &value) const;
 
+    std::vector<EntityNodeBase *> findEntity(const EntityNodeIndexQuery &keyQuery, const std::string &value) const;
+
     std::vector<std::string> allKeys() const;
 
     std::vector<std::string> allValuesForKeys(const EntityNodeIndexQuery &keyQuery) const;
