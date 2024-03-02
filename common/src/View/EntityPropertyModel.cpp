@@ -673,30 +673,42 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
 
     if (role == Qt::ForegroundRole) {
         if (row.isDefault() || row.subset()) {
-            return QVariant(QBrush(Colors::disabledCellText()));
+            return QVariant(QBrush(Colors::defaultText()));
         }
         if (index.column() == ColumnValue) {
             if (row.multi()) {
-                return QVariant(QBrush(Colors::disabledCellText()));
+                return QVariant(QBrush(Colors::highlight()));
             }
+
+            return QVariant(QBrush(Colors::defaultText()));
         }
-        return QVariant();
+
+        return QVariant(QBrush(Colors::highlightText()));
     }
 
     if (role == Qt::FontRole) {
         if (row.isDefault()) {
-            auto italicFont = QFont{};
-            italicFont.setItalic(true);
-            return QVariant(italicFont);
+            auto font = QFont{};
+            font.setItalic(false);
+            return QVariant(font);
         }
+
         if (index.column() == ColumnValue) {
             if (row.multi()) {
-                auto italicFont = QFont{};
-                italicFont.setItalic(true);
-                return QVariant(italicFont);
+                auto font = QFont{};
+                font.setItalic(false);
+                return QVariant(font);
             }
+
+            auto font = QFont{};
+            font.setPointSize(QFont{}.pointSize());
+            return QVariant(font);
+
         }
-        return QVariant{};
+
+        auto font = QFont{};
+        font.setBold(true);
+        return QVariant(font);
     }
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
