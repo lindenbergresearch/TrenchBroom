@@ -24,6 +24,8 @@
 #include "Renderer/RenderContext.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 namespace TrenchBroom {
 namespace Renderer {
@@ -61,10 +63,15 @@ void TriangleRenderer::doPrepareVertices(VboManager &vboManager) {
 void TriangleRenderer::doRender(RenderContext &context) {
     if (m_vertexArray.vertexCount() == 0)
         return;
+    PreferenceManager &prefs = PreferenceManager::instance();
+    const float shadeLevel = pref(Preferences::ShadeLevel);
+
 
     ActiveShader shader(context.shaderManager(), Shaders::TriangleShader);
     shader.set("ApplyTinting", m_applyTinting);
     shader.set("TintColor", m_tintColor);
+    shader.set("Alpha", 0.75f);
+    shader.set("ShadeLevel", shadeLevel);
     shader.set("UseColor", m_useColor);
     shader.set("Color", m_color);
     shader.set("CameraPosition", context.camera().position());
