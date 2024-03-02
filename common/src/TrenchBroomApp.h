@@ -23,6 +23,7 @@
 
 #include "Notifier.h"
 #include "QSSBuilder.h"
+#include "View/MapFrame.h"
 
 #include <filesystem>
 #include <memory>
@@ -74,6 +75,26 @@ private:
     QTimer *m_recentDocumentsReloadTimer;
     QFont m_UI_Font, m_ConsoleFont, m_RenderFont;
     QSSBuilder *builder = nullptr;
+    MapFrame *currentMapFrame = nullptr;
+public:
+    MapFrame *getCurrentMapFrame() const;
+
+    void setCurrentMapFrame(MapFrame *currentMapFrame);
+
+public:
+    const QFont &getMUiFont() const;
+
+    void setMUiFont(const QFont &mUiFont);
+
+    const QFont &getMConsoleFont() const;
+
+    void setMConsoleFont(const QFont &mConsoleFont);
+
+    const QFont &getMRenderFont() const;
+
+    void setMRenderFont(const QFont &mRenderFont);
+
+
 public:
 
     TrenchBroomApp(int &argc, char **argv);
