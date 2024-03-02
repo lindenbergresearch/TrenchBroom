@@ -265,6 +265,14 @@ Preference<bool> ShowBrushEntityBounds("Map view/Show brush entity bounds", true
 Preference<bool> ShowPointEntityBounds("Map view/Show point entity bounds", true);
 Preference<bool> ShowPointEntityModels("Map view/Show point entity models", true);
 
+
+/* --- LIGHTNING -------------------------------------- */
+Preference<bool> EnableLightning("Map view/Enable lightning (experimental)", false);
+Preference<float> LightningIntensity("Map view/Lightning Intensity", 1.0f);
+Preference<Color> LightningAmbient("Map view/Lightning Ambient",Color{0, 0, 0});
+
+
+//extern Preference<bool> EnableLightning;
 QString faceRenderModeTextured() {
     return "textured";
 }
@@ -363,7 +371,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,
         &CameraFlyForward(), &CameraFlyBackward(),
         &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds,
-        &ShowBrushEntityBounds,
+        &ShowBrushEntityBounds,&EnableLightning,&LightningIntensity,&LightningAmbient,
         &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges,
         &ShowSoftMapBounds, &ShowPointEntities,
         &ShowBrushes, &EntityLinkMode

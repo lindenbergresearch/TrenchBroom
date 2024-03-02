@@ -248,6 +248,13 @@ extern Preference<bool> ShowBrushEntityBounds;
 extern Preference<bool> ShowPointEntityBounds;
 extern Preference<bool> ShowPointEntityModels;
 
+
+/* --- LIGHTS ---------------------------------------- */
+extern Preference<bool> EnableLightning;
+extern Preference<float> LightningIntensity;
+extern Preference<Color> LightningAmbient;
+
+
 QString faceRenderModeTextured();
 
 QString faceRenderModeFlat();
