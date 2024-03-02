@@ -21,6 +21,8 @@
 
 #include "FloatType.h"
 #include "Renderer/Transformation.h"
+#include "Model/EntityNodeBase.h"
+#include "FaceRenderer.h"
 
 #include <vecmath/bbox.h>
 
@@ -48,6 +50,8 @@ private:
     Transformation m_transformation;
     FontManager &m_fontManager;
     ShaderManager &m_shaderManager;
+    std::vector<Model::EntityNodeBase *> m_lightNodes;
+    std::vector<PointLight> lightSources;
 
     // settings for any map rendering view
     bool m_showTextures;
@@ -162,6 +166,12 @@ public:
     void setForceShowSelectionGuide();
 
     void setForceHideSelectionGuide();
+
+    const std::vector<Model::EntityNodeBase *> &getLightNodes() const;
+
+    void setLightNodes(const std::vector<Model::EntityNodeBase *> &mLightNodes);
+
+    const std::vector<PointLight> &getLightSources() const;
 
 private:
     void setShowSelectionGuide(ShowSelectionGuide showSelectionGuide);

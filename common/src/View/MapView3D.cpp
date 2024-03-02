@@ -26,6 +26,7 @@
 #include "Model/BrushGeometry.h"
 #include "Model/BrushNode.h"
 #include "Model/EntityNode.h"
+#include "Model/EntityNodeIndex.h"
 #include "Model/GroupNode.h"
 #include "Model/Hit.h"
 #include "Model/HitAdapter.h"
@@ -132,7 +133,7 @@ void MapView3D::connectObservers() {
 void MapView3D::cameraDidChange(const Renderer::Camera * /* camera */) {
     if (!m_ignoreCameraChangeEvents) {
         // Don't refresh if the camera was changed in doPreRender!
-        update();
+       // update();
     }
 }
 
@@ -180,7 +181,7 @@ void MapView3D::documentWasLoaded(MapDocument *document) {
 void MapView3D::preferenceDidChange(const std::filesystem::path &path) {
     if (path == Preferences::CameraFov.path()) {
         m_camera->setFov(pref(Preferences::CameraFov));
-        update();
+       // update();
     }
 }
 
@@ -219,9 +220,10 @@ void MapView3D::bindEvents() {
 }
 
 void MapView3D::updateFlyMode() {
-    if (m_flyModeHelper->anyKeyDown()) {
-        update();
-    }
+    m_framesRendered++;
+    m_totalFrames++;
+
+    update();
 }
 
 void MapView3D::resetFlyModeKeys() {
@@ -498,7 +500,8 @@ void MapView3D::doPreRender() {
     m_flyModeHelper->pollAndUpdate();
 }
 
-void MapView3D::doRenderGrid(Renderer::RenderContext &, Renderer::RenderBatch &) {}
+void MapView3D::doRenderGrid(Renderer::RenderContext &, Renderer::RenderBatch &) {
+}
 
 void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     renderer.render(renderContext, renderBatch);
@@ -536,5 +539,23 @@ bool MapView3D::doBeforePopupMenu() {
 }
 
 void MapView3D::linkCamera(CameraLinkHelper & /* helper */) {}
+
+void MapView3D::doFocusCameraOnEntityByName(const std::string name) {
+    auto document = kdl::mem_lock(m_document);
+    auto result = document->world()->entityNodeIndex().findEntity("classname", name);
+
+    if (result.empty())
+        printf("nothing found!\n");
+    else printf("found %zu for: %s\n", result.size(), name.c_str());
+
+    for (const auto &item: result) {
+        printf("%s\n", item->name().c_str());
+
+        auto center = item->physicalBounds().center();
+        const auto pos = vm::vec3f(center.x(), center.y(), center.z());
+        printf("pos [%.2f %.2f %.2f]", pos.x(), pos.y(), pos.z());
+        doMoveCameraToPosition(pos, true);
+    }
+}
 } // namespace View
 } // namespace TrenchBroom

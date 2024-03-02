@@ -106,6 +106,12 @@ protected:
     Logger *m_logger;
     std::weak_ptr<MapDocument> m_document;
     MapViewToolBox &m_toolBox;
+    double tframe = 0.0f;
+    double tall = 0.0f;
+  //  double maxFrameTime = 0;
+
+    std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double>> to_frame;
+    std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double>> to_start;
 
     std::unique_ptr<AnimationManager> m_animationManager;
 
@@ -354,6 +360,8 @@ public: // view filters
     void toggleShowFog();
 
     void toggleShowEdges();
+
+    void toggleEnableLightning();
 
     void showAllEntityLinks();
 

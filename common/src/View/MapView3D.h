@@ -114,6 +114,8 @@ private: // implement MapView interface
 
     void doFocusCameraOnSelection(bool animate) override;
 
+    void doFocusCameraOnEntityByName(const std::string name);
+
     vm::vec3f focusCameraOnObjectsPosition(const std::vector<Model::Node *> &nodes);
 
     void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;

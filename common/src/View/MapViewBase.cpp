@@ -30,6 +30,7 @@
 #include "Assets/EntityDefinitionGroup.h"
 #include "Assets/EntityDefinitionManager.h"
 #include "FloatType.h"
+#include "StringUtils.h"
 #include "Logger.h"
 #include "Model/BezierPatch.h"
 #include "Model/BrushFace.h"
@@ -37,6 +38,7 @@
 #include "Model/ChangeBrushFaceAttributesRequest.h"
 #include "Model/EditorContext.h"
 #include "Model/EntityNode.h"
+#include "Model/EntityNodeIndex.h"
 #include "Model/EntityProperties.h"
 #include "Model/GroupNode.h"
 #include "Model/Hit.h"
@@ -101,6 +103,8 @@ MapViewBase::MapViewBase(Logger *logger, std::weak_ptr<MapDocument> document, Ma
     connectObservers();
 
     setAcceptDrops(true);
+    to_frame = std::chrono::high_resolution_clock::now();
+    to_start = std::chrono::high_resolution_clock::now();
 }
 
 void MapViewBase::setCompass(std::unique_ptr<Renderer::Compass> compass) {
@@ -719,6 +723,10 @@ void MapViewBase::toggleShowEdges() {
     togglePref(Preferences::ShowEdges);
 }
 
+void MapViewBase::toggleEnableLightning() {
+    togglePref(Preferences::EnableLightning);
+}
+
 void MapViewBase::showAllEntityLinks() {
     setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeAll());
 }
@@ -805,9 +813,10 @@ void MapViewBase::doRefreshViews() {
 
 void MapViewBase::initializeGL() {
     if (doInitializeGL()) {
-        m_logger->info() << "Renderer info      : " << GLContextManager::GLRenderer << " Version: " << GLContextManager::GLVersion << " from "
-                         << GLContextManager::GLVendor;
-        m_logger->info() << "Depth buffer bits  : " << depthBits();
+        m_logger->info() << "Renderer           : " << GLContextManager::GLRenderer;
+        m_logger->info() << "Renderer Version   : " << GLContextManager::GLVersion;
+        m_logger->info() << "Renderer Vendor    : " << GLContextManager::GLVendor;
+        m_logger->info() << "Depth Buffer Bits  : " << depthBits();
         m_logger->info() << "Multisampling      : " << kdl::str_select(multisample(), "enabled", "disabled");
     }
 }
@@ -817,6 +826,16 @@ bool MapViewBase::doShouldRenderFocusIndicator() const {
 }
 
 void MapViewBase::doRender() {
+    auto to_frame_now = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> delta = to_frame_now - to_frame;
+    std::chrono::duration<double> delta_start = to_frame_now - to_start;
+
+    tall =  delta_start.count()/double(this->m_totalFrames);
+    tframe = (tframe + delta.count())/2.0;
+
+
+    to_frame = std::chrono::high_resolution_clock::now();
+
     doPreRender();
 
     const auto &fontPath = pref(Preferences::RendererFontPath);
@@ -825,6 +844,12 @@ void MapViewBase::doRender() {
 
     auto document = kdl::mem_lock(m_document);
     const auto &grid = document->grid();
+
+    std::vector<Model::EntityNodeBase *> result;
+    if (document->world()) {
+        result = document->world()->entityNodeIndex().findEntity("classname", "light", false);
+    }
+
 
     auto renderContext = Renderer::RenderContext{doGetRenderMode(), camera(), fontManager(), shaderManager()};
     renderContext.setShowTextures(pref(Preferences::FaceRenderMode) == Preferences::faceRenderModeTextured());
@@ -845,6 +870,22 @@ void MapViewBase::doRender() {
         } : vm::bbox3f{}
     );
 
+
+    auto t0 = std::chrono::high_resolution_clock::now();
+
+    if(pref(Preferences::EnableLightning)) {
+        renderContext.setLightNodes(result);
+    }
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = t1 - t0;
+    auto td = elapsed.count();
+
+    if (this->m_totalFrames % (20*60) == 0) {
+       // printf("reset max time.\n");
+        maxFrameTime = 0.0;
+    }
+
     setupGL(renderContext);
     setRenderOptions(renderContext);
 
@@ -862,7 +903,29 @@ void MapViewBase::doRender() {
     renderCompass(renderBatch);
     renderFPS(renderContext, renderBatch);
 
+
+    if (tframe>maxFrameTime)
+        maxFrameTime = tframe;
+
+    if (this->m_totalFrames % 120 == 0) {
+        auto msg = stringf(
+            "total=%ld lights=%zu t_frame=%.4fms t_sum=%.2fms (%.2f fps) fps=%.4f td=%.4fms size=%dx%d",
+            m_totalFrames,
+            renderContext.getLightSources().size(),
+            tframe * 1000.0,
+            tall * 1000.0,
+            1.0 / tall,
+            1.0 / tframe,
+            td * 1000.0,
+            glWidth, glHeight
+        );
+
+     //   m_logger->debug() << msg;
+    }
+
     renderBatch.render(renderContext);
+
+
 }
 
 void MapViewBase::setupGL(Renderer::RenderContext &context) {
@@ -931,7 +994,7 @@ void MapViewBase::validatePortalFileRenderer(Renderer::RenderContext &) {
             m_portalFileRenderer->renderFilledPolygon(pref(Preferences::PortalFileFillColor), Renderer::PrimitiveRendererOcclusionPolicy::Hide,
                 Renderer::PrimitiveRendererCullingPolicy::ShowBackfaces, poly.vertices());
 
-            const auto lineWidth = 4.0f;
+            const auto lineWidth = 1.25f;
             m_portalFileRenderer->renderPolygon(pref(Preferences::PortalFileBorderColor), lineWidth, Renderer::PrimitiveRendererOcclusionPolicy::Hide,
                 poly.vertices());
         }

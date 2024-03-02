@@ -144,43 +144,32 @@ void FaceRenderer::doRender(RenderContext &context) {
         const float fogMinDistance = pref(Preferences::FogMinDistance);
         const int fogType = pref(Preferences::FogType);
 
+        const Color ambientLightning = pref(Preferences::LightningAmbient);
+
         glAssert(glEnable(GL_TEXTURE_2D));
         glAssert(glActiveTexture(GL_TEXTURE0));
-//
-//        auto light1 = PointLight();
-//        light1.Position = context.camera().position();
-//        light1.Intensity = vm::vec3f(15000, 15000, 15000);
 
-//        auto light2 = PointLight();
-//        light2.Position = vm::vec3f(-152, -112, 80);
-//        light2.Intensity = vm::vec3f(500,500,5000);
-//
-//        auto light3 = PointLight();
-//        light3.Position = vm::vec3f(-168, 32, 80);
-//        light3.Intensity = vm::vec3f(500,500,5000);
+        auto lightSources = context.getLightSources();
 
-//        lightSources.clear();
-//        lightSources.push_back(light1);
-//        lightSources.push_back(light2);
-//        lightSources.push_back(light3);
+        auto size = lightSources.size() > 60 ? 60 : lightSources.size();
 
-//        for (size_t i = 0; i < lightSources.size(); i++) {
-//            std::string _Position_name = stringf("lights[%d].Position", i);
-//            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
-//            std::string _AttenuationConstant_name = stringf("lights[%d].AttenuationConstant", i);
-//            std::string _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
-//            std::string _AttenuationQuadratic_name = stringf("lights[%d].AttenuationQuadratic", i);
-//
-//            shader.set(_Position_name, lightSources[i].Position);
-//            shader.set(_Intensity_name, lightSources[i].Intensity);
-//            shader.set(_AttenuationConstant_name, lightSources[i].AttenuationConstant);
-//            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
-//            shader.set(_AttenuationQuadratic_name, lightSources[i].AttenuationQuadratic);
-//        }
+        for (size_t i = 0; i < size; i++) {
+            std::string _Position_name = stringf("lights[%d].Position", i);
+            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
+            std::string _AttenuationConstant_name = stringf("lights[%d].AttenuationConstant", i);
+            std::string _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
+            std::string _AttenuationQuadratic_name = stringf("lights[%d].AttenuationQuadratic", i);
 
-        shader.set("AmbientLight", vm::vec3f(0.1, 0.1, 0.1));
-        shader.set("NumLights", lightSources.size());
-        shader.set("EnableLighting", false);
+            shader.set(_Position_name, lightSources[i].Position);
+            shader.set(_Intensity_name, lightSources[i].Intensity);
+            shader.set(_AttenuationConstant_name, lightSources[i].AttenuationConstant);
+            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
+            shader.set(_AttenuationQuadratic_name, lightSources[i].AttenuationQuadratic);
+        }
+
+        shader.set("AmbientLight", ambientLightning);
+        shader.set("NumLights", size);
+        shader.set("EnableLighting", !lightSources.empty());
         shader.set("CameraPosition", context.camera().position());
         shader.set("Brightness", prefs.get(Preferences::Brightness));
         shader.set("RenderGrid", context.showGrid());
@@ -197,11 +186,8 @@ void FaceRenderer::doRender(RenderContext &context) {
             shader.set("TintColor", m_tintColor);
 
         shader.set("GrayScale", m_grayscale);
-        shader.set("CameraPosition", context.camera().position());
-
         shader.set("ShadeFaces", shadeFaces);
         shader.set("ShadeLevel", shadeLevel);
-
         shader.set("ShowFog", showFog);
         shader.set("FogColor", fogColor);
         shader.set("FogMaxAmount", fogMaxAmount);
@@ -216,9 +202,9 @@ void FaceRenderer::doRender(RenderContext &context) {
         shader.set("SoftMapBoundsMin", context.softMapBounds().min);
         shader.set("SoftMapBoundsMax", context.softMapBounds().max);
 
-        shader.set("SoftMapBoundsColor", vm::vec4f(prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(),
-            prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f
-        ));
+        auto boundsColor = prefs.get(Preferences::SoftMapBoundsColor);
+
+        shader.set("SoftMapBoundsColor", vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
 
         RenderFunc func(shader, applyTexture, m_faceColor);
 

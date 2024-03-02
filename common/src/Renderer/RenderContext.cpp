@@ -19,6 +19,7 @@
 
 #include "RenderContext.h"
 #include "Preferences.h"
+#include "Color.h"
 #include "PreferenceManager.h"
 
 #include "Renderer/Camera.h"
@@ -28,12 +29,12 @@ namespace Renderer {
 RenderContext::RenderContext(const RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager) : m_renderMode(
     renderMode
 ), m_camera(camera), m_transformation(m_camera.projectionMatrix(), m_camera.viewMatrix()), m_fontManager(fontManager), m_shaderManager(shaderManager),
-    m_showTextures(true), m_showFaces(true), m_showEdges(true), m_shadeFaces(true), m_showPointEntities(true
+                                                                                                                                          m_showTextures(true), m_showFaces(true), m_showEdges(true), m_shadeFaces(true), m_showPointEntities(true
     ), m_showPointEntityModels(true
     ), m_showEntityClassnames(true
     ), m_showGroupBounds(true
     ), m_showBrushEntityBounds(true), m_showPointEntityBounds(true), m_showFog(false), m_showGrid(true), m_gridSize(4), m_hideSelection(false),
-    m_tintSelection(true), m_showSelectionGuide(ShowSelectionGuide::Hide
+                                                                                                                                          m_tintSelection(true), m_showSelectionGuide(ShowSelectionGuide::Hide
     ) {
 }
 
@@ -191,9 +192,9 @@ void RenderContext::clearTintSelection() {
 
 bool RenderContext::showSelectionGuide() const {
     return
-    m_showSelectionGuide == ShowSelectionGuide::Show ||
-    m_showSelectionGuide == ShowSelectionGuide::ForceShow ||
-    pref(Preferences::AlwaysShowSelectionBounds);
+        m_showSelectionGuide == ShowSelectionGuide::Show ||
+        m_showSelectionGuide == ShowSelectionGuide::ForceShow ||
+        pref(Preferences::AlwaysShowSelectionBounds);
 }
 
 void RenderContext::setShowSelectionGuide() {
@@ -230,6 +231,74 @@ void RenderContext::setShowSelectionGuide(const ShowSelectionGuide showSelection
                 m_showSelectionGuide = ShowSelectionGuide::ForceHide;
             break;
     }
+}
+
+const std::vector<Model::EntityNodeBase *> &RenderContext::getLightNodes() const {
+    return m_lightNodes;
+}
+
+void RenderContext::setLightNodes(const std::vector<Model::EntityNodeBase *> &mLightNodes) {
+    m_lightNodes = mLightNodes;
+    auto i = 0;
+    auto lightIntensity = pref(Preferences::LightningIntensity);
+
+    std::vector<std::pair<float, Model::EntityNodeBase *>> tmp_list;
+
+    for (const auto &item: getLightNodes()) {
+        auto position = item->logicalBounds().center();
+        auto origin = vm::vec3f(position.x(), position.y(), position.z());
+        const float distance = camera().distanceTo(origin);
+
+        tmp_list.push_back(std::pair(distance, item));
+    }
+
+    auto comp = [](std::pair<float, Model::EntityNodeBase *> e1, std::pair<float, Model::EntityNodeBase *> e2) {
+      return e1.first < e2.first;
+    };
+
+    std::sort(tmp_list.begin(), tmp_list.end(), comp);
+
+    for (const auto &item: tmp_list) {
+        if (!item.second->entity().hasProperty("light")) continue;
+
+        if (item.first < -600 || item.first > 1024) continue;
+        if (++i > 52) break;
+
+        auto position = item.second->logicalBounds().center();
+        auto origin = vm::vec3f(position.x(), position.y(), position.z());
+
+        Color lightColor = Color(1.0f, 1.0f, 1.0f);
+
+        if (item.second->entity().hasProperty("color")) {
+            const auto color_str = QString::fromStdString(*item.second->entity().property("color"));
+            const bool is_float = color_str.contains(".");
+            const auto c = Color::parse(color_str.toStdString());
+
+            if (c.has_value()) {
+                lightColor = c.value();
+
+                if (!is_float) {
+                    lightColor.v[0] = lightColor.v[0] / 255.f;
+                    lightColor.v[1] = lightColor.v[1] / 255.f;
+                    lightColor.v[2] = lightColor.v[2] / 255.f;
+                }
+            }
+        }
+
+        auto data = item.second->entity().property("light")->data();
+        auto s_value = data ? atof(data) : 200;
+        auto l_value = s_value * 30 * lightIntensity;
+        //  printf("%d light: dist=%.4f i=%.3f -  POS: %.2f %.2f %.2f\n", i++, distance,l_value, origin.x(), origin.y(), origin.z());
+
+        auto light = PointLight();
+        light.Position = origin;
+        light.Intensity = vm::vec3f(l_value * lightColor.r(), l_value * lightColor.g(), l_value * lightColor.b());
+        lightSources.push_back(light);
+    }
+}
+
+const std::vector<PointLight> &RenderContext::getLightSources() const {
+    return lightSources;
 }
 } // namespace Renderer
 } // namespace TrenchBroom

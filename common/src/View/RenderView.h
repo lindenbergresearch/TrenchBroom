@@ -76,10 +76,13 @@ private:
     InputEventRecorder m_eventRecorder;
     BoxFilter boxFilter;
     QTimer m_timer; // Timer to control the frame rate
-private: // FPS counter
+    double avgFps = 0;
+protected: // FPS counter
     // stats since the last counter update
     long m_totalFrames = 0;
-    int m_framesRendered;
+    int m_framesRendered = 0;
+    double maxFrameTime = 0;
+    int glWidth, glHeight;
 
 protected:
     std::string m_currentFPS;

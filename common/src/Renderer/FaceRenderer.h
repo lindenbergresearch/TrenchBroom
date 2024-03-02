@@ -43,9 +43,9 @@ class RenderBatch;
 struct PointLight {
   vm::vec3f Intensity;
   vm::vec3f Position;
-  float AttenuationConstant = 1.0f;
-  float AttenuationLinear = 0.1f;
-  float AttenuationQuadratic = 0.1f;
+  float AttenuationConstant = 0.9f;
+  float AttenuationLinear = 0.75f;
+  float AttenuationQuadratic = 0.75f;
 };
 
 
@@ -57,7 +57,6 @@ private:
 
     std::shared_ptr<BrushVertexArray> m_vertexArray;
     std::shared_ptr<TextureToBrushIndicesMap> m_indexArrayMap;
-    std::vector<PointLight> lightSources;
     Color m_faceColor;
     bool m_grayscale;
     bool m_tint;

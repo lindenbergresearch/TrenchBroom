@@ -90,19 +90,23 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
     // FPS counter
     QTimer *fpsCounter = new QTimer(this);
 
+
     connect(fpsCounter, &QTimer::timeout, [&]() {
-      const double avgFps = m_framesRendered;
+      avgFps = (avgFps + m_framesRendered * 2) * 0.5;
       m_framesRendered = 0;
 
       m_currentFPS =
-          std::string("Avg FPS: ") + std::to_string(int(avgFps)) + " frames: " + std::to_string(m_totalFrames) + /*" Max time between frames: " + std::to_string(maxFrameTime) + "ms. " +*/
-          std::to_string(m_glContext->vboManager()
-              .currentVboCount()) + " current VBOs (" + std::to_string(m_glContext->vboManager()
-              .peakVboCount()) + " peak) totalling " + std::to_string(m_glContext->vboManager()
-                                                                          .currentVboSize() / 1024u) + " KiB";
+          std::string("FPS=") +
+          std::to_string(int(avgFps)) + " frames=" +
+          std::to_string(m_totalFrames) + " max=" +
+          std::to_string(maxFrameTime * 1000.0) + "ms. | " +
+          std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs (" +
+          std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling " +
+          std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + "k @ " +
+              std::to_string(glWidth) + "x" + std::to_string(glHeight);
     });
 
-    fpsCounter->start(1000);
+    fpsCounter->start(500);
     setMouseTracking(true); // request mouse move events even when no button is held down
     setFocusPolicy(Qt::StrongFocus); // accept focus by clicking or tab
 }
@@ -111,12 +115,12 @@ RenderView::~RenderView() = default;
 
 void RenderView::keyPressEvent(QKeyEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    update();
+    //update();
 }
 
 void RenderView::keyReleaseEvent(QKeyEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    update();
+    //update();
 }
 
 QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
@@ -139,7 +143,7 @@ QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widge
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    update();
+    //update();
 }
 
 void RenderView::mouseMoveEvent(QMouseEvent *event) {
@@ -151,33 +155,29 @@ void RenderView::mouseMoveEvent(QMouseEvent *event) {
     }
 
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    update();
+    //update();
 }
 
 void RenderView::mousePressEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    update();
+    //update();
 }
 
 void RenderView::mouseReleaseEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    update();
+    //update();
 }
 
 void RenderView::wheelEvent(QWheelEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    update();
+    //update();
 }
 
 void RenderView::paintGL() {
+   context()->setFormat(QSurfaceFormat::defaultFormat());
     if (TrenchBroom::View::isReportingCrash())
         return;
-
     render();
-
-    // Update stats
-    m_framesRendered++;
-    m_totalFrames++;
 }
 
 Renderer::VboManager &RenderView::vboManager() {
@@ -245,9 +245,11 @@ void RenderView::renderFocusIndicator() {
     const auto w = static_cast<float>(width() * r);
     const auto h = static_cast<float>(height() * r);
     glAssert(glViewport(0, 0, static_cast<int>(w), static_cast<int>(h)));
+    glWidth = (int) w;
+    glHeight = (int) h;
 
     // const auto t = pref(Preferences::ViewFrameWidth);
-    const auto t = hasFocus() ? 1.0f : 2.0f;
+    const auto t = hasFocus() ? 1.0f : 1.0f;
 
     const auto projection = vm::ortho_matrix(-1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
     Renderer::Transformation transformation(projection, vm::mat4x4f::identity());
@@ -293,7 +295,7 @@ void RenderView::doUpdateViewport(const int /* x */, const int /* y */, const in
 }
 
 void RenderView::updateEvent() {
-    update();
+    //update();
 }
 
 QPointF BoxFilter::average() {
