@@ -161,6 +161,19 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
     shader.set("ViewMatrix", renderContext.camera().viewMatrix());
 
     for (const auto &[entityNode, renderer]: m_entities) {
+//        const Camera &camera = renderContext.camera();
+//
+//        vm::vec3f modelCenter = vm::vec3f(
+//            entityNode->physicalBounds().center().x(),
+//            entityNode->physicalBounds().center().y(),
+//            entityNode->physicalBounds().center().z()
+//        );
+//
+//        const float distance = camera.distanceTo(modelCenter);
+//
+//       // printf("%s -> %.2f\n", entityNode->name().c_str(), distance);
+//
+//       if (distance > 512 || distance < -5) continue;
         if (!m_showHiddenEntities && !m_editorContext.visible(entityNode)) {
             continue;
         }
