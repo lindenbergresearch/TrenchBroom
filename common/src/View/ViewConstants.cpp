@@ -41,10 +41,17 @@ QColor defaultText() {
     return result;
 }
 
-QColor highlightText() {
+QColor highlight() {
     // Used for selected tabs of TabBar control.
     QPalette pal;
     QColor result = pal.color(QPalette::Normal, QPalette::Highlight);
+    return result;
+}
+
+QColor highlightText() {
+    // Used for selected tabs of TabBar control.
+    QPalette pal;
+    QColor result = pal.color(QPalette::Normal, QPalette::HighlightedText);
     return result;
 }
 
@@ -53,6 +60,13 @@ QColor disabledText() {
     QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
     return result;
 }
+
+QColor midlight() {
+    QPalette pal;
+    QColor result = pal.color(QPalette::Disabled, QPalette::Midlight);
+    return result;
+}
+
 
 /**
  * Table cell/text edit widget disabled text. Intended for use against a QPalette::Base

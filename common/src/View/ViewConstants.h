@@ -106,6 +106,10 @@ QColor defaultText();
 
 QColor highlightText();
 
+QColor highlight();
+
+QColor midlight();
+
 QColor disabledText();
 
 QColor disabledCellText();

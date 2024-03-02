@@ -114,13 +114,13 @@ void EntityBrowserView::setFilterText(const std::string &filterText) {
 }
 
 void EntityBrowserView::doInitLayout(Layout &layout) {
-    layout.setOuterMargin(5.0f);
-    layout.setGroupMargin(5.0f);
-    layout.setRowMargin(5.0f);
-    layout.setCellMargin(5.0f);
-    layout.setCellWidth(93.0f, 93.0f);
-    layout.setCellHeight(64.0f, 128.0f);
-    layout.setMaxUpScale(1.5f);
+    layout.setOuterMargin(10.0f);
+    layout.setGroupMargin(10.0f);
+    layout.setRowMargin(10.0f);
+    layout.setCellMargin(10.0f);
+    layout.setCellWidth(128.0f, 128.0f);
+    layout.setCellHeight(96.0f, 128.0f);
+    layout.setMaxUpScale(2.0f);
 }
 
 void EntityBrowserView::doReloadLayout(Layout &layout) {
@@ -169,8 +169,9 @@ void EntityBrowserView::addEntityToLayout(Layout &layout, const Assets::PointEnt
     if ((!m_hideUnused || definition->usageCount() > 0) && (m_filterText.empty() || kdl::ci::str_contains(definition->name(), m_filterText))) {
 
         const auto maxCellWidth = layout.maxCellWidth();
-        const auto actualFont = fontManager().selectFontSize(font, definition->name(), maxCellWidth, 5);
-        const auto actualSize = fontManager().font(actualFont).measure(definition->name());
+//        const auto actualFont = fontManager().selectFontSize(font, definition->name(), maxCellWidth, 2);
+        Renderer::FontDescriptor font2(font.path(), 11);
+        const auto actualSize = fontManager().font(font2).measure(definition->name());
         const auto spec = Assets::safeGetModelSpecification(m_logger, definition->name(), [&]() {
               return definition->modelDefinition().defaultModelSpecification();
             }
@@ -205,8 +206,8 @@ void EntityBrowserView::addEntityToLayout(Layout &layout, const Assets::PointEnt
 
         const auto boundsSize = rotatedBounds.size();
         layout.addItem(EntityCellData{
-                definition, modelRenderer, modelOrientation, actualFont, rotatedBounds, modelScale
-            }, boundsSize.y(), boundsSize.z(), actualSize.x(), static_cast<float>(font.size()) + 2.0f
+                definition, modelRenderer, modelOrientation, font2, rotatedBounds, modelScale
+            }, boundsSize.y(), boundsSize.z(), actualSize.x(), static_cast<float>(font2.size()) + 5.0f
         );
     }
 }
@@ -269,7 +270,9 @@ void EntityBrowserView::renderBounds(Layout &layout, const float y, const float 
     auto vertexArray = Renderer::VertexArray::move(std::move(vertices));
 
     vertexArray.prepare(vboManager());
+    glAssert(glLineWidth(2.0f));
     vertexArray.render(Renderer::PrimType::Lines);
+    glAssert(glLineWidth(1.0f));
 }
 
 void EntityBrowserView::renderModels(Layout &layout, const float y, const float height, Renderer::Transformation &transformation) {
@@ -279,7 +282,7 @@ void EntityBrowserView::renderModels(Layout &layout, const float y, const float 
 
     auto shader = Renderer::ActiveShader{shaderManager(), Renderer::Shaders::EntityModelShader};
     shader.set("ApplyTinting", false);
-    shader.set("Brightness", pref(Preferences::Brightness));
+    shader.set("Brightness", 1.75f);
     shader.set("GrayScale", false);
 
     shader.set("CameraPosition", CameraPosition);
