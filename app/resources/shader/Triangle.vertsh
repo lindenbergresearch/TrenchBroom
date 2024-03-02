@@ -22,7 +22,8 @@
 uniform vec3 CameraPosition;
 uniform vec4 Color;
 uniform bool UseColor;
-
+uniform float ShadeLevel;
+uniform float Alpha;
 varying vec4 vertexColor;
 varying vec3 modelNormal;
 varying vec3 viewVector;
