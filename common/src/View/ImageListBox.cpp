@@ -50,7 +50,7 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(
   imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
   imageAndTextLayout->setSpacing(0);
 
-  m_imageLabel = new QLabel();
+  m_imageLabel = new QLabel(this);
   imageAndTextLayout->addWidget(m_imageLabel);
   m_imageLabel->setPixmap(image);
 

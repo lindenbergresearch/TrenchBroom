@@ -31,10 +31,9 @@ class QListWidget;
 
 class QLabel;
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
+
 class MapDocument;
 
 class SingleSelectionListWidget : public QListWidget
@@ -63,10 +62,10 @@ class EntityDefinitionFileChooser : public QWidget
 private:
   std::weak_ptr<MapDocument> m_document;
 
-  SingleSelectionListWidget* m_builtin;
-  QLabel* m_external;
-  QPushButton* m_chooseExternal;
-  QPushButton* m_reloadExternal;
+  SingleSelectionListWidget* m_builtin = nullptr;
+  QLabel* m_externalLabel = nullptr;
+  QPushButton* m_browseExternal = nullptr;
+  QPushButton* m_reloadExternal = nullptr;
 
   NotifierConnection m_notifierConnection;
 
@@ -95,5 +94,5 @@ private:
 
   void reloadExternalClicked();
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

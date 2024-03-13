@@ -67,6 +67,7 @@
 #include "View/Actions.h"
 #include "View/Autosaver.h"
 #include "View/BorderLine.h"
+#include "View/ChoosePathTypeDialog.h"
 #include "View/ClipTool.h"
 #include "View/ColorButton.h"
 #include "View/CompilationDialog.h"
@@ -169,8 +170,7 @@ MapFrame::MapFrame(FrameManager* frameManager, std::shared_ptr<MapDocument> docu
   restoreWindowGeometry(this);
   restoreWindowState(this);
 
-  // register mapview
-  TrenchBroomApp::instance().setCurrentMapFrame(this);
+  setAcceptDrops(true);
 }
 
 MapFrame::~MapFrame()
@@ -1452,7 +1452,12 @@ void MapFrame::pasteAtCursorPosition()
   if (canPaste())
   {
     const auto referenceBounds = m_document->referenceBounds();
-    if (paste() == PasteType::Node && m_document->hasSelectedNodes())
+
+    auto transaction = Transaction{m_document, "Paste"};
+    switch (paste())
+    {
+    case PasteType::Node:
+      if (m_document->hasSelectedNodes())
     {
       const auto bounds = m_document->selectionBounds();
 
@@ -1461,7 +1466,6 @@ void MapFrame::pasteAtCursorPosition()
       // (https://github.com/TrenchBroom/TrenchBroom/issues/2755)
       const auto nodes = m_document->selectedNodes().nodes();
 
-      auto transaction = Transaction{m_document};
       m_document->hide(nodes);
       const auto delta = m_mapView->pasteObjectsDelta(bounds, referenceBounds);
       m_document->show(nodes);
@@ -1469,9 +1473,17 @@ void MapFrame::pasteAtCursorPosition()
       if (!m_document->translateObjects(delta))
       {
         transaction.cancel();
-        return;
+          break;
+      }
       }
       transaction.commit();
+      break;
+    case PasteType::BrushFace:
+      transaction.commit();
+      break;
+    case PasteType::Failed:
+      transaction.cancel();
+      break;
     }
   }
 }
@@ -2409,7 +2421,7 @@ void MapFrame::debugSetWindowSize()
 void MapFrame::debugShowPalette()
 {
   DebugPaletteWindow* window = new DebugPaletteWindow(this);
-  window->exec();
+  showModelessDialog(window);
 }
 
 void MapFrame::focusChange(QWidget* /* oldFocus */, QWidget* newFocus)
@@ -2444,6 +2456,74 @@ bool MapFrame::canCompile() const
 bool MapFrame::canLaunch() const
 {
   return m_document->persistent();
+}
+
+void MapFrame::dragEnterEvent(QDragEnterEvent* event)
+{
+  if (
+    m_document->game()->wadProperty() && event->mimeData()->hasUrls()
+    && kdl::all_of(event->mimeData()->urls(), [](const auto& url) {
+         if (!url.isLocalFile())
+         {
+           return false;
+         }
+
+         const auto fileInfo = QFileInfo{url.toLocalFile()};
+         return fileInfo.isFile() && fileInfo.fileName().toLower().endsWith(".wad");
+       }))
+  {
+    event->accept();
+  }
+}
+
+void MapFrame::dropEvent(QDropEvent* event)
+{
+  const auto urls = event->mimeData()->urls();
+  if (urls.empty())
+  {
+    return;
+  }
+
+  const auto& wadPropertyKey = m_document->game()->wadProperty();
+  if (!wadPropertyKey)
+  {
+    return;
+  }
+
+  const auto* wadPathsStr = m_document->world()->entity().property(*wadPropertyKey);
+  auto wadPaths = wadPathsStr ? kdl::vec_transform(
+                    kdl::str_split(*wadPathsStr, ";"),
+                    [](const auto& s) { return std::filesystem::path{s}; })
+                              : std::vector<std::filesystem::path>{};
+
+  auto pathDialog = ChoosePathTypeDialog{
+    window(),
+    IO::pathFromQString(urls.front().toLocalFile()),
+    document()->path(),
+    document()->game()->gamePath()};
+
+  const int result = pathDialog.exec();
+  if (result != QDialog::Accepted)
+  {
+    return;
+  }
+
+  auto wadPathsToAdd = kdl::vec_transform(urls, [&](const auto& url) {
+    return convertToPathType(
+      pathDialog.pathType(),
+      IO::pathFromQString(url.toLocalFile()),
+      document()->path(),
+      document()->game()->gamePath());
+  });
+
+  const auto newWadPathsStr = kdl::str_join(
+    kdl::vec_transform(
+      kdl::vec_concat(std::move(wadPaths), std::move(wadPathsToAdd)),
+      [](const auto& path) { return path.string(); }),
+    ";");
+  document()->setProperty(*wadPropertyKey, newWadPathsStr);
+
+  event->acceptProposedAction();
 }
 
 void MapFrame::changeEvent(QEvent*)

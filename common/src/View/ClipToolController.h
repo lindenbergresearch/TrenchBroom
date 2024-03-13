@@ -22,7 +22,7 @@
 #include "FloatType.h"
 #include "View/ToolController.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <memory>
 #include <vector>
@@ -32,16 +32,13 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushFace;
-
 class BrushNode;
-
 class PickResult;
 } // namespace Model
 
 namespace Renderer
 {
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
@@ -56,19 +53,16 @@ protected:
 
 protected:
   explicit ClipToolControllerBase(ClipTool& tool);
-
   virtual ~ClipToolControllerBase() override;
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void pick(const InputState& inputState, Model::PickResult& pickResult) override;
 
   void setRenderOptions(
     const InputState& inputState, Renderer::RenderContext& renderContext) const override;
-
   void render(
     const InputState& inputState,
     Renderer::RenderContext& renderContext,

@@ -31,10 +31,9 @@
 #include "View/Splitter.h"
 #include "View/TitledPanel.h"
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
+
 EntityInspector::EntityInspector(
   std::weak_ptr<MapDocument> document, GLContextManager& contextManager, QWidget* parent)
   : TabBookPage(parent)
@@ -119,5 +118,5 @@ CollapsibleTitledPanel* EntityInspector::createEntityDefinitionFileChooser(
 
   return panel;
 }
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

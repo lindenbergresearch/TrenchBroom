@@ -41,6 +41,7 @@ namespace TrenchBroom
 {
 namespace Renderer
 {
+const float TextRenderer::DefaultMaxViewDistance = 768.0f;
 const float TextRenderer::DefaultMinZoomFactor = 0.5f;
 const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(3.0f, 1.0f);
 const size_t TextRenderer::RectCornerSegments = 6;

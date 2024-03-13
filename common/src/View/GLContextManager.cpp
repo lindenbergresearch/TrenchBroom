@@ -29,6 +29,7 @@
 #include "Renderer/Shaders.h"
 #include "Renderer/Vbo.h"
 
+#include "kdl/result.h"
 #include "kdl/result_fold.h"
 #include "kdl/vector_utils.h"
 #include <kdl/result.h>

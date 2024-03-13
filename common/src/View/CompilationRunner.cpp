@@ -39,6 +39,7 @@
 #include "View/MapDocument.h"
 
 #include "kdl/functional.h"
+#include "kdl/overload.h"
 #include "kdl/result_fold.h"
 #include <kdl/overload.h>
 #include <kdl/string_utils.h>
@@ -386,7 +387,7 @@ void CompilationRunToolTaskRunner::processFinished(
   switch (exitStatus)
   {
   case QProcess::NormalExit:
-    if (exitCode == 0)
+    if (exitCode == 0|| !m_task.treatNonZeroResultCodeAsError)
     {
       m_context.pushSystemMessage(
         "==> Successfully finished execution. \n\n", QColor{"#00FF00"});

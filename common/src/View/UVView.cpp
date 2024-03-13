@@ -196,6 +196,7 @@ void UVView::doRender()
     Renderer::RenderContext renderContext(
       Renderer::RenderMode::Render2D, m_camera, fontManager(), shaderManager());
     Renderer::RenderBatch renderBatch(vboManager());
+    renderContext.setDpiScale(static_cast<float>(window()->devicePixelRatioF()));
 
     setupGL(renderContext);
     renderTexture(renderContext, renderBatch);

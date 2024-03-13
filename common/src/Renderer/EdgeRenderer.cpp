@@ -103,7 +103,7 @@ void EdgeRenderer::RenderBase::renderEdges(RenderContext& renderContext)
 
   if (m_params.onTop)
   {
-    glAssert(glDisable(GL_DEPTH_TEST));
+    glAssert(glDisable(GL_DEPTH_TEST)); //TODO: check dpi line scaling!
 
     // show selection bounds which are covered by a brush
     if (pref(Preferences::ShowHiddenSelectionBounds))

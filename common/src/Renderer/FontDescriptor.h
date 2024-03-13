@@ -37,7 +37,7 @@ private:
 public:
   FontDescriptor(
     const std::filesystem::path& path,
-    size_t size,
+    const size_t size,
     unsigned char minChar = ' ',
     unsigned char maxChar = '~');
 

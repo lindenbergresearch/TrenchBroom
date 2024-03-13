@@ -44,6 +44,7 @@ class TextAnchor;
 class TextRenderer : public DirectRenderable
 {
 private:
+  static const float DefaultMaxViewDistance;
   static const float DefaultMinZoomFactor;
   static const vm::vec2f DefaultInset;
   static const size_t RectCornerSegments;

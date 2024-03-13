@@ -564,6 +564,10 @@ private:
 
   bool canLaunch() const;
 
+public: // drag and drop
+  void dragEnterEvent(QDragEnterEvent* event) override;
+  void dropEvent(QDropEvent* event) override;
+
 protected: // other event handlers
   void changeEvent(QEvent* event) override;
 

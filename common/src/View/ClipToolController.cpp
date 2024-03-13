@@ -38,12 +38,12 @@
 #include "View/HandleDragTracker.h"
 #include "View/MapDocument.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
-#include <vm/distance.h>
-#include <vm/intersection.h>
-#include <vm/segment.h>
-#include <vm/vec.h>
+#include "vm/distance.h"
+#include "vm/intersection.h"
+#include "vm/segment.h"
+#include "vm/vec.h"
 
 #include <memory>
 #include <optional>
@@ -106,7 +106,6 @@ public:
     const InputState& inputState,
     const vm::vec3& initialHandlePosition,
     const vm::vec3& handleOffset) const = 0;
-
   virtual std::vector<vm::vec3> getHelpVectors(
     const InputState& inputState, const vm::vec3& clipPoint) const = 0;
 
@@ -325,7 +324,7 @@ private:
   bool m_secondPointSet{false};
 
 public:
-  AddClipPointDragDelegate(PartDelegateBase& delegate)
+  explicit AddClipPointDragDelegate(PartDelegateBase& delegate)
     : m_delegate{delegate}
   {
   }
@@ -457,7 +456,7 @@ private:
   PartDelegateBase& m_delegate;
 
 public:
-  MoveClipPointDragDelegate(PartDelegateBase& delegate)
+  explicit MoveClipPointDragDelegate(PartDelegateBase& delegate)
     : m_delegate{delegate}
   {
   }
@@ -596,18 +595,18 @@ ClipToolController2D::ClipToolController2D(ClipTool& tool)
   : ClipToolControllerBase{tool}
 {
   addController(
-    std::make_unique<AddClipPointPart>(std::make_unique<PartDelegate2D>(tool)));
-  addController(
     std::make_unique<MoveClipPointPart>(std::make_unique<PartDelegate2D>(tool)));
+  addController(
+    std::make_unique<AddClipPointPart>(std::make_unique<PartDelegate2D>(tool)));
 }
 
 ClipToolController3D::ClipToolController3D(ClipTool& tool)
   : ClipToolControllerBase{tool}
 {
   addController(
-    std::make_unique<AddClipPointPart>(std::make_unique<PartDelegate3D>(tool)));
-  addController(
     std::make_unique<MoveClipPointPart>(std::make_unique<PartDelegate3D>(tool)));
+  addController(
+    std::make_unique<AddClipPointPart>(std::make_unique<PartDelegate3D>(tool)));
 }
 } // namespace View
 } // namespace TrenchBroom

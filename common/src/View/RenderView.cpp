@@ -255,7 +255,7 @@ void RenderView::clearBackground()
 
   glAssert(glClearColor(
     backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.a()));
-  glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+  glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 const Color& RenderView::getBackgroundColor()
@@ -265,7 +265,7 @@ const Color& RenderView::getBackgroundColor()
 
 void RenderView::renderFocusIndicator()
 {
-  if (!doShouldRenderFocusIndicator())
+  if (!doShouldRenderFocusIndicator() || !hasFocus())
     return;
 
   const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator);

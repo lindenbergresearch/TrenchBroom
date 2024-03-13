@@ -22,21 +22,19 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Model
+namespace TrenchBroom::Model
 {
 class PickResult;
 }
 
-namespace Renderer
+namespace TrenchBroom::Renderer
 {
 class RenderBatch;
 
 class RenderContext;
-} // namespace Renderer
+} // namespace TrenchBroom::Renderer
 
-namespace View
+namespace TrenchBroom::View
 {
 class DragTracker;
 
@@ -77,6 +75,7 @@ public:
 
   std::unique_ptr<DragTracker> startMouseDrag(const InputState& inputState);
 
+  bool shouldAcceptDrop(const InputState& inputState, const std::string& payload) const;
   std::unique_ptr<DropTracker> dragEnter(
     const InputState& inputState, const std::string& payload);
 
@@ -95,5 +94,4 @@ private:
 
   bool chainEndsHere() const;
 };
-} // namespace View
-} // namespace TrenchBroom
+} // namespace TrenchBroom::View

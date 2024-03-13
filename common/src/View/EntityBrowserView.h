@@ -36,8 +36,9 @@
 namespace TrenchBroom
 {
 class Logger;
+}
 
-namespace Assets
+namespace TrenchBroom::Assets
 {
 class EntityDefinition;
 
@@ -50,18 +51,18 @@ class EntityModelManager;
 enum class Orientation;
 
 class PointEntityDefinition;
-} // namespace Assets
+} // namespace TrenchBroom::Assets
 
-namespace Renderer
+namespace TrenchBroom::Renderer
 {
 class FontDescriptor;
 
 class TexturedRenderer;
 
 class Transformation;
-} // namespace Renderer
+} // namespace TrenchBroom::Renderer
 
-namespace View
+namespace TrenchBroom::View
 {
 using EntityGroupData = std::string;
 
@@ -95,8 +96,8 @@ private:
   Logger& m_logger;
   vm::quatf m_rotation;
 
-  bool m_group;
-  bool m_hideUnused;
+  bool m_group = false;
+  bool m_hideUnused = false;
   Assets::EntityDefinitionSortOrder m_sortOrder;
   std::string m_filterText;
 
@@ -173,5 +174,5 @@ private:
 
   const EntityCellData& cellData(const Cell& cell) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View
