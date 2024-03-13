@@ -24,42 +24,48 @@
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class Grid;
 
 class InputState;
 
 class MapDocument;
 
-class MoveObjectsTool : public Tool {
+class MoveObjectsTool : public Tool
+{
 public:
-    typedef enum {
-      MR_Continue, MR_Deny, MR_Cancel
-    } MoveResult;
+  typedef enum
+  {
+    MR_Continue,
+    MR_Deny,
+    MR_Cancel
+  } MoveResult;
 
 private:
-    std::weak_ptr<MapDocument> m_document;
-    bool m_duplicateObjects;
+  std::weak_ptr<MapDocument> m_document;
+  bool m_duplicateObjects;
 
 public:
-    explicit MoveObjectsTool(std::weak_ptr<MapDocument> document);
+  explicit MoveObjectsTool(std::weak_ptr<MapDocument> document);
 
 public:
-    const Grid &grid() const;
+  const Grid& grid() const;
 
-    bool startMove(const InputState &inputState);
+  bool startMove(const InputState& inputState);
 
-    MoveResult move(const InputState &inputState, const vm::vec3 &delta);
+  MoveResult move(const InputState& inputState, const vm::vec3& delta);
 
-    void endMove(const InputState &inputState);
+  void endMove(const InputState& inputState);
 
-    void cancelMove();
+  void cancelMove();
 
 private:
-    bool duplicateObjects(const InputState &inputState) const;
+  bool duplicateObjects(const InputState& inputState) const;
 
-    QWidget *doCreatePage(QWidget *parent) override;
+  QWidget* doCreatePage(QWidget* parent) override;
 };
 } // namespace View
 } // namespace TrenchBroom

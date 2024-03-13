@@ -33,72 +33,103 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom::View {
-CompilationRun::~CompilationRun() {
-    if (running()) {
-        m_currentRun->terminate();
-    }
+namespace TrenchBroom::View
+{
+CompilationRun::~CompilationRun()
+{
+  if (running())
+  {
+    m_currentRun->terminate();
+  }
 }
 
-bool CompilationRun::running() const {
-    return doIsRunning();
+bool CompilationRun::running() const
+{
+  return doIsRunning();
 }
 
-void CompilationRun::run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput) {
-    run(profile, std::move(document), currentOutput, false);
+void CompilationRun::run(
+  const Model::CompilationProfile& profile,
+  std::shared_ptr<MapDocument> document,
+  QTextEdit* currentOutput)
+{
+  run(profile, std::move(document), currentOutput, false);
 }
 
-void CompilationRun::test(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput) {
-    run(profile, std::move(document), currentOutput, true);
+void CompilationRun::test(
+  const Model::CompilationProfile& profile,
+  std::shared_ptr<MapDocument> document,
+  QTextEdit* currentOutput)
+{
+  run(profile, std::move(document), currentOutput, true);
 }
 
-void CompilationRun::terminate() {
-    if (doIsRunning()) {
-        m_currentRun->terminate();
-    }
+void CompilationRun::terminate()
+{
+  if (doIsRunning())
+  {
+    m_currentRun->terminate();
+  }
 }
 
-bool CompilationRun::doIsRunning() const {
-    return m_currentRun != nullptr && m_currentRun->running();
+bool CompilationRun::doIsRunning() const
+{
+  return m_currentRun != nullptr && m_currentRun->running();
 }
 
-void CompilationRun::run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput, const bool test) {
-    ensure(!profile.tasks.empty(), "profile has no tasks");
-    ensure(document != nullptr, "document is null");
-    ensure(currentOutput != nullptr, "currentOutput is null");
+void CompilationRun::run(
+  const Model::CompilationProfile& profile,
+  std::shared_ptr<MapDocument> document,
+  QTextEdit* currentOutput,
+  const bool test)
+{
+  ensure(!profile.tasks.empty(), "profile has no tasks");
+  ensure(document != nullptr, "document is null");
+  ensure(currentOutput != nullptr, "currentOutput is null");
 
-    assert(!doIsRunning());
+  assert(!doIsRunning());
+  cleanup();
+
+  auto variables = CompilationVariables{document, buildWorkDir(profile, document)};
+
+  auto compilationContext =
+    CompilationContext{document, variables, TextOutputAdapter{currentOutput}, test};
+  m_currentRun = new CompilationRunner{std::move(compilationContext), profile, this};
+  connect(
+    m_currentRun,
+    &CompilationRunner::compilationStarted,
+    this,
+    &CompilationRun::compilationStarted);
+  connect(m_currentRun, &CompilationRunner::compilationEnded, this, [&]() {
     cleanup();
-
-    auto variables = CompilationVariables{document, buildWorkDir(profile, document)};
-
-    auto compilationContext = CompilationContext{document, variables, TextOutputAdapter{currentOutput}, test};
-    m_currentRun = new CompilationRunner{std::move(compilationContext), profile, this};
-    connect(m_currentRun, &CompilationRunner::compilationStarted, this, &CompilationRun::compilationStarted);
-    connect(m_currentRun, &CompilationRunner::compilationEnded, this, [&]() {
-          cleanup();
-          emit compilationEnded();
-        }
-    );
-    m_currentRun->execute();
+    emit compilationEnded();
+  });
+  m_currentRun->execute();
 }
 
-std::string CompilationRun::buildWorkDir(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document) {
-    try {
-        return EL::interpolate(profile.workDirSpec, EL::EvaluationContext{
-            CompilationWorkDirVariables{std::move(document)}}
-        );
-    } catch (const Exception &) {
-        return "";
-    }
+std::string CompilationRun::buildWorkDir(
+  const Model::CompilationProfile& profile, std::shared_ptr<MapDocument> document)
+{
+  try
+  {
+    return EL::interpolate(
+      profile.workDirSpec,
+      EL::EvaluationContext{CompilationWorkDirVariables{std::move(document)}});
+  }
+  catch (const Exception&)
+  {
+    return "";
+  }
 }
 
-void CompilationRun::cleanup() {
-    if (m_currentRun) {
-        // It's not safe to delete a CompilationRunner during execution of one of its
-        // signals, so use deleteLater()
-        m_currentRun->deleteLater();
-        m_currentRun = nullptr;
-    }
+void CompilationRun::cleanup()
+{
+  if (m_currentRun)
+  {
+    // It's not safe to delete a CompilationRunner during execution of one of its
+    // signals, so use deleteLater()
+    m_currentRun->deleteLater();
+    m_currentRun = nullptr;
+  }
 }
 } // namespace TrenchBroom::View

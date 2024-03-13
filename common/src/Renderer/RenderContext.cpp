@@ -19,9 +19,9 @@
 
 #include "RenderContext.h"
 
-#include "Renderer/Camera.h"
-#include "Preferences.h"
 #include "PreferenceManager.h"
+#include "Preferences.h"
+#include "Renderer/Camera.h"
 
 namespace TrenchBroom
 {
@@ -283,24 +283,26 @@ void RenderContext::setForceHideSelectionGuide()
   setShowSelectionGuide(ShowSelectionGuide::ForceHide);
 }
 
-void RenderContext::setShowSelectionGuide(const ShowSelectionGuide showSelectionGuide) {
-    switch (showSelectionGuide) {
-        case ShowSelectionGuide::Show:
-            if (m_showSelectionGuide == ShowSelectionGuide::Hide)
-                m_showSelectionGuide = ShowSelectionGuide::Show;
-            break;
-        case ShowSelectionGuide::Hide:
-            if (m_showSelectionGuide == ShowSelectionGuide::Show)
-                m_showSelectionGuide = ShowSelectionGuide::Hide;
-            break;
-        case ShowSelectionGuide::ForceShow:
-            m_showSelectionGuide = ShowSelectionGuide::ForceShow;
-            break;
-        case ShowSelectionGuide::ForceHide:
-            if (m_showSelectionGuide != ShowSelectionGuide::ForceShow)
-                m_showSelectionGuide = ShowSelectionGuide::ForceHide;
-            break;
-    }
+void RenderContext::setShowSelectionGuide(const ShowSelectionGuide showSelectionGuide)
+{
+  switch (showSelectionGuide)
+  {
+  case ShowSelectionGuide::Show:
+    if (m_showSelectionGuide == ShowSelectionGuide::Hide)
+      m_showSelectionGuide = ShowSelectionGuide::Show;
+    break;
+  case ShowSelectionGuide::Hide:
+    if (m_showSelectionGuide == ShowSelectionGuide::Show)
+      m_showSelectionGuide = ShowSelectionGuide::Hide;
+    break;
+  case ShowSelectionGuide::ForceShow:
+    m_showSelectionGuide = ShowSelectionGuide::ForceShow;
+    break;
+  case ShowSelectionGuide::ForceHide:
+    if (m_showSelectionGuide != ShowSelectionGuide::ForceShow)
+      m_showSelectionGuide = ShowSelectionGuide::ForceHide;
+    break;
+  }
 }
 } // namespace Renderer
 } // namespace TrenchBroom

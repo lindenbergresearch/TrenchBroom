@@ -27,27 +27,33 @@ class QRadioButton;
 
 class QWidget;
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 
-class ChoosePathTypeDialog : public QDialog {
-Q_OBJECT
+class ChoosePathTypeDialog : public QDialog
+{
+  Q_OBJECT
 private:
-    std::filesystem::path m_absPath;
-    std::filesystem::path m_docRelativePath;
-    std::filesystem::path m_gameRelativePath;
-    std::filesystem::path m_appRelativePath;
+  std::filesystem::path m_absPath;
+  std::filesystem::path m_docRelativePath;
+  std::filesystem::path m_gameRelativePath;
+  std::filesystem::path m_appRelativePath;
 
-    QRadioButton *m_absRadio;
-    QRadioButton *m_docRelativeRadio;
-    QRadioButton *m_appRelativeRadio;
-    QRadioButton *m_gameRelativeRadio;
+  QRadioButton* m_absRadio;
+  QRadioButton* m_docRelativeRadio;
+  QRadioButton* m_appRelativeRadio;
+  QRadioButton* m_gameRelativeRadio;
 
 private:
-    void createGui();
+  void createGui();
 
 public:
-    ChoosePathTypeDialog(QWidget *parent, std::filesystem::path absPath, const std::filesystem::path &docPath, const std::filesystem::path &gamePath);
+  ChoosePathTypeDialog(
+    QWidget* parent,
+    std::filesystem::path absPath,
+    const std::filesystem::path& docPath,
+    const std::filesystem::path& gamePath);
 
-    const std::filesystem::path &path() const;
+  const std::filesystem::path& path() const;
 };
 } // namespace TrenchBroom::View

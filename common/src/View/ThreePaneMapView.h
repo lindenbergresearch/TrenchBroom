@@ -25,17 +25,20 @@
 
 class QSplitter;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 }
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 class MapRenderer;
 
 class VboManager;
 } // namespace TrenchBroom::Renderer
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class CyclingMapView;
 
 class GLContextManager;
@@ -50,31 +53,39 @@ class MapView3D;
 
 class MapViewToolBox;
 
-class ThreePaneMapView : public MultiPaneMapView {
-Q_OBJECT
+class ThreePaneMapView : public MultiPaneMapView
+{
+  Q_OBJECT
 private:
-    Logger *m_logger;
-    std::weak_ptr<MapDocument> m_document;
+  Logger* m_logger;
+  std::weak_ptr<MapDocument> m_document;
 
-    QSplitter *m_hSplitter = nullptr;
-    QSplitter *m_vSplitter = nullptr;
-    MapView3D *m_mapView3D = nullptr;
-    MapView2D *m_mapViewXY = nullptr;
-    CyclingMapView *m_mapViewZZ = nullptr;
+  QSplitter* m_hSplitter = nullptr;
+  QSplitter* m_vSplitter = nullptr;
+  MapView3D* m_mapView3D = nullptr;
+  MapView2D* m_mapViewXY = nullptr;
+  CyclingMapView* m_mapViewZZ = nullptr;
 
 public:
-    ThreePaneMapView(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager,
-        Logger *logger, QWidget *parent = nullptr
-    );
+  ThreePaneMapView(
+    std::weak_ptr<MapDocument> document,
+    MapViewToolBox& toolBox,
+    Renderer::MapRenderer& mapRenderer,
+    GLContextManager& contextManager,
+    Logger* logger,
+    QWidget* parent = nullptr);
 
-    ~ThreePaneMapView() override;
+  ~ThreePaneMapView() override;
 
 private:
-    void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager);
+  void createGui(
+    MapViewToolBox& toolBox,
+    Renderer::MapRenderer& mapRenderer,
+    GLContextManager& contextManager);
 
 private: // implement MultiPaneMapView subclassing interface
-    void doMaximizeView(MapView *view) override;
+  void doMaximizeView(MapView* view) override;
 
-    void doRestoreViews() override;
+  void doRestoreViews() override;
 };
 } // namespace TrenchBroom::View

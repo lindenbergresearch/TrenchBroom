@@ -19,44 +19,55 @@
 
 #include "TexturedIndexArrayRenderer.h"
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 TexturedIndexArrayRenderer::TexturedIndexArrayRenderer() {}
 
-TexturedIndexArrayRenderer::TexturedIndexArrayRenderer(VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap) : m_vertexArray{
-    std::move(vertexArray)
-}, m_indexArray{std::move(indexArray)}, m_indexRanges{
-    std::move(indexArrayMap)
-} {
+TexturedIndexArrayRenderer::TexturedIndexArrayRenderer(
+  VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap)
+  : m_vertexArray{std::move(vertexArray)}
+  , m_indexArray{std::move(indexArray)}
+  , m_indexRanges{std::move(indexArrayMap)}
+{
 }
 
-bool TexturedIndexArrayRenderer::empty() const {
-    return m_indexArray.empty();
+bool TexturedIndexArrayRenderer::empty() const
+{
+  return m_indexArray.empty();
 }
 
-void TexturedIndexArrayRenderer::prepare(VboManager &vboManager) {
-    m_vertexArray.prepare(vboManager);
-    m_indexArray.prepare(vboManager);
+void TexturedIndexArrayRenderer::prepare(VboManager& vboManager)
+{
+  m_vertexArray.prepare(vboManager);
+  m_indexArray.prepare(vboManager);
 }
 
-void TexturedIndexArrayRenderer::render() {
-    if (m_vertexArray.setup()) {
-        if (m_indexArray.setup()) {
-            m_indexRanges.render(m_indexArray);
-            m_indexArray.cleanup();
-        }
-        m_vertexArray.cleanup();
+void TexturedIndexArrayRenderer::render()
+{
+  if (m_vertexArray.setup())
+  {
+    if (m_indexArray.setup())
+    {
+      m_indexRanges.render(m_indexArray);
+      m_indexArray.cleanup();
     }
+    m_vertexArray.cleanup();
+  }
 }
 
-void TexturedIndexArrayRenderer::render(TextureRenderFunc &func) {
-    if (m_vertexArray.setup()) {
-        if (m_indexArray.setup()) {
-            m_indexRanges.render(m_indexArray, func);
-            m_indexArray.cleanup();
-        }
-        m_vertexArray.cleanup();
+void TexturedIndexArrayRenderer::render(TextureRenderFunc& func)
+{
+  if (m_vertexArray.setup())
+  {
+    if (m_indexArray.setup())
+    {
+      m_indexRanges.render(m_indexArray, func);
+      m_indexArray.cleanup();
     }
+    m_vertexArray.cleanup();
+  }
 }
 } // namespace Renderer
 } // namespace TrenchBroom

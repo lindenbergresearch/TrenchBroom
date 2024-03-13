@@ -40,88 +40,116 @@
 
 #include <vector>
 
-namespace TrenchBroom::View {
-FaceInspector::FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : TabBookPage{parent},
-    m_document{std::move(document)} {
-    createGui(m_document, contextManager);
+namespace TrenchBroom::View
+{
+FaceInspector::FaceInspector(
+  std::weak_ptr<MapDocument> document, GLContextManager& contextManager, QWidget* parent)
+  : TabBookPage{parent}
+  , m_document{std::move(document)}
+{
+  createGui(m_document, contextManager);
 }
 
-FaceInspector::~FaceInspector() {
-    saveWindowState(m_splitter);
+FaceInspector::~FaceInspector()
+{
+  saveWindowState(m_splitter);
 }
 
-bool FaceInspector::cancelMouseDrag() {
-    return m_faceAttribsEditor->cancelMouseDrag();
+bool FaceInspector::cancelMouseDrag()
+{
+  return m_faceAttribsEditor->cancelMouseDrag();
 }
 
-void FaceInspector::revealTexture(const Assets::Texture *texture) {
-    m_textureBrowser->revealTexture(texture);
-    m_textureBrowser->setSelectedTexture(texture);
+void FaceInspector::revealTexture(const Assets::Texture* texture)
+{
+  m_textureBrowser->revealTexture(texture);
+  m_textureBrowser->setSelectedTexture(texture);
 }
 
-void FaceInspector::createGui(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
-    m_splitter = new Splitter{Qt::Vertical};
-    m_splitter->setObjectName("FaceInspector_Splitter");
+void FaceInspector::createGui(
+  std::weak_ptr<MapDocument> document, GLContextManager& contextManager)
+{
+  m_splitter = new Splitter{Qt::Vertical};
+  m_splitter->setObjectName("FaceInspector_Splitter");
 
-    m_splitter->addWidget(createFaceAttribsEditor(m_splitter, document, contextManager));
-    m_splitter->addWidget(createTextureBrowser(m_splitter, document, contextManager));
+  m_splitter->addWidget(createFaceAttribsEditor(m_splitter, document, contextManager));
+  m_splitter->addWidget(createTextureBrowser(m_splitter, document, contextManager));
 
-    // when the window resizes, the browser should get extra space
-    m_splitter->setStretchFactor(0, 0);
-    m_splitter->setStretchFactor(1, 1);
+  // when the window resizes, the browser should get extra space
+  m_splitter->setStretchFactor(0, 0);
+  m_splitter->setStretchFactor(1, 1);
 
-    auto *layout = new QVBoxLayout{};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(m_splitter, 1);
-    setLayout(layout);
+  auto* layout = new QVBoxLayout{};
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(m_splitter, 1);
+  setLayout(layout);
 
-    connect(m_textureBrowser, &TextureBrowser::textureSelected, this, &FaceInspector::textureSelected);
+  connect(
+    m_textureBrowser,
+    &TextureBrowser::textureSelected,
+    this,
+    &FaceInspector::textureSelected);
 
-    restoreWindowState(m_splitter);
+  restoreWindowState(m_splitter);
 }
 
-QWidget *FaceInspector::createFaceAttribsEditor(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
-    m_faceAttribsEditor = new FaceAttribsEditor{std::move(document), contextManager, parent};
-    return m_faceAttribsEditor;
+QWidget* FaceInspector::createFaceAttribsEditor(
+  QWidget* parent, std::weak_ptr<MapDocument> document, GLContextManager& contextManager)
+{
+  m_faceAttribsEditor =
+    new FaceAttribsEditor{std::move(document), contextManager, parent};
+  return m_faceAttribsEditor;
 }
 
-QWidget *FaceInspector::createTextureBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
-    auto *panel = new TitledPanel{tr("Texture Browser"), parent};
-    m_textureBrowser = new TextureBrowser{std::move(document), contextManager};
+QWidget* FaceInspector::createTextureBrowser(
+  QWidget* parent, std::weak_ptr<MapDocument> document, GLContextManager& contextManager)
+{
+  auto* panel = new TitledPanel{tr("Texture Browser"), parent};
+  m_textureBrowser = new TextureBrowser{std::move(document), contextManager};
 
-    auto *layout = new QVBoxLayout{};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(m_textureBrowser, 1);
-    panel->getPanel()->setLayout(layout);
+  auto* layout = new QVBoxLayout{};
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(m_textureBrowser, 1);
+  panel->getPanel()->setLayout(layout);
 
-    return panel;
+  return panel;
 }
 
-static bool allFacesHaveTexture(const std::vector<Model::BrushFaceHandle> &faceHandles, const Assets::Texture *texture) {
-    return std::all_of(faceHandles.begin(), faceHandles.end(), [&](const auto &faceHandle) {
-          return faceHandle.face().texture() == texture;
-        }
-    );
+static bool allFacesHaveTexture(
+  const std::vector<Model::BrushFaceHandle>& faceHandles, const Assets::Texture* texture)
+{
+  return std::all_of(faceHandles.begin(), faceHandles.end(), [&](const auto& faceHandle) {
+    return faceHandle.face().texture() == texture;
+  });
 }
 
-void FaceInspector::textureSelected(const Assets::Texture *texture) {
-    auto document = kdl::mem_lock(m_document);
-    const auto faces = document->allSelectedBrushFaces();
+void FaceInspector::textureSelected(const Assets::Texture* texture)
+{
+  auto document = kdl::mem_lock(m_document);
+  const auto faces = document->allSelectedBrushFaces();
 
-    if (texture) {
-        if (!faces.empty()) {
-            const auto textureNameToSet = !allFacesHaveTexture(faces, texture) ? texture->name() : Model::BrushFaceAttributes::NoTextureName;
+  if (texture)
+  {
+    if (!faces.empty())
+    {
+      const auto textureNameToSet = !allFacesHaveTexture(faces, texture)
+                                      ? texture->name()
+                                      : Model::BrushFaceAttributes::NoTextureName;
 
-            document->setCurrentTextureName(textureNameToSet);
-            auto request = Model::ChangeBrushFaceAttributesRequest{};
-            request.setTextureName(textureNameToSet);
-            document->setFaceAttributes(request);
-        }
-        else {
-            document->setCurrentTextureName(document->currentTextureName() != texture->name() ? texture->name() : Model::BrushFaceAttributes::NoTextureName);
-        }
+      document->setCurrentTextureName(textureNameToSet);
+      auto request = Model::ChangeBrushFaceAttributesRequest{};
+      request.setTextureName(textureNameToSet);
+      document->setFaceAttributes(request);
     }
+    else
+    {
+      document->setCurrentTextureName(
+        document->currentTextureName() != texture->name()
+          ? texture->name()
+          : Model::BrushFaceAttributes::NoTextureName);
+    }
+  }
 }
 } // namespace TrenchBroom::View

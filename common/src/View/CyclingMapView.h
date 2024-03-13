@@ -28,94 +28,107 @@
 
 class QStackedLayout;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 }
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 class MapRenderer;
 }
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class GLContextManager;
 
 class MapDocument;
 
 class MapViewToolBox;
 
-class CyclingMapView : public MapViewContainer, public CameraLinkableView {
-Q_OBJECT
+class CyclingMapView : public MapViewContainer, public CameraLinkableView
+{
+  Q_OBJECT
 public:
-    static constexpr auto View_3D = 1;
-    static constexpr auto View_XY = 2;
-    static constexpr auto View_XZ = 4;
-    static constexpr auto View_YZ = 8;
-    static constexpr auto View_ZZ = View_XZ | View_YZ;
-    static constexpr auto View_2D = View_XY | View_ZZ;
-    static constexpr auto View_ALL = View_3D | View_2D;
+  static constexpr auto View_3D = 1;
+  static constexpr auto View_XY = 2;
+  static constexpr auto View_XZ = 4;
+  static constexpr auto View_YZ = 8;
+  static constexpr auto View_ZZ = View_XZ | View_YZ;
+  static constexpr auto View_2D = View_XY | View_ZZ;
+  static constexpr auto View_ALL = View_3D | View_2D;
 
 private:
-    Logger *m_logger;
-    std::weak_ptr<MapDocument> m_document;
+  Logger* m_logger;
+  std::weak_ptr<MapDocument> m_document;
 
-    using MapViewList = std::vector<MapViewBase *>;
-    MapViewList m_mapViews;
-    MapViewBase *m_currentMapView;
+  using MapViewList = std::vector<MapViewBase*>;
+  MapViewList m_mapViews;
+  MapViewBase* m_currentMapView;
 
-    QStackedLayout *m_layout;
+  QStackedLayout* m_layout;
 
 public:
-    CyclingMapView(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager,
-        int views, Logger *logger, QWidget *parent = nullptr
-    );
+  CyclingMapView(
+    std::weak_ptr<MapDocument> document,
+    MapViewToolBox& toolBox,
+    Renderer::MapRenderer& mapRenderer,
+    GLContextManager& contextManager,
+    int views,
+    Logger* logger,
+    QWidget* parent = nullptr);
 
 private:
-    void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, int views);
+  void createGui(
+    MapViewToolBox& toolBox,
+    Renderer::MapRenderer& mapRenderer,
+    GLContextManager& contextManager,
+    int views);
 
-    void addMapView(MapViewBase *mapView);
+  void addMapView(MapViewBase* mapView);
 
 private:
-    void switchToMapView(MapViewBase *mapView);
+  void switchToMapView(MapViewBase* mapView);
 
 private: // implement ViewEffectsService interface
-    void doFlashSelection() override;
+  void doFlashSelection() override;
 
 private: // implement MapView interface
-    bool doGetIsCurrent() const override;
+  bool doGetIsCurrent() const override;
 
-    bool doCanSelectTall() override;
+  bool doCanSelectTall() override;
 
-    void doSelectTall() override;
+  void doSelectTall() override;
 
-    void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
+  void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) override;
 
-    void doFocusCameraOnSelection(bool animate) override;
+  void doFocusCameraOnSelection(bool animate) override;
 
-    void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
+  void doMoveCameraToPosition(const vm::vec3f& position, bool animate) override;
 
-    void doMoveCameraToCurrentTracePoint() override;
+  void doMoveCameraToCurrentTracePoint() override;
 
-    bool doCanMaximizeCurrentView() const override;
+  bool doCanMaximizeCurrentView() const override;
 
-    bool doCurrentViewMaximized() const override;
+  bool doCurrentViewMaximized() const override;
 
-    void doToggleMaximizeCurrentView() override;
+  void doToggleMaximizeCurrentView() override;
 
-    bool doCancelMouseDrag() override;
+  bool doCancelMouseDrag() override;
 
-    void doRefreshViews() override;
+  void doRefreshViews() override;
 
 private: // implement MapViewContainer interface
-    void doInstallActivationTracker(MapViewActivationTracker &activationTracker) override;
+  void doInstallActivationTracker(MapViewActivationTracker& activationTracker) override;
 
-    MapView *doGetCurrentMapView() const override;
+  MapView* doGetCurrentMapView() const override;
 
-    MapViewBase *doGetFirstMapViewBase() override;
+  MapViewBase* doGetFirstMapViewBase() override;
 
 public:
-    void cycleChildMapView(MapView *after) override;
+  void cycleChildMapView(MapView* after) override;
 
 public: // implement CameraLinkableView interface
-    void linkCamera(CameraLinkHelper &linkHelper) override;
+  void linkCamera(CameraLinkHelper& linkHelper) override;
 };
 } // namespace TrenchBroom::View

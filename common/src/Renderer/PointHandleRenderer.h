@@ -27,39 +27,43 @@
 
 #include <map>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class ActiveShader;
 
 class RenderContext;
 
 class VboManager;
 
-class PointHandleRenderer : public DirectRenderable {
+class PointHandleRenderer : public DirectRenderable
+{
 private:
-    using HandleMap = std::map<Color, std::vector<vm::vec3f>>;
+  using HandleMap = std::map<Color, std::vector<vm::vec3f>>;
 
-    HandleMap m_pointHandles;
-    HandleMap m_highlights;
+  HandleMap m_pointHandles;
+  HandleMap m_highlights;
 
-    Circle m_handle;
-    Circle m_highlight;
+  Circle m_handle;
+  Circle m_highlight;
 
 public:
-    PointHandleRenderer();
+  PointHandleRenderer();
 
-    void addPoint(const Color &color, const vm::vec3f &position);
+  void addPoint(const Color& color, const vm::vec3f& position);
 
-    void addHighlight(const Color &color, const vm::vec3f &position);
+  void addHighlight(const Color& color, const vm::vec3f& position);
 
 private:
-    void doPrepareVertices(VboManager &vboManager) override;
+  void doPrepareVertices(VboManager& vboManager) override;
 
-    void doRender(RenderContext &renderContext) override;
+  void doRender(RenderContext& renderContext) override;
 
-    void renderHandles(RenderContext &renderContext, const HandleMap &map, Circle &circle, float opacity);
+  void renderHandles(
+    RenderContext& renderContext, const HandleMap& map, Circle& circle, float opacity);
 
-    void clear();
+  void clear();
 };
 } // namespace Renderer
 } // namespace TrenchBroom

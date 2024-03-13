@@ -31,63 +31,69 @@ class QListWidget;
 
 class QLabel;
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class MapDocument;
 
-class SingleSelectionListWidget : public QListWidget {
-Q_OBJECT
+class SingleSelectionListWidget : public QListWidget
+{
+  Q_OBJECT
 private:
-    bool m_allowDeselectAll;
+  bool m_allowDeselectAll;
 
 public:
-    explicit SingleSelectionListWidget(QWidget *parent = nullptr);
+  explicit SingleSelectionListWidget(QWidget* parent = nullptr);
 
-    void setAllowDeselectAll(bool allow);
+  void setAllowDeselectAll(bool allow);
 
-    bool allowDeselectAll() const;
+  bool allowDeselectAll() const;
 
 protected: // QAbstractItemView overrides
-    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
-    // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
-    // QEvent* event) const override;
+  void selectionChanged(
+    const QItemSelection& selected, const QItemSelection& deselected) override;
+  // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
+  // QEvent* event) const override;
 };
 
-class EntityDefinitionFileChooser : public QWidget {
-Q_OBJECT
+class EntityDefinitionFileChooser : public QWidget
+{
+  Q_OBJECT
 private:
-    std::weak_ptr<MapDocument> m_document;
+  std::weak_ptr<MapDocument> m_document;
 
-    SingleSelectionListWidget *m_builtin;
-    QLabel *m_external;
-    QPushButton *m_chooseExternal;
-    QPushButton *m_reloadExternal;
+  SingleSelectionListWidget* m_builtin;
+  QLabel* m_external;
+  QPushButton* m_chooseExternal;
+  QPushButton* m_reloadExternal;
 
-    NotifierConnection m_notifierConnection;
+  NotifierConnection m_notifierConnection;
 
 public:
-    explicit EntityDefinitionFileChooser(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit EntityDefinitionFileChooser(
+    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
 private:
-    void createGui();
+  void createGui();
 
-    void bindEvents();
+  void bindEvents();
 
-    void connectObservers();
+  void connectObservers();
 
-    void documentWasNewed(MapDocument *document);
+  void documentWasNewed(MapDocument* document);
 
-    void documentWasLoaded(MapDocument *document);
+  void documentWasLoaded(MapDocument* document);
 
-    void entityDefinitionsDidChange();
+  void entityDefinitionsDidChange();
 
-    void updateControls();
+  void updateControls();
 
-    void builtinSelectionChanged();
+  void builtinSelectionChanged();
 
-    void chooseExternalClicked();
+  void chooseExternalClicked();
 
-    void reloadExternalClicked();
+  void reloadExternalClicked();
 };
 } // namespace View
 } // namespace TrenchBroom

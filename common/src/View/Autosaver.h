@@ -26,69 +26,82 @@
 #include <filesystem>
 #include <memory>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 } // namespace TrenchBroom
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class FileSystem;
 
 class WritableDiskFileSystem;
 } // namespace TrenchBroom::IO
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class Command;
 
 class MapDocument;
 
 IO::PathMatcher makeBackupPathMatcher(std::filesystem::path mapBasename);
 
-class Autosaver {
+class Autosaver
+{
 private:
-    using Clock = std::chrono::system_clock;
+  using Clock = std::chrono::system_clock;
 
-    std::weak_ptr<MapDocument> m_document;
+  std::weak_ptr<MapDocument> m_document;
 
-    /**
-     * The time after which a new autosave is attempted, in seconds.
-     */
-    std::chrono::milliseconds m_saveInterval;
+  /**
+   * The time after which a new autosave is attempted, in seconds.
+   */
+  std::chrono::milliseconds m_saveInterval;
 
-    /**
-     * The maximum number of backups to create. When this number is exceeded, old backups
-     * are deleted until the number of backups is equal to the number of backups again.
-     */
-    size_t m_maxBackups;
+  /**
+   * The maximum number of backups to create. When this number is exceeded, old backups
+   * are deleted until the number of backups is equal to the number of backups again.
+   */
+  size_t m_maxBackups;
 
-    /**
-     * The time at which the last autosave has succeeded.
-     */
-    std::chrono::time_point<Clock> m_lastSaveTime;
+  /**
+   * The time at which the last autosave has succeeded.
+   */
+  std::chrono::time_point<Clock> m_lastSaveTime;
 
-    /**
-     * The modification count that was last recorded.
-     */
-    size_t m_lastModificationCount;
+  /**
+   * The modification count that was last recorded.
+   */
+  size_t m_lastModificationCount;
 
 public:
-    explicit Autosaver(std::weak_ptr<MapDocument> document, std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000),
-        size_t maxBackups = 50
-    );
+  explicit Autosaver(
+    std::weak_ptr<MapDocument> document,
+    std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000),
+    size_t maxBackups = 50);
 
-    void triggerAutosave(Logger &logger);
+  void triggerAutosave(Logger& logger);
 
 private:
-    void autosave(Logger &logger, std::shared_ptr<View::MapDocument> document);
+  void autosave(Logger& logger, std::shared_ptr<View::MapDocument> document);
 
-    Result<IO::WritableDiskFileSystem> createBackupFileSystem(const std::filesystem::path &mapPath) const;
+  Result<IO::WritableDiskFileSystem> createBackupFileSystem(
+    const std::filesystem::path& mapPath) const;
 
-    Result<std::vector<std::filesystem::path>> collectBackups(const IO::FileSystem &fs, const std::filesystem::path &mapBasename) const;
+  Result<std::vector<std::filesystem::path>> collectBackups(
+    const IO::FileSystem& fs, const std::filesystem::path& mapBasename) const;
 
-    Result<std::vector<std::filesystem::path>>
-    thinBackups(Logger &logger, IO::WritableDiskFileSystem &fs, const std::vector<std::filesystem::path> &backups) const;
+  Result<std::vector<std::filesystem::path>> thinBackups(
+    Logger& logger,
+    IO::WritableDiskFileSystem& fs,
+    const std::vector<std::filesystem::path>& backups) const;
 
-    Result<void> cleanBackups(IO::WritableDiskFileSystem &fs, std::vector<std::filesystem::path> &backups, const std::filesystem::path &mapBasename) const;
+  Result<void> cleanBackups(
+    IO::WritableDiskFileSystem& fs,
+    std::vector<std::filesystem::path>& backups,
+    const std::filesystem::path& mapBasename) const;
 
-    std::filesystem::path makeBackupName(const std::filesystem::path &mapBasename, size_t index) const;
+  std::filesystem::path makeBackupName(
+    const std::filesystem::path& mapBasename, size_t index) const;
 };
 } // namespace TrenchBroom::View

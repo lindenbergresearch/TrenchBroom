@@ -23,6 +23,8 @@
 #include "Model/Hit.h"
 #include "Model/HitFilter.h"
 #include "Model/PickResult.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
 #include "Renderer/ActiveShader.h"
 #include "Renderer/PrimType.h"
 #include "Renderer/RenderContext.h"
@@ -30,8 +32,6 @@
 #include "Renderer/Shaders.h"
 #include "Renderer/VboManager.h"
 #include "View/MapDocument.h"
-#include "Preferences.h"
-#include "PreferenceManager.h"
 
 #include <vm/forward.h>
 #include <vm/ray.h>
@@ -39,84 +39,110 @@
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace Renderer {
-SpikeGuideRenderer::SpikeGuideRenderer() : m_valid(false) {
+namespace TrenchBroom
+{
+namespace Renderer
+{
+SpikeGuideRenderer::SpikeGuideRenderer()
+  : m_valid(false)
+{
 }
 
-void SpikeGuideRenderer::setColor(const Color &color) {
-    m_color = color;
-    m_valid = false;
+void SpikeGuideRenderer::setColor(const Color& color)
+{
+  m_color = color;
+  m_valid = false;
 }
 
-void SpikeGuideRenderer::add(const vm::ray3 &ray, const FloatType length, std::shared_ptr<View::MapDocument> document) {
-    Model::PickResult pickResult = Model::PickResult::byDistance();
-    document->pick(ray, pickResult);
+void SpikeGuideRenderer::add(
+  const vm::ray3& ray,
+  const FloatType length,
+  std::shared_ptr<View::MapDocument> document)
+{
+  Model::PickResult pickResult = Model::PickResult::byDistance();
+  document->pick(ray, pickResult);
 
-    using namespace Model::HitFilters;
-    const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
-    if (hit.isMatch()) {
-        if (hit.distance() <= length)
-            addPoint(vm::point_at_distance(ray, hit.distance()));
-        addSpike(ray, vm::min(length, hit.distance()), length);
-    }
-    else if (!pref(Preferences::SelectionBoundsIntersectionMode)) {
-        addSpike(ray, length, length);
-    }
-    m_valid = false;
+  using namespace Model::HitFilters;
+  const auto& hit =
+    pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
+  if (hit.isMatch())
+  {
+    if (hit.distance() <= length)
+      addPoint(vm::point_at_distance(ray, hit.distance()));
+    addSpike(ray, vm::min(length, hit.distance()), length);
+  }
+  else if (!pref(Preferences::SelectionBoundsIntersectionMode))
+  {
+    addSpike(ray, length, length);
+  }
+  m_valid = false;
 }
 
-void SpikeGuideRenderer::clear() {
-    m_spikeVertices.clear();
-    m_pointVertices.clear();
-    m_spikeArray = VertexArray();
-    m_pointArray = VertexArray();
-    m_valid = true;
+void SpikeGuideRenderer::clear()
+{
+  m_spikeVertices.clear();
+  m_pointVertices.clear();
+  m_spikeArray = VertexArray();
+  m_pointArray = VertexArray();
+  m_valid = true;
 }
 
-void SpikeGuideRenderer::doPrepareVertices(VboManager &vboManager) {
-    if (!m_valid)
-        validate();
-    m_pointArray.prepare(vboManager);
-    m_spikeArray.prepare(vboManager);
+void SpikeGuideRenderer::doPrepareVertices(VboManager& vboManager)
+{
+  if (!m_valid)
+    validate();
+  m_pointArray.prepare(vboManager);
+  m_spikeArray.prepare(vboManager);
 }
 
-void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
-    ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
+void SpikeGuideRenderer::doRender(RenderContext& renderContext)
+{
+  ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
 
-    if (pref(Preferences::SelectionBoundsDashedLines)) {
-        glAssert(glEnable(GL_LINE_STIPPLE));
-        glAssert(glLineStipple(pref(Preferences::SelectionBoundsDashedSize), (GLushort) pref(Preferences::SelectionBoundsPattern)));
-    }
+  if (pref(Preferences::SelectionBoundsDashedLines))
+  {
+    glAssert(glEnable(GL_LINE_STIPPLE));
+    glAssert(glLineStipple(
+      pref(Preferences::SelectionBoundsDashedSize),
+      (GLushort)pref(Preferences::SelectionBoundsPattern)));
+  }
 
-    glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
-    m_spikeArray.render(PrimType::Lines);
+  glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
+  m_spikeArray.render(PrimType::Lines);
 
-    if (pref(Preferences::SelectionBoundsDashedLines)) {
-        glAssert(glDisable(GL_LINE_STIPPLE));
-    }
+  if (pref(Preferences::SelectionBoundsDashedLines))
+  {
+    glAssert(glDisable(GL_LINE_STIPPLE));
+  }
 
-    glAssert(glPointSize(pref(Preferences::SelectionBoundsPointSize)));
-    shader.set("ApplyTinting", true);
-    shader.set("TintColor", pref(Preferences::SelectionBoundsPointColor));
-    m_pointArray.render(PrimType::Points);
-    glAssert(glPointSize(1.0f));
-    shader.set("ApplyTinting", false);
+  glAssert(glPointSize(pref(Preferences::SelectionBoundsPointSize)));
+  shader.set("ApplyTinting", true);
+  shader.set("TintColor", pref(Preferences::SelectionBoundsPointColor));
+  m_pointArray.render(PrimType::Points);
+  glAssert(glPointSize(1.0f));
+  shader.set("ApplyTinting", false);
 }
 
-void SpikeGuideRenderer::addPoint(const vm::vec3 &position) {
-    m_pointVertices.emplace_back(vm::vec3f(position), m_color);
+void SpikeGuideRenderer::addPoint(const vm::vec3& position)
+{
+  m_pointVertices.emplace_back(vm::vec3f(position), m_color);
 }
 
-void SpikeGuideRenderer::addSpike(const vm::ray3 &ray, const FloatType length, const FloatType maxLength) {
-    m_spikeVertices.emplace_back(vm::vec3f(ray.origin), m_color);
-    m_spikeVertices.emplace_back(vm::vec3f(vm::point_at_distance(ray, length)), (length/maxLength > 0.5f) ? Color{m_color}.darker(0.75f) : Color{m_color}.darker(0.4f));
+void SpikeGuideRenderer::addSpike(
+  const vm::ray3& ray, const FloatType length, const FloatType maxLength)
+{
+  m_spikeVertices.emplace_back(vm::vec3f(ray.origin), m_color);
+  m_spikeVertices.emplace_back(
+    vm::vec3f(vm::point_at_distance(ray, length)),
+    (length / maxLength > 0.5f) ? Color{m_color}.darker(0.75f)
+                                : Color{m_color}.darker(0.4f));
 }
 
-void SpikeGuideRenderer::validate() {
-    m_pointArray = VertexArray::move(std::move(m_pointVertices));
-    m_spikeArray = VertexArray::move(std::move(m_spikeVertices));
-    m_valid = true;
+void SpikeGuideRenderer::validate()
+{
+  m_pointArray = VertexArray::move(std::move(m_pointVertices));
+  m_spikeArray = VertexArray::move(std::move(m_spikeVertices));
+  m_valid = true;
 }
 } // namespace Renderer
 } // namespace TrenchBroom

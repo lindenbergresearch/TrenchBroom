@@ -23,30 +23,34 @@
 
 #include <vector>
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 class Camera;
 }
 
-namespace TrenchBroom::View {
-class CameraLinkHelper {
+namespace TrenchBroom::View
+{
+class CameraLinkHelper
+{
 private:
-    std::vector<Renderer::Camera *> m_cameras;
-    bool m_ignoreNotifications = false;
-    NotifierConnection m_notifierConnection;
+  std::vector<Renderer::Camera*> m_cameras;
+  bool m_ignoreNotifications = false;
+  NotifierConnection m_notifierConnection;
 
 public:
-    void addCamera(Renderer::Camera *camera);
+  void addCamera(Renderer::Camera* camera);
 
-    void updateCameras(const Renderer::Camera *masterCamera);
+  void updateCameras(const Renderer::Camera* masterCamera);
 
 private:
-    void cameraDidChange(const Renderer::Camera *camera);
+  void cameraDidChange(const Renderer::Camera* camera);
 };
 
-class CameraLinkableView {
+class CameraLinkableView
+{
 public:
-    virtual ~CameraLinkableView();
+  virtual ~CameraLinkableView();
 
-    virtual void linkCamera(CameraLinkHelper &linkHelper) = 0;
+  virtual void linkCamera(CameraLinkHelper& linkHelper) = 0;
 };
 } // namespace TrenchBroom::View

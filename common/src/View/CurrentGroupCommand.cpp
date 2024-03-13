@@ -21,41 +21,56 @@
 
 #include "View/MapDocumentCommandFacade.h"
 
-namespace TrenchBroom {
-namespace View {
-std::unique_ptr<CurrentGroupCommand> CurrentGroupCommand::push(Model::GroupNode *group) {
-    return std::make_unique<CurrentGroupCommand>(group);
+namespace TrenchBroom
+{
+namespace View
+{
+std::unique_ptr<CurrentGroupCommand> CurrentGroupCommand::push(Model::GroupNode* group)
+{
+  return std::make_unique<CurrentGroupCommand>(group);
 }
 
-std::unique_ptr<CurrentGroupCommand> CurrentGroupCommand::pop() {
-    return std::make_unique<CurrentGroupCommand>(nullptr);
+std::unique_ptr<CurrentGroupCommand> CurrentGroupCommand::pop()
+{
+  return std::make_unique<CurrentGroupCommand>(nullptr);
 }
 
-CurrentGroupCommand::CurrentGroupCommand(Model::GroupNode *group) : UndoableCommand(group != nullptr ? "Push Group" : "Pop Group", false), m_group(group) {
+CurrentGroupCommand::CurrentGroupCommand(Model::GroupNode* group)
+  : UndoableCommand(group != nullptr ? "Push Group" : "Pop Group", false)
+  , m_group(group)
+{
 }
 
-std::unique_ptr<CommandResult> CurrentGroupCommand::doPerformDo(MapDocumentCommandFacade *document) {
-    if (m_group != nullptr) {
-        document->performPushGroup(m_group);
-        m_group = nullptr;
-    }
-    else {
-        m_group = document->currentGroup();
-        document->performPopGroup();
-    }
-    return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> CurrentGroupCommand::doPerformDo(
+  MapDocumentCommandFacade* document)
+{
+  if (m_group != nullptr)
+  {
+    document->performPushGroup(m_group);
+    m_group = nullptr;
+  }
+  else
+  {
+    m_group = document->currentGroup();
+    document->performPopGroup();
+  }
+  return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> CurrentGroupCommand::doPerformUndo(MapDocumentCommandFacade *document) {
-    if (m_group == nullptr) {
-        m_group = document->currentGroup();
-        document->performPopGroup();
-    }
-    else {
-        document->performPushGroup(m_group);
-        m_group = nullptr;
-    }
-    return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> CurrentGroupCommand::doPerformUndo(
+  MapDocumentCommandFacade* document)
+{
+  if (m_group == nullptr)
+  {
+    m_group = document->currentGroup();
+    document->performPopGroup();
+  }
+  else
+  {
+    document->performPushGroup(m_group);
+    m_group = nullptr;
+  }
+  return std::make_unique<CommandResult>(true);
 }
 } // namespace View
 } // namespace TrenchBroom

@@ -29,54 +29,57 @@ class QPushButton;
 
 class QTextEdit;
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class CompilationProfileManager;
 
 class MapFrame;
 
-class CompilationDialog : public QDialog {
-Q_OBJECT
+class CompilationDialog : public QDialog
+{
+  Q_OBJECT
 private:
-    MapFrame *m_mapFrame{nullptr};
-    CompilationProfileManager *m_profileManager{nullptr};
-    QPushButton *m_launchButton{nullptr};
-    QPushButton *m_compileButton{nullptr};
-    QPushButton *m_testCompileButton{nullptr};
-    QPushButton *m_stopCompileButton{nullptr};
-    QPushButton *m_closeButton{nullptr};
-    QLabel *m_currentRunLabel{nullptr};
-    QTextEdit *m_output{nullptr};
-    CompilationRun m_run;
+  MapFrame* m_mapFrame{nullptr};
+  CompilationProfileManager* m_profileManager{nullptr};
+  QPushButton* m_launchButton{nullptr};
+  QPushButton* m_compileButton{nullptr};
+  QPushButton* m_testCompileButton{nullptr};
+  QPushButton* m_stopCompileButton{nullptr};
+  QPushButton* m_closeButton{nullptr};
+  QLabel* m_currentRunLabel{nullptr};
+  QTextEdit* m_output{nullptr};
+  CompilationRun m_run;
 
 public:
-    explicit CompilationDialog(MapFrame *mapFrame);
+  explicit CompilationDialog(MapFrame* mapFrame);
 
 private:
-    void createGui();
+  void createGui();
 
-    void keyPressEvent(QKeyEvent *event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
-    void updateCompileButtons();
+  void updateCompileButtons();
 
-    void startCompilation(bool test);
+  void startCompilation(bool test);
 
-    void stopCompilation();
+  void stopCompilation();
 
-    void closeEvent(QCloseEvent *event) override;
+  void closeEvent(QCloseEvent* event) override;
 
 private slots:
 
-    void compilationStarted();
+  void compilationStarted();
 
-    void compilationEnded();
+  void compilationEnded();
 
-    void selectedProfileChanged();
+  void selectedProfileChanged();
 
-    void profileChanged();
+  void profileChanged();
 
 private:
-    void saveProfile();
+  void saveProfile();
 };
 } // namespace View
 } // namespace TrenchBroom

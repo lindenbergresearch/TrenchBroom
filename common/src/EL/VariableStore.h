@@ -26,81 +26,86 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace EL {
-class VariableStore {
+namespace TrenchBroom
+{
+namespace EL
+{
+class VariableStore
+{
 public:
-    VariableStore() = default;
+  VariableStore() = default;
 
-    VariableStore(const VariableStore &other) = default;
+  VariableStore(const VariableStore& other) = default;
 
-    VariableStore(VariableStore &&other) noexcept = default;
+  VariableStore(VariableStore&& other) noexcept = default;
 
-    virtual ~VariableStore() = default;
+  virtual ~VariableStore() = default;
 
-    VariableStore &operator=(const VariableStore &other) = default;
+  VariableStore& operator=(const VariableStore& other) = default;
 
-    VariableStore &operator=(VariableStore &&other) noexcept = default;
+  VariableStore& operator=(VariableStore&& other) noexcept = default;
 
-    virtual VariableStore *clone() const = 0;
+  virtual VariableStore* clone() const = 0;
 
-    virtual size_t size() const = 0;
+  virtual size_t size() const = 0;
 
-    virtual Value value(const std::string &name) const = 0;
+  virtual Value value(const std::string& name) const = 0;
 
-    virtual std::vector<std::string> names() const = 0;
+  virtual std::vector<std::string> names() const = 0;
 
-    virtual void declare(const std::string &name, const Value &value) = 0;
+  virtual void declare(const std::string& name, const Value& value) = 0;
 
-    virtual void assign(const std::string &name, const Value &value) = 0;
+  virtual void assign(const std::string& name, const Value& value) = 0;
 
-    virtual void appendToStream(std::ostream &str) const;
+  virtual void appendToStream(std::ostream& str) const;
 };
 
-std::ostream &operator<<(std::ostream &lhs, const VariableStore &rhs);
+std::ostream& operator<<(std::ostream& lhs, const VariableStore& rhs);
 
-bool operator==(const VariableStore &lhs, const VariableStore &rhs);
+bool operator==(const VariableStore& lhs, const VariableStore& rhs);
 
-bool operator!=(const VariableStore &lhs, const VariableStore &rhs);
+bool operator!=(const VariableStore& lhs, const VariableStore& rhs);
 
-class VariableTable : public VariableStore {
+class VariableTable : public VariableStore
+{
 private:
-    using Table = std::map<std::string, Value>;
-    Table m_variables;
+  using Table = std::map<std::string, Value>;
+  Table m_variables;
 
 public:
-    VariableTable();
+  VariableTable();
 
-    explicit VariableTable(Table variables);
+  explicit VariableTable(Table variables);
 
-    VariableStore *clone() const override;
+  VariableStore* clone() const override;
 
-    size_t size() const override;
+  size_t size() const override;
 
-    Value value(const std::string &name) const override;
+  Value value(const std::string& name) const override;
 
-    std::vector<std::string> names() const override;
+  std::vector<std::string> names() const override;
 
-    void declare(const std::string &name, const Value &value) override;
+  void declare(const std::string& name, const Value& value) override;
 
-    void assign(const std::string &name, const Value &value) override;
+  void assign(const std::string& name, const Value& value) override;
 };
 
-class NullVariableStore : public VariableStore {
+class NullVariableStore : public VariableStore
+{
 public:
-    NullVariableStore();
+  NullVariableStore();
 
-    VariableStore *clone() const override;
+  VariableStore* clone() const override;
 
-    size_t size() const override;
+  size_t size() const override;
 
-    Value value(const std::string &name) const override;
+  Value value(const std::string& name) const override;
 
-    std::vector<std::string> names() const override;
+  std::vector<std::string> names() const override;
 
-    void declare(const std::string &name, const Value &value) override;
+  void declare(const std::string& name, const Value& value) override;
 
-    void assign(const std::string &name, const Value &value) override;
+  void assign(const std::string& name, const Value& value) override;
 };
 } // namespace EL
 } // namespace TrenchBroom

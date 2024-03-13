@@ -27,29 +27,32 @@ class QKeyEvent;
 
 class QCloseEvent;
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class GameEngineProfileManager;
 
 /**
  * Dialog for editing game engine profiles (name/path, not parameters).
  */
-class GameEngineDialog : public QDialog {
-Q_OBJECT
+class GameEngineDialog : public QDialog
+{
+  Q_OBJECT
 private:
-    const std::string m_gameName;
-    GameEngineProfileManager *m_profileManager;
+  const std::string m_gameName;
+  GameEngineProfileManager* m_profileManager;
 
 public:
-    explicit GameEngineDialog(const std::string &gameName, QWidget *parent = nullptr);
+  explicit GameEngineDialog(const std::string& gameName, QWidget* parent = nullptr);
 
 public slots: // QDialog overrides
-    void done(int r) override;
+  void done(int r) override;
 
 private:
-    void createGui();
+  void createGui();
 
-    void saveConfig();
+  void saveConfig();
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -24,43 +24,46 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class MapDocument;
 
 class MapFrame;
 
-class FrameManager : public QObject {
-Q_OBJECT
+class FrameManager : public QObject
+{
+  Q_OBJECT
 private:
-    bool m_singleFrame;
-    std::vector<MapFrame *> m_frames;
+  bool m_singleFrame;
+  std::vector<MapFrame*> m_frames;
 
 public:
-    explicit FrameManager(bool singleFrame);
+  explicit FrameManager(bool singleFrame);
 
-    ~FrameManager() override;
+  ~FrameManager() override;
 
-    MapFrame *newFrame();
+  MapFrame* newFrame();
 
-    bool closeAllFrames();
+  bool closeAllFrames();
 
-    std::vector<MapFrame *> frames() const;
+  std::vector<MapFrame*> frames() const;
 
-    MapFrame *topFrame() const;
+  MapFrame* topFrame() const;
 
-    bool allFramesClosed() const;
+  bool allFramesClosed() const;
 
 private:
-    void onFocusChange(QWidget *old, QWidget *now);
+  void onFocusChange(QWidget* old, QWidget* now);
 
-    MapFrame *createOrReuseFrame();
+  MapFrame* createOrReuseFrame();
 
-    MapFrame *createFrame(std::shared_ptr<MapDocument> document);
+  MapFrame* createFrame(std::shared_ptr<MapDocument> document);
 
-    void removeFrame(MapFrame *frame);
+  void removeFrame(MapFrame* frame);
 
-    friend class MapFrame;
+  friend class MapFrame;
 };
 } // namespace View
 } // namespace TrenchBroom

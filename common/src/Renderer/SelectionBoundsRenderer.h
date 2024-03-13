@@ -19,52 +19,55 @@
 
 #pragma once
 
-#include "FloatType.h"
-
-#include <vm/bbox.h>
 #include "Color.h"
 #include "FloatType.h"
 #include "Renderer/GLVertexType.h"
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
 
-namespace TrenchBroom {
-namespace Renderer {
+#include <vm/bbox.h>
+
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class RenderBatch;
 
 class RenderContext;
 
-class SelectionBoundsRenderer {
-    static const float AXIS_LABEL_DIM_FACTOR;
+class SelectionBoundsRenderer
+{
+  static const float AXIS_LABEL_DIM_FACTOR;
 
 private:
-    const vm::bbox3 m_bounds;
+  const vm::bbox3 m_bounds;
 
-    class SizeTextAnchor2D;
+  class SizeTextAnchor2D;
 
-    class SizeTextAnchor3D;
+  class SizeTextAnchor3D;
 
-    class MinMaxTextAnchor3D;
+  class MinMaxTextAnchor3D;
 
-    QString formatDimension(const float value, const int digits = 2, const QString &suffix = "");
+  QString formatDimension(
+    const float value, const int digits = 2, const QString& suffix = "");
 
 public:
-    SelectionBoundsRenderer(const vm::bbox3 &bounds);
+  SelectionBoundsRenderer(const vm::bbox3& bounds);
 
-    void render(RenderContext &renderContext, RenderBatch &renderBatch);
+  void render(RenderContext& renderContext, RenderBatch& renderBatch);
 
 private:
-    void renderBounds(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderBounds(RenderContext& renderContext, RenderBatch& renderBatch);
 
-    void renderSize(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderSize(RenderContext& renderContext, RenderBatch& renderBatch);
 
-    void renderSize2D(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderSize2D(RenderContext& renderContext, RenderBatch& renderBatch);
 
-    void renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderSize3D(RenderContext& renderContext, RenderBatch& renderBatch);
 
-    void renderMinMax(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderMinMax(RenderContext& renderContext, RenderBatch& renderBatch);
 
-    const std::string getFormattedUnitsString(float value_units);
+  const std::string getFormattedUnitsString(float value_units);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

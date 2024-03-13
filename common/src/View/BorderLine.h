@@ -21,17 +21,25 @@
 
 #include <QFrame>
 
-namespace TrenchBroom {
-namespace View {
-class BorderLine : public QFrame {
-Q_OBJECT
+namespace TrenchBroom
+{
+namespace View
+{
+class BorderLine : public QFrame
+{
+  Q_OBJECT
 public:
-    enum class Direction {
-      Horizontal, Vertical
-    };
+  enum class Direction
+  {
+    Horizontal,
+    Vertical
+  };
 
 public:
-    explicit BorderLine(Direction direction = Direction::Horizontal, int thickness = 1, QWidget *parent = nullptr);
+  explicit BorderLine(
+    Direction direction = Direction::Horizontal,
+    int thickness = 1,
+    QWidget* parent = nullptr);
 };
 } // namespace View
 } // namespace TrenchBroom

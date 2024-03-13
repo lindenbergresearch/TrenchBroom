@@ -19,22 +19,31 @@
 
 #include "IndexRangeRenderer.h"
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 IndexRangeRenderer::IndexRangeRenderer() {}
 
-IndexRangeRenderer::IndexRangeRenderer(const VertexArray &vertexArray, const IndexRangeMap &indexArray) : m_vertexArray(vertexArray), m_indexArray(indexArray) {
+IndexRangeRenderer::IndexRangeRenderer(
+  const VertexArray& vertexArray, const IndexRangeMap& indexArray)
+  : m_vertexArray(vertexArray)
+  , m_indexArray(indexArray)
+{
 }
 
-void IndexRangeRenderer::prepare(VboManager &vboManager) {
-    m_vertexArray.prepare(vboManager);
+void IndexRangeRenderer::prepare(VboManager& vboManager)
+{
+  m_vertexArray.prepare(vboManager);
 }
 
-void IndexRangeRenderer::render() {
-    if (m_vertexArray.setup()) {
-        m_indexArray.render(m_vertexArray);
-        m_vertexArray.cleanup();
-    }
+void IndexRangeRenderer::render()
+{
+  if (m_vertexArray.setup())
+  {
+    m_indexArray.render(m_vertexArray);
+    m_vertexArray.cleanup();
+  }
 }
 } // namespace Renderer
 } // namespace TrenchBroom

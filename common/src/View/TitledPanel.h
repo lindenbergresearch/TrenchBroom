@@ -21,24 +21,33 @@
 
 #include <QWidget>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class TitleBar;
 
-class TitledPanel : public QWidget {
-Q_OBJECT
+class TitledPanel : public QWidget
+{
+  Q_OBJECT
 private:
-    TitleBar *m_titleBar;
-    QWidget *m_panel;
+  TitleBar* m_titleBar;
+  QWidget* m_panel;
 
 public:
-    TitledPanel(const QString &title, QWidget *parent, bool boldTitle = true, bool subtitle = false, bool fillBackground = false);
+  TitledPanel(
+    const QString& title,
+    QWidget* parent,
+    bool boldTitle = true,
+    bool subtitle = false,
+    bool fillBackground = false);
 
-    explicit TitledPanel(const QString &title, bool boldTitle = true, bool subtitle = false);
+  explicit TitledPanel(
+    const QString& title, bool boldTitle = true, bool subtitle = false);
 
-    TitleBar *getTitleBar() const;
+  TitleBar* getTitleBar() const;
 
-    QWidget *getPanel() const;
+  QWidget* getPanel() const;
 };
 } // namespace View
 } // namespace TrenchBroom

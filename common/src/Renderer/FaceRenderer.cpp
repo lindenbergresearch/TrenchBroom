@@ -20,6 +20,7 @@
 #include "FaceRenderer.h"
 
 #include "Assets/Texture.h"
+#include "Model/EntityNode.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/ActiveShader.h"
@@ -31,211 +32,264 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
-#include "Model/EntityNode.h"
 #include "StringUtils.h"
 
-namespace TrenchBroom {
-namespace Renderer {
-struct FaceRenderer::RenderFunc : public TextureRenderFunc {
-  ActiveShader &shader;
+namespace TrenchBroom
+{
+namespace Renderer
+{
+struct FaceRenderer::RenderFunc : public TextureRenderFunc
+{
+  ActiveShader& shader;
   bool applyTexture;
-  const Color &defaultColor;
+  const Color& defaultColor;
 
-  RenderFunc(ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor) : shader(i_shader), applyTexture(i_applyTexture),
-                                                                                               defaultColor(i_defaultColor) {
+  RenderFunc(
+    ActiveShader& i_shader, const bool i_applyTexture, const Color& i_defaultColor)
+    : shader(i_shader)
+    , applyTexture(i_applyTexture)
+    , defaultColor(i_defaultColor)
+  {
   }
 
-  void before(const Assets::Texture *texture) override {
-      if (texture != nullptr) {
-          texture->activate();
-          shader.set("ApplyTexture", applyTexture);
-          shader.set("Color", texture->averageColor());
-      } else {
-          shader.set("ApplyTexture", false);
-          shader.set("Color", defaultColor);
-      }
+  void before(const Assets::Texture* texture) override
+  {
+    if (texture != nullptr)
+    {
+      texture->activate();
+      shader.set("ApplyTexture", applyTexture);
+      shader.set("Color", texture->averageColor());
+    }
+    else
+    {
+      shader.set("ApplyTexture", false);
+      shader.set("Color", defaultColor);
+    }
   }
 
-  void after(const Assets::Texture *texture) override {
-      if (texture != nullptr) {
-          texture->deactivate();
-      }
+  void after(const Assets::Texture* texture) override
+  {
+    if (texture != nullptr)
+    {
+      texture->deactivate();
+    }
   }
 };
 
-FaceRenderer::FaceRenderer() : m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+FaceRenderer::FaceRenderer()
+  : m_grayscale(false)
+  , m_tint(false)
+  , m_alpha(1.0f)
+{
 }
 
-FaceRenderer::FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor)
-    : m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor), m_grayscale(false), m_tint(false),
-      m_alpha(1.0f) {
+FaceRenderer::FaceRenderer(
+  std::shared_ptr<BrushVertexArray> vertexArray,
+  std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
+  const Color& faceColor)
+  : m_vertexArray(std::move(vertexArray))
+  , m_indexArrayMap(std::move(indexArrayMap))
+  , m_faceColor(faceColor)
+  , m_grayscale(false)
+  , m_tint(false)
+  , m_alpha(1.0f)
+{
 }
 
-FaceRenderer::FaceRenderer(const FaceRenderer &other) : IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap),
-                                                        m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
+FaceRenderer::FaceRenderer(const FaceRenderer& other)
+  : IndexedRenderable(other)
+  , m_vertexArray(other.m_vertexArray)
+  , m_indexArrayMap(other.m_indexArrayMap)
+  , m_faceColor(other.m_faceColor)
+  , m_grayscale(other.m_grayscale)
+  , m_tint(other.m_tint)
+  , m_tintColor(other.m_tintColor)
+  , m_alpha(other.m_alpha)
+{
 }
 
-FaceRenderer &FaceRenderer::operator=(FaceRenderer other) {
-    using std::swap;
-    swap(*this, other);
-    return *this;
+FaceRenderer& FaceRenderer::operator=(FaceRenderer other)
+{
+  using std::swap;
+  swap(*this, other);
+  return *this;
 }
 
-void swap(FaceRenderer &left, FaceRenderer &right) {
-    using std::swap;
-    swap(left.m_vertexArray, right.m_vertexArray);
-    swap(left.m_indexArrayMap, right.m_indexArrayMap);
-    swap(left.m_faceColor, right.m_faceColor);
-    swap(left.m_grayscale, right.m_grayscale);
-    swap(left.m_tint, right.m_tint);
-    swap(left.m_tintColor, right.m_tintColor);
-    swap(left.m_alpha, right.m_alpha);
+void swap(FaceRenderer& left, FaceRenderer& right)
+{
+  using std::swap;
+  swap(left.m_vertexArray, right.m_vertexArray);
+  swap(left.m_indexArrayMap, right.m_indexArrayMap);
+  swap(left.m_faceColor, right.m_faceColor);
+  swap(left.m_grayscale, right.m_grayscale);
+  swap(left.m_tint, right.m_tint);
+  swap(left.m_tintColor, right.m_tintColor);
+  swap(left.m_alpha, right.m_alpha);
 }
 
-void FaceRenderer::setGrayscale(const bool grayscale) {
-    m_grayscale = grayscale;
+void FaceRenderer::setGrayscale(const bool grayscale)
+{
+  m_grayscale = grayscale;
 }
 
-void FaceRenderer::setTint(const bool tint) {
-    m_tint = tint;
+void FaceRenderer::setTint(const bool tint)
+{
+  m_tint = tint;
 }
 
-void FaceRenderer::setTintColor(const Color &color) {
-    m_tintColor = color;
+void FaceRenderer::setTintColor(const Color& color)
+{
+  m_tintColor = color;
 }
 
-void FaceRenderer::setAlpha(const float alpha) {
-    m_alpha = alpha;
+void FaceRenderer::setAlpha(const float alpha)
+{
+  m_alpha = alpha;
 }
 
-void FaceRenderer::render(RenderBatch &renderBatch) {
-    renderBatch.add(this);
+void FaceRenderer::render(RenderBatch& renderBatch)
+{
+  renderBatch.add(this);
 }
 
-void FaceRenderer::prepareVerticesAndIndices(VboManager &vboManager) {
-    m_vertexArray->prepare(vboManager);
+void FaceRenderer::prepareVerticesAndIndices(VboManager& vboManager)
+{
+  m_vertexArray->prepare(vboManager);
 
-    for (const auto &[texture, brushIndexHolderPtr]: *m_indexArrayMap) {
-        brushIndexHolderPtr->prepare(vboManager);
+  for (const auto& [texture, brushIndexHolderPtr] : *m_indexArrayMap)
+  {
+    brushIndexHolderPtr->prepare(vboManager);
+  }
+}
+
+void FaceRenderer::doRender(RenderContext& context)
+{
+  if (m_indexArrayMap->empty())
+    return;
+
+  if (m_vertexArray->setupVertices())
+  {
+    ShaderManager& shaderManager = context.shaderManager();
+    ActiveShader shader(shaderManager, Shaders::FaceShader);
+    PreferenceManager& prefs = PreferenceManager::instance();
+
+    float gridLineWidth = pref(Preferences::GridLineWidth);
+    int autoBrightnessType = pref(Preferences::FaceAutoBrightness);
+
+    const bool applyTexture = context.showTextures();
+    const bool shadeFaces = context.shadeFaces();
+    const bool showFog = context.showFog();
+
+    const float shadeLevel = pref(Preferences::ShadeLevel);
+    const Color fogColor = pref(Preferences::FogColor);
+    const float fogScale = pref(Preferences::FogScale);
+    const float fogBias = pref(Preferences::FogBias);
+    const float fogMaxAmount = pref(Preferences::FogMaxAmount);
+    const float fogMinDistance = pref(Preferences::FogMinDistance);
+    const int fogType = pref(Preferences::FogType);
+
+    const Color ambientLightning = pref(Preferences::LightningAmbient);
+
+    glAssert(glEnable(GL_TEXTURE_2D));
+    glAssert(glActiveTexture(GL_TEXTURE0));
+
+    //        auto lightSources = context.getLightSources();
+    //
+    //        auto size = lightSources.size() > 60 ? 60 : lightSources.size();
+    //
+    //        for (size_t i = 0; i < size; i++) {
+    //            std::string _Position_name = stringf("lights[%d].Position", i);
+    //            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
+    //            std::string _AttenuationConstant_name =
+    //            stringf("lights[%d].AttenuationConstant", i); std::string
+    //            _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
+    //            std::string _AttenuationQuadratic_name =
+    //            stringf("lights[%d].AttenuationQuadratic", i);
+    //
+    //            shader.set(_Position_name, lightSources[i].Position);
+    //            shader.set(_Intensity_name, lightSources[i].Intensity);
+    //            shader.set(_AttenuationConstant_name,
+    //            lightSources[i].AttenuationConstant);
+    //            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
+    //            shader.set(_AttenuationQuadratic_name,
+    //            lightSources[i].AttenuationQuadratic);
+    //        }
+
+    shader.set("AmbientLight", ambientLightning);
+    shader.set("NumLights", 0);
+    shader.set("EnableLighting", false);
+    shader.set("CameraPosition", context.camera().position());
+    shader.set("Brightness", prefs.get(Preferences::Brightness));
+    shader.set("RenderGrid", context.showGrid());
+    shader.set("GridSize", static_cast<float>(context.gridSize()));
+    shader.set("GridLineWidth", gridLineWidth);
+    shader.set("GridAlpha", prefs.get(Preferences::GridAlpha));
+    shader.set("MajorDivisionSize", pref(Preferences::GridMajorDivisionSize));
+    shader.set("ApplyTexture", applyTexture);
+    shader.set("Texture", 0);
+    shader.set("AutoBrightnessType", autoBrightnessType);
+    shader.set("ApplyTinting", m_tint);
+
+    if (m_tint)
+      shader.set("TintColor", m_tintColor);
+
+    shader.set("GrayScale", m_grayscale);
+    shader.set("ShadeFaces", shadeFaces);
+    shader.set("ShadeLevel", shadeLevel);
+    shader.set("ShowFog", showFog);
+    shader.set("FogColor", fogColor);
+    shader.set("FogMaxAmount", fogMaxAmount);
+    shader.set("FogScale", fogScale);
+    shader.set("FogBias", fogBias);
+    shader.set("FogMinDistance", fogMinDistance);
+    shader.set("FogType", fogType);
+
+    shader.set("Alpha", m_alpha);
+    shader.set("EnableMasked", false);
+    shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
+    shader.set("SoftMapBoundsMin", context.softMapBounds().min);
+    shader.set("SoftMapBoundsMax", context.softMapBounds().max);
+
+    auto boundsColor = prefs.get(Preferences::SoftMapBoundsColor);
+
+    shader.set(
+      "SoftMapBoundsColor",
+      vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
+
+    RenderFunc func(shader, applyTexture, m_faceColor);
+
+    if (m_alpha < 1.0f)
+    {
+      glAssert(glDepthMask(GL_FALSE));
     }
-}
 
-void FaceRenderer::doRender(RenderContext &context) {
-    if (m_indexArrayMap->empty())
-        return;
+    for (const auto& [texture, brushIndexHolderPtr] : *m_indexArrayMap)
+    {
+      if (!brushIndexHolderPtr->hasValidIndices())
+      {
+        continue;
+      }
 
-    if (m_vertexArray->setupVertices()) {
-        ShaderManager &shaderManager = context.shaderManager();
-        ActiveShader shader(shaderManager, Shaders::FaceShader);
-        PreferenceManager &prefs = PreferenceManager::instance();
+      const bool enableMasked = texture != nullptr && texture->masked();
 
-        float gridLineWidth = pref(Preferences::GridLineWidth);
-        int autoBrightnessType = pref(Preferences::FaceAutoBrightness);
+      // set any per-texture uniforms
+      shader.set("GridColor", gridColorForTexture(texture));
+      shader.set("EnableMasked", enableMasked);
 
-        const bool applyTexture = context.showTextures();
-        const bool shadeFaces = context.shadeFaces();
-        const bool showFog = context.showFog();
-
-        const float shadeLevel = pref(Preferences::ShadeLevel);
-        const Color fogColor = pref(Preferences::FogColor);
-        const float fogScale = pref(Preferences::FogScale);
-        const float fogBias = pref(Preferences::FogBias);
-        const float fogMaxAmount = pref(Preferences::FogMaxAmount);
-        const float fogMinDistance = pref(Preferences::FogMinDistance);
-        const int fogType = pref(Preferences::FogType);
-
-        const Color ambientLightning = pref(Preferences::LightningAmbient);
-
-        glAssert(glEnable(GL_TEXTURE_2D));
-        glAssert(glActiveTexture(GL_TEXTURE0));
-
-//        auto lightSources = context.getLightSources();
-//
-//        auto size = lightSources.size() > 60 ? 60 : lightSources.size();
-//
-//        for (size_t i = 0; i < size; i++) {
-//            std::string _Position_name = stringf("lights[%d].Position", i);
-//            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
-//            std::string _AttenuationConstant_name = stringf("lights[%d].AttenuationConstant", i);
-//            std::string _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
-//            std::string _AttenuationQuadratic_name = stringf("lights[%d].AttenuationQuadratic", i);
-//
-//            shader.set(_Position_name, lightSources[i].Position);
-//            shader.set(_Intensity_name, lightSources[i].Intensity);
-//            shader.set(_AttenuationConstant_name, lightSources[i].AttenuationConstant);
-//            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
-//            shader.set(_AttenuationQuadratic_name, lightSources[i].AttenuationQuadratic);
-//        }
-
-        shader.set("AmbientLight", ambientLightning);
-        shader.set("NumLights", 0);
-        shader.set("EnableLighting", false);
-        shader.set("CameraPosition", context.camera().position());
-        shader.set("Brightness", prefs.get(Preferences::Brightness));
-        shader.set("RenderGrid", context.showGrid());
-        shader.set("GridSize", static_cast<float>(context.gridSize()));
-        shader.set("GridLineWidth", gridLineWidth);
-        shader.set("GridAlpha", prefs.get(Preferences::GridAlpha));
-        shader.set("MajorDivisionSize", pref(Preferences::GridMajorDivisionSize));
-        shader.set("ApplyTexture", applyTexture);
-        shader.set("Texture", 0);
-        shader.set("AutoBrightnessType", autoBrightnessType);
-        shader.set("ApplyTinting", m_tint);
-
-        if (m_tint)
-            shader.set("TintColor", m_tintColor);
-
-        shader.set("GrayScale", m_grayscale);
-        shader.set("ShadeFaces", shadeFaces);
-        shader.set("ShadeLevel", shadeLevel);
-        shader.set("ShowFog", showFog);
-        shader.set("FogColor", fogColor);
-        shader.set("FogMaxAmount", fogMaxAmount);
-        shader.set("FogScale", fogScale);
-        shader.set("FogBias", fogBias);
-        shader.set("FogMinDistance", fogMinDistance);
-        shader.set("FogType", fogType);
-
-        shader.set("Alpha", m_alpha);
-        shader.set("EnableMasked", false);
-        shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
-        shader.set("SoftMapBoundsMin", context.softMapBounds().min);
-        shader.set("SoftMapBoundsMax", context.softMapBounds().max);
-
-        auto boundsColor = prefs.get(Preferences::SoftMapBoundsColor);
-
-        shader.set("SoftMapBoundsColor", vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
-
-        RenderFunc func(shader, applyTexture, m_faceColor);
-
-        if (m_alpha < 1.0f) {
-            glAssert(glDepthMask(GL_FALSE));
-        }
-
-        for (const auto &[texture, brushIndexHolderPtr]: *m_indexArrayMap) {
-            if (!brushIndexHolderPtr->hasValidIndices()) {
-                continue;
-            }
-
-            const bool enableMasked = texture != nullptr && texture->masked();
-
-            // set any per-texture uniforms
-            shader.set("GridColor", gridColorForTexture(texture));
-            shader.set("EnableMasked", enableMasked);
-
-            func.before(texture);
-            brushIndexHolderPtr->setupIndices();
-            brushIndexHolderPtr->render(PrimType::Triangles);
-            brushIndexHolderPtr->cleanupIndices();
-            func.after(texture);
-        }
-
-        if (m_alpha < 1.0f) {
-            glAssert(glDepthMask(GL_TRUE));
-        }
-
-        m_vertexArray->cleanupVertices();
+      func.before(texture);
+      brushIndexHolderPtr->setupIndices();
+      brushIndexHolderPtr->render(PrimType::Triangles);
+      brushIndexHolderPtr->cleanupIndices();
+      func.after(texture);
     }
+
+    if (m_alpha < 1.0f)
+    {
+      glAssert(glDepthMask(GL_TRUE));
+    }
+
+    m_vertexArray->cleanupVertices();
+  }
 }
 } // namespace Renderer
 } // namespace TrenchBroom

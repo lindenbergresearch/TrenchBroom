@@ -26,17 +26,21 @@
 
 #include <cassert>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 DragTracker::~DragTracker() = default;
 
-void DragTracker::modifierKeyChange(const InputState &) {}
+void DragTracker::modifierKeyChange(const InputState&) {}
 
-void DragTracker::mouseScroll(const InputState &) {}
+void DragTracker::mouseScroll(const InputState&) {}
 
-void DragTracker::setRenderOptions(const InputState &, Renderer::RenderContext &) const {}
+void DragTracker::setRenderOptions(const InputState&, Renderer::RenderContext&) const {}
 
-void DragTracker::render(const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) const {
+void DragTracker::render(
+  const InputState&, Renderer::RenderContext&, Renderer::RenderBatch&) const
+{
 }
 } // namespace View
 } // namespace TrenchBroom

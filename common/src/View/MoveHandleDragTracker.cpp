@@ -21,24 +21,36 @@
 
 #include "Macros.h"
 
-namespace TrenchBroom {
-namespace View {
-void MoveHandleDragTrackerDelegate::mouseScroll(const InputState &, const DragState &) {}
+namespace TrenchBroom
+{
+namespace View
+{
+void MoveHandleDragTrackerDelegate::mouseScroll(const InputState&, const DragState&) {}
 
-void MoveHandleDragTrackerDelegate::setRenderOptions(const InputState &, Renderer::RenderContext &) const {
+void MoveHandleDragTrackerDelegate::setRenderOptions(
+  const InputState&, Renderer::RenderContext&) const
+{
 }
 
-void MoveHandleDragTrackerDelegate::render(const InputState &, const DragState &, Renderer::RenderContext &, Renderer::RenderBatch &) const {
+void MoveHandleDragTrackerDelegate::render(
+  const InputState&,
+  const DragState&,
+  Renderer::RenderContext&,
+  Renderer::RenderBatch&) const
+{
 }
 
-DragHandleSnapper makeDragHandleSnapperFromSnapMode(const Grid &grid, const SnapMode snapMode) {
-    switch (snapMode) {
-        case SnapMode::Relative:
-            return makeRelativeHandleSnapper(grid);
-        case SnapMode::Absolute:
-            return makeAbsoluteHandleSnapper(grid);
-            switchDefault();
-    }
+DragHandleSnapper makeDragHandleSnapperFromSnapMode(
+  const Grid& grid, const SnapMode snapMode)
+{
+  switch (snapMode)
+  {
+  case SnapMode::Relative:
+    return makeRelativeHandleSnapper(grid);
+  case SnapMode::Absolute:
+    return makeAbsoluteHandleSnapper(grid);
+    switchDefault();
+  }
 }
 } // namespace View
 } // namespace TrenchBroom

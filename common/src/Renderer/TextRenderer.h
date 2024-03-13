@@ -19,125 +19,149 @@
 
 #pragma once
 
+#include "AttrString.h"
 #include "Color.h"
 #include "Renderer/FontDescriptor.h"
 #include "Renderer/GLVertexType.h"
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
-#include "AttrString.h"
 
 #include <vm/forward.h>
 #include <vm/vec.h>
 
 #include <vector>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class AttrString;
 
 class RenderContext;
 
 class TextAnchor;
 
-class TextRenderer : public DirectRenderable {
+class TextRenderer : public DirectRenderable
+{
 private:
-    static const float DefaultMinZoomFactor;
-    static const vm::vec2f DefaultInset;
-    static const size_t RectCornerSegments;
-    static const float RectCornerRadius;
+  static const float DefaultMinZoomFactor;
+  static const vm::vec2f DefaultInset;
+  static const size_t RectCornerSegments;
+  static const float RectCornerRadius;
 
-    struct Entry {
-      std::vector<vm::vec2f> vertices;
-      vm::vec2f size;
-      vm::vec3f offset;
-      Color textColor;
-      Color backgroundColor;
-      AttrString string;
+  struct Entry
+  {
+    std::vector<vm::vec2f> vertices;
+    vm::vec2f size;
+    vm::vec3f offset;
+    Color textColor;
+    Color backgroundColor;
+    AttrString string;
 
-      Entry(std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset,
-          const Color &i_textColor, const Color &i_backgroundColor, const AttrString &i_string
-      );
+    Entry(
+      std::vector<vm::vec2f>& i_vertices,
+      const vm::vec2f& i_size,
+      const vm::vec3f& i_offset,
+      const Color& i_textColor,
+      const Color& i_backgroundColor,
+      const AttrString& i_string);
 
-      bool valueInRange(float value, float min, float max);
+    bool valueInRange(float value, float min, float max);
 
-      bool overlapsWith(const Entry &entry);
-    };
+    bool overlapsWith(const Entry& entry);
+  };
 
-    using EntryList = std::vector<Entry>;
+  using EntryList = std::vector<Entry>;
 
-    struct EntryCollection {
-      EntryList entries;
-      size_t textVertexCount;
-      size_t rectVertexCount;
+  struct EntryCollection
+  {
+    EntryList entries;
+    size_t textVertexCount;
+    size_t rectVertexCount;
 
-      VertexArray textArray;
-      VertexArray rectArray;
+    VertexArray textArray;
+    VertexArray rectArray;
 
-      EntryCollection();
+    EntryCollection();
 
-      bool overlaps(Entry &entry);
+    bool overlaps(Entry& entry);
 
-      void addEntry(Entry &entry);
+    void addEntry(Entry& entry);
 
-      void updateLayout();
-    };
+    void updateLayout();
+  };
 
-    using TextVertex = GLVertexTypes::P3T2C4::Vertex;
-    using RectVertex = GLVertexTypes::P3C4::Vertex;
+  using TextVertex = GLVertexTypes::P3T2C4::Vertex;
+  using RectVertex = GLVertexTypes::P3C4::Vertex;
 
-    FontDescriptor m_fontDescriptor;
-    float m_maxViewDistance;
-    float m_minZoomFactor;
-    vm::vec2f m_inset;
+  FontDescriptor m_fontDescriptor;
+  float m_maxViewDistance;
+  float m_minZoomFactor;
+  vm::vec2f m_inset;
 
-    EntryCollection m_entries;
-    EntryCollection m_entriesOnTop;
+  EntryCollection m_entries;
+  EntryCollection m_entriesOnTop;
 
 public:
-    explicit TextRenderer(const FontDescriptor &fontDescriptor, float maxViewDistance = 512.f,
-        float minZoomFactor = DefaultMinZoomFactor,
-        const vm::vec2f &inset = DefaultInset
-    );
+  explicit TextRenderer(
+    const FontDescriptor& fontDescriptor,
+    float maxViewDistance = 512.f,
+    float minZoomFactor = DefaultMinZoomFactor,
+    const vm::vec2f& inset = DefaultInset);
 
-    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor,
-        const AttrString &string, const TextAnchor &position
-    );
+  void renderString(
+    RenderContext& renderContext,
+    const Color& textColor,
+    const Color& backgroundColor,
+    const AttrString& string,
+    const TextAnchor& position);
 
-    void
-    renderStringOnTop(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor,
-        const AttrString &string, const TextAnchor &position
-    );
-
-private:
-    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor,
-        const AttrString &string, const TextAnchor &position,
-        bool onTop
-    );
-
-    bool isVisible(RenderContext &renderContext, const AttrString &string, const TextAnchor &position, float distance,
-        bool onTop
-    ) const;
-
-    float computeAlphaFactor(const RenderContext &renderContext, float distance, bool onTop) const;
-
-    void addEntry(EntryCollection &collection, const Entry &entry);
-
-    vm::vec2f stringSize(RenderContext &renderContext, const AttrString &string) const;
+  void renderStringOnTop(
+    RenderContext& renderContext,
+    const Color& textColor,
+    const Color& backgroundColor,
+    const AttrString& string,
+    const TextAnchor& position);
 
 private:
-    void doPrepareVertices(VboManager &vboManager) override;
+  void renderString(
+    RenderContext& renderContext,
+    const Color& textColor,
+    const Color& backgroundColor,
+    const AttrString& string,
+    const TextAnchor& position,
+    bool onTop);
 
-    void prepare(EntryCollection &collection, bool onTop, VboManager &vboManager);
+  bool isVisible(
+    RenderContext& renderContext,
+    const AttrString& string,
+    const TextAnchor& position,
+    float distance,
+    bool onTop) const;
 
-    void addEntry(const Entry &entry, bool onTop, std::vector<TextVertex> &textVertices,
-        std::vector<RectVertex> &rectVertices
-    );
+  float computeAlphaFactor(
+    const RenderContext& renderContext, float distance, bool onTop) const;
 
-    void doRender(RenderContext &renderContext) override;
+  void addEntry(EntryCollection& collection, const Entry& entry);
 
-    void render(EntryCollection &collection, RenderContext &renderContext);
+  vm::vec2f stringSize(RenderContext& renderContext, const AttrString& string) const;
 
-    void clear();
+private:
+  void doPrepareVertices(VboManager& vboManager) override;
+
+  void prepare(EntryCollection& collection, bool onTop, VboManager& vboManager);
+
+  void addEntry(
+    const Entry& entry,
+    bool onTop,
+    std::vector<TextVertex>& textVertices,
+    std::vector<RectVertex>& rectVertices);
+
+  void doRender(RenderContext& renderContext) override;
+
+  void render(EntryCollection& collection, RenderContext& renderContext);
+
+  void clear();
 };
 } // namespace Renderer
 } // namespace TrenchBroom

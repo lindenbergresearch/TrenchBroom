@@ -27,26 +27,28 @@ class QTableView;
 
 class QSortFilterProxyModel;
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class ColorModel;
 
-class ColorsPreferencePane : public PreferencePane {
-Q_OBJECT
+class ColorsPreferencePane : public PreferencePane
+{
+  Q_OBJECT
 private:
-    QTableView *m_table;
-    ColorModel *m_model;
-    QSortFilterProxyModel *m_proxy;
+  QTableView* m_table;
+  ColorModel* m_model;
+  QSortFilterProxyModel* m_proxy;
 
 public:
-    explicit ColorsPreferencePane(QWidget *parent = nullptr);
+  explicit ColorsPreferencePane(QWidget* parent = nullptr);
 
 private:
-    bool doCanResetToDefaults() override;
+  bool doCanResetToDefaults() override;
 
-    void doResetToDefaults() override;
+  void doResetToDefaults() override;
 
-    void doUpdateControls() override;
+  void doUpdateControls() override;
 
-    bool doValidate() override;
+  bool doValidate() override;
 };
 } // namespace TrenchBroom::View

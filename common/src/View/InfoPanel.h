@@ -19,15 +19,17 @@
 
 #pragma once
 
-#include <QWidget>
 #include <QTabWidget>
+#include <QWidget>
 
 #include <memory>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 
-namespace View {
+namespace View
+{
 class Console;
 
 class IssueBrowser;
@@ -36,18 +38,19 @@ class MapDocument;
 
 class TabBook;
 
-class InfoPanel : public QWidget {
-Q_OBJECT
+class InfoPanel : public QWidget
+{
+  Q_OBJECT
 private:
-    //   TabBook *m_tabBook;
-    Console *m_console;
-    QTabWidget *m_tabs;
-    IssueBrowser *m_issueBrowser;
+  //   TabBook *m_tabBook;
+  Console* m_console;
+  QTabWidget* m_tabs;
+  IssueBrowser* m_issueBrowser;
 
 public:
-    explicit InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit InfoPanel(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
-    Console *console() const;
+  Console* console() const;
 };
 } // namespace View
 } // namespace TrenchBroom

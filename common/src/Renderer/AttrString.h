@@ -22,57 +22,65 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Renderer {
-class AttrString {
+namespace TrenchBroom
+{
+namespace Renderer
+{
+class AttrString
+{
 private:
-    enum class Justify {
-      Left, Right, Center
-    };
+  enum class Justify
+  {
+    Left,
+    Right,
+    Center
+  };
 
 public:
-    class LineFunc {
-    public:
-        virtual ~LineFunc();
+  class LineFunc
+  {
+  public:
+    virtual ~LineFunc();
 
-        void process(const std::string &str, Justify justify);
+    void process(const std::string& str, Justify justify);
 
-    private:
-        virtual void justifyLeft(const std::string &str) = 0;
+  private:
+    virtual void justifyLeft(const std::string& str) = 0;
 
-        virtual void justifyRight(const std::string &str) = 0;
+    virtual void justifyRight(const std::string& str) = 0;
 
-        virtual void center(const std::string &str) = 0;
-    };
+    virtual void center(const std::string& str) = 0;
+  };
 
 private:
-    struct Line {
-      std::string string;
-      Justify justify;
+  struct Line
+  {
+    std::string string;
+    Justify justify;
 
-      Line(const std::string &i_string, Justify i_justify);
-    };
+    Line(const std::string& i_string, Justify i_justify);
+  };
 
-    using Lines = std::vector<Line>;
+  using Lines = std::vector<Line>;
 
-    Lines m_lines;
+  Lines m_lines;
 
 public:
-    AttrString();
+  AttrString();
 
-    AttrString(const std::string &string);
+  AttrString(const std::string& string);
 
-    bool operator<(const AttrString &other) const;
+  bool operator<(const AttrString& other) const;
 
-    int compare(const AttrString &other) const;
+  int compare(const AttrString& other) const;
 
-    void lines(LineFunc &func) const;
+  void lines(LineFunc& func) const;
 
-    void appendLeftJustified(const std::string &string);
+  void appendLeftJustified(const std::string& string);
 
-    void appendRightJustified(const std::string &string);
+  void appendRightJustified(const std::string& string);
 
-    void appendCentered(const std::string &string);
+  void appendCentered(const std::string& string);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

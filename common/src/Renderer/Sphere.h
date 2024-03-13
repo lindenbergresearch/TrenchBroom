@@ -21,22 +21,25 @@
 
 #include "Renderer/VertexArray.h"
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class VboManager;
 
-class Sphere {
+class Sphere
+{
 private:
-    VertexArray m_array;
+  VertexArray m_array;
 
 public:
-    Sphere(float radius, size_t iterations);
+  Sphere(float radius, size_t iterations);
 
-    bool prepared() const;
+  bool prepared() const;
 
-    void prepare(VboManager &vboManager);
+  void prepare(VboManager& vboManager);
 
-    void render();
+  void render();
 };
 } // namespace Renderer
 } // namespace TrenchBroom

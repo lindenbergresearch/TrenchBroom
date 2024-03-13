@@ -26,49 +26,64 @@
 
 class QTextEdit;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class VariableTable;
 }
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 struct CompilationProfile;
 }
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class CompilationRunner;
 
 class MapDocument;
 
-class CompilationRun : public QObject {
-Q_OBJECT
+class CompilationRun : public QObject
+{
+  Q_OBJECT
 private:
-    CompilationRunner *m_currentRun{nullptr};
+  CompilationRunner* m_currentRun{nullptr};
 
 public:
-    ~CompilationRun() override;
+  ~CompilationRun() override;
 
-    bool running() const;
+  bool running() const;
 
-    void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
+  void run(
+    const Model::CompilationProfile& profile,
+    std::shared_ptr<MapDocument> document,
+    QTextEdit* currentOutput);
 
-    void test(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
+  void test(
+    const Model::CompilationProfile& profile,
+    std::shared_ptr<MapDocument> document,
+    QTextEdit* currentOutput);
 
-    void terminate();
+  void terminate();
 
 private:
-    bool doIsRunning() const;
+  bool doIsRunning() const;
 
-    void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput, bool test);
+  void run(
+    const Model::CompilationProfile& profile,
+    std::shared_ptr<MapDocument> document,
+    QTextEdit* currentOutput,
+    bool test);
 
 private:
-    std::string buildWorkDir(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document);
+  std::string buildWorkDir(
+    const Model::CompilationProfile& profile, std::shared_ptr<MapDocument> document);
 
-    void cleanup();
+  void cleanup();
 
 signals:
 
-    void compilationStarted();
+  void compilationStarted();
 
-    void compilationEnded();
+  void compilationEnded();
 };
 } // namespace TrenchBroom::View

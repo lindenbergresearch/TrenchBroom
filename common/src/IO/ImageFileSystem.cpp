@@ -84,13 +84,14 @@ auto withEntry(
         const auto entryIt =
           findEntry(directoryEntry.entries.begin(), directoryEntry.entries.end(), name);
 
-        return entryIt != directoryEntry.entries.end() ? withEntry(
-                 kdl::path_pop_front(searchPath),
-                 *entryIt,
-                 currentPath / name,
-                 f,
-                 defaultResult)
-                                                       : defaultResult;
+        return entryIt != directoryEntry.entries.end()
+                 ? withEntry(
+                     kdl::path_pop_front(searchPath),
+                     *entryIt,
+                     currentPath / name,
+                     f,
+                     defaultResult)
+                 : defaultResult;
       },
       [&](const ImageFileEntry&) { return defaultResult; }),
     currentEntry);

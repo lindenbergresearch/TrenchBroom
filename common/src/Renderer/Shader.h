@@ -28,27 +28,29 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 
-class Shader {
+class Shader
+{
 private:
-    std::string m_name;
-    GLenum m_type;
-    GLuint m_shaderId;
+  std::string m_name;
+  GLenum m_type;
+  GLuint m_shaderId;
 
 public:
-    Shader(std::string name, GLenum type, GLuint shaderId);
+  Shader(std::string name, GLenum type, GLuint shaderId);
 
-deleteCopy(Shader);
+  deleteCopy(Shader);
 
-    Shader(Shader &&other) noexcept;
+  Shader(Shader&& other) noexcept;
 
-    Shader &operator=(Shader &&other) noexcept;
+  Shader& operator=(Shader&& other) noexcept;
 
-    ~Shader();
+  ~Shader();
 
-    void attach(GLuint programId) const;
+  void attach(GLuint programId) const;
 };
 
-Result<Shader> loadShader(const std::filesystem::path &path, GLenum type);
+Result<Shader> loadShader(const std::filesystem::path& path, GLenum type);
 } // namespace TrenchBroom::Renderer

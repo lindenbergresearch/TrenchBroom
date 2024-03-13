@@ -25,10 +25,10 @@
 #include <QObject>
 #include <QPointer>
 #include <QSettings>
+#include <QSlider>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
-#include <QSlider>
 
 #include "Ensure.h"
 #include "View/ViewConstants.h"
@@ -73,27 +73,37 @@ class QVBoxLayout;
 
 class QWidget;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Color;
 
-namespace View {
+namespace View
+{
 enum class MapTextEncoding;
 
-class SyncHeightEventFilter : public QObject {
+class SyncHeightEventFilter : public QObject
+{
 private:
-    QPointer<QWidget> m_primary;
-    QPointer<QWidget> m_secondary;
+  QPointer<QWidget> m_primary;
+  QPointer<QWidget> m_secondary;
 
 public:
-    SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent = nullptr);
+  SyncHeightEventFilter(QWidget* primary, QWidget* secondary, QObject* parent = nullptr);
 
-    ~SyncHeightEventFilter() override;
+  ~SyncHeightEventFilter() override;
 
-    bool eventFilter(QObject *target, QEvent *event) override;
+  bool eventFilter(QObject* target, QEvent* event) override;
 };
 
-enum class FileDialogDir {
-  Map, TextureCollection, CompileTool, Engine, EntityDefinition, GamePath, Resources
+enum class FileDialogDir
+{
+  Map,
+  TextureCollection,
+  CompileTool,
+  Engine,
+  EntityDefinition,
+  GamePath,
+  Resources
 };
 
 /**
@@ -101,209 +111,232 @@ enum class FileDialogDir {
  */
 QString fileDialogDefaultDirectory(FileDialogDir type);
 
-void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename);
+void updateFileDialogDefaultDirectoryWithFilename(
+  FileDialogDir type, const QString& filename);
 
-void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory);
+void updateFileDialogDefaultDirectoryWithDirectory(
+  FileDialogDir type, const QString& newDefaultDirectory);
 
-QString windowSettingsPath(const QWidget *window, const QString &suffix = "");
+QString windowSettingsPath(const QWidget* window, const QString& suffix = "");
 
-void saveWindowGeometry(QWidget *window);
+void saveWindowGeometry(QWidget* window);
 
-void restoreWindowGeometry(QWidget *window);
+void restoreWindowGeometry(QWidget* window);
 
-template<typename T>
-void saveWindowState(const T *window) {
-    ensure(window != nullptr, "window must not be null");
+template <typename T>
+void saveWindowState(const T* window)
+{
+  ensure(window != nullptr, "window must not be null");
 
-    const auto path = windowSettingsPath(window, "State");
-    auto settings = QSettings{};
-    settings.setValue(path, window->saveState());
+  const auto path = windowSettingsPath(window, "State");
+  auto settings = QSettings{};
+  settings.setValue(path, window->saveState());
 }
 
-template<typename T>
-void restoreWindowState(T *window) {
-    ensure(window != nullptr, "window must not be null");
+template <typename T>
+void restoreWindowState(T* window)
+{
+  ensure(window != nullptr, "window must not be null");
 
-    const auto path = windowSettingsPath(window, "State");
-    auto settings = QSettings{};
-    window->restoreState(settings.value(path).toByteArray());
+  const auto path = windowSettingsPath(window, "State");
+  auto settings = QSettings{};
+  window->restoreState(settings.value(path).toByteArray());
 }
 
 /**
  * Return true if the given widget or any of its children currently has focus.
  */
-bool widgetOrChildHasFocus(const QWidget *widget);
+bool widgetOrChildHasFocus(const QWidget* widget);
 
 class MapFrame;
 
-MapFrame *findMapFrame(QWidget *widget);
+MapFrame* findMapFrame(QWidget* widget);
 
-QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
+QToolButton* createBitmapButton(
+  const std::string& image, const QString& tooltip, QWidget* parent = nullptr);
 
-QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr);
+QToolButton* createBitmapButton(
+  const QIcon& icon, const QString& tooltip, QWidget* parent = nullptr);
 
-QToolButton *createBitmapToggleButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
+QToolButton* createBitmapToggleButton(
+  const std::string& image, const QString& tooltip, QWidget* parent = nullptr);
 
-QWidget *createDefaultPage(const QString &message, QWidget *parent = nullptr);
+QWidget* createDefaultPage(const QString& message, QWidget* parent = nullptr);
 
-QSlider *createSlider(const int min, const int max);
+QSlider* createSlider(const int min, const int max);
 
 
-float getSliderRatio(const QSlider *slider);
+float getSliderRatio(const QSlider* slider);
 
-void setSliderRatio(QSlider *slider, float ratio);
+void setSliderRatio(QSlider* slider, float ratio);
 
-float getSliderRange(QSlider *slider, float length, float offset = 0.f);
+float getSliderRange(QSlider* slider, float length, float offset = 0.f);
 
-void setSliderRange(QSlider *slider, float length, float value, float offset = 0.f);
+void setSliderRange(QSlider* slider, float length, float value, float offset = 0.f);
 
-QLayout *wrapDialogButtonBox(QWidget *buttonBox);
+QLayout* wrapDialogButtonBox(QWidget* buttonBox);
 
-QLayout *wrapDialogButtonBox(QLayout *buttonBox);
+QLayout* wrapDialogButtonBox(QLayout* buttonBox);
 
-void addToMiniToolBarLayout(QBoxLayout *layout);
+void addToMiniToolBarLayout(QBoxLayout* layout);
 
-template<typename... Rest>
-void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest);
+template <typename... Rest>
+void addToMiniToolBarLayout(QBoxLayout* layout, int first, Rest... rest);
 
-template<typename... Rest>
-void addToMiniToolBarLayout(QBoxLayout *layout, QWidget *first, Rest... rest) {
-    layout->addWidget(first);
-    addToMiniToolBarLayout(layout, rest...);
+template <typename... Rest>
+void addToMiniToolBarLayout(QBoxLayout* layout, QWidget* first, Rest... rest)
+{
+  layout->addWidget(first);
+  addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest>
-void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
-    layout->addSpacing(first - LayoutConstants::NarrowHMargin);
-    addToMiniToolBarLayout(layout, rest...);
+template <typename... Rest>
+void addToMiniToolBarLayout(QBoxLayout* layout, int first, Rest... rest)
+{
+  layout->addSpacing(first - LayoutConstants::NarrowHMargin);
+  addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest>
-QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
-    auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
-    layout->setSpacing(LayoutConstants::NarrowHMargin);
-    addToMiniToolBarLayout(layout, first, rest...);
-    layout->addStretch(1);
-    return layout;
+template <typename... Rest>
+QLayout* createMiniToolBarLayout(QWidget* first, Rest... rest)
+{
+  auto* layout = new QHBoxLayout{};
+  layout->setContentsMargins(
+    LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+  layout->setSpacing(LayoutConstants::NarrowHMargin);
+  addToMiniToolBarLayout(layout, first, rest...);
+  layout->addStretch(1);
+  return layout;
 }
 
-template<typename... Rest>
-QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
-    auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
-    layout->setSpacing(LayoutConstants::NarrowHMargin);
-    layout->addStretch(1);
-    addToMiniToolBarLayout(layout, first, rest...);
-    return layout;
+template <typename... Rest>
+QLayout* createMiniToolBarLayoutRightAligned(QWidget* first, Rest... rest)
+{
+  auto* layout = new QHBoxLayout{};
+  layout->setContentsMargins(
+    LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+  layout->setSpacing(LayoutConstants::NarrowHMargin);
+  layout->addStretch(1);
+  addToMiniToolBarLayout(layout, first, rest...);
+  return layout;
 }
 
-void setHint(QLineEdit *ctrl, const char *hint);
+void setHint(QLineEdit* ctrl, const char* hint);
 
-void centerOnScreen(QWidget *window);
+void centerOnScreen(QWidget* window);
 
 int getCommonFieldHeight();
 
-QWidget *makeDefault(QWidget *widget);
+QWidget* makeDefault(QWidget* widget);
 
-QWidget *makeEmphasized(QWidget *widget);
+QWidget* makeEmphasized(QWidget* widget);
 
-QWidget *makeItalic(QWidget *widget);
+QWidget* makeItalic(QWidget* widget);
 
-QWidget *makeUnemphasized(QWidget *widget);
+QWidget* makeUnemphasized(QWidget* widget);
 
-QWidget *makeInfo(QWidget *widget);
+QWidget* makeInfo(QWidget* widget);
 
-QWidget *makeSmall(QWidget *widget);
+QWidget* makeSmall(QWidget* widget);
 
-QWidget *makeTitle(QWidget *widget);
+QWidget* makeTitle(QWidget* widget);
 
-QWidget *makeSubTitle(QWidget *widget);
+QWidget* makeSubTitle(QWidget* widget);
 
-QWidget *makeHeader(QWidget *widget);
+QWidget* makeHeader(QWidget* widget);
 
-QWidget *makePanelTitle(QWidget *widget, bool bold = false, bool isSubTitle = false);
+QWidget* makePanelTitle(QWidget* widget, bool bold = false, bool isSubTitle = false);
 
-QWidget *makeError(QWidget *widget);
+QWidget* makeError(QWidget* widget);
 
-QWidget *makeMono(QWidget *widget, int size);
+QWidget* makeMono(QWidget* widget, int size);
 
-QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role = QPalette::ColorRole::Text);
+QWidget* colorizeWidget(
+  QWidget* widget,
+  const QColor& color,
+  QPalette::ColorRole role = QPalette::ColorRole::Text);
 
-QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
+QWidget* makeSelected(QWidget* widget, const QPalette& defaultPalette);
 
-QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette);
+QWidget* makeBright(QWidget* widget, const QPalette& defaultPalette);
 
-QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette);
+QWidget* makeUnselected(QWidget* widget, const QPalette& defaultPalette);
 
-Color fromQColor(const QColor &color);
+Color fromQColor(const QColor& color);
 
-QColor toQColor(const Color &color, float multiplier = 1.0f);
+QColor toQColor(const Color& color, float multiplier = 1.0f);
 
-float getQColorBrightnessFactor(const QColor &color);
+float getQColorBrightnessFactor(const QColor& color);
 
-QString toStyleSheetColor(const char *prefix, const QColor &color);
+QString toStyleSheetColor(const char* prefix, const QColor& color);
 
-QString toStyleSheetRGBA(const QColor &color, int adjustment = 0);
+QString toStyleSheetRGBA(const QColor& color, int adjustment = 0);
 
-QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, QPalette::ColorGroup group, int adjustment = 0);
+QString toStyleSheetRGBA(
+  const QPalette& palette,
+  QPalette::ColorRole role,
+  QPalette::ColorGroup group,
+  int adjustment = 0);
 
-QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, int adjustment = 0);
+QString toStyleSheetRGBA(
+  const QPalette& palette, QPalette::ColorRole role, int adjustment = 0);
 
-void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type = "solid");
+void setStyledBorder(
+  QWidget* widget, int width, const QColor& color, const char* type = "solid");
 
-void setWindowIconTB(QWidget *window);
+void setWindowIconTB(QWidget* window);
 
-void setDebugBackgroundColor(QWidget *widget, const QColor &color);
+void setDebugBackgroundColor(QWidget* widget, const QColor& color);
 
-void setDefaultWindowColor(QWidget *widget);
+void setDefaultWindowColor(QWidget* widget);
 
-void setBaseWindowColor(QWidget *widget);
+void setBaseWindowColor(QWidget* widget);
 
-void setHighlightWindowColor(QWidget *widget);
+void setHighlightWindowColor(QWidget* widget);
 
-QLineEdit *createSearchBox();
+QLineEdit* createSearchBox();
 
-void checkButtonInGroup(QButtonGroup *group, int id, bool checked);
+void checkButtonInGroup(QButtonGroup* group, int id, bool checked);
 
-void checkButtonInGroup(QButtonGroup *group, const QString &objectName, bool checked);
+void checkButtonInGroup(QButtonGroup* group, const QString& objectName, bool checked);
 
 /**
  * Insert a separating line as the first item in the given layout on platforms where
  * this is necessary.
  */
-void insertTitleBarSeparator(QVBoxLayout *layout);
+void insertTitleBarSeparator(QVBoxLayout* layout);
 
-template<typename I>
-QStringList toQStringList(I cur, I end) {
-    auto result = QStringList{};
-    std::transform(cur, end, std::back_inserter(result), [](const auto &str) {
-          return QString::fromStdString(str);
-        }
-    );
-    return result;
+template <typename I>
+QStringList toQStringList(I cur, I end)
+{
+  auto result = QStringList{};
+  std::transform(cur, end, std::back_inserter(result), [](const auto& str) {
+    return QString::fromStdString(str);
+  });
+  return result;
 }
 
-class AutoResizeRowsEventFilter : public QObject {
-Q_OBJECT
+class AutoResizeRowsEventFilter : public QObject
+{
+  Q_OBJECT
 private:
-    QTableView *m_tableView;
+  QTableView* m_tableView;
 
 public:
-    explicit AutoResizeRowsEventFilter(QTableView *tableView);
+  explicit AutoResizeRowsEventFilter(QTableView* tableView);
 
-    bool eventFilter(QObject *watched, QEvent *event) override;
+  bool eventFilter(QObject* watched, QEvent* event) override;
 };
 
-void autoResizeRows(QTableView *tableView);
+void autoResizeRows(QTableView* tableView);
 
-void deleteChildWidgetsLaterAndDeleteLayout(QWidget *widget);
+void deleteChildWidgetsLaterAndDeleteLayout(QWidget* widget);
 
-void showModelessDialog(QDialog *dialog);
+void showModelessDialog(QDialog* dialog);
 
-QString mapStringToUnicode(MapTextEncoding encoding, const std::string &string);
+QString mapStringToUnicode(MapTextEncoding encoding, const std::string& string);
 
-std::string mapStringFromUnicode(MapTextEncoding encoding, const QString &string);
+std::string mapStringFromUnicode(MapTextEncoding encoding, const QString& string);
 
 /**
  * Maps one of Qt::META, Qt::SHIFT, Qt::CTRL, Qt::ALT to the
