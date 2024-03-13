@@ -26,10 +26,9 @@
 #include <memory>
 #include <optional>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom::View
+{
 class DragTracker;
-
 class MapDocument;
 
 /**
@@ -45,29 +44,27 @@ class MapDocument;
  * - LMB Drag: applies to all faces dragged over
  * - LMB Double click: applies to all faces of target brush
  */
-class SetBrushFaceAttributesTool : public ToolController, public Tool {
+class SetBrushFaceAttributesTool : public ToolController, public Tool
+{
 private:
-    std::weak_ptr<MapDocument> m_document;
+  std::weak_ptr<MapDocument> m_document;
 
 public:
-    SetBrushFaceAttributesTool(std::weak_ptr<MapDocument> document);
+  explicit SetBrushFaceAttributesTool(std::weak_ptr<MapDocument> document);
 
 private:
-    Tool &tool() override;
+  Tool& tool() override;
+  const Tool& tool() const override;
 
-    const Tool &tool() const override;
+  bool mouseClick(const InputState& inputState) override;
+  bool mouseDoubleClick(const InputState& inputState) override;
 
-    bool mouseClick(const InputState &inputState) override;
+  bool cancel() override;
 
-    bool mouseDoubleClick(const InputState &inputState) override;
+  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
 
-    bool cancel() override;
-
-    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
-
-    void copyAttributesFromSelection(const InputState &inputState, bool applyToBrush);
-
-    bool canCopyAttributesFromSelection(const InputState &inputState) const;
+  void copyAttributesFromSelection(const InputState& inputState, bool applyToBrush);
+  bool canCopyAttributesFromSelection(const InputState& inputState) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

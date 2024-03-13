@@ -27,7 +27,7 @@
 #include "Model/Object.h"
 #include "Result.h"
 
-#include <vecmath/bbox.h>
+#include "vm/bbox.h"
 
 #include <memory>
 #include <optional>
@@ -35,38 +35,8 @@
 #include <utility>
 #include <vector>
 
-namespace TrenchBroom::Model {
-using UpdateLinkedGroupsResult = std::vector<std::pair<Node *, std::vector<std::unique_ptr<Node>>>>;
-
-/**
- * Updates the given target group nodes from the given source group node.
- *
- * The children of the source node are cloned (recursively) and transformed into the
- * target nodes by means of the recorded transformations of the source group and the
- * corresponding target groups.
- *
- * Depending on the protected property keys of the cloned entities and their corresponding
- * entities in the target groups, some entity property changes may not be propagated from
- * the source group to the target groups. Specifically, if an entity property is protected
- * in either the cloned entity or its corresponding entity in a target group, then changes
- * to that entity property incl. removal are not propagated. This also applies to numbered
- * properties, i.e. properties whose names end in a number. So if the entity property
- * "target" is protected, then changes to the property "target2" are not propagated or
- * overwritten during propagation.
- *
- * If this operation fails for any child and target group, then an error is returned. The
- * operation can fail if any of the following conditions arises:
- *
- * - the transformation of the source group node is not invertible
- * - transforming any of the source node's children fails
- * - any of the transformed children is no longer within the world bounds
- *
- * If this operation succeeds, a vector of pairs is returned where each pair consists of
- * the target node that should be updated, and the new children that should replace the
- * target node's children.
- */
-Result<UpdateLinkedGroupsResult>
-updateLinkedGroups(const GroupNode &sourceGroupNode, const std::vector<Model::GroupNode *> &targetGroupNodes, const vm::bbox3 &worldBounds);
+namespace TrenchBroom::Model
+{
 
 /**
  * A group of nodes that can be edited as one.
@@ -75,118 +45,106 @@ updateLinkedGroups(const GroupNode &sourceGroupNode, const std::vector<Model::Gr
  * linked group id form a link set. When a member of a link set is changed, all other
  * members of that link set are updated to reflect these changes via `updateLinkedGroups`.
  */
-class GroupNode : public Node, public Object {
+class GroupNode : public Node, public Object
+{
 private:
-    enum class EditState {
-      Open, Closed, DescendantOpen
-    };
+  enum class EditState
+  {
+    Open,
+    Closed,
+    DescendantOpen
+  };
 
-    Group m_group;
-    EditState m_editState;
-    mutable vm::bbox3 m_logicalBounds;
-    mutable vm::bbox3 m_physicalBounds;
-    mutable bool m_boundsValid;
+  Group m_group;
+  EditState m_editState = EditState::Closed;
+  mutable vm::bbox3 m_logicalBounds;
+  mutable vm::bbox3 m_physicalBounds;
+  mutable bool m_boundsValid = false;
 
-    /**
-     * The ID used to serialize group nodes (see MapReader and NodeSerializer). This is set
-     * by MapReader when a layer is read, or by WorldNode when a group is added that doesn't
-     * yet have a persistent ID.
-     */
-    std::optional<IdType> m_persistentId;
+  /**
+   * The ID used to serialize group nodes (see MapReader and NodeSerializer). This is set
+   * by MapReader when a layer is read, or by WorldNode when a group is added that doesn't
+   * yet have a persistent ID.
+   */
+  std::optional<IdType> m_persistentId;
 
-    bool m_hasPendingChanges;
+  bool m_hasPendingChanges = false;
 
 public:
-    explicit GroupNode(Group group);
+  explicit GroupNode(Group group);
 
-    const Group &group() const;
+  const Group& group() const;
+  Group setGroup(Group group);
 
-    Group setGroup(Group group);
+  bool opened() const;
+  bool hasOpenedDescendant() const;
+  bool closed() const;
+  void open();
+  void close();
 
-    bool opened() const;
+  const std::optional<IdType>& persistentId() const;
+  void setPersistentId(IdType persistentId);
+  void resetPersistentId();
 
-    bool hasOpenedDescendant() const;
-
-    bool closed() const;
-
-    void open();
-
-    void close();
-
-    const std::optional<IdType> &persistentId() const;
-
-    void setPersistentId(IdType persistentId);
-
-    void resetPersistentId();
-
-    bool hasPendingChanges() const;
-
-    void setHasPendingChanges(bool hasPendingChanges);
+  bool hasPendingChanges() const;
+  void setHasPendingChanges(bool hasPendingChanges);
 
 private:
-    void setEditState(EditState editState);
+  void setEditState(EditState editState);
+  void setAncestorEditState(EditState editState);
 
-    void setAncestorEditState(EditState editState);
-
-    void openAncestors();
-
-    void closeAncestors();
+  void openAncestors();
+  void closeAncestors();
 
 private: // implement methods inherited from Node
-    const std::string &doGetName() const override;
+  const std::string& doGetName() const override;
+  const vm::bbox3& doGetLogicalBounds() const override;
+  const vm::bbox3& doGetPhysicalBounds() const override;
 
-    const vm::bbox3 &doGetLogicalBounds() const override;
+  FloatType doGetProjectedArea(vm::axis::type axis) const override;
 
-    const vm::bbox3 &doGetPhysicalBounds() const override;
+  Node* doClone(const vm::bbox3& worldBounds, SetLinkId setLinkIds) const override;
 
-    FloatType doGetProjectedArea(vm::axis::type axis) const override;
+  bool doCanAddChild(const Node* child) const override;
+  bool doCanRemoveChild(const Node* child) const override;
+  bool doRemoveIfEmpty() const override;
 
-    Node *doClone(const vm::bbox3 &worldBounds) const override;
+  bool doShouldAddToSpacialIndex() const override;
 
-    bool doCanAddChild(const Node *child) const override;
+  void doChildWasAdded(Node* node) override;
+  void doChildWasRemoved(Node* node) override;
 
-    bool doCanRemoveChild(const Node *child) const override;
+  void doNodePhysicalBoundsDidChange() override;
+  void doChildPhysicalBoundsDidChange() override;
 
-    bool doRemoveIfEmpty() const override;
+  bool doSelectable() const override;
 
-    bool doShouldAddToSpacialIndex() const override;
+  void doPick(
+    const EditorContext& editorContext,
+    const vm::ray3& ray,
+    PickResult& pickResult) override;
+  void doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result) override;
 
-    void doChildWasAdded(Node *node) override;
-
-    void doChildWasRemoved(Node *node) override;
-
-    void doNodePhysicalBoundsDidChange() override;
-
-    void doChildPhysicalBoundsDidChange() override;
-
-    bool doSelectable() const override;
-
-    void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
-
-    void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
-
-    void doAccept(NodeVisitor &visitor) override;
-
-    void doAccept(ConstNodeVisitor &visitor) const override;
+  void doAccept(NodeVisitor& visitor) override;
+  void doAccept(ConstNodeVisitor& visitor) const override;
 
 private: // implement methods inherited from Object
-    Node *doGetContainer() override;
-
-    LayerNode *doGetContainingLayer() override;
-
-    GroupNode *doGetContainingGroup() override;
+  Node* doGetContainer() override;
+  LayerNode* doGetContainingLayer() override;
+  GroupNode* doGetContainingGroup() override;
 
 private:
-    void invalidateBounds();
-
-    void validateBounds() const;
+  void invalidateBounds();
+  void validateBounds() const;
 
 private: // implement Taggable interface
-    void doAcceptTagVisitor(TagVisitor &visitor) override;
-
-    void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
+  void doAcceptTagVisitor(TagVisitor& visitor) override;
+  void doAcceptTagVisitor(ConstTagVisitor& visitor) const override;
 
 private:
-deleteCopyAndMove(GroupNode);
+  deleteCopyAndMove(GroupNode);
 };
+
+bool compareGroupNodesByLinkId(const GroupNode* lhs, const GroupNode* rhs);
+
 } // namespace TrenchBroom::Model

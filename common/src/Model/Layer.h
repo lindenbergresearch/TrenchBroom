@@ -21,45 +21,45 @@
 
 #include "Color.h"
 
+#include "kdl/reflection_decl.h"
+
 #include <optional>
 #include <string>
 
-namespace TrenchBroom {
-namespace Model {
-class Layer {
+namespace TrenchBroom::Model
+{
+
+class Layer
+{
 private:
-    bool m_defaultLayer;
-    std::string m_name;
-    std::optional<int> m_sortIndex;
-    std::optional<Color> m_color;
-    bool m_omitFromExport;
+  bool m_defaultLayer;
+  std::string m_name;
+  std::optional<int> m_sortIndex;
+  std::optional<Color> m_color;
+  bool m_omitFromExport = false;
+
+  kdl_reflect_decl(Layer, m_defaultLayer, m_name, m_sortIndex, m_color, m_omitFromExport);
 
 public:
-    explicit Layer(std::string name, bool defaultLayer = false);
+  explicit Layer(std::string name, bool defaultLayer = false);
 
-    bool defaultLayer() const;
+  bool defaultLayer() const;
 
-    const std::string &name() const;
+  const std::string& name() const;
+  void setName(std::string name);
 
-    void setName(std::string name);
+  bool hasSortIndex() const;
+  int sortIndex() const;
+  void setSortIndex(int sortIndex);
 
-    bool hasSortIndex() const;
+  const std::optional<Color>& color() const;
+  void setColor(const Color& color);
 
-    int sortIndex() const;
+  bool omitFromExport() const;
+  void setOmitFromExport(bool omitFromExport);
 
-    void setSortIndex(int sortIndex);
-
-    const std::optional<Color> &color() const;
-
-    void setColor(const Color &color);
-
-    bool omitFromExport() const;
-
-    void setOmitFromExport(bool omitFromExport);
-
-    static int invalidSortIndex();
-
-    static int defaultLayerSortIndex();
+  static int invalidSortIndex();
+  static int defaultLayerSortIndex();
 };
-} // namespace Model
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::Model

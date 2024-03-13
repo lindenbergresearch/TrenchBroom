@@ -24,66 +24,88 @@
 #include "View/MapDocumentCommandFacade.h"
 #include "View/UpdateLinkedGroupsCommand.h"
 
-#include <kdl/result.h>
+#include "kdl/result.h"
 
 #include <string>
 
-namespace TrenchBroom {
-namespace View {
-UpdateLinkedGroupsCommandBase::UpdateLinkedGroupsCommandBase(std::string name, const bool updateModificationCount,
-    std::vector<Model::GroupNode *> changedLinkedGroups
-) : UndoableCommand{std::move(name), updateModificationCount}, m_updateLinkedGroupsHelper{
-    std::move(changedLinkedGroups)
-} {
+namespace TrenchBroom
+{
+namespace View
+{
+UpdateLinkedGroupsCommandBase::UpdateLinkedGroupsCommandBase(
+  std::string name,
+  const bool updateModificationCount,
+  std::vector<Model::GroupNode*> changedLinkedGroups)
+  : UndoableCommand{std::move(name), updateModificationCount}
+  , m_updateLinkedGroupsHelper{std::move(changedLinkedGroups)}
+{
 }
 
-UpdateLinkedGroupsCommandBase::~UpdateLinkedGroupsCommandBase() {}
+UpdateLinkedGroupsCommandBase::~UpdateLinkedGroupsCommandBase() = default;
 
-std::unique_ptr<CommandResult> UpdateLinkedGroupsCommandBase::performDo(MapDocumentCommandFacade *document) {
-    // reimplemented from UndoableCommand::performDo
-    auto commandResult = Command::performDo(document);
-    if (!commandResult->success()) {
-        return commandResult;
-    }
-
-    return m_updateLinkedGroupsHelper.applyLinkedGroupUpdates(*document).transform([&]() {
-          setModificationCount(document);
-          return std::move(commandResult);
-        }
-    ).transform_error([&](auto e) {
-          doPerformUndo(document);
-          if (document) {
-              document->error() << e.msg;
-          }
-          return std::make_unique<CommandResult>(false);
-        }
-    ).value();
-}
-
-std::unique_ptr<CommandResult> UpdateLinkedGroupsCommandBase::performUndo(MapDocumentCommandFacade *document) {
-    auto commandResult = UndoableCommand::performUndo(document);
-    if (commandResult->success()) {
-        m_updateLinkedGroupsHelper.undoLinkedGroupUpdates(*document);
-    }
+std::unique_ptr<CommandResult> UpdateLinkedGroupsCommandBase::performDo(
+  MapDocumentCommandFacade* document)
+{
+  // reimplemented from UndoableCommand::performDo
+  auto commandResult = Command::performDo(document);
+  if (!commandResult->success())
+  {
     return commandResult;
+  }
+
+  return m_updateLinkedGroupsHelper.applyLinkedGroupUpdates(*document)
+    .transform([&]() {
+      setModificationCount(document);
+      return std::move(commandResult);
+    })
+    .transform_error([&](auto e) {
+      doPerformUndo(document);
+      if (document)
+      {
+        document->error() << e.msg;
+      }
+      return std::make_unique<CommandResult>(false);
+    })
+    .value();
 }
 
-bool UpdateLinkedGroupsCommandBase::collateWith(UndoableCommand &command) {
-    assert(&command != this);
-
-    if (auto *updateLinkedGroupsCommand = dynamic_cast<UpdateLinkedGroupsCommand *>(&command)) {
-        m_updateLinkedGroupsHelper.collateWith(updateLinkedGroupsCommand->m_updateLinkedGroupsHelper);
-        return true;
-    }
-
-    if (UndoableCommand::collateWith(command)) {
-        if (auto *updateLinkedGroupsCommandBase = dynamic_cast<UpdateLinkedGroupsCommandBase *>(&command)) {
-            m_updateLinkedGroupsHelper.collateWith(updateLinkedGroupsCommandBase->m_updateLinkedGroupsHelper);
-        }
-        return true;
-    }
-
-    return false;
+std::unique_ptr<CommandResult> UpdateLinkedGroupsCommandBase::performUndo(
+  MapDocumentCommandFacade* document)
+{
+  auto commandResult = UndoableCommand::performUndo(document);
+  if (commandResult->success())
+  {
+    m_updateLinkedGroupsHelper.undoLinkedGroupUpdates(*document);
+  }
+  return commandResult;
 }
+
+bool UpdateLinkedGroupsCommandBase::collateWith(UndoableCommand& command)
+{
+  assert(&command != this);
+
+  if (
+    auto* updateLinkedGroupsCommand = dynamic_cast<UpdateLinkedGroupsCommand*>(&command))
+  {
+    m_updateLinkedGroupsHelper.collateWith(
+      updateLinkedGroupsCommand->m_updateLinkedGroupsHelper);
+    return true;
+  }
+
+  if (UndoableCommand::collateWith(command))
+  {
+    if (
+      auto* updateLinkedGroupsCommandBase =
+        dynamic_cast<UpdateLinkedGroupsCommandBase*>(&command))
+    {
+      m_updateLinkedGroupsHelper.collateWith(
+        updateLinkedGroupsCommandBase->m_updateLinkedGroupsHelper);
+    }
+    return true;
+  }
+
+  return false;
+}
+
 } // namespace View
 } // namespace TrenchBroom

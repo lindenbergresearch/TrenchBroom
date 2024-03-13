@@ -21,11 +21,14 @@
 
 #include "Exceptions.h"
 
-namespace TrenchBroom {
-namespace IO {
-class ReaderException : public Exception {
+namespace TrenchBroom
+{
+namespace IO
+{
+class ReaderException : public Exception
+{
 public:
-    using Exception::Exception;
+  using Exception::Exception;
 };
 } // namespace IO
 } // namespace TrenchBroom

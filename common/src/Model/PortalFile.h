@@ -21,25 +21,27 @@
 
 #include "Result.h"
 
-#include <vecmath/forward.h>
+#include "vm/forward.h"
 
 #include <filesystem>
 #include <iosfwd>
 #include <vector>
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
-class PortalFile {
+class PortalFile
+{
 private:
-    std::vector<vm::polygon3f> m_portals;
+  std::vector<vm::polygon3f> m_portals;
 
 public:
-    explicit PortalFile(std::vector<vm::polygon3f> portals);
+  explicit PortalFile(std::vector<vm::polygon3f> portals);
 
-    const std::vector<vm::polygon3f> &portals() const;
+  const std::vector<vm::polygon3f>& portals() const;
 };
 
-bool canLoadPortalFile(const std::filesystem::path &path);
+bool canLoadPortalFile(const std::filesystem::path& path);
+Result<PortalFile> loadPortalFile(std::istream& stream);
 
-Result<PortalFile> loadPortalFile(std::istream &stream);
 } // namespace TrenchBroom::Model

@@ -30,38 +30,49 @@
 #include "View/ViewConstants.h"
 #include "View/ViewEditor.h"
 
-namespace TrenchBroom {
-namespace View {
-MapViewBar::MapViewBar(std::weak_ptr<MapDocument> document, QWidget *parent) : ContainerBar(Sides::BottomSide, parent), m_document(document),
-    m_toolBook(nullptr), m_viewEditor(nullptr) {
-    createGui(document);
+namespace TrenchBroom
+{
+namespace View
+{
+MapViewBar::MapViewBar(std::weak_ptr<MapDocument> document, QWidget* parent)
+  : ContainerBar(Sides::BottomSide, parent)
+  , m_document(document)
+  , m_toolBook(nullptr)
+  , m_viewEditor(nullptr)
+{
+  createGui(document);
 }
 
-QStackedLayout *MapViewBar::toolBook() {
-    return m_toolBook;
+QStackedLayout* MapViewBar::toolBook()
+{
+  return m_toolBook;
 }
 
-void MapViewBar::createGui(std::weak_ptr<MapDocument> document) {
-    setAttribute(Qt::WA_MacSmallSize);
+void MapViewBar::createGui(std::weak_ptr<MapDocument> document)
+{
+  setAttribute(Qt::WA_MacSmallSize);
 
-    m_toolBook = new QStackedLayout();
-    m_toolBook->setContentsMargins(0, 0, 0, 0);
+  m_toolBook = new QStackedLayout();
+  m_toolBook->setContentsMargins(0, 0, 0, 0);
 
-    m_viewEditor = new ViewPopupEditor(std::move(document));
+  m_viewEditor = new ViewPopupEditor(std::move(document));
 
 #ifdef __APPLE__
-    const auto vMargin = pref(Preferences::Theme) == Preferences::darkTheme() ? LayoutConstants::MediumVMargin : 0;
+  const auto vMargin = pref(Preferences::Theme) == Preferences::darkTheme()
+                         ? LayoutConstants::MediumVMargin
+                         : 0;
 #else
-    const auto vMargin = LayoutConstants::MediumVMargin;
+  const auto vMargin = LayoutConstants::MediumVMargin;
 #endif
 
-    auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(LayoutConstants::MediumVMargin, vMargin, LayoutConstants::MediumVMargin, vMargin);
-    layout->setSpacing(LayoutConstants::WideHMargin);
-    layout->addLayout(m_toolBook, 1);
-    layout->addWidget(m_viewEditor, 0, Qt::AlignRight);
+  auto* layout = new QHBoxLayout();
+  layout->setContentsMargins(
+    LayoutConstants::WideHMargin, vMargin, LayoutConstants::WideHMargin, vMargin);
+  layout->setSpacing(LayoutConstants::WideHMargin);
+  layout->addLayout(m_toolBook, 1);
+  layout->addWidget(m_viewEditor, 0, Qt::AlignVCenter);
 
-    setLayout(layout);
+  setLayout(layout);
 }
 } // namespace View
 } // namespace TrenchBroom

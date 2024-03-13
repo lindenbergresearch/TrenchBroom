@@ -26,62 +26,55 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class EntityNodeBase;
-
 class BrushNode;
-
 class EntityNode;
-
 class GroupNode;
-
 class Issue;
-
 class LayerNode;
-
 class Node;
-
 class PatchNode;
-
 class WorldNode;
 
-class Validator {
+class Validator
+{
 private:
-    IssueType m_type;
-    std::string m_description;
-    std::vector<IssueQuickFix> m_quickFixes;
+  IssueType m_type;
+  std::string m_description;
+  std::vector<IssueQuickFix> m_quickFixes;
 
 public:
-    virtual ~Validator();
+  virtual ~Validator();
 
-    IssueType type() const;
+  IssueType type() const;
+  const std::string& description() const;
+  std::vector<const IssueQuickFix*> quickFixes() const;
 
-    const std::string &description() const;
-
-    std::vector<const IssueQuickFix *> quickFixes() const;
-
-    void validate(Node &node, std::vector<std::unique_ptr<Issue>> &issues) const;
+  void validate(Node& node, std::vector<std::unique_ptr<Issue>>& issues) const;
 
 protected:
-    Validator(IssueType type, const std::string &description);
-
-    void addQuickFix(IssueQuickFix quickFix);
+  Validator(IssueType type, const std::string& description);
+  void addQuickFix(IssueQuickFix quickFix);
 
 private:
-    virtual void doValidate(WorldNode &worldNode, std::vector<std::unique_ptr<Issue>> &issues) const;
-
-    virtual void doValidate(LayerNode &layerNode, std::vector<std::unique_ptr<Issue>> &issues) const;
-
-    virtual void doValidate(GroupNode &groupNode, std::vector<std::unique_ptr<Issue>> &issues) const;
-
-    virtual void doValidate(EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const;
-
-    virtual void doValidate(BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const;
-
-    virtual void doValidate(PatchNode &patchNode, std::vector<std::unique_ptr<Issue>> &issues) const;
-
-    virtual void doValidate(EntityNodeBase &node, std::vector<std::unique_ptr<Issue>> &issues) const;
+  virtual void doValidate(
+    WorldNode& worldNode, std::vector<std::unique_ptr<Issue>>& issues) const;
+  virtual void doValidate(
+    LayerNode& layerNode, std::vector<std::unique_ptr<Issue>>& issues) const;
+  virtual void doValidate(
+    GroupNode& groupNode, std::vector<std::unique_ptr<Issue>>& issues) const;
+  virtual void doValidate(
+    EntityNode& entityNode, std::vector<std::unique_ptr<Issue>>& issues) const;
+  virtual void doValidate(
+    BrushNode& brushNode, std::vector<std::unique_ptr<Issue>>& issues) const;
+  virtual void doValidate(
+    PatchNode& patchNode, std::vector<std::unique_ptr<Issue>>& issues) const;
+  virtual void doValidate(
+    EntityNodeBase& node, std::vector<std::unique_ptr<Issue>>& issues) const;
 };
 } // namespace Model
 } // namespace TrenchBroom

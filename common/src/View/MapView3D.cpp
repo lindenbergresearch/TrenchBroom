@@ -72,7 +72,7 @@
 
 #include <kdl/set_temp.h>
 
-#include <vecmath/util.h>
+#include <vm/util.h>
 
 #include <memory>
 
@@ -220,10 +220,15 @@ void MapView3D::bindEvents() {
 }
 
 void MapView3D::updateFlyMode() {
-    m_framesRendered++;
-    m_totalFrames++;
+    if (m_flyModeHelper->anyKeyDown()) {
+        update();
+        m_framesRendered++;
+        m_totalFrames++;
+    }
 
-    update();
+
+
+  // update();
 }
 
 void MapView3D::resetFlyModeKeys() {
@@ -540,22 +545,22 @@ bool MapView3D::doBeforePopupMenu() {
 
 void MapView3D::linkCamera(CameraLinkHelper & /* helper */) {}
 
-void MapView3D::doFocusCameraOnEntityByName(const std::string name) {
-    auto document = kdl::mem_lock(m_document);
-    auto result = document->world()->entityNodeIndex().findEntity("classname", name);
-
-    if (result.empty())
-        printf("nothing found!\n");
-    else printf("found %zu for: %s\n", result.size(), name.c_str());
-
-    for (const auto &item: result) {
-        printf("%s\n", item->name().c_str());
-
-        auto center = item->physicalBounds().center();
-        const auto pos = vm::vec3f(center.x(), center.y(), center.z());
-        printf("pos [%.2f %.2f %.2f]", pos.x(), pos.y(), pos.z());
-        doMoveCameraToPosition(pos, true);
-    }
-}
+//void MapView3D::doFocusCameraOnEntityByName(const std::string name) {
+//    auto document = kdl::mem_lock(m_document);
+//    auto result = document->world()->entityNodeIndex().findEntity("classname", name);
+//
+//    if (result.empty())
+//        printf("nothing found!\n");
+//    else printf("found %zu for: %s\n", result.size(), name.c_str());
+//
+//    for (const auto &item: result) {
+//        printf("%s\n", item->name().c_str());
+//
+//        auto center = item->physicalBounds().center();
+//        const auto pos = vm::vec3f(center.x(), center.y(), center.z());
+//        printf("pos [%.2f %.2f %.2f]", pos.x(), pos.y(), pos.z());
+//        doMoveCameraToPosition(pos, true);
+//    }
+//}
 } // namespace View
 } // namespace TrenchBroom

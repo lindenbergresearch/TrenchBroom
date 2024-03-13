@@ -31,7 +31,7 @@
 #include "View/MapView3D.h"
 #include "View/MapViewActivationTracker.h"
 
-#include <vecmath/scalar.h>
+#include <vm/scalar.h>
 
 namespace TrenchBroom::View {
 CyclingMapView::CyclingMapView(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer,

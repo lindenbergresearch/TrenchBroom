@@ -23,61 +23,55 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
-namespace IO {
+namespace TrenchBroom
+{
+namespace IO
+{
 class ImageLoaderImpl;
-
 class Path;
 
-class ImageLoader {
+class ImageLoader
+{
 public:
-    enum Format {
-      PCX, BMP
-    };
+  enum Format
+  {
+    PCX,
+    BMP
+  };
 
-    enum PixelFormat {
-      RGB, RGBA
-    };
+  enum PixelFormat
+  {
+    RGB,
+    RGBA
+  };
 
 private:
-    // we're using the PIMPL idiom here to insulate the clients from the FreeImage headers
-    std::unique_ptr<ImageLoaderImpl> m_impl;
+  // we're using the PIMPL idiom here to insulate the clients from the FreeImage headers
+  std::unique_ptr<ImageLoaderImpl> m_impl;
 
 public:
-    ImageLoader(const Format format, const std::filesystem::path &path);
+  ImageLoader(const Format format, const std::filesystem::path& path);
+  ImageLoader(const Format format, const char* begin, const char* end);
+  ~ImageLoader();
 
-    ImageLoader(const Format format, const char *begin, const char *end);
+  size_t paletteSize() const;
+  size_t bitsPerPixel() const;
+  size_t width() const;
+  size_t height() const;
+  size_t byteWidth() const;
+  size_t scanWidth() const;
 
-    ~ImageLoader();
+  bool hasPalette() const;
+  bool hasIndices() const;
+  bool hasPixels() const;
 
-    size_t paletteSize() const;
-
-    size_t bitsPerPixel() const;
-
-    size_t width() const;
-
-    size_t height() const;
-
-    size_t byteWidth() const;
-
-    size_t scanWidth() const;
-
-    bool hasPalette() const;
-
-    bool hasIndices() const;
-
-    bool hasPixels() const;
-
-    std::vector<unsigned char> loadPalette() const;
-
-    std::vector<unsigned char> loadIndices() const;
-
-    std::vector<unsigned char> loadPixels(const PixelFormat format) const;
+  std::vector<unsigned char> loadPalette() const;
+  std::vector<unsigned char> loadIndices() const;
+  std::vector<unsigned char> loadPixels(const PixelFormat format) const;
 
 private:
-    ImageLoader(const ImageLoader &other);
-
-    ImageLoader &operator=(const ImageLoader &other);
+  ImageLoader(const ImageLoader& other);
+  ImageLoader& operator=(const ImageLoader& other);
 };
 } // namespace IO
 } // namespace TrenchBroom

@@ -33,7 +33,7 @@
 #include <kdl/memory_utils.h>
 #include <kdl/overload.h>
 
-#include <vecmath/vec.h>
+#include <vm/vec.h>
 
 #include <cassert>
 #include <unordered_set>

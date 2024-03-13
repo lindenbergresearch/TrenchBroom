@@ -20,44 +20,80 @@
 #include "Object.h"
 
 #include "Model/GroupNode.h"
+#include "Uuid.h"
 
-namespace TrenchBroom {
-namespace Model {
-Object::Object() {}
+namespace TrenchBroom::Model
+{
 
-Object::~Object() {}
-
-Node *Object::container() {
-    return doGetContainer();
+Object::Object()
+  : m_linkId{generateUuid()}
+{
 }
 
-const Node *Object::container() const {
-    return const_cast<Object *>(this)->container();
+Object::~Object() = default;
+
+const std::string& Object::linkId() const
+{
+  return m_linkId;
 }
 
-LayerNode *Object::containingLayer() {
-    return doGetContainingLayer();
+void Object::setLinkId(std::string linkId)
+{
+  m_linkId = std::move(linkId);
 }
 
-const LayerNode *Object::containingLayer() const {
-    return const_cast<Object *>(this)->containingLayer();
+void Object::cloneLinkId(const Object& original, const SetLinkId linkIdPolicy)
+{
+  switch (linkIdPolicy)
+  {
+  case SetLinkId::keep:
+    setLinkId(original.linkId());
+    break;
+  case SetLinkId::generate:
+    setLinkId(generateUuid());
+    break;
+  }
 }
 
-GroupNode *Object::containingGroup() {
-    return doGetContainingGroup();
+Node* Object::container()
+{
+  return doGetContainer();
 }
 
-const GroupNode *Object::containingGroup() const {
-    return const_cast<Object *>(this)->containingGroup();
+const Node* Object::container() const
+{
+  return const_cast<Object*>(this)->container();
 }
 
-bool Object::containedInGroup() const {
-    return containingGroup() != nullptr;
+LayerNode* Object::containingLayer()
+{
+  return doGetContainingLayer();
 }
 
-bool Object::containingGroupOpened() const {
-    const auto *group = containingGroup();
-    return group == nullptr || group->opened();
+const LayerNode* Object::containingLayer() const
+{
+  return const_cast<Object*>(this)->containingLayer();
 }
-} // namespace Model
-} // namespace TrenchBroom
+
+GroupNode* Object::containingGroup()
+{
+  return doGetContainingGroup();
+}
+
+const GroupNode* Object::containingGroup() const
+{
+  return const_cast<Object*>(this)->containingGroup();
+}
+
+bool Object::containedInGroup() const
+{
+  return containingGroup() != nullptr;
+}
+
+bool Object::containingGroupOpened() const
+{
+  const auto* group = containingGroup();
+  return group == nullptr || group->opened();
+}
+
+} // namespace TrenchBroom::Model

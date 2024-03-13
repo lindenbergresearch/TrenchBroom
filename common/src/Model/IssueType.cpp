@@ -21,11 +21,14 @@
 
 #include <utility>
 
-namespace TrenchBroom {
-namespace Model {
-IssueType freeIssueType() {
-    static IssueType type = 1;
-    return std::exchange(type, type << 1);
+namespace TrenchBroom
+{
+namespace Model
+{
+IssueType freeIssueType()
+{
+  static IssueType type = 1;
+  return std::exchange(type, type << 1);
 }
 } // namespace Model
 } // namespace TrenchBroom

@@ -23,32 +23,40 @@
 #include "FloatType.h"
 #include "Model/EntityProperties.h"
 
-#include <vecmath/forward.h>
-#include <vecmath/mat.h>
-#include <vecmath/vec.h>
+#include "kdl/reflection_decl.h"
 
-#include <optional>
+#include "vm/forward.h"
+#include "vm/mat.h"
+#include "vm/vec.h"
+
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom::Assets
+{
+struct DecalSpecification;
 class EntityDefinition;
-
 class EntityModelFrame;
-
 struct ModelSpecification;
-} // namespace Assets
+} // namespace TrenchBroom::Assets
 
-namespace Model {
+namespace TrenchBroom::Model
+{
+
 class Entity;
 
-enum class SetDefaultPropertyMode {
-  SetExisting, SetMissing, SetAll
+enum class SetDefaultPropertyMode
+{
+  SetExisting,
+  SetMissing,
+  SetAll
 };
 
-void
-setDefaultProperties(const EntityPropertyConfig &propertyConfig, const Assets::EntityDefinition &entityDefinition, Entity &entity, SetDefaultPropertyMode mode);
+void setDefaultProperties(
+  const EntityPropertyConfig& propertyConfig,
+  const Assets::EntityDefinition& entityDefinition,
+  Entity& entity,
+  SetDefaultPropertyMode mode);
 
 /**
  * An entity is essentially a collection of key / value pairs called properties.
@@ -77,135 +85,133 @@ setDefaultProperties(const EntityPropertyConfig &propertyConfig, const Assets::E
  * Brush entities are not subject to any of these rules. They are rotated simply by
  * applying rotation to their constituent brushes.
  */
-class Entity {
+class Entity
+{
 public:
-    static const vm::bbox3 DefaultBounds;
+  static const vm::bbox3 DefaultBounds;
 
 private:
-    std::vector<EntityProperty> m_properties;
-    std::vector<std::string> m_protectedProperties;
+  std::vector<EntityProperty> m_properties;
+  std::vector<std::string> m_protectedProperties;
 
-    /**
-     * Specifies whether this entity has children or not. This does not necessarily
-     * correspond to the entity definition type because point entities can contain brushes.
-     */
-    bool m_pointEntity;
+  kdl_reflect_decl(Entity, m_properties, m_protectedProperties);
 
-    Assets::AssetReference<Assets::EntityDefinition> m_definition;
-    const Assets::EntityModelFrame *m_model;
+  /**
+   * Specifies whether this entity has children or not. This does not necessarily
+   * correspond to the entity definition type because point entities can contain brushes.
+   */
+  bool m_pointEntity = true;
 
-    /**
-     * These properties are cached for performance reasons.
-     */
-    struct CachedProperties {
-      std::string classname;
-      vm::vec3 origin;
-      vm::mat4x4 rotation;
-      vm::mat4x4 modelTransformation;
-    };
+  Assets::AssetReference<Assets::EntityDefinition> m_definition;
+  const Assets::EntityModelFrame* m_model = nullptr;
 
-    CachedProperties m_cachedProperties;
+  /**
+   * These properties are cached for performance reasons.
+   */
+  struct CachedProperties
+  {
+    std::string classname;
+    vm::vec3 origin;
+    vm::mat4x4 rotation;
+    vm::mat4x4 modelTransformation;
+  };
+
+  CachedProperties m_cachedProperties;
 
 public:
-    Entity();
+  Entity();
+  Entity(
+    const EntityPropertyConfig& propertyConfig, std::vector<EntityProperty> properties);
+  Entity(
+    const EntityPropertyConfig& propertyConfig,
+    std::initializer_list<EntityProperty> properties);
 
-    Entity(const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties);
+  Entity(const Entity& other);
+  Entity(Entity&& other);
 
-    Entity(const EntityPropertyConfig &propertyConfig, std::initializer_list<EntityProperty> properties);
+  Entity& operator=(const Entity& other);
+  Entity& operator=(Entity&& other);
 
-    Entity(const Entity &other);
+  ~Entity();
 
-    Entity(Entity &&other);
+public: // property management
+  const std::vector<EntityProperty>& properties() const;
+  void setProperties(
+    const EntityPropertyConfig& propertyConfig, std::vector<EntityProperty> properties);
 
-    Entity &operator=(const Entity &other);
+  /**
+   * Sets the protected property keys of this entity.
+   *
+   * Protected entity properties are not propagated into linked groups and are not
+   * overwritten when a linked group updates this entity. See also
+   * GroupNode::updateLinkedGroups
+   */
+  const std::vector<std::string>& protectedProperties() const;
+  void setProtectedProperties(std::vector<std::string> protectedProperties);
 
-    Entity &operator=(Entity &&other);
+  bool pointEntity() const;
+  void setPointEntity(const EntityPropertyConfig& propertyConfig, bool pointEntity);
 
-    ~Entity();
+  Assets::EntityDefinition* definition();
+  const Assets::EntityDefinition* definition() const;
+  const vm::bbox3& definitionBounds() const;
+  void setDefinition(
+    const EntityPropertyConfig& propertyConfig, Assets::EntityDefinition* definition);
 
-    const std::vector<EntityProperty> &properties() const;
+  const Assets::EntityModelFrame* model() const;
+  void setModel(
+    const EntityPropertyConfig& propertyConfig, const Assets::EntityModelFrame* model);
 
-    void setProperties(const EntityPropertyConfig &propertyConfig, std::vector<EntityProperty> properties);
+  Assets::ModelSpecification modelSpecification() const;
+  const vm::mat4x4& modelTransformation() const;
 
-    /**
-     * Sets the protected property keys of this entity.
-     *
-     * Protected entity properties are not propagated into linked groups and are not
-     * overwritten when a linked group updates this entity. See also
-     * GroupNode::updateLinkedGroups
-     */
-    const std::vector<std::string> &protectedProperties() const;
+  Assets::DecalSpecification decalSpecification() const;
 
-    void setProtectedProperties(std::vector<std::string> protectedProperties);
+  void unsetEntityDefinitionAndModel();
 
-    bool pointEntity() const;
+  void addOrUpdateProperty(
+    const EntityPropertyConfig& propertyConfig,
+    std::string key,
+    std::string value,
+    bool defaultToProtected = false);
+  void renameProperty(
+    const EntityPropertyConfig& propertyConfig,
+    const std::string& oldKey,
+    std::string newKey);
+  void removeProperty(const EntityPropertyConfig& propertyConfig, const std::string& key);
+  void removeNumberedProperty(
+    const EntityPropertyConfig& propertyConfig, const std::string& prefix);
 
-    void setPointEntity(const EntityPropertyConfig &propertyConfig, bool pointEntity);
+  bool hasProperty(const std::string& key) const;
+  bool hasProperty(const std::string& key, const std::string& value) const;
 
-    Assets::EntityDefinition *definition();
+  bool hasPropertyWithPrefix(const std::string& prefix, const std::string& value) const;
+  bool hasNumberedProperty(const std::string& prefix, const std::string& value) const;
 
-    const Assets::EntityDefinition *definition() const;
+  const std::string* property(const std::string& key) const;
+  std::vector<std::string> propertyKeys() const;
 
-    const vm::bbox3 &definitionBounds() const;
+  const std::string& classname() const;
+  void setClassname(
+    const EntityPropertyConfig& propertyConfig, const std::string& classname);
 
-    void setDefinition(const EntityPropertyConfig &propertyConfig, Assets::EntityDefinition *definition);
+  const vm::vec3& origin() const;
+  void setOrigin(const EntityPropertyConfig& propertyConfig, const vm::vec3& origin);
 
-    const Assets::EntityModelFrame *model() const;
+  const vm::mat4x4& rotation() const;
 
-    void setModel(const EntityPropertyConfig &propertyConfig, const Assets::EntityModelFrame *model);
+  std::vector<EntityProperty> propertiesWithKey(const std::string& property) const;
+  std::vector<EntityProperty> propertiesWithPrefix(const std::string& property) const;
+  std::vector<EntityProperty> numberedProperties(const std::string& property) const;
 
-    Assets::ModelSpecification modelSpecification() const;
-
-    const vm::mat4x4 &modelTransformation() const;
-
-    void unsetEntityDefinitionAndModel();
-
-    void addOrUpdateProperty(const EntityPropertyConfig &propertyConfig, std::string key, std::string value, bool defaultToProtected = false);
-
-    void renameProperty(const EntityPropertyConfig &propertyConfig, const std::string &oldKey, std::string newKey);
-
-    void removeProperty(const EntityPropertyConfig &propertyConfig, const std::string &key);
-
-    void removeNumberedProperty(const EntityPropertyConfig &propertyConfig, const std::string &prefix);
-
-    bool hasProperty(const std::string &key) const;
-
-    bool hasProperty(const std::string &key, const std::string &value) const;
-
-    bool hasPropertyWithPrefix(const std::string &prefix, const std::string &value) const;
-
-    bool hasNumberedProperty(const std::string &prefix, const std::string &value) const;
-
-    const std::string *property(const std::string &key) const;
-
-    std::vector<std::string> propertyKeys() const;
-
-    const std::string &classname() const;
-
-    void setClassname(const EntityPropertyConfig &propertyConfig, const std::string &classname);
-
-    const vm::vec3 &origin() const;
-
-    void setOrigin(const EntityPropertyConfig &propertyConfig, const vm::vec3 &origin);
-
-    const vm::mat4x4 &rotation() const;
-
-    std::vector<EntityProperty> propertiesWithKey(const std::string &property) const;
-
-    std::vector<EntityProperty> propertiesWithPrefix(const std::string &property) const;
-
-    std::vector<EntityProperty> numberedProperties(const std::string &property) const;
-
-    void transform(const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation);
+  void transform(
+    const EntityPropertyConfig& propertyConfig, const vm::mat4x4& transformation);
 
 private:
-    void applyRotation(const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &rotation);
+  void applyRotation(
+    const EntityPropertyConfig& propertyConfig, const vm::mat4x4& rotation);
 
-    void updateCachedProperties(const EntityPropertyConfig &propertyConfig);
+  void updateCachedProperties(const EntityPropertyConfig& propertyConfig);
 };
 
-bool operator==(const Entity &lhs, const Entity &rhs);
-
-bool operator!=(const Entity &lhs, const Entity &rhs);
-} // namespace Model
-} // namespace TrenchBroom
+} // namespace TrenchBroom::Model

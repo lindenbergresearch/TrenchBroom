@@ -54,6 +54,7 @@
 #include <cassert>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 namespace TrenchBroom {
 namespace View {
@@ -253,15 +254,15 @@ private:
 
         texture->activate();
 
-        auto gridWidth = m_helper.cameraZoom() * 1.3f;
+        auto gridWidth = m_helper.cameraZoom() * 1.0f;
 
         Renderer::ActiveShader shader(renderContext.shaderManager(), Renderer::Shaders::UVViewShader);
         shader.set("ApplyTexture", true);
         shader.set("Color", texture->averageColor());
-        shader.set("Brightness", pref(Preferences::Brightness));
+        shader.set("Brightness", std::max(pref(Preferences::Brightness), 2.2f));
         shader.set("RenderGrid", true);
         shader.set("GridSizes", vm::vec2f(texture->width(), texture->height()));
-        shader.set("GridColor", vm::vec4f(Renderer::gridColorForTexture(texture), 0.65f)); // TODO: make this a preference
+        shader.set("GridColor", vm::vec4f(Renderer::gridColorForTexture(texture), 0.5f)); // TODO: make this a preference
         shader.set("GridScales", scale);
         shader.set("GridWidth", gridWidth);
         shader.set("GridMatrix", vm::mat4x4f(toTex));
@@ -297,7 +298,7 @@ void UVView::renderFace(Renderer::RenderContext &, Renderer::RenderBatch &render
     }
     auto gridWidth = m_helper.cameraZoom() * 10.0f;
     const Color edgeColor = pref(Preferences::SelectedEdgeColor);
-    const float edgeLineWidth = pref(Preferences::EdgeSelectedLineWidth)*gridWidth;
+    const float edgeLineWidth = pref(Preferences::EdgeSelectedLineWidth);
 
     Renderer::DirectEdgeRenderer edgeRenderer(Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop);
     edgeRenderer.renderOnTop(renderBatch, edgeColor, edgeLineWidth);

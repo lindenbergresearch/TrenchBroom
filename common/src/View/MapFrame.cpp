@@ -99,8 +99,8 @@
 #include <kdl/string_format.h>
 #include <kdl/string_utils.h>
 
-#include <vecmath/vec.h>
-#include <vecmath/vec_io.h>
+#include <vm/vec.h>
+#include <vm/vec_io.h>
 
 #include <cassert>
 #include <chrono>
@@ -602,8 +602,7 @@ static QString describeSelection(const MapDocument *document) {
     }
 
     // get the layers of the selected nodes
-    const std::vector<Model::LayerNode *> selectedObjectLayers = Model::findContainingLayersUserSorted(
-        selectedNodes.nodes());
+    const std::vector<Model::LayerNode *> selectedObjectLayers = Model::collectContainingLayersUserSorted(selectedNodes.nodes());
     QString layersDescription;
     if (selectedObjectLayers.size() == 1) {
         Model::LayerNode *layer = selectedObjectLayers[0];

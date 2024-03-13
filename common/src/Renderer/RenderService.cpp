@@ -35,11 +35,11 @@
 #include "Renderer/TextRenderer.h"
 #include "View/QtUtils.h"
 
-#include <vecmath/forward.h>
-#include <vecmath/polygon.h>
-#include <vecmath/segment.h>
-#include <vecmath/vec.h>
-#include <vecmath/vec_ext.h>
+#include <vm/forward.h>
+#include <vm/polygon.h>
+#include <vm/segment.h>
+#include <vm/vec.h>
+#include <vm/vec_ext.h>
 
 namespace TrenchBroom {
 namespace Renderer {

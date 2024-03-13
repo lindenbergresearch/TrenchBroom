@@ -73,8 +73,8 @@
 #ifdef _WIN32
 #endif
 
-#include <vecmath/mat.h>
-#include <vecmath/mat_ext.h>
+#include <vm/mat.h>
+#include <vm/mat_ext.h>
 
 #include <iostream>
 
@@ -115,12 +115,12 @@ RenderView::~RenderView() = default;
 
 void RenderView::keyPressEvent(QKeyEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    //update();
+    update();
 }
 
 void RenderView::keyReleaseEvent(QKeyEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    //update();
+    update();
 }
 
 QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
@@ -143,7 +143,7 @@ QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widge
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    //update();
+    update();
 }
 
 void RenderView::mouseMoveEvent(QMouseEvent *event) {
@@ -155,26 +155,26 @@ void RenderView::mouseMoveEvent(QMouseEvent *event) {
     }
 
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    //update();
+    update();
 }
 
 void RenderView::mousePressEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    //update();
+    update();
 }
 
 void RenderView::mouseReleaseEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    //update();
+    update();
 }
 
 void RenderView::wheelEvent(QWheelEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    //update();
+    update();
 }
 
 void RenderView::paintGL() {
-   context()->setFormat(QSurfaceFormat::defaultFormat());
+//   context()->setFormat(QSurfaceFormat::defaultFormat());
     if (TrenchBroom::View::isReportingCrash())
         return;
     render();

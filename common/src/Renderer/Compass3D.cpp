@@ -23,7 +23,7 @@
 #include "Preferences.h"
 #include "RenderUtils.h"
 
-#include <vecmath/mat.h>
+#include <vm/mat.h>
 
 namespace TrenchBroom {
 namespace Renderer {

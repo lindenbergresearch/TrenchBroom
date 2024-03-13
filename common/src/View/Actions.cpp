@@ -34,7 +34,7 @@
 #include "View/MapFrame.h"
 #include "View/MapViewBase.h"
 
-#include <vecmath/util.h>
+#include <vm/util.h>
 
 #include <cassert>
 #include <set>
@@ -740,11 +740,11 @@ void ActionManager::createViewActions() {
         }, QObject::tr("Toggle Show Fog"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowFog(); },
         [](ActionExecutionContext &context) { return context.hasDocument(); }
     );
-    createAction(std::filesystem::path{
-            "Controls/Map view/View Filter > Use Lightning"
-        }, QObject::tr("Use lightning (experimental)"), ActionContext::Any, Qt::CTRL + Qt::ALT + Qt::Key_L, [](ActionExecutionContext &context) { context.view()->toggleEnableLightning(); },
-        [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
+//    createAction(std::filesystem::path{
+//            "Controls/Map view/View Filter > Use Lightning"
+//        }, QObject::tr("Use lightning (experimental)"), ActionContext::Any, Qt::CTRL + Qt::ALT + Qt::Key_L, [](ActionExecutionContext &context) { context.view()->toggleEnableLightning(); },
+//        [](ActionExecutionContext &context) { return context.hasDocument(); }
+//    );
     createAction(std::filesystem::path{
             "Controls/Map view/View Filter > Show edges"
         }, QObject::tr("Toggle Show Edges"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowEdges(); },

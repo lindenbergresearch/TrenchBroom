@@ -149,27 +149,27 @@ void FaceRenderer::doRender(RenderContext &context) {
         glAssert(glEnable(GL_TEXTURE_2D));
         glAssert(glActiveTexture(GL_TEXTURE0));
 
-        auto lightSources = context.getLightSources();
-
-        auto size = lightSources.size() > 60 ? 60 : lightSources.size();
-
-        for (size_t i = 0; i < size; i++) {
-            std::string _Position_name = stringf("lights[%d].Position", i);
-            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
-            std::string _AttenuationConstant_name = stringf("lights[%d].AttenuationConstant", i);
-            std::string _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
-            std::string _AttenuationQuadratic_name = stringf("lights[%d].AttenuationQuadratic", i);
-
-            shader.set(_Position_name, lightSources[i].Position);
-            shader.set(_Intensity_name, lightSources[i].Intensity);
-            shader.set(_AttenuationConstant_name, lightSources[i].AttenuationConstant);
-            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
-            shader.set(_AttenuationQuadratic_name, lightSources[i].AttenuationQuadratic);
-        }
+//        auto lightSources = context.getLightSources();
+//
+//        auto size = lightSources.size() > 60 ? 60 : lightSources.size();
+//
+//        for (size_t i = 0; i < size; i++) {
+//            std::string _Position_name = stringf("lights[%d].Position", i);
+//            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
+//            std::string _AttenuationConstant_name = stringf("lights[%d].AttenuationConstant", i);
+//            std::string _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
+//            std::string _AttenuationQuadratic_name = stringf("lights[%d].AttenuationQuadratic", i);
+//
+//            shader.set(_Position_name, lightSources[i].Position);
+//            shader.set(_Intensity_name, lightSources[i].Intensity);
+//            shader.set(_AttenuationConstant_name, lightSources[i].AttenuationConstant);
+//            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
+//            shader.set(_AttenuationQuadratic_name, lightSources[i].AttenuationQuadratic);
+//        }
 
         shader.set("AmbientLight", ambientLightning);
-        shader.set("NumLights", size);
-        shader.set("EnableLighting", !lightSources.empty());
+        shader.set("NumLights", 0);
+        shader.set("EnableLighting", false);
         shader.set("CameraPosition", context.camera().position());
         shader.set("Brightness", prefs.get(Preferences::Brightness));
         shader.set("RenderGrid", context.showGrid());

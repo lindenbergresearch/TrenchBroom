@@ -21,43 +21,46 @@
 
 #include "FloatType.h"
 
-namespace TrenchBroom {
-namespace Model {
+#include <string>
+
+namespace TrenchBroom::Model
+{
+
 class GroupNode;
-
 class LayerNode;
-
 class Node;
+enum class SetLinkId;
 
-class Object {
+class Object
+{
 protected:
-    Object();
+  std::string m_linkId;
+
+  Object();
 
 public:
-    virtual ~Object();
+  virtual ~Object();
 
-    Node *container();
+  const std::string& linkId() const;
+  void setLinkId(std::string linkId);
+  void cloneLinkId(const Object& original, SetLinkId linkIdPolicy);
 
-    const Node *container() const;
+  Node* container();
+  const Node* container() const;
 
-    LayerNode *containingLayer();
+  LayerNode* containingLayer();
+  const LayerNode* containingLayer() const;
 
-    const LayerNode *containingLayer() const;
+  GroupNode* containingGroup();
+  const GroupNode* containingGroup() const;
 
-    GroupNode *containingGroup();
-
-    const GroupNode *containingGroup() const;
-
-    bool containedInGroup() const;
-
-    bool containingGroupOpened() const;
+  bool containedInGroup() const;
+  bool containingGroupOpened() const;
 
 private: // subclassing interface
-    virtual Node *doGetContainer() = 0;
-
-    virtual LayerNode *doGetContainingLayer() = 0;
-
-    virtual GroupNode *doGetContainingGroup() = 0;
+  virtual Node* doGetContainer() = 0;
+  virtual LayerNode* doGetContainingLayer() = 0;
+  virtual GroupNode* doGetContainingGroup() = 0;
 };
-} // namespace Model
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::Model

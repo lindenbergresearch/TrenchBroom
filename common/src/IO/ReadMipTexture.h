@@ -24,16 +24,21 @@
 
 #include <string>
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 class Palette;
 }
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class Reader;
 
-std::string readMipTextureName(Reader &reader);
+std::string readMipTextureName(Reader& reader);
 
-Result<Assets::Texture, ReadTextureError> readIdMipTexture(std::string name, Reader &reader, const Assets::Palette &palette);
+Result<Assets::Texture, ReadTextureError> readIdMipTexture(
+  std::string name, Reader& reader, const Assets::Palette& palette);
 
-Result<Assets::Texture, ReadTextureError> readHlMipTexture(std::string name, Reader &reader);
+Result<Assets::Texture, ReadTextureError> readHlMipTexture(
+  std::string name, Reader& reader);
+
 } // namespace TrenchBroom::IO

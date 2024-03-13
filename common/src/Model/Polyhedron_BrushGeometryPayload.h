@@ -19,24 +19,27 @@
 
 #pragma once
 
-// #include "Renderer/GL.h"
+//#include "Renderer/GL.h"
 
 #include <cstdint>
 #include <limits>
 #include <optional>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class BrushFace;
 
-struct BrushVertexPayload {
+struct BrushVertexPayload
+{
   using Type = uint32_t; // FIXME: GLuint
   static Type defaultValue() { return std::numeric_limits<Type>::max(); }
 };
 
-struct BrushFacePayload {
+struct BrushFacePayload
+{
   using Type = std::optional<size_t>;
-
   static Type defaultValue() { return std::nullopt; }
 };
 } // namespace Model

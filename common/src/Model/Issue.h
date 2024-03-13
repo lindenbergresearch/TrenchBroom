@@ -24,78 +24,77 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class BrushFace;
-
 class BrushNode;
-
 class EntityNodeBase;
-
 class Node;
 
-class Issue {
+class Issue
+{
 protected:
-    size_t m_seqId;
-    IssueType m_type;
-    Node &m_node;
-    std::string m_description;
+  size_t m_seqId;
+  IssueType m_type;
+  Node& m_node;
+  std::string m_description;
 
 public:
-    explicit Issue(IssueType type, Node &node, std::string description);
+  explicit Issue(IssueType type, Node& node, std::string description);
+  virtual ~Issue();
 
-    virtual ~Issue();
+  size_t seqId() const;
+  size_t lineNumber() const;
+  const std::string& description() const;
 
-    size_t seqId() const;
+  IssueType type() const;
+  Node& node() const;
 
-    size_t lineNumber() const;
+  bool addSelectableNodes(std::vector<Model::Node*>& nodes) const;
 
-    const std::string &description() const;
-
-    IssueType type() const;
-
-    Node &node() const;
-
-    bool addSelectableNodes(std::vector<Model::Node *> &nodes) const;
-
-    bool hidden() const;
+  bool hidden() const;
 
 protected:
-    static size_t nextSeqId();
+  static size_t nextSeqId();
 
 private: // subclassing interface
-    virtual size_t doGetLineNumber() const;
+  virtual size_t doGetLineNumber() const;
 };
 
-class BrushFaceIssue : public Issue {
+class BrushFaceIssue : public Issue
+{
 private:
-    size_t m_faceIndex;
+  size_t m_faceIndex;
 
 public:
-    BrushFaceIssue(IssueType type, BrushNode &node, size_t faceIndex, std::string description);
+  BrushFaceIssue(
+    IssueType type, BrushNode& node, size_t faceIndex, std::string description);
+  ~BrushFaceIssue() override;
 
-    ~BrushFaceIssue() override;
-
-    size_t faceIndex() const;
-
-    const BrushFace &face() const;
+  size_t faceIndex() const;
+  const BrushFace& face() const;
 
 private:
-    size_t doGetLineNumber() const override;
+  size_t doGetLineNumber() const override;
 };
 
-class EntityPropertyIssue : public Issue {
+class EntityPropertyIssue : public Issue
+{
 private:
-    std::string m_propertyKey;
+  std::string m_propertyKey;
 
 public:
-    EntityPropertyIssue(IssueType type, EntityNodeBase &entityNode, std::string propertyKey, std::string description);
+  EntityPropertyIssue(
+    IssueType type,
+    EntityNodeBase& entityNode,
+    std::string propertyKey,
+    std::string description);
+  ~EntityPropertyIssue() override;
 
-    ~EntityPropertyIssue() override;
-
-    const std::string &propertyKey() const;
-
-    const std::string &propertyValue() const;
+  const std::string& propertyKey() const;
+  const std::string& propertyValue() const;
 };
 } // namespace Model
 } // namespace TrenchBroom

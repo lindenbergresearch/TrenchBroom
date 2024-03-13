@@ -24,23 +24,23 @@
 
 #include <miniz/miniz.h>
 
-#include <filesystem>
-#include <memory>
+#include <mutex>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
+class CFile;
 
-class ZipFileSystem : public ImageFileSystem {
+class ZipFileSystem : public ImageFileSystem<CFile>
+{
 private:
-    mz_zip_archive m_archive;
+  mz_zip_archive m_archive;
+  std::mutex m_mutex;
 
 public:
-    using ImageFileSystem::ImageFileSystem;
-
-    ~ZipFileSystem() override;
+  using ImageFileSystem::ImageFileSystem;
+  ~ZipFileSystem() override;
 
 private:
-    Result<void> doReadDirectory() override;
-
-    std::string filename(mz_uint fileIndex);
+  Result<void> doReadDirectory() override;
 };
 } // namespace TrenchBroom::IO

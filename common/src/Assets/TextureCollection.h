@@ -22,71 +22,60 @@
 #include "Assets/Texture.h"
 #include "Renderer/GL.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
 #include <filesystem>
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 
-class TextureCollection {
+class TextureCollection
+{
 private:
-    using TextureIdList = std::vector<GLuint>;
+  using TextureIdList = std::vector<GLuint>;
 
-    std::filesystem::path m_path;
-    std::vector<Texture> m_textures;
+  std::filesystem::path m_path;
+  std::vector<Texture> m_textures;
 
-    bool m_loaded{false};
-    TextureIdList m_textureIds;
+  bool m_loaded{false};
+  TextureIdList m_textureIds;
 
-    friend class Texture;
+  friend class Texture;
 
-    kdl_reflect_decl(TextureCollection, m_loaded, m_path, m_textures);
+  kdl_reflect_decl(TextureCollection, m_loaded, m_path, m_textures);
 
 public:
-    TextureCollection();
+  TextureCollection();
+  explicit TextureCollection(std::vector<Texture> textures);
+  explicit TextureCollection(std::filesystem::path path);
+  TextureCollection(std::filesystem::path path, std::vector<Texture> textures);
 
-    explicit TextureCollection(std::vector<Texture> textures);
+  TextureCollection(const TextureCollection&) = delete;
+  TextureCollection& operator=(const TextureCollection&) = delete;
 
-    explicit TextureCollection(std::filesystem::path path);
+  TextureCollection(TextureCollection&& other) = default;
+  TextureCollection& operator=(TextureCollection&& other) = default;
 
-    TextureCollection(std::filesystem::path path, std::vector<Texture> textures);
+  ~TextureCollection();
 
-    TextureCollection(const TextureCollection &) = delete;
+  bool loaded() const;
+  const std::filesystem::path& path() const;
+  size_t textureCount() const;
 
-    TextureCollection &operator=(const TextureCollection &) = delete;
+  const std::vector<Texture>& textures() const;
+  std::vector<Texture>& textures();
 
-    TextureCollection(TextureCollection &&other) = default;
+  const Texture* textureByIndex(size_t index) const;
+  Texture* textureByIndex(size_t index);
 
-    TextureCollection &operator=(TextureCollection &&other) = default;
+  const Texture* textureByName(const std::string& name) const;
+  Texture* textureByName(const std::string& name);
 
-    ~TextureCollection();
-
-    bool loaded() const;
-
-    const std::filesystem::path &path() const;
-
-    std::string name() const;
-
-    size_t textureCount() const;
-
-    const std::vector<Texture> &textures() const;
-
-    std::vector<Texture> &textures();
-
-    const Texture *textureByIndex(size_t index) const;
-
-    Texture *textureByIndex(size_t index);
-
-    const Texture *textureByName(const std::string &name) const;
-
-    Texture *textureByName(const std::string &name);
-
-    bool prepared() const;
-
-    void prepare(int minFilter, int magFilter);
-
-    void setTextureMode(int minFilter, int magFilter);
+  bool prepared() const;
+  void prepare(int minFilter, int magFilter);
+  void setTextureMode(int minFilter, int magFilter);
 };
+
 } // namespace TrenchBroom::Assets

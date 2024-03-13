@@ -26,48 +26,55 @@
 #include "Macros.h"
 #include "Result.h"
 
-#include <kdl/reflection_decl.h>
-#include <kdl/result.h>
+#include "kdl/reflection_decl.h"
+#include "kdl/result.h"
 
 #include <filesystem>
 #include <functional>
 #include <iosfwd>
 #include <string>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 }
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 class Texture;
 }
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class File;
-
 class FileSystem;
 
-std::string getTextureNameFromPathSuffix(const std::filesystem::path &path, size_t prefixLength);
+std::string getTextureNameFromPathSuffix(
+  const std::filesystem::path& path, size_t prefixLength);
 
 bool checkTextureDimensions(size_t width, size_t height);
 
 size_t mipSize(size_t width, size_t height, size_t mipLevel);
 
-struct ReadTextureError {
+struct ReadTextureError
+{
   std::string textureName;
   std::string msg;
 
   kdl_reflect_decl(ReadTextureError, textureName, msg);
 };
 
-inline auto makeReadTextureErrorHandler(const FileSystem &fs, Logger &logger) {
-    return kdl::overload([&](Error e) {
-          logger.error() << "Could not open texture file: " << e.msg;
-          return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
-        }, [&](ReadTextureError e) {
-          logger.error() << "Could not read texture '" << e.textureName << "': " << e.msg;
-          return Result<Assets::Texture>{loadDefaultTexture(fs, e.textureName, logger)};
-        }
-    );
+inline auto makeReadTextureErrorHandler(const FileSystem& fs, Logger& logger)
+{
+  return kdl::overload(
+    [&](Error e) {
+      logger.error() << "Could not open texture file: " << e.msg;
+      return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
+    },
+    [&](ReadTextureError e) {
+      logger.error() << "Could not read texture '" << e.textureName << "': " << e.msg;
+      return Result<Assets::Texture>{loadDefaultTexture(fs, e.textureName, logger)};
+    });
 }
+
 } // namespace TrenchBroom::IO

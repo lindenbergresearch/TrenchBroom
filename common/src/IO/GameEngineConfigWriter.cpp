@@ -23,33 +23,45 @@
 #include "Model/GameEngineConfig.h"
 #include "Model/GameEngineProfile.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
 #include <ostream>
 
-namespace TrenchBroom {
-namespace IO {
-GameEngineConfigWriter::GameEngineConfigWriter(const Model::GameEngineConfig &config, std::ostream &stream) : m_config(config), m_stream(stream) {
-    assert(!m_stream.bad());
+namespace TrenchBroom
+{
+namespace IO
+{
+GameEngineConfigWriter::GameEngineConfigWriter(
+  const Model::GameEngineConfig& config, std::ostream& stream)
+  : m_config(config)
+  , m_stream(stream)
+{
+  assert(!m_stream.bad());
 }
 
-void GameEngineConfigWriter::writeConfig() {
-    m_stream << EL::Value{
-        EL::MapType{{"version",  EL::Value{1.0}},
-                    {"profiles", writeProfiles(m_config)},
-        }} << "\n";
+void GameEngineConfigWriter::writeConfig()
+{
+  m_stream << EL::Value{EL::MapType{
+    {"version", EL::Value{1.0}},
+    {"profiles", writeProfiles(m_config)},
+  }} << "\n";
 }
 
-EL::Value GameEngineConfigWriter::writeProfiles(const Model::GameEngineConfig &config) const {
-    return EL::Value{kdl::vec_transform(config.profiles, [&](const auto &profile) { return writeProfile(profile); })};
+EL::Value GameEngineConfigWriter::writeProfiles(
+  const Model::GameEngineConfig& config) const
+{
+  return EL::Value{kdl::vec_transform(
+    config.profiles, [&](const auto& profile) { return writeProfile(profile); })};
 }
 
-EL::Value GameEngineConfigWriter::writeProfile(const Model::GameEngineProfile &profile) const {
-    return EL::Value{
-        EL::MapType{{"name",       EL::Value{profile.name}},
-                    {"path",       EL::Value{profile.path.string()}},
-                    {"parameters", EL::Value{profile.parameterSpec}},
-        }};
+EL::Value GameEngineConfigWriter::writeProfile(
+  const Model::GameEngineProfile& profile) const
+{
+  return EL::Value{EL::MapType{
+    {"name", EL::Value{profile.name}},
+    {"path", EL::Value{profile.path.string()}},
+    {"parameters", EL::Value{profile.parameterSpec}},
+  }};
 }
 } // namespace IO
 } // namespace TrenchBroom

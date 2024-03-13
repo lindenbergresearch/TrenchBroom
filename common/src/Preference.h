@@ -25,7 +25,7 @@
 
 #include "Macros.h"
 #include "View/KeyboardShortcut.h"
-#include "vecmath/forward.h"
+#include "vm/forward.h"
 
 #include <filesystem>
 #include <optional>

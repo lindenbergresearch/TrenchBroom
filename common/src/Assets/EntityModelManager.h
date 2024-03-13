@@ -19,96 +19,92 @@
 
 #pragma once
 
-#include <kdl/vector_set.h>
+#include "kdl/vector_set.h"
 
 #include <filesystem>
 #include <map>
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 
-namespace IO {
+namespace IO
+{
 class EntityModelLoader;
 }
 
-namespace Model {
+namespace Model
+{
 class EntityNode;
 }
 
-namespace Renderer {
+namespace Renderer
+{
 class TexturedRenderer;
-
 class VboManager;
 } // namespace Renderer
 
-namespace Assets {
+namespace Assets
+{
 class EntityModel;
-
 class EntityModelFrame;
-
 struct ModelSpecification;
 enum class Orientation;
 
-class EntityModelManager {
+class EntityModelManager
+{
 private:
-    using ModelCache = std::map<std::filesystem::path, std::unique_ptr<EntityModel>>;
-    using ModelMismatches = kdl::vector_set<std::filesystem::path>;
-    using ModelList = std::vector<EntityModel *>;
+  using ModelCache = std::map<std::filesystem::path, std::unique_ptr<EntityModel>>;
+  using ModelMismatches = kdl::vector_set<std::filesystem::path>;
+  using ModelList = std::vector<EntityModel*>;
 
-    using RendererCache = std::map<ModelSpecification, std::unique_ptr<Renderer::TexturedRenderer>>;
-    using RendererMismatches = kdl::vector_set<ModelSpecification>;
-    using RendererList = std::vector<Renderer::TexturedRenderer *>;
+  using RendererCache =
+    std::map<ModelSpecification, std::unique_ptr<Renderer::TexturedRenderer>>;
+  using RendererMismatches = kdl::vector_set<ModelSpecification>;
+  using RendererList = std::vector<Renderer::TexturedRenderer*>;
 
-    Logger &m_logger;
-    const IO::EntityModelLoader *m_loader;
+  Logger& m_logger;
+  const IO::EntityModelLoader* m_loader;
 
-    int m_minFilter;
-    int m_magFilter;
-    bool m_resetTextureMode;
+  int m_minFilter;
+  int m_magFilter;
+  bool m_resetTextureMode;
 
-    mutable ModelCache m_models;
-    mutable ModelMismatches m_modelMismatches;
-    mutable RendererCache m_renderers;
-    mutable RendererMismatches m_rendererMismatches;
+  mutable ModelCache m_models;
+  mutable ModelMismatches m_modelMismatches;
+  mutable RendererCache m_renderers;
+  mutable RendererMismatches m_rendererMismatches;
 
-    mutable ModelList m_unpreparedModels;
-    mutable RendererList m_unpreparedRenderers;
+  mutable ModelList m_unpreparedModels;
+  mutable RendererList m_unpreparedRenderers;
 
 public:
-    EntityModelManager(int magFilter, int minFilter, Logger &logger);
+  EntityModelManager(int magFilter, int minFilter, Logger& logger);
+  ~EntityModelManager();
 
-    ~EntityModelManager();
+  void clear();
 
-    void clear();
+  void setTextureMode(int minFilter, int magFilter);
+  void setLoader(const IO::EntityModelLoader* loader);
+  Renderer::TexturedRenderer* renderer(const ModelSpecification& spec) const;
 
-    void setTextureMode(int minFilter, int magFilter);
-
-    void setLoader(const IO::EntityModelLoader *loader);
-
-    Renderer::TexturedRenderer *renderer(const ModelSpecification &spec) const;
-
-    const EntityModelFrame *frame(const ModelSpecification &spec) const;
+  const EntityModelFrame* frame(const ModelSpecification& spec) const;
 
 private:
-    EntityModel *model(const std::filesystem::path &path) const;
-
-    EntityModel *safeGetModel(const std::filesystem::path &path) const;
-
-    std::unique_ptr<EntityModel> loadModel(const std::filesystem::path &path) const;
-
-    void loadFrame(const ModelSpecification &spec, EntityModel &model) const;
+  EntityModel* model(const std::filesystem::path& path) const;
+  EntityModel* safeGetModel(const std::filesystem::path& path) const;
+  std::unique_ptr<EntityModel> loadModel(const std::filesystem::path& path) const;
+  void loadFrame(const ModelSpecification& spec, EntityModel& model) const;
 
 public:
-    void prepare(Renderer::VboManager &vboManager);
+  void prepare(Renderer::VboManager& vboManager);
 
 private:
-    void resetTextureMode();
-
-    void prepareModels();
-
-    void prepareRenderers(Renderer::VboManager &vboManager);
+  void resetTextureMode();
+  void prepareModels();
+  void prepareRenderers(Renderer::VboManager& vboManager);
 };
 } // namespace Assets
 } // namespace TrenchBroom

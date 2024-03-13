@@ -21,13 +21,16 @@
 
 #include "Model/CompilationTask.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
-struct CompilationProfile {
+namespace TrenchBroom
+{
+namespace Model
+{
+struct CompilationProfile
+{
   std::string name;
   std::string workDirSpec;
   std::vector<CompilationTask> tasks;

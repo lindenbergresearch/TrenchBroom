@@ -22,24 +22,27 @@
 #include "Assets/EntityModel_Forward.h"
 #include "IO/EntityModelParser.h"
 
-#include <vecmath/forward.h>
-#include <vecmath/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <filesystem>
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class Palette;
 }
 
-namespace IO {
+namespace IO
+{
 class FileSystem;
-
 class Reader;
 
-namespace Md2Layout {
+namespace Md2Layout
+{
 static const int Ident = (('2' << 24) + ('P' << 16) + ('D' << 8) + 'I');
 static const int Version = 8;
 static const size_t SkinNameLength = 64;
@@ -47,77 +50,89 @@ static const size_t FrameNameLength = 16;
 } // namespace Md2Layout
 
 // see http://tfc.duke.free.fr/coding/md2-specs-en.html
-class Md2Parser : public EntityModelParser {
+class Md2Parser : public EntityModelParser
+{
 private:
-    static const vm::vec3f Normals[162];
+  static const vm::vec3f Normals[162];
 
-    using Md2SkinList = std::vector<std::string>;
+  using Md2SkinList = std::vector<std::string>;
 
-    struct Md2Vertex {
-      unsigned char x, y, z;
-      unsigned char normalIndex;
-    };
-    using Md2VertexList = std::vector<Md2Vertex>;
+  struct Md2Vertex
+  {
+    unsigned char x, y, z;
+    unsigned char normalIndex;
+  };
+  using Md2VertexList = std::vector<Md2Vertex>;
 
-    struct Md2Frame {
-      vm::vec3f scale;
-      vm::vec3f offset;
-      std::string name;
-      Md2VertexList vertices;
+  struct Md2Frame
+  {
+    vm::vec3f scale;
+    vm::vec3f offset;
+    std::string name;
+    Md2VertexList vertices;
 
-      explicit Md2Frame(size_t vertexCount);
+    explicit Md2Frame(size_t vertexCount);
+    vm::vec3f vertex(size_t index) const;
+    const vm::vec3f& normal(size_t index) const;
+  };
 
-      vm::vec3f vertex(size_t index) const;
+  struct Md2MeshVertex
+  {
+    vm::vec2f texCoords;
+    size_t vertexIndex;
+  };
+  using Md2MeshVertexList = std::vector<Md2MeshVertex>;
 
-      const vm::vec3f &normal(size_t index) const;
-    };
-
-    struct Md2MeshVertex {
-      vm::vec2f texCoords;
-      size_t vertexIndex;
-    };
-    using Md2MeshVertexList = std::vector<Md2MeshVertex>;
-
-    struct Md2Mesh {
-      enum Type {
-        Fan, Strip
-      };
-
-      Type type;
-      size_t vertexCount;
-      Md2MeshVertexList vertices;
-
-      explicit Md2Mesh(int i_vertexCount);
+  struct Md2Mesh
+  {
+    enum Type
+    {
+      Fan,
+      Strip
     };
 
-    using Md2MeshList = std::vector<Md2Mesh>;
+    Type type;
+    size_t vertexCount;
+    Md2MeshVertexList vertices;
 
-    std::string m_name;
-    const Reader &m_reader;
-    const Assets::Palette &m_palette;
-    const FileSystem &m_fs;
+    explicit Md2Mesh(int i_vertexCount);
+  };
+  using Md2MeshList = std::vector<Md2Mesh>;
+
+  std::string m_name;
+  const Reader& m_reader;
+  const Assets::Palette& m_palette;
+  const FileSystem& m_fs;
 
 public:
-    Md2Parser(const std::string &name, const Reader &reader, const Assets::Palette &palette, const FileSystem &fs);
+  Md2Parser(
+    const std::string& name,
+    const Reader& reader,
+    const Assets::Palette& palette,
+    const FileSystem& fs);
 
-    static bool canParse(const std::filesystem::path &path, Reader reader);
+  static bool canParse(const std::filesystem::path& path, Reader reader);
 
 private:
-    std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
+  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger& logger) override;
+  void doLoadFrame(
+    size_t frameIndex, Assets::EntityModel& model, Logger& logger) override;
 
-    void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+  Md2SkinList parseSkins(Reader reader, size_t skinCount);
+  Md2Frame parseFrame(Reader reader, size_t frameIndex, size_t vertexCount);
+  Md2MeshList parseMeshes(Reader reader, size_t commandCount);
 
-    Md2SkinList parseSkins(Reader reader, size_t skinCount);
+  void loadSkins(
+    Assets::EntityModelSurface& surface, const Md2SkinList& skins, Logger& logger);
 
-    Md2Frame parseFrame(Reader reader, size_t frameIndex, size_t vertexCount);
-
-    Md2MeshList parseMeshes(Reader reader, size_t commandCount);
-
-    void loadSkins(Assets::EntityModelSurface &surface, const Md2SkinList &skins, Logger &logger);
-
-    void buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const Md2Frame &frame, const Md2MeshList &meshes);
-
-    std::vector<Assets::EntityModelVertex> getVertices(const Md2Frame &frame, const Md2MeshVertexList &meshVertices) const;
+  void buildFrame(
+    Assets::EntityModel& model,
+    Assets::EntityModelSurface& surface,
+    size_t frameIndex,
+    const Md2Frame& frame,
+    const Md2MeshList& meshes);
+  std::vector<Assets::EntityModelVertex> getVertices(
+    const Md2Frame& frame, const Md2MeshVertexList& meshVertices) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

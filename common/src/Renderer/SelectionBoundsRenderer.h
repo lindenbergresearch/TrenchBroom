@@ -21,7 +21,7 @@
 
 #include "FloatType.h"
 
-#include <vecmath/bbox.h>
+#include <vm/bbox.h>
 #include "Color.h"
 #include "FloatType.h"
 #include "Renderer/GLVertexType.h"

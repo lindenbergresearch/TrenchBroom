@@ -19,9 +19,9 @@
 
 #include "Color.h"
 
-#include <vecmath/scalar.h>
-#include <vecmath/vec.h>
-#include <vecmath/vec_io.h>
+#include <vm/scalar.h>
+#include <vm/vec.h>
+#include <vm/vec_io.h>
 
 #include <sstream>
 

@@ -2,6 +2,7 @@ set(COMMON_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Assets/ColorRange.cpp
+        ${COMMON_SOURCE_DIR}/Assets/DecalDefinition.cpp
         ${COMMON_SOURCE_DIR}/Assets/EntityDefinition.cpp
         ${COMMON_SOURCE_DIR}/Assets/EntityDefinitionFileSpec.cpp
         ${COMMON_SOURCE_DIR}/Assets/EntityDefinitionGroup.cpp
@@ -145,6 +146,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Model/IssueType.cpp
         ${COMMON_SOURCE_DIR}/Model/Layer.cpp
         ${COMMON_SOURCE_DIR}/Model/LayerNode.cpp
+        ${COMMON_SOURCE_DIR}/Model/LinkedGroupUtils.cpp
         ${COMMON_SOURCE_DIR}/Model/LinkSourceValidator.cpp
         ${COMMON_SOURCE_DIR}/Model/LinkTargetValidator.cpp
         ${COMMON_SOURCE_DIR}/Model/LongPropertyKeyValidator.cpp
@@ -203,6 +205,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Renderer/Compass3D.cpp
         ${COMMON_SOURCE_DIR}/Renderer/EdgeRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/EntityLinkRenderer.cpp
+        ${COMMON_SOURCE_DIR}/Renderer/EntityDecalRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/EntityModelRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/EntityRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/FaceRenderer.cpp
@@ -259,6 +262,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Renderer/VboManager.cpp
         ${COMMON_SOURCE_DIR}/Renderer/VertexArray.cpp
         ${COMMON_SOURCE_DIR}/Thread.cpp
+        ${COMMON_SOURCE_DIR}/QSSBuilder.cpp
         ${COMMON_SOURCE_DIR}/TrenchBroomApp.cpp
         ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.cpp
         ${COMMON_SOURCE_DIR}/Uuid.cpp
@@ -281,6 +285,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/CellView.cpp
         ${COMMON_SOURCE_DIR}/View/ChoosePathTypeDialog.cpp
         ${COMMON_SOURCE_DIR}/View/ClickableLabel.cpp
+        ${COMMON_SOURCE_DIR}/View/ClickableTitleBar.cpp
         ${COMMON_SOURCE_DIR}/View/ClipTool.cpp
         ${COMMON_SOURCE_DIR}/View/ClipToolController.cpp
         ${COMMON_SOURCE_DIR}/View/CollapsibleTitledPanel.cpp
@@ -288,6 +293,9 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/ColorModel.cpp
         ${COMMON_SOURCE_DIR}/View/ColorsPreferencePane.cpp
         ${COMMON_SOURCE_DIR}/View/ColorTable.cpp
+        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.cpp
+        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.cpp
+        ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
         ${COMMON_SOURCE_DIR}/View/Command.cpp
         ${COMMON_SOURCE_DIR}/View/CommandProcessor.cpp
         ${COMMON_SOURCE_DIR}/View/CompilationContext.cpp
@@ -419,6 +427,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/SelectionTool.cpp
         ${COMMON_SOURCE_DIR}/View/SetBrushFaceAttributesTool.cpp
         ${COMMON_SOURCE_DIR}/View/SetCurrentLayerCommand.cpp
+        ${COMMON_SOURCE_DIR}/View/SetLinkIdsCommand.cpp
         ${COMMON_SOURCE_DIR}/View/SetLockStateCommand.cpp
         ${COMMON_SOURCE_DIR}/View/SetVisibilityCommand.cpp
         ${COMMON_SOURCE_DIR}/View/ShearObjectsTool.cpp
@@ -436,11 +445,13 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/Splitter.cpp
         ${COMMON_SOURCE_DIR}/View/SwapNodeContentsCommand.cpp
         ${COMMON_SOURCE_DIR}/View/SwitchableMapViewContainer.cpp
+        ${COMMON_SOURCE_DIR}/View/SwitchableTitledPanel.cpp
         ${COMMON_SOURCE_DIR}/View/TabBar.cpp
         ${COMMON_SOURCE_DIR}/View/TabBook.cpp
         ${COMMON_SOURCE_DIR}/View/TextOutputAdapter.cpp
         ${COMMON_SOURCE_DIR}/View/TextureBrowser.cpp
         ${COMMON_SOURCE_DIR}/View/TextureBrowserView.cpp
+        ${COMMON_SOURCE_DIR}/View/TextureCollectionEditor.cpp
         ${COMMON_SOURCE_DIR}/View/ThreePaneMapView.cpp
         ${COMMON_SOURCE_DIR}/View/TitleBar.cpp
         ${COMMON_SOURCE_DIR}/View/TitledPanel.cpp
@@ -473,16 +484,13 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/ViewPreferencePane.cpp
         ${COMMON_SOURCE_DIR}/View/ViewUtils.cpp
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.cpp
-        ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
-        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.cpp
-        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.cpp
-        ${COMMON_SOURCE_DIR}/QSSBuilder.cpp
 )
 
 set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Assets/AssetReference.h
         ${COMMON_SOURCE_DIR}/Assets/AssetUtils.h
         ${COMMON_SOURCE_DIR}/Assets/ColorRange.h
+        ${COMMON_SOURCE_DIR}/Assets/DecalDefinition.h
         ${COMMON_SOURCE_DIR}/Assets/EntityDefinition.h
         ${COMMON_SOURCE_DIR}/Assets/EntityDefinitionFileSpec.h
         ${COMMON_SOURCE_DIR}/Assets/EntityDefinitionGroup.h
@@ -636,6 +644,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Model/IssueType.h
         ${COMMON_SOURCE_DIR}/Model/Layer.h
         ${COMMON_SOURCE_DIR}/Model/LayerNode.h
+        ${COMMON_SOURCE_DIR}/Model/LinkedGroupUtils.h
         ${COMMON_SOURCE_DIR}/Model/LinkSourceValidator.h
         ${COMMON_SOURCE_DIR}/Model/LinkTargetValidator.h
         ${COMMON_SOURCE_DIR}/Model/LockState.cpp
@@ -652,6 +661,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Model/Node.h
         ${COMMON_SOURCE_DIR}/Model/NodeCollection.h
         ${COMMON_SOURCE_DIR}/Model/NodeContents.h
+        ${COMMON_SOURCE_DIR}/Model/NodeQueries.h
         ${COMMON_SOURCE_DIR}/Model/NodeVisitor.h
         ${COMMON_SOURCE_DIR}/Model/NonIntegerVerticesValidator.h
         ${COMMON_SOURCE_DIR}/Model/Object.h
@@ -717,6 +727,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Renderer/Compass3D.h
         ${COMMON_SOURCE_DIR}/Renderer/EdgeRenderer.h
         ${COMMON_SOURCE_DIR}/Renderer/EntityLinkRenderer.h
+        ${COMMON_SOURCE_DIR}/Renderer/EntityDecalRenderer.h
         ${COMMON_SOURCE_DIR}/Renderer/EntityModelRenderer.h
         ${COMMON_SOURCE_DIR}/Renderer/EntityRenderer.h
         ${COMMON_SOURCE_DIR}/Renderer/FaceRenderer.h
@@ -782,6 +793,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Result.h
         ${COMMON_SOURCE_DIR}/Thread.h
         ${COMMON_SOURCE_DIR}/TrenchBroomApp.h
+        ${COMMON_SOURCE_DIR}/QSSBuilder.h
         ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.h
         ${COMMON_SOURCE_DIR}/Uuid.h
         ${COMMON_SOURCE_DIR}/View/AboutDialog.h
@@ -801,8 +813,12 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/CameraTool3D.h
         ${COMMON_SOURCE_DIR}/View/CellLayout.h
         ${COMMON_SOURCE_DIR}/View/CellView.h
+        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.h
+        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.h
+        ${COMMON_SOURCE_DIR}/View/PreferenceModel.h
         ${COMMON_SOURCE_DIR}/View/ChoosePathTypeDialog.h
         ${COMMON_SOURCE_DIR}/View/ClickableLabel.h
+        ${COMMON_SOURCE_DIR}/View/ClickableTitleBar.h
         ${COMMON_SOURCE_DIR}/View/ClipTool.h
         ${COMMON_SOURCE_DIR}/View/ClipToolController.h
         ${COMMON_SOURCE_DIR}/View/CollapsibleTitledPanel.h
@@ -942,6 +958,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/SelectionTool.h
         ${COMMON_SOURCE_DIR}/View/SetBrushFaceAttributesTool.h
         ${COMMON_SOURCE_DIR}/View/SetCurrentLayerCommand.h
+        ${COMMON_SOURCE_DIR}/View/SetLinkIdsCommand.h
         ${COMMON_SOURCE_DIR}/View/SetLockStateCommand.h
         ${COMMON_SOURCE_DIR}/View/SetVisibilityCommand.h
         ${COMMON_SOURCE_DIR}/View/ShearObjectsTool.h
@@ -959,11 +976,13 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/Splitter.h
         ${COMMON_SOURCE_DIR}/View/SwapNodeContentsCommand.h
         ${COMMON_SOURCE_DIR}/View/SwitchableMapViewContainer.h
+        ${COMMON_SOURCE_DIR}/View/SwitchableTitledPanel.h
         ${COMMON_SOURCE_DIR}/View/TabBar.h
         ${COMMON_SOURCE_DIR}/View/TabBook.h
         ${COMMON_SOURCE_DIR}/View/TextOutputAdapter.h
         ${COMMON_SOURCE_DIR}/View/TextureBrowser.h
         ${COMMON_SOURCE_DIR}/View/TextureBrowserView.h
+        ${COMMON_SOURCE_DIR}/View/TextureCollectionEditor.h
         ${COMMON_SOURCE_DIR}/View/ThreePaneMapView.h
         ${COMMON_SOURCE_DIR}/View/TitleBar.h
         ${COMMON_SOURCE_DIR}/View/TitledPanel.h
@@ -999,16 +1018,12 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/ViewPreferencePane.h
         ${COMMON_SOURCE_DIR}/View/ViewUtils.h
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.h
-        ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
-        ${COMMON_SOURCE_DIR}/QSSBuilder.h
-        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.h
-        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
 set_target_properties(common PROPERTIES AUTOMOC TRUE)
 target_include_directories(common PUBLIC ${COMMON_SOURCE_DIR})
-target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vecmath GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt5::Widgets Qt5::Svg fmt::fmt assimp::assimp)
+target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt5::Widgets Qt5::Svg fmt::fmt assimp::assimp)
 
 # use precompiled headers on CMake 3.16 or later
 if (NOT TB_SUPPRESS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
@@ -1061,21 +1076,21 @@ if (NOT TB_SUPPRESS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
             <QVBoxLayout>
             <QWidget>
     )
-else ()
+else()
     message(STATUS "Not using precompiled headers")
-endif ()
+endif()
 
 # Organize files into IDE folders
 source_group(TREE "${COMMON_SOURCE_DIR}" FILES ${COMMON_SOURCE} ${COMMON_HEADER})
 
-if (WIN32)
+if(WIN32)
     target_link_libraries(common PRIVATE stackwalker)
-endif ()
+endif()
 
-if (APPLE)
+if(APPLE)
     # Silence macOS OpenGL deprecation warnings
     target_compile_definitions(common PUBLIC GL_SILENCE_DEPRECATION)
-endif ()
+endif()
 
 set_compiler_config(common)
 

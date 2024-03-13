@@ -26,95 +26,83 @@
 
 class QAbstractButton;
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class LayerNode;
 }
 
-namespace View {
+namespace View
+{
 class LayerListBox;
-
 class MapDocument;
 
-class LayerEditor : public QWidget {
-Q_OBJECT
+class LayerEditor : public QWidget
+{
+  Q_OBJECT
 private:
-    std::weak_ptr<MapDocument> m_document;
-    LayerListBox *m_layerList;
+  std::weak_ptr<MapDocument> m_document;
+  LayerListBox* m_layerList;
 
-    QAbstractButton *m_addLayerButton;
-    QAbstractButton *m_removeLayerButton;
-    QAbstractButton *m_moveLayerUpButton;
-    QAbstractButton *m_moveLayerDownButton;
+  QAbstractButton* m_addLayerButton;
+  QAbstractButton* m_removeLayerButton;
+  QAbstractButton* m_moveLayerUpButton;
+  QAbstractButton* m_moveLayerDownButton;
 
 public:
-    explicit LayerEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit LayerEditor(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
 private:
-    void onSetCurrentLayer(Model::LayerNode *layer);
+  void onSetCurrentLayer(Model::LayerNode* layer);
+  bool canSetCurrentLayer(Model::LayerNode* layer) const;
 
-    bool canSetCurrentLayer(Model::LayerNode *layer) const;
+  void onLayerRightClick(Model::LayerNode* layer);
 
-    void onLayerRightClick(Model::LayerNode *layer);
+  void onMoveSelectionToLayer();
+  bool canMoveSelectionToLayer() const;
 
-    void onMoveSelectionToLayer();
+  bool canToggleLayerVisible() const;
+  void toggleLayerVisible(Model::LayerNode* layer);
 
-    bool canMoveSelectionToLayer() const;
+  bool canToggleLayerLocked() const;
+  void toggleLayerLocked(Model::LayerNode* layer);
 
-    bool canToggleLayerVisible() const;
+  void toggleOmitLayerFromExport(Model::LayerNode* layer);
 
-    void toggleLayerVisible(Model::LayerNode *layer);
+  void isolateLayer(Model::LayerNode* layer);
 
-    bool canToggleLayerLocked() const;
+  void onSelectAllInLayer();
+  bool canSelectAllInLayer() const;
 
-    void toggleLayerLocked(Model::LayerNode *layer);
+  void onAddLayer();
 
-    void toggleOmitLayerFromExport(Model::LayerNode *layer);
+  void onRemoveLayer();
+  bool canRemoveLayer() const;
 
-    void isolateLayer(Model::LayerNode *layer);
+  void onRenameLayer();
+  bool canRenameLayer() const;
 
-    void onSelectAllInLayer();
+  void onShowAllLayers();
+  bool canShowAllLayers() const;
 
-    bool canSelectAllInLayer() const;
+  void onHideAllLayers();
+  bool canHideAllLayers() const;
 
-    void onAddLayer();
+  void onLockAllLayers();
+  bool canLockAllLayers() const;
 
-    void onRemoveLayer();
+  void onUnlockAllLayers();
+  bool canUnlockAllLayers() const;
 
-    bool canRemoveLayer() const;
-
-    void onRenameLayer();
-
-    bool canRenameLayer() const;
-
-    void onShowAllLayers();
-
-    bool canShowAllLayers() const;
-
-    void onHideAllLayers();
-
-    bool canHideAllLayers() const;
-
-    void onLockAllLayers();
-
-    bool canLockAllLayers() const;
-
-    void onUnlockAllLayers();
-
-    bool canUnlockAllLayers() const;
-
-    bool canMoveLayer(int direction) const;
-
-    void moveLayer(Model::LayerNode *layer, int direction);
+  bool canMoveLayer(int direction) const;
+  void moveLayer(Model::LayerNode* layer, int direction);
 
 private:
-    Model::LayerNode *findVisibleAndUnlockedLayer(const Model::LayerNode *except) const;
-
-    void createGui();
-
+  Model::LayerNode* findVisibleAndUnlockedLayer(const Model::LayerNode* except) const;
+  void createGui();
 private slots:
-
-    void updateButtons();
+  void updateButtons();
 };
 } // namespace View
 } // namespace TrenchBroom

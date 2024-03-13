@@ -21,11 +21,14 @@
 
 #include "Model/CompilationProfile.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
-namespace TrenchBroom {
-namespace Model {
-struct CompilationConfig {
+namespace TrenchBroom
+{
+namespace Model
+{
+struct CompilationConfig
+{
   std::vector<CompilationProfile> profiles;
 
   kdl_reflect_decl(CompilationConfig, profiles);

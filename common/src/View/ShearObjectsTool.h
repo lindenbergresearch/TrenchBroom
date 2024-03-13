@@ -25,85 +25,89 @@
 #include "Model/HitType.h"
 #include "View/Tool.h"
 
-#include <vecmath/bbox.h>
-#include <vecmath/forward.h>
-#include <vecmath/vec.h>
+#include "vm/bbox.h"
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class PickResult;
 }
 
-namespace Renderer {
+namespace Renderer
+{
 class Camera;
 }
 
-namespace View {
+namespace View
+{
 class Grid;
-
 class MapDocument;
 
-class ShearObjectsTool : public Tool {
+class ShearObjectsTool : public Tool
+{
 public:
-    static const Model::HitType::Type ShearToolSideHitType;
+  static const Model::HitType::Type ShearToolSideHitType;
 
 private:
-    std::weak_ptr<MapDocument> m_document;
-    bool m_resizing;
-    bool m_constrainVertical;
-    vm::bbox3 m_bboxAtDragStart;
-    Model::Hit m_dragStartHit;
-    vm::vec3 m_dragCumulativeDelta;
+  std::weak_ptr<MapDocument> m_document;
+  bool m_resizing;
+  bool m_constrainVertical;
+  vm::bbox3 m_bboxAtDragStart;
+  Model::Hit m_dragStartHit;
+  vm::vec3 m_dragCumulativeDelta;
 
 public:
-    explicit ShearObjectsTool(std::weak_ptr<MapDocument> document);
+  explicit ShearObjectsTool(std::weak_ptr<MapDocument> document);
+  ~ShearObjectsTool() override;
 
-    ~ShearObjectsTool() override;
+  const Grid& grid() const;
 
-    const Grid &grid() const;
+  bool applies() const;
 
-    bool applies() const;
-
-    void pickBackSides(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
-
-    void pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
-
-    void pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
+  void pickBackSides(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult);
+  void pick2D(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult);
+  void pick3D(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult);
 
 public:
-    vm::bbox3 bounds() const;
+  vm::bbox3 bounds() const;
 
-    bool hasDragPolygon() const;
+  bool hasDragPolygon() const;
+  vm::polygon3f dragPolygon() const;
 
-    vm::polygon3f dragPolygon() const;
+  /**
+   * If inside a drag, returns the bbox at the start of the drag.
+   * Otherwise, returns the current bounds(). for rendering sheared bbox.
+   */
+  vm::bbox3 bboxAtDragStart() const;
 
-    /**
-     * If inside a drag, returns the bbox at the start of the drag.
-     * Otherwise, returns the current bounds(). for rendering sheared bbox.
-     */
-    vm::bbox3 bboxAtDragStart() const;
+  void startShearWithHit(const Model::Hit& hit);
+  void commitShear();
+  void cancelShear();
+  void shearByDelta(const vm::vec3& delta);
 
-    void startShearWithHit(const Model::Hit &hit);
+  const Model::Hit& dragStartHit() const;
 
-    void commitShear();
+  vm::mat4x4 bboxShearMatrix() const;
+  vm::polygon3f shearHandle() const;
 
-    void cancelShear();
+  void updatePickedSide(const Model::PickResult& pickResult);
 
-    void shearByDelta(const vm::vec3 &delta);
-
-    const Model::Hit &dragStartHit() const;
-
-    vm::mat4x4 bboxShearMatrix() const;
-
-    vm::polygon3f shearHandle() const;
-
-    void updatePickedSide(const Model::PickResult &pickResult);
-
-    bool constrainVertical() const;
-
-    void setConstrainVertical(bool constrainVertical);
+  bool constrainVertical() const;
+  void setConstrainVertical(bool constrainVertical);
 };
 } // namespace View
 } // namespace TrenchBroom

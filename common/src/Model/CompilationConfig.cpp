@@ -19,11 +19,14 @@
 
 #include "CompilationConfig.h"
 
-#include <kdl/reflection_impl.h>
+#include "kdl/reflection_impl.h"
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 
 kdl_reflect_impl(CompilationConfig);
+
 } // namespace Model
 } // namespace TrenchBroom

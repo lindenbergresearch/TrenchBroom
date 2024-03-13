@@ -22,80 +22,84 @@
 #include "Assets/AssetReference.h"
 #include "FloatType.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
-#include <vecmath/bbox.h>
-#include <vecmath/forward.h>
-#include <vecmath/vec.h>
+#include "vm/bbox.h"
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom::Assets
+{
 class Texture;
 }
 
-namespace Model {
-class BezierPatch {
+namespace TrenchBroom::Model
+{
+
+class BezierPatch
+{
 public:
-    using Point = vm::vec<FloatType, 5>;
+  using Point = vm::vec<FloatType, 5>;
 
 private:
-    size_t m_pointRowCount;
-    size_t m_pointColumnCount;
-    std::vector<Point> m_controlPoints;
-    vm::bbox3 m_bounds;
+  size_t m_pointRowCount;
+  size_t m_pointColumnCount;
+  std::vector<Point> m_controlPoints;
+  vm::bbox3 m_bounds;
 
-    std::string m_textureName;
-    Assets::AssetReference<Assets::Texture> m_textureReference;
+  std::string m_textureName;
+  Assets::AssetReference<Assets::Texture> m_textureReference;
+
+  kdl_reflect_decl(
+    BezierPatch,
+    m_pointRowCount,
+    m_pointColumnCount,
+    m_bounds,
+    m_controlPoints,
+    m_textureName);
 
 public:
-    BezierPatch(size_t pointRowCount, size_t pointColumnCount, std::vector<Point> controlPoints, std::string textureName);
+  BezierPatch(
+    size_t pointRowCount,
+    size_t pointColumnCount,
+    std::vector<Point> controlPoints,
+    std::string textureName);
+  ~BezierPatch();
 
-    ~BezierPatch();
+  BezierPatch(const BezierPatch& other);
+  BezierPatch(BezierPatch&& other) noexcept;
 
-    BezierPatch(const BezierPatch &other);
+  BezierPatch& operator=(const BezierPatch& other);
+  BezierPatch& operator=(BezierPatch&& other) noexcept;
 
-    BezierPatch(BezierPatch &&other) noexcept;
+public: // control points:
+  size_t pointRowCount() const;
+  size_t pointColumnCount() const;
 
-    BezierPatch &operator=(const BezierPatch &other);
+  size_t quadRowCount() const;
+  size_t quadColumnCount() const;
 
-    BezierPatch &operator=(BezierPatch &&other) noexcept;
+  size_t surfaceRowCount() const;
+  size_t surfaceColumnCount() const;
 
-    size_t pointRowCount() const;
+  const std::vector<Point>& controlPoints() const;
+  const Point& controlPoint(size_t row, size_t col) const;
+  void setControlPoint(size_t row, size_t col, Point controlPoint);
 
-    size_t pointColumnCount() const;
+  const vm::bbox3& bounds() const;
 
-    size_t quadRowCount() const;
+  const std::string& textureName() const;
+  void setTextureName(std::string textureName);
 
-    size_t quadColumnCount() const;
+  const Assets::Texture* texture() const;
+  bool setTexture(Assets::Texture* texture);
 
-    size_t surfaceRowCount() const;
+  void transform(const vm::mat4x4& transformation);
 
-    size_t surfaceColumnCount() const;
-
-    const std::vector<Point> &controlPoints() const;
-
-    const Point &controlPoint(size_t row, size_t col) const;
-
-    void setControlPoint(size_t row, size_t col, Point controlPoint);
-
-    const vm::bbox3 &bounds() const;
-
-    const std::string &textureName() const;
-
-    void setTextureName(std::string textureName);
-
-    const Assets::Texture *texture() const;
-
-    bool setTexture(Assets::Texture *texture);
-
-    void transform(const vm::mat4x4 &transformation);
-
-    std::vector<Point> evaluate(size_t subdivisionsPerSurface) const;
-
-    kdl_reflect_decl(BezierPatch, m_pointRowCount, m_pointColumnCount, m_bounds, m_controlPoints, m_textureName);
+  std::vector<Point> evaluate(size_t subdivisionsPerSurface) const;
 };
-} // namespace Model
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::Model

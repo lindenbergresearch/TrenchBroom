@@ -23,113 +23,141 @@
 #include "Model/CompareHits.h"
 #include "Model/Hit.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
-#include <vecmath/scalar.h>
-#include <vecmath/util.h>
-#include <vecmath/vec.h>
+#include "vm/scalar.h"
+#include "vm/util.h"
+#include "vm/vec.h"
 
 #include <algorithm>
 #include <cassert>
 
-namespace TrenchBroom {
-namespace Model {
-class PickResult::CompareWrapper {
+namespace TrenchBroom
+{
+namespace Model
+{
+class PickResult::CompareWrapper
+{
 private:
-    const CompareHits *m_compare;
+  const CompareHits* m_compare;
 
 public:
-    CompareWrapper(const CompareHits *compare) : m_compare(compare) {
-    }
-
-    bool operator()(const Hit &lhs, const Hit &rhs) const {
-        return m_compare->compare(lhs, rhs) < 0;
-    }
+  CompareWrapper(const CompareHits* compare)
+    : m_compare(compare)
+  {
+  }
+  bool operator()(const Hit& lhs, const Hit& rhs) const
+  {
+    return m_compare->compare(lhs, rhs) < 0;
+  }
 };
 
-PickResult::PickResult(std::shared_ptr<CompareHits> compare) : m_compare(std::move(compare)) {
+PickResult::PickResult(std::shared_ptr<CompareHits> compare)
+  : m_compare(std::move(compare))
+{
 }
 
-PickResult::PickResult() : m_compare(std::make_shared<CompareHitsByDistance>()) {
+PickResult::PickResult()
+  : m_compare(std::make_shared<CompareHitsByDistance>())
+{
 }
 
 PickResult::~PickResult() = default;
 
-PickResult PickResult::byDistance() {
-    return PickResult(std::make_shared<CombineCompareHits>(std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
+PickResult PickResult::byDistance()
+{
+  return PickResult(std::make_shared<CombineCompareHits>(
+    std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
 }
 
-PickResult PickResult::bySize(const vm::axis::type axis) {
-    return PickResult(std::make_shared<CompareHitsBySize>(axis));
+PickResult PickResult::bySize(const vm::axis::type axis)
+{
+  return PickResult(std::make_shared<CompareHitsBySize>(axis));
 }
 
-bool PickResult::empty() const {
-    return m_hits.empty();
+bool PickResult::empty() const
+{
+  return m_hits.empty();
 }
 
-size_t PickResult::size() const {
-    return m_hits.size();
+size_t PickResult::size() const
+{
+  return m_hits.size();
 }
 
-void PickResult::addHit(const Hit &hit) {
-    assert(!vm::is_nan(hit.distance()));
-    assert(!vm::is_nan(hit.hitPoint()));
-    if (vm::is_nan(hit.distance()) || vm::is_nan(hit.hitPoint())) {
-        return;
-    }
-    ensure(m_compare.get() != nullptr, "compare is null");
-    auto pos = std::upper_bound(std::begin(m_hits), std::end(m_hits), hit, CompareWrapper(m_compare.get()));
-    m_hits.insert(pos, hit);
+void PickResult::addHit(const Hit& hit)
+{
+  assert(!vm::is_nan(hit.distance()));
+  assert(!vm::is_nan(hit.hitPoint()));
+  if (vm::is_nan(hit.distance()) || vm::is_nan(hit.hitPoint()))
+  {
+    return;
+  }
+  ensure(m_compare.get() != nullptr, "compare is null");
+  auto pos = std::upper_bound(
+    std::begin(m_hits), std::end(m_hits), hit, CompareWrapper(m_compare.get()));
+  m_hits.insert(pos, hit);
 }
 
-const std::vector<Hit> &PickResult::all() const {
-    return m_hits;
+const std::vector<Hit>& PickResult::all() const
+{
+  return m_hits;
 }
 
-const Hit &PickResult::first(const HitFilter &filter) const {
-    const auto occluder = HitFilters::type(HitType::AnyType);
+const Hit& PickResult::first(const HitFilter& filter) const
+{
+  const auto occluder = HitFilters::type(HitType::AnyType);
 
-    if (!m_hits.empty()) {
-        auto it = std::begin(m_hits);
-        auto end = std::end(m_hits);
-        auto bestMatch = end;
+  if (!m_hits.empty())
+  {
+    auto it = std::begin(m_hits);
+    auto end = std::end(m_hits);
+    auto bestMatch = end;
 
-        auto bestMatchError = std::numeric_limits<FloatType>::max();
-        auto bestOccluderError = std::numeric_limits<FloatType>::max();
+    auto bestMatchError = std::numeric_limits<FloatType>::max();
+    auto bestOccluderError = std::numeric_limits<FloatType>::max();
 
-        bool containsOccluder = false;
-        while (it != end && !containsOccluder) {
-            const FloatType distance = it->distance();
-            do {
-                const Hit &hit = *it;
-                if (filter(hit)) {
-                    if (hit.error() < bestMatchError) {
-                        bestMatch = it;
-                        bestMatchError = hit.error();
-                    }
-                }
-                else if (!occluder(hit)) {
-                    bestOccluderError = vm::min(bestOccluderError, hit.error());
-                    containsOccluder = true;
-                }
-                ++it;
-            } while (it != end && vm::is_equal(it->distance(), distance, vm::C::almost_zero()));
+    bool containsOccluder = false;
+    while (it != end && !containsOccluder)
+    {
+      const FloatType distance = it->distance();
+      do
+      {
+        const Hit& hit = *it;
+        if (filter(hit))
+        {
+          if (hit.error() < bestMatchError)
+          {
+            bestMatch = it;
+            bestMatchError = hit.error();
+          }
         }
-
-        if (bestMatch != end && bestMatchError <= bestOccluderError) {
-            return *bestMatch;
+        else if (!occluder(hit))
+        {
+          bestOccluderError = vm::min(bestOccluderError, hit.error());
+          containsOccluder = true;
         }
+        ++it;
+      } while (it != end && vm::is_equal(it->distance(), distance, vm::C::almost_zero()));
     }
 
-    return Hit::NoHit;
+    if (bestMatch != end && bestMatchError <= bestOccluderError)
+    {
+      return *bestMatch;
+    }
+  }
+
+  return Hit::NoHit;
 }
 
-std::vector<Hit> PickResult::all(const HitFilter &filter) const {
-    return kdl::vec_filter(m_hits, filter);
+std::vector<Hit> PickResult::all(const HitFilter& filter) const
+{
+  return kdl::vec_filter(m_hits, filter);
 }
 
-void PickResult::clear() {
-    m_hits.clear();
+void PickResult::clear()
+{
+  m_hits.clear();
 }
 } // namespace Model
 } // namespace TrenchBroom

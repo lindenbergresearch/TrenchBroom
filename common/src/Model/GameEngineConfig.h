@@ -21,14 +21,17 @@
 
 #include "Model/GameEngineProfile.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
-struct GameEngineConfig {
+namespace TrenchBroom
+{
+namespace Model
+{
+struct GameEngineConfig
+{
   std::vector<GameEngineProfile> profiles;
 
   kdl_reflect_decl(GameEngineConfig, profiles);

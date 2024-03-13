@@ -21,40 +21,50 @@
 
 #include "FloatType.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
-#include <vecmath/forward.h>
+#include "vm/forward.h"
 
 #include <iosfwd>
 #include <optional>
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 enum class PitchType;
 }
 
-namespace Model {
+namespace Model
+{
 class Entity;
-
 class EntityProperty;
-
 struct EntityPropertyConfig;
 
-enum class EntityRotationType {
-  None, Angle, AngleUpDown, Euler, Euler_PositivePitchDown, Mangle
+enum class EntityRotationType
+{
+  None,
+  Angle,
+  AngleUpDown,
+  Euler,
+  Euler_PositivePitchDown,
+  Mangle
 };
 
-std::ostream &operator<<(std::ostream &lhs, const EntityRotationType &rhs);
+std::ostream& operator<<(std::ostream& lhs, const EntityRotationType& rhs);
 
-enum class EntityRotationUsage {
-  Allowed, BlockRotation
+enum class EntityRotationUsage
+{
+  Allowed,
+  BlockRotation
 };
 
-std::ostream &operator<<(std::ostream &lhs, const EntityRotationUsage &rhs);
+std::ostream& operator<<(std::ostream& lhs, const EntityRotationUsage& rhs);
 
-struct EntityRotationInfo {
+struct EntityRotationInfo
+{
   const EntityRotationType type;
   const std::string propertyKey;
   const EntityRotationUsage usage;
@@ -62,17 +72,23 @@ struct EntityRotationInfo {
   kdl_reflect_decl(EntityRotationInfo, type, propertyKey, usage);
 };
 
-EntityRotationInfo entityRotationInfo(const Entity &entity);
+EntityRotationInfo entityRotationInfo(const Entity& entity);
 
-vm::mat4x4 entityRotation(const std::vector<EntityProperty> &properties, const EntityRotationInfo &info);
+vm::mat4x4 entityRotation(
+  const std::vector<EntityProperty>& properties, const EntityRotationInfo& info);
 
-vm::mat4x4 entityRotation(const Entity &entity);
+vm::mat4x4 entityRotation(const Entity& entity);
 
-vm::vec3 entityYawPitchRoll(const vm::mat4x4 &transformation, const vm::mat4x4 &rotation);
+vm::vec3 entityYawPitchRoll(const vm::mat4x4& transformation, const vm::mat4x4& rotation);
 
-std::optional<EntityProperty>
-applyEntityRotation(const std::vector<EntityProperty> &properties, const EntityRotationInfo &info, const vm::mat4x4 &transformation);
+std::optional<EntityProperty> applyEntityRotation(
+  const std::vector<EntityProperty>& properties,
+  const EntityRotationInfo& info,
+  const vm::mat4x4& transformation);
+void applyEntityRotation(
+  Entity& entity,
+  const EntityPropertyConfig& propertyConfig,
+  const vm::mat4x4& transformation);
 
-void applyEntityRotation(Entity &entity, const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation);
 } // namespace Model
 } // namespace TrenchBroom

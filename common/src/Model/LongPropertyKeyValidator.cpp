@@ -29,29 +29,38 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
-namespace {
+namespace TrenchBroom
+{
+namespace Model
+{
+namespace
+{
 static const auto Type = freeIssueType();
 } // namespace
 
-LongPropertyKeyValidator::LongPropertyKeyValidator(const size_t maxLength) : Validator{
-    Type, "Long entity property keys"
-}, m_maxLength{
-    maxLength
-} {
-    addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
+LongPropertyKeyValidator::LongPropertyKeyValidator(const size_t maxLength)
+  : Validator{Type, "Long entity property keys"}
+  , m_maxLength{maxLength}
+{
+  addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
 }
 
-void LongPropertyKeyValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
-    for (const auto &property: entityNode.entity().properties()) {
-        const auto &propertyKey = property.key();
-        if (propertyKey.size() >= m_maxLength) {
-            issues.push_back(std::make_unique<EntityPropertyIssue>(Type, entityNode, propertyKey,
-                "Property key '" + propertyKey.substr(0, 8) + "...' of " + entityNode.name() + " is too long."
-            ));
-        }
+void LongPropertyKeyValidator::doValidate(
+  EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues) const
+{
+  for (const auto& property : entityNode.entity().properties())
+  {
+    const auto& propertyKey = property.key();
+    if (propertyKey.size() >= m_maxLength)
+    {
+      issues.push_back(std::make_unique<EntityPropertyIssue>(
+        Type,
+        entityNode,
+        propertyKey,
+        "Property key '" + propertyKey.substr(0, 8) + "...' of " + entityNode.name()
+          + " is too long."));
     }
+  }
 }
 } // namespace Model
 } // namespace TrenchBroom

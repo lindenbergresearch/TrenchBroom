@@ -26,7 +26,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "Color.h"
 #include "IO/PathQt.h"
-#include "vecmath/forward.h"
+#include "vm/forward.h"
 
 namespace TrenchBroom {
 // PreferenceSerializer

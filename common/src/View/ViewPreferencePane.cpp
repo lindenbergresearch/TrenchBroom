@@ -43,7 +43,7 @@
 #include "IO/PathInfo.h"
 
 #include <kdl/overload.h>
-#include <vecmath/scalar.h>
+#include <vm/scalar.h>
 #include <TrenchBroomApp.h>
 
 #include <array>
