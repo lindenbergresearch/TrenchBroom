@@ -39,7 +39,6 @@ struct CompilationProfile;
 namespace TrenchBroom::View
 {
 class CompilationRunner;
-
 class MapDocument;
 
 class CompilationRun : public QObject
@@ -52,22 +51,18 @@ public:
   ~CompilationRun() override;
 
   bool running() const;
-
   void run(
     const Model::CompilationProfile& profile,
     std::shared_ptr<MapDocument> document,
     QTextEdit* currentOutput);
-
   void test(
     const Model::CompilationProfile& profile,
     std::shared_ptr<MapDocument> document,
     QTextEdit* currentOutput);
-
   void terminate();
 
 private:
   bool doIsRunning() const;
-
   void run(
     const Model::CompilationProfile& profile,
     std::shared_ptr<MapDocument> document,
@@ -77,13 +72,10 @@ private:
 private:
   std::string buildWorkDir(
     const Model::CompilationProfile& profile, std::shared_ptr<MapDocument> document);
-
   void cleanup();
-
 signals:
-
   void compilationStarted();
-
   void compilationEnded();
 };
+
 } // namespace TrenchBroom::View

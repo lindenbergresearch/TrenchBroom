@@ -25,7 +25,6 @@
 #include <QObject>
 #include <QPointer>
 #include <QSettings>
-#include <QSlider>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -35,42 +34,23 @@
 
 #include <string>
 
-#define COLOR_ROLE(name) QPalette{}.color(QPalette::name)
-
 class QButtonGroup;
-
 class QColor;
-
 class QCompleter;
-
 class QDialog;
-
 class QDialogButtonBox;
-
 class QEvent;
-
 class QFont;
-
 class QLayout;
-
 class QLineEdit;
-
 class QMainWindow;
-
 class QPalette;
-
 class QSlider;
-
 class QSplitter;
-
 class QString;
-
 class QTableView;
-
 class QToolButton;
-
 class QVBoxLayout;
-
 class QWidget;
 
 namespace TrenchBroom
@@ -89,7 +69,6 @@ private:
 
 public:
   SyncHeightEventFilter(QWidget* primary, QWidget* secondary, QObject* parent = nullptr);
-
   ~SyncHeightEventFilter() override;
 
   bool eventFilter(QObject* target, QEvent* event) override;
@@ -102,8 +81,7 @@ enum class FileDialogDir
   CompileTool,
   Engine,
   EntityDefinition,
-  GamePath,
-  Resources
+  GamePath
 };
 
 /**
@@ -113,14 +91,12 @@ QString fileDialogDefaultDirectory(FileDialogDir type);
 
 void updateFileDialogDefaultDirectoryWithFilename(
   FileDialogDir type, const QString& filename);
-
 void updateFileDialogDefaultDirectoryWithDirectory(
   FileDialogDir type, const QString& newDefaultDirectory);
 
 QString windowSettingsPath(const QWidget* window, const QString& suffix = "");
 
 void saveWindowGeometry(QWidget* window);
-
 void restoreWindowGeometry(QWidget* window);
 
 template <typename T>
@@ -149,33 +125,22 @@ void restoreWindowState(T* window)
 bool widgetOrChildHasFocus(const QWidget* widget);
 
 class MapFrame;
-
 MapFrame* findMapFrame(QWidget* widget);
 
 QToolButton* createBitmapButton(
   const std::string& image, const QString& tooltip, QWidget* parent = nullptr);
-
 QToolButton* createBitmapButton(
   const QIcon& icon, const QString& tooltip, QWidget* parent = nullptr);
-
 QToolButton* createBitmapToggleButton(
   const std::string& image, const QString& tooltip, QWidget* parent = nullptr);
 
 QWidget* createDefaultPage(const QString& message, QWidget* parent = nullptr);
-
-QSlider* createSlider(const int min, const int max);
-
+QSlider* createSlider(int min, int max);
 
 float getSliderRatio(const QSlider* slider);
-
 void setSliderRatio(QSlider* slider, float ratio);
 
-float getSliderRange(QSlider* slider, float length, float offset = 0.f);
-
-void setSliderRange(QSlider* slider, float length, float value, float offset = 0.f);
-
 QLayout* wrapDialogButtonBox(QWidget* buttonBox);
-
 QLayout* wrapDialogButtonBox(QLayout* buttonBox);
 
 void addToMiniToolBarLayout(QBoxLayout* layout);
@@ -222,82 +187,31 @@ QLayout* createMiniToolBarLayoutRightAligned(QWidget* first, Rest... rest)
 }
 
 void setHint(QLineEdit* ctrl, const char* hint);
-
 void centerOnScreen(QWidget* window);
 
-int getCommonFieldHeight();
-
 QWidget* makeDefault(QWidget* widget);
-
 QWidget* makeEmphasized(QWidget* widget);
-
-QWidget* makeItalic(QWidget* widget);
-
 QWidget* makeUnemphasized(QWidget* widget);
-
 QWidget* makeInfo(QWidget* widget);
-
 QWidget* makeSmall(QWidget* widget);
-
-QWidget* makeTitle(QWidget* widget);
-
-QWidget* makeSubTitle(QWidget* widget);
-
 QWidget* makeHeader(QWidget* widget);
-
-QWidget* makePanelTitle(QWidget* widget, bool bold = false, bool isSubTitle = false);
-
 QWidget* makeError(QWidget* widget);
 
-QWidget* makeMono(QWidget* widget, int size);
-
-QWidget* colorizeWidget(
-  QWidget* widget,
-  const QColor& color,
-  QPalette::ColorRole role = QPalette::ColorRole::Text);
-
 QWidget* makeSelected(QWidget* widget, const QPalette& defaultPalette);
-
-QWidget* makeBright(QWidget* widget, const QPalette& defaultPalette);
-
 QWidget* makeUnselected(QWidget* widget, const QPalette& defaultPalette);
 
 Color fromQColor(const QColor& color);
-
-QColor toQColor(const Color& color, float multiplier = 1.0f);
-
-float getQColorBrightnessFactor(const QColor& color);
-
-QString toStyleSheetColor(const char* prefix, const QColor& color);
-
-QString toStyleSheetRGBA(const QColor& color, int adjustment = 0);
-
-QString toStyleSheetRGBA(
-  const QPalette& palette,
-  QPalette::ColorRole role,
-  QPalette::ColorGroup group,
-  int adjustment = 0);
-
-QString toStyleSheetRGBA(
-  const QPalette& palette, QPalette::ColorRole role, int adjustment = 0);
-
-void setStyledBorder(
-  QWidget* widget, int width, const QColor& color, const char* type = "solid");
-
+QColor toQColor(const Color& color);
 void setWindowIconTB(QWidget* window);
-
 void setDebugBackgroundColor(QWidget* widget, const QColor& color);
 
 void setDefaultWindowColor(QWidget* widget);
-
 void setBaseWindowColor(QWidget* widget);
-
 void setHighlightWindowColor(QWidget* widget);
 
 QLineEdit* createSearchBox();
 
 void checkButtonInGroup(QButtonGroup* group, int id, bool checked);
-
 void checkButtonInGroup(QButtonGroup* group, const QString& objectName, bool checked);
 
 /**
@@ -329,13 +243,11 @@ public:
 };
 
 void autoResizeRows(QTableView* tableView);
-
 void deleteChildWidgetsLaterAndDeleteLayout(QWidget* widget);
 
 void showModelessDialog(QDialog* dialog);
 
 QString mapStringToUnicode(MapTextEncoding encoding, const std::string& string);
-
 std::string mapStringFromUnicode(MapTextEncoding encoding, const QString& string);
 
 /**

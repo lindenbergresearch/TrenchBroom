@@ -22,7 +22,7 @@
 #include "NotifierConnection.h"
 #include "View/MapViewBase.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <memory>
 
@@ -38,13 +38,9 @@ class PickResult;
 namespace Renderer
 {
 class MapRenderer;
-
 class OrthographicCamera;
-
 class RenderBatch;
-
 class RenderContext;
-
 enum class RenderMode;
 } // namespace Renderer
 
@@ -77,17 +73,14 @@ public:
 
 private:
   void initializeCamera(ViewPlane viewPlane);
-
   void initializeToolChain(MapViewToolBox& toolBox);
 
 private: // notification
   void connectObservers();
-
   void cameraDidChange(const Renderer::Camera* camera);
 
 private: // implement ToolBoxConnector interface
   PickRequest doGetPickRequest(float x, float y) const override;
-
   Model::PickResult doPick(const vm::ray3& pickRay) const override;
 
 protected: // QOpenGLWidget overrides
@@ -99,17 +92,12 @@ private: // implement RenderView interface
 private: // implement MapView interface
   vm::vec3 doGetPasteObjectsDelta(
     const vm::bbox3& bounds, const vm::bbox3& referenceBounds) const override;
-
   bool doCanSelectTall() override;
-
   void doSelectTall() override;
-
   void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) override;
-
   void doFocusCameraOnSelection(bool animate) override;
 
   void doMoveCameraToPosition(const vm::vec3f& position, bool animate) override;
-
   void animateCamera(
     const vm::vec3f& position,
     const vm::vec3f& direction,
@@ -121,37 +109,27 @@ private: // implement MapView interface
 
 private: // implement MapViewBase interface
   vm::vec3 doGetMoveDirection(vm::direction direction) const override;
-
   size_t doGetFlipAxis(const vm::direction direction) const override;
-
   vm::vec3 doComputePointEntityPosition(const vm::bbox3& bounds) const override;
 
   ActionContext::Type doGetActionContext() const override;
-
   ActionView doGetActionView() const override;
-
   bool doCancel() override;
 
   Renderer::RenderMode doGetRenderMode() override;
-
   Renderer::Camera& doGetCamera() override;
-
   void doRenderGrid(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
-
   void doRenderMap(
     Renderer::MapRenderer& renderer,
     Renderer::RenderContext& renderContext,
     Renderer::RenderBatch& renderBatch) override;
-
   void doRenderTools(
     MapViewToolBox& toolBox,
     Renderer::RenderContext& renderContext,
     Renderer::RenderBatch& renderBatch) override;
-
   void doRenderExtras(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
-
   void doRenderSoftWorldBounds(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
 

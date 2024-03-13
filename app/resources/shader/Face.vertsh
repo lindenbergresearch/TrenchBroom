@@ -34,8 +34,4 @@ void main(void) {
 	modelNormal = gl_Normal;
 	faceColor = Color;
 	viewVector = CameraPosition - gl_Vertex.xyz;
-
-	vec3 N = normalize(modelNormal.xyz);
-	vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
-
 }

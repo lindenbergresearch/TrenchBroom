@@ -32,7 +32,6 @@ class QMenu;
 namespace TrenchBroom::View
 {
 std::vector<std::filesystem::path> loadRecentDocuments(size_t max);
-
 void saveRecentDocuments(const std::vector<std::filesystem::path>& paths);
 
 class RecentDocuments : public QObject
@@ -53,37 +52,28 @@ public:
     std::function<bool(std::filesystem::path)> filterPredicate,
     QObject* parent = nullptr);
 
-  const std::vector<std::filesystem::path>& recentDocuments() const;
+  std::vector<std::filesystem::path> recentDocuments() const;
 
   void reload();
 
   void addMenu(QMenu& menu);
-
   void removeMenu(QMenu& menu);
 
   void updatePath(const std::filesystem::path& path);
-
   void removePath(const std::filesystem::path& path);
 
 private:
   void loadFromConfig();
-
   void saveToConfig();
-
   std::vector<std::filesystem::path> updateFilteredDocuments();
 
   void insertPath(const std::filesystem::path& path);
 
   void updateMenus();
-
   void clearMenu(QMenu& menu);
-
   void createMenuItems(QMenu& menu);
-
 signals:
-
   void loadDocument(const std::filesystem::path& path) const;
-
   void didChange();
 };
 } // namespace TrenchBroom::View

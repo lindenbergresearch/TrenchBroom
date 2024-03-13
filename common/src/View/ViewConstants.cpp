@@ -22,9 +22,8 @@
 #include <QColor>
 #include <QDebug>
 #include <QFont>
+#include <QFontDatabase>
 #include <QWidget>
-
-#include "TrenchBroomApp.h"
 
 namespace TrenchBroom
 {
@@ -34,8 +33,13 @@ namespace Fonts
 {
 QFont fixedWidthFont()
 {
-  auto font = TrenchBroomApp::instance().getConsoleFont();
+#if defined __APPLE__
+  QFont font("Monaco");
+  font.setStyleHint(QFont::TypeWriter);
   return font;
+#else
+  return QFontDatabase::systemFont(QFontDatabase::FixedFont);
+#endif
 }
 } // namespace Fonts
 
@@ -48,19 +52,11 @@ QColor defaultText()
   return result;
 }
 
-QColor highlight()
-{
-  // Used for selected tabs of TabBar control.
-  QPalette pal;
-  QColor result = pal.color(QPalette::Normal, QPalette::Highlight);
-  return result;
-}
-
 QColor highlightText()
 {
   // Used for selected tabs of TabBar control.
   QPalette pal;
-  QColor result = pal.color(QPalette::Normal, QPalette::HighlightedText);
+  QColor result = pal.color(QPalette::Normal, QPalette::Highlight);
   return result;
 }
 
@@ -70,14 +66,6 @@ QColor disabledText()
   QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
   return result;
 }
-
-QColor midlight()
-{
-  QPalette pal;
-  QColor result = pal.color(QPalette::Disabled, QPalette::Midlight);
-  return result;
-}
-
 
 /**
  * Table cell/text edit widget disabled text. Intended for use against a QPalette::Base

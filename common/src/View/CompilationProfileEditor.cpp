@@ -33,12 +33,11 @@
 #include "View/CompilationVariables.h"
 #include "View/MultiCompletionLineEdit.h"
 #include "View/QtUtils.h"
-#include "View/TitledPanel.h"
 #include "View/VariableStoreModel.h"
 #include "View/ViewConstants.h"
 
-#include <kdl/memory_utils.h>
-#include <kdl/vector_utils.h>
+#include "kdl/memory_utils.h"
+#include "kdl/vector_utils.h"
 
 namespace TrenchBroom
 {
@@ -68,7 +67,6 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   auto* containerPanel = new QWidget{parent};
   auto* upperPanel = new QWidget{containerPanel};
   setDefaultWindowColor(upperPanel);
-  setDefaultWindowColor(this);
 
   m_nameTxt = new QLineEdit{};
   m_workDirTxt = new MultiCompletionLineEdit{};
@@ -80,8 +78,8 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   m_workDirTxt->setMultiCompleter(completer);
   m_workDirTxt->setWordDelimiters(QRegularExpression{"\\$"}, QRegularExpression{"\\}"});
   m_workDirTxt->setFont(Fonts::fixedWidthFont());
-  m_workDirTxt->setToolTip(
-    R"(A working directory for the compilation profile. Variables are allowed.)");
+  m_workDirTxt->setToolTip(R"(A working directory for the compilation profile.
+Variables are allowed.)");
 
   auto* upperLayout = new QFormLayout{};
   upperLayout->setContentsMargins(
@@ -92,17 +90,11 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   upperLayout->setHorizontalSpacing(LayoutConstants::MediumHMargin);
   upperLayout->setVerticalSpacing(0);
   upperLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
-  upperLayout->addRow("Profile Name", m_nameTxt);
+  upperLayout->addRow("Name", m_nameTxt);
   upperLayout->addRow("Working Directory", m_workDirTxt);
   upperPanel->setLayout(upperLayout);
 
   m_taskList = new CompilationTaskListBox{m_document, containerPanel};
-  m_taskList->setContentsMargins(0, 0, 0, 0);
-  auto* taskListLayout = new QVBoxLayout{};
-  taskListLayout->setContentsMargins(0, 0, 0, 0);
-  auto* panel = new TitledPanel{"Task List"};
-  taskListLayout->addWidget(m_taskList);
-  panel->getPanel()->setLayout(taskListLayout);
 
   m_addTaskButton = createBitmapButton("Add.svg", "Add task");
   m_removeTaskButton = createBitmapButton("Remove.svg", "Remove the selected task");
@@ -117,9 +109,7 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   layout->setSpacing(0);
   layout->addWidget(upperPanel);
   layout->addWidget(new BorderLine{BorderLine::Direction::Horizontal});
-
-  layout->addWidget(panel, 1);
-
+  layout->addWidget(m_taskList, 1);
   layout->addWidget(new BorderLine{BorderLine::Direction::Horizontal});
   layout->addLayout(buttonLayout);
 

@@ -22,7 +22,7 @@
 #include "NotifierConnection.h"
 #include "View/MapViewBase.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <filesystem>
 #include <memory>
@@ -60,37 +60,21 @@ public:
     Renderer::MapRenderer& renderer,
     GLContextManager& contextManager,
     Logger* logger);
-
   ~MapView3D() override;
 
 private:
   void initializeCamera();
-
   void initializeToolChain(MapViewToolBox& toolBox);
 
 private: // notification
   void connectObservers();
-
   void cameraDidChange(const Renderer::Camera* camera);
-
-  void saveCameraState(MapDocument* document);
-
-  void loadCameraState(MapDocument* document);
-
-
   void preferenceDidChange(const std::filesystem::path& path);
-
-  void documentWasLoaded(MapDocument*);
-
-  void documentWasSaved(MapDocument*);
 
 protected: // QWidget overrides
   void keyPressEvent(QKeyEvent* event) override;
-
   void keyReleaseEvent(QKeyEvent* event) override;
-
   void focusInEvent(QFocusEvent* event) override;
-
   void focusOutEvent(QFocusEvent* event) override;
 
 protected: // QOpenGLWidget overrides
@@ -101,12 +85,10 @@ private: // interaction events
 
 private: // other events
   void updateFlyMode();
-
   void resetFlyModeKeys();
 
 private: // implement ToolBoxConnector interface
   PickRequest doGetPickRequest(float x, float y) const override;
-
   Model::PickResult doPick(const vm::ray3& pickRay) const override;
 
 private: // implement RenderView interface
@@ -117,19 +99,14 @@ private: // implement MapView interface
     const vm::bbox3& bounds, const vm::bbox3& referenceBounds) const override;
 
   bool doCanSelectTall() override;
-
   void doSelectTall() override;
 
   void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) override;
-
   void doFocusCameraOnSelection(bool animate) override;
-
-  void doFocusCameraOnEntityByName(const std::string name);
 
   vm::vec3f focusCameraOnObjectsPosition(const std::vector<Model::Node*>& nodes);
 
   void doMoveCameraToPosition(const vm::vec3f& position, bool animate) override;
-
   void animateCamera(
     const vm::vec3f& position,
     const vm::vec3f& direction,
@@ -141,36 +118,26 @@ private: // implement MapView interface
 
 private: // implement MapViewBase interface
   vm::vec3 doGetMoveDirection(vm::direction direction) const override;
-
   size_t doGetFlipAxis(const vm::direction direction) const override;
-
   vm::vec3 doComputePointEntityPosition(const vm::bbox3& bounds) const override;
 
   ActionContext::Type doGetActionContext() const override;
-
   ActionView doGetActionView() const override;
-
   bool doCancel() override;
 
   Renderer::RenderMode doGetRenderMode() override;
-
   Renderer::Camera& doGetCamera() override;
-
   void doPreRender() override;
-
   void doRenderGrid(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
-
   void doRenderMap(
     Renderer::MapRenderer& renderer,
     Renderer::RenderContext& renderContext,
     Renderer::RenderBatch& renderBatch) override;
-
   void doRenderTools(
     MapViewToolBox& toolBox,
     Renderer::RenderContext& renderContext,
     Renderer::RenderBatch& renderBatch) override;
-
   void doRenderSoftWorldBounds(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
 

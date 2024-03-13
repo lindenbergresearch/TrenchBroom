@@ -22,7 +22,7 @@
 #include "FloatType.h"
 #include "View/VertexToolBase.h"
 
-#include <vm/segment.h>
+#include "vm/segment.h"
 
 #include <memory>
 #include <string>
@@ -33,7 +33,6 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushNode;
-
 class PickResult;
 } // namespace Model
 
@@ -66,7 +65,6 @@ public:
 
 public:
   EdgeHandleManager& handleManager() override;
-
   const EdgeHandleManager& handleManager() const override;
 
 public:

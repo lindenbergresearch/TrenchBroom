@@ -22,7 +22,6 @@
 #include <QWidget>
 
 class QKeySequence;
-
 class QAbstractButton;
 
 namespace TrenchBroom
@@ -42,21 +41,14 @@ private:
 
 public:
   explicit KeySequenceEdit(QWidget* parent = nullptr);
-
   explicit KeySequenceEdit(size_t maxCount, QWidget* parent = nullptr);
 
   const QKeySequence keySequence() const;
-
 public slots:
-
   void setKeySequence(const QKeySequence& keySequence);
-
   void clear();
-
 signals:
-
   void editingFinished();
-
   void keySequenceChanged(const QKeySequence& keySequence);
 };
 } // namespace View

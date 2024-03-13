@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
@@ -42,9 +42,7 @@ class TextAnchor
 {
 public:
   virtual ~TextAnchor();
-
   virtual vm::vec3f offset(const Camera& camera, const vm::vec2f& size) const = 0;
-
   virtual vm::vec3f position(const Camera& camera) const = 0;
 };
 
@@ -52,9 +50,7 @@ class TextAnchor3D : public TextAnchor
 {
 public:
   virtual ~TextAnchor3D() override;
-
   vm::vec3f offset(const Camera& camera, const vm::vec2f& size) const override;
-
   vm::vec3f position(const Camera& camera) const override;
 
 private:
@@ -62,9 +58,7 @@ private:
 
 private:
   virtual vm::vec3f basePosition() const = 0;
-
   virtual TextAlignment::Type alignment() const = 0;
-
   virtual vm::vec2f extraOffsets(TextAlignment::Type a) const;
 };
 
@@ -83,9 +77,7 @@ public:
 
 private:
   vm::vec3f basePosition() const override;
-
   TextAlignment::Type alignment() const override;
-
   vm::vec2f extraOffsets(TextAlignment::Type a) const override;
 };
 } // namespace Renderer

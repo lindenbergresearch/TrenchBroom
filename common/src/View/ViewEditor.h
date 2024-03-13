@@ -23,16 +23,13 @@
 
 #include "Model/TagType.h"
 #include "NotifierConnection.h"
-#include "View/SliderWithLabel.h"
 
 #include <filesystem>
 #include <memory>
 #include <vector>
 
 class QCheckBox;
-
 class QWidget;
-
 class QButtonGroup;
 
 namespace TrenchBroom
@@ -40,21 +37,18 @@ namespace TrenchBroom
 namespace Assets
 {
 class EntityDefinition;
-
 class EntityDefinitionManager;
 } // namespace Assets
 
 namespace Model
 {
 class EditorContext;
-
 class SmartTag;
 } // namespace Model
 
 namespace View
 {
 class MapDocument;
-
 class PopupButton;
 
 class EntityDefinitionCheckBoxList : public QWidget
@@ -76,20 +70,14 @@ public:
     QWidget* parent = nullptr);
 
   void refresh();
-
 private slots:
-
   void groupCheckBoxChanged(size_t groupIndex, bool checked);
-
   void defCheckBoxChanged(const Assets::EntityDefinition* definition, bool checked);
-
   void showAllClicked();
-
   void hideAllClicked();
 
 private:
   void hideAll(bool hidden);
-
   void createGui();
 };
 
@@ -117,25 +105,8 @@ private:
 
   QButtonGroup* m_renderModeRadioGroup;
   QCheckBox* m_shadeFacesCheckBox;
-  QCheckBox* m_showEdgesCheckBox;
-
   QCheckBox* m_showFogCheckBox;
-  QCheckBox* m_showAlternateFogCheckBox;
-  SliderWithLabel* m_fogScaleSlider;
-  SliderWithLabel* m_fogMaxAmountSlider;
-  SliderWithLabel* m_fogMinDistanceSlider;
-  SliderWithLabel* m_fogBiasSlider;
-
-  QCheckBox* m_selectionBoundsUseDashedBounds;
-  QCheckBox* m_selectionBoundsAlwaysShowOnSelected;
-  QCheckBox* m_selectionBoundsIntersectionMode;
-  QCheckBox* m_selectionBoundsShowObjectBounds;
-  SliderWithLabel* m_selectionBoundsDashSize;
-  SliderWithLabel* m_selectionBoundsWidth;
-  SliderWithLabel* m_selectionBoundsIntersectionSize;
-
-  SliderWithLabel* m_shadeAmount;
-  SliderWithLabel* m_brightnessSlider;
+  QCheckBox* m_showEdgesCheckBox;
 
   QButtonGroup* m_entityLinkRadioGroup;
 
@@ -149,103 +120,42 @@ public:
 private:
   void connectObservers();
 
-  void bindEvents();
-
-  void unBindEvents();
-
   void documentWasNewedOrLoaded(MapDocument* document);
-
   void editorContextDidChange();
-
   void entityDefinitionsDidChange();
-
   void preferenceDidChange(const std::filesystem::path& path);
 
   void createGui();
 
   QWidget* createEntityDefinitionsPanel(QWidget* parent);
-
   QWidget* createEntitiesPanel(QWidget* parent);
-
   QWidget* createBrushesPanel(QWidget* parent);
-
-  QWidget* createFogPanel(QWidget* parent);
-
-  QWidget* createSelectionBoundsPanel(QWidget* parent);
-
   void createTagFilter(QWidget* parent);
-
   void createEmptyTagFilter(QWidget* parent);
-
   void createTagFilter(QWidget* parent, const std::vector<Model::SmartTag>& tags);
 
   QWidget* createRendererPanel(QWidget* parent);
 
   void refreshGui();
-
   void refreshEntityDefinitionsPanel();
-
   void refreshEntitiesPanel();
-
   void refreshBrushesPanel();
-
   void refreshRendererPanel();
 
-  void refreshFogPanel();
-
-  void refreshSelectionBoundsPanel();
-
   void showEntityClassnamesChanged(bool checked);
-
   void showGroupBoundsChanged(bool checked);
-
   void showBrushEntityBoundsChanged(bool checked);
-
   void showPointEntityBoundsChanged(bool checked);
-
   void showPointEntitiesChanged(bool checked);
-
   void showPointEntityModelsChanged(bool checked);
-
   void showBrushesChanged(bool checked);
-
-  void showFogMinDistance(int value);
-
-  void showFogScale(int value);
-
-  void showFogBias(int value);
-
-  void showFogMaxAmount(int value);
-
-  void showFogType(bool checked);
-
   void showTagChanged(bool checked, Model::TagType::Type tagType);
-
   void faceRenderModeChanged(int id);
-
   void shadeFacesChanged(bool checked);
-
-  void brightnessChanged(int value);
-
-  void shadeLevelChanged(int value);
-
   void showFogChanged(bool checked);
-
-  void dashedBoundsChanged(bool checked);
-  void showObjectBoundsChanged(bool checked);
-  void showAlwaysShowBoundsChanged(bool checked);
-  void showIntersectionModeChanged(bool checked);
-
-  void dashSizeChanged(int value);
-  void selectionBoundsLineWithChanged(int value);
-  void intersectionMarkerSizeChanged(int value);
-
   void showEdgesChanged(bool checked);
-
   void entityLinkModeChanged(int id);
-
   void showSoftMapBoundsChanged(bool checked);
-
   void restoreDefaultsClicked();
 };
 

@@ -26,9 +26,7 @@
 #include <memory>
 
 class QSpinBox;
-
 class QWidget;
-
 class QAbstractButton;
 
 namespace TrenchBroom
@@ -36,11 +34,8 @@ namespace TrenchBroom
 namespace View
 {
 class Selection;
-
 class GLContextManager;
-
 class MapDocument;
-
 class UVView;
 
 class UVEditor : public QWidget
@@ -81,17 +76,11 @@ private:
   void connectObservers();
 
   void resetTextureClicked();
-
   void resetTextureToWorldClicked();
-
   void flipTextureHClicked();
-
   void flipTextureVClicked();
-
   void rotateTextureCCWClicked();
-
   void rotateTextureCWClicked();
-
   void subDivisionChanged();
 };
 } // namespace View

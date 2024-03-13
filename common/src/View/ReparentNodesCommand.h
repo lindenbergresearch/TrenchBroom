@@ -31,7 +31,6 @@ namespace TrenchBroom
 namespace Model
 {
 class GroupNode;
-
 class Node;
 } // namespace Model
 
@@ -54,7 +53,6 @@ public:
 
 private:
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-
   std::unique_ptr<CommandResult> doPerformUndo(
     MapDocumentCommandFacade* document) override;
 

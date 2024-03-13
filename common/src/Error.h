@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
 #include <string>
 
@@ -32,4 +32,5 @@ struct Error
 
   kdl_reflect_decl(Error, msg);
 };
+
 } // namespace TrenchBroom

@@ -68,4 +68,5 @@ std::string ParserException::buildMessage(const size_t line, const std::string& 
   }
   return msg.str();
 }
+
 } // namespace TrenchBroom

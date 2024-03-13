@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <QTabWidget>
 #include <QWidget>
 
 #include <memory>
@@ -29,33 +28,26 @@ namespace TrenchBroom
 namespace View
 {
 class FaceInspector;
-
 class EntityInspector;
-
 class GLContextManager;
-
 class MapDocument;
-
 class MapInspector;
-
 class MapViewBar;
-
 class SyncHeightEventFilter;
-
 class TabBook;
 
 enum class InspectorPage
 {
   Map = 0,
-  Face = 1,
-  Entity = 2
+  Entity = 1,
+  Face = 2
 };
 
 class Inspector : public QWidget
 {
   Q_OBJECT
 private:
-  QTabWidget* m_tabs;
+  TabBook* m_tabBook;
   MapInspector* m_mapInspector;
   EntityInspector* m_entityInspector;
   FaceInspector* m_faceInspector;
@@ -67,11 +59,8 @@ public:
     std::weak_ptr<MapDocument> document,
     GLContextManager& contextManager,
     QWidget* parent = nullptr);
-
   void connectTopWidgets(MapViewBar* mapViewBar);
-
   void switchToPage(InspectorPage page);
-
   bool cancelMouseDrag();
 
   FaceInspector* faceInspector();

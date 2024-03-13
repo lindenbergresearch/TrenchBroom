@@ -21,7 +21,7 @@
 
 #include <QKeyEvent>
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
 #include <chrono>
 #include <memory>
@@ -35,11 +35,8 @@ namespace TrenchBroom
 namespace View
 {
 class CancelEvent;
-
 class InputEventProcessor;
-
 class KeyEvent;
-
 class MouseEvent;
 
 /**
@@ -93,9 +90,10 @@ public:
     /**
      * A key was pressed.
      */
-    Down, /**
-           * A key was released.
-           */
+    Down,
+    /**
+     * A key was released.
+     */
     Up
   };
 
@@ -135,30 +133,38 @@ public:
     /**
      * A button was pressed.
      */
-    Down,        /**
-                  * A button was released.
-                  */
-    Up,          /**
-                  * A button was clicked.
-                  */
-    Click,       /**
-                  * A button was double clicked.
-                  */
-    DoubleClick, /**
-                  * The mouse was moved.
-                  */
-    Motion,      /**
-                  * The mouse wheel was scrolled.
-                  */
-    Scroll,      /**
-                  * A mouse drag was started.
-                  */
-    DragStart,   /**
-                  * The mouse was moved during a mouse drag.
-                  */
-    Drag,        /**
-                  * The mouse drag ended.
-                  */
+    Down,
+    /**
+     * A button was released.
+     */
+    Up,
+    /**
+     * A button was clicked.
+     */
+    Click,
+    /**
+     * A button was double clicked.
+     */
+    DoubleClick,
+    /**
+     * The mouse was moved.
+     */
+    Motion,
+    /**
+     * The mouse wheel was scrolled.
+     */
+    Scroll,
+    /**
+     * A mouse drag was started.
+     */
+    DragStart,
+    /**
+     * The mouse was moved during a mouse drag.
+     */
+    Drag,
+    /**
+     * The mouse drag ended.
+     */
     DragEnd
   };
   enum class Button
@@ -228,9 +234,7 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& lhs, const MouseEvent::Type& rhs);
-
 std::ostream& operator<<(std::ostream& lhs, const MouseEvent::Button& rhs);
-
 std::ostream& operator<<(std::ostream& lhs, const MouseEvent::WheelAxis& rhs);
 
 /**
@@ -276,7 +280,6 @@ public:
       m_eventQueue.push_back(std::move(event));
     }
   }
-
   /**
    * Process the events in this queue with the given event processor. The events are
    * forwarded to the processor in the order in which they were enqeued.

@@ -27,16 +27,13 @@ namespace TrenchBroom
 namespace Renderer
 {
 class DirectEdgeRenderer;
-
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace View
 {
 class DragTracker;
-
 class ExtrudeTool;
 
 class ExtrudeToolController : public ToolController
@@ -52,7 +49,6 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void pick(const InputState& inputState, Model::PickResult& pickResult) override;
@@ -74,7 +70,6 @@ private:
 
 private:
   virtual bool doHandleInput(const InputState& inputState) const = 0;
-
   virtual Model::Hit doPick(
     const vm::ray3& pickRay, const Model::PickResult& pickResult) = 0;
 };
@@ -87,7 +82,6 @@ public:
 private:
   Model::Hit doPick(
     const vm::ray3& pickRay, const Model::PickResult& pickResult) override;
-
   bool doHandleInput(const InputState& inputState) const override;
 };
 
@@ -99,7 +93,6 @@ public:
 private:
   Model::Hit doPick(
     const vm::ray3& pickRay, const Model::PickResult& pickResult) override;
-
   bool doHandleInput(const InputState& inputState) const override;
 };
 } // namespace View

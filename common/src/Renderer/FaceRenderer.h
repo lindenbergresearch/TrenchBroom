@@ -20,11 +20,10 @@
 #pragma once
 
 #include "Color.h"
-#include "Model/EditorContext.h"
 #include "Renderer/Renderable.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <memory>
 #include <unordered_map>
@@ -39,20 +38,8 @@ class Texture;
 namespace Renderer
 {
 class BrushIndexArray;
-
 class BrushVertexArray;
-
 class RenderBatch;
-
-struct PointLight
-{
-  vm::vec3f Intensity;
-  vm::vec3f Position;
-  float AttenuationConstant = 0.9f;
-  float AttenuationLinear = 0.75f;
-  float AttenuationQuadratic = 0.75f;
-};
-
 
 class FaceRenderer : public IndexedRenderable
 {
@@ -72,31 +59,24 @@ private:
 
 public:
   FaceRenderer();
-
   FaceRenderer(
     std::shared_ptr<BrushVertexArray> vertexArray,
     std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
     const Color& faceColor);
 
   FaceRenderer(const FaceRenderer& other);
-
   FaceRenderer& operator=(FaceRenderer other);
-
   friend void swap(FaceRenderer& left, FaceRenderer& right);
 
   void setGrayscale(bool grayscale);
-
   void setTint(bool tint);
-
   void setTintColor(const Color& color);
-
   void setAlpha(float alpha);
 
   void render(RenderBatch& renderBatch);
 
 private:
   void prepareVerticesAndIndices(VboManager& vboManager) override;
-
   void doRender(RenderContext& context) override;
 };
 

@@ -25,7 +25,6 @@
 #include <QSortFilterProxyModel>
 #include <QTableView>
 
-#include "TrenchBroomApp.h"
 #include "View/ColorModel.h"
 #include "View/QtUtils.h"
 
@@ -48,53 +47,39 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget* parent)
   m_table->setModel(m_proxy);
 
   m_table->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
+  m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
+  m_table->horizontalHeader()->resizeSection(0, 80);
   m_table->horizontalHeader()->setSectionResizeMode(
-    ColorModel::Columns::Value, QHeaderView::ResizeMode::Fixed);
-  m_table->horizontalHeader()->setSectionResizeMode(
-    ColorModel::Columns::Default, QHeaderView::ResizeMode::Fixed);
-  m_table->horizontalHeader()->setSectionResizeMode(
-    ColorModel::Columns::Context, QHeaderView::ResizeMode::ResizeToContents);
-  m_table->horizontalHeader()->setSectionResizeMode(
-    ColorModel::Columns::Path, QHeaderView::ResizeMode::Stretch);
-  m_table->horizontalHeader()->resizeSection(ColorModel::Columns::Value, 80);
-  m_table->horizontalHeader()->resizeSection(ColorModel::Columns::Default, 80);
+    1, QHeaderView::ResizeMode::ResizeToContents);
+  m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
 
   // Tighter than default vertical row height, without the overhead of autoresizing
   m_table->verticalHeader()->setDefaultSectionSize(
-    m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin);
+    m_table->fontMetrics().lineSpacing() + 2);
 
-  m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-  m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
-
-  m_table->setSortingEnabled(true);
-  m_table->sortByColumn(ColorModel::Columns::Context, Qt::AscendingOrder);
-  m_table->hideColumn(ColorModel::Columns::Index);
+  m_table->setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
 
   QLineEdit* searchBox = createSearchBox();
   makeSmall(searchBox);
 
-  auto* infoLabel = new QLabel(tr("Double-Click on a color to begin editing it."));
+  auto* infoLabel = new QLabel(tr("Double-click a color to begin editing it."));
   makeInfo(infoLabel);
-
-  m_table->setSortingEnabled(true);
-  m_table->sortByColumn(0);
 
   auto* infoAndSearchLayout = new QHBoxLayout();
   infoAndSearchLayout->setContentsMargins(
-    0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);
+    LayoutConstants::WideHMargin,
+    LayoutConstants::MediumVMargin,
+    LayoutConstants::MediumHMargin,
+    LayoutConstants::MediumVMargin);
   infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
   infoAndSearchLayout->addWidget(infoLabel, 1);
   infoAndSearchLayout->addWidget(searchBox);
 
   auto* layout = new QVBoxLayout();
-  layout->setContentsMargins(
-    LayoutConstants::WideHMargin,
-    LayoutConstants::WideHMargin,
-    LayoutConstants::WideHMargin,
-    LayoutConstants::WideHMargin);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
-  layout->addLayout(infoAndSearchLayout);
   layout->addWidget(m_table, 1);
+  layout->addLayout(infoAndSearchLayout);
   setLayout(layout);
 
   setMinimumSize(900, 550);

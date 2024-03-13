@@ -35,7 +35,6 @@ class Texture;
 namespace Renderer
 {
 class VboManager;
-
 class TextureRenderFunc;
 
 class TexturedRenderer
@@ -46,9 +45,7 @@ public:
   virtual bool empty() const = 0;
 
   virtual void prepare(VboManager& vboManager) = 0;
-
   virtual void render() = 0;
-
   virtual void render(TextureRenderFunc& func) = 0;
 };
 
@@ -60,23 +57,18 @@ private:
 
 public:
   TexturedIndexRangeRenderer();
-
   TexturedIndexRangeRenderer(
     const VertexArray& vertexArray, const TexturedIndexRangeMap& indexRange);
-
   TexturedIndexRangeRenderer(
     const VertexArray& vertexArray,
     const Assets::Texture* texture,
     const IndexRangeMap& indexRange);
-
   ~TexturedIndexRangeRenderer() override;
 
   bool empty() const override;
 
   void prepare(VboManager& vboManager) override;
-
   void render() override;
-
   void render(TextureRenderFunc& func) override;
 };
 
@@ -88,15 +80,12 @@ private:
 public:
   MultiTexturedIndexRangeRenderer(
     std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers);
-
   ~MultiTexturedIndexRangeRenderer() override;
 
   bool empty() const override;
 
   void prepare(VboManager& vboManager) override;
-
   void render() override;
-
   void render(TextureRenderFunc& func) override;
 };
 } // namespace Renderer

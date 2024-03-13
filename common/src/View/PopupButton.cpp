@@ -23,7 +23,6 @@
 #include <QToolButton>
 #include <QWindow>
 
-#include "IO/ResourceUtils.h"
 #include "View/PopupWindow.h"
 #include "View/QtUtils.h"
 
@@ -31,23 +30,17 @@ namespace TrenchBroom
 {
 namespace View
 {
-PopupButton::PopupButton(const QString& caption, QWidget* parent, const QIcon& icon)
+PopupButton::PopupButton(const QString& caption, QWidget* parent)
   : QWidget(parent)
 {
   m_button = new QToolButton();
   m_button->setText(caption);
   m_button->setCheckable(true);
-  m_button->setIconSize(QSize{12, 12});
-  makeSubTitle(m_button);
-  m_button->setObjectName("toolButton_borderless");
+
   m_window = new PopupWindow(this);
 
   auto* sizer = new QHBoxLayout();
-  sizer->setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowHMargin);
+  sizer->setContentsMargins(0, 0, 0, 0);
   sizer->addWidget(m_button);
   setLayout(sizer);
 
@@ -84,22 +77,6 @@ void PopupButton::buttonClicked(bool checked)
 void PopupButton::popupVisibilityChanged(bool visible)
 {
   m_button->setChecked(visible);
-  m_button->setIcon(visible ? checkedIcon : unCheckedIcon);
-}
-
-void PopupButton::setIcon(const std::string& iconName)
-{
-
-  checkedIcon = IO::loadSVGIcon(iconName + "_on.svg", 12);
-  unCheckedIcon = IO::loadSVGIcon(iconName + "_off.svg", 12);
-
-  if (!unCheckedIcon.isNull())
-  {
-    m_button->setIcon(unCheckedIcon);
-  }
-
-  m_button->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-  m_button->setLayoutDirection(Qt::RightToLeft);
 }
 } // namespace View
 } // namespace TrenchBroom

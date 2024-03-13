@@ -27,14 +27,12 @@
 #include "View/Grid.h"
 #include "View/Tool.h"
 
-#include <vm/distance.h>
-#include <vm/intersection.h>
-#include <vm/line.h>
-#include <vm/vec.h>
+#include "vm/distance.h"
+#include "vm/intersection.h"
+#include "vm/line.h"
+#include "vm/vec.h"
 
-namespace TrenchBroom
-{
-namespace View
+namespace TrenchBroom::View
 {
 ToolController::~ToolController() = default;
 
@@ -48,26 +46,26 @@ void ToolController::pick(const InputState&, Model::PickResult&) {}
 void ToolController::modifierKeyChange(const InputState&) {}
 
 void ToolController::mouseDown(const InputState&) {}
-
 void ToolController::mouseUp(const InputState&) {}
-
 bool ToolController::mouseClick(const InputState&)
 {
   return false;
 }
-
 bool ToolController::mouseDoubleClick(const InputState&)
 {
   return false;
 }
-
 void ToolController::mouseMove(const InputState&) {}
-
 void ToolController::mouseScroll(const InputState&) {}
 
 std::unique_ptr<DragTracker> ToolController::acceptMouseDrag(const InputState&)
 {
   return nullptr;
+}
+
+bool ToolController::shouldAcceptDrop(const InputState&, const std::string&) const
+{
+  return false;
 }
 
 void ToolController::setRenderOptions(const InputState&, Renderer::RenderContext&) const
@@ -96,7 +94,6 @@ std::unique_ptr<DropTracker> ToolController::acceptDrop(
 }
 
 ToolControllerGroup::ToolControllerGroup() = default;
-
 ToolControllerGroup::~ToolControllerGroup() = default;
 
 void ToolControllerGroup::addController(std::unique_ptr<ToolController> controller)
@@ -160,7 +157,7 @@ std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(
 std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(
   const InputState& inputState, const std::string& payload)
 {
-  if (!doShouldHandleDrop(inputState, payload))
+  if (!doShouldAcceptDrop(inputState, payload))
   {
     return nullptr;
   }
@@ -191,10 +188,9 @@ bool ToolControllerGroup::doShouldHandleMouseDrag(const InputState&) const
   return true;
 }
 
-bool ToolControllerGroup::doShouldHandleDrop(
-  const InputState&, const std::string& /* payload */) const
+bool ToolControllerGroup::doShouldAcceptDrop(
+  const InputState& inputState, const std::string& payload) const
 {
-  return true;
+  return m_chain.shouldAcceptDrop(inputState, payload);
 }
-} // namespace View
-} // namespace TrenchBroom
+} // namespace TrenchBroom::View

@@ -35,19 +35,19 @@
 #include "View/MapDocument.h"
 #include "View/TransactionScope.h"
 
-#include <kdl/map_utils.h>
-#include <kdl/memory_utils.h>
-#include <kdl/overload.h>
-#include <kdl/reflection_impl.h>
-#include <kdl/result.h>
-#include <kdl/result_fold.h>
-#include <kdl/string_utils.h>
-#include <kdl/vector_utils.h>
+#include "kdl/map_utils.h"
+#include "kdl/memory_utils.h"
+#include "kdl/overload.h"
+#include "kdl/reflection_impl.h"
+#include "kdl/result.h"
+#include "kdl/result_fold.h"
+#include "kdl/string_utils.h"
+#include "kdl/vector_utils.h"
 
-#include <vm/distance.h>
-#include <vm/line_io.h>
-#include <vm/plane_io.h>
-#include <vm/vec_io.h>
+#include "vm/distance.h"
+#include "vm/line_io.h"
+#include "vm/plane_io.h"
+#include "vm/vec_io.h"
 
 #include <limits>
 #include <map>
@@ -534,7 +534,7 @@ bool splitBrushesInward(
       // Look up the new face index of the new drag handle
       if (const auto newDragFaceIndex = newBrushNode->brush().findFace(clipFace.normal()))
       {
-        newDragFaces.push_back(Model::BrushFaceHandle(newBrushNode, *newDragFaceIndex));
+        newDragFaces.emplace_back(newBrushNode, *newDragFaceIndex);
       }
     }
   }
@@ -551,7 +551,7 @@ bool splitBrushesInward(
   // Add the newly split off brushes and select them (keeping the original brushes
   // selected).
   // FIXME: deal with linked group update failure (needed for #3647)
-  const auto addedNodes = document.addNodes(std::move(newNodes));
+  const auto addedNodes = document.addNodes(newNodes);
   document.selectNodes(addedNodes);
 
   dragState.currentDragFaces = std::move(newDragFaces);
@@ -689,4 +689,5 @@ void ExtrudeTool::selectionDidChange(const Selection&)
     m_proposedDragHandles.clear();
   }
 }
+
 } // namespace TrenchBroom::View

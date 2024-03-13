@@ -30,11 +30,9 @@ using GLIndices = std::vector<GLint>;
 using GLCounts = std::vector<GLsizei>;
 
 void glCheckError(const std::string& msg);
-
 std::string glGetErrorMessage(GLenum code);
 
 GLenum glGetEnum(const std::string& name);
-
 std::string glGetEnumName(GLenum _enum);
 
 // #define GL_DEBUG 1

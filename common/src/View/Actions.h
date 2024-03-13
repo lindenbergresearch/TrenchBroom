@@ -20,7 +20,6 @@
 #pragma once
 
 #include <QKeySequence>
-#include <QToolBar>
 
 #include "Ensure.h"
 #include "Macros.h"
@@ -48,9 +47,7 @@ class SmartTag;
 namespace View
 {
 class MapDocument;
-
 class MapFrame;
-
 class MapViewBase;
 
 class ActionExecutionContext
@@ -64,13 +61,9 @@ public:
   ActionExecutionContext(MapFrame* mapFrame, MapViewBase* mapView);
 
   bool hasDocument() const;
-
   bool hasActionContext(ActionContext::Type actionContext) const;
-
   MapFrame* frame();
-
   MapViewBase* view();
-
   MapDocument* document();
 };
 
@@ -92,31 +85,21 @@ public:
     const QKeySequence& defaultShortcut,
     const std::filesystem::path& iconPath,
     const QString& statusTip);
-
   virtual ~Action();
 
   const QString& label() const;
-
   const std::filesystem::path& preferencePath() const;
-
   ActionContext::Type actionContext() const;
-
   QKeySequence keySequence() const;
-
   void setKeySequence(const QKeySequence& keySequence) const;
-
   void resetKeySequence() const;
 
   virtual void execute(ActionExecutionContext& context) const = 0;
-
   virtual bool enabled(ActionExecutionContext& context) const = 0;
-
   virtual bool checkable() const = 0;
-
   virtual bool checked(ActionExecutionContext& context) const = 0;
 
   bool hasIcon() const;
-
   const std::filesystem::path& iconPath() const;
 
   const QString& statusTip() const;
@@ -185,9 +168,7 @@ public:
 };
 
 class Menu;
-
 class MenuSeparatorItem;
-
 class MenuActionItem;
 
 class MenuVisitor
@@ -196,9 +177,7 @@ public:
   virtual ~MenuVisitor();
 
   virtual void visit(const Menu& menu) = 0;
-
   virtual void visit(const MenuSeparatorItem& item) = 0;
-
   virtual void visit(const MenuActionItem& item) = 0;
 };
 
@@ -221,9 +200,7 @@ private:
 
 public:
   explicit MenuEntry(MenuEntryType entryType);
-
   virtual ~MenuEntry();
-
   virtual void accept(MenuVisitor& visitor) const = 0;
 
   MenuEntryType entryType() const;
@@ -235,7 +212,6 @@ class MenuSeparatorItem : public MenuEntry
 {
 public:
   MenuSeparatorItem();
-
   void accept(MenuVisitor& visitor) const override;
 
   deleteCopyAndMove(MenuSeparatorItem);
@@ -250,7 +226,6 @@ public:
   MenuActionItem(const Action* action, MenuEntryType entryType);
 
   const QString& label() const;
-
   const Action& action() const;
 
   void accept(MenuVisitor& visitor) const override;
@@ -271,14 +246,11 @@ public:
 
   Menu& addMenu(
     const std::string& name, MenuEntryType entryType = MenuEntryType::Menu_None);
-
   void addSeparator();
-
   MenuActionItem& addItem(
     const Action* action, MenuEntryType entryType = MenuEntryType::Menu_None);
 
   void accept(MenuVisitor& visitor) const override;
-
   void visitEntries(MenuVisitor& visitor) const;
 
   deleteCopyAndMove(Menu);
@@ -302,7 +274,7 @@ private:
   std::vector<std::unique_ptr<Menu>> m_mainMenu;
 
   /**
-   * The toolbars for the map editing window. Stored as a menu to allow for separators.
+   * The toolbar for the map editing window. Stored as a menu to allow for separators.
    * These will hold pointers to the actions in m_actions.
    */
   std::unique_ptr<Menu> m_toolBar;
@@ -320,7 +292,6 @@ public:
    */
   std::vector<std::unique_ptr<Action>> createTagActions(
     const std::vector<Model::SmartTag>& tags) const;
-
   /**
    * Note, unlike createAction(), these are not registered / owned by the ActionManager.
    */
@@ -328,46 +299,31 @@ public:
     const std::vector<Assets::EntityDefinition*>& entityDefinitions) const;
 
   void visitMainMenu(MenuVisitor& visitor) const;
-
   void visitToolBarActions(MenuVisitor& visitor) const;
-
-  void createRenderViewToolbar(QToolBar* toolBar);
-
   /**
    * Visits actions not used in the menu or toolbar.
    */
   void visitMapViewActions(const ActionVisitor& visitor) const;
-
   const std::map<std::filesystem::path, std::unique_ptr<Action>>& actionsMap() const;
 
   class ResetMenuVisitor;
-
   void resetAllKeySequences() const;
 
 private:
   void initialize();
-
   void createViewActions();
 
   void createMenu();
-
   void createFileMenu();
-
   void createEditMenu();
-
   void createViewMenu();
-
   void createRunMenu();
-
   void createDebugMenu();
-
   void createHelpMenu();
 
   Menu& createMainMenu(const std::string& name);
 
   void createToolbar();
-
-
   const Action* existingAction(const std::filesystem::path& preferencePath) const;
 
   template <class ExecuteFn, class EnabledFn>

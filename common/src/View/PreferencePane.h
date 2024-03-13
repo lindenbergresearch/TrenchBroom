@@ -29,15 +29,11 @@ class PreferencePane : public QWidget
 {
 public:
   explicit PreferencePane(QWidget* parent = nullptr);
-
   ~PreferencePane() override;
 
   bool canResetToDefaults();
-
   void resetToDefaults();
-
   void updateControls();
-
   /**
    * Returns whether the settings in the preference pane are valid to save.
    * If the aren't, it also displays an error dialog box asking the user to correct the
@@ -47,11 +43,8 @@ public:
 
 private:
   virtual bool doCanResetToDefaults() = 0;
-
   virtual void doResetToDefaults() = 0;
-
   virtual void doUpdateControls() = 0;
-
   virtual bool doValidate() = 0;
 };
 } // namespace View

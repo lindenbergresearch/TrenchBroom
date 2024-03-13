@@ -56,7 +56,6 @@ private:
     size_t count;
 
     IndexArrayRange(size_t i_offset, size_t i_capacity);
-
     size_t add(size_t count);
   };
 

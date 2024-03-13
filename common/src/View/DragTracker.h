@@ -24,7 +24,6 @@ namespace TrenchBroom
 namespace Renderer
 {
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 

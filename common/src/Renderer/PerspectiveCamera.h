@@ -21,7 +21,7 @@
 
 #include "Renderer/Camera.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 namespace TrenchBroom
 {
@@ -34,7 +34,6 @@ private:
 
 public:
   PerspectiveCamera();
-
   PerspectiveCamera(
     float fov,
     float nearPlane,
@@ -45,21 +44,16 @@ public:
     const vm::vec3f& up);
 
   float fov() const;
-
   float zoomedFov() const;
-
   void setFov(float fov);
 
 private:
   static float computeZoomedFov(float zoom, float fov);
-
   ProjectionType doGetProjectionType() const override;
 
   void doValidateMatrices(
     vm::mat4x4f& projectionMatrix, vm::mat4x4f& viewMatrix) const override;
-
   vm::ray3f doGetPickRay(const vm::vec3f& point) const override;
-
   void doComputeFrustumPlanes(
     vm::plane3f& topPlane,
     vm::plane3f& rightPlane,
@@ -71,19 +65,15 @@ private:
     VboManager& vboManager,
     float size,
     const Color& color) const override;
-
   float doPickFrustum(float size, const vm::ray3f& ray) const override;
 
   void getFrustumVertices(float size, vm::vec3f (&verts)[4]) const;
-
   vm::vec2f getFrustum() const;
 
   float doGetPerspectiveScalingFactor(const vm::vec3f& position) const override;
-
   float viewportFrustumDistance() const;
 
   bool isValidZoom(float zoom) const override;
-
   void doUpdateZoom() override;
 };
 } // namespace Renderer

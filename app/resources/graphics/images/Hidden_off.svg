@@ -1,7 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(0.77771,0,0,0.77771,0.999392,1.77832)">
-        <path d="M9,1C6.475,1 4.453,2.15 2.981,3.519C1.519,4.875 0.541,6.5 0.078,7.616C-0.025,7.863 -0.025,8.137 0.078,8.384C0.541,9.5 1.519,11.125 2.981,12.481C4.453,13.85 6.475,15 9,15C11.525,15 13.547,13.85 15.019,12.481C16.481,11.122 17.459,9.5 17.925,8.384C18.028,8.137 18.028,7.862 17.925,7.616C17.459,6.5 16.481,4.875 15.019,3.519C13.547,2.15 11.525,1 9,1ZM4.5,8C4.5,5.531 6.531,3.5 9,3.5C11.469,3.5 13.5,5.531 13.5,8C13.5,10.469 11.469,12.5 9,12.5C6.531,12.5 4.5,10.469 4.5,8ZM9,6C9,7.103 8.103,8 7,8C6.778,8 6.566,7.963 6.366,7.897C6.194,7.841 5.994,7.947 6,8.128C6.009,8.344 6.041,8.559 6.1,8.775C6.528,10.375 8.175,11.325 9.775,10.897C11.375,10.469 12.325,8.822 11.897,7.222C11.55,5.925 10.403,5.053 9.128,5C8.947,4.994 8.841,5.191 8.897,5.366C8.962,5.566 9,5.778 9,6Z" style="fill:white;fill-rule:nonzero;"/>
-    </g>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   x="0"
+   y="0"
+   width="16"
+   height="16"
+   viewBox="0, 0, 16, 16"
+   id="svg168"
+   sodipodi:docname="Hidden_off.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   inkscape:export-filename="/media/psf/Home/Documents/Code/TrenchBroom_qt/app/resources/graphics/images/Hidden_off.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
+  <metadata
+     id="metadata174">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs172" />
+  <sodipodi:namedview
+     inkscape:document-rotation="0"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2488"
+     inkscape:window-height="1373"
+     id="namedview170"
+     showgrid="true"
+     inkscape:zoom="48.083261"
+     inkscape:cx="10.055062"
+     inkscape:cy="6.9749608"
+     inkscape:window-x="72"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg168">
+    <inkscape:grid
+       id="grid834"
+       type="xygrid" />
+  </sodipodi:namedview>
+  <g
+     style="fill:#3f3f3f;fill-opacity:1"
+     id="Layer_1">
+    <path
+       style="fill:#3f3f3f;fill-opacity:1"
+       d="M4.5,13.5 L4.5,13.5"
+       fill-opacity="0"
+       stroke="#000000"
+       stroke-width="1"
+       id="path159" />
+    <path
+       style="fill:#3f3f3f;fill-opacity:1"
+       d="M12.5,5.5 L12.5,5.5"
+       fill-opacity="0"
+       stroke="#000000"
+       stroke-width="1"
+       id="path161" />
+    <path
+       style="fill:#3f3f3f;fill-opacity:1"
+       d="M 7.9792027,1.9826659 C 11.979203,1.9826659 15,7 15,8 15,9 12.020798,13.996537 8.0207972,13.996537 4.0207972,13.996537 1,9 1,8 1,7 3.9792027,1.9826659 7.9792027,1.9826659 Z m 0.041595,2.0190657 C 5.0207973,4.0017316 2,7 2,8 2,9 5,11.998268 8,11.998268 11,11.998268 14,9 14,8 14,7 11.020797,4.0017316 8.0207977,4.0017316 Z"
+       id="path163"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ssssssssss" />
+    <path
+       style="fill:#3f3f3f;fill-opacity:1;stroke-width:1"
+       d="M 7.9999997,11 C 6.3549468,11 5.0225284,9.6578875 5.0225284,8.0008659 c 0,-1.6570216 1.3324184,-2.9991343 2.9774713,-2.9991343 1.6450528,0 2.9774713,1.3421127 2.9774713,2.9991343 C 10.977471,9.6578875 9.6450525,11 7.9999997,11 Z"
+       id="path165"
+       inkscape:connector-curvature="0" />
+  </g>
 </svg>

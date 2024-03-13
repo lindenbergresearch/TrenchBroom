@@ -21,15 +21,11 @@
 
 #include <QDialog>
 
-#include <map>
 #include <memory>
 
 class QDialogButtonBox;
-
 class QStackedWidget;
-
 class QToolBar;
-
 class QWidget;
 
 namespace TrenchBroom
@@ -37,14 +33,13 @@ namespace TrenchBroom
 namespace View
 {
 class MapDocument;
-
 class PreferencePane;
 
 class PreferenceDialog : public QDialog
 {
   Q_OBJECT
 private:
-  enum PrefPane
+  typedef enum
   {
     PrefPane_First = 0,
     PrefPane_Games = 0,
@@ -52,19 +47,13 @@ private:
     PrefPane_Colors = 2,
     PrefPane_Mouse = 3,
     PrefPane_Keyboard = 4,
-    PrefPane_Advanced = 5,
-    PrefPane_Last = 6
-  };
-
-  static const QString WINDOW_TITLE;
-  static const QSize ICON_SIZE;
-  static const int ICON_WIDTH;
+    PrefPane_Last = 4
+  } PrefPane;
 
   std::shared_ptr<MapDocument> m_document;
   QToolBar* m_toolBar;
   QStackedWidget* m_stackedWidget;
   QDialogButtonBox* m_buttonBox;
-  std::map<QString, QAction*> m_toolButtonActions;
 
 public:
   explicit PreferenceDialog(
@@ -72,20 +61,13 @@ public:
 
 protected: // QWidget overrides
   void closeEvent(QCloseEvent* event) override;
-
   bool eventFilter(QObject* o, QEvent* e) override;
 
 private:
   void createGui();
-
   void switchToPane(PrefPane pane);
-
-  void highlightToolButton(QString buttonName, bool highlighted = true);
-
   PreferencePane* currentPane() const;
-
 private slots:
-
   void resetToDefaults();
 };
 } // namespace View

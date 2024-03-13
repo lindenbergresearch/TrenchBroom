@@ -33,13 +33,12 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-#include <kdl/set_temp.h>
-#include <kdl/string_compare.h>
+#include "kdl/set_temp.h"
+#include "kdl/string_compare.h"
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
+
 GameEngineProfileEditor::GameEngineProfileEditor(QWidget* parent)
   : QWidget{parent}
 {
@@ -137,9 +136,10 @@ bool GameEngineProfileEditor::isValidEnginePath(const QString& str) const
     const auto path = IO::pathFromQString(str);
     return IO::Disk::pathInfo(path) == IO::PathInfo::File
 #ifdef __APPLE__
-               || (IO::Disk::pathInfo(path) == IO::PathInfo::Directory && kdl::ci::str_is_equal(path.extension().string(), ".app"))
+           || (IO::Disk::pathInfo(path) == IO::PathInfo::Directory 
+           && kdl::ci::str_is_equal(path.extension().string(), ".app"))
 #endif
-            ;
+      ;
   }
   catch (...)
   {
@@ -172,5 +172,5 @@ void GameEngineProfileEditor::changePathClicked()
     updatePath(pathStr);
   }
 }
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

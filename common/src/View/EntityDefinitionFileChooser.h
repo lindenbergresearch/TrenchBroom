@@ -26,15 +26,12 @@
 #include <memory>
 
 class QPushButton;
-
 class QListWidget;
-
 class QLabel;
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
+
 class MapDocument;
 
 class SingleSelectionListWidget : public QListWidget
@@ -45,9 +42,7 @@ private:
 
 public:
   explicit SingleSelectionListWidget(QWidget* parent = nullptr);
-
   void setAllowDeselectAll(bool allow);
-
   bool allowDeselectAll() const;
 
 protected: // QAbstractItemView overrides
@@ -63,10 +58,10 @@ class EntityDefinitionFileChooser : public QWidget
 private:
   std::weak_ptr<MapDocument> m_document;
 
-  SingleSelectionListWidget* m_builtin;
-  QLabel* m_external;
-  QPushButton* m_chooseExternal;
-  QPushButton* m_reloadExternal;
+  SingleSelectionListWidget* m_builtin = nullptr;
+  QLabel* m_externalLabel = nullptr;
+  QPushButton* m_browseExternal = nullptr;
+  QPushButton* m_reloadExternal = nullptr;
 
   NotifierConnection m_notifierConnection;
 
@@ -76,24 +71,19 @@ public:
 
 private:
   void createGui();
-
   void bindEvents();
 
   void connectObservers();
 
   void documentWasNewed(MapDocument* document);
-
   void documentWasLoaded(MapDocument* document);
-
   void entityDefinitionsDidChange();
 
   void updateControls();
 
   void builtinSelectionChanged();
-
   void chooseExternalClicked();
-
   void reloadExternalClicked();
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

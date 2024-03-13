@@ -41,9 +41,7 @@ class MapRenderer;
 namespace TrenchBroom::View
 {
 class GLContextManager;
-
 class MapDocument;
-
 class MapViewToolBox;
 
 class CyclingMapView : public MapViewContainer, public CameraLinkableView
@@ -84,7 +82,6 @@ private:
     Renderer::MapRenderer& mapRenderer,
     GLContextManager& contextManager,
     int views);
-
   void addMapView(MapViewBase* mapView);
 
 private:
@@ -95,34 +92,22 @@ private: // implement ViewEffectsService interface
 
 private: // implement MapView interface
   bool doGetIsCurrent() const override;
-
   bool doCanSelectTall() override;
-
   void doSelectTall() override;
-
   void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) override;
-
   void doFocusCameraOnSelection(bool animate) override;
-
   void doMoveCameraToPosition(const vm::vec3f& position, bool animate) override;
-
   void doMoveCameraToCurrentTracePoint() override;
-
   bool doCanMaximizeCurrentView() const override;
-
   bool doCurrentViewMaximized() const override;
-
   void doToggleMaximizeCurrentView() override;
 
   bool doCancelMouseDrag() override;
-
   void doRefreshViews() override;
 
 private: // implement MapViewContainer interface
   void doInstallActivationTracker(MapViewActivationTracker& activationTracker) override;
-
   MapView* doGetCurrentMapView() const override;
-
   MapViewBase* doGetFirstMapViewBase() override;
 
 public:

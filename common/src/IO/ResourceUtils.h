@@ -23,30 +23,22 @@
 #include <memory>
 #include <string>
 
-#define DISABLE_RECOLORING_ICON
-
 class QIcon;
-
 class QPixmap;
 
 namespace TrenchBroom
 {
 class Logger;
+}
 
-namespace Assets
+namespace TrenchBroom::Assets
 {
 class Texture;
 }
 
-namespace IO
+namespace TrenchBroom::IO
 {
 class FileSystem;
-
-// Svg render oversampling for quality improvement
-static const int OverSampleFactor = 4;
-
-// icon blending
-static const float DefaultIconAlpha = 0.7f;
 
 /**
  * Loads a default texture file from the given file system. If the default texture cannot
@@ -57,13 +49,15 @@ static const float DefaultIconAlpha = 0.7f;
  * @return the default texture
  */
 Assets::Texture loadDefaultTexture(
-  const FileSystem& fs, const std::string& name, Logger& logger);
+  const FileSystem& fs, std::string name, Logger& logger);
 
 QPixmap loadPixmapResource(const std::filesystem::path& imagePath);
+
+QPixmap loadSVGPixmap(const std::filesystem::path& imagePath);
 
 /**
  * Loads an SVG image into a QIcon
  */
-QIcon loadSVGIcon(const std::filesystem::path& imagePath, int size);
-} // namespace IO
-} // namespace TrenchBroom
+QIcon loadSVGIcon(const std::filesystem::path& imagePath);
+
+} // namespace TrenchBroom::IO

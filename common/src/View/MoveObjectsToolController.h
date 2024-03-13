@@ -26,7 +26,6 @@ namespace TrenchBroom
 namespace View
 {
 class DragTracker;
-
 class MoveObjectsTool;
 
 class MoveObjectsToolController : public ToolController
@@ -36,12 +35,10 @@ private:
 
 public:
   MoveObjectsToolController(MoveObjectsTool& tool);
-
   virtual ~MoveObjectsToolController() override;
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;

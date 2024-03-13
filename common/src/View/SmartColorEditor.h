@@ -25,11 +25,8 @@
 #include <vector>
 
 class QColor;
-
 class QWidget;
-
 class QPushButton;
-
 class QRadioButton;
 
 namespace TrenchBroom
@@ -37,9 +34,7 @@ namespace TrenchBroom
 namespace View
 {
 class ColorButton;
-
 class ColorTable;
-
 class MapDocument;
 
 class SmartColorEditor : public SmartPropertyEditor
@@ -60,21 +55,16 @@ public:
 
 private:
   void createGui();
-
   void doUpdateVisual(const std::vector<Model::EntityNodeBase*>& nodes) override;
 
   void updateColorRange(const std::vector<Model::EntityNodeBase*>& nodes);
-
   void updateColorHistory();
 
   void setColor(const QColor& wxColor) const;
 
   void floatRangeRadioButtonClicked();
-
   void byteRangeRadioButtonClicked();
-
   void colorPickerChanged(const QColor& color);
-
   void colorTableSelected(QColor color);
 };
 } // namespace View

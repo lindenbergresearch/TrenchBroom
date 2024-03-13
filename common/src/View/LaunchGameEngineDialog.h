@@ -38,7 +38,6 @@ struct GameEngineProfile;
 namespace View
 {
 class GameEngineProfileListBox;
-
 class MultiCompletionLineEdit;
 
 /**
@@ -64,21 +63,13 @@ public:
 
 private:
   void createGui();
-
   void reloadConfig();
-
   LaunchGameEngineVariables variables() const;
-
 private slots:
-
   void gameEngineProfileChanged();
-
   void parametersChanged(const QString& text);
-
   void editGameEngines();
-
   void launchEngine();
-
 public slots: // QDialog overrides
   void done(int r) override;
 

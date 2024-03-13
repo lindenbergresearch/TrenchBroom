@@ -24,9 +24,7 @@
 #include <memory>
 
 class QAbstractButton;
-
 class QLineEdit;
-
 class QStackedWidget;
 
 namespace TrenchBroom
@@ -39,9 +37,7 @@ struct CompilationProfile;
 namespace View
 {
 class CompilationTaskListBox;
-
 class MapDocument;
-
 class MultiCompletionLineEdit;
 
 /**
@@ -70,25 +66,16 @@ private:
   QWidget* createEditorPage(QWidget* parent);
 
 private slots:
-
   void nameChanged(const QString& text);
-
   void workDirChanged(const QString& text);
 
   void addTask();
-
   void removeTask();
-
   void removeTask(int index);
-
   void duplicateTask(int index);
-
   void moveTaskUp();
-
   void moveTaskUp(int index);
-
   void moveTaskDown();
-
   void moveTaskDown(int index);
 
   void taskSelectionChanged();
@@ -98,9 +85,7 @@ public:
 
 private:
   void refresh();
-
 signals:
-
   /**
    * Emitted when the profile name/working directory change, or tasks are
    * added/removed/reordered.

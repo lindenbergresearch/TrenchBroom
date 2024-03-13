@@ -33,24 +33,22 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/TextAnchor.h"
 #include "Renderer/TextRenderer.h"
-#include "View/QtUtils.h"
 
-#include <vm/forward.h>
-#include <vm/polygon.h>
-#include <vm/segment.h>
-#include <vm/vec.h>
-#include <vm/vec_ext.h>
+#include "vm/forward.h"
+#include "vm/polygon.h"
+#include "vm/segment.h"
+#include "vm/vec.h"
+#include "vm/vec_ext.h"
 
 namespace TrenchBroom
 {
 namespace Renderer
 {
 Renderer::FontDescriptor makeRenderServiceFont();
-
 Renderer::FontDescriptor makeRenderServiceFont()
 {
   return Renderer::FontDescriptor(
-    pref(Preferences::RendererFontPath),
+    pref(Preferences::RendererFontPath()),
     static_cast<size_t>(pref(Preferences::RendererFontSize)));
 }
 
@@ -72,7 +70,7 @@ private:
   {
     const auto w = static_cast<float>(camera.viewport().width);
     const auto h = static_cast<float>(camera.viewport().height);
-    return vm::vec3f(w / 2.0f, h - 20.0f, 0.f);
+    return vm::vec3f(w / 2.0f, h - 20.0f, 0.0f);
   }
 };
 
@@ -253,13 +251,6 @@ void RenderService::renderLines(const std::vector<vm::vec3f>& positions)
     m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions);
 }
 
-void RenderService::renderDashedLines(
-  const std::vector<vm::vec3f>& positions, int factor, unsigned short pattern)
-{
-  m_primitiveRenderer->renderDashedLines(
-    m_foregroundColor, m_lineWidth, m_occlusionPolicy, positions, factor, pattern);
-}
-
 void RenderService::renderLineStrip(const std::vector<vm::vec3f>& positions)
 {
   m_primitiveRenderer->renderLineStrip(
@@ -268,11 +259,9 @@ void RenderService::renderLineStrip(const std::vector<vm::vec3f>& positions)
 
 void RenderService::renderCoordinateSystem(const vm::bbox3f& bounds)
 {
-  const Color& x = modifyAlpha(pref(Preferences::XAxisColor), 0.5f);
-  const Color& y = modifyAlpha(pref(Preferences::YAxisColor), 0.5f);
-  const Color& z = modifyAlpha(pref(Preferences::ZAxisColor), 0.5f);
-
-  m_lineWidth = 1.5f;
+  const Color& x = pref(Preferences::XAxisColor);
+  const Color& y = pref(Preferences::YAxisColor);
+  const Color& z = pref(Preferences::ZAxisColor);
 
   if (m_renderContext.render2D())
   {
@@ -350,17 +339,7 @@ void RenderService::renderBounds(const vm::bbox3f& bounds)
   positions.push_back(p7);
   positions.push_back(p8);
 
-  if (pref(Preferences::SelectionBoundsDashedLines))
-  {
-    renderDashedLines(
-      positions,
-      pref(Preferences::SelectionBoundsDashedSize),
-      (GLushort)pref(Preferences::SelectionBoundsPattern));
-  }
-  else
-  {
-    renderLines(positions);
-  }
+  renderLines(positions);
 }
 
 void RenderService::renderCircle(

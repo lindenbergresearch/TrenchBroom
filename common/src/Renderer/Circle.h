@@ -21,8 +21,8 @@
 
 #include "Renderer/VertexArray.h"
 
-#include <vm/forward.h>
-#include <vm/util.h>
+#include "vm/forward.h"
+#include "vm/util.h"
 
 namespace TrenchBroom
 {
@@ -36,9 +36,7 @@ private:
 
 public:
   Circle(float radius, size_t segments, bool filled);
-
   Circle(float radius, size_t segments, bool filled, float startAngle, float angleLength);
-
   Circle(
     float radius,
     size_t segments,
@@ -46,7 +44,6 @@ public:
     vm::axis::type axis,
     const vm::vec3f& startAxis,
     const vm::vec3f& endAxis);
-
   Circle(
     float radius,
     size_t segments,
@@ -56,9 +53,7 @@ public:
     float angleLength);
 
   bool prepared() const;
-
   void prepare(VboManager& vboManager);
-
   void render();
 
 private:
@@ -68,7 +63,6 @@ private:
     vm::axis::type axis,
     float startAngle,
     float angleLength);
-
   void init2D(float radius, size_t segments, float startAngle, float angleLength);
 };
 } // namespace Renderer

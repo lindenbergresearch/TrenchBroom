@@ -26,7 +26,6 @@
 #include <vector>
 
 class QModelIndex;
-
 class QVariant;
 
 namespace TrenchBroom
@@ -46,11 +45,9 @@ private:
 
 public:
   explicit VariableStoreModel(const EL::VariableStore& variables);
-
   ~VariableStoreModel() override;
 
   int rowCount(const QModelIndex& parent) const override;
-
   QVariant data(const QModelIndex& index, int role) const override;
 };
 } // namespace View

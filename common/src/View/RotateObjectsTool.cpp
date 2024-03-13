@@ -26,10 +26,10 @@
 #include "View/RotateObjectsToolPage.h"
 #include "View/TransactionScope.h"
 
-#include <kdl/memory_utils.h>
-#include <kdl/vector_utils.h>
+#include "kdl/memory_utils.h"
+#include "kdl/vector_utils.h"
 
-#include <vm/scalar.h>
+#include "vm/scalar.h"
 
 namespace TrenchBroom
 {
@@ -180,7 +180,6 @@ void RotateObjectsTool::renderHighlight2D(
 {
   m_handle.renderHighlight2D(renderContext, renderBatch, area);
 }
-
 void RotateObjectsTool::renderHighlight3D(
   Renderer::RenderContext& renderContext,
   Renderer::RenderBatch& renderBatch,

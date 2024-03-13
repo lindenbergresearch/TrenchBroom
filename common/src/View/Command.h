@@ -37,7 +37,6 @@ private:
 
 public:
   explicit CommandResult(bool success);
-
   virtual ~CommandResult();
 
   bool success() const;
@@ -60,12 +59,10 @@ protected:
 
 public:
   Command(std::string name);
-
   virtual ~Command();
 
 public:
   CommandState state() const;
-
   const std::string& name() const;
 
   virtual std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade* document);

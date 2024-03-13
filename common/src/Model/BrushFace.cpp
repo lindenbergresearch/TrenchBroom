@@ -131,19 +131,18 @@ Result<BrushFace> BrushFace::create(
 {
   return Model::isParallelTexCoordSystem(mapFormat)
            ? BrushFace::create(
-               point0,
-               point1,
-               point2,
-               attributes,
-               std::make_unique<ParallelTexCoordSystem>(
-                 point0, point1, point2, attributes))
+             point0,
+             point1,
+             point2,
+             attributes,
+             std::make_unique<ParallelTexCoordSystem>(point0, point1, point2, attributes))
            : BrushFace::create(
-               point0,
-               point1,
-               point2,
-               attributes,
-               std::make_unique<ParaxialTexCoordSystem>(
-                 point0, point1, point2, attributes));
+             point0,
+             point1,
+             point2,
+             attributes,
+             std::make_unique<ParaxialTexCoordSystem>(
+               point0, point1, point2, attributes));
 }
 
 Result<BrushFace> BrushFace::createFromStandard(

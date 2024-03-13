@@ -31,7 +31,7 @@
 #include "View/IssueBrowserView.h"
 #include "View/MapDocument.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
 namespace TrenchBroom
 {
@@ -133,10 +133,6 @@ void IssueBrowser::issueIgnoreChanged(Model::Issue*)
 
 void IssueBrowser::updateFilterFlags()
 {
-  // TODO: [27.10.23 21:57] => fix bug (crash on updating filter flags after migration to
-  // native tabs)
-  return;
-
   auto document = kdl::mem_lock(m_document);
   const Model::WorldNode* world = document->world();
   const auto validators = world->registeredValidators();

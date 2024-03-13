@@ -26,9 +26,7 @@
 #include <vector>
 
 class QCheckBox;
-
 class QStackedLayout;
-
 class QWidget;
 
 namespace TrenchBroom
@@ -36,18 +34,14 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushFaceHandle;
-
 class Issue;
-
 class Node;
 } // namespace Model
 
 namespace View
 {
 class FlagsPopupEditor;
-
 class IssueBrowserView;
-
 class MapDocument;
 
 class IssueBrowser : public TabBookPage
@@ -73,25 +67,17 @@ public:
 
 private:
   void connectObservers();
-
   void documentWasNewedOrLoaded(MapDocument* document);
-
   void documentWasSaved(MapDocument* document);
-
   void nodesWereAdded(const std::vector<Model::Node*>& nodes);
-
   void nodesWereRemoved(const std::vector<Model::Node*>& nodes);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& faces);
-
   void issueIgnoreChanged(Model::Issue* issue);
 
   void updateFilterFlags();
 
   void showHiddenIssuesChanged();
-
   void filterChanged(size_t index, int value, int setFlag, int mixedFlag);
 };
 } // namespace View

@@ -108,6 +108,7 @@ std::string getInfoLog(const GLuint shaderId)
 
   return "Unknown error";
 }
+
 } // namespace
 
 Result<Shader> loadShader(const std::filesystem::path& path, const GLenum type)
@@ -140,4 +141,5 @@ Result<Shader> loadShader(const std::filesystem::path& path, const GLenum type)
     return Shader{std::move(name), type, shaderId};
   });
 }
+
 } // namespace TrenchBroom::Renderer

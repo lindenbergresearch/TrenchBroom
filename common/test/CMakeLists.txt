@@ -4,13 +4,16 @@ set(COMMON_TEST_UTILS_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/Assets/EntityDefinitionTestUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Assets/EntityDefinitionTestUtils.h"
         "${COMMON_TEST_SOURCE_DIR}/Catch2.h"
+        "${COMMON_TEST_SOURCE_DIR}/CatchUtils/Matchers.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/CatchUtils/Matchers.h"
+        "${COMMON_TEST_SOURCE_DIR}/CatchUtils/StringMakers.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/CatchUtils/StringMakers.h"
         "${COMMON_TEST_SOURCE_DIR}/IO/TestEnvironment.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/TestEnvironment.h"
         "${COMMON_TEST_SOURCE_DIR}/IO/TestFileSystem.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/TestFileSystem.h"
         "${COMMON_TEST_SOURCE_DIR}/IO/TestParserStatus.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/TestParserStatus.h"
-        "${COMMON_TEST_SOURCE_DIR}/Matchers.h"
         "${COMMON_TEST_SOURCE_DIR}/QtPrettyPrinters.h"
         "${COMMON_TEST_SOURCE_DIR}/RunAllTests.cpp"
         "${COMMON_TEST_SOURCE_DIR}/TestLogger.cpp"
@@ -22,8 +25,12 @@ set(COMMON_TEST_UTILS_SOURCE
 
 set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/Assets/tst_AssetUtils.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/Assets/tst_DecalDefinition.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Assets/tst_EntityModel.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Assets/tst_ModelDefinition.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/Assets/tst_Palette.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/CatchUtils/tst_Matchers.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/CatchUtils/tst_StringMakers.cpp"
         "${COMMON_TEST_SOURCE_DIR}/EL/tst_EL.cpp"
         "${COMMON_TEST_SOURCE_DIR}/EL/tst_Expression.cpp"
         "${COMMON_TEST_SOURCE_DIR}/EL/tst_Interpolator.cpp"
@@ -57,6 +64,7 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_ReadQuake3ShaderTexture.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_ReadWalTexture.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_ResourceUtils.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/IO/tst_SystemPaths.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_TestFileSystem.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_TextureUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_Tokenizer.cpp"
@@ -81,9 +89,11 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_GroupNode.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_Issue.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_LayerNode.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/Model/tst_LinkedGroupUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_ModelUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_Node.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_NodeCollection.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/Model/tst_NodeQueries.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_PatchNode.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_PointTrace.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Model/tst_Polyhedron.cpp"
@@ -104,6 +114,7 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/View/tst_AddNodes.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_Autosaver.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_ChangeBrushFaceAttributes.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/View/tst_ClipTool.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_ClipToolController.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_CommandProcessor.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_CompilationRunner.cpp"
@@ -178,46 +189,11 @@ macro(configure_test_target TARGET)
     # By default VS launches with a CWD one level up from the .exe (which is in a "Debug" subdirectory)
     # but we copy resources into the .exe's directory, and the tests expect the CWD to be the .exe's directory.
     set_target_properties(${TARGET} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET}>")
-
-    set(TEST_RESOURCE_DEST_DIR "$<TARGET_FILE_DIR:${TARGET}>")
-    set(TEST_FIXTURE_DEST_DIR "${TEST_RESOURCE_DEST_DIR}/fixture")
-
-    if (WIN32)
-        # Copy DLLs to app directory
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:assimp::assimp>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freeimage::FreeImage>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freetype>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:tinyxml2::tinyxml2>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:miniz::miniz>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fmt::fmt>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:GLEW::GLEW>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Test>" "$<TARGET_FILE_DIR:${TARGET}>"
-                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET}>/platforms"
-                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET}>/styles"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${TARGET}>/platforms"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${TARGET}>/styles")
-    endif ()
-
-    # Copy some resource files required when initializing TrenchBroomApp
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/graphics/images" "${TEST_RESOURCE_DEST_DIR}/images")
-
-    # Copy fixtures
-    add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E rm -rf "${TEST_FIXTURE_DEST_DIR}"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${TEST_FIXTURE_SOURCE_DIR}" "${TEST_FIXTURE_DEST_DIR}/test"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games" "${TEST_FIXTURE_DEST_DIR}/games"
-            COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games-testing" "${TEST_FIXTURE_DEST_DIR}/games")
 endmacro()
 
 file(GENERATE
-        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/ReturnExitCode.h"
-        CONTENT "#define RETURN_EXITCODE_PATH \"$<TARGET_FILE:return-exitcode>\"")
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/ReturnExitCode.h"
+  CONTENT "#define RETURN_EXITCODE_PATH \"$<TARGET_FILE:return-exitcode>\"")
 
 add_executable(common-test ${COMMON_TEST_SOURCE})
 target_include_directories(common-test PRIVATE ${COMMON_TEST_SOURCE_DIR})
@@ -228,3 +204,40 @@ add_dependencies(common-test return-exitcode)
 add_executable(common-regression-test ${COMMON_REGRESSION_TEST_SOURCE})
 target_include_directories(common-regression-test PRIVATE ${COMMON_TEST_SOURCE_DIR})
 configure_test_target(common-regression-test)
+
+# Copy shared resources for the test executables
+# We only need to do this once and not for both targets
+set(TEST_RESOURCE_DEST_DIR "$<TARGET_FILE_DIR:common-test>")
+set(TEST_FIXTURE_DEST_DIR "${TEST_RESOURCE_DEST_DIR}/fixture")
+
+if(WIN32)
+    # Copy DLLs to app directory
+    add_custom_command(TARGET common-test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:assimp::assimp>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freeimage::FreeImage>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freetype>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:tinyxml2::tinyxml2>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:miniz::miniz>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fmt::fmt>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:GLEW::GLEW>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Test>" "${TEST_RESOURCE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory    "${TEST_RESOURCE_DEST_DIR}/platforms"
+        COMMAND ${CMAKE_COMMAND} -E make_directory    "${TEST_RESOURCE_DEST_DIR}/styles"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "${TEST_RESOURCE_DEST_DIR}/platforms"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "${TEST_RESOURCE_DEST_DIR}/styles")
+endif()
+
+# Copy some resource files required when initializing TrenchBroomApp
+add_custom_command(TARGET common-test POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/graphics/images" "${TEST_RESOURCE_DEST_DIR}/images")
+
+# Copy fixtures
+add_custom_command(TARGET common-test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${TEST_FIXTURE_DEST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${TEST_FIXTURE_SOURCE_DIR}" "${TEST_FIXTURE_DEST_DIR}/test"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games" "${TEST_FIXTURE_DEST_DIR}/games"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games-testing" "${TEST_FIXTURE_DEST_DIR}/games")

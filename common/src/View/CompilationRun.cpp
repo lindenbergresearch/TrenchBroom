@@ -132,4 +132,5 @@ void CompilationRun::cleanup()
     m_currentRun = nullptr;
   }
 }
+
 } // namespace TrenchBroom::View

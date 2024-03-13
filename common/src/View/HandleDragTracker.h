@@ -25,10 +25,10 @@
 #include "View/DragTracker.h"
 #include "View/InputState.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <functional>
 #include <memory>
@@ -91,10 +91,11 @@ struct UpdateDragConfig
 enum class DragStatus
 {
   /** The drag should continue. */
-  Continue, /** The drag should continue, but the current event could not be applied to
-             * the object being dragged. The current handle position is not updated in
-             * this case. */
-  Deny,     /** The drag should be cancelled. */
+  Continue,
+  /** The drag should continue, but the current event could not be applied to the object
+   * being dragged. The current handle position is not updated in this case. */
+  Deny,
+  /** The drag should be cancelled. */
   End
 };
 

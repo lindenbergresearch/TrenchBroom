@@ -22,9 +22,7 @@
 #include "View/PreferencePane.h"
 
 class QWidget;
-
 class QTableView;
-
 class QSortFilterProxyModel;
 
 namespace TrenchBroom
@@ -32,7 +30,6 @@ namespace TrenchBroom
 namespace View
 {
 class KeyboardShortcutModel;
-
 class MapDocument;
 
 class KeyboardPreferencePane : public PreferencePane
@@ -48,11 +45,8 @@ public:
 
 private:
   bool doCanResetToDefaults() override;
-
   void doResetToDefaults() override;
-
   void doUpdateControls() override;
-
   bool doValidate() override;
 };
 } // namespace View

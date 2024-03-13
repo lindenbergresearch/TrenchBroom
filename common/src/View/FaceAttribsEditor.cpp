@@ -45,12 +45,12 @@
 #include "View/ViewConstants.h"
 #include "View/ViewUtils.h"
 
-#include <kdl/memory_utils.h>
-#include <kdl/string_format.h>
-#include <kdl/string_utils.h>
+#include "kdl/memory_utils.h"
+#include "kdl/string_format.h"
+#include "kdl/string_utils.h"
 
-#include <vm/vec.h>
-#include <vm/vec_io.h>
+#include "vm/vec.h"
+#include "vm/vec_io.h"
 
 #include <memory>
 #include <string>
@@ -345,6 +345,7 @@ void FaceAttribsEditor::createGui(GLContextManager& contextManager)
   auto* textureNameLabel = new QLabel{"Texture"};
   makeEmphasized(textureNameLabel);
   m_textureName = new QLabel{"none"};
+  m_textureName->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
   auto* textureSizeLabel = new QLabel{"Size"};
   makeEmphasized(textureSizeLabel);

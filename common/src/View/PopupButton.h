@@ -35,19 +35,14 @@ class PopupButton : public QWidget
 private:
   QToolButton* m_button;
   PopupWindow* m_window;
-  QIcon checkedIcon, unCheckedIcon;
 
 public:
-  explicit PopupButton(
-    const QString& caption = "", QWidget* parent = nullptr, const QIcon& icon = QIcon{});
+  explicit PopupButton(const QString& caption = "", QWidget* parent = nullptr);
 
   QWidget* GetPopupWindow() const;
 
-  void setIcon(const std::string& iconName);
-
 private:
   void buttonClicked(bool checked);
-
   void popupVisibilityChanged(bool visible);
 };
 } // namespace View

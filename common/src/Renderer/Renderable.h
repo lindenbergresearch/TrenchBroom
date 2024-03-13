@@ -26,14 +26,12 @@ namespace TrenchBroom
 namespace Renderer
 {
 class RenderContext;
-
 class VboManager;
 
 class Renderable
 {
 public:
   Renderable() = default;
-
   virtual ~Renderable() = default;
 
   void render(RenderContext& renderContext);
@@ -48,7 +46,6 @@ class DirectRenderable : public Renderable
 {
 public:
   DirectRenderable() = default;
-
   ~DirectRenderable() override = default;
 
   void prepareVertices(VboManager& vboManager);
@@ -63,7 +60,6 @@ class IndexedRenderable : public Renderable
 {
 public:
   IndexedRenderable() = default;
-
   ~IndexedRenderable() override = default;
 
   virtual void prepareVerticesAndIndices(VboManager& vboManager) = 0;

@@ -22,7 +22,7 @@
 #include "View/SwapNodeContentsCommand.h"
 #include "View/VertexTool.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
 namespace TrenchBroom
 {
@@ -77,27 +77,22 @@ void BrushVertexCommandBase::selectNewHandlePositions(
   VertexHandleManagerBaseT<vm::vec3>&) const
 {
 }
-
 void BrushVertexCommandBase::selectOldHandlePositions(
   VertexHandleManagerBaseT<vm::vec3>&) const
 {
 }
-
 void BrushVertexCommandBase::selectNewHandlePositions(
   VertexHandleManagerBaseT<vm::segment3>&) const
 {
 }
-
 void BrushVertexCommandBase::selectOldHandlePositions(
   VertexHandleManagerBaseT<vm::segment3>&) const
 {
 }
-
 void BrushVertexCommandBase::selectNewHandlePositions(
   VertexHandleManagerBaseT<vm::polygon3>&) const
 {
 }
-
 void BrushVertexCommandBase::selectOldHandlePositions(
   VertexHandleManagerBaseT<vm::polygon3>&) const
 {

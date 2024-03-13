@@ -50,12 +50,10 @@ public:
   static std::unique_ptr<DuplicateNodesCommand> duplicate();
 
   DuplicateNodesCommand();
-
   ~DuplicateNodesCommand() override;
 
 private:
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-
   std::unique_ptr<CommandResult> doPerformUndo(
     MapDocumentCommandFacade* document) override;
 

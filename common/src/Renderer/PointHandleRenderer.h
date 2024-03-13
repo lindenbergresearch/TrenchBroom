@@ -23,7 +23,7 @@
 #include "Renderer/Circle.h"
 #include "Renderer/Renderable.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <map>
 
@@ -32,9 +32,7 @@ namespace TrenchBroom
 namespace Renderer
 {
 class ActiveShader;
-
 class RenderContext;
-
 class VboManager;
 
 class PointHandleRenderer : public DirectRenderable
@@ -52,14 +50,11 @@ public:
   PointHandleRenderer();
 
   void addPoint(const Color& color, const vm::vec3f& position);
-
   void addHighlight(const Color& color, const vm::vec3f& position);
 
 private:
   void doPrepareVertices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
-
   void renderHandles(
     RenderContext& renderContext, const HandleMap& map, Circle& circle, float opacity);
 

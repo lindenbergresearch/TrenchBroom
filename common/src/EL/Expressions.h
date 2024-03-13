@@ -38,29 +38,20 @@ public:
   virtual ~ExpressionImpl();
 
   virtual Value evaluate(const EvaluationContext& context) const = 0;
-
   virtual std::unique_ptr<ExpressionImpl> optimize() const = 0;
 
   virtual size_t precedence() const;
 
   virtual bool operator==(const ExpressionImpl& rhs) const = 0;
-
   bool operator!=(const ExpressionImpl& rhs) const;
 
   virtual bool operator==(const LiteralExpression& rhs) const;
-
   virtual bool operator==(const VariableExpression& rhs) const;
-
   virtual bool operator==(const ArrayExpression& rhs) const;
-
   virtual bool operator==(const MapExpression& rhs) const;
-
   virtual bool operator==(const UnaryExpression& rhs) const;
-
   virtual bool operator==(const BinaryExpression& rhs) const;
-
   virtual bool operator==(const SubscriptExpression& rhs) const;
-
   virtual bool operator==(const SwitchExpression& rhs) const;
 
   friend std::ostream& operator<<(std::ostream& lhs, const ExpressionImpl& rhs);
@@ -78,11 +69,9 @@ public:
   LiteralExpression(Value value);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const LiteralExpression& rhs) const override;
 
 private:
@@ -98,11 +87,9 @@ public:
   VariableExpression(std::string variableName);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const VariableExpression& rhs) const override;
 
 private:
@@ -118,11 +105,9 @@ public:
   ArrayExpression(std::vector<Expression> elements);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const ArrayExpression& rhs) const override;
 
 private:
@@ -138,11 +123,9 @@ public:
   MapExpression(std::map<std::string, Expression> elements);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const MapExpression& rhs) const override;
 
 private:
@@ -168,11 +151,9 @@ public:
   UnaryExpression(UnaryOperator i_operator, Expression operand);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const UnaryExpression& rhs) const override;
 
 private:
@@ -216,21 +197,17 @@ private:
 public:
   BinaryExpression(
     BinaryOperator i_operator, Expression leftOperand, Expression rightOperand);
-
   static Expression createAutoRangeWithRightOperand(
     Expression rightOperand, size_t line, size_t column);
-
   static Expression createAutoRangeWithLeftOperand(
     Expression leftOperand, size_t line, size_t column);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   size_t precedence() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const BinaryExpression& rhs) const override;
 
 private:
@@ -250,11 +227,9 @@ public:
   SubscriptExpression(Expression leftOperand, Expression rightOperand);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const SubscriptExpression& rhs) const override;
 
 private:
@@ -270,11 +245,9 @@ public:
   SwitchExpression(std::vector<Expression> cases);
 
   Value evaluate(const EvaluationContext& context) const override;
-
   std::unique_ptr<ExpressionImpl> optimize() const override;
 
   bool operator==(const ExpressionImpl& rhs) const override;
-
   bool operator==(const SwitchExpression& rhs) const override;
 
 private:

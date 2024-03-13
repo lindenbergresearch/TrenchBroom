@@ -22,8 +22,8 @@
 #include "EL/ELExceptions.h"
 #include "EL/Value.h"
 
-#include <kdl/map_utils.h>
-#include <kdl/string_utils.h>
+#include "kdl/map_utils.h"
+#include "kdl/string_utils.h"
 
 #include <algorithm>
 #include <ostream>
@@ -153,7 +153,6 @@ std::vector<std::string> NullVariableStore::names() const
 void NullVariableStore::declare(const std::string& /* name */, const Value& /* value */)
 {
 }
-
 void NullVariableStore::assign(const std::string& /* name */, const Value& /* value */) {}
 } // namespace EL
 } // namespace TrenchBroom

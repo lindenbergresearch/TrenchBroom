@@ -24,11 +24,11 @@
 #include "Renderer/Shader.h"
 #include "Renderer/ShaderManager.h"
 
-#include <kdl/result.h>
+#include "kdl/result.h"
 
-#include <vm/forward.h>
-#include <vm/mat.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/mat.h"
+#include "vm/vec.h"
 
 #include <memory>
 #include <sstream>
@@ -248,4 +248,5 @@ Result<ShaderProgram> createShaderProgram(std::string name)
 
   return ShaderProgram{std::move(name), programId};
 }
+
 } // namespace TrenchBroom::Renderer

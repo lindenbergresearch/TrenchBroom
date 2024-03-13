@@ -38,19 +38,14 @@ private:
 
 public:
   FontTexture();
-
   FontTexture(size_t cellCount, size_t cellSize, size_t margin);
-
   FontTexture(const FontTexture& other);
-
   FontTexture& operator=(FontTexture other);
-
   ~FontTexture();
 
   size_t size() const;
 
   void activate();
-
   void deactivate();
 
 private:

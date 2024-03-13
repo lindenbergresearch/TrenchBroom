@@ -34,7 +34,6 @@ TabBookPage::TabBookPage(QWidget* parent)
   : QWidget(parent)
 {
 }
-
 TabBookPage::~TabBookPage() {}
 
 QWidget* TabBookPage::createTabBarPage(QWidget* parent)

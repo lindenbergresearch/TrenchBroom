@@ -39,29 +39,28 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(
   , m_subtitleLabel(nullptr)
   , m_imageLabel(nullptr)
 {
-  m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
+  m_titleLabel = new ElidedLabel(title, Qt::ElideRight);
   makeEmphasized(m_titleLabel);
-  m_titleLabel->setStyleSheet("color: palette(BrightText);");
 
   m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
-  makeSubTitle(m_subtitleLabel);
+  makeInfo(m_subtitleLabel);
 
   auto* imageAndTextLayout = new QHBoxLayout();
   imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
-  imageAndTextLayout->setSpacing(0);
+  imageAndTextLayout->setSpacing(LayoutConstants::MediumHMargin);
+  setLayout(imageAndTextLayout);
 
-  m_imageLabel = new QLabel();
+  m_imageLabel = new QLabel(this);
   imageAndTextLayout->addWidget(m_imageLabel);
   m_imageLabel->setPixmap(image);
 
   auto* textLayout = new QVBoxLayout();
-  textLayout->setContentsMargins(LayoutConstants::NarrowVMargin, 0, 0, 0);
+  textLayout->setContentsMargins(0, 0, 0, 0);
   textLayout->setSpacing(0);
   textLayout->addWidget(m_titleLabel);
   textLayout->addWidget(m_subtitleLabel);
 
-  imageAndTextLayout->addLayout(textLayout);
-  setLayout(imageAndTextLayout);
+  imageAndTextLayout->addLayout(textLayout, 1);
 }
 
 void ImageListBoxItemRenderer::updateItem()
@@ -82,7 +81,7 @@ void ImageListBoxItemRenderer::updateItem()
 }
 
 ImageListBox::ImageListBox(const QString& emptyText, bool showSeparator, QWidget* parent)
-  : ControlListBox(emptyText, false, parent)
+  : ControlListBox(emptyText, showSeparator, parent)
 {
 }
 

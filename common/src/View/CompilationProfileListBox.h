@@ -46,7 +46,6 @@ private:
 public:
   explicit CompilationProfileItemRenderer(
     Model::CompilationProfile& profile, QWidget* parent = nullptr);
-
   ~CompilationProfileItemRenderer() override;
 
 private:
@@ -65,16 +64,12 @@ public:
 
 public:
   void reloadProfiles();
-
   void updateProfiles();
 
 private:
   size_t itemCount() const override;
-
   ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
-
 signals:
-
   void profileContextMenuRequested(
     const QPoint& globalPos, Model::CompilationProfile& profile);
 };

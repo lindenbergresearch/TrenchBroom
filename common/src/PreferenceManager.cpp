@@ -27,11 +27,9 @@
 #include <QLockFile>
 #include <QMessageBox>
 #include <QSaveFile>
-
 #if defined(Q_OS_WIN)
 #include <QSettings>
 #endif
-
 #include <QStandardPaths>
 #include <QStringBuilder>
 #include <QTimer>

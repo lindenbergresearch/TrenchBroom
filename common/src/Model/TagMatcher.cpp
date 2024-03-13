@@ -347,17 +347,16 @@ void FlagsTagMatcher::appendToStream(std::ostream& str) const
 
 ContentFlagsTagMatcher::ContentFlagsTagMatcher(const int i_flags)
   : FlagsTagMatcher(
-      i_flags,
-      [](const BrushFace& face) { return face.resolvedSurfaceContents(); },
-      [](ChangeBrushFaceAttributesRequest& request, const int flags) {
-        request.setContentFlags(flags);
-      },
-      [](ChangeBrushFaceAttributesRequest& request, const int flags) {
-        request.unsetContentFlags(flags);
-      },
-      [](const Game& game, const int flags) {
-        return game.contentFlags().flagNames(flags);
-      })
+    i_flags,
+    [](const BrushFace& face) { return face.resolvedSurfaceContents(); },
+    [](ChangeBrushFaceAttributesRequest& request, const int flags) {
+      request.setContentFlags(flags);
+    },
+    [](ChangeBrushFaceAttributesRequest& request, const int flags) {
+      request.unsetContentFlags(flags);
+    },
+    [](
+      const Game& game, const int flags) { return game.contentFlags().flagNames(flags); })
 {
 }
 
@@ -368,17 +367,16 @@ std::unique_ptr<TagMatcher> ContentFlagsTagMatcher::clone() const
 
 SurfaceFlagsTagMatcher::SurfaceFlagsTagMatcher(const int i_flags)
   : FlagsTagMatcher(
-      i_flags,
-      [](const BrushFace& face) { return face.resolvedSurfaceFlags(); },
-      [](ChangeBrushFaceAttributesRequest& request, const int flags) {
-        request.setSurfaceFlags(flags);
-      },
-      [](ChangeBrushFaceAttributesRequest& request, const int flags) {
-        request.unsetSurfaceFlags(flags);
-      },
-      [](const Game& game, const int flags) {
-        return game.surfaceFlags().flagNames(flags);
-      })
+    i_flags,
+    [](const BrushFace& face) { return face.resolvedSurfaceFlags(); },
+    [](ChangeBrushFaceAttributesRequest& request, const int flags) {
+      request.setSurfaceFlags(flags);
+    },
+    [](ChangeBrushFaceAttributesRequest& request, const int flags) {
+      request.unsetSurfaceFlags(flags);
+    },
+    [](
+      const Game& game, const int flags) { return game.surfaceFlags().flagNames(flags); })
 {
 }
 

@@ -37,24 +37,18 @@ private:
 public:
   FontDescriptor(
     const std::filesystem::path& path,
-    size_t size,
+    const size_t size,
     unsigned char minChar = ' ',
     unsigned char maxChar = '~');
 
   int compare(const FontDescriptor& other) const;
-
   bool operator<(const FontDescriptor& other) const;
 
   const std::filesystem::path& path() const;
-
   std::string name() const;
-
   size_t size() const;
-
   unsigned char minChar() const;
-
   unsigned char maxChar() const;
-
   unsigned char charCount() const;
 };
 } // namespace Renderer

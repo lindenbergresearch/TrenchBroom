@@ -22,7 +22,6 @@
 #include "Notifier.h"
 
 class QWidget;
-
 class QStackedLayout;
 
 namespace TrenchBroom
@@ -50,22 +49,17 @@ public:
   virtual ~Tool();
 
   bool active() const;
-
   bool activate();
-
   bool deactivate();
 
   void refreshViews();
-
   void notifyToolHandleSelectionChanged();
 
   void createPage(QStackedLayout* book);
-
   void showPage();
 
 private:
   virtual bool doActivate();
-
   virtual bool doDeactivate();
 
   virtual QWidget* doCreatePage(QWidget* parent);

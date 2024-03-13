@@ -33,7 +33,6 @@ class Texture;
 namespace Model
 {
 class BrushNode;
-
 class BrushFace;
 } // namespace Model
 
@@ -83,7 +82,6 @@ public:
    * Only exposed to be called by BrushFace
    */
   void invalidateVertexCache();
-
   /**
    * Call this before cachedVertices()/cachedFacesSortedByTexture()/cachedEdges()
    *
@@ -98,9 +96,7 @@ public:
    * Returns all vertices for all faces of the brush.
    */
   const std::vector<Vertex>& cachedVertices() const;
-
   const std::vector<CachedFace>& cachedFacesSortedByTexture() const;
-
   const std::vector<CachedEdge>& cachedEdges() const;
 };
 } // namespace Renderer

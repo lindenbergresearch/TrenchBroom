@@ -35,10 +35,10 @@
 #include "Renderer/Transformation.h"
 #include "Renderer/VertexArray.h"
 
-#include <vm/forward.h>
-#include <vm/mat.h>
-#include <vm/mat_ext.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
+#include "vm/vec.h"
 
 #include <cassert>
 #include <vector>
@@ -49,7 +49,7 @@ namespace Renderer
 {
 const size_t Compass::m_segments = 32;
 const float Compass::m_shaftLength = 28.0f;
-const float Compass::m_shaftRadius = 1.15f;
+const float Compass::m_shaftRadius = 1.2f;
 const float Compass::m_headLength = 7.0f;
 const float Compass::m_headRadius = 3.5f;
 
@@ -96,11 +96,9 @@ void Compass::doRender(RenderContext& renderContext)
                     * vm::translation_matrix(500.0f * vm::vec3f::pos_y());
   const ReplaceTransformation ortho(renderContext.transformation(), projection, view);
 
-  auto locationOffset = 55.0 * pref(Preferences::CompassScale) * 0.5;
-  const auto translation = vm::translation_matrix(vm::vec3f(
-    -viewWidth / 2.0f + locationOffset, 0.0f, -viewHeight / 2.0f + locationOffset));
-  const auto scaling =
-    vm::scaling_matrix(vm::vec3f::fill(pref(Preferences::CompassScale)));
+  const auto translation = vm::translation_matrix(
+    vm::vec3f(-viewWidth / 2.0f + 55.0f, 0.0f, -viewHeight / 2.0f + 55.0f));
+  const auto scaling = vm::scaling_matrix(vm::vec3f::fill(2.0f));
   const auto compassTransformation = translation * scaling;
   const MultiplyModelMatrix compass(
     renderContext.transformation(), compassTransformation);
@@ -210,20 +208,14 @@ vm::mat4x4f Compass::cameraRotationMatrix(const Camera& camera) const
 
 void Compass::renderBackground(RenderContext& renderContext)
 {
+  PreferenceManager& prefs = PreferenceManager::instance();
+
   const MultiplyModelMatrix rotate(
     renderContext.transformation(), vm::mat4x4f::rot_90_x_ccw());
   ActiveShader shader(renderContext.shaderManager(), Shaders::CompassBackgroundShader);
-
-  auto outlineColor = modifyAlpha(
-    pref(Preferences::CompassBackgroundOutlineColor),
-    pref(Preferences::CompassTransparency));
-  auto backgroundColor = modifyAlpha(
-    pref(Preferences::CompassBackgroundColor), pref(Preferences::CompassTransparency));
-
-  shader.set("Color", backgroundColor);
+  shader.set("Color", prefs.get(Preferences::CompassBackgroundColor));
   m_backgroundRenderer.render();
-
-  shader.set("Color", outlineColor);
+  shader.set("Color", prefs.get(Preferences::CompassBackgroundOutlineColor));
   m_backgroundOutlineRenderer.render();
 }
 
@@ -234,9 +226,9 @@ void Compass::renderSolidAxis(
   shader.set("CameraPosition", vm::vec3f(0.0f, 500.0f, 0.0f));
   shader.set("LightDirection", vm::normalize(vm::vec3f(0.0f, 0.5f, 1.0f)));
   shader.set("LightDiffuse", Color(1.0f, 1.0f, 1.0f, 1.0f));
-  shader.set("LightSpecular", Color(0.9f, 0.9f, 0.9f, 1.0f));
-  shader.set("GlobalAmbient", Color(0.5f, 0.5f, 0.5f, 1.0f));
-  shader.set("MaterialShininess", 72.0f);
+  shader.set("LightSpecular", Color(0.3f, 0.3f, 0.3f, 1.0f));
+  shader.set("GlobalAmbient", Color(0.2f, 0.2f, 0.2f, 1.0f));
+  shader.set("MaterialShininess", 32.0f);
 
   shader.set("MaterialDiffuse", color);
   shader.set("MaterialAmbient", color);

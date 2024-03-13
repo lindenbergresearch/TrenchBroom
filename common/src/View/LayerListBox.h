@@ -26,9 +26,7 @@
 #include <vector>
 
 class QLabel;
-
 class QAbstractButton;
-
 class QListWidget;
 
 namespace TrenchBroom
@@ -36,7 +34,6 @@ namespace TrenchBroom
 namespace Model
 {
 class LayerNode;
-
 class Node;
 } // namespace Model
 
@@ -73,19 +70,12 @@ public:
 
 private:
   bool eventFilter(QObject* target, QEvent* event) override;
-
 signals:
-
   void layerActiveClicked(Model::LayerNode* layer);
-
   void layerOmitFromExportToggled(Model::LayerNode* layer);
-
   void layerVisibilityToggled(Model::LayerNode* layer);
-
   void layerLockToggled(Model::LayerNode* layer);
-
   void layerDoubleClicked(Model::LayerNode* layer);
-
   void layerRightClicked(Model::LayerNode* layer);
 };
 
@@ -101,7 +91,6 @@ public:
   explicit LayerListBox(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
   Model::LayerNode* selectedLayer() const;
-
   void setSelectedLayer(Model::LayerNode* layer);
 
 private:
@@ -115,29 +104,19 @@ private:
   void connectObservers();
 
   void documentDidChange(MapDocument* document);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void currentLayerDidChange(const Model::LayerNode* layer);
 
   const LayerListBoxWidget* widgetAtRow(int row) const;
-
   Model::LayerNode* layerForRow(int row) const;
 
   std::vector<Model::LayerNode*> layers() const;
-
 signals:
-
   void layerSelected(Model::LayerNode* layer);
-
   void layerSetCurrent(Model::LayerNode* layer);
-
   void layerRightClicked(Model::LayerNode* layer);
-
   void layerOmitFromExportToggled(Model::LayerNode* layer);
-
   void layerVisibilityToggled(Model::LayerNode* layer);
-
   void layerLockToggled(Model::LayerNode* layer);
 };
 } // namespace View

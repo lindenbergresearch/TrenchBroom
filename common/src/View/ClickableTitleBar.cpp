@@ -31,9 +31,10 @@ namespace TrenchBroom::View
 
 ClickableTitleBar::ClickableTitleBar(
   const QString& title, const QString& stateText, QWidget* parent)
-  : TitleBar{title, parent, true}
+  : TitleBar{title, parent, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, true}
   , m_stateText{new QLabel{stateText}}
 {
+  m_stateText->setFont(m_titleLabel->font());
   makeInfo(m_stateText);
 
   layout()->addWidget(m_stateText);

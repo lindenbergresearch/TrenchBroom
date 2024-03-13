@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <vector>
 
@@ -45,7 +45,6 @@ public:
     int yOffset,
     size_t textureSize,
     bool clockwise) const;
-
   int advance() const;
 };
 } // namespace Renderer

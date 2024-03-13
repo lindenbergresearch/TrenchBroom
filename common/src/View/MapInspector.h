@@ -28,13 +28,9 @@
 #include <vector>
 
 class QWidget;
-
 class QCheckBox;
-
 class QLabel;
-
 class QLineEdit;
-
 class QRadioButton;
 
 namespace TrenchBroom
@@ -47,7 +43,6 @@ class Node;
 namespace View
 {
 class CollapsibleTitledPanel;
-
 class MapDocument;
 
 class MapInspector : public TabBookPage
@@ -59,16 +54,12 @@ private:
 
 public:
   explicit MapInspector(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
-
   ~MapInspector();
 
 private:
   void createGui(std::weak_ptr<MapDocument> document);
-
   QWidget* createLayerEditor(std::weak_ptr<MapDocument> document);
-
   CollapsibleTitledPanel* createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
-
   CollapsibleTitledPanel* createModEditor(std::weak_ptr<MapDocument> document);
 };
 
@@ -98,18 +89,14 @@ public:
 
 private:
   std::optional<vm::bbox3> parseLineEdits();
-
   void createGui();
 
 private:
   void connectObservers();
 
   void documentWasNewed(MapDocument* document);
-
   void documentWasLoaded(MapDocument* document);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void updateGui();
 };
 } // namespace View

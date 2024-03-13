@@ -26,41 +26,46 @@
 #include "IO/ReadDdsTexture.h"
 #include "TestUtils.h"
 
-#include <kdl/result.h>
+#include "kdl/result.h"
 
 #include <filesystem>
 #include <memory>
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-static Assets::Texture loadTexture(const std::string &name) {
-    const auto ddsPath = std::filesystem::current_path() / "fixture/test/IO/Dds/";
-    auto diskFS = DiskFileSystem{ddsPath};
+namespace TrenchBroom
+{
+namespace IO
+{
+static Assets::Texture loadTexture(const std::string& name)
+{
+  const auto ddsPath = std::filesystem::current_path() / "fixture/test/IO/Dds/";
+  auto diskFS = DiskFileSystem{ddsPath};
 
-    const auto file = diskFS.openFile(name).value();
-    auto reader = file->reader().buffer();
-    return readDdsTexture(name, reader).value();
+  const auto file = diskFS.openFile(name).value();
+  auto reader = file->reader().buffer();
+  return readDdsTexture(name, reader).value();
 }
 
-static void assertTexture(const std::string &name, const size_t width, const size_t height, const GLenum format) {
-    const auto texture = loadTexture(name);
+static void assertTexture(
+  const std::string& name, const size_t width, const size_t height, const GLenum format)
+{
+  const auto texture = loadTexture(name);
 
-    CHECK(texture.name() == name);
-    CHECK(texture.width() == width);
-    CHECK(texture.height() == height);
-    CHECK(texture.format() == format);
-    CHECK(texture.type() == Assets::TextureType::Opaque);
+  CHECK(texture.name() == name);
+  CHECK(texture.width() == width);
+  CHECK(texture.height() == height);
+  CHECK(texture.format() == format);
+  CHECK(texture.type() == Assets::TextureType::Opaque);
 }
 
 TEST_CASE("ReadDdsTextureTest.testLoadDds")
 {
-    assertTexture("dds_rgb.dds", 128, 128, GL_BGR);
-    assertTexture("dds_rgba.dds", 128, 128, GL_BGRA);
-    assertTexture("dds_bc1.dds", 128, 128, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT);
-    assertTexture("dds_bc2.dds", 128, 128, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT);
-    assertTexture("dds_bc3.dds", 128, 128, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT);
+  assertTexture("dds_rgb.dds", 128, 128, GL_BGR);
+  assertTexture("dds_rgba.dds", 128, 128, GL_BGRA);
+  assertTexture("dds_bc1.dds", 128, 128, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT);
+  assertTexture("dds_bc2.dds", 128, 128, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT);
+  assertTexture("dds_bc3.dds", 128, 128, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT);
 }
 } // namespace IO
 } // namespace TrenchBroom

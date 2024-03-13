@@ -22,7 +22,7 @@
 #include "Renderer/GLVertex.h"
 #include "Renderer/GLVertexAttributeType.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 namespace TrenchBroom
 {
@@ -107,7 +107,6 @@ struct GLVertexType<AttrType, AttrTypeRest...>
 
   // Non-instantiable
   GLVertexType() = delete;
-
   deleteCopyAndMove(GLVertexType);
 };
 
@@ -171,7 +170,6 @@ struct GLVertexType<AttrType>
 
   // Non-instantiable
   GLVertexType() = delete;
-
   deleteCopyAndMove(GLVertexType);
 };
 

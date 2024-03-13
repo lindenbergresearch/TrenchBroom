@@ -24,15 +24,13 @@
 #include "FloatType.h"
 #include "NotifierConnection.h"
 
-#include <vm/forward.h>
-#include <vm/util.h>
+#include "vm/forward.h"
+#include "vm/util.h"
 
 #include <memory>
 
 class QCheckBox;
-
 class QComboBox;
-
 class QPushButton;
 
 namespace TrenchBroom
@@ -40,11 +38,8 @@ namespace TrenchBroom
 namespace View
 {
 class MapDocument;
-
 class RotateObjectsTool;
-
 class Selection;
-
 class SpinControl;
 
 class RotateObjectsToolPage : public QWidget
@@ -71,32 +66,23 @@ public:
     QWidget* parent = nullptr);
 
   void setAxis(vm::axis::type axis);
-
   void setRecentlyUsedCenters(const std::vector<vm::vec3>& centers);
-
   void setCurrentCenter(const vm::vec3& center);
 
 private:
   void connectObservers();
 
   void createGui();
-
   void updateGui();
 
   void selectionDidChange(const Selection& selection);
-
   void documentWasNewedOrLoaded(MapDocument* document);
 
   void centerChanged();
-
   void resetCenterClicked();
-
   void angleChanged(double value);
-
   void rotateClicked();
-
   void updateAnglePropertyAfterTransformClicked();
-
   vm::vec3 getAxis() const;
 };
 } // namespace View

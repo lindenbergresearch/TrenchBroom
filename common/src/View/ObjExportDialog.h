@@ -23,9 +23,7 @@
 #include <QDialog>
 
 class QLineEdit;
-
 class QPushButton;
-
 class QRadioButton;
 
 namespace TrenchBroom

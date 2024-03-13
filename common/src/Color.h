@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 #include <optional>
 #include <string>
@@ -30,52 +30,20 @@ class Color : public vm::vec<float, 4>
 {
 public:
   static std::optional<Color> parse(const std::string& str);
-
   std::string toString() const;
 
   Color();
-
   Color(const vec<float, 4>& v);
-
   Color(float r, float g, float b, float a = 1.0f);
-
   Color(const Color& color, float a);
-
   Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 0xFF);
-
   Color(int r, int g, int b, float a);
-
   Color(int r, int g, int b, int a = 0xFF);
 
-  Color(QColor qColor);
-
   float r() const;
-
   float g() const;
-
   float b() const;
-
   float a() const;
-
-  Color& darker(const float n = 0.25f)
-  {
-    const auto factor = 1.0f - n;
-    for (size_t i = 0; i < 3; i++)
-    {
-      v[i] = v[i] * factor;
-    }
-    return *this;
-  }
-
-  Color& brighter(const float n = 0.25f)
-  {
-    const auto factor = 1.0f + n;
-    for (size_t i = 0; i < 3; i++)
-    {
-      v[i] = v[i] * factor;
-    }
-    return *this;
-  }
 
   template <typename T>
   Color& mix(const Color& other, const T f)

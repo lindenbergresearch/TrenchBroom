@@ -27,7 +27,7 @@
 #include "Renderer/Vbo.h"
 #include "Renderer/VboManager.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
 #include <memory>
 #include <vector>
@@ -56,13 +56,10 @@ private:
     virtual ~BaseHolder();
 
     virtual size_t vertexCount() const = 0;
-
     virtual size_t sizeInBytes() const = 0;
 
     virtual void prepare(VboManager& vboManager) = 0;
-
     virtual void setup() = 0;
-
     virtual void cleanup() = 0;
   };
 
@@ -124,7 +121,6 @@ private:
 
   private:
     using VertexList = std::vector<typename VertexSpec::Vertex>;
-
     virtual const VertexList& doGetVertices() const = 0;
   };
 
@@ -332,7 +328,6 @@ public:
    * @param count the number of vertices to render
    */
   void render(PrimType primType, const GLIndices& indices, GLsizei count);
-
   void cleanup();
 
 private:

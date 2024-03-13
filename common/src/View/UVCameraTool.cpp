@@ -23,7 +23,7 @@
 #include "View/DragTracker.h"
 #include "View/InputState.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
@@ -103,7 +103,6 @@ public:
   }
 
   void end(const InputState&) {}
-
   void cancel() {}
 };
 } // namespace

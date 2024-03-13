@@ -24,19 +24,15 @@
 #include "FloatType.h"
 #include "NotifierConnection.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <memory>
 #include <optional>
 
 class QComboBox;
-
 class QStackedLayout;
-
 class QLineEdit;
-
 class QComboBox;
-
 class QAbstractButton;
 
 namespace TrenchBroom
@@ -44,9 +40,7 @@ namespace TrenchBroom
 namespace View
 {
 class MapDocument;
-
 class Selection;
-
 class ScaleObjectsToolPage : public QWidget
 {
   Q_OBJECT
@@ -66,18 +60,15 @@ private:
 public:
   explicit ScaleObjectsToolPage(
     std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
-
   void activate();
 
 private:
   void connectObservers();
 
   void createGui();
-
   void updateGui();
 
   bool canScale() const;
-
   std::optional<vm::vec3> getScaleFactors() const;
 
   void selectionDidChange(const Selection& selection);

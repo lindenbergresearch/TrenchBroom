@@ -38,15 +38,12 @@ public:
   TitledPanel(
     const QString& title,
     QWidget* parent,
-    bool boldTitle = true,
-    bool subtitle = false,
-    bool fillBackground = false);
-
+    bool showDivider = true,
+    bool boldTitle = true);
   explicit TitledPanel(
-    const QString& title, bool boldTitle = true, bool subtitle = false);
+    const QString& title, bool showDivider = true, bool boldTitle = true);
 
   TitleBar* getTitleBar() const;
-
   QWidget* getPanel() const;
 };
 } // namespace View

@@ -37,14 +37,11 @@ public:
   CreateComplexBrushTool(std::weak_ptr<MapDocument> document);
 
   const Model::Polyhedron3& polyhedron() const;
-
   void update(const Model::Polyhedron3& polyhedron);
 
 private:
   bool doActivate() override;
-
   bool doDeactivate() override;
-
   void doBrushWasCreated() override;
 };
 } // namespace View

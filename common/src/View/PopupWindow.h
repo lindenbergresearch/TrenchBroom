@@ -30,16 +30,13 @@ class PopupWindow : public QWidget
   Q_OBJECT
 public:
   explicit PopupWindow(QWidget* parent = nullptr);
-
   void positionTouchingWidget(QWidget* refWidget);
 
 protected: // QWidget overrides
   void closeEvent(QCloseEvent* event) override;
-
   void showEvent(QShowEvent* event) override;
 
 signals:
-
   void visibilityChanged(bool visible);
 };
 } // namespace View

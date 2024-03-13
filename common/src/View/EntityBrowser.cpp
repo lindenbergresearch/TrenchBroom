@@ -36,7 +36,7 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
 // for use in QVariant
 Q_DECLARE_METATYPE(TrenchBroom::Assets::EntityDefinitionSortOrder)
@@ -96,8 +96,6 @@ void EntityBrowser::createGui(GLContextManager& contextManager)
   browserPanel->setLayout(browserPanelSizer);
 
   m_sortOrderChoice = new QComboBox();
-  m_sortOrderChoice->setObjectName("TextureBrowser_smallComboBox");
-  makeSmall(m_sortOrderChoice);
   m_sortOrderChoice->addItem(
     tr("Name"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Name));
   m_sortOrderChoice->addItem(
@@ -112,8 +110,6 @@ void EntityBrowser::createGui(GLContextManager& contextManager)
     });
 
   m_groupButton = new QPushButton(tr("Group"));
-  m_groupButton->setObjectName("TextureBrowser_smallPushButton");
-  makeSmall(m_groupButton);
   m_groupButton->setToolTip(tr("Group entity definitions by category"));
   m_groupButton->setCheckable(true);
   connect(m_groupButton, &QAbstractButton::clicked, this, [=]() {
@@ -121,8 +117,6 @@ void EntityBrowser::createGui(GLContextManager& contextManager)
   });
 
   m_usedButton = new QPushButton(tr("Used"));
-  m_usedButton->setObjectName("TextureBrowser_smallPushButton");
-  makeSmall(m_usedButton);
   m_usedButton->setToolTip(tr("Only show entity definitions currently in use"));
   m_usedButton->setCheckable(true);
   connect(m_usedButton, &QAbstractButton::clicked, this, [=]() {

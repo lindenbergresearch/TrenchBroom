@@ -24,7 +24,7 @@
 #include "Renderer/GL.h"
 #include "Renderer/ShaderProgram.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
@@ -78,7 +78,6 @@ public:
 
   // Non-instantiable
   GLVertexAttributeUser() = delete;
-
   deleteCopyAndMove(GLVertexAttributeUser);
 };
 
@@ -117,7 +116,6 @@ public:
 
   // Non-instantiable
   GLVertexAttributePosition() = delete;
-
   deleteCopyAndMove(GLVertexAttributePosition);
 };
 
@@ -154,7 +152,6 @@ public:
 
   // Non-instantiable
   GLVertexAttributeNormal() = delete;
-
   deleteCopyAndMove(GLVertexAttributeNormal);
 };
 
@@ -193,7 +190,6 @@ public:
 
   // Non-instantiable
   GLVertexAttributeColor() = delete;
-
   deleteCopyAndMove(GLVertexAttributeColor);
 };
 
@@ -234,7 +230,6 @@ public:
 
   // Non-instantiable
   GLVertexAttributeTexCoord0() = delete;
-
   deleteCopyAndMove(GLVertexAttributeTexCoord0);
 };
 

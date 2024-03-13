@@ -24,10 +24,10 @@
 #include "Renderer/PrimType.h"
 #include "Renderer/RenderUtils.h"
 
-#include <vm/constants.h>
-#include <vm/forward.h>
-#include <vm/util.h>
-#include <vm/vec.h>
+#include "vm/constants.h"
+#include "vm/forward.h"
+#include "vm/util.h"
+#include "vm/vec.h"
 
 #include <cassert>
 

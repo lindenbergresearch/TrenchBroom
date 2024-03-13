@@ -20,8 +20,6 @@
 #include "TextRenderer.h"
 
 #include "AttrString.h"
-#include "PreferenceManager.h"
-#include "Preferences.h"
 #include "Renderer/ActiveShader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/FontManager.h"
@@ -33,94 +31,39 @@
 #include "Renderer/TextAnchor.h"
 #include "Renderer/TextureFont.h"
 
-#include <vm/forward.h>
-#include <vm/mat_ext.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/mat_ext.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
 namespace Renderer
 {
+const float TextRenderer::DefaultMaxViewDistance = 768.0f;
 const float TextRenderer::DefaultMinZoomFactor = 0.5f;
-const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(3.0f, 1.0f);
-const size_t TextRenderer::RectCornerSegments = 6;
-const float TextRenderer::RectCornerRadius = 2.0f;
+const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(4.0f, 4.0f);
+const size_t TextRenderer::RectCornerSegments = 3;
+const float TextRenderer::RectCornerRadius = 3.0f;
 
 TextRenderer::Entry::Entry(
   std::vector<vm::vec2f>& i_vertices,
   const vm::vec2f& i_size,
   const vm::vec3f& i_offset,
   const Color& i_textColor,
-  const Color& i_backgroundColor,
-  const AttrString& i_string)
+  const Color& i_backgroundColor)
   : size(i_size)
   , offset(i_offset)
   , textColor(i_textColor)
   , backgroundColor(i_backgroundColor)
-  , string(i_string)
 {
   using std::swap;
   swap(vertices, i_vertices);
-}
-
-bool TextRenderer::Entry::valueInRange(float value, float min, float max)
-{
-  return (value >= min) && (value <= max);
-}
-
-bool TextRenderer::Entry::overlapsWith(const TextRenderer::Entry& entry)
-{
-  bool xOverlap =
-    valueInRange(offset.x(), entry.offset.x(), entry.offset.x() + entry.size.x())
-    || valueInRange(entry.offset.x(), offset.x(), offset.x() + size.x());
-
-  bool yOverlap =
-    valueInRange(offset.y(), entry.offset.y(), entry.offset.y() + entry.size.y())
-    || valueInRange(entry.offset.y(), offset.y(), offset.y() + size.y());
-
-  return xOverlap && yOverlap;
 }
 
 TextRenderer::EntryCollection::EntryCollection()
   : textVertexCount(0)
   , rectVertexCount(0)
 {
-}
-
-bool TextRenderer::EntryCollection::overlaps(TextRenderer::Entry& entry)
-{
-  for (const Entry& e : entries)
-  {
-    // don't compare it to self
-    if (&e == &entry)
-    {
-      continue;
-    }
-
-    if (entry.overlapsWith(e))
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-void TextRenderer::EntryCollection::addEntry(TextRenderer::Entry& entry)
-{
-  entries.push_back(entry);
-  updateLayout();
-}
-
-void TextRenderer::EntryCollection::updateLayout()
-{
-  auto correctionShift = vm::vec3f(3.f, 5.f, 0.f);
-  Entry& last = entries.back();
-
-  while (overlaps(last))
-  {
-    last.offset = last.offset + correctionShift;
-  }
 }
 
 TextRenderer::TextRenderer(
@@ -164,7 +107,6 @@ void TextRenderer::renderString(
   const bool onTop)
 {
 
-  m_maxViewDistance = pref(Preferences::TextRendererMaxDistance);
   const Camera& camera = renderContext.camera();
   const float distance = camera.perpendicularDistanceTo(position.position(camera));
   if (distance <= 0.0f)
@@ -182,29 +124,23 @@ void TextRenderer::renderString(
   const vm::vec3f offset = position.offset(camera, size);
 
   if (onTop)
-  {
     addEntry(
       m_entriesOnTop,
       Entry(
         vertices,
         size,
-        floor(offset),
+        offset,
         Color(textColor, alphaFactor * textColor.a()),
-        Color(backgroundColor, alphaFactor * backgroundColor.a()),
-        string));
-  }
+        Color(backgroundColor, alphaFactor * backgroundColor.a())));
   else
-  {
     addEntry(
       m_entries,
       Entry(
         vertices,
         size,
-        floor(offset),
+        offset,
         Color(textColor, alphaFactor * textColor.a()),
-        Color(backgroundColor, alphaFactor * backgroundColor.a()),
-        string));
-  }
+        Color(backgroundColor, alphaFactor * backgroundColor.a())));
 }
 
 bool TextRenderer::isVisible(
@@ -238,14 +174,12 @@ float TextRenderer::computeAlphaFactor(
   if (onTop)
     return 1.0f;
 
-  auto fadeoutPos = pref(Preferences::TextRendererFadeOutFactor) * m_maxViewDistance;
-
   if (renderContext.render3D())
   {
     const float a = m_maxViewDistance - distance;
-    if (a > fadeoutPos)
+    if (a > 128.0f)
       return 1.0f;
-    return a / fadeoutPos;
+    return a / 128.0f;
   }
   else
   {
@@ -259,9 +193,7 @@ float TextRenderer::computeAlphaFactor(
 
 void TextRenderer::addEntry(EntryCollection& collection, const Entry& entry)
 {
-  // collection.entries.push_back(entry);
-  collection.addEntry(const_cast<Entry&>(entry));
-
+  collection.entries.push_back(entry);
   collection.textVertexCount += entry.vertices.size();
   collection.rectVertexCount += roundedRect2DVertexCount(RectCornerSegments);
 }
@@ -325,7 +257,6 @@ void TextRenderer::addEntry(
 
   const std::vector<vm::vec2f> rect =
     roundedRect2D(stringSize + 2.0f * m_inset, RectCornerRadius, RectCornerSegments);
-
   for (size_t i = 0; i < rect.size(); ++i)
   {
     const vm::vec2f& vertex = rect[i];

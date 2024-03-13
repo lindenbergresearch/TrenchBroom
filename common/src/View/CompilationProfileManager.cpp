@@ -30,7 +30,7 @@
 #include "View/QtUtils.h"
 #include "View/TitledPanel.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
 namespace TrenchBroom
 {
@@ -69,18 +69,14 @@ CompilationProfileManager::CompilationProfileManager(
   editorPanel->getPanel()->setLayout(editorLayout);
 
   auto* outerLayout = new QHBoxLayout{};
-  outerLayout->setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowVMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowVMargin);
+  outerLayout->setContentsMargins(0, 0, 0, 0);
   outerLayout->setSpacing(0);
   outerLayout->addWidget(listPanel);
   outerLayout->addWidget(new BorderLine{BorderLine::Direction::Vertical});
   outerLayout->addWidget(editorPanel, 1);
   setLayout(outerLayout);
 
-  listPanel->setMinimumSize(130, 200);
+  listPanel->setMinimumSize(200, 200);
 
   connect(
     m_profileList,

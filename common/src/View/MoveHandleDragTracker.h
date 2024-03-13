@@ -26,13 +26,11 @@
 #include "Renderer/TextAnchor.h"
 #include "View/HandleDragTracker.h"
 
-#include <kdl/string_utils.h>
+#include "kdl/string_utils.h"
 
-#include <vm/line.h>
-#include <vm/plane.h>
-#include <vm/vec.h>
-
-#include <fmt/format.h>
+#include "vm/line.h"
+#include "vm/plane.h"
+#include "vm/vec.h"
 
 #include <array>
 #include <cassert>
@@ -46,7 +44,8 @@ namespace View
 enum class SnapMode
 {
   /** Snap the delta between a previous and the proposed handle position. */
-  Relative, /** Snap the proposed handle position to absolute values. */
+  Relative,
+  /** Snap the proposed handle position to absolute values. */
   Absolute
 };
 
@@ -198,9 +197,10 @@ private:
   enum class MoveMode
   {
     /** A vertical move (3D views only) */
-    Vertical, /** A constricted move (move along only one axis of a horizontal plane) */
-    Constricted, /** Default move mode (X/Y plane for 3D views, orthogonal plane for 2D
-                    views) */
+    Vertical,
+    /** A constricted move (move along only one axis of a horizontal plane) */
+    Constricted,
+    /** Default move mode (X/Y plane for 3D views, orthogonal plane for 2D views) */
     Default
   };
 
@@ -367,40 +367,17 @@ public:
                                                                                   : 1.0f,
       };
 
-      static const auto axisLabels = std::array<std::string, 3>{"x: ", "y: ", "z: "};
-      auto lastPos = dragState.initialHandlePosition;
-      auto unitsDisplayType =
-        (Preferences::LengthUnitDisplay)pref(Preferences::LengthUnitSystem);
+      static const auto axisLabels = std::array<std::string, 3>{"X: ", "Y: ", "Z: "};
 
+      auto lastPos = dragState.initialHandlePosition;
       for (size_t i = 0; i < 3; ++i)
       {
         const auto& stage = stages[i];
-
         if (stage != vm::vec3::zero())
         {
           const auto curPos = lastPos + stage;
           const auto midPoint = (lastPos + curPos) / 2.0;
-          const auto axis_label = axisLabels[i];
-          std::string units_str;
-
-          switch (unitsDisplayType)
-          {
-          case Preferences::Units:
-            units_str = fmt::format("{}{}", axis_label, kdl::str_to_string(stage[i]));
-            break;
-          case Preferences::Metric:
-            units_str = fmt::format(
-              "{}{:.1f}m",
-              axis_label,
-              stage[i] / pref(Preferences::MetricConversationFactor));
-            break;
-          case Preferences::Combined:
-            units_str = fmt::format(
-              "{}{}u ({:.1f}m)",
-              axis_label,
-              kdl::str_to_string(stage[i]),
-              stage[i] / pref(Preferences::MetricConversationFactor));
-          }
+          const auto str = axisLabels[i] + kdl::str_to_string(stage[i]);
 
           renderService.setForegroundColor(colors[i]);
           renderService.setLineWidth(lineWidths[i]);
@@ -408,7 +385,7 @@ public:
 
           renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
           renderService.renderString(
-            units_str,
+            str,
             Renderer::SimpleTextAnchor{
               vm::vec3f{midPoint}, Renderer::TextAlignment::Bottom});
 

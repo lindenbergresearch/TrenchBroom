@@ -39,7 +39,6 @@ public:
   explicit SignalDelayer(QObject* parent = nullptr);
 
 public slots:
-
   /**
    * Enqueues an action on the Qt event loop that will emit `processSignal()`.
    *
@@ -49,7 +48,6 @@ public slots:
   void queueSignal();
 
 signals:
-
   void processSignal();
 };
 } // namespace View

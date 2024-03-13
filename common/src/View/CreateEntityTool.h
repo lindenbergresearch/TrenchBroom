@@ -22,7 +22,7 @@
 #include "FloatType.h"
 #include "View/Tool.h"
 
-#include <vm/bbox.h>
+#include "vm/bbox.h"
 
 #include <memory>
 #include <string>
@@ -32,7 +32,6 @@ namespace TrenchBroom
 namespace Model
 {
 class EntityNode;
-
 class PickResult;
 } // namespace Model
 
@@ -51,13 +50,10 @@ public:
   explicit CreateEntityTool(std::weak_ptr<MapDocument> document);
 
   bool createEntity(const std::string& classname);
-
   void removeEntity();
-
   void commitEntity();
 
   void updateEntityPosition2D(const vm::ray3& pickRay);
-
   void updateEntityPosition3D(
     const vm::ray3& pickRay, const Model::PickResult& pickResult);
 };

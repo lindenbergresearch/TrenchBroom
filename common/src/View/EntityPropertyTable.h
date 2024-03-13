@@ -41,28 +41,18 @@ public:
   explicit EntityPropertyTable(QWidget* parent = nullptr);
 
   static QString insertRowShortcutString();
-
   static QString removeRowShortcutString();
-
   void finishEditing(QWidget* editor);
 
 protected:
   bool event(QEvent* event) override;
-
   void keyPressEvent(QKeyEvent* event) override;
-
   QStyleOptionViewItem viewOptions() const override;
-
   void keyboardSearch(const QString& search) override;
-
   void mousePressEvent(QMouseEvent* event) override;
-
   void mouseReleaseEvent(QMouseEvent* event) override;
-
 signals:
-
   void addRowShortcutTriggered();
-
   void removeRowsShortcutTriggered();
 };
 } // namespace View

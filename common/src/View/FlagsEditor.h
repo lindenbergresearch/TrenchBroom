@@ -45,30 +45,21 @@ public:
   explicit FlagsEditor(size_t numCols, QWidget* parent = nullptr);
 
   void setFlags(const QStringList& labels, const QStringList& tooltips = QStringList());
-
   void setFlags(
     const QList<int>& values,
     const QStringList& labels,
     const QStringList& tooltips = QStringList());
-
   void setFlagValue(int set, int mixed = 0);
 
   size_t getNumFlags() const;
-
   bool isFlagSet(size_t index) const;
-
   bool isFlagMixed(size_t index) const;
-
   int getSetFlagValue() const;
-
   int getMixedFlagValue() const;
-
   QString getFlagLabel(size_t index) const;
 
   int lineHeight() const;
-
 signals:
-
   /**
    * Sent when a checkbox is clicked.
    * If (value & setFlag) != 0 it means the checkbox's bit value was just set, otherwise

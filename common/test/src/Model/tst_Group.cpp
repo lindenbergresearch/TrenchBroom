@@ -20,31 +20,36 @@
 #include "Model/Group.h"
 #include "TestUtils.h"
 
-#include <kdl/result.h>
+#include "kdl/result.h"
 
-#include <vecmath/bbox.h>
-#include <vecmath/bbox_io.h>
-#include <vecmath/mat.h>
-#include <vecmath/mat_ext.h>
-#include <vecmath/mat_io.h>
+#include "vm/bbox.h"
+#include "vm/bbox_io.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
+#include "vm/mat_io.h"
 
 #include <memory>
 #include <vector>
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 TEST_CASE("GroupTest.transform")
 {
-    auto group = Group{"name"};
-    REQUIRE(group.transformation() == vm::mat4x4());
+  auto group = Group{"name"};
+  REQUIRE(group.transformation() == vm::mat4x4());
 
-    group.transform(vm::translation_matrix(vm::vec3(32.0, 0.0, 0.0)));
-    CHECK(group.transformation() == vm::translation_matrix(vm::vec3(32.0, 0.0, 0.0)));
+  group.transform(vm::translation_matrix(vm::vec3(32.0, 0.0, 0.0)));
+  CHECK(group.transformation() == vm::translation_matrix(vm::vec3(32.0, 0.0, 0.0)));
 
-    group.transform(vm::rotation_matrix(0.0, 0.0, vm::to_radians(90.0)));
-    CHECK(group.transformation() == vm::rotation_matrix(0.0, 0.0, vm::to_radians(90.0)) * vm::translation_matrix(vm::vec3(32.0, 0.0, 0.0)));
+  group.transform(vm::rotation_matrix(0.0, 0.0, vm::to_radians(90.0)));
+  CHECK(
+    group.transformation()
+    == vm::rotation_matrix(0.0, 0.0, vm::to_radians(90.0))
+         * vm::translation_matrix(vm::vec3(32.0, 0.0, 0.0)));
 }
 } // namespace Model
 } // namespace TrenchBroom

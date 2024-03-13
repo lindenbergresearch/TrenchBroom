@@ -43,13 +43,13 @@
 #include "View/TransactionScope.h"
 #include "View/UVViewHelper.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/forward.h>
-#include <vm/intersection.h>
-#include <vm/mat.h>
-#include <vm/mat_ext.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/intersection.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
+#include "vm/vec.h"
 
 #include <optional>
 

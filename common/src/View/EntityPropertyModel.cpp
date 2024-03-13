@@ -818,14 +818,14 @@ QVariant EntityPropertyModel::data(const QModelIndex& index, const int role) con
     {
       if (!row.keyMutable())
       {
-        return QVariant{IO::loadSVGIcon("Locked_small.svg", 16)};
+        return QVariant{IO::loadSVGIcon("Locked_small.svg")};
       }
     }
     else if (index.column() == ColumnValue)
     {
       if (!row.valueMutable())
       {
-        return QVariant{IO::loadSVGIcon("Locked_small.svg", 16)};
+        return QVariant{IO::loadSVGIcon("Locked_small.svg")};
       }
     }
     return QVariant{};
@@ -1007,7 +1007,7 @@ QVariant EntityPropertyModel::headerData(
   {
     if (section == ColumnProtected)
     {
-      return QVariant{IO::loadSVGIcon("Protected_small.svg", 16)};
+      return QVariant{IO::loadSVGIcon("Protected_small.svg")};
     }
   }
   else if (role == Qt::ToolTipRole)

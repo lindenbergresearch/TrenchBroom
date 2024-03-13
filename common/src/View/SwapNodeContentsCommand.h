@@ -32,11 +32,8 @@ namespace TrenchBroom
 namespace Model
 {
 class Brush;
-
 class Entity;
-
 class GroupNode;
-
 class Node;
 } // namespace Model
 
@@ -51,11 +48,9 @@ public:
   SwapNodeContentsCommand(
     const std::string& name,
     std::vector<std::pair<Model::Node*, Model::NodeContents>> nodes);
-
   ~SwapNodeContentsCommand();
 
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-
   std::unique_ptr<CommandResult> doPerformUndo(
     MapDocumentCommandFacade* document) override;
 

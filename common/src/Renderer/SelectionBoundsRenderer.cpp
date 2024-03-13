@@ -27,10 +27,10 @@
 #include "Renderer/RenderService.h"
 #include "Renderer/TextAnchor.h"
 
-#include <vm/bbox.h>
-#include <vm/util.h>
-#include <vm/vec.h>
-#include <vm/vec_io.h>
+#include "vm/bbox.h"
+#include "vm/util.h"
+#include "vm/vec.h"
+#include "vm/vec_io.h"
 
 #include <sstream>
 
@@ -38,11 +38,6 @@ namespace TrenchBroom
 {
 namespace Renderer
 {
-
-const float SelectionBoundsRenderer::AXIS_LABEL_DIM_FACTOR = 1.0f;
-static const std::string AXIS_LABELS[3] = {"X", "Y", "Z"};
-static const std::string AXIS_LABEL_DELIMITER = "=";
-
 class SelectionBoundsRenderer::SizeTextAnchor2D : public TextAnchor3D
 {
 private:
@@ -419,19 +414,9 @@ SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3& bounds)
 void SelectionBoundsRenderer::render(
   RenderContext& renderContext, RenderBatch& renderBatch)
 {
-  bool showObjectBounds = pref(Preferences::ShowObjectBoundsSelectionBounds);
-
-  if (showObjectBounds)
-  {
-    renderBounds(renderContext, renderBatch);
-  }
-
+  renderBounds(renderContext, renderBatch);
   renderSize(renderContext, renderBatch);
-
-  if (pref(Preferences::SelectionBoundsShowMinMax))
-  {
-    renderMinMax(renderContext, renderBatch);
-  }
+  // renderMinMax(renderContext, renderBatch);
 }
 
 void SelectionBoundsRenderer::renderBounds(
@@ -439,7 +424,6 @@ void SelectionBoundsRenderer::renderBounds(
 {
   RenderService renderService(renderContext, renderBatch);
   renderService.setForegroundColor(pref(Preferences::SelectionBoundsColor));
-  renderService.setLineWidth(pref(Preferences::SelectionBoundsLineWidth));
   renderService.renderBounds(vm::bbox3f(m_bounds));
 }
 
@@ -452,48 +436,18 @@ void SelectionBoundsRenderer::renderSize(
     renderSize3D(renderContext, renderBatch);
 }
 
-const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_units)
-{
-  auto unitsDisplayType =
-    (Preferences::LengthUnitDisplay)pref(Preferences::LengthUnitSystem);
-  auto metricConversationFactor = pref(Preferences::MetricConversationFactor);
-  auto unitsMaxDigits = pref(Preferences::UnitsMaxDigits);
-  std::stringstream buffer;
-
-  auto units_str = formatDimension(value_units, unitsMaxDigits).toStdString();
-  auto metric_str =
-    formatDimension(value_units / metricConversationFactor, unitsMaxDigits, "m")
-      .toStdString();
-
-  switch (unitsDisplayType)
-  {
-  case Preferences::Units:
-    buffer << units_str;
-    break;
-  case Preferences::Metric:
-    buffer << metric_str;
-    break;
-  case Preferences::Combined:
-    buffer << units_str << " [" << metric_str << "]";
-    break;
-  }
-
-  return buffer.str();
-}
-
 void SelectionBoundsRenderer::renderSize2D(
   RenderContext& renderContext, RenderBatch& renderBatch)
 {
-  Color colors[3];
+  static const std::string labels[3] = {"X", "Y", "Z"};
   std::stringstream buffer;
 
   RenderService renderService(renderContext, renderBatch);
   renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
+  renderService.setBackgroundColor(Color(
+    pref(Preferences::InfoOverlayBackgroundColor),
+    pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
   renderService.setShowOccludedObjects();
-  auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
-
-  colors[0] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::XAxisColor), alpha);
-  colors[1] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::YAxisColor), alpha);
 
   const Camera& camera = renderContext.camera();
   const vm::vec3f& direction = camera.direction();
@@ -501,11 +455,9 @@ void SelectionBoundsRenderer::renderSize2D(
   const vm::vec3 boundsSize = correct(m_bounds.size());
   for (size_t i = 0; i < 3; ++i)
   {
-    renderService.setBackgroundColor(colors[i]);
     if (direction[i] == 0.0f)
     {
-      buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER
-             << getFormattedUnitsString(float(boundsSize[i]));
+      buffer << labels[i] << ": " << boundsSize[i];
       renderService.renderString(buffer.str(), SizeTextAnchor2D(m_bounds, i, camera));
       buffer.str("");
     }
@@ -515,26 +467,24 @@ void SelectionBoundsRenderer::renderSize2D(
 void SelectionBoundsRenderer::renderSize3D(
   RenderContext& renderContext, RenderBatch& renderBatch)
 {
-  Color colors[3];
+  static const std::string labels[3] = {"X", "Y", "Z"};
   std::stringstream buffer;
 
   RenderService renderService(renderContext, renderBatch);
   renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
+  renderService.setBackgroundColor(Color(
+    pref(Preferences::InfoOverlayBackgroundColor),
+    pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
   renderService.setShowOccludedObjects();
-  auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
-
-  colors[0] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::XAxisColor), alpha);
-  colors[1] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::YAxisColor), alpha);
-  colors[2] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::ZAxisColor), alpha);
 
   const vm::vec3 boundsSize = correct(m_bounds.size());
   for (size_t i = 0; i < 3; ++i)
   {
-    renderService.setBackgroundColor(colors[i]);
-    buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER
-           << getFormattedUnitsString(float(boundsSize[i]));
+    buffer << labels[i] << ": " << boundsSize[i];
+
     renderService.renderString(
       buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
+
     buffer.str("");
   }
 }
@@ -561,26 +511,6 @@ void SelectionBoundsRenderer::renderMinMax(
   renderService.renderString(
     buffer.str(),
     MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::max, renderContext.camera()));
-}
-
-QString SelectionBoundsRenderer::formatDimension(
-  const float value, const int digits, const QString& suffix)
-{
-  auto isInt = (value - std::trunc(value) == 0);
-  QString str = "";
-
-  if (isInt)
-  {
-    str = (new QString)->sprintf("%d%s", (int)value, suffix.toStdString().c_str());
-  }
-  else
-  {
-    const char* raw_format_str = "%%.%df%%s";
-    auto format_str = (new QString)->sprintf(raw_format_str, digits).toStdString();
-    str = (new QString)->sprintf(format_str.c_str(), value, suffix.toStdString().c_str());
-  }
-
-  return str;
 }
 } // namespace Renderer
 } // namespace TrenchBroom

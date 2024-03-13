@@ -19,6 +19,7 @@
 
 #include "TextOutputAdapter.h"
 
+#include <QByteArray>
 #include <QScrollBar>
 #include <QString>
 #include <QTextEdit>
@@ -26,21 +27,6 @@
 #include "Ensure.h"
 
 #include <string>
-
-#define match_foreground(STR, COLOR)                                                     \
-  if (string == STR)                                                                     \
-  {                                                                                      \
-    format.setForeground(QBrush{QColor{COLOR}});                                         \
-    return format;                                                                       \
-  }
-
-#define match_background(STR, COLOR)                                                     \
-  if (string == STR)                                                                     \
-  {                                                                                      \
-    format.setBackground(QBrush{QColor{COLOR}});                                         \
-    return format;                                                                       \
-  }
-
 
 namespace TrenchBroom
 {
@@ -61,7 +47,6 @@ void TextOutputAdapter::appendString(const QString& string)
 {
   QScrollBar* scrollBar = m_textEdit->verticalScrollBar();
   const bool wasAtBottom = (scrollBar->value() >= scrollBar->maximum());
-  auto format = QTextCharFormat{};
 
   const int size = string.size();
   for (int i = 0; i < size; ++i)
@@ -70,47 +55,21 @@ void TextOutputAdapter::appendString(const QString& string)
     const QChar n = (i + 1) < size ? string[i + 1] : static_cast<QChar>(0);
 
     // Handle CRLF by advancing to the LF, which is handled below
-    if (c == Ascii::CR && n == Ascii::LF)
+    if (c == '\r' && n == '\n')
     {
       continue;
     }
-
     // Handle LF
-    if (c == Ascii::LF)
+    if (c == '\n')
     {
       m_insertionCursor.movePosition(QTextCursor::End);
       m_insertionCursor.insertBlock();
       continue;
     }
-
     // Handle CR, next character not LF
-    if (c == Ascii::CR)
+    if (c == '\r')
     {
       m_insertionCursor.movePosition(QTextCursor::StartOfLine);
-      continue;
-    }
-
-    // handle ESC basic sequences
-    if (c == Ascii::ESC && n == Ascii::SCREEN_CMD_START)
-    {
-      auto j = 2;
-      QString cmd = "";
-      while (string[i + j] != Ascii::SCREEN_CMD_END && i + j < string.length())
-      {
-        cmd.append(string[i + j]);
-        j++;
-      }
-
-      i += j;
-
-      if (string[i] != Ascii::SCREEN_CMD_END)
-      {
-        // no valid or supported ESC sequence
-        printf("invalid escape sequence: '%s'!\n", cmd.toStdString().c_str());
-        continue;
-      }
-
-      format = decodeVT100Command(cmd, format);
       continue;
     }
 
@@ -120,7 +79,7 @@ void TextOutputAdapter::appendString(const QString& string)
     for (int j = i; j < size; ++j)
     {
       const QChar charJ = string[j];
-      if (charJ == Ascii::CR || charJ == Ascii::LF || charJ == Ascii::ESC)
+      if (charJ == '\r' || charJ == '\n')
       {
         break;
       }
@@ -136,90 +95,14 @@ void TextOutputAdapter::appendString(const QString& string)
       m_insertionCursor.movePosition(
         QTextCursor::NextCharacter, QTextCursor::KeepAnchor, insertionSize);
     }
-    m_insertionCursor.insertText(substring, format);
+    m_insertionCursor.insertText(substring);
     i = lastToInsert;
   }
-
-  scrollBar->setValue(scrollBar->maximum());
 
   if (wasAtBottom)
   {
     m_textEdit->verticalScrollBar()->setValue(m_textEdit->verticalScrollBar()->maximum());
   }
 }
-
-QTextCharFormat& TextOutputAdapter::decodeVT100Command(
-  const QString& string, QTextCharFormat& format)
-{
-  // reset
-  if (string == "0")
-  {
-    format = QTextCharFormat{};
-    return format;
-  }
-
-  if (string == "1")
-  {
-    format.font().setBold(true);
-    return format;
-  }
-
-  match_foreground("30", "#000000");
-  match_foreground("31", "#991011");
-  match_foreground("32", "#00AA00");
-  match_foreground("33", "#CCAA00");
-  match_foreground("34", "#1234AA");
-  match_foreground("35", "#8800AA");
-  match_foreground("36", "#00AABB");
-  match_foreground("37", "#AAAAAA");
-
-  match_background("40", "#000000");
-  match_background("41", "#991011");
-  match_background("42", "#00AA00");
-  match_background("43", "#CCAA00");
-  match_background("44", "#1234AA");
-  match_background("45", "#8800AA");
-  match_background("46", "#00AABB");
-  match_background("47", "#AAAAAA");
-
-  match_foreground("90", "#666666");
-  match_foreground("91", "#FF1234");
-  match_foreground("92", "#00FF00");
-  match_foreground("93", "#FFFF00");
-  match_foreground("94", "#2345FF");
-  match_foreground("95", "#AA00FF");
-  match_foreground("96", "#44FFFF");
-  match_foreground("97", "#FFFFFF");
-
-  match_background("100", "#666666");
-  match_background("101", "#FF1234");
-  match_background("102", "#00FF00");
-  match_background("103", "#FFFF00");
-  match_background("104", "#2345FF");
-  match_background("105", "#AA00FF");
-  match_background("106", "#44FFFF");
-  match_background("107", "#FFFFFF");
-
-  // support for 24bit color codes
-  if (string.startsWith("38;2;"))
-  {
-    auto rgb = string.mid(5).split(";");
-    ;
-
-    if (rgb.size() == 3)
-    {
-      auto color = QColor(rgb[0].toShort(), rgb[1].toShort(), rgb[2].toShort());
-      format.setForeground(QBrush{color});
-    }
-
-    return format;
-  }
-
-  printf("unknown escape sequence found: '%s'\n!", string.toStdString().c_str());
-  format = QTextCharFormat{};
-
-  return format;
-}
-
 } // namespace View
 } // namespace TrenchBroom

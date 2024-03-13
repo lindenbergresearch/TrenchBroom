@@ -29,18 +29,14 @@ namespace TrenchBroom
 namespace Renderer
 {
 class Camera;
-
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace View
 {
 class DragTracker;
-
 class MapDocument;
-
 class ShearObjectsTool;
 
 class ShearObjectsToolController : public ToolController
@@ -54,16 +50,13 @@ private:
 public:
   explicit ShearObjectsToolController(
     ShearObjectsTool& tool, std::weak_ptr<MapDocument> document);
-
   ~ShearObjectsToolController() override;
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void pick(const InputState& inputState, Model::PickResult& pickResult) override;
-
   virtual void doPick(
     const vm::ray3& pickRay,
     const Renderer::Camera& camera,

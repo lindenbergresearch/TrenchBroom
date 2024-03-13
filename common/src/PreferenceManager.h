@@ -32,8 +32,8 @@
 #include "Preference.h"
 #include "Result.h"
 
-#include <kdl/result.h>
-#include <kdl/vector_set.h>
+#include "kdl/result.h"
+#include "kdl/vector_set.h"
 
 #include <filesystem>
 #include <map>
@@ -41,7 +41,6 @@
 #include <vector>
 
 class QTextStream;
-
 class QFileSystemWatcher;
 
 namespace TrenchBroom
@@ -142,14 +141,11 @@ public:
   virtual void initialize() = 0;
 
   virtual bool saveInstantly() const = 0;
-
   virtual void saveChanges() = 0;
-
   virtual void discardChanges() = 0;
 
 private:
   virtual void validatePreference(PreferenceBase&) = 0;
-
   virtual void savePreference(PreferenceBase&) = 0;
 };
 
@@ -183,35 +179,26 @@ private:
 
 public:
   AppPreferenceManager();
-
   ~AppPreferenceManager() override;
 
   void initialize() override;
 
   bool saveInstantly() const override;
-
   void saveChanges() override;
-
   void discardChanges() override;
 
 private:
   void saveChangesImmediately();
 
   void markAsUnsaved(PreferenceBase& preference);
-
   void showErrorAndDisableFileReadWrite(const QString& reason, const QString& suggestion);
-
   void loadCacheFromDisk();
-
   void invalidatePreferences();
-
   void loadPreferenceFromCache(PreferenceBase& pref);
-
   void savePreferenceToCache(PreferenceBase& pref);
 
 private:
   void validatePreference(PreferenceBase&) override;
-
   void savePreference(PreferenceBase&) override;
 
   deleteCopyAndMove(AppPreferenceManager);
@@ -307,16 +294,13 @@ using WritePreferencesResult =
   Result<void, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
 
 QString preferenceFilePath();
-
 ReadPreferencesResult readPreferencesFromFile(const QString& path);
-
 ReadPreferencesResult readPreferences();
 
 WritePreferencesResult writePreferencesToFile(
   const QString& path, const std::map<std::filesystem::path, QJsonValue>& prefs);
-
 ReadPreferencesResult parsePreferencesFromJson(const QByteArray& jsonData);
-
 QByteArray writePreferencesToJson(
   const std::map<std::filesystem::path, QJsonValue>& prefs);
+
 } // namespace TrenchBroom

@@ -23,7 +23,7 @@
 #include "Model/BrushFaceHandle.h"
 #include "Model/HitType.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 #include <optional>
 
@@ -37,18 +37,14 @@ class Texture;
 namespace Renderer
 {
 class ActiveShader;
-
 class Camera;
-
 class OrthographicCamera;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace Model
 {
 class BrushFace;
-
 class PickResult;
 } // namespace Model
 
@@ -73,31 +69,21 @@ public:
   explicit UVViewHelper(Renderer::OrthographicCamera& camera);
 
   bool valid() const;
-
   const Model::BrushFace* face() const;
-
   const Assets::Texture* texture() const;
-
   void setFaceHandle(std::optional<Model::BrushFaceHandle> faceHandle);
-
   void cameraViewportChanged();
 
   const vm::vec2i& subDivisions() const;
-
   vm::vec2 stripeSize() const;
-
   void setSubDivisions(const vm::vec2i& subDivisions);
 
   const vm::vec3 origin() const;
-
   const vm::vec2f originInFaceCoords() const;
-
   const vm::vec2f originInTexCoords() const;
-
   void setOriginInFaceCoords(const vm::vec2f& originInFaceCoords);
 
   const Renderer::OrthographicCamera& camera() const;
-
   float cameraZoom() const;
 
   void pickTextureGrid(
@@ -106,15 +92,12 @@ public:
     Model::PickResult& pickResult) const;
 
   vm::vec2f snapDelta(const vm::vec2f& delta, const vm::vec2f& distance) const;
-
   vm::vec2f computeDistanceFromTextureGrid(const vm::vec3& position) const;
 
   void computeOriginHandleVertices(
     vm::vec3& x1, vm::vec3& x2, vm::vec3& y1, vm::vec3& y2) const;
-
   void computeScaleHandleVertices(
     const vm::vec2& pos, vm::vec3& x1, vm::vec3& x2, vm::vec3& y1, vm::vec3& y2) const;
-
   void computeLineVertices(
     const vm::vec2& pos,
     vm::vec3& x1,
@@ -131,15 +114,11 @@ public:
 
 private:
   void resetOrigin();
-
   void resetCamera();
-
   void resetZoom();
 
   vm::bbox3 computeFaceBoundsInCameraCoords() const;
-
   vm::vec3 transformToCamera(const vm::vec3& point) const;
-
   vm::vec3 transformFromCamera(const vm::vec3& point) const;
 };
 } // namespace View

@@ -21,8 +21,8 @@
 
 #include "View/Animation.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom::Renderer
 {

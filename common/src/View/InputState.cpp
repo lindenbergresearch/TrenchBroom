@@ -26,7 +26,7 @@
 #include "Model/CompareHits.h"
 #include "Renderer/Camera.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {

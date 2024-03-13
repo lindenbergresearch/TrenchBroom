@@ -31,9 +31,7 @@ public:
   virtual ~DropTracker();
 
   virtual bool move(const InputState& inputState) = 0;
-
   virtual bool drop(const InputState& inputState) = 0;
-
   virtual void leave(const InputState& inputState) = 0;
 };
 } // namespace View

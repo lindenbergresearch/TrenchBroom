@@ -154,7 +154,7 @@ void TextureBrowserView::doInitLayout(Layout& layout)
 
 void TextureBrowserView::doReloadLayout(Layout& layout)
 {
-  const auto& fontPath = pref(Preferences::RendererFontPath);
+  const auto& fontPath = pref(Preferences::RendererFontPath());
   const auto fontSize = pref(Preferences::BrowserFontSize);
   assert(fontSize > 0);
 

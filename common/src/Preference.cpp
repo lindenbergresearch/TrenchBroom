@@ -26,10 +26,6 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "Color.h"
 #include "IO/PathQt.h"
 
-#include "vm/forward.h"
-
-#include <sstream>
-
 namespace TrenchBroom
 {
 // PreferenceSerializer
@@ -58,25 +54,6 @@ bool PreferenceSerializer::readFromJson(const QJsonValue& in, Color& out) const
   }
 
   return false;
-}
-
-bool PreferenceSerializer::readFromJson(const QJsonValue& in, vm::vec3f& out) const
-{
-  if (!in.isString())
-  {
-    return false;
-  }
-
-  std::stringstream iss(in.toString().toStdString());
-  float number;
-  std::vector<float> myNumbers;
-
-  while (iss >> number)
-    myNumbers.push_back(number);
-
-  out = vm::vec3f(myNumbers[0], myNumbers[1], myNumbers[2]);
-
-  return true;
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue& in, float& out) const
@@ -164,13 +141,6 @@ QJsonValue PreferenceSerializer::writeToJson(const Color& in) const
   });
 }
 
-QJsonValue PreferenceSerializer::writeToJson(const vm::vec3f& in) const
-{
-  return toJson(in, [](QTextStream& lhs, const vm::vec3f& rhs) {
-    lhs << rhs.x() << " " << rhs.y() << " " << rhs.z();
-  });
-}
-
 QJsonValue PreferenceSerializer::writeToJson(const float in) const
 {
   return {static_cast<double>(in)};
@@ -200,11 +170,8 @@ QJsonValue PreferenceSerializer::writeToJson(const QString& in) const
 PreferenceBase::PreferenceBase() = default;
 
 PreferenceBase::PreferenceBase(const PreferenceBase& other) = default;
-
 PreferenceBase::PreferenceBase(PreferenceBase&& other) noexcept = default;
-
 PreferenceBase& PreferenceBase::operator=(const PreferenceBase& other) = default;
-
 PreferenceBase& PreferenceBase::operator=(PreferenceBase&& other) = default;
 
 bool operator==(const PreferenceBase& lhs, const PreferenceBase& rhs)

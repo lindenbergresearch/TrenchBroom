@@ -49,7 +49,6 @@ private:
    * The contents are initially unspecified.
    */
   Vbo(GLenum type, size_t capacity, GLenum usage);
-
   ~Vbo();
 
   /**
@@ -64,11 +63,9 @@ public:
    * Deprecated, always returns 0.
    */
   size_t offset() const;
-
   size_t capacity() const;
 
   void bind();
-
   void unbind();
 
   template <typename T>

@@ -22,7 +22,6 @@
 #include "View/ControlListBox.h"
 
 class QLabel;
-
 class QPixmap;
 
 namespace TrenchBroom
@@ -42,7 +41,6 @@ private:
 public:
   ImageListBoxItemRenderer(
     const QString& title, const QString& subtitle, const QPixmap& image, QWidget* parent);
-
   void updateItem() override;
 };
 
@@ -60,9 +58,7 @@ private:
   friend class ImageListBoxItemRenderer;
 
   virtual QPixmap image(size_t index) const;
-
   virtual QString title(size_t index) const = 0;
-
   virtual QString subtitle(size_t index) const = 0;
 };
 } // namespace View

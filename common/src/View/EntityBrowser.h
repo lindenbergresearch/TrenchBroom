@@ -28,11 +28,8 @@
 #include <vector>
 
 class QPushButton;
-
 class QComboBox;
-
 class QLineEdit;
-
 class QScrollBar;
 
 namespace TrenchBroom
@@ -45,9 +42,7 @@ class Node;
 namespace View
 {
 class EntityBrowserView;
-
 class GLContextManager;
-
 class MapDocument;
 
 class EntityBrowser : public QWidget
@@ -78,15 +73,11 @@ private:
   void connectObservers();
 
   void documentWasNewed(MapDocument* document);
-
   void documentWasLoaded(MapDocument* document);
 
   void modsDidChange();
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void entityDefinitionsDidChange();
-
   void preferenceDidChange(const std::filesystem::path& path);
 };
 } // namespace View

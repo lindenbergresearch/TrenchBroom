@@ -28,9 +28,9 @@
 #include "Renderer/Shaders.h"
 #include "Renderer/VboManager.h"
 
-#include <vm/forward.h>
-#include <vm/mat_ext.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/mat_ext.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {

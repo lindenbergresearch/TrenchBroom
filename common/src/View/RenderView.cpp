@@ -73,8 +73,8 @@
 #ifdef _WIN32
 #endif
 
-#include <vm/mat.h>
-#include <vm/mat_ext.h>
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
 
 #include <iostream>
 
@@ -85,33 +85,39 @@ namespace View
 RenderView::RenderView(GLContextManager& contextManager, QWidget* parent)
   : QOpenGLWidget(parent)
   , m_glContext(&contextManager)
-  , boxFilter(32)
   , m_framesRendered(0)
+  , m_maxFrameTimeMsecs(0)
+  , m_lastFPSCounterUpdate(0)
 {
-
-  auto palette = QPalette{};
-  m_focusColor = palette.color(QPalette::Highlight);
-  m_frameColor = palette.color(QPalette::Midlight);
+  QPalette pal;
+  const QColor color = pal.color(QPalette::Highlight);
+  m_focusColor = fromQColor(color);
 
   // FPS counter
   QTimer* fpsCounter = new QTimer(this);
 
-
   connect(fpsCounter, &QTimer::timeout, [&]() {
-    avgFps = (avgFps + m_framesRendered * 2) * 0.5;
+    const int64_t currentTime = QDateTime::currentMSecsSinceEpoch();
+    const int framesRenderedInPeriod = m_framesRendered;
+    const int maxFrameTime = m_maxFrameTimeMsecs;
+    const int64_t fpsCounterPeriod = currentTime - m_lastFPSCounterUpdate;
+    const double avgFps = static_cast<double>(framesRenderedInPeriod)
+                          / (static_cast<double>(fpsCounterPeriod) / 1000.0);
+
     m_framesRendered = 0;
+    m_maxFrameTimeMsecs = 0;
+    m_lastFPSCounterUpdate = currentTime;
 
     m_currentFPS =
-      std::string("FPS=") + std::to_string(int(avgFps))
-      + " frames=" + std::to_string(m_totalFrames)
-      + " max=" + std::to_string(maxFrameTime * 1000.0) + "ms. | "
+      std::string("Avg FPS: ") + std::to_string(avgFps)
+      + " Max time between frames: " + std::to_string(maxFrameTime) + "ms. "
       + std::to_string(m_glContext->vboManager().currentVboCount()) + " current VBOs ("
       + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) totalling "
-      + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + "k @ "
-      + std::to_string(glWidth) + "x" + std::to_string(glHeight);
+      + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + " KiB";
   });
 
-  fpsCounter->start(500);
+  fpsCounter->start(1000);
+
   setMouseTracking(true); // request mouse move events even when no button is held down
   setFocusPolicy(Qt::StrongFocus); // accept focus by clicking or tab
 }
@@ -130,20 +136,17 @@ void RenderView::keyReleaseEvent(QKeyEvent* event)
   update();
 }
 
-QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(
+static auto mouseEventWithFullPrecisionLocalPos(
   const QWidget* widget, const QMouseEvent* event)
 {
   // The localPos of a Qt mouse event is only in integer coordinates, but window pos
   // and screen pos have full precision. We can't directly map the windowPos because
   // mapTo takes QPoint, so we just map the origin and subtract that.
-  QPointF localPos =
+  const auto localPos =
     event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
-
-  boxFilter.add(new QPointF(localPos.x(), localPos.y()));
-
   return QMouseEvent(
     event->type(),
-    boxFilter.average(),
+    localPos,
     event->windowPos(),
     event->screenPos(),
     event->button(),
@@ -160,14 +163,6 @@ void RenderView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void RenderView::mouseMoveEvent(QMouseEvent* event)
 {
-  auto length = (size_t)pref(Preferences::CameraLookSmoothing);
-
-  if (boxFilter.length != length)
-  {
-    boxFilter.reset();
-    boxFilter.length = length;
-  }
-
   m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
   update();
 }
@@ -192,10 +187,25 @@ void RenderView::wheelEvent(QWheelEvent* event)
 
 void RenderView::paintGL()
 {
-  //   context()->setFormat(QSurfaceFormat::defaultFormat());
   if (TrenchBroom::View::isReportingCrash())
     return;
+
   render();
+
+  // Update stats
+  m_framesRendered++;
+  if (m_timeSinceLastFrame.isValid())
+  {
+    int frameTime = static_cast<int>(m_timeSinceLastFrame.restart());
+    if (frameTime > m_maxFrameTimeMsecs)
+    {
+      m_maxFrameTimeMsecs = frameTime;
+    }
+  }
+  else
+  {
+    m_timeSinceLastFrame.start();
+  }
 }
 
 Renderer::VboManager& RenderView::vboManager()
@@ -255,7 +265,7 @@ void RenderView::clearBackground()
 
   glAssert(glClearColor(
     backgroundColor.r(), backgroundColor.g(), backgroundColor.b(), backgroundColor.a()));
-  glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+  glAssert(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 const Color& RenderView::getBackgroundColor()
@@ -265,22 +275,18 @@ const Color& RenderView::getBackgroundColor()
 
 void RenderView::renderFocusIndicator()
 {
-  if (!doShouldRenderFocusIndicator())
+  if (!doShouldRenderFocusIndicator() || !hasFocus())
     return;
 
-  const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator);
-  const Color& outer = Color(/*drawFocus ? m_focusColor :*/ m_frameColor);
-  const Color& inner = Color(drawFocus ? m_focusColor : m_frameColor);
+  const Color& outer = m_focusColor;
+  const Color& inner = m_focusColor;
 
   const qreal r = devicePixelRatioF();
   const auto w = static_cast<float>(width() * r);
   const auto h = static_cast<float>(height() * r);
   glAssert(glViewport(0, 0, static_cast<int>(w), static_cast<int>(h)));
-  glWidth = (int)w;
-  glHeight = (int)h;
 
-  // const auto t = pref(Preferences::ViewFrameWidth);
-  const auto t = hasFocus() ? 1.0f : 1.0f;
+  const auto t = 1.0f;
 
   const auto projection = vm::ortho_matrix(
     -1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
@@ -327,50 +333,6 @@ bool RenderView::doInitializeGL()
 void RenderView::doUpdateViewport(
   const int /* x */, const int /* y */, const int /* width */, const int /* height */)
 {
-}
-
-void RenderView::updateEvent()
-{
-  // update();
-}
-
-QPointF BoxFilter::average()
-{
-  int c = 0;
-  QPointF sum = QPointF(0, 0);
-
-  for (QPointF* item : samples)
-  {
-    if (item != nullptr)
-    {
-      sum = QPointF(sum.x() + item->x(), sum.y() + item->y());
-      c++;
-    }
-  }
-
-  return c == 0 ? QPoint(0, 0) : QPointF(sum.x() / c, sum.y() / c);
-}
-
-void BoxFilter::reset()
-{
-  samples.clear();
-  for (size_t i = 0; i < size; ++i)
-  {
-    samples.push_back(nullptr);
-  }
-}
-
-void BoxFilter::add(QPointF* point)
-{
-  if (++index >= length)
-  {
-    index = 0;
-  }
-
-  if (samples[index] != nullptr)
-    delete samples[index];
-
-  samples[index] = point;
 }
 } // namespace View
 } // namespace TrenchBroom

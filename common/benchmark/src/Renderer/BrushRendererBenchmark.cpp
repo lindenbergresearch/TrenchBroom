@@ -30,7 +30,7 @@
 #include "Model/WorldNode.h"
 #include "Renderer/BrushRenderer.h"
 
-#include <kdl/result.h>
+#include "kdl/result.h"
 
 #include <algorithm>
 #include <chrono>
@@ -38,101 +38,121 @@
 #include <tuple>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 static constexpr size_t NumBrushes = 64'000;
 static constexpr size_t NumTextures = 256;
 
 /**
  * Both returned vectors need to be freed with VecUtils::clearAndDelete
  */
-static std::pair<std::vector<Model::BrushNode *>, std::vector<Assets::Texture *>> makeBrushes() {
-    // make textures
-    std::vector<Assets::Texture *> textures;
-    for (size_t i = 0; i < NumTextures; ++i) {
-        const auto textureName = "texture " + std::to_string(i);
-        textures.push_back(new Assets::Texture(textureName, 64, 64));
+static std::pair<std::vector<Model::BrushNode*>, std::vector<Assets::Texture*>>
+makeBrushes()
+{
+  // make textures
+  std::vector<Assets::Texture*> textures;
+  for (size_t i = 0; i < NumTextures; ++i)
+  {
+    const auto textureName = "texture " + std::to_string(i);
+    textures.push_back(new Assets::Texture(textureName, 64, 64));
+  }
+
+  // make brushes, cycling through the textures for each face
+  const vm::bbox3 worldBounds(4096.0);
+
+  Model::BrushBuilder builder(Model::MapFormat::Standard, worldBounds);
+
+  std::vector<Model::BrushNode*> result;
+  size_t currentTextureIndex = 0;
+  for (size_t i = 0; i < NumBrushes; ++i)
+  {
+    Model::Brush brush = builder.createCube(64.0, "").value();
+    for (Model::BrushFace& face : brush.faces())
+    {
+      face.setTexture(textures.at((currentTextureIndex++) % NumTextures));
     }
+    Model::BrushNode* brushNode = new Model::BrushNode(std::move(brush));
+    result.push_back(brushNode);
+  }
 
-    // make brushes, cycling through the textures for each face
-    const vm::bbox3 worldBounds(4096.0);
+  // ensure the brushes have their vertices cached.
+  // we're not benchmarking that, so we don't
+  // want it mixed into the timing
 
-    Model::BrushBuilder builder(Model::MapFormat::Standard, worldBounds);
+  BrushRenderer tempRenderer;
+  for (auto* brushNode : result)
+  {
+    tempRenderer.addBrush(brushNode);
+  }
+  tempRenderer.validate();
+  tempRenderer.clear();
 
-    std::vector<Model::BrushNode *> result;
-    size_t currentTextureIndex = 0;
-    for (size_t i = 0; i < NumBrushes; ++i) {
-        Model::Brush brush = builder.createCube(64.0, "").value();
-        for (Model::BrushFace &face: brush.faces()) {
-            face.setTexture(textures.at((currentTextureIndex++) % NumTextures));
-        }
-        Model::BrushNode *brushNode = new Model::BrushNode(std::move(brush));
-        result.push_back(brushNode);
-    }
-
-    // ensure the brushes have their vertices cached.
-    // we're not benchmarking that, so we don't
-    // want it mixed into the timing
-
-    BrushRenderer tempRenderer;
-    for (auto *brushNode: result) {
-        tempRenderer.addBrush(brushNode);
-    }
-    tempRenderer.validate();
-    tempRenderer.clear();
-
-    return {result, textures};
+  return {result, textures};
 }
 
 TEST_CASE("BrushRendererBenchmark.benchBrushRenderer")
 {
-    auto brushesTextures = makeBrushes();
-    std::vector<Model::BrushNode *> brushes = brushesTextures.first;
-    std::vector<Assets::Texture *> textures = brushesTextures.second;
+  auto brushesTextures = makeBrushes();
+  std::vector<Model::BrushNode*> brushes = brushesTextures.first;
+  std::vector<Assets::Texture*> textures = brushesTextures.second;
 
-    BrushRenderer r;
+  BrushRenderer r;
 
-    timeLambda([&]() {
-          for (auto *brush: brushes) {
-              r.addBrush(brush);
-          }
-        }, "add " + std::to_string(brushes.size()) + " brushes to BrushRenderer"
-    );
-    timeLambda([&]() {
-          if (!r.valid()) {
-              r.validate();
-          }
-        }, "validate after adding " + std::to_string(brushes.size()) + " brushes to BrushRenderer"
-    );
+  timeLambda(
+    [&]() {
+      for (auto* brush : brushes)
+      {
+        r.addBrush(brush);
+      }
+    },
+    "add " + std::to_string(brushes.size()) + " brushes to BrushRenderer");
+  timeLambda(
+    [&]() {
+      if (!r.valid())
+      {
+        r.validate();
+      }
+    },
+    "validate after adding " + std::to_string(brushes.size())
+      + " brushes to BrushRenderer");
 
-    // Tiny change: remove the last brush
-    timeLambda([&]() { r.removeBrush(brushes.back()); }, "call removeBrush once");
-    timeLambda([&]() {
-          if (!r.valid()) {
-              r.validate();
-          }
-        }, "validate after removing one brush"
-    );
+  // Tiny change: remove the last brush
+  timeLambda([&]() { r.removeBrush(brushes.back()); }, "call removeBrush once");
+  timeLambda(
+    [&]() {
+      if (!r.valid())
+      {
+        r.validate();
+      }
+    },
+    "validate after removing one brush");
 
-    // Large change: keep every second brush
-    timeLambda([&]() {
-          for (size_t i = 0; i < brushes.size(); ++i) {
-              if ((i % 2) == 0) {
-                  r.removeBrush(brushes[i]);
-              }
-          }
-        }, "remove every second brush"
-    );
+  // Large change: keep every second brush
+  timeLambda(
+    [&]() {
+      for (size_t i = 0; i < brushes.size(); ++i)
+      {
+        if ((i % 2) == 0)
+        {
+          r.removeBrush(brushes[i]);
+        }
+      }
+    },
+    "remove every second brush");
 
-    timeLambda([&]() {
-          if (!r.valid()) {
-              r.validate();
-          }
-        }, "validate remaining brushes"
-    );
+  timeLambda(
+    [&]() {
+      if (!r.valid())
+      {
+        r.validate();
+      }
+    },
+    "validate remaining brushes");
 
-    kdl::vec_clear_and_delete(brushes);
-    kdl::vec_clear_and_delete(textures);
+  kdl::vec_clear_and_delete(brushes);
+  kdl::vec_clear_and_delete(textures);
 }
 } // namespace Renderer
 } // namespace TrenchBroom

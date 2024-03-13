@@ -36,9 +36,7 @@ public:
   Sphere(float radius, size_t iterations);
 
   bool prepared() const;
-
   void prepare(VboManager& vboManager);
-
   void render();
 };
 } // namespace Renderer

@@ -31,16 +31,9 @@ protected:
 
 public:
   Exception() noexcept;
-
   explicit Exception(std::string str) noexcept;
 
   const char* what() const noexcept override;
-};
-
-class BrushFaceReferenceException : public Exception
-{
-public:
-  using Exception::Exception;
 };
 
 class EntityAttributeException : public Exception
@@ -53,14 +46,11 @@ class ParserException : public Exception
 {
 public:
   using Exception::Exception;
-
   ParserException(size_t line, size_t column, const std::string& str = "");
-
   explicit ParserException(size_t line, const std::string& str = "");
 
 private:
   static std::string buildMessage(size_t line, size_t column, const std::string& str);
-
   static std::string buildMessage(size_t line, const std::string& str);
 };
 

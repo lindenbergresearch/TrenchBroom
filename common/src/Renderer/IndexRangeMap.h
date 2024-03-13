@@ -22,7 +22,7 @@
 #include "Renderer/GL.h"
 #include "Renderer/PrimType.h"
 
-#include <kdl/enum_array.h>
+#include "kdl/enum_array.h"
 
 #include <functional>
 #include <memory>
@@ -54,17 +54,12 @@ private:
     GLCounts counts;
 
     IndicesAndCounts();
-
     IndicesAndCounts(size_t index, size_t count);
 
     bool empty() const;
-
     size_t size() const;
-
     void reserve(size_t capacity);
-
     void add(PrimType primType, size_t index, size_t count, bool dynamicGrowth);
-
     void add(const IndicesAndCounts& other, bool dynamicGrowth);
   };
 

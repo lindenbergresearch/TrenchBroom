@@ -37,9 +37,7 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushNode;
-
 class BrushFace;
-
 class EditorContext;
 } // namespace Model
 
@@ -68,7 +66,6 @@ public:
     using RenderSettings = std::tuple<FaceRenderPolicy, EdgeRenderPolicy>;
 
     Filter();
-
     virtual ~Filter();
 
     /**
@@ -101,21 +98,15 @@ public:
     explicit DefaultFilter(const Model::EditorContext& context);
 
     bool visible(const Model::BrushNode& brush) const;
-
     bool visible(const Model::BrushNode& brush, const Model::BrushFace& face) const;
-
     bool visible(const Model::BrushNode& brush, const Model::BrushEdge& edge) const;
 
     bool editable(const Model::BrushNode& brush) const;
-
     bool editable(const Model::BrushNode& brush, const Model::BrushFace& face) const;
 
     bool selected(const Model::BrushNode& brush) const;
-
     bool selected(const Model::BrushNode& brush, const Model::BrushFace& face) const;
-
     bool selected(const Model::BrushNode& brush, const Model::BrushEdge& edge) const;
-
     bool hasSelectedFaces(const Model::BrushNode& brush) const;
   };
 
@@ -123,7 +114,6 @@ public:
   {
   public:
     using Filter::Filter;
-
     RenderSettings markFaces(const Model::BrushNode& brushNode) const override;
   };
 
@@ -219,9 +209,7 @@ public:
    * lingering Texture* pointers.
    */
   void invalidate();
-
   void invalidateBrush(const Model::BrushNode* brush);
-
   bool valid() const;
 
   /**
@@ -293,16 +281,12 @@ public:
 
 public: // rendering
   void render(RenderContext& renderContext, RenderBatch& renderBatch);
-
   void renderOpaque(RenderContext& renderContext, RenderBatch& renderBatch);
-
   void renderTransparent(RenderContext& renderContext, RenderBatch& renderBatch);
 
 private:
   void renderOpaqueFaces(RenderBatch& renderBatch);
-
   void renderTransparentFaces(RenderBatch& renderBatch);
-
   void renderEdges(RenderBatch& renderBatch);
 
 public:
@@ -314,7 +298,6 @@ public:
 private:
   bool shouldDrawFaceInTransparentPass(
     const Model::BrushNode& brushNode, const Model::BrushFace& face) const;
-
   void validateBrush(const Model::BrushNode& brushNode);
 
 public:
@@ -323,7 +306,6 @@ public:
    * guaranteed to invalidate it).
    */
   void addBrush(const Model::BrushNode* brushNode);
-
   /**
    * Removes a brush. Calling with an unknown brush is allowed, but ignored.
    */

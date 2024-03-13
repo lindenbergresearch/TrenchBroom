@@ -19,8 +19,6 @@
 
 #include "TriangleRenderer.h"
 
-#include "PreferenceManager.h"
-#include "Preferences.h"
 #include "Renderer/ActiveShader.h"
 #include "Renderer/Camera.h"
 #include "Renderer/RenderContext.h"
@@ -84,15 +82,10 @@ void TriangleRenderer::doRender(RenderContext& context)
 {
   if (m_vertexArray.vertexCount() == 0)
     return;
-  PreferenceManager& prefs = PreferenceManager::instance();
-  const float shadeLevel = pref(Preferences::ShadeLevel);
-
 
   ActiveShader shader(context.shaderManager(), Shaders::TriangleShader);
   shader.set("ApplyTinting", m_applyTinting);
   shader.set("TintColor", m_tintColor);
-  shader.set("Alpha", 0.75f);
-  shader.set("ShadeLevel", shadeLevel);
   shader.set("UseColor", m_useColor);
   shader.set("Color", m_color);
   shader.set("CameraPosition", context.camera().position());

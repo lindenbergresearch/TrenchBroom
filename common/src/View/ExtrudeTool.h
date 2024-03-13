@@ -26,12 +26,12 @@
 #include "NotifierConnection.h"
 #include "View/Tool.h"
 
-#include <kdl/reflection_decl.h>
+#include "kdl/reflection_decl.h"
 
-#include <vm/forward.h>
-#include <vm/line.h>
-#include <vm/plane.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/line.h"
+#include "vm/plane.h"
+#include "vm/vec.h"
 
 #include <memory>
 #include <variant>
@@ -42,11 +42,8 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushFace;
-
 class Hit;
-
 class Node;
-
 class PickResult;
 } // namespace Model
 
@@ -58,9 +55,7 @@ class Camera;
 namespace View
 {
 class Grid;
-
 class MapDocument;
-
 class Selection;
 
 /**
@@ -76,7 +71,6 @@ struct ExtrudeDragHandle
   explicit ExtrudeDragHandle(Model::BrushFaceHandle faceHandle);
 
   const Model::BrushFace& faceAtDragStart() const;
-
   vm::vec3 faceNormal() const;
 
   kdl_reflect_decl(ExtrudeDragHandle, faceHandle);
@@ -139,7 +133,6 @@ public:
   const Grid& grid() const;
 
   Model::Hit pick2D(const vm::ray3& pickRay, const Model::PickResult& pickResult) const;
-
   Model::Hit pick3D(const vm::ray3& pickRay, const Model::PickResult& pickResult) const;
 
   /**
@@ -157,22 +150,17 @@ public:
     const std::vector<ExtrudeDragHandle>& dragHandles);
 
   void beginExtrude();
-
   bool extrude(const vm::vec3& faceDelta, ExtrudeDragState& dragState);
 
   void beginMove();
-
   bool move(const vm::vec3& delta, ExtrudeDragState& dragState);
 
   void commit(const ExtrudeDragState& dragState);
-
   void cancel();
 
 private:
   void connectObservers();
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void selectionDidChange(const Selection& selection);
 };
 } // namespace View

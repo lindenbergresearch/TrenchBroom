@@ -39,7 +39,6 @@ private:
 
 public:
   void addCamera(Renderer::Camera* camera);
-
   void updateCameras(const Renderer::Camera* masterCamera);
 
 private:
@@ -50,7 +49,6 @@ class CameraLinkableView
 {
 public:
   virtual ~CameraLinkableView();
-
   virtual void linkCamera(CameraLinkHelper& linkHelper) = 0;
 };
 } // namespace TrenchBroom::View

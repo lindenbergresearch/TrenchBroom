@@ -29,9 +29,7 @@ namespace TrenchBroom
 namespace View
 {
 class Grid;
-
 class InputState;
-
 class MapDocument;
 
 class MoveObjectsTool : public Tool
@@ -55,11 +53,8 @@ public:
   const Grid& grid() const;
 
   bool startMove(const InputState& inputState);
-
   MoveResult move(const InputState& inputState, const vm::vec3& delta);
-
   void endMove(const InputState& inputState);
-
   void cancelMove();
 
 private:

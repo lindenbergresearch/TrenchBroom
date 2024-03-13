@@ -24,11 +24,11 @@
 #include "Macros.h"
 #include "Notifier.h"
 
-#include <vm/forward.h>
-#include <vm/intersection.h>
-#include <vm/plane.h>
-#include <vm/scalar.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/intersection.h"
+#include "vm/plane.h"
+#include "vm/scalar.h"
+#include "vm/vec.h"
 
 #include <array>
 
@@ -61,33 +61,20 @@ public:
 
   static FloatType actualSize(int size);
 
-  static float getScaleFactor();
-
   int size() const;
-
   void setSize(int size);
-
   void incSize();
-
   void decSize();
-
-  static bool isMetric();
-
   FloatType actualSize() const;
-
-  static const QString asString(const int size);
-
   /**
    * Snap increment in radians for angle snapping
    */
   FloatType angle() const;
 
   bool visible() const;
-
   void toggleVisible();
 
   bool snap() const;
-
   void toggleSnap();
 
   template <typename T>
@@ -152,12 +139,14 @@ private:
      * Snap to nearest grid increment (rounding away from 0 if the input is half way
      * between two multiples of the grid size).
      */
-    SnapDir_None, /**
-                   * If off-grid, snap to the next larger grid increment.
-                   */
-    SnapDir_Up,   /**
-                   * If off-grid, snap to the next smaller grid increment.
-                   */
+    SnapDir_None,
+    /**
+     * If off-grid, snap to the next larger grid increment.
+     */
+    SnapDir_Up,
+    /**
+     * If off-grid, snap to the next smaller grid increment.
+     */
     SnapDir_Down
   } SnapDir;
 
@@ -481,7 +470,6 @@ public:
    * the original point for that axis.
    */
   vm::vec3 moveDeltaForPoint(const vm::vec3& point, const vm::vec3& delta) const;
-
   vm::vec3 moveDeltaForBounds(
     const vm::plane3& targetPlane,
     const vm::bbox3& bounds,

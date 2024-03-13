@@ -25,9 +25,7 @@
 #include <vector>
 
 class QString;
-
 class QWidget;
-
 class QScrollArea;
 
 namespace TrenchBroom
@@ -35,7 +33,6 @@ namespace TrenchBroom
 namespace View
 {
 class FlagsEditor;
-
 class MapDocument;
 
 class SmartFlagsEditor : public SmartPropertyEditor
@@ -55,21 +52,17 @@ public:
 
 private:
   void createGui();
-
   void doUpdateVisual(const std::vector<Model::EntityNodeBase*>& nodes) override;
-
   void resetScrollPos();
 
   void getFlags(
     const std::vector<Model::EntityNodeBase*>& nodes,
     QStringList& labels,
     QStringList& tooltips) const;
-
   void getFlagValues(
     const std::vector<Model::EntityNodeBase*>& nodes,
     int& setFlags,
     int& mixedFlags) const;
-
   int getFlagValue(const Model::EntityNodeBase* node) const;
 
   void flagChanged(size_t index, int value, int setFlag, int mixedFlag);

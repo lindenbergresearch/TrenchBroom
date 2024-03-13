@@ -25,9 +25,9 @@
 #include "Renderer/GLVertexType.h"
 #include "View/CellView.h"
 
-#include <vm/bbox.h>
-#include <vm/forward.h>
-#include <vm/quat.h>
+#include "vm/bbox.h"
+#include "vm/forward.h"
+#include "vm/quat.h"
 
 #include <optional>
 #include <string>
@@ -36,33 +36,28 @@
 namespace TrenchBroom
 {
 class Logger;
+}
 
-namespace Assets
+namespace TrenchBroom::Assets
 {
 class EntityDefinition;
-
 class EntityDefinitionManager;
-
 enum class EntityDefinitionSortOrder;
-
 class EntityModelManager;
-
 enum class Orientation;
-
 class PointEntityDefinition;
-} // namespace Assets
+} // namespace TrenchBroom::Assets
 
-namespace Renderer
+namespace TrenchBroom::Renderer
 {
 class FontDescriptor;
-
 class TexturedRenderer;
-
 class Transformation;
-} // namespace Renderer
+} // namespace TrenchBroom::Renderer
 
-namespace View
+namespace TrenchBroom::View
 {
+
 using EntityGroupData = std::string;
 
 struct EntityCellData
@@ -95,8 +90,8 @@ private:
   Logger& m_logger;
   vm::quatf m_rotation;
 
-  bool m_group;
-  bool m_hideUnused;
+  bool m_group = false;
+  bool m_hideUnused = false;
   Assets::EntityDefinitionSortOrder m_sortOrder;
   std::string m_filterText;
 
@@ -109,7 +104,6 @@ public:
     Assets::EntityDefinitionManager& entityDefinitionManager,
     Assets::EntityModelManager& entityModelManager,
     Logger& logger);
-
   ~EntityBrowserView() override;
 
 public:
@@ -117,54 +111,36 @@ public:
     std::optional<EL::Expression> defaultModelScaleExpression);
 
   void setSortOrder(Assets::EntityDefinitionSortOrder sortOrder);
-
   void setGroup(bool group);
-
   void setHideUnused(bool hideUnused);
-
   void setFilterText(const std::string& filterText);
 
 private:
   void doInitLayout(Layout& layout) override;
-
   void doReloadLayout(Layout& layout) override;
 
   bool dndEnabled() override;
-
   QString dndData(const Cell& cell) override;
 
   void addEntitiesToLayout(
     Layout& layout,
     const std::vector<Assets::EntityDefinition*>& definitions,
     const Renderer::FontDescriptor& font);
-
   void addEntityToLayout(
     Layout& layout,
     const Assets::PointEntityDefinition* definition,
     const Renderer::FontDescriptor& font);
 
   void doClear() override;
-
   void doRender(Layout& layout, float y, float height) override;
-
   bool doShouldRenderFocusIndicator() const override;
-
   const Color& getBackgroundColor() override;
 
   void renderBounds(Layout& layout, float y, float height);
 
   class MeshFunc;
-
   void renderModels(
     Layout& layout, float y, float height, Renderer::Transformation& transformation);
-
-  void renderNames(Layout& layout, float y, float height, const vm::mat4x4f& projection);
-
-  void renderGroupTitleBackgrounds(Layout& layout, float y, float height);
-
-  void renderStrings(Layout& layout, float y, float height);
-
-  StringMap collectStringVertices(Layout& layout, float y, float height);
 
   vm::mat4x4f itemTransformation(
     const Cell& cell, float y, float height, bool applyModelScale) const;
@@ -173,5 +149,5 @@ private:
 
   const EntityCellData& cellData(const Cell& cell) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

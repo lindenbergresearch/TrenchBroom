@@ -23,58 +23,30 @@
 #include <QLayout>
 
 #include "View/BorderLine.h"
+#include "View/ClickableTitleBar.h"
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
-// CollapsibleTitleBar
 
-CollapsibleTitleBar::CollapsibleTitleBar(
-  const QString& title, const QString& stateText, QWidget* parent)
-  : TitleBar(title, parent)
-  , m_stateText(new QLabel(stateText))
-{
-  setObjectName("CollapsibleTitleBar");
-  m_stateText->setFont(m_titleText->font());
-  makeInfo(m_stateText);
-  m_stateText->setContentsMargins(0, 0, LayoutConstants::MediumHMargin, 0);
-
-  layout()->addWidget(m_stateText);
-}
-
-void CollapsibleTitleBar::setStateText(const QString& stateText)
-{
-  m_stateText->setText(stateText);
-}
-
-void CollapsibleTitleBar::mousePressEvent(QMouseEvent* /* event */)
-{
-  emit titleBarClicked();
-}
-
-// CollapsibleTitledPanel
 CollapsibleTitledPanel::CollapsibleTitledPanel(
   const QString& title, const bool initiallyExpanded, QWidget* parent)
-  : QWidget(parent)
-  , m_titleBar(new CollapsibleTitleBar(title, "hide"))
-  , m_panel(new QWidget())
-  , m_expanded(initiallyExpanded)
+  : QWidget{parent}
+  , m_titleBar{new ClickableTitleBar{title, "hide"}}
+  , m_divider{new BorderLine{}}
+  , m_panel{new QWidget{}}
+  , m_expanded{initiallyExpanded}
 {
-
-  m_panel->setAutoFillBackground(true);
-  m_panel->setBackgroundRole(QPalette::Window);
-
-  auto* sizer = new QVBoxLayout();
+  auto* sizer = new QVBoxLayout{};
   sizer->setContentsMargins(0, 0, 0, 0);
   sizer->setSpacing(0);
   sizer->addWidget(m_titleBar, 0);
-  sizer->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
+  sizer->addWidget(m_divider, 0);
+  sizer->addWidget(m_panel, 1);
   setLayout(sizer);
 
-  connect(m_titleBar, &CollapsibleTitleBar::titleBarClicked, this, [=]() {
+  connect(m_titleBar, &ClickableTitleBar::titleBarClicked, this, [=]() {
     setExpanded(!m_expanded);
   });
 
@@ -103,26 +75,24 @@ bool CollapsibleTitledPanel::expanded() const
 
 void CollapsibleTitledPanel::setExpanded(const bool expanded)
 {
-  if (expanded == m_expanded)
+  if (expanded != m_expanded)
   {
-    return;
+    m_expanded = expanded;
+    updateExpanded();
   }
-
-  m_expanded = expanded;
-  updateExpanded();
 }
 
 QByteArray CollapsibleTitledPanel::saveState() const
 {
-  auto result = QByteArray();
-  auto stream = QDataStream(&result, QIODevice::WriteOnly);
+  auto result = QByteArray{};
+  auto stream = QDataStream{&result, QIODevice::WriteOnly};
   stream << m_expanded;
   return result;
 }
 
 bool CollapsibleTitledPanel::restoreState(const QByteArray& state)
 {
-  auto stream = QDataStream(state);
+  auto stream = QDataStream{state};
   bool expanded;
   stream >> expanded;
 
@@ -139,14 +109,16 @@ void CollapsibleTitledPanel::updateExpanded()
 {
   if (m_expanded)
   {
+    m_divider->show();
     m_panel->show();
     m_titleBar->setStateText(tr("hide"));
   }
   else
   {
+    m_divider->hide();
     m_panel->hide();
     m_titleBar->setStateText(tr("show"));
   }
 }
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

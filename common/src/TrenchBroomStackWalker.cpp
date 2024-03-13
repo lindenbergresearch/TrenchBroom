@@ -24,9 +24,7 @@
 #include "StackWalker.h"
 #endif
 #else
-
 #include <execinfo.h>
-
 #endif
 
 #include "TrenchBroomStackWalker.h"
@@ -102,7 +100,6 @@ std::string TrenchBroomStackWalker::getStackTrace()
 }
 #endif
 #else
-
 std::string TrenchBroomStackWalker::getStackTrace()
 {
   const int MaxDepth = 256;
@@ -123,6 +120,5 @@ std::string TrenchBroomStackWalker::getStackTrace()
   free(strs);
   return ss.str();
 }
-
 #endif
 } // namespace TrenchBroom

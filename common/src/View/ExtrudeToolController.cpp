@@ -40,11 +40,11 @@
 #include "View/HandleDragTracker.h"
 #include "View/InputState.h"
 
-#include <vm/distance.h>
-#include <vm/intersection.h>
-#include <vm/line.h>
-#include <vm/plane.h>
-#include <vm/scalar.h>
+#include "vm/distance.h"
+#include "vm/intersection.h"
+#include "vm/line.h"
+#include "vm/plane.h"
+#include "vm/scalar.h"
 
 namespace TrenchBroom::View
 {

@@ -30,14 +30,12 @@
 #include "View/BorderLine.h"
 #include "View/QtUtils.h"
 #include "View/RecentDocumentListBox.h"
-#include "View/TitleBar.h"
-#include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
 
 namespace TrenchBroom::View
 {
 WelcomeWindow::WelcomeWindow()
-  : QMainWindow{nullptr, Qt::Window}
+  : QMainWindow{nullptr, Qt::Dialog} // Qt::Dialog flag centers window on Ubuntu
   , m_recentDocumentListBox{nullptr}
   , m_createNewDocumentButton{nullptr}
   , m_openOtherDocumentButton{nullptr}
@@ -51,9 +49,10 @@ void WelcomeWindow::createGui()
   setWindowTitle("Welcome to TrenchBroom");
 
   m_recentDocumentListBox = new RecentDocumentListBox{};
-  m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
-  //  m_recentDocumentListBox->setSizePolicy(QSizePolicy::Expanding,
-  //  QSizePolicy::Expanding);
+  m_recentDocumentListBox->setToolTip("Double click on a file to open it");
+  m_recentDocumentListBox->setFixedWidth(300);
+  m_recentDocumentListBox->setSizePolicy(
+    QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
   connect(
     m_recentDocumentListBox,
@@ -61,19 +60,15 @@ void WelcomeWindow::createGui()
     this,
     &WelcomeWindow::openDocument);
 
-  auto panelLayout = new QVBoxLayout;
-  panelLayout->setContentsMargins(0, 0, 0, 0);
-  panelLayout->setSpacing(0);
-  panelLayout->addWidget(m_recentDocumentListBox);
-
   auto* innerLayout = new QHBoxLayout{};
   innerLayout->setContentsMargins(QMargins{});
   innerLayout->setSpacing(0);
 
   auto* appPanel = createAppPanel();
 
-  innerLayout->addWidget(appPanel);
-  innerLayout->addLayout(panelLayout);
+  innerLayout->addWidget(appPanel, 0, Qt::AlignTop);
+  innerLayout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0);
+  innerLayout->addWidget(m_recentDocumentListBox, 1);
 
   auto* container = new QWidget{};
   auto* outerLayout = new QVBoxLayout{};
@@ -86,7 +81,7 @@ void WelcomeWindow::createGui()
   container->setLayout(outerLayout);
 
   setCentralWidget(container);
-  setMinimumSize(800, 500);
+  setFixedSize(700, 500);
 }
 
 QWidget* WelcomeWindow::createAppPanel()
@@ -94,15 +89,10 @@ QWidget* WelcomeWindow::createAppPanel()
   auto* appPanel = new QWidget{};
   auto* infoPanel = new AppInfoPanel{appPanel};
 
-  m_createNewDocumentButton = new QPushButton{"New..."};
-  m_createNewDocumentButton->setToolTip("Create a new map document.");
-  m_openOtherDocumentButton = new QPushButton{"Open..."};
-  m_openOtherDocumentButton->setToolTip("Open an existing map document.");
-
-  m_openSettingsButton = new QPushButton{"Settings"};
-  m_openSettingsButton->setToolTip("Setup Trenchbroom.");
-  m_quitApplicationButton = new QPushButton{"Quit"};
-  m_quitApplicationButton->setToolTip("Quit Trenchbroom.");
+  m_createNewDocumentButton = new QPushButton{"New map..."};
+  m_createNewDocumentButton->setToolTip("Create a new map document");
+  m_openOtherDocumentButton = new QPushButton{"Browse..."};
+  m_openOtherDocumentButton->setToolTip("Open an existing map document");
 
   connect(
     m_createNewDocumentButton,
@@ -114,33 +104,23 @@ QWidget* WelcomeWindow::createAppPanel()
     &QPushButton::clicked,
     this,
     &WelcomeWindow::openOtherDocument);
-  connect(
-    m_quitApplicationButton,
-    &QPushButton::clicked,
-    this,
-    &WelcomeWindow::quitApplication);
-  connect(
-    m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings);
 
   auto* buttonLayout = new QHBoxLayout{};
   buttonLayout->setContentsMargins(0, 0, 0, 0);
-  buttonLayout->setSpacing(LayoutConstants::NarrowHMargin);
+  buttonLayout->setSpacing(LayoutConstants::WideHMargin);
   buttonLayout->addStretch();
   buttonLayout->addWidget(m_createNewDocumentButton);
   buttonLayout->addWidget(m_openOtherDocumentButton);
-  buttonLayout->addWidget(m_openSettingsButton);
-  buttonLayout->addWidget(m_quitApplicationButton);
   buttonLayout->addStretch();
 
   auto* outerLayout = new QVBoxLayout{};
   outerLayout->setContentsMargins(0, 0, 0, 0);
   outerLayout->setSpacing(0);
-  outerLayout->addWidget(infoPanel);
+  outerLayout->addWidget(infoPanel, 0, Qt::AlignHCenter);
   outerLayout->addSpacing(20);
   outerLayout->addLayout(buttonLayout);
   outerLayout->addSpacing(20);
   appPanel->setLayout(outerLayout);
-  appPanel->setFixedWidth(400);
 
   return appPanel;
 }
@@ -177,17 +157,5 @@ void WelcomeWindow::openDocument(const std::filesystem::path& path)
   {
     show();
   }
-}
-
-void WelcomeWindow::quitApplication()
-{
-  auto& app = TrenchBroomApp::instance();
-  app.quit();
-}
-
-void WelcomeWindow::openSettings()
-{
-  auto& app = TrenchBroomApp::instance();
-  app.openPreferences();
 }
 } // namespace TrenchBroom::View

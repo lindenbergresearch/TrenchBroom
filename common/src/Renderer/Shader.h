@@ -44,7 +44,6 @@ public:
   deleteCopy(Shader);
 
   Shader(Shader&& other) noexcept;
-
   Shader& operator=(Shader&& other) noexcept;
 
   ~Shader();
@@ -53,4 +52,5 @@ public:
 };
 
 Result<Shader> loadShader(const std::filesystem::path& path, GLenum type);
+
 } // namespace TrenchBroom::Renderer

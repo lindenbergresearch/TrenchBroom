@@ -37,14 +37,11 @@ private:
 
 public:
   explicit LimitedKeySequenceEdit(QWidget* parent = nullptr);
-
   explicit LimitedKeySequenceEdit(size_t maxCount, QWidget* parent = nullptr);
 
 protected:
   void keyPressEvent(QKeyEvent* event) override;
-
 private slots:
-
   void resetCount();
 };
 } // namespace View

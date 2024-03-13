@@ -35,7 +35,6 @@ protected:
   void mousePressEvent(QMouseEvent* event) override;
 
 signals:
-
   void clicked();
 };
 } // namespace View

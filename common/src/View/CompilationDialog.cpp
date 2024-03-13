@@ -31,7 +31,6 @@
 #include "Model/CompilationProfile.h"
 #include "Model/Game.h"
 #include "Model/GameFactory.h"
-#include "TrenchBroomApp.h"
 #include "View/CompilationContext.h"
 #include "View/CompilationProfileManager.h"
 #include "View/CompilationRunner.h"
@@ -53,8 +52,8 @@ CompilationDialog::CompilationDialog(MapFrame* mapFrame)
 {
   ensure(mapFrame != nullptr, "must have a map frame");
   createGui();
-  setMinimumSize(700, 600);
-  resize(1000, 700);
+  setMinimumSize(600, 300);
+  resize(800, 600);
   updateCompileButtons();
 }
 
@@ -82,8 +81,8 @@ void CompilationDialog::createGui()
 
   auto* splitter = new Splitter{Qt::Vertical};
   splitter->addWidget(m_profileManager);
-  splitter->addWidget(outputPanel);
-  splitter->setSizes({1, 1});
+  splitter->addWidget(m_output);
+  splitter->setSizes({2, 1});
 
   auto* buttonBox = new QDialogButtonBox{};
   m_launchButton = buttonBox->addButton("Launch...", QDialogButtonBox::NoRole);

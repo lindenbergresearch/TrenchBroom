@@ -77,86 +77,60 @@ private:
 
 public:
   InputState();
-
   InputState(const float mouseX, const float mouseY);
-
   virtual ~InputState();
 
   virtual ModifierKeyState modifierKeys() const;
-
   bool modifierKeysDown(ModifierKeyState keys) const;
-
   bool modifierKeysPressed(ModifierKeyState keys) const;
-
   bool checkModifierKeys(
     ModifierKeyState key1,
     ModifierKeyState key2 = ModifierKeys::MKDontCare,
     ModifierKeyState key3 = ModifierKeys::MKDontCare,
     ModifierKeyState key4 = ModifierKeys::MKDontCare) const;
-
   bool checkModifierKeys(
     ModifierKeyPressed ctrl, ModifierKeyPressed alt, ModifierKeyPressed shift) const;
-
   bool checkModifierKey(ModifierKeyPressed state, ModifierKeyState key) const;
 
   MouseButtonState mouseButtons() const;
-
   bool mouseButtonsDown(MouseButtonState buttons) const;
-
   /**
    * Checks whether only the given buttons are down (and no others).
    */
   bool mouseButtonsPressed(const MouseButtonState buttons) const;
-
   float mouseX() const;
-
   float mouseY() const;
-
   float mouseDX() const;
-
   float mouseDY() const;
 
   /**
    * Number of "lines" to scroll horizontally.
    */
   float scrollX() const;
-
   /**
    * Number of "lines" to scroll vertically.
    */
   float scrollY() const;
 
   void setModifierKeys(const ModifierKeyState keys);
-
   void clearModifierKeys();
-
   void mouseDown(const MouseButtonState button);
-
   void mouseUp(const MouseButtonState button);
-
   void clearMouseButtons();
-
   void mouseMove(
     const float mouseX, const float mouseY, const float mouseDX, const float mouseDY);
-
   void scroll(const float scrollX, const float scrollY);
 
   bool anyToolDragging() const;
-
   void setAnyToolDragging(bool anyToolDragging);
 
   const vm::ray3& pickRay() const;
-
   const vm::vec3 defaultPoint() const;
-
   const vm::vec3 defaultPointUnderMouse() const;
-
   const Renderer::Camera& camera() const;
-
   void setPickRequest(const PickRequest& pickRequest);
 
   const Model::PickResult& pickResult() const;
-
   void setPickResult(Model::PickResult&& pickResult);
 };
 } // namespace View

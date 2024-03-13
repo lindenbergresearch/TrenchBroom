@@ -29,7 +29,6 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-#include <TrenchBroomApp.h>
 #include <iostream>
 
 namespace TrenchBroom
@@ -66,6 +65,38 @@ void ControlListBoxItemRenderer::updateItem() {}
 void ControlListBoxItemRenderer::setSelected(
   const bool selected, const QListWidget* listWidget)
 {
+  QPalette backgroundPalette;
+  backgroundPalette.setColor(
+    QPalette::Active,
+    QPalette::Highlight,
+    listWidget->palette().color(QPalette::Active, QPalette::Highlight));
+  backgroundPalette.setColor(
+    QPalette::Inactive,
+    QPalette::Highlight,
+    listWidget->palette().color(QPalette::Inactive, QPalette::Highlight));
+  backgroundPalette.setColor(
+    QPalette::Disabled,
+    QPalette::Highlight,
+    listWidget->palette().color(QPalette::Disabled, QPalette::Highlight));
+
+  backgroundPalette.setColor(
+    QPalette::Active,
+    QPalette::Base,
+    listWidget->palette().color(QPalette::Active, QPalette::Base));
+  backgroundPalette.setColor(
+    QPalette::Inactive,
+    QPalette::Base,
+    listWidget->palette().color(QPalette::Inactive, QPalette::Base));
+  backgroundPalette.setColor(
+    QPalette::Disabled,
+    QPalette::Base,
+    listWidget->palette().color(QPalette::Disabled, QPalette::Base));
+  setPalette(backgroundPalette);
+  // macOS: we'd prefer setPalette(listWidget->palette()); but this doesn't work, whereas
+  // the above does.
+  // FIXME: the above setPalette call should be removed once we stop using QListWidget and
+  // make ControlListBox a standalone widget.
+
   setBackgroundRole(selected ? QPalette::Highlight : QPalette::Base);
 
   // by default, we just change the appearance of all labels
@@ -80,6 +111,43 @@ void ControlListBoxItemRenderer::setSelected(
     {
       continue;
     }
+
+    // The label colorRole automatically updates from QPalette::Text to
+    // QPalette::HighlightedText. However the macOS palette is different on listWidget and
+    // the app default QPalette, so we need to transfer the listWidget palette to the
+    // QLabel for good contrast.
+
+    QPalette labelPalette;
+    labelPalette.setColor(
+      QPalette::Active,
+      QPalette::HighlightedText,
+      listWidget->palette().color(QPalette::Active, QPalette::HighlightedText));
+    labelPalette.setColor(
+      QPalette::Inactive,
+      QPalette::HighlightedText,
+      listWidget->palette().color(QPalette::Inactive, QPalette::HighlightedText));
+    labelPalette.setColor(
+      QPalette::Disabled,
+      QPalette::HighlightedText,
+      listWidget->palette().color(QPalette::Disabled, QPalette::HighlightedText));
+
+    labelPalette.setColor(
+      QPalette::Active,
+      QPalette::Text,
+      listWidget->palette().color(QPalette::Active, QPalette::Text));
+    labelPalette.setColor(
+      QPalette::Inactive,
+      QPalette::Text,
+      listWidget->palette().color(QPalette::Inactive, QPalette::Text));
+    labelPalette.setColor(
+      QPalette::Disabled,
+      QPalette::Text,
+      listWidget->palette().color(QPalette::Disabled, QPalette::Text));
+    child->setPalette(labelPalette);
+    // macOS: we'd prefer child->setPalette(listWidget->palette()); but this doesn't work,
+    // whereas the above does.
+    // FIXME: the above setPalette call should be removed once we stop using QListWidget
+    // and make ControlListBox a standalone widget.
   }
 }
 
@@ -93,13 +161,11 @@ ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(
   auto* layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
-  layout->addWidget(m_renderer, 1);
+  layout->addWidget(m_renderer);
 
   if (showSeparator)
   {
-    auto borderline = new BorderLine(BorderLine::Direction::Horizontal, 1, this);
-    borderline->setContentsMargins(0, LayoutConstants::NarrowVMargin, 0, 0);
-    layout->addWidget(borderline);
+    layout->addWidget(new BorderLine());
   }
 
   setLayout(layout);
@@ -160,14 +226,14 @@ ControlListBox::ControlListBox(
 ControlListBox::ControlListBox(
   const QString& emptyText, const bool showSeparator, QWidget* parent)
   : ControlListBox(
-      emptyText,
-      QMargins(
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::NarrowVMargin,
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::NarrowVMargin),
-      showSeparator,
-      parent)
+    emptyText,
+    QMargins(
+      LayoutConstants::MediumHMargin,
+      LayoutConstants::NarrowVMargin,
+      LayoutConstants::MediumHMargin,
+      LayoutConstants::NarrowVMargin),
+    showSeparator,
+    parent)
 {
 }
 

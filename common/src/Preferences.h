@@ -22,7 +22,7 @@
 #include "Color.h"
 #include "Preference.h"
 
-#include <vm/util.h>
+#include "vm/util.h"
 
 #include <filesystem>
 #include <vector>
@@ -37,92 +37,49 @@ namespace Preferences
 // NOTE: When adding a new preference here, always update the staticPreferences()
 // implementation
 
-enum LengthUnitDisplay
-{
-  Units,   /* common units used by Quake (standard) */
-  Metric,  /* metric system used for interfacing 3rd party systems and engines */
-  Combined /* combined */
-};
-
-
 extern Preference<int> MapViewLayout;
 
 QString systemTheme();
-
 QString darkTheme();
-
 extern Preference<QString> Theme;
 
-/* --- VIEW ------------------------------------------ */
-extern Preference<bool> ShowFocusIndicator;
-extern Preference<float> ViewFrameWidth;
+extern Preference<bool> ShowAxes;
 extern Preference<Color> SoftMapBoundsColor;
 extern Preference<Color> BackgroundColor;
+extern Preference<float> AxisLength;
+extern Preference<Color> XAxisColor;
+extern Preference<Color> YAxisColor;
+extern Preference<Color> ZAxisColor;
 extern Preference<Color> PointFileColor;
 extern Preference<Color> PortalFileBorderColor;
 extern Preference<Color> PortalFileFillColor;
 extern Preference<bool> ShowFPS;
 
-extern Preference<float> TextRendererMaxDistance;
-extern Preference<float> TextRendererFadeOutFactor;
-
-/* --- AXIS ------------------------------------------ */
-extern Preference<bool> ShowAxes;
-extern Preference<float> AxisLength;
-extern Preference<Color> XAxisColor;
-extern Preference<Color> YAxisColor;
-extern Preference<Color> ZAxisColor;
 Preference<Color>& axisColor(vm::axis::type axis);
 
-/* --- UNITS CONVERSATION ---------------------------- */
-extern Preference<int> LengthUnitSystem;
-extern Preference<float> MetricConversationFactor;
-extern Preference<int> UnitsMaxDigits;
-
-/* --- COMPASS---------------------------------------- */
 extern Preference<Color> CompassBackgroundColor;
 extern Preference<Color> CompassBackgroundOutlineColor;
-extern Preference<float> CompassTransparency;
-extern Preference<float> CompassScale;
+extern Preference<Color> CompassAxisOutlineColor;
 
 extern Preference<Color> CameraFrustumColor;
+
 extern Preference<Color> DefaultGroupColor;
 extern Preference<Color> LinkedGroupColor;
+
 extern Preference<Color> TutorialOverlayTextColor;
 extern Preference<Color> TutorialOverlayBackgroundColor;
-extern Preference<Color> UndefinedEntityColor;
 
-/* --- FACES ----------------------------------------- */
 extern Preference<Color> FaceColor;
 extern Preference<Color> SelectedFaceColor;
 extern Preference<Color> LockedFaceColor;
 extern Preference<float> TransparentFaceAlpha;
-
-/* --- EDGES ----------------------------------------- */
 extern Preference<Color> EdgeColor;
 extern Preference<Color> SelectedEdgeColor;
-extern Preference<Color> OccludedSelectedEdgeColor;
-extern Preference<float> EdgeLineWidth;
-extern Preference<float> EdgeSelectedLineWidth;
-extern Preference<Color> LockedEdgeColor;
 extern Preference<float> OccludedSelectedEdgeAlpha;
 extern Preference<Color> LockedEdgeColor;
+extern Preference<Color> UndefinedEntityColor;
 
-/* --- SELECTION BOUNDS ------------------------------ */
 extern Preference<Color> SelectionBoundsColor;
-extern Preference<Color> SelectionBoundsPointColor;
-extern Preference<float> SelectionBoundsAlpha;
-extern Preference<float> SelectionBoundsLineWidth;
-extern Preference<float> SelectionBoundsPointSize;
-extern Preference<int> SelectionBoundsPattern;
-extern Preference<bool> SelectionBoundsIntersectionMode;
-extern Preference<bool> SelectionBoundsDashedLines;
-extern Preference<bool> ShowHiddenSelectionBounds;
-extern Preference<bool> AlwaysShowSelectionBounds;
-extern Preference<bool> ShowObjectBoundsSelectionBounds;
-extern Preference<bool> SelectionBoundsShowMinMax;
-extern Preference<int> SelectionBoundsDashedSize;
-
 
 extern Preference<Color> InfoOverlayTextColor;
 extern Preference<Color> GroupInfoOverlayTextColor;
@@ -165,32 +122,20 @@ extern Preference<Color> AngleIndicatorColor;
 extern Preference<Color> TextureSeamColor;
 
 extern Preference<float> Brightness;
-extern Preference<int> FaceAutoBrightness;
-
-/* --- GRID ------------------------------------------ */
-extern Preference<float> GridLineWidth;
 extern Preference<float> GridAlpha;
-extern Preference<float> GridMajorDivisionSize;
-extern Preference<int> GridUnitSystem;
 extern Preference<Color> GridColor2D;
 
 extern Preference<int> TextureMinFilter;
 extern Preference<int> TextureMagFilter;
 extern Preference<bool> EnableMSAA;
+
 extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
-/* --- FONTS ----------------------------------------- */
-extern Preference<std::filesystem::path> RendererFontPath;
-extern Preference<std::filesystem::path> UIFontPath;
-extern Preference<std::filesystem::path> ConsoleFontPath;
+Preference<std::filesystem::path>& RendererFontPath();
 extern Preference<int> RendererFontSize;
+
 extern Preference<int> BrowserFontSize;
-extern Preference<int> UIFontSize;
-extern Preference<int> ConsoleFontSize;
-
-extern Preference<int> ToolBarIconsSize;
-
 extern Preference<Color> BrowserTextColor;
 extern Preference<Color> BrowserSubTextColor;
 extern Preference<Color> BrowserBackgroundColor;
@@ -200,21 +145,7 @@ extern Preference<Color> TextureBrowserDefaultColor;
 extern Preference<Color> TextureBrowserSelectedColor;
 extern Preference<Color> TextureBrowserUsedColor;
 
-/* --- UI COLORS  ------------------------------------ */
-extern Preference<Color> UIHighlightColor;
-extern Preference<Color> UIWindowTintColor;
-extern Preference<Color> UITextColor;
-extern Preference<float> UIBrightness;
-
-/* --- LOGGING COLORS -------------------------------- */
-extern Preference<Color> LogDebugColor;
-extern Preference<Color> LogInfoColor;
-extern Preference<Color> LogWarningColor;
-extern Preference<Color> LogErrorColor;
-
-/* --- CAMERA ---------------------------------------- */
 extern Preference<float> CameraLookSpeed;
-extern Preference<int> CameraLookSmoothing;
 extern Preference<bool> CameraLookInvertH;
 extern Preference<bool> CameraLookInvertV;
 extern Preference<float> CameraPanSpeed;
@@ -225,82 +156,48 @@ extern Preference<bool> CameraMouseWheelInvert;
 extern Preference<bool> CameraEnableAltMove;
 extern Preference<bool> CameraAltMoveInvert;
 extern Preference<bool> CameraMoveInCursorDir;
+
 extern Preference<float> CameraFov;
-extern Preference<float> CameraFlyMoveSpeed;
-extern Preference<bool> Link2DCameras;
 
 static constexpr auto MinCameraFlyMoveSpeed = 0.1f;
 static constexpr auto MaxCameraFlyMoveSpeed = 10.0f;
+extern Preference<float> CameraFlyMoveSpeed;
+
+extern Preference<bool> Link2DCameras;
 
 extern Preference<QKeySequence>& CameraFlyForward();
-
 extern Preference<QKeySequence>& CameraFlyBackward();
-
 extern Preference<QKeySequence>& CameraFlyLeft();
-
 extern Preference<QKeySequence>& CameraFlyRight();
-
 extern Preference<QKeySequence>& CameraFlyUp();
-
 extern Preference<QKeySequence>& CameraFlyDown();
 
-/* --- MAP VIEW--------------------------------------- */
+// Map view config
 extern Preference<bool> ShowEntityClassnames;
 extern Preference<bool> ShowGroupBounds;
 extern Preference<bool> ShowBrushEntityBounds;
 extern Preference<bool> ShowPointEntityBounds;
 extern Preference<bool> ShowPointEntityModels;
 
-
-/* --- LIGHTS ---------------------------------------- */
-extern Preference<bool> EnableLightning;
-extern Preference<float> LightningIntensity;
-extern Preference<Color> LightningAmbient;
-
-
 QString faceRenderModeTextured();
-
 QString faceRenderModeFlat();
-
 QString faceRenderModeSkip();
+extern Preference<QString> FaceRenderMode;
 
 extern Preference<bool> ShadeFaces;
-extern Preference<float> ShadeLevel;
-
 extern Preference<bool> ShowFog;
-extern Preference<Color> FogColor;
-extern Preference<float> FogMaxAmount;
-extern Preference<float> FogMinDistance;
-extern Preference<float> FogScale;
-extern Preference<float> FogBias;
-extern Preference<int> FogType;
-
-
-/*
- * uniform vec3 FogColor;
-uniform float FogMaxAmount;
-uniform float FogMinDistance;
-uniform float FogScale;
-uniform float FogBias;
- *
- * */
-
-extern Preference<QString> FaceRenderMode;
 extern Preference<bool> ShowEdges;
+
 extern Preference<bool> ShowSoftMapBounds;
 
-/* --- EDITOR CONTEXT -------------------------------- */
+// Editor context
 extern Preference<bool> ShowPointEntities;
 extern Preference<bool> ShowBrushes;
 
 QString entityLinkModeAll();
-
 QString entityLinkModeTransitive();
-
 QString entityLinkModeDirect();
-
 QString entityLinkModeNone();
-
 extern Preference<QString> EntityLinkMode;
 
 /**
@@ -308,9 +205,7 @@ extern Preference<QString> EntityLinkMode;
  * or if we wanted to do a Path to Preference lookup.
  */
 const std::vector<PreferenceBase*>& staticPreferences();
-
 const std::map<std::filesystem::path, PreferenceBase*>& staticPreferencesMap();
-
 /**
  * Returns the subset of staticPreferences() that are key sequences, used by
  * dump-shortcuts.

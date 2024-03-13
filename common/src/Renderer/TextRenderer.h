@@ -19,15 +19,14 @@
 
 #pragma once
 
-#include "AttrString.h"
 #include "Color.h"
 #include "Renderer/FontDescriptor.h"
 #include "Renderer/GLVertexType.h"
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <vector>
 
@@ -36,14 +35,13 @@ namespace TrenchBroom
 namespace Renderer
 {
 class AttrString;
-
 class RenderContext;
-
 class TextAnchor;
 
 class TextRenderer : public DirectRenderable
 {
 private:
+  static const float DefaultMaxViewDistance;
   static const float DefaultMinZoomFactor;
   static const vm::vec2f DefaultInset;
   static const size_t RectCornerSegments;
@@ -56,19 +54,13 @@ private:
     vm::vec3f offset;
     Color textColor;
     Color backgroundColor;
-    AttrString string;
 
     Entry(
       std::vector<vm::vec2f>& i_vertices,
       const vm::vec2f& i_size,
       const vm::vec3f& i_offset,
       const Color& i_textColor,
-      const Color& i_backgroundColor,
-      const AttrString& i_string);
-
-    bool valueInRange(float value, float min, float max);
-
-    bool overlapsWith(const Entry& entry);
+      const Color& i_backgroundColor);
   };
 
   using EntryList = std::vector<Entry>;
@@ -83,12 +75,6 @@ private:
     VertexArray rectArray;
 
     EntryCollection();
-
-    bool overlaps(Entry& entry);
-
-    void addEntry(Entry& entry);
-
-    void updateLayout();
   };
 
   using TextVertex = GLVertexTypes::P3T2C4::Vertex;
@@ -105,7 +91,7 @@ private:
 public:
   explicit TextRenderer(
     const FontDescriptor& fontDescriptor,
-    float maxViewDistance = 512.f,
+    float maxViewDistance = DefaultMaxViewDistance,
     float minZoomFactor = DefaultMinZoomFactor,
     const vm::vec2f& inset = DefaultInset);
 
@@ -115,7 +101,6 @@ public:
     const Color& backgroundColor,
     const AttrString& string,
     const TextAnchor& position);
-
   void renderStringOnTop(
     RenderContext& renderContext,
     const Color& textColor,
@@ -138,17 +123,14 @@ private:
     const TextAnchor& position,
     float distance,
     bool onTop) const;
-
   float computeAlphaFactor(
     const RenderContext& renderContext, float distance, bool onTop) const;
-
   void addEntry(EntryCollection& collection, const Entry& entry);
 
   vm::vec2f stringSize(RenderContext& renderContext, const AttrString& string) const;
 
 private:
   void doPrepareVertices(VboManager& vboManager) override;
-
   void prepare(EntryCollection& collection, bool onTop, VboManager& vboManager);
 
   void addEntry(
@@ -158,7 +140,6 @@ private:
     std::vector<RectVertex>& rectVertices);
 
   void doRender(RenderContext& renderContext) override;
-
   void render(EntryCollection& collection, RenderContext& renderContext);
 
   void clear();

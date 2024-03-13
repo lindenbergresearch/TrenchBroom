@@ -37,9 +37,9 @@
 #include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/vec_io.h>
+#include "vm/vec_io.h"
 
 #include <optional>
 #include <utility>
@@ -56,7 +56,6 @@ MapInspector::MapInspector(std::weak_ptr<MapDocument> document, QWidget* parent)
   , m_modEditor(nullptr)
 {
   createGui(document);
-  setObjectName("MapInspector_Widget");
 }
 
 MapInspector::~MapInspector()
@@ -72,9 +71,12 @@ void MapInspector::createGui(std::weak_ptr<MapDocument> document)
 
   auto* sizer = new QVBoxLayout();
   sizer->setContentsMargins(0, 0, 0, 0);
-  sizer->setSpacing(LayoutConstants::NarrowVMargin);
+  sizer->setSpacing(0);
+
   sizer->addWidget(createLayerEditor(document), 1);
+  sizer->addWidget(new BorderLine(BorderLine::Direction::Horizontal), 0);
   sizer->addWidget(m_mapPropertiesEditor, 0);
+  sizer->addWidget(new BorderLine(BorderLine::Direction::Horizontal), 0);
   sizer->addWidget(m_modEditor, 0);
   setLayout(sizer);
 }
@@ -186,11 +188,6 @@ std::optional<vm::bbox3> MapPropertiesEditor::parseLineEdits()
 
 void MapPropertiesEditor::createGui()
 {
-  setPalette(qApp->palette());
-  setAutoFillBackground(true);
-  setBackgroundRole(QPalette::ColorRole::Window);
-  setObjectName("MapPropertiesEditor");
-
   m_softBoundsDisabled = new QRadioButton();
   auto* softBoundsDisabledLabel = new ClickableLabel(tr("Soft bounds disabled"));
 

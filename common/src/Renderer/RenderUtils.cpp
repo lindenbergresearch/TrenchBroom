@@ -22,10 +22,10 @@
 #include "Assets/Texture.h"
 #include "Renderer/GL.h"
 
-#include <vm/bbox.h>
-#include <vm/forward.h>
-#include <vm/util.h>
-#include <vm/vec.h>
+#include "vm/bbox.h"
+#include "vm/forward.h"
+#include "vm/util.h"
+#include "vm/vec.h"
 
 #include <map>
 
@@ -35,27 +35,17 @@ namespace Renderer
 {
 static const double EdgeOffset = 0.0001;
 
-Color modifyAlpha(const Color& color, float alpha)
-{
-  return Color{color.r(), color.g(), color.b(), alpha};
-}
-
-Color modifyColor(const Color& color, float r, float g, float b, float a)
-{
-  return Color{color.r() * r, color.g() * g, color.b() * b, color.a() * a};
-}
-
 vm::vec3f gridColorForTexture(const Assets::Texture* texture)
 {
   if (texture == nullptr)
   {
     return vm::vec3f::fill(1.0f);
   }
-
-  auto peakColor = std::max(
-    std::max(texture->averageColor().r(), texture->averageColor().g()),
-    texture->averageColor().b());
-  if (peakColor > 0.25f)
+  if (
+    (texture->averageColor().r() + texture->averageColor().g()
+     + texture->averageColor().b())
+      / 3.0f
+    > 0.50f)
   {
     // bright texture grid color
     return vm::vec3f::fill(0.0f);
@@ -99,9 +89,7 @@ void coordinateSystemVerticesZ(const vm::bbox3f& bounds, vm::vec3f& start, vm::v
 }
 
 TextureRenderFunc::~TextureRenderFunc() {}
-
 void TextureRenderFunc::before(const Assets::Texture* /* texture */) {}
-
 void TextureRenderFunc::after(const Assets::Texture* /* texture */) {}
 
 void DefaultTextureRenderFunc::before(const Assets::Texture* texture)
@@ -387,7 +375,6 @@ public:
 };
 
 using MidPointCache = std::map<SphereBuilder::MidPointIndex, size_t>;
-
 size_t midPoint(
   std::vector<vm::vec3f>& vertices,
   MidPointCache& cache,

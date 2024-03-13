@@ -81,5 +81,6 @@ void DialogHeader::createGui()
   layout->addWidget(m_textLabel, 1, Qt::AlignLeft | Qt::AlignVCenter);
   setLayout(layout);
 }
+
 } // namespace View
 } // namespace TrenchBroom

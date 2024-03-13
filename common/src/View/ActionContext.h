@@ -50,7 +50,6 @@ static const Type Any = AnyView | AnyOrNoSelection | AnyOrNoTool;
 } // namespace ActionContext
 
 bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs);
-
 bool actionContextMatches(
   ActionContext::Type lhs, ActionContext::Type rhs, ActionContext::Type mask);
 

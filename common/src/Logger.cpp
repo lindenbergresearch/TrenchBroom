@@ -141,6 +141,5 @@ void Logger::log(const LogLevel level, const QString& message)
 }
 
 void NullLogger::doLog(const LogLevel /* level */, const std::string& /* message */) {}
-
 void NullLogger::doLog(const LogLevel /* level */, const QString& /* message */) {}
 } // namespace TrenchBroom

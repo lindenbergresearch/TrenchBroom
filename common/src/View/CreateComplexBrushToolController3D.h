@@ -37,11 +37,9 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   bool mouseClick(const InputState& inputState) override;
-
   bool mouseDoubleClick(const InputState& inputState) override;
 
   bool doShouldHandleMouseDrag(const InputState& inputState) const override;

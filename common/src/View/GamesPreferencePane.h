@@ -22,9 +22,7 @@
 #include "View/PreferencePane.h"
 
 class QLineEdit;
-
 class QPushButton;
-
 class QStackedWidget;
 
 namespace TrenchBroom
@@ -32,9 +30,7 @@ namespace TrenchBroom
 namespace View
 {
 class GameListBox;
-
 class GamePreferencePane;
-
 class MapDocument;
 
 /**
@@ -58,13 +54,9 @@ private:
 
 private:
   void showUserConfigDirClicked();
-
   bool doCanResetToDefaults() override;
-
   void doResetToDefaults() override;
-
   void doUpdateControls() override;
-
   bool doValidate() override;
 };
 
@@ -88,23 +80,17 @@ private:
 
 private:
   void currentGameChanged(const QString& gameName);
-
   void chooseGamePathClicked();
-
   void updateGamePath(const QString& str);
-
   void configureEnginesClicked();
 
 public:
   const std::string& gameName() const;
-
   /**
    * Refresh controls from GameFactory
    */
   void updateControls();
-
 signals:
-
   /**
    * Emitted by GamePreferencePane after changing a preference
    */

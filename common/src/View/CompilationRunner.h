@@ -52,15 +52,10 @@ public:
   ~CompilationTaskRunner() override;
 
   void execute();
-
   void terminate();
-
 signals:
-
   void start();
-
   void error();
-
   void end();
 
 protected:
@@ -68,7 +63,6 @@ protected:
 
 private:
   virtual void doExecute() = 0;
-
   virtual void doTerminate() = 0;
 
   deleteCopyAndMove(CompilationTaskRunner);
@@ -83,12 +77,10 @@ private:
 public:
   CompilationExportMapTaskRunner(
     CompilationContext& context, Model::CompilationExportMap task);
-
   ~CompilationExportMapTaskRunner() override;
 
 private:
   void doExecute() override;
-
   void doTerminate() override;
 
   deleteCopyAndMove(CompilationExportMapTaskRunner);
@@ -103,12 +95,10 @@ private:
 public:
   CompilationCopyFilesTaskRunner(
     CompilationContext& context, Model::CompilationCopyFiles task);
-
   ~CompilationCopyFilesTaskRunner() override;
 
 private:
   void doExecute() override;
-
   void doTerminate() override;
 
   deleteCopyAndMove(CompilationCopyFilesTaskRunner);
@@ -123,12 +113,10 @@ private:
 public:
   CompilationRenameFileTaskRunner(
     CompilationContext& context, Model::CompilationRenameFile task);
-
   ~CompilationRenameFileTaskRunner() override;
 
 private:
   void doExecute() override;
-
   void doTerminate() override;
 
   deleteCopyAndMove(CompilationRenameFileTaskRunner);
@@ -143,12 +131,10 @@ private:
 public:
   CompilationDeleteFilesTaskRunner(
     CompilationContext& context, Model::CompilationDeleteFiles task);
-
   ~CompilationDeleteFilesTaskRunner() override;
 
 private:
   void doExecute() override;
-
   void doTerminate() override;
 
   deleteCopyAndMove(CompilationDeleteFilesTaskRunner);
@@ -165,27 +151,19 @@ private:
 public:
   CompilationRunToolTaskRunner(
     CompilationContext& context, Model::CompilationRunTool task);
-
   ~CompilationRunToolTaskRunner() override;
 
 private:
   void doExecute() override;
-
   void doTerminate() override;
 
 private:
   void startProcess();
-
   std::string cmd();
-
 private slots:
-
   void processErrorOccurred(QProcess::ProcessError processError);
-
   void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-
   void processReadyReadStandardError();
-
   void processReadyReadStandardOutput();
 
   deleteCopyAndMove(CompilationRunToolTaskRunner);
@@ -206,7 +184,6 @@ public:
     CompilationContext context,
     const Model::CompilationProfile& profile,
     QObject* parent = nullptr);
-
   ~CompilationRunner() override;
 
 private:
@@ -215,28 +192,20 @@ private:
 
 public:
   void execute();
-
   void terminate();
-
   bool running() const;
 
 private:
   void bindEvents(CompilationTaskRunner& runner) const;
-
   void unbindEvents(CompilationTaskRunner& runner) const;
-
 private slots:
-
   void taskError();
-
   void taskEnd();
-
 signals:
-
   void compilationStarted();
-
   void compilationEnded();
 
   deleteCopyAndMove(CompilationRunner);
 };
+
 } // namespace TrenchBroom::View

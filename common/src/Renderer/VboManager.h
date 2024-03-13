@@ -28,7 +28,6 @@ namespace TrenchBroom
 namespace Renderer
 {
 class Vbo;
-
 class ShaderManager;
 
 enum class VboType
@@ -53,19 +52,15 @@ private:
 
 public:
   explicit VboManager(ShaderManager* shaderManager);
-
   /**
    * Immediately creates and binds to an OpenGL buffer of the given type and capacity.
    * The contents are initially unspecified. See Vbo class.
    */
   Vbo* allocateVbo(VboType type, size_t capacity, VboUsage usage = VboUsage::StaticDraw);
-
   void destroyVbo(Vbo* vbo);
 
   size_t peakVboCount() const;
-
   size_t currentVboCount() const;
-
   size_t currentVboSize() const;
 
   ShaderManager& shaderManager();

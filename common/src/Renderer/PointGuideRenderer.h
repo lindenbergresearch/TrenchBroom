@@ -24,7 +24,7 @@
 #include "Renderer/Renderable.h"
 #include "Renderer/SpikeGuideRenderer.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 #include <memory>
 
@@ -38,7 +38,6 @@ class MapDocument;
 namespace Renderer
 {
 class RenderContext;
-
 class VboManager;
 
 class PointGuideRenderer : public DirectRenderable
@@ -56,12 +55,10 @@ public:
   PointGuideRenderer(std::weak_ptr<View::MapDocument> document);
 
   void setColor(const Color& color);
-
   void setPosition(const vm::vec3& position);
 
 private:
   void doPrepareVertices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
 };
 } // namespace Renderer

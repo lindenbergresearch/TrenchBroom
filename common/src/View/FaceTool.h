@@ -22,7 +22,7 @@
 #include "FloatType.h"
 #include "View/VertexToolBase.h"
 
-#include <vm/polygon.h>
+#include "vm/polygon.h"
 
 #include <memory>
 #include <string>
@@ -57,7 +57,6 @@ public:
 
 public:
   FaceHandleManager& handleManager() override;
-
   const FaceHandleManager& handleManager() const override;
 
 public:

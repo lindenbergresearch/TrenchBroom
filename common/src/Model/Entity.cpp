@@ -74,7 +74,7 @@ const vm::bbox3 Entity::DefaultBounds = vm::bbox3{8.0};
 
 Entity::Entity()
   : m_cachedProperties{
-      EntityPropertyValues::NoClassname, vm::vec3{}, vm::mat4x4{}, vm::mat4x4{}}
+    EntityPropertyValues::NoClassname, vm::vec3{}, vm::mat4x4{}, vm::mat4x4{}}
 {
 }
 

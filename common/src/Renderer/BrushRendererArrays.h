@@ -28,7 +28,7 @@
 #include "Renderer/Vbo.h"
 #include "Renderer/VboManager.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 #include <cassert>
 #include <memory>
@@ -49,18 +49,14 @@ struct DirtyRangeTracker
    * New trackers are initially clean.
    */
   explicit DirtyRangeTracker(size_t initial_capacity);
-
   DirtyRangeTracker();
 
   /**
    * Expanding marks the new range as dirty.
    */
   void expand(size_t newcap);
-
   size_t capacity() const;
-
   void markDirty(size_t pos, size_t size);
-
   bool clean() const;
 };
 
@@ -240,14 +236,11 @@ public:
   using Index = GLuint;
 
   IndexHolder();
-
   /**
    * NOTE: This destructively moves the contents of `elements` into the Holder.
    */
   explicit IndexHolder(std::vector<Index>& elements);
-
   void zeroRange(size_t offsetWithinBlock, size_t count);
-
   void render(PrimType primType, size_t offset, size_t count) const;
 
   static std::shared_ptr<IndexHolder> swap(std::vector<Index>& elements);
@@ -291,13 +284,10 @@ public:
   void zeroElementsWithKey(AllocationTracker::Block* key);
 
   void render(const PrimType primType) const;
-
   bool prepared() const;
-
   void prepare(VboManager& vboManager);
 
   void setupIndices();
-
   void cleanupIndices();
 };
 
@@ -305,11 +295,8 @@ class VertexArrayInterface
 {
 public:
   virtual ~VertexArrayInterface() = 0;
-
   virtual bool setupVertices() = 0;
-
   virtual void prepareVertices(VboManager& vboManager) = 0;
-
   virtual void cleanupVertices() = 0;
 };
 
@@ -389,12 +376,10 @@ public:
 
   // setting up GL attributes
   bool setupVertices();
-
   void cleanupVertices();
 
   // uploading the VBO
   bool prepared() const;
-
   void prepare(VboManager& vboManager);
 };
 } // namespace Renderer

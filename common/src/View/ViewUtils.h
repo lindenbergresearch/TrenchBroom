@@ -23,16 +23,15 @@
 #include <string>
 
 class QWidget;
-
 class QString;
-
 class QStringList;
 
 namespace TrenchBroom
 {
 class Logger;
+}
 
-namespace View
+namespace TrenchBroom::View
 {
 class MapDocument;
 
@@ -40,12 +39,10 @@ void combineFlags(size_t numFlags, int newFlagValue, int& setFlags, int& mixedFl
 
 bool loadEntityDefinitionFile(
   std::weak_ptr<MapDocument> document, QWidget* parent, const QString& path);
-
 size_t loadEntityDefinitionFile(
   std::weak_ptr<MapDocument> document, QWidget* parent, const QStringList& pathStrs);
 
 std::string queryGroupName(QWidget* parent, const std::string& suggestion);
-
 std::string queryLayerName(QWidget* parent, const std::string& suggestion);
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

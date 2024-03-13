@@ -41,14 +41,11 @@ public:
   {
   public:
     virtual ~LineFunc();
-
     void process(const std::string& str, Justify justify);
 
   private:
     virtual void justifyLeft(const std::string& str) = 0;
-
     virtual void justifyRight(const std::string& str) = 0;
-
     virtual void center(const std::string& str) = 0;
   };
 
@@ -57,10 +54,8 @@ private:
   {
     std::string string;
     Justify justify;
-
     Line(const std::string& i_string, Justify i_justify);
   };
-
   using Lines = std::vector<Line>;
 
   Lines m_lines;
@@ -71,15 +66,12 @@ public:
   AttrString(const std::string& string);
 
   bool operator<(const AttrString& other) const;
-
   int compare(const AttrString& other) const;
 
   void lines(LineFunc& func) const;
 
   void appendLeftJustified(const std::string& string);
-
   void appendRightJustified(const std::string& string);
-
   void appendCentered(const std::string& string);
 };
 } // namespace Renderer

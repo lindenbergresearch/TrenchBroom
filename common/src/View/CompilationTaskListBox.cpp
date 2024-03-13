@@ -41,8 +41,8 @@
 #include "View/VariableStoreModel.h"
 #include "View/ViewConstants.h"
 
-#include <kdl/memory_utils.h>
-#include <kdl/overload.h>
+#include "kdl/memory_utils.h"
+#include "kdl/overload.h"
 
 namespace TrenchBroom::View
 {
@@ -63,13 +63,14 @@ CompilationTaskEditorBase::CompilationTaskEditorBase(
   // request customContextMenuRequested() to be emitted
   setContextMenuPolicy(Qt::CustomContextMenu);
 
-  //    auto *panel = new TitledPanel{m_title, false, false, true};
-  //
-  //    auto *layout = new QVBoxLayout{};
-  //    layout->setContentsMargins(0, 0, 0, 0);
-  //    layout->setSpacing(0);
-  //    layout->addWidget(panel);
-  //    layout->addWidget(new BorderLine{});
+  auto* panel = new TitledPanel{m_title};
+
+  auto* layout = new QVBoxLayout{};
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(panel);
+  layout->addWidget(new BorderLine{});
+  setLayout(layout);
 
   m_enabledCheckbox = new QCheckBox{};
   m_enabledCheckbox->setToolTip(
@@ -81,40 +82,7 @@ CompilationTaskEditorBase::CompilationTaskEditorBase(
   m_taskLayout->addWidget(m_enabledCheckbox, 0, Qt::AlignVCenter);
   m_taskLayout->addSpacing(LayoutConstants::NarrowHMargin);
   // subclasses call addMainLayout() to add their contents after the checkbox
-  // panel->getPanel()->setLayout(m_taskLayout);
-
-  auto layout = new QVBoxLayout;
-  layout->setContentsMargins(
-    LayoutConstants::NoMargin,
-    LayoutConstants::NarrowVMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowVMargin);
-
-  //    layout->addWidget(new BorderLine);
-  auto titleLabel = new QLabel{m_title};
-  makeSmall(titleLabel);
-  makeEmphasized(titleLabel);
-
-  titleLabel->setAutoFillBackground(true);
-  titleLabel->setBackgroundRole(QPalette::ColorRole::Midlight);
-  titleLabel->setContentsMargins(
-    LayoutConstants::MediumHMargin,
-    LayoutConstants::NarrowVMargin,
-    LayoutConstants::NoMargin,
-    LayoutConstants::NarrowVMargin);
-
-  layout->addWidget(titleLabel);
-  layout->addLayout(m_taskLayout);
-  // layout->addWidget(new BorderLine);
-
-  auto pal = QPalette{};
-  auto highlight = pal.color(QPalette::ColorRole::Highlight);
-
-  colorizeWidget(this, highlight.darker(250), QPalette::ColorRole::Highlight);
-
-  setLayout(layout);
-  //    setBaseWindowColor(this);
-  // setBaseWindowColor(titleLabel);
+  panel->getPanel()->setLayout(m_taskLayout);
 
   connect(m_enabledCheckbox, &QCheckBox::clicked, this, [&](const bool checked) {
     std::visit([&](auto& t) { t.enabled = checked; }, m_task);
@@ -176,7 +144,7 @@ CompilationExportMapTaskEditor::CompilationExportMapTaskEditor(
     LayoutConstants::WideVMargin,
     LayoutConstants::WideHMargin,
     LayoutConstants::WideVMargin);
-  formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
+  formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
   formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
   addMainLayout(formLayout);
 
@@ -232,7 +200,7 @@ CompilationCopyFilesTaskEditor::CompilationCopyFilesTaskEditor(
     LayoutConstants::WideVMargin,
     LayoutConstants::WideHMargin,
     LayoutConstants::WideVMargin);
-  formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
+  formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
   formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
   addMainLayout(formLayout);
 
@@ -316,7 +284,7 @@ CompilationRenameFileTaskEditor::CompilationRenameFileTaskEditor(
     LayoutConstants::WideVMargin,
     LayoutConstants::WideHMargin,
     LayoutConstants::WideVMargin);
-  formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
+  formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
   formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
   addMainLayout(formLayout);
 
@@ -401,7 +369,7 @@ CompilationDeleteFilesTaskEditor::CompilationDeleteFilesTaskEditor(
     LayoutConstants::WideVMargin,
     LayoutConstants::WideHMargin,
     LayoutConstants::WideVMargin);
-  formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
+  formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
   formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
   addMainLayout(formLayout);
 
@@ -461,7 +429,7 @@ CompilationRunToolTaskEditor::CompilationRunToolTaskEditor(
     LayoutConstants::WideVMargin,
     LayoutConstants::WideHMargin,
     LayoutConstants::WideVMargin);
-  formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
+  formLayout->setVerticalSpacing(LayoutConstants::NarrowVMargin);
   formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
   addMainLayout(formLayout);
 
@@ -495,7 +463,6 @@ Variables are allowed.)");
   formLayout->addRow("Parameters", m_parametersEditor);
 
   m_treatNonZeroResultCodeAsError = new QCheckBox{"Stop on nonzero error code"};
-  makeSmall(m_treatNonZeroResultCodeAsError);
   m_treatNonZeroResultCodeAsError->setToolTip(
     tr("Stop compilation if the tool returns a nonzero error code"));
   formLayout->addRow("", m_treatNonZeroResultCodeAsError);

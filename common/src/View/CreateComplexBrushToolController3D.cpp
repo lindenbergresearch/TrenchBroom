@@ -39,11 +39,11 @@
 #include "View/InputState.h"
 #include "View/MapDocument.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
-#include <vm/line.h>
-#include <vm/vec.h>
-#include <vm/vec_ext.h>
+#include "vm/line.h"
+#include "vm/vec.h"
+#include "vm/vec_ext.h"
 
 #include <algorithm>
 #include <cassert>
@@ -155,7 +155,6 @@ public:
 
 private:
   Tool& tool() override { return m_tool; }
-
   const Tool& tool() const override { return m_tool; }
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override
@@ -249,7 +248,6 @@ public:
 
 private:
   Tool& tool() override { return m_tool; }
-
   const Tool& tool() const override { return m_tool; }
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override
@@ -282,7 +280,6 @@ private:
       initialHandlePosition,
       initialHandlePosition);
   }
-
   bool cancel() override { return false; }
 };
 } // namespace

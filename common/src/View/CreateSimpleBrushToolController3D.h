@@ -22,7 +22,7 @@
 #include "FloatType.h"
 #include "View/ToolController.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 #include <memory>
 
@@ -31,9 +31,7 @@ namespace TrenchBroom
 namespace View
 {
 class CreateSimpleBrushTool;
-
 class DragTracker;
-
 class MapDocument;
 
 class CreateSimpleBrushToolController3D : public ToolController
@@ -50,7 +48,6 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;

@@ -25,7 +25,7 @@
 #include "Renderer/Vbo.h"
 #include "Renderer/VboManager.h"
 
-#include <kdl/vector_utils.h>
+#include "kdl/vector_utils.h"
 
 #include <memory>
 
@@ -49,17 +49,13 @@ private:
   {
   public:
     using Ptr = std::shared_ptr<BaseHolder>;
-
     virtual ~BaseHolder() {}
 
     virtual size_t indexCount() const = 0;
-
     virtual size_t sizeInBytes() const = 0;
 
     virtual void prepare(VboManager& vboManager) = 0;
-
     virtual void setup() = 0;
-
     virtual void cleanup() = 0;
 
   public:

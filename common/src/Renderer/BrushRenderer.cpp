@@ -53,7 +53,6 @@ BrushRenderer::Filter::RenderSettings BrushRenderer::Filter::renderNothing()
 // DefaultFilter
 
 BrushRenderer::DefaultFilter::~DefaultFilter() = default;
-
 BrushRenderer::DefaultFilter::DefaultFilter(const Model::EditorContext& context)
   : m_context{context}
 {

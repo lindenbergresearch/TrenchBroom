@@ -51,28 +51,23 @@ private:
 public:
   static std::unique_ptr<AddRemoveNodesCommand> add(
     Model::Node* parent, const std::vector<Model::Node*>& children);
-
   static std::unique_ptr<AddRemoveNodesCommand> add(
     const std::map<Model::Node*, std::vector<Model::Node*>>& nodes);
-
   static std::unique_ptr<AddRemoveNodesCommand> remove(
     const std::map<Model::Node*, std::vector<Model::Node*>>& nodes);
 
   AddRemoveNodesCommand(
     Action action, const std::map<Model::Node*, std::vector<Model::Node*>>& nodes);
-
   ~AddRemoveNodesCommand() override;
 
 private:
   static std::string makeName(Action action);
 
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-
   std::unique_ptr<CommandResult> doPerformUndo(
     MapDocumentCommandFacade* document) override;
 
   void doAction(MapDocumentCommandFacade* document);
-
   void undoAction(MapDocumentCommandFacade* document);
 
   deleteCopyAndMove(AddRemoveNodesCommand);

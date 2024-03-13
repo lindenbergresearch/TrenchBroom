@@ -21,8 +21,8 @@
 
 #include "NotifierConnection.h"
 
-#include <kdl/set_temp.h>
-#include <kdl/tuple_utils.h>
+#include "kdl/set_temp.h"
+#include "kdl/tuple_utils.h"
 
 #include <cassert>
 #include <functional>
@@ -42,7 +42,6 @@ public:
 
 private:
   friend class NotifierConnection;
-
   virtual void disconnect(size_t id) = 0;
 };
 
@@ -193,11 +192,9 @@ public:
   Notifier() = default;
 
   Notifier(const Notifier&) = delete;
-
   Notifier(Notifier&&) noexcept = default;
 
   Notifier& operator=(const Notifier&) = delete;
-
   Notifier& operator=(Notifier&&) noexcept = default;
 
   /**

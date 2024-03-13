@@ -54,17 +54,10 @@
 #include "View/MapTextEncoding.h"
 #include "View/ViewConstants.h"
 
-#include <PreferenceManager.h>
-#include <Preferences.h>
-#include <TrenchBroomApp.h>
-
-
 // QDesktopWidget was deprecated in Qt 5.10 and we should use QGuiApplication::screenAt
 // in 5.10 and above Used in centerOnScreen
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-
 #include <QGuiApplication>
-
 #else
 #include <QApplication>
 #include <QDesktopWidget>
@@ -74,7 +67,6 @@ namespace TrenchBroom
 {
 namespace View
 {
-
 
 SyncHeightEventFilter::SyncHeightEventFilter(
   QWidget* primary, QWidget* secondary, QObject* parent)
@@ -130,8 +122,6 @@ static QString fileDialogDirToString(const FileDialogDir dir)
     return "EntityDefinition";
   case FileDialogDir::GamePath:
     return "GamePath";
-  case FileDialogDir::Resources:
-    return "Resources";
     switchDefault();
   }
 }
@@ -237,17 +227,10 @@ void centerOnScreen(QWidget* window)
     Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry));
 }
 
-int getCommonFieldHeight()
-{
-  auto fontsize = pref(Preferences::UIFontSize);
-  return fontsize + 2 * LayoutConstants::MediumVMargin;
-}
-
 QWidget* makeDefault(QWidget* widget)
 {
-  const auto& app = TrenchBroomApp::instance();
   widget->setFont(QFont{});
-  widget->setPalette(app.palette());
+  widget->setPalette(QPalette{});
   return widget;
 }
 
@@ -255,14 +238,6 @@ QWidget* makeEmphasized(QWidget* widget)
 {
   auto font = widget->font();
   font.setBold(true);
-  widget->setFont(font);
-  return widget;
-}
-
-QWidget* makeItalic(QWidget* widget)
-{
-  auto font = widget->font();
-  font.setItalic(true);
   widget->setFont(font);
   return widget;
 }
@@ -276,59 +251,34 @@ QWidget* makeUnemphasized(QWidget* widget)
 QWidget* makeInfo(QWidget* widget)
 {
   makeDefault(widget);
+
   widget = makeSmall(widget);
+
+  const auto defaultPalette = QPalette{};
+  auto palette = widget->palette();
+  // Set all color groups (active, inactive, disabled) to use the disabled color, so it's
+  // dimmer
+  palette.setColor(
+    QPalette::WindowText, defaultPalette.color(QPalette::Disabled, QPalette::WindowText));
+  palette.setColor(
+    QPalette::Text, defaultPalette.color(QPalette::Disabled, QPalette::Text));
+  widget->setPalette(palette);
   return widget;
 }
 
 QWidget* makeSmall(QWidget* widget)
 {
-  auto font = widget->font();
-  font.setPointSize(font.pointSize() - 2);
-  widget->setFont(font);
-  return widget;
-}
-
-QWidget* makeTitle(QWidget* widget)
-{
-  auto font = widget->font();
-  font.setPointSize(font.pointSize() + 1);
-  font.setBold(true);
-  widget->setFont(font);
-  return widget;
-}
-
-QWidget* makeSubTitle(QWidget* widget)
-{
-  auto font = widget->font();
-  font.setPointSize(font.pointSize() - 1);
-  // font.setItalic(true);
-  widget->setFont(font);
+  widget->setAttribute(Qt::WA_MacSmallSize);
   return widget;
 }
 
 QWidget* makeHeader(QWidget* widget)
 {
   makeDefault(widget);
+
   auto font = widget->font();
-  font.setPointSize(font.pointSize() * 2);
+  font.setPointSize(2 * font.pointSize());
   font.setBold(true);
-  widget->setFont(font);
-  return widget;
-}
-
-QWidget* makePanelTitle(QWidget* widget, bool bold, bool isSubTitle)
-{
-
-  widget->setForegroundRole(QPalette::HighlightedText);
-  auto font = widget->font();
-
-  if (bold)
-    font.setBold(true);
-  // font.setItalic(true);
-
-  if (isSubTitle)
-    font.setPointSize(font.pointSize() - 1);
-
   widget->setFont(font);
   return widget;
 }
@@ -339,15 +289,6 @@ QWidget* makeError(QWidget* widget)
   palette.setColor(QPalette::Normal, QPalette::WindowText, Qt::red);
   palette.setColor(QPalette::Normal, QPalette::Text, Qt::red);
   widget->setPalette(palette);
-  return widget;
-}
-
-
-QWidget* makeMono(QWidget* widget, int size)
-{
-  auto font = TrenchBroomApp::instance().getConsoleFont();
-  font.setPointSize(size);
-  widget->setFont(font);
   return widget;
 }
 
@@ -362,27 +303,6 @@ QWidget* makeSelected(QWidget* widget, const QPalette& defaultPalette)
     QPalette::Normal,
     QPalette::Text,
     defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
-  widget->setPalette(palette);
-  return widget;
-}
-
-QWidget* colorizeWidget(QWidget* widget, const QColor& color, QPalette::ColorRole role)
-{
-  auto palette = widget->palette();
-  palette.setColor(QPalette::Normal, role, color);
-  widget->setPalette(palette);
-  return widget;
-}
-
-QWidget* makeBright(QWidget* widget, const QPalette& defaultPalette)
-{
-  auto palette = widget->palette();
-  palette.setColor(
-    QPalette::Normal,
-    QPalette::Button,
-    defaultPalette.color(QPalette::Normal, QPalette::Midlight));
-  //    palette.setColor(QPalette::Normal, QPalette::Base,
-  //    defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
   widget->setPalette(palette);
   return widget;
 }
@@ -411,73 +331,19 @@ Color fromQColor(const QColor& color)
     static_cast<float>(color.alphaF()));
 }
 
-QColor toQColor(const Color& color, const float multiplier)
+QColor toQColor(const Color& color)
 {
-  // return QColor::fromRgb(int(color.r() * 255.0f * multiplier), int(color.g() * 255.0f *
-  // multiplier), int(color.b() * 255.0f * multiplier), int(color.a() * 255.0f));
-  return QColor::fromRgbF(
-    color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
+  return QColor::fromRgb(
+    int(color.r() * 255.0f),
+    int(color.g() * 255.0f),
+    int(color.b() * 255.0f),
+    int(color.a() * 255.0f));
 }
-
-float getQColorBrightnessFactor(const QColor& color)
-{
-  return float(
-    std::max(std::max(color.redF(), color.greenF()), color.blueF()) * color.alphaF());
-}
-
-QString toStyleSheetColor(const char* prefix, const QColor& color)
-{
-  auto sheet = QString::asprintf(
-    "%s: rgba(%d, %d, %d, %d); ",
-    prefix,
-    color.red(),
-    color.green(),
-    color.blue(),
-    color.alpha());
-  return sheet;
-}
-
-QString toStyleSheetRGBA(const QColor& color, int adjustment)
-{
-  auto tmp_color = adjustment < 0 ? color.darker(-adjustment) : color.lighter(adjustment);
-  return QString::asprintf(
-    "rgba(%d, %d, %d, %d)",
-    tmp_color.red(),
-    tmp_color.green(),
-    tmp_color.blue(),
-    tmp_color.alpha());
-}
-
-QString toStyleSheetRGBA(
-  const QPalette& palette,
-  QPalette::ColorRole role,
-  QPalette::ColorGroup group,
-  int adjustment)
-{
-  auto color = palette.color(group, role);
-  return toStyleSheetRGBA(color, adjustment);
-}
-
-QString toStyleSheetRGBA(
-  const QPalette& palette, QPalette::ColorRole role, int adjustment)
-{
-  auto color = palette.color(QPalette::ColorGroup::Active, role);
-  return toStyleSheetRGBA(color, adjustment);
-}
-
-
-void setStyledBorder(QWidget* widget, int width, const QColor& color, const char* type)
-{
-  auto qss = QString::asprintf(
-    "border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
-  widget->setStyleSheet(qss);
-}
-
 
 QToolButton* createBitmapButton(
   const std::string& image, const QString& tooltip, QWidget* parent)
 {
-  return createBitmapButton(IO::loadSVGIcon(image, 16), tooltip, parent);
+  return createBitmapButton(IO::loadSVGIcon(image), tooltip, parent);
 }
 
 QToolButton* createBitmapButton(
@@ -527,11 +393,9 @@ QSlider* createSlider(const int min, const int max)
   auto* slider = new QSlider{};
   slider->setMinimum(min);
   slider->setMaximum(max);
-  slider->setTickPosition(QSlider::NoTicks);
+  slider->setTickPosition(QSlider::TicksBelow);
   slider->setTracking(true);
   slider->setOrientation(Qt::Horizontal);
-  makeBright(slider, QPalette{});
-
   return slider;
 }
 
@@ -546,18 +410,6 @@ void setSliderRatio(QSlider* slider, float ratio)
   const auto value =
     ratio * float(slider->maximum() - slider->minimum()) + float(slider->minimum());
   slider->setValue(int(value));
-}
-
-float getSliderRange(QSlider* slider, float length, float offset)
-{
-  auto ratio = getSliderRatio(slider);
-  return ratio * length + offset;
-}
-
-void setSliderRange(QSlider* slider, float length, float value, float offset)
-{
-  auto ratio = (value - offset) / length;
-  setSliderRatio(slider, ratio);
 }
 
 QLayout* wrapDialogButtonBox(QWidget* buttonBox)
@@ -641,7 +493,7 @@ QLineEdit* createSearchBox()
   widget->setClearButtonEnabled(true);
   widget->setPlaceholderText(QLineEdit::tr("Search..."));
 
-  const auto icon = IO::loadSVGIcon("Search.svg", 16);
+  const auto icon = IO::loadSVGIcon("Search.svg");
   widget->addAction(icon, QLineEdit::LeadingPosition);
   return widget;
 }

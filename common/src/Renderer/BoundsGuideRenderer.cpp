@@ -19,16 +19,16 @@
 
 #include "BoundsGuideRenderer.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/bbox.h>
-#include <vm/ray.h>
+#include "vm/bbox.h"
+#include "vm/ray.h"
 
 namespace TrenchBroom
 {
 namespace Renderer
 {
-const FloatType BoundsGuideRenderer::SpikeLength = 1024.0;
+const FloatType BoundsGuideRenderer::SpikeLength = 512.0;
 
 BoundsGuideRenderer::BoundsGuideRenderer(std::weak_ptr<View::MapDocument> document)
   : m_document(document)

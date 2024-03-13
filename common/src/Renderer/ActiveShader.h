@@ -28,7 +28,6 @@ namespace TrenchBroom
 namespace Renderer
 {
 class ShaderConfig;
-
 class ShaderManager;
 
 class ActiveShader
@@ -39,7 +38,6 @@ private:
 
 public:
   ActiveShader(ShaderManager& shaderManager, const ShaderConfig& shaderConfig);
-
   ~ActiveShader();
 
   template <class T>

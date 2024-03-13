@@ -31,13 +31,9 @@ namespace TrenchBroom
 namespace View
 {
 class Command;
-
 class CommandResult;
-
 class MapDocumentCommandFacade;
-
 class UndoableCommand;
-
 enum class TransactionScope;
 
 /**
@@ -96,7 +92,6 @@ private:
   std::vector<TransactionState> m_transactionStack;
 
   struct SubmitAndStoreResult;
-
   class TransactionCommand;
 
 public:

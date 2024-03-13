@@ -74,27 +74,16 @@ public:
   Value();
 
   explicit Value(BooleanType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(StringType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(const char* value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(NumberType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(int value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(long value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(size_t value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(ArrayType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(MapType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(RangeType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(NullType value, std::optional<Expression> expression = std::nullopt);
-
   explicit Value(
     UndefinedType value, std::optional<Expression> expression = std::nullopt);
 
@@ -111,66 +100,45 @@ public:
   }
 
   std::string typeName() const;
-
   std::string describe() const;
 
   const std::optional<Expression>& expression() const;
 
   size_t line() const;
-
   size_t column() const;
 
   const BooleanType& booleanValue() const;
-
   const StringType& stringValue() const;
-
   const NumberType& numberValue() const;
-
   IntegerType integerValue() const;
-
   const ArrayType& arrayValue() const;
-
   const MapType& mapValue() const;
-
   const RangeType& rangeValue() const;
 
   const std::vector<std::string> asStringList() const;
-
   const std::vector<std::string> asStringSet() const;
 
   size_t length() const;
-
   bool convertibleTo(ValueType toType) const;
-
   Value convertTo(ValueType toType) const;
-
   std::optional<Value> tryConvertTo(ValueType toType) const;
 
   std::string asString(bool multiline = false) const;
-
   void appendToStream(
     std::ostream& str, bool multiline = true, const std::string& indent = "") const;
 
   bool contains(const Value& indexValue) const;
-
   bool contains(size_t index) const;
-
   bool contains(const std::string& key) const;
-
   std::vector<std::string> keys() const;
 
   Value operator[](const Value& indexValue) const;
-
   Value operator[](size_t index) const;
-
   Value operator[](int index) const;
-
   Value operator[](const std::string& key) const;
-
   Value operator[](const char* key) const;
 
   friend bool operator==(const Value& lhs, const Value& rhs);
-
   friend bool operator!=(const Value& lhs, const Value& rhs);
 
   friend std::ostream& operator<<(std::ostream& lhs, const Value& rhs);

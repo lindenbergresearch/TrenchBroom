@@ -33,7 +33,6 @@ class Texture;
 namespace Renderer
 {
 class TextureRenderFunc;
-
 class VertexArray;
 
 /**
@@ -96,7 +95,6 @@ public:
 
   private:
     IndexRangeMap::Size& findCurrent(const Texture* texture);
-
     bool isCurrent(const Texture* texture) const;
 
     void initialize(TextureToIndexRangeMap& data) const;
@@ -197,7 +195,6 @@ public:
 
 private:
   IndexRangeMap& findCurrent(const Texture* texture);
-
   bool isCurrent(const Texture* texture) const;
 };
 } // namespace Renderer

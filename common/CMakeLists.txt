@@ -262,7 +262,6 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Renderer/VboManager.cpp
         ${COMMON_SOURCE_DIR}/Renderer/VertexArray.cpp
         ${COMMON_SOURCE_DIR}/Thread.cpp
-        ${COMMON_SOURCE_DIR}/QSSBuilder.cpp
         ${COMMON_SOURCE_DIR}/TrenchBroomApp.cpp
         ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.cpp
         ${COMMON_SOURCE_DIR}/Uuid.cpp
@@ -293,9 +292,6 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/ColorModel.cpp
         ${COMMON_SOURCE_DIR}/View/ColorsPreferencePane.cpp
         ${COMMON_SOURCE_DIR}/View/ColorTable.cpp
-        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.cpp
-        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.cpp
-        ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
         ${COMMON_SOURCE_DIR}/View/Command.cpp
         ${COMMON_SOURCE_DIR}/View/CommandProcessor.cpp
         ${COMMON_SOURCE_DIR}/View/CompilationContext.cpp
@@ -793,7 +789,6 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Result.h
         ${COMMON_SOURCE_DIR}/Thread.h
         ${COMMON_SOURCE_DIR}/TrenchBroomApp.h
-        ${COMMON_SOURCE_DIR}/QSSBuilder.h
         ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.h
         ${COMMON_SOURCE_DIR}/Uuid.h
         ${COMMON_SOURCE_DIR}/View/AboutDialog.h
@@ -813,9 +808,6 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/CameraTool3D.h
         ${COMMON_SOURCE_DIR}/View/CellLayout.h
         ${COMMON_SOURCE_DIR}/View/CellView.h
-        ${COMMON_SOURCE_DIR}/View/PreferencesPreferencePane.h
-        ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.h
-        ${COMMON_SOURCE_DIR}/View/PreferenceModel.h
         ${COMMON_SOURCE_DIR}/View/ChoosePathTypeDialog.h
         ${COMMON_SOURCE_DIR}/View/ClickableLabel.h
         ${COMMON_SOURCE_DIR}/View/ClickableTitleBar.h

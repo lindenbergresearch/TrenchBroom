@@ -28,189 +28,203 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-static const char *buff() {
-    static const auto *result = "abcdefghij_";
-    return result;
+namespace TrenchBroom
+{
+namespace IO
+{
+static const char* buff()
+{
+  static const auto* result = "abcdefghij_";
+  return result;
 }
 
-static std::shared_ptr<File> file() {
-    static auto result = Disk::openFile(std::filesystem::current_path() / "fixture/test/IO/Reader/10byte").value();
-    return result;
+static std::shared_ptr<File> file()
+{
+  static auto result =
+    Disk::openFile(std::filesystem::current_path() / "fixture/test/IO/Reader/10byte")
+      .value();
+  return result;
 }
 
-static void createEmpty(Reader &&r) {
-    CHECK(r.size() == 0U);
-    CHECK(r.position() == 0U);
-    CHECK_NOTHROW(r.seekFromBegin(0U));
-    CHECK_NOTHROW(r.seekFromEnd(0U));
-    CHECK_NOTHROW(r.seekForward(0U));
-    CHECK_FALSE(r.canRead(1U));
-    CHECK(r.canRead(0U));
-    CHECK(r.eof());
-    CHECK_THROWS_AS(r.readChar<char>(), ReaderException);
+static void createEmpty(Reader&& r)
+{
+  CHECK(r.size() == 0U);
+  CHECK(r.position() == 0U);
+  CHECK_NOTHROW(r.seekFromBegin(0U));
+  CHECK_NOTHROW(r.seekFromEnd(0U));
+  CHECK_NOTHROW(r.seekForward(0U));
+  CHECK_FALSE(r.canRead(1U));
+  CHECK(r.canRead(0U));
+  CHECK(r.eof());
+  CHECK_THROWS_AS(r.readChar<char>(), ReaderException);
 }
 
 TEST_CASE("BufferReaderTest.createEmpty")
 {
-    createEmpty(Reader::from(buff(), buff()));
+  createEmpty(Reader::from(buff(), buff()));
 }
 
 TEST_CASE("FileReaderTest.createEmpty")
 {
-    const auto emptyFile = Disk::openFile(std::filesystem::current_path() / "fixture/test/IO/Reader/empty").value();
-    createEmpty(emptyFile->reader());
+  const auto emptyFile =
+    Disk::openFile(std::filesystem::current_path() / "fixture/test/IO/Reader/empty")
+      .value();
+  createEmpty(emptyFile->reader());
 }
 
-static void createNonEmpty(Reader &&r) {
-    CHECK(r.size() == 10U);
-    CHECK(r.position() == 0U);
-    CHECK(r.canRead(0U));
-    CHECK(r.canRead(10U));
-    CHECK_FALSE(r.canRead(11U));
-    CHECK_FALSE(r.eof());
+static void createNonEmpty(Reader&& r)
+{
+  CHECK(r.size() == 10U);
+  CHECK(r.position() == 0U);
+  CHECK(r.canRead(0U));
+  CHECK(r.canRead(10U));
+  CHECK_FALSE(r.canRead(11U));
+  CHECK_FALSE(r.eof());
 
-    // read a char
-    CHECK(r.readChar<char>() == 'a');
-    CHECK(r.position() == 1U);
-    CHECK(r.canRead(1U));
-    CHECK(r.canRead(9U));
-    CHECK_FALSE(r.canRead(10U));
+  // read a char
+  CHECK(r.readChar<char>() == 'a');
+  CHECK(r.position() == 1U);
+  CHECK(r.canRead(1U));
+  CHECK(r.canRead(9U));
+  CHECK_FALSE(r.canRead(10U));
 
-    // read remainder
-    CHECK(r.readString(9) == std::string("bcdefghij"));
-    CHECK(r.position() == 10U);
-    CHECK_FALSE(r.canRead(1U));
-    CHECK(r.canRead(0U));
-    CHECK(r.eof());
-    CHECK_THROWS_AS(r.readChar<char>(), ReaderException);
+  // read remainder
+  CHECK(r.readString(9) == std::string("bcdefghij"));
+  CHECK(r.position() == 10U);
+  CHECK_FALSE(r.canRead(1U));
+  CHECK(r.canRead(0U));
+  CHECK(r.eof());
+  CHECK_THROWS_AS(r.readChar<char>(), ReaderException);
 }
 
 TEST_CASE("BufferReaderTest.createNonEmpty")
 {
-    createNonEmpty(Reader::from(buff(), buff() + 10));
+  createNonEmpty(Reader::from(buff(), buff() + 10));
 }
 
 TEST_CASE("FileReaderTest.createNonEmpty")
 {
-    createNonEmpty(file()->reader());
+  createNonEmpty(file()->reader());
 }
 
-static void seekFromBegin(Reader &&r) {
-    r.seekFromBegin(0U);
-    CHECK(r.position() == 0U);
+static void seekFromBegin(Reader&& r)
+{
+  r.seekFromBegin(0U);
+  CHECK(r.position() == 0U);
 
-    r.seekFromBegin(1U);
-    CHECK(r.position() == 1U);
+  r.seekFromBegin(1U);
+  CHECK(r.position() == 1U);
 
-    r.seekFromBegin(2U);
-    CHECK(r.position() == 2U);
+  r.seekFromBegin(2U);
+  CHECK(r.position() == 2U);
 
-    CHECK_THROWS_AS(r.seekFromBegin(11U), ReaderException);
-    CHECK(r.position() == 2U);
+  CHECK_THROWS_AS(r.seekFromBegin(11U), ReaderException);
+  CHECK(r.position() == 2U);
 }
 
 TEST_CASE("BufferReaderTest.seekFromBegin")
 {
-    seekFromBegin(Reader::from(buff(), buff() + 10));
+  seekFromBegin(Reader::from(buff(), buff() + 10));
 }
 
 TEST_CASE("FileReaderTest.seekFromBegin")
 {
-    seekFromBegin(file()->reader());
+  seekFromBegin(file()->reader());
 }
 
-static void seekFromEnd(Reader &&r) {
-    r.seekFromEnd(0U);
-    CHECK(r.position() == 10U);
+static void seekFromEnd(Reader&& r)
+{
+  r.seekFromEnd(0U);
+  CHECK(r.position() == 10U);
 
-    r.seekFromEnd(1U);
-    CHECK(r.position() == 9U);
+  r.seekFromEnd(1U);
+  CHECK(r.position() == 9U);
 
-    r.seekFromEnd(10U);
-    CHECK(r.position() == 0U);
+  r.seekFromEnd(10U);
+  CHECK(r.position() == 0U);
 
-    CHECK_THROWS_AS(r.seekFromEnd(11U), ReaderException);
-    CHECK(r.position() == 0U);
+  CHECK_THROWS_AS(r.seekFromEnd(11U), ReaderException);
+  CHECK(r.position() == 0U);
 }
 
 TEST_CASE("BufferReaderTest.seekFromEnd")
 {
-    seekFromEnd(Reader::from(buff(), buff() + 10));
+  seekFromEnd(Reader::from(buff(), buff() + 10));
 }
 
 TEST_CASE("FileReaderTest.seekFromEnd")
 {
-    seekFromEnd(file()->reader());
+  seekFromEnd(file()->reader());
 }
 
-static void seekForward(Reader &&r) {
-    r.seekForward(1U);
-    CHECK(r.position() == 1U);
+static void seekForward(Reader&& r)
+{
+  r.seekForward(1U);
+  CHECK(r.position() == 1U);
 
-    r.seekForward(1U);
-    CHECK(r.position() == 2U);
+  r.seekForward(1U);
+  CHECK(r.position() == 2U);
 
-    CHECK_THROWS_AS(r.seekForward(9U), ReaderException);
-    CHECK(r.position() == 2U);
+  CHECK_THROWS_AS(r.seekForward(9U), ReaderException);
+  CHECK(r.position() == 2U);
 }
 
 TEST_CASE("ReaderTest.copyConstructor")
 {
-    auto reader = Reader::from(buff(), buff() + 10);
-    REQUIRE(reader.readString(4) == "abcd");
-    REQUIRE(reader.canRead(6));
-    REQUIRE_FALSE(reader.canRead(7));
+  auto reader = Reader::from(buff(), buff() + 10);
+  REQUIRE(reader.readString(4) == "abcd");
+  REQUIRE(reader.canRead(6));
+  REQUIRE_FALSE(reader.canRead(7));
 
-    auto copy = Reader{reader};
-    CHECK(reader.canRead(6) == copy.canRead(6));
-    CHECK(reader.canRead(7) == copy.canRead(7));
+  auto copy = Reader{reader};
+  CHECK(reader.canRead(6) == copy.canRead(6));
+  CHECK(reader.canRead(7) == copy.canRead(7));
 
-    CHECK(reader.readString(2) == copy.readString(2));
+  CHECK(reader.readString(2) == copy.readString(2));
 
-    reader.seekFromBegin(0);
-    copy.seekFromBegin(0);
-    CHECK(reader.readString(2) == copy.readString(2));
+  reader.seekFromBegin(0);
+  copy.seekFromBegin(0);
+  CHECK(reader.readString(2) == copy.readString(2));
 }
 
 TEST_CASE("BufferReaderTest.seekForward")
 {
-    seekForward(Reader::from(buff(), buff() + 10));
+  seekForward(Reader::from(buff(), buff() + 10));
 }
 
 TEST_CASE("FileReaderTest.seekForward")
 {
-    seekForward(file()->reader());
+  seekForward(file()->reader());
 }
 
-static void subReader(Reader &&r) {
-    auto s = r.subReaderFromBegin(5, 3);
+static void subReader(Reader&& r)
+{
+  auto s = r.subReaderFromBegin(5, 3);
 
-    CHECK(s.size() == 3U);
-    CHECK(s.position() == 0U);
+  CHECK(s.size() == 3U);
+  CHECK(s.position() == 0U);
 
-    CHECK(s.readChar<char>() == 'f');
-    CHECK(s.position() == 1U);
+  CHECK(s.readChar<char>() == 'f');
+  CHECK(s.position() == 1U);
 
-    CHECK(s.readChar<char>() == 'g');
-    CHECK(s.position() == 2U);
+  CHECK(s.readChar<char>() == 'g');
+  CHECK(s.position() == 2U);
 
-    CHECK(s.readChar<char>() == 'h');
-    CHECK(s.position() == 3U);
+  CHECK(s.readChar<char>() == 'h');
+  CHECK(s.position() == 3U);
 
-    CHECK_THROWS_AS(s.seekForward(1U), ReaderException);
-    CHECK(s.position() == 3U);
+  CHECK_THROWS_AS(s.seekForward(1U), ReaderException);
+  CHECK(s.position() == 3U);
 }
 
 TEST_CASE("BufferReaderTest.subReader")
 {
-    subReader(Reader::from(buff(), buff() + 10));
+  subReader(Reader::from(buff(), buff() + 10));
 }
 
 TEST_CASE("FileReaderTest.subReader")
 {
-    subReader(file()->reader());
+  subReader(file()->reader());
 }
 } // namespace IO
 } // namespace TrenchBroom

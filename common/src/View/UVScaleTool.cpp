@@ -39,11 +39,11 @@
 #include "View/UVOriginTool.h"
 #include "View/UVViewHelper.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/intersection.h>
-#include <vm/ray.h>
-#include <vm/vec.h>
+#include "vm/intersection.h"
+#include "vm/ray.h"
+#include "vm/vec.h"
 
 #include <numeric>
 #include <vector>
@@ -193,7 +193,7 @@ static void renderHighlight(
   auto handleRenderer = Renderer::DirectEdgeRenderer{
     Renderer::VertexArray::move(getHandleVertices(helper, handle, selector)),
     Renderer::PrimType::Lines};
-  handleRenderer.render(renderBatch, color, 0.5f);
+  handleRenderer.render(renderBatch, color, 1.0f);
 }
 
 namespace

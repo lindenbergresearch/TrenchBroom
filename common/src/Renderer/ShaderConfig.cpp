@@ -49,4 +49,5 @@ const std::vector<std::string>& ShaderConfig::fragmentShaders() const
 {
   return m_fragmentShaders;
 }
+
 } // namespace TrenchBroom::Renderer

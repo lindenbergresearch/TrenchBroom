@@ -24,9 +24,9 @@
 #include "IO/SystemPaths.h"
 #include "Renderer/ShaderConfig.h"
 
+#include "kdl/result.h"
+#include "kdl/result_fold.h"
 #include "kdl/vector_utils.h"
-#include <kdl/result.h>
-#include <kdl/result_fold.h>
 
 #include <cassert>
 #include <filesystem>
@@ -113,4 +113,5 @@ Result<std::reference_wrapper<Shader>> ShaderManager::loadShader(
     return std::ref(insertIt->second);
   });
 }
+
 } // namespace TrenchBroom::Renderer

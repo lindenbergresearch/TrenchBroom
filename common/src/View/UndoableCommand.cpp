@@ -95,5 +95,6 @@ void UndoableCommand::resetModificationCount(MapDocumentCommandFacade* document)
     document->decModificationCount(m_modificationCount);
   }
 }
+
 } // namespace View
 } // namespace TrenchBroom

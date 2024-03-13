@@ -33,7 +33,6 @@ class Texture;
 namespace Renderer
 {
 class IndexArray;
-
 class TextureRenderFunc;
 
 /**

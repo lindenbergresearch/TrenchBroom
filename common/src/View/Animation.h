@@ -36,7 +36,6 @@ class AnimationCurve
 {
 public:
   virtual ~AnimationCurve();
-
   double apply(double progress) const;
 
 private:
@@ -56,7 +55,6 @@ private:
 
 public:
   EaseInEaseOutAnimationCurve(double duration);
-
   double doApply(double progress) const override;
 };
 
@@ -84,23 +82,19 @@ public:
   static Type freeType();
 
   Animation(Type type, Curve curve, double duration);
-
   virtual ~Animation();
 
   Type type() const;
-
   /**
    * Advances the animation by the given number of milliseconds.
    * @return true if the animation is finished.
    */
   bool step(double deltaMilliseconds);
-
   void update();
 
 private:
   static std::unique_ptr<AnimationCurve> createAnimationCurve(
     Curve curve, double duration);
-
   virtual void doUpdate(double progress) = 0;
 };
 
@@ -121,7 +115,6 @@ private:
 
 public:
   explicit AnimationManager(QObject* parent);
-
   void runAnimation(std::unique_ptr<Animation> animation, bool replace);
 
 private:

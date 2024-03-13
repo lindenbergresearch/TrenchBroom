@@ -40,14 +40,12 @@ private:
 
 public:
   static std::unique_ptr<CurrentGroupCommand> push(Model::GroupNode* group);
-
   static std::unique_ptr<CurrentGroupCommand> pop();
 
   explicit CurrentGroupCommand(Model::GroupNode* group);
 
 private:
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-
   std::unique_ptr<CommandResult> doPerformUndo(
     MapDocumentCommandFacade* document) override;
 

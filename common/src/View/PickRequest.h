@@ -21,7 +21,7 @@
 
 #include "FloatType.h"
 
-#include <vm/ray.h>
+#include "vm/ray.h"
 
 namespace TrenchBroom
 {
@@ -40,11 +40,9 @@ private:
 
 public:
   PickRequest();
-
   PickRequest(const vm::ray3& pickRay, const Renderer::Camera& camera);
 
   const vm::ray3& pickRay() const;
-
   const Renderer::Camera& camera() const;
 };
 } // namespace View

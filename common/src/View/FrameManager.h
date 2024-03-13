@@ -29,7 +29,6 @@ namespace TrenchBroom
 namespace View
 {
 class MapDocument;
-
 class MapFrame;
 
 class FrameManager : public QObject
@@ -41,26 +40,19 @@ private:
 
 public:
   explicit FrameManager(bool singleFrame);
-
   ~FrameManager() override;
 
   MapFrame* newFrame();
-
   bool closeAllFrames();
 
   std::vector<MapFrame*> frames() const;
-
   MapFrame* topFrame() const;
-
   bool allFramesClosed() const;
 
 private:
   void onFocusChange(QWidget* old, QWidget* now);
-
   MapFrame* createOrReuseFrame();
-
   MapFrame* createFrame(std::shared_ptr<MapDocument> document);
-
   void removeFrame(MapFrame* frame);
 
   friend class MapFrame;

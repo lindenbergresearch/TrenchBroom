@@ -21,7 +21,7 @@
 
 #include "Renderer/Camera.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <vector>
 
@@ -36,7 +36,6 @@ private:
 
 public:
   OrthographicCamera();
-
   OrthographicCamera(
     float nearPlane,
     float farPlane,
@@ -46,7 +45,6 @@ public:
     const vm::vec3f& up);
 
   const Viewport& zoomedViewport() const;
-
   std::vector<vm::vec3> viewportVertices() const;
 
 private:
@@ -54,9 +52,7 @@ private:
 
   void doValidateMatrices(
     vm::mat4x4f& projectionMatrix, vm::mat4x4f& viewMatrix) const override;
-
   vm::ray3f doGetPickRay(const vm::vec3f& point) const override;
-
   void doComputeFrustumPlanes(
     vm::plane3f& topPlane,
     vm::plane3f& rightPlane,
@@ -68,11 +64,8 @@ private:
     VboManager& vboManager,
     float size,
     const Color& color) const override;
-
   float doPickFrustum(float size, const vm::ray3f& ray) const override;
-
   float doGetPerspectiveScalingFactor(const vm::vec3f& position) const override;
-
   void doUpdateZoom() override;
 };
 } // namespace Renderer

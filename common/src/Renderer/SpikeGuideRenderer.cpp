@@ -23,8 +23,6 @@
 #include "Model/Hit.h"
 #include "Model/HitFilter.h"
 #include "Model/PickResult.h"
-#include "PreferenceManager.h"
-#include "Preferences.h"
 #include "Renderer/ActiveShader.h"
 #include "Renderer/PrimType.h"
 #include "Renderer/RenderContext.h"
@@ -33,9 +31,9 @@
 #include "Renderer/VboManager.h"
 #include "View/MapDocument.h"
 
-#include <vm/forward.h>
-#include <vm/ray.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/ray.h"
+#include "vm/vec.h"
 
 #include <memory>
 
@@ -68,10 +66,10 @@ void SpikeGuideRenderer::add(
   if (hit.isMatch())
   {
     if (hit.distance() <= length)
-      addPoint(vm::point_at_distance(ray, hit.distance()));
+      addPoint(vm::point_at_distance(ray, hit.distance() - 0.01));
     addSpike(ray, vm::min(length, hit.distance()), length);
   }
-  else if (!pref(Preferences::SelectionBoundsIntersectionMode))
+  else
   {
     addSpike(ray, length, length);
   }
@@ -98,29 +96,11 @@ void SpikeGuideRenderer::doPrepareVertices(VboManager& vboManager)
 void SpikeGuideRenderer::doRender(RenderContext& renderContext)
 {
   ActiveShader shader(renderContext.shaderManager(), Shaders::VaryingPCShader);
-
-  if (pref(Preferences::SelectionBoundsDashedLines))
-  {
-    glAssert(glEnable(GL_LINE_STIPPLE));
-    glAssert(glLineStipple(
-      pref(Preferences::SelectionBoundsDashedSize),
-      (GLushort)pref(Preferences::SelectionBoundsPattern)));
-  }
-
-  glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
   m_spikeArray.render(PrimType::Lines);
 
-  if (pref(Preferences::SelectionBoundsDashedLines))
-  {
-    glAssert(glDisable(GL_LINE_STIPPLE));
-  }
-
-  glAssert(glPointSize(pref(Preferences::SelectionBoundsPointSize)));
-  shader.set("ApplyTinting", true);
-  shader.set("TintColor", pref(Preferences::SelectionBoundsPointColor));
+  glAssert(glPointSize(3.0f));
   m_pointArray.render(PrimType::Points);
   glAssert(glPointSize(1.0f));
-  shader.set("ApplyTinting", false);
 }
 
 void SpikeGuideRenderer::addPoint(const vm::vec3& position)
@@ -131,11 +111,11 @@ void SpikeGuideRenderer::addPoint(const vm::vec3& position)
 void SpikeGuideRenderer::addSpike(
   const vm::ray3& ray, const FloatType length, const FloatType maxLength)
 {
+  const auto mix = static_cast<float>(maxLength / length / 2.0);
+
   m_spikeVertices.emplace_back(vm::vec3f(ray.origin), m_color);
   m_spikeVertices.emplace_back(
-    vm::vec3f(vm::point_at_distance(ray, length)),
-    (length / maxLength > 0.5f) ? Color{m_color}.darker(0.75f)
-                                : Color{m_color}.darker(0.4f));
+    vm::vec3f(vm::point_at_distance(ray, length)), Color(m_color, m_color.a() * mix));
 }
 
 void SpikeGuideRenderer::validate()

@@ -24,9 +24,7 @@
 #include "View/CompilationRun.h"
 
 class QLabel;
-
 class QPushButton;
-
 class QTextEdit;
 
 namespace TrenchBroom
@@ -34,7 +32,6 @@ namespace TrenchBroom
 namespace View
 {
 class CompilationProfileManager;
-
 class MapFrame;
 
 class CompilationDialog : public QDialog
@@ -61,21 +58,14 @@ private:
   void keyPressEvent(QKeyEvent* event) override;
 
   void updateCompileButtons();
-
   void startCompilation(bool test);
-
   void stopCompilation();
-
   void closeEvent(QCloseEvent* event) override;
-
 private slots:
-
   void compilationStarted();
-
   void compilationEnded();
 
   void selectedProfileChanged();
-
   void profileChanged();
 
 private:

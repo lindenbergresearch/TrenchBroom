@@ -32,11 +32,11 @@
 #include "View/DragTracker.h"
 #include "View/InputState.h"
 
-#include <vm/forward.h>
-#include <vm/intersection.h>
-#include <vm/plane.h>
-#include <vm/scalar.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/intersection.h"
+#include "vm/plane.h"
+#include "vm/scalar.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
@@ -230,7 +230,6 @@ public:
   }
 
   void end(const InputState&) override {}
-
   void cancel() override {}
 };
 
@@ -275,7 +274,6 @@ public:
   }
 
   void end(const InputState&) override {}
-
   void cancel() override {}
 };
 
@@ -317,7 +315,6 @@ public:
   }
 
   void end(const InputState&) override {}
-
   void cancel() override {}
 };
 } // namespace

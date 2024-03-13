@@ -22,66 +22,68 @@
 #include "Model/EntityNode.h"
 #include "TestUtils.h"
 
-#include <vecmath/mat_ext.h>
+#include "vm/mat_ext.h"
 
 #include "Catch2.h"
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 
 TEST_CASE_METHOD(MapDocumentTest, "Transaction")
 {
+  document->selectAllNodes();
+  document->deleteObjects();
+  document->selectAllNodes();
+
+  REQUIRE(document->selectedNodes().empty());
+
+  auto* entityNode = new Model::EntityNode{Model::Entity{}};
+
+  auto transaction = Transaction{document};
+  CHECK(transaction.state() == Transaction::State::Running);
+
+  document->addNodes({{document->parentForNodes(), {entityNode}}});
+  document->selectNodes({entityNode});
+  document->transformObjects("translate", vm::translation_matrix(vm::vec3{1, 0, 0}));
+
+  REQUIRE(transaction.state() == Transaction::State::Running);
+  REQUIRE(entityNode->entity().origin() == vm::vec3{1, 0, 0});
+
+  SECTION("commit")
+  {
+    CHECK(transaction.commit());
+
+    CHECK(transaction.state() == Transaction::State::Committed);
+    CHECK(entityNode->entity().origin() == vm::vec3{1, 0, 0});
+
+    document->undoCommand();
     document->selectAllNodes();
-    document->deleteObjects();
-    document->selectAllNodes();
 
-    REQUIRE(document->selectedNodes().empty());
+    CHECK(document->selectedNodes().empty());
+  }
 
-    auto *entityNode = new Model::EntityNode{Model::Entity{}};
+  SECTION("rollback")
+  {
+    transaction.rollback();
 
-    auto transaction = Transaction{document};
     CHECK(transaction.state() == Transaction::State::Running);
 
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
-    document->selectNodes({entityNode});
-    document->transformObjects("translate", vm::translation_matrix(vm::vec3{1, 0, 0}));
+    document->selectAllNodes();
+    CHECK(document->selectedNodes().empty());
 
-    REQUIRE(transaction.state() == Transaction::State::Running);
-    REQUIRE(entityNode->entity().origin() == vm::vec3{1, 0, 0});
+    // must commit the transaction in order to destroy it
+    transaction.commit();
+  }
 
-    SECTION("commit")
-    {
-        CHECK(transaction.commit());
+  SECTION("cancel")
+  {
+    transaction.cancel();
 
-        CHECK(transaction.state() == Transaction::State::Committed);
-        CHECK(entityNode->entity().origin() == vm::vec3{1, 0, 0});
+    CHECK(transaction.state() == Transaction::State::Cancelled);
 
-        document->undoCommand();
-        document->selectAllNodes();
-
-        CHECK(document->selectedNodes().empty());
-    }
-
-    SECTION("rollback")
-    {
-        transaction.rollback();
-
-        CHECK(transaction.state() == Transaction::State::Running);
-
-        document->selectAllNodes();
-        CHECK(document->selectedNodes().empty());
-
-        // must commit the transaction in order to destroy it
-        transaction.commit();
-    }
-
-    SECTION("cancel")
-    {
-        transaction.cancel();
-
-        CHECK(transaction.state() == Transaction::State::Cancelled);
-
-        document->selectAllNodes();
-        CHECK(document->selectedNodes().empty());
-    }
+    document->selectAllNodes();
+    CHECK(document->selectedNodes().empty());
+  }
 }
+
 } // namespace TrenchBroom::View

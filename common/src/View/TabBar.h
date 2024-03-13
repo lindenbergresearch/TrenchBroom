@@ -26,9 +26,7 @@
 #include <vector>
 
 class QHBoxLayout;
-
 class QLabel;
-
 class QStackedLayout;
 
 namespace TrenchBroom
@@ -36,7 +34,6 @@ namespace TrenchBroom
 namespace View
 {
 class TabBook;
-
 class TabBookPage;
 
 class TabBarButton : public QWidget
@@ -49,7 +46,6 @@ private:
 
 public:
   explicit TabBarButton(const QString& label = "", QWidget* parent = nullptr);
-
   /**
    * Update the label color
    */
@@ -59,7 +55,6 @@ protected:
   void mousePressEvent(QMouseEvent* event) override;
 
 signals:
-
   void clicked();
 
 private:
@@ -85,11 +80,9 @@ public:
 
 private:
   size_t findButtonIndex(QWidget* button) const;
-
   void setButtonActive(int index);
 
   void buttonClicked();
-
   void tabBookPageChanged(int newIndex);
 };
 } // namespace View

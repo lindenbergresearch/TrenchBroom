@@ -26,7 +26,6 @@ namespace TrenchBroom
 namespace Renderer
 {
 class FontGlyph;
-
 class FontTexture;
 
 class FontGlyphBuilder

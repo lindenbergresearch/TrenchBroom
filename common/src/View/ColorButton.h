@@ -22,7 +22,6 @@
 #include <QWidget>
 
 class QPushButton;
-
 class QResizeEvent;
 
 namespace TrenchBroom
@@ -39,22 +38,17 @@ private:
 
 public:
   explicit ColorButton(QWidget* parent = nullptr);
-
 signals:
-
   /**
    * Emitted when the color is set either programatically via setColor() or
    * as a result of the user clicking on the color button.
    */
   void colorChanged(const QColor& color);
-
   /**
    * Emitted only as a result of the user clicking on the color button.
    */
   void colorChangedByUser(const QColor& color);
-
 public slots:
-
   /**
    * Change the current color displayed on the button. Causes colorChanged() to be
    * emitted.

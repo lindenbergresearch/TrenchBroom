@@ -21,8 +21,8 @@
 
 #include "Renderer/Camera.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom::View
 {

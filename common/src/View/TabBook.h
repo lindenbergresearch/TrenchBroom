@@ -34,9 +34,7 @@ class TabBookPage : public QWidget
   Q_OBJECT
 public:
   explicit TabBookPage(QWidget* parent = nullptr);
-
   virtual ~TabBookPage();
-
   virtual QWidget* createTabBarPage(QWidget* parent);
 };
 
@@ -53,11 +51,9 @@ public:
   TabBar* tabBar();
 
   void addPage(TabBookPage* page, const QString& title);
-
   void switchToPage(int index);
 
 signals:
-
   void pageChanged(int page);
 };
 } // namespace View

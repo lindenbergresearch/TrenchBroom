@@ -49,24 +49,18 @@ private:
 public:
   explicit SmartPropertyEditor(
     std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
-
   ~SmartPropertyEditor() override;
 
   bool usesPropertyKey(const std::string& propertyKey) const;
 
   void activate(const std::string& propertyKey);
-
   void update(const std::vector<Model::EntityNodeBase*>& nodes);
-
   void deactivate();
 
 protected:
   std::shared_ptr<MapDocument> document() const;
-
   const std::string& propertyKey() const;
-
   const std::vector<Model::EntityNodeBase*> nodes() const;
-
   void addOrUpdateProperty(const std::string& value);
 
 private:

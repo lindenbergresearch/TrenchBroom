@@ -22,17 +22,19 @@
 #include "IO/PathInfo.h"
 #include "Result.h"
 
-#include <kdl/overload.h>
-#include <kdl/reflection_decl.h>
+#include "kdl/overload.h"
+#include "kdl/reflection_decl.h"
 
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <variant>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 
-struct Object {
+struct Object
+{
   int id;
 
   kdl_reflect_decl(Object, id);
@@ -40,7 +42,8 @@ struct Object {
 
 std::shared_ptr<File> makeObjectFile(int id);
 
-struct FileEntry {
+struct FileEntry
+{
   constexpr static auto type = PathInfo::File;
   std::string name;
   std::shared_ptr<File> file;
@@ -50,29 +53,32 @@ struct DirectoryEntry;
 
 using Entry = std::variant<FileEntry, DirectoryEntry>;
 
-struct DirectoryEntry {
+struct DirectoryEntry
+{
   constexpr static auto type = PathInfo::Directory;
   std::string name;
   std::vector<Entry> entries;
 };
 
-class TestFileSystem : public FileSystem {
+class TestFileSystem : public FileSystem
+{
 private:
-    Entry m_root;
-    std::filesystem::path m_absolutePathPrefix;
+  Entry m_root;
+  std::filesystem::path m_absolutePathPrefix;
 
 public:
-    explicit TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix = {"/"});
+  explicit TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix = {"/"});
 
-    Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
-
-    PathInfo pathInfo(const std::filesystem::path &path) const override;
+  Result<std::filesystem::path> makeAbsolute(
+    const std::filesystem::path& path) const override;
+  PathInfo pathInfo(const std::filesystem::path& path) const override;
 
 private:
-    const Entry *findEntry(std::filesystem::path path) const;
-
-    Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
-
-    Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
+  const Entry* findEntry(std::filesystem::path path) const;
+  Result<std::vector<std::filesystem::path>> doFind(
+    const std::filesystem::path& path, TraversalMode traversalMode) const override;
+  Result<std::shared_ptr<File>> doOpenFile(
+    const std::filesystem::path& path) const override;
 };
+
 } // namespace TrenchBroom::IO

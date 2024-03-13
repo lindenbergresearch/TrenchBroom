@@ -25,9 +25,7 @@
 #include <string>
 
 class QTextEdit;
-
 class QString;
-
 class QWidget;
 
 namespace TrenchBroom
@@ -44,11 +42,8 @@ public:
 
 private:
   void doLog(LogLevel level, const std::string& message) override;
-
   void doLog(LogLevel level, const QString& message) override;
-
   void logToDebugOut(LogLevel level, const QString& message);
-
   void logToConsole(LogLevel level, const QString& message);
 };
 } // namespace View

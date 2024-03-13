@@ -25,40 +25,32 @@
 #include "ToolChain.h"
 #include "View/InputState.h"
 
-#include <vm/line.h>
-#include <vm/plane.h>
-#include <vm/vec.h>
+#include "vm/line.h"
+#include "vm/plane.h"
+#include "vm/vec.h"
 
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
+namespace TrenchBroom::Model
 {
 class Hit;
-
 class HitQuery;
-
 class PickResult;
-} // namespace Model
+} // namespace TrenchBroom::Model
 
-namespace Renderer
+namespace TrenchBroom::Renderer
 {
 class RenderBatch;
-
 class RenderContext;
-} // namespace Renderer
+} // namespace TrenchBroom::Renderer
 
-namespace View
+namespace TrenchBroom::View
 {
 class DragTracker;
-
 class DropTracker;
-
 class InputState;
-
 class Tool;
 
 class ToolController
@@ -67,9 +59,7 @@ public:
   virtual ~ToolController();
 
   virtual Tool& tool() = 0;
-
   virtual const Tool& tool() const = 0;
-
   bool toolActive() const;
 
   virtual void pick(const InputState& inputState, Model::PickResult& pickResult);
@@ -77,25 +67,21 @@ public:
   virtual void modifierKeyChange(const InputState& inputState);
 
   virtual void mouseDown(const InputState& inputState);
-
   virtual void mouseUp(const InputState& inputState);
-
   virtual bool mouseClick(const InputState& inputState);
-
   virtual bool mouseDoubleClick(const InputState& inputState);
-
   virtual void mouseMove(const InputState& inputState);
-
   virtual void mouseScroll(const InputState& inputState);
 
   virtual std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState);
 
+  virtual bool shouldAcceptDrop(
+    const InputState& inputState, const std::string& payload) const;
   virtual std::unique_ptr<DropTracker> acceptDrop(
     const InputState& inputState, const std::string& payload);
 
   virtual void setRenderOptions(
     const InputState& inputState, Renderer::RenderContext& renderContext) const;
-
   virtual void render(
     const InputState& inputState,
     Renderer::RenderContext& renderContext,
@@ -114,7 +100,6 @@ private:
 
 public:
   ToolControllerGroup();
-
   ~ToolControllerGroup() override;
 
 protected:
@@ -126,25 +111,18 @@ public:
   void modifierKeyChange(const InputState& inputState) override;
 
   void mouseDown(const InputState& inputState) override;
-
   void mouseUp(const InputState& inputState) override;
-
   bool mouseClick(const InputState& inputState) override;
-
   bool mouseDoubleClick(const InputState& inputState) override;
-
   void mouseMove(const InputState& inputState) override;
-
   void mouseScroll(const InputState& inputState) override;
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
-
   std::unique_ptr<DropTracker> acceptDrop(
     const InputState& inputState, const std::string& payload) override;
 
   void setRenderOptions(
     const InputState& inputState, Renderer::RenderContext& renderContext) const override;
-
   void render(
     const InputState& inputState,
     Renderer::RenderContext& renderContext,
@@ -154,9 +132,7 @@ public:
 
 private: // subclassing interface
   virtual bool doShouldHandleMouseDrag(const InputState& inputState) const;
-
-  virtual bool doShouldHandleDrop(
+  virtual bool doShouldAcceptDrop(
     const InputState& inputState, const std::string& payload) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+} // namespace TrenchBroom::View

@@ -22,9 +22,7 @@
 #include <QWidget>
 
 class QLabel;
-
 class QListWidget;
-
 class QListWidgetItem;
 
 namespace TrenchBroom
@@ -39,7 +37,6 @@ protected:
 
 public:
   explicit ControlListBoxItemRenderer(QWidget* parent = nullptr);
-
   ~ControlListBoxItemRenderer() override;
 
   void setIndex(size_t index);
@@ -49,11 +46,8 @@ protected:
 
 public:
   virtual void updateItem();
-
   virtual void setSelected(bool selected, const QListWidget* listWidget);
-
 signals:
-
   void doubleClicked(size_t index);
 };
 
@@ -71,7 +65,6 @@ public:
     ControlListBoxItemRenderer* renderer, bool showSeparator, QWidget* parent = nullptr);
 
   ControlListBoxItemRenderer* renderer();
-
   const ControlListBoxItemRenderer* renderer() const;
 };
 
@@ -95,17 +88,13 @@ public:
     const QMargins& itemMargins,
     bool showSeparator,
     QWidget* parent = nullptr);
-
   ControlListBox(const QString& emptyText, bool showSeparator, QWidget* parent = nullptr);
 
   void setEmptyText(const QString& emptyText);
-
   void setItemMargins(const QMargins& itemMargins);
 
   int count() const;
-
   int currentRow() const;
-
   void setCurrentRow(int currentRow);
 
 protected:
@@ -125,11 +114,8 @@ protected:
   void updateItems();
 
   const ControlListBoxItemRenderer* renderer(int i) const;
-
   ControlListBoxItemRenderer* renderer(int i);
-
   ControlListBoxItemRendererWrapper* wrapper(int i) const;
-
   ControlListBoxItemRendererWrapper* wrapper(int i);
 
 private:
@@ -137,20 +123,13 @@ private:
 
 private:
   virtual size_t itemCount() const = 0;
-
   virtual ControlListBoxItemRenderer* createItemRenderer(
     QWidget* parent, size_t index) = 0;
-
   virtual void selectedRowChanged(int index);
-
   virtual void doubleClicked(size_t index);
-
 private slots:
-
   void listItemSelectionChanged();
-
 signals:
-
   void itemSelectionChanged();
 };
 } // namespace View

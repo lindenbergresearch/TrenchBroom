@@ -42,7 +42,6 @@ public:
 
   private:
     friend class AllocationTracker;
-
     /**
      * If this is null, it means we're the head of the list in the
      * m_freeBlockSizeBins map.
@@ -104,18 +103,14 @@ private:
    * Block::size.
    */
   void unlinkFromBinList(Block* block);
-
   void linkToBinList(Block* block);
 
   void recycle(Block* block);
-
   Block* obtainBlock();
 
 public:
   explicit AllocationTracker(Index initial_capacity);
-
   AllocationTracker();
-
   ~AllocationTracker();
 
   /**
@@ -129,13 +124,9 @@ public:
    * The AllocationTracker owns the Block object itself.
    */
   Block* allocate(size_t size);
-
   void free(Block* block);
-
   size_t capacity() const;
-
   void expand(Index newCapacity);
-
   /**
    * @return whether there are any allocations. i.e. returns false iff the whole range
    * managed by the allocation tracker is free. Returns false if `capacity() == 0`.
@@ -154,16 +145,12 @@ public:
     Range(Index p, Index s);
 
     bool operator==(const Range& other) const;
-
     bool operator<(const Range& other) const;
   };
 
   std::vector<Range> freeBlocks() const;
-
   std::vector<Range> usedBlocks() const;
-
   Index largestPossibleAllocation() const;
-
   void checkInvariants() const;
 };
 } // namespace Renderer

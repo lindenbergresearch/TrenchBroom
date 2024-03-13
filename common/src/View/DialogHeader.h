@@ -22,9 +22,7 @@
 #include <QWidget>
 
 class QLabel;
-
 class QPixmap;
-
 class QString;
 
 namespace TrenchBroom
@@ -40,13 +38,10 @@ private:
 
 public:
   explicit DialogHeader(QWidget* parent = nullptr);
-
   explicit DialogHeader(const QString& text, QWidget* parent = nullptr);
-
   DialogHeader(const QString& text, QPixmap icon, QWidget* parent = nullptr);
 
   void set(const QString& text);
-
   void set(const QString& text, QPixmap icon);
 
 private:

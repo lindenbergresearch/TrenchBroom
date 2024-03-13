@@ -25,8 +25,8 @@
 #include "Model/HitType.h"
 #include "View/Tool.h"
 
-#include <vm/bbox.h>
-#include <vm/vec.h>
+#include "vm/bbox.h"
+#include "vm/vec.h"
 
 #include <bitset>
 #include <memory>
@@ -47,9 +47,7 @@ class Camera;
 namespace View
 {
 class Grid;
-
 class MapDocument;
-
 class ScaleObjectsToolPage;
 
 /**
@@ -62,11 +60,8 @@ public:
   vm::vec3 normal;
 
   static bool validSideNormal(const vm::vec3& n);
-
   explicit BBoxSide(const vm::vec3& n);
-
   bool operator<(const BBoxSide& other) const;
-
   bool operator==(const BBoxSide& other) const;
 };
 
@@ -80,7 +75,6 @@ public:
   vm::vec3 corner;
 
   static bool validCorner(const vm::vec3& c);
-
   explicit BBoxCorner(const vm::vec3& c);
 
   bool operator==(const BBoxCorner& other) const;
@@ -120,38 +114,25 @@ public:
   ProportionalAxes(bool xProportional, bool yProportional, bool zProportional);
 
   static ProportionalAxes All();
-
   static ProportionalAxes None();
 
   void setAxisProportional(size_t axis, bool proportional);
-
   bool isAxisProportional(size_t axis) const;
-
   bool allAxesProportional() const;
 
   bool operator==(const ProportionalAxes& other) const;
-
   bool operator!=(const ProportionalAxes& other) const;
 };
 
 std::vector<BBoxSide> allSides();
-
 std::vector<BBoxEdge> allEdges();
-
 std::vector<BBoxCorner> allCorners();
-
 vm::vec3 pointForBBoxCorner(const vm::bbox3& box, const BBoxCorner& corner);
-
 BBoxSide oppositeSide(const BBoxSide& side);
-
 BBoxCorner oppositeCorner(const BBoxCorner& corner);
-
 BBoxEdge oppositeEdge(const BBoxEdge& edge);
-
 vm::segment3 pointsForBBoxEdge(const vm::bbox3& box, const BBoxEdge& edge);
-
 vm::polygon3 polygonForBBoxSide(const vm::bbox3& box, const BBoxSide& side);
-
 vm::vec3 centerForBBoxSide(const vm::bbox3& box, const BBoxSide& side);
 
 /**
@@ -257,7 +238,6 @@ private:
 
 public:
   explicit ScaleObjectsTool(std::weak_ptr<MapDocument> document);
-
   ~ScaleObjectsTool() override;
 
   bool doActivate() override;
@@ -265,19 +245,16 @@ public:
   const Grid& grid() const;
 
   const Model::Hit& dragStartHit() const;
-
   bool applies() const;
 
   void pickBackSides(
     const vm::ray3& pickRay,
     const Renderer::Camera& camera,
     Model::PickResult& pickResult) const;
-
   void pick2D(
     const vm::ray3& pickRay,
     const Renderer::Camera& camera,
     Model::PickResult& pickResult) const;
-
   void pick3D(
     const vm::ray3& pickRay,
     const Renderer::Camera& camera,
@@ -290,19 +267,15 @@ public:
   std::vector<vm::polygon3f> polygonsHighlightedByDrag() const;
 
   bool hasDragSide() const;
-
   vm::polygon3f dragSide() const;
 
   bool hasDragEdge() const;
-
   vm::segment3f dragEdge() const;
 
   bool hasDragCorner() const;
-
   vm::vec3f dragCorner() const;
 
   bool hasDragAnchor() const;
-
   vm::vec3f dragAnchor() const;
 
   /**
@@ -316,20 +289,15 @@ public:
   void updatePickedHandle(const Model::PickResult& pickResult);
 
   void setAnchorPos(AnchorPos pos);
-
   AnchorPos anchorPos() const;
 
   void setProportionalAxes(const ProportionalAxes& proportionalAxes);
-
   const ProportionalAxes& proportionalAxes() const;
 
 public:
   void startScaleWithHit(const Model::Hit& hit);
-
   void scaleByDelta(const vm::vec3& delta);
-
   void commitScale();
-
   void cancelScale();
 
 private:

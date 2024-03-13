@@ -33,14 +33,12 @@ private:
 
 public:
   static void showAboutDialog();
-
   static void closeAboutDialog();
 
   ~AboutDialog() override;
 
 private:
   AboutDialog();
-
   void createGui();
 };
 } // namespace View

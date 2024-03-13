@@ -40,9 +40,8 @@ public:
 
 public:
   const std::string& name() const;
-
   const std::vector<std::string>& vertexShaders() const;
-
   const std::vector<std::string>& fragmentShaders() const;
 };
+
 } // namespace TrenchBroom::Renderer

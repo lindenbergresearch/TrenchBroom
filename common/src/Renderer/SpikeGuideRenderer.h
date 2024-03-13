@@ -25,7 +25,7 @@
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <memory>
 #include <vector>
@@ -65,20 +65,16 @@ public:
   SpikeGuideRenderer();
 
   void setColor(const Color& color);
-
   void add(
     const vm::ray3& ray, FloatType length, std::shared_ptr<View::MapDocument> document);
-
   void clear();
 
 private:
   void doPrepareVertices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
 
 private:
   void addPoint(const vm::vec3& position);
-
   void addSpike(const vm::ray3& ray, FloatType length, FloatType maxLength);
 
   void validate();

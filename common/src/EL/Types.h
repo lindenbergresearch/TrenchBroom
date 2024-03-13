@@ -50,7 +50,6 @@ enum class ValueType
 };
 
 std::string typeName(ValueType type);
-
 ValueType typeForName(const std::string& type);
 } // namespace EL
 } // namespace TrenchBroom

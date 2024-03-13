@@ -30,41 +30,42 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
+namespace TrenchBroom::IO
+{
+
 TEST_CASE("Quake3ShaderParserTest.parseEmptyShader")
 {
-    const std::string data("");
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+  const auto data = "";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{}));
+  CHECK(parser.parse(status).empty());
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseSingleShaderWithEmptyBlock")
 {
-    const std::string data(R"(
+  const auto data = R"(
 textures/liquids/lavahell2 //path and name of new texture
 {}
-)"
-    );
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+)";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-                                                                                                  "textures/liquids/lavahell2",         // shaderPath
-                                                                                                  "",                                   // editorImage
-                                                                                                  "",                                   // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::Front, // culling
-                                                                                                  {},                                   // surfaceParms
-                                                                                                  {}                                    // stages
-                                                                                              }}
-    ));
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+      "textures/liquids/lavahell2",         // shaderPath
+      "",                                   // editorImage
+      "",                                   // lightImage
+      Assets::Quake3Shader::Culling::Front, // culling
+      {},                                   // surfaceParms
+      {}                                    // stages
+    }}));
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseSingleSimpleShaderWithoutEditorImage")
 {
-    const std::string data(R"(
+  const auto data = R"(
 textures/liquids/lavahell2 //path and name of new texture
 {
 
@@ -94,28 +95,28 @@ textures/liquids/lavahell2 //path and name of new texture
     //the turbulence is scrolled
     }
 
-})"
-    );
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+})";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-                                                                                                  "textures/liquids/lavahell2",        // shaderPath
-                                                                                                  "",                                  // editorImage
-                                                                                                  "",                                  // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::None, // culling
-                                                                                                  {"noimpact", "lava", "nolightmap"},  // surfaceParms
-                                                                                                  {{
-                                                                                                       "textures/eerie/lavahell.tga", // map
-                                                                                                       {"", ""}                       // blendFunc
-                                                                                                   }}                               // stages
-                                                                                              }}
-    ));
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+      "textures/liquids/lavahell2",        // shaderPath
+      "",                                  // editorImage
+      "",                                  // lightImage
+      Assets::Quake3Shader::Culling::None, // culling
+      {"noimpact", "lava", "nolightmap"},  // surfaceParms
+      {{
+        "textures/eerie/lavahell.tga", // map
+        {"", ""}                       // blendFunc
+      }}                               // stages
+    }}));
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseSingleSimpleShaderWithEditorImage")
 {
-    const std::string data(R"(
+  const auto data = R"(
 textures/liquids/lavahell2 //path and name of new texture
 {
 
@@ -146,28 +147,28 @@ textures/liquids/lavahell2 //path and name of new texture
     //the turbulence is scrolled
     }
 
-})"
-    );
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+})";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-                                                                                                  "textures/liquids/lavahell2",        // shaderPath
-                                                                                                  "textures/eerie/lavahell.tga",       // editorImage
-                                                                                                  "",                                  // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::None, // culling
-                                                                                                  {"noimpact", "lava", "nolightmap"},  // surfaceParms
-                                                                                                  {{
-                                                                                                       "textures/eerie/lavahell.tga", // map
-                                                                                                       {"", ""}                       // blendFunc
-                                                                                                   }}                               // stages
-                                                                                              }}
-    ));
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+      "textures/liquids/lavahell2",        // shaderPath
+      "textures/eerie/lavahell.tga",       // editorImage
+      "",                                  // lightImage
+      Assets::Quake3Shader::Culling::None, // culling
+      {"noimpact", "lava", "nolightmap"},  // surfaceParms
+      {{
+        "textures/eerie/lavahell.tga", // map
+        {"", ""}                       // blendFunc
+      }}                               // stages
+    }}));
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseSingleComplexShaderWithEditorImage")
 {
-    const std::string data(R"(
+  const auto data = R"(
 textures/eerie/ironcrosslt2_10000
 {
 
@@ -198,36 +199,96 @@ textures/eerie/ironcrosslt2_10000
     blendFunc add
     }
 
-})"
-    );
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+})";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-                                                                                                  "textures/eerie/ironcrosslt2_10000",            // shaderPath
-                                                                                                  "textures/gothic_light/ironcrosslt2.tga",       // editorImage
-                                                                                                  "textures/gothic_light/ironcrosslt2.blend.tga", // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::Front,           // culling
-                                                                                                  {},                                             // surfaceParms
-                                                                                                  {{
-                                                                                                       "$lightmap", // map
-                                                                                                       {"", ""}     // blendFunc
-                                                                                                   }, {
-                                                                                                       "textures/gothic_light/ironcrosslt2.tga", // map
-                                                                                                       {"GL_DST_COLOR", "GL_ZERO"}               // blendFunc
-                                                                                                   }, {
-                                                                                                       "textures/gothic_light/ironcrosslt2.blend.tga", // map
-                                                                                                       {
-                                                                                                           "GL_ONE", "GL_ONE"
-                                                                                                       }                            // blendFunc
-                                                                                                   }}                                                // stages
-                                                                                              }}
-    ));
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+      "textures/eerie/ironcrosslt2_10000",            // shaderPath
+      "textures/gothic_light/ironcrosslt2.tga",       // editorImage
+      "textures/gothic_light/ironcrosslt2.blend.tga", // lightImage
+      Assets::Quake3Shader::Culling::Front,           // culling
+      {},                                             // surfaceParms
+      {{
+         "$lightmap", // map
+         {"", ""}     // blendFunc
+       },
+       {
+         "textures/gothic_light/ironcrosslt2.tga", // map
+         {"GL_DST_COLOR", "GL_ZERO"}               // blendFunc
+       },
+       {
+         "textures/gothic_light/ironcrosslt2.blend.tga", // map
+         {"GL_ONE", "GL_ONE"}                            // blendFunc
+       }}                                                // stages
+    }}));
+}
+
+TEST_CASE("Quake3ShaderParserTest.caseSensitivity")
+{
+  const auto data = R"(
+textures/eerie/ironcrosslt2_10000
+{
+
+    Q3MAP_LIGHTIMAGE textures/gothic_light/ironcrosslt2.blend.tga
+    // this TGA is the source for the color of the blended light
+
+    QER_EDITORIMAGE textures/gothic_light/ironcrosslt2.tga
+    //base TGA (used because the shader is used with several
+    // different light values
+
+    Q3MAP_SURFACELIGHT 10000
+    //emitted light value of 10,000
+
+    {
+    MAP $lightmap
+    //source texture is affected by the lightmap
+    RGBGEN IDENTITY
+    // this command HANDLES the overbright bits created by "sunlight"
+    // in the game
+    }
+    {
+    MAP textures/gothic_light/ironcrosslt2.tga
+    BLENDFUNC FILTER
+    RGBGEN IDENTITY
+    }
+    {
+    MAP textures/gothic_light/ironcrosslt2.blend.tga
+    BLENDFUNC ADD
+    }
+
+})";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
+
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+      "textures/eerie/ironcrosslt2_10000",            // shaderPath
+      "textures/gothic_light/ironcrosslt2.tga",       // editorImage
+      "textures/gothic_light/ironcrosslt2.blend.tga", // lightImage
+      Assets::Quake3Shader::Culling::Front,           // culling
+      {},                                             // surfaceParms
+      {{
+         "$lightmap", // map
+         {"", ""}     // blendFunc
+       },
+       {
+         "textures/gothic_light/ironcrosslt2.tga", // map
+         {"GL_DST_COLOR", "GL_ZERO"}               // blendFunc
+       },
+       {
+         "textures/gothic_light/ironcrosslt2.blend.tga", // map
+         {"GL_ONE", "GL_ONE"}                            // blendFunc
+       }}                                                // stages
+    }}));
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseTwoShaders")
 {
-    const std::string data(R"(
+  const auto data = R"(
 textures/eerie/ironcrosslt2_10000
 {
 
@@ -293,45 +354,48 @@ textures/liquids/lavahell2 //path and name of new texture
 
 }
 
-)"
-    );
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+)";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-                                                                                                  "textures/eerie/ironcrosslt2_10000",            // shaderPath
-                                                                                                  "textures/gothic_light/ironcrosslt2.tga",       // editorImage
-                                                                                                  "textures/gothic_light/ironcrosslt2.blend.tga", // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::Front,           // culling
-                                                                                                  {},                                             // surfaceParms
-                                                                                                  {{
-                                                                                                       "$lightmap", // map
-                                                                                                       {"", ""}     // blendFunc
-                                                                                                   }, {
-                                                                                                          "textures/gothic_light/ironcrosslt2.tga", // map
-                                                                                                          {"GL_DST_COLOR", "GL_ZERO"}               // blendFunc
-                                                                                                      }, {
-                                                                                                             "textures/gothic_light/ironcrosslt2.blend.tga", // map
-                                                                                                             {"GL_ONE", "GL_ONE"}                            // blendFunc
-                                                                                                         }}                                                // stages
-                                                                                              },
-                                                                                              {
-                                                                                                  "textures/liquids/lavahell2",        // shaderPath
-                                                                                                  "textures/eerie/lavahell.tga",       // editorImage
-                                                                                                  "",                                  // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::None, // culling
-                                                                                                  {"noimpact", "lava", "nolightmap"},  // surfaceParms
-                                                                                                  {{
-                                                                                                       "textures/eerie/lavahell.tga", // map
-                                                                                                       {"", ""}                       // blendFunc
-                                                                                                   }}                               // stages
-                                                                                              }}
-    ));
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{
+      {
+        "textures/eerie/ironcrosslt2_10000",            // shaderPath
+        "textures/gothic_light/ironcrosslt2.tga",       // editorImage
+        "textures/gothic_light/ironcrosslt2.blend.tga", // lightImage
+        Assets::Quake3Shader::Culling::Front,           // culling
+        {},                                             // surfaceParms
+        {{
+           "$lightmap", // map
+           {"", ""}     // blendFunc
+         },
+         {
+           "textures/gothic_light/ironcrosslt2.tga", // map
+           {"GL_DST_COLOR", "GL_ZERO"}               // blendFunc
+         },
+         {
+           "textures/gothic_light/ironcrosslt2.blend.tga", // map
+           {"GL_ONE", "GL_ONE"}                            // blendFunc
+         }}                                                // stages
+      },
+      {
+        "textures/liquids/lavahell2",        // shaderPath
+        "textures/eerie/lavahell.tga",       // editorImage
+        "",                                  // lightImage
+        Assets::Quake3Shader::Culling::None, // culling
+        {"noimpact", "lava", "nolightmap"},  // surfaceParms
+        {{
+          "textures/eerie/lavahell.tga", // map
+          {"", ""}                       // blendFunc
+        }}                               // stages
+      }}));
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseShadersWithMultilineComment")
 {
-    const std::string data(R"(
+  const auto data = R"(
 /*
 This is a
 multiline comment.
@@ -350,18 +414,17 @@ waterBubble
     }
 }
 
-)"
-    );
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
-    CHECK_NOTHROW(parser.parse(status));
+)";
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
+  CHECK_NOTHROW(parser.parse(status));
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseBlendFuncParameters")
 {
-    // see
-    // https://github.com/id-Software/Quake-III-Arena/blob/master/code/renderer/tr_shader.c#L176
-    const std::string data(R"(
+  // see
+  // https://github.com/id-Software/Quake-III-Arena/blob/master/code/renderer/tr_shader.c#L176
+  const auto data = R"(
             waterBubble
             {
                 {
@@ -414,66 +477,72 @@ TEST_CASE("Quake3ShaderParserTest.parseBlendFuncParameters")
                 }
             }
 
-            )"
-    );
+            )";
 
-    using BF = Assets::Quake3ShaderStage::BlendFunc;
+  using BF = Assets::Quake3ShaderStage::BlendFunc;
 
-    Quake3ShaderParser parser(data);
-    TestParserStatus status;
+  auto parser = Quake3ShaderParser{data};
+  auto status = TestParserStatus{};
 
-    CHECK_THAT(parser.parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-                                                                                                  "waterBubble",                        // shaderPath
-                                                                                                  "",                                   // editorImage
-                                                                                                  "",                                   // lightImage
-                                                                                                  Assets::Quake3Shader::Culling::Front, // culling
-                                                                                                  {},                                   // surfaceParms
-                                                                                                  {{
-                                                                                                       "sprites/bubble.tga", // map
-                                                                                                       {BF::One, BF::One}    // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",     // map
-                                                                                                       {BF::DestColor, BF::Zero} // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",                // map
-                                                                                                       {BF::SrcAlpha, BF::OneMinusSrcAlpha} // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga", // map
-                                                                                                       {BF::One, BF::One}    // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga", // map
-                                                                                                       {BF::Zero, BF::Zero}  // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",         // map
-                                                                                                       {BF::DestColor, BF::SrcAlpha} // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",                         // map
-                                                                                                       {
-                                                                                                           BF::OneMinusDestColor, BF::OneMinusSrcAlpha
-                                                                                                       } // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",         // map
-                                                                                                       {BF::SrcAlpha, BF::DestAlpha} // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",                         // map
-                                                                                                       {
-                                                                                                           BF::OneMinusSrcAlpha, BF::OneMinusDestAlpha
-                                                                                                       } // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",         // map
-                                                                                                       {BF::DestAlpha, BF::SrcColor} // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",                         // map
-                                                                                                       {
-                                                                                                           BF::OneMinusDestAlpha, BF::OneMinusSrcColor
-                                                                                                       } // blendFunc
-                                                                                                   }, {
-                                                                                                       "sprites/bubble.tga",                        // map
-                                                                                                       {BF::SrcAlphaSaturate, BF::OneMinusSrcColor} // blendFunc
-                                                                                                   },
-                                                                                                  } // stages
-                                                                                              }}
-    ));
+  CHECK_THAT(
+    parser.parse(status),
+    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+      "waterBubble",                        // shaderPath
+      "",                                   // editorImage
+      "",                                   // lightImage
+      Assets::Quake3Shader::Culling::Front, // culling
+      {},                                   // surfaceParms
+      {
+        {
+          "sprites/bubble.tga", // map
+          {BF::One, BF::One}    // blendFunc
+        },
+        {
+          "sprites/bubble.tga",     // map
+          {BF::DestColor, BF::Zero} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",                // map
+          {BF::SrcAlpha, BF::OneMinusSrcAlpha} // blendFunc
+        },
+        {
+          "sprites/bubble.tga", // map
+          {BF::One, BF::One}    // blendFunc
+        },
+        {
+          "sprites/bubble.tga", // map
+          {BF::Zero, BF::Zero}  // blendFunc
+        },
+        {
+          "sprites/bubble.tga",         // map
+          {BF::DestColor, BF::SrcAlpha} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",                         // map
+          {BF::OneMinusDestColor, BF::OneMinusSrcAlpha} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",         // map
+          {BF::SrcAlpha, BF::DestAlpha} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",                         // map
+          {BF::OneMinusSrcAlpha, BF::OneMinusDestAlpha} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",         // map
+          {BF::DestAlpha, BF::SrcColor} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",                         // map
+          {BF::OneMinusDestAlpha, BF::OneMinusSrcColor} // blendFunc
+        },
+        {
+          "sprites/bubble.tga",                        // map
+          {BF::SrcAlphaSaturate, BF::OneMinusSrcColor} // blendFunc
+        },
+      } // stages
+    }}));
 }
-} // namespace IO
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::IO

@@ -26,8 +26,6 @@
 #include "Macros.h"
 #include "View/KeyboardShortcut.h"
 
-#include "vm/forward.h"
-
 #include <filesystem>
 #include <optional>
 
@@ -50,35 +48,19 @@ class PreferenceSerializer
 {
 public:
   bool readFromJson(const QJsonValue& in, bool& out) const;
-
   bool readFromJson(const QJsonValue& in, Color& out) const;
-
-  bool readFromJson(const QJsonValue& in, vm::vec3f& out) const;
-
   bool readFromJson(const QJsonValue& in, float& out) const;
-
   bool readFromJson(const QJsonValue& in, int& out) const;
-
   bool readFromJson(const QJsonValue& in, std::filesystem::path& out) const;
-
   bool readFromJson(const QJsonValue& in, QKeySequence& out) const;
-
   bool readFromJson(const QJsonValue& in, QString& out) const;
 
   QJsonValue writeToJson(bool in) const;
-
   QJsonValue writeToJson(const Color& in) const;
-
-  QJsonValue writeToJson(const vm::vec3f& in) const;
-
   QJsonValue writeToJson(float in) const;
-
   QJsonValue writeToJson(int in) const;
-
   QJsonValue writeToJson(const std::filesystem::path& in) const;
-
   QJsonValue writeToJson(const QKeySequence& in) const;
-
   QJsonValue writeToJson(const QString& in) const;
 };
 
@@ -86,35 +68,25 @@ class PreferenceBase
 {
 public:
   PreferenceBase();
-
   virtual ~PreferenceBase();
 
   PreferenceBase(const PreferenceBase& other);
-
   PreferenceBase(PreferenceBase&& other) noexcept;
-
   PreferenceBase& operator=(const PreferenceBase& other);
-
   PreferenceBase& operator=(PreferenceBase&& other);
 
   friend bool operator==(const PreferenceBase& lhs, const PreferenceBase& rhs);
-
   friend bool operator!=(const PreferenceBase& lhs, const PreferenceBase& rhs);
 
   virtual const std::filesystem::path& path() const = 0;
 
 public: // private to PreferenceManager
   virtual void resetToDefault() = 0;
-
   virtual bool valid() const = 0;
-
   virtual void setValid(bool _valid) = 0;
-
   virtual bool loadFromJson(
     const PreferenceSerializer& format, const QJsonValue& value) = 0;
-
   virtual QJsonValue writeToJson(const PreferenceSerializer& format) const = 0;
-
   virtual bool isDefault() const = 0;
 };
 
@@ -122,7 +94,6 @@ class DynamicPreferencePatternBase
 {
 public:
   virtual ~DynamicPreferencePatternBase();
-
   virtual const std::filesystem::path& pathPattern() const = 0;
 };
 
@@ -172,7 +143,6 @@ public:
   Preference(Preference&& other) = default;
 
   Preference& operator=(const Preference& other) = default;
-
   Preference& operator=(Preference&& other) = default;
 
   const std::filesystem::path& path() const override { return m_path; }

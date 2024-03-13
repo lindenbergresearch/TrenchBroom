@@ -30,34 +30,30 @@ namespace TrenchBroom
 namespace View
 {
 TitledPanel::TitledPanel(
-  const QString& title,
-  QWidget* parent,
-  bool boldTitle,
-  bool subtitle,
-  bool fillBackground)
+  const QString& title, QWidget* parent, bool showDivider, bool boldTitle)
   : QWidget(parent)
   , m_titleBar(nullptr)
   , m_panel(nullptr)
 {
-  m_titleBar = new TitleBar(title, boldTitle, subtitle);
+  m_titleBar = new TitleBar(
+    title, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, boldTitle);
   m_panel = new QWidget();
-
-  if (fillBackground)
-  {
-    m_panel->setAutoFillBackground(true);
-    m_panel->setBackgroundRole(QPalette::Window);
-  }
 
   auto* layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   layout->addWidget(m_titleBar);
-  layout->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
+  if (showDivider)
+  {
+    layout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
+  }
+  layout->addWidget(m_panel, 1);
   setLayout(layout);
 }
 
-TitledPanel::TitledPanel(const QString& title, const bool boldTitle, bool subtitle)
-  : TitledPanel(title, nullptr, boldTitle, subtitle)
+TitledPanel::TitledPanel(
+  const QString& title, const bool showDivider, const bool boldTitle)
+  : TitledPanel(title, nullptr, showDivider, boldTitle)
 {
 }
 

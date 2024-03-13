@@ -27,7 +27,6 @@ namespace TrenchBroom
 namespace Renderer
 {
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
@@ -48,14 +47,12 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void pick(const InputState& inputState, Model::PickResult& pickResult) override;
 
   void setRenderOptions(
     const InputState& inputState, Renderer::RenderContext& renderContext) const override;
-
   void render(
     const InputState& inputState,
     Renderer::RenderContext& renderContext,
@@ -65,7 +62,6 @@ private:
 
 private: // subclassing interface
   virtual Model::Hit doPick(const InputState& inputState) = 0;
-
   virtual void doRenderHandle(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) = 0;
 };
@@ -77,7 +73,6 @@ public:
 
 private:
   Model::Hit doPick(const InputState& inputState) override;
-
   void doRenderHandle(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
 };
@@ -89,7 +84,6 @@ public:
 
 private:
   Model::Hit doPick(const InputState& inputState) override;
-
   void doRenderHandle(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
 };

@@ -23,7 +23,7 @@
 #include "Macros.h"
 #include "Model/HitType.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
@@ -35,9 +35,7 @@ class Hit;
 namespace Renderer
 {
 class Camera;
-
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
@@ -65,31 +63,25 @@ private:
 
   public:
     explicit Handle(const vm::vec3& position);
-
     virtual ~Handle();
 
     virtual Model::Hit pick(
       const vm::ray3& pickRay, const Renderer::Camera& camera) const = 0;
-
     virtual void renderHandle(
       Renderer::RenderContext& renderContext,
       Renderer::RenderBatch& renderBatch) const = 0;
-
     virtual void renderHighlight(
       Renderer::RenderContext& renderContext,
       Renderer::RenderBatch& renderBatch,
       HitArea area) const = 0;
 
     FloatType scalingFactor(const Renderer::Camera& camera) const;
-
     static FloatType majorRadius();
-
     static FloatType minorRadius();
 
   protected:
     Model::Hit pickCenterHandle(
       const vm::ray3& pickRay, const Renderer::Camera& camera) const;
-
     virtual Model::Hit pickRotateHandle(
       const vm::ray3& pickRay, const Renderer::Camera& camera, HitArea area) const;
 
@@ -103,11 +95,9 @@ private:
 
     Model::Hit pick(
       const vm::ray3& pickRay, const Renderer::Camera& camera) const override;
-
     void renderHandle(
       Renderer::RenderContext& renderContext,
       Renderer::RenderBatch& renderBatch) const override;
-
     void renderHighlight(
       Renderer::RenderContext& renderContext,
       Renderer::RenderBatch& renderBatch,
@@ -129,11 +119,9 @@ private:
 
     Model::Hit pick(
       const vm::ray3& pickRay, const Renderer::Camera& camera) const override;
-
     void renderHandle(
       Renderer::RenderContext& renderContext,
       Renderer::RenderBatch& renderBatch) const override;
-
     void renderHighlight(
       Renderer::RenderContext& renderContext,
       Renderer::RenderBatch& renderBatch,
@@ -157,15 +145,12 @@ public:
   RotateObjectsHandle();
 
   const vm::vec3& position() const;
-
   void setPosition(const vm::vec3& position);
 
   Model::Hit pick2D(const vm::ray3& pickRay, const Renderer::Camera& camera) const;
-
   Model::Hit pick3D(const vm::ray3& pickRay, const Renderer::Camera& camera) const;
 
   FloatType majorHandleRadius(const Renderer::Camera& camera) const;
-
   FloatType minorHandleRadius(const Renderer::Camera& camera) const;
 
   vm::vec3 rotationAxis(HitArea area) const;
@@ -173,15 +158,12 @@ public:
 public:
   void renderHandle2D(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-
   void renderHandle3D(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-
   void renderHighlight2D(
     Renderer::RenderContext& renderContext,
     Renderer::RenderBatch& renderBatch,
     HitArea area);
-
   void renderHighlight3D(
     Renderer::RenderContext& renderContext,
     Renderer::RenderBatch& renderBatch,

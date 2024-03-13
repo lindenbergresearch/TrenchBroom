@@ -25,11 +25,11 @@ uniform sampler2D Texture;
 uniform bool RenderGrid;
 uniform vec2 GridSizes;
 uniform vec4 GridColor;
-uniform float GridWidth;
 uniform vec2 GridScales;
 uniform mat4 GridMatrix;
 uniform vec2 GridDivider;
 uniform float CameraZoom;
+uniform float DpiScale;
 
 varying vec4 modelCoordinates;
 varying vec3 modelNormal;
@@ -59,7 +59,7 @@ float getSoftStripes(float coord, float gridDivider, float gridSize, float strip
 
 void gridLinesSoft(vec2 inCoords) {
     // the width of the grid lines, corrected by the texture scaling factors and the camera zoom level
-    vec2 lineWidths = abs(GridWidth / GridScales / CameraZoom);
+    vec2 lineWidths = abs(1.0 / GridScales / CameraZoom) * DpiScale;
     // the widths of each grid stripe
     vec2 stripeWidths = GridSizes / GridDivider;
     // ratio of the line widths and the stripe widths
@@ -78,8 +78,8 @@ void main() {
 	else
 		gl_FragColor = faceColor;
 
-    gl_FragColor = vec4(vec3(Brightness * gl_FragColor), gl_FragColor.a);
-    gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
+    gl_FragColor = vec4(vec3(Brightness / 2.0 * gl_FragColor), gl_FragColor.a);
+    gl_FragColor = clamp(2.0 * gl_FragColor, 0.0, 1.0);
 
 	if (RenderGrid) {
 		// vec2 gridRatios = GridDivider / GridSizes;

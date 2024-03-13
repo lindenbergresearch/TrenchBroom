@@ -75,13 +75,11 @@ struct GLVertex<AttrType, AttrTypeRest...>
 
   // Copy and move constructors
   GLVertex(const GLVertex<AttrType, AttrTypeRest...>& other) = default;
-
   GLVertex(GLVertex<AttrType, AttrTypeRest...>&& other) noexcept = default;
 
   // Assignment operators
   GLVertex<AttrType, AttrTypeRest...>& operator=(
     const GLVertex<AttrType, AttrTypeRest...>& other) = default;
-
   GLVertex<AttrType, AttrTypeRest...>& operator=(
     GLVertex<AttrType, AttrTypeRest...>&& other) noexcept = default;
 
@@ -165,12 +163,10 @@ struct GLVertex<AttrType>
 
   // Copy and move constructors
   GLVertex(const GLVertex<AttrType>& other) = default;
-
   GLVertex(GLVertex<AttrType>&& other) noexcept = default;
 
   // Assignment operators
   GLVertex<AttrType>& operator=(const GLVertex<AttrType>& other) = default;
-
   GLVertex<AttrType>& operator=(GLVertex<AttrType>&& other) noexcept = default;
 
   // explicitly declare the following two constructors instead of using type deduction

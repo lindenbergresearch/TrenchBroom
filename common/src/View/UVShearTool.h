@@ -30,9 +30,7 @@ namespace TrenchBroom
 namespace View
 {
 class DragTracker;
-
 class MapDocument;
-
 class UVViewHelper;
 
 class UVShearTool : public ToolController, public Tool
@@ -50,7 +48,6 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void pick(const InputState& inputState, Model::PickResult& pickResult) override;

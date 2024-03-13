@@ -23,7 +23,6 @@
 
 #include <QElapsedTimer>
 #include <QOpenGLWidget>
-#include <QTimer>
 
 #include "Color.h"
 #include "Renderer/GL.h"
@@ -40,9 +39,7 @@ namespace TrenchBroom
 namespace Renderer
 {
 class FontManager;
-
 class ShaderManager;
-
 class VboManager;
 } // namespace Renderer
 
@@ -50,47 +47,21 @@ namespace View
 {
 class GLContextManager;
 
-
-struct BoxFilter
-{
-  std::vector<QPointF*> samples;
-  size_t size, length;
-  size_t index;
-
-  explicit BoxFilter(size_t size, size_t length = 0)
-    : size(size)
-  {
-    samples.resize(size);
-    index = 0;
-
-    this->length = length <= 0 ? size : length;
-    reset();
-  }
-
-  QPointF average();
-
-  void reset();
-
-  void add(QPointF* point);
-};
-
 class RenderView : public QOpenGLWidget, public InputEventProcessor
 {
   Q_OBJECT
 private:
-  Color m_focusColor, m_frameColor;
+  Color m_focusColor;
   GLContextManager* m_glContext;
   InputEventRecorder m_eventRecorder;
-  BoxFilter boxFilter;
-  QTimer m_timer; // Timer to control the frame rate
-  double avgFps = 0;
 
-protected: // FPS counter
+private: // FPS counter
   // stats since the last counter update
-  long m_totalFrames = 0;
-  int m_framesRendered = 0;
-  double maxFrameTime = 0;
-  int glWidth, glHeight;
+  int m_framesRendered;
+  int m_maxFrameTimeMsecs;
+  // other
+  int64_t m_lastFPSCounterUpdate;
+  QElapsedTimer m_timeSinceLastFrame;
 
 protected:
   std::string m_currentFPS;
@@ -103,49 +74,30 @@ public:
 
 protected: // QWindow overrides
   void keyPressEvent(QKeyEvent* event) override;
-
   void keyReleaseEvent(QKeyEvent* event) override;
-
   void mouseDoubleClickEvent(QMouseEvent* event) override;
-
   void mouseMoveEvent(QMouseEvent* event) override;
-
   void mousePressEvent(QMouseEvent* event) override;
-
   void mouseReleaseEvent(QMouseEvent* event) override;
-
   void wheelEvent(QWheelEvent* event) override;
-
-  void updateEvent();
-
-  QMouseEvent mouseEventWithFullPrecisionLocalPos(
-    const QWidget* widget, const QMouseEvent* event);
 
 protected:
   Renderer::VboManager& vboManager();
-
   Renderer::FontManager& fontManager();
-
   Renderer::ShaderManager& shaderManager();
 
   int depthBits() const;
-
   bool multisample() const;
 
 protected: // QOpenGLWidget overrides
   void initializeGL() override;
-
   void paintGL() override;
-
   void resizeGL(int w, int h) override;
 
 private:
   void render();
-
   void processInput();
-
   void clearBackground();
-
   void renderFocusIndicator();
 
 protected:
@@ -154,11 +106,8 @@ protected:
 
 private:
   virtual const Color& getBackgroundColor();
-
   virtual void doUpdateViewport(int x, int y, int width, int height);
-
   virtual bool doShouldRenderFocusIndicator() const = 0;
-
   virtual void doRender() = 0;
 };
 } // namespace View

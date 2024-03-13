@@ -31,7 +31,7 @@
 #include "View/MapView3D.h"
 #include "View/MapViewActivationTracker.h"
 
-#include <vm/scalar.h>
+#include "vm/scalar.h"
 
 namespace TrenchBroom::View
 {

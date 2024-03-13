@@ -69,7 +69,7 @@ void GamesPreferencePane::createGui()
 {
   m_gameListBox = new GameListBox();
   m_gameListBox->selectGame(0);
-  m_gameListBox->setMaximumWidth(300);
+  m_gameListBox->setMaximumWidth(220);
   m_gameListBox->setMinimumHeight(300);
 
   m_defaultPage = createDefaultPage(tr("Select a game."));
@@ -90,13 +90,10 @@ void GamesPreferencePane::createGui()
   auto* glbLayout = new QVBoxLayout();
   glbLayout->addWidget(m_gameListBox);
   glbLayout->addWidget(new BorderLine(BorderLine::Direction::Horizontal));
-  buttonLayout->setContentsMargins(
-    0, LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin);
   glbLayout->addLayout(buttonLayout);
 
   auto* layout = new QHBoxLayout();
-  layout->setContentsMargins(
-    LayoutConstants::WideHMargin, LayoutConstants::MediumHMargin * 3, 0, 0);
+  layout->setContentsMargins(QMargins());
   layout->setSpacing(0);
   setLayout(layout);
 
@@ -105,7 +102,7 @@ void GamesPreferencePane::createGui()
   layout->addSpacing(LayoutConstants::MediumVMargin);
   layout->addWidget(m_stackedWidget, 1, Qt::AlignTop);
 
-  setMinimumWidth(500);
+  setMinimumWidth(600);
 
   connect(
     m_gameListBox, &GameListBox::currentGameChanged, this, [&]() { updateControls(); });
@@ -210,7 +207,7 @@ void GamePreferencePane::createGui()
       else
       {
         validDirectoryIcon->setToolTip(tr("Directory not found"));
-        validDirectoryIcon->setIcon(IO::loadSVGIcon("IssueBrowser.svg", 16));
+        validDirectoryIcon->setIcon(IO::loadSVGIcon("IssueBrowser.svg"));
       }
     });
 

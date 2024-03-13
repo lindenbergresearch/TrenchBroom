@@ -33,24 +33,17 @@ class Logger;
 namespace TrenchBroom::Renderer
 {
 class MapRenderer;
-
 class VboManager;
 } // namespace TrenchBroom::Renderer
 
 namespace TrenchBroom::View
 {
 class CyclingMapView;
-
 class GLContextManager;
-
 class MapDocument;
-
 class MapViewBase;
-
 class MapView2D;
-
 class MapView3D;
-
 class MapViewToolBox;
 
 class ThreePaneMapView : public MultiPaneMapView
@@ -74,7 +67,6 @@ public:
     GLContextManager& contextManager,
     Logger* logger,
     QWidget* parent = nullptr);
-
   ~ThreePaneMapView() override;
 
 private:
@@ -85,7 +77,6 @@ private:
 
 private: // implement MultiPaneMapView subclassing interface
   void doMaximizeView(MapView* view) override;
-
   void doRestoreViews() override;
 };
 } // namespace TrenchBroom::View

@@ -24,7 +24,7 @@
 #include "Renderer/PrimType.h"
 #include "Renderer/RenderUtils.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {

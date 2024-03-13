@@ -19,8 +19,8 @@
 
 #include "FontGlyph.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {

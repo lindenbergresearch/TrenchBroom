@@ -34,7 +34,6 @@ class CreateSimpleBrushTool : public CreateBrushToolBase
 {
 public:
   explicit CreateSimpleBrushTool(std::weak_ptr<MapDocument> document);
-
   void update(const vm::bbox3& bounds);
 };
 } // namespace View

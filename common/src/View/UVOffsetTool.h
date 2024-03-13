@@ -29,9 +29,7 @@ namespace TrenchBroom
 namespace View
 {
 class DragTracker;
-
 class MapDocument;
-
 class UVViewHelper;
 
 class UVOffsetTool : public ToolController, public Tool
@@ -45,7 +43,6 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;

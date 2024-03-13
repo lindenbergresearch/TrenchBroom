@@ -28,7 +28,6 @@
 #include <vector>
 
 class QTextEdit;
-
 class QSplitter;
 
 namespace TrenchBroom
@@ -36,7 +35,6 @@ namespace TrenchBroom
 namespace Assets
 {
 class PropertyDefinition;
-
 class EntityDefinition;
 } // namespace Assets
 
@@ -48,11 +46,8 @@ class Node;
 namespace View
 {
 class EntityPropertyGrid;
-
 class MapDocument;
-
 class Selection;
-
 class SmartPropertyEditorManager;
 
 /**
@@ -75,7 +70,6 @@ private:
 public:
   explicit EntityPropertyEditor(
     std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
-
   ~EntityPropertyEditor() override;
 
 private:
@@ -84,11 +78,9 @@ private:
   void connectObservers();
 
   void selectionDidChange(const Selection& selection);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
 
   void updateIfSelectedEntityDefinitionChanged();
-
   void updateDocumentationAndSmartEditor();
 
   /**
@@ -98,7 +90,6 @@ private:
   static QString optionDescriptions(const Assets::PropertyDefinition& definition);
 
   void updateDocumentation(const std::string& propertyKey);
-
   void createGui(std::weak_ptr<MapDocument> document);
 
   void updateMinimumSize();

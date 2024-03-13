@@ -42,12 +42,12 @@
 #include "View/InputState.h"
 #include "View/UVViewHelper.h"
 
-#include <vm/distance.h>
-#include <vm/intersection.h>
-#include <vm/line.h>
-#include <vm/mat.h>
-#include <vm/mat_ext.h>
-#include <vm/vec.h>
+#include "vm/distance.h"
+#include "vm/intersection.h"
+#include "vm/line.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
+#include "vm/vec.h"
 
 #include <vector>
 
@@ -256,7 +256,7 @@ static void renderLineHandles(
   auto edgeRenderer = Renderer::DirectEdgeRenderer{
     Renderer::VertexArray::move(getHandleVertices(helper, highlightHandles)),
     Renderer::PrimType::Lines};
-  edgeRenderer.renderOnTop(renderBatch, 0.25f);
+  edgeRenderer.renderOnTop(renderBatch, 0.5f);
 }
 
 namespace
@@ -368,7 +368,6 @@ public:
   }
 
   void end(const InputState&) {}
-
   void cancel() {}
 
   void render(

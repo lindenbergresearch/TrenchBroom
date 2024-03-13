@@ -22,9 +22,7 @@
 #include "View/PreferencePane.h"
 
 class QWidget;
-
 class QTableView;
-
 class QSortFilterProxyModel;
 
 namespace TrenchBroom::View
@@ -44,11 +42,8 @@ public:
 
 private:
   bool doCanResetToDefaults() override;
-
   void doResetToDefaults() override;
-
   void doUpdateControls() override;
-
   bool doValidate() override;
 };
 } // namespace TrenchBroom::View

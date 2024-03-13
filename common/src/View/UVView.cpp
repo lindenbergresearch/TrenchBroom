@@ -49,9 +49,8 @@
 #include "View/UVScaleTool.h"
 #include "View/UVShearTool.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <algorithm>
 #include <cassert>
 #include <memory>
 #include <vector>
@@ -196,6 +195,7 @@ void UVView::doRender()
     Renderer::RenderContext renderContext(
       Renderer::RenderMode::Render2D, m_camera, fontManager(), shaderManager());
     Renderer::RenderBatch renderBatch(vboManager());
+    renderContext.setDpiScale(static_cast<float>(window()->devicePixelRatioF()));
 
     setupGL(renderContext);
     renderTexture(renderContext, renderBatch);
@@ -300,21 +300,19 @@ private:
 
     texture->activate();
 
-    auto gridWidth = m_helper.cameraZoom() * 1.0f;
-
     Renderer::ActiveShader shader(
       renderContext.shaderManager(), Renderer::Shaders::UVViewShader);
     shader.set("ApplyTexture", true);
     shader.set("Color", texture->averageColor());
-    shader.set("Brightness", std::max(pref(Preferences::Brightness), 2.2f));
+    shader.set("Brightness", pref(Preferences::Brightness));
     shader.set("RenderGrid", true);
     shader.set("GridSizes", vm::vec2f(texture->width(), texture->height()));
     shader.set(
       "GridColor",
       vm::vec4f(
-        Renderer::gridColorForTexture(texture), 0.5f)); // TODO: make this a preference
+        Renderer::gridColorForTexture(texture), 0.6f)); // TODO: make this a preference
+    shader.set("DpiScale", renderContext.dpiScale());
     shader.set("GridScales", scale);
-    shader.set("GridWidth", gridWidth);
     shader.set("GridMatrix", vm::mat4x4f(toTex));
     shader.set("GridDivider", vm::vec2f(m_helper.subDivisions()));
     shader.set("CameraZoom", m_helper.cameraZoom());
@@ -349,13 +347,12 @@ void UVView::renderFace(Renderer::RenderContext&, Renderer::RenderBatch& renderB
   {
     edgeVertices.push_back(Vertex(vm::vec3f(vertex->position())));
   }
-  auto gridWidth = m_helper.cameraZoom() * 10.0f;
-  const Color edgeColor = pref(Preferences::SelectedEdgeColor);
-  const float edgeLineWidth = pref(Preferences::EdgeSelectedLineWidth);
+
+  const Color edgeColor(1.0f, 1.0f, 1.0f, 1.0f); // TODO: make this a preference
 
   Renderer::DirectEdgeRenderer edgeRenderer(
     Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop);
-  edgeRenderer.renderOnTop(renderBatch, edgeColor, edgeLineWidth);
+  edgeRenderer.renderOnTop(renderBatch, edgeColor, 2.5f);
 }
 
 void UVView::renderTextureAxes(

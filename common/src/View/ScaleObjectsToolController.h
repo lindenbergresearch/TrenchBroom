@@ -22,7 +22,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "View/ToolController.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <memory>
 
@@ -31,16 +31,13 @@ namespace TrenchBroom
 namespace Renderer
 {
 class Camera;
-
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace View
 {
 class MapDocument;
-
 class ScaleObjectsTool;
 
 class ScaleObjectsToolController : public ToolController
@@ -54,12 +51,10 @@ private:
 public:
   explicit ScaleObjectsToolController(
     ScaleObjectsTool& tool, std::weak_ptr<MapDocument> document);
-
   ~ScaleObjectsToolController() override;
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void pick(const InputState& inputState, Model::PickResult& pickResult) override;
@@ -72,7 +67,6 @@ private:
 
   void setRenderOptions(
     const InputState& inputState, Renderer::RenderContext& renderContext) const override;
-
   void render(
     const InputState& inputState,
     Renderer::RenderContext& renderContext,

@@ -22,59 +22,42 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-#include "View/BorderLine.h"
 #include "View/ControlListBox.h"
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
+
 TitleBar::TitleBar(
-  const QString& title, QWidget* parent, const bool boldTitle, bool subtitle)
-  : QWidget(parent)
-  , m_titleText(nullptr)
+  const QString& title,
+  QWidget* parent,
+  const int hMargin,
+  const int vMargin,
+  const bool boldTitle)
+  : QWidget{parent}
+  , m_titleLabel{new QLabel{title}}
 {
-
-  setObjectName("TitleBar");
-  m_titleText = new QLabel(title);
-  m_titleText->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  m_titleText->setContentsMargins(
-    LayoutConstants::MediumHMargin,
-    LayoutConstants::NoMargin,
-    LayoutConstants::NoMargin,
-    LayoutConstants::NoMargin);
-
-  if (!subtitle)
-  {
-    setAutoFillBackground(true);
-    setBackgroundRole(QPalette::Midlight);
-    setForegroundRole(QPalette::Text);
-  }
   // Tell ControlListBox to not update the title label's color when the selection changes,
   // in case this widget is used inside of a ControlListBox.
-  m_titleText->setProperty(ControlListBox::LabelColorShouldNotUpdateWhenSelected, true);
+  m_titleLabel->setProperty(ControlListBox::LabelColorShouldNotUpdateWhenSelected, true);
 
   if (boldTitle)
   {
-    makePanelTitle(m_titleText, false, subtitle);
-  }
-  else
-  {
-    makePanelTitle(m_titleText, true, subtitle);
+    makeEmphasized(m_titleLabel);
   }
 
-  auto* layout = new QHBoxLayout();
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->addWidget(m_titleText, 1);
+  auto* layout = new QHBoxLayout{};
+  layout->setContentsMargins(hMargin, vMargin, hMargin, vMargin);
+  layout->setSpacing(LayoutConstants::WideHMargin);
+  layout->addWidget(m_titleLabel, 1);
   setLayout(layout);
-  setMinimumHeight(22);
 }
 
-TitleBar::TitleBar(const QString& title, const bool boldTitle, bool subtitle)
-  : TitleBar(title, nullptr, boldTitle, subtitle)
+TitleBar::TitleBar(
+  const QString& title, const int hMargin, const int vMargin, const bool boldTitle)
+  : TitleBar{title, nullptr, hMargin, vMargin, boldTitle}
 {
 }
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

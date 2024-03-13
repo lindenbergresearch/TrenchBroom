@@ -49,11 +49,9 @@ public:
   NotifierConnection(std::weak_ptr<NotifierStateBase> notifier, const size_t id);
 
   NotifierConnection(const NotifierConnection&) = delete;
-
   NotifierConnection(NotifierConnection&&) noexcept;
 
   NotifierConnection& operator=(const NotifierConnection&) = delete;
-
   NotifierConnection& operator=(NotifierConnection&&) noexcept;
 
   /**

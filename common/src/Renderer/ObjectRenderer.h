@@ -30,7 +30,6 @@
 namespace TrenchBroom
 {
 class Color;
-
 class Logger;
 
 namespace Assets
@@ -41,22 +40,16 @@ class EntityModelManager;
 namespace Model
 {
 class BrushNode;
-
 class EditorContext;
-
 class EntityNode;
-
 class GroupNode;
-
 class Node;
-
 class PatchNode;
 } // namespace Model
 
 namespace Renderer
 {
 class FontManager;
-
 class RenderBatch;
 
 class ObjectRenderer
@@ -83,59 +76,43 @@ public:
 
 public: // object management
   void addNode(Model::Node* node);
-
   void removeNode(Model::Node* node);
-
   void invalidateNode(Model::Node* node);
-
   void invalidate();
-
   void clear();
-
   void reloadModels();
 
 public: // configuration
   void setShowOverlays(bool showOverlays);
-
   void setEntityOverlayTextColor(const Color& overlayTextColor);
-
   void setGroupOverlayTextColor(const Color& overlayTextColor);
-
   void setOverlayBackgroundColor(const Color& overlayBackgroundColor);
 
   void setTint(bool tint);
-
   void setTintColor(const Color& tintColor);
 
   void setShowOccludedObjects(bool showOccludedObjects);
-
   void setOccludedEdgeColor(const Color& occludedEdgeColor);
 
   void setTransparencyAlpha(float transparencyAlpha);
 
   void setShowEntityAngles(bool showAngles);
-
   void setEntityAngleColor(const Color& color);
 
   void setOverrideGroupColors(bool overrideGroupColors);
-
   void setGroupBoundsColor(const Color& color);
 
   void setOverrideEntityBoundsColor(bool overrideEntityBoundsColor);
-
   void setEntityBoundsColor(const Color& color);
 
   void setShowBrushEdges(bool showBrushEdges);
-
   void setBrushFaceColor(const Color& brushFaceColor);
-
   void setBrushEdgeColor(const Color& brushEdgeColor);
 
   void setShowHiddenObjects(bool showHiddenObjects);
 
 public: // rendering
   void renderOpaque(RenderContext& renderContext, RenderBatch& renderBatch);
-
   void renderTransparent(RenderContext& renderContext, RenderBatch& renderBatch);
 
   deleteCopy(ObjectRenderer);

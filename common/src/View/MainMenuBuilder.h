@@ -24,9 +24,7 @@
 #include <functional>
 
 class QAction;
-
 class QMenu;
-
 class QMenuBar;
 
 namespace TrenchBroom
@@ -78,9 +76,7 @@ public:
   MainMenuBuilder(QMenuBar& menuBar, ActionMap& actions, const TriggerFn& triggerFn);
 
   void visit(const Menu& menu) override;
-
   void visit(const MenuSeparatorItem& item) override;
-
   void visit(const MenuActionItem& item) override;
 };
 } // namespace View

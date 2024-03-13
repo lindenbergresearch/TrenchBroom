@@ -26,20 +26,19 @@ namespace TrenchBroom
 namespace Renderer
 {
 class FontDescriptor;
-
 class TextureFont;
 
 class FontFactory
 {
-protected:
+public:
   struct Metrics
   {
     size_t cellSize;
-    size_t maxAscend;
+    size_t ascend;
+    size_t descend;
     size_t lineHeight;
   };
 
-public:
   virtual ~FontFactory();
 
   std::unique_ptr<TextureFont> createFont(const FontDescriptor& fontDescriptor);

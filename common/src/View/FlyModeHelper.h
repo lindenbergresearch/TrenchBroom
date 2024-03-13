@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <cstdint>
 
@@ -57,19 +57,15 @@ public:
 
 public:
   void keyDown(QKeyEvent* event);
-
   void keyUp(QKeyEvent* event);
-
   /**
    * Returns whether the camera is currently moving due to a fly key being held down.
    */
   bool anyKeyDown() const;
-
   void resetKeys();
 
 private:
   vm::vec3f moveDelta(float time);
-
   float moveSpeed() const;
 };
 } // namespace View

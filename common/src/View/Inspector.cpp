@@ -21,9 +21,6 @@
 
 #include <QVBoxLayout>
 
-#include "IO/ResourceUtils.h"
-#include "QTabBar.h"
-#include "QTabWidget"
 #include "View/EntityInspector.h"
 #include "View/FaceInspector.h"
 #include "View/MapInspector.h"
@@ -39,30 +36,25 @@ namespace View
 Inspector::Inspector(
   std::weak_ptr<MapDocument> document, GLContextManager& contextManager, QWidget* parent)
   : QWidget(parent)
-  , m_tabs(nullptr)
+  , m_tabBook(nullptr)
   , m_mapInspector(nullptr)
   , m_entityInspector(nullptr)
   , m_faceInspector(nullptr)
   , m_syncTabBarEventFilter(nullptr)
 {
-  setObjectName("Inspector_Widget");
+  m_tabBook = new TabBook();
 
-  m_tabs = new QTabWidget(this);
   m_mapInspector = new MapInspector(document);
   m_entityInspector = new EntityInspector(document, contextManager);
   m_faceInspector = new FaceInspector(document, contextManager);
 
-  m_tabs->addTab(m_mapInspector, "Map");
-  m_tabs->addTab(m_faceInspector, "Face");
-  m_tabs->addTab(m_entityInspector, "Entity");
+  m_tabBook->addPage(m_mapInspector, "Map");
+  m_tabBook->addPage(m_entityInspector, "Entity");
+  m_tabBook->addPage(m_faceInspector, "Face");
 
   auto* layout = new QVBoxLayout();
-  layout->setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::MediumVMargin,
-    0,
-    LayoutConstants::NarrowHMargin);
-  layout->addWidget(m_tabs);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(m_tabBook);
   setLayout(layout);
 }
 
@@ -73,12 +65,13 @@ void Inspector::connectTopWidgets(MapViewBar* mapViewBar)
     delete std::exchange(m_syncTabBarEventFilter, nullptr);
   }
 
-  m_syncTabBarEventFilter = new SyncHeightEventFilter(mapViewBar, m_tabs->tabBar(), this);
+  m_syncTabBarEventFilter =
+    new SyncHeightEventFilter(mapViewBar, m_tabBook->tabBar(), this);
 }
 
 void Inspector::switchToPage(const InspectorPage page)
 {
-  m_tabs->setCurrentIndex(static_cast<int>(page));
+  m_tabBook->switchToPage(static_cast<int>(page));
 }
 
 bool Inspector::cancelMouseDrag()

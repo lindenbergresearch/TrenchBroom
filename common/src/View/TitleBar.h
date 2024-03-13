@@ -23,20 +23,23 @@
 
 class QLabel;
 
-namespace TrenchBroom
+namespace TrenchBroom::View
 {
-namespace View
-{
+
 class TitleBar : public QWidget
 {
 protected:
-  QLabel* m_titleText;
+  QLabel* m_titleLabel = nullptr;
 
 public:
   TitleBar(
-    const QString& title, QWidget* parent, bool boldTitle = true, bool subtitle = false);
-
-  explicit TitleBar(const QString& title, bool boldTitle = true, bool subtitle = false);
+    const QString& title,
+    QWidget* parent,
+    int hMargin = 0,
+    int vMargin = 0,
+    bool boldTitle = true);
+  explicit TitleBar(
+    const QString& title, int hMargin = 0, int vMargin = 0, bool boldTitle = true);
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

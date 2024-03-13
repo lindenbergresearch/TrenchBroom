@@ -117,7 +117,6 @@ public: // transactions
    * Has no effect if we are currently repeating actions.
    */
   void startTransaction();
-
   /**
    * Closes the currently open transaction. If there is a parent transaction,
    * pushes it to the end of that transaction, which becomes the new currently open
@@ -126,7 +125,6 @@ public: // transactions
    * Has no effect if we are currently repeating actions.
    */
   void commitTransaction();
-
   /**
    * Clear all repeatable actions/transactions in the currently open transaction.
    * The transaction remains open, i.e. you still need to call commitTransaction()

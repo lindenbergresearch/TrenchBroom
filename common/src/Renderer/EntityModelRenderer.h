@@ -36,16 +36,13 @@ class EntityModelManager;
 namespace Model
 {
 class EditorContext;
-
 class EntityNode;
 } // namespace Model
 
 namespace Renderer
 {
 class RenderBatch;
-
 class ShaderConfig;
-
 class TexturedRenderer;
 
 class EntityModelRenderer : public DirectRenderable
@@ -68,7 +65,6 @@ public:
     Logger& logger,
     Assets::EntityModelManager& entityModelManager,
     const Model::EditorContext& editorContext);
-
   ~EntityModelRenderer() override;
 
   template <typename I>
@@ -99,30 +95,22 @@ public:
   }
 
   void addEntity(const Model::EntityNode* entityNode);
-
   void removeEntity(const Model::EntityNode* entityNode);
-
   void updateEntity(const Model::EntityNode* entityNode);
-
   void clear();
 
   bool applyTinting() const;
-
   void setApplyTinting(const bool applyTinting);
-
   const Color& tintColor() const;
-
   void setTintColor(const Color& tintColor);
 
   bool showHiddenEntities() const;
-
   void setShowHiddenEntities(bool showHiddenEntities);
 
   void render(RenderBatch& renderBatch);
 
 private:
   void doPrepareVertices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
 };
 } // namespace Renderer

@@ -36,11 +36,8 @@ class MapRenderer;
 namespace TrenchBroom::View
 {
 class CyclingMapView;
-
 class GLContextManager;
-
 class MapDocument;
-
 class MapViewToolBox;
 
 class OnePaneMapView : public MultiPaneMapView
@@ -68,7 +65,6 @@ private:
 
 private: // implement MultiPaneMapView subclassing interface
   void doMaximizeView(MapView* view) override;
-
   void doRestoreViews() override;
 };
 } // namespace TrenchBroom::View

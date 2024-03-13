@@ -31,7 +31,7 @@ BorderLine::BorderLine(const Direction direction, const int thickness, QWidget* 
   setObjectName("borderLine");
   setContentsMargins(0, 0, 0, 0);
   setFrameShadow(QFrame::Plain);
-  setForegroundRole(QPalette::Midlight);
+  setForegroundRole(QPalette::Mid);
   setLineWidth(thickness - 1);
   if (direction == Direction::Horizontal)
   {

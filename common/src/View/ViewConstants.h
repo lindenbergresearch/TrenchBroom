@@ -20,9 +20,7 @@
 #pragma once
 
 class QColor;
-
 class QFont;
-
 class QWidget;
 
 namespace TrenchBroom
@@ -32,7 +30,7 @@ namespace View
 namespace LayoutConstants
 {
 #if defined _WIN32
-static const int DialogOuterMargin = 10;
+static const int DialogOuterMargin = 20;
 static const int DialogButtonTopMargin = 10;
 static const int DialogButtonLeftMargin = 7;
 static const int DialogButtonRightMargin = 7;
@@ -53,7 +51,7 @@ static const int TextBoxInnerMargin = 5;
 static const int TabBarBarLeftMargin = 10;
 static const int ToggleButtonStyle = 0;
 #elif defined __APPLE__
-static const int DialogOuterMargin = 10;
+static const int DialogOuterMargin = 20;
 static const int DialogButtonTopMargin = 10;
 static const int DialogButtonLeftMargin = 10;
 static const int DialogButtonRightMargin = 10;
@@ -74,7 +72,7 @@ static const int TextBoxInnerMargin = 0;
 static const int TabBarBarLeftMargin = 10;
 static const int ToggleButtonStyle = 0x08000000; // wxBORDER_SUNKEN
 #else
-static const int DialogOuterMargin = 10;
+static const int DialogOuterMargin = 20;
 static const int DialogButtonTopMargin = 10;
 static const int DialogButtonLeftMargin = 8;
 static const int DialogButtonRightMargin = 8;
@@ -95,7 +93,6 @@ static const int TextBoxInnerMargin = 2;
 static const int TabBarBarLeftMargin = 10;
 static const int ToggleButtonStyle = 0;
 #endif
-static const int NoMargin = 0;
 static const int MinPreferenceLabelWidth = 100;
 static const int HighlightBoxMargin = 5;
 } // namespace LayoutConstants
@@ -108,19 +105,10 @@ QFont fixedWidthFont();
 namespace Colors
 {
 QColor defaultText();
-
 QColor highlightText();
-
-QColor highlight();
-
-QColor midlight();
-
 QColor disabledText();
-
 QColor disabledCellText();
-
 QColor disabledText(const QWidget* widget);
-
 QColor window();
 } // namespace Colors
 } // namespace View

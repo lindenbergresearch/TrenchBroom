@@ -19,14 +19,11 @@
 
 #include "InfoPanel.h"
 
-#include <QTabBar>
-#include <QTabWidget>
 #include <QVBoxLayout>
 
-#include "View/BorderLine.h"
 #include "View/Console.h"
 #include "View/IssueBrowser.h"
-#include "View/QtUtils.h"
+#include "View/TabBook.h"
 
 namespace TrenchBroom
 {
@@ -34,24 +31,21 @@ namespace View
 {
 InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget* parent)
   : QWidget(parent)
+  , m_tabBook(nullptr)
   , m_console(nullptr)
   , m_issueBrowser(nullptr)
 {
+  m_tabBook = new TabBook(this);
+
   m_console = new Console();
   m_issueBrowser = new IssueBrowser(document);
 
-  m_tabs = new QTabWidget(this);
-  m_tabs->tabBar()->setObjectName("InfoPanelTabWidget");
-  makeSubTitle(m_tabs);
-  m_tabs->addTab(m_console, "Console");
-  m_tabs->addTab(m_issueBrowser, "Issues");
-  m_tabs->setTabPosition(QTabWidget::TabPosition::North);
+  m_tabBook->addPage(m_console, tr("Console"));
+  m_tabBook->addPage(m_issueBrowser, tr("Issues"));
 
   auto* sizer = new QVBoxLayout();
-  sizer->setContentsMargins(
-    0, LayoutConstants::MediumVMargin, 0, LayoutConstants::NoMargin);
-  sizer->addWidget(m_tabs);
-  sizer->addWidget(new BorderLine());
+  sizer->setContentsMargins(0, 0, 0, 0);
+  sizer->addWidget(m_tabBook);
   setLayout(sizer);
 }
 

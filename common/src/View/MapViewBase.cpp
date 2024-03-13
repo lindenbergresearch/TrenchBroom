@@ -1007,7 +1007,7 @@ void MapViewBase::doRender()
 {
   doPreRender();
 
-  const auto& fontPath = pref(Preferences::RendererFontPath);
+  const auto& fontPath = pref(Preferences::RendererFontPath());
   const auto fontSize = static_cast<size_t>(pref(Preferences::RendererFontSize));
   const auto fontDescriptor = Renderer::FontDescriptor{fontPath, fontSize};
 

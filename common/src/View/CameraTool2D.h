@@ -22,8 +22,8 @@
 #include "View/Tool.h"
 #include "View/ToolController.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
@@ -47,7 +47,6 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void mouseScroll(const InputState& inputState) override;

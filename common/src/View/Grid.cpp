@@ -26,13 +26,11 @@
 #include "Model/BrushNode.h"
 #include "Model/Polyhedron.h"
 
-#include <vm/intersection.h>
-#include <vm/ray.h>
-#include <vm/scalar.h>
-#include <vm/vec.h>
+#include "vm/intersection.h"
+#include "vm/ray.h"
+#include "vm/scalar.h"
+#include "vm/vec.h"
 
-#include <PreferenceManager.h>
-#include <Preferences.h>
 #include <cmath>
 
 namespace TrenchBroom
@@ -48,36 +46,7 @@ Grid::Grid(const int size)
 
 FloatType Grid::actualSize(const int size)
 {
-  return std::exp2(float(size)) * getScaleFactor();
-}
-
-
-const QString Grid::asString(const int size)
-{
-  auto gridSize = actualSize(size) / getScaleFactor();
-  auto suffix = isMetric() ? "m" : "";
-  QString str;
-  str = str.sprintf("%.1f%s", gridSize, suffix);
-
-  return str;
-}
-
-bool Grid::isMetric()
-{
-  Preferences::LengthUnitDisplay lengthUnitDisplay =
-    (Preferences::LengthUnitDisplay)pref(Preferences::GridUnitSystem);
-
-  return lengthUnitDisplay != Preferences::Units;
-}
-
-float Grid::getScaleFactor()
-{
-  Preferences::LengthUnitDisplay lengthUnitDisplay =
-    (Preferences::LengthUnitDisplay)pref(Preferences::GridUnitSystem);
-
-  return lengthUnitDisplay == Preferences::Units
-           ? 1.0f
-           : pref(Preferences::MetricConversationFactor);
+  return std::exp2(size);
 }
 
 int Grid::size() const

@@ -33,7 +33,6 @@ class Texture;
 namespace Renderer
 {
 class VboManager;
-
 class TextureRenderFunc;
 
 class TexturedIndexArrayRenderer
@@ -45,16 +44,13 @@ private:
 
 public:
   TexturedIndexArrayRenderer();
-
   TexturedIndexArrayRenderer(
     VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap);
 
   bool empty() const;
 
   void prepare(VboManager& vboManager);
-
   void render();
-
   void render(TextureRenderFunc& func);
 };
 } // namespace Renderer

@@ -22,7 +22,6 @@
 #include <QStyledItemDelegate>
 
 class QLineEdit;
-
 class QSortFilterProxyModel;
 
 namespace TrenchBroom
@@ -30,7 +29,6 @@ namespace TrenchBroom
 namespace View
 {
 class EntityPropertyModel;
-
 class EntityPropertyTable;
 
 class EntityPropertyItemDelegate : public QStyledItemDelegate
@@ -52,12 +50,10 @@ public:
     QWidget* parent,
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const override;
-
   void setEditorData(QWidget* editor, const QModelIndex& index) const override;
 
 private:
   void setupCompletions(QLineEdit* lineEdit, const QModelIndex& index) const;
-
   QStringList getCompletions(const QModelIndex& index) const;
 };
 } // namespace View

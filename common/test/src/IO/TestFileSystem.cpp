@@ -22,92 +22,123 @@
 #include "Error.h"
 #include "IO/TraversalMode.h"
 
-#include <kdl/overload.h>
-#include <kdl/path_utils.h>
-#include <kdl/reflection_impl.h>
-#include <kdl/result.h>
+#include "kdl/overload.h"
+#include "kdl/path_utils.h"
+#include "kdl/reflection_impl.h"
+#include "kdl/result.h"
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 
 kdl_reflect_impl(Object);
 
-std::shared_ptr<File> makeObjectFile(const int id) {
-    return std::make_shared<ObjectFile<Object>>(Object{id});
+std::shared_ptr<File> makeObjectFile(const int id)
+{
+  return std::make_shared<ObjectFile<Object>>(Object{id});
 }
 
-namespace {
-const std::string &getEntryName(const Entry &entry) {
-    return std::visit([](const auto &e) -> const std::string & { return e.name; }, entry);
+namespace
+{
+const std::string& getEntryName(const Entry& entry)
+{
+  return std::visit([](const auto& e) -> const std::string& { return e.name; }, entry);
 }
 
-PathInfo getEntryType(const Entry &entry) {
-    return std::visit([](const auto &e) { return e.type; }, entry);
+PathInfo getEntryType(const Entry& entry)
+{
+  return std::visit([](const auto& e) { return e.type; }, entry);
 }
 
-const Entry *getChild(const Entry &entry, const std::string &name) {
-    return std::visit(kdl::overload([&](const DirectoryEntry &d) -> const Entry * {
-              const auto it = std::find_if(d.entries.begin(), d.entries.end(), [&](const auto &child) {
-                    return getEntryName(child) == name;
-                  }
-              );
-              return it != d.entries.end() ? &*it : nullptr;
-            }, [](const auto &) -> const Entry * { return nullptr; }
-        ), entry
-    );
+const Entry* getChild(const Entry& entry, const std::string& name)
+{
+  return std::visit(
+    kdl::overload(
+      [&](const DirectoryEntry& d) -> const Entry* {
+        const auto it =
+          std::find_if(d.entries.begin(), d.entries.end(), [&](const auto& child) {
+            return getEntryName(child) == name;
+          });
+        return it != d.entries.end() ? &*it : nullptr;
+      },
+      [](const auto&) -> const Entry* { return nullptr; }),
+    entry);
 }
 } // namespace
 
-TestFileSystem::TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix) : m_root{
-    std::move(root)
-}, m_absolutePathPrefix{std::move(absolutePathPrefix)} {
+TestFileSystem::TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix)
+  : m_root{std::move(root)}
+  , m_absolutePathPrefix{std::move(absolutePathPrefix)}
+{
 }
 
-const Entry *TestFileSystem::findEntry(std::filesystem::path path) const {
-    const Entry *entry = &m_root;
-    while (!path.empty() && entry != nullptr) {
-        entry = getChild(*entry, kdl::path_front(path).string());
-        path = kdl::path_pop_front(path);
-    }
-    return entry;
+const Entry* TestFileSystem::findEntry(std::filesystem::path path) const
+{
+  const Entry* entry = &m_root;
+  while (!path.empty() && entry != nullptr)
+  {
+    entry = getChild(*entry, kdl::path_front(path).string());
+    path = kdl::path_pop_front(path);
+  }
+  return entry;
 }
 
-PathInfo TestFileSystem::pathInfo(const std::filesystem::path &path) const {
-    const auto *entry = findEntry(path);
-    return entry ? getEntryType(*entry) : PathInfo::Unknown;
+PathInfo TestFileSystem::pathInfo(const std::filesystem::path& path) const
+{
+  const auto* entry = findEntry(path);
+  return entry ? getEntryType(*entry) : PathInfo::Unknown;
 }
 
-Result<std::filesystem::path> TestFileSystem::makeAbsolute(const std::filesystem::path &path) const {
-    return m_absolutePathPrefix / path;
+Result<std::filesystem::path> TestFileSystem::makeAbsolute(
+  const std::filesystem::path& path) const
+{
+  return m_absolutePathPrefix / path;
 }
 
-namespace {
-void doFindImpl(const Entry &entry, const std::filesystem::path &entryPath, const TraversalMode traversalMode, std::vector<std::filesystem::path> &result) {
-    std::visit(kdl::overload([&](const DirectoryEntry &d) {
-              for (const auto &child: d.entries) {
-                  const auto childPath = entryPath / getEntryName(child);
-                  result.push_back(childPath);
-                  if (traversalMode == TraversalMode::Recursive) {
-                      doFindImpl(child, childPath, traversalMode, result);
-                  }
-              }
-            }, [](const auto &) {}
-        ), entry
-    );
+namespace
+{
+void doFindImpl(
+  const Entry& entry,
+  const std::filesystem::path& entryPath,
+  const TraversalMode traversalMode,
+  std::vector<std::filesystem::path>& result)
+{
+  std::visit(
+    kdl::overload(
+      [&](const DirectoryEntry& d) {
+        for (const auto& child : d.entries)
+        {
+          const auto childPath = entryPath / getEntryName(child);
+          result.push_back(childPath);
+          if (traversalMode == TraversalMode::Recursive)
+          {
+            doFindImpl(child, childPath, traversalMode, result);
+          }
+        }
+      },
+      [](const auto&) {}),
+    entry);
 }
 } // namespace
 
-Result<std::vector<std::filesystem::path>> TestFileSystem::doFind(const std::filesystem::path &path, const TraversalMode traversalMode) const {
-    auto result = std::vector<std::filesystem::path>{};
-    if (const auto *entry = findEntry(path)) {
-        doFindImpl(*entry, path, traversalMode, result);
-    }
-    return result;
+Result<std::vector<std::filesystem::path>> TestFileSystem::doFind(
+  const std::filesystem::path& path, const TraversalMode traversalMode) const
+{
+  auto result = std::vector<std::filesystem::path>{};
+  if (const auto* entry = findEntry(path))
+  {
+    doFindImpl(*entry, path, traversalMode, result);
+  }
+  return result;
 }
 
-Result<std::shared_ptr<File>> TestFileSystem::doOpenFile(const std::filesystem::path &path) const {
-    if (const auto *fileEntry = std::get_if<FileEntry>(findEntry(path))) {
-        return fileEntry->file;
-    }
-    return Error{};
+Result<std::shared_ptr<File>> TestFileSystem::doOpenFile(
+  const std::filesystem::path& path) const
+{
+  if (const auto* fileEntry = std::get_if<FileEntry>(findEntry(path)))
+  {
+    return fileEntry->file;
+  }
+  return Error{};
 }
+
 } // namespace TrenchBroom::IO

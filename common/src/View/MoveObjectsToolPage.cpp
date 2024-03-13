@@ -27,10 +27,10 @@
 #include "View/MapDocument.h"
 #include "View/ViewConstants.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/vec.h>
-#include <vm/vec_io.h>
+#include "vm/vec.h"
+#include "vm/vec_io.h"
 
 namespace TrenchBroom
 {
@@ -57,7 +57,7 @@ void MoveObjectsToolPage::connectObservers()
 
 void MoveObjectsToolPage::createGui()
 {
-  m_label = new QLabel(tr("Quick Move:"));
+  QLabel* text = new QLabel(tr("Move objects by"));
   m_offset = new QLineEdit("0.0 0.0 0.0");
   m_button = new QPushButton(tr("Apply"));
 
@@ -65,10 +65,10 @@ void MoveObjectsToolPage::createGui()
   connect(m_offset, &QLineEdit::returnPressed, this, &MoveObjectsToolPage::applyMove);
 
   auto* layout = new QHBoxLayout();
-  layout->setContentsMargins(0, 0, 0, 5);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(LayoutConstants::MediumHMargin);
 
-  layout->addWidget(m_label, 0, Qt::AlignVCenter);
+  layout->addWidget(text, 0, Qt::AlignVCenter);
   layout->addWidget(m_offset, 0, Qt::AlignVCenter);
   layout->addWidget(m_button, 0, Qt::AlignVCenter);
   layout->addStretch(1);
@@ -79,8 +79,6 @@ void MoveObjectsToolPage::createGui()
 void MoveObjectsToolPage::updateGui()
 {
   auto document = kdl::mem_lock(m_document);
-  m_label->setEnabled(document->hasSelectedNodes());
-  m_offset->setEnabled(document->hasSelectedNodes());
   m_button->setEnabled(document->hasSelectedNodes());
 }
 

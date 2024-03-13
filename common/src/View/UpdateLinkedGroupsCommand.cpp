@@ -28,7 +28,7 @@ namespace View
 UpdateLinkedGroupsCommand::UpdateLinkedGroupsCommand(
   std::vector<Model::GroupNode*> changedLinkedGroups)
   : UpdateLinkedGroupsCommandBase{
-      "Update Linked Groups", true, std::move(changedLinkedGroups)}
+    "Update Linked Groups", true, std::move(changedLinkedGroups)}
 {
 }
 

@@ -70,9 +70,7 @@ WorldNode::WorldNode(
   std::initializer_list<EntityProperty> properties,
   const MapFormat mapFormat)
   : WorldNode{
-      entityPropertyConfig,
-      Entity{entityPropertyConfig, std::move(properties)},
-      mapFormat}
+    entityPropertyConfig, Entity{entityPropertyConfig, std::move(properties)}, mapFormat}
 {
 }
 

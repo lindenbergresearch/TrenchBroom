@@ -26,7 +26,6 @@
 #include <memory>
 
 class QAbstractButton;
-
 class QLineEdit;
 
 namespace TrenchBroom
@@ -34,7 +33,6 @@ namespace TrenchBroom
 namespace View
 {
 class MapDocument;
-
 class Selection;
 
 class MoveObjectsToolPage : public QWidget
@@ -45,7 +43,6 @@ private:
 
   QLineEdit* m_offset;
   QAbstractButton* m_button;
-  QLabel* m_label;
 
   NotifierConnection m_notifierConnection;
 
@@ -57,7 +54,6 @@ private:
   void connectObservers();
 
   void createGui();
-
   void updateGui();
 
   void selectionDidChange(const Selection& selection);

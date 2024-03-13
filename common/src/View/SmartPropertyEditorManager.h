@@ -34,16 +34,13 @@ namespace TrenchBroom
 namespace Model
 {
 class EntityNodeBase;
-
 class Node;
 } // namespace Model
 
 namespace View
 {
 class MapDocument;
-
 class Selection;
-
 class SmartPropertyEditor;
 
 using SmartPropertyEditorMatcher =
@@ -66,30 +63,24 @@ public:
 
   void switchEditor(
     const std::string& propertyKey, const std::vector<Model::EntityNodeBase*>& nodes);
-
   bool isDefaultEditorActive() const;
 
 private:
   SmartPropertyEditor* activeEditor() const;
-
   void createEditors();
 
   void connectObservers();
 
   void selectionDidChange(const Selection& selection);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
 
   SmartPropertyEditor* selectEditor(
     const std::string& propertyKey,
     const std::vector<Model::EntityNodeBase*>& nodes) const;
-
   SmartPropertyEditor* defaultEditor() const;
 
   void activateEditor(SmartPropertyEditor* editor, const std::string& propertyKey);
-
   void deactivateEditor();
-
   void updateEditor();
 };
 } // namespace View

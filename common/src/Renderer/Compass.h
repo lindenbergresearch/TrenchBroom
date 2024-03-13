@@ -22,7 +22,7 @@
 #include "Renderer/IndexRangeRenderer.h"
 #include "Renderer/Renderable.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 namespace TrenchBroom
 {
@@ -31,7 +31,6 @@ class Color;
 namespace Renderer
 {
 class Camera;
-
 class RenderBatch;
 
 class Compass : public DirectRenderable
@@ -50,32 +49,26 @@ private:
 
 public:
   Compass();
-
   ~Compass() override;
 
   void render(RenderBatch& renderBatch);
 
 private: // implement Renderable interface
   void doPrepareVertices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
 
 private:
   void makeArrows();
-
   void makeBackground();
 
   vm::mat4x4f cameraRotationMatrix(const Camera& camera) const;
 
 protected:
   void renderBackground(RenderContext& renderContext);
-
   void renderSolidAxis(
     RenderContext& renderContext, const vm::mat4x4f& transformation, const Color& color);
-
   void renderAxisOutline(
     RenderContext& renderContext, const vm::mat4x4f& transformation, const Color& color);
-
   void renderAxis(RenderContext& renderContext, const vm::mat4x4f& transformation);
 
 private:

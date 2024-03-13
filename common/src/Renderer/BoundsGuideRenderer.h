@@ -24,7 +24,7 @@
 #include "Renderer/Renderable.h"
 #include "Renderer/SpikeGuideRenderer.h"
 
-#include <vm/bbox.h>
+#include "vm/bbox.h"
 
 #include <memory>
 
@@ -52,12 +52,10 @@ public:
   explicit BoundsGuideRenderer(std::weak_ptr<View::MapDocument> document);
 
   void setColor(const Color& color);
-
   void setBounds(const vm::bbox3& bounds);
 
 private:
   void doPrepareVertices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
 };
 } // namespace Renderer

@@ -30,9 +30,7 @@
 #include <vector>
 
 class QWindow;
-
 class QFocusEvent;
-
 class QMouseEvent;
 
 namespace TrenchBroom
@@ -45,22 +43,16 @@ class PickResult;
 namespace Renderer
 {
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace View
 {
 class DragTracker;
-
 class DropTracker;
-
 class InputState;
-
 class Tool;
-
 class ToolController;
-
 class ToolChain;
 
 class ToolBox : public QObject
@@ -87,7 +79,6 @@ public:
 
 public:
   ToolBox();
-
   ~ToolBox();
 
 protected:
@@ -99,33 +90,21 @@ public: // picking
 
 public: // event handling
   bool dragEnter(ToolChain* chain, const InputState& inputState, const std::string& text);
-
   bool dragMove(ToolChain* chain, const InputState& inputState, const std::string& text);
-
   void dragLeave(ToolChain* chain, const InputState& inputState);
-
   bool dragDrop(ToolChain* chain, const InputState& inputState, const std::string& text);
 
   void modifierKeyChange(ToolChain* chain, const InputState& inputState);
-
   void mouseDown(ToolChain* chain, const InputState& inputState);
-
   void mouseUp(ToolChain* chain, const InputState& inputState);
-
   bool mouseClick(ToolChain* chain, const InputState& inputState);
-
   void mouseDoubleClick(ToolChain* chain, const InputState& inputState);
-
   void mouseMove(ToolChain* chain, const InputState& inputState);
 
   bool dragging() const;
-
   void startMouseDrag(ToolChain* chain, const InputState& inputState);
-
   bool mouseDrag(const InputState& inputState);
-
   void endMouseDrag(const InputState& inputState);
-
   void cancelMouseDrag();
 
   void mouseScroll(ToolChain* chain, const InputState& inputState);
@@ -143,15 +122,11 @@ public: // tool management
   void suppressWhileActive(Tool& suppressedTool, Tool& primaryTool);
 
   bool anyToolActive() const;
-
   void toggleTool(Tool& tool);
-
   void deactivateAllTools();
 
   bool enabled() const;
-
   void enable();
-
   void disable();
 
 public: // rendering
@@ -159,7 +134,6 @@ public: // rendering
     ToolChain* chain,
     const InputState& inputState,
     Renderer::RenderContext& renderContext);
-
   void renderTools(
     ToolChain* chain,
     const InputState& inputState,
@@ -168,7 +142,6 @@ public: // rendering
 
 private:
   bool activateTool(Tool& tool);
-
   void deactivateTool(Tool& tool);
 };
 } // namespace View

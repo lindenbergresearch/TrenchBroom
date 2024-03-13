@@ -34,16 +34,13 @@ class BrushNode;
 namespace Renderer
 {
 class BrushRenderer;
-
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace View
 {
 class Grid;
-
 class MapDocument;
 
 class CreateBrushToolBase : public Tool
@@ -57,14 +54,12 @@ private:
 
 public:
   CreateBrushToolBase(bool initiallyActive, std::weak_ptr<MapDocument> document);
-
   ~CreateBrushToolBase() override;
 
 public:
   const Grid& grid() const;
 
   void createBrush();
-
   void cancel();
 
   void render(Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);

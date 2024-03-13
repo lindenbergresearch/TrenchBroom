@@ -28,9 +28,7 @@ namespace TrenchBroom
 namespace View
 {
 class ElidedLabel;
-
 class FlagsEditor;
-
 class PopupButton;
 
 /**
@@ -52,19 +50,15 @@ public:
     bool showFlagsText = true);
 
   void setFlags(const QStringList& labels, const QStringList& tooltips = QStringList());
-
   void setFlags(
     const QList<int>& values,
     const QStringList& labels,
     const QStringList& tooltips = QStringList());
-
   void setFlagValue(int set, int mixed = 0);
 
 private:
   void updateFlagsText();
-
 signals:
-
   void flagChanged(size_t index, int value, int setFlag, int mixedFlag);
 };
 } // namespace View

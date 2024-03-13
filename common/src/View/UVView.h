@@ -40,35 +40,25 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushFaceHandle;
-
 class Node;
 } // namespace Model
 
 namespace Renderer
 {
 class ActiveShader;
-
 class RenderBatch;
-
 class RenderContext;
 } // namespace Renderer
 
 namespace View
 {
 class MapDocument;
-
 class Selection;
-
 class UVRotateTool;
-
 class UVOriginTool;
-
 class UVScaleTool;
-
 class UVShearTool;
-
 class UVOffsetTool;
-
 class UVCameraTool;
 
 /**
@@ -105,53 +95,38 @@ private:
   void connectObservers();
 
   void selectionDidChange(const Selection& selection);
-
   void documentWasCleared(MapDocument* document);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& faces);
-
   void gridDidChange();
-
   void cameraDidChange(const Renderer::Camera* camera);
-
   void preferenceDidChange(const std::filesystem::path& path);
 
   void doUpdateViewport(int x, int y, int width, int height) override;
-
   void doRender() override;
-
   bool doShouldRenderFocusIndicator() const override;
-
   const Color& getBackgroundColor() override;
 
   void setupGL(Renderer::RenderContext& renderContext);
 
   class RenderTexture;
-
   void renderTexture(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
 
   void renderFace(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-
   void renderTextureAxes(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
-
   void renderToolBox(
     Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
 
 public: // implement InputEventProcessor interface
   void processEvent(const KeyEvent& event) override;
-
   void processEvent(const MouseEvent& event) override;
-
   void processEvent(const CancelEvent& event) override;
 
 private:
   PickRequest doGetPickRequest(float x, float y) const override;
-
   Model::PickResult doPick(const vm::ray3& pickRay) const override;
 };
 } // namespace View

@@ -21,15 +21,13 @@
 
 #include "View/ControlListBox.h"
 
-namespace TrenchBroom
-{
-namespace Model
+namespace TrenchBroom::Model
 {
 struct GameEngineConfig;
 struct GameEngineProfile;
-} // namespace Model
+} // namespace TrenchBroom::Model
 
-namespace View
+namespace TrenchBroom::View
 {
 class ElidedLabel;
 
@@ -49,11 +47,8 @@ public:
 
 private:
   void createGui();
-
   void refresh();
-
   void profileWillBeRemoved();
-
   void profileDidChange();
 };
 
@@ -71,31 +66,23 @@ public:
 
 public:
   void setConfig(Model::GameEngineConfig& config);
-
   void reloadProfiles();
-
   void updateProfiles();
 
 private:
   size_t itemCount() const override;
-
   ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
-
   void selectedRowChanged(int index) override;
-
   void doubleClicked(size_t index) override;
-
 signals:
-
   /**
    * Emitted when the selection changes.
    */
   void currentProfileChanged(Model::GameEngineProfile* profile);
-
   /**
    * Emitted when a profile is double-clicked.
    */
   void profileSelected(Model::GameEngineProfile& profile);
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

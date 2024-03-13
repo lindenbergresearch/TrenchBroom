@@ -30,11 +30,9 @@ namespace TrenchBroom
 namespace View
 {
 std::optional<QKeySequence> keySequenceFromV1Settings(const QString& string);
-
 QString keySequenceToV1Settings(const QKeySequence& keySequence);
 
 int wxKeyToQt(int wxKey);
-
 int qtKeyToWx(int qtKey);
 } // namespace View
 } // namespace TrenchBroom

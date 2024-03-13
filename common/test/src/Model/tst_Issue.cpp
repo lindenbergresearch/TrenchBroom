@@ -30,98 +30,100 @@
 #include "Model/MapFormat.h"
 #include "Model/PatchNode.h"
 
-#include <kdl/result.h>
-#include <kdl/result_io.h>
+#include "kdl/result.h"
+#include "kdl/result_io.h"
 
-#include <vecmath/bbox.h>
-#include <vecmath/bbox_io.h>
+#include "vm/bbox.h"
+#include "vm/bbox_io.h"
 
 #include <vector>
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace Model {
-class TestIssue : public Issue {
+namespace TrenchBroom
+{
+namespace Model
+{
+class TestIssue : public Issue
+{
 public:
-    TestIssue(Node &node) : Issue{0, node, ""} {
-    }
+  TestIssue(Node& node)
+    : Issue{0, node, ""}
+  {
+  }
 };
 
 TEST_CASE("Issue.addSelectableNodes")
 {
-    const auto worldBounds = vm::bbox3{8192.0};
+  const auto worldBounds = vm::bbox3{8192.0};
 
-    auto outerGroupNode = GroupNode{Group{"outer"}};
+  auto outerGroupNode = GroupNode{Group{"outer"}};
 
-    auto *innerGroupNode = new GroupNode{Group{"inner"}};
-    auto *pointEntityNode = new EntityNode{Entity{}};
-    auto *brushNode = new BrushNode{BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()};
+  auto* innerGroupNode = new GroupNode{Group{"inner"}};
+  auto* pointEntityNode = new EntityNode{Entity{}};
+  auto* brushNode = new BrushNode{
+    BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()};
 
-    auto *brushEntityNode = new EntityNode{Entity{}};
-    auto *entityBrushNode = new BrushNode{
-        BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()
-    };
-    brushEntityNode->addChild(entityBrushNode);
+  auto* brushEntityNode = new EntityNode{Entity{}};
+  auto* entityBrushNode = new BrushNode{
+    BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()};
+  brushEntityNode->addChild(entityBrushNode);
 
-    // clang-format off
-    auto *patchNode = new PatchNode{
-        BezierPatch{
-            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-        }};
-    // clang-format on
+  // clang-format off
+  auto* patchNode = new PatchNode{BezierPatch{3, 3, {
+    {0, 0, 0}, {1, 0, 1}, {2, 0, 0},
+    {0, 1, 1}, {1, 1, 2}, {2, 1, 1},
+    {0, 2, 0}, {1, 2, 1}, {2, 2, 0} }, "texture"}};
+  // clang-format on
 
-    outerGroupNode.addChildren({innerGroupNode, pointEntityNode, brushNode, brushEntityNode, patchNode});
+  outerGroupNode.addChildren(
+    {innerGroupNode, pointEntityNode, brushNode, brushEntityNode, patchNode});
 
-    const auto getSelectableNodes = [](const auto &issue) {
-      auto nodes = std::vector<Node *>{};
-      issue.addSelectableNodes(nodes);
-      return nodes;
-    };
+  const auto getSelectableNodes = [](const auto& issue) {
+    auto nodes = std::vector<Node*>{};
+    issue.addSelectableNodes(nodes);
+    return nodes;
+  };
 
-    const auto hasSelectableNodes = [](const auto &issue) {
-      auto nodes = std::vector<Node *>{};
-      return issue.addSelectableNodes(nodes);
-    };
+  const auto hasSelectableNodes = [](const auto& issue) {
+    auto nodes = std::vector<Node*>{};
+    return issue.addSelectableNodes(nodes);
+  };
 
-    CHECK_FALSE(hasSelectableNodes(TestIssue{outerGroupNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{outerGroupNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{}));
+  CHECK_FALSE(hasSelectableNodes(TestIssue{outerGroupNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{outerGroupNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{}));
 
-    CHECK(hasSelectableNodes(TestIssue{*innerGroupNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*innerGroupNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            innerGroupNode
-        }
-    ));
+  CHECK(hasSelectableNodes(TestIssue{*innerGroupNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{*innerGroupNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{innerGroupNode}));
 
-    CHECK(hasSelectableNodes(TestIssue{*pointEntityNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*pointEntityNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            pointEntityNode
-        }
-    ));
+  CHECK(hasSelectableNodes(TestIssue{*pointEntityNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{*pointEntityNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{pointEntityNode}));
 
-    CHECK(hasSelectableNodes(TestIssue{*brushNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*brushNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            brushNode
-        }
-    ));
+  CHECK(hasSelectableNodes(TestIssue{*brushNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{*brushNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{brushNode}));
 
-    CHECK(hasSelectableNodes(TestIssue{*brushEntityNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*brushEntityNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            entityBrushNode
-        }
-    ));
+  CHECK(hasSelectableNodes(TestIssue{*brushEntityNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{*brushEntityNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{entityBrushNode}));
 
-    CHECK(hasSelectableNodes(TestIssue{*entityBrushNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*entityBrushNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            entityBrushNode
-        }
-    ));
+  CHECK(hasSelectableNodes(TestIssue{*entityBrushNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{*entityBrushNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{entityBrushNode}));
 
-    CHECK(hasSelectableNodes(TestIssue{*patchNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*patchNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            patchNode
-        }
-    ));
+  CHECK(hasSelectableNodes(TestIssue{*patchNode}));
+  CHECK_THAT(
+    getSelectableNodes(TestIssue{*patchNode}),
+    Catch::Matchers::UnorderedEquals(std::vector<Node*>{patchNode}));
 }
 } // namespace Model
 } // namespace TrenchBroom

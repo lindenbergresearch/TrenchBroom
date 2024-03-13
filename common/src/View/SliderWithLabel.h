@@ -19,60 +19,34 @@
 
 #pragma once
 
-#include <QPainter>
-#include <QSlider>
-#include <QStyleOptionSlider>
 #include <QWidget>
 
 class QLabel;
-
 class QSlider;
 
 namespace TrenchBroom
 {
 namespace View
 {
-
 class SliderWithLabel : public QWidget
 {
   Q_OBJECT
 private:
   QSlider* m_slider;
   QLabel* m_label;
-  float m_factor;
-  QString m_format;
 
 public:
-  SliderWithLabel(
-    int minimum,
-    int maximum,
-    const float factor = 0.0,
-    const QString& format = "%d",
-    const int maxSliderWidth = 0,
-    const int minLabelWidth = 0,
-    QWidget* parent = nullptr);
+  SliderWithLabel(int minimum, int maximum, QWidget* parent = nullptr);
 
   int value() const;
-
   float ratio() const;
-
-  void setMaximumSliderWidth(const int width);
-
 public slots:
-
   void setValue(int value);
-
   void setRatio(float ratio);
-
 private slots:
-
   void valueChangedInternal(int value);
-
-  QString getValueLabel(int value);
-
 signals:
-
-  void valueChanged(const int value);
+  void valueChanged(int value);
 };
 } // namespace View
 } // namespace TrenchBroom

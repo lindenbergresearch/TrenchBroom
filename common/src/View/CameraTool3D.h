@@ -22,8 +22,8 @@
 #include "View/Tool.h"
 #include "View/ToolController.h"
 
-#include <vm/forward.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/vec.h"
 
 #include <memory>
 
@@ -48,11 +48,9 @@ public:
 
 private:
   Tool& tool() override;
-
   const Tool& tool() const override;
 
   void mouseScroll(const InputState& inputState) override;
-
   void mouseUp(const InputState& inputState) override;
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;

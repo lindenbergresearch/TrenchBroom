@@ -28,10 +28,10 @@
 #include "Renderer/OrthographicCamera.h"
 #include "View/UVView.h"
 
-#include <vm/intersection.h>
-#include <vm/mat.h>
-#include <vm/mat_ext.h>
-#include <vm/vec.h>
+#include "vm/intersection.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {

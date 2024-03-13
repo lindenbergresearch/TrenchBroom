@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <vm/forward.h>
-#include <vm/mat.h>
+#include "vm/forward.h"
+#include "vm/mat.h"
 
 #include <vector>
 
@@ -41,13 +41,10 @@ public:
     const vm::mat4x4f& projection,
     const vm::mat4x4f& view,
     const vm::mat4x4f& model = vm::mat4x4f::identity());
-
   ~Transformation();
 
   const vm::mat4x4f& projectionMatrix() const;
-
   const vm::mat4x4f& viewMatrix() const;
-
   const vm::mat4x4f& modelMatrix() const;
 
   Transformation slice() const;
@@ -56,23 +53,17 @@ public:
     const vm::mat4x4f& projection,
     const vm::mat4x4f& view,
     const vm::mat4x4f& model = vm::mat4x4f::identity());
-
   void popTransformation();
-
   void pushModelMatrix(const vm::mat4x4f& matrix);
-
   void replaceAndPushModelMatrix(const vm::mat4x4f& matrix);
-
   void popModelMatrix();
 
 private:
   void loadProjectionMatrix(const vm::mat4x4f& matrix);
-
   void loadModelViewMatrix(const vm::mat4x4f& matrix);
 
 private:
   Transformation(const Transformation& other);
-
   Transformation& operator=(const Transformation& other);
 };
 
@@ -87,12 +78,10 @@ public:
     const vm::mat4x4f& projectionMatrix,
     const vm::mat4x4f& viewMatrix,
     const vm::mat4x4f& modelMatrix = vm::mat4x4f::identity());
-
   ~ReplaceTransformation();
 
 private:
   ReplaceTransformation(const ReplaceTransformation& other);
-
   ReplaceTransformation& operator=(const ReplaceTransformation& other);
 };
 
@@ -103,12 +92,10 @@ protected:
 
 public:
   MultiplyModelMatrix(Transformation& transformation, const vm::mat4x4f& modelMatrix);
-
   ~MultiplyModelMatrix();
 
 private:
   MultiplyModelMatrix(const ReplaceTransformation& other);
-
   MultiplyModelMatrix& operator=(const ReplaceTransformation& other);
 };
 
@@ -119,12 +106,10 @@ protected:
 
 public:
   ReplaceModelMatrix(Transformation& transformation, const vm::mat4x4f& modelMatrix);
-
   ~ReplaceModelMatrix();
 
 private:
   ReplaceModelMatrix(const ReplaceTransformation& other);
-
   ReplaceModelMatrix& operator=(const ReplaceTransformation& other);
 };
 } // namespace Renderer

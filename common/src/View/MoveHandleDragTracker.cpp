@@ -26,12 +26,10 @@ namespace TrenchBroom
 namespace View
 {
 void MoveHandleDragTrackerDelegate::mouseScroll(const InputState&, const DragState&) {}
-
 void MoveHandleDragTrackerDelegate::setRenderOptions(
   const InputState&, Renderer::RenderContext&) const
 {
 }
-
 void MoveHandleDragTrackerDelegate::render(
   const InputState&,
   const DragState&,

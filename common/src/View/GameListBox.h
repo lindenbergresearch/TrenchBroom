@@ -48,13 +48,9 @@ private:
 
 public:
   explicit GameListBox(QWidget* parent = nullptr);
-
   std::string selectedGameName() const;
-
   void selectGame(size_t index);
-
   void reloadGameInfos();
-
   void updateGameInfos();
 
 private:
@@ -62,21 +58,14 @@ private:
 
 private:
   size_t itemCount() const override;
-
   QPixmap image(size_t index) const override;
-
   QString title(size_t index) const override;
-
   QString subtitle(size_t index) const override;
 
   void selectedRowChanged(int index) override;
-
   void doubleClicked(size_t index) override;
-
 signals:
-
   void currentGameChanged(const QString& gameName);
-
   void selectCurrentGame(const QString& gameName);
 };
 } // namespace View

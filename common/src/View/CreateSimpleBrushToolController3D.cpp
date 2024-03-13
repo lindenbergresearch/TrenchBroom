@@ -33,12 +33,12 @@
 #include "View/InputState.h"
 #include "View/MapDocument.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/bbox.h>
-#include <vm/line.h>
-#include <vm/plane.h>
-#include <vm/vec.h>
+#include "vm/bbox.h"
+#include "vm/line.h"
+#include "vm/plane.h"
+#include "vm/vec.h"
 
 #include <cassert>
 

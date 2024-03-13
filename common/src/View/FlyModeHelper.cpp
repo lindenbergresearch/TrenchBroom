@@ -26,15 +26,12 @@
 #include "Preferences.h"
 #include "Renderer/Camera.h"
 
-#include <vm/vec.h>
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {
 namespace View
 {
-
-const float SpeedAltModifier = 3.0f; // alternate fly speed modifier
-
 static qint64 msecsSinceReference()
 {
   QElapsedTimer timer;
@@ -229,16 +226,16 @@ vm::vec3f FlyModeHelper::moveDelta(const float time)
   return delta;
 }
 
-
+const float SpeedModifier = 2.0f;
 float FlyModeHelper::moveSpeed() const
 {
   if (m_fast)
   {
-    return pref(Preferences::CameraFlyMoveSpeed) * SpeedAltModifier;
+    return pref(Preferences::CameraFlyMoveSpeed) * SpeedModifier;
   }
   else if (m_slow)
   {
-    return pref(Preferences::CameraFlyMoveSpeed) / SpeedAltModifier;
+    return pref(Preferences::CameraFlyMoveSpeed) / SpeedModifier;
   }
   return pref(Preferences::CameraFlyMoveSpeed);
 }

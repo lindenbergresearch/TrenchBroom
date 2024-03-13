@@ -43,7 +43,6 @@ public:
 
 private:
   void doLog(LogLevel level, const std::string& message) override;
-
   void doLog(LogLevel level, const QString& message) override;
 
   deleteCopyAndMove(FileLogger);

@@ -27,11 +27,8 @@
 #include <vector>
 
 class QAbstractButton;
-
 class QLabel;
-
 class QLineEdit;
-
 class QGridLayout;
 
 namespace TrenchBroom
@@ -39,24 +36,17 @@ namespace TrenchBroom
 namespace Model
 {
 class BrushFaceHandle;
-
 class Node;
 } // namespace Model
 
 namespace View
 {
 class FlagsPopupEditor;
-
 class GLContextManager;
-
 class MapDocument;
-
 class Selection;
-
 class SignalDelayer;
-
 class SpinControl;
-
 class UVEditor;
 
 class FaceAttribsEditor : public QWidget
@@ -106,76 +96,48 @@ public:
 
 private:
   void xOffsetChanged(double value);
-
   void yOffsetChanged(double value);
-
   void rotationChanged(double value);
-
   void xScaleChanged(double value);
-
   void yScaleChanged(double value);
-
   void surfaceFlagChanged(size_t index, int value, int setFlag, int mixedFlag);
-
   void contentFlagChanged(size_t index, int value, int setFlag, int mixedFlag);
-
   void surfaceValueChanged(double value);
-
   void colorValueChanged(const QString& text);
-
   void surfaceFlagsUnset();
-
   void contentFlagsUnset();
-
   void surfaceValueUnset();
-
   void colorValueUnset();
-
   void updateIncrements();
 
 private:
   void createGui(GLContextManager& contextManager);
-
   void bindEvents();
 
   void connectObservers();
 
   void documentWasNewed(MapDocument* document);
-
   void documentWasLoaded(MapDocument* document);
-
   void nodesDidChange(const std::vector<Model::Node*>& nodes);
-
   void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& faces);
-
   void selectionDidChange(const Selection& selection);
-
   void textureCollectionsDidChange();
 
   void updateControls();
-
   void updateControlsDelayed();
 
   bool hasSurfaceFlags() const;
-
   bool hasContentFlags() const;
-
   void showSurfaceFlagsEditor();
-
   void showContentFlagsEditor();
-
   void hideSurfaceFlagsEditor();
-
   void hideContentFlagsEditor();
 
   bool hasColorAttribs() const;
-
   void showColorAttribEditor();
-
   void hideColorAttribEditor();
 
   std::tuple<QList<int>, QStringList, QStringList> getSurfaceFlags() const;
-
   std::tuple<QList<int>, QStringList, QStringList> getContentFlags() const;
 };
 } // namespace View

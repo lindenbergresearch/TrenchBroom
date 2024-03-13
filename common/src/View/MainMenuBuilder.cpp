@@ -22,8 +22,6 @@
 #include <QMenuBar>
 
 #include "IO/ResourceUtils.h"
-#include "PreferenceManager.h"
-#include "Preferences.h"
 #include "View/MapFrame.h"
 
 namespace TrenchBroom
@@ -72,8 +70,7 @@ QAction* MenuBuilderBase::findOrCreateQAction(const Action* tAction)
   qAction->setCheckable(tAction->checkable());
   if (tAction->hasIcon())
   {
-    auto size = pref(Preferences::ToolBarIconsSize);
-    qAction->setIcon(IO::loadSVGIcon(tAction->iconPath(), size));
+    qAction->setIcon(IO::loadSVGIcon(tAction->iconPath()));
   }
   qAction->setStatusTip(tAction->statusTip());
   updateActionKeySeqeunce(qAction, tAction);

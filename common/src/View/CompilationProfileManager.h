@@ -26,7 +26,6 @@
 #include <memory>
 
 class QAbstractButton;
-
 class QPoint;
 
 namespace TrenchBroom
@@ -39,9 +38,7 @@ struct CompilationProfile;
 namespace View
 {
 class CompilationProfileListBox;
-
 class CompilationProfileEditor;
-
 class MapDocument;
 
 /**
@@ -66,36 +63,24 @@ public:
     QWidget* parent = nullptr);
 
   const Model::CompilationProfile* selectedProfile() const;
-
   const Model::CompilationConfig& config() const;
 
 private:
   void updateGui();
-
 private slots:
-
   void addProfile();
-
   void removeProfile();
-
   void removeProfile(size_t index);
-
   void removeProfile(const Model::CompilationProfile& profile);
-
   void duplicateProfile(const Model::CompilationProfile& profile);
-
   void profileContextMenuRequested(
     const QPoint& globalPos, Model::CompilationProfile& profile);
-
   void profileSelectionChanged();
-
 signals:
-
   /**
    * *Which* profile is selected changed.
    */
   void selectedProfileChanged();
-
   /**
    * An edit was made to a profile.
    */

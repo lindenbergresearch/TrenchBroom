@@ -22,7 +22,7 @@
 #include <QPainter>
 #include <QPalette>
 
-#include "View/QtUtils.h"
+#include "View/ViewConstants.h"
 
 namespace TrenchBroom
 {
@@ -33,7 +33,7 @@ BorderPanel::BorderPanel(const Sides borders, const int thickness, QWidget* pare
   , m_borders(borders)
   , m_thickness(thickness)
 {
-  setForegroundRole(QPalette::Midlight);
+  setForegroundRole(QPalette::Mid);
 }
 
 void BorderPanel::paintEvent(QPaintEvent* /*event*/)

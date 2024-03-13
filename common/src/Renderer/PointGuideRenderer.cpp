@@ -21,10 +21,10 @@
 
 #include "FloatType.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
-#include <vm/ray.h>
-#include <vm/vec.h>
+#include "vm/ray.h"
+#include "vm/vec.h"
 
 namespace TrenchBroom
 {

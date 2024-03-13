@@ -36,84 +36,89 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 TEST_CASE_METHOD(MapDocumentTest, "UndoTest.setTexturesAfterRestore")
 {
-    document->deselectAll();
-    document->setProperty(Model::EntityPropertyKeys::Wad, "fixture/test/IO/Wad/cr8_czg.wad");
+  document->deselectAll();
+  document->setProperty(
+    Model::EntityPropertyKeys::Wad, "fixture/test/IO/Wad/cr8_czg.wad");
 
-    Model::BrushNode *brushNode = createBrushNode("coffin1");
-    document->addNodes({{document->parentForNodes(), {brushNode}}});
+  Model::BrushNode* brushNode = createBrushNode("coffin1");
+  document->addNodes({{document->parentForNodes(), {brushNode}}});
 
-    const Assets::Texture *texture = document->textureManager().texture("coffin1");
-    CHECK(texture != nullptr);
+  const Assets::Texture* texture = document->textureManager().texture("coffin1");
+  CHECK(texture != nullptr);
+  CHECK(texture->usageCount() == 6u);
+
+  for (const Model::BrushFace& face : brushNode->brush().faces())
+  {
+    CHECK(face.texture() == texture);
+  }
+
+  SECTION("translate brush")
+  {
+    document->selectNodes({brushNode});
+    document->translateObjects(vm::vec3(1, 1, 1));
     CHECK(texture->usageCount() == 6u);
 
-    for (const Model::BrushFace &face: brushNode->brush().faces()) {
-        CHECK(face.texture() == texture);
-    }
+    document->undoCommand();
+    CHECK(texture->usageCount() == 6u);
+  }
 
-    SECTION("translate brush")
-    {
-        document->selectNodes({brushNode});
-        document->translateObjects(vm::vec3(1, 1, 1));
-        CHECK(texture->usageCount() == 6u);
+  SECTION("delete brush")
+  {
+    document->selectNodes({brushNode});
+    document->deleteObjects();
+    CHECK(texture->usageCount() == 0u);
 
-        document->undoCommand();
-        CHECK(texture->usageCount() == 6u);
-    }
+    document->undoCommand();
+    CHECK(texture->usageCount() == 6u);
+  }
 
-    SECTION("delete brush")
-    {
-        document->selectNodes({brushNode});
-        document->deleteObjects();
-        CHECK(texture->usageCount() == 0u);
+  SECTION("select top face, move texture")
+  {
+    auto topFaceIndex = brushNode->brush().findFace(vm::vec3::pos_z());
+    REQUIRE(topFaceIndex.has_value());
 
-        document->undoCommand();
-        CHECK(texture->usageCount() == 6u);
-    }
+    document->selectBrushFaces({{brushNode, *topFaceIndex}});
 
-    SECTION("select top face, move texture")
-    {
-        auto topFaceIndex = brushNode->brush().findFace(vm::vec3::pos_z());
-        REQUIRE(topFaceIndex.has_value());
+    Model::ChangeBrushFaceAttributesRequest request;
+    request.setXOffset(static_cast<float>(12.34f));
+    REQUIRE(document->setFaceAttributes(request));
 
-        document->selectBrushFaces({{brushNode, *topFaceIndex}});
+    document->undoCommand(); // undo move
+    CHECK(texture->usageCount() == 6u);
+    REQUIRE(document->hasSelectedBrushFaces());
 
-        Model::ChangeBrushFaceAttributesRequest request;
-        request.setXOffset(static_cast<float>(12.34f));
-        REQUIRE(document->setFaceAttributes(request));
+    document->undoCommand(); // undo select
+    CHECK(texture->usageCount() == 6u);
+    REQUIRE(!document->hasSelectedBrushFaces());
+  }
 
-        document->undoCommand(); // undo move
-        CHECK(texture->usageCount() == 6u);
-        REQUIRE(document->hasSelectedBrushFaces());
-
-        document->undoCommand(); // undo select
-        CHECK(texture->usageCount() == 6u);
-        REQUIRE(!document->hasSelectedBrushFaces());
-    }
-
-    for (const Model::BrushFace &face: brushNode->brush().faces()) {
-        CHECK(face.texture() == texture);
-    }
+  for (const Model::BrushFace& face : brushNode->brush().faces())
+  {
+    CHECK(face.texture() == texture);
+  }
 }
 
 TEST_CASE_METHOD(MapDocumentTest, "UndoTest.undoRotation")
 {
-    auto *entityNode = new Model::EntityNode{{},
-                                             {{Model::EntityPropertyKeys::Classname, "test"}}};
+  auto* entityNode =
+    new Model::EntityNode{{}, {{Model::EntityPropertyKeys::Classname, "test"}}};
 
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
-    CHECK(!entityNode->entity().hasProperty("angle"));
+  document->addNodes({{document->parentForNodes(), {entityNode}}});
+  CHECK(!entityNode->entity().hasProperty("angle"));
 
-    document->selectNodes({entityNode});
-    document->rotateObjects(vm::vec3::zero(), vm::vec3::pos_z(), vm::to_radians(15.0));
-    CHECK(entityNode->entity().hasProperty("angle"));
-    CHECK(*entityNode->entity().property("angle") == "15");
+  document->selectNodes({entityNode});
+  document->rotateObjects(vm::vec3::zero(), vm::vec3::pos_z(), vm::to_radians(15.0));
+  CHECK(entityNode->entity().hasProperty("angle"));
+  CHECK(*entityNode->entity().property("angle") == "15");
 
-    document->undoCommand();
-    CHECK(!entityNode->entity().hasProperty("angle"));
+  document->undoCommand();
+  CHECK(!entityNode->entity().hasProperty("angle"));
 }
 } // namespace View
 } // namespace TrenchBroom

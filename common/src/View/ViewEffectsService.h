@@ -27,7 +27,6 @@ class ViewEffectsService
 {
 public:
   virtual ~ViewEffectsService();
-
   void flashSelection();
 
 private:

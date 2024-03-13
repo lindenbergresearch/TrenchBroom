@@ -23,7 +23,6 @@
 #include <QChildEvent>
 #include <QClipboard>
 #include <QComboBox>
-#include <QDockWidget>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
@@ -45,7 +44,6 @@
 #include "FileLogger.h"
 #include "IO/ExportOptions.h"
 #include "IO/PathQt.h"
-#include "IO/SystemPaths.h"
 #include "Model/BrushNode.h"
 #include "Model/EditorContext.h"
 #include "Model/Entity.h"
@@ -60,13 +58,13 @@
 #include "Model/Node.h"
 #include "Model/PatchNode.h"
 #include "Model/WorldNode.h"
-#include "PreferenceDialog.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "TrenchBroomApp.h"
 #include "View/Actions.h"
 #include "View/Autosaver.h"
 #include "View/BorderLine.h"
+#include "View/ChoosePathTypeDialog.h"
 #include "View/ClipTool.h"
 #include "View/ColorButton.h"
 #include "View/CompilationDialog.h"
@@ -95,12 +93,12 @@
 #include "View/VertexTool.h"
 #include "View/ViewUtils.h"
 
-#include <kdl/overload.h>
-#include <kdl/string_format.h>
-#include <kdl/string_utils.h>
+#include "kdl/overload.h"
+#include "kdl/string_format.h"
+#include "kdl/string_utils.h"
 
-#include <vm/vec.h>
-#include <vm/vec_io.h>
+#include "vm/vec.h"
+#include "vm/vec_io.h"
 
 #include <cassert>
 #include <chrono>
@@ -169,8 +167,7 @@ MapFrame::MapFrame(FrameManager* frameManager, std::shared_ptr<MapDocument> docu
   restoreWindowGeometry(this);
   restoreWindowState(this);
 
-  // register mapview
-  TrenchBroomApp::instance().setCurrentMapFrame(this);
+  setAcceptDrops(true);
 }
 
 MapFrame::~MapFrame()
@@ -210,8 +207,6 @@ MapFrame::~MapFrame()
 
   // FIXME: m_contextManager is deleted via smart pointer; it may release openGL resources
   // in its destructor
-
-  TrenchBroomApp::instance().setCurrentMapFrame(nullptr);
 }
 
 void MapFrame::positionOnScreen(QWidget* reference)
@@ -369,14 +364,14 @@ void MapFrame::updateRecentDocumentsMenu()
 void MapFrame::createGui()
 {
   setWindowIconTB(this);
-  setWindowTitle("TrenchBroom Nova");
+  setWindowTitle("TrenchBroom");
 
-  m_hSplitter = new Splitter(Qt::Horizontal);
-  m_hSplitter->setChildrenCollapsible(true);
+  m_hSplitter = new Splitter(Qt::Horizontal, DrawKnob::No);
+  m_hSplitter->setChildrenCollapsible(false);
   m_hSplitter->setObjectName("MapFrame_HorizontalSplitter");
 
-  m_vSplitter = new Splitter(Qt::Vertical);
-  m_vSplitter->setChildrenCollapsible(true);
+  m_vSplitter = new Splitter(Qt::Vertical, DrawKnob::No);
+  m_vSplitter->setChildrenCollapsible(false);
   m_vSplitter->setObjectName("MapFrame_VerticalSplitterSplitter");
 
   m_infoPanel = new InfoPanel(m_document);
@@ -401,9 +396,10 @@ void MapFrame::createGui()
 
   // configure minimum sizes
   m_mapView->setMinimumSize(100, 100);
-  m_infoPanel->setMinimumSize(0, 0);
-  m_vSplitter->setMinimumSize(0, 0);
-  m_inspector->setMinimumSize(300, 100);
+  m_infoPanel->setMinimumSize(100, 100);
+
+  m_vSplitter->setMinimumSize(100, 100);
+  m_inspector->setMinimumSize(350, 100);
 
   // resize only the map view when the window resizes
   m_vSplitter->setStretchFactor(0, 1);
@@ -412,12 +408,11 @@ void MapFrame::createGui()
   m_hSplitter->setStretchFactor(1, 0);
 
   // give most of the space to the map view
-  //    m_hSplitter->setSizes(QList<int>{1'000'000, 1});
-  //    m_vSplitter->setSizes(QList<int>{1'000'000, 1});
+  m_hSplitter->setSizes(QList<int>{1'000'000, 1});
+  m_vSplitter->setSizes(QList<int>{1'000'000, 1});
 
   auto* frameLayout = new QVBoxLayout();
-  frameLayout->setContentsMargins(
-    LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
   frameLayout->setSpacing(0); // no space between BorderLine and m_hSplitter
   frameLayout->addWidget(m_hSplitter);
 
@@ -425,12 +420,7 @@ void MapFrame::createGui()
   // layout in
   auto* layoutWrapper = new QWidget();
   layoutWrapper->setLayout(frameLayout);
-  layoutWrapper->setObjectName("layoutWrapper");
-  layoutWrapper->setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowHMargin);
+
   setCentralWidget(layoutWrapper);
 
   restoreWindowState(m_hSplitter);
@@ -468,55 +458,29 @@ void MapFrame::createToolBar()
   m_toolBar->setObjectName("MapFrameToolBar");
   m_toolBar->setFloatable(false);
   m_toolBar->setMovable(false);
-  m_toolBar->setAutoFillBackground(true);
-
-  // macOS Qt bug: with the 32x32 default icon size, 24x24 high-dpi icons get scaled up to
+  // macOS Qt bug: with the 32x32 default icon size, 24x24 highdpi icons get scaled up to
   // 32x32. We expect them to be drawn at 24x24 logical pixels centered in a 32x32 box, as
-  // is the case with non-high-dpi icons. As a workaround, just lower the toolbar size to
+  // is the case with non-highdpi icons. As a workaround, just lower the toolbar size to
   // 24x24 (we could alternatively render the icons at 32x32).
-  auto size = pref(Preferences::ToolBarIconsSize);
-  m_toolBar->setIconSize(QSize(size, size));
-  //   makeSmall(m_toolBar);
+  m_toolBar->setIconSize(QSize(24, 24));
 
-  ToolBarBuilder toolsBuilder(*m_toolBar, m_actionMap, [this](const Action& action) {
+  ToolBarBuilder builder(*m_toolBar, m_actionMap, [this](const Action& action) {
     ActionExecutionContext context(this, currentMapViewBase());
     action.execute(context);
   });
 
   auto& actionManager = ActionManager::instance();
-  actionManager.visitToolBarActions(toolsBuilder);
+  actionManager.visitToolBarActions(builder);
 
-  updateGridSizeComboBox();
-  m_toolBar->addWidget(m_gridChoice);
-}
-
-void MapFrame::updateGridSizeComboBox()
-{
-  if (!m_gridChoice)
-  {
-    m_gridChoice = new QComboBox();
-  }
-  else
-  {
-    m_gridChoice->clear();
-  }
-
-  m_gridChoice->setObjectName("ToolBar_GridChoice");
+  m_gridChoice = new QComboBox();
   for (int i = Grid::MinSize; i <= Grid::MaxSize; ++i)
   {
-    const QString gridSizeStr = tr("Grid ") + Grid::asString(i);
+    const FloatType gridSize = Grid::actualSize(i);
+    const QString gridSizeStr = tr("Grid %1").arg(QString::number(gridSize, 'g'));
     m_gridChoice->addItem(gridSizeStr, QVariant(i));
   }
-}
 
-
-void MapFrame::updateToolbar()
-{
-  if (m_toolBar)
-  {
-    removeToolBar(m_toolBar);
-    createToolBar();
-  }
+  m_toolBar->addWidget(m_gridChoice);
 }
 
 void MapFrame::updateToolBarWidgets()
@@ -1452,26 +1416,38 @@ void MapFrame::pasteAtCursorPosition()
   if (canPaste())
   {
     const auto referenceBounds = m_document->referenceBounds();
-    if (paste() == PasteType::Node && m_document->hasSelectedNodes())
+
+    auto transaction = Transaction{m_document, "Paste"};
+    switch (paste())
     {
-      const auto bounds = m_document->selectionBounds();
-
-      // The pasted objects must be hidden to prevent the picking done in
-      // pasteObjectsDelta from hitting them
-      // (https://github.com/TrenchBroom/TrenchBroom/issues/2755)
-      const auto nodes = m_document->selectedNodes().nodes();
-
-      auto transaction = Transaction{m_document};
-      m_document->hide(nodes);
-      const auto delta = m_mapView->pasteObjectsDelta(bounds, referenceBounds);
-      m_document->show(nodes);
-      m_document->selectNodes(nodes); // Hiding deselected the nodes, so reselect them
-      if (!m_document->translateObjects(delta))
+    case PasteType::Node:
+      if (m_document->hasSelectedNodes())
       {
-        transaction.cancel();
-        return;
+        const auto bounds = m_document->selectionBounds();
+
+        // The pasted objects must be hidden to prevent the picking done in
+        // pasteObjectsDelta from hitting them
+        // (https://github.com/TrenchBroom/TrenchBroom/issues/2755)
+        const auto nodes = m_document->selectedNodes().nodes();
+
+        m_document->hide(nodes);
+        const auto delta = m_mapView->pasteObjectsDelta(bounds, referenceBounds);
+        m_document->show(nodes);
+        m_document->selectNodes(nodes); // Hiding deselected the nodes, so reselect them
+        if (!m_document->translateObjects(delta))
+        {
+          transaction.cancel();
+          break;
+        }
       }
       transaction.commit();
+      break;
+    case PasteType::BrushFace:
+      transaction.commit();
+      break;
+    case PasteType::Failed:
+      transaction.cancel();
+      break;
     }
   }
 }
@@ -2052,31 +2028,6 @@ void MapFrame::setGridSize(const int size)
   m_document->grid().setSize(size);
 }
 
-void MapFrame::setMajorGridDivision(int size)
-{
-  float gridDivSize = 0;
-
-  if (size > 0)
-  {
-    gridDivSize = 32.0f * float(size + 1);
-  }
-
-  setPref(Preferences::GridMajorDivisionSize, gridDivSize);
-  m_document->grid().gridDidChangeNotifier();
-}
-
-bool MapFrame::isMajorGridDivisionVisible(int size)
-{
-  float gridDivSize = 0;
-
-  if (size > 0)
-  {
-    gridDivSize = 32.0f * float(size + 1);
-  }
-
-  return pref(Preferences::GridMajorDivisionSize) == gridDivSize;
-}
-
 void MapFrame::moveCameraToNextPoint()
 {
   if (canMoveCameraToNextPoint())
@@ -2133,8 +2084,7 @@ void MapFrame::moveCameraToPosition()
     "Enter a position (x y z) for the camera.",
     QLineEdit::Normal,
     "0.0 0.0 0.0",
-    &ok,
-    Qt::Tool);
+    &ok);
   if (ok)
   {
     if (const auto position = vm::parse<float, 3>(str.toStdString()))
@@ -2347,13 +2297,11 @@ void MapFrame::debugClipBrush()
 #pragma clang diagnostic ignored "-Wold-style-cast"
 #pragma clang diagnostic ignored "-Wcast-qual"
 #endif
-
 static void debugSegfault()
 {
   volatile void* test = nullptr;
   printf("%p\n", *((void**)test));
 }
-
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
@@ -2409,7 +2357,7 @@ void MapFrame::debugSetWindowSize()
 void MapFrame::debugShowPalette()
 {
   DebugPaletteWindow* window = new DebugPaletteWindow(this);
-  window->exec();
+  showModelessDialog(window);
 }
 
 void MapFrame::focusChange(QWidget* /* oldFocus */, QWidget* newFocus)
@@ -2444,6 +2392,74 @@ bool MapFrame::canCompile() const
 bool MapFrame::canLaunch() const
 {
   return m_document->persistent();
+}
+
+void MapFrame::dragEnterEvent(QDragEnterEvent* event)
+{
+  if (
+    m_document->game()->wadProperty() && event->mimeData()->hasUrls()
+    && kdl::all_of(event->mimeData()->urls(), [](const auto& url) {
+         if (!url.isLocalFile())
+         {
+           return false;
+         }
+
+         const auto fileInfo = QFileInfo{url.toLocalFile()};
+         return fileInfo.isFile() && fileInfo.fileName().toLower().endsWith(".wad");
+       }))
+  {
+    event->accept();
+  }
+}
+
+void MapFrame::dropEvent(QDropEvent* event)
+{
+  const auto urls = event->mimeData()->urls();
+  if (urls.empty())
+  {
+    return;
+  }
+
+  const auto& wadPropertyKey = m_document->game()->wadProperty();
+  if (!wadPropertyKey)
+  {
+    return;
+  }
+
+  const auto* wadPathsStr = m_document->world()->entity().property(*wadPropertyKey);
+  auto wadPaths = wadPathsStr ? kdl::vec_transform(
+                    kdl::str_split(*wadPathsStr, ";"),
+                    [](const auto& s) { return std::filesystem::path{s}; })
+                              : std::vector<std::filesystem::path>{};
+
+  auto pathDialog = ChoosePathTypeDialog{
+    window(),
+    IO::pathFromQString(urls.front().toLocalFile()),
+    document()->path(),
+    document()->game()->gamePath()};
+
+  const int result = pathDialog.exec();
+  if (result != QDialog::Accepted)
+  {
+    return;
+  }
+
+  auto wadPathsToAdd = kdl::vec_transform(urls, [&](const auto& url) {
+    return convertToPathType(
+      pathDialog.pathType(),
+      IO::pathFromQString(url.toLocalFile()),
+      document()->path(),
+      document()->game()->gamePath());
+  });
+
+  const auto newWadPathsStr = kdl::str_join(
+    kdl::vec_transform(
+      kdl::vec_concat(std::move(wadPaths), std::move(wadPathsToAdd)),
+      [](const auto& path) { return path.string(); }),
+    ";");
+  document()->setProperty(*wadPropertyKey, newWadPathsStr);
+
+  event->acceptProposedAction();
 }
 
 void MapFrame::changeEvent(QEvent*)
@@ -2534,27 +2550,23 @@ DebugPaletteWindow::DebugPaletteWindow(QWidget* parent)
 {
   setWindowTitle(tr("Palette"));
 
-  const auto roles = std::vector<std::pair<QPalette::ColorRole, QString>>{
-    {QPalette::Window, "Window"},
-    {QPalette::WindowText, "WindowText"},
-    {QPalette::Base, "Base"},
-    {QPalette::AlternateBase, "AlternateBase"},
-    {QPalette::ToolTipBase, "ToolTipBase"},
-    {QPalette::ToolTipText, "ToolTipText"},
+  const auto roles = std::vector<std::pair<QPalette::ColorRole, QString>>
+  {
+    {QPalette::Window, "Window"}, {QPalette::WindowText, "WindowText"},
+      {QPalette::Base, "Base"}, {QPalette::AlternateBase, "AlternateBase"},
+      {QPalette::ToolTipBase, "ToolTipBase"}, {QPalette::ToolTipText, "ToolTipText"},
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    {QPalette::PlaceholderText, "PlaceholderText"},
+      {QPalette::PlaceholderText, "PlaceholderText"},
 #endif
-    {QPalette::Text, "Text"},
-    {QPalette::Button, "Button"},
-    {QPalette::ButtonText, "ButtonText"},
-    {QPalette::BrightText, "BrightText"},
-    {QPalette::Light, "Light"},
-    {QPalette::Midlight, "Midlight"},
-    {QPalette::Mid, "Mid"},
-    {QPalette::Dark, "Dark"},
-    {QPalette::Shadow, "Shadow"},
-    {QPalette::Highlight, "Highlight"},
-    {QPalette::HighlightedText, "HighlightedText"}};
+      {QPalette::Text, "Text"}, {QPalette::Button, "Button"},
+      {QPalette::ButtonText, "ButtonText"}, {QPalette::BrightText, "BrightText"},
+      {QPalette::Light, "Light"}, {QPalette::Midlight, "Midlight"},
+      {QPalette::Dark, "Dark"}, {QPalette::Mid, "Mid"}, {QPalette::Shadow, "Shadow"},
+      {QPalette::Highlight, "Highlight"},
+    {
+      QPalette::HighlightedText, "HighlightedText"
+    }
+  };
 
   const auto groups = std::vector<std::pair<QPalette::ColorGroup, QString>>{
     {QPalette::Disabled, "Disabled"},
@@ -2578,9 +2590,6 @@ DebugPaletteWindow::DebugPaletteWindow(QWidget* parent)
   table->setHorizontalHeaderLabels(horizontalHeaderLabels);
   table->setVerticalHeaderLabels(verticalHeaderLabels);
 
-  auto setAllRoles = new QCheckBox;
-  setAllRoles->setText("set all roles?");
-
   for (int x = 0; x < table->columnCount(); ++x)
   {
     for (int y = 0; y < table->rowCount(); ++y)
@@ -2591,20 +2600,11 @@ DebugPaletteWindow::DebugPaletteWindow(QWidget* parent)
       ColorButton* button = new ColorButton();
       table->setCellWidget(y, x, button);
 
-      button->setColor((QPalette{}).color(group, role));
+      button->setColor(qApp->palette().color(group, role));
 
       connect(button, &ColorButton::colorChangedByUser, this, [=](const QColor& color) {
-        QPalette palette = QPalette{};
-        if (setAllRoles->isChecked())
-        {
-          palette.setColor(QPalette::ColorGroup::Disabled, role, color);
-          palette.setColor(QPalette::ColorGroup::Active, role, color);
-          palette.setColor(QPalette::ColorGroup::Inactive, role, color);
-        }
-        else
-        {
-          palette.setColor(group, role, color);
-        }
+        QPalette palette = qApp->palette();
+        palette.setColor(group, role, color);
         qApp->setPalette(palette);
       });
     }
@@ -2614,9 +2614,7 @@ DebugPaletteWindow::DebugPaletteWindow(QWidget* parent)
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   layout->addWidget(table);
-  layout->addWidget(setAllRoles);
   setLayout(layout);
-  setFixedSize(430, 600);
 }
 
 DebugPaletteWindow::~DebugPaletteWindow() = default;

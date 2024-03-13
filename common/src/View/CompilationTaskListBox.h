@@ -26,15 +26,10 @@
 #include <vector>
 
 class QCheckBox;
-
 class QCompleter;
-
 class QHBoxLayout;
-
 class QLayout;
-
 class QLineEdit;
-
 class QWidget;
 
 namespace TrenchBroom::Model
@@ -45,9 +40,7 @@ struct CompilationProfile;
 namespace TrenchBroom::View
 {
 class MapDocument;
-
 class MultiCompletionLineEdit;
-
 class TitledPanel;
 
 class CompilationTaskEditorBase : public ControlListBoxItemRenderer
@@ -73,7 +66,6 @@ protected:
 
 protected:
   void setupCompleter(MultiCompletionLineEdit* lineEdit);
-
   void addMainLayout(QLayout* layout);
 
 protected:
@@ -98,11 +90,8 @@ public:
 
 private:
   void updateItem() override;
-
   Model::CompilationExportMap& task();
-
 private slots:
-
   void targetSpecChanged(const QString& text);
 };
 
@@ -122,13 +111,9 @@ public:
 
 private:
   void updateItem() override;
-
   Model::CompilationCopyFiles& task();
-
 private slots:
-
   void sourceSpecChanged(const QString& text);
-
   void targetSpecChanged(const QString& text);
 };
 
@@ -148,13 +133,9 @@ public:
 
 private:
   void updateItem() override;
-
   Model::CompilationRenameFile& task();
-
 private slots:
-
   void sourceSpecChanged(const QString& text);
-
   void targetSpecChanged(const QString& text);
 };
 
@@ -173,11 +154,8 @@ public:
 
 private:
   void updateItem() override;
-
   Model::CompilationDeleteFiles& task();
-
 private slots:
-
   void targetSpecChanged(const QString& text);
 };
 
@@ -198,17 +176,11 @@ public:
 
 private:
   void updateItem() override;
-
   Model::CompilationRunTool& task();
-
 private slots:
-
   void browseTool();
-
   void toolSpecChanged(const QString& text);
-
   void parameterSpecChanged(const QString& text);
-
   void treatNonZeroResultCodeAsErrorChanged(int state);
 };
 
@@ -230,11 +202,8 @@ public:
 
 private:
   size_t itemCount() const override;
-
   ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
-
 signals:
-
   void taskContextMenuRequested(const QPoint& globalPos, Model::CompilationTask& task);
 };
 } // namespace TrenchBroom::View

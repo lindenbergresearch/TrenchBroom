@@ -25,10 +25,6 @@
 #include <QVBoxLayout>
 
 #include "FileLogger.h"
-#include "PreferenceManager.h"
-#include "Preferences.h"
-#include "TrenchBroomApp.h"
-#include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
 #include <string>
@@ -67,7 +63,7 @@ void Console::doLog(const LogLevel level, const QString& message)
 
 void Console::logToDebugOut(const LogLevel /* level */, const QString& message)
 {
-  qDebug("[%8.4f] %s", Timer::appstart.elapsed(), message.toStdString().c_str());
+  qDebug("%s", message.toStdString().c_str());
 }
 
 void Console::logToConsole(const LogLevel level, const QString& message)
@@ -78,20 +74,20 @@ void Console::logToConsole(const LogLevel level, const QString& message)
   switch (level)
   {
   case LogLevel::Debug:
-    format.setForeground(QBrush(toQColor(pref(Preferences::LogDebugColor))));
+    format.setForeground(
+      QBrush(m_textView->palette().color(QPalette::Disabled, QPalette::Text)));
     break;
   case LogLevel::Info:
-    format.setForeground(QBrush(toQColor(pref(Preferences::LogInfoColor))));
     break;
   case LogLevel::Warn:
-    format.setForeground(QBrush(toQColor(pref(Preferences::LogWarningColor))));
+    format.setForeground(
+      QBrush(m_textView->palette().color(QPalette::Active, QPalette::Text)));
     break;
   case LogLevel::Error:
-    format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
+    format.setForeground(QBrush(QColor(250, 30, 60)));
     break;
   }
-
-  format.setFont(TrenchBroomApp::instance().getConsoleFont());
+  format.setFont(Fonts::fixedWidthFont());
 
   QTextCursor cursor(m_textView->document());
   cursor.movePosition(QTextCursor::MoveOperation::End);

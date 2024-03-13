@@ -20,7 +20,6 @@
 #include "FaceRenderer.h"
 
 #include "Assets/Texture.h"
-#include "Model/EntityNode.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/ActiveShader.h"
@@ -32,7 +31,6 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
-#include "StringUtils.h"
 
 namespace TrenchBroom
 {
@@ -173,96 +171,43 @@ void FaceRenderer::doRender(RenderContext& context)
     ActiveShader shader(shaderManager, Shaders::FaceShader);
     PreferenceManager& prefs = PreferenceManager::instance();
 
-    float gridLineWidth = pref(Preferences::GridLineWidth);
-    int autoBrightnessType = pref(Preferences::FaceAutoBrightness);
-
     const bool applyTexture = context.showTextures();
     const bool shadeFaces = context.shadeFaces();
     const bool showFog = context.showFog();
 
-    const float shadeLevel = pref(Preferences::ShadeLevel);
-    const Color fogColor = pref(Preferences::FogColor);
-    const float fogScale = pref(Preferences::FogScale);
-    const float fogBias = pref(Preferences::FogBias);
-    const float fogMaxAmount = pref(Preferences::FogMaxAmount);
-    const float fogMinDistance = pref(Preferences::FogMinDistance);
-    const int fogType = pref(Preferences::FogType);
-
-    const Color ambientLightning = pref(Preferences::LightningAmbient);
-
     glAssert(glEnable(GL_TEXTURE_2D));
     glAssert(glActiveTexture(GL_TEXTURE0));
-
-    //        auto lightSources = context.getLightSources();
-    //
-    //        auto size = lightSources.size() > 60 ? 60 : lightSources.size();
-    //
-    //        for (size_t i = 0; i < size; i++) {
-    //            std::string _Position_name = stringf("lights[%d].Position", i);
-    //            std::string _Intensity_name = stringf("lights[%d].Intensity", i);
-    //            std::string _AttenuationConstant_name =
-    //            stringf("lights[%d].AttenuationConstant", i); std::string
-    //            _AttenuationLinear_name = stringf("lights[%d].AttenuationLinear", i);
-    //            std::string _AttenuationQuadratic_name =
-    //            stringf("lights[%d].AttenuationQuadratic", i);
-    //
-    //            shader.set(_Position_name, lightSources[i].Position);
-    //            shader.set(_Intensity_name, lightSources[i].Intensity);
-    //            shader.set(_AttenuationConstant_name,
-    //            lightSources[i].AttenuationConstant);
-    //            shader.set(_AttenuationLinear_name, lightSources[i].AttenuationLinear);
-    //            shader.set(_AttenuationQuadratic_name,
-    //            lightSources[i].AttenuationQuadratic);
-    //        }
-
-    shader.set("AmbientLight", ambientLightning);
-    shader.set("NumLights", 0);
-    shader.set("EnableLighting", false);
-    shader.set("CameraPosition", context.camera().position());
     shader.set("Brightness", prefs.get(Preferences::Brightness));
     shader.set("RenderGrid", context.showGrid());
     shader.set("GridSize", static_cast<float>(context.gridSize()));
-    shader.set("GridLineWidth", gridLineWidth);
     shader.set("GridAlpha", prefs.get(Preferences::GridAlpha));
-    shader.set("MajorDivisionSize", pref(Preferences::GridMajorDivisionSize));
     shader.set("ApplyTexture", applyTexture);
     shader.set("Texture", 0);
-    shader.set("AutoBrightnessType", autoBrightnessType);
     shader.set("ApplyTinting", m_tint);
-
     if (m_tint)
       shader.set("TintColor", m_tintColor);
-
     shader.set("GrayScale", m_grayscale);
+    shader.set("CameraPosition", context.camera().position());
     shader.set("ShadeFaces", shadeFaces);
-    shader.set("ShadeLevel", shadeLevel);
     shader.set("ShowFog", showFog);
-    shader.set("FogColor", fogColor);
-    shader.set("FogMaxAmount", fogMaxAmount);
-    shader.set("FogScale", fogScale);
-    shader.set("FogBias", fogBias);
-    shader.set("FogMinDistance", fogMinDistance);
-    shader.set("FogType", fogType);
-
     shader.set("Alpha", m_alpha);
     shader.set("EnableMasked", false);
     shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
     shader.set("SoftMapBoundsMin", context.softMapBounds().min);
     shader.set("SoftMapBoundsMax", context.softMapBounds().max);
-
-    auto boundsColor = prefs.get(Preferences::SoftMapBoundsColor);
-
     shader.set(
       "SoftMapBoundsColor",
-      vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
+      vm::vec4f(
+        prefs.get(Preferences::SoftMapBoundsColor).r(),
+        prefs.get(Preferences::SoftMapBoundsColor).g(),
+        prefs.get(Preferences::SoftMapBoundsColor).b(),
+        0.1f));
 
     RenderFunc func(shader, applyTexture, m_faceColor);
-
     if (m_alpha < 1.0f)
     {
       glAssert(glDepthMask(GL_FALSE));
     }
-
     for (const auto& [texture, brushIndexHolderPtr] : *m_indexArrayMap)
     {
       if (!brushIndexHolderPtr->hasValidIndices())
@@ -282,12 +227,10 @@ void FaceRenderer::doRender(RenderContext& context)
       brushIndexHolderPtr->cleanupIndices();
       func.after(texture);
     }
-
     if (m_alpha < 1.0f)
     {
       glAssert(glDepthMask(GL_TRUE));
     }
-
     m_vertexArray->cleanupVertices();
   }
 }

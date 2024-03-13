@@ -35,13 +35,12 @@
 #include "Renderer/RenderContext.h"
 #include "Renderer/RenderService.h"
 #include "Renderer/TextAnchor.h"
-#include "StringUtils.h"
 
-#include <vm/forward.h>
-#include <vm/mat.h>
-#include <vm/mat_ext.h>
-#include <vm/scalar.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
+#include "vm/scalar.h"
+#include "vm/vec.h"
 
 #include <vector>
 
@@ -63,12 +62,13 @@ public:
 private:
   vm::vec3f basePosition() const override
   {
-    auto f = vm::vec3f(0.0, 0.0, m_entity->logicalBounds().size().z() * 0.3);
-    auto position = vm::vec3f(m_entity->logicalBounds().center()) + f;
+    auto position = vm::vec3f(m_entity->logicalBounds().center());
+    position[2] = float(m_entity->logicalBounds().max.z());
+    position[2] += 2.0f;
     return position;
   }
 
-  TextAlignment::Type alignment() const override { return TextAlignment::Center; }
+  TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
 };
 
 EntityRenderer::EntityRenderer(
@@ -537,12 +537,14 @@ void EntityRenderer::validateBounds()
 
 AttrString EntityRenderer::entityString(const Model::EntityNode* entityNode) const
 {
-  const auto& classname = "<" + entityNode->entity().classname() + ">";
-  // const auto center = entityNode->logicalBounds().center();
+  const auto& classname = entityNode->entity().classname();
+  // const Model::AttributeValue& targetname =
+  // entity->attribute(Model::AttributeNames::Targetname);
 
   AttrString str;
   str.appendCentered(classname);
-  // str.appendCentered(stringf("[%.0f %.0f %.0f]", center.x(), center.y(), center.z()));
+  // if (!targetname.empty())
+  // str.appendCentered(targetname);
   return str;
 }
 

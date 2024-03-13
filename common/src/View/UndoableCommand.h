@@ -43,7 +43,6 @@ public:
   virtual ~UndoableCommand();
 
   std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade* document) override;
-
   virtual std::unique_ptr<CommandResult> performUndo(MapDocumentCommandFacade* document);
 
   virtual bool collateWith(UndoableCommand& command);
@@ -55,7 +54,6 @@ protected:
   virtual bool doCollateWith(UndoableCommand& command);
 
   void setModificationCount(MapDocumentCommandFacade* document);
-
   void resetModificationCount(MapDocumentCommandFacade* document);
 
   deleteCopyAndMove(UndoableCommand);

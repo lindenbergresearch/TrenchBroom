@@ -24,7 +24,7 @@
 #include "Renderer/Renderable.h"
 #include "Renderer/TexturedIndexArrayRenderer.h"
 
-#include <kdl/vector_set.h>
+#include "kdl/vector_set.h"
 
 #include <vector>
 
@@ -33,16 +33,13 @@ namespace TrenchBroom
 namespace Model
 {
 class EditorContext;
-
 class PatchNode;
 } // namespace Model
 
 namespace Renderer
 {
 class RenderBatch;
-
 class RenderContext;
-
 class VboManager;
 
 class PatchRenderer : public IndexedRenderable
@@ -71,13 +68,9 @@ public:
   explicit PatchRenderer(const Model::EditorContext& editorContext);
 
   void setDefaultColor(const Color& faceColor);
-
   void setGrayscale(bool grayscale);
-
   void setTint(bool tint);
-
   void setTintColor(const Color& color);
-
   void setTransparencyAlpha(float alpha);
 
   /**
@@ -104,7 +97,6 @@ public:
    * Equivalent to invalidatePatch() on all added patches.
    */
   void invalidate();
-
   /**
    * Equivalent to removePatch() on all added patches.
    */
@@ -115,12 +107,10 @@ public:
    * guaranteed to invalidate it).
    */
   void addPatch(const Model::PatchNode* patchNode);
-
   /**
    * Removes a patch. Calling with an unknown patch is allowed, but ignored.
    */
   void removePatch(const Model::PatchNode* patchNode);
-
   /**
    * Causes cached renderer data to be rebuilt for the given patch (on the next render()
    * call).
@@ -134,7 +124,6 @@ private:
 
 private: // implement IndexedRenderable interface
   void prepareVerticesAndIndices(VboManager& vboManager) override;
-
   void doRender(RenderContext& renderContext) override;
 };
 } // namespace Renderer

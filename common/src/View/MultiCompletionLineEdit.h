@@ -37,17 +37,13 @@ private:
 
 public:
   explicit MultiCompletionLineEdit(QWidget* parent = nullptr);
-
   explicit MultiCompletionLineEdit(const QString& contents, QWidget* parent = nullptr);
-
   ~MultiCompletionLineEdit() override;
 
 public:
   void setWordDelimiter(const QRegularExpression& leftDelimiter);
-
   void setWordDelimiters(
     const QRegularExpression& leftDelimiter, const QRegularExpression& rightDelimiter);
-
   void setMultiCompleter(QCompleter* completer);
 
 protected:
@@ -57,17 +53,12 @@ private:
   void updateCompleter(bool showCompleter);
 
   int findLeftBoundary() const;
-
   int findRightBoundary() const;
 
   int findFirstMatch(const QString& str, const QRegularExpression& expression) const;
-
   int findLastMatch(const QString& str, const QRegularExpression& expression) const;
-
 private slots:
-
   void triggerCompletion();
-
   void insertCompletion(const QString& string);
 };
 } // namespace View

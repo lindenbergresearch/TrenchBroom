@@ -62,9 +62,9 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument* document, QWidget* p
     1, QHeaderView::ResizeMode::ResizeToContents);
   m_table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
 
-  // Tighter than default vertical row height, without the overhead of authorizing
+  // Tighter than default vertical row height, without the overhead of autoresizing
   m_table->verticalHeader()->setDefaultSectionSize(
-    m_table->fontMetrics().lineSpacing() + LayoutConstants::MediumVMargin);
+    m_table->fontMetrics().lineSpacing() + 2);
 
   m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
   m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
@@ -84,20 +84,19 @@ KeyboardPreferencePane::KeyboardPreferencePane(MapDocument* document, QWidget* p
 
   auto* infoAndSearchLayout = new QHBoxLayout();
   infoAndSearchLayout->setContentsMargins(
-    0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);
+    LayoutConstants::WideHMargin,
+    LayoutConstants::MediumVMargin,
+    LayoutConstants::MediumHMargin,
+    LayoutConstants::MediumVMargin);
   infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
   infoAndSearchLayout->addWidget(infoLabel, 1);
   infoAndSearchLayout->addWidget(searchBox);
 
   auto* layout = new QVBoxLayout();
-  layout->setContentsMargins(
-    LayoutConstants::WideHMargin,
-    LayoutConstants::WideHMargin,
-    LayoutConstants::WideHMargin,
-    LayoutConstants::WideHMargin);
+  layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
-  layout->addLayout(infoAndSearchLayout);
   layout->addWidget(m_table, 1);
+  layout->addLayout(infoAndSearchLayout);
   setLayout(layout);
 
   setMinimumSize(900, 550);

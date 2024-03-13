@@ -23,7 +23,7 @@
 #include "Renderer/GL.h"
 #include "Result.h"
 
-#include <vm/forward.h>
+#include "vm/forward.h"
 
 #include <string>
 #include <unordered_map>
@@ -32,7 +32,6 @@ namespace TrenchBroom::Renderer
 {
 
 class ShaderManager;
-
 class Shader;
 
 class ShaderProgram
@@ -54,48 +53,35 @@ public:
   deleteCopy(ShaderProgram);
 
   ShaderProgram(ShaderProgram&& other) noexcept;
-
   ShaderProgram& operator=(ShaderProgram&& other) noexcept;
 
   ~ShaderProgram();
 
   void attach(Shader& shader) const;
-
   Result<void> link();
 
   void activate(ShaderManager& shaderManager);
-
   void deactivate(ShaderManager& shaderManager);
 
   void set(const std::string& name, bool value);
-
   void set(const std::string& name, int value);
-
   void set(const std::string& name, size_t value);
-
   void set(const std::string& name, float value);
-
   void set(const std::string& name, double value);
-
   void set(const std::string& name, const vm::vec2f& value);
-
   void set(const std::string& name, const vm::vec3f& value);
-
   void set(const std::string& name, const vm::vec4f& value);
-
   void set(const std::string& name, const vm::mat2x2f& value);
-
   void set(const std::string& name, const vm::mat3x3f& value);
-
   void set(const std::string& name, const vm::mat4x4f& value);
 
   GLint findAttributeLocation(const std::string& name) const;
 
 private:
   GLint findUniformLocation(const std::string& name) const;
-
   bool checkActive() const;
 };
 
 Result<ShaderProgram> createShaderProgram(std::string name);
+
 } // namespace TrenchBroom::Renderer

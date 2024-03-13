@@ -37,7 +37,6 @@ private:
 
 public:
   IndexRangeRenderer();
-
   template <typename VertexSpec>
   explicit IndexRangeRenderer(IndexRangeMapBuilder<VertexSpec>& builder)
     : m_vertexArray(VertexArray::move(std::move(builder.vertices())))
@@ -48,7 +47,6 @@ public:
   IndexRangeRenderer(const VertexArray& vertexArray, const IndexRangeMap& indexArray);
 
   void prepare(VboManager& vboManager);
-
   void render();
 };
 } // namespace Renderer

@@ -19,13 +19,13 @@
 
 #include "AllocationTracker.h"
 
-#include <kdl/vector_set.h>
+#include "kdl/vector_set.h"
 
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
 
-// #define EXPENSIVE_CHECKS
+//#define EXPENSIVE_CHECKS
 
 namespace TrenchBroom
 {

@@ -22,10 +22,10 @@
 #include "Macros.h"
 #include "View/SwapNodeContentsCommand.h"
 
-#include <vm/forward.h>
-#include <vm/polygon.h>
-#include <vm/segment.h>
-#include <vm/vec.h>
+#include "vm/forward.h"
+#include "vm/polygon.h"
+#include "vm/segment.h"
+#include "vm/vec.h"
 
 #include <memory>
 #include <vector>
@@ -35,9 +35,7 @@ namespace TrenchBroom
 namespace View
 {
 class MapDocument;
-
 class VertexHandleManagerBase;
-
 template <typename H>
 class VertexHandleManagerBaseT;
 
@@ -50,31 +48,24 @@ protected:
 
 private:
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
-
   virtual std::unique_ptr<CommandResult> createCommandResult(
     std::unique_ptr<CommandResult> swapResult);
 
 public:
   void removeHandles(VertexHandleManagerBase& manager);
-
   void addHandles(VertexHandleManagerBase& manager);
 
 public:
   virtual void selectNewHandlePositions(
     VertexHandleManagerBaseT<vm::vec3>& manager) const;
-
   virtual void selectOldHandlePositions(
     VertexHandleManagerBaseT<vm::vec3>& manager) const;
-
   virtual void selectNewHandlePositions(
     VertexHandleManagerBaseT<vm::segment3>& manager) const;
-
   virtual void selectOldHandlePositions(
     VertexHandleManagerBaseT<vm::segment3>& manager) const;
-
   virtual void selectNewHandlePositions(
     VertexHandleManagerBaseT<vm::polygon3>& manager) const;
-
   virtual void selectOldHandlePositions(
     VertexHandleManagerBaseT<vm::polygon3>& manager) const;
 
@@ -113,7 +104,6 @@ private:
 
   void selectNewHandlePositions(
     VertexHandleManagerBaseT<vm::vec3>& manager) const override;
-
   void selectOldHandlePositions(
     VertexHandleManagerBaseT<vm::vec3>& manager) const override;
 
@@ -138,7 +128,6 @@ private:
 
   void selectNewHandlePositions(
     VertexHandleManagerBaseT<vm::segment3>& manager) const override;
-
   void selectOldHandlePositions(
     VertexHandleManagerBaseT<vm::segment3>& manager) const override;
 
@@ -163,7 +152,6 @@ private:
 
   void selectNewHandlePositions(
     VertexHandleManagerBaseT<vm::polygon3>& manager) const override;
-
   void selectOldHandlePositions(
     VertexHandleManagerBaseT<vm::polygon3>& manager) const override;
 
