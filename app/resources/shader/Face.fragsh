@@ -67,7 +67,6 @@ varying vec4 modelCoordinates;
 varying vec3 modelNormal;
 varying vec4 faceColor;
 varying vec3 viewVector;
-varying vec3 lightColor;
 
 float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorLineFactor);
 vec3 applySoftMapBoundsTint(vec3 inputFragColor, vec3 worldCoords);
@@ -153,10 +152,10 @@ void main() {
         gl_FragColor.rgb = mix(gl_FragColor.rgb, GridColor, gridValue * GridAlpha);
     }
 
-    vec3 N = normalize(modelNormal.xyz);
-    vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
-
     if (EnableLighting) {
+        vec3 N = normalize(modelNormal.xyz);
+        vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
+
         vec3 _lightColor = vec3(0, 0, 0);;
 
         for (int i=0; i < NumLights; i++) {
@@ -193,11 +192,7 @@ void main() {
             _lightColor += color;
         }
 
-        gl_FragColor.rgb = gl_FragColor.rgb * clamp(_lightColor, 0.0f, 2.25f) * lightColor.rgb;
-    }
-
-    if (EnableLighting) {
-
+        gl_FragColor.rgb = gl_FragColor.rgb * clamp(_lightColor, 0.0f, 2.25f);
     }
 
     gl_FragColor.rgb = applySoftMapBoundsTint(gl_FragColor.rgb, modelCoordinates.xyz);
