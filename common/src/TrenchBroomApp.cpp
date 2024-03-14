@@ -549,7 +549,7 @@ void TrenchBroomApp::loadStyle()
   }
 }
 
-const std::vector<std::filesystem::path>& TrenchBroomApp::recentDocuments() const
+std::vector<std::filesystem::path> TrenchBroomApp::recentDocuments() const
 {
   return m_recentDocuments->recentDocuments();
 }
@@ -816,21 +816,16 @@ bool TrenchBroomApp::event(QEvent* event)
 
 void TrenchBroomApp::openFilesOrWelcomeFrame(const QStringList& fileNames)
 {
+  const auto filesToOpen =
+    useSDI() && !fileNames.empty() ? QStringList{fileNames.front()} : fileNames;
+
   auto anyDocumentOpened = false;
-  if (useSDI())
-  {
-    if (fileNames.length() > 0)
-    {
-      const auto path = IO::pathFromQString(fileNames.at(0));
-      anyDocumentOpened = !path.empty() && openDocument(path);
-    }
-  }
-  else
-  {
-    for (const auto& fileName : fileNames)
+  for (const auto& fileName : filesToOpen)
     {
       const auto path = IO::pathFromQString(fileName);
-      anyDocumentOpened = anyDocumentOpened | (!path.empty() && openDocument(path));
+    if (!path.empty() && openDocument(path))
+    {
+      anyDocumentOpened = true;
     }
   }
 

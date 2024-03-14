@@ -260,9 +260,7 @@ float TextRenderer::computeAlphaFactor(
 
 void TextRenderer::addEntry(EntryCollection& collection, const Entry& entry)
 {
-  // collection.entries.push_back(entry);
-  collection.addEntry(const_cast<Entry&>(entry));
-
+  collection.entries.push_back(entry);
   collection.textVertexCount += entry.vertices.size();
   collection.rectVertexCount += roundedRect2DVertexCount(RectCornerSegments);
 }

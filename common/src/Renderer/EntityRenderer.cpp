@@ -63,12 +63,13 @@ public:
 private:
   vm::vec3f basePosition() const override
   {
-    auto f = vm::vec3f(0.0, 0.0, m_entity->logicalBounds().size().z() * 0.3);
-    auto position = vm::vec3f(m_entity->logicalBounds().center()) + f;
+    auto position = vm::vec3f(m_entity->logicalBounds().center());
+    position[2] = float(m_entity->logicalBounds().max.z());
+    position[2] += 2.0f;
     return position;
   }
 
-  TextAlignment::Type alignment() const override { return TextAlignment::Center; }
+  TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
 };
 
 EntityRenderer::EntityRenderer(

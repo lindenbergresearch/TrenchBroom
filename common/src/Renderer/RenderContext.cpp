@@ -257,10 +257,11 @@ void RenderContext::clearTintSelection()
   m_tintSelection = false;
 }
 
-bool RenderContext::showSelectionGuide() const
-{
-  return m_showSelectionGuide == ShowSelectionGuide::Show
-         || m_showSelectionGuide == ShowSelectionGuide::ForceShow;
+bool RenderContext::showSelectionGuide() const {
+    return
+    m_showSelectionGuide == ShowSelectionGuide::Show ||
+    m_showSelectionGuide == ShowSelectionGuide::ForceShow ||
+    pref(Preferences::AlwaysShowSelectionBounds);
 }
 
 void RenderContext::setShowSelectionGuide()

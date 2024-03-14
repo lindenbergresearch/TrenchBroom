@@ -133,7 +133,7 @@ public:
 
   QFont loadFont(const std::filesystem::path& path, const int size);
 
-  const std::vector<std::filesystem::path>& recentDocuments() const;
+  std::vector<std::filesystem::path> recentDocuments() const;
 
   void addRecentDocumentMenu(QMenu& menu);
 

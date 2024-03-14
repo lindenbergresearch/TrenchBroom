@@ -32,6 +32,7 @@
 
 #include "Assets/Texture.h"
 #include "Ensure.h"
+#include "Error.h"
 #include "IO/File.h"
 #include "IO/FileSystem.h"
 #include "IO/PathQt.h"
@@ -39,17 +40,16 @@
 #include "IO/SystemPaths.h"
 #include "Logger.h"
 
-#include <kdl/set_temp.h>
+#include "kdl/result.h"
+#include "kdl/set_temp.h"
 
 #include <map>
 #include <string>
 
-namespace TrenchBroom
+namespace TrenchBroom::IO
 {
-namespace IO
-{
-Assets::Texture loadDefaultTexture(
-  const FileSystem& fs, const std::string& name, Logger& logger)
+
+Assets::Texture loadDefaultTexture(const FileSystem& fs, std::string name, Logger& logger)
 {
   // recursion guard
   static auto executing = false;
@@ -64,7 +64,7 @@ Assets::Texture loadDefaultTexture(
       })
       .transform_error([&](auto e) {
         logger.error() << "Could not load default texture: " << e.msg;
-        return Assets::Texture{name, 32, 32};
+        return Assets::Texture{std::move(name), 32, 32};
       })
       .value();
   }
@@ -72,7 +72,7 @@ Assets::Texture loadDefaultTexture(
   {
     logger.error() << "Could not load default texture";
   }
-  return Assets::Texture{name, 32, 32};
+  return Assets::Texture{std::move(name), 32, 32};
 }
 
 static QString imagePathToString(const std::filesystem::path& imagePath)
@@ -88,7 +88,7 @@ QPixmap loadPixmapResource(const std::filesystem::path& imagePath)
   return QPixmap{imagePathToString(imagePath)};
 }
 
-static QImage createDisabledState(const QImage& image)
+QImage createDisabledState(const QImage& image)
 {
   // Convert to greyscale, divide the opacity by 3
   auto disabledImage = image.convertToFormat(QImage::Format_ARGB32);
@@ -230,5 +230,5 @@ QIcon loadSVGIcon(const std::filesystem::path& imagePath, int size)
   cache[imagePath] = result;
   return result;
 }
-} // namespace IO
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::IO

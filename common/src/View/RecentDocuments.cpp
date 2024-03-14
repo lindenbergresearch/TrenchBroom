@@ -78,7 +78,7 @@ RecentDocuments::RecentDocuments(
   assert(m_maxSize > 0);
 }
 
-const std::vector<std::filesystem::path>& RecentDocuments::recentDocuments() const
+std::vector<std::filesystem::path> RecentDocuments::recentDocuments() const
 {
   return m_filteredDocuments;
 }
@@ -190,4 +190,5 @@ void RecentDocuments::createMenuItems(QMenu& menu)
       IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); });
   }
 }
+
 } // namespace TrenchBroom::View
