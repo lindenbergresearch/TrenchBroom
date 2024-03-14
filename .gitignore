@@ -4,8 +4,12 @@ Thumbs.db
 *.sublime-workspace
 .vscode
 .cache
-
+/autosave
 /cmake-build-*
+/backup
+/vcpkg
+/vcpkg*
+/vcpkg-overlay-ports
 /build*
 /codeblocks
 /Xcode*
@@ -19,4 +23,3 @@ Thumbs.db
 /coverity
 
 app/resources/documentation/help/index.html
-
