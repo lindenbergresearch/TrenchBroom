@@ -22,28 +22,38 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include "IO/Reader.h"
 #include "Renderer/FontFactory.h"
 
-#include "kdl/resource.h"
-
 #include <memory>
+#include <utility>
 
-namespace TrenchBroom::Renderer
-{
+namespace TrenchBroom {
+ namespace Renderer {
  class FontDescriptor;
+
  class TextureFont;
 
- class FreeTypeFontFactory : public FontFactory
- {
+ class FreeTypeFontFactory : public FontFactory {
  private:
-   kdl::resource<FT_Library> m_library;
+   FT_Library m_library;
 
  public:
    FreeTypeFontFactory();
 
+   ~FreeTypeFontFactory() override;
+
  private:
    std::unique_ptr<TextureFont> doCreateFont(
-     const FontDescriptor& fontDescriptor) override;
- };
+     const FontDescriptor &fontDescriptor) override;
 
-} // namespace TrenchBroom::Renderer
+   std::pair<FT_Face, IO::BufferedReader> loadFont(const FontDescriptor &fontDescriptor);
+
+   std::unique_ptr<TextureFont> buildFont(
+     FT_Face face, unsigned char firstChar, unsigned char charCount);
+
+   Metrics computeMetrics(
+     FT_Face face, unsigned char firstChar, unsigned char charCount) const;
+ };
+ } // namespace Renderer
+} // namespace TrenchBroom

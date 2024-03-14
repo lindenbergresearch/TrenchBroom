@@ -34,8 +34,7 @@ namespace TrenchBroom
    struct Metrics
    {
      size_t cellSize;
-     size_t ascend;
-     size_t descend;
+      size_t maxAscend;
      size_t lineHeight;
    };
 
