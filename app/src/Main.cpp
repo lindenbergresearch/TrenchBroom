@@ -19,9 +19,11 @@
 
 #include <QApplication>
 #include <QSettings>
+#include <QString>
 #include <QSurfaceFormat>
 #include <QtGlobal>
 
+#include "IO/SystemPaths.h"
 #include "Model/GameFactory.h"
 #include "PreferenceManager.h"
 #include "TrenchBroomApp.h"
@@ -68,6 +70,20 @@ int main(int argc, char* argv[])
   // having Qt disable it (also we've had reports of some Intel drivers being blocked that
   // actually work with TB.)
   qputenv("QT_OPENGL_BUGLIST", ":/opengl_buglist.json");
+
+  // parse portable arg out manually at first to ensure it's set before any settings load
+  if (argc > 1)
+  {
+    for (int i = 1; i < argc; i++)
+    {
+      if (strcmp(argv[i], "--portable") == 0)
+      {
+        TrenchBroom::IO::SystemPaths::setPortable();
+        QSettings::setPath(
+          QSettings::IniFormat, QSettings::UserScope, QString("./config"));
+      }
+    }
+  }
 
   // PreferenceManager is destroyed by TrenchBroomApp::~TrenchBroomApp()
   TrenchBroom::PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
