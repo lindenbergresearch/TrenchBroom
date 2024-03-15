@@ -132,10 +132,7 @@ void SpikeGuideRenderer::addSpike(
   const vm::ray3& ray, const FloatType length, const FloatType maxLength)
 {
   m_spikeVertices.emplace_back(vm::vec3f(ray.origin), m_color);
-  m_spikeVertices.emplace_back(
-    vm::vec3f(vm::point_at_distance(ray, length)),
-    (length / maxLength > 0.5f) ? Color{m_color}.darker(0.75f)
-                                : Color{m_color}.darker(0.4f));
+  m_spikeVertices.emplace_back(vm::vec3f(vm::point_at_distance(ray, length)), m_color);
 }
 
 void SpikeGuideRenderer::validate()
