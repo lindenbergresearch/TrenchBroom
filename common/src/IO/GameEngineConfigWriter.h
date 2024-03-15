@@ -24,32 +24,28 @@
 
 #include <iosfwd>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 struct GameEngineConfig;
 struct GameEngineProfile;
 } // namespace Model
 
-namespace IO
-{
-class GameEngineConfigWriter
-{
+namespace IO {
+class GameEngineConfigWriter {
 private:
-  const Model::GameEngineConfig& m_config;
-  std::ostream& m_stream;
+  const Model::GameEngineConfig &m_config;
+  std::ostream &m_stream;
 
 public:
-  GameEngineConfigWriter(const Model::GameEngineConfig& config, std::ostream& stream);
+  GameEngineConfigWriter(const Model::GameEngineConfig &config, std::ostream &stream);
 
   void writeConfig();
 
 private:
-  EL::Value writeProfiles(const Model::GameEngineConfig& config) const;
-  EL::Value writeProfile(const Model::GameEngineProfile& profile) const;
+  EL::Value writeProfiles(const Model::GameEngineConfig &config) const;
+  EL::Value writeProfile(const Model::GameEngineProfile &profile) const;
 
-  deleteCopyAndMove(GameEngineConfigWriter);
+deleteCopyAndMove(GameEngineConfigWriter);
 };
 } // namespace IO
 } // namespace TrenchBroom

@@ -26,12 +26,10 @@
 
 #include <mutex>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class CFile;
 
-class ZipFileSystem : public ImageFileSystem<CFile>
-{
+class ZipFileSystem : public ImageFileSystem<CFile> {
 private:
   mz_zip_archive m_archive;
   std::mutex m_mutex;

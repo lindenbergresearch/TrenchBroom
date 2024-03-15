@@ -29,11 +29,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 // for debug builds, ensure is just an assertion
 void TrenchBroom::ensureFailed(
-  const char* /* file */,
-  const int /* line */,
-  const char* /* condition */,
-  const char* /* message */)
-{
+    const char * /* file */,
+    const int /* line */,
+    const char * /* condition */,
+    const char * /* message */) {
   assert(0);
 }
 

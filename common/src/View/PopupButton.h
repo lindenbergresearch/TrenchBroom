@@ -23,27 +23,24 @@
 
 class QToolButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class PopupWindow;
 
-class PopupButton : public QWidget
-{
-  Q_OBJECT
+class PopupButton : public QWidget {
+Q_OBJECT
 private:
-  QToolButton* m_button;
-  PopupWindow* m_window;
+  QToolButton *m_button;
+  PopupWindow *m_window;
   QIcon checkedIcon, unCheckedIcon;
 
 public:
   explicit PopupButton(
-    const QString& caption = "", QWidget* parent = nullptr, const QIcon& icon = QIcon{});
+      const QString &caption = "", QWidget *parent = nullptr, const QIcon &icon = QIcon{});
 
-  QWidget* GetPopupWindow() const;
+  QWidget *GetPopupWindow() const;
 
-  void setIcon(const std::string& iconName);
+  void setIcon(const std::string &iconName);
 
 private:
   void buttonClicked(bool checked);

@@ -19,10 +19,8 @@
 
 #pragma once
 
-namespace TrenchBroom
-{
-namespace EL
-{
+namespace TrenchBroom {
+namespace EL {
 class Value;
 
 enum class ValueType;

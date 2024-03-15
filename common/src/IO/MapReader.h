@@ -37,8 +37,7 @@
 #include <variant>
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class BrushNode;
 class EntityNode;
 class EntityNodeBase;
@@ -50,8 +49,7 @@ class Node;
 class WorldNode;
 } // namespace TrenchBroom::Model
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 class ParserStatus;
 
@@ -72,26 +70,22 @@ class ParserStatus;
  * 4. Post process the nodes to find the correct parent nodes (createNodes).
  * 5. Call the appropriate callbacks (onWorldspawn, onLayer, ...).
  */
-class MapReader : public StandardMapParser
-{
+class MapReader : public StandardMapParser {
 public: // only public so that helper methods can see these declarations
-  struct EntityInfo
-  {
+  struct EntityInfo {
     std::vector<Model::EntityProperty> properties;
     size_t startLine;
     size_t lineCount;
   };
 
-  struct BrushInfo
-  {
+  struct BrushInfo {
     std::vector<Model::BrushFace> faces;
     size_t startLine;
     size_t lineCount;
     std::optional<size_t> parentIndex;
   };
 
-  struct PatchInfo
-  {
+  struct PatchInfo {
     size_t rowCount;
     size_t columnCount;
     std::vector<Model::BezierPatch::Point> controlPoints;
@@ -123,71 +117,71 @@ protected:
    * if orphaned
    */
   MapReader(
-    std::string_view str,
-    Model::MapFormat sourceMapFormat,
-    Model::MapFormat targetMapFormat,
-    Model::EntityPropertyConfig entityPropertyConfig);
+      std::string_view str,
+      Model::MapFormat sourceMapFormat,
+      Model::MapFormat targetMapFormat,
+      Model::EntityPropertyConfig entityPropertyConfig);
 
   /**
    * Attempts to parse as one or more entities.
    *
    * @throws ParserException if parsing fails
    */
-  void readEntities(const vm::bbox3& worldBounds, ParserStatus& status);
+  void readEntities(const vm::bbox3 &worldBounds, ParserStatus &status);
   /**
    * Attempts to parse as one or more brushes without any enclosing entity.
    *
    * @throws ParserException if parsing fails
    */
-  void readBrushes(const vm::bbox3& worldBounds, ParserStatus& status);
+  void readBrushes(const vm::bbox3 &worldBounds, ParserStatus &status);
   /**
    * Attempts to parse as one or more brush faces.
    *
    * @throws ParserException if parsing fails
    */
-  void readBrushFaces(const vm::bbox3& worldBounds, ParserStatus& status);
+  void readBrushFaces(const vm::bbox3 &worldBounds, ParserStatus &status);
 
 protected: // implement MapParser interface
   void onBeginEntity(
-    size_t line,
-    std::vector<Model::EntityProperty> properties,
-    ParserStatus& status) override;
-  void onEndEntity(size_t startLine, size_t lineCount, ParserStatus& status) override;
-  void onBeginBrush(size_t line, ParserStatus& status) override;
-  void onEndBrush(size_t startLine, size_t lineCount, ParserStatus& status) override;
+      size_t line,
+      std::vector<Model::EntityProperty> properties,
+      ParserStatus &status) override;
+  void onEndEntity(size_t startLine, size_t lineCount, ParserStatus &status) override;
+  void onBeginBrush(size_t line, ParserStatus &status) override;
+  void onEndBrush(size_t startLine, size_t lineCount, ParserStatus &status) override;
   void onStandardBrushFace(
-    size_t line,
-    Model::MapFormat targetMapFormat,
-    const vm::vec3& point1,
-    const vm::vec3& point2,
-    const vm::vec3& point3,
-    const Model::BrushFaceAttributes& attribs,
-    ParserStatus& status) override;
+      size_t line,
+      Model::MapFormat targetMapFormat,
+      const vm::vec3 &point1,
+      const vm::vec3 &point2,
+      const vm::vec3 &point3,
+      const Model::BrushFaceAttributes &attribs,
+      ParserStatus &status) override;
   void onValveBrushFace(
-    size_t line,
-    Model::MapFormat targetMapFormat,
-    const vm::vec3& point1,
-    const vm::vec3& point2,
-    const vm::vec3& point3,
-    const Model::BrushFaceAttributes& attribs,
-    const vm::vec3& texAxisX,
-    const vm::vec3& texAxisY,
-    ParserStatus& status) override;
+      size_t line,
+      Model::MapFormat targetMapFormat,
+      const vm::vec3 &point1,
+      const vm::vec3 &point2,
+      const vm::vec3 &point3,
+      const Model::BrushFaceAttributes &attribs,
+      const vm::vec3 &texAxisX,
+      const vm::vec3 &texAxisY,
+      ParserStatus &status) override;
   void onPatch(
-    size_t startLine,
-    size_t lineCount,
-    Model::MapFormat targetMapFormat,
-    size_t rowCount,
-    size_t columnCount,
-    std::vector<vm::vec<FloatType, 5>> controlPoints,
-    std::string textureName,
-    ParserStatus& status) override;
+      size_t startLine,
+      size_t lineCount,
+      Model::MapFormat targetMapFormat,
+      size_t rowCount,
+      size_t columnCount,
+      std::vector<vm::vec<FloatType, 5>> controlPoints,
+      std::string textureName,
+      ParserStatus &status) override;
 
 private: // helper methods
-  void createNodes(ParserStatus& status);
+  void createNodes(ParserStatus &status);
 
 private: // subclassing interface - these will be called in the order that nodes should be
-         // inserted
+  // inserted
   /**
    * Called for the first worldspawn entity. Subclasses cannot capture the given world
    * node but must create their own instead.
@@ -198,25 +192,25 @@ private: // subclassing interface - these will be called in the order that nodes
    * Returns a pointer to a node which should become the parent of any node that belongs
    * to the world. This could be the default layer of the world node, or a dummy entity.
    */
-  virtual Model::Node* onWorldNode(
-    std::unique_ptr<Model::WorldNode> worldNode, ParserStatus& status) = 0;
+  virtual Model::Node *onWorldNode(
+      std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) = 0;
 
   /**
    * Called for each custom layer.
    */
   virtual void onLayerNode(
-    std::unique_ptr<Model::Node> layerNode, ParserStatus& status) = 0;
+      std::unique_ptr<Model::Node> layerNode, ParserStatus &status) = 0;
 
   /**
    * Called for each group, entity entity or brush node. The given parent can be null.
    */
   virtual void onNode(
-    Model::Node* parentNode, std::unique_ptr<Model::Node> node, ParserStatus& status) = 0;
+      Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status) = 0;
 
   /**
    * Called for each brush face.
    */
-  virtual void onBrushFace(Model::BrushFace face, ParserStatus& status);
+  virtual void onBrushFace(Model::BrushFace face, ParserStatus &status);
 };
 
 } // namespace TrenchBroom::IO

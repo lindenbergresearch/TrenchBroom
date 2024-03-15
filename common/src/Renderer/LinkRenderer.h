@@ -24,57 +24,53 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
 
-namespace TrenchBroom::Renderer
-{
- class RenderContext;
- class RenderBatch;
- class VboManager;
+namespace TrenchBroom::Renderer {
+class RenderContext;
+class RenderBatch;
+class VboManager;
 
- class LinkRenderer : public DirectRenderable
- {
- public:
-   using LineVertex = GLVertexTypes::P3C4::Vertex;
+class LinkRenderer : public DirectRenderable {
+public:
+  using LineVertex = GLVertexTypes::P3C4::Vertex;
 
-   struct ArrowPositionName
-   {
-     static inline const auto name = std::string{"arrowPosition"};
-   };
+  struct ArrowPositionName {
+    static inline const auto name = std::string{"arrowPosition"};
+  };
 
-   struct LineDirName
-   {
-     static inline const auto name = std::string{"lineDir"};
-   };
+  struct LineDirName {
+    static inline const auto name = std::string{"lineDir"};
+  };
 
-   using ArrowVertex = GLVertexType<
-     GLVertexAttributeTypes::P3, // vertex of the arrow (exposed in shader as gl_Vertex)
-     GLVertexAttributeTypes::C4, // arrow color (exposed in shader as gl_Color)
-     GLVertexAttributeUser<ArrowPositionName, GL_FLOAT, 3, false>,    // arrow position
-     GLVertexAttributeUser<LineDirName, GL_FLOAT, 3, false>>::Vertex; // direction the
-                                                                      // arrow is pointing
- private:
-   VertexArray m_lines;
-   VertexArray m_arrows;
+  using ArrowVertex = GLVertexType<
+      GLVertexAttributeTypes::P3, // vertex of the arrow (exposed in shader as gl_Vertex)
+      GLVertexAttributeTypes::C4, // arrow color (exposed in shader as gl_Color)
+      GLVertexAttributeUser<ArrowPositionName, GL_FLOAT, 3, false>,    // arrow position
+      GLVertexAttributeUser<LineDirName, GL_FLOAT, 3, false>>::Vertex; // direction the
+  // arrow is pointing
+private:
+  VertexArray m_lines;
+  VertexArray m_arrows;
 
-   bool m_valid = false;
+  bool m_valid = false;
 
- public:
-   LinkRenderer();
+public:
+  LinkRenderer();
 
-   void render(RenderContext& renderContext, RenderBatch& renderBatch);
-   void invalidate();
+  void render(RenderContext &renderContext, RenderBatch &renderBatch);
+  void invalidate();
 
- private:
-   void doPrepareVertices(VboManager& vboManager) override;
-   void doRender(RenderContext& renderContext) override;
+private:
+  void doPrepareVertices(VboManager &vboManager) override;
+  void doRender(RenderContext &renderContext) override;
 
-   void renderLines(RenderContext& renderContext);
-   void renderArrows(RenderContext& renderContext);
+  void renderLines(RenderContext &renderContext);
+  void renderArrows(RenderContext &renderContext);
 
-   void validate();
+  void validate();
 
-   virtual std::vector<LinkRenderer::LineVertex> getLinks() = 0;
+  virtual std::vector<LinkRenderer::LineVertex> getLinks() = 0;
 
-   deleteCopy(LinkRenderer);
- };
+deleteCopy(LinkRenderer);
+};
 
 } // namespace TrenchBroom::Renderer

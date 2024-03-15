@@ -30,10 +30,8 @@
 // Undefine this symbol since it interferes somehow with our enums.
 #undef None
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class CancelEvent;
 
 class InputEventProcessor;
@@ -45,8 +43,7 @@ class MouseEvent;
 /**
  * Superclass for all input events. Provides protocols for event collation and processing.
  */
-class InputEvent
-{
+class InputEvent {
 public:
   virtual ~InputEvent();
 
@@ -56,7 +53,7 @@ public:
    * @param event the event to collate with
    * @return true if this event was collated with the given event and false otherwise
    */
-  virtual bool collateWith(const KeyEvent& event);
+  virtual bool collateWith(const KeyEvent &event);
 
   /**
    * Collate this event with the given mouse event.
@@ -64,7 +61,7 @@ public:
    * @param event the event to collate with
    * @return true if this event was collated with the given event and false otherwise
    */
-  virtual bool collateWith(const MouseEvent& event);
+  virtual bool collateWith(const MouseEvent &event);
 
   /**
    * Collate this event with the given cancellation event.
@@ -72,24 +69,22 @@ public:
    * @param event the event to collate with
    * @return true if this event was collated with the given event and false otherwise
    */
-  virtual bool collateWith(const CancelEvent& event);
+  virtual bool collateWith(const CancelEvent &event);
 
   /**
    * Process this event using the given event processor.
    *
    * @param processor the event processor
    */
-  virtual void processWith(InputEventProcessor& processor) const = 0;
+  virtual void processWith(InputEventProcessor &processor) const = 0;
 };
 
 /**
  * A keyboard event. Supports only key up and down events.
  */
-class KeyEvent : public InputEvent
-{
+class KeyEvent : public InputEvent {
 public:
-  enum class Type
-  {
+  enum class Type {
     /**
      * A key was pressed.
      */
@@ -116,22 +111,20 @@ public:
    *
    * @param processor the event processor
    */
-  void processWith(InputEventProcessor& processor) const override;
+  void processWith(InputEventProcessor &processor) const override;
 
   kdl_reflect_decl(KeyEvent, type);
 };
 
-std::ostream& operator<<(std::ostream& lhs, const KeyEvent::Type& rhs);
+std::ostream &operator<<(std::ostream &lhs, const KeyEvent::Type &rhs);
 
 /**
  * A mouse event. Supports several event types such as button down and button up, up to
  * five mouse buttons, and mouse wheel events.
  */
-class MouseEvent : public InputEvent
-{
+class MouseEvent : public InputEvent {
 public:
-  enum class Type
-  {
+  enum class Type {
     /**
      * A button was pressed.
      */
@@ -161,8 +154,7 @@ public:
                   */
     DragEnd
   };
-  enum class Button
-  {
+  enum class Button {
     None,
     Left,
     Middle,
@@ -170,8 +162,7 @@ public:
     Aux1,
     Aux2
   };
-  enum class WheelAxis
-  {
+  enum class WheelAxis {
     None,
     Vertical,
     Horizontal
@@ -199,12 +190,12 @@ public:
    * @param scrollDistance the distance by which the mouse wheel was scrolled, in lines
    */
   MouseEvent(
-    Type type,
-    Button button,
-    WheelAxis wheelAxis,
-    float posX,
-    float posY,
-    float scrollDistance);
+      Type type,
+      Button button,
+      WheelAxis wheelAxis,
+      float posX,
+      float posY,
+      float scrollDistance);
 
 public:
   /**
@@ -215,37 +206,36 @@ public:
    * @return true if this event was collated with the given mouse event and false
    * otherwise
    */
-  bool collateWith(const MouseEvent& event) override;
+  bool collateWith(const MouseEvent &event) override;
 
   /**
    * Process this mouse event using the given event processor.
    *
    * @param processor the event processor
    */
-  void processWith(InputEventProcessor& processor) const override;
+  void processWith(InputEventProcessor &processor) const override;
 
   kdl_reflect_decl(MouseEvent, type, button, wheelAxis, posX, posY, scrollDistance);
 };
 
-std::ostream& operator<<(std::ostream& lhs, const MouseEvent::Type& rhs);
+std::ostream &operator<<(std::ostream &lhs, const MouseEvent::Type &rhs);
 
-std::ostream& operator<<(std::ostream& lhs, const MouseEvent::Button& rhs);
+std::ostream &operator<<(std::ostream &lhs, const MouseEvent::Button &rhs);
 
-std::ostream& operator<<(std::ostream& lhs, const MouseEvent::WheelAxis& rhs);
+std::ostream &operator<<(std::ostream &lhs, const MouseEvent::WheelAxis &rhs);
 
 /**
  * Event to signal that a mouse drag was cancelled by the windowing system, e.g. when the
  * window lost focus.
  */
-class CancelEvent : public InputEvent
-{
+class CancelEvent : public InputEvent {
 public:
   /**
    * Process this event using the given event processor.
    *
    * @param processor the event processor
    */
-  void processWith(InputEventProcessor& processor) const override;
+  void processWith(InputEventProcessor &processor) const override;
 
   kdl_reflect_decl_empty(CancelEvent);
 };
@@ -253,8 +243,7 @@ public:
 /**
  * Collects input events in a queue and processes them when instructed.
  */
-class InputEventQueue
-{
+class InputEventQueue {
 private:
   using EventQueue = std::vector<std::unique_ptr<InputEvent>>;
   EventQueue m_eventQueue;
@@ -268,11 +257,9 @@ public:
    * @tparam T the type of the event to enqueue
    * @param event the event to enqueue
    */
-  template <typename T>
-  void enqueueEvent(std::unique_ptr<T> event)
-  {
-    if (m_eventQueue.empty() || !m_eventQueue.back()->collateWith(*event))
-    {
+  template<typename T>
+  void enqueueEvent(std::unique_ptr<T> event) {
+    if (m_eventQueue.empty() || !m_eventQueue.back()->collateWith(*event)) {
       m_eventQueue.push_back(std::move(event));
     }
   }
@@ -285,7 +272,7 @@ public:
    *
    * @param processor the event processor
    */
-  void processEvents(InputEventProcessor& processor);
+  void processEvents(InputEventProcessor &processor);
 };
 
 /**
@@ -301,8 +288,7 @@ public:
  * and the total distance from the position at which the mouse button was pressed is more
  * than 1 pixel in any direction.
  */
-class InputEventRecorder
-{
+class InputEventRecorder {
 private:
   InputEventQueue m_queue;
 
@@ -346,25 +332,25 @@ public:
    *
    * @param event the event to record
    */
-  void recordEvent(const QKeyEvent& event);
+  void recordEvent(const QKeyEvent &event);
 
   /**
    * Records the given mouse event.
    *
    * @param event the event to record
    */
-  void recordEvent(const QMouseEvent& event);
+  void recordEvent(const QMouseEvent &event);
 
-  static QPointF scrollLinesForEvent(const QWheelEvent& event);
+  static QPointF scrollLinesForEvent(const QWheelEvent &event);
 
-  void recordEvent(const QWheelEvent& event);
+  void recordEvent(const QWheelEvent &event);
 
   /**
    * Processes all recorded events using the given event processor.
    *
    * @param processor the event processor
    */
-  void processEvents(InputEventProcessor& processor);
+  void processEvents(InputEventProcessor &processor);
 
 private:
   /**
@@ -383,7 +369,7 @@ private:
    * @param event the event to decode
    * @return the event type
    */
-  static KeyEvent::Type getEventType(const QKeyEvent& event);
+  static KeyEvent::Type getEventType(const QKeyEvent &event);
 
   /**
    * Decodes the event type of the given mouse event.
@@ -391,7 +377,7 @@ private:
    * @param event the event to decode
    * @return the event type
    */
-  static MouseEvent::Type getEventType(const QMouseEvent& event);
+  static MouseEvent::Type getEventType(const QMouseEvent &event);
 
   /**
    * Decodes the button of the given mouse event, if any.
@@ -399,14 +385,13 @@ private:
    * @param event the event to decode
    * @return the mouse button
    */
-  static MouseEvent::Button getButton(const QMouseEvent& event);
+  static MouseEvent::Button getButton(const QMouseEvent &event);
 };
 
 /**
  * Processes input events.
  */
-class InputEventProcessor
-{
+class InputEventProcessor {
 public:
   virtual ~InputEventProcessor();
 
@@ -416,21 +401,21 @@ public:
    *
    * @param event the event to process
    */
-  virtual void processEvent(const KeyEvent& event) = 0;
+  virtual void processEvent(const KeyEvent &event) = 0;
 
   /**
    * Process a mouse event.
    *
    * @param event the event to process
    */
-  virtual void processEvent(const MouseEvent& event) = 0;
+  virtual void processEvent(const MouseEvent &event) = 0;
 
   /**
    * Process a cancellation event.
    *
    * @param event the event to process
    */
-  virtual void processEvent(const CancelEvent& event) = 0;
+  virtual void processEvent(const CancelEvent &event) = 0;
 };
 } // namespace View
 } // namespace TrenchBroom

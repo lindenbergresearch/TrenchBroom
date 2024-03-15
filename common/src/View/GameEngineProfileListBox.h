@@ -21,68 +21,64 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "View/ControlListBox.h"
 
-namespace TrenchBroom::Model
-{
- struct GameEngineConfig;
- struct GameEngineProfile;
+namespace TrenchBroom::Model {
+struct GameEngineConfig;
+struct GameEngineProfile;
 } // namespace TrenchBroom::Model
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class ElidedLabel;
 
-class GameEngineProfileItemRenderer : public ControlListBoxItemRenderer
-{
- Q_OBJECT
+class GameEngineProfileItemRenderer : public ControlListBoxItemRenderer {
+Q_OBJECT
 private:
- Model::GameEngineProfile* m_profile;
- ElidedLabel* m_nameLabel{nullptr};
- ElidedLabel* m_pathLabel{nullptr};
+  Model::GameEngineProfile *m_profile;
+  ElidedLabel *m_nameLabel{nullptr};
+  ElidedLabel *m_pathLabel{nullptr};
 
 public:
- explicit GameEngineProfileItemRenderer(
-   Model::GameEngineProfile& profile, QWidget* parent = nullptr);
+  explicit GameEngineProfileItemRenderer(
+      Model::GameEngineProfile &profile, QWidget *parent = nullptr);
 
- void updateItem() override;
+  void updateItem() override;
 
 private:
- void createGui();
- void refresh();
- void profileWillBeRemoved();
- void profileDidChange();
+  void createGui();
+  void refresh();
+  void profileWillBeRemoved();
+  void profileDidChange();
 };
 
-class GameEngineProfileListBox : public ControlListBox
-{
- Q_OBJECT
+class GameEngineProfileListBox : public ControlListBox {
+Q_OBJECT
 private:
- Model::GameEngineConfig* m_config;
+  Model::GameEngineConfig *m_config;
 
 public:
- explicit GameEngineProfileListBox(
-   Model::GameEngineConfig& config, QWidget* parent = nullptr);
+  explicit GameEngineProfileListBox(
+      Model::GameEngineConfig &config, QWidget *parent = nullptr);
 
- Model::GameEngineProfile* selectedProfile();
+  Model::GameEngineProfile *selectedProfile();
 
 public:
- void setConfig(Model::GameEngineConfig& config);
- void reloadProfiles();
- void updateProfiles();
+  void setConfig(Model::GameEngineConfig &config);
+  void reloadProfiles();
+  void updateProfiles();
 
 private:
- size_t itemCount() const override;
- ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
- void selectedRowChanged(int index) override;
- void doubleClicked(size_t index) override;
+  size_t itemCount() const override;
+  ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;
+  void selectedRowChanged(int index) override;
+  void doubleClicked(size_t index) override;
 signals:
- /**
-  * Emitted when the selection changes.
-  */
- void currentProfileChanged(Model::GameEngineProfile* profile);
- /**
-  * Emitted when a profile is double-clicked.
-  */
- void profileSelected(Model::GameEngineProfile& profile);
+  /**
+   * Emitted when the selection changes.
+   */
+  void currentProfileChanged(Model::GameEngineProfile *profile);
+  /**
+   * Emitted when a profile is double-clicked.
+   */
+  void profileSelected(Model::GameEngineProfile &profile);
 };
 
 } // namespace TrenchBroom::View

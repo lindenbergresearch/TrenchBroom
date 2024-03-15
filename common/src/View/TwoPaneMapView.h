@@ -25,18 +25,15 @@
 
 class QSplitter;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 }
 
-namespace TrenchBroom::Renderer
-{
+namespace TrenchBroom::Renderer {
 class MapRenderer;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class CyclingMapView;
 
 class GLContextManager;
@@ -47,36 +44,35 @@ class MapView3D;
 
 class MapViewToolBox;
 
-class TwoPaneMapView : public MultiPaneMapView
-{
-  Q_OBJECT
+class TwoPaneMapView : public MultiPaneMapView {
+Q_OBJECT
 private:
-  Logger* m_logger;
+  Logger *m_logger;
   std::weak_ptr<MapDocument> m_document;
 
-  QSplitter* m_splitter = nullptr;
-  MapView3D* m_mapView3D = nullptr;
-  CyclingMapView* m_mapView2D = nullptr;
+  QSplitter *m_splitter = nullptr;
+  MapView3D *m_mapView3D = nullptr;
+  CyclingMapView *m_mapView2D = nullptr;
 
 public:
   TwoPaneMapView(
-    std::weak_ptr<MapDocument> document,
-    MapViewToolBox& toolBox,
-    Renderer::MapRenderer& mapRenderer,
-    GLContextManager& contextManager,
-    Logger* logger,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      MapViewToolBox &toolBox,
+      Renderer::MapRenderer &mapRenderer,
+      GLContextManager &contextManager,
+      Logger *logger,
+      QWidget *parent = nullptr);
 
   ~TwoPaneMapView() override;
 
 private:
   void createGui(
-    MapViewToolBox& toolBox,
-    Renderer::MapRenderer& mapRenderer,
-    GLContextManager& contextManager);
+      MapViewToolBox &toolBox,
+      Renderer::MapRenderer &mapRenderer,
+      GLContextManager &contextManager);
 
 private: // implement MultiPaneMapView subclassing interface
-  void doMaximizeView(MapView* view) override;
+  void doMaximizeView(MapView *view) override;
 
   void doRestoreViews() override;
 };

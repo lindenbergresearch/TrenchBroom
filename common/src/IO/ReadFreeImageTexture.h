@@ -26,24 +26,22 @@
 
 #include <string>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class TextureBuffer;
 }
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 class Reader;
 
-Color getAverageColor(const Assets::TextureBuffer& buffer, GLenum format);
+Color getAverageColor(const Assets::TextureBuffer &buffer, GLenum format);
 
 Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(
-  std::string name, const uint8_t* begin, size_t size);
+    std::string name, const uint8_t *begin, size_t size);
 
 Result<Assets::Texture, ReadTextureError> readFreeImageTexture(
-  std::string name, Reader& reader);
+    std::string name, Reader &reader);
 
-bool isSupportedFreeImageExtension(const std::string& extension);
+bool isSupportedFreeImageExtension(const std::string &extension);
 
 } // namespace TrenchBroom::IO

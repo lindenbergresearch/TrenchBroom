@@ -26,16 +26,12 @@
 
 class QPixmap;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class GameListBox : public ImageListBox
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class GameListBox : public ImageListBox {
+Q_OBJECT
 private:
-  struct Info
-  {
+  struct Info {
     std::string name;
     QPixmap image;
     QString title;
@@ -47,7 +43,7 @@ private:
   InfoList m_gameInfos;
 
 public:
-  explicit GameListBox(QWidget* parent = nullptr);
+  explicit GameListBox(QWidget *parent = nullptr);
 
   std::string selectedGameName() const;
 
@@ -58,7 +54,7 @@ public:
   void updateGameInfos();
 
 private:
-  Info makeGameInfo(const std::string& gameName) const;
+  Info makeGameInfo(const std::string &gameName) const;
 
 private:
   size_t itemCount() const override;
@@ -75,9 +71,9 @@ private:
 
 signals:
 
-  void currentGameChanged(const QString& gameName);
+  void currentGameChanged(const QString &gameName);
 
-  void selectCurrentGame(const QString& gameName);
+  void selectCurrentGame(const QString &gameName);
 };
 } // namespace View
 } // namespace TrenchBroom

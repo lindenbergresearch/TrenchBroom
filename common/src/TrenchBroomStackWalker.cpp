@@ -36,8 +36,7 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 #ifdef _WIN32
 #ifdef _MSC_VER
 
@@ -103,21 +102,19 @@ std::string TrenchBroomStackWalker::getStackTrace()
 #endif
 #else
 
-std::string TrenchBroomStackWalker::getStackTrace()
-{
+std::string TrenchBroomStackWalker::getStackTrace() {
   const int MaxDepth = 256;
-  void* callstack[MaxDepth];
+  void *callstack[MaxDepth];
   const int frames = backtrace(callstack, MaxDepth);
 
   // copy into a vector
-  std::vector<void*> framesVec(callstack, callstack + frames);
+  std::vector<void *> framesVec(callstack, callstack + frames);
   if (framesVec.empty())
     return "";
 
   std::stringstream ss;
-  char** strs = backtrace_symbols(&framesVec.front(), static_cast<int>(framesVec.size()));
-  for (size_t i = 0; i < framesVec.size(); i++)
-  {
+  char **strs = backtrace_symbols(&framesVec.front(), static_cast<int>(framesVec.size()));
+  for (size_t i = 0; i < framesVec.size(); i++) {
     ss << strs[i] << std::endl;
   }
   free(strs);

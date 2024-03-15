@@ -27,8 +27,7 @@
 
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class BrushNode;
 
 /**
@@ -40,10 +39,9 @@ class BrushNode;
  * the resolved face might not be the same as the face which the reference was created
  * with.
  */
-class BrushFaceReference
-{
+class BrushFaceReference {
 private:
-  BrushNode* m_node;
+  BrushNode *m_node;
   vm::plane3 m_facePlane;
 
 public:
@@ -53,7 +51,7 @@ public:
    * @param node the containing brush node, must not be null
    * @param face the face to reference
    */
-  BrushFaceReference(Model::BrushNode* node, const Model::BrushFace& face);
+  BrushFaceReference(Model::BrushNode *node, const Model::BrushFace &face);
 
   /**
    * Resolves the referenced brush face or an error if this reference cannot be resolved.
@@ -64,13 +62,13 @@ public:
 /**
  * Returns a vector of brush face references for faces represented by the given handles.
  */
-std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle>& handles);
+std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &handles);
 
 /**
  * Returns a vector brush face handles representing the faces to which the given face
  * references are resolved or an error if any reference cannot be resolved.
  */
 Result<std::vector<BrushFaceHandle>> resolveAllRefs(
-  const std::vector<BrushFaceReference>& faceRefs);
+    const std::vector<BrushFaceReference> &faceRefs);
 
 } // namespace TrenchBroom::Model

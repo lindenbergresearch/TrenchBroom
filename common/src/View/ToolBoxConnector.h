@@ -26,15 +26,12 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class PickResult;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class Camera;
 
 class RenderBatch;
@@ -42,8 +39,7 @@ class RenderBatch;
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class PickRequest;
 
 class ToolController;
@@ -52,11 +48,10 @@ class ToolBox;
 
 class ToolChain;
 
-class ToolBoxConnector : public InputEventProcessor
-{
+class ToolBoxConnector : public InputEventProcessor {
 private:
-  ToolBox* m_toolBox;
-  ToolChain* m_toolChain;
+  ToolBox *m_toolBox;
+  ToolChain *m_toolChain;
 
   InputState m_inputState;
 
@@ -70,34 +65,34 @@ public:
   ~ToolBoxConnector() override;
 
 public:
-  const vm::ray3& pickRay() const;
+  const vm::ray3 &pickRay() const;
 
-  const Model::PickResult& pickResult() const;
+  const Model::PickResult &pickResult() const;
 
   void updatePickResult();
 
 protected:
-  void setToolBox(ToolBox& toolBox);
+  void setToolBox(ToolBox &toolBox);
 
   void addTool(std::unique_ptr<ToolController> tool);
 
 public: // drag and drop
-  bool dragEnter(float x, float y, const std::string& text);
+  bool dragEnter(float x, float y, const std::string &text);
 
-  bool dragMove(float x, float y, const std::string& text);
+  bool dragMove(float x, float y, const std::string &text);
 
   void dragLeave();
 
-  bool dragDrop(float x, float y, const std::string& text);
+  bool dragDrop(float x, float y, const std::string &text);
 
 public: // cancel
   bool cancel();
 
 protected: // rendering
-  void setRenderOptions(Renderer::RenderContext& renderContext);
+  void setRenderOptions(Renderer::RenderContext &renderContext);
 
   void renderTools(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
+      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 private:
   ModifierKeyState modifierKeys();
@@ -113,32 +108,32 @@ private:
   void showPopupMenu();
 
 public: // implement InputEventProcessor interface
-  void processEvent(const KeyEvent& event) override;
+  void processEvent(const KeyEvent &event) override;
 
-  void processEvent(const MouseEvent& event) override;
+  void processEvent(const MouseEvent &event) override;
 
-  void processEvent(const CancelEvent& event) override;
+  void processEvent(const CancelEvent &event) override;
 
 private:
-  void processMouseButtonDown(const MouseEvent& event);
+  void processMouseButtonDown(const MouseEvent &event);
 
-  void processMouseButtonUp(const MouseEvent& event);
+  void processMouseButtonUp(const MouseEvent &event);
 
-  void processMouseClick(const MouseEvent& event);
+  void processMouseClick(const MouseEvent &event);
 
-  void processMouseDoubleClick(const MouseEvent& event);
+  void processMouseDoubleClick(const MouseEvent &event);
 
-  void processMouseMotion(const MouseEvent& event);
+  void processMouseMotion(const MouseEvent &event);
 
-  void processScroll(const MouseEvent& event);
+  void processScroll(const MouseEvent &event);
 
-  void processDragStart(const MouseEvent& event);
+  void processDragStart(const MouseEvent &event);
 
-  void processDrag(const MouseEvent& event);
+  void processDrag(const MouseEvent &event);
 
-  void processDragEnd(const MouseEvent& event);
+  void processDragEnd(const MouseEvent &event);
 
-  MouseButtonState mouseButton(const MouseEvent& event);
+  MouseButtonState mouseButton(const MouseEvent &event);
 
   void mouseMoved(float x, float y);
 
@@ -148,11 +143,11 @@ public:
 private:
   virtual PickRequest doGetPickRequest(float x, float y) const = 0;
 
-  virtual Model::PickResult doPick(const vm::ray3& pickRay) const = 0;
+  virtual Model::PickResult doPick(const vm::ray3 &pickRay) const = 0;
 
   virtual void doShowPopupMenu();
 
-  deleteCopyAndMove(ToolBoxConnector);
+deleteCopyAndMove(ToolBoxConnector);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -37,10 +37,8 @@
 #include <variant>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushFace;
 
 class Hit;
@@ -50,13 +48,11 @@ class Node;
 class PickResult;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class Camera;
 }
 
-namespace View
-{
+namespace View {
 class Grid;
 
 class MapDocument;
@@ -68,22 +64,20 @@ class Selection;
  * drag. We need this to be able to make decisions about the drag before reverting the
  * transaction.
  */
-struct ExtrudeDragHandle
-{
+struct ExtrudeDragHandle {
   Model::BrushFaceHandle faceHandle;
   Model::Brush brushAtDragStart;
 
   explicit ExtrudeDragHandle(Model::BrushFaceHandle faceHandle);
 
-  const Model::BrushFace& faceAtDragStart() const;
+  const Model::BrushFace &faceAtDragStart() const;
 
   vm::vec3 faceNormal() const;
 
   kdl_reflect_decl(ExtrudeDragHandle, faceHandle);
 };
 
-struct ExtrudeDragState
-{
+struct ExtrudeDragState {
   /** The drag handles when the drag started. */
   std::vector<ExtrudeDragHandle> initialDragHandles;
   /** The faces being dragged. */
@@ -95,11 +89,10 @@ struct ExtrudeDragState
   vm::vec3 totalDelta = {0, 0, 0};
 
   kdl_reflect_decl(
-    ExtrudeDragState, initialDragHandles, currentDragFaces, splitBrushes, totalDelta);
+      ExtrudeDragState, initialDragHandles, currentDragFaces, splitBrushes, totalDelta);
 };
 
-struct ExtrudeHitData
-{
+struct ExtrudeHitData {
   Model::BrushFaceHandle face;
   std::variant<vm::plane3, vm::line3> dragReference;
   vm::vec3 initialHandlePosition;
@@ -114,8 +107,7 @@ struct ExtrudeHitData
  *  - split brushes outward/inward (Ctrl+Shift+LMB Drag)
  *  - move faces (Alt+Shift+LMB Drag, 2D views only)
  */
-class ExtrudeTool : public Tool
-{
+class ExtrudeTool : public Tool {
 public:
   static const Model::HitType::Type ExtrudeHitType;
 
@@ -136,44 +128,44 @@ public:
 
   bool applies() const;
 
-  const Grid& grid() const;
+  const Grid &grid() const;
 
-  Model::Hit pick2D(const vm::ray3& pickRay, const Model::PickResult& pickResult) const;
+  Model::Hit pick2D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const;
 
-  Model::Hit pick3D(const vm::ray3& pickRay, const Model::PickResult& pickResult) const;
+  Model::Hit pick3D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const;
 
   /**
    * Returns the current proposed drag handles as per the last call to
    * updateProposedDragHandles.
    */
-  const std::vector<ExtrudeDragHandle>& proposedDragHandles() const;
+  const std::vector<ExtrudeDragHandle> &proposedDragHandles() const;
 
   /**
    * Updates the proposed drag handles according to the given picking result.
    */
-  void updateProposedDragHandles(const Model::PickResult& pickResult);
+  void updateProposedDragHandles(const Model::PickResult &pickResult);
 
   static std::vector<Model::BrushFaceHandle> getDragFaces(
-    const std::vector<ExtrudeDragHandle>& dragHandles);
+      const std::vector<ExtrudeDragHandle> &dragHandles);
 
   void beginExtrude();
 
-  bool extrude(const vm::vec3& faceDelta, ExtrudeDragState& dragState);
+  bool extrude(const vm::vec3 &faceDelta, ExtrudeDragState &dragState);
 
   void beginMove();
 
-  bool move(const vm::vec3& delta, ExtrudeDragState& dragState);
+  bool move(const vm::vec3 &delta, ExtrudeDragState &dragState);
 
-  void commit(const ExtrudeDragState& dragState);
+  void commit(const ExtrudeDragState &dragState);
 
   void cancel();
 
 private:
   void connectObservers();
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+  void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void selectionDidChange(const Selection& selection);
+  void selectionDidChange(const Selection &selection);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -26,27 +26,23 @@
 
 class QTextEdit;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class VariableTable;
 }
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 struct CompilationProfile;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class CompilationRunner;
 
 class MapDocument;
 
-class CompilationRun : public QObject
-{
-  Q_OBJECT
+class CompilationRun : public QObject {
+Q_OBJECT
 private:
-  CompilationRunner* m_currentRun{nullptr};
+  CompilationRunner *m_currentRun{nullptr};
 
 public:
   ~CompilationRun() override;
@@ -54,14 +50,14 @@ public:
   bool running() const;
 
   void run(
-    const Model::CompilationProfile& profile,
-    std::shared_ptr<MapDocument> document,
-    QTextEdit* currentOutput);
+      const Model::CompilationProfile &profile,
+      std::shared_ptr<MapDocument> document,
+      QTextEdit *currentOutput);
 
   void test(
-    const Model::CompilationProfile& profile,
-    std::shared_ptr<MapDocument> document,
-    QTextEdit* currentOutput);
+      const Model::CompilationProfile &profile,
+      std::shared_ptr<MapDocument> document,
+      QTextEdit *currentOutput);
 
   void terminate();
 
@@ -69,14 +65,14 @@ private:
   bool doIsRunning() const;
 
   void run(
-    const Model::CompilationProfile& profile,
-    std::shared_ptr<MapDocument> document,
-    QTextEdit* currentOutput,
-    bool test);
+      const Model::CompilationProfile &profile,
+      std::shared_ptr<MapDocument> document,
+      QTextEdit *currentOutput,
+      bool test);
 
 private:
   std::string buildWorkDir(
-    const Model::CompilationProfile& profile, std::shared_ptr<MapDocument> document);
+      const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document);
 
   void cleanup();
 

@@ -28,12 +28,9 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-namespace EntityPropertyKeys
-{
+namespace TrenchBroom {
+namespace Model {
+namespace EntityPropertyKeys {
 const std::string Classname = "classname";
 const std::string Origin = "origin";
 const std::string Wad = "wad";
@@ -67,8 +64,7 @@ const std::string ValveVersion = "mapversion";
 const std::string SoftMapBounds = "_tb_soft_map_bounds";
 } // namespace EntityPropertyKeys
 
-namespace EntityPropertyValues
-{
+namespace EntityPropertyValues {
 const std::string WorldspawnClassname = "worldspawn";
 const std::string NoClassname = "undefined";
 const std::string LayerClassname = "func_group";
@@ -84,8 +80,7 @@ const std::string LayerOmitFromExportValue = "1";
 
 kdl_reflect_impl(EntityPropertyConfig);
 
-bool isNumberedProperty(std::string_view prefix, std::string_view key)
-{
+bool isNumberedProperty(std::string_view prefix, std::string_view key) {
   // %* matches 0 or more digits
   const std::string pattern = std::string(prefix) + "%*";
   return kdl::cs::str_matches_glob(key, pattern);
@@ -94,128 +89,103 @@ bool isNumberedProperty(std::string_view prefix, std::string_view key)
 EntityProperty::EntityProperty() = default;
 
 EntityProperty::EntityProperty(std::string key, std::string value)
-  : m_key{std::move(key)}
-  , m_value{std::move(value)}
-{
+    : m_key{std::move(key)}, m_value{std::move(value)} {
 }
 
 kdl_reflect_impl(EntityProperty);
 
-const std::string& EntityProperty::key() const
-{
+const std::string &EntityProperty::key() const {
   return m_key;
 }
 
-const std::string& EntityProperty::value() const
-{
+const std::string &EntityProperty::value() const {
   return m_value;
 }
 
-bool EntityProperty::hasKey(std::string_view key) const
-{
+bool EntityProperty::hasKey(std::string_view key) const {
   return kdl::cs::str_is_equal(m_key, key);
 }
 
-bool EntityProperty::hasValue(const std::string_view value) const
-{
+bool EntityProperty::hasValue(const std::string_view value) const {
   return kdl::cs::str_is_equal(m_value, value);
 }
 
-bool EntityProperty::hasKeyAndValue(std::string_view key, std::string_view value) const
-{
+bool EntityProperty::hasKeyAndValue(std::string_view key, std::string_view value) const {
   return hasKey(key) && hasValue(value);
 }
 
-bool EntityProperty::hasPrefix(const std::string_view prefix) const
-{
+bool EntityProperty::hasPrefix(const std::string_view prefix) const {
   return kdl::cs::str_is_prefix(m_key, prefix);
 }
 
 bool EntityProperty::hasPrefixAndValue(
-  const std::string_view prefix, const std::string_view value) const
-{
+    const std::string_view prefix, const std::string_view value) const {
   return hasPrefix(prefix) && hasValue(value);
 }
 
-bool EntityProperty::hasNumberedPrefix(const std::string_view prefix) const
-{
+bool EntityProperty::hasNumberedPrefix(const std::string_view prefix) const {
   return isNumberedProperty(prefix, m_key);
 }
 
 bool EntityProperty::hasNumberedPrefixAndValue(
-  const std::string_view prefix, const std::string_view value) const
-{
+    const std::string_view prefix, const std::string_view value) const {
   return hasNumberedPrefix(prefix) && hasValue(value);
 }
 
-void EntityProperty::setKey(std::string key)
-{
+void EntityProperty::setKey(std::string key) {
   m_key = std::move(key);
 }
 
-void EntityProperty::setValue(std::string value)
-{
+void EntityProperty::setValue(std::string value) {
   m_value = std::move(value);
 }
 
-bool isLayer(const std::string& classname, const std::vector<EntityProperty>& properties)
-{
-  if (classname != EntityPropertyValues::LayerClassname)
-  {
+bool isLayer(const std::string &classname, const std::vector<EntityProperty> &properties) {
+  if (classname!=EntityPropertyValues::LayerClassname) {
     return false;
-  }
-  else
-  {
-    const std::string& groupType =
-      findEntityPropertyOrDefault(properties, EntityPropertyKeys::GroupType);
-    return groupType == EntityPropertyValues::GroupTypeLayer;
+  } else {
+    const std::string &groupType =
+        findEntityPropertyOrDefault(properties, EntityPropertyKeys::GroupType);
+    return groupType==EntityPropertyValues::GroupTypeLayer;
   }
 }
 
-bool isGroup(const std::string& classname, const std::vector<EntityProperty>& properties)
-{
-  if (classname != EntityPropertyValues::GroupClassname)
-  {
+bool isGroup(const std::string &classname, const std::vector<EntityProperty> &properties) {
+  if (classname!=EntityPropertyValues::GroupClassname) {
     return false;
-  }
-  else
-  {
-    const std::string& groupType =
-      findEntityPropertyOrDefault(properties, EntityPropertyKeys::GroupType);
-    return groupType == EntityPropertyValues::GroupTypeGroup;
+  } else {
+    const std::string &groupType =
+        findEntityPropertyOrDefault(properties, EntityPropertyKeys::GroupType);
+    return groupType==EntityPropertyValues::GroupTypeGroup;
   }
 }
 
-bool isWorldspawn(const std::string& classname)
-{
-  return classname == EntityPropertyValues::WorldspawnClassname;
+bool isWorldspawn(const std::string &classname) {
+  return classname==EntityPropertyValues::WorldspawnClassname;
 }
 
 std::vector<EntityProperty>::const_iterator findEntityProperty(
-  const std::vector<EntityProperty>& properties, const std::string& key)
-{
+    const std::vector<EntityProperty> &properties, const std::string &key) {
   return std::find_if(
-    std::begin(properties), std::end(properties), [&](const auto& property) {
-      return property.hasKey(key);
-    });
+      std::begin(properties), std::end(properties), [&](const auto &property) {
+        return property.hasKey(key);
+      });
 }
 
 std::vector<EntityProperty>::iterator findEntityProperty(
-  std::vector<EntityProperty>& properties, const std::string& key)
-{
+    std::vector<EntityProperty> &properties, const std::string &key) {
   return std::find_if(
-    std::begin(properties), std::end(properties), [&](const auto& property) {
-      return property.hasKey(key);
-    });
+      std::begin(properties), std::end(properties), [&](const auto &property) {
+        return property.hasKey(key);
+      });
 }
 
-const std::string& findEntityPropertyOrDefault(
-  const std::vector<EntityProperty>& properties,
-  const std::string& key,
-  const std::string& defaultValue)
-{
+const std::string &findEntityPropertyOrDefault(
+    const std::vector<EntityProperty> &properties,
+    const std::string &key,
+    const std::string &defaultValue) {
   const auto it = findEntityProperty(properties, key);
-  return it != std::end(properties) ? it->value() : defaultValue;
+  return it!=std::end(properties) ? it->value() : defaultValue;
 }
 
 } // namespace Model

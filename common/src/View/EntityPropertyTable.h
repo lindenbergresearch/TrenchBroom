@@ -22,42 +22,39 @@
 #include <QString>
 #include <QTableView>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 /**
  * Hardcoded shortcuts:
  * - Ctrl+Enter emits the `addRowShortcutTriggered` signal
  * - Delete or Backspace emits the `removeRowsShortcutTriggered` signal
  */
-class EntityPropertyTable : public QTableView
-{
-  Q_OBJECT
+class EntityPropertyTable : public QTableView {
+Q_OBJECT
 private:
   bool m_mousePressedOnSelectedCell;
 
 public:
-  explicit EntityPropertyTable(QWidget* parent = nullptr);
+  explicit EntityPropertyTable(QWidget *parent = nullptr);
 
   static QString insertRowShortcutString();
 
   static QString removeRowShortcutString();
 
-  void finishEditing(QWidget* editor);
+  void finishEditing(QWidget *editor);
 
 protected:
-  bool event(QEvent* event) override;
+  bool event(QEvent *event) override;
 
-  void keyPressEvent(QKeyEvent* event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
   QStyleOptionViewItem viewOptions() const override;
 
-  void keyboardSearch(const QString& search) override;
+  void keyboardSearch(const QString &search) override;
 
-  void mousePressEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent *event) override;
 
-  void mouseReleaseEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
 
 signals:
 

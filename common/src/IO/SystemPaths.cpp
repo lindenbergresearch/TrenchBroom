@@ -31,94 +31,80 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::IO::SystemPaths
-{
+namespace TrenchBroom::IO::SystemPaths {
 
 bool portableState = false;
 
-bool isPortable()
-{
+bool isPortable() {
   return portableState;
 }
 
-void setPortable()
-{
+void setPortable() {
   setPortable(true);
 }
 
-void setPortable(bool newState)
-{
+void setPortable(bool newState) {
   portableState = newState;
 }
 
-std::filesystem::path appDirectory()
-{
+std::filesystem::path appDirectory() {
   return IO::pathFromQString(QCoreApplication::applicationDirPath());
 }
 
-std::filesystem::path userDataDirectory()
-{
-  if (isPortable())
-  {
-    return appDirectory() / "config";
+std::filesystem::path userDataDirectory() {
+  if (isPortable()) {
+    return appDirectory()/"config";
   }
 #if defined __linux__ || defined __FreeBSD__
   // Compatibility with wxWidgets
   return IO::pathFromQString(QDir::homePath()) / ".TrenchBroom";
 #else
   return IO::pathFromQString(
-    QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+      QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 #endif
 }
 
-std::filesystem::path logFilePath()
-{
-  return userDataDirectory() / "TrenchBroom.log";
+std::filesystem::path logFilePath() {
+  return userDataDirectory()/"TrenchBroom.log";
 }
 
-std::filesystem::path findResourceFile(const std::filesystem::path& file)
-{
+std::filesystem::path findResourceFile(const std::filesystem::path &file) {
   // Special case for running debug builds on Linux, we want to search
   // next to the executable for resources
-  const auto relativeToExecutable = appDirectory() / file;
-  if (Disk::pathInfo(relativeToExecutable) == PathInfo::File)
-  {
+  const auto relativeToExecutable = appDirectory()/file;
+  if (Disk::pathInfo(relativeToExecutable)==PathInfo::File) {
     return relativeToExecutable;
   }
 
   // Compatibility with wxWidgets
-  const auto inUserDataDir = userDataDirectory() / file;
-  if (Disk::pathInfo(inUserDataDir) == PathInfo::File)
-  {
+  const auto inUserDataDir = userDataDirectory()/file;
+  if (Disk::pathInfo(inUserDataDir)==PathInfo::File) {
     return inUserDataDir;
   }
 
   return IO::pathFromQString(QStandardPaths::locate(
-    QStandardPaths::AppDataLocation,
-    IO::pathAsQString(file),
-    QStandardPaths::LocateOption::LocateFile));
+      QStandardPaths::AppDataLocation,
+      IO::pathAsQString(file),
+      QStandardPaths::LocateOption::LocateFile));
 }
 
 std::vector<std::filesystem::path> findResourceDirectories(
-  const std::filesystem::path& directory)
-{
+    const std::filesystem::path &directory) {
   auto result = std::vector<std::filesystem::path>{
-    // Special case for running debug builds on Linux
-    appDirectory() / directory,
-    // Compatibility with wxWidgets
-    userDataDirectory() / directory,
+      // Special case for running debug builds on Linux
+      appDirectory()/directory,
+      // Compatibility with wxWidgets
+      userDataDirectory()/directory,
   };
 
   const auto dirs = QStandardPaths::locateAll(
-    QStandardPaths::AppDataLocation,
-    IO::pathAsQString(directory),
-    QStandardPaths::LocateOption::LocateDirectory);
+      QStandardPaths::AppDataLocation,
+      IO::pathAsQString(directory),
+      QStandardPaths::LocateOption::LocateDirectory);
 
-  for (const auto& dir : dirs)
-  {
+  for (const auto &dir : dirs) {
     const auto path = IO::pathFromQString(dir);
-    if (std::find(result.begin(), result.end(), path) == result.end())
-    {
+    if (std::find(result.begin(), result.end(), path)==result.end()) {
       result.push_back(path);
     }
   }

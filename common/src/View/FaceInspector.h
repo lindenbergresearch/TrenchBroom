@@ -27,53 +27,49 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 class QSplitter;
 class QWidget;
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace View
-{
+namespace View {
 class CollapsibleTitledPanel;
 class FaceAttribsEditor;
 class GLContextManager;
 class MapDocument;
 class TextureBrowser;
 
-class FaceInspector : public TabBookPage
-{
- Q_OBJECT
+class FaceInspector : public TabBookPage {
+Q_OBJECT
 private:
- std::weak_ptr<MapDocument> m_document;
- QSplitter* m_splitter{nullptr};
- FaceAttribsEditor* m_faceAttribsEditor{nullptr};
- TextureBrowser* m_textureBrowser{nullptr};
- QWidget* m_textureBrowserInfo{nullptr};
+  std::weak_ptr<MapDocument> m_document;
+  QSplitter *m_splitter{nullptr};
+  FaceAttribsEditor *m_faceAttribsEditor{nullptr};
+  TextureBrowser *m_textureBrowser{nullptr};
+  QWidget *m_textureBrowserInfo{nullptr};
 
- NotifierConnection m_notifierConnection;
+  NotifierConnection m_notifierConnection;
 
 public:
- FaceInspector(
-   std::weak_ptr<MapDocument> document,
-   GLContextManager& contextManager,
-   QWidget* parent = nullptr);
- ~FaceInspector() override;
+  FaceInspector(
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
+  ~FaceInspector() override;
 
- bool cancelMouseDrag();
- void revealTexture(const Assets::Texture* texture);
+  bool cancelMouseDrag();
+  void revealTexture(const Assets::Texture *texture);
 
 private:
- void createGui(GLContextManager& contextManager);
- QWidget* createFaceAttribsEditor(GLContextManager& contextManager);
- QWidget* createTextureBrowser(GLContextManager& contextManager);
- QWidget* createTextureBrowserInfo();
+  void createGui(GLContextManager &contextManager);
+  QWidget *createFaceAttribsEditor(GLContextManager &contextManager);
+  QWidget *createTextureBrowser(GLContextManager &contextManager);
+  QWidget *createTextureBrowserInfo();
 
- void textureSelected(const Assets::Texture* texture);
+  void textureSelected(const Assets::Texture *texture);
 
- void connectObservers();
- void documentWasNewedOrOpened(MapDocument* document);
+  void connectObservers();
+  void documentWasNewedOrOpened(MapDocument *document);
 };
 } // namespace View
 } // namespace TrenchBroom

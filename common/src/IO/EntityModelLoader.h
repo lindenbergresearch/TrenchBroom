@@ -22,38 +22,34 @@
 #include <filesystem>
 #include <memory>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class EntityModel;
 }
 
-namespace IO
-{
+namespace IO {
 
-class EntityModelLoader
-{
+class EntityModelLoader {
 public:
   virtual ~EntityModelLoader();
   std::unique_ptr<Assets::EntityModel> initializeModel(
-    const std::filesystem::path& path, Logger& logger) const;
+      const std::filesystem::path &path, Logger &logger) const;
   void loadFrame(
-    const std::filesystem::path& path,
-    size_t frameIndex,
-    Assets::EntityModel& model,
-    Logger& logger) const;
+      const std::filesystem::path &path,
+      size_t frameIndex,
+      Assets::EntityModel &model,
+      Logger &logger) const;
 
 private:
   virtual std::unique_ptr<Assets::EntityModel> doInitializeModel(
-    const std::filesystem::path& path, Logger& logger) const = 0;
+      const std::filesystem::path &path, Logger &logger) const = 0;
   virtual void doLoadFrame(
-    const std::filesystem::path& path,
-    size_t frameIndex,
-    Assets::EntityModel& model,
-    Logger& logger) const = 0;
+      const std::filesystem::path &path,
+      size_t frameIndex,
+      Assets::EntityModel &model,
+      Logger &logger) const = 0;
 };
 } // namespace IO
 } // namespace TrenchBroom

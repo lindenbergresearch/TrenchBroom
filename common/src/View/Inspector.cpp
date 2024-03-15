@@ -32,19 +32,12 @@
 #include "View/TabBar.h"
 #include "View/TabBook.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 Inspector::Inspector(
-  std::weak_ptr<MapDocument> document, GLContextManager& contextManager, QWidget* parent)
-  : QWidget(parent)
-  , m_tabs(nullptr)
-  , m_mapInspector(nullptr)
-  , m_entityInspector(nullptr)
-  , m_faceInspector(nullptr)
-  , m_syncTabBarEventFilter(nullptr)
-{
+    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
+    : QWidget(parent), m_tabs(nullptr), m_mapInspector(nullptr), m_entityInspector(nullptr), m_faceInspector(nullptr),
+      m_syncTabBarEventFilter(nullptr) {
   setObjectName("Inspector_Widget");
 
   m_tabs = new QTabWidget(this);
@@ -56,38 +49,33 @@ Inspector::Inspector(
   m_tabs->addTab(m_faceInspector, "Face");
   m_tabs->addTab(m_entityInspector, "Entity");
 
-  auto* layout = new QVBoxLayout();
+  auto *layout = new QVBoxLayout();
   layout->setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::MediumVMargin,
-    0,
-    LayoutConstants::NarrowHMargin);
+      LayoutConstants::NarrowHMargin,
+      LayoutConstants::MediumVMargin,
+      0,
+      LayoutConstants::NarrowHMargin);
   layout->addWidget(m_tabs);
   setLayout(layout);
 }
 
-void Inspector::connectTopWidgets(MapViewBar* mapViewBar)
-{
-  if (m_syncTabBarEventFilter != nullptr)
-  {
+void Inspector::connectTopWidgets(MapViewBar *mapViewBar) {
+  if (m_syncTabBarEventFilter!=nullptr) {
     delete std::exchange(m_syncTabBarEventFilter, nullptr);
   }
 
   m_syncTabBarEventFilter = new SyncHeightEventFilter(mapViewBar, m_tabs->tabBar(), this);
 }
 
-void Inspector::switchToPage(const InspectorPage page)
-{
+void Inspector::switchToPage(const InspectorPage page) {
   m_tabs->setCurrentIndex(static_cast<int>(page));
 }
 
-bool Inspector::cancelMouseDrag()
-{
+bool Inspector::cancelMouseDrag() {
   return m_faceInspector->cancelMouseDrag();
 }
 
-FaceInspector* Inspector::faceInspector()
-{
+FaceInspector *Inspector::faceInspector() {
   return m_faceInspector;
 }
 } // namespace View

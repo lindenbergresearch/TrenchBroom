@@ -43,21 +43,15 @@
 
 #include <filesystem>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 const QString PreferenceDialog::WINDOW_TITLE = "Editor Preferences";
 const QSize PreferenceDialog::ICON_SIZE = QSize{32, 32};
-const int PreferenceDialog::ICON_WIDTH = int(float(ICON_SIZE.width()) * 2.5f);
+const int PreferenceDialog::ICON_WIDTH = int(float(ICON_SIZE.width())*2.5f);
 
-PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget* parent)
-  : QDialog(parent)
-  , m_document(std::move(document))
-  , m_toolBar(nullptr)
-  , m_stackedWidget(nullptr)
-  , m_buttonBox(nullptr)
-{
+PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent)
+    : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr),
+      m_buttonBox(nullptr) {
   setWindowTitle(WINDOW_TITLE);
   setWindowIconTB(this);
   createGui();
@@ -65,33 +59,29 @@ PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidge
   currentPane()->updateControls();
 }
 
-void PreferenceDialog::closeEvent(QCloseEvent* event)
-{
-  if (!currentPane()->validate())
-  {
+void PreferenceDialog::closeEvent(QCloseEvent *event) {
+  if (!currentPane()->validate()) {
     event->ignore();
     return;
   }
 
-  auto& prefs = PreferenceManager::instance();
-  if (!prefs.saveInstantly())
-  {
+  auto &prefs = PreferenceManager::instance();
+  if (!prefs.saveInstantly()) {
     prefs.discardChanges();
   }
 
   event->accept();
 }
 
-void PreferenceDialog::createGui()
-{
+void PreferenceDialog::createGui() {
   const auto gamesImage = IO::loadSVGIcon("GeneralPreferences.svg", ICON_SIZE.width());
   const auto viewImage = IO::loadSVGIcon("ViewPreferences.svg", ICON_SIZE.width());
   const auto colorsImage = IO::loadSVGIcon("ColorPreferences.svg", ICON_SIZE.width());
   const auto mouseImage = IO::loadSVGIcon("MousePreferences.svg", ICON_SIZE.width());
   const auto keyboardImage =
-    IO::loadSVGIcon("KeyboardPreferences.svg", ICON_SIZE.width());
+      IO::loadSVGIcon("KeyboardPreferences.svg", ICON_SIZE.width());
   const auto preferencesImage =
-    IO::loadSVGIcon("AdvancedPreferences.svg", ICON_SIZE.width());
+      IO::loadSVGIcon("AdvancedPreferences.svg", ICON_SIZE.width());
 
   m_toolBar = new QToolBar();
   m_toolBar->setObjectName("ToolBar_PreferenceDialog");
@@ -120,20 +110,19 @@ void PreferenceDialog::createGui()
     highlightToolButton("Mouse");
   });
   m_toolButtonActions["Keyboard"] =
-    m_toolBar->addAction(keyboardImage, "Keyboard", [this]() {
-      switchToPane(PrefPane_Keyboard);
-      highlightToolButton("Keyboard");
-    });
+      m_toolBar->addAction(keyboardImage, "Keyboard", [this]() {
+        switchToPane(PrefPane_Keyboard);
+        highlightToolButton("Keyboard");
+      });
 
   m_toolButtonActions["Advanced"] =
-    m_toolBar->addAction(preferencesImage, "Advanced", [this]() {
-      switchToPane(PrefPane_Advanced);
-      highlightToolButton("Advanced");
-    });
+      m_toolBar->addAction(preferencesImage, "Advanced", [this]() {
+        switchToPane(PrefPane_Advanced);
+        highlightToolButton("Advanced");
+      });
 
   // Don't display tooltips for pane switcher buttons...
-  for (auto* button : m_toolBar->findChildren<QToolButton*>())
-  {
+  for (auto *button : m_toolBar->findChildren<QToolButton *>()) {
     button->installEventFilter(this);
     button->setCheckable(true);
     button->setMinimumWidth(ICON_WIDTH);
@@ -152,14 +141,14 @@ void PreferenceDialog::createGui()
   highlightToolButton("Games");
 
   m_buttonBox = new QDialogButtonBox(
-    QDialogButtonBox::RestoreDefaults
+      QDialogButtonBox::RestoreDefaults
 #if !defined __APPLE__
       | QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel
 #endif
-    ,
-    this);
+      ,
+      this);
 
-  auto* resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
+  auto *resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
   connect(resetButton, &QPushButton::clicked, this, &PreferenceDialog::resetToDefaults);
 
 #if !defined __APPLE__
@@ -180,7 +169,7 @@ void PreferenceDialog::createGui()
     });
 #endif
 
-  auto* layout = new QVBoxLayout();
+  auto *layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(layout, Qt::AlignVCenter);
   layout->setSpacing(0);
@@ -192,65 +181,54 @@ void PreferenceDialog::createGui()
   setLayout(layout);
 }
 
-void PreferenceDialog::switchToPane(const PrefPane pane)
-{
-  if (!currentPane()->validate())
-  {
+void PreferenceDialog::switchToPane(const PrefPane pane) {
+  if (!currentPane()->validate()) {
     return;
   }
 
   m_stackedWidget->setCurrentIndex(pane);
   currentPane()->updateControls();
 
-  auto* resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
+  auto *resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
   resetButton->setEnabled(currentPane()->canResetToDefaults());
 }
 
-PreferencePane* PreferenceDialog::currentPane() const
-{
-  return static_cast<PreferencePane*>(m_stackedWidget->currentWidget());
+PreferencePane *PreferenceDialog::currentPane() const {
+  return static_cast<PreferencePane *>(m_stackedWidget->currentWidget());
 }
 
-void PreferenceDialog::resetToDefaults()
-{
+void PreferenceDialog::resetToDefaults() {
   currentPane()->resetToDefaults();
 }
 
 // Don't display tooltips for pane switcher buttons...
-bool PreferenceDialog::eventFilter(QObject* o, QEvent* e)
-{
-  if (e->type() == QEvent::ToolTip)
-  {
+bool PreferenceDialog::eventFilter(QObject *o, QEvent *e) {
+  if (e->type()==QEvent::ToolTip) {
     return true;
   }
 
   return QDialog::eventFilter(o, e);
 }
 
-void PreferenceDialog::highlightToolButton(QString buttonName, bool highlighted)
-{
+void PreferenceDialog::highlightToolButton(QString buttonName, bool highlighted) {
   auto palette = QPalette{};
 
   // reset
-  for (std::pair<const QString, QAction*> item : m_toolButtonActions)
-  {
+  for (std::pair<const QString, QAction *> item : m_toolButtonActions) {
     //  palette.setColor(QPalette::Active, QPalette::ButtonText,
     //  toQColor(pref(Preferences::UITextColor)));
-    QToolButton* toolButton =
-      dynamic_cast<QToolButton*>(m_toolBar->widgetForAction(item.second));
+    QToolButton *toolButton =
+        dynamic_cast<QToolButton *>(m_toolBar->widgetForAction(item.second));
 
-    if (toolButton)
-    {
+    if (toolButton) {
       toolButton->setChecked(false);
     }
   }
 
-  QToolButton* toolButton = dynamic_cast<QToolButton*>(
-    m_toolBar->widgetForAction(m_toolButtonActions[buttonName]));
-  if (toolButton)
-  {
-    if (highlighted)
-    {
+  QToolButton *toolButton = dynamic_cast<QToolButton *>(
+      m_toolBar->widgetForAction(m_toolButtonActions[buttonName]));
+  if (toolButton) {
+    if (highlighted) {
       toolButton->setChecked(true);
       setWindowTitle(WINDOW_TITLE + " - " + buttonName);
     }

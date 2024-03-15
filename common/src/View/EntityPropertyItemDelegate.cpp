@@ -32,44 +32,34 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 EntityPropertyItemDelegate::EntityPropertyItemDelegate(
-  EntityPropertyTable* table,
-  const EntityPropertyModel* model,
-  const QSortFilterProxyModel* proxyModel,
-  QWidget* parent)
-  : QStyledItemDelegate(parent)
-  , m_table(table)
-  , m_model(model)
-  , m_proxyModel(proxyModel)
-{
+    EntityPropertyTable *table,
+    const EntityPropertyModel *model,
+    const QSortFilterProxyModel *proxyModel,
+    QWidget *parent)
+    : QStyledItemDelegate(parent), m_table(table), m_model(model), m_proxyModel(proxyModel) {
 }
 
-QWidget* EntityPropertyItemDelegate::createEditor(
-  QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
-{
-  auto* editor = QStyledItemDelegate::createEditor(parent, option, index);
-  auto* lineEdit = dynamic_cast<QLineEdit*>(editor);
-  if (lineEdit != nullptr)
-  {
+QWidget *EntityPropertyItemDelegate::createEditor(
+    QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+  auto *editor = QStyledItemDelegate::createEditor(parent, option, index);
+  auto *lineEdit = dynamic_cast<QLineEdit *>(editor);
+  if (lineEdit!=nullptr) {
     setupCompletions(lineEdit, index);
   }
   return editor;
 }
 
 void EntityPropertyItemDelegate::setEditorData(
-  QWidget* editor, const QModelIndex& index) const
-{
+    QWidget *editor, const QModelIndex &index) const {
   QStyledItemDelegate::setEditorData(editor, index);
 
   // show the completions immediately when the editor is opened if the editor's text is
   // empty
-  auto* lineEdit = dynamic_cast<QLineEdit*>(editor);
-  if (lineEdit != nullptr)
-  {
+  auto *lineEdit = dynamic_cast<QLineEdit *>(editor);
+  if (lineEdit!=nullptr) {
     // Delay to work around https://github.com/TrenchBroom/TrenchBroom/issues/3082
     // Briefly, when typing the first letter of the text you want to enter to open the
     // cell editor, when setEditorData() runs, the letter has not been inserted into the
@@ -77,11 +67,9 @@ void EntityPropertyItemDelegate::setEditorData(
     // editor to close, which is issue #3082 and quite annoying. Only happens on Linux.
     QTimer::singleShot(0, lineEdit, [lineEdit]() {
       const QString text = lineEdit->text();
-      if (text.isEmpty())
-      {
-        QCompleter* completer = lineEdit->completer();
-        if (completer != nullptr)
-        {
+      if (text.isEmpty()) {
+        QCompleter *completer = lineEdit->completer();
+        if (completer!=nullptr) {
           completer->setCompletionPrefix("");
           completer->complete();
         }
@@ -91,29 +79,26 @@ void EntityPropertyItemDelegate::setEditorData(
 }
 
 void EntityPropertyItemDelegate::setupCompletions(
-  QLineEdit* lineEdit, const QModelIndex& index) const
-{
-  auto* completer = new QCompleter(getCompletions(index), lineEdit);
+    QLineEdit *lineEdit, const QModelIndex &index) const {
+  auto *completer = new QCompleter(getCompletions(index), lineEdit);
   completer->setCaseSensitivity(Qt::CaseInsensitive);
   completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
   lineEdit->setCompleter(completer);
 
   connect(
-    completer,
-    QOverload<const QString&>::of(&QCompleter::activated),
-    this,
-    [this, lineEdit](const QString& /* value */) { m_table->finishEditing(lineEdit); });
+      completer,
+      QOverload<const QString &>::of(&QCompleter::activated),
+      this,
+      [this, lineEdit](const QString & /* value */) { m_table->finishEditing(lineEdit); });
 
   connect(lineEdit, &QLineEdit::returnPressed, this, [this, lineEdit, completer]() {
-    if (completer->popup()->isVisible())
-    {
+    if (completer->popup()->isVisible()) {
       m_table->finishEditing(lineEdit);
     }
   });
 }
 
-QStringList EntityPropertyItemDelegate::getCompletions(const QModelIndex& index) const
-{
+QStringList EntityPropertyItemDelegate::getCompletions(const QModelIndex &index) const {
   auto completions = m_model->getCompletions(m_proxyModel->mapToSource(index));
   completions.sort(Qt::CaseInsensitive);
   return completions;

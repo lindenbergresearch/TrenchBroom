@@ -24,10 +24,8 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class FontManager;
 
 class ShaderManager;
@@ -35,10 +33,8 @@ class ShaderManager;
 class VboManager;
 } // namespace Renderer
 
-namespace View
-{
-class GLContextManager
-{
+namespace View {
+class GLContextManager {
 public:
   static std::string GLVendor;
   static std::string GLRenderer;
@@ -64,13 +60,13 @@ public:
 
   bool initialize();
 
-  Renderer::VboManager& vboManager();
+  Renderer::VboManager &vboManager();
 
-  Renderer::FontManager& fontManager();
+  Renderer::FontManager &fontManager();
 
-  Renderer::ShaderManager& shaderManager();
+  Renderer::ShaderManager &shaderManager();
 
-  deleteCopyAndMove(GLContextManager);
+deleteCopyAndMove(GLContextManager);
 };
 } // namespace View
 } // namespace TrenchBroom

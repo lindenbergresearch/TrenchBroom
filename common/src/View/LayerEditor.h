@@ -26,51 +26,47 @@
 
 class QAbstractButton;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class LayerNode;
 }
 
-namespace View
-{
+namespace View {
 class LayerListBox;
 class MapDocument;
 
-class LayerEditor : public QWidget
-{
-  Q_OBJECT
+class LayerEditor : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
-  LayerListBox* m_layerList;
+  LayerListBox *m_layerList;
 
-  QAbstractButton* m_addLayerButton;
-  QAbstractButton* m_removeLayerButton;
-  QAbstractButton* m_moveLayerUpButton;
-  QAbstractButton* m_moveLayerDownButton;
+  QAbstractButton *m_addLayerButton;
+  QAbstractButton *m_removeLayerButton;
+  QAbstractButton *m_moveLayerUpButton;
+  QAbstractButton *m_moveLayerDownButton;
 
 public:
-  explicit LayerEditor(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  explicit LayerEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
-  void onSetCurrentLayer(Model::LayerNode* layer);
-  bool canSetCurrentLayer(Model::LayerNode* layer) const;
+  void onSetCurrentLayer(Model::LayerNode *layer);
+  bool canSetCurrentLayer(Model::LayerNode *layer) const;
 
-  void onLayerRightClick(Model::LayerNode* layer);
+  void onLayerRightClick(Model::LayerNode *layer);
 
   void onMoveSelectionToLayer();
   bool canMoveSelectionToLayer() const;
 
   bool canToggleLayerVisible() const;
-  void toggleLayerVisible(Model::LayerNode* layer);
+  void toggleLayerVisible(Model::LayerNode *layer);
 
   bool canToggleLayerLocked() const;
-  void toggleLayerLocked(Model::LayerNode* layer);
+  void toggleLayerLocked(Model::LayerNode *layer);
 
-  void toggleOmitLayerFromExport(Model::LayerNode* layer);
+  void toggleOmitLayerFromExport(Model::LayerNode *layer);
 
-  void isolateLayer(Model::LayerNode* layer);
+  void isolateLayer(Model::LayerNode *layer);
 
   void onSelectAllInLayer();
   bool canSelectAllInLayer() const;
@@ -96,10 +92,10 @@ private:
   bool canUnlockAllLayers() const;
 
   bool canMoveLayer(int direction) const;
-  void moveLayer(Model::LayerNode* layer, int direction);
+  void moveLayer(Model::LayerNode *layer, int direction);
 
 private:
-  Model::LayerNode* findVisibleAndUnlockedLayer(const Model::LayerNode* except) const;
+  Model::LayerNode *findVisibleAndUnlockedLayer(const Model::LayerNode *except) const;
   void createGui();
 private slots:
   void updateButtons();

@@ -29,114 +29,93 @@
 
 #include <cassert>
 
-namespace TrenchBroom
-{
-namespace View
-{
-MoveObjectsToolController::MoveObjectsToolController(MoveObjectsTool& tool)
-  : m_tool(tool)
-{
+namespace TrenchBroom {
+namespace View {
+MoveObjectsToolController::MoveObjectsToolController(MoveObjectsTool &tool)
+    : m_tool(tool) {
 }
 
 MoveObjectsToolController::~MoveObjectsToolController() {}
 
-Tool& MoveObjectsToolController::tool()
-{
+Tool &MoveObjectsToolController::tool() {
   return m_tool;
 }
 
-const Tool& MoveObjectsToolController::tool() const
-{
+const Tool &MoveObjectsToolController::tool() const {
   return m_tool;
 }
 
-namespace
-{
-class MoveObjectsDragDelegate : public MoveHandleDragTrackerDelegate
-{
+namespace {
+class MoveObjectsDragDelegate : public MoveHandleDragTrackerDelegate {
 private:
-  MoveObjectsTool& m_tool;
+  MoveObjectsTool &m_tool;
 
 public:
-  MoveObjectsDragDelegate(MoveObjectsTool& tool)
-    : m_tool{tool}
-  {
+  MoveObjectsDragDelegate(MoveObjectsTool &tool)
+      : m_tool{tool} {
   }
 
   DragStatus move(
-    const InputState& inputState,
-    const DragState& dragState,
-    const vm::vec3& proposedHandlePosition) override
-  {
+      const InputState &inputState,
+      const DragState &dragState,
+      const vm::vec3 &proposedHandlePosition) override {
     switch (
-      m_tool.move(inputState, proposedHandlePosition - dragState.currentHandlePosition))
-    {
-    case MoveObjectsTool::MR_Continue:
-      return DragStatus::Continue;
-    case MoveObjectsTool::MR_Deny:
-      return DragStatus::Deny;
-    case MoveObjectsTool::MR_Cancel:
-      return DragStatus::End;
+        m_tool.move(inputState, proposedHandlePosition - dragState.currentHandlePosition)) {
+    case MoveObjectsTool::MR_Continue:return DragStatus::Continue;
+    case MoveObjectsTool::MR_Deny:return DragStatus::Deny;
+    case MoveObjectsTool::MR_Cancel:return DragStatus::End;
       switchDefault();
     }
   }
 
-  void end(const InputState& inputState, const DragState&) override
-  {
+  void end(const InputState &inputState, const DragState &) override {
     m_tool.endMove(inputState);
   }
 
-  void cancel(const DragState&) override { m_tool.cancelMove(); }
+  void cancel(const DragState &) override { m_tool.cancelMove(); }
 
   void setRenderOptions(
-    const InputState&, Renderer::RenderContext& renderContext) const override
-  {
+      const InputState &, Renderer::RenderContext &renderContext) const override {
     renderContext.setForceShowSelectionGuide();
   }
 
   DragHandleSnapper makeDragHandleSnapper(
-    const InputState&, const SnapMode) const override
-  {
+      const InputState &, const SnapMode) const override {
     return makeRelativeHandleSnapper(m_tool.grid());
   }
 };
 } // namespace
 
 std::unique_ptr<DragTracker> MoveObjectsToolController::acceptMouseDrag(
-  const InputState& inputState)
-{
+    const InputState &inputState) {
   using namespace Model::HitFilters;
 
   if (
-    !inputState.modifierKeysPressed(ModifierKeys::MKNone)
-    && !inputState.modifierKeysPressed(ModifierKeys::MKAlt)
-    && !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd)
-    && !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt))
-  {
+      !inputState.modifierKeysPressed(ModifierKeys::MKNone)
+          && !inputState.modifierKeysPressed(ModifierKeys::MKAlt)
+          && !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd)
+          && !inputState.modifierKeysPressed(ModifierKeys::MKCtrlCmd | ModifierKeys::MKAlt)) {
     return nullptr;
   }
 
   // The transitivelySelected() lets the hit query match entities/brushes inside a
   // selected group, even though the entities/brushes aren't selected themselves.
 
-  const Model::Hit& hit =
-    inputState.pickResult().first(type(Model::nodeHitType()) && transitivelySelected());
-  if (!hit.isMatch())
-  {
+  const Model::Hit &hit =
+      inputState.pickResult().first(type(Model::nodeHitType()) && transitivelySelected());
+  if (!hit.isMatch()) {
     return nullptr;
   }
 
-  if (!m_tool.startMove(inputState))
-  {
+  if (!m_tool.startMove(inputState)) {
     return nullptr;
   }
 
   return createMoveHandleDragTracker(
-    MoveObjectsDragDelegate{m_tool}, inputState, hit.hitPoint(), hit.hitPoint());
+      MoveObjectsDragDelegate{m_tool}, inputState, hit.hitPoint(), hit.hitPoint());
 }
 
-bool MoveObjectsToolController::cancel()
-{
+bool MoveObjectsToolController::cancel() {
   return false;
 }
 } // namespace View

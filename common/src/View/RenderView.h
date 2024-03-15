@@ -35,10 +35,8 @@
 #undef Status
 #undef CursorShape
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class FontManager;
 
 class ShaderManager;
@@ -46,20 +44,16 @@ class ShaderManager;
 class VboManager;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class GLContextManager;
 
-
-struct BoxFilter
-{
-  std::vector<QPointF*> samples;
+struct BoxFilter {
+  std::vector<QPointF *> samples;
   size_t size, length;
   size_t index;
 
   explicit BoxFilter(size_t size, size_t length = 0)
-    : size(size)
-  {
+      : size(size) {
     samples.resize(size);
     index = 0;
 
@@ -71,15 +65,14 @@ struct BoxFilter
 
   void reset();
 
-  void add(QPointF* point);
+  void add(QPointF *point);
 };
 
-class RenderView : public QOpenGLWidget, public InputEventProcessor
-{
-  Q_OBJECT
+class RenderView : public QOpenGLWidget, public InputEventProcessor {
+Q_OBJECT
 private:
   Color m_focusColor, m_frameColor;
-  GLContextManager* m_glContext;
+  GLContextManager *m_glContext;
   InputEventRecorder m_eventRecorder;
   BoxFilter boxFilter;
   QTimer m_timer; // Timer to control the frame rate
@@ -96,37 +89,37 @@ protected:
   std::string m_currentFPS;
 
 protected:
-  explicit RenderView(GLContextManager& contextManager, QWidget* parent = nullptr);
+  explicit RenderView(GLContextManager &contextManager, QWidget *parent = nullptr);
 
 public:
   ~RenderView() override;
 
 protected: // QWindow overrides
-  void keyPressEvent(QKeyEvent* event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
-  void keyReleaseEvent(QKeyEvent* event) override;
+  void keyReleaseEvent(QKeyEvent *event) override;
 
-  void mouseDoubleClickEvent(QMouseEvent* event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-  void mouseMoveEvent(QMouseEvent* event) override;
+  void mouseMoveEvent(QMouseEvent *event) override;
 
-  void mousePressEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent *event) override;
 
-  void mouseReleaseEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
 
-  void wheelEvent(QWheelEvent* event) override;
+  void wheelEvent(QWheelEvent *event) override;
 
   void updateEvent();
 
   QMouseEvent mouseEventWithFullPrecisionLocalPos(
-    const QWidget* widget, const QMouseEvent* event);
+      const QWidget *widget, const QMouseEvent *event);
 
 protected:
-  Renderer::VboManager& vboManager();
+  Renderer::VboManager &vboManager();
 
-  Renderer::FontManager& fontManager();
+  Renderer::FontManager &fontManager();
 
-  Renderer::ShaderManager& shaderManager();
+  Renderer::ShaderManager &shaderManager();
 
   int depthBits() const;
 
@@ -153,7 +146,7 @@ protected:
   virtual bool doInitializeGL();
 
 private:
-  virtual const Color& getBackgroundColor();
+  virtual const Color &getBackgroundColor();
 
   virtual void doUpdateViewport(int x, int y, int width, int height);
 

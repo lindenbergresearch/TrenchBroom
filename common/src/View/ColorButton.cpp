@@ -25,23 +25,18 @@
 
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
-ColorButton::ColorButton(QWidget* parent)
-  : QWidget(parent)
-  , m_colorIndicator(nullptr)
-  , m_button(nullptr)
-{
+namespace TrenchBroom {
+namespace View {
+ColorButton::ColorButton(QWidget *parent)
+    : QWidget(parent), m_colorIndicator(nullptr), m_button(nullptr) {
   m_colorIndicator = new QWidget();
   m_button = new QPushButton("...");
 
   m_colorIndicator->setSizePolicy(
-    QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
+      QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
   m_colorIndicator->setMinimumSize(20, 15);
 
-  auto* layout = new QHBoxLayout();
+  auto *layout = new QHBoxLayout();
   layout->setContentsMargins(QMargins());
   layout->setSpacing(LayoutConstants::MediumHMargin);
   layout->addWidget(m_colorIndicator);
@@ -51,23 +46,20 @@ ColorButton::ColorButton(QWidget* parent)
 
   connect(m_button, &QPushButton::clicked, this, [this]() {
     const QColor color = QColorDialog::getColor(m_color, this);
-    if (color.isValid())
-    {
+    if (color.isValid()) {
       setColor(color);
       emit colorChangedByUser(m_color);
     }
   });
 }
 
-void ColorButton::setColor(const QColor& color)
-{
+void ColorButton::setColor(const QColor &color) {
   const auto borderColor = palette().color(QPalette::Active, QPalette::Mid);
-  if (color != m_color)
-  {
+  if (color!=m_color) {
     m_color = color;
     m_colorIndicator->setStyleSheet(
-      "QWidget { background-color: " + m_color.name()
-      + "; border-radius: 3px; border: 1px solid " + borderColor.name() + ";}");
+        "QWidget { background-color: " + m_color.name()
+            + "; border-radius: 3px; border: 1px solid " + borderColor.name() + ";}");
 
     update();
     emit colorChanged(m_color);

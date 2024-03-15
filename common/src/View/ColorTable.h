@@ -25,13 +25,10 @@
 
 class QColor;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class ColorTable : public QWidget
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class ColorTable : public QWidget {
+Q_OBJECT
 private:
   int m_cellSize;
   int m_cellSpacing;
@@ -39,16 +36,16 @@ private:
   std::vector<QColor> m_selectedColors;
 
 public:
-  explicit ColorTable(int cellSize, QWidget* parent = nullptr);
+  explicit ColorTable(int cellSize, QWidget *parent = nullptr);
 
-  void setColors(const std::vector<QColor>& colors);
+  void setColors(const std::vector<QColor> &colors);
 
-  void setSelection(const std::vector<QColor>& colors);
+  void setSelection(const std::vector<QColor> &colors);
 
 protected: // QWidget overrides
-  void paintEvent(QPaintEvent* event) override;
+  void paintEvent(QPaintEvent *event) override;
 
-  void mouseReleaseEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
 
 public: // QWidget overrides
   bool hasHeightForWidth() const override;

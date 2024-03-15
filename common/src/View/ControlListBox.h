@@ -27,30 +27,27 @@ class QListWidget;
 
 class QListWidgetItem;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class ControlListBoxItemRenderer : public QWidget
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class ControlListBoxItemRenderer : public QWidget {
+Q_OBJECT
 protected:
   size_t m_index;
 
 public:
-  explicit ControlListBoxItemRenderer(QWidget* parent = nullptr);
+  explicit ControlListBoxItemRenderer(QWidget *parent = nullptr);
 
   ~ControlListBoxItemRenderer() override;
 
   void setIndex(size_t index);
 
 protected:
-  void mouseDoubleClickEvent(QMouseEvent* event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 public:
   virtual void updateItem();
 
-  virtual void setSelected(bool selected, const QListWidget* listWidget);
+  virtual void setSelected(bool selected, const QListWidget *listWidget);
 
 signals:
 
@@ -60,47 +57,45 @@ signals:
 /**
  * Wraps a renderer and adds a separator line at the bottom.
  */
-class ControlListBoxItemRendererWrapper : public QWidget
-{
-  Q_OBJECT
+class ControlListBoxItemRendererWrapper : public QWidget {
+Q_OBJECT
 private:
-  ControlListBoxItemRenderer* m_renderer;
+  ControlListBoxItemRenderer *m_renderer;
 
 public:
   explicit ControlListBoxItemRendererWrapper(
-    ControlListBoxItemRenderer* renderer, bool showSeparator, QWidget* parent = nullptr);
+      ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr);
 
-  ControlListBoxItemRenderer* renderer();
+  ControlListBoxItemRenderer *renderer();
 
-  const ControlListBoxItemRenderer* renderer() const;
+  const ControlListBoxItemRenderer *renderer() const;
 };
 
-class ControlListBox : public QWidget
-{
-  Q_OBJECT
+class ControlListBox : public QWidget {
+Q_OBJECT
 public:
   static constexpr auto LabelColorShouldNotUpdateWhenSelected =
-    "LabelColorShouldNotUpdateWhenSelected";
+      "LabelColorShouldNotUpdateWhenSelected";
 
 private:
-  QListWidget* m_listWidget;
-  QWidget* m_emptyTextContainer;
-  QLabel* m_emptyTextLabel;
+  QListWidget *m_listWidget;
+  QWidget *m_emptyTextContainer;
+  QLabel *m_emptyTextLabel;
   QMargins m_itemMargins;
   bool m_showSeparator;
 
 public:
   ControlListBox(
-    const QString& emptyText,
-    const QMargins& itemMargins,
-    bool showSeparator,
-    QWidget* parent = nullptr);
+      const QString &emptyText,
+      const QMargins &itemMargins,
+      bool showSeparator,
+      QWidget *parent = nullptr);
 
-  ControlListBox(const QString& emptyText, bool showSeparator, QWidget* parent = nullptr);
+  ControlListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
-  void setEmptyText(const QString& emptyText);
+  void setEmptyText(const QString &emptyText);
 
-  void setItemMargins(const QMargins& itemMargins);
+  void setItemMargins(const QMargins &itemMargins);
 
   int count() const;
 
@@ -124,22 +119,22 @@ protected:
    */
   void updateItems();
 
-  const ControlListBoxItemRenderer* renderer(int i) const;
+  const ControlListBoxItemRenderer *renderer(int i) const;
 
-  ControlListBoxItemRenderer* renderer(int i);
+  ControlListBoxItemRenderer *renderer(int i);
 
-  ControlListBoxItemRendererWrapper* wrapper(int i) const;
+  ControlListBoxItemRendererWrapper *wrapper(int i) const;
 
-  ControlListBoxItemRendererWrapper* wrapper(int i);
+  ControlListBoxItemRendererWrapper *wrapper(int i);
 
 private:
-  void addItemRenderer(ControlListBoxItemRenderer* renderer);
+  void addItemRenderer(ControlListBoxItemRenderer *renderer);
 
 private:
   virtual size_t itemCount() const = 0;
 
-  virtual ControlListBoxItemRenderer* createItemRenderer(
-    QWidget* parent, size_t index) = 0;
+  virtual ControlListBoxItemRenderer *createItemRenderer(
+      QWidget *parent, size_t index) = 0;
 
   virtual void selectedRowChanged(int index);
 

@@ -22,10 +22,8 @@
 #include <functional>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 /**
  * A stack of actions (C++ callables) that can be repeatedly executed as a whole.
  *
@@ -36,8 +34,7 @@ namespace View
  * The stack can be cleared immediately or it can be primed to be cleared automatically
  * when the next action is pushed to the stack.
  */
-class RepeatStack
-{
+class RepeatStack {
 public:
   using RepeatableAction = std::function<void()>;
   using Transaction = std::vector<RepeatableAction>;

@@ -32,10 +32,8 @@
 #include <iosfwd>
 #include <string>
 
-namespace TrenchBroom::IO
-{
-namespace ELToken
-{
+namespace TrenchBroom::IO {
+namespace ELToken {
 using Type = uint64_t;
 constexpr auto Name = Type{1} << 1;
 constexpr auto String = Type{1} << 2;
@@ -79,32 +77,29 @@ constexpr auto Literal = String | Number | Boolean | Null;
 constexpr auto UnaryOperator = Addition | Subtraction | LogicalNegation | BitwiseNegation;
 constexpr auto SimpleTerm = Name | Literal | OParen | OBracket | OBrace | UnaryOperator;
 constexpr auto CompoundTerm =
-  Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr
-  | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd
-  | BitwiseXOr | BitwiseOr | BitwiseShiftLeft | BitwiseShiftRight;
+    Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr
+        | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd
+        | BitwiseXOr | BitwiseOr | BitwiseShiftLeft | BitwiseShiftRight;
 } // namespace ELToken
 
-class ELTokenizer : public Tokenizer<ELToken::Type>
-{
+class ELTokenizer : public Tokenizer<ELToken::Type> {
 private:
-  const std::string& NumberDelim() const;
-  const std::string& IntegerDelim() const;
+  const std::string &NumberDelim() const;
+  const std::string &IntegerDelim() const;
 
 public:
   ELTokenizer(std::string_view str, size_t line, size_t column);
 
 public:
-  void appendUntil(const std::string& pattern, std::stringstream& str);
+  void appendUntil(const std::string &pattern, std::stringstream &str);
 
 private:
   Token emitToken() override;
 };
 
-class ELParser : public Parser<ELToken::Type>
-{
+class ELParser : public Parser<ELToken::Type> {
 public:
-  enum class Mode
-  {
+  enum class Mode {
     Strict,
     Lenient
   };
@@ -118,8 +113,8 @@ public:
   ELParser(ELParser::Mode mode, std::string_view str, size_t line = 1, size_t column = 1);
   TokenizerState tokenizerState() const;
 
-  static EL::Expression parseStrict(const std::string& str);
-  static EL::Expression parseLenient(const std::string& str);
+  static EL::Expression parseStrict(const std::string &str);
+  static EL::Expression parseLenient(const std::string &str);
 
   EL::Expression parse();
 

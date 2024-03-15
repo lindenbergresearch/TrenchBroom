@@ -33,18 +33,12 @@
 
 #include <kdl/memory_utils.h>
 
-namespace TrenchBroom
-{
-namespace View
-{
-IssueBrowser::IssueBrowser(std::weak_ptr<MapDocument> document, QWidget* parent)
-  : TabBookPage(parent)
-  , m_document(document)
-  , m_view(new IssueBrowserView(m_document))
-  , m_showHiddenIssuesCheckBox(nullptr)
-  , m_filterEditor(nullptr)
-{
-  auto* sizer = new QVBoxLayout();
+namespace TrenchBroom {
+namespace View {
+IssueBrowser::IssueBrowser(std::weak_ptr<MapDocument> document, QWidget *parent)
+    : TabBookPage(parent), m_document(document), m_view(new IssueBrowserView(m_document)),
+      m_showHiddenIssuesCheckBox(nullptr), m_filterEditor(nullptr) {
+  auto *sizer = new QVBoxLayout();
   sizer->setContentsMargins(0, 0, 0, 0);
   sizer->addWidget(m_view);
   setLayout(sizer);
@@ -52,22 +46,21 @@ IssueBrowser::IssueBrowser(std::weak_ptr<MapDocument> document, QWidget* parent)
   connectObservers();
 }
 
-QWidget* IssueBrowser::createTabBarPage(QWidget* parent)
-{
+QWidget *IssueBrowser::createTabBarPage(QWidget *parent) {
 
-  auto* barPage = new QWidget(parent);
+  auto *barPage = new QWidget(parent);
   m_showHiddenIssuesCheckBox = new QCheckBox("Show hidden issues");
   connect(
-    m_showHiddenIssuesCheckBox,
-    &QCheckBox::stateChanged,
-    this,
-    &IssueBrowser::showHiddenIssuesChanged);
+      m_showHiddenIssuesCheckBox,
+      &QCheckBox::stateChanged,
+      this,
+      &IssueBrowser::showHiddenIssuesChanged);
 
   m_filterEditor = new FlagsPopupEditor(1, nullptr, "Filter", false);
   connect(
-    m_filterEditor, &FlagsPopupEditor::flagChanged, this, &IssueBrowser::filterChanged);
+      m_filterEditor, &FlagsPopupEditor::flagChanged, this, &IssueBrowser::filterChanged);
 
-  auto* barPageSizer = new QHBoxLayout();
+  auto *barPageSizer = new QHBoxLayout();
   barPageSizer->setContentsMargins(0, 0, 0, 0);
   barPageSizer->addWidget(m_showHiddenIssuesCheckBox, 0, Qt::AlignVCenter);
   barPageSizer->addWidget(m_filterEditor, 0, Qt::AlignVCenter);
@@ -76,78 +69,68 @@ QWidget* IssueBrowser::createTabBarPage(QWidget* parent)
   return barPage;
 }
 
-void IssueBrowser::connectObservers()
-{
+void IssueBrowser::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection +=
-    document->documentWasSavedNotifier.connect(this, &IssueBrowser::documentWasSaved);
+      document->documentWasSavedNotifier.connect(this, &IssueBrowser::documentWasSaved);
   m_notifierConnection += document->documentWasNewedNotifier.connect(
-    this, &IssueBrowser::documentWasNewedOrLoaded);
+      this, &IssueBrowser::documentWasNewedOrLoaded);
   m_notifierConnection += document->documentWasLoadedNotifier.connect(
-    this, &IssueBrowser::documentWasNewedOrLoaded);
+      this, &IssueBrowser::documentWasNewedOrLoaded);
   m_notifierConnection +=
-    document->nodesWereAddedNotifier.connect(this, &IssueBrowser::nodesWereAdded);
+      document->nodesWereAddedNotifier.connect(this, &IssueBrowser::nodesWereAdded);
   m_notifierConnection +=
-    document->nodesWereRemovedNotifier.connect(this, &IssueBrowser::nodesWereRemoved);
+      document->nodesWereRemovedNotifier.connect(this, &IssueBrowser::nodesWereRemoved);
   m_notifierConnection +=
-    document->nodesDidChangeNotifier.connect(this, &IssueBrowser::nodesDidChange);
+      document->nodesDidChangeNotifier.connect(this, &IssueBrowser::nodesDidChange);
   m_notifierConnection += document->brushFacesDidChangeNotifier.connect(
-    this, &IssueBrowser::brushFacesDidChange);
+      this, &IssueBrowser::brushFacesDidChange);
 }
 
-void IssueBrowser::documentWasNewedOrLoaded(MapDocument*)
-{
+void IssueBrowser::documentWasNewedOrLoaded(MapDocument *) {
   updateFilterFlags();
   m_view->reload();
 }
 
-void IssueBrowser::documentWasSaved(MapDocument*)
-{
+void IssueBrowser::documentWasSaved(MapDocument *) {
   m_view->update();
 }
 
-void IssueBrowser::nodesWereAdded(const std::vector<Model::Node*>&)
-{
+void IssueBrowser::nodesWereAdded(const std::vector<Model::Node *> &) {
   m_view->reload();
 }
 
-void IssueBrowser::nodesWereRemoved(const std::vector<Model::Node*>&)
-{
+void IssueBrowser::nodesWereRemoved(const std::vector<Model::Node *> &) {
   m_view->reload();
 }
 
-void IssueBrowser::nodesDidChange(const std::vector<Model::Node*>&)
-{
+void IssueBrowser::nodesDidChange(const std::vector<Model::Node *> &) {
   m_view->reload();
 }
 
-void IssueBrowser::brushFacesDidChange(const std::vector<Model::BrushFaceHandle>&)
-{
+void IssueBrowser::brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &) {
   m_view->reload();
 }
 
-void IssueBrowser::issueIgnoreChanged(Model::Issue*)
-{
+void IssueBrowser::issueIgnoreChanged(Model::Issue *) {
   m_view->update();
 }
 
-void IssueBrowser::updateFilterFlags()
-{
+void IssueBrowser::updateFilterFlags() {
   // TODO: [27.10.23 21:57] => fix bug (crash on updating filter flags after migration to
   // native tabs)
   return;
 
   auto document = kdl::mem_lock(m_document);
-  const Model::WorldNode* world = document->world();
+  const Model::WorldNode *world = document->world();
   const auto validators = world->registeredValidators();
 
   QList<int> flags;
   QStringList labels;
 
-  for (const auto* validator : validators)
-  {
+  for (const auto *validator : validators) {
     const auto flag = validator->type();
-    const auto& description = validator->description();
+    const auto &description = validator->description();
 
     flags.push_back(flag);
     labels.push_back(QString::fromStdString(description));
@@ -158,17 +141,15 @@ void IssueBrowser::updateFilterFlags()
   m_filterEditor->setFlagValue(~0);
 }
 
-void IssueBrowser::showHiddenIssuesChanged()
-{
+void IssueBrowser::showHiddenIssuesChanged() {
   m_view->setShowHiddenIssues(m_showHiddenIssuesCheckBox->isChecked());
 }
 
 void IssueBrowser::filterChanged(
-  const size_t /* index */,
-  const int /* value */,
-  const int setFlag,
-  const int /* mixedFlag */)
-{
+    const size_t /* index */,
+    const int /* value */,
+    const int setFlag,
+    const int /* mixedFlag */) {
   m_view->setHiddenIssueTypes(~setFlag);
 }
 } // namespace View

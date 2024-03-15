@@ -23,27 +23,20 @@
 #include <QMetaMethod>
 #include <QTimer>
 
-namespace TrenchBroom
-{
-namespace View
-{
-SignalDelayer::SignalDelayer(QObject* parent)
-  : QObject{parent}
-  , m_isQueued{false}
-{
+namespace TrenchBroom {
+namespace View {
+SignalDelayer::SignalDelayer(QObject *parent)
+    : QObject{parent}, m_isQueued{false} {
 }
 
-void SignalDelayer::queueSignal()
-{
+void SignalDelayer::queueSignal() {
   static const QMetaMethod processSignalMetaMethod =
-    QMetaMethod::fromSignal(&SignalDelayer::processSignal);
-  if (!isSignalConnected(processSignalMetaMethod))
-  {
+      QMetaMethod::fromSignal(&SignalDelayer::processSignal);
+  if (!isSignalConnected(processSignalMetaMethod)) {
     qWarning() << "queueSignal called with nothing connected to processSignal";
   }
 
-  if (m_isQueued)
-  {
+  if (m_isQueued) {
     return;
   }
 

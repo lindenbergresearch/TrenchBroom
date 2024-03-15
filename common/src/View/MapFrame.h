@@ -53,17 +53,14 @@ class QTimer;
 
 class QToolBar;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class Texture;
 }
 
-namespace Model
-{
+namespace Model {
 class Game;
 
 class GroupNode;
@@ -71,8 +68,7 @@ class GroupNode;
 class LayerNode;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class Action;
 
 class Autosaver;
@@ -103,35 +99,34 @@ class SwitchableMapViewContainer;
 
 class Tool;
 
-class MapFrame : public QMainWindow
-{
-  Q_OBJECT
+class MapFrame : public QMainWindow {
+Q_OBJECT
 private:
-  FrameManager* m_frameManager;
+  FrameManager *m_frameManager;
   std::shared_ptr<MapDocument> m_document;
 
   std::chrono::time_point<std::chrono::system_clock> m_lastInputTime;
   std::unique_ptr<Autosaver> m_autosaver;
-  QTimer* m_autosaveTimer;
+  QTimer *m_autosaveTimer;
 
-  QToolBar* m_toolBar;
+  QToolBar *m_toolBar;
 
-  QSplitter* m_hSplitter;
-  QSplitter* m_vSplitter;
+  QSplitter *m_hSplitter;
+  QSplitter *m_vSplitter;
 
   std::unique_ptr<GLContextManager> m_contextManager;
-  SwitchableMapViewContainer* m_mapView;
+  SwitchableMapViewContainer *m_mapView;
   /**
    * Last focused MapViewBase. It's a QPointer to handle changing from e.g. a 2-pane map
    * view to 1-pane.
    */
   QPointer<MapViewBase> m_currentMapView;
-  InfoPanel* m_infoPanel;
-  Console* m_console;
-  Inspector* m_inspector;
+  InfoPanel *m_infoPanel;
+  Console *m_console;
+  Inspector *m_inspector;
 
-  QComboBox* m_gridChoice;
-  QLabel* m_statusBarLabel;
+  QComboBox *m_gridChoice;
+  QLabel *m_statusBarLabel;
 
   QPointer<QDialog> m_compilationDialog;
   QPointer<ObjExportDialog> m_objExportDialog;
@@ -139,32 +134,32 @@ private:
   NotifierConnection m_notifierConnection;
 
 private: // shortcuts
-  using ActionMap = std::map<const Action*, QAction*>;
+  using ActionMap = std::map<const Action *, QAction *>;
   ActionMap m_actionMap;
 
 private: // special menu entries
-  QMenu* m_recentDocumentsMenu;
-  QAction* m_undoAction;
-  QAction* m_redoAction;
+  QMenu *m_recentDocumentsMenu;
+  QAction *m_undoAction;
+  QAction *m_redoAction;
 
 private:
-  SignalDelayer* m_updateTitleSignalDelayer;
-  SignalDelayer* m_updateActionStateSignalDelayer;
-  SignalDelayer* m_updateStatusBarSignalDelayer;
+  SignalDelayer *m_updateTitleSignalDelayer;
+  SignalDelayer *m_updateActionStateSignalDelayer;
+  SignalDelayer *m_updateStatusBarSignalDelayer;
 
 public:
-  MapFrame(FrameManager* frameManager, std::shared_ptr<MapDocument> document);
+  MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> document);
 
   ~MapFrame() override;
 
-  void positionOnScreen(QWidget* reference);
+  void positionOnScreen(QWidget *reference);
 
   std::shared_ptr<MapDocument> document() const;
 
 public: // getters and such
-  Logger& logger() const;
+  Logger &logger() const;
 
-  QAction* findAction(const std::filesystem::path& path);
+  QAction *findAction(const std::filesystem::path &path);
 
 private: // title bar contents
   void updateTitle();
@@ -208,35 +203,35 @@ private: // gui creation
 private: // notification handlers
   void connectObservers();
 
-  void documentWasCleared(View::MapDocument* document);
+  void documentWasCleared(View::MapDocument *document);
 
-  void documentDidChange(View::MapDocument* document);
+  void documentDidChange(View::MapDocument *document);
 
   void documentModificationStateDidChange();
 
-  void transactionDone(const std::string&);
+  void transactionDone(const std::string &);
 
-  void transactionUndone(const std::string&);
+  void transactionUndone(const std::string &);
 
-  void preferenceDidChange(const std::filesystem::path& path);
+  void preferenceDidChange(const std::filesystem::path &path);
 
   void gridDidChange();
 
-  void toolActivated(Tool& tool);
+  void toolActivated(Tool &tool);
 
-  void toolDeactivated(Tool& tool);
+  void toolDeactivated(Tool &tool);
 
-  void toolHandleSelectionChanged(Tool& tool);
+  void toolHandleSelectionChanged(Tool &tool);
 
-  void selectionDidChange(const Selection& selection);
+  void selectionDidChange(const Selection &selection);
 
-  void currentLayerDidChange(const TrenchBroom::Model::LayerNode* layer);
+  void currentLayerDidChange(const TrenchBroom::Model::LayerNode *layer);
 
-  void groupWasOpened(Model::GroupNode* group);
+  void groupWasOpened(Model::GroupNode *group);
 
-  void groupWasClosed(Model::GroupNode* group);
+  void groupWasClosed(Model::GroupNode *group);
 
-  void nodeVisibilityDidChange(const std::vector<Model::Node*>& nodes);
+  void nodeVisibilityDidChange(const std::vector<Model::Node *> &nodes);
 
   void editorContextDidChange();
 
@@ -251,9 +246,9 @@ public:
   Result<bool> newDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat);
 
   Result<bool> openDocument(
-    std::shared_ptr<Model::Game> game,
-    Model::MapFormat mapFormat,
-    const std::filesystem::path& path);
+      std::shared_ptr<Model::Game> game,
+      Model::MapFormat mapFormat,
+      const std::filesystem::path &path);
 
   void updateToolbar();
 
@@ -269,7 +264,7 @@ public:
 
   bool exportDocumentAsMap();
 
-  bool exportDocument(const IO::ExportOptions& options);
+  bool exportDocument(const IO::ExportOptions &options);
 
 private:
   bool confirmOrDiscardChanges();
@@ -537,7 +532,7 @@ public:
 
   void revealTexture();
 
-  void revealTexture(const Assets::Texture* texture);
+  void revealTexture(const Assets::Texture *texture);
 
   void debugPrintVertices();
 
@@ -555,9 +550,9 @@ public:
 
   void debugShowPalette();
 
-  void focusChange(QWidget* oldFocus, QWidget* newFocus);
+  void focusChange(QWidget *oldFocus, QWidget *newFocus);
 
-  MapViewBase* currentMapViewBase();
+  MapViewBase *currentMapViewBase();
 
 private:
   bool canCompile() const;
@@ -565,26 +560,25 @@ private:
   bool canLaunch() const;
 
 public: // drag and drop
-  void dragEnterEvent(QDragEnterEvent* event) override;
-  void dropEvent(QDropEvent* event) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 
 protected: // other event handlers
-  void changeEvent(QEvent* event) override;
+  void changeEvent(QEvent *event) override;
 
-  void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent *event) override;
 
 public: // event filter (suppress autosave for user input events)
-  bool eventFilter(QObject* target, QEvent* event) override;
+  bool eventFilter(QObject *target, QEvent *event) override;
 
 private:
   void triggerAutosave();
 };
 
-class DebugPaletteWindow : public QDialog
-{
-  Q_OBJECT
+class DebugPaletteWindow : public QDialog {
+Q_OBJECT
 public:
-  DebugPaletteWindow(QWidget* parent = nullptr);
+  DebugPaletteWindow(QWidget *parent = nullptr);
 
   virtual ~DebugPaletteWindow();
 };

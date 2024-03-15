@@ -26,10 +26,8 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace EL
-{
+namespace TrenchBroom {
+namespace EL {
 class ExpressionImpl;
 
 class LiteralExpression;
@@ -48,8 +46,7 @@ class SubscriptExpression;
 
 class SwitchExpression;
 
-class Expression
-{
+class Expression {
 private:
   std::shared_ptr<ExpressionImpl> m_expression;
   size_t m_line;
@@ -74,7 +71,7 @@ public:
 
   Expression(SwitchExpression expression, size_t line, size_t column);
 
-  Value evaluate(const EvaluationContext& context) const;
+  Value evaluate(const EvaluationContext &context) const;
 
   Expression optimize() const;
 
@@ -84,11 +81,11 @@ public:
 
   std::string asString() const;
 
-  friend bool operator==(const Expression& lhs, const Expression& rhs);
+  friend bool operator==(const Expression &lhs, const Expression &rhs);
 
-  friend bool operator!=(const Expression& lhs, const Expression& rhs);
+  friend bool operator!=(const Expression &lhs, const Expression &rhs);
 
-  friend std::ostream& operator<<(std::ostream& str, const Expression& exp);
+  friend std::ostream &operator<<(std::ostream &str, const Expression &exp);
 
 private:
   void rebalanceByPrecedence();

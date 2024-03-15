@@ -24,14 +24,11 @@
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class RenderContext;
 
-class TriangleRenderer : public DirectRenderable
-{
+class TriangleRenderer : public DirectRenderable {
 private:
   VertexArray m_vertexArray;
   IndexRangeMap m_indexArray;
@@ -44,26 +41,26 @@ private:
 public:
   TriangleRenderer();
 
-  TriangleRenderer(const VertexArray& vertexArray, const IndexRangeMap& indexArray);
+  TriangleRenderer(const VertexArray &vertexArray, const IndexRangeMap &indexArray);
 
-  TriangleRenderer(const VertexArray& vertexArray, PrimType primType);
+  TriangleRenderer(const VertexArray &vertexArray, PrimType primType);
 
-  TriangleRenderer(const TriangleRenderer& other) = default;
+  TriangleRenderer(const TriangleRenderer &other) = default;
 
-  TriangleRenderer& operator=(const TriangleRenderer& other) = default;
+  TriangleRenderer &operator=(const TriangleRenderer &other) = default;
 
   void setUseColor(bool useColor);
 
-  void setColor(const Color& color);
+  void setColor(const Color &color);
 
   void setApplyTinting(bool applyTinting);
 
-  void setTintColor(const Color& tintColor);
+  void setTintColor(const Color &tintColor);
 
 private:
-  void doPrepareVertices(VboManager& vboManager) override;
+  void doPrepareVertices(VboManager &vboManager) override;
 
-  void doRender(RenderContext& context) override;
+  void doRender(RenderContext &context) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

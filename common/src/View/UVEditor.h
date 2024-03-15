@@ -31,10 +31,8 @@ class QWidget;
 
 class QAbstractButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class Selection;
 
 class GLContextManager;
@@ -43,30 +41,29 @@ class MapDocument;
 
 class UVView;
 
-class UVEditor : public QWidget
-{
-  Q_OBJECT
+class UVEditor : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
 
-  UVView* m_uvView{nullptr};
-  QSpinBox* m_xSubDivisionEditor{nullptr};
-  QSpinBox* m_ySubDivisionEditor{nullptr};
+  UVView *m_uvView{nullptr};
+  QSpinBox *m_xSubDivisionEditor{nullptr};
+  QSpinBox *m_ySubDivisionEditor{nullptr};
 
-  QAbstractButton* m_resetTextureButton{nullptr};
-  QAbstractButton* m_resetTextureToWorldButton{nullptr};
-  QAbstractButton* m_flipTextureHButton{nullptr};
-  QAbstractButton* m_flipTextureVButton{nullptr};
-  QAbstractButton* m_rotateTextureCCWButton{nullptr};
-  QAbstractButton* m_rotateTextureCWButton{nullptr};
+  QAbstractButton *m_resetTextureButton{nullptr};
+  QAbstractButton *m_resetTextureToWorldButton{nullptr};
+  QAbstractButton *m_flipTextureHButton{nullptr};
+  QAbstractButton *m_flipTextureVButton{nullptr};
+  QAbstractButton *m_rotateTextureCCWButton{nullptr};
+  QAbstractButton *m_rotateTextureCWButton{nullptr};
 
   NotifierConnection m_notifierConnection;
 
 public:
   explicit UVEditor(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
 
   bool cancelMouseDrag();
 
@@ -74,9 +71,9 @@ private:
   void updateButtons();
 
 private:
-  void createGui(GLContextManager& contextManager);
+  void createGui(GLContextManager &contextManager);
 
-  void selectionDidChange(const Selection& selection);
+  void selectionDidChange(const Selection &selection);
 
   void connectObservers();
 

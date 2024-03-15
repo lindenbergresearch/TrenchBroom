@@ -24,13 +24,12 @@
 
 #include <string>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class Reader;
 
 /**
  * Heretic 2 .m8 format
  */
-Result<Assets::Texture, ReadTextureError> readM8Texture(std::string name, Reader& reader);
+Result<Assets::Texture, ReadTextureError> readM8Texture(std::string name, Reader &reader);
 
 } // namespace TrenchBroom::IO

@@ -22,14 +22,11 @@
 #include <vm/forward.h>
 #include <vm/vec.h>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Camera;
 
-namespace TextAlignment
-{
+namespace TextAlignment {
 using Type = unsigned int;
 static const Type Top = 1 << 0;
 static const Type Bottom = 1 << 1;
@@ -38,24 +35,22 @@ static const Type Right = 1 << 3;
 static const Type Center = 1 << 4;
 } // namespace TextAlignment
 
-class TextAnchor
-{
+class TextAnchor {
 public:
   virtual ~TextAnchor();
 
-  virtual vm::vec3f offset(const Camera& camera, const vm::vec2f& size) const = 0;
+  virtual vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const = 0;
 
-  virtual vm::vec3f position(const Camera& camera) const = 0;
+  virtual vm::vec3f position(const Camera &camera) const = 0;
 };
 
-class TextAnchor3D : public TextAnchor
-{
+class TextAnchor3D : public TextAnchor {
 public:
   virtual ~TextAnchor3D() override;
 
-  vm::vec3f offset(const Camera& camera, const vm::vec2f& size) const override;
+  vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override;
 
-  vm::vec3f position(const Camera& camera) const override;
+  vm::vec3f position(const Camera &camera) const override;
 
 private:
   vm::vec2f alignmentFactors(TextAlignment::Type a) const;
@@ -68,8 +63,7 @@ private:
   virtual vm::vec2f extraOffsets(TextAlignment::Type a) const;
 };
 
-class SimpleTextAnchor : public TextAnchor3D
-{
+class SimpleTextAnchor : public TextAnchor3D {
 private:
   vm::vec3f m_position;
   TextAlignment::Type m_alignment;
@@ -77,9 +71,9 @@ private:
 
 public:
   SimpleTextAnchor(
-    const vm::vec3f& position,
-    const TextAlignment::Type alignment,
-    const vm::vec2f& extraOffsets = vm::vec2f::zero());
+      const vm::vec3f &position,
+      const TextAlignment::Type alignment,
+      const vm::vec2f &extraOffsets = vm::vec2f::zero());
 
 private:
   vm::vec3f basePosition() const override;

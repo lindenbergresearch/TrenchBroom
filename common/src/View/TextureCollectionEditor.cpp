@@ -38,27 +38,22 @@
 
 #include <cassert>
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
 TextureCollectionEditor::TextureCollectionEditor(
-  std::weak_ptr<MapDocument> document, QWidget* parent)
-  : QWidget{parent}
-  , m_document{std::move(document)}
-{
+    std::weak_ptr<MapDocument> document, QWidget *parent)
+    : QWidget{parent}, m_document{std::move(document)} {
   createGui();
   connectObservers();
   updateAllTextureCollections();
   updateButtons();
 }
 
-void TextureCollectionEditor::addSelectedTextureCollections()
-{
+void TextureCollectionEditor::addSelectedTextureCollections() {
   const auto availableCollections = availableTextureCollections();
   auto enabledCollections = enabledTextureCollections();
 
-  for (auto* selectedItem : m_availableCollectionsList->selectedItems())
-  {
+  for (auto *selectedItem : m_availableCollectionsList->selectedItems()) {
     const auto index = size_t(m_availableCollectionsList->row(selectedItem));
     enabledCollections.push_back(availableCollections[index]);
   }
@@ -69,20 +64,17 @@ void TextureCollectionEditor::addSelectedTextureCollections()
   document->setEnabledTextureCollections(enabledCollections);
 }
 
-void TextureCollectionEditor::removeSelectedTextureCollections()
-{
+void TextureCollectionEditor::removeSelectedTextureCollections() {
   auto enabledCollections = enabledTextureCollections();
 
   auto selections = std::vector<int>{};
-  for (auto* selectedItem : m_enabledCollectionsList->selectedItems())
-  {
+  for (auto *selectedItem : m_enabledCollectionsList->selectedItems()) {
     selections.push_back(m_enabledCollectionsList->row(selectedItem));
   }
 
   // erase back to front
-  for (auto sIt = std::rbegin(selections), sEnd = std::rend(selections); sIt != sEnd;
-       ++sIt)
-  {
+  for (auto sIt = std::rbegin(selections), sEnd = std::rend(selections); sIt!=sEnd;
+       ++sIt) {
     const auto index = size_t(*sIt);
     enabledCollections = kdl::vec_erase_at(std::move(enabledCollections), index);
   }
@@ -91,83 +83,76 @@ void TextureCollectionEditor::removeSelectedTextureCollections()
   document->setEnabledTextureCollections(enabledCollections);
 }
 
-void TextureCollectionEditor::reloadTextureCollections()
-{
+void TextureCollectionEditor::reloadTextureCollections() {
   auto document = kdl::mem_lock(m_document);
   document->reloadTextureCollections();
 }
 
-void TextureCollectionEditor::availableTextureCollectionSelectionChanged()
-{
+void TextureCollectionEditor::availableTextureCollectionSelectionChanged() {
   updateButtons();
 }
 
-void TextureCollectionEditor::enabledTextureCollectionSelectionChanged()
-{
+void TextureCollectionEditor::enabledTextureCollectionSelectionChanged() {
   updateButtons();
 }
 
-bool TextureCollectionEditor::canAddTextureCollections() const
-{
+bool TextureCollectionEditor::canAddTextureCollections() const {
   return !m_availableCollectionsList->selectedItems().empty();
 }
 
-bool TextureCollectionEditor::canRemoveTextureCollections() const
-{
+bool TextureCollectionEditor::canRemoveTextureCollections() const {
   return !m_enabledCollectionsList->selectedItems().empty();
 }
 
-bool TextureCollectionEditor::canReloadTextureCollections() const
-{
-  return m_enabledCollectionsList->count() != 0;
+bool TextureCollectionEditor::canReloadTextureCollections() const {
+  return m_enabledCollectionsList->count()!=0;
 }
 
 /**
  * See ModEditor::createGui
  */
-void TextureCollectionEditor::createGui()
-{
-  auto* availableCollectionsContainer = new TitledPanel{"Available", false, true};
+void TextureCollectionEditor::createGui() {
+  auto *availableCollectionsContainer = new TitledPanel{"Available", false, true};
   availableCollectionsContainer->setBackgroundRole(QPalette::Base);
   availableCollectionsContainer->setAutoFillBackground(true);
 
   m_availableCollectionsList = new QListWidget{};
   m_availableCollectionsList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-  auto* availableCollectionsContainerLayout = new QVBoxLayout{};
+  auto *availableCollectionsContainerLayout = new QVBoxLayout{};
   availableCollectionsContainerLayout->setContentsMargins(0, 0, 0, 0);
   availableCollectionsContainerLayout->setSpacing(0);
   availableCollectionsContainerLayout->addWidget(m_availableCollectionsList);
   availableCollectionsContainer->getPanel()->setLayout(
-    availableCollectionsContainerLayout);
+      availableCollectionsContainerLayout);
 
-  auto* enabledCollectionsContainer = new TitledPanel{"Enabled", false, true};
+  auto *enabledCollectionsContainer = new TitledPanel{"Enabled", false, true};
   enabledCollectionsContainer->setBackgroundRole(QPalette::Base);
   enabledCollectionsContainer->setAutoFillBackground(true);
 
   m_enabledCollectionsList = new QListWidget{};
   m_enabledCollectionsList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-  auto* enabledCollectionsContainerLayout = new QVBoxLayout{};
+  auto *enabledCollectionsContainerLayout = new QVBoxLayout{};
   enabledCollectionsContainerLayout->setContentsMargins(0, 0, 0, 0);
   enabledCollectionsContainerLayout->setSpacing(0);
   enabledCollectionsContainerLayout->addWidget(m_enabledCollectionsList);
   enabledCollectionsContainer->getPanel()->setLayout(enabledCollectionsContainerLayout);
 
   m_addCollectionsButton =
-    createBitmapButton("Add.svg", tr("Enable the selected texture collections"), this);
+      createBitmapButton("Add.svg", tr("Enable the selected texture collections"), this);
   m_removeCollectionsButton = createBitmapButton(
-    "Remove.svg", tr("Disable the selected texture collections"), this);
+      "Remove.svg", tr("Disable the selected texture collections"), this);
   m_reloadCollectionsButton =
-    createBitmapButton("Refresh.svg", tr("Reload all enabled texture collections"), this);
+      createBitmapButton("Refresh.svg", tr("Reload all enabled texture collections"), this);
 
-  auto* toolBar = createMiniToolBarLayout(
-    m_addCollectionsButton,
-    m_removeCollectionsButton,
-    LayoutConstants::WideHMargin,
-    m_reloadCollectionsButton);
+  auto *toolBar = createMiniToolBarLayout(
+      m_addCollectionsButton,
+      m_removeCollectionsButton,
+      LayoutConstants::WideHMargin,
+      m_reloadCollectionsButton);
 
-  auto* layout = new QGridLayout{};
+  auto *layout = new QGridLayout{};
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
@@ -182,147 +167,131 @@ void TextureCollectionEditor::createGui()
   updateAllTextureCollections();
 
   connect(
-    m_availableCollectionsList,
-    &QListWidget::itemSelectionChanged,
-    this,
-    &TextureCollectionEditor::availableTextureCollectionSelectionChanged);
+      m_availableCollectionsList,
+      &QListWidget::itemSelectionChanged,
+      this,
+      &TextureCollectionEditor::availableTextureCollectionSelectionChanged);
   connect(
-    m_enabledCollectionsList,
-    &QListWidget::itemSelectionChanged,
-    this,
-    &TextureCollectionEditor::enabledTextureCollectionSelectionChanged);
+      m_enabledCollectionsList,
+      &QListWidget::itemSelectionChanged,
+      this,
+      &TextureCollectionEditor::enabledTextureCollectionSelectionChanged);
   connect(
-    m_availableCollectionsList,
-    &QListWidget::itemDoubleClicked,
-    this,
-    &TextureCollectionEditor::addSelectedTextureCollections);
+      m_availableCollectionsList,
+      &QListWidget::itemDoubleClicked,
+      this,
+      &TextureCollectionEditor::addSelectedTextureCollections);
   connect(
-    m_enabledCollectionsList,
-    &QListWidget::itemDoubleClicked,
-    this,
-    &TextureCollectionEditor::removeSelectedTextureCollections);
+      m_enabledCollectionsList,
+      &QListWidget::itemDoubleClicked,
+      this,
+      &TextureCollectionEditor::removeSelectedTextureCollections);
   connect(
-    m_addCollectionsButton,
-    &QAbstractButton::clicked,
-    this,
-    &TextureCollectionEditor::addSelectedTextureCollections);
+      m_addCollectionsButton,
+      &QAbstractButton::clicked,
+      this,
+      &TextureCollectionEditor::addSelectedTextureCollections);
   connect(
-    m_removeCollectionsButton,
-    &QAbstractButton::clicked,
-    this,
-    &TextureCollectionEditor::removeSelectedTextureCollections);
+      m_removeCollectionsButton,
+      &QAbstractButton::clicked,
+      this,
+      &TextureCollectionEditor::removeSelectedTextureCollections);
   connect(
-    m_reloadCollectionsButton,
-    &QAbstractButton::clicked,
-    this,
-    &TextureCollectionEditor::reloadTextureCollections);
+      m_reloadCollectionsButton,
+      &QAbstractButton::clicked,
+      this,
+      &TextureCollectionEditor::reloadTextureCollections);
 }
 
-void TextureCollectionEditor::updateButtons()
-{
+void TextureCollectionEditor::updateButtons() {
   m_addCollectionsButton->setEnabled(canAddTextureCollections());
   m_removeCollectionsButton->setEnabled(canRemoveTextureCollections());
   m_reloadCollectionsButton->setEnabled(canReloadTextureCollections());
 }
 
-void TextureCollectionEditor::connectObservers()
-{
+void TextureCollectionEditor::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection += document->documentWasNewedNotifier.connect(
-    this, &TextureCollectionEditor::documentWasNewedOrLoaded);
+      this, &TextureCollectionEditor::documentWasNewedOrLoaded);
   m_notifierConnection += document->nodesDidChangeNotifier.connect(
-    this, &TextureCollectionEditor::nodesDidChange);
+      this, &TextureCollectionEditor::nodesDidChange);
   m_notifierConnection += document->documentWasLoadedNotifier.connect(
-    this, &TextureCollectionEditor::documentWasNewedOrLoaded);
+      this, &TextureCollectionEditor::documentWasNewedOrLoaded);
   m_notifierConnection += document->textureCollectionsDidChangeNotifier.connect(
-    this, &TextureCollectionEditor::textureCollectionsDidChange);
+      this, &TextureCollectionEditor::textureCollectionsDidChange);
   m_notifierConnection += document->modsDidChangeNotifier.connect(
-    this, &TextureCollectionEditor::modsDidChange);
+      this, &TextureCollectionEditor::modsDidChange);
 
-  auto& prefs = PreferenceManager::instance();
+  auto &prefs = PreferenceManager::instance();
   m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(
-    this, &TextureCollectionEditor::preferenceDidChange);
+      this, &TextureCollectionEditor::preferenceDidChange);
 }
 
-void TextureCollectionEditor::documentWasNewedOrLoaded(MapDocument*)
-{
+void TextureCollectionEditor::documentWasNewedOrLoaded(MapDocument *) {
   updateAllTextureCollections();
   updateButtons();
 }
 
-void TextureCollectionEditor::nodesDidChange(const std::vector<Model::Node*>& nodes)
-{
+void TextureCollectionEditor::nodesDidChange(const std::vector<Model::Node *> &nodes) {
   auto document = kdl::mem_lock(m_document);
-  if (kdl::vec_contains(nodes, document->world()))
-  {
+  if (kdl::vec_contains(nodes, document->world())) {
     updateAllTextureCollections();
     updateButtons();
   }
 }
 
-void TextureCollectionEditor::textureCollectionsDidChange()
-{
+void TextureCollectionEditor::textureCollectionsDidChange() {
   updateAllTextureCollections();
   updateButtons();
 }
 
-void TextureCollectionEditor::modsDidChange()
-{
+void TextureCollectionEditor::modsDidChange() {
   updateAllTextureCollections();
   updateButtons();
 }
 
-void TextureCollectionEditor::preferenceDidChange(const std::filesystem::path& path)
-{
+void TextureCollectionEditor::preferenceDidChange(const std::filesystem::path &path) {
   auto document = kdl::mem_lock(m_document);
-  if (document->isGamePathPreference(path))
-  {
+  if (document->isGamePathPreference(path)) {
     updateAllTextureCollections();
     updateButtons();
   }
 }
 
-void TextureCollectionEditor::updateAllTextureCollections()
-{
+void TextureCollectionEditor::updateAllTextureCollections() {
   updateAvailableTextureCollections();
   updateEnabledTextureCollections();
 }
 
-void TextureCollectionEditor::updateAvailableTextureCollections()
-{
+void TextureCollectionEditor::updateAvailableTextureCollections() {
   updateListBox(m_availableCollectionsList, availableTextureCollections());
 }
 
-void TextureCollectionEditor::updateEnabledTextureCollections()
-{
+void TextureCollectionEditor::updateEnabledTextureCollections() {
   updateListBox(m_enabledCollectionsList, enabledTextureCollections());
 }
 
 void TextureCollectionEditor::updateListBox(
-  QListWidget* box, const std::vector<std::filesystem::path>& paths)
-{
+    QListWidget *box, const std::vector<std::filesystem::path> &paths) {
   // We need to block QListWidget::itemSelectionChanged from firing while clearing and
   // rebuilding the list because it will cause debugUIConsistency() to fail, as the number
   // of list items in the UI won't match the document's texture collections lists.
   auto blocker = QSignalBlocker{box};
 
   box->clear();
-  for (const auto& path : paths)
-  {
+  for (const auto &path : paths) {
     box->addItem(IO::pathAsQString(path));
   }
 }
 
 std::vector<std::filesystem::path> TextureCollectionEditor::availableTextureCollections()
-  const
-{
+const {
   auto document = kdl::mem_lock(m_document);
   return document->disabledTextureCollections();
 }
 
 std::vector<std::filesystem::path> TextureCollectionEditor::enabledTextureCollections()
-  const
-{
+const {
   auto document = kdl::mem_lock(m_document);
   return document->enabledTextureCollections();
 }

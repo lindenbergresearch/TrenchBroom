@@ -24,18 +24,15 @@
 
 #include <string>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class Quake3Shader;
 class Quake3ShaderStage;
 } // namespace TrenchBroom::Assets
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class ParserStatus;
 
-namespace Quake3ShaderToken
-{
+namespace Quake3ShaderToken {
 using Type = unsigned int;
 static const Type Number = 1 << 1;   // decimal number
 static const Type String = 1 << 2;   // string
@@ -47,8 +44,7 @@ static const Type Eol = 1 << 7;      // end of line
 static const Type Eof = 1 << 8;      // end of file
 } // namespace Quake3ShaderToken
 
-class Quake3ShaderTokenizer : public Tokenizer<Quake3ShaderToken::Type>
-{
+class Quake3ShaderTokenizer : public Tokenizer<Quake3ShaderToken::Type> {
 public:
   explicit Quake3ShaderTokenizer(std::string_view str);
 
@@ -56,8 +52,7 @@ private:
   Token emitToken() override;
 };
 
-class Quake3ShaderParser : public Parser<Quake3ShaderToken::Type>
-{
+class Quake3ShaderParser : public Parser<Quake3ShaderToken::Type> {
 private:
   Quake3ShaderTokenizer m_tokenizer;
 
@@ -72,14 +67,14 @@ public:
    *
    * @throws ParserException if the shader is not well-formed
    */
-  std::vector<Assets::Quake3Shader> parse(ParserStatus& status);
+  std::vector<Assets::Quake3Shader> parse(ParserStatus &status);
 
 private:
-  void parseTexture(Assets::Quake3Shader& shader, ParserStatus& status);
-  void parseBody(Assets::Quake3Shader& shader, ParserStatus& status);
-  void parseStage(Assets::Quake3Shader& shader, ParserStatus& status);
-  void parseBodyEntry(Assets::Quake3Shader& shader, ParserStatus& status);
-  void parseStageEntry(Assets::Quake3ShaderStage& stage, ParserStatus& status);
+  void parseTexture(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseBody(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseStage(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseBodyEntry(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseStageEntry(Assets::Quake3ShaderStage &stage, ParserStatus &status);
   void skipRemainderOfEntry();
 
 private:

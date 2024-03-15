@@ -31,34 +31,29 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class EntityModelManager;
 }
 
-namespace Model
-{
+namespace Model {
 class EditorContext;
 
 class EntityNode;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class AttrString;
 
-class EntityRenderer
-{
+class EntityRenderer {
 private:
   class EntityClassnameAnchor;
 
-  Assets::EntityModelManager& m_entityModelManager;
-  const Model::EditorContext& m_editorContext;
-  kdl::vector_set<const Model::EntityNode*> m_entities;
+  Assets::EntityModelManager &m_entityModelManager;
+  const Model::EditorContext &m_editorContext;
+  kdl::vector_set<const Model::EntityNode *> m_entities;
 
   DirectEdgeRenderer m_pointEntityWireframeBoundsRenderer;
   DirectEdgeRenderer m_brushEntityWireframeBoundsRenderer;
@@ -83,9 +78,9 @@ private:
 
 public:
   EntityRenderer(
-    Logger& logger,
-    Assets::EntityModelManager& entityModelManager,
-    const Model::EditorContext& editorContext);
+      Logger &logger,
+      Assets::EntityModelManager &entityModelManager,
+      const Model::EditorContext &editorContext);
 
   /**
    * Equivalent to invalidateEntity() on all added entities.
@@ -103,62 +98,62 @@ public:
    * Adds an entity. Calling with an already-added entity is allowed, but ignored (not
    * guaranteed to invalidate it).
    */
-  void addEntity(const Model::EntityNode* entity);
+  void addEntity(const Model::EntityNode *entity);
 
   /**
    * Removes an entity. Calling with an unknown entity is allowed, but ignored.
    */
-  void removeEntity(const Model::EntityNode* entity);
+  void removeEntity(const Model::EntityNode *entity);
 
   /**
    * Causes cached renderer data to be rebuilt for the given entity (on the next render()
    * call).
    */
-  void invalidateEntity(const Model::EntityNode* entity);
+  void invalidateEntity(const Model::EntityNode *entity);
 
   void setShowOverlays(bool showOverlays);
 
-  void setOverlayTextColor(const Color& overlayTextColor);
+  void setOverlayTextColor(const Color &overlayTextColor);
 
-  void setOverlayBackgroundColor(const Color& overlayBackgroundColor);
+  void setOverlayBackgroundColor(const Color &overlayBackgroundColor);
 
   void setShowOccludedOverlays(bool showOccludedOverlays);
 
   void setTint(bool tint);
 
-  void setTintColor(const Color& tintColor);
+  void setTintColor(const Color &tintColor);
 
   void setOverrideBoundsColor(bool overrideBoundsColor);
 
-  void setBoundsColor(const Color& boundsColor);
+  void setBoundsColor(const Color &boundsColor);
 
   void setShowOccludedBounds(bool showOccludedBounds);
 
-  void setOccludedBoundsColor(const Color& occludedBoundsColor);
+  void setOccludedBoundsColor(const Color &occludedBoundsColor);
 
   void setShowAngles(bool showAngles);
 
-  void setAngleColor(const Color& angleColor);
+  void setAngleColor(const Color &angleColor);
 
   void setShowHiddenEntities(bool showHiddenEntities);
 
 public: // rendering
-  void render(RenderContext& renderContext, RenderBatch& renderBatch);
+  void render(RenderContext &renderContext, RenderBatch &renderBatch);
 
 private:
-  void renderBounds(RenderContext& renderContext, RenderBatch& renderBatch);
+  void renderBounds(RenderContext &renderContext, RenderBatch &renderBatch);
 
-  void renderPointEntityWireframeBounds(RenderBatch& renderBatch);
+  void renderPointEntityWireframeBounds(RenderBatch &renderBatch);
 
-  void renderBrushEntityWireframeBounds(RenderBatch& renderBatch);
+  void renderBrushEntityWireframeBounds(RenderBatch &renderBatch);
 
-  void renderSolidBounds(RenderBatch& renderBatch);
+  void renderSolidBounds(RenderBatch &renderBatch);
 
-  void renderModels(RenderContext& renderContext, RenderBatch& renderBatch);
+  void renderModels(RenderContext &renderContext, RenderBatch &renderBatch);
 
-  void renderClassnames(RenderContext& renderContext, RenderBatch& renderBatch);
+  void renderClassnames(RenderContext &renderContext, RenderBatch &renderBatch);
 
-  void renderAngles(RenderContext& renderContext, RenderBatch& renderBatch);
+  void renderAngles(RenderContext &renderContext, RenderBatch &renderBatch);
 
   std::vector<vm::vec3f> arrowHead(float length, float width) const;
 
@@ -170,9 +165,9 @@ private:
 
   void validateBounds();
 
-  AttrString entityString(const Model::EntityNode* entityNode) const;
+  AttrString entityString(const Model::EntityNode *entityNode) const;
 
-  const Color& boundsColor(const Model::EntityNode* entityNode) const;
+  const Color &boundsColor(const Model::EntityNode *entityNode) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

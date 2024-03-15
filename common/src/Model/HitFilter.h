@@ -24,16 +24,13 @@
 
 #include <functional>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Hit;
 
-using HitFilter = std::function<bool(const Hit& hit)>;
+using HitFilter = std::function<bool(const Hit &hit)>;
 
-namespace HitFilters
-{
+namespace HitFilters {
 HitFilter any();
 HitFilter none();
 

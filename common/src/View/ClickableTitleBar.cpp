@@ -26,26 +26,21 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
 ClickableTitleBar::ClickableTitleBar(
-  const QString& title, const QString& stateText, QWidget* parent)
-  : TitleBar{title, parent, true}
-  , m_stateText{new QLabel{stateText}}
-{
+    const QString &title, const QString &stateText, QWidget *parent)
+    : TitleBar{title, parent, true}, m_stateText{new QLabel{stateText}} {
   makeInfo(m_stateText);
 
   layout()->addWidget(m_stateText);
 }
 
-void ClickableTitleBar::setStateText(const QString& stateText)
-{
+void ClickableTitleBar::setStateText(const QString &stateText) {
   m_stateText->setText(stateText);
 }
 
-void ClickableTitleBar::mousePressEvent(QMouseEvent* /* event */)
-{
+void ClickableTitleBar::mousePressEvent(QMouseEvent * /* event */) {
   emit titleBarClicked();
 }
 

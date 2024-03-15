@@ -25,10 +25,8 @@
 
 #include <string_view>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 /**
  * Evaluates the given lambda and returns the resulting model specification. If an EL
  * exception is thrown by the given lambda, it is caught and an error message is logged
@@ -41,16 +39,13 @@ namespace Assets
  * @return the model specification returned by the lambda, or an empty model specification
  * if the lambda throws an EL exception
  */
-template <typename GetModelSpec>
+template<typename GetModelSpec>
 ModelSpecification safeGetModelSpecification(
-  Logger& logger, std::string_view classname, GetModelSpec getModelSpec)
-{
-  try
-  {
+    Logger &logger, std::string_view classname, GetModelSpec getModelSpec) {
+  try {
     return getModelSpec();
   }
-  catch (const EL::Exception& e)
-  {
+  catch (const EL::Exception &e) {
     logger.error() << "Could not get entity model for entity '" << classname
                    << "': " << e.what();
     return ModelSpecification();

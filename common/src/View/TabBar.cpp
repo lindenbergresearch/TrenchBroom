@@ -28,24 +28,18 @@
 #include "View/TabBook.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 // TabBarButton
 
-TabBarButton::TabBarButton(const QString& label, QWidget* parent)
-  : QWidget(parent)
-  , m_label(new QLabel(label, this))
-  , m_indicator(new QWidget(this))
-  , m_pressed(false)
-{
-  auto* labelLayout = new QHBoxLayout();
+TabBarButton::TabBarButton(const QString &label, QWidget *parent)
+    : QWidget(parent), m_label(new QLabel(label, this)), m_indicator(new QWidget(this)), m_pressed(false) {
+  auto *labelLayout = new QHBoxLayout();
   labelLayout->setContentsMargins(
-    LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
+      LayoutConstants::WideHMargin, 0, LayoutConstants::WideHMargin, 0);
   labelLayout->addWidget(m_label);
 
-  auto* outerLayout = new QVBoxLayout();
+  auto *outerLayout = new QVBoxLayout();
   outerLayout->setContentsMargins(0, 1, 0, 1); // needs extra vertical space!
   outerLayout->setSpacing(0);
 
@@ -62,38 +56,29 @@ TabBarButton::TabBarButton(const QString& label, QWidget* parent)
   setLayout(outerLayout);
 }
 
-void TabBarButton::setPressed(const bool pressed)
-{
+void TabBarButton::setPressed(const bool pressed) {
   m_pressed = pressed;
   updateState();
 }
 
-void TabBarButton::mousePressEvent(QMouseEvent*)
-{
+void TabBarButton::mousePressEvent(QMouseEvent *) {
   emit clicked();
 }
 
-void TabBarButton::updateState()
-{
+void TabBarButton::updateState() {
   QPalette pal;
-  if (m_pressed)
-  {
+  if (m_pressed) {
     m_indicator->setBackgroundRole(QPalette::Highlight);
-  }
-  else
-  {
+  } else {
     m_indicator->setBackgroundRole(QPalette::NoRole);
   }
 }
 
 // TabBar
 
-TabBar::TabBar(TabBook* tabBook)
-  : ContainerBar(BorderPanel::BottomSide, tabBook)
-  , m_tabBook(tabBook)
-  , m_barBook(new QStackedLayout())
-{
-  ensure(m_tabBook != nullptr, "tabBook is null");
+TabBar::TabBar(TabBook *tabBook)
+    : ContainerBar(BorderPanel::BottomSide, tabBook), m_tabBook(tabBook), m_barBook(new QStackedLayout()) {
+  ensure(m_tabBook!=nullptr, "tabBook is null");
   connect(m_tabBook, &TabBook::pageChanged, this, &TabBar::tabBookPageChanged);
 
   m_controlLayout = new QHBoxLayout();
@@ -108,11 +93,10 @@ TabBar::TabBar(TabBook* tabBook)
   setLayout(m_controlLayout);
 }
 
-void TabBar::addTab(TabBookPage* bookPage, const QString& title)
-{
-  ensure(bookPage != nullptr, "bookPage is null");
+void TabBar::addTab(TabBookPage *bookPage, const QString &title) {
+  ensure(bookPage!=nullptr, "bookPage is null");
 
-  auto* button = new TabBarButton(title);
+  auto *button = new TabBarButton(title);
   connect(button, &TabBarButton::clicked, this, &TabBar::buttonClicked);
   button->setPressed(m_buttons.empty());
   m_buttons.push_back(button);
@@ -120,40 +104,33 @@ void TabBar::addTab(TabBookPage* bookPage, const QString& title)
   const auto sizerIndex = static_cast<int>(m_buttons.size());
   m_controlLayout->insertWidget(sizerIndex, button);
 
-  QWidget* barPage = bookPage->createTabBarPage(nullptr);
+  QWidget *barPage = bookPage->createTabBarPage(nullptr);
   m_barBook->addWidget(barPage);
 }
 
-size_t TabBar::findButtonIndex(QWidget* button) const
-{
+size_t TabBar::findButtonIndex(QWidget *button) const {
 
-  for (size_t i = 0; i < m_buttons.size(); ++i)
-  {
-    if (m_buttons[i] == button)
-    {
+  for (size_t i = 0; i < m_buttons.size(); ++i) {
+    if (m_buttons[i]==button) {
       return i;
     }
   }
   return m_buttons.size();
 }
 
-void TabBar::setButtonActive(const int index)
-{
+void TabBar::setButtonActive(const int index) {
   m_buttons.at(static_cast<size_t>(index))->setPressed(true);
 }
 
-void TabBar::buttonClicked()
-{
-  auto* button = dynamic_cast<QWidget*>(QObject::sender());
+void TabBar::buttonClicked() {
+  auto *button = dynamic_cast<QWidget *>(QObject::sender());
   const size_t index = findButtonIndex(button);
   ensure(index < m_buttons.size(), "index out of range");
   m_tabBook->switchToPage(static_cast<int>(index));
 }
 
-void TabBar::tabBookPageChanged(const int newIndex)
-{
-  for (TabBarButton* button : m_buttons)
-  {
+void TabBar::tabBookPageChanged(const int newIndex) {
+  for (TabBarButton *button : m_buttons) {
     button->setPressed(false);
   }
 

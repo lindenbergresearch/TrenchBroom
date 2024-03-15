@@ -25,55 +25,40 @@
 
 #include <cassert>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 RepeatStack::RepeatStack()
-  : m_clearOnNextPush{false}
-  , m_repeating{false}
-{
+    : m_clearOnNextPush{false}, m_repeating{false} {
 }
 
-size_t RepeatStack::size() const
-{
+size_t RepeatStack::size() const {
   return m_stack.size();
 }
 
-void RepeatStack::push(RepeatableAction repeatableAction)
-{
-  if (!m_repeating)
-  {
-    if (m_openTransactionsStack.empty())
-    {
-      if (m_clearOnNextPush)
-      {
+void RepeatStack::push(RepeatableAction repeatableAction) {
+  if (!m_repeating) {
+    if (m_openTransactionsStack.empty()) {
+      if (m_clearOnNextPush) {
         m_clearOnNextPush = false;
         clear();
       }
 
       m_stack.push_back(std::move(repeatableAction));
-    }
-    else
-    {
-      auto& openTransaction = m_openTransactionsStack.back();
+    } else {
+      auto &openTransaction = m_openTransactionsStack.back();
       openTransaction.push_back(std::move(repeatableAction));
     }
   }
 }
 
-static void execute(const std::vector<RepeatStack::RepeatableAction>& actions)
-{
-  for (const auto& repeatable : actions)
-  {
+static void execute(const std::vector<RepeatStack::RepeatableAction> &actions) {
+  for (const auto &repeatable : actions) {
     repeatable();
   }
 }
 
-void RepeatStack::repeat() const
-{
-  if (!m_openTransactionsStack.empty())
-  {
+void RepeatStack::repeat() const {
+  if (!m_openTransactionsStack.empty()) {
     return;
   }
 
@@ -81,38 +66,30 @@ void RepeatStack::repeat() const
   execute(m_stack);
 }
 
-void RepeatStack::clear()
-{
-  if (!m_openTransactionsStack.empty())
-  {
+void RepeatStack::clear() {
+  if (!m_openTransactionsStack.empty()) {
     return;
   }
   assert(!m_repeating);
   m_stack.clear();
 }
 
-void RepeatStack::clearOnNextPush()
-{
-  if (!m_openTransactionsStack.empty())
-  {
+void RepeatStack::clearOnNextPush() {
+  if (!m_openTransactionsStack.empty()) {
     return;
   }
   m_clearOnNextPush = true;
 }
 
-void RepeatStack::startTransaction()
-{
-  if (m_repeating)
-  {
+void RepeatStack::startTransaction() {
+  if (m_repeating) {
     return;
   }
   m_openTransactionsStack.emplace_back();
 }
 
-void RepeatStack::commitTransaction()
-{
-  if (m_repeating)
-  {
+void RepeatStack::commitTransaction() {
+  if (m_repeating) {
     return;
   }
   ensure(!m_openTransactionsStack.empty(), "a transaction is open");
@@ -121,8 +98,7 @@ void RepeatStack::commitTransaction()
   m_openTransactionsStack.pop_back();
 
   // discard empty transactions
-  if (transaction.empty())
-  {
+  if (transaction.empty()) {
     return;
   }
 
@@ -130,15 +106,13 @@ void RepeatStack::commitTransaction()
   push([transaction = std::move(transaction)]() { execute(transaction); });
 }
 
-void RepeatStack::rollbackTransaction()
-{
-  if (m_repeating)
-  {
+void RepeatStack::rollbackTransaction() {
+  if (m_repeating) {
     return;
   }
   ensure(!m_openTransactionsStack.empty(), "a transaction is open");
 
-  auto& openTransaction = m_openTransactionsStack.back();
+  auto &openTransaction = m_openTransactionsStack.back();
   openTransaction.clear();
 }
 } // namespace View

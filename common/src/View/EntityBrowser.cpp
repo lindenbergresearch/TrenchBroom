@@ -41,75 +41,63 @@
 // for use in QVariant
 Q_DECLARE_METATYPE(TrenchBroom::Assets::EntityDefinitionSortOrder)
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 EntityBrowser::EntityBrowser(
-  std::weak_ptr<MapDocument> document, GLContextManager& contextManager, QWidget* parent)
-  : QWidget(parent)
-  , m_document(std::move(document))
-  , m_sortOrderChoice(nullptr)
-  , m_groupButton(nullptr)
-  , m_usedButton(nullptr)
-  , m_filterBox(nullptr)
-  , m_scrollBar(nullptr)
-  , m_view(nullptr)
-{
+    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
+    : QWidget(parent), m_document(std::move(document)), m_sortOrderChoice(nullptr), m_groupButton(nullptr),
+      m_usedButton(nullptr), m_filterBox(nullptr), m_scrollBar(nullptr), m_view(nullptr) {
   createGui(contextManager);
   connectObservers();
 }
 
-void EntityBrowser::reload()
-{
-  if (m_view != nullptr)
-  {
+void EntityBrowser::reload() {
+  if (m_view!=nullptr) {
     auto document = kdl::mem_lock(m_document);
     m_view->setDefaultModelScaleExpression(
-      document->world()->entityPropertyConfig().defaultModelScaleExpression);
+        document->world()->entityPropertyConfig().defaultModelScaleExpression);
 
     m_view->invalidate();
     m_view->update();
   }
 }
 
-void EntityBrowser::createGui(GLContextManager& contextManager)
-{
+void EntityBrowser::createGui(GLContextManager &contextManager) {
   m_scrollBar = new QScrollBar(Qt::Vertical);
 
   auto document = kdl::mem_lock(m_document);
 
   m_view = new EntityBrowserView(
-    m_scrollBar,
-    contextManager,
-    document->entityDefinitionManager(),
-    document->entityModelManager(),
-    *document);
+      m_scrollBar,
+      contextManager,
+      document->entityDefinitionManager(),
+      document->entityModelManager(),
+      *document);
 
-  auto* browserPanelSizer = new QHBoxLayout();
+  auto *browserPanelSizer = new QHBoxLayout();
   browserPanelSizer->setContentsMargins(0, 0, 0, 0);
   browserPanelSizer->setSpacing(0);
   browserPanelSizer->addWidget(m_view, 1);
   browserPanelSizer->addWidget(m_scrollBar, 0);
 
-  auto* browserPanel = new QWidget(this);
+  auto *browserPanel = new QWidget(this);
   browserPanel->setLayout(browserPanelSizer);
 
   m_sortOrderChoice = new QComboBox();
   m_sortOrderChoice->setObjectName("TextureBrowser_smallComboBox");
   makeSmall(m_sortOrderChoice);
   m_sortOrderChoice->addItem(
-    tr("Name"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Name));
+      tr("Name"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Name));
   m_sortOrderChoice->addItem(
-    tr("Usage"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Usage));
+      tr("Usage"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Usage));
   m_sortOrderChoice->setCurrentIndex(0);
   m_sortOrderChoice->setToolTip(tr("Select ordering criterion"));
   connect(
-    m_sortOrderChoice, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
-      auto sortOrder = static_cast<Assets::EntityDefinitionSortOrder>(
-        m_sortOrderChoice->itemData(index).toInt());
-      m_view->setSortOrder(sortOrder);
-    });
+      m_sortOrderChoice, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
+        auto sortOrder = static_cast<Assets::EntityDefinitionSortOrder>(
+            m_sortOrderChoice->itemData(index).toInt());
+        m_view->setSortOrder(sortOrder);
+      });
 
   m_groupButton = new QPushButton(tr("Group"));
   m_groupButton->setObjectName("TextureBrowser_smallPushButton");
@@ -134,19 +122,19 @@ void EntityBrowser::createGui(GLContextManager& contextManager)
     m_view->setFilterText(m_filterBox->text().toStdString());
   });
 
-  auto* controlSizer = new QHBoxLayout();
+  auto *controlSizer = new QHBoxLayout();
   controlSizer->setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowVMargin,
-    LayoutConstants::NarrowHMargin,
-    LayoutConstants::NarrowVMargin);
+      LayoutConstants::NarrowHMargin,
+      LayoutConstants::NarrowVMargin,
+      LayoutConstants::NarrowHMargin,
+      LayoutConstants::NarrowVMargin);
   controlSizer->setSpacing(LayoutConstants::NarrowHMargin);
   controlSizer->addWidget(m_sortOrderChoice, 0);
   controlSizer->addWidget(m_groupButton, 0);
   controlSizer->addWidget(m_usedButton, 0);
   controlSizer->addWidget(m_filterBox, 1);
 
-  auto* outerSizer = new QVBoxLayout();
+  auto *outerSizer = new QVBoxLayout();
   outerSizer->setContentsMargins(0, 0, 0, 0);
   outerSizer->setSpacing(0);
   outerSizer->addWidget(browserPanel, 1);
@@ -155,60 +143,50 @@ void EntityBrowser::createGui(GLContextManager& contextManager)
   setLayout(outerSizer);
 }
 
-void EntityBrowser::connectObservers()
-{
+void EntityBrowser::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection +=
-    document->documentWasNewedNotifier.connect(this, &EntityBrowser::documentWasNewed);
+      document->documentWasNewedNotifier.connect(this, &EntityBrowser::documentWasNewed);
   m_notifierConnection +=
-    document->documentWasLoadedNotifier.connect(this, &EntityBrowser::documentWasLoaded);
+      document->documentWasLoadedNotifier.connect(this, &EntityBrowser::documentWasLoaded);
   m_notifierConnection +=
-    document->modsDidChangeNotifier.connect(this, &EntityBrowser::modsDidChange);
+      document->modsDidChangeNotifier.connect(this, &EntityBrowser::modsDidChange);
   m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(
-    this, &EntityBrowser::entityDefinitionsDidChange);
+      this, &EntityBrowser::entityDefinitionsDidChange);
   m_notifierConnection +=
-    document->nodesDidChangeNotifier.connect(this, &EntityBrowser::nodesDidChange);
+      document->nodesDidChangeNotifier.connect(this, &EntityBrowser::nodesDidChange);
 
-  PreferenceManager& prefs = PreferenceManager::instance();
+  PreferenceManager &prefs = PreferenceManager::instance();
   m_notifierConnection +=
-    prefs.preferenceDidChangeNotifier.connect(this, &EntityBrowser::preferenceDidChange);
+      prefs.preferenceDidChangeNotifier.connect(this, &EntityBrowser::preferenceDidChange);
 }
 
-void EntityBrowser::documentWasNewed(MapDocument*)
-{
+void EntityBrowser::documentWasNewed(MapDocument *) {
   reload();
 }
 
-void EntityBrowser::documentWasLoaded(MapDocument*)
-{
+void EntityBrowser::documentWasLoaded(MapDocument *) {
   reload();
 }
 
-void EntityBrowser::modsDidChange()
-{
+void EntityBrowser::modsDidChange() {
   reload();
 }
 
-void EntityBrowser::nodesDidChange(const std::vector<Model::Node*>&)
-{
+void EntityBrowser::nodesDidChange(const std::vector<Model::Node *> &) {
   // to handle definition usage count changes
   reload();
 }
 
-void EntityBrowser::entityDefinitionsDidChange()
-{
+void EntityBrowser::entityDefinitionsDidChange() {
   reload();
 }
 
-void EntityBrowser::preferenceDidChange(const std::filesystem::path& path)
-{
+void EntityBrowser::preferenceDidChange(const std::filesystem::path &path) {
   auto document = kdl::mem_lock(m_document);
-  if (document->isGamePathPreference(path))
-  {
+  if (document->isGamePathPreference(path)) {
     reload();
-  }
-  else
-  {
+  } else {
     m_view->update();
   }
 }

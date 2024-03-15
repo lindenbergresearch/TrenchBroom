@@ -26,79 +26,65 @@
 
 #include "TrenchBroomApp.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
-namespace Fonts
-{
-QFont fixedWidthFont()
-{
+namespace TrenchBroom {
+namespace View {
+namespace Fonts {
+QFont fixedWidthFont() {
   auto font = TrenchBroomApp::instance().getConsoleFont();
   return font;
 }
 } // namespace Fonts
 
-namespace Colors
-{
-QColor defaultText()
-{
+namespace Colors {
+QColor defaultText() {
   QPalette pal;
   QColor result = pal.color(QPalette::Normal, QPalette::WindowText);
   return result;
 }
 
-QColor highlight()
-{
+QColor highlight() {
   // Used for selected tabs of TabBar control.
   QPalette pal;
   QColor result = pal.color(QPalette::Normal, QPalette::Highlight);
   return result;
 }
 
-QColor highlightText()
-{
+QColor highlightText() {
   // Used for selected tabs of TabBar control.
   QPalette pal;
   QColor result = pal.color(QPalette::Normal, QPalette::HighlightedText);
   return result;
 }
 
-QColor disabledText()
-{
+QColor disabledText() {
   QPalette pal;
   QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
   return result;
 }
 
-QColor midlight()
-{
+QColor midlight() {
   QPalette pal;
   QColor result = pal.color(QPalette::Disabled, QPalette::Midlight);
   return result;
 }
 
-
 /**
  * Table cell/text edit widget disabled text. Intended for use against a QPalette::Base
  * background.
  */
-QColor disabledCellText()
-{
+QColor disabledCellText() {
   QPalette pal;
   QColor result = pal.color(QPalette::Disabled, QPalette::Text);
   return result;
 }
 
-QColor disabledText(const QWidget* widget)
-{
-  const QPalette& pal = widget->palette();
+QColor disabledText(const QWidget *widget) {
+  const QPalette &pal = widget->palette();
   QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
   return result;
 }
 
-QColor window()
-{
+QColor window() {
   QPalette pal;
   QColor result = pal.color(QPalette::Active, QPalette::Window);
   return result;

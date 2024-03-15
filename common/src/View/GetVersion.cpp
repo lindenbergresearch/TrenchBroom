@@ -21,22 +21,17 @@
 
 #include "Version.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
-QString getBuildVersion()
-{
+namespace TrenchBroom {
+namespace View {
+QString getBuildVersion() {
   return QString(VERSION_STR);
 }
 
-QString getBuildIdStr()
-{
+QString getBuildIdStr() {
   return QString(BUILD_ID_STR);
 }
 
-QString getBuildType()
-{
+QString getBuildType() {
   return QString(BUILD_TYPE);
 }
 } // namespace View

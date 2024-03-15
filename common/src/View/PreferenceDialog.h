@@ -32,20 +32,16 @@ class QToolBar;
 
 class QWidget;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
 
 class PreferencePane;
 
-class PreferenceDialog : public QDialog
-{
-  Q_OBJECT
+class PreferenceDialog : public QDialog {
+Q_OBJECT
 private:
-  enum PrefPane
-  {
+  enum PrefPane {
     PrefPane_First = 0,
     PrefPane_Games = 0,
     PrefPane_View = 1,
@@ -61,19 +57,19 @@ private:
   static const int ICON_WIDTH;
 
   std::shared_ptr<MapDocument> m_document;
-  QToolBar* m_toolBar;
-  QStackedWidget* m_stackedWidget;
-  QDialogButtonBox* m_buttonBox;
-  std::map<QString, QAction*> m_toolButtonActions;
+  QToolBar *m_toolBar;
+  QStackedWidget *m_stackedWidget;
+  QDialogButtonBox *m_buttonBox;
+  std::map<QString, QAction *> m_toolButtonActions;
 
 public:
   explicit PreferenceDialog(
-    std::shared_ptr<MapDocument> document, QWidget* parent = nullptr);
+      std::shared_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 protected: // QWidget overrides
-  void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent *event) override;
 
-  bool eventFilter(QObject* o, QEvent* e) override;
+  bool eventFilter(QObject *o, QEvent *e) override;
 
 private:
   void createGui();
@@ -82,7 +78,7 @@ private:
 
   void highlightToolButton(QString buttonName, bool highlighted = true);
 
-  PreferencePane* currentPane() const;
+  PreferencePane *currentPane() const;
 
 private slots:
 

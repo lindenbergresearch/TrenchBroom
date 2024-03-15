@@ -41,34 +41,25 @@
 
 #include <filesystem>
 
-namespace TrenchBroom
-{
-namespace View
-{
-ObjExportDialog::ObjExportDialog(MapFrame* mapFrame)
-  : QDialog{mapFrame}
-  , m_mapFrame{mapFrame}
-  , m_exportPathEdit{nullptr}
-  , m_browseExportPathButton{nullptr}
-  , m_relativeToGamePathRadioButton{nullptr}
-  , m_relativeToExportPathRadioButton{nullptr}
-  , m_exportButton{nullptr}
-  , m_closeButton{nullptr}
-{
-  ensure(m_mapFrame != nullptr, "Map frame is not null");
+namespace TrenchBroom {
+namespace View {
+ObjExportDialog::ObjExportDialog(MapFrame *mapFrame)
+    : QDialog{mapFrame}, m_mapFrame{mapFrame}, m_exportPathEdit{nullptr}, m_browseExportPathButton{nullptr},
+      m_relativeToGamePathRadioButton{nullptr}, m_relativeToExportPathRadioButton{nullptr}, m_exportButton{nullptr},
+      m_closeButton{nullptr} {
+  ensure(m_mapFrame!=nullptr, "Map frame is not null");
   createGui();
   resize(500, 0);
   // setFixedHeight(height());
 }
 
-void ObjExportDialog::createGui()
-{
+void ObjExportDialog::createGui() {
   setWindowIconTB(this);
   setWindowTitle("Export");
 
-  auto* header = new DialogHeader{tr("Export Wavefront OBJ")};
+  auto *header = new DialogHeader{tr("Export Wavefront OBJ")};
 
-  auto* formLayout = new FormWithSectionsLayout{};
+  auto *formLayout = new FormWithSectionsLayout{};
   formLayout->setContentsMargins(0, 20, 0, 20);
   formLayout->setHorizontalSpacing(LayoutConstants::WideHMargin);
   formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
@@ -76,7 +67,7 @@ void ObjExportDialog::createGui()
 
   formLayout->addSection(tr("Export Path"));
 
-  auto* exportPathLayout = new QHBoxLayout{};
+  auto *exportPathLayout = new QHBoxLayout{};
   exportPathLayout->setContentsMargins(0, 0, 0, 0);
   exportPathLayout->setSpacing(LayoutConstants::MediumHMargin);
 
@@ -91,8 +82,8 @@ void ObjExportDialog::createGui()
   formLayout->addRow("Path", exportPathLayout);
 
   formLayout->addSection(
-    tr("Texture Paths"),
-    tr("Controls how the texture paths in the generated material file are computed."));
+      tr("Texture Paths"),
+      tr("Controls how the texture paths in the generated material file are computed."));
 
   m_relativeToGamePathRadioButton = new QRadioButton{};
   m_relativeToGamePathRadioButton->setText(tr("Relative to game path"));
@@ -101,7 +92,7 @@ void ObjExportDialog::createGui()
   m_relativeToExportPathRadioButton = new QRadioButton{};
   m_relativeToExportPathRadioButton->setText(tr("Relative to export path"));
 
-  auto* texturePathLayout = new QVBoxLayout{};
+  auto *texturePathLayout = new QVBoxLayout{};
   texturePathLayout->setContentsMargins(0, 0, 0, 0);
   texturePathLayout->setSpacing(0);
   texturePathLayout->addWidget(m_relativeToGamePathRadioButton);
@@ -109,20 +100,20 @@ void ObjExportDialog::createGui()
 
   formLayout->addRow(texturePathLayout);
 
-  auto* innerLayout = new QVBoxLayout{};
+  auto *innerLayout = new QVBoxLayout{};
   innerLayout->setContentsMargins(0, 0, 0, 0);
   innerLayout->setSpacing(0);
   innerLayout->addWidget(header);
   innerLayout->addWidget(new BorderLine{});
   innerLayout->addLayout(formLayout);
 
-  auto* outerLayout = new QVBoxLayout{};
+  auto *outerLayout = new QVBoxLayout{};
   outerLayout->setContentsMargins(0, 0, 0, 0);
   outerLayout->setSpacing(LayoutConstants::MediumVMargin);
   outerLayout->addLayout(innerLayout);
 
   // Bottom button row.
-  auto* buttonBox = new QDialogButtonBox{};
+  auto *buttonBox = new QDialogButtonBox{};
   m_closeButton = buttonBox->addButton(QDialogButtonBox::Cancel);
   m_exportButton = buttonBox->addButton("Export", QDialogButtonBox::AcceptRole);
   m_exportButton->setDefault(true);
@@ -136,12 +127,11 @@ void ObjExportDialog::createGui()
   connect(m_closeButton, &QPushButton::clicked, this, &ObjExportDialog::close);
   connect(m_browseExportPathButton, &QPushButton::clicked, this, [&]() {
     const QString newFileName = QFileDialog::getSaveFileName(
-      this,
-      tr("Export Wavefront OBJ file"),
-      m_exportPathEdit->text(),
-      "Wavefront OBJ files (*.obj)");
-    if (!newFileName.isEmpty())
-    {
+        this,
+        tr("Export Wavefront OBJ file"),
+        m_exportPathEdit->text(),
+        "Wavefront OBJ files (*.obj)");
+    if (!newFileName.isEmpty()) {
       m_exportPathEdit->setText(newFileName);
     }
   });
@@ -149,17 +139,16 @@ void ObjExportDialog::createGui()
     IO::ObjExportOptions options;
     options.exportPath = IO::pathFromQString(m_exportPathEdit->text());
     options.mtlPathMode = m_relativeToGamePathRadioButton->isChecked()
-                            ? IO::ObjMtlPathMode::RelativeToGamePath
-                            : IO::ObjMtlPathMode::RelativeToExportPath;
+                          ? IO::ObjMtlPathMode::RelativeToGamePath
+                          : IO::ObjMtlPathMode::RelativeToExportPath;
     m_mapFrame->exportDocument(options);
     close();
   });
 }
 
-void ObjExportDialog::updateExportPath()
-{
+void ObjExportDialog::updateExportPath() {
   const auto document = m_mapFrame->document();
-  const auto& originalPath = document->path();
+  const auto &originalPath = document->path();
   const auto objPath = kdl::path_replace_extension(originalPath, ".obj");
   m_exportPathEdit->setText(IO::pathAsQString(objPath));
 }

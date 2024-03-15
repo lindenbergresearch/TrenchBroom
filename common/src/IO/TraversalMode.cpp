@@ -23,18 +23,13 @@
 
 #include <ostream>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-std::ostream& operator<<(std::ostream& lhs, const TraversalMode& rhs)
-{
-  switch (rhs)
-  {
-  case TraversalMode::Flat:
-    lhs << "Normal";
+std::ostream &operator<<(std::ostream &lhs, const TraversalMode &rhs) {
+  switch (rhs) {
+  case TraversalMode::Flat:lhs << "Normal";
     break;
-  case TraversalMode::Recursive:
-    lhs << "Recursive";
+  case TraversalMode::Recursive:lhs << "Recursive";
     break;
     switchDefault();
   }

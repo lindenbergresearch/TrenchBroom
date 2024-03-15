@@ -27,72 +27,54 @@
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 TriangleRenderer::TriangleRenderer()
-  : m_useColor(false)
-  , m_applyTinting(false)
-{
+    : m_useColor(false), m_applyTinting(false) {
 }
 
 TriangleRenderer::TriangleRenderer(
-  const VertexArray& vertexArray, const IndexRangeMap& indexArray)
-  : m_vertexArray(vertexArray)
-  , m_indexArray(indexArray)
-  , m_useColor(false)
-  , m_applyTinting(false)
-{
+    const VertexArray &vertexArray, const IndexRangeMap &indexArray)
+    : m_vertexArray(vertexArray), m_indexArray(indexArray), m_useColor(false), m_applyTinting(false) {
 }
 
 TriangleRenderer::TriangleRenderer(
-  const VertexArray& vertexArray, const PrimType primType)
-  : m_vertexArray(vertexArray)
-  , m_indexArray(primType, 0, m_vertexArray.vertexCount())
-  , m_useColor(false)
-  , m_applyTinting(false)
-{
+    const VertexArray &vertexArray, const PrimType primType)
+    : m_vertexArray(vertexArray), m_indexArray(primType, 0, m_vertexArray.vertexCount()), m_useColor(false),
+      m_applyTinting(false) {
 }
 
-void TriangleRenderer::setUseColor(const bool useColor)
-{
+void TriangleRenderer::setUseColor(const bool useColor) {
   m_useColor = useColor;
 }
 
-void TriangleRenderer::setColor(const Color& color)
-{
+void TriangleRenderer::setColor(const Color &color) {
   m_color = color;
 }
 
-void TriangleRenderer::setApplyTinting(const bool applyTinting)
-{
+void TriangleRenderer::setApplyTinting(const bool applyTinting) {
   m_applyTinting = applyTinting;
 }
 
-void TriangleRenderer::setTintColor(const Color& tintColor)
-{
+void TriangleRenderer::setTintColor(const Color &tintColor) {
   m_tintColor = tintColor;
 }
 
-void TriangleRenderer::doPrepareVertices(VboManager& vboManager)
-{
+void TriangleRenderer::doPrepareVertices(VboManager &vboManager) {
   m_vertexArray.prepare(vboManager);
 }
 
-void TriangleRenderer::doRender(RenderContext& context)
-{
-  if (m_vertexArray.vertexCount() == 0)
+void TriangleRenderer::doRender(RenderContext &context) {
+  if (m_vertexArray.vertexCount()==0)
     return;
-  PreferenceManager& prefs = PreferenceManager::instance();
+  PreferenceManager &prefs = PreferenceManager::instance();
   const float shadeLevel = pref(Preferences::ShadeLevel);
-
 
   ActiveShader shader(context.shaderManager(), Shaders::TriangleShader);
   shader.set("ApplyTinting", m_applyTinting);
   shader.set("TintColor", m_tintColor);
-  shader.set("Alpha", 0.75f);
-  shader.set("ShadeLevel", shadeLevel);
+  shader.set("Alpha", 0.9f);
+  shader.set("ShadeLevel", 0.5);
   shader.set("UseColor", m_useColor);
   shader.set("Color", m_color);
   shader.set("CameraPosition", context.camera().position());

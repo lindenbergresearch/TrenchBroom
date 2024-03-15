@@ -25,19 +25,15 @@
 
 class QKeyEvent;
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Camera;
 }
 
-namespace View
-{
-class FlyModeHelper
-{
+namespace View {
+class FlyModeHelper {
 private:
-  Renderer::Camera& m_camera;
+  Renderer::Camera &m_camera;
 
   bool m_forward;
   bool m_backward;
@@ -51,14 +47,14 @@ private:
   int64_t m_lastPollTime;
 
 public:
-  explicit FlyModeHelper(Renderer::Camera& camera);
+  explicit FlyModeHelper(Renderer::Camera &camera);
 
   void pollAndUpdate();
 
 public:
-  void keyDown(QKeyEvent* event);
+  void keyDown(QKeyEvent *event);
 
-  void keyUp(QKeyEvent* event);
+  void keyUp(QKeyEvent *event);
 
   /**
    * Returns whether the camera is currently moving due to a fly key being held down.

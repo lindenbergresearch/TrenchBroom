@@ -31,21 +31,16 @@
 
 #include <optional>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Model
-{
+namespace Model {
 class EntityNodeBase;
 
-struct PatchGrid
-{
-  struct Point
-  {
+struct PatchGrid {
+  struct Point {
     vm::vec3 position;
     vm::vec2 texCoords;
     vm::vec3 normal;
@@ -58,7 +53,7 @@ struct PatchGrid
   std::vector<Point> points;
   vm::bbox3 bounds;
 
-  const Point& point(size_t row, size_t col) const;
+  const Point &point(size_t row, size_t col) const;
 
   size_t quadRowCount() const;
   size_t quadColumnCount() const;
@@ -68,15 +63,14 @@ struct PatchGrid
 
 // public for testing
 std::vector<vm::vec3> computeGridNormals(
-  std::vector<BezierPatch::Point> patchGrid,
-  size_t pointRowCount,
-  size_t pointColumnCount);
+    std::vector<BezierPatch::Point> patchGrid,
+    size_t pointRowCount,
+    size_t pointColumnCount);
 
 // public for testing
-PatchGrid makePatchGrid(const BezierPatch& patch, size_t subdivisionsPerSurface);
+PatchGrid makePatchGrid(const BezierPatch &patch, size_t subdivisionsPerSurface);
 
-class PatchNode : public Node, public Object
-{
+class PatchNode : public Node, public Object {
 public:
   static const HitType::Type PatchHitType;
 
@@ -87,27 +81,27 @@ private:
 public:
   explicit PatchNode(BezierPatch patch);
 
-  EntityNodeBase* entity();
-  const EntityNodeBase* entity() const;
+  EntityNodeBase *entity();
+  const EntityNodeBase *entity() const;
 
-  const BezierPatch& patch() const;
+  const BezierPatch &patch() const;
   BezierPatch setPatch(BezierPatch patch);
 
-  void setTexture(Assets::Texture* texture);
+  void setTexture(Assets::Texture *texture);
 
-  const PatchGrid& grid() const;
+  const PatchGrid &grid() const;
 
 private: // implement Node interface
-  const std::string& doGetName() const override;
-  const vm::bbox3& doGetLogicalBounds() const override;
-  const vm::bbox3& doGetPhysicalBounds() const override;
+  const std::string &doGetName() const override;
+  const vm::bbox3 &doGetLogicalBounds() const override;
+  const vm::bbox3 &doGetPhysicalBounds() const override;
 
   FloatType doGetProjectedArea(vm::axis::type axis) const override;
 
-  Node* doClone(const vm::bbox3& worldBounds, SetLinkId setLinkIds) const override;
+  Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
 
-  bool doCanAddChild(const Node* child) const override;
-  bool doCanRemoveChild(const Node* child) const override;
+  bool doCanAddChild(const Node *child) const override;
+  bool doCanRemoveChild(const Node *child) const override;
   bool doRemoveIfEmpty() const override;
 
   bool doShouldAddToSpacialIndex() const override;
@@ -115,22 +109,22 @@ private: // implement Node interface
   bool doSelectable() const override;
 
   void doPick(
-    const EditorContext& editorContext,
-    const vm::ray3& ray,
-    PickResult& pickResult) override;
-  void doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result) override;
+      const EditorContext &editorContext,
+      const vm::ray3 &ray,
+      PickResult &pickResult) override;
+  void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
-  void doAccept(NodeVisitor& visitor) override;
-  void doAccept(ConstNodeVisitor& visitor) const override;
+  void doAccept(NodeVisitor &visitor) override;
+  void doAccept(ConstNodeVisitor &visitor) const override;
 
 private: // implement Object interface
-  Node* doGetContainer() override;
-  LayerNode* doGetContainingLayer() override;
-  GroupNode* doGetContainingGroup() override;
+  Node *doGetContainer() override;
+  LayerNode *doGetContainingLayer() override;
+  GroupNode *doGetContainingGroup() override;
 
 private: // implement Taggable interface
-  void doAcceptTagVisitor(TagVisitor& visitor) override;
-  void doAcceptTagVisitor(ConstTagVisitor& visitor) const override;
+  void doAcceptTagVisitor(TagVisitor &visitor) override;
+  void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

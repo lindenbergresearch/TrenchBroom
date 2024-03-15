@@ -24,18 +24,15 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
 
-class CreateSimpleBrushTool : public CreateBrushToolBase
-{
+class CreateSimpleBrushTool : public CreateBrushToolBase {
 public:
   explicit CreateSimpleBrushTool(std::weak_ptr<MapDocument> document);
 
-  void update(const vm::bbox3& bounds);
+  void update(const vm::bbox3 &bounds);
 };
 } // namespace View
 } // namespace TrenchBroom

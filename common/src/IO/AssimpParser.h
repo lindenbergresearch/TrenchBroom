@@ -32,37 +32,33 @@ struct aiNode;
 struct aiScene;
 struct aiMesh;
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class Texture;
 } // namespace TrenchBroom::Assets
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class FileSystem;
 
-struct AssimpMeshWithTransforms
-{
-  const aiMesh* m_mesh;
+struct AssimpMeshWithTransforms {
+  const aiMesh *m_mesh;
   aiMatrix4x4 m_transform;
   aiMatrix4x4 m_axisTransform;
 };
 
-class AssimpParser : public EntityModelParser
-{
+class AssimpParser : public EntityModelParser {
 private:
   std::filesystem::path m_path;
-  const FileSystem& m_fs;
+  const FileSystem &m_fs;
 
 public:
-  AssimpParser(std::filesystem::path path, const FileSystem& fs);
+  AssimpParser(std::filesystem::path path, const FileSystem &fs);
 
-  static bool canParse(const std::filesystem::path& path);
+  static bool canParse(const std::filesystem::path &path);
 
 private:
   void doLoadFrame(
-    size_t frameIndex, Assets::EntityModel& model, Logger& logger) override;
-  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger& logger) override;
+      size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 };
 
 } // namespace TrenchBroom::IO

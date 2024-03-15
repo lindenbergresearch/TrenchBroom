@@ -25,28 +25,25 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Entity;
 
-class EntityPropertiesVariableStore : public EL::VariableStore
-{
+class EntityPropertiesVariableStore : public EL::VariableStore {
 private:
-  const Entity& m_entity;
+  const Entity &m_entity;
 
 public:
-  explicit EntityPropertiesVariableStore(const Entity& entity);
+  explicit EntityPropertiesVariableStore(const Entity &entity);
 
-  VariableStore* clone() const override;
+  VariableStore *clone() const override;
   size_t size() const override;
-  EL::Value value(const std::string& name) const override;
+  EL::Value value(const std::string &name) const override;
   std::vector<std::string> names() const override;
-  void declare(const std::string& name, const EL::Value& value) override;
-  void assign(const std::string& name, const EL::Value& value) override;
+  void declare(const std::string &name, const EL::Value &value) override;
+  void assign(const std::string &name, const EL::Value &value) override;
 
-  deleteCopyAndMove(EntityPropertiesVariableStore);
+deleteCopyAndMove(EntityPropertiesVariableStore);
 };
 } // namespace Model
 } // namespace TrenchBroom

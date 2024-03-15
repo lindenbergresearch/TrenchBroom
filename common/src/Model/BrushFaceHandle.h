@@ -23,10 +23,8 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushNode;
 class BrushFace;
 
@@ -38,10 +36,9 @@ class BrushFace;
  * must be taken to prevent stale brush face handles which reference non existing brush
  * faces.
  */
-class BrushFaceHandle
-{
+class BrushFaceHandle {
 private:
-  BrushNode* m_node;
+  BrushNode *m_node;
   size_t m_faceIndex;
 
 public:
@@ -51,12 +48,12 @@ public:
    * @param node the containing brush node, must not be null
    * @param faceIndex the brush face index, must be valid for the given brush node
    */
-  BrushFaceHandle(BrushNode* node, size_t faceIndex);
+  BrushFaceHandle(BrushNode *node, size_t faceIndex);
 
   /**
    * Returns the containing brush node.
    */
-  BrushNode* node() const;
+  BrushNode *node() const;
 
   /**
    * Returns the face index.
@@ -66,7 +63,7 @@ public:
   /**
    * Returns the brush face.
    */
-  const BrushFace& face() const;
+  const BrushFace &face() const;
 
   kdl_reflect_decl(BrushFaceHandle, m_node, m_faceIndex);
 };
@@ -74,11 +71,11 @@ public:
 /**
  * Returns a vector containing the nodes contained in the given handles.
  */
-std::vector<BrushNode*> toNodes(const std::vector<BrushFaceHandle>& handles);
+std::vector<BrushNode *> toNodes(const std::vector<BrushFaceHandle> &handles);
 
 /**
  * Returns a vector containing handles representing the faces of the given brush.
  */
-std::vector<BrushFaceHandle> toHandles(BrushNode* brushNode);
+std::vector<BrushFaceHandle> toHandles(BrushNode *brushNode);
 } // namespace Model
 } // namespace TrenchBroom

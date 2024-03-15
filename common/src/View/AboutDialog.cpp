@@ -25,48 +25,37 @@
 #include "View/AppInfoPanel.h"
 #include "View/QtUtils.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
-AboutDialog* AboutDialog::instance = nullptr;
+namespace TrenchBroom {
+namespace View {
+AboutDialog *AboutDialog::instance = nullptr;
 
-void AboutDialog::showAboutDialog()
-{
-  if (!AboutDialog::instance)
-  {
+void AboutDialog::showAboutDialog() {
+  if (!AboutDialog::instance) {
     AboutDialog::instance = new AboutDialog{};
     AboutDialog::instance->show();
-  }
-  else
-  {
+  } else {
     AboutDialog::instance->show();
     AboutDialog::instance->raise();
   }
 }
 
-void AboutDialog::closeAboutDialog()
-{
-  if (AboutDialog::instance)
-  {
+void AboutDialog::closeAboutDialog() {
+  if (AboutDialog::instance) {
     AboutDialog::instance->close();
   }
 }
 
-AboutDialog::~AboutDialog()
-{
+AboutDialog::~AboutDialog() {
   instance = nullptr;
 }
 
-AboutDialog::AboutDialog()
-{
+AboutDialog::AboutDialog() {
   // This makes it so the About dialog doesn't prevent the application from quitting
   setAttribute(Qt::WA_QuitOnClose, false);
   createGui();
 }
 
-void AboutDialog::createGui()
-{
+void AboutDialog::createGui() {
   const QString creditsString = tr(R"(
 github.com/TrenchBroom/TrenchBroom<br />
 <br />
@@ -116,12 +105,12 @@ Source Sans Pro (Font)<br />
 Font Awesome 5 Free (Icons)<br />)");
   setWindowIconTB(this);
 
-  auto* infoPanel = new AppInfoPanel{};
-  auto* creditsText = new QLabel{creditsString};
+  auto *infoPanel = new AppInfoPanel{};
+  auto *creditsText = new QLabel{creditsString};
   creditsText->setWordWrap(true);
   creditsText->setMaximumWidth(300);
 
-  auto* layout = new QHBoxLayout{};
+  auto *layout = new QHBoxLayout{};
   layout->setSizeConstraint(QLayout::SetFixedSize);
   layout->setContentsMargins(0, 20, 0, 20);
   layout->addSpacing(50);

@@ -29,15 +29,12 @@ class QLineEdit;
 
 class QStackedWidget;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 struct CompilationProfile;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class CompilationTaskListBox;
 
 class MapDocument;
@@ -47,33 +44,32 @@ class MultiCompletionLineEdit;
 /**
  * Editor UI for a single compilation profile.
  */
-class CompilationProfileEditor : public QWidget
-{
-  Q_OBJECT
+class CompilationProfileEditor : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
-  Model::CompilationProfile* m_profile{nullptr};
-  QStackedWidget* m_stackedWidget{nullptr};
-  QLineEdit* m_nameTxt{nullptr};
-  MultiCompletionLineEdit* m_workDirTxt{nullptr};
-  CompilationTaskListBox* m_taskList{nullptr};
-  QAbstractButton* m_addTaskButton{nullptr};
-  QAbstractButton* m_removeTaskButton{nullptr};
-  QAbstractButton* m_moveTaskUpButton{nullptr};
-  QAbstractButton* m_moveTaskDownButton{nullptr};
+  Model::CompilationProfile *m_profile{nullptr};
+  QStackedWidget *m_stackedWidget{nullptr};
+  QLineEdit *m_nameTxt{nullptr};
+  MultiCompletionLineEdit *m_workDirTxt{nullptr};
+  CompilationTaskListBox *m_taskList{nullptr};
+  QAbstractButton *m_addTaskButton{nullptr};
+  QAbstractButton *m_removeTaskButton{nullptr};
+  QAbstractButton *m_moveTaskUpButton{nullptr};
+  QAbstractButton *m_moveTaskDownButton{nullptr};
 
 public:
   explicit CompilationProfileEditor(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
-  QWidget* createEditorPage(QWidget* parent);
+  QWidget *createEditorPage(QWidget *parent);
 
 private slots:
 
-  void nameChanged(const QString& text);
+  void nameChanged(const QString &text);
 
-  void workDirChanged(const QString& text);
+  void workDirChanged(const QString &text);
 
   void addTask();
 
@@ -94,7 +90,7 @@ private slots:
   void taskSelectionChanged();
 
 public:
-  void setProfile(Model::CompilationProfile* profile);
+  void setProfile(Model::CompilationProfile *profile);
 
 private:
   void refresh();

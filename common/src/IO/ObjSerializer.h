@@ -33,42 +33,34 @@
 #include <variant>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Model
-{
+namespace Model {
 class BrushNode;
 class BrushFace;
 class EntityProperty;
 class Node;
 } // namespace Model
 
-namespace IO
-{
-class ObjSerializer : public NodeSerializer
-{
+namespace IO {
+class ObjSerializer : public NodeSerializer {
 public:
-  template <typename V>
-  class IndexMap
-  {
+  template<typename V>
+  class IndexMap {
   private:
     std::map<V, size_t> m_map;
     std::vector<V> m_list;
 
   public:
-    const std::vector<V>& list() const { return m_list; }
+    const std::vector<V> &list() const { return m_list; }
 
-    size_t index(const V& v)
-    {
+    size_t index(const V &v) {
       const auto it = m_map.emplace(v, m_list.size()).first;
       const size_t index = it->second;
-      if (index == m_list.size())
-      {
+      if (index==m_list.size()) {
         m_list.push_back(v);
       }
       return index;
@@ -81,53 +73,48 @@ public:
     void clearIndices() { m_map.clear(); }
   };
 
-  struct IndexedVertex
-  {
+  struct IndexedVertex {
     size_t vertex;
     size_t texCoords;
     size_t normal;
   };
 
-  struct BrushFace
-  {
+  struct BrushFace {
     std::vector<IndexedVertex> verts;
     std::string textureName;
-    const Assets::Texture* texture;
+    const Assets::Texture *texture;
   };
 
-  struct BrushObject
-  {
+  struct BrushObject {
     size_t entityNo;
     size_t brushNo;
     std::vector<BrushFace> faces;
   };
 
-  struct PatchQuad
-  {
+  struct PatchQuad {
     std::array<IndexedVertex, 4u> verts;
   };
 
-  struct PatchObject
-  {
+  struct PatchObject {
     size_t entityNo;
     size_t patchNo;
     std::vector<PatchQuad> quads;
     std::string textureName;
-    const Assets::Texture* texture;
+    const Assets::Texture *texture;
   };
 
   using Object = std::variant<BrushObject, PatchObject>;
 
-  friend std::ostream& operator<<(std::ostream& str, const IndexedVertex& vertex);
-  friend std::ostream& operator<<(std::ostream& str, const BrushFace& face);
-  friend std::ostream& operator<<(std::ostream& str, const BrushObject& object);
-  friend std::ostream& operator<<(std::ostream& str, const PatchQuad& quad);
-  friend std::ostream& operator<<(std::ostream& str, const PatchObject& object);
-  friend std::ostream& operator<<(std::ostream& str, const Object& object);
+  friend std::ostream &operator<<(std::ostream &str, const IndexedVertex &vertex);
+  friend std::ostream &operator<<(std::ostream &str, const BrushFace &face);
+  friend std::ostream &operator<<(std::ostream &str, const BrushObject &object);
+  friend std::ostream &operator<<(std::ostream &str, const PatchQuad &quad);
+  friend std::ostream &operator<<(std::ostream &str, const PatchObject &object);
+  friend std::ostream &operator<<(std::ostream &str, const Object &object);
 
 private:
-  std::ostream& m_objStream;
-  std::ostream& m_mtlStream;
+  std::ostream &m_objStream;
+  std::ostream &m_mtlStream;
   std::string m_mtlFilename;
   ObjExportOptions m_options;
 
@@ -140,23 +127,23 @@ private:
 
 public:
   ObjSerializer(
-    std::ostream& objStream,
-    std::ostream& mtlStream,
-    std::string mtlFilename,
-    ObjExportOptions options);
+      std::ostream &objStream,
+      std::ostream &mtlStream,
+      std::string mtlFilename,
+      ObjExportOptions options);
 
 private:
-  void doBeginFile(const std::vector<const Model::Node*>& rootNodes) override;
+  void doBeginFile(const std::vector<const Model::Node *> &rootNodes) override;
   void doEndFile() override;
 
-  void doBeginEntity(const Model::Node* node) override;
-  void doEndEntity(const Model::Node* node) override;
-  void doEntityProperty(const Model::EntityProperty& property) override;
+  void doBeginEntity(const Model::Node *node) override;
+  void doEndEntity(const Model::Node *node) override;
+  void doEntityProperty(const Model::EntityProperty &property) override;
 
-  void doBrush(const Model::BrushNode* brush) override;
-  void doBrushFace(const Model::BrushFace& face) override;
+  void doBrush(const Model::BrushNode *brush) override;
+  void doBrushFace(const Model::BrushFace &face) override;
 
-  void doPatch(const Model::PatchNode* patchNode) override;
+  void doPatch(const Model::PatchNode *patchNode) override;
 };
 } // namespace IO
 } // namespace TrenchBroom

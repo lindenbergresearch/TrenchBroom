@@ -26,15 +26,12 @@
 
 class QCheckBox;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class FlagsEditor : public QWidget
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class FlagsEditor : public QWidget {
+Q_OBJECT
 private:
-  using CheckBoxList = std::vector<QCheckBox*>;
+  using CheckBoxList = std::vector<QCheckBox *>;
   using ValueList = std::vector<int>;
 
   size_t m_numCols;
@@ -42,14 +39,14 @@ private:
   ValueList m_values;
 
 public:
-  explicit FlagsEditor(size_t numCols, QWidget* parent = nullptr);
+  explicit FlagsEditor(size_t numCols, QWidget *parent = nullptr);
 
-  void setFlags(const QStringList& labels, const QStringList& tooltips = QStringList());
+  void setFlags(const QStringList &labels, const QStringList &tooltips = QStringList());
 
   void setFlags(
-    const QList<int>& values,
-    const QStringList& labels,
-    const QStringList& tooltips = QStringList());
+      const QList<int> &values,
+      const QStringList &labels,
+      const QStringList &tooltips = QStringList());
 
   void setFlagValue(int set, int mixed = 0);
 

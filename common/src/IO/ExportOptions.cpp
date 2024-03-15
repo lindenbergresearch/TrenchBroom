@@ -27,22 +27,16 @@
 
 #include <ostream>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 
 kdl_reflect_impl(MapExportOptions);
 
-std::ostream& operator<<(std::ostream& lhs, const ObjMtlPathMode rhs)
-{
-  switch (rhs)
-  {
-  case ObjMtlPathMode::RelativeToGamePath:
-    lhs << "RelativeToGamePath";
+std::ostream &operator<<(std::ostream &lhs, const ObjMtlPathMode rhs) {
+  switch (rhs) {
+  case ObjMtlPathMode::RelativeToGamePath:lhs << "RelativeToGamePath";
     break;
-  case ObjMtlPathMode::RelativeToExportPath:
-    lhs << "RelativeToExportPath";
+  case ObjMtlPathMode::RelativeToExportPath:lhs << "RelativeToExportPath";
     break;
     switchDefault();
   }
@@ -51,9 +45,8 @@ std::ostream& operator<<(std::ostream& lhs, const ObjMtlPathMode rhs)
 
 kdl_reflect_impl(ObjExportOptions);
 
-std::ostream& operator<<(std::ostream& lhs, const ExportOptions& rhs)
-{
-  std::visit([&](const auto& o) { lhs << o; }, rhs);
+std::ostream &operator<<(std::ostream &lhs, const ExportOptions &rhs) {
+  std::visit([&](const auto &o) { lhs << o; }, rhs);
   return lhs;
 }
 } // namespace IO

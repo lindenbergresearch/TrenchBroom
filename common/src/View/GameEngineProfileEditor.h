@@ -24,48 +24,45 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 class QLineEdit;
 class QStackedWidget;
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 struct GameEngineProfile;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 /**
 * Editor widget for a single game engine profile.
 */
-class GameEngineProfileEditor : public QWidget
-{
- Q_OBJECT
+class GameEngineProfileEditor : public QWidget {
+Q_OBJECT
 private:
- Model::GameEngineProfile* m_profile = nullptr;
- QStackedWidget* m_stackedWidget = nullptr;
- QLineEdit* m_nameEdit = nullptr;
- QLineEdit* m_pathEdit = nullptr;
+  Model::GameEngineProfile *m_profile = nullptr;
+  QStackedWidget *m_stackedWidget = nullptr;
+  QLineEdit *m_nameEdit = nullptr;
+  QLineEdit *m_pathEdit = nullptr;
 
 public:
- explicit GameEngineProfileEditor(QWidget* parent = nullptr);
+  explicit GameEngineProfileEditor(QWidget *parent = nullptr);
 
 private:
- QWidget* createEditorPage();
- void updatePath(const QString& str);
+  QWidget *createEditorPage();
+  void updatePath(const QString &str);
 
 public:
- void setProfile(Model::GameEngineProfile* profile);
+  void setProfile(Model::GameEngineProfile *profile);
 
 private:
- void refresh();
+  void refresh();
 
- bool isValidEnginePath(const QString& str) const;
+  bool isValidEnginePath(const QString &str) const;
 private slots:
- void nameChanged(const QString& text);
- void pathChanged();
- void changePathClicked();
+  void nameChanged(const QString &text);
+  void pathChanged();
+  void changePathClicked();
 signals:
- /**
-  * Emitted after m_profile is changed in response to a UI action.
-  */
- void profileChanged();
+  /**
+   * Emitted after m_profile is changed in response to a UI action.
+   */
+  void profileChanged();
 };
 
 } // namespace TrenchBroom::View

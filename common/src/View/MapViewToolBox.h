@@ -27,10 +27,8 @@
 
 class QStackedLayout;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class ClipTool;
 class CreateComplexBrushTool;
 class CreateEntityTool;
@@ -45,8 +43,7 @@ class EdgeTool;
 class FaceTool;
 class MapDocument;
 
-class MapViewToolBox : public ToolBox
-{
+class MapViewToolBox : public ToolBox {
 private:
   std::weak_ptr<MapDocument> m_document;
 
@@ -66,22 +63,22 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  MapViewToolBox(std::weak_ptr<MapDocument> document, QStackedLayout* bookCtrl);
+  MapViewToolBox(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl);
   ~MapViewToolBox() override;
 
 public: // tools
-  ClipTool& clipTool();
-  CreateComplexBrushTool& createComplexBrushTool();
-  CreateEntityTool& createEntityTool();
-  CreateSimpleBrushTool& createSimpleBrushTool();
-  MoveObjectsTool& moveObjectsTool();
-  ExtrudeTool& extrudeTool();
-  RotateObjectsTool& rotateObjectsTool();
-  ScaleObjectsTool& scaleObjectsTool();
-  ShearObjectsTool& shearObjectsTool();
-  VertexTool& vertexTool();
-  EdgeTool& edgeTool();
-  FaceTool& faceTool();
+  ClipTool &clipTool();
+  CreateComplexBrushTool &createComplexBrushTool();
+  CreateEntityTool &createEntityTool();
+  CreateSimpleBrushTool &createSimpleBrushTool();
+  MoveObjectsTool &moveObjectsTool();
+  ExtrudeTool &extrudeTool();
+  RotateObjectsTool &rotateObjectsTool();
+  ScaleObjectsTool &scaleObjectsTool();
+  ShearObjectsTool &shearObjectsTool();
+  VertexTool &vertexTool();
+  EdgeTool &edgeTool();
+  FaceTool &faceTool();
 
   void toggleCreateComplexBrushTool();
   bool createComplexBrushToolActive() const;
@@ -97,7 +94,7 @@ public: // tools
   bool rotateObjectsToolActive() const;
   double rotateToolAngle() const;
   vm::vec3 rotateToolCenter() const;
-  void moveRotationCenter(const vm::vec3& delta);
+  void moveRotationCenter(const vm::vec3 &delta);
 
   void toggleScaleObjectsTool();
   bool scaleObjectsToolActive() const;
@@ -116,18 +113,18 @@ public: // tools
   void toggleFaceTool();
   bool faceToolActive() const;
 
-  void moveVertices(const vm::vec3& delta);
+  void moveVertices(const vm::vec3 &delta);
 
 private: // Tool related methods
-  void createTools(std::weak_ptr<MapDocument> document, QStackedLayout* bookCtrl);
+  void createTools(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl);
 
 private: // notification
-  void registerTool(Tool& tool, QStackedLayout* bookCtrl);
+  void registerTool(Tool &tool, QStackedLayout *bookCtrl);
   void connectObservers();
-  void toolActivated(Tool& tool);
-  void toolDeactivated(Tool& tool);
+  void toolActivated(Tool &tool);
+  void toolDeactivated(Tool &tool);
   void updateEditorContext();
-  void documentWasNewedOrLoaded(MapDocument* document);
+  void documentWasNewedOrLoaded(MapDocument *document);
 };
 } // namespace View
 } // namespace TrenchBroom

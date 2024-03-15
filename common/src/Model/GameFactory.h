@@ -28,35 +28,30 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-template <typename T>
+template<typename T>
 class Preference;
 } // namespace TrenchBroom
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class Path;
 class WritableVirtualFileSystem;
 } // namespace TrenchBroom::IO
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 struct CompilationConfig;
 class Game;
 struct GameConfig;
 struct GameEngineConfig;
 
-struct GamePathConfig
-{
+struct GamePathConfig {
   std::vector<std::filesystem::path> gameConfigSearchDirs;
   std::filesystem::path userGameDir;
 };
 
-class GameFactory
-{
+class GameFactory {
 private:
   using ConfigMap = std::map<std::string, GameConfig>;
   using GamePathMap = std::map<std::string, Preference<std::filesystem::path>>;
@@ -70,7 +65,7 @@ private:
   mutable GamePathMap m_defaultEngines;
 
 public:
-  static GameFactory& instance();
+  static GameFactory &instance();
 
   /**
    * Initializes the game factory, must be called once when the application starts.
@@ -90,7 +85,7 @@ public:
    * @return a result containing error messages for game configurations that could not be
    * loaded or a Error if a fatal error occurs
    */
-  Result<std::vector<std::string>> initialize(const GamePathConfig& gamePathConfig);
+  Result<std::vector<std::string>> initialize(const GamePathConfig &gamePathConfig);
 
   /**
    * Resets all state so that we can call initialize again.
@@ -104,9 +99,9 @@ public:
    * @param gameEngineConfig new config to save
    */
   void saveGameEngineConfig(
-    const std::string& gameName,
-    const GameEngineConfig& gameEngineConfig,
-    Logger& logger);
+      const std::string &gameName,
+      const GameEngineConfig &gameEngineConfig,
+      Logger &logger);
   /**
    * Saves the compilation configurations for the game with the given name.
    *
@@ -115,30 +110,30 @@ public:
    * @param logger the logger
    */
   void saveCompilationConfig(
-    const std::string& gameName,
-    const CompilationConfig& compilationConfig,
-    Logger& logger);
+      const std::string &gameName,
+      const CompilationConfig &compilationConfig,
+      Logger &logger);
 
-  const std::vector<std::string>& gameList() const;
+  const std::vector<std::string> &gameList() const;
   size_t gameCount() const;
-  std::shared_ptr<Game> createGame(const std::string& gameName, Logger& logger);
+  std::shared_ptr<Game> createGame(const std::string &gameName, Logger &logger);
 
-  std::vector<std::string> fileFormats(const std::string& gameName) const;
-  std::filesystem::path iconPath(const std::string& gameName) const;
-  std::filesystem::path gamePath(const std::string& gameName) const;
-  bool setGamePath(const std::string& gameName, const std::filesystem::path& gamePath);
+  std::vector<std::string> fileFormats(const std::string &gameName) const;
+  std::filesystem::path iconPath(const std::string &gameName) const;
+  std::filesystem::path gamePath(const std::string &gameName) const;
+  bool setGamePath(const std::string &gameName, const std::filesystem::path &gamePath);
   bool isGamePathPreference(
-    const std::string& gameName, const std::filesystem::path& prefPath) const;
+      const std::string &gameName, const std::filesystem::path &prefPath) const;
 
   std::filesystem::path compilationToolPath(
-    const std::string& gameName, const std::string& toolName) const;
+      const std::string &gameName, const std::string &toolName) const;
   bool setCompilationToolPath(
-    const std::string& gameName,
-    const std::string& toolName,
-    const std::filesystem::path& gamePath);
+      const std::string &gameName,
+      const std::string &toolName,
+      const std::filesystem::path &gamePath);
 
-  GameConfig& gameConfig(const std::string& gameName);
-  const GameConfig& gameConfig(const std::string& gameName) const;
+  GameConfig &gameConfig(const std::string &gameName);
+  const GameConfig &gameConfig(const std::string &gameName) const;
 
   /**
    * Scans the map file at the given path to find game type and map format comments and
@@ -149,7 +144,7 @@ public:
    * MapFormat::Unknown is returned as the map format.
    */
   Result<std::pair<std::string, MapFormat>> detectGame(
-    const std::filesystem::path& path) const;
+      const std::filesystem::path &path) const;
 
   /**
    * Returns the directory for user game configurations.
@@ -157,19 +152,19 @@ public:
    *
    * Must not be called before initialize() was called.
    */
-  const std::filesystem::path& userGameConfigsPath() const;
+  const std::filesystem::path &userGameConfigsPath() const;
 
 private:
   GameFactory();
-  Result<void> initializeFileSystem(const GamePathConfig& gamePathConfig);
+  Result<void> initializeFileSystem(const GamePathConfig &gamePathConfig);
   Result<std::vector<std::string>> loadGameConfigs();
-  Result<void> loadGameConfig(const std::filesystem::path& path);
-  void loadCompilationConfig(GameConfig& gameConfig);
-  void loadGameEngineConfig(GameConfig& gameConfig);
+  Result<void> loadGameConfig(const std::filesystem::path &path);
+  void loadCompilationConfig(GameConfig &gameConfig);
+  void loadGameEngineConfig(GameConfig &gameConfig);
 
   void writeCompilationConfig(
-    GameConfig& gameConfig, CompilationConfig compilationConfig, Logger& logger);
+      GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger);
   void writeGameEngineConfig(
-    GameConfig& gameConfig, GameEngineConfig gameEngineConfig, Logger& logger);
+      GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger);
 };
 } // namespace TrenchBroom::Model

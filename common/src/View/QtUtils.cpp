@@ -70,80 +70,56 @@
 #include <QDesktopWidget>
 #endif
 
-namespace TrenchBroom
-{
-namespace View
-{
-
+namespace TrenchBroom {
+namespace View {
 
 SyncHeightEventFilter::SyncHeightEventFilter(
-  QWidget* primary, QWidget* secondary, QObject* parent)
-  : QObject{parent}
-  , m_primary{primary}
-  , m_secondary{secondary}
-{
-  ensure(m_primary != nullptr, "primary is not null");
-  ensure(m_secondary != nullptr, "secondary is not null");
+    QWidget *primary, QWidget *secondary, QObject *parent)
+    : QObject{parent}, m_primary{primary}, m_secondary{secondary} {
+  ensure(m_primary!=nullptr, "primary is not null");
+  ensure(m_secondary!=nullptr, "secondary is not null");
 
   m_primary->installEventFilter(this);
 }
 
-SyncHeightEventFilter::~SyncHeightEventFilter()
-{
-  if (m_primary)
-  {
+SyncHeightEventFilter::~SyncHeightEventFilter() {
+  if (m_primary) {
     m_primary->removeEventFilter(this);
   }
 }
 
-bool SyncHeightEventFilter::eventFilter(QObject* target, QEvent* event)
-{
-  if (target == m_primary && event->type() == QEvent::Resize)
-  {
-    const auto* sizeEvent = static_cast<QResizeEvent*>(event);
+bool SyncHeightEventFilter::eventFilter(QObject *target, QEvent *event) {
+  if (target==m_primary && event->type()==QEvent::Resize) {
+    const auto *sizeEvent = static_cast<QResizeEvent *>(event);
     const auto height = sizeEvent->size().height();
-    if (m_secondary->height() != height)
-    {
+    if (m_secondary->height()!=height) {
       m_secondary->setFixedHeight(height);
     }
     return false;
-  }
-  else
-  {
+  } else {
     return QObject::eventFilter(target, event);
   }
 }
 
-static QString fileDialogDirToString(const FileDialogDir dir)
-{
-  switch (dir)
-  {
-  case FileDialogDir::Map:
-    return "Map";
-  case FileDialogDir::TextureCollection:
-    return "TextureCollection";
-  case FileDialogDir::CompileTool:
-    return "CompileTool";
-  case FileDialogDir::Engine:
-    return "Engine";
-  case FileDialogDir::EntityDefinition:
-    return "EntityDefinition";
-  case FileDialogDir::GamePath:
-    return "GamePath";
-  case FileDialogDir::Resources:
-    return "Resources";
+static QString fileDialogDirToString(const FileDialogDir dir) {
+  switch (dir) {
+  case FileDialogDir::Map:return "Map";
+  case FileDialogDir::TextureCollection:return "TextureCollection";
+  case FileDialogDir::CompileTool:return "CompileTool";
+  case FileDialogDir::Engine:return "Engine";
+  case FileDialogDir::EntityDefinition:return "EntityDefinition";
+  case FileDialogDir::GamePath:return "GamePath";
+  case FileDialogDir::Resources:return "Resources";
     switchDefault();
   }
 }
 
-static QString fileDialogDefaultDirectorySettingsPath(const FileDialogDir dir)
-{
+static QString fileDialogDefaultDirectorySettingsPath(const FileDialogDir dir) {
   return QString::fromLatin1("FileDialog/%1/DefaultDirectory")
-    .arg(fileDialogDirToString(dir));
+      .arg(fileDialogDirToString(dir));
 }
 
-QString fileDialogDefaultDirectory(const FileDialogDir dir)
-{
+QString fileDialogDefaultDirectory(const FileDialogDir dir) {
   const auto key = fileDialogDefaultDirectorySettingsPath(dir);
 
   const auto settings = QSettings{};
@@ -152,57 +128,49 @@ QString fileDialogDefaultDirectory(const FileDialogDir dir)
 }
 
 void updateFileDialogDefaultDirectoryWithFilename(
-  FileDialogDir type, const QString& filename)
-{
+    FileDialogDir type, const QString &filename) {
   const auto dirQDir = QFileInfo(filename).absoluteDir();
   const auto dirString = dirQDir.absolutePath();
   updateFileDialogDefaultDirectoryWithDirectory(type, dirString);
 }
 
 void updateFileDialogDefaultDirectoryWithDirectory(
-  FileDialogDir type, const QString& newDefaultDirectory)
-{
+    FileDialogDir type, const QString &newDefaultDirectory) {
   const auto key = fileDialogDefaultDirectorySettingsPath(type);
 
   auto settings = QSettings{};
   settings.setValue(key, newDefaultDirectory);
 }
 
-QString windowSettingsPath(const QWidget* window, const QString& suffix)
-{
-  ensure(window != nullptr, "window must not be null");
+QString windowSettingsPath(const QWidget *window, const QString &suffix) {
+  ensure(window!=nullptr, "window must not be null");
   ensure(!window->objectName().isEmpty(), "window name must not be empty");
 
   return "Windows/" + window->objectName() + "/" + suffix;
 }
 
-void saveWindowGeometry(QWidget* window)
-{
-  ensure(window != nullptr, "window must not be null");
+void saveWindowGeometry(QWidget *window) {
+  ensure(window!=nullptr, "window must not be null");
 
   const auto path = windowSettingsPath(window, "Geometry");
   auto settings = QSettings{};
   settings.setValue(path, window->saveGeometry());
 }
 
-void restoreWindowGeometry(QWidget* window)
-{
-  ensure(window != nullptr, "window must not be null");
+void restoreWindowGeometry(QWidget *window) {
+  ensure(window!=nullptr, "window must not be null");
 
   const auto path = windowSettingsPath(window, "Geometry");
   auto settings = QSettings{};
   window->restoreGeometry(settings.value(path).toByteArray());
 }
 
-bool widgetOrChildHasFocus(const QWidget* widget)
-{
-  ensure(widget != nullptr, "widget must not be null");
+bool widgetOrChildHasFocus(const QWidget *widget) {
+  ensure(widget!=nullptr, "widget must not be null");
 
-  const auto* currentWidget = static_cast<QObject*>(QApplication::focusWidget());
-  while (currentWidget != nullptr)
-  {
-    if (currentWidget == widget)
-    {
+  const auto *currentWidget = static_cast<QObject *>(QApplication::focusWidget());
+  while (currentWidget!=nullptr) {
+    if (currentWidget==widget) {
       return true;
     }
     currentWidget = currentWidget->parent();
@@ -210,23 +178,19 @@ bool widgetOrChildHasFocus(const QWidget* widget)
   return false;
 }
 
-MapFrame* findMapFrame(QWidget* widget)
-{
-  return dynamic_cast<MapFrame*>(widget->window());
+MapFrame *findMapFrame(QWidget *widget) {
+  return dynamic_cast<MapFrame *>(widget->window());
 }
 
-void setHint(QLineEdit* ctrl, const char* hint)
-{
+void setHint(QLineEdit *ctrl, const char *hint) {
   ctrl->setPlaceholderText(hint);
 }
 
-void centerOnScreen(QWidget* window)
-{
+void centerOnScreen(QWidget *window) {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-  const auto* screen =
-    QGuiApplication::screenAt(window->mapToGlobal({window->width() / 2, 0}));
-  if (screen == nullptr)
-  {
+  const auto *screen =
+      QGuiApplication::screenAt(window->mapToGlobal({window->width()/2, 0}));
+  if (screen==nullptr) {
     return;
   }
   const auto screenGeometry = screen->availableGeometry();
@@ -234,62 +198,54 @@ void centerOnScreen(QWidget* window)
   const auto screenGeometry = QApplication::desktop()->availableGeometry(window);
 #endif
   window->setGeometry(QStyle::alignedRect(
-    Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry));
+      Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry));
 }
 
-int getCommonFieldHeight()
-{
+int getCommonFieldHeight() {
   auto fontsize = pref(Preferences::UIFontSize);
-  return fontsize + 2 * LayoutConstants::MediumVMargin;
+  return fontsize + 2*LayoutConstants::MediumVMargin;
 }
 
-QWidget* makeDefault(QWidget* widget)
-{
-  const auto& app = TrenchBroomApp::instance();
+QWidget *makeDefault(QWidget *widget) {
+  const auto &app = TrenchBroomApp::instance();
   widget->setFont(QFont{});
   widget->setPalette(app.palette());
   return widget;
 }
 
-QWidget* makeEmphasized(QWidget* widget)
-{
+QWidget *makeEmphasized(QWidget *widget) {
   auto font = widget->font();
   font.setBold(true);
   widget->setFont(font);
   return widget;
 }
 
-QWidget* makeItalic(QWidget* widget)
-{
+QWidget *makeItalic(QWidget *widget) {
   auto font = widget->font();
   font.setItalic(true);
   widget->setFont(font);
   return widget;
 }
 
-QWidget* makeUnemphasized(QWidget* widget)
-{
+QWidget *makeUnemphasized(QWidget *widget) {
   widget->setFont(QFont{});
   return widget;
 }
 
-QWidget* makeInfo(QWidget* widget)
-{
+QWidget *makeInfo(QWidget *widget) {
   makeDefault(widget);
   widget = makeSmall(widget);
   return widget;
 }
 
-QWidget* makeSmall(QWidget* widget)
-{
+QWidget *makeSmall(QWidget *widget) {
   auto font = widget->font();
   font.setPointSize(font.pointSize() - 2);
   widget->setFont(font);
   return widget;
 }
 
-QWidget* makeTitle(QWidget* widget)
-{
+QWidget *makeTitle(QWidget *widget) {
   auto font = widget->font();
   font.setPointSize(font.pointSize() + 1);
   font.setBold(true);
@@ -297,8 +253,7 @@ QWidget* makeTitle(QWidget* widget)
   return widget;
 }
 
-QWidget* makeSubTitle(QWidget* widget)
-{
+QWidget *makeSubTitle(QWidget *widget) {
   auto font = widget->font();
   font.setPointSize(font.pointSize() - 1);
   // font.setItalic(true);
@@ -306,18 +261,16 @@ QWidget* makeSubTitle(QWidget* widget)
   return widget;
 }
 
-QWidget* makeHeader(QWidget* widget)
-{
+QWidget *makeHeader(QWidget *widget) {
   makeDefault(widget);
   auto font = widget->font();
-  font.setPointSize(font.pointSize() * 2);
+  font.setPointSize(font.pointSize()*2);
   font.setBold(true);
   widget->setFont(font);
   return widget;
 }
 
-QWidget* makePanelTitle(QWidget* widget, bool bold, bool isSubTitle)
-{
+QWidget *makePanelTitle(QWidget *widget, bool bold, bool isSubTitle) {
 
   widget->setForegroundRole(QPalette::HighlightedText);
   auto font = widget->font();
@@ -333,8 +286,7 @@ QWidget* makePanelTitle(QWidget* widget, bool bold, bool isSubTitle)
   return widget;
 }
 
-QWidget* makeError(QWidget* widget)
-{
+QWidget *makeError(QWidget *widget) {
   auto palette = widget->palette();
   palette.setColor(QPalette::Normal, QPalette::WindowText, Qt::red);
   palette.setColor(QPalette::Normal, QPalette::Text, Qt::red);
@@ -342,155 +294,137 @@ QWidget* makeError(QWidget* widget)
   return widget;
 }
 
-
-QWidget* makeMono(QWidget* widget, int size)
-{
+QWidget *makeMono(QWidget *widget, int size) {
   auto font = TrenchBroomApp::instance().getConsoleFont();
   font.setPointSize(size);
   widget->setFont(font);
   return widget;
 }
 
-QWidget* makeSelected(QWidget* widget, const QPalette& defaultPalette)
-{
+QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette) {
   auto palette = widget->palette();
   palette.setColor(
-    QPalette::Normal,
-    QPalette::WindowText,
-    defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+      QPalette::Normal,
+      QPalette::WindowText,
+      defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
   palette.setColor(
-    QPalette::Normal,
-    QPalette::Text,
-    defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+      QPalette::Normal,
+      QPalette::Text,
+      defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
   widget->setPalette(palette);
   return widget;
 }
 
-QWidget* colorizeWidget(QWidget* widget, const QColor& color, QPalette::ColorRole role)
-{
+QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role) {
   auto palette = widget->palette();
   palette.setColor(QPalette::Normal, role, color);
   widget->setPalette(palette);
   return widget;
 }
 
-QWidget* makeBright(QWidget* widget, const QPalette& defaultPalette)
-{
+QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette) {
   auto palette = widget->palette();
   palette.setColor(
-    QPalette::Normal,
-    QPalette::Button,
-    defaultPalette.color(QPalette::Normal, QPalette::Midlight));
+      QPalette::Normal,
+      QPalette::Button,
+      defaultPalette.color(QPalette::Normal, QPalette::Midlight));
   //    palette.setColor(QPalette::Normal, QPalette::Base,
   //    defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
   widget->setPalette(palette);
   return widget;
 }
 
-QWidget* makeUnselected(QWidget* widget, const QPalette& defaultPalette)
-{
+QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette) {
   auto palette = widget->palette();
   palette.setColor(
-    QPalette::Normal,
-    QPalette::WindowText,
-    defaultPalette.color(QPalette::Normal, QPalette::WindowText));
+      QPalette::Normal,
+      QPalette::WindowText,
+      defaultPalette.color(QPalette::Normal, QPalette::WindowText));
   palette.setColor(
-    QPalette::Normal,
-    QPalette::Text,
-    defaultPalette.color(QPalette::Normal, QPalette::Text));
+      QPalette::Normal,
+      QPalette::Text,
+      defaultPalette.color(QPalette::Normal, QPalette::Text));
   widget->setPalette(palette);
   return widget;
 }
 
-Color fromQColor(const QColor& color)
-{
+Color fromQColor(const QColor &color) {
   return Color(
-    static_cast<float>(color.redF()),
-    static_cast<float>(color.greenF()),
-    static_cast<float>(color.blueF()),
-    static_cast<float>(color.alphaF()));
+      static_cast<float>(color.redF()),
+      static_cast<float>(color.greenF()),
+      static_cast<float>(color.blueF()),
+      static_cast<float>(color.alphaF()));
 }
 
-QColor toQColor(const Color& color, const float multiplier)
-{
+QColor toQColor(const Color &color, const float multiplier) {
   // return QColor::fromRgb(int(color.r() * 255.0f * multiplier), int(color.g() * 255.0f *
   // multiplier), int(color.b() * 255.0f * multiplier), int(color.a() * 255.0f));
   return QColor::fromRgbF(
-    color.r() * multiplier, color.g() * multiplier, color.b() * multiplier, color.a());
+      color.r()*multiplier, color.g()*multiplier, color.b()*multiplier, color.a());
 }
 
-float getQColorBrightnessFactor(const QColor& color)
-{
+float getQColorBrightnessFactor(const QColor &color) {
   return float(
-    std::max(std::max(color.redF(), color.greenF()), color.blueF()) * color.alphaF());
+      std::max(std::max(color.redF(), color.greenF()), color.blueF())*color.alphaF());
 }
 
-QString toStyleSheetColor(const char* prefix, const QColor& color)
-{
+QString toStyleSheetColor(const char *prefix, const QColor &color) {
   auto sheet = QString::asprintf(
-    "%s: rgba(%d, %d, %d, %d); ",
-    prefix,
-    color.red(),
-    color.green(),
-    color.blue(),
-    color.alpha());
+      "%s: rgba(%d, %d, %d, %d); ",
+      prefix,
+      color.red(),
+      color.green(),
+      color.blue(),
+      color.alpha());
   return sheet;
 }
 
-QString toStyleSheetRGBA(const QColor& color, int adjustment)
-{
+QString toStyleSheetRGBA(const QColor &color, int adjustment) {
   auto tmp_color = adjustment < 0 ? color.darker(-adjustment) : color.lighter(adjustment);
   return QString::asprintf(
-    "rgba(%d, %d, %d, %d)",
-    tmp_color.red(),
-    tmp_color.green(),
-    tmp_color.blue(),
-    tmp_color.alpha());
+      "rgba(%d, %d, %d, %d)",
+      tmp_color.red(),
+      tmp_color.green(),
+      tmp_color.blue(),
+      tmp_color.alpha());
 }
 
 QString toStyleSheetRGBA(
-  const QPalette& palette,
-  QPalette::ColorRole role,
-  QPalette::ColorGroup group,
-  int adjustment)
-{
+    const QPalette &palette,
+    QPalette::ColorRole role,
+    QPalette::ColorGroup group,
+    int adjustment) {
   auto color = palette.color(group, role);
   return toStyleSheetRGBA(color, adjustment);
 }
 
 QString toStyleSheetRGBA(
-  const QPalette& palette, QPalette::ColorRole role, int adjustment)
-{
+    const QPalette &palette, QPalette::ColorRole role, int adjustment) {
   auto color = palette.color(QPalette::ColorGroup::Active, role);
   return toStyleSheetRGBA(color, adjustment);
 }
 
-
-void setStyledBorder(QWidget* widget, int width, const QColor& color, const char* type)
-{
+void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type) {
   auto qss = QString::asprintf(
-    "border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
+      "border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
   widget->setStyleSheet(qss);
 }
 
-
-QToolButton* createBitmapButton(
-  const std::string& image, const QString& tooltip, QWidget* parent)
-{
+QToolButton *createBitmapButton(
+    const std::string &image, const QString &tooltip, QWidget *parent) {
   return createBitmapButton(IO::loadSVGIcon(image, 16), tooltip, parent);
 }
 
-QToolButton* createBitmapButton(
-  const QIcon& icon, const QString& tooltip, QWidget* parent)
-{
+QToolButton *createBitmapButton(
+    const QIcon &icon, const QString &tooltip, QWidget *parent) {
   // NOTE: QIcon::availableSizes() is not high-dpi friendly, it returns pixels when we
   // want logical sizes. We rely on the fact that loadIconResourceQt inserts pixmaps in
   // the order 1x then 2x, so the first pixmap has the logical size.
   ensure(
-    !icon.availableSizes().empty(),
-    "expected a non-empty icon. Fails when the image file couldn't be found.");
+      !icon.availableSizes().empty(),
+      "expected a non-empty icon. Fails when the image file couldn't be found.");
 
-  auto* button = new QToolButton{parent};
+  auto *button = new QToolButton{parent};
   button->setMinimumSize(icon.availableSizes().front());
   // button->setAutoDefault(false);
   button->setToolTip(tooltip);
@@ -501,20 +435,18 @@ QToolButton* createBitmapButton(
   return button;
 }
 
-QToolButton* createBitmapToggleButton(
-  const std::string& image, const QString& tooltip, QWidget* parent)
-{
-  auto* button = createBitmapButton(image, tooltip, parent);
+QToolButton *createBitmapToggleButton(
+    const std::string &image, const QString &tooltip, QWidget *parent) {
+  auto *button = createBitmapButton(image, tooltip, parent);
   button->setCheckable(true);
   return button;
 }
 
-QWidget* createDefaultPage(const QString& message, QWidget* parent)
-{
-  auto* container = new QWidget{parent};
-  auto* layout = new QVBoxLayout{};
+QWidget *createDefaultPage(const QString &message, QWidget *parent) {
+  auto *container = new QWidget{parent};
+  auto *layout = new QVBoxLayout{};
 
-  auto* messageLabel = new QLabel{message};
+  auto *messageLabel = new QLabel{message};
   makeEmphasized(messageLabel);
   layout->addWidget(messageLabel, 0, Qt::AlignHCenter | Qt::AlignTop);
   container->setLayout(layout);
@@ -522,9 +454,8 @@ QWidget* createDefaultPage(const QString& message, QWidget* parent)
   return container;
 }
 
-QSlider* createSlider(const int min, const int max)
-{
-  auto* slider = new QSlider{};
+QSlider *createSlider(const int min, const int max) {
+  auto *slider = new QSlider{};
   slider->setMinimum(min);
   slider->setMaximum(max);
   slider->setTickPosition(QSlider::NoTicks);
@@ -535,43 +466,38 @@ QSlider* createSlider(const int min, const int max)
   return slider;
 }
 
-float getSliderRatio(const QSlider* slider)
-{
+float getSliderRatio(const QSlider *slider) {
   return float(slider->value() - slider->minimum())
-         / float(slider->maximum() - slider->minimum());
+      /float(slider->maximum() - slider->minimum());
 }
 
-void setSliderRatio(QSlider* slider, float ratio)
-{
+void setSliderRatio(QSlider *slider, float ratio) {
   const auto value =
-    ratio * float(slider->maximum() - slider->minimum()) + float(slider->minimum());
+      ratio*float(slider->maximum() - slider->minimum()) + float(slider->minimum());
   slider->setValue(int(value));
 }
 
-float getSliderRange(QSlider* slider, float length, float offset)
-{
+float getSliderRange(QSlider *slider, float length, float offset) {
   auto ratio = getSliderRatio(slider);
-  return ratio * length + offset;
+  return ratio*length + offset;
 }
 
-void setSliderRange(QSlider* slider, float length, float value, float offset)
-{
-  auto ratio = (value - offset) / length;
+void setSliderRange(QSlider *slider, float length, float value, float offset) {
+  auto ratio = (value - offset)/length;
   setSliderRatio(slider, ratio);
 }
 
-QLayout* wrapDialogButtonBox(QWidget* buttonBox)
-{
-  auto* innerLayout = new QHBoxLayout{};
+QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
+  auto *innerLayout = new QHBoxLayout{};
   innerLayout->setContentsMargins(
-    LayoutConstants::DialogButtonLeftMargin,
-    LayoutConstants::DialogButtonTopMargin,
-    LayoutConstants::DialogButtonRightMargin,
-    LayoutConstants::DialogButtonBottomMargin);
+      LayoutConstants::DialogButtonLeftMargin,
+      LayoutConstants::DialogButtonTopMargin,
+      LayoutConstants::DialogButtonRightMargin,
+      LayoutConstants::DialogButtonBottomMargin);
   innerLayout->setSpacing(0);
   innerLayout->addWidget(buttonBox);
 
-  auto* outerLayout = new QVBoxLayout{};
+  auto *outerLayout = new QVBoxLayout{};
   outerLayout->setContentsMargins(QMargins{});
   outerLayout->setSpacing(0);
   outerLayout->addWidget(new BorderLine{BorderLine::Direction::Horizontal});
@@ -580,18 +506,17 @@ QLayout* wrapDialogButtonBox(QWidget* buttonBox)
   return outerLayout;
 }
 
-QLayout* wrapDialogButtonBox(QLayout* buttonBox)
-{
-  auto* innerLayout = new QHBoxLayout{};
+QLayout *wrapDialogButtonBox(QLayout *buttonBox) {
+  auto *innerLayout = new QHBoxLayout{};
   innerLayout->setContentsMargins(
-    LayoutConstants::DialogButtonLeftMargin,
-    LayoutConstants::DialogButtonTopMargin,
-    LayoutConstants::DialogButtonRightMargin,
-    LayoutConstants::DialogButtonBottomMargin);
+      LayoutConstants::DialogButtonLeftMargin,
+      LayoutConstants::DialogButtonTopMargin,
+      LayoutConstants::DialogButtonRightMargin,
+      LayoutConstants::DialogButtonBottomMargin);
   innerLayout->setSpacing(0);
   innerLayout->addLayout(buttonBox);
 
-  auto* outerLayout = new QVBoxLayout{};
+  auto *outerLayout = new QVBoxLayout{};
   outerLayout->setContentsMargins(QMargins{});
   outerLayout->setSpacing(0);
   outerLayout->addWidget(new BorderLine{BorderLine::Direction::Horizontal});
@@ -600,16 +525,14 @@ QLayout* wrapDialogButtonBox(QLayout* buttonBox)
   return outerLayout;
 }
 
-void addToMiniToolBarLayout(QBoxLayout*) {}
+void addToMiniToolBarLayout(QBoxLayout *) {}
 
-void setWindowIconTB(QWidget* window)
-{
-  ensure(window != nullptr, "window is null");
+void setWindowIconTB(QWidget *window) {
+  ensure(window!=nullptr, "window is null");
   window->setWindowIcon(QIcon{IO::loadPixmapResource("AppIcon.png")});
 }
 
-void setDebugBackgroundColor(QWidget* widget, const QColor& color)
-{
+void setDebugBackgroundColor(QWidget *widget, const QColor &color) {
   auto p = widget->palette();
   p.setColor(QPalette::Window, color);
 
@@ -617,27 +540,23 @@ void setDebugBackgroundColor(QWidget* widget, const QColor& color)
   widget->setPalette(p);
 }
 
-void setDefaultWindowColor(QWidget* widget)
-{
+void setDefaultWindowColor(QWidget *widget) {
   widget->setAutoFillBackground(true);
   widget->setBackgroundRole(QPalette::Window);
 }
 
-void setBaseWindowColor(QWidget* widget)
-{
+void setBaseWindowColor(QWidget *widget) {
   widget->setAutoFillBackground(true);
   widget->setBackgroundRole(QPalette::Base);
 }
 
-void setHighlightWindowColor(QWidget* widget)
-{
+void setHighlightWindowColor(QWidget *widget) {
   widget->setAutoFillBackground(true);
   widget->setBackgroundRole(QPalette::Highlight);
 }
 
-QLineEdit* createSearchBox()
-{
-  auto* widget = new QLineEdit{};
+QLineEdit *createSearchBox() {
+  auto *widget = new QLineEdit{};
   widget->setClearButtonEnabled(true);
   widget->setPlaceholderText(QLineEdit::tr("Search..."));
 
@@ -646,115 +565,94 @@ QLineEdit* createSearchBox()
   return widget;
 }
 
-void checkButtonInGroup(QButtonGroup* group, const int id, const bool checked)
-{
-  if (auto* button = group->button(id))
-  {
+void checkButtonInGroup(QButtonGroup *group, const int id, const bool checked) {
+  if (auto *button = group->button(id)) {
     button->setChecked(checked);
   }
 }
 
-void checkButtonInGroup(QButtonGroup* group, const QString& objectName, bool checked)
-{
-  for (auto* button : group->buttons())
-  {
-    if (button->objectName() == objectName)
-    {
+void checkButtonInGroup(QButtonGroup *group, const QString &objectName, bool checked) {
+  for (auto *button : group->buttons()) {
+    if (button->objectName()==objectName) {
       button->setChecked(checked);
       return;
     }
   }
 }
 
-void insertTitleBarSeparator(QVBoxLayout* layout)
-{
+void insertTitleBarSeparator(QVBoxLayout *layout) {
 #ifdef _WIN32
   layout->insertWidget(0, new BorderLine{}, 1);
 #endif
   unused(layout);
 }
 
-AutoResizeRowsEventFilter::AutoResizeRowsEventFilter(QTableView* tableView)
-  : QObject{tableView}
-  , m_tableView{tableView}
-{
+AutoResizeRowsEventFilter::AutoResizeRowsEventFilter(QTableView *tableView)
+    : QObject{tableView}, m_tableView{tableView} {
   m_tableView->installEventFilter(this);
 }
 
-bool AutoResizeRowsEventFilter::eventFilter(QObject* watched, QEvent* event)
-{
-  if (watched == m_tableView && event->type() == QEvent::Show)
-  {
+bool AutoResizeRowsEventFilter::eventFilter(QObject *watched, QEvent *event) {
+  if (watched==m_tableView && event->type()==QEvent::Show) {
     m_tableView->resizeRowsToContents();
     m_tableView->removeEventFilter(this);
   }
   return QObject::eventFilter(watched, event);
 }
 
-void autoResizeRows(QTableView* tableView)
-{
+void autoResizeRows(QTableView *tableView) {
   tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   tableView->installEventFilter(new AutoResizeRowsEventFilter{tableView});
   tableView->resizeRowsToContents();
 }
 
-void deleteChildWidgetsLaterAndDeleteLayout(QWidget* widget)
-{
-  const auto children = widget->findChildren<QWidget*>("", Qt::FindDirectChildrenOnly);
-  for (auto* childWidget : children)
-  {
+void deleteChildWidgetsLaterAndDeleteLayout(QWidget *widget) {
+  const auto children = widget->findChildren<QWidget *>("", Qt::FindDirectChildrenOnly);
+  for (auto *childWidget : children) {
     childWidget->deleteLater();
   }
 
   delete widget->layout();
 }
 
-void showModelessDialog(QDialog* dialog)
-{
+void showModelessDialog(QDialog *dialog) {
   // https://doc.qt.io/qt-5/qdialog.html#code-examples
   dialog->show();
   dialog->raise();
   dialog->activateWindow();
 }
 
-static QTextCodec* codecForEncoding(const MapTextEncoding encoding)
-{
-  switch (encoding)
-  {
+static QTextCodec *codecForEncoding(const MapTextEncoding encoding) {
+  switch (encoding) {
   case MapTextEncoding::Quake:
     // Quake uses the full 1-255 range for its bitmap font.
     // So using a "just assume UTF-8" approach would not work here.
     // See: https://github.com/TrenchBroom/TrenchBroom/issues/3122
     return QTextCodec::codecForLocale();
-  case MapTextEncoding::Iso88591:
-    return QTextCodec::codecForName("ISO 8859-1");
-  case MapTextEncoding::Utf8:
-    return QTextCodec::codecForName("UTF-8");
+  case MapTextEncoding::Iso88591:return QTextCodec::codecForName("ISO 8859-1");
+  case MapTextEncoding::Utf8:return QTextCodec::codecForName("UTF-8");
     switchDefault();
   }
 }
 
-QString mapStringToUnicode(const MapTextEncoding encoding, const std::string& string)
-{
-  auto* codec = codecForEncoding(encoding);
-  ensure(codec != nullptr, "null codec");
+QString mapStringToUnicode(const MapTextEncoding encoding, const std::string &string) {
+  auto *codec = codecForEncoding(encoding);
+  ensure(codec!=nullptr, "null codec");
 
   return codec->toUnicode(QByteArray::fromStdString(string));
 }
 
-std::string mapStringFromUnicode(const MapTextEncoding encoding, const QString& string)
-{
-  auto* codec = codecForEncoding(encoding);
-  ensure(codec != nullptr, "null codec");
+std::string mapStringFromUnicode(const MapTextEncoding encoding, const QString &string) {
+  auto *codec = codecForEncoding(encoding);
+  ensure(codec!=nullptr, "null codec");
 
   return codec->fromUnicode(string).toStdString();
 }
 
-QString nativeModifierLabel(const int modifier)
-{
+QString nativeModifierLabel(const int modifier) {
   assert(
-    modifier == Qt::META || modifier == Qt::SHIFT || modifier == Qt::CTRL
-    || modifier == Qt::ALT);
+      modifier==Qt::META || modifier==Qt::SHIFT || modifier==Qt::CTRL
+          || modifier==Qt::ALT);
 
   const auto keySequence = QKeySequence(modifier);
 
@@ -764,8 +662,7 @@ QString nativeModifierLabel(const int modifier)
   // and portable text as "Shift+".
 
   auto nativeLabel = keySequence.toString(QKeySequence::NativeText);
-  if (nativeLabel.endsWith("+"))
-  {
+  if (nativeLabel.endsWith("+")) {
     // On Linux we get nativeLabel as something like "Ctrl+"
     // On macOS it's just the special Command character, with no +
     nativeLabel.chop(1); // Remove last character

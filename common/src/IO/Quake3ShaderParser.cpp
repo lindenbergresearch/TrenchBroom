@@ -29,57 +29,45 @@
 #include <filesystem>
 #include <string>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 Quake3ShaderTokenizer::Quake3ShaderTokenizer(std::string_view str)
-  : Tokenizer{std::move(str), "", '\\'}
-{
+    : Tokenizer{std::move(str), "", '\\'} {
 }
 
-Tokenizer<unsigned int>::Token Quake3ShaderTokenizer::emitToken()
-{
-  while (!eof())
-  {
+Tokenizer<unsigned int>::Token Quake3ShaderTokenizer::emitToken() {
+  while (!eof()) {
     const auto startLine = line();
     const auto startColumn = column();
-    const auto* c = curPos();
-    switch (*c)
-    {
-    case '{':
-      advance();
+    const auto *c = curPos();
+    switch (*c) {
+    case '{':advance();
       return Token{
-        Quake3ShaderToken::OBrace, c, c + 1, offset(c), startLine, startColumn};
-    case '}':
-      advance();
+          Quake3ShaderToken::OBrace, c, c + 1, offset(c), startLine, startColumn};
+    case '}':advance();
       return Token{
-        Quake3ShaderToken::CBrace, c, c + 1, offset(c), startLine, startColumn};
+          Quake3ShaderToken::CBrace, c, c + 1, offset(c), startLine, startColumn};
     case '\r':
-      if (lookAhead() == '\n')
-      {
+      if (lookAhead()=='\n') {
         advance();
       }
       // handle carriage return without consecutive linefeed
       // by falling through into the line feed case
       switchFallthrough();
-    case '\n':
-      discardWhile(Whitespace()); // handle empty lines and such
+    case '\n':discardWhile(Whitespace()); // handle empty lines and such
       return Token{Quake3ShaderToken::Eol, c, c + 1, offset(c), startLine, startColumn};
     case ' ':
-    case '\t':
-      advance();
+    case '\t':advance();
       break;
     case '$':
-      if (const auto* e = readUntil(Whitespace()))
-      {
+      if (const auto *e = readUntil(Whitespace())) {
         return Token{
-          Quake3ShaderToken::Variable, c, e, offset(c), startLine, startColumn};
+            Quake3ShaderToken::Variable, c, e, offset(c), startLine, startColumn};
       }
       throw ParserException{
-        startLine, startColumn, "Unexpected character: " + std::string{c, 1}};
+          startLine, startColumn, "Unexpected character: " + std::string{c, 1}};
     case '/':
-      if (lookAhead() == '/')
-      {
+      if (lookAhead()=='/') {
         // parse single line comment starting with //
         advance(2);
         discardUntil("\n\r");
@@ -87,12 +75,10 @@ Tokenizer<unsigned int>::Token Quake3ShaderTokenizer::emitToken()
         // relevant e.g. for terminating a block entry
         break;
       }
-      if (lookAhead() == '*')
-      {
+      if (lookAhead()=='*') {
         // parse multiline comment delimited by /* and */
         advance(2);
-        while (curChar() != '*' || lookAhead() != '/')
-        {
+        while (curChar()!='*' || lookAhead()!='/') {
           errorIfEof();
           advance();
         }
@@ -102,33 +88,28 @@ Tokenizer<unsigned int>::Token Quake3ShaderTokenizer::emitToken()
       // fall through into the default case to parse a string that starts with '/'
       switchFallthrough();
     default:
-      if (const auto* e = readDecimal(Whitespace()))
-      {
+      if (const auto *e = readDecimal(Whitespace())) {
         return Token{Quake3ShaderToken::Number, c, e, offset(c), startLine, startColumn};
       }
 
-      if (const auto* e = readUntil(Whitespace()))
-      {
+      if (const auto *e = readUntil(Whitespace())) {
         return Token{Quake3ShaderToken::String, c, e, offset(c), startLine, startColumn};
       }
 
       throw ParserException{
-        startLine, startColumn, "Unexpected character: " + std::string{c, 1}};
+          startLine, startColumn, "Unexpected character: " + std::string{c, 1}};
     }
   }
   return Token{Quake3ShaderToken::Eof, nullptr, nullptr, length(), line(), column()};
 }
 
 Quake3ShaderParser::Quake3ShaderParser(std::string_view str)
-  : m_tokenizer{std::move(str)}
-{
+    : m_tokenizer{std::move(str)} {
 }
 
-std::vector<Assets::Quake3Shader> Quake3ShaderParser::parse(ParserStatus& status)
-{
+std::vector<Assets::Quake3Shader> Quake3ShaderParser::parse(ParserStatus &status) {
   auto result = std::vector<Assets::Quake3Shader>{};
-  while (!m_tokenizer.peekToken(Quake3ShaderToken::Eol).hasType(Quake3ShaderToken::Eof))
-  {
+  while (!m_tokenizer.peekToken(Quake3ShaderToken::Eol).hasType(Quake3ShaderToken::Eof)) {
     auto shader = Assets::Quake3Shader{};
     parseTexture(shader, status);
     parseBody(shader, status);
@@ -137,22 +118,17 @@ std::vector<Assets::Quake3Shader> Quake3ShaderParser::parse(ParserStatus& status
   return result;
 }
 
-void Quake3ShaderParser::parseBody(Assets::Quake3Shader& shader, ParserStatus& status)
-{
+void Quake3ShaderParser::parseBody(Assets::Quake3Shader &shader, ParserStatus &status) {
   expect(Quake3ShaderToken::OBrace, m_tokenizer.nextToken(Quake3ShaderToken::Eol));
   auto token = m_tokenizer.peekToken(Quake3ShaderToken::Eol);
   expect(
-    Quake3ShaderToken::CBrace | Quake3ShaderToken::OBrace | Quake3ShaderToken::String,
-    token);
+      Quake3ShaderToken::CBrace | Quake3ShaderToken::OBrace | Quake3ShaderToken::String,
+      token);
 
-  while (!token.hasType(Quake3ShaderToken::CBrace))
-  {
-    if (token.hasType(Quake3ShaderToken::OBrace))
-    {
+  while (!token.hasType(Quake3ShaderToken::CBrace)) {
+    if (token.hasType(Quake3ShaderToken::OBrace)) {
       parseStage(shader, status);
-    }
-    else
-    {
+    } else {
       parseBodyEntry(shader, status);
     }
     token = m_tokenizer.peekToken(Quake3ShaderToken::Eol);
@@ -160,17 +136,15 @@ void Quake3ShaderParser::parseBody(Assets::Quake3Shader& shader, ParserStatus& s
   expect(Quake3ShaderToken::CBrace, m_tokenizer.nextToken(Quake3ShaderToken::Eol));
 }
 
-void Quake3ShaderParser::parseStage(Assets::Quake3Shader& shader, ParserStatus& status)
-{
+void Quake3ShaderParser::parseStage(Assets::Quake3Shader &shader, ParserStatus &status) {
   expect(Quake3ShaderToken::OBrace, m_tokenizer.nextToken(Quake3ShaderToken::Eol));
   auto token = m_tokenizer.peekToken(Quake3ShaderToken::Eol);
   expect(
-    Quake3ShaderToken::CBrace | Quake3ShaderToken::OBrace | Quake3ShaderToken::String,
-    token);
+      Quake3ShaderToken::CBrace | Quake3ShaderToken::OBrace | Quake3ShaderToken::String,
+      token);
 
-  auto& stage = shader.addStage();
-  while (!token.hasType(Quake3ShaderToken::CBrace))
-  {
+  auto &stage = shader.addStage();
+  while (!token.hasType(Quake3ShaderToken::CBrace)) {
     parseStageEntry(stage, status);
     token = m_tokenizer.peekToken(Quake3ShaderToken::Eol);
   }
@@ -178,91 +152,67 @@ void Quake3ShaderParser::parseStage(Assets::Quake3Shader& shader, ParserStatus& 
 }
 
 void Quake3ShaderParser::parseTexture(
-  Assets::Quake3Shader& shader, ParserStatus& /* status */)
-{
+    Assets::Quake3Shader &shader, ParserStatus & /* status */) {
   const auto token =
-    expect(Quake3ShaderToken::String, m_tokenizer.nextToken(Quake3ShaderToken::Eol));
+      expect(Quake3ShaderToken::String, m_tokenizer.nextToken(Quake3ShaderToken::Eol));
   const auto pathStr = token.data();
-  if (!pathStr.empty() && pathStr[0] == '/')
-  {
+  if (!pathStr.empty() && pathStr[0]=='/') {
     // 2633: Q3 accepts absolute shader paths, so we just strip the leading slash
     shader.shaderPath = std::filesystem::path{pathStr.substr(1)};
-  }
-  else
-  {
+  } else {
     shader.shaderPath = std::filesystem::path{token.data()};
   }
 }
 
 void Quake3ShaderParser::parseBodyEntry(
-  Assets::Quake3Shader& shader, ParserStatus& /* status */)
-{
+    Assets::Quake3Shader &shader, ParserStatus & /* status */) {
   auto token = m_tokenizer.nextToken(Quake3ShaderToken::Eol);
   expect(Quake3ShaderToken::String, token);
 
   const auto key = token.data();
-  if (kdl::ci::str_is_equal(key, "qer_editorimage"))
-  {
+  if (kdl::ci::str_is_equal(key, "qer_editorimage")) {
     token = expect(Quake3ShaderToken::String, m_tokenizer.nextToken());
     shader.editorImage = std::filesystem::path{token.data()};
-  }
-  else if (kdl::ci::str_is_equal(key, "q3map_lightimage"))
-  {
+  } else if (kdl::ci::str_is_equal(key, "q3map_lightimage")) {
     token = expect(Quake3ShaderToken::String, m_tokenizer.nextToken());
     shader.lightImage = std::filesystem::path{token.data()};
-  }
-  else if (kdl::ci::str_is_equal(key, "surfaceparm"))
-  {
+  } else if (kdl::ci::str_is_equal(key, "surfaceparm")) {
     token = expect(Quake3ShaderToken::String, m_tokenizer.nextToken());
     shader.surfaceParms.insert(token.data());
-  }
-  else if (kdl::ci::str_is_equal(key, "cull"))
-  {
+  } else if (kdl::ci::str_is_equal(key, "cull")) {
     token = expect(Quake3ShaderToken::String, m_tokenizer.nextToken());
     const auto value = token.data();
-    if (kdl::ci::str_is_equal(value, "front"))
-    {
+    if (kdl::ci::str_is_equal(value, "front")) {
       shader.culling = Assets::Quake3Shader::Culling::Front;
-    }
-    else if (kdl::ci::str_is_equal(value, "back"))
-    {
+    } else if (kdl::ci::str_is_equal(value, "back")) {
       shader.culling = Assets::Quake3Shader::Culling::Back;
-    }
-    else if (
-      kdl::ci::str_is_equal(value, "none") || kdl::ci::str_is_equal(value, "disable"))
-    {
+    } else if (
+        kdl::ci::str_is_equal(value, "none") || kdl::ci::str_is_equal(value, "disable")) {
       shader.culling = Assets::Quake3Shader::Culling::None;
     }
-  }
-  else
-  {
+  } else {
     skipRemainderOfEntry();
   }
 }
 
 void Quake3ShaderParser::parseStageEntry(
-  Assets::Quake3ShaderStage& stage, ParserStatus& status)
-{
+    Assets::Quake3ShaderStage &stage, ParserStatus &status) {
   auto token = m_tokenizer.nextToken(Quake3ShaderToken::Eol);
   expect(Quake3ShaderToken::String, token);
 
   const auto key = token.data();
-  if (kdl::ci::str_is_equal(key, "map"))
-  {
+  if (kdl::ci::str_is_equal(key, "map")) {
     token = expect(
-      Quake3ShaderToken::String | Quake3ShaderToken::Variable, m_tokenizer.nextToken());
+        Quake3ShaderToken::String | Quake3ShaderToken::Variable, m_tokenizer.nextToken());
     stage.map = std::filesystem::path{token.data()};
-  }
-  else if (kdl::ci::str_is_equal(key, "blendFunc"))
-  {
+  } else if (kdl::ci::str_is_equal(key, "blendFunc")) {
     const auto line = token.line();
 
     token = expect(Quake3ShaderToken::String, m_tokenizer.nextToken());
     const auto param1 = token.data();
     const auto param1Column = token.column();
 
-    if (m_tokenizer.peekToken().hasType(Quake3ShaderToken::String))
-    {
+    if (m_tokenizer.peekToken().hasType(Quake3ShaderToken::String)) {
       token = m_tokenizer.nextToken();
       const auto param2 = token.data();
       const auto param2Column = token.column();
@@ -270,78 +220,60 @@ void Quake3ShaderParser::parseStageEntry(
       stage.blendFunc.destFactor = kdl::str_to_upper(param2);
 
       auto valid = true;
-      if (!stage.blendFunc.validateSrcFactor())
-      {
+      if (!stage.blendFunc.validateSrcFactor()) {
         valid = false;
         status.warn(
-          line, param1Column, "Unknown blendFunc source factor '" + param1 + "'");
+            line, param1Column, "Unknown blendFunc source factor '" + param1 + "'");
       }
-      if (!stage.blendFunc.validateDestFactor())
-      {
+      if (!stage.blendFunc.validateDestFactor()) {
         valid = false;
         status.warn(
-          line, param2Column, "Unknown blendFunc destination factor '" + param2 + "'");
+            line, param2Column, "Unknown blendFunc destination factor '" + param2 + "'");
       }
-      if (!valid)
-      {
+      if (!valid) {
         stage.blendFunc.reset();
       }
-    }
-    else
-    {
-      if (kdl::ci::str_is_equal(param1, "add"))
-      {
+    } else {
+      if (kdl::ci::str_is_equal(param1, "add")) {
         stage.blendFunc.srcFactor = Assets::Quake3ShaderStage::BlendFunc::One;
         stage.blendFunc.destFactor = Assets::Quake3ShaderStage::BlendFunc::One;
-      }
-      else if (kdl::ci::str_is_equal(param1, "filter"))
-      {
+      } else if (kdl::ci::str_is_equal(param1, "filter")) {
         stage.blendFunc.srcFactor = Assets::Quake3ShaderStage::BlendFunc::DestColor;
         stage.blendFunc.destFactor = Assets::Quake3ShaderStage::BlendFunc::Zero;
-      }
-      else if (kdl::ci::str_is_equal(param1, "blend"))
-      {
+      } else if (kdl::ci::str_is_equal(param1, "blend")) {
         stage.blendFunc.srcFactor = Assets::Quake3ShaderStage::BlendFunc::SrcAlpha;
         stage.blendFunc.destFactor =
-          Assets::Quake3ShaderStage::BlendFunc::OneMinusSrcAlpha;
-      }
-      else
-      {
+            Assets::Quake3ShaderStage::BlendFunc::OneMinusSrcAlpha;
+      } else {
         status.warn(line, param1Column, "Unknown blendFunc name '" + param1 + "'");
       }
     }
-  }
-  else
-  {
+  } else {
     skipRemainderOfEntry();
   }
 }
 
-void Quake3ShaderParser::skipRemainderOfEntry()
-{
+void Quake3ShaderParser::skipRemainderOfEntry() {
   auto token = m_tokenizer.peekToken();
-  while (!token.hasType(Quake3ShaderToken::Eol | Quake3ShaderToken::CBrace))
-  {
+  while (!token.hasType(Quake3ShaderToken::Eol | Quake3ShaderToken::CBrace)) {
     m_tokenizer.nextToken();
     token = m_tokenizer.peekToken();
   }
-  if (token.hasType(Quake3ShaderToken::Eol))
-  {
+  if (token.hasType(Quake3ShaderToken::Eol)) {
     m_tokenizer.skipToken();
   }
 }
 
-Quake3ShaderParser::TokenNameMap Quake3ShaderParser::tokenNames() const
-{
+Quake3ShaderParser::TokenNameMap Quake3ShaderParser::tokenNames() const {
   return {
-    {Quake3ShaderToken::Number, "number"},
-    {Quake3ShaderToken::String, "string"},
-    {Quake3ShaderToken::Variable, "variable"},
-    {Quake3ShaderToken::OBrace, "'{'"},
-    {Quake3ShaderToken::CBrace, "'}'"},
-    {Quake3ShaderToken::Comment, "comment"},
-    {Quake3ShaderToken::Eol, "end of line"},
-    {Quake3ShaderToken::Eof, "end of file"},
+      {Quake3ShaderToken::Number, "number"},
+      {Quake3ShaderToken::String, "string"},
+      {Quake3ShaderToken::Variable, "variable"},
+      {Quake3ShaderToken::OBrace, "'{'"},
+      {Quake3ShaderToken::CBrace, "'}'"},
+      {Quake3ShaderToken::Comment, "comment"},
+      {Quake3ShaderToken::Eol, "end of line"},
+      {Quake3ShaderToken::Eof, "end of file"},
   };
 }
 

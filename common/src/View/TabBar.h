@@ -31,24 +31,21 @@ class QLabel;
 
 class QStackedLayout;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class TabBook;
 
 class TabBookPage;
 
-class TabBarButton : public QWidget
-{
-  Q_OBJECT
+class TabBarButton : public QWidget {
+Q_OBJECT
 private:
-  QLabel* m_label;
-  QWidget* m_indicator;
+  QLabel *m_label;
+  QWidget *m_indicator;
   bool m_pressed;
 
 public:
-  explicit TabBarButton(const QString& label = "", QWidget* parent = nullptr);
+  explicit TabBarButton(const QString &label = "", QWidget *parent = nullptr);
 
   /**
    * Update the label color
@@ -56,7 +53,7 @@ public:
   void setPressed(bool pressed);
 
 protected:
-  void mousePressEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent *event) override;
 
 signals:
 
@@ -66,25 +63,24 @@ private:
   void updateState();
 };
 
-class TabBar : public ContainerBar
-{
-  Q_OBJECT
+class TabBar : public ContainerBar {
+Q_OBJECT
 private:
-  using ButtonList = std::vector<TabBarButton*>;
+  using ButtonList = std::vector<TabBarButton *>;
 
-  TabBook* m_tabBook;
+  TabBook *m_tabBook;
 
-  QStackedLayout* m_barBook;
-  QHBoxLayout* m_controlLayout;
+  QStackedLayout *m_barBook;
+  QHBoxLayout *m_controlLayout;
   ButtonList m_buttons;
 
 public:
-  explicit TabBar(TabBook* tabBook);
+  explicit TabBar(TabBook *tabBook);
 
-  void addTab(TabBookPage* bookPage, const QString& title);
+  void addTab(TabBookPage *bookPage, const QString &title);
 
 private:
-  size_t findButtonIndex(QWidget* button) const;
+  size_t findButtonIndex(QWidget *button) const;
 
   void setButtonActive(int index);
 

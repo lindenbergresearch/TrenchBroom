@@ -23,21 +23,17 @@
 #include "Renderer/TexturedIndexArrayMap.h"
 #include "Renderer/VertexArray.h"
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class VboManager;
 
 class TextureRenderFunc;
 
-class TexturedIndexArrayRenderer
-{
+class TexturedIndexArrayRenderer {
 private:
   VertexArray m_vertexArray;
   IndexArray m_indexArray;
@@ -47,15 +43,15 @@ public:
   TexturedIndexArrayRenderer();
 
   TexturedIndexArrayRenderer(
-    VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap);
+      VertexArray vertexArray, IndexArray indexArray, TexturedIndexArrayMap indexArrayMap);
 
   bool empty() const;
 
-  void prepare(VboManager& vboManager);
+  void prepare(VboManager &vboManager);
 
   void render();
 
-  void render(TextureRenderFunc& func);
+  void render(TextureRenderFunc &func);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

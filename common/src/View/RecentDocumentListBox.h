@@ -25,16 +25,14 @@
 
 #include <filesystem>
 
-namespace TrenchBroom::View
-{
-class RecentDocumentListBox : public ImageListBox
-{
-  Q_OBJECT
+namespace TrenchBroom::View {
+class RecentDocumentListBox : public ImageListBox {
+Q_OBJECT
 private:
   QPixmap m_documentIcon;
 
 public:
-  explicit RecentDocumentListBox(QWidget* parent = nullptr);
+  explicit RecentDocumentListBox(QWidget *parent = nullptr);
 
 private slots:
 
@@ -53,6 +51,6 @@ private:
 
 signals:
 
-  void loadRecentDocument(const std::filesystem::path& path);
+  void loadRecentDocument(const std::filesystem::path &path);
 };
 } // namespace TrenchBroom::View

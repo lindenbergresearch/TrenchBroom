@@ -28,15 +28,12 @@
 
 class QPushButton;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 struct GameEngineProfile;
 }
 
-namespace View
-{
+namespace View {
 class GameEngineProfileListBox;
 
 class MultiCompletionLineEdit;
@@ -48,19 +45,18 @@ class MultiCompletionLineEdit;
  * A "Configure Engines..." button opens GameEngineDialog for editing the
  * name/path of engines.
  */
-class LaunchGameEngineDialog : public QDialog
-{
+class LaunchGameEngineDialog : public QDialog {
 private:
   std::weak_ptr<MapDocument> m_document;
-  GameEngineProfileListBox* m_gameEngineList{nullptr};
-  MultiCompletionLineEdit* m_parameterText{nullptr};
-  QPushButton* m_launchButton{nullptr};
-  Model::GameEngineProfile* m_lastProfile{nullptr};
+  GameEngineProfileListBox *m_gameEngineList{nullptr};
+  MultiCompletionLineEdit *m_parameterText{nullptr};
+  QPushButton *m_launchButton{nullptr};
+  Model::GameEngineProfile *m_lastProfile{nullptr};
   Model::GameEngineConfig m_config;
 
 public:
   explicit LaunchGameEngineDialog(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void createGui();
@@ -73,7 +69,7 @@ private slots:
 
   void gameEngineProfileChanged();
 
-  void parametersChanged(const QString& text);
+  void parametersChanged(const QString &text);
 
   void editGameEngines();
 

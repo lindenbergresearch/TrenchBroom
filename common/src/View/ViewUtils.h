@@ -26,23 +26,21 @@ class QWidget;
 class QString;
 class QStringList;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class MapDocument;
 
-void combineFlags(size_t numFlags, int newFlagValue, int& setFlags, int& mixedFlags);
+void combineFlags(size_t numFlags, int newFlagValue, int &setFlags, int &mixedFlags);
 
 bool loadEntityDefinitionFile(
- std::weak_ptr<MapDocument> document, QWidget* parent, const QString& path);
+    std::weak_ptr<MapDocument> document, QWidget *parent, const QString &path);
 size_t loadEntityDefinitionFile(
- std::weak_ptr<MapDocument> document, QWidget* parent, const QStringList& pathStrs);
+    std::weak_ptr<MapDocument> document, QWidget *parent, const QStringList &pathStrs);
 
-std::string queryGroupName(QWidget* parent, const std::string& suggestion);
-std::string queryLayerName(QWidget* parent, const std::string& suggestion);
+std::string queryGroupName(QWidget *parent, const std::string &suggestion);
+std::string queryLayerName(QWidget *parent, const std::string &suggestion);
 
 } // namespace TrenchBroom::View

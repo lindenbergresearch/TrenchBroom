@@ -26,46 +26,42 @@
 
 class QPushButton;
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class Texture;
 }
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class BrushFaceHandle;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
 class GLContextManager;
 class MapDocument;
 class TextureBrowser;
 
-class ReplaceTextureDialog : public QDialog
-{
-  Q_OBJECT
+class ReplaceTextureDialog : public QDialog {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
 
-  TextureBrowser* m_subjectBrowser = nullptr;
-  TextureBrowser* m_replacementBrowser = nullptr;
-  QPushButton* m_replaceButton = nullptr;
+  TextureBrowser *m_subjectBrowser = nullptr;
+  TextureBrowser *m_replacementBrowser = nullptr;
+  QPushButton *m_replaceButton = nullptr;
 
 public:
   ReplaceTextureDialog(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
 
 private:
   void accept() override;
   std::vector<Model::BrushFaceHandle> getApplicableFaces() const;
-  void createGui(GLContextManager& contextManager);
+  void createGui(GLContextManager &contextManager);
 private slots:
-  void subjectSelected(const Assets::Texture* subject);
-  void replacementSelected(const Assets::Texture* replacement);
+  void subjectSelected(const Assets::Texture *subject);
+  void replacementSelected(const Assets::Texture *replacement);
   void updateReplaceButton();
 };
 

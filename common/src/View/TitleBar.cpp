@@ -27,27 +27,22 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 TitleBar::TitleBar(
-  const QString& title, QWidget* parent, const bool boldTitle, bool subtitle)
-  : QWidget(parent)
-  , m_titleText(nullptr)
-{
+    const QString &title, QWidget *parent, const bool boldTitle, bool subtitle)
+    : QWidget(parent), m_titleText(nullptr) {
 
   setObjectName("TitleBar");
   m_titleText = new QLabel(title);
   m_titleText->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   m_titleText->setContentsMargins(
-    LayoutConstants::MediumHMargin,
-    LayoutConstants::NoMargin,
-    LayoutConstants::NoMargin,
-    LayoutConstants::NoMargin);
+      LayoutConstants::MediumHMargin,
+      LayoutConstants::NoMargin,
+      LayoutConstants::NoMargin,
+      LayoutConstants::NoMargin);
 
-  if (!subtitle)
-  {
+  if (!subtitle) {
     setAutoFillBackground(true);
     setBackgroundRole(QPalette::Midlight);
     setForegroundRole(QPalette::Text);
@@ -56,25 +51,21 @@ TitleBar::TitleBar(
   // in case this widget is used inside of a ControlListBox.
   m_titleText->setProperty(ControlListBox::LabelColorShouldNotUpdateWhenSelected, true);
 
-  if (boldTitle)
-  {
+  if (boldTitle) {
     makePanelTitle(m_titleText, false, subtitle);
-  }
-  else
-  {
+  } else {
     makePanelTitle(m_titleText, true, subtitle);
   }
 
-  auto* layout = new QHBoxLayout();
+  auto *layout = new QHBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(m_titleText, 1);
   setLayout(layout);
   setMinimumHeight(22);
 }
 
-TitleBar::TitleBar(const QString& title, const bool boldTitle, bool subtitle)
-  : TitleBar(title, nullptr, boldTitle, subtitle)
-{
+TitleBar::TitleBar(const QString &title, const bool boldTitle, bool subtitle)
+    : TitleBar(title, nullptr, boldTitle, subtitle) {
 }
 } // namespace View
 } // namespace TrenchBroom

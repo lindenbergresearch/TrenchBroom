@@ -27,23 +27,19 @@
 
 #include <iosfwd>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 
-namespace DecalSpecificationKeys
-{
+namespace DecalSpecificationKeys {
 constexpr auto Texture = "texture";
 } // namespace DecalSpecificationKeys
 
-struct DecalSpecification
-{
+struct DecalSpecification {
   std::string textureName;
 
   kdl_reflect_decl(DecalSpecification, textureName);
 };
 
-class DecalDefinition
-{
+class DecalDefinition {
 private:
   EL::Expression m_expression;
 
@@ -52,7 +48,7 @@ public:
   DecalDefinition(size_t line, size_t column);
   explicit DecalDefinition(EL::Expression expression);
 
-  void append(const DecalDefinition& other);
+  void append(const DecalDefinition &other);
 
   /**
    * Evaluates the decal expresion, using the given variable store to interpolate
@@ -63,7 +59,7 @@ public:
    *
    * @throws EL::Exception if the expression could not be evaluated
    */
-  DecalSpecification decalSpecification(const EL::VariableStore& variableStore) const;
+  DecalSpecification decalSpecification(const EL::VariableStore &variableStore) const;
 
   /**
    * Evaluates the decal expresion.

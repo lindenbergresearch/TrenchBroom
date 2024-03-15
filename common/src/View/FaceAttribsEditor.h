@@ -34,17 +34,14 @@ class QLineEdit;
 
 class QGridLayout;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushFaceHandle;
 
 class Node;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class FlagsPopupEditor;
 
 class GLContextManager;
@@ -59,48 +56,47 @@ class SpinControl;
 
 class UVEditor;
 
-class FaceAttribsEditor : public QWidget
-{
-  Q_OBJECT
+class FaceAttribsEditor : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
 
-  UVEditor* m_uvEditor{nullptr};
-  QLabel* m_textureName{nullptr};
-  QLabel* m_textureSize{nullptr};
-  SpinControl* m_xOffsetEditor{nullptr};
-  SpinControl* m_yOffsetEditor{nullptr};
-  SpinControl* m_xScaleEditor{nullptr};
-  SpinControl* m_yScaleEditor{nullptr};
-  SpinControl* m_rotationEditor{nullptr};
-  QLabel* m_surfaceValueLabel{nullptr};
-  QWidget* m_surfaceValueEditorLayout{nullptr};
-  SpinControl* m_surfaceValueEditor{nullptr};
-  QAbstractButton* m_surfaceValueUnsetButton{nullptr};
+  UVEditor *m_uvEditor{nullptr};
+  QLabel *m_textureName{nullptr};
+  QLabel *m_textureSize{nullptr};
+  SpinControl *m_xOffsetEditor{nullptr};
+  SpinControl *m_yOffsetEditor{nullptr};
+  SpinControl *m_xScaleEditor{nullptr};
+  SpinControl *m_yScaleEditor{nullptr};
+  SpinControl *m_rotationEditor{nullptr};
+  QLabel *m_surfaceValueLabel{nullptr};
+  QWidget *m_surfaceValueEditorLayout{nullptr};
+  SpinControl *m_surfaceValueEditor{nullptr};
+  QAbstractButton *m_surfaceValueUnsetButton{nullptr};
 
-  QLabel* m_surfaceFlagsLabel{nullptr};
-  QWidget* m_surfaceFlagsEditorLayout{nullptr};
-  FlagsPopupEditor* m_surfaceFlagsEditor{nullptr};
-  QAbstractButton* m_surfaceFlagsUnsetButton{nullptr};
-  QLabel* m_contentFlagsLabel{nullptr};
-  QWidget* m_contentFlagsEditorLayout{nullptr};
-  FlagsPopupEditor* m_contentFlagsEditor{nullptr};
-  QAbstractButton* m_contentFlagsUnsetButton{nullptr};
+  QLabel *m_surfaceFlagsLabel{nullptr};
+  QWidget *m_surfaceFlagsEditorLayout{nullptr};
+  FlagsPopupEditor *m_surfaceFlagsEditor{nullptr};
+  QAbstractButton *m_surfaceFlagsUnsetButton{nullptr};
+  QLabel *m_contentFlagsLabel{nullptr};
+  QWidget *m_contentFlagsEditorLayout{nullptr};
+  FlagsPopupEditor *m_contentFlagsEditor{nullptr};
+  QAbstractButton *m_contentFlagsUnsetButton{nullptr};
 
-  QLabel* m_colorLabel{nullptr};
-  QWidget* m_colorEditorLayout{nullptr};
-  QLineEdit* m_colorEditor{nullptr};
-  QAbstractButton* m_colorUnsetButton{nullptr};
+  QLabel *m_colorLabel{nullptr};
+  QWidget *m_colorEditorLayout{nullptr};
+  QLineEdit *m_colorEditor{nullptr};
+  QAbstractButton *m_colorUnsetButton{nullptr};
 
-  SignalDelayer* m_updateControlsSignalDelayer{nullptr};
+  SignalDelayer *m_updateControlsSignalDelayer{nullptr};
 
   NotifierConnection m_notifierConnection;
 
 public:
   FaceAttribsEditor(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
 
   bool cancelMouseDrag();
 
@@ -121,7 +117,7 @@ private:
 
   void surfaceValueChanged(double value);
 
-  void colorValueChanged(const QString& text);
+  void colorValueChanged(const QString &text);
 
   void surfaceFlagsUnset();
 
@@ -134,21 +130,21 @@ private:
   void updateIncrements();
 
 private:
-  void createGui(GLContextManager& contextManager);
+  void createGui(GLContextManager &contextManager);
 
   void bindEvents();
 
   void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
+  void documentWasNewed(MapDocument *document);
 
-  void documentWasLoaded(MapDocument* document);
+  void documentWasLoaded(MapDocument *document);
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+  void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& faces);
+  void brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &faces);
 
-  void selectionDidChange(const Selection& selection);
+  void selectionDidChange(const Selection &selection);
 
   void textureCollectionsDidChange();
 

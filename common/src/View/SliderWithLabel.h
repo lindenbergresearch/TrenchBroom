@@ -28,29 +28,26 @@ class QLabel;
 
 class QSlider;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 
-class SliderWithLabel : public QWidget
-{
-  Q_OBJECT
+class SliderWithLabel : public QWidget {
+Q_OBJECT
 private:
-  QSlider* m_slider;
-  QLabel* m_label;
+  QSlider *m_slider;
+  QLabel *m_label;
   float m_factor;
   QString m_format;
 
 public:
   SliderWithLabel(
-    int minimum,
-    int maximum,
-    const float factor = 0.0,
-    const QString& format = "%d",
-    const int maxSliderWidth = 0,
-    const int minLabelWidth = 0,
-    QWidget* parent = nullptr);
+      int minimum,
+      int maximum,
+      const float factor = 0.0,
+      const QString &format = "%d",
+      const int maxSliderWidth = 0,
+      const int minLabelWidth = 0,
+      QWidget *parent = nullptr);
 
   int value() const;
 

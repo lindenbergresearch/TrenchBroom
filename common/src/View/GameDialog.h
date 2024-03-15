@@ -33,38 +33,34 @@ class QPushButton;
 
 class QWidget;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class GameListBox;
 
-class GameDialog : public QDialog
-{
-  Q_OBJECT
+class GameDialog : public QDialog {
+Q_OBJECT
 private:
-  enum class DialogType
-  {
+  enum class DialogType {
     Open,
     New
   };
 
 protected:
   DialogType m_dialogType;
-  GameListBox* m_gameListBox;
-  QComboBox* m_mapFormatComboBox;
-  QPushButton* m_openPreferencesButton;
-  QPushButton* m_okButton;
+  GameListBox *m_gameListBox;
+  QComboBox *m_mapFormatComboBox;
+  QPushButton *m_openPreferencesButton;
+  QPushButton *m_okButton;
 
   NotifierConnection m_notifierConnection;
 
 public:
   // FIXME: return a tuple instead of taking in/out parameters
   static bool showNewDocumentDialog(
-    QWidget* parent, std::string& gameName, Model::MapFormat& mapFormat);
+      QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat);
 
   static bool showOpenDocumentDialog(
-    QWidget* parent, std::string& gameName, Model::MapFormat& mapFormat);
+      QWidget *parent, std::string &gameName, Model::MapFormat &mapFormat);
 
   std::string currentGameName() const;
 
@@ -72,32 +68,32 @@ public:
 
 private slots:
 
-  void currentGameChanged(const QString& gameName);
+  void currentGameChanged(const QString &gameName);
 
-  void gameSelected(const QString& gameName);
+  void gameSelected(const QString &gameName);
 
   void openPreferencesClicked();
 
 protected:
   GameDialog(
-    const QString& title,
-    const QString& infoText,
-    DialogType type,
-    QWidget* parent = nullptr);
+      const QString &title,
+      const QString &infoText,
+      DialogType type,
+      QWidget *parent = nullptr);
 
-  void createGui(const QString& title, const QString& infoText);
+  void createGui(const QString &title, const QString &infoText);
 
-  QWidget* createInfoPanel(
-    QWidget* parent, const QString& title, const QString& infoText);
+  QWidget *createInfoPanel(
+      QWidget *parent, const QString &title, const QString &infoText);
 
-  QWidget* createSelectionPanel(QWidget* parent);
+  QWidget *createSelectionPanel(QWidget *parent);
 
 private:
-  void updateMapFormats(const std::string& gameName);
+  void updateMapFormats(const std::string &gameName);
 
   void connectObservers();
 
-  void preferenceDidChange(const std::filesystem::path& path);
+  void preferenceDidChange(const std::filesystem::path &path);
 };
 } // namespace View
 } // namespace TrenchBroom

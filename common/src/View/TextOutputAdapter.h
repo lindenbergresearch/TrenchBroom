@@ -27,13 +27,10 @@
 
 class QTextEdit;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 
-namespace Ascii
-{
+namespace Ascii {
 static QChar ESC = 0x1b; // Escape character
 static QChar BEL = 0x07; // Terminal bell
 static QChar BS = 0x08;  // Backspace
@@ -55,18 +52,16 @@ static QChar SCREEN_CMD_END = 'm';
  * - Interprets CR and LF control characters.
  * - Scroll bar follows output, unless it's manually raised.
  */
-class TextOutputAdapter
-{
+class TextOutputAdapter {
 private:
-  QTextEdit* m_textEdit;
+  QTextEdit *m_textEdit;
   QTextCursor m_insertionCursor;
 
 public:
-  explicit TextOutputAdapter(QTextEdit* textEdit);
+  explicit TextOutputAdapter(QTextEdit *textEdit);
 
-  template <typename T>
-  void pushSystemMessage(const T& t, const QColor& color = QColor{"#FFFFFF"})
-  {
+  template<typename T>
+  void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
     QString string;
     QTextStream stream(&string);
     stream << t;
@@ -84,9 +79,8 @@ public:
    * Appends the given value to the text widget.
    * Objects are formatted using QTextStream.
    */
-  template <typename T>
-  TextOutputAdapter& operator<<(const T& t)
-  {
+  template<typename T>
+  TextOutputAdapter &operator<<(const T &t) {
     QString string;
     QTextStream stream(&string);
     stream << t;
@@ -95,9 +89,9 @@ public:
   }
 
 private:
-  void appendString(const QString& string);
+  void appendString(const QString &string);
 
-  QTextCharFormat& decodeVT100Command(const QString& string, QTextCharFormat& format);
+  QTextCharFormat &decodeVT100Command(const QString &string, QTextCharFormat &format);
 };
 } // namespace View
 } // namespace TrenchBroom

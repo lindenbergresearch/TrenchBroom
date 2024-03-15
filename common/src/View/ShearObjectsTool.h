@@ -31,25 +31,20 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class PickResult;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class Camera;
 }
 
-namespace View
-{
+namespace View {
 class Grid;
 class MapDocument;
 
-class ShearObjectsTool : public Tool
-{
+class ShearObjectsTool : public Tool {
 public:
   static const Model::HitType::Type ShearToolSideHitType;
 
@@ -65,22 +60,22 @@ public:
   explicit ShearObjectsTool(std::weak_ptr<MapDocument> document);
   ~ShearObjectsTool() override;
 
-  const Grid& grid() const;
+  const Grid &grid() const;
 
   bool applies() const;
 
   void pickBackSides(
-    const vm::ray3& pickRay,
-    const Renderer::Camera& camera,
-    Model::PickResult& pickResult);
+      const vm::ray3 &pickRay,
+      const Renderer::Camera &camera,
+      Model::PickResult &pickResult);
   void pick2D(
-    const vm::ray3& pickRay,
-    const Renderer::Camera& camera,
-    Model::PickResult& pickResult);
+      const vm::ray3 &pickRay,
+      const Renderer::Camera &camera,
+      Model::PickResult &pickResult);
   void pick3D(
-    const vm::ray3& pickRay,
-    const Renderer::Camera& camera,
-    Model::PickResult& pickResult);
+      const vm::ray3 &pickRay,
+      const Renderer::Camera &camera,
+      Model::PickResult &pickResult);
 
 public:
   vm::bbox3 bounds() const;
@@ -94,17 +89,17 @@ public:
    */
   vm::bbox3 bboxAtDragStart() const;
 
-  void startShearWithHit(const Model::Hit& hit);
+  void startShearWithHit(const Model::Hit &hit);
   void commitShear();
   void cancelShear();
-  void shearByDelta(const vm::vec3& delta);
+  void shearByDelta(const vm::vec3 &delta);
 
-  const Model::Hit& dragStartHit() const;
+  const Model::Hit &dragStartHit() const;
 
   vm::mat4x4 bboxShearMatrix() const;
   vm::polygon3f shearHandle() const;
 
-  void updatePickedSide(const Model::PickResult& pickResult);
+  void updatePickedSide(const Model::PickResult &pickResult);
 
   bool constrainVertical() const;
   void setConstrainVertical(bool constrainVertical);

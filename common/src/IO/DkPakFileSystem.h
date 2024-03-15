@@ -25,12 +25,10 @@
 #include <filesystem>
 #include <memory>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class CFile;
 
-class DkPakFileSystem : public ImageFileSystem<CFile>
-{
+class DkPakFileSystem : public ImageFileSystem<CFile> {
 public:
   using ImageFileSystem::ImageFileSystem;
 

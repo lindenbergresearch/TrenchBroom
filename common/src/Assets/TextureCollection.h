@@ -28,11 +28,9 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 
-class TextureCollection
-{
+class TextureCollection {
 private:
   using TextureIdList = std::vector<GLuint>;
 
@@ -52,26 +50,26 @@ public:
   explicit TextureCollection(std::filesystem::path path);
   TextureCollection(std::filesystem::path path, std::vector<Texture> textures);
 
-  TextureCollection(const TextureCollection&) = delete;
-  TextureCollection& operator=(const TextureCollection&) = delete;
+  TextureCollection(const TextureCollection &) = delete;
+  TextureCollection &operator=(const TextureCollection &) = delete;
 
-  TextureCollection(TextureCollection&& other) = default;
-  TextureCollection& operator=(TextureCollection&& other) = default;
+  TextureCollection(TextureCollection &&other) = default;
+  TextureCollection &operator=(TextureCollection &&other) = default;
 
   ~TextureCollection();
 
   bool loaded() const;
-  const std::filesystem::path& path() const;
+  const std::filesystem::path &path() const;
   size_t textureCount() const;
 
-  const std::vector<Texture>& textures() const;
-  std::vector<Texture>& textures();
+  const std::vector<Texture> &textures() const;
+  std::vector<Texture> &textures();
 
-  const Texture* textureByIndex(size_t index) const;
-  Texture* textureByIndex(size_t index);
+  const Texture *textureByIndex(size_t index) const;
+  Texture *textureByIndex(size_t index);
 
-  const Texture* textureByName(const std::string& name) const;
-  Texture* textureByName(const std::string& name);
+  const Texture *textureByName(const std::string &name) const;
+  Texture *textureByName(const std::string &name);
 
   bool prepared() const;
   void prepare(int minFilter, int magFilter);

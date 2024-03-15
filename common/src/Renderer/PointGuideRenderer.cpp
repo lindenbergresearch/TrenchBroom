@@ -26,29 +26,24 @@
 #include <vm/ray.h>
 #include <vm/vec.h>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 const FloatType PointGuideRenderer::SpikeLength = 512.0;
 
 PointGuideRenderer::PointGuideRenderer(std::weak_ptr<View::MapDocument> document)
-  : m_document(document)
-{
+    : m_document(document) {
 }
 
-void PointGuideRenderer::setColor(const Color& color)
-{
-  if (color == m_color)
+void PointGuideRenderer::setColor(const Color &color) {
+  if (color==m_color)
     return;
 
   m_spikeRenderer.setColor(color);
   m_color = color;
 }
 
-void PointGuideRenderer::setPosition(const vm::vec3& position)
-{
-  if (position == m_position)
+void PointGuideRenderer::setPosition(const vm::vec3 &position) {
+  if (position==m_position)
     return;
 
   m_spikeRenderer.clear();
@@ -64,13 +59,11 @@ void PointGuideRenderer::setPosition(const vm::vec3& position)
   m_position = position;
 }
 
-void PointGuideRenderer::doPrepareVertices(VboManager& vboManager)
-{
+void PointGuideRenderer::doPrepareVertices(VboManager &vboManager) {
   m_spikeRenderer.prepareVertices(vboManager);
 }
 
-void PointGuideRenderer::doRender(RenderContext& renderContext)
-{
+void PointGuideRenderer::doRender(RenderContext &renderContext) {
   m_spikeRenderer.render(renderContext);
 }
 } // namespace Renderer

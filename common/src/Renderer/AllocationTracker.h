@@ -22,20 +22,16 @@
 #include <cstddef>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 /**
  * Implements bookkeeping for dynamic memory allocation (like malloc).
  */
-class AllocationTracker
-{
+class AllocationTracker {
 public:
   using Index = size_t;
 
-  struct Block
-  {
+  struct Block {
   public:
     Index pos;
     Index size;
@@ -47,8 +43,8 @@ public:
      * If this is null, it means we're the head of the list in the
      * m_freeBlockSizeBins map.
      */
-    Block* prevOfSameSize;
-    Block* nextOfSameSize;
+    Block *prevOfSameSize;
+    Block *nextOfSameSize;
     /**
      * If this is null it means m_leftmostBlock points to us.
      * These are used for:
@@ -56,16 +52,16 @@ public:
      *  - freeing the actual memory used for the Block objects
      *    in the AllocationTracker destructor.
      */
-    Block* left;
+    Block *left;
     /**
      * Null iff m_rightmostBlock points to this block.
      * Links to the Block at (pos + size).
      */
-    Block* right;
+    Block *right;
 
     bool free;
 
-    Block* nextRecycledBlock;
+    Block *nextRecycledBlock;
   };
 
 private:
@@ -78,18 +74,18 @@ private:
   /**
    * Points to the Block with pos 0. Used to free all of the blocks in the destructor
    */
-  Block* m_leftmostBlock;
+  Block *m_leftmostBlock;
   /**
    * Points to the Block with the highest pos. Used when expanding.
    */
-  Block* m_rightmostBlock;
+  Block *m_rightmostBlock;
 
   /**
    * Instead of always calling new/delete on Blocks when splitting/merging,
    * we keep a singly-linked list of "recycled" blocks (using the nextRecycledBlock
    * pointer). If the list is empty, then fall back to calling `new Block`.
    */
-  Block* m_recycledBlockList;
+  Block *m_recycledBlockList;
 
   /**
    * A map from Block size to a linked list of Blocks of that exact size
@@ -97,19 +93,19 @@ private:
    *
    * Sorted vector, benchmarks faster than std::map for this use case.
    */
-  std::vector<Block*> m_freeBlockSizeBins;
+  std::vector<Block *> m_freeBlockSizeBins;
 
   /**
    * Unlinks a Block from m_freeBlockSizeBins. Must be called before modifying
    * Block::size.
    */
-  void unlinkFromBinList(Block* block);
+  void unlinkFromBinList(Block *block);
 
-  void linkToBinList(Block* block);
+  void linkToBinList(Block *block);
 
-  void recycle(Block* block);
+  void recycle(Block *block);
 
-  Block* obtainBlock();
+  Block *obtainBlock();
 
 public:
   explicit AllocationTracker(Index initial_capacity);
@@ -128,9 +124,9 @@ public:
    *
    * The AllocationTracker owns the Block object itself.
    */
-  Block* allocate(size_t size);
+  Block *allocate(size_t size);
 
-  void free(Block* block);
+  void free(Block *block);
 
   size_t capacity() const;
 
@@ -145,17 +141,16 @@ public:
 
   // Testing / debugging
 
-  class Range
-  {
+  class Range {
   public:
     Index pos;
     Index size;
 
     Range(Index p, Index s);
 
-    bool operator==(const Range& other) const;
+    bool operator==(const Range &other) const;
 
-    bool operator<(const Range& other) const;
+    bool operator<(const Range &other) const;
   };
 
   std::vector<Range> freeBlocks() const;

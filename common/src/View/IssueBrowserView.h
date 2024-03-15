@@ -31,24 +31,20 @@ class QWidget;
 
 class QTableView;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Issue;
 
 class IssueQuickFix;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class IssueBrowserModel;
 
 class MapDocument;
 
-class IssueBrowserView : public QWidget
-{
-  Q_OBJECT
+class IssueBrowserView : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
 
@@ -57,12 +53,12 @@ private:
 
   bool m_valid;
 
-  QTableView* m_tableView;
-  IssueBrowserModel* m_tableModel;
+  QTableView *m_tableView;
+  IssueBrowserModel *m_tableModel;
 
 public:
   explicit IssueBrowserView(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void createGui();
@@ -81,10 +77,10 @@ public:
 private:
   void updateIssues();
 
-  std::vector<const Model::Issue*> collectIssues(const QList<QModelIndex>& indices) const;
+  std::vector<const Model::Issue *> collectIssues(const QList<QModelIndex> &indices) const;
 
-  std::vector<const Model::IssueQuickFix*> collectQuickFixes(
-    const QList<QModelIndex>& indices) const;
+  std::vector<const Model::IssueQuickFix *> collectQuickFixes(
+      const QList<QModelIndex> &indices) const;
 
   Model::IssueType issueTypeMask() const;
 
@@ -96,7 +92,7 @@ private:
 
   void bindEvents();
 
-  void itemRightClicked(const QPoint& pos);
+  void itemRightClicked(const QPoint &pos);
 
   void itemSelectionChanged();
 
@@ -104,7 +100,7 @@ private:
 
   void hideIssues();
 
-  void applyQuickFix(const Model::IssueQuickFix& quickFix);
+  void applyQuickFix(const Model::IssueQuickFix &quickFix);
 
 private:
   void invalidate();
@@ -118,25 +114,24 @@ public slots:
  * Trivial QAbstractTableModel subclass, when the issues list changes,
  * it just refreshes the entire list with beginResetModel()/endResetModel().
  */
-class IssueBrowserModel : public QAbstractTableModel
-{
-  Q_OBJECT
+class IssueBrowserModel : public QAbstractTableModel {
+Q_OBJECT
 private:
-  std::vector<const Model::Issue*> m_issues;
+  std::vector<const Model::Issue *> m_issues;
 
 public:
-  explicit IssueBrowserModel(QObject* parent);
+  explicit IssueBrowserModel(QObject *parent);
 
-  void setIssues(std::vector<const Model::Issue*> issues);
+  void setIssues(std::vector<const Model::Issue *> issues);
 
-  const std::vector<const Model::Issue*>& issues();
+  const std::vector<const Model::Issue *> &issues();
 
 public: // QAbstractTableModel overrides
-  int rowCount(const QModelIndex& parent) const override;
+  int rowCount(const QModelIndex &parent) const override;
 
-  int columnCount(const QModelIndex& parent) const override;
+  int columnCount(const QModelIndex &parent) const override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+  QVariant data(const QModelIndex &index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 };

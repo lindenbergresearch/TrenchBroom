@@ -28,25 +28,21 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-template <typename T, typename U>
+namespace TrenchBroom {
+template<typename T, typename U>
 class octree;
 
-namespace Renderer
-{
+namespace Renderer {
 enum class PrimType;
 class TexturedIndexRangeRenderer;
 class TexturedRenderer;
 } // namespace Renderer
 
-namespace Assets
-{
+namespace Assets {
 class Texture;
 class TextureCollection;
 
-enum class PitchType
-{
+enum class PitchType {
   Normal,
   MdlInverted
 };
@@ -57,8 +53,7 @@ enum class PitchType
  * See
  * https://github.com/ericwa/Quakespasm/blob/7e7e13f9335697f8e94d1631fdf60ecdddb7498f/quakespasm/Quake/r_sprite.c#L82
  */
-enum class Orientation
-{
+enum class Orientation {
   /** Faces view plane, up is towards the heavens. */
   ViewPlaneParallelUpright,
   /** Faces camera origin, up is towards the heavens. */
@@ -75,8 +70,7 @@ enum class Orientation
  * One frame of the model. Since frames are loaded on demand, each frame has two possible
  * states: loaded and unloaded. These states are modeled as subclasses of this class.
  */
-class EntityModelFrame
-{
+class EntityModelFrame {
 private:
   size_t m_index;
   size_t m_skinOffset;
@@ -120,14 +114,14 @@ public:
    *
    * @return the name
    */
-  virtual const std::string& name() const = 0;
+  virtual const std::string &name() const = 0;
 
   /**
    * Returns this frame's bounding box.
    *
    * @return the bounding box
    */
-  virtual const vm::bbox3f& bounds() const = 0;
+  virtual const vm::bbox3f &bounds() const = 0;
 
   /**
    * Returns this frame's pitch type. The pitch type controls how a rotational
@@ -148,14 +142,13 @@ public:
    * @return the distance to the point of intersection or NaN if the given ray does not
    * intersect this frame
    */
-  virtual float intersect(const vm::ray3f& ray) const = 0;
+  virtual float intersect(const vm::ray3f &ray) const = 0;
 };
 
 /**
  * A frame of the model in its loaded state.
  */
-class EntityModelLoadedFrame : public EntityModelFrame
-{
+class EntityModelLoadedFrame : public EntityModelFrame {
 private:
   std::string m_name;
   vm::bbox3f m_bounds;
@@ -179,20 +172,20 @@ public:
    * @param orientation the orientation
    */
   EntityModelLoadedFrame(
-    size_t index,
-    const std::string& name,
-    const vm::bbox3f& bounds,
-    PitchType pitchType,
-    Orientation orientation);
+      size_t index,
+      const std::string &name,
+      const vm::bbox3f &bounds,
+      PitchType pitchType,
+      Orientation orientation);
 
   ~EntityModelLoadedFrame();
 
   bool loaded() const override;
-  const std::string& name() const override;
-  const vm::bbox3f& bounds() const override;
+  const std::string &name() const override;
+  const vm::bbox3f &bounds() const override;
   PitchType pitchType() const override;
   Orientation orientation() const override;
-  float intersect(const vm::ray3f& ray) const override;
+  float intersect(const vm::ray3f &ray) const override;
 
   /**
    * Adds the given primitives to the spacial tree for this frame.
@@ -204,10 +197,10 @@ public:
    * @param count the number of vertices that make up the primitive(s)
    */
   void addToSpacialTree(
-    const std::vector<EntityModelVertex>& vertices,
-    Renderer::PrimType primType,
-    size_t index,
-    size_t count);
+      const std::vector<EntityModelVertex> &vertices,
+      Renderer::PrimType primType,
+      size_t index,
+      size_t count);
 };
 
 class EntityModelMesh;
@@ -222,8 +215,7 @@ class EntityModelTexturedMesh;
  * Each surface contains per frame meshes. The number of per frame meshes should match the
  * number of frames in the model.
  */
-class EntityModelSurface
-{
+class EntityModelSurface {
 private:
   std::string m_name;
   std::vector<std::unique_ptr<EntityModelMesh>> m_meshes;
@@ -245,7 +237,7 @@ public:
    *
    * @return the name of this surface
    */
-  const std::string& name() const;
+  const std::string &name() const;
 
   /**
    * Prepares the skin textures of this surface for rendering.
@@ -272,9 +264,9 @@ public:
    * @param indices the vertex indices
    */
   void addIndexedMesh(
-    EntityModelLoadedFrame& frame,
-    std::vector<EntityModelVertex> vertices,
-    EntityModelIndices indices);
+      EntityModelLoadedFrame &frame,
+      std::vector<EntityModelVertex> vertices,
+      EntityModelIndices indices);
 
   /**
    * Adds a new multitextured mesh to this surface.
@@ -284,9 +276,9 @@ public:
    * @param indices the per texture vertex indices
    */
   void addTexturedMesh(
-    EntityModelLoadedFrame& frame,
-    std::vector<EntityModelVertex> vertices,
-    EntityModelTexturedIndices indices);
+      EntityModelLoadedFrame &frame,
+      std::vector<EntityModelVertex> vertices,
+      EntityModelTexturedIndices indices);
 
   /**
    * Sets the given textures as skins to this surface.
@@ -316,7 +308,7 @@ public:
    * @param name the name of the skin to find
    * @return the skin with the given name, or null if no such skin was found
    */
-  const Texture* skin(const std::string& name) const;
+  const Texture *skin(const std::string &name) const;
 
   /**
    * Returns the skin with the given index.
@@ -324,10 +316,10 @@ public:
    * @param index the index of the skin to find
    * @return the skin with the given index, or null if the index is out of bounds
    */
-  const Texture* skin(size_t index) const;
+  const Texture *skin(size_t index) const;
 
   std::unique_ptr<Renderer::TexturedIndexRangeRenderer> buildRenderer(
-    size_t skinIndex, size_t frameIndex);
+      size_t skinIndex, size_t frameIndex);
 };
 
 /**
@@ -336,8 +328,7 @@ public:
  * primitives such as triangles, and the corresponding textures. Every surface has a
  * separate mesh for each frame of the model.
  */
-class EntityModel
-{
+class EntityModel {
 private:
   std::string m_name;
   bool m_prepared;
@@ -365,7 +356,7 @@ public:
    * @return the renderer
    */
   std::unique_ptr<Renderer::TexturedRenderer> buildRenderer(
-    size_t skinIndex, size_t frameIndex) const;
+      size_t skinIndex, size_t frameIndex) const;
 
   /**
    * Returns the bounds of the given frame of this model.
@@ -401,7 +392,7 @@ public:
   /**
    * Add a frame to this model.
    */
-  EntityModelFrame& addFrame();
+  EntityModelFrame &addFrame();
 
   /**
    * Adds a frame with the given name and bounds.
@@ -413,8 +404,8 @@ public:
    *
    * @throws AssetException if the given frame index is out of bounds
    */
-  EntityModelLoadedFrame& loadFrame(
-    size_t frameIndex, const std::string& name, const vm::bbox3f& bounds);
+  EntityModelLoadedFrame &loadFrame(
+      size_t frameIndex, const std::string &name, const vm::bbox3f &bounds);
 
   /**
    * Adds a surface with the given name.
@@ -422,7 +413,7 @@ public:
    * @param name the surface name
    * @return the newly added surface
    */
-  EntityModelSurface& addSurface(std::string name);
+  EntityModelSurface &addSurface(std::string name);
 
   /**
    * Returns the number of frames of this model.
@@ -443,21 +434,21 @@ public:
    *
    * @return the frames
    */
-  std::vector<const EntityModelFrame*> frames() const;
+  std::vector<const EntityModelFrame *> frames() const;
 
   /**
    * Returns all frames of this model.
    *
    * @return the frames
    */
-  std::vector<EntityModelFrame*> frames();
+  std::vector<EntityModelFrame *> frames();
 
   /**
    * Returns all surfaces of this model.
    *
    * @return the surfaces
    */
-  std::vector<const EntityModelSurface*> surfaces() const;
+  std::vector<const EntityModelSurface *> surfaces() const;
 
   /**
    * Returns the frame with the given name.
@@ -465,7 +456,7 @@ public:
    * @param name the name of the frame to find
    * @return the frame with the given name or null if no such frame was found
    */
-  const EntityModelFrame* frame(const std::string& name) const;
+  const EntityModelFrame *frame(const std::string &name) const;
 
   /**
    * Returns the frame with the given index.
@@ -473,7 +464,7 @@ public:
    * @param index the index of the frame
    * @return the frame with the given index or null if the index is out of bounds
    */
-  const EntityModelFrame* frame(size_t index) const;
+  const EntityModelFrame *frame(size_t index) const;
 
   /**
    * Returns the surface with the given index.
@@ -482,7 +473,7 @@ public:
    * @return the surface with the given index
    * @throw std::out_of_range if the given index is out of bounds
    */
-  EntityModelSurface& surface(size_t index);
+  EntityModelSurface &surface(size_t index);
 
   /**
    * Returns the surface with the given name.
@@ -490,7 +481,7 @@ public:
    * @param name the name of the surface to find
    * @return the surface with the given name or null if no such surface was found
    */
-  const EntityModelSurface* surface(const std::string& name) const;
+  const EntityModelSurface *surface(const std::string &name) const;
 };
 } // namespace Assets
 } // namespace TrenchBroom

@@ -26,11 +26,9 @@
 #include <optional>
 #include <string>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
-class Layer
-{
+class Layer {
 private:
   bool m_defaultLayer;
   std::string m_name;
@@ -45,15 +43,15 @@ public:
 
   bool defaultLayer() const;
 
-  const std::string& name() const;
+  const std::string &name() const;
   void setName(std::string name);
 
   bool hasSortIndex() const;
   int sortIndex() const;
   void setSortIndex(int sortIndex);
 
-  const std::optional<Color>& color() const;
-  void setColor(const Color& color);
+  const std::optional<Color> &color() const;
+  void setColor(const Color &color);
 
   bool omitFromExport() const;
   void setOmitFromExport(bool omitFromExport);

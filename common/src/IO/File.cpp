@@ -26,76 +26,63 @@
 #include <cstdio>
 #include <cstring>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 File::File() = default;
 
 File::~File() = default;
 
 OwningBufferFile::OwningBufferFile(std::unique_ptr<char[]> buffer, const size_t size)
-  : m_buffer{std::move(buffer)}
-  , m_size{size}
-{
+    : m_buffer{std::move(buffer)}, m_size{size} {
 }
 
-Reader OwningBufferFile::reader() const
-{
+Reader OwningBufferFile::reader() const {
   return Reader::from(m_buffer.get(), m_buffer.get() + m_size);
 }
 
-size_t OwningBufferFile::size() const
-{
+size_t OwningBufferFile::size() const {
   return m_size;
 }
 
-namespace
-{
-Result<kdl::resource<std::FILE*>> openPathAsFILE(
-  const std::filesystem::path& path, const std::string& mode)
-{
+namespace {
+Result<kdl::resource<std::FILE *>> openPathAsFILE(
+    const std::filesystem::path &path, const std::string &mode) {
   // Windows: fopen() doesn't handle UTF-8. We have to use the nonstandard _wfopen
   // to open a Unicode path.
   //
   // All other platforms, just assume fopen() can handle UTF-8
   //
   // mode is assumed to be ASCII (one byte per char)
-  auto* file =
+  auto *file =
 #ifdef _WIN32
-    _wfopen(path.wstring().c_str(), std::wstring{mode.begin(), mode.end()}.c_str());
+      _wfopen(path.wstring().c_str(), std::wstring{mode.begin(), mode.end()}.c_str());
 #else
-    fopen(path.u8string().c_str(), mode.c_str());
+      fopen(path.u8string().c_str(), mode.c_str());
 #endif
 
-  if (!file)
-  {
+  if (!file) {
     return Error{"Cannot open file " + path.string()};
   }
 
   return kdl::resource{file, std::fclose};
 }
 
-Result<size_t> fileSize(std::FILE* file)
-{
+Result<size_t> fileSize(std::FILE *file) {
   const auto pos = std::ftell(file);
-  if (pos < 0)
-  {
+  if (pos < 0) {
     return Error{"ftell failed"};
   }
 
-  if (std::fseek(file, 0, SEEK_END) != 0)
-  {
+  if (std::fseek(file, 0, SEEK_END)!=0) {
     return Error{"fseek failed"};
   }
 
   const auto size = std::ftell(file);
-  if (size < 0)
-  {
+  if (size < 0) {
     return Error{"ftell failed"};
   }
 
-  if (std::fseek(file, pos, SEEK_SET) != 0)
-  {
+  if (std::fseek(file, pos, SEEK_SET)!=0) {
     return Error{"fseek failed"};
   }
 
@@ -103,69 +90,55 @@ Result<size_t> fileSize(std::FILE* file)
 }
 } // namespace
 
-CFile::CFile(kdl::resource<std::FILE*> file, const size_t size)
-  : m_file{std::move(file)}
-  , m_size{size}
-{
+CFile::CFile(kdl::resource<std::FILE *> file, const size_t size)
+    : m_file{std::move(file)}, m_size{size} {
 }
 
-Reader CFile::reader() const
-{
+Reader CFile::reader() const {
   return Reader::from(*this, m_size);
 }
 
-size_t CFile::size() const
-{
+size_t CFile::size() const {
   return m_size;
 }
 
-std::FILE* CFile::file() const
-{
+std::FILE *CFile::file() const {
   return *m_file;
 }
 
-std::unique_ptr<OwningBufferFile> CFile::buffer() const
-{
-  if (std::fseek(file(), 0, SEEK_SET))
-  {
+std::unique_ptr<OwningBufferFile> CFile::buffer() const {
+  if (std::fseek(file(), 0, SEEK_SET)) {
     return nullptr;
   }
 
   auto buffer = std::make_unique<char[]>(size());
-  if (std::fread(buffer.get(), 1, size(), file()) != size())
-  {
+  if (std::fread(buffer.get(), 1, size(), file())!=size()) {
     return nullptr;
   }
 
   return std::make_unique<OwningBufferFile>(std::move(buffer), size());
 }
 
-Result<void> CFile::read(char* val, const size_t position, const size_t size) const
-{
+Result<void> CFile::read(char *val, const size_t position, const size_t size) const {
   auto guard = std::lock_guard{m_mutex};
 
   const auto currentPosition = std::ftell(m_file.get());
-  if (currentPosition < 0)
-  {
+  if (currentPosition < 0) {
     return makeError("ftell failed");
   }
-  if (size_t(currentPosition) != position)
-  {
-    if (std::fseek(*m_file, long(position), SEEK_SET) != 0)
-    {
+  if (size_t(currentPosition)!=position) {
+    if (std::fseek(*m_file, long(position), SEEK_SET)!=0) {
       return makeError("fseek failed");
     }
   }
-  if (std::fread(val, 1, size, *m_file) != size)
-  {
+  if (std::fread(val, 1, size, *m_file)!=size) {
     return makeError("fread failed");
   }
 
   return kdl::void_success;
 }
 
-Result<CFile::BufferType> CFile::buffer(const size_t position, const size_t size) const
-{
+Result<CFile::BufferType> CFile::buffer(const size_t position, const size_t size) const {
 #if defined __APPLE__
   // AppleClang doesn't support std::shared_ptr<T[]> (new as of C++17)
   auto buffer = BufferType{new char[size], std::default_delete<char[]>{}};
@@ -179,14 +152,12 @@ Result<CFile::BufferType> CFile::buffer(const size_t position, const size_t size
   });
 }
 
-Error CFile::makeError(const std::string& msg) const
-{
+Error CFile::makeError(const std::string &msg) const {
   return std::feof(*m_file) ? Error{msg + ": unexpected end of file"}
                             : Error{msg + ": " + std::strerror(errno)};
 }
 
-Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path& path)
-{
+Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path) {
   return openPathAsFILE(path, "rb").and_then([](auto file) {
     return fileSize(*file).transform([&](auto size) {
       // NOLINTNEXTLINE
@@ -196,19 +167,14 @@ Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path& path)
 }
 
 FileView::FileView(std::shared_ptr<File> file, const size_t offset, const size_t length)
-  : m_file{std::move(file)}
-  , m_offset{offset}
-  , m_length{length}
-{
+    : m_file{std::move(file)}, m_offset{offset}, m_length{length} {
 }
 
-Reader FileView::reader() const
-{
+Reader FileView::reader() const {
   return m_file->reader().subReaderFromBegin(m_offset, m_length);
 }
 
-size_t FileView::size() const
-{
+size_t FileView::size() const {
   return m_length;
 }
 } // namespace TrenchBroom::IO

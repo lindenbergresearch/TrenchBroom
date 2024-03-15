@@ -35,59 +35,55 @@ class QLineEdit;
 
 class QScrollBar;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Node;
 }
 
-namespace View
-{
+namespace View {
 class EntityBrowserView;
 
 class GLContextManager;
 
 class MapDocument;
 
-class EntityBrowser : public QWidget
-{
-  Q_OBJECT
+class EntityBrowser : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
-  QComboBox* m_sortOrderChoice;
-  QPushButton* m_groupButton;
-  QPushButton* m_usedButton;
-  QLineEdit* m_filterBox;
-  QScrollBar* m_scrollBar;
-  EntityBrowserView* m_view;
+  QComboBox *m_sortOrderChoice;
+  QPushButton *m_groupButton;
+  QPushButton *m_usedButton;
+  QLineEdit *m_filterBox;
+  QScrollBar *m_scrollBar;
+  EntityBrowserView *m_view;
 
   NotifierConnection m_notifierConnection;
 
 public:
   EntityBrowser(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
 
   void reload();
 
 private:
-  void createGui(GLContextManager& contextManager);
+  void createGui(GLContextManager &contextManager);
 
   void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
+  void documentWasNewed(MapDocument *document);
 
-  void documentWasLoaded(MapDocument* document);
+  void documentWasLoaded(MapDocument *document);
 
   void modsDidChange();
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+  void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
   void entityDefinitionsDidChange();
 
-  void preferenceDidChange(const std::filesystem::path& path);
+  void preferenceDidChange(const std::filesystem::path &path);
 };
 } // namespace View
 } // namespace TrenchBroom

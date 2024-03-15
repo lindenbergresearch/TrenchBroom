@@ -21,30 +21,26 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include <memory>
 
-namespace TrenchBroom
-{
- namespace Renderer
- {
- class FontDescriptor;
- class TextureFont;
+namespace TrenchBroom {
+namespace Renderer {
+class FontDescriptor;
+class TextureFont;
 
- class FontFactory
- {
- public:
-   struct Metrics
-   {
-     size_t cellSize;
-      size_t maxAscend;
-     size_t lineHeight;
-   };
+class FontFactory {
+public:
+  struct Metrics {
+    size_t cellSize;
+    size_t maxAscend;
+    size_t lineHeight;
+  };
 
-   virtual ~FontFactory();
+  virtual ~FontFactory();
 
-   std::unique_ptr<TextureFont> createFont(const FontDescriptor& fontDescriptor);
+  std::unique_ptr<TextureFont> createFont(const FontDescriptor &fontDescriptor);
 
- private:
-   virtual std::unique_ptr<TextureFont> doCreateFont(
-     const FontDescriptor& fontDescriptor) = 0;
- };
- } // namespace Renderer
+private:
+  virtual std::unique_ptr<TextureFont> doCreateFont(
+      const FontDescriptor &fontDescriptor) = 0;
+};
+} // namespace Renderer
 } // namespace TrenchBroom

@@ -29,16 +29,14 @@
 #include <memory>
 #include <mutex>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 /**
  * Represents an opened (logical) file. A logical file can be backed by a physical file on
  * the disk, a memory buffer, or a portion thereof. A special case is a file that is
  * backed by a C++ object. These files are used to insert information into the virtual
  * file system.
  */
-class File
-{
+class File {
 protected:
   File();
 
@@ -59,8 +57,7 @@ public:
 /**
  * A file that is backed by a memory buffer. The file takes ownership of the buffer.
  */
-class OwningBufferFile : public File
-{
+class OwningBufferFile : public File {
 private:
   std::unique_ptr<char[]> m_buffer;
   size_t m_size;
@@ -82,8 +79,7 @@ public:
  * A file that is backed by a physical file on the disk. The file is opened in the
  * constructor and closed in the destructor.
  */
-class CFile : public File
-{
+class CFile : public File {
 public:
 #if defined __APPLE__
   // AppleClang doesn't support std::shared_ptr<T[]> (new as of C++17)
@@ -93,17 +89,17 @@ public:
   using BufferType = std::shared_ptr<char[]>;
 #endif
 private:
-  kdl::resource<std::FILE*> m_file;
+  kdl::resource<std::FILE *> m_file;
   size_t m_size;
   mutable std::mutex m_mutex;
 
   /**
    * Creates a new file with the given file ptr and size in bytes.
    */
-  CFile(kdl::resource<std::FILE*> file, size_t size);
+  CFile(kdl::resource<std::FILE *> file, size_t size);
 
 public:
-  friend Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path& path);
+  friend Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path);
 
   Reader reader() const override;
   size_t size() const override;
@@ -111,26 +107,25 @@ public:
   /**
    * Returns the underlying file.
    */
-  std::FILE* file() const;
+  std::FILE *file() const;
 
   std::unique_ptr<OwningBufferFile> buffer() const;
 
 private:
   friend class FileReaderSource;
 
-  Result<void> read(char* val, size_t position, size_t size) const;
+  Result<void> read(char *val, size_t position, size_t size) const;
   Result<BufferType> buffer(size_t position, size_t size) const;
 
-  Error makeError(const std::string& msg) const;
+  Error makeError(const std::string &msg) const;
 };
 
-Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path& path);
+Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path);
 
 /**
  * A file that is backed by a portion of a physical file.
  */
-class FileView : public File
-{
+class FileView : public File {
 private:
   std::shared_ptr<File> m_file;
   size_t m_offset;
@@ -158,9 +153,8 @@ public:
  *
  * @tparam T the type of the object represented by this file
  */
-template <typename T>
-class ObjectFile : public File
-{
+template<typename T>
+class ObjectFile : public File {
 private:
   T m_object;
 
@@ -171,15 +165,13 @@ public:
    * @tparam S the type of the given object, must be convertible to T
    * @param object the object
    */
-  template <typename S>
-  explicit ObjectFile(S&& object)
-    : m_object(std::forward<S>(object))
-  {
+  template<typename S>
+  explicit ObjectFile(S &&object)
+      : m_object(std::forward<S>(object)) {
   }
 
-  Reader reader() const override
-  {
-    const auto addr = reinterpret_cast<const char*>(&m_object);
+  Reader reader() const override {
+    const auto addr = reinterpret_cast<const char *>(&m_object);
     return Reader::from(addr, addr + size());
   }
 
@@ -188,6 +180,6 @@ public:
   /**
    * Returns the object that backs this file.
    */
-  const T& object() const { return m_object; }
+  const T &object() const { return m_object; }
 };
 } // namespace TrenchBroom::IO

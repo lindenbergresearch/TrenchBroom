@@ -26,8 +26,7 @@
 #include <string>
 #include <string_view>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class BufferedReader;
 class BufferReaderSource;
 class CFile;
@@ -38,8 +37,7 @@ class ReaderSource;
  * by a source, which can either be a file or a memory region. Allows reading and
  * converting data of various types for easier use.
  */
-class Reader
-{
+class Reader {
 protected:
   std::shared_ptr<ReaderSource> m_source;
   size_t m_position;
@@ -62,7 +60,7 @@ public:
    *
    * @throw ReaderException if the reader cannot be created
    */
-  static Reader from(const CFile& file, size_t size);
+  static Reader from(const CFile &file, size_t size);
 
   /**
    * Creates a new reader that reads from the given memory region.
@@ -73,7 +71,7 @@ public:
    *
    * @throw ReaderException if the reader cannot be created
    */
-  static Reader from(const char* begin, const char* end);
+  static Reader from(const char *begin, const char *end);
 
 public:
   /**
@@ -192,7 +190,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  void read(unsigned char* val, size_t size);
+  void read(unsigned char *val, size_t size);
 
   /**
    * Reads the given number of bytes into the given memory region.
@@ -202,7 +200,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  void read(char* val, size_t size);
+  void read(char *val, size_t size);
 
   /**
    * Reads a value of the given type T, converts it into a value of the given type R and
@@ -214,11 +212,10 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T, typename R>
-  R read()
-  {
+  template<typename T, typename R>
+  R read() {
     T result;
-    read(reinterpret_cast<char*>(&result), sizeof(T));
+    read(reinterpret_cast<char *>(&result), sizeof(T));
     return static_cast<R>(result);
   }
 
@@ -230,9 +227,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  char readChar()
-  {
+  template<typename T>
+  char readChar() {
     return read<T, char>();
   }
 
@@ -244,9 +240,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  unsigned char readUnsignedChar()
-  {
+  template<typename T>
+  unsigned char readUnsignedChar() {
     return read<T, unsigned char>();
   }
 
@@ -258,9 +253,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  int readInt()
-  {
+  template<typename T>
+  int readInt() {
     return read<T, int>();
   }
 
@@ -272,9 +266,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  unsigned int readUnsignedInt()
-  {
+  template<typename T>
+  unsigned int readUnsignedInt() {
     return read<T, unsigned int>();
   }
 
@@ -286,9 +279,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  size_t readSize()
-  {
+  template<typename T>
+  size_t readSize() {
     return read<T, size_t>();
   }
 
@@ -300,10 +292,9 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  bool readBool()
-  {
-    return read<T, T>() != 0;
+  template<typename T>
+  bool readBool() {
+    return read<T, T>()!=0;
   }
 
   /**
@@ -314,9 +305,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  float readFloat()
-  {
+  template<typename T>
+  float readFloat() {
     return read<T, float>();
   }
 
@@ -328,9 +318,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename T>
-  double readDouble()
-  {
+  template<typename T>
+  double readDouble() {
     return read<T, double>();
   }
 
@@ -344,12 +333,10 @@ public:
    */
   std::string readString(size_t size);
 
-  template <typename R, size_t S, typename T = R>
-  vm::vec<T, S> readVec()
-  {
+  template<typename R, size_t S, typename T = R>
+  vm::vec<T, S> readVec() {
     vm::vec<T, S> result;
-    for (size_t i = 0; i < S; ++i)
-    {
+    for (size_t i = 0; i < S; ++i) {
       result[i] = read<T, R>();
     }
     return result;
@@ -367,9 +354,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename C, typename T, typename R>
-  void read(C& col, const size_t n)
-  {
+  template<typename C, typename T, typename R>
+  void read(C &col, const size_t n) {
     read<T, R>(std::back_inserter(col), n);
   }
 
@@ -385,11 +371,9 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template <typename I, typename T, typename R>
-  void read(I out, const size_t n)
-  {
-    for (size_t i = 0; i < n; ++i)
-    {
+  template<typename I, typename T, typename R>
+  void read(I out, const size_t n) {
+    for (size_t i = 0; i < n; ++i) {
       out += read<T, R>();
     }
   }
@@ -402,8 +386,7 @@ protected:
  * A special subtype of reader that can manage the lifetime of a region of memory. Such a
  * buffered reader will be created when calling the Reader::buffer() method.
  */
-class BufferedReader : public Reader
-{
+class BufferedReader : public Reader {
 protected:
   friend class Reader;
 
@@ -420,12 +403,12 @@ public:
   /**
    * Returns the beginning of the underlying buffer memory region.
    */
-  const char* begin() const;
+  const char *begin() const;
 
   /**
    * Returns the end of the underlying buffer memory region.
    */
-  const char* end() const;
+  const char *end() const;
   /**
    * Returns a std::string_view view of the buffer.
    *

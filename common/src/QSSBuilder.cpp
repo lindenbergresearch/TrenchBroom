@@ -5,21 +5,17 @@
 #include "IO/PathQt.h"
 #include "IO/SystemPaths.h"
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 
-QSSBuilder* QSSBuilder::fromFile(const std::filesystem::path& path)
-{
-  if (auto file = QFile{IO::pathAsQString(path)}; file.exists())
-  {
-    QSSBuilder* builder = new QSSBuilder;
+QSSBuilder *QSSBuilder::fromFile(const std::filesystem::path &path) {
+  if (auto file = QFile{IO::pathAsQString(path)}; file.exists()) {
+    QSSBuilder *builder = new QSSBuilder;
 
     // closed automatically by destructor
     file.open(QFile::ReadOnly | QFile::Text);
     builder->setText(QTextStream{&file}.readAll());
 
-    if (!builder->text.isNull() || !builder->text.isEmpty())
-    {
+    if (!builder->text.isNull() || !builder->text.isEmpty()) {
       qInfo() << "Created builder from file: " << path.c_str();
       return builder;
     }
@@ -29,41 +25,34 @@ QSSBuilder* QSSBuilder::fromFile(const std::filesystem::path& path)
   return nullptr;
 }
 
-const QString& QSSBuilder::getText() const
-{
+const QString &QSSBuilder::getText() const {
   return text;
 }
 
-void QSSBuilder::setText(const QString& text)
-{
+void QSSBuilder::setText(const QString &text) {
   QSSBuilder::text = text;
 }
 
-const QString& QSSBuilder::getRenderedText() const
-{
+const QString &QSSBuilder::getRenderedText() const {
   return renderedText;
 }
 
-void QSSBuilder::update()
-{
+void QSSBuilder::update() {
   // keep original text untouched
   renderedText = text;
 
-  for (const auto& item : repl_table)
-  {
+  for (const auto &item : repl_table) {
     auto source = REPLACEMENT_TOKEN + item.first + REPLACEMENT_TOKEN;
     std::function<QString()> repl = item.second;
     auto replacement = repl();
 
-    if (!replacement.isEmpty())
-    {
+    if (!replacement.isEmpty()) {
       renderedText.replace(source, replacement);
     }
   }
 }
 
-void QSSBuilder::addReplacement(QString symbol, std::function<QString()> repl_f)
-{
+void QSSBuilder::addReplacement(QString symbol, std::function<QString()> repl_f) {
   repl_table[symbol] = repl_f;
 }
 } // namespace TrenchBroom

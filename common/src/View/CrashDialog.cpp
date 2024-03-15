@@ -31,44 +31,41 @@
 #include "View/GetVersion.h"
 #include "View/QtUtils.h"
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 CrashDialog::CrashDialog(
-  const std::string& reason,
-  const std::filesystem::path& reportPath,
-  const std::filesystem::path& mapPath,
-  const std::filesystem::path& logPath)
-  : QDialog{}
-{
+    const std::string &reason,
+    const std::filesystem::path &reportPath,
+    const std::filesystem::path &mapPath,
+    const std::filesystem::path &logPath)
+    : QDialog{} {
   createGui(reason, reportPath, mapPath, logPath);
 }
 
 void CrashDialog::createGui(
-  const std::string& reason,
-  const std::filesystem::path& reportPath,
-  const std::filesystem::path& mapPath,
-  const std::filesystem::path& logPath)
-{
+    const std::string &reason,
+    const std::filesystem::path &reportPath,
+    const std::filesystem::path &mapPath,
+    const std::filesystem::path &logPath) {
   setWindowTitle(tr("Crash"));
 
-  auto* header = new DialogHeader{"Crash Report"};
+  auto *header = new DialogHeader{"Crash Report"};
 
-  auto* text1 = new QLabel{
-    tr("TrenchBroom has crashed, but was able to save a crash report,"
-       "a log file and the current state of the map to the following locations.\n\n"
-       "Please create an issue report and upload all three files.")};
+  auto *text1 = new QLabel{
+      tr("TrenchBroom has crashed, but was able to save a crash report,"
+         "a log file and the current state of the map to the following locations.\n\n"
+         "Please create an issue report and upload all three files.")};
   text1->setWordWrap(true);
 
-  auto* reasonText = new QLabel{QString::fromStdString(reason)};
-  auto* reportPathText = new QLabel{IO::pathAsQString(reportPath)};
-  auto* mapPathText = new QLabel{IO::pathAsQString(mapPath)};
-  auto* logPathText = new QLabel{IO::pathAsQString(logPath)};
-  auto* versionText = new QLabel{getBuildVersion()};
-  auto* buildText = new QLabel{getBuildIdStr()};
+  auto *reasonText = new QLabel{QString::fromStdString(reason)};
+  auto *reportPathText = new QLabel{IO::pathAsQString(reportPath)};
+  auto *mapPathText = new QLabel{IO::pathAsQString(mapPath)};
+  auto *logPathText = new QLabel{IO::pathAsQString(logPath)};
+  auto *versionText = new QLabel{getBuildVersion()};
+  auto *buildText = new QLabel{getBuildIdStr()};
 
-  auto* reportLayout = new FormWithSectionsLayout{};
+  auto *reportLayout = new FormWithSectionsLayout{};
   reportLayout->setContentsMargins(
-    0, LayoutConstants::MediumVMargin, 0, LayoutConstants::MediumVMargin);
+      0, LayoutConstants::MediumVMargin, 0, LayoutConstants::MediumVMargin);
   reportLayout->setVerticalSpacing(2);
 
   reportLayout->addRow(text1);
@@ -83,17 +80,17 @@ void CrashDialog::createGui(
   reportLayout->addRow("Map File", mapPathText);
   reportLayout->addRow("Log File", logPathText);
 
-  auto* buttonBox = new QDialogButtonBox{};
+  auto *buttonBox = new QDialogButtonBox{};
   buttonBox->addButton(QDialogButtonBox::Close);
-  auto* reportButton = buttonBox->addButton(tr("Report"), QDialogButtonBox::AcceptRole);
+  auto *reportButton = buttonBox->addButton(tr("Report"), QDialogButtonBox::AcceptRole);
 
   connect(reportButton, &QAbstractButton::clicked, this, []() {
     QDesktopServices::openUrl(
-      QUrl{"https://github.com/TrenchBroom/TrenchBroom/issues/new"});
+        QUrl{"https://github.com/TrenchBroom/TrenchBroom/issues/new"});
   });
   connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
-  auto* outerLayout = new QVBoxLayout{};
+  auto *outerLayout = new QVBoxLayout{};
   outerLayout->setSizeConstraint(QLayout::SetFixedSize);
   outerLayout->setContentsMargins(0, 0, 0, 0);
   outerLayout->addWidget(header);

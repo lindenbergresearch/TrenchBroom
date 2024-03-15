@@ -33,13 +33,11 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-template <typename T, typename U>
+namespace TrenchBroom {
+template<typename T, typename U>
 class octree;
 
-namespace Model
-{
+namespace Model {
 class EntityNodeIndex;
 class IssueQuickFix;
 enum class MapFormat;
@@ -47,16 +45,15 @@ class PickResult;
 class Validator;
 class ValidatorRegistry;
 
-class WorldNode : public EntityNodeBase
-{
+class WorldNode : public EntityNodeBase {
 private:
   EntityPropertyConfig m_entityPropertyConfig;
   MapFormat m_mapFormat;
-  LayerNode* m_defaultLayer;
+  LayerNode *m_defaultLayer;
   std::unique_ptr<EntityNodeIndex> m_entityNodeIndex;
   std::unique_ptr<ValidatorRegistry> m_validatorRegistry;
 
-  using NodeTree = octree<FloatType, Node*>;
+  using NodeTree = octree<FloatType, Node *>;
   std::unique_ptr<NodeTree> m_nodeTree;
   bool m_updateNodeTree;
 
@@ -64,76 +61,76 @@ private:
 
 public:
   WorldNode(
-    EntityPropertyConfig entityPropertyConfig, Entity entity, MapFormat mapFormat);
+      EntityPropertyConfig entityPropertyConfig, Entity entity, MapFormat mapFormat);
   WorldNode(
-    EntityPropertyConfig entityPropertyConfig,
-    std::initializer_list<EntityProperty> properties,
-    MapFormat mapFormat);
+      EntityPropertyConfig entityPropertyConfig,
+      std::initializer_list<EntityProperty> properties,
+      MapFormat mapFormat);
   ~WorldNode() override;
 
   using Node::entityPropertyConfig;
-  EntityPropertyConfig& entityPropertyConfig();
+  EntityPropertyConfig &entityPropertyConfig();
 
   MapFormat mapFormat() const;
 
-  const NodeTree& nodeTree() const;
+  const NodeTree &nodeTree() const;
 
 public: // layer management
-  LayerNode* defaultLayer();
+  LayerNode *defaultLayer();
 
-  const LayerNode* defaultLayer() const;
-
-  /**
-   * Returns defaultLayer() plus customLayers()
-   */
-  std::vector<LayerNode*> allLayers();
+  const LayerNode *defaultLayer() const;
 
   /**
    * Returns defaultLayer() plus customLayers()
    */
-  std::vector<const LayerNode*> allLayers() const;
+  std::vector<LayerNode *> allLayers();
+
+  /**
+   * Returns defaultLayer() plus customLayers()
+   */
+  std::vector<const LayerNode *> allLayers() const;
 
   /**
    * Returns the custom layers in file order
    */
-  std::vector<LayerNode*> customLayers();
+  std::vector<LayerNode *> customLayers();
 
   /**
    * Returns the custom layers in file order
    */
-  std::vector<const LayerNode*> customLayers() const;
+  std::vector<const LayerNode *> customLayers() const;
 
   /**
    * Returns defaultLayer() plus customLayers() ordered by LayerNode::sortIndex(). The
    * default layer is always first.
    */
-  std::vector<LayerNode*> allLayersUserSorted();
+  std::vector<LayerNode *> allLayersUserSorted();
 
   /**
    * Returns defaultLayer() plus customLayers() ordered by LayerNode::sortIndex(). The
    * default layer is always first.
    */
-  std::vector<const LayerNode*> allLayersUserSorted() const;
+  std::vector<const LayerNode *> allLayersUserSorted() const;
 
   /**
    * Returns customLayers() ordered by LayerNode::sortIndex()
    */
-  std::vector<LayerNode*> customLayersUserSorted();
+  std::vector<LayerNode *> customLayersUserSorted();
 
   /**
    * Returns customLayers() ordered by LayerNode::sortIndex()
    */
-  std::vector<const LayerNode*> customLayersUserSorted() const;
+  std::vector<const LayerNode *> customLayersUserSorted() const;
 
 private:
   void createDefaultLayer();
 
 public: // index
-  const EntityNodeIndex& entityNodeIndex() const;
+  const EntityNodeIndex &entityNodeIndex() const;
 
 public: // validator registration
-  std::vector<const Validator*> registeredValidators() const;
-  std::vector<const IssueQuickFix*> quickFixes(IssueType issueTypes) const;
+  std::vector<const Validator *> registeredValidators() const;
+  std::vector<const IssueQuickFix *> quickFixes(IssueType issueTypes) const;
   void registerValidator(std::unique_ptr<Validator> validator);
   void unregisterAllValidators();
 
@@ -146,54 +143,54 @@ private:
   void invalidateAllIssues();
 
 private: // implement Node interface
-  const vm::bbox3& doGetLogicalBounds() const override;
-  const vm::bbox3& doGetPhysicalBounds() const override;
+  const vm::bbox3 &doGetLogicalBounds() const override;
+  const vm::bbox3 &doGetPhysicalBounds() const override;
   FloatType doGetProjectedArea(vm::axis::type axis) const override;
-  Node* doClone(const vm::bbox3& worldBounds, SetLinkId setLinkIds) const override;
-  Node* doCloneRecursively(
-    const vm::bbox3& worldBounds, SetLinkId setLinkIds) const override;
-  bool doCanAddChild(const Node* child) const override;
-  bool doCanRemoveChild(const Node* child) const override;
+  Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
+  Node *doCloneRecursively(
+      const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
+  bool doCanAddChild(const Node *child) const override;
+  bool doCanRemoveChild(const Node *child) const override;
   bool doRemoveIfEmpty() const override;
   bool doShouldAddToSpacialIndex() const override;
 
-  void doDescendantWasAdded(Node* node, size_t depth) override;
-  void doDescendantWillBeRemoved(Node* node, size_t depth) override;
-  void doDescendantPhysicalBoundsDidChange(Node* node) override;
+  void doDescendantWasAdded(Node *node, size_t depth) override;
+  void doDescendantWillBeRemoved(Node *node, size_t depth) override;
+  void doDescendantPhysicalBoundsDidChange(Node *node) override;
 
   bool doSelectable() const override;
   void doPick(
-    const EditorContext& editorContext,
-    const vm::ray3& ray,
-    PickResult& pickResult) override;
-  void doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result) override;
-  void doAccept(NodeVisitor& visitor) override;
-  void doAccept(ConstNodeVisitor& visitor) const override;
-  const EntityPropertyConfig& doGetEntityPropertyConfig() const override;
+      const EditorContext &editorContext,
+      const vm::ray3 &ray,
+      PickResult &pickResult) override;
+  void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
+  void doAccept(NodeVisitor &visitor) override;
+  void doAccept(ConstNodeVisitor &visitor) const override;
+  const EntityPropertyConfig &doGetEntityPropertyConfig() const override;
   void doFindEntityNodesWithProperty(
-    const std::string& name,
-    const std::string& value,
-    std::vector<EntityNodeBase*>& result) const override;
+      const std::string &name,
+      const std::string &value,
+      std::vector<EntityNodeBase *> &result) const override;
   void doFindEntityNodesWithNumberedProperty(
-    const std::string& prefix,
-    const std::string& value,
-    std::vector<EntityNodeBase*>& result) const override;
+      const std::string &prefix,
+      const std::string &value,
+      std::vector<EntityNodeBase *> &result) const override;
   void doAddToIndex(
-    EntityNodeBase* node, const std::string& key, const std::string& value) override;
+      EntityNodeBase *node, const std::string &key, const std::string &value) override;
   void doRemoveFromIndex(
-    EntityNodeBase* node, const std::string& key, const std::string& value) override;
+      EntityNodeBase *node, const std::string &key, const std::string &value) override;
 
 private: // implement EntityNodeBase interface
-  void doPropertiesDidChange(const vm::bbox3& oldBounds) override;
+  void doPropertiesDidChange(const vm::bbox3 &oldBounds) override;
   vm::vec3 doGetLinkSourceAnchor() const override;
   vm::vec3 doGetLinkTargetAnchor() const override;
 
 private: // implement Taggable interface
-  void doAcceptTagVisitor(TagVisitor& visitor) override;
-  void doAcceptTagVisitor(ConstTagVisitor& visitor) const override;
+  void doAcceptTagVisitor(TagVisitor &visitor) override;
+  void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 
 private:
-  deleteCopyAndMove(WorldNode);
+deleteCopyAndMove(WorldNode);
 };
 } // namespace Model
 } // namespace TrenchBroom

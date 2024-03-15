@@ -28,30 +28,26 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class EditorContext;
 
 class PatchNode;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderBatch;
 
 class RenderContext;
 
 class VboManager;
 
-class PatchRenderer : public IndexedRenderable
-{
+class PatchRenderer : public IndexedRenderable {
 private:
-  const Model::EditorContext& m_editorContext;
+  const Model::EditorContext &m_editorContext;
 
   bool m_valid = true;
-  kdl::vector_set<const Model::PatchNode*> m_patchNodes;
+  kdl::vector_set<const Model::PatchNode *> m_patchNodes;
 
   TexturedIndexArrayRenderer m_patchMeshRenderer;
   DirectEdgeRenderer m_edgeRenderer;
@@ -68,15 +64,15 @@ private:
   Color m_occludedEdgeColor;
 
 public:
-  explicit PatchRenderer(const Model::EditorContext& editorContext);
+  explicit PatchRenderer(const Model::EditorContext &editorContext);
 
-  void setDefaultColor(const Color& faceColor);
+  void setDefaultColor(const Color &faceColor);
 
   void setGrayscale(bool grayscale);
 
   void setTint(bool tint);
 
-  void setTintColor(const Color& color);
+  void setTintColor(const Color &color);
 
   void setTransparencyAlpha(float alpha);
 
@@ -88,7 +84,7 @@ public:
   /**
    * The color to render patch edges with.
    */
-  void setEdgeColor(const Color& edgeColor);
+  void setEdgeColor(const Color &edgeColor);
 
   /**
    * Specifies whether or not occluded edges should be visible.
@@ -98,7 +94,7 @@ public:
   /**
    * The color to render occluded edges with.
    */
-  void setOccludedEdgeColor(const Color& occludedEdgeColor);
+  void setOccludedEdgeColor(const Color &occludedEdgeColor);
 
   /**
    * Equivalent to invalidatePatch() on all added patches.
@@ -114,28 +110,28 @@ public:
    * Adds a patch. Calling with an already-added patch is allowed, but ignored (not
    * guaranteed to invalidate it).
    */
-  void addPatch(const Model::PatchNode* patchNode);
+  void addPatch(const Model::PatchNode *patchNode);
 
   /**
    * Removes a patch. Calling with an unknown patch is allowed, but ignored.
    */
-  void removePatch(const Model::PatchNode* patchNode);
+  void removePatch(const Model::PatchNode *patchNode);
 
   /**
    * Causes cached renderer data to be rebuilt for the given patch (on the next render()
    * call).
    */
-  void invalidatePatch(const Model::PatchNode* patchNode);
+  void invalidatePatch(const Model::PatchNode *patchNode);
 
-  void render(RenderContext& renderContext, RenderBatch& renderBatch);
+  void render(RenderContext &renderContext, RenderBatch &renderBatch);
 
 private:
   void validate();
 
 private: // implement IndexedRenderable interface
-  void prepareVerticesAndIndices(VboManager& vboManager) override;
+  void prepareVerticesAndIndices(VboManager &vboManager) override;
 
-  void doRender(RenderContext& renderContext) override;
+  void doRender(RenderContext &renderContext) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

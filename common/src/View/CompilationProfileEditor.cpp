@@ -40,33 +40,28 @@
 #include <kdl/memory_utils.h>
 #include <kdl/vector_utils.h>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 CompilationProfileEditor::CompilationProfileEditor(
-  std::weak_ptr<MapDocument> document, QWidget* parent)
-  : QWidget{parent}
-  , m_document{std::move(document)}
-{
+    std::weak_ptr<MapDocument> document, QWidget *parent)
+    : QWidget{parent}, m_document{std::move(document)} {
   setBaseWindowColor(this);
 
   m_stackedWidget = new QStackedWidget{this};
   m_stackedWidget->addWidget(
-    createDefaultPage("Select a compilation profile", m_stackedWidget));
+      createDefaultPage("Select a compilation profile", m_stackedWidget));
   m_stackedWidget->addWidget(createEditorPage(m_stackedWidget));
 
-  auto* layout = new QHBoxLayout{};
+  auto *layout = new QHBoxLayout{};
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   layout->addWidget(m_stackedWidget);
   setLayout(layout);
 }
 
-QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
-{
-  auto* containerPanel = new QWidget{parent};
-  auto* upperPanel = new QWidget{containerPanel};
+QWidget *CompilationProfileEditor::createEditorPage(QWidget *parent) {
+  auto *containerPanel = new QWidget{parent};
+  auto *upperPanel = new QWidget{containerPanel};
   setDefaultWindowColor(upperPanel);
   setDefaultWindowColor(this);
 
@@ -74,21 +69,21 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   m_workDirTxt = new MultiCompletionLineEdit{};
 
   const auto variables = CompilationWorkDirVariables{kdl::mem_lock(m_document)};
-  auto* completer = new QCompleter{new VariableStoreModel{variables}};
+  auto *completer = new QCompleter{new VariableStoreModel{variables}};
   completer->setCaseSensitivity(Qt::CaseInsensitive);
 
   m_workDirTxt->setMultiCompleter(completer);
   m_workDirTxt->setWordDelimiters(QRegularExpression{"\\$"}, QRegularExpression{"\\}"});
   m_workDirTxt->setFont(Fonts::fixedWidthFont());
   m_workDirTxt->setToolTip(
-    R"(A working directory for the compilation profile. Variables are allowed.)");
+      R"(A working directory for the compilation profile. Variables are allowed.)");
 
-  auto* upperLayout = new QFormLayout{};
+  auto *upperLayout = new QFormLayout{};
   upperLayout->setContentsMargins(
-    LayoutConstants::MediumHMargin,
-    LayoutConstants::WideVMargin,
-    LayoutConstants::MediumHMargin,
-    LayoutConstants::WideVMargin);
+      LayoutConstants::MediumHMargin,
+      LayoutConstants::WideVMargin,
+      LayoutConstants::MediumHMargin,
+      LayoutConstants::WideVMargin);
   upperLayout->setHorizontalSpacing(LayoutConstants::MediumHMargin);
   upperLayout->setVerticalSpacing(0);
   upperLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
@@ -98,9 +93,9 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
 
   m_taskList = new CompilationTaskListBox{m_document, containerPanel};
   m_taskList->setContentsMargins(0, 0, 0, 0);
-  auto* taskListLayout = new QVBoxLayout{};
+  auto *taskListLayout = new QVBoxLayout{};
   taskListLayout->setContentsMargins(0, 0, 0, 0);
-  auto* panel = new TitledPanel{"Task List"};
+  auto *panel = new TitledPanel{"Task List"};
   taskListLayout->addWidget(m_taskList);
   panel->getPanel()->setLayout(taskListLayout);
 
@@ -109,10 +104,10 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   m_moveTaskUpButton = createBitmapButton("Up.svg", "Move the selected task up");
   m_moveTaskDownButton = createBitmapButton("Down.svg", "Move the selected task down");
 
-  auto* buttonLayout = createMiniToolBarLayout(
-    m_addTaskButton, m_removeTaskButton, m_moveTaskUpButton, m_moveTaskDownButton);
+  auto *buttonLayout = createMiniToolBarLayout(
+      m_addTaskButton, m_removeTaskButton, m_moveTaskUpButton, m_moveTaskDownButton);
 
-  auto* layout = new QVBoxLayout{};
+  auto *layout = new QVBoxLayout{};
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   layout->addWidget(upperPanel);
@@ -126,111 +121,101 @@ QWidget* CompilationProfileEditor::createEditorPage(QWidget* parent)
   containerPanel->setLayout(layout);
 
   connect(
-    m_nameTxt, &QLineEdit::textChanged, this, &CompilationProfileEditor::nameChanged);
+      m_nameTxt, &QLineEdit::textChanged, this, &CompilationProfileEditor::nameChanged);
   connect(
-    m_workDirTxt,
-    &QLineEdit::textChanged,
-    this,
-    &CompilationProfileEditor::workDirChanged);
+      m_workDirTxt,
+      &QLineEdit::textChanged,
+      this,
+      &CompilationProfileEditor::workDirChanged);
   connect(
-    m_taskList,
-    &ControlListBox::itemSelectionChanged,
-    this,
-    &CompilationProfileEditor::taskSelectionChanged);
+      m_taskList,
+      &ControlListBox::itemSelectionChanged,
+      this,
+      &CompilationProfileEditor::taskSelectionChanged);
   connect(
-    m_taskList,
-    &CompilationTaskListBox::taskContextMenuRequested,
-    this,
-    [&](const QPoint& globalPos, const Model::CompilationTask& task) {
-      const auto index = static_cast<int>(*kdl::vec_index_of(m_profile->tasks, task));
+      m_taskList,
+      &CompilationTaskListBox::taskContextMenuRequested,
+      this,
+      [&](const QPoint &globalPos, const Model::CompilationTask &task) {
+        const auto index = static_cast<int>(*kdl::vec_index_of(m_profile->tasks, task));
 
-      auto menu = QMenu{this};
-      auto* moveUpAction =
-        menu.addAction(tr("Move Up"), this, [=]() { moveTaskUp(index); });
-      auto* moveDownAction =
-        menu.addAction(tr("Move Down"), this, [=]() { moveTaskDown(index); });
-      menu.addSeparator();
-      menu.addAction(tr("Duplicate"), this, [=]() { duplicateTask(index); });
-      menu.addAction(tr("Remove"), this, [=]() { removeTask(index); });
+        auto menu = QMenu{this};
+        auto *moveUpAction =
+            menu.addAction(tr("Move Up"), this, [=]() { moveTaskUp(index); });
+        auto *moveDownAction =
+            menu.addAction(tr("Move Down"), this, [=]() { moveTaskDown(index); });
+        menu.addSeparator();
+        menu.addAction(tr("Duplicate"), this, [=]() { duplicateTask(index); });
+        menu.addAction(tr("Remove"), this, [=]() { removeTask(index); });
 
-      moveUpAction->setEnabled(index > 0);
-      moveDownAction->setEnabled(
-        static_cast<size_t>(index + 1) < m_profile->tasks.size());
+        moveUpAction->setEnabled(index > 0);
+        moveDownAction->setEnabled(
+            static_cast<size_t>(index + 1) < m_profile->tasks.size());
 
-      menu.exec(globalPos);
-    });
+        menu.exec(globalPos);
+      });
   connect(
-    m_addTaskButton, &QAbstractButton::clicked, this, &CompilationProfileEditor::addTask);
+      m_addTaskButton, &QAbstractButton::clicked, this, &CompilationProfileEditor::addTask);
   connect(
-    m_removeTaskButton,
-    &QAbstractButton::clicked,
-    this,
-    qOverload<>(&CompilationProfileEditor::removeTask));
+      m_removeTaskButton,
+      &QAbstractButton::clicked,
+      this,
+      qOverload<>(&CompilationProfileEditor::removeTask));
   connect(
-    m_moveTaskUpButton,
-    &QAbstractButton::clicked,
-    this,
-    qOverload<>(&CompilationProfileEditor::moveTaskUp));
+      m_moveTaskUpButton,
+      &QAbstractButton::clicked,
+      this,
+      qOverload<>(&CompilationProfileEditor::moveTaskUp));
   connect(
-    m_moveTaskDownButton,
-    &QAbstractButton::clicked,
-    this,
-    qOverload<>(&CompilationProfileEditor::moveTaskDown));
+      m_moveTaskDownButton,
+      &QAbstractButton::clicked,
+      this,
+      qOverload<>(&CompilationProfileEditor::moveTaskDown));
 
   return containerPanel;
 }
 
-void CompilationProfileEditor::nameChanged(const QString& text)
-{
-  ensure(m_profile != nullptr, "profile is null");
+void CompilationProfileEditor::nameChanged(const QString &text) {
+  ensure(m_profile!=nullptr, "profile is null");
   auto name = text.toStdString();
-  if (m_profile->name != name)
-  {
+  if (m_profile->name!=name) {
     m_profile->name = std::move(name);
     emit profileChanged();
   }
 }
 
-void CompilationProfileEditor::workDirChanged(const QString& text)
-{
-  ensure(m_profile != nullptr, "profile is null");
+void CompilationProfileEditor::workDirChanged(const QString &text) {
+  ensure(m_profile!=nullptr, "profile is null");
   auto workDirSpec = text.toStdString();
-  if (m_profile->workDirSpec != workDirSpec)
-  {
+  if (m_profile->workDirSpec!=workDirSpec) {
     m_profile->workDirSpec = std::move(workDirSpec);
     emit profileChanged();
   }
 }
 
-void CompilationProfileEditor::addTask()
-{
+void CompilationProfileEditor::addTask() {
   auto menu = QMenu{};
-  auto* exportMapAction = menu.addAction("Export Map");
-  auto* copyFilesAction = menu.addAction("Copy Files");
-  auto* renameFileAction = menu.addAction("Rename File");
-  auto* deleteFilesAction = menu.addAction("Delete Files");
-  auto* runToolAction = menu.addAction("Run Tool");
+  auto *exportMapAction = menu.addAction("Export Map");
+  auto *copyFilesAction = menu.addAction("Copy Files");
+  auto *renameFileAction = menu.addAction("Rename File");
+  auto *deleteFilesAction = menu.addAction("Delete Files");
+  auto *runToolAction = menu.addAction("Run Tool");
 
-  auto task = [&](const auto* chosenAction) -> std::optional<Model::CompilationTask> {
-    if (chosenAction == exportMapAction)
-    {
+  auto task = [&](const auto *chosenAction) -> std::optional<Model::CompilationTask> {
+    if (chosenAction==exportMapAction) {
       return Model::CompilationExportMap{
-        true, "${WORK_DIR_PATH}/${MAP_BASE_NAME}-compile.map"};
+          true, "${WORK_DIR_PATH}/${MAP_BASE_NAME}-compile.map"};
     }
-    if (chosenAction == copyFilesAction)
-    {
+    if (chosenAction==copyFilesAction) {
       return Model::CompilationCopyFiles{true, "", ""};
     }
-    if (chosenAction == renameFileAction)
-    {
+    if (chosenAction==renameFileAction) {
       return Model::CompilationRenameFile{true, "", ""};
     }
-    if (chosenAction == deleteFilesAction)
-    {
+    if (chosenAction==deleteFilesAction) {
       return Model::CompilationDeleteFiles{true, ""};
     }
-    if (chosenAction == runToolAction)
-    {
+    if (chosenAction==runToolAction) {
       return Model::CompilationRunTool{true, "", "", false};
     }
     {
@@ -238,19 +223,15 @@ void CompilationProfileEditor::addTask()
     }
   }(menu.exec(QCursor::pos()));
 
-  if (task)
-  {
+  if (task) {
     const auto index = m_taskList->currentRow();
-    if (index < 0)
-    {
+    if (index < 0) {
       m_profile->tasks.push_back(std::move(*task));
       m_taskList->reloadTasks();
       m_taskList->setCurrentRow(static_cast<int>(m_profile->tasks.size()) - 1);
-    }
-    else
-    {
+    } else {
       m_profile->tasks.insert(
-        std::next(m_profile->tasks.begin(), index + 1), std::move(*task));
+          std::next(m_profile->tasks.begin(), index + 1), std::move(*task));
       m_taskList->reloadTasks();
       m_taskList->setCurrentRow(index + 1);
     }
@@ -258,42 +239,36 @@ void CompilationProfileEditor::addTask()
   }
 }
 
-void CompilationProfileEditor::removeTask()
-{
+void CompilationProfileEditor::removeTask() {
   removeTask(m_taskList->currentRow());
 }
 
-void CompilationProfileEditor::removeTask(const int index)
-{
+void CompilationProfileEditor::removeTask(const int index) {
   assert(index >= 0);
 
   m_profile->tasks = kdl::vec_erase_at(std::move(m_profile->tasks), size_t(index));
   m_taskList->reloadTasks();
 
-  if (!m_profile->tasks.empty())
-  {
+  if (!m_profile->tasks.empty()) {
     m_taskList->setCurrentRow(std::min(index, int(m_profile->tasks.size()) - 1));
   }
   emit profileChanged();
 }
 
-void CompilationProfileEditor::duplicateTask(const int index)
-{
+void CompilationProfileEditor::duplicateTask(const int index) {
   auto task = m_profile->tasks[size_t(index)];
   m_profile->tasks.insert(
-    std::next(m_profile->tasks.begin(), index + 1), std::move(task));
+      std::next(m_profile->tasks.begin(), index + 1), std::move(task));
   m_taskList->reloadTasks();
   m_taskList->setCurrentRow(index + 1);
   emit profileChanged();
 }
 
-void CompilationProfileEditor::moveTaskUp()
-{
+void CompilationProfileEditor::moveTaskUp() {
   moveTaskUp(m_taskList->currentRow());
 }
 
-void CompilationProfileEditor::moveTaskUp(const int index)
-{
+void CompilationProfileEditor::moveTaskUp(const int index) {
   assert(index > 0);
 
   auto it = std::next(m_profile->tasks.begin(), index);
@@ -303,13 +278,11 @@ void CompilationProfileEditor::moveTaskUp(const int index)
   emit profileChanged();
 }
 
-void CompilationProfileEditor::moveTaskDown()
-{
+void CompilationProfileEditor::moveTaskDown() {
   moveTaskDown(m_taskList->currentRow());
 }
 
-void CompilationProfileEditor::moveTaskDown(const int index)
-{
+void CompilationProfileEditor::moveTaskDown(const int index) {
   assert(index >= 0 && index < static_cast<int>(m_profile->tasks.size()) - 1);
 
   auto it = std::next(m_profile->tasks.begin(), index);
@@ -319,29 +292,23 @@ void CompilationProfileEditor::moveTaskDown(const int index)
   emit profileChanged();
 }
 
-void CompilationProfileEditor::taskSelectionChanged()
-{
+void CompilationProfileEditor::taskSelectionChanged() {
   refresh();
 }
 
-void CompilationProfileEditor::setProfile(Model::CompilationProfile* profile)
-{
+void CompilationProfileEditor::setProfile(Model::CompilationProfile *profile) {
   m_profile = profile;
   m_taskList->setProfile(profile);
   m_stackedWidget->setCurrentIndex(m_profile ? 1 : 0);
   refresh();
 }
 
-void CompilationProfileEditor::refresh()
-{
-  if (m_profile)
-  {
-    if (m_nameTxt->text().toStdString() != m_profile->name)
-    {
+void CompilationProfileEditor::refresh() {
+  if (m_profile) {
+    if (m_nameTxt->text().toStdString()!=m_profile->name) {
       m_nameTxt->setText(QString::fromStdString(m_profile->name));
     }
-    if (m_workDirTxt->text().toStdString() != m_profile->workDirSpec)
-    {
+    if (m_workDirTxt->text().toStdString()!=m_profile->workDirSpec) {
       m_workDirTxt->setText(QString::fromStdString(m_profile->workDirSpec));
     }
   }
@@ -349,8 +316,8 @@ void CompilationProfileEditor::refresh()
   m_removeTaskButton->setEnabled(m_profile && m_taskList->currentRow() >= 0);
   m_moveTaskUpButton->setEnabled(m_profile && m_taskList->currentRow() > 0);
   m_moveTaskDownButton->setEnabled(
-    m_profile && m_taskList->currentRow() >= 0
-    && m_taskList->currentRow() < static_cast<int>(m_profile->tasks.size()) - 1);
+      m_profile && m_taskList->currentRow() >= 0
+          && m_taskList->currentRow() < static_cast<int>(m_profile->tasks.size()) - 1);
 }
 } // namespace View
 } // namespace TrenchBroom

@@ -33,70 +33,66 @@ class QComboBox;
 class QLineEdit;
 class QScrollBar;
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class Texture;
 }
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class BrushFaceHandle;
 class Node;
 } // namespace TrenchBroom::Model
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class GLContextManager;
 class MapDocument;
 class TextureBrowserView;
 enum class TextureSortOrder;
 
-class TextureBrowser : public QWidget
-{
-  Q_OBJECT
+class TextureBrowser : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
-  QComboBox* m_sortOrderChoice = nullptr;
-  QPushButton* m_groupButton = nullptr;
-  QPushButton* m_usedButton = nullptr;
-  QLineEdit* m_filterBox = nullptr;
-  QScrollBar* m_scrollBar = nullptr;
-  TextureBrowserView* m_view = nullptr;
+  QComboBox *m_sortOrderChoice = nullptr;
+  QPushButton *m_groupButton = nullptr;
+  QPushButton *m_usedButton = nullptr;
+  QLineEdit *m_filterBox = nullptr;
+  QScrollBar *m_scrollBar = nullptr;
+  TextureBrowserView *m_view = nullptr;
 
   NotifierConnection m_notifierConnection;
 
 public:
   TextureBrowser(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
 
-  const Assets::Texture* selectedTexture() const;
-  void setSelectedTexture(const Assets::Texture* selectedTexture);
-  void revealTexture(const Assets::Texture* texture);
+  const Assets::Texture *selectedTexture() const;
+  void setSelectedTexture(const Assets::Texture *selectedTexture);
+  void revealTexture(const Assets::Texture *texture);
 
   void setSortOrder(TextureSortOrder sortOrder);
   void setGroup(bool group);
   void setHideUnused(bool hideUnused);
-  void setFilterText(const std::string& filterText);
+  void setFilterText(const std::string &filterText);
 signals:
-  void textureSelected(const Assets::Texture* texture);
+  void textureSelected(const Assets::Texture *texture);
 
 private:
-  void createGui(GLContextManager& contextManager);
+  void createGui(GLContextManager &contextManager);
   void bindEvents();
 
   void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
-  void documentWasLoaded(MapDocument* document);
-  void nodesWereAdded(const std::vector<Model::Node*>& nodes);
-  void nodesWereRemoved(const std::vector<Model::Node*>& nodes);
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
-  void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& faces);
+  void documentWasNewed(MapDocument *document);
+  void documentWasLoaded(MapDocument *document);
+  void nodesWereAdded(const std::vector<Model::Node *> &nodes);
+  void nodesWereRemoved(const std::vector<Model::Node *> &nodes);
+  void nodesDidChange(const std::vector<Model::Node *> &nodes);
+  void brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &faces);
   void textureCollectionsDidChange();
-  void currentTextureNameDidChange(const std::string& textureName);
-  void preferenceDidChange(const std::filesystem::path& path);
+  void currentTextureNameDidChange(const std::string &textureName);
+  void preferenceDidChange(const std::filesystem::path &path);
 
   void reload();
   void updateSelectedTexture();

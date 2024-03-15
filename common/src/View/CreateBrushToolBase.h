@@ -24,15 +24,12 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushNode;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class BrushRenderer;
 
 class RenderBatch;
@@ -40,20 +37,18 @@ class RenderBatch;
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
+namespace View {
 class Grid;
 
 class MapDocument;
 
-class CreateBrushToolBase : public Tool
-{
+class CreateBrushToolBase : public Tool {
 protected:
   std::weak_ptr<MapDocument> m_document;
 
 private:
-  Model::BrushNode* m_brush;
-  Renderer::BrushRenderer* m_brushRenderer;
+  Model::BrushNode *m_brush;
+  Renderer::BrushRenderer *m_brushRenderer;
 
 public:
   CreateBrushToolBase(bool initiallyActive, std::weak_ptr<MapDocument> document);
@@ -61,25 +56,25 @@ public:
   ~CreateBrushToolBase() override;
 
 public:
-  const Grid& grid() const;
+  const Grid &grid() const;
 
   void createBrush();
 
   void cancel();
 
-  void render(Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
+  void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 private:
   void renderBrush(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
+      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 protected:
-  void updateBrush(Model::BrushNode* brush);
+  void updateBrush(Model::BrushNode *brush);
 
 private:
   virtual void doBrushWasCreated();
 
-  deleteCopyAndMove(CreateBrushToolBase);
+deleteCopyAndMove(CreateBrushToolBase);
 };
 } // namespace View
 } // namespace TrenchBroom

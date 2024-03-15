@@ -21,13 +21,10 @@
 
 #include <QKeySequenceEdit>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class LimitedKeySequenceEdit : public QKeySequenceEdit
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class LimitedKeySequenceEdit : public QKeySequenceEdit {
+Q_OBJECT
 public:
   static const size_t MaxCount = 4;
 
@@ -36,12 +33,12 @@ private:
   size_t m_count;
 
 public:
-  explicit LimitedKeySequenceEdit(QWidget* parent = nullptr);
+  explicit LimitedKeySequenceEdit(QWidget *parent = nullptr);
 
-  explicit LimitedKeySequenceEdit(size_t maxCount, QWidget* parent = nullptr);
+  explicit LimitedKeySequenceEdit(size_t maxCount, QWidget *parent = nullptr);
 
 protected:
-  void keyPressEvent(QKeyEvent* event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
 

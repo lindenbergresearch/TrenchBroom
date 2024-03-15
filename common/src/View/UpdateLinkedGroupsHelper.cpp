@@ -37,50 +37,42 @@
 #include <map>
 #include <unordered_set>
 
-namespace TrenchBroom::View
-{
-namespace
-{
+namespace TrenchBroom::View {
+namespace {
 
 // Order groups so that descendants will be updated before their ancestors
-auto compareByAncestry(const Model::GroupNode* lhs, const Model::GroupNode* rhs)
-{
+auto compareByAncestry(const Model::GroupNode *lhs, const Model::GroupNode *rhs) {
   return rhs->isAncestorOf(lhs);
 }
 
 } // namespace
 
-bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode*>& changedLinkedGroups)
-{
+bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode *> &changedLinkedGroups) {
   const auto linkedGroupIds = kdl::vec_sort(kdl::vec_transform(
-    changedLinkedGroups, [](const auto* groupNode) { return groupNode->linkId(); }));
+      changedLinkedGroups, [](const auto *groupNode) { return groupNode->linkId(); }));
 
   return std::adjacent_find(std::begin(linkedGroupIds), std::end(linkedGroupIds))
-         == std::end(linkedGroupIds);
+      ==std::end(linkedGroupIds);
 }
 
 UpdateLinkedGroupsHelper::UpdateLinkedGroupsHelper(
-  ChangedLinkedGroups changedLinkedGroups)
-  : m_state{kdl::vec_sort(std::move(changedLinkedGroups), compareByAncestry)}
-{
+    ChangedLinkedGroups changedLinkedGroups)
+    : m_state{kdl::vec_sort(std::move(changedLinkedGroups), compareByAncestry)} {
 }
 
 UpdateLinkedGroupsHelper::~UpdateLinkedGroupsHelper() = default;
 
 Result<void> UpdateLinkedGroupsHelper::applyLinkedGroupUpdates(
-  MapDocumentCommandFacade& document)
-{
+    MapDocumentCommandFacade &document) {
   return computeLinkedGroupUpdates(document).transform(
-    [&]() { doApplyOrUndoLinkedGroupUpdates(document); });
+      [&]() { doApplyOrUndoLinkedGroupUpdates(document); });
 }
 
-void UpdateLinkedGroupsHelper::undoLinkedGroupUpdates(MapDocumentCommandFacade& document)
-{
+void UpdateLinkedGroupsHelper::undoLinkedGroupUpdates(MapDocumentCommandFacade &document) {
   doApplyOrUndoLinkedGroupUpdates(document);
 }
 
-void UpdateLinkedGroupsHelper::collateWith(UpdateLinkedGroupsHelper& other)
-{
+void UpdateLinkedGroupsHelper::collateWith(UpdateLinkedGroupsHelper &other) {
   // Both helpers have already applied their changes at this point, so in both helpers,
   // m_linkedGroups contains pairs p where
   // - p.first is the group node to update
@@ -94,75 +86,69 @@ void UpdateLinkedGroupsHelper::collateWith(UpdateLinkedGroupsHelper& other)
   // will add p_o to our updates and remove it from the other helper's updates to prevent
   // the replaced node to be deleted with the other helper.
 
-  auto& myLinkedGroupUpdates = std::get<LinkedGroupUpdates>(m_state);
-  auto& theirLinkedGroupUpdates = std::get<LinkedGroupUpdates>(other.m_state);
+  auto &myLinkedGroupUpdates = std::get<LinkedGroupUpdates>(m_state);
+  auto &theirLinkedGroupUpdates = std::get<LinkedGroupUpdates>(other.m_state);
 
-  for (auto& [theirGroupNodeToUpdate, theirOldChildren] : theirLinkedGroupUpdates)
-  {
+  for (auto &[theirGroupNodeToUpdate, theirOldChildren] : theirLinkedGroupUpdates) {
     const auto myIt = std::find_if(
-      std::begin(myLinkedGroupUpdates),
-      std::end(myLinkedGroupUpdates),
-      [theirGroupNodeToUpdate = theirGroupNodeToUpdate](const auto& p) {
-        return p.first == theirGroupNodeToUpdate;
-      });
-    if (myIt == std::end(myLinkedGroupUpdates))
-    {
+        std::begin(myLinkedGroupUpdates),
+        std::end(myLinkedGroupUpdates),
+        [theirGroupNodeToUpdate = theirGroupNodeToUpdate](const auto &p) {
+          return p.first==theirGroupNodeToUpdate;
+        });
+    if (myIt==std::end(myLinkedGroupUpdates)) {
       myLinkedGroupUpdates.emplace_back(
-        theirGroupNodeToUpdate, std::move(theirOldChildren));
+          theirGroupNodeToUpdate, std::move(theirOldChildren));
     }
   }
 }
 
 Result<void> UpdateLinkedGroupsHelper::computeLinkedGroupUpdates(
-  MapDocumentCommandFacade& document)
-{
+    MapDocumentCommandFacade &document) {
   return std::visit(
-    kdl::overload(
-      [&](const ChangedLinkedGroups& changedLinkedGroups) {
-        return computeLinkedGroupUpdates(changedLinkedGroups, document)
-          .transform([&](auto&& linkedGroupUpdates) {
-            m_state = std::forward<decltype(linkedGroupUpdates)>(linkedGroupUpdates);
-          });
-      },
-      [](const LinkedGroupUpdates&) -> Result<void> { return kdl::void_success; }),
-    m_state);
+      kdl::overload(
+          [&](const ChangedLinkedGroups &changedLinkedGroups) {
+            return computeLinkedGroupUpdates(changedLinkedGroups, document)
+                .transform([&](auto &&linkedGroupUpdates) {
+                  m_state = std::forward<decltype(linkedGroupUpdates)>(linkedGroupUpdates);
+                });
+          },
+          [](const LinkedGroupUpdates &) -> Result<void> { return kdl::void_success; }),
+      m_state);
 }
 
 Result<UpdateLinkedGroupsHelper::LinkedGroupUpdates> UpdateLinkedGroupsHelper::
-  computeLinkedGroupUpdates(
-    const ChangedLinkedGroups& changedLinkedGroups, MapDocumentCommandFacade& document)
-{
-  if (!checkLinkedGroupsToUpdate(changedLinkedGroups))
-  {
+computeLinkedGroupUpdates(
+    const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document) {
+  if (!checkLinkedGroupsToUpdate(changedLinkedGroups)) {
     return Error{"Cannot update multiple members of the same link set"};
   }
 
-  const auto& worldBounds = document.worldBounds();
+  const auto &worldBounds = document.worldBounds();
   return kdl::fold_results(
-           kdl::vec_transform(
-             changedLinkedGroups,
-             [&](const auto* groupNode) {
-               const auto groupNodesToUpdate = kdl::vec_erase(
-                 Model::collectGroupsWithLinkId({document.world()}, groupNode->linkId()),
-                 groupNode);
+      kdl::vec_transform(
+          changedLinkedGroups,
+          [&](const auto *groupNode) {
+            const auto groupNodesToUpdate = kdl::vec_erase(
+                Model::collectGroupsWithLinkId({document.world()}, groupNode->linkId()),
+                groupNode);
 
-               return Model::updateLinkedGroups(
-                 *groupNode, groupNodesToUpdate, worldBounds);
-             }))
-    .and_then([&](auto nestedUpdateLists) -> Result<LinkedGroupUpdates> {
-      return kdl::vec_flatten(std::move(nestedUpdateLists));
-    });
+            return Model::updateLinkedGroups(
+                *groupNode, groupNodesToUpdate, worldBounds);
+          }))
+      .and_then([&](auto nestedUpdateLists) -> Result<LinkedGroupUpdates> {
+        return kdl::vec_flatten(std::move(nestedUpdateLists));
+      });
 }
 
 void UpdateLinkedGroupsHelper::doApplyOrUndoLinkedGroupUpdates(
-  MapDocumentCommandFacade& document)
-{
+    MapDocumentCommandFacade &document) {
   std::visit(
-    kdl::overload(
-      [](const ChangedLinkedGroups&) {},
-      [&](LinkedGroupUpdates&& linkedGroupUpdates) {
-        m_state = document.performReplaceChildren(std::move(linkedGroupUpdates));
-      }),
-    std::move(m_state));
+      kdl::overload(
+          [](const ChangedLinkedGroups &) {},
+          [&](LinkedGroupUpdates &&linkedGroupUpdates) {
+            m_state = document.performReplaceChildren(std::move(linkedGroupUpdates));
+          }),
+      std::move(m_state));
 }
 } // namespace TrenchBroom::View

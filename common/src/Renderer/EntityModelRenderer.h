@@ -24,39 +24,34 @@
 
 #include <unordered_map>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class EntityModelManager;
 }
 
-namespace Model
-{
+namespace Model {
 class EditorContext;
 
 class EntityNode;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderBatch;
 
 class ShaderConfig;
 
 class TexturedRenderer;
 
-class EntityModelRenderer : public DirectRenderable
-{
+class EntityModelRenderer : public DirectRenderable {
 private:
-  Logger& m_logger;
+  Logger &m_logger;
 
-  Assets::EntityModelManager& m_entityModelManager;
-  const Model::EditorContext& m_editorContext;
+  Assets::EntityModelManager &m_entityModelManager;
+  const Model::EditorContext &m_editorContext;
 
-  std::unordered_map<const Model::EntityNode*, TexturedRenderer*> m_entities;
+  std::unordered_map<const Model::EntityNode *, TexturedRenderer *> m_entities;
 
   bool m_applyTinting;
   Color m_tintColor;
@@ -65,44 +60,39 @@ private:
 
 public:
   EntityModelRenderer(
-    Logger& logger,
-    Assets::EntityModelManager& entityModelManager,
-    const Model::EditorContext& editorContext);
+      Logger &logger,
+      Assets::EntityModelManager &entityModelManager,
+      const Model::EditorContext &editorContext);
 
   ~EntityModelRenderer() override;
 
-  template <typename I>
-  void setEntities(I cur, I end)
-  {
+  template<typename I>
+  void setEntities(I cur, I end) {
     clear();
     addEntities(cur, end);
   }
 
-  template <typename I>
-  void addEntities(I cur, I end)
-  {
-    while (cur != end)
-    {
+  template<typename I>
+  void addEntities(I cur, I end) {
+    while (cur!=end) {
       addEntity(*cur);
       ++cur;
     }
   }
 
-  template <typename I>
-  void updateEntities(I cur, I end)
-  {
-    while (cur != end)
-    {
+  template<typename I>
+  void updateEntities(I cur, I end) {
+    while (cur!=end) {
       updateEntity(*cur);
       ++cur;
     }
   }
 
-  void addEntity(const Model::EntityNode* entityNode);
+  void addEntity(const Model::EntityNode *entityNode);
 
-  void removeEntity(const Model::EntityNode* entityNode);
+  void removeEntity(const Model::EntityNode *entityNode);
 
-  void updateEntity(const Model::EntityNode* entityNode);
+  void updateEntity(const Model::EntityNode *entityNode);
 
   void clear();
 
@@ -110,20 +100,20 @@ public:
 
   void setApplyTinting(const bool applyTinting);
 
-  const Color& tintColor() const;
+  const Color &tintColor() const;
 
-  void setTintColor(const Color& tintColor);
+  void setTintColor(const Color &tintColor);
 
   bool showHiddenEntities() const;
 
   void setShowHiddenEntities(bool showHiddenEntities);
 
-  void render(RenderBatch& renderBatch);
+  void render(RenderBatch &renderBatch);
 
 private:
-  void doPrepareVertices(VboManager& vboManager) override;
+  void doPrepareVertices(VboManager &vboManager) override;
 
-  void doRender(RenderContext& renderContext) override;
+  void doRender(RenderContext &renderContext) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

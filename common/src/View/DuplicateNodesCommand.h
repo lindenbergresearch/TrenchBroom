@@ -26,24 +26,20 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Node;
 }
 
-namespace View
-{
-class DuplicateNodesCommand : public UndoableCommand
-{
+namespace View {
+class DuplicateNodesCommand : public UndoableCommand {
 public:
   static const CommandType Type;
 
 private:
-  std::vector<Model::Node*> m_previouslySelectedNodes;
-  std::vector<Model::Node*> m_nodesToSelect;
-  std::map<Model::Node*, std::vector<Model::Node*>> m_addedNodes;
+  std::vector<Model::Node *> m_previouslySelectedNodes;
+  std::vector<Model::Node *> m_nodesToSelect;
+  std::map<Model::Node *, std::vector<Model::Node *>> m_addedNodes;
   bool m_firstExecution;
 
 public:
@@ -54,14 +50,14 @@ public:
   ~DuplicateNodesCommand() override;
 
 private:
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
+  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
   std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+      MapDocumentCommandFacade *document) override;
 
-  bool shouldCloneParentWhenCloningNode(const Model::Node* node) const;
+  bool shouldCloneParentWhenCloningNode(const Model::Node *node) const;
 
-  deleteCopyAndMove(DuplicateNodesCommand);
+deleteCopyAndMove(DuplicateNodesCommand);
 };
 } // namespace View
 } // namespace TrenchBroom

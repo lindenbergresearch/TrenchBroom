@@ -24,12 +24,9 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
-class Transformation
-{
+namespace TrenchBroom {
+namespace Renderer {
+class Transformation {
 private:
   using MatrixStack = std::vector<vm::mat4x4f>;
   MatrixStack m_projectionStack;
@@ -38,94 +35,91 @@ private:
 
 public:
   Transformation(
-    const vm::mat4x4f& projection,
-    const vm::mat4x4f& view,
-    const vm::mat4x4f& model = vm::mat4x4f::identity());
+      const vm::mat4x4f &projection,
+      const vm::mat4x4f &view,
+      const vm::mat4x4f &model = vm::mat4x4f::identity());
 
   ~Transformation();
 
-  const vm::mat4x4f& projectionMatrix() const;
+  const vm::mat4x4f &projectionMatrix() const;
 
-  const vm::mat4x4f& viewMatrix() const;
+  const vm::mat4x4f &viewMatrix() const;
 
-  const vm::mat4x4f& modelMatrix() const;
+  const vm::mat4x4f &modelMatrix() const;
 
   Transformation slice() const;
 
   void pushTransformation(
-    const vm::mat4x4f& projection,
-    const vm::mat4x4f& view,
-    const vm::mat4x4f& model = vm::mat4x4f::identity());
+      const vm::mat4x4f &projection,
+      const vm::mat4x4f &view,
+      const vm::mat4x4f &model = vm::mat4x4f::identity());
 
   void popTransformation();
 
-  void pushModelMatrix(const vm::mat4x4f& matrix);
+  void pushModelMatrix(const vm::mat4x4f &matrix);
 
-  void replaceAndPushModelMatrix(const vm::mat4x4f& matrix);
+  void replaceAndPushModelMatrix(const vm::mat4x4f &matrix);
 
   void popModelMatrix();
 
 private:
-  void loadProjectionMatrix(const vm::mat4x4f& matrix);
+  void loadProjectionMatrix(const vm::mat4x4f &matrix);
 
-  void loadModelViewMatrix(const vm::mat4x4f& matrix);
+  void loadModelViewMatrix(const vm::mat4x4f &matrix);
 
 private:
-  Transformation(const Transformation& other);
+  Transformation(const Transformation &other);
 
-  Transformation& operator=(const Transformation& other);
+  Transformation &operator=(const Transformation &other);
 };
 
-class ReplaceTransformation
-{
+class ReplaceTransformation {
 protected:
-  Transformation& m_transformation;
+  Transformation &m_transformation;
 
 public:
   ReplaceTransformation(
-    Transformation& transformation,
-    const vm::mat4x4f& projectionMatrix,
-    const vm::mat4x4f& viewMatrix,
-    const vm::mat4x4f& modelMatrix = vm::mat4x4f::identity());
+      Transformation &transformation,
+      const vm::mat4x4f &projectionMatrix,
+      const vm::mat4x4f &viewMatrix,
+      const vm::mat4x4f &modelMatrix = vm::mat4x4f::identity());
 
   ~ReplaceTransformation();
 
 private:
-  ReplaceTransformation(const ReplaceTransformation& other);
+  ReplaceTransformation(const ReplaceTransformation &other);
 
-  ReplaceTransformation& operator=(const ReplaceTransformation& other);
+  ReplaceTransformation &operator=(const ReplaceTransformation &other);
 };
 
-class MultiplyModelMatrix
-{
+class MultiplyModelMatrix {
 protected:
-  Transformation& m_transformation;
+  Transformation &m_transformation;
 
 public:
-  MultiplyModelMatrix(Transformation& transformation, const vm::mat4x4f& modelMatrix);
+  MultiplyModelMatrix(Transformation &transformation, const vm::mat4x4f &modelMatrix);
 
   ~MultiplyModelMatrix();
 
 private:
-  MultiplyModelMatrix(const ReplaceTransformation& other);
+  MultiplyModelMatrix(const ReplaceTransformation &other);
 
-  MultiplyModelMatrix& operator=(const ReplaceTransformation& other);
+  MultiplyModelMatrix &operator=(const ReplaceTransformation &other);
 };
 
-class ReplaceModelMatrix
-{
+class ReplaceModelMatrix {
 protected:
-  Transformation& m_transformation;
+  Transformation &m_transformation;
 
 public:
-  ReplaceModelMatrix(Transformation& transformation, const vm::mat4x4f& modelMatrix);
+  ReplaceModelMatrix(Transformation &transformation, const vm::mat4x4f &modelMatrix);
 
   ~ReplaceModelMatrix();
 
 private:
-  ReplaceModelMatrix(const ReplaceTransformation& other);
+  ReplaceModelMatrix(const ReplaceTransformation &other);
 
-  ReplaceModelMatrix& operator=(const ReplaceTransformation& other);
+  ReplaceModelMatrix &operator=(const ReplaceTransformation &other);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

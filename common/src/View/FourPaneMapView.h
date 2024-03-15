@@ -25,61 +25,57 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 class QSplitter;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 }
 
-namespace TrenchBroom::Renderer
-{
+namespace TrenchBroom::Renderer {
 class MapRenderer;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class GLContextManager;
 class MapDocument;
 class MapView2D;
 class MapView3D;
 class MapViewToolBox;
 
-class FourPaneMapView : public MultiPaneMapView
-{
- Q_OBJECT
+class FourPaneMapView : public MultiPaneMapView {
+Q_OBJECT
 private:
- Logger* m_logger;
- std::weak_ptr<MapDocument> m_document;
+  Logger *m_logger;
+  std::weak_ptr<MapDocument> m_document;
 
- QSplitter* m_hSplitter = nullptr;
- QSplitter* m_leftVSplitter = nullptr;
- QSplitter* m_rightVSplitter = nullptr;
+  QSplitter *m_hSplitter = nullptr;
+  QSplitter *m_leftVSplitter = nullptr;
+  QSplitter *m_rightVSplitter = nullptr;
 
- MapView3D* m_mapView3D = nullptr;
- MapView2D* m_mapViewXY = nullptr;
- MapView2D* m_mapViewXZ = nullptr;
- MapView2D* m_mapViewYZ = nullptr;
+  MapView3D *m_mapView3D = nullptr;
+  MapView2D *m_mapViewXY = nullptr;
+  MapView2D *m_mapViewXZ = nullptr;
+  MapView2D *m_mapViewYZ = nullptr;
 
 public:
- FourPaneMapView(
-   std::weak_ptr<MapDocument> document,
-   MapViewToolBox& toolBox,
-   Renderer::MapRenderer& mapRenderer,
-   GLContextManager& contextManager,
-   Logger* logger,
-   QWidget* parent = nullptr);
- ~FourPaneMapView() override;
+  FourPaneMapView(
+      std::weak_ptr<MapDocument> document,
+      MapViewToolBox &toolBox,
+      Renderer::MapRenderer &mapRenderer,
+      GLContextManager &contextManager,
+      Logger *logger,
+      QWidget *parent = nullptr);
+  ~FourPaneMapView() override;
 
 private:
- void createGui(
-   MapViewToolBox& toolBox,
-   Renderer::MapRenderer& mapRenderer,
-   GLContextManager& contextManager);
+  void createGui(
+      MapViewToolBox &toolBox,
+      Renderer::MapRenderer &mapRenderer,
+      GLContextManager &contextManager);
 
 private: // event handlers
- void onSplitterMoved(int pos, int index);
+  void onSplitterMoved(int pos, int index);
 
 private: // implement MultiPaneMapView subclassing interface
- void doMaximizeView(MapView* view) override;
- void doRestoreViews() override;
+  void doMaximizeView(MapView *view) override;
+  void doRestoreViews() override;
 };
 } // namespace TrenchBroom::View

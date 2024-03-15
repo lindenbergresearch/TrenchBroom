@@ -25,18 +25,15 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 } // namespace TrenchBroom
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class Quake3Shader;
 }
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
 /**
  * Parses Quake 3 shader scripts found in a file system and makes the shader objects
@@ -45,13 +42,12 @@ namespace TrenchBroom::IO
  * Also scans for textures available at a list of search paths and generates shaders for
  * such textures which do not already have a shader by the same name.
  */
-class Quake3ShaderFileSystem : public ImageFileSystemBase
-{
+class Quake3ShaderFileSystem : public ImageFileSystemBase {
 private:
-  const FileSystem& m_fs;
+  const FileSystem &m_fs;
   std::filesystem::path m_shaderSearchPath;
   std::vector<std::filesystem::path> m_textureSearchPaths;
-  Logger& m_logger;
+  Logger &m_logger;
 
 public:
   /**
@@ -68,20 +64,20 @@ public:
    * @param logger the logger to use
    */
   Quake3ShaderFileSystem(
-    const FileSystem& fs,
-    std::filesystem::path shaderSearchPath,
-    std::vector<std::filesystem::path> textureSearchPaths,
-    Logger& logger);
+      const FileSystem &fs,
+      std::filesystem::path shaderSearchPath,
+      std::vector<std::filesystem::path> textureSearchPaths,
+      Logger &logger);
 
 private:
   Result<void> doReadDirectory() override;
 
   Result<std::vector<Assets::Quake3Shader>> loadShaders() const;
-  Result<void> linkShaders(std::vector<Assets::Quake3Shader>& shaders);
+  Result<void> linkShaders(std::vector<Assets::Quake3Shader> &shaders);
   void linkTextures(
-    const std::vector<std::filesystem::path>& textures,
-    std::vector<Assets::Quake3Shader>& shaders);
-  void linkStandaloneShaders(std::vector<Assets::Quake3Shader>& shaders);
+      const std::vector<std::filesystem::path> &textures,
+      std::vector<Assets::Quake3Shader> &shaders);
+  void linkStandaloneShaders(std::vector<Assets::Quake3Shader> &shaders);
 };
 
 } // namespace TrenchBroom::IO

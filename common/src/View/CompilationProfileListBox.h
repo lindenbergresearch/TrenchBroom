@@ -23,29 +23,25 @@
 
 class QPoint;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 struct CompilationConfig;
 struct CompilationProfile;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class ElidedLabel;
 
-class CompilationProfileItemRenderer : public ControlListBoxItemRenderer
-{
-  Q_OBJECT
+class CompilationProfileItemRenderer : public ControlListBoxItemRenderer {
+Q_OBJECT
 private:
-  Model::CompilationProfile& m_profile;
-  ElidedLabel* m_nameText{nullptr};
-  ElidedLabel* m_taskCountText{nullptr};
+  Model::CompilationProfile &m_profile;
+  ElidedLabel *m_nameText{nullptr};
+  ElidedLabel *m_taskCountText{nullptr};
 
 public:
   explicit CompilationProfileItemRenderer(
-    Model::CompilationProfile& profile, QWidget* parent = nullptr);
+      Model::CompilationProfile &profile, QWidget *parent = nullptr);
 
   ~CompilationProfileItemRenderer() override;
 
@@ -53,15 +49,14 @@ private:
   void updateItem() override;
 };
 
-class CompilationProfileListBox : public ControlListBox
-{
-  Q_OBJECT
+class CompilationProfileListBox : public ControlListBox {
+Q_OBJECT
 private:
-  Model::CompilationConfig& m_config;
+  Model::CompilationConfig &m_config;
 
 public:
   explicit CompilationProfileListBox(
-    Model::CompilationConfig& config, QWidget* parent = nullptr);
+      Model::CompilationConfig &config, QWidget *parent = nullptr);
 
 public:
   void reloadProfiles();
@@ -71,12 +66,12 @@ public:
 private:
   size_t itemCount() const override;
 
-  ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
+  ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;
 
 signals:
 
   void profileContextMenuRequested(
-    const QPoint& globalPos, Model::CompilationProfile& profile);
+      const QPoint &globalPos, Model::CompilationProfile &profile);
 };
 } // namespace View
 } // namespace TrenchBroom

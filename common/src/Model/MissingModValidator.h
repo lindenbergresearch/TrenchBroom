@@ -25,14 +25,11 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Game;
 
-class MissingModValidator : public Validator
-{
+class MissingModValidator : public Validator {
   std::weak_ptr<Game> m_game;
   mutable std::vector<std::string> m_lastMods;
 
@@ -40,8 +37,8 @@ public:
   explicit MissingModValidator(std::weak_ptr<Game> game);
 
 private:
-  void doValidate(EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues)
-    const override;
+  void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues)
+  const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

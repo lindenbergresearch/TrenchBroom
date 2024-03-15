@@ -25,19 +25,16 @@
 #include <string_view>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 class ParserStatus;
 
 /**
  * MapReader subclass for loading the clipboard contents, rather than an entire .map
  */
-class NodeReader : public MapReader
-{
+class NodeReader : public MapReader {
 private:
-  std::vector<Model::Node*> m_nodes;
+  std::vector<Model::Node *> m_nodes;
 
 public:
   /**
@@ -50,35 +47,35 @@ public:
    * @param entityPropertyConfig the entity property config to use
    */
   NodeReader(
-    std::string_view str,
-    Model::MapFormat sourceMapFormat,
-    Model::MapFormat targetMapFormat,
-    const Model::EntityPropertyConfig& entityPropertyConfig);
+      std::string_view str,
+      Model::MapFormat sourceMapFormat,
+      Model::MapFormat targetMapFormat,
+      const Model::EntityPropertyConfig &entityPropertyConfig);
 
-  static std::vector<Model::Node*> read(
-    const std::string& str,
-    Model::MapFormat preferredMapFormat,
-    const vm::bbox3& worldBounds,
-    const Model::EntityPropertyConfig& entityPropertyConfig,
-    ParserStatus& status);
+  static std::vector<Model::Node *> read(
+      const std::string &str,
+      Model::MapFormat preferredMapFormat,
+      const vm::bbox3 &worldBounds,
+      const Model::EntityPropertyConfig &entityPropertyConfig,
+      ParserStatus &status);
 
 private:
-  static std::vector<Model::Node*> readAsFormat(
-    Model::MapFormat sourceMapFormat,
-    Model::MapFormat targetMapFormat,
-    const std::string& str,
-    const vm::bbox3& worldBounds,
-    const Model::EntityPropertyConfig& entityPropertyConfig,
-    ParserStatus& status);
+  static std::vector<Model::Node *> readAsFormat(
+      Model::MapFormat sourceMapFormat,
+      Model::MapFormat targetMapFormat,
+      const std::string &str,
+      const vm::bbox3 &worldBounds,
+      const Model::EntityPropertyConfig &entityPropertyConfig,
+      ParserStatus &status);
 
 private: // implement MapReader interface
-  Model::Node* onWorldNode(
-    std::unique_ptr<Model::WorldNode> worldNode, ParserStatus& status) override;
-  void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus& status) override;
+  Model::Node *onWorldNode(
+      std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) override;
+  void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &status) override;
   void onNode(
-    Model::Node* parentNode,
-    std::unique_ptr<Model::Node> node,
-    ParserStatus& status) override;
+      Model::Node *parentNode,
+      std::unique_ptr<Model::Node> node,
+      ParserStatus &status) override;
 };
 } // namespace IO
 } // namespace TrenchBroom

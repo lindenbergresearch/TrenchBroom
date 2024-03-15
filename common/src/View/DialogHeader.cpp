@@ -24,45 +24,35 @@
 
 #include "QtUtils.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
-DialogHeader::DialogHeader(QWidget* parent)
-  : QWidget{parent}
-  , m_iconLabel{nullptr}
-  , m_textLabel{nullptr}
-{
+namespace TrenchBroom {
+namespace View {
+DialogHeader::DialogHeader(QWidget *parent)
+    : QWidget{parent}, m_iconLabel{nullptr}, m_textLabel{nullptr} {
   createGui();
 }
 
-DialogHeader::DialogHeader(const QString& text, QWidget* parent)
-  : DialogHeader{parent}
-{
+DialogHeader::DialogHeader(const QString &text, QWidget *parent)
+    : DialogHeader{parent} {
   set(text);
 }
 
-DialogHeader::DialogHeader(const QString& text, QPixmap icon, QWidget* parent)
-  : DialogHeader{parent}
-{
+DialogHeader::DialogHeader(const QString &text, QPixmap icon, QWidget *parent)
+    : DialogHeader{parent} {
   set(text, icon);
 }
 
-void DialogHeader::set(const QString& text)
-{
+void DialogHeader::set(const QString &text) {
   m_textLabel->setText(text);
   m_iconLabel->setVisible(false);
 }
 
-void DialogHeader::set(const QString& text, QPixmap icon)
-{
+void DialogHeader::set(const QString &text, QPixmap icon) {
   m_textLabel->setText(text);
   m_iconLabel->setPixmap(icon);
   m_iconLabel->setVisible(true);
 }
 
-void DialogHeader::createGui()
-{
+void DialogHeader::createGui() {
   // Use white background (or whatever color a text widget uses)
   setBaseWindowColor(this);
 
@@ -70,12 +60,12 @@ void DialogHeader::createGui()
   m_textLabel = new QLabel{};
   makeHeader(m_textLabel);
 
-  auto* layout = new QHBoxLayout{};
+  auto *layout = new QHBoxLayout{};
   layout->setContentsMargins(
-    LayoutConstants::WideHMargin,
-    LayoutConstants::MediumVMargin,
-    LayoutConstants::WideHMargin,
-    LayoutConstants::MediumVMargin);
+      LayoutConstants::WideHMargin,
+      LayoutConstants::MediumVMargin,
+      LayoutConstants::WideHMargin,
+      LayoutConstants::MediumVMargin);
   layout->setSpacing(LayoutConstants::MediumHMargin);
   layout->addWidget(m_iconLabel, 0, Qt::AlignLeft | Qt::AlignVCenter);
   layout->addWidget(m_textLabel, 1, Qt::AlignLeft | Qt::AlignVCenter);

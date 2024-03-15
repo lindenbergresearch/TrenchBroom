@@ -23,11 +23,9 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 
-struct Error
-{
+struct Error {
   std::string msg;
 
   kdl_reflect_decl(Error, msg);

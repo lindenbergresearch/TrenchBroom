@@ -30,89 +30,68 @@
 #include <map>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(
-  Model::Node* parent, const std::vector<Model::Node*>& children)
-{
-  ensure(parent != nullptr, "parent is null");
-  auto nodes = std::map<Model::Node*, std::vector<Model::Node*>>{};
+    Model::Node *parent, const std::vector<Model::Node *> &children) {
+  ensure(parent!=nullptr, "parent is null");
+  auto nodes = std::map<Model::Node *, std::vector<Model::Node *>>{};
   nodes[parent] = children;
 
   return add(nodes);
 }
 
 std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::add(
-  const std::map<Model::Node*, std::vector<Model::Node*>>& nodes)
-{
+    const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) {
   return std::make_unique<AddRemoveNodesCommand>(Action::Add, nodes);
 }
 
 std::unique_ptr<AddRemoveNodesCommand> AddRemoveNodesCommand::remove(
-  const std::map<Model::Node*, std::vector<Model::Node*>>& nodes)
-{
+    const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) {
   return std::make_unique<AddRemoveNodesCommand>(Action::Remove, nodes);
 }
 
-AddRemoveNodesCommand::~AddRemoveNodesCommand()
-{
+AddRemoveNodesCommand::~AddRemoveNodesCommand() {
   kdl::map_clear_and_delete(m_nodesToAdd);
 }
 
 AddRemoveNodesCommand::AddRemoveNodesCommand(
-  const Action action, const std::map<Model::Node*, std::vector<Model::Node*>>& nodes)
-  : UpdateLinkedGroupsCommandBase{makeName(action), true}
-  , m_action{action}
-{
-  switch (m_action)
-  {
-  case Action::Add:
-    m_nodesToAdd = nodes;
+    const Action action, const std::map<Model::Node *, std::vector<Model::Node *>> &nodes)
+    : UpdateLinkedGroupsCommandBase{makeName(action), true}, m_action{action} {
+  switch (m_action) {
+  case Action::Add:m_nodesToAdd = nodes;
     break;
-  case Action::Remove:
-    m_nodesToRemove = nodes;
+  case Action::Remove:m_nodesToRemove = nodes;
     break;
     switchDefault();
   }
 }
 
-std::string AddRemoveNodesCommand::makeName(const Action action)
-{
-  switch (action)
-  {
-  case Action::Add:
-    return "Add Objects";
-  case Action::Remove:
-    return "Remove Objects";
+std::string AddRemoveNodesCommand::makeName(const Action action) {
+  switch (action) {
+  case Action::Add:return "Add Objects";
+  case Action::Remove:return "Remove Objects";
     switchDefault();
   }
 }
 
 std::unique_ptr<CommandResult> AddRemoveNodesCommand::doPerformDo(
-  MapDocumentCommandFacade* document)
-{
+    MapDocumentCommandFacade *document) {
   doAction(document);
   return std::make_unique<CommandResult>(true);
 }
 
 std::unique_ptr<CommandResult> AddRemoveNodesCommand::doPerformUndo(
-  MapDocumentCommandFacade* document)
-{
+    MapDocumentCommandFacade *document) {
   undoAction(document);
   return std::make_unique<CommandResult>(true);
 }
 
-void AddRemoveNodesCommand::doAction(MapDocumentCommandFacade* document)
-{
-  switch (m_action)
-  {
-  case Action::Add:
-    document->performAddNodes(m_nodesToAdd);
+void AddRemoveNodesCommand::doAction(MapDocumentCommandFacade *document) {
+  switch (m_action) {
+  case Action::Add:document->performAddNodes(m_nodesToAdd);
     break;
-  case Action::Remove:
-    document->performRemoveNodes(m_nodesToRemove);
+  case Action::Remove:document->performRemoveNodes(m_nodesToRemove);
     break;
   }
 
@@ -120,15 +99,11 @@ void AddRemoveNodesCommand::doAction(MapDocumentCommandFacade* document)
   swap(m_nodesToAdd, m_nodesToRemove);
 }
 
-void AddRemoveNodesCommand::undoAction(MapDocumentCommandFacade* document)
-{
-  switch (m_action)
-  {
-  case Action::Add:
-    document->performRemoveNodes(m_nodesToRemove);
+void AddRemoveNodesCommand::undoAction(MapDocumentCommandFacade *document) {
+  switch (m_action) {
+  case Action::Add:document->performRemoveNodes(m_nodesToRemove);
     break;
-  case Action::Remove:
-    document->performAddNodes(m_nodesToAdd);
+  case Action::Remove:document->performAddNodes(m_nodesToAdd);
     break;
   }
 

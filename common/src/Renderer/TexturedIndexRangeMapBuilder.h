@@ -25,24 +25,20 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 /**
  * Builds an index range map and a corresponding vertex array by recording textured
  * rendering primitives. The recorded data can be used to create an vertex array that can
  * be uploaded to video card memory, and to render the recorded primitives using the index
  * ranges stored in the constructed index range map.
  */
-template <typename VertexSpec>
-class TexturedIndexRangeMapBuilder
-{
+template<typename VertexSpec>
+class TexturedIndexRangeMapBuilder {
 public:
   using Vertex = typename VertexSpec::Vertex;
   using VertexList = std::vector<Vertex>;
@@ -64,10 +60,8 @@ public:
    * @param indexRangeSize the size of the index range map to expect
    */
   TexturedIndexRangeMapBuilder(
-    const size_t vertexCount, const TexturedIndexRangeMap::Size& indexRangeSize)
-    : m_vertexListBuilder(vertexCount)
-    , m_indexRange(indexRangeSize)
-  {
+      const size_t vertexCount, const TexturedIndexRangeMap::Size &indexRangeSize)
+      : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
   }
 
   /**
@@ -75,28 +69,28 @@ public:
    *
    * @return the recorded vertices
    */
-  const VertexList& vertices() const { return m_vertexListBuilder.vertices(); }
+  const VertexList &vertices() const { return m_vertexListBuilder.vertices(); }
 
   /**
    * Returns the recorded vertices.
    *
    * @return the recorded vertices
    */
-  VertexList& vertices() { return m_vertexListBuilder.vertices(); }
+  VertexList &vertices() { return m_vertexListBuilder.vertices(); }
 
   /**
    * Returns the recorded index ranges.
    *
    * @return the recorded index ranges
    */
-  const TexturedIndexRangeMap& indices() const { return m_indexRange; }
+  const TexturedIndexRangeMap &indices() const { return m_indexRange; }
 
   /**
    * Returns the recorded index ranges.
    *
    * @return the recorded index ranges
    */
-  TexturedIndexRangeMap& indices() { return m_indexRange; }
+  TexturedIndexRangeMap &indices() { return m_indexRange; }
 
   /**
    * Adds a textured point primitive at the given position.
@@ -104,8 +98,7 @@ public:
    * @param texture the texture to use
    * @param v the position of the point to add
    */
-  void addPoint(const Texture* texture, const Vertex& v)
-  {
+  void addPoint(const Texture *texture, const Vertex &v) {
     add(texture, Renderer::PrimType::Points, m_vertexListBuilder.addPoint(v));
   }
 
@@ -115,8 +108,7 @@ public:
    * @param texture the texture to use
    * @param vertices the positions of the points to add
    */
-  void addPoints(const Texture* texture, const VertexList& vertices)
-  {
+  void addPoints(const Texture *texture, const VertexList &vertices) {
     add(texture, Renderer::PrimType::Points, m_vertexListBuilder.addPoints(vertices));
   }
 
@@ -127,8 +119,7 @@ public:
    * @param v1 the position of the first end point
    * @param v2 the position of the second end point
    */
-  void addLine(const Texture* texture, const Vertex& v1, const Vertex& v2)
-  {
+  void addLine(const Texture *texture, const Vertex &v1, const Vertex &v2) {
     add(texture, Renderer::PrimType::Lines, m_vertexListBuilder.addLine(v1, v2));
   }
 
@@ -140,8 +131,7 @@ public:
    * @param texture the texture to use
    * @param vertices the end points of the lines to add
    */
-  void addLines(const Texture* texture, const VertexList& vertices)
-  {
+  void addLines(const Texture *texture, const VertexList &vertices) {
     add(texture, Renderer::PrimType::Lines, m_vertexListBuilder.addLines(vertices));
   }
 
@@ -151,10 +141,9 @@ public:
    * @param texture the texture to use
    * @param vertices the end points of the lines to add
    */
-  void addLineStrip(const Texture* texture, const VertexList& vertices)
-  {
+  void addLineStrip(const Texture *texture, const VertexList &vertices) {
     add(
-      texture, Renderer::PrimType::LineStrip, m_vertexListBuilder.addLineStrip(vertices));
+        texture, Renderer::PrimType::LineStrip, m_vertexListBuilder.addLineStrip(vertices));
   }
 
   /**
@@ -163,8 +152,7 @@ public:
    * @param texture the texture to use
    * @param vertices the end points of the lines to add
    */
-  void addLineLoop(const Texture* texture, const VertexList& vertices)
-  {
+  void addLineLoop(const Texture *texture, const VertexList &vertices) {
     add(texture, Renderer::PrimType::LineLoop, m_vertexListBuilder.addLineLoop(vertices));
   }
 
@@ -177,12 +165,11 @@ public:
    * @param v3 the position of the third corner
    */
   void addTriangle(
-    const Texture* texture, const Vertex& v1, const Vertex& v2, const Vertex& v3)
-  {
+      const Texture *texture, const Vertex &v1, const Vertex &v2, const Vertex &v3) {
     add(
-      texture,
-      Renderer::PrimType::Triangles,
-      m_vertexListBuilder.addTriangle(v1, v2, v3));
+        texture,
+        Renderer::PrimType::Triangles,
+        m_vertexListBuilder.addTriangle(v1, v2, v3));
   }
 
   /**
@@ -192,10 +179,9 @@ public:
    * @param texture the texture to use
    * @param vertices the corner positions
    */
-  void addTriangles(const Texture* texture, const VertexList& vertices)
-  {
+  void addTriangles(const Texture *texture, const VertexList &vertices) {
     add(
-      texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangles(vertices));
+        texture, Renderer::PrimType::Triangles, m_vertexListBuilder.addTriangles(vertices));
   }
 
   /**
@@ -204,12 +190,11 @@ public:
    * @param texture the texture to use
    * @param vertices the vertex positions
    */
-  void addTriangleFan(const Texture* texture, const VertexList& vertices)
-  {
+  void addTriangleFan(const Texture *texture, const VertexList &vertices) {
     add(
-      texture,
-      Renderer::PrimType::TriangleFan,
-      m_vertexListBuilder.addTriangleFan(vertices));
+        texture,
+        Renderer::PrimType::TriangleFan,
+        m_vertexListBuilder.addTriangleFan(vertices));
   }
 
   /**
@@ -218,12 +203,11 @@ public:
    * @param texture the texture to use
    * @param vertices the vertex positions
    */
-  void addTriangleStrip(const Texture* texture, const VertexList& vertices)
-  {
+  void addTriangleStrip(const Texture *texture, const VertexList &vertices) {
     add(
-      texture,
-      Renderer::PrimType::TriangleStrip,
-      m_vertexListBuilder.addTriangleStrip(vertices));
+        texture,
+        Renderer::PrimType::TriangleStrip,
+        m_vertexListBuilder.addTriangleStrip(vertices));
   }
 
   /**
@@ -236,12 +220,11 @@ public:
    * @param v4 the position of the fourth corner
    */
   void addQuad(
-    const Texture* texture,
-    const Vertex& v1,
-    const Vertex& v2,
-    const Vertex& v3,
-    const Vertex& v4)
-  {
+      const Texture *texture,
+      const Vertex &v1,
+      const Vertex &v2,
+      const Vertex &v3,
+      const Vertex &v4) {
     add(texture, Renderer::PrimType::Quads, m_vertexListBuilder.addQuad(v1, v2, v3, v4));
   }
 
@@ -252,8 +235,7 @@ public:
    * @param texture the texture to use
    * @param vertices the corner positions
    */
-  void addQuads(const Texture* texture, const VertexList& vertices)
-  {
+  void addQuads(const Texture *texture, const VertexList &vertices) {
     add(texture, Renderer::PrimType::Quads, m_vertexListBuilder.addQuads(vertices));
   }
 
@@ -263,10 +245,9 @@ public:
    * @param texture the texture to use
    * @param vertices the vertex positions
    */
-  void addQuadStrip(const Texture* texture, const VertexList& vertices)
-  {
+  void addQuadStrip(const Texture *texture, const VertexList &vertices) {
     add(
-      texture, Renderer::PrimType::QuadStrip, m_vertexListBuilder.addQuadStrip(vertices));
+        texture, Renderer::PrimType::QuadStrip, m_vertexListBuilder.addQuadStrip(vertices));
   }
 
   /**
@@ -275,14 +256,12 @@ public:
    * @param texture the texture to use
    * @param vertices the croner positions
    */
-  void addPolygon(const Texture* texture, const VertexList& vertices)
-  {
+  void addPolygon(const Texture *texture, const VertexList &vertices) {
     add(texture, Renderer::PrimType::Polygon, m_vertexListBuilder.addPolygon(vertices));
   }
 
 private:
-  void add(const Texture* texture, const PrimType primType, const IndexData& data)
-  {
+  void add(const Texture *texture, const PrimType primType, const IndexData &data) {
     m_indexRange.add(texture, primType, data.index, data.count);
   }
 };

@@ -36,20 +36,15 @@
 #include <ostream>
 #include <string>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 
 kdl_reflect_impl(PaletteData);
 
-std::ostream& operator<<(std::ostream& lhs, const PaletteColorFormat rhs)
-{
-  switch (rhs)
-  {
-  case PaletteColorFormat::Rgb:
-    lhs << "Rgb";
+std::ostream &operator<<(std::ostream &lhs, const PaletteColorFormat rhs) {
+  switch (rhs) {
+  case PaletteColorFormat::Rgb:lhs << "Rgb";
     break;
-  case PaletteColorFormat::Rgba:
-    lhs << "Rgba";
+  case PaletteColorFormat::Rgba:lhs << "Rgba";
     break;
     switchDefault();
   }
@@ -58,105 +53,89 @@ std::ostream& operator<<(std::ostream& lhs, const PaletteColorFormat rhs)
 }
 
 Palette::Palette(std::shared_ptr<PaletteData> data)
-  : m_data{std::move(data)}
-{
+    : m_data{std::move(data)} {
 }
 
 bool Palette::indexedToRgba(
-  IO::Reader& reader,
-  const size_t pixelCount,
-  TextureBuffer& rgbaImage,
-  const PaletteTransparency transparency,
-  Color& averageColor) const
-{
-  ensure(rgbaImage.size() == 4 * pixelCount, "incorrect destination buffer size");
+    IO::Reader &reader,
+    const size_t pixelCount,
+    TextureBuffer &rgbaImage,
+    const PaletteTransparency transparency,
+    Color &averageColor) const {
+  ensure(rgbaImage.size()==4*pixelCount, "incorrect destination buffer size");
 
-  const unsigned char* paletteData = (transparency == PaletteTransparency::Opaque)
-                                       ? m_data->opaqueData.data()
-                                       : m_data->index255TransparentData.data();
+  const unsigned char *paletteData = (transparency==PaletteTransparency::Opaque)
+                                     ? m_data->opaqueData.data()
+                                     : m_data->index255TransparentData.data();
 
   // Write rgba pixels
-  auto* const rgbaData = rgbaImage.data();
-  for (size_t i = 0; i < pixelCount; ++i)
-  {
+  auto *const rgbaData = rgbaImage.data();
+  for (size_t i = 0; i < pixelCount; ++i) {
     const int index = reader.readInt<unsigned char>();
 
-    std::memcpy(rgbaData + (i * 4), &paletteData[index * 4], 4);
+    std::memcpy(rgbaData + (i*4), &paletteData[index*4], 4);
   }
 
   // Check average color
   uint32_t colorSum[3] = {0, 0, 0};
-  for (size_t i = 0; i < pixelCount; ++i)
-  {
-    colorSum[0] += uint32_t(rgbaData[(i * 4) + 0]);
-    colorSum[1] += uint32_t(rgbaData[(i * 4) + 1]);
-    colorSum[2] += uint32_t(rgbaData[(i * 4) + 2]);
+  for (size_t i = 0; i < pixelCount; ++i) {
+    colorSum[0] += uint32_t(rgbaData[(i*4) + 0]);
+    colorSum[1] += uint32_t(rgbaData[(i*4) + 1]);
+    colorSum[2] += uint32_t(rgbaData[(i*4) + 2]);
   }
   averageColor = Color{
-    float(colorSum[0]) / (255.0f * float(pixelCount)),
-    float(colorSum[1]) / (255.0f * float(pixelCount)),
-    float(colorSum[2]) / (255.0f * float(pixelCount)),
-    1.0f};
+      float(colorSum[0])/(255.0f*float(pixelCount)),
+      float(colorSum[1])/(255.0f*float(pixelCount)),
+      float(colorSum[2])/(255.0f*float(pixelCount)),
+      1.0f};
 
   // Check for transparency
   auto hasTransparency = false;
-  if (transparency == PaletteTransparency::Index255Transparent)
-  {
+  if (transparency==PaletteTransparency::Index255Transparent) {
     // Take the bitwise AND of the alpha channel of all pixels
     unsigned char andAlpha = 0xFF;
-    for (size_t i = 0; i < pixelCount; ++i)
-    {
-      andAlpha = static_cast<unsigned char>(andAlpha & rgbaData[4 * i + 3]);
+    for (size_t i = 0; i < pixelCount; ++i) {
+      andAlpha = static_cast<unsigned char>(andAlpha & rgbaData[4*i + 3]);
     }
-    hasTransparency = (andAlpha != 0xFF);
+    hasTransparency = (andAlpha!=0xFF);
   }
 
   return hasTransparency;
 }
 
-bool operator==(const Palette& lhs, const Palette& rhs)
-{
-  return lhs.m_data == rhs.m_data || *lhs.m_data == *rhs.m_data;
+bool operator==(const Palette &lhs, const Palette &rhs) {
+  return lhs.m_data==rhs.m_data || *lhs.m_data==*rhs.m_data;
 }
 
-bool operator!=(const Palette& lhs, const Palette& rhs)
-{
-  return !(lhs == rhs);
+bool operator!=(const Palette &lhs, const Palette &rhs) {
+  return !(lhs==rhs);
 }
 
-std::ostream& operator<<(std::ostream& lhs, const Palette& rhs)
-{
+std::ostream &operator<<(std::ostream &lhs, const Palette &rhs) {
   auto str = kdl::struct_stream{lhs};
   str << "Palette"
       << "m_data";
-  if (rhs.m_data)
-  {
+  if (rhs.m_data) {
     str << *rhs.m_data;
-  }
-  else
-  {
+  } else {
     str << "nullptr";
   }
   return lhs;
 }
 
-
 Result<Palette> makePalette(
-  const std::vector<unsigned char>& data, const PaletteColorFormat colorFormat)
-{
+    const std::vector<unsigned char> &data, const PaletteColorFormat colorFormat) {
   auto result = std::make_shared<PaletteData>();
 
-  switch (colorFormat)
-  {
+  switch (colorFormat) {
   case PaletteColorFormat::Rgb:
     // transform data to RGBA
-    result->opaqueData.reserve(data.size() / 3 * 4);
+    result->opaqueData.reserve(data.size()/3*4);
 
-    for (size_t i = 0; i < data.size() / 3; ++i)
-    {
-      const auto r = data[3 * i + 0];
-      const auto g = data[3 * i + 1];
-      const auto b = data[3 * i + 2];
+    for (size_t i = 0; i < data.size()/3; ++i) {
+      const auto r = data[3*i + 0];
+      const auto g = data[3*i + 1];
+      const auto b = data[3*i + 2];
 
       result->opaqueData.push_back(r);
       result->opaqueData.push_back(g);
@@ -164,8 +143,7 @@ Result<Palette> makePalette(
       result->opaqueData.push_back(0xFF);
     }
 
-    if (!result->opaqueData.empty())
-    {
+    if (!result->opaqueData.empty()) {
       // build index255TransparentData from opaqueData
       result->index255TransparentData = result->opaqueData;
       result->index255TransparentData.back() = 0;
@@ -181,29 +159,25 @@ Result<Palette> makePalette(
   return Palette{std::move(result)};
 }
 
-namespace
-{
+namespace {
 
-Result<Palette> loadLmp(IO::Reader& reader)
-{
+Result<Palette> loadLmp(IO::Reader &reader) {
   auto data = std::vector<unsigned char>(reader.size());
   reader.read(data.data(), data.size());
   return makePalette(data, PaletteColorFormat::Rgb);
 }
 
-Result<Palette> loadPcx(IO::Reader& reader)
-{
+Result<Palette> loadPcx(IO::Reader &reader) {
   auto data = std::vector<unsigned char>(768);
   reader.seekFromEnd(data.size());
   reader.read(data.data(), data.size());
   return makePalette(data, PaletteColorFormat::Rgb);
 }
 
-Result<Palette> loadBmp(IO::Reader& reader)
-{
+Result<Palette> loadBmp(IO::Reader &reader) {
   auto bufferedReader = reader.buffer();
   auto imageLoader =
-    IO::ImageLoader{IO::ImageLoader::BMP, bufferedReader.begin(), bufferedReader.end()};
+      IO::ImageLoader{IO::ImageLoader::BMP, bufferedReader.begin(), bufferedReader.end()};
   auto data = imageLoader.hasPalette() ? imageLoader.loadPalette()
                                        : imageLoader.loadPixels(IO::ImageLoader::RGB);
   return makePalette(data, PaletteColorFormat::Rgb);
@@ -211,46 +185,37 @@ Result<Palette> loadBmp(IO::Reader& reader)
 
 } // namespace
 
-Result<Palette> loadPalette(const IO::File& file, const std::filesystem::path& path)
-{
-  try
-  {
+Result<Palette> loadPalette(const IO::File &file, const std::filesystem::path &path) {
+  try {
     const auto extension = kdl::str_to_lower(path.extension().string());
-    if (extension == ".lmp")
-    {
+    if (extension==".lmp") {
       auto reader = file.reader().buffer();
       return loadLmp(reader);
     }
-    if (extension == ".pcx")
-    {
+    if (extension==".pcx") {
       auto reader = file.reader().buffer();
       return loadPcx(reader);
     }
-    if (extension == ".bmp")
-    {
+    if (extension==".bmp") {
       auto reader = file.reader().buffer();
       return loadBmp(reader);
     }
 
     return Error{
-      "Could not load palette file '" + path.string() + "': Unknown palette format"};
+        "Could not load palette file '" + path.string() + "': Unknown palette format"};
   }
-  catch (const Exception& e)
-  {
+  catch (const Exception &e) {
     return Error{"Could not load palette file '" + path.string() + "': " + e.what()};
   }
 }
 
-Result<Palette> loadPalette(IO::Reader& reader, const PaletteColorFormat colorFormat)
-{
-  try
-  {
+Result<Palette> loadPalette(IO::Reader &reader, const PaletteColorFormat colorFormat) {
+  try {
     auto data = std::vector<unsigned char>(reader.size());
     reader.read(data.data(), data.size());
     return makePalette(data, colorFormat);
   }
-  catch (const Exception& e)
-  {
+  catch (const Exception &e) {
     using namespace std::string_literals;
     return Error{"Could not load palette: "s + e.what()};
   }

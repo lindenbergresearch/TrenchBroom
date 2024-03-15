@@ -31,24 +31,19 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Palette;
 class Texture;
 } // namespace Assets
 
-namespace IO
-{
+namespace IO {
 class FileSystem;
 class Reader;
 
-class Bsp29Parser : public EntityModelParser
-{
+class Bsp29Parser : public EntityModelParser {
 private:
-  struct TextureInfo
-  {
+  struct TextureInfo {
     vm::vec3f sAxis;
     vm::vec3f tAxis;
     float sOffset;
@@ -57,14 +52,12 @@ private:
   };
   using TextureInfoList = std::vector<TextureInfo>;
 
-  struct EdgeInfo
-  {
+  struct EdgeInfo {
     size_t vertexIndex1, vertexIndex2;
   };
   using EdgeInfoList = std::vector<EdgeInfo>;
 
-  struct FaceInfo
-  {
+  struct FaceInfo {
     size_t edgeIndex;
     size_t edgeCount;
     size_t textureInfoIndex;
@@ -74,25 +67,25 @@ private:
   using FaceEdgeIndexList = std::vector<int>;
 
   std::string m_name;
-  const Reader& m_reader;
+  const Reader &m_reader;
   const Assets::Palette m_palette;
-  const FileSystem& m_fs;
+  const FileSystem &m_fs;
 
 public:
   Bsp29Parser(
-    std::string name,
-    const Reader& reader,
-    Assets::Palette palette,
-    const FileSystem& fs);
+      std::string name,
+      const Reader &reader,
+      Assets::Palette palette,
+      const FileSystem &fs);
 
-  static bool canParse(const std::filesystem::path& path, Reader reader);
+  static bool canParse(const std::filesystem::path &path, Reader reader);
 
 private:
-  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger& logger) override;
+  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
   void doLoadFrame(
-    size_t frameIndex, Assets::EntityModel& model, Logger& logger) override;
+      size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 
-  std::vector<Assets::Texture> parseTextures(Reader reader, Logger& logger);
+  std::vector<Assets::Texture> parseTextures(Reader reader, Logger &logger);
   TextureInfoList parseTextureInfos(Reader reader, size_t textureInfoCount);
   std::vector<vm::vec3f> parseVertices(Reader reader, size_t vertexCount);
   EdgeInfoList parseEdgeInfos(Reader reader, size_t edgeInfoCount);
@@ -100,18 +93,18 @@ private:
   FaceEdgeIndexList parseFaceEdges(Reader reader, size_t faceEdgeCount);
 
   void parseFrame(
-    Reader reader,
-    size_t frameIndex,
-    Assets::EntityModel& model,
-    const TextureInfoList& textureInfos,
-    const std::vector<vm::vec3f>& vertices,
-    const EdgeInfoList& edgeInfos,
-    const FaceInfoList& faceInfos,
-    const FaceEdgeIndexList& faceEdges);
+      Reader reader,
+      size_t frameIndex,
+      Assets::EntityModel &model,
+      const TextureInfoList &textureInfos,
+      const std::vector<vm::vec3f> &vertices,
+      const EdgeInfoList &edgeInfos,
+      const FaceInfoList &faceInfos,
+      const FaceEdgeIndexList &faceEdges);
   vm::vec2f textureCoords(
-    const vm::vec3f& vertex,
-    const TextureInfo& textureInfo,
-    const Assets::Texture* texture) const;
+      const vm::vec3f &vertex,
+      const TextureInfo &textureInfo,
+      const Assets::Texture *texture) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

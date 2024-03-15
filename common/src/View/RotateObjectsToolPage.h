@@ -35,10 +35,8 @@ class QComboBox;
 
 class QPushButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
 
 class RotateObjectsTool;
@@ -47,34 +45,33 @@ class Selection;
 
 class SpinControl;
 
-class RotateObjectsToolPage : public QWidget
-{
-  Q_OBJECT
+class RotateObjectsToolPage : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
-  RotateObjectsTool& m_tool;
+  RotateObjectsTool &m_tool;
 
-  QComboBox* m_recentlyUsedCentersList;
-  QPushButton* m_resetCenterButton;
+  QComboBox *m_recentlyUsedCentersList;
+  QPushButton *m_resetCenterButton;
 
-  SpinControl* m_angle;
-  QComboBox* m_axis;
-  QPushButton* m_rotateButton;
-  QCheckBox* m_updateAnglePropertyAfterTransformCheckBox;
+  SpinControl *m_angle;
+  QComboBox *m_axis;
+  QPushButton *m_rotateButton;
+  QCheckBox *m_updateAnglePropertyAfterTransformCheckBox;
 
   NotifierConnection m_notifierConnection;
 
 public:
   RotateObjectsToolPage(
-    std::weak_ptr<MapDocument> document,
-    RotateObjectsTool& tool,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      RotateObjectsTool &tool,
+      QWidget *parent = nullptr);
 
   void setAxis(vm::axis::type axis);
 
-  void setRecentlyUsedCenters(const std::vector<vm::vec3>& centers);
+  void setRecentlyUsedCenters(const std::vector<vm::vec3> &centers);
 
-  void setCurrentCenter(const vm::vec3& center);
+  void setCurrentCenter(const vm::vec3 &center);
 
 private:
   void connectObservers();
@@ -83,9 +80,9 @@ private:
 
   void updateGui();
 
-  void selectionDidChange(const Selection& selection);
+  void selectionDidChange(const Selection &selection);
 
-  void documentWasNewedOrLoaded(MapDocument* document);
+  void documentWasNewedOrLoaded(MapDocument *document);
 
   void centerChanged();
 

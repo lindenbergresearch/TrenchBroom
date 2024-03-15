@@ -24,10 +24,8 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class FaceInspector;
 
 class EntityInspector;
@@ -44,37 +42,35 @@ class SyncHeightEventFilter;
 
 class TabBook;
 
-enum class InspectorPage
-{
+enum class InspectorPage {
   Map = 0,
   Face = 1,
   Entity = 2
 };
 
-class Inspector : public QWidget
-{
-  Q_OBJECT
+class Inspector : public QWidget {
+Q_OBJECT
 private:
-  QTabWidget* m_tabs;
-  MapInspector* m_mapInspector;
-  EntityInspector* m_entityInspector;
-  FaceInspector* m_faceInspector;
+  QTabWidget *m_tabs;
+  MapInspector *m_mapInspector;
+  EntityInspector *m_entityInspector;
+  FaceInspector *m_faceInspector;
 
-  SyncHeightEventFilter* m_syncTabBarEventFilter;
+  SyncHeightEventFilter *m_syncTabBarEventFilter;
 
 public:
   Inspector(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document,
+      GLContextManager &contextManager,
+      QWidget *parent = nullptr);
 
-  void connectTopWidgets(MapViewBar* mapViewBar);
+  void connectTopWidgets(MapViewBar *mapViewBar);
 
   void switchToPage(InspectorPage page);
 
   bool cancelMouseDrag();
 
-  FaceInspector* faceInspector();
+  FaceInspector *faceInspector();
 };
 } // namespace View
 } // namespace TrenchBroom

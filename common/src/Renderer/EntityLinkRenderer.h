@@ -26,31 +26,28 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom::View
-{
- class MapDocument; // FIXME: Renderer should not depend on View
+namespace TrenchBroom::View {
+class MapDocument; // FIXME: Renderer should not depend on View
 }
 
-namespace TrenchBroom::Renderer
-{
+namespace TrenchBroom::Renderer {
 
-class EntityLinkRenderer : public LinkRenderer
-{
- std::weak_ptr<View::MapDocument> m_document;
+class EntityLinkRenderer : public LinkRenderer {
+  std::weak_ptr<View::MapDocument> m_document;
 
- Color m_defaultColor = {0.5f, 1.0f, 0.5f, 1.0f};
- Color m_selectedColor = {1.0f, 0.0f, 0.0f, 1.0f};
+  Color m_defaultColor = {0.5f, 1.0f, 0.5f, 1.0f};
+  Color m_selectedColor = {1.0f, 0.0f, 0.0f, 1.0f};
 
 public:
- explicit EntityLinkRenderer(std::weak_ptr<View::MapDocument> document);
+  explicit EntityLinkRenderer(std::weak_ptr<View::MapDocument> document);
 
- void setDefaultColor(const Color& color);
- void setSelectedColor(const Color& color);
+  void setDefaultColor(const Color &color);
+  void setSelectedColor(const Color &color);
 
 private:
- std::vector<LinkRenderer::LineVertex> getLinks() override;
+  std::vector<LinkRenderer::LineVertex> getLinks() override;
 
- deleteCopy(EntityLinkRenderer);
+deleteCopy(EntityLinkRenderer);
 };
 
 } // namespace TrenchBroom::Renderer

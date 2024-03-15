@@ -21,10 +21,8 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
-class TrenchBroomStackWalker
-{
+namespace TrenchBroom {
+class TrenchBroomStackWalker {
 public:
 #if defined(_WIN32) && defined(_MSC_VER)
   static std::string getStackTraceFromContext(void* context);

@@ -25,36 +25,32 @@ class QLabel;
 
 class QPixmap;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class ElidedLabel;
 
-class ImageListBoxItemRenderer : public ControlListBoxItemRenderer
-{
-  Q_OBJECT
+class ImageListBoxItemRenderer : public ControlListBoxItemRenderer {
+Q_OBJECT
 private:
-  ElidedLabel* m_titleLabel;
-  ElidedLabel* m_subtitleLabel;
-  QLabel* m_imageLabel;
+  ElidedLabel *m_titleLabel;
+  ElidedLabel *m_subtitleLabel;
+  QLabel *m_imageLabel;
 
 public:
   ImageListBoxItemRenderer(
-    const QString& title, const QString& subtitle, const QPixmap& image, QWidget* parent);
+      const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent);
 
   void updateItem() override;
 };
 
-class ImageListBox : public ControlListBox
-{
-  Q_OBJECT
+class ImageListBox : public ControlListBox {
+Q_OBJECT
 public:
   explicit ImageListBox(
-    const QString& emptyText, bool showSeparator, QWidget* parent = nullptr);
+      const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
 private:
-  ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
+  ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;
 
 private:
   friend class ImageListBoxItemRenderer;

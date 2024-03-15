@@ -30,12 +30,9 @@
 #include <variant>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace EL
-{
-class NullType
-{
+namespace TrenchBroom {
+namespace EL {
+class NullType {
 private:
   NullType();
 
@@ -43,8 +40,7 @@ public:
   static const NullType Value;
 };
 
-class UndefinedType
-{
+class UndefinedType {
 private:
   UndefinedType();
 
@@ -52,18 +48,17 @@ public:
   static const UndefinedType Value;
 };
 
-class Value
-{
+class Value {
 private:
   using VariantType = std::variant<
-    BooleanType,
-    StringType,
-    NumberType,
-    ArrayType,
-    MapType,
-    RangeType,
-    NullType,
-    UndefinedType>;
+      BooleanType,
+      StringType,
+      NumberType,
+      ArrayType,
+      MapType,
+      RangeType,
+      NullType,
+      UndefinedType>;
   std::shared_ptr<VariantType> m_value;
   std::optional<Expression> m_expression;
 
@@ -77,7 +72,7 @@ public:
 
   explicit Value(StringType value, std::optional<Expression> expression = std::nullopt);
 
-  explicit Value(const char* value, std::optional<Expression> expression = std::nullopt);
+  explicit Value(const char *value, std::optional<Expression> expression = std::nullopt);
 
   explicit Value(NumberType value, std::optional<Expression> expression = std::nullopt);
 
@@ -96,7 +91,7 @@ public:
   explicit Value(NullType value, std::optional<Expression> expression = std::nullopt);
 
   explicit Value(
-    UndefinedType value, std::optional<Expression> expression = std::nullopt);
+      UndefinedType value, std::optional<Expression> expression = std::nullopt);
 
   Value(Value value, std::optional<Expression> expression);
 
@@ -104,9 +99,8 @@ public:
 
   bool hasType(ValueType type) const;
 
-  template <typename... T>
-  bool hasType(const T... types) const
-  {
+  template<typename... T>
+  bool hasType(const T... types) const {
     return (... || hasType(types));
   }
 
@@ -114,25 +108,25 @@ public:
 
   std::string describe() const;
 
-  const std::optional<Expression>& expression() const;
+  const std::optional<Expression> &expression() const;
 
   size_t line() const;
 
   size_t column() const;
 
-  const BooleanType& booleanValue() const;
+  const BooleanType &booleanValue() const;
 
-  const StringType& stringValue() const;
+  const StringType &stringValue() const;
 
-  const NumberType& numberValue() const;
+  const NumberType &numberValue() const;
 
   IntegerType integerValue() const;
 
-  const ArrayType& arrayValue() const;
+  const ArrayType &arrayValue() const;
 
-  const MapType& mapValue() const;
+  const MapType &mapValue() const;
 
-  const RangeType& rangeValue() const;
+  const RangeType &rangeValue() const;
 
   const std::vector<std::string> asStringList() const;
 
@@ -149,31 +143,31 @@ public:
   std::string asString(bool multiline = false) const;
 
   void appendToStream(
-    std::ostream& str, bool multiline = true, const std::string& indent = "") const;
+      std::ostream &str, bool multiline = true, const std::string &indent = "") const;
 
-  bool contains(const Value& indexValue) const;
+  bool contains(const Value &indexValue) const;
 
   bool contains(size_t index) const;
 
-  bool contains(const std::string& key) const;
+  bool contains(const std::string &key) const;
 
   std::vector<std::string> keys() const;
 
-  Value operator[](const Value& indexValue) const;
+  Value operator[](const Value &indexValue) const;
 
   Value operator[](size_t index) const;
 
   Value operator[](int index) const;
 
-  Value operator[](const std::string& key) const;
+  Value operator[](const std::string &key) const;
 
-  Value operator[](const char* key) const;
+  Value operator[](const char *key) const;
 
-  friend bool operator==(const Value& lhs, const Value& rhs);
+  friend bool operator==(const Value &lhs, const Value &rhs);
 
-  friend bool operator!=(const Value& lhs, const Value& rhs);
+  friend bool operator!=(const Value &lhs, const Value &rhs);
 
-  friend std::ostream& operator<<(std::ostream& lhs, const Value& rhs);
+  friend std::ostream &operator<<(std::ostream &lhs, const Value &rhs);
 };
 } // namespace EL
 } // namespace TrenchBroom

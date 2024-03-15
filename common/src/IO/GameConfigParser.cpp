@@ -41,44 +41,36 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::IO
-{
-namespace
-{
-std::string prependDot(const std::string& extension)
-{
-  return !extension.empty() && extension.front() != '.' ? "." + extension : extension;
+namespace TrenchBroom::IO {
+namespace {
+std::string prependDot(const std::string &extension) {
+  return !extension.empty() && extension.front()!='.' ? "." + extension : extension;
 }
 
-std::vector<std::string> prependDot(const std::vector<std::string>& extensions)
-{
+std::vector<std::string> prependDot(const std::vector<std::string> &extensions) {
   return kdl::vec_transform(
-    extensions, [](const auto& extension) { return prependDot(extension); });
+      extensions, [](const auto &extension) { return prependDot(extension); });
 }
 
-void checkVersion(const EL::Value& version)
-{
+void checkVersion(const EL::Value &version) {
   const auto validVsns = std::vector<EL::IntegerType>{7, 8};
   const auto isValidVersion =
-    version.convertibleTo(EL::ValueType::Number)
-    && std::find(validVsns.begin(), validVsns.end(), version.integerValue())
-         != validVsns.end();
+      version.convertibleTo(EL::ValueType::Number)
+          && std::find(validVsns.begin(), validVsns.end(), version.integerValue())
+              !=validVsns.end();
 
-  if (!isValidVersion)
-  {
+  if (!isValidVersion) {
     throw ParserException{
-      version.line(),
-      version.column(),
-      " Unsupported game configuration version "
-        + version.convertTo(EL::ValueType::String).stringValue()
-        + "; valid versions are: " + kdl::str_join(validVsns, ", ")};
+        version.line(),
+        version.column(),
+        " Unsupported game configuration version "
+            + version.convertTo(EL::ValueType::String).stringValue()
+            + "; valid versions are: " + kdl::str_join(validVsns, ", ")};
   }
 }
 
-std::vector<Model::CompilationTool> parseCompilationTools(const EL::Value& value)
-{
-  if (value == EL::Value::Null)
-  {
+std::vector<Model::CompilationTool> parseCompilationTools(const EL::Value &value) {
+  if (value==EL::Value::Null) {
     return {};
   }
 
@@ -87,27 +79,23 @@ std::vector<Model::CompilationTool> parseCompilationTools(const EL::Value& value
   auto result = std::vector<Model::CompilationTool>{};
   result.reserve(value.length());
 
-  for (size_t i = 0; i < value.length(); ++i)
-  {
+  for (size_t i = 0; i < value.length(); ++i) {
     expectStructure(
-      value[i],
-      R"([
+        value[i],
+        R"([
         {'name': 'String'},
         {'description': 'String'}
       ])");
 
-    if (value[i]["description"] != EL::Value::Null)
-    {
+    if (value[i]["description"]!=EL::Value::Null) {
       result.push_back(Model::CompilationTool{
-        value[i]["name"].stringValue(),
-        value[i]["description"].stringValue(),
+          value[i]["name"].stringValue(),
+          value[i]["description"].stringValue(),
       });
-    }
-    else
-    {
+    } else {
       result.push_back(Model::CompilationTool{
-        value[i]["name"].stringValue(),
-        std::nullopt,
+          value[i]["name"].stringValue(),
+          std::nullopt,
       });
     }
   }
@@ -115,95 +103,75 @@ std::vector<Model::CompilationTool> parseCompilationTools(const EL::Value& value
   return result;
 }
 
-std::optional<vm::bbox3> parseSoftMapBounds(const EL::Value& value)
-{
-  if (value == EL::Value::Null)
-  {
+std::optional<vm::bbox3> parseSoftMapBounds(const EL::Value &value) {
+  if (value==EL::Value::Null) {
     return std::nullopt;
   }
 
   const auto bounds = parseSoftMapBoundsString(value.stringValue());
-  if (!bounds.has_value())
-  {
+  if (!bounds.has_value()) {
     // If a bounds is provided in the config, it must be valid
     throw ParserException{
-      value.line(),
-      value.column(),
-      "Can't parse soft map bounds '" + value.asString() + "'"};
+        value.line(),
+        value.column(),
+        "Can't parse soft map bounds '" + value.asString() + "'"};
   }
   return bounds;
 }
 
-std::vector<Model::TagAttribute> parseTagAttributes(const EL::Value& value)
-{
+std::vector<Model::TagAttribute> parseTagAttributes(const EL::Value &value) {
   auto result = std::vector<Model::TagAttribute>{};
-  if (value == EL::Value::Null)
-  {
+  if (value==EL::Value::Null) {
     return result;
   }
 
   result.reserve(value.length());
-  for (size_t i = 0; i < value.length(); ++i)
-  {
-    const auto& entry = value[i];
-    const auto& name = entry.stringValue();
+  for (size_t i = 0; i < value.length(); ++i) {
+    const auto &entry = value[i];
+    const auto &name = entry.stringValue();
 
-    if (name == Model::TagAttributes::Transparency.name())
-    {
+    if (name==Model::TagAttributes::Transparency.name()) {
       result.push_back(Model::TagAttributes::Transparency);
-    }
-    else
-    {
+    } else {
       throw ParserException{
-        entry.line(), entry.column(), "Unexpected tag attribute '" + name + "'"};
+          entry.line(), entry.column(), "Unexpected tag attribute '" + name + "'"};
     }
   }
 
   return result;
 }
 
-int parseFlagValue(const EL::Value& value, const Model::FlagsConfig& flags)
-{
+int parseFlagValue(const EL::Value &value, const Model::FlagsConfig &flags) {
   const auto flagSet = value.asStringSet();
   int flagValue = 0;
-  for (const std::string& currentName : flagSet)
-  {
+  for (const std::string &currentName : flagSet) {
     const auto currentValue = flags.flagValue(currentName);
     flagValue = flagValue | currentValue;
   }
   return flagValue;
 }
 
-void checkTagName(const EL::Value& nameValue, const std::vector<Model::SmartTag>& tags)
-{
-  const auto& name = nameValue.stringValue();
-  for (const auto& tag : tags)
-  {
-    if (tag.name() == name)
-    {
+void checkTagName(const EL::Value &nameValue, const std::vector<Model::SmartTag> &tags) {
+  const auto &name = nameValue.stringValue();
+  for (const auto &tag : tags) {
+    if (tag.name()==name) {
       throw ParserException{
-        nameValue.line(), nameValue.column(), "Duplicate tag '" + name + "'"};
+          nameValue.line(), nameValue.column(), "Duplicate tag '" + name + "'"};
     }
   }
 }
 
 void parseSurfaceParmTag(
-  std::string name, const EL::Value& value, std::vector<Model::SmartTag>& result)
-{
+    std::string name, const EL::Value &value, std::vector<Model::SmartTag> &result) {
   auto attribs = parseTagAttributes(value["attribs"]);
   auto matcher = std::unique_ptr<Model::SurfaceParmTagMatcher>{};
-  if (value["pattern"].type() == EL::ValueType::String)
-  {
+  if (value["pattern"].type()==EL::ValueType::String) {
     matcher =
-      std::make_unique<Model::SurfaceParmTagMatcher>(value["pattern"].stringValue());
-  }
-  else if (value["pattern"].type() == EL::ValueType::Array)
-  {
+        std::make_unique<Model::SurfaceParmTagMatcher>(value["pattern"].stringValue());
+  } else if (value["pattern"].type()==EL::ValueType::Array) {
     matcher =
-      std::make_unique<Model::SurfaceParmTagMatcher>(value["pattern"].asStringSet());
-  }
-  else
-  {
+        std::make_unique<Model::SurfaceParmTagMatcher>(value["pattern"].asStringSet());
+  } else {
     // Generate the type exception specifying Array as the
     // expected type, since String is really a legacy type for
     // backward compatibility.
@@ -213,114 +181,94 @@ void parseSurfaceParmTag(
 }
 
 void parseFaceTags(
-  const EL::Value& value,
-  const Model::FaceAttribsConfig& faceAttribsConfig,
-  std::vector<Model::SmartTag>& result)
-{
-  if (value == EL::Value::Null)
-  {
+    const EL::Value &value,
+    const Model::FaceAttribsConfig &faceAttribsConfig,
+    std::vector<Model::SmartTag> &result) {
+  if (value==EL::Value::Null) {
     return;
   }
 
-  for (size_t i = 0; i < value.length(); ++i)
-  {
-    const auto& entry = value[i];
+  for (size_t i = 0; i < value.length(); ++i) {
+    const auto &entry = value[i];
 
     expectStructure(
-      entry,
-      R"([
+        entry,
+        R"([
         {'name': 'String', 'match': 'String'},
         {'attribs': 'Array', 'pattern': 'String', 'flags': 'Array' }
       ])");
     checkTagName(entry["name"], result);
 
     const auto match = entry["match"].stringValue();
-    if (match == "texture")
-    {
+    if (match=="texture") {
       expectMapEntry(entry, "pattern", EL::ValueType::String);
       result.emplace_back(
-        entry["name"].stringValue(),
-        parseTagAttributes(entry["attribs"]),
-        std::make_unique<Model::TextureNameTagMatcher>(entry["pattern"].stringValue()));
-    }
-    else if (match == "surfaceparm")
-    {
+          entry["name"].stringValue(),
+          parseTagAttributes(entry["attribs"]),
+          std::make_unique<Model::TextureNameTagMatcher>(entry["pattern"].stringValue()));
+    } else if (match=="surfaceparm") {
       parseSurfaceParmTag(entry["name"].stringValue(), entry, result);
-    }
-    else if (match == "contentflag")
-    {
+    } else if (match=="contentflag") {
       expectMapEntry(entry, "flags", EL::ValueType::Array);
       result.emplace_back(
-        entry["name"].stringValue(),
-        parseTagAttributes(entry["attribs"]),
-        std::make_unique<Model::ContentFlagsTagMatcher>(
-          parseFlagValue(entry["flags"], faceAttribsConfig.contentFlags)));
-    }
-    else if (match == "surfaceflag")
-    {
+          entry["name"].stringValue(),
+          parseTagAttributes(entry["attribs"]),
+          std::make_unique<Model::ContentFlagsTagMatcher>(
+              parseFlagValue(entry["flags"], faceAttribsConfig.contentFlags)));
+    } else if (match=="surfaceflag") {
       expectMapEntry(entry, "flags", EL::ValueType::Array);
       result.emplace_back(
-        entry["name"].stringValue(),
-        parseTagAttributes(entry["attribs"]),
-        std::make_unique<Model::SurfaceFlagsTagMatcher>(
-          parseFlagValue(entry["flags"], faceAttribsConfig.surfaceFlags)));
-    }
-    else
-    {
+          entry["name"].stringValue(),
+          parseTagAttributes(entry["attribs"]),
+          std::make_unique<Model::SurfaceFlagsTagMatcher>(
+              parseFlagValue(entry["flags"], faceAttribsConfig.surfaceFlags)));
+    } else {
       throw ParserException{
-        entry.line(), entry.column(), "Unexpected smart tag match type '" + match + "'"};
+          entry.line(), entry.column(), "Unexpected smart tag match type '" + match + "'"};
     }
   }
 }
 
-void parseBrushTags(const EL::Value& value, std::vector<Model::SmartTag>& result)
-{
-  if (value == EL::Value::Null)
-  {
+void parseBrushTags(const EL::Value &value, std::vector<Model::SmartTag> &result) {
+  if (value==EL::Value::Null) {
     return;
   }
 
-  for (size_t i = 0; i < value.length(); ++i)
-  {
+  for (size_t i = 0; i < value.length(); ++i) {
     const auto entry = value[i];
 
     expectStructure(
-      entry,
-      R"([
+        entry,
+        R"([
         {'name': 'String', 'match': 'String'},
         {'attribs': 'Array', 'pattern': 'String', 'texture': 'String' }
       ])");
     checkTagName(entry["name"], result);
 
     const auto match = entry["match"].stringValue();
-    if (match == "classname")
-    {
+    if (match=="classname") {
       result.emplace_back(
-        entry["name"].stringValue(),
-        parseTagAttributes(entry["attribs"]),
-        std::make_unique<Model::EntityClassNameTagMatcher>(
-          entry["pattern"].stringValue(), entry["texture"].stringValue()));
-    }
-    else
-    {
+          entry["name"].stringValue(),
+          parseTagAttributes(entry["attribs"]),
+          std::make_unique<Model::EntityClassNameTagMatcher>(
+              entry["pattern"].stringValue(), entry["texture"].stringValue()));
+    } else {
       throw ParserException{
-        entry.line(), entry.column(), "Unexpected smart tag match type '" + match + "'"};
+          entry.line(), entry.column(), "Unexpected smart tag match type '" + match + "'"};
     }
   }
 }
 
 std::vector<Model::SmartTag> parseTags(
-  const EL::Value& value, const Model::FaceAttribsConfig& faceAttribsConfig)
-{
+    const EL::Value &value, const Model::FaceAttribsConfig &faceAttribsConfig) {
   auto result = std::vector<Model::SmartTag>{};
-  if (value == EL::Value::Null)
-  {
+  if (value==EL::Value::Null) {
     return result;
   }
 
   expectStructure(
-    value,
-    R"([
+      value,
+      R"([
       {},
       {'brush': 'Array', 'brushface': 'Array'}
     ])");
@@ -331,67 +279,55 @@ std::vector<Model::SmartTag> parseTags(
 }
 
 Model::BrushFaceAttributes parseFaceAttribsDefaults(
-  const EL::Value& value,
-  const Model::FlagsConfig& surfaceFlags,
-  const Model::FlagsConfig& contentFlags)
-{
+    const EL::Value &value,
+    const Model::FlagsConfig &surfaceFlags,
+    const Model::FlagsConfig &contentFlags) {
   auto defaults = Model::BrushFaceAttributes{Model::BrushFaceAttributes::NoTextureName};
-  if (value == EL::Value::Null)
-  {
+  if (value==EL::Value::Null) {
     return defaults;
   }
 
   expectStructure(
-    value,
-    R"([
+      value,
+      R"([
       {},
       {'textureName': 'String', 'offset': 'Array', 'scale': 'Array', 'rotation': 'Number', 'surfaceContents': 'Array', 'surfaceFlags': 'Array', 'surfaceValue': 'Number', 'color': 'String'}
     ])");
 
-  if (value["textureName"] != EL::Value::Null)
-  {
+  if (value["textureName"]!=EL::Value::Null) {
     defaults = Model::BrushFaceAttributes{value["textureName"].stringValue()};
   }
-  if (value["offset"] != EL::Value::Null && value["offset"].length() == 2)
-  {
+  if (value["offset"]!=EL::Value::Null && value["offset"].length()==2) {
     const auto offset = value["offset"];
     defaults.setOffset(vm::vec2f(offset[0].numberValue(), offset[1].numberValue()));
   }
-  if (value["scale"] != EL::Value::Null && value["scale"].length() == 2)
-  {
+  if (value["scale"]!=EL::Value::Null && value["scale"].length()==2) {
     const auto scale = value["scale"];
     defaults.setScale(vm::vec2f(scale[0].numberValue(), scale[1].numberValue()));
   }
-  if (value["rotation"] != EL::Value::Null)
-  {
+  if (value["rotation"]!=EL::Value::Null) {
     defaults.setRotation(float(value["rotation"].numberValue()));
   }
-  if (value["surfaceContents"] != EL::Value::Null)
-  {
+  if (value["surfaceContents"]!=EL::Value::Null) {
     int defaultSurfaceContents = 0;
-    for (size_t i = 0; i < value["surfaceContents"].length(); ++i)
-    {
+    for (size_t i = 0; i < value["surfaceContents"].length(); ++i) {
       auto name = value["surfaceContents"][i].stringValue();
       defaultSurfaceContents = defaultSurfaceContents | contentFlags.flagValue(name);
     }
     defaults.setSurfaceContents(defaultSurfaceContents);
   }
-  if (value["surfaceFlags"] != EL::Value::Null)
-  {
+  if (value["surfaceFlags"]!=EL::Value::Null) {
     int defaultSurfaceFlags = 0;
-    for (size_t i = 0; i < value["surfaceFlags"].length(); ++i)
-    {
+    for (size_t i = 0; i < value["surfaceFlags"].length(); ++i) {
       auto name = value["surfaceFlags"][i].stringValue();
       defaultSurfaceFlags = defaultSurfaceFlags | surfaceFlags.flagValue(name);
     }
     defaults.setSurfaceFlags(defaultSurfaceFlags);
   }
-  if (value["surfaceValue"] != EL::Value::Null)
-  {
+  if (value["surfaceValue"]!=EL::Value::Null) {
     defaults.setSurfaceValue(float(value["surfaceValue"].numberValue()));
   }
-  if (value["color"] != EL::Value::Null)
-  {
+  if (value["color"]!=EL::Value::Null) {
     defaults.setColor(Color::parse(value["color"].stringValue()).value_or(Color{}));
   }
 
@@ -399,68 +335,59 @@ Model::BrushFaceAttributes parseFaceAttribsDefaults(
 }
 
 void parseFlag(
-  const EL::Value& value, const size_t index, std::vector<Model::FlagConfig>& flags)
-{
-  if (value["unused"].booleanValue())
-  {
+    const EL::Value &value, const size_t index, std::vector<Model::FlagConfig> &flags) {
+  if (value["unused"].booleanValue()) {
     expectStructure(
-      value,
-      R"([
+        value,
+        R"([
         {},
         {'name': 'String', 'description': 'String', 'unused': 'Boolean'}
       ])");
-  }
-  else
-  {
+  } else {
     expectStructure(
-      value,
-      R"([
+        value,
+        R"([
       {'name': 'String'},
       {'description': 'String', 'unused': 'Boolean'}
       ])");
 
     flags.push_back(Model::FlagConfig{
-      value["name"].stringValue(),
-      value["description"].stringValue(),
-      1 << index,
+        value["name"].stringValue(),
+        value["description"].stringValue(),
+        1 << index,
     });
   }
 }
 
-Model::FlagsConfig parseFlagsConfig(const EL::Value& value)
-{
+Model::FlagsConfig parseFlagsConfig(const EL::Value &value) {
   using Model::GameConfig;
 
-  if (value == EL::Value::Null)
-  {
+  if (value==EL::Value::Null) {
     return {};
   }
 
   auto flags = std::vector<Model::FlagConfig>{};
   flags.reserve(value.length());
 
-  for (size_t i = 0; i < value.length(); ++i)
-  {
+  for (size_t i = 0; i < value.length(); ++i) {
     parseFlag(value[i], i, flags);
   }
 
   return Model::FlagsConfig{flags};
 }
 
-Model::FaceAttribsConfig parseFaceAttribsConfig(const EL::Value& value)
-{
-  if (value == EL::Value::Null)
-  {
+Model::FaceAttribsConfig parseFaceAttribsConfig(const EL::Value &value) {
+  if (value==EL::Value::Null) {
     return Model::FaceAttribsConfig{
-      {},
-      {},
-      Model::BrushFaceAttributes{Model::BrushFaceAttributes::NoTextureName},
+        {},
+        {},
+        Model::BrushFaceAttributes{Model::BrushFaceAttributes::NoTextureName},
     };
   }
 
   expectStructure(
-    value,
-    R"([
+      value,
+      R"([
       {'surfaceflags': 'Array', 'contentflags': 'Array'},
       {'defaults': 'Map'}
     ])");
@@ -470,66 +397,59 @@ Model::FaceAttribsConfig parseFaceAttribsConfig(const EL::Value& value)
   auto defaults = parseFaceAttribsDefaults(value["defaults"], surfaceFlags, contentFlags);
 
   return Model::FaceAttribsConfig{
-    std::move(surfaceFlags),
-    std::move(contentFlags),
-    defaults,
+      std::move(surfaceFlags),
+      std::move(contentFlags),
+      defaults,
   };
 }
 
-Model::EntityConfig parseEntityConfig(const EL::Value& value)
-{
+Model::EntityConfig parseEntityConfig(const EL::Value &value) {
   expectStructure(
-    value,
-    R"([
+      value,
+      R"([
       {'definitions': 'Array', 'defaultcolor': 'String'},
       // scale is an expression
       {'modelformats': 'Array', 'scale': '*', 'setDefaultProperties': 'Boolean'}
     ])");
 
   return Model::EntityConfig{
-    kdl::vec_transform(
-      value["definitions"].asStringList(),
-      [](const auto& str) { return std::filesystem::path{str}; }),
-    Color::parse(value["defaultcolor"].stringValue()).value_or(Color{}),
-    value["scale"].expression(),
-    value["setDefaultProperties"].booleanValue(),
+      kdl::vec_transform(
+          value["definitions"].asStringList(),
+          [](const auto &str) { return std::filesystem::path{str}; }),
+      Color::parse(value["defaultcolor"].stringValue()).value_or(Color{}),
+      value["scale"].expression(),
+      value["setDefaultProperties"].booleanValue(),
   };
 }
 
-Model::PackageFormatConfig parsePackageFormatConfig(const EL::Value& value)
-{
+Model::PackageFormatConfig parsePackageFormatConfig(const EL::Value &value) {
   expectMapEntry(value, "format", EL::typeForName("String"));
   const auto formatValue = value["format"];
   expectType(formatValue, EL::typeForName("String"));
 
-  if (value["extension"] != EL::Value::Null)
-  {
+  if (value["extension"]!=EL::Value::Null) {
     expectType(value["extension"], EL::typeForName("String"));
 
     return Model::PackageFormatConfig{
-      {prependDot(value["extension"].stringValue())},
-      formatValue.stringValue(),
+        {prependDot(value["extension"].stringValue())},
+        formatValue.stringValue(),
     };
-  }
-  else if (value["extensions"] != EL::Value::Null)
-  {
+  } else if (value["extensions"]!=EL::Value::Null) {
     expectType(value["extensions"], EL::typeForName("Array"));
 
     return Model::PackageFormatConfig{
-      prependDot(value["extensions"].asStringList()),
-      formatValue.stringValue(),
+        prependDot(value["extensions"].asStringList()),
+        formatValue.stringValue(),
     };
   }
   throw ParserException{
-    value.line(),
-    value.column(),
-    "Expected map entry 'extension' of type 'String' or 'extensions' of type 'Array'"};
+      value.line(),
+      value.column(),
+      "Expected map entry 'extension' of type 'String' or 'extensions' of type 'Array'"};
 }
 
-std::vector<std::string> parseTextureExtensions(const EL::Value& value)
-{
-  if (value["extensions"] != EL::Value::Null)
-  {
+std::vector<std::string> parseTextureExtensions(const EL::Value &value) {
+  if (value["extensions"]!=EL::Value::Null) {
     // version 8
     return prependDot(value["extensions"].asStringList());
   }
@@ -537,61 +457,57 @@ std::vector<std::string> parseTextureExtensions(const EL::Value& value)
   return parsePackageFormatConfig(value["format"]).extensions;
 }
 
-Model::TextureConfig parseTextureConfig(const EL::Value& value)
-{
+Model::TextureConfig parseTextureConfig(const EL::Value &value) {
   expectStructure(
-    value,
-    R"([
+      value,
+      R"([
       {'root': 'String'},
       {'extensions': 'String', 'format': 'Map', 'attribute': 'String', 'palette': 'String', 'shaderSearchPath': 'String', 'excludes': 'Array'}
     ])");
 
   return Model::TextureConfig{
-    std::filesystem::path{value["root"].stringValue()},
-    parseTextureExtensions(value),
-    std::filesystem::path{value["palette"].stringValue()},
-    value["attribute"] != EL::Value::Null
+      std::filesystem::path{value["root"].stringValue()},
+      parseTextureExtensions(value),
+      std::filesystem::path{value["palette"].stringValue()},
+      value["attribute"]!=EL::Value::Null
       ? std::optional{value["attribute"].stringValue()}
       : std::nullopt,
-    std::filesystem::path{value["shaderSearchPath"].stringValue()},
-    value["excludes"].asStringList(),
+      std::filesystem::path{value["shaderSearchPath"].stringValue()},
+      value["excludes"].asStringList(),
   };
 }
 
-Model::FileSystemConfig parseFileSystemConfig(const EL::Value& value)
-{
+Model::FileSystemConfig parseFileSystemConfig(const EL::Value &value) {
   expectStructure(
-    value,
-    R"([
+      value,
+      R"([
       {'searchpath': 'String', 'packageformat': 'Map'},
       {}
     ])");
 
   return Model::FileSystemConfig{
-    std::filesystem::path{value["searchpath"].stringValue()},
-    parsePackageFormatConfig(value["packageformat"]),
+      std::filesystem::path{value["searchpath"].stringValue()},
+      parsePackageFormatConfig(value["packageformat"]),
   };
 }
 
-std::vector<Model::MapFormatConfig> parseMapFormatConfigs(const EL::Value& value)
-{
+std::vector<Model::MapFormatConfig> parseMapFormatConfigs(const EL::Value &value) {
   expectType(value, EL::typeForName("Array"));
 
   auto result = std::vector<Model::MapFormatConfig>{};
   result.reserve(value.length());
 
-  for (size_t i = 0; i < value.length(); ++i)
-  {
+  for (size_t i = 0; i < value.length(); ++i) {
     expectStructure(
-      value[i],
-      R"([
+        value[i],
+        R"([
         {'format': 'String'},
         {'initialmap': 'String'}
       ])");
 
     result.push_back(Model::MapFormatConfig{
-      value[i]["format"].stringValue(),
-      std::filesystem::path{value[i]["initialmap"].stringValue()},
+        value[i]["format"].stringValue(),
+        std::filesystem::path{value[i]["initialmap"].stringValue()},
     });
   }
 
@@ -601,26 +517,23 @@ std::vector<Model::MapFormatConfig> parseMapFormatConfigs(const EL::Value& value
 } // namespace
 
 GameConfigParser::GameConfigParser(
-  std::string_view str, const std::filesystem::path& path)
-  : ConfigParserBase{std::move(str), path}
-  , m_version{0}
-{
+    std::string_view str, const std::filesystem::path &path)
+    : ConfigParserBase{std::move(str), path}, m_version{0} {
 }
 
-Model::GameConfig GameConfigParser::parse()
-{
+Model::GameConfig GameConfigParser::parse() {
   using Model::GameConfig;
 
   const auto root = parseConfigFile().evaluate(EL::EvaluationContext());
   expectType(root, EL::ValueType::Map);
 
-  const auto& version = root["version"];
+  const auto &version = root["version"];
   checkVersion(version);
   m_version = version.integerValue();
 
   expectStructure(
-    root,
-    R"([
+      root,
+      R"([
       {'version': 'Number', 'name': 'String', 'fileformats': 'Array', 'filesystem': 'Map', 'textures': 'Map', 'entities': 'Map'},
       {'icon': 'String', 'experimental': 'Boolean', 'faceattribs': 'Map', 'tags': 'Map', 'softMapBounds': 'String'}
     ])");
@@ -635,32 +548,29 @@ Model::GameConfig GameConfigParser::parse()
   auto compilationTools = parseCompilationTools(root["compilationTools"]);
 
   return {
-    root["name"].stringValue(),
-    m_path,
-    std::filesystem::path{root["icon"].stringValue()},
-    root["experimental"].booleanValue(),
-    std::move(mapFormatConfigs),
-    std::move(fileSystemConfig),
-    std::move(textureConfig),
-    std::move(entityConfig),
-    std::move(faceAttribsConfig),
-    std::move(tags),
-    std::move(softMapBounds),
-    std::move(compilationTools),
+      root["name"].stringValue(),
+      m_path,
+      std::filesystem::path{root["icon"].stringValue()},
+      root["experimental"].booleanValue(),
+      std::move(mapFormatConfigs),
+      std::move(fileSystemConfig),
+      std::move(textureConfig),
+      std::move(entityConfig),
+      std::move(faceAttribsConfig),
+      std::move(tags),
+      std::move(softMapBounds),
+      std::move(compilationTools),
   };
 }
 
-std::optional<vm::bbox3> parseSoftMapBoundsString(const std::string& string)
-{
-  if (const auto v = vm::parse<double, 6u>(string))
-  {
+std::optional<vm::bbox3> parseSoftMapBoundsString(const std::string &string) {
+  if (const auto v = vm::parse<double, 6u>(string)) {
     return vm::bbox3{{(*v)[0], (*v)[1], (*v)[2]}, {(*v)[3], (*v)[4], (*v)[5]}};
   }
   return std::nullopt;
 }
 
-std::string serializeSoftMapBoundsString(const vm::bbox3& bounds)
-{
+std::string serializeSoftMapBoundsString(const vm::bbox3 &bounds) {
   auto result = std::stringstream{};
   result << bounds.min << " " << bounds.max;
   return result.str();

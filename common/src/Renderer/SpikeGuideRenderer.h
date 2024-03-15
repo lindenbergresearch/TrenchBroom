@@ -30,23 +30,18 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Picker;
 }
 
-namespace View
-{
+namespace View {
 // FIXME: Renderer should not depend on View
 class MapDocument;
 } // namespace View
 
-namespace Renderer
-{
-class SpikeGuideRenderer : public DirectRenderable
-{
+namespace Renderer {
+class SpikeGuideRenderer : public DirectRenderable {
 private:
   Color m_color;
 
@@ -64,22 +59,22 @@ private:
 public:
   SpikeGuideRenderer();
 
-  void setColor(const Color& color);
+  void setColor(const Color &color);
 
   void add(
-    const vm::ray3& ray, FloatType length, std::shared_ptr<View::MapDocument> document);
+      const vm::ray3 &ray, FloatType length, std::shared_ptr<View::MapDocument> document);
 
   void clear();
 
 private:
-  void doPrepareVertices(VboManager& vboManager) override;
+  void doPrepareVertices(VboManager &vboManager) override;
 
-  void doRender(RenderContext& renderContext) override;
+  void doRender(RenderContext &renderContext) override;
 
 private:
-  void addPoint(const vm::vec3& position);
+  void addPoint(const vm::vec3 &position);
 
-  void addSpike(const vm::ray3& ray, FloatType length, FloatType maxLength);
+  void addSpike(const vm::ray3 &ray, FloatType length, FloatType maxLength);
 
   void validate();
 };

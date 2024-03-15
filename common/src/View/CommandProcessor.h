@@ -26,10 +26,8 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class Command;
 
 class CommandResult;
@@ -58,13 +56,12 @@ enum class TransactionScope;
  * or rolled back individually. Committing a nested transaction adds it as a command to
  * the containing transaction.
  */
-class CommandProcessor
-{
+class CommandProcessor {
 private:
   /**
    * The document to pass on to commands when they are executed or undone.
    */
-  MapDocumentCommandFacade* m_document;
+  MapDocumentCommandFacade *m_document;
 
   /**
    * Limits the time after which to succeeding commands can be collated.
@@ -107,49 +104,49 @@ public:
    * @param document the document to pass to commands, may be null
    */
   explicit CommandProcessor(
-    MapDocumentCommandFacade* document,
-    std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000});
+      MapDocumentCommandFacade *document,
+      std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000});
 
   ~CommandProcessor();
 
   /**
    * Notifies observers when a command is going to be executed.
    */
-  Notifier<Command&> commandDoNotifier;
+  Notifier<Command &> commandDoNotifier;
 
   /**
    * Notifies observers when a command was successfully executed.
    */
-  Notifier<Command&> commandDoneNotifier;
+  Notifier<Command &> commandDoneNotifier;
 
   /**
    * Notifies observers when a command failed to execute.
    */
-  Notifier<Command&> commandDoFailedNotifier;
+  Notifier<Command &> commandDoFailedNotifier;
 
   /**
    * Notifies observers when an undoable command is going to be undone.
    */
-  Notifier<UndoableCommand&> commandUndoNotifier;
+  Notifier<UndoableCommand &> commandUndoNotifier;
 
   /**
    * Notifies observers when an undoable command was successfully undone.
    */
-  Notifier<UndoableCommand&> commandUndoneNotifier;
+  Notifier<UndoableCommand &> commandUndoneNotifier;
 
   /**
    * Notifies observers when an undoable command failed to undo.
    */
-  Notifier<UndoableCommand&> commandUndoFailedNotifier;
+  Notifier<UndoableCommand &> commandUndoFailedNotifier;
 
   /**
    * Notifies observers when a transaction completed successfully.
    */
-  Notifier<const std::string&> transactionDoneNotifier;
+  Notifier<const std::string &> transactionDoneNotifier;
   /**
    * Notifies observers when a transaction was undone successfully.
    */
-  Notifier<const std::string&> transactionUndoneNotifier;
+  Notifier<const std::string &> transactionUndoneNotifier;
 
   /**
    * Indicates whether there is any command on the undo stack.
@@ -166,12 +163,12 @@ public:
    *
    * Precondition: canUndo() == true
    */
-  const std::string& undoCommandName() const;
+  const std::string &undoCommandName() const;
 
   /**
    * Returns the name of the command that will be executed when callind `redo`.
    */
-  const std::string& redoCommandName() const;
+  const std::string &redoCommandName() const;
 
   /**
    * Starts a new transaction. If a transaction is currently executing, then the newly
@@ -247,7 +244,7 @@ public:
    * @return the result of executing the given command
    */
   std::unique_ptr<CommandResult> executeAndStore(
-    std::unique_ptr<UndoableCommand> command);
+      std::unique_ptr<UndoableCommand> command);
 
   /**
    * Undoes the most recently executed command by calling its `performUndo` method and
@@ -292,7 +289,7 @@ private:
    * indicating whether the given command was stored on the undo stack
    */
   SubmitAndStoreResult executeAndStoreCommand(
-    std::unique_ptr<UndoableCommand> command, bool collate);
+      std::unique_ptr<UndoableCommand> command, bool collate);
 
   /**
    * Executes the given command by calling its `performDo` method and triggers the
@@ -301,7 +298,7 @@ private:
    * @param command the command to execute
    * @return the result of executing the given command
    */
-  std::unique_ptr<CommandResult> executeCommand(Command& command);
+  std::unique_ptr<CommandResult> executeCommand(Command &command);
 
   /**
    * Undoes the given command by calling its `performUndo` method and triggers the
@@ -310,7 +307,7 @@ private:
    * @param command the command to undo
    * @return the result of undoing the given command
    */
-  std::unique_ptr<CommandResult> undoCommand(UndoableCommand& command);
+  std::unique_ptr<CommandResult> undoCommand(UndoableCommand &command);
 
   /**
    * Stores the given command or collates it with the topmost command on the undo stack.
@@ -356,7 +353,7 @@ private:
    * @return the newly created command
    */
   std::unique_ptr<UndoableCommand> createTransaction(
-    std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands);
+      std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands);
 
   /**
    * Pushes the given command onto the undo stack, unless it can be collated with the

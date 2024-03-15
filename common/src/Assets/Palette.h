@@ -30,18 +30,15 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class File;
 class Reader;
 } // namespace TrenchBroom::IO
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class TextureBuffer;
 
-struct PaletteData
-{
+struct PaletteData {
   /**
    * 1024 bytes, RGBA order.
    */
@@ -54,22 +51,19 @@ struct PaletteData
   kdl_reflect_decl(PaletteData, opaqueData, index255TransparentData);
 };
 
-enum class PaletteTransparency
-{
+enum class PaletteTransparency {
   Opaque,
   Index255Transparent
 };
 
-enum class PaletteColorFormat
-{
+enum class PaletteColorFormat {
   Rgb,
   Rgba,
 };
 
-std::ostream& operator<<(std::ostream& lhs, PaletteColorFormat rhs);
+std::ostream &operator<<(std::ostream &lhs, PaletteColorFormat rhs);
 
-class Palette
-{
+class Palette {
 private:
   std::shared_ptr<PaletteData> m_data;
 
@@ -95,21 +89,21 @@ public:
    * @throws ReaderException if reader doesn't have pixelCount bytes available
    */
   bool indexedToRgba(
-    IO::Reader& reader,
-    size_t pixelCount,
-    TextureBuffer& rgbaImage,
-    PaletteTransparency transparency,
-    Color& averageColor) const;
+      IO::Reader &reader,
+      size_t pixelCount,
+      TextureBuffer &rgbaImage,
+      PaletteTransparency transparency,
+      Color &averageColor) const;
 
-  friend bool operator==(const Palette& lhs, const Palette& rhs);
-  friend bool operator!=(const Palette& lhs, const Palette& rhs);
-  friend std::ostream& operator<<(std::ostream& lhs, const Palette& rhs);
+  friend bool operator==(const Palette &lhs, const Palette &rhs);
+  friend bool operator!=(const Palette &lhs, const Palette &rhs);
+  friend std::ostream &operator<<(std::ostream &lhs, const Palette &rhs);
 };
 
 Result<Palette> makePalette(
-  const std::vector<unsigned char>& data, PaletteColorFormat colorFormat);
+    const std::vector<unsigned char> &data, PaletteColorFormat colorFormat);
 
-Result<Palette> loadPalette(const IO::File& file, const std::filesystem::path& path);
-Result<Palette> loadPalette(IO::Reader& reader, PaletteColorFormat colorFormat);
+Result<Palette> loadPalette(const IO::File &file, const std::filesystem::path &path);
+Result<Palette> loadPalette(IO::Reader &reader, PaletteColorFormat colorFormat);
 
 } // namespace TrenchBroom::Assets

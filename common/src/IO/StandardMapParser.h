@@ -33,14 +33,11 @@
 #include <tuple>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 class ParserStatus;
 
-namespace QuakeMapToken
-{
+namespace QuakeMapToken {
 using Type = unsigned int;
 static const Type Integer = 1 << 0;      // integer number
 static const Type Decimal = 1 << 1;      // decimal number
@@ -57,10 +54,9 @@ static const Type Eol = 1 << 11;         // end of line
 static const Type Number = Integer | Decimal;
 } // namespace QuakeMapToken
 
-class QuakeMapTokenizer : public Tokenizer<QuakeMapToken::Type>
-{
+class QuakeMapTokenizer : public Tokenizer<QuakeMapToken::Type> {
 private:
-  static const std::string& NumberDelim();
+  static const std::string &NumberDelim();
   bool m_skipEol;
 
 public:
@@ -72,8 +68,7 @@ private:
   Token emitToken() override;
 };
 
-class StandardMapParser : public MapParser, public Parser<QuakeMapToken::Type>
-{
+class StandardMapParser : public MapParser, public Parser<QuakeMapToken::Type> {
 private:
   using Token = QuakeMapTokenizer::Token;
   using EntityPropertyKeys = kdl::vector_set<std::string>;
@@ -97,54 +92,52 @@ public:
    * @param targetMapFormat the format to convert the created objects to
    */
   StandardMapParser(
-    std::string_view str,
-    Model::MapFormat sourceMapFormat,
-    Model::MapFormat targetMapFormat);
+      std::string_view str,
+      Model::MapFormat sourceMapFormat,
+      Model::MapFormat targetMapFormat);
 
   ~StandardMapParser() override;
 
 protected:
-  void parseEntities(ParserStatus& status);
-  void parseBrushesOrPatches(ParserStatus& status);
-  void parseBrushFaces(ParserStatus& status);
+  void parseEntities(ParserStatus &status);
+  void parseBrushesOrPatches(ParserStatus &status);
+  void parseBrushFaces(ParserStatus &status);
 
   void reset();
 
 private:
-  void parseEntity(ParserStatus& status);
+  void parseEntity(ParserStatus &status);
   void parseEntityProperty(
-    std::vector<Model::EntityProperty>& properties,
-    EntityPropertyKeys& keys,
-    ParserStatus& status);
+      std::vector<Model::EntityProperty> &properties,
+      EntityPropertyKeys &keys,
+      ParserStatus &status);
 
-  void parseBrushOrBrushPrimitiveOrPatch(ParserStatus& status);
-  void parseBrushPrimitive(ParserStatus& status, size_t startLine);
-  void parseBrush(ParserStatus& status, size_t startLine, bool primitive);
+  void parseBrushOrBrushPrimitiveOrPatch(ParserStatus &status);
+  void parseBrushPrimitive(ParserStatus &status, size_t startLine);
+  void parseBrush(ParserStatus &status, size_t startLine, bool primitive);
 
-  void parseFace(ParserStatus& status, bool primitive);
-  void parseQuakeFace(ParserStatus& status);
-  void parseQuake2Face(ParserStatus& status);
-  void parseQuake2ValveFace(ParserStatus& status);
-  void parseHexen2Face(ParserStatus& status);
-  void parseDaikatanaFace(ParserStatus& status);
-  void parseValveFace(ParserStatus& status);
-  void parsePrimitiveFace(ParserStatus& status);
+  void parseFace(ParserStatus &status, bool primitive);
+  void parseQuakeFace(ParserStatus &status);
+  void parseQuake2Face(ParserStatus &status);
+  void parseQuake2ValveFace(ParserStatus &status);
+  void parseHexen2Face(ParserStatus &status);
+  void parseDaikatanaFace(ParserStatus &status);
+  void parseValveFace(ParserStatus &status);
+  void parsePrimitiveFace(ParserStatus &status);
 
-  void parsePatch(ParserStatus& status, size_t startLine);
+  void parsePatch(ParserStatus &status, size_t startLine);
 
-  std::tuple<vm::vec3, vm::vec3, vm::vec3> parseFacePoints(ParserStatus& status);
-  std::string parseTextureName(ParserStatus& status);
+  std::tuple<vm::vec3, vm::vec3, vm::vec3> parseFacePoints(ParserStatus &status);
+  std::string parseTextureName(ParserStatus &status);
   std::tuple<vm::vec3, float, vm::vec3, float> parseValveTextureAxes(
-    ParserStatus& status);
-  std::tuple<vm::vec3, vm::vec3> parsePrimitiveTextureAxes(ParserStatus& status);
+      ParserStatus &status);
+  std::tuple<vm::vec3, vm::vec3> parsePrimitiveTextureAxes(ParserStatus &status);
 
-  template <size_t S = 3, typename T = FloatType>
-  vm::vec<T, S> parseFloatVector(const QuakeMapToken::Type o, const QuakeMapToken::Type c)
-  {
+  template<size_t S = 3, typename T = FloatType>
+  vm::vec<T, S> parseFloatVector(const QuakeMapToken::Type o, const QuakeMapToken::Type c) {
     expect(o, m_tokenizer.nextToken());
     vm::vec<T, S> vec;
-    for (size_t i = 0; i < S; i++)
-    {
+    for (size_t i = 0; i < S; i++) {
       vec[i] = expect(QuakeMapToken::Number, m_tokenizer.nextToken()).toFloat<T>();
     }
     expect(c, m_tokenizer.nextToken());

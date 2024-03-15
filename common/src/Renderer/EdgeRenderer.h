@@ -28,21 +28,17 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class BrushIndexArray;
 
 class BrushVertexArray;
 
 class RenderBatch;
 
-class EdgeRenderer
-{
+class EdgeRenderer {
 public:
-  struct Params
-  {
+  struct Params {
     float width;
     double offset;
     bool onTop;
@@ -51,102 +47,99 @@ public:
 
     Params(float i_width, double i_offset, bool i_onTop);
 
-    Params(float i_width, double i_offset, bool i_onTop, const Color& i_color);
+    Params(float i_width, double i_offset, bool i_onTop, const Color &i_color);
 
     Params(
-      float i_width,
-      double i_offset,
-      bool i_onTop,
-      bool i_useColor,
-      const Color& i_color);
+        float i_width,
+        double i_offset,
+        bool i_onTop,
+        bool i_useColor,
+        const Color &i_color);
   };
 
-  class RenderBase
-  {
+  class RenderBase {
   private:
     const Params m_params;
 
   public:
-    explicit RenderBase(const Params& params);
+    explicit RenderBase(const Params &params);
 
     virtual ~RenderBase();
 
   protected:
-    void renderEdges(RenderContext& renderContext);
+    void renderEdges(RenderContext &renderContext);
 
   private:
-    virtual void doRenderVertices(RenderContext& renderContext) = 0;
+    virtual void doRenderVertices(RenderContext &renderContext) = 0;
   };
 
 public:
   virtual ~EdgeRenderer();
 
   void render(
-    RenderBatch& renderBatch,
-    float width = pref(Preferences::EdgeLineWidth),
-    double offset = 0.0);
+      RenderBatch &renderBatch,
+      float width = pref(Preferences::EdgeLineWidth),
+      double offset = 0.0);
 
   void render(
-    RenderBatch& renderBatch,
-    const Color& color,
-    float width = pref(Preferences::EdgeLineWidth),
-    double offset = 0.0);
+      RenderBatch &renderBatch,
+      const Color &color,
+      float width = pref(Preferences::EdgeLineWidth),
+      double offset = 0.0);
 
   void render(
-    RenderBatch& renderBatch,
-    bool useColor,
-    const Color& color,
-    float width = pref(Preferences::EdgeLineWidth),
-    double offset = 0.0);
+      RenderBatch &renderBatch,
+      bool useColor,
+      const Color &color,
+      float width = pref(Preferences::EdgeLineWidth),
+      double offset = 0.0);
 
   void renderOnTop(
-    RenderBatch& renderBatch,
-    float width = pref(Preferences::EdgeLineWidth),
-    double offset = 0.2);
+      RenderBatch &renderBatch,
+      float width = pref(Preferences::EdgeLineWidth),
+      double offset = 0.2);
 
   void renderOnTop(
-    RenderBatch& renderBatch,
-    const Color& color,
-    float width = pref(Preferences::EdgeLineWidth),
-    double offset = 0.2);
+      RenderBatch &renderBatch,
+      const Color &color,
+      float width = pref(Preferences::EdgeLineWidth),
+      double offset = 0.2);
 
   void renderOnTop(
-    RenderBatch& renderBatch,
-    bool useColor,
-    const Color& color,
-    float width = pref(Preferences::EdgeLineWidth),
-    double offset = 0.2);
+      RenderBatch &renderBatch,
+      bool useColor,
+      const Color &color,
+      float width = pref(Preferences::EdgeLineWidth),
+      double offset = 0.2);
 
   void render(
-    RenderBatch& renderBatch,
-    bool useColor,
-    const Color& color,
-    bool onTop,
-    float width,
-    double offset);
+      RenderBatch &renderBatch,
+      bool useColor,
+      const Color &color,
+      bool onTop,
+      float width,
+      double offset);
 
 private:
-  virtual void doRender(RenderBatch& renderBatch, const Params& params) = 0;
+  virtual void doRender(RenderBatch &renderBatch, const Params &params) = 0;
 };
 
-class DirectEdgeRenderer : public EdgeRenderer
-{
+class DirectEdgeRenderer : public EdgeRenderer {
 private:
-  class Render : public RenderBase, public DirectRenderable
-  {
+  class Render : public RenderBase, public DirectRenderable {
   private:
     VertexArray m_vertexArray;
     IndexRangeMap m_indexRanges;
 
   public:
-    Render(const Params& params, VertexArray& vertexArray, IndexRangeMap& indexRanges);
+    Render(const Params &params, VertexArray &vertexArray, IndexRangeMap &indexRanges);
 
   private:
-    void doPrepareVertices(VboManager& vboManager) override;
+    void doPrepareVertices(VboManager &vboManager) override;
 
-    void doRender(RenderContext& renderContext) override;
+    void doRender(RenderContext &renderContext) override;
 
-    void doRenderVertices(RenderContext& renderContext) override;
+    void doRenderVertices(RenderContext &renderContext) override;
   };
 
 private:
@@ -161,30 +154,28 @@ public:
   DirectEdgeRenderer(VertexArray vertexArray, PrimType primType);
 
 private:
-  void doRender(RenderBatch& renderBatch, const EdgeRenderer::Params& params) override;
+  void doRender(RenderBatch &renderBatch, const EdgeRenderer::Params &params) override;
 };
 
-class IndexedEdgeRenderer : public EdgeRenderer
-{
+class IndexedEdgeRenderer : public EdgeRenderer {
 private:
-  class Render : public RenderBase, public IndexedRenderable
-  {
+  class Render : public RenderBase, public IndexedRenderable {
   private:
     std::shared_ptr<BrushVertexArray> m_vertexArray;
     std::shared_ptr<BrushIndexArray> m_indexArray;
 
   public:
     Render(
-      const Params& params,
-      std::shared_ptr<BrushVertexArray> vertexArray,
-      std::shared_ptr<BrushIndexArray> indexArray);
+        const Params &params,
+        std::shared_ptr<BrushVertexArray> vertexArray,
+        std::shared_ptr<BrushIndexArray> indexArray);
 
   private:
-    void prepareVerticesAndIndices(VboManager& vboManager) override;
+    void prepareVerticesAndIndices(VboManager &vboManager) override;
 
-    void doRender(RenderContext& renderContext) override;
+    void doRender(RenderContext &renderContext) override;
 
-    void doRenderVertices(RenderContext& renderContext) override;
+    void doRenderVertices(RenderContext &renderContext) override;
   };
 
 private:
@@ -195,11 +186,11 @@ public:
   IndexedEdgeRenderer();
 
   IndexedEdgeRenderer(
-    std::shared_ptr<BrushVertexArray> vertexArray,
-    std::shared_ptr<BrushIndexArray> indexArray);
+      std::shared_ptr<BrushVertexArray> vertexArray,
+      std::shared_ptr<BrushIndexArray> indexArray);
 
 private:
-  void doRender(RenderBatch& renderBatch, const EdgeRenderer::Params& params) override;
+  void doRender(RenderBatch &renderBatch, const EdgeRenderer::Params &params) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

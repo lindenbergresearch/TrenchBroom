@@ -23,15 +23,11 @@
 
 #include <cstddef>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-namespace HitType
-{
-Type freeType()
-{
-  static const std::size_t Bits = (sizeof(Type) * 8);
+namespace TrenchBroom {
+namespace Model {
+namespace HitType {
+Type freeType() {
+  static const std::size_t Bits = (sizeof(Type)*8);
   static std::size_t currentShift = 0;
 
   ensure(currentShift <= Bits, "No more hit types");

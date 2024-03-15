@@ -33,23 +33,19 @@ class QShortcut;
 class QSortFilterProxyModel;
 class QToolButton;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class EntityNode;
 class Node;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class EntityPropertyModel;
 class EntityPropertyTable;
 class MapDocument;
 class Selection;
 
-struct PropertyGridSelection
-{
+struct PropertyGridSelection {
   std::string propertyKey;
   int column;
 };
@@ -58,27 +54,26 @@ struct PropertyGridSelection
  * Panel with the entity property table, and the toolbar below it (add/remove icons,
  * "show default properties" checkbox, etc.)
  */
-class EntityPropertyGrid : public QWidget
-{
-  Q_OBJECT
+class EntityPropertyGrid : public QWidget {
+Q_OBJECT
 private:
   std::weak_ptr<MapDocument> m_document;
 
-  EntityPropertyModel* m_model;
-  QSortFilterProxyModel* m_proxyModel;
-  EntityPropertyTable* m_table;
-  QToolButton* m_addProtectedPropertyButton;
-  QToolButton* m_addPropertyButton;
-  QToolButton* m_removePropertiesButton;
-  QToolButton* m_setDefaultPropertiesButton;
-  QCheckBox* m_showDefaultPropertiesCheckBox;
+  EntityPropertyModel *m_model;
+  QSortFilterProxyModel *m_proxyModel;
+  EntityPropertyTable *m_table;
+  QToolButton *m_addProtectedPropertyButton;
+  QToolButton *m_addPropertyButton;
+  QToolButton *m_removePropertiesButton;
+  QToolButton *m_setDefaultPropertiesButton;
+  QCheckBox *m_showDefaultPropertiesCheckBox;
   std::vector<PropertyGridSelection> m_selectionBackup;
 
   NotifierConnection m_notifierConnection;
 
 public:
   explicit EntityPropertyGrid(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void backupSelection();
@@ -96,11 +91,11 @@ private:
 
   void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
-  void documentWasLoaded(MapDocument* document);
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+  void documentWasNewed(MapDocument *document);
+  void documentWasLoaded(MapDocument *document);
+  void nodesDidChange(const std::vector<Model::Node *> &nodes);
   void selectionWillChange();
-  void selectionDidChange(const Selection& selection);
+  void selectionDidChange(const Selection &selection);
   void entityDefinitionsOrModsDidChange();
 
 private:

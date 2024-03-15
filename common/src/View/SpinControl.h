@@ -21,13 +21,10 @@ along with TrenchBroom.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QDoubleSpinBox>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class SpinControl : public QDoubleSpinBox
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class SpinControl : public QDoubleSpinBox {
+Q_OBJECT
 private:
   double m_regularIncrement;
   double m_shiftIncrement;
@@ -36,7 +33,7 @@ private:
   int m_maxDigits;
 
 public:
-  explicit SpinControl(QWidget* parent = nullptr);
+  explicit SpinControl(QWidget *parent = nullptr);
 
 public: // QDoubleSpinBox overrides
   void stepBy(int steps) override;
@@ -45,7 +42,7 @@ public: // QDoubleSpinBox overrides
 
 public:
   void setIncrements(
-    double regularIncrement, double shiftIncrement, double ctrlIncrement);
+      double regularIncrement, double shiftIncrement, double ctrlIncrement);
 
   void setDigits(int minDigits, int maxDigits);
 

@@ -19,22 +19,17 @@
 
 #include "PathQt.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
-QString pathAsQString(const std::filesystem::path& path)
-{
+namespace TrenchBroom {
+namespace IO {
+QString pathAsQString(const std::filesystem::path &path) {
   return QString::fromStdString(path.string());
 }
 
-QString pathAsGenericQString(const std::filesystem::path& path)
-{
+QString pathAsGenericQString(const std::filesystem::path &path) {
   return QString::fromStdString(path.generic_string());
 }
 
-std::filesystem::path pathFromQString(const QString& path)
-{
+std::filesystem::path pathFromQString(const QString &path) {
   return std::filesystem::path{path.toStdString()};
 }
 } // namespace IO

@@ -24,39 +24,32 @@
 #include "View/KeySequenceEdit.h"
 #include "View/KeyboardShortcutModel.h"
 
-namespace TrenchBroom
-{
-namespace View
-{
-KeyboardShortcutItemDelegate::KeyboardShortcutItemDelegate()
-{
-  auto* itemEditorFactory = new QItemEditorFactory();
+namespace TrenchBroom {
+namespace View {
+KeyboardShortcutItemDelegate::KeyboardShortcutItemDelegate() {
+  auto *itemEditorFactory = new QItemEditorFactory();
   itemEditorFactory->registerEditor(
-    QVariant::KeySequence, new QStandardItemEditorCreator<KeySequenceEdit>());
+      QVariant::KeySequence, new QStandardItemEditorCreator<KeySequenceEdit>());
   setItemEditorFactory(itemEditorFactory);
 }
 
-QWidget* KeyboardShortcutItemDelegate::createEditor(
-  QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
-{
-  QWidget* widget = QStyledItemDelegate::createEditor(parent, option, index);
-  auto* editor = dynamic_cast<KeySequenceEdit*>(widget);
-  if (editor)
-  {
+QWidget *KeyboardShortcutItemDelegate::createEditor(
+    QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+  QWidget *widget = QStyledItemDelegate::createEditor(parent, option, index);
+  auto *editor = dynamic_cast<KeySequenceEdit *>(widget);
+  if (editor) {
     connect(
-      editor,
-      &KeySequenceEdit::editingFinished,
-      this,
-      &KeyboardShortcutItemDelegate::commitAndCloseEditor);
+        editor,
+        &KeySequenceEdit::editingFinished,
+        this,
+        &KeyboardShortcutItemDelegate::commitAndCloseEditor);
   }
   return widget;
 }
 
-void KeyboardShortcutItemDelegate::commitAndCloseEditor()
-{
-  auto* editor = dynamic_cast<KeySequenceEdit*>(sender());
-  if (editor)
-  {
+void KeyboardShortcutItemDelegate::commitAndCloseEditor() {
+  auto *editor = dynamic_cast<KeySequenceEdit *>(sender());
+  if (editor) {
     emit commitData(editor);
     emit closeEditor(editor);
   }

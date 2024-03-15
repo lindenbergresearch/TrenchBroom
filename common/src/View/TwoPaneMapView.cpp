@@ -28,38 +28,32 @@
 #include "View/QtUtils.h"
 #include "View/Splitter.h"
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 TwoPaneMapView::TwoPaneMapView(
-  std::weak_ptr<MapDocument> document,
-  MapViewToolBox& toolBox,
-  Renderer::MapRenderer& mapRenderer,
-  GLContextManager& contextManager,
-  Logger* logger,
-  QWidget* parent)
-  : MultiPaneMapView{parent}
-  , m_logger{logger}
-  , m_document(std::move(document))
-{
+    std::weak_ptr<MapDocument> document,
+    MapViewToolBox &toolBox,
+    Renderer::MapRenderer &mapRenderer,
+    GLContextManager &contextManager,
+    Logger *logger,
+    QWidget *parent)
+    : MultiPaneMapView{parent}, m_logger{logger}, m_document(std::move(document)) {
   createGui(toolBox, mapRenderer, contextManager);
 }
 
-TwoPaneMapView::~TwoPaneMapView()
-{
+TwoPaneMapView::~TwoPaneMapView() {
   saveWindowState(m_splitter);
 }
 
 void TwoPaneMapView::createGui(
-  MapViewToolBox& toolBox,
-  Renderer::MapRenderer& mapRenderer,
-  GLContextManager& contextManager)
-{
+    MapViewToolBox &toolBox,
+    Renderer::MapRenderer &mapRenderer,
+    GLContextManager &contextManager) {
 
   // See comment in CyclingMapView::createGui
   m_splitter = new Splitter{};
   m_splitter->setObjectName("TwoPaneMapView_Splitter");
 
-  auto* layout = new QHBoxLayout{};
+  auto *layout = new QHBoxLayout{};
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   setLayout(layout);
@@ -67,7 +61,7 @@ void TwoPaneMapView::createGui(
 
   m_mapView3D = new MapView3D{m_document, toolBox, mapRenderer, contextManager, m_logger};
   m_mapView2D = new CyclingMapView{
-    m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_2D, m_logger};
+      m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_2D, m_logger};
 
   m_mapView3D->linkCamera(m_linkHelper);
   m_mapView2D->linkCamera(m_linkHelper);
@@ -86,21 +80,17 @@ void TwoPaneMapView::createGui(
   restoreWindowState(m_splitter);
 }
 
-void TwoPaneMapView::doMaximizeView(MapView* view)
-{
-  assert(view == m_mapView2D || view == m_mapView3D);
-  if (view == m_mapView2D)
-  {
+void TwoPaneMapView::doMaximizeView(MapView *view) {
+  assert(view==m_mapView2D || view==m_mapView3D);
+  if (view==m_mapView2D) {
     m_mapView3D->hide();
   }
-  if (view == m_mapView3D)
-  {
+  if (view==m_mapView3D) {
     m_mapView2D->hide();
   }
 }
 
-void TwoPaneMapView::doRestoreViews()
-{
+void TwoPaneMapView::doRestoreViews() {
   m_mapView3D->show();
   m_mapView2D->show();
 }

@@ -32,10 +32,8 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 enum class PrimType;
 
 /**
@@ -47,11 +45,9 @@ enum class PrimType;
  * method. Furthermore, a vertex array can be rendered by calling one of the provided
  * render methods.
  */
-class VertexArray
-{
+class VertexArray {
 private:
-  class BaseHolder
-  {
+  class BaseHolder {
   public:
     virtual ~BaseHolder();
 
@@ -59,64 +55,53 @@ private:
 
     virtual size_t sizeInBytes() const = 0;
 
-    virtual void prepare(VboManager& vboManager) = 0;
+    virtual void prepare(VboManager &vboManager) = 0;
 
     virtual void setup() = 0;
 
     virtual void cleanup() = 0;
   };
 
-  template <typename VertexSpec>
-  class Holder : public BaseHolder
-  {
+  template<typename VertexSpec>
+  class Holder : public BaseHolder {
   private:
-    VboManager* m_vboManager;
-    Vbo* m_vbo;
+    VboManager *m_vboManager;
+    Vbo *m_vbo;
     size_t m_vertexCount;
 
   public:
     size_t vertexCount() const override { return m_vertexCount; }
 
-    size_t sizeInBytes() const override { return VertexSpec::Size * m_vertexCount; }
+    size_t sizeInBytes() const override { return VertexSpec::Size*m_vertexCount; }
 
-    void prepare(VboManager& vboManager) override
-    {
-      if (m_vertexCount > 0 && m_vbo == nullptr)
-      {
+    void prepare(VboManager &vboManager) override {
+      if (m_vertexCount > 0 && m_vbo==nullptr) {
         m_vboManager = &vboManager;
-        m_vbo = vboManager.allocateVbo(VboType::ArrayBuffer, sizeInBytes());
-        ;
+        m_vbo = vboManager.allocateVbo(VboType::ArrayBuffer, sizeInBytes());;
         m_vbo->writeBuffer(0, doGetVertices());
       }
     }
 
-    void setup() override
-    {
-      ensure(m_vbo != nullptr, "block is null");
+    void setup() override {
+      ensure(m_vbo!=nullptr, "block is null");
       m_vbo->bind();
       VertexSpec::setup(m_vboManager->shaderManager().currentProgram(), m_vbo->offset());
     }
 
-    void cleanup() override
-    {
+    void cleanup() override {
       VertexSpec::cleanup(m_vboManager->shaderManager().currentProgram());
       m_vbo->unbind();
     }
 
   protected:
     Holder(const size_t vertexCount)
-      : m_vboManager(nullptr)
-      , m_vbo(nullptr)
-      , m_vertexCount(vertexCount)
-    {
+        : m_vboManager(nullptr), m_vbo(nullptr), m_vertexCount(vertexCount) {
     }
 
-    ~Holder() override
-    {
+    ~Holder() override {
       // TODO: Revisit this revisiting OpenGL resource management. We should not store the
       // VboManager, since it represents a safe time to delete the OpenGL buffer object.
-      if (m_vbo != nullptr)
-      {
+      if (m_vbo!=nullptr) {
         m_vboManager->destroyVbo(m_vbo);
         m_vbo = nullptr;
       }
@@ -125,12 +110,11 @@ private:
   private:
     using VertexList = std::vector<typename VertexSpec::Vertex>;
 
-    virtual const VertexList& doGetVertices() const = 0;
+    virtual const VertexList &doGetVertices() const = 0;
   };
 
-  template <typename VertexSpec>
-  class ByValueHolder : public Holder<VertexSpec>
-  {
+  template<typename VertexSpec>
+  class ByValueHolder : public Holder<VertexSpec> {
   private:
     using VertexList = std::vector<typename VertexSpec::Vertex>;
 
@@ -138,46 +122,38 @@ private:
     VertexList m_vertices;
 
   public:
-    ByValueHolder(const VertexList& vertices)
-      : Holder<VertexSpec>(vertices.size())
-      , m_vertices(vertices)
-    {
+    ByValueHolder(const VertexList &vertices)
+        : Holder<VertexSpec>(vertices.size()), m_vertices(vertices) {
     }
 
-    ByValueHolder(VertexList&& vertices)
-      : Holder<VertexSpec>(vertices.size())
-      , m_vertices(std::move(vertices))
-    {
+    ByValueHolder(VertexList &&vertices)
+        : Holder<VertexSpec>(vertices.size()), m_vertices(std::move(vertices)) {
     }
 
-    void prepare(VboManager& vboManager) override
-    {
+    void prepare(VboManager &vboManager) override {
       Holder<VertexSpec>::prepare(vboManager);
       kdl::vec_clear_to_zero(m_vertices);
     }
 
   private:
-    const VertexList& doGetVertices() const override { return m_vertices; }
+    const VertexList &doGetVertices() const override { return m_vertices; }
   };
 
-  template <typename VertexSpec>
-  class ByRefHolder : public Holder<VertexSpec>
-  {
+  template<typename VertexSpec>
+  class ByRefHolder : public Holder<VertexSpec> {
   private:
     using VertexList = std::vector<typename VertexSpec::Vertex>;
 
   private:
-    const VertexList& m_vertices;
+    const VertexList &m_vertices;
 
   public:
-    ByRefHolder(const VertexList& vertices)
-      : Holder<VertexSpec>(vertices.size())
-      , m_vertices(vertices)
-    {
+    ByRefHolder(const VertexList &vertices)
+        : Holder<VertexSpec>(vertices.size()), m_vertices(vertices) {
     }
 
   private:
-    const VertexList& doGetVertices() const override { return m_vertices; }
+    const VertexList &doGetVertices() const override { return m_vertices; }
   };
 
 private:
@@ -199,11 +175,10 @@ public:
    * @param vertices the vertices to copy
    * @return the vertex array
    */
-  template <typename... Attrs>
-  static VertexArray copy(const std::vector<GLVertex<Attrs...>>& vertices)
-  {
+  template<typename... Attrs>
+  static VertexArray copy(const std::vector<GLVertex<Attrs...>> &vertices) {
     return VertexArray(
-      std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(vertices));
+        std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(vertices));
   }
 
   /**
@@ -213,11 +188,10 @@ public:
    * @param vertices the vertices to move
    * @return the vertex array
    */
-  template <typename... Attrs>
-  static VertexArray move(std::vector<GLVertex<Attrs...>>&& vertices)
-  {
+  template<typename... Attrs>
+  static VertexArray move(std::vector<GLVertex<Attrs...>> &&vertices) {
     return VertexArray(std::make_shared<ByValueHolder<typename GLVertex<Attrs...>::Type>>(
-      std::move(vertices)));
+        std::move(vertices)));
   }
 
   /**
@@ -233,11 +207,10 @@ public:
    * @param vertices the vertices to reference
    * @return the vertex array
    */
-  template <typename... Attrs>
-  static VertexArray ref(const std::vector<GLVertex<Attrs...>>& vertices)
-  {
+  template<typename... Attrs>
+  static VertexArray ref(const std::vector<GLVertex<Attrs...>> &vertices) {
     return VertexArray(
-      std::make_shared<ByRefHolder<typename GLVertex<Attrs...>::Type>>(vertices));
+        std::make_shared<ByRefHolder<typename GLVertex<Attrs...>::Type>>(vertices));
   }
 
   /**
@@ -276,7 +249,7 @@ public:
    * @param vboManager the vertex buffer object to upload the contents of this vertex
    * array into
    */
-  void prepare(VboManager& vboManager);
+  void prepare(VboManager &vboManager);
 
   /**
    * Sets this vertex array up for rendering. If this vertex array is only rendered once,
@@ -321,7 +294,7 @@ public:
    * @param primCount the number of ranges to render
    */
   void render(
-    PrimType primType, const GLIndices& indices, const GLCounts& counts, GLint primCount);
+      PrimType primType, const GLIndices &indices, const GLCounts &counts, GLint primCount);
 
   /**
    * Renders a number of primitives of the given type, the vertices of which are indicates
@@ -331,7 +304,7 @@ public:
    * @param indices the indices of the vertices to render
    * @param count the number of vertices to render
    */
-  void render(PrimType primType, const GLIndices& indices, GLsizei count);
+  void render(PrimType primType, const GLIndices &indices, GLsizei count);
 
   void cleanup();
 

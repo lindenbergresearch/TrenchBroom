@@ -25,13 +25,10 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 
-class InitFreeImage
-{
+class InitFreeImage {
 private:
   InitFreeImage();
   ~InitFreeImage();
@@ -40,15 +37,14 @@ public:
   static void initialize();
 };
 
-class ImageLoaderImpl
-{
+class ImageLoaderImpl {
 private:
-  FIMEMORY* m_stream;
-  FIBITMAP* m_bitmap;
+  FIMEMORY *m_stream;
+  FIBITMAP *m_bitmap;
 
 public:
-  ImageLoaderImpl(const ImageLoader::Format format, const std::filesystem::path& path);
-  ImageLoaderImpl(const ImageLoader::Format format, const char* begin, const char* end);
+  ImageLoaderImpl(const ImageLoader::Format format, const std::filesystem::path &path);
+  ImageLoaderImpl(const ImageLoader::Format format, const char *begin, const char *end);
   ~ImageLoaderImpl();
 
   size_t paletteSize() const;

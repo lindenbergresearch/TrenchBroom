@@ -27,10 +27,8 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Brush;
 
 class Entity;
@@ -40,28 +38,26 @@ class GroupNode;
 class Node;
 } // namespace Model
 
-namespace View
-{
-class SwapNodeContentsCommand : public UpdateLinkedGroupsCommandBase
-{
+namespace View {
+class SwapNodeContentsCommand : public UpdateLinkedGroupsCommandBase {
 protected:
-  std::vector<std::pair<Model::Node*, Model::NodeContents>> m_nodes;
+  std::vector<std::pair<Model::Node *, Model::NodeContents>> m_nodes;
 
 public:
   SwapNodeContentsCommand(
-    const std::string& name,
-    std::vector<std::pair<Model::Node*, Model::NodeContents>> nodes);
+      const std::string &name,
+      std::vector<std::pair<Model::Node *, Model::NodeContents>> nodes);
 
   ~SwapNodeContentsCommand();
 
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
+  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
   std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+      MapDocumentCommandFacade *document) override;
 
-  bool doCollateWith(UndoableCommand& command) override;
+  bool doCollateWith(UndoableCommand &command) override;
 
-  deleteCopyAndMove(SwapNodeContentsCommand);
+deleteCopyAndMove(SwapNodeContentsCommand);
 };
 } // namespace View
 } // namespace TrenchBroom

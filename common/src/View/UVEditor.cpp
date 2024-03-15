@@ -35,26 +35,20 @@
 
 #include <kdl/memory_utils.h>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 UVEditor::UVEditor(
-  std::weak_ptr<MapDocument> document, GLContextManager& contextManager, QWidget* parent)
-  : QWidget{parent}
-  , m_document{std::move(document)}
-{
+    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
+    : QWidget{parent}, m_document{std::move(document)} {
   createGui(contextManager);
   connectObservers();
 }
 
-bool UVEditor::cancelMouseDrag()
-{
+bool UVEditor::cancelMouseDrag() {
   return m_uvView->cancelDrag();
 }
 
-void UVEditor::updateButtons()
-{
+void UVEditor::updateButtons() {
   auto document = kdl::mem_lock(m_document);
   const bool enabled = !document->allSelectedBrushFaces().empty();
 
@@ -66,55 +60,54 @@ void UVEditor::updateButtons()
   m_rotateTextureCWButton->setEnabled(enabled);
 }
 
-void UVEditor::createGui(GLContextManager& contextManager)
-{
+void UVEditor::createGui(GLContextManager &contextManager) {
   m_uvView = new UVView{m_document, contextManager};
 
   m_resetTextureButton =
-    createBitmapButton("ResetTexture.svg", tr("Reset texture alignment"), this);
+      createBitmapButton("ResetTexture.svg", tr("Reset texture alignment"), this);
   m_resetTextureToWorldButton = createBitmapButton(
-    "ResetTextureToWorld.svg", tr("Reset texture alignment to world aligned"), this);
+      "ResetTextureToWorld.svg", tr("Reset texture alignment to world aligned"), this);
   m_flipTextureHButton =
-    createBitmapButton("FlipTextureH.svg", tr("Flip texture X axis"), this);
+      createBitmapButton("FlipTextureH.svg", tr("Flip texture X axis"), this);
   m_flipTextureVButton =
-    createBitmapButton("FlipTextureV.svg", tr("Flip texture Y axis"), this);
+      createBitmapButton("FlipTextureV.svg", tr("Flip texture Y axis"), this);
   m_rotateTextureCCWButton = createBitmapButton(
-    "RotateTextureCCW.svg", tr("Rotate texture 90° counter-clockwise"), this);
+      "RotateTextureCCW.svg", tr("Rotate texture 90° counter-clockwise"), this);
   m_rotateTextureCWButton =
-    createBitmapButton("RotateTextureCW.svg", tr("Rotate texture 90° clockwise"), this);
+      createBitmapButton("RotateTextureCW.svg", tr("Rotate texture 90° clockwise"), this);
 
   connect(
-    m_resetTextureButton,
-    &QAbstractButton::clicked,
-    this,
-    &UVEditor::resetTextureClicked);
+      m_resetTextureButton,
+      &QAbstractButton::clicked,
+      this,
+      &UVEditor::resetTextureClicked);
   connect(
-    m_resetTextureToWorldButton,
-    &QAbstractButton::clicked,
-    this,
-    &UVEditor::resetTextureToWorldClicked);
+      m_resetTextureToWorldButton,
+      &QAbstractButton::clicked,
+      this,
+      &UVEditor::resetTextureToWorldClicked);
   connect(
-    m_flipTextureHButton,
-    &QAbstractButton::clicked,
-    this,
-    &UVEditor::flipTextureHClicked);
+      m_flipTextureHButton,
+      &QAbstractButton::clicked,
+      this,
+      &UVEditor::flipTextureHClicked);
   connect(
-    m_flipTextureVButton,
-    &QAbstractButton::clicked,
-    this,
-    &UVEditor::flipTextureVClicked);
+      m_flipTextureVButton,
+      &QAbstractButton::clicked,
+      this,
+      &UVEditor::flipTextureVClicked);
   connect(
-    m_rotateTextureCCWButton,
-    &QAbstractButton::clicked,
-    this,
-    &UVEditor::rotateTextureCCWClicked);
+      m_rotateTextureCCWButton,
+      &QAbstractButton::clicked,
+      this,
+      &UVEditor::rotateTextureCCWClicked);
   connect(
-    m_rotateTextureCWButton,
-    &QAbstractButton::clicked,
-    this,
-    &UVEditor::rotateTextureCWClicked);
+      m_rotateTextureCWButton,
+      &QAbstractButton::clicked,
+      this,
+      &UVEditor::rotateTextureCWClicked);
 
-  auto* gridLabel = new QLabel("Grid ");
+  auto *gridLabel = new QLabel("Grid ");
   makeEmphasized(gridLabel);
   m_xSubDivisionEditor = new QSpinBox();
   m_xSubDivisionEditor->setRange(1, 16);
@@ -125,19 +118,19 @@ void UVEditor::createGui(GLContextManager& contextManager)
   m_ySubDivisionEditor->setValue(1);
 
   connect(
-    m_xSubDivisionEditor,
-    QOverload<int>::of(&QSpinBox::valueChanged),
-    this,
-    &UVEditor::subDivisionChanged);
+      m_xSubDivisionEditor,
+      QOverload<int>::of(&QSpinBox::valueChanged),
+      this,
+      &UVEditor::subDivisionChanged);
   connect(
-    m_ySubDivisionEditor,
-    QOverload<int>::of(&QSpinBox::valueChanged),
-    this,
-    &UVEditor::subDivisionChanged);
+      m_ySubDivisionEditor,
+      QOverload<int>::of(&QSpinBox::valueChanged),
+      this,
+      &UVEditor::subDivisionChanged);
 
-  auto* bottomLayout = new QHBoxLayout();
+  auto *bottomLayout = new QHBoxLayout();
   bottomLayout->setContentsMargins(
-    LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
   bottomLayout->setSpacing(LayoutConstants::NarrowHMargin);
   bottomLayout->addWidget(m_resetTextureButton);
   bottomLayout->addWidget(m_resetTextureToWorldButton);
@@ -150,11 +143,11 @@ void UVEditor::createGui(GLContextManager& contextManager)
   bottomLayout->addWidget(new QLabel("X:"));
   bottomLayout->addWidget(m_xSubDivisionEditor);
   bottomLayout->addSpacing(
-    LayoutConstants::MediumHMargin - LayoutConstants::NarrowHMargin);
+      LayoutConstants::MediumHMargin - LayoutConstants::NarrowHMargin);
   bottomLayout->addWidget(new QLabel("Y:"));
   bottomLayout->addWidget(m_ySubDivisionEditor);
 
-  auto* outerLayout = new QVBoxLayout();
+  auto *outerLayout = new QVBoxLayout();
   outerLayout->setContentsMargins(0, 0, 0, 0);
   outerLayout->setSpacing(LayoutConstants::NarrowVMargin);
   outerLayout->addWidget(m_uvView, 1);
@@ -164,20 +157,17 @@ void UVEditor::createGui(GLContextManager& contextManager)
   updateButtons();
 }
 
-void UVEditor::selectionDidChange(const Selection&)
-{
+void UVEditor::selectionDidChange(const Selection &) {
   updateButtons();
 }
 
-void UVEditor::connectObservers()
-{
+void UVEditor::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection +=
-    document->selectionDidChangeNotifier.connect(this, &UVEditor::selectionDidChange);
+      document->selectionDidChangeNotifier.connect(this, &UVEditor::selectionDidChange);
 }
 
-void UVEditor::resetTextureClicked()
-{
+void UVEditor::resetTextureClicked() {
   Model::ChangeBrushFaceAttributesRequest request;
 
   auto document = kdl::mem_lock(m_document);
@@ -185,8 +175,7 @@ void UVEditor::resetTextureClicked()
   document->setFaceAttributes(request);
 }
 
-void UVEditor::resetTextureToWorldClicked()
-{
+void UVEditor::resetTextureToWorldClicked() {
   Model::ChangeBrushFaceAttributesRequest request;
 
   auto document = kdl::mem_lock(m_document);
@@ -194,8 +183,7 @@ void UVEditor::resetTextureToWorldClicked()
   document->setFaceAttributes(request);
 }
 
-void UVEditor::flipTextureHClicked()
-{
+void UVEditor::flipTextureHClicked() {
   Model::ChangeBrushFaceAttributesRequest request;
   request.mulXScale(-1.0f);
 
@@ -203,8 +191,7 @@ void UVEditor::flipTextureHClicked()
   document->setFaceAttributes(request);
 }
 
-void UVEditor::flipTextureVClicked()
-{
+void UVEditor::flipTextureVClicked() {
   Model::ChangeBrushFaceAttributesRequest request;
   request.mulYScale(-1.0f);
 
@@ -212,8 +199,7 @@ void UVEditor::flipTextureVClicked()
   document->setFaceAttributes(request);
 }
 
-void UVEditor::rotateTextureCCWClicked()
-{
+void UVEditor::rotateTextureCCWClicked() {
   Model::ChangeBrushFaceAttributesRequest request;
   request.addRotation(90.0f);
 
@@ -221,8 +207,7 @@ void UVEditor::rotateTextureCCWClicked()
   document->setFaceAttributes(request);
 }
 
-void UVEditor::rotateTextureCWClicked()
-{
+void UVEditor::rotateTextureCWClicked() {
   Model::ChangeBrushFaceAttributesRequest request;
   request.addRotation(-90.0f);
 
@@ -230,8 +215,7 @@ void UVEditor::rotateTextureCWClicked()
   document->setFaceAttributes(request);
 }
 
-void UVEditor::subDivisionChanged()
-{
+void UVEditor::subDivisionChanged() {
   const int x = m_xSubDivisionEditor->value();
   const int y = m_ySubDivisionEditor->value();
   m_uvView->setSubDivisions(vm::vec2i(x, y));

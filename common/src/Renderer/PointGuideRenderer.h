@@ -28,21 +28,17 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderContext;
 
 class VboManager;
 
-class PointGuideRenderer : public DirectRenderable
-{
+class PointGuideRenderer : public DirectRenderable {
 private:
   static const FloatType SpikeLength;
 
@@ -55,14 +51,14 @@ private:
 public:
   PointGuideRenderer(std::weak_ptr<View::MapDocument> document);
 
-  void setColor(const Color& color);
+  void setColor(const Color &color);
 
-  void setPosition(const vm::vec3& position);
+  void setPosition(const vm::vec3 &position);
 
 private:
-  void doPrepareVertices(VboManager& vboManager) override;
+  void doPrepareVertices(VboManager &vboManager) override;
 
-  void doRender(RenderContext& renderContext) override;
+  void doRender(RenderContext &renderContext) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

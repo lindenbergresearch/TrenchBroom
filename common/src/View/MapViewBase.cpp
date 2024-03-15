@@ -84,29 +84,19 @@
 #include <sstream>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 const int MapViewBase::DefaultCameraAnimationDuration = 250;
 
 MapViewBase::MapViewBase(
-  Logger* logger,
-  std::weak_ptr<MapDocument> document,
-  MapViewToolBox& toolBox,
-  Renderer::MapRenderer& renderer,
-  GLContextManager& contextManager)
-  : RenderView{contextManager}
-  , m_logger{logger}
-  , m_document{std::move(document)}
-  , m_toolBox{toolBox}
-  , m_animationManager{std::make_unique<AnimationManager>(this)}
-  , m_renderer{renderer}
-  , m_compass{nullptr}
-  , m_portalFileRenderer{nullptr}
-  , m_isCurrent{false}
-  , m_updateActionStatesSignalDelayer{new SignalDelayer{this}}
-{
+    Logger *logger,
+    std::weak_ptr<MapDocument> document,
+    MapViewToolBox &toolBox,
+    Renderer::MapRenderer &renderer,
+    GLContextManager &contextManager)
+    : RenderView{contextManager}, m_logger{logger}, m_document{std::move(document)}, m_toolBox{toolBox},
+      m_animationManager{std::make_unique<AnimationManager>(this)}, m_renderer{renderer}, m_compass{nullptr},
+      m_portalFileRenderer{nullptr}, m_isCurrent{false}, m_updateActionStatesSignalDelayer{new SignalDelayer{this}} {
   setToolBox(toolBox);
   bindEvents();
   connectObservers();
@@ -114,182 +104,160 @@ MapViewBase::MapViewBase(
   setAcceptDrops(true);
 }
 
-void MapViewBase::setCompass(std::unique_ptr<Renderer::Compass> compass)
-{
+void MapViewBase::setCompass(std::unique_ptr<Renderer::Compass> compass) {
   m_compass = std::move(compass);
 }
 
-void MapViewBase::mapViewBaseVirtualInit()
-{
+void MapViewBase::mapViewBaseVirtualInit() {
   createActionsAndUpdatePicking();
 }
 
-MapViewBase::~MapViewBase()
-{
+MapViewBase::~MapViewBase() {
   // Deleting m_compass will access the VBO so we need to be current
   // see: http://doc.qt.io/qt-5/qopenglwidget.html#resource-initialization-and-cleanup
   makeCurrent();
 }
 
-void MapViewBase::setIsCurrent(const bool isCurrent)
-{
+void MapViewBase::setIsCurrent(const bool isCurrent) {
   m_isCurrent = isCurrent;
 }
 
-Renderer::Camera& MapViewBase::camera()
-{
+Renderer::Camera &MapViewBase::camera() {
   return doGetCamera();
 }
 
-void MapViewBase::bindEvents()
-{
+void MapViewBase::bindEvents() {
   connect(
-    m_updateActionStatesSignalDelayer,
-    &SignalDelayer::processSignal,
-    this,
-    &MapViewBase::updateActionStates);
+      m_updateActionStatesSignalDelayer,
+      &SignalDelayer::processSignal,
+      this,
+      &MapViewBase::updateActionStates);
 }
 
-void MapViewBase::connectObservers()
-{
+void MapViewBase::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection +=
-    document->nodesWereAddedNotifier.connect(this, &MapViewBase::nodesDidChange);
+      document->nodesWereAddedNotifier.connect(this, &MapViewBase::nodesDidChange);
   m_notifierConnection +=
-    document->nodesWereRemovedNotifier.connect(this, &MapViewBase::nodesDidChange);
+      document->nodesWereRemovedNotifier.connect(this, &MapViewBase::nodesDidChange);
   m_notifierConnection +=
-    document->nodesDidChangeNotifier.connect(this, &MapViewBase::nodesDidChange);
+      document->nodesDidChangeNotifier.connect(this, &MapViewBase::nodesDidChange);
   m_notifierConnection +=
-    document->nodeVisibilityDidChangeNotifier.connect(this, &MapViewBase::nodesDidChange);
+      document->nodeVisibilityDidChangeNotifier.connect(this, &MapViewBase::nodesDidChange);
   m_notifierConnection +=
-    document->nodeLockingDidChangeNotifier.connect(this, &MapViewBase::nodesDidChange);
+      document->nodeLockingDidChangeNotifier.connect(this, &MapViewBase::nodesDidChange);
   m_notifierConnection +=
-    document->commandDoneNotifier.connect(this, &MapViewBase::commandDone);
+      document->commandDoneNotifier.connect(this, &MapViewBase::commandDone);
   m_notifierConnection +=
-    document->commandUndoneNotifier.connect(this, &MapViewBase::commandUndone);
+      document->commandUndoneNotifier.connect(this, &MapViewBase::commandUndone);
   m_notifierConnection +=
-    document->selectionDidChangeNotifier.connect(this, &MapViewBase::selectionDidChange);
+      document->selectionDidChangeNotifier.connect(this, &MapViewBase::selectionDidChange);
   m_notifierConnection += document->textureCollectionsDidChangeNotifier.connect(
-    this, &MapViewBase::textureCollectionsDidChange);
+      this, &MapViewBase::textureCollectionsDidChange);
   m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(
-    this, &MapViewBase::entityDefinitionsDidChange);
+      this, &MapViewBase::entityDefinitionsDidChange);
   m_notifierConnection +=
-    document->modsDidChangeNotifier.connect(this, &MapViewBase::modsDidChange);
+      document->modsDidChangeNotifier.connect(this, &MapViewBase::modsDidChange);
   m_notifierConnection += document->editorContextDidChangeNotifier.connect(
-    this, &MapViewBase::editorContextDidChange);
+      this, &MapViewBase::editorContextDidChange);
   m_notifierConnection +=
-    document->documentWasNewedNotifier.connect(this, &MapViewBase::documentDidChange);
+      document->documentWasNewedNotifier.connect(this, &MapViewBase::documentDidChange);
   m_notifierConnection +=
-    document->documentWasClearedNotifier.connect(this, &MapViewBase::documentDidChange);
+      document->documentWasClearedNotifier.connect(this, &MapViewBase::documentDidChange);
   m_notifierConnection +=
-    document->documentWasLoadedNotifier.connect(this, &MapViewBase::documentDidChange);
+      document->documentWasLoadedNotifier.connect(this, &MapViewBase::documentDidChange);
   m_notifierConnection +=
-    document->pointFileWasLoadedNotifier.connect(this, &MapViewBase::pointFileDidChange);
+      document->pointFileWasLoadedNotifier.connect(this, &MapViewBase::pointFileDidChange);
   m_notifierConnection += document->pointFileWasUnloadedNotifier.connect(
-    this, &MapViewBase::pointFileDidChange);
+      this, &MapViewBase::pointFileDidChange);
   m_notifierConnection += document->portalFileWasLoadedNotifier.connect(
-    this, &MapViewBase::portalFileDidChange);
+      this, &MapViewBase::portalFileDidChange);
   m_notifierConnection += document->portalFileWasUnloadedNotifier.connect(
-    this, &MapViewBase::portalFileDidChange);
+      this, &MapViewBase::portalFileDidChange);
 
-  auto& grid = document->grid();
+  auto &grid = document->grid();
   m_notifierConnection +=
-    grid.gridDidChangeNotifier.connect(this, &MapViewBase::gridDidChange);
+      grid.gridDidChangeNotifier.connect(this, &MapViewBase::gridDidChange);
 
   m_notifierConnection +=
-    m_toolBox.toolActivatedNotifier.connect(this, &MapViewBase::toolChanged);
+      m_toolBox.toolActivatedNotifier.connect(this, &MapViewBase::toolChanged);
   m_notifierConnection +=
-    m_toolBox.toolDeactivatedNotifier.connect(this, &MapViewBase::toolChanged);
+      m_toolBox.toolDeactivatedNotifier.connect(this, &MapViewBase::toolChanged);
 
-  auto& prefs = PreferenceManager::instance();
+  auto &prefs = PreferenceManager::instance();
   m_notifierConnection +=
-    prefs.preferenceDidChangeNotifier.connect(this, &MapViewBase::preferenceDidChange);
+      prefs.preferenceDidChangeNotifier.connect(this, &MapViewBase::preferenceDidChange);
 }
 
 /**
  * Full re-initialization of QActions and picking state.
  */
-void MapViewBase::createActionsAndUpdatePicking()
-{
+void MapViewBase::createActionsAndUpdatePicking() {
   createActions();
   updateActionStates();
   updatePickResult();
 }
 
-void MapViewBase::nodesDidChange(const std::vector<Model::Node*>&)
-{
+void MapViewBase::nodesDidChange(const std::vector<Model::Node *> &) {
   updatePickResult();
   update();
 }
 
-void MapViewBase::toolChanged(Tool&)
-{
+void MapViewBase::toolChanged(Tool &) {
   updatePickResult();
   updateActionStates();
   update();
 }
 
-void MapViewBase::commandDone(Command&)
-{
+void MapViewBase::commandDone(Command &) {
   updateActionStatesDelayed();
   updatePickResult();
   update();
 }
 
-void MapViewBase::commandUndone(UndoableCommand&)
-{
+void MapViewBase::commandUndone(UndoableCommand &) {
   updateActionStatesDelayed();
   updatePickResult();
   update();
 }
 
-void MapViewBase::selectionDidChange(const Selection&)
-{
+void MapViewBase::selectionDidChange(const Selection &) {
   updateActionStatesDelayed();
 }
 
-void MapViewBase::textureCollectionsDidChange()
-{
+void MapViewBase::textureCollectionsDidChange() {
   update();
 }
 
-void MapViewBase::entityDefinitionsDidChange()
-{
+void MapViewBase::entityDefinitionsDidChange() {
   createActions();
   updateActionStates();
   update();
 }
 
-void MapViewBase::modsDidChange()
-{
+void MapViewBase::modsDidChange() {
   update();
 }
 
-void MapViewBase::editorContextDidChange()
-{
+void MapViewBase::editorContextDidChange() {
   update();
 }
 
-void MapViewBase::gridDidChange()
-{
+void MapViewBase::gridDidChange() {
   update();
 }
 
-void MapViewBase::pointFileDidChange()
-{
+void MapViewBase::pointFileDidChange() {
   update();
 }
 
-void MapViewBase::portalFileDidChange()
-{
+void MapViewBase::portalFileDidChange() {
   invalidatePortalFileRenderer();
   update();
 }
 
-void MapViewBase::preferenceDidChange(const std::filesystem::path& path)
-{
-  if (path == Preferences::RendererFontSize.path())
-  {
+void MapViewBase::preferenceDidChange(const std::filesystem::path &path) {
+  if (path==Preferences::RendererFontSize.path()) {
     fontManager().clearCache();
   }
 
@@ -297,37 +265,34 @@ void MapViewBase::preferenceDidChange(const std::filesystem::path& path)
   update();
 }
 
-void MapViewBase::documentDidChange(MapDocument*)
-{
+void MapViewBase::documentDidChange(MapDocument *) {
   createActionsAndUpdatePicking();
   update();
 }
 
-void MapViewBase::createActions()
-{
+void MapViewBase::createActions() {
   // Destroy existing QShortcuts via the weak references in m_shortcuts
-  for (auto& [shortcut, action] : m_shortcuts)
-  {
+  for (auto &[shortcut, action] : m_shortcuts) {
     unused(action);
     delete shortcut;
   }
   m_shortcuts.clear();
 
-  auto visitor = [this](const Action& action) {
+  auto visitor = [this](const Action &action) {
     const auto keySequence = action.keySequence();
 
-    auto* shortcut = new QShortcut{this};
+    auto *shortcut = new QShortcut{this};
     shortcut->setContext(Qt::WidgetWithChildrenShortcut);
     shortcut->setKey(keySequence);
     connect(
-      shortcut, &QShortcut::activated, this, [this, &action] { triggerAction(action); });
+        shortcut, &QShortcut::activated, this, [this, &action] { triggerAction(action); });
     connect(shortcut, &QShortcut::activatedAmbiguously, this, [this, &action] {
       triggerAmbiguousAction(action.label());
     });
     m_shortcuts.emplace_back(shortcut, &action);
   };
 
-  auto& actionManager = ActionManager::instance();
+  auto &actionManager = ActionManager::instance();
   // We don't create a QShortcut for actions whose key binding is handled
   // by the menu or toolbar since they would conflict.
   actionManager.visitMapViewActions(visitor);
@@ -337,137 +302,110 @@ void MapViewBase::createActions()
   document->visitEntityDefinitionActions(visitor);
 }
 
-void MapViewBase::updateActionBindings()
-{
-  for (auto& [shortcut, action] : m_shortcuts)
-  {
+void MapViewBase::updateActionBindings() {
+  for (auto &[shortcut, action] : m_shortcuts) {
     shortcut->setKey(action->keySequence());
   }
 }
 
-void MapViewBase::updateActionStates()
-{
+void MapViewBase::updateActionStates() {
   auto context = ActionExecutionContext{findMapFrame(this), this};
-  for (auto& [shortcut, action] : m_shortcuts)
-  {
+  for (auto &[shortcut, action] : m_shortcuts) {
     shortcut->setEnabled(hasFocus() && action->enabled(context));
   }
 }
 
-void MapViewBase::updateActionStatesDelayed()
-{
+void MapViewBase::updateActionStatesDelayed() {
   m_updateActionStatesSignalDelayer->queueSignal();
 }
 
-void MapViewBase::triggerAction(const Action& action)
-{
+void MapViewBase::triggerAction(const Action &action) {
   auto context = ActionExecutionContext{findMapFrame(this), this};
   action.execute(context);
 }
 
-void MapViewBase::triggerAmbiguousAction(const QString& label)
-{
+void MapViewBase::triggerAmbiguousAction(const QString &label) {
   qDebug() << "Ambiguous action triggered: " << label;
 }
 
-void MapViewBase::move(const vm::direction direction)
-{
-  if ((actionContext() & ActionContext::RotateTool) != 0)
-  {
+void MapViewBase::move(const vm::direction direction) {
+  if ((actionContext() & ActionContext::RotateTool)!=0) {
     moveRotationCenter(direction);
-  }
-  else if ((actionContext() & ActionContext::AnyVertexTool) != 0)
-  {
+  } else if ((actionContext() & ActionContext::AnyVertexTool)!=0) {
     moveVertices(direction);
-  }
-  else if ((actionContext() & ActionContext::NodeSelection) != 0)
-  {
+  } else if ((actionContext() & ActionContext::NodeSelection)!=0) {
     moveObjects(direction);
   }
 }
 
-void MapViewBase::moveRotationCenter(const vm::direction direction)
-{
+void MapViewBase::moveRotationCenter(const vm::direction direction) {
   auto document = kdl::mem_lock(m_document);
-  const auto& grid = document->grid();
-  const auto delta = moveDirection(direction) * static_cast<FloatType>(grid.actualSize());
+  const auto &grid = document->grid();
+  const auto delta = moveDirection(direction)*static_cast<FloatType>(grid.actualSize());
   m_toolBox.moveRotationCenter(delta);
   update();
 }
 
-void MapViewBase::moveVertices(const vm::direction direction)
-{
+void MapViewBase::moveVertices(const vm::direction direction) {
   auto document = kdl::mem_lock(m_document);
-  const auto& grid = document->grid();
-  const auto delta = moveDirection(direction) * static_cast<FloatType>(grid.actualSize());
+  const auto &grid = document->grid();
+  const auto delta = moveDirection(direction)*static_cast<FloatType>(grid.actualSize());
   m_toolBox.moveVertices(delta);
 }
 
-void MapViewBase::moveObjects(const vm::direction direction)
-{
+void MapViewBase::moveObjects(const vm::direction direction) {
   auto document = kdl::mem_lock(m_document);
-  const auto& grid = document->grid();
-  const auto delta = moveDirection(direction) * static_cast<FloatType>(grid.actualSize());
+  const auto &grid = document->grid();
+  const auto delta = moveDirection(direction)*static_cast<FloatType>(grid.actualSize());
   document->translateObjects(delta);
 }
 
-vm::vec3 MapViewBase::moveDirection(const vm::direction direction) const
-{
+vm::vec3 MapViewBase::moveDirection(const vm::direction direction) const {
   return doGetMoveDirection(direction);
 }
 
-void MapViewBase::duplicateObjects()
-{
+void MapViewBase::duplicateObjects() {
   auto document = kdl::mem_lock(m_document);
-  if (document->hasSelectedNodes())
-  {
+  if (document->hasSelectedNodes()) {
     document->duplicateObjects();
   }
 }
 
-void MapViewBase::duplicateAndMoveObjects(const vm::direction direction)
-{
+void MapViewBase::duplicateAndMoveObjects(const vm::direction direction) {
   auto transaction = Transaction{m_document};
   duplicateObjects();
   moveObjects(direction);
   transaction.commit();
 }
 
-void MapViewBase::rotateObjects(const vm::rotation_axis axisSpec, const bool clockwise)
-{
+void MapViewBase::rotateObjects(const vm::rotation_axis axisSpec, const bool clockwise) {
   auto document = kdl::mem_lock(m_document);
-  if (!document->hasSelectedNodes())
-  {
+  if (!document->hasSelectedNodes()) {
     return;
   }
 
   const auto axis = rotationAxis(axisSpec, clockwise);
   const auto angle = m_toolBox.rotateObjectsToolActive()
-                       ? vm::abs(m_toolBox.rotateToolAngle())
-                       : vm::C::half_pi();
+                     ? vm::abs(m_toolBox.rotateToolAngle())
+                     : vm::C::half_pi();
 
-  const auto& grid = document->grid();
+  const auto &grid = document->grid();
   const auto center = m_toolBox.rotateObjectsToolActive()
-                        ? m_toolBox.rotateToolCenter()
-                        : grid.referencePoint(document->selectionBounds());
+                      ? m_toolBox.rotateToolCenter()
+                      : grid.referencePoint(document->selectionBounds());
 
   document->rotateObjects(center, axis, angle);
 }
 
 vm::vec3 MapViewBase::rotationAxis(
-  const vm::rotation_axis axisSpec, const bool clockwise) const
-{
+    const vm::rotation_axis axisSpec, const bool clockwise) const {
   vm::vec3 axis;
-  switch (axisSpec)
-  {
-  case vm::rotation_axis::roll:
-    axis = -moveDirection(vm::direction::forward);
+  switch (axisSpec) {
+  case vm::rotation_axis::roll:axis = -moveDirection(vm::direction::forward);
     break;
-  case vm::rotation_axis::pitch:
-    axis = moveDirection(vm::direction::right);
+  case vm::rotation_axis::pitch:axis = moveDirection(vm::direction::right);
     break;
-  case vm::rotation_axis::yaw:
-    axis = moveDirection(vm::direction::up);
+  case vm::rotation_axis::yaw:axis = moveDirection(vm::direction::up);
     break;
     switchDefault();
   }
@@ -475,10 +413,8 @@ vm::vec3 MapViewBase::rotationAxis(
   return clockwise ? -axis : axis;
 }
 
-void MapViewBase::flipObjects(const vm::direction direction)
-{
-  if (canFlipObjects())
-  {
+void MapViewBase::flipObjects(const vm::direction direction) {
+  if (canFlipObjects()) {
     auto document = kdl::mem_lock(m_document);
 
     // If we snap the selection bounds' center to the grid size, then
@@ -495,103 +431,78 @@ void MapViewBase::flipObjects(const vm::direction direction)
   }
 }
 
-bool MapViewBase::canFlipObjects() const
-{
+bool MapViewBase::canFlipObjects() const {
   auto document = kdl::mem_lock(m_document);
   return !m_toolBox.anyToolActive() && document->hasSelectedNodes();
 }
 
 void MapViewBase::moveTextures(
-  const vm::direction direction, const TextureActionMode mode)
-{
+    const vm::direction direction, const TextureActionMode mode) {
   auto document = kdl::mem_lock(m_document);
-  if (document->hasSelectedBrushFaces())
-  {
+  if (document->hasSelectedBrushFaces()) {
     const auto offset = moveTextureOffset(direction, mode);
     document->moveTextures(camera().up(), camera().right(), offset);
   }
 }
 
 vm::vec2f MapViewBase::moveTextureOffset(
-  const vm::direction direction, const TextureActionMode mode) const
-{
-  switch (direction)
-  {
-  case vm::direction::up:
-    return vm::vec2f{0.0f, moveTextureDistance(mode)};
-  case vm::direction::down:
-    return vm::vec2f{0.0f, -moveTextureDistance(mode)};
-  case vm::direction::left:
-    return vm::vec2f{-moveTextureDistance(mode), 0.0f};
-  case vm::direction::right:
-    return vm::vec2f{moveTextureDistance(mode), 0.0f};
+    const vm::direction direction, const TextureActionMode mode) const {
+  switch (direction) {
+  case vm::direction::up:return vm::vec2f{0.0f, moveTextureDistance(mode)};
+  case vm::direction::down:return vm::vec2f{0.0f, -moveTextureDistance(mode)};
+  case vm::direction::left:return vm::vec2f{-moveTextureDistance(mode), 0.0f};
+  case vm::direction::right:return vm::vec2f{moveTextureDistance(mode), 0.0f};
   case vm::direction::forward:
-  case vm::direction::backward:
-    return vm::vec2f{};
+  case vm::direction::backward:return vm::vec2f{};
     switchDefault();
   }
 }
 
-float MapViewBase::moveTextureDistance(const TextureActionMode mode) const
-{
-  const auto& grid = kdl::mem_lock(m_document)->grid();
+float MapViewBase::moveTextureDistance(const TextureActionMode mode) const {
+  const auto &grid = kdl::mem_lock(m_document)->grid();
   const auto gridSize = static_cast<float>(grid.actualSize());
 
-  switch (mode)
-  {
-  case TextureActionMode::Fine:
-    return 1.0f;
-  case TextureActionMode::Coarse:
-    return 2.0f * gridSize;
-  case TextureActionMode::Normal:
-    return gridSize;
+  switch (mode) {
+  case TextureActionMode::Fine:return 1.0f;
+  case TextureActionMode::Coarse:return 2.0f*gridSize;
+  case TextureActionMode::Normal:return gridSize;
     switchDefault();
   }
 }
 
-void MapViewBase::rotateTextures(const bool clockwise, const TextureActionMode mode)
-{
+void MapViewBase::rotateTextures(const bool clockwise, const TextureActionMode mode) {
   auto document = kdl::mem_lock(m_document);
-  if (document->hasSelectedBrushFaces())
-  {
+  if (document->hasSelectedBrushFaces()) {
     const auto angle = rotateTextureAngle(clockwise, mode);
     document->rotateTextures(angle);
   }
 }
 
 float MapViewBase::rotateTextureAngle(
-  const bool clockwise, const TextureActionMode mode) const
-{
-  const auto& grid = kdl::mem_lock(m_document)->grid();
+    const bool clockwise, const TextureActionMode mode) const {
+  const auto &grid = kdl::mem_lock(m_document)->grid();
   const auto gridAngle = static_cast<float>(vm::to_degrees(grid.angle()));
   auto angle = 0.0f;
 
-  switch (mode)
-  {
-  case TextureActionMode::Fine:
-    angle = 1.0f;
+  switch (mode) {
+  case TextureActionMode::Fine:angle = 1.0f;
     break;
-  case TextureActionMode::Coarse:
-    angle = 90.0f;
+  case TextureActionMode::Coarse:angle = 90.0f;
     break;
-  case TextureActionMode::Normal:
-    angle = gridAngle;
+  case TextureActionMode::Normal:angle = gridAngle;
     break;
   }
   return clockwise ? angle : -angle;
 }
 
-void MapViewBase::flipTextures(const vm::direction direction)
-{
+void MapViewBase::flipTextures(const vm::direction direction) {
   auto document = kdl::mem_lock(m_document);
-  if (document->hasSelectedBrushFaces())
-  {
+  if (document->hasSelectedBrushFaces()) {
     document->flipTextures(camera().up(), camera().right(), direction);
   }
 }
 
-void MapViewBase::resetTextures()
-{
+void MapViewBase::resetTextures() {
   auto request = Model::ChangeBrushFaceAttributesRequest{};
 
   auto document = kdl::mem_lock(m_document);
@@ -599,8 +510,7 @@ void MapViewBase::resetTextures()
   document->setFaceAttributes(request);
 }
 
-void MapViewBase::resetTexturesToWorld()
-{
+void MapViewBase::resetTexturesToWorld() {
   auto request = Model::ChangeBrushFaceAttributesRequest{};
 
   auto document = kdl::mem_lock(m_document);
@@ -608,90 +518,73 @@ void MapViewBase::resetTexturesToWorld()
   document->setFaceAttributes(request);
 }
 
-void MapViewBase::createComplexBrush()
-{
-  if (m_toolBox.createComplexBrushToolActive())
-  {
+void MapViewBase::createComplexBrush() {
+  if (m_toolBox.createComplexBrushToolActive()) {
     m_toolBox.performCreateComplexBrush();
   }
 }
 
-void MapViewBase::toggleClipSide()
-{
+void MapViewBase::toggleClipSide() {
   m_toolBox.toggleClipSide();
 }
 
-void MapViewBase::performClip()
-{
+void MapViewBase::performClip() {
   m_toolBox.performClip();
 }
 
-void MapViewBase::resetCameraZoom()
-{
+void MapViewBase::resetCameraZoom() {
   camera().setZoom(1.0f);
 }
 
-void MapViewBase::cancel()
-{
-  if (doCancel())
-  {
+void MapViewBase::cancel() {
+  if (doCancel()) {
     return;
   }
-  if (ToolBoxConnector::cancel())
-  {
+  if (ToolBoxConnector::cancel()) {
     return;
   }
 
   auto document = kdl::mem_lock(m_document);
-  if (document->hasSelection())
-  {
+  if (document->hasSelection()) {
     document->deselectAll();
-  }
-  else if (document->currentGroup() != nullptr)
-  {
+  } else if (document->currentGroup()!=nullptr) {
     document->closeGroup();
   }
 }
 
-void MapViewBase::deactivateTool()
-{
+void MapViewBase::deactivateTool() {
   m_toolBox.deactivateAllTools();
 }
 
-void MapViewBase::createPointEntity()
-{
-  auto* action = qobject_cast<const QAction*>(sender());
+void MapViewBase::createPointEntity() {
+  auto *action = qobject_cast<const QAction *>(sender());
   auto document = kdl::mem_lock(m_document);
   const auto index = action->data().toUInt();
-  const auto* definition =
-    findEntityDefinition(Assets::EntityDefinitionType::PointEntity, index);
-  ensure(definition != nullptr, "definition is null");
-  assert(definition->type() == Assets::EntityDefinitionType::PointEntity);
-  createPointEntity(static_cast<const Assets::PointEntityDefinition*>(definition));
+  const auto *definition =
+      findEntityDefinition(Assets::EntityDefinitionType::PointEntity, index);
+  ensure(definition!=nullptr, "definition is null");
+  assert(definition->type()==Assets::EntityDefinitionType::PointEntity);
+  createPointEntity(static_cast<const Assets::PointEntityDefinition *>(definition));
 }
 
-void MapViewBase::createBrushEntity()
-{
-  auto* action = qobject_cast<const QAction*>(sender());
+void MapViewBase::createBrushEntity() {
+  auto *action = qobject_cast<const QAction *>(sender());
   auto document = kdl::mem_lock(m_document);
   const auto index = action->data().toUInt();
-  const auto* definition =
-    findEntityDefinition(Assets::EntityDefinitionType::BrushEntity, index);
-  ensure(definition != nullptr, "definition is null");
-  assert(definition->type() == Assets::EntityDefinitionType::BrushEntity);
-  createBrushEntity(static_cast<const Assets::BrushEntityDefinition*>(definition));
+  const auto *definition =
+      findEntityDefinition(Assets::EntityDefinitionType::BrushEntity, index);
+  ensure(definition!=nullptr, "definition is null");
+  assert(definition->type()==Assets::EntityDefinitionType::BrushEntity);
+  createBrushEntity(static_cast<const Assets::BrushEntityDefinition *>(definition));
 }
 
-Assets::EntityDefinition* MapViewBase::findEntityDefinition(
-  const Assets::EntityDefinitionType type, const size_t index) const
-{
+Assets::EntityDefinition *MapViewBase::findEntityDefinition(
+    const Assets::EntityDefinitionType type, const size_t index) const {
   size_t count = 0;
-  for (const auto& group : kdl::mem_lock(m_document)->entityDefinitionManager().groups())
-  {
+  for (const auto &group : kdl::mem_lock(m_document)->entityDefinitionManager().groups()) {
     const auto definitions =
-      group.definitions(type, Assets::EntityDefinitionSortOrder::Name);
-    if (index < count + definitions.size())
-    {
+        group.definitions(type, Assets::EntityDefinitionSortOrder::Name);
+    if (index < count + definitions.size()) {
       return definitions[index - count];
     }
     count += definitions.size();
@@ -699,42 +592,37 @@ Assets::EntityDefinition* MapViewBase::findEntityDefinition(
   return nullptr;
 }
 
-void MapViewBase::createPointEntity(const Assets::PointEntityDefinition* definition)
-{
-  ensure(definition != nullptr, "definition is null");
+void MapViewBase::createPointEntity(const Assets::PointEntityDefinition *definition) {
+  ensure(definition!=nullptr, "definition is null");
 
   auto document = kdl::mem_lock(m_document);
   const auto delta = doComputePointEntityPosition(definition->bounds());
   document->createPointEntity(definition, delta);
 }
 
-void MapViewBase::createBrushEntity(const Assets::BrushEntityDefinition* definition)
-{
-  ensure(definition != nullptr, "definition is null");
+void MapViewBase::createBrushEntity(const Assets::BrushEntityDefinition *definition) {
+  ensure(definition!=nullptr, "definition is null");
 
   auto document = kdl::mem_lock(m_document);
   document->createBrushEntity(definition);
 }
 
-bool MapViewBase::canCreateBrushEntity()
-{
+bool MapViewBase::canCreateBrushEntity() {
   auto document = kdl::mem_lock(m_document);
   return document->selectedNodes().hasOnlyBrushes();
 }
 
-void MapViewBase::toggleTagVisible(const Model::SmartTag& tag)
-{
+void MapViewBase::toggleTagVisible(const Model::SmartTag &tag) {
   const auto tagIndex = tag.index();
 
   auto document = kdl::mem_lock(m_document);
-  auto& editorContext = document->editorContext();
+  auto &editorContext = document->editorContext();
   auto hiddenTags = editorContext.hiddenTags();
   hiddenTags ^= Model::TagType::Type{1} << tagIndex;
   editorContext.setHiddenTags(hiddenTags);
 }
 
-void MapViewBase::enableTag(const Model::SmartTag& tag)
-{
+void MapViewBase::enableTag(const Model::SmartTag &tag) {
   assert(tag.canEnable());
   auto document = kdl::mem_lock(m_document);
 
@@ -744,8 +632,7 @@ void MapViewBase::enableTag(const Model::SmartTag& tag)
   transaction.commit();
 }
 
-void MapViewBase::disableTag(const Model::SmartTag& tag)
-{
+void MapViewBase::disableTag(const Model::SmartTag &tag) {
   assert(tag.canDisable());
   auto document = kdl::mem_lock(m_document);
   auto transaction = Transaction{document, "Turn Selection into non-" + tag.name()};
@@ -754,44 +641,37 @@ void MapViewBase::disableTag(const Model::SmartTag& tag)
   transaction.commit();
 }
 
-void MapViewBase::makeStructural()
-{
+void MapViewBase::makeStructural() {
   auto document = kdl::mem_lock(m_document);
-  if (!document->selectedNodes().hasBrushes())
-  {
+  if (!document->selectedNodes().hasBrushes()) {
     return;
   }
 
-  auto toReparent = std::vector<Model::Node*>{};
-  const auto& selectedBrushes = document->selectedNodes().brushes();
+  auto toReparent = std::vector<Model::Node *>{};
+  const auto &selectedBrushes = document->selectedNodes().brushes();
   std::copy_if(
-    selectedBrushes.begin(),
-    selectedBrushes.end(),
-    std::back_inserter(toReparent),
-    [&](const auto* brushNode) { return brushNode->entity() != document->world(); });
+      selectedBrushes.begin(),
+      selectedBrushes.end(),
+      std::back_inserter(toReparent),
+      [&](const auto *brushNode) { return brushNode->entity()!=document->world(); });
 
   auto transaction = Transaction{document, "Make Structural"};
 
-  if (!toReparent.empty())
-  {
+  if (!toReparent.empty()) {
     reparentNodes(toReparent, document->parentForNodes(toReparent), false);
   }
   bool anyTagDisabled = false;
   auto callback = EnableDisableTagCallback{};
-  for (auto* brush : document->selectedNodes().brushes())
-  {
-    for (const auto& tag : document->smartTags())
-    {
-      if (brush->hasTag(tag) || brush->anyFacesHaveAnyTagInMask(tag.type()))
-      {
+  for (auto *brush : document->selectedNodes().brushes()) {
+    for (const auto &tag : document->smartTags()) {
+      if (brush->hasTag(tag) || brush->anyFacesHaveAnyTagInMask(tag.type())) {
         anyTagDisabled = true;
         tag.disable(callback, *document);
       }
     }
   }
 
-  if (!anyTagDisabled && toReparent.empty())
-  {
+  if (!anyTagDisabled && toReparent.empty()) {
     transaction.cancel();
     return;
   }
@@ -800,195 +680,164 @@ void MapViewBase::makeStructural()
 }
 
 void MapViewBase::toggleEntityDefinitionVisible(
-  const Assets::EntityDefinition* definition)
-{
+    const Assets::EntityDefinition *definition) {
   auto document = kdl::mem_lock(m_document);
 
-  auto& editorContext = document->editorContext();
+  auto &editorContext = document->editorContext();
   editorContext.setEntityDefinitionHidden(
-    definition, !editorContext.entityDefinitionHidden(definition));
+      definition, !editorContext.entityDefinitionHidden(definition));
 }
 
-void MapViewBase::createEntity(const Assets::EntityDefinition* definition)
-{
+void MapViewBase::createEntity(const Assets::EntityDefinition *definition) {
   auto document = kdl::mem_lock(m_document);
-  if (definition->type() == Assets::EntityDefinitionType::PointEntity)
-  {
-    createPointEntity(static_cast<const Assets::PointEntityDefinition*>(definition));
-  }
-  else if (canCreateBrushEntity())
-  {
-    createBrushEntity(static_cast<const Assets::BrushEntityDefinition*>(definition));
+  if (definition->type()==Assets::EntityDefinitionType::PointEntity) {
+    createPointEntity(static_cast<const Assets::PointEntityDefinition *>(definition));
+  } else if (canCreateBrushEntity()) {
+    createBrushEntity(static_cast<const Assets::BrushEntityDefinition *>(definition));
   }
 }
 
-void MapViewBase::toggleShowEntityClassnames()
-{
+void MapViewBase::toggleShowEntityClassnames() {
   togglePref(Preferences::ShowEntityClassnames);
 }
 
-void MapViewBase::toggleShowGroupBounds()
-{
+void MapViewBase::toggleShowGroupBounds() {
   togglePref(Preferences::ShowGroupBounds);
 }
 
-void MapViewBase::toggleShowBrushEntityBounds()
-{
+void MapViewBase::toggleShowBrushEntityBounds() {
   togglePref(Preferences::ShowBrushEntityBounds);
 }
 
-void MapViewBase::toggleShowPointEntityBounds()
-{
+void MapViewBase::toggleShowPointEntityBounds() {
   togglePref(Preferences::ShowPointEntityBounds);
 }
 
-void MapViewBase::toggleShowPointEntities()
-{
+void MapViewBase::toggleShowPointEntities() {
   togglePref(Preferences::ShowPointEntities);
 }
 
-void MapViewBase::toggleShowPointEntityModels()
-{
+void MapViewBase::toggleShowPointEntityModels() {
   togglePref(Preferences::ShowPointEntityModels);
 }
 
-void MapViewBase::toggleShowBrushes()
-{
+void MapViewBase::toggleShowBrushes() {
   togglePref(Preferences::ShowBrushes);
 }
 
-void MapViewBase::showTextures()
-{
+void MapViewBase::showTextures() {
   setPref(Preferences::FaceRenderMode, Preferences::faceRenderModeTextured());
 }
 
-void MapViewBase::hideTextures()
-{
+void MapViewBase::hideTextures() {
   setPref(Preferences::FaceRenderMode, Preferences::faceRenderModeFlat());
 }
 
-void MapViewBase::hideFaces()
-{
+void MapViewBase::hideFaces() {
   setPref(Preferences::FaceRenderMode, Preferences::faceRenderModeSkip());
 }
 
-void MapViewBase::toggleShadeFaces()
-{
+void MapViewBase::toggleShadeFaces() {
   togglePref(Preferences::ShadeFaces);
 }
 
-void MapViewBase::toggleShowFog()
-{
+void MapViewBase::toggleShowFog() {
   togglePref(Preferences::ShowFog);
 }
 
-void MapViewBase::toggleShowEdges()
-{
+void MapViewBase::toggleShowEdges() {
   togglePref(Preferences::ShowEdges);
 }
 
-void MapViewBase::showAllEntityLinks()
-{
+void MapViewBase::showAllEntityLinks() {
   setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeAll());
 }
 
-void MapViewBase::showTransitivelySelectedEntityLinks()
-{
+void MapViewBase::showTransitivelySelectedEntityLinks() {
   setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeTransitive());
 }
 
-void MapViewBase::showDirectlySelectedEntityLinks()
-{
+void MapViewBase::showDirectlySelectedEntityLinks() {
   setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeDirect());
 }
 
-void MapViewBase::hideAllEntityLinks()
-{
+void MapViewBase::hideAllEntityLinks() {
   setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeNone());
 }
 
-bool MapViewBase::event(QEvent* event)
-{
-  if (event->type() == QEvent::WindowDeactivate)
-  {
+bool MapViewBase::event(QEvent *event) {
+  if (event->type()==QEvent::WindowDeactivate) {
     cancelMouseDrag();
   }
 
   return RenderView::event(event);
 }
 
-void MapViewBase::focusInEvent(QFocusEvent* event)
-{
+void MapViewBase::focusInEvent(QFocusEvent *event) {
   updateActionStates(); // enable/disable QShortcut's to reflect whether we have focus
-                        // (needed because of QOpenGLWindow; see comment in
-                        // createAndRegisterShortcut)
+  // (needed because of QOpenGLWindow; see comment in
+  // createAndRegisterShortcut)
   updateModifierKeys();
   update();
   RenderView::focusInEvent(event);
 }
 
-void MapViewBase::focusOutEvent(QFocusEvent* event)
-{
+void MapViewBase::focusOutEvent(QFocusEvent *event) {
   clearModifierKeys();
   update();
   RenderView::focusOutEvent(event);
 }
 
-ActionContext::Type MapViewBase::actionContext() const
-{
+ActionContext::Type MapViewBase::actionContext() const {
   auto document = kdl::mem_lock(m_document);
 
   const auto derivedContext = doGetActionContext();
   const auto toolContext =
-    m_toolBox.createComplexBrushToolActive() ? ActionContext::CreateComplexBrushTool
-    : m_toolBox.clipToolActive()             ? ActionContext::ClipTool
-    : m_toolBox.anyVertexToolActive()        ? ActionContext::AnyVertexTool
-    : m_toolBox.rotateObjectsToolActive()    ? ActionContext::RotateTool
-    : m_toolBox.scaleObjectsToolActive()     ? ActionContext::ScaleTool
-    : m_toolBox.shearObjectsToolActive()     ? ActionContext::ShearTool
-                                             : ActionContext::NoTool;
+      m_toolBox.createComplexBrushToolActive() ? ActionContext::CreateComplexBrushTool
+                                               : m_toolBox.clipToolActive() ? ActionContext::ClipTool
+                                                                            : m_toolBox.anyVertexToolActive()
+                                                                              ? ActionContext::AnyVertexTool
+                                                                              : m_toolBox.rotateObjectsToolActive()
+                                                                                ? ActionContext::RotateTool
+                                                                                : m_toolBox.scaleObjectsToolActive()
+                                                                                  ? ActionContext::ScaleTool
+                                                                                  : m_toolBox.shearObjectsToolActive()
+                                                                                    ? ActionContext::ShearTool
+                                                                                    : ActionContext::NoTool;
   const auto selectionContext =
-    document->hasSelectedNodes()        ? ActionContext::NodeSelection
-    : document->hasSelectedBrushFaces() ? ActionContext::FaceSelection
-                                        : ActionContext::NoSelection;
+      document->hasSelectedNodes() ? ActionContext::NodeSelection
+                                   : document->hasSelectedBrushFaces() ? ActionContext::FaceSelection
+                                                                       : ActionContext::NoSelection;
   return derivedContext | toolContext | selectionContext;
 }
 
-void MapViewBase::doFlashSelection()
-{
+void MapViewBase::doFlashSelection() {
   auto animation = std::make_unique<FlashSelectionAnimation>(m_renderer, this, 180);
   m_animationManager->runAnimation(std::move(animation), true);
 }
 
-void MapViewBase::doInstallActivationTracker(MapViewActivationTracker& activationTracker)
-{
+void MapViewBase::doInstallActivationTracker(MapViewActivationTracker &activationTracker) {
   activationTracker.addWindow(this);
 }
 
-bool MapViewBase::doGetIsCurrent() const
-{
+bool MapViewBase::doGetIsCurrent() const {
   return m_isCurrent;
 }
 
-MapViewBase* MapViewBase::doGetFirstMapViewBase()
-{
+MapViewBase *MapViewBase::doGetFirstMapViewBase() {
   return this;
 }
 
-bool MapViewBase::doCancelMouseDrag()
-{
+bool MapViewBase::doCancelMouseDrag() {
   return ToolBoxConnector::cancelDrag();
 }
 
-void MapViewBase::doRefreshViews()
-{
+void MapViewBase::doRefreshViews() {
   update();
 }
 
-void MapViewBase::initializeGL()
-{
-  if (doInitializeGL())
-  {
+void MapViewBase::initializeGL() {
+  if (doInitializeGL()) {
     m_logger->info() << "Renderer info: " << GLContextManager::GLRenderer << " version "
                      << GLContextManager::GLVersion << " from "
                      << GLContextManager::GLVendor;
@@ -998,28 +847,26 @@ void MapViewBase::initializeGL()
   }
 }
 
-bool MapViewBase::doShouldRenderFocusIndicator() const
-{
+bool MapViewBase::doShouldRenderFocusIndicator() const {
   return true;
 }
 
-void MapViewBase::doRender()
-{
+void MapViewBase::doRender() {
   doPreRender();
 
-  const auto& fontPath = pref(Preferences::RendererFontPath);
+  const auto &fontPath = pref(Preferences::RendererFontPath);
   const auto fontSize = static_cast<size_t>(pref(Preferences::RendererFontSize));
   const auto fontDescriptor = Renderer::FontDescriptor{fontPath, fontSize};
 
   auto document = kdl::mem_lock(m_document);
-  const auto& grid = document->grid();
+  const auto &grid = document->grid();
 
   auto renderContext =
-    Renderer::RenderContext{doGetRenderMode(), camera(), fontManager(), shaderManager()};
+      Renderer::RenderContext{doGetRenderMode(), camera(), fontManager(), shaderManager()};
   renderContext.setShowTextures(
-    pref(Preferences::FaceRenderMode) == Preferences::faceRenderModeTextured());
+      pref(Preferences::FaceRenderMode)==Preferences::faceRenderModeTextured());
   renderContext.setShowFaces(
-    pref(Preferences::FaceRenderMode) != Preferences::faceRenderModeSkip());
+      pref(Preferences::FaceRenderMode)!=Preferences::faceRenderModeSkip());
   renderContext.setShowEdges(pref(Preferences::ShowEdges));
   renderContext.setShadeFaces(pref(Preferences::ShadeFaces));
   renderContext.setShowPointEntities(pref(Preferences::ShowPointEntities));
@@ -1033,7 +880,7 @@ void MapViewBase::doRender()
   renderContext.setGridSize(grid.actualSize());
   renderContext.setDpiScale(static_cast<float>(window()->devicePixelRatioF()));
   renderContext.setSoftMapBounds(
-    pref(Preferences::ShowSoftMapBounds)
+      pref(Preferences::ShowSoftMapBounds)
       ? vm::bbox3f{document->softMapBounds().bounds.value_or(vm::bbox3{})}
       : vm::bbox3f{});
 
@@ -1057,22 +904,18 @@ void MapViewBase::doRender()
   renderBatch.render(renderContext);
 }
 
-void MapViewBase::setupGL(Renderer::RenderContext& context)
-{
-  const auto& viewport = context.camera().viewport();
+void MapViewBase::setupGL(Renderer::RenderContext &context) {
+  const auto &viewport = context.camera().viewport();
   const auto r = devicePixelRatioF();
-  const auto x = static_cast<int>(viewport.x * r);
-  const auto y = static_cast<int>(viewport.y * r);
-  const auto width = static_cast<int>(viewport.width * r);
-  const auto height = static_cast<int>(viewport.height * r);
+  const auto x = static_cast<int>(viewport.x*r);
+  const auto y = static_cast<int>(viewport.y*r);
+  const auto width = static_cast<int>(viewport.width*r);
+  const auto height = static_cast<int>(viewport.height*r);
   glAssert(glViewport(x, y, width, height));
 
-  if (pref(Preferences::EnableMSAA))
-  {
+  if (pref(Preferences::EnableMSAA)) {
     glAssert(glEnable(GL_MULTISAMPLE));
-  }
-  else
-  {
+  } else {
     glAssert(glDisable(GL_MULTISAMPLE));
   }
   glAssert(glEnable(GL_BLEND));
@@ -1081,12 +924,10 @@ void MapViewBase::setupGL(Renderer::RenderContext& context)
 }
 
 void MapViewBase::renderCoordinateSystem(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
-  if (pref(Preferences::ShowAxes))
-  {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+  if (pref(Preferences::ShowAxes)) {
     auto document = kdl::mem_lock(m_document);
-    const auto& worldBounds = document->worldBounds();
+    const auto &worldBounds = document->worldBounds();
 
     auto renderService = Renderer::RenderService{renderContext, renderBatch};
     renderService.renderCoordinateSystem(vm::bbox3f{worldBounds});
@@ -1094,17 +935,14 @@ void MapViewBase::renderCoordinateSystem(
 }
 
 void MapViewBase::renderSoftMapBounds(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
   doRenderSoftWorldBounds(renderContext, renderBatch);
 }
 
 void MapViewBase::renderPointFile(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
   auto document = kdl::mem_lock(m_document);
-  if (const auto* pointFile = document->pointFile())
-  {
+  if (const auto *pointFile = document->pointFile()) {
     auto renderService = Renderer::RenderService{renderContext, renderBatch};
     renderService.setForegroundColor(pref(Preferences::PointFileColor));
     renderService.renderLineStrip(pointFile->points());
@@ -1112,108 +950,92 @@ void MapViewBase::renderPointFile(
 }
 
 void MapViewBase::renderPortalFile(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
-  if (m_portalFileRenderer == nullptr)
-  {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+  if (m_portalFileRenderer==nullptr) {
     validatePortalFileRenderer(renderContext);
-    assert(m_portalFileRenderer != nullptr);
+    assert(m_portalFileRenderer!=nullptr);
   }
   renderBatch.add(m_portalFileRenderer.get());
 }
 
-void MapViewBase::invalidatePortalFileRenderer()
-{
+void MapViewBase::invalidatePortalFileRenderer() {
   m_portalFileRenderer = nullptr;
 }
 
-void MapViewBase::validatePortalFileRenderer(Renderer::RenderContext&)
-{
-  assert(m_portalFileRenderer == nullptr);
+void MapViewBase::validatePortalFileRenderer(Renderer::RenderContext &) {
+  assert(m_portalFileRenderer==nullptr);
   m_portalFileRenderer = std::make_unique<Renderer::PrimitiveRenderer>();
 
   auto document = kdl::mem_lock(m_document);
-  auto* portalFile = document->portalFile();
-  if (portalFile != nullptr)
-  {
-    for (const auto& poly : portalFile->portals())
-    {
+  auto *portalFile = document->portalFile();
+  if (portalFile!=nullptr) {
+    for (const auto &poly : portalFile->portals()) {
       m_portalFileRenderer->renderFilledPolygon(
-        pref(Preferences::PortalFileFillColor),
-        Renderer::PrimitiveRendererOcclusionPolicy::Hide,
-        Renderer::PrimitiveRendererCullingPolicy::ShowBackfaces,
-        poly.vertices());
+          pref(Preferences::PortalFileFillColor),
+          Renderer::PrimitiveRendererOcclusionPolicy::Hide,
+          Renderer::PrimitiveRendererCullingPolicy::ShowBackfaces,
+          poly.vertices());
 
       const auto lineWidth = 4.0f;
       m_portalFileRenderer->renderPolygon(
-        pref(Preferences::PortalFileBorderColor),
-        lineWidth,
-        Renderer::PrimitiveRendererOcclusionPolicy::Hide,
-        poly.vertices());
+          pref(Preferences::PortalFileBorderColor),
+          lineWidth,
+          Renderer::PrimitiveRendererOcclusionPolicy::Hide,
+          poly.vertices());
     }
   }
 }
 
-void MapViewBase::renderCompass(Renderer::RenderBatch& renderBatch)
-{
-  if (m_compass != nullptr)
-  {
+void MapViewBase::renderCompass(Renderer::RenderBatch &renderBatch) {
+  if (m_compass!=nullptr) {
     m_compass->render(renderBatch);
   }
 }
 
 void MapViewBase::renderFPS(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
-  if (pref(Preferences::ShowFPS))
-  {
+    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+  if (pref(Preferences::ShowFPS)) {
     auto renderService = Renderer::RenderService{renderContext, renderBatch};
     renderService.renderHeadsUp(m_currentFPS);
   }
 }
 
-void MapViewBase::processEvent(const KeyEvent& event)
-{
+void MapViewBase::processEvent(const KeyEvent &event) {
   ToolBoxConnector::processEvent(event);
 }
 
-void MapViewBase::processEvent(const MouseEvent& event)
-{
+void MapViewBase::processEvent(const MouseEvent &event) {
   ToolBoxConnector::processEvent(event);
 }
 
-void MapViewBase::processEvent(const CancelEvent& event)
-{
+void MapViewBase::processEvent(const CancelEvent &event) {
   ToolBoxConnector::processEvent(event);
 }
 
-void MapViewBase::doShowPopupMenu()
-{
+void MapViewBase::doShowPopupMenu() {
   // We process input events during paint event processing, but we cannot show a popup
   // menu during paint processing, so we enqueue an event for later.
   QMetaObject::invokeMethod(this, "showPopupMenuLater", Qt::QueuedConnection);
 }
 
-void MapViewBase::showPopupMenuLater()
-{
-  if (!doBeforePopupMenu())
-  {
+void MapViewBase::showPopupMenuLater() {
+  if (!doBeforePopupMenu()) {
     return;
   }
 
   auto document = kdl::mem_lock(m_document);
-  const auto& nodes = document->selectedNodes().nodes();
-  auto* newBrushParent = findNewParentEntityForBrushes(nodes);
-  auto* currentGroup = document->editorContext().currentGroup();
-  auto* newGroup = findNewGroupForObjects(nodes);
-  auto* mergeGroup = findGroupToMergeGroupsInto(document->selectedNodes());
+  const auto &nodes = document->selectedNodes().nodes();
+  auto *newBrushParent = findNewParentEntityForBrushes(nodes);
+  auto *currentGroup = document->editorContext().currentGroup();
+  auto *newGroup = findNewGroupForObjects(nodes);
+  auto *mergeGroup = findGroupToMergeGroupsInto(document->selectedNodes());
 
-  auto* mapFrame = findMapFrame(this);
+  auto *mapFrame = findMapFrame(this);
 
   auto menu = QMenu{};
-  const auto addMainMenuAction = [&](const auto& path) -> QAction* {
-    auto* groupAction = mapFrame->findAction(path);
-    assert(groupAction != nullptr);
+  const auto addMainMenuAction = [&](const auto &path) -> QAction * {
+    auto *groupAction = mapFrame->findAction(path);
+    assert(groupAction!=nullptr);
     menu.addAction(groupAction);
     return groupAction;
   };
@@ -1221,32 +1043,30 @@ void MapViewBase::showPopupMenuLater()
   addMainMenuAction("Menu/Edit/Group");
   addMainMenuAction("Menu/Edit/Ungroup");
 
-  auto* mergeGroupAction = menu.addAction(
-    mergeGroup
+  auto *mergeGroupAction = menu.addAction(
+      mergeGroup
       ? tr("Merge Groups into %1").arg(QString::fromStdString(mergeGroup->name()))
       : tr("Merge Groups"),
-    this,
-    &MapViewBase::mergeSelectedGroups);
+      this,
+      &MapViewBase::mergeSelectedGroups);
   mergeGroupAction->setEnabled(canMergeGroups());
 
-  auto* renameAction =
-    menu.addAction(tr("Rename Groups"), mapFrame, &MapFrame::renameSelectedGroups);
+  auto *renameAction =
+      menu.addAction(tr("Rename Groups"), mapFrame, &MapFrame::renameSelectedGroups);
   renameAction->setEnabled(mapFrame->canRenameSelectedGroups());
 
-  if (newGroup && canReparentNodes(nodes, newGroup))
-  {
+  if (newGroup && canReparentNodes(nodes, newGroup)) {
     menu.addAction(
-      tr("Add Objects to Group %1").arg(QString::fromStdString(newGroup->name())),
-      this,
-      &MapViewBase::addSelectedObjectsToGroup);
+        tr("Add Objects to Group %1").arg(QString::fromStdString(newGroup->name())),
+        this,
+        &MapViewBase::addSelectedObjectsToGroup);
   }
-  if (currentGroup && !document->selectedNodes().empty())
-  {
+  if (currentGroup && !document->selectedNodes().empty()) {
     menu.addAction(
-      tr("Remove Objects from Group %1")
-        .arg(QString::fromStdString(currentGroup->name())),
-      this,
-      &MapViewBase::removeSelectedObjectsFromGroup);
+        tr("Remove Objects from Group %1")
+            .arg(QString::fromStdString(currentGroup->name())),
+        this,
+        &MapViewBase::removeSelectedObjectsFromGroup);
   }
   menu.addSeparator();
 
@@ -1261,99 +1081,90 @@ void MapViewBase::showPopupMenuLater()
 
   const auto selectedObjectLayers = Model::collectContainingLayersUserSorted(nodes);
 
-  auto* moveSelectionTo = menu.addMenu(tr("Move to Layer"));
-  for (auto* layerNode : document->world()->allLayersUserSorted())
-  {
-    auto* action =
-      moveSelectionTo->addAction(QString::fromStdString(layerNode->name()), this, [=] {
-        document->moveSelectionToLayer(layerNode);
-      });
+  auto *moveSelectionTo = menu.addMenu(tr("Move to Layer"));
+  for (auto *layerNode : document->world()->allLayersUserSorted()) {
+    auto *action =
+        moveSelectionTo->addAction(QString::fromStdString(layerNode->name()), this, [=] {
+          document->moveSelectionToLayer(layerNode);
+        });
     action->setEnabled(document->canMoveSelectionToLayer(layerNode));
   }
 
   const auto moveSelectionToItems = moveSelectionTo->actions();
   moveSelectionTo->setEnabled(std::any_of(
-    std::begin(moveSelectionToItems),
-    std::end(moveSelectionToItems),
-    [](QAction* action) { return action->isEnabled(); }));
+      std::begin(moveSelectionToItems),
+      std::end(moveSelectionToItems),
+      [](QAction *action) { return action->isEnabled(); }));
 
-  if (selectedObjectLayers.size() == 1u)
-  {
-    auto* layerNode = selectedObjectLayers[0];
-    auto* action = menu.addAction(
-      tr("Make Layer %1 Active").arg(QString::fromStdString(layerNode->name())),
-      this,
-      [=]() { document->setCurrentLayer(layerNode); });
+  if (selectedObjectLayers.size()==1u) {
+    auto *layerNode = selectedObjectLayers[0];
+    auto *action = menu.addAction(
+        tr("Make Layer %1 Active").arg(QString::fromStdString(layerNode->name())),
+        this,
+        [=]() { document->setCurrentLayer(layerNode); });
     action->setEnabled(document->canSetCurrentLayer(layerNode));
-  }
-  else
-  {
-    auto* makeLayerActive = menu.addMenu(tr("Make Layer Active"));
-    for (auto* layerNode : selectedObjectLayers)
-    {
-      auto* action = makeLayerActive->addAction(
-        QString::fromStdString(layerNode->name()), this, [=]() {
-          document->setCurrentLayer(layerNode);
-        });
+  } else {
+    auto *makeLayerActive = menu.addMenu(tr("Make Layer Active"));
+    for (auto *layerNode : selectedObjectLayers) {
+      auto *action = makeLayerActive->addAction(
+          QString::fromStdString(layerNode->name()), this, [=]() {
+            document->setCurrentLayer(layerNode);
+          });
       action->setEnabled(document->canSetCurrentLayer(layerNode));
     }
-    if (makeLayerActive->isEmpty())
-    {
+    if (makeLayerActive->isEmpty()) {
       makeLayerActive->setDisabled(true);
     }
   }
 
-  auto* hideLayersAction = menu.addAction(
-    tr("Hide Layers"), this, [=]() { document->hideLayers(selectedObjectLayers); });
+  auto *hideLayersAction = menu.addAction(
+      tr("Hide Layers"), this, [=]() { document->hideLayers(selectedObjectLayers); });
   hideLayersAction->setEnabled(document->canHideLayers(selectedObjectLayers));
-  auto* isolateLayersAction = menu.addAction(
-    tr("Isolate Layers"), this, [=]() { document->isolateLayers(selectedObjectLayers); });
+  auto *isolateLayersAction = menu.addAction(
+      tr("Isolate Layers"), this, [=]() { document->isolateLayers(selectedObjectLayers); });
   isolateLayersAction->setEnabled(document->canIsolateLayers(selectedObjectLayers));
-  auto* selectAllInLayersAction = menu.addAction(tr("Select All in Layers"), this, [=]() {
+  auto *selectAllInLayersAction = menu.addAction(tr("Select All in Layers"), this, [=]() {
     document->selectAllInLayers(selectedObjectLayers);
   });
   selectAllInLayersAction->setEnabled(
-    document->canSelectAllInLayers(selectedObjectLayers));
+      document->canSelectAllInLayers(selectedObjectLayers));
 
   menu.addSeparator();
 
-  if (document->selectedNodes().hasOnlyBrushes())
-  {
-    auto* moveToWorldAction =
-      menu.addAction(tr("Make Structural"), this, &MapViewBase::makeStructural);
+  if (document->selectedNodes().hasOnlyBrushes()) {
+    auto *moveToWorldAction =
+        menu.addAction(tr("Make Structural"), this, &MapViewBase::makeStructural);
     moveToWorldAction->setEnabled(canMakeStructural());
 
     const auto isEntity = newBrushParent->accept(kdl::overload(
-      [](const Model::WorldNode*) { return false; },
-      [](const Model::LayerNode*) { return false; },
-      [](const Model::GroupNode*) { return false; },
-      [](const Model::EntityNode*) { return true; },
-      [](const Model::BrushNode*) { return false; },
-      [](const Model::PatchNode*) { return false; }));
+        [](const Model::WorldNode *) { return false; },
+        [](const Model::LayerNode *) { return false; },
+        [](const Model::GroupNode *) { return false; },
+        [](const Model::EntityNode *) { return true; },
+        [](const Model::BrushNode *) { return false; },
+        [](const Model::PatchNode *) { return false; }));
 
-    if (isEntity)
-    {
+    if (isEntity) {
       menu.addAction(
-        tr("Move Brushes to Entity %1")
-          .arg(QString::fromStdString(newBrushParent->name())),
-        this,
-        &MapViewBase::moveSelectedBrushesToEntity);
+          tr("Move Brushes to Entity %1")
+              .arg(QString::fromStdString(newBrushParent->name())),
+          this,
+          &MapViewBase::moveSelectedBrushesToEntity);
     }
   }
 
   menu.addSeparator();
 
   using namespace Model::HitFilters;
-  const auto& hit = pickResult().first(type(Model::BrushNode::BrushHitType));
+  const auto &hit = pickResult().first(type(Model::BrushNode::BrushHitType));
   const auto faceHandle = Model::hitToFaceHandle(hit);
-  if (faceHandle)
-  {
-    const auto* texture = faceHandle->face().texture();
+  if (faceHandle) {
+    const auto *texture = faceHandle->face().texture();
     menu.addAction(
-      tr("Reveal %1 in Texture Browser")
-        .arg(QString::fromStdString(faceHandle->face().attributes().textureName())),
-      mapFrame,
-      [=] { mapFrame->revealTexture(texture); });
+        tr("Reveal %1 in Texture Browser")
+            .arg(QString::fromStdString(faceHandle->face().attributes().textureName())),
+        mapFrame,
+        [=] { mapFrame->revealTexture(texture); });
 
     menu.addSeparator();
   }
@@ -1369,14 +1180,14 @@ void MapViewBase::showPopupMenuLater()
   const auto windowPos = window()->mapFromGlobal(screenPos);
   const auto localPos = mapFromGlobal(screenPos);
   auto mouseEvent = QMouseEvent(
-    QEvent::MouseMove,
-    localPos,
-    windowPos,
-    screenPos,
-    Qt::NoButton,
-    Qt::NoButton,
-    Qt::NoModifier,
-    Qt::MouseEventSynthesizedByApplication);
+      QEvent::MouseMove,
+      localPos,
+      windowPos,
+      screenPos,
+      Qt::NoButton,
+      Qt::NoButton,
+      Qt::NoModifier,
+      Qt::MouseEventSynthesizedByApplication);
   mouseMoveEvent(&mouseEvent);
 
   doAfterPopupMenu();
@@ -1385,51 +1196,42 @@ void MapViewBase::showPopupMenuLater()
 /**
  * Forward drag and drop events from QWidget to ToolBoxConnector
  */
-void MapViewBase::dragEnterEvent(QDragEnterEvent* dragEnterEvent)
-{
+void MapViewBase::dragEnterEvent(QDragEnterEvent *dragEnterEvent) {
   if (dragEnter(
-        static_cast<float>(dragEnterEvent->posF().x()),
-        static_cast<float>(dragEnterEvent->posF().y()),
-        dragEnterEvent->mimeData()->text().toStdString()))
-  {
+      static_cast<float>(dragEnterEvent->posF().x()),
+      static_cast<float>(dragEnterEvent->posF().y()),
+      dragEnterEvent->mimeData()->text().toStdString())) {
     dragEnterEvent->acceptProposedAction();
   }
 }
 
-void MapViewBase::dragLeaveEvent(QDragLeaveEvent*)
-{
+void MapViewBase::dragLeaveEvent(QDragLeaveEvent *) {
   dragLeave();
 }
 
-void MapViewBase::dragMoveEvent(QDragMoveEvent* dragMoveEvent)
-{
+void MapViewBase::dragMoveEvent(QDragMoveEvent *dragMoveEvent) {
   dragMove(
-    static_cast<float>(dragMoveEvent->posF().x()),
-    static_cast<float>(dragMoveEvent->posF().y()),
-    dragMoveEvent->mimeData()->text().toStdString());
+      static_cast<float>(dragMoveEvent->posF().x()),
+      static_cast<float>(dragMoveEvent->posF().y()),
+      dragMoveEvent->mimeData()->text().toStdString());
   dragMoveEvent->acceptProposedAction();
 }
 
-void MapViewBase::dropEvent(QDropEvent* dropEvent)
-{
+void MapViewBase::dropEvent(QDropEvent *dropEvent) {
   dragDrop(
-    static_cast<float>(dropEvent->posF().x()),
-    static_cast<float>(dropEvent->posF().y()),
-    dropEvent->mimeData()->text().toStdString());
+      static_cast<float>(dropEvent->posF().x()),
+      static_cast<float>(dropEvent->posF().y()),
+      dropEvent->mimeData()->text().toStdString());
   dropEvent->acceptProposedAction();
 }
 
-QMenu* MapViewBase::makeEntityGroupsMenu(const Assets::EntityDefinitionType type)
-{
-  auto* menu = new QMenu{};
+QMenu *MapViewBase::makeEntityGroupsMenu(const Assets::EntityDefinitionType type) {
+  auto *menu = new QMenu{};
 
-  switch (type)
-  {
-  case Assets::EntityDefinitionType::PointEntity:
-    menu->setTitle(tr("Create Point Entity"));
+  switch (type) {
+  case Assets::EntityDefinitionType::PointEntity:menu->setTitle(tr("Create Point Entity"));
     break;
-  case Assets::EntityDefinitionType::BrushEntity:
-    menu->setTitle(tr("Create Brush Entity"));
+  case Assets::EntityDefinitionType::BrushEntity:menu->setTitle(tr("Create Brush Entity"));
     break;
   }
 
@@ -1437,36 +1239,32 @@ QMenu* MapViewBase::makeEntityGroupsMenu(const Assets::EntityDefinitionType type
   size_t id = 0;
 
   auto document = kdl::mem_lock(m_document);
-  for (const auto& group : document->entityDefinitionManager().groups())
-  {
+  for (const auto &group : document->entityDefinitionManager().groups()) {
     const auto definitions =
-      group.definitions(type, Assets::EntityDefinitionSortOrder::Name);
+        group.definitions(type, Assets::EntityDefinitionSortOrder::Name);
 
-    const auto filteredDefinitions = kdl::vec_filter(definitions, [](auto* definition) {
+    const auto filteredDefinitions = kdl::vec_filter(definitions, [](auto *definition) {
       return !kdl::cs::str_is_equal(
-        definition->name(), Model::EntityPropertyValues::WorldspawnClassname);
+          definition->name(), Model::EntityPropertyValues::WorldspawnClassname);
     });
 
-    if (!filteredDefinitions.empty())
-    {
+    if (!filteredDefinitions.empty()) {
       const auto groupName = QString::fromStdString(group.displayName());
-      auto* groupMenu = new QMenu{groupName};
+      auto *groupMenu = new QMenu{groupName};
 
-      for (auto* definition : filteredDefinitions)
-      {
+      for (auto *definition : filteredDefinitions) {
         const auto label = QString::fromStdString(definition->shortName());
-        QAction* action = nullptr;
+        QAction *action = nullptr;
 
-        switch (type)
-        {
+        switch (type) {
         case Assets::EntityDefinitionType::PointEntity: {
           action = groupMenu->addAction(
-            label, this, qOverload<>(&MapViewBase::createPointEntity));
+              label, this, qOverload<>(&MapViewBase::createPointEntity));
           break;
         }
         case Assets::EntityDefinitionType::BrushEntity: {
           action = groupMenu->addAction(
-            label, this, qOverload<>(&MapViewBase::createBrushEntity));
+              label, this, qOverload<>(&MapViewBase::createBrushEntity));
           action->setEnabled(enableMakeBrushEntity);
           break;
         }
@@ -1483,12 +1281,11 @@ QMenu* MapViewBase::makeEntityGroupsMenu(const Assets::EntityDefinitionType type
   return menu;
 }
 
-void MapViewBase::addSelectedObjectsToGroup()
-{
+void MapViewBase::addSelectedObjectsToGroup() {
   auto document = kdl::mem_lock(m_document);
   const auto nodes = document->selectedNodes().nodes();
-  auto* newGroup = findNewGroupForObjects(nodes);
-  ensure(newGroup != nullptr, "newGroup is null");
+  auto *newGroup = findNewGroupForObjects(nodes);
+  ensure(newGroup!=nullptr, "newGroup is null");
 
   auto transaction = Transaction{document, "Add Objects to Group"};
   reparentNodes(nodes, newGroup, true);
@@ -1497,72 +1294,61 @@ void MapViewBase::addSelectedObjectsToGroup()
   transaction.commit();
 }
 
-void MapViewBase::removeSelectedObjectsFromGroup()
-{
+void MapViewBase::removeSelectedObjectsFromGroup() {
   auto document = kdl::mem_lock(m_document);
   const auto nodes = document->selectedNodes().nodes();
-  auto* currentGroup = document->editorContext().currentGroup();
-  ensure(currentGroup != nullptr, "currentGroup is null");
+  auto *currentGroup = document->editorContext().currentGroup();
+  ensure(currentGroup!=nullptr, "currentGroup is null");
 
   auto transaction = Transaction{document, "Remove Objects from Group"};
   reparentNodes(nodes, document->currentLayer(), true);
 
-  while (document->currentGroup() != nullptr)
-  {
+  while (document->currentGroup()!=nullptr) {
     document->closeGroup();
   }
   document->selectNodes(nodes);
   transaction.commit();
 }
 
-Model::Node* MapViewBase::findNewGroupForObjects(
-  const std::vector<Model::Node*>& nodes) const
-{
+Model::Node *MapViewBase::findNewGroupForObjects(
+    const std::vector<Model::Node *> &nodes) const {
   using namespace Model::HitFilters;
 
   const auto hits = pickResult().all(type(Model::nodeHitType()));
-  if (!hits.empty())
-  {
-    auto* newGroup = Model::findOutermostClosedGroup(Model::hitToNode(hits.front()));
-    if (newGroup && canReparentNodes(nodes, newGroup))
-    {
+  if (!hits.empty()) {
+    auto *newGroup = Model::findOutermostClosedGroup(Model::hitToNode(hits.front()));
+    if (newGroup && canReparentNodes(nodes, newGroup)) {
       return newGroup;
     }
   }
   return nullptr;
 }
 
-void MapViewBase::mergeSelectedGroups()
-{
+void MapViewBase::mergeSelectedGroups() {
   auto document = kdl::mem_lock(m_document);
-  auto* newGroup = findGroupToMergeGroupsInto(document->selectedNodes());
-  ensure(newGroup != nullptr, "newGroup is null");
+  auto *newGroup = findGroupToMergeGroupsInto(document->selectedNodes());
+  ensure(newGroup!=nullptr, "newGroup is null");
 
   auto transaction = Transaction{document, "Merge Groups"};
   document->mergeSelectedGroupsWithGroup(newGroup);
   transaction.commit();
 }
 
-Model::GroupNode* MapViewBase::findGroupToMergeGroupsInto(
-  const Model::NodeCollection& selectedNodes) const
-{
+Model::GroupNode *MapViewBase::findGroupToMergeGroupsInto(
+    const Model::NodeCollection &selectedNodes) const {
   using namespace Model::HitFilters;
 
-  if (!(selectedNodes.hasOnlyGroups() && selectedNodes.groupCount() >= 2))
-  {
+  if (!(selectedNodes.hasOnlyGroups() && selectedNodes.groupCount() >= 2)) {
     return nullptr;
   }
 
   auto document = kdl::mem_lock(m_document);
   const auto hits = pickResult().all(type(Model::nodeHitType()));
-  if (!hits.empty())
-  {
-    if (auto* mergeTarget = findOutermostClosedGroup(Model::hitToNode(hits.front())))
-    {
-      if (kdl::all_of(selectedNodes.nodes(), [&](const auto* node) {
-            return node == mergeTarget || canReparentNode(node, mergeTarget);
-          }))
-      {
+  if (!hits.empty()) {
+    if (auto *mergeTarget = findOutermostClosedGroup(Model::hitToNode(hits.front()))) {
+      if (kdl::all_of(selectedNodes.nodes(), [&](const auto *node) {
+        return node==mergeTarget || canReparentNode(node, mergeTarget);
+      })) {
         return mergeTarget;
       }
     }
@@ -1572,20 +1358,18 @@ Model::GroupNode* MapViewBase::findGroupToMergeGroupsInto(
 }
 
 bool MapViewBase::canReparentNode(
-  const Model::Node* node, const Model::Node* newParent) const
-{
-  return newParent != node && newParent != node->parent() && newParent->canAddChild(node);
+    const Model::Node *node, const Model::Node *newParent) const {
+  return newParent!=node && newParent!=node->parent() && newParent->canAddChild(node);
 }
 
-void MapViewBase::moveSelectedBrushesToEntity()
-{
+void MapViewBase::moveSelectedBrushesToEntity() {
   auto document = kdl::mem_lock(m_document);
   const auto nodes = document->selectedNodes().nodes();
-  auto* newParent = findNewParentEntityForBrushes(nodes);
-  ensure(newParent != nullptr, "newParent is null");
+  auto *newParent = findNewParentEntityForBrushes(nodes);
+  ensure(newParent!=nullptr, "newParent is null");
 
   auto transaction =
-    Transaction{document, "Move " + kdl::str_plural(nodes.size(), "Brush", "Brushes")};
+      Transaction{document, "Move " + kdl::str_plural(nodes.size(), "Brush", "Brushes")};
   reparentNodes(nodes, newParent, false);
 
   document->deselectAll();
@@ -1593,35 +1377,29 @@ void MapViewBase::moveSelectedBrushesToEntity()
   transaction.commit();
 }
 
-Model::Node* MapViewBase::findNewParentEntityForBrushes(
-  const std::vector<Model::Node*>& nodes) const
-{
+Model::Node *MapViewBase::findNewParentEntityForBrushes(
+    const std::vector<Model::Node *> &nodes) const {
   using namespace Model::HitFilters;
 
   auto document = kdl::mem_lock(m_document);
-  const auto& hit = pickResult().first(type(Model::BrushNode::BrushHitType));
-  if (const auto faceHandle = Model::hitToFaceHandle(hit))
-  {
-    auto* brush = faceHandle->node();
-    auto* newParent = brush->entity();
+  const auto &hit = pickResult().first(type(Model::BrushNode::BrushHitType));
+  if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
+    auto *brush = faceHandle->node();
+    auto *newParent = brush->entity();
 
-    if (newParent && newParent != document->world() && canReparentNodes(nodes, newParent))
-    {
+    if (newParent && newParent!=document->world() && canReparentNodes(nodes, newParent)) {
       return newParent;
     }
   }
 
-  if (!nodes.empty())
-  {
-    auto* lastNode = nodes.back();
+  if (!nodes.empty()) {
+    auto *lastNode = nodes.back();
 
-    if (auto* group = Model::findContainingGroup(lastNode))
-    {
+    if (auto *group = Model::findContainingGroup(lastNode)) {
       return group;
     }
 
-    if (auto* layer = Model::findContainingLayer(lastNode))
-    {
+    if (auto *layer = Model::findContainingLayer(lastNode)) {
       return layer;
     }
   }
@@ -1630,9 +1408,8 @@ Model::Node* MapViewBase::findNewParentEntityForBrushes(
 }
 
 bool MapViewBase::canReparentNodes(
-  const std::vector<Model::Node*>& nodes, const Model::Node* newParent) const
-{
-  return std::any_of(nodes.begin(), nodes.end(), [&](const auto* node) {
+    const std::vector<Model::Node *> &nodes, const Model::Node *newParent) const {
+  return std::any_of(nodes.begin(), nodes.end(), [&](const auto *node) {
     return canReparentNode(node, newParent);
   });
 }
@@ -1641,55 +1418,49 @@ bool MapViewBase::canReparentNodes(
  * Return the given nodes, but replace all entity brushes with the parent entity (with
  * duplicates removed).
  */
-static std::vector<Model::Node*> collectEntitiesForNodes(
-  const std::vector<Model::Node*>& selectedNodes, const Model::WorldNode* world)
-{
-  auto result = std::vector<Model::Node*>{};
-  const auto addNode = [&](auto&& thisLambda, auto* node) {
-    if (node->entity() == world)
-    {
+static std::vector<Model::Node *> collectEntitiesForNodes(
+    const std::vector<Model::Node *> &selectedNodes, const Model::WorldNode *world) {
+  auto result = std::vector<Model::Node *>{};
+  const auto addNode = [&](auto &&thisLambda, auto *node) {
+    if (node->entity()==world) {
       result.push_back(node);
-    }
-    else
-    {
+    } else {
       node->visitParent(thisLambda);
     }
   };
 
   Model::Node::visitAll(
-    selectedNodes,
-    kdl::overload(
-      [](Model::WorldNode*) {},
-      [](Model::LayerNode*) {},
-      [&](Model::GroupNode* group) { result.push_back(group); },
-      [&](Model::EntityNode* entity) { result.push_back(entity); },
-      [&](auto&& thisLambda, Model::BrushNode* brush) { addNode(thisLambda, brush); },
-      [&](auto&& thisLambda, Model::PatchNode* patch) { addNode(thisLambda, patch); }));
+      selectedNodes,
+      kdl::overload(
+          [](Model::WorldNode *) {},
+          [](Model::LayerNode *) {},
+          [&](Model::GroupNode *group) { result.push_back(group); },
+          [&](Model::EntityNode *entity) { result.push_back(entity); },
+          [&](auto &&thisLambda, Model::BrushNode *brush) { addNode(thisLambda, brush); },
+          [&](auto &&thisLambda, Model::PatchNode *patch) { addNode(thisLambda, patch); }));
   return kdl::vec_sort_and_remove_duplicates(std::move(result));
 }
 
 void MapViewBase::reparentNodes(
-  const std::vector<Model::Node*>& nodes,
-  Model::Node* newParent,
-  const bool preserveEntities)
-{
-  ensure(newParent != nullptr, "newParent is null");
+    const std::vector<Model::Node *> &nodes,
+    Model::Node *newParent,
+    const bool preserveEntities) {
+  ensure(newParent!=nullptr, "newParent is null");
 
   auto document = kdl::mem_lock(m_document);
   const auto inputNodes =
-    preserveEntities ? collectEntitiesForNodes(nodes, document->world()) : nodes;
+      preserveEntities ? collectEntitiesForNodes(nodes, document->world()) : nodes;
 
   const auto reparentableNodes = collectReparentableNodes(inputNodes, newParent);
   assert(!reparentableNodes.empty());
 
   const auto name = "Move "
-                    + kdl::str_plural(reparentableNodes.size(), "Object", "Objects")
-                    + " to " + newParent->name();
+      + kdl::str_plural(reparentableNodes.size(), "Object", "Objects")
+      + " to " + newParent->name();
 
   auto transaction = Transaction{document, name};
   document->deselectAll();
-  if (!document->reparentNodes({{newParent, reparentableNodes}}))
-  {
+  if (!document->reparentNodes({{newParent, reparentableNodes}})) {
     transaction.cancel();
     return;
   }
@@ -1697,31 +1468,27 @@ void MapViewBase::reparentNodes(
   transaction.commit();
 }
 
-std::vector<Model::Node*> MapViewBase::collectReparentableNodes(
-  const std::vector<Model::Node*>& nodes, const Model::Node* newParent) const
-{
-  return kdl::vec_filter(nodes, [&](const auto* node) {
-    return newParent != node && newParent != node->parent()
-           && !newParent->isDescendantOf(node);
+std::vector<Model::Node *> MapViewBase::collectReparentableNodes(
+    const std::vector<Model::Node *> &nodes, const Model::Node *newParent) const {
+  return kdl::vec_filter(nodes, [&](const auto *node) {
+    return newParent!=node && newParent!=node->parent()
+        && !newParent->isDescendantOf(node);
   });
 }
 
-bool MapViewBase::canMergeGroups() const
-{
+bool MapViewBase::canMergeGroups() const {
   auto document = kdl::mem_lock(m_document);
-  auto* mergeGroup = findGroupToMergeGroupsInto(document->selectedNodes());
-  return mergeGroup != nullptr;
+  auto *mergeGroup = findGroupToMergeGroupsInto(document->selectedNodes());
+  return mergeGroup!=nullptr;
 }
 
-bool MapViewBase::canMakeStructural() const
-{
+bool MapViewBase::canMakeStructural() const {
   auto document = kdl::mem_lock(m_document);
-  if (document->selectedNodes().hasOnlyBrushes())
-  {
-    const auto& brushes = document->selectedNodes().brushes();
-    return std::any_of(brushes.begin(), brushes.end(), [&](const auto* brush) {
-      return brush->hasAnyTag() || brush->entity() != document->world()
-             || brush->anyFaceHasAnyTag();
+  if (document->selectedNodes().hasOnlyBrushes()) {
+    const auto &brushes = document->selectedNodes().brushes();
+    return std::any_of(brushes.begin(), brushes.end(), [&](const auto *brush) {
+      return brush->hasAnyTag() || brush->entity()!=document->world()
+          || brush->anyFaceHasAnyTag();
     });
   }
   return false;
@@ -1729,10 +1496,9 @@ bool MapViewBase::canMakeStructural() const
 
 void MapViewBase::doPreRender() {}
 
-void MapViewBase::doRenderExtras(Renderer::RenderContext&, Renderer::RenderBatch&) {}
+void MapViewBase::doRenderExtras(Renderer::RenderContext &, Renderer::RenderBatch &) {}
 
-bool MapViewBase::doBeforePopupMenu()
-{
+bool MapViewBase::doBeforePopupMenu() {
   return true;
 }
 void MapViewBase::doAfterPopupMenu() {}

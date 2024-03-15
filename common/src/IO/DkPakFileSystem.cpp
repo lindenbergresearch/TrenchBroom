@@ -31,56 +31,43 @@
 #include <cstring>
 #include <memory>
 
-namespace TrenchBroom::IO
-{
-namespace DkPakLayout
-{
+namespace TrenchBroom::IO {
+namespace DkPakLayout {
 static const size_t HeaderMagicLength = 0x4;
 static const size_t EntryLength = 0x48;
 static const size_t EntryNameLength = 0x38;
 static const std::string HeaderMagic = "PACK";
 } // namespace DkPakLayout
 
-namespace
-{
+namespace {
 Result<std::unique_ptr<char[]>> decompress(
-  std::shared_ptr<File> file, const size_t uncompressedSize)
-{
-  try
-  {
+    std::shared_ptr<File> file, const size_t uncompressedSize) {
+  try {
     auto reader = file->reader().buffer();
 
     auto result = std::make_unique<char[]>(uncompressedSize);
-    auto* begin = result.get();
-    auto* curTarget = begin;
+    auto *begin = result.get();
+    auto *curTarget = begin;
 
     auto x = reader.readUnsignedChar<unsigned char>();
-    while (!reader.eof() && x < 0xFF)
-    {
-      if (x < 0x40)
-      {
+    while (!reader.eof() && x < 0xFF) {
+      if (x < 0x40) {
         // x+1 bytes of uncompressed data follow (just read+write them as they are)
         const auto len = static_cast<size_t>(x) + 1;
         reader.read(curTarget, len);
         curTarget += len;
-      }
-      else if (x < 0x80)
-      {
+      } else if (x < 0x80) {
         // run-length encoded zeros, write (x - 62) zero-bytes to output
         const auto len = static_cast<size_t>(x) - 62;
         std::memset(curTarget, 0, len);
         curTarget += len;
-      }
-      else if (x < 0xC0)
-      {
+      } else if (x < 0xC0) {
         // run-length encoded data, read one byte, write it (x-126) times to output
         const auto len = static_cast<size_t>(x) - 126;
         const auto data = reader.readInt<unsigned char>();
         std::memset(curTarget, data, len);
         curTarget += len;
-      }
-      else if (x < 0xFE)
-      {
+      } else if (x < 0xFE) {
         // this references previously uncompressed data
         // read one byte to get _offset_
         // read (x-190) bytes from the already uncompressed and written output data,
@@ -88,7 +75,7 @@ Result<std::unique_ptr<char[]>> decompress(
         // output, of course)
         const auto len = static_cast<size_t>(x) - 190;
         const auto offset = reader.readSize<unsigned char>();
-        auto* from = curTarget - (offset + 2);
+        auto *from = curTarget - (offset + 2);
 
         assert(from >= begin);
         assert(from <= curTarget - len);
@@ -102,28 +89,24 @@ Result<std::unique_ptr<char[]>> decompress(
 
     return result;
   }
-  catch (const ReaderException& e)
-  {
+  catch (const ReaderException &e) {
     return Error{e.what()};
   }
 }
 } // namespace
 
-Result<void> DkPakFileSystem::doReadDirectory()
-{
-  try
-  {
+Result<void> DkPakFileSystem::doReadDirectory() {
+  try {
     auto reader = m_file->reader();
     reader.seekFromBegin(DkPakLayout::HeaderMagicLength);
 
     const auto directoryAddress = reader.readSize<int32_t>();
     const auto directorySize = reader.readSize<int32_t>();
-    const auto entryCount = directorySize / DkPakLayout::EntryLength;
+    const auto entryCount = directorySize/DkPakLayout::EntryLength;
 
     reader.seekFromBegin(directoryAddress);
 
-    for (size_t i = 0; i < entryCount; ++i)
-    {
+    for (size_t i = 0; i < entryCount; ++i) {
       const auto entryName = reader.readString(DkPakLayout::EntryNameLength);
       const auto entryAddress = reader.readSize<int32_t>();
       const auto uncompressedSize = reader.readSize<int32_t>();
@@ -134,27 +117,23 @@ Result<void> DkPakFileSystem::doReadDirectory()
       const auto entryPath = std::filesystem::path(kdl::str_to_lower(entryName));
       auto entryFile = std::make_shared<FileView>(m_file, entryAddress, entrySize);
 
-      if (compressed)
-      {
+      if (compressed) {
         addFile(
-          entryPath,
-          [entryFile = std::move(entryFile),
-           uncompressedSize]() -> Result<std::shared_ptr<File>> {
-            return decompress(entryFile, uncompressedSize).transform([&](auto data) {
-              return std::static_pointer_cast<File>(
-                std::make_shared<OwningBufferFile>(std::move(data), uncompressedSize));
+            entryPath,
+            [entryFile = std::move(entryFile),
+                uncompressedSize]() -> Result<std::shared_ptr<File>> {
+              return decompress(entryFile, uncompressedSize).transform([&](auto data) {
+                return std::static_pointer_cast<File>(
+                    std::make_shared<OwningBufferFile>(std::move(data), uncompressedSize));
+              });
             });
-          });
-      }
-      else
-      {
+      } else {
         addFile(entryPath, [entryFile = std::move(entryFile)]() { return entryFile; });
       }
     }
     return kdl::void_success;
   }
-  catch (const ReaderException& e)
-  {
+  catch (const ReaderException &e) {
     return Error{e.what()};
   }
 }

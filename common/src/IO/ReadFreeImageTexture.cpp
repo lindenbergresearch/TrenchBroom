@@ -37,11 +37,9 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-namespace
-{
+namespace {
 /**
  * The byte order of a 32bpp FIBITMAP is defined by the macros FI_RGBA_RED,
  * FI_RGBA_GREEN, FI_RGBA_BLUE, FI_RGBA_ALPHA.
@@ -49,18 +47,15 @@ namespace
  * so we can handle both possible orders and map them to the relevant GL_RGBA
  * or GL_BGRA constant.
  */
-constexpr GLenum freeImage32BPPFormatToGLFormat()
-{
+constexpr GLenum freeImage32BPPFormatToGLFormat() {
   if constexpr (
-    FI_RGBA_RED == 0 && FI_RGBA_GREEN == 1 && FI_RGBA_BLUE == 2 && FI_RGBA_ALPHA == 3)
-  {
+      FI_RGBA_RED==0 && FI_RGBA_GREEN==1 && FI_RGBA_BLUE==2 && FI_RGBA_ALPHA==3) {
 
     return GL_RGBA;
   }
 
   if constexpr (
-    FI_RGBA_BLUE == 0 && FI_RGBA_GREEN == 1 && FI_RGBA_RED == 2 && FI_RGBA_ALPHA == 3)
-  {
+      FI_RGBA_BLUE==0 && FI_RGBA_GREEN==1 && FI_RGBA_RED==2 && FI_RGBA_ALPHA==3) {
 
     return GL_BGRA;
   }
@@ -70,62 +65,56 @@ constexpr GLenum freeImage32BPPFormatToGLFormat()
 
 } // namespace
 
-Color getAverageColor(const Assets::TextureBuffer& buffer, const GLenum format)
-{
-  ensure(format == GL_RGBA || format == GL_BGRA, "format is GL_RGBA or GL_BGRA");
+Color getAverageColor(const Assets::TextureBuffer &buffer, const GLenum format) {
+  ensure(format==GL_RGBA || format==GL_BGRA, "format is GL_RGBA or GL_BGRA");
 
-  const auto r = size_t(format == GL_RGBA ? 0 : 2);
-  const auto g = size_t(format == GL_RGBA ? 1 : 1);
-  const auto b = size_t(format == GL_RGBA ? 2 : 0);
+  const auto r = size_t(format==GL_RGBA ? 0 : 2);
+  const auto g = size_t(format==GL_RGBA ? 1 : 1);
+  const auto b = size_t(format==GL_RGBA ? 2 : 0);
   const auto a = size_t(3);
 
-  const auto* const data = buffer.data();
+  const auto *const data = buffer.data();
   const auto bufferSize = buffer.size();
-  const auto numPixels = bufferSize / 4;
+  const auto numPixels = bufferSize/4;
 
-  const auto stride = numPixels <= 4192 ? 1 : numPixels / 64;
-  const auto numSamples = numPixels / stride;
+  const auto stride = numPixels <= 4192 ? 1 : numPixels/64;
+  const auto numSamples = numPixels/stride;
 
   auto average = Color{};
-  for (std::size_t i = 0; i < numSamples; ++i)
-  {
-    const auto pixel = i * 4 * stride;
+  for (std::size_t i = 0; i < numSamples; ++i) {
+    const auto pixel = i*4*stride;
     average =
-      average + Color{data[pixel + r], data[pixel + g], data[pixel + b], data[pixel + a]};
+        average + Color{data[pixel + r], data[pixel + g], data[pixel + b], data[pixel + a]};
   }
-  average = average / static_cast<float>(numSamples);
+  average = average/static_cast<float>(numSamples);
 
   return average;
 }
 
 Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(
-  std::string name, const uint8_t* begin, const size_t size)
-{
-  try
-  {
+    std::string name, const uint8_t *begin, const size_t size) {
+  try {
     InitFreeImage::initialize();
 
     auto imageMemory = kdl::resource{
-      FreeImage_OpenMemory(const_cast<uint8_t*>(begin), static_cast<DWORD>(size)),
-      FreeImage_CloseMemory};
+        FreeImage_OpenMemory(const_cast<uint8_t *>(begin), static_cast<DWORD>(size)),
+        FreeImage_CloseMemory};
 
     const auto imageFormat = FreeImage_GetFileTypeFromMemory(*imageMemory);
     auto image = kdl::resource{
-      FreeImage_LoadFromMemory(imageFormat, *imageMemory), FreeImage_Unload};
+        FreeImage_LoadFromMemory(imageFormat, *imageMemory), FreeImage_Unload};
 
-    if (!image)
-    {
+    if (!image) {
       return ReadTextureError{std::move(name), "FreeImage could not load image data"};
     }
 
     const auto imageWidth = size_t(FreeImage_GetWidth(*image));
     const auto imageHeight = size_t(FreeImage_GetHeight(*image));
 
-    if (!checkTextureDimensions(imageWidth, imageHeight))
-    {
+    if (!checkTextureDimensions(imageWidth, imageHeight)) {
       return ReadTextureError{
-        std::move(name),
-        fmt::format("Invalid texture dimensions: {}*{}", imageWidth, imageHeight)};
+          std::move(name),
+          fmt::format("Invalid texture dimensions: {}*{}", imageWidth, imageHeight)};
     }
 
     // This is supposed to indicate whether any pixels are transparent (alpha < 100%)
@@ -138,83 +127,75 @@ Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(
     Assets::setMipBufferSize(buffers, mipCount, imageWidth, imageHeight, format);
 
     if (
-      FreeImage_GetColorType(*image) != FIC_RGBALPHA
-      || FreeImage_GetLine(*image) / FreeImage_GetWidth(*image) != 4)
-    {
+        FreeImage_GetColorType(*image)!=FIC_RGBALPHA
+            || FreeImage_GetLine(*image)/FreeImage_GetWidth(*image)!=4) {
       image = FreeImage_ConvertTo32Bits(*image);
     }
 
-    if (!image)
-    {
+    if (!image) {
       return ReadTextureError{std::move(name), "Unsupported pixel format"};
     }
 
-    assert(FreeImage_GetLine(*image) / FreeImage_GetWidth(*image) == 4);
+    assert(FreeImage_GetLine(*image)/FreeImage_GetWidth(*image)==4);
 
-    auto* outBytes = buffers.at(0).data();
-    const auto outBytesPerRow = int(imageWidth * 4);
+    auto *outBytes = buffers.at(0).data();
+    const auto outBytesPerRow = int(imageWidth*4);
 
     FreeImage_ConvertToRawBits(
-      outBytes,
-      *image,
-      outBytesPerRow,
-      32,
-      FI_RGBA_RED_MASK,
-      FI_RGBA_GREEN_MASK,
-      FI_RGBA_BLUE_MASK,
-      TRUE);
+        outBytes,
+        *image,
+        outBytesPerRow,
+        32,
+        FI_RGBA_RED_MASK,
+        FI_RGBA_GREEN_MASK,
+        FI_RGBA_BLUE_MASK,
+        TRUE);
 
     const auto textureType = Assets::Texture::selectTextureType(masked);
     const auto averageColor = getAverageColor(buffers.at(0), format);
 
     return Assets::Texture{
-      std::move(name),
-      imageWidth,
-      imageHeight,
-      averageColor,
-      std::move(buffers),
-      format,
-      textureType};
+        std::move(name),
+        imageWidth,
+        imageHeight,
+        averageColor,
+        std::move(buffers),
+        format,
+        textureType};
   }
-  catch (const std::exception& e)
-  {
+  catch (const std::exception &e) {
     return ReadTextureError{std::move(name), e.what()};
   }
 }
 
 Result<Assets::Texture, ReadTextureError> readFreeImageTexture(
-  std::string name, Reader& reader)
-{
+    std::string name, Reader &reader) {
   auto bufferedReader = reader.buffer();
-  const auto* begin = bufferedReader.begin();
-  const auto* end = bufferedReader.end();
+  const auto *begin = bufferedReader.begin();
+  const auto *end = bufferedReader.end();
   const auto imageSize = size_t(end - begin);
-  auto* imageBegin = reinterpret_cast<BYTE*>(const_cast<char*>(begin));
+  auto *imageBegin = reinterpret_cast<BYTE *>(const_cast<char *>(begin));
 
   return readFreeImageTextureFromMemory(std::move(name), imageBegin, imageSize);
 }
 
-namespace
-{
-std::vector<std::string> getSupportedFreeImageExtensions()
-{
+namespace {
+std::vector<std::string> getSupportedFreeImageExtensions() {
   auto result = std::vector<std::string>{};
 
   const auto count = FreeImage_GetFIFCount();
   assert(count >= 0);
 
-  for (int i = 0; i < count; ++i)
-  {
+  for (int i = 0; i < count; ++i) {
     const auto format = static_cast<FREE_IMAGE_FORMAT>(i);
-    if (FreeImage_IsPluginEnabled(format))
-    {
+    if (FreeImage_IsPluginEnabled(format)) {
       const auto extensionListStr =
-        kdl::str_to_lower(std::string{FreeImage_GetFIFExtensionList(format)});
+          kdl::str_to_lower(std::string{FreeImage_GetFIFExtensionList(format)});
       result = kdl::vec_concat(
-        std::move(result),
-        kdl::vec_transform(
-          kdl::str_split(extensionListStr, ","),
-          [](const auto& extension) { return "." + extension; }));
+          std::move(result),
+          kdl::vec_transform(
+              kdl::str_split(extensionListStr, ","),
+              [](const auto &extension) { return "." + extension; }));
     }
   }
 
@@ -222,8 +203,7 @@ std::vector<std::string> getSupportedFreeImageExtensions()
 }
 } // namespace
 
-bool isSupportedFreeImageExtension(const std::string& extension)
-{
+bool isSupportedFreeImageExtension(const std::string &extension) {
   InitFreeImage::initialize();
 
   static const auto extensions = getSupportedFreeImageExtensions();

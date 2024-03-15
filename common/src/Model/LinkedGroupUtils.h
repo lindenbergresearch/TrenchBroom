@@ -39,35 +39,32 @@
 #include <utility>
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
-std::vector<Node*> collectNodesWithLinkId(
-  const std::vector<Node*>& nodes, const std::string& linkId);
+std::vector<Node *> collectNodesWithLinkId(
+    const std::vector<Node *> &nodes, const std::string &linkId);
 
-template <typename N>
-std::vector<N*> collectLinkedNodes(const std::vector<Node*>& nodes, const N& node)
-{
-  return kdl::vec_static_cast<N*>(node.accept(kdl::overload(
-    [](const WorldNode*) { return std::vector<Node*>{}; },
-    [](const LayerNode*) { return std::vector<Node*>{}; },
-    [&](const Object* object) {
-      return collectNodesWithLinkId(nodes, object->linkId());
-    })));
+template<typename N>
+std::vector<N *> collectLinkedNodes(const std::vector<Node *> &nodes, const N &node) {
+  return kdl::vec_static_cast<N *>(node.accept(kdl::overload(
+      [](const WorldNode *) { return std::vector<Node *>{}; },
+      [](const LayerNode *) { return std::vector<Node *>{}; },
+      [&](const Object *object) {
+        return collectNodesWithLinkId(nodes, object->linkId());
+      })));
 }
 
-std::vector<GroupNode*> collectGroupsWithLinkId(
-  const std::vector<Node*>& nodes, const std::string& linkId);
+std::vector<GroupNode *> collectGroupsWithLinkId(
+    const std::vector<Node *> &nodes, const std::string &linkId);
 
-std::vector<std::string> collectLinkedGroupIds(const std::vector<Node*>& nodes);
-std::vector<std::string> collectLinkedGroupIds(const Node& node);
+std::vector<std::string> collectLinkedGroupIds(const std::vector<Node *> &nodes);
+std::vector<std::string> collectLinkedGroupIds(const Node &node);
 
-std::vector<std::string> collectParentLinkedGroupIds(const Node& parent);
+std::vector<std::string> collectParentLinkedGroupIds(const Node &parent);
 
-struct SelectionResult
-{
-  std::vector<Node*> nodesToSelect;
-  std::vector<GroupNode*> groupsToLock;
+struct SelectionResult {
+  std::vector<Node *> nodesToSelect;
+  std::vector<GroupNode *> groupsToLock;
 };
 
 /**
@@ -85,12 +82,11 @@ struct SelectionResult
  * Note: no changes are made, just the proposed selection and locking is returned.
  */
 SelectionResult nodeSelectionWithLinkedGroupConstraints(
-  WorldNode& world, const std::vector<Node*>& nodes);
+    WorldNode &world, const std::vector<Node *> &nodes);
 
-struct FaceSelectionResult
-{
+struct FaceSelectionResult {
   std::vector<BrushFaceHandle> facesToSelect;
-  std::vector<GroupNode*> groupsToLock;
+  std::vector<GroupNode *> groupsToLock;
 };
 
 /**
@@ -100,10 +96,10 @@ struct FaceSelectionResult
  * @see nodeSelectionWithLinkedGroupConstraints()
  */
 FaceSelectionResult faceSelectionWithLinkedGroupConstraints(
-  WorldNode& world, const std::vector<BrushFaceHandle>& faces);
+    WorldNode &world, const std::vector<BrushFaceHandle> &faces);
 
 using UpdateLinkedGroupsResult =
-  std::vector<std::pair<Node*, std::vector<std::unique_ptr<Node>>>>;
+    std::vector<std::pair<Node *, std::vector<std::unique_ptr<Node>>>>;
 
 /**
  * Updates the given target group nodes from the given source group node.
@@ -133,17 +129,16 @@ using UpdateLinkedGroupsResult =
  * target node's children.
  */
 Result<UpdateLinkedGroupsResult> updateLinkedGroups(
-  const GroupNode& sourceGroupNode,
-  const std::vector<Model::GroupNode*>& targetGroupNodes,
-  const vm::bbox3& worldBounds);
+    const GroupNode &sourceGroupNode,
+    const std::vector<Model::GroupNode *> &targetGroupNodes,
+    const vm::bbox3 &worldBounds);
 
-std::vector<Error> initializeLinkIds(const std::vector<Node*>& nodes);
+std::vector<Error> initializeLinkIds(const std::vector<Node *> &nodes);
 
-
-Result<std::unordered_map<Node*, std::string>> copyAndReturnLinkIds(
-  const GroupNode& sourceGroupNode, const std::vector<GroupNode*>& targetGroupNodes);
+Result<std::unordered_map<Node *, std::string>> copyAndReturnLinkIds(
+    const GroupNode &sourceGroupNode, const std::vector<GroupNode *> &targetGroupNodes);
 
 std::vector<Error> copyAndSetLinkIds(
-  const GroupNode& sourceGroupNode, const std::vector<GroupNode*>& targetGroupNodes);
+    const GroupNode &sourceGroupNode, const std::vector<GroupNode *> &targetGroupNodes);
 
 } // namespace TrenchBroom::Model

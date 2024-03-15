@@ -27,21 +27,17 @@
 #include <vm/ray.h>
 #include <vm/vec.h>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Color;
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderContext;
 
 class VboManager;
 
-class Camera
-{
+class Camera {
 public:
-  struct Viewport
-  {
+  struct Viewport {
     int x, y;
     int width, height;
 
@@ -49,24 +45,22 @@ public:
 
     Viewport(int i_x, int i_y, int i_width, int i_height);
 
-    bool operator==(const Viewport& other) const;
+    bool operator==(const Viewport &other) const;
 
-    bool operator!=(const Viewport& other) const;
+    bool operator!=(const Viewport &other) const;
 
-    template <typename T>
-    bool contains(const T i_x, const T i_y, const T i_w, const T i_h) const
-    {
+    template<typename T>
+    bool contains(const T i_x, const T i_y, const T i_w, const T i_h) const {
       return (
-        i_x + i_w >= static_cast<T>(0) && i_x <= static_cast<T>(width)
-        && i_y + i_h >= static_cast<T>(0) && i_y <= static_cast<T>(height));
+          i_x + i_w >= static_cast<T>(0) && i_x <= static_cast<T>(width)
+              && i_y + i_h >= static_cast<T>(0) && i_y <= static_cast<T>(height));
     }
 
-    template <typename T>
-    bool contains(const T i_x, const T i_y) const
-    {
+    template<typename T>
+    bool contains(const T i_x, const T i_y) const {
       return (
-        i_x >= static_cast<T>(0) && i_x <= static_cast<T>(width)
-        && i_y >= static_cast<T>(0) && i_y <= static_cast<T>(height));
+          i_x >= static_cast<T>(0) && i_x <= static_cast<T>(width)
+              && i_y >= static_cast<T>(0) && i_y <= static_cast<T>(height));
     }
 
     int minDimension() const { return width < height ? width : height; }
@@ -91,15 +85,14 @@ private:
   mutable vm::mat4x4f m_inverseMatrix;
 
 protected:
-  typedef enum
-  {
+  typedef enum {
     Projection_Orthographic,
     Projection_Perspective
   } ProjectionType;
   mutable bool m_valid;
 
 public:
-  Notifier<const Camera*> cameraDidChangeNotifier;
+  Notifier<const Camera *> cameraDidChangeNotifier;
 
   virtual ~Camera();
 
@@ -111,7 +104,7 @@ public:
 
   float farPlane() const;
 
-  const Viewport& viewport() const;
+  const Viewport &viewport() const;
 
   float zoom() const;
 
@@ -119,56 +112,55 @@ public:
 
   void setZoom(float zoom);
 
-  const vm::vec3f& direction() const;
+  const vm::vec3f &direction() const;
 
-  const vm::vec3f& position() const;
+  const vm::vec3f &position() const;
 
-  const vm::vec3f& up() const;
+  const vm::vec3f &up() const;
 
-  const vm::vec3f& right() const;
+  const vm::vec3f &right() const;
 
-  const vm::mat4x4f& projectionMatrix() const;
+  const vm::mat4x4f &projectionMatrix() const;
 
-  const vm::mat4x4f& viewMatrix() const;
+  const vm::mat4x4f &viewMatrix() const;
 
   const vm::mat4x4f orthogonalBillboardMatrix() const;
 
   const vm::mat4x4f verticalBillboardMatrix() const;
 
   void frustumPlanes(
-    vm::plane3f& topPlane,
-    vm::plane3f& rightPlane,
-    vm::plane3f& bottomPlane,
-    vm::plane3f& leftPlane) const;
+      vm::plane3f &topPlane,
+      vm::plane3f &rightPlane,
+      vm::plane3f &bottomPlane,
+      vm::plane3f &leftPlane) const;
 
   vm::ray3f viewRay() const;
 
   vm::ray3f pickRay(float x, float y) const;
 
-  vm::ray3f pickRay(const vm::vec3f& point) const;
+  vm::ray3f pickRay(const vm::vec3f &point) const;
 
-  float distanceTo(const vm::vec3f& point) const;
+  float distanceTo(const vm::vec3f &point) const;
 
-  float squaredDistanceTo(const vm::vec3f& point) const;
+  float squaredDistanceTo(const vm::vec3f &point) const;
 
-  float perpendicularDistanceTo(const vm::vec3f& point) const;
+  float perpendicularDistanceTo(const vm::vec3f &point) const;
 
   vm::vec3f defaultPoint(const float distance = DefaultPointDistance) const;
 
   vm::vec3f defaultPoint(float x, float y) const;
 
-  template <typename T>
+  template<typename T>
   static vm::vec<T, 3> defaultPoint(
-    const vm::ray<T, 3>& ray, const T distance = T(DefaultPointDistance))
-  {
+      const vm::ray<T, 3> &ray, const T distance = T(DefaultPointDistance)) {
     return vm::point_at_distance(ray, distance);
   }
 
-  float perspectiveScalingFactor(const vm::vec3f& position) const;
+  float perspectiveScalingFactor(const vm::vec3f &position) const;
 
-  vm::vec3f project(const vm::vec3f& point) const;
+  vm::vec3f project(const vm::vec3f &point) const;
 
-  vm::vec3f unproject(const vm::vec3f& point) const;
+  vm::vec3f unproject(const vm::vec3f &point) const;
 
   vm::vec3f unproject(float x, float y, float depth) const;
 
@@ -176,19 +168,19 @@ public:
 
   void setFarPlane(float farPlane);
 
-  bool setViewport(const Viewport& viewport);
+  bool setViewport(const Viewport &viewport);
 
-  void moveTo(const vm::vec3f& position);
+  void moveTo(const vm::vec3f &position);
 
-  void moveBy(const vm::vec3f& delta);
+  void moveBy(const vm::vec3f &delta);
 
-  void lookAt(const vm::vec3f& point, const vm::vec3f& up);
+  void lookAt(const vm::vec3f &point, const vm::vec3f &up);
 
-  void setDirection(const vm::vec3f& direction, const vm::vec3f& up);
+  void setDirection(const vm::vec3f &direction, const vm::vec3f &up);
 
   void rotate(float yaw, float pitch);
 
-  void orbit(const vm::vec3f& center, float horizontal, float vertical);
+  void orbit(const vm::vec3f &center, float horizontal, float vertical);
 
   /**
    * Makes a vm::quatf that applies the given yaw and pitch rotations to the current
@@ -206,36 +198,36 @@ public:
    * @param rotation desired rotation
    * @return clamped rotation
    */
-  vm::quatf clampRotationToUpright(const vm::quatf& rotation) const;
+  vm::quatf clampRotationToUpright(const vm::quatf &rotation) const;
 
   void renderFrustum(
-    RenderContext& renderContext,
-    VboManager& vboManager,
-    float size,
-    const Color& color) const;
+      RenderContext &renderContext,
+      VboManager &vboManager,
+      float size,
+      const Color &color) const;
 
-  float pickFrustum(float size, const vm::ray3f& ray) const;
+  float pickFrustum(float size, const vm::ray3f &ray) const;
 
   FloatType pickPointHandle(
-    const vm::ray3& pickRay,
-    const vm::vec3& handlePosition,
-    FloatType handleRadius) const;
+      const vm::ray3 &pickRay,
+      const vm::vec3 &handlePosition,
+      FloatType handleRadius) const;
 
   FloatType pickLineSegmentHandle(
-    const vm::ray3& pickRay,
-    const vm::segment3& handlePosition,
-    FloatType handleRadius) const;
+      const vm::ray3 &pickRay,
+      const vm::segment3 &handlePosition,
+      FloatType handleRadius) const;
 
 protected:
   Camera();
 
   Camera(
-    float nearPlane,
-    float farPlane,
-    const Viewport& viewport,
-    const vm::vec3f& position,
-    const vm::vec3f& direction,
-    const vm::vec3f& up);
+      float nearPlane,
+      float farPlane,
+      const Viewport &viewport,
+      const vm::vec3f &position,
+      const vm::vec3f &direction,
+      const vm::vec3f &up);
 
 private:
   ProjectionType projectionType() const;
@@ -246,25 +238,25 @@ private:
   virtual ProjectionType doGetProjectionType() const = 0;
 
   virtual void doValidateMatrices(
-    vm::mat4x4f& projectionMatrix, vm::mat4x4f& viewMatrix) const = 0;
+      vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix) const = 0;
 
-  virtual vm::ray3f doGetPickRay(const vm::vec3f& point) const = 0;
+  virtual vm::ray3f doGetPickRay(const vm::vec3f &point) const = 0;
 
   virtual void doComputeFrustumPlanes(
-    vm::plane3f& topPlane,
-    vm::plane3f& rightPlane,
-    vm::plane3f& bottomPlane,
-    vm::plane3f& leftPlane) const = 0;
+      vm::plane3f &topPlane,
+      vm::plane3f &rightPlane,
+      vm::plane3f &bottomPlane,
+      vm::plane3f &leftPlane) const = 0;
 
   virtual void doRenderFrustum(
-    RenderContext& renderContext,
-    VboManager& vboManager,
-    float size,
-    const Color& color) const = 0;
+      RenderContext &renderContext,
+      VboManager &vboManager,
+      float size,
+      const Color &color) const = 0;
 
-  virtual float doPickFrustum(float size, const vm::ray3f& ray) const = 0;
+  virtual float doPickFrustum(float size, const vm::ray3f &ray) const = 0;
 
-  virtual float doGetPerspectiveScalingFactor(const vm::vec3f& position) const = 0;
+  virtual float doGetPerspectiveScalingFactor(const vm::vec3f &position) const = 0;
 
   virtual bool isValidZoom(float zoom) const;
 

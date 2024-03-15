@@ -21,14 +21,11 @@
 
 #include <QWidget>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class PreferencePane : public QWidget
-{
+namespace TrenchBroom {
+namespace View {
+class PreferencePane : public QWidget {
 public:
-  explicit PreferencePane(QWidget* parent = nullptr);
+  explicit PreferencePane(QWidget *parent = nullptr);
 
   ~PreferencePane() override;
 

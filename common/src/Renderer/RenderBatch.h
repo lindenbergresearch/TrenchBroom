@@ -21,10 +21,8 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Renderable;
 
 class DirectRenderable;
@@ -35,16 +33,15 @@ class RenderContext;
 
 class VboManager;
 
-class RenderBatch
-{
+class RenderBatch {
 private:
-  VboManager& m_vboManager;
+  VboManager &m_vboManager;
 
   class IndexedRenderableWrapper;
 
-  using RenderableList = std::vector<Renderable*>;
-  using DirectRenderableList = std::vector<DirectRenderable*>;
-  using IndexedRenderableList = std::vector<IndexedRenderable*>;
+  using RenderableList = std::vector<Renderable *>;
+  using DirectRenderableList = std::vector<DirectRenderable *>;
+  using IndexedRenderableList = std::vector<IndexedRenderable *>;
 
   DirectRenderableList m_directRenderables;
   IndexedRenderableList m_indexedRenderables;
@@ -53,34 +50,34 @@ private:
   RenderableList m_oneshots;
 
 public:
-  explicit RenderBatch(VboManager& vboManager);
+  explicit RenderBatch(VboManager &vboManager);
 
   ~RenderBatch();
 
-  void add(Renderable* renderable);
+  void add(Renderable *renderable);
 
-  void add(DirectRenderable* renderable);
+  void add(DirectRenderable *renderable);
 
-  void add(IndexedRenderable* renderable);
+  void add(IndexedRenderable *renderable);
 
   /**
    * Same as `add()`, but takes ownership of the given renderable and deletes it in
    * `~RenderBatch`.
    */
-  void addOneShot(Renderable* renderable);
+  void addOneShot(Renderable *renderable);
 
-  void addOneShot(DirectRenderable* renderable);
+  void addOneShot(DirectRenderable *renderable);
 
-  void addOneShot(IndexedRenderable* renderable);
+  void addOneShot(IndexedRenderable *renderable);
 
-  void render(RenderContext& renderContext);
+  void render(RenderContext &renderContext);
 
 private:
-  void doAdd(Renderable* renderable);
+  void doAdd(Renderable *renderable);
 
   void prepareRenderables();
 
-  void renderRenderables(RenderContext& renderContext);
+  void renderRenderables(RenderContext &renderContext);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

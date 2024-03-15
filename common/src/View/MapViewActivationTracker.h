@@ -27,10 +27,8 @@ class QFocusEvent;
 class QMouseEvent;
 class QWindow;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapViewBase;
 
 /**
@@ -52,11 +50,10 @@ class MapViewBase;
  * that is, when the user moves the mouse cursor from one map view to another, then that
  * map view will receive focus.
  */
-class MapViewActivationTracker : public QObject
-{
-  Q_OBJECT
+class MapViewActivationTracker : public QObject {
+Q_OBJECT
 private:
-  std::vector<MapViewBase*> m_mapViews;
+  std::vector<MapViewBase *> m_mapViews;
 
   bool m_active;
 
@@ -77,7 +74,7 @@ public:
    *
    * @param mapView the map view to add
    */
-  void addWindow(MapViewBase* mapView);
+  void addWindow(MapViewBase *mapView);
 
   /**
    * Clears this activation tracker;
@@ -92,7 +89,7 @@ public:
   void windowActivationChanged(bool active);
 
 protected: // QObject overrides
-  bool eventFilter(QObject* object, QEvent* event) override;
+  bool eventFilter(QObject *object, QEvent *event) override;
 
 private:
   /**
@@ -101,7 +98,7 @@ private:
    * @param event the focus event
    * @param widget the window that received the event
    */
-  void setFocusEvent(QFocusEvent* event, QWidget* widget);
+  void setFocusEvent(QFocusEvent *event, QWidget *widget);
 
   /**
    * Called when a map view has lost focus.
@@ -109,7 +106,7 @@ private:
    * @param event the focus event
    * @param widget the window that received the event
    */
-  void killFocusEvent(QFocusEvent* event, QWidget* widget);
+  void killFocusEvent(QFocusEvent *event, QWidget *widget);
 
   /**
    * Called when a map view has received a mouse down event.
@@ -121,7 +118,7 @@ private:
    * @param widget the window that received the event
    * @return true if the event should be discarded and false otherwise
    */
-  bool mouseDownEvent(QMouseEvent* event, QWidget* widget);
+  bool mouseDownEvent(QMouseEvent *event, QWidget *widget);
 
   /**
    * Called when a map view has received a mouse up event.
@@ -133,7 +130,7 @@ private:
    * @param widget the window that received the event
    * @return true if the event should be discarded and false otherwise
    */
-  bool mouseUpEvent(QMouseEvent* event, QWidget* widget);
+  bool mouseUpEvent(QMouseEvent *event, QWidget *widget);
 
   /**
    * Called when the mouse enters a map view. If the group is in the active state and the
@@ -142,8 +139,8 @@ private:
    * @param event the enter event
    * @param widget the window that received the event
    */
-  void enterEvent(QEvent* event, QWidget* widget);
-  void dragEnterEvent(QEvent* event, QWidget* widget);
+  void enterEvent(QEvent *event, QWidget *widget);
+  void dragEnterEvent(QEvent *event, QWidget *widget);
 
   /**
    * Called when the group is activated.
@@ -166,7 +163,7 @@ private:
    *
    * @param mapView the map view
    */
-  void setFocusCursor(MapViewBase* mapView);
+  void setFocusCursor(MapViewBase *mapView);
 
   /**
    * Sets the cursor to the regular pointer cursor.
@@ -178,7 +175,7 @@ private:
    *
    * @param mapView the map view
    */
-  void clearFocusCursor(MapViewBase* mapView);
+  void clearFocusCursor(MapViewBase *mapView);
 };
 } // namespace View
 } // namespace TrenchBroom

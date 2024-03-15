@@ -21,22 +21,19 @@
 
 #include <QWidget>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class PopupWindow : public QWidget
-{
-  Q_OBJECT
+namespace TrenchBroom {
+namespace View {
+class PopupWindow : public QWidget {
+Q_OBJECT
 public:
-  explicit PopupWindow(QWidget* parent = nullptr);
+  explicit PopupWindow(QWidget *parent = nullptr);
 
-  void positionTouchingWidget(QWidget* refWidget);
+  void positionTouchingWidget(QWidget *refWidget);
 
 protected: // QWidget overrides
-  void closeEvent(QCloseEvent* event) override;
+  void closeEvent(QCloseEvent *event) override;
 
-  void showEvent(QShowEvent* event) override;
+  void showEvent(QShowEvent *event) override;
 
 signals:
 
