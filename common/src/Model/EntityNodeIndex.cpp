@@ -54,13 +54,17 @@ std::set<EntityNodeBase *> EntityNodeIndexQuery::execute(
     const EntityNodeStringIndex &index) const {
   std::set<EntityNodeBase *> result;
   switch (m_type) {
-  case Type_Exact:index.find_matches(m_pattern, std::inserter(result, std::end(result)));
+        case Type_Exact:
+            index.find_matches(m_pattern, std::inserter(result, std::end(result)));
+            break;
+        case Type_Prefix:
+            index.find_matches(m_pattern + "*", std::inserter(result, std::end(result)));
     break;
-  case Type_Prefix:index.find_matches(m_pattern + "*", std::inserter(result, std::end(result)));
+        case Type_Numbered:
+            index.find_matches(m_pattern + "%*", std::inserter(result, std::end(result)));
     break;
-  case Type_Numbered:index.find_matches(m_pattern + "%*", std::inserter(result, std::end(result)));
+        case Type_Any:
     break;
-  case Type_Any:break;
     switchDefault();
   }
   return result;
@@ -119,6 +123,37 @@ void EntityNodeIndex::removeProperty(
     EntityNodeBase *node, const std::string &key, const std::string &value) {
   m_keyIndex->remove(key, node);
   m_valueIndex->remove(value, node);
+}
+
+std::vector<EntityNodeBase *> EntityNodeIndex::findEntity(const std::string &value, const std::string &name, const bool exact) const {
+    // first, find Nodes which have `value` as the value for any key
+    std::vector<EntityNodeBase *> result;
+    std::vector<EntityNodeBase *> matched;
+
+    m_keyIndex->find_matches(value, std::back_inserter(result));
+
+    if (result.empty()) {
+        return {};
+    }
+
+    result = kdl::vec_sort_and_remove_duplicates(std::move(result));
+
+    // next, remove results from the result set that don't match `keyQuery`
+    auto it = std::begin(result);
+    while (it != std::end(result)) {
+        const EntityNodeBase *node = *it;
+        auto classname = QString::fromStdString(node->entity().classname());
+        auto qname = QString::fromStdString(name);
+        auto matches = false;
+
+        if (exact) matches = classname == qname; else
+        matches = classname.startsWith(qname);
+
+        if (matches) { matched.push_back(*it); }
+        ++it;
+    }
+
+    return matched;
 }
 
 std::vector<EntityNodeBase *> EntityNodeIndex::findEntityNodes(
