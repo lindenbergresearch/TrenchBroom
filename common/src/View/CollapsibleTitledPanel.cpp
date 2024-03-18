@@ -30,9 +30,8 @@ namespace TrenchBroom {
 namespace View {
 // CollapsibleTitleBar
 
-CollapsibleTitleBar::CollapsibleTitleBar(
-    const QString &title, const QString &stateText, QWidget *parent)
-    : TitleBar(title, parent), m_stateText(new QLabel(stateText)) {
+CollapsibleTitleBar::CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent) :
+    TitleBar(title, parent), m_stateText(new QLabel(stateText)) {
   setObjectName("CollapsibleTitleBar");
   m_stateText->setFont(m_titleText->font());
   makeInfo(m_stateText);

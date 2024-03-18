@@ -22,10 +22,13 @@
 #include "FloatType.h"
 #include "NotifierConnection.h"
 #include "View/TabBook.h"
+#include "View/LayerEditor.h"
+#include "View/MapSearchListBox.h"
 
 #include <memory>
 #include <optional>
 #include <vector>
+#include <QSplitter>
 
 class QWidget;
 
@@ -52,6 +55,11 @@ Q_OBJECT
 private:
   CollapsibleTitledPanel *m_mapPropertiesEditor;
   CollapsibleTitledPanel *m_modEditor;
+  QSplitter *m_splitter;
+  LayerEditor *m_layerEditor;
+  MapSearchListBox *m_mapSearchListBox;
+  QLineEdit *m_searchBoxEdit;
+  QPushButton *m_searchButton;
 
 public:
   explicit MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
@@ -66,6 +74,10 @@ private:
   CollapsibleTitledPanel *createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
 
   CollapsibleTitledPanel *createModEditor(std::weak_ptr<MapDocument> document);
+
+  CollapsibleTitledPanel *createSearchList(std::weak_ptr<MapDocument> document);
+
+  QLineEdit *createSearchBox();
 };
 
 /**

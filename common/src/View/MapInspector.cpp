@@ -36,6 +36,9 @@
 #include "View/QtUtils.h"
 #include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
+#include "View/MapSearchListBox.h"
+#include "View/Splitter.h"
+#include "IO/ResourceUtils.h"
 
 #include <kdl/memory_utils.h>
 
@@ -62,11 +65,26 @@ MapInspector::~MapInspector() {
 void MapInspector::createGui(std::weak_ptr<MapDocument> document) {
   m_mapPropertiesEditor = createMapPropertiesEditor(document);
   m_modEditor = createModEditor(document);
+  auto layerEditor = createLayerEditor(document);
+  auto mapSearchListBox = createSearchList(document);
+
+  m_splitter = new Splitter(Qt::Vertical);
+  m_splitter->setObjectName("MapProperties_Splitter");
+
+  m_splitter->addWidget(layerEditor);
+  m_splitter->addWidget(mapSearchListBox);
+
+  // when the window resizes, keep the attribute editor size constant
+  m_splitter->setStretchFactor(0, 0);
+  m_splitter->setStretchFactor(1, 1);
+
+  layerEditor->setMinimumSize(100, 150);
+  mapSearchListBox->setMinimumSize(100, 150);
 
   auto *sizer = new QVBoxLayout();
   sizer->setContentsMargins(0, 0, 0, 0);
   sizer->setSpacing(LayoutConstants::NarrowVMargin);
-  sizer->addWidget(createLayerEditor(document), 1);
+  sizer->addWidget(m_splitter, 1);
   sizer->addWidget(m_mapPropertiesEditor, 0);
   sizer->addWidget(m_modEditor, 0);
   setLayout(sizer);
@@ -74,18 +92,17 @@ void MapInspector::createGui(std::weak_ptr<MapDocument> document) {
 
 QWidget *MapInspector::createLayerEditor(std::weak_ptr<MapDocument> document) {
   TitledPanel *titledPanel = new TitledPanel(tr("Layers"));
-  LayerEditor *layerEditor = new LayerEditor(document);
+  m_layerEditor = new LayerEditor(document);
 
   auto *sizer = new QVBoxLayout();
   sizer->setContentsMargins(0, 0, 0, 0);
-  sizer->addWidget(layerEditor, 1);
+  sizer->addWidget(m_layerEditor, 1);
   titledPanel->getPanel()->setLayout(sizer);
 
   return titledPanel;
 }
 
-CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(
-    std::weak_ptr<MapDocument> document) {
+CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(std::weak_ptr<MapDocument> document) {
   CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Map Properties"));
   titledPanel->setObjectName("MapInspector_MapPropertiesPanel");
 
@@ -111,6 +128,31 @@ CollapsibleTitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument>
   sizer->setContentsMargins(0, 0, 0, 0);
   sizer->addWidget(modEditor, 1);
   titledPanel->getPanel()->setLayout(sizer);
+
+  restoreWindowState(titledPanel);
+
+  return titledPanel;
+}
+
+CollapsibleTitledPanel *MapInspector::createSearchList(std::weak_ptr<MapDocument> document) {
+  CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Search"));
+  titledPanel->setObjectName("MapInspector_SearchBoxPanel");
+
+  m_mapSearchListBox = new MapSearchListBox(document);
+
+  auto *v_layout = new QVBoxLayout();
+
+  m_searchBoxEdit = createSearchBox();
+  m_searchButton = new QPushButton{tr("Group")};
+
+  auto *h_layout = new QHBoxLayout();
+  h_layout->addWidget(m_searchBoxEdit);
+  h_layout->addWidget(m_searchButton);
+
+  v_layout->setContentsMargins(0, 0, 0, 0);
+  v_layout->addLayout(h_layout);
+  v_layout->addWidget(m_mapSearchListBox, 1);
+  titledPanel->getPanel()->setLayout(v_layout);
 
   restoreWindowState(titledPanel);
 
@@ -300,6 +342,16 @@ void MapPropertiesEditor::createGui() {
       m_softBoundsFromMapMaxEdit, &QLineEdit::editingFinished, this, textEditingFinished);
 
   updateGui();
+}
+
+QLineEdit *MapInspector::createSearchBox() {
+  auto *widget = new QLineEdit{};
+  widget->setClearButtonEnabled(true);
+  widget->setPlaceholderText(QLineEdit::tr("Search..."));
+
+  const auto icon = IO::loadSVGIcon("Search.svg", 16);
+  widget->addAction(icon, QLineEdit::LeadingPosition);
+  return widget;
 }
 
 void MapPropertiesEditor::connectObservers() {
