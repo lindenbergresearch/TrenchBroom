@@ -16,6 +16,7 @@ namespace View {
 
 class MapDocument;
 
+
 /* ---------------------------------------------------------------------------- */
 
 class SearchListBoxItemRenderer : public ControlListBoxItemRenderer {
@@ -43,6 +44,7 @@ private:
 signals:
 
 };
+
 
 /* ---------------------------------------------------------------------------- */
 

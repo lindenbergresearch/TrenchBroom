@@ -33,20 +33,28 @@ namespace TrenchBroom {
 namespace Renderer {
 class AttrString;
 
+
 class PointHandleRenderer;
 
+
 class PrimitiveRenderer;
+
 
 enum class PrimitiveRendererCullingPolicy;
 enum class PrimitiveRendererOcclusionPolicy;
 
+
 class RenderBatch;
+
 
 class RenderContext;
 
+
 class TextAnchor;
 
+
 class TextRenderer;
+
 
 class RenderService {
 private:
@@ -124,10 +132,7 @@ deleteCopyAndMove(RenderService);
 
   void renderLines(const std::vector<vm::vec3f> &positions);
 
-  void renderDashedLines(
-      const std::vector<vm::vec3f> &positions,
-      int factor = 4,
-      unsigned short pattern = 0x3333);
+  void renderDashedLines(const std::vector<vm::vec3f> &positions, int factor = 4, unsigned short pattern = 0x3333);
 
   void renderLineStrip(const std::vector<vm::vec3f> &positions);
 
@@ -139,37 +144,17 @@ deleteCopyAndMove(RenderService);
 
   void renderBounds(const vm::bbox3f &bounds);
 
-  void renderCircle(
-      const vm::vec3f &position,
-      vm::axis::type normal,
-      size_t segments,
-      float radius,
-      const vm::vec3f &startAxis,
-      const vm::vec3f &endAxis);
+  void renderCircle(const vm::vec3f &position, vm::axis::type normal, size_t segments, float radius, const vm::vec3f &startAxis, const vm::vec3f &endAxis);
 
   void renderCircle(
-      const vm::vec3f &position,
-      vm::axis::type normal,
-      size_t segments,
-      float radius,
-      float startAngle = 0.0f,
-      float angleLength = vm::Cf::two_pi());
+      const vm::vec3f &position, vm::axis::type normal, size_t segments, float radius, float startAngle = 0.0f, float angleLength = vm::Cf::two_pi());
 
   void renderFilledCircle(
-      const vm::vec3f &position,
-      vm::axis::type normal,
-      size_t segments,
-      float radius,
-      const vm::vec3f &startAxis,
-      const vm::vec3f &endAxis);
+      const vm::vec3f &position, vm::axis::type normal, size_t segments, float radius, const vm::vec3f &startAxis, const vm::vec3f &endAxis
+  );
 
   void renderFilledCircle(
-      const vm::vec3f &position,
-      vm::axis::type normal,
-      size_t segments,
-      float radius,
-      float startAngle = 0.0f,
-      float angleLength = vm::Cf::two_pi());
+      const vm::vec3f &position, vm::axis::type normal, size_t segments, float radius, float startAngle = 0.0f, float angleLength = vm::Cf::two_pi());
 
 private:
   void flush();

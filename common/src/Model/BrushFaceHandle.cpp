@@ -28,9 +28,8 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom {
 namespace Model {
-BrushFaceHandle::BrushFaceHandle(BrushNode *node, const size_t faceIndex)
-    : m_node(node), m_faceIndex(faceIndex) {
-  assert(m_node!=nullptr);
+BrushFaceHandle::BrushFaceHandle(BrushNode *node, const size_t faceIndex) : m_node(node), m_faceIndex(faceIndex) {
+  assert(m_node != nullptr);
   ensure(m_faceIndex < m_node->brush().faceCount(), "face index must be valid");
 }
 
@@ -55,7 +54,7 @@ std::vector<BrushNode *> toNodes(const std::vector<BrushFaceHandle> &handles) {
 std::vector<BrushFaceHandle> toHandles(BrushNode *brushNode) {
   std::vector<BrushFaceHandle> result;
   result.reserve(brushNode->brush().faceCount());
-  for (size_t i = 0u; i < brushNode->brush().faceCount(); ++i) {
+  for (size_t i = 0u; i < brushNode->brush().faceCount(); ++ i) {
     result.emplace_back(brushNode, i);
   }
   return result;

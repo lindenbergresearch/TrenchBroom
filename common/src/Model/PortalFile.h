@@ -39,7 +39,9 @@ public:
   const std::vector<vm::polygon3f> &portals() const;
 };
 
+
 bool canLoadPortalFile(const std::filesystem::path &path);
+
 Result<PortalFile> loadPortalFile(std::istream &stream);
 
 } // namespace TrenchBroom::Model

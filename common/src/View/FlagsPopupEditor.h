@@ -21,15 +21,19 @@
 
 #include <QWidget>
 
+
 class QWidget;
 
 namespace TrenchBroom {
 namespace View {
 class ElidedLabel;
 
+
 class FlagsEditor;
 
+
 class PopupButton;
+
 
 /**
  * Button that opens up a flags editor popup
@@ -42,18 +46,11 @@ private:
   FlagsEditor *m_editor;
 
 public:
-  explicit FlagsPopupEditor(
-      size_t numCols,
-      QWidget *parent = nullptr,
-      const QString &buttonLabel = "...",
-      bool showFlagsText = true);
+  explicit FlagsPopupEditor(size_t numCols, QWidget *parent = nullptr, const QString &buttonLabel = "...", bool showFlagsText = true);
 
   void setFlags(const QStringList &labels, const QStringList &tooltips = QStringList());
 
-  void setFlags(
-      const QList<int> &values,
-      const QStringList &labels,
-      const QStringList &tooltips = QStringList());
+  void setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips = QStringList());
 
   void setFlagValue(int set, int mixed = 0);
 

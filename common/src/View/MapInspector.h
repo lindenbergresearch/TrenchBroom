@@ -30,13 +30,18 @@
 #include <vector>
 #include <QSplitter>
 
+
 class QWidget;
+
 
 class QCheckBox;
 
+
 class QLabel;
 
+
 class QLineEdit;
+
 
 class QRadioButton;
 
@@ -48,7 +53,9 @@ class Node;
 namespace View {
 class CollapsibleTitledPanel;
 
+
 class MapDocument;
+
 
 class MapInspector : public TabBookPage {
 Q_OBJECT
@@ -80,6 +87,7 @@ private:
   QLineEdit *createSearchBox();
 };
 
+
 /**
  * Currently just the soft bounds editor
  */
@@ -100,8 +108,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  explicit MapPropertiesEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit MapPropertiesEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   std::optional<vm::bbox3> parseLineEdits();

@@ -25,9 +25,12 @@
 
 #include <memory>
 
+
 class QSpinBox;
 
+
 class QWidget;
+
 
 class QAbstractButton;
 
@@ -35,11 +38,15 @@ namespace TrenchBroom {
 namespace View {
 class Selection;
 
+
 class GLContextManager;
+
 
 class MapDocument;
 
+
 class UVView;
+
 
 class UVEditor : public QWidget {
 Q_OBJECT
@@ -60,10 +67,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  explicit UVEditor(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  explicit UVEditor(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
   bool cancelMouseDrag();
 

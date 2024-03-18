@@ -36,9 +36,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom::View {
 
-GameEngineProfileManager::GameEngineProfileManager(
-    Model::GameEngineConfig config, QWidget *parent)
-    : QWidget{parent}, m_config{std::move(config)} {
+GameEngineProfileManager::GameEngineProfileManager(Model::GameEngineConfig config, QWidget *parent) : QWidget{parent}, m_config{std::move(config)} {
   auto *listPanel = new TitledPanel{"Profiles"};
   auto *editorPanel = new TitledPanel{"Details"};
 
@@ -76,25 +74,21 @@ GameEngineProfileManager::GameEngineProfileManager(
   listPanel->setMaximumWidth(250);
 
   connect(
-      addProfileButton,
-      &QAbstractButton::clicked,
-      this,
-      &GameEngineProfileManager::addProfile);
+      addProfileButton, &QAbstractButton::clicked, this, &GameEngineProfileManager::addProfile
+  );
   connect(
-      m_removeProfileButton,
-      &QAbstractButton::clicked,
-      this,
-      &GameEngineProfileManager::removeProfile);
+      m_removeProfileButton, &QAbstractButton::clicked, this, &GameEngineProfileManager::removeProfile
+  );
   connect(
-      m_profileList,
-      &GameEngineProfileListBox::currentProfileChanged,
-      this,
-      &GameEngineProfileManager::currentProfileChanged);
-  connect(m_profileEditor, &GameEngineProfileEditor::profileChanged, this, [&]() {
-    // update the names in the list box (but don't refresh() the list) when a profile is
-    // edited
-    m_profileList->updateProfiles();
-  });
+      m_profileList, &GameEngineProfileListBox::currentProfileChanged, this, &GameEngineProfileManager::currentProfileChanged
+  );
+  connect(
+      m_profileEditor, &GameEngineProfileEditor::profileChanged, this, [&]() {
+        // update the names in the list box (but don't refresh() the list) when a profile is
+        // edited
+        m_profileList->updateProfiles();
+      }
+  );
 }
 
 const Model::GameEngineConfig &GameEngineProfileManager::config() const {
@@ -120,7 +114,7 @@ void GameEngineProfileManager::removeProfile() {
 
 void GameEngineProfileManager::currentProfileChanged(Model::GameEngineProfile *profile) {
   m_profileEditor->setProfile(profile);
-  m_removeProfileButton->setEnabled(profile!=nullptr);
+  m_removeProfileButton->setEnabled(profile != nullptr);
 }
 
 } // namespace TrenchBroom::View

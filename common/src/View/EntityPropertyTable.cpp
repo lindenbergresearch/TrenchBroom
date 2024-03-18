@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace View {
-EntityPropertyTable::EntityPropertyTable(QWidget *parent)
-    : QTableView{parent}, m_mousePressedOnSelectedCell{false} {
+EntityPropertyTable::EntityPropertyTable(QWidget *parent) : QTableView{parent}, m_mousePressedOnSelectedCell{false} {
 }
 
 void EntityPropertyTable::finishEditing(QWidget *editor) {
@@ -49,22 +48,20 @@ QString EntityPropertyTable::insertRowShortcutString() {
  * Just for generating tooltips, keep in sync with isRemoveRowsShortcut
  */
 QString EntityPropertyTable::removeRowShortcutString() {
-  return QObject::tr("%1 or %2")
-      .arg(QKeySequence{Qt::Key_Delete}.toString(QKeySequence::NativeText))
-      .arg(QKeySequence{Qt::Key_Backspace}.toString(QKeySequence::NativeText));
+  return QObject::tr("%1 or %2").arg(QKeySequence{Qt::Key_Delete}.toString(QKeySequence::NativeText))
+                                .arg(QKeySequence{Qt::Key_Backspace}.toString(QKeySequence::NativeText));
 }
 
 static bool isInsertRowShortcut(QKeyEvent *event) {
-  return event->key()==Qt::Key_Return && event->modifiers()==Qt::CTRL;
+  return event->key() == Qt::Key_Return && event->modifiers() == Qt::CTRL;
 }
 
 static bool isRemoveRowsShortcut(QKeyEvent *event) {
-  return (event->key()==Qt::Key_Delete && event->modifiers()==0)
-      || (event->key()==Qt::Key_Backspace && event->modifiers()==0);
+  return (event->key() == Qt::Key_Delete && event->modifiers() == 0) || (event->key() == Qt::Key_Backspace && event->modifiers() == 0);
 }
 
 bool EntityPropertyTable::event(QEvent *event) {
-  if (event->type()==QEvent::ShortcutOverride) {
+  if (event->type() == QEvent::ShortcutOverride) {
     auto *keyEvent = static_cast<QKeyEvent *>(event);
 
     // Accepting a QEvent::ShortcutOverride suppresses QShortcut/QAction from being
@@ -72,9 +69,7 @@ bool EntityPropertyTable::event(QEvent *event) {
 
     // This is necessary so e.g. pressing U (UV lock menu item) types a U character into
     // the current row, rather than activating the UV lock menu shortcut.
-    if (
-        keyEvent->key() < Qt::Key_Escape
-            && (keyEvent->modifiers()==Qt::NoModifier || keyEvent->modifiers()==Qt::KeypadModifier)) {
+    if (keyEvent->key() < Qt::Key_Escape && (keyEvent->modifiers() == Qt::NoModifier || keyEvent->modifiers() == Qt::KeypadModifier)) {
       event->setAccepted(true);
       return true;
     }
@@ -103,10 +98,8 @@ void EntityPropertyTable::keyPressEvent(QKeyEvent *event) {
 
   // Set up Qt::Key_Return to open the editor. Doing this binding via a QShortcut makes it
   // so you can't close an open editor, so do it this way.
-  if (
-      event->key()==Qt::Key_Return
-          && (event->modifiers()==Qt::NoModifier || event->modifiers()==Qt::KeypadModifier)
-          && state()!=QAbstractItemView::EditingState) {
+  if (event->key() == Qt::Key_Return && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier)
+      && state() != QAbstractItemView::EditingState) {
 
     // open the editor
     TABLE_LOG(qDebug("opening editor..."));
@@ -144,9 +137,7 @@ void EntityPropertyTable::mousePressEvent(QMouseEvent *event) {
   const auto modelIndex = indexAt(event->pos());
   m_mousePressedOnSelectedCell = selectedIndexes().contains(modelIndex);
 
-  TABLE_LOG(
-      qDebug() << "EntityAPropertyTable::mousePressEvent m_mousePressedOnSelectedCell:"
-               << m_mousePressedOnSelectedCell);
+  TABLE_LOG(qDebug() << "EntityAPropertyTable::mousePressEvent m_mousePressedOnSelectedCell:" << m_mousePressedOnSelectedCell);
 
   QTableView::mousePressEvent(event);
 }

@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+
 class QPixmap;
 
 namespace TrenchBroom {

@@ -32,6 +32,8 @@
 namespace TrenchBroom {
 namespace IO {
 class FileSystem;
+
+
 class Reader;
 
 namespace DkmLayout {
@@ -63,7 +65,9 @@ private:
     DkmVertexList vertices;
 
     explicit DkmFrame(size_t vertexCount);
+
     vm::vec3f vertex(size_t index) const;
+
     const vm::vec3f &normal(size_t index) const;
   };
 
@@ -75,8 +79,7 @@ private:
 
   struct DkmMesh {
     enum Type {
-      Fan,
-      Strip
+      Fan, Strip
     };
 
     Type type;
@@ -85,6 +88,7 @@ private:
 
     explicit DkmMesh(int i_vertexCount);
   };
+
   using DkmMeshList = std::vector<DkmMesh>;
 
   std::string m_name;
@@ -98,25 +102,22 @@ public:
 
 private:
   std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
-  void doLoadFrame(
-      size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+
+  void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 
   DkmSkinList parseSkins(Reader reader, size_t skinCount);
+
   DkmFrame parseFrame(Reader reader, size_t frameIndex, size_t vertexCount, int version);
+
   DkmMeshList parseMeshes(Reader reader, size_t commandCount);
 
-  void loadSkins(
-      Assets::EntityModelSurface &surface, const DkmSkinList &skins, Logger &logger);
+  void loadSkins(Assets::EntityModelSurface &surface, const DkmSkinList &skins, Logger &logger);
+
   std::filesystem::path findSkin(const std::string &skin) const;
 
-  void buildFrame(
-      Assets::EntityModel &model,
-      Assets::EntityModelSurface &surface,
-      size_t frameIndex,
-      const DkmFrame &frame,
-      const DkmMeshList &meshes);
-  std::vector<Assets::EntityModelVertex> getVertices(
-      const DkmFrame &frame, const DkmMeshVertexList &meshVertices) const;
+  void buildFrame(Assets::EntityModel &model, Assets::EntityModelSurface &surface, size_t frameIndex, const DkmFrame &frame, const DkmMeshList &meshes);
+
+  std::vector<Assets::EntityModelVertex> getVertices(const DkmFrame &frame, const DkmMeshVertexList &meshVertices) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

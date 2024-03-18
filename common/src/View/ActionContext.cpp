@@ -27,25 +27,21 @@
 namespace TrenchBroom {
 namespace View {
 bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs) {
-  return actionContextMatches(lhs, rhs, ActionContext::AnyView)
-      && actionContextMatches(lhs, rhs, ActionContext::AnyOrNoTool)
+  return actionContextMatches(lhs, rhs, ActionContext::AnyView) && actionContextMatches(lhs, rhs, ActionContext::AnyOrNoTool)
       && actionContextMatches(lhs, rhs, ActionContext::AnyOrNoSelection);
 }
 
-bool actionContextMatches(
-    const ActionContext::Type lhs,
-    const ActionContext::Type rhs,
-    const ActionContext::Type mask) {
-  return (lhs & rhs & mask)!=0;
+bool actionContextMatches(const ActionContext::Type lhs, const ActionContext::Type rhs, const ActionContext::Type mask) {
+  return (lhs & rhs & mask) != 0;
 }
 
 std::string actionContextName(const ActionContext::Type actionContext) {
-  if (actionContext==ActionContext::Any) {
+  if (actionContext == ActionContext::Any) {
     return "any";
   }
 
   std::vector<std::string> actionContexts;
-  if ((actionContext & ActionContext::AnyView)==ActionContext::AnyView) {
+  if ((actionContext & ActionContext::AnyView) == ActionContext::AnyView) {
     actionContexts.emplace_back("any view");
   } else if (actionContext & ActionContext::View3D) {
     actionContexts.emplace_back("3D view");
@@ -53,11 +49,9 @@ std::string actionContextName(const ActionContext::Type actionContext) {
     actionContexts.emplace_back("2D view");
   }
 
-  if (
-      (actionContext & ActionContext::AnyOrNoSelection)==ActionContext::AnyOrNoSelection) {
+  if ((actionContext & ActionContext::AnyOrNoSelection) == ActionContext::AnyOrNoSelection) {
     actionContexts.emplace_back("any or no selection");
-  } else if (
-      (actionContext & ActionContext::AnyOrNoSelection)==ActionContext::AnySelection) {
+  } else if ((actionContext & ActionContext::AnyOrNoSelection) == ActionContext::AnySelection) {
     actionContexts.emplace_back("any selection");
   } else {
     if (actionContext & ActionContext::NoSelection) {
@@ -71,9 +65,9 @@ std::string actionContextName(const ActionContext::Type actionContext) {
     }
   }
 
-  if ((actionContext & ActionContext::AnyOrNoTool)==ActionContext::AnyOrNoTool) {
+  if ((actionContext & ActionContext::AnyOrNoTool) == ActionContext::AnyOrNoTool) {
     actionContexts.emplace_back("any or no tool");
-  } else if ((actionContext & ActionContext::AnyOrNoTool)==ActionContext::AnyTool) {
+  } else if ((actionContext & ActionContext::AnyOrNoTool) == ActionContext::AnyTool) {
     actionContexts.emplace_back("any tool");
   } else {
     if (actionContext & ActionContext::NoTool) {

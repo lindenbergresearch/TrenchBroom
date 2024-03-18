@@ -45,9 +45,14 @@ class Texture;
 
 namespace TrenchBroom::Model {
 class TexCoordSystem;
+
+
 class TexCoordSystemSnapshot;
+
+
 enum class WrapStyle;
 enum class MapFormat;
+
 
 class BrushFace : public Taggable {
 public:
@@ -100,7 +105,9 @@ private:
 
 public:
   BrushFace(const BrushFace &other);
+
   BrushFace(BrushFace &&other) noexcept;
+
   BrushFace &operator=(BrushFace other) noexcept;
 
   friend void swap(BrushFace &lhs, BrushFace &rhs) noexcept;
@@ -121,11 +128,8 @@ public:
    * The returned face has a TexCoordSystem matching the given format.
    */
   static Result<BrushFace> create(
-      const vm::vec3 &point0,
-      const vm::vec3 &point1,
-      const vm::vec3 &point2,
-      const BrushFaceAttributes &attributes,
-      MapFormat mapFormat);
+      const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, MapFormat mapFormat
+  );
 
   /**
    * Creates a face from a Standard texture projection, converting it to Valve if
@@ -136,11 +140,8 @@ public:
    * The returned face has a TexCoordSystem matching the given format.
    */
   static Result<BrushFace> createFromStandard(
-      const vm::vec3 &point0,
-      const vm::vec3 &point1,
-      const vm::vec3 &point2,
-      const BrushFaceAttributes &attributes,
-      MapFormat mapFormat);
+      const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, MapFormat mapFormat
+  );
 
   /**
    * Creates a face from a Valve texture projection, converting it to Standard if
@@ -151,110 +152,128 @@ public:
    * The returned face has a TexCoordSystem matching the given format.
    */
   static Result<BrushFace> createFromValve(
-      const vm::vec3 &point1,
-      const vm::vec3 &point2,
-      const vm::vec3 &point3,
-      const BrushFaceAttributes &attributes,
-      const vm::vec3 &texAxisX,
-      const vm::vec3 &texAxisY,
-      MapFormat mapFormat);
+      const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const BrushFaceAttributes &attributes, const vm::vec3 &texAxisX,
+      const vm::vec3 &texAxisY, MapFormat mapFormat
+  );
 
   static Result<BrushFace> create(
-      const vm::vec3 &point0,
-      const vm::vec3 &point1,
-      const vm::vec3 &point2,
-      const BrushFaceAttributes &attributes,
-      std::unique_ptr<TexCoordSystem> texCoordSystem);
+      const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes,
+      std::unique_ptr<TexCoordSystem> texCoordSystem
+  );
 
-  BrushFace(
-      const BrushFace::Points &points,
-      const vm::plane3 &boundary,
-      const BrushFaceAttributes &attributes,
-      std::unique_ptr<TexCoordSystem> texCoordSystem);
+  BrushFace(const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem);
 
   static void sortFaces(std::vector<BrushFace> &faces);
 
   std::unique_ptr<TexCoordSystemSnapshot> takeTexCoordSystemSnapshot() const;
+
   void restoreTexCoordSystemSnapshot(const TexCoordSystemSnapshot &coordSystemSnapshot);
+
   void copyTexCoordSystemFromFace(
-      const TexCoordSystemSnapshot &coordSystemSnapshot,
-      const BrushFaceAttributes &attributes,
-      const vm::plane3 &sourceFacePlane,
-      WrapStyle wrapStyle);
+      const TexCoordSystemSnapshot &coordSystemSnapshot, const BrushFaceAttributes &attributes, const vm::plane3 &sourceFacePlane, WrapStyle wrapStyle
+  );
 
   const BrushFace::Points &points() const;
+
   const vm::plane3 &boundary() const;
+
   const vm::vec3 &normal() const;
+
   vm::vec3 center() const;
+
   vm::vec3 boundsCenter() const;
+
   FloatType projectedArea(vm::axis::type axis) const;
+
   FloatType area() const;
+
   bool coplanarWith(const vm::plane3d &plane) const;
 
   const BrushFaceAttributes &attributes() const;
+
   void setAttributes(const BrushFaceAttributes &attributes);
+
   bool setAttributes(const BrushFace &other);
 
   int resolvedSurfaceContents() const;
+
   int resolvedSurfaceFlags() const;
+
   float resolvedSurfaceValue() const;
+
   Color resolvedColor() const;
 
   void resetTexCoordSystemCache();
+
   const TexCoordSystem &texCoordSystem() const;
 
   const Assets::Texture *texture() const;
+
   vm::vec2f textureSize() const;
+
   vm::vec2f modOffset(const vm::vec2f &offset) const;
 
   bool setTexture(Assets::Texture *texture);
 
   vm::vec3 textureXAxis() const;
+
   vm::vec3 textureYAxis() const;
+
   void resetTextureAxes();
+
   void resetTextureAxesToParaxial();
 
   void convertToParaxial();
+
   void convertToParallel();
 
   void moveTexture(const vm::vec3 &up, const vm::vec3 &right, const vm::vec2f &offset);
+
   void rotateTexture(float angle);
+
   void shearTexture(const vm::vec2f &factors);
-  void flipTexture(
-      const vm::vec3 &cameraUp,
-      const vm::vec3 &cameraRight,
-      vm::direction cameraRelativeFlipDirection);
+
+  void flipTexture(const vm::vec3 &cameraUp, const vm::vec3 &cameraRight, vm::direction cameraRelativeFlipDirection);
 
   Result<void> transform(const vm::mat4x4 &transform, bool lockTexture);
+
   void invert();
 
   Result<void> updatePointsFromVertices();
 
   vm::mat4x4 projectToBoundaryMatrix() const;
-  vm::mat4x4 toTexCoordSystemMatrix(
-      const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
-  vm::mat4x4 fromTexCoordSystemMatrix(
-      const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
+
+  vm::mat4x4 toTexCoordSystemMatrix(const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
+
+  vm::mat4x4 fromTexCoordSystemMatrix(const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
+
   float measureTextureAngle(const vm::vec2f &center, const vm::vec2f &point) const;
 
   size_t vertexCount() const;
+
   EdgeList edges() const;
+
   VertexList vertices() const;
+
   std::vector<vm::vec3> vertexPositions() const;
 
-  bool hasVertices(
-      const vm::polygon3 &vertices, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+  bool hasVertices(const vm::polygon3 &vertices, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+
   vm::polygon3 polygon() const;
 
 public:
   BrushFaceGeometry *geometry() const;
+
   void setGeometry(BrushFaceGeometry *geometry);
 
   size_t lineNumber() const;
+
   void setFilePosition(size_t lineNumber, size_t lineCount) const;
 
   bool selected() const;
+
   void select();
+
   void deselect();
 
   vm::vec2f textureCoords(const vm::vec3 &point) const;
@@ -262,8 +281,8 @@ public:
   FloatType intersectWithRay(const vm::ray3 &ray) const;
 
 private:
-  Result<void> setPoints(
-      const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2);
+  Result<void> setPoints(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2);
+
   void correctPoints();
 
 public: // brush renderer
@@ -274,10 +293,12 @@ public: // brush renderer
    * @param marked    whether the face is going to be rendered.
    */
   void setMarked(bool marked) const;
+
   bool isMarked() const;
 
 private: // implement Taggable interface
   void doAcceptTagVisitor(TagVisitor &visitor) override;
+
   void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 };
 

@@ -34,11 +34,15 @@ namespace TrenchBroom {
 namespace View {
 class CancelEvent;
 
+
 class InputEventProcessor;
+
 
 class KeyEvent;
 
+
 class MouseEvent;
+
 
 /**
  * Superclass for all input events. Provides protocols for event collation and processing.
@@ -79,6 +83,7 @@ public:
   virtual void processWith(InputEventProcessor &processor) const = 0;
 };
 
+
 /**
  * A keyboard event. Supports only key up and down events.
  */
@@ -116,7 +121,9 @@ public:
   kdl_reflect_decl(KeyEvent, type);
 };
 
+
 std::ostream &operator<<(std::ostream &lhs, const KeyEvent::Type &rhs);
+
 
 /**
  * A mouse event. Supports several event types such as button down and button up, up to
@@ -155,17 +162,10 @@ public:
     DragEnd
   };
   enum class Button {
-    None,
-    Left,
-    Middle,
-    Right,
-    Aux1,
-    Aux2
+    None, Left, Middle, Right, Aux1, Aux2
   };
   enum class WheelAxis {
-    None,
-    Vertical,
-    Horizontal
+    None, Vertical, Horizontal
   };
 
 public:
@@ -189,13 +189,7 @@ public:
    * @param posY the current Y position of the mouse pointer
    * @param scrollDistance the distance by which the mouse wheel was scrolled, in lines
    */
-  MouseEvent(
-      Type type,
-      Button button,
-      WheelAxis wheelAxis,
-      float posX,
-      float posY,
-      float scrollDistance);
+  MouseEvent(Type type, Button button, WheelAxis wheelAxis, float posX, float posY, float scrollDistance);
 
 public:
   /**
@@ -218,11 +212,13 @@ public:
   kdl_reflect_decl(MouseEvent, type, button, wheelAxis, posX, posY, scrollDistance);
 };
 
+
 std::ostream &operator<<(std::ostream &lhs, const MouseEvent::Type &rhs);
 
 std::ostream &operator<<(std::ostream &lhs, const MouseEvent::Button &rhs);
 
 std::ostream &operator<<(std::ostream &lhs, const MouseEvent::WheelAxis &rhs);
+
 
 /**
  * Event to signal that a mouse drag was cancelled by the windowing system, e.g. when the
@@ -239,6 +235,7 @@ public:
 
   kdl_reflect_decl_empty(CancelEvent);
 };
+
 
 /**
  * Collects input events in a queue and processes them when instructed.
@@ -257,9 +254,8 @@ public:
    * @tparam T the type of the event to enqueue
    * @param event the event to enqueue
    */
-  template<typename T>
-  void enqueueEvent(std::unique_ptr<T> event) {
-    if (m_eventQueue.empty() || !m_eventQueue.back()->collateWith(*event)) {
+  template<typename T> void enqueueEvent(std::unique_ptr<T> event) {
+    if (m_eventQueue.empty() || ! m_eventQueue.back()->collateWith(*event)) {
       m_eventQueue.push_back(std::move(event));
     }
   }
@@ -274,6 +270,7 @@ public:
    */
   void processEvents(InputEventProcessor &processor);
 };
+
 
 /**
  * Handles and records input events. May synthesize new events such as mouse click and
@@ -387,6 +384,7 @@ private:
    */
   static MouseEvent::Button getButton(const QMouseEvent &event);
 };
+
 
 /**
  * Processes input events.

@@ -29,11 +29,9 @@
 
 namespace TrenchBroom::View {
 
-SwitchableTitledPanel::SwitchableTitledPanel(
-    const QString &title, const std::array<QString, 2> &stateTexts, QWidget *parent)
-    : QWidget{parent}, m_titleBar{new ClickableTitleBar{title, stateTexts[1]}}, m_divider{new BorderLine{}},
-      m_stackedLayout{new QStackedLayout{}},
-      m_panels{{{new QWidget{}, stateTexts[1]}, {new QWidget{}, stateTexts[0]}}} {
+SwitchableTitledPanel::SwitchableTitledPanel(const QString &title, const std::array<QString, 2> &stateTexts, QWidget *parent) :
+    QWidget{parent}, m_titleBar{new ClickableTitleBar{title, stateTexts[1]}}, m_divider{
+    new BorderLine{}}, m_stackedLayout{new QStackedLayout{}}, m_panels{{{new QWidget{}, stateTexts[1]}, {new QWidget{}, stateTexts[0]}}} {
   m_stackedLayout->addWidget(m_panels[0].panel);
   m_stackedLayout->addWidget(m_panels[1].panel);
 
@@ -45,9 +43,11 @@ SwitchableTitledPanel::SwitchableTitledPanel(
   outerLayout->addLayout(m_stackedLayout, 1);
   setLayout(outerLayout);
 
-  connect(m_titleBar, &ClickableTitleBar::titleBarClicked, this, [=]() {
-    setCurrentIndex(1 - currentIndex());
-  });
+  connect(
+      m_titleBar, &ClickableTitleBar::titleBarClicked, this, [=]() {
+        setCurrentIndex(1 - currentIndex());
+      }
+  );
 }
 
 QWidget *SwitchableTitledPanel::getPanel(const size_t index) const {
@@ -76,7 +76,7 @@ bool SwitchableTitledPanel::restoreState(const QByteArray &state) {
   int currentIndex;
   stream >> currentIndex;
 
-  if (stream.status()==QDataStream::Ok && currentIndex >= 0 && currentIndex < 2) {
+  if (stream.status() == QDataStream::Ok && currentIndex >= 0 && currentIndex < 2) {
     setCurrentIndex(size_t(currentIndex));
     return true;
   }

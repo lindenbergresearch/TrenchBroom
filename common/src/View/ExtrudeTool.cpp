@@ -57,8 +57,7 @@ namespace TrenchBroom::View {
 
 // DragHandle
 
-ExtrudeDragHandle::ExtrudeDragHandle(Model::BrushFaceHandle i_faceHandle)
-    : faceHandle{std::move(i_faceHandle)}, brushAtDragStart{faceHandle.node()->brush()} {
+ExtrudeDragHandle::ExtrudeDragHandle(Model::BrushFaceHandle i_faceHandle) : faceHandle{std::move(i_faceHandle)}, brushAtDragStart{faceHandle.node()->brush()} {
 }
 
 const Model::BrushFace &ExtrudeDragHandle::faceAtDragStart() const {
@@ -79,8 +78,7 @@ kdl_reflect_impl(ExtrudeHitData);
 
 const Model::HitType::Type ExtrudeTool::ExtrudeHitType = Model::HitType::freeType();
 
-ExtrudeTool::ExtrudeTool(std::weak_ptr<MapDocument> document)
-    : Tool{true}, m_document{std::move(document)}, m_dragging{false} {
+ExtrudeTool::ExtrudeTool(std::weak_ptr<MapDocument> document) : Tool{true}, m_document{std::move(document)}, m_dragging{false} {
   connectObservers();
 }
 
@@ -104,13 +102,10 @@ struct EdgeInfo {
 };
 
 bool operator<(const std::optional<EdgeInfo> &lhs, const std::optional<EdgeInfo> &rhs) {
-  return lhs==std::nullopt ? false
-                           : rhs==std::nullopt ? true
-                                               : lhs->dist.distance < rhs->dist.distance;
+  return lhs == std::nullopt ? false : rhs == std::nullopt ? true : lhs->dist.distance < rhs->dist.distance;
 }
 
-std::optional<EdgeInfo> getEdgeInfo(
-    const Model::BrushEdge *edge, Model::BrushNode *brushNode, const vm::ray3 &pickRay) {
+std::optional<EdgeInfo> getEdgeInfo(const Model::BrushEdge *edge, Model::BrushNode *brushNode, const vm::ray3 &pickRay) {
 
   const auto segment = edge->segment();
   const auto dist = vm::distance(pickRay, segment);
@@ -128,7 +123,7 @@ std::optional<EdgeInfo> getEdgeInfo(
   const auto leftDot = vm::dot(leftFace.boundary().normal, pickRay.direction);
   const auto rightDot = vm::dot(rightFace.boundary().normal, pickRay.direction);
 
-  if ((leftDot < 0.0)==(rightDot < 0.0)) {
+  if ((leftDot < 0.0) == (rightDot < 0.0)) {
     // either both faces visible or both faces invisible
     return std::nullopt;
   }
@@ -139,28 +134,23 @@ std::optional<EdgeInfo> getEdgeInfo(
   return {{leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, dist}};
 }
 
-std::optional<EdgeInfo> findClosestHorizonEdge(
-    const std::vector<Model::Node *> &nodes, const vm::ray3 &pickRay) {
+std::optional<EdgeInfo> findClosestHorizonEdge(const std::vector<Model::Node *> &nodes, const vm::ray3 &pickRay) {
   auto result = std::optional<EdgeInfo>{};
   for (auto *node : nodes) {
-    node->accept(kdl::overload(
-        [](Model::WorldNode *) {},
-        [](Model::LayerNode *) {},
-        [](Model::GroupNode *) {},
-        [](Model::EntityNode *) {},
-        [&](Model::BrushNode *brushNode) {
-          for (const auto *edge : brushNode->brush().edges()) {
-            result = std::min(result, getEdgeInfo(edge, brushNode, pickRay));
-          }
-        },
-        [](Model::PatchNode *) {}));
+    node->accept(
+        kdl::overload(
+            [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {}, [](Model::EntityNode *) {}, [&](Model::BrushNode *brushNode) {
+              for (const auto *edge : brushNode->brush().edges()) {
+                result = std::min(result, getEdgeInfo(edge, brushNode, pickRay));
+              }
+            }, [](Model::PatchNode *) {}
+        ));
   }
   return result;
 }
 } // namespace
 
-Model::Hit ExtrudeTool::pick2D(
-    const vm::ray3 &pickRay, const Model::PickResult &pickResult) const {
+Model::Hit ExtrudeTool::pick2D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const {
   using namespace Model::HitFilters;
 
   auto document = kdl::mem_lock(m_document);
@@ -169,36 +159,23 @@ Model::Hit ExtrudeTool::pick2D(
     return Model::Hit::NoHit;
   }
 
-  const auto edgeInfo =
-      findClosestHorizonEdge(document->selectedNodes().nodes(), pickRay);
-  if (!edgeInfo) {
+  const auto edgeInfo = findClosestHorizonEdge(document->selectedNodes().nodes(), pickRay);
+  if (! edgeInfo) {
     return Model::Hit::NoHit;
   }
 
-  const auto [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] =
-      *edgeInfo;
+  const auto [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] = *edgeInfo;
   const auto hitPoint = vm::point_at_distance(pickRay, distance.position1);
   const auto handlePosition = vm::point_at_distance(segment, distance.position2);
 
   // Select the face that is perpendicular to the view direction or the back facing one.
-  if (leftDot >= -vm::C::almost_zero() && !vm::is_zero(rightDot, vm::C::almost_zero())) {
-    return {
-        ExtrudeHitType,
-        distance.position1,
-        hitPoint,
-        ExtrudeHitData{
-            leftFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition}};
+  if (leftDot >= - vm::C::almost_zero() && ! vm::is_zero(rightDot, vm::C::almost_zero())) {
+    return {ExtrudeHitType, distance.position1, hitPoint, ExtrudeHitData{leftFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition}};
   }
-  return {
-      ExtrudeHitType,
-      distance.position1,
-      hitPoint,
-      ExtrudeHitData{
-          rightFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition}};
+  return {ExtrudeHitType, distance.position1, hitPoint, ExtrudeHitData{rightFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition}};
 }
 
-Model::Hit ExtrudeTool::pick3D(
-    const vm::ray3 &pickRay, const Model::PickResult &pickResult) const {
+Model::Hit ExtrudeTool::pick3D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const {
   using namespace Model::HitFilters;
 
   auto document = kdl::mem_lock(m_document);
@@ -206,23 +183,15 @@ Model::Hit ExtrudeTool::pick3D(
   const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && selected());
   if (const auto faceHandle = hitToFaceHandle(hit)) {
     return {
-        ExtrudeHitType,
-        hit.distance(),
-        hit.hitPoint(),
-        ExtrudeHitData{
-            *faceHandle,
-            vm::line3{hit.hitPoint(), faceHandle->face().normal()},
-            hit.hitPoint()}};
+        ExtrudeHitType, hit.distance(), hit.hitPoint(), ExtrudeHitData{*faceHandle, vm::line3{hit.hitPoint(), faceHandle->face().normal()}, hit.hitPoint()}};
   }
 
-  const auto edgeInfo =
-      findClosestHorizonEdge(document->selectedNodes().nodes(), pickRay);
-  if (!edgeInfo) {
+  const auto edgeInfo = findClosestHorizonEdge(document->selectedNodes().nodes(), pickRay);
+  if (! edgeInfo) {
     return Model::Hit::NoHit;
   }
 
-  const auto [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] =
-      *edgeInfo;
+  const auto [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] = *edgeInfo;
   const auto hitPoint = vm::point_at_distance(pickRay, distance.position1);
   const auto handlePosition = vm::point_at_distance(segment, distance.position2);
 
@@ -231,13 +200,8 @@ Model::Hit ExtrudeTool::pick3D(
   const auto referenceFaceHandle = leftDot > rightDot ? rightFaceHandle : leftFaceHandle;
 
   return {
-      ExtrudeHitType,
-      distance.position1,
-      hitPoint,
-      ExtrudeHitData{
-          dragFaceHandle,
-          vm::plane3{handlePosition, referenceFaceHandle.face().normal()},
-          handlePosition}};
+      ExtrudeHitType, distance.position1, hitPoint,
+      ExtrudeHitData{dragFaceHandle, vm::plane3{handlePosition, referenceFaceHandle.face().normal()}, handlePosition}};
 }
 
 const std::vector<ExtrudeDragHandle> &ExtrudeTool::proposedDragHandles() const {
@@ -245,37 +209,32 @@ const std::vector<ExtrudeDragHandle> &ExtrudeTool::proposedDragHandles() const {
 }
 
 namespace {
-std::vector<Model::BrushFaceHandle> collectCoplanarFaces(
-    const std::vector<Model::Node *> &nodes, const Model::BrushFaceHandle &faceHandle) {
+std::vector<Model::BrushFaceHandle> collectCoplanarFaces(const std::vector<Model::Node *> &nodes, const Model::BrushFaceHandle &faceHandle) {
   auto result = std::vector<Model::BrushFaceHandle>{};
 
   const auto &referenceFace = faceHandle.face();
   for (auto *node : nodes) {
-    node->accept(kdl::overload(
-        [](Model::WorldNode *) {},
-        [](Model::LayerNode *) {},
-        [](Model::GroupNode *) {},
-        [](Model::EntityNode *) {},
-        [&](Model::BrushNode *brushNode) {
-          const auto &brush = brushNode->brush();
-          for (size_t i = 0; i < brush.faceCount(); ++i) {
-            const auto &face = brush.face(i);
-            if (!face.coplanarWith(referenceFace.boundary())) {
-              continue;
-            }
+    node->accept(
+        kdl::overload(
+            [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {}, [](Model::EntityNode *) {}, [&](Model::BrushNode *brushNode) {
+              const auto &brush = brushNode->brush();
+              for (size_t i = 0; i < brush.faceCount(); ++ i) {
+                const auto &face = brush.face(i);
+                if (! face.coplanarWith(referenceFace.boundary())) {
+                  continue;
+                }
 
-            result.emplace_back(brushNode, i);
-          }
-        },
-        [](Model::PatchNode *) {}));
+                result.emplace_back(brushNode, i);
+              }
+            }, [](Model::PatchNode *) {}
+        ));
   }
 
   return result;
 }
 
-std::vector<ExtrudeDragHandle> getDragHandles(
-    const std::vector<Model::Node *> &nodes, const Model::Hit &hit) {
-  if (!hit.isMatch()) {
+std::vector<ExtrudeDragHandle> getDragHandles(const std::vector<Model::Node *> &nodes, const Model::Hit &hit) {
+  if (! hit.isMatch()) {
     return {};
   }
 
@@ -283,8 +242,8 @@ std::vector<ExtrudeDragHandle> getDragHandles(
   const auto &data = hit.target<const ExtrudeHitData &>();
 
   return kdl::vec_transform(
-      collectCoplanarFaces(nodes, data.face),
-      [](const auto &handle) { return ExtrudeDragHandle{handle}; });
+      collectCoplanarFaces(nodes, data.face), [](const auto &handle) { return ExtrudeDragHandle{handle}; }
+  );
 }
 } // namespace
 
@@ -305,14 +264,13 @@ void ExtrudeTool::updateProposedDragHandles(const Model::PickResult &pickResult)
   const auto &nodes = document->selectedNodes().nodes();
 
   auto newDragHandles = getDragHandles(nodes, hit);
-  if (newDragHandles!=m_proposedDragHandles) {
+  if (newDragHandles != m_proposedDragHandles) {
     m_proposedDragHandles = std::move(newDragHandles);
     refreshViews();
   }
 }
 
-std::vector<Model::BrushFaceHandle> ExtrudeTool::getDragFaces(
-    const std::vector<ExtrudeDragHandle> &dragHandles) {
+std::vector<Model::BrushFaceHandle> ExtrudeTool::getDragFaces(const std::vector<ExtrudeDragHandle> &dragHandles) {
   auto dragFaces = std::vector<Model::BrushFaceHandle>{};
   dragFaces.reserve(dragHandles.size());
 
@@ -330,10 +288,9 @@ std::vector<Model::BrushFaceHandle> ExtrudeTool::getDragFaces(
  * Starts resizing the faces determined by the previous call to updateProposedDragHandles
  */
 void ExtrudeTool::beginExtrude() {
-  ensure(!m_dragging, "may not be called during a drag");
+  ensure(! m_dragging, "may not be called during a drag");
   m_dragging = true;
-  kdl::mem_lock(m_document)
-      ->startTransaction("Resize Brushes", TransactionScope::LongRunning);
+  kdl::mem_lock(m_document)->startTransaction("Resize Brushes", TransactionScope::LongRunning);
 }
 
 namespace {
@@ -349,8 +306,7 @@ namespace {
  * - sets m_totalDelta to the given delta
  * - returns true
  */
-bool splitBrushesOutward(
-    MapDocument &document, const vm::vec3 &delta, ExtrudeDragState &dragState) {
+bool splitBrushesOutward(MapDocument &document, const vm::vec3 &delta, ExtrudeDragState &dragState) {
   const auto &worldBounds = document.worldBounds();
   const bool lockTextures = pref(Preferences::TextureLock);
 
@@ -368,8 +324,7 @@ bool splitBrushesOutward(
 
   return kdl::fold_results(
       kdl::vec_transform(
-          dragState.initialDragHandles,
-          [&](const auto &dragHandle) {
+          dragState.initialDragHandles, [&](const auto &dragHandle) {
             auto *brushNode = dragHandle.faceHandle.node();
 
             const auto &oldBrush = dragHandle.brushAtDragStart;
@@ -377,27 +332,27 @@ bool splitBrushesOutward(
             const auto newDragFaceNormal = dragHandle.faceNormal();
 
             auto newBrush = oldBrush;
-            return newBrush
-                .moveBoundary(worldBounds, dragFaceIndex, delta, lockTextures)
-                .and_then([&]() {
+            return newBrush.moveBoundary(worldBounds, dragFaceIndex, delta, lockTextures).and_then(
+                [&]() {
                   auto clipFace = oldBrush.face(dragFaceIndex);
                   clipFace.invert();
                   return newBrush.clip(worldBounds, std::move(clipFace));
-                })
-                .transform([&]() {
+                }
+            ).transform(
+                [&]() {
                   auto *newBrushNode = new Model::BrushNode(std::move(newBrush));
                   newNodes[brushNode->parent()].push_back(newBrushNode);
 
                   // Look up the new face index of the new drag handle
-                  if (
-                      const auto newDragFaceIndex =
-                          newBrushNode->brush().findFace(newDragFaceNormal)) {
+                  if (const auto newDragFaceIndex = newBrushNode->brush().findFace(newDragFaceNormal)) {
                     newDragFaces.push_back(
                         Model::BrushFaceHandle(newBrushNode, *newDragFaceIndex));
                   }
-                });
-          }))
-      .transform([&]() {
+                }
+            );
+          }
+      )).transform(
+      [&]() {
         // Apply the changes calculated above
         document.rollbackTransaction();
 
@@ -406,12 +361,13 @@ bool splitBrushesOutward(
         document.selectNodes(addedNodes);
         dragState.currentDragFaces = std::move(newDragFaces);
         dragState.totalDelta = delta;
-      })
-      .transform_error([&](auto e) {
+      }
+  ).transform_error(
+      [&](auto e) {
         document.error() << "Could not extrude brush: " << e;
         kdl::map_clear_and_delete(newNodes);
-      })
-      .is_success();
+      }
+  ).is_success();
 }
 
 /**
@@ -425,8 +381,7 @@ bool splitBrushesOutward(
  * - sets m_totalDelta to the given delta
  * - returns true
  */
-bool splitBrushesInward(
-    MapDocument &document, const vm::vec3 &delta, ExtrudeDragState &dragState) {
+bool splitBrushesInward(MapDocument &document, const vm::vec3 &delta, ExtrudeDragState &dragState) {
   const auto &worldBounds = document.worldBounds();
   const bool lockTextures = pref(Preferences::TextureLock);
 
@@ -507,9 +462,11 @@ bool splitBrushesInward(
 }
 
 std::vector<vm::polygon3> getPolygons(const std::vector<ExtrudeDragHandle> &dragHandles) {
-  return kdl::vec_transform(dragHandles, [](const auto &dragHandle) {
-    return dragHandle.brushAtDragStart.face(dragHandle.faceHandle.faceIndex()).polygon();
-  });
+  return kdl::vec_transform(
+      dragHandles, [](const auto &dragHandle) {
+        return dragHandle.brushAtDragStart.face(dragHandle.faceHandle.faceIndex()).polygon();
+      }
+  );
 }
 } // namespace
 
@@ -519,9 +476,7 @@ bool ExtrudeTool::extrude(const vm::vec3 &handleDelta, ExtrudeDragState &dragSta
   auto document = kdl::mem_lock(m_document);
 
   if (dragState.splitBrushes) {
-    if (
-        splitBrushesOutward(*document, handleDelta, dragState)
-            || splitBrushesInward(*document, handleDelta, dragState)) {
+    if (splitBrushesOutward(*document, handleDelta, dragState) || splitBrushesInward(*document, handleDelta, dragState)) {
       return true;
     }
   } else {
@@ -532,7 +487,8 @@ bool ExtrudeTool::extrude(const vm::vec3 &handleDelta, ExtrudeDragState &dragSta
       // extrudeBrushes() fails if some brushes were completely clipped away.
       // In that case, restore the last m_totalDelta to be successfully applied.
       document->extrudeBrushes(
-          getPolygons(dragState.initialDragHandles), dragState.totalDelta);
+          getPolygons(dragState.initialDragHandles), dragState.totalDelta
+      );
     }
   }
 
@@ -542,10 +498,9 @@ bool ExtrudeTool::extrude(const vm::vec3 &handleDelta, ExtrudeDragState &dragSta
 }
 
 void ExtrudeTool::beginMove() {
-  ensure(!m_dragging, "may not be called during a drag");
+  ensure(! m_dragging, "may not be called during a drag");
   m_dragging = true;
-  kdl::mem_lock(m_document)
-      ->startTransaction("Move Faces", TransactionScope::LongRunning);
+  kdl::mem_lock(m_document)->startTransaction("Move Faces", TransactionScope::LongRunning);
 }
 
 bool ExtrudeTool::move(const vm::vec3 &delta, ExtrudeDragState &dragState) {
@@ -590,24 +545,20 @@ void ExtrudeTool::cancel() {
 
 void ExtrudeTool::connectObservers() {
   auto document = kdl::mem_lock(m_document);
-  m_notifierConnection +=
-      document->nodesWereAddedNotifier.connect(this, &ExtrudeTool::nodesDidChange);
-  m_notifierConnection +=
-      document->nodesWillChangeNotifier.connect(this, &ExtrudeTool::nodesDidChange);
-  m_notifierConnection +=
-      document->nodesWillBeRemovedNotifier.connect(this, &ExtrudeTool::nodesDidChange);
-  m_notifierConnection +=
-      document->selectionDidChangeNotifier.connect(this, &ExtrudeTool::selectionDidChange);
+  m_notifierConnection += document->nodesWereAddedNotifier.connect(this, &ExtrudeTool::nodesDidChange);
+  m_notifierConnection += document->nodesWillChangeNotifier.connect(this, &ExtrudeTool::nodesDidChange);
+  m_notifierConnection += document->nodesWillBeRemovedNotifier.connect(this, &ExtrudeTool::nodesDidChange);
+  m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &ExtrudeTool::selectionDidChange);
 }
 
 void ExtrudeTool::nodesDidChange(const std::vector<Model::Node *> &) {
-  if (!m_dragging) {
+  if (! m_dragging) {
     m_proposedDragHandles.clear();
   }
 }
 
 void ExtrudeTool::selectionDidChange(const Selection &) {
-  if (!m_dragging) {
+  if (! m_dragging) {
     m_proposedDragHandles.clear();
   }
 }

@@ -40,6 +40,7 @@ public:
 
 private:
   std::vector<Model::GameEngineProfile> parseProfiles(const EL::Value &value) const;
+
   Model::GameEngineProfile parseProfile(const EL::Value &value) const;
 
 deleteCopyAndMove(GameEngineConfigParser);

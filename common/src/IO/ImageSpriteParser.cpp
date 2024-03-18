@@ -37,9 +37,8 @@
 #include <vector>
 
 namespace TrenchBroom::IO {
-ImageSpriteParser::ImageSpriteParser(
-    std::string name, std::shared_ptr<File> file, const FileSystem &fs)
-    : m_name{std::move(name)}, m_file{std::move(file)}, m_fs{fs} {
+ImageSpriteParser::ImageSpriteParser(std::string name, std::shared_ptr<File> file, const FileSystem &fs) :
+    m_name{std::move(name)}, m_file{std::move(file)}, m_fs{fs} {
 }
 
 bool ImageSpriteParser::canParse(const std::filesystem::path &path) {
@@ -50,12 +49,12 @@ std::unique_ptr<Assets::EntityModel> ImageSpriteParser::doInitializeModel(Logger
   auto textures = std::vector<Assets::Texture>{};
 
   auto reader = m_file->reader().buffer();
-  textures.push_back(readFreeImageTexture(m_name, reader)
-                         .or_else(makeReadTextureErrorHandler(m_fs, logger))
-                         .value());
+  textures.push_back(
+      readFreeImageTexture(m_name, reader).or_else(makeReadTextureErrorHandler(m_fs, logger)).value());
 
   auto model = std::make_unique<Assets::EntityModel>(
-      m_name, Assets::PitchType::Normal, Assets::Orientation::ViewPlaneParallel);
+      m_name, Assets::PitchType::Normal, Assets::Orientation::ViewPlaneParallel
+  );
   model->addFrame();
 
   auto &surface = model->addSurface(m_name);
@@ -64,15 +63,14 @@ std::unique_ptr<Assets::EntityModel> ImageSpriteParser::doInitializeModel(Logger
   return model;
 }
 
-void ImageSpriteParser::doLoadFrame(
-    const size_t frameIndex, Assets::EntityModel &model, Logger &) {
+void ImageSpriteParser::doLoadFrame(const size_t frameIndex, Assets::EntityModel &model, Logger &) {
   auto &surface = model.surface(0);
 
   if (const auto *texture = surface.skin(0)) {
     const auto w = static_cast<float>(texture->width());
     const auto h = static_cast<float>(texture->height());
-    const auto x1 = -w/2.0f;
-    const auto y1 = -h/2.0f;
+    const auto x1 = - w / 2.0f;
+    const auto y1 = - h / 2.0f;
     const auto x2 = x1 + w;
     const auto y2 = y1 + h;
 
@@ -81,20 +79,15 @@ void ImageSpriteParser::doLoadFrame(
     auto &frame = model.loadFrame(frameIndex, m_name, {bboxMin, bboxMax});
 
     const auto triangles = std::vector<Assets::EntityModelVertex>{
-        Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}},
-        Assets::EntityModelVertex{{x1, y2, 0}, {0, 0}},
-        Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}},
+        Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}}, Assets::EntityModelVertex{{x1, y2, 0}, {0, 0}}, Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}},
 
-        Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}},
-        Assets::EntityModelVertex{{x2, y1, 0}, {1, 1}},
-        Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}},
+        Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}}, Assets::EntityModelVertex{{x2, y1, 0}, {1, 1}}, Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}},
     };
 
     auto size = Renderer::IndexRangeMap::Size{};
     size.inc(Renderer::PrimType::Triangles, 2);
 
-    auto builder =
-        Renderer::IndexRangeMapBuilder<Assets::EntityModelVertex::Type>{6, size};
+    auto builder = Renderer::IndexRangeMapBuilder<Assets::EntityModelVertex::Type>{6, size};
     builder.addTriangles(triangles);
 
     surface.addIndexedMesh(frame, builder.vertices(), builder.indices());

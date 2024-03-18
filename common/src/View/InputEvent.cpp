@@ -42,8 +42,7 @@ bool InputEvent::collateWith(const CancelEvent & /* event */) {
   return false;
 }
 
-KeyEvent::KeyEvent(const Type i_type)
-    : type(i_type) {
+KeyEvent::KeyEvent(const Type i_type) : type(i_type) {
 }
 
 void KeyEvent::processWith(InputEventProcessor &processor) const {
@@ -62,28 +61,18 @@ std::ostream &operator<<(std::ostream &lhs, const KeyEvent::Type &rhs) {
   return lhs;
 }
 
-MouseEvent::MouseEvent(
-    const Type i_type,
-    const Button i_button,
-    const WheelAxis i_wheelAxis,
-    const float i_posX,
-    const float i_posY,
-    const float i_scrollDistance)
-    : type(i_type), button(i_button), wheelAxis(i_wheelAxis), posX(i_posX), posY(i_posY),
-      scrollDistance(i_scrollDistance) {
+MouseEvent::MouseEvent(const Type i_type, const Button i_button, const WheelAxis i_wheelAxis, const float i_posX, const float i_posY, const float i_scrollDistance) : type(i_type), button(i_button), wheelAxis(i_wheelAxis), posX(i_posX), posY(i_posY), scrollDistance(i_scrollDistance) {
 }
 
 bool MouseEvent::collateWith(const MouseEvent &event) {
-  if (
-      (type==Type::Motion && event.type==Type::Motion)
-          || (type==Type::Drag && event.type==Type::Drag)) {
+  if ((type == Type::Motion && event.type == Type::Motion) || (type == Type::Drag && event.type == Type::Drag)) {
     posX = event.posX;
     posY = event.posY;
     return true;
   }
 
-  if (type==Type::Scroll && event.type==Type::Scroll) {
-    if (wheelAxis==event.wheelAxis) {
+  if (type == Type::Scroll && event.type == Type::Scroll) {
+    if (wheelAxis == event.wheelAxis) {
       scrollDistance += event.scrollDistance;
       return true;
     }
@@ -171,10 +160,7 @@ void InputEventQueue::processEvents(InputEventProcessor &processor) {
   }
 }
 
-InputEventRecorder::InputEventRecorder()
-    : m_dragging(false), m_anyMouseButtonDown(false), m_lastClickX(0.0f), m_lastClickY(0.0f),
-      m_lastClickTime(std::chrono::high_resolution_clock::now()), m_nextMouseUpIsRMB(false),
-      m_nextMouseUpIsDblClick(false) {
+InputEventRecorder::InputEventRecorder() : m_dragging(false), m_anyMouseButtonDown(false), m_lastClickX(0.0f), m_lastClickY(0.0f), m_lastClickTime(std::chrono::high_resolution_clock::now()), m_nextMouseUpIsRMB(false), m_nextMouseUpIsDblClick(false) {
 }
 
 void InputEventRecorder::recordEvent(const QKeyEvent &qEvent) {
@@ -190,7 +176,7 @@ void InputEventRecorder::recordEvent(const QMouseEvent &qEvent) {
   const auto wheelAxis = MouseEvent::WheelAxis::None;
   const float scrollDistance = 0.0f;
 
-  if (type==MouseEvent::Type::Down) {
+  if (type == MouseEvent::Type::Down) {
     // macOS: apply Ctrl+click = right click emulation
     // (Implemented ourselves rather than using Qt's implementation to work around Qt bug,
     // see Main.cpp)
@@ -203,21 +189,22 @@ void InputEventRecorder::recordEvent(const QMouseEvent &qEvent) {
     m_lastClickY = posY;
     m_lastClickTime = std::chrono::high_resolution_clock::now();
     m_anyMouseButtonDown = true;
-    m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-        MouseEvent::Type::Down, button, wheelAxis, posX, posY, scrollDistance));
-  } else if (type==MouseEvent::Type::Up) {
+    m_queue.enqueueEvent(
+        std::make_unique<MouseEvent>(
+            MouseEvent::Type::Down, button, wheelAxis, posX, posY, scrollDistance
+        ));
+  } else if (type == MouseEvent::Type::Up) {
     // macOS: apply Ctrl+click = right click
     if (m_nextMouseUpIsRMB) {
       m_nextMouseUpIsRMB = false;
-      if (button==MouseEvent::Button::Left) {
+      if (button == MouseEvent::Button::Left) {
         button = MouseEvent::Button::Right;
       }
     }
 
     if (m_dragging) {
       const auto now = std::chrono::high_resolution_clock::now();
-      const auto duration =
-          std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastClickTime);
+      const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastClickTime);
       const auto minDuration = std::chrono::milliseconds(100);
       if (duration < minDuration) {
         // This was an accidental drag.
@@ -225,59 +212,62 @@ void InputEventRecorder::recordEvent(const QMouseEvent &qEvent) {
         m_dragging = false;
 
         // Synthesize a click event
-        if (!isDrag(posX, posY)) {
-          m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-              MouseEvent::Type::Click,
-              button,
-              wheelAxis,
-              m_lastClickX,
-              m_lastClickY,
-              scrollDistance));
+        if (! isDrag(posX, posY)) {
+          m_queue.enqueueEvent(
+              std::make_unique<MouseEvent>(
+                  MouseEvent::Type::Click, button, wheelAxis, m_lastClickX, m_lastClickY, scrollDistance
+              ));
         }
       } else {
-        m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-            MouseEvent::Type::DragEnd, button, wheelAxis, posX, posY, scrollDistance));
+        m_queue.enqueueEvent(
+            std::make_unique<MouseEvent>(
+                MouseEvent::Type::DragEnd, button, wheelAxis, posX, posY, scrollDistance
+            ));
         m_dragging = false;
       }
-    } else if (!m_nextMouseUpIsDblClick) {
+    } else if (! m_nextMouseUpIsDblClick) {
       // Synthesize a click event
-      m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-          MouseEvent::Type::Click,
-          button,
-          wheelAxis,
-          m_lastClickX,
-          m_lastClickY,
-          scrollDistance));
+      m_queue.enqueueEvent(
+          std::make_unique<MouseEvent>(
+              MouseEvent::Type::Click, button, wheelAxis, m_lastClickX, m_lastClickY, scrollDistance
+          ));
     }
     m_anyMouseButtonDown = false;
     m_nextMouseUpIsDblClick = false;
-    m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-        MouseEvent::Type::Up, button, wheelAxis, posX, posY, scrollDistance));
-  } else if (type==MouseEvent::Type::Motion) {
-    if (!m_dragging && m_anyMouseButtonDown) {
+    m_queue.enqueueEvent(
+        std::make_unique<MouseEvent>(
+            MouseEvent::Type::Up, button, wheelAxis, posX, posY, scrollDistance
+        ));
+  } else if (type == MouseEvent::Type::Motion) {
+    if (! m_dragging && m_anyMouseButtonDown) {
       if (isDrag(posX, posY)) {
-        m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-            MouseEvent::Type::DragStart,
-            button,
-            wheelAxis,
-            m_lastClickX,
-            m_lastClickY,
-            scrollDistance));
+        m_queue.enqueueEvent(
+            std::make_unique<MouseEvent>(
+                MouseEvent::Type::DragStart, button, wheelAxis, m_lastClickX, m_lastClickY, scrollDistance
+            ));
         m_dragging = true;
       }
     }
     if (m_dragging) {
-      m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-          MouseEvent::Type::Drag, button, wheelAxis, posX, posY, scrollDistance));
+      m_queue.enqueueEvent(
+          std::make_unique<MouseEvent>(
+              MouseEvent::Type::Drag, button, wheelAxis, posX, posY, scrollDistance
+          ));
     } else {
-      m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-          MouseEvent::Type::Motion, button, wheelAxis, posX, posY, scrollDistance));
+      m_queue.enqueueEvent(
+          std::make_unique<MouseEvent>(
+              MouseEvent::Type::Motion, button, wheelAxis, posX, posY, scrollDistance
+          ));
     }
-  } else if (type==MouseEvent::Type::DoubleClick) {
-    m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-        MouseEvent::Type::Down, button, wheelAxis, posX, posY, scrollDistance));
-    m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-        MouseEvent::Type::DoubleClick, button, wheelAxis, posX, posY, scrollDistance));
+  } else if (type == MouseEvent::Type::DoubleClick) {
+    m_queue.enqueueEvent(
+        std::make_unique<MouseEvent>(
+            MouseEvent::Type::Down, button, wheelAxis, posX, posY, scrollDistance
+        ));
+    m_queue.enqueueEvent(
+        std::make_unique<MouseEvent>(
+            MouseEvent::Type::DoubleClick, button, wheelAxis, posX, posY, scrollDistance
+        ));
     m_nextMouseUpIsDblClick = true;
   } else {
     m_queue.enqueueEvent(
@@ -289,10 +279,9 @@ QPointF InputEventRecorder::scrollLinesForEvent(const QWheelEvent &qtEvent) {
   // TODO: support pixel scrolling via qtEvent.pixelDelta()?
   const int linesPerStep = QApplication::wheelScrollLines();
   const QPointF angleDelta = QPointF(qtEvent.angleDelta()); // in eighths-of-degrees
-  constexpr float EighthsOfDegreesPerStep =
-      120.0f; // see: https://doc.qt.io/qt-5/qwheelevent.html#angleDelta
+  constexpr float EighthsOfDegreesPerStep = 120.0f; // see: https://doc.qt.io/qt-5/qwheelevent.html#angleDelta
 
-  const QPointF lines = (angleDelta/EighthsOfDegreesPerStep)*linesPerStep;
+  const QPointF lines = (angleDelta / EighthsOfDegreesPerStep) * linesPerStep;
   return lines;
 }
 
@@ -318,23 +307,15 @@ void InputEventRecorder::recordEvent(const QWheelEvent &qtEvent) {
     scrollDistance = QPointF(scrollDistance.y(), scrollDistance.x());
   }
 
-  if (scrollDistance.x()!=0.0f) {
-    m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-        MouseEvent::Type::Scroll,
-        MouseEvent::Button::None,
-        MouseEvent::WheelAxis::Horizontal,
-        posX,
-        posY,
-        static_cast<float>(scrollDistance.x())));
+  if (scrollDistance.x() != 0.0f) {
+    m_queue.enqueueEvent(
+        std::make_unique<MouseEvent>(
+            MouseEvent::Type::Scroll, MouseEvent::Button::None, MouseEvent::WheelAxis::Horizontal, posX, posY, static_cast<float>(scrollDistance.x())));
   }
-  if (scrollDistance.y()!=0.0f) {
-    m_queue.enqueueEvent(std::make_unique<MouseEvent>(
-        MouseEvent::Type::Scroll,
-        MouseEvent::Button::None,
-        MouseEvent::WheelAxis::Vertical,
-        posX,
-        posY,
-        static_cast<float>(scrollDistance.y())));
+  if (scrollDistance.y() != 0.0f) {
+    m_queue.enqueueEvent(
+        std::make_unique<MouseEvent>(
+            MouseEvent::Type::Scroll, MouseEvent::Button::None, MouseEvent::WheelAxis::Vertical, posX, posY, static_cast<float>(scrollDistance.y())));
   }
 }
 
@@ -344,15 +325,14 @@ void InputEventRecorder::processEvents(InputEventProcessor &processor) {
 
 bool InputEventRecorder::isDrag(const float posX, const float posY) const {
   static const auto MinDragDistance = 2.0f;
-  return std::abs(posX - m_lastClickX) > MinDragDistance
-      || std::abs(posY - m_lastClickY) > MinDragDistance;
+  return std::abs(posX - m_lastClickX) > MinDragDistance || std::abs(posY - m_lastClickY) > MinDragDistance;
 }
 
 KeyEvent::Type InputEventRecorder::getEventType(const QKeyEvent &qEvent) {
   const auto qEventType = qEvent.type();
-  if (qEventType==QEvent::KeyPress) {
+  if (qEventType == QEvent::KeyPress) {
     return KeyEvent::Type::Down;
-  } else if (qEventType==QEvent::KeyRelease) {
+  } else if (qEventType == QEvent::KeyRelease) {
     return KeyEvent::Type::Up;
   } else {
     throw std::runtime_error("Unexpected qEvent type");
@@ -360,13 +340,13 @@ KeyEvent::Type InputEventRecorder::getEventType(const QKeyEvent &qEvent) {
 }
 
 MouseEvent::Type InputEventRecorder::getEventType(const QMouseEvent &qEvent) {
-  if (qEvent.type()==QEvent::MouseButtonPress) {
+  if (qEvent.type() == QEvent::MouseButtonPress) {
     return MouseEvent::Type::Down;
-  } else if (qEvent.type()==QEvent::MouseButtonRelease) {
+  } else if (qEvent.type() == QEvent::MouseButtonRelease) {
     return MouseEvent::Type::Up;
-  } else if (qEvent.type()==QEvent::MouseButtonDblClick) {
+  } else if (qEvent.type() == QEvent::MouseButtonDblClick) {
     return MouseEvent::Type::DoubleClick;
-  } else if (qEvent.type()==QEvent::MouseMove) {
+  } else if (qEvent.type() == QEvent::MouseMove) {
     return MouseEvent::Type::Motion;
   } else {
     throw std::runtime_error("Unexpected qEvent type");
@@ -374,15 +354,15 @@ MouseEvent::Type InputEventRecorder::getEventType(const QMouseEvent &qEvent) {
 }
 
 MouseEvent::Button InputEventRecorder::getButton(const QMouseEvent &qEvent) {
-  if (qEvent.button()==Qt::LeftButton) {
+  if (qEvent.button() == Qt::LeftButton) {
     return MouseEvent::Button::Left;
-  } else if (qEvent.button()==Qt::MiddleButton) {
+  } else if (qEvent.button() == Qt::MiddleButton) {
     return MouseEvent::Button::Middle;
-  } else if (qEvent.button()==Qt::RightButton) {
+  } else if (qEvent.button() == Qt::RightButton) {
     return MouseEvent::Button::Right;
-  } else if (qEvent.button()==Qt::XButton1) {
+  } else if (qEvent.button() == Qt::XButton1) {
     return MouseEvent::Button::Aux1;
-  } else if (qEvent.button()==Qt::XButton2) {
+  } else if (qEvent.button() == Qt::XButton2) {
     return MouseEvent::Button::Aux2;
   } else {
     return MouseEvent::Button::None;

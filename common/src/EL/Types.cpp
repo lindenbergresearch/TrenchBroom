@@ -40,19 +40,19 @@ std::string typeName(const ValueType type) {
 }
 
 ValueType typeForName(const std::string &type) {
-  if (type=="Boolean")
+  if (type == "Boolean")
     return ValueType::Boolean;
-  if (type=="String")
+  if (type == "String")
     return ValueType::String;
-  if (type=="Number")
+  if (type == "Number")
     return ValueType::Number;
-  if (type=="Array")
+  if (type == "Array")
     return ValueType::Array;
-  if (type=="Map")
+  if (type == "Map")
     return ValueType::Map;
-  if (type=="Range")
+  if (type == "Range")
     return ValueType::Range;
-  if (type=="Undefined")
+  if (type == "Undefined")
     return ValueType::Undefined;
   assert(false);
   return ValueType::Null;

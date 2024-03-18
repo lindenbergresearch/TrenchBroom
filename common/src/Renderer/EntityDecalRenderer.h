@@ -33,13 +33,21 @@
 
 namespace TrenchBroom::Assets {
 class Texture;
+
+
 struct DecalSpecification;
 } // namespace TrenchBroom::Assets
 
 namespace TrenchBroom::Model {
 class BrushFace;
+
+
 class BrushNode;
+
+
 class EntityNode;
+
+
 class Node;
 } // namespace TrenchBroom::Model
 
@@ -63,15 +71,13 @@ private:
     AllocationTracker::Block *faceIndicesKey = nullptr;
   };
 
-  using EntityWithDependenciesMap =
-      std::unordered_map<const Model::EntityNode *, EntityDecalData>;
+  using EntityWithDependenciesMap = std::unordered_map<const Model::EntityNode *, EntityDecalData>;
 
   std::weak_ptr<View::MapDocument> m_document;
   EntityWithDependenciesMap m_entities;
 
   using Vertex = Renderer::GLVertexTypes::P3NT2::Vertex;
-  using TextureToBrushIndicesMap =
-      std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
+  using TextureToBrushIndicesMap = std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
 
   std::shared_ptr<TextureToBrushIndicesMap> m_faces;
   std::shared_ptr<BrushVertexArray> m_vertexArray;
@@ -103,14 +109,16 @@ public:
 
 private:
   void updateEntity(const Model::EntityNode *entityNode);
+
   void removeEntity(const Model::EntityNode *entityNode);
+
   void updateBrush(const Model::BrushNode *brushNode);
+
   void removeBrush(const Model::BrushNode *brushNode);
 
   void invalidateDecalData(EntityDecalData &data) const;
 
-  void validateDecalData(
-      const Model::EntityNode *entityNode, EntityDecalData &data) const;
+  void validateDecalData(const Model::EntityNode *entityNode, EntityDecalData &data) const;
 
 public: // rendering
   void render(RenderContext &renderContext, RenderBatch &renderBatch);

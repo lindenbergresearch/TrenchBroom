@@ -55,7 +55,7 @@ bool TagManager::isRegisteredSmartTag(const std::string &name) const {
 
 const SmartTag &TagManager::smartTag(const std::string &name) const {
   const auto it = m_smartTags.find(name);
-  if (it==std::end(m_smartTags)) {
+  if (it == std::end(m_smartTags)) {
     throw std::logic_error("Smart tag not registered");
   }
   return *it;
@@ -63,7 +63,7 @@ const SmartTag &TagManager::smartTag(const std::string &name) const {
 
 bool TagManager::isRegisteredSmartTag(const size_t index) const {
   for (const auto &tag : m_smartTags) {
-    if (tag.index()==index) {
+    if (tag.index() == index) {
       return true;
     }
   }
@@ -72,7 +72,7 @@ bool TagManager::isRegisteredSmartTag(const size_t index) const {
 
 const SmartTag &TagManager::smartTag(const size_t index) const {
   for (const auto &tag : m_smartTags) {
-    if (tag.index()==index) {
+    if (tag.index() == index) {
       return tag;
     }
   }
@@ -85,7 +85,7 @@ void TagManager::registerSmartTags(const std::vector<SmartTag> &tags) {
     const size_t nextIndex = freeTagIndex();
     auto [it, inserted] = m_smartTags.insert(tag);
 
-    if (!inserted) {
+    if (! inserted) {
       throw std::logic_error("Smart tag '" + tag.name() + "' already registered");
     }
 
@@ -104,7 +104,7 @@ void TagManager::updateTags(Taggable &taggable) const {
 }
 
 size_t TagManager::freeTagIndex() {
-  static const size_t Bits = (sizeof(TagType::Type)*8);
+  static const size_t Bits = (sizeof(TagType::Type) * 8);
   const auto index = m_smartTags.size();
   ensure(index <= Bits, "no more tag types");
   return index;

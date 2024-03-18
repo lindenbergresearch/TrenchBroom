@@ -29,12 +29,7 @@ class ColorModel : public QAbstractTableModel {
 Q_OBJECT
 public:
   enum Columns {
-    Index,
-    Context,
-    Path,
-    Value,
-    Default,
-    count,
+    Index, Context, Path, Value, Default, count,
   };
 
   QString columnNames[Columns::count]{"Index", "Context", "Path", "Value", "Default"};

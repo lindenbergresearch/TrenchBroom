@@ -30,9 +30,8 @@ namespace TrenchBroom {
 namespace View {
 // CompilationProfileItemRenderer
 
-CompilationProfileItemRenderer::CompilationProfileItemRenderer(
-    Model::CompilationProfile &profile, QWidget *parent)
-    : ControlListBoxItemRenderer{parent}, m_profile{profile} {
+CompilationProfileItemRenderer::CompilationProfileItemRenderer(Model::CompilationProfile &profile, QWidget *parent) :
+    ControlListBoxItemRenderer{parent}, m_profile{profile} {
   // request customContextMenuRequested() to be emitted
   setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -60,9 +59,8 @@ void CompilationProfileItemRenderer::updateItem() {
 
 // CompilationProfileListBox
 
-CompilationProfileListBox::CompilationProfileListBox(
-    Model::CompilationConfig &config, QWidget *parent)
-    : ControlListBox{"Click the '+' button to create a compilation profile.", true, parent}, m_config{config} {
+CompilationProfileListBox::CompilationProfileListBox(Model::CompilationConfig &config, QWidget *parent) :
+    ControlListBox{"Click the '+' button to create a compilation profile.", true, parent}, m_config{config} {
   reload();
 }
 
@@ -78,14 +76,16 @@ size_t CompilationProfileListBox::itemCount() const {
   return m_config.profiles.size();
 }
 
-ControlListBoxItemRenderer *CompilationProfileListBox::createItemRenderer(
-    QWidget *parent, const size_t index) {
+ControlListBoxItemRenderer *CompilationProfileListBox::createItemRenderer(QWidget *parent, const size_t index) {
   auto &profile = m_config.profiles[index];
   auto *renderer = new CompilationProfileItemRenderer{profile, parent};
-  connect(renderer, &QWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
-    emit this->profileContextMenuRequested(
-      renderer->mapToGlobal(pos), m_config.profiles[index]);
-  });
+  connect(
+      renderer, &QWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
+        emit this->profileContextMenuRequested(
+          renderer->mapToGlobal(pos), m_config.profiles[index]
+      );
+      }
+  );
   return renderer;
 }
 } // namespace View

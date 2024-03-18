@@ -33,8 +33,7 @@
 
 namespace TrenchBroom {
 namespace View {
-FrameManager::FrameManager(const bool singleFrame)
-    : QObject(), m_singleFrame(singleFrame) {
+FrameManager::FrameManager(const bool singleFrame) : QObject(), m_singleFrame(singleFrame) {
   connect(qApp, &QApplication::focusChanged, this, &FrameManager::onFocusChange);
 }
 
@@ -55,7 +54,7 @@ MapFrame *FrameManager::topFrame() const {
 bool FrameManager::closeAllFrames() {
   auto framesCopy = m_frames;
   for (MapFrame *frame : framesCopy) {
-    if (!frame->close()) {
+    if (! frame->close()) {
       return false;
     }
   }
@@ -68,24 +67,24 @@ bool FrameManager::allFramesClosed() const {
 }
 
 void FrameManager::onFocusChange(QWidget * /* old */, QWidget *now) {
-  if (now==nullptr) {
+  if (now == nullptr) {
     return;
   }
 
   // The QApplication::focusChanged signal also notifies us of focus changes between child
   // widgets, so get the top-level widget with QWidget::window()
   auto *frame = dynamic_cast<MapFrame *>(now->window());
-  if (frame!=nullptr) {
+  if (frame != nullptr) {
     auto it = std::find(std::begin(m_frames), std::end(m_frames), frame);
 
     // Focus can switch to a frame after FrameManager::removeFrame is called,
     // in that case just ignore the focus change.
-    if (it==std::end(m_frames)) {
+    if (it == std::end(m_frames)) {
       return;
     }
 
-    if (it!=std::begin(m_frames)) {
-      assert(topFrame()!=frame);
+    if (it != std::begin(m_frames)) {
+      assert(topFrame() != frame);
       m_frames.erase(it);
       m_frames.insert(std::begin(m_frames), frame);
     }
@@ -93,8 +92,8 @@ void FrameManager::onFocusChange(QWidget * /* old */, QWidget *now) {
 }
 
 MapFrame *FrameManager::createOrReuseFrame() {
-  assert(!m_singleFrame || m_frames.size() <= 1);
-  if (!m_singleFrame || m_frames.empty()) {
+  assert(! m_singleFrame || m_frames.size() <= 1);
+  if (! m_singleFrame || m_frames.empty()) {
     auto document = MapDocumentCommandFacade::newMapDocument();
     createFrame(document);
   }
@@ -115,7 +114,7 @@ void FrameManager::removeFrame(MapFrame *frame) {
   // This is called from MapFrame::closeEvent
 
   auto it = std::find(std::begin(m_frames), std::end(m_frames), frame);
-  if (it==std::end(m_frames)) {
+  if (it == std::end(m_frames)) {
     // On OS X, we sometimes get two close events for a frame when terminating the app
     // from the dock.
     return;

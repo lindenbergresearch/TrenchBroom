@@ -34,15 +34,19 @@ class PickResult;
 namespace Renderer {
 class RenderBatch;
 
+
 class RenderContext;
 } // namespace Renderer
 
 namespace View {
 class DragTracker;
 
+
 class MapDocument;
 
+
 class UVViewHelper;
+
 
 class UVScaleTool : public ToolController, public Tool {
 public:
@@ -65,10 +69,7 @@ private:
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  void render(
-      const InputState &inputState,
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch) override;
+  void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
   bool cancel() override;
 };

@@ -31,21 +31,36 @@
 
 namespace TrenchBroom {
 namespace IO {
-TEST_CASE("AssimpParserTest.loadBlenderModel")
-{
-    auto logger = NullLogger{};
+TEST_CASE("AssimpParserTest.loadBlenderModel") {
+auto logger = NullLogger{};
 
-    const auto basePath = std::filesystem::current_path() / "fixture/test/IO/assimp";
-    auto fs = std::make_shared<DiskFileSystem>(basePath);
+const auto basePath = std::filesystem::current_path() / "fixture/test/IO/assimp";
+auto fs = std::make_shared<DiskFileSystem>(basePath);
 
-    auto assimpParser = AssimpParser{"cube.dae", *fs};
+auto assimpParser = AssimpParser{"cube.dae", *fs};
 
-    auto model = assimpParser.initializeModel(logger);
-    CHECK(model != nullptr);
+auto model = assimpParser.initializeModel(logger);
+CHECK(model
+!= nullptr);
 
-    CHECK(model->frameCount() == 1);
-    CHECK(model->surfaceCount() == 1);
-    CHECK(model->surface(0).skinCount() == 1);
+CHECK(model
+->
+
+frameCount()
+
+== 1);
+CHECK(model
+->
+
+surfaceCount()
+
+== 1);
+CHECK(model
+->surface(0).
+
+skinCount()
+
+== 1);
 }
 } // namespace IO
 } // namespace TrenchBroom

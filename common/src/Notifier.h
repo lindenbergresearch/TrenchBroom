@@ -44,6 +44,7 @@ private:
   virtual void disconnect(size_t id) = 0;
 };
 
+
 /**
  * A notifier that multiple observers can connect to.
  *
@@ -52,8 +53,7 @@ private:
  *
  * @tparam A the types of the parameters passed to the observer callbacks.
  */
-template<typename... A>
-class Notifier {
+template<typename... A> class Notifier {
 private:
   using Callback = std::function<void(A...)>;
 
@@ -62,8 +62,7 @@ private:
     size_t id;
     bool pendingRemove;
 
-    Observer(Callback i_callback, const size_t i_id)
-        : callback{std::move(i_callback)}, id{i_id}, pendingRemove{false} {
+    Observer(Callback i_callback, const size_t i_id) : callback{std::move(i_callback)}, id{i_id}, pendingRemove{false} {
     }
   };
 
@@ -78,7 +77,7 @@ private:
     ~NotifierState() override = default;
 
     size_t connect(Callback callback) {
-      const auto id = m_nextId++;
+      const auto id = m_nextId ++;
       if (m_notifying) {
         m_toAdd.emplace_back(std::move(callback), id);
       } else {
@@ -88,7 +87,7 @@ private:
     }
 
     size_t connect(Notifier &notifier) {
-      const auto id = m_nextId++;
+      const auto id = m_nextId ++;
       auto callback = [&](auto &&... a) { notifier(std::forward<decltype(a)>(a)...); };
       if (m_notifying) {
         m_toAdd.emplace_back(std::move(callback), id);
@@ -98,25 +97,24 @@ private:
       return id;
     }
 
-    template<typename... NA>
-    void notify(NA &&... a) {
+    template<typename... NA> void notify(NA &&... a) {
       processPendingObservers();
 
       const kdl::set_temp notifying(m_notifying);
       for (const auto &observer : m_observers) {
-        if (!observer.pendingRemove) {
+        if (! observer.pendingRemove) {
           observer.callback(std::forward<NA>(a)...);
         }
       }
     }
 
     void disconnect(const size_t id) override {
-      if (const auto it = findObserver(m_toAdd, id); it!=std::end(m_toAdd)) {
+      if (const auto it = findObserver(m_toAdd, id); it != std::end(m_toAdd)) {
         m_toAdd.erase(it);
         return;
       }
 
-      if (const auto it = findObserver(m_observers, id); it!=std::end(m_observers)) {
+      if (const auto it = findObserver(m_observers, id); it != std::end(m_observers)) {
         if (m_notifying) {
           it->pendingRemove = true;
         } else {
@@ -126,26 +124,26 @@ private:
     }
 
   private:
-    typename std::vector<Observer>::iterator findObserver(
-        std::vector<Observer> &observers, const size_t id) {
+    typename std::vector<Observer>::iterator findObserver(std::vector<Observer> &observers, const size_t id) {
       return std::find_if(
           std::begin(observers), std::end(observers), [&](const auto &observer) {
-            return observer.id==id;
-          });
+            return observer.id == id;
+          }
+      );
     }
 
     void processPendingObservers() {
-      assert(!m_notifying);
+      assert(! m_notifying);
 
-      for (auto it = std::begin(m_observers); it!=std::end(m_observers);) {
+      for (auto it = std::begin(m_observers); it != std::end(m_observers);) {
         if (it->pendingRemove) {
           it = m_observers.erase(it);
         } else {
-          ++it;
+          ++ it;
         }
       }
 
-      while (!m_toAdd.empty()) {
+      while (! m_toAdd.empty()) {
         auto observer = std::move(m_toAdd.back());
         m_observers.push_back(std::move(observer));
         m_toAdd.pop_back();
@@ -190,11 +188,12 @@ public:
    * @param receiver the receiver object, i.e. the owner of the member function
    * @param callback the observer callback to call when the notification happens
    */
-  template<typename R, typename MemberCallback>
-  [[nodiscard]] NotifierConnection connect(R *receiver, MemberCallback callback) {
-    return connect([receiver = receiver, callback = std::move(callback)](auto &&... args) {
-      std::invoke(callback, receiver, std::forward<decltype(args)>(args)...);
-    });
+  template<typename R, typename MemberCallback> [[nodiscard]] NotifierConnection connect(R *receiver, MemberCallback callback) {
+    return connect(
+        [receiver = receiver, callback = std::move(callback)](auto &&... args) {
+          std::invoke(callback, receiver, std::forward<decltype(args)>(args)...);
+        }
+    );
   }
 
   /**
@@ -216,8 +215,7 @@ public:
    *
    * @param a the arguments to pass to each notifier
    */
-  template<typename... NA>
-  void notify(NA &&... a) {
+  template<typename... NA> void notify(NA &&... a) {
     m_state->notify(std::forward<NA>(a)...);
   }
 
@@ -226,18 +224,17 @@ public:
    *
    * @param a the arguments to pass to each notifier
    */
-  template<typename... NA>
-  void operator()(NA &&... a) {
+  template<typename... NA> void operator()(NA &&... a) {
     notify(std::forward<NA>(a)...);
   }
 };
+
 
 /**
  * RAII style helper tht notifies the given notifier when it is destroyed, passing the
  * given arguments.
  */
-template<typename... A>
-class NotifyAfter {
+template<typename... A> class NotifyAfter {
 private:
   Notifier<A...> &m_notifier;
 
@@ -256,16 +253,14 @@ public:
    * @param notifier the notifier to notify
    * @param a the arguments to pass to the notifier
    */
-  template<typename... NA>
-  explicit NotifyAfter(const bool notify, Notifier<A...> &notifier, NA &&... a)
+  template<typename... NA> explicit NotifyAfter(const bool notify, Notifier<A...> &notifier, NA &&... a)
       : m_notifier{notifier}, m_notify{makeNotify(notify, std::forward<NA>(a)...)} {
   }
 
   virtual ~NotifyAfter() { m_notify(m_notifier); }
 
 private:
-  template<typename... NA>
-  static std::function<void(Notifier<A...> &)> makeNotify(const bool notify, NA &&... a) {
+  template<typename... NA> static std::function<void(Notifier<A...> &)> makeNotify(const bool notify, NA &&... a) {
     if (notify) {
       return [args = kdl::tup_capture(std::forward<NA>(a)...)](Notifier<A...> &notifier) {
         std::apply(notifier, args);
@@ -275,15 +270,15 @@ private:
   }
 };
 
-template<typename... AA, typename... NA>
-NotifyAfter(bool, Notifier<AA...> &, NA &&...) -> NotifyAfter<AA...>;
+
+template<typename... AA, typename... NA> NotifyAfter(bool, Notifier<AA...> &, NA &&...) -> NotifyAfter<AA...>;
+
 
 /**
  * RAII style helper tht notifies a given notifier immediately and another notifier when
  * it is destroyed, passing the given arguments to either notifier.
  */
-template<typename... A>
-class NotifyBeforeAndAfter : public NotifyAfter<A...> {
+template<typename... A> class NotifyBeforeAndAfter : public NotifyAfter<A...> {
 public:
   /**
    * Creates a new instance that notifies the given notifiers.
@@ -293,9 +288,7 @@ public:
    * @param after the notifier to notify later when this object is destroyed
    * @param a the arguments to pass to either notifier
    */
-  template<typename... NA>
-  NotifyBeforeAndAfter(
-      const bool notify, Notifier<A...> &before, Notifier<A...> &after, NA &&... a)
+  template<typename... NA> NotifyBeforeAndAfter(const bool notify, Notifier<A...> &before, Notifier<A...> &after, NA &&... a)
       : NotifyAfter<A...>{notify, after, std::forward<NA>(a)...} {
     NotifyAfter<A...>::m_notify(before);
   }
@@ -307,17 +300,15 @@ public:
    * @param after the notifier to notify later when this object is destroyed
    * @param a the arguments to pass to either notifier
    */
-  template<typename... NA>
-  NotifyBeforeAndAfter(Notifier<A...> &before, Notifier<A...> &after, NA &&... a)
+  template<typename... NA> NotifyBeforeAndAfter(Notifier<A...> &before, Notifier<A...> &after, NA &&... a)
       : NotifyBeforeAndAfter{true, before, after, std::forward<NA>(a)...} {
   }
 };
 
-template<typename... AA, typename... NA>
-NotifyBeforeAndAfter(bool, Notifier<AA...> &, Notifier<AA...> &, NA &&...)
+
+template<typename... AA, typename... NA> NotifyBeforeAndAfter(bool, Notifier<AA...> &, Notifier<AA...> &, NA &&...)
 -> NotifyBeforeAndAfter<AA...>;
 
-template<typename... AA, typename... NA>
-NotifyBeforeAndAfter(Notifier<AA...> &, Notifier<AA...> &, NA &&...)
+template<typename... AA, typename... NA> NotifyBeforeAndAfter(Notifier<AA...> &, Notifier<AA...> &, NA &&...)
 -> NotifyBeforeAndAfter<AA...>;
 } // namespace TrenchBroom

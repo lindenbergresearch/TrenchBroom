@@ -59,43 +59,47 @@ namespace TrenchBroom::View {
 
 const Model::HitType::Type ClipTool::PointHitType = Model::HitType::freeType();
 
+
 class ClipStrategy {
 public:
   virtual ~ClipStrategy() = default;
 
-  virtual void pick(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const = 0;
-  virtual void render(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const Model::PickResult &pickResult) = 0;
-  virtual void renderFeedback(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const vm::vec3 &point) const = 0;
+  virtual void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const = 0;
+
+  virtual void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult) = 0;
+
+  virtual void renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const = 0;
 
   virtual std::optional<vm::vec3> computeThirdPoint() const = 0;
 
   virtual bool canClip() const = 0;
+
   virtual bool hasPoints() const = 0;
+
   virtual bool canAddPoint(const vm::vec3 &point) const = 0;
+
   virtual void addPoint(const vm::vec3 &point, std::vector<vm::vec3> helpVectors) = 0;
+
   virtual bool canRemoveLastPoint() const = 0;
+
   virtual void removeLastPoint() = 0;
 
-  virtual std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(
-      const Model::PickResult &pickResult) const = 0;
+  virtual std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(const Model::PickResult &pickResult) const = 0;
+
   virtual void beginDragPoint(const Model::PickResult &pickResult) = 0;
+
   virtual void beginDragLastPoint() = 0;
-  virtual bool dragPoint(
-      const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) = 0;
+
+  virtual bool dragPoint(const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) = 0;
+
   virtual void endDragPoint() = 0;
+
   virtual void cancelDragPoint() = 0;
 
   virtual bool setFace(const Model::BrushFaceHandle &faceHandle) = 0;
+
   virtual void reset() = 0;
+
   virtual std::vector<vm::vec3> getPoints() const = 0;
 };
 
@@ -117,42 +121,33 @@ private:
   std::optional<DragState> m_dragState;
 
 public:
-  void pick(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const override {
-    for (size_t i = 0; i < m_points.size(); ++i) {
+  void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const override {
+    for (size_t i = 0; i < m_points.size(); ++ i) {
       const auto &point = m_points[i].point;
       const auto distance = camera.pickPointHandle(
           pickRay, point, static_cast<FloatType>(pref(Preferences::HandleRadius)));
-      if (!vm::is_nan(distance)) {
+      if (! vm::is_nan(distance)) {
         const auto hitPoint = vm::point_at_distance(pickRay, distance);
         pickResult.addHit(Model::Hit{ClipTool::PointHitType, distance, hitPoint, i});
       }
     }
   }
 
-  void render(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const Model::PickResult &pickResult) override {
+  void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult) override {
     renderPoints(renderContext, renderBatch);
     renderHighlight(renderContext, renderBatch, pickResult);
   }
 
-  void renderFeedback(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const vm::vec3 &point) const override {
+  void renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const override {
     auto renderService = Renderer::RenderService{renderContext, renderBatch};
     renderService.setForegroundColor(pref(Preferences::ClipHandleColor));
     renderService.renderHandle(vm::vec3f{point});
   }
 
   std::optional<vm::vec3> computeThirdPoint() const override {
-    if (m_points.size()==2) {
-      const auto point = m_points[1].point + 128.0*computeHelpVector();
-      if (!vm::is_colinear(m_points[0].point, m_points[1].point, point)) {
+    if (m_points.size() == 2) {
+      const auto point = m_points[1].point + 128.0 * computeHelpVector();
+      if (! vm::is_colinear(m_points[0].point, m_points[1].point, point)) {
         return point;
       }
     }
@@ -164,24 +159,24 @@ public:
     counts[0] = counts[1] = counts[2] = counts[3] = counts[4] = counts[5] = 0;
 
     const auto helpVectors = combineHelpVectors();
-    for (size_t i = 0; i < helpVectors.size(); ++i) {
+    for (size_t i = 0; i < helpVectors.size(); ++ i) {
       const auto axis = vm::find_abs_max_component(helpVectors[i]);
       const auto index = helpVectors[i][axis] > 0.0 ? axis : axis + 3;
-      counts[index]++;
+      counts[index] ++;
     }
 
     const auto first = std::max_element(std::begin(counts), std::end(counts));
     const auto firstIndex = std::distance(std::begin(counts), first);
 
     const auto next = std::max_element(std::next(first), std::end(counts));
-    if (next==std::end(counts) || *first > *next) {
-      return vm::vec3::axis(size_t(firstIndex%3));
+    if (next == std::end(counts) || *first > *next) {
+      return vm::vec3::axis(size_t(firstIndex % 3));
     }
 
     const auto nextIndex = std::distance(std::begin(counts), next);
 
     // two counts are equal
-    if (firstIndex%3==2 || nextIndex%3==2) {
+    if (firstIndex % 3 == 2 || nextIndex % 3 == 2) {
       // prefer the Z axis if possible:
       return vm::vec3::pos_z();
     }
@@ -195,16 +190,16 @@ public:
         kdl::vec_transform(m_points, [](const auto &point) { return point.helpVectors; }));
   }
 
-  bool canClip() const override { return m_points.size()==3 || computeThirdPoint(); }
+  bool canClip() const override { return m_points.size() == 3 || computeThirdPoint(); }
 
-  bool hasPoints() const override { return !m_points.empty(); }
+  bool hasPoints() const override { return ! m_points.empty(); }
 
   bool canAddPoint(const vm::vec3 &point) const override {
-    return (m_points.size() < 2
-        || (m_points.size()==2 && !vm::is_colinear(m_points[0].point, m_points[1].point, point)))
-        && kdl::none_of(m_points, [&](const auto &p) {
+    return (m_points.size() < 2 || (m_points.size() == 2 && ! vm::is_colinear(m_points[0].point, m_points[1].point, point))) && kdl::none_of(
+        m_points, [&](const auto &p) {
           return vm::is_equal(p.point, point, vm::C::almost_zero());
-        });
+        }
+    );
   }
 
   void addPoint(const vm::vec3 &point, std::vector<vm::vec3> helpVectors) override {
@@ -218,12 +213,11 @@ public:
     m_points.pop_back();
   }
 
-  std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(
-      const Model::PickResult &pickResult) const override {
+  std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(const Model::PickResult &pickResult) const override {
     using namespace Model::HitFilters;
 
     const auto &hit = pickResult.first(type(ClipTool::PointHitType));
-    if (!hit.isMatch()) {
+    if (! hit.isMatch()) {
       return std::nullopt;
     }
 
@@ -247,30 +241,26 @@ public:
     m_dragState = DragState{m_points.size() - 1, m_points.back()};
   }
 
-  bool dragPoint(
-      const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) override {
+  bool dragPoint(const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) override {
     ensure(m_dragState, "Clip tool is dragging");
 
     // Don't allow to drag a point onto another point!
-    for (size_t i = 0; i < m_points.size(); ++i) {
-      if (
-          m_dragState->index!=i
-              && vm::is_equal(m_points[i].point, newPosition, vm::C::almost_zero())) {
+    for (size_t i = 0; i < m_points.size(); ++ i) {
+      if (m_dragState->index != i && vm::is_equal(m_points[i].point, newPosition, vm::C::almost_zero())) {
         return false;
       }
     }
 
-    if (m_points.size()==3) {
-      const auto index0 = (m_dragState->index + 1)%3;
-      const auto index1 = (m_dragState->index + 2)%3;
+    if (m_points.size() == 3) {
+      const auto index0 = (m_dragState->index + 1) % 3;
+      const auto index1 = (m_dragState->index + 2) % 3;
       if (vm::is_colinear(m_points[index0].point, m_points[index1].point, newPosition)) {
         return false;
       }
     }
 
     if (helpVectors.empty()) {
-      m_points[m_dragState->index] =
-          ClipPoint{newPosition, m_points[m_dragState->index].helpVectors};
+      m_points[m_dragState->index] = ClipPoint{newPosition, m_points[m_dragState->index].helpVectors};
     } else {
       m_points[m_dragState->index] = ClipPoint{newPosition, helpVectors};
     }
@@ -298,39 +288,39 @@ public:
   }
 
 private:
-  void renderPoints(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+  void renderPoints(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     auto renderService = Renderer::RenderService{renderContext, renderBatch};
     renderService.setForegroundColor(pref(Preferences::ClipHandleColor));
     renderService.setShowOccludedObjects();
 
     if (m_points.size() > 1) {
       renderService.renderLine(
-          vm::vec3f{m_points[0].point}, vm::vec3f{m_points[1].point});
+          vm::vec3f{m_points[0].point}, vm::vec3f{m_points[1].point}
+      );
 
       if (m_points.size() > 2) {
         renderService.renderLine(
-            vm::vec3f{m_points[1].point}, vm::vec3f{m_points[2].point});
+            vm::vec3f{m_points[1].point}, vm::vec3f{m_points[2].point}
+        );
         renderService.renderLine(
-            vm::vec3f{m_points[2].point}, vm::vec3f{m_points[0].point});
+            vm::vec3f{m_points[2].point}, vm::vec3f{m_points[0].point}
+        );
       }
     }
 
     renderService.setForegroundColor(pref(Preferences::ClipHandleColor));
     renderService.setBackgroundColor(pref(Preferences::InfoOverlayBackgroundColor));
 
-    for (size_t i = 0; i < m_points.size(); ++i) {
+    for (size_t i = 0; i < m_points.size(); ++ i) {
       const auto &point = m_points[i].point;
       renderService.renderHandle(vm::vec3f{point});
       renderService.renderString(
-          fmt::format("{}: {}", i + 1, fmt::streamed(point)), vm::vec3f{point});
+          fmt::format("{}: {}", i + 1, fmt::streamed(point)), vm::vec3f{point}
+      );
     }
   }
 
-  void renderHighlight(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const Model::PickResult &pickResult) {
+  void renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult) {
     if (m_dragState) {
       renderHighlight(renderContext, renderBatch, m_dragState->index);
     } else {
@@ -344,15 +334,13 @@ private:
     }
   }
 
-  void renderHighlight(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const size_t index) {
+  void renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const size_t index) {
     auto renderService = Renderer::RenderService{renderContext, renderBatch};
     renderService.setForegroundColor(pref(Preferences::SelectedHandleColor));
     renderService.renderHandleHighlight(vm::vec3f(m_points[index].point));
   }
 };
+
 
 class FaceClipStrategy : public ClipStrategy {
 private:
@@ -362,16 +350,13 @@ public:
   void pick(const vm::ray3 &, const Renderer::Camera &, Model::PickResult &) const override {
   }
 
-  void render(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const Model::PickResult &) override {
+  void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &) override {
     if (m_faceHandle) {
       auto renderService = Renderer::RenderService{renderContext, renderBatch};
 
       const auto positions = kdl::vec_transform(
-          m_faceHandle->face().vertices(),
-          [](const auto &vertex) { return vm::vec3f{vertex->position()}; });
+          m_faceHandle->face().vertices(), [](const auto &vertex) { return vm::vec3f{vertex->position()}; }
+      );
 
       renderService.setForegroundColor(pref(Preferences::ClipHandleColor));
       renderService.renderPolygonOutline(positions);
@@ -381,8 +366,7 @@ public:
     }
   }
 
-  void renderFeedback(
-      Renderer::RenderContext &, Renderer::RenderBatch &, const vm::vec3 &) const override {
+  void renderFeedback(Renderer::RenderContext &, Renderer::RenderBatch &, const vm::vec3 &) const override {
   }
 
   vm::vec3 getHelpVector() const { return vm::vec3::zero(); }
@@ -390,24 +374,31 @@ public:
   std::optional<vm::vec3> computeThirdPoint() const override { return std::nullopt; }
 
   bool canClip() const override { return m_faceHandle.has_value(); }
+
   bool hasPoints() const override { return false; }
+
   bool canAddPoint(const vm::vec3 &) const override { return false; }
+
   void addPoint(const vm::vec3 &, std::vector<vm::vec3>) override {}
+
   bool canRemoveLastPoint() const override { return false; }
+
   void removeLastPoint() override {}
 
-  std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(
-      const Model::PickResult &) const override {
+  std::optional<std::tuple<vm::vec3, vm::vec3>> canDragPoint(const Model::PickResult &) const override {
     return std::nullopt;
   }
+
   void beginDragPoint(const Model::PickResult &) override {}
+
   void beginDragLastPoint() override {}
-  bool dragPoint(
-      const vm::vec3 & /* newPosition */,
-      const std::vector<vm::vec3> & /* helpVectors */) override {
+
+  bool dragPoint(const vm::vec3 & /* newPosition */, const std::vector<vm::vec3> & /* helpVectors */) override {
     return false;
   }
+
   void endDragPoint() override {}
+
   void cancelDragPoint() override {}
 
   bool setFace(const Model::BrushFaceHandle &faceHandle) override {
@@ -429,10 +420,10 @@ public:
 
 } // namespace
 
-ClipTool::ClipTool(std::weak_ptr<MapDocument> document)
-    : Tool{false}, m_document{std::move(document)},
-      m_remainingBrushRenderer{std::make_unique<Renderer::BrushRenderer>()},
-      m_clippedBrushRenderer{std::make_unique<Renderer::BrushRenderer>()} {
+ClipTool::ClipTool(std::weak_ptr<MapDocument> document) :
+    Tool{false}, m_document{std::move(document)}, m_remainingBrushRenderer{std::make_unique<Renderer::BrushRenderer>()}, m_clippedBrushRenderer{
+    std::make_unique<Renderer::BrushRenderer>()
+} {
 }
 
 ClipTool::~ClipTool() {
@@ -458,29 +449,25 @@ void ClipTool::toggleSide() {
   }
 }
 
-void ClipTool::pick(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+void ClipTool::pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
   if (m_strategy) {
     m_strategy->pick(pickRay, camera, pickResult);
   }
 }
 
-void ClipTool::render(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const Model::PickResult &pickResult) {
+void ClipTool::render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult) {
   renderBrushes(renderContext, renderBatch);
   renderStrategy(renderContext, renderBatch, pickResult);
 }
 
-void ClipTool::renderBrushes(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+void ClipTool::renderBrushes(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
   m_remainingBrushRenderer->setFaceColor(pref(Preferences::FaceColor));
   m_remainingBrushRenderer->setEdgeColor(pref(Preferences::SelectedEdgeColor));
   m_remainingBrushRenderer->setShowEdges(true);
   m_remainingBrushRenderer->setShowOccludedEdges(true);
-  m_remainingBrushRenderer->setOccludedEdgeColor(Color(
-      pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
+  m_remainingBrushRenderer->setOccludedEdgeColor(
+      Color(
+          pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
   m_remainingBrushRenderer->setTint(true);
   m_remainingBrushRenderer->setTintColor(pref(Preferences::SelectedFaceColor));
   m_remainingBrushRenderer->render(renderContext, renderBatch);
@@ -494,19 +481,13 @@ void ClipTool::renderBrushes(
   m_clippedBrushRenderer->render(renderContext, renderBatch);
 }
 
-void ClipTool::renderStrategy(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const Model::PickResult &pickResult) {
+void ClipTool::renderStrategy(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult) {
   if (m_strategy) {
     m_strategy->render(renderContext, renderBatch, pickResult);
   }
 }
 
-void ClipTool::renderFeedback(
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch,
-    const vm::vec3 &point) const {
+void ClipTool::renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const {
   if (m_strategy) {
     m_strategy->renderFeedback(renderContext, renderBatch, point);
   } else {
@@ -524,7 +505,7 @@ bool ClipTool::canClip() const {
 }
 
 void ClipTool::performClip() {
-  if (!m_dragging && canClip()) {
+  if (! m_dragging && canClip()) {
     const auto ignoreNotifications = kdl::set_temp{m_ignoreNotifications};
 
     auto document = kdl::mem_lock(m_document);
@@ -546,7 +527,7 @@ void ClipTool::performClip() {
 
 std::map<Model::Node *, std::vector<Model::Node *>> ClipTool::clipBrushes() {
   auto result = std::map<Model::Node *, std::vector<Model::Node *>>{};
-  if (!m_frontBrushes.empty()) {
+  if (! m_frontBrushes.empty()) {
     if (keepFrontBrushes()) {
       result = kdl::map_merge(result, m_frontBrushes);
       m_frontBrushes.clear();
@@ -555,7 +536,7 @@ std::map<Model::Node *, std::vector<Model::Node *>> ClipTool::clipBrushes() {
     }
   }
 
-  if (!m_backBrushes.empty()) {
+  if (! m_backBrushes.empty()) {
     if (keepBackBrushes()) {
       result = kdl::map_merge(result, m_backBrushes);
       m_backBrushes.clear();
@@ -574,7 +555,7 @@ vm::vec3 ClipTool::defaultClipPointPos() const {
 }
 
 bool ClipTool::canAddPoint(const vm::vec3 &point) const {
-  return !m_strategy || m_strategy->canAddPoint(point);
+  return ! m_strategy || m_strategy->canAddPoint(point);
 }
 
 bool ClipTool::hasPoints() const {
@@ -583,7 +564,7 @@ bool ClipTool::hasPoints() const {
 
 void ClipTool::addPoint(const vm::vec3 &point, const std::vector<vm::vec3> &helpVectors) {
   assert(canAddPoint(point));
-  if (!m_strategy) {
+  if (! m_strategy) {
     m_strategy = std::make_unique<PointClipStrategy>();
   }
 
@@ -605,9 +586,8 @@ bool ClipTool::removeLastPoint() {
   return false;
 }
 
-std::optional<std::tuple<vm::vec3, vm::vec3>> ClipTool::beginDragPoint(
-    const Model::PickResult &pickResult) {
-  assert(!m_dragging);
+std::optional<std::tuple<vm::vec3, vm::vec3>> ClipTool::beginDragPoint(const Model::PickResult &pickResult) {
+  assert(! m_dragging);
   if (m_strategy) {
     const auto handlePositionAndHitPoint = m_strategy->canDragPoint(pickResult);
     if (handlePositionAndHitPoint) {
@@ -621,17 +601,16 @@ std::optional<std::tuple<vm::vec3, vm::vec3>> ClipTool::beginDragPoint(
 }
 
 void ClipTool::beginDragLastPoint() {
-  assert(!m_dragging);
+  assert(! m_dragging);
   ensure(m_strategy, "strategy is not null");
   m_strategy->beginDragLastPoint();
   m_dragging = true;
 }
 
-bool ClipTool::dragPoint(
-    const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) {
+bool ClipTool::dragPoint(const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors) {
   assert(m_dragging);
   ensure(m_strategy, "strategy is not null");
-  if (!m_strategy->dragPoint(newPosition, helpVectors)) {
+  if (! m_strategy->dragPoint(newPosition, helpVectors)) {
     return false;
   }
 
@@ -696,29 +675,26 @@ void ClipTool::updateBrushes() {
   const auto &brushNodes = document->selectedNodes().brushes();
   const auto &worldBounds = document->worldBounds();
 
-  const auto clip =
-      [&](auto *node, const auto &p1, const auto &p2, const auto &p3, auto &brushMap) {
-        auto brush = node->brush();
-        Model::BrushFace::create(
-            p1,
-            p2,
-            p3,
-            Model::BrushFaceAttributes(document->currentTextureName()),
-            document->world()->mapFormat())
-            .and_then([&](Model::BrushFace &&clipFace) {
-              setFaceAttributes(brush.faces(), clipFace);
-              return brush.clip(worldBounds, std::move(clipFace));
-            })
-            .transform([&]() {
-              brushMap[node->parent()].push_back(new Model::BrushNode(std::move(brush)));
-            })
-            .transform_error(
-                [&](auto e) { document->error() << "Could not clip brush: " << e.msg; });
-      };
+  const auto clip = [&](auto *node, const auto &p1, const auto &p2, const auto &p3, auto &brushMap) {
+    auto brush = node->brush();
+    Model::BrushFace::create(
+        p1, p2, p3, Model::BrushFaceAttributes(document->currentTextureName()), document->world()->mapFormat()).and_then(
+        [&](Model::BrushFace &&clipFace) {
+          setFaceAttributes(brush.faces(), clipFace);
+          return brush.clip(worldBounds, std::move(clipFace));
+        }
+    ).transform(
+        [&]() {
+          brushMap[node->parent()].push_back(new Model::BrushNode(std::move(brush)));
+        }
+    ).transform_error(
+        [&](auto e) { document->error() << "Could not clip brush: " << e.msg; }
+    );
+  };
 
   if (canClip()) {
     const auto points = m_strategy->getPoints();
-    ensure(points.size()==3, "invalid number of points");
+    ensure(points.size() == 3, "invalid number of points");
 
     for (auto *brushNode : brushNodes) {
       clip(brushNode, points[0], points[1], points[2], m_frontBrushes);
@@ -732,15 +708,14 @@ void ClipTool::updateBrushes() {
   }
 }
 
-void ClipTool::setFaceAttributes(
-    const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet) const {
-  ensure(!faces.empty(), "no faces");
+void ClipTool::setFaceAttributes(const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet) const {
+  ensure(! faces.empty(), "no faces");
 
   auto faceIt = std::begin(faces);
   auto faceEnd = std::end(faces);
-  auto bestMatch = faceIt++;
+  auto bestMatch = faceIt ++;
 
-  while (faceIt!=faceEnd) {
+  while (faceIt != faceEnd) {
     const auto &face = *faceIt;
 
     const auto bestDiff = bestMatch->boundary().normal - toSet.boundary().normal;
@@ -749,7 +724,7 @@ void ClipTool::setFaceAttributes(
       bestMatch = faceIt;
     }
 
-    ++faceIt;
+    ++ faceIt;
   }
 
   toSet.setAttributes(*bestMatch);
@@ -779,33 +754,29 @@ void ClipTool::updateRenderers() {
   }
 }
 
-void ClipTool::addBrushesToRenderer(
-    const std::map<Model::Node *, std::vector<Model::Node *>> &map,
-    Renderer::BrushRenderer &renderer) {
+void ClipTool::addBrushesToRenderer(const std::map<Model::Node *, std::vector<Model::Node *>> &map, Renderer::BrushRenderer &renderer) {
   for (const auto &[parent, nodes] : map) {
     for (auto *node : nodes) {
-      node->accept(kdl::overload(
-          [](const Model::WorldNode *) {},
-          [](const Model::LayerNode *) {},
-          [](const Model::GroupNode *) {},
-          [](const Model::EntityNode *) {},
-          [&](Model::BrushNode *brush) { renderer.addBrush(brush); },
-          [](Model::PatchNode *) {}));
+      node->accept(
+          kdl::overload(
+              [](const Model::WorldNode *) {}, [](const Model::LayerNode *) {}, [](const Model::GroupNode *) {}, [](const Model::EntityNode *) {},
+              [&](Model::BrushNode *brush) { renderer.addBrush(brush); }, [](Model::PatchNode *) {}
+          ));
     }
   }
 }
 
 bool ClipTool::keepFrontBrushes() const {
-  return m_clipSide!=ClipSide::Back;
+  return m_clipSide != ClipSide::Back;
 }
 
 bool ClipTool::keepBackBrushes() const {
-  return m_clipSide!=ClipSide::Front;
+  return m_clipSide != ClipSide::Front;
 }
 
 bool ClipTool::doActivate() {
   auto document = kdl::mem_lock(m_document);
-  if (!document->selectedNodes().hasOnlyBrushes()) {
+  if (! document->selectedNodes().hasOnlyBrushes()) {
     return false;
   }
 
@@ -830,36 +801,32 @@ bool ClipTool::doRemove() {
 
 void ClipTool::connectObservers() {
   auto document = kdl::mem_lock(m_document);
-  m_notifierConnection +=
-      document->selectionDidChangeNotifier.connect(this, &ClipTool::selectionDidChange);
-  m_notifierConnection +=
-      document->nodesWillChangeNotifier.connect(this, &ClipTool::nodesWillChange);
-  m_notifierConnection +=
-      document->nodesDidChangeNotifier.connect(this, &ClipTool::nodesDidChange);
-  m_notifierConnection +=
-      document->brushFacesDidChangeNotifier.connect(this, &ClipTool::brushFacesDidChange);
+  m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &ClipTool::selectionDidChange);
+  m_notifierConnection += document->nodesWillChangeNotifier.connect(this, &ClipTool::nodesWillChange);
+  m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &ClipTool::nodesDidChange);
+  m_notifierConnection += document->brushFacesDidChangeNotifier.connect(this, &ClipTool::brushFacesDidChange);
 }
 
 void ClipTool::selectionDidChange(const Selection &) {
-  if (!m_ignoreNotifications) {
+  if (! m_ignoreNotifications) {
     update();
   }
 }
 
 void ClipTool::nodesWillChange(const std::vector<Model::Node *> &) {
-  if (!m_ignoreNotifications) {
+  if (! m_ignoreNotifications) {
     update();
   }
 }
 
 void ClipTool::nodesDidChange(const std::vector<Model::Node *> &) {
-  if (!m_ignoreNotifications) {
+  if (! m_ignoreNotifications) {
     update();
   }
 }
 
 void ClipTool::brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &) {
-  if (!m_ignoreNotifications) {
+  if (! m_ignoreNotifications) {
     update();
   }
 }

@@ -57,27 +57,25 @@ public:
 
   Color &darker(const float n = 0.25f) {
     const auto factor = 1.0f - n;
-    for (size_t i = 0; i < 3; i++) {
-      v[i] = v[i]*factor;
+    for (size_t i = 0; i < 3; i ++) {
+      v[i] = v[i] * factor;
     }
     return *this;
   }
 
   Color &brighter(const float n = 0.25f) {
     const auto factor = 1.0f + n;
-    for (size_t i = 0; i < 3; i++) {
-      v[i] = v[i]*factor;
+    for (size_t i = 0; i < 3; i ++) {
+      v[i] = v[i] * factor;
     }
     return *this;
   }
 
-  template<typename T>
-  Color &mix(const Color &other, const T f) {
-    const float c =
-        static_cast<float>(vm::max(static_cast<T>(0.0), vm::min(static_cast<T>(1.0), f)));
+  template<typename T> Color &mix(const Color &other, const T f) {
+    const float c = static_cast<float>(vm::max(static_cast<T>(0.0), vm::min(static_cast<T>(1.0), f)));
     const float d = 1.0f - c;
-    for (size_t i = 0; i < 4; i++)
-      v[i] = d*v[i] + c*other[i];
+    for (size_t i = 0; i < 4; i ++)
+      v[i] = d * v[i] + c * other[i];
     return *this;
   }
 
@@ -86,7 +84,7 @@ public:
   }
 
   friend Color mixAlpha(const Color &color, const float f) {
-    return Color(color.r(), color.g(), color.b(), f*color.a());
+    return Color(color.r(), color.g(), color.b(), f * color.a());
   }
 
   static void rgbToHSB(float r, float g, float b, float &h, float &s, float &br);

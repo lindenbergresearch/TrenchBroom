@@ -114,7 +114,7 @@ std::string TrenchBroomStackWalker::getStackTrace() {
 
   std::stringstream ss;
   char **strs = backtrace_symbols(&framesVec.front(), static_cast<int>(framesVec.size()));
-  for (size_t i = 0; i < framesVec.size(); i++) {
+  for (size_t i = 0; i < framesVec.size(); i ++) {
     ss << strs[i] << std::endl;
   }
   free(strs);

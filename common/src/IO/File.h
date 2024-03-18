@@ -54,6 +54,7 @@ public:
   virtual size_t size() const = 0;
 };
 
+
 /**
  * A file that is backed by a memory buffer. The file takes ownership of the buffer.
  */
@@ -72,8 +73,10 @@ public:
   OwningBufferFile(std::unique_ptr<char[]> buffer, size_t size);
 
   Reader reader() const override;
+
   size_t size() const override;
 };
+
 
 /**
  * A file that is backed by a physical file on the disk. The file is opened in the
@@ -102,6 +105,7 @@ public:
   friend Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path);
 
   Reader reader() const override;
+
   size_t size() const override;
 
   /**
@@ -115,12 +119,15 @@ private:
   friend class FileReaderSource;
 
   Result<void> read(char *val, size_t position, size_t size) const;
+
   Result<BufferType> buffer(size_t position, size_t size) const;
 
   Error makeError(const std::string &msg) const;
 };
 
+
 Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path);
+
 
 /**
  * A file that is backed by a portion of a physical file.
@@ -142,6 +149,7 @@ public:
   explicit FileView(std::shared_ptr<File> file, size_t offset, size_t length);
 
   Reader reader() const override;
+
   size_t size() const override;
 };
 
@@ -153,8 +161,7 @@ public:
  *
  * @tparam T the type of the object represented by this file
  */
-template<typename T>
-class ObjectFile : public File {
+template<typename T> class ObjectFile : public File {
 private:
   T m_object;
 
@@ -165,8 +172,7 @@ public:
    * @tparam S the type of the given object, must be convertible to T
    * @param object the object
    */
-  template<typename S>
-  explicit ObjectFile(S &&object)
+  template<typename S> explicit ObjectFile(S &&object)
       : m_object(std::forward<S>(object)) {
   }
 

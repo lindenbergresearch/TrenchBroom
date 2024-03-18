@@ -33,33 +33,20 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-Circle::Circle(const float radius, const size_t segments, const bool filled)
-    : m_filled(filled) {
+Circle::Circle(const float radius, const size_t segments, const bool filled) : m_filled(filled) {
   assert(radius > 0.0f);
   assert(segments > 0);
   init2D(radius, segments, 0.0f, vm::Cf::two_pi());
 }
 
-Circle::Circle(
-    const float radius,
-    const size_t segments,
-    const bool filled,
-    const float startAngle,
-    const float angleLength)
-    : m_filled(filled) {
+Circle::Circle(const float radius, const size_t segments, const bool filled, const float startAngle, const float angleLength) : m_filled(filled) {
   assert(radius > 0.0f);
   assert(segments > 0);
   init2D(radius, segments, startAngle, angleLength);
 }
 
-Circle::Circle(
-    const float radius,
-    const size_t segments,
-    const bool filled,
-    const vm::axis::type axis,
-    const vm::vec3f &startAxis,
-    const vm::vec3f &endAxis)
-    : m_filled(filled) {
+Circle::Circle(const float radius, const size_t segments, const bool filled, const vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis) :
+    m_filled(filled) {
   assert(radius > 0.0f);
   assert(segments > 0);
 
@@ -67,14 +54,8 @@ Circle::Circle(
   init3D(radius, segments, axis, angles.first, angles.second);
 }
 
-Circle::Circle(
-    const float radius,
-    const size_t segments,
-    const bool filled,
-    const vm::axis::type axis,
-    const float startAngle,
-    const float angleLength)
-    : m_filled(filled) {
+Circle::Circle(const float radius, const size_t segments, const bool filled, const vm::axis::type axis, const float startAngle, const float angleLength) :
+    m_filled(filled) {
   assert(radius > 0.0f);
   assert(segments > 0);
   assert(angleLength > 0.0f);
@@ -93,11 +74,7 @@ void Circle::render() {
   m_array.render(m_filled ? PrimType::TriangleFan : PrimType::LineLoop);
 }
 
-void Circle::init2D(
-    const float radius,
-    const size_t segments,
-    const float startAngle,
-    const float angleLength) {
+void Circle::init2D(const float radius, const size_t segments, const float startAngle, const float angleLength) {
   using Vertex = GLVertexTypes::P2::Vertex;
 
   auto positions = circle2D(radius, startAngle, angleLength, segments);
@@ -107,12 +84,7 @@ void Circle::init2D(
   m_array = VertexArray::move(Vertex::toList(positions.size(), std::begin(positions)));
 }
 
-void Circle::init3D(
-    const float radius,
-    const size_t segments,
-    const vm::axis::type axis,
-    const float startAngle,
-    const float angleLength) {
+void Circle::init3D(const float radius, const size_t segments, const vm::axis::type axis, const float startAngle, const float angleLength) {
   using Vertex = GLVertexTypes::P3::Vertex;
 
   auto positions = circle2D(radius, axis, startAngle, angleLength, segments);

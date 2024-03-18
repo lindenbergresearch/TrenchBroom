@@ -43,10 +43,9 @@ std::string GLContextManager::GLVendor = "unknown";
 std::string GLContextManager::GLRenderer = "unknown";
 std::string GLContextManager::GLVersion = "unknown";
 
-GLContextManager::GLContextManager()
-    : m_initialized(false), m_shaderManager(std::make_unique<Renderer::ShaderManager>()),
-      m_vboManager(std::make_unique<Renderer::VboManager>(m_shaderManager.get())),
-      m_fontManager(std::make_unique<Renderer::FontManager>()) {
+GLContextManager::GLContextManager() :
+    m_initialized(false), m_shaderManager(std::make_unique<Renderer::ShaderManager>()),
+    m_vboManager(std::make_unique<Renderer::VboManager>(m_shaderManager.get())), m_fontManager(std::make_unique<Renderer::FontManager>()) {
 }
 
 GLContextManager::~GLContextManager() = default;
@@ -58,7 +57,7 @@ bool GLContextManager::initialized() const {
 static void initializeGlew() {
   glewExperimental = GL_TRUE;
   const GLenum glewState = glewInit();
-  if (glewState!=GLEW_OK) {
+  if (glewState != GLEW_OK) {
     auto str = std::stringstream();
     str << "Error initializing glew: " << glewGetErrorString(glewState);
     throw RenderException(str.str());
@@ -68,7 +67,7 @@ static void initializeGlew() {
 bool GLContextManager::initialize() {
   using namespace Renderer::Shaders;
 
-  if (!m_initialized) {
+  if (! m_initialized) {
     m_initialized = true;
 
     initializeGlew();
@@ -77,34 +76,16 @@ bool GLContextManager::initialize() {
     GLRenderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
     GLVersion = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 
-    kdl::fold_results(kdl::vec_transform(
-        std::vector<Renderer::ShaderConfig>{
-            Grid2DShader,
-            VaryingPCShader,
-            VaryingPUniformCShader,
-            MiniMapEdgeShader,
-            EntityModelShader,
-            FaceShader,
-            PatchShader,
-            EdgeShader,
-            ColoredTextShader,
-            TextBackgroundShader,
-            TextureBrowserShader,
-            TextureBrowserBorderShader,
-            HandleShader,
-            ColoredHandleShader,
-            CompassShader,
-            CompassOutlineShader,
-            CompassBackgroundShader,
-            LinkLineShader,
-            LinkArrowShader,
-            TriangleShader,
-            UVViewShader,
-        },
-        [&](const auto &shaderConfig) {
-          return m_shaderManager->loadProgram(shaderConfig);
-        }))
-        .transform_error([&](const auto &e) { throw RenderException{e.msg}; });
+    kdl::fold_results(
+        kdl::vec_transform(
+            std::vector<Renderer::ShaderConfig>{
+                Grid2DShader, VaryingPCShader, VaryingPUniformCShader, MiniMapEdgeShader, EntityModelShader, FaceShader, PatchShader, EdgeShader,
+                ColoredTextShader, TextBackgroundShader, TextureBrowserShader, TextureBrowserBorderShader, HandleShader, ColoredHandleShader, CompassShader,
+                CompassOutlineShader, CompassBackgroundShader, LinkLineShader, LinkArrowShader, TriangleShader, UVViewShader,
+            }, [&](const auto &shaderConfig) {
+              return m_shaderManager->loadProgram(shaderConfig);
+            }
+        )).transform_error([&](const auto &e) { throw RenderException{e.msg}; });
 
     return true;
   }

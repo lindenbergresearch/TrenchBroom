@@ -21,6 +21,7 @@
 
 #include <QWidget>
 
+
 class QLabel;
 
 namespace TrenchBroom {
@@ -30,8 +31,7 @@ protected:
   QLabel *m_titleText;
 
 public:
-  TitleBar(
-      const QString &title, QWidget *parent, bool boldTitle = true, bool subtitle = false);
+  TitleBar(const QString &title, QWidget *parent, bool boldTitle = true, bool subtitle = false);
 
   explicit TitleBar(const QString &title, bool boldTitle = true, bool subtitle = false);
 };

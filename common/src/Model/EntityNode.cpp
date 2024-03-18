@@ -52,14 +52,11 @@ namespace TrenchBroom::Model {
 const HitType::Type EntityNode::EntityHitType = HitType::freeType();
 const vm::bbox3 EntityNode::DefaultBounds = vm::bbox3{8.0};
 
-EntityNode::EntityNode(Entity entity)
-    : EntityNodeBase{std::move(entity)} {
+EntityNode::EntityNode(Entity entity) : EntityNodeBase{std::move(entity)} {
 }
 
-EntityNode::EntityNode(
-    const Model::EntityPropertyConfig &entityPropertyConfig,
-    std::initializer_list<EntityProperty> properties)
-    : EntityNode{Entity{entityPropertyConfig, std::move(properties)}} {
+EntityNode::EntityNode(const Model::EntityPropertyConfig &entityPropertyConfig, std::initializer_list<EntityProperty> properties) :
+    EntityNode{Entity{entityPropertyConfig, std::move(properties)}} {
 }
 
 const vm::bbox3 &EntityNode::modelBounds() const {
@@ -85,15 +82,14 @@ const vm::bbox3 &EntityNode::doGetPhysicalBounds() const {
 FloatType EntityNode::doGetProjectedArea(const vm::axis::type axis) const {
   const auto size = physicalBounds().size();
   switch (axis) {
-  case vm::axis::x:return size.y()*size.z();
-  case vm::axis::y:return size.x()*size.z();
-  case vm::axis::z:return size.x()*size.y();
+  case vm::axis::x:return size.y() * size.z();
+  case vm::axis::y:return size.x() * size.z();
+  case vm::axis::z:return size.x() * size.y();
   default:return 0.0;
   }
 }
 
-Node *EntityNode::doClone(
-    const vm::bbox3 & /* worldBounds */, const SetLinkId setLinkIds) const {
+Node *EntityNode::doClone(const vm::bbox3 & /* worldBounds */, const SetLinkId setLinkIds) const {
   auto result = std::make_unique<EntityNode>(m_entity);
   result->cloneLinkId(*this, setLinkIds);
   cloneAttributes(result.get());
@@ -101,13 +97,11 @@ Node *EntityNode::doClone(
 }
 
 bool EntityNode::doCanAddChild(const Node *child) const {
-  return child->accept(kdl::overload(
-      [](const WorldNode *) { return false; },
-      [](const LayerNode *) { return false; },
-      [](const GroupNode *) { return false; },
-      [](const EntityNode *) { return false; },
-      [](const BrushNode *) { return true; },
-      [](const PatchNode *) { return true; }));
+  return child->accept(
+      kdl::overload(
+          [](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [](const GroupNode *) { return false; },
+          [](const EntityNode *) { return false; }, [](const BrushNode *) { return true; }, [](const PatchNode *) { return true; }
+      ));
 }
 
 bool EntityNode::doCanRemoveChild(const Node * /* child */) const {
@@ -123,12 +117,12 @@ bool EntityNode::doShouldAddToSpacialIndex() const {
 }
 
 void EntityNode::doChildWasAdded(Node * /* node */) {
-  m_entity.setPointEntity(entityPropertyConfig(), !hasChildren());
+  m_entity.setPointEntity(entityPropertyConfig(), ! hasChildren());
   nodePhysicalBoundsDidChange();
 }
 
 void EntityNode::doChildWasRemoved(Node * /* node */) {
-  m_entity.setPointEntity(entityPropertyConfig(), !hasChildren());
+  m_entity.setPointEntity(entityPropertyConfig(), ! hasChildren());
   nodePhysicalBoundsDidChange();
 }
 
@@ -142,16 +136,15 @@ void EntityNode::doChildPhysicalBoundsDidChange() {
 }
 
 bool EntityNode::doSelectable() const {
-  return !hasChildren();
+  return ! hasChildren();
 }
 
-void EntityNode::doPick(
-    const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
-  if (!hasChildren() && editorContext.visible(this)) {
+void EntityNode::doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
+  if (! hasChildren() && editorContext.visible(this)) {
     const auto &myBounds = logicalBounds();
-    if (!myBounds.contains(ray.origin)) {
+    if (! myBounds.contains(ray.origin)) {
       const auto distance = vm::intersect_ray_bbox(ray, myBounds);
-      if (!vm::is_nan(distance)) {
+      if (! vm::is_nan(distance)) {
         const auto hitPoint = vm::point_at_distance(ray, distance);
         pickResult.addHit(Hit(EntityHitType, distance, hitPoint, this));
         return;
@@ -159,18 +152,17 @@ void EntityNode::doPick(
     }
 
     // only if the bbox hit test failed do we hit test the model
-    if (m_entity.model()!=nullptr) {
+    if (m_entity.model() != nullptr) {
       // we transform the ray into the model's space
       const auto transform = m_entity.modelTransformation();
       const auto [invertible, inverse] = vm::invert(transform);
       if (invertible) {
         const auto transformedRay = vm::ray3f{ray.transform(inverse)};
         const auto distance = m_entity.model()->intersect(transformedRay);
-        if (!vm::is_nan(distance)) {
+        if (! vm::is_nan(distance)) {
           // transform back to world space
-          const auto transformedHitPoint =
-              vm::vec3{point_at_distance(transformedRay, distance)};
-          const auto hitPoint = transform*transformedHitPoint;
+          const auto transformedHitPoint = vm::vec3{point_at_distance(transformedRay, distance)};
+          const auto hitPoint = transform * transformedHitPoint;
           pickResult.addHit(Hit{EntityHitType, FloatType(distance), hitPoint, this});
           return;
         }
@@ -243,10 +235,9 @@ void EntityNode::validateBounds() const {
 
   m_cachedBounds = CachedBounds{};
 
-  const auto hasModel = m_entity.model()!=nullptr;
+  const auto hasModel = m_entity.model() != nullptr;
   if (hasModel) {
-    m_cachedBounds->modelBounds =
-        vm::bbox3(m_entity.model()->bounds()).transform(m_entity.modelTransformation());
+    m_cachedBounds->modelBounds = vm::bbox3(m_entity.model()->bounds()).transform(m_entity.modelTransformation());
   } else {
     m_cachedBounds->modelBounds = DefaultBounds.transform(m_entity.modelTransformation());
   }
@@ -255,14 +246,12 @@ void EntityNode::validateBounds() const {
     m_cachedBounds->logicalBounds = computeLogicalBounds(children(), vm::bbox3(0.0));
     m_cachedBounds->physicalBounds = computePhysicalBounds(children(), vm::bbox3(0.0));
   } else {
-    const auto *definition =
-        dynamic_cast<const Assets::PointEntityDefinition *>(m_entity.definition());
+    const auto *definition = dynamic_cast<const Assets::PointEntityDefinition *>(m_entity.definition());
     const auto definitionBounds = definition ? definition->bounds() : DefaultBounds;
 
     m_cachedBounds->logicalBounds = definitionBounds.translate(m_entity.origin());
     if (hasModel) {
-      m_cachedBounds->physicalBounds =
-          vm::merge(m_cachedBounds->logicalBounds, m_cachedBounds->modelBounds);
+      m_cachedBounds->physicalBounds = vm::merge(m_cachedBounds->logicalBounds, m_cachedBounds->modelBounds);
     } else {
       m_cachedBounds->physicalBounds = m_cachedBounds->logicalBounds;
     }

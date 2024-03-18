@@ -46,21 +46,20 @@
 
 namespace TrenchBroom::IO {
 
-FgdTokenizer::FgdTokenizer(const std::string_view str)
-    : Tokenizer{str, "", 0} {
+FgdTokenizer::FgdTokenizer(const std::string_view str) : Tokenizer{str, "", 0} {
 }
 
 const std::string FgdTokenizer::WordDelims = " \t\n\r()[]?;:,=";
 
 FgdTokenizer::Token FgdTokenizer::emitToken() {
-  while (!eof()) {
+  while (! eof()) {
     auto startLine = line();
     auto startColumn = column();
     const auto *c = curPos();
 
     switch (*c) {
     case '/':advance();
-      if (curChar()=='/') {
+      if (curChar() == '/') {
         discardUntil("\n\r");
       }
       break;
@@ -96,7 +95,7 @@ FgdTokenizer::Token FgdTokenizer::emitToken() {
       const auto *e = curPos();
       discardWhile(Whitespace());
 
-      if (curChar()=='"') {
+      if (curChar() == '"') {
         return Token{FgdToken::Plus, c, e, offset(c), startLine, startColumn};
       } else {
         restore(snapshot);
@@ -106,19 +105,18 @@ FgdTokenizer::Token FgdTokenizer::emitToken() {
     }
     default: {
       const auto *e = readInteger(WordDelims);
-      if (e!=nullptr) {
+      if (e != nullptr) {
         return Token{FgdToken::Integer, c, e, offset(c), startLine, startColumn};
       }
 
       e = readDecimal(WordDelims);
-      if (e!=nullptr) {
+      if (e != nullptr) {
         return Token{FgdToken::Decimal, c, e, offset(c), startLine, startColumn};
       }
 
       e = readUntil(WordDelims);
-      if (e==nullptr) {
-        throw ParserException{
-            startLine, startColumn, fmt::format("Unexpected character: '{}'", c)};
+      if (e == nullptr) {
+        throw ParserException{startLine, startColumn, fmt::format("Unexpected character: '{}'", c)};
       } else {
         return Token{FgdToken::Word, c, e, offset(c), startLine, startColumn};
       }
@@ -128,19 +126,15 @@ FgdTokenizer::Token FgdTokenizer::emitToken() {
   return Token{FgdToken::Eof, nullptr, nullptr, length(), line(), column()};
 }
 
-FgdParser::FgdParser(
-    const std::string_view str,
-    const Color &defaultEntityColor,
-    const std::filesystem::path &path)
-    : EntityDefinitionParser{defaultEntityColor}, m_tokenizer{FgdTokenizer{str}} {
-  if (!path.empty() && path.is_absolute()) {
+FgdParser::FgdParser(const std::string_view str, const Color &defaultEntityColor, const std::filesystem::path &path) :
+    EntityDefinitionParser{defaultEntityColor}, m_tokenizer{FgdTokenizer{str}} {
+  if (! path.empty() && path.is_absolute()) {
     m_fs = std::make_unique<DiskFileSystem>(path.parent_path());
     pushIncludePath(path.filename());
   }
 }
 
-FgdParser::FgdParser(std::string_view str, const Color &defaultEntityColor)
-    : FgdParser{std::move(str), defaultEntityColor, {}} {
+FgdParser::FgdParser(std::string_view str, const Color &defaultEntityColor) : FgdParser{std::move(str), defaultEntityColor, {}} {
 }
 
 FgdParser::~FgdParser() = default;
@@ -148,71 +142,60 @@ FgdParser::~FgdParser() = default;
 FgdParser::TokenNameMap FgdParser::tokenNames() const {
   using namespace FgdToken;
 
-  return {
-      {Integer, "integer"},
-      {Decimal, "decimal"},
-      {Word, "word"},
-      {String, "string"},
-      {OParenthesis, "'('"},
-      {CParenthesis, "')'"},
-      {OBracket, "'['"},
-      {CBracket, "']'"},
-      {Equality, "'='"},
-      {Colon, "':'"},
-      {Comma, "','"},
-      {Plus, "'+'"},
-      {Eof, "end of file"},
+  return {{Integer, "integer"}, {Decimal, "decimal"}, {Word, "word"}, {String, "string"}, {OParenthesis, "'('"}, {CParenthesis, "')'"}, {OBracket, "'['"},
+          {CBracket, "']'"}, {Equality, "'='"}, {Colon, "':'"}, {Comma, "','"}, {Plus, "'+'"}, {Eof, "end of file"},
   };
 }
+
 
 class FgdParser::PushIncludePath {
 private:
   FgdParser &m_parser;
 
 public:
-  PushIncludePath(FgdParser &parser, const std::filesystem::path &path)
-      : m_parser{parser} {
+  PushIncludePath(FgdParser &parser, const std::filesystem::path &path) : m_parser{parser} {
     m_parser.pushIncludePath(path);
   }
 
   ~PushIncludePath() { m_parser.popIncludePath(); }
 };
 
+
 void FgdParser::pushIncludePath(std::filesystem::path path) {
-  assert(!isRecursiveInclude(path));
+  assert(! isRecursiveInclude(path));
   m_paths.push_back(std::move(path));
 }
 
 void FgdParser::popIncludePath() {
-  assert(!m_paths.empty());
+  assert(! m_paths.empty());
   m_paths.pop_back();
 }
 
 std::filesystem::path FgdParser::currentRoot() const {
-  assert(m_paths.empty() || !m_paths.back().empty());
-  return !m_paths.empty() ? m_paths.back().parent_path() : std::filesystem::path{};
+  assert(m_paths.empty() || ! m_paths.back().empty());
+  return ! m_paths.empty() ? m_paths.back().parent_path() : std::filesystem::path{};
 }
 
 bool FgdParser::isRecursiveInclude(const std::filesystem::path &path) const {
-  return std::any_of(m_paths.begin(), m_paths.end(), [&](const auto &includedPath) {
-    return includedPath==path;
-  });
+  return std::any_of(
+      m_paths.begin(), m_paths.end(), [&](const auto &includedPath) {
+        return includedPath == path;
+      }
+  );
 }
 
 std::vector<EntityDefinitionClassInfo> FgdParser::parseClassInfos(ParserStatus &status) {
   auto classInfos = std::vector<EntityDefinitionClassInfo>{};
   auto token = m_tokenizer.peekToken();
-  while (!token.hasType(FgdToken::Eof)) {
+  while (! token.hasType(FgdToken::Eof)) {
     parseClassInfoOrInclude(status, classInfos);
     token = m_tokenizer.peekToken();
   }
   return classInfos;
 }
 
-void FgdParser::parseClassInfoOrInclude(
-    ParserStatus &status, std::vector<EntityDefinitionClassInfo> &classInfos) {
-  const auto token =
-      expect(status, FgdToken::Eof | FgdToken::Word, m_tokenizer.peekToken());
+void FgdParser::parseClassInfoOrInclude(ParserStatus &status, std::vector<EntityDefinitionClassInfo> &classInfos) {
+  const auto token = expect(status, FgdToken::Eof | FgdToken::Word, m_tokenizer.peekToken());
   if (token.hasType(FgdToken::Eof)) {
     return;
   }
@@ -255,19 +238,18 @@ EntityDefinitionClassInfo FgdParser::parseSolidClassInfo(ParserStatus &status) {
   const auto classInfo = parseClassInfo(status, EntityDefinitionClassType::BrushClass);
   if (classInfo.size) {
     status.warn(
-        classInfo.line, classInfo.column, "Solid entity definition must not have a size");
+        classInfo.line, classInfo.column, "Solid entity definition must not have a size"
+    );
   }
   if (classInfo.modelDefinition) {
     status.warn(
-        classInfo.line,
-        classInfo.column,
-        "Solid entity definition must not have model definitions");
+        classInfo.line, classInfo.column, "Solid entity definition must not have model definitions"
+    );
   }
   if (classInfo.decalDefinition) {
     status.warn(
-        classInfo.line,
-        classInfo.column,
-        "Solid entity definition must not have decal definitions");
+        classInfo.line, classInfo.column, "Solid entity definition must not have decal definitions"
+    );
   }
   return classInfo;
 }
@@ -280,20 +262,18 @@ EntityDefinitionClassInfo FgdParser::parseBaseClassInfo(ParserStatus &status) {
   return parseClassInfo(status, EntityDefinitionClassType::BaseClass);
 }
 
-EntityDefinitionClassInfo FgdParser::parseClassInfo(
-    ParserStatus &status, const EntityDefinitionClassType classType) {
-  auto token =
-      expect(status, FgdToken::Word | FgdToken::Equality, m_tokenizer.nextToken());
+EntityDefinitionClassInfo FgdParser::parseClassInfo(ParserStatus &status, const EntityDefinitionClassType classType) {
+  auto token = expect(status, FgdToken::Word | FgdToken::Equality, m_tokenizer.nextToken());
 
   auto classInfo = EntityDefinitionClassInfo{};
   classInfo.type = classType;
   classInfo.line = token.line();
   classInfo.column = token.column();
 
-  while (token.type()==FgdToken::Word) {
+  while (token.type() == FgdToken::Word) {
     const auto typeName = token.data();
     if (kdl::ci::str_is_equal(typeName, "base")) {
-      if (!classInfo.superClasses.empty()) {
+      if (! classInfo.superClasses.empty()) {
         status.warn(token.line(), token.column(), "Found multiple base properties");
       }
       classInfo.superClasses = parseSuperClasses(status);
@@ -307,17 +287,12 @@ EntityDefinitionClassInfo FgdParser::parseClassInfo(
         status.warn(token.line(), token.column(), "Found multiple size properties");
       }
       classInfo.size = parseSize(status);
-    } else if (
-        kdl::ci::str_is_equal(typeName, "model")
-            || kdl::ci::str_is_equal(typeName, "studio")
-            || kdl::ci::str_is_equal(typeName, "studioprop")
-            || kdl::ci::str_is_equal(typeName, "sprite")
-            || kdl::ci::str_is_equal(typeName, "iconsprite")) {
+    } else if (kdl::ci::str_is_equal(typeName, "model") || kdl::ci::str_is_equal(typeName, "studio") || kdl::ci::str_is_equal(typeName, "studioprop")
+        || kdl::ci::str_is_equal(typeName, "sprite") || kdl::ci::str_is_equal(typeName, "iconsprite")) {
       if (classInfo.modelDefinition) {
         status.warn(token.line(), token.column(), "Found multiple model properties");
       }
-      classInfo.modelDefinition =
-          parseModel(status, kdl::ci::str_is_equal(typeName, "sprite"));
+      classInfo.modelDefinition = parseModel(status, kdl::ci::str_is_equal(typeName, "sprite"));
     } else if (kdl::ci::str_is_equal(typeName, "decal")) {
       if (classInfo.decalDefinition) {
         status.warn(token.line(), token.column(), "Found multiple decal properties");
@@ -325,9 +300,7 @@ EntityDefinitionClassInfo FgdParser::parseClassInfo(
       classInfo.decalDefinition = parseDecal(status);
     } else {
       status.warn(
-          token.line(),
-          token.column(),
-          fmt::format("Unknown entity definition header properties '{}'", typeName));
+          token.line(), token.column(), fmt::format("Unknown entity definition header properties '{}'", typeName));
       skipClassProperty(status);
     }
     token = expect(status, FgdToken::Equality | FgdToken::Word, m_tokenizer.nextToken());
@@ -337,7 +310,7 @@ EntityDefinitionClassInfo FgdParser::parseClassInfo(
   classInfo.name = token.data();
 
   token = expect(status, FgdToken::Colon | FgdToken::OBracket, m_tokenizer.peekToken());
-  if (token.type()==FgdToken::Colon) {
+  if (token.type() == FgdToken::Colon) {
     m_tokenizer.nextToken();
     classInfo.description = kdl::str_trim(parseString(status));
   }
@@ -354,31 +327,28 @@ void FgdParser::skipMainClass(ParserStatus &status) {
   auto token = Token{};
   do {
     token = m_tokenizer.nextToken();
-  } while (token.type()!=FgdToken::CBracket);
+  } while (token.type() != FgdToken::CBracket);
 }
 
 std::vector<std::string> FgdParser::parseSuperClasses(ParserStatus &status) {
   expect(status, FgdToken::OParenthesis, m_tokenizer.nextToken());
 
-  auto token =
-      expect(status, FgdToken::Word | FgdToken::CParenthesis, m_tokenizer.peekToken());
+  auto token = expect(status, FgdToken::Word | FgdToken::CParenthesis, m_tokenizer.peekToken());
 
   auto superClasses = std::vector<std::string>{};
-  if (token.type()==FgdToken::Word) {
+  if (token.type() == FgdToken::Word) {
     do {
       token = expect(status, FgdToken::Word, m_tokenizer.nextToken());
       superClasses.push_back(token.data());
-      token =
-          expect(status, FgdToken::Comma | FgdToken::CParenthesis, m_tokenizer.nextToken());
-    } while (token.type()==FgdToken::Comma);
+      token = expect(status, FgdToken::Comma | FgdToken::CParenthesis, m_tokenizer.nextToken());
+    } while (token.type() == FgdToken::Comma);
   } else {
     m_tokenizer.nextToken();
   }
   return superClasses;
 }
 
-Assets::ModelDefinition FgdParser::parseModel(
-    ParserStatus &status, const bool allowEmptyExpression) {
+Assets::ModelDefinition FgdParser::parseModel(ParserStatus &status, const bool allowEmptyExpression) {
   expect(status, FgdToken::OParenthesis, m_tokenizer.nextToken());
 
   const auto line = m_tokenizer.line();
@@ -387,18 +357,15 @@ Assets::ModelDefinition FgdParser::parseModel(
   if (allowEmptyExpression && m_tokenizer.peekToken().hasType(FgdToken::CParenthesis)) {
     m_tokenizer.skipToken();
 
-    auto defaultModel = EL::MapExpression{{
-                                              {"path", {EL::VariableExpression{"model"}, line, column}},
-                                              {"scale", {EL::VariableExpression{"scale"}, line, column}},
-                                          }};
+    auto defaultModel =
+        EL::MapExpression{{{"path", {EL::VariableExpression{"model"}, line, column}}, {"scale", {EL::VariableExpression{"scale"}, line, column}},}};
     auto defaultExp = EL::Expression{std::move(defaultModel), line, column};
     return Assets::ModelDefinition{std::move(defaultExp)};
   }
 
   const auto snapshot = m_tokenizer.snapshot();
   try {
-    auto parser =
-        ELParser{ELParser::Mode::Lenient, m_tokenizer.remainder(), line, column};
+    auto parser = ELParser{ELParser::Mode::Lenient, m_tokenizer.remainder(), line, column};
     auto expression = parser.parse();
 
     // advance our tokenizer by the amount that `parser` parsed
@@ -407,8 +374,7 @@ Assets::ModelDefinition FgdParser::parseModel(
 
     expression.optimize();
     return Assets::ModelDefinition{std::move(expression)};
-  }
-  catch (const ParserException &e) {
+  } catch (const ParserException &e) {
     try {
       m_tokenizer.restore(snapshot);
 
@@ -421,21 +387,15 @@ Assets::ModelDefinition FgdParser::parseModel(
 
       expression.optimize();
       status.warn(
-          line,
-          column,
-          fmt::format(
-              "Legacy model expressions are deprecated, replace with '{}'",
-              expression.asString()));
+          line, column, fmt::format(
+              "Legacy model expressions are deprecated, replace with '{}'", expression.asString()));
       return Assets::ModelDefinition{std::move(expression)};
-    }
-    catch (const ParserException &) {
+    } catch (const ParserException &) {
       m_tokenizer.restore(snapshot);
       throw e;
     }
-  }
-  catch (const EL::EvaluationError &evaluationError) {
-    throw ParserException{
-        m_tokenizer.line(), m_tokenizer.column(), evaluationError.what()};
+  } catch (const EL::EvaluationError &evaluationError) {
+    throw ParserException{m_tokenizer.line(), m_tokenizer.column(), evaluationError.what()};
   }
 }
 
@@ -450,15 +410,13 @@ Assets::DecalDefinition FgdParser::parseDecal(ParserStatus &status) {
   const auto token = m_tokenizer.peekToken();
   if (token.hasType(FgdToken::CParenthesis)) {
     expect(status, FgdToken::CParenthesis, m_tokenizer.nextToken());
-    auto defaultDecal =
-        EL::MapExpression{{{"texture", {EL::VariableExpression{"texture"}, line, column}}}};
+    auto defaultDecal = EL::MapExpression{{{"texture", {EL::VariableExpression{"texture"}, line, column}}}};
     auto defaultExp = EL::Expression{std::move(defaultDecal), line, column};
     return Assets::DecalDefinition{std::move(defaultExp)};
   }
 
   try {
-    auto parser =
-        ELParser{ELParser::Mode::Lenient, m_tokenizer.remainder(), line, column};
+    auto parser = ELParser{ELParser::Mode::Lenient, m_tokenizer.remainder(), line, column};
     auto expression = parser.parse();
 
     // advance our tokenizer by the amount that `parser` parsed
@@ -467,14 +425,11 @@ Assets::DecalDefinition FgdParser::parseDecal(ParserStatus &status) {
 
     expression = expression.optimize();
     return Assets::DecalDefinition{std::move(expression)};
-  }
-  catch (const ParserException &) {
+  } catch (const ParserException &) {
     m_tokenizer.restore(snapshot);
     throw;
-  }
-  catch (const EL::EvaluationError &evaluationError) {
-    throw ParserException{
-        m_tokenizer.line(), m_tokenizer.column(), evaluationError.what()};
+  } catch (const EL::EvaluationError &evaluationError) {
+    throw ParserException{m_tokenizer.line(), m_tokenizer.column(), evaluationError.what()};
   }
 }
 
@@ -484,7 +439,7 @@ void FgdParser::skipClassProperty(ParserStatus & /* status */) {
   // an open parenthesis. If the next token is not a
   // parenthesis, it forms part of the next property
   // (which we should not skip).
-  if (m_tokenizer.peekToken().type()!=FgdToken::OParenthesis) {
+  if (m_tokenizer.peekToken().type() != FgdToken::OParenthesis) {
     return;
   }
 
@@ -492,23 +447,21 @@ void FgdParser::skipClassProperty(ParserStatus & /* status */) {
   auto token = Token{};
   do {
     token = m_tokenizer.nextToken();
-    if (token.type()==FgdToken::OParenthesis) {
-      ++depth;
-    } else if (token.type()==FgdToken::CParenthesis) {
-      --depth;
+    if (token.type() == FgdToken::OParenthesis) {
+      ++ depth;
+    } else if (token.type() == FgdToken::CParenthesis) {
+      -- depth;
     }
-  } while (depth > 0 && token.type()!=FgdToken::Eof);
+  } while (depth > 0 && token.type() != FgdToken::Eof);
 }
 
-std::vector<std::shared_ptr<Assets::PropertyDefinition>> FgdParser::
-parsePropertyDefinitions(ParserStatus &status) {
+std::vector<std::shared_ptr<Assets::PropertyDefinition>> FgdParser::parsePropertyDefinitions(ParserStatus &status) {
   auto propertyDefinitions = std::vector<std::shared_ptr<Assets::PropertyDefinition>>{};
 
   expect(status, FgdToken::OBracket, m_tokenizer.nextToken());
-  auto token =
-      expect(status, FgdToken::Word | FgdToken::CBracket, m_tokenizer.nextToken());
+  auto token = expect(status, FgdToken::Word | FgdToken::CBracket, m_tokenizer.nextToken());
 
-  while (token.type()!=FgdToken::CBracket) {
+  while (token.type() != FgdToken::CBracket) {
     const auto propertyKey = token.data();
     const auto line = token.line();
     const auto column = token.column();
@@ -518,13 +471,10 @@ parsePropertyDefinitions(ParserStatus &status) {
     const auto typeName = token.data();
     expect(status, FgdToken::CParenthesis, m_tokenizer.nextToken());
 
-    auto propertyDefinition =
-        parsePropertyDefinition(status, propertyKey, typeName, line, column);
-    if (!addPropertyDefinition(propertyDefinitions, std::move(propertyDefinition))) {
+    auto propertyDefinition = parsePropertyDefinition(status, propertyKey, typeName, line, column);
+    if (! addPropertyDefinition(propertyDefinitions, std::move(propertyDefinition))) {
       status.warn(
-          line,
-          column,
-          fmt::format("Skipping duplicate property definition: '{}'", propertyKey));
+          line, column, fmt::format("Skipping duplicate property definition: '{}'", propertyKey));
     }
 
     token = expect(status, FgdToken::Word | FgdToken::CBracket, m_tokenizer.nextToken());
@@ -534,11 +484,8 @@ parsePropertyDefinitions(ParserStatus &status) {
 }
 
 std::unique_ptr<Assets::PropertyDefinition> FgdParser::parsePropertyDefinition(
-    ParserStatus &status,
-    std::string propertyKey,
-    const std::string &typeName,
-    const size_t line,
-    const size_t column) {
+    ParserStatus &status, std::string propertyKey, const std::string &typeName, const size_t line, const size_t column
+) {
   if (kdl::ci::str_is_equal(typeName, "target_source")) {
     return parseTargetSourcePropertyDefinition(status, std::move(propertyKey));
   }
@@ -562,85 +509,60 @@ std::unique_ptr<Assets::PropertyDefinition> FgdParser::parsePropertyDefinition(
   }
 
   status.debug(
-      line,
-      column,
-      fmt::format(
-          "Unknown property definition type '{}' for property '{}'", typeName, propertyKey));
+      line, column, fmt::format(
+          "Unknown property definition type '{}' for property '{}'", typeName, propertyKey
+      ));
   return parseUnknownPropertyDefinition(status, std::move(propertyKey));
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::
-parseTargetSourcePropertyDefinition(ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseTargetSourcePropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   parseDefaultStringValue(status);
   auto longDescription = parsePropertyDescription(status);
   return std::make_unique<Assets::PropertyDefinition>(
-      std::move(propertyKey),
-      Assets::PropertyDefinitionType::TargetSourceProperty,
-      std::move(shortDescription),
-      std::move(longDescription),
-      readOnly);
+      std::move(propertyKey), Assets::PropertyDefinitionType::TargetSourceProperty, std::move(shortDescription), std::move(longDescription), readOnly
+  );
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::
-parseTargetDestinationPropertyDefinition(ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseTargetDestinationPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   parseDefaultStringValue(status);
   auto longDescription = parsePropertyDescription(status);
   return std::make_unique<Assets::PropertyDefinition>(
-      std::move(propertyKey),
-      Assets::PropertyDefinitionType::TargetDestinationProperty,
-      std::move(shortDescription),
-      std::move(longDescription),
-      readOnly);
+      std::move(propertyKey), Assets::PropertyDefinitionType::TargetDestinationProperty, std::move(shortDescription), std::move(longDescription), readOnly
+  );
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseStringPropertyDefinition(
-    ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseStringPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   auto defaultValue = parseDefaultStringValue(status);
   auto longDescription = parsePropertyDescription(status);
   return std::make_unique<Assets::StringPropertyDefinition>(
-      std::move(propertyKey),
-      std::move(shortDescription),
-      std::move(longDescription),
-      readOnly,
-      std::move(defaultValue));
+      std::move(propertyKey), std::move(shortDescription), std::move(longDescription), readOnly, std::move(defaultValue));
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseIntegerPropertyDefinition(
-    ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseIntegerPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   auto defaultValue = parseDefaultIntegerValue(status);
   auto longDescription = parsePropertyDescription(status);
   return std::make_unique<Assets::IntegerPropertyDefinition>(
-      std::move(propertyKey),
-      std::move(shortDescription),
-      std::move(longDescription),
-      readOnly,
-      std::move(defaultValue));
+      std::move(propertyKey), std::move(shortDescription), std::move(longDescription), readOnly, std::move(defaultValue));
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseFloatPropertyDefinition(
-    ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseFloatPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   auto defaultValue = parseDefaultFloatValue(status);
   auto longDescription = parsePropertyDescription(status);
   return std::make_unique<Assets::FloatPropertyDefinition>(
-      std::move(propertyKey),
-      std::move(shortDescription),
-      std::move(longDescription),
-      readOnly,
-      std::move(defaultValue));
+      std::move(propertyKey), std::move(shortDescription), std::move(longDescription), readOnly, std::move(defaultValue));
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseChoicesPropertyDefinition(
-    ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseChoicesPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   auto defaultValue = parseDefaultChoiceValue(status);
@@ -650,97 +572,76 @@ std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseChoicesPropertyDefin
   expect(status, FgdToken::OBracket, m_tokenizer.nextToken());
 
   auto token = expect(
-      status,
-      FgdToken::Integer | FgdToken::Decimal | FgdToken::String | FgdToken::CBracket,
-      m_tokenizer.nextToken());
+      status, FgdToken::Integer | FgdToken::Decimal | FgdToken::String | FgdToken::CBracket, m_tokenizer.nextToken());
 
   auto options = Assets::ChoicePropertyOption::List{};
-  while (token.type()!=FgdToken::CBracket) {
+  while (token.type() != FgdToken::CBracket) {
     auto value = token.data();
     expect(status, FgdToken::Colon, m_tokenizer.nextToken());
     auto caption = parseString(status);
 
     options.emplace_back(std::move(value), std::move(caption));
     token = expect(
-        status,
-        FgdToken::Integer | FgdToken::Decimal | FgdToken::String | FgdToken::CBracket,
-        m_tokenizer.nextToken());
+        status, FgdToken::Integer | FgdToken::Decimal | FgdToken::String | FgdToken::CBracket, m_tokenizer.nextToken());
   }
 
   return std::make_unique<Assets::ChoicePropertyDefinition>(
-      std::move(propertyKey),
-      std::move(shortDescription),
-      std::move(longDescription),
-      std::move(options),
-      readOnly,
-      std::move(defaultValue));
+      std::move(propertyKey), std::move(shortDescription), std::move(longDescription), std::move(options), readOnly, std::move(defaultValue));
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseFlagsPropertyDefinition(
-    ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseFlagsPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   // Flag property definitions do not have descriptions or defaults, see
   // https://developer.valvesoftware.com/wiki/FGD
 
   expect(status, FgdToken::Equality, m_tokenizer.nextToken());
   expect(status, FgdToken::OBracket, m_tokenizer.nextToken());
 
-  auto token =
-      expect(status, FgdToken::Integer | FgdToken::CBracket, m_tokenizer.nextToken());
+  auto token = expect(status, FgdToken::Integer | FgdToken::CBracket, m_tokenizer.nextToken());
 
-  auto definition =
-      std::make_unique<Assets::FlagsPropertyDefinition>(std::move(propertyKey));
+  auto definition = std::make_unique<Assets::FlagsPropertyDefinition>(std::move(propertyKey));
 
-  while (token.type()!=FgdToken::CBracket) {
+  while (token.type() != FgdToken::CBracket) {
     const auto value = token.toInteger<int>();
     expect(status, FgdToken::Colon, m_tokenizer.nextToken());
     auto shortDescription = parseString(status);
 
     auto defaultValue = false;
     token = expect(
-        status,
-        FgdToken::Colon | FgdToken::Integer | FgdToken::CBracket,
-        m_tokenizer.peekToken());
-    if (token.type()==FgdToken::Colon) {
+        status, FgdToken::Colon | FgdToken::Integer | FgdToken::CBracket, m_tokenizer.peekToken());
+    if (token.type() == FgdToken::Colon) {
       m_tokenizer.nextToken();
       token = expect(status, FgdToken::Integer, m_tokenizer.nextToken());
-      defaultValue = token.toInteger<int>()!=0;
+      defaultValue = token.toInteger<int>() != 0;
     }
 
     token = expect(
-        status,
-        FgdToken::Integer | FgdToken::CBracket | FgdToken::Colon,
-        m_tokenizer.nextToken());
+        status, FgdToken::Integer | FgdToken::CBracket | FgdToken::Colon, m_tokenizer.nextToken());
 
     auto longDescription = std::string{};
-    if (token.type()==FgdToken::Colon) {
+    if (token.type() == FgdToken::Colon) {
       longDescription = parseString(status);
-      token =
-          expect(status, FgdToken::Integer | FgdToken::CBracket, m_tokenizer.nextToken());
+      token = expect(status, FgdToken::Integer | FgdToken::CBracket, m_tokenizer.nextToken());
     }
 
     definition->addOption(
-        value, std::move(shortDescription), std::move(longDescription), defaultValue);
+        value, std::move(shortDescription), std::move(longDescription), defaultValue
+    );
   }
   return definition;
 }
 
-std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseUnknownPropertyDefinition(
-    ParserStatus &status, std::string propertyKey) {
+std::unique_ptr<Assets::PropertyDefinition> FgdParser::parseUnknownPropertyDefinition(ParserStatus &status, std::string propertyKey) {
   const auto readOnly = parseReadOnlyFlag(status);
   auto shortDescription = parsePropertyDescription(status);
   auto defaultValue = parseDefaultStringValue(status);
   auto longDescription = parsePropertyDescription(status);
   return std::make_unique<Assets::UnknownPropertyDefinition>(
-      std::move(propertyKey),
-      std::move(shortDescription),
-      std::move(longDescription),
-      readOnly,
-      std::move(defaultValue));
+      std::move(propertyKey), std::move(shortDescription), std::move(longDescription), readOnly, std::move(defaultValue));
 }
 
 bool FgdParser::parseReadOnlyFlag(ParserStatus & /* status */) {
   auto token = m_tokenizer.peekToken();
-  if (token.hasType(FgdToken::Word) && token.data()=="readonly") {
+  if (token.hasType(FgdToken::Word) && token.data() == "readonly") {
     m_tokenizer.nextToken();
     return true;
   }
@@ -749,10 +650,10 @@ bool FgdParser::parseReadOnlyFlag(ParserStatus & /* status */) {
 
 std::string FgdParser::parsePropertyDescription(ParserStatus &status) {
   auto token = m_tokenizer.peekToken();
-  if (token.type()==FgdToken::Colon) {
+  if (token.type() == FgdToken::Colon) {
     m_tokenizer.nextToken();
     token = expect(status, FgdToken::String | FgdToken::Colon, m_tokenizer.peekToken());
-    if (token.type()==FgdToken::String) {
+    if (token.type() == FgdToken::String) {
       return parseString(status);
     }
   }
@@ -761,20 +662,19 @@ std::string FgdParser::parsePropertyDescription(ParserStatus &status) {
 
 std::optional<std::string> FgdParser::parseDefaultStringValue(ParserStatus &status) {
   auto token = m_tokenizer.peekToken();
-  if (token.type()==FgdToken::Colon) {
+  if (token.type() == FgdToken::Colon) {
     m_tokenizer.nextToken();
     token = expect(
-        status,
-        FgdToken::String | FgdToken::Colon | FgdToken::Integer | FgdToken::Decimal,
-        m_tokenizer.peekToken());
-    if (token.type()==FgdToken::String) {
+        status, FgdToken::String | FgdToken::Colon | FgdToken::Integer | FgdToken::Decimal, m_tokenizer.peekToken());
+    if (token.type() == FgdToken::String) {
       token = m_tokenizer.nextToken();
       return token.data();
     }
-    if (token.type()==FgdToken::Integer || token.type()==FgdToken::Decimal) {
+    if (token.type() == FgdToken::Integer || token.type() == FgdToken::Decimal) {
       token = m_tokenizer.nextToken();
       status.warn(
-          token.line(), token.column(), "Found numeric default value for string property");
+          token.line(), token.column(), "Found numeric default value for string property"
+      );
       return token.data();
     }
   }
@@ -783,20 +683,19 @@ std::optional<std::string> FgdParser::parseDefaultStringValue(ParserStatus &stat
 
 std::optional<int> FgdParser::parseDefaultIntegerValue(ParserStatus &status) {
   auto token = m_tokenizer.peekToken();
-  if (token.type()==FgdToken::Colon) {
+  if (token.type() == FgdToken::Colon) {
     m_tokenizer.nextToken();
     token = expect(
-        status,
-        FgdToken::Integer | FgdToken::Decimal | FgdToken::Colon,
-        m_tokenizer.peekToken());
-    if (token.type()==FgdToken::Integer) {
+        status, FgdToken::Integer | FgdToken::Decimal | FgdToken::Colon, m_tokenizer.peekToken());
+    if (token.type() == FgdToken::Integer) {
       token = m_tokenizer.nextToken();
       return token.toInteger<int>();
     }
-    if (token.type()==FgdToken::Decimal) { // be graceful for DaZ
+    if (token.type() == FgdToken::Decimal) { // be graceful for DaZ
       token = m_tokenizer.nextToken();
       status.warn(
-          token.line(), token.column(), "Found float default value for integer property");
+          token.line(), token.column(), "Found float default value for integer property"
+      );
       return static_cast<int>(token.toFloat<float>());
     }
   }
@@ -805,20 +704,16 @@ std::optional<int> FgdParser::parseDefaultIntegerValue(ParserStatus &status) {
 
 std::optional<float> FgdParser::parseDefaultFloatValue(ParserStatus &status) {
   auto token = m_tokenizer.peekToken();
-  if (token.type()==FgdToken::Colon) {
+  if (token.type() == FgdToken::Colon) {
     m_tokenizer.nextToken();
     // the default value should have quotes around it, but sometimes they're missing
     token = expect(
-        status,
-        FgdToken::String | FgdToken::Decimal | FgdToken::Integer | FgdToken::Colon,
-        m_tokenizer.peekToken());
-    if (token.type()!=FgdToken::Colon) {
+        status, FgdToken::String | FgdToken::Decimal | FgdToken::Integer | FgdToken::Colon, m_tokenizer.peekToken());
+    if (token.type() != FgdToken::Colon) {
       token = m_tokenizer.nextToken();
-      if (token.type()!=FgdToken::String) {
+      if (token.type() != FgdToken::String) {
         status.warn(
-            token.line(),
-            token.column(),
-            fmt::format("Unquoted float default value {}", token.data()));
+            token.line(), token.column(), fmt::format("Unquoted float default value {}", token.data()));
       }
       return token.toFloat<float>();
     }
@@ -828,12 +723,10 @@ std::optional<float> FgdParser::parseDefaultFloatValue(ParserStatus &status) {
 
 std::optional<std::string> FgdParser::parseDefaultChoiceValue(ParserStatus &status) {
   auto token = m_tokenizer.peekToken();
-  if (token.type()==FgdToken::Colon) {
+  if (token.type() == FgdToken::Colon) {
     m_tokenizer.nextToken();
     token = expect(
-        status,
-        FgdToken::String | FgdToken::Integer | FgdToken::Decimal | FgdToken::Colon,
-        m_tokenizer.peekToken());
+        status, FgdToken::String | FgdToken::Integer | FgdToken::Decimal | FgdToken::Colon, m_tokenizer.peekToken());
     if (token.hasType(FgdToken::String | FgdToken::Integer | FgdToken::Decimal)) {
       token = m_tokenizer.nextToken();
       return token.data();
@@ -844,9 +737,8 @@ std::optional<std::string> FgdParser::parseDefaultChoiceValue(ParserStatus &stat
 
 vm::vec3 FgdParser::parseVector(ParserStatus &status) {
   auto vec = vm::vec3{};
-  for (size_t i = 0; i < 3; i++) {
-    auto token =
-        expect(status, FgdToken::Integer | FgdToken::Decimal, m_tokenizer.nextToken());
+  for (size_t i = 0; i < 3; i ++) {
+    auto token = expect(status, FgdToken::Integer | FgdToken::Decimal, m_tokenizer.nextToken());
     vec[i] = token.toFloat<double>();
   }
   return vec;
@@ -857,14 +749,13 @@ vm::bbox3 FgdParser::parseSize(ParserStatus &status) {
   expect(status, FgdToken::OParenthesis, m_tokenizer.nextToken());
   size.min = parseVector(status);
 
-  auto token =
-      expect(status, FgdToken::CParenthesis | FgdToken::Comma, m_tokenizer.nextToken());
-  if (token.type()==FgdToken::Comma) {
+  auto token = expect(status, FgdToken::CParenthesis | FgdToken::Comma, m_tokenizer.nextToken());
+  if (token.type() == FgdToken::Comma) {
     size.max = parseVector(status);
     expect(status, FgdToken::CParenthesis, m_tokenizer.nextToken());
   } else {
-    const auto halfSize = size.min/2.0;
-    size.min = -halfSize;
+    const auto halfSize = size.min / 2.0;
+    size.min = - halfSize;
     size.max = halfSize;
   }
   return repair(size);
@@ -873,9 +764,8 @@ vm::bbox3 FgdParser::parseSize(ParserStatus &status) {
 Color FgdParser::parseColor(ParserStatus &status) {
   auto color = Color{};
   expect(status, FgdToken::OParenthesis, m_tokenizer.nextToken());
-  for (size_t i = 0; i < 3; i++) {
-    auto token =
-        expect(status, FgdToken::Decimal | FgdToken::Integer, m_tokenizer.nextToken());
+  for (size_t i = 0; i < 3; i ++) {
+    auto token = expect(status, FgdToken::Decimal | FgdToken::Integer, m_tokenizer.nextToken());
     color[i] = token.toFloat<float>();
     if (color[i] > 1.0f) {
       color[i] /= 255.0f;
@@ -910,37 +800,31 @@ std::vector<EntityDefinitionClassInfo> FgdParser::parseInclude(ParserStatus &sta
   return handleInclude(status, token.data());
 }
 
-std::vector<EntityDefinitionClassInfo> FgdParser::handleInclude(
-    ParserStatus &status, const std::filesystem::path &path) {
-  if (!m_fs) {
+std::vector<EntityDefinitionClassInfo> FgdParser::handleInclude(ParserStatus &status, const std::filesystem::path &path) {
+  if (! m_fs) {
     status.error(
-        m_tokenizer.line(),
-        kdl::str_to_string("Cannot include file without host file path"));
+        m_tokenizer.line(), kdl::str_to_string("Cannot include file without host file path"));
     return {};
   }
 
-  const auto restoreSnapshot =
-      kdl::invoke_later{[&, snapshot = m_tokenizer.snapshotStateAndSource()]() {
+  const auto restoreSnapshot = kdl::invoke_later{
+      [&, snapshot = m_tokenizer.snapshotStateAndSource()]() {
         m_tokenizer.restoreStateAndSource(snapshot);
       }};
 
   status.debug(
       m_tokenizer.line(), fmt::format("Parsing included file '{}'", path.string()));
 
-  const auto filePath = currentRoot()/path;
-  return m_fs->openFile(filePath)
-      .transform([&](auto file) {
+  const auto filePath = currentRoot() / path;
+  return m_fs->openFile(filePath).transform(
+      [&](auto file) {
         status.debug(
-            m_tokenizer.line(),
-            fmt::format("Resolved '{}' to '{}'", path.string(), filePath.string()));
+            m_tokenizer.line(), fmt::format("Resolved '{}' to '{}'", path.string(), filePath.string()));
 
         if (isRecursiveInclude(filePath)) {
           status.error(
-              m_tokenizer.line(),
-              fmt::format(
-                  "Skipping recursively included file: {} ({})",
-                  path.string(),
-                  filePath.string()));
+              m_tokenizer.line(), fmt::format(
+                  "Skipping recursively included file: {} ({})", path.string(), filePath.string()));
           return std::vector<EntityDefinitionClassInfo>{};
         }
 
@@ -948,13 +832,14 @@ std::vector<EntityDefinitionClassInfo> FgdParser::handleInclude(
         auto reader = file->reader().buffer();
         m_tokenizer.replaceState(reader.stringView());
         return parseClassInfos(status);
-      })
-      .transform_error([&](auto e) {
+      }
+  ).transform_error(
+      [&](auto e) {
         status.error(
             m_tokenizer.line(), fmt::format("Failed to parse included file: {}", e.msg));
         return std::vector<EntityDefinitionClassInfo>{};
-      })
-      .value();
+      }
+  ).value();
 }
 
 } // namespace TrenchBroom::IO

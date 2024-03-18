@@ -34,6 +34,7 @@ protected:
   // void paintEvent(QPaintEvent *event) override;
 };
 
+
 class Splitter : public QSplitter {
 Q_OBJECT
 public:

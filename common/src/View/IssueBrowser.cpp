@@ -35,9 +35,8 @@
 
 namespace TrenchBroom {
 namespace View {
-IssueBrowser::IssueBrowser(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : TabBookPage(parent), m_document(document), m_view(new IssueBrowserView(m_document)),
-      m_showHiddenIssuesCheckBox(nullptr), m_filterEditor(nullptr) {
+IssueBrowser::IssueBrowser(std::weak_ptr<MapDocument> document, QWidget *parent) :
+    TabBookPage(parent), m_document(document), m_view(new IssueBrowserView(m_document)), m_showHiddenIssuesCheckBox(nullptr), m_filterEditor(nullptr) {
   auto *sizer = new QVBoxLayout();
   sizer->setContentsMargins(0, 0, 0, 0);
   sizer->addWidget(m_view);
@@ -51,14 +50,13 @@ QWidget *IssueBrowser::createTabBarPage(QWidget *parent) {
   auto *barPage = new QWidget(parent);
   m_showHiddenIssuesCheckBox = new QCheckBox("Show hidden issues");
   connect(
-      m_showHiddenIssuesCheckBox,
-      &QCheckBox::stateChanged,
-      this,
-      &IssueBrowser::showHiddenIssuesChanged);
+      m_showHiddenIssuesCheckBox, &QCheckBox::stateChanged, this, &IssueBrowser::showHiddenIssuesChanged
+  );
 
   m_filterEditor = new FlagsPopupEditor(1, nullptr, "Filter", false);
   connect(
-      m_filterEditor, &FlagsPopupEditor::flagChanged, this, &IssueBrowser::filterChanged);
+      m_filterEditor, &FlagsPopupEditor::flagChanged, this, &IssueBrowser::filterChanged
+  );
 
   auto *barPageSizer = new QHBoxLayout();
   barPageSizer->setContentsMargins(0, 0, 0, 0);
@@ -71,20 +69,19 @@ QWidget *IssueBrowser::createTabBarPage(QWidget *parent) {
 
 void IssueBrowser::connectObservers() {
   auto document = kdl::mem_lock(m_document);
-  m_notifierConnection +=
-      document->documentWasSavedNotifier.connect(this, &IssueBrowser::documentWasSaved);
+  m_notifierConnection += document->documentWasSavedNotifier.connect(this, &IssueBrowser::documentWasSaved);
   m_notifierConnection += document->documentWasNewedNotifier.connect(
-      this, &IssueBrowser::documentWasNewedOrLoaded);
+      this, &IssueBrowser::documentWasNewedOrLoaded
+  );
   m_notifierConnection += document->documentWasLoadedNotifier.connect(
-      this, &IssueBrowser::documentWasNewedOrLoaded);
-  m_notifierConnection +=
-      document->nodesWereAddedNotifier.connect(this, &IssueBrowser::nodesWereAdded);
-  m_notifierConnection +=
-      document->nodesWereRemovedNotifier.connect(this, &IssueBrowser::nodesWereRemoved);
-  m_notifierConnection +=
-      document->nodesDidChangeNotifier.connect(this, &IssueBrowser::nodesDidChange);
+      this, &IssueBrowser::documentWasNewedOrLoaded
+  );
+  m_notifierConnection += document->nodesWereAddedNotifier.connect(this, &IssueBrowser::nodesWereAdded);
+  m_notifierConnection += document->nodesWereRemovedNotifier.connect(this, &IssueBrowser::nodesWereRemoved);
+  m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &IssueBrowser::nodesDidChange);
   m_notifierConnection += document->brushFacesDidChangeNotifier.connect(
-      this, &IssueBrowser::brushFacesDidChange);
+      this, &IssueBrowser::brushFacesDidChange
+  );
 }
 
 void IssueBrowser::documentWasNewedOrLoaded(MapDocument *) {
@@ -138,19 +135,15 @@ void IssueBrowser::updateFilterFlags() {
 
   m_filterEditor->setFlags(flags, labels);
   m_view->setHiddenIssueTypes(0);
-  m_filterEditor->setFlagValue(~0);
+  m_filterEditor->setFlagValue(~ 0);
 }
 
 void IssueBrowser::showHiddenIssuesChanged() {
   m_view->setShowHiddenIssues(m_showHiddenIssuesCheckBox->isChecked());
 }
 
-void IssueBrowser::filterChanged(
-    const size_t /* index */,
-    const int /* value */,
-    const int setFlag,
-    const int /* mixedFlag */) {
-  m_view->setHiddenIssueTypes(~setFlag);
+void IssueBrowser::filterChanged(const size_t /* index */, const int /* value */, const int setFlag, const int /* mixedFlag */) {
+  m_view->setHiddenIssueTypes(~ setFlag);
 }
 } // namespace View
 } // namespace TrenchBroom

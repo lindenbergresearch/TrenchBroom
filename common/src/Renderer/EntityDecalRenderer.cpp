@@ -45,19 +45,17 @@ namespace TrenchBroom::Renderer {
 
 namespace {
 
-std::optional<Assets::DecalSpecification> getDecalSpecification(
-    const Model::EntityNode *entityNode) {
+std::optional<Assets::DecalSpecification> getDecalSpecification(const Model::EntityNode *entityNode) {
   const auto decalSpec = entityNode->entity().decalSpecification();
   return decalSpec.textureName.empty() ? std::nullopt : std::make_optional(decalSpec);
 }
 
 using Vertex = Renderer::GLVertexTypes::P3NT2::Vertex;
+
 std::vector<Vertex> createDecalBrushFace(
-    const Model::EntityNode *entityNode,
-    const Model::BrushNode *brush,
-    const Model::BrushFace &face,
-    const Assets::Texture *texture) {
-  assert(texture!=nullptr);
+    const Model::EntityNode *entityNode, const Model::BrushNode *brush, const Model::BrushFace &face, const Assets::Texture *texture
+) {
+  assert(texture != nullptr);
 
   const auto textureSize = vm::vec2f{float(texture->width()), float(texture->height())};
   const auto textureName = texture->name();
@@ -73,11 +71,11 @@ std::vector<Vertex> createDecalBrushFace(
   const auto center = plane.project_point(origin);
 
   // re-project the vertices in case the texture axes are not on the face plane
-  const auto xShift = tex->xAxis()*double(attrs.xScale()*textureSize.x()/2.0f);
-  const auto yShift = tex->yAxis()*double(attrs.yScale()*textureSize.y()/2.0f);
+  const auto xShift = tex->xAxis() * double(attrs.xScale() * textureSize.x() / 2.0f);
+  const auto yShift = tex->yAxis() * double(attrs.yScale() * textureSize.y() / 2.0f);
 
   // we want to shift every vertex by just a little bit to avoid z-fighting
-  const auto offset = plane.normal*0.1;
+  const auto offset = plane.normal * 0.1;
 
   // start with a rectangle
   auto verts = std::vector{
@@ -90,20 +88,20 @@ std::vector<Vertex> createDecalBrushFace(
   // because the texture axes don't have to align to the face, we might have a reversed
   // face here. if so, reverse the points to get a valid face for the plane
   const auto [_, vertPlane] = vm::from_points(verts[0], verts[1], verts[2]);
-  if (!vm::is_equal(plane.normal, vertPlane.normal, vm::C::almost_zero())) {
+  if (! vm::is_equal(plane.normal, vertPlane.normal, vm::C::almost_zero())) {
     std::reverse(std::begin(verts), std::end(verts));
   }
 
   // calculate the texture offset based on the first vertex location
   const auto vtx = verts[0];
-  const auto xOffs = -vm::dot(vtx, tex->xAxis())/attrs.xScale();
-  const auto yOffs = -vm::dot(vtx, tex->yAxis())/attrs.yScale();
+  const auto xOffs = - vm::dot(vtx, tex->xAxis()) / attrs.xScale();
+  const auto yOffs = - vm::dot(vtx, tex->yAxis()) / attrs.yScale();
   attrs.setXOffset(float(xOffs));
   attrs.setYOffset(float(yOffs));
 
   // clip the decal geometry against every other plane in the brush
   for (const auto &f : brush->brush().faces()) {
-    if (&f==&face) {
+    if (&f == &face) {
       // skip the face that the decal is to be applied to, it's coplanar
       continue;
     }
@@ -117,15 +115,16 @@ std::vector<Vertex> createDecalBrushFace(
 
   // convert the geometry into a list of vertices
   const auto norm = vm::vec3f{plane.normal};
-  return kdl::vec_transform(verts, [&](const auto &v) {
-    return Vertex{vm::vec3f{v}, norm, tex->getTexCoords(v, attrs, textureSize)};
-  });
+  return kdl::vec_transform(
+      verts, [&](const auto &v) {
+        return Vertex{vm::vec3f{v}, norm, tex->getTexCoords(v, attrs, textureSize)};
+      }
+  );
 }
 
 } // namespace
 
-EntityDecalRenderer::EntityDecalRenderer(std::weak_ptr<View::MapDocument> document)
-    : m_document{std::move(document)} {
+EntityDecalRenderer::EntityDecalRenderer(std::weak_ptr<View::MapDocument> document) : m_document{std::move(document)} {
   clear();
 }
 
@@ -143,23 +142,19 @@ void EntityDecalRenderer::clear() {
 }
 
 void EntityDecalRenderer::updateNode(Model::Node *node) {
-  node->accept(kdl::overload(
-      [](Model::WorldNode *) {},
-      [](Model::LayerNode *) {},
-      [](Model::GroupNode *) {},
-      [&](const Model::EntityNode *entity) { updateEntity(entity); },
-      [&](const Model::BrushNode *brush) { updateBrush(brush); },
-      [](Model::PatchNode *) {}));
+  node->accept(
+      kdl::overload(
+          [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {}, [&](const Model::EntityNode *entity) { updateEntity(entity); },
+          [&](const Model::BrushNode *brush) { updateBrush(brush); }, [](Model::PatchNode *) {}
+      ));
 }
 
 void EntityDecalRenderer::removeNode(Model::Node *node) {
-  node->accept(kdl::overload(
-      [](Model::WorldNode *) {},
-      [](Model::LayerNode *) {},
-      [](Model::GroupNode *) {},
-      [&](const Model::EntityNode *entity) { removeEntity(entity); },
-      [&](const Model::BrushNode *brush) { removeBrush(brush); },
-      [](Model::PatchNode *) {}));
+  node->accept(
+      kdl::overload(
+          [](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {}, [&](const Model::EntityNode *entity) { removeEntity(entity); },
+          [&](const Model::BrushNode *brush) { removeBrush(brush); }, [](Model::PatchNode *) {}
+      ));
 }
 
 void EntityDecalRenderer::updateEntity(const Model::EntityNode *entityNode) {
@@ -167,12 +162,11 @@ void EntityDecalRenderer::updateEntity(const Model::EntityNode *entityNode) {
   const auto &editorContext = kdl::mem_lock(m_document)->editorContext();
 
   // check if the entity has a decal specification
-  const auto spec =
-      editorContext.visible(entityNode) ? getDecalSpecification(entityNode) : std::nullopt;
+  const auto spec = editorContext.visible(entityNode) ? getDecalSpecification(entityNode) : std::nullopt;
 
   // see if we are tracking this entity
   const auto entity = m_entities.find(entityNode);
-  const auto isTracking = entity!=std::end(m_entities);
+  const auto isTracking = entity != std::end(m_entities);
   if (isTracking && spec) {
     // entity is being tracked and has a decal specification, invalidate it
     invalidateDecalData(entity->second);
@@ -186,7 +180,7 @@ void EntityDecalRenderer::updateEntity(const Model::EntityNode *entityNode) {
 }
 
 void EntityDecalRenderer::removeEntity(const Model::EntityNode *entityNode) {
-  if (const auto it = m_entities.find(entityNode); it!=std::end(m_entities)) {
+  if (const auto it = m_entities.find(entityNode); it != std::end(m_entities)) {
     // make sure the entity data is cleaned up
     invalidateDecalData(it->second);
     m_entities.erase(it);
@@ -197,16 +191,14 @@ void EntityDecalRenderer::updateBrush(const Model::BrushNode *brushNode) {
   // invalidate any entities that intersect this brush or are tracking this brush
   for (auto &[ent, data] : m_entities) {
     // skip entities that are going to be recomputed anyway
-    if (!data.validated) {
+    if (! data.validated) {
       continue;
     }
 
     // if the brush is not visible, then it doesn't (currently) intersect
     const auto &editorContext = kdl::mem_lock(m_document)->editorContext();
-    const auto intersects =
-        editorContext.visible(brushNode) && brushNode->intersects(ent);
-    const auto tracked = std::find(data.brushes.begin(), data.brushes.end(), brushNode)
-        !=data.brushes.end();
+    const auto intersects = editorContext.visible(brushNode) && brushNode->intersects(ent);
+    const auto tracked = std::find(data.brushes.begin(), data.brushes.end(), brushNode) != data.brushes.end();
 
     // if this brush is tracked by this entity or intersects, we'll need to
     // recalculate the geometry
@@ -220,13 +212,12 @@ void EntityDecalRenderer::removeBrush(const Model::BrushNode *brushNode) {
   // invalidate any entities that are tracking this brush
   for (auto &[ent, data] : m_entities) {
     // skip entities that are going to be recomputed anyway
-    if (!data.validated) {
+    if (! data.validated) {
       continue;
     }
 
     // if this brush is tracked by this entity, remove it and recalculate
-    const auto tracked = std::find(data.brushes.begin(), data.brushes.end(), brushNode)
-        !=data.brushes.end();
+    const auto tracked = std::find(data.brushes.begin(), data.brushes.end(), brushNode) != data.brushes.end();
     if (tracked) {
       invalidateDecalData(data);
     }
@@ -235,7 +226,7 @@ void EntityDecalRenderer::removeBrush(const Model::BrushNode *brushNode) {
 
 void EntityDecalRenderer::invalidateDecalData(EntityDecalData &data) const {
   // do nothing if the brush data is already marked as invalidated
-  if (!data.validated) {
+  if (! data.validated) {
     return;
   }
 
@@ -243,7 +234,7 @@ void EntityDecalRenderer::invalidateDecalData(EntityDecalData &data) const {
 
   // if the texture doesn't exist, do nothing
   // also do nothing if the VBO storage fields are null, but it shouldn't happen
-  if (!data.texture || !data.vertexHolderKey || !data.faceIndicesKey) {
+  if (! data.texture || ! data.vertexHolderKey || ! data.faceIndicesKey) {
     return;
   }
 
@@ -253,7 +244,7 @@ void EntityDecalRenderer::invalidateDecalData(EntityDecalData &data) const {
   const auto faceIndexHolder = m_faces->at(data.texture);
   faceIndexHolder->zeroElementsWithKey(data.faceIndicesKey);
 
-  if (!faceIndexHolder->hasValidIndices()) {
+  if (! faceIndexHolder->hasValidIndices()) {
     // there are no indices left to render for this texture
     m_faces->erase(data.texture);
   }
@@ -262,8 +253,7 @@ void EntityDecalRenderer::invalidateDecalData(EntityDecalData &data) const {
   data.faceIndicesKey = nullptr;
 }
 
-void EntityDecalRenderer::validateDecalData(
-    const Model::EntityNode *entityNode, EntityDecalData &data) const {
+void EntityDecalRenderer::validateDecalData(const Model::EntityNode *entityNode, EntityDecalData &data) const {
   if (data.validated) {
     // already validated, no need to check again
     return;
@@ -290,7 +280,7 @@ void EntityDecalRenderer::validateDecalData(
   }
 
   data.texture = document->textureManager().texture(spec->textureName);
-  if (!data.texture) {
+  if (! data.texture) {
     // no decal texture was found, don't generate any geometry
     data.validated = true;
     return;
@@ -302,7 +292,7 @@ void EntityDecalRenderer::validateDecalData(
   // bounding box 'touches' but doesn't actually intersect through a face, we do not want
   // to place a decal on it. To achieve this logic, we shrink the bounds just a tiny bit
   // so adjacent faces that don't actually breach the entity's bounding box are excluded.
-  const auto shrunkBounds = entityBounds.expand(-vm::C::almost_zero());
+  const auto shrunkBounds = entityBounds.expand(- vm::C::almost_zero());
 
   // create geometry for the decal
   auto vertices = std::vector<Vertex>{};
@@ -314,14 +304,13 @@ void EntityDecalRenderer::validateDecalData(
       const auto facePolygon = face.geometry()->vertexPositions();
       if (vm::intersect_bbox_polygon(
           shrunkBounds, facePolygon.begin(), facePolygon.end())) {
-        const auto decalPolygon =
-            createDecalBrushFace(entityNode, brush, face, data.texture);
-        if (!decalPolygon.empty()) {
+        const auto decalPolygon = createDecalBrushFace(entityNode, brush, face, data.texture);
+        if (! decalPolygon.empty()) {
           // add the geometry to be uploaded into the VBO
           const auto vertexOffset = vertices.size();
 
           vertices.insert(vertices.end(), decalPolygon.begin(), decalPolygon.end());
-          for (size_t i = 0; i < decalPolygon.size() - 2; ++i) {
+          for (size_t i = 0; i < decalPolygon.size() - 2; ++ i) {
             indices.push_back(vertexOffset);
             indices.push_back(vertexOffset + i + 1);
             indices.push_back(vertexOffset + i + 2);
@@ -331,27 +320,25 @@ void EntityDecalRenderer::validateDecalData(
     }
   }
 
-  if (!vertices.empty() && !indices.empty()) {
+  if (! vertices.empty() && ! indices.empty()) {
     // upload the geometry into the VBO
-    assert(m_vertexArray!=nullptr);
-    auto [vertBlock, vertDest] =
-        m_vertexArray->getPointerToInsertVerticesAt(vertices.size());
-    std::memcpy(vertDest, vertices.data(), vertices.size()*sizeof(*vertDest));
+    assert(m_vertexArray != nullptr);
+    auto [vertBlock, vertDest] = m_vertexArray->getPointerToInsertVerticesAt(vertices.size());
+    std::memcpy(vertDest, vertices.data(), vertices.size() * sizeof(*vertDest));
     data.vertexHolderKey = vertBlock;
 
     const auto brushVerticesStartIndex = GLuint(vertBlock->pos);
 
     auto &faceVboMap = *m_faces;
     auto &holderPtr = faceVboMap[data.texture];
-    if (!holderPtr) {
+    if (! holderPtr) {
       // inserts into map!
       holderPtr = std::make_shared<BrushIndexArray>();
     }
-    auto [indexBlock, indexDest] =
-        holderPtr->getPointerToInsertElementsAt(indices.size());
+    auto [indexBlock, indexDest] = holderPtr->getPointerToInsertElementsAt(indices.size());
     auto *currentDest = indexDest;
     for (const auto &i : indices) {
-      *(currentDest++) = GLuint(brushVerticesStartIndex + i);
+      *(currentDest ++) = GLuint(brushVerticesStartIndex + i);
     }
     data.faceIndicesKey = indexBlock;
   }

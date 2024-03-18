@@ -27,13 +27,8 @@
 
 namespace TrenchBroom {
 namespace View {
-TitledPanel::TitledPanel(
-    const QString &title,
-    QWidget *parent,
-    bool boldTitle,
-    bool subtitle,
-    bool fillBackground)
-    : QWidget(parent), m_titleBar(nullptr), m_panel(nullptr) {
+TitledPanel::TitledPanel(const QString &title, QWidget *parent, bool boldTitle, bool subtitle, bool fillBackground) :
+    QWidget(parent), m_titleBar(nullptr), m_panel(nullptr) {
   m_titleBar = new TitleBar(title, boldTitle, subtitle);
   m_panel = new QWidget();
 
@@ -50,8 +45,7 @@ TitledPanel::TitledPanel(
   setLayout(layout);
 }
 
-TitledPanel::TitledPanel(const QString &title, const bool boldTitle, bool subtitle)
-    : TitledPanel(title, nullptr, boldTitle, subtitle) {
+TitledPanel::TitledPanel(const QString &title, const bool boldTitle, bool subtitle) : TitledPanel(title, nullptr, boldTitle, subtitle) {
 }
 
 TitleBar *TitledPanel::getTitleBar() const {

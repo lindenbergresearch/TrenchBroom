@@ -34,11 +34,15 @@ class MapRenderer;
 namespace TrenchBroom::View {
 class CyclingMapView;
 
+
 class GLContextManager;
+
 
 class MapDocument;
 
+
 class MapViewToolBox;
+
 
 class OnePaneMapView : public MultiPaneMapView {
 private:
@@ -49,18 +53,12 @@ private:
 
 public:
   explicit OnePaneMapView(
-      std::weak_ptr<MapDocument> document,
-      MapViewToolBox &toolBox,
-      Renderer::MapRenderer &mapRenderer,
-      GLContextManager &contextManager,
-      Logger *logger,
-      QWidget *parent = nullptr);
+      std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger,
+      QWidget *parent = nullptr
+  );
 
 private:
-  void createGui(
-      MapViewToolBox &toolBox,
-      Renderer::MapRenderer &mapRenderer,
-      GLContextManager &contextManager);
+  void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager);
 
 private: // implement MultiPaneMapView subclassing interface
   void doMaximizeView(MapView *view) override;

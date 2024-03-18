@@ -32,8 +32,13 @@
 namespace TrenchBroom {
 namespace Model {
 class ConstTagVisitor;
+
+
 class TagManager;
+
+
 class TagVisitor;
+
 
 /**
  * This class represents an attribute of a tag. A tag can have multiple attributes, but
@@ -67,10 +72,14 @@ public:
   const std::string &name() const;
 
   friend bool operator==(const TagAttribute &lhs, const TagAttribute &rhs);
+
   friend bool operator!=(const TagAttribute &lhs, const TagAttribute &rhs);
+
   friend bool operator<(const TagAttribute &lhs, const TagAttribute &rhs);
+
   friend std::ostream &operator<<(std::ostream &str, const TagAttribute &attr);
 };
+
 
 /**
  * Tags can be attached to any class that implement the Taggable interface. Each tag has a
@@ -107,9 +116,11 @@ public:
   virtual ~Tag();
 
   Tag(const Tag &other);
+
   Tag(Tag &&other) noexcept;
 
   Tag &operator=(const Tag &other);
+
   Tag &operator=(Tag &&other);
 
   /**
@@ -140,13 +151,17 @@ public:
   const std::vector<TagAttribute> &attributes() const;
 
   friend bool operator==(const Tag &lhs, const Tag &rhs);
+
   friend bool operator!=(const Tag &lhs, const Tag &rhs);
+
   friend bool operator<(const Tag &lhs, const Tag &rhs);
 
   virtual void appendToStream(std::ostream &str) const;
 };
 
+
 std::ostream &operator<<(std::ostream &str, const Tag &tag);
+
 
 /**
  * Tag references are used to store the tags attached to an object implementing the
@@ -172,9 +187,12 @@ defineCopyAndMove(TagReference);
   const Tag &tag() const;
 
   friend bool operator==(const TagReference &lhs, const TagReference &rhs);
+
   friend bool operator!=(const TagReference &lhs, const TagReference &rhs);
+
   friend bool operator<(const TagReference &lhs, const TagReference &rhs);
 };
+
 
 /**
  * Implementing this interface gives a class the ability to be tagged.
@@ -190,6 +208,7 @@ public:
    * Creates a new instance.
    */
   Taggable();
+
 defineCopyAndMove(Taggable);
 
   friend void swap(Taggable &lhs, Taggable &rhs) noexcept;
@@ -290,10 +309,13 @@ private:
 
 private:
   virtual void doAcceptTagVisitor(TagVisitor &visitor) = 0;
+
   virtual void doAcceptTagVisitor(ConstTagVisitor &visitor) const = 0;
 };
 
+
 class MapFacade;
+
 
 /**
  * A mechanism to query user input when enabling or disabling a tag matcher.
@@ -301,8 +323,10 @@ class MapFacade;
 class TagMatcherCallback {
 public:
   virtual ~TagMatcherCallback();
+
   virtual size_t selectOption(const std::vector<std::string> &options) = 0;
 };
+
 
 /**
  * Decides whether a taggable object should be tagged with a particular smart tag.
@@ -363,7 +387,9 @@ public:
   virtual void appendToStream(std::ostream &str) const = 0;
 };
 
+
 std::ostream &operator<<(std::ostream &str, const TagMatcher &matcher);
+
 
 /**
  * A smart tag is applied to any object that satisfies a matcher automatically.
@@ -380,15 +406,14 @@ public:
    * @param attributes the attributes of this tag
    * @param matcher the matcher that decides whether to apply this tag to a given taggable
    */
-  SmartTag(
-      const std::string &name,
-      std::vector<TagAttribute> attributes,
-      std::unique_ptr<TagMatcher> matcher);
+  SmartTag(const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher);
 
   SmartTag(const SmartTag &other);
+
   SmartTag(SmartTag &&other) noexcept;
 
   SmartTag &operator=(const SmartTag &other);
+
   SmartTag &operator=(SmartTag &&other);
 
   /**

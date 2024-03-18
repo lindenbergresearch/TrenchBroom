@@ -32,15 +32,19 @@ namespace TrenchBroom {
 namespace Model {
 class EditorContext;
 
+
 class PatchNode;
 } // namespace Model
 
 namespace Renderer {
 class RenderBatch;
 
+
 class RenderContext;
 
+
 class VboManager;
+
 
 class PatchRenderer : public IndexedRenderable {
 private:

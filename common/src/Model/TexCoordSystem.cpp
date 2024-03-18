@@ -43,11 +43,11 @@ TexCoordSystem::TexCoordSystem() = default;
 TexCoordSystem::~TexCoordSystem() = default;
 
 bool operator==(const TexCoordSystem &lhs, const TexCoordSystem &rhs) {
-  return lhs.xAxis()==rhs.xAxis() && lhs.yAxis()==rhs.yAxis();
+  return lhs.xAxis() == rhs.xAxis() && lhs.yAxis() == rhs.yAxis();
 }
 
 bool operator!=(const TexCoordSystem &lhs, const TexCoordSystem &rhs) {
-  return !(lhs==rhs);
+  return ! (lhs == rhs);
 }
 
 std::unique_ptr<TexCoordSystem> TexCoordSystem::clone() const {
@@ -66,11 +66,7 @@ vm::vec3 TexCoordSystem::yAxis() const {
   return getYAxis();
 }
 
-void TexCoordSystem::resetCache(
-    const vm::vec3 &point0,
-    const vm::vec3 &point1,
-    const vm::vec3 &point2,
-    const BrushFaceAttributes &attribs) {
+void TexCoordSystem::resetCache(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attribs) {
   doResetCache(point0, point1, point2, attribs);
 }
 
@@ -86,42 +82,22 @@ void TexCoordSystem::resetTextureAxesToParallel(const vm::vec3 &normal, const fl
   doResetTextureAxesToParaxial(normal, angle);
 }
 
-vm::vec2f TexCoordSystem::getTexCoords(
-    const vm::vec3 &point,
-    const BrushFaceAttributes &attribs,
-    const vm::vec2f &textureSize) const {
+vm::vec2f TexCoordSystem::getTexCoords(const vm::vec3 &point, const BrushFaceAttributes &attribs, const vm::vec2f &textureSize) const {
   return doGetTexCoords(point, attribs, textureSize);
 }
 
-void TexCoordSystem::setRotation(
-    const vm::vec3 &normal, const float oldAngle, const float newAngle) {
+void TexCoordSystem::setRotation(const vm::vec3 &normal, const float oldAngle, const float newAngle) {
   doSetRotation(normal, oldAngle, newAngle);
 }
 
-void TexCoordSystem::transform(
-    const vm::plane3 &oldBoundary,
-    const vm::plane3 &newBoundary,
-    const vm::mat4x4 &transformation,
-    BrushFaceAttributes &attribs,
-    const vm::vec2f &textureSize,
-    bool lockTexture,
-    const vm::vec3 &invariant) {
+void TexCoordSystem::transform(const vm::plane3 &oldBoundary, const vm::plane3 &newBoundary, const vm::mat4x4 &transformation, BrushFaceAttributes &attribs, const vm::vec2f &textureSize, bool lockTexture, const vm::vec3 &invariant) {
   doTransform(
-      oldBoundary,
-      newBoundary,
-      transformation,
-      attribs,
-      textureSize,
-      lockTexture,
-      invariant);
+      oldBoundary, newBoundary, transformation, attribs, textureSize, lockTexture, invariant
+  );
 }
 
-void TexCoordSystem::updateNormal(
-    const vm::vec3 &oldNormal,
-    const vm::vec3 &newNormal,
-    const BrushFaceAttributes &attribs,
-    const WrapStyle style) {
-  if (oldNormal!=newNormal) {
+void TexCoordSystem::updateNormal(const vm::vec3 &oldNormal, const vm::vec3 &newNormal, const BrushFaceAttributes &attribs, const WrapStyle style) {
+  if (oldNormal != newNormal) {
     switch (style) {
     case WrapStyle::Rotation:doUpdateNormalWithRotation(oldNormal, newNormal, attribs);
       break;
@@ -131,17 +107,12 @@ void TexCoordSystem::updateNormal(
   }
 }
 
-void TexCoordSystem::moveTexture(
-    const vm::vec3 &normal,
-    const vm::vec3 &up,
-    const vm::vec3 &right,
-    const vm::vec2f &offset,
-    BrushFaceAttributes &attribs) const {
+void TexCoordSystem::moveTexture(const vm::vec3 &normal, const vm::vec3 &up, const vm::vec3 &right, const vm::vec2f &offset, BrushFaceAttributes &attribs) const {
   const auto toPlane = vm::plane_projection_matrix(0.0, normal);
   const auto [invertible, fromPlane] = invert(toPlane);
-  const auto transform = fromPlane*vm::mat4x4::zero_out<2>()*toPlane;
-  const auto texX = normalize(transform*getXAxis());
-  const auto texY = normalize(transform*getYAxis());
+  const auto transform = fromPlane * vm::mat4x4::zero_out<2>() * toPlane;
+  const auto texX = normalize(transform * getXAxis());
+  const auto texY = normalize(transform * getYAxis());
   assert(invertible);
   unused(invertible);
 
@@ -201,30 +172,29 @@ void TexCoordSystem::moveTexture(
 
   vm::vec2f actualOffset;
   if (dot(right, hAxis) >= 0.0) {
-    actualOffset[xIndex] = -offset.x();
+    actualOffset[xIndex] = - offset.x();
   } else {
-    actualOffset[xIndex] = +offset.x();
+    actualOffset[xIndex] = + offset.x();
   }
   if (dot(up, vAxis) >= 0.0) {
-    actualOffset[yIndex] = -offset.y();
+    actualOffset[yIndex] = - offset.y();
   } else {
-    actualOffset[yIndex] = +offset.y();
+    actualOffset[yIndex] = + offset.y();
   }
 
   // Flip offset direction when texture scale is negative
   if (attribs.scale().x() < 0.0f) {
-    actualOffset[0] *= -1.0f;
+    actualOffset[0] *= - 1.0f;
   }
   if (attribs.scale().y() < 0.0f) {
-    actualOffset[1] *= -1.0f;
+    actualOffset[1] *= - 1.0f;
   }
 
   attribs.setOffset(attribs.offset() + actualOffset);
 }
 
-void TexCoordSystem::rotateTexture(
-    const vm::vec3 &normal, const float angle, BrushFaceAttributes &attribs) const {
-  const float actualAngle = isRotationInverted(normal) ? -angle : angle;
+void TexCoordSystem::rotateTexture(const vm::vec3 &normal, const float angle, BrushFaceAttributes &attribs) const {
+  const float actualAngle = isRotationInverted(normal) ? - angle : angle;
   attribs.setRotation(attribs.rotation() + actualAngle);
 }
 
@@ -238,59 +208,31 @@ vm::mat4x4 TexCoordSystem::toMatrix(const vm::vec2f &o, const vm::vec2f &s) cons
   const vm::vec3 z = getZAxis();
 
   return vm::mat4x4(
-      x[0],
-      x[1],
-      x[2],
-      o[0],
-      y[0],
-      y[1],
-      y[2],
-      o[1],
-      z[0],
-      z[1],
-      z[2],
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      1.0);
+      x[0], x[1], x[2], o[0], y[0], y[1], y[2], o[1], z[0], z[1], z[2], 0.0, 0.0, 0.0, 0.0, 1.0
+  );
 }
 
-vm::mat4x4 TexCoordSystem::fromMatrix(
-    const vm::vec2f &offset, const vm::vec2f &scale) const {
+vm::mat4x4 TexCoordSystem::fromMatrix(const vm::vec2f &offset, const vm::vec2f &scale) const {
   const auto [invertible, result] = invert(toMatrix(offset, scale));
   assert(invertible);
   unused(invertible);
   return result;
 }
 
-float TexCoordSystem::measureAngle(
-    const float currentAngle, const vm::vec2f &center, const vm::vec2f &point) const {
+float TexCoordSystem::measureAngle(const float currentAngle, const vm::vec2f &center, const vm::vec2f &point) const {
   return doMeasureAngle(currentAngle, center, point);
 }
 
-vm::vec2f TexCoordSystem::computeTexCoords(
-    const vm::vec3 &point, const vm::vec2f &scale) const {
+vm::vec2f TexCoordSystem::computeTexCoords(const vm::vec3 &point, const vm::vec2f &scale) const {
   return vm::vec2f(
-      dot(point, safeScaleAxis(getXAxis(), scale.x())),
-      dot(point, safeScaleAxis(getYAxis(), scale.y())));
+      dot(point, safeScaleAxis(getXAxis(), scale.x())), dot(point, safeScaleAxis(getYAxis(), scale.y())));
 }
 
-std::tuple<std::unique_ptr<TexCoordSystem>, BrushFaceAttributes> TexCoordSystem::
-toParallel(
-    const vm::vec3 &point0,
-    const vm::vec3 &point1,
-    const vm::vec3 &point2,
-    const BrushFaceAttributes &attribs) const {
+std::tuple<std::unique_ptr<TexCoordSystem>, BrushFaceAttributes> TexCoordSystem::toParallel(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attribs) const {
   return doToParallel(point0, point1, point2, attribs);
 }
 
-std::tuple<std::unique_ptr<TexCoordSystem>, BrushFaceAttributes> TexCoordSystem::
-toParaxial(
-    const vm::vec3 &point0,
-    const vm::vec3 &point1,
-    const vm::vec3 &point2,
-    const BrushFaceAttributes &attribs) const {
+std::tuple<std::unique_ptr<TexCoordSystem>, BrushFaceAttributes> TexCoordSystem::toParaxial(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attribs) const {
   return doToParaxial(point0, point1, point2, attribs);
 }
 } // namespace Model

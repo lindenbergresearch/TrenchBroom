@@ -49,9 +49,8 @@ const std::size_t Ddcaps2CubemapPY = 1 << 12;
 const std::size_t Ddcaps2CubemapNY = 1 << 13;
 const std::size_t Ddcaps2CubemapPZ = 1 << 14;
 const std::size_t Ddcaps2CubemapNZ = 1 << 15;
-[[maybe_unused]] const std::size_t Ddcaps2CubemapAllFacesMask =
-    (Ddcaps2CubemapPX | Ddcaps2CubemapNX | Ddcaps2CubemapPY | Ddcaps2CubemapNY
-        | Ddcaps2CubemapPZ | Ddcaps2CubemapNZ);
+[[maybe_unused]] const std::size_t
+    Ddcaps2CubemapAllFacesMask = (Ddcaps2CubemapPX | Ddcaps2CubemapNX | Ddcaps2CubemapPY | Ddcaps2CubemapNY | Ddcaps2CubemapPZ | Ddcaps2CubemapNZ);
 const std::size_t Ddcaps2Volume = 1 << 21;
 
 const std::size_t FourccDXT1 = (('1' << 24) + ('T' << 16) + ('X' << 8) + 'D');
@@ -108,7 +107,7 @@ GLenum convertDx10FormatToGLFormat(const size_t dx10Format) {
 }
 
 void readDdsMips(Reader &reader, Assets::TextureBufferList &buffers) {
-  for (size_t i = 0, mipLevels = buffers.size(); i < mipLevels; ++i) {
+  for (size_t i = 0, mipLevels = buffers.size(); i < mipLevels; ++ i) {
     reader.read(buffers[i].data(), buffers[i].size());
   }
 }
@@ -118,9 +117,8 @@ void readDdsMips(Reader &reader, Assets::TextureBufferList &buffers) {
 Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reader &reader) {
   try {
     const auto ident = reader.readSize<uint32_t>();
-    if (ident!=DdsLayout::Ident) {
-      return ReadTextureError{
-          std::move(name), "Unknown Dds ident: " + std::to_string(ident)};
+    if (ident != DdsLayout::Ident) {
+      return ReadTextureError{std::move(name), "Unknown Dds ident: " + std::to_string(ident)};
     }
 
     /*const auto size =*/reader.readSize<uint32_t>();
@@ -131,9 +129,8 @@ Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reade
     /*const auto depth =*/reader.readSize<uint32_t>();
     const auto mipMapsCount = reader.readSize<uint32_t>();
 
-    if (!checkTextureDimensions(width, height)) {
-      return ReadTextureError{
-          std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)};
+    if (! checkTextureDimensions(width, height)) {
+      return ReadTextureError{std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)};
     }
 
     reader.seekFromBegin(DdsLayout::PixelFormatOffset);
@@ -151,8 +148,8 @@ Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reade
 
     reader.seekFromBegin(DdsLayout::BasicHeaderLengthWithIdent);
 
-    const auto hasFourcc = (ddpfFlags & DdsLayout::DdpfFourcc)==DdsLayout::DdpfFourcc;
-    const auto isDx10File = hasFourcc && ddpfFourcc==DdsLayout::IdentDx10;
+    const auto hasFourcc = (ddpfFlags & DdsLayout::DdpfFourcc) == DdsLayout::DdpfFourcc;
+    const auto isDx10File = hasFourcc && ddpfFourcc == DdsLayout::IdentDx10;
 
     const auto dx10Format = isDx10File ? reader.readSize<uint32_t>() : 0;
     const auto dx10resDimension = isDx10File ? reader.readSize<uint32_t>() : 0;
@@ -161,40 +158,33 @@ Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reade
     auto format = GLenum{0};
 
     if (isDx10File) {
-      if (
-          dx10resDimension==DdsLayout::D3d10ResourceDimensionTexture2D
-              && !(dx10MiscFlags & DdsLayout::D3d10ResourceMiscCubemap)) {
+      if (dx10resDimension == DdsLayout::D3d10ResourceDimensionTexture2D && ! (dx10MiscFlags & DdsLayout::D3d10ResourceMiscCubemap)) {
         reader.seekFromBegin(
-            DdsLayout::BasicHeaderLengthWithIdent + DdsLayout::Dx10HeaderLength);
+            DdsLayout::BasicHeaderLengthWithIdent + DdsLayout::Dx10HeaderLength
+        );
         format = convertDx10FormatToGLFormat(dx10Format);
       }
     } else {
-      if (!(caps2 & (DdsLayout::Ddcaps2Cubemap | DdsLayout::Ddcaps2Volume))) {
+      if (! (caps2 & (DdsLayout::Ddcaps2Cubemap | DdsLayout::Ddcaps2Volume))) {
         if (hasFourcc) {
-          if (ddpfFourcc==DdsLayout::FourccDXT1) {
+          if (ddpfFourcc == DdsLayout::FourccDXT1) {
             format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-          } else if (ddpfFourcc==DdsLayout::FourccDXT3) {
+          } else if (ddpfFourcc == DdsLayout::FourccDXT3) {
             format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-          } else if (ddpfFourcc==DdsLayout::FourccDXT5) {
+          } else if (ddpfFourcc == DdsLayout::FourccDXT5) {
             format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
           }
         } else {
-          if (ddpfRgbBitcount==24) {
-            if (
-                ddpfRBitMask==0xFF && ddpfGBitMask==0xFF00 && ddpfBBitMask==0xFF0000) {
+          if (ddpfRgbBitcount == 24) {
+            if (ddpfRBitMask == 0xFF && ddpfGBitMask == 0xFF00 && ddpfBBitMask == 0xFF0000) {
               format = GL_RGB;
-            } else if (
-                ddpfRBitMask==0xFF0000 && ddpfGBitMask==0xFF00 && ddpfBBitMask==0xFF) {
+            } else if (ddpfRBitMask == 0xFF0000 && ddpfGBitMask == 0xFF00 && ddpfBBitMask == 0xFF) {
               format = GL_BGR;
             }
-          } else if (ddpfRgbBitcount==32) {
-            if (
-                ddpfRBitMask==0xFF && ddpfGBitMask==0xFF00 && ddpfBBitMask==0xFF0000
-                    && ddpfABitMask==0xFF000000) {
+          } else if (ddpfRgbBitcount == 32) {
+            if (ddpfRBitMask == 0xFF && ddpfGBitMask == 0xFF00 && ddpfBBitMask == 0xFF0000 && ddpfABitMask == 0xFF000000) {
               format = GL_RGBA;
-            } else if (
-                ddpfRBitMask==0xFF0000 && ddpfGBitMask==0xFF00 && ddpfBBitMask==0xFF
-                    && ddpfABitMask==0xFF000000) {
+            } else if (ddpfRBitMask == 0xFF0000 && ddpfGBitMask == 0xFF00 && ddpfBBitMask == 0xFF && ddpfABitMask == 0xFF000000) {
               format = GL_BGRA;
             }
           }
@@ -202,9 +192,8 @@ Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reade
       }
     }
 
-    if (!format) {
-      return ReadTextureError{
-          std::move(name), "Invalid Dds texture format: " + std::to_string(format)};
+    if (! format) {
+      return ReadTextureError{std::move(name), "Invalid Dds texture format: " + std::to_string(format)};
     }
 
     const auto numMips = mipMapsCount ? mipMapsCount : 1;
@@ -213,16 +202,8 @@ Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reade
     Assets::setMipBufferSize(buffers, numMips, width, height, format);
     readDdsMips(reader, buffers);
 
-    return Assets::Texture{
-        std::move(name),
-        width,
-        height,
-        Color{},
-        std::move(buffers),
-        format,
-        Assets::TextureType::Opaque};
-  }
-  catch (const ReaderException &e) {
+    return Assets::Texture{std::move(name), width, height, Color{}, std::move(buffers), format, Assets::TextureType::Opaque};
+  } catch (const ReaderException &e) {
     return ReadTextureError{std::move(name), e.what()};
   }
 }

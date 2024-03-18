@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-FlagsEditor::FlagsEditor(size_t numCols, QWidget *parent)
-    : QWidget(parent), m_numCols(numCols) {
+FlagsEditor::FlagsEditor(size_t numCols, QWidget *parent) : QWidget(parent), m_numCols(numCols) {
   assert(m_numCols > 0);
 }
 
@@ -39,17 +38,16 @@ void FlagsEditor::setFlags(const QStringList &labels, const QStringList &tooltip
   QList<int> values;
   values.reserve(labels.size());
 
-  for (int i = 0; i < labels.size(); ++i) {
+  for (int i = 0; i < labels.size(); ++ i) {
     values.push_back(1 << i);
   }
   setFlags(values, labels, tooltips);
 }
 
-void FlagsEditor::setFlags(
-    const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
+void FlagsEditor::setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
   const auto count = static_cast<size_t>(values.size());
-  const size_t numRows = (count + (m_numCols - 1))/m_numCols;
-  ensure(numRows*m_numCols >= count, "didn't allocate enough grid cells");
+  const size_t numRows = (count + (m_numCols - 1)) / m_numCols;
+  ensure(numRows * m_numCols >= count, "didn't allocate enough grid cells");
 
   m_checkBoxes.clear();
   m_values.clear();
@@ -64,9 +62,9 @@ void FlagsEditor::setFlags(
   layout->setVerticalSpacing(0);
   layout->setSizeConstraint(QLayout::SetMinimumSize);
 
-  for (size_t row = 0; row < numRows; ++row) {
-    for (size_t col = 0; col < m_numCols; ++col) {
-      const size_t index = col*numRows + row;
+  for (size_t row = 0; row < numRows; ++ row) {
+    for (size_t col = 0; col < m_numCols; ++ col) {
+      const size_t index = col * numRows + row;
       if (index < count) {
         const int indexInt = static_cast<int>(index);
         const int rowInt = static_cast<int>(row);
@@ -79,30 +77,33 @@ void FlagsEditor::setFlags(
         m_checkBoxes[index]->setText(
             indexInt < labels.size() ? labels[indexInt] : QString::number(value));
         m_checkBoxes[index]->setToolTip(
-            indexInt < tooltips.size() ? tooltips[indexInt] : "");
-        connect(m_checkBoxes[index], &QCheckBox::clicked, this, [index, value, this]() {
-          emit flagChanged(
-            index, value, this->getSetFlagValue(), this->getMixedFlagValue());
-        });
+            indexInt < tooltips.size() ? tooltips[indexInt] : ""
+        );
+        connect(
+            m_checkBoxes[index], &QCheckBox::clicked, this, [index, value, this]() {
+              emit flagChanged(
+                index, value, this->getSetFlagValue(), this->getMixedFlagValue());
+            }
+        );
 
         layout->addWidget(m_checkBoxes[index], rowInt, colInt);
       }
     }
   }
 
-  for (size_t i = 0; i < m_checkBoxes.size(); ++i) {
-    ensure(m_checkBoxes[i]!=nullptr, "didn't create enough checkbox widgets");
+  for (size_t i = 0; i < m_checkBoxes.size(); ++ i) {
+    ensure(m_checkBoxes[i] != nullptr, "didn't create enough checkbox widgets");
   }
 
   setLayout(layout);
 }
 
 void FlagsEditor::setFlagValue(const int on, const int mixed) {
-  for (size_t i = 0; i < m_checkBoxes.size(); ++i) {
+  for (size_t i = 0; i < m_checkBoxes.size(); ++ i) {
     QCheckBox *checkBox = m_checkBoxes[i];
     const int value = m_values[i];
-    const bool isMixed = (mixed & value)!=0;
-    const bool isChecked = (on & value)!=0;
+    const bool isMixed = (mixed & value) != 0;
+    const bool isChecked = (on & value) != 0;
     if (isMixed) {
       checkBox->setCheckState(Qt::PartiallyChecked);
     } else if (isChecked) {
@@ -119,17 +120,17 @@ size_t FlagsEditor::getNumFlags() const {
 
 bool FlagsEditor::isFlagSet(const size_t index) const {
   ensure(index < m_checkBoxes.size(), "index out of range");
-  return m_checkBoxes[index]->checkState()==Qt::Checked;
+  return m_checkBoxes[index]->checkState() == Qt::Checked;
 }
 
 bool FlagsEditor::isFlagMixed(const size_t index) const {
   ensure(index < m_checkBoxes.size(), "index out of range");
-  return m_checkBoxes[index]->checkState()==Qt::PartiallyChecked;
+  return m_checkBoxes[index]->checkState() == Qt::PartiallyChecked;
 }
 
 int FlagsEditor::getSetFlagValue() const {
   int value = 0;
-  for (size_t i = 0; i < m_checkBoxes.size(); ++i) {
+  for (size_t i = 0; i < m_checkBoxes.size(); ++ i) {
     if (isFlagSet(i)) {
       value |= m_values[i];
     }
@@ -139,7 +140,7 @@ int FlagsEditor::getSetFlagValue() const {
 
 int FlagsEditor::getMixedFlagValue() const {
   int value = 0;
-  for (size_t i = 0; i < m_checkBoxes.size(); ++i) {
+  for (size_t i = 0; i < m_checkBoxes.size(); ++ i) {
     if (isFlagMixed(i)) {
       value |= m_values[i];
     }
@@ -153,7 +154,7 @@ QString FlagsEditor::getFlagLabel(const size_t index) const {
 }
 
 int FlagsEditor::lineHeight() const {
-  assert(!m_checkBoxes.empty());
+  assert(! m_checkBoxes.empty());
   return m_checkBoxes.front()->frameSize().height();
 }
 } // namespace View

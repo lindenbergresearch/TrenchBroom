@@ -28,11 +28,14 @@
 
 namespace TrenchBroom::Model {
 class GroupNode;
+
+
 class Node;
 } // namespace TrenchBroom::Model
 
 namespace TrenchBroom::View {
 class MapDocumentCommandFacade;
+
 
 /**
  * Checks whether the given vector of linked group can be updated consistently.
@@ -41,6 +44,7 @@ class MapDocumentCommandFacade;
  * linked set.
  */
 bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode *> &changedLinkedGroups);
+
 
 /**
  * A helper class to add support for updating linked groups to commands.
@@ -55,22 +59,24 @@ bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode *> &changedLin
 class UpdateLinkedGroupsHelper {
 private:
   using ChangedLinkedGroups = std::vector<Model::GroupNode *>;
-  using LinkedGroupUpdates =
-      std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>;
+  using LinkedGroupUpdates = std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>;
   std::variant<ChangedLinkedGroups, LinkedGroupUpdates> m_state;
 
 public:
   explicit UpdateLinkedGroupsHelper(ChangedLinkedGroups changedLinkedGroups);
+
   ~UpdateLinkedGroupsHelper();
 
   Result<void> applyLinkedGroupUpdates(MapDocumentCommandFacade &document);
+
   void undoLinkedGroupUpdates(MapDocumentCommandFacade &document);
+
   void collateWith(UpdateLinkedGroupsHelper &other);
 
 private:
   Result<void> computeLinkedGroupUpdates(MapDocumentCommandFacade &document);
-  static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(
-      const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document);
+
+  static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document);
 
   void doApplyOrUndoLinkedGroupUpdates(MapDocumentCommandFacade &document);
 };

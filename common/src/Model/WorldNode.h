@@ -34,16 +34,26 @@
 #include <vector>
 
 namespace TrenchBroom {
-template<typename T, typename U>
-class octree;
+template<typename T, typename U> class octree;
 
 namespace Model {
 class EntityNodeIndex;
+
+
 class IssueQuickFix;
+
+
 enum class MapFormat;
+
+
 class PickResult;
+
+
 class Validator;
+
+
 class ValidatorRegistry;
+
 
 class WorldNode : public EntityNodeBase {
 private:
@@ -60,15 +70,14 @@ private:
   IdType m_nextPersistentId = 1;
 
 public:
-  WorldNode(
-      EntityPropertyConfig entityPropertyConfig, Entity entity, MapFormat mapFormat);
-  WorldNode(
-      EntityPropertyConfig entityPropertyConfig,
-      std::initializer_list<EntityProperty> properties,
-      MapFormat mapFormat);
+  WorldNode(EntityPropertyConfig entityPropertyConfig, Entity entity, MapFormat mapFormat);
+
+  WorldNode(EntityPropertyConfig entityPropertyConfig, std::initializer_list<EntityProperty> properties, MapFormat mapFormat);
+
   ~WorldNode() override;
 
   using Node::entityPropertyConfig;
+
   EntityPropertyConfig &entityPropertyConfig();
 
   MapFormat mapFormat() const;
@@ -130,13 +139,18 @@ public: // index
 
 public: // validator registration
   std::vector<const Validator *> registeredValidators() const;
+
   std::vector<const IssueQuickFix *> quickFixes(IssueType issueTypes) const;
+
   void registerValidator(std::unique_ptr<Validator> validator);
+
   void unregisterAllValidators();
 
 public: // node tree bulk updating
   void disableNodeTreeUpdates();
+
   void enableNodeTreeUpdates();
+
   void rebuildNodeTree();
 
 private:
@@ -144,49 +158,59 @@ private:
 
 private: // implement Node interface
   const vm::bbox3 &doGetLogicalBounds() const override;
+
   const vm::bbox3 &doGetPhysicalBounds() const override;
+
   FloatType doGetProjectedArea(vm::axis::type axis) const override;
+
   Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
-  Node *doCloneRecursively(
-      const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
+
+  Node *doCloneRecursively(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
+
   bool doCanAddChild(const Node *child) const override;
+
   bool doCanRemoveChild(const Node *child) const override;
+
   bool doRemoveIfEmpty() const override;
+
   bool doShouldAddToSpacialIndex() const override;
 
   void doDescendantWasAdded(Node *node, size_t depth) override;
+
   void doDescendantWillBeRemoved(Node *node, size_t depth) override;
+
   void doDescendantPhysicalBoundsDidChange(Node *node) override;
 
   bool doSelectable() const override;
-  void doPick(
-      const EditorContext &editorContext,
-      const vm::ray3 &ray,
-      PickResult &pickResult) override;
+
+  void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
+
   void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
+
   void doAccept(NodeVisitor &visitor) override;
+
   void doAccept(ConstNodeVisitor &visitor) const override;
+
   const EntityPropertyConfig &doGetEntityPropertyConfig() const override;
-  void doFindEntityNodesWithProperty(
-      const std::string &name,
-      const std::string &value,
-      std::vector<EntityNodeBase *> &result) const override;
-  void doFindEntityNodesWithNumberedProperty(
-      const std::string &prefix,
-      const std::string &value,
-      std::vector<EntityNodeBase *> &result) const override;
-  void doAddToIndex(
-      EntityNodeBase *node, const std::string &key, const std::string &value) override;
-  void doRemoveFromIndex(
-      EntityNodeBase *node, const std::string &key, const std::string &value) override;
+
+  void doFindEntityNodesWithProperty(const std::string &name, const std::string &value, std::vector<EntityNodeBase *> &result) const override;
+
+  void doFindEntityNodesWithNumberedProperty(const std::string &prefix, const std::string &value, std::vector<EntityNodeBase *> &result) const override;
+
+  void doAddToIndex(EntityNodeBase *node, const std::string &key, const std::string &value) override;
+
+  void doRemoveFromIndex(EntityNodeBase *node, const std::string &key, const std::string &value) override;
 
 private: // implement EntityNodeBase interface
   void doPropertiesDidChange(const vm::bbox3 &oldBounds) override;
+
   vm::vec3 doGetLinkSourceAnchor() const override;
+
   vm::vec3 doGetLinkTargetAnchor() const override;
 
 private: // implement Taggable interface
   void doAcceptTagVisitor(TagVisitor &visitor) override;
+
   void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 
 private:

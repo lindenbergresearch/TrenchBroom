@@ -44,84 +44,108 @@ namespace TrenchBroom {
 namespace Model {
 class TestIssue : public Issue {
 public:
-    TestIssue(Node &node) : Issue{0, node, ""} {
-    }
+  TestIssue(Node &node) : Issue{0, node, ""} {
+  }
 };
 
-TEST_CASE("Issue.addSelectableNodes")
-{
-    const auto worldBounds = vm::bbox3{8192.0};
 
-    auto outerGroupNode = GroupNode{Group{"outer"}};
+TEST_CASE("Issue.addSelectableNodes") {
+const auto worldBounds = vm::bbox3{8192.0};
 
-    auto *innerGroupNode = new GroupNode{Group{"inner"}};
-    auto *pointEntityNode = new EntityNode{Entity{}};
-    auto *brushNode = new BrushNode{BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()};
+auto outerGroupNode = GroupNode{Group{"outer"}};
 
-    auto *brushEntityNode = new EntityNode{Entity{}};
-    auto *entityBrushNode = new BrushNode{
-        BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()
-    };
-    brushEntityNode->addChild(entityBrushNode);
+auto *innerGroupNode = new GroupNode{Group{"inner"}};
+auto *pointEntityNode = new EntityNode{Entity{}};
+auto *brushNode = new BrushNode{BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()};
 
-    // clang-format off
-    auto *patchNode = new PatchNode{
-        BezierPatch{
-            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-        }};
-    // clang-format on
+auto *brushEntityNode = new EntityNode{Entity{}};
+auto *entityBrushNode = new BrushNode{
+    BrushBuilder{MapFormat::Quake3, worldBounds}.createCube(64.0, "texture").value()
+};
+brushEntityNode->
+addChild(entityBrushNode);
 
-    outerGroupNode.addChildren({innerGroupNode, pointEntityNode, brushNode, brushEntityNode, patchNode});
+// clang-format off
+auto *patchNode = new PatchNode{
+    BezierPatch{
+        3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
+    }};
+// clang-format on
 
-    const auto getSelectableNodes = [](const auto &issue) {
-      auto nodes = std::vector<Node *>{};
-      issue.addSelectableNodes(nodes);
-      return nodes;
-    };
+outerGroupNode.addChildren( {
+innerGroupNode, pointEntityNode, brushNode, brushEntityNode, patchNode
+}
+);
 
-    const auto hasSelectableNodes = [](const auto &issue) {
-      auto nodes = std::vector<Node *>{};
-      return issue.addSelectableNodes(nodes);
-    };
+const auto getSelectableNodes = [](const auto &issue) {
+  auto nodes = std::vector<Node *>{};
+  issue.addSelectableNodes(nodes);
+  return nodes;
+};
 
-    CHECK_FALSE(hasSelectableNodes(TestIssue{outerGroupNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{outerGroupNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{}));
+const auto hasSelectableNodes = [](const auto &issue) {
+  auto nodes = std::vector<Node *>{};
+  return issue.addSelectableNodes(nodes);
+};
 
-    CHECK(hasSelectableNodes(TestIssue{*innerGroupNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*innerGroupNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            innerGroupNode
-        }
-    ));
+CHECK_FALSE(hasSelectableNodes(TestIssue{outerGroupNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{outerGroupNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{})
+);
 
-    CHECK(hasSelectableNodes(TestIssue{*pointEntityNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*pointEntityNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            pointEntityNode
-        }
-    ));
+CHECK(hasSelectableNodes(TestIssue{*innerGroupNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{*innerGroupNode}), Catch::Matchers::UnorderedEquals(
+    std::vector<Node *>{
+        innerGroupNode
+    }
+)
+);
 
-    CHECK(hasSelectableNodes(TestIssue{*brushNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*brushNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            brushNode
-        }
-    ));
+CHECK(hasSelectableNodes(TestIssue{*pointEntityNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{*pointEntityNode}), Catch::Matchers::UnorderedEquals(
+    std::vector<Node *>{
+        pointEntityNode
+    }
+)
+);
 
-    CHECK(hasSelectableNodes(TestIssue{*brushEntityNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*brushEntityNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            entityBrushNode
-        }
-    ));
+CHECK(hasSelectableNodes(TestIssue{*brushNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{*brushNode}), Catch::Matchers::UnorderedEquals(
+    std::vector<Node *>{
+        brushNode
+    }
+)
+);
 
-    CHECK(hasSelectableNodes(TestIssue{*entityBrushNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*entityBrushNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            entityBrushNode
-        }
-    ));
+CHECK(hasSelectableNodes(TestIssue{*brushEntityNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{*brushEntityNode}), Catch::Matchers::UnorderedEquals(
+    std::vector<Node *>{
+        entityBrushNode
+    }
+)
+);
 
-    CHECK(hasSelectableNodes(TestIssue{*patchNode}));
-    CHECK_THAT(getSelectableNodes(TestIssue{*patchNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
-            patchNode
-        }
-    ));
+CHECK(hasSelectableNodes(TestIssue{*entityBrushNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{*entityBrushNode}), Catch::Matchers::UnorderedEquals(
+    std::vector<Node *>{
+        entityBrushNode
+    }
+)
+);
+
+CHECK(hasSelectableNodes(TestIssue{*patchNode})
+);
+CHECK_THAT(getSelectableNodes(TestIssue{*patchNode}), Catch::Matchers::UnorderedEquals(
+    std::vector<Node *>{
+        patchNode
+    }
+)
+);
 }
 } // namespace Model
 } // namespace TrenchBroom

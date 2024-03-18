@@ -23,19 +23,25 @@
 
 #include <memory>
 
+
 class QSplitter;
 
 namespace TrenchBroom {
 namespace View {
 class CollapsibleTitledPanel;
 
+
 class EntityBrowser;
+
 
 class EntityPropertyEditor;
 
+
 class GLContextManager;
 
+
 class MapDocument;
+
 
 class EntityInspector : public TabBookPage {
 Q_OBJECT
@@ -46,10 +52,7 @@ private:
   CollapsibleTitledPanel *m_entityDefinitionFileChooser;
 
 public:
-  EntityInspector(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  EntityInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
   ~EntityInspector() override;
 
@@ -58,13 +61,9 @@ private:
 
   QWidget *createAttributeEditor(QWidget *parent, std::weak_ptr<MapDocument> document);
 
-  QWidget *createEntityBrowser(
-      QWidget *parent,
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager);
+  QWidget *createEntityBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-  CollapsibleTitledPanel *createEntityDefinitionFileChooser(
-      QWidget *parent, std::weak_ptr<MapDocument> document);
+  CollapsibleTitledPanel *createEntityDefinitionFileChooser(QWidget *parent, std::weak_ptr<MapDocument> document);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -31,8 +31,13 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 namespace TrenchBroom {
 namespace Renderer {
 class AttrString;
+
+
 class FontGlyph;
+
+
 class FontTexture;
+
 
 class TextureFont {
 private:
@@ -44,29 +49,22 @@ private:
   unsigned char m_charCount;
 
 public:
-  TextureFont(std::unique_ptr<FontTexture> texture,
-              const std::vector<FontGlyph> &glyphs,
-              int lineHeight,
-              unsigned char firstChar,
-              unsigned char charCount);
+  TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, int lineHeight, unsigned char firstChar, unsigned char charCount);
 
   ~TextureFont();
 
 deleteCopyAndMove(TextureFont);
 
-  std::vector<vm::vec2f> quads(const AttrString &string,
-                               bool clockwise,
-                               const vm::vec2f &offset = vm::vec2f::zero()) const;
+  std::vector<vm::vec2f> quads(const AttrString &string, bool clockwise, const vm::vec2f &offset = vm::vec2f::zero()) const;
 
   vm::vec2f measure(const AttrString &string) const;
 
-  std::vector<vm::vec2f> quads(
-      const std::string &string,
-      bool clockwise,
-      const vm::vec2f &offset = vm::vec2f::zero()) const;
+  std::vector<vm::vec2f> quads(const std::string &string, bool clockwise, const vm::vec2f &offset = vm::vec2f::zero()) const;
+
   vm::vec2f measure(const std::string &string) const;
 
   void activate();
+
   void deactivate();
 };
 } // namespace Renderer

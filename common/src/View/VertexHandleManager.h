@@ -42,6 +42,7 @@ class Camera;
 namespace View {
 class Grid;
 
+
 class VertexHandleManagerBase {
 public:
   virtual ~VertexHandleManagerBase();
@@ -54,11 +55,10 @@ public:
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-  template<typename I>
-  void addHandles(I cur, I end) {
-    while (cur!=end) {
+  template<typename I> void addHandles(I cur, I end) {
+    while (cur != end) {
       addHandles(*cur);
-      ++cur;
+      ++ cur;
     }
   }
 
@@ -76,11 +76,10 @@ public:
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-  template<typename I>
-  void removeHandles(I cur, I end) {
-    while (cur!=end) {
+  template<typename I> void removeHandles(I cur, I end) {
+    while (cur != end) {
       removeHandles(*cur);
-      ++cur;
+      ++ cur;
     }
   }
 
@@ -92,8 +91,8 @@ public:
   virtual void removeHandles(const Model::BrushNode *brushNode) = 0;
 };
 
-template<typename H>
-class VertexHandleManagerBaseT : public VertexHandleManagerBase {
+
+template<typename H> class VertexHandleManagerBaseT : public VertexHandleManagerBase {
 public:
   using Handle = H;
   using HandleList = std::vector<H>;
@@ -108,8 +107,7 @@ protected:
     size_t count;
     bool selected;
 
-    HandleInfo()
-        : count(0), selected(false) {
+    HandleInfo() : count(0), selected(false) {
     }
 
     /**
@@ -118,7 +116,7 @@ protected:
      * @return true if and only if this handle was not previously selected
      */
     bool select() {
-      const bool result = !selected;
+      const bool result = ! selected;
       selected = true;
       return result;
     }
@@ -140,19 +138,19 @@ protected:
      * @return true if and only if this handle was previously selected
      */
     bool toggle() {
-      selected = !selected;
+      selected = ! selected;
       return selected;
     }
 
     /**
      * Increments the number of handles at the same coordinates.
      */
-    void inc() { ++count; }
+    void inc() { ++ count; }
 
     /**
      * Deccrements the number of handles at the same coordinates.
      */
-    void dec() { --count; }
+    void dec() { -- count; }
   };
 
   using HandleMap = std::map<H, HandleInfo>;
@@ -169,8 +167,7 @@ protected:
   size_t m_selectedHandleCount;
 
 public:
-  VertexHandleManagerBaseT()
-      : m_selectedHandleCount(0) {
+  VertexHandleManagerBaseT() : m_selectedHandleCount(0) {
   }
 
   virtual ~VertexHandleManagerBaseT() {}
@@ -242,16 +239,15 @@ public:
     HandleList result;
     result.reserve(unselectedHandleCount());
     collectHandles(
-        [](const HandleInfo &info) { return !info.selected; }, std::back_inserter(result));
+        [](const HandleInfo &info) { return ! info.selected; }, std::back_inserter(result));
     return result;
   }
 
 private:
-  template<typename T, typename O>
-  void collectHandles(const T &test, O out) const {
+  template<typename T, typename O> void collectHandles(const T &test, O out) const {
     for (const auto &[handle, info] : m_handles) {
       if (test(info)) {
-        out++ = handle;
+        out ++ = handle;
       }
     }
   }
@@ -274,7 +270,7 @@ public:
    */
   bool selected(const Handle &handle) const {
     const auto it = m_handles.find(handle);
-    if (it==std::end(m_handles))
+    if (it == std::end(m_handles))
       return false;
     return it->second.selected;
   }
@@ -290,7 +286,7 @@ public:
    * Indicates whether all handles are currently selected
    * @return true if and only if all handles are selected
    */
-  bool allSelected() const { return selectedHandleCount()==totalHandleCount(); }
+  bool allSelected() const { return selectedHandleCount() == totalHandleCount(); }
 
 public:
   /**
@@ -312,11 +308,11 @@ public:
    */
   bool remove(const Handle &handle) {
     const auto it = m_handles.find(handle);
-    if (it!=std::end(m_handles)) {
+    if (it != std::end(m_handles)) {
       HandleInfo &info = it->second;
       info.dec();
 
-      if (info.count==0) {
+      if (info.count == 0) {
         deselect(info);
         m_handles.erase(it);
       }
@@ -341,11 +337,10 @@ public:
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-  template<typename I>
-  void select(I cur, I end) {
-    while (cur!=end) {
+  template<typename I> void select(I cur, I end) {
+    while (cur != end) {
       select(*cur);
-      ++cur;
+      ++ cur;
     }
   }
 
@@ -366,11 +361,10 @@ public:
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-  template<typename I>
-  void deselect(I cur, I end) {
-    while (cur!=end) {
+  template<typename I> void deselect(I cur, I end) {
+    while (cur != end) {
       deselect(*cur);
-      ++cur;
+      ++ cur;
     }
   }
 
@@ -400,16 +394,15 @@ public:
    * @param begin the beginning of the range
    * @param end the end of the range
    */
-  template<typename I>
-  void toggle(I begin, I end) {
+  template<typename I> void toggle(I begin, I end) {
     using SelectionState = std::map<Handle, bool>;
     SelectionState selectionState;
 
-    for (auto cur = begin; cur!=end; ++cur) {
+    for (auto cur = begin; cur != end; ++ cur) {
       selectionState[*cur] = selected(*cur);
     }
 
-    for (auto cur = begin; cur!=end; ++cur) {
+    for (auto cur = begin; cur != end; ++ cur) {
       if (selectionState[*cur]) {
         deselect(*cur);
       } else {
@@ -419,11 +412,10 @@ public:
   }
 
 private:
-  template<typename F>
-  void forEachCloseHandle(const H &otherHandle, F fun) {
-    static const auto epsilon = 0.001*0.001;
+  template<typename F> void forEachCloseHandle(const H &otherHandle, F fun) {
+    static const auto epsilon = 0.001 * 0.001;
     for (auto &[handle, info] : m_handles) {
-      if (compare(otherHandle, handle, epsilon)==0) {
+      if (compare(otherHandle, handle, epsilon) == 0) {
         fun(info);
       }
     }
@@ -432,24 +424,24 @@ private:
   void select(HandleInfo &info) {
     if (info.select()) {
       assert(selectedHandleCount() < totalHandleCount());
-      ++m_selectedHandleCount;
+      ++ m_selectedHandleCount;
     }
   }
 
   void deselect(HandleInfo &info) {
     if (info.deselect()) {
       assert(m_selectedHandleCount > 0);
-      --m_selectedHandleCount;
+      -- m_selectedHandleCount;
     }
   }
 
   void toggle(HandleInfo &info) {
     if (info.toggle()) {
       assert(selectedHandleCount() < totalHandleCount());
-      ++m_selectedHandleCount;
+      ++ m_selectedHandleCount;
     } else {
       assert(m_selectedHandleCount > 0);
-      --m_selectedHandleCount;
+      -- m_selectedHandleCount;
     }
   }
 
@@ -463,8 +455,7 @@ public:
    * @param test the picking test to apply
    * @param pickResult the pick result to add hits to
    */
-  template<typename P>
-  void pick(const P &test, Model::PickResult &pickResult) const {
+  template<typename P> void pick(const P &test, Model::PickResult &pickResult) const {
     for (const auto &[handle, info] : m_handles) {
       const auto hit = test(handle);
       if (hit.isMatch()) {
@@ -484,9 +475,7 @@ public:
    * @param end the end of the range of brushes
    * @return a set of all brushes that are incident to the given handle
    */
-  template<typename I>
-  std::vector<Model::BrushNode *> findIncidentBrushes(
-      const Handle &handle, I begin, I end) const {
+  template<typename I> std::vector<Model::BrushNode *> findIncidentBrushes(const Handle &handle, I begin, I end) const {
     kdl::vector_set<Model::BrushNode *> result;
     findIncidentBrushes(handle, begin, end, std::inserter(result, result.end()));
     return result.release_data();
@@ -504,12 +493,10 @@ public:
    * @param bEnd the end of the range of brushes
    * @return a set containing all incident brushes
    */
-  template<typename I1, typename I2>
-  std::vector<Model::BrushNode *> findIncidentBrushes(
-      I1 hBegin, I1 hEnd, I2 bBegin, I2 bEnd) const {
+  template<typename I1, typename I2> std::vector<Model::BrushNode *> findIncidentBrushes(I1 hBegin, I1 hEnd, I2 bBegin, I2 bEnd) const {
     kdl::vector_set<Model::BrushNode *> result;
     auto out = std::inserter(result, std::end(result));
-    for (auto hCur = hBegin; hCur!=hEnd; ++hCur) {
+    for (auto hCur = hBegin; hCur != hEnd; ++ hCur) {
       findIncidentBrushes(*hCur, bBegin, bEnd, out);
     }
     return result.release_data();
@@ -525,11 +512,10 @@ public:
    * @param end the end of the range of brushes
    * @param out an output iterator that accepts the incident brushes
    */
-  template<typename I, typename O>
-  void findIncidentBrushes(const Handle &handle, I begin, I end, O out) const {
-    for (auto cur = begin; cur!=end; ++cur) {
+  template<typename I, typename O> void findIncidentBrushes(const Handle &handle, I begin, I end, O out) const {
+    for (auto cur = begin; cur != end; ++ cur) {
       if (isIncident(handle, *cur)) {
-        out++ = *cur;
+        out ++ = *cur;
       }
     }
   }
@@ -542,9 +528,9 @@ private:
    * @param brushNode the brush to check
    * @return true if and only if the given brush is incident to the given handle
    */
-  virtual bool isIncident(
-      const Handle &handle, const Model::BrushNode *brushNode) const = 0;
+  virtual bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const = 0;
 };
+
 
 /**
  * Manages vertex handles. A vertex handle is a 3D point.
@@ -566,13 +552,11 @@ public:
    * @param camera the camera
    * @param pickResult the picking result to add the hits to
    */
-  void pick(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const;
+  void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
   void addHandles(const Model::BrushNode *brushNode) override;
+
   void removeHandles(const Model::BrushNode *brushNode) override;
 
   Model::HitType::Type hitType() const override;
@@ -580,6 +564,7 @@ public:
 private:
   bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const override;
 };
+
 
 /**
  * Manages edge handles. An edge handle is a line segment given by two points. The edge
@@ -610,11 +595,7 @@ public:
    * @param grid the current grid
    * @param pickResult the picking result to add the hits to
    */
-  void pickGridHandle(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      const Grid &grid,
-      Model::PickResult &pickResult) const;
+  void pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const;
 
   /**
    * Picks the center point of the edge handles contained in this manager.
@@ -623,13 +604,11 @@ public:
    * @param camera the camera
    * @param pickResult the picking result to add the hits to
    */
-  void pickCenterHandle(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const;
+  void pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
   void addHandles(const Model::BrushNode *brushNode) override;
+
   void removeHandles(const Model::BrushNode *brushNode) override;
 
   Model::HitType::Type hitType() const override;
@@ -637,6 +616,7 @@ public:
 private:
   bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const override;
 };
+
 
 /**
  * Manages face handles. A face handle is a polygon given its vertices. The face handles
@@ -667,11 +647,7 @@ public:
    * @param grid the current grid
    * @param pickResult the picking result to add the hits to
    */
-  void pickGridHandle(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      const Grid &grid,
-      Model::PickResult &pickResult) const;
+  void pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const;
 
   /**
    * Picks the center point of the face handles contained in this manager.
@@ -680,13 +656,11 @@ public:
    * @param camera the camera
    * @param pickResult the picking result to add the hits to
    */
-  void pickCenterHandle(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const;
+  void pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
   void addHandles(const Model::BrushNode *brushNode) override;
+
   void removeHandles(const Model::BrushNode *brushNode) override;
 
   Model::HitType::Type hitType() const override;

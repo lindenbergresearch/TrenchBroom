@@ -27,6 +27,7 @@
 namespace TrenchBroom::IO {
 class Reader;
 
+
 /**
  * Heretic 2 .m8 format
  */

@@ -23,9 +23,7 @@ namespace TrenchBroom {
 namespace Renderer {
 IndexRangeRenderer::IndexRangeRenderer() {}
 
-IndexRangeRenderer::IndexRangeRenderer(
-    const VertexArray &vertexArray, const IndexRangeMap &indexArray)
-    : m_vertexArray(vertexArray), m_indexArray(indexArray) {
+IndexRangeRenderer::IndexRangeRenderer(const VertexArray &vertexArray, const IndexRangeMap &indexArray) : m_vertexArray(vertexArray), m_indexArray(indexArray) {
 }
 
 void IndexRangeRenderer::prepare(VboManager &vboManager) {

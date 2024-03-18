@@ -28,7 +28,9 @@ namespace TrenchBroom {
 namespace Renderer {
 class FontManager;
 
+
 class ShaderManager;
+
 
 class VboManager;
 } // namespace Renderer

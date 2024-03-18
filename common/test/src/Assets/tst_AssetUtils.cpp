@@ -28,38 +28,70 @@
 
 namespace TrenchBroom {
 namespace Assets {
-TEST_CASE("AssetUtilsTest.safeGetModelSpecification")
-{
-    TestLogger logger;
+TEST_CASE("AssetUtilsTest.safeGetModelSpecification") {
+TestLogger logger;
 
-    const auto expected = ModelSpecification("test/test", 1, 2);
-    std::optional<ModelSpecification> actual;
+const auto expected = ModelSpecification("test/test", 1, 2);
+std::optional<ModelSpecification> actual;
 
-    // regular execution is fine
-    SECTION("Regular execution")
-    {
-        CHECK_NOTHROW(actual = safeGetModelSpecification(logger, "", [&]() { return expected; }));
-        CHECK(logger.countMessages() == 0u);
-        CHECK(actual.has_value());
-        CHECK(*actual == expected);
-    }
+// regular execution is fine
+SECTION("Regular execution") {
+CHECK_NOTHROW(actual = safeGetModelSpecification(logger, "", [&]() { return expected; })
+);
+CHECK(logger
+.
 
-        // only ELExceptions are caught, and nothing is logged
-    SECTION("Only ELExceptions are caught, and nothing is logged")
-    {
-        CHECK_THROWS_AS(safeGetModelSpecification(logger, "", []() -> ModelSpecification { throw AssetException(); }), AssetException);
-        CHECK(logger.countMessages() == 0u);
-    }
+countMessages()
 
-        // throwing an EL exception logs and returns an empty model spec
-    SECTION("Throwing an EL exception logs and returns an empty model spec")
-    {
-        CHECK_NOTHROW(actual = safeGetModelSpecification(logger, "", []() -> ModelSpecification { throw EL::Exception(); }));
-        CHECK(logger.countMessages() == 1u);
-        CHECK(logger.countMessages(LogLevel::Error) == 1u);
-        CHECK(actual.has_value());
-        CHECK(*actual == ModelSpecification());
-    }
+== 0u);
+CHECK(actual
+.
+
+has_value()
+
+);
+CHECK(*actual
+== expected);
 }
-} // namespace Assets
+
+// only ELExceptions are caught, and nothing is logged
+SECTION("Only ELExceptions are caught, and nothing is logged") {
+CHECK_THROWS_AS(safeGetModelSpecification(logger, "", []() -> ModelSpecification { throw AssetException(); }), AssetException
+);
+CHECK(logger
+.
+
+countMessages()
+
+== 0u);
+}
+
+// throwing an EL exception logs and returns an empty model spec
+SECTION("Throwing an EL exception logs and returns an empty model spec")
+{
+CHECK_NOTHROW(actual = safeGetModelSpecification(logger, "", []() -> ModelSpecification { throw EL::Exception(); })
+);
+CHECK(logger
+.
+
+countMessages()
+
+== 1u);
+CHECK(logger
+.
+countMessages(LogLevel::Error)
+== 1u);
+CHECK(actual
+.
+
+has_value()
+
+);
+CHECK(*actual
+==
+
+ModelSpecification()
+
+);
+}}} // namespace Assets
 } // namespace TrenchBroom

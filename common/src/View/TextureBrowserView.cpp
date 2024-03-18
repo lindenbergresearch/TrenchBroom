@@ -53,14 +53,12 @@
 
 namespace TrenchBroom::View {
 
-TextureBrowserView::TextureBrowserView(
-    QScrollBar *scrollBar,
-    GLContextManager &contextManager,
-    std::weak_ptr<MapDocument> document_)
-    : CellView{contextManager, scrollBar}, m_document{std::move(document_)} {
+TextureBrowserView::TextureBrowserView(QScrollBar *scrollBar, GLContextManager &contextManager, std::weak_ptr<MapDocument> document_) :
+    CellView{contextManager, scrollBar}, m_document{std::move(document_)} {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection += document->textureUsageCountsDidChangeNotifier.connect(
-      this, &TextureBrowserView::usageCountDidChange);
+      this, &TextureBrowserView::usageCountDidChange
+  );
 }
 
 TextureBrowserView::~TextureBrowserView() {
@@ -68,7 +66,7 @@ TextureBrowserView::~TextureBrowserView() {
 }
 
 void TextureBrowserView::setSortOrder(const TextureSortOrder sortOrder) {
-  if (sortOrder!=m_sortOrder) {
+  if (sortOrder != m_sortOrder) {
     m_sortOrder = sortOrder;
     invalidate();
     update();
@@ -76,7 +74,7 @@ void TextureBrowserView::setSortOrder(const TextureSortOrder sortOrder) {
 }
 
 void TextureBrowserView::setGroup(const bool group) {
-  if (group!=m_group) {
+  if (group != m_group) {
     m_group = group;
     invalidate();
     update();
@@ -84,7 +82,7 @@ void TextureBrowserView::setGroup(const bool group) {
 }
 
 void TextureBrowserView::setHideUnused(const bool hideUnused) {
-  if (hideUnused!=m_hideUnused) {
+  if (hideUnused != m_hideUnused) {
     m_hideUnused = hideUnused;
     invalidate();
     update();
@@ -92,7 +90,7 @@ void TextureBrowserView::setHideUnused(const bool hideUnused) {
 }
 
 void TextureBrowserView::setFilterText(const std::string &filterText) {
-  if (filterText!=m_filterText) {
+  if (filterText != m_filterText) {
     m_filterText = filterText;
     invalidate();
     update();
@@ -104,17 +102,19 @@ const Assets::Texture *TextureBrowserView::selectedTexture() const {
 }
 
 void TextureBrowserView::setSelectedTexture(const Assets::Texture *selectedTexture) {
-  if (m_selectedTexture!=selectedTexture) {
+  if (m_selectedTexture != selectedTexture) {
     m_selectedTexture = selectedTexture;
     update();
   }
 }
 
 void TextureBrowserView::revealTexture(const Assets::Texture *texture) {
-  scrollToCell([=](const Cell &cell) {
-    const auto &cellTexture = cellData(cell);
-    return &cellTexture==texture;
-  });
+  scrollToCell(
+      [=](const Cell &cell) {
+        const auto &cellTexture = cellData(cell);
+        return &cellTexture == texture;
+      }
+  );
 }
 
 void TextureBrowserView::usageCountDidChange() {
@@ -130,8 +130,8 @@ void TextureBrowserView::doInitLayout(Layout &layout) {
   layout.setRowMargin(15.0f);
   layout.setCellMargin(10.0f);
   layout.setTitleMargin(2.0f);
-  layout.setCellWidth(scaleFactor*64.0f, scaleFactor*64.0f);
-  layout.setCellHeight(scaleFactor*64.0f, scaleFactor*128.0f);
+  layout.setCellWidth(scaleFactor * 64.0f, scaleFactor * 64.0f);
+  layout.setCellHeight(scaleFactor * 64.0f, scaleFactor * 128.0f);
 }
 
 void TextureBrowserView::doReloadLayout(Layout &layout) {
@@ -151,33 +151,25 @@ void TextureBrowserView::doReloadLayout(Layout &layout) {
   }
 }
 
-void TextureBrowserView::addTexturesToLayout(
-    Layout &layout,
-    const std::vector<const Assets::Texture *> &textures,
-    const Renderer::FontDescriptor &font) {
+void TextureBrowserView::addTexturesToLayout(Layout &layout, const std::vector<const Assets::Texture *> &textures, const Renderer::FontDescriptor &font) {
   for (const auto *texture : textures) {
     addTextureToLayout(layout, texture, font);
   }
 }
 
-void TextureBrowserView::addTextureToLayout(
-    Layout &layout, const Assets::Texture *texture, const Renderer::FontDescriptor &font) {
+void TextureBrowserView::addTextureToLayout(Layout &layout, const Assets::Texture *texture, const Renderer::FontDescriptor &font) {
   const auto maxCellWidth = layout.maxCellWidth();
 
   const auto textureName = std::filesystem::path{texture->name()}.filename().string();
   const auto titleHeight = fontManager().font(font).measure(textureName).y();
 
   const auto scaleFactor = pref(Preferences::TextureBrowserIconSize);
-  const auto scaledTextureWidth = vm::round(scaleFactor*float(texture->width()));
-  const auto scaledTextureHeight = vm::round(scaleFactor*float(texture->height()));
+  const auto scaledTextureWidth = vm::round(scaleFactor * float(texture->width()));
+  const auto scaledTextureHeight = vm::round(scaleFactor * float(texture->height()));
 
   layout.addItem(
-      texture,
-      textureName,
-      scaledTextureWidth,
-      scaledTextureHeight,
-      maxCellWidth,
-      titleHeight + 4.0f);
+      texture, textureName, scaledTextureWidth, scaledTextureHeight, maxCellWidth, titleHeight + 4.0f
+  );
 }
 
 std::vector<const Assets::TextureCollection *> TextureBrowserView::getCollections() const {
@@ -193,10 +185,10 @@ std::vector<const Assets::TextureCollection *> TextureBrowserView::getCollection
   return result;
 }
 
-std::vector<const Assets::Texture *> TextureBrowserView::getTextures(
-    const Assets::TextureCollection &collection) const {
-  return sortTextures(filterTextures(
-      kdl::vec_transform(collection.textures(), [](const auto &t) { return &t; })));
+std::vector<const Assets::Texture *> TextureBrowserView::getTextures(const Assets::TextureCollection &collection) const {
+  return sortTextures(
+      filterTextures(
+          kdl::vec_transform(collection.textures(), [](const auto &t) { return &t; })));
 }
 
 std::vector<const Assets::Texture *> TextureBrowserView::getTextures() const {
@@ -204,7 +196,7 @@ std::vector<const Assets::Texture *> TextureBrowserView::getTextures() const {
   auto textures = std::vector<const Assets::Texture *>{};
   for (const auto &collection : getCollections()) {
     for (const auto &texture : collection->textures()) {
-      if (!texture.overridden()) {
+      if (! texture.overridden()) {
         textures.push_back(&texture);
       }
     }
@@ -212,25 +204,29 @@ std::vector<const Assets::Texture *> TextureBrowserView::getTextures() const {
   return sortTextures(filterTextures(textures));
 }
 
-std::vector<const Assets::Texture *> TextureBrowserView::filterTextures(
-    std::vector<const Assets::Texture *> textures) const {
+std::vector<const Assets::Texture *> TextureBrowserView::filterTextures(std::vector<const Assets::Texture *> textures) const {
   if (m_hideUnused) {
-    textures = kdl::vec_erase_if(std::move(textures), [](const auto *texture) {
-      return texture->usageCount()==0;
-    });
+    textures = kdl::vec_erase_if(
+        std::move(textures), [](const auto *texture) {
+          return texture->usageCount() == 0;
+        }
+    );
   }
-  if (!m_filterText.empty()) {
-    textures = kdl::vec_erase_if(std::move(textures), [&](const auto *texture) {
-      return !kdl::all_of(kdl::str_split(m_filterText, " "), [&](const auto &pattern) {
-        return kdl::ci::str_contains(texture->name(), pattern);
-      });
-    });
+  if (! m_filterText.empty()) {
+    textures = kdl::vec_erase_if(
+        std::move(textures), [&](const auto *texture) {
+          return ! kdl::all_of(
+              kdl::str_split(m_filterText, " "), [&](const auto &pattern) {
+                return kdl::ci::str_contains(texture->name(), pattern);
+              }
+          );
+        }
+    );
   }
   return textures;
 }
 
-std::vector<const Assets::Texture *> TextureBrowserView::sortTextures(
-    std::vector<const Assets::Texture *> textures) const {
+std::vector<const Assets::Texture *> TextureBrowserView::sortTextures(std::vector<const Assets::Texture *> textures) const {
   const auto compareNames = [](const auto &lhs, const auto &rhs) {
     return kdl::ci::string_less{}(lhs->name(), rhs->name());
   };
@@ -238,11 +234,11 @@ std::vector<const Assets::Texture *> TextureBrowserView::sortTextures(
   switch (m_sortOrder) {
   case TextureSortOrder::Name:return kdl::vec_sort(std::move(textures), compareNames);
   case TextureSortOrder::Usage:
-    return kdl::vec_sort(std::move(textures), [&](const auto *lhs, const auto *rhs) {
-      return lhs->usageCount() < rhs->usageCount() ? false
-                                                   : lhs->usageCount() > rhs->usageCount() ? true
-                                                                                           : compareNames(lhs, rhs);
-    });
+    return kdl::vec_sort(
+        std::move(textures), [&](const auto *lhs, const auto *rhs) {
+          return lhs->usageCount() < rhs->usageCount() ? false : lhs->usageCount() > rhs->usageCount() ? true : compareNames(lhs, rhs);
+        }
+    );
     switchDefault();
   }
 }
@@ -259,9 +255,9 @@ void TextureBrowserView::doRender(Layout &layout, const float y, const float hei
   const auto viewBottom = float(0);
 
   const auto transformation = Renderer::Transformation{
-      vm::ortho_matrix(-1.0f, 1.0f, viewLeft, viewTop, viewRight, viewBottom),
-      vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y())
-          *vm::translation_matrix(vm::vec3f{0.0f, 0.0f, 0.1f})};
+      vm::ortho_matrix(- 1.0f, 1.0f, viewLeft, viewTop, viewRight, viewBottom),
+      vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y()) * vm::translation_matrix(vm::vec3f{0.0f, 0.0f, 0.1f})
+  };
 
   renderBounds(layout, y, height);
   renderTextures(layout, y, height);
@@ -288,16 +284,17 @@ void TextureBrowserView::renderBounds(Layout &layout, const float y, const float
             const auto &texture = cellData(cell);
             const auto &color = textureColor(texture);
             vertices.emplace_back(
-                vm::vec2f{bounds.left() - 2.0f, height - (bounds.top() - 2.0f - y)}, color);
+                vm::vec2f{bounds.left() - 2.0f, height - (bounds.top() - 2.0f - y)}, color
+            );
             vertices.emplace_back(
-                vm::vec2f{bounds.left() - 2.0f, height - (bounds.bottom() + 2.0f - y)},
-                color);
+                vm::vec2f{bounds.left() - 2.0f, height - (bounds.bottom() + 2.0f - y)}, color
+            );
             vertices.emplace_back(
-                vm::vec2f{bounds.right() + 2.0f, height - (bounds.bottom() + 2.0f - y)},
-                color);
+                vm::vec2f{bounds.right() + 2.0f, height - (bounds.bottom() + 2.0f - y)}, color
+            );
             vertices.emplace_back(
-                vm::vec2f{bounds.right() + 2.0f, height - (bounds.top() - 2.0f - y)},
-                color);
+                vm::vec2f{bounds.right() + 2.0f, height - (bounds.top() - 2.0f - y)}, color
+            );
           }
         }
       }
@@ -305,15 +302,14 @@ void TextureBrowserView::renderBounds(Layout &layout, const float y, const float
   }
 
   auto vertexArray = Renderer::VertexArray::move(std::move(vertices));
-  auto shader = Renderer::ActiveShader{
-      shaderManager(), Renderer::Shaders::TextureBrowserBorderShader};
+  auto shader = Renderer::ActiveShader{shaderManager(), Renderer::Shaders::TextureBrowserBorderShader};
 
   vertexArray.prepare(vboManager());
   vertexArray.render(Renderer::PrimType::Quads);
 }
 
 const Color &TextureBrowserView::textureColor(const Assets::Texture &texture) const {
-  if (&texture==m_selectedTexture) {
+  if (&texture == m_selectedTexture) {
     return pref(Preferences::TextureBrowserSelectedColor);
   }
   if (texture.usageCount() > 0) {
@@ -325,8 +321,7 @@ const Color &TextureBrowserView::textureColor(const Assets::Texture &texture) co
 void TextureBrowserView::renderTextures(Layout &layout, const float y, const float height) {
   using TextureVertex = Renderer::GLVertexTypes::P2T2::Vertex;
 
-  auto shader =
-      Renderer::ActiveShader{shaderManager(), Renderer::Shaders::TextureBrowserShader};
+  auto shader = Renderer::ActiveShader{shaderManager(), Renderer::Shaders::TextureBrowserShader};
   shader.set("ApplyTinting", false);
   shader.set("Texture", 0);
   shader.set("Brightness", pref(Preferences::Brightness));
@@ -339,12 +334,13 @@ void TextureBrowserView::renderTextures(Layout &layout, const float y, const flo
             const auto &bounds = cell.itemBounds();
             const auto &texture = cellData(cell);
 
-            auto vertexArray = Renderer::VertexArray::move(std::vector<TextureVertex>{
-                TextureVertex{{bounds.left(), height - (bounds.top() - y)}, {0, 0}},
-                TextureVertex{{bounds.left(), height - (bounds.bottom() - y)}, {0, 1}},
-                TextureVertex{{bounds.right(), height - (bounds.bottom() - y)}, {1, 1}},
-                TextureVertex{{bounds.right(), height - (bounds.top() - y)}, {1, 0}},
-            });
+            auto vertexArray = Renderer::VertexArray::move(
+                std::vector<TextureVertex>{
+                    TextureVertex{{bounds.left(), height - (bounds.top() - y)}, {0, 0}}, TextureVertex{{bounds.left(), height - (bounds.bottom() - y)}, {0, 1}},
+                    TextureVertex{{bounds.right(), height - (bounds.bottom() - y)}, {1, 1}},
+                    TextureVertex{{bounds.right(), height - (bounds.top() - y)}, {1, 0}},
+                }
+            );
 
             shader.set("GrayScale", texture.overridden());
             texture.activate();
@@ -363,7 +359,7 @@ void TextureBrowserView::renderTextures(Layout &layout, const float y, const flo
 void TextureBrowserView::doLeftClick(Layout &layout, const float x, const float y) {
   if (const auto *cell = layout.cellAt(x, y)) {
     const auto &texture = cellData(*cell);
-    if (!texture.overridden()) {
+    if (! texture.overridden()) {
       // NOTE: wx had the ability for the textureSelected event to veto the selection, but
       // it wasn't used.
       setSelectedTexture(&texture);
@@ -383,17 +379,18 @@ QString TextureBrowserView::tooltip(const Cell &cell) {
   return tooltip;
 }
 
-void TextureBrowserView::doContextMenu(
-    Layout &layout, float x, float y, QContextMenuEvent *event) {
+void TextureBrowserView::doContextMenu(Layout &layout, float x, float y, QContextMenuEvent *event) {
   if (const auto *cell = layout.cellAt(x, y)) {
     const auto &texture = cellData(*cell);
-    if (!cellData(*cell).overridden()) {
+    if (! cellData(*cell).overridden()) {
 
       auto menu = QMenu{this};
-      menu.addAction(tr("Select Faces"), this, [&, texture = &texture]() {
-        auto doc = kdl::mem_lock(m_document);
-        doc->selectFacesWithTexture(texture);
-      });
+      menu.addAction(
+          tr("Select Faces"), this, [&, texture = &texture]() {
+            auto doc = kdl::mem_lock(m_document);
+            doc->selectFacesWithTexture(texture);
+          }
+      );
       menu.exec(event->globalPos());
     }
   }

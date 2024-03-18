@@ -21,12 +21,15 @@
 
 #include "View/PreferencePane.h"
 
+
 class QCheckBox;
+
 
 class QComboBox;
 
 namespace TrenchBroom::View {
 class SliderWithLabel;
+
 
 class ViewPreferencePane : public PreferencePane {
 Q_OBJECT

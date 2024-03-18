@@ -28,7 +28,10 @@
 namespace TrenchBroom {
 namespace Model {
 class Issue;
+
+
 class MapFacade;
+
 
 class IssueQuickFix {
 private:
@@ -40,7 +43,9 @@ private:
 
 public:
   IssueQuickFix(std::string description, MultiIssueFix fix);
+
   IssueQuickFix(IssueType issueType, std::string description, SingleIssueFix fix);
+
   virtual ~IssueQuickFix();
 
   const std::string &description() const;
@@ -48,15 +53,15 @@ public:
   void apply(MapFacade &facade, const std::vector<const Issue *> &issues) const;
 };
 
+
 IssueQuickFix makeDeleteNodesQuickFix();
 
 IssueQuickFix makeRemoveEntityPropertiesQuickFix(IssueType type);
 
 IssueQuickFix makeTransformEntityPropertiesQuickFix(
-    IssueType type,
-    std::string description,
-    std::function<std::string(const std::string &)> keyTransform,
-    std::function<std::string(const std::string &)> valueTransform);
+    IssueType type, std::string description, std::function<std::string(const std::string &)> keyTransform,
+    std::function<std::string(const std::string &)> valueTransform
+);
 
 } // namespace Model
 } // namespace TrenchBroom

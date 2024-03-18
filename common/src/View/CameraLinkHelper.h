@@ -43,6 +43,7 @@ private:
   void cameraDidChange(const Renderer::Camera *camera);
 };
 
+
 class CameraLinkableView {
 public:
   virtual ~CameraLinkableView();

@@ -32,9 +32,7 @@
 
 namespace TrenchBroom {
 namespace IO {
-CompilationConfigParser::CompilationConfigParser(
-    const std::string_view str, std::filesystem::path path)
-    : ConfigParserBase{str, std::move(path)} {
+CompilationConfigParser::CompilationConfigParser(const std::string_view str, std::filesystem::path path) : ConfigParserBase{str, std::move(path)} {
 }
 
 Model::CompilationConfig CompilationConfigParser::parse() {
@@ -45,39 +43,34 @@ Model::CompilationConfig CompilationConfigParser::parse() {
 
   const auto version = root["version"].numberValue();
   unused(version);
-  assert(version==1.0);
+  assert(version == 1.0);
 
   return Model::CompilationConfig{parseProfiles(root["profiles"])};
 }
 
-std::vector<Model::CompilationProfile> CompilationConfigParser::parseProfiles(
-    const EL::Value &value) const {
+std::vector<Model::CompilationProfile> CompilationConfigParser::parseProfiles(const EL::Value &value) const {
   auto result = std::vector<Model::CompilationProfile>{};
   result.reserve(value.length());
 
-  for (size_t i = 0; i < value.length(); ++i) {
+  for (size_t i = 0; i < value.length(); ++ i) {
     result.push_back(parseProfile(value[i]));
   }
   return result;
 }
 
-Model::CompilationProfile CompilationConfigParser::parseProfile(
-    const EL::Value &value) const {
+Model::CompilationProfile CompilationConfigParser::parseProfile(const EL::Value &value) const {
   expectStructure(
-      value, "[ {'name': 'String', 'workdir': 'String', 'tasks': 'Array'}, {} ]");
+      value, "[ {'name': 'String', 'workdir': 'String', 'tasks': 'Array'}, {} ]"
+  );
 
-  return {
-      value["name"].stringValue(),
-      value["workdir"].stringValue(),
-      parseTasks(value["tasks"])};
+  return {value["name"].stringValue(), value["workdir"].stringValue(), parseTasks(value["tasks"])};
 }
 
-std::vector<Model::CompilationTask> CompilationConfigParser::parseTasks(
-    const EL::Value &value) const {
+std::vector<Model::CompilationTask> CompilationConfigParser::parseTasks(const EL::Value &value) const {
   auto result = std::vector<Model::CompilationTask>{};
   result.reserve(value.length());
 
-  for (size_t i = 0; i < value.length(); ++i) {
+  for (size_t i = 0; i < value.length(); ++ i) {
     result.push_back(parseTask(value[i]));
   }
   return result;
@@ -87,83 +80,73 @@ Model::CompilationTask CompilationConfigParser::parseTask(const EL::Value &value
   expectMapEntry(value, "type", EL::ValueType::String);
   const auto typeName = value["type"].stringValue();
 
-  if (typeName=="export") {
+  if (typeName == "export") {
     return parseExportTask(value);
   }
-  if (typeName=="copy") {
+  if (typeName == "copy") {
     return parseCopyTask(value);
   }
-  if (typeName=="rename") {
+  if (typeName == "rename") {
     return parseRenameTask(value);
   }
-  if (typeName=="delete") {
+  if (typeName == "delete") {
     return parseDeleteTask(value);
   }
-  if (typeName=="tool") {
+  if (typeName == "tool") {
     return parseToolTask(value);
   }
 
   throw ParserException{"Unknown compilation task type '" + typeName + "'"};
 }
 
-Model::CompilationExportMap CompilationConfigParser::parseExportTask(
-    const EL::Value &value) const {
+Model::CompilationExportMap CompilationConfigParser::parseExportTask(const EL::Value &value) const {
   expectStructure(
-      value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]");
+      value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]"
+  );
 
   const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
   return {enabled, value["target"].stringValue()};
 }
 
-Model::CompilationCopyFiles CompilationConfigParser::parseCopyTask(
-    const EL::Value &value) const {
+Model::CompilationCopyFiles CompilationConfigParser::parseCopyTask(const EL::Value &value) const {
   expectStructure(
-      value,
-      "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
-      "'Boolean' } ]");
+      value, "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
+             "'Boolean' } ]"
+  );
 
   const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
   return {enabled, value["source"].stringValue(), value["target"].stringValue()};
 }
 
-Model::CompilationRenameFile CompilationConfigParser::parseRenameTask(
-    const EL::Value &value) const {
+Model::CompilationRenameFile CompilationConfigParser::parseRenameTask(const EL::Value &value) const {
   expectStructure(
-      value,
-      "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
-      "'Boolean' } ]");
+      value, "[ {'type': 'String', 'source': 'String', 'target': 'String'}, { 'enabled': "
+             "'Boolean' } ]"
+  );
 
   const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
   return {enabled, value["source"].stringValue(), value["target"].stringValue()};
 }
 
-Model::CompilationDeleteFiles CompilationConfigParser::parseDeleteTask(
-    const EL::Value &value) const {
+Model::CompilationDeleteFiles CompilationConfigParser::parseDeleteTask(const EL::Value &value) const {
   expectStructure(
-      value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]");
+      value, "[ {'type': 'String', 'target': 'String'}, { 'enabled': 'Boolean' } ]"
+  );
 
   const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
   return {enabled, value["target"].stringValue()};
 }
 
-Model::CompilationRunTool CompilationConfigParser::parseToolTask(
-    const EL::Value &value) const {
+Model::CompilationRunTool CompilationConfigParser::parseToolTask(const EL::Value &value) const {
   expectStructure(
-      value,
-      "[ {'type': 'String', 'tool': 'String', 'parameters': 'String'}, { 'enabled': "
-      "'Boolean', 'treatNonZeroResultCodeAsError': 'Boolean' } ]");
+      value, "[ {'type': 'String', 'tool': 'String', 'parameters': 'String'}, { 'enabled': "
+             "'Boolean', 'treatNonZeroResultCodeAsError': 'Boolean' } ]"
+  );
 
   const auto enabled = value.contains("enabled") ? value["enabled"].booleanValue() : true;
-  const auto treatNonZeroResultCodeAsError =
-      value.contains("treatNonZeroResultCodeAsError")
-      ? value["treatNonZeroResultCodeAsError"].booleanValue()
-      : false;
+  const auto treatNonZeroResultCodeAsError = value.contains("treatNonZeroResultCodeAsError") ? value["treatNonZeroResultCodeAsError"].booleanValue() : false;
 
-  return {
-      enabled,
-      value["tool"].stringValue(),
-      value["parameters"].stringValue(),
-      treatNonZeroResultCodeAsError};
+  return {enabled, value["tool"].stringValue(), value["parameters"].stringValue(), treatNonZeroResultCodeAsError};
 }
 } // namespace IO
 } // namespace TrenchBroom

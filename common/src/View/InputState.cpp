@@ -30,17 +30,13 @@
 
 namespace TrenchBroom {
 namespace View {
-InputState::InputState()
-    : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(0.0f), m_mouseY(0.0f),
-      m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
+InputState::InputState() : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(0.0f), m_mouseY(0.0f), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
   const QPoint mouseState = QCursor::pos();
   m_mouseX = static_cast<float>(mouseState.x());
   m_mouseY = static_cast<float>(mouseState.y());
 }
 
-InputState::InputState(const float mouseX, const float mouseY)
-    : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(mouseX), m_mouseY(mouseY),
-      m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
+InputState::InputState(const float mouseX, const float mouseY) : m_modifierKeys(ModifierKeys::MKNone), m_mouseButtons(MouseButtons::MBNone), m_mouseX(mouseX), m_mouseY(mouseY), m_mouseDX(0.0f), m_mouseDY(0.0f), m_scrollX(0.0f), m_scrollY(0.0f), m_anyToolDragging(false) {
 }
 
 InputState::~InputState() {}
@@ -50,44 +46,34 @@ ModifierKeyState InputState::modifierKeys() const {
 }
 
 bool InputState::modifierKeysDown(const ModifierKeyState keys) const {
-  return (modifierKeys() & keys)!=0;
+  return (modifierKeys() & keys) != 0;
 }
 
 bool InputState::modifierKeysPressed(const ModifierKeyState keys) const {
-  return modifierKeys()==keys;
+  return modifierKeys() == keys;
 }
 
-bool InputState::checkModifierKeys(
-    const ModifierKeyState key1,
-    const ModifierKeyState key2,
-    const ModifierKeyState key3,
-    const ModifierKeyState key4) const {
-  assert(key1!=ModifierKeys::MKDontCare);
+bool InputState::checkModifierKeys(const ModifierKeyState key1, const ModifierKeyState key2, const ModifierKeyState key3, const ModifierKeyState key4) const {
+  assert(key1 != ModifierKeys::MKDontCare);
   if (modifierKeysPressed(key1))
     return true;
-  if (key2!=ModifierKeys::MKDontCare && modifierKeysPressed(key2))
+  if (key2 != ModifierKeys::MKDontCare && modifierKeysPressed(key2))
     return true;
-  if (key3!=ModifierKeys::MKDontCare && modifierKeysPressed(key3))
+  if (key3 != ModifierKeys::MKDontCare && modifierKeysPressed(key3))
     return true;
-  if (key4!=ModifierKeys::MKDontCare && modifierKeysPressed(key4))
+  if (key4 != ModifierKeys::MKDontCare && modifierKeysPressed(key4))
     return true;
   return false;
 }
 
-bool InputState::checkModifierKeys(
-    const ModifierKeyPressed ctrl,
-    const ModifierKeyPressed alt,
-    const ModifierKeyPressed shift) const {
-  return (
-      checkModifierKey(ctrl, ModifierKeys::MKCtrlCmd)
-          && checkModifierKey(alt, ModifierKeys::MKAlt)
-          && checkModifierKey(shift, ModifierKeys::MKShift));
+bool InputState::checkModifierKeys(const ModifierKeyPressed ctrl, const ModifierKeyPressed alt, const ModifierKeyPressed shift) const {
+  return (checkModifierKey(ctrl, ModifierKeys::MKCtrlCmd) && checkModifierKey(alt, ModifierKeys::MKAlt) && checkModifierKey(shift, ModifierKeys::MKShift));
 }
 
 bool InputState::checkModifierKey(ModifierKeyPressed state, ModifierKeyState key) const {
   switch (state) {
   case MK_Yes:return modifierKeysDown(key);
-  case MK_No:return !modifierKeysDown(key);
+  case MK_No:return ! modifierKeysDown(key);
   case MK_DontCare:return true;
     switchDefault();
   }
@@ -98,11 +84,11 @@ MouseButtonState InputState::mouseButtons() const {
 }
 
 bool InputState::mouseButtonsDown(const MouseButtonState buttons) const {
-  return (mouseButtons() & buttons)!=0;
+  return (mouseButtons() & buttons) != 0;
 }
 
 bool InputState::mouseButtonsPressed(const MouseButtonState buttons) const {
-  return mouseButtons()==buttons;
+  return mouseButtons() == buttons;
 }
 
 float InputState::mouseX() const {
@@ -142,15 +128,14 @@ void InputState::mouseDown(const MouseButtonState button) {
 }
 
 void InputState::mouseUp(const MouseButtonState button) {
-  m_mouseButtons &= ~button;
+  m_mouseButtons &= ~ button;
 }
 
 void InputState::clearMouseButtons() {
   m_mouseButtons = MouseButtons::MBNone;
 }
 
-void InputState::mouseMove(
-    const float mouseX, const float mouseY, const float mouseDX, const float mouseDY) {
+void InputState::mouseMove(const float mouseX, const float mouseY, const float mouseDX, const float mouseDY) {
   m_mouseX = mouseX;
   m_mouseY = mouseY;
   m_mouseDX = mouseDX;

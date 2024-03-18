@@ -284,10 +284,10 @@ static std::unordered_map<int, int> qtKeyToWxMap() {
   std::unordered_map<int, int> qtToWx;
 
   // invert wxKeyToQt()
-  for (int wxKey = 1; wxKey <= WXK_LAUNCH_MAIL; ++wxKey) {
+  for (int wxKey = 1; wxKey <= WXK_LAUNCH_MAIL; ++ wxKey) {
     const int qtKey = wxKeyToQt(wxKey);
 
-    if (qtKey!=0) {
+    if (qtKey != 0) {
       qtToWx[qtKey] = wxKey;
     }
   }
@@ -296,9 +296,7 @@ static std::unordered_map<int, int> qtKeyToWxMap() {
 }
 
 int qtKeyToWx(const int qtKey) {
-  ensure(
-      qApp->thread()==QThread::currentThread(),
-      "qtKeyToWx() can only be used on the main thread");
+  ensure(qApp->thread() == QThread::currentThread(), "qtKeyToWx() can only be used on the main thread");
 
   static std::unordered_map<int, int> qtToWx;
   if (qtToWx.empty()) {
@@ -306,7 +304,7 @@ int qtKeyToWx(const int qtKey) {
   }
 
   auto it = qtToWx.find(qtKey);
-  if (it!=qtToWx.end()) {
+  if (it != qtToWx.end()) {
     return it->second;
   }
   return 0;
@@ -324,10 +322,10 @@ std::optional<QKeySequence> keySequenceFromV1Settings(const QString &string) {
   if (wxKey < 0 || mod1 < 0 || mod2 < 0 || mod3 < 0) {
     return {};
   }
-  if (sep1!=':' || sep2!=':' || sep3!=':') {
+  if (sep1 != ':' || sep2 != ':' || sep3 != ':') {
     return {};
   }
-  if (inStream.status()!=QTextStream::Ok) {
+  if (inStream.status() != QTextStream::Ok) {
     return {};
   }
 
@@ -353,7 +351,7 @@ std::optional<QKeySequence> keySequenceFromV1Settings(const QString &string) {
 }
 
 QString keySequenceToV1Settings(const QKeySequence &ks) {
-  if (ks.count()!=1) {
+  if (ks.count() != 1) {
     return "";
   }
 
@@ -366,7 +364,7 @@ QString keySequenceToV1Settings(const QKeySequence &ks) {
   const auto QtCtrl = static_cast<unsigned int>(Qt::ControlModifier);
   const auto QtAlt = static_cast<unsigned int>(Qt::AltModifier);
 
-  const auto qtKeyWithoutModifier = qtKey & ~(QtShift | QtCtrl | QtAlt);
+  const auto qtKeyWithoutModifier = qtKey & ~ (QtShift | QtCtrl | QtAlt);
   const int wxKey = qtKeyToWx(static_cast<int>(qtKeyWithoutModifier));
 
   std::vector<int> modifiers;

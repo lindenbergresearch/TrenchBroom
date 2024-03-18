@@ -30,43 +30,82 @@
 
 namespace TrenchBroom {
 namespace Model {
-TEST_CASE("PortalFileTest.parseInvalidPRT1")
-{
-    const auto path = "fixture/test/Model/PortalFile/portaltest_prt1_invalid.prt";
-    CHECK(IO::Disk::withInputStream(path, [](auto &stream) {
-          return Model::loadPortalFile(stream);
-        }
-    ).is_error());
+TEST_CASE("PortalFileTest.parseInvalidPRT1") {
+const auto path = "fixture/test/Model/PortalFile/portaltest_prt1_invalid.prt";
+CHECK(IO::Disk::withInputStream(
+    path, [](auto &stream) {
+      return Model::loadPortalFile(stream);
+    }
+)
+.
+
+is_error()
+
+);
 }
 
-static const std::vector<vm::polygon3f> ExpectedPortals{{{-96, -32, 80}, {-96, 160, 80}, {0,   160, 80}, {0,   -32, 80}},
-                                                        {{208, -64, 80}, {64,  -64, 80}, {64,  160, 80}, {208, 160, 80}},
-                                                        {{64,  80,  48}, {64,  80,  16}, {64,  64,  0},  {64,  32,  0}, {64, 16, 16}, {64, 16, 48}, {64, 32, 64}, {64, 64, 64}},
-                                                        {{0,   80,  48}, {0,   80,  16}, {0,   64,  0},  {0,   32,  0}, {0,  16, 16}, {0,  16, 48}, {0,  32, 64}, {0,  64, 64}},
-                                                        {{-64, -32, 0},  {-32, -32, 0},  {-48, -32, 64}}};
+static const std::vector<vm::polygon3f> ExpectedPortals
+    {{{- 96, - 32, 80}, {- 96, 160, 80}, {0, 160, 80}, {0, - 32, 80}}, {{208, - 64, 80}, {64, - 64, 80}, {64, 160, 80}, {208, 160, 80}},
+     {{64, 80, 48}, {64, 80, 16}, {64, 64, 0}, {64, 32, 0}, {64, 16, 16}, {64, 16, 48}, {64, 32, 64}, {64, 64, 64}},
+     {{0, 80, 48}, {0, 80, 16}, {0, 64, 0}, {0, 32, 0}, {0, 16, 16}, {0, 16, 48}, {0, 32, 64}, {0, 64, 64}},
+     {{- 64, - 32, 0}, {- 32, - 32, 0}, {- 48, - 32, 64}}};
 
-TEST_CASE("PortalFileTest.parsePRT1")
-{
-    const auto path = "fixture/test/Model/PortalFile/portaltest_prt1.prt";
-    CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); }).value().portals() == ExpectedPortals);
+TEST_CASE("PortalFileTest.parsePRT1") {
+const auto path = "fixture/test/Model/PortalFile/portaltest_prt1.prt";
+CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); })
+.
+
+value()
+
+.
+
+portals()
+
+== ExpectedPortals);
 }
 
 TEST_CASE("PortalFileTest.parsePRT1Q3")
 {
-    const auto path = "fixture/test/Model/PortalFile/portaltest_prt1q3.prt";
-    CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); }).value().portals() == ExpectedPortals);
+const auto path = "fixture/test/Model/PortalFile/portaltest_prt1q3.prt";
+CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); })
+.
+
+value()
+
+.
+
+portals()
+
+== ExpectedPortals);
 }
 
 TEST_CASE("PortalFileTest.parsePRT1AM")
 {
-    const auto path = "fixture/test/Model/PortalFile/portaltest_prt1am.prt";
-    CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); }).value().portals() == ExpectedPortals);
+const auto path = "fixture/test/Model/PortalFile/portaltest_prt1am.prt";
+CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); })
+.
+
+value()
+
+.
+
+portals()
+
+== ExpectedPortals);
 }
 
 TEST_CASE("PortalFileTest.parsePRT2")
 {
-    const auto path = "fixture/test/Model/PortalFile/portaltest_prt2.prt";
-    CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); }).value().portals() == ExpectedPortals);
-}
-} // namespace Model
+const auto path = "fixture/test/Model/PortalFile/portaltest_prt2.prt";
+CHECK(IO::Disk::withInputStream(path, [](auto &stream) { return Model::loadPortalFile(stream); })
+.
+
+value()
+
+.
+
+portals()
+
+== ExpectedPortals);
+}} // namespace Model
 } // namespace TrenchBroom

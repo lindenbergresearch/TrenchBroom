@@ -32,8 +32,8 @@ namespace TrenchBroom {
 namespace IO {
 class ParserStatus;
 
-template<typename TokenType>
-class Parser {
+
+template<typename TokenType> class Parser {
 protected:
   using TokenNameMap = std::map<TokenType, std::string>;
 
@@ -50,53 +50,47 @@ protected:
   }
 
   const Token &expect(const TokenType typeMask, const Token &token) const {
-    if (!check(typeMask, token)) {
+    if (! check(typeMask, token)) {
       throw ParserException(
           token.line(), token.column(), expectString(tokenName(typeMask), token));
     }
     return token;
   }
 
-  const Token &expect(
-      ParserStatus &status, const TokenType typeMask, const Token &token) const {
-    if (!check(typeMask, token)) {
+  const Token &expect(ParserStatus &status, const TokenType typeMask, const Token &token) const {
+    if (! check(typeMask, token)) {
       expect(status, tokenName(typeMask), token);
     }
     return token;
   }
 
-  void expect(
-      ParserStatus & /* status */, const std::string &typeName, const Token &token) const {
+  void expect(ParserStatus & /* status */, const std::string &typeName, const Token &token) const {
     const std::string msg = expectString(typeName, token);
     throw ParserException(token.line(), token.column(), msg);
   }
 
   void expect(const std::string &expected, const Token &token) const {
-    if (token.data()!=expected) {
+    if (token.data() != expected) {
       throw ParserException(
-          token.line(),
-          token.column(),
-          "Expected string '" + expected + "', but got '" + token.data() + "'");
+          token.line(), token.column(), "Expected string '" + expected + "', but got '" + token.data() + "'"
+      );
     }
   }
 
   void expect(const std::vector<std::string> &expected, const Token &token) const {
     for (const auto &str : expected) {
-      if (token.data()==str) {
+      if (token.data() == str) {
         return;
       }
     }
     throw ParserException(
-        token.line(),
-        token.column(),
-        "Expected string '" + kdl::str_join(expected, "', '", "', or '", "' or '")
-            + "', but got '" + token.data() + "'");
+        token.line(), token.column(), "Expected string '" + kdl::str_join(expected, "', '", "', or '", "' or '") + "', but got '" + token.data() + "'"
+    );
   }
 
 private:
   std::string expectString(const std::string &expected, const Token &token) const {
-    return "Expected " + expected + ", but got " + tokenName(token.type())
-        + (!token.data().empty() ? " (raw data: '" + token.data() + "')" : "");
+    return "Expected " + expected + ", but got " + tokenName(token.type()) + (! token.data().empty() ? " (raw data: '" + token.data() + "')" : "");
   }
 
 protected:
@@ -106,13 +100,13 @@ protected:
 
     std::vector<std::string> names;
     for (const auto &[type, name] : m_tokenNames) {
-      if ((typeMask & type)!=0)
+      if ((typeMask & type) != 0)
         names.push_back(name);
     }
 
     if (names.empty())
       return "unknown token type";
-    if (names.size()==1)
+    if (names.size() == 1)
       return names[0];
     return kdl::str_join(names, ", ", ", or ", " or ");
   }

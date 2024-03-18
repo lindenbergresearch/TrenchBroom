@@ -29,9 +29,12 @@ namespace TrenchBroom {
 namespace Renderer {
 class FontDescriptor;
 
+
 class FontFactory;
 
+
 class TextureFont;
+
 
 class FontManager {
 private:
@@ -45,11 +48,7 @@ public:
 
   TextureFont &font(const FontDescriptor &fontDescriptor);
 
-  FontDescriptor selectFontSize(
-      const FontDescriptor &fontDescriptor,
-      const std::string &string,
-      float maxWidth,
-      size_t minFontSize);
+  FontDescriptor selectFontSize(const FontDescriptor &fontDescriptor, const std::string &string, float maxWidth, size_t minFontSize);
 
   void clearCache();
 

@@ -33,11 +33,13 @@
 #include <memory>
 #include <vector>
 
+
 class QWidget;
 
 namespace TrenchBroom {
 namespace Model {
 class BrushFaceHandle;
+
 
 class Node;
 } // namespace Model
@@ -45,7 +47,9 @@ class Node;
 namespace Renderer {
 class ActiveShader;
 
+
 class RenderBatch;
+
 
 class RenderContext;
 } // namespace Renderer
@@ -53,19 +57,27 @@ class RenderContext;
 namespace View {
 class MapDocument;
 
+
 class Selection;
+
 
 class UVRotateTool;
 
+
 class UVOriginTool;
+
 
 class UVScaleTool;
 
+
 class UVShearTool;
+
 
 class UVOffsetTool;
 
+
 class UVCameraTool;
+
 
 /**
  A view which allows the user to manipulate the texture projection interactively with the
@@ -125,17 +137,13 @@ private:
 
   class RenderTexture;
 
-  void renderTexture(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderTexture(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-  void renderFace(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderFace(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-  void renderTextureAxes(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderTextureAxes(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-  void renderToolBox(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderToolBox(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 public: // implement InputEventProcessor interface
   void processEvent(const KeyEvent &event) override;

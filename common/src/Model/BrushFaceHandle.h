@@ -26,7 +26,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 namespace TrenchBroom {
 namespace Model {
 class BrushNode;
+
+
 class BrushFace;
+
 
 /**
  * A brush face handle represents a brush face and additionally gives access to its
@@ -67,6 +70,7 @@ public:
 
   kdl_reflect_decl(BrushFaceHandle, m_node, m_faceIndex);
 };
+
 
 /**
  * Returns a vector containing the nodes contained in the given handles.

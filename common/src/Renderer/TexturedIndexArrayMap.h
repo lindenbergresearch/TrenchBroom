@@ -31,7 +31,9 @@ class Texture;
 namespace Renderer {
 class IndexArray;
 
+
 class TextureRenderFunc;
+
 
 /**
  * Manages ranges of textured primitives to be rendered using indices stored in an

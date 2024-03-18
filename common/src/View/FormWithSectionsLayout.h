@@ -28,6 +28,7 @@ namespace View {
 
 static const int RowIndent = LayoutConstants::NoMargin;
 
+
 class FormWithSectionsLayout : public QFormLayout {
 public:
   using QFormLayout::QFormLayout;
@@ -51,11 +52,9 @@ public:
 
   void insertRow(int row, QWidget *label, QLayout *field, QLayout *additional = nullptr);
 
-  void insertRow(
-      int row, const QString &labelText, QWidget *field, QWidget *additional = nullptr);
+  void insertRow(int row, const QString &labelText, QWidget *field, QWidget *additional = nullptr);
 
-  void insertRow(
-      int row, const QString &labelText, QLayout *field, QLayout *additional = nullptr);
+  void insertRow(int row, const QString &labelText, QLayout *field, QLayout *additional = nullptr);
 
   void insertRow(int row, QWidget *field, QWidget *additional = nullptr);
 

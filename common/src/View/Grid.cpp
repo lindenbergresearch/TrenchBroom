@@ -37,16 +37,15 @@
 
 namespace TrenchBroom {
 namespace View {
-Grid::Grid(const int size)
-    : m_size(size), m_snap(true), m_visible(true) {
+Grid::Grid(const int size) : m_size(size), m_snap(true), m_visible(true) {
 }
 
 FloatType Grid::actualSize(const int size) {
-  return std::exp2(float(size))*getScaleFactor();
+  return std::exp2(float(size)) * getScaleFactor();
 }
 
 const QString Grid::asString(const int size) {
-  auto gridSize = actualSize(size)/getScaleFactor();
+  auto gridSize = actualSize(size) / getScaleFactor();
   auto suffix = isMetric() ? "m" : "";
   QString str;
   str = str.sprintf("%.1f%s", gridSize, suffix);
@@ -55,19 +54,15 @@ const QString Grid::asString(const int size) {
 }
 
 bool Grid::isMetric() {
-  Preferences::LengthUnitDisplay lengthUnitDisplay =
-      (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
+  Preferences::LengthUnitDisplay lengthUnitDisplay = (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
 
-  return lengthUnitDisplay!=Preferences::Units;
+  return lengthUnitDisplay != Preferences::Units;
 }
 
 float Grid::getScaleFactor() {
-  Preferences::LengthUnitDisplay lengthUnitDisplay =
-      (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
+  Preferences::LengthUnitDisplay lengthUnitDisplay = (Preferences::LengthUnitDisplay) pref(Preferences::GridUnitSystem);
 
-  return lengthUnitDisplay==Preferences::Units
-         ? 1.0f
-         : pref(Preferences::MetricConversationFactor);
+  return lengthUnitDisplay == Preferences::Units ? 1.0f : pref(Preferences::MetricConversationFactor);
 }
 
 int Grid::size() const {
@@ -83,14 +78,14 @@ void Grid::setSize(const int size) {
 
 void Grid::incSize() {
   if (m_size < MaxSize) {
-    ++m_size;
+    ++ m_size;
     gridDidChangeNotifier();
   }
 }
 
 void Grid::decSize() {
   if (m_size > MinSize) {
-    --m_size;
+    -- m_size;
     gridDidChangeNotifier();
   }
 }
@@ -111,7 +106,7 @@ bool Grid::visible() const {
 }
 
 void Grid::toggleVisible() {
-  m_visible = !m_visible;
+  m_visible = ! m_visible;
   gridDidChangeNotifier();
 }
 
@@ -120,32 +115,27 @@ bool Grid::snap() const {
 }
 
 void Grid::toggleSnap() {
-  m_snap = !m_snap;
+  m_snap = ! m_snap;
   gridDidChangeNotifier();
 }
 
 FloatType Grid::intersectWithRay(const vm::ray3 &ray, const size_t skip) const {
   vm::vec3 planeAnchor;
 
-  for (size_t i = 0; i < 3; ++i) {
-    planeAnchor[i] =
-        ray.direction[i] > 0.0
-        ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip)*actualSize()
-        : snapDown(ray.origin[i], true) - static_cast<FloatType>(skip)*actualSize();
+  for (size_t i = 0; i < 3; ++ i) {
+    planeAnchor[i] = ray.direction[i] > 0.0 ? snapUp(ray.origin[i], true) + static_cast<FloatType>(skip) * actualSize() : snapDown(ray.origin[i], true)
+        - static_cast<FloatType>(skip) * actualSize();
   }
 
-  const auto distX =
-      vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_x()));
-  const auto distY =
-      vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_y()));
-  const auto distZ =
-      vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_z()));
+  const auto distX = vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_x()));
+  const auto distY = vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_y()));
+  const auto distZ = vm::intersect_ray_plane(ray, vm::plane3(planeAnchor, vm::vec3::pos_z()));
 
   auto dist = distX;
-  if (!vm::is_nan(distY) && (vm::is_nan(dist) || std::abs(distY) < std::abs(dist))) {
+  if (! vm::is_nan(distY) && (vm::is_nan(dist) || std::abs(distY) < std::abs(dist))) {
     dist = distY;
   }
-  if (!vm::is_nan(distZ) && (vm::is_nan(dist) || std::abs(distZ) < std::abs(dist))) {
+  if (! vm::is_nan(distZ) && (vm::is_nan(dist) || std::abs(distZ) < std::abs(dist))) {
     dist = distZ;
   }
   return dist;
@@ -155,10 +145,8 @@ vm::vec3 Grid::moveDeltaForPoint(const vm::vec3 &point, const vm::vec3 &delta) c
   const auto newPoint = snap(point + delta);
   auto actualDelta = newPoint - point;
 
-  for (size_t i = 0; i < 3; ++i) {
-    if (
-        (actualDelta[i] > static_cast<FloatType>(0.0))
-            !=(delta[i] > static_cast<FloatType>(0.0))) {
+  for (size_t i = 0; i < 3; ++ i) {
+    if ((actualDelta[i] > static_cast<FloatType>(0.0)) != (delta[i] > static_cast<FloatType>(0.0))) {
       actualDelta[i] = static_cast<FloatType>(0.0);
     }
   }
@@ -185,11 +173,7 @@ vm::vec3 Grid::moveDeltaForPoint(const vm::vec3 &point, const vm::vec3 &delta) c
  * an entity from the entity browser onto the map, the mouse is always grabbing the edge
  * of the entity bbox that's closest to the camera.
  */
-vm::vec3 Grid::moveDeltaForBounds(
-    const vm::plane3 &targetPlane,
-    const vm::bbox3 &bounds,
-    const vm::bbox3 & /* worldBounds */,
-    const vm::ray3 &ray) const {
+vm::vec3 Grid::moveDeltaForBounds(const vm::plane3 &targetPlane, const vm::bbox3 &bounds, const vm::bbox3 & /* worldBounds */, const vm::ray3 &ray) const {
   // First, find the ray/plane intersection, and snap it to grid.
   // This will become one of the corners of our resulting bbox.
   // Note that this means we might let the box clip into the plane somewhat.
@@ -202,11 +186,9 @@ vm::vec3 Grid::moveDeltaForBounds(
   const size_t localX = vm::find_abs_max_component(targetPlane.normal, 1);
   const size_t localY = vm::find_abs_max_component(targetPlane.normal, 2);
 
-  vm::vec3 firstCorner = snapTowards(hitPoint, -ray.direction);
+  vm::vec3 firstCorner = snapTowards(hitPoint, - ray.direction);
   if (vm::is_equal(
-      targetPlane.normal,
-      vm::get_abs_max_component_axis(targetPlane.normal),
-      vm::C::almost_zero())) {
+      targetPlane.normal, vm::get_abs_max_component_axis(targetPlane.normal), vm::C::almost_zero())) {
     // targetPlane is axial. As a special case, only snap X and Y
     firstCorner[localZ] = hitPoint[localZ];
   }
@@ -250,22 +232,21 @@ FloatType Grid::snapToGridPlane(const vm::line3 &line, const FloatType distance)
   const auto c = snap(x);
 
   // intersect l with every grid plane that meets at that corner
-  for (size_t i = 0; i < 3; ++i) {
+  for (size_t i = 0; i < 3; ++ i) {
     const auto p = vm::plane3{c, vm::vec3::axis(i)};
     const auto y = vm::intersect_line_plane(line, p);
-    if (!vm::is_nan(y) && vm::abs(y - distance) < vm::abs(snappedDistance - distance)) {
+    if (! vm::is_nan(y) && vm::abs(y - distance) < vm::abs(snappedDistance - distance)) {
       snappedDistance = y;
     }
   }
 
-  assert(!vm::is_nan(snappedDistance));
+  assert(! vm::is_nan(snappedDistance));
   return snappedDistance;
 }
 
-FloatType Grid::snapMoveDistanceForFace(
-    const Model::BrushFace &face, const FloatType moveDistance) const {
+FloatType Grid::snapMoveDistanceForFace(const Model::BrushFace &face, const FloatType moveDistance) const {
   const auto isBoundaryEdge = [&](const Model::BrushEdge *edge) {
-    return edge->firstFace()==face.geometry() || edge->secondFace()==face.geometry();
+    return edge->firstFace() == face.geometry() || edge->secondFace() == face.geometry();
   };
 
   const auto &moveDirection = face.normal();
@@ -274,25 +255,22 @@ FloatType Grid::snapMoveDistanceForFace(
   for (const auto *vertex : face.vertices()) {
     const auto *currentHalfEdge = vertex->leaving();
     do {
-      if (!isBoundaryEdge(currentHalfEdge->edge())) {
+      if (! isBoundaryEdge(currentHalfEdge->edge())) {
         // compute how far the vertex has to move along its edge vector to hit a grid
         // plane
         const auto edgeDirection = vm::normalize(currentHalfEdge->vector());
-        const auto distanceOnEdge = moveDistance/vm::dot(edgeDirection, moveDirection);
+        const auto distanceOnEdge = moveDistance / vm::dot(edgeDirection, moveDirection);
         const auto line = vm::line3{currentHalfEdge->origin()->position(), edgeDirection};
         const auto snappedDistanceOnEdge = snapToGridPlane(line, distanceOnEdge);
 
         // convert this to a movement along moveDirection and minimize the difference
-        const auto snappedMoveDistanceForEdge =
-            snappedDistanceOnEdge*vm::dot(edgeDirection, moveDirection);
-        if (
-            vm::abs(snappedMoveDistanceForEdge - moveDistance)
-                < vm::abs(snappedMoveDistance - moveDistance)) {
+        const auto snappedMoveDistanceForEdge = snappedDistanceOnEdge * vm::dot(edgeDirection, moveDirection);
+        if (vm::abs(snappedMoveDistanceForEdge - moveDistance) < vm::abs(snappedMoveDistance - moveDistance)) {
           snappedMoveDistance = snappedMoveDistanceForEdge;
         }
       }
       currentHalfEdge = currentHalfEdge->nextIncident();
-    } while (currentHalfEdge!=vertex->leaving());
+    } while (currentHalfEdge != vertex->leaving());
   }
 
   return snappedMoveDistance;

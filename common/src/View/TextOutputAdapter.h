@@ -25,6 +25,7 @@
 
 #include <TrenchBroomApp.h>
 
+
 class QTextEdit;
 
 namespace TrenchBroom {
@@ -60,8 +61,7 @@ private:
 public:
   explicit TextOutputAdapter(QTextEdit *textEdit);
 
-  template<typename T>
-  void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
+  template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
     QString string;
     QTextStream stream(&string);
     stream << t;
@@ -79,8 +79,7 @@ public:
    * Appends the given value to the text widget.
    * Objects are formatted using QTextStream.
    */
-  template<typename T>
-  TextOutputAdapter &operator<<(const T &t) {
+  template<typename T> TextOutputAdapter &operator<<(const T &t) {
     QString string;
     QTextStream stream(&string);
     stream << t;

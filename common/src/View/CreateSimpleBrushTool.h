@@ -28,6 +28,7 @@ namespace TrenchBroom {
 namespace View {
 class MapDocument;
 
+
 class CreateSimpleBrushTool : public CreateBrushToolBase {
 public:
   explicit CreateSimpleBrushTool(std::weak_ptr<MapDocument> document);

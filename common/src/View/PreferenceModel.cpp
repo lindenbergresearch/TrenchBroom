@@ -11,8 +11,7 @@
 
 namespace TrenchBroom::View {
 
-PreferenceModel::PreferenceModel(QObject *parent)
-    : QAbstractTableModel(parent) {
+PreferenceModel::PreferenceModel(QObject *parent) : QAbstractTableModel(parent) {
   initialize();
 }
 
@@ -26,9 +25,8 @@ int PreferenceModel::columnCount(const QModelIndex &parent) const {
   return Columns::count;
 }
 
-QVariant PreferenceModel::headerData(
-    int section, Qt::Orientation orientation, int role) const {
-  if (orientation==Qt::Horizontal && role==Qt::DisplayRole && section < count) {
+QVariant PreferenceModel::headerData(int section, Qt::Orientation orientation, int role) const {
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < count) {
     return columnNames[section];
   }
 
@@ -36,18 +34,17 @@ QVariant PreferenceModel::headerData(
 }
 
 QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
-  auto valid =
-      index.isValid() && index.column() < count && index.row() < int(data().size());
+  auto valid = index.isValid() && index.column() < count && index.row() < int(data().size());
 
   auto preferenceBase = data().at(size_t(index.row()));
 
-  if (!valid) {
+  if (! valid) {
     return QVariant{};
   }
 
   auto info = getInfo(preferenceBase);
 
-  if (role==Qt::DisplayRole) {
+  if (role == Qt::DisplayRole) {
     switch (index.column()) {
     case Index:return QString{}.sprintf("%d", index.row());
     case Context:return QString::fromStdString(kdl::path_front(preferenceBase->path()).string());
@@ -62,9 +59,9 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
   }
 
   // font role
-  if (role==Qt::FontRole) {
+  if (role == Qt::FontRole) {
     // default
-    if (index.column()==Value || index.column()==Default) {
+    if (index.column() == Value || index.column() == Default) {
       auto font = TrenchBroomApp::instance().getConsoleFont();
       font.setPointSize(QFont{}.pointSize());
       return font;
@@ -72,17 +69,14 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
   }
 
   // set foreground color
-  if (role==Qt::ForegroundRole) {
+  if (role == Qt::ForegroundRole) {
     // invalid
-    if (
-        !preferenceBase->valid()
-            && (index.column()==Value || index.column()==Default || index.column()==Type)) {
+    if (! preferenceBase->valid() && (index.column() == Value || index.column() == Default || index.column() == Type)) {
       return QBrush(COLOR_ROLE(BrightText));
     }
 
     // default value was overwritten
-    if (
-        preferenceBase->valid() && !preferenceBase->isDefault() && index.column()==Value) {
+    if (preferenceBase->valid() && ! preferenceBase->isDefault() && index.column() == Value) {
       auto highlightColor = COLOR_ROLE(Highlight);
       return QBrush{highlightColor};
     }
@@ -96,8 +90,7 @@ bool PreferenceModel::setData(const QModelIndex &index, const QVariant &value, i
 }
 
 Qt::ItemFlags PreferenceModel::flags(const QModelIndex &index) const {
-  auto valid =
-      index.isValid() && index.column() < count && index.row() < int(data().size());
+  auto valid = index.isValid() && index.column() < count && index.row() < int(data().size());
 
   auto preferenceBase = data().at(size_t(index.row()));
 
@@ -113,9 +106,9 @@ void PreferenceModel::initialize() {
   auto ref = Preferences::staticPreferences();
   std::copy_if(
       ref.begin(), ref.end(), std::back_inserter(m_preferences), [](PreferenceBase *base) {
-        return !dynamic_cast<Preference<Color> *>(base)
-            && !dynamic_cast<Preference<QKeySequence> *>(base);
-      });
+        return ! dynamic_cast<Preference<Color> *>(base) && ! dynamic_cast<Preference<QKeySequence> *>(base);
+      }
+  );
 }
 
 std::vector<PreferenceBase *> PreferenceModel::data() const {
@@ -131,7 +124,7 @@ StringTuple3 PreferenceModel::getInfo(PreferenceBase *preferenceBase) const {
   QString value = "nothing";
   QString defaultValue = "nothing";
 
-  if (preferenceBase==nullptr) {
+  if (preferenceBase == nullptr) {
     name = "NULL";
     value = "-";
     defaultValue = "-";
@@ -145,8 +138,7 @@ StringTuple3 PreferenceModel::getInfo(PreferenceBase *preferenceBase) const {
     defaultValue = preference->defaultValue() ? "true" : "false";
   }
 
-  if (
-      Preference<QString> *preference = dynamic_cast<Preference<QString> *>(preferenceBase)) {
+  if (Preference<QString> *preference = dynamic_cast<Preference<QString> *>(preferenceBase)) {
     name = "QString";
     value = pref(*preference);
     defaultValue = preference->defaultValue();
@@ -178,17 +170,13 @@ StringTuple3 PreferenceModel::getInfo(PreferenceBase *preferenceBase) const {
     defaultValue = defaultColor.name().toUpper();
   }
 
-  if (
-      Preference<std::filesystem::path> *preference =
-          dynamic_cast<Preference<std::filesystem::path> *>(preferenceBase)) {
+  if (Preference<std::filesystem::path> *preference = dynamic_cast<Preference<std::filesystem::path> *>(preferenceBase)) {
     name = "path";
     value = QString::fromStdString(pref(*preference).string());
     defaultValue = QString::fromStdString(preference->defaultValue().string());
   };
 
-  if (
-      Preference<QKeySequence> *preference =
-          dynamic_cast<Preference<QKeySequence> *>(preferenceBase)) {
+  if (Preference<QKeySequence> *preference = dynamic_cast<Preference<QKeySequence> *>(preferenceBase)) {
     name = "QKeySequence";
     value = pref(*preference).toString();
     defaultValue = preference->defaultValue().toString();

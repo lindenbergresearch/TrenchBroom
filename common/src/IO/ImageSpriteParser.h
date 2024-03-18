@@ -27,7 +27,10 @@
 
 namespace TrenchBroom::IO {
 class File;
+
+
 class FileSystem;
+
 
 class ImageSpriteParser : public EntityModelParser {
 private:
@@ -42,7 +45,7 @@ public:
 
 private:
   std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
-  void doLoadFrame(
-      size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+
+  void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 };
 } // namespace TrenchBroom::IO

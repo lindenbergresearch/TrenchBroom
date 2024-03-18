@@ -34,7 +34,10 @@
 
 namespace TrenchBroom::IO {
 class CFile;
+
+
 class File;
+
 
 using GetImageFile = std::function<Result<std::shared_ptr<File>>()>;
 
@@ -51,6 +54,7 @@ struct ImageDirectoryEntry {
   std::vector<ImageEntry> entries;
 };
 
+
 class ImageFileSystemBase : public FileSystem {
 protected:
   ImageEntry m_root;
@@ -60,8 +64,7 @@ protected:
 public:
   ~ImageFileSystemBase() override;
 
-  Result<std::filesystem::path> makeAbsolute(
-      const std::filesystem::path &path) const override;
+  Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
   /**
    * Reload this file system.
@@ -74,28 +77,26 @@ protected:
   PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 private:
-  Result<std::vector<std::filesystem::path>> doFind(
-      const std::filesystem::path &path, TraversalMode traversalMode) const override;
-  Result<std::shared_ptr<File>> doOpenFile(
-      const std::filesystem::path &path) const override;
+  Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
+
+  Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
 
   virtual Result<void> doReadDirectory() = 0;
 };
 
-template<typename FileType>
-class ImageFileSystem : public ImageFileSystemBase {
+
+template<typename FileType> class ImageFileSystem : public ImageFileSystemBase {
 protected:
   std::shared_ptr<FileType> m_file;
 
 public:
-  explicit ImageFileSystem(std::shared_ptr<FileType> file)
-      : m_file{std::move(file)} {
+  explicit ImageFileSystem(std::shared_ptr<FileType> file) : m_file{std::move(file)} {
     ensure(m_file, "file must not be null");
   }
 };
 
-template<typename T, typename... Args>
-Result<std::unique_ptr<T>> createImageFileSystem(Args &&... args) {
+
+template<typename T, typename... Args> Result<std::unique_ptr<T>> createImageFileSystem(Args &&... args) {
   auto fs = std::make_unique<T>(std::forward<Args>(args)...);
   return fs->reload().transform([&]() { return std::move(fs); });
 }

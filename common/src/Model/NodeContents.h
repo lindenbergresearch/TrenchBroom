@@ -41,6 +41,7 @@ public:
   explicit NodeContents(std::variant<Layer, Group, Entity, Brush, BezierPatch> contents);
 
   const std::variant<Layer, Group, Entity, Brush, BezierPatch> &get() const;
+
   std::variant<Layer, Group, Entity, Brush, BezierPatch> &get();
 };
 } // namespace Model

@@ -53,7 +53,7 @@ std::filesystem::path appDirectory() {
 
 std::filesystem::path userDataDirectory() {
   if (isPortable()) {
-    return appDirectory()/"config";
+    return appDirectory() / "config";
   }
 #if defined __linux__ || defined __FreeBSD__
   // Compatibility with wxWidgets
@@ -65,46 +65,44 @@ std::filesystem::path userDataDirectory() {
 }
 
 std::filesystem::path logFilePath() {
-  return userDataDirectory()/"TrenchBroom.log";
+  return userDataDirectory() / "TrenchBroom.log";
 }
 
 std::filesystem::path findResourceFile(const std::filesystem::path &file) {
   // Special case for running debug builds on Linux, we want to search
   // next to the executable for resources
-  const auto relativeToExecutable = appDirectory()/file;
-  if (Disk::pathInfo(relativeToExecutable)==PathInfo::File) {
+  const auto relativeToExecutable = appDirectory() / file;
+  if (Disk::pathInfo(relativeToExecutable) == PathInfo::File) {
     return relativeToExecutable;
   }
 
   // Compatibility with wxWidgets
-  const auto inUserDataDir = userDataDirectory()/file;
-  if (Disk::pathInfo(inUserDataDir)==PathInfo::File) {
+  const auto inUserDataDir = userDataDirectory() / file;
+  if (Disk::pathInfo(inUserDataDir) == PathInfo::File) {
     return inUserDataDir;
   }
 
-  return IO::pathFromQString(QStandardPaths::locate(
-      QStandardPaths::AppDataLocation,
-      IO::pathAsQString(file),
-      QStandardPaths::LocateOption::LocateFile));
+  return IO::pathFromQString(
+      QStandardPaths::locate(
+          QStandardPaths::AppDataLocation, IO::pathAsQString(file), QStandardPaths::LocateOption::LocateFile
+      ));
 }
 
-std::vector<std::filesystem::path> findResourceDirectories(
-    const std::filesystem::path &directory) {
+std::vector<std::filesystem::path> findResourceDirectories(const std::filesystem::path &directory) {
   auto result = std::vector<std::filesystem::path>{
       // Special case for running debug builds on Linux
-      appDirectory()/directory,
+      appDirectory() / directory,
       // Compatibility with wxWidgets
-      userDataDirectory()/directory,
+      userDataDirectory() / directory,
   };
 
   const auto dirs = QStandardPaths::locateAll(
-      QStandardPaths::AppDataLocation,
-      IO::pathAsQString(directory),
-      QStandardPaths::LocateOption::LocateDirectory);
+      QStandardPaths::AppDataLocation, IO::pathAsQString(directory), QStandardPaths::LocateOption::LocateDirectory
+  );
 
   for (const auto &dir : dirs) {
     const auto path = IO::pathFromQString(dir);
-    if (std::find(result.begin(), result.end(), path)==result.end()) {
+    if (std::find(result.begin(), result.end(), path) == result.end()) {
       result.push_back(path);
     }
   }

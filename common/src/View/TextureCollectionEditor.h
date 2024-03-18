@@ -27,7 +27,10 @@
 #include <memory>
 #include <vector>
 
+
 class QListWidget;
+
+
 class QAbstractButton;
 
 namespace TrenchBroom::Model {
@@ -36,6 +39,7 @@ class Node;
 
 namespace TrenchBroom::View {
 class MapDocument;
+
 
 class TextureCollectionEditor : public QWidget {
 Q_OBJECT
@@ -52,38 +56,52 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  explicit TextureCollectionEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit TextureCollectionEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void addSelectedTextureCollections();
+
   void removeSelectedTextureCollections();
+
   void reloadTextureCollections();
+
   void availableTextureCollectionSelectionChanged();
+
   void enabledTextureCollectionSelectionChanged();
 
   bool canAddTextureCollections() const;
+
   bool canRemoveTextureCollections() const;
+
   bool canReloadTextureCollections() const;
 
 private:
   void createGui();
+
   void updateButtons();
 
   void connectObservers();
 
   void documentWasNewedOrLoaded(MapDocument *);
+
   void nodesDidChange(const std::vector<Model::Node *> &nodes);
+
   void textureCollectionsDidChange();
+
   void modsDidChange();
+
   void preferenceDidChange(const std::filesystem::path &path);
 
   void updateAllTextureCollections();
+
   void updateAvailableTextureCollections();
+
   void updateEnabledTextureCollections();
+
   void updateListBox(QListWidget *box, const std::vector<std::filesystem::path> &paths);
 
   std::vector<std::filesystem::path> availableTextureCollections() const;
+
   std::vector<std::filesystem::path> enabledTextureCollections() const;
 };
 

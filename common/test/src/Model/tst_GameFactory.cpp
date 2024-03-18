@@ -34,9 +34,10 @@ static const auto userPath = std::filesystem::path{"user"};
 
 namespace {
 void setupTestEnvironment(IO::TestEnvironment &env) {
-    env.createDirectory(gamesPath);
-    env.createDirectory(gamesPath / "Quake");
-    env.createFile(gamesPath / "Quake/GameConfig.cfg", R"({
+  env.createDirectory(gamesPath);
+  env.createDirectory(gamesPath / "Quake");
+  env.createFile(
+      gamesPath / "Quake/GameConfig.cfg", R"({
     "version": 8,
     "name": "Quake",
     "icon": "Icon.png",
@@ -63,11 +64,12 @@ void setupTestEnvironment(IO::TestEnvironment &env) {
         "brushface": []
     }
 })"
-    );
+  );
 
-    env.createDirectory(userPath);
-    env.createDirectory(userPath / "Quake");
-    env.createFile(userPath / "Quake/CompilationProfiles.cfg", R"({
+  env.createDirectory(userPath);
+  env.createDirectory(userPath / "Quake");
+  env.createFile(
+      userPath / "Quake/CompilationProfiles.cfg", R"({
     "profiles": [
         {
             "name": "Full Compile",
@@ -82,9 +84,10 @@ void setupTestEnvironment(IO::TestEnvironment &env) {
     ],
     "version": 1
 })"
-    );
+  );
 
-    env.createFile(userPath / "Quake/GameEngineProfiles.cfg", R"({
+  env.createFile(
+      userPath / "Quake/GameEngineProfiles.cfg", R"({
     "profiles": [
         {
             "name": "QuakeSpasm",
@@ -94,18 +97,20 @@ void setupTestEnvironment(IO::TestEnvironment &env) {
     ],
     "version": 1
 })"
-    );
+  );
 
-    // This config will fail to parse and should be ignored
-    env.createDirectory(gamesPath / "Quake 2");
-    env.createFile(gamesPath / "Quake 2/GameConfig.cfg", R"({
+  // This config will fail to parse and should be ignored
+  env.createDirectory(gamesPath / "Quake 2");
+  env.createFile(
+      gamesPath / "Quake 2/GameConfig.cfg", R"({
     asdf
 })"
-    );
+  );
 
-    env.createDirectory(gamesPath);
-    env.createDirectory(gamesPath / "Quake 3");
-    env.createFile(gamesPath / "Quake 3/GameConfig.cfg", R"({
+  env.createDirectory(gamesPath);
+  env.createDirectory(gamesPath / "Quake 3");
+  env.createFile(
+      gamesPath / "Quake 3/GameConfig.cfg", R"({
     "version": 8,
     "name": "Quake 3",
     "icon": "Icon.png",
@@ -133,25 +138,28 @@ void setupTestEnvironment(IO::TestEnvironment &env) {
       "brush" : [], "brushface" : []
     }
 })"
-    );
+  );
 
-    env.createDirectory(userPath);
-    env.createDirectory(userPath / "Quake 3");
+  env.createDirectory(userPath);
+  env.createDirectory(userPath / "Quake 3");
 
-    // This config will fail to parse and should be ignored
-    env.createFile(userPath / "Quake 3/CompilationProfiles.cfg", R"({
+  // This config will fail to parse and should be ignored
+  env.createFile(
+      userPath / "Quake 3/CompilationProfiles.cfg", R"({
     asdf
 })"
-    );
+  );
 
-    // This config will fail to parse and should be ignored
-    env.createFile(userPath / "Quake 3/GameEngineProfiles.cfg", R"({
+  // This config will fail to parse and should be ignored
+  env.createFile(
+      userPath / "Quake 3/GameEngineProfiles.cfg", R"({
     asdf
 })"
-    );
+  );
 
-    env.createDirectory(gamesPath / "Daikatana");
-    env.createFile(gamesPath / "Daikatana/GameConfig.cfg", R"({
+  env.createDirectory(gamesPath / "Daikatana");
+  env.createFile(
+      gamesPath / "Daikatana/GameConfig.cfg", R"({
     "version": 8,
     "name": "Daikatana",
     "icon": "Icon.png",
@@ -178,73 +186,195 @@ void setupTestEnvironment(IO::TestEnvironment &env) {
         "brushface": []
     }
 })"
-    );
+  );
 }
 } // namespace
 
-TEST_CASE("GameFactory")
+TEST_CASE("GameFactory") {
+auto env = IO::TestEnvironment{setupTestEnvironment};
+auto &gameFactory = GameFactory::instance();
+gameFactory.
+
+reset();
+
+SECTION("initialize") {
+CHECK(gameFactory
+.initialize( {{
+env.
+
+dir()
+
+/ gamesPath
+}
+, env.
+
+dir()
+
+/ userPath}).
+
+is_success()
+
+);
+
+CHECK(gameFactory
+.
+
+userGameConfigsPath()
+
+== env.
+
+dir()
+
+/ userPath);
+CHECK(gameFactory
+.
+
+gameList()
+
+== std::vector<std::string>{
+"Daikatana", "Quake", "Quake 3",});
+
+const auto &quakeConfig = gameFactory.gameConfig("Quake");
+CHECK(quakeConfig
+.name == "Quake");
+CHECK(quakeConfig
+.compilationConfig.profiles.
+
+size()
+
+== 1);
+CHECK(quakeConfig
+.gameEngineConfig.profiles.
+
+size()
+
+== 1);
+
+const auto &quake3Config = gameFactory.gameConfig("Quake 3");
+CHECK(quake3Config
+.name == "Quake 3");
+CHECK(quake3Config
+.compilationConfig.profiles.
+
+empty()
+
+);
+CHECK(quake3Config
+.gameEngineConfig.profiles.
+
+empty()
+
+);
+}
+
+SECTION("saveCompilationConfig")
 {
-    auto env = IO::TestEnvironment{setupTestEnvironment};
-    auto &gameFactory = GameFactory::instance();
-    gameFactory.reset();
+REQUIRE(gameFactory
+.initialize({
+{
+env.
 
-    SECTION("initialize")
-    {
-        CHECK(gameFactory.initialize({{env.dir() / gamesPath}, env.dir() / userPath}).is_success());
+dir()
 
-        CHECK(gameFactory.userGameConfigsPath() == env.dir() / userPath);
-        CHECK(gameFactory.gameList() == std::vector<std::string>{"Daikatana", "Quake", "Quake 3",});
+/ gamesPath}, env.
 
-        const auto &quakeConfig = gameFactory.gameConfig("Quake");
-        CHECK(quakeConfig.name == "Quake");
-        CHECK(quakeConfig.compilationConfig.profiles.size() == 1);
-        CHECK(quakeConfig.gameEngineConfig.profiles.size() == 1);
+dir()
 
-        const auto &quake3Config = gameFactory.gameConfig("Quake 3");
-        CHECK(quake3Config.name == "Quake 3");
-        CHECK(quake3Config.compilationConfig.profiles.empty());
-        CHECK(quake3Config.gameEngineConfig.profiles.empty());
-    }
+/ userPath}).
 
-    SECTION("saveCompilationConfig")
-    {
-        REQUIRE(gameFactory.initialize({{env.dir() / gamesPath}, env.dir() / userPath}).is_success());
+is_success()
 
-        REQUIRE(gameFactory.gameList() == std::vector<std::string>{"Daikatana", "Quake", "Quake 3",});
+);
 
-        auto logger = NullLogger{};
-        gameFactory.saveCompilationConfig("Daikatana", {{{"name", "workDir", {}}}}, logger);
-        CHECK(env.fileExists(userPath / "Daikatana/CompilationProfiles.cfg"));
-    }
+REQUIRE(gameFactory
+.
 
-    SECTION("saveGameEngineConfig")
-    {
-        REQUIRE(gameFactory.initialize({{env.dir() / gamesPath}, env.dir() / userPath}).is_success());
+gameList()
 
-        REQUIRE(gameFactory.gameList() == std::vector<std::string>{"Daikatana", "Quake", "Quake 3",});
+== std::vector<std::string>{
+"Daikatana", "Quake", "Quake 3",});
 
-        auto logger = NullLogger{};
-        gameFactory.saveGameEngineConfig("Daikatana", {{{"name", "path", "parameters"}}}, logger);
-        CHECK(env.fileExists(userPath / "Daikatana/GameEngineProfiles.cfg"));
-    }
+auto logger = NullLogger{};
+gameFactory.saveCompilationConfig("Daikatana", {
+{
+{
+"name", "workDir", {
+}}}}, logger);
+CHECK(env
+.
+fileExists(userPath
+/ "Daikatana/CompilationProfiles.cfg"));
+}
 
-    SECTION("detectGame")
-    {
-        using namespace std::string_literals;
+SECTION("saveGameEngineConfig")
+{
+REQUIRE(gameFactory
+.initialize({
+{
+env.
 
-        REQUIRE_NOTHROW(gameFactory.initialize({{env.dir() / gamesPath}, env.dir() / userPath}));
+dir()
 
-        const auto detectGame = [&](const auto &mapFile) {
-          return env.withTempFile(mapFile, [&](const auto &path) { return gameFactory.detectGame(path); });
-        };
+/ gamesPath}, env.
 
-        CHECK(detectGame(R"(// Game: Quake
+dir()
+
+/ userPath}).
+
+is_success()
+
+);
+
+REQUIRE(gameFactory
+.
+
+gameList()
+
+== std::vector<std::string>{
+"Daikatana", "Quake", "Quake 3",});
+
+auto logger = NullLogger{};
+gameFactory.saveGameEngineConfig("Daikatana", {
+{
+{
+"name", "path", "parameters"}}}, logger);
+CHECK(env
+.
+fileExists(userPath
+/ "Daikatana/GameEngineProfiles.cfg"));
+}
+
+SECTION("detectGame")
+{
+using namespace std::string_literals;
+
+REQUIRE_NOTHROW(gameFactory
+.initialize({
+{
+env.
+
+dir()
+
+/ gamesPath}, env.
+
+dir()
+
+/ userPath}));
+
+const auto detectGame = [&](const auto &mapFile) {
+  return env.withTempFile(mapFile, [&](const auto &path) { return gameFactory.detectGame(path); });
+};
+
+CHECK(detectGame(
+    R"(// Game: Quake
 // Format: Quake2
 )"
-        ) == std::pair{"Quake"s, MapFormat::Quake2});
+)
+== std::pair{
+"Quake"s, MapFormat::Quake2});
 
-
-        CHECK(detectGame(R"(// Game: Quake
+CHECK(detectGame(
+    R"(// Game: Quake
 // Format: Quake2
 {
 "classname" "worldspawn"
@@ -257,8 +387,9 @@ TEST_CASE("GameFactory")
 ( -896 1056 -416 ) ( -896 1056 -448 ) ( -896 1344 -448 ) rtz/c_mf_v3c 16 96 0 1 1 0 0 0
 }
 })"
-        ) == std::pair{"Quake"s, MapFormat::Quake2});
-    }
-} // namespace
+)
+== std::pair{
+"Quake"s, MapFormat::Quake2});
+}} // namespace
 
 } // namespace TrenchBroom::Model

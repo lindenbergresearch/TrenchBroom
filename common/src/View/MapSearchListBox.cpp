@@ -43,15 +43,15 @@ void SearchListBoxItemRenderer::updateItem() {
 }
 
 bool SearchListBoxItemRenderer::eventFilter(QObject *target, QEvent *event) {
-  if (event->type()==QEvent::MouseButtonDblClick) {
+  if (event->type() == QEvent::MouseButtonDblClick) {
     auto *mouseEvent = static_cast<QMouseEvent *>(event);
-    if (mouseEvent->button()==Qt::LeftButton) {
+    if (mouseEvent->button() == Qt::LeftButton) {
       //   emit layerDoubleClicked(m_layer);
       return true;
     }
-  } else if (event->type()==QEvent::MouseButtonRelease) {
+  } else if (event->type() == QEvent::MouseButtonRelease) {
     auto *mouseEvent = static_cast<QMouseEvent *>(event);
-    if (mouseEvent->button()==Qt::RightButton) {
+    if (mouseEvent->button() == Qt::RightButton) {
       //  emit layerRightClicked(m_layer);
       return true;
     }
@@ -63,22 +63,22 @@ bool SearchListBoxItemRenderer::eventFilter(QObject *target, QEvent *event) {
 QLabel *SearchListBoxItemRenderer::getNameText() const {
   return m_nameText;
 }
+
 void SearchListBoxItemRenderer::setNameText(QLabel *MNameText) {
   m_nameText = MNameText;
 }
+
 QLabel *SearchListBoxItemRenderer::getInfoText() const {
   return m_infoText;
 }
+
 void SearchListBoxItemRenderer::setInfoText(QLabel *MInfoText) {
   m_infoText = MInfoText;
 }
 
 /* ---------------------------------------------------------------------------- */
 
-MapSearchListBox::MapSearchListBox(std::weak_ptr<MapDocument> document, QWidget *parent) :
-    ControlListBox("", true, parent), m_document(std::move(document)) {
-
-
+MapSearchListBox::MapSearchListBox(std::weak_ptr<MapDocument> document, QWidget *parent) : ControlListBox("", true, parent), m_document(std::move(document)) {
 
 }
 
@@ -86,7 +86,6 @@ ControlListBoxItemRenderer *MapSearchListBox::createItemRenderer(QWidget *parent
   auto document = kdl::mem_lock(m_document);
 
   auto renderer = new SearchListBoxItemRenderer{document, new QLabel{tr("Test Item _ bla")}, new QLabel{tr("This is at (123 12 42)")}, parent};
-
 
   return renderer;
 }

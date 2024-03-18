@@ -23,6 +23,7 @@
 
 #include <vector>
 
+
 class QColor;
 
 namespace TrenchBroom {

@@ -35,9 +35,8 @@
 #include "View/ViewConstants.h"
 
 namespace TrenchBroom::View {
-WelcomeWindow::WelcomeWindow()
-    : QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr},
-      m_openOtherDocumentButton{nullptr} {
+WelcomeWindow::WelcomeWindow() :
+    QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
   createGui();
 }
 
@@ -51,10 +50,8 @@ void WelcomeWindow::createGui() {
   //  QSizePolicy::Expanding);
 
   connect(
-      m_recentDocumentListBox,
-      &RecentDocumentListBox::loadRecentDocument,
-      this,
-      &WelcomeWindow::openDocument);
+      m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument
+  );
 
   auto panelLayout = new QVBoxLayout;
   panelLayout->setContentsMargins(0, 0, 0, 0);
@@ -99,22 +96,17 @@ QWidget *WelcomeWindow::createAppPanel() {
   m_quitApplicationButton->setToolTip("Quit Trenchbroom.");
 
   connect(
-      m_createNewDocumentButton,
-      &QPushButton::clicked,
-      this,
-      &WelcomeWindow::createNewDocument);
+      m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument
+  );
   connect(
-      m_openOtherDocumentButton,
-      &QPushButton::clicked,
-      this,
-      &WelcomeWindow::openOtherDocument);
+      m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument
+  );
   connect(
-      m_quitApplicationButton,
-      &QPushButton::clicked,
-      this,
-      &WelcomeWindow::quitApplication);
+      m_quitApplicationButton, &QPushButton::clicked, this, &WelcomeWindow::quitApplication
+  );
   connect(
-      m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings);
+      m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings
+  );
 
   auto *buttonLayout = new QHBoxLayout{};
   buttonLayout->setContentsMargins(0, 0, 0, 0);
@@ -141,20 +133,18 @@ QWidget *WelcomeWindow::createAppPanel() {
 
 void WelcomeWindow::createNewDocument() {
   auto &app = TrenchBroomApp::instance();
-  if (!app.newDocument()) {
+  if (! app.newDocument()) {
     show();
   }
 }
 
 void WelcomeWindow::openOtherDocument() {
   const auto pathStr = QFileDialog::getOpenFileName(
-      nullptr,
-      tr("Open Map"),
-      fileDialogDefaultDirectory(FileDialogDir::Map),
-      "Map files (*.map);;Any files (*.*)");
+      nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map), "Map files (*.map);;Any files (*.*)"
+  );
   const auto path = IO::pathFromQString(pathStr);
 
-  if (!path.empty()) {
+  if (! path.empty()) {
     updateFileDialogDefaultDirectoryWithFilename(FileDialogDir::Map, pathStr);
     openDocument(path);
   }
@@ -162,7 +152,7 @@ void WelcomeWindow::openOtherDocument() {
 
 void WelcomeWindow::openDocument(const std::filesystem::path &path) {
   auto &app = TrenchBroomApp::instance();
-  if (!app.openDocument(path)) {
+  if (! app.openDocument(path)) {
     show();
   }
 }

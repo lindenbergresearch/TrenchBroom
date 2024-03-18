@@ -26,6 +26,8 @@
 
 namespace TrenchBroom::Assets {
 class Quake3Shader;
+
+
 class Quake3ShaderStage;
 } // namespace TrenchBroom::Assets
 
@@ -52,6 +54,7 @@ private:
   Token emitToken() override;
 };
 
+
 class Quake3ShaderParser : public Parser<Quake3ShaderToken::Type> {
 private:
   Quake3ShaderTokenizer m_tokenizer;
@@ -71,10 +74,15 @@ public:
 
 private:
   void parseTexture(Assets::Quake3Shader &shader, ParserStatus &status);
+
   void parseBody(Assets::Quake3Shader &shader, ParserStatus &status);
+
   void parseStage(Assets::Quake3Shader &shader, ParserStatus &status);
+
   void parseBodyEntry(Assets::Quake3Shader &shader, ParserStatus &status);
+
   void parseStageEntry(Assets::Quake3ShaderStage &stage, ParserStatus &status);
+
   void skipRemainderOfEntry();
 
 private:

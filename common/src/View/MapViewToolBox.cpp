@@ -36,9 +36,7 @@
 
 namespace TrenchBroom {
 namespace View {
-MapViewToolBox::MapViewToolBox(
-    std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl)
-    : m_document(document) {
+MapViewToolBox::MapViewToolBox(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl) : m_document(document) {
   createTools(document, bookCtrl);
   connectObservers();
 }
@@ -206,8 +204,7 @@ void MapViewToolBox::moveVertices(const vm::vec3 &delta) {
     faceTool().moveSelection(delta);
 }
 
-void MapViewToolBox::createTools(
-    std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl) {
+void MapViewToolBox::createTools(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl) {
   m_clipTool = std::make_unique<ClipTool>(document);
   m_createComplexBrushTool = std::make_unique<CreateComplexBrushTool>(document);
   m_createEntityTool = std::make_unique<CreateEntityTool>(document);
@@ -266,16 +263,16 @@ void MapViewToolBox::registerTool(Tool &tool, QStackedLayout *bookCtrl) {
 }
 
 void MapViewToolBox::connectObservers() {
-  m_notifierConnection +=
-      toolActivatedNotifier.connect(this, &MapViewToolBox::toolActivated);
-  m_notifierConnection +=
-      toolDeactivatedNotifier.connect(this, &MapViewToolBox::toolDeactivated);
+  m_notifierConnection += toolActivatedNotifier.connect(this, &MapViewToolBox::toolActivated);
+  m_notifierConnection += toolDeactivatedNotifier.connect(this, &MapViewToolBox::toolDeactivated);
 
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection += document->documentWasNewedNotifier.connect(
-      this, &MapViewToolBox::documentWasNewedOrLoaded);
+      this, &MapViewToolBox::documentWasNewedOrLoaded
+  );
   m_notifierConnection += document->documentWasLoadedNotifier.connect(
-      this, &MapViewToolBox::documentWasNewedOrLoaded);
+      this, &MapViewToolBox::documentWasNewedOrLoaded
+  );
 }
 
 void MapViewToolBox::toolActivated(Tool &tool) {

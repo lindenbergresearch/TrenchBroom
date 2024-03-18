@@ -38,6 +38,7 @@ struct Object {
   kdl_reflect_decl(Object, id);
 };
 
+
 std::shared_ptr<File> makeObjectFile(int id);
 
 struct FileEntry {
@@ -56,23 +57,24 @@ struct DirectoryEntry {
   std::vector<Entry> entries;
 };
 
+
 class TestFileSystem : public FileSystem {
 private:
-    Entry m_root;
-    std::filesystem::path m_absolutePathPrefix;
+  Entry m_root;
+  std::filesystem::path m_absolutePathPrefix;
 
 public:
-    explicit TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix = {"/"});
+  explicit TestFileSystem(Entry root, std::filesystem::path absolutePathPrefix = {"/"});
 
-    Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
+  Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
-    PathInfo pathInfo(const std::filesystem::path &path) const override;
+  PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 private:
-    const Entry *findEntry(std::filesystem::path path) const;
+  const Entry *findEntry(std::filesystem::path path) const;
 
-    Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
+  Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
 
-    Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
+  Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
 };
 } // namespace TrenchBroom::IO

@@ -34,12 +34,13 @@ using Type = int;
 namespace Model {
 class EntityNodeBase;
 
-Assets::ColorRange::Type detectColorRange(
-    const std::string &entityNode, const std::vector<EntityNodeBase *> &nodes);
 
-const std::string convertEntityColor(
-    const std::string &str, Assets::ColorRange::Type colorRange);
+Assets::ColorRange::Type detectColorRange(const std::string &entityNode, const std::vector<EntityNodeBase *> &nodes);
+
+const std::string convertEntityColor(const std::string &str, Assets::ColorRange::Type colorRange);
+
 Color parseEntityColor(const std::string &str);
+
 std::string entityColorAsString(const Color &color, Assets::ColorRange::Type colorRange);
 } // namespace Model
 } // namespace TrenchBroom

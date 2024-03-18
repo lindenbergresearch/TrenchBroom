@@ -29,7 +29,7 @@
 namespace TrenchBroom::IO {
 class Reader;
 
-Result<Assets::Texture, ReadTextureError> readDdsTexture(
-    std::string name, Reader &reader);
+
+Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reader &reader);
 
 } // namespace TrenchBroom::IO

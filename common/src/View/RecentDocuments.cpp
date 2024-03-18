@@ -35,7 +35,7 @@ std::vector<std::filesystem::path> loadRecentDocuments(const size_t max) {
   result.reserve(max);
 
   const auto settings = QSettings{};
-  for (size_t i = 0; i < max; ++i) {
+  for (size_t i = 0; i < max; ++ i) {
     const auto key = QString::fromStdString("RecentDocuments/" + std::to_string(i));
     const auto value = settings.value(key);
     if (value.isValid()) {
@@ -52,18 +52,15 @@ void saveRecentDocuments(const std::vector<std::filesystem::path> &paths) {
   auto settings = QSettings{};
   settings.remove("RecentDocuments");
 
-  for (size_t i = 0; i < paths.size(); ++i) {
+  for (size_t i = 0; i < paths.size(); ++ i) {
     const auto key = QString::fromStdString("RecentDocuments/" + std::to_string(i));
     const auto value = QVariant{IO::pathAsQString(paths[i])};
     settings.setValue(key, value);
   }
 }
 
-RecentDocuments::RecentDocuments(
-    const size_t maxSize,
-    std::function<bool(std::filesystem::path)> filterPredicate,
-    QObject *parent)
-    : QObject{parent}, m_maxSize{maxSize}, m_filterPredicate{std::move(filterPredicate)} {
+RecentDocuments::RecentDocuments(const size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent) :
+    QObject{parent}, m_maxSize{maxSize}, m_filterPredicate{std::move(filterPredicate)} {
   assert(m_maxSize > 0);
 }
 
@@ -74,7 +71,7 @@ std::vector<std::filesystem::path> RecentDocuments::recentDocuments() const {
 void RecentDocuments::reload() {
   loadFromConfig();
   const auto previousFilteredDocuments = updateFilteredDocuments();
-  if (previousFilteredDocuments!=m_filteredDocuments) {
+  if (previousFilteredDocuments != m_filteredDocuments) {
     updateMenus();
     emit didChange();
   }
@@ -95,7 +92,7 @@ void RecentDocuments::updatePath(const std::filesystem::path &path) {
   const auto previousDocuments = m_filteredDocuments;
   insertPath(path);
   saveToConfig();
-  if (m_filteredDocuments!=previousDocuments) {
+  if (m_filteredDocuments != previousDocuments) {
     updateMenus();
     emit didChange();
   }
@@ -130,9 +127,8 @@ std::vector<std::filesystem::path> RecentDocuments::updateFilteredDocuments() {
 
 void RecentDocuments::insertPath(const std::filesystem::path &path) {
   const auto canonPath = path.lexically_normal();
-  auto it =
-      std::find(std::begin(m_recentDocuments), std::end(m_recentDocuments), canonPath);
-  if (it!=std::end(m_recentDocuments)) {
+  auto it = std::find(std::begin(m_recentDocuments), std::end(m_recentDocuments), canonPath);
+  if (it != std::end(m_recentDocuments)) {
     m_recentDocuments.erase(it);
   }
   m_recentDocuments.insert(std::begin(m_recentDocuments), canonPath);
@@ -156,7 +152,8 @@ void RecentDocuments::clearMenu(QMenu &menu) {
 void RecentDocuments::createMenuItems(QMenu &menu) {
   for (const auto &path : m_filteredDocuments) {
     menu.addAction(
-        IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); });
+        IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); }
+    );
   }
 }
 

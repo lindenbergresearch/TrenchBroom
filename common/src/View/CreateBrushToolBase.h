@@ -32,7 +32,9 @@ class BrushNode;
 namespace Renderer {
 class BrushRenderer;
 
+
 class RenderBatch;
+
 
 class RenderContext;
 } // namespace Renderer
@@ -40,7 +42,9 @@ class RenderContext;
 namespace View {
 class Grid;
 
+
 class MapDocument;
+
 
 class CreateBrushToolBase : public Tool {
 protected:
@@ -65,8 +69,7 @@ public:
   void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 private:
-  void renderBrush(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderBrush(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 protected:
   void updateBrush(Model::BrushNode *brush);

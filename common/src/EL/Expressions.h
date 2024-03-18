@@ -66,6 +66,7 @@ private:
   virtual void appendToStream(std::ostream &str) const = 0;
 };
 
+
 class LiteralExpression : public ExpressionImpl {
 private:
   Value m_value;
@@ -84,6 +85,7 @@ public:
 private:
   void appendToStream(std::ostream &str) const override;
 };
+
 
 class VariableExpression : public ExpressionImpl {
 private:
@@ -104,6 +106,7 @@ private:
   void appendToStream(std::ostream &str) const override;
 };
 
+
 class ArrayExpression : public ExpressionImpl {
 private:
   std::vector<Expression> m_elements;
@@ -122,6 +125,7 @@ public:
 private:
   void appendToStream(std::ostream &str) const override;
 };
+
 
 class MapExpression : public ExpressionImpl {
 private:
@@ -142,13 +146,11 @@ private:
   void appendToStream(std::ostream &str) const override;
 };
 
+
 enum class UnaryOperator {
-  Plus,
-  Minus,
-  LogicalNegation,
-  BitwiseNegation,
-  Group
+  Plus, Minus, LogicalNegation, BitwiseNegation, Group
 };
+
 
 class UnaryExpression : public ExpressionImpl {
 private:
@@ -169,6 +171,7 @@ public:
 private:
   void appendToStream(std::ostream &str) const override;
 };
+
 
 enum class BinaryOperator {
   Addition,
@@ -193,6 +196,7 @@ enum class BinaryOperator {
   Case,
 };
 
+
 class BinaryExpression : public ExpressionImpl {
 public:
   friend class Expression;
@@ -203,14 +207,11 @@ private:
   Expression m_rightOperand;
 
 public:
-  BinaryExpression(
-      BinaryOperator i_operator, Expression leftOperand, Expression rightOperand);
+  BinaryExpression(BinaryOperator i_operator, Expression leftOperand, Expression rightOperand);
 
-  static Expression createAutoRangeWithRightOperand(
-      Expression rightOperand, size_t line, size_t column);
+  static Expression createAutoRangeWithRightOperand(Expression rightOperand, size_t line, size_t column);
 
-  static Expression createAutoRangeWithLeftOperand(
-      Expression leftOperand, size_t line, size_t column);
+  static Expression createAutoRangeWithLeftOperand(Expression leftOperand, size_t line, size_t column);
 
   Value evaluate(const EvaluationContext &context) const override;
 
@@ -225,6 +226,7 @@ public:
 private:
   void appendToStream(std::ostream &str) const override;
 };
+
 
 class SubscriptExpression : public ExpressionImpl {
 public:
@@ -248,6 +250,7 @@ public:
 private:
   void appendToStream(std::ostream &str) const override;
 };
+
 
 class SwitchExpression : public ExpressionImpl {
 private:

@@ -30,6 +30,7 @@
 namespace TrenchBroom::Model {
 class BrushNode;
 
+
 /**
  * A brush face reference creates a persistent reference to a face that has a specific
  * boundary plane. It can be resolved later, and if the brush then has a face with the
@@ -59,6 +60,7 @@ public:
   Result<BrushFaceHandle> resolve() const;
 };
 
+
 /**
  * Returns a vector of brush face references for faces represented by the given handles.
  */
@@ -68,7 +70,6 @@ std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &h
  * Returns a vector brush face handles representing the faces to which the given face
  * references are resolved or an error if any reference cannot be resolved.
  */
-Result<std::vector<BrushFaceHandle>> resolveAllRefs(
-    const std::vector<BrushFaceReference> &faceRefs);
+Result<std::vector<BrushFaceHandle>> resolveAllRefs(const std::vector<BrushFaceReference> &faceRefs);
 
 } // namespace TrenchBroom::Model

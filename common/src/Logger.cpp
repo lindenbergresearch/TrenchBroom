@@ -24,8 +24,7 @@
 #include <string>
 
 namespace TrenchBroom {
-Logger::stream::stream(Logger *logger, const LogLevel logLevel)
-    : m_logger(logger), m_logLevel(logLevel) {
+Logger::stream::stream(Logger *logger, const LogLevel logLevel) : m_logger(logger), m_logLevel(logLevel) {
 }
 
 Logger::stream::~stream() {
@@ -108,14 +107,14 @@ void Logger::log(const LogLevel level, const std::string &message) {
 #ifdef NDEBUG
   if (level != LogLevel::Debug)
 #endif
-  doLog(level, message);
+    doLog(level, message);
 }
 
 void Logger::log(const LogLevel level, const QString &message) {
 #ifdef NDEBUG
   if (level != LogLevel::Debug)
 #endif
-  doLog(level, message);
+    doLog(level, message);
 }
 
 void NullLogger::doLog(const LogLevel /* level */, const std::string & /* message */) {}

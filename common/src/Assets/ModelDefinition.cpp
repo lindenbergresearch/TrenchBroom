@@ -37,29 +37,22 @@
 
 namespace TrenchBroom {
 namespace Assets {
-ModelSpecification::ModelSpecification()
-    : path{""}, skinIndex{0}, frameIndex{0} {
+ModelSpecification::ModelSpecification() : path{""}, skinIndex{0}, frameIndex{0} {
 }
 
-ModelSpecification::ModelSpecification(
-    const std::filesystem::path &i_path,
-    const size_t i_skinIndex,
-    const size_t i_frameIndex)
-    : path{i_path}, skinIndex{i_skinIndex}, frameIndex{i_frameIndex} {
+ModelSpecification::ModelSpecification(const std::filesystem::path &i_path, const size_t i_skinIndex, const size_t i_frameIndex) :
+    path{i_path}, skinIndex{i_skinIndex}, frameIndex{i_frameIndex} {
 }
 
 kdl_reflect_impl(ModelSpecification);
 
-ModelDefinition::ModelDefinition()
-    : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
+ModelDefinition::ModelDefinition() : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
 }
 
-ModelDefinition::ModelDefinition(const size_t line, const size_t column)
-    : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
+ModelDefinition::ModelDefinition(const size_t line, const size_t column) : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
 }
 
-ModelDefinition::ModelDefinition(EL::Expression expression)
-    : m_expression{std::move(expression)} {
+ModelDefinition::ModelDefinition(EL::Expression expression) : m_expression{std::move(expression)} {
 }
 
 void ModelDefinition::append(ModelDefinition other) {
@@ -71,7 +64,7 @@ void ModelDefinition::append(ModelDefinition other) {
 }
 
 static std::filesystem::path path(const EL::Value &value) {
-  if (value.type()!=EL::ValueType::String) {
+  if (value.type() != EL::ValueType::String) {
     return std::filesystem::path();
   }
   const std::string &path = value.stringValue();
@@ -79,7 +72,7 @@ static std::filesystem::path path(const EL::Value &value) {
 }
 
 static size_t index(const EL::Value &value) {
-  if (!value.convertibleTo(EL::ValueType::Number)) {
+  if (! value.convertibleTo(EL::ValueType::Number)) {
     return 0;
   }
   const EL::IntegerType intValue = value.convertTo(EL::ValueType::Number).integerValue();
@@ -90,9 +83,8 @@ static ModelSpecification convertToModel(const EL::Value &value) {
   switch (value.type()) {
   case EL::ValueType::Map:
     return ModelSpecification{
-        path(value[ModelSpecificationKeys::Path]),
-        index(value[ModelSpecificationKeys::Skin]),
-        index(value[ModelSpecificationKeys::Frame])};
+        path(value[ModelSpecificationKeys::Path]), index(value[ModelSpecificationKeys::Skin]), index(value[ModelSpecificationKeys::Frame])
+    };
   case EL::ValueType::String:return ModelSpecification{path(value), 0, 0};
   case EL::ValueType::Boolean:
   case EL::ValueType::Number:
@@ -105,8 +97,7 @@ static ModelSpecification convertToModel(const EL::Value &value) {
   return ModelSpecification{};
 }
 
-ModelSpecification ModelDefinition::modelSpecification(
-    const EL::VariableStore &variableStore) const {
+ModelSpecification ModelDefinition::modelSpecification(const EL::VariableStore &variableStore) const {
   const auto context = EL::EvaluationContext{variableStore};
   return convertToModel(m_expression.evaluate(context));
 }
@@ -116,12 +107,12 @@ ModelSpecification ModelDefinition::defaultModelSpecification() const {
 }
 
 static std::optional<vm::vec3> scaleValue(const EL::Value &value) {
-  if (value.type()==EL::ValueType::Number) {
+  if (value.type() == EL::ValueType::Number) {
     const auto scale = value.numberValue();
     return vm::vec3{scale, scale, scale};
   }
 
-  if (value.type()!=EL::ValueType::String) {
+  if (value.type() != EL::ValueType::String) {
     return std::nullopt;
   }
 
@@ -134,7 +125,7 @@ static std::optional<vm::vec3> scaleValue(const EL::Value &value) {
     return *scale;
   }
 
-  if (!value.convertibleTo(EL::ValueType::Number)) {
+  if (! value.convertibleTo(EL::ValueType::Number)) {
     return std::nullopt;
   }
 
@@ -143,7 +134,7 @@ static std::optional<vm::vec3> scaleValue(const EL::Value &value) {
 }
 
 static std::optional<vm::vec3> convertToScale(const EL::Value &value) {
-  if (value.type()==EL::ValueType::Array) {
+  if (value.type() == EL::ValueType::Array) {
     for (const auto &x : value.arrayValue()) {
       if (const auto scale = scaleValue(x)) {
         return scale;
@@ -156,9 +147,7 @@ static std::optional<vm::vec3> convertToScale(const EL::Value &value) {
   return scaleValue(value);
 }
 
-vm::vec3 ModelDefinition::scale(
-    const EL::VariableStore &variableStore,
-    const std::optional<EL::Expression> &defaultScaleExpression) const {
+vm::vec3 ModelDefinition::scale(const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression) const {
   const auto context = EL::EvaluationContext{variableStore};
   const auto value = m_expression.evaluate(context);
 
@@ -188,13 +177,11 @@ vm::vec3 ModelDefinition::scale(
 kdl_reflect_impl(ModelDefinition);
 
 vm::vec3 safeGetModelScale(
-    const ModelDefinition &definition,
-    const EL::VariableStore &variableStore,
-    const std::optional<EL::Expression> &defaultScaleExpression) {
+    const ModelDefinition &definition, const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression
+) {
   try {
     return definition.scale(variableStore, defaultScaleExpression);
-  }
-  catch (const EL::Exception &) {
+  } catch (const EL::Exception &) {
     return vm::vec3{1, 1, 1};
   }
 }

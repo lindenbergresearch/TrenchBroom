@@ -35,27 +35,29 @@ private:
 
 public:
   explicit TextureBuffer();
+
   explicit TextureBuffer(size_t size);
 
   const unsigned char *data() const;
+
   unsigned char *data();
 
   size_t size() const;
 };
+
+
 using TextureBufferList = std::vector<TextureBuffer>;
 
 vm::vec2s sizeAtMipLevel(size_t width, size_t height, size_t level);
-bool isCompressedFormat(GLenum format);
-size_t blockSizeForFormat(GLenum format);
-size_t bytesPerPixelForFormat(GLenum format);
-void setMipBufferSize(
-    TextureBufferList &buffers,
-    size_t mipLevels,
-    size_t width,
-    size_t height,
-    GLenum format);
 
-void resizeMips(
-    TextureBufferList &buffers, const vm::vec2s &oldSize, const vm::vec2s &newSize);
+bool isCompressedFormat(GLenum format);
+
+size_t blockSizeForFormat(GLenum format);
+
+size_t bytesPerPixelForFormat(GLenum format);
+
+void setMipBufferSize(TextureBufferList &buffers, size_t mipLevels, size_t width, size_t height, GLenum format);
+
+void resizeMips(TextureBufferList &buffers, const vm::vec2s &oldSize, const vm::vec2s &newSize);
 } // namespace Assets
 } // namespace TrenchBroom

@@ -27,17 +27,18 @@ namespace TrenchBroom {
 namespace Renderer {
 class Vbo;
 
+
 class ShaderManager;
 
+
 enum class VboType {
-  ArrayBuffer,
-  ElementArrayBuffer
+  ArrayBuffer, ElementArrayBuffer
 };
 
 enum class VboUsage {
-  StaticDraw,
-  DynamicDraw
+  StaticDraw, DynamicDraw
 };
+
 
 class VboManager {
 private:

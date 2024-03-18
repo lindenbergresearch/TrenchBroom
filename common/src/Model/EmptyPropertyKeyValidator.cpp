@@ -34,16 +34,16 @@ namespace {
 static const auto Type = freeIssueType();
 } // namespace
 
-EmptyPropertyKeyValidator::EmptyPropertyKeyValidator()
-    : Validator{Type, "Empty property name"} {
+EmptyPropertyKeyValidator::EmptyPropertyKeyValidator() : Validator{Type, "Empty property name"} {
   addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
 }
 
-void EmptyPropertyKeyValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+void EmptyPropertyKeyValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
   if (entityNode.entity().hasProperty("")) {
-    issues.push_back(std::make_unique<EntityPropertyIssue>(
-        Type, entityNode, "", entityNode.name() + " has a property with an empty name."));
+    issues.push_back(
+        std::make_unique<EntityPropertyIssue>(
+            Type, entityNode, "", entityNode.name() + " has a property with an empty name."
+        ));
   }
 }
 } // namespace Model

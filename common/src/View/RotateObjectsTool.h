@@ -32,7 +32,9 @@ namespace TrenchBroom {
 namespace Renderer {
 class Camera;
 
+
 class RenderBatch;
+
 
 class RenderContext;
 } // namespace Renderer
@@ -40,9 +42,12 @@ class RenderContext;
 namespace View {
 class Grid;
 
+
 class MapDocument;
 
+
 class RotateObjectsToolPage;
+
 
 class RotateObjectsTool : public Tool {
 private:
@@ -91,21 +96,13 @@ public:
 
   vm::vec3 rotationAxis(RotateObjectsHandle::HitArea area) const;
 
-  void renderHandle2D(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderHandle2D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-  void renderHandle3D(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderHandle3D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-  void renderHighlight2D(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      RotateObjectsHandle::HitArea area);
+  void renderHighlight2D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area);
 
-  void renderHighlight3D(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      RotateObjectsHandle::HitArea area);
+  void renderHighlight3D(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, RotateObjectsHandle::HitArea area);
 
 private:
   void updateRecentlyUsedCenters(const vm::vec3 &center);

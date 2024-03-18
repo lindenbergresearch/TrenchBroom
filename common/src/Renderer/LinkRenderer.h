@@ -26,8 +26,13 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom::Renderer {
 class RenderContext;
+
+
 class RenderBatch;
+
+
 class VboManager;
+
 
 class LinkRenderer : public DirectRenderable {
 public:
@@ -41,8 +46,7 @@ public:
     static inline const auto name = std::string{"lineDir"};
   };
 
-  using ArrowVertex = GLVertexType<
-      GLVertexAttributeTypes::P3, // vertex of the arrow (exposed in shader as gl_Vertex)
+  using ArrowVertex = GLVertexType<GLVertexAttributeTypes::P3, // vertex of the arrow (exposed in shader as gl_Vertex)
       GLVertexAttributeTypes::C4, // arrow color (exposed in shader as gl_Color)
       GLVertexAttributeUser<ArrowPositionName, GL_FLOAT, 3, false>,    // arrow position
       GLVertexAttributeUser<LineDirName, GL_FLOAT, 3, false>>::Vertex; // direction the
@@ -57,13 +61,16 @@ public:
   LinkRenderer();
 
   void render(RenderContext &renderContext, RenderBatch &renderBatch);
+
   void invalidate();
 
 private:
   void doPrepareVertices(VboManager &vboManager) override;
+
   void doRender(RenderContext &renderContext) override;
 
   void renderLines(RenderContext &renderContext);
+
   void renderArrows(RenderContext &renderContext);
 
   void validate();

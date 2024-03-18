@@ -40,296 +40,956 @@
 
 namespace TrenchBroom {
 namespace View {
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.canRepeat")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.canRepeat") {
+CHECK_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes( {{
+document->
+
+parentForNodes(),
+
 {
-    CHECK_FALSE(document->canRepeatCommands());
+entityNode
+}
+}
+});
+CHECK_FALSE(document
+->
 
-    auto *entityNode = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
-    CHECK_FALSE(document->canRepeatCommands());
+canRepeatCommands()
 
-    document->selectNodes({entityNode});
-    CHECK_FALSE(document->canRepeatCommands());
+);
 
-    document->duplicateObjects();
-    CHECK(document->canRepeatCommands());
+document->selectNodes({
+entityNode});
+CHECK_FALSE(document
+->
 
-    document->clearRepeatableCommands();
-    CHECK_FALSE(document->canRepeatCommands());
+canRepeatCommands()
+
+);
+
+document->
+
+duplicateObjects();
+
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+document->
+
+clearRepeatableCommands();
+
+CHECK_FALSE(document
+->
+
+canRepeatCommands()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatTranslate")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatTranslate")
 {
-    auto *entityNode = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
-    document->selectNodes({entityNode});
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+document->
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    document->translateObjects(vm::vec3(1, 2, 3));
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    REQUIRE(entityNode->entity().origin() == vm::vec3(1, 2, 3));
-    document->repeatCommands();
-    CHECK(entityNode->entity().origin() == vm::vec3(2, 4, 6));
+{
+entityNode}}});
+document->selectNodes({
+entityNode});
+
+REQUIRE_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+document->
+translateObjects(vm::vec3(1, 2, 3)
+);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+REQUIRE(entityNode
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(1, 2, 3));
+document->
+
+repeatCommands();
+
+CHECK(entityNode
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(2, 4, 6));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatRotate")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatRotate")
 {
-    auto entity = Model::Entity();
-    entity.transform({}, vm::translation_matrix(vm::vec3(1, 2, 3)));
+auto entity = Model::Entity();
+entity.transform({
+},
+vm::translation_matrix(vm::vec3(1, 2, 3)
+));
 
-    auto *entityNode = new Model::EntityNode(std::move(entity));
+auto *entityNode = new Model::EntityNode(std::move(entity));
 
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
-    document->selectNodes({entityNode});
+document->addNodes({
+{
+document->
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    document->rotateObjects(vm::vec3::zero(), vm::vec3::pos_z(), vm::to_radians(90.0));
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    REQUIRE(entityNode->entity().origin() == vm::approx(vm::rotation_matrix(vm::vec3::pos_z(), vm::to_radians(90.0)) * vm::vec3(1, 2, 3)));
-    document->repeatCommands();
-    CHECK(entityNode->entity().origin() == vm::approx(vm::rotation_matrix(vm::vec3::pos_z(), vm::to_radians(180.0)) * vm::vec3(1, 2, 3)));
+{
+entityNode}}});
+document->selectNodes({
+entityNode});
+
+REQUIRE_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+document->
+
+rotateObjects(vm::vec3::zero(), vm::vec3::pos_z(), vm::to_radians(90.0)
+
+);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+REQUIRE(entityNode
+->
+
+entity()
+
+.
+
+origin()
+
+==
+vm::approx(vm::rotation_matrix(vm::vec3::pos_z(), vm::to_radians(90.0))
+* vm::vec3(1, 2, 3)));
+document->
+
+repeatCommands();
+
+CHECK(entityNode
+->
+
+entity()
+
+.
+
+origin()
+
+==
+vm::approx(vm::rotation_matrix(vm::vec3::pos_z(), vm::to_radians(180.0))
+* vm::vec3(1, 2, 3)));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatScaleWithBBox")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatScaleWithBBox")
 {
-    auto *brushNode1 = createBrushNode();
+auto *brushNode1 = createBrushNode();
 
-    document->addNodes({{document->parentForNodes(), {brushNode1}}});
-    document->selectNodes({brushNode1});
+document->addNodes({
+{
+document->
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    const auto oldBounds = brushNode1->logicalBounds();
-    const auto newBounds = vm::bbox3(oldBounds.min, 2.0 * oldBounds.max);
-    document->scaleObjects(oldBounds, newBounds);
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    auto *brushNode2 = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brushNode2}}});
-    document->selectNodes({brushNode2});
+{
+brushNode1}}});
+document->selectNodes({
+brushNode1});
 
-    document->repeatCommands();
-    CHECK(brushNode2->logicalBounds() == newBounds);
+REQUIRE_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+const auto oldBounds = brushNode1->logicalBounds();
+const auto newBounds = vm::bbox3(oldBounds.min, 2.0 * oldBounds.max);
+document->
+scaleObjects(oldBounds, newBounds
+);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+auto *brushNode2 = createBrushNode();
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+brushNode2}}});
+document->selectNodes({
+brushNode2});
+
+document->
+
+repeatCommands();
+
+CHECK(brushNode2
+->
+
+logicalBounds()
+
+== newBounds);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatScaleWithFactors")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatScaleWithFactors")
 {
-    auto *brushNode1 = createBrushNode();
+auto *brushNode1 = createBrushNode();
 
-    document->addNodes({{document->parentForNodes(), {brushNode1}}});
-    document->selectNodes({brushNode1});
+document->addNodes({
+{
+document->
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    document->scaleObjects(brushNode1->logicalBounds().center(), vm::vec3(2, 2, 2));
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    auto *brushNode2 = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brushNode2}}});
-    document->deselectAll();
-    document->selectNodes({brushNode2});
+{
+brushNode1}}});
+document->selectNodes({
+brushNode1});
 
-    document->repeatCommands();
-    CHECK(brushNode2->logicalBounds() == brushNode1->logicalBounds());
+REQUIRE_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+document->
+scaleObjects(brushNode1
+->
+
+logicalBounds()
+
+.
+
+center(), vm::vec3(2, 2, 2)
+
+);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+auto *brushNode2 = createBrushNode();
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+brushNode2}}});
+document->
+
+deselectAll();
+
+document->selectNodes({
+brushNode2});
+
+document->
+
+repeatCommands();
+
+CHECK(brushNode2
+->
+
+logicalBounds()
+
+== brushNode1->
+
+logicalBounds()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.shearObjects")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.shearObjects")
 {
-    auto *brushNode1 = createBrushNode();
-    const auto originalBounds = brushNode1->logicalBounds();
+auto *brushNode1 = createBrushNode();
+const auto originalBounds = brushNode1->logicalBounds();
 
-    document->addNodes({{document->parentForNodes(), {brushNode1}}});
-    document->selectNodes({brushNode1});
+document->addNodes({
+{
+document->
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    document->shearObjects(originalBounds, vm::vec3::pos_z(), vm::vec3(32, 0, 0));
-    REQUIRE(brushNode1->logicalBounds() != originalBounds);
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    auto *brushNode2 = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brushNode2}}});
-    document->deselectAll();
-    document->selectNodes({brushNode2});
+{
+brushNode1}}});
+document->selectNodes({
+brushNode1});
 
-    document->repeatCommands();
-    CHECK(brushNode2->logicalBounds() == brushNode1->logicalBounds());
+REQUIRE_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+document->
+shearObjects(originalBounds, vm::vec3::pos_z(), vm::vec3(32, 0, 0)
+);
+REQUIRE(brushNode1
+->
+
+logicalBounds()
+
+!= originalBounds);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+auto *brushNode2 = createBrushNode();
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+brushNode2}}});
+document->
+
+deselectAll();
+
+document->selectNodes({
+brushNode2});
+
+document->
+
+repeatCommands();
+
+CHECK(brushNode2
+->
+
+logicalBounds()
+
+== brushNode1->
+
+logicalBounds()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.flipObjects")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.flipObjects")
 {
-    auto *brushNode1 = createBrushNode();
-    const auto originalBounds = brushNode1->logicalBounds();
+auto *brushNode1 = createBrushNode();
+const auto originalBounds = brushNode1->logicalBounds();
 
-    document->addNodes({{document->parentForNodes(), {brushNode1}}});
-    document->selectNodes({brushNode1});
+document->addNodes({
+{
+document->
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    document->flipObjects(originalBounds.max, vm::axis::z);
-    REQUIRE(brushNode1->logicalBounds() != originalBounds);
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    auto *brushNode2 = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brushNode2}}});
-    document->deselectAll();
-    document->selectNodes({brushNode2});
+{
+brushNode1}}});
+document->selectNodes({
+brushNode1});
 
-    document->repeatCommands();
-    CHECK(brushNode2->logicalBounds() == brushNode1->logicalBounds());
+REQUIRE_FALSE(document
+->
+
+canRepeatCommands()
+
+);
+document->
+flipObjects(originalBounds
+.max, vm::axis::z);
+REQUIRE(brushNode1
+->
+
+logicalBounds()
+
+!= originalBounds);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+auto *brushNode2 = createBrushNode();
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+brushNode2}}});
+document->
+
+deselectAll();
+
+document->selectNodes({
+brushNode2});
+
+document->
+
+repeatCommands();
+
+CHECK(brushNode2
+->
+
+logicalBounds()
+
+== brushNode1->
+
+logicalBounds()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.selectionClears")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.selectionClears")
 {
-    auto *entityNode1 = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {entityNode1}}});
+auto *entityNode1 = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+document->
 
-    auto *entityNode2 = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {entityNode2}}});
+parentForNodes(),
 
-    document->selectNodes({entityNode1});
+{
+entityNode1}}});
 
-    REQUIRE_FALSE(document->canRepeatCommands());
-    document->translateObjects(vm::vec3(1, 2, 3));
-    REQUIRE(document->canRepeatCommands());
+auto *entityNode2 = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+document->
 
-    document->deselectAll();
-    document->selectNodes({entityNode2});
-    CHECK(document->canRepeatCommands());
+parentForNodes(),
 
-    // this command will not clear the repeat stack
-    document->setProperty("this", "that");
-    CHECK(document->canRepeatCommands());
+{
+entityNode2}}});
 
-    // this command will replace the command on the repeat stack
-    document->translateObjects(vm::vec3(-1, -2, -3));
-    CHECK(document->canRepeatCommands());
+document->selectNodes({
+entityNode1});
 
-    document->deselectAll();
-    document->selectNodes({entityNode1});
+REQUIRE_FALSE(document
+->
 
-    document->repeatCommands();
-    CHECK(entityNode1->entity().origin() == vm::vec3::zero());
+canRepeatCommands()
 
-    document->deselectAll();
-    document->selectNodes({entityNode1});
-    CHECK(document->canRepeatCommands());
+);
+document->
+translateObjects(vm::vec3(1, 2, 3)
+);
+REQUIRE(document
+->
+
+canRepeatCommands()
+
+);
+
+document->
+
+deselectAll();
+
+document->selectNodes({
+entityNode2});
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+// this command will not clear the repeat stack
+document->setProperty("this", "that");
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+// this command will replace the command on the repeat stack
+document->
+translateObjects(vm::vec3(- 1, - 2, - 3)
+);
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+document->
+
+deselectAll();
+
+document->selectNodes({
+entityNode1});
+
+document->
+
+repeatCommands();
+
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+==
+
+vm::vec3::zero()
+
+);
+
+document->
+
+deselectAll();
+
+document->selectNodes({
+entityNode1});
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatTransaction")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatTransaction")
 {
-    auto *entityNode1 = new Model::EntityNode({});
-    document->addNodes({{document->parentForNodes(), {entityNode1}}});
+auto *entityNode1 = new Model::EntityNode({});
+document->addNodes({
+{
+document->
 
-    document->selectNodes({entityNode1});
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 0));
+parentForNodes(),
 
-    document->startTransaction("", TransactionScope::Oneshot);
-    document->translateObjects(vm::vec3(0, 0, 10));
-    document->rollbackTransaction();
-    document->translateObjects(vm::vec3(10, 0, 0));
-    document->commitTransaction();
-    // overall result: x += 10
+{
+entityNode1}}});
 
-    CHECK(entityNode1->entity().origin() == vm::vec3(10, 0, 0));
+document->selectNodes({
+entityNode1});
+CHECK(entityNode1
+->
 
-    // now repeat the transaction on a second entity
+entity()
 
-    auto *entityNode2 = new Model::EntityNode({});
-    document->addNodes({{document->parentForNodes(), {entityNode2}}});
+.
 
-    document->deselectAll();
-    document->selectNodes({entityNode2});
-    CHECK(entityNode2->entity().origin() == vm::vec3(0, 0, 0));
+origin()
 
-    CHECK(document->canRepeatCommands());
-    document->repeatCommands();
-    CHECK(entityNode2->entity().origin() == vm::vec3(10, 0, 0));
+== vm::vec3(0, 0, 0));
 
-    document->repeatCommands();
-    CHECK(entityNode2->entity().origin() == vm::vec3(20, 0, 0));
+document->startTransaction("", TransactionScope::Oneshot);
+document->
+translateObjects(vm::vec3(0, 0, 10)
+);
+document->
 
-    // ensure entityNode1 was unmodified
+rollbackTransaction();
 
-    CHECK(entityNode1->entity().origin() == vm::vec3(10, 0, 0));
+document->
+translateObjects(vm::vec3(10, 0, 0)
+);
+document->
+
+commitTransaction();
+// overall result: x += 10
+
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(10, 0, 0));
+
+// now repeat the transaction on a second entity
+
+auto *entityNode2 = new Model::EntityNode({});
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+entityNode2}}});
+
+document->
+
+deselectAll();
+
+document->selectNodes({
+entityNode2});
+CHECK(entityNode2
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(0, 0, 0));
+
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+document->
+
+repeatCommands();
+
+CHECK(entityNode2
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(10, 0, 0));
+
+document->
+
+repeatCommands();
+
+CHECK(entityNode2
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(20, 0, 0));
+
+// ensure entityNode1 was unmodified
+
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(10, 0, 0));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatDuplicateAndTranslate")
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatDuplicateAndTranslate")
 {
-    auto *entityNode1 = new Model::EntityNode({});
-    document->addNodes({{document->parentForNodes(), {entityNode1}}});
+auto *entityNode1 = new Model::EntityNode({});
+document->addNodes({
+{
+document->
 
-    document->selectNodes({entityNode1});
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 0));
+parentForNodes(),
 
-    SECTION("transaction containing a rollback")
-    {
-        document->duplicateObjects();
+{
+entityNode1}}});
 
-        document->startTransaction("", TransactionScope::Oneshot);
-        document->translateObjects(vm::vec3(0, 0, 10));
-        document->rollbackTransaction();
-        document->translateObjects(vm::vec3(10, 0, 0));
-        document->commitTransaction();
-    }SECTION("translations that get coalesced")
-    {
-        document->duplicateObjects();
+document->selectNodes({
+entityNode1});
+CHECK(entityNode1
+->
 
-        document->translateObjects(vm::vec3(5, 0, 0));
-        document->translateObjects(vm::vec3(5, 0, 0));
-    }SECTION("duplicate inside transaction, then standalone movements")
-    {
-        document->startTransaction("", TransactionScope::Oneshot);
-        document->duplicateObjects();
-        document->translateObjects(vm::vec3(2, 0, 0));
-        document->translateObjects(vm::vec3(2, 0, 0));
-        document->commitTransaction();
+entity()
 
-        document->translateObjects(vm::vec3(2, 0, 0));
-        document->translateObjects(vm::vec3(2, 0, 0));
-        document->translateObjects(vm::vec3(2, 0, 0));
-    }
+.
 
-    // repeatable actions:
-    //  - duplicate
-    //  - translate by x = +10
+origin()
 
-    REQUIRE(document->allSelectedEntityNodes().size() == 1);
+== vm::vec3(0, 0, 0));
 
-    auto *entityNode2 = document->allSelectedEntityNodes().at(0);
-    CHECK(entityNode2 != entityNode1);
+SECTION("transaction containing a rollback")
+{
+document->
 
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 0));
-    CHECK(entityNode2->entity().origin() == vm::vec3(10, 0, 0));
+duplicateObjects();
 
-    document->repeatCommands();
+document->startTransaction("", TransactionScope::Oneshot);
+document->
+translateObjects(vm::vec3(0, 0, 10)
+);
+document->
 
-    REQUIRE(document->allSelectedEntityNodes().size() == 1);
+rollbackTransaction();
 
-    auto *entityNode3 = document->allSelectedEntityNodes().at(0);
-    CHECK(entityNode3 != entityNode2);
+document->
+translateObjects(vm::vec3(10, 0, 0)
+);
+document->
 
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 0));
-    CHECK(entityNode2->entity().origin() == vm::vec3(10, 0, 0));
-    CHECK(entityNode3->entity().origin() == vm::vec3(20, 0, 0));
+commitTransaction();
+
+}SECTION("translations that get coalesced")
+{
+document->
+
+duplicateObjects();
+
+document->
+translateObjects(vm::vec3(5, 0, 0)
+);
+document->
+translateObjects(vm::vec3(5, 0, 0)
+);
+}SECTION("duplicate inside transaction, then standalone movements")
+{
+document->startTransaction("", TransactionScope::Oneshot);
+document->
+
+duplicateObjects();
+
+document->
+translateObjects(vm::vec3(2, 0, 0)
+);
+document->
+translateObjects(vm::vec3(2, 0, 0)
+);
+document->
+
+commitTransaction();
+
+document->
+translateObjects(vm::vec3(2, 0, 0)
+);
+document->
+translateObjects(vm::vec3(2, 0, 0)
+);
+document->
+translateObjects(vm::vec3(2, 0, 0)
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RepeatableActionsTest.repeatUndo")
-{
-    auto *entityNode1 = new Model::EntityNode({});
-    document->addNodes({{document->parentForNodes(), {entityNode1}}});
+// repeatable actions:
+//  - duplicate
+//  - translate by x = +10
 
-    document->selectNodes({entityNode1});
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 0));
+REQUIRE(document
+->
 
-    document->translateObjects(vm::vec3(0, 0, 10));
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 10));
-    CHECK(document->canRepeatCommands());
+allSelectedEntityNodes()
 
-    document->undoCommand();
-    CHECK(entityNode1->entity().origin() == vm::vec3(0, 0, 0));
+.
 
-    // For now, we won't support repeating a sequence of commands
-    // containing undo/redo (it just clears the repeat stack)
-    CHECK(!document->canRepeatCommands());
+size()
+
+== 1);
+
+auto *entityNode2 = document->allSelectedEntityNodes().at(0);
+CHECK(entityNode2
+!= entityNode1);
+
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(0, 0, 0));
+CHECK(entityNode2
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(10, 0, 0));
+
+document->
+
+repeatCommands();
+
+REQUIRE(document
+->
+
+allSelectedEntityNodes()
+
+.
+
+size()
+
+== 1);
+
+auto *entityNode3 = document->allSelectedEntityNodes().at(0);
+CHECK(entityNode3
+!= entityNode2);
+
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(0, 0, 0));
+CHECK(entityNode2
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(10, 0, 0));
+CHECK(entityNode3
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(20, 0, 0));
 }
-} // namespace View
+
+TEST_CASE_METHOD(MapDocumentTest,
+"RepeatableActionsTest.repeatUndo")
+{
+auto *entityNode1 = new Model::EntityNode({});
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+entityNode1}}});
+
+document->selectNodes({
+entityNode1});
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(0, 0, 0));
+
+document->
+translateObjects(vm::vec3(0, 0, 10)
+);
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(0, 0, 10));
+CHECK(document
+->
+
+canRepeatCommands()
+
+);
+
+document->
+
+undoCommand();
+
+CHECK(entityNode1
+->
+
+entity()
+
+.
+
+origin()
+
+== vm::vec3(0, 0, 0));
+
+// For now, we won't support repeating a sequence of commands
+// containing undo/redo (it just clears the repeat stack)
+CHECK(!document->
+
+canRepeatCommands()
+
+);
+}} // namespace View
 } // namespace TrenchBroom

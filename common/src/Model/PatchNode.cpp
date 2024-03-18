@@ -51,7 +51,7 @@ constexpr static size_t DefaultSubdivisionsPerSurface = 3u;
 kdl_reflect_impl(PatchGrid::Point);
 
 const PatchGrid::Point &PatchGrid::point(const size_t row, const size_t col) const {
-  const auto index = row*pointColumnCount + col;
+  const auto index = row * pointColumnCount + col;
   assert(index < points.size());
   return points[index];
 }
@@ -84,13 +84,10 @@ kdl_reflect_impl(PatchGrid);
  * quadrants (e.g. the corner points have only one). If the grid points of two opposing
  * sides of the grid coincide, we treat them as one grid point and average their normals.
  */
-std::vector<vm::vec3> computeGridNormals(
-    const std::vector<BezierPatch::Point> patchGrid,
-    const size_t pointRowCount,
-    const size_t pointColumnCount) {
+std::vector<vm::vec3> computeGridNormals(const std::vector<BezierPatch::Point> patchGrid, const size_t pointRowCount, const size_t pointColumnCount) {
   /* Returns the index of a grid point with the given coordinates. */
   const auto index = [&](const size_t row, const size_t col) {
-    return row*pointColumnCount + col;
+    return row * pointColumnCount + col;
   };
 
   /* Returns the grid point with the given coordinates. */
@@ -99,12 +96,10 @@ std::vector<vm::vec3> computeGridNormals(
   };
 
   enum class RowOffset {
-    Above,
-    Below
+    Above, Below
   };
   enum class ColOffset {
-    Left,
-    Right
+    Left, Right
   };
 
   /* Returns the of the quadrant next to the grid point with the given coordinates.
@@ -120,11 +115,7 @@ std::vector<vm::vec3> computeGridNormals(
    * right of the grid point, and so on. We determine the incident grid points necessary
    * to compute the normals (via cross product). The returned normal is not normalized.
    */
-  const auto normalForQuadrant = [&](
-      const size_t row,
-      const size_t col,
-      const RowOffset rowOffset,
-      const ColOffset colOffset) {
+  const auto normalForQuadrant = [&](const size_t row, const size_t col, const RowOffset rowOffset, const ColOffset colOffset) {
     const auto point = gridPoint(row, col);
     switch (rowOffset) {
     case RowOffset::Above: {
@@ -180,38 +171,28 @@ std::vector<vm::vec3> computeGridNormals(
   normals[index(b, r)] = normalForQuadrant(b, r, RowOffset::Above, ColOffset::Left);
 
   // top and bottom row normals, excluding corners
-  for (size_t col = 1u; col < r; ++col) {
-    normals[index(t, col)] =
-        (normalForQuadrant(t, col, RowOffset::Below, ColOffset::Left)
-            + normalForQuadrant(t, col, RowOffset::Below, ColOffset::Right))
-            /static_cast<FloatType>(2);
-    normals[index(b, col)] =
-        (normalForQuadrant(b, col, RowOffset::Above, ColOffset::Left)
-            + normalForQuadrant(b, col, RowOffset::Above, ColOffset::Right))
-            /static_cast<FloatType>(2);
+  for (size_t col = 1u; col < r; ++ col) {
+    normals[index(t, col)] = (normalForQuadrant(t, col, RowOffset::Below, ColOffset::Left) + normalForQuadrant(t, col, RowOffset::Below, ColOffset::Right))
+        / static_cast<FloatType>(2);
+    normals[index(b, col)] = (normalForQuadrant(b, col, RowOffset::Above, ColOffset::Left) + normalForQuadrant(b, col, RowOffset::Above, ColOffset::Right))
+        / static_cast<FloatType>(2);
   }
 
   // left and right column normals, excluding corners
-  for (size_t row = 1u; row < b; ++row) {
-    normals[index(row, l)] =
-        (normalForQuadrant(row, l, RowOffset::Above, ColOffset::Right)
-            + normalForQuadrant(row, l, RowOffset::Below, ColOffset::Right))
-            /static_cast<FloatType>(2);
-    normals[index(row, r)] =
-        (normalForQuadrant(row, r, RowOffset::Above, ColOffset::Left)
-            + normalForQuadrant(row, r, RowOffset::Below, ColOffset::Left))
-            /static_cast<FloatType>(2);
+  for (size_t row = 1u; row < b; ++ row) {
+    normals[index(row, l)] = (normalForQuadrant(row, l, RowOffset::Above, ColOffset::Right) + normalForQuadrant(row, l, RowOffset::Below, ColOffset::Right))
+        / static_cast<FloatType>(2);
+    normals[index(row, r)] = (normalForQuadrant(row, r, RowOffset::Above, ColOffset::Left) + normalForQuadrant(row, r, RowOffset::Below, ColOffset::Left))
+        / static_cast<FloatType>(2);
   }
 
   // inner point normals
-  for (size_t row = 1u; row < b; ++row) {
-    for (size_t col = 1u; col < r; ++col) {
+  for (size_t row = 1u; row < b; ++ row) {
+    for (size_t col = 1u; col < r; ++ col) {
       normals[index(row, col)] =
-          (normalForQuadrant(row, col, RowOffset::Above, ColOffset::Left)
-              + normalForQuadrant(row, col, RowOffset::Above, ColOffset::Right)
-              + normalForQuadrant(row, col, RowOffset::Below, ColOffset::Left)
-              + normalForQuadrant(row, col, RowOffset::Below, ColOffset::Right))
-              /static_cast<FloatType>(4);
+          (normalForQuadrant(row, col, RowOffset::Above, ColOffset::Left) + normalForQuadrant(row, col, RowOffset::Above, ColOffset::Right)
+              + normalForQuadrant(row, col, RowOffset::Below, ColOffset::Left) + normalForQuadrant(row, col, RowOffset::Below, ColOffset::Right))
+              / static_cast<FloatType>(4);
     }
   }
 
@@ -221,21 +202,15 @@ std::vector<vm::vec3> computeGridNormals(
 
   // check opposing sides of the grid, if their corresponding points coincide, combine the
   // normals
-  for (size_t row = 0u; row < pointRowCount; ++row) {
-    if (
-        vm::squared_distance(gridPoint(row, l), gridPoint(row, r))
-            < GridPointEpsilon*GridPointEpsilon) {
-      const auto combinedNormal =
-          (normals[index(row, l)] + normals[index(row, r)])/static_cast<FloatType>(2);
+  for (size_t row = 0u; row < pointRowCount; ++ row) {
+    if (vm::squared_distance(gridPoint(row, l), gridPoint(row, r)) < GridPointEpsilon * GridPointEpsilon) {
+      const auto combinedNormal = (normals[index(row, l)] + normals[index(row, r)]) / static_cast<FloatType>(2);
       normals[index(row, l)] = normals[index(row, r)] = combinedNormal;
     }
   }
-  for (size_t col = 0u; col < pointColumnCount; ++col) {
-    if (
-        vm::squared_distance(gridPoint(t, col), gridPoint(b, col))
-            < GridPointEpsilon*GridPointEpsilon) {
-      const auto combinedNormal =
-          (normals[index(t, col)] + normals[index(b, col)])/static_cast<FloatType>(2);
+  for (size_t col = 0u; col < pointColumnCount; ++ col) {
+    if (vm::squared_distance(gridPoint(t, col), gridPoint(b, col)) < GridPointEpsilon * GridPointEpsilon) {
+      const auto combinedNormal = (normals[index(t, col)] + normals[index(b, col)]) / static_cast<FloatType>(2);
       normals[index(t, col)] = normals[index(b, col)] = combinedNormal;
     }
   }
@@ -249,15 +224,12 @@ std::vector<vm::vec3> computeGridNormals(
 }
 
 PatchGrid makePatchGrid(const BezierPatch &patch, const size_t subdivisionsPerSurface) {
-  const size_t gridPointRowCount =
-      patch.surfaceRowCount()*(size_t(1) << subdivisionsPerSurface) + 1u;
-  const size_t gridPointColumnCount =
-      patch.surfaceColumnCount()*(size_t(1) << subdivisionsPerSurface) + 1u;
+  const size_t gridPointRowCount = patch.surfaceRowCount() * (size_t(1) << subdivisionsPerSurface) + 1u;
+  const size_t gridPointColumnCount = patch.surfaceColumnCount() * (size_t(1) << subdivisionsPerSurface) + 1u;
 
   const auto patchGrid = patch.evaluate(subdivisionsPerSurface);
-  const auto normals =
-      computeGridNormals(patchGrid, gridPointRowCount, gridPointColumnCount);
-  assert(patchGrid.size()==normals.size());
+  const auto normals = computeGridNormals(patchGrid, gridPointRowCount, gridPointColumnCount);
+  assert(patchGrid.size() == normals.size());
 
   auto points = std::vector<PatchGrid::Point>{};
   auto boundsBuilder = vm::bbox3::builder{};
@@ -268,34 +240,28 @@ PatchGrid makePatchGrid(const BezierPatch &patch, const size_t subdivisionsPerSu
     boundsBuilder.add(position);
   }
 
-  return {
-      gridPointRowCount, gridPointColumnCount, std::move(points), boundsBuilder.bounds()};
+  return {gridPointRowCount, gridPointColumnCount, std::move(points), boundsBuilder.bounds()};
 }
 
 const HitType::Type PatchNode::PatchHitType = HitType::freeType();
 
-PatchNode::PatchNode(BezierPatch patch)
-    : m_patch{std::move(patch)}, m_grid{makePatchGrid(m_patch, DefaultSubdivisionsPerSurface)} {
+PatchNode::PatchNode(BezierPatch patch) : m_patch{std::move(patch)}, m_grid{makePatchGrid(m_patch, DefaultSubdivisionsPerSurface)} {
 }
 
 const EntityNodeBase *PatchNode::entity() const {
   return visitParent(
       kdl::overload(
-          [](const WorldNode *world) -> const EntityNodeBase * { return world; },
-          [](const EntityNode *entity) -> const EntityNodeBase * { return entity; },
+          [](const WorldNode *world) -> const EntityNodeBase * { return world; }, [](const EntityNode *entity) -> const EntityNodeBase * { return entity; },
           [](auto &&thisLambda, const LayerNode *layer) -> const EntityNodeBase * {
             return layer->visitParent(thisLambda).value_or(nullptr);
-          },
-          [](auto &&thisLambda, const GroupNode *group) -> const EntityNodeBase * {
+          }, [](auto &&thisLambda, const GroupNode *group) -> const EntityNodeBase * {
             return group->visitParent(thisLambda).value_or(nullptr);
-          },
-          [](auto &&thisLambda, const BrushNode *brush) -> const EntityNodeBase * {
+          }, [](auto &&thisLambda, const BrushNode *brush) -> const EntityNodeBase * {
             return brush->visitParent(thisLambda).value_or(nullptr);
-          },
-          [](auto &&thisLambda, const PatchNode *patch) -> const EntityNodeBase * {
+          }, [](auto &&thisLambda, const PatchNode *patch) -> const EntityNodeBase * {
             return patch->visitParent(thisLambda).value_or(nullptr);
-          }))
-      .value_or(nullptr);
+          }
+      )).value_or(nullptr);
 }
 
 EntityNodeBase *PatchNode::entity() {
@@ -340,9 +306,9 @@ FloatType PatchNode::doGetProjectedArea(const vm::axis::type axis) const {
   // computing the projected area of a patch is expensive, so we just use the bounds
   const vm::vec3 size = physicalBounds().size();
   switch (axis) {
-  case vm::axis::x:return size.y()*size.z();
-  case vm::axis::y:return size.x()*size.z();
-  case vm::axis::z:return size.x()*size.y();
+  case vm::axis::x:return size.y() * size.z();
+  case vm::axis::y:return size.x() * size.z();
+  case vm::axis::z:return size.x() * size.y();
   default:return 0.0;
   }
 }
@@ -373,14 +339,13 @@ bool PatchNode::doSelectable() const {
   return true;
 }
 
-void PatchNode::doPick(
-    const EditorContext &editorContext, const vm::ray3 &pickRay, PickResult &pickResult) {
-  if (!editorContext.visible(this)) {
+void PatchNode::doPick(const EditorContext &editorContext, const vm::ray3 &pickRay, PickResult &pickResult) {
+  if (! editorContext.visible(this)) {
     return;
   }
   const auto pickTriangle = [&](const auto &p0, const auto &p1, const auto &p2) {
     if (const auto distance = vm::intersect_ray_triangle(pickRay, p0, p1, p2);
-        !vm::is_nan(distance)) {
+        ! vm::is_nan(distance)) {
       const auto hitPoint = vm::point_at_distance(pickRay, distance);
       pickResult.addHit(Hit(PatchHitType, distance, hitPoint, this));
       return true;
@@ -388,8 +353,8 @@ void PatchNode::doPick(
     return false;
   };
 
-  for (size_t row = 0u; row < m_grid.pointRowCount - 1u; ++row) {
-    for (size_t col = 0u; col < m_grid.pointColumnCount - 1u; ++col) {
+  for (size_t row = 0u; row < m_grid.pointRowCount - 1u; ++ row) {
+    for (size_t col = 0u; col < m_grid.pointColumnCount - 1u; ++ col) {
       const auto v0 = m_grid.point(row, col).position;
       const auto v1 = m_grid.point(row, col + 1u).position;
       const auto v2 = m_grid.point(row + 1u, col + 1u).position;

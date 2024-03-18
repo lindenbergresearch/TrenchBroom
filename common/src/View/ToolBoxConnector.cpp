@@ -32,9 +32,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ToolBoxConnector::ToolBoxConnector()
-    : m_toolBox(nullptr), m_toolChain(new ToolChain()), m_lastMouseX(0.0f), m_lastMouseY(0.0f),
-      m_ignoreNextDrag(false) {
+ToolBoxConnector::ToolBoxConnector() : m_toolBox(nullptr), m_toolChain(new ToolChain()), m_lastMouseX(0.0f), m_lastMouseY(0.0f), m_ignoreNextDrag(false) {
 }
 
 ToolBoxConnector::~ToolBoxConnector() {
@@ -50,7 +48,7 @@ const Model::PickResult &ToolBoxConnector::pickResult() const {
 }
 
 void ToolBoxConnector::updatePickResult() {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+  ensure(m_toolBox != nullptr, "toolBox is null");
 
   m_inputState.setPickRequest(
       doGetPickRequest(m_inputState.mouseX(), m_inputState.mouseY()));
@@ -60,7 +58,7 @@ void ToolBoxConnector::updatePickResult() {
 }
 
 void ToolBoxConnector::setToolBox(ToolBox &toolBox) {
-  assert(m_toolBox==nullptr);
+  assert(m_toolBox == nullptr);
   m_toolBox = &toolBox;
 }
 
@@ -69,7 +67,7 @@ void ToolBoxConnector::addTool(std::unique_ptr<ToolController> tool) {
 }
 
 bool ToolBoxConnector::dragEnter(const float x, const float y, const std::string &text) {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+  ensure(m_toolBox != nullptr, "toolBox is null");
 
   mouseMoved(x, y);
   updatePickResult();
@@ -78,7 +76,7 @@ bool ToolBoxConnector::dragEnter(const float x, const float y, const std::string
 }
 
 bool ToolBoxConnector::dragMove(const float x, const float y, const std::string &text) {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+  ensure(m_toolBox != nullptr, "toolBox is null");
 
   mouseMoved(x, y);
   updatePickResult();
@@ -87,14 +85,13 @@ bool ToolBoxConnector::dragMove(const float x, const float y, const std::string 
 }
 
 void ToolBoxConnector::dragLeave() {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+  ensure(m_toolBox != nullptr, "toolBox is null");
 
   m_toolBox->dragLeave(m_toolChain, m_inputState);
 }
 
-bool ToolBoxConnector::dragDrop(
-    const float /* x */, const float /* y */, const std::string &text) {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+bool ToolBoxConnector::dragDrop(const float /* x */, const float /* y */, const std::string &text) {
+  ensure(m_toolBox != nullptr, "toolBox is null");
 
   updatePickResult();
 
@@ -102,20 +99,19 @@ bool ToolBoxConnector::dragDrop(
 }
 
 bool ToolBoxConnector::cancel() {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+  ensure(m_toolBox != nullptr, "toolBox is null");
   m_inputState.setAnyToolDragging(m_toolBox->dragging());
   return m_toolBox->cancel(m_toolChain);
 }
 
 void ToolBoxConnector::setRenderOptions(Renderer::RenderContext &renderContext) {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+  ensure(m_toolBox != nullptr, "toolBox is null");
   m_inputState.setAnyToolDragging(m_toolBox->dragging());
   m_toolBox->setRenderOptions(m_toolChain, m_inputState, renderContext);
 }
 
-void ToolBoxConnector::renderTools(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
-  ensure(m_toolBox!=nullptr, "toolBox is null");
+void ToolBoxConnector::renderTools(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+  ensure(m_toolBox != nullptr, "toolBox is null");
   m_inputState.setAnyToolDragging(m_toolBox->dragging());
   m_toolBox->renderTools(m_toolChain, m_inputState, renderContext, renderBatch);
 }
@@ -147,7 +143,7 @@ bool ToolBoxConnector::setModifierKeys() {
   m_inputState.setAnyToolDragging(m_toolBox->dragging());
 
   const ModifierKeyState keys = modifierKeys();
-  if (keys!=m_inputState.modifierKeys()) {
+  if (keys != m_inputState.modifierKeys()) {
     m_inputState.setModifierKeys(keys);
     return true;
   } else {
@@ -158,7 +154,7 @@ bool ToolBoxConnector::setModifierKeys() {
 bool ToolBoxConnector::clearModifierKeys() {
   m_inputState.setAnyToolDragging(m_toolBox->dragging());
 
-  if (m_inputState.modifierKeys()!=ModifierKeys::MKNone) {
+  if (m_inputState.modifierKeys() != ModifierKeys::MKNone) {
     m_inputState.setModifierKeys(ModifierKeys::MKNone);
     updatePickResult();
     m_toolBox->modifierKeyChange(m_toolChain, m_inputState);
@@ -233,7 +229,7 @@ void ToolBoxConnector::processMouseButtonUp(const MouseEvent &event) {
 
 void ToolBoxConnector::processMouseClick(const MouseEvent &event) {
   const auto handled = m_toolBox->mouseClick(m_toolChain, m_inputState);
-  if (event.button==MouseEvent::Button::Right && !handled) {
+  if (event.button == MouseEvent::Button::Right && ! handled) {
     // We miss mouse events when a popup menu is already open, so we must make sure that
     // the input state is up to date.
     mouseMoved(event.posX, event.posY);
@@ -258,9 +254,9 @@ void ToolBoxConnector::processMouseMotion(const MouseEvent &event) {
 
 void ToolBoxConnector::processScroll(const MouseEvent &event) {
   updateModifierKeys();
-  if (event.wheelAxis==MouseEvent::WheelAxis::Horizontal) {
+  if (event.wheelAxis == MouseEvent::WheelAxis::Horizontal) {
     m_inputState.scroll(event.scrollDistance, 0.0f);
-  } else if (event.wheelAxis==MouseEvent::WheelAxis::Vertical) {
+  } else if (event.wheelAxis == MouseEvent::WheelAxis::Vertical) {
     m_inputState.scroll(0.0f, event.scrollDistance);
   }
   m_toolBox->mouseScroll(m_toolChain, m_inputState);
@@ -283,7 +279,7 @@ void ToolBoxConnector::processDrag(const MouseEvent &event) {
   mouseMoved(event.posX, event.posY);
   updatePickResult();
   if (m_toolBox->dragging()) {
-    if (!m_toolBox->mouseDrag(m_inputState)) {
+    if (! m_toolBox->mouseDrag(m_inputState)) {
       processDragEnd(event);
     }
   }

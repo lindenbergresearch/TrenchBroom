@@ -25,6 +25,7 @@ namespace TrenchBroom {
 namespace View {
 class TitleBar;
 
+
 class TitledPanel : public QWidget {
 Q_OBJECT
 private:
@@ -32,15 +33,9 @@ private:
   QWidget *m_panel;
 
 public:
-  TitledPanel(
-      const QString &title,
-      QWidget *parent,
-      bool boldTitle = true,
-      bool subtitle = false,
-      bool fillBackground = false);
+  TitledPanel(const QString &title, QWidget *parent, bool boldTitle = true, bool subtitle = false, bool fillBackground = false);
 
-  explicit TitledPanel(
-      const QString &title, bool boldTitle = true, bool subtitle = false);
+  explicit TitledPanel(const QString &title, bool boldTitle = true, bool subtitle = false);
 
   TitleBar *getTitleBar() const;
 

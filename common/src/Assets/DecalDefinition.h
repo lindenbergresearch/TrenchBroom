@@ -39,13 +39,16 @@ struct DecalSpecification {
   kdl_reflect_decl(DecalSpecification, textureName);
 };
 
+
 class DecalDefinition {
 private:
   EL::Expression m_expression;
 
 public:
   DecalDefinition();
+
   DecalDefinition(size_t line, size_t column);
+
   explicit DecalDefinition(EL::Expression expression);
 
   void append(const DecalDefinition &other);

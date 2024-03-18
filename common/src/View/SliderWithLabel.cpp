@@ -31,20 +31,12 @@
 namespace TrenchBroom {
 namespace View {
 SliderWithLabel::SliderWithLabel(
-    const int minimum,
-    const int maximum,
-    const float factor,
-    const QString &format,
-    const int maxSliderWidth,
-    const int minLabelWidth,
-    QWidget *parent)
-    : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()), m_factor(factor),
-      m_format(format) {
+    const int minimum, const int maximum, const float factor, const QString &format, const int maxSliderWidth, const int minLabelWidth, QWidget *parent
+) : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()), m_factor(factor), m_format(format) {
   // get maximum label bounding
   const auto min_size = m_label->fontMetrics().boundingRect(getValueLabel(minimum));
   const auto max_size = m_label->fontMetrics().boundingRect(getValueLabel(maximum));
-  const auto max_width =
-      std::max(std::max(min_size.width(), max_size.width()) + 1, minLabelWidth);
+  const auto max_width = std::max(std::max(min_size.width(), max_size.width()) + 1, minLabelWidth);
 
   m_label->setMinimumWidth(max_width);
   m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -88,9 +80,9 @@ void SliderWithLabel::valueChangedInternal(const int value) {
 QString SliderWithLabel::getValueLabel(const int value) {
   QString labelText;
 
-  if (m_factor!=0) {
+  if (m_factor != 0) {
     // use decimal numbers if factor is set != zero
-    float factorized = float(value)*m_factor;
+    float factorized = float(value) * m_factor;
     QString fmt = m_format.isEmpty() ? "%.2f" : m_format;
     labelText = labelText.sprintf(fmt.toStdString().c_str(), factorized);
   } else {

@@ -49,10 +49,8 @@ void CollapsibleTitleBar::mousePressEvent(QMouseEvent * /* event */) {
 }
 
 // CollapsibleTitledPanel
-CollapsibleTitledPanel::CollapsibleTitledPanel(
-    const QString &title, const bool initiallyExpanded, QWidget *parent)
-    : QWidget(parent), m_titleBar(new CollapsibleTitleBar(title, "hide")), m_panel(new QWidget()),
-      m_expanded(initiallyExpanded) {
+CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool initiallyExpanded, QWidget *parent) :
+    QWidget(parent), m_titleBar(new CollapsibleTitleBar(title, "hide")), m_panel(new QWidget()), m_expanded(initiallyExpanded) {
 
   m_panel->setAutoFillBackground(true);
   m_panel->setBackgroundRole(QPalette::Window);
@@ -64,9 +62,7 @@ CollapsibleTitledPanel::CollapsibleTitledPanel(
   sizer->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
   setLayout(sizer);
 
-  connect(m_titleBar, &CollapsibleTitleBar::titleBarClicked, this, [=]() {
-    setExpanded(!m_expanded);
-  });
+  connect(m_titleBar, &CollapsibleTitleBar::titleBarClicked, this, [=]() { setExpanded(! m_expanded); });
 
   updateExpanded();
 }
@@ -88,7 +84,7 @@ bool CollapsibleTitledPanel::expanded() const {
 }
 
 void CollapsibleTitledPanel::setExpanded(const bool expanded) {
-  if (expanded==m_expanded) {
+  if (expanded == m_expanded) {
     return;
   }
 
@@ -108,7 +104,7 @@ bool CollapsibleTitledPanel::restoreState(const QByteArray &state) {
   bool expanded;
   stream >> expanded;
 
-  if (stream.status()==QDataStream::Ok) {
+  if (stream.status() == QDataStream::Ok) {
     setExpanded(expanded);
     return true;
   }

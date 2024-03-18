@@ -35,8 +35,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom::View {
 
-GameEngineDialog::GameEngineDialog(std::string gameName, QWidget *parent)
-    : QDialog{parent}, m_gameName{std::move(gameName)} {
+GameEngineDialog::GameEngineDialog(std::string gameName, QWidget *parent) : QDialog{parent}, m_gameName{std::move(gameName)} {
   setWindowTitle("Game Engines");
   setWindowIconTB(this);
   createGui();

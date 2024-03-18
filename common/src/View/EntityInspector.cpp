@@ -33,10 +33,8 @@
 
 namespace TrenchBroom::View {
 
-EntityInspector::EntityInspector(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
-    : TabBookPage(parent), m_splitter(nullptr), m_attributeEditor(nullptr), m_entityBrowser(nullptr),
-      m_entityDefinitionFileChooser(nullptr) {
+EntityInspector::EntityInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) :
+    TabBookPage(parent), m_splitter(nullptr), m_attributeEditor(nullptr), m_entityBrowser(nullptr), m_entityDefinitionFileChooser(nullptr) {
   createGui(std::move(document), contextManager);
 }
 
@@ -45,8 +43,7 @@ EntityInspector::~EntityInspector() {
   saveWindowState(m_entityDefinitionFileChooser);
 }
 
-void EntityInspector::createGui(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
+void EntityInspector::createGui(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
   m_splitter = new Splitter(Qt::Vertical);
   m_splitter->setObjectName("EntityInspector_Splitter");
 
@@ -73,14 +70,12 @@ void EntityInspector::createGui(
   restoreWindowState(m_splitter);
 }
 
-QWidget *EntityInspector::createAttributeEditor(
-    QWidget *parent, std::weak_ptr<MapDocument> document) {
+QWidget *EntityInspector::createAttributeEditor(QWidget *parent, std::weak_ptr<MapDocument> document) {
   m_attributeEditor = new EntityPropertyEditor(std::move(document), parent);
   return m_attributeEditor;
 }
 
-QWidget *EntityInspector::createEntityBrowser(
-    QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
+QWidget *EntityInspector::createEntityBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager) {
   auto *panel = new TitledPanel(tr("Entity Browser"), parent);
   m_entityBrowser = new EntityBrowser(std::move(document), contextManager);
 
@@ -92,8 +87,7 @@ QWidget *EntityInspector::createEntityBrowser(
   return panel;
 }
 
-CollapsibleTitledPanel *EntityInspector::createEntityDefinitionFileChooser(
-    QWidget *parent, std::weak_ptr<MapDocument> document) {
+CollapsibleTitledPanel *EntityInspector::createEntityDefinitionFileChooser(QWidget *parent, std::weak_ptr<MapDocument> document) {
   auto *panel = new CollapsibleTitledPanel(tr("Entity Definitions"), true, parent);
   panel->setObjectName("EntityInspector_EntityDefinitionFileChooser");
 

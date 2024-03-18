@@ -9,21 +9,15 @@ namespace TrenchBroom::View {
 
 typedef std::tuple<QString, QString, QString> StringTuple3;
 
+
 class PreferenceModel : public QAbstractTableModel {
 Q_OBJECT
 public:
   enum Columns {
-    Index,
-    Context,
-    Path,
-    Value,
-    Default,
-    Type,
-    count,
+    Index, Context, Path, Value, Default, Type, count,
   };
 
-  QString columnNames[Columns::count]{
-      "Index", "Context", "Path", "Value", "Default", "Type"};
+  QString columnNames[Columns::count]{"Index", "Context", "Path", "Value", "Default", "Type"};
 
 private:
   std::vector<PreferenceBase *> m_preferences;

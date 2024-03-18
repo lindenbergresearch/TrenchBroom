@@ -24,11 +24,15 @@
 #include <map>
 #include <memory>
 
+
 class QDialogButtonBox;
+
 
 class QStackedWidget;
 
+
 class QToolBar;
+
 
 class QWidget;
 
@@ -36,7 +40,9 @@ namespace TrenchBroom {
 namespace View {
 class MapDocument;
 
+
 class PreferencePane;
+
 
 class PreferenceDialog : public QDialog {
 Q_OBJECT
@@ -63,8 +69,7 @@ private:
   std::map<QString, QAction *> m_toolButtonActions;
 
 public:
-  explicit PreferenceDialog(
-      std::shared_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 protected: // QWidget overrides
   void closeEvent(QCloseEvent *event) override;

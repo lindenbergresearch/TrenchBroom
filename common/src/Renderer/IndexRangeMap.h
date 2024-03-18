@@ -31,6 +31,7 @@ namespace TrenchBroom {
 namespace Renderer {
 class VertexArray;
 
+
 /**
  * Manages ranges of primitives that consist of vertices stored in a vertex array. For
  * each primitive type, multiple ranges of vertices can be stored, each range having an
@@ -163,8 +164,7 @@ public:
    *
    * @param func the function to invoke
    */
-  void forEachPrimitive(
-      std::function<void(PrimType, size_t index, size_t count)> func) const;
+  void forEachPrimitive(std::function<void(PrimType, size_t index, size_t count)> func) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

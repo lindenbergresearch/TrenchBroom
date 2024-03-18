@@ -28,14 +28,22 @@
 #include <string>
 #include <vector>
 
+
 class QLineEdit;
+
+
 class QListWidget;
+
+
 class QWidget;
+
+
 class QAbstractButton;
 
 namespace TrenchBroom {
 namespace View {
 class MapDocument;
+
 
 class ModEditor : public QWidget {
 Q_OBJECT
@@ -59,28 +67,42 @@ public:
 
 private:
   void createGui();
+
 private slots:
+
   void updateButtons();
 
 private:
   void connectObservers();
 
   void documentWasNewed(MapDocument *document);
+
   void documentWasLoaded(MapDocument *document);
+
   void modsDidChange();
+
   void preferenceDidChange(const std::filesystem::path &path);
 
   void updateAvailableMods();
+
   void updateMods();
 
   void addModClicked();
+
   void removeModClicked();
+
   void moveModUpClicked();
+
   void moveModDownClicked();
+
   bool canEnableAddButton() const;
+
   bool canEnableRemoveButton() const;
+
   bool canEnableMoveUpButton() const;
+
   bool canEnableMoveDownButton() const;
+
   void filterBoxChanged();
 };
 } // namespace View

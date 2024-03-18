@@ -41,6 +41,7 @@ const float SelectionBoundsRenderer::AXIS_LABEL_DIM_FACTOR = 1.0f;
 static const std::string AXIS_LABELS[3] = {"X", "Y", "Z"};
 static const std::string AXIS_LABEL_DELIMITER = "=";
 
+
 class SelectionBoundsRenderer::SizeTextAnchor2D : public TextAnchor3D {
 private:
   const vm::bbox3 &m_bounds;
@@ -48,23 +49,21 @@ private:
   const Camera &m_camera;
 
 public:
-  SizeTextAnchor2D(
-      const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera)
-      : m_bounds(bounds), m_axis(axis), m_camera(camera) {
+  SizeTextAnchor2D(const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera) : m_bounds(bounds), m_axis(axis), m_camera(camera) {
   }
 
 private:
   vm::vec3f basePosition() const override {
-    const auto half = m_bounds.size()/2.0;
+    const auto half = m_bounds.size() / 2.0;
     auto pos = m_bounds.min;
     pos[m_axis] += half[m_axis];
     return vm::vec3f(pos);
   }
 
   TextAlignment::Type alignment() const override {
-    if (m_axis==vm::axis::x) {
+    if (m_axis == vm::axis::x) {
       return TextAlignment::Top;
-    } else if (m_axis==vm::axis::y && m_camera.direction().x()!=0.0f) {
+    } else if (m_axis == vm::axis::y && m_camera.direction().x() != 0.0f) {
       return TextAlignment::Top;
     } else {
       return TextAlignment::Right;
@@ -89,6 +88,7 @@ private:
   }
 };
 
+
 class SelectionBoundsRenderer::SizeTextAnchor3D : public TextAnchor3D {
 private:
   const vm::bbox3 &m_bounds;
@@ -96,9 +96,7 @@ private:
   const Camera &m_camera;
 
 public:
-  SizeTextAnchor3D(
-      const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera)
-      : m_bounds(bounds), m_axis(axis), m_camera(camera) {
+  SizeTextAnchor3D(const vm::bbox3 &bounds, const vm::axis::type axis, const Renderer::Camera &camera) : m_bounds(bounds), m_axis(axis), m_camera(camera) {
   }
 
 private:
@@ -106,27 +104,23 @@ private:
     const auto camPos = m_bounds.relative_position(vm::vec3(m_camera.position()));
     const auto camDir = m_camera.direction();
     vm::vec3 pos;
-    const auto half = m_bounds.size()/2.0;
+    const auto half = m_bounds.size() / 2.0;
 
-    if (m_axis==vm::axis::z) {
-      if (
-          (camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::less)
-              || (camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::within)) {
+    if (m_axis == vm::axis::z) {
+      if ((camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::less)
+          || (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::within)) {
         pos[0] = m_bounds.min.x();
         pos[1] = m_bounds.max.y();
-      } else if (
-          (camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::greater)
-              || (camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::greater)) {
+      } else if ((camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::greater)
+          || (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::greater)) {
         pos[0] = m_bounds.max.x();
         pos[1] = m_bounds.max.y();
-      } else if (
-          (camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::greater)
-              || (camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::within)) {
+      } else if ((camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::greater)
+          || (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::within)) {
         pos[0] = m_bounds.max.x();
         pos[1] = m_bounds.min.y();
-      } else if (
-          (camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::less)
-              || (camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::less)) {
+      } else if ((camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::less)
+          || (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::less)) {
         pos[0] = m_bounds.min.x();
         pos[1] = m_bounds.min.y();
       } else {
@@ -137,81 +131,51 @@ private:
 
       pos[2] = m_bounds.min.z() + half.z();
     } else {
-      if (m_axis==vm::axis::x) {
+      if (m_axis == vm::axis::x) {
         pos[0] = m_bounds.min.x() + half.x();
-        if (camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::less) {
-          pos[1] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.min.y() : m_bounds.max.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::within) {
+        if (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::less) {
+          pos[1] = camPos[2] == vm::bbox3::Range::within ? m_bounds.min.y() : m_bounds.max.y();
+        } else if (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::within) {
           pos[1] = m_bounds.max.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::greater) {
-          pos[1] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.max.y() : m_bounds.min.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::less) {
-          pos[1] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.min.y() : m_bounds.max.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::within) {
+        } else if (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::greater) {
+          pos[1] = camPos[2] == vm::bbox3::Range::within ? m_bounds.max.y() : m_bounds.min.y();
+        } else if (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::less) {
+          pos[1] = camPos[2] == vm::bbox3::Range::within ? m_bounds.min.y() : m_bounds.max.y();
+        } else if (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::within) {
           pos[1] = camDir.y() <= 0.0f ? m_bounds.min.y() : m_bounds.max.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::greater) {
-          pos[1] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.max.y() : m_bounds.min.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::less) {
-          pos[1] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.min.y() : m_bounds.max.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::within) {
+        } else if (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::greater) {
+          pos[1] = camPos[2] == vm::bbox3::Range::within ? m_bounds.max.y() : m_bounds.min.y();
+        } else if (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::less) {
+          pos[1] = camPos[2] == vm::bbox3::Range::within ? m_bounds.min.y() : m_bounds.max.y();
+        } else if (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::within) {
           pos[1] = m_bounds.min.y();
-        } else if (
-            camPos[0]==vm::bbox3::Range::greater
-                && camPos[1]==vm::bbox3::Range::greater) {
-          pos[1] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.max.y() : m_bounds.min.y();
+        } else if (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::greater) {
+          pos[1] = camPos[2] == vm::bbox3::Range::within ? m_bounds.max.y() : m_bounds.min.y();
         }
       } else {
         pos[1] = m_bounds.min.y() + half.y();
-        if (camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::less) {
-          pos[0] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.min.x() : m_bounds.max.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::within) {
-          pos[0] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.min.x() : m_bounds.max.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::less && camPos[1]==vm::bbox3::Range::greater) {
-          pos[0] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.min.x() : m_bounds.max.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::less) {
+        if (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::less) {
+          pos[0] = camPos[2] == vm::bbox3::Range::within ? m_bounds.min.x() : m_bounds.max.x();
+        } else if (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::within) {
+          pos[0] = camPos[2] == vm::bbox3::Range::within ? m_bounds.min.x() : m_bounds.max.x();
+        } else if (camPos[0] == vm::bbox3::Range::less && camPos[1] == vm::bbox3::Range::greater) {
+          pos[0] = camPos[2] == vm::bbox3::Range::within ? m_bounds.min.x() : m_bounds.max.x();
+        } else if (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::less) {
           pos[0] = m_bounds.min.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::within) {
+        } else if (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::within) {
           pos[0] = camDir.x() <= 0.0f ? m_bounds.min.x() : m_bounds.max.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::within && camPos[1]==vm::bbox3::Range::greater) {
+        } else if (camPos[0] == vm::bbox3::Range::within && camPos[1] == vm::bbox3::Range::greater) {
           pos[0] = m_bounds.max.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::less) {
-          pos[0] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.max.x() : m_bounds.min.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::greater && camPos[1]==vm::bbox3::Range::within) {
-          pos[0] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.max.x() : m_bounds.min.x();
-        } else if (
-            camPos[0]==vm::bbox3::Range::greater
-                && camPos[1]==vm::bbox3::Range::greater) {
-          pos[0] =
-              camPos[2]==vm::bbox3::Range::within ? m_bounds.max.x() : m_bounds.min.x();
+        } else if (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::less) {
+          pos[0] = camPos[2] == vm::bbox3::Range::within ? m_bounds.max.x() : m_bounds.min.x();
+        } else if (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::within) {
+          pos[0] = camPos[2] == vm::bbox3::Range::within ? m_bounds.max.x() : m_bounds.min.x();
+        } else if (camPos[0] == vm::bbox3::Range::greater && camPos[1] == vm::bbox3::Range::greater) {
+          pos[0] = camPos[2] == vm::bbox3::Range::within ? m_bounds.max.x() : m_bounds.min.x();
         }
       }
 
-      if (camPos[2]==vm::bbox3::Range::less) {
+      if (camPos[2] == vm::bbox3::Range::less) {
         pos[2] = m_bounds.min.z();
       } else {
         pos[2] = m_bounds.max.z();
@@ -222,12 +186,12 @@ private:
   }
 
   TextAlignment::Type alignment() const override {
-    if (m_axis==vm::axis::z) {
+    if (m_axis == vm::axis::z) {
       return TextAlignment::Right;
     }
 
     const auto camPos = m_bounds.relative_position(vm::vec3(m_camera.position()));
-    if (camPos[2]==vm::bbox3::Range::less) {
+    if (camPos[2] == vm::bbox3::Range::less) {
       return TextAlignment::Top;
     } else {
       return TextAlignment::Bottom;
@@ -252,6 +216,7 @@ private:
   }
 };
 
+
 class SelectionBoundsRenderer::MinMaxTextAnchor3D : public TextAnchor3D {
 private:
   const vm::bbox3 &m_bounds;
@@ -259,16 +224,13 @@ private:
   const Renderer::Camera &m_camera;
 
 public:
-  MinMaxTextAnchor3D(
-      const vm::bbox3 &bounds,
-      const vm::bbox3::Corner minMax,
-      const Renderer::Camera &camera)
-      : m_bounds(bounds), m_minMax(minMax), m_camera(camera) {
+  MinMaxTextAnchor3D(const vm::bbox3 &bounds, const vm::bbox3::Corner minMax, const Renderer::Camera &camera) :
+      m_bounds(bounds), m_minMax(minMax), m_camera(camera) {
   }
 
 private:
   vm::vec3f basePosition() const override {
-    if (m_minMax==vm::bbox3::Corner::min) {
+    if (m_minMax == vm::bbox3::Corner::min) {
       return vm::vec3f(m_bounds.min);
     } else {
       return vm::vec3f(m_bounds.max);
@@ -277,17 +239,13 @@ private:
 
   TextAlignment::Type alignment() const override {
     const auto camPos = m_bounds.relative_position(vm::vec3(m_camera.position()));
-    if (m_minMax==vm::bbox3::Corner::min) {
-      if (
-          (camPos[1]==vm::bbox3::Range::less)
-              || (camPos[1]==vm::bbox3::Range::within && camPos[0]!=vm::bbox3::Range::less)) {
+    if (m_minMax == vm::bbox3::Corner::min) {
+      if ((camPos[1] == vm::bbox3::Range::less) || (camPos[1] == vm::bbox3::Range::within && camPos[0] != vm::bbox3::Range::less)) {
         return TextAlignment::Top | TextAlignment::Right;
       } else {
         return TextAlignment::Top | TextAlignment::Left;
       }
-    } else if (
-        (camPos[1]==vm::bbox3::Range::less)
-            || (camPos[1]==vm::bbox3::Range::within && camPos[0]!=vm::bbox3::Range::less)) {
+    } else if ((camPos[1] == vm::bbox3::Range::less) || (camPos[1] == vm::bbox3::Range::within && camPos[0] != vm::bbox3::Range::less)) {
       return TextAlignment::Bottom | TextAlignment::Left;
     } else {
       return TextAlignment::Bottom | TextAlignment::Right;
@@ -308,12 +266,11 @@ private:
   }
 };
 
-SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3 &bounds)
-    : m_bounds(bounds) {
+
+SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3 &bounds) : m_bounds(bounds) {
 }
 
-void SelectionBoundsRenderer::render(
-    RenderContext &renderContext, RenderBatch &renderBatch) {
+void SelectionBoundsRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
   bool showObjectBounds = pref(Preferences::ShowObjectBoundsSelectionBounds);
 
   if (showObjectBounds) {
@@ -327,16 +284,14 @@ void SelectionBoundsRenderer::render(
   }
 }
 
-void SelectionBoundsRenderer::renderBounds(
-    RenderContext &renderContext, RenderBatch &renderBatch) {
+void SelectionBoundsRenderer::renderBounds(RenderContext &renderContext, RenderBatch &renderBatch) {
   RenderService renderService(renderContext, renderBatch);
   renderService.setForegroundColor(pref(Preferences::SelectionBoundsColor));
   renderService.setLineWidth(pref(Preferences::SelectionBoundsLineWidth));
   renderService.renderBounds(vm::bbox3f(m_bounds));
 }
 
-void SelectionBoundsRenderer::renderSize(
-    RenderContext &renderContext, RenderBatch &renderBatch) {
+void SelectionBoundsRenderer::renderSize(RenderContext &renderContext, RenderBatch &renderBatch) {
   if (renderContext.render2D())
     renderSize2D(renderContext, renderBatch);
   else
@@ -344,16 +299,13 @@ void SelectionBoundsRenderer::renderSize(
 }
 
 const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_units) {
-  auto unitsDisplayType =
-      (Preferences::LengthUnitDisplay) pref(Preferences::LengthUnitSystem);
+  auto unitsDisplayType = (Preferences::LengthUnitDisplay) pref(Preferences::LengthUnitSystem);
   auto metricConversationFactor = pref(Preferences::MetricConversationFactor);
   auto unitsMaxDigits = pref(Preferences::UnitsMaxDigits);
   std::stringstream buffer;
 
   auto units_str = formatDimension(value_units, unitsMaxDigits).toStdString();
-  auto metric_str =
-      formatDimension(value_units/metricConversationFactor, unitsMaxDigits, "m")
-          .toStdString();
+  auto metric_str = formatDimension(value_units / metricConversationFactor, unitsMaxDigits, "m").toStdString();
 
   switch (unitsDisplayType) {
   case Preferences::Units:buffer << units_str;
@@ -367,8 +319,7 @@ const std::string SelectionBoundsRenderer::getFormattedUnitsString(float value_u
   return buffer.str();
 }
 
-void SelectionBoundsRenderer::renderSize2D(
-    RenderContext &renderContext, RenderBatch &renderBatch) {
+void SelectionBoundsRenderer::renderSize2D(RenderContext &renderContext, RenderBatch &renderBatch) {
   Color colors[3];
   std::stringstream buffer;
 
@@ -377,26 +328,24 @@ void SelectionBoundsRenderer::renderSize2D(
   renderService.setShowOccludedObjects();
   auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
 
-  colors[0] = AXIS_LABEL_DIM_FACTOR*Color(pref(Preferences::XAxisColor), alpha);
-  colors[1] = AXIS_LABEL_DIM_FACTOR*Color(pref(Preferences::YAxisColor), alpha);
+  colors[0] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::XAxisColor), alpha);
+  colors[1] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::YAxisColor), alpha);
 
   const Camera &camera = renderContext.camera();
   const vm::vec3f &direction = camera.direction();
 
   const vm::vec3 boundsSize = correct(m_bounds.size());
-  for (size_t i = 0; i < 3; ++i) {
+  for (size_t i = 0; i < 3; ++ i) {
     renderService.setBackgroundColor(colors[i]);
-    if (direction[i]==0.0f) {
-      buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER
-             << getFormattedUnitsString(float(boundsSize[i]));
+    if (direction[i] == 0.0f) {
+      buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER << getFormattedUnitsString(float(boundsSize[i]));
       renderService.renderString(buffer.str(), SizeTextAnchor2D(m_bounds, i, camera));
       buffer.str("");
     }
   }
 }
 
-void SelectionBoundsRenderer::renderSize3D(
-    RenderContext &renderContext, RenderBatch &renderBatch) {
+void SelectionBoundsRenderer::renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch) {
   Color colors[3];
   std::stringstream buffer;
 
@@ -405,47 +354,42 @@ void SelectionBoundsRenderer::renderSize3D(
   renderService.setShowOccludedObjects();
   auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
 
-  colors[0] = AXIS_LABEL_DIM_FACTOR*Color(pref(Preferences::XAxisColor), alpha);
-  colors[1] = AXIS_LABEL_DIM_FACTOR*Color(pref(Preferences::YAxisColor), alpha);
-  colors[2] = AXIS_LABEL_DIM_FACTOR*Color(pref(Preferences::ZAxisColor), alpha);
+  colors[0] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::XAxisColor), alpha);
+  colors[1] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::YAxisColor), alpha);
+  colors[2] = AXIS_LABEL_DIM_FACTOR * Color(pref(Preferences::ZAxisColor), alpha);
 
   const vm::vec3 boundsSize = correct(m_bounds.size());
-  for (size_t i = 0; i < 3; ++i) {
+  for (size_t i = 0; i < 3; ++ i) {
     renderService.setBackgroundColor(colors[i]);
-    buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER
-           << getFormattedUnitsString(float(boundsSize[i]));
+    buffer << AXIS_LABELS[i] << AXIS_LABEL_DELIMITER << getFormattedUnitsString(float(boundsSize[i]));
     renderService.renderString(
         buffer.str(), SizeTextAnchor3D(m_bounds, i, renderContext.camera()));
     buffer.str("");
   }
 }
 
-void SelectionBoundsRenderer::renderMinMax(
-    RenderContext &renderContext, RenderBatch &renderBatch) {
+void SelectionBoundsRenderer::renderMinMax(RenderContext &renderContext, RenderBatch &renderBatch) {
   std::stringstream buffer;
 
   RenderService renderService(renderContext, renderBatch);
   renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-  renderService.setBackgroundColor(Color(
-      pref(Preferences::InfoOverlayBackgroundColor),
-      pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
+  renderService.setBackgroundColor(
+      Color(
+          pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
   renderService.setShowOccludedObjects();
 
   buffer << "Min: " << vm::correct(m_bounds.min);
   renderService.renderString(
-      buffer.str(),
-      MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::min, renderContext.camera()));
+      buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::min, renderContext.camera()));
   buffer.str("");
 
   buffer << "Max: " << vm::correct(m_bounds.max);
   renderService.renderString(
-      buffer.str(),
-      MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::max, renderContext.camera()));
+      buffer.str(), MinMaxTextAnchor3D(m_bounds, vm::bbox3::Corner::max, renderContext.camera()));
 }
 
-QString SelectionBoundsRenderer::formatDimension(
-    const float value, const int digits, const QString &suffix) {
-  auto isInt = (value - std::trunc(value)==0);
+QString SelectionBoundsRenderer::formatDimension(const float value, const int digits, const QString &suffix) {
+  auto isInt = (value - std::trunc(value) == 0);
   QString str = "";
 
   if (isInt) {

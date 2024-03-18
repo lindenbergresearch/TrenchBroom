@@ -24,7 +24,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include <memory>
 
+
 class QSplitter;
+
+
 class QWidget;
 
 namespace TrenchBroom {
@@ -34,10 +37,19 @@ class Texture;
 
 namespace View {
 class CollapsibleTitledPanel;
+
+
 class FaceAttribsEditor;
+
+
 class GLContextManager;
+
+
 class MapDocument;
+
+
 class TextureBrowser;
+
 
 class FaceInspector : public TabBookPage {
 Q_OBJECT
@@ -51,24 +63,27 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  FaceInspector(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
+
   ~FaceInspector() override;
 
   bool cancelMouseDrag();
+
   void revealTexture(const Assets::Texture *texture);
 
 private:
   void createGui(GLContextManager &contextManager);
+
   QWidget *createFaceAttribsEditor(GLContextManager &contextManager);
+
   QWidget *createTextureBrowser(GLContextManager &contextManager);
+
   QWidget *createTextureBrowserInfo();
 
   void textureSelected(const Assets::Texture *texture);
 
   void connectObservers();
+
   void documentWasNewedOrOpened(MapDocument *document);
 };
 } // namespace View

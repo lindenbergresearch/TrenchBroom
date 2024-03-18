@@ -34,7 +34,7 @@ namespace TrenchBroom {
 // PreferenceSerializer
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, bool &out) const {
-  if (!in.isBool()) {
+  if (! in.isBool()) {
     return false;
   }
   out = in.toBool();
@@ -42,7 +42,7 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, bool &out) const {
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, Color &out) const {
-  if (!in.isString()) {
+  if (! in.isString()) {
     return false;
   }
 
@@ -55,7 +55,7 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, Color &out) const 
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, vm::vec3f &out) const {
-  if (!in.isString()) {
+  if (! in.isString()) {
     return false;
   }
 
@@ -72,7 +72,7 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, vm::vec3f &out) co
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, float &out) const {
-  if (!in.isDouble()) {
+  if (! in.isDouble()) {
     return false;
   }
   out = static_cast<float>(in.toDouble());
@@ -80,16 +80,15 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, float &out) const 
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, int &out) const {
-  if (!in.isDouble()) {
+  if (! in.isDouble()) {
     return false;
   }
   out = static_cast<int>(in.toDouble());
   return true;
 }
 
-bool PreferenceSerializer::readFromJson(
-    const QJsonValue &in, std::filesystem::path &out) const {
-  if (!in.isString()) {
+bool PreferenceSerializer::readFromJson(const QJsonValue &in, std::filesystem::path &out) const {
+  if (! in.isString()) {
     return false;
   }
 
@@ -98,7 +97,7 @@ bool PreferenceSerializer::readFromJson(
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, QKeySequence &out) const {
-  if (!in.isString()) {
+  if (! in.isString()) {
     return false;
   }
   out = QKeySequence{in.toString(), QKeySequence::PortableText};
@@ -106,7 +105,7 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, QKeySequence &out)
 }
 
 bool PreferenceSerializer::readFromJson(const QJsonValue &in, QString &out) const {
-  if (!in.isString()) {
+  if (! in.isString()) {
     return false;
   }
 
@@ -119,9 +118,7 @@ QJsonValue PreferenceSerializer::writeToJson(const bool in) const {
 }
 
 namespace {
-template<typename T, typename L>
-QJsonValue toJson(
-    const T &in, const L &serialize = [](QTextStream &lhs, const T &rhs) { lhs << rhs; }) {
+template<typename T, typename L> QJsonValue toJson(const T &in, const L &serialize = [](QTextStream &lhs, const T &rhs) { lhs << rhs; }) {
   // NOTE: QTextStream's default locale is C, unlike QString::arg()
   auto string = QString{};
   auto stream = QTextStream{&string};
@@ -129,22 +126,25 @@ QJsonValue toJson(
   return {string};
 }
 
-template<typename T>
-QJsonValue toJson(const T &in) {
+template<typename T> QJsonValue toJson(const T &in) {
   return toJson(in, [](QTextStream &lhs, const T &rhs) { lhs << rhs; });
 }
 } // namespace
 
 QJsonValue PreferenceSerializer::writeToJson(const Color &in) const {
-  return toJson(in, [](QTextStream &lhs, const Color &rhs) {
-    lhs << rhs.r() << " " << rhs.g() << " " << rhs.b() << " " << rhs.a();
-  });
+  return toJson(
+      in, [](QTextStream &lhs, const Color &rhs) {
+        lhs << rhs.r() << " " << rhs.g() << " " << rhs.b() << " " << rhs.a();
+      }
+  );
 }
 
 QJsonValue PreferenceSerializer::writeToJson(const vm::vec3f &in) const {
-  return toJson(in, [](QTextStream &lhs, const vm::vec3f &rhs) {
-    lhs << rhs.x() << " " << rhs.y() << " " << rhs.z();
-  });
+  return toJson(
+      in, [](QTextStream &lhs, const vm::vec3f &rhs) {
+        lhs << rhs.x() << " " << rhs.y() << " " << rhs.z();
+      }
+  );
 }
 
 QJsonValue PreferenceSerializer::writeToJson(const float in) const {
@@ -178,11 +178,11 @@ PreferenceBase &PreferenceBase::operator=(const PreferenceBase &other) = default
 PreferenceBase &PreferenceBase::operator=(PreferenceBase &&other) = default;
 
 bool operator==(const PreferenceBase &lhs, const PreferenceBase &rhs) {
-  return &lhs==&rhs;
+  return &lhs == &rhs;
 }
 
 bool operator!=(const PreferenceBase &lhs, const PreferenceBase &rhs) {
-  return !(lhs==rhs);
+  return ! (lhs == rhs);
 }
 
 PreferenceBase::~PreferenceBase() = default;

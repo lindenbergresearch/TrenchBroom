@@ -15,7 +15,7 @@ QSSBuilder *QSSBuilder::fromFile(const std::filesystem::path &path) {
     file.open(QFile::ReadOnly | QFile::Text);
     builder->setText(QTextStream{&file}.readAll());
 
-    if (!builder->text.isNull() || !builder->text.isEmpty()) {
+    if (! builder->text.isNull() || ! builder->text.isEmpty()) {
       qInfo() << "Created builder from file: " << path.c_str();
       return builder;
     }
@@ -46,7 +46,7 @@ void QSSBuilder::update() {
     std::function<QString()> repl = item.second;
     auto replacement = repl();
 
-    if (!replacement.isEmpty()) {
+    if (! replacement.isEmpty()) {
       renderedText.replace(source, replacement);
     }
   }

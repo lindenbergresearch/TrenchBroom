@@ -46,8 +46,10 @@ public:
 
 private:
   static const std::string WordDelims;
+
   Token emitToken() override;
 };
+
 
 class LegacyModelDefinitionParser : public Parser<MdlToken::Type> {
 private:
@@ -56,6 +58,7 @@ private:
 
 public:
   LegacyModelDefinitionParser(std::string_view str, size_t line, size_t column);
+
   TokenizerState tokenizerState() const;
 
 public:
@@ -63,8 +66,11 @@ public:
 
 private:
   EL::Expression parseModelDefinition(ParserStatus &status);
+
   EL::Expression parseStaticModelDefinition(ParserStatus &status);
+
   EL::Expression parseDynamicModelDefinition(ParserStatus &status);
+
   EL::Expression parseNamedValue(ParserStatus &status, const std::string &name);
 
 private:

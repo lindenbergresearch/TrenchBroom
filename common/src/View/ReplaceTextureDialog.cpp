@@ -45,17 +45,13 @@
 
 namespace TrenchBroom::View {
 
-ReplaceTextureDialog::ReplaceTextureDialog(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
-    : QDialog{parent}, m_document{std::move(document)} {
+ReplaceTextureDialog::ReplaceTextureDialog(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) :
+    QDialog{parent}, m_document{std::move(document)} {
   createGui(contextManager);
 }
 
 namespace {
-void replaceTextures(
-    MapDocument &document,
-    const std::vector<Model::BrushFaceHandle> &faces,
-    const std::string &textureName) {
+void replaceTextures(MapDocument &document, const std::vector<Model::BrushFaceHandle> &faces, const std::string &textureName) {
   auto request = Model::ChangeBrushFaceAttributesRequest{};
   request.setTextureName(textureName);
 
@@ -63,7 +59,7 @@ void replaceTextures(
 
   auto transaction = Transaction{document, "Replace Textures"};
   document.selectBrushFaces(faces);
-  if (!document.setFaceAttributes(request)) {
+  if (! document.setFaceAttributes(request)) {
     transaction.cancel();
     return;
   }
@@ -73,36 +69,31 @@ void replaceTextures(
 
 void ReplaceTextureDialog::accept() {
   const auto *subject = m_subjectBrowser->selectedTexture();
-  ensure(subject!=nullptr, "subject is null");
+  ensure(subject != nullptr, "subject is null");
 
   const auto *replacement = m_replacementBrowser->selectedTexture();
-  ensure(replacement!=nullptr, "replacement is null");
+  ensure(replacement != nullptr, "replacement is null");
 
   auto document = kdl::mem_lock(m_document);
   const auto faces = getApplicableFaces();
 
   if (faces.empty()) {
     QMessageBox::warning(
-        this,
-        tr("Replace Failed"),
-        tr("None of the selected faces has the selected texture"));
+        this, tr("Replace Failed"), tr("None of the selected faces has the selected texture"));
     return;
   }
 
   replaceTextures(*document, faces, replacement->name());
 
   const auto msg = fmt::format(
-      "Replaced texture '{}' with '{}' on {} faces.",
-      subject->name(),
-      replacement->name(),
-      faces.size());
+      "Replaced texture '{}' with '{}' on {} faces.", subject->name(), replacement->name(), faces.size());
 
   QMessageBox::information(this, tr("Replace Succeeded"), QString::fromStdString(msg));
 }
 
 std::vector<Model::BrushFaceHandle> ReplaceTextureDialog::getApplicableFaces() const {
   const auto *subject = m_subjectBrowser->selectedTexture();
-  ensure(subject!=nullptr, "subject is null");
+  ensure(subject != nullptr, "subject is null");
 
   auto document = kdl::mem_lock(m_document);
   auto faces = document->allSelectedBrushFaces();
@@ -111,7 +102,8 @@ std::vector<Model::BrushFaceHandle> ReplaceTextureDialog::getApplicableFaces() c
   }
 
   return kdl::vec_filter(
-      faces, [&](const auto &handle) { return handle.face().texture()==subject; });
+      faces, [&](const auto &handle) { return handle.face().texture() == subject; }
+  );
 }
 
 void ReplaceTextureDialog::createGui(GLContextManager &contextManager) {
@@ -122,10 +114,8 @@ void ReplaceTextureDialog::createGui(GLContextManager &contextManager) {
   m_subjectBrowser = new TextureBrowser{m_document, contextManager};
   m_subjectBrowser->setHideUnused(true);
   connect(
-      m_subjectBrowser,
-      &TextureBrowser::textureSelected,
-      this,
-      &ReplaceTextureDialog::subjectSelected);
+      m_subjectBrowser, &TextureBrowser::textureSelected, this, &ReplaceTextureDialog::subjectSelected
+  );
 
   auto *subjectPanelLayout = new QVBoxLayout{};
   subjectPanelLayout->setContentsMargins(QMargins{});
@@ -137,10 +127,8 @@ void ReplaceTextureDialog::createGui(GLContextManager &contextManager) {
   m_replacementBrowser = new TextureBrowser{m_document, contextManager};
   m_replacementBrowser->setSelectedTexture(nullptr); // Override the current texture.
   connect(
-      m_replacementBrowser,
-      &TextureBrowser::textureSelected,
-      this,
-      &ReplaceTextureDialog::replacementSelected);
+      m_replacementBrowser, &TextureBrowser::textureSelected, this, &ReplaceTextureDialog::replacementSelected
+  );
 
   auto *replacementPanelLayout = new QVBoxLayout{};
   replacementPanelLayout->setContentsMargins(QMargins{});

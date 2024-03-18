@@ -23,11 +23,13 @@
 
 #include "View/TitleBar.h"
 
+
 class QLabel;
 
 namespace TrenchBroom {
 namespace View {
 class BorderLine;
+
 
 class CollapsibleTitleBar : public TitleBar {
 Q_OBJECT
@@ -35,8 +37,7 @@ private:
   QLabel *m_stateText;
 
 public:
-  CollapsibleTitleBar(
-      const QString &title, const QString &stateText, QWidget *parent = nullptr);
+  CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
 
   void setStateText(const QString &stateText);
 
@@ -48,6 +49,7 @@ protected:
   void mousePressEvent(QMouseEvent *event) override;
 };
 
+
 class CollapsibleTitledPanel : public QWidget {
 Q_OBJECT
 private:
@@ -56,8 +58,7 @@ private:
   bool m_expanded;
 
 public:
-  explicit CollapsibleTitledPanel(
-      const QString &title, bool initiallyExpanded = true, QWidget *parent = nullptr);
+  explicit CollapsibleTitledPanel(const QString &title, bool initiallyExpanded = true, QWidget *parent = nullptr);
 
   QWidget *getPanel() const;
 

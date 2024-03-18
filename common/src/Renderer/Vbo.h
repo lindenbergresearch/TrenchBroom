@@ -68,13 +68,11 @@ public:
 
   void unbind();
 
-  template<typename T>
-  size_t writeElements(const size_t address, const std::vector<T> &elements) {
+  template<typename T> size_t writeElements(const size_t address, const std::vector<T> &elements) {
     return writeArray(address, elements.data(), elements.size());
   }
 
-  template<typename T>
-  size_t writeBuffer(const size_t address, const std::vector<T> &buffer) {
+  template<typename T> size_t writeBuffer(const size_t address, const std::vector<T> &buffer) {
     return writeArray(address, buffer.data(), buffer.size());
   }
 
@@ -87,9 +85,8 @@ public:
    * @param count     number of elements to write
    * @return          number of bytes written
    */
-  template<typename T>
-  size_t writeArray(const size_t address, const T *array, const size_t count) {
-    const size_t size = count*sizeof(T);
+  template<typename T> size_t writeArray(const size_t address, const T *array, const size_t count) {
+    const size_t size = count * sizeof(T);
     assert(address + size <= m_capacity);
 
     static_assert(std::is_trivially_copyable<T>::value);

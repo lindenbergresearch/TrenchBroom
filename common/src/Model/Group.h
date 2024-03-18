@@ -41,10 +41,13 @@ public:
   explicit Group(std::string name);
 
   const std::string &name() const;
+
   void setName(std::string name);
 
   const vm::mat4x4 &transformation() const;
+
   void setTransformation(const vm::mat4x4 &transformation);
+
   void transform(const vm::mat4x4 &transformation);
 };
 

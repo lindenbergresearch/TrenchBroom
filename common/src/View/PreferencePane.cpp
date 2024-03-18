@@ -21,8 +21,7 @@
 
 namespace TrenchBroom {
 namespace View {
-PreferencePane::PreferencePane(QWidget *parent)
-    : QWidget(parent) {
+PreferencePane::PreferencePane(QWidget *parent) : QWidget(parent) {
 }
 
 PreferencePane::~PreferencePane() = default;

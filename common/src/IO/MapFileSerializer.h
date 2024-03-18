@@ -29,11 +29,23 @@
 namespace TrenchBroom {
 namespace Model {
 class BezierPatch;
+
+
 class Brush;
+
+
 class BrushNode;
+
+
 class BrushFace;
+
+
 class EntityProperty;
+
+
 class Node;
+
+
 class PatchNode;
 } // namespace Model
 
@@ -52,32 +64,38 @@ private:
   std::unordered_map<const Model::Node *, PrecomputedString> m_nodeToPrecomputedString;
 
 public:
-  static std::unique_ptr<NodeSerializer> create(
-      Model::MapFormat format, std::ostream &stream);
+  static std::unique_ptr<NodeSerializer> create(Model::MapFormat format, std::ostream &stream);
 
 protected:
   explicit MapFileSerializer(std::ostream &stream);
 
 private:
   void doBeginFile(const std::vector<const Model::Node *> &rootNodes) override;
+
   void doEndFile() override;
 
   void doBeginEntity(const Model::Node *node) override;
+
   void doEndEntity(const Model::Node *node) override;
+
   void doEntityProperty(const Model::EntityProperty &attribute) override;
+
   void doBrush(const Model::BrushNode *brush) override;
+
   void doBrushFace(const Model::BrushFace &face) override;
 
   void doPatch(const Model::PatchNode *patchNode) override;
 
 private:
   void setFilePosition(const Model::Node *node);
+
   size_t startLine();
 
 private: // threadsafe
-  virtual void doWriteBrushFace(
-      std::ostream &stream, const Model::BrushFace &face) const = 0;
+  virtual void doWriteBrushFace(std::ostream &stream, const Model::BrushFace &face) const = 0;
+
   PrecomputedString writeBrushFaces(const Model::Brush &brush) const;
+
   PrecomputedString writePatch(const Model::BezierPatch &patch) const;
 };
 } // namespace IO

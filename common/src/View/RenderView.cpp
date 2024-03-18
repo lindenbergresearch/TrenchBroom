@@ -80,8 +80,8 @@
 
 namespace TrenchBroom {
 namespace View {
-RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
-    : QOpenGLWidget(parent), m_glContext(&contextManager), boxFilter(32), m_framesRendered(0) {
+RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) :
+    QOpenGLWidget(parent), m_glContext(&contextManager), boxFilter(32), m_framesRendered(0) {
 
   auto palette = QPalette{};
   m_focusColor = palette.color(QPalette::Highlight);
@@ -90,35 +90,33 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
   // FPS counter
   QTimer *fpsCounter = new QTimer(this);
 
-  connect(fpsCounter, &QTimer::timeout, [&]() {
-    avgFps = (avgFps + m_framesRendered*2)*0.5;
-    m_framesRendered = 0;
+  connect(
+      fpsCounter, &QTimer::timeout, [&]() {
+        avgFps = (avgFps + m_framesRendered * 2) * 0.5;
+        m_framesRendered = 0;
 
-    auto frameT = 1.f/avgFps;
+        auto frameT = 1.f / avgFps;
 
-    if (m_totalFrames%60*5==0)
-      maxFrameTime = 0;
+        if (m_totalFrames % 60 * 5 == 0)
+          maxFrameTime = 0;
 
-    if (maxFrameTime < frameT)
-      maxFrameTime = frameT;
+        if (maxFrameTime < frameT)
+          maxFrameTime = frameT;
 
-    std::basic_string<char> appendix = "";
+        std::basic_string<char> appendix = "";
 
-    if (context()) {
-      appendix = " | swbuff: " + std::to_string(int(context()->format().swapBehavior())) +
-          " | swap: " + std::to_string(int(context()->format().swapInterval()));
-    }
+        if (context()) {
+          appendix =
+              " | swbuff: " + std::to_string(int(context()->format().swapBehavior())) + " | swap: " + std::to_string(int(context()->format().swapInterval()));
+        }
 
-    m_currentFPS =
-        std::string("FPS=") + std::to_string(int(avgFps))
-            + " frames=" + std::to_string(m_totalFrames)
-            + " max=" + std::to_string(maxFrameTime*1000.0) + "ms. | "
-            + std::to_string(m_glContext->vboManager().currentVboCount()) + " VBOs ("
-            + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) mem: "
-            + std::to_string(m_glContext->vboManager().currentVboSize()/1024u) + "k @ "
-            + std::to_string(glWidth) + "x" + std::to_string(glHeight) + " | depth: "
-            + std::to_string(depthBits()) + " | msamples: " + std::to_string(multisample()) + appendix;
-  });
+        m_currentFPS =
+            std::string("FPS=") + std::to_string(int(avgFps)) + " frames=" + std::to_string(m_totalFrames) + " max=" + std::to_string(maxFrameTime * 1000.0)
+                + "ms. | " + std::to_string(m_glContext->vboManager().currentVboCount()) + " VBOs (" + std::to_string(m_glContext->vboManager().peakVboCount())
+                + " peak) mem: " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + "k @ " + std::to_string(glWidth) + "x"
+                + std::to_string(glHeight) + " | depth: " + std::to_string(depthBits()) + " | msamples: " + std::to_string(multisample()) + appendix;
+      }
+  );
 
   fpsCounter->start(500);
   setMouseTracking(true); // request mouse move events even when no button is held down
@@ -137,25 +135,16 @@ void RenderView::keyReleaseEvent(QKeyEvent *event) {
   //update();
 }
 
-QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(
-    const QWidget *widget, const QMouseEvent *event) {
+QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
   // The localPos of a Qt mouse event is only in integer coordinates, but window pos
   // and screen pos have full precision. We can't directly map the windowPos because
   // mapTo takes QPoint, so we just map the origin and subtract that.
-  QPointF localPos =
-      event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
+  QPointF localPos = event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
 
   boxFilter.add(new QPointF(localPos.x(), localPos.y()));
 
   return QMouseEvent(
-      event->type(),
-      boxFilter.average(),
-      event->windowPos(),
-      event->screenPos(),
-      event->button(),
-      event->buttons(),
-      event->modifiers(),
-      event->source());
+      event->type(), boxFilter.average(), event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
 }
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
@@ -166,7 +155,7 @@ void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
 void RenderView::mouseMoveEvent(QMouseEvent *event) {
   auto length = (size_t) pref(Preferences::CameraLookSmoothing);
 
-  if (boxFilter.length!=length) {
+  if (boxFilter.length != length) {
     boxFilter.reset();
     boxFilter.length = length;
   }
@@ -221,7 +210,7 @@ int RenderView::depthBits() const {
 bool RenderView::multisample() const {
   if (this->context()) {
     const auto format = this->context()->format();
-    return format.samples()!=-1;
+    return format.samples() != - 1;
   } else {
     return 0;
   }
@@ -260,7 +249,7 @@ const Color &RenderView::getBackgroundColor() {
 }
 
 void RenderView::renderFocusIndicator() {
-  if (!doShouldRenderFocusIndicator() || !hasFocus())
+  if (! doShouldRenderFocusIndicator() || ! hasFocus())
     return;
 
   const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator);
@@ -268,8 +257,8 @@ void RenderView::renderFocusIndicator() {
   const Color &inner = Color(drawFocus ? m_focusColor : m_frameColor);
 
   const qreal r = devicePixelRatioF();
-  const auto w = static_cast<float>(width()*r);
-  const auto h = static_cast<float>(height()*r);
+  const auto w = static_cast<float>(width() * r);
+  const auto h = static_cast<float>(height() * r);
   glAssert(glViewport(0, 0, static_cast<int>(w), static_cast<int>(h)));
   glWidth = (int) w;
   glHeight = (int) h;
@@ -278,36 +267,31 @@ void RenderView::renderFocusIndicator() {
   const auto t = hasFocus() ? 1.0f : 1.0f;
 
   const auto projection = vm::ortho_matrix(
-      -1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
+      - 1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
   Renderer::Transformation transformation(projection, vm::mat4x4f::identity());
 
   glAssert(glDisable(GL_DEPTH_TEST));
 
   using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
   auto array = Renderer::VertexArray::move(
-      std::vector<Vertex>({// top
-                              Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
-                              Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
-                              Vertex(vm::vec3f(w - t, t, 0.0f), inner),
-                              Vertex(vm::vec3f(t, t, 0.0f), inner),
+      std::vector<Vertex>(
+          {// top
+              Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+              Vertex(vm::vec3f(t, t, 0.0f), inner),
 
-                              // right
-                              Vertex(vm::vec3f(w, 0.0f, 0.0f), outer),
-                              Vertex(vm::vec3f(w, h, 0.0f), outer),
-                              Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
-                              Vertex(vm::vec3f(w - t, t, 0.0f), inner),
+              // right
+              Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+              Vertex(vm::vec3f(w - t, t, 0.0f), inner),
 
-                              // bottom
-                              Vertex(vm::vec3f(w, h, 0.0f), outer),
-                              Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
-                              Vertex(vm::vec3f(t, h - t, 0.0f), inner),
-                              Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
+              // bottom
+              Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(t, h - t, 0.0f), inner),
+              Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
 
-                              // left
-                              Vertex(vm::vec3f(0.0f, h, 0.0f), outer),
-                              Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer),
-                              Vertex(vm::vec3f(t, t, 0.0f), inner),
-                              Vertex(vm::vec3f(t, h - t, 0.0f), inner)}));
+              // left
+              Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(t, t, 0.0f), inner),
+              Vertex(vm::vec3f(t, h - t, 0.0f), inner)
+          }
+      ));
 
   array.prepare(vboManager());
   array.render(Renderer::PrimType::Quads);
@@ -319,8 +303,7 @@ bool RenderView::doInitializeGL() {
   return m_glContext->initialize();
 }
 
-void RenderView::doUpdateViewport(
-    const int /* x */, const int /* y */, const int /* width */, const int /* height */) {
+void RenderView::doUpdateViewport(const int /* x */, const int /* y */, const int /* width */, const int /* height */) {
 }
 
 void RenderView::updateEvent() {
@@ -332,28 +315,28 @@ QPointF BoxFilter::average() {
   QPointF sum = QPointF(0, 0);
 
   for (QPointF *item : samples) {
-    if (item!=nullptr) {
+    if (item != nullptr) {
       sum = QPointF(sum.x() + item->x(), sum.y() + item->y());
-      c++;
+      c ++;
     }
   }
 
-  return c==0 ? QPoint(0, 0) : QPointF(sum.x()/c, sum.y()/c);
+  return c == 0 ? QPoint(0, 0) : QPointF(sum.x() / c, sum.y() / c);
 }
 
 void BoxFilter::reset() {
   samples.clear();
-  for (size_t i = 0; i < size; ++i) {
+  for (size_t i = 0; i < size; ++ i) {
     samples.push_back(nullptr);
   }
 }
 
 void BoxFilter::add(QPointF *point) {
-  if (++index >= length) {
+  if (++ index >= length) {
     index = 0;
   }
 
-  if (samples[index]!=nullptr)
+  if (samples[index] != nullptr)
     delete samples[index];
 
   samples[index] = point;

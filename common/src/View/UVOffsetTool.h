@@ -28,9 +28,12 @@ namespace TrenchBroom {
 namespace View {
 class DragTracker;
 
+
 class MapDocument;
 
+
 class UVViewHelper;
+
 
 class UVOffsetTool : public ToolController, public Tool {
 private:

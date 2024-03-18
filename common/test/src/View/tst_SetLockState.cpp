@@ -38,137 +38,353 @@
 
 namespace TrenchBroom {
 namespace View {
-TEST_CASE_METHOD(ValveMapDocumentTest, "SetLockStateTest.lockStateChanges")
+TEST_CASE_METHOD(ValveMapDocumentTest,
+"SetLockStateTest.lockStateChanges") {
+auto *brushNode = createBrushNode();
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+auto *patchNode = createPatchNode();
+
+auto *entityNodeInGroup = new Model::EntityNode{Model::Entity{}};
+
+document->addNodes( {{
+document->
+
+parentForNodes(),
+
 {
-    auto *brushNode = createBrushNode();
-    auto *entityNode = new Model::EntityNode{Model::Entity{}};
-    auto *patchNode = createPatchNode();
+brushNode, entityNode, patchNode, entityNodeInGroup
+}
+}
+});
+document->
 
-    auto *entityNodeInGroup = new Model::EntityNode{Model::Entity{}};
+deselectAll();
 
-    document->addNodes({{document->parentForNodes(), {brushNode, entityNode, patchNode, entityNodeInGroup}}});
-    document->deselectAll();
-    document->selectNodes({entityNodeInGroup});
+document->selectNodes({
+entityNodeInGroup});
 
-    auto *groupNode = document->groupSelection("group");
-    document->deselectAll();
+auto *groupNode = document->groupSelection("group");
+document->
 
-    auto *layerNode = new Model::LayerNode{Model::Layer{"layer"}};
-    document->addNodes({{document->world(), {layerNode}}});
+deselectAll();
 
-    REQUIRE_FALSE(brushNode->locked());
-    REQUIRE_FALSE(entityNode->locked());
-    REQUIRE_FALSE(groupNode->locked());
-    REQUIRE_FALSE(patchNode->locked());
+auto *layerNode = new Model::LayerNode{Model::Layer{"layer"}};
+document->addNodes({
+{
+document->
 
-    document->lock({brushNode, entityNode, groupNode, patchNode});
-    CHECK(brushNode->locked());
-    CHECK(entityNode->locked());
-    CHECK(groupNode->locked());
-    CHECK(patchNode->locked());
+world(),
 
-    document->undoCommand();
-    CHECK_FALSE(brushNode->locked());
-    CHECK_FALSE(entityNode->locked());
-    CHECK_FALSE(groupNode->locked());
-    CHECK_FALSE(patchNode->locked());
+{
+layerNode}}});
 
-    REQUIRE_FALSE(layerNode->locked());
+REQUIRE_FALSE(brushNode
+->
 
-    document->lock({layerNode});
-    CHECK(layerNode->locked());
+locked()
 
-    document->undoCommand();
-    CHECK_FALSE(layerNode->locked());
+);
+REQUIRE_FALSE(entityNode
+->
+
+locked()
+
+);
+REQUIRE_FALSE(groupNode
+->
+
+locked()
+
+);
+REQUIRE_FALSE(patchNode
+->
+
+locked()
+
+);
+
+document->lock({
+brushNode, entityNode, groupNode, patchNode});
+CHECK(brushNode
+->
+
+locked()
+
+);
+CHECK(entityNode
+->
+
+locked()
+
+);
+CHECK(groupNode
+->
+
+locked()
+
+);
+CHECK(patchNode
+->
+
+locked()
+
+);
+
+document->
+
+undoCommand();
+
+CHECK_FALSE(brushNode
+->
+
+locked()
+
+);
+CHECK_FALSE(entityNode
+->
+
+locked()
+
+);
+CHECK_FALSE(groupNode
+->
+
+locked()
+
+);
+CHECK_FALSE(patchNode
+->
+
+locked()
+
+);
+
+REQUIRE_FALSE(layerNode
+->
+
+locked()
+
+);
+
+document->lock({
+layerNode});
+CHECK(layerNode
+->
+
+locked()
+
+);
+
+document->
+
+undoCommand();
+
+CHECK_FALSE(layerNode
+->
+
+locked()
+
+);
 }
 
-TEST_CASE_METHOD(ValveMapDocumentTest, "SetLockStateTest.modificationCount")
+TEST_CASE_METHOD(ValveMapDocumentTest,
+"SetLockStateTest.modificationCount")
 {
-    auto *brushNode = createBrushNode();
-    auto *entityNode = new Model::EntityNode{Model::Entity{}};
-    auto *patchNode = createPatchNode();
+auto *brushNode = createBrushNode();
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+auto *patchNode = createPatchNode();
 
-    auto *entityNodeInGroup = new Model::EntityNode{Model::Entity{}};
+auto *entityNodeInGroup = new Model::EntityNode{Model::Entity{}};
 
-    document->addNodes({{document->parentForNodes(), {brushNode, entityNode, patchNode, entityNodeInGroup}}});
-    document->deselectAll();
-    document->selectNodes({entityNodeInGroup});
+document->addNodes({
+{
+document->
 
-    auto *groupNode = document->groupSelection("group");
-    document->deselectAll();
+parentForNodes(),
 
-    auto *layerNode = new Model::LayerNode{Model::Layer{"layer"}};
-    document->addNodes({{document->world(), {layerNode}}});
+{
+brushNode, entityNode, patchNode, entityNodeInGroup}}});
+document->
 
-    const auto originalModificationCount = document->modificationCount();
+deselectAll();
 
-    document->lock({brushNode, entityNode, groupNode, patchNode});
-    CHECK(document->modificationCount() == originalModificationCount);
+document->selectNodes({
+entityNodeInGroup});
 
-    document->undoCommand();
-    CHECK(document->modificationCount() == originalModificationCount);
+auto *groupNode = document->groupSelection("group");
+document->
 
-    document->lock({layerNode});
-    CHECK(document->modificationCount() == originalModificationCount + 1u);
+deselectAll();
 
-    document->undoCommand();
-    CHECK(document->modificationCount() == originalModificationCount);
+auto *layerNode = new Model::LayerNode{Model::Layer{"layer"}};
+document->addNodes({
+{
+document->
+
+world(),
+
+{
+layerNode}}});
+
+const auto originalModificationCount = document->modificationCount();
+
+document->lock({
+brushNode, entityNode, groupNode, patchNode});
+CHECK(document
+->
+
+modificationCount()
+
+== originalModificationCount);
+
+document->
+
+undoCommand();
+
+CHECK(document
+->
+
+modificationCount()
+
+== originalModificationCount);
+
+document->lock({
+layerNode});
+CHECK(document
+->
+
+modificationCount()
+
+== originalModificationCount + 1u);
+
+document->
+
+undoCommand();
+
+CHECK(document
+->
+
+modificationCount()
+
+== originalModificationCount);
 }
 
-TEST_CASE_METHOD(ValveMapDocumentTest, "SetLockStateTest.selection")
+TEST_CASE_METHOD(ValveMapDocumentTest,
+"SetLockStateTest.selection")
 {
-    auto *selectedBrushNode = createBrushNode();
-    auto *unselectedBrushNode = createBrushNode();
-    auto *unlockedBrushNode = createBrushNode();
+auto *selectedBrushNode = createBrushNode();
+auto *unselectedBrushNode = createBrushNode();
+auto *unlockedBrushNode = createBrushNode();
 
-    auto *layerNode = new Model::LayerNode{Model::Layer{"layer"}};
-    document->addNodes({{document->world(), {layerNode}}});
+auto *layerNode = new Model::LayerNode{Model::Layer{"layer"}};
+document->addNodes({
+{
+document->
 
-    document->addNodes({{layerNode, {unlockedBrushNode}}});
-    document->addNodes({{document->world()->defaultLayer(), {selectedBrushNode, unselectedBrushNode}}});
+world(),
 
-    SECTION("Node selection")
-    {
-        document->selectNodes({selectedBrushNode, unlockedBrushNode});
+{
+layerNode}}});
 
-        REQUIRE_THAT(document->selectedNodes().nodes(), Catch::UnorderedEquals(std::vector<Model::Node *>{
-                selectedBrushNode, unlockedBrushNode
-            }
-        ));
-        document->lock({document->world()->defaultLayer()});
-        CHECK_THAT(document->selectedNodes().nodes(), Catch::UnorderedEquals(std::vector<Model::Node *>{
-                unlockedBrushNode
-            }
-        ));
+document->addNodes({
+{
+layerNode, {
+unlockedBrushNode}}});
+document->addNodes({
+{
+document->world()->defaultLayer(), {
+selectedBrushNode, unselectedBrushNode}}});
 
-        document->undoCommand();
-        CHECK_THAT(document->selectedNodes().nodes(), Catch::UnorderedEquals(std::vector<Model::Node *>{
-                selectedBrushNode, unlockedBrushNode
-            }
-        ));
-    }
+SECTION("Node selection")
+{
+document->selectNodes({
+selectedBrushNode, unlockedBrushNode});
 
-    SECTION("Brush face selection")
-    {
-        document->selectBrushFaces({{selectedBrushNode, 0},
-                                    {selectedBrushNode, 1},
-                                    {unlockedBrushNode, 0}}
-        );
+REQUIRE_THAT(document
+->
 
-        REQUIRE_THAT(document->selectedBrushFaces(), Catch::UnorderedEquals(std::vector<Model::BrushFaceHandle>{{selectedBrushNode, 0},
-                                                                                                                {selectedBrushNode, 1},
-                                                                                                                {unlockedBrushNode, 0}}
-        ));
+selectedNodes()
 
-        document->lock({document->world()->defaultLayer()});
-        CHECK_THAT(document->selectedBrushFaces(), Catch::UnorderedEquals(std::vector<Model::BrushFaceHandle>{{unlockedBrushNode, 0}}));
+.
 
-        document->undoCommand();
-        CHECK_THAT(document->selectedBrushFaces(), Catch::UnorderedEquals(std::vector<Model::BrushFaceHandle>{{selectedBrushNode, 0},
-                                                                                                              {selectedBrushNode, 1},
-                                                                                                              {unlockedBrushNode, 0}}
-        ));
-    }
+nodes(), Catch::UnorderedEquals(
+    std::vector<Model::Node *>{selectedBrushNode, unlockedBrushNode}
+)
+
+);
+document->lock({
+document->world()->defaultLayer()});
+CHECK_THAT(document
+->
+
+selectedNodes()
+
+.
+
+nodes(), Catch::UnorderedEquals(
+    std::vector<Model::Node *>{unlockedBrushNode}
+)
+
+);
+
+document->
+
+undoCommand();
+
+CHECK_THAT(document
+->
+
+selectedNodes()
+
+.
+
+nodes(), Catch::UnorderedEquals(
+    std::vector<Model::Node *>{selectedBrushNode, unlockedBrushNode}
+)
+
+);
 }
-} // namespace View
+
+SECTION("Brush face selection")
+{
+document->selectBrushFaces({
+{
+selectedBrushNode, 0},
+{
+selectedBrushNode, 1},
+{
+unlockedBrushNode, 0}}
+);
+
+REQUIRE_THAT(document
+->
+
+selectedBrushFaces(), Catch::UnorderedEquals(
+    std::vector<Model::BrushFaceHandle>{{selectedBrushNode, 0}, {selectedBrushNode, 1}, {unlockedBrushNode, 0}}
+)
+
+);
+
+document->lock({
+document->world()->defaultLayer()});
+CHECK_THAT(document
+->
+
+selectedBrushFaces(), Catch::UnorderedEquals(std::vector<Model::BrushFaceHandle>{{unlockedBrushNode, 0}})
+
+);
+
+document->
+
+undoCommand();
+
+CHECK_THAT(document
+->
+
+selectedBrushFaces(), Catch::UnorderedEquals(
+    std::vector<Model::BrushFaceHandle>{{selectedBrushNode, 0}, {selectedBrushNode, 1}, {unlockedBrushNode, 0}}
+)
+
+);
+}}} // namespace View
 } // namespace TrenchBroom

@@ -29,6 +29,7 @@ namespace TrenchBroom {
 namespace View {
 class MapDocumentCommandFacade;
 
+
 class UndoableCommand : public Command {
 private:
   size_t m_modificationCount;
@@ -46,8 +47,7 @@ public:
   virtual bool collateWith(UndoableCommand &command);
 
 protected:
-  virtual std::unique_ptr<CommandResult> doPerformUndo(
-      MapDocumentCommandFacade *document) = 0;
+  virtual std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) = 0;
 
   virtual bool doCollateWith(UndoableCommand &command);
 

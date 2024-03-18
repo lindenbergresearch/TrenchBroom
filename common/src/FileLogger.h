@@ -26,6 +26,7 @@
 #include <fstream>
 #include <string>
 
+
 class QString;
 
 namespace TrenchBroom {

@@ -25,7 +25,9 @@ namespace TrenchBroom {
 namespace View {
 class DragTracker;
 
+
 class MoveObjectsTool;
+
 
 class MoveObjectsToolController : public ToolController {
 private:

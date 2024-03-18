@@ -24,7 +24,9 @@
 #include <QStyleOptionSlider>
 #include <QWidget>
 
+
 class QLabel;
+
 
 class QSlider;
 
@@ -41,13 +43,9 @@ private:
 
 public:
   SliderWithLabel(
-      int minimum,
-      int maximum,
-      const float factor = 0.0,
-      const QString &format = "%d",
-      const int maxSliderWidth = 0,
-      const int minLabelWidth = 0,
-      QWidget *parent = nullptr);
+      int minimum, int maximum, const float factor = 0.0, const QString &format = "%d", const int maxSliderWidth = 0, const int minLabelWidth = 0,
+      QWidget *parent = nullptr
+  );
 
   int value() const;
 

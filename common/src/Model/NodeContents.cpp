@@ -25,21 +25,16 @@
 
 namespace TrenchBroom {
 namespace Model {
-NodeContents::NodeContents(
-    std::variant<Layer, Group, Entity, Brush, BezierPatch> contents)
-    : m_contents(std::move(contents)) {
+NodeContents::NodeContents(std::variant<Layer, Group, Entity, Brush, BezierPatch> contents) : m_contents(std::move(contents)) {
   std::visit(
       kdl::overload(
-          [](Layer &) {},
-          [](Group &) {},
-          [](Entity &entity) { entity.unsetEntityDefinitionAndModel(); },
-          [](Brush &brush) {
+          [](Layer &) {}, [](Group &) {}, [](Entity &entity) { entity.unsetEntityDefinitionAndModel(); }, [](Brush &brush) {
             for (auto &face : brush.faces()) {
               face.setTexture(nullptr);
             }
-          },
-          [](BezierPatch &) {}),
-      m_contents);
+          }, [](BezierPatch &) {}
+      ), m_contents
+  );
 }
 
 const std::variant<Layer, Group, Entity, Brush, BezierPatch> &NodeContents::get() const {

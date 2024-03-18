@@ -30,13 +30,17 @@
 
 namespace TrenchBroom {
 namespace IO {
-TEST_CASE("ResourceUtilsTest.loadDefaultTexture")
-{
-    auto fs = std::make_shared<DiskFileSystem>(std::filesystem::current_path() / "fixture/test/IO/ResourceUtils/assets");
-    NullLogger logger;
+TEST_CASE("ResourceUtilsTest.loadDefaultTexture") {
+auto fs = std::make_shared<DiskFileSystem>(std::filesystem::current_path() / "fixture/test/IO/ResourceUtils/assets");
+NullLogger logger;
 
-    auto texture = loadDefaultTexture(*fs, "some_name", logger);
-    CHECK(texture.name() == "some_name");
+auto texture = loadDefaultTexture(*fs, "some_name", logger);
+CHECK(texture
+.
+
+name()
+
+== "some_name");
 }
 } // namespace IO
 } // namespace TrenchBroom

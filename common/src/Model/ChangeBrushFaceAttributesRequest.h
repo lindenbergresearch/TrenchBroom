@@ -30,39 +30,35 @@
 namespace TrenchBroom {
 namespace Model {
 class BrushFace;
+
+
 class BrushFaceHandle;
+
+
 class BrushFaceAttributes;
+
 
 class ChangeBrushFaceAttributesRequest {
 public:
   // TODO: replace with class based enum
   typedef enum {
-    AxisOp_None,
-    AxisOp_Reset,
-    AxisOp_ToParaxial,
-    AxisOp_ToParallel
+    AxisOp_None, AxisOp_Reset, AxisOp_ToParaxial, AxisOp_ToParallel
   } AxisOp;
 
   // TODO: replace with class based enum
   typedef enum {
-    ValueOp_None,
-    ValueOp_Set,
-    ValueOp_Add,
-    ValueOp_Mul
+    ValueOp_None, ValueOp_Set, ValueOp_Add, ValueOp_Mul
   } ValueOp;
 
   // TODO: replace with class based enum
   typedef enum {
-    FlagOp_None,
-    FlagOp_Replace,
-    FlagOp_Set,   // TODO: rename to SetBits
+    FlagOp_None, FlagOp_Replace, FlagOp_Set,   // TODO: rename to SetBits
     FlagOp_Unset, // TODO: rename to UnsetBits or ClearBits
   } FlagOp;
 
   // TODO: replace with class based enum
   typedef enum {
-    TextureOp_None,
-    TextureOp_Set
+    TextureOp_None, TextureOp_Set
   } TextureOp;
 
 private:
@@ -95,43 +91,61 @@ public:
   void clear();
 
   const std::string name() const;
+
   bool evaluate(BrushFace &brushFace) const;
 
   void resetAll(const BrushFaceAttributes &defaultFaceAttributes);
+
   void resetAllToParaxial(const BrushFaceAttributes &defaultFaceAttributes);
 
   void setTextureName(const std::string &textureName);
 
   void resetTextureAxes();
+
   void resetTextureAxesToParaxial();
+
   void resetTextureAxesToParallel();
 
   void setOffset(const vm::vec2f &offset);
+
   void addOffset(const vm::vec2f &offset);
+
   void mulOffset(const vm::vec2f &offset);
 
   void setXOffset(float xOffset);
+
   void addXOffset(float xOffset);
+
   void mulXOffset(float xOffset);
 
   void setYOffset(float yOffset);
+
   void addYOffset(float yOffset);
+
   void mulYOffset(float yOffset);
 
   void setRotation(float rotation);
+
   void addRotation(float rotation);
+
   void mulRotation(float rotation);
 
   void setScale(const vm::vec2f &scale);
+
   void addScale(const vm::vec2f &scale);
+
   void mulScale(const vm::vec2f &scale);
 
   void setXScale(float xScale);
+
   void addXScale(float xScale);
+
   void mulXScale(float xScale);
 
   void setYScale(float yScale);
+
   void addYScale(float yScale);
+
   void mulYScale(float yScale);
 
   /**
@@ -139,22 +153,28 @@ public:
    * flags (leaving other surface flags on the target face as-is).
    */
   void setSurfaceFlags(int surfaceFlags);
+
   /**
    * When evaluated, the flags in `surfaceFlags` are cleared on the target face's surface
    * flags (leaving other surface flags on the target face as-is).
    */
   void unsetSurfaceFlags(int surfaceFlags);
+
   /**
    * When evaluated, replace the target face's surface flags with `surfaceFlags`.
    */
   void replaceSurfaceFlags(const std::optional<int> &surfaceFlags);
 
   void setContentFlags(int contentFlags);
+
   void unsetContentFlags(int contentFlags);
+
   void replaceContentFlags(const std::optional<int> &contentFlags);
 
   void setSurfaceValue(const std::optional<float> &surfaceValue);
+
   void addSurfaceValue(float surfaceValue);
+
   void mulSurfaceValue(float surfaceValue);
 
   void setColor(const std::optional<Color> &colorValue);
@@ -164,11 +184,14 @@ public:
    * face to the evaluation target.
    */
   void setAll(const Model::BrushFace &face);
+
   /**
    * Same as setAll(), but doesn't transfer content flags.
    */
   void setAllExceptContentFlags(const Model::BrushFace &face);
+
   void setAll(const Model::BrushFaceAttributes &attributes);
+
   void setAllExceptContentFlags(const Model::BrushFaceAttributes &attributes);
 };
 } // namespace Model

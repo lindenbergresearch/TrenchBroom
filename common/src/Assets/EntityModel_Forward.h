@@ -24,13 +24,20 @@
 namespace TrenchBroom {
 namespace Renderer {
 class IndexRangeMap;
+
+
 class TexturedIndexRangeMap;
 } // namespace Renderer
 
 namespace Assets {
 class EntityModel;
+
+
 class EntityModelLoadedFrame;
+
+
 class EntityModelSurface;
+
 
 using EntityModelVertex = Renderer::GLVertexTypes::P3T2::Vertex;
 using EntityModelIndices = Renderer::IndexRangeMap;

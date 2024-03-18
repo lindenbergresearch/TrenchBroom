@@ -27,18 +27,16 @@
 
 namespace TrenchBroom {
 namespace EL {
-Interpolator::Interpolator(const std::string &str)
-    : ELParser(ELParser::Mode::Lenient, str) {
+Interpolator::Interpolator(const std::string &str) : ELParser(ELParser::Mode::Lenient, str) {
 }
 
 std::string Interpolator::interpolate(const EvaluationContext &context) {
   std::stringstream result;
-  while (!m_tokenizer.eof()) {
+  while (! m_tokenizer.eof()) {
     m_tokenizer.appendUntil("${", result);
-    if (!m_tokenizer.eof()) {
+    if (! m_tokenizer.eof()) {
       Expression expression = parse();
-      result
-          << expression.evaluate(context).convertTo(EL::ValueType::String).stringValue();
+      result << expression.evaluate(context).convertTo(EL::ValueType::String).stringValue();
       expect(IO::ELToken::CBrace, m_tokenizer.nextToken());
     }
   }

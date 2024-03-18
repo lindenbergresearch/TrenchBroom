@@ -24,8 +24,7 @@
 
 namespace TrenchBroom::Model {
 
-Object::Object()
-    : m_linkId{generateUuid()} {
+Object::Object() : m_linkId{generateUuid()} {
 }
 
 Object::~Object() = default;
@@ -72,12 +71,12 @@ const GroupNode *Object::containingGroup() const {
 }
 
 bool Object::containedInGroup() const {
-  return containingGroup()!=nullptr;
+  return containingGroup() != nullptr;
 }
 
 bool Object::containingGroupOpened() const {
   const auto *group = containingGroup();
-  return group==nullptr || group->opened();
+  return group == nullptr || group->opened();
 }
 
 } // namespace TrenchBroom::Model

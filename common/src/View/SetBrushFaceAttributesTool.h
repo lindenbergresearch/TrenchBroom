@@ -28,7 +28,10 @@
 
 namespace TrenchBroom::View {
 class DragTracker;
+
+
 class MapDocument;
+
 
 /**
  * Functionality summary:
@@ -52,9 +55,11 @@ public:
 
 private:
   Tool &tool() override;
+
   const Tool &tool() const override;
 
   bool mouseClick(const InputState &inputState) override;
+
   bool mouseDoubleClick(const InputState &inputState) override;
 
   bool cancel() override;
@@ -62,6 +67,7 @@ private:
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
   void copyAttributesFromSelection(const InputState &inputState, bool applyToBrush);
+
   bool canCopyAttributesFromSelection(const InputState &inputState) const;
 };
 

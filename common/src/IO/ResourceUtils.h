@@ -25,7 +25,9 @@
 
 #define DISABLE_RECOLORING_ICON
 
+
 class QIcon;
+
 
 class QPixmap;
 
@@ -39,6 +41,7 @@ class Texture;
 
 namespace TrenchBroom::IO {
 class FileSystem;
+
 
 // Svg render oversampling for quality improvement
 static const int OverSampleFactor = 4;
@@ -54,8 +57,7 @@ static const float DefaultIconAlpha = 0.7f;
  * @param name the name of the texture to be returned
  * @return the default texture
  */
-Assets::Texture loadDefaultTexture(
-    const FileSystem &fs, std::string name, Logger &logger);
+Assets::Texture loadDefaultTexture(const FileSystem &fs, std::string name, Logger &logger);
 
 QPixmap loadPixmapResource(const std::filesystem::path &imagePath);
 

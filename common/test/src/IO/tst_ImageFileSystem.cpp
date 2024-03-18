@@ -458,50 +458,63 @@ const auto cr8_czg_03_contents = std::vector<unsigned char>{
     0x8D, 0x8D, 0x12, 0x8D, 0x11, 0x10, 0x10, 0x11, 0xAE, 0xAE, 0x13, 0x8D, 0x11, 0x10, 0x10, 0x11, 0x8D, 0x13, 0x8D, 0x13, 0x11, 0x10, 0x8E, 0x11, 0x8D, 0xAD
 };
 
-TEST_CASE("Hierarchical ImageFileSystems")
-{
-    const auto fsTestPath = std::filesystem::current_path() / "fixture/test/IO/";
-    const auto [name, fs] = GENERATE_REF(values<std::tuple<std::string, std::shared_ptr<FileSystem>>>(
-        {{"IdPakFileSystem", openFS<IdPakFileSystem>(fsTestPath / "Pak/idpak.pak")},
-         {"DkPakFileSystem", openFS<DkPakFileSystem>(fsTestPath / "Pak/dkpak.pak")},
-         {"ZipFileSystem",   openFS<ZipFileSystem>(fsTestPath / "Zip/zip.zip")},
+TEST_CASE("Hierarchical ImageFileSystems") {
+const auto fsTestPath = std::filesystem::current_path() / "fixture/test/IO/";
+const auto [name, fs] = GENERATE_REF(
+    values<std::tuple<std::string, std::shared_ptr<FileSystem>>>(
+        {{"IdPakFileSystem", openFS<IdPakFileSystem>(fsTestPath / "Pak/idpak.pak")}, {"DkPakFileSystem", openFS<DkPakFileSystem>(fsTestPath / "Pak/dkpak.pak")},
+         {"ZipFileSystem", openFS<ZipFileSystem>(fsTestPath / "Zip/zip.zip")},
         }
     ));
 
-    CAPTURE(name);
+CAPTURE(name);
 
-    SECTION("pathInfo")
-    {
-        CHECK(fs->pathInfo("pics") == PathInfo::Directory);
-        CHECK(fs->pathInfo("PICS") == PathInfo::Directory);
-        CHECK(fs->pathInfo("pics/tag1.pcx") == PathInfo::File);
-        CHECK(fs->pathInfo("PICS/TAG1.pcX") == PathInfo::File);
-        CHECK(fs->pathInfo("does_not_exist") == PathInfo::Unknown);
-    }
+SECTION("pathInfo") {
+CHECK(fs
+->pathInfo("pics") == PathInfo::Directory);
+CHECK(fs
+->pathInfo("PICS") == PathInfo::Directory);
+CHECK(fs
+->pathInfo("pics/tag1.pcx") == PathInfo::File);
+CHECK(fs
+->pathInfo("PICS/TAG1.pcX") == PathInfo::File);
+CHECK(fs
+->pathInfo("does_not_exist") == PathInfo::Unknown);
+}
 
-    SECTION("find")
-    {
-        CHECK_THAT(fs->find("", TraversalMode::Flat), MatchesPathsResult({
-                "bear.cfg", "pics", "textures", "amnet.cfg",
-            }
-        ));
+SECTION("find") {
+CHECK_THAT(fs
+->find("", TraversalMode::Flat), MatchesPathsResult( {
+"bear.cfg", "pics", "textures", "amnet.cfg",
+}
+));
 
-        CHECK_THAT(fs->find("pics", TraversalMode::Flat), MatchesPathsResult({"pics/tag2.pcx", "pics/tag1.pcx",}));
+CHECK_THAT(fs
+->find("pics", TraversalMode::Flat), MatchesPathsResult({
+"pics/tag2.pcx", "pics/tag1.pcx",}));
 
-        CHECK_THAT(fs->find("", TraversalMode::Recursive), MatchesPathsResult({
-                "amnet.cfg", "textures", "textures/e1u3", "textures/e1u3/strs1_3.wal", "textures/e1u3/stflr1_5.wal", "textures/e1u2", "textures/e1u2/basic1_7.wal",
-                "textures/e1u2/angle1_2.wal", "textures/e1u2/angle1_1.wal", "textures/e1u1", "textures/e1u1/brlava.wal", "textures/e1u1/box1_3.wal", "pics",
-                "pics/tag2.pcx", "pics/tag1.pcx", "bear.cfg",
-            }
-        ));
-    }
+CHECK_THAT(fs
+->find("", TraversalMode::Recursive), MatchesPathsResult({
+"amnet.cfg", "textures", "textures/e1u3", "textures/e1u3/strs1_3.wal", "textures/e1u3/stflr1_5.wal", "textures/e1u2", "textures/e1u2/basic1_7.wal",
+"textures/e1u2/angle1_2.wal", "textures/e1u2/angle1_1.wal", "textures/e1u1", "textures/e1u1/brlava.wal", "textures/e1u1/box1_3.wal", "pics",
+"pics/tag2.pcx", "pics/tag1.pcx", "bear.cfg",
+}
+));
+}
 
-    SECTION("openFile")
-    {
-        const auto amnet_cfg = fs->openFile("amnet.cfg").value();
+SECTION("openFile")
+{
+const auto amnet_cfg = fs->openFile("amnet.cfg").value();
 
-        auto reader = amnet_cfg->reader();
-        CHECK(reader.readString(reader.size()) == R"(//
+auto reader = amnet_cfg->reader();
+CHECK(reader
+.
+readString(reader
+.
+
+size()
+
+) == R"(//
 // my stuff
 //
 
@@ -530,51 +543,62 @@ bind mouse1 v30
 alias v30 "fov 30; sensitivity 7; bind mouse1 v90"
 alias v90 "fov 90; sensitivity 13; bind mouse1 v30"
 )");
-    }
-}
+}}
 
 TEST_CASE("Flat ImageFileSystems")
 {
-    const auto fsTestPath = std::filesystem::current_path() / "fixture/test/IO/";
-    const auto [name, fs] = GENERATE_REF(values<std::tuple<std::string, std::shared_ptr<FileSystem>>>({{
-                                                                                                           "WadFileSystem",
-                                                                                                           openFS<WadFileSystem>(fsTestPath / "Wad/cr8_czg.wad")
-                                                                                                       },
-        }
+const auto fsTestPath = std::filesystem::current_path() / "fixture/test/IO/";
+const auto [name, fs] = GENERATE_REF(
+    values<std::tuple<std::string, std::shared_ptr<FileSystem>>>(
+        {{"WadFileSystem", openFS<WadFileSystem>(fsTestPath / "Wad/cr8_czg.wad")},}
     ));
 
-    CAPTURE(name);
+CAPTURE(name);
 
-    SECTION("pathInfo")
-    {
-        CHECK(fs->pathInfo("cr8_czg_1.D") == PathInfo::File);
-        CHECK(fs->pathInfo("speedM_1.D") == PathInfo::File);
-        CHECK(fs->pathInfo("SpEeDm_1.D") == PathInfo::File);
-        CHECK(fs->pathInfo("does_not_exist") == PathInfo::Unknown);
-    }
-
-    SECTION("directoryContents")
-    {
-        const auto traversalMode = GENERATE(TraversalMode::Flat, TraversalMode::Recursive);
-        CAPTURE(traversalMode);
-
-        CHECK_THAT(fs->find("", traversalMode), MatchesPathsResult({
-                "blowjob_machine.D", "bongs2.D", "can-o-jam.D", "cap4can-o-jam.D", "coffin1.D", "coffin2.D", "cr8_czg_1.D", "cr8_czg_2.D", "cr8_czg_3.D",
-                "cr8_czg_4.D", "cr8_czg_5.D", "crackpipes.D", "czg_backhole.D", "czg_fronthole.D", "dex_5.D", "eat_me.D", "for_sux-m-ass.D", "lasthopeofhuman.D",
-                "polished_turd.D", "speedM_1.D", "u_get_this.D",
-            }
-        ));
-    }
-
-    SECTION("openFile")
-    {
-        const auto cr8_czg_3_d = fs->openFile("cr8_czg_3.D").value();
-
-        auto reader = cr8_czg_3_d->reader();
-        auto contents = std::vector<unsigned char>(reader.size());
-        reader.read(contents.data(), reader.size());
-        CHECK(contents == cr8_czg_03_contents);
-    }
+SECTION("pathInfo")
+{
+CHECK(fs
+->pathInfo("cr8_czg_1.D") == PathInfo::File);
+CHECK(fs
+->pathInfo("speedM_1.D") == PathInfo::File);
+CHECK(fs
+->pathInfo("SpEeDm_1.D") == PathInfo::File);
+CHECK(fs
+->pathInfo("does_not_exist") == PathInfo::Unknown);
 }
-} // namespace IO
+
+SECTION("directoryContents")
+{
+const auto traversalMode = GENERATE(TraversalMode::Flat, TraversalMode::Recursive);
+CAPTURE(traversalMode);
+
+CHECK_THAT(fs
+->find("", traversalMode), MatchesPathsResult({
+"blowjob_machine.D", "bongs2.D", "can-o-jam.D", "cap4can-o-jam.D", "coffin1.D", "coffin2.D", "cr8_czg_1.D", "cr8_czg_2.D", "cr8_czg_3.D",
+"cr8_czg_4.D", "cr8_czg_5.D", "crackpipes.D", "czg_backhole.D", "czg_fronthole.D", "dex_5.D", "eat_me.D", "for_sux-m-ass.D", "lasthopeofhuman.D",
+"polished_turd.D", "speedM_1.D", "u_get_this.D",
+}
+));
+}
+
+SECTION("openFile")
+{
+const auto cr8_czg_3_d = fs->openFile("cr8_czg_3.D").value();
+
+auto reader = cr8_czg_3_d->reader();
+auto contents = std::vector<unsigned char>(reader.size());
+reader.
+read(contents
+.
+
+data(), reader
+
+.
+
+size()
+
+);
+CHECK(contents
+== cr8_czg_03_contents);
+}}} // namespace IO
 } // namespace TrenchBroom

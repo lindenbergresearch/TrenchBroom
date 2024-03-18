@@ -31,24 +31,42 @@
 
 namespace TrenchBroom::Model {
 class BrushFace;
+
+
 class BrushFaceHandle;
+
+
 class Node;
+
+
 class PickResult;
 } // namespace TrenchBroom::Model
 
 namespace TrenchBroom::Renderer {
 class BrushRenderer;
+
+
 class Camera;
+
+
 class RenderBatch;
+
+
 class RenderContext;
 } // namespace TrenchBroom::Renderer
 
 namespace TrenchBroom::View {
 class Grid;
+
+
 class MapDocument;
+
+
 class Selection;
 
+
 class ClipStrategy;
+
 
 class ClipTool : public Tool {
 public:
@@ -56,9 +74,7 @@ public:
 
 private:
   enum class ClipSide {
-    Front,
-    Both,
-    Back
+    Front, Both, Back
   };
 
 private:
@@ -80,39 +96,30 @@ private:
 
 public:
   explicit ClipTool(std::weak_ptr<MapDocument> document);
+
   ~ClipTool() override;
 
   const Grid &grid() const;
 
   void toggleSide();
 
-  void pick(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult);
+  void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
 
-  void render(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const Model::PickResult &pickResult);
+  void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
 
 private:
-  void renderBrushes(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
-  void renderStrategy(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const Model::PickResult &pickResult);
+  void renderBrushes(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+
+  void renderStrategy(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
 
 public:
-  void renderFeedback(
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch,
-      const vm::vec3 &point) const;
+  void renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const;
 
 public:
   bool hasBrushes() const;
+
   bool canClip() const;
+
   void performClip();
 
 private:
@@ -122,50 +129,65 @@ public:
   vm::vec3 defaultClipPointPos() const;
 
   bool canAddPoint(const vm::vec3 &point) const;
+
   bool hasPoints() const;
+
   void addPoint(const vm::vec3 &point, const std::vector<vm::vec3> &helpVectors);
+
   bool canRemoveLastPoint() const;
+
   bool removeLastPoint();
 
-  std::optional<std::tuple<vm::vec3, vm::vec3>> beginDragPoint(
-      const Model::PickResult &pickResult);
+  std::optional<std::tuple<vm::vec3, vm::vec3>> beginDragPoint(const Model::PickResult &pickResult);
+
   void beginDragLastPoint();
+
   bool dragPoint(const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors);
+
   void endDragPoint();
+
   void cancelDragPoint();
 
   void setFace(const Model::BrushFaceHandle &face);
+
   bool reset();
 
 private:
   void resetStrategy();
+
   void update();
 
   void clearBrushes();
+
   void updateBrushes();
 
-  void setFaceAttributes(
-      const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet) const;
+  void setFaceAttributes(const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet) const;
 
   void clearRenderers();
+
   void updateRenderers();
-  void addBrushesToRenderer(
-      const std::map<Model::Node *, std::vector<Model::Node *>> &map,
-      Renderer::BrushRenderer &renderer);
+
+  void addBrushesToRenderer(const std::map<Model::Node *, std::vector<Model::Node *>> &map, Renderer::BrushRenderer &renderer);
 
   bool keepFrontBrushes() const;
+
   bool keepBackBrushes() const;
 
 private:
   bool doActivate() override;
+
   bool doDeactivate() override;
 
   bool doRemove();
 
   void connectObservers();
+
   void selectionDidChange(const Selection &selection);
+
   void nodesWillChange(const std::vector<Model::Node *> &nodes);
+
   void nodesDidChange(const std::vector<Model::Node *> &nodes);
+
   void brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &nodes);
 };
 

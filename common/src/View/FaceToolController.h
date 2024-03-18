@@ -25,6 +25,7 @@ namespace TrenchBroom {
 namespace View {
 class FaceTool;
 
+
 class FaceToolController : public VertexToolControllerBase<FaceTool> {
 private:
   class SelectFacePart;

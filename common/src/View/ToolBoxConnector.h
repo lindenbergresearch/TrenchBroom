@@ -34,7 +34,9 @@ class PickResult;
 namespace Renderer {
 class Camera;
 
+
 class RenderBatch;
+
 
 class RenderContext;
 } // namespace Renderer
@@ -42,11 +44,15 @@ class RenderContext;
 namespace View {
 class PickRequest;
 
+
 class ToolController;
+
 
 class ToolBox;
 
+
 class ToolChain;
+
 
 class ToolBoxConnector : public InputEventProcessor {
 private:
@@ -91,8 +97,7 @@ public: // cancel
 protected: // rendering
   void setRenderOptions(Renderer::RenderContext &renderContext);
 
-  void renderTools(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderTools(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 private:
   ModifierKeyState modifierKeys();

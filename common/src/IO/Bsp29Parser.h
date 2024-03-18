@@ -34,12 +34,17 @@
 namespace TrenchBroom {
 namespace Assets {
 class Palette;
+
+
 class Texture;
 } // namespace Assets
 
 namespace IO {
 class FileSystem;
+
+
 class Reader;
+
 
 class Bsp29Parser : public EntityModelParser {
 private:
@@ -72,39 +77,33 @@ private:
   const FileSystem &m_fs;
 
 public:
-  Bsp29Parser(
-      std::string name,
-      const Reader &reader,
-      Assets::Palette palette,
-      const FileSystem &fs);
+  Bsp29Parser(std::string name, const Reader &reader, Assets::Palette palette, const FileSystem &fs);
 
   static bool canParse(const std::filesystem::path &path, Reader reader);
 
 private:
   std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
-  void doLoadFrame(
-      size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+
+  void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 
   std::vector<Assets::Texture> parseTextures(Reader reader, Logger &logger);
+
   TextureInfoList parseTextureInfos(Reader reader, size_t textureInfoCount);
+
   std::vector<vm::vec3f> parseVertices(Reader reader, size_t vertexCount);
+
   EdgeInfoList parseEdgeInfos(Reader reader, size_t edgeInfoCount);
+
   FaceInfoList parseFaceInfos(Reader reader, size_t faceInfoCount);
+
   FaceEdgeIndexList parseFaceEdges(Reader reader, size_t faceEdgeCount);
 
   void parseFrame(
-      Reader reader,
-      size_t frameIndex,
-      Assets::EntityModel &model,
-      const TextureInfoList &textureInfos,
-      const std::vector<vm::vec3f> &vertices,
-      const EdgeInfoList &edgeInfos,
-      const FaceInfoList &faceInfos,
-      const FaceEdgeIndexList &faceEdges);
-  vm::vec2f textureCoords(
-      const vm::vec3f &vertex,
-      const TextureInfo &textureInfo,
-      const Assets::Texture *texture) const;
+      Reader reader, size_t frameIndex, Assets::EntityModel &model, const TextureInfoList &textureInfos, const std::vector<vm::vec3f> &vertices,
+      const EdgeInfoList &edgeInfos, const FaceInfoList &faceInfos, const FaceEdgeIndexList &faceEdges
+  );
+
+  vm::vec2f textureCoords(const vm::vec3f &vertex, const TextureInfo &textureInfo, const Assets::Texture *texture) const;
 };
 } // namespace IO
 } // namespace TrenchBroom

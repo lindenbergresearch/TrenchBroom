@@ -23,13 +23,19 @@
 
 #include <vector>
 
+
 class QFocusEvent;
+
+
 class QMouseEvent;
+
+
 class QWindow;
 
 namespace TrenchBroom {
 namespace View {
 class MapViewBase;
+
 
 /**
  * Tracks the activation state of the group of map views in the map window. The group of
@@ -140,6 +146,7 @@ private:
    * @param widget the window that received the event
    */
   void enterEvent(QEvent *event, QWidget *widget);
+
   void dragEnterEvent(QEvent *event, QWidget *widget);
 
   /**

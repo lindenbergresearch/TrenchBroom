@@ -30,13 +30,12 @@
 #include "View/QtUtils.h"
 
 namespace TrenchBroom::View {
-ColorsPreferencePane::ColorsPreferencePane(QWidget *parent)
-    : PreferencePane(parent), m_table(nullptr), m_model(nullptr), m_proxy(nullptr) {
+ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(parent), m_table(nullptr), m_model(nullptr), m_proxy(nullptr) {
   m_model = new ColorModel(this);
   m_proxy = new QSortFilterProxyModel(this);
   m_proxy->setSourceModel(m_model);
   m_proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
-  m_proxy->setFilterKeyColumn(-1); // Filter based on all columns
+  m_proxy->setFilterKeyColumn(- 1); // Filter based on all columns
 
   m_table = new QTableView();
   m_table->setCornerButtonEnabled(false);
@@ -44,19 +43,24 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent)
 
   m_table->setHorizontalHeader(new QHeaderView(Qt::Horizontal));
   m_table->horizontalHeader()->setSectionResizeMode(
-      ColorModel::Columns::Value, QHeaderView::ResizeMode::Fixed);
+      ColorModel::Columns::Value, QHeaderView::ResizeMode::Fixed
+  );
   m_table->horizontalHeader()->setSectionResizeMode(
-      ColorModel::Columns::Default, QHeaderView::ResizeMode::Fixed);
+      ColorModel::Columns::Default, QHeaderView::ResizeMode::Fixed
+  );
   m_table->horizontalHeader()->setSectionResizeMode(
-      ColorModel::Columns::Context, QHeaderView::ResizeMode::ResizeToContents);
+      ColorModel::Columns::Context, QHeaderView::ResizeMode::ResizeToContents
+  );
   m_table->horizontalHeader()->setSectionResizeMode(
-      ColorModel::Columns::Path, QHeaderView::ResizeMode::Stretch);
+      ColorModel::Columns::Path, QHeaderView::ResizeMode::Stretch
+  );
   m_table->horizontalHeader()->resizeSection(ColorModel::Columns::Value, 80);
   m_table->horizontalHeader()->resizeSection(ColorModel::Columns::Default, 80);
 
   // Tighter than default vertical row height, without the overhead of autoresizing
   m_table->verticalHeader()->setDefaultSectionSize(
-      m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin);
+      m_table->fontMetrics().lineSpacing() + LayoutConstants::WideHMargin
+  );
 
   m_table->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
   m_table->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
@@ -76,17 +80,16 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent)
 
   auto *infoAndSearchLayout = new QHBoxLayout();
   infoAndSearchLayout->setContentsMargins(
-      0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);
+      0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin
+  );
   infoAndSearchLayout->setSpacing(LayoutConstants::WideHMargin);
   infoAndSearchLayout->addWidget(infoLabel, 1);
   infoAndSearchLayout->addWidget(searchBox);
 
   auto *layout = new QVBoxLayout();
   layout->setContentsMargins(
-      LayoutConstants::WideHMargin,
-      LayoutConstants::WideHMargin,
-      LayoutConstants::WideHMargin,
-      LayoutConstants::WideHMargin);
+      LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin
+  );
   layout->setSpacing(0);
   layout->addLayout(infoAndSearchLayout);
   layout->addWidget(m_table, 1);
@@ -94,13 +97,17 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent)
 
   setMinimumSize(900, 550);
 
-  connect(searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
-    m_proxy->setFilterFixedString(newText);
-  });
+  connect(
+      searchBox, &QLineEdit::textChanged, this, [&](const QString &newText) {
+        m_proxy->setFilterFixedString(newText);
+      }
+  );
 
-  connect(m_table, &QTableView::doubleClicked, this, [&](const QModelIndex &index) {
-    m_model->pickColor(m_proxy->mapToSource(index));
-  });
+  connect(
+      m_table, &QTableView::doubleClicked, this, [&](const QModelIndex &index) {
+        m_model->pickColor(m_proxy->mapToSource(index));
+      }
+  );
 }
 
 bool ColorsPreferencePane::doCanResetToDefaults() {

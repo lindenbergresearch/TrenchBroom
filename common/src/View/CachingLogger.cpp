@@ -23,17 +23,15 @@
 
 namespace TrenchBroom {
 namespace View {
-CachingLogger::Message::Message(const LogLevel i_level, const QString &i_str)
-    : level(i_level), str(i_str) {
+CachingLogger::Message::Message(const LogLevel i_level, const QString &i_str) : level(i_level), str(i_str) {
 }
 
-CachingLogger::CachingLogger()
-    : m_logger(nullptr) {
+CachingLogger::CachingLogger() : m_logger(nullptr) {
 }
 
 void CachingLogger::setParentLogger(Logger *logger) {
   m_logger = logger;
-  if (m_logger!=nullptr) {
+  if (m_logger != nullptr) {
     for (const Message &message : m_cachedMessages) {
       log(message.level, message.str);
     }
@@ -46,7 +44,7 @@ void CachingLogger::doLog(const LogLevel level, const std::string &message) {
 }
 
 void CachingLogger::doLog(const LogLevel level, const QString &message) {
-  if (m_logger==nullptr) {
+  if (m_logger == nullptr) {
     m_cachedMessages.push_back(Message(level, message));
   } else {
     m_logger->log(level, message);

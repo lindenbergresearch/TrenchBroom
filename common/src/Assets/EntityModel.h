@@ -29,22 +29,27 @@
 #include <vector>
 
 namespace TrenchBroom {
-template<typename T, typename U>
-class octree;
+template<typename T, typename U> class octree;
 
 namespace Renderer {
 enum class PrimType;
+
+
 class TexturedIndexRangeRenderer;
+
+
 class TexturedRenderer;
 } // namespace Renderer
 
 namespace Assets {
 class Texture;
+
+
 class TextureCollection;
 
+
 enum class PitchType {
-  Normal,
-  MdlInverted
+  Normal, MdlInverted
 };
 
 /**
@@ -55,16 +60,13 @@ enum class PitchType {
  */
 enum class Orientation {
   /** Faces view plane, up is towards the heavens. */
-  ViewPlaneParallelUpright,
-  /** Faces camera origin, up is towards the heavens. */
-  FacingUpright,
-  /** Faces view plane, up is towards the top of the screen. */
-  ViewPlaneParallel,
-  /** Pitch yaw roll are independent of camera. */
-  Oriented,
-  /** Faces view plane, but obeys roll value. */
+  ViewPlaneParallelUpright, /** Faces camera origin, up is towards the heavens. */
+  FacingUpright, /** Faces view plane, up is towards the top of the screen. */
+  ViewPlaneParallel, /** Pitch yaw roll are independent of camera. */
+  Oriented, /** Faces view plane, but obeys roll value. */
   ViewPlaneParallelOriented,
 };
+
 
 /**
  * One frame of the model. Since frames are loaded on demand, each frame has two possible
@@ -145,6 +147,7 @@ public:
   virtual float intersect(const vm::ray3f &ray) const = 0;
 };
 
+
 /**
  * A frame of the model in its loaded state.
  */
@@ -171,20 +174,20 @@ public:
    * @param pitchType the pitch type
    * @param orientation the orientation
    */
-  EntityModelLoadedFrame(
-      size_t index,
-      const std::string &name,
-      const vm::bbox3f &bounds,
-      PitchType pitchType,
-      Orientation orientation);
+  EntityModelLoadedFrame(size_t index, const std::string &name, const vm::bbox3f &bounds, PitchType pitchType, Orientation orientation);
 
   ~EntityModelLoadedFrame();
 
   bool loaded() const override;
+
   const std::string &name() const override;
+
   const vm::bbox3f &bounds() const override;
+
   PitchType pitchType() const override;
+
   Orientation orientation() const override;
+
   float intersect(const vm::ray3f &ray) const override;
 
   /**
@@ -196,16 +199,18 @@ public:
    * array
    * @param count the number of vertices that make up the primitive(s)
    */
-  void addToSpacialTree(
-      const std::vector<EntityModelVertex> &vertices,
-      Renderer::PrimType primType,
-      size_t index,
-      size_t count);
+  void addToSpacialTree(const std::vector<EntityModelVertex> &vertices, Renderer::PrimType primType, size_t index, size_t count);
 };
 
+
 class EntityModelMesh;
+
+
 class EntityModelIndexedMesh;
+
+
 class EntityModelTexturedMesh;
+
 
 /**
  * A model surface represents an individual part of a model. MDL and MD2 models use only
@@ -263,10 +268,7 @@ public:
    * @param vertices the mesh vertices
    * @param indices the vertex indices
    */
-  void addIndexedMesh(
-      EntityModelLoadedFrame &frame,
-      std::vector<EntityModelVertex> vertices,
-      EntityModelIndices indices);
+  void addIndexedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelIndices indices);
 
   /**
    * Adds a new multitextured mesh to this surface.
@@ -275,10 +277,7 @@ public:
    * @param vertices the mesh vertices
    * @param indices the per texture vertex indices
    */
-  void addTexturedMesh(
-      EntityModelLoadedFrame &frame,
-      std::vector<EntityModelVertex> vertices,
-      EntityModelTexturedIndices indices);
+  void addTexturedMesh(EntityModelLoadedFrame &frame, std::vector<EntityModelVertex> vertices, EntityModelTexturedIndices indices);
 
   /**
    * Sets the given textures as skins to this surface.
@@ -318,9 +317,9 @@ public:
    */
   const Texture *skin(size_t index) const;
 
-  std::unique_ptr<Renderer::TexturedIndexRangeRenderer> buildRenderer(
-      size_t skinIndex, size_t frameIndex);
+  std::unique_ptr<Renderer::TexturedIndexRangeRenderer> buildRenderer(size_t skinIndex, size_t frameIndex);
 };
+
 
 /**
  * Manages all data necessary to render an entity model. Each model can have multiple
@@ -355,8 +354,7 @@ public:
    * @param frameIndex the index of the frame to render
    * @return the renderer
    */
-  std::unique_ptr<Renderer::TexturedRenderer> buildRenderer(
-      size_t skinIndex, size_t frameIndex) const;
+  std::unique_ptr<Renderer::TexturedRenderer> buildRenderer(size_t skinIndex, size_t frameIndex) const;
 
   /**
    * Returns the bounds of the given frame of this model.
@@ -404,8 +402,7 @@ public:
    *
    * @throws AssetException if the given frame index is out of bounds
    */
-  EntityModelLoadedFrame &loadFrame(
-      size_t frameIndex, const std::string &name, const vm::bbox3f &bounds);
+  EntityModelLoadedFrame &loadFrame(size_t frameIndex, const std::string &name, const vm::bbox3f &bounds);
 
   /**
    * Adds a surface with the given name.

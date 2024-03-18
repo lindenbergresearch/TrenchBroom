@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 
+
 class QTextEdit;
 
 namespace TrenchBroom {
@@ -37,7 +38,9 @@ struct CompilationProfile;
 namespace TrenchBroom::View {
 class CompilationRunner;
 
+
 class MapDocument;
+
 
 class CompilationRun : public QObject {
 Q_OBJECT
@@ -49,30 +52,19 @@ public:
 
   bool running() const;
 
-  void run(
-      const Model::CompilationProfile &profile,
-      std::shared_ptr<MapDocument> document,
-      QTextEdit *currentOutput);
+  void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
 
-  void test(
-      const Model::CompilationProfile &profile,
-      std::shared_ptr<MapDocument> document,
-      QTextEdit *currentOutput);
+  void test(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
 
   void terminate();
 
 private:
   bool doIsRunning() const;
 
-  void run(
-      const Model::CompilationProfile &profile,
-      std::shared_ptr<MapDocument> document,
-      QTextEdit *currentOutput,
-      bool test);
+  void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput, bool test);
 
 private:
-  std::string buildWorkDir(
-      const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document);
+  std::string buildWorkDir(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document);
 
   void cleanup();
 

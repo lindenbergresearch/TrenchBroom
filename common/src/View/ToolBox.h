@@ -29,9 +29,12 @@
 #include <string>
 #include <vector>
 
+
 class QWindow;
 
+
 class QFocusEvent;
+
 
 class QMouseEvent;
 
@@ -43,21 +46,28 @@ class PickResult;
 namespace Renderer {
 class RenderBatch;
 
+
 class RenderContext;
 } // namespace Renderer
 
 namespace View {
 class DragTracker;
 
+
 class DropTracker;
+
 
 class InputState;
 
+
 class Tool;
+
 
 class ToolController;
 
+
 class ToolChain;
+
 
 class ToolBox : public QObject {
 Q_OBJECT
@@ -89,8 +99,7 @@ protected:
   void addTool(Tool &tool);
 
 public: // picking
-  void pick(
-      ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult);
+  void pick(ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult);
 
 public: // event handling
   bool dragEnter(ToolChain *chain, const InputState &inputState, const std::string &text);
@@ -150,16 +159,9 @@ public: // tool management
   void disable();
 
 public: // rendering
-  void setRenderOptions(
-      ToolChain *chain,
-      const InputState &inputState,
-      Renderer::RenderContext &renderContext);
+  void setRenderOptions(ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext);
 
-  void renderTools(
-      ToolChain *chain,
-      const InputState &inputState,
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch);
+  void renderTools(ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
 private:
   bool activateTool(Tool &tool);

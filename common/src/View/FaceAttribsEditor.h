@@ -26,11 +26,15 @@
 #include <memory>
 #include <vector>
 
+
 class QAbstractButton;
+
 
 class QLabel;
 
+
 class QLineEdit;
+
 
 class QGridLayout;
 
@@ -38,23 +42,31 @@ namespace TrenchBroom {
 namespace Model {
 class BrushFaceHandle;
 
+
 class Node;
 } // namespace Model
 
 namespace View {
 class FlagsPopupEditor;
 
+
 class GLContextManager;
+
 
 class MapDocument;
 
+
 class Selection;
+
 
 class SignalDelayer;
 
+
 class SpinControl;
 
+
 class UVEditor;
+
 
 class FaceAttribsEditor : public QWidget {
 Q_OBJECT
@@ -93,10 +105,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  FaceAttribsEditor(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  FaceAttribsEditor(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
   bool cancelMouseDrag();
 

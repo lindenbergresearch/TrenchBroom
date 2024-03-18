@@ -30,20 +30,19 @@ namespace TrenchBroom {
 namespace View {
 class MapDocumentCommandFacade;
 
+
 class UpdateLinkedGroupsCommandBase : public UndoableCommand {
 private:
   UpdateLinkedGroupsHelper m_updateLinkedGroupsHelper;
 
 protected:
-  UpdateLinkedGroupsCommandBase(
-      std::string name,
-      bool updateModificationCount,
-      std::vector<Model::GroupNode *> changedLinkedGroups = {});
+  UpdateLinkedGroupsCommandBase(std::string name, bool updateModificationCount, std::vector<Model::GroupNode *> changedLinkedGroups = {});
 
 public:
   ~UpdateLinkedGroupsCommandBase() override;
 
   std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document) override;
+
   std::unique_ptr<CommandResult> performUndo(MapDocumentCommandFacade *document) override;
 
   bool collateWith(UndoableCommand &command) override;

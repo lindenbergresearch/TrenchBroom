@@ -68,6 +68,7 @@ extern Preference<float> AxisLength;
 extern Preference<Color> XAxisColor;
 extern Preference<Color> YAxisColor;
 extern Preference<Color> ZAxisColor;
+
 Preference<Color> &axisColor(vm::axis::type axis);
 
 /* --- UNITS CONVERSATION ---------------------------- */

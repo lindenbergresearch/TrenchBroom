@@ -25,6 +25,7 @@
 namespace TrenchBroom {
 class NotifierStateBase;
 
+
 /**
  * Manages one or multiple connections of observer calllbacks to notifiers.
  *

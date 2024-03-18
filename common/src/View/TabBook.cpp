@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace View {
-TabBookPage::TabBookPage(QWidget *parent)
-    : QWidget(parent) {
+TabBookPage::TabBookPage(QWidget *parent) : QWidget(parent) {
 }
 
 TabBookPage::~TabBookPage() {}
@@ -38,8 +37,7 @@ QWidget *TabBookPage::createTabBarPage(QWidget *parent) {
   return new QWidget(parent);
 }
 
-TabBook::TabBook(QWidget *parent)
-    : QWidget(parent), m_tabBar(new TabBar(this)) {
+TabBook::TabBook(QWidget *parent) : QWidget(parent), m_tabBar(new TabBar(this)) {
   m_tabBook = new QStackedLayout();
   m_tabBook->setContentsMargins(0, 0, 0, 0);
 
@@ -59,7 +57,7 @@ TabBar *TabBook::tabBar() {
 }
 
 void TabBook::addPage(TabBookPage *page, const QString &title) {
-  ensure(page!=nullptr, "page is null");
+  ensure(page != nullptr, "page is null");
 
   m_tabBar->addTab(page, title);
   m_tabBook->addWidget(page);

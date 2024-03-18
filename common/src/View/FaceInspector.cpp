@@ -44,9 +44,8 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 namespace TrenchBroom::View {
-FaceInspector::FaceInspector(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
-    : TabBookPage{parent}, m_document{std::move(document)} {
+FaceInspector::FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) :
+    TabBookPage{parent}, m_document{std::move(document)} {
   createGui(contextManager);
   connectObservers();
 }
@@ -82,10 +81,8 @@ void FaceInspector::createGui(GLContextManager &contextManager) {
   setLayout(layout);
 
   connect(
-      m_textureBrowser,
-      &TextureBrowser::textureSelected,
-      this,
-      &FaceInspector::textureSelected);
+      m_textureBrowser, &TextureBrowser::textureSelected, this, &FaceInspector::textureSelected
+  );
 
   restoreWindowState(m_splitter);
 }
@@ -96,8 +93,7 @@ QWidget *FaceInspector::createFaceAttribsEditor(GLContextManager &contextManager
 }
 
 QWidget *FaceInspector::createTextureBrowser(GLContextManager &contextManager) {
-  auto *panel =
-      new SwitchableTitledPanel{tr("Texture Browser"), {{tr("Browser"), tr("Settings")}}};
+  auto *panel = new SwitchableTitledPanel{tr("Texture Browser"), {{tr("Browser"), tr("Settings")}}};
 
   m_textureBrowser = new TextureBrowser{m_document, contextManager};
 
@@ -121,18 +117,19 @@ QWidget *FaceInspector::createTextureBrowser(GLContextManager &contextManager) {
 }
 
 QWidget *FaceInspector::createTextureBrowserInfo() {
-  auto *label = new QLabel{tr(
-      R"(To manage wad files, select the "wad" property of the worldspawn entity to reveal a wad file manager below the entity property table.)")};
+  auto *label = new QLabel{
+      tr(
+          R"(To manage wad files, select the "wad" property of the worldspawn entity to reveal a wad file manager below the entity property table.)"
+      )
+  };
 
   label->setWordWrap(true);
   makeInfo(label);
 
   auto *labelLayout = new QVBoxLayout{};
   labelLayout->setContentsMargins(
-      LayoutConstants::WideHMargin,
-      LayoutConstants::WideVMargin,
-      LayoutConstants::WideHMargin,
-      LayoutConstants::WideVMargin);
+      LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin
+  );
   labelLayout->addWidget(label);
 
   auto *panelLayout = new QVBoxLayout{};
@@ -146,11 +143,12 @@ QWidget *FaceInspector::createTextureBrowserInfo() {
   return panel;
 }
 
-static bool allFacesHaveTexture(
-    const std::vector<Model::BrushFaceHandle> &faceHandles, const Assets::Texture *texture) {
-  return std::all_of(faceHandles.begin(), faceHandles.end(), [&](const auto &faceHandle) {
-    return faceHandle.face().texture()==texture;
-  });
+static bool allFacesHaveTexture(const std::vector<Model::BrushFaceHandle> &faceHandles, const Assets::Texture *texture) {
+  return std::all_of(
+      faceHandles.begin(), faceHandles.end(), [&](const auto &faceHandle) {
+        return faceHandle.face().texture() == texture;
+      }
+  );
 }
 
 void FaceInspector::textureSelected(const Assets::Texture *texture) {
@@ -158,10 +156,8 @@ void FaceInspector::textureSelected(const Assets::Texture *texture) {
   const auto faces = document->allSelectedBrushFaces();
 
   if (texture) {
-    if (!faces.empty()) {
-      const auto textureNameToSet = !allFacesHaveTexture(faces, texture)
-                                    ? texture->name()
-                                    : Model::BrushFaceAttributes::NoTextureName;
+    if (! faces.empty()) {
+      const auto textureNameToSet = ! allFacesHaveTexture(faces, texture) ? texture->name() : Model::BrushFaceAttributes::NoTextureName;
 
       document->setCurrentTextureName(textureNameToSet);
       auto request = Model::ChangeBrushFaceAttributesRequest{};
@@ -169,9 +165,8 @@ void FaceInspector::textureSelected(const Assets::Texture *texture) {
       document->setFaceAttributes(request);
     } else {
       document->setCurrentTextureName(
-          document->currentTextureName()!=texture->name()
-          ? texture->name()
-          : Model::BrushFaceAttributes::NoTextureName);
+          document->currentTextureName() != texture->name() ? texture->name() : Model::BrushFaceAttributes::NoTextureName
+      );
     }
   }
 }
@@ -179,14 +174,16 @@ void FaceInspector::textureSelected(const Assets::Texture *texture) {
 void FaceInspector::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection += document->documentWasNewedNotifier.connect(
-      this, &FaceInspector::documentWasNewedOrOpened);
+      this, &FaceInspector::documentWasNewedOrOpened
+  );
   m_notifierConnection += document->documentWasLoadedNotifier.connect(
-      this, &FaceInspector::documentWasNewedOrOpened);
+      this, &FaceInspector::documentWasNewedOrOpened
+  );
 }
 
 void FaceInspector::documentWasNewedOrOpened(MapDocument *document) {
   const auto &game = *document->game();
   const auto &gameConfig = Model::GameFactory::instance().gameConfig(game.gameName());
-  m_textureBrowserInfo->setVisible(gameConfig.textureConfig.property!=std::nullopt);
+  m_textureBrowserInfo->setVisible(gameConfig.textureConfig.property != std::nullopt);
 }
 } // namespace TrenchBroom::View

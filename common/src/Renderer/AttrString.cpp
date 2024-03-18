@@ -39,8 +39,7 @@ void AttrString::LineFunc::process(const std::string &str, const Justify justify
   }
 }
 
-AttrString::Line::Line(const std::string &i_string, Justify i_justify)
-    : string(i_string), justify(i_justify) {
+AttrString::Line::Line(const std::string &i_string, Justify i_justify) : string(i_string), justify(i_justify) {
 }
 
 AttrString::AttrString() {}
@@ -54,31 +53,31 @@ bool AttrString::operator<(const AttrString &other) const {
 }
 
 int AttrString::compare(const AttrString &other) const {
-  for (size_t i = 0; i < std::min(m_lines.size(), other.m_lines.size()); ++i) {
+  for (size_t i = 0; i < std::min(m_lines.size(), other.m_lines.size()); ++ i) {
     const Line &myLine = m_lines[i];
     const Line &otherLine = other.m_lines[i];
 
     if (myLine.justify < otherLine.justify)
-      return -1;
+      return - 1;
     if (myLine.justify > otherLine.justify)
       return 1;
 
     const int cmp = myLine.string.compare(otherLine.string);
     if (cmp < 0)
-      return -1;
+      return - 1;
     if (cmp > 0)
       return 1;
   }
 
   if (m_lines.size() < other.m_lines.size())
-    return -1;
+    return - 1;
   if (m_lines.size() > other.m_lines.size())
     return 1;
   return 0;
 }
 
 void AttrString::lines(LineFunc &func) const {
-  for (size_t i = 0; i < m_lines.size(); ++i)
+  for (size_t i = 0; i < m_lines.size(); ++ i)
     func.process(m_lines[i].string, m_lines[i].justify);
 }
 

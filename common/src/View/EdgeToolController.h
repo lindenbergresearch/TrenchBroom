@@ -25,6 +25,7 @@ namespace TrenchBroom {
 namespace View {
 class EdgeTool;
 
+
 class EdgeToolController : public VertexToolControllerBase<EdgeTool> {
 private:
   class SelectEdgePart;

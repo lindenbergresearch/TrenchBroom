@@ -35,8 +35,7 @@
 
 namespace TrenchBroom {
 namespace View {
-MoveObjectsTool::MoveObjectsTool(std::weak_ptr<MapDocument> document)
-    : Tool(true), m_document(document), m_duplicateObjects(false) {
+MoveObjectsTool::MoveObjectsTool(std::weak_ptr<MapDocument> document) : Tool(true), m_document(document), m_duplicateObjects(false) {
 }
 
 const Grid &MoveObjectsTool::grid() const {
@@ -46,23 +45,22 @@ const Grid &MoveObjectsTool::grid() const {
 bool MoveObjectsTool::startMove(const InputState &inputState) {
   auto document = kdl::mem_lock(m_document);
 
-  if (!document->selectedBrushFaces().empty()) {
+  if (! document->selectedBrushFaces().empty()) {
     return false;
   }
 
   document->startTransaction(
-      duplicateObjects(inputState) ? "Duplicate Objects" : "Move Objects",
-      TransactionScope::LongRunning);
+      duplicateObjects(inputState) ? "Duplicate Objects" : "Move Objects", TransactionScope::LongRunning
+  );
   m_duplicateObjects = duplicateObjects(inputState);
   return true;
 }
 
-MoveObjectsTool::MoveResult MoveObjectsTool::move(
-    const InputState &, const vm::vec3 &delta) {
+MoveObjectsTool::MoveResult MoveObjectsTool::move(const InputState &, const vm::vec3 &delta) {
   auto document = kdl::mem_lock(m_document);
   const auto &worldBounds = document->worldBounds();
   const auto bounds = document->selectionBounds();
-  if (!worldBounds.contains(bounds.translate(delta))) {
+  if (! worldBounds.contains(bounds.translate(delta))) {
     return MR_Deny;
   }
 
@@ -71,7 +69,7 @@ MoveObjectsTool::MoveResult MoveObjectsTool::move(
     document->duplicateObjects();
   }
 
-  if (!document->translateObjects(delta)) {
+  if (! document->translateObjects(delta)) {
     return MR_Deny;
   } else {
     return MR_Continue;

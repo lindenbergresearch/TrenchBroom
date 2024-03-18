@@ -27,15 +27,26 @@
 namespace TrenchBroom {
 namespace Model {
 class BrushNode;
+
+
 class BrushFace;
+
+
 class EntityNode;
+
+
 class LayerNode;
+
+
 class Node;
+
+
 class WorldNode;
 } // namespace Model
 
 namespace IO {
 class NodeSerializer;
+
 
 class NodeWriter {
 private:
@@ -46,15 +57,20 @@ private:
 
 public:
   NodeWriter(const Model::WorldNode &world, std::ostream &stream);
+
   NodeWriter(const Model::WorldNode &world, std::unique_ptr<NodeSerializer> serializer);
+
   ~NodeWriter();
 
   void setExporting(bool exporting);
+
   void writeMap();
 
 private:
   void writeDefaultLayer();
+
   void writeCustomLayers();
+
   void writeCustomLayer(const Model::LayerNode *layer);
 
 public:
@@ -62,6 +78,7 @@ public:
 
 private:
   void writeWorldBrushes(const std::vector<Model::BrushNode *> &brushes);
+
   void writeEntityBrushes(const EntityBrushesMap &entityBrushes);
 
 public:

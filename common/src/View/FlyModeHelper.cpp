@@ -39,9 +39,9 @@ static qint64 msecsSinceReference() {
   return timer.msecsSinceReference();
 }
 
-FlyModeHelper::FlyModeHelper(Renderer::Camera &camera)
-    : m_camera(camera), m_forward(false), m_backward(false), m_left(false), m_right(false), m_up(false), m_down(false),
-      m_fast(false), m_slow(false), m_lastPollTime(msecsSinceReference()) {
+FlyModeHelper::FlyModeHelper(Renderer::Camera &camera) :
+    m_camera(camera), m_forward(false), m_backward(false), m_left(false), m_right(false), m_up(false), m_down(false), m_fast(false), m_slow(false),
+    m_lastPollTime(msecsSinceReference()) {
 }
 
 void FlyModeHelper::pollAndUpdate() {
@@ -51,7 +51,7 @@ void FlyModeHelper::pollAndUpdate() {
 
   if (anyKeyDown()) {
     const auto delta = moveDelta(time);
-    if (!vm::is_zero(delta, vm::Cf::almost_zero())) {
+    if (! vm::is_zero(delta, vm::Cf::almost_zero())) {
       m_camera.moveBy(delta);
     }
   }
@@ -66,7 +66,7 @@ static bool eventMatchesShortcut(const QKeySequence &shortcut, QKeyEvent *event)
   // e.g. you can't bind Shift+W to fly forward, only Shift or W.
   const int ourKey = shortcut[0];
   const int theirKey = event->key();
-  return ourKey==theirKey;
+  return ourKey == theirKey;
 }
 
 void FlyModeHelper::keyDown(QKeyEvent *event) {
@@ -97,14 +97,14 @@ void FlyModeHelper::keyDown(QKeyEvent *event) {
   if (eventMatchesShortcut(down, event)) {
     m_down = true;
   }
-  if (event->key()==Qt::Key_Shift) {
+  if (event->key() == Qt::Key_Shift) {
     m_fast = true;
   }
-  if (event->key()==Qt::Key_Alt) {
+  if (event->key() == Qt::Key_Alt) {
     m_slow = true;
   }
 
-  if (anyKeyDown() && !wasAnyKeyDown) {
+  if (anyKeyDown() && ! wasAnyKeyDown) {
     // Reset the last polling time, otherwise the view will jump!
     m_lastPollTime = msecsSinceReference();
   }
@@ -142,10 +142,10 @@ void FlyModeHelper::keyUp(QKeyEvent *event) {
   if (eventMatchesShortcut(down, event)) {
     m_down = false;
   }
-  if (event->key()==Qt::Key_Shift) {
+  if (event->key() == Qt::Key_Shift) {
     m_fast = false;
   }
-  if (event->key()==Qt::Key_Alt) {
+  if (event->key() == Qt::Key_Alt) {
     m_slow = false;
   }
 }
@@ -159,35 +159,35 @@ void FlyModeHelper::resetKeys() {
 }
 
 vm::vec3f FlyModeHelper::moveDelta(const float time) {
-  const float dist = moveSpeed()*time;
+  const float dist = moveSpeed() * time;
 
   vm::vec3f delta;
   if (m_forward) {
-    delta = delta + m_camera.direction()*dist;
+    delta = delta + m_camera.direction() * dist;
   }
   if (m_backward) {
-    delta = delta - m_camera.direction()*dist;
+    delta = delta - m_camera.direction() * dist;
   }
   if (m_left) {
-    delta = delta - m_camera.right()*dist;
+    delta = delta - m_camera.right() * dist;
   }
   if (m_right) {
-    delta = delta + m_camera.right()*dist;
+    delta = delta + m_camera.right() * dist;
   }
   if (m_up) {
-    delta = delta + vm::vec3f::pos_z()*dist;
+    delta = delta + vm::vec3f::pos_z() * dist;
   }
   if (m_down) {
-    delta = delta - vm::vec3f::pos_z()*dist;
+    delta = delta - vm::vec3f::pos_z() * dist;
   }
   return delta;
 }
 
 float FlyModeHelper::moveSpeed() const {
   if (m_fast) {
-    return pref(Preferences::CameraFlyMoveSpeed)*SpeedAltModifier;
+    return pref(Preferences::CameraFlyMoveSpeed) * SpeedAltModifier;
   } else if (m_slow) {
-    return pref(Preferences::CameraFlyMoveSpeed)/SpeedAltModifier;
+    return pref(Preferences::CameraFlyMoveSpeed) / SpeedAltModifier;
   }
   return pref(Preferences::CameraFlyMoveSpeed);
 }

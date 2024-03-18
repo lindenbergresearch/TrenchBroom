@@ -33,6 +33,7 @@ class OrthographicCamera;
 namespace View {
 class DragTracker;
 
+
 class CameraTool2D : public ToolController, public Tool {
 private:
   Renderer::OrthographicCamera &m_camera;

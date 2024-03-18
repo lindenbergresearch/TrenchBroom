@@ -35,6 +35,7 @@ struct CompilationExportMap {
   kdl_reflect_decl(CompilationExportMap, enabled, targetSpec);
 };
 
+
 struct CompilationCopyFiles {
   bool enabled;
   std::string sourceSpec;
@@ -42,6 +43,7 @@ struct CompilationCopyFiles {
 
   kdl_reflect_decl(CompilationCopyFiles, enabled, sourceSpec, targetSpec);
 };
+
 
 struct CompilationRenameFile {
   bool enabled;
@@ -51,6 +53,7 @@ struct CompilationRenameFile {
   kdl_reflect_decl(CompilationRenameFile, enabled, sourceSpec, targetSpec);
 };
 
+
 struct CompilationDeleteFiles {
   bool enabled;
   std::string targetSpec;
@@ -58,22 +61,18 @@ struct CompilationDeleteFiles {
   kdl_reflect_decl(CompilationDeleteFiles, enabled, targetSpec);
 };
 
+
 struct CompilationRunTool {
   bool enabled;
   std::string toolSpec;
   std::string parameterSpec;
   bool treatNonZeroResultCodeAsError;
 
-  kdl_reflect_decl(
-      CompilationRunTool, enabled, toolSpec, parameterSpec, treatNonZeroResultCodeAsError);
+  kdl_reflect_decl(CompilationRunTool, enabled, toolSpec, parameterSpec, treatNonZeroResultCodeAsError);
 };
 
-using CompilationTask = std::variant<
-    CompilationExportMap,
-    CompilationCopyFiles,
-    CompilationRenameFile,
-    CompilationDeleteFiles,
-    CompilationRunTool>;
+
+using CompilationTask = std::variant<CompilationExportMap, CompilationCopyFiles, CompilationRenameFile, CompilationDeleteFiles, CompilationRunTool>;
 
 std::ostream &operator<<(std::ostream &lhs, const CompilationTask &rhs);
 

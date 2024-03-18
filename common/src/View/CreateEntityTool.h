@@ -31,11 +31,13 @@ namespace TrenchBroom {
 namespace Model {
 class EntityNode;
 
+
 class PickResult;
 } // namespace Model
 
 namespace View {
 class MapDocument;
+
 
 class CreateEntityTool : public Tool {
 private:
@@ -54,8 +56,7 @@ public:
 
   void updateEntityPosition2D(const vm::ray3 &pickRay);
 
-  void updateEntityPosition3D(
-      const vm::ray3 &pickRay, const Model::PickResult &pickResult);
+  void updateEntityPosition3D(const vm::ray3 &pickRay, const Model::PickResult &pickResult);
 };
 } // namespace View
 } // namespace TrenchBroom

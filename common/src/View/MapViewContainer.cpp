@@ -23,8 +23,7 @@
 #include "View/MapViewBase.h"
 
 namespace TrenchBroom::View {
-MapViewContainer::MapViewContainer(QWidget *parent)
-    : QWidget{parent} {
+MapViewContainer::MapViewContainer(QWidget *parent) : QWidget{parent} {
 }
 
 MapViewContainer::~MapViewContainer() = default;
@@ -45,10 +44,9 @@ MapView *MapViewContainer::currentMapView() const {
   return doGetCurrentMapView();
 }
 
-vm::vec3 MapViewContainer::doGetPasteObjectsDelta(
-    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
+vm::vec3 MapViewContainer::doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
   auto *current = currentMapView();
-  ensure(current!=nullptr, "current is nullptr");
+  ensure(current != nullptr, "current is nullptr");
   return current->pasteObjectsDelta(bounds, referenceBounds);
 }
 } // namespace TrenchBroom::View

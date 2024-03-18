@@ -38,8 +38,7 @@
 namespace TrenchBroom {
 namespace IO {
 std::ostream &operator<<(std::ostream &str, const ObjSerializer::IndexedVertex &vertex) {
-  str << " " << (vertex.vertex + 1u) << "/" << (vertex.texCoords + 1u) << "/"
-      << (vertex.normal + 1u);
+  str << " " << (vertex.vertex + 1u) << "/" << (vertex.texCoords + 1u) << "/" << (vertex.normal + 1u);
   return str;
 }
 
@@ -72,29 +71,23 @@ std::ostream &operator<<(std::ostream &str, const ObjSerializer::PatchObject &ob
 std::ostream &operator<<(std::ostream &str, const ObjSerializer::Object &object) {
   std::visit(
       kdl::overload(
-          [&](const ObjSerializer::BrushObject &brushObject) { str << brushObject; },
-          [&](const ObjSerializer::PatchObject &patchObject) { str << patchObject; }),
-      object);
+          [&](const ObjSerializer::BrushObject &brushObject) { str << brushObject; }, [&](const ObjSerializer::PatchObject &patchObject) { str << patchObject; }
+      ), object
+  );
   return str;
 }
 
-ObjSerializer::ObjSerializer(
-    std::ostream &objStream,
-    std::ostream &mtlStream,
-    std::string mtlFilename,
-    IO::ObjExportOptions options)
-    : m_objStream{objStream}, m_mtlStream{mtlStream}, m_mtlFilename{std::move(mtlFilename)},
-      m_options{std::move(options)} {
+ObjSerializer::ObjSerializer(std::ostream &objStream, std::ostream &mtlStream, std::string mtlFilename, IO::ObjExportOptions options) :
+    m_objStream{objStream}, m_mtlStream{mtlStream}, m_mtlFilename{std::move(mtlFilename)}, m_options{
+    std::move(options)
+} {
   ensure(m_objStream.good(), "obj stream is good");
   ensure(m_mtlStream.good(), "mtl stream is good");
 }
 
 void ObjSerializer::doBeginFile(const std::vector<const Model::Node *> & /* rootNodes */) {}
 
-static void writeMtlFile(
-    std::ostream &str,
-    const std::vector<ObjSerializer::Object> &objects,
-    const IO::ObjExportOptions &options) {
+static void writeMtlFile(std::ostream &str, const std::vector<ObjSerializer::Object> &objects, const IO::ObjExportOptions &options) {
   auto usedTextures = std::map<std::string, const Assets::Texture *>{};
 
   for (const auto &object : objects) {
@@ -104,11 +97,11 @@ static void writeMtlFile(
               for (const auto &face : brushObject.faces) {
                 usedTextures[face.textureName] = face.texture;
               }
-            },
-            [&](const ObjSerializer::PatchObject &patchObject) {
+            }, [&](const ObjSerializer::PatchObject &patchObject) {
               usedTextures[patchObject.textureName] = patchObject.texture;
-            }),
-        object);
+            }
+        ), object
+    );
   }
 
   const auto basePath = options.exportPath.parent_path();
@@ -120,7 +113,7 @@ static void writeMtlFile(
         break;
       case ObjMtlPathMode::RelativeToExportPath:
         // textures loaded from image files (pak files) don't have absolute paths
-        if (!texture->absolutePath().empty()) {
+        if (! texture->absolutePath().empty()) {
           const auto mtlPath = texture->absolutePath().lexically_relative(basePath);
           str << "map_Kd " << mtlPath.generic_string() << "\n";
         }
@@ -136,7 +129,7 @@ static void writeVertices(std::ostream &str, const std::vector<vm::vec3> &vertic
   for (const vm::vec3 &elem : vertices) {
     // no idea why I have to switch Y and Z
     fmt::format_to(
-        std::ostreambuf_iterator<char>(str), "v {} {} {}\n", elem.x(), elem.z(), -elem.y());
+        std::ostreambuf_iterator<char>(str), "v {} {} {}\n", elem.x(), elem.z(), - elem.y());
   }
 }
 
@@ -146,7 +139,7 @@ static void writeTexCoords(std::ostream &str, const std::vector<vm::vec2f> &texC
     // multiplying Y by -1 needed to get the UV's to appear correct in Blender and UE4
     // (see: https://github.com/TrenchBroom/TrenchBroom/issues/2851 )
     fmt::format_to(
-        std::ostreambuf_iterator<char>(str), "vt {} {}\n", elem.x(), -elem.y());
+        std::ostreambuf_iterator<char>(str), "vt {} {}\n", elem.x(), - elem.y());
   }
 }
 
@@ -155,21 +148,14 @@ static void writeNormals(std::ostream &str, const std::vector<vm::vec3> &normals
   for (const vm::vec3 &elem : normals) {
     // no idea why I have to switch Y and Z
     fmt::format_to(
-        std::ostreambuf_iterator<char>(str),
-        "vn {} {} {}\n",
-        elem.x(),
-        elem.z(),
-        -elem.y());
+        std::ostreambuf_iterator<char>(str), "vn {} {} {}\n", elem.x(), elem.z(), - elem.y());
   }
 }
 
 static void writeObjFile(
-    std::ostream &str,
-    const std::string mtlFilename,
-    const std::vector<vm::vec3> &vertices,
-    const std::vector<vm::vec2f> &texCoords,
-    const std::vector<vm::vec3> &normals,
-    const std::vector<ObjSerializer::Object> &objects) {
+    std::ostream &str, const std::string mtlFilename, const std::vector<vm::vec3> &vertices, const std::vector<vm::vec2f> &texCoords,
+    const std::vector<vm::vec3> &normals, const std::vector<ObjSerializer::Object> &objects
+) {
 
   str << "mtllib " << mtlFilename << "\n";
   writeVertices(str, vertices);
@@ -188,16 +174,14 @@ static void writeObjFile(
 void ObjSerializer::doEndFile() {
   writeMtlFile(m_mtlStream, m_objects, m_options);
   writeObjFile(
-      m_objStream,
-      m_mtlFilename,
-      m_vertices.list(),
-      m_texCoords.list(),
-      m_normals.list(),
-      m_objects);
+      m_objStream, m_mtlFilename, m_vertices.list(), m_texCoords.list(), m_normals.list(), m_objects
+  );
 }
 
 void ObjSerializer::doBeginEntity(const Model::Node * /* node */) {}
+
 void ObjSerializer::doEndEntity(const Model::Node * /* node */) {}
+
 void ObjSerializer::doEntityProperty(const Model::EntityProperty & /* property */) {}
 
 void ObjSerializer::doBrush(const Model::BrushNode *brush) {
@@ -232,17 +216,17 @@ void ObjSerializer::doBrushFace(const Model::BrushFace &face) {
     indexedVertices.push_back(IndexedVertex{vertexIndex, texCoordsIndex, normalIndex});
   }
 
-  m_currentBrush->faces.push_back(BrushFace{
-      std::move(indexedVertices), face.attributes().textureName(), face.texture()});
+  m_currentBrush->faces.push_back(
+      BrushFace{std::move(indexedVertices), face.attributes().textureName(), face.texture()}
+  );
 }
 
 void ObjSerializer::doPatch(const Model::PatchNode *patchNode) {
   const auto &patch = patchNode->patch();
-  auto patchObject =
-      PatchObject{entityNo(), brushNo(), {}, patch.textureName(), patch.texture()};
+  auto patchObject = PatchObject{entityNo(), brushNo(), {}, patch.textureName(), patch.texture()};
 
   const auto &patchGrid = patchNode->grid();
-  patchObject.quads.reserve(patchGrid.quadRowCount()*patchGrid.quadColumnCount());
+  patchObject.quads.reserve(patchGrid.quadRowCount() * patchGrid.quadColumnCount());
 
   // Vertex positions inserted from now on should get new indices
   m_vertices.clearIndices();
@@ -255,15 +239,15 @@ void ObjSerializer::doPatch(const Model::PatchNode *patchNode) {
     return IndexedVertex{positionIndex, texCoordsIndex, normalIndex};
   };
 
-  for (size_t row = 0u; row < patchGrid.pointRowCount - 1u; ++row) {
-    for (size_t col = 0u; col < patchGrid.pointColumnCount - 1u; ++col) {
+  for (size_t row = 0u; row < patchGrid.pointRowCount - 1u; ++ row) {
+    for (size_t col = 0u; col < patchGrid.pointColumnCount - 1u; ++ col) {
       // counter clockwise order
-      patchObject.quads.push_back(PatchQuad{{
-                                                makeIndexedVertex(patchGrid.point(row, col)),
-                                                makeIndexedVertex(patchGrid.point(row + 1u, col)),
-                                                makeIndexedVertex(patchGrid.point(row + 1u, col + 1u)),
-                                                makeIndexedVertex(patchGrid.point(row, col + 1u)),
-                                            }});
+      patchObject.quads.push_back(
+          PatchQuad{{
+                        makeIndexedVertex(patchGrid.point(row, col)), makeIndexedVertex(patchGrid.point(row + 1u, col)),
+                        makeIndexedVertex(patchGrid.point(row + 1u, col + 1u)), makeIndexedVertex(patchGrid.point(row, col + 1u)),
+                    }}
+      );
     }
   }
 

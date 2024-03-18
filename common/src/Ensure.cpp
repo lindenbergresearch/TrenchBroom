@@ -37,15 +37,14 @@ void TrenchBroom::ensureFailed(
 }
 
 #else
+
 // for release builds, ensure generates a crash report
-void TrenchBroom::ensureFailed(
-  const char* file, const int line, const char* condition, const char* message)
-{
+void TrenchBroom::ensureFailed(const char *file, const int line, const char *condition, const char *message) {
   std::stringstream reason;
-  reason << file << ":" << line << ": Condition '" << condition
-         << "' failed: " << message;
+  reason << file << ":" << line << ": Condition '" << condition << "' failed: " << message;
 
   const std::string stacktrace = TrenchBroomStackWalker::getStackTrace();
   TrenchBroom::View::reportCrashAndExit(stacktrace, reason.str());
 }
+
 #endif

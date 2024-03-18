@@ -41,13 +41,12 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
   bool applyTexture;
   const Color &defaultColor;
 
-  RenderFunc(
-      ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor)
-      : shader(i_shader), applyTexture(i_applyTexture), defaultColor(i_defaultColor) {
+  RenderFunc(ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor) :
+      shader(i_shader), applyTexture(i_applyTexture), defaultColor(i_defaultColor) {
   }
 
   void before(const Assets::Texture *texture) override {
-    if (texture!=nullptr) {
+    if (texture != nullptr) {
       texture->activate();
       shader.set("ApplyTexture", applyTexture);
       shader.set("Color", texture->averageColor());
@@ -58,28 +57,23 @@ struct FaceRenderer::RenderFunc : public TextureRenderFunc {
   }
 
   void after(const Assets::Texture *texture) override {
-    if (texture!=nullptr) {
+    if (texture != nullptr) {
       texture->deactivate();
     }
   }
 };
 
-FaceRenderer::FaceRenderer()
-    : m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+
+FaceRenderer::FaceRenderer() : m_grayscale(false), m_tint(false), m_alpha(1.0f) {
 }
 
-FaceRenderer::FaceRenderer(
-    std::shared_ptr<BrushVertexArray> vertexArray,
-    std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
-    const Color &faceColor)
-    : m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor),
-      m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+FaceRenderer::FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor) :
+    m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor), m_grayscale(false), m_tint(false), m_alpha(1.0f) {
 }
 
-FaceRenderer::FaceRenderer(const FaceRenderer &other)
-    : IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap),
-      m_faceColor(other.m_faceColor), m_grayscale(other.m_grayscale), m_tint(other.m_tint),
-      m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
+FaceRenderer::FaceRenderer(const FaceRenderer &other) :
+    IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap), m_faceColor(other.m_faceColor),
+    m_grayscale(other.m_grayscale), m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
 }
 
 FaceRenderer &FaceRenderer::operator=(FaceRenderer other) {
@@ -209,15 +203,14 @@ void FaceRenderer::doRender(RenderContext &context) {
 
     shader.set("Alpha", m_alpha);
     shader.set("EnableMasked", false);
-    shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
+    shader.set("ShowSoftMapBounds", ! context.softMapBounds().is_empty());
     shader.set("SoftMapBoundsMin", context.softMapBounds().min);
     shader.set("SoftMapBoundsMax", context.softMapBounds().max);
 
     auto boundsColor = prefs.get(Preferences::SoftMapBoundsColor);
 
     shader.set(
-        "SoftMapBoundsColor",
-        vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
+        "SoftMapBoundsColor", vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
 
     RenderFunc func(shader, applyTexture, m_faceColor);
 
@@ -226,11 +219,11 @@ void FaceRenderer::doRender(RenderContext &context) {
     }
 
     for (const auto &[texture, brushIndexHolderPtr] : *m_indexArrayMap) {
-      if (!brushIndexHolderPtr->hasValidIndices()) {
+      if (! brushIndexHolderPtr->hasValidIndices()) {
         continue;
       }
 
-      const bool enableMasked = texture!=nullptr && texture->masked();
+      const bool enableMasked = texture != nullptr && texture->masked();
 
       // set any per-texture uniforms
       shader.set("GridColor", gridColorForTexture(texture));

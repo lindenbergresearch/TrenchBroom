@@ -25,7 +25,9 @@ namespace TrenchBroom {
 namespace Renderer {
 class FontGlyph;
 
+
 class FontTexture;
+
 
 class FontGlyphBuilder {
 private:
@@ -39,26 +41,12 @@ private:
   size_t m_y;
 
 public:
-  FontGlyphBuilder(
-      size_t maxAscend, size_t cellSize, size_t margin, FontTexture &texture);
+  FontGlyphBuilder(size_t maxAscend, size_t cellSize, size_t margin, FontTexture &texture);
 
-  FontGlyph createGlyph(
-      size_t left,
-      size_t top,
-      size_t width,
-      size_t height,
-      size_t advance,
-      const char *glyphBuffer,
-      size_t pitch);
+  FontGlyph createGlyph(size_t left, size_t top, size_t width, size_t height, size_t advance, const char *glyphBuffer, size_t pitch);
 
 private:
-  void drawGlyph(
-      size_t left,
-      size_t top,
-      size_t width,
-      size_t height,
-      const char *glyphBuffer,
-      size_t pitch);
+  void drawGlyph(size_t left, size_t top, size_t width, size_t height, const char *glyphBuffer, size_t pitch);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

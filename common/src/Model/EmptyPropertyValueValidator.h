@@ -30,8 +30,7 @@ public:
   EmptyPropertyValueValidator();
 
 private:
-  void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues)
-  const override;
+  void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

@@ -21,18 +21,21 @@
 
 #include "View/PreferencePane.h"
 
+
 class QCheckBox;
+
 
 class QKeySequence;
 
 namespace TrenchBroom {
-template<typename T>
-class Preference;
+template<typename T> class Preference;
 
 namespace View {
 class KeySequenceEdit;
 
+
 class SliderWithLabel;
+
 
 class MousePreferencePane : public PreferencePane {
 private:
@@ -116,8 +119,7 @@ private slots:
 private:
   void setKeySequence(KeySequenceEdit *editor, Preference<QKeySequence> &preference);
 
-  bool hasConflict(
-      const QKeySequence &keySequence, const Preference<QKeySequence> &preference) const;
+  bool hasConflict(const QKeySequence &keySequence, const Preference<QKeySequence> &preference) const;
 };
 } // namespace View
 } // namespace TrenchBroom

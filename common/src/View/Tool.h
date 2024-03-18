@@ -21,7 +21,9 @@
 
 #include "Notifier.h"
 
+
 class QWidget;
+
 
 class QStackedLayout;
 

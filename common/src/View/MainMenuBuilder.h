@@ -23,9 +23,12 @@
 
 #include <functional>
 
+
 class QAction;
 
+
 class QMenu;
+
 
 class QMenuBar;
 
@@ -55,6 +58,7 @@ public:
 protected:
   QAction *findOrCreateQAction(const Action *tAction);
 };
+
 
 class MainMenuBuilder : public MenuVisitor, public MenuBuilderBase {
 private:

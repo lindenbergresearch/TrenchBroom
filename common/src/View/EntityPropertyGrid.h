@@ -27,28 +27,47 @@
 #include <string>
 #include <vector>
 
+
 class QTableView;
+
+
 class QCheckBox;
+
+
 class QShortcut;
+
+
 class QSortFilterProxyModel;
+
+
 class QToolButton;
 
 namespace TrenchBroom {
 namespace Model {
 class EntityNode;
+
+
 class Node;
 } // namespace Model
 
 namespace View {
 class EntityPropertyModel;
+
+
 class EntityPropertyTable;
+
+
 class MapDocument;
+
+
 class Selection;
+
 
 struct PropertyGridSelection {
   std::string propertyKey;
   int column;
 };
+
 
 /**
  * Panel with the entity property table, and the toolbar below it (add/remove icons,
@@ -72,14 +91,15 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  explicit EntityPropertyGrid(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit EntityPropertyGrid(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void backupSelection();
+
   void restoreSelection();
 
   void addProperty(bool defaultToProtected);
+
   void removeSelectedProperties();
 
   bool canRemoveSelectedProperties() const;
@@ -92,20 +112,29 @@ private:
   void connectObservers();
 
   void documentWasNewed(MapDocument *document);
+
   void documentWasLoaded(MapDocument *document);
+
   void nodesDidChange(const std::vector<Model::Node *> &nodes);
+
   void selectionWillChange();
+
   void selectionDidChange(const Selection &selection);
+
   void entityDefinitionsOrModsDidChange();
 
 private:
   void ensureSelectionVisible();
+
   void updateControls();
+
   void updateControlsEnabled();
 
 public:
   std::string selectedRowName() const;
+
 signals:
+
   void currentRowChanged();
 };
 } // namespace View

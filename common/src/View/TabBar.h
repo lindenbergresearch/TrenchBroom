@@ -25,9 +25,12 @@
 
 #include <vector>
 
+
 class QHBoxLayout;
 
+
 class QLabel;
+
 
 class QStackedLayout;
 
@@ -35,7 +38,9 @@ namespace TrenchBroom {
 namespace View {
 class TabBook;
 
+
 class TabBookPage;
+
 
 class TabBarButton : public QWidget {
 Q_OBJECT
@@ -62,6 +67,7 @@ signals:
 private:
   void updateState();
 };
+
 
 class TabBar : public ContainerBar {
 Q_OBJECT

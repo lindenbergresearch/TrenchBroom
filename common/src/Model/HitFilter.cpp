@@ -85,7 +85,7 @@ HitFilter operator||(HitFilter lhs, HitFilter rhs) {
 }
 
 HitFilter operator!(HitFilter filter) {
-  return [filter = std::move(filter)](const Hit &hit) { return !filter(hit); };
+  return [filter = std::move(filter)](const Hit &hit) { return ! filter(hit); };
 }
 } // namespace Model
 } // namespace TrenchBroom

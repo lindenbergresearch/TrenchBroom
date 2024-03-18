@@ -44,7 +44,10 @@ protected:
   EL::Expression parseConfigFile();
 };
 
+
 void expectType(const EL::Value &value, EL::ValueType type);
+
 void expectStructure(const EL::Value &value, const std::string &structure);
+
 void expectMapEntry(const EL::Value &value, const std::string &key, EL::ValueType type);
 } // namespace TrenchBroom::IO

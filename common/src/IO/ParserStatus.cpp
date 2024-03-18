@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace IO {
-ParserStatus::ParserStatus(Logger &logger, const std::string &prefix)
-    : m_logger(logger), m_prefix(prefix) {
+ParserStatus::ParserStatus(Logger &logger, const std::string &prefix) : m_logger(logger), m_prefix(prefix) {
 }
 
 ParserStatus::~ParserStatus() {}
@@ -55,8 +54,7 @@ void ParserStatus::error(const size_t line, const size_t column, const std::stri
   log(LogLevel::Error, line, column, str);
 }
 
-void ParserStatus::errorAndThrow(
-    const size_t line, const size_t column, const std::string &str) {
+void ParserStatus::errorAndThrow(const size_t line, const size_t column, const std::string &str) {
   error(line, column, str);
   throw ParserException(buildMessage(line, column, str));
 }
@@ -103,15 +101,13 @@ void ParserStatus::errorAndThrow(const std::string &str) {
   throw ParserException(buildMessage(str));
 }
 
-void ParserStatus::log(
-    const LogLevel level, const size_t line, const size_t column, const std::string &str) {
+void ParserStatus::log(const LogLevel level, const size_t line, const size_t column, const std::string &str) {
   doLog(level, buildMessage(line, column, str));
 }
 
-std::string ParserStatus::buildMessage(
-    const size_t line, const size_t column, const std::string &str) const {
+std::string ParserStatus::buildMessage(const size_t line, const size_t column, const std::string &str) const {
   std::stringstream msg;
-  if (!m_prefix.empty()) {
+  if (! m_prefix.empty()) {
     msg << m_prefix << ": ";
   }
   msg << str << " (line " << line << ", column " << column << ")";
@@ -124,7 +120,7 @@ void ParserStatus::log(const LogLevel level, const size_t line, const std::strin
 
 std::string ParserStatus::buildMessage(const size_t line, const std::string &str) const {
   std::stringstream msg;
-  if (!m_prefix.empty()) {
+  if (! m_prefix.empty()) {
     msg << m_prefix << ": ";
   }
   msg << str << " (line " << line << ")";
@@ -137,7 +133,7 @@ void ParserStatus::log(const LogLevel level, const std::string &str) {
 
 std::string ParserStatus::buildMessage(const std::string &str) const {
   std::stringstream msg;
-  if (!m_prefix.empty()) {
+  if (! m_prefix.empty()) {
     msg << m_prefix << ": ";
   }
   msg << str << " (unknown position)";

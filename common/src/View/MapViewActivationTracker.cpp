@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-MapViewActivationTracker::MapViewActivationTracker()
-    : m_active(false) {
+MapViewActivationTracker::MapViewActivationTracker() : m_active(false) {
 }
 
 bool MapViewActivationTracker::active() const {
@@ -39,7 +38,7 @@ bool MapViewActivationTracker::active() const {
 }
 
 void MapViewActivationTracker::addWindow(MapViewBase *mapView) {
-  ensure(mapView!=nullptr, "map view is null");
+  ensure(mapView != nullptr, "map view is null");
 
   mapView->installEventFilter(this);
   m_mapViews.push_back(mapView);
@@ -61,7 +60,7 @@ void MapViewActivationTracker::clear() {
 }
 
 void MapViewActivationTracker::windowActivationChanged(const bool active) {
-  if (!active) {
+  if (! active) {
     // window has lost activation, deactivate the group
     deactivate();
   }
@@ -69,7 +68,7 @@ void MapViewActivationTracker::windowActivationChanged(const bool active) {
 
 bool MapViewActivationTracker::eventFilter(QObject *object, QEvent *event) {
   auto *widget = dynamic_cast<QWidget *>(object);
-  ensure(widget!=nullptr, "expected a QWidget");
+  ensure(widget != nullptr, "expected a QWidget");
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -106,13 +105,13 @@ bool MapViewActivationTracker::eventFilter(QObject *object, QEvent *event) {
 
 void MapViewActivationTracker::setFocusEvent(QFocusEvent *, QWidget *widget) {
   for (auto *mapView : m_mapViews) {
-    mapView->setIsCurrent(mapView==widget);
+    mapView->setIsCurrent(mapView == widget);
   }
 }
 
 void MapViewActivationTracker::killFocusEvent(QFocusEvent *, QWidget *) {
   const auto *focusedWidget = QApplication::focusWidget();
-  if (!kdl::vec_contains(m_mapViews, focusedWidget)) {
+  if (! kdl::vec_contains(m_mapViews, focusedWidget)) {
     deactivate();
   }
 }
@@ -123,7 +122,7 @@ bool MapViewActivationTracker::mouseDownEvent(QMouseEvent *event, QWidget *) {
     return false;
   }
 
-  if (event->button()!=Qt::LeftButton) {
+  if (event->button() != Qt::LeftButton) {
     activate();
     return false;
   }
@@ -145,7 +144,7 @@ bool MapViewActivationTracker::mouseUpEvent([[maybe_unused]] QMouseEvent *event,
   // without having received a corresponding mouse down event. In that case, we want to
   // activate in any case, but only discard the event if it was a left click. see
   // https://github.com/TrenchBroom/TrenchBroom/issues/3045
-  return event->button()==Qt::LeftButton;
+  return event->button() == Qt::LeftButton;
 }
 
 void MapViewActivationTracker::enterEvent(QEvent *, QWidget *widget) {
@@ -155,14 +154,14 @@ void MapViewActivationTracker::enterEvent(QEvent *, QWidget *widget) {
 }
 
 void MapViewActivationTracker::dragEnterEvent(QEvent *, QWidget *widget) {
-  if (!m_active) {
+  if (! m_active) {
     activate();
   }
   widget->setFocus();
 }
 
 void MapViewActivationTracker::activate() {
-  if (!m_active) {
+  if (! m_active) {
     m_active = true;
     clearFocusCursor();
   }

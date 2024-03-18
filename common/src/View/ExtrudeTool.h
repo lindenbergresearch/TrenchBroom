@@ -41,9 +41,12 @@ namespace TrenchBroom {
 namespace Model {
 class BrushFace;
 
+
 class Hit;
 
+
 class Node;
+
 
 class PickResult;
 } // namespace Model
@@ -55,9 +58,12 @@ class Camera;
 namespace View {
 class Grid;
 
+
 class MapDocument;
 
+
 class Selection;
+
 
 /**
  * Similar to Model::BrushFaceHandle but caches the Brush state at the beginning of the
@@ -77,6 +83,7 @@ struct ExtrudeDragHandle {
   kdl_reflect_decl(ExtrudeDragHandle, faceHandle);
 };
 
+
 struct ExtrudeDragState {
   /** The drag handles when the drag started. */
   std::vector<ExtrudeDragHandle> initialDragHandles;
@@ -88,9 +95,9 @@ struct ExtrudeDragState {
   /** The total drag distance so far. */
   vm::vec3 totalDelta = {0, 0, 0};
 
-  kdl_reflect_decl(
-      ExtrudeDragState, initialDragHandles, currentDragFaces, splitBrushes, totalDelta);
+  kdl_reflect_decl(ExtrudeDragState, initialDragHandles, currentDragFaces, splitBrushes, totalDelta);
 };
+
 
 struct ExtrudeHitData {
   Model::BrushFaceHandle face;
@@ -99,6 +106,7 @@ struct ExtrudeHitData {
 
   kdl_reflect_decl(ExtrudeHitData, face, dragReference, initialHandlePosition);
 };
+
 
 /**
  * Tool for extruding faces along their normals (Shift+LMB Drag).
@@ -145,8 +153,7 @@ public:
    */
   void updateProposedDragHandles(const Model::PickResult &pickResult);
 
-  static std::vector<Model::BrushFaceHandle> getDragFaces(
-      const std::vector<ExtrudeDragHandle> &dragHandles);
+  static std::vector<Model::BrushFaceHandle> getDragFaces(const std::vector<ExtrudeDragHandle> &dragHandles);
 
   void beginExtrude();
 

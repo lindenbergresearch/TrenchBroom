@@ -34,8 +34,11 @@ class TagManager {
 private:
   struct TagCmp {
     bool operator()(const SmartTag &lhs, const SmartTag &rhs) const;
+
     bool operator()(const std::string &lhs, const SmartTag &rhs) const;
+
     bool operator()(const SmartTag &lhs, const std::string &rhs) const;
+
     bool operator()(const std::string &lhs, const std::string &rhs) const;
   };
 

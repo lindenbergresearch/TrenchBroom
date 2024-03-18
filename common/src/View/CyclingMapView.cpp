@@ -35,53 +35,34 @@
 
 namespace TrenchBroom::View {
 CyclingMapView::CyclingMapView(
-    std::weak_ptr<MapDocument> document,
-    MapViewToolBox &toolBox,
-    Renderer::MapRenderer &mapRenderer,
-    GLContextManager &contextManager,
-    const int views,
-    Logger *logger,
-    QWidget *parent)
-    : MapViewContainer(parent), m_logger(logger), m_document(std::move(document)), m_currentMapView(nullptr),
-      m_layout(nullptr) {
+    std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, const int views,
+    Logger *logger, QWidget *parent
+) : MapViewContainer(parent), m_logger(logger), m_document(std::move(document)), m_currentMapView(nullptr), m_layout(nullptr) {
   setObjectName("CyclingMapView");
   createGui(toolBox, mapRenderer, contextManager, views);
 }
 
-void CyclingMapView::createGui(
-    MapViewToolBox &toolBox,
-    Renderer::MapRenderer &mapRenderer,
-    GLContextManager &contextManager,
-    const int views) {
+void CyclingMapView::createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, const int views) {
   if (views & View_3D) {
     addMapView(new MapView3D(m_document, toolBox, mapRenderer, contextManager, m_logger));
   }
   if (views & View_XY) {
-    addMapView(new MapView2D(
-        m_document,
-        toolBox,
-        mapRenderer,
-        contextManager,
-        MapView2D::ViewPlane_XY,
-        m_logger));
+    addMapView(
+        new MapView2D(
+            m_document, toolBox, mapRenderer, contextManager, MapView2D::ViewPlane_XY, m_logger
+        ));
   }
   if (views & View_XZ) {
-    addMapView(new MapView2D(
-        m_document,
-        toolBox,
-        mapRenderer,
-        contextManager,
-        MapView2D::ViewPlane_XZ,
-        m_logger));
+    addMapView(
+        new MapView2D(
+            m_document, toolBox, mapRenderer, contextManager, MapView2D::ViewPlane_XZ, m_logger
+        ));
   }
   if (views & View_YZ) {
-    addMapView(new MapView2D(
-        m_document,
-        toolBox,
-        mapRenderer,
-        contextManager,
-        MapView2D::ViewPlane_YZ,
-        m_logger));
+    addMapView(
+        new MapView2D(
+            m_document, toolBox, mapRenderer, contextManager, MapView2D::ViewPlane_YZ, m_logger
+        ));
   }
 
   m_layout = new QStackedLayout();
@@ -94,7 +75,7 @@ void CyclingMapView::createGui(
     m_layout->addWidget(mapView);
   }
 
-  assert(!m_mapViews.empty());
+  assert(! m_mapViews.empty());
   switchToMapView(m_mapViews[0]);
 }
 
@@ -164,8 +145,7 @@ bool CyclingMapView::doCurrentViewMaximized() const {
 
 void CyclingMapView::doToggleMaximizeCurrentView() {}
 
-void CyclingMapView::doInstallActivationTracker(
-    MapViewActivationTracker &activationTracker) {
+void CyclingMapView::doInstallActivationTracker(MapViewActivationTracker &activationTracker) {
   for (auto *mapView : m_mapViews) {
     activationTracker.addWindow(mapView);
   }
@@ -188,8 +168,8 @@ void CyclingMapView::linkCamera(CameraLinkHelper &helper) {
 }
 
 void CyclingMapView::cycleChildMapView(MapView *after) {
-  for (size_t i = 0; i < m_mapViews.size(); ++i) {
-    if (after==m_mapViews[i]) {
+  for (size_t i = 0; i < m_mapViews.size(); ++ i) {
+    if (after == m_mapViews[i]) {
       switchToMapView(m_mapViews[vm::succ(i, m_mapViews.size())]);
       focusCameraOnSelection(false);
       break;

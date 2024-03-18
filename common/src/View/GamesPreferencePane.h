@@ -21,9 +21,12 @@
 
 #include "View/PreferencePane.h"
 
+
 class QLineEdit;
 
+
 class QPushButton;
+
 
 class QStackedWidget;
 
@@ -31,9 +34,12 @@ namespace TrenchBroom {
 namespace View {
 class GameListBox;
 
+
 class GamePreferencePane;
 
+
 class MapDocument;
+
 
 /**
  * List of all games with the ability to edit game path, compile tools for each game
@@ -64,6 +70,7 @@ private:
 
   bool doValidate() override;
 };
+
 
 /**
  * Widget for configuring a single game

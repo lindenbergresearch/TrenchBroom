@@ -41,13 +41,14 @@ namespace TrenchBroom::View {
 
 namespace {
 
-std::vector<std::filesystem::path> getWadPaths(
-    const std::vector<Model::EntityNodeBase *> &nodes, const std::string &propertyKey) {
-  if (nodes.size()==1) {
+std::vector<std::filesystem::path> getWadPaths(const std::vector<Model::EntityNodeBase *> &nodes, const std::string &propertyKey) {
+  if (nodes.size() == 1) {
     if (const auto *wadPathsStr = nodes.front()->entity().property(propertyKey)) {
-      return kdl::vec_transform(kdl::str_split(*wadPathsStr, ";"), [](const auto &s) {
-        return std::filesystem::path{s};
-      });
+      return kdl::vec_transform(
+          kdl::str_split(*wadPathsStr, ";"), [](const auto &s) {
+            return std::filesystem::path{s};
+          }
+      );
     }
   }
   return {};
@@ -55,37 +56,28 @@ std::vector<std::filesystem::path> getWadPaths(
 
 std::string getWadPathStr(const std::vector<std::filesystem::path> &wadPaths) {
   return kdl::str_join(
-      kdl::vec_transform(wadPaths, [](const auto &path) { return path.string(); }), ";");
+      kdl::vec_transform(wadPaths, [](const auto &path) { return path.string(); }), ";"
+  );
 }
 
 } // namespace
 
-SmartWadEditor::SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : SmartPropertyEditor{std::move(document), parent} {
+SmartWadEditor::SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor{std::move(document), parent} {
   auto *header = new TitleBar{"Wad Files"};
 
   m_wadPaths = new QListWidget{};
   m_wadPaths->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-  m_addWadsButton =
-      createBitmapButton("Add.svg", "Add texture collections from the file system");
-  m_removeWadsButton =
-      createBitmapButton("Remove.svg", "Remove the selected texture collections");
-  m_moveWadUpButton =
-      createBitmapButton("Up.svg", "Move the selected texture collection up");
-  m_moveWadDownButton =
-      createBitmapButton("Down.svg", "Move the selected texture collection down");
-  m_reloadWadsButton =
-      createBitmapButton("Refresh.svg", "Reload all texture collections");
+  m_addWadsButton = createBitmapButton("Add.svg", "Add texture collections from the file system");
+  m_removeWadsButton = createBitmapButton("Remove.svg", "Remove the selected texture collections");
+  m_moveWadUpButton = createBitmapButton("Up.svg", "Move the selected texture collection up");
+  m_moveWadDownButton = createBitmapButton("Down.svg", "Move the selected texture collection down");
+  m_reloadWadsButton = createBitmapButton("Refresh.svg", "Reload all texture collections");
 
   auto *toolBar = createMiniToolBarLayout(
-      m_addWadsButton,
-      m_removeWadsButton,
-      LayoutConstants::WideHMargin,
-      m_moveWadUpButton,
-      m_moveWadDownButton,
-      LayoutConstants::WideHMargin,
-      m_reloadWadsButton);
+      m_addWadsButton, m_removeWadsButton, LayoutConstants::WideHMargin, m_moveWadUpButton, m_moveWadDownButton, LayoutConstants::WideHMargin,
+      m_reloadWadsButton
+  );
 
   auto *layout = new QVBoxLayout{};
   layout->setContentsMargins(0, 0, 0, 0);
@@ -98,71 +90,63 @@ SmartWadEditor::SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *par
   setLayout(layout);
 
   connect(
-      m_wadPaths, &QListWidget::itemSelectionChanged, this, &SmartWadEditor::updateButtons);
+      m_wadPaths, &QListWidget::itemSelectionChanged, this, &SmartWadEditor::updateButtons
+  );
 
   connect(m_addWadsButton, &QAbstractButton::clicked, this, &SmartWadEditor::addWads);
   connect(
-      m_removeWadsButton,
-      &QAbstractButton::clicked,
-      this,
-      &SmartWadEditor::removeSelectedWads);
+      m_removeWadsButton, &QAbstractButton::clicked, this, &SmartWadEditor::removeSelectedWads
+  );
   connect(
-      m_moveWadUpButton,
-      &QAbstractButton::clicked,
-      this,
-      &SmartWadEditor::moveSelectedWadsUp);
+      m_moveWadUpButton, &QAbstractButton::clicked, this, &SmartWadEditor::moveSelectedWadsUp
+  );
   connect(
-      m_moveWadDownButton,
-      &QAbstractButton::clicked,
-      this,
-      &SmartWadEditor::moveSelectedWadsDown);
+      m_moveWadDownButton, &QAbstractButton::clicked, this, &SmartWadEditor::moveSelectedWadsDown
+  );
   connect(
-      m_reloadWadsButton, &QAbstractButton::clicked, this, &SmartWadEditor::reloadWads);
+      m_reloadWadsButton, &QAbstractButton::clicked, this, &SmartWadEditor::reloadWads
+  );
 
   setAcceptDrops(true);
 }
 
 void SmartWadEditor::addWads() {
   const auto pathQStr = QFileDialog::getOpenFileName(
-      nullptr,
-      tr("Load Wad File"),
-      fileDialogDefaultDirectory(FileDialogDir::TextureCollection),
-      tr("Wad files (*.wad);;All files (*.*)"));
+      nullptr, tr("Load Wad File"), fileDialogDefaultDirectory(FileDialogDir::TextureCollection), tr("Wad files (*.wad);;All files (*.*)"));
 
-  if (!pathQStr.isEmpty()) {
+  if (! pathQStr.isEmpty()) {
     updateFileDialogDefaultDirectoryWithFilename(
-        FileDialogDir::TextureCollection, pathQStr);
+        FileDialogDir::TextureCollection, pathQStr
+    );
 
     const auto absWadPath = IO::pathFromQString(pathQStr);
-    auto pathDialog = ChoosePathTypeDialog{
-        window(), absWadPath, document()->path(), document()->game()->gamePath()};
+    auto pathDialog = ChoosePathTypeDialog{window(), absWadPath, document()->path(), document()->game()->gamePath()};
 
     const int result = pathDialog.exec();
-    if (result==QDialog::Accepted) {
+    if (result == QDialog::Accepted) {
       auto wadPaths = getWadPaths(nodes(), propertyKey());
-      wadPaths.push_back(convertToPathType(
-          pathDialog.pathType(),
-          absWadPath,
-          document()->path(),
-          document()->game()->gamePath()));
+      wadPaths.push_back(
+          convertToPathType(
+              pathDialog.pathType(), absWadPath, document()->path(), document()->game()->gamePath()));
 
       document()->setProperty(propertyKey(), getWadPathStr(wadPaths));
       m_wadPaths->setCurrentRow(
-          m_wadPaths->count() - 1, QItemSelectionModel::ClearAndSelect);
+          m_wadPaths->count() - 1, QItemSelectionModel::ClearAndSelect
+      );
     }
   }
 }
 
 void SmartWadEditor::removeSelectedWads() {
-  if (!canRemoveWads()) {
+  if (! canRemoveWads()) {
     return;
   }
 
   const auto indicesToRemove = kdl::vec_sort(
       kdl::vec_transform(
-          m_wadPaths->selectedItems(),
-          [&](const auto &selectedItem) { return size_t(m_wadPaths->row(selectedItem)); }),
-      std::greater<size_t>{});
+          m_wadPaths->selectedItems(), [&](const auto &selectedItem) { return size_t(m_wadPaths->row(selectedItem)); }
+      ), std::greater<size_t>{}
+  );
 
   auto wadPaths = getWadPaths(nodes(), propertyKey());
   for (const auto index : indicesToRemove) {
@@ -171,12 +155,12 @@ void SmartWadEditor::removeSelectedWads() {
 
   document()->setProperty(propertyKey(), getWadPathStr(wadPaths));
   m_wadPaths->setCurrentRow(
-      std::min(int(indicesToRemove.back()), m_wadPaths->count() - 1),
-      QItemSelectionModel::ClearAndSelect);
+      std::min(int(indicesToRemove.back()), m_wadPaths->count() - 1), QItemSelectionModel::ClearAndSelect
+  );
 }
 
 void SmartWadEditor::moveSelectedWadsUp() {
-  if (!canMoveWadsUp()) {
+  if (! canMoveWadsUp()) {
     return;
   }
 
@@ -193,7 +177,7 @@ void SmartWadEditor::moveSelectedWadsUp() {
 }
 
 void SmartWadEditor::moveSelectedWadsDown() {
-  if (!canMoveWadsDown()) {
+  if (! canMoveWadsDown()) {
     return;
   }
 
@@ -219,22 +203,21 @@ bool SmartWadEditor::canRemoveWads() const {
   }
 
   const auto wadPaths = getWadPaths(nodes(), propertyKey());
-  return !selections.empty()
-      && std::all_of(selections.begin(), selections.end(), [&](const auto s) {
+  return ! selections.empty() && std::all_of(
+      selections.begin(), selections.end(), [&](const auto s) {
         return size_t(s) < wadPaths.size();
-      });
+      }
+  );
 
   return true;
 }
 
 bool SmartWadEditor::canMoveWadsUp() const {
-  return m_wadPaths->selectedItems().size()==1 && size_t(m_wadPaths->currentRow()) > 0;
+  return m_wadPaths->selectedItems().size() == 1 && size_t(m_wadPaths->currentRow()) > 0;
 }
 
 bool SmartWadEditor::canMoveWadsDown() const {
-  return m_wadPaths->selectedItems().size()==1
-      && size_t(m_wadPaths->currentRow())
-          < getWadPaths(nodes(), propertyKey()).size() - 1;
+  return m_wadPaths->selectedItems().size() == 1 && size_t(m_wadPaths->currentRow()) < getWadPaths(nodes(), propertyKey()).size() - 1;
 }
 
 bool SmartWadEditor::canReloadWads() const {
@@ -242,10 +225,11 @@ bool SmartWadEditor::canReloadWads() const {
 }
 
 void SmartWadEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) {
-  const auto selectedRows =
-      kdl::vec_transform(m_wadPaths->selectedItems(), [&](const auto &selectedItem) {
+  const auto selectedRows = kdl::vec_transform(
+      m_wadPaths->selectedItems(), [&](const auto &selectedItem) {
         return std::tuple{m_wadPaths->row(selectedItem), selectedItem->text()};
-      });
+      }
+  );
 
   m_wadPaths->clear();
 
@@ -254,7 +238,7 @@ void SmartWadEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *> &
   }
 
   for (const auto &[index, text] : selectedRows) {
-    if (index < m_wadPaths->count() && m_wadPaths->item(index)->text()==text) {
+    if (index < m_wadPaths->count() && m_wadPaths->item(index)->text() == text) {
       m_wadPaths->setCurrentRow(index, QItemSelectionModel::Select);
     } else {
       m_wadPaths->clearSelection();

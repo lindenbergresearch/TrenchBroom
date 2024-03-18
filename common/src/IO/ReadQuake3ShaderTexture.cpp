@@ -42,43 +42,34 @@ namespace TrenchBroom::IO {
 
 namespace {
 
-std::optional<std::filesystem::path> findImage(
-    const std::filesystem::path &texturePath, const FileSystem &fs) {
-  static const auto imageExtensions =
-      std::vector<std::string>{".tga", ".png", ".jpg", ".jpeg"};
+std::optional<std::filesystem::path> findImage(const std::filesystem::path &texturePath, const FileSystem &fs) {
+  static const auto imageExtensions = std::vector<std::string>{".tga", ".png", ".jpg", ".jpeg"};
 
-  if (!texturePath.empty()) {
-    if (
-        kdl::vec_contains(
-            imageExtensions, kdl::str_to_lower(texturePath.extension().string()))
-            && fs.pathInfo(texturePath)==PathInfo::File) {
+  if (! texturePath.empty()) {
+    if (kdl::vec_contains(
+        imageExtensions, kdl::str_to_lower(texturePath.extension().string())) && fs.pathInfo(texturePath) == PathInfo::File) {
       return texturePath;
     }
 
     const auto directoryPath = texturePath.parent_path();
     const auto basename = texturePath.stem().string();
-    return fs
-        .find(
-            texturePath.parent_path(),
-            TraversalMode::Flat,
-            kdl::lift_and(
-                makeFilenamePathMatcher(basename + ".*"),
-                makeExtensionPathMatcher(imageExtensions)))
-        .transform([](auto candidates) -> std::optional<std::filesystem::path> {
-          if (!candidates.empty()) {
+    return fs.find(
+        texturePath.parent_path(), TraversalMode::Flat, kdl::lift_and(
+            makeFilenamePathMatcher(basename + ".*"), makeExtensionPathMatcher(imageExtensions))).transform(
+        [](auto candidates) -> std::optional<std::filesystem::path> {
+          if (! candidates.empty()) {
             return candidates.front();
           }
           return std::nullopt;
-        })
-        .value_or(std::nullopt);
+        }
+    ).value_or(std::nullopt);
   }
 
   // texture path is empty OR (the extension is not empty AND the file does not exist)
   return std::nullopt;
 }
 
-std::optional<std::filesystem::path> findImagePath(
-    const Assets::Quake3Shader &shader, const FileSystem &fs) {
+std::optional<std::filesystem::path> findImagePath(const Assets::Quake3Shader &shader, const FileSystem &fs) {
   if (const auto path = findImage(shader.editorImage, fs)) {
     return path;
   }
@@ -97,44 +88,40 @@ std::optional<std::filesystem::path> findImagePath(
   return std::nullopt;
 }
 
-Result<Assets::Texture, ReadTextureError> loadTextureImage(
-    std::string shaderName, const std::filesystem::path &imagePath, const FileSystem &fs) {
+Result<Assets::Texture, ReadTextureError> loadTextureImage(std::string shaderName, const std::filesystem::path &imagePath, const FileSystem &fs) {
   auto imageName = imagePath.filename();
-  if (fs.pathInfo(imagePath)!=PathInfo::File) {
-    return ReadTextureError{
-        std::move(shaderName), "Image file '" + imagePath.string() + "' does not exist"};
+  if (fs.pathInfo(imagePath) != PathInfo::File) {
+    return ReadTextureError{std::move(shaderName), "Image file '" + imagePath.string() + "' does not exist"};
   }
 
-  return fs.openFile(imagePath)
-      .and_then([&](auto file) {
+  return fs.openFile(imagePath).and_then(
+      [&](auto file) {
         auto reader = file->reader().buffer();
         return readFreeImageTexture(shaderName, reader);
-      })
-      .or_else([&](auto e) {
-        return Result<Assets::Texture, ReadTextureError>{
-            ReadTextureError{shaderName, e.msg}};
-      });
+      }
+  ).or_else(
+      [&](auto e) {
+        return Result<Assets::Texture, ReadTextureError>{ReadTextureError{shaderName, e.msg}};
+      }
+  );
 }
 
 } // namespace
 
-Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(
-    std::string shaderName, const File &file, const FileSystem &fs) {
+Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(std::string shaderName, const File &file, const FileSystem &fs) {
   const auto *shaderFile = dynamic_cast<const ObjectFile<Assets::Quake3Shader> *>(&file);
-  if (!shaderFile) {
+  if (! shaderFile) {
     return ReadTextureError{std::move(shaderName), "Shader not found: " + shaderName};
   }
 
   const auto &shader = shaderFile->object();
   const auto imagePath = findImagePath(shader, fs);
-  if (!imagePath) {
-    return ReadTextureError{
-        std::move(shaderName),
-        "Could not find texture path for shader '" + shader.shaderPath.string() + "'"};
+  if (! imagePath) {
+    return ReadTextureError{std::move(shaderName), "Could not find texture path for shader '" + shader.shaderPath.string() + "'"};
   }
 
-  return loadTextureImage(std::move(shaderName), *imagePath, fs)
-      .transform([&](auto texture) {
+  return loadTextureImage(std::move(shaderName), *imagePath, fs).transform(
+      [&](auto texture) {
         texture.setSurfaceParms(shader.surfaceParms);
         texture.setOpaque();
 
@@ -149,7 +136,7 @@ Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(
           break;
         }
 
-        if (!shader.stages.empty()) {
+        if (! shader.stages.empty()) {
           const auto &stage = shader.stages.front();
           if (stage.blendFunc.enable()) {
             texture.setBlendFunc(
@@ -160,7 +147,8 @@ Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(
         }
 
         return texture;
-      });
+      }
+  );
 }
 
 } // namespace TrenchBroom::IO

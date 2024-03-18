@@ -35,32 +35,32 @@
 
 namespace TrenchBroom {
 namespace View {
-template<typename Ignore, typename T, typename C>
-void notifyCommandIfNotType(T &notifier, C &command) {
-  if (dynamic_cast<Ignore *>(&command)==nullptr) {
+template<typename Ignore, typename T, typename C> void notifyCommandIfNotType(T &notifier, C &command) {
+  if (dynamic_cast<Ignore *>(&command) == nullptr) {
     notifier(command);
   }
 }
+
 
 struct CommandProcessor::TransactionState {
   std::string name;
   TransactionScope scope;
   std::vector<std::unique_ptr<UndoableCommand>> commands;
 
-  TransactionState(std::string i_name, const TransactionScope i_scope)
-      : name{std::move(i_name)}, scope{i_scope} {
+  TransactionState(std::string i_name, const TransactionScope i_scope) : name{std::move(i_name)}, scope{i_scope} {
   }
 };
+
 
 struct CommandProcessor::SubmitAndStoreResult {
   std::unique_ptr<CommandResult> commandResult;
   bool commandStored;
 
-  SubmitAndStoreResult(
-      std::unique_ptr<CommandResult> i_commandResult, const bool i_commandStored)
-      : commandResult{std::move(i_commandResult)}, commandStored{i_commandStored} {
+  SubmitAndStoreResult(std::unique_ptr<CommandResult> i_commandResult, const bool i_commandStored) :
+      commandResult{std::move(i_commandResult)}, commandStored{i_commandStored} {
   }
 };
+
 
 class CommandProcessor::TransactionCommand : public UndoableCommand {
 private:
@@ -73,22 +73,19 @@ private:
 
 public:
   TransactionCommand(
-      std::string name,
-      std::vector<std::unique_ptr<UndoableCommand>> commands,
-      Notifier<Command &> &i_commandDoNotifier,
-      Notifier<Command &> &i_commandDoneNotifier,
-      Notifier<UndoableCommand &> &i_commandUndoNotifier,
-      Notifier<UndoableCommand &> &i_commandUndoneNotifier)
-      : UndoableCommand(std::move(name), false), m_commands{std::move(commands)},
-        m_commandDoNotifier{i_commandDoNotifier}, m_commandDoneNotifier{i_commandDoneNotifier},
-        m_commandUndoNotifier{i_commandUndoNotifier}, m_commandUndoneNotifier{i_commandUndoneNotifier} {
+      std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands, Notifier<Command &> &i_commandDoNotifier,
+      Notifier<Command &> &i_commandDoneNotifier, Notifier<UndoableCommand &> &i_commandUndoNotifier, Notifier<UndoableCommand &> &i_commandUndoneNotifier
+  ) : UndoableCommand(std::move(name), false), m_commands{
+      std::move(commands)
+  }, m_commandDoNotifier{i_commandDoNotifier}, m_commandDoneNotifier{i_commandDoneNotifier}, m_commandUndoNotifier{i_commandUndoNotifier},
+      m_commandUndoneNotifier{i_commandUndoneNotifier} {
   }
 
 private:
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override {
     for (auto &command : m_commands) {
       notifyCommandIfNotType<TransactionCommand>(m_commandDoNotifier, *command);
-      if (!command->performDo(document)) {
+      if (! command->performDo(document)) {
         throw CommandProcessorException("Partial failure while executing transaction");
       }
       notifyCommandIfNotType<TransactionCommand>(m_commandDoneNotifier, *command);
@@ -96,12 +93,11 @@ private:
     return std::make_unique<CommandResult>(true);
   }
 
-  std::unique_ptr<CommandResult> doPerformUndo(
-      MapDocumentCommandFacade *document) override {
-    for (auto it = m_commands.rbegin(), end = m_commands.rend(); it!=end; ++it) {
+  std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override {
+    for (auto it = m_commands.rbegin(), end = m_commands.rend(); it != end; ++ it) {
       auto &command = *it;
       notifyCommandIfNotType<TransactionCommand>(m_commandUndoNotifier, *command);
-      if (!command->performUndo(document)) {
+      if (! command->performUndo(document)) {
         throw CommandProcessorException("Partial failure while undoing transaction");
       }
       notifyCommandIfNotType<TransactionCommand>(m_commandUndoneNotifier, *command);
@@ -122,9 +118,7 @@ private:
       auto it = std::begin(transactionCommand->m_commands);
       if (m_commands.back()->collateWith(**it)) {
         std::move(
-            std::next(it),
-            std::end(transactionCommand->m_commands),
-            std::back_inserter(m_commands));
+            std::next(it), std::end(transactionCommand->m_commands), std::back_inserter(m_commands));
         return true;
       }
     }
@@ -133,24 +127,24 @@ private:
   }
 };
 
-CommandProcessor::CommandProcessor(
-    MapDocumentCommandFacade *document, const std::chrono::milliseconds collationInterval)
-    : m_document{document}, m_collationInterval{collationInterval},
-      m_lastCommandTimestamp{std::chrono::time_point<std::chrono::system_clock>{}} {
+
+CommandProcessor::CommandProcessor(MapDocumentCommandFacade *document, const std::chrono::milliseconds collationInterval) :
+    m_document{document}, m_collationInterval{collationInterval}, m_lastCommandTimestamp{
+    std::chrono::time_point<std::chrono::system_clock>{}} {
 }
 
 CommandProcessor::~CommandProcessor() = default;
 
 bool CommandProcessor::canUndo() const {
-  return m_transactionStack.empty() && !m_undoStack.empty();
+  return m_transactionStack.empty() && ! m_undoStack.empty();
 }
 
 bool CommandProcessor::canRedo() const {
-  return m_transactionStack.empty() && !m_redoStack.empty();
+  return m_transactionStack.empty() && ! m_redoStack.empty();
 }
 
 const std::string &CommandProcessor::undoCommandName() const {
-  if (!canUndo()) {
+  if (! canUndo()) {
     throw CommandProcessorException{"Command stack is empty"};
   } else {
     return m_undoStack.back()->name();
@@ -158,7 +152,7 @@ const std::string &CommandProcessor::undoCommandName() const {
 }
 
 const std::string &CommandProcessor::redoCommandName() const {
-  if (!canRedo()) {
+  if (! canRedo()) {
     throw CommandProcessorException{"Undo stack is empty"};
   } else {
     return m_redoStack.back()->name();
@@ -183,18 +177,14 @@ void CommandProcessor::rollbackTransaction() {
   }
 
   auto &transaction = m_transactionStack.back();
-  for (auto it = std::rbegin(transaction.commands), end = std::rend(transaction.commands);
-       it!=end;
-       ++it) {
+  for (auto it = std::rbegin(transaction.commands), end = std::rend(transaction.commands); it != end; ++ it) {
     undoCommand(**it);
   }
   transaction.commands.clear();
 }
 
 bool CommandProcessor::isCurrentDocumentStateObservable() const {
-  return m_transactionStack.size() < 2
-      || m_transactionStack[m_transactionStack.size() - 2].scope
-          ==TransactionScope::LongRunning;
+  return m_transactionStack.size() < 2 || m_transactionStack[m_transactionStack.size() - 2].scope == TransactionScope::LongRunning;
 }
 
 std::unique_ptr<CommandResult> CommandProcessor::execute(std::unique_ptr<Command> command) {
@@ -206,13 +196,12 @@ std::unique_ptr<CommandResult> CommandProcessor::execute(std::unique_ptr<Command
   return result;
 }
 
-std::unique_ptr<CommandResult> CommandProcessor::executeAndStore(
-    std::unique_ptr<UndoableCommand> command) {
+std::unique_ptr<CommandResult> CommandProcessor::executeAndStore(std::unique_ptr<UndoableCommand> command) {
   return executeAndStoreCommand(std::move(command), true).commandResult;
 }
 
 std::unique_ptr<CommandResult> CommandProcessor::undo() {
-  if (!m_transactionStack.empty()) {
+  if (! m_transactionStack.empty()) {
     throw CommandProcessorException("Cannot undo individual commands of a transaction");
   } else if (m_undoStack.empty()) {
     throw CommandProcessorException("Undo stack is empty");
@@ -229,7 +218,7 @@ std::unique_ptr<CommandResult> CommandProcessor::undo() {
 }
 
 std::unique_ptr<CommandResult> CommandProcessor::redo() {
-  if (!m_transactionStack.empty()) {
+  if (! m_transactionStack.empty()) {
     throw CommandProcessorException("Cannot redo while in a transaction");
   } else if (m_redoStack.empty()) {
     throw CommandProcessorException("Redo stack is empty");
@@ -251,10 +240,9 @@ void CommandProcessor::clear() {
   m_lastCommandTimestamp = std::chrono::time_point<std::chrono::system_clock>();
 }
 
-CommandProcessor::SubmitAndStoreResult CommandProcessor::executeAndStoreCommand(
-    std::unique_ptr<UndoableCommand> command, const bool collate) {
+CommandProcessor::SubmitAndStoreResult CommandProcessor::executeAndStoreCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
   auto commandResult = executeCommand(*command);
-  if (!commandResult->success()) {
+  if (! commandResult->success()) {
     return SubmitAndStoreResult(std::move(commandResult), false);
   }
 
@@ -288,8 +276,7 @@ std::unique_ptr<CommandResult> CommandProcessor::undoCommand(UndoableCommand &co
   return result;
 }
 
-bool CommandProcessor::storeCommand(
-    std::unique_ptr<UndoableCommand> command, const bool collate) {
+bool CommandProcessor::storeCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
   if (m_transactionStack.empty()) {
     return pushToUndoStack(std::move(command), collate);
   } else {
@@ -297,11 +284,10 @@ bool CommandProcessor::storeCommand(
   }
 }
 
-bool CommandProcessor::pushTransactionCommand(
-    std::unique_ptr<UndoableCommand> command, const bool collate) {
-  assert(!m_transactionStack.empty());
+bool CommandProcessor::pushTransactionCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
+  assert(! m_transactionStack.empty());
   auto &transaction = m_transactionStack.back();
-  if (!transaction.commands.empty()) {
+  if (! transaction.commands.empty()) {
     auto &lastCommand = transaction.commands.back();
     if (collate && lastCommand->collateWith(*command)) {
       // the command is not stored because it was collated with its predecessor
@@ -313,10 +299,10 @@ bool CommandProcessor::pushTransactionCommand(
 }
 
 void CommandProcessor::createAndStoreTransaction() {
-  assert(!m_transactionStack.empty());
+  assert(! m_transactionStack.empty());
 
   auto transaction = kdl::vec_pop_back(m_transactionStack);
-  if (!transaction.commands.empty()) {
+  if (! transaction.commands.empty()) {
     if (transaction.name.empty()) {
       transaction.name = transaction.commands.front()->name();
     }
@@ -331,19 +317,13 @@ void CommandProcessor::createAndStoreTransaction() {
   }
 }
 
-std::unique_ptr<UndoableCommand> CommandProcessor::createTransaction(
-    std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands) {
+std::unique_ptr<UndoableCommand> CommandProcessor::createTransaction(std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands) {
   return std::make_unique<TransactionCommand>(
-      std::move(name),
-      std::move(commands),
-      commandDoNotifier,
-      commandDoneNotifier,
-      commandUndoNotifier,
-      commandUndoneNotifier);
+      std::move(name), std::move(commands), commandDoNotifier, commandDoneNotifier, commandUndoNotifier, commandUndoneNotifier
+  );
 }
 
-bool CommandProcessor::pushToUndoStack(
-    std::unique_ptr<UndoableCommand> command, const bool collate) {
+bool CommandProcessor::pushToUndoStack(std::unique_ptr<UndoableCommand> command, const bool collate) {
   assert(m_transactionStack.empty());
 
   const auto timestamp = std::chrono::system_clock::now();
@@ -362,15 +342,13 @@ bool CommandProcessor::pushToUndoStack(
 
 std::unique_ptr<UndoableCommand> CommandProcessor::popFromUndoStack() {
   assert(m_transactionStack.empty());
-  assert(!m_undoStack.empty());
+  assert(! m_undoStack.empty());
 
   return kdl::vec_pop_back(m_undoStack);
 }
 
-bool CommandProcessor::collatable(
-    const bool collate, const std::chrono::system_clock::time_point timestamp) const {
-  return collate && !m_undoStack.empty()
-      && timestamp - m_lastCommandTimestamp <= m_collationInterval;
+bool CommandProcessor::collatable(const bool collate, const std::chrono::system_clock::time_point timestamp) const {
+  return collate && ! m_undoStack.empty() && timestamp - m_lastCommandTimestamp <= m_collationInterval;
 }
 
 void CommandProcessor::pushToRedoStack(std::unique_ptr<UndoableCommand> command) {
@@ -380,7 +358,7 @@ void CommandProcessor::pushToRedoStack(std::unique_ptr<UndoableCommand> command)
 
 std::unique_ptr<UndoableCommand> CommandProcessor::popFromRedoStack() {
   assert(m_transactionStack.empty());
-  assert(!m_redoStack.empty());
+  assert(! m_redoStack.empty());
 
   return kdl::vec_pop_back(m_redoStack);
 }

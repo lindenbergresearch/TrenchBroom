@@ -28,19 +28,14 @@
 
 namespace TrenchBroom {
 namespace View {
-MenuBuilderBase::MenuBuilderBase(
-    MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn)
-    : m_actions(actions), m_triggerFn(triggerFn) {
+MenuBuilderBase::MenuBuilderBase(MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn) : m_actions(actions), m_triggerFn(triggerFn) {
 }
 
 MenuBuilderBase::~MenuBuilderBase() = default;
 
 void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tAction) {
-  if (!tAction->keySequence().isEmpty()) {
-    const QString tooltip =
-        QObject::tr("%1 (%2)")
-            .arg(tAction->label())
-            .arg(tAction->keySequence().toString(QKeySequence::NativeText));
+  if (! tAction->keySequence().isEmpty()) {
+    const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label()).arg(tAction->keySequence().toString(QKeySequence::NativeText));
     qAction->setToolTip(tooltip);
   } else {
     qAction->setToolTip(tAction->label());
@@ -53,7 +48,7 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
   // Check if it already exists
   {
     auto it = m_actions.find(tAction);
-    if (it!=m_actions.end()) {
+    if (it != m_actions.end()) {
       return it->second;
     }
   }
@@ -74,22 +69,21 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
   return qAction;
 }
 
-MainMenuBuilder::MainMenuBuilder(
-    QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn)
-    : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr),
-      undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
+MainMenuBuilder::MainMenuBuilder(QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn) :
+    MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr), undoAction(nullptr), redoAction(nullptr),
+    pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
 }
 
 void MainMenuBuilder::visit(const Menu &menu) {
   auto *parentMenu = m_currentMenu;
-  if (m_currentMenu==nullptr) {
+  if (m_currentMenu == nullptr) {
     // top level menu
     m_currentMenu = m_menuBar.addMenu(QString::fromStdString(menu.name()));
   } else {
     m_currentMenu = m_currentMenu->addMenu(QString::fromStdString(menu.name()));
   }
 
-  if (menu.entryType()==MenuEntryType::Menu_RecentDocuments) {
+  if (menu.entryType() == MenuEntryType::Menu_RecentDocuments) {
     recentDocumentsMenu = m_currentMenu;
   }
 
@@ -98,23 +92,23 @@ void MainMenuBuilder::visit(const Menu &menu) {
 }
 
 void MainMenuBuilder::visit(const MenuSeparatorItem &) {
-  assert(m_currentMenu!=nullptr);
+  assert(m_currentMenu != nullptr);
   m_currentMenu->addSeparator();
 }
 
 void MainMenuBuilder::visit(const MenuActionItem &item) {
-  assert(m_currentMenu!=nullptr);
+  assert(m_currentMenu != nullptr);
   const auto &tAction = item.action();
   QAction *qAction = findOrCreateQAction(&tAction);
   m_currentMenu->addAction(qAction);
 
-  if (item.entryType()==MenuEntryType::Menu_Undo) {
+  if (item.entryType() == MenuEntryType::Menu_Undo) {
     undoAction = qAction;
-  } else if (item.entryType()==MenuEntryType::Menu_Redo) {
+  } else if (item.entryType() == MenuEntryType::Menu_Redo) {
     redoAction = qAction;
-  } else if (item.entryType()==MenuEntryType::Menu_Paste) {
+  } else if (item.entryType() == MenuEntryType::Menu_Paste) {
     pasteAction = qAction;
-  } else if (item.entryType()==MenuEntryType::Menu_PasteAtOriginalPosition) {
+  } else if (item.entryType() == MenuEntryType::Menu_PasteAtOriginalPosition) {
     pasteAtOriginalPositionAction = qAction;
   }
 }

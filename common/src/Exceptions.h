@@ -35,15 +35,18 @@ public:
   const char *what() const noexcept override;
 };
 
+
 class BrushFaceReferenceException : public Exception {
 public:
   using Exception::Exception;
 };
 
+
 class EntityAttributeException : public Exception {
 public:
   using Exception::Exception;
 };
+
 
 class ParserException : public Exception {
 public:
@@ -59,35 +62,42 @@ private:
   static std::string buildMessage(size_t line, const std::string &str);
 };
 
+
 class VboException : public Exception {
 public:
   using Exception::Exception;
 };
+
 
 class AssetException : public Exception {
 public:
   using Exception::Exception;
 };
 
+
 class CommandProcessorException : public Exception {
 public:
   using Exception::Exception;
 };
+
 
 class RenderException : public Exception {
 public:
   using Exception::Exception;
 };
 
+
 class NodeTreeException : public Exception {
 public:
   using Exception::Exception;
 };
 
+
 class GameException : public Exception {
 public:
   using Exception::Exception;
 };
+
 
 class FileFormatException : public Exception {
 public:

@@ -40,16 +40,21 @@ class Texture;
 
 namespace Model {
 class BrushNode;
+
+
 class BrushFace;
+
+
 class EntityProperty;
+
+
 class Node;
 } // namespace Model
 
 namespace IO {
 class ObjSerializer : public NodeSerializer {
 public:
-  template<typename V>
-  class IndexMap {
+  template<typename V> class IndexMap {
   private:
     std::map<V, size_t> m_map;
     std::vector<V> m_list;
@@ -60,7 +65,7 @@ public:
     size_t index(const V &v) {
       const auto it = m_map.emplace(v, m_list.size()).first;
       const size_t index = it->second;
-      if (index==m_list.size()) {
+      if (index == m_list.size()) {
         m_list.push_back(v);
       }
       return index;
@@ -106,10 +111,15 @@ public:
   using Object = std::variant<BrushObject, PatchObject>;
 
   friend std::ostream &operator<<(std::ostream &str, const IndexedVertex &vertex);
+
   friend std::ostream &operator<<(std::ostream &str, const BrushFace &face);
+
   friend std::ostream &operator<<(std::ostream &str, const BrushObject &object);
+
   friend std::ostream &operator<<(std::ostream &str, const PatchQuad &quad);
+
   friend std::ostream &operator<<(std::ostream &str, const PatchObject &object);
+
   friend std::ostream &operator<<(std::ostream &str, const Object &object);
 
 private:
@@ -126,21 +136,21 @@ private:
   std::vector<Object> m_objects;
 
 public:
-  ObjSerializer(
-      std::ostream &objStream,
-      std::ostream &mtlStream,
-      std::string mtlFilename,
-      ObjExportOptions options);
+  ObjSerializer(std::ostream &objStream, std::ostream &mtlStream, std::string mtlFilename, ObjExportOptions options);
 
 private:
   void doBeginFile(const std::vector<const Model::Node *> &rootNodes) override;
+
   void doEndFile() override;
 
   void doBeginEntity(const Model::Node *node) override;
+
   void doEndEntity(const Model::Node *node) override;
+
   void doEntityProperty(const Model::EntityProperty &property) override;
 
   void doBrush(const Model::BrushNode *brush) override;
+
   void doBrushFace(const Model::BrushFace &face) override;
 
   void doPatch(const Model::PatchNode *patchNode) override;

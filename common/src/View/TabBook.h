@@ -21,11 +21,13 @@
 
 #include <QWidget>
 
+
 class QStackedLayout;
 
 namespace TrenchBroom {
 namespace View {
 class TabBar;
+
 
 class TabBookPage : public QWidget {
 Q_OBJECT
@@ -36,6 +38,7 @@ public:
 
   virtual QWidget *createTabBarPage(QWidget *parent);
 };
+
 
 class TabBook : public QWidget {
 Q_OBJECT

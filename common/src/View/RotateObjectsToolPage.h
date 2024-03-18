@@ -29,9 +29,12 @@
 
 #include <memory>
 
+
 class QCheckBox;
 
+
 class QComboBox;
+
 
 class QPushButton;
 
@@ -39,11 +42,15 @@ namespace TrenchBroom {
 namespace View {
 class MapDocument;
 
+
 class RotateObjectsTool;
+
 
 class Selection;
 
+
 class SpinControl;
+
 
 class RotateObjectsToolPage : public QWidget {
 Q_OBJECT
@@ -62,10 +69,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  RotateObjectsToolPage(
-      std::weak_ptr<MapDocument> document,
-      RotateObjectsTool &tool,
-      QWidget *parent = nullptr);
+  RotateObjectsToolPage(std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent = nullptr);
 
   void setAxis(vm::axis::type axis);
 

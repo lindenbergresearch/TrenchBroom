@@ -30,13 +30,18 @@ namespace TrenchBroom {
 namespace View {
 class Command;
 
+
 class CommandResult;
+
 
 class MapDocumentCommandFacade;
 
+
 class UndoableCommand;
 
+
 enum class TransactionScope;
+
 
 /**
  * The command processor is responsible for executing and undoing commands and for
@@ -103,9 +108,7 @@ public:
    *
    * @param document the document to pass to commands, may be null
    */
-  explicit CommandProcessor(
-      MapDocumentCommandFacade *document,
-      std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000});
+  explicit CommandProcessor(MapDocumentCommandFacade *document, std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000});
 
   ~CommandProcessor();
 
@@ -243,8 +246,7 @@ public:
    * @param command the command to execute
    * @return the result of executing the given command
    */
-  std::unique_ptr<CommandResult> executeAndStore(
-      std::unique_ptr<UndoableCommand> command);
+  std::unique_ptr<CommandResult> executeAndStore(std::unique_ptr<UndoableCommand> command);
 
   /**
    * Undoes the most recently executed command by calling its `performUndo` method and
@@ -288,8 +290,7 @@ private:
    * @return a struct containing the result of executing the given command and a boolean
    * indicating whether the given command was stored on the undo stack
    */
-  SubmitAndStoreResult executeAndStoreCommand(
-      std::unique_ptr<UndoableCommand> command, bool collate);
+  SubmitAndStoreResult executeAndStoreCommand(std::unique_ptr<UndoableCommand> command, bool collate);
 
   /**
    * Executes the given command by calling its `performDo` method and triggers the
@@ -352,8 +353,7 @@ private:
    * @param commands the commands to store in the newly created transaction command
    * @return the newly created command
    */
-  std::unique_ptr<UndoableCommand> createTransaction(
-      std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands);
+  std::unique_ptr<UndoableCommand> createTransaction(std::string name, std::vector<std::unique_ptr<UndoableCommand>> commands);
 
   /**
    * Pushes the given command onto the undo stack, unless it can be collated with the

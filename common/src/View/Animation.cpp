@@ -43,15 +43,15 @@ EaseInEaseOutAnimationCurve::EaseInEaseOutAnimationCurve(const double duration) 
   if (duration < 100 + 100)
     m_threshold = 0.5;
   else
-    m_threshold = 100.0/duration;
+    m_threshold = 100.0 / duration;
 }
 
 double EaseInEaseOutAnimationCurve::doApply(const double progress) const {
   if (progress < m_threshold)
-    return progress*progress/m_threshold;
+    return progress * progress / m_threshold;
   if (progress > 1.0 - m_threshold) {
     double temp = 1.0 - progress;
-    temp = temp*temp/m_threshold;
+    temp = temp * temp / m_threshold;
     return 1.0 - m_threshold + temp;
   }
   return progress;
@@ -61,12 +61,11 @@ double EaseInEaseOutAnimationCurve::doApply(const double progress) const {
 
 Animation::Type Animation::freeType() {
   static Type type = 0;
-  return type++;
+  return type ++;
 }
 
-Animation::Animation(const Type type, const Curve curve, const double duration)
-    : m_type(type), m_curve(createAnimationCurve(curve, duration)), m_duration(duration), m_elapsed(0),
-      m_progress(0.0) {
+Animation::Animation(const Type type, const Curve curve, const double duration) :
+    m_type(type), m_curve(createAnimationCurve(curve, duration)), m_duration(duration), m_elapsed(0), m_progress(0.0) {
   assert(m_duration > 0);
 }
 
@@ -78,7 +77,7 @@ Animation::Type Animation::type() const {
 
 bool Animation::step(const double delta) {
   m_elapsed = std::min(m_elapsed + delta, m_duration);
-  m_progress = m_elapsed/m_duration;
+  m_progress = m_elapsed / m_duration;
   return m_elapsed >= m_duration;
 }
 
@@ -86,8 +85,7 @@ void Animation::update() {
   doUpdate(m_progress);
 }
 
-std::unique_ptr<AnimationCurve> Animation::createAnimationCurve(
-    const Curve curve, const double duration) {
+std::unique_ptr<AnimationCurve> Animation::createAnimationCurve(const Curve curve, const double duration) {
   switch (curve) {
   case Curve::EaseInEaseOut:return std::make_unique<EaseInEaseOutAnimationCurve>(duration);
   case Curve::Flat:return std::make_unique<FlatAnimationCurve>();
@@ -99,14 +97,12 @@ std::unique_ptr<AnimationCurve> Animation::createAnimationCurve(
 
 const int AnimationManager::AnimationUpdateRateHz = 60;
 
-AnimationManager::AnimationManager(QObject *parent)
-    : QObject(parent), m_timer(new QTimer(this)) {
+AnimationManager::AnimationManager(QObject *parent) : QObject(parent), m_timer(new QTimer(this)) {
   connect(m_timer, &QTimer::timeout, this, &AnimationManager::onTimerTick);
 }
 
-void AnimationManager::runAnimation(
-    std::unique_ptr<Animation> animation, const bool replace) {
-  ensure(animation!=nullptr, "animation is null");
+void AnimationManager::runAnimation(std::unique_ptr<Animation> animation, const bool replace) {
+  ensure(animation != nullptr, "animation is null");
 
   auto &list = m_animations[animation->type()];
   if (replace) {
@@ -115,11 +111,11 @@ void AnimationManager::runAnimation(
   list.emplace_back(std::move(animation));
 
   // start the ticks if needed
-  if (!m_timer->isActive()) {
-    assert(!m_elapsedTimer.isValid());
+  if (! m_timer->isActive()) {
+    assert(! m_elapsedTimer.isValid());
     m_elapsedTimer.start();
 
-    m_timer->start(1000/AnimationUpdateRateHz);
+    m_timer->start(1000 / AnimationUpdateRateHz);
   }
 }
 
@@ -128,12 +124,12 @@ void AnimationManager::onTimerTick() {
   const auto msElapsed = static_cast<double>(m_elapsedTimer.restart());
 
   // advance the animation times
-  if (!m_animations.empty()) {
+  if (! m_animations.empty()) {
     auto mapIt = std::begin(m_animations);
-    while (mapIt!=std::end(m_animations)) {
+    while (mapIt != std::end(m_animations)) {
       auto &list = mapIt->second;
       auto listIt = std::begin(list);
-      while (listIt!=std::end(list)) {
+      while (listIt != std::end(list)) {
         auto &animation = *listIt;
         const auto finished = animation->step(msElapsed);
         animation->update();
@@ -141,14 +137,14 @@ void AnimationManager::onTimerTick() {
         if (finished) {
           listIt = list.erase(listIt);
         } else {
-          ++listIt;
+          ++ listIt;
         }
       }
 
       if (list.empty()) {
-        m_animations.erase(mapIt++);
+        m_animations.erase(mapIt ++);
       } else {
-        ++mapIt;
+        ++ mapIt;
       }
     }
   }

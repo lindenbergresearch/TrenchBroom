@@ -25,16 +25,14 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-template<typename VertexSpec>
-class VertexListBuilder {
+template<typename VertexSpec> class VertexListBuilder {
 public:
   // FIXME: move out or make private
   struct Range {
     size_t index;
     size_t count;
 
-    Range(const size_t i_index, const size_t i_count)
-        : index(i_index), count(i_count) {
+    Range(const size_t i_index, const size_t i_count) : index(i_index), count(i_count) {
     }
   };
 
@@ -47,13 +45,11 @@ private:
   bool m_dynamicGrowth;
 
 public:
-  explicit VertexListBuilder(const size_t capacity)
-      : m_vertices(), m_dynamicGrowth(false) {
+  explicit VertexListBuilder(const size_t capacity) : m_vertices(), m_dynamicGrowth(false) {
     m_vertices.reserve(capacity);
   }
 
-  VertexListBuilder()
-      : m_dynamicGrowth(true) {
+  VertexListBuilder() : m_dynamicGrowth(true) {
   }
 
   size_t vertexCount() const { return m_vertices.size(); }
@@ -84,7 +80,7 @@ public:
   }
 
   Range addLines(const VertexList &vertices) {
-    assert(vertices.size()%2==0);
+    assert(vertices.size() % 2 == 0);
     return addVertices(vertices);
   }
 
@@ -110,7 +106,7 @@ public:
   }
 
   Range addTriangles(const VertexList &vertices) {
-    assert(vertices.size()%3==0);
+    assert(vertices.size() % 3 == 0);
     return addVertices(vertices);
   }
 
@@ -137,13 +133,13 @@ public:
   }
 
   Range addQuads(const VertexList &vertices) {
-    assert(vertices.size()%4==0);
+    assert(vertices.size() % 4 == 0);
     return addVertices(vertices);
   }
 
   Range addQuadStrip(const VertexList &vertices) {
     assert(vertices.size() >= 4);
-    assert(vertices.size()%2==0);
+    assert(vertices.size() % 2 == 0);
     return addVertices(vertices);
   }
 

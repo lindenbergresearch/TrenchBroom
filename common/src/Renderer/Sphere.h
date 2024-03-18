@@ -25,6 +25,7 @@ namespace TrenchBroom {
 namespace Renderer {
 class VboManager;
 
+
 class Sphere {
 private:
   VertexArray m_array;

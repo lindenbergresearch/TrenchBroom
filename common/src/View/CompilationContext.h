@@ -28,6 +28,7 @@
 namespace TrenchBroom::View {
 class MapDocument;
 
+
 class CompilationContext {
 private:
   std::weak_ptr<MapDocument> m_document;
@@ -37,11 +38,7 @@ private:
   bool m_test;
 
 public:
-  CompilationContext(
-      std::weak_ptr<MapDocument> document,
-      const EL::VariableStore &variables,
-      TextOutputAdapter output,
-      bool test);
+  CompilationContext(std::weak_ptr<MapDocument> document, const EL::VariableStore &variables, TextOutputAdapter output, bool test);
 
   std::shared_ptr<MapDocument> document() const;
 
@@ -51,14 +48,12 @@ public:
 
   std::string variableValue(const std::string &variableName) const;
 
-  template<typename T>
-  void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
+  template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
     m_output.pushSystemMessage(t, color);
     return;
   }
 
-  template<typename T>
-  CompilationContext &operator<<(const T &t) {
+  template<typename T> CompilationContext &operator<<(const T &t) {
     m_output << t;
     return *this;
   }

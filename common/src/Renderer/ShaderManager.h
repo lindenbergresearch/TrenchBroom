@@ -30,6 +30,7 @@
 namespace TrenchBroom::Renderer {
 class ShaderConfig;
 
+
 class ShaderManager {
 private:
   friend class ShaderProgram;

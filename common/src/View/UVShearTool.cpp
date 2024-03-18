@@ -40,8 +40,7 @@ namespace View {
 const Model::HitType::Type UVShearTool::XHandleHitType = Model::HitType::freeType();
 const Model::HitType::Type UVShearTool::YHandleHitType = Model::HitType::freeType();
 
-UVShearTool::UVShearTool(std::weak_ptr<MapDocument> document, UVViewHelper &helper)
-    : ToolController{}, Tool{true}, m_document{document}, m_helper{helper} {
+UVShearTool::UVShearTool(std::weak_ptr<MapDocument> document, UVViewHelper &helper) : ToolController{}, Tool{true}, m_document{document}, m_helper{helper} {
 }
 
 Tool &UVShearTool::tool() {
@@ -59,19 +58,13 @@ void UVShearTool::pick(const InputState &inputState, Model::PickResult &pickResu
   }
 }
 
-static vm::vec2f getHit(
-    const UVViewHelper &helper,
-    const vm::vec3 &xAxis,
-    const vm::vec3 &yAxis,
-    const vm::ray3 &pickRay) {
+static vm::vec2f getHit(const UVViewHelper &helper, const vm::vec3 &xAxis, const vm::vec3 &yAxis, const vm::ray3 &pickRay) {
   const auto &boundary = helper.face()->boundary();
   const auto hitPointDist = vm::intersect_ray_plane(pickRay, boundary);
   const auto hitPoint = vm::point_at_distance(pickRay, hitPointDist);
   const auto hitVec = hitPoint - helper.origin();
 
-  return vm::vec2f{
-      static_cast<float>(vm::dot(hitVec, xAxis)),
-      static_cast<float>(vm::dot(hitVec, yAxis))};
+  return vm::vec2f{static_cast<float>(vm::dot(hitVec, xAxis)), static_cast<float>(vm::dot(hitVec, yAxis))};
 }
 
 namespace {
@@ -87,14 +80,10 @@ private:
 
 public:
   UVShearDragTracker(
-      MapDocument &document,
-      const UVViewHelper &helper,
-      const vm::vec2b &selector,
-      const vm::vec3 &xAxis,
-      const vm::vec3 &yAxis,
-      const vm::vec2f &initialHit)
-      : m_document{document}, m_helper{helper}, m_selector{selector}, m_xAxis{xAxis}, m_yAxis{yAxis},
-        m_initialHit{initialHit}, m_lastHit{initialHit} {
+      MapDocument &document, const UVViewHelper &helper, const vm::vec2b &selector, const vm::vec3 &xAxis, const vm::vec3 &yAxis, const vm::vec2f &initialHit
+  ) : m_document{document}, m_helper{helper}, m_selector{
+      selector
+  }, m_xAxis{xAxis}, m_yAxis{yAxis}, m_initialHit{initialHit}, m_lastHit{initialHit} {
     m_document.startTransaction("Shear Texture", TransactionScope::LongRunning);
   }
 
@@ -105,25 +94,27 @@ public:
     const auto origin = m_helper.origin();
     const auto oldCoords = vm::vec2f{
         m_helper.face()->toTexCoordSystemMatrix(
-            vm::vec2f::zero(), m_helper.face()->attributes().scale(), true)
-            *origin};
+            vm::vec2f::zero(), m_helper.face()->attributes().scale(), true
+        ) * origin
+    };
 
     if (m_selector[0]) {
-      const auto factors = vm::vec2f{-delta.y()/m_initialHit.x(), 0.0f};
-      if (!vm::is_zero(factors, vm::Cf::almost_zero())) {
+      const auto factors = vm::vec2f{- delta.y() / m_initialHit.x(), 0.0f};
+      if (! vm::is_zero(factors, vm::Cf::almost_zero())) {
         m_document.shearTextures(factors);
       }
     } else if (m_selector[1]) {
-      const auto factors = vm::vec2f{0.0f, -delta.x()/m_initialHit.y()};
-      if (!vm::is_zero(factors, vm::Cf::almost_zero())) {
+      const auto factors = vm::vec2f{0.0f, - delta.x() / m_initialHit.y()};
+      if (! vm::is_zero(factors, vm::Cf::almost_zero())) {
         m_document.shearTextures(factors);
       }
     }
 
     const auto newCoords = vm::vec2f{
         m_helper.face()->toTexCoordSystemMatrix(
-            vm::vec2f::zero(), m_helper.face()->attributes().scale(), true)
-            *origin};
+            vm::vec2f::zero(), m_helper.face()->attributes().scale(), true
+        ) * origin
+    };
     const auto newOffset = m_helper.face()->attributes().offset() + oldCoords - newCoords;
 
     auto request = Model::ChangeBrushFaceAttributesRequest{};
@@ -145,20 +136,18 @@ std::unique_ptr<DragTracker> UVShearTool::acceptMouseDrag(const InputState &inpu
 
   assert(m_helper.valid());
 
-  if (
-      !inputState.modifierKeysPressed(ModifierKeys::MKAlt)
-          || !inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
+  if (! inputState.modifierKeysPressed(ModifierKeys::MKAlt) || ! inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
     return nullptr;
   }
 
-  if (!m_helper.face()->attributes().valid()) {
+  if (! m_helper.face()->attributes().valid()) {
     return nullptr;
   }
 
   const Model::Hit &xHit = inputState.pickResult().first(type(XHandleHitType));
   const Model::Hit &yHit = inputState.pickResult().first(type(YHandleHitType));
 
-  if (!(xHit.isMatch() ^ yHit.isMatch())) {
+  if (! (xHit.isMatch() ^ yHit.isMatch())) {
     return nullptr;
   }
 
@@ -175,7 +164,8 @@ std::unique_ptr<DragTracker> UVShearTool::acceptMouseDrag(const InputState &inpu
   }
 
   return std::make_unique<UVShearDragTracker>(
-      *kdl::mem_lock(m_document), m_helper, selector, xAxis, yAxis, initialHit);
+      *kdl::mem_lock(m_document), m_helper, selector, xAxis, yAxis, initialHit
+  );
 }
 
 bool UVShearTool::cancel() {

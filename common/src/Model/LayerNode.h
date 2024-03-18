@@ -52,6 +52,7 @@ public:
   explicit LayerNode(Layer layer);
 
   const Layer &layer() const;
+
   Layer setLayer(Layer layer);
 
   bool isDefaultLayer() const;
@@ -62,37 +63,48 @@ public:
   static void sortLayers(std::vector<LayerNode *> &layers);
 
   const std::optional<IdType> &persistentId() const;
+
   void setPersistentId(IdType persistentId);
 
 private: // implement Node interface
   const std::string &doGetName() const override;
+
   const vm::bbox3 &doGetLogicalBounds() const override;
+
   const vm::bbox3 &doGetPhysicalBounds() const override;
+
   FloatType doGetProjectedArea(vm::axis::type axis) const override;
 
   Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
+
   bool doCanAddChild(const Node *child) const override;
+
   bool doCanRemoveChild(const Node *child) const override;
+
   bool doRemoveIfEmpty() const override;
+
   bool doShouldAddToSpacialIndex() const override;
+
   void doNodePhysicalBoundsDidChange() override;
+
   bool doSelectable() const override;
 
-  void doPick(
-      const EditorContext &editorContext,
-      const vm::ray3 &ray,
-      PickResult &pickResult) override;
+  void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
+
   void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
   void doAccept(NodeVisitor &visitor) override;
+
   void doAccept(ConstNodeVisitor &visitor) const override;
 
 private:
   void invalidateBounds();
+
   void validateBounds() const;
 
 private: // implement Taggable interface
   void doAcceptTagVisitor(TagVisitor &visitor) override;
+
   void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 
 private:

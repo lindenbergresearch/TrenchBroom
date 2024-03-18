@@ -33,16 +33,13 @@ KeyboardShortcutItemDelegate::KeyboardShortcutItemDelegate() {
   setItemEditorFactory(itemEditorFactory);
 }
 
-QWidget *KeyboardShortcutItemDelegate::createEditor(
-    QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+QWidget *KeyboardShortcutItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   QWidget *widget = QStyledItemDelegate::createEditor(parent, option, index);
   auto *editor = dynamic_cast<KeySequenceEdit *>(widget);
   if (editor) {
     connect(
-        editor,
-        &KeySequenceEdit::editingFinished,
-        this,
-        &KeyboardShortcutItemDelegate::commitAndCloseEditor);
+        editor, &KeySequenceEdit::editingFinished, this, &KeyboardShortcutItemDelegate::commitAndCloseEditor
+    );
   }
   return widget;
 }

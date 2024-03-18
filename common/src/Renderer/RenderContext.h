@@ -27,21 +27,23 @@
 namespace TrenchBroom {
 namespace Renderer {
 class Camera;
+
+
 class FontManager;
+
+
 class ShaderManager;
 
+
 enum class RenderMode {
-  Render3D,
-  Render2D
+  Render3D, Render2D
 };
+
 
 class RenderContext {
 private:
   enum class ShowSelectionGuide {
-    Show,
-    Hide,
-    ForceShow,
-    ForceHide
+    Show, Hide, ForceShow, ForceHide
   };
 
   // general context for any rendering view
@@ -78,75 +80,96 @@ private:
   vm::bbox3f m_sofMapBounds;
 
 public:
-  RenderContext(
-      RenderMode renderMode,
-      const Camera &camera,
-      FontManager &fontManager,
-      ShaderManager &shaderManager);
+  RenderContext(RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager);
 
   bool render2D() const;
+
   bool render3D() const;
 
   const Camera &camera() const;
+
   Transformation &transformation();
+
   FontManager &fontManager();
+
   ShaderManager &shaderManager();
 
   bool showTextures() const;
+
   void setShowTextures(bool showTextures);
 
   bool showFaces() const;
+
   void setShowFaces(bool showFaces);
 
   bool showEdges() const;
+
   void setShowEdges(bool showEdges);
 
   bool shadeFaces() const;
+
   void setShadeFaces(bool shadeFaces);
 
   bool showPointEntities() const;
+
   void setShowPointEntities(bool showPointEntities);
 
   bool showPointEntityModels() const;
+
   void setShowPointEntityModels(bool showPointEntityModels);
 
   bool showEntityClassnames() const;
+
   void setShowEntityClassnames(bool showEntityClassnames);
 
   bool showGroupBounds() const;
+
   void setShowGroupBounds(bool showGroupBounds);
 
   bool showBrushEntityBounds() const;
+
   void setShowBrushEntityBounds(bool showBrushEntityBounds);
 
   bool showPointEntityBounds() const;
+
   void setShowPointEntityBounds(bool showPointEntityBounds);
 
   bool showFog() const;
+
   void setShowFog(bool showFog);
 
   bool showGrid() const;
+
   void setShowGrid(bool showGrid);
 
   const vm::bbox3f &softMapBounds() const;
+
   void setSoftMapBounds(const vm::bbox3f &softMapBounds);
 
   FloatType gridSize() const;
+
   void setGridSize(FloatType gridSize);
 
   float dpiScale() const;
+
   void setDpiScale(float dpiScale);
 
   bool hideSelection() const;
+
   void setHideSelection();
 
   bool tintSelection() const;
+
   void clearTintSelection();
 
   bool showSelectionGuide() const;
+
   void setShowSelectionGuide();
+
   void setHideSelectionGuide();
+
   void setForceShowSelectionGuide();
+
   void setForceHideSelectionGuide();
 
 private:
@@ -154,6 +177,7 @@ private:
 
 private:
   RenderContext(const RenderContext &other);
+
   RenderContext &operator=(const RenderContext &other);
 };
 } // namespace Renderer

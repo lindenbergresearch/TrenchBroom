@@ -24,6 +24,7 @@
 #include <memory>
 #include <vector>
 
+
 class QPushButton;
 
 namespace TrenchBroom::Assets {
@@ -37,8 +38,13 @@ class BrushFaceHandle;
 namespace TrenchBroom::View {
 
 class GLContextManager;
+
+
 class MapDocument;
+
+
 class TextureBrowser;
+
 
 class ReplaceTextureDialog : public QDialog {
 Q_OBJECT
@@ -50,18 +56,21 @@ private:
   QPushButton *m_replaceButton = nullptr;
 
 public:
-  ReplaceTextureDialog(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  ReplaceTextureDialog(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
 private:
   void accept() override;
+
   std::vector<Model::BrushFaceHandle> getApplicableFaces() const;
+
   void createGui(GLContextManager &contextManager);
+
 private slots:
+
   void subjectSelected(const Assets::Texture *subject);
+
   void replacementSelected(const Assets::Texture *replacement);
+
   void updateReplaceButton();
 };
 

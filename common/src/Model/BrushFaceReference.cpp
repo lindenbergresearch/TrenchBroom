@@ -33,9 +33,8 @@
 #include <cassert>
 
 namespace TrenchBroom::Model {
-BrushFaceReference::BrushFaceReference(BrushNode *node, const BrushFace &face)
-    : m_node{node}, m_facePlane{face.boundary()} {
-  assert(m_node!=nullptr);
+BrushFaceReference::BrushFaceReference(BrushNode *node, const BrushFace &face) : m_node{node}, m_facePlane{face.boundary()} {
+  assert(m_node != nullptr);
 }
 
 Result<BrushFaceHandle> BrushFaceReference::resolve() const {
@@ -46,13 +45,14 @@ Result<BrushFaceHandle> BrushFaceReference::resolve() const {
 }
 
 std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &handles) {
-  return kdl::vec_transform(handles, [](const auto &handle) {
-    return BrushFaceReference(handle.node(), handle.face());
-  });
+  return kdl::vec_transform(
+      handles, [](const auto &handle) {
+        return BrushFaceReference(handle.node(), handle.face());
+      }
+  );
 }
 
-Result<std::vector<BrushFaceHandle>> resolveAllRefs(
-    const std::vector<BrushFaceReference> &faceRefs) {
+Result<std::vector<BrushFaceHandle>> resolveAllRefs(const std::vector<BrushFaceReference> &faceRefs) {
   return kdl::fold_results(
       kdl::vec_transform(faceRefs, [](const auto &faceRef) { return faceRef.resolve(); }));
 }

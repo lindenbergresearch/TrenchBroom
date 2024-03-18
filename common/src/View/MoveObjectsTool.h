@@ -28,16 +28,17 @@ namespace TrenchBroom {
 namespace View {
 class Grid;
 
+
 class InputState;
 
+
 class MapDocument;
+
 
 class MoveObjectsTool : public Tool {
 public:
   typedef enum {
-    MR_Continue,
-    MR_Deny,
-    MR_Cancel
+    MR_Continue, MR_Deny, MR_Cancel
   } MoveResult;
 
 private:

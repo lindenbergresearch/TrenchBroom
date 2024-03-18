@@ -74,20 +74,17 @@ kdl_reflect_impl(EntityRotationInfo);
 
 namespace {
 std::optional<std::tuple<std::string, EntityRotationType>> selectEntityRotationType(
-    const Entity &entity,
-    const std::vector<std::tuple<std::string, EntityRotationType>> &
-    propertyToEntityRotationTypeMapping) {
-  for (const auto &[propertyKey, entityRotationType] :
-      propertyToEntityRotationTypeMapping) {
+    const Entity &entity, const std::vector<std::tuple<std::string, EntityRotationType>> &propertyToEntityRotationTypeMapping
+) {
+  for (const auto &[propertyKey, entityRotationType] : propertyToEntityRotationTypeMapping) {
     if (entity.hasProperty(propertyKey)) {
       return {{propertyKey, entityRotationType}};
     }
   }
 
-  for (const auto &[propertyKey, entityRotationType] :
-      propertyToEntityRotationTypeMapping) {
+  for (const auto &[propertyKey, entityRotationType] : propertyToEntityRotationTypeMapping) {
     const auto *definition = entity.definition();
-    if (definition!=nullptr && definition->propertyDefinition(propertyKey)!=nullptr) {
+    if (definition != nullptr && definition->propertyDefinition(propertyKey) != nullptr) {
       return {{propertyKey, entityRotationType}};
     }
   }
@@ -103,20 +100,17 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
 
   const auto *model = entity.model();
   const auto pitchType = model ? model->pitchType() : Assets::PitchType::Normal;
-  const EntityRotationType eulerType =
-      (pitchType==Assets::PitchType::MdlInverted
-       ? EntityRotationType::Euler
-       : EntityRotationType::Euler_PositivePitchDown);
+  const EntityRotationType eulerType = (pitchType == Assets::PitchType::MdlInverted ? EntityRotationType::Euler : EntityRotationType::Euler_PositivePitchDown);
 
   // determine the type of rotation to apply to this entity
   const auto classname = entity.classname();
-  if (classname!=EntityPropertyValues::NoClassname) {
+  if (classname != EntityPropertyValues::NoClassname) {
     if (kdl::cs::str_is_prefix(classname, "light")) {
       if (entity.hasProperty(EntityPropertyKeys::Mangle)) {
         // spotlight without a target, update mangle
         type = EntityRotationType::Mangle;
         propertyKey = EntityPropertyKeys::Mangle;
-      } else if (!entity.hasProperty(EntityPropertyKeys::Target)) {
+      } else if (! entity.hasProperty(EntityPropertyKeys::Target)) {
         // not a spotlight, but might have a rotatable model, so change angle or angles
         if (entity.hasProperty(EntityPropertyKeys::Angles)) {
           type = eulerType;
@@ -133,34 +127,30 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
     } else {
       // non-light
 
-      if (!entity.pointEntity()) {
+      if (! entity.pointEntity()) {
         // brush entity
-        std::tie(propertyKey, type) =
-            selectEntityRotationType(
-                entity,
-                {{EntityPropertyKeys::Angles, eulerType},
-                 {EntityPropertyKeys::Mangle, eulerType},
-                 {EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown}})
-                .value_or(std::make_tuple(propertyKey, type));
+        std::tie(propertyKey, type) = selectEntityRotationType(
+            entity,
+            {{EntityPropertyKeys::Angles, eulerType}, {EntityPropertyKeys::Mangle, eulerType}, {EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown}}
+        ).value_or(std::make_tuple(propertyKey, type));
       } else {
         // point entity
 
         // if the origin of the definition's bounding box is not in its center, don't
         // apply the rotation
         const auto offset = entity.definitionBounds().center();
-        if (!vm::is_zero(offset.xy(), vm::C::almost_zero())) {
+        if (! vm::is_zero(offset.xy(), vm::C::almost_zero())) {
           // TODO: this only makes sense for Quake
           usage = EntityRotationUsage::BlockRotation;
         }
 
-        std::tie(propertyKey, type) =
-            selectEntityRotationType(
-                entity,
-                {{EntityPropertyKeys::Angles, eulerType},
-                 {EntityPropertyKeys::Mangle, eulerType},
-                 {EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown}})
-                .value_or(std::make_tuple(
-                    EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown));
+        std::tie(propertyKey, type) = selectEntityRotationType(
+            entity,
+            {{EntityPropertyKeys::Angles, eulerType}, {EntityPropertyKeys::Mangle, eulerType}, {EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown}}
+        ).value_or(
+            std::make_tuple(
+                EntityPropertyKeys::Angle, EntityRotationType::AngleUpDown
+            ));
       }
     }
   }
@@ -168,12 +158,11 @@ EntityRotationInfo entityRotationInfo(const Entity &entity) {
   return EntityRotationInfo{type, propertyKey, usage};
 }
 
-vm::mat4x4 entityRotation(
-    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info) {
+vm::mat4x4 entityRotation(const std::vector<EntityProperty> &properties, const EntityRotationInfo &info) {
   switch (info.type) {
   case EntityRotationType::Angle: {
     const auto it = findEntityProperty(properties, info.propertyKey);
-    if (it==std::end(properties) || it->value().empty()) {
+    if (it == std::end(properties) || it->value().empty()) {
       return vm::mat4x4::identity();
     } else {
       const auto angle = static_cast<FloatType>(std::atof(it->value().c_str()));
@@ -182,13 +171,13 @@ vm::mat4x4 entityRotation(
   }
   case EntityRotationType::AngleUpDown: {
     const auto it = findEntityProperty(properties, info.propertyKey);
-    if (it==std::end(properties) || it->value().empty()) {
+    if (it == std::end(properties) || it->value().empty()) {
       return vm::mat4x4::identity();
     }
     const auto angle = static_cast<FloatType>(std::atof(it->value().c_str()));
-    if (angle==-1.0) {
+    if (angle == - 1.0) {
       return vm::mat4x4::rot_90_y_cw();
-    } else if (angle==-2.0) {
+    } else if (angle == - 2.0) {
       return vm::mat4x4::rot_90_y_ccw();
     } else {
       return vm::rotation_matrix(vm::vec3::pos_z(), vm::to_radians(angle));
@@ -196,49 +185,40 @@ vm::mat4x4 entityRotation(
   }
   case EntityRotationType::Euler: {
     const auto it = findEntityProperty(properties, info.propertyKey);
-    const auto angles =
-        it!=std::end(properties)
-        ? vm::parse<FloatType, 3>(it->value()).value_or(vm::vec3::zero())
-        : vm::vec3::zero();
+    const auto angles = it != std::end(properties) ? vm::parse<FloatType, 3>(it->value()).value_or(vm::vec3::zero()) : vm::vec3::zero();
 
     // x = -pitch
     // y =  yaw
     // z =  roll
     // pitch is applied with an inverted sign
     // see QuakeSpasm sources gl_rmain R_RotateForEntity function
-    const auto roll = +vm::to_radians(angles.z());
-    const auto pitch = -vm::to_radians(angles.x());
-    const auto yaw = +vm::to_radians(angles.y());
+    const auto roll = + vm::to_radians(angles.z());
+    const auto pitch = - vm::to_radians(angles.x());
+    const auto yaw = + vm::to_radians(angles.y());
     return vm::rotation_matrix(roll, pitch, yaw);
   }
   case EntityRotationType::Euler_PositivePitchDown: {
     const auto it = findEntityProperty(properties, info.propertyKey);
-    const auto angles =
-        it!=std::end(properties)
-        ? vm::parse<FloatType, 3>(it->value()).value_or(vm::vec3::zero())
-        : vm::vec3::zero();
+    const auto angles = it != std::end(properties) ? vm::parse<FloatType, 3>(it->value()).value_or(vm::vec3::zero()) : vm::vec3::zero();
 
     // x = pitch
     // y = yaw
     // z = roll
-    const auto roll = +vm::to_radians(angles.z());
-    const auto pitch = +vm::to_radians(angles.x());
-    const auto yaw = +vm::to_radians(angles.y());
+    const auto roll = + vm::to_radians(angles.z());
+    const auto pitch = + vm::to_radians(angles.x());
+    const auto yaw = + vm::to_radians(angles.y());
     return vm::rotation_matrix(roll, pitch, yaw);
   }
   case EntityRotationType::Mangle: {
     const auto it = findEntityProperty(properties, info.propertyKey);
-    const auto angles =
-        it!=std::end(properties)
-        ? vm::parse<FloatType, 3>(it->value()).value_or(vm::vec3::zero())
-        : vm::vec3::zero();
+    const auto angles = it != std::end(properties) ? vm::parse<FloatType, 3>(it->value()).value_or(vm::vec3::zero()) : vm::vec3::zero();
 
     // x = yaw
     // y = -pitch
     // z = roll
-    const auto roll = +vm::to_radians(angles.z());
-    const auto pitch = -vm::to_radians(angles.y());
-    const auto yaw = +vm::to_radians(angles.x());
+    const auto roll = + vm::to_radians(angles.z());
+    const auto pitch = - vm::to_radians(angles.y());
+    const auto yaw = + vm::to_radians(angles.x());
     return vm::rotation_matrix(roll, pitch, yaw);
   }
   case EntityRotationType::None:return vm::mat4x4::identity();
@@ -251,10 +231,10 @@ vm::mat4x4 entityRotation(const Entity &entity) {
 }
 
 vm::vec3 entityYawPitchRoll(const vm::mat4x4 &transformation, const vm::mat4x4 &rotation) {
-  const auto M = vm::strip_translation(transformation)*vm::strip_translation(rotation);
+  const auto M = vm::strip_translation(transformation) * vm::strip_translation(rotation);
 
-  const auto newPosX = vm::normalize(M*vm::vec3::pos_x());
-  const auto newPosY = vm::normalize(vm::cross(M*vm::vec3::pos_z(), newPosX));
+  const auto newPosX = vm::normalize(M * vm::vec3::pos_x());
+  const auto newPosY = vm::normalize(vm::cross(M * vm::vec3::pos_z(), newPosX));
   const auto newPosZ = vm::normalize(vm::cross(newPosX, newPosY));
 
   // Build a new rotation matrix from the three transformed unit vectors
@@ -266,9 +246,7 @@ vm::vec3 entityYawPitchRoll(const vm::mat4x4 &transformation, const vm::mat4x4 &
   const auto rollPitchYaw = vm::rotation_matrix_to_euler_angles(rotMat);
 
   return vm::vec3(
-      vm::to_degrees(rollPitchYaw[2]),
-      vm::to_degrees(rollPitchYaw[1]),
-      vm::to_degrees(rollPitchYaw[0]));
+      vm::to_degrees(rollPitchYaw[2]), vm::to_degrees(rollPitchYaw[1]), vm::to_degrees(rollPitchYaw[0]));
 }
 
 namespace {
@@ -284,53 +262,48 @@ FloatType getEntityRotationAngle(vm::vec3 direction) {
   return angle;
 }
 
-EntityProperty setEntityRotationAngle(
-    const std::string &propertyKey, const vm::vec3 &direction) {
+EntityProperty setEntityRotationAngle(const std::string &propertyKey, const vm::vec3 &direction) {
   const auto angle = getEntityRotationAngle(direction);
   return {propertyKey, kdl::str_to_string(vm::round(angle))};
 }
 } // namespace
 
 std::optional<EntityProperty> applyEntityRotation(
-    const std::vector<EntityProperty> &properties,
-    const EntityRotationInfo &info,
-    const vm::mat4x4 &transformation) {
-  if (info.usage==EntityRotationUsage::BlockRotation) {
+    const std::vector<EntityProperty> &properties, const EntityRotationInfo &info, const vm::mat4x4 &transformation
+) {
+  if (info.usage == EntityRotationUsage::BlockRotation) {
     return std::nullopt;
   }
 
   const auto rotation = entityRotation(properties, info);
   switch (info.type) {
   case EntityRotationType::Angle: {
-    const auto direction = normalize(transformation*rotation*vm::vec3::pos_x());
+    const auto direction = normalize(transformation * rotation * vm::vec3::pos_x());
     return setEntityRotationAngle(info.propertyKey, direction);
   }
   case EntityRotationType::AngleUpDown: {
-    const auto direction = normalize(transformation*rotation*vm::vec3::pos_x());
+    const auto direction = normalize(transformation * rotation * vm::vec3::pos_x());
     if (direction.z() > 0.9) {
       return {{info.propertyKey, "-1"}};
     }
-    if (direction.z() < -0.9) {
+    if (direction.z() < - 0.9) {
       return {{info.propertyKey, "-2"}};
     }
     return setEntityRotationAngle(info.propertyKey, direction);
   }
   case EntityRotationType::Euler: {
     const auto yawPitchRoll = entityYawPitchRoll(transformation, rotation);
-    const auto nPitchYawRoll =
-        vm::vec3(-yawPitchRoll.y(), yawPitchRoll.x(), yawPitchRoll.z());
+    const auto nPitchYawRoll = vm::vec3(- yawPitchRoll.y(), yawPitchRoll.x(), yawPitchRoll.z());
     return {{info.propertyKey, kdl::str_to_string(vm::round(nPitchYawRoll))}};
   }
   case EntityRotationType::Euler_PositivePitchDown: {
     const auto yawPitchRoll = entityYawPitchRoll(transformation, rotation);
-    const auto nPitchYawRoll =
-        vm::vec3(yawPitchRoll.y(), yawPitchRoll.x(), yawPitchRoll.z());
+    const auto nPitchYawRoll = vm::vec3(yawPitchRoll.y(), yawPitchRoll.x(), yawPitchRoll.z());
     return {{info.propertyKey, kdl::str_to_string(vm::round(nPitchYawRoll))}};
   }
   case EntityRotationType::Mangle: {
     const auto yawPitchRoll = entityYawPitchRoll(transformation, rotation);
-    const auto yawNPitchRoll =
-        vm::vec3(yawPitchRoll.x(), -yawPitchRoll.y(), yawPitchRoll.z());
+    const auto yawNPitchRoll = vm::vec3(yawPitchRoll.x(), - yawPitchRoll.y(), yawPitchRoll.z());
     return {{info.propertyKey, kdl::str_to_string(vm::round(yawNPitchRoll))}};
   }
   case EntityRotationType::None:return std::nullopt;
@@ -338,15 +311,10 @@ std::optional<EntityProperty> applyEntityRotation(
   }
 }
 
-void applyEntityRotation(
-    Entity &entity,
-    const EntityPropertyConfig &propertyConfig,
-    const vm::mat4x4 &transformation) {
+void applyEntityRotation(Entity &entity, const EntityPropertyConfig &propertyConfig, const vm::mat4x4 &transformation) {
   const auto info = entityRotationInfo(entity);
 
-  if (
-      const auto entityProperty =
-          applyEntityRotation(entity.properties(), info, transformation)) {
+  if (const auto entityProperty = applyEntityRotation(entity.properties(), info, transformation)) {
     entity.addOrUpdateProperty(
         propertyConfig, entityProperty->key(), entityProperty->value());
   }

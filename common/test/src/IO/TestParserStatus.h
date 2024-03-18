@@ -30,21 +30,21 @@ namespace TrenchBroom {
 namespace IO {
 class TestParserStatus : public ParserStatus {
 private:
-    static NullLogger _logger;
-    std::map<LogLevel, std::vector<std::string>> m_messages;
+  static NullLogger _logger;
+  std::map<LogLevel, std::vector<std::string>> m_messages;
 
 public:
-    TestParserStatus();
+  TestParserStatus();
 
 public:
-    size_t countStatus(LogLevel level) const;
+  size_t countStatus(LogLevel level) const;
 
-    const std::vector<std::string> &messages(LogLevel level) const;
+  const std::vector<std::string> &messages(LogLevel level) const;
 
 private:
-    void doProgress(double progress) override;
+  void doProgress(double progress) override;
 
-    void doLog(LogLevel level, const std::string &str) override;
+  void doLog(LogLevel level, const std::string &str) override;
 };
 } // namespace IO
 } // namespace TrenchBroom

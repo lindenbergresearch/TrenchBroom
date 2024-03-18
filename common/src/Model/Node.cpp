@@ -55,7 +55,7 @@ NodePath Node::pathFrom(const Node &ancestor) const {
 
   auto *parent = m_parent;
   auto *child = this;
-  while (parent && child!=&ancestor) {
+  while (parent && child != &ancestor) {
     const auto index = kdl::vec_index_of(parent->children(), child);
 
     result.indices.push_back(*index);
@@ -63,7 +63,7 @@ NodePath Node::pathFrom(const Node &ancestor) const {
     parent = parent->m_parent;
   }
 
-  assert(child==&ancestor);
+  assert(child == &ancestor);
 
   std::reverse(std::begin(result.indices), std::end(result.indices));
   return result;
@@ -101,8 +101,7 @@ Node *Node::clone(const vm::bbox3 &worldBounds, const SetLinkId setLinkIds) cons
   return doClone(worldBounds, setLinkIds);
 }
 
-Node *Node::cloneRecursively(
-    const vm::bbox3 &worldBounds, const SetLinkId setLinkIds) const {
+Node *Node::cloneRecursively(const vm::bbox3 &worldBounds, const SetLinkId setLinkIds) const {
   return doCloneRecursively(worldBounds, setLinkIds);
 }
 
@@ -111,33 +110,19 @@ void Node::cloneAttributes(Node *node) const {
   node->setLockState(m_lockState);
 }
 
-std::vector<Node *> Node::clone(
-    const vm::bbox3 &worldBounds,
-    const std::vector<Node *> &nodes,
-    const SetLinkId setLinkIds) {
+std::vector<Node *> Node::clone(const vm::bbox3 &worldBounds, const std::vector<Node *> &nodes, const SetLinkId setLinkIds) {
   auto clones = std::vector<Node *>{};
   clones.reserve(nodes.size());
   clone(
-      worldBounds,
-      setLinkIds,
-      std::begin(nodes),
-      std::end(nodes),
-      std::back_inserter(clones));
+      worldBounds, setLinkIds, std::begin(nodes), std::end(nodes), std::back_inserter(clones));
   return clones;
 }
 
-std::vector<Node *> Node::cloneRecursively(
-    const vm::bbox3 &worldBounds,
-    const std::vector<Node *> &nodes,
-    const SetLinkId setLinkIds) {
+std::vector<Node *> Node::cloneRecursively(const vm::bbox3 &worldBounds, const std::vector<Node *> &nodes, const SetLinkId setLinkIds) {
   auto clones = std::vector<Node *>{};
   clones.reserve(nodes.size());
   cloneRecursively(
-      worldBounds,
-      setLinkIds,
-      std::begin(nodes),
-      std::end(nodes),
-      std::back_inserter(clones));
+      worldBounds, setLinkIds, std::begin(nodes), std::end(nodes), std::back_inserter(clones));
   return clones;
 }
 
@@ -154,15 +139,17 @@ bool Node::isAncestorOf(const Node *node) const {
 }
 
 bool Node::isAncestorOf(const std::vector<Node *> &nodes) const {
-  return std::any_of(std::begin(nodes), std::end(nodes), [this](const Node *node) {
-    return isAncestorOf(node);
-  });
+  return std::any_of(
+      std::begin(nodes), std::end(nodes), [this](const Node *node) {
+        return isAncestorOf(node);
+      }
+  );
 }
 
 bool Node::isDescendantOf(const Node *node) const {
   Node *parent = m_parent;
   while (parent) {
-    if (parent==node) {
+    if (parent == node) {
       return true;
     }
     parent = parent->parent();
@@ -171,9 +158,11 @@ bool Node::isDescendantOf(const Node *node) const {
 }
 
 bool Node::isDescendantOf(const std::vector<Node *> &nodes) const {
-  return any_of(std::begin(nodes), std::end(nodes), [this](const Node *node) {
-    return isDescendantOf(node);
-  });
+  return any_of(
+      std::begin(nodes), std::end(nodes), [this](const Node *node) {
+        return isDescendantOf(node);
+      }
+  );
 }
 
 std::vector<Node *> Node::findDescendants(const std::vector<Node *> &nodes) const {
@@ -191,7 +180,7 @@ bool Node::removeIfEmpty() const {
 }
 
 bool Node::hasChildren() const {
-  return !m_children.empty();
+  return ! m_children.empty();
 }
 
 size_t Node::childCount() const {
@@ -226,13 +215,12 @@ Node &Node::addChild(Node *child) {
   return *child;
 }
 
-std::vector<std::unique_ptr<Node>> Node::replaceChildren(
-    std::vector<std::unique_ptr<Node>> newChildren) {
+std::vector<std::unique_ptr<Node>> Node::replaceChildren(std::vector<std::unique_ptr<Node>> newChildren) {
   // nodeWillChange();
 
   for (auto *child : m_children) {
-    ensure(child!=nullptr, "child is null");
-    assert(child->parent()==this);
+    ensure(child != nullptr, "child is null");
+    assert(child->parent() == this);
     assert(canRemoveChild(child));
 
     childWillBeRemoved(child);
@@ -240,7 +228,8 @@ std::vector<std::unique_ptr<Node>> Node::replaceChildren(
   }
 
   auto oldChildren = kdl::vec_transform(
-      m_children, [](Node *child) { return std::unique_ptr<Node>(child); });
+      m_children, [](Node *child) { return std::unique_ptr<Node>(child); }
+  );
   m_children.clear();
 
   for (auto &child : oldChildren) {
@@ -248,9 +237,10 @@ std::vector<std::unique_ptr<Node>> Node::replaceChildren(
   }
 
   decDescendantCount(descendantCount());
-  addChildren(kdl::vec_transform(
-      std::move(newChildren),
-      [](std::unique_ptr<Node> &&child) { return child.release(); }));
+  addChildren(
+      kdl::vec_transform(
+          std::move(newChildren), [](std::unique_ptr<Node> &&child) { return child.release(); }
+      ));
 
   // nodeDidChange();
 
@@ -265,7 +255,7 @@ void Node::removeChild(Node *child) {
 }
 
 bool Node::canAddChild(const Node *child) const {
-  return child!=this && !isDescendantOf(child) && doCanAddChild(child);
+  return child != this && ! isDescendantOf(child) && doCanAddChild(child);
 }
 
 bool Node::canRemoveChild(const Node *child) const {
@@ -273,9 +263,9 @@ bool Node::canRemoveChild(const Node *child) const {
 }
 
 void Node::doAddChild(Node *child) {
-  ensure(child!=nullptr, "child is null");
-  assert(!kdl::vec_contains(m_children, child));
-  assert(child->parent()==nullptr);
+  ensure(child != nullptr, "child is null");
+  assert(! kdl::vec_contains(m_children, child));
+  assert(child->parent() == nullptr);
   assert(canAddChild(child));
 
   childWillBeAdded(child);
@@ -287,8 +277,8 @@ void Node::doAddChild(Node *child) {
 }
 
 void Node::doRemoveChild(Node *child) {
-  ensure(child!=nullptr, "child is null");
-  assert(child->parent()==this);
+  ensure(child != nullptr, "child is null");
+  assert(child->parent() == this);
   assert(canRemoveChild(child));
 
   childWillBeRemoved(child);
@@ -354,7 +344,7 @@ void Node::descendantWasRemoved(Node *oldParent, Node *node, const size_t depth)
 }
 
 void Node::incDescendantCount(const size_t delta) {
-  if (delta!=0) {
+  if (delta != 0) {
     m_descendantCount += delta;
     if (m_parent) {
       m_parent->incDescendantCount(delta);
@@ -364,7 +354,7 @@ void Node::incDescendantCount(const size_t delta) {
 
 void Node::decDescendantCount(const size_t delta) {
   assert(m_descendantCount >= delta);
-  if (delta!=0) {
+  if (delta != 0) {
     m_descendantCount -= delta;
     if (m_parent) {
       m_parent->decDescendantCount(delta);
@@ -373,9 +363,9 @@ void Node::decDescendantCount(const size_t delta) {
 }
 
 void Node::setParent(Node *parent) {
-  assert((m_parent==nullptr) ^ (parent==nullptr));
-  assert(parent!=this);
-  if (parent!=m_parent) {
+  assert((m_parent == nullptr) ^ (parent == nullptr));
+  assert(parent != this);
+  if (parent != m_parent) {
     parentWillChange();
     m_parent = parent;
     parentDidChange();
@@ -422,8 +412,7 @@ void Node::nodeDidChange() {
   invalidateIssues();
 }
 
-Node::NotifyNodeChange::NotifyNodeChange(Node &node)
-    : m_node{node} {
+Node::NotifyNodeChange::NotifyNodeChange(Node &node) : m_node{node} {
   m_node.nodeWillChange();
 }
 
@@ -431,8 +420,7 @@ Node::NotifyNodeChange::~NotifyNodeChange() {
   m_node.nodeDidChange();
 }
 
-Node::NotifyPhysicalBoundsChange::NotifyPhysicalBoundsChange(Node &node)
-    : m_node{node} {
+Node::NotifyPhysicalBoundsChange::NotifyPhysicalBoundsChange(Node &node) : m_node{node} {
 }
 
 Node::NotifyPhysicalBoundsChange::~NotifyPhysicalBoundsChange() {
@@ -491,7 +479,7 @@ bool Node::selected() const {
 
 void Node::select() {
   if (selectable()) {
-    assert(!m_selected);
+    assert(! m_selected);
     m_selected = true;
     if (m_parent) {
       m_parent->childWasSelected();
@@ -546,14 +534,14 @@ std::vector<Node *> Node::nodesRequiredForViewSelection() {
 }
 
 void Node::incChildSelectionCount(const size_t delta) {
-  if (delta!=0) {
+  if (delta != 0) {
     m_childSelectionCount += delta;
     incDescendantSelectionCount(delta);
   }
 }
 
 void Node::decChildSelectionCount(const size_t delta) {
-  if (delta!=0) {
+  if (delta != 0) {
     assert(m_childSelectionCount >= delta);
     m_childSelectionCount -= delta;
     decDescendantSelectionCount(delta);
@@ -561,7 +549,7 @@ void Node::decChildSelectionCount(const size_t delta) {
 }
 
 void Node::incDescendantSelectionCount(const size_t delta) {
-  if (delta!=0) {
+  if (delta != 0) {
     m_descendantSelectionCount += delta;
     if (m_parent) {
       m_parent->incDescendantSelectionCount(delta);
@@ -570,7 +558,7 @@ void Node::incDescendantSelectionCount(const size_t delta) {
 }
 
 void Node::decDescendantSelectionCount(const size_t delta) {
-  if (delta!=0) {
+  if (delta != 0) {
     assert(m_descendantSelectionCount >= delta);
     m_descendantSelectionCount -= delta;
     if (m_parent) {
@@ -585,7 +573,7 @@ bool Node::selectable() const {
 
 bool Node::visible() const {
   switch (m_visibilityState) {
-  case VisibilityState::Inherited:return !m_parent || m_parent->visible();
+  case VisibilityState::Inherited:return ! m_parent || m_parent->visible();
   case VisibilityState::Hidden:return false;
   case VisibilityState::Shown:return true;
     switchDefault();
@@ -593,11 +581,11 @@ bool Node::visible() const {
 }
 
 bool Node::shown() const {
-  return m_visibilityState==VisibilityState::Shown;
+  return m_visibilityState == VisibilityState::Shown;
 }
 
 bool Node::hidden() const {
-  return m_visibilityState==VisibilityState::Hidden;
+  return m_visibilityState == VisibilityState::Hidden;
 }
 
 VisibilityState Node::visibilityState() const {
@@ -605,7 +593,7 @@ VisibilityState Node::visibilityState() const {
 }
 
 bool Node::setVisibilityState(const VisibilityState visibility) {
-  if (visibility!=m_visibilityState) {
+  if (visibility != m_visibilityState) {
     m_visibilityState = visibility;
     return true;
   }
@@ -613,7 +601,7 @@ bool Node::setVisibilityState(const VisibilityState visibility) {
 }
 
 bool Node::ensureVisible() {
-  return !visible() ? setVisibilityState(VisibilityState::Shown) : false;
+  return ! visible() ? setVisibilityState(VisibilityState::Shown) : false;
 }
 
 bool Node::editable() const {
@@ -621,7 +609,7 @@ bool Node::editable() const {
     return false;
   }
   switch (m_lockState) {
-  case LockState::Inherited:return !m_parent || m_parent->editable();
+  case LockState::Inherited:return ! m_parent || m_parent->editable();
   case LockState::Locked:return false;
   case LockState::Unlocked:return true;
     switchDefault();
@@ -629,7 +617,7 @@ bool Node::editable() const {
 }
 
 bool Node::locked() const {
-  return !editable();
+  return ! editable();
 }
 
 LockState Node::lockState() const {
@@ -637,7 +625,7 @@ LockState Node::lockState() const {
 }
 
 bool Node::setLockState(const LockState lockState) {
-  if (lockState!=m_lockState) {
+  if (lockState != m_lockState) {
     m_lockState = lockState;
     return true;
   }
@@ -652,8 +640,7 @@ void Node::setLockedByOtherSelection(const bool lockedByOtherSelection) {
   m_lockedByOtherSelection = lockedByOtherSelection;
 }
 
-void Node::pick(
-    const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
+void Node::pick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) {
   doPick(editorContext, ray, pickResult);
 }
 
@@ -677,23 +664,24 @@ bool Node::containsLine(const size_t lineNumber) const {
 std::vector<const Issue *> Node::issues(const std::vector<const Validator *> &validators) {
   validateIssues(validators);
   return kdl::vec_transform(
-      m_issues, [](const auto &issue) { return const_cast<const Issue *>(issue.get()); });
+      m_issues, [](const auto &issue) { return const_cast<const Issue *>(issue.get()); }
+  );
 }
 
 bool Node::issueHidden(const IssueType type) const {
-  return (type & m_hiddenIssues)!=0;
+  return (type & m_hiddenIssues) != 0;
 }
 
 void Node::setIssueHidden(const IssueType type, const bool hidden) {
   if (hidden) {
     m_hiddenIssues |= type;
   } else {
-    m_hiddenIssues &= ~type;
+    m_hiddenIssues &= ~ type;
   }
 }
 
 void Node::validateIssues(const std::vector<const Validator *> &validators) {
-  if (!m_issuesValid) {
+  if (! m_issuesValid) {
     for (const auto *validator : validators) {
       validator->validate(*this, m_issues);
     }
@@ -710,63 +698,66 @@ const EntityPropertyConfig &Node::entityPropertyConfig() const {
   return doGetEntityPropertyConfig();
 }
 
-void Node::findEntityNodesWithProperty(
-    const std::string &key,
-    const std::string &value,
-    std::vector<EntityNodeBase *> &result) const {
+void Node::findEntityNodesWithProperty(const std::string &key, const std::string &value, std::vector<EntityNodeBase *> &result) const {
   return doFindEntityNodesWithProperty(key, value, result);
 }
 
-void Node::findEntityNodesWithNumberedProperty(
-    const std::string &prefix,
-    const std::string &value,
-    std::vector<EntityNodeBase *> &result) const {
+void Node::findEntityNodesWithNumberedProperty(const std::string &prefix, const std::string &value, std::vector<EntityNodeBase *> &result) const {
   return doFindEntityNodesWithNumberedProperty(prefix, value, result);
 }
 
-void Node::addToIndex(
-    EntityNodeBase *node, const std::string &key, const std::string &value) {
+void Node::addToIndex(EntityNodeBase *node, const std::string &key, const std::string &value) {
   doAddToIndex(node, key, value);
 }
 
-void Node::removeFromIndex(
-    EntityNodeBase *node, const std::string &key, const std::string &value) {
+void Node::removeFromIndex(EntityNodeBase *node, const std::string &key, const std::string &value) {
   doRemoveFromIndex(node, key, value);
 }
 
-Node *Node::doCloneRecursively(
-    const vm::bbox3 &worldBounds, const SetLinkId setLinkIds) const {
+Node *Node::doCloneRecursively(const vm::bbox3 &worldBounds, const SetLinkId setLinkIds) const {
   auto *clone = Node::clone(worldBounds, setLinkIds);
   clone->addChildren(Node::cloneRecursively(worldBounds, children(), setLinkIds));
   return clone;
 }
 
 void Node::doChildWillBeAdded(Node * /* node */) {}
+
 void Node::doChildWasAdded(Node * /* node */) {}
+
 void Node::doChildWillBeRemoved(Node * /* node */) {}
+
 void Node::doChildWasRemoved(Node * /* node */) {}
 
-void Node::doDescendantWillBeAdded(
-    Node * /* newParent */, Node * /* node */, const size_t /* depth */) {
+void Node::doDescendantWillBeAdded(Node * /* newParent */, Node * /* node */, const size_t /* depth */) {
 }
+
 void Node::doDescendantWasAdded(Node * /* node */, const size_t /* depth */) {}
+
 void Node::doDescendantWillBeRemoved(Node * /* node */, const size_t /* depth */) {}
-void Node::doDescendantWasRemoved(
-    Node * /* oldParent */, Node * /* node */, const size_t /* depth */) {
+
+void Node::doDescendantWasRemoved(Node * /* oldParent */, Node * /* node */, const size_t /* depth */) {
 }
 
 void Node::doParentWillChange() {}
+
 void Node::doParentDidChange() {}
+
 void Node::doAncestorWillChange() {}
+
 void Node::doAncestorDidChange() {}
 
 void Node::doNodePhysicalBoundsDidChange() {}
+
 void Node::doChildPhysicalBoundsDidChange() {}
+
 void Node::doDescendantPhysicalBoundsDidChange(Node * /* node */) {}
 
 void Node::doChildWillChange(Node * /* node */) {}
+
 void Node::doChildDidChange(Node * /* node */) {}
+
 void Node::doDescendantWillChange(Node * /* node */) {}
+
 void Node::doDescendantDidChange(Node * /* node */) {}
 
 const EntityPropertyConfig &Node::doGetEntityPropertyConfig() const {
@@ -778,33 +769,25 @@ const EntityPropertyConfig &Node::doGetEntityPropertyConfig() const {
   return defaultConfig;
 }
 
-void Node::doFindEntityNodesWithProperty(
-    const std::string &key,
-    const std::string &value,
-    std::vector<EntityNodeBase *> &result) const {
+void Node::doFindEntityNodesWithProperty(const std::string &key, const std::string &value, std::vector<EntityNodeBase *> &result) const {
   if (m_parent) {
     m_parent->findEntityNodesWithProperty(key, value, result);
   }
 }
 
-void Node::doFindEntityNodesWithNumberedProperty(
-    const std::string &prefix,
-    const std::string &value,
-    std::vector<EntityNodeBase *> &result) const {
+void Node::doFindEntityNodesWithNumberedProperty(const std::string &prefix, const std::string &value, std::vector<EntityNodeBase *> &result) const {
   if (m_parent) {
     m_parent->findEntityNodesWithNumberedProperty(prefix, value, result);
   }
 }
 
-void Node::doAddToIndex(
-    EntityNodeBase *node, const std::string &key, const std::string &value) {
+void Node::doAddToIndex(EntityNodeBase *node, const std::string &key, const std::string &value) {
   if (m_parent) {
     m_parent->addToIndex(node, key, value);
   }
 }
 
-void Node::doRemoveFromIndex(
-    EntityNodeBase *node, const std::string &key, const std::string &value) {
+void Node::doRemoveFromIndex(EntityNodeBase *node, const std::string &key, const std::string &value) {
   if (m_parent) {
     m_parent->removeFromIndex(node, key, value);
   }

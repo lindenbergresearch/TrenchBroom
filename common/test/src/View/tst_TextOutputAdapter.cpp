@@ -25,47 +25,84 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom {
 namespace View {
-TEST_CASE("TextOutputAdapterTest.test")
-{
-    QTextEdit textEdit;
-    TextOutputAdapter adapter(&textEdit);
+TEST_CASE("TextOutputAdapterTest.test") {
+QTextEdit textEdit;
+TextOutputAdapter adapter(&textEdit);
 
-    SECTION("string literal")
-    {
-        adapter << "abc";
-        CHECK(textEdit.toPlainText() == "abc");
-    }SECTION("trailing CR LF")
-    {
-        adapter << "abc\r\n";
-        CHECK(textEdit.toPlainText() == "abc\n");
-    }SECTION("CR LF")
-    {
-        adapter << "abc\r\ndef";
-        CHECK(textEdit.toPlainText() == "abc\ndef");
-    }SECTION("two CR LF")
-    {
-        adapter << "abc\r\n\r\ndef";
-        CHECK(textEdit.toPlainText() == "abc\n\ndef");
-    }
+SECTION("string literal") {
+adapter << "abc";
+CHECK(textEdit
+.
 
-        // CR tests
-    SECTION("CR then CR LF mid line")
-    {
-        adapter << "abc\rA\r\nline 2";
-        CHECK(textEdit.toPlainText() == "Abc\nline 2");
-    }SECTION("several CR's")
-    {
-        adapter << "abc\rAB\ra\r\nline 2";
-        CHECK(textEdit.toPlainText() == "aBc\nline 2");
-    }SECTION("CR then CR LF")
-    {
-        adapter << "abc\rABC\r\nline 2";
-        CHECK(textEdit.toPlainText() == "ABC\nline 2");
-    }SECTION("CR then LF")
-    {
-        adapter << "abc\rABC\nline 2";
-        CHECK(textEdit.toPlainText() == "ABC\nline 2");
-    }
+toPlainText()
+
+== "abc");
 }
-} // namespace View
+SECTION("trailing CR LF") {
+adapter << "abc\r\n";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "abc\n");
+}
+SECTION("CR LF")
+{
+adapter << "abc\r\ndef";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "abc\ndef");
+}SECTION("two CR LF")
+{
+adapter << "abc\r\n\r\ndef";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "abc\n\ndef");
+}
+
+// CR tests
+SECTION("CR then CR LF mid line")
+{
+adapter << "abc\rA\r\nline 2";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "Abc\nline 2");
+}SECTION("several CR's")
+{
+adapter << "abc\rAB\ra\r\nline 2";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "aBc\nline 2");
+}SECTION("CR then CR LF")
+{
+adapter << "abc\rABC\r\nline 2";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "ABC\nline 2");
+}SECTION("CR then LF")
+{
+adapter << "abc\rABC\nline 2";
+CHECK(textEdit
+.
+
+toPlainText()
+
+== "ABC\nline 2");
+}}} // namespace View
 } // namespace TrenchBroom

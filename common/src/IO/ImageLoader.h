@@ -26,18 +26,19 @@
 namespace TrenchBroom {
 namespace IO {
 class ImageLoaderImpl;
+
+
 class Path;
+
 
 class ImageLoader {
 public:
   enum Format {
-    PCX,
-    BMP
+    PCX, BMP
   };
 
   enum PixelFormat {
-    RGB,
-    RGBA
+    RGB, RGBA
   };
 
 private:
@@ -46,26 +47,38 @@ private:
 
 public:
   ImageLoader(const Format format, const std::filesystem::path &path);
+
   ImageLoader(const Format format, const char *begin, const char *end);
+
   ~ImageLoader();
 
   size_t paletteSize() const;
+
   size_t bitsPerPixel() const;
+
   size_t width() const;
+
   size_t height() const;
+
   size_t byteWidth() const;
+
   size_t scanWidth() const;
 
   bool hasPalette() const;
+
   bool hasIndices() const;
+
   bool hasPixels() const;
 
   std::vector<unsigned char> loadPalette() const;
+
   std::vector<unsigned char> loadIndices() const;
+
   std::vector<unsigned char> loadPixels(const PixelFormat format) const;
 
 private:
   ImageLoader(const ImageLoader &other);
+
   ImageLoader &operator=(const ImageLoader &other);
 };
 } // namespace IO

@@ -39,15 +39,11 @@ namespace Assets {
  * @return the model specification returned by the lambda, or an empty model specification
  * if the lambda throws an EL exception
  */
-template<typename GetModelSpec>
-ModelSpecification safeGetModelSpecification(
-    Logger &logger, std::string_view classname, GetModelSpec getModelSpec) {
+template<typename GetModelSpec> ModelSpecification safeGetModelSpecification(Logger &logger, std::string_view classname, GetModelSpec getModelSpec) {
   try {
     return getModelSpec();
-  }
-  catch (const EL::Exception &e) {
-    logger.error() << "Could not get entity model for entity '" << classname
-                   << "': " << e.what();
+  } catch (const EL::Exception &e) {
+    logger.error() << "Could not get entity model for entity '" << classname << "': " << e.what();
     return ModelSpecification();
   }
 }

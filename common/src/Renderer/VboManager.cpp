@@ -48,15 +48,14 @@ static GLenum usageToOpenGL(const VboUsage usage) {
 
 // VboManager
 
-VboManager::VboManager(ShaderManager *shaderManager)
-    : m_peakVboCount(0u), m_currentVboCount(0u), m_currentVboSize(0u), m_shaderManager(shaderManager) {
+VboManager::VboManager(ShaderManager *shaderManager) : m_peakVboCount(0u), m_currentVboCount(0u), m_currentVboSize(0u), m_shaderManager(shaderManager) {
 }
 
 Vbo *VboManager::allocateVbo(VboType type, const size_t capacity, const VboUsage usage) {
   auto *result = new Vbo(typeToOpenGL(type), capacity, usageToOpenGL(usage));
 
   m_currentVboSize += capacity;
-  m_currentVboCount++;
+  m_currentVboCount ++;
   m_peakVboCount = std::max(m_peakVboCount, m_currentVboCount);
 
   return result;
@@ -64,7 +63,7 @@ Vbo *VboManager::allocateVbo(VboType type, const size_t capacity, const VboUsage
 
 void VboManager::destroyVbo(Vbo *vbo) {
   m_currentVboSize -= vbo->capacity();
-  m_currentVboCount--;
+  m_currentVboCount --;
 
   vbo->free();
   delete vbo;

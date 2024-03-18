@@ -23,11 +23,13 @@
 
 #include <filesystem>
 
+
 class QPushButton;
 
 namespace TrenchBroom {
 namespace View {
 class RecentDocumentListBox;
+
 
 class WelcomeWindow : public QMainWindow {
 Q_OBJECT

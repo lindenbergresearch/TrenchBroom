@@ -31,8 +31,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-TagAttribute::TagAttribute(const AttributeType type, const std::string &name)
-    : m_type(type), m_name(name) {
+TagAttribute::TagAttribute(const AttributeType type, const std::string &name) : m_type(type), m_name(name) {
 }
 
 TagAttribute::AttributeType TagAttribute::type() const {
@@ -44,11 +43,11 @@ const std::string &TagAttribute::name() const {
 }
 
 bool operator==(const TagAttribute &lhs, const TagAttribute &rhs) {
-  return lhs.m_name==rhs.m_name;
+  return lhs.m_name == rhs.m_name;
 }
 
 bool operator!=(const TagAttribute &lhs, const TagAttribute &rhs) {
-  return !(lhs==rhs);
+  return ! (lhs == rhs);
 }
 
 bool operator<(const TagAttribute &lhs, const TagAttribute &rhs) {
@@ -56,26 +55,25 @@ bool operator<(const TagAttribute &lhs, const TagAttribute &rhs) {
 }
 
 std::ostream &operator<<(std::ostream &str, const TagAttribute &attr) {
-  kdl::struct_stream{str} << "TagAttribute"
-                          << "m_type" << attr.m_type << "m_name" << attr.m_name;
+  kdl::struct_stream{str} << "TagAttribute" << "m_type" << attr.m_type << "m_name" << attr.m_name;
   return str;
 }
 
-Tag::Tag(
-    const size_t index, const std::string &name, std::vector<TagAttribute> attributes)
-    : m_index(index), m_name(name), m_attributes(std::move(attributes)) {
+Tag::Tag(const size_t index, const std::string &name, std::vector<TagAttribute> attributes) :
+    m_index(index), m_name(name), m_attributes(std::move(attributes)) {
 }
 
-Tag::Tag(const std::string &name, std::vector<TagAttribute> attributes)
-    : Tag(0, name, std::move(attributes)) {
+Tag::Tag(const std::string &name, std::vector<TagAttribute> attributes) : Tag(0, name, std::move(attributes)) {
 }
 
 Tag::~Tag() = default;
 
 Tag::Tag(const Tag &other) = default;
+
 Tag::Tag(Tag &&other) noexcept = default;
 
 Tag &Tag::operator=(const Tag &other) = default;
+
 Tag &Tag::operator=(Tag &&other) = default;
 
 TagType::Type Tag::type() const {
@@ -99,11 +97,11 @@ const std::vector<TagAttribute> &Tag::attributes() const {
 }
 
 bool operator==(const Tag &lhs, const Tag &rhs) {
-  return lhs.m_name==rhs.m_name;
+  return lhs.m_name == rhs.m_name;
 }
 
 bool operator!=(const Tag &lhs, const Tag &rhs) {
-  return !(lhs==rhs);
+  return ! (lhs == rhs);
 }
 
 bool operator<(const Tag &lhs, const Tag &rhs) {
@@ -111,9 +109,7 @@ bool operator<(const Tag &lhs, const Tag &rhs) {
 }
 
 void Tag::appendToStream(std::ostream &str) const {
-  kdl::struct_stream{str} << "Tag"
-                          << "m_index" << m_index << "m_name" << m_name << "m_attributes"
-                          << m_attributes;
+  kdl::struct_stream{str} << "Tag" << "m_index" << m_index << "m_name" << m_name << "m_attributes" << m_attributes;
 }
 
 std::ostream &operator<<(std::ostream &str, const Tag &tag) {
@@ -121,8 +117,7 @@ std::ostream &operator<<(std::ostream &str, const Tag &tag) {
   return str;
 }
 
-TagReference::TagReference(const Tag &tag)
-    : m_tag(&tag) {
+TagReference::TagReference(const Tag &tag) : m_tag(&tag) {
 }
 
 const Tag &TagReference::tag() const {
@@ -130,19 +125,18 @@ const Tag &TagReference::tag() const {
 }
 
 bool operator==(const TagReference &lhs, const TagReference &rhs) {
-  return *(lhs.m_tag)==*(rhs.m_tag);
+  return *(lhs.m_tag) == *(rhs.m_tag);
 }
 
 bool operator!=(const TagReference &lhs, const TagReference &rhs) {
-  return !(lhs==rhs);
+  return ! (lhs == rhs);
 }
 
 bool operator<(const TagReference &lhs, const TagReference &rhs) {
   return *(lhs.m_tag) < *(rhs.m_tag);
 }
 
-Taggable::Taggable()
-    : m_tagMask(0), m_attributeMask(0) {
+Taggable::Taggable() : m_tagMask(0), m_attributeMask(0) {
 }
 
 void swap(Taggable &lhs, Taggable &rhs) noexcept {
@@ -155,7 +149,7 @@ void swap(Taggable &lhs, Taggable &rhs) noexcept {
 Taggable::~Taggable() = default;
 
 bool Taggable::hasAnyTag() const {
-  return m_tagMask!=0;
+  return m_tagMask != 0;
 }
 
 bool Taggable::hasTag(const Tag &tag) const {
@@ -163,7 +157,7 @@ bool Taggable::hasTag(const Tag &tag) const {
 }
 
 bool Taggable::hasTag(TagType::Type mask) const {
-  return (m_tagMask & mask)!=0;
+  return (m_tagMask & mask) != 0;
 }
 
 TagType::Type Taggable::tagMask() const {
@@ -184,13 +178,13 @@ bool Taggable::addTag(const Tag &tag) {
 
 bool Taggable::removeTag(const Tag &tag) {
   const auto it = m_tags.find(TagReference(tag));
-  if (it==std::end(m_tags)) {
+  if (it == std::end(m_tags)) {
     return false;
   }
 
-  m_tagMask &= ~tag.type();
+  m_tagMask &= ~ tag.type();
   m_tags.erase(it);
-  assert(!hasTag(tag));
+  assert(! hasTag(tag));
 
   updateAttributeMask();
   return true;
@@ -213,7 +207,7 @@ void Taggable::clearTags() {
 }
 
 bool Taggable::hasAttribute(const TagAttribute &attribute) const {
-  return (m_attributeMask & attribute.type())!=0;
+  return (m_attributeMask & attribute.type()) != 0;
 }
 
 void Taggable::accept(TagVisitor &visitor) {
@@ -240,8 +234,8 @@ TagMatcher::~TagMatcher() = default;
 
 void TagMatcher::enable(TagMatcherCallback & /* callback */, MapFacade & /* facade */) const {
 }
-void TagMatcher::disable(
-    TagMatcherCallback & /* callback */, MapFacade & /* facade */) const {
+
+void TagMatcher::disable(TagMatcherCallback & /* callback */, MapFacade & /* facade */) const {
 }
 
 bool TagMatcher::canEnable() const {
@@ -257,15 +251,11 @@ std::ostream &operator<<(std::ostream &str, const TagMatcher &matcher) {
   return str;
 }
 
-SmartTag::SmartTag(
-    const std::string &name,
-    std::vector<TagAttribute> attributes,
-    std::unique_ptr<TagMatcher> matcher)
-    : Tag(name, std::move(attributes)), m_matcher(std::move(matcher)) {
+SmartTag::SmartTag(const std::string &name, std::vector<TagAttribute> attributes, std::unique_ptr<TagMatcher> matcher) :
+    Tag(name, std::move(attributes)), m_matcher(std::move(matcher)) {
 }
 
-SmartTag::SmartTag(const SmartTag &other)
-    : Tag(other.m_index, other.m_name, other.m_attributes), m_matcher(other.m_matcher->clone()) {
+SmartTag::SmartTag(const SmartTag &other) : Tag(other.m_index, other.m_name, other.m_attributes), m_matcher(other.m_matcher->clone()) {
 }
 
 SmartTag::SmartTag(SmartTag &&other) noexcept = default;
@@ -309,9 +299,7 @@ bool SmartTag::canDisable() const {
 }
 
 void SmartTag::appendToStream(std::ostream &str) const {
-  kdl::struct_stream{str} << "SmartTag"
-                          << "m_index" << m_index << "m_name" << m_name << "m_attributes"
-                          << m_attributes << "m_matcher" << *m_matcher;
+  kdl::struct_stream{str} << "SmartTag" << "m_index" << m_index << "m_name" << m_name << "m_attributes" << m_attributes << "m_matcher" << *m_matcher;
 }
 } // namespace Model
 } // namespace TrenchBroom

@@ -31,11 +31,13 @@ namespace IO {
 class InitFreeImage {
 private:
   InitFreeImage();
+
   ~InitFreeImage();
 
 public:
   static void initialize();
 };
+
 
 class ImageLoaderImpl {
 private:
@@ -44,28 +46,42 @@ private:
 
 public:
   ImageLoaderImpl(const ImageLoader::Format format, const std::filesystem::path &path);
+
   ImageLoaderImpl(const ImageLoader::Format format, const char *begin, const char *end);
+
   ~ImageLoaderImpl();
 
   size_t paletteSize() const;
+
   size_t bitsPerPixel() const;
+
   size_t width() const;
+
   size_t height() const;
+
   size_t byteWidth() const;
+
   size_t scanWidth() const;
 
   bool hasPalette() const;
+
   bool hasIndices() const;
+
   bool hasPixels() const;
 
   std::vector<unsigned char> loadPalette() const;
+
   std::vector<unsigned char> loadIndices() const;
+
   std::vector<unsigned char> loadPixels(const ImageLoader::PixelFormat format) const;
 
 private:
   std::vector<unsigned char> loadIndexedPixels(const size_t pSize) const;
+
   std::vector<unsigned char> loadPixels(const size_t pSize) const;
+
   static FREE_IMAGE_FORMAT translateFormat(const ImageLoader::Format format);
+
   static size_t pixelSize(const ImageLoader::PixelFormat format);
 };
 } // namespace IO

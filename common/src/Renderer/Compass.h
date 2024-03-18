@@ -30,7 +30,9 @@ class Color;
 namespace Renderer {
 class Camera;
 
+
 class RenderBatch;
+
 
 class Compass : public DirectRenderable {
 private:
@@ -67,17 +69,14 @@ private:
 protected:
   void renderBackground(RenderContext &renderContext);
 
-  void renderSolidAxis(
-      RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color);
+  void renderSolidAxis(RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color);
 
-  void renderAxisOutline(
-      RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color);
+  void renderAxisOutline(RenderContext &renderContext, const vm::mat4x4f &transformation, const Color &color);
 
   void renderAxis(RenderContext &renderContext, const vm::mat4x4f &transformation);
 
 private:
-  virtual void doRenderCompass(
-      RenderContext &renderContext, const vm::mat4x4f &cameraTransformation) = 0;
+  virtual void doRenderCompass(RenderContext &renderContext, const vm::mat4x4f &cameraTransformation) = 0;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

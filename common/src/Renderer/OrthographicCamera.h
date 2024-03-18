@@ -34,13 +34,7 @@ private:
 public:
   OrthographicCamera();
 
-  OrthographicCamera(
-      float nearPlane,
-      float farPlane,
-      const Viewport &viewport,
-      const vm::vec3f &position,
-      const vm::vec3f &direction,
-      const vm::vec3f &up);
+  OrthographicCamera(float nearPlane, float farPlane, const Viewport &viewport, const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up);
 
   const Viewport &zoomedViewport() const;
 
@@ -49,22 +43,13 @@ public:
 private:
   ProjectionType doGetProjectionType() const override;
 
-  void doValidateMatrices(
-      vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix) const override;
+  void doValidateMatrices(vm::mat4x4f &projectionMatrix, vm::mat4x4f &viewMatrix) const override;
 
   vm::ray3f doGetPickRay(const vm::vec3f &point) const override;
 
-  void doComputeFrustumPlanes(
-      vm::plane3f &topPlane,
-      vm::plane3f &rightPlane,
-      vm::plane3f &bottomPlane,
-      vm::plane3f &leftPlane) const override;
+  void doComputeFrustumPlanes(vm::plane3f &topPlane, vm::plane3f &rightPlane, vm::plane3f &bottomPlane, vm::plane3f &leftPlane) const override;
 
-  void doRenderFrustum(
-      RenderContext &renderContext,
-      VboManager &vboManager,
-      float size,
-      const Color &color) const override;
+  void doRenderFrustum(RenderContext &renderContext, VboManager &vboManager, float size, const Color &color) const override;
 
   float doPickFrustum(float size, const vm::ray3f &ray) const override;
 

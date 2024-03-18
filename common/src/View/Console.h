@@ -24,9 +24,12 @@
 
 #include <string>
 
+
 class QTextEdit;
 
+
 class QString;
+
 
 class QWidget;
 

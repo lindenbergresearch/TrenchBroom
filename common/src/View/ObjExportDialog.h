@@ -22,15 +22,19 @@
 
 #include <QDialog>
 
+
 class QLineEdit;
 
+
 class QPushButton;
+
 
 class QRadioButton;
 
 namespace TrenchBroom {
 namespace View {
 class MapFrame;
+
 
 class ObjExportDialog : public QDialog {
 Q_OBJECT

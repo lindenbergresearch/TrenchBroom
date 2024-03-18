@@ -32,11 +32,13 @@ class EntityDefinition;
 namespace TrenchBroom::IO {
 class ParserStatus;
 
+
 class EntityDefinitionLoader {
 public:
   virtual ~EntityDefinitionLoader();
-  virtual Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>>
-  loadEntityDefinitions(
-      ParserStatus &status, const std::filesystem::path &path) const = 0;
+
+  virtual Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>> loadEntityDefinitions(
+      ParserStatus &status, const std::filesystem::path &path
+  ) const = 0;
 };
 } // namespace TrenchBroom::IO

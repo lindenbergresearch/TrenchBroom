@@ -42,16 +42,14 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 namespace TrenchBroom::View {
 // SingleSelectionListWidget
 
-SingleSelectionListWidget::SingleSelectionListWidget(QWidget *parent)
-    : QListWidget{parent}, m_allowDeselectAll{true} {
+SingleSelectionListWidget::SingleSelectionListWidget(QWidget *parent) : QListWidget{parent}, m_allowDeselectAll{true} {
 }
 
-void SingleSelectionListWidget::selectionChanged(
-    const QItemSelection &selected, const QItemSelection &deselected) {
+void SingleSelectionListWidget::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
   QListWidget::selectionChanged(selected, deselected);
 
-  if (!m_allowDeselectAll) {
-    if (selectedIndexes().isEmpty() && !deselected.isEmpty()) {
+  if (! m_allowDeselectAll) {
+    if (selectedIndexes().isEmpty() && ! deselected.isEmpty()) {
       // reselect the items that were just deselected
       selectionModel()->select(deselected, QItemSelectionModel::Select);
     }
@@ -68,9 +66,8 @@ bool SingleSelectionListWidget::allowDeselectAll() const {
 
 // EntityDefinitionFileChooser
 
-EntityDefinitionFileChooser::EntityDefinitionFileChooser(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)} {
+EntityDefinitionFileChooser::EntityDefinitionFileChooser(std::weak_ptr<MapDocument> document, QWidget *parent) :
+    QWidget{parent}, m_document{std::move(document)} {
   createGui();
   bindEvents();
   connectObservers();
@@ -120,30 +117,27 @@ void EntityDefinitionFileChooser::createGui() {
 
 void EntityDefinitionFileChooser::bindEvents() {
   connect(
-      m_builtin,
-      &QListWidget::itemSelectionChanged,
-      this,
-      &EntityDefinitionFileChooser::builtinSelectionChanged);
+      m_builtin, &QListWidget::itemSelectionChanged, this, &EntityDefinitionFileChooser::builtinSelectionChanged
+  );
   connect(
-      m_browseExternal,
-      &QAbstractButton::clicked,
-      this,
-      &EntityDefinitionFileChooser::chooseExternalClicked);
+      m_browseExternal, &QAbstractButton::clicked, this, &EntityDefinitionFileChooser::chooseExternalClicked
+  );
   connect(
-      m_reloadExternal,
-      &QAbstractButton::clicked,
-      this,
-      &EntityDefinitionFileChooser::reloadExternalClicked);
+      m_reloadExternal, &QAbstractButton::clicked, this, &EntityDefinitionFileChooser::reloadExternalClicked
+  );
 }
 
 void EntityDefinitionFileChooser::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection += document->documentWasNewedNotifier.connect(
-      this, &EntityDefinitionFileChooser::documentWasNewed);
+      this, &EntityDefinitionFileChooser::documentWasNewed
+  );
   m_notifierConnection += document->documentWasLoadedNotifier.connect(
-      this, &EntityDefinitionFileChooser::documentWasLoaded);
+      this, &EntityDefinitionFileChooser::documentWasLoaded
+  );
   m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(
-      this, &EntityDefinitionFileChooser::entityDefinitionsDidChange);
+      this, &EntityDefinitionFileChooser::entityDefinitionsDidChange
+  );
 }
 
 void EntityDefinitionFileChooser::documentWasNewed(MapDocument *) {
@@ -209,13 +203,13 @@ void EntityDefinitionFileChooser::updateControls() {
 }
 
 void EntityDefinitionFileChooser::builtinSelectionChanged() {
-  if (!m_builtin->selectedItems().isEmpty()) {
+  if (! m_builtin->selectedItems().isEmpty()) {
 
     auto *item = m_builtin->selectedItems().first();
     auto spec = item->data(Qt::UserRole).value<Assets::EntityDefinitionFileSpec>();
 
     auto document = kdl::mem_lock(m_document);
-    if (document->entityDefinitionFile()!=spec) {
+    if (document->entityDefinitionFile() != spec) {
       document->setEntityDefinitionFile(spec);
     }
   }
@@ -223,17 +217,17 @@ void EntityDefinitionFileChooser::builtinSelectionChanged() {
 
 void EntityDefinitionFileChooser::chooseExternalClicked() {
   const auto fileName = QFileDialog::getOpenFileName(
-      nullptr,
-      tr("Load Entity Definition File"),
-      fileDialogDefaultDirectory(FileDialogDir::EntityDefinition),
+      nullptr, tr("Load Entity Definition File"), fileDialogDefaultDirectory(FileDialogDir::EntityDefinition),
       "All supported entity definition files (*.fgd *.def *.ent);;"
       "Worldcraft / Hammer files (*.fgd);;"
       "QuakeC files (*.def);;"
-      "Radiant XML files (*.ent)");
+      "Radiant XML files (*.ent)"
+  );
 
-  if (!fileName.isEmpty()) {
+  if (! fileName.isEmpty()) {
     updateFileDialogDefaultDirectoryWithFilename(
-        FileDialogDir::EntityDefinition, fileName);
+        FileDialogDir::EntityDefinition, fileName
+    );
     loadEntityDefinitionFile(m_document, this, fileName);
   }
 }

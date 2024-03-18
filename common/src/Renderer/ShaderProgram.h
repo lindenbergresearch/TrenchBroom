@@ -32,7 +32,9 @@ namespace TrenchBroom::Renderer {
 
 class ShaderManager;
 
+
 class Shader;
+
 
 class ShaderProgram {
 private:
@@ -94,6 +96,7 @@ private:
 
   bool checkActive() const;
 };
+
 
 Result<ShaderProgram> createShaderProgram(std::string name);
 } // namespace TrenchBroom::Renderer

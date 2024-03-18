@@ -33,8 +33,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-GroupLinkRenderer::GroupLinkRenderer(std::weak_ptr<View::MapDocument> document)
-    : m_document(document) {
+GroupLinkRenderer::GroupLinkRenderer(std::weak_ptr<View::MapDocument> document) : m_document(document) {
 }
 
 static vm::vec3f getLinkAnchorPosition(const Model::GroupNode &groupNode) {
@@ -48,18 +47,16 @@ std::vector<LinkRenderer::LineVertex> GroupLinkRenderer::getLinks() {
   const auto selectedGroupNodes = document->selectedNodes().groups();
 
   const auto &editorContext = document->editorContext();
-  const auto *groupNode = selectedGroupNodes.size()==1 ? selectedGroupNodes.front()
-                                                       : editorContext.currentGroup();
+  const auto *groupNode = selectedGroupNodes.size() == 1 ? selectedGroupNodes.front() : editorContext.currentGroup();
 
   if (groupNode) {
     const auto &linkId = groupNode->linkId();
-    const auto linkedGroupNodes =
-        Model::collectGroupsWithLinkId({document->world()}, linkId);
+    const auto linkedGroupNodes = Model::collectGroupsWithLinkId({document->world()}, linkId);
 
     const auto linkColor = pref(Preferences::LinkedGroupColor);
     const auto sourcePosition = getLinkAnchorPosition(*groupNode);
     for (const auto *linkedGroupNode : linkedGroupNodes) {
-      if (linkedGroupNode!=groupNode && editorContext.visible(linkedGroupNode)) {
+      if (linkedGroupNode != groupNode && editorContext.visible(linkedGroupNode)) {
         const auto targetPosition = getLinkAnchorPosition(*linkedGroupNode);
         links.emplace_back(sourcePosition, linkColor);
         links.emplace_back(targetPosition, linkColor);

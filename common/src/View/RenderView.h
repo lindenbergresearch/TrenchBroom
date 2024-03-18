@@ -39,7 +39,9 @@ namespace TrenchBroom {
 namespace Renderer {
 class FontManager;
 
+
 class ShaderManager;
+
 
 class VboManager;
 } // namespace Renderer
@@ -47,13 +49,13 @@ class VboManager;
 namespace View {
 class GLContextManager;
 
+
 struct BoxFilter {
   std::vector<QPointF *> samples;
   size_t size, length;
   size_t index;
 
-  explicit BoxFilter(size_t size, size_t length = 0)
-      : size(size) {
+  explicit BoxFilter(size_t size, size_t length = 0) : size(size) {
     samples.resize(size);
     index = 0;
 
@@ -67,6 +69,7 @@ struct BoxFilter {
 
   void add(QPointF *point);
 };
+
 
 class RenderView : public QOpenGLWidget, public InputEventProcessor {
 Q_OBJECT
@@ -111,8 +114,7 @@ protected: // QWindow overrides
 
   void updateEvent();
 
-  QMouseEvent mouseEventWithFullPrecisionLocalPos(
-      const QWidget *widget, const QMouseEvent *event);
+  QMouseEvent mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event);
 
 protected:
   Renderer::VboManager &vboManager();

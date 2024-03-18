@@ -37,9 +37,12 @@ class Texture;
 namespace Renderer {
 class BrushIndexArray;
 
+
 class BrushVertexArray;
 
+
 class RenderBatch;
+
 
 struct PointLight {
   vm::vec3f Intensity;
@@ -49,12 +52,12 @@ struct PointLight {
   float AttenuationQuadratic = 0.75f;
 };
 
+
 class FaceRenderer : public IndexedRenderable {
 private:
   struct RenderFunc;
 
-  using TextureToBrushIndicesMap =
-      const std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
+  using TextureToBrushIndicesMap = const std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
 
   std::shared_ptr<BrushVertexArray> m_vertexArray;
   std::shared_ptr<TextureToBrushIndicesMap> m_indexArrayMap;
@@ -67,10 +70,7 @@ private:
 public:
   FaceRenderer();
 
-  FaceRenderer(
-      std::shared_ptr<BrushVertexArray> vertexArray,
-      std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
-      const Color &faceColor);
+  FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor);
 
   FaceRenderer(const FaceRenderer &other);
 
@@ -93,6 +93,7 @@ private:
 
   void doRender(RenderContext &context) override;
 };
+
 
 void swap(FaceRenderer &left, FaceRenderer &right);
 } // namespace Renderer

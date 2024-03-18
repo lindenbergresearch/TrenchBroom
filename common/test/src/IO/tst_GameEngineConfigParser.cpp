@@ -32,51 +32,80 @@
 namespace TrenchBroom {
 namespace IO {
 
-TEST_CASE("GameEngineConfigParserTest.parseBlankConfig")
-{
-    const auto config = R"(   )";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK_THROWS_AS(parser.parse(), ParserException);
+TEST_CASE("GameEngineConfigParserTest.parseBlankConfig") {
+const auto config = R"(   )";
+auto parser = GameEngineConfigParser{config, {}};
+CHECK_THROWS_AS(parser
+.
+
+parse(), ParserException
+
+);
 }
 
-TEST_CASE("GameEngineConfigParserTest.parseEmptyConfig")
-{
-    const auto config = R"( { } )";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK_THROWS_AS(parser.parse(), ParserException);
+TEST_CASE("GameEngineConfigParserTest.parseEmptyConfig") {
+const auto config = R"( { } )";
+auto parser = GameEngineConfigParser{config, {}};
+CHECK_THROWS_AS(parser
+.
+
+parse(), ParserException
+
+);
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseEmptyConfigWithTrailingGarbage")
 {
-    const auto config = R"(  {  } asdf)";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK_THROWS_AS(parser.parse(), ParserException);
+const auto config = R"(  {  } asdf)";
+auto parser = GameEngineConfigParser{config, {}};
+CHECK_THROWS_AS(parser
+.
+
+parse(), ParserException
+
+);
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseMissingProfiles")
 {
-    const auto config = R"(  { 'version' : 1 } )";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK_THROWS_AS(parser.parse(), ParserException);
+const auto config = R"(  { 'version' : 1 } )";
+auto parser = GameEngineConfigParser{config, {}};
+CHECK_THROWS_AS(parser
+.
+
+parse(), ParserException
+
+);
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseMissingVersion")
 {
-    const auto config = R"(  { 'profiles': {} } )";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK_THROWS_AS(parser.parse(), ParserException);
+const auto config = R"(  { 'profiles': {} } )";
+auto parser = GameEngineConfigParser{config, {}};
+CHECK_THROWS_AS(parser
+.
+
+parse(), ParserException
+
+);
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseEmptyProfiles")
 {
-    const auto config = R"(  { 'version': 1, 'profiles': [] } )";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK(parser.parse() == Model::GameEngineConfig{});
+const auto config = R"(  { 'version': 1, 'profiles': [] } )";
+auto parser = GameEngineConfigParser{config, {}};
+CHECK(parser
+.
+
+parse()
+
+== Model::GameEngineConfig{
+});
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseOneProfileWithMissingAttributes")
 {
-    const auto config = R"(
+const auto config = R"(
 {
 	"profiles": [
 		{
@@ -85,13 +114,18 @@ TEST_CASE("GameEngineConfigParserTest.parseOneProfileWithMissingAttributes")
 	"version": 1
 }
 )";
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK_THROWS_AS(parser.parse(), ParserException);
+auto parser = GameEngineConfigParser{config, {}};
+CHECK_THROWS_AS(parser
+.
+
+parse(), ParserException
+
+);
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseTwoProfiles")
 {
-    const auto config = R"(
+const auto config = R"(
 {
 	"profiles": [
 		{
@@ -111,9 +145,17 @@ TEST_CASE("GameEngineConfigParserTest.parseTwoProfiles")
 }
 )";
 
-    auto parser = GameEngineConfigParser{config, {}};
-    CHECK(parser.parse() ==
-          Model::GameEngineConfig{{{"winquake", R"(C:\Quake\winquake.exe)", "-flag1 -flag2"}, {"glquake", R"(C:\Quake\glquake.exe)", "-flag3 -flag4"}}});
-}
-} // namespace IO
+auto parser = GameEngineConfigParser{config, {}};
+CHECK(parser
+.
+
+parse()
+
+==
+Model::GameEngineConfig{
+{
+{
+"winquake", R"(C:\Quake\winquake.exe)", "-flag1 -flag2"}, {
+"glquake", R"(C:\Quake\glquake.exe)", "-flag3 -flag4"}}});
+}} // namespace IO
 } // namespace TrenchBroom

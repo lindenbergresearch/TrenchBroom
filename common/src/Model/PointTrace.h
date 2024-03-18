@@ -39,17 +39,22 @@ public:
   explicit PointTrace(std::vector<vm::vec3f> points);
 
   bool hasNextPoint() const;
+
   bool hasPreviousPoint() const;
 
   const std::vector<vm::vec3f> &points() const;
+
   const vm::vec3f &currentPoint() const;
+
   const vm::vec3f currentDirection() const;
 
   void advance();
+
   void retreat();
 
   kdl_reflect_decl(PointTrace, m_points, m_current);
 };
+
 
 Result<PointTrace> loadPointFile(std::istream &stream);
 } // namespace TrenchBroom::Model

@@ -29,9 +29,12 @@
 #include <memory>
 #include <vector>
 
+
 class QCheckBox;
 
+
 class QWidget;
+
 
 class QButtonGroup;
 
@@ -39,11 +42,13 @@ namespace TrenchBroom {
 namespace Assets {
 class EntityDefinition;
 
+
 class EntityDefinitionManager;
 } // namespace Assets
 
 namespace Model {
 class EditorContext;
+
 
 class SmartTag;
 } // namespace Model
@@ -51,7 +56,9 @@ class SmartTag;
 namespace View {
 class MapDocument;
 
+
 class PopupButton;
+
 
 class EntityDefinitionCheckBoxList : public QWidget {
 Q_OBJECT
@@ -65,10 +72,7 @@ private:
   CheckBoxList m_defCheckBoxes;
 
 public:
-  EntityDefinitionCheckBoxList(
-      Assets::EntityDefinitionManager &entityDefinitionManager,
-      Model::EditorContext &editorContext,
-      QWidget *parent = nullptr);
+  EntityDefinitionCheckBoxList(Assets::EntityDefinitionManager &entityDefinitionManager, Model::EditorContext &editorContext, QWidget *parent = nullptr);
 
   void refresh();
 
@@ -87,6 +91,7 @@ private:
 
   void createGui();
 };
+
 
 class ViewEditor : public QWidget {
 Q_OBJECT
@@ -226,12 +231,17 @@ private:
   void showFogChanged(bool checked);
 
   void dashedBoundsChanged(bool checked);
+
   void showObjectBoundsChanged(bool checked);
+
   void showAlwaysShowBoundsChanged(bool checked);
+
   void showIntersectionModeChanged(bool checked);
 
   void dashSizeChanged(int value);
+
   void selectionBoundsLineWithChanged(int value);
+
   void intersectionMarkerSizeChanged(int value);
 
   void showEdgesChanged(bool checked);
@@ -243,6 +253,7 @@ private:
   void restoreDefaultsClicked();
 };
 
+
 class ViewPopupEditor : public QWidget {
 Q_OBJECT
 private:
@@ -250,8 +261,7 @@ private:
   ViewEditor *m_editor;
 
 public:
-  explicit ViewPopupEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 };
 } // namespace View
 } // namespace TrenchBroom

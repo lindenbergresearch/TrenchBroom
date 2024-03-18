@@ -38,13 +38,19 @@ private:
 
 public:
   const std::vector<Model::Node *> &selectedNodes() const;
+
   const std::vector<Model::Node *> &deselectedNodes() const;
+
   const std::vector<Model::BrushFaceHandle> &selectedBrushFaces() const;
+
   const std::vector<Model::BrushFaceHandle> &deselectedBrushFaces() const;
 
   void addSelectedNodes(const std::vector<Model::Node *> &nodes);
+
   void addDeselectedNodes(const std::vector<Model::Node *> &nodes);
+
   void addSelectedBrushFaces(const std::vector<Model::BrushFaceHandle> &faces);
+
   void addDeselectedBrushFaces(const std::vector<Model::BrushFaceHandle> &faces);
 };
 } // namespace View

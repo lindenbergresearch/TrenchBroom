@@ -42,6 +42,7 @@ public:
   explicit EntityLinkRenderer(std::weak_ptr<View::MapDocument> document);
 
   void setDefaultColor(const Color &color);
+
   void setSelectedColor(const Color &color);
 
 private:

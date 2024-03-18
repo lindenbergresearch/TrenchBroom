@@ -38,71 +38,59 @@ const size_t TextureNameLength = 32;
 
 namespace {
 
-size_t readMipOffsets(
-    const size_t maxMipLevels,
-    size_t offsets[],
-    const size_t width,
-    const size_t height,
-    Reader &reader) {
+size_t readMipOffsets(const size_t maxMipLevels, size_t offsets[], const size_t width, const size_t height, Reader &reader) {
   const auto mipLevels = std::min(
-      std::min(size_t(std::log2(width)), size_t(std::log2(height))) + 1, maxMipLevels);
+      std::min(size_t(std::log2(width)), size_t(std::log2(height))) + 1, maxMipLevels
+  );
 
-  for (size_t i = 0; i < mipLevels; ++i) {
+  for (size_t i = 0; i < mipLevels; ++ i) {
     offsets[i] = reader.readSize<uint32_t>();
   }
 
   // make sure the reader position is correct afterwards
-  reader.seekForward((maxMipLevels - mipLevels)*sizeof(uint32_t));
+  reader.seekForward((maxMipLevels - mipLevels) * sizeof(uint32_t));
 
   return mipLevels;
 }
 
 std::tuple<Assets::TextureBufferList, bool> readMips(
-    const Assets::Palette &palette,
-    const size_t mipLevels,
-    const size_t offsets[],
-    const size_t width,
-    const size_t height,
-    Reader &reader,
-    Color &averageColor,
-    const Assets::PaletteTransparency transparency) {
+    const Assets::Palette &palette, const size_t mipLevels, const size_t offsets[], const size_t width, const size_t height, Reader &reader,
+    Color &averageColor, const Assets::PaletteTransparency transparency
+) {
   static auto tempColor = Color{};
 
   auto buffers = Assets::TextureBufferList{};
   Assets::setMipBufferSize(buffers, mipLevels, width, height, GL_RGBA);
 
   auto hasTransparency = false;
-  for (size_t i = 0; i < mipLevels; ++i) {
+  for (size_t i = 0; i < mipLevels; ++ i) {
     const auto offset = offsets[i];
     reader.seekFromBegin(offset);
-    const auto curWidth = width/(size_t(1) << i);
-    const auto curHeight = height/(size_t(1) << i);
-    const auto size = curWidth*curHeight;
+    const auto curWidth = width / (size_t(1) << i);
+    const auto curHeight = height / (size_t(1) << i);
+    const auto size = curWidth * curHeight;
 
-    if (!reader.canRead(size)) {
+    if (! reader.canRead(size)) {
       // This can happen if the .wal file is corrupt.
       break;
     }
 
-    hasTransparency =
-        hasTransparency
-            || (palette.indexedToRgba(reader, size, buffers[i], transparency, tempColor) && i==0);
-    if (i==0) {
+    hasTransparency = hasTransparency || (palette.indexedToRgba(reader, size, buffers[i], transparency, tempColor) && i == 0);
+    if (i == 0) {
       averageColor = tempColor;
     }
   }
   return {std::move(buffers), hasTransparency};
 }
 
-Result<Assets::Texture, ReadTextureError> readQ2Wal(
-    std::string name, Reader &reader, const std::optional<Assets::Palette> &palette) {
+Result<Assets::Texture, ReadTextureError> readQ2Wal(std::string name, Reader &reader, const std::optional<Assets::Palette> &palette) {
   static const auto MaxMipLevels = size_t(4);
   auto averageColor = Color{};
   size_t offsets[MaxMipLevels];
 
   // https://github.com/id-Software/Quake-2-Tools/blob/master/qe4/qfiles.h#L142
 
-  if (!palette) {
+  if (! palette) {
     return ReadTextureError{std::move(name), "Missing palette"};
   }
 
@@ -111,9 +99,8 @@ Result<Assets::Texture, ReadTextureError> readQ2Wal(
     const auto width = reader.readSize<uint32_t>();
     const auto height = reader.readSize<uint32_t>();
 
-    if (!checkTextureDimensions(width, height)) {
-      return ReadTextureError{
-          std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)};
+    if (! checkTextureDimensions(width, height)) {
+      return ReadTextureError{std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)};
     }
 
     const auto mipLevels = readMipOffsets(MaxMipLevels, offsets, width, height, reader);
@@ -125,28 +112,13 @@ Result<Assets::Texture, ReadTextureError> readQ2Wal(
     const auto gameData = Assets::Q2Data{flags, contents, value};
 
     auto [buffers, hasTransparency] = readMips(
-        *palette,
-        mipLevels,
-        offsets,
-        width,
-        height,
-        reader,
-        averageColor,
-        Assets::PaletteTransparency::Opaque);
+        *palette, mipLevels, offsets, width, height, reader, averageColor, Assets::PaletteTransparency::Opaque
+    );
 
     unused(hasTransparency);
 
-    return Assets::Texture{
-        std::move(name),
-        width,
-        height,
-        averageColor,
-        std::move(buffers),
-        GL_RGBA,
-        Assets::TextureType::Opaque,
-        gameData};
-  }
-  catch (const ReaderException &e) {
+    return Assets::Texture{std::move(name), width, height, averageColor, std::move(buffers), GL_RGBA, Assets::TextureType::Opaque, gameData};
+  } catch (const ReaderException &e) {
     return ReadTextureError{std::move(name), e.what()};
   }
 }
@@ -160,7 +132,7 @@ Result<Assets::Texture, ReadTextureError> readDkWal(std::string name, Reader &re
 
   try {
     const auto version = reader.readChar<char>();
-    ensure(version==3, "wal texture has version 3");
+    ensure(version == 3, "wal texture has version 3");
 
     reader.seekForward(WalLayout::TextureNameLength);
     reader.seekForward(3); // garbage
@@ -168,9 +140,8 @@ Result<Assets::Texture, ReadTextureError> readDkWal(std::string name, Reader &re
     const auto width = reader.readSize<uint32_t>();
     const auto height = reader.readSize<uint32_t>();
 
-    if (!checkTextureDimensions(width, height)) {
-      return ReadTextureError{
-          std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)};
+    if (! checkTextureDimensions(width, height)) {
+      return ReadTextureError{std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)};
     }
 
     const auto mipLevels = readMipOffsets(MaxMipLevels, offsets, width, height, reader);
@@ -179,57 +150,44 @@ Result<Assets::Texture, ReadTextureError> readDkWal(std::string name, Reader &re
     const auto flags = reader.readInt<int32_t>();
     const auto contents = reader.readInt<int32_t>();
 
-    auto paletteReader = reader.subReaderFromCurrent(3*256);
-    reader.seekForward(3*256); // seek past palette
+    auto paletteReader = reader.subReaderFromCurrent(3 * 256);
+    reader.seekForward(3 * 256); // seek past palette
     const auto value = reader.readInt<int32_t>();
     const auto gameData = Assets::Q2Data{flags, contents, value};
 
-    return Assets::loadPalette(paletteReader, Assets::PaletteColorFormat::Rgb)
-        .transform([&](const auto &palette) {
+    return Assets::loadPalette(paletteReader, Assets::PaletteColorFormat::Rgb).transform(
+        [&](const auto &palette) {
           auto [buffers, hasTransparency] = readMips(
-              palette,
-              mipLevels,
-              offsets,
-              width,
-              height,
-              reader,
-              averageColor,
-              Assets::PaletteTransparency::Index255Transparent);
+              palette, mipLevels, offsets, width, height, reader, averageColor, Assets::PaletteTransparency::Index255Transparent
+          );
 
           return Assets::Texture{
-              std::move(name),
-              width,
-              height,
-              averageColor,
-              std::move(buffers),
-              GL_RGBA,
-              hasTransparency ? Assets::TextureType::Masked : Assets::TextureType::Opaque,
-              gameData};
-        })
-        .or_else([&](const auto &error) {
-          return Result<Assets::Texture, ReadTextureError>{
-              ReadTextureError{std::move(name), error.msg}};
-        });;
-  }
-  catch (const ReaderException &e) {
+              std::move(name), width, height, averageColor, std::move(buffers), GL_RGBA,
+              hasTransparency ? Assets::TextureType::Masked : Assets::TextureType::Opaque, gameData
+          };
+        }
+    ).or_else(
+        [&](const auto &error) {
+          return Result<Assets::Texture, ReadTextureError>{ReadTextureError{std::move(name), error.msg}};
+        }
+    );;
+  } catch (const ReaderException &e) {
     return ReadTextureError{std::move(name), e.what()};
   }
 }
 
 } // namespace
 
-Result<Assets::Texture, ReadTextureError> readWalTexture(
-    std::string name, Reader &reader, const std::optional<Assets::Palette> &palette) {
+Result<Assets::Texture, ReadTextureError> readWalTexture(std::string name, Reader &reader, const std::optional<Assets::Palette> &palette) {
   try {
     const auto version = reader.readChar<char>();
     reader.seekFromBegin(0);
 
-    if (version==3) {
+    if (version == 3) {
       return readDkWal(std::move(name), reader);
     }
     return readQ2Wal(std::move(name), reader, palette);
-  }
-  catch (const Exception &e) {
+  } catch (const Exception &e) {
     return ReadTextureError{std::move(name), e.what()};
   }
 }

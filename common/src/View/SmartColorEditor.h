@@ -24,11 +24,15 @@
 #include <memory>
 #include <vector>
 
+
 class QColor;
+
 
 class QWidget;
 
+
 class QPushButton;
+
 
 class QRadioButton;
 
@@ -36,9 +40,12 @@ namespace TrenchBroom {
 namespace View {
 class ColorButton;
 
+
 class ColorTable;
 
+
 class MapDocument;
+
 
 class SmartColorEditor : public SmartPropertyEditor {
 Q_OBJECT
@@ -52,8 +59,7 @@ private:
   ColorTable *m_colorHistory;
 
 public:
-  explicit SmartColorEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit SmartColorEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void createGui();

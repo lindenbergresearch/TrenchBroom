@@ -23,6 +23,7 @@ namespace TrenchBroom {
 namespace View {
 class InputState;
 
+
 class DropTracker {
 public:
   virtual ~DropTracker();

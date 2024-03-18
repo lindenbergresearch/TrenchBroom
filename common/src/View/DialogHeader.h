@@ -21,9 +21,12 @@
 
 #include <QWidget>
 
+
 class QLabel;
 
+
 class QPixmap;
+
 
 class QString;
 

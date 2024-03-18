@@ -28,25 +28,32 @@ namespace TrenchBroom {
 namespace View {
 class FaceInspector;
 
+
 class EntityInspector;
+
 
 class GLContextManager;
 
+
 class MapDocument;
+
 
 class MapInspector;
 
+
 class MapViewBar;
+
 
 class SyncHeightEventFilter;
 
+
 class TabBook;
 
+
 enum class InspectorPage {
-  Map = 0,
-  Face = 1,
-  Entity = 2
+  Map = 0, Face = 1, Entity = 2
 };
+
 
 class Inspector : public QWidget {
 Q_OBJECT
@@ -59,10 +66,7 @@ private:
   SyncHeightEventFilter *m_syncTabBarEventFilter;
 
 public:
-  Inspector(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
   void connectTopWidgets(MapViewBar *mapViewBar);
 

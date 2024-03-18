@@ -25,22 +25,19 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-TexturedIndexArrayMap::Size::Size()
-    : m_indexCount{0u} {
+TexturedIndexArrayMap::Size::Size() : m_indexCount{0u} {
 }
 
 size_t TexturedIndexArrayMap::Size::indexCount() const {
   return m_indexCount;
 }
 
-void TexturedIndexArrayMap::Size::inc(
-    const Texture *texture, const PrimType primType, const size_t count) {
+void TexturedIndexArrayMap::Size::inc(const Texture *texture, const PrimType primType, const size_t count) {
   m_sizes[texture].inc(primType, count);
   m_indexCount += count;
 }
 
-void TexturedIndexArrayMap::Size::inc(
-    const TexturedIndexArrayMap::Texture *texture, const IndexArrayMap::Size &size) {
+void TexturedIndexArrayMap::Size::inc(const TexturedIndexArrayMap::Texture *texture, const IndexArrayMap::Size &size) {
   m_sizes[texture].inc(size);
   m_indexCount += size.indexCount();
 }
@@ -68,10 +65,9 @@ TexturedIndexArrayMap::Size TexturedIndexArrayMap::size() const {
   return result;
 }
 
-size_t TexturedIndexArrayMap::add(
-    const Texture *texture, const PrimType primType, const size_t count) {
+size_t TexturedIndexArrayMap::add(const Texture *texture, const PrimType primType, const size_t count) {
   auto it = m_ranges.find(texture);
-  assert(it!=std::end(m_ranges));
+  assert(it != std::end(m_ranges));
   return it->second.add(primType, count);
 }
 

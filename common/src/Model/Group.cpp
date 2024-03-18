@@ -27,8 +27,7 @@ namespace TrenchBroom::Model {
 
 kdl_reflect_impl(Group);
 
-Group::Group(std::string name)
-    : m_name{std::move(name)} {
+Group::Group(std::string name) : m_name{std::move(name)} {
 }
 
 const std::string &Group::name() const {
@@ -48,7 +47,7 @@ void Group::setTransformation(const vm::mat4x4 &transformation) {
 }
 
 void Group::transform(const vm::mat4x4 &transformation) {
-  m_transformation = transformation*m_transformation;
+  m_transformation = transformation * m_transformation;
 }
 
 } // namespace TrenchBroom::Model

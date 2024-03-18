@@ -21,13 +21,16 @@
 
 #include "View/ControlListBox.h"
 
+
 class QLabel;
+
 
 class QPixmap;
 
 namespace TrenchBroom {
 namespace View {
 class ElidedLabel;
+
 
 class ImageListBoxItemRenderer : public ControlListBoxItemRenderer {
 Q_OBJECT
@@ -37,17 +40,16 @@ private:
   QLabel *m_imageLabel;
 
 public:
-  ImageListBoxItemRenderer(
-      const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent);
+  ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent);
 
   void updateItem() override;
 };
 
+
 class ImageListBox : public ControlListBox {
 Q_OBJECT
 public:
-  explicit ImageListBox(
-      const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
+  explicit ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
 private:
   ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;

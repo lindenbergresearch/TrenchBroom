@@ -21,7 +21,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include <QWidget>
 
+
 class QLineEdit;
+
+
 class QStackedWidget;
 
 namespace TrenchBroom::Model {
@@ -45,6 +48,7 @@ public:
 
 private:
   QWidget *createEditorPage();
+
   void updatePath(const QString &str);
 
 public:
@@ -54,11 +58,17 @@ private:
   void refresh();
 
   bool isValidEnginePath(const QString &str) const;
+
 private slots:
+
   void nameChanged(const QString &text);
+
   void pathChanged();
+
   void changePathClicked();
+
 signals:
+
   /**
    * Emitted after m_profile is changed in response to a UI action.
    */

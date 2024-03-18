@@ -24,9 +24,7 @@
 namespace TrenchBroom {
 namespace Model {
 enum class VisibilityState {
-  Inherited = 1,
-  Hidden = 2,
-  Shown = 4
+  Inherited = 1, Hidden = 2, Shown = 4
 };
 
 std::ostream &operator<<(std::ostream &str, VisibilityState state);

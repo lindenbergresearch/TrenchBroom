@@ -28,7 +28,9 @@ namespace TrenchBroom {
 namespace View {
 class MapDocument;
 
+
 class MapFrame;
+
 
 class FrameManager : public QObject {
 Q_OBJECT

@@ -30,9 +30,8 @@
 
 namespace TrenchBroom {
 namespace View {
-FlagsPopupEditor::FlagsPopupEditor(
-    size_t numCols, QWidget *parent, const QString &buttonLabel, const bool showFlagsText)
-    : QWidget(parent), m_flagsTxt(nullptr), m_button(nullptr), m_editor(nullptr) {
+FlagsPopupEditor::FlagsPopupEditor(size_t numCols, QWidget *parent, const QString &buttonLabel, const bool showFlagsText) :
+    QWidget(parent), m_flagsTxt(nullptr), m_button(nullptr), m_editor(nullptr) {
   QFrame *flagsFrame = nullptr;
   if (showFlagsText) {
     m_flagsTxt = new ElidedLabel(Qt::ElideRight);
@@ -42,7 +41,8 @@ FlagsPopupEditor::FlagsPopupEditor(
 
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(
-        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+    );
     layout->setSpacing(0);
     layout->addWidget(m_flagsTxt);
     flagsFrame->setLayout(layout);
@@ -70,7 +70,7 @@ FlagsPopupEditor::FlagsPopupEditor(
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(LayoutConstants::MediumHMargin);
 
-  if (flagsFrame!=nullptr) {
+  if (flagsFrame != nullptr) {
     layout->addWidget(flagsFrame, 1);
   }
 
@@ -78,14 +78,9 @@ FlagsPopupEditor::FlagsPopupEditor(
   setLayout(layout);
 
   connect(
-      m_editor,
-      &FlagsEditor::flagChanged,
-      this,
-      [this](
-          const size_t /* index */,
-          const int /* value */,
-          const int /* setFlag */,
-          const int /* mixedFlag */) { updateFlagsText(); });
+      m_editor, &FlagsEditor::flagChanged, this,
+      [this](const size_t /* index */, const int /* value */, const int /* setFlag */, const int /* mixedFlag */) { updateFlagsText(); }
+  );
   // forward this signal
   connect(m_editor, &FlagsEditor::flagChanged, this, &FlagsPopupEditor::flagChanged);
 }
@@ -95,8 +90,7 @@ void FlagsPopupEditor::setFlags(const QStringList &labels, const QStringList &to
   updateFlagsText();
 }
 
-void FlagsPopupEditor::setFlags(
-    const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
+void FlagsPopupEditor::setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips) {
   m_editor->setFlags(values, labels, tooltips);
   updateFlagsText();
 }
@@ -107,11 +101,11 @@ void FlagsPopupEditor::setFlagValue(const int set, const int mixed) {
 }
 
 void FlagsPopupEditor::updateFlagsText() {
-  if (m_flagsTxt==nullptr) {
+  if (m_flagsTxt == nullptr) {
     return;
   }
 
-  if (!isEnabled()) {
+  if (! isEnabled()) {
     m_flagsTxt->setDisabled(true);
     m_flagsTxt->setText("n/a");
     m_flagsTxt->setToolTip("");
@@ -121,12 +115,12 @@ void FlagsPopupEditor::updateFlagsText() {
   QString label;
   bool first = true;
   bool mixed = false;
-  for (size_t i = 0; i < m_editor->getNumFlags() && !mixed; ++i) {
+  for (size_t i = 0; i < m_editor->getNumFlags() && ! mixed; ++ i) {
     if (m_editor->isFlagMixed(i)) {
       label = "multi";
       mixed = true;
     } else if (m_editor->isFlagSet(i)) {
-      if (!first) {
+      if (! first) {
         label += ", ";
       }
       label += m_editor->getFlagLabel(i);
@@ -135,7 +129,7 @@ void FlagsPopupEditor::updateFlagsText() {
   }
 
   m_flagsTxt->setText(label);
-  if (!first) {
+  if (! first) {
     m_flagsTxt->setToolTip(label);
   } else {
     m_flagsTxt->setToolTip("");

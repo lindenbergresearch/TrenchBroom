@@ -29,8 +29,7 @@
 
 namespace TrenchBroom {
 namespace View {
-ColorTable::ColorTable(const int cellSize, QWidget *parent)
-    : QWidget(parent), m_cellSize(cellSize), m_cellSpacing(2) {
+ColorTable::ColorTable(const int cellSize, QWidget *parent) : QWidget(parent), m_cellSize(cellSize), m_cellSpacing(2) {
   assert(m_cellSize > 0);
 
   auto sizePolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -62,14 +61,12 @@ void ColorTable::paintEvent(QPaintEvent * /* event */) {
   QPainter dc(this);
 
   auto it = std::begin(m_colors);
-  for (int row = 0; row < rows; ++row) {
-    for (int col = 0; col < cols; ++col) {
-      if (it!=std::end(m_colors)) {
+  for (int row = 0; row < rows; ++ row) {
+    for (int col = 0; col < cols; ++ col) {
+      if (it != std::end(m_colors)) {
         const auto &color = *it;
 
-        if (
-            std::find(std::begin(m_selectedColors), std::end(m_selectedColors), color)
-                !=std::end(m_selectedColors)) {
+        if (std::find(std::begin(m_selectedColors), std::end(m_selectedColors), color) != std::end(m_selectedColors)) {
           dc.setPen(QColor(Qt::red));
           dc.setBrush(QColor(Qt::red));
           dc.drawRect(x - 1, y - 1, m_cellSize + 2, m_cellSize + 2);
@@ -79,7 +76,7 @@ void ColorTable::paintEvent(QPaintEvent * /* event */) {
         dc.setBrush(color);
         dc.drawRect(x, y, m_cellSize, m_cellSize);
 
-        ++it;
+        ++ it;
       }
       x += m_cellSize + m_cellSpacing;
     }
@@ -93,10 +90,10 @@ void ColorTable::mouseReleaseEvent(QMouseEvent *event) {
   const auto cols = computeCols(virtualSize.width());
 
   const auto pos = event->pos();
-  const auto col = (pos.x() - m_cellSpacing)/(m_cellSize + m_cellSpacing);
-  const auto row = (pos.y() - m_cellSpacing)/(m_cellSize + m_cellSpacing);
+  const auto col = (pos.x() - m_cellSpacing) / (m_cellSize + m_cellSpacing);
+  const auto row = (pos.y() - m_cellSpacing) / (m_cellSize + m_cellSpacing);
 
-  const auto index = static_cast<size_t>(row*cols + col);
+  const auto index = static_cast<size_t>(row * cols + col);
   if (index < m_colors.size()) {
     const auto &color = m_colors[index];
     emit colorTableSelected(color);
@@ -115,19 +112,19 @@ int ColorTable::heightForWidth(const int w) const {
 }
 
 int ColorTable::computeCols(const int width) const {
-  return (width - m_cellSpacing)/(m_cellSize + m_cellSpacing);
+  return (width - m_cellSpacing) / (m_cellSize + m_cellSpacing);
 }
 
 int ColorTable::computeRows(const int cols) const {
-  if (cols==0) {
+  if (cols == 0) {
     return 0;
   } else {
-    return (static_cast<int>(m_colors.size()) + cols - 1)/cols;
+    return (static_cast<int>(m_colors.size()) + cols - 1) / cols;
   }
 }
 
 int ColorTable::computeHeight(const int rows) const {
-  return m_cellSpacing + rows*(m_cellSize + m_cellSpacing);
+  return m_cellSpacing + rows * (m_cellSize + m_cellSpacing);
 }
 } // namespace View
 } // namespace TrenchBroom

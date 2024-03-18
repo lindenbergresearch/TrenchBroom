@@ -31,15 +31,34 @@ class EntityDefinition;
 
 namespace Model {
 class EntityNodeBase;
+
+
 class BrushNode;
+
+
 class BrushFace;
+
+
 class EntityNode;
+
+
 class GroupNode;
+
+
 class LayerNode;
+
+
 class Node;
+
+
 class Object;
+
+
 class PatchNode;
+
+
 class WorldNode;
+
 
 class EditorContext {
 private:
@@ -59,28 +78,41 @@ public:
   void reset();
 
   TagType::Type hiddenTags() const;
+
   void setHiddenTags(TagType::Type hiddenTags);
 
   bool entityDefinitionHidden(const Model::EntityNodeBase *entityNode) const;
+
   bool entityDefinitionHidden(const Assets::EntityDefinition *definition) const;
+
   void setEntityDefinitionHidden(const Assets::EntityDefinition *definition, bool hidden);
 
   bool blockSelection() const;
+
   void setBlockSelection(bool blockSelection);
 
 public:
   Model::GroupNode *currentGroup() const;
+
   void pushGroup(Model::GroupNode *groupNode);
+
   void popGroup();
 
 public:
   bool visible(const Model::Node *node) const;
+
   bool visible(const Model::WorldNode *worldNode) const;
+
   bool visible(const Model::LayerNode *layerNode) const;
+
   bool visible(const Model::GroupNode *groupNode) const;
+
   bool visible(const Model::EntityNode *entityNode) const;
+
   bool visible(const Model::BrushNode *brushNode) const;
+
   bool visible(const Model::BrushNode *brushNode, const Model::BrushFace &face) const;
+
   bool visible(const Model::PatchNode *patchNode) const;
 
 private:
@@ -88,22 +120,32 @@ private:
 
 public:
   bool editable(const Model::Node *node) const;
+
   bool editable(const Model::BrushNode *brushNode, const Model::BrushFace &face) const;
 
   bool selectable(const Model::Node *node) const;
+
   bool selectable(const Model::WorldNode *worldNode) const;
+
   bool selectable(const Model::LayerNode *layerNode) const;
+
   bool selectable(const Model::GroupNode *groupNode) const;
+
   bool selectable(const Model::EntityNode *entityNode) const;
+
   bool selectable(const Model::BrushNode *brushNode) const;
+
   bool selectable(const Model::BrushNode *brushNode, const Model::BrushFace &face) const;
+
   bool selectable(const Model::PatchNode *patchNode) const;
 
   bool canChangeSelection() const;
+
   bool inOpenGroup(const Model::Object *object) const;
 
 private:
   EditorContext(const EditorContext &);
+
   EditorContext &operator=(const EditorContext &);
 };
 } // namespace Model

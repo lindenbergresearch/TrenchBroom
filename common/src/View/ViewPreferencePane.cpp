@@ -58,33 +58,29 @@ struct TextureMode {
   int magFilter;
   std::string name;
 
-  TextureMode(const int i_minFilter, const int i_magFilter, std::string i_name)
-      : minFilter{i_minFilter}, magFilter{i_magFilter}, name{std::move(i_name)} {
+  TextureMode(const int i_minFilter, const int i_magFilter, std::string i_name) : minFilter{i_minFilter}, magFilter{i_magFilter}, name{std::move(i_name)} {
   }
 };
 
+
 const auto TextureModes = std::array<TextureMode, 6>{
-    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"},
-    TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"},
-    TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"},
-    TextureMode{GL_LINEAR, GL_LINEAR, "Linear"},
-    TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"},
-    TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
+    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"},
+    TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"}, TextureMode{GL_LINEAR, GL_LINEAR, "Linear"},
+    TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"}, TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
 };
 
 constexpr int brightnessToUI(const float value) {
-  return int(vm::round(100.0f*(value - 1.0f)));
+  return int(vm::round(100.0f * (value - 1.0f)));
 }
 
 constexpr float brightnessFromUI(const int value) {
-  return (float(value)/100.0f) + 1.0f;
+  return (float(value) / 100.0f) + 1.0f;
 }
 
-static_assert(0==brightnessToUI(brightnessFromUI(0)));
+static_assert(0 == brightnessToUI(brightnessFromUI(0)));
 } // namespace
 
-ViewPreferencePane::ViewPreferencePane(QWidget *parent)
-    : PreferencePane{parent} {
+ViewPreferencePane::ViewPreferencePane(QWidget *parent) : PreferencePane{parent} {
   createGui();
   bindEvents();
 }
@@ -123,13 +119,13 @@ QWidget *ViewPreferencePane::createViewPreferences() {
   viewLayoutLayout->addWidget(m_link2dCameras);
   viewLayoutLayout->setContentsMargins(0, 0, 0, 0);
 
-  m_UIBrightnessSlider =
-      new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f), 0, "%d%%", 350, 45};
+  m_UIBrightnessSlider = new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f), 0, "%d%%", 350, 45};
   m_UIBrightnessSlider->setToolTip("Sets the contrast for UI controls");
 
-  m_gridAlphaSlider = new SliderWithLabel{-50, +50, 0, "%d%%", 350, 45};
+  m_gridAlphaSlider = new SliderWithLabel{- 50, + 50, 0, "%d%%", 350, 45};
   m_gridAlphaSlider->setToolTip(
-      "Sets the visibility of the grid lines in the 3D editing view.");
+      "Sets the visibility of the grid lines in the 3D editing view."
+  );
 
   m_gridWidthSlider = new SliderWithLabel{10, 300, 10e-3f, "%.1f px", 350, 45};
   m_gridWidthSlider->setToolTip("Sets the thickness of the grid-lines.");
@@ -139,7 +135,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
   m_showAxes = new QCheckBox{};
   m_showAxes->setToolTip(
-      "Toggle showing the coordinate system axes in the 3D editing view.");
+      "Toggle showing the coordinate system axes in the 3D editing view."
+  );
 
   m_unitsDisplayType = new QComboBox{};
   m_unitsDisplayType->addItem("Units");
@@ -157,7 +154,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
   m_metricConversationFactor->setMaximumWidth(70);
   m_metricConversationFactor->setAlignment(Qt::AlignRight);
   m_metricConversationFactor->setValidator(
-      new QDoubleValidator{1.0, 60.0, 4, m_metricConversationFactor});
+      new QDoubleValidator{1.0, 60.0, 4, m_metricConversationFactor}
+  );
 
   auto *unitsFactorLayout = new QHBoxLayout{};
   auto unitLabel = new QLabel{"units/meter"};
@@ -169,7 +167,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
   m_autoBrightnessTypeCombo = new QComboBox;
   m_autoBrightnessTypeCombo->setToolTip(
-      "Sets how color tinting on objects should behave.");
+      "Sets how color tinting on objects should behave."
+  );
   m_autoBrightnessTypeCombo->addItem("as is");
   m_autoBrightnessTypeCombo->addItem("average");
   m_autoBrightnessTypeCombo->addItem("peak");
@@ -206,7 +205,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
   auto fontsPath = IO::SystemPaths::findResourceDirectories(
       std::filesystem::path("fonts").parent_path());
 
-  if (!fontsPath.empty()) {
+  if (! fontsPath.empty()) {
     auto m_fs = std::make_unique<IO::DiskFileSystem>(fontsPath.back());
 
     // default font configured
@@ -224,9 +223,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     // search compatible fonts
     auto res = m_fs->find(
-        "fonts",
-        IO::TraversalMode::Recursive,
-        IO::makeExtensionPathMatcher({".ttf", ".otf"}));
+        "fonts", IO::TraversalMode::Recursive, IO::makeExtensionPathMatcher({".ttf", ".otf"}));
 
     auto tmp_files = std::vector<std::filesystem::path>();
 
@@ -265,50 +262,46 @@ QWidget *ViewPreferencePane::createViewPreferences() {
   m_rendererFontSizeCombo = new QComboBox{};
   m_rendererFontSizeCombo->setEditable(true);
   m_rendererFontSizeCombo->setToolTip(
-      "Sets the font size for various labels in the editing views.");
-  m_rendererFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15",
-                                     "16", "17", "18", "19", "20", "22", "24", "26",
-                                     "28", "32", "36", "40", "48", "56", "64", "72"});
+      "Sets the font size for various labels in the editing views."
+  );
+  m_rendererFontSizeCombo->addItems(
+      {"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"}
+  );
   m_rendererFontSizeCombo->setValidator(
-      new QIntValidator{1, 96, m_rendererFontSizeCombo});
+      new QIntValidator{1, 96, m_rendererFontSizeCombo}
+  );
 
   m_UIFontSizeCombo = new QComboBox{};
   m_UIFontSizeCombo->setEditable(true);
   m_UIFontSizeCombo->setToolTip("Sets the font size UI elements.");
   m_UIFontSizeCombo->addItems(
-      {"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"});
+      {"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"}
+  );
   m_UIFontSizeCombo->setValidator(new QIntValidator{1, 20, m_UIFontSizeCombo});
 
   m_ConsoleFontSizeCombo = new QComboBox{};
   m_ConsoleFontSizeCombo->setEditable(true);
   m_ConsoleFontSizeCombo->setToolTip("Sets the font size for the console panel.");
-  m_ConsoleFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15",
-                                    "16", "17", "18", "19", "20", "22", "24", "26",
-                                    "28", "32", "36", "40", "48", "56", "64", "72"});
+  m_ConsoleFontSizeCombo->addItems(
+      {"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"}
+  );
   m_ConsoleFontSizeCombo->setValidator(new QIntValidator{1, 96, m_ConsoleFontSizeCombo});
 
   m_ToolbarIconSizeCombo = new QComboBox{};
   m_ToolbarIconSizeCombo->setEditable(false);
   m_ToolbarIconSizeCombo->setToolTip("Sets the icon size for the main toolbar.");
   m_ToolbarIconSizeCombo->addItems(
-      {"14x14",
-       "16x16",
-       "18x18",
-       "20x20",
-       "22x22",
-       "24x24",
-       "26x26",
-       "28x28",
-       "30x30",
-       "32x32"});
+      {"14x14", "16x16", "18x18", "20x20", "22x22", "24x24", "26x26", "28x28", "30x30", "32x32"}
+  );
 
   /*************************************************************************************************************************/
 
   auto *layout = new FormWithSectionsLayout{};
   layout->setContentsMargins(
-      LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, 0, 0);
+      LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, 0, 0
+  );
   layout->setVerticalSpacing(LayoutConstants::MediumVMargin);
-  layout->setHorizontalSpacing(LayoutConstants::WideHMargin*2);
+  layout->setHorizontalSpacing(LayoutConstants::WideHMargin * 2);
   // override the default to make the sliders take up maximum width
   layout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
@@ -345,200 +338,134 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
 void ViewPreferencePane::bindEvents() {
   connect(
-      m_layoutCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::layoutChanged);
+      m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged
+  );
   connect(
-      m_link2dCameras,
-      &QCheckBox::stateChanged,
-      this,
-      &ViewPreferencePane::link2dCamerasChanged);
+      m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged
+  );
   connect(
-      m_UIBrightnessSlider,
-      &SliderWithLabel::valueChanged,
-      this,
-      &ViewPreferencePane::UIBrightnessChanged);
+      m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged
+  );
   connect(
-      m_gridAlphaSlider,
-      &SliderWithLabel::valueChanged,
-      this,
-      &ViewPreferencePane::gridAlphaChanged);
+      m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged
+  );
   connect(
-      m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
+      m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged
+  );
   connect(
-      m_unitsDisplayType,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::unitsDisplayTypeIndexChanged);
+      m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged
+  );
   connect(
-      m_unitsGridType,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::unitsGridTypeIndexChanged);
+      m_unitsGridType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsGridTypeIndexChanged
+  );
   connect(
-      m_metricConversationFactor,
-      &QLineEdit::textChanged,
-      this,
-      &ViewPreferencePane::metricConversationFactorChanged);
+      m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged
+  );
   connect(
-      m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
+      m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged
+  );
   connect(
-      m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
+      m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged
+  );
   connect(
-      m_textureModeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::textureModeChanged);
+      m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged
+  );
   connect(
-      m_textureBrowserIconSizeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::textureBrowserIconSizeChanged);
+      m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged
+  );
   connect(
-      m_autoBrightnessTypeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorFaceAutoBrightnessChanged);
+      m_autoBrightnessTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorFaceAutoBrightnessChanged
+  );
   connect(
-      m_gridWidthSlider,
-      &SliderWithLabel::valueChanged,
-      this,
-      &ViewPreferencePane::editorGridWithChanged);
+      m_gridWidthSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorGridWithChanged
+  );
   connect(
-      m_rendererFontCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::renderFontFileChanged);
+      m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged
+  );
   connect(
-      m_rendererFontSizeCombo,
-      &QComboBox::currentTextChanged,
-      this,
-      &ViewPreferencePane::rendererFontSizeChanged);
+      m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged
+  );
   connect(
-      m_UIFontCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorUIFontFileChanged);
+      m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged
+  );
   connect(
-      m_UIFontSizeCombo,
-      &QComboBox::currentTextChanged,
-      this,
-      &ViewPreferencePane::editorUIFontSizeChanged);
+      m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged
+  );
   connect(
-      m_ConsoleFontCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorConsoleFontFileChanged);
+      m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged
+  );
   connect(
-      m_ConsoleFontSizeCombo,
-      &QComboBox::currentTextChanged,
-      this,
-      &ViewPreferencePane::editorConsoleFontSizeChanged);
+      m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged
+  );
   connect(
-      m_ToolbarIconSizeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorToolbarIconSizeChanged);
+      m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged
+  );
 }
 
 void ViewPreferencePane::unBindEvents() {
   disconnect(
-      m_layoutCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::layoutChanged);
+      m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged
+  );
   disconnect(
-      m_link2dCameras,
-      &QCheckBox::stateChanged,
-      this,
-      &ViewPreferencePane::link2dCamerasChanged);
+      m_link2dCameras, &QCheckBox::stateChanged, this, &ViewPreferencePane::link2dCamerasChanged
+  );
   disconnect(
-      m_UIBrightnessSlider,
-      &SliderWithLabel::valueChanged,
-      this,
-      &ViewPreferencePane::UIBrightnessChanged);
+      m_UIBrightnessSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::UIBrightnessChanged
+  );
   disconnect(
-      m_gridAlphaSlider,
-      &SliderWithLabel::valueChanged,
-      this,
-      &ViewPreferencePane::gridAlphaChanged);
+      m_gridAlphaSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::gridAlphaChanged
+  );
   disconnect(
-      m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged);
+      m_fovSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::fovChanged
+  );
   disconnect(
-      m_unitsDisplayType,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::unitsDisplayTypeIndexChanged);
+      m_unitsDisplayType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsDisplayTypeIndexChanged
+  );
   disconnect(
-      m_unitsGridType,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::unitsGridTypeIndexChanged);
+      m_unitsGridType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::unitsGridTypeIndexChanged
+  );
   disconnect(
-      m_metricConversationFactor,
-      &QLineEdit::textChanged,
-      this,
-      &ViewPreferencePane::metricConversationFactorChanged);
+      m_metricConversationFactor, &QLineEdit::textChanged, this, &ViewPreferencePane::metricConversationFactorChanged
+  );
   disconnect(
-      m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged);
+      m_showAxes, &QCheckBox::stateChanged, this, &ViewPreferencePane::showAxesChanged
+  );
   disconnect(
-      m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged);
+      m_enableMsaa, &QCheckBox::stateChanged, this, &ViewPreferencePane::enableMsaaChanged
+  );
   disconnect(
-      m_textureModeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::textureModeChanged);
+      m_textureModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureModeChanged
+  );
   disconnect(
-      m_textureBrowserIconSizeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::textureBrowserIconSizeChanged);
+      m_textureBrowserIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::textureBrowserIconSizeChanged
+  );
   disconnect(
-      m_autoBrightnessTypeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorFaceAutoBrightnessChanged);
+      m_autoBrightnessTypeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorFaceAutoBrightnessChanged
+  );
   disconnect(
-      m_gridWidthSlider,
-      &SliderWithLabel::valueChanged,
-      this,
-      &ViewPreferencePane::editorGridWithChanged);
+      m_gridWidthSlider, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorGridWithChanged
+  );
   disconnect(
-      m_rendererFontCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::renderFontFileChanged);
+      m_rendererFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::renderFontFileChanged
+  );
   disconnect(
-      m_rendererFontSizeCombo,
-      &QComboBox::currentTextChanged,
-      this,
-      &ViewPreferencePane::rendererFontSizeChanged);
+      m_rendererFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::rendererFontSizeChanged
+  );
   disconnect(
-      m_UIFontCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorUIFontFileChanged);
+      m_UIFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorUIFontFileChanged
+  );
   disconnect(
-      m_UIFontSizeCombo,
-      &QComboBox::currentTextChanged,
-      this,
-      &ViewPreferencePane::editorUIFontSizeChanged);
+      m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged
+  );
   disconnect(
-      m_ConsoleFontCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorConsoleFontFileChanged);
+      m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged
+  );
   disconnect(
-      m_ConsoleFontSizeCombo,
-      &QComboBox::currentTextChanged,
-      this,
-      &ViewPreferencePane::editorConsoleFontSizeChanged);
+      m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged
+  );
   disconnect(
-      m_ToolbarIconSizeCombo,
-      QOverload<int>::of(&QComboBox::currentIndexChanged),
-      this,
-      &ViewPreferencePane::editorToolbarIconSizeChanged);
+      m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged
+  );
 }
 
 bool ViewPreferencePane::doCanResetToDefaults() {
@@ -586,7 +513,7 @@ void ViewPreferencePane::doUpdateControls() {
   m_metricConversationFactor->setText(
       QString::asprintf("%.4f", pref(Preferences::MetricConversationFactor)));
 
-  m_gridWidthSlider->setValue(int(pref(Preferences::GridLineWidth)*100));
+  m_gridWidthSlider->setValue(int(pref(Preferences::GridLineWidth) * 100));
   m_autoBrightnessTypeCombo->setCurrentIndex(pref(Preferences::FaceAutoBrightness));
 
   const auto textureModeIndex = findTextureMode(
@@ -598,23 +525,23 @@ void ViewPreferencePane::doUpdateControls() {
   // m_themeCombo->setCurrentIndex(findThemeIndex(pref(Preferences::Theme)));
 
   const auto textureBrowserIconSize = pref(Preferences::TextureBrowserIconSize);
-  if (textureBrowserIconSize==0.25f) {
+  if (textureBrowserIconSize == 0.25f) {
     m_textureBrowserIconSizeCombo->setCurrentIndex(0);
-  } else if (textureBrowserIconSize==0.5f) {
+  } else if (textureBrowserIconSize == 0.5f) {
     m_textureBrowserIconSizeCombo->setCurrentIndex(1);
-  } else if (textureBrowserIconSize==1.5f) {
+  } else if (textureBrowserIconSize == 1.5f) {
     m_textureBrowserIconSizeCombo->setCurrentIndex(3);
-  } else if (textureBrowserIconSize==2.0f) {
+  } else if (textureBrowserIconSize == 2.0f) {
     m_textureBrowserIconSizeCombo->setCurrentIndex(4);
-  } else if (textureBrowserIconSize==2.5f) {
+  } else if (textureBrowserIconSize == 2.5f) {
     m_textureBrowserIconSizeCombo->setCurrentIndex(5);
-  } else if (textureBrowserIconSize==3.0f) {
+  } else if (textureBrowserIconSize == 3.0f) {
     m_textureBrowserIconSizeCombo->setCurrentIndex(6);
   } else {
     m_textureBrowserIconSizeCombo->setCurrentIndex(2);
   }
 
-  auto iconSize = (pref(Preferences::ToolBarIconsSize) - 14)/2;
+  auto iconSize = (pref(Preferences::ToolBarIconsSize) - 14) / 2;
   m_ToolbarIconSizeCombo->setCurrentIndex(iconSize);
 
   m_rendererFontSizeCombo->setCurrentText(
@@ -627,7 +554,7 @@ void ViewPreferencePane::doUpdateControls() {
   auto render_font = pref(Preferences::RendererFontPath);
   auto render_font_found = std::find(font_files.begin(), font_files.end(), render_font);
 
-  if (render_font_found!=font_files.end()) {
+  if (render_font_found != font_files.end()) {
     auto index = render_font_found - font_files.begin();
     m_rendererFontCombo->setCurrentIndex(int(index));
   }
@@ -635,7 +562,7 @@ void ViewPreferencePane::doUpdateControls() {
   auto ui_font = pref(Preferences::UIFontPath);
   auto ui_font_found = std::find(font_files.begin(), font_files.end(), ui_font);
 
-  if (ui_font_found!=font_files.end()) {
+  if (ui_font_found != font_files.end()) {
     auto index = ui_font_found - font_files.begin();
     m_UIFontCombo->setCurrentIndex(int(index));
   }
@@ -643,7 +570,7 @@ void ViewPreferencePane::doUpdateControls() {
   auto console_font = pref(Preferences::ConsoleFontPath);
   auto console_font_found = std::find(font_files.begin(), font_files.end(), console_font);
 
-  if (console_font_found!=font_files.end()) {
+  if (console_font_found != font_files.end()) {
     auto index = console_font_found - font_files.begin();
     m_ConsoleFontCombo->setCurrentIndex(int(index));
   }
@@ -656,8 +583,8 @@ bool ViewPreferencePane::doValidate() {
 }
 
 size_t ViewPreferencePane::findTextureMode(const int minFilter, const int magFilter) const {
-  for (size_t i = 0; i < TextureModes.size(); ++i) {
-    if (TextureModes[i].minFilter==minFilter && TextureModes[i].magFilter==magFilter) {
+  for (size_t i = 0; i < TextureModes.size(); ++ i) {
+    if (TextureModes[i].minFilter == minFilter && TextureModes[i].magFilter == magFilter) {
       return i;
     }
   }
@@ -672,7 +599,7 @@ void ViewPreferencePane::layoutChanged(const int index) {
 }
 
 void ViewPreferencePane::link2dCamerasChanged(const int state) {
-  const auto value = state==Qt::Checked;
+  const auto value = state == Qt::Checked;
   auto &prefs = PreferenceManager::instance();
   prefs.set(Preferences::Link2DCameras, value);
 }
@@ -723,13 +650,13 @@ void ViewPreferencePane::metricConversationFactorChanged(const QString &text) {
 }
 
 void ViewPreferencePane::showAxesChanged(const int state) {
-  const auto value = state==Qt::Checked;
+  const auto value = state == Qt::Checked;
   auto &prefs = PreferenceManager::instance();
   prefs.set(Preferences::ShowAxes, value);
 }
 
 void ViewPreferencePane::enableMsaaChanged(const int state) {
-  const auto value = state==Qt::Checked;
+  const auto value = state == Qt::Checked;
   auto &prefs = PreferenceManager::instance();
   prefs.set(Preferences::EnableMSAA, value);
 }
@@ -781,7 +708,7 @@ void ViewPreferencePane::renderFontFileChanged(const int index) {
   auto &prefs = PreferenceManager::instance();
 
   // default
-  if (index==0) {
+  if (index == 0) {
     prefs.resetToDefault(Preferences::RendererFontPath);
     prefs.resetToDefault(Preferences::RendererFontSize);
   } else {
@@ -811,7 +738,7 @@ void ViewPreferencePane::editorUIFontFileChanged(const int index) {
   auto &prefs = PreferenceManager::instance();
 
   // default
-  if (index==0) {
+  if (index == 0) {
     prefs.resetToDefault(Preferences::UIFontPath);
     prefs.resetToDefault(Preferences::UIFontSize);
   } else {
@@ -839,7 +766,7 @@ void ViewPreferencePane::editorConsoleFontFileChanged(int index) {
   auto &prefs = PreferenceManager::instance();
 
   // default
-  if (index==0) {
+  if (index == 0) {
     prefs.resetToDefault(Preferences::ConsoleFontPath);
     prefs.resetToDefault(Preferences::ConsoleFontSize);
   } else {
@@ -853,7 +780,7 @@ void ViewPreferencePane::editorToolbarIconSizeChanged(int index) {
   auto &prefs = PreferenceManager::instance();
 
   // start at font-size 14px
-  auto size = 14 + index*2;
+  auto size = 14 + index * 2;
   prefs.set(Preferences::ToolBarIconsSize, size);
 
   if (TrenchBroomApp::instance().getCurrentMapFrame()) {
@@ -870,6 +797,6 @@ void ViewPreferencePane::editorFaceAutoBrightnessChanged(int value) {
 
 void ViewPreferencePane::editorGridWithChanged(int value) {
   auto &prefs = PreferenceManager::instance();
-  prefs.set(Preferences::GridLineWidth, float(value)/100.0f);
+  prefs.set(Preferences::GridLineWidth, float(value) / 100.0f);
 }
 } // namespace TrenchBroom::View

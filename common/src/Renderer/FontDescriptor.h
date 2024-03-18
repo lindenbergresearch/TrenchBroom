@@ -32,11 +32,7 @@ private:
   unsigned char m_maxChar;
 
 public:
-  FontDescriptor(
-      const std::filesystem::path &path,
-      const size_t size,
-      unsigned char minChar = ' ',
-      unsigned char maxChar = '~');
+  FontDescriptor(const std::filesystem::path &path, const size_t size, unsigned char minChar = ' ', unsigned char maxChar = '~');
 
   int compare(const FontDescriptor &other) const;
 

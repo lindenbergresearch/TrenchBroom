@@ -39,27 +39,39 @@ class MapRenderer;
 namespace TrenchBroom::View {
 class ClipTool;
 
+
 class EdgeTool;
+
 
 class FaceTool;
 
+
 class GLContextManager;
+
 
 class Inspector;
 
+
 class MapDocument;
+
 
 class MapViewBar;
 
+
 enum class MapViewLayout;
+
 
 class MapViewToolBox;
 
+
 class MultiPaneMapView;
+
 
 class Tool;
 
+
 class VertexTool;
+
 
 class SwitchableMapViewContainer : public QWidget, public MapView {
 Q_OBJECT
@@ -79,11 +91,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  SwitchableMapViewContainer(
-      Logger *logger,
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  SwitchableMapViewContainer(Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
   ~SwitchableMapViewContainer() override;
 
@@ -185,8 +193,7 @@ private: // implement MapView interface
 
   void doSelectTall() override;
 
-  vm::vec3 doGetPasteObjectsDelta(
-      const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
+  vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
 
   void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
 

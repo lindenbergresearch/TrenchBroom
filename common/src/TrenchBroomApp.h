@@ -31,9 +31,12 @@
 #include <string>
 #include <vector>
 
+
 class QMenu;
 
+
 class QSettings;
+
 
 class QTimer;
 
@@ -43,18 +46,21 @@ class Logger;
 namespace View {
 class ExecutableEvent;
 
+
 class FrameManager;
+
 
 class RecentDocuments;
 
+
 class WelcomeWindow;
+
 
 class Timer {
 public:
   static const Timer appstart;
 
-  Timer()
-      : m_start(t_highres_clock::now()) {
+  Timer() : m_start(t_highres_clock::now()) {
   }
 
   void reset();
@@ -66,6 +72,7 @@ private:
   typedef std::chrono::duration<double, std::ratio<1>> t_duration_second;
   std::chrono::time_point<t_highres_clock> m_start;
 };
+
 
 class TrenchBroomApp : public QApplication {
 Q_OBJECT
@@ -176,10 +183,10 @@ signals:
   void recentDocumentsDidChange();
 };
 
+
 void setCrashReportGUIEnbled(bool guiEnabled);
 
-[[noreturn]] void reportCrashAndExit(
-    const std::string &stacktrace, const std::string &reason);
+[[noreturn]] void reportCrashAndExit(const std::string &stacktrace, const std::string &reason);
 
 bool isReportingCrash();
 } // namespace View

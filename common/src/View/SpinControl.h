@@ -41,8 +41,7 @@ public: // QDoubleSpinBox overrides
   QString textFromValue(double val) const override;
 
 public:
-  void setIncrements(
-      double regularIncrement, double shiftIncrement, double ctrlIncrement);
+  void setIncrements(double regularIncrement, double shiftIncrement, double ctrlIncrement);
 
   void setDigits(int minDigits, int maxDigits);
 

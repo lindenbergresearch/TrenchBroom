@@ -31,9 +31,12 @@ class Camera;
 namespace TrenchBroom::View {
 class MapViewActivationTracker;
 
+
 class MapViewBase;
 
+
 class MapViewContainer;
+
 
 class MapView : public ViewEffectsService {
 private:
@@ -54,8 +57,7 @@ public:
 
   void selectTall();
 
-  vm::vec3 pasteObjectsDelta(
-      const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const;
+  vm::vec3 pasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const;
 
   void reset2dCameras(const Renderer::Camera &masterCamera, bool animate);
 
@@ -80,8 +82,7 @@ public:
   void refreshViews();
 
 private:
-  virtual void doInstallActivationTracker(
-      MapViewActivationTracker &activationTracker) = 0;
+  virtual void doInstallActivationTracker(MapViewActivationTracker &activationTracker) = 0;
 
   virtual bool doGetIsCurrent() const = 0;
 
@@ -91,8 +92,7 @@ private:
 
   virtual void doSelectTall() = 0;
 
-  virtual vm::vec3 doGetPasteObjectsDelta(
-      const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const = 0;
+  virtual vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const = 0;
 
   virtual void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) = 0;
 

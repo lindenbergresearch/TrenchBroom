@@ -32,9 +32,8 @@ private:
   IndexedRenderable *m_wrappee;
 
 public:
-  IndexedRenderableWrapper(VboManager &, IndexedRenderable *wrappee)
-      : m_wrappee{wrappee} {
-    ensure(m_wrappee!=nullptr, "wrappee is null");
+  IndexedRenderableWrapper(VboManager &, IndexedRenderable *wrappee) : m_wrappee{wrappee} {
+    ensure(m_wrappee != nullptr, "wrappee is null");
   }
 
 private:
@@ -47,8 +46,8 @@ private:
   }
 };
 
-RenderBatch::RenderBatch(VboManager &vboManager)
-    : m_vboManager{vboManager} {
+
+RenderBatch::RenderBatch(VboManager &vboManager) : m_vboManager{vboManager} {
 }
 
 RenderBatch::~RenderBatch() {
@@ -95,7 +94,7 @@ void RenderBatch::render(RenderContext &renderContext) {
 }
 
 void RenderBatch::doAdd(Renderable *renderable) {
-  ensure(renderable!=nullptr, "renderable is null");
+  ensure(renderable != nullptr, "renderable is null");
   m_batch.push_back(renderable);
 }
 

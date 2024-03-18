@@ -23,6 +23,7 @@
 
 #include <cstdint>
 
+
 class QKeyEvent;
 
 namespace TrenchBroom {

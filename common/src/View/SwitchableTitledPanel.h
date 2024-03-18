@@ -25,11 +25,15 @@
 
 #include <array>
 
+
 class QStackedLayout;
 
 namespace TrenchBroom::View {
 class BorderLine;
+
+
 class ClickableTitleBar;
+
 
 class SwitchableTitledPanel : public QWidget {
 Q_OBJECT
@@ -45,17 +49,16 @@ private:
   std::array<SwitchablePanel, 2> m_panels;
 
 public:
-  explicit SwitchableTitledPanel(
-      const QString &title,
-      const std::array<QString, 2> &stateTexts,
-      QWidget *parent = nullptr);
+  explicit SwitchableTitledPanel(const QString &title, const std::array<QString, 2> &stateTexts, QWidget *parent = nullptr);
 
   QWidget *getPanel(size_t index) const;
 
   size_t currentIndex() const;
+
   void setCurrentIndex(size_t index);
 
   QByteArray saveState() const;
+
   bool restoreState(const QByteArray &state);
 };
 

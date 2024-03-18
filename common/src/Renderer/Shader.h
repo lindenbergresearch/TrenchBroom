@@ -50,5 +50,6 @@ deleteCopy(Shader);
   void attach(GLuint programId) const;
 };
 
+
 Result<Shader> loadShader(const std::filesystem::path &path, GLenum type);
 } // namespace TrenchBroom::Renderer

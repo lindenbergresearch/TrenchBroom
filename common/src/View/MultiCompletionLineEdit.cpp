@@ -29,12 +29,10 @@
 
 namespace TrenchBroom {
 namespace View {
-MultiCompletionLineEdit::MultiCompletionLineEdit(QWidget *parent)
-    : MultiCompletionLineEdit(QString(), parent) {
+MultiCompletionLineEdit::MultiCompletionLineEdit(QWidget *parent) : MultiCompletionLineEdit(QString(), parent) {
 }
 
-MultiCompletionLineEdit::MultiCompletionLineEdit(const QString &contents, QWidget *parent)
-    : QLineEdit(contents, parent), m_multiCompleter(nullptr) {
+MultiCompletionLineEdit::MultiCompletionLineEdit(const QString &contents, QWidget *parent) : QLineEdit(contents, parent), m_multiCompleter(nullptr) {
   auto *shortcut = new QShortcut(
       QKeySequence(
 #ifdef __APPLE__
@@ -42,10 +40,12 @@ MultiCompletionLineEdit::MultiCompletionLineEdit(const QString &contents, QWidge
 #else
               Qt::CTRL
 #endif
-              + Qt::Key_Space),
-      this);
+              + Qt::Key_Space
+      ), this
+  );
   connect(
-      shortcut, &QShortcut::activated, this, &MultiCompletionLineEdit::triggerCompletion);
+      shortcut, &QShortcut::activated, this, &MultiCompletionLineEdit::triggerCompletion
+  );
 }
 
 MultiCompletionLineEdit::~MultiCompletionLineEdit() {
@@ -57,8 +57,7 @@ void MultiCompletionLineEdit::setWordDelimiter(const QRegularExpression &delimit
   setWordDelimiters(delimiters, delimiters);
 }
 
-void MultiCompletionLineEdit::setWordDelimiters(
-    const QRegularExpression &leftDelimiter, const QRegularExpression &rightDelimiter) {
+void MultiCompletionLineEdit::setWordDelimiters(const QRegularExpression &leftDelimiter, const QRegularExpression &rightDelimiter) {
   m_leftDelimiter = leftDelimiter;
   m_rightDelimiter = rightDelimiter;
 }
@@ -66,13 +65,11 @@ void MultiCompletionLineEdit::setWordDelimiters(
 void MultiCompletionLineEdit::setMultiCompleter(QCompleter *completer) {
   delete m_multiCompleter;
   m_multiCompleter = completer;
-  if (m_multiCompleter!=nullptr) {
+  if (m_multiCompleter != nullptr) {
     m_multiCompleter->setWidget(this);
     connect(
-        m_multiCompleter,
-        QOverload<const QString &>::of(&QCompleter::activated),
-        this,
-        &MultiCompletionLineEdit::insertCompletion);
+        m_multiCompleter, QOverload<const QString &>::of(&QCompleter::activated), this, &MultiCompletionLineEdit::insertCompletion
+    );
   }
 }
 
@@ -80,11 +77,11 @@ void MultiCompletionLineEdit::keyPressEvent(QKeyEvent *event) {
   QLineEdit::keyPressEvent(event);
 
   const auto t = event->text();
-  updateCompleter(!t.isEmpty() && t[0].isPrint());
+  updateCompleter(! t.isEmpty() && t[0].isPrint());
 }
 
 void MultiCompletionLineEdit::updateCompleter(const bool showCompleter) {
-  if (!m_multiCompleter) {
+  if (! m_multiCompleter) {
     return;
   }
 
@@ -107,16 +104,13 @@ void MultiCompletionLineEdit::updateCompleter(const bool showCompleter) {
   if (showCompleter) {
     QRect cr = cursorRect();
     cr.setWidth(
-        m_multiCompleter->popup()->sizeHintForColumn(0)
-            + m_multiCompleter->popup()->verticalScrollBar()->sizeHint().width());
+        m_multiCompleter->popup()->sizeHintForColumn(0) + m_multiCompleter->popup()->verticalScrollBar()->sizeHint().width());
     m_multiCompleter->complete(cr);
   }
 }
 
 int MultiCompletionLineEdit::findLeftBoundary() const {
-  if (
-      cursorPosition()==0 || m_leftDelimiter.pattern().isEmpty()
-          || m_rightDelimiter.pattern().isEmpty()) {
+  if (cursorPosition() == 0 || m_leftDelimiter.pattern().isEmpty() || m_rightDelimiter.pattern().isEmpty()) {
     return 0;
   }
 
@@ -125,9 +119,9 @@ int MultiCompletionLineEdit::findLeftBoundary() const {
   const auto lastLeftDelimiter = findLastMatch(prefix, m_leftDelimiter);
   const auto lastRightDelimiter = findLastMatch(prefix, m_rightDelimiter);
 
-  if (lastLeftDelimiter==-1) {
+  if (lastLeftDelimiter == - 1) {
     return cursorPosition();
-  } else if (lastRightDelimiter==-1) {
+  } else if (lastRightDelimiter == - 1) {
     return lastLeftDelimiter;
   } else if (lastRightDelimiter > lastLeftDelimiter) {
     return cursorPosition();
@@ -138,9 +132,7 @@ int MultiCompletionLineEdit::findLeftBoundary() const {
 
 int MultiCompletionLineEdit::findRightBoundary() const {
   const auto &t = this->text();
-  if (
-      cursorPosition()==t.length() || m_leftDelimiter.pattern().isEmpty()
-          || m_rightDelimiter.pattern().isEmpty()) {
+  if (cursorPosition() == t.length() || m_leftDelimiter.pattern().isEmpty() || m_rightDelimiter.pattern().isEmpty()) {
     return t.length();
   }
 
@@ -149,9 +141,9 @@ int MultiCompletionLineEdit::findRightBoundary() const {
   const auto firstLeftDelimiter = findFirstMatch(suffix, m_leftDelimiter);
   const auto firstRightDelimiter = findFirstMatch(suffix, m_rightDelimiter);
 
-  if (firstRightDelimiter==-1) {
+  if (firstRightDelimiter == - 1) {
     return cursorPosition();
-  } else if (firstLeftDelimiter==-1) {
+  } else if (firstLeftDelimiter == - 1) {
     return cursorPosition() + firstRightDelimiter + 1;
   } else if (firstLeftDelimiter < firstRightDelimiter) {
     return cursorPosition();
@@ -160,21 +152,19 @@ int MultiCompletionLineEdit::findRightBoundary() const {
   }
 }
 
-int MultiCompletionLineEdit::findFirstMatch(
-    const QString &str, const QRegularExpression &expression) const {
+int MultiCompletionLineEdit::findFirstMatch(const QString &str, const QRegularExpression &expression) const {
   auto matches = expression.globalMatch(str);
-  if (!matches.hasNext() || !matches.isValid()) {
-    return -1;
+  if (! matches.hasNext() || ! matches.isValid()) {
+    return - 1;
   }
 
   return matches.next().capturedStart();
 }
 
-int MultiCompletionLineEdit::findLastMatch(
-    const QString &str, const QRegularExpression &expression) const {
+int MultiCompletionLineEdit::findLastMatch(const QString &str, const QRegularExpression &expression) const {
   auto matches = expression.globalMatch(str);
-  if (!matches.hasNext() || !matches.isValid()) {
-    return -1;
+  if (! matches.hasNext() || ! matches.isValid()) {
+    return - 1;
   }
 
   auto lastMatch = matches.next();

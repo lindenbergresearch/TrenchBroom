@@ -30,11 +30,15 @@ class Logger;
 namespace View {
 class Console;
 
+
 class IssueBrowser;
+
 
 class MapDocument;
 
+
 class TabBook;
+
 
 class InfoPanel : public QWidget {
 Q_OBJECT

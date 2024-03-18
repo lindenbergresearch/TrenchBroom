@@ -25,7 +25,9 @@
 
 #include <memory>
 
+
 class QAbstractButton;
+
 
 class QPoint;
 
@@ -37,9 +39,12 @@ struct CompilationProfile;
 namespace View {
 class CompilationProfileListBox;
 
+
 class CompilationProfileEditor;
 
+
 class MapDocument;
+
 
 /**
  * Editor widget for all profiles in a compilation config.
@@ -56,10 +61,7 @@ private:
   QAbstractButton *m_removeProfileButton{nullptr};
 
 public:
-  CompilationProfileManager(
-      std::weak_ptr<MapDocument> document,
-      Model::CompilationConfig config,
-      QWidget *parent = nullptr);
+  CompilationProfileManager(std::weak_ptr<MapDocument> document, Model::CompilationConfig config, QWidget *parent = nullptr);
 
   const Model::CompilationProfile *selectedProfile() const;
 
@@ -80,8 +82,7 @@ private slots:
 
   void duplicateProfile(const Model::CompilationProfile &profile);
 
-  void profileContextMenuRequested(
-      const QPoint &globalPos, Model::CompilationProfile &profile);
+  void profileContextMenuRequested(const QPoint &globalPos, Model::CompilationProfile &profile);
 
   void profileSelectionChanged();
 

@@ -27,7 +27,10 @@
 namespace TrenchBroom {
 namespace Model {
 class IssueQuickFix;
+
+
 class Validator;
+
 
 class ValidatorRegistry {
 private:
@@ -37,9 +40,11 @@ public:
   ~ValidatorRegistry();
 
   std::vector<const Validator *> registeredValidators() const;
+
   std::vector<const IssueQuickFix *> quickFixes(IssueType issueTypes) const;
 
   void registerValidator(const std::unique_ptr<Validator> validator);
+
   void unregisterAllValidators();
 };
 } // namespace Model

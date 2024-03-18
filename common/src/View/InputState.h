@@ -39,9 +39,7 @@ static const ModifierKeyState MKDontCare = 1 << 3;
 } // namespace ModifierKeys
 
 typedef enum {
-  MK_Yes,
-  MK_No,
-  MK_DontCare
+  MK_Yes, MK_No, MK_DontCare
 } ModifierKeyPressed;
 
 using MouseButtonState = unsigned int;
@@ -82,13 +80,11 @@ public:
   bool modifierKeysPressed(ModifierKeyState keys) const;
 
   bool checkModifierKeys(
-      ModifierKeyState key1,
-      ModifierKeyState key2 = ModifierKeys::MKDontCare,
-      ModifierKeyState key3 = ModifierKeys::MKDontCare,
-      ModifierKeyState key4 = ModifierKeys::MKDontCare) const;
+      ModifierKeyState key1, ModifierKeyState key2 = ModifierKeys::MKDontCare, ModifierKeyState key3 = ModifierKeys::MKDontCare,
+      ModifierKeyState key4 = ModifierKeys::MKDontCare
+  ) const;
 
-  bool checkModifierKeys(
-      ModifierKeyPressed ctrl, ModifierKeyPressed alt, ModifierKeyPressed shift) const;
+  bool checkModifierKeys(ModifierKeyPressed ctrl, ModifierKeyPressed alt, ModifierKeyPressed shift) const;
 
   bool checkModifierKey(ModifierKeyPressed state, ModifierKeyState key) const;
 
@@ -129,8 +125,7 @@ public:
 
   void clearMouseButtons();
 
-  void mouseMove(
-      const float mouseX, const float mouseY, const float mouseDX, const float mouseDY);
+  void mouseMove(const float mouseX, const float mouseY, const float mouseDX, const float mouseDY);
 
   void scroll(const float scrollX, const float scrollY);
 

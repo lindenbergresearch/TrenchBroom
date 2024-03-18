@@ -44,9 +44,12 @@ class Camera;
 namespace View {
 class Grid;
 
+
 class MapDocument;
 
+
 class ScaleObjectsToolPage;
+
 
 /**
  * Identifies the side of a bbox using a normal. The normal will be one of +/- 1.0 along
@@ -65,6 +68,7 @@ public:
   bool operator==(const BBoxSide &other) const;
 };
 
+
 /**
  * Identifies a bbox corner, using a point on a bbox whose corners are at +/- 1.0
  * (i.e. a 2x2x2 box centered at 0, 0, 0).
@@ -80,6 +84,7 @@ public:
   bool operator==(const BBoxCorner &other) const;
 };
 
+
 /**
  * Identifies a directed edge of a bbox, using points on a bbox whose corners are at
  * +/- 1.0 (i.e. a 2x2x2 box centered at 0, 0, 0).
@@ -94,10 +99,11 @@ public:
   bool operator==(const BBoxEdge &other) const;
 };
 
+
 enum class AnchorPos {
-  Opposite,
-  Center
+  Opposite, Center
 };
+
 
 /**
  * A set containing a subset of (X, Y, Z). Identifies which axes will be scaled.
@@ -124,6 +130,7 @@ public:
 
   bool operator!=(const ProportionalAxes &other) const;
 };
+
 
 std::vector<BBoxSide> allSides();
 
@@ -155,12 +162,7 @@ vm::vec3 centerForBBoxSide(const vm::bbox3 &box, const BBoxSide &side);
  * Returns BBox3(Vec3::Null, Vec3::Null) if the move could not be completed
  * because the specified delta either collapses the bbox, or inverts it.
  */
-vm::bbox3 moveBBoxSide(
-    const vm::bbox3 &in,
-    const BBoxSide &side,
-    const vm::vec3 &delta,
-    const ProportionalAxes &proportional,
-    AnchorPos anchor);
+vm::bbox3 moveBBoxSide(const vm::bbox3 &in, const BBoxSide &side, const vm::vec3 &delta, const ProportionalAxes &proportional, AnchorPos anchor);
 
 /**
  * Computes a new bbox after moving the given corner by the given delta.
@@ -170,8 +172,7 @@ vm::bbox3 moveBBoxSide(
  * Returns BBox3(Vec3::Null, Vec3::Null) if the move could not be completed
  * because the specified delta either collapses the bbox, or inverts it.
  */
-vm::bbox3 moveBBoxCorner(
-    const vm::bbox3 &in, const BBoxCorner &corner, const vm::vec3 &delta, AnchorPos anchor);
+vm::bbox3 moveBBoxCorner(const vm::bbox3 &in, const BBoxCorner &corner, const vm::vec3 &delta, AnchorPos anchor);
 
 /**
  * Computes a new bbox after moving the specified edge by the specified delta.
@@ -182,12 +183,7 @@ vm::bbox3 moveBBoxCorner(
  * Returns BBox3(Vec3::Null, Vec3::Null) if the move could not be completed
  * because the specified delta either collapses the bbox, or inverts it.
  */
-vm::bbox3 moveBBoxEdge(
-    const vm::bbox3 &in,
-    const BBoxEdge &edge,
-    const vm::vec3 &delta,
-    const ProportionalAxes &proportional,
-    AnchorPos anchor);
+vm::bbox3 moveBBoxEdge(const vm::bbox3 &in, const BBoxEdge &edge, const vm::vec3 &delta, const ProportionalAxes &proportional, AnchorPos anchor);
 
 /**
  * Returns the line through the bbox that an invisible handle should be dragged, assuming
@@ -204,11 +200,8 @@ vm::line3 handleLineForHit(const vm::bbox3 &bboxAtDragStart, const Model::Hit &h
  * side, edge, or corner handle was grabbed.
  */
 vm::bbox3 moveBBoxForHit(
-    const vm::bbox3 &bboxAtDragStart,
-    const Model::Hit &dragStartHit,
-    const vm::vec3 &delta,
-    const ProportionalAxes &proportional,
-    AnchorPos anchor);
+    const vm::bbox3 &bboxAtDragStart, const Model::Hit &dragStartHit, const vm::vec3 &delta, const ProportionalAxes &proportional, AnchorPos anchor
+);
 
 struct BackSide {
   FloatType distAlongRay;
@@ -225,8 +218,8 @@ struct BackSide {
  * Returns the point on the pick ray (stored as a distance along the ray) that is closest
  * to the selected face, as well as that face's normal.
  */
-BackSide pickBackSideOfBox(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, const vm::bbox3 &box);
+BackSide pickBackSideOfBox(const vm::ray3 &pickRay, const Renderer::Camera &camera, const vm::bbox3 &box);
+
 
 class ScaleObjectsTool : public Tool {
 public:
@@ -257,20 +250,11 @@ public:
 
   bool applies() const;
 
-  void pickBackSides(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const;
+  void pickBackSides(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
-  void pick2D(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const;
+  void pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
-  void pick3D(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult) const;
+  void pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
   vm::bbox3 bounds() const;

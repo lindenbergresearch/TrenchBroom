@@ -45,12 +45,10 @@
 
 namespace TrenchBroom {
 namespace View {
-const Model::HitType::Type ShearObjectsTool::ShearToolSideHitType =
-    Model::HitType::freeType();
+const Model::HitType::Type ShearObjectsTool::ShearToolSideHitType = Model::HitType::freeType();
 
-ShearObjectsTool::ShearObjectsTool(std::weak_ptr<MapDocument> document)
-    : Tool(false), m_document(std::move(document)), m_resizing(false), m_constrainVertical(false),
-      m_dragStartHit(Model::Hit::NoHit) {
+ShearObjectsTool::ShearObjectsTool(std::weak_ptr<MapDocument> document) :
+    Tool(false), m_document(std::move(document)), m_resizing(false), m_constrainVertical(false), m_dragStartHit(Model::Hit::NoHit) {
 }
 
 ShearObjectsTool::~ShearObjectsTool() = default;
@@ -61,11 +59,10 @@ const Grid &ShearObjectsTool::grid() const {
 
 bool ShearObjectsTool::applies() const {
   auto document = kdl::mem_lock(m_document);
-  return !document->selectedNodes().empty();
+  return ! document->selectedNodes().empty();
 }
 
-void ShearObjectsTool::pickBackSides(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+void ShearObjectsTool::pickBackSides(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
   // select back sides. Used for both 2D and 3D.
   if (pickResult.empty()) {
     const auto result = pickBackSideOfBox(pickRay, camera, bounds());
@@ -73,17 +70,15 @@ void ShearObjectsTool::pickBackSides(
     // The hit point is the closest point on the pick ray to one of the edges of the face.
     // For face dragging, we'll project the pick ray onto the line through this point and
     // having the face normal.
-    assert(result.pickedSideNormal!=vm::vec3::zero());
-    pickResult.addHit(Model::Hit(
-        ShearToolSideHitType,
-        result.distAlongRay,
-        vm::point_at_distance(pickRay, result.distAlongRay),
-        BBoxSide{result.pickedSideNormal}));
+    assert(result.pickedSideNormal != vm::vec3::zero());
+    pickResult.addHit(
+        Model::Hit(
+            ShearToolSideHitType, result.distAlongRay, vm::point_at_distance(pickRay, result.distAlongRay), BBoxSide{result.pickedSideNormal}
+        ));
   }
 }
 
-void ShearObjectsTool::pick2D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+void ShearObjectsTool::pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
   using namespace Model::HitFilters;
 
   const vm::bbox3 &myBounds = bounds();
@@ -97,13 +92,12 @@ void ShearObjectsTool::pick2D(
 
   pickBackSides(pickRay, camera, localPickResult);
 
-  if (!localPickResult.empty()) {
+  if (! localPickResult.empty()) {
     pickResult.addHit(localPickResult.all().front());
   }
 }
 
-void ShearObjectsTool::pick3D(
-    const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
+void ShearObjectsTool::pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) {
   using namespace Model::HitFilters;
 
   const auto &myBounds = bounds();
@@ -122,17 +116,18 @@ void ShearObjectsTool::pick3D(
   for (const auto &side : allSides()) {
     const auto poly = polygonForBBoxSide(myBounds, side);
 
-    const auto dist =
-        vm::intersect_ray_polygon(pickRay, std::begin(poly), std::end(poly));
-    if (!vm::is_nan(dist)) {
-      localPickResult.addHit(Model::Hit(
-          ShearToolSideHitType, dist, vm::point_at_distance(pickRay, dist), side));
+    const auto dist = vm::intersect_ray_polygon(pickRay, std::begin(poly), std::end(poly));
+    if (! vm::is_nan(dist)) {
+      localPickResult.addHit(
+          Model::Hit(
+              ShearToolSideHitType, dist, vm::point_at_distance(pickRay, dist), side
+          ));
     }
   }
 
   pickBackSides(pickRay, camera, localPickResult);
 
-  if (!localPickResult.empty()) {
+  if (! localPickResult.empty()) {
     pickResult.addHit(localPickResult.all().front());
   }
 }
@@ -149,7 +144,7 @@ bool ShearObjectsTool::hasDragPolygon() const {
 }
 
 vm::polygon3f ShearObjectsTool::dragPolygon() const {
-  if (m_dragStartHit.type()==ShearToolSideHitType) {
+  if (m_dragStartHit.type() == ShearToolSideHitType) {
     const auto side = m_dragStartHit.target<BBoxSide>();
     return vm::polygon3f(polygonForBBoxSide(bounds(), side));
   }
@@ -168,8 +163,8 @@ vm::bbox3 ShearObjectsTool::bboxAtDragStart() const {
 
 void ShearObjectsTool::startShearWithHit(const Model::Hit &hit) {
   ensure(hit.isMatch(), "must start with matching hit");
-  ensure(hit.type()==ShearToolSideHitType, "wrong hit type");
-  ensure(!m_resizing, "must not be resizing already");
+  ensure(hit.type() == ShearToolSideHitType, "wrong hit type");
+  ensure(! m_resizing, "must not be resizing already");
 
   m_bboxAtDragStart = bounds();
   m_dragStartHit = hit;
@@ -208,7 +203,7 @@ void ShearObjectsTool::shearByDelta(const vm::vec3 &delta) {
 
   auto document = kdl::mem_lock(m_document);
 
-  if (!vm::is_zero(delta, vm::C::almost_zero())) {
+  if (! vm::is_zero(delta, vm::C::almost_zero())) {
     const BBoxSide side = m_dragStartHit.target<BBoxSide>();
     document->shearObjects(bounds(), side.normal, delta);
   }
@@ -219,12 +214,12 @@ const Model::Hit &ShearObjectsTool::dragStartHit() const {
 }
 
 vm::mat4x4 ShearObjectsTool::bboxShearMatrix() const {
-  if (!m_resizing) {
+  if (! m_resizing) {
     return vm::mat4x4::identity();
   }
 
   // happens if you cmd+drag on an edge or corner
-  if (m_dragStartHit.type()!=ShearToolSideHitType) {
+  if (m_dragStartHit.type() != ShearToolSideHitType) {
     return vm::mat4x4::identity();
   }
 
@@ -234,7 +229,7 @@ vm::mat4x4 ShearObjectsTool::bboxShearMatrix() const {
 
 vm::polygon3f ShearObjectsTool::shearHandle() const {
   // happens if you cmd+drag on an edge or corner
-  if (m_dragStartHit.type()!=ShearToolSideHitType) {
+  if (m_dragStartHit.type() != ShearToolSideHitType) {
     return vm::polygon3f();
   }
 
@@ -253,8 +248,8 @@ void ShearObjectsTool::updatePickedSide(const Model::PickResult &pickResult) {
 
   // extract the highlighted handle from the hit here, and only refresh views if it
   // changed
-  if (hit.type()==ShearToolSideHitType && m_dragStartHit.type()==ShearToolSideHitType) {
-    if (hit.target<BBoxSide>()==m_dragStartHit.target<BBoxSide>()) {
+  if (hit.type() == ShearToolSideHitType && m_dragStartHit.type() == ShearToolSideHitType) {
+    if (hit.target<BBoxSide>() == m_dragStartHit.target<BBoxSide>()) {
       return;
     }
   }

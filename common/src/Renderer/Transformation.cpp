@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-Transformation::Transformation(
-    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
+Transformation::Transformation(const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
   pushTransformation(projection, view, model);
 }
 
@@ -37,21 +36,21 @@ Transformation::~Transformation() {
   if (m_projectionStack.size() > 1)
     loadProjectionMatrix(m_projectionStack.front());
   if (m_viewStack.size() > 1 || m_modelStack.size() > 1)
-    loadModelViewMatrix(m_viewStack.front()*m_modelStack.front());
+    loadModelViewMatrix(m_viewStack.front() * m_modelStack.front());
 }
 
 const vm::mat4x4f &Transformation::projectionMatrix() const {
-  assert(!m_projectionStack.empty());
+  assert(! m_projectionStack.empty());
   return m_projectionStack.back();
 }
 
 const vm::mat4x4f &Transformation::viewMatrix() const {
-  assert(!m_viewStack.empty());
+  assert(! m_viewStack.empty());
   return m_viewStack.back();
 }
 
 const vm::mat4x4f &Transformation::modelMatrix() const {
-  assert(!m_modelStack.empty());
+  assert(! m_modelStack.empty());
   return m_modelStack.back();
 }
 
@@ -60,14 +59,13 @@ Transformation Transformation::slice() const {
       m_projectionStack.back(), m_viewStack.back(), m_modelStack.back());
 }
 
-void Transformation::pushTransformation(
-    const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
+void Transformation::pushTransformation(const vm::mat4x4f &projection, const vm::mat4x4f &view, const vm::mat4x4f &model) {
   m_projectionStack.push_back(projection);
   m_viewStack.push_back(view);
   m_modelStack.push_back(model);
 
   loadProjectionMatrix(m_projectionStack.back());
-  loadModelViewMatrix(m_viewStack.back()*m_modelStack.back());
+  loadModelViewMatrix(m_viewStack.back() * m_modelStack.back());
 }
 
 void Transformation::popTransformation() {
@@ -80,23 +78,23 @@ void Transformation::popTransformation() {
   m_modelStack.pop_back();
 
   loadProjectionMatrix(m_projectionStack.back());
-  loadModelViewMatrix(m_viewStack.back()*m_modelStack.back());
+  loadModelViewMatrix(m_viewStack.back() * m_modelStack.back());
 }
 
 void Transformation::pushModelMatrix(const vm::mat4x4f &matrix) {
-  m_modelStack.push_back(m_modelStack.back()*matrix);
-  loadModelViewMatrix(m_viewStack.back()*m_modelStack.back());
+  m_modelStack.push_back(m_modelStack.back() * matrix);
+  loadModelViewMatrix(m_viewStack.back() * m_modelStack.back());
 }
 
 void Transformation::replaceAndPushModelMatrix(const vm::mat4x4f &matrix) {
   m_modelStack.push_back(matrix);
-  loadModelViewMatrix(m_viewStack.back()*m_modelStack.back());
+  loadModelViewMatrix(m_viewStack.back() * m_modelStack.back());
 }
 
 void Transformation::popModelMatrix() {
   assert(m_modelStack.size() > 1);
   m_modelStack.pop_back();
-  loadModelViewMatrix(m_viewStack.back()*m_modelStack.back());
+  loadModelViewMatrix(m_viewStack.back() * m_modelStack.back());
 }
 
 void Transformation::loadProjectionMatrix(const vm::mat4x4f &matrix) {
@@ -110,11 +108,8 @@ void Transformation::loadModelViewMatrix(const vm::mat4x4f &matrix) {
 }
 
 ReplaceTransformation::ReplaceTransformation(
-    Transformation &transformation,
-    const vm::mat4x4f &projectionMatrix,
-    const vm::mat4x4f &viewMatrix,
-    const vm::mat4x4f &modelMatrix)
-    : m_transformation(transformation) {
+    Transformation &transformation, const vm::mat4x4f &projectionMatrix, const vm::mat4x4f &viewMatrix, const vm::mat4x4f &modelMatrix
+) : m_transformation(transformation) {
   m_transformation.pushTransformation(projectionMatrix, viewMatrix, modelMatrix);
 }
 
@@ -122,9 +117,7 @@ ReplaceTransformation::~ReplaceTransformation() {
   m_transformation.popTransformation();
 }
 
-MultiplyModelMatrix::MultiplyModelMatrix(
-    Transformation &transformation, const vm::mat4x4f &modelMatrix)
-    : m_transformation(transformation) {
+MultiplyModelMatrix::MultiplyModelMatrix(Transformation &transformation, const vm::mat4x4f &modelMatrix) : m_transformation(transformation) {
   m_transformation.pushModelMatrix(modelMatrix);
 }
 
@@ -132,9 +125,7 @@ MultiplyModelMatrix::~MultiplyModelMatrix() {
   m_transformation.popModelMatrix();
 }
 
-ReplaceModelMatrix::ReplaceModelMatrix(
-    Transformation &transformation, const vm::mat4x4f &modelMatrix)
-    : m_transformation(transformation) {
+ReplaceModelMatrix::ReplaceModelMatrix(Transformation &transformation, const vm::mat4x4f &modelMatrix) : m_transformation(transformation) {
   m_transformation.replaceAndPushModelMatrix(modelMatrix);
 }
 

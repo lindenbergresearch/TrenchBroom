@@ -52,8 +52,7 @@
 
 namespace TrenchBroom::Model {
 
-GroupNode::GroupNode(Group group)
-    : m_group{std::move(group)} {
+GroupNode::GroupNode(Group group) : m_group{std::move(group)} {
 }
 
 const Group &GroupNode::group() const {
@@ -67,25 +66,25 @@ Group GroupNode::setGroup(Group group) {
 }
 
 bool GroupNode::opened() const {
-  return m_editState==EditState::Open;
+  return m_editState == EditState::Open;
 }
 
 bool GroupNode::hasOpenedDescendant() const {
-  return m_editState==EditState::DescendantOpen;
+  return m_editState == EditState::DescendantOpen;
 }
 
 bool GroupNode::closed() const {
-  return m_editState==EditState::Closed;
+  return m_editState == EditState::Closed;
 }
 
 void GroupNode::open() {
-  assert(m_editState==EditState::Closed);
+  assert(m_editState == EditState::Closed);
   setEditState(EditState::Open);
   openAncestors();
 }
 
 void GroupNode::close() {
-  assert(m_editState==EditState::Open);
+  assert(m_editState == EditState::Open);
   setEditState(EditState::Closed);
   closeAncestors();
 }
@@ -115,18 +114,16 @@ void GroupNode::setEditState(const EditState editState) {
 }
 
 void GroupNode::setAncestorEditState(const EditState editState) {
-  visitParent(kdl::overload(
-      [=](auto &&thisLambda, WorldNode *world) -> void { world->visitParent(thisLambda); },
-      [=](auto &&thisLambda, LayerNode *layer) -> void { layer->visitParent(thisLambda); },
-      [=](auto &&thisLambda, GroupNode *group) -> void {
-        group->setEditState(editState);
-        group->visitParent(thisLambda);
-      },
-      [=](
-          auto &&thisLambda, EntityNode *entity) -> void { entity->visitParent(thisLambda); },
-      [=](auto &&thisLambda, BrushNode *brush) -> void { brush->visitParent(thisLambda); },
-      [=](
-          auto &&thisLambda, PatchNode *patch) -> void { patch->visitParent(thisLambda); }));
+  visitParent(
+      kdl::overload(
+          [=](auto &&thisLambda, WorldNode *world) -> void { world->visitParent(thisLambda); },
+          [=](auto &&thisLambda, LayerNode *layer) -> void { layer->visitParent(thisLambda); }, [=](auto &&thisLambda, GroupNode *group) -> void {
+            group->setEditState(editState);
+            group->visitParent(thisLambda);
+          }, [=](auto &&thisLambda, EntityNode *entity) -> void { entity->visitParent(thisLambda); },
+          [=](auto &&thisLambda, BrushNode *brush) -> void { brush->visitParent(thisLambda); },
+          [=](auto &&thisLambda, PatchNode *patch) -> void { patch->visitParent(thisLambda); }
+      ));
 }
 
 void GroupNode::openAncestors() {
@@ -142,14 +139,14 @@ const std::string &GroupNode::doGetName() const {
 }
 
 const vm::bbox3 &GroupNode::doGetLogicalBounds() const {
-  if (!m_boundsValid) {
+  if (! m_boundsValid) {
     validateBounds();
   }
   return m_logicalBounds;
 }
 
 const vm::bbox3 &GroupNode::doGetPhysicalBounds() const {
-  if (!m_boundsValid) {
+  if (! m_boundsValid) {
     validateBounds();
   }
   return m_physicalBounds;
@@ -159,8 +156,7 @@ FloatType GroupNode::doGetProjectedArea(const vm::axis::type) const {
   return static_cast<FloatType>(0);
 }
 
-Node *GroupNode::doClone(
-    const vm::bbox3 & /* worldBounds */, const SetLinkId setLinkIds) const {
+Node *GroupNode::doClone(const vm::bbox3 & /* worldBounds */, const SetLinkId setLinkIds) const {
   auto result = std::make_unique<GroupNode>(m_group);
   result->cloneLinkId(*this, setLinkIds);
   cloneAttributes(result.get());
@@ -172,8 +168,7 @@ namespace {
  *  or any of its descendants have the same link id.
  */
 bool checkRecursiveLinkedGroups(const Node &parentNode, const GroupNode &groupNodeToAdd) {
-  const auto ancestorLinkedGroupIds =
-      kdl::vec_sort(collectParentLinkedGroupIds(parentNode));
+  const auto ancestorLinkedGroupIds = kdl::vec_sort(collectParentLinkedGroupIds(parentNode));
   const auto linkedGroupIdsToAdd = collectLinkedGroupIds(groupNodeToAdd);
 
   return kdl::set_has_shared_element(ancestorLinkedGroupIds, linkedGroupIdsToAdd);
@@ -181,15 +176,12 @@ bool checkRecursiveLinkedGroups(const Node &parentNode, const GroupNode &groupNo
 } // namespace
 
 bool GroupNode::doCanAddChild(const Node *child) const {
-  return child->accept(kdl::overload(
-      [](const WorldNode *) { return false; },
-      [](const LayerNode *) { return false; },
-      [&](const GroupNode *groupNode) {
-        return !checkRecursiveLinkedGroups(*this, *groupNode);
-      },
-      [](const EntityNode *) { return true; },
-      [](const BrushNode *) { return true; },
-      [](const PatchNode *) { return true; }));
+  return child->accept(
+      kdl::overload(
+          [](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [&](const GroupNode *groupNode) {
+            return ! checkRecursiveLinkedGroups(*this, *groupNode);
+          }, [](const EntityNode *) { return true; }, [](const BrushNode *) { return true; }, [](const PatchNode *) { return true; }
+      ));
 }
 
 bool GroupNode::doCanRemoveChild(const Node * /* child */) const {

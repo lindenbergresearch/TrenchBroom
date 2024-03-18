@@ -28,9 +28,16 @@
 
 namespace TrenchBroom::IO {
 class BufferedReader;
+
+
 class BufferReaderSource;
+
+
 class CFile;
+
+
 class ReaderSource;
+
 
 /**
  * Accesses information from a stream of binary data. The underlying stream is represented
@@ -212,8 +219,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T, typename R>
-  R read() {
+  template<typename T, typename R> R read() {
     T result;
     read(reinterpret_cast<char *>(&result), sizeof(T));
     return static_cast<R>(result);
@@ -227,8 +233,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  char readChar() {
+  template<typename T> char readChar() {
     return read<T, char>();
   }
 
@@ -240,8 +245,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  unsigned char readUnsignedChar() {
+  template<typename T> unsigned char readUnsignedChar() {
     return read<T, unsigned char>();
   }
 
@@ -253,8 +257,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  int readInt() {
+  template<typename T> int readInt() {
     return read<T, int>();
   }
 
@@ -266,8 +269,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  unsigned int readUnsignedInt() {
+  template<typename T> unsigned int readUnsignedInt() {
     return read<T, unsigned int>();
   }
 
@@ -279,8 +281,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  size_t readSize() {
+  template<typename T> size_t readSize() {
     return read<T, size_t>();
   }
 
@@ -292,9 +293,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  bool readBool() {
-    return read<T, T>()!=0;
+  template<typename T> bool readBool() {
+    return read<T, T>() != 0;
   }
 
   /**
@@ -305,8 +305,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  float readFloat() {
+  template<typename T> float readFloat() {
     return read<T, float>();
   }
 
@@ -318,8 +317,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T>
-  double readDouble() {
+  template<typename T> double readDouble() {
     return read<T, double>();
   }
 
@@ -333,10 +331,9 @@ public:
    */
   std::string readString(size_t size);
 
-  template<typename R, size_t S, typename T = R>
-  vm::vec<T, S> readVec() {
+  template<typename R, size_t S, typename T = R> vm::vec<T, S> readVec() {
     vm::vec<T, S> result;
-    for (size_t i = 0; i < S; ++i) {
+    for (size_t i = 0; i < S; ++ i) {
       result[i] = read<T, R>();
     }
     return result;
@@ -354,8 +351,7 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename C, typename T, typename R>
-  void read(C &col, const size_t n) {
+  template<typename C, typename T, typename R> void read(C &col, const size_t n) {
     read<T, R>(std::back_inserter(col), n);
   }
 
@@ -371,9 +367,8 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename I, typename T, typename R>
-  void read(I out, const size_t n) {
-    for (size_t i = 0; i < n; ++i) {
+  template<typename I, typename T, typename R> void read(I out, const size_t n) {
+    for (size_t i = 0; i < n; ++ i) {
       out += read<T, R>();
     }
   }
@@ -381,6 +376,7 @@ public:
 protected:
   void ensurePosition(size_t position) const;
 };
+
 
 /**
  * A special subtype of reader that can manage the lifetime of a region of memory. Such a
@@ -409,6 +405,7 @@ public:
    * Returns the end of the underlying buffer memory region.
    */
   const char *end() const;
+
   /**
    * Returns a std::string_view view of the buffer.
    *

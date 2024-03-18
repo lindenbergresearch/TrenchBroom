@@ -28,8 +28,7 @@
 
 namespace TrenchBroom {
 namespace View {
-Tool::Tool(const bool initiallyActive)
-    : m_active(initiallyActive), m_book(nullptr), m_pageIndex(0) {
+Tool::Tool(const bool initiallyActive) : m_active(initiallyActive), m_book(nullptr), m_pageIndex(0) {
 }
 
 Tool::~Tool() {}
@@ -39,7 +38,7 @@ bool Tool::active() const {
 }
 
 bool Tool::activate() {
-  assert(!active());
+  assert(! active());
   if (doActivate()) {
     m_active = true;
     toolActivatedNotifier(*this);
@@ -53,7 +52,7 @@ bool Tool::deactivate() {
     m_active = false;
     toolDeactivatedNotifier(*this);
   }
-  return !m_active;
+  return ! m_active;
 }
 
 void Tool::refreshViews() {
@@ -65,7 +64,7 @@ void Tool::notifyToolHandleSelectionChanged() {
 }
 
 void Tool::createPage(QStackedLayout *book) {
-  assert(m_book==nullptr);
+  assert(m_book == nullptr);
 
   m_book = book;
   m_pageIndex = m_book->count();

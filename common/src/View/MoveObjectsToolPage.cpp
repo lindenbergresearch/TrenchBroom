@@ -34,9 +34,8 @@
 
 namespace TrenchBroom {
 namespace View {
-MoveObjectsToolPage::MoveObjectsToolPage(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_offset(nullptr), m_button(nullptr) {
+MoveObjectsToolPage::MoveObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent) :
+    QWidget(parent), m_document(document), m_offset(nullptr), m_button(nullptr) {
   createGui();
   connectObservers();
   updateGui();
@@ -45,7 +44,8 @@ MoveObjectsToolPage::MoveObjectsToolPage(
 void MoveObjectsToolPage::connectObservers() {
   auto document = kdl::mem_lock(m_document);
   m_notifierConnection += document->selectionDidChangeNotifier.connect(
-      this, &MoveObjectsToolPage::selectionDidChange);
+      this, &MoveObjectsToolPage::selectionDidChange
+  );
 }
 
 void MoveObjectsToolPage::createGui() {

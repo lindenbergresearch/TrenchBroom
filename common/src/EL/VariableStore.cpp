@@ -36,7 +36,7 @@ void VariableStore::appendToStream(std::ostream &str) const {
   str << "{\n";
 
   const auto &allNames = names();
-  for (size_t i = 0; i < allNames.size(); ++i) {
+  for (size_t i = 0; i < allNames.size(); ++ i) {
     const auto &name = allNames[i];
     str << "  " << name << ": " << value(name);
     if (i < allNames.size() - 1) {
@@ -54,20 +54,20 @@ std::ostream &operator<<(std::ostream &lhs, const VariableStore &rhs) {
 
 bool operator==(const VariableStore &lhs, const VariableStore &rhs) {
   const auto names = lhs.names();
-  return names==rhs.names()
-      && std::all_of(std::begin(names), std::end(names), [&](const auto &name) {
-        return lhs.value(name)==rhs.value(name);
-      });
+  return names == rhs.names() && std::all_of(
+      std::begin(names), std::end(names), [&](const auto &name) {
+        return lhs.value(name) == rhs.value(name);
+      }
+  );
 }
 
 bool operator!=(const VariableStore &lhs, const VariableStore &rhs) {
-  return !(lhs==rhs);
+  return ! (lhs == rhs);
 }
 
 VariableTable::VariableTable() = default;
 
-VariableTable::VariableTable(Table variables)
-    : m_variables(std::move(variables)) {
+VariableTable::VariableTable(Table variables) : m_variables(std::move(variables)) {
 }
 
 VariableStore *VariableTable::clone() const {
@@ -80,7 +80,7 @@ size_t VariableTable::size() const {
 
 Value VariableTable::value(const std::string &name) const {
   auto it = m_variables.find(name);
-  if (it!=std::end(m_variables)) {
+  if (it != std::end(m_variables)) {
     return it->second;
   } else {
     return Value::Undefined;
@@ -92,14 +92,14 @@ std::vector<std::string> VariableTable::names() const {
 }
 
 void VariableTable::declare(const std::string &name, const Value &value) {
-  if (!m_variables.try_emplace(name, value).second) {
+  if (! m_variables.try_emplace(name, value).second) {
     throw EvaluationError("Variable '" + name + "' already declared");
   }
 }
 
 void VariableTable::assign(const std::string &name, const Value &value) {
   auto it = m_variables.find(name);
-  if (it==std::end(m_variables)) {
+  if (it == std::end(m_variables)) {
     throw EvaluationError("Cannot assign to undeclared variable '" + name + "'");
   } else {
     it->second = value;

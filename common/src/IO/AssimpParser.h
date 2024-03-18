@@ -39,11 +39,13 @@ class Texture;
 namespace TrenchBroom::IO {
 class FileSystem;
 
+
 struct AssimpMeshWithTransforms {
   const aiMesh *m_mesh;
   aiMatrix4x4 m_transform;
   aiMatrix4x4 m_axisTransform;
 };
+
 
 class AssimpParser : public EntityModelParser {
 private:
@@ -56,8 +58,8 @@ public:
   static bool canParse(const std::filesystem::path &path);
 
 private:
-  void doLoadFrame(
-      size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+  void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+
   std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
 };
 

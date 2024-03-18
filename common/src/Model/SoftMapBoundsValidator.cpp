@@ -38,38 +38,30 @@ namespace Model {
 namespace {
 static const auto Type = freeIssueType();
 
-void validateInternal(
-    const std::shared_ptr<Game> &game,
-    const WorldNode &worldNode,
-    Node &node,
-    std::vector<std::unique_ptr<Issue>> &issues) {
+void validateInternal(const std::shared_ptr<Game> &game, const WorldNode &worldNode, Node &node, std::vector<std::unique_ptr<Issue>> &issues) {
   const auto bounds = game->extractSoftMapBounds(worldNode.entity());
 
-  if (bounds.bounds && !bounds.bounds->contains(node.logicalBounds())) {
+  if (bounds.bounds && ! bounds.bounds->contains(node.logicalBounds())) {
     issues.push_back(
         std::make_unique<Issue>(Type, node, "Object is out of soft map bounds"));
   }
 }
 } // namespace
 
-SoftMapBoundsValidator::SoftMapBoundsValidator(
-    std::weak_ptr<Game> game, const WorldNode &world)
-    : Validator(Type, "Objects out of soft map bounds"), m_game{game}, m_world{world} {
+SoftMapBoundsValidator::SoftMapBoundsValidator(std::weak_ptr<Game> game, const WorldNode &world) :
+    Validator(Type, "Objects out of soft map bounds"), m_game{game}, m_world{world} {
   addQuickFix(makeDeleteNodesQuickFix());
 }
 
-void SoftMapBoundsValidator::doValidate(
-    EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+void SoftMapBoundsValidator::doValidate(EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
   validateInternal(kdl::mem_lock(m_game), m_world, entityNode, issues);
 }
 
-void SoftMapBoundsValidator::doValidate(
-    BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+void SoftMapBoundsValidator::doValidate(BrushNode &brushNode, std::vector<std::unique_ptr<Issue>> &issues) const {
   validateInternal(kdl::mem_lock(m_game), m_world, brushNode, issues);
 }
 
-void SoftMapBoundsValidator::doValidate(
-    PatchNode &patchNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+void SoftMapBoundsValidator::doValidate(PatchNode &patchNode, std::vector<std::unique_ptr<Issue>> &issues) const {
   validateInternal(kdl::mem_lock(m_game), m_world, patchNode, issues);
 }
 } // namespace Model

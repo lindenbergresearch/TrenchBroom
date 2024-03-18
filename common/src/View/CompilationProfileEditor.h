@@ -23,9 +23,12 @@
 
 #include <memory>
 
+
 class QAbstractButton;
 
+
 class QLineEdit;
+
 
 class QStackedWidget;
 
@@ -37,9 +40,12 @@ struct CompilationProfile;
 namespace View {
 class CompilationTaskListBox;
 
+
 class MapDocument;
 
+
 class MultiCompletionLineEdit;
+
 
 /**
  * Editor UI for a single compilation profile.
@@ -59,8 +65,7 @@ private:
   QAbstractButton *m_moveTaskDownButton{nullptr};
 
 public:
-  explicit CompilationProfileEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit CompilationProfileEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   QWidget *createEditorPage(QWidget *parent);

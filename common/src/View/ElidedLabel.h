@@ -22,6 +22,7 @@
 #include <QString>
 #include <QWidget>
 
+
 class QLabel;
 
 namespace TrenchBroom {
@@ -34,8 +35,7 @@ private:
   QString m_elidedText;
 
 public:
-  ElidedLabel(
-      const QString &text, Qt::TextElideMode elideMode, QWidget *parent = nullptr);
+  ElidedLabel(const QString &text, Qt::TextElideMode elideMode, QWidget *parent = nullptr);
 
   explicit ElidedLabel(Qt::TextElideMode elideMode, QWidget *parent = nullptr);
 

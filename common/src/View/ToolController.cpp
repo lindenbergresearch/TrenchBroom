@@ -44,14 +44,19 @@ void ToolController::pick(const InputState &, Model::PickResult &) {}
 void ToolController::modifierKeyChange(const InputState &) {}
 
 void ToolController::mouseDown(const InputState &) {}
+
 void ToolController::mouseUp(const InputState &) {}
+
 bool ToolController::mouseClick(const InputState &) {
   return false;
 }
+
 bool ToolController::mouseDoubleClick(const InputState &) {
   return false;
 }
+
 void ToolController::mouseMove(const InputState &) {}
+
 void ToolController::mouseScroll(const InputState &) {}
 
 std::unique_ptr<DragTracker> ToolController::acceptMouseDrag(const InputState &) {
@@ -65,8 +70,7 @@ bool ToolController::shouldAcceptDrop(const InputState &, const std::string &) c
 void ToolController::setRenderOptions(const InputState &, Renderer::RenderContext &) const {
 }
 
-void ToolController::render(
-    const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) {
+void ToolController::render(const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) {
 }
 
 bool ToolController::cancel() {
@@ -77,21 +81,20 @@ void ToolController::refreshViews() {
   tool().refreshViews();
 }
 
-std::unique_ptr<DropTracker> ToolController::acceptDrop(
-    const InputState &, const std::string & /* payload */) {
+std::unique_ptr<DropTracker> ToolController::acceptDrop(const InputState &, const std::string & /* payload */) {
   return nullptr;
 }
 
 ToolControllerGroup::ToolControllerGroup() = default;
+
 ToolControllerGroup::~ToolControllerGroup() = default;
 
 void ToolControllerGroup::addController(std::unique_ptr<ToolController> controller) {
-  ensure(controller!=nullptr, "controller is null");
+  ensure(controller != nullptr, "controller is null");
   m_chain.append(std::move(controller));
 }
 
-void ToolControllerGroup::pick(
-    const InputState &inputState, Model::PickResult &pickResult) {
+void ToolControllerGroup::pick(const InputState &inputState, Model::PickResult &pickResult) {
   m_chain.pick(inputState, pickResult);
 }
 
@@ -123,32 +126,26 @@ void ToolControllerGroup::mouseScroll(const InputState &inputState) {
   m_chain.mouseScroll(inputState);
 }
 
-std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(
-    const InputState &inputState) {
-  if (!doShouldHandleMouseDrag(inputState)) {
+std::unique_ptr<DragTracker> ToolControllerGroup::acceptMouseDrag(const InputState &inputState) {
+  if (! doShouldHandleMouseDrag(inputState)) {
     return nullptr;
   }
 
   return m_chain.startMouseDrag(inputState);
 }
 
-std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(
-    const InputState &inputState, const std::string &payload) {
-  if (!doShouldAcceptDrop(inputState, payload)) {
+std::unique_ptr<DropTracker> ToolControllerGroup::acceptDrop(const InputState &inputState, const std::string &payload) {
+  if (! doShouldAcceptDrop(inputState, payload)) {
     return nullptr;
   }
   return m_chain.dragEnter(inputState, payload);
 }
 
-void ToolControllerGroup::setRenderOptions(
-    const InputState &inputState, Renderer::RenderContext &renderContext) const {
+void ToolControllerGroup::setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const {
   m_chain.setRenderOptions(inputState, renderContext);
 }
 
-void ToolControllerGroup::render(
-    const InputState &inputState,
-    Renderer::RenderContext &renderContext,
-    Renderer::RenderBatch &renderBatch) {
+void ToolControllerGroup::render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
   m_chain.render(inputState, renderContext, renderBatch);
 }
 
@@ -160,8 +157,7 @@ bool ToolControllerGroup::doShouldHandleMouseDrag(const InputState &) const {
   return true;
 }
 
-bool ToolControllerGroup::doShouldAcceptDrop(
-    const InputState &inputState, const std::string &payload) const {
+bool ToolControllerGroup::doShouldAcceptDrop(const InputState &inputState, const std::string &payload) const {
   return m_chain.shouldAcceptDrop(inputState, payload);
 }
 } // namespace TrenchBroom::View

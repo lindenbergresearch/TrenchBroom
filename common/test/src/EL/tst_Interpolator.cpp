@@ -28,59 +28,59 @@
 namespace TrenchBroom {
 namespace EL {
 static void interpolateAndCheck(const std::string &expression, const std::string &expected, const EvaluationContext &context = EvaluationContext()) {
-    CHECK(Interpolator(expression).interpolate(context) == expected);
+  CHECK(Interpolator(expression).interpolate(context) == expected);
 }
 
-TEST_CASE("ELInterpolatorTest.interpolateEmptyString")
-{
-    interpolateAndCheck("", "");
-    interpolateAndCheck("   ", "   ");
+TEST_CASE("ELInterpolatorTest.interpolateEmptyString") {
+interpolateAndCheck("", "");
+interpolateAndCheck("   ", "   ");
 }
 
-TEST_CASE("ELInterpolatorTest.interpolateStringWithoutExpression")
-{
-    interpolateAndCheck(" asdfasdf  sdf ", " asdfasdf  sdf ");
+TEST_CASE("ELInterpolatorTest.interpolateStringWithoutExpression") {
+interpolateAndCheck(" asdfasdf  sdf ", " asdfasdf  sdf ");
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithSimpleExpression")
 {
-    interpolateAndCheck(" asdfasdf ${'asdf'}  sdf ", " asdfasdf asdf  sdf ");
-    interpolateAndCheck(" asdfasdf ${'asdf'} ${'AND'}  sdf ", " asdfasdf asdf AND  sdf ");
-    interpolateAndCheck(" asdfasdf ${'asdf'}${' AND'}  sdf ", " asdfasdf asdf AND  sdf ");
-    interpolateAndCheck(" ${ true } ", " true ");
-    interpolateAndCheck(" ${ 'this'+' and ' }${'that'} ", " this and that ");
+interpolateAndCheck(" asdfasdf ${'asdf'}  sdf ", " asdfasdf asdf  sdf ");
+interpolateAndCheck(" asdfasdf ${'asdf'} ${'AND'}  sdf ", " asdfasdf asdf AND  sdf ");
+interpolateAndCheck(" asdfasdf ${'asdf'}${' AND'}  sdf ", " asdfasdf asdf AND  sdf ");
+interpolateAndCheck(" ${ true } ", " true ");
+interpolateAndCheck(" ${ 'this'+' and ' }${'that'} ", " this and that ");
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithNestedExpression")
 {
-    interpolateAndCheck(" asdfasdf ${ 'nested ${TEST} expression' }  sdf ", " asdfasdf nested ${TEST} expression  sdf ");
+interpolateAndCheck(" asdfasdf ${ 'nested ${TEST} expression' }  sdf ", " asdfasdf nested ${TEST} expression  sdf ");
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithVariable")
 {
-    EvaluationContext context;
-    context.declareVariable("TEST", Value("interesting"));
-    interpolateAndCheck(" an ${TEST} expression", " an interesting expression", context);
+EvaluationContext context;
+context.declareVariable("TEST", Value("interesting"));
+interpolateAndCheck(" an ${TEST} expression", " an interesting expression", context);
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithBackslashAndVariable")
 {
-    EvaluationContext context;
-    context.declareVariable("TEST", Value("interesting"));
-    interpolateAndCheck(" an \\${TEST} expression", " an \\interesting expression", context);
+EvaluationContext context;
+context.declareVariable("TEST", Value("interesting"));
+interpolateAndCheck(" an \\${TEST} expression", " an \\interesting expression", context);
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithUnknownVariable")
 {
-    EvaluationContext context;
-    CHECK_THROWS(interpolate(" an ${TEST} expression", context));
+EvaluationContext context;
+CHECK_THROWS(interpolate(" an ${TEST} expression", context)
+);
 }
 
 TEST_CASE("ELInterpolatorTest.interpolateStringWithUnterminatedEL")
 {
-    EvaluationContext context;
-    CHECK_THROWS(interpolate(" an ${TEST", context));
-    CHECK_THROWS(interpolate(" an ${TEST expression", context));
-}
-} // namespace EL
+EvaluationContext context;
+CHECK_THROWS(interpolate(" an ${TEST", context)
+);
+CHECK_THROWS(interpolate(" an ${TEST expression", context)
+);
+}} // namespace EL
 } // namespace TrenchBroom

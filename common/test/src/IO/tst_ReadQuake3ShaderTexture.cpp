@@ -46,60 +46,81 @@ struct TextureInfo {
   kdl_reflect_inline(TextureInfo, name, width, height);
 };
 
+
 bool operator==(const Assets::Texture &lhs, const TextureInfo &rhs) {
-    return lhs.name() == rhs.name && lhs.width() == rhs.width && lhs.height() == rhs.height;
+  return lhs.name() == rhs.name && lhs.width() == rhs.width && lhs.height() == rhs.height;
 }
 
 bool operator==(const Result<Assets::Texture, ReadTextureError> &lhs, const Result<TextureInfo, ReadTextureError> &rhs) {
-    if (lhs.is_success()) {
-        return rhs.is_success() && lhs.value() == rhs.value();
-    }
-    return lhs.is_error() == rhs.is_error();
+  if (lhs.is_success()) {
+    return rhs.is_success() && lhs.value() == rhs.value();
+  }
+  return lhs.is_error() == rhs.is_error();
 }
 } // namespace
 
-TEST_CASE("readQuake3ShaderTexture")
-{
-    auto logger = NullLogger{};
+TEST_CASE("readQuake3ShaderTexture") {
+auto logger = NullLogger{};
 
-    const auto testDir = std::filesystem::current_path() / "fixture/test/IO/Shader/reader";
-    const auto fallbackDir = std::filesystem::current_path() / "fixture/test/IO/Shader/reader/fallback";
-    const auto texturePrefix = std::filesystem::path{"textures"};
-    const auto shaderSearchPath = std::filesystem::path{"scripts"};
-    const auto textureSearchPaths = std::vector<std::filesystem::path>{texturePrefix};
+const auto testDir = std::filesystem::current_path() / "fixture/test/IO/Shader/reader";
+const auto fallbackDir = std::filesystem::current_path() / "fixture/test/IO/Shader/reader/fallback";
+const auto texturePrefix = std::filesystem::path{"textures"};
+const auto shaderSearchPath = std::filesystem::path{"scripts"};
+const auto textureSearchPaths = std::vector<std::filesystem::path>{texturePrefix};
 
-    auto fs = VirtualFileSystem{};
-    fs.mount("", std::make_unique<DiskFileSystem>(testDir));
-    fs.mount("", std::make_unique<DiskFileSystem>(fallbackDir));
-    fs.mount("", createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger).value());
+auto fs = VirtualFileSystem{};
+fs.mount("",
+std::make_unique<DiskFileSystem>(testDir)
+);
+fs.mount("",
+std::make_unique<DiskFileSystem>(fallbackDir)
+);
+fs.mount("",
+createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger
+).
 
-    SECTION("find texture path")
-    {
-        CHECK(readQuake3ShaderTexture("test/with_editor_image", *fs.openFile(texturePrefix / "test/with_editor_image").value(), fs) ==
-              Result<TextureInfo, ReadTextureError>{
-                  TextureInfo{"test/with_editor_image", 128, 128}});
+value()
 
-        CHECK(readQuake3ShaderTexture("test/with_shader_path", *fs.openFile(texturePrefix / "test/with_shader_path").value(), fs) ==
-              Result<TextureInfo, ReadTextureError>{
-                  TextureInfo{"test/with_shader_path", 64, 64}});
+);
 
-        CHECK(readQuake3ShaderTexture("test/with_light_image", *fs.openFile(texturePrefix / "test/with_light_image").value(), fs) ==
-              Result<TextureInfo, ReadTextureError>{
-                  TextureInfo{"test/with_light_image", 128, 64}});
+SECTION("find texture path") {
+CHECK(readQuake3ShaderTexture("test/with_editor_image", *fs.openFile(texturePrefix / "test/with_editor_image").value(), fs)
+==
+Result<TextureInfo, ReadTextureError> {
+TextureInfo {
+"test/with_editor_image", 128, 128
+}
+});
 
-        CHECK(readQuake3ShaderTexture("test/with_stage_map", *fs.openFile(texturePrefix / "test/with_stage_map").value(), fs) ==
-              Result<TextureInfo, ReadTextureError>{
-                  TextureInfo{"test/with_stage_map", 64, 128}});
+CHECK(readQuake3ShaderTexture("test/with_shader_path", *fs.openFile(texturePrefix / "test/with_shader_path").value(), fs)
+==
+Result <TextureInfo, ReadTextureError>{
+TextureInfo{
+"test/with_shader_path", 64, 64}});
 
-        CHECK(readQuake3ShaderTexture("test/missing_extension", *fs.openFile(texturePrefix / "test/missing_extension").value(), fs) ==
-              Result<TextureInfo, ReadTextureError>{
-                  TextureInfo{"test/missing_extension", 128, 128}});
+CHECK(readQuake3ShaderTexture("test/with_light_image", *fs.openFile(texturePrefix / "test/with_light_image").value(), fs)
+==
+Result <TextureInfo, ReadTextureError>{
+TextureInfo{
+"test/with_light_image", 128, 64}});
 
-        CHECK(readQuake3ShaderTexture("test/different_extension", *fs.openFile(texturePrefix / "test/different_extension").value(), fs) ==
-              Result<TextureInfo, ReadTextureError>{
-                  TextureInfo{"test/different_extension", 128, 128}});
+CHECK(readQuake3ShaderTexture("test/with_stage_map", *fs.openFile(texturePrefix / "test/with_stage_map").value(), fs)
+==
+Result <TextureInfo, ReadTextureError>{
+TextureInfo{
+"test/with_stage_map", 64, 128}});
+
+CHECK(readQuake3ShaderTexture("test/missing_extension", *fs.openFile(texturePrefix / "test/missing_extension").value(), fs)
+==
+Result <TextureInfo, ReadTextureError>{
+TextureInfo{
+"test/missing_extension", 128, 128}});
+
+CHECK(readQuake3ShaderTexture("test/different_extension", *fs.openFile(texturePrefix / "test/different_extension").value(), fs)
+==
+Result <TextureInfo, ReadTextureError>{
+TextureInfo{
+"test/different_extension", 128, 128}});
 #
 
-    }
-}
-} // namespace TrenchBroom::IO
+}}} // namespace TrenchBroom::IO

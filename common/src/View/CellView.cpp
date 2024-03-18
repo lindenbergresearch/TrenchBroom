@@ -75,24 +75,19 @@ void CellView::reloadLayout() {
 }
 
 void CellView::validate() {
-  if (!m_valid) {
+  if (! m_valid) {
     reloadLayout();
   }
 }
 
-CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar)
-    : RenderView{contextManager}, m_scrollBar{scrollBar} {
+CellView::CellView(GLContextManager &contextManager, QScrollBar *scrollBar) : RenderView{contextManager}, m_scrollBar{scrollBar} {
   if (m_scrollBar) {
     connect(
-        m_scrollBar,
-        &QAbstractSlider::actionTriggered,
-        this,
-        &CellView::onScrollBarActionTriggered);
+        m_scrollBar, &QAbstractSlider::actionTriggered, this, &CellView::onScrollBarActionTriggered
+    );
     connect(
-        m_scrollBar,
-        &QAbstractSlider::valueChanged,
-        this,
-        &CellView::onScrollBarValueChanged);
+        m_scrollBar, &QAbstractSlider::valueChanged, this, &CellView::onScrollBarValueChanged
+    );
   }
 }
 
@@ -124,9 +119,7 @@ void CellView::scrollToCellInternal(const Cell &cell) {
   }
 
   const auto rowMargin = int(m_layout.rowMargin());
-  const auto newPosition = top < visibleRect.top()
-                           ? top - rowMargin
-                           : visibleRect.top() + bottom - visibleRect.bottom();
+  const auto newPosition = top < visibleRect.top() ? top - rowMargin : visibleRect.top() + bottom - visibleRect.bottom();
 
   auto *animation = new QPropertyAnimation{m_scrollBar, "sliderPosition"};
   animation->setDuration(300);
@@ -153,20 +146,29 @@ void CellView::onScrollBarActionTriggered(int action) {
   // see: https://doc.qt.io/archives/qt-4.8/qabstractslider.html#actionTriggered
   switch (action) {
   case QAbstractSlider::SliderSingleStepAdd:
-    m_scrollBar->setSliderPosition(int(m_layout.rowPosition(top,
-                                                            1))); // line down
+    m_scrollBar->setSliderPosition(
+        int(
+            m_layout.rowPosition(
+                top, 1
+            ))); // line down
     break;
   case QAbstractSlider::SliderSingleStepSub:
-    m_scrollBar->setSliderPosition(int(m_layout.rowPosition(top,
-                                                            -1))); // line up
+    m_scrollBar->setSliderPosition(
+        int(
+            m_layout.rowPosition(
+                top, - 1
+            ))); // line up
     break;
   case QAbstractSlider::SliderPageStepAdd:
     m_scrollBar->setSliderPosition(
         int(m_layout.rowPosition(top + height, 0))); // page down
     break;
   case QAbstractSlider::SliderPageStepSub:
-    m_scrollBar->setSliderPosition(int(m_layout.rowPosition(top - height,
-                                                            0))); // page up
+    m_scrollBar->setSliderPosition(
+        int(
+            m_layout.rowPosition(
+                top - height, 0
+            ))); // page up
     break;
   default:break;
   }
@@ -176,9 +178,9 @@ void CellView::onScrollBarActionTriggered(int action) {
 
 void CellView::mousePressEvent(QMouseEvent *event) {
   validate();
-  if (event->button()==Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton) {
     m_potentialDrag = true;
-  } else if (event->button()==Qt::RightButton) {
+  } else if (event->button() == Qt::RightButton) {
     if (event->modifiers() & Qt::AltModifier) {
       m_lastMousePos = event->pos();
     }
@@ -187,7 +189,7 @@ void CellView::mousePressEvent(QMouseEvent *event) {
 
 void CellView::mouseReleaseEvent(QMouseEvent *event) {
   validate();
-  if (event->button()==Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton) {
     const auto top = m_scrollBar ? m_scrollBar->value() : 0;
     const auto x = float(event->localPos().x());
     const auto y = float(event->localPos().y() + top);
@@ -213,16 +215,16 @@ void CellView::wheelEvent(QWheelEvent *event) {
   const auto pixelDelta = event->pixelDelta();
   const auto angleDelta = event->angleDelta();
 
-  if (!pixelDelta.isNull()) {
+  if (! pixelDelta.isNull()) {
     scrollBy(pixelDelta.y());
-  } else if (!angleDelta.isNull()) {
+  } else if (! angleDelta.isNull()) {
     scrollBy(angleDelta.y());
   }
   event->accept();
 }
 
 bool CellView::event(QEvent *event) {
-  if (event->type()==QEvent::ToolTip) {
+  if (event->type() == QEvent::ToolTip) {
     return updateTooltip(static_cast<QHelpEvent *>(event));
   }
   return QWidget::event(event);
@@ -301,13 +303,13 @@ QRect CellView::visibleRect() const {
 
 void CellView::doRender() {
   validate();
-  if (!m_layoutInitialized) {
+  if (! m_layoutInitialized) {
     initLayout();
   }
 
   const auto r = devicePixelRatioF();
-  const auto viewportWidth = int(width()*r);
-  const auto viewportHeight = int(height()*r);
+  const auto viewportWidth = int(width() * r);
+  const auto viewportHeight = int(height() * r);
   glAssert(glViewport(0, 0, viewportWidth, viewportHeight));
 
   setupGL();
@@ -327,9 +329,9 @@ void CellView::doRender() {
   const auto viewBottom = float(0);
 
   const auto transformation = Renderer::Transformation{
-      vm::ortho_matrix(-1.0f, 1.0f, viewLeft, viewTop, viewRight, viewBottom),
-      vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y())
-          *vm::translation_matrix(vm::vec3f{0.0f, 0.0f, 0.1f})};
+      vm::ortho_matrix(- 1.0f, 1.0f, viewLeft, viewTop, viewRight, viewBottom),
+      vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y()) * vm::translation_matrix(vm::vec3f{0.0f, 0.0f, 0.1f})
+  };
 
   glAssert(glDisable(GL_DEPTH_TEST));
   glAssert(glFrontFace(GL_CCW));
@@ -356,21 +358,24 @@ void CellView::renderTitleBackgrounds(float y, float height) {
   auto vertices = std::vector<Vertex>{};
 
   for (const auto &group : m_layout.groups()) {
-    if (group.intersectsY(y, height) && !group.title().empty()) {
+    if (group.intersectsY(y, height) && ! group.title().empty()) {
       const auto titleBounds = m_layout.titleBoundsForVisibleRect(group, y, height);
       vertices.emplace_back(
-          vm::vec2f{titleBounds.left(), height - (titleBounds.top() - y)});
+          vm::vec2f{titleBounds.left(), height - (titleBounds.top() - y)}
+      );
       vertices.emplace_back(
-          vm::vec2f{titleBounds.left(), height - (titleBounds.bottom() - y)});
+          vm::vec2f{titleBounds.left(), height - (titleBounds.bottom() - y)}
+      );
       vertices.emplace_back(
-          vm::vec2f{titleBounds.right(), height - (titleBounds.bottom() - y)});
+          vm::vec2f{titleBounds.right(), height - (titleBounds.bottom() - y)}
+      );
       vertices.emplace_back(
-          vm::vec2f{titleBounds.right(), height - (titleBounds.top() - y)});
+          vm::vec2f{titleBounds.right(), height - (titleBounds.top() - y)}
+      );
     }
   }
 
-  auto shader =
-      Renderer::ActiveShader{shaderManager(), Renderer::Shaders::VaryingPUniformCShader};
+  auto shader = Renderer::ActiveShader{shaderManager(), Renderer::Shaders::VaryingPUniformCShader};
   shader.set("Color", pref(Preferences::BrowserGroupBackgroundColor));
 
   auto vertexArray = Renderer::VertexArray::move(std::move(vertices));
@@ -379,15 +384,10 @@ void CellView::renderTitleBackgrounds(float y, float height) {
 }
 
 namespace {
-auto collectStringVertices(
-    CellLayout &layout,
-    const float y,
-    const float height,
-    Renderer::FontManager &fontManager) {
+auto collectStringVertices(CellLayout &layout, const float y, const float height, Renderer::FontManager &fontManager) {
   using TextVertex = Renderer::GLVertexTypes::P2T2C4::Vertex;
 
-  auto defaultFont = Renderer::FontDescriptor{
-      pref(Preferences::RendererFontPath), size_t(pref(Preferences::BrowserFontSize))};
+  auto defaultFont = Renderer::FontDescriptor{pref(Preferences::RendererFontPath), size_t(pref(Preferences::BrowserFontSize))};
 
   const auto textColor = std::vector<Color>{pref(Preferences::BrowserTextColor)};
   const auto subTextColor = std::vector<Color>{pref(Preferences::BrowserSubTextColor)};
@@ -396,19 +396,18 @@ auto collectStringVertices(
   for (const auto &group : layout.groups()) {
     if (group.intersectsY(y, height)) {
       const auto &groupTitle = group.title();
-      if (!groupTitle.empty()) {
+      if (! groupTitle.empty()) {
         const auto titleBounds = layout.titleBoundsForVisibleRect(group, y, height);
         const auto offset = vm::vec2f(
-            titleBounds.left() + 2.0f,
-            height - (titleBounds.top() - y) - titleBounds.height);
+            titleBounds.left() + 2.0f, height - (titleBounds.top() - y) - titleBounds.height
+        );
 
         auto &font = fontManager.font(defaultFont);
         const auto quads = font.quads(groupTitle, false, offset);
         const auto titleVertices = TextVertex::toList(
-            quads.size()/2,
-            kdl::skip_iterator{std::begin(quads), std::end(quads), 0, 2},
-            kdl::skip_iterator{std::begin(quads), std::end(quads), 1, 2},
-            kdl::skip_iterator{std::begin(textColor), std::end(textColor), 0, 0});
+            quads.size() / 2, kdl::skip_iterator{std::begin(quads), std::end(quads), 0, 2}, kdl::skip_iterator{std::begin(quads), std::end(quads), 1, 2},
+            kdl::skip_iterator{std::begin(textColor), std::end(textColor), 0, 0}
+        );
         auto &vertices = stringVertices[defaultFont];
         vertices.insert(
             std::end(vertices), std::begin(titleVertices), std::end(titleVertices));
@@ -420,31 +419,27 @@ auto collectStringVertices(
             const auto &cellTitle = cell.title();
             const auto textureNameBounds = cell.titleBounds();
             const auto textureNameFont = fontManager.selectFontSize(
-                defaultFont, cellTitle, textureNameBounds.width, 6);
+                defaultFont, cellTitle, textureNameBounds.width, 6
+            );
             const auto &font = fontManager.font(textureNameFont);
             const auto textureNameSize = font.measure(cellTitle);
 
-            const auto textureNameX =
-                textureNameBounds.left()
-                    + std::max((textureNameBounds.width - textureNameSize.x())/2.0f, 0.0f);
+            const auto textureNameX = textureNameBounds.left() + std::max((textureNameBounds.width - textureNameSize.x()) / 2.0f, 0.0f);
 
             // y is relative to top, but OpenGL coords are relative to bottom, so invert
-            const auto renderOffset =
-                vm::vec2f{textureNameX, y + height - textureNameBounds.bottom()};
+            const auto renderOffset = vm::vec2f{textureNameX, y + height - textureNameBounds.bottom()};
 
             const auto cellTitleQuads = font.quads(cellTitle, false, renderOffset);
 
             const auto textureNameVertices = TextVertex::toList(
-                cellTitleQuads.size()/2,
-                kdl::skip_iterator{
-                    std::begin(cellTitleQuads), std::end(cellTitleQuads), 0, 2},
-                kdl::skip_iterator{
-                    std::begin(cellTitleQuads), std::end(cellTitleQuads), 1, 2},
-                kdl::skip_iterator{std::begin(textColor), std::end(textColor), 0, 0});
+                cellTitleQuads.size() / 2, kdl::skip_iterator{std::begin(cellTitleQuads), std::end(cellTitleQuads), 0, 2},
+                kdl::skip_iterator{std::begin(cellTitleQuads), std::end(cellTitleQuads), 1, 2}, kdl::skip_iterator{
+                    std::begin(textColor), std::end(textColor), 0, 0
+                }
+            );
 
             auto &allTextureNameVertices = stringVertices[textureNameFont];
-            allTextureNameVertices =
-                kdl::vec_concat(std::move(allTextureNameVertices), textureNameVertices);
+            allTextureNameVertices = kdl::vec_concat(std::move(allTextureNameVertices), textureNameVertices);
           }
         }
       }
@@ -459,14 +454,12 @@ void CellView::renderTitleStrings(float y, float height) {
   using StringRendererMap = std::map<Renderer::FontDescriptor, Renderer::VertexArray>;
   auto stringRenderers = StringRendererMap{};
 
-  for (const auto &[descriptor, vertices] :
-      collectStringVertices(m_layout, y, height, fontManager())) {
+  for (const auto &[descriptor, vertices] : collectStringVertices(m_layout, y, height, fontManager())) {
     stringRenderers[descriptor] = Renderer::VertexArray::ref(vertices);
     stringRenderers[descriptor].prepare(vboManager());
   }
 
-  auto shader =
-      Renderer::ActiveShader{shaderManager(), Renderer::Shaders::ColoredTextShader};
+  auto shader = Renderer::ActiveShader{shaderManager(), Renderer::Shaders::ColoredTextShader};
   shader.set("Texture", 0);
 
   for (auto &[descriptor, vertexArray] : stringRenderers) {
@@ -478,7 +471,9 @@ void CellView::renderTitleStrings(float y, float height) {
 }
 
 void CellView::doClear() {}
+
 void CellView::doLeftClick(Layout &, float, float) {}
+
 void CellView::doContextMenu(Layout &, float, float, QContextMenuEvent *) {}
 
 bool CellView::dndEnabled() {
@@ -500,7 +495,9 @@ QString CellView::tooltip(const Cell &) {
 }
 
 void CellView::processEvent(const KeyEvent & /* event */) {}
+
 void CellView::processEvent(const MouseEvent & /* event */) {}
+
 void CellView::processEvent(const CancelEvent & /* event */) {}
 
 } // namespace TrenchBroom::View

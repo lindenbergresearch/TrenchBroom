@@ -35,21 +35,30 @@
 #include <memory>
 #include <string>
 
+
 class QAction;
+
 
 class QComboBox;
 
+
 class QDialog;
+
 
 class QDropEvent;
 
+
 class QMenuBar;
+
 
 class QLabel;
 
+
 class QSplitter;
 
+
 class QTimer;
+
 
 class QToolBar;
 
@@ -63,7 +72,9 @@ class Texture;
 namespace Model {
 class Game;
 
+
 class GroupNode;
+
 
 class LayerNode;
 } // namespace Model
@@ -71,33 +82,48 @@ class LayerNode;
 namespace View {
 class Action;
 
+
 class Autosaver;
+
 
 class Console;
 
+
 class FrameManager;
+
 
 class GLContextManager;
 
+
 class InfoPanel;
+
 
 class Inspector;
 
+
 enum class InspectorPage;
+
 
 class MapDocument;
 
+
 class MapViewBase;
+
 
 class ObjExportDialog;
 
+
 enum class PasteType;
+
 
 class SignalDelayer;
 
+
 class SwitchableMapViewContainer;
 
+
 class Tool;
+
 
 class MapFrame : public QMainWindow {
 Q_OBJECT
@@ -245,10 +271,7 @@ private: // menu event handlers
 public:
   Result<bool> newDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat);
 
-  Result<bool> openDocument(
-      std::shared_ptr<Model::Game> game,
-      Model::MapFormat mapFormat,
-      const std::filesystem::path &path);
+  Result<bool> openDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat, const std::filesystem::path &path);
 
   void updateToolbar();
 
@@ -561,6 +584,7 @@ private:
 
 public: // drag and drop
   void dragEnterEvent(QDragEnterEvent *event) override;
+
   void dropEvent(QDropEvent *event) override;
 
 protected: // other event handlers
@@ -574,6 +598,7 @@ public: // event filter (suppress autosave for user input events)
 private:
   void triggerAutosave();
 };
+
 
 class DebugPaletteWindow : public QDialog {
 Q_OBJECT

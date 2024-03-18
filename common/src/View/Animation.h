@@ -26,6 +26,7 @@
 #include <memory>
 #include <vector>
 
+
 class QTimer;
 
 namespace TrenchBroom {
@@ -40,10 +41,12 @@ private:
   virtual double doApply(double progress) const = 0;
 };
 
+
 class FlatAnimationCurve : public AnimationCurve {
 private:
   double doApply(double progress) const override;
 };
+
 
 class EaseInEaseOutAnimationCurve : public AnimationCurve {
 private:
@@ -55,14 +58,14 @@ public:
   double doApply(double progress) const override;
 };
 
+
 class Animation {
 public:
   using Type = int;
-  static const Type NoType = -1;
+  static const Type NoType = - 1;
 
   enum class Curve {
-    Flat,
-    EaseInEaseOut
+    Flat, EaseInEaseOut
   };
 
 private:
@@ -91,11 +94,11 @@ public:
   void update();
 
 private:
-  static std::unique_ptr<AnimationCurve> createAnimationCurve(
-      Curve curve, double duration);
+  static std::unique_ptr<AnimationCurve> createAnimationCurve(Curve curve, double duration);
 
   virtual void doUpdate(double progress) = 0;
 };
+
 
 class AnimationManager : public QObject {
 Q_OBJECT

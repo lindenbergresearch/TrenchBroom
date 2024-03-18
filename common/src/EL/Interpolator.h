@@ -33,6 +33,7 @@ public:
   std::string interpolate(const EvaluationContext &context);
 };
 
+
 std::string interpolate(const std::string &str, const EvaluationContext &context);
 } // namespace EL
 } // namespace TrenchBroom

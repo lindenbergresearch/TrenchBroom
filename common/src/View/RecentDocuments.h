@@ -27,12 +27,14 @@
 #include <functional>
 #include <vector>
 
+
 class QMenu;
 
 namespace TrenchBroom::View {
 std::vector<std::filesystem::path> loadRecentDocuments(size_t max);
 
 void saveRecentDocuments(const std::vector<std::filesystem::path> &paths);
+
 
 class RecentDocuments : public QObject {
 Q_OBJECT
@@ -46,10 +48,7 @@ private:
   std::vector<std::filesystem::path> m_filteredDocuments;
 
 public:
-  RecentDocuments(
-      size_t maxSize,
-      std::function<bool(std::filesystem::path)> filterPredicate,
-      QObject *parent = nullptr);
+  RecentDocuments(size_t maxSize, std::function<bool(std::filesystem::path)> filterPredicate, QObject *parent = nullptr);
 
   std::vector<std::filesystem::path> recentDocuments() const;
 

@@ -31,9 +31,13 @@ class Logger;
 
 namespace TrenchBroom::View {
 class Command;
+
+
 class MapDocument;
 
+
 IO::PathMatcher makeBackupPathMatcher(std::filesystem::path mapBasename);
+
 
 class Autosaver {
 private:
@@ -64,9 +68,8 @@ private:
 
 public:
   explicit Autosaver(
-      std::weak_ptr<MapDocument> document,
-      std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10*60*1000),
-      size_t maxBackups = 50);
+      std::weak_ptr<MapDocument> document, std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000), size_t maxBackups = 50
+  );
 
   void triggerAutosave(Logger &logger);
 

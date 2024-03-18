@@ -29,18 +29,22 @@
 
 namespace TrenchBroom::Model {
 struct EntityPropertyConfig;
+
+
 class WorldNode;
 } // namespace TrenchBroom::Model
 
 namespace TrenchBroom::IO {
 class ParserStatus;
 
+
 class WorldReaderException : public Exception {
 public:
   WorldReaderException();
-  explicit WorldReaderException(
-      const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions);
+
+  explicit WorldReaderException(const std::vector<std::tuple<Model::MapFormat, std::string>> &parserExceptions);
 };
+
 
 /**
  * MapReader subclass for loading a whole .map file.
@@ -49,13 +53,9 @@ class WorldReader : public MapReader {
   std::unique_ptr<Model::WorldNode> m_worldNode;
 
 public:
-  WorldReader(
-      std::string_view str,
-      Model::MapFormat sourceAndTargetMapFormat,
-      const Model::EntityPropertyConfig &entityPropertyConfig);
+  WorldReader(std::string_view str, Model::MapFormat sourceAndTargetMapFormat, const Model::EntityPropertyConfig &entityPropertyConfig);
 
-  std::unique_ptr<Model::WorldNode> read(
-      const vm::bbox3 &worldBounds, ParserStatus &status);
+  std::unique_ptr<Model::WorldNode> read(const vm::bbox3 &worldBounds, ParserStatus &status);
 
   /**
    * Try to parse the given string as the given map formats, in order.
@@ -69,20 +69,16 @@ public:
    * @throws WorldReaderException if `str` can't be parsed by any of the given formats
    */
   static std::unique_ptr<Model::WorldNode> tryRead(
-      std::string_view str,
-      const std::vector<Model::MapFormat> &mapFormatsToTry,
-      const vm::bbox3 &worldBounds,
-      const Model::EntityPropertyConfig &entityPropertyConfig,
-      ParserStatus &status);
+      std::string_view str, const std::vector<Model::MapFormat> &mapFormatsToTry, const vm::bbox3 &worldBounds,
+      const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status
+  );
 
 private: // implement MapReader interface
-  Model::Node *onWorldNode(
-      std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) override;
+  Model::Node *onWorldNode(std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) override;
+
   void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &status) override;
-  void onNode(
-      Model::Node *parentNode,
-      std::unique_ptr<Model::Node> node,
-      ParserStatus &status) override;
+
+  void onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status) override;
 };
 
 } // namespace TrenchBroom::IO

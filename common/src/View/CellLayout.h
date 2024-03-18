@@ -35,13 +35,18 @@ struct LayoutBounds {
   float height;
 
   float left() const;
+
   float top() const;
+
   float right() const;
+
   float bottom() const;
 
   bool containsPoint(float pointX, float pointY) const;
+
   bool intersectsY(float rangeY, float rangeHeight) const;
 };
+
 
 class LayoutCell {
 private:
@@ -61,26 +66,15 @@ private:
 
 public:
   LayoutCell(
-      std::any item,
-      std::string title,
-      float x,
-      float y,
-      float itemWidth,
-      float itemHeight,
-      float titleWidth,
-      float titleHeight,
-      float titleMargin,
-      float maxUpScale,
-      float minWidth,
-      float maxWidth,
-      float minHeight,
-      float maxHeight);
+      std::any item, std::string title, float x, float y, float itemWidth, float itemHeight, float titleWidth, float titleHeight, float titleMargin,
+      float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight
+  );
 
   std::any &item();
+
   const std::any &item() const;
 
-  template<typename T>
-  const T &itemAs() const {
+  template<typename T> const T &itemAs() const {
     if (const auto *result = std::any_cast<T>(&m_item)) {
       return *result;
     }
@@ -92,19 +86,21 @@ public:
   float scale() const;
 
   const LayoutBounds &bounds() const;
+
   const LayoutBounds &cellBounds() const;
+
   const LayoutBounds &titleBounds() const;
+
   const LayoutBounds &itemBounds() const;
 
   bool hitTest(float x, float y) const;
 
-  void updateLayout(
-      float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight);
+  void updateLayout(float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight);
 
 private:
-  void doLayout(
-      float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight);
+  void doLayout(float maxUpScale, float minWidth, float maxWidth, float minHeight, float maxHeight);
 };
+
 
 class LayoutRow {
 private:
@@ -123,38 +119,26 @@ private:
 
 public:
   LayoutRow(
-      float x,
-      float y,
-      float cellMargin,
-      float titleMargin,
-      float maxWidth,
-      size_t maxCells,
-      float maxUpScale,
-      float minCellWidth,
-      float maxCellWidth,
-      float minCellHeight,
-      float maxCellHeight);
+      float x, float y, float cellMargin, float titleMargin, float maxWidth, size_t maxCells, float maxUpScale, float minCellWidth, float maxCellWidth,
+      float minCellHeight, float maxCellHeight
+  );
 
   const LayoutBounds &bounds() const;
 
   const std::vector<LayoutCell> &cells() const;
+
   const LayoutCell *cellAt(float x, float y) const;
 
   bool intersectsY(float y, float height) const;
 
-  bool canAddItem(
-      float itemWidth, float itemHeight, float titleWidth, float titleHeight) const;
-  void addItem(
-      std::any item,
-      std::string title,
-      float itemWidth,
-      float itemHeight,
-      float titleWidth,
-      float titleHeight);
+  bool canAddItem(float itemWidth, float itemHeight, float titleWidth, float titleHeight) const;
+
+  void addItem(std::any item, std::string title, float itemWidth, float itemHeight, float titleWidth, float titleHeight);
 
 private:
   void readjustItems();
 };
+
 
 class LayoutGroup {
 private:
@@ -175,57 +159,38 @@ private:
 
 public:
   LayoutGroup(
-      std::string title,
-      float x,
-      float y,
-      float cellMargin,
-      float titleMargin,
-      float rowMargin,
-      float titleHeight,
-      float width,
-      size_t maxCellsPerRow,
-      float maxUpScale,
-      float minCellWidth,
-      float maxCellWidth,
-      float minCellHeight,
-      float maxCellHeight);
+      std::string title, float x, float y, float cellMargin, float titleMargin, float rowMargin, float titleHeight, float width, size_t maxCellsPerRow,
+      float maxUpScale, float minCellWidth, float maxCellWidth, float minCellHeight, float maxCellHeight
+  );
 
   LayoutGroup(
-      float x,
-      float y,
-      float cellMargin,
-      float titleMargin,
-      float rowMargin,
-      float width,
-      size_t maxCellsPerRow,
-      float maxUpScale,
-      float minCellWidth,
-      float maxCellWidth,
-      float minCellHeight,
-      float maxCellHeight);
+      float x, float y, float cellMargin, float titleMargin, float rowMargin, float width, size_t maxCellsPerRow, float maxUpScale, float minCellWidth,
+      float maxCellWidth, float minCellHeight, float maxCellHeight
+  );
 
   const std::string &title() const;
 
   const LayoutBounds &titleBounds() const;
+
   LayoutBounds titleBoundsForVisibleRect(float y, float height, float groupMargin) const;
+
   const LayoutBounds &contentBounds() const;
+
   LayoutBounds bounds() const;
 
   const std::vector<LayoutRow> &rows() const;
+
   size_t indexOfRowAt(float y) const;
+
   const LayoutCell *cellAt(float x, float y) const;
 
   bool hitTest(float x, float y) const;
+
   bool intersectsY(float y, float height) const;
 
-  void addItem(
-      std::any item,
-      std::string title,
-      float itemWidth,
-      float itemHeight,
-      float titleWidth,
-      float titleHeight);
+  void addItem(std::any item, std::string title, float itemWidth, float itemHeight, float titleWidth, float titleHeight);
 };
+
 
 class CellLayout {
 private:
@@ -250,36 +215,47 @@ public:
   explicit CellLayout(size_t maxCellsPerRow = 0);
 
   float titleMargin() const;
+
   void setTitleMargin(float titleMargin);
 
   float cellMargin() const;
+
   void setCellMargin(float cellMargin);
 
   float rowMargin() const;
+
   void setRowMargin(float rowMargin);
 
   float groupMargin() const;
+
   void setGroupMargin(float groupMargin);
 
   float outerMargin() const;
+
   void setOuterMargin(float outerMargin);
 
   float minCellWidth() const;
+
   float maxCellWidth() const;
+
   void setCellWidth(float minCellWidth, float maxCellWidth);
 
   float minCellHeight() const;
+
   float maxCellHeight() const;
+
   void setCellHeight(float minCellHeight, float maxCellHeight);
 
   float maxUpScale() const;
+
   void setMaxUpScale(float maxUpScale);
 
   float width() const;
+
   float height();
 
-  LayoutBounds titleBoundsForVisibleRect(
-      const LayoutGroup &group, float y, float height) const;
+  LayoutBounds titleBoundsForVisibleRect(const LayoutGroup &group, float y, float height) const;
+
   float rowPosition(float y, int offset);
 
   void invalidate();
@@ -287,16 +263,12 @@ public:
   void setWidth(float width);
 
   const std::vector<LayoutGroup> &groups();
+
   const LayoutCell *cellAt(float x, float y);
 
   void addGroup(std::string title, float titleHeight);
-  void addItem(
-      std::any item,
-      std::string title,
-      float itemWidth,
-      float itemHeight,
-      float titleWidth,
-      float titleHeight);
+
+  void addItem(std::any item, std::string title, float itemWidth, float itemHeight, float titleWidth, float titleHeight);
 
   void clear();
 

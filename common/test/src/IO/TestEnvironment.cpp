@@ -29,59 +29,56 @@
 
 namespace TrenchBroom {
 namespace IO {
-TestEnvironment::TestEnvironment(const std::string &dir, const SetupFunction &setup) : m_sandboxPath{
-    std::filesystem::current_path() / generateUuid()
-}, m_dir{m_sandboxPath / dir} {
-    createTestEnvironment(setup);
+TestEnvironment::TestEnvironment(const std::string &dir, const SetupFunction &setup) :
+    m_sandboxPath{std::filesystem::current_path() / generateUuid()}, m_dir{m_sandboxPath / dir} {
+  createTestEnvironment(setup);
 }
 
-TestEnvironment::TestEnvironment(const SetupFunction &setup) : TestEnvironment{
-    Catch::getResultCapture().getCurrentTestName(), setup
-} {
+TestEnvironment::TestEnvironment(const SetupFunction &setup) : TestEnvironment{Catch::getResultCapture().getCurrentTestName(), setup} {
 }
 
 TestEnvironment::~TestEnvironment() {
-    assertResult(deleteTestEnvironment());
+  assertResult(deleteTestEnvironment());
 }
 
 const std::filesystem::path &TestEnvironment::dir() const {
-    return m_dir;
+  return m_dir;
 }
 
 void TestEnvironment::createTestEnvironment(const SetupFunction &setup) {
-    deleteTestEnvironment();
-    createDirectory({});
-    setup(*this);
+  deleteTestEnvironment();
+  createDirectory({});
+  setup(*this);
 }
 
 void TestEnvironment::createDirectory(const std::filesystem::path &path) {
-    std::filesystem::create_directories(m_dir / path);
+  std::filesystem::create_directories(m_dir / path);
 }
 
 void TestEnvironment::createFile(const std::filesystem::path &path, const std::string &contents) {
-    auto stream = std::ofstream{m_dir / path, std::ios::out};
-    stream << contents;
+  auto stream = std::ofstream{m_dir / path, std::ios::out};
+  stream << contents;
 }
 
 static bool deleteDirectoryAbsolute(const std::filesystem::path &absolutePath) {
-    return std::filesystem::remove_all(absolutePath);
+  return std::filesystem::remove_all(absolutePath);
 }
 
 bool TestEnvironment::deleteTestEnvironment() {
-    return deleteDirectoryAbsolute(m_sandboxPath);
+  return deleteDirectoryAbsolute(m_sandboxPath);
 }
 
 bool TestEnvironment::directoryExists(const std::filesystem::path &path) const {
-    return std::filesystem::is_directory(m_dir / path);
+  return std::filesystem::is_directory(m_dir / path);
 }
 
 bool TestEnvironment::fileExists(const std::filesystem::path &path) const {
-    return std::filesystem::is_regular_file(m_dir / path);
+  return std::filesystem::is_regular_file(m_dir / path);
 }
 
 std::string TestEnvironment::loadFile(const std::filesystem::path &path) const {
-    auto stream = std::ifstream{m_dir / path, std::ios::in};
-    return std::string{std::istreambuf_iterator<char>{stream}, {}};
+  auto stream = std::ifstream{m_dir / path, std::ios::in};
+  return std::string{std::istreambuf_iterator<char>{stream}, {}};
 }
 } // namespace IO
 } // namespace TrenchBroom

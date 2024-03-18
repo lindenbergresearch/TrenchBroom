@@ -40,8 +40,7 @@ static const auto Type = freeIssueType();
 
 IssueQuickFix makeMoveBrushesToWorldQuickFix() {
   return {
-      "Move Brushes to World",
-      [](MapFacade &facade, const std::vector<const Issue *> &issues) {
+      "Move Brushes to World", [](MapFacade &facade, const std::vector<const Issue *> &issues) {
         auto affectedNodes = std::vector<Node *>{};
         auto nodesToReparent = std::map<Node *, std::vector<Node *>>{};
 
@@ -60,15 +59,12 @@ IssueQuickFix makeMoveBrushesToWorldQuickFix() {
 }
 } // namespace
 
-PointEntityWithBrushesValidator::PointEntityWithBrushesValidator()
-    : Validator{Type, "Point entity with brushes"} {
+PointEntityWithBrushesValidator::PointEntityWithBrushesValidator() : Validator{Type, "Point entity with brushes"} {
   addQuickFix(makeMoveBrushesToWorldQuickFix());
 }
 
-void PointEntityWithBrushesValidator::doValidate(
-    EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
-  const auto *definition =
-      dynamic_cast<const Assets::PointEntityDefinition *>(entityNode.entity().definition());
+void PointEntityWithBrushesValidator::doValidate(EntityNode &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+  const auto *definition = dynamic_cast<const Assets::PointEntityDefinition *>(entityNode.entity().definition());
   if (definition && entityNode.hasChildren()) {
     issues.push_back(
         std::make_unique<Issue>(Type, entityNode, entityNode.name() + " contains brushes"));

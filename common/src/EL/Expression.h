@@ -30,21 +30,30 @@ namespace TrenchBroom {
 namespace EL {
 class ExpressionImpl;
 
+
 class LiteralExpression;
+
 
 class VariableExpression;
 
+
 class ArrayExpression;
+
 
 class MapExpression;
 
+
 class UnaryExpression;
+
 
 class BinaryExpression;
 
+
 class SubscriptExpression;
 
+
 class SwitchExpression;
+
 
 class Expression {
 private:

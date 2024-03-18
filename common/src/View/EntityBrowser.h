@@ -27,11 +27,15 @@
 #include <memory>
 #include <vector>
 
+
 class QPushButton;
+
 
 class QComboBox;
 
+
 class QLineEdit;
+
 
 class QScrollBar;
 
@@ -43,9 +47,12 @@ class Node;
 namespace View {
 class EntityBrowserView;
 
+
 class GLContextManager;
 
+
 class MapDocument;
+
 
 class EntityBrowser : public QWidget {
 Q_OBJECT
@@ -61,10 +68,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  EntityBrowser(
-      std::weak_ptr<MapDocument> document,
-      GLContextManager &contextManager,
-      QWidget *parent = nullptr);
+  EntityBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
   void reload();
 

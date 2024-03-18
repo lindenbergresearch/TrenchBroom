@@ -26,7 +26,10 @@
 
 namespace TrenchBroom::IO {
 struct EntityDefinitionClassInfo;
+
+
 class ParserStatus;
+
 
 class EntParser : public EntityDefinitionParser {
 private:

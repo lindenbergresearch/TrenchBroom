@@ -32,8 +32,7 @@ File::File() = default;
 
 File::~File() = default;
 
-OwningBufferFile::OwningBufferFile(std::unique_ptr<char[]> buffer, const size_t size)
-    : m_buffer{std::move(buffer)}, m_size{size} {
+OwningBufferFile::OwningBufferFile(std::unique_ptr<char[]> buffer, const size_t size) : m_buffer{std::move(buffer)}, m_size{size} {
 }
 
 Reader OwningBufferFile::reader() const {
@@ -45,8 +44,7 @@ size_t OwningBufferFile::size() const {
 }
 
 namespace {
-Result<kdl::resource<std::FILE *>> openPathAsFILE(
-    const std::filesystem::path &path, const std::string &mode) {
+Result<kdl::resource<std::FILE *>> openPathAsFILE(const std::filesystem::path &path, const std::string &mode) {
   // Windows: fopen() doesn't handle UTF-8. We have to use the nonstandard _wfopen
   // to open a Unicode path.
   //
@@ -60,7 +58,7 @@ Result<kdl::resource<std::FILE *>> openPathAsFILE(
       fopen(path.u8string().c_str(), mode.c_str());
 #endif
 
-  if (!file) {
+  if (! file) {
     return Error{"Cannot open file " + path.string()};
   }
 
@@ -73,7 +71,7 @@ Result<size_t> fileSize(std::FILE *file) {
     return Error{"ftell failed"};
   }
 
-  if (std::fseek(file, 0, SEEK_END)!=0) {
+  if (std::fseek(file, 0, SEEK_END) != 0) {
     return Error{"fseek failed"};
   }
 
@@ -82,7 +80,7 @@ Result<size_t> fileSize(std::FILE *file) {
     return Error{"ftell failed"};
   }
 
-  if (std::fseek(file, pos, SEEK_SET)!=0) {
+  if (std::fseek(file, pos, SEEK_SET) != 0) {
     return Error{"fseek failed"};
   }
 
@@ -90,8 +88,7 @@ Result<size_t> fileSize(std::FILE *file) {
 }
 } // namespace
 
-CFile::CFile(kdl::resource<std::FILE *> file, const size_t size)
-    : m_file{std::move(file)}, m_size{size} {
+CFile::CFile(kdl::resource<std::FILE *> file, const size_t size) : m_file{std::move(file)}, m_size{size} {
 }
 
 Reader CFile::reader() const {
@@ -112,7 +109,7 @@ std::unique_ptr<OwningBufferFile> CFile::buffer() const {
   }
 
   auto buffer = std::make_unique<char[]>(size());
-  if (std::fread(buffer.get(), 1, size(), file())!=size()) {
+  if (std::fread(buffer.get(), 1, size(), file()) != size()) {
     return nullptr;
   }
 
@@ -126,12 +123,12 @@ Result<void> CFile::read(char *val, const size_t position, const size_t size) co
   if (currentPosition < 0) {
     return makeError("ftell failed");
   }
-  if (size_t(currentPosition)!=position) {
-    if (std::fseek(*m_file, long(position), SEEK_SET)!=0) {
+  if (size_t(currentPosition) != position) {
+    if (std::fseek(*m_file, long(position), SEEK_SET) != 0) {
       return makeError("fseek failed");
     }
   }
-  if (std::fread(val, 1, size, *m_file)!=size) {
+  if (std::fread(val, 1, size, *m_file) != size) {
     return makeError("fread failed");
   }
 
@@ -147,27 +144,31 @@ Result<CFile::BufferType> CFile::buffer(const size_t position, const size_t size
   auto buffer = std::shared_ptr<char[]>{new char[size]};
 #endif
 
-  return read(buffer.get(), position, size).transform([&]() {
-    return std::move(buffer);
-  });
+  return read(buffer.get(), position, size).transform(
+      [&]() {
+        return std::move(buffer);
+      }
+  );
 }
 
 Error CFile::makeError(const std::string &msg) const {
-  return std::feof(*m_file) ? Error{msg + ": unexpected end of file"}
-                            : Error{msg + ": " + std::strerror(errno)};
+  return std::feof(*m_file) ? Error{msg + ": unexpected end of file"} : Error{msg + ": " + std::strerror(errno)};
 }
 
 Result<std::shared_ptr<CFile>> createCFile(const std::filesystem::path &path) {
-  return openPathAsFILE(path, "rb").and_then([](auto file) {
-    return fileSize(*file).transform([&](auto size) {
-      // NOLINTNEXTLINE
-      return std::shared_ptr<CFile>{new CFile{std::move(file), size}};
-    });
-  });
+  return openPathAsFILE(path, "rb").and_then(
+      [](auto file) {
+        return fileSize(*file).transform(
+            [&](auto size) {
+              // NOLINTNEXTLINE
+              return std::shared_ptr<CFile>{new CFile{std::move(file), size}};
+            }
+        );
+      }
+  );
 }
 
-FileView::FileView(std::shared_ptr<File> file, const size_t offset, const size_t length)
-    : m_file{std::move(file)}, m_offset{offset}, m_length{length} {
+FileView::FileView(std::shared_ptr<File> file, const size_t offset, const size_t length) : m_file{std::move(file)}, m_offset{offset}, m_length{length} {
 }
 
 Reader FileView::reader() const {

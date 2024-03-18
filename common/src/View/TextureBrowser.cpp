@@ -42,9 +42,8 @@ Q_DECLARE_METATYPE(TrenchBroom::View::TextureSortOrder)
 
 namespace TrenchBroom::View {
 
-TextureBrowser::TextureBrowser(
-    std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)} {
+TextureBrowser::TextureBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) :
+    QWidget{parent}, m_document{std::move(document)} {
   createGui(contextManager);
   bindEvents();
   connectObservers();
@@ -114,36 +113,40 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
   m_sortOrderChoice->setToolTip(tr("Select ordering criterion"));
   connect(
       m_sortOrderChoice, QOverload<int>::of(&QComboBox::activated), this, [=](int index) {
-        auto sortOrder =
-            static_cast<TextureSortOrder>(m_sortOrderChoice->itemData(index).toInt());
+        auto sortOrder = static_cast<TextureSortOrder>(m_sortOrderChoice->itemData(index).toInt());
         m_view->setSortOrder(sortOrder);
-      });
+      }
+  );
 
   m_groupButton = new QPushButton{tr("Group")};
   m_groupButton->setToolTip(tr("Group textures by texture collection"));
   m_groupButton->setCheckable(true);
-  connect(m_groupButton, &QAbstractButton::clicked, this, [=]() {
-    m_view->setGroup(m_groupButton->isChecked());
-  });
+  connect(
+      m_groupButton, &QAbstractButton::clicked, this, [=]() {
+        m_view->setGroup(m_groupButton->isChecked());
+      }
+  );
 
   m_usedButton = new QPushButton{tr("Used")};
   m_usedButton->setToolTip(tr("Only show textures currently in use"));
   m_usedButton->setCheckable(true);
-  connect(m_usedButton, &QAbstractButton::clicked, this, [=]() {
-    m_view->setHideUnused(m_usedButton->isChecked());
-  });
+  connect(
+      m_usedButton, &QAbstractButton::clicked, this, [=]() {
+        m_view->setHideUnused(m_usedButton->isChecked());
+      }
+  );
 
   m_filterBox = createSearchBox();
-  connect(m_filterBox, &QLineEdit::textEdited, this, [=]() {
-    m_view->setFilterText(m_filterBox->text().toStdString());
-  });
+  connect(
+      m_filterBox, &QLineEdit::textEdited, this, [=]() {
+        m_view->setFilterText(m_filterBox->text().toStdString());
+      }
+  );
 
   auto *controlLayout = new QHBoxLayout{};
   controlLayout->setContentsMargins(
-      LayoutConstants::NarrowHMargin,
-      LayoutConstants::NarrowVMargin,
-      LayoutConstants::NarrowHMargin,
-      LayoutConstants::NarrowVMargin);
+      LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin
+  );
   controlLayout->setSpacing(LayoutConstants::NarrowHMargin);
   controlLayout->addWidget(m_sortOrderChoice);
   controlLayout->addWidget(m_groupButton);
@@ -161,31 +164,29 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
 
 void TextureBrowser::bindEvents() {
   connect(
-      m_view, &TextureBrowserView::textureSelected, this, &TextureBrowser::textureSelected);
+      m_view, &TextureBrowserView::textureSelected, this, &TextureBrowser::textureSelected
+  );
 }
 
 void TextureBrowser::connectObservers() {
   auto document = kdl::mem_lock(m_document);
-  m_notifierConnection +=
-      document->documentWasNewedNotifier.connect(this, &TextureBrowser::documentWasNewed);
-  m_notifierConnection +=
-      document->documentWasLoadedNotifier.connect(this, &TextureBrowser::documentWasLoaded);
-  m_notifierConnection +=
-      document->nodesWereAddedNotifier.connect(this, &TextureBrowser::nodesWereAdded);
-  m_notifierConnection +=
-      document->nodesWereRemovedNotifier.connect(this, &TextureBrowser::nodesWereRemoved);
-  m_notifierConnection +=
-      document->nodesDidChangeNotifier.connect(this, &TextureBrowser::nodesDidChange);
+  m_notifierConnection += document->documentWasNewedNotifier.connect(this, &TextureBrowser::documentWasNewed);
+  m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &TextureBrowser::documentWasLoaded);
+  m_notifierConnection += document->nodesWereAddedNotifier.connect(this, &TextureBrowser::nodesWereAdded);
+  m_notifierConnection += document->nodesWereRemovedNotifier.connect(this, &TextureBrowser::nodesWereRemoved);
+  m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &TextureBrowser::nodesDidChange);
   m_notifierConnection += document->brushFacesDidChangeNotifier.connect(
-      this, &TextureBrowser::brushFacesDidChange);
+      this, &TextureBrowser::brushFacesDidChange
+  );
   m_notifierConnection += document->textureCollectionsDidChangeNotifier.connect(
-      this, &TextureBrowser::textureCollectionsDidChange);
+      this, &TextureBrowser::textureCollectionsDidChange
+  );
   m_notifierConnection += document->currentTextureNameDidChangeNotifier.connect(
-      this, &TextureBrowser::currentTextureNameDidChange);
+      this, &TextureBrowser::currentTextureNameDidChange
+  );
 
   auto &prefs = PreferenceManager::instance();
-  m_notifierConnection +=
-      prefs.preferenceDidChangeNotifier.connect(this, &TextureBrowser::preferenceDidChange);
+  m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &TextureBrowser::preferenceDidChange);
 }
 
 void TextureBrowser::documentWasNewed(MapDocument *) {
@@ -222,9 +223,7 @@ void TextureBrowser::currentTextureNameDidChange(const std::string & /* textureN
 
 void TextureBrowser::preferenceDidChange(const std::filesystem::path &path) {
   auto document = kdl::mem_lock(m_document);
-  if (
-      path==Preferences::TextureBrowserIconSize.path()
-          || document->isGamePathPreference(path)) {
+  if (path == Preferences::TextureBrowserIconSize.path() || document->isGamePathPreference(path)) {
     reload();
   } else {
     m_view->update();

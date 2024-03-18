@@ -28,7 +28,9 @@ namespace TrenchBroom {
 namespace Renderer {
 class Camera;
 
+
 class RenderBatch;
+
 
 class RenderContext;
 } // namespace Renderer
@@ -46,33 +48,28 @@ public:
 
   void update(const vm::vec3 &point);
 
-  template<typename I, typename O>
-  void selected(I cur, I end, O out) const {
+  template<typename I, typename O> void selected(I cur, I end, O out) const {
     const auto plane = getPlane();
     const auto box = getBox(getTransform());
-    while (cur!=end) {
+    while (cur != end) {
       if (selects(*cur, plane, box)) {
         out = *cur;
       }
-      ++cur;
+      ++ cur;
     }
   }
 
 private:
-  bool selects(
-      const vm::vec3 &point, const vm::plane3 &plane, const vm::bbox2 &box) const;
+  bool selects(const vm::vec3 &point, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-  bool selects(
-      const vm::segment3 &edge, const vm::plane3 &plane, const vm::bbox2 &box) const;
+  bool selects(const vm::segment3 &edge, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-  bool selects(
-      const vm::polygon3 &polygon, const vm::plane3 &plane, const vm::bbox2 &box) const;
+  bool selects(const vm::polygon3 &polygon, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
   vm::vec3 project(const vm::vec3 &point, const vm::plane3 &plane) const;
 
 public:
-  void render(
-      Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
+  void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
 
 private:
   vm::plane3 getPlane() const;

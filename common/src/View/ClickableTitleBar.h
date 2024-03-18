@@ -23,10 +23,12 @@
 
 #include "View/TitleBar.h"
 
+
 class QLabel;
 
 namespace TrenchBroom::View {
 class BorderLine;
+
 
 class ClickableTitleBar : public TitleBar {
 Q_OBJECT
@@ -34,11 +36,12 @@ private:
   QLabel *m_stateText = nullptr;
 
 public:
-  ClickableTitleBar(
-      const QString &title, const QString &stateText, QWidget *parent = nullptr);
+  ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
 
   void setStateText(const QString &stateText);
+
 signals:
+
   void titleBarClicked();
 
 protected:

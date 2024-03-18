@@ -30,15 +30,13 @@
 
 namespace TrenchBroom {
 namespace View {
-SmartPropertyEditor::SmartPropertyEditor(
-    std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_active(false) {
+SmartPropertyEditor::SmartPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_document(document), m_active(false) {
 }
 
 SmartPropertyEditor::~SmartPropertyEditor() {}
 
 void SmartPropertyEditor::activate(const std::string &propertyKey) {
-  assert(!m_active);
+  assert(! m_active);
   m_propertyKey = propertyKey;
   m_active = true;
 }
@@ -54,7 +52,7 @@ void SmartPropertyEditor::deactivate() {
 }
 
 bool SmartPropertyEditor::usesPropertyKey(const std::string &propertyKey) const {
-  return m_propertyKey==propertyKey;
+  return m_propertyKey == propertyKey;
 }
 
 std::shared_ptr<MapDocument> SmartPropertyEditor::document() const {

@@ -33,8 +33,7 @@ namespace Renderer {
  * uploaded to video card memory, and to render the recorded primitives using the index
  * ranges stored in the constructed index range map.
  */
-template<typename VertexSpec>
-class IndexRangeMapBuilder {
+template<typename VertexSpec> class IndexRangeMapBuilder {
 private:
   using Vertex = typename VertexSpec::Vertex;
   using VertexList = std::vector<Vertex>;
@@ -59,9 +58,7 @@ public:
    * @param vertexCount the total number of vertices to expect
    * @param indexRangeSize the size of the index range map to expect
    */
-  IndexRangeMapBuilder(
-      const size_t vertexCount, const IndexRangeMap::Size &indexRangeSize)
-      : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
+  IndexRangeMapBuilder(const size_t vertexCount, const IndexRangeMap::Size &indexRangeSize) : m_vertexListBuilder(vertexCount), m_indexRange(indexRangeSize) {
   }
 
   /**

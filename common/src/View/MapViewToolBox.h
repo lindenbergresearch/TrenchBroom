@@ -25,23 +25,49 @@
 
 #include <memory>
 
+
 class QStackedLayout;
 
 namespace TrenchBroom {
 namespace View {
 class ClipTool;
+
+
 class CreateComplexBrushTool;
+
+
 class CreateEntityTool;
+
+
 class CreateSimpleBrushTool;
+
+
 class MoveObjectsTool;
+
+
 class ExtrudeTool;
+
+
 class RotateObjectsTool;
+
+
 class ScaleObjectsTool;
+
+
 class ShearObjectsTool;
+
+
 class VertexTool;
+
+
 class EdgeTool;
+
+
 class FaceTool;
+
+
 class MapDocument;
+
 
 class MapViewToolBox : public ToolBox {
 private:
@@ -64,53 +90,80 @@ private:
 
 public:
   MapViewToolBox(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl);
+
   ~MapViewToolBox() override;
 
 public: // tools
   ClipTool &clipTool();
+
   CreateComplexBrushTool &createComplexBrushTool();
+
   CreateEntityTool &createEntityTool();
+
   CreateSimpleBrushTool &createSimpleBrushTool();
+
   MoveObjectsTool &moveObjectsTool();
+
   ExtrudeTool &extrudeTool();
+
   RotateObjectsTool &rotateObjectsTool();
+
   ScaleObjectsTool &scaleObjectsTool();
+
   ShearObjectsTool &shearObjectsTool();
+
   VertexTool &vertexTool();
+
   EdgeTool &edgeTool();
+
   FaceTool &faceTool();
 
   void toggleCreateComplexBrushTool();
+
   bool createComplexBrushToolActive() const;
+
   void performCreateComplexBrush();
 
   void toggleClipTool();
+
   bool clipToolActive() const;
+
   void toggleClipSide();
+
   void performClip();
+
   void removeLastClipPoint();
 
   void toggleRotateObjectsTool();
+
   bool rotateObjectsToolActive() const;
+
   double rotateToolAngle() const;
+
   vm::vec3 rotateToolCenter() const;
+
   void moveRotationCenter(const vm::vec3 &delta);
 
   void toggleScaleObjectsTool();
+
   bool scaleObjectsToolActive() const;
 
   void toggleShearObjectsTool();
+
   bool shearObjectsToolActive() const;
 
   bool anyVertexToolActive() const;
 
   void toggleVertexTool();
+
   bool vertexToolActive() const;
 
   void toggleEdgeTool();
+
   bool edgeToolActive() const;
 
   void toggleFaceTool();
+
   bool faceToolActive() const;
 
   void moveVertices(const vm::vec3 &delta);
@@ -120,10 +173,15 @@ private: // Tool related methods
 
 private: // notification
   void registerTool(Tool &tool, QStackedLayout *bookCtrl);
+
   void connectObservers();
+
   void toolActivated(Tool &tool);
+
   void toolDeactivated(Tool &tool);
+
   void updateEditorContext();
+
   void documentWasNewedOrLoaded(MapDocument *document);
 };
 } // namespace View

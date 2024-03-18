@@ -42,7 +42,10 @@ class Camera;
 
 namespace View {
 class Grid;
+
+
 class MapDocument;
+
 
 class ShearObjectsTool : public Tool {
 public:
@@ -58,29 +61,24 @@ private:
 
 public:
   explicit ShearObjectsTool(std::weak_ptr<MapDocument> document);
+
   ~ShearObjectsTool() override;
 
   const Grid &grid() const;
 
   bool applies() const;
 
-  void pickBackSides(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult);
-  void pick2D(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult);
-  void pick3D(
-      const vm::ray3 &pickRay,
-      const Renderer::Camera &camera,
-      Model::PickResult &pickResult);
+  void pickBackSides(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
+
+  void pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
+
+  void pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
 
 public:
   vm::bbox3 bounds() const;
 
   bool hasDragPolygon() const;
+
   vm::polygon3f dragPolygon() const;
 
   /**
@@ -90,18 +88,23 @@ public:
   vm::bbox3 bboxAtDragStart() const;
 
   void startShearWithHit(const Model::Hit &hit);
+
   void commitShear();
+
   void cancelShear();
+
   void shearByDelta(const vm::vec3 &delta);
 
   const Model::Hit &dragStartHit() const;
 
   vm::mat4x4 bboxShearMatrix() const;
+
   vm::polygon3f shearHandle() const;
 
   void updatePickedSide(const Model::PickResult &pickResult);
 
   bool constrainVertical() const;
+
   void setConstrainVertical(bool constrainVertical);
 };
 } // namespace View

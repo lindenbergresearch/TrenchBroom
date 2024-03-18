@@ -48,10 +48,16 @@ class BrushRendererBrushCache;
 
 namespace Model {
 class BrushFace;
+
+
 class GroupNode;
+
+
 class LayerNode;
 
+
 class ModelFactory;
+
 
 class BrushNode : public Node, public Object {
 public:
@@ -62,24 +68,28 @@ public:
   using EdgeList = BrushEdgeList;
 
 private:
-  mutable std::unique_ptr<Renderer::BrushRendererBrushCache>
-      m_brushRendererBrushCache; // unique_ptr for breaking header dependencies
+  mutable std::unique_ptr<Renderer::BrushRendererBrushCache> m_brushRendererBrushCache; // unique_ptr for breaking header dependencies
   Brush m_brush;               // must be destroyed before the brush renderer cache
   size_t m_selectedFaceCount = 0u;
 
 public:
   explicit BrushNode(Brush brush);
+
   ~BrushNode() override;
 
 public:
   EntityNodeBase *entity();
+
   const EntityNodeBase *entity() const;
 
   const Brush &brush() const;
+
   Brush setBrush(Brush brush);
 
   bool hasSelectedFaces() const;
+
   void selectFace(size_t faceIndex);
+
   void deselectFace(size_t faceIndex);
 
   void updateFaceTags(size_t faceIndex, TagManager &tagManager);
@@ -87,15 +97,19 @@ public:
   void setFaceTexture(size_t faceIndex, Assets::Texture *texture);
 
   bool contains(const Node *node) const;
+
   bool intersects(const Node *node) const;
 
 private:
   void clearSelectedFaces();
+
   void updateSelectedFaceCount();
 
 private: // implement Node interface
   const std::string &doGetName() const override;
+
   const vm::bbox3 &doGetLogicalBounds() const override;
+
   const vm::bbox3 &doGetPhysicalBounds() const override;
 
   FloatType doGetProjectedArea(vm::axis::type axis) const override;
@@ -103,7 +117,9 @@ private: // implement Node interface
   Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
 
   bool doCanAddChild(const Node *child) const override;
+
   bool doCanRemoveChild(const Node *child) const override;
+
   bool doRemoveIfEmpty() const override;
 
   bool doShouldAddToSpacialIndex() const override;
@@ -111,19 +127,20 @@ private: // implement Node interface
   bool doSelectable() const override;
 
   void doAccept(NodeVisitor &visitor) override;
+
   void doAccept(ConstNodeVisitor &visitor) const override;
 
 private: // implement Object interface
-  void doPick(
-      const EditorContext &editorContext,
-      const vm::ray3 &ray,
-      PickResult &pickResult) override;
+  void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
+
   void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
   std::optional<std::tuple<FloatType, size_t>> findFaceHit(const vm::ray3 &ray) const;
 
   Node *doGetContainer() override;
+
   LayerNode *doGetContainingLayer() override;
+
   GroupNode *doGetContainingGroup() override;
 
 public: // renderer cache
@@ -131,12 +148,15 @@ public: // renderer cache
    * Only exposed to be called by BrushFace
    */
   void invalidateVertexCache();
+
   Renderer::BrushRendererBrushCache &brushRendererBrushCache() const;
 
 private: // implement Taggable interface
 public:
   void initializeTags(TagManager &tagManager) override;
+
   void clearTags() override;
+
   void updateTags(TagManager &tagManager) override;
 
   /**
@@ -164,13 +184,16 @@ public:
 
 private:
   void doAcceptTagVisitor(TagVisitor &visitor) override;
+
   void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 
 private:
 deleteCopyAndMove(BrushNode);
 };
 
+
 bool operator==(const BrushNode &lhs, const BrushNode &rhs);
+
 bool operator!=(const BrushNode &lhs, const BrushNode &rhs);
 } // namespace Model
 } // namespace TrenchBroom

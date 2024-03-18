@@ -39,8 +39,7 @@ private:
   const Model::GroupNode *m_group;
 
 public:
-  GroupNameAnchor(const Model::GroupNode *group)
-      : m_group(group) {
+  GroupNameAnchor(const Model::GroupNode *group) : m_group(group) {
   }
 
 private:
@@ -54,9 +53,10 @@ private:
   TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
 };
 
-GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext)
-    : m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false), m_showOverlays(true),
-      m_showOccludedOverlays(false), m_showOccludedBounds(false) {
+
+GroupRenderer::GroupRenderer(const Model::EditorContext &editorContext) :
+    m_editorContext(editorContext), m_boundsValid(false), m_overrideColors(false), m_showOverlays(true), m_showOccludedOverlays(false),
+    m_showOccludedBounds(false) {
 }
 
 void GroupRenderer::invalidate() {
@@ -75,7 +75,7 @@ void GroupRenderer::addGroup(const Model::GroupNode *group) {
 }
 
 void GroupRenderer::removeGroup(const Model::GroupNode *group) {
-  if (auto it = m_groups.find(group); it!=std::end(m_groups)) {
+  if (auto it = m_groups.find(group); it != std::end(m_groups)) {
     m_groups.erase(it);
     invalidate();
   }
@@ -118,7 +118,7 @@ void GroupRenderer::setOccludedBoundsColor(const Color &occludedBoundsColor) {
 }
 
 void GroupRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
-  if (!m_groups.empty()) {
+  if (! m_groups.empty()) {
     if (renderContext.showGroupBounds()) {
       renderBounds(renderContext, renderBatch);
       renderNames(renderContext, renderBatch);
@@ -127,7 +127,7 @@ void GroupRenderer::render(RenderContext &renderContext, RenderBatch &renderBatc
 }
 
 void GroupRenderer::renderBounds(RenderContext &, RenderBatch &renderBatch) {
-  if (!m_boundsValid) {
+  if (! m_boundsValid) {
     validateBounds();
   }
 
@@ -149,7 +149,7 @@ void GroupRenderer::renderNames(RenderContext &renderContext, RenderBatch &rende
 
     for (const auto *group : m_groups) {
       if (shouldRenderGroup(*group)) {
-        if (!m_overrideColors) {
+        if (! m_overrideColors) {
           renderService.setForegroundColor(groupColor(*group));
         }
 
@@ -172,35 +172,37 @@ void GroupRenderer::invalidateBounds() {
 void GroupRenderer::validateBounds() {
   if (m_overrideColors) {
     std::vector<GLVertexTypes::P3::Vertex> vertices;
-    vertices.reserve(24*m_groups.size());
+    vertices.reserve(24 * m_groups.size());
 
     for (const auto *group : m_groups) {
       if (shouldRenderGroup(*group)) {
-        group->logicalBounds().for_each_edge([&](const vm::vec3 &v1, const vm::vec3 &v2) {
-          vertices.emplace_back(vm::vec3f(v1));
-          vertices.emplace_back(vm::vec3f(v2));
-        });
+        group->logicalBounds().for_each_edge(
+            [&](const vm::vec3 &v1, const vm::vec3 &v2) {
+              vertices.emplace_back(vm::vec3f(v1));
+              vertices.emplace_back(vm::vec3f(v2));
+            }
+        );
       }
     }
 
-    m_boundsRenderer =
-        DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
+    m_boundsRenderer = DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
   } else {
     std::vector<GLVertexTypes::P3C4::Vertex> vertices;
-    vertices.reserve(24*m_groups.size());
+    vertices.reserve(24 * m_groups.size());
 
     for (const auto *group : m_groups) {
       if (shouldRenderGroup(*group)) {
         const auto color = groupColor(*group);
-        group->logicalBounds().for_each_edge([&](const vm::vec3 &v1, const vm::vec3 &v2) {
-          vertices.emplace_back(vm::vec3f(v1), color);
-          vertices.emplace_back(vm::vec3f(v2), color);
-        });
+        group->logicalBounds().for_each_edge(
+            [&](const vm::vec3 &v1, const vm::vec3 &v2) {
+              vertices.emplace_back(vm::vec3f(v1), color);
+              vertices.emplace_back(vm::vec3f(v2), color);
+            }
+        );
       }
     }
 
-    m_boundsRenderer =
-        DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
+    m_boundsRenderer = DirectEdgeRenderer(VertexArray::move(std::move(vertices)), PrimType::Lines);
   }
 
   m_boundsValid = true;
@@ -209,7 +211,7 @@ void GroupRenderer::validateBounds() {
 bool GroupRenderer::shouldRenderGroup(const Model::GroupNode &group) const {
   const auto *currentGroup = m_editorContext.currentGroup();
   const auto *parentGroup = group.containingGroup();
-  return parentGroup==currentGroup && m_editorContext.visible(&group);
+  return parentGroup == currentGroup && m_editorContext.visible(&group);
 }
 
 AttrString GroupRenderer::groupString(const Model::GroupNode &groupNode) const {

@@ -41,21 +41,20 @@ const std::string &ELTokenizer::IntegerDelim() const {
   return Delim;
 }
 
-ELTokenizer::ELTokenizer(std::string_view str, const size_t line, const size_t column)
-    : Tokenizer{std::move(str), "\"", '\\', line, column} {
+ELTokenizer::ELTokenizer(std::string_view str, const size_t line, const size_t column) : Tokenizer{std::move(str), "\"", '\\', line, column} {
 }
 
 void ELTokenizer::appendUntil(const std::string &pattern, std::stringstream &str) {
   const auto *begin = curPos();
   const auto *end = discardUntilPattern(pattern);
   str << std::string{begin, end};
-  if (!eof()) {
+  if (! eof()) {
     discard("${");
   }
 }
 
 ELTokenizer::Token ELTokenizer::emitToken() {
-  while (!eof()) {
+  while (! eof()) {
     auto line = this->line();
     auto column = this->column();
     const auto *c = curPos();
@@ -65,13 +64,13 @@ ELTokenizer::Token ELTokenizer::emitToken() {
     case ']':advance();
       return Token{ELToken::CBracket, c, c + 1, offset(c), line, column};
     case '{':advance();
-      if (curChar()=='{') {
+      if (curChar() == '{') {
         advance();
         return Token{ELToken::DoubleOBrace, c, c + 2, offset(c), line, column};
       }
       return Token{ELToken::OBrace, c, c + 1, offset(c), line, column};
     case '}':advance();
-      if (curChar()=='}') {
+      if (curChar() == '}') {
         advance();
         return Token{ELToken::DoubleCBrace, c, c + 2, offset(c), line, column};
       }
@@ -83,7 +82,7 @@ ELTokenizer::Token ELTokenizer::emitToken() {
     case '+':advance();
       return Token{ELToken::Addition, c, c + 1, offset(c), line, column};
     case '-':advance();
-      if (curChar()=='>') {
+      if (curChar() == '>') {
         advance();
         return Token{ELToken::Case, c, c + 2, offset(c), line, column};
       }
@@ -91,7 +90,7 @@ ELTokenizer::Token ELTokenizer::emitToken() {
     case '*':advance();
       return Token{ELToken::Multiplication, c, c + 1, offset(c), line, column};
     case '/':advance();
-      if (curChar()=='/') {
+      if (curChar() == '/') {
         discardUntil("\n\r");
         break;
       }
@@ -101,13 +100,13 @@ ELTokenizer::Token ELTokenizer::emitToken() {
     case '~':advance();
       return Token{ELToken::BitwiseNegation, c, c + 1, offset(c), line, column};
     case '&':advance();
-      if (curChar()=='&') {
+      if (curChar() == '&') {
         advance();
         return Token{ELToken::LogicalAnd, c, c + 2, offset(c), line, column};
       }
       return Token{ELToken::BitwiseAnd, c, c + 1, offset(c), line, column};
     case '|':advance();
-      if (curChar()=='|') {
+      if (curChar() == '|') {
         advance();
         return Token{ELToken::LogicalOr, c, c + 2, offset(c), line, column};
       }
@@ -115,25 +114,25 @@ ELTokenizer::Token ELTokenizer::emitToken() {
     case '^':advance();
       return Token{ELToken::BitwiseXOr, c, c + 1, offset(c), line, column};
     case '!':advance();
-      if (curChar()=='=') {
+      if (curChar() == '=') {
         advance();
         return Token{ELToken::NotEqual, c, c + 2, offset(c), line, column};
       }
       return Token{ELToken::LogicalNegation, c, c + 1, offset(c), line, column};
     case '<':advance();
-      if (curChar()=='=') {
+      if (curChar() == '=') {
         advance();
         return Token{ELToken::LessOrEqual, c, c + 2, offset(c), line, column};
-      } else if (curChar()=='<') {
+      } else if (curChar() == '<') {
         advance();
         return Token{ELToken::BitwiseShiftLeft, c, c + 2, offset(c), line, column};
       }
       return Token(ELToken::Less, c, c + 1, offset(c), line, column);
     case '>':advance();
-      if (curChar()=='=') {
+      if (curChar() == '=') {
         advance();
         return Token{ELToken::GreaterOrEqual, c, c + 2, offset(c), line, column};
-      } else if (curChar()=='>') {
+      } else if (curChar() == '>') {
         advance();
         return Token{ELToken::BitwiseShiftRight, c, c + 2, offset(c), line, column};
       }
@@ -158,13 +157,13 @@ ELTokenizer::Token ELTokenizer::emitToken() {
     default: {
       switch (curChar()) {
       case '.':
-        if (lookAhead()=='.') {
+        if (lookAhead() == '.') {
           advance(2);
           return Token{ELToken::Range, c, c + 2, offset(c), line, column};
         }
         break;
       case '=':
-        if (curChar()=='=') {
+        if (curChar() == '=') {
           advance(2);
           return Token{ELToken::Equal, c, c + 2, offset(c), line, column};
         }
@@ -173,34 +172,33 @@ ELTokenizer::Token ELTokenizer::emitToken() {
       }
 
       const char *e;
-      if ((e = readDecimal(NumberDelim()))!=nullptr) {
-        if (!eof() && curChar()=='.' && lookAhead()!='.') {
-          throw ParserException{
-              line, column, "Unexpected character: " + std::string{c, 1}};
+      if ((e = readDecimal(NumberDelim())) != nullptr) {
+        if (! eof() && curChar() == '.' && lookAhead() != '.') {
+          throw ParserException{line, column, "Unexpected character: " + std::string{c, 1}};
         }
         return Token{ELToken::Number, c, e, offset(c), line, column};
       }
 
-      if ((e = readInteger(IntegerDelim()))!=nullptr) {
+      if ((e = readInteger(IntegerDelim())) != nullptr) {
         return Token{ELToken::Number, c, e, offset(c), line, column};
       }
 
-      if ((e = discard("true"))!=nullptr) {
+      if ((e = discard("true")) != nullptr) {
         return Token{ELToken::Boolean, c, e, offset(c), line, column};
       }
-      if ((e = discard("false"))!=nullptr) {
+      if ((e = discard("false")) != nullptr) {
         return Token{ELToken::Boolean, c, e, offset(c), line, column};
       }
 
-      if ((e = discard("null"))!=nullptr) {
+      if ((e = discard("null")) != nullptr) {
         return Token{ELToken::Null, c, e, offset(c), line, column};
       }
 
-      if (isLetter(*c) || *c=='_') {
+      if (isLetter(*c) || *c == '_') {
         do {
           advance();
           e = curPos();
-        } while (!eof() && (isLetter(*e) || isDigit(*e) || *e=='_'));
+        } while (! eof() && (isLetter(*e) || isDigit(*e) || *e == '_'));
 
         return Token{ELToken::Name, c, e, offset(c), line, column};
       }
@@ -212,9 +210,7 @@ ELTokenizer::Token ELTokenizer::emitToken() {
   return Token{ELToken::Eof, nullptr, nullptr, length(), line(), column()};
 }
 
-ELParser::ELParser(
-    const ELParser::Mode mode, std::string_view str, const size_t line, const size_t column)
-    : m_mode{mode}, m_tokenizer{str, line, column} {
+ELParser::ELParser(const ELParser::Mode mode, std::string_view str, const size_t line, const size_t column) : m_mode{mode}, m_tokenizer{str, line, column} {
 }
 
 TokenizerState ELParser::tokenizerState() const {
@@ -231,7 +227,7 @@ EL::Expression ELParser::parseLenient(const std::string &str) {
 
 EL::Expression ELParser::parse() {
   auto result = parseExpression();
-  if (m_mode==Mode::Strict) {
+  if (m_mode == Mode::Strict) {
     expect(ELToken::Eof, m_tokenizer.peekToken()); // avoid trailing garbage
   }
   return result;
@@ -250,10 +246,7 @@ EL::Expression ELParser::parseGroupedTerm() {
   auto expression = parseTerm();
   expect(ELToken::CParen, m_tokenizer.nextToken());
 
-  auto lhs = EL::Expression{
-      EL::UnaryExpression{EL::UnaryOperator::Group, std::move(expression)},
-      token.line(),
-      token.column()};
+  auto lhs = EL::Expression{EL::UnaryExpression{EL::UnaryOperator::Group, std::move(expression)}, token.line(), token.column()};
   if (m_tokenizer.peekToken().hasType(ELToken::CompoundTerm)) {
     return parseCompoundTerm(lhs);
   }
@@ -313,18 +306,15 @@ EL::Expression ELParser::parseSubscript(EL::Expression lhs) {
 
   expect(ELToken::OBracket, token);
   auto elements = std::vector<EL::Expression>{};
-  if (!m_tokenizer.peekToken().hasType(ELToken::CBracket)) {
+  if (! m_tokenizer.peekToken().hasType(ELToken::CBracket)) {
     do {
       elements.push_back(parseExpressionOrAnyRange());
-    } while (expect(ELToken::Comma | ELToken::CBracket, m_tokenizer.nextToken())
-        .hasType(ELToken::Comma));
+    } while (expect(ELToken::Comma | ELToken::CBracket, m_tokenizer.nextToken()).hasType(ELToken::Comma));
   } else {
     m_tokenizer.nextToken();
   }
 
-  auto rhs = elements.size()==1u
-             ? std::move(elements.front())
-             : EL::Expression{EL::ArrayExpression{std::move(elements)}, line, column};
+  auto rhs = elements.size() == 1u ? std::move(elements.front()) : EL::Expression{EL::ArrayExpression{std::move(elements)}, line, column};
   return {EL::SubscriptExpression{std::move(lhs), std::move(rhs)}, line, column};
 }
 
@@ -342,22 +332,15 @@ EL::Expression ELParser::parseLiteral() {
     m_tokenizer.nextToken();
     // Escaping happens in EL::Value::appendToStream
     auto value = kdl::str_unescape(token.data(), "\\\"");
-    return {
-        EL::LiteralExpression{EL::Value{std::move(value)}}, token.line(), token.column()};
+    return {EL::LiteralExpression{EL::Value{std::move(value)}}, token.line(), token.column()};
   }
   if (token.hasType(ELToken::Number)) {
     m_tokenizer.nextToken();
-    return {
-        EL::LiteralExpression{EL::Value{token.toFloat<EL::NumberType>()}},
-        token.line(),
-        token.column()};
+    return {EL::LiteralExpression{EL::Value{token.toFloat<EL::NumberType>()}}, token.line(), token.column()};
   }
   if (token.hasType(ELToken::Boolean)) {
     m_tokenizer.nextToken();
-    return {
-        EL::LiteralExpression{EL::Value{token.data()=="true"}},
-        token.line(),
-        token.column()};
+    return {EL::LiteralExpression{EL::Value{token.data() == "true"}}, token.line(), token.column()};
   }
   if (token.hasType(ELToken::Null)) {
     m_tokenizer.nextToken();
@@ -377,11 +360,10 @@ EL::Expression ELParser::parseArray() {
 
   expect(ELToken::OBracket, token);
   auto elements = std::vector<EL::Expression>{};
-  if (!m_tokenizer.peekToken().hasType(ELToken::CBracket)) {
+  if (! m_tokenizer.peekToken().hasType(ELToken::CBracket)) {
     do {
       elements.push_back(parseExpressionOrRange());
-    } while (expect(ELToken::Comma | ELToken::CBracket, m_tokenizer.nextToken())
-        .hasType(ELToken::Comma));
+    } while (expect(ELToken::Comma | ELToken::CBracket, m_tokenizer.nextToken()).hasType(ELToken::Comma));
   } else {
     m_tokenizer.nextToken();
   }
@@ -393,11 +375,7 @@ EL::Expression ELParser::parseExpressionOrRange() {
   auto expression = parseExpression();
   if (m_tokenizer.peekToken().hasType(ELToken::Range)) {
     auto token = m_tokenizer.nextToken();
-    expression = EL::Expression{
-        EL::BinaryExpression{
-            EL::BinaryOperator::Range, std::move(expression), parseExpression()},
-        token.line(),
-        token.column()};
+    expression = EL::Expression{EL::BinaryExpression{EL::BinaryOperator::Range, std::move(expression), parseExpression()}, token.line(), token.column()};
   }
 
   return expression;
@@ -414,11 +392,7 @@ EL::Expression ELParser::parseExpressionOrAnyRange() {
     if (m_tokenizer.peekToken().hasType(ELToken::Range)) {
       auto token = m_tokenizer.nextToken();
       if (m_tokenizer.peekToken().hasType(ELToken::SimpleTerm)) {
-        expression = EL::Expression{
-            EL::BinaryExpression{
-                EL::BinaryOperator::Range, std::move(*expression), parseExpression()},
-            token.line(),
-            token.column()};
+        expression = EL::Expression{EL::BinaryExpression{EL::BinaryOperator::Range, std::move(*expression), parseExpression()}, token.line(), token.column()};
       } else {
         expression = EL::BinaryExpression::createAutoRangeWithLeftOperand(
             std::move(*expression), token.line(), token.column());
@@ -437,7 +411,7 @@ EL::Expression ELParser::parseMap() {
   const auto column = token.column();
 
   expect(ELToken::OBrace, token);
-  if (!m_tokenizer.peekToken().hasType(ELToken::CBrace)) {
+  if (! m_tokenizer.peekToken().hasType(ELToken::CBrace)) {
     do {
       token = m_tokenizer.nextToken();
       expect(ELToken::String | ELToken::Name, token);
@@ -445,8 +419,7 @@ EL::Expression ELParser::parseMap() {
 
       expect(ELToken::Colon, m_tokenizer.nextToken());
       elements.emplace(std::move(key), parseExpression());
-    } while (expect(ELToken::Comma | ELToken::CBrace, m_tokenizer.nextToken())
-        .hasType(ELToken::Comma));
+    } while (expect(ELToken::Comma | ELToken::CBrace, m_tokenizer.nextToken()).hasType(ELToken::Comma));
   } else {
     m_tokenizer.nextToken();
   }
@@ -455,23 +428,20 @@ EL::Expression ELParser::parseMap() {
 }
 
 EL::Expression ELParser::parseUnaryOperator() {
-  static const auto TokenMap = std::unordered_map<ELToken::Type, EL::UnaryOperator>{
-      {ELToken::Addition, EL::UnaryOperator::Plus},
-      {ELToken::Subtraction, EL::UnaryOperator::Minus},
-      {ELToken::LogicalNegation, EL::UnaryOperator::LogicalNegation},
-      {ELToken::BitwiseNegation, EL::UnaryOperator::BitwiseNegation},
-  };
+  static const auto TokenMap =
+      std::unordered_map<ELToken::Type, EL::UnaryOperator>{{ELToken::Addition, EL::UnaryOperator::Plus}, {ELToken::Subtraction, EL::UnaryOperator::Minus},
+                                                           {ELToken::LogicalNegation, EL::UnaryOperator::LogicalNegation},
+                                                           {ELToken::BitwiseNegation, EL::UnaryOperator::BitwiseNegation},
+      };
 
   auto token = m_tokenizer.nextToken();
   expect(ELToken::UnaryOperator, token);
 
-  if (const auto it = TokenMap.find(token.type()); it!=TokenMap.end()) {
+  if (const auto it = TokenMap.find(token.type()); it != TokenMap.end()) {
     const auto op = it->second;
-    return {
-        EL::UnaryExpression{op, parseSimpleTermOrSwitch()}, token.line(), token.column()};
+    return {EL::UnaryExpression{op, parseSimpleTermOrSwitch()}, token.line(), token.column()};
   }
-  throw ParserException{
-      token.line(), token.column(), "Unhandled unary operator: " + tokenName(token.type())};
+  throw ParserException{token.line(), token.column(), "Unhandled unary operator: " + tokenName(token.type())};
 }
 
 EL::Expression ELParser::parseSwitch() {
@@ -488,8 +458,7 @@ EL::Expression ELParser::parseSwitch() {
   if (token.hasType(ELToken::SimpleTerm)) {
     do {
       subExpressions.push_back(parseExpression());
-    } while (expect(ELToken::Comma | ELToken::DoubleCBrace, m_tokenizer.nextToken())
-        .hasType(ELToken::Comma));
+    } while (expect(ELToken::Comma | ELToken::DoubleCBrace, m_tokenizer.nextToken()).hasType(ELToken::Comma));
   } else if (token.hasType(ELToken::DoubleCBrace)) {
     m_tokenizer.nextToken();
   }
@@ -498,44 +467,37 @@ EL::Expression ELParser::parseSwitch() {
 }
 
 EL::Expression ELParser::parseCompoundTerm(EL::Expression lhs) {
-  static const auto TokenMap = std::unordered_map<ELToken::Type, EL::BinaryOperator>{
-      {ELToken::Addition, EL::BinaryOperator::Addition},
-      {ELToken::Subtraction, EL::BinaryOperator::Subtraction},
-      {ELToken::Multiplication, EL::BinaryOperator::Multiplication},
-      {ELToken::Division, EL::BinaryOperator::Division},
-      {ELToken::Modulus, EL::BinaryOperator::Modulus},
-      {ELToken::LogicalAnd, EL::BinaryOperator::LogicalAnd},
-      {ELToken::LogicalOr, EL::BinaryOperator::LogicalOr},
-      {ELToken::BitwiseAnd, EL::BinaryOperator::BitwiseAnd},
-      {ELToken::BitwiseXOr, EL::BinaryOperator::BitwiseXOr},
-      {ELToken::BitwiseOr, EL::BinaryOperator::BitwiseOr},
-      {ELToken::BitwiseShiftLeft, EL::BinaryOperator::BitwiseShiftLeft},
-      {ELToken::BitwiseShiftRight, EL::BinaryOperator::BitwiseShiftRight},
-      {ELToken::Less, EL::BinaryOperator::Less},
-      {ELToken::LessOrEqual, EL::BinaryOperator::LessOrEqual},
-      {ELToken::Greater, EL::BinaryOperator::Greater},
-      {ELToken::GreaterOrEqual, EL::BinaryOperator::GreaterOrEqual},
-      {ELToken::Equal, EL::BinaryOperator::Equal},
-      {ELToken::NotEqual, EL::BinaryOperator::NotEqual},
-      {ELToken::Range, EL::BinaryOperator::Range},
-      {ELToken::Case, EL::BinaryOperator::Case},
+  static const auto TokenMap = std::unordered_map<ELToken::Type, EL::BinaryOperator>{{ELToken::Addition, EL::BinaryOperator::Addition},
+                                                                                     {ELToken::Subtraction, EL::BinaryOperator::Subtraction},
+                                                                                     {ELToken::Multiplication, EL::BinaryOperator::Multiplication},
+                                                                                     {ELToken::Division, EL::BinaryOperator::Division},
+                                                                                     {ELToken::Modulus, EL::BinaryOperator::Modulus},
+                                                                                     {ELToken::LogicalAnd, EL::BinaryOperator::LogicalAnd},
+                                                                                     {ELToken::LogicalOr, EL::BinaryOperator::LogicalOr},
+                                                                                     {ELToken::BitwiseAnd, EL::BinaryOperator::BitwiseAnd},
+                                                                                     {ELToken::BitwiseXOr, EL::BinaryOperator::BitwiseXOr},
+                                                                                     {ELToken::BitwiseOr, EL::BinaryOperator::BitwiseOr},
+                                                                                     {ELToken::BitwiseShiftLeft, EL::BinaryOperator::BitwiseShiftLeft},
+                                                                                     {ELToken::BitwiseShiftRight, EL::BinaryOperator::BitwiseShiftRight},
+                                                                                     {ELToken::Less, EL::BinaryOperator::Less},
+                                                                                     {ELToken::LessOrEqual, EL::BinaryOperator::LessOrEqual},
+                                                                                     {ELToken::Greater, EL::BinaryOperator::Greater},
+                                                                                     {ELToken::GreaterOrEqual, EL::BinaryOperator::GreaterOrEqual},
+                                                                                     {ELToken::Equal, EL::BinaryOperator::Equal},
+                                                                                     {ELToken::NotEqual, EL::BinaryOperator::NotEqual},
+                                                                                     {ELToken::Range, EL::BinaryOperator::Range},
+                                                                                     {ELToken::Case, EL::BinaryOperator::Case},
   };
 
   while (m_tokenizer.peekToken().hasType(ELToken::CompoundTerm)) {
     auto token = m_tokenizer.nextToken();
     expect(ELToken::CompoundTerm, token);
 
-    if (const auto it = TokenMap.find(token.type()); it!=TokenMap.end()) {
+    if (const auto it = TokenMap.find(token.type()); it != TokenMap.end()) {
       const auto op = it->second;
-      lhs = EL::Expression{
-          EL::BinaryExpression{op, std::move(lhs), parseSimpleTermOrSwitch()},
-          token.line(),
-          token.column()};
+      lhs = EL::Expression{EL::BinaryExpression{op, std::move(lhs), parseSimpleTermOrSwitch()}, token.line(), token.column()};
     } else {
-      throw ParserException{
-          token.line(),
-          token.column(),
-          "Unhandled binary operator: " + tokenName(token.type())};
+      throw ParserException{token.line(), token.column(), "Unhandled binary operator: " + tokenName(token.type())};
     }
   }
 
@@ -543,44 +505,14 @@ EL::Expression ELParser::parseCompoundTerm(EL::Expression lhs) {
 }
 
 ELParser::TokenNameMap ELParser::tokenNames() const {
-  return {
-      {ELToken::Name, "variable"},
-      {ELToken::String, "string"},
-      {ELToken::Number, "number"},
-      {ELToken::Boolean, "boolean"},
-      {ELToken::OBracket, "'['"},
-      {ELToken::CBracket, "']'"},
-      {ELToken::OBrace, "'{'"},
-      {ELToken::CBrace, "'}'"},
-      {ELToken::OParen, "'('"},
-      {ELToken::CParen, "')'"},
-      {ELToken::Addition, "'+'"},
-      {ELToken::Subtraction, "'-'"},
-      {ELToken::Multiplication, "'*'"},
-      {ELToken::Division, "'/'"},
-      {ELToken::Modulus, "'%'"},
-      {ELToken::Colon, "':'"},
-      {ELToken::Comma, "','"},
-      {ELToken::Range, "'..'"},
-      {ELToken::LogicalNegation, "'!'"},
-      {ELToken::LogicalAnd, "'&&'"},
-      {ELToken::LogicalOr, "'||'"},
-      {ELToken::Less, "'<'"},
-      {ELToken::LessOrEqual, "'<='"},
-      {ELToken::Equal, "'=='"},
-      {ELToken::NotEqual, "'!='"},
-      {ELToken::GreaterOrEqual, "'>='"},
-      {ELToken::Greater, "'>'"},
-      {ELToken::Case, "'->'"},
-      {ELToken::BitwiseNegation, "'~'"},
-      {ELToken::BitwiseAnd, "'&'"},
-      {ELToken::BitwiseOr, "'|'"},
-      {ELToken::BitwiseShiftLeft, "'<<'"},
-      {ELToken::BitwiseShiftRight, "'>>'"},
-      {ELToken::DoubleOBrace, "'{{'"},
-      {ELToken::DoubleCBrace, "'}}'"},
-      {ELToken::Null, "'null'"},
-      {ELToken::Eof, "end of file"},
+  return {{ELToken::Name, "variable"}, {ELToken::String, "string"}, {ELToken::Number, "number"}, {ELToken::Boolean, "boolean"}, {ELToken::OBracket, "'['"},
+          {ELToken::CBracket, "']'"}, {ELToken::OBrace, "'{'"}, {ELToken::CBrace, "'}'"}, {ELToken::OParen, "'('"}, {ELToken::CParen, "')'"},
+          {ELToken::Addition, "'+'"}, {ELToken::Subtraction, "'-'"}, {ELToken::Multiplication, "'*'"}, {ELToken::Division, "'/'"}, {ELToken::Modulus, "'%'"},
+          {ELToken::Colon, "':'"}, {ELToken::Comma, "','"}, {ELToken::Range, "'..'"}, {ELToken::LogicalNegation, "'!'"}, {ELToken::LogicalAnd, "'&&'"},
+          {ELToken::LogicalOr, "'||'"}, {ELToken::Less, "'<'"}, {ELToken::LessOrEqual, "'<='"}, {ELToken::Equal, "'=='"}, {ELToken::NotEqual, "'!='"},
+          {ELToken::GreaterOrEqual, "'>='"}, {ELToken::Greater, "'>'"}, {ELToken::Case, "'->'"}, {ELToken::BitwiseNegation, "'~'"},
+          {ELToken::BitwiseAnd, "'&'"}, {ELToken::BitwiseOr, "'|'"}, {ELToken::BitwiseShiftLeft, "'<<'"}, {ELToken::BitwiseShiftRight, "'>>'"},
+          {ELToken::DoubleOBrace, "'{{'"}, {ELToken::DoubleCBrace, "'}}'"}, {ELToken::Null, "'null'"}, {ELToken::Eof, "end of file"},
   };
 }
 

@@ -35,8 +35,7 @@
 
 namespace TrenchBroom {
 namespace View {
-Console::Console(QWidget *parent)
-    : TabBookPage(parent) {
+Console::Console(QWidget *parent) : TabBookPage(parent) {
   m_textView = new QTextEdit();
   m_textView->setReadOnly(true);
   m_textView->setWordWrapMode(QTextOption::NoWrap);
@@ -52,7 +51,7 @@ void Console::doLog(const LogLevel level, const std::string &message) {
 }
 
 void Console::doLog(const LogLevel level, const QString &message) {
-  if (!message.isEmpty()) {
+  if (! message.isEmpty()) {
     logToDebugOut(level, message);
     logToConsole(level, message);
     FileLogger::instance().log(level, message);

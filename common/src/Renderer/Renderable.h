@@ -25,7 +25,9 @@ namespace TrenchBroom {
 namespace Renderer {
 class RenderContext;
 
+
 class VboManager;
+
 
 class Renderable {
 public:
@@ -41,6 +43,7 @@ private:
 defineCopyAndMove(Renderable);
 };
 
+
 class DirectRenderable : public Renderable {
 public:
   DirectRenderable() = default;
@@ -54,6 +57,7 @@ private:
 
 defineCopyAndMove(DirectRenderable);
 };
+
 
 class IndexedRenderable : public Renderable {
 public:

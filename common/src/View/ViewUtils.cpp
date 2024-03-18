@@ -40,27 +40,24 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom::View {
 
-void combineFlags(
-    const size_t numFlags, const int newFlagValue, int &setFlags, int &mixedFlags) {
-  for (size_t i = 0; i < numFlags; ++i) {
-    const auto alreadySet = (newFlagValue & (1 << i))!=0;
-    const auto willBeSet = (setFlags & (1 << i))!=0;
-    if (alreadySet==willBeSet) {
+void combineFlags(const size_t numFlags, const int newFlagValue, int &setFlags, int &mixedFlags) {
+  for (size_t i = 0; i < numFlags; ++ i) {
+    const auto alreadySet = (newFlagValue & (1 << i)) != 0;
+    const auto willBeSet = (setFlags & (1 << i)) != 0;
+    if (alreadySet == willBeSet) {
       continue;
     }
 
-    setFlags &= ~(1 << i);
+    setFlags &= ~ (1 << i);
     mixedFlags |= (1 << i);
   }
 }
 
-bool loadEntityDefinitionFile(
-    std::weak_ptr<MapDocument> document, QWidget *parent, const QString &path) {
-  return loadEntityDefinitionFile(document, parent, QStringList{path})==0;
+bool loadEntityDefinitionFile(std::weak_ptr<MapDocument> document, QWidget *parent, const QString &path) {
+  return loadEntityDefinitionFile(document, parent, QStringList{path}) == 0;
 }
 
-size_t loadEntityDefinitionFile(
-    std::weak_ptr<MapDocument> i_document, QWidget *parent, const QStringList &pathStrs) {
+size_t loadEntityDefinitionFile(std::weak_ptr<MapDocument> i_document, QWidget *parent, const QStringList &pathStrs) {
   if (pathStrs.empty()) {
     return 0;
   }
@@ -71,15 +68,13 @@ size_t loadEntityDefinitionFile(
   const auto gamePath = gameFactory.gamePath(game->gameName());
   const auto docPath = document->path();
 
-  for (int i = 0; i < pathStrs.size(); ++i) {
+  for (int i = 0; i < pathStrs.size(); ++ i) {
     const auto &pathStr = pathStrs[i];
     const auto absPath = IO::pathFromQString(pathStr);
     if (game->isEntityDefinitionFile(absPath)) {
-      auto pathDialog =
-          ChoosePathTypeDialog{parent->window(), absPath, docPath, gamePath};
-      if (pathDialog.exec()==QDialog::Accepted) {
-        const auto path =
-            convertToPathType(pathDialog.pathType(), absPath, docPath, gamePath);
+      auto pathDialog = ChoosePathTypeDialog{parent->window(), absPath, docPath, gamePath};
+      if (pathDialog.exec() == QDialog::Accepted) {
+        const auto path = convertToPathType(pathDialog.pathType(), absPath, docPath, gamePath);
         const auto spec = Assets::EntityDefinitionFileSpec::external(path);
         document->setEntityDefinitionFile(spec);
         return static_cast<size_t>(i);
@@ -90,43 +85,27 @@ size_t loadEntityDefinitionFile(
   return static_cast<size_t>(pathStrs.size());
 }
 
-static std::string queryObjectName(
-    QWidget *parent, const QString &objectType, const std::string &suggestion) {
+static std::string queryObjectName(QWidget *parent, const QString &objectType, const std::string &suggestion) {
   while (true) {
     auto ok = false;
     const auto name = QInputDialog::getText(
-        parent,
-        "Enter a name",
-        QObject::tr("%1 Name").arg(objectType),
-        QLineEdit::Normal,
-        QString::fromStdString(suggestion),
-        &ok)
-        .toStdString();
+        parent, "Enter a name", QObject::tr("%1 Name").arg(objectType), QLineEdit::Normal, QString::fromStdString(suggestion), &ok
+    ).toStdString();
 
-    if (!ok) {
+    if (! ok) {
       return "";
     }
 
     if (kdl::str_is_blank(name)) {
-      if (
-          QMessageBox::warning(
-              parent,
-              "Error",
-              QObject::tr("%1 names cannot be blank.").arg(objectType),
-              QMessageBox::Ok | QMessageBox::Cancel,
-              QMessageBox::Ok)
-              !=QMessageBox::Ok) {
+      if (QMessageBox::warning(
+          parent, "Error", QObject::tr("%1 names cannot be blank.").arg(objectType), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok
+      ) != QMessageBox::Ok) {
         return "";
       }
     } else if (kdl::ci::str_contains(name, "\"")) {
-      if (
-          QMessageBox::warning(
-              parent,
-              "Error",
-              QObject::tr("%1 names cannot contain double quotes.").arg(objectType),
-              QMessageBox::Ok | QMessageBox::Cancel,
-              QMessageBox::Ok)
-              !=QMessageBox::Ok) {
+      if (QMessageBox::warning(
+          parent, "Error", QObject::tr("%1 names cannot contain double quotes.").arg(objectType), QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok
+      ) != QMessageBox::Ok) {
         return "";
       }
     } else {

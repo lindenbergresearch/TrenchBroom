@@ -24,50 +24,81 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-TEST_CASE("CameraTest.testInvalidUp")
-{
-    PerspectiveCamera c;
-    c.setDirection(vm::vec3f(0, 0, 1), vm::vec3f(0, 0, 1));
+TEST_CASE("CameraTest.testInvalidUp") {
+PerspectiveCamera c;
+c.
+setDirection(vm::vec3f(0, 0, 1), vm::vec3f(0, 0, 1)
+);
 
-    CHECK_FALSE(vm::is_nan(c.direction()));
-    CHECK_FALSE(vm::is_nan(c.right()));
-    CHECK_FALSE(vm::is_nan(c.up()));
+CHECK_FALSE(vm::is_nan(c.direction())
+);
+CHECK_FALSE(vm::is_nan(c.right())
+);
+CHECK_FALSE(vm::is_nan(c.up())
+);
 }
 
-TEST_CASE("CameraTest.testOrbitDown")
-{
-    PerspectiveCamera c;
-    c.setDirection(vm::vec3f(1, 0, 0), vm::vec3f(0, 0, 1));
+TEST_CASE("CameraTest.testOrbitDown") {
+PerspectiveCamera c;
+c.
+setDirection(vm::vec3f(1, 0, 0), vm::vec3f(0, 0, 1)
+);
 
-    c.orbit(vm::vec3f::zero(), 0.0f, vm::constants<float>::pi());
+c.
 
-    CHECK_FALSE(vm::is_nan(c.direction()));
-    CHECK_FALSE(vm::is_nan(c.right()));
-    CHECK_FALSE(vm::is_nan(c.up()));
+orbit(vm::vec3f::zero(),
+
+0.0f,
+
+vm::constants<float>::pi()
+
+);
+
+CHECK_FALSE(vm::is_nan(c.direction())
+);
+CHECK_FALSE(vm::is_nan(c.right())
+);
+CHECK_FALSE(vm::is_nan(c.up())
+);
 }
 
 TEST_CASE("CameraTest.testOrbitWhileInverted")
 {
-    PerspectiveCamera c;
-    c.setDirection(vm::vec3f(1, 0, 0), vm::vec3f(0, 0, -1));
+PerspectiveCamera c;
+c.
+setDirection(vm::vec3f(1, 0, 0), vm::vec3f(0, 0, - 1)
+);
 
-    c.orbit(vm::vec3f::zero(), vm::constants<float>::pi(), 0.0f);
+c.
 
-    CHECK_FALSE(vm::is_nan(c.direction()));
-    CHECK_FALSE(vm::is_nan(c.right()));
-    CHECK_FALSE(vm::is_nan(c.up()));
+orbit(vm::vec3f::zero(), vm::constants<float>::pi(),
+
+0.0f);
+
+CHECK_FALSE(vm::is_nan(c.direction())
+);
+CHECK_FALSE(vm::is_nan(c.right())
+);
+CHECK_FALSE(vm::is_nan(c.up())
+);
 }
 
 TEST_CASE("CameraTest.testYawWhenPitchedDown")
 {
-    PerspectiveCamera c;
-    c.setDirection(vm::vec3f::neg_z(), vm::vec3f::pos_x());
+PerspectiveCamera c;
+c.
 
-    c.rotate(0.1f, 0.0f);
+setDirection(vm::vec3f::neg_z(), vm::vec3f::pos_x()
 
-    CHECK_FALSE(vm::is_nan(c.direction()));
-    CHECK_FALSE(vm::is_nan(c.right()));
-    CHECK_FALSE(vm::is_nan(c.up()));
-}
-} // namespace Renderer
+);
+
+c.rotate(0.1f, 0.0f);
+
+CHECK_FALSE(vm::is_nan(c.direction())
+);
+CHECK_FALSE(vm::is_nan(c.right())
+);
+CHECK_FALSE(vm::is_nan(c.up())
+);
+}} // namespace Renderer
 } // namespace TrenchBroom

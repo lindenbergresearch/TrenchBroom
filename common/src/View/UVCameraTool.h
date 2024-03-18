@@ -32,6 +32,7 @@ class OrthographicCamera;
 namespace View {
 class DragTracker;
 
+
 class UVCameraTool : public ToolController, public Tool {
 private:
   Renderer::OrthographicCamera &m_camera;

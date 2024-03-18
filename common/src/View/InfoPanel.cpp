@@ -30,8 +30,7 @@
 
 namespace TrenchBroom {
 namespace View {
-InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_console(nullptr), m_issueBrowser(nullptr) {
+InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget(parent), m_console(nullptr), m_issueBrowser(nullptr) {
   m_console = new Console();
   m_issueBrowser = new IssueBrowser(document);
 
@@ -44,7 +43,8 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent)
 
   auto *sizer = new QVBoxLayout();
   sizer->setContentsMargins(
-      0, LayoutConstants::MediumVMargin, 0, LayoutConstants::NoMargin);
+      0, LayoutConstants::MediumVMargin, 0, LayoutConstants::NoMargin
+  );
   sizer->addWidget(m_tabs);
   sizer->addWidget(new BorderLine());
   setLayout(sizer);

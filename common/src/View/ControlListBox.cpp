@@ -36,8 +36,7 @@ namespace TrenchBroom {
 namespace View {
 // ControlListBoxItemRenderer
 
-ControlListBoxItemRenderer::ControlListBoxItemRenderer(QWidget *parent)
-    : QWidget(parent), m_index(0) {
+ControlListBoxItemRenderer::ControlListBoxItemRenderer(QWidget *parent) : QWidget(parent), m_index(0) {
   setBaseWindowColor(this);
 }
 
@@ -49,25 +48,21 @@ void ControlListBoxItemRenderer::setIndex(const size_t index) {
 
 void ControlListBoxItemRenderer::mouseDoubleClickEvent(QMouseEvent *event) {
   QWidget::mouseDoubleClickEvent(event);
-  if (event->button()==Qt::LeftButton) {
+  if (event->button() == Qt::LeftButton) {
     emit doubleClicked(m_index);
   }
 }
 
 void ControlListBoxItemRenderer::updateItem() {}
 
-void ControlListBoxItemRenderer::setSelected(
-    const bool selected, const QListWidget *listWidget) {
+void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWidget *listWidget) {
   setBackgroundRole(selected ? QPalette::Highlight : QPalette::Base);
 
   // by default, we just change the appearance of all labels
   auto children = findChildren<QLabel *>();
   for (auto *child : children) {
-    const auto dontUpdate =
-        child->property(ControlListBox::LabelColorShouldNotUpdateWhenSelected);
-    if (
-        dontUpdate.isValid() && dontUpdate.canConvert(QMetaType::Bool)
-            && dontUpdate.toBool()) {
+    const auto dontUpdate = child->property(ControlListBox::LabelColorShouldNotUpdateWhenSelected);
+    if (dontUpdate.isValid() && dontUpdate.canConvert(QMetaType::Bool) && dontUpdate.toBool()) {
       continue;
     }
   }
@@ -75,9 +70,8 @@ void ControlListBoxItemRenderer::setSelected(
 
 // ControlListBoxItemRendererWrapper
 
-ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(
-    ControlListBoxItemRenderer *renderer, const bool showSeparator, QWidget *parent)
-    : QWidget(parent), m_renderer(renderer) {
+ControlListBoxItemRendererWrapper::ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, const bool showSeparator, QWidget *parent) :
+    QWidget(parent), m_renderer(renderer) {
   auto *layout = new QVBoxLayout();
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
@@ -102,23 +96,17 @@ const ControlListBoxItemRenderer *ControlListBoxItemRendererWrapper::renderer() 
 
 // ControlListBox
 
-ControlListBox::ControlListBox(
-    const QString &emptyText,
-    const QMargins &itemMargins,
-    const bool showSeparator,
-    QWidget *parent)
-    : QWidget(parent), m_listWidget(new QListWidget()), m_emptyTextContainer(new QWidget()),
-      m_emptyTextLabel(new QLabel(emptyText)), m_itemMargins(itemMargins), m_showSeparator(showSeparator) {
+ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMargins, const bool showSeparator, QWidget *parent) :
+    QWidget(parent), m_listWidget(new QListWidget()), m_emptyTextContainer(new QWidget()), m_emptyTextLabel(new QLabel(emptyText)), m_itemMargins(itemMargins),
+    m_showSeparator(showSeparator) {
   m_listWidget->setObjectName("controlListBox_listWidget");
   m_listWidget->hide();
   m_listWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   // m_listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   connect(
-      m_listWidget,
-      &QListWidget::itemSelectionChanged,
-      this,
-      &ControlListBox::listItemSelectionChanged);
+      m_listWidget, &QListWidget::itemSelectionChanged, this, &ControlListBox::listItemSelectionChanged
+  );
 
   m_emptyTextLabel->setWordWrap(true);
   m_emptyTextLabel->setDisabled(true);
@@ -137,17 +125,11 @@ ControlListBox::ControlListBox(
   emptyTextLayout->addWidget(m_emptyTextLabel);
 }
 
-ControlListBox::ControlListBox(
-    const QString &emptyText, const bool showSeparator, QWidget *parent)
-    : ControlListBox(
-    emptyText,
-    QMargins(
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::NarrowVMargin,
-        LayoutConstants::MediumHMargin,
-        LayoutConstants::NarrowVMargin),
-    showSeparator,
-    parent) {
+ControlListBox::ControlListBox(const QString &emptyText, const bool showSeparator, QWidget *parent) : ControlListBox(
+    emptyText, QMargins(
+        LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin
+    ), showSeparator, parent
+) {
 }
 
 void ControlListBox::setEmptyText(const QString &emptyText) {
@@ -181,13 +163,13 @@ void ControlListBox::reload() {
   // This was causing a crash in LayerListBox's selectedRowChanged() override
   // if you clicked on a layer and then opened a new map on Windows.
   // As a workaround, unset the current row before clearing the list.
-  m_listWidget->setCurrentRow(-1);
+  m_listWidget->setCurrentRow(- 1);
 
   m_listWidget->clear();
 
   const auto count = itemCount();
   if (count > 0) {
-    for (size_t i = 0; i < count; ++i) {
+    for (size_t i = 0; i < count; ++ i) {
       addItemRenderer(createItemRenderer(m_listWidget, i));
     }
     m_listWidget->show();
@@ -199,7 +181,7 @@ void ControlListBox::reload() {
 }
 
 void ControlListBox::updateItems() {
-  for (int i = 0; i < m_listWidget->count(); ++i) {
+  for (int i = 0; i < m_listWidget->count(); ++ i) {
     auto *renderer = this->renderer(i);
     renderer->updateItem();
   }
@@ -207,7 +189,7 @@ void ControlListBox::updateItems() {
 
 const ControlListBoxItemRenderer *ControlListBox::renderer(const int i) const {
   auto *wrapper = this->wrapper(i);
-  if (wrapper==nullptr) {
+  if (wrapper == nullptr) {
     return nullptr;
   }
   return wrapper->renderer();
@@ -215,7 +197,7 @@ const ControlListBoxItemRenderer *ControlListBox::renderer(const int i) const {
 
 ControlListBoxItemRenderer *ControlListBox::renderer(const int i) {
   auto *wrapper = this->wrapper(i);
-  if (wrapper==nullptr) {
+  if (wrapper == nullptr) {
     return nullptr;
   }
   return wrapper->renderer();
@@ -244,15 +226,13 @@ void ControlListBox::addItemRenderer(ControlListBoxItemRenderer *renderer) {
   renderer->setIndex(static_cast<size_t>(index));
   renderer->setContentsMargins(m_itemMargins);
   connect(
-      renderer,
-      &ControlListBoxItemRenderer::doubleClicked,
-      this,
-      &ControlListBox::doubleClicked);
+      renderer, &ControlListBoxItemRenderer::doubleClicked, this, &ControlListBox::doubleClicked
+  );
 
   auto *widgetItem = new QListWidgetItem(m_listWidget);
   m_listWidget->addItem(widgetItem);
 
-  if (m_listWidget->itemWidget(widgetItem)!=nullptr) {
+  if (m_listWidget->itemWidget(widgetItem) != nullptr) {
     m_listWidget->removeItemWidget(widgetItem);
   }
 
@@ -261,7 +241,7 @@ void ControlListBox::addItemRenderer(ControlListBoxItemRenderer *renderer) {
   m_listWidget->setItemWidget(widgetItem, wrapper);
   widgetItem->setSizeHint(renderer->minimumSizeHint());
   renderer->updateItem();
-  renderer->setSelected(m_listWidget->currentItem()==widgetItem, m_listWidget);
+  renderer->setSelected(m_listWidget->currentItem() == widgetItem, m_listWidget);
 }
 
 void ControlListBox::selectedRowChanged(const int /* index */) {}
@@ -271,7 +251,7 @@ void ControlListBox::doubleClicked(const size_t /* index */) {}
 void ControlListBox::listItemSelectionChanged() {
   bool wasAnyRowSelected = false;
 
-  for (int row = 0; row < count(); ++row) {
+  for (int row = 0; row < count(); ++ row) {
     auto *listItem = m_listWidget->item(row);
     auto *renderer = this->renderer(row);
     // FIXME: this uses QListWidgetItem::isSelected() but addItemRenderer() is doing
@@ -284,8 +264,8 @@ void ControlListBox::listItemSelectionChanged() {
     }
   }
 
-  if (!wasAnyRowSelected) {
-    selectedRowChanged(-1);
+  if (! wasAnyRowSelected) {
+    selectedRowChanged(- 1);
   }
 
   emit itemSelectionChanged();

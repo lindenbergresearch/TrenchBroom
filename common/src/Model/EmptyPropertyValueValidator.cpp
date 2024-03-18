@@ -35,21 +35,17 @@ namespace {
 static const auto Type = freeIssueType();
 } // namespace
 
-EmptyPropertyValueValidator::EmptyPropertyValueValidator()
-    : Validator{Type, "Empty property value"} {
+EmptyPropertyValueValidator::EmptyPropertyValueValidator() : Validator{Type, "Empty property value"} {
   addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
 }
 
-void EmptyPropertyValueValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+void EmptyPropertyValueValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
   for (const auto &property : entityNode.entity().properties()) {
     if (property.value().empty()) {
-      issues.push_back(std::make_unique<EntityPropertyIssue>(
-          Type,
-          entityNode,
-          property.key(),
-          "Property '" + property.key() + "' of " + entityNode.name()
-              + " has an empty value."));
+      issues.push_back(
+          std::make_unique<EntityPropertyIssue>(
+              Type, entityNode, property.key(), "Property '" + property.key() + "' of " + entityNode.name() + " has an empty value."
+          ));
     }
   }
 }

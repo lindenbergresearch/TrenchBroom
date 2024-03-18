@@ -21,9 +21,12 @@
 
 #include <QWidget>
 
+
 class QLabel;
 
+
 class QListWidget;
+
 
 class QListWidgetItem;
 
@@ -54,6 +57,7 @@ signals:
   void doubleClicked(size_t index);
 };
 
+
 /**
  * Wraps a renderer and adds a separator line at the bottom.
  */
@@ -63,19 +67,18 @@ private:
   ControlListBoxItemRenderer *m_renderer;
 
 public:
-  explicit ControlListBoxItemRendererWrapper(
-      ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr);
+  explicit ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr);
 
   ControlListBoxItemRenderer *renderer();
 
   const ControlListBoxItemRenderer *renderer() const;
 };
 
+
 class ControlListBox : public QWidget {
 Q_OBJECT
 public:
-  static constexpr auto LabelColorShouldNotUpdateWhenSelected =
-      "LabelColorShouldNotUpdateWhenSelected";
+  static constexpr auto LabelColorShouldNotUpdateWhenSelected = "LabelColorShouldNotUpdateWhenSelected";
 
 private:
   QListWidget *m_listWidget;
@@ -85,11 +88,7 @@ private:
   bool m_showSeparator;
 
 public:
-  ControlListBox(
-      const QString &emptyText,
-      const QMargins &itemMargins,
-      bool showSeparator,
-      QWidget *parent = nullptr);
+  ControlListBox(const QString &emptyText, const QMargins &itemMargins, bool showSeparator, QWidget *parent = nullptr);
 
   ControlListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
@@ -133,8 +132,7 @@ private:
 private:
   virtual size_t itemCount() const = 0;
 
-  virtual ControlListBoxItemRenderer *createItemRenderer(
-      QWidget *parent, size_t index) = 0;
+  virtual ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) = 0;
 
   virtual void selectedRowChanged(int index);
 

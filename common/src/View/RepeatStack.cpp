@@ -27,8 +27,7 @@
 
 namespace TrenchBroom {
 namespace View {
-RepeatStack::RepeatStack()
-    : m_clearOnNextPush{false}, m_repeating{false} {
+RepeatStack::RepeatStack() : m_clearOnNextPush{false}, m_repeating{false} {
 }
 
 size_t RepeatStack::size() const {
@@ -36,7 +35,7 @@ size_t RepeatStack::size() const {
 }
 
 void RepeatStack::push(RepeatableAction repeatableAction) {
-  if (!m_repeating) {
+  if (! m_repeating) {
     if (m_openTransactionsStack.empty()) {
       if (m_clearOnNextPush) {
         m_clearOnNextPush = false;
@@ -58,7 +57,7 @@ static void execute(const std::vector<RepeatStack::RepeatableAction> &actions) {
 }
 
 void RepeatStack::repeat() const {
-  if (!m_openTransactionsStack.empty()) {
+  if (! m_openTransactionsStack.empty()) {
     return;
   }
 
@@ -67,15 +66,15 @@ void RepeatStack::repeat() const {
 }
 
 void RepeatStack::clear() {
-  if (!m_openTransactionsStack.empty()) {
+  if (! m_openTransactionsStack.empty()) {
     return;
   }
-  assert(!m_repeating);
+  assert(! m_repeating);
   m_stack.clear();
 }
 
 void RepeatStack::clearOnNextPush() {
-  if (!m_openTransactionsStack.empty()) {
+  if (! m_openTransactionsStack.empty()) {
     return;
   }
   m_clearOnNextPush = true;
@@ -92,7 +91,7 @@ void RepeatStack::commitTransaction() {
   if (m_repeating) {
     return;
   }
-  ensure(!m_openTransactionsStack.empty(), "a transaction is open");
+  ensure(! m_openTransactionsStack.empty(), "a transaction is open");
 
   auto transaction = std::move(m_openTransactionsStack.back());
   m_openTransactionsStack.pop_back();
@@ -110,7 +109,7 @@ void RepeatStack::rollbackTransaction() {
   if (m_repeating) {
     return;
   }
-  ensure(!m_openTransactionsStack.empty(), "a transaction is open");
+  ensure(! m_openTransactionsStack.empty(), "a transaction is open");
 
   auto &openTransaction = m_openTransactionsStack.back();
   openTransaction.clear();

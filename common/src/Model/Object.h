@@ -26,9 +26,16 @@
 namespace TrenchBroom::Model {
 
 class GroupNode;
+
+
 class LayerNode;
+
+
 class Node;
+
+
 enum class SetLinkId;
+
 
 class Object {
 protected:
@@ -40,24 +47,32 @@ public:
   virtual ~Object();
 
   const std::string &linkId() const;
+
   void setLinkId(std::string linkId);
+
   void cloneLinkId(const Object &original, SetLinkId linkIdPolicy);
 
   Node *container();
+
   const Node *container() const;
 
   LayerNode *containingLayer();
+
   const LayerNode *containingLayer() const;
 
   GroupNode *containingGroup();
+
   const GroupNode *containingGroup() const;
 
   bool containedInGroup() const;
+
   bool containingGroupOpened() const;
 
 private: // subclassing interface
   virtual Node *doGetContainer() = 0;
+
   virtual LayerNode *doGetContainingLayer() = 0;
+
   virtual GroupNode *doGetContainingGroup() = 0;
 };
 

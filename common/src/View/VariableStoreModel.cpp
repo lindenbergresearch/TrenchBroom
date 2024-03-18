@@ -23,8 +23,7 @@
 
 namespace TrenchBroom {
 namespace View {
-VariableStoreModel::VariableStoreModel(const EL::VariableStore &variables)
-    : m_variables(variables.clone()) {
+VariableStoreModel::VariableStoreModel(const EL::VariableStore &variables) : m_variables(variables.clone()) {
   for (const auto &name : m_variables->names()) {
     m_variableNames.push_back(name);
   }
@@ -37,17 +36,15 @@ int VariableStoreModel::rowCount(const QModelIndex & /* parent */) const {
 }
 
 QVariant VariableStoreModel::data(const QModelIndex &index, const int role) const {
-  if (
-      index.column() < 0 || index.column() > 1 || index.row() < 0
-          || index.row() >= static_cast<int>(m_variables->size())) {
+  if (index.column() < 0 || index.column() > 1 || index.row() < 0 || index.row() >= static_cast<int>(m_variables->size())) {
     return QVariant();
   }
 
   const auto &name = m_variableNames[static_cast<size_t>(index.row())];
-  if (index.column()==0) {
-    if (role==Qt::EditRole) {
+  if (index.column() == 0) {
+    if (role == Qt::EditRole) {
       return QString::fromStdString("${" + name + "}");
-    } else if (role==Qt::DisplayRole) {
+    } else if (role == Qt::DisplayRole) {
       return QString::fromStdString(name);
     } else {
       return QVariant();

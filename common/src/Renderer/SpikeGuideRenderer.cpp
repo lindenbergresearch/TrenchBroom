@@ -41,8 +41,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-SpikeGuideRenderer::SpikeGuideRenderer()
-    : m_valid(false) {
+SpikeGuideRenderer::SpikeGuideRenderer() : m_valid(false) {
 }
 
 void SpikeGuideRenderer::setColor(const Color &color) {
@@ -50,21 +49,17 @@ void SpikeGuideRenderer::setColor(const Color &color) {
   m_valid = false;
 }
 
-void SpikeGuideRenderer::add(
-    const vm::ray3 &ray,
-    const FloatType length,
-    std::shared_ptr<View::MapDocument> document) {
+void SpikeGuideRenderer::add(const vm::ray3 &ray, const FloatType length, std::shared_ptr<View::MapDocument> document) {
   Model::PickResult pickResult = Model::PickResult::byDistance();
   document->pick(ray, pickResult);
 
   using namespace Model::HitFilters;
-  const auto &hit =
-      pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
+  const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && minDistance(1.0));
   if (hit.isMatch()) {
     if (hit.distance() <= length)
       addPoint(vm::point_at_distance(ray, hit.distance()));
     addSpike(ray, vm::min(length, hit.distance()), length);
-  } else if (!pref(Preferences::SelectionBoundsIntersectionMode)) {
+  } else if (! pref(Preferences::SelectionBoundsIntersectionMode)) {
     addSpike(ray, length, length);
   }
   m_valid = false;
@@ -79,7 +74,7 @@ void SpikeGuideRenderer::clear() {
 }
 
 void SpikeGuideRenderer::doPrepareVertices(VboManager &vboManager) {
-  if (!m_valid)
+  if (! m_valid)
     validate();
   m_pointArray.prepare(vboManager);
   m_spikeArray.prepare(vboManager);
@@ -91,8 +86,7 @@ void SpikeGuideRenderer::doRender(RenderContext &renderContext) {
   if (pref(Preferences::SelectionBoundsDashedLines)) {
     glAssert(glEnable(GL_LINE_STIPPLE));
     glAssert(glLineStipple(
-        pref(Preferences::SelectionBoundsDashedSize),
-        (GLushort) pref(Preferences::SelectionBoundsPattern)));
+        pref(Preferences::SelectionBoundsDashedSize), (GLushort) pref(Preferences::SelectionBoundsPattern)));
   }
 
   glAssert(glLineWidth(pref(Preferences::SelectionBoundsLineWidth)));
@@ -114,8 +108,7 @@ void SpikeGuideRenderer::addPoint(const vm::vec3 &position) {
   m_pointVertices.emplace_back(vm::vec3f(position), m_color);
 }
 
-void SpikeGuideRenderer::addSpike(
-    const vm::ray3 &ray, const FloatType length, const FloatType maxLength) {
+void SpikeGuideRenderer::addSpike(const vm::ray3 &ray, const FloatType length, const FloatType maxLength) {
   m_spikeVertices.emplace_back(vm::vec3f(ray.origin), m_color);
   m_spikeVertices.emplace_back(vm::vec3f(vm::point_at_distance(ray, length)), m_color);
 }

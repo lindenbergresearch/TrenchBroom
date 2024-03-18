@@ -25,15 +25,19 @@
 
 #include <memory>
 
+
 class QPushButton;
 
+
 class QListWidget;
+
 
 class QLabel;
 
 namespace TrenchBroom::View {
 
 class MapDocument;
+
 
 class SingleSelectionListWidget : public QListWidget {
 Q_OBJECT
@@ -48,11 +52,11 @@ public:
   bool allowDeselectAll() const;
 
 protected: // QAbstractItemView overrides
-  void selectionChanged(
-      const QItemSelection &selected, const QItemSelection &deselected) override;
+  void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
   // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
   // QEvent* event) const override;
 };
+
 
 class EntityDefinitionFileChooser : public QWidget {
 Q_OBJECT
@@ -67,8 +71,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  explicit EntityDefinitionFileChooser(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit EntityDefinitionFileChooser(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void createGui();

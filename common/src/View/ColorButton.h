@@ -21,7 +21,9 @@
 
 #include <QWidget>
 
+
 class QPushButton;
+
 
 class QResizeEvent;
 

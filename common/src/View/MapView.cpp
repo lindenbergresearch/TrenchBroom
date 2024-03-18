@@ -51,8 +51,7 @@ void MapView::selectTall() {
   doSelectTall();
 }
 
-vm::vec3 MapView::pasteObjectsDelta(
-    const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
+vm::vec3 MapView::pasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
   return doGetPasteObjectsDelta(bounds, referenceBounds);
 }
 
@@ -77,7 +76,7 @@ bool MapView::cancelMouseDrag() {
 }
 
 void MapView::cycleMapView() {
-  if (m_container!=nullptr) {
+  if (m_container != nullptr) {
     m_container->cycleChildMapView(this);
   }
 }

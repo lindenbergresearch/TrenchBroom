@@ -27,13 +27,16 @@
 #include <string>
 #include <vector>
 
+
 class QTextEdit;
+
 
 class QSplitter;
 
 namespace TrenchBroom {
 namespace Assets {
 class PropertyDefinition;
+
 
 class EntityDefinition;
 } // namespace Assets
@@ -45,11 +48,15 @@ class Node;
 namespace View {
 class EntityPropertyGrid;
 
+
 class MapDocument;
+
 
 class Selection;
 
+
 class SmartPropertyEditorManager;
+
 
 /**
  * Panel containing the EntityPropertyGrid (the key/value editor table),
@@ -68,8 +75,7 @@ private:
   NotifierConnection m_notifierConnection;
 
 public:
-  explicit EntityPropertyEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
   ~EntityPropertyEditor() override;
 

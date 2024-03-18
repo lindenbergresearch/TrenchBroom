@@ -26,10 +26,10 @@
 namespace TrenchBroom {
 void glCheckError(const std::string &msg) {
   const GLenum error = glGetError();
-  if (error!=GL_NO_ERROR) {
+  if (error != GL_NO_ERROR) {
     throw RenderException(
-        "OpenGL error: " + std::to_string(error) + " (" + glGetErrorMessage(error) + ") "
-            + msg);
+        "OpenGL error: " + std::to_string(error) + " (" + glGetErrorMessage(error) + ") " + msg
+    );
   }
 }
 
@@ -48,27 +48,27 @@ std::string glGetErrorMessage(const GLenum code) {
 }
 
 GLenum glGetEnum(const std::string &name) {
-  if (name=="GL_ONE") {
+  if (name == "GL_ONE") {
     return GL_ONE;
-  } else if (name=="GL_ZERO") {
+  } else if (name == "GL_ZERO") {
     return GL_ZERO;
-  } else if (name=="GL_SRC_COLOR") {
+  } else if (name == "GL_SRC_COLOR") {
     return GL_SRC_COLOR;
-  } else if (name=="GL_DST_COLOR") {
+  } else if (name == "GL_DST_COLOR") {
     return GL_DST_COLOR;
-  } else if (name=="GL_ONE_MINUS_SRC_COLOR") {
+  } else if (name == "GL_ONE_MINUS_SRC_COLOR") {
     return GL_ONE_MINUS_SRC_COLOR;
-  } else if (name=="GL_ONE_MINUS_DST_COLOR") {
+  } else if (name == "GL_ONE_MINUS_DST_COLOR") {
     return GL_ONE_MINUS_DST_COLOR;
-  } else if (name=="GL_SRC_ALPHA") {
+  } else if (name == "GL_SRC_ALPHA") {
     return GL_SRC_ALPHA;
-  } else if (name=="GL_DST_ALPHA") {
+  } else if (name == "GL_DST_ALPHA") {
     return GL_DST_ALPHA;
-  } else if (name=="GL_ONE_MINUS_SRC_ALPHA") {
+  } else if (name == "GL_ONE_MINUS_SRC_ALPHA") {
     return GL_ONE_MINUS_SRC_ALPHA;
-  } else if (name=="GL_ONE_MINUS_DST_ALPHA") {
+  } else if (name == "GL_ONE_MINUS_DST_ALPHA") {
     return GL_ONE_MINUS_DST_ALPHA;
-  } else if (name=="GL_SRC_ALPHA_SATURATE") {
+  } else if (name == "GL_SRC_ALPHA_SATURATE") {
     return GL_SRC_ALPHA_SATURATE;
   } else {
     throw RenderException("Unknown GL enum: " + name);

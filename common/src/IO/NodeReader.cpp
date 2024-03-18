@@ -38,29 +38,23 @@
 namespace TrenchBroom {
 namespace IO {
 NodeReader::NodeReader(
-    std::string_view str,
-    const Model::MapFormat sourceMapFormat,
-    const Model::MapFormat targetMapFormat,
-    const Model::EntityPropertyConfig &entityPropertyConfig)
-    : MapReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig} {
+    std::string_view str, const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat,
+    const Model::EntityPropertyConfig &entityPropertyConfig
+) : MapReader{
+    str, sourceMapFormat, targetMapFormat, entityPropertyConfig
+} {
 }
 
 std::vector<Model::Node *> NodeReader::read(
-    const std::string &str,
-    const Model::MapFormat preferredMapFormat,
-    const vm::bbox3 &worldBounds,
-    const Model::EntityPropertyConfig &entityPropertyConfig,
-    ParserStatus &status) {
+    const std::string &str, const Model::MapFormat preferredMapFormat, const vm::bbox3 &worldBounds, const Model::EntityPropertyConfig &entityPropertyConfig,
+    ParserStatus &status
+) {
   // Try preferred format first
   for (const auto compatibleMapFormat : Model::compatibleFormats(preferredMapFormat)) {
     if (auto result = readAsFormat(
-          compatibleMapFormat,
-          preferredMapFormat,
-          str,
-          worldBounds,
-          entityPropertyConfig,
-          status);
-        !result.empty()) {
+          compatibleMapFormat, preferredMapFormat, str, worldBounds, entityPropertyConfig, status
+      );
+        ! result.empty()) {
       for (const auto &error : Model::initializeLinkIds(result)) {
         status.error("Could not restore linked groups: " + error.msg);
       }
@@ -82,24 +76,20 @@ std::vector<Model::Node *> NodeReader::read(
  * @returns the parsed nodes; caller is responsible for freeing them.
  */
 std::vector<Model::Node *> NodeReader::readAsFormat(
-    const Model::MapFormat sourceMapFormat,
-    const Model::MapFormat targetMapFormat,
-    const std::string &str,
-    const vm::bbox3 &worldBounds,
-    const Model::EntityPropertyConfig &entityPropertyConfig,
-    ParserStatus &status) {
+    const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat, const std::string &str, const vm::bbox3 &worldBounds,
+    const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status
+) {
   {
     auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig};
     try {
       reader.readEntities(worldBounds, status);
       status.info(
-          "Parsed successfully as " + Model::formatName(sourceMapFormat) + " entities");
+          "Parsed successfully as " + Model::formatName(sourceMapFormat) + " entities"
+      );
       return reader.m_nodes;
-    }
-    catch (const ParserException &e) {
+    } catch (const ParserException &e) {
       status.info(
-          "Couldn't parse as " + Model::formatName(sourceMapFormat)
-              + " entities: " + e.what());
+          "Couldn't parse as " + Model::formatName(sourceMapFormat) + " entities: " + e.what());
       kdl::vec_clear_and_delete(reader.m_nodes);
     }
   }
@@ -109,13 +99,12 @@ std::vector<Model::Node *> NodeReader::readAsFormat(
     try {
       reader.readBrushes(worldBounds, status);
       status.info(
-          "Parsed successfully as " + Model::formatName(sourceMapFormat) + " brushes");
+          "Parsed successfully as " + Model::formatName(sourceMapFormat) + " brushes"
+      );
       return reader.m_nodes;
-    }
-    catch (const ParserException &e) {
+    } catch (const ParserException &e) {
       status.info(
-          "Couldn't parse as " + Model::formatName(sourceMapFormat)
-              + " brushes: " + e.what());
+          "Couldn't parse as " + Model::formatName(sourceMapFormat) + " brushes: " + e.what());
       kdl::vec_clear_and_delete(reader.m_nodes);
     }
   }
@@ -134,9 +123,8 @@ void NodeReader::onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatu
   m_nodes.push_back(layerNode.release());
 }
 
-void NodeReader::onNode(
-    Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &) {
-  if (parentNode!=nullptr) {
+void NodeReader::onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &) {
+  if (parentNode != nullptr) {
     parentNode->addChild(node.release());
   } else {
     m_nodes.push_back(node.release());

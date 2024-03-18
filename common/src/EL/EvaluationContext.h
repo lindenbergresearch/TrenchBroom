@@ -45,6 +45,7 @@ public:
 deleteCopyAndMove(EvaluationContext);
 };
 
+
 class EvaluationStack : public EvaluationContext {
 private:
   const EvaluationContext &m_next;

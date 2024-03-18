@@ -27,8 +27,7 @@
 #include <string>
 
 namespace TrenchBroom::IO {
-ConfigParserBase::ConfigParserBase(const std::string_view str, std::filesystem::path path)
-    : m_parser{ELParser::Mode::Strict, str}, m_path{std::move(path)} {
+ConfigParserBase::ConfigParserBase(const std::string_view str, std::filesystem::path path) : m_parser{ELParser::Mode::Strict, str}, m_path{std::move(path)} {
 }
 
 ConfigParserBase::~ConfigParserBase() = default;
@@ -38,43 +37,37 @@ EL::Expression ConfigParserBase::parseConfigFile() {
 }
 
 void expectType(const EL::Value &value, const EL::ValueType type) {
-  if (value.type()!=type) {
-    throw ParserException{
-        value.line(),
-        value.column(),
-        "Expected value of type '" + EL::typeName(type) + "', but got type '"
-            + value.typeName() + "'"};
+  if (value.type() != type) {
+    throw ParserException{value.line(), value.column(), "Expected value of type '" + EL::typeName(type) + "', but got type '" + value.typeName() + "'"};
   }
 }
 
 void expectStructure(const EL::Value &value, const std::string &structure) {
   auto parser = ELParser{ELParser::Mode::Strict, structure};
   const auto expected = parser.parse().evaluate(EL::EvaluationContext());
-  assert(expected.type()==EL::ValueType::Array);
+  assert(expected.type() == EL::ValueType::Array);
 
   const auto mandatory = expected[0];
-  assert(mandatory.type()==EL::ValueType::Map);
+  assert(mandatory.type() == EL::ValueType::Map);
 
   const auto optional = expected[1];
-  assert(optional.type()==EL::ValueType::Map);
+  assert(optional.type() == EL::ValueType::Map);
 
   // Are all mandatory keys present?
   for (const auto &key : mandatory.keys()) {
     const auto typeName = mandatory[key].stringValue();
-    if (typeName!="*") {
+    if (typeName != "*") {
       const auto type = EL::typeForName(typeName);
       expectMapEntry(value, key, type);
     }
   }
 }
 
-void expectMapEntry(
-    const EL::Value &value, const std::string &key, const EL::ValueType type) {
+void expectMapEntry(const EL::Value &value, const std::string &key, const EL::ValueType type) {
   const auto &map = value.mapValue();
   const auto it = map.find(key);
-  if (it==std::end(map)) {
-    throw ParserException{
-        value.line(), value.column(), "Expected map entry '" + key + "'"};
+  if (it == std::end(map)) {
+    throw ParserException{value.line(), value.column(), "Expected map entry '" + key + "'"};
   }
   expectType(it->second, type);
 }

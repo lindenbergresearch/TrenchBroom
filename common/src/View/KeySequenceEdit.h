@@ -21,7 +21,9 @@
 
 #include <QWidget>
 
+
 class QKeySequence;
+
 
 class QAbstractButton;
 
@@ -29,10 +31,11 @@ namespace TrenchBroom {
 namespace View {
 class LimitedKeySequenceEdit;
 
+
 class KeySequenceEdit : public QWidget {
 Q_OBJECT
   Q_PROPERTY(QKeySequence keySequence READ keySequence WRITE setKeySequence NOTIFY
-                 keySequenceChanged USER true)
+      keySequenceChanged USER true)
 private:
   LimitedKeySequenceEdit *m_keySequenceEdit;
   QAbstractButton *m_clearButton;

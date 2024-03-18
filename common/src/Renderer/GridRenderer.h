@@ -30,9 +30,12 @@ namespace TrenchBroom {
 namespace Renderer {
 class OrthographicCamera;
 
+
 class RenderContext;
 
+
 class VboManager;
+
 
 class GridRenderer : public DirectRenderable {
 private:
@@ -43,8 +46,7 @@ public:
   GridRenderer(const OrthographicCamera &camera, const vm::bbox3 &worldBounds);
 
 private:
-  static std::vector<Vertex> vertices(
-      const OrthographicCamera &camera, const vm::bbox3 &worldBounds);
+  static std::vector<Vertex> vertices(const OrthographicCamera &camera, const vm::bbox3 &worldBounds);
 
   void doPrepareVertices(VboManager &vboManager) override;
 

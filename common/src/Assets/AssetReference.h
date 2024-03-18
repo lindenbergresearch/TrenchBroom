@@ -24,25 +24,21 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom::Assets {
 
-template<typename T>
-class AssetReference {
+template<typename T> class AssetReference {
 private:
   T *m_asset;
 
 public:
-  explicit AssetReference(T *asset = nullptr)
-      : m_asset{asset} {
+  explicit AssetReference(T *asset = nullptr) : m_asset{asset} {
     if (m_asset) {
       m_asset->incUsageCount();
     }
   }
 
-  AssetReference(const AssetReference &other) noexcept
-      : AssetReference{other.m_asset} {
+  AssetReference(const AssetReference &other) noexcept: AssetReference{other.m_asset} {
   }
 
-  AssetReference(AssetReference &&other) noexcept
-      : m_asset{std::exchange(other.m_asset, nullptr)} {
+  AssetReference(AssetReference &&other) noexcept: m_asset{std::exchange(other.m_asset, nullptr)} {
   }
 
   ~AssetReference() {
@@ -67,11 +63,11 @@ public:
   const T *get() const { return m_asset; }
 
   friend bool operator==(const AssetReference<T> &lhs, const AssetReference<T> &rhs) {
-    return lhs.m_asset==rhs.m_asset;
+    return lhs.m_asset == rhs.m_asset;
   }
 
   friend bool operator!=(const AssetReference<T> &lhs, const AssetReference<T> &rhs) {
-    return !(lhs==rhs);
+    return ! (lhs == rhs);
   }
 
   friend std::ostream &operator<<(std::ostream &lhs, const AssetReference<T> &rhs) {

@@ -24,13 +24,16 @@
 #include <filesystem>
 #include <vector>
 
+
 class QObject;
 
 namespace TrenchBroom {
 namespace View {
 class Action;
 
+
 class MapDocument;
+
 
 class KeyboardShortcutModel : public QAbstractTableModel {
 Q_OBJECT

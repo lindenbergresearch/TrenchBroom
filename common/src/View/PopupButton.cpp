@@ -29,8 +29,7 @@
 
 namespace TrenchBroom {
 namespace View {
-PopupButton::PopupButton(const QString &caption, QWidget *parent, const QIcon &icon)
-    : QWidget(parent) {
+PopupButton::PopupButton(const QString &caption, QWidget *parent, const QIcon &icon) : QWidget(parent) {
   m_button = new QToolButton();
   m_button->setText(caption);
   m_button->setCheckable(true);
@@ -41,19 +40,15 @@ PopupButton::PopupButton(const QString &caption, QWidget *parent, const QIcon &i
 
   auto *sizer = new QHBoxLayout();
   sizer->setContentsMargins(
-      LayoutConstants::NarrowHMargin,
-      LayoutConstants::NarrowHMargin,
-      LayoutConstants::NarrowHMargin,
-      LayoutConstants::NarrowHMargin);
+      LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin
+  );
   sizer->addWidget(m_button);
   setLayout(sizer);
 
   connect(m_button, &QAbstractButton::clicked, this, &PopupButton::buttonClicked);
   connect(
-      m_window,
-      &PopupWindow::visibilityChanged,
-      this,
-      &PopupButton::popupVisibilityChanged);
+      m_window, &PopupWindow::visibilityChanged, this, &PopupButton::popupVisibilityChanged
+  );
 }
 
 QWidget *PopupButton::GetPopupWindow() const {
@@ -83,7 +78,7 @@ void PopupButton::setIcon(const std::string &iconName) {
   checkedIcon = IO::loadSVGIcon(iconName + "_on.svg", 12);
   unCheckedIcon = IO::loadSVGIcon(iconName + "_off.svg", 12);
 
-  if (!unCheckedIcon.isNull()) {
+  if (! unCheckedIcon.isNull()) {
     m_button->setIcon(unCheckedIcon);
   }
 

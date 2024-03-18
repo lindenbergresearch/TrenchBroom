@@ -23,6 +23,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "Model/GameEngineConfig.h"
 
+
 class QAbstractButton;
 
 namespace TrenchBroom::Model {
@@ -32,7 +33,10 @@ struct GameEngineProfile;
 namespace TrenchBroom::View {
 
 class GameEngineProfileEditor;
+
+
 class GameEngineProfileListBox;
+
 
 /**
 * Widget for editing game engine profiles (name/path, not parameters).
@@ -46,11 +50,14 @@ private:
   QAbstractButton *m_removeProfileButton = nullptr;
 
 public:
-  explicit GameEngineProfileManager(
-      Model::GameEngineConfig config, QWidget *parent = nullptr);
+  explicit GameEngineProfileManager(Model::GameEngineConfig config, QWidget *parent = nullptr);
+
   const Model::GameEngineConfig &config() const;
+
 private slots:
+
   void addProfile();
+
   void removeProfile();
 
   void currentProfileChanged(Model::GameEngineProfile *profile);

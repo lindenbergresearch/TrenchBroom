@@ -23,6 +23,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include <memory>
 
+
 class QSplitter;
 
 namespace TrenchBroom {
@@ -35,10 +36,19 @@ class MapRenderer;
 
 namespace TrenchBroom::View {
 class GLContextManager;
+
+
 class MapDocument;
+
+
 class MapView2D;
+
+
 class MapView3D;
+
+
 class MapViewToolBox;
+
 
 class FourPaneMapView : public MultiPaneMapView {
 Q_OBJECT
@@ -57,25 +67,21 @@ private:
 
 public:
   FourPaneMapView(
-      std::weak_ptr<MapDocument> document,
-      MapViewToolBox &toolBox,
-      Renderer::MapRenderer &mapRenderer,
-      GLContextManager &contextManager,
-      Logger *logger,
-      QWidget *parent = nullptr);
+      std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger,
+      QWidget *parent = nullptr
+  );
+
   ~FourPaneMapView() override;
 
 private:
-  void createGui(
-      MapViewToolBox &toolBox,
-      Renderer::MapRenderer &mapRenderer,
-      GLContextManager &contextManager);
+  void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager);
 
 private: // event handlers
   void onSplitterMoved(int pos, int index);
 
 private: // implement MultiPaneMapView subclassing interface
   void doMaximizeView(MapView *view) override;
+
   void doRestoreViews() override;
 };
 } // namespace TrenchBroom::View

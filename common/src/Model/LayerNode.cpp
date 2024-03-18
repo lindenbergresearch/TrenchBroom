@@ -40,8 +40,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-LayerNode::LayerNode(Layer layer)
-    : m_layer(layer), m_boundsValid(false) {
+LayerNode::LayerNode(Layer layer) : m_layer(layer), m_boundsValid(false) {
 }
 
 const Layer &LayerNode::layer() const {
@@ -49,7 +48,7 @@ const Layer &LayerNode::layer() const {
 }
 
 Layer LayerNode::setLayer(Layer layer) {
-  ensure(layer.defaultLayer()==m_layer.defaultLayer(), "Set same layer type");
+  ensure(layer.defaultLayer() == m_layer.defaultLayer(), "Set same layer type");
 
   using std::swap;
   swap(m_layer, layer);
@@ -61,9 +60,11 @@ bool LayerNode::isDefaultLayer() const {
 }
 
 void LayerNode::sortLayers(std::vector<LayerNode *> &layers) {
-  std::stable_sort(layers.begin(), layers.end(), [](LayerNode *a, LayerNode *b) {
-    return a->layer().sortIndex() < b->layer().sortIndex();
-  });
+  std::stable_sort(
+      layers.begin(), layers.end(), [](LayerNode *a, LayerNode *b) {
+        return a->layer().sortIndex() < b->layer().sortIndex();
+      }
+  );
 }
 
 const std::optional<IdType> &LayerNode::persistentId() const {
@@ -79,14 +80,14 @@ const std::string &LayerNode::doGetName() const {
 }
 
 const vm::bbox3 &LayerNode::doGetLogicalBounds() const {
-  if (!m_boundsValid) {
+  if (! m_boundsValid) {
     validateBounds();
   }
   return m_logicalBounds;
 }
 
 const vm::bbox3 &LayerNode::doGetPhysicalBounds() const {
-  if (!m_boundsValid) {
+  if (! m_boundsValid) {
     validateBounds();
   }
   return m_physicalBounds;
@@ -103,13 +104,11 @@ Node *LayerNode::doClone(const vm::bbox3 &, const SetLinkId /* setLinkIds */) co
 }
 
 bool LayerNode::doCanAddChild(const Node *child) const {
-  return child->accept(kdl::overload(
-      [](const WorldNode *) { return false; },
-      [](const LayerNode *) { return false; },
-      [](const GroupNode *) { return true; },
-      [](const EntityNode *) { return true; },
-      [](const BrushNode *) { return true; },
-      [](const PatchNode *) { return true; }));
+  return child->accept(
+      kdl::overload(
+          [](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [](const GroupNode *) { return true; },
+          [](const EntityNode *) { return true; }, [](const BrushNode *) { return true; }, [](const PatchNode *) { return true; }
+      ));
 }
 
 bool LayerNode::doCanRemoveChild(const Node * /* child */) const {

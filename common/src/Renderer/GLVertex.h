@@ -24,8 +24,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-template<typename... AttrTypes>
-struct GLVertexType;
+template<typename... AttrTypes> struct GLVertexType;
 
 /**
  * Stores the attribute values of an OpenGL vertex such as the position, the texture
@@ -36,8 +35,8 @@ struct GLVertexType;
  *
  * @tparam AttrTypes the attribute types
  */
-template<typename... AttrTypes>
-struct GLVertex;
+template<typename... AttrTypes> struct GLVertex;
+
 
 /**
  * Template specialization of the GLVertex template for the case of multiple vertex
@@ -55,8 +54,7 @@ struct GLVertex;
  * @tparam AttrType the type of the vertex attribute stored here
  * @tparam AttrTypeRest the types of the remaining vertex attributes
  */
-template<typename AttrType, typename... AttrTypeRest>
-struct GLVertex<AttrType, AttrTypeRest...> {
+template<typename AttrType, typename... AttrTypeRest> struct GLVertex<AttrType, AttrTypeRest...> {
   using Type = GLVertexType<AttrType, AttrTypeRest...>;
 
   // To achieve standard memory layout and to allow a vector of vertices to be uploaded,
@@ -76,11 +74,9 @@ struct GLVertex<AttrType, AttrTypeRest...> {
   GLVertex(GLVertex<AttrType, AttrTypeRest...> &&other) noexcept = default;
 
   // Assignment operators
-  GLVertex<AttrType, AttrTypeRest...> &operator=(
-      const GLVertex<AttrType, AttrTypeRest...> &other) = default;
+  GLVertex<AttrType, AttrTypeRest...> &operator=(const GLVertex<AttrType, AttrTypeRest...> &other) = default;
 
-  GLVertex<AttrType, AttrTypeRest...> &operator=(
-      GLVertex<AttrType, AttrTypeRest...> &&other) noexcept = default;
+  GLVertex<AttrType, AttrTypeRest...> &operator=(GLVertex<AttrType, AttrTypeRest...> &&other) noexcept = default;
 
   // explicitly declare the following two constructors instead of using type deduction
   // with an rvalue reference to avoid any clashes with the copy / move constructors
@@ -91,10 +87,8 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    * @param i_attr the value of the first attribute
    * @param i_rest the values of the remaining attributes
    */
-  explicit GLVertex(
-      typename AttrType::ElementType &&i_attr,
-      typename AttrTypeRest::ElementType &&... i_rest)
-      : attr(std::move(i_attr)), rest(std::move(i_rest)...) {
+  explicit GLVertex(typename AttrType::ElementType &&i_attr, typename AttrTypeRest::ElementType &&... i_rest) :
+      attr(std::move(i_attr)), rest(std::move(i_rest)...) {
   }
 
   /**
@@ -103,10 +97,7 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    * @param i_attr the value of the first attribute
    * @param i_rest the value of the remaining attributes
    */
-  explicit GLVertex(
-      const typename AttrType::ElementType &i_attr,
-      const typename AttrTypeRest::ElementType &... i_rest)
-      : attr(i_attr), rest(i_rest...) {
+  explicit GLVertex(const typename AttrType::ElementType &i_attr, const typename AttrTypeRest::ElementType &... i_rest) : attr(i_attr), rest(i_rest...) {
   }
 
   /**
@@ -120,20 +111,19 @@ struct GLVertex<AttrType, AttrTypeRest...> {
    * @param cur the attribute value iterators
    * @return the list of vertices
    */
-  template<typename... I>
-  static std::vector<GLVertex<AttrType, AttrTypeRest...>> toList(
-      const size_t count, I... cur) {
+  template<typename... I> static std::vector<GLVertex<AttrType, AttrTypeRest...>> toList(const size_t count, I... cur) {
     static_assert(
-        sizeof...(I)==sizeof...(AttrTypeRest) + 1,
-        "number of iterators must match number of vertex attributes");
+        sizeof...(I) == sizeof...(AttrTypeRest) + 1, "number of iterators must match number of vertex attributes"
+    );
     std::vector<GLVertex<AttrType, AttrTypeRest...>> result;
     result.reserve(count);
-    for (size_t i = 0; i < count; ++i) {
-      result.emplace_back((*cur++)...);
+    for (size_t i = 0; i < count; ++ i) {
+      result.emplace_back((*cur ++)...);
     }
     return result;
   }
 };
+
 
 /**
  * Template specialization of the GLVertex template for the case of a single vertex
@@ -142,8 +132,7 @@ struct GLVertex<AttrType, AttrTypeRest...> {
  *
  * @tparam AttrType the type of the vertex attribute stored here
  */
-template<typename AttrType>
-struct GLVertex<AttrType> {
+template<typename AttrType> struct GLVertex<AttrType> {
   using Type = GLVertexType<AttrType>;
 
   typename AttrType::ElementType attr;
@@ -171,8 +160,7 @@ struct GLVertex<AttrType> {
    *
    * @param i_attr the value of the first attribute
    */
-  explicit GLVertex(typename AttrType::ElementType &&i_attr)
-      : attr(std::move(i_attr)) {
+  explicit GLVertex(typename AttrType::ElementType &&i_attr) : attr(std::move(i_attr)) {
   }
 
   /**
@@ -180,8 +168,7 @@ struct GLVertex<AttrType> {
    *
    * @param i_attr the value of the first attribute
    */
-  explicit GLVertex(const typename AttrType::ElementType &i_attr)
-      : attr(i_attr) {
+  explicit GLVertex(const typename AttrType::ElementType &i_attr) : attr(i_attr) {
   }
 
   /**
@@ -194,16 +181,16 @@ struct GLVertex<AttrType> {
    * @param cur the attribute value iterator
    * @return the list of vertices
    */
-  template<typename I>
-  static std::vector<GLVertex<AttrType>> toList(const size_t count, I cur) {
+  template<typename I> static std::vector<GLVertex<AttrType>> toList(const size_t count, I cur) {
     std::vector<GLVertex<AttrType>> result;
     result.reserve(count);
-    for (size_t i = 0; i < count; ++i) {
-      result.emplace_back(*cur++);
+    for (size_t i = 0; i < count; ++ i) {
+      result.emplace_back(*cur ++);
     }
     return result;
   }
 };
+
 
 /**
  * A helper to access the value of a vertex attribute. The index of the value to be
@@ -212,8 +199,7 @@ struct GLVertex<AttrType> {
  *
  * @tparam I the index of the vertex attribute whose value should be accessed
  */
-template<size_t I>
-struct GetVertexComponent {
+template<size_t I> struct GetVertexComponent {
   /**
    * Returns the value of the attribute at index I of the given vertex.
    *
@@ -221,8 +207,7 @@ struct GetVertexComponent {
    * @param v the vertex
    * @return the value of the attribute at index I
    */
-  template<typename... AttrTypes>
-  static const auto &get(const GLVertex<AttrTypes...> &v) {
+  template<typename... AttrTypes> static const auto &get(const GLVertex<AttrTypes...> &v) {
     return GetVertexComponent<I - 1>::get(v.rest);
   }
 
@@ -233,17 +218,16 @@ struct GetVertexComponent {
    * @param v the vertex
    * @return the value of the attribute at index I
    */
-  template<typename... AttrTypes>
-  const auto &operator()(const GLVertex<AttrTypes...> &v) const {
+  template<typename... AttrTypes> const auto &operator()(const GLVertex<AttrTypes...> &v) const {
     return get(v);
   }
 };
 
+
 /**
  * Specialization for the base case with index 0.
  */
-template<>
-struct GetVertexComponent<0> {
+template<> struct GetVertexComponent<0> {
   /**
    * Returns the value of the first attribute of the given vertex.
    *
@@ -251,8 +235,7 @@ struct GetVertexComponent<0> {
    * @param v the vertex
    * @return the value of the first attribute
    */
-  template<typename... AttrTypes>
-  static const auto &get(const GLVertex<AttrTypes...> &v) {
+  template<typename... AttrTypes> static const auto &get(const GLVertex<AttrTypes...> &v) {
     return v.attr;
   }
 
@@ -263,11 +246,11 @@ struct GetVertexComponent<0> {
    * @param v the vertex
    * @return the value of the first attribute
    */
-  template<typename... AttrTypes>
-  const auto &operator()(const GLVertex<AttrTypes...> &v) const {
+  template<typename... AttrTypes> const auto &operator()(const GLVertex<AttrTypes...> &v) const {
     return get(v);
   }
 };
+
 
 /**
  * Helper to get access a vertex attribute value by index.
@@ -277,8 +260,7 @@ struct GetVertexComponent<0> {
  * @param v the vertex
  * @return a reference to the attribute value
  */
-template<size_t I, typename... Attrs>
-const auto &getVertexComponent(const GLVertex<Attrs...> &v) {
+template<size_t I, typename... Attrs> const auto &getVertexComponent(const GLVertex<Attrs...> &v) {
   return GetVertexComponent<I>::get(v);
 }
 } // namespace Renderer

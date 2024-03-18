@@ -30,9 +30,7 @@ namespace Assets {
 class EntityDefinitionFileSpec {
 private:
   enum class Type {
-    Builtin,
-    External,
-    Unset
+    Builtin, External, Unset
   };
 
   Type m_type;
@@ -42,19 +40,23 @@ public:
   EntityDefinitionFileSpec();
 
   static EntityDefinitionFileSpec parse(const std::string &str);
+
   static EntityDefinitionFileSpec builtin(const std::filesystem::path &path);
+
   static EntityDefinitionFileSpec external(const std::filesystem::path &path);
+
   static EntityDefinitionFileSpec unset();
 
-  friend bool operator<(
-      const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
-  friend bool operator==(
-      const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
-  friend bool operator!=(
-      const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+  friend bool operator<(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+
+  friend bool operator==(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+
+  friend bool operator!=(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
 
   bool valid() const;
+
   bool builtin() const;
+
   bool external() const;
 
   const std::filesystem::path &path() const;

@@ -37,15 +37,18 @@ class RenderContext;
 
 namespace View {
 class DragTracker;
+
+
 class MapDocument;
+
 
 /**
  * Applies the group picking logic of findOutermostClosedGroupOrNode() to a list of hits.
  * The order of the hits is preserved, but if multiple hits map to the same group, that
  * group will only be listed once in the output.
  */
-std::vector<Model::Node *> hitsToNodesWithGroupPicking(
-    const std::vector<Model::Hit> &hits);
+std::vector<Model::Node *> hitsToNodesWithGroupPicking(const std::vector<Model::Hit> &hits);
+
 
 class SelectionTool : public ToolController, public Tool {
 private:
@@ -55,16 +58,18 @@ public:
   explicit SelectionTool(std::weak_ptr<MapDocument> document);
 
   Tool &tool() override;
+
   const Tool &tool() const override;
 
   bool mouseClick(const InputState &inputState) override;
+
   bool mouseDoubleClick(const InputState &inputState) override;
+
   void mouseScroll(const InputState &inputState) override;
 
   std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  void setRenderOptions(
-      const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+  void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
 
   bool cancel() override;
 };

@@ -35,10 +35,19 @@
 namespace TrenchBroom {
 namespace Model {
 class BrushNode;
+
+
 class BrushFace;
+
+
 class ChangeBrushFaceAttributesRequest;
+
+
 class Game;
+
+
 class MapFacade;
+
 
 class MatchVisitor : public ConstTagVisitor {
 private:
@@ -53,39 +62,43 @@ protected:
   void setMatches();
 };
 
+
 class BrushFaceMatchVisitor : public MatchVisitor {
 private:
   std::function<bool(const BrushFace &)> m_matcher;
 
 public:
-  explicit BrushFaceMatchVisitor(std::function<bool(const BrushFace &)> matcher)
-      : m_matcher(std::move(matcher)) {
+  explicit BrushFaceMatchVisitor(std::function<bool(const BrushFace &)> matcher) : m_matcher(std::move(matcher)) {
   }
 
   void visit(const BrushFace &face) override;
 };
+
 
 class BrushMatchVisitor : public MatchVisitor {
 private:
   std::function<bool(const BrushNode &)> m_matcher;
 
 public:
-  explicit BrushMatchVisitor(std::function<bool(const BrushNode &)> matcher)
-      : m_matcher(std::move(matcher)) {
+  explicit BrushMatchVisitor(std::function<bool(const BrushNode &)> matcher) : m_matcher(std::move(matcher)) {
   }
 
   void visit(const BrushNode &brush) override;
 };
 
+
 class TextureTagMatcher : public TagMatcher {
 public:
   void enable(TagMatcherCallback &callback, MapFacade &facade) const override;
+
   bool canEnable() const override;
+
   void appendToStream(std::ostream &str) const override;
 
 private:
   virtual bool matchesTexture(const Assets::Texture *texture) const = 0;
 };
+
 
 class TextureNameTagMatcher : public TextureTagMatcher {
 private:
@@ -93,14 +106,19 @@ private:
 
 public:
   explicit TextureNameTagMatcher(const std::string &pattern);
+
   std::unique_ptr<TagMatcher> clone() const override;
+
   bool matches(const Taggable &taggable) const override;
+
   void appendToStream(std::ostream &str) const override;
 
 private:
   bool matchesTexture(const Assets::Texture *texture) const override;
+
   bool matchesTextureName(std::string_view textureName) const;
 };
+
 
 class SurfaceParmTagMatcher : public TextureTagMatcher {
 private:
@@ -108,14 +126,19 @@ private:
 
 public:
   explicit SurfaceParmTagMatcher(const std::string &parameter);
+
   explicit SurfaceParmTagMatcher(const kdl::vector_set<std::string> &parameters);
+
   std::unique_ptr<TagMatcher> clone() const override;
+
   bool matches(const Taggable &taggable) const override;
+
   void appendToStream(std::ostream &str) const override;
 
 private:
   bool matchesTexture(const Assets::Texture *texture) const override;
 };
+
 
 class FlagsTagMatcher : public TagMatcher {
 protected:
@@ -131,33 +154,38 @@ protected:
   GetFlagNames m_getFlagNames;
 
 protected:
-  FlagsTagMatcher(
-      int flags,
-      GetFlags getFlags,
-      SetFlags setFlags,
-      SetFlags unsetFlags,
-      GetFlagNames getFlagNames);
+  FlagsTagMatcher(int flags, GetFlags getFlags, SetFlags setFlags, SetFlags unsetFlags, GetFlagNames getFlagNames);
 
 public:
   bool matches(const Taggable &taggable) const override;
+
   void enable(TagMatcherCallback &callback, MapFacade &facade) const override;
+
   void disable(TagMatcherCallback &callback, MapFacade &facade) const override;
+
   bool canEnable() const override;
+
   bool canDisable() const override;
+
   void appendToStream(std::ostream &str) const override;
 };
+
 
 class ContentFlagsTagMatcher : public FlagsTagMatcher {
 public:
   explicit ContentFlagsTagMatcher(int flags);
+
   std::unique_ptr<TagMatcher> clone() const override;
 };
+
 
 class SurfaceFlagsTagMatcher : public FlagsTagMatcher {
 public:
   explicit SurfaceFlagsTagMatcher(int flags);
+
   std::unique_ptr<TagMatcher> clone() const override;
 };
+
 
 class EntityClassNameTagMatcher : public TagMatcher {
 private:
@@ -169,14 +197,20 @@ private:
 
 public:
   EntityClassNameTagMatcher(const std::string &pattern, const std::string &texture);
+
   std::unique_ptr<TagMatcher> clone() const override;
 
 public:
   bool matches(const Taggable &taggable) const override;
+
   void enable(TagMatcherCallback &callback, MapFacade &facade) const override;
+
   void disable(TagMatcherCallback &callback, MapFacade &facade) const override;
+
   bool canEnable() const override;
+
   bool canDisable() const override;
+
   void appendToStream(std::ostream &str) const override;
 
 private:

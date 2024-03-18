@@ -23,22 +23,17 @@ private:
   int lineHeight = 0;
 
 public:
-  PreferenceEditDialog(
-      PreferenceBase *preference,
-      QWidget *parent = nullptr,
-      const Qt::WindowFlags &f = Qt::Dialog);
+  PreferenceEditDialog(PreferenceBase *preference, QWidget *parent = nullptr, const Qt::WindowFlags &f = Qt::Dialog);
 
   ~PreferenceEditDialog() override;
 
   void updateValue();
+
   void cancel();
 
-  template<typename T>
-  std::tuple<T *, QHBoxLayout *> createCompound(
-      QString labelText,
-      const int minWidthLabel,
-      const int minWidthWidget,
-      const int minHeight) {
+  template<typename T> std::tuple<T *, QHBoxLayout *> createCompound(
+      QString labelText, const int minWidthLabel, const int minWidthWidget, const int minHeight
+  ) {
     auto labelWidget = new QLabel(labelText);
     labelWidget->setMinimumWidth(minWidthLabel);
     labelWidget->setMinimumHeight(minHeight);

@@ -39,17 +39,13 @@ EntityDefinitionManager::~EntityDefinitionManager() {
   clear();
 }
 
-Result<void> EntityDefinitionManager::loadDefinitions(
-    const std::filesystem::path &path,
-    const IO::EntityDefinitionLoader &loader,
-    IO::ParserStatus &status) {
-  return loader.loadEntityDefinitions(status, path)
-      .transform(
-          [&](auto entityDefinitions) { setDefinitions(std::move(entityDefinitions)); });
+Result<void> EntityDefinitionManager::loadDefinitions(const std::filesystem::path &path, const IO::EntityDefinitionLoader &loader, IO::ParserStatus &status) {
+  return loader.loadEntityDefinitions(status, path).transform(
+      [&](auto entityDefinitions) { setDefinitions(std::move(entityDefinitions)); }
+  );
 }
 
-void EntityDefinitionManager::setDefinitions(
-    std::vector<std::unique_ptr<EntityDefinition>> newDefinitions) {
+void EntityDefinitionManager::setDefinitions(std::vector<std::unique_ptr<EntityDefinition>> newDefinitions) {
   clear();
 
   m_definitions = std::move(newDefinitions);
@@ -64,27 +60,26 @@ void EntityDefinitionManager::clear() {
   clearGroups();
 }
 
-EntityDefinition *EntityDefinitionManager::definition(
-    const Model::EntityNodeBase *node) const {
-  ensure(node!=nullptr, "node is null");
+EntityDefinition *EntityDefinitionManager::definition(const Model::EntityNodeBase *node) const {
+  ensure(node != nullptr, "node is null");
   return definition(node->entity().classname());
 }
 
 EntityDefinition *EntityDefinitionManager::definition(const std::string &classname) const {
-  if (auto it = m_cache.find(classname); it!=m_cache.end()) {
+  if (auto it = m_cache.find(classname); it != m_cache.end()) {
     return it->second;
   }
   return nullptr;
 }
 
-std::vector<EntityDefinition *> EntityDefinitionManager::definitions(
-    const EntityDefinitionType type, const EntityDefinitionSortOrder order) const {
+std::vector<EntityDefinition *> EntityDefinitionManager::definitions(const EntityDefinitionType type, const EntityDefinitionSortOrder order) const {
   return EntityDefinition::filterAndSort(definitions(), type, order);
 }
 
 std::vector<EntityDefinition *> EntityDefinitionManager::definitions() const {
   return kdl::vec_transform(
-      m_definitions, [](const auto &definition) { return definition.get(); });
+      m_definitions, [](const auto &definition) { return definition.get(); }
+  );
 }
 
 const std::vector<EntityDefinitionGroup> &EntityDefinitionManager::groups() const {
@@ -92,7 +87,7 @@ const std::vector<EntityDefinitionGroup> &EntityDefinitionManager::groups() cons
 }
 
 void EntityDefinitionManager::updateIndices() {
-  for (size_t i = 0; i < m_definitions.size(); ++i) {
+  for (size_t i = 0; i < m_definitions.size(); ++ i) {
     m_definitions[i]->setIndex(i + 1);
   }
 }

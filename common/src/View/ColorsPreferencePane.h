@@ -21,14 +21,18 @@
 
 #include "View/PreferencePane.h"
 
+
 class QWidget;
 
+
 class QTableView;
+
 
 class QSortFilterProxyModel;
 
 namespace TrenchBroom::View {
 class ColorModel;
+
 
 class ColorsPreferencePane : public PreferencePane {
 Q_OBJECT

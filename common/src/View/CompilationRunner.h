@@ -37,6 +37,7 @@ struct CompilationProfile;
 namespace TrenchBroom::View {
 class CompilationContext;
 
+
 class CompilationTaskRunner : public QObject {
 Q_OBJECT
 protected:
@@ -71,14 +72,14 @@ private:
 deleteCopyAndMove(CompilationTaskRunner);
 };
 
+
 class CompilationExportMapTaskRunner : public CompilationTaskRunner {
 Q_OBJECT
 private:
   Model::CompilationExportMap m_task;
 
 public:
-  CompilationExportMapTaskRunner(
-      CompilationContext &context, Model::CompilationExportMap task);
+  CompilationExportMapTaskRunner(CompilationContext &context, Model::CompilationExportMap task);
 
   ~CompilationExportMapTaskRunner() override;
 
@@ -90,14 +91,14 @@ private:
 deleteCopyAndMove(CompilationExportMapTaskRunner);
 };
 
+
 class CompilationCopyFilesTaskRunner : public CompilationTaskRunner {
 Q_OBJECT
 private:
   Model::CompilationCopyFiles m_task;
 
 public:
-  CompilationCopyFilesTaskRunner(
-      CompilationContext &context, Model::CompilationCopyFiles task);
+  CompilationCopyFilesTaskRunner(CompilationContext &context, Model::CompilationCopyFiles task);
 
   ~CompilationCopyFilesTaskRunner() override;
 
@@ -109,14 +110,14 @@ private:
 deleteCopyAndMove(CompilationCopyFilesTaskRunner);
 };
 
+
 class CompilationRenameFileTaskRunner : public CompilationTaskRunner {
 Q_OBJECT
 private:
   Model::CompilationRenameFile m_task;
 
 public:
-  CompilationRenameFileTaskRunner(
-      CompilationContext &context, Model::CompilationRenameFile task);
+  CompilationRenameFileTaskRunner(CompilationContext &context, Model::CompilationRenameFile task);
 
   ~CompilationRenameFileTaskRunner() override;
 
@@ -128,14 +129,14 @@ private:
 deleteCopyAndMove(CompilationRenameFileTaskRunner);
 };
 
+
 class CompilationDeleteFilesTaskRunner : public CompilationTaskRunner {
 Q_OBJECT
 private:
   Model::CompilationDeleteFiles m_task;
 
 public:
-  CompilationDeleteFilesTaskRunner(
-      CompilationContext &context, Model::CompilationDeleteFiles task);
+  CompilationDeleteFilesTaskRunner(CompilationContext &context, Model::CompilationDeleteFiles task);
 
   ~CompilationDeleteFilesTaskRunner() override;
 
@@ -147,6 +148,7 @@ private:
 deleteCopyAndMove(CompilationDeleteFilesTaskRunner);
 };
 
+
 class CompilationRunToolTaskRunner : public CompilationTaskRunner {
 Q_OBJECT
 private:
@@ -155,8 +157,7 @@ private:
   bool m_terminated{false};
 
 public:
-  CompilationRunToolTaskRunner(
-      CompilationContext &context, Model::CompilationRunTool task);
+  CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task);
 
   ~CompilationRunToolTaskRunner() override;
 
@@ -183,6 +184,7 @@ private slots:
 deleteCopyAndMove(CompilationRunToolTaskRunner);
 };
 
+
 class CompilationRunner : public QObject {
 Q_OBJECT
 private:
@@ -193,16 +195,12 @@ private:
   TaskRunnerList::iterator m_currentTask;
 
 public:
-  CompilationRunner(
-      CompilationContext context,
-      const Model::CompilationProfile &profile,
-      QObject *parent = nullptr);
+  CompilationRunner(CompilationContext context, const Model::CompilationProfile &profile, QObject *parent = nullptr);
 
   ~CompilationRunner() override;
 
 private:
-  static TaskRunnerList createTaskRunners(
-      CompilationContext &context, const Model::CompilationProfile &profile);
+  static TaskRunnerList createTaskRunners(CompilationContext &context, const Model::CompilationProfile &profile);
 
 public:
   void execute();

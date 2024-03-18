@@ -24,8 +24,7 @@
 namespace TrenchBroom::IO {
 
 enum class TraversalMode {
-  Flat,
-  Recursive
+  Flat, Recursive
 };
 
 std::ostream &operator<<(std::ostream &lhs, const TraversalMode &rhs);

@@ -38,13 +38,13 @@ protected:
   std::vector<std::tuple<Model::Node *, std::string>> m_linkIds;
 
 public:
-  SetLinkIdsCommand(
-      const std::string &name, std::vector<std::tuple<Model::Node *, std::string>> linkIds);
+  SetLinkIdsCommand(const std::string &name, std::vector<std::tuple<Model::Node *, std::string>> linkIds);
+
   ~SetLinkIdsCommand() override;
 
   std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
-  std::unique_ptr<CommandResult> doPerformUndo(
-      MapDocumentCommandFacade *document) override;
+
+  std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
   bool doCollateWith(UndoableCommand &command) override;
 

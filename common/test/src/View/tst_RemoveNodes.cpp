@@ -34,199 +34,586 @@
 
 namespace TrenchBroom {
 namespace View {
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.removeNodes")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.removeNodes") {
+SECTION("Update linked groups") {
+auto *groupNode = new Model::GroupNode{Model::Group{"test"}};
+auto *brushNode = createBrushNode();
+
+using CreateNode = std::function<Model::Node *(const
+MapDocumentTest &test
+)>;
+CreateNode createNode = GENERATE_COPY(
+    CreateNode{
+        [](const auto &) -> Model::Node * {
+          return new Model::EntityNode{Model::Entity{}};
+        }}, CreateNode{[](const auto &test) -> Model::Node * { return test.createBrushNode(); }},
+    CreateNode{[](const auto &test) -> Model::Node * { return test.createPatchNode(); }}
+);
+
+auto *nodeToRemove = createNode(*this);
+groupNode->addChildren( {
+brushNode, nodeToRemove
+}
+);
+document->addNodes( {{
+document->
+
+parentForNodes(),
+
 {
-    SECTION("Update linked groups")
-    {
-        auto *groupNode = new Model::GroupNode{Model::Group{"test"}};
-        auto *brushNode = createBrushNode();
+groupNode
+}
+}});
 
-        using CreateNode = std::function<Model::Node *(const MapDocumentTest &test)>;
-        CreateNode createNode = GENERATE_COPY(CreateNode{
-            [](const auto &) -> Model::Node * {
-              return new Model::EntityNode{Model::Entity{}};
-            }}, CreateNode{[](const auto &test) -> Model::Node * { return test.createBrushNode(); }}, CreateNode{
-            [](const auto &test) -> Model::Node * { return test.createPatchNode(); }});
+document->selectNodes({
+groupNode});
+auto *linkedGroupNode = document->createLinkedDuplicate();
+document->
 
-        auto *nodeToRemove = createNode(*this);
-        groupNode->addChildren({brushNode, nodeToRemove});
-        document->addNodes({{document->parentForNodes(), {groupNode}}});
+deselectAll();
 
-        document->selectNodes({groupNode});
-        auto *linkedGroupNode = document->createLinkedDuplicate();
-        document->deselectAll();
+document->removeNodes({
+nodeToRemove});
 
-        document->removeNodes({nodeToRemove});
+CHECK(linkedGroupNode
+->
 
-        CHECK(linkedGroupNode->childCount() == 1u);
+childCount()
 
-        document->undoCommand();
+== 1u);
 
-        REQUIRE(groupNode->childCount() == 2u);
-        CHECK(linkedGroupNode->childCount() == 2u);
-    }
+document->
+
+undoCommand();
+
+REQUIRE(groupNode
+->
+
+childCount()
+
+== 2u);
+CHECK(linkedGroupNode
+->
+
+childCount()
+
+== 2u);
+}}
+
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.removeLayer")
+{
+Model::LayerNode *layer = new Model::LayerNode(Model::Layer("Layer 1"));
+document->addNodes({
+{
+document->
+
+world(),
+
+{
+layer}}});
+
+document->removeNodes({
+layer});
+CHECK(layer
+->
+
+parent()
+
+== nullptr);
+
+document->
+
+undoCommand();
+
+CHECK(layer
+->
+
+parent()
+
+== document->
+
+world()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.removeLayer")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.removeEmptyBrushEntity")
 {
-    Model::LayerNode *layer = new Model::LayerNode(Model::Layer("Layer 1"));
-    document->addNodes({{document->world(), {layer}}});
+Model::LayerNode *layer = new Model::LayerNode(Model::Layer("Layer 1"));
+document->addNodes({
+{
+document->
 
-    document->removeNodes({layer});
-    CHECK(layer->parent() == nullptr);
+world(),
 
-    document->undoCommand();
-    CHECK(layer->parent() == document->world());
+{
+layer}}});
+
+Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+layer, {
+entity}}});
+
+Model::BrushNode *brush = createBrushNode();
+document->addNodes({
+{
+entity, {
+brush}}});
+
+document->removeNodes({
+brush});
+CHECK(brush
+->
+
+parent()
+
+== nullptr);
+CHECK(entity
+->
+
+parent()
+
+== nullptr);
+
+document->
+
+undoCommand();
+
+CHECK(brush
+->
+
+parent()
+
+== entity);
+CHECK(entity
+->
+
+parent()
+
+== layer);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.removeEmptyBrushEntity")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.removeEmptyGroup")
 {
-    Model::LayerNode *layer = new Model::LayerNode(Model::Layer("Layer 1"));
-    document->addNodes({{document->world(), {layer}}});
+Model::GroupNode *group = new Model::GroupNode(Model::Group("group"));
+document->addNodes({
+{
+document->
 
-    Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{layer, {entity}}});
+parentForNodes(),
 
-    Model::BrushNode *brush = createBrushNode();
-    document->addNodes({{entity, {brush}}});
+{
+group}}});
 
-    document->removeNodes({brush});
-    CHECK(brush->parent() == nullptr);
-    CHECK(entity->parent() == nullptr);
+document->
+openGroup(group);
 
-    document->undoCommand();
-    CHECK(brush->parent() == entity);
-    CHECK(entity->parent() == layer);
+Model::BrushNode *brush = createBrushNode();
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+brush}}});
+
+document->removeNodes({
+brush});
+CHECK(document
+->
+
+currentGroup()
+
+== nullptr);
+CHECK(brush
+->
+
+parent()
+
+== nullptr);
+CHECK(group
+->
+
+parent()
+
+== nullptr);
+
+document->
+
+undoCommand();
+
+CHECK(document
+->
+
+currentGroup()
+
+== group);
+CHECK(brush
+->
+
+parent()
+
+== group);
+CHECK(group
+->
+
+parent()
+
+== document->world()->defaultLayer());
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.removeEmptyGroup")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.recursivelyRemoveEmptyGroups")
 {
-    Model::GroupNode *group = new Model::GroupNode(Model::Group("group"));
-    document->addNodes({{document->parentForNodes(), {group}}});
+Model::GroupNode *outer = new Model::GroupNode(Model::Group("outer"));
+document->addNodes({
+{
+document->
 
-    document->openGroup(group);
+parentForNodes(),
 
-    Model::BrushNode *brush = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brush}}});
+{
+outer}}});
 
-    document->removeNodes({brush});
-    CHECK(document->currentGroup() == nullptr);
-    CHECK(brush->parent() == nullptr);
-    CHECK(group->parent() == nullptr);
+document->
+openGroup(outer);
 
-    document->undoCommand();
-    CHECK(document->currentGroup() == group);
-    CHECK(brush->parent() == group);
-    CHECK(group->parent() == document->world()->defaultLayer());
+Model::GroupNode *inner = new Model::GroupNode(Model::Group("inner"));
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+inner}}});
+
+document->
+openGroup(inner);
+
+Model::BrushNode *brush = createBrushNode();
+document->addNodes({
+{
+document->
+
+parentForNodes(),
+
+{
+brush}}});
+
+document->removeNodes({
+brush});
+CHECK(document
+->
+
+currentGroup()
+
+== nullptr);
+CHECK(brush
+->
+
+parent()
+
+== nullptr);
+CHECK(inner
+->
+
+parent()
+
+== nullptr);
+CHECK(outer
+->
+
+parent()
+
+== nullptr);
+
+document->
+
+undoCommand();
+
+CHECK(document
+->
+
+currentGroup()
+
+== inner);
+CHECK(brush
+->
+
+parent()
+
+== inner);
+CHECK(inner
+->
+
+parent()
+
+== outer);
+CHECK(outer
+->
+
+parent()
+
+== document->world()->defaultLayer());
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.recursivelyRemoveEmptyGroups")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.updateLinkedGroups")
 {
-    Model::GroupNode *outer = new Model::GroupNode(Model::Group("outer"));
-    document->addNodes({{document->parentForNodes(), {outer}}});
+auto *groupNode = new Model::GroupNode(Model::Group("outer"));
+document->addNodes({
+{
+document->
 
-    document->openGroup(outer);
+parentForNodes(),
 
-    Model::GroupNode *inner = new Model::GroupNode(Model::Group("inner"));
-    document->addNodes({{document->parentForNodes(), {inner}}});
+{
+groupNode}}});
 
-    document->openGroup(inner);
+document->
+openGroup(groupNode);
 
-    Model::BrushNode *brush = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brush}}});
+auto *entityNode1 = new Model::EntityNode{Model::Entity{}};
+auto *entityNode2 = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+document->
 
-    document->removeNodes({brush});
-    CHECK(document->currentGroup() == nullptr);
-    CHECK(brush->parent() == nullptr);
-    CHECK(inner->parent() == nullptr);
-    CHECK(outer->parent() == nullptr);
+parentForNodes(),
 
-    document->undoCommand();
-    CHECK(document->currentGroup() == inner);
-    CHECK(brush->parent() == inner);
-    CHECK(inner->parent() == outer);
-    CHECK(outer->parent() == document->world()->defaultLayer());
+{
+entityNode1, entityNode2}}});
+
+document->
+
+closeGroup();
+
+document->selectNodes({
+groupNode});
+
+auto *linkedGroupNode = document->createLinkedDuplicate();
+REQUIRE(linkedGroupNode
+->
+
+childCount()
+
+== groupNode->
+
+childCount()
+
+);
+
+document->
+
+deselectAll();
+
+document->removeNodes({
+entityNode2});
+CHECK(linkedGroupNode
+->
+
+childCount()
+
+== groupNode->
+
+childCount()
+
+);
+
+document->
+
+undoCommand();
+
+CHECK(linkedGroupNode
+->
+
+childCount()
+
+== groupNode->
+
+childCount()
+
+);
+
+document->
+
+redoCommand();
+
+CHECK(linkedGroupNode
+->
+
+childCount()
+
+== groupNode->
+
+childCount()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.updateLinkedGroups")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.updateLinkedGroupsWithRecursiveDelete")
 {
-    auto *groupNode = new Model::GroupNode(Model::Group("outer"));
-    document->addNodes({{document->parentForNodes(), {groupNode}}});
+auto *outerGroupNode = new Model::GroupNode(Model::Group("outer"));
+document->addNodes({
+{
+document->
 
-    document->openGroup(groupNode);
+parentForNodes(),
 
-    auto *entityNode1 = new Model::EntityNode{Model::Entity{}};
-    auto *entityNode2 = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {entityNode1, entityNode2}}});
+{
+outerGroupNode}}});
 
-    document->closeGroup();
+document->
+openGroup(outerGroupNode);
 
-    document->selectNodes({groupNode});
+auto *outerEntityNode = new Model::EntityNode{Model::Entity{}};
+auto *innerGroupNode = new Model::GroupNode{Model::Group{"inner"}};
+document->addNodes({
+{
+document->
 
-    auto *linkedGroupNode = document->createLinkedDuplicate();
-    REQUIRE(linkedGroupNode->childCount() == groupNode->childCount());
+parentForNodes(),
 
-    document->deselectAll();
+{
+outerEntityNode, innerGroupNode}}});
 
-    document->removeNodes({entityNode2});
-    CHECK(linkedGroupNode->childCount() == groupNode->childCount());
+document->
+openGroup(innerGroupNode);
 
-    document->undoCommand();
-    CHECK(linkedGroupNode->childCount() == groupNode->childCount());
+auto *innerEntityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+document->
 
-    document->redoCommand();
-    CHECK(linkedGroupNode->childCount() == groupNode->childCount());
+parentForNodes(),
+
+{
+innerEntityNode}}});
+
+document->
+
+closeGroup();
+
+document->
+
+closeGroup();
+
+document->selectNodes({
+outerGroupNode});
+
+auto *linkedOuterGroupNode = document->createLinkedDuplicate();
+
+document->
+
+deselectAll();
+
+document->removeNodes({
+innerEntityNode});
+REQUIRE(outerGroupNode
+->
+
+children()
+
+== std::vector<Model::Node *>{
+outerEntityNode});
+CHECK(linkedOuterGroupNode
+->
+
+childCount()
+
+== outerGroupNode->
+
+childCount()
+
+);
+
+document->
+
+undoCommand();
+
+CHECK(linkedOuterGroupNode
+->
+
+childCount()
+
+== outerGroupNode->
+
+childCount()
+
+);
+
+document->
+
+redoCommand();
+
+CHECK(linkedOuterGroupNode
+->
+
+childCount()
+
+== outerGroupNode->
+
+childCount()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.updateLinkedGroupsWithRecursiveDelete")
+TEST_CASE_METHOD(MapDocumentTest,
+"RemoveNodesTest.unlinkSingletonLinkedGroups")
 {
-    auto *outerGroupNode = new Model::GroupNode(Model::Group("outer"));
-    document->addNodes({{document->parentForNodes(), {outerGroupNode}}});
-
-    document->openGroup(outerGroupNode);
-
-    auto *outerEntityNode = new Model::EntityNode{Model::Entity{}};
-    auto *innerGroupNode = new Model::GroupNode{Model::Group{"inner"}};
-    document->addNodes({{document->parentForNodes(), {outerEntityNode, innerGroupNode}}});
-
-    document->openGroup(innerGroupNode);
-
-    auto *innerEntityNode = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {innerEntityNode}}});
-
-    document->closeGroup();
-    document->closeGroup();
-
-    document->selectNodes({outerGroupNode});
-
-    auto *linkedOuterGroupNode = document->createLinkedDuplicate();
-
-    document->deselectAll();
-
-    document->removeNodes({innerEntityNode});
-    REQUIRE(outerGroupNode->children() == std::vector<Model::Node *>{outerEntityNode});
-    CHECK(linkedOuterGroupNode->childCount() == outerGroupNode->childCount());
-
-    document->undoCommand();
-    CHECK(linkedOuterGroupNode->childCount() == outerGroupNode->childCount());
-
-    document->redoCommand();
-    CHECK(linkedOuterGroupNode->childCount() == outerGroupNode->childCount());
-}
-
-TEST_CASE_METHOD(MapDocumentTest, "RemoveNodesTest.unlinkSingletonLinkedGroups")
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
 {
-    auto *entityNode = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
+document->
 
-    document->selectNodes({entityNode});
-    auto *groupNode = document->groupSelection("group");
-    auto *linkedGroupNode = document->createLinkedDuplicate();
+parentForNodes(),
 
-    REQUIRE(groupNode->group().linkedGroupId().has_value());
+{
+entityNode}}});
 
-    document->removeNodes({linkedGroupNode});
-    CHECK_FALSE(groupNode->group().linkedGroupId().has_value());
-}
-} // namespace View
+document->selectNodes({
+entityNode});
+auto *groupNode = document->groupSelection("group");
+auto *linkedGroupNode = document->createLinkedDuplicate();
+
+REQUIRE(groupNode
+->
+
+group()
+
+.
+
+linkedGroupId()
+
+.
+
+has_value()
+
+);
+
+document->removeNodes({
+linkedGroupNode});
+CHECK_FALSE(groupNode
+->
+
+group()
+
+.
+
+linkedGroupId()
+
+.
+
+has_value()
+
+);
+}} // namespace View
 } // namespace TrenchBroom

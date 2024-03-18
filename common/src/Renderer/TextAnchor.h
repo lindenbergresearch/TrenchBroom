@@ -44,6 +44,7 @@ public:
   virtual vm::vec3f position(const Camera &camera) const = 0;
 };
 
+
 class TextAnchor3D : public TextAnchor {
 public:
   virtual ~TextAnchor3D() override;
@@ -63,6 +64,7 @@ private:
   virtual vm::vec2f extraOffsets(TextAlignment::Type a) const;
 };
 
+
 class SimpleTextAnchor : public TextAnchor3D {
 private:
   vm::vec3f m_position;
@@ -70,10 +72,7 @@ private:
   vm::vec2f m_extraOffsets;
 
 public:
-  SimpleTextAnchor(
-      const vm::vec3f &position,
-      const TextAlignment::Type alignment,
-      const vm::vec2f &extraOffsets = vm::vec2f::zero());
+  SimpleTextAnchor(const vm::vec3f &position, const TextAlignment::Type alignment, const vm::vec2f &extraOffsets = vm::vec2f::zero());
 
 private:
   vm::vec3f basePosition() const override;

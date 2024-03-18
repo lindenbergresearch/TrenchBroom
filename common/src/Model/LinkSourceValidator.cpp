@@ -35,19 +35,16 @@ namespace {
 static const auto Type = freeIssueType();
 } // namespace
 
-LinkSourceValidator::LinkSourceValidator()
-    : Validator{Type, "Missing entity link source"} {
+LinkSourceValidator::LinkSourceValidator() : Validator{Type, "Missing entity link source"} {
   addQuickFix(makeRemoveEntityPropertiesQuickFix(Type));
 }
 
-void LinkSourceValidator::doValidate(
-    EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+void LinkSourceValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
   if (entityNode.hasMissingSources()) {
-    issues.push_back(std::make_unique<EntityPropertyIssue>(
-        Type,
-        entityNode,
-        EntityPropertyKeys::Targetname,
-        entityNode.name() + " has unused targetname key"));
+    issues.push_back(
+        std::make_unique<EntityPropertyIssue>(
+            Type, entityNode, EntityPropertyKeys::Targetname, entityNode.name() + " has unused targetname key"
+        ));
   }
 }
 } // namespace Model

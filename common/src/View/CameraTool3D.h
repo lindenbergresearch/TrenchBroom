@@ -35,6 +35,7 @@ class PerspectiveCamera;
 namespace View {
 class DragTracker;
 
+
 class CameraTool3D : public ToolController, public Tool {
 private:
   Renderer::PerspectiveCamera &m_camera;

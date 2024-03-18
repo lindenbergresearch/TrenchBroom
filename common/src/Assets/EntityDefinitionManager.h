@@ -28,6 +28,8 @@
 
 namespace TrenchBroom::IO {
 class EntityDefinitionLoader;
+
+
 class ParserStatus;
 } // namespace TrenchBroom::IO
 
@@ -37,9 +39,14 @@ class EntityNodeBase;
 
 namespace TrenchBroom::Assets {
 class EntityDefinition;
+
+
 class EntityDefinitionGroup;
+
+
 enum class EntityDefinitionSortOrder;
 enum class EntityDefinitionType;
+
 
 class EntityDefinitionManager {
 private:
@@ -51,26 +58,31 @@ private:
 public:
   ~EntityDefinitionManager();
 
-  Result<void> loadDefinitions(
-      const std::filesystem::path &path,
-      const IO::EntityDefinitionLoader &loader,
-      IO::ParserStatus &status);
+  Result<void> loadDefinitions(const std::filesystem::path &path, const IO::EntityDefinitionLoader &loader, IO::ParserStatus &status);
+
   void setDefinitions(std::vector<std::unique_ptr<EntityDefinition>> newDefinitions);
+
   void clear();
 
   EntityDefinition *definition(const Model::EntityNodeBase *node) const;
+
   EntityDefinition *definition(const std::string &classname) const;
-  std::vector<EntityDefinition *> definitions(
-      EntityDefinitionType type, EntityDefinitionSortOrder order) const;
+
+  std::vector<EntityDefinition *> definitions(EntityDefinitionType type, EntityDefinitionSortOrder order) const;
+
   std::vector<EntityDefinition *> definitions() const;
 
   const std::vector<EntityDefinitionGroup> &groups() const;
 
 private:
   void updateIndices();
+
   void updateGroups();
+
   void updateCache();
+
   void clearCache();
+
   void clearGroups();
 };
 } // namespace TrenchBroom::Assets

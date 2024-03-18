@@ -87,6 +87,7 @@ public:
   virtual std::shared_ptr<BufferReaderSource> buffer() const = 0;
 };
 
+
 /**
  * A reader source that reads from a memory region. Does not take ownership of the
  * memory region and will not deallocate it.
@@ -106,8 +107,7 @@ public:
    *
    * @throw ReaderException if the given memory region is invalid
    */
-  BufferReaderSource(const char *begin, const char *end)
-      : m_begin{begin}, m_end{end} {
+  BufferReaderSource(const char *begin, const char *end) : m_begin{begin}, m_end{end} {
     if (m_begin > m_end) {
       throw ReaderException{"Invalid buffer"};
     }
@@ -129,10 +129,10 @@ public:
     std::memcpy(val, m_begin + position, size);
   }
 
-  std::shared_ptr<ReaderSource> subSource(
-      const size_t offset, const size_t length) const override {
+  std::shared_ptr<ReaderSource> subSource(const size_t offset, const size_t length) const override {
     return std::make_shared<BufferReaderSource>(
-        m_begin + offset, m_begin + offset + length);
+        m_begin + offset, m_begin + offset + length
+    );
   }
 
   std::shared_ptr<BufferReaderSource> buffer() const override {
@@ -140,19 +140,20 @@ public:
   }
 };
 
+
 class OwningBufferReaderSource : public BufferReaderSource {
 private:
   CFile::BufferType m_buffer;
 
 public:
-  OwningBufferReaderSource(CFile::BufferType buffer, const char *begin, const char *end)
-      : BufferReaderSource{begin, end}, m_buffer{std::move(buffer)} {
+  OwningBufferReaderSource(CFile::BufferType buffer, const char *begin, const char *end) : BufferReaderSource{begin, end}, m_buffer{std::move(buffer)} {
   }
 
   std::shared_ptr<BufferReaderSource> buffer() const override {
     return std::make_shared<OwningBufferReaderSource>(m_buffer, begin(), end());
   }
 };
+
 
 /**
  * A reader source that reads directly from a file. Note that the seek position of the
@@ -174,38 +175,37 @@ public:
    * @param offset the offset into the file at which this reader source should begin
    * @param length the length of this reader source
    */
-  FileReaderSource(const CFile &file, const size_t offset, const size_t length)
-      : m_file{file}, m_offset{offset}, m_length{length} {
+  FileReaderSource(const CFile &file, const size_t offset, const size_t length) : m_file{file}, m_offset{offset}, m_length{length} {
   }
 
 public:
   size_t size() const override { return m_length; }
 
   void read(char *val, const size_t position, const size_t size) override {
-    m_file.read(val, m_offset + position, size).transform_error([](auto error) {
-      throw ReaderException{std::move(error.msg)};
-    });
+    m_file.read(val, m_offset + position, size).transform_error(
+        [](auto error) {
+          throw ReaderException{std::move(error.msg)};
+        }
+    );
   }
 
-  std::shared_ptr<ReaderSource> subSource(
-      const size_t offset, const size_t length) const override {
+  std::shared_ptr<ReaderSource> subSource(const size_t offset, const size_t length) const override {
     return std::make_shared<FileReaderSource>(m_file, m_offset + offset, length);
   }
 
   std::shared_ptr<BufferReaderSource> buffer() const override {
-    return m_file.buffer(m_offset, m_length)
-        .transform([&](auto buffer) {
+    return m_file.buffer(m_offset, m_length).transform(
+        [&](auto buffer) {
           const auto *begin = buffer.get();
           const auto *end = begin + m_length;
           return std::make_shared<OwningBufferReaderSource>(std::move(buffer), begin, end);
-        })
-        .if_error([&](auto error) { throw ReaderException{std::move(error.msg)}; })
-        .value();
+        }
+    ).if_error([&](auto error) { throw ReaderException{std::move(error.msg)}; }).value();
   }
 };
 
-Reader::Reader(std::shared_ptr<ReaderSource> source)
-    : m_source{std::move(source)}, m_position{0} {
+
+Reader::Reader(std::shared_ptr<ReaderSource> source) : m_source{std::move(source)}, m_position{0} {
 }
 
 Reader::~Reader() = default;
@@ -227,7 +227,7 @@ size_t Reader::position() const {
 }
 
 bool Reader::eof() const {
-  return position()==size();
+  return position() == size();
 }
 
 void Reader::seekFromBegin(const size_t position) {
@@ -245,9 +245,7 @@ void Reader::seekForward(const size_t offset) {
 
 void Reader::seekBackward(const size_t offset) {
   if (offset > position()) {
-    throw ReaderException{
-        "Cannot seek beyond start of reader at position " + std::to_string(position())
-            + " with offset " + std::to_string(offset)};
+    throw ReaderException{"Cannot seek beyond start of reader at position " + std::to_string(position()) + " with offset " + std::to_string(offset)};
   }
   seekFromBegin(position() - offset);
 }
@@ -295,14 +293,11 @@ std::string Reader::readString(const size_t size) {
 
 void Reader::ensurePosition(const size_t position) const {
   if (position > size()) {
-    throw ReaderException{
-        "Position " + std::to_string(position) + " is out of bounds for reader of size "
-            + std::to_string(size())};
+    throw ReaderException{"Position " + std::to_string(position) + " is out of bounds for reader of size " + std::to_string(size())};
   }
 }
 
-BufferedReader::BufferedReader(std::shared_ptr<BufferReaderSource> source)
-    : Reader{std::move(source)} {
+BufferedReader::BufferedReader(std::shared_ptr<BufferReaderSource> source) : Reader{std::move(source)} {
 }
 
 BufferedReader BufferedReader::buffer() const {

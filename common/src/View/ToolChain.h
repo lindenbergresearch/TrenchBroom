@@ -29,17 +29,22 @@ class PickResult;
 namespace TrenchBroom::Renderer {
 class RenderBatch;
 
+
 class RenderContext;
 } // namespace TrenchBroom::Renderer
 
 namespace TrenchBroom::View {
 class DragTracker;
 
+
 class DropTracker;
+
 
 class InputState;
 
+
 class ToolController;
+
 
 class ToolChain {
 private:
@@ -72,16 +77,12 @@ public:
   std::unique_ptr<DragTracker> startMouseDrag(const InputState &inputState);
 
   bool shouldAcceptDrop(const InputState &inputState, const std::string &payload) const;
-  std::unique_ptr<DropTracker> dragEnter(
-      const InputState &inputState, const std::string &payload);
 
-  void setRenderOptions(
-      const InputState &inputState, Renderer::RenderContext &renderContext) const;
+  std::unique_ptr<DropTracker> dragEnter(const InputState &inputState, const std::string &payload);
 
-  void render(
-      const InputState &inputState,
-      Renderer::RenderContext &renderContext,
-      Renderer::RenderBatch &renderBatch);
+  void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
+
+  void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
   bool cancel();
 

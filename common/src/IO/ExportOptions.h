@@ -33,12 +33,13 @@ struct MapExportOptions {
   kdl_reflect_decl(MapExportOptions, exportPath);
 };
 
+
 enum class ObjMtlPathMode {
-  RelativeToGamePath,
-  RelativeToExportPath
+  RelativeToGamePath, RelativeToExportPath
 };
 
 std::ostream &operator<<(std::ostream &lhs, ObjMtlPathMode rhs);
+
 
 struct ObjExportOptions {
   std::filesystem::path exportPath;
@@ -46,6 +47,7 @@ struct ObjExportOptions {
 
   kdl_reflect_decl(ObjExportOptions, exportPath, mtlPathMode);
 };
+
 
 using ExportOptions = std::variant<MapExportOptions, ObjExportOptions>;
 

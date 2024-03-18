@@ -55,7 +55,7 @@ namespace View {
  */
 static Model::Node *findOutermostClosedGroupOrNode(Model::Node *node) {
   Model::GroupNode *group = findOutermostClosedGroup(node);
-  if (group!=nullptr) {
+  if (group != nullptr) {
     return group;
   }
 
@@ -64,7 +64,7 @@ static Model::Node *findOutermostClosedGroupOrNode(Model::Node *node) {
 
 static const Model::Node *findOutermostClosedGroupOrNode(const Model::Node *node) {
   const Model::GroupNode *group = findOutermostClosedGroup(node);
-  if (group!=nullptr) {
+  if (group != nullptr) {
     return group;
   }
 
@@ -74,7 +74,7 @@ static const Model::Node *findOutermostClosedGroupOrNode(const Model::Node *node
 static Model::HitFilter isNodeSelectable(const Model::EditorContext &editorContext) {
   return [&](const auto &hit) {
     if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
-      if (!editorContext.selectable(faceHandle->node(), faceHandle->face())) {
+      if (! editorContext.selectable(faceHandle->node(), faceHandle->face())) {
         return false;
       }
     }
@@ -93,7 +93,7 @@ std::vector<Model::Node *> hitsToNodesWithGroupPicking(const std::vector<Model::
 
   for (const auto &hit : hits) {
     Model::Node *node = findOutermostClosedGroupOrNode(Model::hitToNode(hit));
-    if (!duplicateCheck.insert(node).second) {
+    if (! duplicateCheck.insert(node).second) {
       continue;
     }
 
@@ -113,30 +113,26 @@ static bool isMultiClick(const InputState &inputState) {
   return inputState.modifierKeysDown(ModifierKeys::MKCtrlCmd);
 }
 
-static const Model::Hit &firstHit(
-    const InputState &inputState, const Model::HitFilter &hitFilter) {
+static const Model::Hit &firstHit(const InputState &inputState, const Model::HitFilter &hitFilter) {
   return inputState.pickResult().first(hitFilter);
 }
 
-static std::vector<Model::Node *> collectSelectableChildren(
-    const Model::EditorContext &editorContext, const Model::Node *node) {
+static std::vector<Model::Node *> collectSelectableChildren(const Model::EditorContext &editorContext, const Model::Node *node) {
   return Model::collectSelectableNodes(node->children(), editorContext);
 }
 
-static bool handleClick(
-    const InputState &inputState, const Model::EditorContext &editorContext) {
-  if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
+static bool handleClick(const InputState &inputState, const Model::EditorContext &editorContext) {
+  if (! inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
     return false;
   }
-  if (!inputState.checkModifierKeys(MK_DontCare, MK_No, MK_DontCare)) {
+  if (! inputState.checkModifierKeys(MK_DontCare, MK_No, MK_DontCare)) {
     return false;
   }
 
   return editorContext.canChangeSelection();
 }
 
-SelectionTool::SelectionTool(std::weak_ptr<MapDocument> document)
-    : ToolController{}, Tool{true}, m_document{std::move(document)} {
+SelectionTool::SelectionTool(std::weak_ptr<MapDocument> document) : ToolController{}, Tool{true}, m_document{std::move(document)} {
 }
 
 Tool &SelectionTool::tool() {
@@ -153,7 +149,7 @@ bool SelectionTool::mouseClick(const InputState &inputState) {
   auto document = kdl::mem_lock(m_document);
   const auto &editorContext = document->editorContext();
 
-  if (!handleClick(inputState, editorContext)) {
+  if (! handleClick(inputState, editorContext)) {
     return false;
   }
 
@@ -192,8 +188,7 @@ bool SelectionTool::mouseClick(const InputState &inputState) {
       document->deselectAll();
     }
   } else {
-    const auto &hit =
-        firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
+    const auto &hit = firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
     if (hit.isMatch()) {
       auto *node = findOutermostClosedGroupOrNode(Model::hitToNode(hit));
       if (editorContext.selectable(node)) {
@@ -229,7 +224,7 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
   auto document = kdl::mem_lock(m_document);
   const auto &editorContext = document->editorContext();
 
-  if (!handleClick(inputState, editorContext)) {
+  if (! handleClick(inputState, editorContext)) {
     return false;
   }
 
@@ -253,16 +248,14 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
       }
     }
   } else {
-    const auto inGroup = document->currentGroup()!=nullptr;
-    const auto &hit =
-        firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
+    const auto inGroup = document->currentGroup() != nullptr;
+    const auto &hit = firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
     if (hit.isMatch()) {
-      const auto hitInGroup =
-          inGroup && Model::hitToNode(hit)->isDescendantOf(document->currentGroup());
-      if (!inGroup || hitInGroup) {
+      const auto hitInGroup = inGroup && Model::hitToNode(hit)->isDescendantOf(document->currentGroup());
+      if (! inGroup || hitInGroup) {
         // If the hit node is inside a closed group, treat it as a hit on the group insted
         auto *group = findOutermostClosedGroup(Model::hitToNode(hit));
-        if (group!=nullptr) {
+        if (group != nullptr) {
           if (editorContext.selectable(group)) {
             document->openGroup(group);
           }
@@ -296,10 +289,10 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
 }
 
 static void adjustGrid(const InputState &inputState, Grid &grid) {
-  const auto factor = pref(Preferences::CameraMouseWheelInvert) ? -1.0f : 1.0f;
-  if (factor*inputState.scrollY() < 0.0f) {
+  const auto factor = pref(Preferences::CameraMouseWheelInvert) ? - 1.0f : 1.0f;
+  if (factor * inputState.scrollY() < 0.0f) {
     grid.incSize();
-  } else if (factor*inputState.scrollY() > 0.0f) {
+  } else if (factor * inputState.scrollY() > 0.0f) {
     grid.decSize();
   }
 }
@@ -309,16 +302,14 @@ static void adjustGrid(const InputState &inputState, Grid &grid) {
  *  - first is the first node in the given list that's currently selected
  *  - second is the next selectable node in the list
  */
-template<typename I>
-static std::pair<Model::Node *, Model::Node *> findSelectionPair(I it, I end) {
-  const auto first =
-      std::find_if(it, end, [](const auto *node) { return node->selected(); });
-  if (first==end) {
+template<typename I> static std::pair<Model::Node *, Model::Node *> findSelectionPair(I it, I end) {
+  const auto first = std::find_if(it, end, [](const auto *node) { return node->selected(); });
+  if (first == end) {
     return {nullptr, nullptr};
   }
 
   const auto next = std::next(first);
-  if (next==end) {
+  if (next == end) {
     return {*first, nullptr};
   }
 
@@ -338,16 +329,13 @@ static void drillSelection(const InputState &inputState, MapDocument &document) 
   // hits on the same Group need to be collapsed.
   const std::vector<Model::Node *> hitNodes = hitsToNodesWithGroupPicking(hits);
 
-  const auto forward =
-      (inputState.scrollY() > 0.0f)!=(pref(Preferences::CameraMouseWheelInvert));
-  const auto nodePair = forward
-                        ? findSelectionPair(std::begin(hitNodes), std::end(hitNodes))
-                        : findSelectionPair(std::rbegin(hitNodes), std::rend(hitNodes));
+  const auto forward = (inputState.scrollY() > 0.0f) != (pref(Preferences::CameraMouseWheelInvert));
+  const auto nodePair = forward ? findSelectionPair(std::begin(hitNodes), std::end(hitNodes)) : findSelectionPair(std::rbegin(hitNodes), std::rend(hitNodes));
 
   auto *selectedNode = nodePair.first;
   auto *nextNode = nodePair.second;
 
-  if (nextNode!=nullptr) {
+  if (nextNode != nullptr) {
     auto transaction = Transaction{document, "Drill Selection"};
     document.deselectNodes({selectedNode});
     document.selectNodes({nextNode});
@@ -371,8 +359,7 @@ private:
   std::shared_ptr<MapDocument> m_document;
 
 public:
-  PaintSelectionDragTracker(std::shared_ptr<MapDocument> document)
-      : m_document{std::move(document)} {
+  PaintSelectionDragTracker(std::shared_ptr<MapDocument> document) : m_document{std::move(document)} {
   }
 
   bool drag(const InputState &inputState) override {
@@ -384,7 +371,7 @@ public:
       if (const auto faceHandle = Model::hitToFaceHandle(hit)) {
         const auto *brush = faceHandle->node();
         const auto &face = faceHandle->face();
-        if (!face.selected() && editorContext.selectable(brush, face)) {
+        if (! face.selected() && editorContext.selectable(brush, face)) {
           m_document->selectBrushFaces({*faceHandle});
         }
       }
@@ -394,7 +381,7 @@ public:
           inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
       if (hit.isMatch()) {
         auto *node = findOutermostClosedGroupOrNode(Model::hitToNode(hit));
-        if (!node->selected() && editorContext.selectable(node)) {
+        if (! node->selected() && editorContext.selectable(node)) {
           m_document->selectNodes({node});
         }
       }
@@ -414,7 +401,7 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
   auto document = kdl::mem_lock(m_document);
   const auto &editorContext = document->editorContext();
 
-  if (!handleClick(inputState, editorContext) || !isMultiClick(inputState)) {
+  if (! handleClick(inputState, editorContext) || ! isMultiClick(inputState)) {
     return nullptr;
   }
 
@@ -425,11 +412,12 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
       const auto &face = faceHandle->face();
       if (editorContext.selectable(brush, face)) {
         document->startTransaction(
-            "Drag Select Brush Faces", TransactionScope::LongRunning);
-        if (document->hasSelection() && !document->hasSelectedBrushFaces()) {
+            "Drag Select Brush Faces", TransactionScope::LongRunning
+        );
+        if (document->hasSelection() && ! document->hasSelectedBrushFaces()) {
           document->deselectAll();
         }
-        if (!face.selected()) {
+        if (! face.selected()) {
           document->selectBrushFaces({*faceHandle});
         }
 
@@ -437,19 +425,18 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
       }
     }
   } else {
-    const auto &hit =
-        firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
-    if (!hit.isMatch()) {
+    const auto &hit = firstHit(inputState, type(Model::nodeHitType()) && isNodeSelectable(editorContext));
+    if (! hit.isMatch()) {
       return nullptr;
     }
 
     auto *node = findOutermostClosedGroupOrNode(Model::hitToNode(hit));
     if (editorContext.selectable(node)) {
       document->startTransaction("Drag Select Objects", TransactionScope::LongRunning);
-      if (document->hasSelection() && !document->hasSelectedNodes()) {
+      if (document->hasSelection() && ! document->hasSelectedNodes()) {
         document->deselectAll();
       }
-      if (!node->selected()) {
+      if (! node->selected()) {
         document->selectNodes({node});
       }
 
@@ -460,8 +447,7 @@ std::unique_ptr<DragTracker> SelectionTool::acceptMouseDrag(const InputState &in
   return nullptr;
 }
 
-void SelectionTool::setRenderOptions(
-    const InputState &inputState, Renderer::RenderContext &renderContext) const {
+void SelectionTool::setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const {
   using namespace Model::HitFilters;
 
   auto document = kdl::mem_lock(m_document);

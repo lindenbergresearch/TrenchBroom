@@ -53,162 +53,444 @@
 
 namespace TrenchBroom {
 namespace View {
-TEST_CASE_METHOD(MapDocumentTest, "SwapNodeContentsTest.swapBrushes")
+TEST_CASE_METHOD(MapDocumentTest,
+"SwapNodeContentsTest.swapBrushes") {
+auto *brushNode = createBrushNode();
+document->addNodes( {{
+document->
+
+parentForNodes(),
+
 {
-    auto *brushNode = createBrushNode();
-    document->addNodes({{document->parentForNodes(), {brushNode}}});
+brushNode
+}
+}
+});
 
-    const auto originalBrush = brushNode->brush();
-    auto modifiedBrush = originalBrush;
-    REQUIRE(modifiedBrush.transform(document->worldBounds(), vm::translation_matrix(vm::vec3(16, 0, 0)), false).is_success());
+const auto originalBrush = brushNode->brush();
+auto modifiedBrush = originalBrush;
+REQUIRE(modifiedBrush
+.
+transform(document
+->
 
-    auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
-    nodesToSwap.emplace_back(brushNode, modifiedBrush);
+worldBounds(), vm::translation_matrix(vm::vec3(16, 0, 0)),
 
-    document->swapNodeContents("Swap Nodes", std::move(nodesToSwap), {});
-    CHECK(brushNode->brush() == modifiedBrush);
+false).
 
-    document->undoCommand();
-    CHECK(brushNode->brush() == originalBrush);
+is_success()
+
+);
+
+auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
+nodesToSwap.
+emplace_back(brushNode, modifiedBrush
+);
+
+document->swapNodeContents("Swap Nodes",
+std::move(nodesToSwap),
+{
+});
+CHECK(brushNode
+->
+
+brush()
+
+== modifiedBrush);
+
+document->
+
+undoCommand();
+
+CHECK(brushNode
+->
+
+brush()
+
+== originalBrush);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "SwapNodeContentsTest.swapPatches")
+TEST_CASE_METHOD(MapDocumentTest,
+"SwapNodeContentsTest.swapPatches")
 {
-    auto *patchNode = createPatchNode();
-    document->addNodes({{document->parentForNodes(), {patchNode}}});
+auto *patchNode = createPatchNode();
+document->addNodes({
+{
+document->
 
-    const auto originalPatch = patchNode->patch();
-    auto modifiedPatch = originalPatch;
-    modifiedPatch.transform(vm::translation_matrix(vm::vec3{16, 0, 0}));
+parentForNodes(),
 
-    auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
-    nodesToSwap.emplace_back(patchNode, modifiedPatch);
+{
+patchNode}}});
 
-    document->swapNodeContents("Swap Nodes", std::move(nodesToSwap), {});
-    CHECK(patchNode->patch() == modifiedPatch);
+const auto originalPatch = patchNode->patch();
+auto modifiedPatch = originalPatch;
+modifiedPatch.
+transform(vm::translation_matrix(vm::vec3{16, 0, 0})
+);
 
-    document->undoCommand();
-    CHECK(patchNode->patch() == originalPatch);
+auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
+nodesToSwap.
+emplace_back(patchNode, modifiedPatch
+);
+
+document->swapNodeContents("Swap Nodes",
+std::move(nodesToSwap),
+{
+});
+CHECK(patchNode
+->
+
+patch()
+
+== modifiedPatch);
+
+document->
+
+undoCommand();
+
+CHECK(patchNode
+->
+
+patch()
+
+== originalPatch);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "SwapNodeContentsTest.textureUsageCount")
+TEST_CASE_METHOD(MapDocumentTest,
+"SwapNodeContentsTest.textureUsageCount")
 {
-    document->deselectAll();
-    document->setProperty(Model::EntityPropertyKeys::Wad, "fixture/test/IO/Wad/cr8_czg.wad");
+document->
 
-    constexpr auto TextureName = "bongs2";
-    const auto *texture = document->textureManager().texture(TextureName);
-    REQUIRE(texture != nullptr);
+deselectAll();
 
-    auto *brushNode = createBrushNode(TextureName);
-    document->addNodes({{document->parentForNodes(), {brushNode}}});
+document->
+setProperty(Model::EntityPropertyKeys::Wad,
+"fixture/test/IO/Wad/cr8_czg.wad");
 
-    const auto &originalBrush = brushNode->brush();
-    auto modifiedBrush = originalBrush;
-    REQUIRE(modifiedBrush.transform(document->worldBounds(), vm::translation_matrix(vm::vec3(16, 0, 0)), false).is_success());
+constexpr auto TextureName = "bongs2";
+const auto *texture = document->textureManager().texture(TextureName);
+REQUIRE(texture
+!= nullptr);
 
-    auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
-    nodesToSwap.emplace_back(brushNode, std::move(modifiedBrush));
+auto *brushNode = createBrushNode(TextureName);
+document->addNodes({
+{
+document->
 
-    REQUIRE(texture->usageCount() == 6u);
+parentForNodes(),
 
-    document->swapNodeContents("Swap Nodes", std::move(nodesToSwap), {});
-    CHECK(texture->usageCount() == 6u);
+{
+brushNode}}});
 
-    document->undoCommand();
-    CHECK(texture->usageCount() == 6u);
+const auto &originalBrush = brushNode->brush();
+auto modifiedBrush = originalBrush;
+REQUIRE(modifiedBrush
+.
+transform(document
+->
+
+worldBounds(), vm::translation_matrix(vm::vec3(16, 0, 0)),
+
+false).
+
+is_success()
+
+);
+
+auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
+nodesToSwap.
+emplace_back(brushNode, std::move(modifiedBrush)
+);
+
+REQUIRE(texture
+->
+
+usageCount()
+
+== 6u);
+
+document->swapNodeContents("Swap Nodes",
+std::move(nodesToSwap),
+{
+});
+CHECK(texture
+->
+
+usageCount()
+
+== 6u);
+
+document->
+
+undoCommand();
+
+CHECK(texture
+->
+
+usageCount()
+
+== 6u);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "SwapNodeContentsTest.entityDefinitionUsageCount")
+TEST_CASE_METHOD(MapDocumentTest,
+"SwapNodeContentsTest.entityDefinitionUsageCount")
 {
-    constexpr auto Classname = "point_entity";
+constexpr auto Classname = "point_entity";
 
-    auto *entityNode = new Model::EntityNode{{},
-                                             {{Model::EntityPropertyKeys::Classname, Classname}}};
+auto *entityNode = new Model::EntityNode{{}, {{Model::EntityPropertyKeys::Classname, Classname}}};
 
-    document->addNodes({{document->parentForNodes(), {entityNode}}});
+document->addNodes({
+{
+document->
 
-    const auto &originalEntity = entityNode->entity();
-    auto modifiedEntity = originalEntity;
-    modifiedEntity.addOrUpdateProperty({}, "this", "that");
+parentForNodes(),
 
-    auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
-    nodesToSwap.emplace_back(entityNode, std::move(modifiedEntity));
+{
+entityNode}}});
 
-    REQUIRE(m_pointEntityDef->usageCount() == 1u);
+const auto &originalEntity = entityNode->entity();
+auto modifiedEntity = originalEntity;
+modifiedEntity.addOrUpdateProperty({
+}, "this", "that");
 
-    document->swapNodeContents("Swap Nodes", std::move(nodesToSwap), {});
-    CHECK(m_pointEntityDef->usageCount() == 1u);
+auto nodesToSwap = std::vector<std::pair<Model::Node *, Model::NodeContents>>{};
+nodesToSwap.
+emplace_back(entityNode, std::move(modifiedEntity)
+);
 
-    document->undoCommand();
-    CHECK(m_pointEntityDef->usageCount() == 1u);
+REQUIRE(m_pointEntityDef
+->
+
+usageCount()
+
+== 1u);
+
+document->swapNodeContents("Swap Nodes",
+std::move(nodesToSwap),
+{
+});
+CHECK(m_pointEntityDef
+->
+
+usageCount()
+
+== 1u);
+
+document->
+
+undoCommand();
+
+CHECK(m_pointEntityDef
+->
+
+usageCount()
+
+== 1u);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "SwapNodesContentCommandTest.updateLinkedGroups")
+TEST_CASE_METHOD(MapDocumentTest,
+"SwapNodesContentCommandTest.updateLinkedGroups")
 {
-    auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
-    auto *brushNode = createBrushNode();
-    groupNode->addChild(brushNode);
-    document->addNodes({{document->parentForNodes(), {groupNode}}});
+auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
+auto *brushNode = createBrushNode();
+groupNode->
+addChild(brushNode);
+document->addNodes({
+{
+document->
 
-    document->selectNodes({groupNode});
-    auto *linkedGroupNode = document->createLinkedDuplicate();
-    document->deselectAll();
+parentForNodes(),
 
-    document->selectNodes({linkedGroupNode});
-    document->translateObjects(vm::vec3(32.0, 0.0, 0.0));
-    document->deselectAll();
+{
+groupNode}}});
 
-    const auto originalBrushBounds = brushNode->physicalBounds();
+document->selectNodes({
+groupNode});
+auto *linkedGroupNode = document->createLinkedDuplicate();
+document->
 
-    document->selectNodes({brushNode});
-    document->translateObjects(vm::vec3(0.0, 16.0, 0.0));
+deselectAll();
 
-    REQUIRE(brushNode->physicalBounds() == originalBrushBounds.translate(vm::vec3(0.0, 16.0, 0.0)));
+document->selectNodes({
+linkedGroupNode});
+document->
+translateObjects(vm::vec3(32.0, 0.0, 0.0)
+);
+document->
 
-    REQUIRE(linkedGroupNode->childCount() == 1u);
-    auto *linkedBrushNode = dynamic_cast<Model::BrushNode *>(linkedGroupNode->children().front());
-    REQUIRE(linkedBrushNode != nullptr);
+deselectAll();
 
-    CHECK(linkedBrushNode->physicalBounds() == brushNode->physicalBounds().transform(linkedGroupNode->group().transformation()));
+const auto originalBrushBounds = brushNode->physicalBounds();
 
-    document->undoCommand();
+document->selectNodes({
+brushNode});
+document->
+translateObjects(vm::vec3(0.0, 16.0, 0.0)
+);
 
-    linkedBrushNode = dynamic_cast<Model::BrushNode *>(linkedGroupNode->children().front());
-    REQUIRE(linkedBrushNode != nullptr);
+REQUIRE(brushNode
+->
 
-    CHECK(linkedBrushNode->physicalBounds() == brushNode->physicalBounds().transform(linkedGroupNode->group().transformation()));
+physicalBounds()
+
+== originalBrushBounds.
+translate(vm::vec3(0.0, 16.0, 0.0)
+));
+
+REQUIRE(linkedGroupNode
+->
+
+childCount()
+
+== 1u);
+auto *linkedBrushNode = dynamic_cast<Model::BrushNode *>(linkedGroupNode->children().front());
+REQUIRE(linkedBrushNode
+!= nullptr);
+
+CHECK(linkedBrushNode
+->
+
+physicalBounds()
+
+== brushNode->
+
+physicalBounds()
+
+.
+transform(linkedGroupNode
+->
+
+group()
+
+.
+
+transformation()
+
+));
+
+document->
+
+undoCommand();
+
+linkedBrushNode = dynamic_cast<Model::BrushNode *>(linkedGroupNode->children().front());
+REQUIRE(linkedBrushNode
+!= nullptr);
+
+CHECK(linkedBrushNode
+->
+
+physicalBounds()
+
+== brushNode->
+
+physicalBounds()
+
+.
+transform(linkedGroupNode
+->
+
+group()
+
+.
+
+transformation()
+
+));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "SwapNodesContentCommandTest.updateLinkedGroupsFails")
+TEST_CASE_METHOD(MapDocumentTest,
+"SwapNodesContentCommandTest.updateLinkedGroupsFails")
 {
-    auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
-    auto *brushNode = createBrushNode();
-    groupNode->addChild(brushNode);
-    document->addNodes({{document->parentForNodes(), {groupNode}}});
+auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
+auto *brushNode = createBrushNode();
+groupNode->
+addChild(brushNode);
+document->addNodes({
+{
+document->
 
-    document->selectNodes({groupNode});
-    auto *linkedGroupNode = document->createLinkedDuplicate();
-    document->deselectAll();
+parentForNodes(),
 
-    // moving the brush in linked group node will fail because it will go out of world
-    // bounds
-    document->selectNodes({linkedGroupNode});
-    REQUIRE(document->translateObjects(document->worldBounds().max - linkedGroupNode->physicalBounds().size()));
-    document->deselectAll();
+{
+groupNode}}});
 
-    const auto originalBrushBounds = brushNode->physicalBounds();
+document->selectNodes({
+groupNode});
+auto *linkedGroupNode = document->createLinkedDuplicate();
+document->
 
-    document->selectNodes({brushNode});
-    CHECK_FALSE(document->translateObjects(vm::vec3(0.0, 16.0, 0.0)));
+deselectAll();
 
-    REQUIRE(brushNode->physicalBounds() == originalBrushBounds);
+// moving the brush in linked group node will fail because it will go out of world
+// bounds
+document->selectNodes({
+linkedGroupNode});
+REQUIRE(document
+->
+translateObjects(document
+->
 
-    REQUIRE(linkedGroupNode->childCount() == 1u);
-    auto *linkedBrushNode = dynamic_cast<Model::BrushNode *>(linkedGroupNode->children().front());
-    REQUIRE(linkedBrushNode != nullptr);
+worldBounds()
 
-    CHECK(linkedBrushNode->physicalBounds() == brushNode->physicalBounds().transform(linkedGroupNode->group().transformation()));
-}
-} // namespace View
+.max - linkedGroupNode->
+
+physicalBounds()
+
+.
+
+size()
+
+));
+document->
+
+deselectAll();
+
+const auto originalBrushBounds = brushNode->physicalBounds();
+
+document->selectNodes({
+brushNode});
+CHECK_FALSE(document
+->
+translateObjects(vm::vec3(0.0, 16.0, 0.0)
+));
+
+REQUIRE(brushNode
+->
+
+physicalBounds()
+
+== originalBrushBounds);
+
+REQUIRE(linkedGroupNode
+->
+
+childCount()
+
+== 1u);
+auto *linkedBrushNode = dynamic_cast<Model::BrushNode *>(linkedGroupNode->children().front());
+REQUIRE(linkedBrushNode
+!= nullptr);
+
+CHECK(linkedBrushNode
+->
+
+physicalBounds()
+
+== brushNode->
+
+physicalBounds()
+
+.
+transform(linkedGroupNode
+->
+
+group()
+
+.
+
+transformation()
+
+));
+}} // namespace View
 } // namespace TrenchBroom

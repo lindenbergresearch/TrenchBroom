@@ -26,8 +26,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-HitQuery::HitQuery(const std::vector<Hit> &hits)
-    : m_hits{&hits}, m_include{[](const Hit &) { return true; }}, m_exclude{[](const Hit &) { return false; }} {
+HitQuery::HitQuery(const std::vector<Hit> &hits) : m_hits{&hits}, m_include{[](const Hit &) { return true; }}, m_exclude{[](const Hit &) { return false; }} {
 }
 
 HitQuery HitQuery::type(const HitType::Type typeMask) &&{

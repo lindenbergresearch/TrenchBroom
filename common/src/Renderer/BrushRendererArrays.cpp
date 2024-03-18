@@ -31,12 +31,10 @@ namespace Renderer {
 
 // DirtyRangeTracker
 
-DirtyRangeTracker::DirtyRangeTracker(const size_t initial_capacity)
-    : m_dirtyPos(0), m_dirtySize(0), m_capacity(initial_capacity) {
+DirtyRangeTracker::DirtyRangeTracker(const size_t initial_capacity) : m_dirtyPos(0), m_dirtySize(0), m_capacity(initial_capacity) {
 }
 
-DirtyRangeTracker::DirtyRangeTracker()
-    : m_dirtyPos(0), m_dirtySize(0), m_capacity(0) {
+DirtyRangeTracker::DirtyRangeTracker() : m_dirtyPos(0), m_dirtySize(0), m_capacity(0) {
 }
 
 void DirtyRangeTracker::expand(const size_t newcap) {
@@ -67,28 +65,25 @@ void DirtyRangeTracker::markDirty(const size_t pos, const size_t size) {
 }
 
 bool DirtyRangeTracker::clean() const {
-  return m_dirtySize==0;
+  return m_dirtySize == 0;
 }
 
 // IndexHolder
 
-IndexHolder::IndexHolder()
-    : VboHolder<Index>(VboType::ElementArrayBuffer) {
+IndexHolder::IndexHolder() : VboHolder<Index>(VboType::ElementArrayBuffer) {
 }
 
-IndexHolder::IndexHolder(std::vector<Index> &elements)
-    : VboHolder<Index>(VboType::ElementArrayBuffer, elements) {
+IndexHolder::IndexHolder(std::vector<Index> &elements) : VboHolder<Index>(VboType::ElementArrayBuffer, elements) {
 }
 
 void IndexHolder::zeroRange(const size_t offsetWithinBlock, const size_t count) {
   Index *dest = getPointerToWriteElementsTo(offsetWithinBlock, count);
-  std::memset(dest, 0, count*sizeof(Index));
+  std::memset(dest, 0, count * sizeof(Index));
 }
 
 void IndexHolder::render(const PrimType primType, const size_t offset, size_t count) const {
   const GLsizei renderCount = static_cast<GLsizei>(count);
-  const GLvoid *renderOffset =
-      reinterpret_cast<GLvoid *>(m_vbo->offset() + sizeof(Index)*offset);
+  const GLvoid *renderOffset = reinterpret_cast<GLvoid *>(m_vbo->offset() + sizeof(Index) * offset);
 
   glAssert(glDrawElements(toGL(primType), renderCount, glType<Index>(), renderOffset));
 }
@@ -101,31 +96,30 @@ VertexArrayInterface::~VertexArrayInterface() {}
 
 // BrushIndexArray
 
-BrushIndexArray::BrushIndexArray()
-    : m_indexHolder(), m_allocationTracker(0) {
+BrushIndexArray::BrushIndexArray() : m_indexHolder(), m_allocationTracker(0) {
 }
 
 bool BrushIndexArray::hasValidIndices() const {
   return m_allocationTracker.hasAllocations();
 }
 
-std::pair<AllocationTracker::Block *, GLuint *> BrushIndexArray::
-getPointerToInsertElementsAt(const size_t elementCount) {
+std::pair<AllocationTracker::Block *, GLuint *> BrushIndexArray::getPointerToInsertElementsAt(const size_t elementCount) {
   auto block = m_allocationTracker.allocate(elementCount);
-  if (block!=nullptr) {
+  if (block != nullptr) {
     GLuint *dest = m_indexHolder.getPointerToWriteElementsTo(block->pos, elementCount);
     return {block, dest};
   }
 
   // retry
   const size_t newSize = std::max(
-      2*m_allocationTracker.capacity(), m_allocationTracker.capacity() + elementCount);
+      2 * m_allocationTracker.capacity(), m_allocationTracker.capacity() + elementCount
+  );
   m_allocationTracker.expand(newSize);
   m_indexHolder.resize(newSize);
 
   // insert again
   block = m_allocationTracker.allocate(elementCount);
-  assert(block!=nullptr);
+  assert(block != nullptr);
 
   GLuint *dest = m_indexHolder.getPointerToWriteElementsTo(block->pos, elementCount);
   return {block, dest};
@@ -163,27 +157,26 @@ void BrushIndexArray::cleanupIndices() {
 
 // BrushVertexArray
 
-BrushVertexArray::BrushVertexArray()
-    : m_vertexHolder(), m_allocationTracker(0) {
+BrushVertexArray::BrushVertexArray() : m_vertexHolder(), m_allocationTracker(0) {
 }
 
-std::pair<AllocationTracker::Block *, BrushVertexArray::Vertex *> BrushVertexArray::
-getPointerToInsertVerticesAt(const size_t vertexCount) {
+std::pair<AllocationTracker::Block *, BrushVertexArray::Vertex *> BrushVertexArray::getPointerToInsertVerticesAt(const size_t vertexCount) {
   auto block = m_allocationTracker.allocate(vertexCount);
-  if (block!=nullptr) {
+  if (block != nullptr) {
     Vertex *dest = m_vertexHolder.getPointerToWriteElementsTo(block->pos, vertexCount);
     return {block, dest};
   }
 
   // retry
   const size_t newSize = std::max(
-      2*m_allocationTracker.capacity(), m_allocationTracker.capacity() + vertexCount);
+      2 * m_allocationTracker.capacity(), m_allocationTracker.capacity() + vertexCount
+  );
   m_allocationTracker.expand(newSize);
   m_vertexHolder.resize(newSize);
 
   // insert again
   block = m_allocationTracker.allocate(vertexCount);
-  assert(block!=nullptr);
+  assert(block != nullptr);
 
   Vertex *dest = m_vertexHolder.getPointerToWriteElementsTo(block->pos, vertexCount);
   return {block, dest};

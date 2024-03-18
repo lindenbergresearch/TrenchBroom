@@ -39,6 +39,7 @@ class Texture;
 namespace Model {
 class EntityNodeBase;
 
+
 struct PatchGrid {
   struct Point {
     vm::vec3 position;
@@ -56,19 +57,19 @@ struct PatchGrid {
   const Point &point(size_t row, size_t col) const;
 
   size_t quadRowCount() const;
+
   size_t quadColumnCount() const;
 
   kdl_reflect_decl(PatchGrid, pointRowCount, pointColumnCount, points, bounds);
 };
 
+
 // public for testing
-std::vector<vm::vec3> computeGridNormals(
-    std::vector<BezierPatch::Point> patchGrid,
-    size_t pointRowCount,
-    size_t pointColumnCount);
+std::vector<vm::vec3> computeGridNormals(std::vector<BezierPatch::Point> patchGrid, size_t pointRowCount, size_t pointColumnCount);
 
 // public for testing
 PatchGrid makePatchGrid(const BezierPatch &patch, size_t subdivisionsPerSurface);
+
 
 class PatchNode : public Node, public Object {
 public:
@@ -82,9 +83,11 @@ public:
   explicit PatchNode(BezierPatch patch);
 
   EntityNodeBase *entity();
+
   const EntityNodeBase *entity() const;
 
   const BezierPatch &patch() const;
+
   BezierPatch setPatch(BezierPatch patch);
 
   void setTexture(Assets::Texture *texture);
@@ -93,7 +96,9 @@ public:
 
 private: // implement Node interface
   const std::string &doGetName() const override;
+
   const vm::bbox3 &doGetLogicalBounds() const override;
+
   const vm::bbox3 &doGetPhysicalBounds() const override;
 
   FloatType doGetProjectedArea(vm::axis::type axis) const override;
@@ -101,29 +106,33 @@ private: // implement Node interface
   Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
 
   bool doCanAddChild(const Node *child) const override;
+
   bool doCanRemoveChild(const Node *child) const override;
+
   bool doRemoveIfEmpty() const override;
 
   bool doShouldAddToSpacialIndex() const override;
 
   bool doSelectable() const override;
 
-  void doPick(
-      const EditorContext &editorContext,
-      const vm::ray3 &ray,
-      PickResult &pickResult) override;
+  void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
+
   void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
   void doAccept(NodeVisitor &visitor) override;
+
   void doAccept(ConstNodeVisitor &visitor) const override;
 
 private: // implement Object interface
   Node *doGetContainer() override;
+
   LayerNode *doGetContainingLayer() override;
+
   GroupNode *doGetContainingGroup() override;
 
 private: // implement Taggable interface
   void doAcceptTagVisitor(TagVisitor &visitor) override;
+
   void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 };
 } // namespace Model

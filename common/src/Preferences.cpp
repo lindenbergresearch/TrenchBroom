@@ -115,7 +115,8 @@ Preference<Color> SelectedEdgeColor(
 Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.15f);
 Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.3f);
 Preference<float> OccludedSelectedEdgeAlpha(
-    "Renderer/Colors/Occluded selected edge alpha", 0.12f);
+    "Renderer/Colors/Occluded selected edge alpha", 0.12f
+);
 Preference<Color> LockedEdgeColor(
     "Renderer/Colors/Locked edges", Color(0.7f, 0.7f, 0.7f, 0.7f));
 Preference<Color> UndefinedEntityColor(
@@ -131,19 +132,26 @@ Preference<Color> SelectionBoundsPointColor(
     "Renderer/Selection bounds point color", Color(1.0f, 0.0f, 0.0f, 0.6f));
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines(
-    "Renderer/Selection bounds dashed lines", true);
+    "Renderer/Selection bounds dashed lines", true
+);
 Preference<bool> SelectionBoundsIntersectionMode(
-    "Renderer/Selection bounds intersection mode", true);
+    "Renderer/Selection bounds intersection mode", true
+);
 Preference<bool> ShowHiddenSelectionBounds(
-    "Renderer/Selection bounds show hidden bounds", false);
+    "Renderer/Selection bounds show hidden bounds", false
+);
 Preference<bool> AlwaysShowSelectionBounds(
-    "Renderer/Selection bounds always show bounds", true);
+    "Renderer/Selection bounds always show bounds", true
+);
 Preference<bool> ShowObjectBoundsSelectionBounds(
-    "Renderer/Selection bounds show object bounds", true);
+    "Renderer/Selection bounds show object bounds", true
+);
 Preference<bool> SelectionBoundsShowMinMax(
-    "Renderer/Selection bounds show min max values", false);
+    "Renderer/Selection bounds show min max values", false
+);
 Preference<int> SelectionBoundsDashedSize(
-    "Renderer/Selection bounds line dashes size", 2);
+    "Renderer/Selection bounds line dashes size", 2
+);
 
 Preference<Color> InfoOverlayTextColor(
     "Renderer/Colors/Info overlay text", Color(1.0f, 1.0f, 1.0f, 1.0f));
@@ -152,7 +160,8 @@ Preference<Color> GroupInfoOverlayTextColor(
 Preference<Color> InfoOverlayBackgroundColor(
     "Renderer/Colors/Info overlay background", Color(0.1f, 0.1f, 0.9f, 0.9f));
 Preference<float> WeakInfoOverlayBackgroundAlpha(
-    "Renderer/Colors/Weak info overlay background alpha", 0.6f);
+    "Renderer/Colors/Weak info overlay background alpha", 0.6f
+);
 
 Preference<Color> SelectedInfoOverlayTextColor(
     "Renderer/Colors/Selected info overlay text", Color(0.0f, 0.0f, 0.0f, 1.0f));
@@ -232,11 +241,14 @@ Preference<bool> UVLock("Editor/UV lock", false);
 
 /* --- FONTS ----------------------------------------- */
 Preference<std::filesystem::path> RendererFontPath(
-    "Renderer/Font name", "fonts/Inter-SemiBold.otf");
+    "Renderer/Font name", "fonts/Inter-SemiBold.otf"
+);
 Preference<std::filesystem::path> UIFontPath(
-    "Editor/UI Font name", "fonts/Inter-Regular.otf");
+    "Editor/UI Font name", "fonts/Inter-Regular.otf"
+);
 Preference<std::filesystem::path> ConsoleFontPath(
-    "Editor/Console Font name", "fonts/JetBrainsMono-VariableFont_wght.ttf");
+    "Editor/Console Font name", "fonts/JetBrainsMono-VariableFont_wght.ttf"
+);
 Preference<int> RendererFontSize("Renderer/Font size", 12);
 Preference<int> BrowserFontSize("Browser/Font size", 12);
 Preference<int> UIFontSize("Editor/UI Font size", 13);
@@ -287,9 +299,11 @@ Preference<bool> CameraMouseWheelInvert("Controls/Camera/Invert mouse wheel", fa
 Preference<float> CameraMoveSpeed("Controls/Camera/Move speed", 0.3f);
 Preference<bool> CameraEnableAltMove("Controls/Camera/Use alt to move", false);
 Preference<bool> CameraAltMoveInvert(
-    "Controls/Camera/Invert zoom direction when using alt to move", false);
+    "Controls/Camera/Invert zoom direction when using alt to move", false
+);
 Preference<bool> CameraMoveInCursorDir(
-    "Controls/Camera/Move camera in cursor dir", false);
+    "Controls/Camera/Move camera in cursor dir", false
+);
 Preference<float> CameraFov("Controls/Camera/Field of vision", 90.0f);
 Preference<float> CameraFlyMoveSpeed("Controls/Camera/Fly move speed", 0.1f);
 Preference<bool> Link2DCameras("Controls/Camera/Link 2D cameras", true);
@@ -389,165 +403,29 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 
 const std::vector<PreferenceBase *> &staticPreferences() {
   static const std::vector<PreferenceBase *> list{
-      &MapViewLayout,
-      &Theme,
-      &ShowAxes,
-      &BackgroundColor,
-      &AxisLength,
-      &XAxisColor,
-      &YAxisColor,
-      &ZAxisColor,
-      &UnitsMaxDigits,
-      &PointFileColor,
-      &PortalFileBorderColor,
-      &ShowObjectBoundsSelectionBounds,
-      &PortalFileFillColor,
-      &ShowFPS,
-      &TextRendererMaxDistance,
-      &TextRendererFadeOutFactor,
-      &LengthUnitSystem,
-      &MetricConversationFactor,
-      &SoftMapBoundsColor,
-      &CompassBackgroundColor,
-      &CompassBackgroundOutlineColor,
-      &CompassTransparency,
-      &CompassScale,
-      &CameraFrustumColor,
-      &DefaultGroupColor,
-      &TutorialOverlayTextColor,
-      &TutorialOverlayBackgroundColor,
-      &FaceColor,
-      &SelectedFaceColor,
-      &LockedFaceColor,
-      &TransparentFaceAlpha,
-      &EdgeColor,
-      &OccludedSelectedEdgeColor,
-      &FogColor,
-      &FogBias,
-      &FogMaxAmount,
-      &FogMinDistance,
-      &FogType,
-      &FogScale,
-      &SelectedEdgeColor,
-      &ShadeLevel,
-      &EdgeLineWidth,
-      &EdgeSelectedLineWidth,
-      &OccludedSelectedEdgeAlpha,
-      &LockedEdgeColor,
-      &UndefinedEntityColor,
-      &SelectionBoundsColor,
-      &AlwaysShowSelectionBounds,
-      &SelectionBoundsDashedSize,
-      &SelectionBoundsPointColor,
-      &SelectionBoundsPointSize,
-      &SelectionBoundsDashedLines,
-      &ShowHiddenSelectionBounds,
-      &InfoOverlayTextColor,
-      &SelectionBoundsIntersectionMode,
-      &SelectionBoundsLineWidth,
-      &SelectionBoundsShowMinMax,
-      &GroupInfoOverlayTextColor,
-      &InfoOverlayBackgroundColor,
-      &WeakInfoOverlayBackgroundAlpha,
-      &SelectedInfoOverlayTextColor,
-      &SelectedInfoOverlayBackgroundColor,
-      &LockedInfoOverlayTextColor,
-      &LockedInfoOverlayBackgroundColor,
-      &HandleRadius,
-      &MaximumHandleDistance,
-      &HandleColor,
-      &OccludedHandleColor,
-      &SelectedHandleColor,
-      &OccludedSelectedHandleColor,
-      &ClipHandleColor,
-      &ClipFaceColor,
-      &ExtrudeHandleColor,
-      &RotateHandleRadius,
-      &RotateHandleColor,
-      &ScaleHandleColor,
-      &ScaleFillColor,
-      &ScaleOutlineColor,
-      &ScaleOutlineDimAlpha,
-      &ShearFillColor,
-      &ShearOutlineColor,
-      &MoveTraceColor,
-      &OccludedMoveTraceColor,
-      &MoveIndicatorOutlineColor,
-      &MoveIndicatorFillColor,
-      &AngleIndicatorColor,
-      &TextureSeamColor,
-      &Brightness,
-      &FaceAutoBrightness,
-      &GridLineWidth,
-      &GridAlpha,
-      &GridMajorDivisionSize,
-      &GridColor2D,
-      &GridUnitSystem,
-      &TextureMinFilter,
-      &TextureMagFilter,
-      &TextureLock,
-      &UVLock,
-      &RendererFontPath,
-      &UIFontPath,
-      &ConsoleFontPath,
-      &RendererFontSize,
-      &BrowserFontSize,
-      &UIFontSize,
-      &ConsoleFontSize,
-      &ToolBarIconsSize,
-      &BrowserTextColor,
-      &BrowserSubTextColor,
-      &BrowserBackgroundColor,
-      &BrowserGroupBackgroundColor,
-      &TextureBrowserIconSize,
-      &TextureBrowserDefaultColor,
-      &TextureBrowserSelectedColor,
-      &TextureBrowserUsedColor,
-      &UIHighlightColor,
-      &UITextColor,
-      &UIWindowTintColor,
-      &UIBrightness,
-      &LogInfoColor,
-      &LogDebugColor,
-      &LogWarningColor,
-      &LogErrorColor,
-      &CameraLookSpeed,
-      &CameraLookSmoothing,
-      &CameraLookInvertH,
-      &CameraLookInvertV,
-      &CameraPanSpeed,
-      &CameraPanInvertH,
-      &CameraPanInvertV,
-      &CameraMouseWheelInvert,
-      &CameraMoveSpeed,
-      &CameraEnableAltMove,
-      &CameraAltMoveInvert,
-      &CameraMoveInCursorDir,
-      &CameraFov,
-      &CameraFlyMoveSpeed,
-      &Link2DCameras,
-      &CameraFlyForward(),
-      &CameraFlyBackward(),
-      &CameraFlyLeft(),
-      &CameraFlyRight(),
-      &CameraFlyUp(),
-      &CameraFlyDown(),
-      &ShowEntityClassnames,
-      &ShowGroupBounds,
-      &ShowBrushEntityBounds,
-      &EnableLightning,
-      &LightningIntensity,
-      &LightningAmbient,
-      &ShowPointEntityBounds,
-      &ShowPointEntityModels,
-      &FaceRenderMode,
-      &ShadeFaces,
-      &ShowFog,
-      &ShowEdges,
-      &ShowSoftMapBounds,
-      &ShowPointEntities,
-      &ShowBrushes,
-      &EntityLinkMode};
+      &MapViewLayout, &Theme, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor, &UnitsMaxDigits, &PointFileColor,
+      &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &ShowFPS, &TextRendererMaxDistance, &TextRendererFadeOutFactor,
+      &LengthUnitSystem, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency,
+      &CompassScale, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor,
+      &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias, &FogMaxAmount, &FogMinDistance, &FogType, &FogScale,
+      &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
+      &SelectionBoundsColor, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize,
+      &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds, &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth,
+      &SelectionBoundsShowMinMax, &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor,
+      &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor,
+      &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius,
+      &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor,
+      &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness,
+      &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &GridUnitSystem, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock,
+      &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize,
+      &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor,
+      &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor,
+      &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed, &CameraPanInvertH,
+      &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov,
+      &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(), &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(),
+      &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &EnableLightning, &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds,
+      &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes, &EntityLinkMode
+  };
 
   return list;
 }
@@ -569,7 +447,7 @@ std::vector<Preference<QKeySequence> *> keyPreferences() {
 
   for (PreferenceBase *pref : staticPreferences()) {
     auto *keyPref = dynamic_cast<Preference<QKeySequence> *>(pref);
-    if (keyPref!=nullptr) {
+    if (keyPref != nullptr) {
       result.push_back(keyPref);
     }
   }
@@ -584,19 +462,13 @@ DynamicPreferencePattern<QKeySequence> FiltersTagsToggle("Filters/Tags/*/Toggle 
 DynamicPreferencePattern<QKeySequence> TagsEnable("Tags/*/Enable");
 DynamicPreferencePattern<QKeySequence> TagsDisable("Tags/*/Disable");
 DynamicPreferencePattern<QKeySequence> FiltersEntitiesToggleVisible(
-    "Filters/Entities/*/Toggle Visible");
+    "Filters/Entities/*/Toggle Visible"
+);
 DynamicPreferencePattern<QKeySequence> EntitiesCreate("Entities/*/Create");
 
 const std::vector<DynamicPreferencePatternBase *> &dynamicPreferencePatterns() {
-  static const std::vector<DynamicPreferencePatternBase *> list{
-      &GamesPath,
-      &GamesToolPath,
-      &GamesDefaultEngine,
-      &FiltersTagsToggle,
-      &TagsEnable,
-      &TagsDisable,
-      &FiltersEntitiesToggleVisible,
-      &EntitiesCreate};
+  static const std::vector<DynamicPreferencePatternBase *>
+      list{&GamesPath, &GamesToolPath, &GamesDefaultEngine, &FiltersTagsToggle, &TagsEnable, &TagsDisable, &FiltersEntitiesToggleVisible, &EntitiesCreate};
   return list;
 }
 } // namespace Preferences

@@ -25,8 +25,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-IndexArrayMapBuilder::IndexArrayMapBuilder(const IndexArrayMap::Size &size)
-    : m_indices(size.indexCount()), m_ranges(size) {
+IndexArrayMapBuilder::IndexArrayMapBuilder(const IndexArrayMap::Size &size) : m_indices(size.indexCount()), m_ranges(size) {
 }
 
 const IndexArrayMapBuilder::IndexList &IndexArrayMapBuilder::indices() const {
@@ -57,7 +56,7 @@ void IndexArrayMapBuilder::addLine(const Index i1, const Index i2) {
 }
 
 void IndexArrayMapBuilder::addLines(const IndexList &indices) {
-  assert(indices.size()%2==0);
+  assert(indices.size() % 2 == 0);
   add(PrimType::Lines, indices);
 }
 
@@ -69,12 +68,11 @@ void IndexArrayMapBuilder::addTriangle(const Index i1, const Index i2, const Ind
 }
 
 void IndexArrayMapBuilder::addTriangles(const IndexList &indices) {
-  assert(indices.size()%3==0);
+  assert(indices.size() % 3 == 0);
   add(PrimType::Triangles, indices);
 }
 
-void IndexArrayMapBuilder::addQuad(
-    const Index, const Index i1, const Index i2, const Index i3, const Index i4) {
+void IndexArrayMapBuilder::addQuad(const Index, const Index i1, const Index i2, const Index i3, const Index i4) {
   const size_t offset = m_ranges.add(PrimType::Quads, 4);
   m_indices[offset + 0] = i1;
   m_indices[offset + 1] = i2;
@@ -83,15 +81,15 @@ void IndexArrayMapBuilder::addQuad(
 }
 
 void IndexArrayMapBuilder::addQuads(const IndexList &indices) {
-  assert(indices.size()%4==0);
+  assert(indices.size() % 4 == 0);
   add(PrimType::Quads, indices);
 }
 
 void IndexArrayMapBuilder::addQuads(const Index baseIndex, const size_t vertexCount) {
-  assert(vertexCount%4==0);
+  assert(vertexCount % 4 == 0);
   IndexList indices(vertexCount);
 
-  for (size_t i = 0; i < vertexCount; ++i) {
+  for (size_t i = 0; i < vertexCount; ++ i) {
     indices[i] = baseIndex + static_cast<Index>(i);
   }
 
@@ -102,9 +100,9 @@ void IndexArrayMapBuilder::addPolygon(const IndexList &indices) {
   const size_t count = indices.size();
 
   IndexList polyIndices(0);
-  polyIndices.reserve(3*(count - 2));
+  polyIndices.reserve(3 * (count - 2));
 
-  for (size_t i = 0; i < count - 2; ++i) {
+  for (size_t i = 0; i < count - 2; ++ i) {
     polyIndices.push_back(indices[0]);
     polyIndices.push_back(indices[i + 1]);
     polyIndices.push_back(indices[i + 2]);
@@ -115,9 +113,9 @@ void IndexArrayMapBuilder::addPolygon(const IndexList &indices) {
 
 void IndexArrayMapBuilder::addPolygon(const Index baseIndex, const size_t vertexCount) {
   IndexList polyIndices(0);
-  polyIndices.reserve(3*(vertexCount - 2));
+  polyIndices.reserve(3 * (vertexCount - 2));
 
-  for (size_t i = 0; i < vertexCount - 2; ++i) {
+  for (size_t i = 0; i < vertexCount - 2; ++ i) {
     polyIndices.push_back(baseIndex);
     polyIndices.push_back(baseIndex + static_cast<Index>(i + 1));
     polyIndices.push_back(baseIndex + static_cast<Index>(i + 2));

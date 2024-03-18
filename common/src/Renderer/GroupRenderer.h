@@ -30,12 +30,17 @@
 namespace TrenchBroom {
 namespace Model {
 class EditorContext;
+
+
 class GroupNode;
 } // namespace Model
 
 namespace Renderer {
 class RenderBatch;
+
+
 class RenderContext;
+
 
 class GroupRenderer {
 private:
@@ -63,6 +68,7 @@ public:
    * Equivalent to invalidateGroup() on all added groups.
    */
   void invalidate();
+
   /**
    * Equivalent to removeGroup() on all added groups.
    */
@@ -73,10 +79,12 @@ public:
    * guaranteed to invalidate it).
    */
   void addGroup(const Model::GroupNode *group);
+
   /**
    * Removes a group. Calling with an unknown group is allowed, but ignored.
    */
   void removeGroup(const Model::GroupNode *group);
+
   /**
    * Causes cached renderer data to be rebuilt for the given group (on the next render()
    * call).
@@ -86,13 +94,17 @@ public:
   void setOverrideColors(bool overrideColors);
 
   void setShowOverlays(bool showOverlays);
+
   void setOverlayTextColor(const Color &overlayTextColor);
+
   void setOverlayBackgroundColor(const Color &overlayBackgroundColor);
+
   void setShowOccludedOverlays(bool showOccludedOverlays);
 
   void setBoundsColor(const Color &boundsColor);
 
   void setShowOccludedBounds(bool showOccludedBounds);
+
   void setOccludedBoundsColor(const Color &occludedBoundsColor);
 
 public: // rendering
@@ -100,14 +112,17 @@ public: // rendering
 
 private:
   void renderBounds(RenderContext &renderContext, RenderBatch &renderBatch);
+
   void renderNames(RenderContext &renderContext, RenderBatch &renderBatch);
 
   void invalidateBounds();
+
   void validateBounds();
 
   bool shouldRenderGroup(const Model::GroupNode &group) const;
 
   AttrString groupString(const Model::GroupNode &group) const;
+
   Color groupColor(const Model::GroupNode &group) const;
 };
 } // namespace Renderer

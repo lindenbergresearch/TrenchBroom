@@ -44,9 +44,8 @@ constexpr size_t PaletteSize = 768;
 Result<Assets::Texture, ReadTextureError> readM8Texture(std::string name, Reader &reader) {
   try {
     const auto version = reader.readInt<int32_t>();
-    if (version!=M8Layout::Version) {
-      return ReadTextureError{
-          std::move(name), "Unknown M8 texture version: " + std::to_string(version)};
+    if (version != M8Layout::Version) {
+      return ReadTextureError{std::move(name), "Unknown M8 texture version: " + std::to_string(version)};
     }
 
     reader.seekForward(M8Layout::TextureNameLength);
@@ -59,13 +58,13 @@ Result<Assets::Texture, ReadTextureError> readM8Texture(std::string name, Reader
     heights.reserve(M8Layout::MipLevels);
     offsets.reserve(M8Layout::MipLevels);
 
-    for (size_t i = 0; i < M8Layout::MipLevels; ++i) {
+    for (size_t i = 0; i < M8Layout::MipLevels; ++ i) {
       widths.push_back(reader.readSize<uint32_t>());
     }
-    for (size_t i = 0; i < M8Layout::MipLevels; ++i) {
+    for (size_t i = 0; i < M8Layout::MipLevels; ++ i) {
       heights.push_back(reader.readSize<uint32_t>());
     }
-    for (size_t i = 0; i < M8Layout::MipLevels; ++i) {
+    for (size_t i = 0; i < M8Layout::MipLevels; ++ i) {
       offsets.push_back(reader.readSize<uint32_t>());
     }
 
@@ -74,51 +73,46 @@ Result<Assets::Texture, ReadTextureError> readM8Texture(std::string name, Reader
     auto paletteReader = reader.subReaderFromCurrent(M8Layout::PaletteSize);
     reader.seekForward(M8Layout::PaletteSize);
 
-    return Assets::loadPalette(paletteReader, Assets::PaletteColorFormat::Rgb)
-        .and_then([&](const auto &palette) {
+    return Assets::loadPalette(paletteReader, Assets::PaletteColorFormat::Rgb).and_then(
+        [&](const auto &palette) {
           reader.seekForward(4); // flags
           reader.seekForward(4); // contents
           reader.seekForward(4); // value
 
           auto mip0AverageColor = Color{};
           auto buffers = Assets::TextureBufferList{};
-          for (size_t mipLevel = 0; mipLevel < M8Layout::MipLevels; ++mipLevel) {
+          for (size_t mipLevel = 0; mipLevel < M8Layout::MipLevels; ++ mipLevel) {
             const auto w = widths[mipLevel];
             const auto h = heights[mipLevel];
 
-            if (w==0 || h==0) {
+            if (w == 0 || h == 0) {
               break;
             }
 
             reader.seekFromBegin(offsets[mipLevel]);
 
-            auto rgbaImage = Assets::TextureBuffer{4*w*h};
+            auto rgbaImage = Assets::TextureBuffer{4 * w * h};
 
             auto averageColor = Color{};
             palette.indexedToRgba(
-                reader, w*h, rgbaImage, Assets::PaletteTransparency::Opaque, averageColor);
+                reader, w * h, rgbaImage, Assets::PaletteTransparency::Opaque, averageColor
+            );
             buffers.emplace_back(std::move(rgbaImage));
 
-            if (mipLevel==0) {
+            if (mipLevel == 0) {
               mip0AverageColor = averageColor;
             }
           }
 
-          return Result<Assets::Texture>{Assets::Texture{
-              std::move(name),
-              widths[0],
-              heights[0],
-              mip0AverageColor,
-              std::move(buffers),
-              GL_RGBA,
-              Assets::TextureType::Opaque}};
-        })
-        .or_else([&](const auto &error) {
-          return Result<Assets::Texture, ReadTextureError>{
-              ReadTextureError{std::move(name), error.msg}};
-        });
-  }
-  catch (const ReaderException &e) {
+          return Result<Assets::Texture>{
+              Assets::Texture{std::move(name), widths[0], heights[0], mip0AverageColor, std::move(buffers), GL_RGBA, Assets::TextureType::Opaque}};
+        }
+    ).or_else(
+        [&](const auto &error) {
+          return Result<Assets::Texture, ReadTextureError>{ReadTextureError{std::move(name), error.msg}};
+        }
+    );
+  } catch (const ReaderException &e) {
     return ReadTextureError{std::move(name), e.what()};
   }
 }

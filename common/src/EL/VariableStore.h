@@ -57,11 +57,13 @@ public:
   virtual void appendToStream(std::ostream &str) const;
 };
 
+
 std::ostream &operator<<(std::ostream &lhs, const VariableStore &rhs);
 
 bool operator==(const VariableStore &lhs, const VariableStore &rhs);
 
 bool operator!=(const VariableStore &lhs, const VariableStore &rhs);
+
 
 class VariableTable : public VariableStore {
 private:
@@ -85,6 +87,7 @@ public:
 
   void assign(const std::string &name, const Value &value) override;
 };
+
 
 class NullVariableStore : public VariableStore {
 public:

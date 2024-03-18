@@ -19,9 +19,12 @@
 
 #pragma once
 
+
 class QColor;
 
+
 class QFont;
+
 
 class QWidget;
 

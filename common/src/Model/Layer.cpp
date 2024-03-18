@@ -27,8 +27,7 @@ namespace TrenchBroom::Model {
 
 kdl_reflect_impl(Layer);
 
-Layer::Layer(std::string name, const bool defaultLayer)
-    : m_defaultLayer{defaultLayer}, m_name{std::move(name)} {
+Layer::Layer(std::string name, const bool defaultLayer) : m_defaultLayer{defaultLayer}, m_name{std::move(name)} {
 }
 
 bool Layer::defaultLayer() const {
@@ -80,7 +79,7 @@ int Layer::invalidSortIndex() {
 }
 
 int Layer::defaultLayerSortIndex() {
-  return -1;
+  return - 1;
 }
 
 } // namespace TrenchBroom::Model

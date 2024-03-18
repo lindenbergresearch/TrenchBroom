@@ -28,96 +28,201 @@
 #include "Catch2.h"
 
 namespace TrenchBroom::Model {
-TEST_CASE("PointTrace")
-{
-    const auto points = std::vector<vm::vec3f>{{1, 1, 1},
-                                               {1, 1, 2},
-                                               {1, 2, 2},
-    };
+TEST_CASE("PointTrace") {
+const auto points = std::vector<vm::vec3f>{{1, 1, 1}, {1, 1, 2}, {1, 2, 2},
+};
 
-    auto trace = PointTrace{points};
-    CHECK(trace.points() == points);
+auto trace = PointTrace{points};
+CHECK(trace
+.
 
-    CHECK(trace.hasNextPoint());
-    CHECK_FALSE(trace.hasPreviousPoint());
-    CHECK(trace.currentPoint() == vm::vec3f{1, 1, 1});
-    CHECK(trace.currentDirection() == vm::vec3f{0, 0, 1});
+points()
 
-    trace.advance();
+== points);
 
-    CHECK(trace.hasNextPoint());
-    CHECK(trace.hasPreviousPoint());
-    CHECK(trace.currentPoint() == vm::vec3f{1, 1, 2});
-    CHECK(trace.currentDirection() == vm::vec3f{0, 1, 0});
+CHECK(trace
+.
 
-    trace.advance();
+hasNextPoint()
 
-    CHECK_FALSE(trace.hasNextPoint());
-    CHECK(trace.hasPreviousPoint());
-    CHECK(trace.currentPoint() == vm::vec3f{1, 2, 2});
-    CHECK(trace.currentDirection() == vm::vec3f{0, 1, 0});
+);
+CHECK_FALSE(trace
+.
 
-    trace.advance();
-    CHECK(trace.currentPoint() == vm::vec3f{1, 2, 2});
+hasPreviousPoint()
 
-    trace.retreat();
-    CHECK(trace.currentPoint() == vm::vec3f{1, 1, 2});
+);
+CHECK(trace
+.
 
-    trace.retreat();
-    CHECK(trace.currentPoint() == vm::vec3f{1, 1, 1});
+currentPoint()
 
-    trace.retreat();
-    CHECK(trace.currentPoint() == vm::vec3f{1, 1, 1});
+== vm::vec3f {
+1, 1, 1
+}
+);
+CHECK(trace
+.
+
+currentDirection()
+
+== vm::vec3f{
+0, 0, 1});
+
+trace.
+
+advance();
+
+CHECK(trace
+.
+
+hasNextPoint()
+
+);
+CHECK(trace
+.
+
+hasPreviousPoint()
+
+);
+CHECK(trace
+.
+
+currentPoint()
+
+== vm::vec3f{
+1, 1, 2});
+CHECK(trace
+.
+
+currentDirection()
+
+== vm::vec3f{
+0, 1, 0});
+
+trace.
+
+advance();
+
+CHECK_FALSE(trace
+.
+
+hasNextPoint()
+
+);
+CHECK(trace
+.
+
+hasPreviousPoint()
+
+);
+CHECK(trace
+.
+
+currentPoint()
+
+== vm::vec3f{
+1, 2, 2});
+CHECK(trace
+.
+
+currentDirection()
+
+== vm::vec3f{
+0, 1, 0});
+
+trace.
+
+advance();
+
+CHECK(trace
+.
+
+currentPoint()
+
+== vm::vec3f{
+1, 2, 2});
+
+trace.
+
+retreat();
+
+CHECK(trace
+.
+
+currentPoint()
+
+== vm::vec3f{
+1, 1, 2});
+
+trace.
+
+retreat();
+
+CHECK(trace
+.
+
+currentPoint()
+
+== vm::vec3f{
+1, 1, 1});
+
+trace.
+
+retreat();
+
+CHECK(trace
+.
+
+currentPoint()
+
+== vm::vec3f{
+1, 1, 1});
 }
 
 TEST_CASE("loadPointFile")
 {
-    using T = std::tuple<std::string, Result<PointTrace>>;
-    // clang-format off
-    const auto [file, expectedTrace] = GENERATE(values<T>({{
-                                                               R"()",      Error{
+using T = std::tuple<std::string, Result < PointTrace>>;
+// clang-format off
+const auto [file, expectedTrace] = GENERATE(
+    values<T>(
+        {{
+             R"()", Error{
                 "PointFile must contain at least two points"
-            }},
-                                                           {
-                                                               R"(asdf)",  Error{
-                                                               "PointFile must contain at least two points"
-                                                           }},
-                                                           {
-                                                               R"(1)",     Error{
-                                                               "PointFile must contain at least two points"
-                                                           }},
-                                                           {
-                                                               R"(1 2)",   Error{
-                                                               "PointFile must contain at least two points"
-                                                           }},
-                                                           {
-                                                               R"(1 2 3)", Error{
-                                                               "PointFile must contain at least two points"
-                                                           }},
-                                                           {
-                                                               R"(
+            }}, {
+             R"(asdf)", Error{
+                "PointFile must contain at least two points"
+            }}, {
+             R"(1)", Error{
+                "PointFile must contain at least two points"
+            }}, {
+             R"(1 2)", Error{
+                "PointFile must contain at least two points"
+            }}, {
+             R"(1 2 3)", Error{
+                "PointFile must contain at least two points"
+            }}, {
+             R"(
     1 2 3
     4 5 6
-  )",       PointTrace{{{1, 2, 3}, {4, 5, 6},}}},
-                                                           {
-                                                               R"(
+  )", PointTrace{{{1, 2, 3}, {4, 5, 6},}}}, {
+             R"(
     0 0 1
     0 0 1
     4 5 6
     4 5 6
-  )",       PointTrace{{{0, 0, 1}, {4, 5, 6},}}},
-                                                           {
-                                                               R"(
+  )", PointTrace{{{0, 0, 1}, {4, 5, 6},}}}, {
+             R"(
     0 0 1
     0 0 2
     0 0 3
     4 5 6
-  )",       PointTrace{{{0, 0, 1}, {0, 0, 3}, {4, 5, 6},}}},
+  )", PointTrace{{{0, 0, 1}, {0, 0, 3}, {4, 5, 6},}}},
         }
     ));
-    // clang-format on
+// clang-format on
 
-    auto stream = std::istringstream{file};
-    CHECK(loadPointFile(stream) == expectedTrace);
-}
-} // namespace TrenchBroom::Model
+auto stream = std::istringstream{file};
+CHECK(loadPointFile(stream)
+== expectedTrace);
+}} // namespace TrenchBroom::Model

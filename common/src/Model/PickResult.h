@@ -31,16 +31,21 @@
 namespace TrenchBroom {
 namespace Model {
 class CompareHits;
+
+
 class HitQuery;
+
 
 class PickResult {
 private:
   std::vector<Hit> m_hits;
   std::shared_ptr<CompareHits> m_compare;
+
   class CompareWrapper;
 
 public:
   PickResult(std::shared_ptr<CompareHits> compare);
+
   PickResult();
 
 defineCopyAndMove(PickResult);
@@ -48,15 +53,19 @@ defineCopyAndMove(PickResult);
   ~PickResult();
 
   static PickResult byDistance();
+
   static PickResult bySize(vm::axis::type axis);
 
   bool empty() const;
+
   size_t size() const;
 
   void addHit(const Hit &hit);
 
   const std::vector<Hit> &all() const;
+
   const Hit &first(const HitFilter &filter) const;
+
   std::vector<Hit> all(const HitFilter &filter) const;
 
   void clear();

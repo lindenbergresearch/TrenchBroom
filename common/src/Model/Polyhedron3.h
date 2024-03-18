@@ -26,7 +26,6 @@
 
 namespace TrenchBroom {
 namespace Model {
-using Polyhedron3 =
-    Polyhedron<FloatType, DefaultPolyhedronPayload, DefaultPolyhedronPayload>;
+using Polyhedron3 = Polyhedron<FloatType, DefaultPolyhedronPayload, DefaultPolyhedronPayload>;
 }
 } // namespace TrenchBroom

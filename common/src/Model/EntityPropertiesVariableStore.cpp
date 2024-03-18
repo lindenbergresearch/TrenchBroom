@@ -27,8 +27,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-EntityPropertiesVariableStore::EntityPropertiesVariableStore(const Entity &entity)
-    : m_entity{entity} {
+EntityPropertiesVariableStore::EntityPropertiesVariableStore(const Entity &entity) : m_entity{entity} {
 }
 
 EL::VariableStore *EntityPropertiesVariableStore::clone() const {
@@ -48,13 +47,11 @@ std::vector<std::string> EntityPropertiesVariableStore::names() const {
   return m_entity.propertyKeys();
 }
 
-void EntityPropertiesVariableStore::declare(
-    const std::string & /* name */, const EL::Value & /* value */) {
+void EntityPropertiesVariableStore::declare(const std::string & /* name */, const EL::Value & /* value */) {
   throw EL::EvaluationError{"Declaring properties directly is unsafe"};
 }
 
-void EntityPropertiesVariableStore::assign(
-    const std::string & /* name */, const EL::Value & /* value */) {
+void EntityPropertiesVariableStore::assign(const std::string & /* name */, const EL::Value & /* value */) {
   throw EL::EvaluationError{"Changing properties directly is unsafe"};
 }
 } // namespace Model

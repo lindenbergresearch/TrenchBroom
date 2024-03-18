@@ -36,17 +36,16 @@ public:
 
   const std::filesystem::path &root() const;
 
-  Result<std::filesystem::path> makeAbsolute(
-      const std::filesystem::path &path) const override;
+  Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
   PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 protected:
-  Result<std::vector<std::filesystem::path>> doFind(
-      const std::filesystem::path &path, TraversalMode traversalMode) const override;
-  Result<std::shared_ptr<File>> doOpenFile(
-      const std::filesystem::path &path) const override;
+  Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
+
+  Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
 };
+
 
 #ifdef _MSC_VER
 // MSVC complains about the fact that this class inherits some (pure virtual) method
@@ -55,22 +54,25 @@ protected:
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
+
+
 class WritableDiskFileSystem : public DiskFileSystem, public WritableFileSystem {
 public:
   explicit WritableDiskFileSystem(const std::filesystem::path &root);
 
 private:
-  Result<void> doCreateFile(
-      const std::filesystem::path &path, const std::string &contents) override;
+  Result<void> doCreateFile(const std::filesystem::path &path, const std::string &contents) override;
+
   Result<bool> doCreateDirectory(const std::filesystem::path &path) override;
+
   Result<bool> doDeleteFile(const std::filesystem::path &path) override;
-  Result<void> doCopyFile(
-      const std::filesystem::path &sourcePath,
-      const std::filesystem::path &destPath) override;
-  Result<void> doMoveFile(
-      const std::filesystem::path &sourcePath,
-      const std::filesystem::path &destPath) override;
+
+  Result<void> doCopyFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) override;
+
+  Result<void> doMoveFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) override;
 };
+
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

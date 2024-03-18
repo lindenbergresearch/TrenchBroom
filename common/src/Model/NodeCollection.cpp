@@ -74,43 +74,43 @@ size_t NodeCollection::patchCount() const {
 }
 
 bool NodeCollection::hasLayers() const {
-  return !m_layers.empty();
+  return ! m_layers.empty();
 }
 
 bool NodeCollection::hasOnlyLayers() const {
-  return !empty() && nodeCount()==layerCount();
+  return ! empty() && nodeCount() == layerCount();
 }
 
 bool NodeCollection::hasGroups() const {
-  return !m_groups.empty();
+  return ! m_groups.empty();
 }
 
 bool NodeCollection::hasOnlyGroups() const {
-  return !empty() && nodeCount()==groupCount();
+  return ! empty() && nodeCount() == groupCount();
 }
 
 bool NodeCollection::hasEntities() const {
-  return !m_entities.empty();
+  return ! m_entities.empty();
 }
 
 bool NodeCollection::hasOnlyEntities() const {
-  return !empty() && nodeCount()==entityCount();
+  return ! empty() && nodeCount() == entityCount();
 }
 
 bool NodeCollection::hasBrushes() const {
-  return !m_brushes.empty();
+  return ! m_brushes.empty();
 }
 
 bool NodeCollection::hasOnlyBrushes() const {
-  return !empty() && nodeCount()==brushCount();
+  return ! empty() && nodeCount() == brushCount();
 }
 
 bool NodeCollection::hasPatches() const {
-  return !m_patches.empty();
+  return ! m_patches.empty();
 }
 
 bool NodeCollection::hasOnlyPatches() const {
-  return !empty() && nodeCount()==patchCount();
+  return ! empty() && nodeCount() == patchCount();
 }
 
 std::vector<Node *>::iterator NodeCollection::begin() {
@@ -160,40 +160,29 @@ void NodeCollection::addNodes(const std::vector<Node *> &nodes) {
 }
 
 void NodeCollection::addNode(Node *node) {
-  ensure(node!=nullptr, "node is null");
-  node->accept(kdl::overload(
-      [](WorldNode *) {},
-      [&](LayerNode *layer) {
+  ensure(node != nullptr, "node is null");
+  node->accept(
+      kdl::overload(
+          [](WorldNode *) {}, [&](LayerNode *layer) {
         m_nodes.push_back(layer);
         m_layers.push_back(layer);
-      },
-      [&](GroupNode *group) {
+      }, [&](GroupNode *group) {
         m_nodes.push_back(group);
         m_groups.push_back(group);
-      },
-      [&](EntityNode *entity) {
+      }, [&](EntityNode *entity) {
         m_nodes.push_back(entity);
         m_entities.push_back(entity);
-      },
-      [&](BrushNode *brush) {
+      }, [&](BrushNode *brush) {
         m_nodes.push_back(brush);
         m_brushes.push_back(brush);
-      },
-      [&](PatchNode *patch) {
+      }, [&](PatchNode *patch) {
         m_nodes.push_back(patch);
         m_patches.push_back(patch);
-      }));
+      }
+      ));
 }
 
-static const auto doRemoveNodes = [](
-    auto &nodes,
-    auto &layers,
-    auto &groups,
-    auto &entities,
-    auto &brushes,
-    auto &patches,
-    auto cur,
-    auto end) {
+static const auto doRemoveNodes = [](auto &nodes, auto &layers, auto &groups, auto &entities, auto &brushes, auto &patches, auto cur, auto end) {
   auto nodeEnd = std::end(nodes);
   auto layerEnd = std::end(layers);
   auto groupEnd = std::end(groups);
@@ -201,30 +190,27 @@ static const auto doRemoveNodes = [](
   auto brushEnd = std::end(brushes);
   auto patchEnd = std::end(patches);
 
-  while (cur!=end) {
-    (*cur)->accept(kdl::overload(
-        [](WorldNode *) {},
-        [&](LayerNode *layer) {
+  while (cur != end) {
+    (*cur)->accept(
+        kdl::overload(
+            [](WorldNode *) {}, [&](LayerNode *layer) {
           nodeEnd = std::remove(std::begin(nodes), nodeEnd, layer);
           layerEnd = std::remove(std::begin(layers), layerEnd, layer);
-        },
-        [&](GroupNode *group) {
+        }, [&](GroupNode *group) {
           nodeEnd = std::remove(std::begin(nodes), nodeEnd, group);
           groupEnd = std::remove(std::begin(groups), groupEnd, group);
-        },
-        [&](EntityNode *entity) {
+        }, [&](EntityNode *entity) {
           nodeEnd = std::remove(std::begin(nodes), nodeEnd, entity);
           entityEnd = std::remove(std::begin(entities), entityEnd, entity);
-        },
-        [&](BrushNode *brush) {
+        }, [&](BrushNode *brush) {
           nodeEnd = std::remove(std::begin(nodes), nodeEnd, brush);
           brushEnd = std::remove(std::begin(brushes), brushEnd, brush);
-        },
-        [&](PatchNode *patch) {
+        }, [&](PatchNode *patch) {
           nodeEnd = std::remove(std::begin(nodes), nodeEnd, patch);
           patchEnd = std::remove(std::begin(patches), patchEnd, patch);
-        }));
-    ++cur;
+        }
+        ));
+    ++ cur;
   }
 
   nodes.erase(nodeEnd, std::end(nodes));
@@ -237,27 +223,13 @@ static const auto doRemoveNodes = [](
 
 void NodeCollection::removeNodes(const std::vector<Node *> &nodes) {
   doRemoveNodes(
-      m_nodes,
-      m_layers,
-      m_groups,
-      m_entities,
-      m_brushes,
-      m_patches,
-      std::begin(nodes),
-      std::end(nodes));
+      m_nodes, m_layers, m_groups, m_entities, m_brushes, m_patches, std::begin(nodes), std::end(nodes));
 }
 
 void NodeCollection::removeNode(Node *node) {
-  ensure(node!=nullptr, "node is null");
+  ensure(node != nullptr, "node is null");
   doRemoveNodes(
-      m_nodes,
-      m_layers,
-      m_groups,
-      m_entities,
-      m_brushes,
-      m_patches,
-      &node,
-      std::next(&node));
+      m_nodes, m_layers, m_groups, m_entities, m_brushes, m_patches, &node, std::next(&node));
 }
 
 void NodeCollection::clear() {

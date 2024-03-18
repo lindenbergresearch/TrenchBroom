@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 
+
 class QAbstractButton;
 
 namespace TrenchBroom {
@@ -33,7 +34,10 @@ class LayerNode;
 
 namespace View {
 class LayerListBox;
+
+
 class MapDocument;
+
 
 class LayerEditor : public QWidget {
 Q_OBJECT
@@ -51,17 +55,21 @@ public:
 
 private:
   void onSetCurrentLayer(Model::LayerNode *layer);
+
   bool canSetCurrentLayer(Model::LayerNode *layer) const;
 
   void onLayerRightClick(Model::LayerNode *layer);
 
   void onMoveSelectionToLayer();
+
   bool canMoveSelectionToLayer() const;
 
   bool canToggleLayerVisible() const;
+
   void toggleLayerVisible(Model::LayerNode *layer);
 
   bool canToggleLayerLocked() const;
+
   void toggleLayerLocked(Model::LayerNode *layer);
 
   void toggleOmitLayerFromExport(Model::LayerNode *layer);
@@ -69,35 +77,46 @@ private:
   void isolateLayer(Model::LayerNode *layer);
 
   void onSelectAllInLayer();
+
   bool canSelectAllInLayer() const;
 
   void onAddLayer();
 
   void onRemoveLayer();
+
   bool canRemoveLayer() const;
 
   void onRenameLayer();
+
   bool canRenameLayer() const;
 
   void onShowAllLayers();
+
   bool canShowAllLayers() const;
 
   void onHideAllLayers();
+
   bool canHideAllLayers() const;
 
   void onLockAllLayers();
+
   bool canLockAllLayers() const;
 
   void onUnlockAllLayers();
+
   bool canUnlockAllLayers() const;
 
   bool canMoveLayer(int direction) const;
+
   void moveLayer(Model::LayerNode *layer, int direction);
 
 private:
   Model::LayerNode *findVisibleAndUnlockedLayer(const Model::LayerNode *except) const;
+
   void createGui();
+
 private slots:
+
   void updateButtons();
 };
 } // namespace View

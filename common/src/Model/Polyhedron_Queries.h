@@ -31,46 +31,43 @@
 
 namespace TrenchBroom {
 namespace Model {
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::contains(const vm::vec<T, 3> &point, const T epsilon) const {
-  if (!polyhedron()) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::contains(const vm::vec<T, 3> &point, const T epsilon) const {
+  if (! polyhedron()) {
     return false;
   }
 
-  if (!bounds().contains(point)) {
+  if (! bounds().contains(point)) {
     return false;
   }
 
   for (const Face *face : m_faces) {
     const vm::plane<T, 3> &plane = face->plane();
-    if (plane.point_status(point, epsilon)==vm::plane_status::above) {
+    if (plane.point_status(point, epsilon) == vm::plane_status::above) {
       return false;
     }
   }
   return true;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::contains(const Polyhedron &other) const {
-  if (!polyhedron()) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::contains(const Polyhedron &other) const {
+  if (! polyhedron()) {
     return false;
   }
 
-  if (!bounds().contains(other.bounds())) {
+  if (! bounds().contains(other.bounds())) {
     return false;
   }
 
   for (const Vertex *vertex : other.vertices()) {
-    if (!contains(vertex->position(), vm::constants<T>::point_status_epsilon())) {
+    if (! contains(vertex->position(), vm::constants<T>::point_status_epsilon())) {
       return false;
     }
   }
   return true;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::intersects(const Polyhedron &other) const {
-  if (!bounds().intersects(other.bounds())) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::intersects(const Polyhedron &other) const {
+  if (! bounds().intersects(other.bounds())) {
     return false;
   }
 
@@ -121,20 +118,16 @@ bool Polyhedron<T, FP, VP>::intersects(const Polyhedron &other) const {
   }
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::pointIntersectsPoint(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::pointIntersectsPoint(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.point());
   assert(rhs.point());
 
   const vm::vec<T, 3> &lhsPos = lhs.m_vertices.front()->position();
   const vm::vec<T, 3> &rhsPos = rhs.m_vertices.front()->position();
-  return lhsPos==rhsPos;
+  return lhsPos == rhsPos;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::pointIntersectsEdge(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::pointIntersectsEdge(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.point());
   assert(rhs.edge());
 
@@ -143,13 +136,10 @@ bool Polyhedron<T, FP, VP>::pointIntersectsEdge(
   const vm::vec<T, 3> &rhsStart = rhsEdge->firstVertex()->position();
   const vm::vec<T, 3> &rhsEnd = rhsEdge->secondVertex()->position();
 
-  return vm::segment<T, 3>(rhsStart, rhsEnd)
-      .contains(lhsPos, vm::constants<T>::almost_zero());
+  return vm::segment<T, 3>(rhsStart, rhsEnd).contains(lhsPos, vm::constants<T>::almost_zero());
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::pointIntersectsPolygon(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::pointIntersectsPolygon(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.point());
   assert(rhs.polygon());
 
@@ -159,16 +149,10 @@ bool Polyhedron<T, FP, VP>::pointIntersectsPolygon(
   const HalfEdgeList &rhsBoundary = rhsFace->boundary();
 
   return vm::polygon_contains_point(
-      lhsPos,
-      rhsNormal,
-      std::begin(rhsBoundary),
-      std::end(rhsBoundary),
-      GetVertexPosition());
+      lhsPos, rhsNormal, std::begin(rhsBoundary), std::end(rhsBoundary), GetVertexPosition());
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::pointIntersectsPolyhedron(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::pointIntersectsPolyhedron(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.point());
   assert(rhs.polyhedron());
 
@@ -176,15 +160,11 @@ bool Polyhedron<T, FP, VP>::pointIntersectsPolyhedron(
   return rhs.contains(lhsPos, vm::constants<T>::point_status_epsilon());
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::edgeIntersectsPoint(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::edgeIntersectsPoint(const Polyhedron &lhs, const Polyhedron &rhs) {
   return pointIntersectsEdge(rhs, lhs);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::edgeIntersectsEdge(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::edgeIntersectsEdge(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.edge());
   assert(rhs.edge());
 
@@ -209,23 +189,19 @@ bool Polyhedron<T, FP, VP>::edgeIntersectsEdge(
       const auto rhsStartDist = vm::distance_to_projected_point(lhsRay, rhsStart);
       const auto rhsEndDist = vm::distance_to_projected_point(lhsRay, rhsEnd);
 
-      return (
-          vm::contains(rhsStartDist, 0.0, rayLen) ||   // lhs constains rhs start
-              vm::contains(rhsEndDist, 0.0, rayLen) ||     // lhs contains rhs end
-              (rhsStartDist > 0.0)!=(rhsEndDist > 0.0)); // rhs contains lhs
+      return (vm::contains(rhsStartDist, 0.0, rayLen) ||   // lhs constains rhs start
+          vm::contains(rhsEndDist, 0.0, rayLen) ||     // lhs contains rhs end
+          (rhsStartDist > 0.0) != (rhsEndDist > 0.0)); // rhs contains lhs
     } else {
       return false;
     }
   }
 
-  static const auto epsilon2 =
-      vm::constants<T>::almost_zero()*vm::constants<T>::almost_zero();
+  static const auto epsilon2 = vm::constants<T>::almost_zero() * vm::constants<T>::almost_zero();
   return dist.distance < epsilon2 && dist.position1 <= rayLen;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::edgeIntersectsPolygon(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::edgeIntersectsPolygon(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.edge());
   assert(rhs.polygon());
 
@@ -235,9 +211,7 @@ bool Polyhedron<T, FP, VP>::edgeIntersectsPolygon(
   return edgeIntersectsFace(lhsEdge, rhsFace);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::edgeIntersectsPolyhedron(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::edgeIntersectsPolyhedron(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.edge());
   assert(rhs.polyhedron());
 
@@ -266,11 +240,10 @@ bool Polyhedron<T, FP, VP>::edgeIntersectsPolyhedron(
     }
   }
 
-  return backHit && !frontHit;
+  return backHit && ! frontHit;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::edgeIntersectsFace(const Edge *lhsEdge, const Face *rhsFace) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::edgeIntersectsFace(const Edge *lhsEdge, const Face *rhsFace) {
   const auto &lhsStart = lhsEdge->firstVertex()->position();
   const auto &lhsEnd = lhsEdge->secondVertex()->position();
   const auto lhsRay = vm::ray<T, 3>(lhsStart, normalize(lhsEnd - lhsStart));
@@ -282,8 +255,7 @@ bool Polyhedron<T, FP, VP>::edgeIntersectsFace(const Edge *lhsEdge, const Face *
     if (vm::is_zero(dot(faceNorm, edgeDir), vm::constants<T>::almost_zero())) {
       // ray and face are parallel, intersect with edges
 
-      static const auto MaxDistance =
-          vm::constants<T>::almost_zero()*vm::constants<T>::almost_zero();
+      static const auto MaxDistance = vm::constants<T>::almost_zero() * vm::constants<T>::almost_zero();
 
       for (const auto *rhsEdge : rhsFace->boundary()) {
         const auto &start = rhsEdge->origin()->position();
@@ -301,21 +273,15 @@ bool Polyhedron<T, FP, VP>::edgeIntersectsFace(const Edge *lhsEdge, const Face *
   return dist <= rayLen;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polygonIntersectsPoint(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polygonIntersectsPoint(const Polyhedron &lhs, const Polyhedron &rhs) {
   return pointIntersectsPolygon(rhs, lhs);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polygonIntersectsEdge(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polygonIntersectsEdge(const Polyhedron &lhs, const Polyhedron &rhs) {
   return edgeIntersectsPolygon(rhs, lhs);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polygonIntersectsPolygon(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polygonIntersectsPolygon(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.polygon());
   assert(rhs.polygon());
 
@@ -325,9 +291,7 @@ bool Polyhedron<T, FP, VP>::polygonIntersectsPolygon(
   return faceIntersectsFace(lhsFace, rhsFace);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polygonIntersectsPolyhedron(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polygonIntersectsPolyhedron(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.polygon());
   assert(rhs.polyhedron());
 
@@ -342,8 +306,7 @@ bool Polyhedron<T, FP, VP>::polygonIntersectsPolyhedron(
   return rhs.contains(vertex->position(), vm::constants<T>::point_status_epsilon());
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::faceIntersectsFace(const Face *lhsFace, const Face *rhsFace) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::faceIntersectsFace(const Face *lhsFace, const Face *rhsFace) {
   const auto &lhsBoundary = lhsFace->boundary();
   const auto &rhsBoundary = rhsFace->boundary();
 
@@ -356,40 +319,24 @@ bool Polyhedron<T, FP, VP>::faceIntersectsFace(const Face *lhsFace, const Face *
   const auto *lhsVertex = lhsBoundary.front()->origin();
   const auto *rhsVertex = rhsBoundary.front()->origin();
 
-  return (
-      vm::polygon_contains_point(
-          lhsVertex->position(),
-          std::begin(rhsBoundary),
-          std::end(rhsBoundary),
-          GetVertexPosition())
-          || vm::polygon_contains_point(
-              rhsVertex->position(),
-              std::begin(lhsBoundary),
-              std::end(lhsBoundary),
-              GetVertexPosition()));
+  return (vm::polygon_contains_point(
+      lhsVertex->position(), std::begin(rhsBoundary), std::end(rhsBoundary), GetVertexPosition()) || vm::polygon_contains_point(
+      rhsVertex->position(), std::begin(lhsBoundary), std::end(lhsBoundary), GetVertexPosition()));
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polyhedronIntersectsPoint(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polyhedronIntersectsPoint(const Polyhedron &lhs, const Polyhedron &rhs) {
   return pointIntersectsPolyhedron(rhs, lhs);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polyhedronIntersectsEdge(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polyhedronIntersectsEdge(const Polyhedron &lhs, const Polyhedron &rhs) {
   return edgeIntersectsPolyhedron(rhs, lhs);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polyhedronIntersectsPolygon(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polyhedronIntersectsPolygon(const Polyhedron &lhs, const Polyhedron &rhs) {
   return polygonIntersectsPolyhedron(rhs, lhs);
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::polyhedronIntersectsPolyhedron(
-    const Polyhedron &lhs, const Polyhedron &rhs) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::polyhedronIntersectsPolyhedron(const Polyhedron &lhs, const Polyhedron &rhs) {
   assert(lhs.polyhedron());
   assert(rhs.polyhedron());
 
@@ -411,14 +358,14 @@ bool Polyhedron<T, FP, VP>::polyhedronIntersectsPolyhedron(
       const auto rhsEdgeVec = rhsEdge->vector();
       const auto direction = vm::cross(lhsEdgeVec, rhsEdgeVec);
 
-      if (!vm::is_zero(direction, vm::constants<T>::almost_zero())) {
+      if (! vm::is_zero(direction, vm::constants<T>::almost_zero())) {
         const auto plane = vm::plane<T, 3>(lhsEdgeOrigin, direction);
 
         const auto lhsStatus = pointStatus(plane, lhs.vertices());
-        if (lhsStatus!=vm::plane_status::inside) {
+        if (lhsStatus != vm::plane_status::inside) {
           const auto rhsStatus = pointStatus(plane, rhs.vertices());
-          if (rhsStatus!=vm::plane_status::inside) {
-            if (lhsStatus!=rhsStatus) {
+          if (rhsStatus != vm::plane_status::inside) {
+            if (lhsStatus != rhsStatus) {
               return false;
             }
           }
@@ -430,11 +377,10 @@ bool Polyhedron<T, FP, VP>::polyhedronIntersectsPolyhedron(
   return true;
 }
 
-template<typename T, typename FP, typename VP>
-bool Polyhedron<T, FP, VP>::separate(const FaceList &faces, const VertexList &vertices) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::separate(const FaceList &faces, const VertexList &vertices) {
   for (const auto *face : faces) {
     const auto &plane = face->plane();
-    if (pointStatus(plane, vertices)==vm::plane_status::above) {
+    if (pointStatus(plane, vertices) == vm::plane_status::above) {
       return true;
     }
   }
@@ -442,18 +388,16 @@ bool Polyhedron<T, FP, VP>::separate(const FaceList &faces, const VertexList &ve
   return false;
 }
 
-template<typename T, typename FP, typename VP>
-vm::plane_status Polyhedron<T, FP, VP>::pointStatus(
-    const vm::plane<T, 3> &plane, const VertexList &vertices) {
+template<typename T, typename FP, typename VP> vm::plane_status Polyhedron<T, FP, VP>::pointStatus(const vm::plane<T, 3> &plane, const VertexList &vertices) {
   std::size_t above = 0u;
   std::size_t below = 0u;
 
   for (const auto *vertex : vertices) {
     const auto status = plane.point_status(vertex->position());
-    if (status==vm::plane_status::above) {
-      ++above;
-    } else if (status==vm::plane_status::below) {
-      ++below;
+    if (status == vm::plane_status::above) {
+      ++ above;
+    } else if (status == vm::plane_status::below) {
+      ++ below;
     }
     if (above > 0u && below > 0u) {
       return vm::plane_status::inside;

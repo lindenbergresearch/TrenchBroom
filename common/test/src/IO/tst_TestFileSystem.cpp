@@ -32,85 +32,100 @@
 
 namespace TrenchBroom {
 namespace IO {
-TEST_CASE("TestFileSystem")
-{
-    auto root_file_1 = makeObjectFile(1);
-    auto root_file_2 = makeObjectFile(2);
-    auto some_dir_file_1 = makeObjectFile(3);
-    auto some_dir_file_2 = makeObjectFile(4);
-    auto nested_dir_file_1 = makeObjectFile(5);
-    auto nested_dir_file_2 = makeObjectFile(6);
+TEST_CASE("TestFileSystem") {
+auto root_file_1 = makeObjectFile(1);
+auto root_file_2 = makeObjectFile(2);
+auto some_dir_file_1 = makeObjectFile(3);
+auto some_dir_file_2 = makeObjectFile(4);
+auto nested_dir_file_1 = makeObjectFile(5);
+auto nested_dir_file_2 = makeObjectFile(6);
 
-    auto fs = TestFileSystem{
-        DirectoryEntry{
-            "", {
-                DirectoryEntry{
-                    "some_dir", {
-                        DirectoryEntry{
-                            "nested_dir", {
-                                FileEntry{
-                                    "nested_dir_file_1", nested_dir_file_1
-                                }, FileEntry{"nested_dir_file_2", nested_dir_file_2},
-                            }}, FileEntry{
-                            "some_dir_file_1", some_dir_file_1
-                        }, FileEntry{
-                            "some_dir_file_2", some_dir_file_2
-                        },
-                    }}, FileEntry{"root_file_1", root_file_1}, FileEntry{"root_file_2", root_file_2},
-            }}};
+auto fs = TestFileSystem{
+    DirectoryEntry{
+        "", {
+            DirectoryEntry{
+                "some_dir", {
+                    DirectoryEntry{"nested_dir", {FileEntry{"nested_dir_file_1", nested_dir_file_1}, FileEntry{"nested_dir_file_2", nested_dir_file_2},}},
+                    FileEntry{"some_dir_file_1", some_dir_file_1}, FileEntry{"some_dir_file_2", some_dir_file_2},
+                }}, FileEntry{"root_file_1", root_file_1}, FileEntry{"root_file_2", root_file_2},
+        }}};
 
-    SECTION("makeAbsolute")
-    {
-        CHECK(fs.makeAbsolute("root_file_1") == Result<std::filesystem::path>{"/root_file_1"});
-        CHECK(fs.makeAbsolute("some_dir") == Result<std::filesystem::path>{"/some_dir"});
-        CHECK(fs.makeAbsolute("some_dir/some_dir_file_1") == Result<std::filesystem::path>{
-            "/some_dir/some_dir_file_1"
-        });
-    }
-
-    SECTION("pathInfo")
-    {
-        CHECK(fs.pathInfo("root_file_1") == PathInfo::File);
-        CHECK(fs.pathInfo("some_dir") == PathInfo::Directory);
-        CHECK(fs.pathInfo("does_not_exist") == PathInfo::Unknown);
-        CHECK(fs.pathInfo("some_dir/some_dir_file_1") == PathInfo::File);
-        CHECK(fs.pathInfo("some_dir/nested_dir") == PathInfo::Directory);
-        CHECK(fs.pathInfo("some_dir/does_not_exist") == PathInfo::Unknown);
-        CHECK(fs.pathInfo("some_dir/nested_dir/nested_dir_file_1") == PathInfo::File);
-        CHECK(fs.pathInfo("some_dir/nested_dir/does_not_exist") == PathInfo::Unknown);
-    }
-
-    SECTION("find")
-    {
-        CHECK(fs.find("does_not_exist", TraversalMode::Flat) == Result<std::vector<std::filesystem::path>>{
-            Error{"Path does not denote a directory: 'does_not_exist'"}});
-
-        CHECK(fs.find("", TraversalMode::Flat) == Result<std::vector<std::filesystem::path>>{
-            std::vector<std::filesystem::path>{"some_dir", "root_file_1", "root_file_2",}});
-
-        CHECK(fs.find("some_dir", TraversalMode::Flat) == Result<std::vector<std::filesystem::path>>{
-            std::vector<std::filesystem::path>{
-                "some_dir/nested_dir", "some_dir/some_dir_file_1", "some_dir/some_dir_file_2",
-            }});
-
-        CHECK(fs.find("some_dir/nested_dir", TraversalMode::Flat) == Result<std::vector<std::filesystem::path>>{
-            std::vector<std::filesystem::path>{
-                "some_dir/nested_dir/nested_dir_file_1", "some_dir/nested_dir/nested_dir_file_2",
-            }});
-
-        CHECK(fs.find("", TraversalMode::Recursive) == Result<std::vector<std::filesystem::path>>{
-            std::vector<std::filesystem::path>{
-                "some_dir", "some_dir/nested_dir", "some_dir/nested_dir/nested_dir_file_1", "some_dir/nested_dir/nested_dir_file_2", "some_dir/some_dir_file_1",
-                "some_dir/some_dir_file_2", "root_file_1", "root_file_2",
-            }});
-    }
-
-    SECTION("openFile")
-    {
-        CHECK(fs.openFile("root_file_1") == root_file_1);
-        CHECK(fs.openFile("some_dir/some_dir_file_1") == some_dir_file_1);
-        CHECK(fs.openFile("some_dir/nested_dir/nested_dir_file_1") == nested_dir_file_1);
-    }
+SECTION("makeAbsolute") {
+CHECK(fs
+.makeAbsolute("root_file_1") == Result<std::filesystem::path> {
+"/root_file_1"
 }
-} // namespace IO
+);
+CHECK(fs
+.makeAbsolute("some_dir") == Result<std::filesystem::path> {
+"/some_dir"
+}
+);
+CHECK(fs
+.makeAbsolute("some_dir/some_dir_file_1") == Result <std::filesystem::path>{
+"/some_dir/some_dir_file_1"
+});
+}
+
+SECTION("pathInfo")
+{
+CHECK(fs
+.pathInfo("root_file_1") == PathInfo::File);
+CHECK(fs
+.pathInfo("some_dir") == PathInfo::Directory);
+CHECK(fs
+.pathInfo("does_not_exist") == PathInfo::Unknown);
+CHECK(fs
+.pathInfo("some_dir/some_dir_file_1") == PathInfo::File);
+CHECK(fs
+.pathInfo("some_dir/nested_dir") == PathInfo::Directory);
+CHECK(fs
+.pathInfo("some_dir/does_not_exist") == PathInfo::Unknown);
+CHECK(fs
+.pathInfo("some_dir/nested_dir/nested_dir_file_1") == PathInfo::File);
+CHECK(fs
+.pathInfo("some_dir/nested_dir/does_not_exist") == PathInfo::Unknown);
+}
+
+SECTION("find")
+{
+CHECK(fs
+.find("does_not_exist", TraversalMode::Flat) == Result <std::vector<std::filesystem::path>>{
+Error{
+"Path does not denote a directory: 'does_not_exist'"}});
+
+CHECK(fs
+.find("", TraversalMode::Flat) == Result <std::vector<std::filesystem::path>>{
+std::vector<std::filesystem::path>{
+"some_dir", "root_file_1", "root_file_2",}});
+
+CHECK(fs
+.find("some_dir", TraversalMode::Flat) == Result <std::vector<std::filesystem::path>>{
+std::vector<std::filesystem::path>{
+"some_dir/nested_dir", "some_dir/some_dir_file_1", "some_dir/some_dir_file_2",
+}});
+
+CHECK(fs
+.find("some_dir/nested_dir", TraversalMode::Flat) == Result <std::vector<std::filesystem::path>>{
+std::vector<std::filesystem::path>{
+"some_dir/nested_dir/nested_dir_file_1", "some_dir/nested_dir/nested_dir_file_2",
+}});
+
+CHECK(fs
+.find("", TraversalMode::Recursive) == Result <std::vector<std::filesystem::path>>{
+std::vector<std::filesystem::path>{
+"some_dir", "some_dir/nested_dir", "some_dir/nested_dir/nested_dir_file_1", "some_dir/nested_dir/nested_dir_file_2", "some_dir/some_dir_file_1",
+"some_dir/some_dir_file_2", "root_file_1", "root_file_2",
+}});
+}
+
+SECTION("openFile")
+{
+CHECK(fs
+.openFile("root_file_1") == root_file_1);
+CHECK(fs
+.openFile("some_dir/some_dir_file_1") == some_dir_file_1);
+CHECK(fs
+.openFile("some_dir/nested_dir/nested_dir_file_1") == nested_dir_file_1);
+}}} // namespace IO
 } // namespace TrenchBroom

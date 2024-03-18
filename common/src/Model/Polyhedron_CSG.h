@@ -25,9 +25,8 @@
 
 namespace TrenchBroom {
 namespace Model {
-template<typename T, typename FP, typename VP>
-Polyhedron<T, FP, VP> Polyhedron<T, FP, VP>::intersect(Polyhedron other) const {
-  if (!polyhedron() || !other.polyhedron()) {
+template<typename T, typename FP, typename VP> Polyhedron<T, FP, VP> Polyhedron<T, FP, VP>::intersect(Polyhedron other) const {
+  if (! polyhedron() || ! other.polyhedron()) {
     return Polyhedron();
   }
 
@@ -42,15 +41,13 @@ Polyhedron<T, FP, VP> Polyhedron<T, FP, VP>::intersect(Polyhedron other) const {
   return other;
 }
 
-template<typename T, typename FP, typename VP>
-std::vector<Polyhedron<T, FP, VP>> Polyhedron<T, FP, VP>::subtract(
-    const Polyhedron &subtrahend) const {
+template<typename T, typename FP, typename VP> std::vector<Polyhedron<T, FP, VP>> Polyhedron<T, FP, VP>::subtract(const Polyhedron &subtrahend) const {
   Subtract subtract(*this, subtrahend);
   return subtract.result();
 }
 
-template<typename T, typename FP, typename VP>
-class Polyhedron<T, FP, VP>::Subtract {
+
+template<typename T, typename FP, typename VP> class Polyhedron<T, FP, VP>::Subtract {
 private:
   const Polyhedron &m_minuend;
   Polyhedron m_subtrahend;
@@ -61,8 +58,7 @@ private:
   using PlaneList = std::vector<vm::plane<T, 3>>;
 
 public:
-  Subtract(const Polyhedron &minuend, const Polyhedron &subtrahend)
-      : m_minuend(minuend), m_subtrahend(subtrahend) {
+  Subtract(const Polyhedron &minuend, const Polyhedron &subtrahend) : m_minuend(minuend), m_subtrahend(subtrahend) {
     if (clipSubtrahend()) {
       subtract();
     } else {
@@ -117,33 +113,27 @@ private:
   static PlaneList sortPlanes(PlaneList planes) {
     auto it = std::begin(planes);
     it = sortPlanes(
-        it,
-        std::end(planes),
-        {vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_z()});
+        it, std::end(planes), {vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_z()}
+    );
     it = sortPlanes(
-        it,
-        std::end(planes),
-        {vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_z()});
+        it, std::end(planes), {vm::vec<T, 3>::pos_y(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_z()}
+    );
     sortPlanes(
-        it,
-        std::end(planes),
-        {vm::vec<T, 3>::pos_z(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y()});
+        it, std::end(planes), {vm::vec<T, 3>::pos_z(), vm::vec<T, 3>::pos_x(), vm::vec<T, 3>::pos_y()}
+    );
 
     return planes;
   }
 
-  static typename PlaneList::iterator sortPlanes(
-      typename PlaneList::iterator begin,
-      typename PlaneList::iterator end,
-      const std::vector<vm::vec<T, 3>> &axes) {
-    if (begin==end) {
+  static typename PlaneList::iterator sortPlanes(typename PlaneList::iterator begin, typename PlaneList::iterator end, const std::vector<vm::vec<T, 3>> &axes) {
+    if (begin == end) {
       return end;
     }
 
     auto it = begin;
-    while (it!=end) {
+    while (it != end) {
       auto next = selectPlanes(it, end, axes);
-      if (next==it || next==end) {
+      if (next == it || next == end) {
         break; // no further progress
       }
       it = next;
@@ -153,34 +143,31 @@ private:
   }
 
   static typename PlaneList::iterator selectPlanes(
-      typename PlaneList::iterator begin,
-      typename PlaneList::iterator end,
-      const std::vector<vm::vec<T, 3>> &axes) {
-    assert(begin!=end);
-    assert(!axes.empty());
+      typename PlaneList::iterator begin, typename PlaneList::iterator end, const std::vector<vm::vec<T, 3>> &axes
+  ) {
+    assert(begin != end);
+    assert(! axes.empty());
 
     vm::vec<T, 3> axis = axes.front();
     auto bestIt = end;
-    for (auto it = begin; it!=end; ++it) {
+    for (auto it = begin; it != end; ++ it) {
       auto newBestIt = selectPlane(it, bestIt, end, axis);
 
       // Resolve ambiguities if necessary.
-      for (auto axIt = std::next(std::begin(axes)), axEnd = std::end(axes);
-           newBestIt==end && axIt!=axEnd;
-           ++axIt) {
+      for (auto axIt = std::next(std::begin(axes)), axEnd = std::end(axes); newBestIt == end && axIt != axEnd; ++ axIt) {
         const vm::vec<T, 3> &altAxis = *axIt;
         newBestIt = selectPlane(it, bestIt, end, altAxis);
-        if (newBestIt!=end) {
+        if (newBestIt != end) {
           break;
         }
       }
 
-      if (newBestIt!=end) {
+      if (newBestIt != end) {
         bestIt = newBestIt;
       }
     }
 
-    if (bestIt==end) {
+    if (bestIt == end) {
       return end;
     }
 
@@ -188,25 +175,25 @@ private:
       return begin;
     }
 
-    assert(bestIt!=end);
-    axis = -bestIt->normal;
-    std::iter_swap(begin++, bestIt);
+    assert(bestIt != end);
+    axis = - bestIt->normal;
+    std::iter_swap(begin ++, bestIt);
 
     bestIt = end;
-    for (auto it = begin; it!=end; ++it) {
-      const T bestDot = bestIt!=end ? dot(bestIt->normal, axis) : 0.0;
+    for (auto it = begin; it != end; ++ it) {
+      const T bestDot = bestIt != end ? dot(bestIt->normal, axis) : 0.0;
       const T curDot = dot(it->normal, axis);
 
       if (curDot > bestDot) {
         bestIt = it;
       }
-      if (bestDot==1.0) {
+      if (bestDot == 1.0) {
         break;
       }
     }
 
-    if (bestIt!=end) {
-      std::iter_swap(begin++, bestIt);
+    if (bestIt != end) {
+      std::iter_swap(begin ++, bestIt);
     }
 
     return begin;
@@ -223,19 +210,17 @@ private:
    * @return an iterator to the new best plane
    */
   static typename PlaneList::iterator selectPlane(
-      typename PlaneList::iterator curIt,
-      typename PlaneList::iterator bestIt,
-      typename PlaneList::iterator end,
-      const vm::vec<T, 3> &axis) {
+      typename PlaneList::iterator curIt, typename PlaneList::iterator bestIt, typename PlaneList::iterator end, const vm::vec<T, 3> &axis
+  ) {
     const T curDot = vm::dot(curIt->normal, axis);
-    if (curDot==0.0) {
+    if (curDot == 0.0) {
       return bestIt;
     }
-    if (curDot==1.0) {
+    if (curDot == 1.0) {
       return curIt;
     }
 
-    const T bestDot = bestIt!=end ? vm::dot(bestIt->normal, axis) : 0.0;
+    const T bestDot = bestIt != end ? vm::dot(bestIt->normal, axis) : 0.0;
     if (vm::abs(curDot) > vm::abs(bestDot)) {
       return curIt;
     } else if (vm::abs(curDot) < vm::abs(bestDot)) {
@@ -243,7 +228,7 @@ private:
     } else {
       // vm::abs(curDot) == vm::abs(bestDot), resolve ambiguities.
 
-      assert(bestIt!=end); // Because curDot != 0.0, the same is true for bestDot!
+      assert(bestIt != end); // Because curDot != 0.0, the same is true for bestDot!
       if (bestDot < 0.0 && curDot > 0.0) {
         // Prefer best matches pointing towards the direction of the axis, not the
         // opposite.
@@ -255,11 +240,8 @@ private:
     }
   }
 
-  void doSubtract(
-      const Fragments &fragments,
-      typename PlaneList::const_iterator curPlaneIt,
-      typename PlaneList::const_iterator endPlaneIt) {
-    if (fragments.empty() || curPlaneIt==endPlaneIt) {
+  void doSubtract(const Fragments &fragments, typename PlaneList::const_iterator curPlaneIt, typename PlaneList::const_iterator endPlaneIt) {
+    if (fragments.empty() || curPlaneIt == endPlaneIt) {
       // no more fragments to process or all of `minutendFragments`
       // are now behind all of subtrahendPlanes so they can be discarded.
       return;
@@ -277,14 +259,14 @@ private:
       Polyhedron<T, FP, VP> fragmentInFront = fragment;
       const auto frontClipResult = fragmentInFront.clip(curPlaneInv);
 
-      if (!frontClipResult.empty()) { // Polyhedron::clip() keeps the part behind the plane.
+      if (! frontClipResult.empty()) { // Polyhedron::clip() keeps the part behind the plane.
         m_fragments.push_back(std::move(fragmentInFront));
       }
 
       // back fragments need to be clipped by the rest of the subtrahend planes
       Polyhedron<T, FP, VP> fragmentBehind = fragment;
       const auto backClipResult = fragmentBehind.clip(curPlane);
-      if (!backClipResult.empty()) {
+      if (! backClipResult.empty()) {
         backFragments.push_back(std::move(fragmentBehind));
       }
     }

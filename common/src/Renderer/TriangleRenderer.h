@@ -28,6 +28,7 @@ namespace TrenchBroom {
 namespace Renderer {
 class RenderContext;
 
+
 class TriangleRenderer : public DirectRenderable {
 private:
   VertexArray m_vertexArray;

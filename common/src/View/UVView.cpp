@@ -60,8 +60,8 @@ namespace TrenchBroom {
 namespace View {
 const Model::HitType::Type UVView::FaceHitType = Model::HitType::freeType();
 
-UVView::UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager)
-    : RenderView{contextManager}, m_document{std::move(document)}, m_helper{m_camera} {
+UVView::UVView(std::weak_ptr<MapDocument> document, GLContextManager &contextManager) :
+    RenderView{contextManager}, m_document{std::move(document)}, m_helper{m_camera} {
   setToolBox(m_toolBox);
   createTools();
   m_toolBox.disable();
@@ -74,7 +74,7 @@ void UVView::setSubDivisions(const vm::vec2i &subDivisions) {
 }
 
 bool UVView::event(QEvent *event) {
-  if (event->type()==QEvent::WindowDeactivate) {
+  if (event->type() == QEvent::WindowDeactivate) {
     cancelDrag();
   }
 
@@ -92,29 +92,22 @@ void UVView::createTools() {
 
 void UVView::connectObservers() {
   auto document = kdl::mem_lock(m_document);
-  m_notifierConnection +=
-      document->documentWasClearedNotifier.connect(this, &UVView::documentWasCleared);
-  m_notifierConnection +=
-      document->nodesDidChangeNotifier.connect(this, &UVView::nodesDidChange);
-  m_notifierConnection +=
-      document->brushFacesDidChangeNotifier.connect(this, &UVView::brushFacesDidChange);
-  m_notifierConnection +=
-      document->selectionDidChangeNotifier.connect(this, &UVView::selectionDidChange);
-  m_notifierConnection +=
-      document->grid().gridDidChangeNotifier.connect(this, &UVView::gridDidChange);
+  m_notifierConnection += document->documentWasClearedNotifier.connect(this, &UVView::documentWasCleared);
+  m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &UVView::nodesDidChange);
+  m_notifierConnection += document->brushFacesDidChangeNotifier.connect(this, &UVView::brushFacesDidChange);
+  m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &UVView::selectionDidChange);
+  m_notifierConnection += document->grid().gridDidChangeNotifier.connect(this, &UVView::gridDidChange);
 
   PreferenceManager &prefs = PreferenceManager::instance();
-  m_notifierConnection +=
-      prefs.preferenceDidChangeNotifier.connect(this, &UVView::preferenceDidChange);
+  m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &UVView::preferenceDidChange);
 
-  m_notifierConnection +=
-      m_camera.cameraDidChangeNotifier.connect(this, &UVView::cameraDidChange);
+  m_notifierConnection += m_camera.cameraDidChangeNotifier.connect(this, &UVView::cameraDidChange);
 }
 
 void UVView::selectionDidChange(const Selection &) {
   auto document = kdl::mem_lock(m_document);
   const auto faces = document->selectedBrushFaces();
-  if (faces.size()!=1) {
+  if (faces.size() != 1) {
     m_helper.setFaceHandle(std::nullopt);
   } else {
     m_helper.setFaceHandle(faces.back());
@@ -192,10 +185,10 @@ const Color &UVView::getBackgroundColor() {
 void UVView::setupGL(Renderer::RenderContext &renderContext) {
   const Renderer::Camera::Viewport &viewport = renderContext.camera().viewport();
   const qreal r = devicePixelRatioF();
-  const int x = static_cast<int>(viewport.x*r);
-  const int y = static_cast<int>(viewport.y*r);
-  const int width = static_cast<int>(viewport.width*r);
-  const int height = static_cast<int>(viewport.height*r);
+  const int x = static_cast<int>(viewport.x * r);
+  const int y = static_cast<int>(viewport.y * r);
+  const int width = static_cast<int>(viewport.width * r);
+  const int height = static_cast<int>(viewport.height * r);
 
   glAssert(glViewport(x, y, width, height));
 
@@ -210,6 +203,7 @@ void UVView::setupGL(Renderer::RenderContext &renderContext) {
   glAssert(glDisable(GL_DEPTH_TEST));
 }
 
+
 class UVView::RenderTexture : public Renderer::DirectRenderable {
 private:
   using Vertex = Renderer::GLVertexTypes::P3NT2::Vertex;
@@ -218,8 +212,7 @@ private:
   Renderer::VertexArray m_vertexArray;
 
 public:
-  explicit RenderTexture(const UVViewHelper &helper)
-      : m_helper{helper}, m_vertexArray{Renderer::VertexArray::move(getVertices())} {
+  explicit RenderTexture(const UVViewHelper &helper) : m_helper{helper}, m_vertexArray{Renderer::VertexArray::move(getVertices())} {
   }
 
 private:
@@ -228,23 +221,22 @@ private:
 
     const auto &camera = m_helper.camera();
     const auto &v = camera.zoomedViewport();
-    const auto w2 = static_cast<float>(v.width)/2.0f;
-    const auto h2 = static_cast<float>(v.height)/2.0f;
+    const auto w2 = static_cast<float>(v.width) / 2.0f;
+    const auto h2 = static_cast<float>(v.height) / 2.0f;
 
     const auto &p = camera.position();
     const auto &r = camera.right();
     const auto &u = camera.up();
 
-    const auto pos1 = -w2*r + h2*u + p;
-    const auto pos2 = +w2*r + h2*u + p;
-    const auto pos3 = +w2*r - h2*u + p;
-    const auto pos4 = -w2*r - h2*u + p;
+    const auto pos1 = - w2 * r + h2 * u + p;
+    const auto pos2 = + w2 * r + h2 * u + p;
+    const auto pos3 = + w2 * r - h2 * u + p;
+    const auto pos4 = - w2 * r - h2 * u + p;
 
     return {
-        Vertex(pos1, normal, m_helper.face()->textureCoords(vm::vec3(pos1))),
-        Vertex(pos2, normal, m_helper.face()->textureCoords(vm::vec3(pos2))),
-        Vertex(pos3, normal, m_helper.face()->textureCoords(vm::vec3(pos3))),
-        Vertex(pos4, normal, m_helper.face()->textureCoords(vm::vec3(pos4)))};
+        Vertex(pos1, normal, m_helper.face()->textureCoords(vm::vec3(pos1))), Vertex(pos2, normal, m_helper.face()->textureCoords(vm::vec3(pos2))),
+        Vertex(pos3, normal, m_helper.face()->textureCoords(vm::vec3(pos3))), Vertex(pos4, normal, m_helper.face()->textureCoords(vm::vec3(pos4)))
+    };
   }
 
 private:
@@ -258,23 +250,24 @@ private:
     const auto toTex = m_helper.face()->toTexCoordSystemMatrix(offset, scale, true);
 
     const auto *texture = m_helper.face()->texture();
-    ensure(texture!=nullptr, "texture is null");
+    ensure(texture != nullptr, "texture is null");
 
     texture->activate();
 
-    auto gridWidth = m_helper.cameraZoom()*1.0f;
+    auto gridWidth = m_helper.cameraZoom() * 1.0f;
 
     Renderer::ActiveShader shader(
-        renderContext.shaderManager(), Renderer::Shaders::UVViewShader);
+        renderContext.shaderManager(), Renderer::Shaders::UVViewShader
+    );
     shader.set("ApplyTexture", true);
     shader.set("Color", texture->averageColor());
     shader.set("Brightness", std::max(pref(Preferences::Brightness), 2.2f));
     shader.set("RenderGrid", true);
     shader.set("GridSizes", vm::vec2f(texture->width(), texture->height()));
     shader.set(
-        "GridColor",
-        vm::vec4f(
-            Renderer::gridColorForTexture(texture), 0.5f)); // TODO: make this a preference
+        "GridColor", vm::vec4f(
+            Renderer::gridColorForTexture(texture), 0.5f
+        )); // TODO: make this a preference
     shader.set("GridScales", scale);
     shader.set("GridWidth", gridWidth);
     shader.set("GridMatrix", vm::mat4x4f(toTex));
@@ -288,9 +281,10 @@ private:
   }
 };
 
+
 void UVView::renderTexture(Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
   const Assets::Texture *texture = m_helper.face()->texture();
-  if (texture==nullptr)
+  if (texture == nullptr)
     return;
 
   renderBatch.addOneShot(new RenderTexture(m_helper));
@@ -308,45 +302,45 @@ void UVView::renderFace(Renderer::RenderContext &, Renderer::RenderBatch &render
   for (const auto *vertex : faceVertices) {
     edgeVertices.push_back(Vertex(vm::vec3f(vertex->position())));
   }
-  auto gridWidth = m_helper.cameraZoom()*10.0f;
+  auto gridWidth = m_helper.cameraZoom() * 10.0f;
   const Color edgeColor = pref(Preferences::SelectedEdgeColor);
   const float edgeLineWidth = pref(Preferences::EdgeSelectedLineWidth);
 
   Renderer::DirectEdgeRenderer edgeRenderer(
-      Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop);
+      Renderer::VertexArray::move(std::move(edgeVertices)), Renderer::PrimType::LineLoop
+  );
   edgeRenderer.renderOnTop(renderBatch, edgeColor, edgeLineWidth);
 }
 
-void UVView::renderTextureAxes(
-    Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
+void UVView::renderTextureAxes(Renderer::RenderContext &, Renderer::RenderBatch &renderBatch) {
   assert(m_helper.valid());
 
   const auto &normal = m_helper.face()->boundary().normal;
 
   const auto xAxis = vm::vec3f(
-      m_helper.face()->textureXAxis()
-          - dot(m_helper.face()->textureXAxis(), normal)*normal);
+      m_helper.face()->textureXAxis() - dot(m_helper.face()->textureXAxis(), normal) * normal
+  );
   const auto yAxis = vm::vec3f(
-      m_helper.face()->textureYAxis()
-          - dot(m_helper.face()->textureYAxis(), normal)*normal);
+      m_helper.face()->textureYAxis() - dot(m_helper.face()->textureYAxis(), normal) * normal
+  );
   const auto center = vm::vec3f(m_helper.face()->boundsCenter());
 
-  const auto length = 32.0f/m_helper.cameraZoom();
+  const auto length = 32.0f / m_helper.cameraZoom();
 
   using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
   Renderer::DirectEdgeRenderer edgeRenderer(
-      Renderer::VertexArray::move(std::vector<Vertex>({
-                                                          Vertex(center, pref(Preferences::XAxisColor)),
-                                                          Vertex(center + length*xAxis, pref(Preferences::XAxisColor)),
-                                                          Vertex(center, pref(Preferences::YAxisColor)),
-                                                          Vertex(center + length*yAxis, pref(Preferences::YAxisColor)),
-                                                      })),
-      Renderer::PrimType::Lines);
+      Renderer::VertexArray::move(
+          std::vector<Vertex>(
+              {
+                  Vertex(center, pref(Preferences::XAxisColor)), Vertex(center + length * xAxis, pref(Preferences::XAxisColor)),
+                  Vertex(center, pref(Preferences::YAxisColor)), Vertex(center + length * yAxis, pref(Preferences::YAxisColor)),
+              }
+          )), Renderer::PrimType::Lines
+  );
   edgeRenderer.renderOnTop(renderBatch, 2.0f);
 }
 
-void UVView::renderToolBox(
-    Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+void UVView::renderToolBox(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
   renderTools(renderContext, renderBatch);
 }
 
@@ -368,11 +362,11 @@ PickRequest UVView::doGetPickRequest(const float x, const float y) const {
 
 Model::PickResult UVView::doPick(const vm::ray3 &pickRay) const {
   Model::PickResult pickResult = Model::PickResult::byDistance();
-  if (!m_helper.valid())
+  if (! m_helper.valid())
     return pickResult;
 
   const FloatType distance = m_helper.face()->intersectWithRay(pickRay);
-  if (!vm::is_nan(distance)) {
+  if (! vm::is_nan(distance)) {
     const vm::vec3 hitPoint = vm::point_at_distance(pickRay, distance);
     pickResult.addHit(
         Model::Hit(UVView::FaceHitType, distance, hitPoint, m_helper.face()));

@@ -49,11 +49,11 @@ Result<void> IdPakFileSystem::doReadDirectory() {
 
     const auto directoryAddress = reader.readSize<int32_t>();
     const auto directorySize = reader.readSize<int32_t>();
-    const auto entryCount = directorySize/PakLayout::EntryLength;
+    const auto entryCount = directorySize / PakLayout::EntryLength;
 
     reader.seekFromBegin(directoryAddress);
 
-    for (size_t i = 0; i < entryCount; ++i) {
+    for (size_t i = 0; i < entryCount; ++ i) {
       const auto entryName = reader.readString(PakLayout::EntryNameLength);
       const auto entryAddress = reader.readSize<int32_t>();
       const auto entrySize = reader.readSize<int32_t>();
@@ -64,12 +64,12 @@ Result<void> IdPakFileSystem::doReadDirectory() {
       addFile(
           entryPath, [entryFile = std::move(entryFile)]() -> Result<std::shared_ptr<File>> {
             return entryFile;
-          });
+          }
+      );
     }
 
     return kdl::void_success;
-  }
-  catch (const ReaderException &e) {
+  } catch (const ReaderException &e) {
     return Error{e.what()};
   }
 }

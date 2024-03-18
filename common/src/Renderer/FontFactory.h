@@ -24,7 +24,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 namespace TrenchBroom {
 namespace Renderer {
 class FontDescriptor;
+
+
 class TextureFont;
+
 
 class FontFactory {
 public:
@@ -39,8 +42,7 @@ public:
   std::unique_ptr<TextureFont> createFont(const FontDescriptor &fontDescriptor);
 
 private:
-  virtual std::unique_ptr<TextureFont> doCreateFont(
-      const FontDescriptor &fontDescriptor) = 0;
+  virtual std::unique_ptr<TextureFont> doCreateFont(const FontDescriptor &fontDescriptor) = 0;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

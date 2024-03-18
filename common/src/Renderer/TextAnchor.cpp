@@ -31,13 +31,13 @@ TextAnchor::~TextAnchor() {}
 TextAnchor3D::~TextAnchor3D() {}
 
 vm::vec3f TextAnchor3D::offset(const Camera &camera, const vm::vec2f &size) const {
-  const vm::vec2f halfSize = size/2.0f;
+  const vm::vec2f halfSize = size / 2.0f;
   const TextAlignment::Type a = alignment();
   const vm::vec2f factors = alignmentFactors(a);
   const vm::vec2f extra = extraOffsets(a);
   vm::vec3f offset = camera.project(basePosition());
-  for (size_t i = 0; i < 2; i++)
-    offset[i] = vm::round(offset[i] + factors[i]*size[i] - halfSize[i] + extra[i]);
+  for (size_t i = 0; i < 2; i ++)
+    offset[i] = vm::round(offset[i] + factors[i] * size[i] - halfSize[i] + extra[i]);
   return offset;
 }
 
@@ -48,13 +48,13 @@ vm::vec3f TextAnchor3D::position(const Camera & /* camera */) const {
 vm::vec2f TextAnchor3D::alignmentFactors(const TextAlignment::Type a) const {
   vm::vec2f factors;
   if ((a & TextAlignment::Left))
-    factors[0] = +0.5f;
+    factors[0] = + 0.5f;
   else if ((a & TextAlignment::Right))
-    factors[0] = -0.5f;
+    factors[0] = - 0.5f;
   if ((a & TextAlignment::Top))
-    factors[1] = -0.5f;
+    factors[1] = - 0.5f;
   else if ((a & TextAlignment::Bottom))
-    factors[1] = +0.5f;
+    factors[1] = + 0.5f;
   return factors;
 }
 
@@ -74,11 +74,8 @@ vm::vec2f SimpleTextAnchor::extraOffsets(const TextAlignment::Type /* a */) cons
   return m_extraOffsets;
 }
 
-SimpleTextAnchor::SimpleTextAnchor(
-    const vm::vec3f &position,
-    const TextAlignment::Type alignment,
-    const vm::vec2f &extraOffsets)
-    : m_position(position), m_alignment(alignment), m_extraOffsets(extraOffsets) {
+SimpleTextAnchor::SimpleTextAnchor(const vm::vec3f &position, const TextAlignment::Type alignment, const vm::vec2f &extraOffsets) :
+    m_position(position), m_alignment(alignment), m_extraOffsets(extraOffsets) {
 }
 } // namespace Renderer
 } // namespace TrenchBroom

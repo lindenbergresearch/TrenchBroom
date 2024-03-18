@@ -33,6 +33,7 @@ class EntityNodeBase;
 namespace View {
 class MapDocument;
 
+
 class SmartPropertyEditor : public QWidget {
 Q_OBJECT
 private:
@@ -43,8 +44,7 @@ private:
   bool m_active;
 
 public:
-  explicit SmartPropertyEditor(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit SmartPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
   ~SmartPropertyEditor() override;
 

@@ -33,6 +33,7 @@ static const Type Mixed = Float | Byte;
 } // namespace ColorRange
 
 ColorRange::Type detectColorRange(const std::string &str);
+
 ColorRange::Type detectColorRange(const std::vector<std::string> &components);
 } // namespace Assets
 } // namespace TrenchBroom

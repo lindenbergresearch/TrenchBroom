@@ -38,14 +38,16 @@ std::filesystem::path userDataDirectory();
 std::filesystem::path logFilePath();
 
 std::filesystem::path findResourceFile(const std::filesystem::path &file);
+
 /**
  * Returns the possible search paths for the requested directory name.
  * They may or may not exist.
  */
-std::vector<std::filesystem::path> findResourceDirectories(
-    const std::filesystem::path &directory);
+std::vector<std::filesystem::path> findResourceDirectories(const std::filesystem::path &directory);
 
 void setPortable();
+
 void setPortable(bool newState);
+
 bool isPortable();
 } // namespace TrenchBroom::IO::SystemPaths

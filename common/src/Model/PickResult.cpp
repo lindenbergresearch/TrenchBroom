@@ -39,27 +39,27 @@ private:
   const CompareHits *m_compare;
 
 public:
-  CompareWrapper(const CompareHits *compare)
-      : m_compare(compare) {
+  CompareWrapper(const CompareHits *compare) : m_compare(compare) {
   }
+
   bool operator()(const Hit &lhs, const Hit &rhs) const {
     return m_compare->compare(lhs, rhs) < 0;
   }
 };
 
-PickResult::PickResult(std::shared_ptr<CompareHits> compare)
-    : m_compare(std::move(compare)) {
+
+PickResult::PickResult(std::shared_ptr<CompareHits> compare) : m_compare(std::move(compare)) {
 }
 
-PickResult::PickResult()
-    : m_compare(std::make_shared<CompareHitsByDistance>()) {
+PickResult::PickResult() : m_compare(std::make_shared<CompareHitsByDistance>()) {
 }
 
 PickResult::~PickResult() = default;
 
 PickResult PickResult::byDistance() {
-  return PickResult(std::make_shared<CombineCompareHits>(
-      std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
+  return PickResult(
+      std::make_shared<CombineCompareHits>(
+          std::make_unique<CompareHitsByDistance>(), std::make_unique<CompareHitsByType>()));
 }
 
 PickResult PickResult::bySize(const vm::axis::type axis) {
@@ -75,12 +75,12 @@ size_t PickResult::size() const {
 }
 
 void PickResult::addHit(const Hit &hit) {
-  assert(!vm::is_nan(hit.distance()));
-  assert(!vm::is_nan(hit.hitPoint()));
+  assert(! vm::is_nan(hit.distance()));
+  assert(! vm::is_nan(hit.hitPoint()));
   if (vm::is_nan(hit.distance()) || vm::is_nan(hit.hitPoint())) {
     return;
   }
-  ensure(m_compare.get()!=nullptr, "compare is null");
+  ensure(m_compare.get() != nullptr, "compare is null");
   auto pos = std::upper_bound(
       std::begin(m_hits), std::end(m_hits), hit, CompareWrapper(m_compare.get()));
   m_hits.insert(pos, hit);
@@ -93,7 +93,7 @@ const std::vector<Hit> &PickResult::all() const {
 const Hit &PickResult::first(const HitFilter &filter) const {
   const auto occluder = HitFilters::type(HitType::AnyType);
 
-  if (!m_hits.empty()) {
+  if (! m_hits.empty()) {
     auto it = std::begin(m_hits);
     auto end = std::end(m_hits);
     auto bestMatch = end;
@@ -102,7 +102,7 @@ const Hit &PickResult::first(const HitFilter &filter) const {
     auto bestOccluderError = std::numeric_limits<FloatType>::max();
 
     bool containsOccluder = false;
-    while (it!=end && !containsOccluder) {
+    while (it != end && ! containsOccluder) {
       const FloatType distance = it->distance();
       do {
         const Hit &hit = *it;
@@ -111,15 +111,15 @@ const Hit &PickResult::first(const HitFilter &filter) const {
             bestMatch = it;
             bestMatchError = hit.error();
           }
-        } else if (!occluder(hit)) {
+        } else if (! occluder(hit)) {
           bestOccluderError = vm::min(bestOccluderError, hit.error());
           containsOccluder = true;
         }
-        ++it;
-      } while (it!=end && vm::is_equal(it->distance(), distance, vm::C::almost_zero()));
+        ++ it;
+      } while (it != end && vm::is_equal(it->distance(), distance, vm::C::almost_zero()));
     }
 
-    if (bestMatch!=end && bestMatchError <= bestOccluderError) {
+    if (bestMatch != end && bestMatchError <= bestOccluderError) {
       return *bestMatch;
     }
   }

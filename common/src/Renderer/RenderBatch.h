@@ -25,13 +25,18 @@ namespace TrenchBroom {
 namespace Renderer {
 class Renderable;
 
+
 class DirectRenderable;
+
 
 class IndexedRenderable;
 
+
 class RenderContext;
 
+
 class VboManager;
+
 
 class RenderBatch {
 private:

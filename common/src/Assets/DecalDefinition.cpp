@@ -37,7 +37,7 @@ namespace Assets {
 namespace {
 std::string textureName(const EL::Value &value) {
   using namespace std::string_literals;
-  return value.type()==EL::ValueType::String ? value.stringValue() : ""s;
+  return value.type() == EL::ValueType::String ? value.stringValue() : ""s;
 }
 
 DecalSpecification convertToDecal(const EL::Value &value) {
@@ -58,16 +58,13 @@ DecalSpecification convertToDecal(const EL::Value &value) {
 
 kdl_reflect_impl(DecalSpecification);
 
-DecalDefinition::DecalDefinition()
-    : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
+DecalDefinition::DecalDefinition() : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
 }
 
-DecalDefinition::DecalDefinition(const size_t line, const size_t column)
-    : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
+DecalDefinition::DecalDefinition(const size_t line, const size_t column) : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
 }
 
-DecalDefinition::DecalDefinition(EL::Expression expression)
-    : m_expression{std::move(expression)} {
+DecalDefinition::DecalDefinition(EL::Expression expression) : m_expression{std::move(expression)} {
 }
 
 void DecalDefinition::append(const DecalDefinition &other) {
@@ -78,8 +75,7 @@ void DecalDefinition::append(const DecalDefinition &other) {
   m_expression = EL::Expression{EL::SwitchExpression{std::move(cases)}, line, column};
 }
 
-DecalSpecification DecalDefinition::decalSpecification(
-    const EL::VariableStore &variableStore) const {
+DecalSpecification DecalDefinition::decalSpecification(const EL::VariableStore &variableStore) const {
   return convertToDecal(m_expression.evaluate(EL::EvaluationContext{variableStore}));
 }
 

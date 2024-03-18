@@ -40,6 +40,7 @@ public:
   static const NullType Value;
 };
 
+
 class UndefinedType {
 private:
   UndefinedType();
@@ -48,17 +49,10 @@ public:
   static const UndefinedType Value;
 };
 
+
 class Value {
 private:
-  using VariantType = std::variant<
-      BooleanType,
-      StringType,
-      NumberType,
-      ArrayType,
-      MapType,
-      RangeType,
-      NullType,
-      UndefinedType>;
+  using VariantType = std::variant<BooleanType, StringType, NumberType, ArrayType, MapType, RangeType, NullType, UndefinedType>;
   std::shared_ptr<VariantType> m_value;
   std::optional<Expression> m_expression;
 
@@ -90,8 +84,7 @@ public:
 
   explicit Value(NullType value, std::optional<Expression> expression = std::nullopt);
 
-  explicit Value(
-      UndefinedType value, std::optional<Expression> expression = std::nullopt);
+  explicit Value(UndefinedType value, std::optional<Expression> expression = std::nullopt);
 
   Value(Value value, std::optional<Expression> expression);
 
@@ -99,8 +92,7 @@ public:
 
   bool hasType(ValueType type) const;
 
-  template<typename... T>
-  bool hasType(const T... types) const {
+  template<typename... T> bool hasType(const T... types) const {
     return (... || hasType(types));
   }
 
@@ -142,8 +134,7 @@ public:
 
   std::string asString(bool multiline = false) const;
 
-  void appendToStream(
-      std::ostream &str, bool multiline = true, const std::string &indent = "") const;
+  void appendToStream(std::ostream &str, bool multiline = true, const std::string &indent = "") const;
 
   bool contains(const Value &indexValue) const;
 

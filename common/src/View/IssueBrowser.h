@@ -25,9 +25,12 @@
 #include <memory>
 #include <vector>
 
+
 class QCheckBox;
 
+
 class QStackedLayout;
+
 
 class QWidget;
 
@@ -35,7 +38,9 @@ namespace TrenchBroom {
 namespace Model {
 class BrushFaceHandle;
 
+
 class Issue;
+
 
 class Node;
 } // namespace Model
@@ -43,9 +48,12 @@ class Node;
 namespace View {
 class FlagsPopupEditor;
 
+
 class IssueBrowserView;
 
+
 class MapDocument;
+
 
 class IssueBrowser : public TabBookPage {
 Q_OBJECT

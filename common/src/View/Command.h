@@ -28,6 +28,7 @@ namespace TrenchBroom {
 namespace View {
 class MapDocumentCommandFacade;
 
+
 class CommandResult {
 private:
   bool m_success;
@@ -40,13 +41,11 @@ public:
   bool success() const;
 };
 
+
 class Command {
 public:
   enum class CommandState {
-    Default,
-    Doing,
-    Done,
-    Undoing
+    Default, Doing, Done, Undoing
   };
 
 protected:
@@ -66,8 +65,7 @@ public:
   virtual std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document);
 
 private:
-  virtual std::unique_ptr<CommandResult> doPerformDo(
-      MapDocumentCommandFacade *document) = 0;
+  virtual std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) = 0;
 
 deleteCopyAndMove(Command);
 };

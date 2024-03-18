@@ -34,15 +34,19 @@ class EntityModelManager;
 namespace Model {
 class EditorContext;
 
+
 class EntityNode;
 } // namespace Model
 
 namespace Renderer {
 class RenderBatch;
 
+
 class ShaderConfig;
 
+
 class TexturedRenderer;
+
 
 class EntityModelRenderer : public DirectRenderable {
 private:
@@ -59,32 +63,26 @@ private:
   bool m_showHiddenEntities;
 
 public:
-  EntityModelRenderer(
-      Logger &logger,
-      Assets::EntityModelManager &entityModelManager,
-      const Model::EditorContext &editorContext);
+  EntityModelRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext);
 
   ~EntityModelRenderer() override;
 
-  template<typename I>
-  void setEntities(I cur, I end) {
+  template<typename I> void setEntities(I cur, I end) {
     clear();
     addEntities(cur, end);
   }
 
-  template<typename I>
-  void addEntities(I cur, I end) {
-    while (cur!=end) {
+  template<typename I> void addEntities(I cur, I end) {
+    while (cur != end) {
       addEntity(*cur);
-      ++cur;
+      ++ cur;
     }
   }
 
-  template<typename I>
-  void updateEntities(I cur, I end) {
-    while (cur!=end) {
+  template<typename I> void updateEntities(I cur, I end) {
+    while (cur != end) {
       updateEntity(*cur);
-      ++cur;
+      ++ cur;
     }
   }
 

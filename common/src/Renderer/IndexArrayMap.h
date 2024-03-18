@@ -28,6 +28,7 @@ namespace TrenchBroom {
 namespace Renderer {
 class IndexArray;
 
+
 /**
  * Manages ranges of primitives to be rendered using indices stored in an IndexArray
  * instance. For each call to the add method, the range of primitives of a given type is

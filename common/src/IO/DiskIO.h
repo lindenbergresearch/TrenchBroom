@@ -33,8 +33,14 @@
 
 namespace TrenchBroom::IO {
 enum class TraversalMode;
+
+
 class CFile;
+
+
 class File;
+
+
 enum class PathInfo;
 
 namespace Disk {
@@ -44,22 +50,18 @@ std::filesystem::path fixPath(const std::filesystem::path &path);
 
 PathInfo pathInfo(const std::filesystem::path &path);
 
-Result<std::vector<std::filesystem::path>> find(
-    const std::filesystem::path &path,
-    TraversalMode traversalMode,
-    const PathMatcher &pathMatcher = matchAnyPath);
+Result<std::vector<std::filesystem::path>> find(const std::filesystem::path &path, TraversalMode traversalMode, const PathMatcher &pathMatcher = matchAnyPath);
 
 Result<std::shared_ptr<CFile>> openFile(const std::filesystem::path &path);
 
-template<typename Stream, typename F>
-auto withStream(
-    const std::filesystem::path &path, const std::ios::openmode mode, const F &function)
--> kdl::wrap_result_t<decltype(function(std::declval<Stream &>())), Error> {
+template<typename Stream, typename F> auto withStream(
+    const std::filesystem::path &path, const std::ios::openmode mode, const F &function
+) -> kdl::wrap_result_t<decltype(function(std::declval<Stream &>())), Error> {
   using FnResultType = decltype(function(std::declval<Stream &>()));
   using ResultType = kdl::wrap_result_t<FnResultType, Error>;
   try {
     auto stream = Stream{path, mode};
-    if (!stream) {
+    if (! stream) {
       return ResultType{Error{"Could not open stream for file '" + path.string() + "'"}};
     }
     if constexpr (kdl::is_result_v<FnResultType>) {
@@ -74,32 +76,24 @@ auto withStream(
     } else {
       return ResultType{function(stream)};
     }
-  }
-  catch (const std::filesystem::filesystem_error &e) {
-    return ResultType{
-        Error{"Could not open stream for file '" + path.string() + "': " + e.what()}};
+  } catch (const std::filesystem::filesystem_error &e) {
+    return ResultType{Error{"Could not open stream for file '" + path.string() + "': " + e.what()}};
   }
 }
 
-template<typename F>
-auto withInputStream(
-    const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
+template<typename F> auto withInputStream(const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
   return withStream<std::ifstream>(path, mode, function);
 }
 
-template<typename F>
-auto withInputStream(const std::filesystem::path &path, const F &function) {
+template<typename F> auto withInputStream(const std::filesystem::path &path, const F &function) {
   return withStream<std::ifstream>(path, std::ios_base::in, function);
 }
 
-template<typename F>
-auto withOutputStream(
-    const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
+template<typename F> auto withOutputStream(const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
   return withStream<std::ofstream>(path, mode, function);
 }
 
-template<typename F>
-auto withOutputStream(const std::filesystem::path &path, const F &function) {
+template<typename F> auto withOutputStream(const std::filesystem::path &path, const F &function) {
   return withStream<std::ofstream>(path, std::ios_base::out, function);
 }
 
@@ -107,15 +101,11 @@ Result<bool> createDirectory(const std::filesystem::path &path);
 
 Result<bool> deleteFile(const std::filesystem::path &path);
 
-Result<void> copyFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath);
+Result<void> copyFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath);
 
-Result<void> moveFile(
-    const std::filesystem::path &sourcePath, const std::filesystem::path &destPath);
+Result<void> moveFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath);
 
-std::filesystem::path resolvePath(
-    const std::vector<std::filesystem::path> &searchPaths,
-    const std::filesystem::path &path);
+std::filesystem::path resolvePath(const std::vector<std::filesystem::path> &searchPaths, const std::filesystem::path &path);
 
 } // namespace Disk
 } // namespace TrenchBroom::IO

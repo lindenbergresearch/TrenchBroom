@@ -21,11 +21,13 @@
 
 #include <QWidget>
 
+
 class QToolButton;
 
 namespace TrenchBroom {
 namespace View {
 class PopupWindow;
+
 
 class PopupButton : public QWidget {
 Q_OBJECT
@@ -35,8 +37,7 @@ private:
   QIcon checkedIcon, unCheckedIcon;
 
 public:
-  explicit PopupButton(
-      const QString &caption = "", QWidget *parent = nullptr, const QIcon &icon = QIcon{});
+  explicit PopupButton(const QString &caption = "", QWidget *parent = nullptr, const QIcon &icon = QIcon{});
 
   QWidget *GetPopupWindow() const;
 

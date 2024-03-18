@@ -41,13 +41,21 @@ public:
 
 private:
   std::vector<Model::CompilationProfile> parseProfiles(const EL::Value &value) const;
+
   Model::CompilationProfile parseProfile(const EL::Value &value) const;
+
   std::vector<Model::CompilationTask> parseTasks(const EL::Value &value) const;
+
   Model::CompilationTask parseTask(const EL::Value &value) const;
+
   Model::CompilationExportMap parseExportTask(const EL::Value &value) const;
+
   Model::CompilationCopyFiles parseCopyTask(const EL::Value &value) const;
+
   Model::CompilationRenameFile parseRenameTask(const EL::Value &value) const;
+
   Model::CompilationDeleteFiles parseDeleteTask(const EL::Value &value) const;
+
   Model::CompilationRunTool parseToolTask(const EL::Value &value) const;
 
 deleteCopyAndMove(CompilationConfigParser);

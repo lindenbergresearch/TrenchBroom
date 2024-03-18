@@ -40,12 +40,15 @@
 #include <memory>
 #include <vector>
 
+
 class QTextStream;
+
 
 class QFileSystemWatcher;
 
 namespace TrenchBroom {
 class Color;
+
 
 class PreferenceManager : public QObject {
 Q_OBJECT
@@ -62,8 +65,7 @@ public:
 public:
   static PreferenceManager &instance();
 
-  template<typename T>
-  static void createInstance() {
+  template<typename T> static void createInstance() {
     m_instance = std::make_unique<T>();
     m_initialized = false;
   }
@@ -73,10 +75,9 @@ public:
     m_initialized = false;
   }
 
-  template<typename T>
-  Preference<T> &dynamicPreference(const std::filesystem::path &path, T &&defaultValue) {
+  template<typename T> Preference<T> &dynamicPreference(const std::filesystem::path &path, T &&defaultValue) {
     auto it = m_dynamicPreferences.find(path);
-    if (it==std::end(m_dynamicPreferences)) {
+    if (it == std::end(m_dynamicPreferences)) {
       bool success = false;
       std::tie(it, success) = m_dynamicPreferences.emplace(
           path, std::make_unique<Preference<T>>(path, std::forward<T>(defaultValue)));
@@ -87,17 +88,14 @@ public:
     const auto &prefPtr = it->second;
     auto *prefBase = prefPtr.get();
     auto *pref = dynamic_cast<Preference<T> *>(prefBase);
-    ensure(
-        pref!=nullptr,
-        ("Preference " + path.string() + " must be of the expected type").c_str());
+    ensure(pref != nullptr, ("Preference " + path.string() + " must be of the expected type").c_str());
     return *pref;
   }
 
   /**
    * Public API for getting the value of a preference.
    */
-  template<typename T>
-  const T &get(Preference<T> &preference) {
+  template<typename T> const T &get(Preference<T> &preference) {
     validatePreference(preference);
     return preference.value();
   }
@@ -105,10 +103,9 @@ public:
   /**
    * Public API for setting the value of a preference.
    */
-  template<typename T>
-  bool set(Preference<T> &preference, const T &value) {
+  template<typename T> bool set(Preference<T> &preference, const T &value) {
     const T previousValue = get(preference);
-    if (previousValue==value) {
+    if (previousValue == value) {
       return false;
     }
 
@@ -123,8 +120,7 @@ public:
     return true;
   }
 
-  template<typename T>
-  void resetToDefault(Preference<T> &preference) {
+  template<typename T> void resetToDefault(Preference<T> &preference) {
     set(preference, preference.defaultValue());
   }
 
@@ -142,12 +138,12 @@ private:
   virtual void savePreference(PreferenceBase &) = 0;
 };
 
+
 class AppPreferenceManager : public PreferenceManager {
 Q_OBJECT
 private:
   using UnsavedPreferences = kdl::vector_set<PreferenceBase *>;
-  using DynamicPreferences =
-      std::map<std::filesystem::path, std::unique_ptr<PreferenceBase>>;
+  using DynamicPreferences = std::map<std::filesystem::path, std::unique_ptr<PreferenceBase>>;
 
   QString m_preferencesFilePath;
   bool m_saveInstantly;
@@ -205,8 +201,8 @@ private:
 deleteCopyAndMove(AppPreferenceManager);
 };
 
-template<typename T>
-const T &pref(Preference<T> &preference) {
+
+template<typename T> const T &pref(Preference<T> &preference) {
   PreferenceManager &prefs = PreferenceManager::instance();
   return prefs.get(preference);
 }
@@ -214,26 +210,24 @@ const T &pref(Preference<T> &preference) {
 /**
  * Sets a preference, and saves the change immediately.
  */
-template<typename T>
-void setPref(Preference<T> &preference, const T &value) {
+template<typename T> void setPref(Preference<T> &preference, const T &value) {
   PreferenceManager &prefs = PreferenceManager::instance();
   prefs.set(preference, value);
   prefs.saveChanges();
 }
 
+
 /**
  * Temporarily sets a preference and resets it when destroyed.
  * Both changes are saved immediately.
  */
-template<typename T>
-class TemporarilySetPref {
+template<typename T> class TemporarilySetPref {
 private:
   Preference<T> &m_preference;
   T m_originalValue;
 
 public:
-  TemporarilySetPref(Preference<T> &preference, const T &value)
-      : m_preference{preference}, m_originalValue{pref(m_preference)} {
+  TemporarilySetPref(Preference<T> &preference, const T &value) : m_preference{preference}, m_originalValue{pref(m_preference)} {
     setPref(m_preference, value);
   }
 
@@ -243,8 +237,7 @@ public:
 /**
  * Deduction guide.
  */
-template<typename T>
-TemporarilySetPref(Preference<T> &preference, const T &value) -> TemporarilySetPref<T>;
+template<typename T> TemporarilySetPref(Preference<T> &preference, const T &value) -> TemporarilySetPref<T>;
 
 /**
  * Toggles a bool preference, and saves the change immediately.
@@ -254,8 +247,7 @@ void togglePref(Preference<bool> &preference);
 /**
  * Resets a preference to its default value, and saves the change immediately.
  */
-template<typename T>
-void resetPref(Preference<T> &preference) {
+template<typename T> void resetPref(Preference<T> &preference) {
   PreferenceManager &prefs = PreferenceManager::instance();
   prefs.resetToDefault(preference);
   prefs.saveChanges();
@@ -273,15 +265,10 @@ struct LockFileError {
 };
 } // namespace PreferenceErrors
 
-using ReadPreferencesResult = Result<
-    std::map<std::filesystem::path, QJsonValue>, // Success case
-    PreferenceErrors::NoFilePresent,
-    PreferenceErrors::JsonParseError,
-    PreferenceErrors::FileAccessError,
-    PreferenceErrors::LockFileError>;
+using ReadPreferencesResult = Result<std::map<std::filesystem::path, QJsonValue>, // Success case
+    PreferenceErrors::NoFilePresent, PreferenceErrors::JsonParseError, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
 
-using WritePreferencesResult =
-    Result<void, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
+using WritePreferencesResult = Result<void, PreferenceErrors::FileAccessError, PreferenceErrors::LockFileError>;
 
 QString preferenceFilePath();
 
@@ -289,11 +276,9 @@ ReadPreferencesResult readPreferencesFromFile(const QString &path);
 
 ReadPreferencesResult readPreferences();
 
-WritePreferencesResult writePreferencesToFile(
-    const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs);
+WritePreferencesResult writePreferencesToFile(const QString &path, const std::map<std::filesystem::path, QJsonValue> &prefs);
 
 ReadPreferencesResult parsePreferencesFromJson(const QByteArray &jsonData);
 
-QByteArray writePreferencesToJson(
-    const std::map<std::filesystem::path, QJsonValue> &prefs);
+QByteArray writePreferencesToJson(const std::map<std::filesystem::path, QJsonValue> &prefs);
 } // namespace TrenchBroom

@@ -23,9 +23,12 @@
 
 #include "View/CompilationRun.h"
 
+
 class QLabel;
 
+
 class QPushButton;
+
 
 class QTextEdit;
 
@@ -33,7 +36,9 @@ namespace TrenchBroom {
 namespace View {
 class CompilationProfileManager;
 
+
 class MapFrame;
+
 
 class CompilationDialog : public QDialog {
 Q_OBJECT

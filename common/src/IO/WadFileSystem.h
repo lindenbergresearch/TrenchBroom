@@ -26,7 +26,10 @@
 
 namespace TrenchBroom::IO {
 class FileSystem;
+
+
 class OwningBufferFile;
+
 
 class WadFileSystem : public ImageFileSystem<OwningBufferFile> {
 public:

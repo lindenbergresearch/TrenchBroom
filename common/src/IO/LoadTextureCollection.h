@@ -41,13 +41,11 @@ struct TextureConfig;
 namespace TrenchBroom::IO {
 class FileSystem;
 
-Result<std::vector<std::filesystem::path>> findTextureCollections(
-    const FileSystem &gameFS, const Model::TextureConfig &textureConfig);
+
+Result<std::vector<std::filesystem::path>> findTextureCollections(const FileSystem &gameFS, const Model::TextureConfig &textureConfig);
 
 Result<Assets::TextureCollection> loadTextureCollection(
-    const std::filesystem::path &path,
-    const FileSystem &gameFS,
-    const Model::TextureConfig &textureConfig,
-    Logger &logger);
+    const std::filesystem::path &path, const FileSystem &gameFS, const Model::TextureConfig &textureConfig, Logger &logger
+);
 
 } // namespace TrenchBroom::IO

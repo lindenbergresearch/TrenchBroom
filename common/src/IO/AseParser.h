@@ -37,6 +37,8 @@ class Logger;
 
 namespace Assets {
 class EntityModel;
+
+
 class Texture;
 } // namespace Assets
 
@@ -67,6 +69,7 @@ public:
 private:
   Token emitToken() override;
 };
+
 
 class AseParser : public EntityModelParser, private Parser<AseToken::Type> {
 private:
@@ -127,55 +130,72 @@ private: // parsing
 
   // MATERIALS
   void parseMaterialList(Logger &logger, std::vector<std::filesystem::path> &paths);
-  void parseMaterialListMaterialCount(
-      Logger &logger, std::vector<std::filesystem::path> &paths);
-  void parseMaterialListMaterial(
-      Logger &logger, std::vector<std::filesystem::path> &paths);
-  void parseMaterialListMaterialName(Logger &logger, std::string &name);
-  void parseMaterialListMaterialMapDiffuse(Logger &logger, std::filesystem::path &path);
-  void parseMaterialListMaterialMapDiffuseBitmap(
-      Logger &logger, std::filesystem::path &path);
 
-  void parseGeomObject(
-      Logger &logger,
-      GeomObject &geomObject,
-      const std::vector<std::filesystem::path> &materialPaths);
+  void parseMaterialListMaterialCount(Logger &logger, std::vector<std::filesystem::path> &paths);
+
+  void parseMaterialListMaterial(Logger &logger, std::vector<std::filesystem::path> &paths);
+
+  void parseMaterialListMaterialName(Logger &logger, std::string &name);
+
+  void parseMaterialListMaterialMapDiffuse(Logger &logger, std::filesystem::path &path);
+
+  void parseMaterialListMaterialMapDiffuseBitmap(Logger &logger, std::filesystem::path &path);
+
+  void parseGeomObject(Logger &logger, GeomObject &geomObject, const std::vector<std::filesystem::path> &materialPaths);
+
   void parseGeomObjectNodeName(Logger &logger, GeomObject &geomObject);
-  void parseGeomObjectMaterialRef(
-      Logger &logger, GeomObject &geomObject, size_t materialCount);
+
+  void parseGeomObjectMaterialRef(Logger &logger, GeomObject &geomObject, size_t materialCount);
+
   void parseGeomObjectMesh(Logger &logger, Mesh &mesh);
+
   void parseGeomObjectMeshNumVertex(Logger &logger, std::vector<vm::vec3f> &vertices);
+
   void parseGeomObjectMeshVertexList(Logger &logger, std::vector<vm::vec3f> &vertices);
+
   void parseGeomObjectMeshVertex(Logger &logger, std::vector<vm::vec3f> &vertices);
+
   void parseGeomObjectMeshNumFaces(Logger &logger, std::vector<MeshFace> &faces);
+
   void parseGeomObjectMeshFaceList(Logger &logger, std::vector<MeshFace> &faces);
+
   void parseGeomObjectMeshFace(Logger &logger, std::vector<MeshFace> &faces);
+
   void parseGeomObjectMeshNumTVertex(Logger &logger, std::vector<vm::vec2f> &uv);
+
   void parseGeomObjectMeshTVertexList(Logger &logger, std::vector<vm::vec2f> &uv);
+
   void parseGeomObjectMeshTVertex(Logger &logger, std::vector<vm::vec2f> &uv);
+
   void parseGeomObjectMeshTFaceList(Logger &logger, std::vector<MeshFace> &faces);
+
   void parseGeomObjectMeshTFace(Logger &logger, std::vector<MeshFace> &faces);
 
   void parseBlock(const std::map<std::string, std::function<void(void)>> &handlers);
 
   void expectDirective(const std::string &name);
+
   void skipDirective(const std::string &name);
+
   void skipDirective();
 
   void expectArgumentName(const std::string &expected);
 
   void expectSizeArgument(size_t expected);
+
   size_t parseSizeArgument();
+
   vm::vec3f parseVecArgument();
 
   TokenNameMap tokenNames() const override;
 
 private: // model construction
-  std::unique_ptr<Assets::EntityModel> buildModel(
-      Logger &logger, const Scene &scene) const;
+  std::unique_ptr<Assets::EntityModel> buildModel(Logger &logger, const Scene &scene) const;
+
   bool checkIndices(Logger &logger, const MeshFace &face, const Mesh &mesh) const;
 
   Assets::Texture loadTexture(Logger &logger, const std::filesystem::path &path) const;
+
   std::filesystem::path fixTexturePath(Logger &logger, std::filesystem::path path) const;
 };
 } // namespace IO

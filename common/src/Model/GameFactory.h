@@ -31,18 +31,24 @@
 namespace TrenchBroom {
 class Logger;
 
-template<typename T>
-class Preference;
+
+template<typename T> class Preference;
 } // namespace TrenchBroom
 
 namespace TrenchBroom::IO {
 class Path;
+
+
 class WritableVirtualFileSystem;
 } // namespace TrenchBroom::IO
 
 namespace TrenchBroom::Model {
 struct CompilationConfig;
+
+
 class Game;
+
+
 struct GameConfig;
 struct GameEngineConfig;
 
@@ -50,6 +56,7 @@ struct GamePathConfig {
   std::vector<std::filesystem::path> gameConfigSearchDirs;
   std::filesystem::path userGameDir;
 };
+
 
 class GameFactory {
 private:
@@ -98,10 +105,8 @@ public:
    * @param gameName the game for which the configurations should be saved
    * @param gameEngineConfig new config to save
    */
-  void saveGameEngineConfig(
-      const std::string &gameName,
-      const GameEngineConfig &gameEngineConfig,
-      Logger &logger);
+  void saveGameEngineConfig(const std::string &gameName, const GameEngineConfig &gameEngineConfig, Logger &logger);
+
   /**
    * Saves the compilation configurations for the game with the given name.
    *
@@ -109,30 +114,30 @@ public:
    * @param compilationConfig new config to save
    * @param logger the logger
    */
-  void saveCompilationConfig(
-      const std::string &gameName,
-      const CompilationConfig &compilationConfig,
-      Logger &logger);
+  void saveCompilationConfig(const std::string &gameName, const CompilationConfig &compilationConfig, Logger &logger);
 
   const std::vector<std::string> &gameList() const;
+
   size_t gameCount() const;
+
   std::shared_ptr<Game> createGame(const std::string &gameName, Logger &logger);
 
   std::vector<std::string> fileFormats(const std::string &gameName) const;
-  std::filesystem::path iconPath(const std::string &gameName) const;
-  std::filesystem::path gamePath(const std::string &gameName) const;
-  bool setGamePath(const std::string &gameName, const std::filesystem::path &gamePath);
-  bool isGamePathPreference(
-      const std::string &gameName, const std::filesystem::path &prefPath) const;
 
-  std::filesystem::path compilationToolPath(
-      const std::string &gameName, const std::string &toolName) const;
-  bool setCompilationToolPath(
-      const std::string &gameName,
-      const std::string &toolName,
-      const std::filesystem::path &gamePath);
+  std::filesystem::path iconPath(const std::string &gameName) const;
+
+  std::filesystem::path gamePath(const std::string &gameName) const;
+
+  bool setGamePath(const std::string &gameName, const std::filesystem::path &gamePath);
+
+  bool isGamePathPreference(const std::string &gameName, const std::filesystem::path &prefPath) const;
+
+  std::filesystem::path compilationToolPath(const std::string &gameName, const std::string &toolName) const;
+
+  bool setCompilationToolPath(const std::string &gameName, const std::string &toolName, const std::filesystem::path &gamePath);
 
   GameConfig &gameConfig(const std::string &gameName);
+
   const GameConfig &gameConfig(const std::string &gameName) const;
 
   /**
@@ -143,8 +148,7 @@ public:
    * the game name. If no map format comment is found or the format is unknown,
    * MapFormat::Unknown is returned as the map format.
    */
-  Result<std::pair<std::string, MapFormat>> detectGame(
-      const std::filesystem::path &path) const;
+  Result<std::pair<std::string, MapFormat>> detectGame(const std::filesystem::path &path) const;
 
   /**
    * Returns the directory for user game configurations.
@@ -156,15 +160,19 @@ public:
 
 private:
   GameFactory();
+
   Result<void> initializeFileSystem(const GamePathConfig &gamePathConfig);
+
   Result<std::vector<std::string>> loadGameConfigs();
+
   Result<void> loadGameConfig(const std::filesystem::path &path);
+
   void loadCompilationConfig(GameConfig &gameConfig);
+
   void loadGameEngineConfig(GameConfig &gameConfig);
 
-  void writeCompilationConfig(
-      GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger);
-  void writeGameEngineConfig(
-      GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger);
+  void writeCompilationConfig(GameConfig &gameConfig, CompilationConfig compilationConfig, Logger &logger);
+
+  void writeGameEngineConfig(GameConfig &gameConfig, GameEngineConfig gameEngineConfig, Logger &logger);
 };
 } // namespace TrenchBroom::Model

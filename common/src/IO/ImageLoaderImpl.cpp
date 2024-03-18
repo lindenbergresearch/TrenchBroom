@@ -37,24 +37,20 @@ void InitFreeImage::initialize() {
   static InitFreeImage initFreeImage;
 }
 
-ImageLoaderImpl::ImageLoaderImpl(
-    const ImageLoader::Format format, const std::filesystem::path &path)
-    : m_stream(nullptr), m_bitmap(nullptr) {
+ImageLoaderImpl::ImageLoaderImpl(const ImageLoader::Format format, const std::filesystem::path &path) : m_stream(nullptr), m_bitmap(nullptr) {
   InitFreeImage::initialize();
   const FREE_IMAGE_FORMAT fifFormat = translateFormat(format);
-  if (fifFormat==FIF_UNKNOWN) {
+  if (fifFormat == FIF_UNKNOWN) {
     throw FileFormatException("Unknown image format");
   }
 
   m_bitmap = FreeImage_Load(fifFormat, path.string().c_str());
 }
 
-ImageLoaderImpl::ImageLoaderImpl(
-    const ImageLoader::Format format, const char *begin, const char *end)
-    : m_stream(nullptr), m_bitmap(nullptr) {
+ImageLoaderImpl::ImageLoaderImpl(const ImageLoader::Format format, const char *begin, const char *end) : m_stream(nullptr), m_bitmap(nullptr) {
   InitFreeImage::initialize();
   const FREE_IMAGE_FORMAT fifFormat = translateFormat(format);
-  if (fifFormat==FIF_UNKNOWN) {
+  if (fifFormat == FIF_UNKNOWN) {
     throw FileFormatException("Unknown image format");
   }
 
@@ -67,11 +63,11 @@ ImageLoaderImpl::ImageLoaderImpl(
 }
 
 ImageLoaderImpl::~ImageLoaderImpl() {
-  if (m_bitmap!=nullptr) {
+  if (m_bitmap != nullptr) {
     FreeImage_Unload(m_bitmap);
     m_bitmap = nullptr;
   }
-  if (m_stream!=nullptr) {
+  if (m_stream != nullptr) {
     FreeImage_CloseMemory(m_stream);
     m_stream = nullptr;
   }
@@ -102,27 +98,27 @@ size_t ImageLoaderImpl::scanWidth() const {
 }
 
 bool ImageLoaderImpl::hasPalette() const {
-  return FreeImage_GetPalette(m_bitmap)!=nullptr;
+  return FreeImage_GetPalette(m_bitmap) != nullptr;
 }
 
 bool ImageLoaderImpl::hasIndices() const {
-  return FreeImage_GetColorType(m_bitmap)==FIC_PALETTE;
+  return FreeImage_GetColorType(m_bitmap) == FIC_PALETTE;
 }
 
 bool ImageLoaderImpl::hasPixels() const {
-  return static_cast<bool>(FreeImage_HasPixels(m_bitmap)==TRUE);
+  return static_cast<bool>(FreeImage_HasPixels(m_bitmap) == TRUE);
 }
 
 std::vector<unsigned char> ImageLoaderImpl::loadPalette() const {
   assert(hasPalette());
   const RGBQUAD *pal = FreeImage_GetPalette(m_bitmap);
-  if (pal==nullptr) {
+  if (pal == nullptr) {
     return {};
   }
 
   auto result = std::vector<unsigned char>();
-  result.reserve(paletteSize()*3);
-  for (size_t i = 0; i < paletteSize(); ++i) {
+  result.reserve(paletteSize() * 3);
+  for (size_t i = 0; i < paletteSize(); ++ i) {
     result.push_back(static_cast<unsigned char>(pal[i].rgbRed));
     result.push_back(static_cast<unsigned char>(pal[i].rgbGreen));
     result.push_back(static_cast<unsigned char>(pal[i].rgbBlue));
@@ -134,20 +130,19 @@ std::vector<unsigned char> ImageLoaderImpl::loadPalette() const {
 std::vector<unsigned char> ImageLoaderImpl::loadIndices() const {
   assert(hasIndices());
 
-  auto result = std::vector<unsigned char>(width()*height());
-  for (unsigned y = 0; y < height(); ++y) {
-    for (unsigned x = 0; x < width(); ++x) {
+  auto result = std::vector<unsigned char>(width() * height());
+  for (unsigned y = 0; y < height(); ++ y) {
+    for (unsigned x = 0; x < width(); ++ x) {
       BYTE index = 0;
-      assertResult(FreeImage_GetPixelIndex(m_bitmap, x, y, &index)==TRUE);
-      result[(height() - y - 1)*width() + x] = static_cast<unsigned char>(index);
+      assertResult(FreeImage_GetPixelIndex(m_bitmap, x, y, &index) == TRUE);
+      result[(height() - y - 1) * width() + x] = static_cast<unsigned char>(index);
     }
   }
 
   return result;
 }
 
-std::vector<unsigned char> ImageLoaderImpl::loadPixels(
-    const ImageLoader::PixelFormat format) const {
+std::vector<unsigned char> ImageLoaderImpl::loadPixels(const ImageLoader::PixelFormat format) const {
   assert(hasPixels());
   const size_t pSize = pixelSize(format);
   if (hasIndices()) {
@@ -158,18 +153,18 @@ std::vector<unsigned char> ImageLoaderImpl::loadPixels(
 }
 
 std::vector<unsigned char> ImageLoaderImpl::loadIndexedPixels(const size_t pSize) const {
-  assert(pSize==3);
+  assert(pSize == 3);
   const RGBQUAD *pal = FreeImage_GetPalette(m_bitmap);
-  ensure(pal!=nullptr, "pal is null");
+  ensure(pal != nullptr, "pal is null");
 
-  std::vector<unsigned char> result(width()*height()*pSize);
-  for (unsigned y = 0; y < height(); ++y) {
-    for (unsigned x = 0; x < width(); ++x) {
+  std::vector<unsigned char> result(width() * height() * pSize);
+  for (unsigned y = 0; y < height(); ++ y) {
+    for (unsigned x = 0; x < width(); ++ x) {
       BYTE paletteIndex = 0;
-      assertResult(FreeImage_GetPixelIndex(m_bitmap, x, y, &paletteIndex)==TRUE);
+      assertResult(FreeImage_GetPixelIndex(m_bitmap, x, y, &paletteIndex) == TRUE);
       assert(paletteIndex < paletteSize());
 
-      const size_t pixelIndex = ((height() - y - 1)*width() + x)*pSize;
+      const size_t pixelIndex = ((height() - y - 1) * width() + x) * pSize;
       result[pixelIndex + 0] = static_cast<unsigned char>(pal[paletteIndex].rgbRed);
       result[pixelIndex + 1] = static_cast<unsigned char>(pal[paletteIndex].rgbGreen);
       result[pixelIndex + 2] = static_cast<unsigned char>(pal[paletteIndex].rgbBlue);
@@ -179,13 +174,13 @@ std::vector<unsigned char> ImageLoaderImpl::loadIndexedPixels(const size_t pSize
 }
 
 std::vector<unsigned char> ImageLoaderImpl::loadPixels(const size_t pSize) const {
-  std::vector<unsigned char> result(width()*height()*pSize);
-  for (unsigned y = 0; y < height(); ++y) {
-    for (unsigned x = 0; x < width(); ++x) {
+  std::vector<unsigned char> result(width() * height() * pSize);
+  for (unsigned y = 0; y < height(); ++ y) {
+    for (unsigned x = 0; x < width(); ++ x) {
       RGBQUAD pixel;
-      assertResult(FreeImage_GetPixelColor(m_bitmap, x, y, &pixel)==TRUE);
+      assertResult(FreeImage_GetPixelColor(m_bitmap, x, y, &pixel) == TRUE);
 
-      const size_t pixelIndex = ((height() - y - 1)*width() + x)*pSize;
+      const size_t pixelIndex = ((height() - y - 1) * width() + x) * pSize;
       result[pixelIndex + 0] = static_cast<unsigned char>(pixel.rgbRed);
       result[pixelIndex + 1] = static_cast<unsigned char>(pixel.rgbGreen);
       result[pixelIndex + 2] = static_cast<unsigned char>(pixel.rgbBlue);

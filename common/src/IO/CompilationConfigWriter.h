@@ -44,6 +44,7 @@ public:
 
 private:
   EL::Value writeProfiles(const Model::CompilationConfig &config) const;
+
   EL::Value writeProfile(const Model::CompilationProfile &profile) const;
 
   EL::Value writeTasks(const Model::CompilationProfile &profile) const;

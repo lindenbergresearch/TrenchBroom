@@ -45,6 +45,7 @@ struct TokenizerStateAndSource {
   const char *end;
 };
 
+
 class TokenizerBase {
 protected:
   const char *m_begin;
@@ -54,15 +55,10 @@ protected:
   TokenizerState m_state;
 
 public:
-  TokenizerBase(
-      const char *begin,
-      const char *end,
-      std::string_view escapableChars,
-      const char escapeChar,
-      const size_t line,
-      const size_t column)
-      : m_begin(begin), m_end(end), m_escapableChars(escapableChars), m_escapeChar(escapeChar),
-        m_state{begin, line, column, false} {
+  TokenizerBase(const char *begin, const char *end, std::string_view escapableChars, const char escapeChar, const size_t line, const size_t column) :
+      m_begin(begin), m_end(end), m_escapableChars(escapableChars), m_escapeChar(escapeChar), m_state{
+      begin, line, column, false
+  } {
   }
 
   void replaceState(std::string_view str) {
@@ -75,6 +71,7 @@ public:
   TokenizerStateAndSource snapshotStateAndSource() const {
     return {m_state, m_begin, m_end};
   }
+
   void restoreStateAndSource(const TokenizerStateAndSource &snapshot) {
     m_state = snapshot.state;
     m_begin = snapshot.begin;
@@ -96,8 +93,7 @@ protected:
   }
 
   bool escaped() const {
-    return !eof() && m_state.escaped
-        && m_escapableChars.find(curChar())!=std::string::npos;
+    return ! eof() && m_state.escaped && m_escapableChars.find(curChar()) != std::string::npos;
   }
 
   std::string unescape(std::string_view str) const {
@@ -114,7 +110,7 @@ protected:
   }
 
   void advance(size_t offset) {
-    for (size_t i = 0; i < offset; ++i) {
+    for (size_t i = 0; i < offset; ++ i) {
       advance();
     }
   }
@@ -124,26 +120,26 @@ protected:
 
     switch (curChar()) {
     case '\r':
-      if (lookAhead()=='\n') {
-        ++m_state.column;
+      if (lookAhead() == '\n') {
+        ++ m_state.column;
         break;
       }
       // handle carriage return without consecutive line feed
       // by falling through into the line feed case
       switchFallthrough();
-    case '\n':++m_state.line;
+    case '\n':++ m_state.line;
       m_state.column = 1;
       m_state.escaped = false;
       break;
-    default:++m_state.column;
-      if (curChar()==m_escapeChar) {
-        m_state.escaped = !m_state.escaped;
+    default:++ m_state.column;
+      if (curChar() == m_escapeChar) {
+        m_state.escaped = ! m_state.escaped;
       } else {
         m_state.escaped = false;
       }
       break;
     }
-    ++m_state.cur;
+    ++ m_state.cur;
   }
 
   void errorIfEof() const {
@@ -182,8 +178,8 @@ public:
   }
 };
 
-template<typename TokenType>
-class Tokenizer : public TokenizerBase {
+
+template<typename TokenType> class Tokenizer : public TokenizerBase {
 public:
   using Token = TokenTemplate<TokenType>;
 
@@ -194,8 +190,7 @@ private:
     TokenizerState m_snapshot;
 
   public:
-    explicit SaveAndRestoreState(TokenizerState &target)
-        : m_target(target), m_snapshot(target) {
+    explicit SaveAndRestoreState(TokenizerState &target) : m_target(target), m_snapshot(target) {
     }
 
     ~SaveAndRestoreState() { m_target = m_snapshot; }
@@ -208,14 +203,8 @@ public:
   }
 
 public:
-  Tokenizer(
-      std::string_view str,
-      std::string_view escapableChars,
-      const char escapeChar,
-      const size_t line = 1,
-      const size_t column = 1)
-      : TokenizerBase{
-      str.data(), str.data() + str.size(), escapableChars, escapeChar, line, column} {
+  Tokenizer(std::string_view str, std::string_view escapableChars, const char escapeChar, const size_t line = 1, const size_t column = 1) :
+      TokenizerBase{str.data(), str.data() + str.size(), escapableChars, escapeChar, line, column} {
   }
 
   virtual ~Tokenizer() = default;
@@ -233,7 +222,7 @@ public:
     return nextToken(skipTokens);
   }
 
-  void skipToken(const TokenType skipTokens = ~0u) {
+  void skipToken(const TokenType skipTokens = ~ 0u) {
     if (peekToken().hasType(skipTokens)) {
       nextToken();
     }
@@ -255,7 +244,7 @@ public:
     do {
       token = nextToken();
       endPos = std::end(token);
-    } while (peekToken().hasType(delimiterType)==0 && !eof());
+    } while (peekToken().hasType(delimiterType) == 0 && ! eof());
 
     return std::string_view(startPos, static_cast<size_t>(endPos - startPos));
   }
@@ -265,7 +254,7 @@ public:
       advance();
     }
 
-    if (curChar()=='"') {
+    if (curChar() == '"') {
       advance();
       const char *startPos = curPos();
       const char *endPos = readQuotedString();
@@ -280,12 +269,12 @@ public:
   std::string unescapeString(std::string_view str) const { return unescape(str); }
 
   double progress() const {
-    if (length()==0) {
+    if (length() == 0) {
       return 0.0;
     }
     const auto cur = static_cast<double>(offset(curPos()));
     const auto len = static_cast<double>(length());
-    return cur/len;
+    return cur / len;
   }
 
   size_t length() const { return static_cast<size_t>(m_end - m_begin); }
@@ -319,15 +308,15 @@ protected:
   bool isEscaped() const { return escaped(); }
 
   const char *readInteger(std::string_view delims) {
-    if (curChar()!='+' && curChar()!='-' && !isDigit(curChar())) {
+    if (curChar() != '+' && curChar() != '-' && ! isDigit(curChar())) {
       return nullptr;
     }
 
     const TokenizerState previousState = m_state;
-    if (curChar()=='+' || curChar()=='-') {
+    if (curChar() == '+' || curChar() == '-') {
       advance();
     }
-    while (!eof() && isDigit(curChar())) {
+    while (! eof() && isDigit(curChar())) {
       advance();
     }
     if (eof() || isAnyOf(curChar(), delims)) {
@@ -339,24 +328,24 @@ protected:
   }
 
   const char *readDecimal(std::string_view delims) {
-    if (curChar()!='+' && curChar()!='-' && curChar()!='.' && !isDigit(curChar())) {
+    if (curChar() != '+' && curChar() != '-' && curChar() != '.' && ! isDigit(curChar())) {
       return nullptr;
     }
 
     const TokenizerState previousState = m_state;
-    if (curChar()!='.') {
+    if (curChar() != '.') {
       advance();
       readDigits();
     }
 
-    if (curChar()=='.') {
+    if (curChar() == '.') {
       advance();
       readDigits();
     }
 
-    if (curChar()=='e' || curChar()=='E') {
+    if (curChar() == 'e' || curChar() == 'E') {
       advance();
-      if (curChar()=='+' || curChar()=='-' || isDigit(curChar())) {
+      if (curChar() == '+' || curChar() == '-' || isDigit(curChar())) {
         advance();
         readDigits();
       }
@@ -372,36 +361,33 @@ protected:
 
 private:
   void readDigits() {
-    while (!eof() && isDigit(curChar())) {
+    while (! eof() && isDigit(curChar())) {
       advance();
     }
   }
 
 protected:
   const char *readUntil(std::string_view delims) {
-    if (!eof()) {
+    if (! eof()) {
       do {
         advance();
-      } while (!eof() && !isAnyOf(curChar(), delims));
+      } while (! eof() && ! isAnyOf(curChar(), delims));
     }
     return curPos();
   }
 
   const char *readWhile(std::string_view allow) {
-    while (!eof() && isAnyOf(curChar(), allow)) {
+    while (! eof() && isAnyOf(curChar(), allow)) {
       advance();
     }
     return curPos();
   }
 
-  const char *readQuotedString(
-      const char delim = '"', std::string_view hackDelims = std::string_view()) {
-    while (!eof() && (curChar()!=delim || isEscaped())) {
+  const char *readQuotedString(const char delim = '"', std::string_view hackDelims = std::string_view()) {
+    while (! eof() && (curChar() != delim || isEscaped())) {
       // This is a hack to handle paths with trailing backslashes that get misinterpreted
       // as escaped double quotation marks.
-      if (
-          !hackDelims.empty() && curChar()=='"' && isEscaped()
-              && hackDelims.find(lookAhead())!=std::string_view::npos) {
+      if (! hackDelims.empty() && curChar() == '"' && isEscaped() && hackDelims.find(lookAhead()) != std::string_view::npos) {
         resetEscaped();
         break;
       }
@@ -414,25 +400,25 @@ protected:
   }
 
   const char *discardWhile(std::string_view allow) {
-    while (!eof() && isAnyOf(curChar(), allow)) {
+    while (! eof() && isAnyOf(curChar(), allow)) {
       advance();
     }
     return curPos();
   }
 
   const char *discardUntil(std::string_view delims) {
-    while (!eof() && !isAnyOf(curChar(), delims)) {
+    while (! eof() && ! isAnyOf(curChar(), delims)) {
       advance();
     }
     return curPos();
   }
 
   bool matchesPattern(std::string_view pattern) const {
-    if (pattern.empty() || isEscaped() || curChar()!=pattern[0]) {
+    if (pattern.empty() || isEscaped() || curChar() != pattern[0]) {
       return false;
     }
-    for (size_t i = 1; i < pattern.size(); ++i) {
-      if (lookAhead(i)!=pattern[i]) {
+    for (size_t i = 1; i < pattern.size(); ++ i) {
+      if (lookAhead(i) != pattern[i]) {
         return false;
       }
     }
@@ -444,7 +430,7 @@ protected:
       return curPos();
     }
 
-    while (!eof() && !matchesPattern(pattern)) {
+    while (! eof() && ! matchesPattern(pattern)) {
       advance();
     }
 
@@ -456,9 +442,9 @@ protected:
   }
 
   const char *discard(std::string_view str) {
-    for (size_t i = 0; i < str.size(); ++i) {
+    for (size_t i = 0; i < str.size(); ++ i) {
       const char c = lookAhead(i);
-      if (c==0 || c!=str[i]) {
+      if (c == 0 || c != str[i]) {
         return nullptr;
       }
     }
@@ -470,7 +456,7 @@ protected:
 protected:
   bool isAnyOf(const char c, std::string_view allow) const {
     for (const auto &a : allow) {
-      if (c==a) {
+      if (c == a) {
         return true;
       }
     }

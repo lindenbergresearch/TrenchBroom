@@ -36,7 +36,9 @@ class MapDocument;
 namespace Renderer {
 class RenderContext;
 
+
 class VboManager;
+
 
 class PointGuideRenderer : public DirectRenderable {
 private:

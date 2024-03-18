@@ -31,9 +31,12 @@ namespace TrenchBroom {
 namespace Renderer {
 class ActiveShader;
 
+
 class RenderContext;
 
+
 class VboManager;
+
 
 class PointHandleRenderer : public DirectRenderable {
 private:
@@ -57,8 +60,7 @@ private:
 
   void doRender(RenderContext &renderContext) override;
 
-  void renderHandles(
-      RenderContext &renderContext, const HandleMap &map, Circle &circle, float opacity);
+  void renderHandles(RenderContext &renderContext, const HandleMap &map, Circle &circle, float opacity);
 
   void clear();
 };

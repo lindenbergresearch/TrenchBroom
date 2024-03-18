@@ -28,12 +28,17 @@
 namespace TrenchBroom {
 namespace View {
 // see https://github.com/TrenchBroom/TrenchBroom/issues/2244
-TEST_CASE_METHOD(MapDocumentTest, "SnapBrushVerticesTest.snapVerticesCrash_2244")
-{
-    document->selectAllNodes();
-    document->deleteObjects();
+TEST_CASE_METHOD(MapDocumentTest,
+"SnapBrushVerticesTest.snapVerticesCrash_2244") {
+document->
 
-    const auto brush = R"(
+selectAllNodes();
+
+document->
+
+deleteObjects();
+
+const auto brush = R"(
 // Game: Quake
 // Format: Standard
 // entity 0
@@ -48,11 +53,34 @@ TEST_CASE_METHOD(MapDocumentTest, "SnapBrushVerticesTest.snapVerticesCrash_2244"
 ( -96 -64 172 ) ( -96 -64 116 ) ( -116 -64 144 ) karch1 -0 -0 -0 1 1
 }
 })";
-    document->paste(brush);
-    document->selectAllNodes();
+document->
+paste(brush);
+document->
 
-    CHECK(document->selectedNodes().brushCount() == 1u);
-    CHECK_NOTHROW(document->snapVertices(document->grid().actualSize()));
+selectAllNodes();
+
+CHECK(document
+->
+
+selectedNodes()
+
+.
+
+brushCount()
+
+== 1u);
+CHECK_NOTHROW(document
+->
+snapVertices(document
+->
+
+grid()
+
+.
+
+actualSize()
+
+));
 }
 } // namespace View
 } // namespace TrenchBroom

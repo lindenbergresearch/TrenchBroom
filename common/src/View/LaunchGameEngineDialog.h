@@ -26,6 +26,7 @@
 
 #include <memory>
 
+
 class QPushButton;
 
 namespace TrenchBroom {
@@ -36,7 +37,9 @@ struct GameEngineProfile;
 namespace View {
 class GameEngineProfileListBox;
 
+
 class MultiCompletionLineEdit;
+
 
 /**
  * Dialog for launching engine (Run -> Launch Engine); only lets you edit the
@@ -55,8 +58,7 @@ private:
   Model::GameEngineConfig m_config;
 
 public:
-  explicit LaunchGameEngineDialog(
-      std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit LaunchGameEngineDialog(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
   void createGui();

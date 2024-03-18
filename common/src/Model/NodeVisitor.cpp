@@ -22,9 +22,11 @@
 namespace TrenchBroom::Model {
 
 NodeVisitor::NodeVisitor() = default;
+
 NodeVisitor::~NodeVisitor() = default;
 
 ConstNodeVisitor::ConstNodeVisitor() = default;
+
 ConstNodeVisitor::~ConstNodeVisitor() = default;
 
 } // namespace TrenchBroom::Model

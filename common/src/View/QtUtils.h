@@ -37,39 +37,57 @@
 
 #define COLOR_ROLE(name) QPalette{}.color(QPalette::name)
 
+
 class QButtonGroup;
+
 
 class QColor;
 
+
 class QCompleter;
+
 
 class QDialog;
 
+
 class QDialogButtonBox;
+
 
 class QEvent;
 
+
 class QFont;
+
 
 class QLayout;
 
+
 class QLineEdit;
+
 
 class QMainWindow;
 
+
 class QPalette;
+
 
 class QSlider;
 
+
 class QSplitter;
+
 
 class QString;
 
+
 class QTableView;
+
 
 class QToolButton;
 
+
 class QVBoxLayout;
+
 
 class QWidget;
 
@@ -78,6 +96,7 @@ class Color;
 
 namespace View {
 enum class MapTextEncoding;
+
 
 class SyncHeightEventFilter : public QObject {
 private:
@@ -92,14 +111,9 @@ public:
   bool eventFilter(QObject *target, QEvent *event) override;
 };
 
+
 enum class FileDialogDir {
-  Map,
-  TextureCollection,
-  CompileTool,
-  Engine,
-  EntityDefinition,
-  GamePath,
-  Resources
+  Map, TextureCollection, CompileTool, Engine, EntityDefinition, GamePath, Resources
 };
 
 /**
@@ -107,11 +121,9 @@ enum class FileDialogDir {
  */
 QString fileDialogDefaultDirectory(FileDialogDir type);
 
-void updateFileDialogDefaultDirectoryWithFilename(
-    FileDialogDir type, const QString &filename);
+void updateFileDialogDefaultDirectoryWithFilename(FileDialogDir type, const QString &filename);
 
-void updateFileDialogDefaultDirectoryWithDirectory(
-    FileDialogDir type, const QString &newDefaultDirectory);
+void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QString &newDefaultDirectory);
 
 QString windowSettingsPath(const QWidget *window, const QString &suffix = "");
 
@@ -119,18 +131,16 @@ void saveWindowGeometry(QWidget *window);
 
 void restoreWindowGeometry(QWidget *window);
 
-template<typename T>
-void saveWindowState(const T *window) {
-  ensure(window!=nullptr, "window must not be null");
+template<typename T> void saveWindowState(const T *window) {
+  ensure(window != nullptr, "window must not be null");
 
   const auto path = windowSettingsPath(window, "State");
   auto settings = QSettings{};
   settings.setValue(path, window->saveState());
 }
 
-template<typename T>
-void restoreWindowState(T *window) {
-  ensure(window!=nullptr, "window must not be null");
+template<typename T> void restoreWindowState(T *window) {
+  ensure(window != nullptr, "window must not be null");
 
   const auto path = windowSettingsPath(window, "State");
   auto settings = QSettings{};
@@ -142,18 +152,17 @@ void restoreWindowState(T *window) {
  */
 bool widgetOrChildHasFocus(const QWidget *widget);
 
+
 class MapFrame;
+
 
 MapFrame *findMapFrame(QWidget *widget);
 
-QToolButton *createBitmapButton(
-    const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
+QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
 
-QToolButton *createBitmapButton(
-    const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr);
+QToolButton *createBitmapButton(const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr);
 
-QToolButton *createBitmapToggleButton(
-    const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
+QToolButton *createBitmapToggleButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
 
 QWidget *createDefaultPage(const QString &message, QWidget *parent = nullptr);
 
@@ -173,37 +182,34 @@ QLayout *wrapDialogButtonBox(QLayout *buttonBox);
 
 void addToMiniToolBarLayout(QBoxLayout *layout);
 
-template<typename... Rest>
-void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest);
+template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest);
 
-template<typename... Rest>
-void addToMiniToolBarLayout(QBoxLayout *layout, QWidget *first, Rest... rest) {
+template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, QWidget *first, Rest... rest) {
   layout->addWidget(first);
   addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest>
-void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
+template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
   layout->addSpacing(first - LayoutConstants::NarrowHMargin);
   addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest>
-QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
+template<typename... Rest> QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
   auto *layout = new QHBoxLayout{};
   layout->setContentsMargins(
-      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+  );
   layout->setSpacing(LayoutConstants::NarrowHMargin);
   addToMiniToolBarLayout(layout, first, rest...);
   layout->addStretch(1);
   return layout;
 }
 
-template<typename... Rest>
-QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
+template<typename... Rest> QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
   auto *layout = new QHBoxLayout{};
   layout->setContentsMargins(
-      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
+  );
   layout->setSpacing(LayoutConstants::NarrowHMargin);
   layout->addStretch(1);
   addToMiniToolBarLayout(layout, first, rest...);
@@ -240,10 +246,7 @@ QWidget *makeError(QWidget *widget);
 
 QWidget *makeMono(QWidget *widget, int size);
 
-QWidget *colorizeWidget(
-    QWidget *widget,
-    const QColor &color,
-    QPalette::ColorRole role = QPalette::ColorRole::Text);
+QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role = QPalette::ColorRole::Text);
 
 QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
 
@@ -261,17 +264,11 @@ QString toStyleSheetColor(const char *prefix, const QColor &color);
 
 QString toStyleSheetRGBA(const QColor &color, int adjustment = 0);
 
-QString toStyleSheetRGBA(
-    const QPalette &palette,
-    QPalette::ColorRole role,
-    QPalette::ColorGroup group,
-    int adjustment = 0);
+QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, QPalette::ColorGroup group, int adjustment = 0);
 
-QString toStyleSheetRGBA(
-    const QPalette &palette, QPalette::ColorRole role, int adjustment = 0);
+QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, int adjustment = 0);
 
-void setStyledBorder(
-    QWidget *widget, int width, const QColor &color, const char *type = "solid");
+void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type = "solid");
 
 void setWindowIconTB(QWidget *window);
 
@@ -295,14 +292,16 @@ void checkButtonInGroup(QButtonGroup *group, const QString &objectName, bool che
  */
 void insertTitleBarSeparator(QVBoxLayout *layout);
 
-template<typename I>
-QStringList toQStringList(I cur, I end) {
+template<typename I> QStringList toQStringList(I cur, I end) {
   auto result = QStringList{};
-  std::transform(cur, end, std::back_inserter(result), [](const auto &str) {
-    return QString::fromStdString(str);
-  });
+  std::transform(
+      cur, end, std::back_inserter(result), [](const auto &str) {
+        return QString::fromStdString(str);
+      }
+  );
   return result;
 }
+
 
 class AutoResizeRowsEventFilter : public QObject {
 Q_OBJECT
@@ -314,6 +313,7 @@ public:
 
   bool eventFilter(QObject *watched, QEvent *event) override;
 };
+
 
 void autoResizeRows(QTableView *tableView);
 

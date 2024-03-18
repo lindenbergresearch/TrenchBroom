@@ -25,6 +25,7 @@ namespace TrenchBroom {
 namespace Renderer {
 class FontGlyphBuilder;
 
+
 class FontTexture {
 private:
   size_t m_size;

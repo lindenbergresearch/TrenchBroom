@@ -23,13 +23,19 @@
 
 #include <memory>
 
+
 class QStackedLayout;
+
+
 class QLabel;
 
 namespace TrenchBroom {
 namespace View {
 class MapDocument;
+
+
 class ViewPopupEditor;
+
 
 class MapViewBar : public ContainerBar {
 Q_OBJECT
