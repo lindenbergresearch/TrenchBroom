@@ -37,7 +37,7 @@
 
 namespace TrenchBroom {
 namespace Model {
-const vm::vec3ParaxialTexCoordSystem::BaseAxes [] = {
+const vm::vec3 ParaxialTexCoordSystem::BaseAxes[] = {
     vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, - 1.0, 0.0), vm::vec3(0.0, 0.0, - 1.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, - 1.0, 0.0),
     vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, - 1.0), vm::vec3(- 1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, - 1.0),
     vm::vec3(0.0, 1.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 0.0, - 1.0), vm::vec3(0.0, - 1.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 0.0, - 1.0),
