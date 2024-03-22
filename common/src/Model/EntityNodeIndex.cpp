@@ -133,13 +133,16 @@ std::vector<EntityNodeBase *> EntityNodeIndex::findEntity(const std::string &val
     const EntityNodeBase *node = *it;
     auto classname = QString::fromStdString(node->entity().classname());
     auto qname = QString::fromStdString(name);
-    auto matches = false;
+    bool matches;
 
-    if (exact) matches = classname == qname;
+    if (exact)
+      matches = classname == qname;
     else
-      matches = classname.startsWith(qname);
+      matches = classname.contains(qname);
 
-    if (matches) { matched.push_back(*it); }
+    if (matches)
+      matched.push_back(*it);
+
     ++ it;
   }
 
