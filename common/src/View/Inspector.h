@@ -22,6 +22,8 @@
 #include <QTabWidget>
 #include <QWidget>
 
+#include "View/MapView.h"
+
 #include <memory>
 
 namespace TrenchBroom {
@@ -62,11 +64,12 @@ private:
   MapInspector *m_mapInspector;
   EntityInspector *m_entityInspector;
   FaceInspector *m_faceInspector;
+  MapView *m_mapView;
 
   SyncHeightEventFilter *m_syncTabBarEventFilter;
 
 public:
-  Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
+  Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, MapView *mapView, QWidget *parent = nullptr);
 
   void connectTopWidgets(MapViewBar *mapViewBar);
 

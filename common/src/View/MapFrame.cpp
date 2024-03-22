@@ -334,7 +334,7 @@ void MapFrame::createGui() {
   m_currentMapView = m_mapView->firstMapViewBase();
   ensure(m_currentMapView != nullptr, "SwitchableMapViewContainer should have constructed a MapViewBase");
 
-  m_inspector = new Inspector(m_document, *m_contextManager);
+  m_inspector = new Inspector(m_document, *m_contextManager, m_mapView);
 
   m_mapView->connectTopWidgets(m_inspector);
 
