@@ -122,6 +122,13 @@ void FrameManager::removeFrame(MapFrame *frame) {
 
   m_frames.erase(it);
 
+#ifdef __APPLE__
+  // reactivate welcome windows on mac
+  if (m_frames.size() <= 0) {
+    auto *appInstance = &TrenchBroomApp::instance();
+    appInstance->showWelcomeWindow();
+  }
+#endif
   // MapFrame uses Qt::WA_DeleteOnClose so we don't need to delete it here
 }
 } // namespace View
