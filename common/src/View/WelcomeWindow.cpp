@@ -43,6 +43,8 @@ WelcomeWindow::WelcomeWindow() :
 void WelcomeWindow::createGui() {
   setWindowIconTB(this);
   setWindowTitle("Welcome to TrenchBroom");
+  setWindowFlags(Qt::WindowStaysOnTopHint);
+  setWindowModality(Qt::ApplicationModal);
 
   m_recentDocumentListBox = new RecentDocumentListBox{};
   m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
@@ -79,6 +81,8 @@ void WelcomeWindow::createGui() {
 
   setCentralWidget(container);
   setMinimumSize(800, 500);
+  setFocus();
+
 }
 
 QWidget *WelcomeWindow::createAppPanel() {
