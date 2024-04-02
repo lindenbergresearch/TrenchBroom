@@ -247,6 +247,13 @@ QWidget *makeSmall(QWidget *widget) {
     return widget;
 }
 
+QWidget *makeBigger(QWidget *widget, int value) {
+    auto font = widget->font();
+    font.setPointSize(font.pointSize() + value);
+    widget->setFont(font);
+    return widget;
+}
+
 QWidget *makeTitle(QWidget *widget) {
     widget->setForegroundRole(QPalette::HighlightedText);
     auto font = widget->font();

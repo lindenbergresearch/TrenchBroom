@@ -245,6 +245,8 @@ QWidget *makeInfo(QWidget *widget);
 
 QWidget *makeSmall(QWidget *widget);
 
+QWidget *makeBigger(QWidget *widget, int value);
+
 QWidget *makeTitle(QWidget *widget);
 
 QWidget *makeSubTitle(QWidget *widget);
