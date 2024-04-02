@@ -25,8 +25,7 @@
 
 #include <ostream>
 
-namespace kdl
-{
+namespace kdl {
 
 #ifdef _MSC_VER
 // MSVC issues a warning about infinite recursion with a range of grouped iterators
@@ -34,14 +33,13 @@ namespace kdl
 #pragma warning(disable : 4717)
 #endif
 
-template <typename I>
-std::ostream& operator<<(std::ostream& lhs, const range<I>& rhs)
-{
-  return lhs << make_streamable(rhs);
+template<typename I>
+std::ostream &operator<<(std::ostream &lhs, const range<I> &rhs) {
+    return lhs << make_streamable(rhs);
 }
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
-} // namespace kdl
+}// namespace kdl

@@ -39,23 +39,23 @@ class MapDocument;
 
 
 class KeyboardPreferencePane : public PreferencePane {
-Q_OBJECT
+    Q_OBJECT
 private:
-  QTableView *m_table;
-  KeyboardShortcutModel *m_model;
-  QSortFilterProxyModel *m_proxy;
+    QTableView *m_table;
+    KeyboardShortcutModel *m_model;
+    QSortFilterProxyModel *m_proxy;
 
 public:
-  explicit KeyboardPreferencePane(MapDocument *document, QWidget *parent = nullptr);
+    explicit KeyboardPreferencePane(MapDocument *document, QWidget *parent = nullptr);
 
 private:
-  bool doCanResetToDefaults() override;
+    bool doCanResetToDefaults() override;
 
-  void doResetToDefaults() override;
+    void doResetToDefaults() override;
 
-  void doUpdateControls() override;
+    void doUpdateControls() override;
 
-  bool doValidate() override;
+    bool doValidate() override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

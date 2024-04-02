@@ -37,10 +37,10 @@ mat4 getScaleMatrix() {
     float sz = length(vec3(ModelMatrix[2]));
 
     return mat4(
-        vec4(sx,  0.0, 0.0, 0.0),
-        vec4(0.0, sy,  0.0, 0.0),
-        vec4(0.0, 0.0, sz,  0.0),
-        vec4(0.0, 0.0, 0.0, 1.0)
+    vec4(sx, 0.0, 0.0, 0.0),
+    vec4(0.0, sy, 0.0, 0.0),
+    vec4(0.0, 0.0, sz, 0.0),
+    vec4(0.0, 0.0, 0.0, 1.0)
     );
 }
 
@@ -51,10 +51,10 @@ mat4 getViewPlaneParallelUprightModelMatrix() {
     vec3 normal = normalize(cross(right, up));
 
     return mat4(
-        vec4(right, 0.0),
-        vec4(up, 0.0),
-        vec4(normal, 0.0),
-        ModelMatrix[3]
+    vec4(right, 0.0),
+    vec4(up, 0.0),
+    vec4(normal, 0.0),
+    ModelMatrix[3]
     ) * getScaleMatrix();
 }
 
@@ -66,10 +66,10 @@ mat4 getFacingUprightModelMatrix() {
     vec3 normal = normalize(cross(right, up));
 
     return mat4(
-        vec4(right, 0.0),
-        vec4(up, 0.0),
-        vec4(normal, 0.0),
-        ModelMatrix[3]
+    vec4(right, 0.0),
+    vec4(up, 0.0),
+    vec4(normal, 0.0),
+    ModelMatrix[3]
     ) * getScaleMatrix();
 }
 
@@ -80,10 +80,10 @@ mat4 getViewPlaneParallelModelMatrix() {
     vec3 up = CameraUp;
 
     return mat4(
-        vec4(right, 0.0),
-        vec4(up, 0.0),
-        vec4(normal, 0.0),
-        ModelMatrix[3]
+    vec4(right, 0.0),
+    vec4(up, 0.0),
+    vec4(normal, 0.0),
+    ModelMatrix[3]
     ) * getScaleMatrix();
 }
 
@@ -92,7 +92,7 @@ float extractRollAngle(mat4 rotation) {
         float theta = -asin(rotation[0][1]);
         float cosTheta = cos(theta);
         return atan(rotation[1][2] / cosTheta, rotation[2][2] / cosTheta);
-    }  else if (rotation[0][2] == -1.0) {
+    } else if (rotation[0][2] == -1.0) {
         return atan(rotation[1][0], rotation[2][0]);
     } else {
         return atan(-rotation[1][0], -rotation[2][0]);
@@ -103,10 +103,10 @@ mat4 getViewPlaneParallelOrientedModelMatrix() {
     // Faces view plane, but obeys roll value.
 
     mat4 transform = mat4(
-        ModelMatrix[0],
-        ModelMatrix[1],
-        ModelMatrix[2],
-        vec4(0.0, 0.0, 0.0, 1.0)
+    ModelMatrix[0],
+    ModelMatrix[1],
+    ModelMatrix[2],
+    vec4(0.0, 0.0, 0.0, 1.0)
     );
 
     // the rotated unit vectors
@@ -115,10 +115,10 @@ mat4 getViewPlaneParallelOrientedModelMatrix() {
     vec3 z = normalize(cross(x, y));
 
     mat4 rotation = mat4(
-        vec4(x, 0.0),
-        vec4(y, 0.0),
-        vec4(z, 0.0),
-        vec4(0.0, 0.0, 0.0, 1.0)
+    vec4(x, 0.0),
+    vec4(y, 0.0),
+    vec4(z, 0.0),
+    vec4(0.0, 0.0, 0.0, 1.0)
     );
 
     float roll = extractRollAngle(rotation);
@@ -130,10 +130,10 @@ mat4 getViewPlaneParallelOrientedModelMatrix() {
     vec3 up = CameraRight * -s + CameraUp * c;
 
     return mat4(
-        vec4(right, 0.0),
-        vec4(up, 0.0),
-        vec4(normal, 0.0),
-        ModelMatrix[3]
+    vec4(right, 0.0),
+    vec4(up, 0.0),
+    vec4(normal, 0.0),
+    ModelMatrix[3]
     ) * getScaleMatrix();
 }
 

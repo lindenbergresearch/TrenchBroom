@@ -27,14 +27,13 @@
 #endif
 
 #include <atomic>
-#include <future> // for std::async
+#include <future>// for std::async
 #include <optional>
 #include <thread>
-#include <utility> // for std::declval
+#include <utility>// for std::declval
 #include <vector>
 
-namespace kdl
-{
+namespace kdl {
 /**
  * Runs the given lambda `count` times, passing it indices `0` through `count - 1`.
  *
@@ -49,42 +48,36 @@ namespace kdl
  * @param count the maximum value (exclusive) to pass to lambda
  * @param lambda the lambda to run
  */
-template <class L>
-void parallel_for(const size_t count, L&& lambda)
-{
+template<class L>
+void parallel_for(const size_t count, L &&lambda) {
 #ifdef _WIN32
-  concurrency::parallel_for<size_t>(0, count, lambda);
+    concurrency::parallel_for<size_t>(0, count, lambda);
 #else
-  size_t numThreads = static_cast<size_t>(std::thread::hardware_concurrency());
-  if (numThreads == 0)
-  {
-    numThreads = 1;
-  }
+    size_t numThreads = static_cast<size_t>(std::thread::hardware_concurrency());
+    if (numThreads == 0) {
+        numThreads = 1;
+    }
 
-  std::atomic<size_t> nextIndex(0);
+    std::atomic<size_t> nextIndex(0);
 
-  std::vector<std::future<void>> threads;
-  threads.resize(numThreads);
+    std::vector<std::future<void>> threads;
+    threads.resize(numThreads);
 
-  for (size_t i = 0; i < numThreads; ++i)
-  {
-    threads[i] = std::async(std::launch::async, [&]() {
-      while (true)
-      {
-        const size_t ourIndex = std::atomic_fetch_add(&nextIndex, static_cast<size_t>(1));
-        if (ourIndex >= count)
-        {
-          break;
-        }
-        lambda(ourIndex);
-      }
-    });
-  }
+    for (size_t i = 0; i < numThreads; ++i) {
+        threads[i] = std::async(std::launch::async, [&]() {
+            while (true) {
+                const size_t ourIndex = std::atomic_fetch_add(&nextIndex, static_cast<size_t>(1));
+                if (ourIndex >= count) {
+                    break;
+                }
+                lambda(ourIndex);
+            }
+        });
+    }
 
-  for (size_t i = 0; i < numThreads; ++i)
-  {
-    threads[i].wait();
-  }
+    for (size_t i = 0; i < numThreads; ++i) {
+        threads[i].wait();
+    }
 #endif
 }
 
@@ -105,18 +98,17 @@ void parallel_for(const size_t count, L&& lambda)
  * @param transform the lambda to apply, must be of type `auto(T&&)`
  * @return a vector containing the transformed values
  */
-template <class T, class L>
-auto vec_parallel_transform(std::vector<T> input, L&& transform)
-{
-  using ResultType = std::optional<decltype(transform(std::declval<T&&>()))>;
+template<class T, class L>
+auto vec_parallel_transform(std::vector<T> input, L &&transform) {
+    using ResultType = std::optional<decltype(transform(std::declval<T &&>()))>;
 
-  std::vector<ResultType> result;
-  result.resize(input.size());
+    std::vector<ResultType> result;
+    result.resize(input.size());
 
-  parallel_for(input.size(), [&](const size_t index) {
-    result[index] = transform(std::move(input[index]));
-  });
+    parallel_for(input.size(), [&](const size_t index) {
+        result[index] = transform(std::move(input[index]));
+    });
 
-  return vec_transform(std::move(result), [](ResultType&& x) { return std::move(*x); });
+    return vec_transform(std::move(result), [](ResultType &&x) { return std::move(*x); });
 }
-} // namespace kdl
+}// namespace kdl

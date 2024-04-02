@@ -36,43 +36,43 @@ namespace TrenchBroom::View {
 * Editor widget for a single game engine profile.
 */
 class GameEngineProfileEditor : public QWidget {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Model::GameEngineProfile *m_profile = nullptr;
-  QStackedWidget *m_stackedWidget = nullptr;
-  QLineEdit *m_nameEdit = nullptr;
-  QLineEdit *m_pathEdit = nullptr;
+    Model::GameEngineProfile *m_profile = nullptr;
+    QStackedWidget *m_stackedWidget = nullptr;
+    QLineEdit *m_nameEdit = nullptr;
+    QLineEdit *m_pathEdit = nullptr;
 
 public:
-  explicit GameEngineProfileEditor(QWidget *parent = nullptr);
+    explicit GameEngineProfileEditor(QWidget *parent = nullptr);
 
 private:
-  QWidget *createEditorPage();
+    QWidget *createEditorPage();
 
-  void updatePath(const QString &str);
+    void updatePath(const QString &str);
 
 public:
-  void setProfile(Model::GameEngineProfile *profile);
+    void setProfile(Model::GameEngineProfile *profile);
 
 private:
-  void refresh();
+    void refresh();
 
-  bool isValidEnginePath(const QString &str) const;
+    bool isValidEnginePath(const QString &str) const;
 
 private slots:
 
-  void nameChanged(const QString &text);
+    void nameChanged(const QString &text);
 
-  void pathChanged();
+    void pathChanged();
 
-  void changePathClicked();
+    void changePathClicked();
 
 signals:
 
-  /**
+    /**
    * Emitted after m_profile is changed in response to a UI action.
    */
-  void profileChanged();
+    void profileChanged();
 };
 
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

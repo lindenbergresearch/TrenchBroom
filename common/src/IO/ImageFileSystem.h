@@ -42,63 +42,65 @@ class File;
 using GetImageFile = std::function<Result<std::shared_ptr<File>>()>;
 
 struct ImageFileEntry {
-  std::filesystem::path name;
-  GetImageFile getFile;
+    std::filesystem::path name;
+    GetImageFile getFile;
 };
 
 struct ImageDirectoryEntry;
 using ImageEntry = std::variant<ImageDirectoryEntry, ImageFileEntry>;
 
 struct ImageDirectoryEntry {
-  std::filesystem::path name;
-  std::vector<ImageEntry> entries;
+    std::filesystem::path name;
+    std::vector<ImageEntry> entries;
 };
 
 
 class ImageFileSystemBase : public FileSystem {
 protected:
-  ImageEntry m_root;
+    ImageEntry m_root;
 
-  ImageFileSystemBase();
+    ImageFileSystemBase();
 
 public:
-  ~ImageFileSystemBase() override;
+    ~ImageFileSystemBase() override;
 
-  Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
+    Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
-  /**
+    /**
    * Reload this file system.
    */
-  Result<void> reload();
+    Result<void> reload();
 
 protected:
-  void addFile(const std::filesystem::path &path, GetImageFile getFile);
+    void addFile(const std::filesystem::path &path, GetImageFile getFile);
 
-  PathInfo pathInfo(const std::filesystem::path &path) const override;
+    PathInfo pathInfo(const std::filesystem::path &path) const override;
 
 private:
-  Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
+    Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const override;
 
-  Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
+    Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const override;
 
-  virtual Result<void> doReadDirectory() = 0;
+    virtual Result<void> doReadDirectory() = 0;
 };
 
 
-template<typename FileType> class ImageFileSystem : public ImageFileSystemBase {
+template<typename FileType>
+class ImageFileSystem : public ImageFileSystemBase {
 protected:
-  std::shared_ptr<FileType> m_file;
+    std::shared_ptr<FileType> m_file;
 
 public:
-  explicit ImageFileSystem(std::shared_ptr<FileType> file) : m_file{std::move(file)} {
-    ensure(m_file, "file must not be null");
-  }
+    explicit ImageFileSystem(std::shared_ptr<FileType> file) : m_file{std::move(file)} {
+        ensure(m_file, "file must not be null");
+    }
 };
 
 
-template<typename T, typename... Args> Result<std::unique_ptr<T>> createImageFileSystem(Args &&... args) {
-  auto fs = std::make_unique<T>(std::forward<Args>(args)...);
-  return fs->reload().transform([&]() { return std::move(fs); });
+template<typename T, typename... Args>
+Result<std::unique_ptr<T>> createImageFileSystem(Args &&...args) {
+    auto fs = std::make_unique<T>(std::forward<Args>(args)...);
+    return fs->reload().transform([&]() { return std::move(fs); });
 }
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

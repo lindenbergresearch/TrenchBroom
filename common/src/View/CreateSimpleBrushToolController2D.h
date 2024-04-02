@@ -40,20 +40,20 @@ class MapDocument;
 
 class CreateSimpleBrushToolController2D : public ToolController {
 private:
-  CreateSimpleBrushTool &m_tool;
-  std::weak_ptr<MapDocument> m_document;
+    CreateSimpleBrushTool &m_tool;
+    std::weak_ptr<MapDocument> m_document;
 
 public:
-  CreateSimpleBrushToolController2D(CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document);
+    CreateSimpleBrushToolController2D(CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document);
 
 private:
-  Tool &tool() override;
+    Tool &tool() override;
 
-  const Tool &tool() const override;
+    const Tool &tool() const override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  bool cancel() override;
+    bool cancel() override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

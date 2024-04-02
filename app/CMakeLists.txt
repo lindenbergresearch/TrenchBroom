@@ -4,11 +4,11 @@ set(APP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(APP_RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 
 set(APP_SOURCE
-    "${APP_SOURCE_DIR}/Main.cpp"
-    "${APP_RESOURCE_DIR}/qrc/resources.qrc")
+        "${APP_SOURCE_DIR}/Main.cpp"
+        "${APP_RESOURCE_DIR}/qrc/resources.qrc")
 
 # OS X app bundle configuration, must happen before the executable is added
-if(APPLE)
+if (APPLE)
     # Configure icons
     set(MACOSX_ICON_FILES "${APP_RESOURCE_DIR}/mac/icons/AppIcon.icns" "${APP_RESOURCE_DIR}/mac/icons/DocIcon.icns")
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_ICON_FILES})
@@ -29,51 +29,51 @@ if(APPLE)
     file(GLOB_RECURSE MACOSX_DEFAULT_FILES RELATIVE ${APP_RESOURCE_DIR}/defaults "${APP_RESOURCE_DIR}/defaults/*")
 
     # Set correct locations for default resources
-    foreach(DEFAULT_FILE ${MACOSX_DEFAULT_FILES})
+    foreach (DEFAULT_FILE ${MACOSX_DEFAULT_FILES})
         get_filename_component(DEFAULT_FILE_DIR "${DEFAULT_FILE}" DIRECTORY)
         set(DEFAULT_FILE "${APP_RESOURCE_DIR}/defaults/${DEFAULT_FILE}")
 
         set(APP_SOURCE ${APP_SOURCE} ${DEFAULT_FILE})
-        set_source_files_properties(${DEFAULT_FILE} PROPERTIES  MACOSX_PACKAGE_LOCATION Resources/defaults/${DEFAULT_FILE_DIR})
-    endforeach()
+        set_source_files_properties(${DEFAULT_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/defaults/${DEFAULT_FILE_DIR})
+    endforeach ()
 
     # Configure game resources
     # Collect all game resources
     file(GLOB_RECURSE MACOSX_GAME_FILES RELATIVE ${APP_RESOURCE_DIR}/games "${APP_RESOURCE_DIR}/games/*")
 
     # Set correct locations for game files
-    foreach(GAME_FILE ${MACOSX_GAME_FILES})
+    foreach (GAME_FILE ${MACOSX_GAME_FILES})
         get_filename_component(GAME_FILE_DIR "${GAME_FILE}" DIRECTORY)
         set(GAME_FILE "${APP_RESOURCE_DIR}/games/${GAME_FILE}")
 
         set(APP_SOURCE ${APP_SOURCE} ${GAME_FILE})
-        set_source_files_properties(${GAME_FILE} PROPERTIES  MACOSX_PACKAGE_LOCATION Resources/games/${GAME_FILE_DIR} HEADER_FILE_ONLY ON)
-    endforeach()
+        set_source_files_properties(${GAME_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/games/${GAME_FILE_DIR} HEADER_FILE_ONLY ON)
+    endforeach ()
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         # Collect all untested game resources
         file(GLOB_RECURSE MACOSX_GAME_TESTING_FILES RELATIVE ${APP_RESOURCE_DIR}/games-testing "${APP_RESOURCE_DIR}/games-testing/*")
 
         # Set correct locations for untested game files
-        foreach(GAME_FILE ${MACOSX_GAME_TESTING_FILES})
+        foreach (GAME_FILE ${MACOSX_GAME_TESTING_FILES})
             get_filename_component(GAME_FILE_DIR "${GAME_FILE}" DIRECTORY)
             set(GAME_FILE "${APP_RESOURCE_DIR}/games-testing/${GAME_FILE}")
 
             set(APP_SOURCE ${APP_SOURCE} ${GAME_FILE})
             set_source_files_properties(${GAME_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/games/${GAME_FILE_DIR} HEADER_FILE_ONLY ON)
-        endforeach()
-    endif()
+        endforeach ()
+    endif ()
 
     # Configure shaders
     # Collect all shaders
     file(GLOB_RECURSE MACOSX_SHADER_FILES
             "${APP_RESOURCE_DIR}/shader/*.fragsh"
             "${APP_RESOURCE_DIR}/shader/*.vertsh")
-    set_source_files_properties(${MACOSX_SHADER_FILES} PROPERTIES  MACOSX_PACKAGE_LOCATION Resources/shader)
+    set_source_files_properties(${MACOSX_SHADER_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/shader)
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_SHADER_FILES})
 
     # Configure Qt stylesheets
-    file (GLOB_RECURSE MACOSX_STYLESHEET_FILES
+    file(GLOB_RECURSE MACOSX_STYLESHEET_FILES
             "${APP_RESOURCE_DIR}/stylesheets/*.qss")
     set_source_files_properties(${MACOSX_STYLESHEET_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/stylesheets)
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_STYLESHEET_FILES})
@@ -83,21 +83,21 @@ if(APPLE)
     set_source_files_properties(${DOC_MANUAL_TARGET_FILES_ABSOLUTE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/manual)
     set_source_files_properties(${DOC_MANUAL_SHORTCUTS_JS_TARGET_ABSOLUTE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/manual)
     set_source_files_properties(${DOC_MANUAL_TARGET_IMAGE_FILES_ABSOLUTE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/manual/images)
-endif()
+endif ()
 
 # Set up resource compilation for Windows
-if(WIN32)
+if (WIN32)
     # Create the windows resource file
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/TrenchBroom.rc.in" "${CMAKE_CURRENT_BINARY_DIR}/TrenchBroom.rc" @ONLY)
 
-    if(COMPILER_IS_MSVC)
+    if (COMPILER_IS_MSVC)
         set(APP_SOURCE ${APP_SOURCE} "${CMAKE_CURRENT_BINARY_DIR}/TrenchBroom.rc")
-    elseif(MINGW)
+    elseif (MINGW)
         set(CMAKE_RC_COMPILER_INIT windres)
         enable_language(RC)
         set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> <DEFINES> -i <SOURCE> -o <OBJECT>")
-    endif()
-endif()
+    endif ()
+endif ()
 
 # Set CPACK_PACKAGE_VERSION which is used by CPack.
 # Strip the "v" prefix off GIT_DESCRIBE (e.g. "v2020.1-RC1") to produce a CPACK_PACKAGE_VERSION of "2020.1-RC1"
@@ -112,12 +112,12 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
     # so we must make TrenchBroom depend on GenerateManual (see #3608)
     if (${SHOULD_BUILD_MANUAL})
         add_dependencies(${APP_TARGET_NAME} GenerateManual)
-    endif()
+    endif ()
     set_compiler_config(${APP_TARGET_NAME})
 
     set_target_properties(${APP_TARGET_NAME} PROPERTIES AUTORCC TRUE)
 
-    if(APPLE)
+    if (APPLE)
         # Configure variables that are substituted into the plist
         # Set CFBundleName, which controls the application menu label
         set_target_properties(${APP_TARGET_NAME} PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "${APP_TARGET_NAME}")
@@ -136,7 +136,7 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
         # If requested, run macdeployqt which copies the Qt frameworks into the TrenchBroom.app bundle
         # and modifies the TrenchBroom executable to refer to these private copies of the framework instead
         # of the ones in /usr/local. This is slow so only do it if requested.
-        if(TB_RUN_MACDEPLOYQT)
+        if (TB_RUN_MACDEPLOYQT)
             message(STATUS "macdeployqt requested")
 
             # Get macdeployqt path (hack)
@@ -145,15 +145,15 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
 
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                     COMMAND "${TB_MACDEPLOYQT_PATH}" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../..")
-        endif()
-    endif()
+        endif ()
+    endif ()
 
     # Copy some Windows-specific resources
-    if(WIN32)
+    if (WIN32)
         # Copy icons to target dir
         add_custom_command(TARGET ${APP_TARGET_NAME} PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/AppIcon.ico"    "${CMAKE_CURRENT_BINARY_DIR}"
-                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/DocIcon.ico"    "${CMAKE_CURRENT_BINARY_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/AppIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
+                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/DocIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
                 COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/WindowIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}")
 
         # Copy DLLs to app directory
@@ -169,27 +169,27 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E make_directory    "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
-                COMMAND ${CMAKE_COMMAND} -E make_directory    "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles")
-    endif()
+    endif ()
 
     # Generate a small stripped PDB for release builds so we get stack traces with symbols
-    if(COMPILER_IS_MSVC)
+    if (COMPILER_IS_MSVC)
         set_target_properties(${APP_TARGET_NAME} PROPERTIES LINK_FLAGS_RELEASE "/DEBUG /PDBSTRIPPED:Release/${APP_TARGET_NAME}-stripped.pdb /PDBALTPATH:${APP_TARGET_NAME}-stripped.pdb")
-    endif()
+    endif ()
 
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD")
         # Make executable name conventional lowercase on linux
         string(TOLOWER ${APP_TARGET_NAME} APP_TARGET_NAME_LOWER)
         set_target_properties(${APP_TARGET_NAME} PROPERTIES OUTPUT_NAME ${APP_TARGET_NAME_LOWER})
-    endif()
+    endif ()
 
     # Set up the resources and DLLs for the executable
     set(APP_RESOURCE_DEST_DIR "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>")
 
-    if(WIN32 OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD")
+    if (WIN32 OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD")
         # Copy button images to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/graphics/images" "${APP_RESOURCE_DEST_DIR}/images")
@@ -206,11 +206,11 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games/" "${APP_RESOURCE_DEST_DIR}/games")
 
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             # Copy untested game files to resources directory
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games-testing/" "${APP_RESOURCE_DEST_DIR}/games")
-        endif()
+        endif ()
 
         # Copy shader files to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
@@ -229,17 +229,17 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
                     COMMAND ${CMAKE_COMMAND} -E copy "${INDEX_OUTPUT_PATH}" "${APP_RESOURCE_DEST_DIR}/manual/"
                     COMMAND ${CMAKE_COMMAND} -E copy "${DOC_MANUAL_SHORTCUTS_JS_TARGET_ABSOLUTE}" "${APP_RESOURCE_DEST_DIR}/manual/")
 
-            foreach(MANUAL_FILE ${DOC_MANUAL_TARGET_FILES_ABSOLUTE})
+            foreach (MANUAL_FILE ${DOC_MANUAL_TARGET_FILES_ABSOLUTE})
                 add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy ${MANUAL_FILE} "${APP_RESOURCE_DEST_DIR}/manual/")
-            endforeach(MANUAL_FILE)
+            endforeach (MANUAL_FILE)
 
-            foreach(MANUAL_IMAGE_FILE ${DOC_MANUAL_TARGET_IMAGE_FILES_ABSOLUTE})
+            foreach (MANUAL_IMAGE_FILE ${DOC_MANUAL_TARGET_IMAGE_FILES_ABSOLUTE})
                 add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy ${MANUAL_IMAGE_FILE} "${APP_RESOURCE_DEST_DIR}/manual/images/")
-            endforeach(MANUAL_IMAGE_FILE)
-        endif()
-    endif()
+            endforeach (MANUAL_IMAGE_FILE)
+        endif ()
+    endif ()
 endmacro()
 
 # Create the executable target and link with libraries
@@ -259,29 +259,29 @@ set(CPACK_PACKAGE_VENDOR "TrenchBroom")
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     # We want stack trace symbols even in our release builds, so don't strip
     set(CPACK_STRIP_FILES FALSE)
-else()
+else ()
     set(CPACK_STRIP_FILES FALSE)
-endif()
+endif ()
 
 # Platform specific CPack configuration
-if(WIN32)
-    if(COMPILER_IS_MSVC)
+if (WIN32)
+    if (COMPILER_IS_MSVC)
         # set(CMAKE_INSTALLL_DEBUG_LIBRARIES OFF)
         # INCLUDE(InstallRequiredSystemLibraries)
-    endif()
+    endif ()
 
     # Copy PDB files (msvc debug symbols)
-    if(COMPILER_IS_MSVC)
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    if (COMPILER_IS_MSVC)
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
             install(FILES
                     "$<TARGET_FILE_DIR:TrenchBroom>/TrenchBroom.pdb"
                     DESTINATION . COMPONENT TrenchBroom)
-        elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
             install(FILES
                     "$<TARGET_FILE_DIR:TrenchBroom>/TrenchBroom-stripped.pdb"
                     DESTINATION . COMPONENT TrenchBroom)
-        endif()
-    endif()
+        endif ()
+    endif ()
 
     install(TARGETS TrenchBroom RUNTIME DESTINATION . COMPONENT TrenchBroom)
     install(CODE [[
@@ -329,13 +329,13 @@ if(WIN32)
 
     set(CPACK_PACKAGE_FILE_EXT "7z")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateChecksum.bat.in" "${CMAKE_BINARY_DIR}/generate_checksum.bat" @ONLY)
-elseif(APPLE)
+elseif (APPLE)
     install(TARGETS TrenchBroom BUNDLE DESTINATION . COMPONENT TrenchBroom)
     set(CPACK_GENERATOR "DragNDrop")
 
     set(CPACK_PACKAGE_FILE_EXT "dmg")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateChecksum.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/generate_checksum.sh" @ONLY)
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # add architecture to filename
     set(APP_PACKAGE_FILE_NAME "${APP_PACKAGE_FILE_NAME}.${CMAKE_SYSTEM_PROCESSOR}")
     set(CPACK_PACKAGE_FILE_NAME ${APP_PACKAGE_FILE_NAME})
@@ -357,17 +357,17 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     # add files
     install(TARGETS TrenchBroom RUNTIME DESTINATION bin COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fonts"           DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/defaults"        DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/games"           DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/manual"          DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/images"          DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/shader"          DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/stylesheets"     DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(DIRECTORY "${APP_DIR}/resources/linux/icons"            DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom FILES_MATCHING PATTERN "*.png")
-    install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt"                 DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(FILES "${APP_DIR}/resources/linux/copyright"            DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
-    install(FILES "${APP_DIR}/resources/linux/trenchbroom.desktop"  DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fonts" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/defaults" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/games" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/manual" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/images" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/shader" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/stylesheets" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(DIRECTORY "${APP_DIR}/resources/linux/icons" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom FILES_MATCHING PATTERN "*.png")
+    install(FILES "${CMAKE_SOURCE_DIR}/LICENSE.txt" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(FILES "${APP_DIR}/resources/linux/copyright" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
+    install(FILES "${APP_DIR}/resources/linux/trenchbroom.desktop" DESTINATION ${LINUX_RESOURCE_LOCATION} COMPONENT TrenchBroom)
 
     # deb package specifics
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_VENDOR})
@@ -384,6 +384,6 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateChecksum.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/generate_checksum_deb.sh" @ONLY)
 
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/PrintLinuxPackageInfo.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/print_linux_package_info.sh" @ONLY)
-endif()
+endif ()
 
 include(CPack)

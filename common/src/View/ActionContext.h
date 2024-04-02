@@ -43,7 +43,7 @@ static const Type FaceSelection = 1u << 11u;
 static const Type AnySelection = NodeSelection | FaceSelection;
 static const Type AnyOrNoSelection = AnySelection | NoSelection;
 static const Type Any = AnyView | AnyOrNoSelection | AnyOrNoTool;
-} // namespace ActionContext
+}// namespace ActionContext
 
 bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs);
 
@@ -52,9 +52,10 @@ bool actionContextMatches(ActionContext::Type lhs, ActionContext::Type rhs, Acti
 std::string actionContextName(ActionContext::Type actionContext);
 
 typedef enum {
-  ActionView_Map2D = 0, ActionView_Map3D = 1
+    ActionView_Map2D = 0,
+    ActionView_Map3D = 1
 } ActionView;
 
 static const size_t NumActionViews = 2;
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

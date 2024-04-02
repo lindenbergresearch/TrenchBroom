@@ -24,65 +24,59 @@
 
 #include "catch2.h"
 
-namespace kdl
-{
-TEST_CASE("skip_iterator_test.prefix_increment")
-{
-  std::vector<int> vec({1, 2, 3, 4, 5});
-  auto it = skip_iterator(std::begin(vec), std::end(vec), 1, 2);
+namespace kdl {
+TEST_CASE("skip_iterator_test.prefix_increment") {
+    std::vector<int> vec({1, 2, 3, 4, 5});
+    auto it = skip_iterator(std::begin(vec), std::end(vec), 1, 2);
 
-  CHECK(std::next(std::begin(vec), 1) == it);
-  CHECK(std::next(std::begin(vec), 3) == ++it);
-  CHECK(std::end(vec) == ++it);
+    CHECK(std::next(std::begin(vec), 1) == it);
+    CHECK(std::next(std::begin(vec), 3) == ++it);
+    CHECK(std::end(vec) == ++it);
 }
 
-TEST_CASE("skip_iterator_test.postfix_increment")
-{
-  std::vector<int> vec({1, 2, 3, 4, 5});
-  auto it = skip_iterator(std::begin(vec), std::end(vec), 1, 2);
+TEST_CASE("skip_iterator_test.postfix_increment") {
+    std::vector<int> vec({1, 2, 3, 4, 5});
+    auto it = skip_iterator(std::begin(vec), std::end(vec), 1, 2);
 
-  CHECK(std::next(std::begin(vec), 1) == it++);
-  CHECK(std::next(std::begin(vec), 3) == it++);
-  CHECK(std::end(vec) == it);
+    CHECK(std::next(std::begin(vec), 1) == it++);
+    CHECK(std::next(std::begin(vec), 3) == it++);
+    CHECK(std::end(vec) == it);
 }
 
-TEST_CASE("skip_iterator_test.empty_sequence")
-{
-  std::vector<size_t> vec;
+TEST_CASE("skip_iterator_test.empty_sequence") {
+    std::vector<size_t> vec;
 
-  CHECK(skip_iterator(std::begin(vec), std::end(vec)) == std::begin(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec)) == std::end(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 1) == std::begin(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 1) == std::end(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec)) == std::begin(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec)) == std::end(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 1) == std::begin(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 1) == std::end(vec));
 }
 
-TEST_CASE("skip_iterator_test.zero_stride")
-{
-  std::vector<size_t> vec({1});
+TEST_CASE("skip_iterator_test.zero_stride") {
+    std::vector<size_t> vec({1});
 
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 0, 0) == std::begin(vec));
-  CHECK(
-    std::next(skip_iterator(std::begin(vec), std::end(vec), 0, 0)) == std::begin(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 0, 0) == std::begin(vec));
+    CHECK(
+        std::next(skip_iterator(std::begin(vec), std::end(vec), 0, 0)) == std::begin(vec));
 }
 
-TEST_CASE("skip_iterator_test.oneElement_sequence")
-{
-  std::vector<size_t> vec({1});
+TEST_CASE("skip_iterator_test.oneElement_sequence") {
+    std::vector<size_t> vec({1});
 
-  CHECK(skip_iterator(std::begin(vec), std::end(vec)) == std::begin(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 1) == std::end(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 2) == std::end(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec)) == std::begin(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 1) == std::end(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 2) == std::end(vec));
 
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 0, 2) == std::begin(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 1, 2) == std::end(vec));
-  CHECK(skip_iterator(std::begin(vec), std::end(vec), 2, 2) == std::end(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 0, 2) == std::begin(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 1, 2) == std::end(vec));
+    CHECK(skip_iterator(std::begin(vec), std::end(vec), 2, 2) == std::end(vec));
 
-  CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 0)) == std::end(vec));
-  CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 1)) == std::end(vec));
-  CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 2)) == std::end(vec));
+    CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 0)) == std::end(vec));
+    CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 1)) == std::end(vec));
+    CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 2)) == std::end(vec));
 
-  CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 0, 2)) == std::end(vec));
-  CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 1, 2)) == std::end(vec));
-  CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 2, 2)) == std::end(vec));
+    CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 0, 2)) == std::end(vec));
+    CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 1, 2)) == std::end(vec));
+    CHECK(std::next(skip_iterator(std::begin(vec), std::end(vec), 2, 2)) == std::end(vec));
 }
-} // namespace kdl
+}// namespace kdl

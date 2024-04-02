@@ -32,8 +32,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace kdl
-{
+namespace kdl {
 /**
  * Maps string keys to values, but with more efficient storage characteristics than a
  * regular std::map. Another difference is that values can be stored multiple times in
@@ -66,14 +65,13 @@ namespace kdl
  *
  * @tparam V the type of the values associated with each node
  */
-template <typename V>
-class compact_trie
-{
+template<typename V>
+class compact_trie {
 private:
-  struct node_cmp;
-  class node;
+    struct node_cmp;
+    class node;
 
-  /**
+    /**
    * To avoid matching the same node multiple times using different partial patterns, we
    * store tsome state for each node that is encountered during matching. For each node,
    * we remember its parent node, whether or not the node was previously matched by a
@@ -83,57 +81,51 @@ private:
    * A node is fully matched if the node itself was matched and each of its children is
    * fully matched.
    */
-  class match_state
-  {
-  private:
-    struct node_match_state
-    {
-      /**
+    class match_state {
+    private:
+        struct node_match_state {
+            /**
        * The parent of a node.
        */
-      const node* parent;
+            const node *parent;
 
-      /**
+            /**
        * Indicates whether a node was matched by a pattern.
        */
-      bool node_matched;
+            bool node_matched;
 
-      /**
+            /**
        * The number of fully matched children.
        */
-      std::size_t fully_matched_children;
+            std::size_t fully_matched_children;
 
-    public:
-      /**
+        public:
+            /**
        * Creates a new state with the given parent. `node_matched` is initialized to
        * `false` and `fully_matched_children` to 0.
        *
        * @param i_parent the parent, can be null
        */
-      explicit node_match_state(const node* i_parent)
-        : parent(i_parent)
-        , node_matched(false)
-        , fully_matched_children(0u)
-      {
-      }
-    };
+            explicit node_match_state(const node *i_parent)
+                : parent(i_parent), node_matched(false), fully_matched_children(0u) {
+            }
+        };
 
-    std::unordered_map<const node*, node_match_state> m_state;
+        std::unordered_map<const node *, node_match_state> m_state;
 
-  public:
-    /**
+    public:
+        /**
      * Inserts a match state for the given node and its parent.
      *
      * @param n the node, must not be null
      * @param parent the parent, may be null
      */
-    void insert(const node* n, const node* parent)
-    {
-      assert(n != nullptr);
-      m_state.try_emplace(n, parent);
-    }
+        void insert(const node *n, const node *parent) {
+            assert(n != nullptr);
+            m_state.try_emplace(n, parent);
+        }
 
-    /**
+        /**
      * Indicates whether the given node is fully matched.
      *
      * Precondition: the node must have an associated state (insert was previously called
@@ -142,15 +134,14 @@ private:
      * @param n the node to check
      * @return true if the given node is fully matched and false otherwise
      */
-    bool is_fully_matched(const node* n)
-    {
-      auto it = m_state.find(n);
-      assert(it != std::end(m_state));
-      const auto& state = it->second;
-      return state.node_matched && state.fully_matched_children == n->m_children.size();
-    }
+        bool is_fully_matched(const node *n) {
+            auto it = m_state.find(n);
+            assert(it != std::end(m_state));
+            const auto &state = it->second;
+            return state.node_matched && state.fully_matched_children == n->m_children.size();
+        }
 
-    /**
+        /**
      * Sets the given node to be fully matched. Note that none of the node's descendents
      * are set to be fully matched, but this is not necessary as the match algorithm will
      * not traverse into the given node's subtree anymore.
@@ -160,18 +151,17 @@ private:
      *
      * @param n the node to set to fully matched
      */
-    void set_fully_matched(const node* n)
-    {
-      auto it = m_state.find(n);
-      assert(it != std::end(m_state));
+        void set_fully_matched(const node *n) {
+            auto it = m_state.find(n);
+            assert(it != std::end(m_state));
 
-      auto& state = it->second;
-      state.node_matched = true;
-      state.fully_matched_children = n->m_children.size();
-      update_parent_states(state.parent);
-    }
+            auto &state = it->second;
+            state.node_matched = true;
+            state.fully_matched_children = n->m_children.size();
+            update_parent_states(state.parent);
+        }
 
-    /**
+        /**
      * Sets the given node to be matched if it isn't already. If the given node is already
      * matched, then the function immediately returns `false`. Otherwise, the given node's
      * state is set to matched, and if the node is now fully matched, its parents are
@@ -184,50 +174,44 @@ private:
      * @param n the node to set to matched
      * @return `false` if the given node is already matched, and `true` otherwise
      */
-    bool set_matched(const node* n)
-    {
-      auto it = m_state.find(n);
-      assert(it != std::end(m_state));
+        bool set_matched(const node *n) {
+            auto it = m_state.find(n);
+            assert(it != std::end(m_state));
 
-      auto& state = it->second;
-      if (state.node_matched)
-      {
-        return false;
-      }
+            auto &state = it->second;
+            if (state.node_matched) {
+                return false;
+            }
 
-      state.node_matched = true;
-      if (state.fully_matched_children == n->m_children.size())
-      {
-        // update the subtree match counts of all nodes on the path to the given node
-        update_parent_states(state.parent);
-      }
+            state.node_matched = true;
+            if (state.fully_matched_children == n->m_children.size()) {
+                // update the subtree match counts of all nodes on the path to the given node
+                update_parent_states(state.parent);
+            }
 
-      return true;
-    }
-
-  private:
-    void update_parent_states(const node* n)
-    {
-      while (n != nullptr)
-      {
-        auto it = m_state.find(n);
-        assert(it != std::end(m_state));
-
-        auto& state = it->second;
-        state.fully_matched_children += 1u;
-        if (!state.node_matched || state.fully_matched_children < n->m_children.size())
-        {
-          // parent is not fully matched, so it cannot contribute to its parents' subtree
-          // match count yet
-          break;
+            return true;
         }
 
-        n = it->second.parent;
-      }
-    }
-  };
+    private:
+        void update_parent_states(const node *n) {
+            while (n != nullptr) {
+                auto it = m_state.find(n);
+                assert(it != std::end(m_state));
 
-  /**
+                auto &state = it->second;
+                state.fully_matched_children += 1u;
+                if (!state.node_matched || state.fully_matched_children < n->m_children.size()) {
+                    // parent is not fully matched, so it cannot contribute to its parents' subtree
+                    // match count yet
+                    break;
+                }
+
+                n = it->second.parent;
+            }
+        }
+    };
+
+    /**
    * A trie node. Children are stored in a set ordered by `node_cmp`. Each node can store
    * a given value multiple times.
    *
@@ -253,42 +237,40 @@ private:
    * containing set, and we can update a node's key without violating any invariants of
    * the containing set.
    */
-  class node
-  {
-  private:
-    friend struct node_cmp;
-    friend class match_state;
+    class node {
+    private:
+        friend struct node_cmp;
+        friend class match_state;
 
-    using value_container = std::unordered_map<V, std::size_t>;
-    using node_set = std::set<node, node_cmp>;
+        using value_container = std::unordered_map<V, std::size_t>;
+        using node_set = std::set<node, node_cmp>;
 
-    /**
+        /**
      * The partical key of this node.
      */
-    mutable std::string m_key;
+        mutable std::string m_key;
 
-    /**
+        /**
      * Maps a value to the number of times it was stored in this node.
      */
-    mutable value_container m_values;
+        mutable value_container m_values;
 
-    /**
+        /**
      * The children of this node.
      */
-    mutable node_set m_children;
+        mutable node_set m_children;
 
-  public:
-    /**
+    public:
+        /**
      * Creates a new node with the given key.
      *
      * @param key the key
      */
-    explicit node(std::string key)
-      : m_key(std::move(key))
-    {
-    }
+        explicit node(std::string key)
+            : m_key(std::move(key)) {
+        }
 
-    /**
+        /**
      * Inserts the given value into this node's subtree. If this node's key is empty, then
      * it is the root node.
      *
@@ -298,9 +280,8 @@ private:
      * @param key the key to insert
      * @param value the value to insert
      */
-    void insert(const std::string_view key, const V& value) const
-    {
-      /*
+        void insert(const std::string_view key, const V &value) const {
+            /*
        Possible cases for insertion:
         index: 01234567 |   | #m_key: 6
         m_key: target   | ^ | #key | conditions              | todo
@@ -319,85 +300,71 @@ private:
         ^ indicates where key and m_key first differ
        */
 
-      // find the index of the first character where the given key and this node's key
-      // differ
-      const std::size_t mismatch = kdl::cs::str_mismatch(key, m_key);
-      assert(mismatch > 0u || m_key.empty());
+            // find the index of the first character where the given key and this node's key
+            // differ
+            const std::size_t mismatch = kdl::cs::str_mismatch(key, m_key);
+            assert(mismatch > 0u || m_key.empty());
 
-      if (mismatch < key.size())
-      {
-        // cases 0, 1, 2: key and m_key have a common prefix, or m_key is a prefix of key
-        if (mismatch == m_key.size())
-        {
-          // case 0, 1: m_key is a prefix of key, find or create a child that has a common
-          // prefix with the remainder of key and insert there
-          const auto remainder = key.substr(mismatch);
-          const auto& child = *m_children.insert(node(std::string(remainder))).first;
-          child.insert(remainder, value);
+            if (mismatch < key.size()) {
+                // cases 0, 1, 2: key and m_key have a common prefix, or m_key is a prefix of key
+                if (mismatch == m_key.size()) {
+                    // case 0, 1: m_key is a prefix of key, find or create a child that has a common
+                    // prefix with the remainder of key and insert there
+                    const auto remainder = key.substr(mismatch);
+                    const auto &child = *m_children.insert(node(std::string(remainder))).first;
+                    child.insert(remainder, value);
+                } else {// mismatch == m_key.size()
+                    // case 2: key and m_key have a common prefix, split this node and insert again
+                    split_node(mismatch);
+                    insert(key, value);
+                }
+            } else if (mismatch == key.size()) {
+                // cases 3, 4: key is a prefix of m_key, or key == m_key
+                if (mismatch < m_key.size()) {
+                    // case 3: key is a prefix of m_key, split this node
+                    split_node(mismatch);
+                }
+                insert_value(value);
+            }
         }
-        else
-        { // mismatch == m_key.size()
-          // case 2: key and m_key have a common prefix, split this node and insert again
-          split_node(mismatch);
-          insert(key, value);
-        }
-      }
-      else if (mismatch == key.size())
-      {
-        // cases 3, 4: key is a prefix of m_key, or key == m_key
-        if (mismatch < m_key.size())
-        {
-          // case 3: key is a prefix of m_key, split this node
-          split_node(mismatch);
-        }
-        insert_value(value);
-      }
-    }
 
-    /**
+        /**
      * Removes the given value from this node's subtree.
      *
      * @param key the key to remove
      * @param value the value to remove
      * @return true if the given key and value were removed from this node's subtree
      */
-    bool remove(const std::string_view key, const V& value) const
-    {
-      bool result = false;
+        bool remove(const std::string_view key, const V &value) const {
+            bool result = false;
 
-      const std::size_t mismatch = kdl::cs::str_mismatch(key, m_key);
-      if (m_key.size() <= key.length() && mismatch == m_key.length())
-      {
-        // m_key is a prefix of key or m_key == key
-        if (mismatch < key.length())
-        {
-          // m_key is a true prefix of key, continue at the corresponding child node
-          const auto remainder = key.substr(mismatch);
-          const auto it = m_children.find(remainder);
-          assert(it != std::end(m_children));
+            const std::size_t mismatch = kdl::cs::str_mismatch(key, m_key);
+            if (m_key.size() <= key.length() && mismatch == m_key.length()) {
+                // m_key is a prefix of key or m_key == key
+                if (mismatch < key.length()) {
+                    // m_key is a true prefix of key, continue at the corresponding child node
+                    const auto remainder = key.substr(mismatch);
+                    const auto it = m_children.find(remainder);
+                    assert(it != std::end(m_children));
 
-          result = it->remove(remainder, value);
-          if (!it->m_key.empty() && it->m_values.empty() && it->m_children.empty())
-          {
-            m_children.erase(it);
-          }
+                    result = it->remove(remainder, value);
+                    if (!it->m_key.empty() && it->m_values.empty() && it->m_children.empty()) {
+                        m_children.erase(it);
+                    }
+                } else {
+                    // m_key == key
+                    result = remove_value(value);
+                }
+
+                if (!m_key.empty() && m_values.empty() && m_children.size() == 1u) {
+                    merge_node();
+                }
+            }
+
+            return result;
         }
-        else
-        {
-          // m_key == key
-          result = remove_value(value);
-        }
 
-        if (!m_key.empty() && m_values.empty() && m_children.size() == 1u)
-        {
-          merge_node();
-        }
-      }
-
-      return result;
-    }
-
-    /**
+        /**
      * Finds every node in this node's subtree whose keys match a pattern, and adds the
      * values to the given output iterator.
      *
@@ -427,253 +394,194 @@ private:
      * @throws std::invalid_argument if the given pattern contains an invalid escape
      * sequence
      */
-    template <typename O>
-    void find_matches(
-      const std::string_view pattern,
-      const std::size_t pattern_position,
-      const node* parent,
-      match_state& match_state,
-      O out) const
-    {
-      using match_task = std::pair<std::size_t, std::size_t>;
+        template<typename O>
+        void find_matches(
+            const std::string_view pattern,
+            const std::size_t pattern_position,
+            const node *parent,
+            match_state &match_state,
+            O out) const {
+            using match_task = std::pair<std::size_t, std::size_t>;
 
-      match_state.insert(this, parent);
+            match_state.insert(this, parent);
 
-      std::vector<match_task> match_tasks({{0u, pattern_position}});
-      while (!match_tasks.empty())
-      {
-        if (match_state.is_fully_matched(this))
-        {
-          // this node and all of its subtrees have been fully matched, so we are done
-          // here
-          return;
+            std::vector<match_task> match_tasks({{0u, pattern_position}});
+            while (!match_tasks.empty()) {
+                if (match_state.is_fully_matched(this)) {
+                    // this node and all of its subtrees have been fully matched, so we are done
+                    // here
+                    return;
+                }
+
+                const auto [k_i, p_i] = match_tasks.back();
+                match_tasks.pop_back();
+
+                if (k_i == m_key.length() && p_i == pattern.length()) {
+                    if (match_state.set_matched(this)) {
+                        // this node was not matched yet, so fetch the results
+                        get_values(out);
+                    }
+
+                    // there might still be children of this node that could be matched by a pending
+                    // match task, so continue matching
+                    continue;
+                }
+
+                if (p_i == pattern.length()) {
+                    // the pattern is consumed by the key isn't, we cannot have a match here
+                    continue;
+                }
+
+                // after this point, we can assume that the pattern is not consumed, but the key
+                // might be
+                if (pattern[p_i] == '\\' && p_i < pattern.length() - 1u) {
+                    // handle escaped characters in the pattern
+                    const auto &n = pattern[p_i + 1u];
+
+                    if (k_i < m_key.length()) {
+                        // check the next character in the pattern against the next character in the
+                        // key
+                        if (n == '*' || n == '?' || n == '%' || n == '\\') {
+                            if (m_key[k_i] == n) {
+                                // the key matches the escaped character, continue
+                                match_tasks.emplace_back(k_i + 1u, p_i + 2u);
+                            }
+                        } else {
+                            throw std::invalid_argument("invalid escape sequence in pattern");
+                        }
+                    } else {
+                        // the key is consumed, so continue matching at the children
+                        for (const auto &c: {"*", "?", "%", "\\"}) {
+                            const auto it = m_children.find(c);
+                            if (it != std::end(m_children)) {
+                                it->find_matches(pattern, p_i, this, match_state, out);
+                            }
+                        }
+                    }
+                } else if (pattern[p_i] == '*') {
+                    // handle '*' in the pattern
+                    if (p_i == pattern.length() - 1u) {
+                        // the pattern is consumed after the '*', so it matches all keys in this
+                        // node's subtree
+                        match_state.set_fully_matched(this);
+                        get_values_and_recurse(out);
+                        return;
+                    }
+
+                    if (k_i < m_key.length()) {
+                        // '*' matches any character
+                        // consume the '*' and continue matching at the current character of the key
+                        match_tasks.emplace_back(k_i, p_i + 1u);
+                        // consume the current character of the key and continue matching at '*'
+                        match_tasks.emplace_back(k_i + 1u, p_i);
+                    } else {
+                        // the key is consumed, so continue matching at the children
+                        for (const auto &child: m_children) {
+                            child.find_matches(pattern, p_i, this, match_state, out);
+                        }
+                    }
+                } else if (pattern[p_i] == '?') {
+                    // handle '?' in the pattern
+                    if (k_i < m_key.length()) {
+                        // '?' matches any character, continue at the next chars in both the pattern
+                        // and the key
+                        match_tasks.emplace_back(k_i + 1u, p_i + 1u);
+                    } else {
+                        // the key is consumed, so continue matching at the children
+                        for (const auto &child: m_children) {
+                            child.find_matches(pattern, p_i, this, match_state, out);
+                        }
+                    }
+                } else if (pattern[p_i] == '%') {
+                    // handle '%' in the pattern
+                    if (p_i < pattern.length() - 1u && pattern[p_i + 1u] == '*') {
+                        // handle "%*" in the pattern
+                        // try to continue matching after "%*"
+                        match_tasks.emplace_back(k_i, p_i + 2u);
+                        if (k_i < m_key.length()) {
+                            if (m_key[k_i] >= '0' && m_key[k_i] <= '9') {
+                                // try to match more digits
+                                match_tasks.emplace_back(k_i + 1u, p_i);
+                            }
+                        } else {
+                            // the key is consumed, so continue matching at the children
+                            for (auto it = m_children.lower_bound("0"),
+                                      end = m_children.upper_bound("9");
+                                 it != end;
+                                 ++it) {
+                                it->find_matches(pattern, p_i, this, match_state, out);
+                            }
+                        }
+                    } else {
+                        if (k_i < m_key.length()) {
+                            // handle '%' in the pattern (not followed by '*')
+                            if (m_key[k_i] >= '0' && m_key[k_i] <= '9') {
+                                // continue matching after the digit
+                                match_tasks.emplace_back(k_i + 1u, p_i + 1u);
+                            }
+                        } else {
+                            // the key is consumed, so continue matching at the children
+                            for (auto it = m_children.lower_bound("0"),
+                                      end = m_children.upper_bound("9");
+                                 it != end;
+                                 ++it) {
+                                it->find_matches(pattern, p_i, this, match_state, out);
+                            }
+                        }
+                    }
+                } else {
+                    if (k_i < m_key.length()) {
+                        if (pattern[p_i] == m_key[k_i]) {
+                            // handle a regular character in the pattern
+                            match_tasks.emplace_back(k_i + 1u, p_i + 1u);
+                        }
+                    } else {
+                        // the key is consumed, so continue matching at the children
+                        for (auto [it, end] = m_children.equal_range(pattern.substr(p_i, 1u));
+                             it != end;
+                             ++it) {
+                            it->find_matches(pattern, p_i, this, match_state, out);
+                        }
+                    }
+                }
+            }
         }
 
-        const auto [k_i, p_i] = match_tasks.back();
-        match_tasks.pop_back();
-
-        if (k_i == m_key.length() && p_i == pattern.length())
-        {
-          if (match_state.set_matched(this))
-          {
-            // this node was not matched yet, so fetch the results
-            get_values(out);
-          }
-
-          // there might still be children of this node that could be matched by a pending
-          // match task, so continue matching
-          continue;
-        }
-
-        if (p_i == pattern.length())
-        {
-          // the pattern is consumed by the key isn't, we cannot have a match here
-          continue;
-        }
-
-        // after this point, we can assume that the pattern is not consumed, but the key
-        // might be
-        if (pattern[p_i] == '\\' && p_i < pattern.length() - 1u)
-        {
-          // handle escaped characters in the pattern
-          const auto& n = pattern[p_i + 1u];
-
-          if (k_i < m_key.length())
-          {
-            // check the next character in the pattern against the next character in the
-            // key
-            if (n == '*' || n == '?' || n == '%' || n == '\\')
-            {
-              if (m_key[k_i] == n)
-              {
-                // the key matches the escaped character, continue
-                match_tasks.emplace_back(k_i + 1u, p_i + 2u);
-              }
-            }
-            else
-            {
-              throw std::invalid_argument("invalid escape sequence in pattern");
-            }
-          }
-          else
-          {
-            // the key is consumed, so continue matching at the children
-            for (const auto& c : {"*", "?", "%", "\\"})
-            {
-              const auto it = m_children.find(c);
-              if (it != std::end(m_children))
-              {
-                it->find_matches(pattern, p_i, this, match_state, out);
-              }
-            }
-          }
-        }
-        else if (pattern[p_i] == '*')
-        {
-          // handle '*' in the pattern
-          if (p_i == pattern.length() - 1u)
-          {
-            // the pattern is consumed after the '*', so it matches all keys in this
-            // node's subtree
-            match_state.set_fully_matched(this);
-            get_values_and_recurse(out);
-            return;
-          }
-
-          if (k_i < m_key.length())
-          {
-            // '*' matches any character
-            // consume the '*' and continue matching at the current character of the key
-            match_tasks.emplace_back(k_i, p_i + 1u);
-            // consume the current character of the key and continue matching at '*'
-            match_tasks.emplace_back(k_i + 1u, p_i);
-          }
-          else
-          {
-            // the key is consumed, so continue matching at the children
-            for (const auto& child : m_children)
-            {
-              child.find_matches(pattern, p_i, this, match_state, out);
-            }
-          }
-        }
-        else if (pattern[p_i] == '?')
-        {
-          // handle '?' in the pattern
-          if (k_i < m_key.length())
-          {
-            // '?' matches any character, continue at the next chars in both the pattern
-            // and the key
-            match_tasks.emplace_back(k_i + 1u, p_i + 1u);
-          }
-          else
-          {
-            // the key is consumed, so continue matching at the children
-            for (const auto& child : m_children)
-            {
-              child.find_matches(pattern, p_i, this, match_state, out);
-            }
-          }
-        }
-        else if (pattern[p_i] == '%')
-        {
-          // handle '%' in the pattern
-          if (p_i < pattern.length() - 1u && pattern[p_i + 1u] == '*')
-          {
-            // handle "%*" in the pattern
-            // try to continue matching after "%*"
-            match_tasks.emplace_back(k_i, p_i + 2u);
-            if (k_i < m_key.length())
-            {
-              if (m_key[k_i] >= '0' && m_key[k_i] <= '9')
-              {
-                // try to match more digits
-                match_tasks.emplace_back(k_i + 1u, p_i);
-              }
-            }
-            else
-            {
-              // the key is consumed, so continue matching at the children
-              for (auto it = m_children.lower_bound("0"),
-                        end = m_children.upper_bound("9");
-                   it != end;
-                   ++it)
-              {
-                it->find_matches(pattern, p_i, this, match_state, out);
-              }
-            }
-          }
-          else
-          {
-            if (k_i < m_key.length())
-            {
-              // handle '%' in the pattern (not followed by '*')
-              if (m_key[k_i] >= '0' && m_key[k_i] <= '9')
-              {
-                // continue matching after the digit
-                match_tasks.emplace_back(k_i + 1u, p_i + 1u);
-              }
-            }
-            else
-            {
-              // the key is consumed, so continue matching at the children
-              for (auto it = m_children.lower_bound("0"),
-                        end = m_children.upper_bound("9");
-                   it != end;
-                   ++it)
-              {
-                it->find_matches(pattern, p_i, this, match_state, out);
-              }
-            }
-          }
-        }
-        else
-        {
-          if (k_i < m_key.length())
-          {
-            if (pattern[p_i] == m_key[k_i])
-            {
-              // handle a regular character in the pattern
-              match_tasks.emplace_back(k_i + 1u, p_i + 1u);
-            }
-          }
-          else
-          {
-            // the key is consumed, so continue matching at the children
-            for (auto [it, end] = m_children.equal_range(pattern.substr(p_i, 1u));
-                 it != end;
-                 ++it)
-            {
-              it->find_matches(pattern, p_i, this, match_state, out);
-            }
-          }
-        }
-      }
-    }
-
-    /**
+        /**
      * Adds the keys of all nodes in this subtree to the given output iterator.
      *
      * @tparam O the type of the output iterator
      * @param prefix the prefix of all keys in this subtree
      * @param out the output iterator
      */
-    template <typename O>
-    void get_keys(const std::string& prefix, O out) const
-    {
-      const auto key = prefix + m_key;
-      if (!m_values.empty())
-      {
-        out++ = key;
-      }
+        template<typename O>
+        void get_keys(const std::string &prefix, O out) const {
+            const auto key = prefix + m_key;
+            if (!m_values.empty()) {
+                out++ = key;
+            }
 
-      for (const auto& child : m_children)
-      {
-        child.get_keys(key, out);
-      }
-    }
-
-  private:
-    void insert_value(const V& value) const { m_values[value]++; }
-
-    bool remove_value(const V& value) const
-    {
-      auto it = m_values.find(value);
-      if (it == std::end(m_values))
-      {
-        return false;
-      }
-      else
-      {
-        if (--(it->second) == 0u)
-        {
-          m_values.erase(it);
+            for (const auto &child: m_children) {
+                child.get_keys(key, out);
+            }
         }
-        return true;
-      }
-    }
 
-    /**
+    private:
+        void insert_value(const V &value) const { m_values[value]++; }
+
+        bool remove_value(const V &value) const {
+            auto it = m_values.find(value);
+            if (it == std::end(m_values)) {
+                return false;
+            } else {
+                if (--(it->second) == 0u) {
+                    m_values.erase(it);
+                }
+                return true;
+            }
+        }
+
+        /**
      * Splits this node into two nodes at the given index of its key. For example, given a
      * node n with key "abcd" and index 2, the following will happen:
      * - n's key will be shortened to "ab"
@@ -686,74 +594,67 @@ private:
      *
      * @param index the index at which to split the node's key
      */
-    void split_node(const std::size_t index) const
-    {
-      assert(m_key.length() > 1u);
+        void split_node(const std::size_t index) const {
+            assert(m_key.length() > 1u);
 
-      auto new_key = m_key.substr(0u, index);
-      auto remainder = m_key.substr(index);
+            auto new_key = m_key.substr(0u, index);
+            auto remainder = m_key.substr(index);
 
-      assert(!new_key.empty());
-      assert(!remainder.empty());
+            assert(!new_key.empty());
+            assert(!remainder.empty());
 
-      using std::swap;
-      node_set new_children;
-      swap(new_children, m_children);
+            using std::swap;
+            node_set new_children;
+            swap(new_children, m_children);
 
-      const node& new_child = *m_children.insert(node(std::move(remainder))).first;
-      swap(new_child.m_children, new_children);
-      swap(new_child.m_values, m_values);
+            const node &new_child = *m_children.insert(node(std::move(remainder))).first;
+            swap(new_child.m_children, new_children);
+            swap(new_child.m_values, m_values);
 
-      m_key = std::move(new_key);
-    }
+            m_key = std::move(new_key);
+        }
 
-    /**
+        /**
      * Merges this node with its only child. Thereby, this child node's key is appended to
      * this node's key, the child's children and values are moved to this node, and the
      * child is removed.
      *
      * Precondition: This node has only one child, and this node has no values of its own.
      */
-    void merge_node() const
-    {
-      assert(m_children.size() == 1u);
-      assert(m_values.empty());
+        void merge_node() const {
+            assert(m_children.size() == 1u);
+            assert(m_values.empty());
 
-      using std::swap;
-      node_set old_children;
-      swap(old_children, m_children);
+            using std::swap;
+            node_set old_children;
+            swap(old_children, m_children);
 
-      const node& child = *std::begin(old_children);
-      swap(m_children, child.m_children);
-      swap(m_values, child.m_values);
+            const node &child = *std::begin(old_children);
+            swap(m_children, child.m_children);
+            swap(m_values, child.m_values);
 
-      m_key += child.m_key;
-    }
-
-    template <typename O>
-    void get_values(O out) const
-    {
-      for (const auto& [value, count] : m_values)
-      {
-        for (std::size_t i = 0u; i < count; ++i)
-        {
-          out++ = value;
+            m_key += child.m_key;
         }
-      }
-    }
 
-    template <typename O>
-    void get_values_and_recurse(O out) const
-    {
-      get_values(out);
-      for (const auto& child : m_children)
-      {
-        child.get_values_and_recurse(out);
-      }
-    }
-  };
+        template<typename O>
+        void get_values(O out) const {
+            for (const auto &[value, count]: m_values) {
+                for (std::size_t i = 0u; i < count; ++i) {
+                    out++ = value;
+                }
+            }
+        }
 
-  /**
+        template<typename O>
+        void get_values_and_recurse(O out) const {
+            get_values(out);
+            for (const auto &child: m_children) {
+                child.get_values_and_recurse(out);
+            }
+        }
+    };
+
+    /**
    * Compares nodes against each other or nodes against strings.
    *
    * Two nodes are compared by their keys.
@@ -766,53 +667,47 @@ private:
    *
    * Precondition: the strings to copmare are not empty.
    */
-  struct node_cmp
-  {
-    using is_transparent = void;
+    struct node_cmp {
+        using is_transparent = void;
 
-    bool operator()(const node& lhs, const node& rhs) const
-    {
-      return compare(lhs.m_key, rhs.m_key);
-    }
+        bool operator()(const node &lhs, const node &rhs) const {
+            return compare(lhs.m_key, rhs.m_key);
+        }
 
-    bool operator()(const std::string_view lhs, const node& rhs) const
-    {
-      return compare(lhs, rhs.m_key);
-    }
+        bool operator()(const std::string_view lhs, const node &rhs) const {
+            return compare(lhs, rhs.m_key);
+        }
 
-    bool operator()(const node& lhs, const std::string_view rhs) const
-    {
-      return compare(lhs.m_key, rhs);
-    }
+        bool operator()(const node &lhs, const std::string_view rhs) const {
+            return compare(lhs.m_key, rhs);
+        }
 
-    bool compare(const std::string_view lhs, const std::string_view& rhs) const
-    {
-      assert(!lhs.empty() && !rhs.empty());
-      return lhs[0] < rhs[0];
-    }
-  };
+        bool compare(const std::string_view lhs, const std::string_view &rhs) const {
+            assert(!lhs.empty() && !rhs.empty());
+            return lhs[0] < rhs[0];
+        }
+    };
 
 private:
-  node m_root;
+    node m_root;
 
 public:
-  /**
+    /**
    * Creates a new empty trie.
    */
-  compact_trie()
-    : m_root(node(""))
-  {
-  }
+    compact_trie()
+        : m_root(node("")) {
+    }
 
-  /**
+    /**
    * Inserts the given value under the given key.
    *
    * @param key the key to insert
    * @param value the value to insert
    */
-  void insert(const std::string_view key, const V& value) { m_root.insert(key, value); }
+    void insert(const std::string_view key, const V &value) { m_root.insert(key, value); }
 
-  /**
+    /**
    * Removes the given value using the given key.
    *
    * @param key the key to remove
@@ -820,17 +715,16 @@ public:
    * @return `true` if the given value was found under the given key, and `false`
    * otherwise
    */
-  bool remove(const std::string_view key, const V& value)
-  {
-    return m_root.remove(key, value);
-  }
+    bool remove(const std::string_view key, const V &value) {
+        return m_root.remove(key, value);
+    }
 
-  /**
+    /**
    * Clears this trie.
    */
-  void clear() { m_root = node(""); }
+    void clear() { m_root = node(""); }
 
-  /**
+    /**
    * Finds all values whose keys match the given glob pattern. See `kdl::str_matches_glob`
    * for the definition and semantics of glob patterns and adds the values to the given
    * output iterator.
@@ -839,23 +733,21 @@ public:
    * @param pattern the pattern to match
    * @param out the output iterator
    */
-  template <typename O>
-  void find_matches(const std::string_view pattern, O out) const
-  {
-    match_state match_state;
-    m_root.find_matches(pattern, {0u}, nullptr, match_state, out);
-  }
+    template<typename O>
+    void find_matches(const std::string_view pattern, O out) const {
+        match_state match_state;
+        m_root.find_matches(pattern, {0u}, nullptr, match_state, out);
+    }
 
-  /**
+    /**
    * Adds the keys of all nodes in this trie to the give output iterator.
    *
    * @tparam O the type of the output iterator
    * @param out the output iterator
    */
-  template <typename O>
-  void get_keys(O out) const
-  {
-    m_root.get_keys("", out);
-  }
+    template<typename O>
+    void get_keys(O out) const {
+        m_root.get_keys("", out);
+    }
 };
-} // namespace kdl
+}// namespace kdl

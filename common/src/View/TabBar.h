@@ -43,56 +43,56 @@ class TabBookPage;
 
 
 class TabBarButton : public QWidget {
-Q_OBJECT
+    Q_OBJECT
 private:
-  QLabel *m_label;
-  QWidget *m_indicator;
-  bool m_pressed;
+    QLabel *m_label;
+    QWidget *m_indicator;
+    bool m_pressed;
 
 public:
-  explicit TabBarButton(const QString &label = "", QWidget *parent = nullptr);
+    explicit TabBarButton(const QString &label = "", QWidget *parent = nullptr);
 
-  /**
+    /**
    * Update the label color
    */
-  void setPressed(bool pressed);
+    void setPressed(bool pressed);
 
 protected:
-  void mousePressEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
 signals:
 
-  void clicked();
+    void clicked();
 
 private:
-  void updateState();
+    void updateState();
 };
 
 
 class TabBar : public ContainerBar {
-Q_OBJECT
+    Q_OBJECT
 private:
-  using ButtonList = std::vector<TabBarButton *>;
+    using ButtonList = std::vector<TabBarButton *>;
 
-  TabBook *m_tabBook;
+    TabBook *m_tabBook;
 
-  QStackedLayout *m_barBook;
-  QHBoxLayout *m_controlLayout;
-  ButtonList m_buttons;
+    QStackedLayout *m_barBook;
+    QHBoxLayout *m_controlLayout;
+    ButtonList m_buttons;
 
 public:
-  explicit TabBar(TabBook *tabBook);
+    explicit TabBar(TabBook *tabBook);
 
-  void addTab(TabBookPage *bookPage, const QString &title);
+    void addTab(TabBookPage *bookPage, const QString &title);
 
 private:
-  size_t findButtonIndex(QWidget *button) const;
+    size_t findButtonIndex(QWidget *button) const;
 
-  void setButtonActive(int index);
+    void setButtonActive(int index);
 
-  void buttonClicked();
+    void buttonClicked();
 
-  void tabBookPageChanged(int newIndex);
+    void tabBookPageChanged(int newIndex);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

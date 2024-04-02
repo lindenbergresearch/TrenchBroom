@@ -33,13 +33,13 @@ class ParserStatus;
 
 class EntParser : public EntityDefinitionParser {
 private:
-  std::string_view m_str;
+    std::string_view m_str;
 
 public:
-  EntParser(std::string_view str, const Color &defaultEntityColor);
+    EntParser(std::string_view str, const Color &defaultEntityColor);
 
 private:
-  std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) override;
+    std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) override;
 };
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

@@ -53,52 +53,52 @@ class SpinControl;
 
 
 class RotateObjectsToolPage : public QWidget {
-Q_OBJECT
+    Q_OBJECT
 private:
-  std::weak_ptr<MapDocument> m_document;
-  RotateObjectsTool &m_tool;
+    std::weak_ptr<MapDocument> m_document;
+    RotateObjectsTool &m_tool;
 
-  QComboBox *m_recentlyUsedCentersList;
-  QPushButton *m_resetCenterButton;
+    QComboBox *m_recentlyUsedCentersList;
+    QPushButton *m_resetCenterButton;
 
-  SpinControl *m_angle;
-  QComboBox *m_axis;
-  QPushButton *m_rotateButton;
-  QCheckBox *m_updateAnglePropertyAfterTransformCheckBox;
+    SpinControl *m_angle;
+    QComboBox *m_axis;
+    QPushButton *m_rotateButton;
+    QCheckBox *m_updateAnglePropertyAfterTransformCheckBox;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  RotateObjectsToolPage(std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent = nullptr);
+    RotateObjectsToolPage(std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent = nullptr);
 
-  void setAxis(vm::axis::type axis);
+    void setAxis(vm::axis::type axis);
 
-  void setRecentlyUsedCenters(const std::vector<vm::vec3> &centers);
+    void setRecentlyUsedCenters(const std::vector<vm::vec3> &centers);
 
-  void setCurrentCenter(const vm::vec3 &center);
+    void setCurrentCenter(const vm::vec3 &center);
 
 private:
-  void connectObservers();
+    void connectObservers();
 
-  void createGui();
+    void createGui();
 
-  void updateGui();
+    void updateGui();
 
-  void selectionDidChange(const Selection &selection);
+    void selectionDidChange(const Selection &selection);
 
-  void documentWasNewedOrLoaded(MapDocument *document);
+    void documentWasNewedOrLoaded(MapDocument *document);
 
-  void centerChanged();
+    void centerChanged();
 
-  void resetCenterClicked();
+    void resetCenterClicked();
 
-  void angleChanged(double value);
+    void angleChanged(double value);
 
-  void rotateClicked();
+    void rotateClicked();
 
-  void updateAnglePropertyAfterTransformClicked();
+    void updateAnglePropertyAfterTransformClicked();
 
-  vm::vec3 getAxis() const;
+    vm::vec3 getAxis() const;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

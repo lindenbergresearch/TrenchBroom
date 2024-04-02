@@ -23,4 +23,4 @@ namespace TrenchBroom {
 namespace View {
 DropTracker::~DropTracker() = default;
 }
-} // namespace TrenchBroom
+}// namespace TrenchBroom

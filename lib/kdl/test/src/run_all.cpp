@@ -35,10 +35,9 @@
 
 #include <clocale>
 
-int main(int argc, char** argv)
-{
-  // set the locale to US so that we can parse floats attribute
-  std::setlocale(LC_NUMERIC, "C");
+int main(int argc, char **argv) {
+    // set the locale to US so that we can parse floats attribute
+    std::setlocale(LC_NUMERIC, "C");
 
-  return Catch::Session().run(argc, argv);
+    return Catch::Session().run(argc, argv);
 }

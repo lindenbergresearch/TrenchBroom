@@ -30,42 +30,42 @@ namespace TrenchBroom {
 namespace View {
 namespace Fonts {
 QFont fixedWidthFont() {
-  auto font = TrenchBroomApp::instance().getConsoleFont();
-  return font;
+    auto font = TrenchBroomApp::instance().getConsoleFont();
+    return font;
 }
-} // namespace Fonts
+}// namespace Fonts
 
 namespace Colors {
 QColor defaultText() {
-  QPalette pal;
-  QColor result = pal.color(QPalette::Normal, QPalette::WindowText);
-  return result;
+    QPalette pal;
+    QColor result = pal.color(QPalette::Normal, QPalette::WindowText);
+    return result;
 }
 
 QColor highlight() {
-  // Used for selected tabs of TabBar control.
-  QPalette pal;
-  QColor result = pal.color(QPalette::Normal, QPalette::Highlight);
-  return result;
+    // Used for selected tabs of TabBar control.
+    QPalette pal;
+    QColor result = pal.color(QPalette::Normal, QPalette::Highlight);
+    return result;
 }
 
 QColor highlightText() {
-  // Used for selected tabs of TabBar control.
-  QPalette pal;
-  QColor result = pal.color(QPalette::Normal, QPalette::HighlightedText);
-  return result;
+    // Used for selected tabs of TabBar control.
+    QPalette pal;
+    QColor result = pal.color(QPalette::Normal, QPalette::HighlightedText);
+    return result;
 }
 
 QColor disabledText() {
-  QPalette pal;
-  QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
-  return result;
+    QPalette pal;
+    QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
+    return result;
 }
 
 QColor midlight() {
-  QPalette pal;
-  QColor result = pal.color(QPalette::Disabled, QPalette::Midlight);
-  return result;
+    QPalette pal;
+    QColor result = pal.color(QPalette::Disabled, QPalette::Midlight);
+    return result;
 }
 
 /**
@@ -73,22 +73,22 @@ QColor midlight() {
  * background.
  */
 QColor disabledCellText() {
-  QPalette pal;
-  QColor result = pal.color(QPalette::Disabled, QPalette::Text);
-  return result;
+    QPalette pal;
+    QColor result = pal.color(QPalette::Disabled, QPalette::Text);
+    return result;
 }
 
 QColor disabledText(const QWidget *widget) {
-  const QPalette &pal = widget->palette();
-  QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
-  return result;
+    const QPalette &pal = widget->palette();
+    QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
+    return result;
 }
 
 QColor window() {
-  QPalette pal;
-  QColor result = pal.color(QPalette::Active, QPalette::Window);
-  return result;
+    QPalette pal;
+    QColor result = pal.color(QPalette::Active, QPalette::Window);
+    return result;
 }
-} // namespace Colors
-} // namespace View
-} // namespace TrenchBroom
+}// namespace Colors
+}// namespace View
+}// namespace TrenchBroom

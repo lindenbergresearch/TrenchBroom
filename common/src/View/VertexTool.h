@@ -43,7 +43,7 @@ class RenderBatch;
 
 
 class RenderService;
-} // namespace Renderer
+}// namespace Renderer
 
 namespace View {
 class BrushVertexCommandBase;
@@ -60,80 +60,82 @@ class Selection;
 
 class VertexTool : public VertexToolBase<vm::vec3> {
 private:
-  enum class Mode {
-    Move, SplitEdge, SplitFace
-  };
+    enum class Mode {
+        Move,
+        SplitEdge,
+        SplitFace
+    };
 
-  Mode m_mode;
+    Mode m_mode;
 
-  std::unique_ptr<VertexHandleManager> m_vertexHandles;
-  std::unique_ptr<EdgeHandleManager> m_edgeHandles;
-  std::unique_ptr<FaceHandleManager> m_faceHandles;
+    std::unique_ptr<VertexHandleManager> m_vertexHandles;
+    std::unique_ptr<EdgeHandleManager> m_edgeHandles;
+    std::unique_ptr<FaceHandleManager> m_faceHandles;
 
-  mutable Renderer::PointGuideRenderer m_guideRenderer;
+    mutable Renderer::PointGuideRenderer m_guideRenderer;
 
 public:
-  explicit VertexTool(const std::weak_ptr<MapDocument> &document);
+    explicit VertexTool(const std::weak_ptr<MapDocument> &document);
 
 public:
-  std::vector<Model::BrushNode *> findIncidentBrushes(const vm::vec3 &handle) const;
+    std::vector<Model::BrushNode *> findIncidentBrushes(const vm::vec3 &handle) const;
 
-  std::vector<Model::BrushNode *> findIncidentBrushes(const vm::segment3 &handle) const;
+    std::vector<Model::BrushNode *> findIncidentBrushes(const vm::segment3 &handle) const;
 
-  std::vector<Model::BrushNode *> findIncidentBrushes(const vm::polygon3 &handle) const;
+    std::vector<Model::BrushNode *> findIncidentBrushes(const vm::polygon3 &handle) const;
 
 private:
-  using VertexToolBase::findIncidentBrushes;
+    using VertexToolBase::findIncidentBrushes;
 
 public:
-  void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const override;
+    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const override;
 
-public: // Handle selection
-  bool deselectAll() override;
+public:// Handle selection
+    bool deselectAll() override;
 
 public:
-  VertexHandleManager &handleManager() override;
+    VertexHandleManager &handleManager() override;
 
-  const VertexHandleManager &handleManager() const override;
+    const VertexHandleManager &handleManager() const override;
 
-public: // Vertex moving
-  std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const override;
+public:// Vertex moving
+    std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const override;
 
-  bool startMove(const std::vector<Model::Hit> &hits) override;
+    bool startMove(const std::vector<Model::Hit> &hits) override;
 
-  MoveResult move(const vm::vec3 &delta) override;
+    MoveResult move(const vm::vec3 &delta) override;
 
-  void endMove() override;
+    void endMove() override;
 
-  void cancelMove() override;
+    void cancelMove() override;
 
-  bool allowAbsoluteSnapping() const override;
+    bool allowAbsoluteSnapping() const override;
 
-  vm::vec3 getHandlePosition(const Model::Hit &hit) const override;
+    vm::vec3 getHandlePosition(const Model::Hit &hit) const override;
 
-  std::string actionName() const override;
+    std::string actionName() const override;
 
-  void removeSelection();
+    void removeSelection();
 
-public: // Rendering
-  void renderGuide(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &position) const override;
+public:// Rendering
+    void renderGuide(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &position) const override;
 
-private: // Tool interface
-  bool doActivate() override;
+private:// Tool interface
+    bool doActivate() override;
 
-  bool doDeactivate() override;
+    bool doDeactivate() override;
 
 private:
-  void addHandles(const std::vector<Model::Node *> &nodes) override;
+    void addHandles(const std::vector<Model::Node *> &nodes) override;
 
-  void removeHandles(const std::vector<Model::Node *> &nodes) override;
+    void removeHandles(const std::vector<Model::Node *> &nodes) override;
 
-  void addHandles(BrushVertexCommandBase *command) override;
+    void addHandles(BrushVertexCommandBase *command) override;
 
-  void removeHandles(BrushVertexCommandBase *command) override;
+    void removeHandles(BrushVertexCommandBase *command) override;
 
-private: // General helper methods
-  void resetModeAfterDeselection();
+private:// General helper methods
+    void resetModeAfterDeselection();
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

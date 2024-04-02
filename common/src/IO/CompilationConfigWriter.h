@@ -29,29 +29,29 @@ namespace TrenchBroom {
 namespace Model {
 struct CompilationConfig;
 struct CompilationProfile;
-} // namespace Model
+}// namespace Model
 
 namespace IO {
 class CompilationConfigWriter {
 private:
-  const Model::CompilationConfig &m_config;
-  std::ostream &m_stream;
+    const Model::CompilationConfig &m_config;
+    std::ostream &m_stream;
 
 public:
-  CompilationConfigWriter(const Model::CompilationConfig &config, std::ostream &stream);
+    CompilationConfigWriter(const Model::CompilationConfig &config, std::ostream &stream);
 
-  void writeConfig();
+    void writeConfig();
 
 private:
-  EL::Value writeProfiles(const Model::CompilationConfig &config) const;
+    EL::Value writeProfiles(const Model::CompilationConfig &config) const;
 
-  EL::Value writeProfile(const Model::CompilationProfile &profile) const;
+    EL::Value writeProfile(const Model::CompilationProfile &profile) const;
 
-  EL::Value writeTasks(const Model::CompilationProfile &profile) const;
+    EL::Value writeTasks(const Model::CompilationProfile &profile) const;
 
-  std::string escape(const std::string &str) const;
+    std::string escape(const std::string &str) const;
 
-deleteCopyAndMove(CompilationConfigWriter);
+    deleteCopyAndMove(CompilationConfigWriter);
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

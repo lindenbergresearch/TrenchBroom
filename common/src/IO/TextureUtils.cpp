@@ -29,18 +29,18 @@
 namespace TrenchBroom::IO {
 
 std::string getTextureNameFromPathSuffix(const std::filesystem::path &path, size_t prefixLength) {
-  return prefixLength < kdl::path_length(path) ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength)).generic_string() : "";
+    return prefixLength < kdl::path_length(path) ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength)).generic_string() : "";
 }
 
 bool checkTextureDimensions(size_t width, size_t height) {
-  return width > 0 && height > 0 && width <= 8192 && height <= 8192;
+    return width > 0 && height > 0 && width <= 8192 && height <= 8192;
 }
 
 size_t mipSize(const size_t width, const size_t height, const size_t mipLevel) {
-  const auto size = Assets::sizeAtMipLevel(width, height, mipLevel);
-  return size.x() * size.y();
+    const auto size = Assets::sizeAtMipLevel(width, height, mipLevel);
+    return size.x() * size.y();
 }
 
 kdl_reflect_impl(ReadTextureError);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

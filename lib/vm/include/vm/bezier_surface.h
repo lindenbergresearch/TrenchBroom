@@ -24,36 +24,34 @@
 
 #include <array>
 
-namespace vm
-{
-template <typename T, size_t C>
+namespace vm {
+template<typename T, size_t C>
 vec<T, C> evaluate_quadratic_bezier_surface(
-  const std::array<std::array<vec<T, C>, 3>, 3>& controlPoints, const T u, const T v)
-{
-  const auto bernsteinPolynomial_0 = [](const auto x) {
-    return static_cast<T>(1) - static_cast<T>(2) * x + (x * x);
-  };
+    const std::array<std::array<vec<T, C>, 3>, 3> &controlPoints, const T u, const T v) {
+    const auto bernsteinPolynomial_0 = [](const auto x) {
+        return static_cast<T>(1) - static_cast<T>(2) * x + (x * x);
+    };
 
-  const auto bernsteinPolynomial_1 = [](const auto x) {
-    return static_cast<T>(2) * (x - (x * x));
-  };
+    const auto bernsteinPolynomial_1 = [](const auto x) {
+        return static_cast<T>(2) * (x - (x * x));
+    };
 
-  const auto bernsteinPolynomial_2 = [](const auto x) { return x * x; };
+    const auto bernsteinPolynomial_2 = [](const auto x) { return x * x; };
 
-  const auto interpolate = [&](const auto x, const std::array<vec<T, C>, 3>& p) {
-    auto result = vec<T, C>{};
-    result = result + bernsteinPolynomial_0(x) * p[0];
-    result = result + bernsteinPolynomial_1(x) * p[1];
-    result = result + bernsteinPolynomial_2(x) * p[2];
-    return result;
-  };
+    const auto interpolate = [&](const auto x, const std::array<vec<T, C>, 3> &p) {
+        auto result = vec<T, C>{};
+        result = result + bernsteinPolynomial_0(x) * p[0];
+        result = result + bernsteinPolynomial_1(x) * p[1];
+        result = result + bernsteinPolynomial_2(x) * p[2];
+        return result;
+    };
 
-  return interpolate(
-    v,
-    {
-      interpolate(u, controlPoints[0]),
-      interpolate(u, controlPoints[1]),
-      interpolate(u, controlPoints[2]),
-    });
+    return interpolate(
+        v,
+        {
+            interpolate(u, controlPoints[0]),
+            interpolate(u, controlPoints[1]),
+            interpolate(u, controlPoints[2]),
+        });
 }
-} // namespace vm
+}// namespace vm

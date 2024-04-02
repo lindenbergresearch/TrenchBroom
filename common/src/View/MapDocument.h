@@ -45,7 +45,7 @@
 
 namespace TrenchBroom {
 class Color;
-} // namespace TrenchBroom
+}// namespace TrenchBroom
 
 namespace TrenchBroom::Assets {
 class EntityDefinition;
@@ -64,7 +64,7 @@ class Texture;
 
 
 class TextureManager;
-} // namespace TrenchBroom::Assets
+}// namespace TrenchBroom::Assets
 
 namespace TrenchBroom::Model {
 class Brush;
@@ -116,7 +116,7 @@ class WorldNode;
 
 
 enum class WrapStyle;
-} // namespace TrenchBroom::Model
+}// namespace TrenchBroom::Model
 
 namespace TrenchBroom::View {
 class Action;
@@ -150,158 +150,158 @@ enum class MapTextEncoding;
 enum class TransactionScope;
 
 struct PointFile {
-  Model::PointTrace trace;
-  std::filesystem::path path;
+    Model::PointTrace trace;
+    std::filesystem::path path;
 };
 
 struct PortalFile {
-  Model::PortalFile portalFile;
-  std::filesystem::path path;
+    Model::PortalFile portalFile;
+    std::filesystem::path path;
 };
 
 
 class MapDocument : public Model::MapFacade, public CachingLogger {
 public:
-  static const vm::bbox3 DefaultWorldBounds;
-  static const std::string DefaultDocumentName;
+    static const vm::bbox3 DefaultWorldBounds;
+    static const std::string DefaultDocumentName;
 
 protected:
-  vm::bbox3 m_worldBounds;
-  std::shared_ptr<Model::Game> m_game;
-  std::unique_ptr<Model::WorldNode> m_world;
+    vm::bbox3 m_worldBounds;
+    std::shared_ptr<Model::Game> m_game;
+    std::unique_ptr<Model::WorldNode> m_world;
 
-  std::optional<PointFile> m_pointFile;
-  std::optional<PortalFile> m_portalFile;
+    std::optional<PointFile> m_pointFile;
+    std::optional<PortalFile> m_portalFile;
 
-  std::unique_ptr<Assets::EntityDefinitionManager> m_entityDefinitionManager;
-  std::unique_ptr<Assets::EntityModelManager> m_entityModelManager;
-  std::unique_ptr<Assets::TextureManager> m_textureManager;
-  std::unique_ptr<Model::TagManager> m_tagManager;
+    std::unique_ptr<Assets::EntityDefinitionManager> m_entityDefinitionManager;
+    std::unique_ptr<Assets::EntityModelManager> m_entityModelManager;
+    std::unique_ptr<Assets::TextureManager> m_textureManager;
+    std::unique_ptr<Model::TagManager> m_tagManager;
 
-  std::unique_ptr<Model::EditorContext> m_editorContext;
-  std::unique_ptr<Grid> m_grid;
+    std::unique_ptr<Model::EditorContext> m_editorContext;
+    std::unique_ptr<Grid> m_grid;
 
-  using ActionList = std::vector<std::unique_ptr<Action>>;
-  ActionList m_tagActions;
-  ActionList m_entityDefinitionActions;
+    using ActionList = std::vector<std::unique_ptr<Action>>;
+    ActionList m_tagActions;
+    ActionList m_entityDefinitionActions;
 
-  std::filesystem::path m_path;
-  size_t m_lastSaveModificationCount;
-  size_t m_modificationCount;
+    std::filesystem::path m_path;
+    size_t m_lastSaveModificationCount;
+    size_t m_modificationCount;
 
-  Model::NodeCollection m_selectedNodes;
-  std::vector<Model::BrushFaceHandle> m_selectedBrushFaces;
+    Model::NodeCollection m_selectedNodes;
+    std::vector<Model::BrushFaceHandle> m_selectedBrushFaces;
 
-  Model::LayerNode *m_currentLayer;
-  std::string m_currentTextureName;
-  vm::bbox3 m_lastSelectionBounds;
-  mutable vm::bbox3 m_selectionBounds;
-  mutable bool m_selectionBoundsValid;
+    Model::LayerNode *m_currentLayer;
+    std::string m_currentTextureName;
+    vm::bbox3 m_lastSelectionBounds;
+    mutable vm::bbox3 m_selectionBounds;
+    mutable bool m_selectionBoundsValid;
 
-  ViewEffectsService *m_viewEffectsService;
+    ViewEffectsService *m_viewEffectsService;
 
-  /*
+    /*
    * All actions pushed to this stack can be repeated later. The stack must be
    * primed to be cleared whenever the selection changes. The effect is that
    * changing the selection automatically begins a new "macro", but at the same
    * time the current repeat stack can still be repeated after the selection
    * was changed.
    */
-  std::unique_ptr<RepeatStack> m_repeatStack;
+    std::unique_ptr<RepeatStack> m_repeatStack;
 
-public: // notification
-  Notifier<Command &> commandDoNotifier;
-  Notifier<Command &> commandDoneNotifier;
-  Notifier<Command &> commandDoFailedNotifier;
-  Notifier<UndoableCommand &> commandUndoNotifier;
-  Notifier<UndoableCommand &> commandUndoneNotifier;
-  Notifier<UndoableCommand &> commandUndoFailedNotifier;
-  Notifier<const std::string &> transactionDoneNotifier;
-  Notifier<const std::string &> transactionUndoneNotifier;
+public:// notification
+    Notifier<Command &> commandDoNotifier;
+    Notifier<Command &> commandDoneNotifier;
+    Notifier<Command &> commandDoFailedNotifier;
+    Notifier<UndoableCommand &> commandUndoNotifier;
+    Notifier<UndoableCommand &> commandUndoneNotifier;
+    Notifier<UndoableCommand &> commandUndoFailedNotifier;
+    Notifier<const std::string &> transactionDoneNotifier;
+    Notifier<const std::string &> transactionUndoneNotifier;
 
-  Notifier<MapDocument *> documentWillBeClearedNotifier;
-  Notifier<MapDocument *> documentWasClearedNotifier;
-  Notifier<MapDocument *> documentWasNewedNotifier;
-  Notifier<MapDocument *> documentWasLoadedNotifier;
-  Notifier<MapDocument *> documentWasSavedNotifier;
-  Notifier<> documentModificationStateDidChangeNotifier;
+    Notifier<MapDocument *> documentWillBeClearedNotifier;
+    Notifier<MapDocument *> documentWasClearedNotifier;
+    Notifier<MapDocument *> documentWasNewedNotifier;
+    Notifier<MapDocument *> documentWasLoadedNotifier;
+    Notifier<MapDocument *> documentWasSavedNotifier;
+    Notifier<> documentModificationStateDidChangeNotifier;
 
-  Notifier<> editorContextDidChangeNotifier;
-  Notifier<const Model::LayerNode *> currentLayerDidChangeNotifier;
-  Notifier<const std::string &> currentTextureNameDidChangeNotifier;
+    Notifier<> editorContextDidChangeNotifier;
+    Notifier<const Model::LayerNode *> currentLayerDidChangeNotifier;
+    Notifier<const std::string &> currentTextureNameDidChangeNotifier;
 
-  Notifier<> selectionWillChangeNotifier;
-  Notifier<const Selection &> selectionDidChangeNotifier;
+    Notifier<> selectionWillChangeNotifier;
+    Notifier<const Selection &> selectionDidChangeNotifier;
 
-  Notifier<const std::vector<Model::Node *> &> nodesWereAddedNotifier;
-  Notifier<const std::vector<Model::Node *> &> nodesWillBeRemovedNotifier;
-  Notifier<const std::vector<Model::Node *> &> nodesWereRemovedNotifier;
-  Notifier<const std::vector<Model::Node *> &> nodesWillChangeNotifier;
-  Notifier<const std::vector<Model::Node *> &> nodesDidChangeNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodesWereAddedNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodesWillBeRemovedNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodesWereRemovedNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodesWillChangeNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodesDidChangeNotifier;
 
-  Notifier<const std::vector<Model::Node *> &> nodeVisibilityDidChangeNotifier;
-  Notifier<const std::vector<Model::Node *> &> nodeLockingDidChangeNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodeVisibilityDidChangeNotifier;
+    Notifier<const std::vector<Model::Node *> &> nodeLockingDidChangeNotifier;
 
-  Notifier<Model::GroupNode *> groupWasOpenedNotifier;
-  Notifier<Model::GroupNode *> groupWasClosedNotifier;
+    Notifier<Model::GroupNode *> groupWasOpenedNotifier;
+    Notifier<Model::GroupNode *> groupWasClosedNotifier;
 
-  Notifier<const std::vector<Model::BrushFaceHandle> &> brushFacesDidChangeNotifier;
+    Notifier<const std::vector<Model::BrushFaceHandle> &> brushFacesDidChangeNotifier;
 
-  Notifier<> textureCollectionsWillChangeNotifier;
-  Notifier<> textureCollectionsDidChangeNotifier;
+    Notifier<> textureCollectionsWillChangeNotifier;
+    Notifier<> textureCollectionsDidChangeNotifier;
 
-  Notifier<> textureUsageCountsDidChangeNotifier;
+    Notifier<> textureUsageCountsDidChangeNotifier;
 
-  Notifier<> entityDefinitionsWillChangeNotifier;
-  Notifier<> entityDefinitionsDidChangeNotifier;
+    Notifier<> entityDefinitionsWillChangeNotifier;
+    Notifier<> entityDefinitionsDidChangeNotifier;
 
-  Notifier<> modsWillChangeNotifier;
-  Notifier<> modsDidChangeNotifier;
+    Notifier<> modsWillChangeNotifier;
+    Notifier<> modsDidChangeNotifier;
 
-  Notifier<> pointFileWasLoadedNotifier;
-  Notifier<> pointFileWasUnloadedNotifier;
+    Notifier<> pointFileWasLoadedNotifier;
+    Notifier<> pointFileWasUnloadedNotifier;
 
-  Notifier<> portalFileWasLoadedNotifier;
-  Notifier<> portalFileWasUnloadedNotifier;
+    Notifier<> portalFileWasLoadedNotifier;
+    Notifier<> portalFileWasUnloadedNotifier;
 
 private:
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 protected:
-  MapDocument();
+    MapDocument();
 
 public:
-  ~MapDocument() override;
+    ~MapDocument() override;
 
-public: // accessors and such
-  Logger &logger();
+public:// accessors and such
+    Logger &logger();
 
-  std::shared_ptr<Model::Game> game() const override;
+    std::shared_ptr<Model::Game> game() const override;
 
-  const vm::bbox3 &worldBounds() const;
+    const vm::bbox3 &worldBounds() const;
 
-  Model::WorldNode *world() const;
+    Model::WorldNode *world() const;
 
-  bool isGamePathPreference(const std::filesystem::path &path) const;
+    bool isGamePathPreference(const std::filesystem::path &path) const;
 
-  Model::LayerNode *currentLayer() const override;
+    Model::LayerNode *currentLayer() const override;
 
 protected:
-  Model::LayerNode *performSetCurrentLayer(Model::LayerNode *currentLayer);
+    Model::LayerNode *performSetCurrentLayer(Model::LayerNode *currentLayer);
 
 public:
-  void setCurrentLayer(Model::LayerNode *currentLayer);
+    void setCurrentLayer(Model::LayerNode *currentLayer);
 
-  bool canSetCurrentLayer(Model::LayerNode *currentLayer) const;
+    bool canSetCurrentLayer(Model::LayerNode *currentLayer) const;
 
-  Model::GroupNode *currentGroup() const override;
+    Model::GroupNode *currentGroup() const override;
 
-  /**
+    /**
    * Returns the current group if one is open, otherwise the world.
    */
-  Model::Node *currentGroupOrWorld() const override;
+    Model::Node *currentGroupOrWorld() const override;
 
-  /**
+    /**
    * Suggests a parent to use for new nodes.
    *
    * If reference nodes are given, return the parent (either a group, if there is one,
@@ -309,111 +309,114 @@ public:
    *
    * Otherwise, returns the current group if one is open, otherwise the current layer.
    */
-  Model::Node *parentForNodes(const std::vector<Model::Node *> &referenceNodes = std::vector<Model::Node *>()) const override;
+    Model::Node *parentForNodes(const std::vector<Model::Node *> &referenceNodes = std::vector<Model::Node *>()) const override;
 
-  Model::EditorContext &editorContext() const;
+    Model::EditorContext &editorContext() const;
 
-  Assets::EntityDefinitionManager &entityDefinitionManager() override;
+    Assets::EntityDefinitionManager &entityDefinitionManager() override;
 
-  Assets::EntityModelManager &entityModelManager() override;
+    Assets::EntityModelManager &entityModelManager() override;
 
-  Assets::TextureManager &textureManager() override;
+    Assets::TextureManager &textureManager() override;
 
-  Grid &grid() const;
+    Grid &grid() const;
 
-  Model::PointTrace *pointFile();
+    Model::PointTrace *pointFile();
 
-  const Model::PortalFile *portalFile() const;
+    const Model::PortalFile *portalFile() const;
 
-  void setViewEffectsService(ViewEffectsService *viewEffectsService);
+    void setViewEffectsService(ViewEffectsService *viewEffectsService);
 
-public: // tag and entity definition actions
-  template<typename ActionVisitor> void visitTagActions(const ActionVisitor &visitor) const {
-    visitActions(visitor, m_tagActions);
-  }
-
-  template<typename ActionVisitor> void visitEntityDefinitionActions(const ActionVisitor &visitor) const {
-    visitActions(visitor, m_entityDefinitionActions);
-  }
-
-private: // tag and entity definition actions
-  template<typename ActionVisitor> void visitActions(const ActionVisitor &visitor, const ActionList &actions) const {
-    for (const std::unique_ptr<Action> &action : actions) {
-      visitor(*action);
+public:// tag and entity definition actions
+    template<typename ActionVisitor>
+    void visitTagActions(const ActionVisitor &visitor) const {
+        visitActions(visitor, m_tagActions);
     }
-  }
 
-  void createTagActions();
+    template<typename ActionVisitor>
+    void visitEntityDefinitionActions(const ActionVisitor &visitor) const {
+        visitActions(visitor, m_entityDefinitionActions);
+    }
 
-  void clearTagActions();
+private:// tag and entity definition actions
+    template<typename ActionVisitor>
+    void visitActions(const ActionVisitor &visitor, const ActionList &actions) const {
+        for (const std::unique_ptr<Action> &action: actions) {
+            visitor(*action);
+        }
+    }
 
-  void createEntityDefinitionActions();
+    void createTagActions();
 
-public: // new, load, save document
-  Result<void> newDocument(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game);
+    void clearTagActions();
 
-  Result<void> loadDocument(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path);
+    void createEntityDefinitionActions();
 
-  void saveDocument();
+public:// new, load, save document
+    Result<void> newDocument(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game);
 
-  void saveDocumentAs(const std::filesystem::path &path);
+    Result<void> loadDocument(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path);
 
-  void saveDocumentTo(const std::filesystem::path &path);
+    void saveDocument();
 
-  Result<void> exportDocumentAs(const IO::ExportOptions &options);
+    void saveDocumentAs(const std::filesystem::path &path);
 
-private:
-  void doSaveDocument(const std::filesystem::path &path);
+    void saveDocumentTo(const std::filesystem::path &path);
 
-  void clearDocument();
-
-public: // text encoding
-  MapTextEncoding encoding() const;
-
-public: // copy and paste
-  std::string serializeSelectedNodes();
-
-  std::string serializeSelectedBrushFaces();
-
-  PasteType paste(const std::string &str);
+    Result<void> exportDocumentAs(const IO::ExportOptions &options);
 
 private:
-  bool pasteNodes(const std::vector<Model::Node *> &nodes);
+    void doSaveDocument(const std::filesystem::path &path);
 
-  bool pasteBrushFaces(const std::vector<Model::BrushFace> &faces);
+    void clearDocument();
 
-public: // point file management
-  void loadPointFile(std::filesystem::path path);
+public:// text encoding
+    MapTextEncoding encoding() const;
 
-  bool isPointFileLoaded() const;
+public:// copy and paste
+    std::string serializeSelectedNodes();
 
-  bool canReloadPointFile() const;
+    std::string serializeSelectedBrushFaces();
 
-  void reloadPointFile();
+    PasteType paste(const std::string &str);
 
-  void unloadPointFile();
+private:
+    bool pasteNodes(const std::vector<Model::Node *> &nodes);
 
-public: // portal file management
-  void loadPortalFile(std::filesystem::path path);
+    bool pasteBrushFaces(const std::vector<Model::BrushFace> &faces);
 
-  bool isPortalFileLoaded() const;
+public:// point file management
+    void loadPointFile(std::filesystem::path path);
 
-  bool canReloadPortalFile() const;
+    bool isPointFileLoaded() const;
 
-  void reloadPortalFile();
+    bool canReloadPointFile() const;
 
-  void unloadPortalFile();
+    void reloadPointFile();
 
-public: // selection
-  bool hasSelection() const override;
+    void unloadPointFile();
 
-  bool hasSelectedNodes() const override;
+public:// portal file management
+    void loadPortalFile(std::filesystem::path path);
 
-  bool hasSelectedBrushFaces() const override;
+    bool isPortalFileLoaded() const;
 
-  bool hasAnySelectedBrushFaces() const override;
+    bool canReloadPortalFile() const;
 
-  /**
+    void reloadPortalFile();
+
+    void unloadPortalFile();
+
+public:// selection
+    bool hasSelection() const override;
+
+    bool hasSelectedNodes() const override;
+
+    bool hasSelectedBrushFaces() const override;
+
+    bool hasAnySelectedBrushFaces() const override;
+
+    /**
    * For commands that modify entities, this returns all entities that should be acted on,
    * based on the current selection.
    *
@@ -423,9 +426,9 @@ public: // selection
    * If multiple linked groups are selected, returns entities from all of them, so
    * attempting to perform commands on all of them will be blocked as a conflict.
    */
-  std::vector<Model::EntityNodeBase *> allSelectedEntityNodes() const override;
+    std::vector<Model::EntityNodeBase *> allSelectedEntityNodes() const override;
 
-  /**
+    /**
    * For commands that modify brushes, this returns all brushes that should be acted on,
    * based on the current selection.
    *
@@ -434,13 +437,13 @@ public: // selection
    * If multiple linked groups are selected, returns brushes from all of them, so
    * attempting to perform commands on all of them will be blocked as a conflict.
    */
-  std::vector<Model::BrushNode *> allSelectedBrushNodes() const;
+    std::vector<Model::BrushNode *> allSelectedBrushNodes() const;
 
-  bool hasAnySelectedBrushNodes() const;
+    bool hasAnySelectedBrushNodes() const;
 
-  const Model::NodeCollection &selectedNodes() const override;
+    const Model::NodeCollection &selectedNodes() const override;
 
-  /**
+    /**
    * For commands that modify brush faces, this returns all that should be acted on, based
    * on the current selection.
    *
@@ -453,128 +456,128 @@ public: // selection
    * can be performed without generating conflicts. (e.g. this allows selecting 2 closed
    * linked groups in a link set and applying textures.)
    */
-  std::vector<Model::BrushFaceHandle> allSelectedBrushFaces() const override;
+    std::vector<Model::BrushFaceHandle> allSelectedBrushFaces() const override;
 
-  std::vector<Model::BrushFaceHandle> selectedBrushFaces() const override;
+    std::vector<Model::BrushFaceHandle> selectedBrushFaces() const override;
 
-  const vm::bbox3 &referenceBounds() const override;
+    const vm::bbox3 &referenceBounds() const override;
 
-  const vm::bbox3 &lastSelectionBounds() const override;
+    const vm::bbox3 &lastSelectionBounds() const override;
 
-  const vm::bbox3 &selectionBounds() const override;
+    const vm::bbox3 &selectionBounds() const override;
 
-  const std::string &currentTextureName() const override;
+    const std::string &currentTextureName() const override;
 
-  void setCurrentTextureName(const std::string &currentTextureName);
+    void setCurrentTextureName(const std::string &currentTextureName);
 
-  void selectAllNodes() override;
+    void selectAllNodes() override;
 
-  void selectSiblings() override;
+    void selectSiblings() override;
 
-  void selectTouching(bool del) override;
+    void selectTouching(bool del) override;
 
-  void selectInside(bool del) override;
+    void selectInside(bool del) override;
 
-  void selectInverse() override;
+    void selectInverse() override;
 
-  void selectNodesWithFilePosition(const std::vector<size_t> &positions) override;
+    void selectNodesWithFilePosition(const std::vector<size_t> &positions) override;
 
-  void selectNodes(const std::vector<Model::Node *> &nodes) override;
+    void selectNodes(const std::vector<Model::Node *> &nodes) override;
 
-  void selectBrushFaces(const std::vector<Model::BrushFaceHandle> &handles) override;
+    void selectBrushFaces(const std::vector<Model::BrushFaceHandle> &handles) override;
 
-  void convertToFaceSelection() override;
+    void convertToFaceSelection() override;
 
-  void selectFacesWithTexture(const Assets::Texture *texture);
+    void selectFacesWithTexture(const Assets::Texture *texture);
 
-  void selectTall(vm::axis::type cameraAxis);
+    void selectTall(vm::axis::type cameraAxis);
 
-  void deselectAll() override;
+    void deselectAll() override;
 
-  void deselectNodes(const std::vector<Model::Node *> &nodes) override;
+    void deselectNodes(const std::vector<Model::Node *> &nodes) override;
 
-  void deselectBrushFaces(const std::vector<Model::BrushFaceHandle> &handles) override;
+    void deselectBrushFaces(const std::vector<Model::BrushFaceHandle> &handles) override;
 
 protected:
-  void updateLastSelectionBounds();
+    void updateLastSelectionBounds();
 
-  void invalidateSelectionBounds();
-
-private:
-  void validateSelectionBounds() const;
-
-  void clearSelection();
-
-public: // adding, removing, reparenting, and duplicating nodes, declared in MapFacade
-  // interface
-  std::vector<Model::Node *> addNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) override;
-
-  void removeNodes(const std::vector<Model::Node *> &nodes) override;
+    void invalidateSelectionBounds();
 
 private:
-  std::map<Model::Node *, std::vector<Model::Node *>> collectRemovableParents(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) const;
+    void validateSelectionBounds() const;
 
-  struct CompareByAncestry;
+    void clearSelection();
 
-  std::vector<Model::Node *> removeImplicitelyRemovedNodes(std::vector<Model::Node *> nodes) const;
+public:// adding, removing, reparenting, and duplicating nodes, declared in MapFacade
+    // interface
+    std::vector<Model::Node *> addNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) override;
 
-  void closeRemovedGroups(const std::map<Model::Node *, std::vector<Model::Node *>> &toRemove);
-
-public:
-  bool reparentNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd) override;
+    void removeNodes(const std::vector<Model::Node *> &nodes) override;
 
 private:
-  bool checkReparenting(const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd) const;
+    std::map<Model::Node *, std::vector<Model::Node *>> collectRemovableParents(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes) const;
+
+    struct CompareByAncestry;
+
+    std::vector<Model::Node *> removeImplicitelyRemovedNodes(std::vector<Model::Node *> nodes) const;
+
+    void closeRemovedGroups(const std::map<Model::Node *, std::vector<Model::Node *>> &toRemove);
 
 public:
-  void deleteObjects() override;
+    bool reparentNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd) override;
 
-  void duplicateObjects() override;
-
-public: // entity management
-  Model::EntityNode *createPointEntity(const Assets::PointEntityDefinition *definition, const vm::vec3 &delta) override;
-
-  Model::EntityNode *createBrushEntity(const Assets::BrushEntityDefinition *definition) override;
-
-public: // group management
-  Model::GroupNode *groupSelection(const std::string &name);
-
-  void mergeSelectedGroupsWithGroup(Model::GroupNode *group);
+private:
+    bool checkReparenting(const std::map<Model::Node *, std::vector<Model::Node *>> &nodesToAdd) const;
 
 public:
-  void ungroupSelection();
+    void deleteObjects() override;
 
-  void renameGroups(const std::string &name);
+    void duplicateObjects() override;
 
-  void openGroup(Model::GroupNode *group);
+public:// entity management
+    Model::EntityNode *createPointEntity(const Assets::PointEntityDefinition *definition, const vm::vec3 &delta) override;
 
-  void closeGroup();
+    Model::EntityNode *createBrushEntity(const Assets::BrushEntityDefinition *definition) override;
 
-  /**
+public:// group management
+    Model::GroupNode *groupSelection(const std::string &name);
+
+    void mergeSelectedGroupsWithGroup(Model::GroupNode *group);
+
+public:
+    void ungroupSelection();
+
+    void renameGroups(const std::string &name);
+
+    void openGroup(Model::GroupNode *group);
+
+    void closeGroup();
+
+    /**
    * Creates a new group that is linked to the currently selected group and returns the
    * newly created group.
    *
    * If the current selection does not consist of exactly one group, then null is
    * returned.
    */
-  Model::GroupNode *createLinkedDuplicate();
+    Model::GroupNode *createLinkedDuplicate();
 
-  bool canCreateLinkedDuplicate() const;
+    bool canCreateLinkedDuplicate() const;
 
-  /**
+    /**
    * Selects all groups linked to the currently selected groups.
    *
    * Nothing happens if the current selection does not consist of only groups.
    */
-  void selectLinkedGroups();
+    void selectLinkedGroups();
 
-  bool canSelectLinkedGroups() const;
+    bool canSelectLinkedGroups() const;
 
-  void linkGroups(const std::vector<Model::GroupNode *> &groupNodes);
+    void linkGroups(const std::vector<Model::GroupNode *> &groupNodes);
 
-  void unlinkGroups(const std::vector<Model::GroupNode *> &groupNodes);
+    void unlinkGroups(const std::vector<Model::GroupNode *> &groupNodes);
 
-  /**
+    /**
    * Unlinks the selected linked groups.
    *
    * For every set of selected linked groups that belong to the same link set, the
@@ -582,450 +585,451 @@ public:
    * will still be linked to each other, but they will no longer be linked to any other
    * member of their original link set that was not selected.
    */
-  void separateLinkedGroups();
+    void separateLinkedGroups();
 
-  bool canSeparateLinkedGroups() const;
+    bool canSeparateLinkedGroups() const;
 
-  bool canUpdateLinkedGroups(const std::vector<Model::Node *> &nodes) const;
+    bool canUpdateLinkedGroups(const std::vector<Model::Node *> &nodes) const;
 
 protected:
-  void setHasPendingChanges(const std::vector<Model::GroupNode *> &groupNodes, bool hasPendingChanges);
+    void setHasPendingChanges(const std::vector<Model::GroupNode *> &groupNodes, bool hasPendingChanges);
 
-  bool updateLinkedGroups();
-
-private:
-  void separateSelectedLinkedGroups(bool relinkGroups);
-
-public: // layer management
-  void renameLayer(Model::LayerNode *layer, const std::string &name);
+    bool updateLinkedGroups();
 
 private:
-  enum class MoveDirection {
-    Up, Down
-  };
+    void separateSelectedLinkedGroups(bool relinkGroups);
 
-  bool moveLayerByOne(Model::LayerNode *layerNode, MoveDirection direction);
+public:// layer management
+    void renameLayer(Model::LayerNode *layer, const std::string &name);
+
+private:
+    enum class MoveDirection {
+        Up,
+        Down
+    };
+
+    bool moveLayerByOne(Model::LayerNode *layerNode, MoveDirection direction);
 
 public:
-  void moveLayer(Model::LayerNode *layer, int offset);
+    void moveLayer(Model::LayerNode *layer, int offset);
 
-  bool canMoveLayer(Model::LayerNode *layer, int offset) const;
+    bool canMoveLayer(Model::LayerNode *layer, int offset) const;
 
-  void moveSelectionToLayer(Model::LayerNode *layer);
+    void moveSelectionToLayer(Model::LayerNode *layer);
 
-  bool canMoveSelectionToLayer(Model::LayerNode *layer) const;
+    bool canMoveSelectionToLayer(Model::LayerNode *layer) const;
 
-  void hideLayers(const std::vector<Model::LayerNode *> &layers);
+    void hideLayers(const std::vector<Model::LayerNode *> &layers);
 
-  bool canHideLayers(const std::vector<Model::LayerNode *> &layers) const;
+    bool canHideLayers(const std::vector<Model::LayerNode *> &layers) const;
 
-  void isolateLayers(const std::vector<Model::LayerNode *> &layers);
+    void isolateLayers(const std::vector<Model::LayerNode *> &layers);
 
-  bool canIsolateLayers(const std::vector<Model::LayerNode *> &layers) const;
+    bool canIsolateLayers(const std::vector<Model::LayerNode *> &layers) const;
 
-  void setOmitLayerFromExport(Model::LayerNode *layerNode, bool omitFromExport);
+    void setOmitLayerFromExport(Model::LayerNode *layerNode, bool omitFromExport);
 
-  void selectAllInLayers(const std::vector<Model::LayerNode *> &layers);
+    void selectAllInLayers(const std::vector<Model::LayerNode *> &layers);
 
-  bool canSelectAllInLayers(const std::vector<Model::LayerNode *> &layers) const;
+    bool canSelectAllInLayers(const std::vector<Model::LayerNode *> &layers) const;
 
-public: // modifying transient node attributes, declared in MapFacade interface
-  void isolate();
+public:// modifying transient node attributes, declared in MapFacade interface
+    void isolate();
 
-  void hide(std::vector<Model::Node *> nodes) override; // Don't take the nodes by reference!
-  void hideSelection();
+    void hide(std::vector<Model::Node *> nodes) override;// Don't take the nodes by reference!
+    void hideSelection();
 
-  void show(const std::vector<Model::Node *> &nodes) override;
+    void show(const std::vector<Model::Node *> &nodes) override;
 
-  void showAll();
+    void showAll();
 
-  void ensureVisible(const std::vector<Model::Node *> &nodes);
+    void ensureVisible(const std::vector<Model::Node *> &nodes);
 
-  void resetVisibility(const std::vector<Model::Node *> &nodes) override;
+    void resetVisibility(const std::vector<Model::Node *> &nodes) override;
 
-  void lock(const std::vector<Model::Node *> &nodes) override;
+    void lock(const std::vector<Model::Node *> &nodes) override;
 
-  void unlock(const std::vector<Model::Node *> &nodes) override;
+    void unlock(const std::vector<Model::Node *> &nodes) override;
 
-  void ensureUnlocked(const std::vector<Model::Node *> &nodes);
+    void ensureUnlocked(const std::vector<Model::Node *> &nodes);
 
-  void resetLock(const std::vector<Model::Node *> &nodes) override;
+    void resetLock(const std::vector<Model::Node *> &nodes) override;
 
 private:
-  void downgradeShownToInherit(const std::vector<Model::Node *> &nodes);
+    void downgradeShownToInherit(const std::vector<Model::Node *> &nodes);
 
-  void downgradeUnlockedToInherit(const std::vector<Model::Node *> &nodes);
+    void downgradeUnlockedToInherit(const std::vector<Model::Node *> &nodes);
 
-public: // modifying objects, declared in MapFacade interface
-  bool swapNodeContents(
-      const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap,
-      std::vector<Model::GroupNode *> changedLinkedGroups
-  );
+public:// modifying objects, declared in MapFacade interface
+    bool swapNodeContents(
+        const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap,
+        std::vector<Model::GroupNode *> changedLinkedGroups);
 
-  bool swapNodeContents(const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap);
+    bool swapNodeContents(const std::string &commandName, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodesToSwap);
 
-  bool transformObjects(const std::string &commandName, const vm::mat4x4 &transformation);
+    bool transformObjects(const std::string &commandName, const vm::mat4x4 &transformation);
 
-  bool translateObjects(const vm::vec3 &delta) override;
+    bool translateObjects(const vm::vec3 &delta) override;
 
-  bool rotateObjects(const vm::vec3 &center, const vm::vec3 &axis, FloatType angle) override;
+    bool rotateObjects(const vm::vec3 &center, const vm::vec3 &axis, FloatType angle) override;
 
-  bool scaleObjects(const vm::bbox3 &oldBBox, const vm::bbox3 &newBBox) override;
+    bool scaleObjects(const vm::bbox3 &oldBBox, const vm::bbox3 &newBBox) override;
 
-  bool scaleObjects(const vm::vec3 &center, const vm::vec3 &scaleFactors) override;
+    bool scaleObjects(const vm::vec3 &center, const vm::vec3 &scaleFactors) override;
 
-  bool shearObjects(const vm::bbox3 &box, const vm::vec3 &sideToShear, const vm::vec3 &delta) override;
+    bool shearObjects(const vm::bbox3 &box, const vm::vec3 &sideToShear, const vm::vec3 &delta) override;
 
-  bool flipObjects(const vm::vec3 &center, vm::axis::type axis) override;
+    bool flipObjects(const vm::vec3 &center, vm::axis::type axis) override;
 
-public: // CSG operations, declared in MapFacade interface
-  bool createBrush(const std::vector<vm::vec3> &points);
+public:// CSG operations, declared in MapFacade interface
+    bool createBrush(const std::vector<vm::vec3> &points);
 
-  bool csgConvexMerge();
+    bool csgConvexMerge();
 
-  bool csgSubtract();
+    bool csgSubtract();
 
-  bool csgIntersect();
+    bool csgIntersect();
 
-  bool csgHollow();
+    bool csgHollow();
 
-public: // Clipping operations, declared in MapFacade interface
-  bool clipBrushes(const vm::vec3 &p1, const vm::vec3 &p2, const vm::vec3 &p3);
+public:// Clipping operations, declared in MapFacade interface
+    bool clipBrushes(const vm::vec3 &p1, const vm::vec3 &p2, const vm::vec3 &p3);
 
-public: // modifying entity properties, declared in MapFacade interface
-  bool setProperty(const std::string &key, const std::string &value, bool defaultToProtected = false) override;
+public:// modifying entity properties, declared in MapFacade interface
+    bool setProperty(const std::string &key, const std::string &value, bool defaultToProtected = false) override;
 
-  bool renameProperty(const std::string &oldKey, const std::string &newKey) override;
+    bool renameProperty(const std::string &oldKey, const std::string &newKey) override;
 
-  bool removeProperty(const std::string &key) override;
+    bool removeProperty(const std::string &key) override;
 
-  bool convertEntityColorRange(const std::string &key, Assets::ColorRange::Type range) override;
+    bool convertEntityColorRange(const std::string &key, Assets::ColorRange::Type range) override;
 
-  bool updateSpawnflag(const std::string &key, size_t flagIndex, bool setFlag) override;
+    bool updateSpawnflag(const std::string &key, size_t flagIndex, bool setFlag) override;
 
-  bool setProtectedProperty(const std::string &key, bool value);
+    bool setProtectedProperty(const std::string &key, bool value);
 
-  bool clearProtectedProperties();
+    bool clearProtectedProperties();
 
-  bool canClearProtectedProperties() const;
+    bool canClearProtectedProperties() const;
 
-  void setDefaultProperties(Model::SetDefaultPropertyMode mode);
+    void setDefaultProperties(Model::SetDefaultPropertyMode mode);
 
-public: // brush resizing, declared in MapFacade interface
-  bool extrudeBrushes(const std::vector<vm::polygon3> &faces, const vm::vec3 &delta) override;
+public:// brush resizing, declared in MapFacade interface
+    bool extrudeBrushes(const std::vector<vm::polygon3> &faces, const vm::vec3 &delta) override;
 
 public:
-  bool setFaceAttributes(const Model::BrushFaceAttributes &attributes) override;
+    bool setFaceAttributes(const Model::BrushFaceAttributes &attributes) override;
 
-  bool setFaceAttributesExceptContentFlags(const Model::BrushFaceAttributes &attributes) override;
+    bool setFaceAttributesExceptContentFlags(const Model::BrushFaceAttributes &attributes) override;
 
-  bool setFaceAttributes(const Model::ChangeBrushFaceAttributesRequest &request) override;
+    bool setFaceAttributes(const Model::ChangeBrushFaceAttributesRequest &request) override;
 
-  bool copyTexCoordSystemFromFace(
-      const Model::TexCoordSystemSnapshot &coordSystemSnapshot, const Model::BrushFaceAttributes &attribs, const vm::plane3 &sourceFacePlane,
-      Model::WrapStyle wrapStyle
-  );
+    bool copyTexCoordSystemFromFace(
+        const Model::TexCoordSystemSnapshot &coordSystemSnapshot, const Model::BrushFaceAttributes &attribs, const vm::plane3 &sourceFacePlane,
+        Model::WrapStyle wrapStyle);
 
-  bool moveTextures(const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, const vm::vec2f &delta) override;
+    bool moveTextures(const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, const vm::vec2f &delta) override;
 
-  bool rotateTextures(float angle) override;
+    bool rotateTextures(float angle) override;
 
-  bool shearTextures(const vm::vec2f &factors) override;
+    bool shearTextures(const vm::vec2f &factors) override;
 
-  bool flipTextures(const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, vm::direction cameraRelativeFlipDirection);
+    bool flipTextures(const vm::vec3f &cameraUp, const vm::vec3f &cameraRight, vm::direction cameraRelativeFlipDirection);
 
-public: // modifying vertices, declared in MapFacade interface
-  bool snapVertices(FloatType snapTo) override;
+public:// modifying vertices, declared in MapFacade interface
+    bool snapVertices(FloatType snapTo) override;
 
-  MoveVerticesResult moveVertices(std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta) override;
+    MoveVerticesResult moveVertices(std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta) override;
 
-  bool moveEdges(std::vector<vm::segment3> edgePositions, const vm::vec3 &delta) override;
+    bool moveEdges(std::vector<vm::segment3> edgePositions, const vm::vec3 &delta) override;
 
-  bool moveFaces(std::vector<vm::polygon3> facePositions, const vm::vec3 &delta) override;
+    bool moveFaces(std::vector<vm::polygon3> facePositions, const vm::vec3 &delta) override;
 
-  bool addVertex(const vm::vec3 &vertexPosition);
+    bool addVertex(const vm::vec3 &vertexPosition);
 
-  bool removeVertices(const std::string &commandName, std::vector<vm::vec3> vertexPositions);
+    bool removeVertices(const std::string &commandName, std::vector<vm::vec3> vertexPositions);
 
-public: // debug commands
-  void printVertices();
+public:// debug commands
+    void printVertices();
 
-  bool throwExceptionDuringCommand();
+    bool throwExceptionDuringCommand();
 
-public: // command processing
-  bool canUndoCommand() const;
+public:// command processing
+    bool canUndoCommand() const;
 
-  bool canRedoCommand() const;
+    bool canRedoCommand() const;
 
-  const std::string &undoCommandName() const;
+    const std::string &undoCommandName() const;
 
-  const std::string &redoCommandName() const;
+    const std::string &redoCommandName() const;
 
-  void undoCommand();
+    void undoCommand();
 
-  void redoCommand();
+    void redoCommand();
 
-  bool canRepeatCommands() const;
+    bool canRepeatCommands() const;
 
-  void repeatCommands();
+    void repeatCommands();
 
-  void clearRepeatableCommands();
+    void clearRepeatableCommands();
 
-public: // transactions
-  void startTransaction(std::string name, TransactionScope scope);
+public:// transactions
+    void startTransaction(std::string name, TransactionScope scope);
 
-  void rollbackTransaction();
+    void rollbackTransaction();
 
-  bool commitTransaction();
+    bool commitTransaction();
 
-  void cancelTransaction();
+    void cancelTransaction();
 
-  virtual bool isCurrentDocumentStateObservable() const = 0;
-
-private:
-  std::unique_ptr<CommandResult> execute(std::unique_ptr<Command> &&command);
-
-  std::unique_ptr<CommandResult> executeAndStore(std::unique_ptr<UndoableCommand> &&command);
-
-private: // subclassing interface for command processing
-  virtual bool doCanUndoCommand() const = 0;
-
-  virtual bool doCanRedoCommand() const = 0;
-
-  virtual const std::string &doGetUndoCommandName() const = 0;
-
-  virtual const std::string &doGetRedoCommandName() const = 0;
-
-  virtual void doUndoCommand() = 0;
-
-  virtual void doRedoCommand() = 0;
-
-  virtual void doClearCommandProcessor() = 0;
-
-  virtual void doStartTransaction(std::string name, TransactionScope scope) = 0;
-
-  virtual void doCommitTransaction() = 0;
-
-  virtual void doRollbackTransaction() = 0;
-
-  virtual std::unique_ptr<CommandResult> doExecute(std::unique_ptr<Command> command) = 0;
-
-  virtual std::unique_ptr<CommandResult> doExecuteAndStore(std::unique_ptr<UndoableCommand> command) = 0;
-
-public: // asset state management
-  void commitPendingAssets();
-
-public: // picking
-  void pick(const vm::ray3 &pickRay, Model::PickResult &pickResult) const;
-
-  std::vector<Model::Node *> findNodesContaining(const vm::vec3 &point) const;
-
-private: // world management
-  Result<void> createWorld(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game);
-
-  Result<void> loadWorld(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path);
-
-  void clearWorld();
-
-public: // asset management
-  Assets::EntityDefinitionFileSpec entityDefinitionFile() const;
-
-  std::vector<Assets::EntityDefinitionFileSpec> allEntityDefinitionFiles() const;
-
-  void setEntityDefinitionFile(const Assets::EntityDefinitionFileSpec &spec);
-
-  // For testing
-  void setEntityDefinitions(std::vector<std::unique_ptr<Assets::EntityDefinition>> definitions);
-
-  void reloadTextureCollections();
-
-  void reloadEntityDefinitions();
-
-  std::vector<std::filesystem::path> enabledTextureCollections() const;
-
-  std::vector<std::filesystem::path> disabledTextureCollections() const;
-
-  void setEnabledTextureCollections(const std::vector<std::filesystem::path> &enabledTextureCollections);
+    virtual bool isCurrentDocumentStateObservable() const = 0;
 
 private:
-  void loadAssets();
+    std::unique_ptr<CommandResult> execute(std::unique_ptr<Command> &&command);
 
-  void unloadAssets();
+    std::unique_ptr<CommandResult> executeAndStore(std::unique_ptr<UndoableCommand> &&command);
 
-  void loadEntityDefinitions();
+private:// subclassing interface for command processing
+    virtual bool doCanUndoCommand() const = 0;
 
-  void unloadEntityDefinitions();
+    virtual bool doCanRedoCommand() const = 0;
 
-  void loadEntityModels();
+    virtual const std::string &doGetUndoCommandName() const = 0;
 
-  void unloadEntityModels();
+    virtual const std::string &doGetRedoCommandName() const = 0;
+
+    virtual void doUndoCommand() = 0;
+
+    virtual void doRedoCommand() = 0;
+
+    virtual void doClearCommandProcessor() = 0;
+
+    virtual void doStartTransaction(std::string name, TransactionScope scope) = 0;
+
+    virtual void doCommitTransaction() = 0;
+
+    virtual void doRollbackTransaction() = 0;
+
+    virtual std::unique_ptr<CommandResult> doExecute(std::unique_ptr<Command> command) = 0;
+
+    virtual std::unique_ptr<CommandResult> doExecuteAndStore(std::unique_ptr<UndoableCommand> command) = 0;
+
+public:// asset state management
+    void commitPendingAssets();
+
+public:// picking
+    void pick(const vm::ray3 &pickRay, Model::PickResult &pickResult) const;
+
+    std::vector<Model::Node *> findNodesContaining(const vm::vec3 &point) const;
+
+private:// world management
+    Result<void> createWorld(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game);
+
+    Result<void> loadWorld(Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path);
+
+    void clearWorld();
+
+public:// asset management
+    Assets::EntityDefinitionFileSpec entityDefinitionFile() const;
+
+    std::vector<Assets::EntityDefinitionFileSpec> allEntityDefinitionFiles() const;
+
+    void setEntityDefinitionFile(const Assets::EntityDefinitionFileSpec &spec);
+
+    // For testing
+    void setEntityDefinitions(std::vector<std::unique_ptr<Assets::EntityDefinition>> definitions);
+
+    void reloadTextureCollections();
+
+    void reloadEntityDefinitions();
+
+    std::vector<std::filesystem::path> enabledTextureCollections() const;
+
+    std::vector<std::filesystem::path> disabledTextureCollections() const;
+
+    void setEnabledTextureCollections(const std::vector<std::filesystem::path> &enabledTextureCollections);
+
+private:
+    void loadAssets();
+
+    void unloadAssets();
+
+    void loadEntityDefinitions();
+
+    void unloadEntityDefinitions();
+
+    void loadEntityModels();
+
+    void unloadEntityModels();
 
 protected:
-  void reloadTextures();
+    void reloadTextures();
 
-  void loadTextures();
+    void loadTextures();
 
-  void unloadTextures();
+    void unloadTextures();
 
-  void setTextures();
+    void setTextures();
 
-  void setTextures(const std::vector<Model::Node *> &nodes);
+    void setTextures(const std::vector<Model::Node *> &nodes);
 
-  void setTextures(const std::vector<Model::BrushFaceHandle> &faceHandles);
+    void setTextures(const std::vector<Model::BrushFaceHandle> &faceHandles);
 
-  void unsetTextures();
+    void unsetTextures();
 
-  void unsetTextures(const std::vector<Model::Node *> &nodes);
+    void unsetTextures(const std::vector<Model::Node *> &nodes);
 
-  void setEntityDefinitions();
+    void setEntityDefinitions();
 
-  void setEntityDefinitions(const std::vector<Model::Node *> &nodes);
+    void setEntityDefinitions(const std::vector<Model::Node *> &nodes);
 
-  void unsetEntityDefinitions();
+    void unsetEntityDefinitions();
 
-  void unsetEntityDefinitions(const std::vector<Model::Node *> &nodes);
+    void unsetEntityDefinitions(const std::vector<Model::Node *> &nodes);
 
-  void reloadEntityDefinitionsInternal();
+    void reloadEntityDefinitionsInternal();
 
-  void clearEntityModels();
+    void clearEntityModels();
 
-  void setEntityModels();
+    void setEntityModels();
 
-  void setEntityModels(const std::vector<Model::Node *> &nodes);
+    void setEntityModels(const std::vector<Model::Node *> &nodes);
 
-  void unsetEntityModels();
+    void unsetEntityModels();
 
-  void unsetEntityModels(const std::vector<Model::Node *> &nodes);
+    void unsetEntityModels(const std::vector<Model::Node *> &nodes);
 
-protected: // search paths and mods
-  std::vector<std::filesystem::path> externalSearchPaths() const;
+protected:// search paths and mods
+    std::vector<std::filesystem::path> externalSearchPaths() const;
 
-  void updateGameSearchPaths();
-
-public:
-  std::vector<std::string> mods() const override;
-
-  void setMods(const std::vector<std::string> &mods) override;
-
-  std::string defaultMod() const;
-
-public: // map soft bounds
-  void setSoftMapBounds(const Model::Game::SoftMapBounds &bounds);
-
-  Model::Game::SoftMapBounds softMapBounds() const;
-
-private: // validator management
-  void registerValidators();
+    void updateGameSearchPaths();
 
 public:
-  void setIssueHidden(const Model::Issue &issue, bool hidden);
+    std::vector<std::string> mods() const override;
+
+    void setMods(const std::vector<std::string> &mods) override;
+
+    std::string defaultMod() const;
+
+public:// map soft bounds
+    void setSoftMapBounds(const Model::Game::SoftMapBounds &bounds);
+
+    Model::Game::SoftMapBounds softMapBounds() const;
+
+private:// validator management
+    void registerValidators();
+
+public:
+    void setIssueHidden(const Model::Issue &issue, bool hidden);
 
 private:
-  virtual void doSetIssueHidden(const Model::Issue &issue, bool hidden) = 0;
+    virtual void doSetIssueHidden(const Model::Issue &issue, bool hidden) = 0;
 
-public:                     // tag management
-  void registerSmartTags(); // public for testing
-  const std::vector<Model::SmartTag> &smartTags() const;
+public:                      // tag management
+    void registerSmartTags();// public for testing
+    const std::vector<Model::SmartTag> &smartTags() const;
 
-  bool isRegisteredSmartTag(const std::string &name) const;
+    bool isRegisteredSmartTag(const std::string &name) const;
 
-  const Model::SmartTag &smartTag(const std::string &name) const;
+    const Model::SmartTag &smartTag(const std::string &name) const;
 
-  bool isRegisteredSmartTag(size_t index) const;
+    bool isRegisteredSmartTag(size_t index) const;
 
-  const Model::SmartTag &smartTag(size_t index) const;
-
-private:
-  void initializeAllNodeTags(MapDocument *document);
-
-  void initializeNodeTags(const std::vector<Model::Node *> &nodes);
-
-  void clearNodeTags(const std::vector<Model::Node *> &nodes);
-
-  void updateNodeTags(const std::vector<Model::Node *> &nodes);
-
-  void updateFaceTags(const std::vector<Model::BrushFaceHandle> &faces);
-
-  void updateAllFaceTags();
-
-public: // document path
-  bool persistent() const;
-
-  std::string filename() const;
-
-  const std::filesystem::path &path() const;
+    const Model::SmartTag &smartTag(size_t index) const;
 
 private:
-  void setPath(const std::filesystem::path &path);
+    void initializeAllNodeTags(MapDocument *document);
 
-public: // modification count
-  bool modified() const;
+    void initializeNodeTags(const std::vector<Model::Node *> &nodes);
 
-  size_t modificationCount() const;
+    void clearNodeTags(const std::vector<Model::Node *> &nodes);
+
+    void updateNodeTags(const std::vector<Model::Node *> &nodes);
+
+    void updateFaceTags(const std::vector<Model::BrushFaceHandle> &faces);
+
+    void updateAllFaceTags();
+
+public:// document path
+    bool persistent() const;
+
+    std::string filename() const;
+
+    const std::filesystem::path &path() const;
 
 private:
-  void setLastSaveModificationCount();
+    void setPath(const std::filesystem::path &path);
 
-  void clearModificationCount();
+public:// modification count
+    bool modified() const;
 
-private: // observers
-  void connectObservers();
+    size_t modificationCount() const;
 
-  void textureCollectionsWillChange();
+private:
+    void setLastSaveModificationCount();
 
-  void textureCollectionsDidChange();
+    void clearModificationCount();
 
-  void entityDefinitionsWillChange();
+private:// observers
+    void connectObservers();
 
-  void entityDefinitionsDidChange();
+    void textureCollectionsWillChange();
 
-  void modsWillChange();
+    void textureCollectionsDidChange();
 
-  void modsDidChange();
+    void entityDefinitionsWillChange();
 
-  void preferenceDidChange(const std::filesystem::path &path);
+    void entityDefinitionsDidChange();
 
-  void commandDone(Command &command);
+    void modsWillChange();
 
-  void commandUndone(UndoableCommand &command);
+    void modsDidChange();
 
-  void transactionDone(const std::string &name);
+    void preferenceDidChange(const std::filesystem::path &path);
 
-  void transactionUndone(const std::string &name);
+    void commandDone(Command &command);
+
+    void commandUndone(UndoableCommand &command);
+
+    void transactionDone(const std::string &name);
+
+    void transactionUndone(const std::string &name);
 };
 
 
 class Transaction {
 public:
-  enum class State {
-    Running, Committed, Cancelled,
-  };
+    enum class State {
+        Running,
+        Committed,
+        Cancelled,
+    };
 
 private:
-  MapDocument &m_document;
-  std::string m_name;
-  State m_state;
+    MapDocument &m_document;
+    std::string m_name;
+    State m_state;
 
 public:
-  explicit Transaction(std::weak_ptr<MapDocument> document, std::string name = "");
+    explicit Transaction(std::weak_ptr<MapDocument> document, std::string name = "");
 
-  explicit Transaction(std::shared_ptr<MapDocument> document, std::string name = "");
+    explicit Transaction(std::shared_ptr<MapDocument> document, std::string name = "");
 
-  explicit Transaction(MapDocument &document, std::string name = "");
+    explicit Transaction(MapDocument &document, std::string name = "");
 
-  ~Transaction();
+    ~Transaction();
 
-  State state() const;
+    State state() const;
 
-  void finish(bool commit);
+    void finish(bool commit);
 
-  bool commit();
+    bool commit();
 
-  void rollback();
+    void rollback();
 
-  void cancel();
+    void cancel();
 
 private:
-  void begin();
+    void begin();
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

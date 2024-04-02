@@ -74,142 +74,142 @@ class VertexTool;
 
 
 class SwitchableMapViewContainer : public QWidget, public MapView {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Logger *m_logger;
-  std::weak_ptr<MapDocument> m_document;
-  GLContextManager &m_contextManager;
+    Logger *m_logger;
+    std::weak_ptr<MapDocument> m_document;
+    GLContextManager &m_contextManager;
 
-  MapViewBar *m_mapViewBar = nullptr;
-  std::unique_ptr<MapViewToolBox> m_toolBox;
+    MapViewBar *m_mapViewBar = nullptr;
+    std::unique_ptr<MapViewToolBox> m_toolBox;
 
-  std::unique_ptr<Renderer::MapRenderer> m_mapRenderer;
+    std::unique_ptr<Renderer::MapRenderer> m_mapRenderer;
 
-  MultiPaneMapView *m_mapView = nullptr;
-  std::unique_ptr<MapViewActivationTracker> m_activationTracker;
+    MultiPaneMapView *m_mapView = nullptr;
+    std::unique_ptr<MapViewActivationTracker> m_activationTracker;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  SwitchableMapViewContainer(Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
+    SwitchableMapViewContainer(Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
-  ~SwitchableMapViewContainer() override;
+    ~SwitchableMapViewContainer() override;
 
-  void connectTopWidgets(Inspector *inspector);
+    void connectTopWidgets(Inspector *inspector);
 
-  void windowActivationStateChanged(bool active);
+    void windowActivationStateChanged(bool active);
 
-  bool active() const;
+    bool active() const;
 
-  void switchToMapView(MapViewLayout viewId);
+    void switchToMapView(MapViewLayout viewId);
 
-  bool anyToolActive() const;
+    bool anyToolActive() const;
 
-  void deactivateTool();
+    void deactivateTool();
 
-  bool createComplexBrushToolActive() const;
+    bool createComplexBrushToolActive() const;
 
-  bool canToggleCreateComplexBrushTool() const;
+    bool canToggleCreateComplexBrushTool() const;
 
-  void toggleCreateComplexBrushTool();
+    void toggleCreateComplexBrushTool();
 
-  bool clipToolActive() const;
+    bool clipToolActive() const;
 
-  bool canToggleClipTool() const;
+    bool canToggleClipTool() const;
 
-  void toggleClipTool();
+    void toggleClipTool();
 
-  ClipTool &clipTool();
+    ClipTool &clipTool();
 
-  bool rotateObjectsToolActive() const;
+    bool rotateObjectsToolActive() const;
 
-  bool canToggleRotateObjectsTool() const;
+    bool canToggleRotateObjectsTool() const;
 
-  void toggleRotateObjectsTool();
+    void toggleRotateObjectsTool();
 
-  bool scaleObjectsToolActive() const;
+    bool scaleObjectsToolActive() const;
 
-  bool canToggleScaleObjectsTool() const;
+    bool canToggleScaleObjectsTool() const;
 
-  void toggleScaleObjectsTool();
+    void toggleScaleObjectsTool();
 
-  bool shearObjectsToolActive() const;
+    bool shearObjectsToolActive() const;
 
-  bool canToggleShearObjectsTool() const;
+    bool canToggleShearObjectsTool() const;
 
-  void toggleShearObjectsTool();
+    void toggleShearObjectsTool();
 
-  bool canToggleVertexTools() const;
+    bool canToggleVertexTools() const;
 
-  bool anyVertexToolActive() const;
+    bool anyVertexToolActive() const;
 
-  bool vertexToolActive() const;
+    bool vertexToolActive() const;
 
-  bool edgeToolActive() const;
+    bool edgeToolActive() const;
 
-  bool faceToolActive() const;
+    bool faceToolActive() const;
 
-  void toggleVertexTool();
+    void toggleVertexTool();
 
-  void toggleEdgeTool();
+    void toggleEdgeTool();
 
-  void toggleFaceTool();
+    void toggleFaceTool();
 
-  VertexTool &vertexTool();
+    VertexTool &vertexTool();
 
-  EdgeTool &edgeTool();
+    EdgeTool &edgeTool();
 
-  FaceTool &faceTool();
+    FaceTool &faceTool();
 
-  MapViewToolBox &mapViewToolBox();
+    MapViewToolBox &mapViewToolBox();
 
-  bool canMoveCameraToNextTracePoint() const;
+    bool canMoveCameraToNextTracePoint() const;
 
-  bool canMoveCameraToPreviousTracePoint() const;
+    bool canMoveCameraToPreviousTracePoint() const;
 
-  void moveCameraToNextTracePoint();
+    void moveCameraToNextTracePoint();
 
-  void moveCameraToPreviousTracePoint();
+    void moveCameraToPreviousTracePoint();
 
-  bool canMaximizeCurrentView() const;
+    bool canMaximizeCurrentView() const;
 
-  bool currentViewMaximized() const;
+    bool currentViewMaximized() const;
 
-  void toggleMaximizeCurrentView();
+    void toggleMaximizeCurrentView();
 
 private:
-  void connectObservers();
+    void connectObservers();
 
-  void refreshViews(Tool &tool);
+    void refreshViews(Tool &tool);
 
-private: // implement MapView interface
-  void doInstallActivationTracker(MapViewActivationTracker &activationTracker) override;
+private:// implement MapView interface
+    void doInstallActivationTracker(MapViewActivationTracker &activationTracker) override;
 
-  bool doGetIsCurrent() const override;
+    bool doGetIsCurrent() const override;
 
-  MapViewBase *doGetFirstMapViewBase() override;
+    MapViewBase *doGetFirstMapViewBase() override;
 
-  bool doCanSelectTall() override;
+    bool doCanSelectTall() override;
 
-  void doSelectTall() override;
+    void doSelectTall() override;
 
-  vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
+    vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
 
-  void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
+    void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
 
-  void doFocusCameraOnSelection(bool animate) override;
+    void doFocusCameraOnSelection(bool animate) override;
 
-  void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
+    void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
 
-  void doMoveCameraToCurrentTracePoint() override;
+    void doMoveCameraToCurrentTracePoint() override;
 
-  bool doCancelMouseDrag() override;
+    bool doCancelMouseDrag() override;
 
-  void doRefreshViews() override;
+    void doRefreshViews() override;
 
-private: // implement ViewEffectsService interface
-  void doFlashSelection() override;
+private:// implement ViewEffectsService interface
+    void doFlashSelection() override;
 
-deleteCopyAndMove(SwitchableMapViewContainer);
+    deleteCopyAndMove(SwitchableMapViewContainer);
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

@@ -32,51 +32,51 @@ ImageLoader::ImageLoader(const Format format, const char *begin, const char *end
 ImageLoader::~ImageLoader() = default;
 
 size_t ImageLoader::paletteSize() const {
-  return m_impl->paletteSize();
+    return m_impl->paletteSize();
 }
 
 size_t ImageLoader::bitsPerPixel() const {
-  return m_impl->bitsPerPixel();
+    return m_impl->bitsPerPixel();
 }
 
 size_t ImageLoader::width() const {
-  return m_impl->width();
+    return m_impl->width();
 }
 
 size_t ImageLoader::height() const {
-  return m_impl->height();
+    return m_impl->height();
 }
 
 size_t ImageLoader::byteWidth() const {
-  return m_impl->byteWidth();
+    return m_impl->byteWidth();
 }
 
 size_t ImageLoader::scanWidth() const {
-  return m_impl->scanWidth();
+    return m_impl->scanWidth();
 }
 
 bool ImageLoader::hasPalette() const {
-  return m_impl->hasPalette();
+    return m_impl->hasPalette();
 }
 
 bool ImageLoader::hasIndices() const {
-  return m_impl->hasIndices();
+    return m_impl->hasIndices();
 }
 
 bool ImageLoader::hasPixels() const {
-  return m_impl->hasPixels();
+    return m_impl->hasPixels();
 }
 
 std::vector<unsigned char> ImageLoader::loadPalette() const {
-  return m_impl->loadPalette();
+    return m_impl->loadPalette();
 }
 
 std::vector<unsigned char> ImageLoader::loadIndices() const {
-  return m_impl->loadIndices();
+    return m_impl->loadIndices();
 }
 
 std::vector<unsigned char> ImageLoader::loadPixels(const PixelFormat format) const {
-  return m_impl->loadPixels(format);
+    return m_impl->loadPixels(format);
 }
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

@@ -26,14 +26,16 @@
 namespace TrenchBroom::IO {
 
 std::ostream &operator<<(std::ostream &lhs, const TraversalMode &rhs) {
-  switch (rhs) {
-  case TraversalMode::Flat:lhs << "Normal";
-    break;
-  case TraversalMode::Recursive:lhs << "Recursive";
-    break;
-    switchDefault();
-  }
-  return lhs;
+    switch (rhs) {
+        case TraversalMode::Flat:
+            lhs << "Normal";
+            break;
+        case TraversalMode::Recursive:
+            lhs << "Recursive";
+            break;
+            switchDefault();
+    }
+    return lhs;
 }
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

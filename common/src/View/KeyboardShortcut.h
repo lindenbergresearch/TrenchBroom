@@ -35,5 +35,5 @@ QString keySequenceToV1Settings(const QKeySequence &keySequence);
 int wxKeyToQt(int wxKey);
 
 int qtKeyToWx(int qtKey);
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

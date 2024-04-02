@@ -32,30 +32,30 @@ class MapDocumentCommandFacade;
 
 class UndoableCommand : public Command {
 private:
-  size_t m_modificationCount;
+    size_t m_modificationCount;
 
 protected:
-  UndoableCommand(std::string name, bool updateModificationCount);
+    UndoableCommand(std::string name, bool updateModificationCount);
 
 public:
-  virtual ~UndoableCommand();
+    virtual ~UndoableCommand();
 
-  std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document) override;
+    std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document) override;
 
-  virtual std::unique_ptr<CommandResult> performUndo(MapDocumentCommandFacade *document);
+    virtual std::unique_ptr<CommandResult> performUndo(MapDocumentCommandFacade *document);
 
-  virtual bool collateWith(UndoableCommand &command);
+    virtual bool collateWith(UndoableCommand &command);
 
 protected:
-  virtual std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) = 0;
+    virtual std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) = 0;
 
-  virtual bool doCollateWith(UndoableCommand &command);
+    virtual bool doCollateWith(UndoableCommand &command);
 
-  void setModificationCount(MapDocumentCommandFacade *document);
+    void setModificationCount(MapDocumentCommandFacade *document);
 
-  void resetModificationCount(MapDocumentCommandFacade *document);
+    void resetModificationCount(MapDocumentCommandFacade *document);
 
-deleteCopyAndMove(UndoableCommand);
+    deleteCopyAndMove(UndoableCommand);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

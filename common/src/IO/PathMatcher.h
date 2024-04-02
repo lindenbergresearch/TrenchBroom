@@ -39,4 +39,4 @@ PathMatcher makePathInfoPathMatcher(std::vector<PathInfo> pathInfos);
 
 bool matchAnyPath(const std::filesystem::path &path, const GetPathInfo &getPathInfo);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

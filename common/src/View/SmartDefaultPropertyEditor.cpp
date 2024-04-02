@@ -28,5 +28,5 @@ SmartDefaultPropertyEditor::SmartDefaultPropertyEditor(std::weak_ptr<MapDocument
 
 void SmartDefaultPropertyEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *> & /* nodes */) {
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

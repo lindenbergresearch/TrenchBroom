@@ -36,22 +36,22 @@ class DragTracker;
 
 class CameraTool2D : public ToolController, public Tool {
 private:
-  Renderer::OrthographicCamera &m_camera;
-  vm::vec2f m_lastMousePos;
+    Renderer::OrthographicCamera &m_camera;
+    vm::vec2f m_lastMousePos;
 
 public:
-  explicit CameraTool2D(Renderer::OrthographicCamera &camera);
+    explicit CameraTool2D(Renderer::OrthographicCamera &camera);
 
 private:
-  Tool &tool() override;
+    Tool &tool() override;
 
-  const Tool &tool() const override;
+    const Tool &tool() const override;
 
-  void mouseScroll(const InputState &inputState) override;
+    void mouseScroll(const InputState &inputState) override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  bool cancel() override;
+    bool cancel() override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

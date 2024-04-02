@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <GL/glew.h> // must be included here, before QOpenGLWidget
+#include <GL/glew.h>// must be included here, before QOpenGLWidget
 
 #include <QElapsedTimer>
 #include <QOpenGLWidget>
@@ -44,117 +44,117 @@ class ShaderManager;
 
 
 class VboManager;
-} // namespace Renderer
+}// namespace Renderer
 
 namespace View {
 class GLContextManager;
 
 
 struct BoxFilter {
-  std::vector<QPointF *> samples;
-  size_t size, length;
-  size_t index;
+    std::vector<QPointF *> samples;
+    size_t size, length;
+    size_t index;
 
-  explicit BoxFilter(size_t size, size_t length = 0) : size(size) {
-    samples.resize(size);
-    index = 0;
+    explicit BoxFilter(size_t size, size_t length = 0) : size(size) {
+        samples.resize(size);
+        index = 0;
 
-    this->length = length <= 0 ? size : length;
-    reset();
-  }
+        this->length = length <= 0 ? size : length;
+        reset();
+    }
 
-  QPointF average();
+    QPointF average();
 
-  void reset();
+    void reset();
 
-  void add(QPointF *point);
+    void add(QPointF *point);
 };
 
 
 class RenderView : public QOpenGLWidget, public InputEventProcessor {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Color m_focusColor, m_frameColor;
-  GLContextManager *m_glContext;
-  InputEventRecorder m_eventRecorder;
-  BoxFilter boxFilter;
-  QTimer m_timer; // Timer to control the frame rate
-  double avgFps = 0;
+    Color m_focusColor, m_frameColor;
+    GLContextManager *m_glContext;
+    InputEventRecorder m_eventRecorder;
+    BoxFilter boxFilter;
+    QTimer m_timer;// Timer to control the frame rate
+    double avgFps = 0;
 
-protected: // FPS counter
-  // stats since the last counter update
-  long m_totalFrames = 0;
-  int m_framesRendered = 0;
-  double maxFrameTime = 0;
-  int glWidth, glHeight;
-
-protected:
-  std::string m_currentFPS;
+protected:// FPS counter
+    // stats since the last counter update
+    long m_totalFrames = 0;
+    int m_framesRendered = 0;
+    double maxFrameTime = 0;
+    int glWidth, glHeight;
 
 protected:
-  explicit RenderView(GLContextManager &contextManager, QWidget *parent = nullptr);
+    std::string m_currentFPS;
+
+protected:
+    explicit RenderView(GLContextManager &contextManager, QWidget *parent = nullptr);
 
 public:
-  ~RenderView() override;
+    ~RenderView() override;
 
-protected: // QWindow overrides
-  void keyPressEvent(QKeyEvent *event) override;
+protected:// QWindow overrides
+    void keyPressEvent(QKeyEvent *event) override;
 
-  void keyReleaseEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-  void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
-  void mousePressEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 
-  void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
-  void wheelEvent(QWheelEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
-  void updateEvent();
+    void updateEvent();
 
-  QMouseEvent mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event);
-
-protected:
-  Renderer::VboManager &vboManager();
-
-  Renderer::FontManager &fontManager();
-
-  Renderer::ShaderManager &shaderManager();
-
-  int depthBits() const;
-
-  bool multisample() const;
-
-protected: // QOpenGLWidget overrides
-  void initializeGL() override;
-
-  void paintGL() override;
-
-  void resizeGL(int w, int h) override;
-
-private:
-  void render();
-
-  void processInput();
-
-  void clearBackground();
-
-  void renderFocusIndicator();
+    QMouseEvent mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event);
 
 protected:
-  // called by initializeGL by default
-  virtual bool doInitializeGL();
+    Renderer::VboManager &vboManager();
+
+    Renderer::FontManager &fontManager();
+
+    Renderer::ShaderManager &shaderManager();
+
+    int depthBits() const;
+
+    bool multisample() const;
+
+protected:// QOpenGLWidget overrides
+    void initializeGL() override;
+
+    void paintGL() override;
+
+    void resizeGL(int w, int h) override;
 
 private:
-  virtual const Color &getBackgroundColor();
+    void render();
 
-  virtual void doUpdateViewport(int x, int y, int width, int height);
+    void processInput();
 
-  virtual bool doShouldRenderFocusIndicator() const = 0;
+    void clearBackground();
 
-  virtual void doRender() = 0;
+    void renderFocusIndicator();
+
+protected:
+    // called by initializeGL by default
+    virtual bool doInitializeGL();
+
+private:
+    virtual const Color &getBackgroundColor();
+
+    virtual void doUpdateViewport(int x, int y, int width, int height);
+
+    virtual bool doShouldRenderFocusIndicator() const = 0;
+
+    virtual void doRender() = 0;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

@@ -32,31 +32,31 @@
 
 namespace TrenchBroom::View {
 void CameraLinkHelper::addCamera(Renderer::Camera *camera) {
-  ensure(camera != nullptr, "camera is null");
-  assert(! kdl::vec_contains(m_cameras, camera));
-  m_cameras.push_back(camera);
-  m_notifierConnection += camera->cameraDidChangeNotifier.connect(this, &CameraLinkHelper::cameraDidChange);
+    ensure(camera != nullptr, "camera is null");
+    assert(!kdl::vec_contains(m_cameras, camera));
+    m_cameras.push_back(camera);
+    m_notifierConnection += camera->cameraDidChangeNotifier.connect(this, &CameraLinkHelper::cameraDidChange);
 }
 
 void CameraLinkHelper::updateCameras(const Renderer::Camera *masterCamera) {
-  for (auto *camera : m_cameras) {
-    if (camera != masterCamera) {
-      camera->setZoom(masterCamera->zoom());
+    for (auto *camera: m_cameras) {
+        if (camera != masterCamera) {
+            camera->setZoom(masterCamera->zoom());
 
-      const auto oldPosition = camera->position();
-      const auto factors = vm::vec3f::one() - abs(masterCamera->direction()) - abs(camera->direction());
-      const auto newPosition = (vm::vec3f::one() - factors) * oldPosition + factors * masterCamera->position();
-      camera->moveTo(newPosition);
+            const auto oldPosition = camera->position();
+            const auto factors = vm::vec3f::one() - abs(masterCamera->direction()) - abs(camera->direction());
+            const auto newPosition = (vm::vec3f::one() - factors) * oldPosition + factors * masterCamera->position();
+            camera->moveTo(newPosition);
+        }
     }
-  }
 }
 
 void CameraLinkHelper::cameraDidChange(const Renderer::Camera *camera) {
-  if (! m_ignoreNotifications && pref(Preferences::Link2DCameras)) {
-    const auto ignoreNotifications = kdl::set_temp{m_ignoreNotifications};
-    updateCameras(camera);
-  }
+    if (!m_ignoreNotifications && pref(Preferences::Link2DCameras)) {
+        const auto ignoreNotifications = kdl::set_temp{m_ignoreNotifications};
+        updateCameras(camera);
+    }
 }
 
 CameraLinkableView::~CameraLinkableView() = default;
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

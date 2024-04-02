@@ -26,16 +26,19 @@
 namespace TrenchBroom::IO {
 
 std::ostream &operator<<(std::ostream &lhs, const PathInfo &rhs) {
-  switch (rhs) {
-  case PathInfo::Directory:lhs << "Directory";
-    break;
-  case PathInfo::File:lhs << "File";
-    break;
-  case PathInfo::Unknown:lhs << "Unknown";
-    break;
-    switchDefault();
-  }
-  return lhs;
+    switch (rhs) {
+        case PathInfo::Directory:
+            lhs << "Directory";
+            break;
+        case PathInfo::File:
+            lhs << "File";
+            break;
+        case PathInfo::Unknown:
+            lhs << "Unknown";
+            break;
+            switchDefault();
+    }
+    return lhs;
 }
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

@@ -29,24 +29,23 @@ SignalDelayer::SignalDelayer(QObject *parent) : QObject{parent}, m_isQueued{fals
 }
 
 void SignalDelayer::queueSignal() {
-  static const QMetaMethod processSignalMetaMethod = QMetaMethod::fromSignal(&SignalDelayer::processSignal);
-  if (! isSignalConnected(processSignalMetaMethod)) {
-    qWarning() << "queueSignal called with nothing connected to processSignal";
-  }
+    static const QMetaMethod processSignalMetaMethod = QMetaMethod::fromSignal(&SignalDelayer::processSignal);
+    if (!isSignalConnected(processSignalMetaMethod)) {
+        qWarning() << "queueSignal called with nothing connected to processSignal";
+    }
 
-  if (m_isQueued) {
-    return;
-  }
+    if (m_isQueued) {
+        return;
+    }
 
-  m_isQueued = true;
+    m_isQueued = true;
 
-  QTimer::singleShot(
-      0, this, [&]() {
-        m_isQueued = false;
+    QTimer::singleShot(
+        0, this, [&]() {
+            m_isQueued = false;
 
-        emit processSignal();
-      }
-  );
+            emit processSignal();
+        });
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

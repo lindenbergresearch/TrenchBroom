@@ -22,21 +22,17 @@
 
 #include <tuple>
 
-namespace kdl
-{
-inline auto tup_capture()
-{
-  return std::tuple<>{};
+namespace kdl {
+inline auto tup_capture() {
+    return std::tuple<>{};
 }
 
-template <typename Type>
-auto tup_capture(Type&& arg)
-{
-  if constexpr (std::is_rvalue_reference_v<Type>)
-  {
-    return std::tuple<std::decay_t<Type>>{std::forward<Type>(arg)};
-  }
-  return std::tuple<Type>{std::forward<Type>(arg)};
+template<typename Type>
+auto tup_capture(Type &&arg) {
+    if constexpr (std::is_rvalue_reference_v<Type>) {
+        return std::tuple<std::decay_t<Type>>{std::forward<Type>(arg)};
+    }
+    return std::tuple<Type>{std::forward<Type>(arg)};
 }
 
 /**
@@ -57,10 +53,9 @@ auto tup_capture(Type&& arg)
  *
  * @return a tuple containing the values of the arguments, as per the rules defined above
  */
-template <typename First, typename... Rest>
-auto tup_capture(First&& first, Rest&&... rest)
-{
-  return std::tuple_cat(
-    tup_capture(std::forward<First>(first)), tup_capture(std::forward<Rest>(rest)...));
+template<typename First, typename... Rest>
+auto tup_capture(First &&first, Rest &&...rest) {
+    return std::tuple_cat(
+        tup_capture(std::forward<First>(first)), tup_capture(std::forward<Rest>(rest)...));
 }
-} // namespace kdl
+}// namespace kdl

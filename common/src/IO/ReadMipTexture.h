@@ -38,4 +38,4 @@ Result<Assets::Texture, ReadTextureError> readIdMipTexture(std::string name, Rea
 
 Result<Assets::Texture, ReadTextureError> readHlMipTexture(std::string name, Reader &reader);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

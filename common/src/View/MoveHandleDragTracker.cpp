@@ -32,11 +32,13 @@ void MoveHandleDragTrackerDelegate::render(const InputState &, const DragState &
 }
 
 DragHandleSnapper makeDragHandleSnapperFromSnapMode(const Grid &grid, const SnapMode snapMode) {
-  switch (snapMode) {
-  case SnapMode::Relative:return makeRelativeHandleSnapper(grid);
-  case SnapMode::Absolute:return makeAbsoluteHandleSnapper(grid);
-    switchDefault();
-  }
+    switch (snapMode) {
+        case SnapMode::Relative:
+            return makeRelativeHandleSnapper(grid);
+        case SnapMode::Absolute:
+            return makeAbsoluteHandleSnapper(grid);
+            switchDefault();
+    }
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

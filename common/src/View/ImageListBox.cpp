@@ -30,58 +30,56 @@
 
 namespace TrenchBroom {
 namespace View {
-ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent) :
-    ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
-  m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
-  makeEmphasized(m_titleLabel);
-  m_titleLabel->setStyleSheet("color: palette(BrightText);");
+ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent) : ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
+    m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
+    makeEmphasized(m_titleLabel);
+    m_titleLabel->setStyleSheet("color: palette(BrightText);");
 
-  m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
-  makeSubTitle(m_subtitleLabel);
+    m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
+    makeSubTitle(m_subtitleLabel);
 
-  auto *imageAndTextLayout = new QHBoxLayout();
-  imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
-  imageAndTextLayout->setSpacing(0);
+    auto *imageAndTextLayout = new QHBoxLayout();
+    imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
+    imageAndTextLayout->setSpacing(0);
 
-  m_imageLabel = new QLabel(this);
-  imageAndTextLayout->addWidget(m_imageLabel);
-  m_imageLabel->setPixmap(image);
+    m_imageLabel = new QLabel(this);
+    imageAndTextLayout->addWidget(m_imageLabel);
+    m_imageLabel->setPixmap(image);
 
-  auto *textLayout = new QVBoxLayout();
-  textLayout->setContentsMargins(LayoutConstants::NarrowVMargin, 0, 0, 0);
-  textLayout->setSpacing(0);
-  textLayout->addWidget(m_titleLabel);
-  textLayout->addWidget(m_subtitleLabel);
+    auto *textLayout = new QVBoxLayout();
+    textLayout->setContentsMargins(LayoutConstants::NarrowVMargin, 0, 0, 0);
+    textLayout->setSpacing(0);
+    textLayout->addWidget(m_titleLabel);
+    textLayout->addWidget(m_subtitleLabel);
 
-  imageAndTextLayout->addLayout(textLayout);
-  setLayout(imageAndTextLayout);
+    imageAndTextLayout->addLayout(textLayout);
+    setLayout(imageAndTextLayout);
 }
 
 void ImageListBoxItemRenderer::updateItem() {
-  QObject *element = this->parent();
-  ImageListBox *listBox = nullptr;
-  do {
-    listBox = dynamic_cast<ImageListBox *>(element);
-    element = element->parent();
-  } while (listBox == nullptr && element != nullptr);
-  if (listBox != nullptr) {
-    m_titleLabel->setText(listBox->title(m_index));
-    m_subtitleLabel->setText(listBox->subtitle(m_index));
-    m_imageLabel->setPixmap(listBox->image(m_index));
-  }
+    QObject *element = this->parent();
+    ImageListBox *listBox = nullptr;
+    do {
+        listBox = dynamic_cast<ImageListBox *>(element);
+        element = element->parent();
+    } while (listBox == nullptr && element != nullptr);
+    if (listBox != nullptr) {
+        m_titleLabel->setText(listBox->title(m_index));
+        m_subtitleLabel->setText(listBox->subtitle(m_index));
+        m_imageLabel->setPixmap(listBox->image(m_index));
+    }
 }
 
 ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, false, parent) {
 }
 
 ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, const size_t index) {
-  return new ImageListBoxItemRenderer(
-      title(index), subtitle(index), image(index), parent
-  );
+    return new ImageListBoxItemRenderer(
+        title(index), subtitle(index), image(index), parent);
 }
 
 QPixmap ImageListBox::image(const size_t /* index */) const {
-  return QPixmap();
+    return QPixmap();
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

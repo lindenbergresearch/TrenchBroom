@@ -30,25 +30,25 @@ CachingLogger::CachingLogger() : m_logger(nullptr) {
 }
 
 void CachingLogger::setParentLogger(Logger *logger) {
-  m_logger = logger;
-  if (m_logger != nullptr) {
-    for (const Message &message : m_cachedMessages) {
-      log(message.level, message.str);
+    m_logger = logger;
+    if (m_logger != nullptr) {
+        for (const Message &message: m_cachedMessages) {
+            log(message.level, message.str);
+        }
+        m_cachedMessages.clear();
     }
-    m_cachedMessages.clear();
-  }
 }
 
 void CachingLogger::doLog(const LogLevel level, const std::string &message) {
-  doLog(level, QString::fromStdString(message));
+    doLog(level, QString::fromStdString(message));
 }
 
 void CachingLogger::doLog(const LogLevel level, const QString &message) {
-  if (m_logger == nullptr) {
-    m_cachedMessages.push_back(Message(level, message));
-  } else {
-    m_logger->log(level, message);
-  }
+    if (m_logger == nullptr) {
+        m_cachedMessages.push_back(Message(level, message));
+    } else {
+        m_logger->log(level, message);
+    }
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

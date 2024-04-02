@@ -31,16 +31,16 @@ class EntityModel;
 namespace IO {
 class EntityModelParser {
 public:
-  virtual ~EntityModelParser();
+    virtual ~EntityModelParser();
 
-  std::unique_ptr<Assets::EntityModel> initializeModel(Logger &logger);
+    std::unique_ptr<Assets::EntityModel> initializeModel(Logger &logger);
 
-  void loadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger);
+    void loadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger);
 
 private:
-  virtual std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) = 0;
+    virtual std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) = 0;
 
-  virtual void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger);
+    virtual void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger);
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

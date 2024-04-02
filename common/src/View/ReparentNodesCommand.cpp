@@ -25,27 +25,25 @@
 namespace TrenchBroom {
 namespace View {
 std::unique_ptr<ReparentNodesCommand> ReparentNodesCommand::reparent(
-    std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove
-) {
-  return std::make_unique<ReparentNodesCommand>(
-      std::move(nodesToAdd), std::move(nodesToRemove));
+    std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove) {
+    return std::make_unique<ReparentNodesCommand>(
+        std::move(nodesToAdd), std::move(nodesToRemove));
 }
 
 ReparentNodesCommand::ReparentNodesCommand(
-    std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove
-) : UpdateLinkedGroupsCommandBase("Reparent Objects", true), m_nodesToAdd(std::move(nodesToAdd)), m_nodesToRemove(std::move(nodesToRemove)) {
+    std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove) : UpdateLinkedGroupsCommandBase("Reparent Objects", true), m_nodesToAdd(std::move(nodesToAdd)), m_nodesToRemove(std::move(nodesToRemove)) {
 }
 
 std::unique_ptr<CommandResult> ReparentNodesCommand::doPerformDo(MapDocumentCommandFacade *document) {
-  document->performRemoveNodes(m_nodesToRemove);
-  document->performAddNodes(m_nodesToAdd);
-  return std::make_unique<CommandResult>(true);
+    document->performRemoveNodes(m_nodesToRemove);
+    document->performAddNodes(m_nodesToAdd);
+    return std::make_unique<CommandResult>(true);
 }
 
 std::unique_ptr<CommandResult> ReparentNodesCommand::doPerformUndo(MapDocumentCommandFacade *document) {
-  document->performRemoveNodes(m_nodesToAdd);
-  document->performAddNodes(m_nodesToRemove);
-  return std::make_unique<CommandResult>(true);
+    document->performRemoveNodes(m_nodesToAdd);
+    document->performAddNodes(m_nodesToRemove);
+    return std::make_unique<CommandResult>(true);
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

@@ -28,19 +28,18 @@
 
 namespace TrenchBroom::View {
 
-ClickableTitleBar::ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent) :
-    TitleBar{title, parent, true}, m_stateText{new QLabel{stateText}} {
-  makeInfo(m_stateText);
+ClickableTitleBar::ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent) : TitleBar{title, parent, true}, m_stateText{new QLabel{stateText}} {
+    makeInfo(m_stateText);
 
-  layout()->addWidget(m_stateText);
+    layout()->addWidget(m_stateText);
 }
 
 void ClickableTitleBar::setStateText(const QString &stateText) {
-  m_stateText->setText(stateText);
+    m_stateText->setText(stateText);
 }
 
 void ClickableTitleBar::mousePressEvent(QMouseEvent * /* event */) {
-  emit titleBarClicked();
+    emit titleBarClicked();
 }
 
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

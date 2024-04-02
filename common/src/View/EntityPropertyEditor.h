@@ -39,7 +39,7 @@ class PropertyDefinition;
 
 
 class EntityDefinition;
-} // namespace Assets
+}// namespace Assets
 
 namespace Model {
 class Node;
@@ -63,46 +63,46 @@ class SmartPropertyEditorManager;
  * smart editor, and documentation text view.
  */
 class EntityPropertyEditor : public QWidget {
-Q_OBJECT
+    Q_OBJECT
 private:
-  std::weak_ptr<MapDocument> m_document;
-  QSplitter *m_splitter;
-  EntityPropertyGrid *m_propertyGrid;
-  SmartPropertyEditorManager *m_smartEditorManager;
-  QTextEdit *m_documentationText;
-  const Assets::EntityDefinition *m_currentDefinition;
+    std::weak_ptr<MapDocument> m_document;
+    QSplitter *m_splitter;
+    EntityPropertyGrid *m_propertyGrid;
+    SmartPropertyEditorManager *m_smartEditorManager;
+    QTextEdit *m_documentationText;
+    const Assets::EntityDefinition *m_currentDefinition;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  explicit EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+    explicit EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-  ~EntityPropertyEditor() override;
+    ~EntityPropertyEditor() override;
 
 private:
-  void OnCurrentRowChanged();
+    void OnCurrentRowChanged();
 
-  void connectObservers();
+    void connectObservers();
 
-  void selectionDidChange(const Selection &selection);
+    void selectionDidChange(const Selection &selection);
 
-  void nodesDidChange(const std::vector<Model::Node *> &nodes);
+    void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void updateIfSelectedEntityDefinitionChanged();
+    void updateIfSelectedEntityDefinitionChanged();
 
-  void updateDocumentationAndSmartEditor();
+    void updateDocumentationAndSmartEditor();
 
-  /**
+    /**
    * Returns a description of the options for ChoicePropertyOption and
    * FlagsPropertyDefinition, other subclasses return an empty string.
    */
-  static QString optionDescriptions(const Assets::PropertyDefinition &definition);
+    static QString optionDescriptions(const Assets::PropertyDefinition &definition);
 
-  void updateDocumentation(const std::string &propertyKey);
+    void updateDocumentation(const std::string &propertyKey);
 
-  void createGui(std::weak_ptr<MapDocument> document);
+    void createGui(std::weak_ptr<MapDocument> document);
 
-  void updateMinimumSize();
+    void updateMinimumSize();
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

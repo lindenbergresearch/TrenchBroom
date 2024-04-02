@@ -23,40 +23,34 @@
 #include <cstddef>
 #include <tuple>
 
-namespace kdl
-{
+namespace kdl {
 
-namespace detail
-{
-template <typename T, size_t... I>
-auto lift_and_impl(T&& tuple_of_functions, const std::index_sequence<I...>&)
-{
-  return [tuple_of_functions = std::forward<T>(tuple_of_functions)](auto&&... x) {
-    return (... && std::get<I>(tuple_of_functions)(std::forward<decltype(x)>(x)...));
-  };
+namespace detail {
+template<typename T, size_t... I>
+auto lift_and_impl(T &&tuple_of_functions, const std::index_sequence<I...> &) {
+    return [tuple_of_functions = std::forward<T>(tuple_of_functions)](auto &&...x) {
+        return (... && std::get<I>(tuple_of_functions)(std::forward<decltype(x)>(x)...));
+    };
 }
 
-template <typename T, size_t... I>
-auto lift_or_impl(T&& tuple_of_functions, const std::index_sequence<I...>&)
-{
-  return [tuple_of_functions = std::forward<T>(tuple_of_functions)](auto&&... x) {
-    return (... || std::get<I>(tuple_of_functions)(std::forward<decltype(x)>(x)...));
-  };
+template<typename T, size_t... I>
+auto lift_or_impl(T &&tuple_of_functions, const std::index_sequence<I...> &) {
+    return [tuple_of_functions = std::forward<T>(tuple_of_functions)](auto &&...x) {
+        return (... || std::get<I>(tuple_of_functions)(std::forward<decltype(x)>(x)...));
+    };
 }
-} // namespace detail
+}// namespace detail
 
-template <typename... F>
-auto lift_and(F&&... fun)
-{
-  return detail::lift_and_impl(
-    std::make_tuple(std::forward<F>(fun)...), std::make_index_sequence<sizeof...(F)>{});
+template<typename... F>
+auto lift_and(F &&...fun) {
+    return detail::lift_and_impl(
+        std::make_tuple(std::forward<F>(fun)...), std::make_index_sequence<sizeof...(F)>{});
 }
 
-template <typename... F>
-auto lift_or(F&&... fun)
-{
-  return detail::lift_or_impl(
-    std::make_tuple(std::forward<F>(fun)...), std::make_index_sequence<sizeof...(F)>{});
+template<typename... F>
+auto lift_or(F &&...fun) {
+    return detail::lift_or_impl(
+        std::make_tuple(std::forward<F>(fun)...), std::make_index_sequence<sizeof...(F)>{});
 }
 
-} // namespace kdl
+}// namespace kdl

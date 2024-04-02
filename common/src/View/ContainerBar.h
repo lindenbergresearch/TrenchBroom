@@ -26,9 +26,9 @@
 namespace TrenchBroom {
 namespace View {
 class ContainerBar : public BorderPanel {
-Q_OBJECT
+    Q_OBJECT
 public:
-  explicit ContainerBar(Sides borders, QWidget *parent = nullptr);
+    explicit ContainerBar(Sides borders, QWidget *parent = nullptr);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

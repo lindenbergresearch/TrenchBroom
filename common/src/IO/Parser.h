@@ -33,86 +33,85 @@ namespace IO {
 class ParserStatus;
 
 
-template<typename TokenType> class Parser {
+template<typename TokenType>
+class Parser {
 protected:
-  using TokenNameMap = std::map<TokenType, std::string>;
+    using TokenNameMap = std::map<TokenType, std::string>;
 
 private:
-  using Token = TokenTemplate<TokenType>;
-  mutable TokenNameMap m_tokenNames;
+    using Token = TokenTemplate<TokenType>;
+    mutable TokenNameMap m_tokenNames;
 
 public:
-  virtual ~Parser() = default;
+    virtual ~Parser() = default;
 
 protected:
-  bool check(const TokenType typeMask, const Token &token) const {
-    return token.hasType(typeMask);
-  }
-
-  const Token &expect(const TokenType typeMask, const Token &token) const {
-    if (! check(typeMask, token)) {
-      throw ParserException(
-          token.line(), token.column(), expectString(tokenName(typeMask), token));
+    bool check(const TokenType typeMask, const Token &token) const {
+        return token.hasType(typeMask);
     }
-    return token;
-  }
 
-  const Token &expect(ParserStatus &status, const TokenType typeMask, const Token &token) const {
-    if (! check(typeMask, token)) {
-      expect(status, tokenName(typeMask), token);
+    const Token &expect(const TokenType typeMask, const Token &token) const {
+        if (!check(typeMask, token)) {
+            throw ParserException(
+                token.line(), token.column(), expectString(tokenName(typeMask), token));
+        }
+        return token;
     }
-    return token;
-  }
 
-  void expect(ParserStatus & /* status */, const std::string &typeName, const Token &token) const {
-    const std::string msg = expectString(typeName, token);
-    throw ParserException(token.line(), token.column(), msg);
-  }
-
-  void expect(const std::string &expected, const Token &token) const {
-    if (token.data() != expected) {
-      throw ParserException(
-          token.line(), token.column(), "Expected string '" + expected + "', but got '" + token.data() + "'"
-      );
+    const Token &expect(ParserStatus &status, const TokenType typeMask, const Token &token) const {
+        if (!check(typeMask, token)) {
+            expect(status, tokenName(typeMask), token);
+        }
+        return token;
     }
-  }
 
-  void expect(const std::vector<std::string> &expected, const Token &token) const {
-    for (const auto &str : expected) {
-      if (token.data() == str) {
-        return;
-      }
+    void expect(ParserStatus & /* status */, const std::string &typeName, const Token &token) const {
+        const std::string msg = expectString(typeName, token);
+        throw ParserException(token.line(), token.column(), msg);
     }
-    throw ParserException(
-        token.line(), token.column(), "Expected string '" + kdl::str_join(expected, "', '", "', or '", "' or '") + "', but got '" + token.data() + "'"
-    );
-  }
+
+    void expect(const std::string &expected, const Token &token) const {
+        if (token.data() != expected) {
+            throw ParserException(
+                token.line(), token.column(), "Expected string '" + expected + "', but got '" + token.data() + "'");
+        }
+    }
+
+    void expect(const std::vector<std::string> &expected, const Token &token) const {
+        for (const auto &str: expected) {
+            if (token.data() == str) {
+                return;
+            }
+        }
+        throw ParserException(
+            token.line(), token.column(), "Expected string '" + kdl::str_join(expected, "', '", "', or '", "' or '") + "', but got '" + token.data() + "'");
+    }
 
 private:
-  std::string expectString(const std::string &expected, const Token &token) const {
-    return "Expected " + expected + ", but got " + tokenName(token.type()) + (! token.data().empty() ? " (raw data: '" + token.data() + "')" : "");
-  }
+    std::string expectString(const std::string &expected, const Token &token) const {
+        return "Expected " + expected + ", but got " + tokenName(token.type()) + (!token.data().empty() ? " (raw data: '" + token.data() + "')" : "");
+    }
 
 protected:
-  std::string tokenName(const TokenType typeMask) const {
-    if (m_tokenNames.empty())
-      m_tokenNames = tokenNames();
+    std::string tokenName(const TokenType typeMask) const {
+        if (m_tokenNames.empty())
+            m_tokenNames = tokenNames();
 
-    std::vector<std::string> names;
-    for (const auto &[type, name] : m_tokenNames) {
-      if ((typeMask & type) != 0)
-        names.push_back(name);
+        std::vector<std::string> names;
+        for (const auto &[type, name]: m_tokenNames) {
+            if ((typeMask & type) != 0)
+                names.push_back(name);
+        }
+
+        if (names.empty())
+            return "unknown token type";
+        if (names.size() == 1)
+            return names[0];
+        return kdl::str_join(names, ", ", ", or ", " or ");
     }
 
-    if (names.empty())
-      return "unknown token type";
-    if (names.size() == 1)
-      return names[0];
-    return kdl::str_join(names, ", ", ", or ", " or ");
-  }
-
 private:
-  virtual TokenNameMap tokenNames() const = 0;
+    virtual TokenNameMap tokenNames() const = 0;
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

@@ -36,23 +36,23 @@ class EntityPropertyTable;
 
 
 class EntityPropertyItemDelegate : public QStyledItemDelegate {
-Q_OBJECT
+    Q_OBJECT
 private:
-  EntityPropertyTable *m_table;
-  const EntityPropertyModel *m_model;
-  const QSortFilterProxyModel *m_proxyModel;
+    EntityPropertyTable *m_table;
+    const EntityPropertyModel *m_model;
+    const QSortFilterProxyModel *m_proxyModel;
 
 public:
-  EntityPropertyItemDelegate(EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent = nullptr);
+    EntityPropertyItemDelegate(EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent = nullptr);
 
-  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-  void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
 private:
-  void setupCompletions(QLineEdit *lineEdit, const QModelIndex &index) const;
+    void setupCompletions(QLineEdit *lineEdit, const QModelIndex &index) const;
 
-  QStringList getCompletions(const QModelIndex &index) const;
+    QStringList getCompletions(const QModelIndex &index) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

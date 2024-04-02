@@ -33,42 +33,42 @@ class ShaderManager;
 
 
 class VboManager;
-} // namespace Renderer
+}// namespace Renderer
 
 namespace View {
 class GLContextManager {
 public:
-  static std::string GLVendor;
-  static std::string GLRenderer;
-  static std::string GLVersion;
+    static std::string GLVendor;
+    static std::string GLRenderer;
+    static std::string GLVersion;
 
 private:
-  bool m_initialized;
+    bool m_initialized;
 
-  std::string m_glVendor;
-  std::string m_glRenderer;
-  std::string m_glVersion;
+    std::string m_glVendor;
+    std::string m_glRenderer;
+    std::string m_glVersion;
 
-  std::unique_ptr<Renderer::ShaderManager> m_shaderManager;
-  std::unique_ptr<Renderer::VboManager> m_vboManager;
-  std::unique_ptr<Renderer::FontManager> m_fontManager;
+    std::unique_ptr<Renderer::ShaderManager> m_shaderManager;
+    std::unique_ptr<Renderer::VboManager> m_vboManager;
+    std::unique_ptr<Renderer::FontManager> m_fontManager;
 
 public:
-  GLContextManager();
+    GLContextManager();
 
-  ~GLContextManager();
+    ~GLContextManager();
 
-  bool initialized() const;
+    bool initialized() const;
 
-  bool initialize();
+    bool initialize();
 
-  Renderer::VboManager &vboManager();
+    Renderer::VboManager &vboManager();
 
-  Renderer::FontManager &fontManager();
+    Renderer::FontManager &fontManager();
 
-  Renderer::ShaderManager &shaderManager();
+    Renderer::ShaderManager &shaderManager();
 
-deleteCopyAndMove(GLContextManager);
+    deleteCopyAndMove(GLContextManager);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

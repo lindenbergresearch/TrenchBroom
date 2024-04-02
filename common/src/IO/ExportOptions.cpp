@@ -33,21 +33,23 @@ namespace IO {
 kdl_reflect_impl(MapExportOptions);
 
 std::ostream &operator<<(std::ostream &lhs, const ObjMtlPathMode rhs) {
-  switch (rhs) {
-  case ObjMtlPathMode::RelativeToGamePath:lhs << "RelativeToGamePath";
-    break;
-  case ObjMtlPathMode::RelativeToExportPath:lhs << "RelativeToExportPath";
-    break;
-    switchDefault();
-  }
-  return lhs;
+    switch (rhs) {
+        case ObjMtlPathMode::RelativeToGamePath:
+            lhs << "RelativeToGamePath";
+            break;
+        case ObjMtlPathMode::RelativeToExportPath:
+            lhs << "RelativeToExportPath";
+            break;
+            switchDefault();
+    }
+    return lhs;
 }
 
 kdl_reflect_impl(ObjExportOptions);
 
 std::ostream &operator<<(std::ostream &lhs, const ExportOptions &rhs) {
-  std::visit([&](const auto &o) { lhs << o; }, rhs);
-  return lhs;
+    std::visit([&](const auto &o) { lhs << o; }, rhs);
+    return lhs;
 }
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

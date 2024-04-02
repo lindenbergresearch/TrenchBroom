@@ -25,31 +25,31 @@ namespace TrenchBroom {
 namespace View {
 class PreferencePane : public QWidget {
 public:
-  explicit PreferencePane(QWidget *parent = nullptr);
+    explicit PreferencePane(QWidget *parent = nullptr);
 
-  ~PreferencePane() override;
+    ~PreferencePane() override;
 
-  bool canResetToDefaults();
+    bool canResetToDefaults();
 
-  void resetToDefaults();
+    void resetToDefaults();
 
-  void updateControls();
+    void updateControls();
 
-  /**
+    /**
    * Returns whether the settings in the preference pane are valid to save.
    * If the aren't, it also displays an error dialog box asking the user to correct the
    * issues.
    */
-  bool validate();
+    bool validate();
 
 private:
-  virtual bool doCanResetToDefaults() = 0;
+    virtual bool doCanResetToDefaults() = 0;
 
-  virtual void doResetToDefaults() = 0;
+    virtual void doResetToDefaults() = 0;
 
-  virtual void doUpdateControls() = 0;
+    virtual void doUpdateControls() = 0;
 
-  virtual bool doValidate() = 0;
+    virtual bool doValidate() = 0;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

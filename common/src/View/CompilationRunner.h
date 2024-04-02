@@ -20,7 +20,7 @@
 #pragma once
 
 #include <QObject>
-#include <QProcess> // for QProcess::ProcessError
+#include <QProcess>// for QProcess::ProcessError
 
 #include "Macros.h"
 #include "Model/CompilationTask.h"
@@ -32,200 +32,200 @@
 
 namespace TrenchBroom::Model {
 struct CompilationProfile;
-} // namespace TrenchBroom::Model
+}// namespace TrenchBroom::Model
 
 namespace TrenchBroom::View {
 class CompilationContext;
 
 
 class CompilationTaskRunner : public QObject {
-Q_OBJECT
+    Q_OBJECT
 protected:
-  CompilationContext &m_context;
+    CompilationContext &m_context;
 
 protected:
-  explicit CompilationTaskRunner(CompilationContext &context);
+    explicit CompilationTaskRunner(CompilationContext &context);
 
 public:
-  ~CompilationTaskRunner() override;
+    ~CompilationTaskRunner() override;
 
-  void execute();
+    void execute();
 
-  void terminate();
+    void terminate();
 
 signals:
 
-  void start();
+    void start();
 
-  void error();
+    void error();
 
-  void end();
+    void end();
 
 protected:
-  std::string interpolate(const std::string &spec);
+    std::string interpolate(const std::string &spec);
 
 private:
-  virtual void doExecute() = 0;
+    virtual void doExecute() = 0;
 
-  virtual void doTerminate() = 0;
+    virtual void doTerminate() = 0;
 
-deleteCopyAndMove(CompilationTaskRunner);
+    deleteCopyAndMove(CompilationTaskRunner);
 };
 
 
 class CompilationExportMapTaskRunner : public CompilationTaskRunner {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Model::CompilationExportMap m_task;
+    Model::CompilationExportMap m_task;
 
 public:
-  CompilationExportMapTaskRunner(CompilationContext &context, Model::CompilationExportMap task);
+    CompilationExportMapTaskRunner(CompilationContext &context, Model::CompilationExportMap task);
 
-  ~CompilationExportMapTaskRunner() override;
+    ~CompilationExportMapTaskRunner() override;
 
 private:
-  void doExecute() override;
+    void doExecute() override;
 
-  void doTerminate() override;
+    void doTerminate() override;
 
-deleteCopyAndMove(CompilationExportMapTaskRunner);
+    deleteCopyAndMove(CompilationExportMapTaskRunner);
 };
 
 
 class CompilationCopyFilesTaskRunner : public CompilationTaskRunner {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Model::CompilationCopyFiles m_task;
+    Model::CompilationCopyFiles m_task;
 
 public:
-  CompilationCopyFilesTaskRunner(CompilationContext &context, Model::CompilationCopyFiles task);
+    CompilationCopyFilesTaskRunner(CompilationContext &context, Model::CompilationCopyFiles task);
 
-  ~CompilationCopyFilesTaskRunner() override;
+    ~CompilationCopyFilesTaskRunner() override;
 
 private:
-  void doExecute() override;
+    void doExecute() override;
 
-  void doTerminate() override;
+    void doTerminate() override;
 
-deleteCopyAndMove(CompilationCopyFilesTaskRunner);
+    deleteCopyAndMove(CompilationCopyFilesTaskRunner);
 };
 
 
 class CompilationRenameFileTaskRunner : public CompilationTaskRunner {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Model::CompilationRenameFile m_task;
+    Model::CompilationRenameFile m_task;
 
 public:
-  CompilationRenameFileTaskRunner(CompilationContext &context, Model::CompilationRenameFile task);
+    CompilationRenameFileTaskRunner(CompilationContext &context, Model::CompilationRenameFile task);
 
-  ~CompilationRenameFileTaskRunner() override;
+    ~CompilationRenameFileTaskRunner() override;
 
 private:
-  void doExecute() override;
+    void doExecute() override;
 
-  void doTerminate() override;
+    void doTerminate() override;
 
-deleteCopyAndMove(CompilationRenameFileTaskRunner);
+    deleteCopyAndMove(CompilationRenameFileTaskRunner);
 };
 
 
 class CompilationDeleteFilesTaskRunner : public CompilationTaskRunner {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Model::CompilationDeleteFiles m_task;
+    Model::CompilationDeleteFiles m_task;
 
 public:
-  CompilationDeleteFilesTaskRunner(CompilationContext &context, Model::CompilationDeleteFiles task);
+    CompilationDeleteFilesTaskRunner(CompilationContext &context, Model::CompilationDeleteFiles task);
 
-  ~CompilationDeleteFilesTaskRunner() override;
+    ~CompilationDeleteFilesTaskRunner() override;
 
 private:
-  void doExecute() override;
+    void doExecute() override;
 
-  void doTerminate() override;
+    void doTerminate() override;
 
-deleteCopyAndMove(CompilationDeleteFilesTaskRunner);
+    deleteCopyAndMove(CompilationDeleteFilesTaskRunner);
 };
 
 
 class CompilationRunToolTaskRunner : public CompilationTaskRunner {
-Q_OBJECT
+    Q_OBJECT
 private:
-  Model::CompilationRunTool m_task;
-  QProcess *m_process{nullptr};
-  bool m_terminated{false};
+    Model::CompilationRunTool m_task;
+    QProcess *m_process{nullptr};
+    bool m_terminated{false};
 
 public:
-  CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task);
+    CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task);
 
-  ~CompilationRunToolTaskRunner() override;
-
-private:
-  void doExecute() override;
-
-  void doTerminate() override;
+    ~CompilationRunToolTaskRunner() override;
 
 private:
-  void startProcess();
+    void doExecute() override;
 
-  std::string cmd();
+    void doTerminate() override;
+
+private:
+    void startProcess();
+
+    std::string cmd();
 
 private slots:
 
-  void processErrorOccurred(QProcess::ProcessError processError);
+    void processErrorOccurred(QProcess::ProcessError processError);
 
-  void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
-  void processReadyReadStandardError();
+    void processReadyReadStandardError();
 
-  void processReadyReadStandardOutput();
+    void processReadyReadStandardOutput();
 
-deleteCopyAndMove(CompilationRunToolTaskRunner);
+    deleteCopyAndMove(CompilationRunToolTaskRunner);
 };
 
 
 class CompilationRunner : public QObject {
-Q_OBJECT
+    Q_OBJECT
 private:
-  using TaskRunnerList = std::vector<std::unique_ptr<CompilationTaskRunner>>;
+    using TaskRunnerList = std::vector<std::unique_ptr<CompilationTaskRunner>>;
 
-  CompilationContext m_context;
-  TaskRunnerList m_taskRunners;
-  TaskRunnerList::iterator m_currentTask;
+    CompilationContext m_context;
+    TaskRunnerList m_taskRunners;
+    TaskRunnerList::iterator m_currentTask;
 
 public:
-  CompilationRunner(CompilationContext context, const Model::CompilationProfile &profile, QObject *parent = nullptr);
+    CompilationRunner(CompilationContext context, const Model::CompilationProfile &profile, QObject *parent = nullptr);
 
-  ~CompilationRunner() override;
+    ~CompilationRunner() override;
 
 private:
-  static TaskRunnerList createTaskRunners(CompilationContext &context, const Model::CompilationProfile &profile);
+    static TaskRunnerList createTaskRunners(CompilationContext &context, const Model::CompilationProfile &profile);
 
 public:
-  void execute();
+    void execute();
 
-  void terminate();
+    void terminate();
 
-  bool running() const;
+    bool running() const;
 
 private:
-  void bindEvents(CompilationTaskRunner &runner) const;
+    void bindEvents(CompilationTaskRunner &runner) const;
 
-  void unbindEvents(CompilationTaskRunner &runner) const;
+    void unbindEvents(CompilationTaskRunner &runner) const;
 
 private slots:
 
-  void taskError();
+    void taskError();
 
-  void taskEnd();
+    void taskEnd();
 
 signals:
 
-  void compilationStarted();
+    void compilationStarted();
 
-  void compilationEnded();
+    void compilationEnded();
 
-deleteCopyAndMove(CompilationRunner);
+    deleteCopyAndMove(CompilationRunner);
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

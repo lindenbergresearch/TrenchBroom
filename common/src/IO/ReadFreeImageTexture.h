@@ -43,4 +43,4 @@ Result<Assets::Texture, ReadTextureError> readFreeImageTexture(std::string name,
 
 bool isSupportedFreeImageExtension(const std::string &extension);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

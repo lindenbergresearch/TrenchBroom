@@ -35,23 +35,23 @@ EvaluationContext::EvaluationContext(const VariableStore &store) : m_store(store
 EvaluationContext::~EvaluationContext() = default;
 
 Value EvaluationContext::variableValue(const std::string &name) const {
-  return m_store->value(name);
+    return m_store->value(name);
 }
 
 void EvaluationContext::declareVariable(const std::string &name, const Value &value) {
-  m_store->declare(name, value);
+    m_store->declare(name, value);
 }
 
 EvaluationStack::EvaluationStack(const EvaluationContext &next) : m_next(next) {
 }
 
 Value EvaluationStack::variableValue(const std::string &name) const {
-  const Value &value = EvaluationContext::variableValue(name);
-  if (value != Value::Undefined) {
-    return value;
-  } else {
-    return m_next.variableValue(name);
-  }
+    const Value &value = EvaluationContext::variableValue(name);
+    if (value != Value::Undefined) {
+        return value;
+    } else {
+        return m_next.variableValue(name);
+    }
 }
-} // namespace EL
-} // namespace TrenchBroom
+}// namespace EL
+}// namespace TrenchBroom

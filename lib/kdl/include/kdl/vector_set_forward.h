@@ -23,11 +23,10 @@
 #include <functional>
 #include <memory>
 
-namespace kdl
-{
-template <
-  typename T,
-  typename Compare = std::less<T>,
-  typename Allocator = std::allocator<T>>
+namespace kdl {
+template<
+    typename T,
+    typename Compare = std::less<T>,
+    typename Allocator = std::allocator<T>>
 class vector_set;
 }

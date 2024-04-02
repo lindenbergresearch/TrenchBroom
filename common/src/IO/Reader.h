@@ -46,19 +46,19 @@ class ReaderSource;
  */
 class Reader {
 protected:
-  std::shared_ptr<ReaderSource> m_source;
-  size_t m_position;
+    std::shared_ptr<ReaderSource> m_source;
+    size_t m_position;
 
 protected:
-  /**
+    /**
    * Creates a new reader using the given reader source.
    */
-  explicit Reader(std::shared_ptr<ReaderSource> source);
+    explicit Reader(std::shared_ptr<ReaderSource> source);
 
 public:
-  virtual ~Reader();
+    virtual ~Reader();
 
-  /**
+    /**
    * Creates a new reader that reads from the given file.
    *
    * @param file the file to read from
@@ -67,9 +67,9 @@ public:
    *
    * @throw ReaderException if the reader cannot be created
    */
-  static Reader from(const CFile &file, size_t size);
+    static Reader from(const CFile &file, size_t size);
 
-  /**
+    /**
    * Creates a new reader that reads from the given memory region.
    *
    * @param begin the beginning of the memory region
@@ -78,55 +78,55 @@ public:
    *
    * @throw ReaderException if the reader cannot be created
    */
-  static Reader from(const char *begin, const char *end);
+    static Reader from(const char *begin, const char *end);
 
 public:
-  /**
+    /**
    * Returns the size of the underlying reader source.
    */
-  size_t size() const;
+    size_t size() const;
 
-  /**
+    /**
    * Returns the current position of the underlying reader source.
    */
-  size_t position() const;
+    size_t position() const;
 
-  /**
+    /**
    * Indicates whether the end of the underlying reader source is reached.
    */
-  bool eof() const;
+    bool eof() const;
 
-  /**
+    /**
    * Seeks to the given position relative to the start of the reader source.
    *
    * @throw ReaderException if the given position is out of bounds
    */
-  void seekFromBegin(size_t position);
+    void seekFromBegin(size_t position);
 
-  /**
+    /**
    * Seeks to the given position relative to the end of the reader source.
    *
    * @throw ReaderException if the given position is out of bounds
    */
-  void seekFromEnd(size_t offset);
+    void seekFromEnd(size_t offset);
 
-  /**
+    /**
    * Forward seeks to the given position relative to the current position of the reader
    * source.
    *
    * @throw ReaderException if the given position is out of bounds
    */
-  void seekForward(size_t offset);
+    void seekForward(size_t offset);
 
-  /**
+    /**
    * Backward seeks to the given position relative to the current position of the reader
    * source.
    *
    * @throw ReaderException if the given position is out of bounds
    */
-  void seekBackward(size_t offset);
+    void seekBackward(size_t offset);
 
-  /**
+    /**
    * Returns a reader for the given sub region of this reader's source.
    *
    * @param position the start position, relative to the start position of this reader
@@ -135,9 +135,9 @@ public:
    *
    * @throw ReaderException if the given sub region is out of bounds
    */
-  Reader subReaderFromBegin(size_t position, size_t length) const;
+    Reader subReaderFromBegin(size_t position, size_t length) const;
 
-  /**
+    /**
    * Returns a reader for a sub region of this reader's source that starts at the given
    * position and ends at the end of the reader source.
    *
@@ -146,9 +146,9 @@ public:
    *
    * @throw ReaderException if the given sub region is out of bounds
    */
-  Reader subReaderFromBegin(size_t position) const;
+    Reader subReaderFromBegin(size_t position) const;
 
-  /**
+    /**
    * Returns a reader for a sub region of this reader's source that starts at the current
    * position and that has the given length
    *
@@ -157,9 +157,9 @@ public:
    *
    * @throw ReaderException if the given sub region is out of bounds
    */
-  Reader subReaderFromCurrent(size_t length) const;
+    Reader subReaderFromCurrent(size_t length) const;
 
-  /**
+    /**
    * Returns a reader for a sub region of this reader's source that starts at the given
    * offset to the current position and that has the given length
    *
@@ -169,9 +169,9 @@ public:
    *
    * @throw ReaderException if the given sub region is out of bounds
    */
-  Reader subReaderFromCurrent(size_t offset, size_t length) const;
+    Reader subReaderFromCurrent(size_t offset, size_t length) const;
 
-  /**
+    /**
    * Buffers the contents of this reader's source if necessary and returns a buffered
    * reader that manages the buffered data and allows access to it.
    *
@@ -179,17 +179,17 @@ public:
    *
    * @throw ReaderException if reading the data from the underlying reader source fails
    */
-  virtual BufferedReader buffer() const;
+    virtual BufferedReader buffer() const;
 
-  /**
+    /**
    * Indicates whether the given number of bytes can be read from this reader.
    *
    * @param readSize the number of bytes to read
    * @return true if the given number of bytes can be read and false otherwise
    */
-  bool canRead(size_t readSize) const;
+    bool canRead(size_t readSize) const;
 
-  /**
+    /**
    * Reads the given number of bytes into the given memory region.
    *
    * @param val the memory region to read into
@@ -197,9 +197,9 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  void read(unsigned char *val, size_t size);
+    void read(unsigned char *val, size_t size);
 
-  /**
+    /**
    * Reads the given number of bytes into the given memory region.
    *
    * @param val the memory region to read into
@@ -207,9 +207,9 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  void read(char *val, size_t size);
+    void read(char *val, size_t size);
 
-  /**
+    /**
    * Reads a value of the given type T, converts it into a value of the given type R and
    * returns that.
    *
@@ -219,13 +219,14 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T, typename R> R read() {
-    T result;
-    read(reinterpret_cast<char *>(&result), sizeof(T));
-    return static_cast<R>(result);
-  }
+    template<typename T, typename R>
+    R read() {
+        T result;
+        read(reinterpret_cast<char *>(&result), sizeof(T));
+        return static_cast<R>(result);
+    }
 
-  /**
+    /**
    * Reads a single signed char.
    *
    * @tparam T the type of the underlying value to read and convert to char
@@ -233,11 +234,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> char readChar() {
-    return read<T, char>();
-  }
+    template<typename T>
+    char readChar() {
+        return read<T, char>();
+    }
 
-  /**
+    /**
    * Reads a single unsigned char.
    *
    * @tparam T the type of the underlying value to read and convert to unsigned char
@@ -245,11 +247,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> unsigned char readUnsignedChar() {
-    return read<T, unsigned char>();
-  }
+    template<typename T>
+    unsigned char readUnsignedChar() {
+        return read<T, unsigned char>();
+    }
 
-  /**
+    /**
    * Reads a value of the given type, converts it to int and returns that.
    *
    * @tparam T the type of the underlying value to read and convert to int
@@ -257,11 +260,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> int readInt() {
-    return read<T, int>();
-  }
+    template<typename T>
+    int readInt() {
+        return read<T, int>();
+    }
 
-  /**
+    /**
    * Reads a value of the given type, converts it to unsigned int and returns that.
    *
    * @tparam T the type of the underlying value to read and convert to unsigned int
@@ -269,11 +273,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> unsigned int readUnsignedInt() {
-    return read<T, unsigned int>();
-  }
+    template<typename T>
+    unsigned int readUnsignedInt() {
+        return read<T, unsigned int>();
+    }
 
-  /**
+    /**
    * Reads a value of the given type, converts it to size_t and returns that.
    *
    * @tparam T the type of the underlying value to read and convert to size_t
@@ -281,11 +286,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> size_t readSize() {
-    return read<T, size_t>();
-  }
+    template<typename T>
+    size_t readSize() {
+        return read<T, size_t>();
+    }
 
-  /**
+    /**
    * Reads a value of the given type, converts it to boolean and returns that.
    *
    * @tparam T the type of the underlying value to read and convert to boolean
@@ -293,11 +299,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> bool readBool() {
-    return read<T, T>() != 0;
-  }
+    template<typename T>
+    bool readBool() {
+        return read<T, T>() != 0;
+    }
 
-  /**
+    /**
    * Reads a value of the given type, converts it to 32bit float and returns that.
    *
    * @tparam T the type of the underlying value to read and convert to 32bit float
@@ -305,11 +312,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> float readFloat() {
-    return read<T, float>();
-  }
+    template<typename T>
+    float readFloat() {
+        return read<T, float>();
+    }
 
-  /**
+    /**
    * Reads a value of the given type, converts it to 64bit double and returns that.
    *
    * @tparam T the type of the underlying value to read and convert to 64bit double
@@ -317,11 +325,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename T> double readDouble() {
-    return read<T, double>();
-  }
+    template<typename T>
+    double readDouble() {
+        return read<T, double>();
+    }
 
-  /**
+    /**
    * Reads an ASCII string of the given length.
    *
    * @param size the number of characters to read
@@ -329,17 +338,18 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  std::string readString(size_t size);
+    std::string readString(size_t size);
 
-  template<typename R, size_t S, typename T = R> vm::vec<T, S> readVec() {
-    vm::vec<T, S> result;
-    for (size_t i = 0; i < S; ++ i) {
-      result[i] = read<T, R>();
+    template<typename R, size_t S, typename T = R>
+    vm::vec<T, S> readVec() {
+        vm::vec<T, S> result;
+        for (size_t i = 0; i < S; ++i) {
+            result[i] = read<T, R>();
+        }
+        return result;
     }
-    return result;
-  }
 
-  /**
+    /**
    * Reads values of the given type T, converts them to the given type R and stores them
    * in the given collection. The collection must support push_back.
    *
@@ -351,11 +361,12 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename C, typename T, typename R> void read(C &col, const size_t n) {
-    read<T, R>(std::back_inserter(col), n);
-  }
+    template<typename C, typename T, typename R>
+    void read(C &col, const size_t n) {
+        read<T, R>(std::back_inserter(col), n);
+    }
 
-  /**
+    /**
    * Reads values of the given type T, converts them to the given type R and stores them
    * in the given output iterator.
    *
@@ -367,14 +378,15 @@ public:
    *
    * @throw ReaderException if reading fails
    */
-  template<typename I, typename T, typename R> void read(I out, const size_t n) {
-    for (size_t i = 0; i < n; ++ i) {
-      out += read<T, R>();
+    template<typename I, typename T, typename R>
+    void read(I out, const size_t n) {
+        for (size_t i = 0; i < n; ++i) {
+            out += read<T, R>();
+        }
     }
-  }
 
 protected:
-  void ensurePosition(size_t position) const;
+    void ensurePosition(size_t position) const;
 };
 
 
@@ -384,34 +396,34 @@ protected:
  */
 class BufferedReader : public Reader {
 protected:
-  friend class Reader;
+    friend class Reader;
 
-  /**
+    /**
    * Creates a new buffered reader for the given memory region. If the given buffer is not
    * nullptr, it will be moved into this object and it will be destroyed when this object
    * is destroyed.
    */
-  explicit BufferedReader(std::shared_ptr<BufferReaderSource> source);
+    explicit BufferedReader(std::shared_ptr<BufferReaderSource> source);
 
 public:
-  BufferedReader buffer() const override;
+    BufferedReader buffer() const override;
 
-  /**
+    /**
    * Returns the beginning of the underlying buffer memory region.
    */
-  const char *begin() const;
+    const char *begin() const;
 
-  /**
+    /**
    * Returns the end of the underlying buffer memory region.
    */
-  const char *end() const;
+    const char *end() const;
 
-  /**
+    /**
    * Returns a std::string_view view of the buffer.
    *
    * Caller's responsibility to ensure that the BufferedReader outlives the returned
    * std::string_view.
    */
-  std::string_view stringView() const;
+    std::string_view stringView() const;
 };
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

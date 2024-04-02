@@ -27,5 +27,5 @@ SimpleParserStatus::SimpleParserStatus(Logger &logger, const std::string &prefix
 }
 
 void SimpleParserStatus::doProgress(const double /* progress */) {}
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

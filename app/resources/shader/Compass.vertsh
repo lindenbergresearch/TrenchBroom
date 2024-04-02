@@ -30,10 +30,10 @@ uniform float MaterialShininess;
 uniform vec4 GlobalAmbient;
 
 void main(void) {
-	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
-    
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+
     vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-    float NdotL = max(dot(normal, LightDirection), 0.0); // cosine of normal and light direction
+    float NdotL = max(dot(normal, LightDirection), 0.0);// cosine of normal and light direction
 
     vec4 diffuse = NdotL * LightDiffuse * MaterialDiffuse;
     vec4 ambient = GlobalAmbient * MaterialAmbient;
@@ -43,5 +43,5 @@ void main(void) {
     float NdotHV = max(-dot(normal, halfVector), 0.0);
     vec4 specular = MaterialSpecular * LightSpecular * pow(NdotHV, MaterialShininess);
 
-	gl_FrontColor = (diffuse + ambient + specular);
+    gl_FrontColor = (diffuse + ambient + specular);
 }

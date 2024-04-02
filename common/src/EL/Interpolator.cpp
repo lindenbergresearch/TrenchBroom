@@ -31,22 +31,22 @@ Interpolator::Interpolator(const std::string &str) : ELParser(ELParser::Mode::Le
 }
 
 std::string Interpolator::interpolate(const EvaluationContext &context) {
-  std::stringstream result;
-  while (! m_tokenizer.eof()) {
-    m_tokenizer.appendUntil("${", result);
-    if (! m_tokenizer.eof()) {
-      Expression expression = parse();
-      result << expression.evaluate(context).convertTo(EL::ValueType::String).stringValue();
-      expect(IO::ELToken::CBrace, m_tokenizer.nextToken());
+    std::stringstream result;
+    while (!m_tokenizer.eof()) {
+        m_tokenizer.appendUntil("${", result);
+        if (!m_tokenizer.eof()) {
+            Expression expression = parse();
+            result << expression.evaluate(context).convertTo(EL::ValueType::String).stringValue();
+            expect(IO::ELToken::CBrace, m_tokenizer.nextToken());
+        }
     }
-  }
 
-  return result.str();
+    return result.str();
 }
 
 std::string interpolate(const std::string &str, const EvaluationContext &context) {
-  Interpolator interpolator(str);
-  return interpolator.interpolate(context);
+    Interpolator interpolator(str);
+    return interpolator.interpolate(context);
 }
-} // namespace EL
-} // namespace TrenchBroom
+}// namespace EL
+}// namespace TrenchBroom

@@ -46,184 +46,176 @@
 namespace TrenchBroom {
 namespace View {
 CompilationDialog::CompilationDialog(MapFrame *mapFrame) : QDialog{mapFrame}, m_mapFrame{mapFrame} {
-  ensure(mapFrame != nullptr, "must have a map frame");
-  createGui();
-  setMinimumSize(700, 600);
-  resize(1000, 700);
-  updateCompileButtons();
+    ensure(mapFrame != nullptr, "must have a map frame");
+    createGui();
+    setMinimumSize(700, 600);
+    resize(1000, 700);
+    updateCompileButtons();
 }
 
 void CompilationDialog::createGui() {
-  setWindowIconTB(this);
-  setWindowTitle("Compile");
+    setWindowIconTB(this);
+    setWindowTitle("Compile");
 
-  auto document = m_mapFrame->document();
-  auto game = document->game();
-  auto &compilationConfig = game->compilationConfig();
+    auto document = m_mapFrame->document();
+    auto game = document->game();
+    auto &compilationConfig = game->compilationConfig();
 
-  m_profileManager = new CompilationProfileManager{document, compilationConfig};
+    m_profileManager = new CompilationProfileManager{document, compilationConfig};
 
-  auto *outputPanel = new TitledPanel{"Output"};
-  m_output = new QTextEdit{};
-  m_output->setReadOnly(true);
-  m_output->setFont(Fonts::fixedWidthFont());
+    auto *outputPanel = new TitledPanel{"Output"};
+    m_output = new QTextEdit{};
+    m_output->setReadOnly(true);
+    m_output->setFont(Fonts::fixedWidthFont());
 
-  auto *outputLayout = new QVBoxLayout{};
-  outputLayout->setContentsMargins(0, 0, 0, 0);
-  outputLayout->setSpacing(0);
-  outputLayout->addWidget(m_output);
-  outputPanel->getPanel()->setLayout(outputLayout);
+    auto *outputLayout = new QVBoxLayout{};
+    outputLayout->setContentsMargins(0, 0, 0, 0);
+    outputLayout->setSpacing(0);
+    outputLayout->addWidget(m_output);
+    outputPanel->getPanel()->setLayout(outputLayout);
 
-  auto *splitter = new Splitter{Qt::Vertical};
-  splitter->addWidget(m_profileManager);
-  splitter->addWidget(outputPanel);
-  splitter->setSizes({1, 1});
+    auto *splitter = new Splitter{Qt::Vertical};
+    splitter->addWidget(m_profileManager);
+    splitter->addWidget(outputPanel);
+    splitter->setSizes({1, 1});
 
-  auto *buttonBox = new QDialogButtonBox{};
-  m_launchButton = buttonBox->addButton("Launch...", QDialogButtonBox::NoRole);
-  m_stopCompileButton = buttonBox->addButton("Stop", QDialogButtonBox::NoRole);
-  m_testCompileButton = buttonBox->addButton("Test", QDialogButtonBox::NoRole);
-  m_compileButton = buttonBox->addButton("Compile", QDialogButtonBox::NoRole);
-  m_closeButton = buttonBox->addButton("Close", QDialogButtonBox::RejectRole);
+    auto *buttonBox = new QDialogButtonBox{};
+    m_launchButton = buttonBox->addButton("Launch...", QDialogButtonBox::NoRole);
+    m_stopCompileButton = buttonBox->addButton("Stop", QDialogButtonBox::NoRole);
+    m_testCompileButton = buttonBox->addButton("Test", QDialogButtonBox::NoRole);
+    m_compileButton = buttonBox->addButton("Compile", QDialogButtonBox::NoRole);
+    m_closeButton = buttonBox->addButton("Close", QDialogButtonBox::RejectRole);
 
-  m_currentRunLabel = new QLabel{""};
-  m_currentRunLabel->setAlignment(Qt::AlignRight);
+    m_currentRunLabel = new QLabel{""};
+    m_currentRunLabel->setAlignment(Qt::AlignRight);
 
-  auto *buttonLayout = new QHBoxLayout{};
-  buttonLayout->setContentsMargins(0, 0, 0, 0);
-  buttonLayout->setSpacing(LayoutConstants::WideHMargin);
-  buttonLayout->addWidget(m_launchButton, 0, Qt::AlignVCenter);
-  buttonLayout->addWidget(m_currentRunLabel, 1, Qt::AlignVCenter);
-  buttonLayout->addWidget(buttonBox);
+    auto *buttonLayout = new QHBoxLayout{};
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
+    buttonLayout->setSpacing(LayoutConstants::WideHMargin);
+    buttonLayout->addWidget(m_launchButton, 0, Qt::AlignVCenter);
+    buttonLayout->addWidget(m_currentRunLabel, 1, Qt::AlignVCenter);
+    buttonLayout->addWidget(buttonBox);
 
-  auto *dialogLayout = new QVBoxLayout{};
-  dialogLayout->setContentsMargins(0, 0, 0, 0);
-  dialogLayout->setSpacing(0);
-  dialogLayout->addWidget(splitter, 1);
-  dialogLayout->addLayout(wrapDialogButtonBox(buttonLayout));
-  insertTitleBarSeparator(dialogLayout);
+    auto *dialogLayout = new QVBoxLayout{};
+    dialogLayout->setContentsMargins(0, 0, 0, 0);
+    dialogLayout->setSpacing(0);
+    dialogLayout->addWidget(splitter, 1);
+    dialogLayout->addLayout(wrapDialogButtonBox(buttonLayout));
+    insertTitleBarSeparator(dialogLayout);
 
-  setLayout(dialogLayout);
+    setLayout(dialogLayout);
 
-  m_compileButton->setDefault(true);
+    m_compileButton->setDefault(true);
 
-  connect(
-      &m_run, &CompilationRun::compilationStarted, this, &CompilationDialog::compilationStarted
-  );
-  connect(
-      &m_run, &CompilationRun::compilationEnded, this, &CompilationDialog::compilationEnded
-  );
-  connect(
-      m_profileManager, &CompilationProfileManager::selectedProfileChanged, this, &CompilationDialog::selectedProfileChanged
-  );
-  connect(
-      m_profileManager, &CompilationProfileManager::profileChanged, this, &CompilationDialog::profileChanged
-  );
+    connect(
+        &m_run, &CompilationRun::compilationStarted, this, &CompilationDialog::compilationStarted);
+    connect(
+        &m_run, &CompilationRun::compilationEnded, this, &CompilationDialog::compilationEnded);
+    connect(
+        m_profileManager, &CompilationProfileManager::selectedProfileChanged, this, &CompilationDialog::selectedProfileChanged);
+    connect(
+        m_profileManager, &CompilationProfileManager::profileChanged, this, &CompilationDialog::profileChanged);
 
-  connect(
-      m_compileButton, &QPushButton::clicked, this, [&]() { startCompilation(false); }
-  );
-  connect(
-      m_testCompileButton, &QPushButton::clicked, this, [&]() { startCompilation(true); }
-  );
-  connect(m_stopCompileButton, &QPushButton::clicked, this, [&]() { stopCompilation(); });
-  connect(
-      m_launchButton, &QPushButton::clicked, this, [&]() {
-        LaunchGameEngineDialog dialog(m_mapFrame->document(), this);
-        dialog.exec();
-      }
-  );
-  connect(m_closeButton, &QPushButton::clicked, this, &CompilationDialog::close);
+    connect(
+        m_compileButton, &QPushButton::clicked, this, [&]() { startCompilation(false); });
+    connect(
+        m_testCompileButton, &QPushButton::clicked, this, [&]() { startCompilation(true); });
+    connect(m_stopCompileButton, &QPushButton::clicked, this, [&]() { stopCompilation(); });
+    connect(
+        m_launchButton, &QPushButton::clicked, this, [&]() {
+            LaunchGameEngineDialog dialog(m_mapFrame->document(), this);
+            dialog.exec();
+        });
+    connect(m_closeButton, &QPushButton::clicked, this, &CompilationDialog::close);
 }
 
 void CompilationDialog::keyPressEvent(QKeyEvent *event) {
-  // Dismissing the dialog with Escape, doesn't invoke CompilationDialog::closeEvent
-  // so handle it here, so we can potentially block it.
-  if (event->key() == Qt::Key_Escape) {
-    close();
-    return;
-  }
+    // Dismissing the dialog with Escape, doesn't invoke CompilationDialog::closeEvent
+    // so handle it here, so we can potentially block it.
+    if (event->key() == Qt::Key_Escape) {
+        close();
+        return;
+    }
 
-  QDialog::keyPressEvent(event);
+    QDialog::keyPressEvent(event);
 }
 
 void CompilationDialog::updateCompileButtons() {
-  const auto *profile = m_profileManager->selectedProfile();
+    const auto *profile = m_profileManager->selectedProfile();
 
-  m_compileButton->setEnabled(! m_run.running() && profile && ! profile->tasks.empty());
-  m_testCompileButton->setEnabled(! m_run.running() && profile && ! profile->tasks.empty());
-  m_stopCompileButton->setEnabled(m_run.running());
+    m_compileButton->setEnabled(!m_run.running() && profile && !profile->tasks.empty());
+    m_testCompileButton->setEnabled(!m_run.running() && profile && !profile->tasks.empty());
+    m_stopCompileButton->setEnabled(m_run.running());
 }
 
 void CompilationDialog::startCompilation(const bool test) {
-  saveProfile();
-  if (m_run.running()) {
-    m_run.terminate();
-  } else {
-    const auto *profile = m_profileManager->selectedProfile();
-    ensure(profile != nullptr, "profile is null");
-    ensure(! profile->tasks.empty(), "profile has no tasks");
-
-    if (test) {
-      m_run.test(*profile, m_mapFrame->document(), m_output);
+    saveProfile();
+    if (m_run.running()) {
+        m_run.terminate();
     } else {
-      m_run.run(*profile, m_mapFrame->document(), m_output);
+        const auto *profile = m_profileManager->selectedProfile();
+        ensure(profile != nullptr, "profile is null");
+        ensure(!profile->tasks.empty(), "profile has no tasks");
+
+        if (test) {
+            m_run.test(*profile, m_mapFrame->document(), m_output);
+        } else {
+            m_run.run(*profile, m_mapFrame->document(), m_output);
+        }
     }
-  }
 }
 
 void CompilationDialog::stopCompilation() {
-  if (m_run.running()) {
-    m_run.terminate();
-  }
+    if (m_run.running()) {
+        m_run.terminate();
+    }
 }
 
 void CompilationDialog::closeEvent(QCloseEvent *event) {
-  if (m_run.running()) {
-    const auto result = QMessageBox::warning(
-        this, "Warning", "Closing this dialog will stop the running compilation. Are you sure?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes
-    );
+    if (m_run.running()) {
+        const auto result = QMessageBox::warning(
+            this, "Warning", "Closing this dialog will stop the running compilation. Are you sure?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
-    if (result != QMessageBox::Yes) {
-      event->ignore();
-      return;
+        if (result != QMessageBox::Yes) {
+            event->ignore();
+            return;
+        }
+
+        stopCompilation();
     }
-
-    stopCompilation();
-  }
-  saveProfile();
-  event->accept();
+    saveProfile();
+    event->accept();
 }
 
 void CompilationDialog::compilationStarted() {
-  const auto *profile = m_profileManager->selectedProfile();
-  ensure(profile != nullptr, "profile is null");
-  m_currentRunLabel->setText(QString::fromStdString("Running " + profile->name));
-  m_output->setText("");
+    const auto *profile = m_profileManager->selectedProfile();
+    ensure(profile != nullptr, "profile is null");
+    m_currentRunLabel->setText(QString::fromStdString("Running " + profile->name));
+    m_output->setText("");
 
-  updateCompileButtons();
+    updateCompileButtons();
 }
 
 void CompilationDialog::compilationEnded() {
-  m_currentRunLabel->setText("");
+    m_currentRunLabel->setText("");
 
-  updateCompileButtons();
+    updateCompileButtons();
 }
 
 void CompilationDialog::selectedProfileChanged() {
-  updateCompileButtons();
+    updateCompileButtons();
 }
 
 void CompilationDialog::profileChanged() {
-  updateCompileButtons();
+    updateCompileButtons();
 }
 
 void CompilationDialog::saveProfile() {
-  auto document = m_mapFrame->document();
-  const auto &gameName = document->game()->gameName();
-  auto &gameFactory = Model::GameFactory::instance();
-  gameFactory.saveCompilationConfig(
-      gameName, m_profileManager->config(), m_mapFrame->logger());
+    auto document = m_mapFrame->document();
+    const auto &gameName = document->game()->gameName();
+    auto &gameFactory = Model::GameFactory::instance();
+    gameFactory.saveCompilationConfig(
+        gameName, m_profileManager->config(), m_mapFrame->logger());
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

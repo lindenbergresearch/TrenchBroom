@@ -28,29 +28,28 @@
 namespace TrenchBroom::View {
 OnePaneMapView::OnePaneMapView(
     std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger,
-    QWidget *parent
-) : MultiPaneMapView{parent}, m_logger{
-    logger
-}, m_document{std::move(document)} {
-  createGui(toolBox, mapRenderer, contextManager);
+    QWidget *parent) : MultiPaneMapView{parent}, m_logger{
+                                                     logger},
+                       m_document{std::move(document)} {
+    createGui(toolBox, mapRenderer, contextManager);
 }
 
 void OnePaneMapView::createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager) {
-  m_mapView = new CyclingMapView{m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_ALL, m_logger, this};
-  m_mapView->linkCamera(m_linkHelper);
-  addMapView(m_mapView);
+    m_mapView = new CyclingMapView{m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_ALL, m_logger, this};
+    m_mapView->linkCamera(m_linkHelper);
+    addMapView(m_mapView);
 
-  auto *layout = new QGridLayout{};
-  layout->setMargin(0);
-  layout->addWidget(m_mapView, 0, 0, 1, 1);
-  setLayout(layout);
+    auto *layout = new QGridLayout{};
+    layout->setMargin(0);
+    layout->addWidget(m_mapView, 0, 0, 1, 1);
+    setLayout(layout);
 }
 
 void OnePaneMapView::doMaximizeView(MapView *) {
-  // nothing to do
+    // nothing to do
 }
 
 void OnePaneMapView::doRestoreViews() {
-  // nothing to do
+    // nothing to do
 }
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

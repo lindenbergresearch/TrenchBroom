@@ -27,7 +27,7 @@
 
 namespace TrenchBroom::Assets {
 class EntityDefinition;
-} // namespace TrenchBroom::Assets
+}// namespace TrenchBroom::Assets
 
 namespace TrenchBroom::IO {
 class ParserStatus;
@@ -35,10 +35,9 @@ class ParserStatus;
 
 class EntityDefinitionLoader {
 public:
-  virtual ~EntityDefinitionLoader();
+    virtual ~EntityDefinitionLoader();
 
-  virtual Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>> loadEntityDefinitions(
-      ParserStatus &status, const std::filesystem::path &path
-  ) const = 0;
+    virtual Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>> loadEntityDefinitions(
+        ParserStatus &status, const std::filesystem::path &path) const = 0;
 };
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

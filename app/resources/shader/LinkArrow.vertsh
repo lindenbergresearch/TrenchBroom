@@ -98,11 +98,11 @@ Quat conjugated(Quat left) {
 }
 
 vec3 quatMult(Quat left, vec3 right) {
-     Quat p;
-     p.r = 0.0;
-     p.v = right;
-     p = quatMult(quatMult(left, p), conjugated(left));
-     return p.v;
+    Quat p;
+    p.r = 0.0;
+    p.v = right;
+    p = quatMult(quatMult(left, p), conjugated(left));
+    return p.v;
 }
 
 /**
@@ -131,7 +131,7 @@ void main(void) {
     // see: http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/#how-do-i-find-the-rotation-between-2-vectors-
     vec3 desiredUp = normalize(CameraPosition - arrowPosition);
     vec3 desiredRight = cross(lineDir, desiredUp);
-    desiredUp = normalize(cross(desiredRight, lineDir)); // make desiredUp perpendicular to the lineDir
+    desiredUp = normalize(cross(desiredRight, lineDir));// make desiredUp perpendicular to the lineDir
 
     vec3 currentUp = quatMult(rotateFromPosXToLineDir, vec3(0.0, 0.0, 1.0));
 

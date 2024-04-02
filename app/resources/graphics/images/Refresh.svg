@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <path id="path2643" d="M8,2C5.516,2.001 3.278,3.545 2.395,5.867L4.275,6.555C4.87,5.02 6.354,4.002 8,4C9.512,4.001 10.9,4.858 11.576,6.211L13.359,5.32C12.347,3.292 10.267,2.003 8,2ZM11.74,9.402C11.157,10.959 9.662,11.998 8,12C6.478,11.999 5.083,11.128 4.412,9.762L2.631,10.66C3.64,12.699 5.725,13.997 8,14C10.495,13.999 12.74,12.442 13.615,10.105L11.74,9.402Z" style="fill:white;fill-rule:nonzero;"/>
+<svg width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/"
+     style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <path id="path2643"
+          d="M8,2C5.516,2.001 3.278,3.545 2.395,5.867L4.275,6.555C4.87,5.02 6.354,4.002 8,4C9.512,4.001 10.9,4.858 11.576,6.211L13.359,5.32C12.347,3.292 10.267,2.003 8,2ZM11.74,9.402C11.157,10.959 9.662,11.998 8,12C6.478,11.999 5.083,11.128 4.412,9.762L2.631,10.66C3.64,12.699 5.725,13.997 8,14C10.495,13.999 12.74,12.442 13.615,10.105L11.74,9.402Z"
+          style="fill:white;fill-rule:nonzero;"/>
     <ellipse id="path1647" cx="7.942" cy="8.007" rx="6.585" ry="6.596" style="fill:none;"/>
-    <path id="path1668" d="M10.466,9.751L14.28,10.956L13.277,7.493L10.466,9.751Z" style="fill:white;fill-rule:nonzero;"/>
+    <path id="path1668" d="M10.466,9.751L14.28,10.956L13.277,7.493L10.466,9.751Z"
+          style="fill:white;fill-rule:nonzero;"/>
     <path id="path1668-6" d="M5.478,6.349L1.664,5.144L2.667,8.607L5.478,6.349Z" style="fill:white;fill-rule:nonzero;"/>
 </svg>

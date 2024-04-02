@@ -31,17 +31,17 @@ class Camera;
 namespace View {
 class PickRequest {
 private:
-  vm::ray3 m_pickRay;
-  const Renderer::Camera *m_camera;
+    vm::ray3 m_pickRay;
+    const Renderer::Camera *m_camera;
 
 public:
-  PickRequest();
+    PickRequest();
 
-  PickRequest(const vm::ray3 &pickRay, const Renderer::Camera &camera);
+    PickRequest(const vm::ray3 &pickRay, const Renderer::Camera &camera);
 
-  const vm::ray3 &pickRay() const;
+    const vm::ray3 &pickRay() const;
 
-  const Renderer::Camera &camera() const;
+    const Renderer::Camera &camera() const;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

@@ -26,8 +26,7 @@
 #include <optional>
 #include <ostream>
 
-namespace vm
-{
+namespace vm {
 /**
  * Parses the given string representation. The syntax of the given string is as follows
  *
@@ -44,32 +43,26 @@ namespace vm
  * @param str the string to parse
  * @return the matrix parsed from the string
  */
-template <typename T, std::size_t R, std::size_t C>
-std::optional<mat<T, R, C>> parse(const std::string_view str)
-{
-  constexpr auto blank = " \t\n\r()";
+template<typename T, std::size_t R, std::size_t C>
+std::optional<mat<T, R, C>> parse(const std::string_view str) {
+    constexpr auto blank = " \t\n\r()";
 
-  auto result = mat<T, R, C>{};
-  std::size_t pos = 0u;
-  for (std::size_t r = 0u; r < R; ++r)
-  {
-    for (std::size_t c = 0u; c < C; ++c)
-    {
-      if ((pos = str.find_first_not_of(blank, pos)) == std::string::npos)
-      {
-        return std::nullopt;
-      }
-      result[c][r] = static_cast<T>(std::atof(str.data() + pos));
-      if ((pos = str.find_first_of(blank, pos)) == std::string::npos)
-      {
-        if ((r * C) + c < R * C - 1u)
-        {
-          return std::nullopt;
+    auto result = mat<T, R, C>{};
+    std::size_t pos = 0u;
+    for (std::size_t r = 0u; r < R; ++r) {
+        for (std::size_t c = 0u; c < C; ++c) {
+            if ((pos = str.find_first_not_of(blank, pos)) == std::string::npos) {
+                return std::nullopt;
+            }
+            result[c][r] = static_cast<T>(std::atof(str.data() + pos));
+            if ((pos = str.find_first_of(blank, pos)) == std::string::npos) {
+                if ((r * C) + c < R * C - 1u) {
+                    return std::nullopt;
+                }
+            }
         }
-      }
     }
-  }
-  return result;
+    return result;
 }
 
 /**
@@ -82,24 +75,19 @@ std::optional<mat<T, R, C>> parse(const std::string_view str)
  * @param mat the matrix to print
  * @return the given stream
  */
-template <typename T, size_t R, size_t C>
-std::ostream& operator<<(std::ostream& stream, const mat<T, R, C>& mat)
-{
-  for (size_t r = 0u; r < R; ++r)
-  {
-    for (size_t c = 0u; c < C; ++c)
-    {
-      stream << mat[c][r];
-      if (c < C - 1u)
-      {
-        stream << " ";
-      }
+template<typename T, size_t R, size_t C>
+std::ostream &operator<<(std::ostream &stream, const mat<T, R, C> &mat) {
+    for (size_t r = 0u; r < R; ++r) {
+        for (size_t c = 0u; c < C; ++c) {
+            stream << mat[c][r];
+            if (c < C - 1u) {
+                stream << " ";
+            }
+        }
+        if (r < R - 1u) {
+            stream << " ";
+        }
     }
-    if (r < R - 1u)
-    {
-      stream << " ";
-    }
-  }
-  return stream;
+    return stream;
 }
-} // namespace vm
+}// namespace vm

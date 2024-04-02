@@ -26,37 +26,32 @@
 
 #include <iostream>
 
-namespace kdl
-{
-template <typename Value, typename... Errors>
-std::ostream& operator<<(std::ostream& str, const result<Value, Errors...>& result)
-{
-  result.visit([&](const auto& x) { str << make_streamable(x); });
-  return str;
+namespace kdl {
+template<typename Value, typename... Errors>
+std::ostream &operator<<(std::ostream &str, const result<Value, Errors...> &result) {
+    result.visit([&](const auto &x) { str << make_streamable(x); });
+    return str;
 }
 
-template <typename... Values>
-std::ostream& operator<<(std::ostream& str, const multi_value<Values...>& value)
-{
-  str << "multi_value" << make_streamable(value.values);
-  return str;
+template<typename... Values>
+std::ostream &operator<<(std::ostream &str, const multi_value<Values...> &value) {
+    str << "multi_value" << make_streamable(value.values);
+    return str;
 }
 
-template <typename... Values, typename... Errors>
-std::ostream& operator<<(
-  std::ostream& str, const result<multi_value<Values...>, Errors...>& result)
-{
-  result.visit([&](const auto&... x) {
-    str << "multi_value" << make_streamable(std::forward_as_tuple(x...));
-  });
-  return str;
+template<typename... Values, typename... Errors>
+std::ostream &operator<<(
+    std::ostream &str, const result<multi_value<Values...>, Errors...> &result) {
+    result.visit([&](const auto &...x) {
+        str << "multi_value" << make_streamable(std::forward_as_tuple(x...));
+    });
+    return str;
 }
 
-template <typename... Errors>
-std::ostream& operator<<(std::ostream& str, const result<void, Errors...>& result)
-{
-  result.visit(kdl::overload(
-    [&]() { str << "void"; }, [&](const auto& e) { str << make_streamable(e); }));
-  return str;
+template<typename... Errors>
+std::ostream &operator<<(std::ostream &str, const result<void, Errors...> &result) {
+    result.visit(kdl::overload(
+        [&]() { str << "void"; }, [&](const auto &e) { str << make_streamable(e); }));
+    return str;
 }
-} // namespace kdl
+}// namespace kdl

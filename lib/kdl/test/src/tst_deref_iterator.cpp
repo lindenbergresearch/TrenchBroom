@@ -25,131 +25,116 @@
 
 #include "catch2.h"
 
-namespace kdl
-{
-TEST_CASE("deref_iterator type members")
-{
-  SECTION("non-const pointer")
-  {
-    using I = std::vector<int*>::iterator;
-    using D = deref_iterator<I>;
-    static_assert(
-      std::is_same_v<D::iterator_category, I::iterator_category>,
-      "same iterator category");
-    static_assert(
-      std::is_same_v<D::difference_type, I::difference_type>, "same difference type");
-    static_assert(std::is_same_v<D::value_type, int>, "correct value type");
-    static_assert(std::is_same_v<D::reference, int&>, "correct reference type");
-    static_assert(std::is_same_v<D::pointer, int*>, "correct pointer type");
-  }
+namespace kdl {
+TEST_CASE("deref_iterator type members") {
+    SECTION("non-const pointer") {
+        using I = std::vector<int *>::iterator;
+        using D = deref_iterator<I>;
+        static_assert(
+            std::is_same_v<D::iterator_category, I::iterator_category>,
+            "same iterator category");
+        static_assert(
+            std::is_same_v<D::difference_type, I::difference_type>, "same difference type");
+        static_assert(std::is_same_v<D::value_type, int>, "correct value type");
+        static_assert(std::is_same_v<D::reference, int &>, "correct reference type");
+        static_assert(std::is_same_v<D::pointer, int *>, "correct pointer type");
+    }
 
-  SECTION("const pointer")
-  {
-    using I = std::vector<const int*>::iterator;
-    using D = deref_iterator<I>;
-    static_assert(
-      std::is_same_v<D::iterator_category, I::iterator_category>,
-      "same iterator category");
-    static_assert(
-      std::is_same_v<D::difference_type, I::difference_type>, "same difference type");
-    static_assert(std::is_same_v<D::value_type, const int>, "correct value type");
-    static_assert(std::is_same_v<D::reference, const int&>, "correct reference type");
-    static_assert(std::is_same_v<D::pointer, const int*>, "correct pointer type");
-  }
+    SECTION("const pointer") {
+        using I = std::vector<const int *>::iterator;
+        using D = deref_iterator<I>;
+        static_assert(
+            std::is_same_v<D::iterator_category, I::iterator_category>,
+            "same iterator category");
+        static_assert(
+            std::is_same_v<D::difference_type, I::difference_type>, "same difference type");
+        static_assert(std::is_same_v<D::value_type, const int>, "correct value type");
+        static_assert(std::is_same_v<D::reference, const int &>, "correct reference type");
+        static_assert(std::is_same_v<D::pointer, const int *>, "correct pointer type");
+    }
 
-  SECTION("unique_ptr")
-  {
-    using I = std::vector<std::unique_ptr<int>>::iterator;
-    using D = deref_iterator<I>;
-    static_assert(
-      std::is_same_v<D::iterator_category, I::iterator_category>,
-      "same iterator category");
-    static_assert(
-      std::is_same_v<D::difference_type, I::difference_type>, "same difference type");
-    static_assert(std::is_same_v<D::value_type, int>, "correct value type");
-    static_assert(std::is_same_v<D::reference, int&>, "correct reference type");
-    static_assert(std::is_same_v<D::pointer, int*>, "correct pointer type");
-  }
+    SECTION("unique_ptr") {
+        using I = std::vector<std::unique_ptr<int>>::iterator;
+        using D = deref_iterator<I>;
+        static_assert(
+            std::is_same_v<D::iterator_category, I::iterator_category>,
+            "same iterator category");
+        static_assert(
+            std::is_same_v<D::difference_type, I::difference_type>, "same difference type");
+        static_assert(std::is_same_v<D::value_type, int>, "correct value type");
+        static_assert(std::is_same_v<D::reference, int &>, "correct reference type");
+        static_assert(std::is_same_v<D::pointer, int *>, "correct pointer type");
+    }
 }
 
-TEST_CASE("deref_iterator.operator+/-")
-{
-  const int a = 1;
-  const int b = 2;
-  const int c = 3;
+TEST_CASE("deref_iterator.operator+/-") {
+    const int a = 1;
+    const int b = 2;
+    const int c = 3;
 
-  const auto v = std::vector<const int*>{&a, &b, &c};
+    const auto v = std::vector<const int *>{&a, &b, &c};
 
-  const auto d = GENERATE(0, 1, 2, 3);
-  SECTION("operator+")
-  {
-    CHECK(deref_iterator{v.begin()} + d == deref_iterator{v.begin() + d});
-    CHECK(d + deref_iterator{v.begin()} == deref_iterator{v.begin()} + d);
-  }
+    const auto d = GENERATE(0, 1, 2, 3);
+    SECTION("operator+") {
+        CHECK(deref_iterator{v.begin()} + d == deref_iterator{v.begin() + d});
+        CHECK(d + deref_iterator{v.begin()} == deref_iterator{v.begin()} + d);
+    }
 
-  SECTION("operator+=")
-  {
-    auto i = deref_iterator{v.begin()};
-    CHECK((i += d) == deref_iterator{v.begin()} + d);
-  }
+    SECTION("operator+=") {
+        auto i = deref_iterator{v.begin()};
+        CHECK((i += d) == deref_iterator{v.begin()} + d);
+    }
 
-  SECTION("operator-")
-  {
-    CHECK(deref_iterator{v.end()} - d == deref_iterator{v.end() - d});
-    CHECK(deref_iterator{v.begin()} + d - deref_iterator{v.begin()} == d);
-  }
+    SECTION("operator-") {
+        CHECK(deref_iterator{v.end()} - d == deref_iterator{v.end() - d});
+        CHECK(deref_iterator{v.begin()} + d - deref_iterator{v.begin()} == d);
+    }
 
-  SECTION("operator-=")
-  {
-    auto i = deref_iterator{v.end()};
-    CHECK((i -= d) == deref_iterator{v.end()} - d);
-  }
+    SECTION("operator-=") {
+        auto i = deref_iterator{v.end()};
+        CHECK((i -= d) == deref_iterator{v.end()} - d);
+    }
 }
 
-TEST_CASE("deref_iterator.operator*")
-{
-  int a = 1;
-  int b = 2;
-  int c = 3;
+TEST_CASE("deref_iterator.operator*") {
+    int a = 1;
+    int b = 2;
+    int c = 3;
 
-  SECTION("non const")
-  {
-    const auto v = std::vector<int*>{&a, &b, &c};
-    auto d = deref_iterator{v.begin()};
+    SECTION("non const") {
+        const auto v = std::vector<int *>{&a, &b, &c};
+        auto d = deref_iterator{v.begin()};
 
-    CHECK(*d == 1);
-    ++d;
-    CHECK(*d == 2);
-  }
+        CHECK(*d == 1);
+        ++d;
+        CHECK(*d == 2);
+    }
 
-  SECTION("const")
-  {
-    const auto v = std::vector<const int*>{&a, &b, &c};
-    auto d = deref_iterator{v.begin()};
+    SECTION("const") {
+        const auto v = std::vector<const int *>{&a, &b, &c};
+        auto d = deref_iterator{v.begin()};
 
-    CHECK(*d == 1);
-    ++d;
-    CHECK(*d == 2);
-  }
+        CHECK(*d == 1);
+        ++d;
+        CHECK(*d == 2);
+    }
 }
 
-struct A
-{
-  void doIt() {}
-  void doItConst() const {}
+struct A {
+    void doIt() {}
+    void doItConst() const {}
 };
 
-TEST_CASE("deref_iterator.operator->")
-{
-  auto a = A{};
-  auto b = A{};
-  auto c = A{};
+TEST_CASE("deref_iterator.operator->") {
+    auto a = A{};
+    auto b = A{};
+    auto c = A{};
 
-  const auto v = std::vector<const A*>{&a, &b, &c};
-  auto d = deref_iterator{v.begin()};
+    const auto v = std::vector<const A *>{&a, &b, &c};
+    auto d = deref_iterator{v.begin()};
 
-  // must notcompile
-  // d->doIt();
-  d->doItConst();
+    // must notcompile
+    // d->doIt();
+    d->doItConst();
 }
-} // namespace kdl
+}// namespace kdl

@@ -31,7 +31,7 @@ class RenderBatch;
 
 
 class RenderContext;
-} // namespace Renderer
+}// namespace Renderer
 
 namespace View {
 class DragTracker;
@@ -42,59 +42,59 @@ class ExtrudeTool;
 
 class ExtrudeToolController : public ToolController {
 protected:
-  ExtrudeTool &m_tool;
+    ExtrudeTool &m_tool;
 
 protected:
-  explicit ExtrudeToolController(ExtrudeTool &tool);
+    explicit ExtrudeToolController(ExtrudeTool &tool);
 
 public:
-  ~ExtrudeToolController() override;
+    ~ExtrudeToolController() override;
 
 private:
-  Tool &tool() override;
+    Tool &tool() override;
 
-  const Tool &tool() const override;
+    const Tool &tool() const override;
 
-  void pick(const InputState &inputState, Model::PickResult &pickResult) override;
+    void pick(const InputState &inputState, Model::PickResult &pickResult) override;
 
-  void modifierKeyChange(const InputState &inputState) override;
+    void modifierKeyChange(const InputState &inputState) override;
 
-  void mouseMove(const InputState &inputState) override;
+    void mouseMove(const InputState &inputState) override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
 
-  bool cancel() override;
+    bool cancel() override;
 
-  bool handleInput(const InputState &inputState) const;
+    bool handleInput(const InputState &inputState) const;
 
 private:
-  virtual bool doHandleInput(const InputState &inputState) const = 0;
+    virtual bool doHandleInput(const InputState &inputState) const = 0;
 
-  virtual Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) = 0;
+    virtual Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) = 0;
 };
 
 
 class ExtrudeToolController2D : public ExtrudeToolController {
 public:
-  explicit ExtrudeToolController2D(ExtrudeTool &tool);
+    explicit ExtrudeToolController2D(ExtrudeTool &tool);
 
 private:
-  Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
+    Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
 
-  bool doHandleInput(const InputState &inputState) const override;
+    bool doHandleInput(const InputState &inputState) const override;
 };
 
 
 class ExtrudeToolController3D : public ExtrudeToolController {
 public:
-  explicit ExtrudeToolController3D(ExtrudeTool &tool);
+    explicit ExtrudeToolController3D(ExtrudeTool &tool);
 
 private:
-  Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
+    Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
 
-  bool doHandleInput(const InputState &inputState) const override;
+    bool doHandleInput(const InputState &inputState) const override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

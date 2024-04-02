@@ -25,8 +25,7 @@
 #include <iterator>
 #include <tuple>
 
-namespace kdl
-{
+namespace kdl {
 /**
  * Wraps several iterators and offers their current values as a tuple of references.
  *
@@ -39,92 +38,81 @@ namespace kdl
  *
  * @tparam I the types of the iterators
  */
-template <typename... I>
-class zip_iterator
-{
+template<typename... I>
+class zip_iterator {
 public:
-  static_assert(sizeof...(I) > 0, "At least one iterator is required.");
+    static_assert(sizeof...(I) > 0, "At least one iterator is required.");
 
-  using iterator_category = std::forward_iterator_tag;
-  using difference_type = long;
-  using value_type = std::tuple<typename I::reference...>;
-  using pointer = value_type*;
-  using reference = value_type&;
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = long;
+    using value_type = std::tuple<typename I::reference...>;
+    using pointer = value_type *;
+    using reference = value_type &;
 
 private:
-  using tuple_type = std::tuple<I...>;
-  tuple_type m_iters;
+    using tuple_type = std::tuple<I...>;
+    tuple_type m_iters;
 
 public:
-  /**
+    /**
    * Creates a zip iterator of the given iterators
    *
    * @param iters the iterators
    */
-  explicit zip_iterator(I... iters)
-    : m_iters(std::forward<I>(iters)...)
-  {
-  }
+    explicit zip_iterator(I... iters)
+        : m_iters(std::forward<I>(iters)...) {
+    }
 
-  friend bool operator<(const zip_iterator& lhs, const zip_iterator& rhs)
-  {
-    return std::get<0>(lhs.m_iters) < std::get<0>(rhs.m_iters);
-  }
-  friend bool operator>(const zip_iterator& lhs, const zip_iterator& rhs)
-  {
-    return std::get<0>(lhs.m_iters) > std::get<0>(rhs.m_iters);
-  }
+    friend bool operator<(const zip_iterator &lhs, const zip_iterator &rhs) {
+        return std::get<0>(lhs.m_iters) < std::get<0>(rhs.m_iters);
+    }
+    friend bool operator>(const zip_iterator &lhs, const zip_iterator &rhs) {
+        return std::get<0>(lhs.m_iters) > std::get<0>(rhs.m_iters);
+    }
 
-  friend bool operator==(const zip_iterator& lhs, const zip_iterator& rhs)
-  {
-    return std::get<0>(lhs.m_iters) == std::get<0>(rhs.m_iters);
-  }
-  friend bool operator!=(const zip_iterator& lhs, const zip_iterator& rhs)
-  {
-    return std::get<0>(lhs.m_iters) != std::get<0>(rhs.m_iters);
-  }
+    friend bool operator==(const zip_iterator &lhs, const zip_iterator &rhs) {
+        return std::get<0>(lhs.m_iters) == std::get<0>(rhs.m_iters);
+    }
+    friend bool operator!=(const zip_iterator &lhs, const zip_iterator &rhs) {
+        return std::get<0>(lhs.m_iters) != std::get<0>(rhs.m_iters);
+    }
 
-  zip_iterator& operator++()
-  {
-    advance();
-    return *this;
-  }
+    zip_iterator &operator++() {
+        advance();
+        return *this;
+    }
 
-  zip_iterator operator++(int)
-  {
-    auto result = zip_iterator(*this);
-    advance();
-    return result;
-  }
+    zip_iterator operator++(int) {
+        auto result = zip_iterator(*this);
+        advance();
+        return result;
+    }
 
-  value_type operator*() const { return dereference(); }
-  value_type operator->() const { return dereference(); }
+    value_type operator*() const { return dereference(); }
+    value_type operator->() const { return dereference(); }
 
 private:
-  template <size_t... Idx>
-  void advance(std::index_sequence<Idx...>)
-  {
-    (..., ++std::get<Idx>(m_iters));
-  }
+    template<size_t... Idx>
+    void advance(std::index_sequence<Idx...>) {
+        (..., ++std::get<Idx>(m_iters));
+    }
 
-  void advance() { advance(std::make_index_sequence<std::tuple_size_v<tuple_type>>{}); }
+    void advance() { advance(std::make_index_sequence<std::tuple_size_v<tuple_type>>{}); }
 
-  template <size_t... Idx>
-  value_type dereference(std::index_sequence<Idx...>) const
-  {
-    return std::forward_as_tuple(*std::get<Idx>(m_iters)...);
-  }
+    template<size_t... Idx>
+    value_type dereference(std::index_sequence<Idx...>) const {
+        return std::forward_as_tuple(*std::get<Idx>(m_iters)...);
+    }
 
-  value_type dereference() const
-  {
-    return dereference(std::make_index_sequence<std::tuple_size_v<tuple_type>>{});
-  }
+    value_type dereference() const {
+        return dereference(std::make_index_sequence<std::tuple_size_v<tuple_type>>{});
+    }
 };
 
 /**
  * Deduction guide.
  */
-template <typename... I>
+template<typename... I>
 zip_iterator(I... iters) -> zip_iterator<I...>;
 
 /**
@@ -134,10 +122,9 @@ zip_iterator(I... iters) -> zip_iterator<I...>;
  * @tparam C the types of the ranges
  * @param c the ranges to iterate
  */
-template <typename... C>
-auto make_zip_begin(C&&... c)
-{
-  return zip_iterator(std::begin(std::forward<C>(c))...);
+template<typename... C>
+auto make_zip_begin(C &&...c) {
+    return zip_iterator(std::begin(std::forward<C>(c))...);
 }
 
 /**
@@ -146,10 +133,9 @@ auto make_zip_begin(C&&... c)
  * @tparam C the types of the ranges
  * @param c the ranges to iterate
  */
-template <typename... C>
-auto make_zip_end(C&&... c)
-{
-  return zip_iterator(std::end(std::forward<C>(c))...);
+template<typename... C>
+auto make_zip_end(C &&...c) {
+    return zip_iterator(std::end(std::forward<C>(c))...);
 }
 
 /**
@@ -158,11 +144,10 @@ auto make_zip_end(C&&... c)
  * @tparam C the types of the ranges
  * @param c the ranges to iterate
  */
-template <typename... C>
-auto make_zip_range(C&&... c)
-{
-  using I = decltype(make_zip_begin(std::forward<C>(c)...));
-  return range<I>{
-    make_zip_begin(std::forward<C>(c)...), make_zip_end(std::forward<C>(c)...)};
+template<typename... C>
+auto make_zip_range(C &&...c) {
+    using I = decltype(make_zip_begin(std::forward<C>(c)...));
+    return range<I>{
+        make_zip_begin(std::forward<C>(c)...), make_zip_end(std::forward<C>(c)...)};
 }
-} // namespace kdl
+}// namespace kdl

@@ -48,27 +48,27 @@ class MapDocument;
  */
 class SetBrushFaceAttributesTool : public ToolController, public Tool {
 private:
-  std::weak_ptr<MapDocument> m_document;
+    std::weak_ptr<MapDocument> m_document;
 
 public:
-  explicit SetBrushFaceAttributesTool(std::weak_ptr<MapDocument> document);
+    explicit SetBrushFaceAttributesTool(std::weak_ptr<MapDocument> document);
 
 private:
-  Tool &tool() override;
+    Tool &tool() override;
 
-  const Tool &tool() const override;
+    const Tool &tool() const override;
 
-  bool mouseClick(const InputState &inputState) override;
+    bool mouseClick(const InputState &inputState) override;
 
-  bool mouseDoubleClick(const InputState &inputState) override;
+    bool mouseDoubleClick(const InputState &inputState) override;
 
-  bool cancel() override;
+    bool cancel() override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  void copyAttributesFromSelection(const InputState &inputState, bool applyToBrush);
+    void copyAttributesFromSelection(const InputState &inputState, bool applyToBrush);
 
-  bool canCopyAttributesFromSelection(const InputState &inputState) const;
+    bool canCopyAttributesFromSelection(const InputState &inputState) const;
 };
 
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

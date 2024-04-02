@@ -66,4 +66,4 @@ QPixmap loadPixmapResource(const std::filesystem::path &imagePath);
  */
 QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

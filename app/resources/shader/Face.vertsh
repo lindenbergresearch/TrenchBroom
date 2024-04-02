@@ -28,14 +28,14 @@ varying vec4 faceColor;
 varying vec3 viewVector;
 
 void main(void) {
-	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	modelCoordinates = gl_Vertex;
-	modelNormal = gl_Normal;
-	faceColor = Color;
-	viewVector = CameraPosition - gl_Vertex.xyz;
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    modelCoordinates = gl_Vertex;
+    modelNormal = gl_Normal;
+    faceColor = Color;
+    viewVector = CameraPosition - gl_Vertex.xyz;
 
-	vec3 N = normalize(modelNormal.xyz);
-	vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
+    vec3 N = normalize(modelNormal.xyz);
+    vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
 
 }

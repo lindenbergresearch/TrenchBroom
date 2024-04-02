@@ -20,22 +20,19 @@
 
 #pragma once
 
-#include <algorithm>   // for std::remove
-#include <functional>  // for std::less
-#include <type_traits> // for std::is_convertible
+#include <algorithm>  // for std::remove
+#include <functional> // for std::less
+#include <type_traits>// for std::is_convertible
 
-namespace kdl
-{
-template <typename T>
-struct deleter
-{
-  void operator()(T ptr) const { delete ptr; }
+namespace kdl {
+template<typename T>
+struct deleter {
+    void operator()(T ptr) const { delete ptr; }
 };
 
-template <typename First>
-auto combine_cmp(First first)
-{
-  return first;
+template<typename First>
+auto combine_cmp(First first) {
+    return first;
 }
 
 /**
@@ -46,15 +43,14 @@ auto combine_cmp(First first)
  * @param first the first comparator
  * @param rest the remaining comparators
  */
-template <typename First, typename... Rest>
-auto combine_cmp(First first, Rest... rest)
-{
-  return [first = std::move(first), rest = std::move(rest...)](
-           const auto& lhs, const auto& rhs) {
-    return first(lhs, rhs)   ? true
-           : first(rhs, lhs) ? false
-                             : combine_cmp(std::move(rest))(lhs, rhs);
-  };
+template<typename First, typename... Rest>
+auto combine_cmp(First first, Rest... rest) {
+    return [first = std::move(first), rest = std::move(rest...)](
+               const auto &lhs, const auto &rhs) {
+        return first(lhs, rhs)   ? true
+               : first(rhs, lhs) ? false
+                                 : combine_cmp(std::move(rest))(lhs, rhs);
+    };
 }
 
 /**
@@ -64,20 +60,17 @@ auto combine_cmp(First first, Rest... rest)
  * @tparam T the value type
  * @tparam Compare the type of the comparator, defaults to std::less<T>
  */
-template <typename T, typename Compare = std::less<T>>
-struct equivalence
-{
-  Compare cmp;
+template<typename T, typename Compare = std::less<T>>
+struct equivalence {
+    Compare cmp;
 
-  explicit equivalence(const Compare& i_cmp = Compare())
-    : cmp(i_cmp)
-  {
-  }
+    explicit equivalence(const Compare &i_cmp = Compare())
+        : cmp(i_cmp) {
+    }
 
-  bool operator()(const T& lhs, const T& rhs) const
-  {
-    return !cmp(lhs, rhs) && !cmp(rhs, lhs);
-  }
+    bool operator()(const T &lhs, const T &rhs) const {
+        return !cmp(lhs, rhs) && !cmp(rhs, lhs);
+    }
 };
 
 /**
@@ -97,15 +90,13 @@ struct equivalence
  * that [first1, result) contains the retained elements and [result, last1) contains the
  * removed elements
  */
-template <typename I1, typename I2>
-I1 range_remove_all(I1 first1, I1 last1, I2 first2, I2 last2)
-{
-  I1 result = last1;
-  while (first2 != last2)
-  {
-    result = std::remove(first1, result, *first2++);
-  }
-  return result;
+template<typename I1, typename I2>
+I1 range_remove_all(I1 first1, I1 last1, I2 first2, I2 last2) {
+    I1 result = last1;
+    while (first2 != last2) {
+        result = std::remove(first1, result, *first2++);
+    }
+    return result;
 }
 
 /**
@@ -117,13 +108,11 @@ I1 range_remove_all(I1 first1, I1 last1, I2 first2, I2 last2)
  * @param last the end of the range of values to delete (past-the-end iterator)
  * @param deleter the deleter to apply
  */
-template <typename I, typename D = deleter<typename I::value_type>>
-void range_delete_all(I first, I last, const D& deleter = D())
-{
-  while (first != last)
-  {
-    deleter(*first++);
-  }
+template<typename I, typename D = deleter<typename I::value_type>>
+void range_delete_all(I first, I last, const D &deleter = D()) {
+    while (first != last) {
+        deleter(*first++);
+    }
 }
 
 /**
@@ -142,43 +131,31 @@ void range_delete_all(I first, I last, const D& deleter = D())
  * @param cmp the comparator to use
  * @return an int indicating the result of the comparison
  */
-template <
-  typename I1,
-  typename I2,
-  typename Compare = std::less<
-    typename std::common_type<typename I1::value_type, typename I2::value_type>::type>>
+template<
+    typename I1,
+    typename I2,
+    typename Compare = std::less<
+        typename std::common_type<typename I1::value_type, typename I2::value_type>::type>>
 int range_lexicographical_compare(
-  I1 first1, I1 last1, I2 first2, I2 last2, const Compare& cmp = Compare())
-{
-  while (first1 != last1 && first2 != last2)
-  {
-    if (cmp(*first1, *first2))
-    {
-      return -1;
+    I1 first1, I1 last1, I2 first2, I2 last2, const Compare &cmp = Compare()) {
+    while (first1 != last1 && first2 != last2) {
+        if (cmp(*first1, *first2)) {
+            return -1;
+        } else if (cmp(*first2, *first1)) {
+            return 1;
+        } else {
+            ++first1;
+            ++first2;
+        }
     }
-    else if (cmp(*first2, *first1))
-    {
-      return 1;
-    }
-    else
-    {
-      ++first1;
-      ++first2;
-    }
-  }
 
-  if (first1 != last1)
-  {
-    return 1;
-  }
-  else if (first2 != last2)
-  {
-    return -1;
-  }
-  else
-  {
-    return 0;
-  }
+    if (first1 != last1) {
+        return 1;
+    } else if (first2 != last2) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 /**
@@ -198,28 +175,26 @@ int range_lexicographical_compare(
  * @param cmp the comparator to use
  * @return true if the given ranges are equivalent and false otherwise
  */
-template <
-  typename I1,
-  typename I2,
-  typename Compare = std::less<
-    typename std::common_type<typename I1::value_type, typename I2::value_type>::type>>
+template<
+    typename I1,
+    typename I2,
+    typename Compare = std::less<
+        typename std::common_type<typename I1::value_type, typename I2::value_type>::type>>
 bool range_is_equivalent(
-  I1 first1, I1 last1, I2 first2, I2 last2, const Compare& cmp = Compare())
-{
-  // if the given iterators are random access iterators, short circuit the evaluation if
-  // the sizes of the given ranges differ
-  if constexpr (
-    std::is_convertible_v<
-      typename std::iterator_traits<I1>::iterator_category,
-      std::
-        random_access_iterator_tag> && std::is_convertible_v<typename std::iterator_traits<I2>::iterator_category, std::random_access_iterator_tag>)
-  {
-    if (last1 - first1 != last2 - first2)
-    {
-      return false;
+    I1 first1, I1 last1, I2 first2, I2 last2, const Compare &cmp = Compare()) {
+    // if the given iterators are random access iterators, short circuit the evaluation if
+    // the sizes of the given ranges differ
+    if constexpr (
+        std::is_convertible_v<
+            typename std::iterator_traits<I1>::iterator_category,
+            std::
+                random_access_iterator_tag> &&
+        std::is_convertible_v<typename std::iterator_traits<I2>::iterator_category, std::random_access_iterator_tag>) {
+        if (last1 - first1 != last2 - first2) {
+            return false;
+        }
     }
-  }
-  return kdl::range_lexicographical_compare(first1, last1, first2, last2, cmp) == 0;
+    return kdl::range_lexicographical_compare(first1, last1, first2, last2, cmp) == 0;
 }
 
 /**
@@ -230,10 +205,9 @@ bool range_is_equivalent(
  * @param c the collection
  * @return the size of the given collection
  */
-template <typename O, typename C>
-O col_size(const C& c)
-{
-  return static_cast<O>(c.size());
+template<typename O, typename C>
+O col_size(const C &c) {
+    return static_cast<O>(c.size());
 }
 
 /**
@@ -245,10 +219,9 @@ O col_size(const C& c)
  * @param args the remaining containers
  * @return the sum of the sizes of the given containers
  */
-template <typename C, typename... Args>
-auto col_total_size(const C& c, Args&&... args)
-{
-  return (c.size() + ... + args.size());
+template<typename C, typename... Args>
+auto col_total_size(const C &c, Args &&...args) {
+    return (c.size() + ... + args.size());
 }
 
 /**
@@ -259,10 +232,9 @@ auto col_total_size(const C& c, Args&&... args)
  * @param c the container
  * @param deleter the deleter to apply
  */
-template <typename C, typename D = deleter<typename C::value_type>>
-void col_delete_all(C& c, const D& deleter = D())
-{
-  kdl::range_delete_all(std::begin(c), std::end(c), deleter);
+template<typename C, typename D = deleter<typename C::value_type>>
+void col_delete_all(C &c, const D &deleter = D()) {
+    kdl::range_delete_all(std::begin(c), std::end(c), deleter);
 }
 
 /**
@@ -279,16 +251,15 @@ void col_delete_all(C& c, const D& deleter = D())
  * @param cmp the comparator to use
  * @return an int indicating the result of the comparison
  */
-template <
-  typename C1,
-  typename C2,
-  typename Compare = std::less<
-    typename std::common_type<typename C1::value_type, typename C2::value_type>::type>>
+template<
+    typename C1,
+    typename C2,
+    typename Compare = std::less<
+        typename std::common_type<typename C1::value_type, typename C2::value_type>::type>>
 int col_lexicographical_compare(
-  const C1& c1, const C2& c2, const Compare& cmp = Compare())
-{
-  return kdl::range_lexicographical_compare(
-    std::begin(c1), std::end(c1), std::begin(c2), std::end(c2), cmp);
+    const C1 &c1, const C2 &c2, const Compare &cmp = Compare()) {
+    return kdl::range_lexicographical_compare(
+        std::begin(c1), std::end(c1), std::begin(c2), std::end(c2), cmp);
 }
 
 /**
@@ -306,22 +277,18 @@ int col_lexicographical_compare(
  * @param cmp the comparator to use
  * @return true if the given collections are equivalent and false otherwise
  */
-template <
-  typename C1,
-  typename C2,
-  typename Compare = std::less<
-    typename std::common_type<typename C1::value_type, typename C2::value_type>::type>>
-bool col_is_equivalent(const C1& c1, const C2& c2, const Compare& cmp = Compare())
-{
-  if (c1.size() != c2.size())
-  {
-    return false;
-  }
-  else
-  {
-    return kdl::range_is_equivalent(
-      std::begin(c1), std::end(c1), std::begin(c2), std::end(c2), cmp);
-  }
+template<
+    typename C1,
+    typename C2,
+    typename Compare = std::less<
+        typename std::common_type<typename C1::value_type, typename C2::value_type>::type>>
+bool col_is_equivalent(const C1 &c1, const C2 &c2, const Compare &cmp = Compare()) {
+    if (c1.size() != c2.size()) {
+        return false;
+    } else {
+        return kdl::range_is_equivalent(
+            std::begin(c1), std::end(c1), std::begin(c2), std::end(c2), cmp);
+    }
 }
 
 /**
@@ -332,29 +299,25 @@ bool col_is_equivalent(const C1& c1, const C2& c2, const Compare& cmp = Compare(
  * @param c the collection to sort
  * @param cmp the comparator to use for comparisons
  */
-template <typename C, typename Compare = std::less<typename C::value_type>>
-C col_sort(C c, const Compare& cmp = Compare())
-{
-  std::sort(std::begin(c), std::end(c), cmp);
-  return c;
+template<typename C, typename Compare = std::less<typename C::value_type>>
+C col_sort(C c, const Compare &cmp = Compare()) {
+    std::sort(std::begin(c), std::end(c), cmp);
+    return c;
 }
 
-template <typename C, typename P>
-bool none_of(const C& c, const P& p)
-{
-  return std::none_of(std::begin(c), std::end(c), p);
+template<typename C, typename P>
+bool none_of(const C &c, const P &p) {
+    return std::none_of(std::begin(c), std::end(c), p);
 }
 
-template <typename C, typename P>
-bool any_of(const C& c, const P& p)
-{
-  return std::any_of(std::begin(c), std::end(c), p);
+template<typename C, typename P>
+bool any_of(const C &c, const P &p) {
+    return std::any_of(std::begin(c), std::end(c), p);
 }
 
-template <typename C, typename P>
-bool all_of(const C& c, const P& p)
-{
-  return std::all_of(std::begin(c), std::end(c), p);
+template<typename C, typename P>
+bool all_of(const C &c, const P &p) {
+    return std::all_of(std::begin(c), std::end(c), p);
 }
 
-} // namespace kdl
+}// namespace kdl

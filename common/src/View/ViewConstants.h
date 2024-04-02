@@ -72,7 +72,7 @@ static const int ChoiceLeftMargin = 1;
 static const int ChoiceSizeDelta = 1;
 static const int TextBoxInnerMargin = 0;
 static const int TabBarBarLeftMargin = 10;
-static const int ToggleButtonStyle = 0x08000000; // wxBORDER_SUNKEN
+static const int ToggleButtonStyle = 0x08000000;// wxBORDER_SUNKEN
 #else
 static const int DialogOuterMargin = 10;
 static const int DialogButtonTopMargin = 10;
@@ -98,7 +98,7 @@ static const int ToggleButtonStyle = 0;
 static const int NoMargin = 0;
 static const int MinPreferenceLabelWidth = 100;
 static const int HighlightBoxMargin = 5;
-} // namespace LayoutConstants
+}// namespace LayoutConstants
 
 namespace Fonts {
 QFont fixedWidthFont();
@@ -120,6 +120,6 @@ QColor disabledCellText();
 QColor disabledText(const QWidget *widget);
 
 QColor window();
-} // namespace Colors
-} // namespace View
-} // namespace TrenchBroom
+}// namespace Colors
+}// namespace View
+}// namespace TrenchBroom

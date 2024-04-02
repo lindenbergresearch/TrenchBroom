@@ -25,7 +25,7 @@ ClickableLabel::ClickableLabel(const QString &text, QWidget *parent) : QLabel(te
 }
 
 void ClickableLabel::mousePressEvent(QMouseEvent *) {
-  emit clicked();
+    emit clicked();
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

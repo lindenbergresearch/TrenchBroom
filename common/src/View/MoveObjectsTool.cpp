@@ -39,59 +39,58 @@ MoveObjectsTool::MoveObjectsTool(std::weak_ptr<MapDocument> document) : Tool(tru
 }
 
 const Grid &MoveObjectsTool::grid() const {
-  return kdl::mem_lock(m_document)->grid();
+    return kdl::mem_lock(m_document)->grid();
 }
 
 bool MoveObjectsTool::startMove(const InputState &inputState) {
-  auto document = kdl::mem_lock(m_document);
+    auto document = kdl::mem_lock(m_document);
 
-  if (! document->selectedBrushFaces().empty()) {
-    return false;
-  }
+    if (!document->selectedBrushFaces().empty()) {
+        return false;
+    }
 
-  document->startTransaction(
-      duplicateObjects(inputState) ? "Duplicate Objects" : "Move Objects", TransactionScope::LongRunning
-  );
-  m_duplicateObjects = duplicateObjects(inputState);
-  return true;
+    document->startTransaction(
+        duplicateObjects(inputState) ? "Duplicate Objects" : "Move Objects", TransactionScope::LongRunning);
+    m_duplicateObjects = duplicateObjects(inputState);
+    return true;
 }
 
 MoveObjectsTool::MoveResult MoveObjectsTool::move(const InputState &, const vm::vec3 &delta) {
-  auto document = kdl::mem_lock(m_document);
-  const auto &worldBounds = document->worldBounds();
-  const auto bounds = document->selectionBounds();
-  if (! worldBounds.contains(bounds.translate(delta))) {
-    return MR_Deny;
-  }
+    auto document = kdl::mem_lock(m_document);
+    const auto &worldBounds = document->worldBounds();
+    const auto bounds = document->selectionBounds();
+    if (!worldBounds.contains(bounds.translate(delta))) {
+        return MR_Deny;
+    }
 
-  if (m_duplicateObjects) {
-    m_duplicateObjects = false;
-    document->duplicateObjects();
-  }
+    if (m_duplicateObjects) {
+        m_duplicateObjects = false;
+        document->duplicateObjects();
+    }
 
-  if (! document->translateObjects(delta)) {
-    return MR_Deny;
-  } else {
-    return MR_Continue;
-  }
+    if (!document->translateObjects(delta)) {
+        return MR_Deny;
+    } else {
+        return MR_Continue;
+    }
 }
 
 void MoveObjectsTool::endMove(const InputState &) {
-  auto document = kdl::mem_lock(m_document);
-  document->commitTransaction();
+    auto document = kdl::mem_lock(m_document);
+    document->commitTransaction();
 }
 
 void MoveObjectsTool::cancelMove() {
-  auto document = kdl::mem_lock(m_document);
-  document->cancelTransaction();
+    auto document = kdl::mem_lock(m_document);
+    document->cancelTransaction();
 }
 
 bool MoveObjectsTool::duplicateObjects(const InputState &inputState) const {
-  return inputState.modifierKeysDown(ModifierKeys::MKCtrlCmd);
+    return inputState.modifierKeysDown(ModifierKeys::MKCtrlCmd);
 }
 
 QWidget *MoveObjectsTool::doCreatePage(QWidget *parent) {
-  return new MoveObjectsToolPage(m_document, parent);
+    return new MoveObjectsToolPage(m_document, parent);
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

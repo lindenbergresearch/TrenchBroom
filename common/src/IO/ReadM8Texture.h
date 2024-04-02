@@ -33,4 +33,4 @@ class Reader;
  */
 Result<Assets::Texture, ReadTextureError> readM8Texture(std::string name, Reader &reader);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

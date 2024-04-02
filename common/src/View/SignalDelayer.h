@@ -28,26 +28,26 @@ namespace View {
  * multiple requests.
  */
 class SignalDelayer : public QObject {
-Q_OBJECT
+    Q_OBJECT
 private:
-  bool m_isQueued;
+    bool m_isQueued;
 
 public:
-  explicit SignalDelayer(QObject *parent = nullptr);
+    explicit SignalDelayer(QObject *parent = nullptr);
 
 public slots:
 
-  /**
+    /**
    * Enqueues an action on the Qt event loop that will emit `processSignal()`.
    *
    * Multiple calls to `queueSignal()` before the signal is emitted will only emit one
    * `processSignal()`.
    */
-  void queueSignal();
+    void queueSignal();
 
 signals:
 
-  void processSignal();
+    void processSignal();
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

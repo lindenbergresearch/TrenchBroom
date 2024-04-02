@@ -31,7 +31,7 @@ class GroupNode;
 
 
 class Node;
-} // namespace TrenchBroom::Model
+}// namespace TrenchBroom::Model
 
 namespace TrenchBroom::View {
 class MapDocumentCommandFacade;
@@ -58,26 +58,26 @@ bool checkLinkedGroupsToUpdate(const std::vector<Model::GroupNode *> &changedLin
  */
 class UpdateLinkedGroupsHelper {
 private:
-  using ChangedLinkedGroups = std::vector<Model::GroupNode *>;
-  using LinkedGroupUpdates = std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>;
-  std::variant<ChangedLinkedGroups, LinkedGroupUpdates> m_state;
+    using ChangedLinkedGroups = std::vector<Model::GroupNode *>;
+    using LinkedGroupUpdates = std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>>;
+    std::variant<ChangedLinkedGroups, LinkedGroupUpdates> m_state;
 
 public:
-  explicit UpdateLinkedGroupsHelper(ChangedLinkedGroups changedLinkedGroups);
+    explicit UpdateLinkedGroupsHelper(ChangedLinkedGroups changedLinkedGroups);
 
-  ~UpdateLinkedGroupsHelper();
+    ~UpdateLinkedGroupsHelper();
 
-  Result<void> applyLinkedGroupUpdates(MapDocumentCommandFacade &document);
+    Result<void> applyLinkedGroupUpdates(MapDocumentCommandFacade &document);
 
-  void undoLinkedGroupUpdates(MapDocumentCommandFacade &document);
+    void undoLinkedGroupUpdates(MapDocumentCommandFacade &document);
 
-  void collateWith(UpdateLinkedGroupsHelper &other);
+    void collateWith(UpdateLinkedGroupsHelper &other);
 
 private:
-  Result<void> computeLinkedGroupUpdates(MapDocumentCommandFacade &document);
+    Result<void> computeLinkedGroupUpdates(MapDocumentCommandFacade &document);
 
-  static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document);
+    static Result<LinkedGroupUpdates> computeLinkedGroupUpdates(const ChangedLinkedGroups &changedLinkedGroups, MapDocumentCommandFacade &document);
 
-  void doApplyOrUndoLinkedGroupUpdates(MapDocumentCommandFacade &document);
+    void doApplyOrUndoLinkedGroupUpdates(MapDocumentCommandFacade &document);
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

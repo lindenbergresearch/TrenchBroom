@@ -33,47 +33,47 @@ enum class ValueType;
 
 class Exception : public TrenchBroom::Exception {
 public:
-  using TrenchBroom::Exception::Exception;
+    using TrenchBroom::Exception::Exception;
 };
 
 
 class ConversionError : public Exception {
 public:
-  ConversionError(const std::string &value, ValueType from, ValueType to);
+    ConversionError(const std::string &value, ValueType from, ValueType to);
 };
 
 
 class DereferenceError : public Exception {
 public:
-  DereferenceError(const std::string &value, ValueType from, ValueType to);
+    DereferenceError(const std::string &value, ValueType from, ValueType to);
 };
 
 
 class EvaluationError : public Exception {
 public:
-  using Exception::Exception;
+    using Exception::Exception;
 };
 
 
 class IndexError : public EvaluationError {
 public:
-  IndexError(const Value &indexableValue, const Value &indexValue);
+    IndexError(const Value &indexableValue, const Value &indexValue);
 
-  IndexError(const Value &indexableValue, size_t index);
+    IndexError(const Value &indexableValue, size_t index);
 
-  IndexError(const Value &indexableValue, const std::string &key);
+    IndexError(const Value &indexableValue, const std::string &key);
 };
 
 
 class IndexOutOfBoundsError : public EvaluationError {
 public:
-  IndexOutOfBoundsError(const Value &indexableValue, const Value &indexValue, size_t outOfBoundsIndex);
+    IndexOutOfBoundsError(const Value &indexableValue, const Value &indexValue, size_t outOfBoundsIndex);
 
-  IndexOutOfBoundsError(const Value &indexableValue, const Value &indexValue, const std::string &outOfBoundsIndex);
+    IndexOutOfBoundsError(const Value &indexableValue, const Value &indexValue, const std::string &outOfBoundsIndex);
 
-  IndexOutOfBoundsError(const Value &indexableValue, size_t index);
+    IndexOutOfBoundsError(const Value &indexableValue, size_t index);
 
-  IndexOutOfBoundsError(const Value &indexableValue, const std::string &key);
+    IndexOutOfBoundsError(const Value &indexableValue, const std::string &key);
 };
-} // namespace EL
-} // namespace TrenchBroom
+}// namespace EL
+}// namespace TrenchBroom

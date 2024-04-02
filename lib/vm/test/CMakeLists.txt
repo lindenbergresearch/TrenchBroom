@@ -19,16 +19,16 @@ target_sources(vm-test PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src/tst_vec_ext.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/tst_vec_io.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/tst_vec.cpp"
-        )
+)
 
 target_link_libraries(vm-test Catch2::Catch2 vm)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     target_compile_options(vm-test PRIVATE -Wall -Wextra -Wconversion -pedantic -Wno-c++98-compat -Wno-global-constructors -Wno-zero-as-null-pointer-constant)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(vm-test PRIVATE -Wall -Wextra -Wconversion -pedantic)
-elseif(MSVC EQUAL 1)
+elseif (MSVC EQUAL 1)
     target_compile_options(vm-test PRIVATE /W3 /EHsc /MP)
-else()
+else ()
     message(FATAL_ERROR "Cannot set compile options for target")
-endif()
+endif ()

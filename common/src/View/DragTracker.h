@@ -25,7 +25,7 @@ class RenderBatch;
 
 
 class RenderContext;
-} // namespace Renderer
+}// namespace Renderer
 
 namespace View {
 class InputState;
@@ -36,44 +36,44 @@ class InputState;
  */
 class DragTracker {
 public:
-  virtual ~DragTracker();
+    virtual ~DragTracker();
 
-  /**
+    /**
    * Called when a modifier key is pressed or released. The given input state represents
    * the state after the key was pressed or released.
    */
-  virtual void modifierKeyChange(const InputState &inputState);
+    virtual void modifierKeyChange(const InputState &inputState);
 
-  /**
+    /**
    * Called when the mouse wheel is scrolled.
    */
-  virtual void mouseScroll(const InputState &inputState);
+    virtual void mouseScroll(const InputState &inputState);
 
-  /**
+    /**
    * Called when a drag took place. This does not always have to correspond to a mouse
    * movement; sometimes these events are synthesized.
    */
-  virtual bool drag(const InputState &inputState) = 0;
+    virtual bool drag(const InputState &inputState) = 0;
 
-  /**
+    /**
    * Called once at the end of a successful drag. Not called if the drag is cancelled.
    */
-  virtual void end(const InputState &inputState) = 0;
+    virtual void end(const InputState &inputState) = 0;
 
-  /**
+    /**
    * Called once at the end of a canceled drag.
    */
-  virtual void cancel() = 0;
+    virtual void cancel() = 0;
 
-  /**
+    /**
    * Called prior to a rendering pass.
    */
-  virtual void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
+    virtual void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
 
-  /**
+    /**
    * Called once during every render pass.
    */
-  virtual void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
+    virtual void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

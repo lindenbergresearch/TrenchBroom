@@ -43,310 +43,308 @@
 #include <kdl/memory_utils.h>
 
 namespace TrenchBroom::View {
-SwitchableMapViewContainer::SwitchableMapViewContainer(Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) :
-    QWidget{parent}, m_logger{logger}, m_document{
-    std::move(document)
-}, m_contextManager{contextManager}, m_mapViewBar{new MapViewBar(m_document)},
-    m_toolBox{std::make_unique<MapViewToolBox>(m_document, m_mapViewBar->toolBook())}, m_mapRenderer{
-    std::make_unique<Renderer::MapRenderer>(m_document)
-}, m_activationTracker{std::make_unique<MapViewActivationTracker>()} {
-  setObjectName("SwitchableMapViewContainer");
-  switchToMapView(static_cast<MapViewLayout>(pref(Preferences::MapViewLayout)));
-  connectObservers();
+SwitchableMapViewContainer::SwitchableMapViewContainer(Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent) : QWidget{parent}, m_logger{logger}, m_document{
+                                                                                                                                                                                                        std::move(document)},
+                                                                                                                                                                 m_contextManager{contextManager}, m_mapViewBar{new MapViewBar(m_document)}, m_toolBox{std::make_unique<MapViewToolBox>(m_document, m_mapViewBar->toolBook())}, m_mapRenderer{std::make_unique<Renderer::MapRenderer>(m_document)}, m_activationTracker{std::make_unique<MapViewActivationTracker>()} {
+    setObjectName("SwitchableMapViewContainer");
+    switchToMapView(static_cast<MapViewLayout>(pref(Preferences::MapViewLayout)));
+    connectObservers();
 }
 
 SwitchableMapViewContainer::~SwitchableMapViewContainer() {
-  // we must destroy our children before we destroy our resources because they might still
-  // use them in their destructors
-  m_activationTracker->clear();
-  delete m_mapView;
+    // we must destroy our children before we destroy our resources because they might still
+    // use them in their destructors
+    m_activationTracker->clear();
+    delete m_mapView;
 }
 
 void SwitchableMapViewContainer::connectTopWidgets(Inspector *inspector) {
-  inspector->connectTopWidgets(m_mapViewBar);
+    inspector->connectTopWidgets(m_mapViewBar);
 }
 
 void SwitchableMapViewContainer::windowActivationStateChanged(const bool active) {
-  m_activationTracker->windowActivationChanged(active);
+    m_activationTracker->windowActivationChanged(active);
 }
 
 bool SwitchableMapViewContainer::active() const {
-  return m_activationTracker->active();
+    return m_activationTracker->active();
 }
 
 void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
-  m_activationTracker->clear();
+    m_activationTracker->clear();
 
-  // NOTE: not all widgets are deleted so we can't use deleteChildWidgetsAndLayout()
-  delete m_mapView;
-  m_mapView = nullptr;
+    // NOTE: not all widgets are deleted so we can't use deleteChildWidgetsAndLayout()
+    delete m_mapView;
+    m_mapView = nullptr;
 
-  delete layout();
+    delete layout();
 
-  switch (viewId) {
-  case MapViewLayout::OnePane: m_mapView = new OnePaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
-    break;
-  case MapViewLayout::TwoPanes: m_mapView = new TwoPaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
-    break;
-  case MapViewLayout::ThreePanes: m_mapView = new ThreePaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
-    break;
-  case MapViewLayout::FourPanes: m_mapView = new FourPaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
-    break;
-    switchDefault();
-  }
+    switch (viewId) {
+        case MapViewLayout::OnePane:
+            m_mapView = new OnePaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            break;
+        case MapViewLayout::TwoPanes:
+            m_mapView = new TwoPaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            break;
+        case MapViewLayout::ThreePanes:
+            m_mapView = new ThreePaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            break;
+        case MapViewLayout::FourPanes:
+            m_mapView = new FourPaneMapView{m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger};
+            break;
+            switchDefault();
+    }
 
-  installActivationTracker(*m_activationTracker);
+    installActivationTracker(*m_activationTracker);
 
-  auto *layout = new QVBoxLayout{};
-  layout->setContentsMargins(0, LayoutConstants::NarrowHMargin, 0, 0);
-  layout->setSpacing(LayoutConstants::NarrowHMargin);
+    auto *layout = new QVBoxLayout{};
+    layout->setContentsMargins(0, LayoutConstants::NarrowHMargin, 0, 0);
+    layout->setSpacing(LayoutConstants::NarrowHMargin);
 
-  layout->addWidget(m_mapViewBar);
-  layout->addWidget(m_mapView, 1);
-  setLayout(layout);
+    layout->addWidget(m_mapViewBar);
+    layout->addWidget(m_mapView, 1);
+    setLayout(layout);
 
-  m_mapView->setFocus();
+    m_mapView->setFocus();
 }
 
 bool SwitchableMapViewContainer::anyToolActive() const {
-  return createComplexBrushToolActive() || clipToolActive() || rotateObjectsToolActive() || scaleObjectsToolActive() || shearObjectsToolActive()
-      || anyVertexToolActive();
+    return createComplexBrushToolActive() || clipToolActive() || rotateObjectsToolActive() || scaleObjectsToolActive() || shearObjectsToolActive() || anyVertexToolActive();
 }
 
 void SwitchableMapViewContainer::deactivateTool() {
-  m_toolBox->deactivateAllTools();
+    m_toolBox->deactivateAllTools();
 }
 
 bool SwitchableMapViewContainer::createComplexBrushToolActive() const {
-  return m_toolBox->createComplexBrushToolActive();
+    return m_toolBox->createComplexBrushToolActive();
 }
 
 bool SwitchableMapViewContainer::canToggleCreateComplexBrushTool() const {
-  return true;
+    return true;
 }
 
 void SwitchableMapViewContainer::toggleCreateComplexBrushTool() {
-  assert(canToggleCreateComplexBrushTool());
-  m_toolBox->toggleCreateComplexBrushTool();
+    assert(canToggleCreateComplexBrushTool());
+    m_toolBox->toggleCreateComplexBrushTool();
 }
 
 bool SwitchableMapViewContainer::clipToolActive() const {
-  return m_toolBox->clipToolActive();
+    return m_toolBox->clipToolActive();
 }
 
 bool SwitchableMapViewContainer::canToggleClipTool() const {
-  return clipToolActive() || kdl::mem_lock(m_document)->selectedNodes().hasOnlyBrushes();
+    return clipToolActive() || kdl::mem_lock(m_document)->selectedNodes().hasOnlyBrushes();
 }
 
 void SwitchableMapViewContainer::toggleClipTool() {
-  assert(canToggleClipTool());
-  m_toolBox->toggleClipTool();
+    assert(canToggleClipTool());
+    m_toolBox->toggleClipTool();
 }
 
 ClipTool &SwitchableMapViewContainer::clipTool() {
-  return m_toolBox->clipTool();
+    return m_toolBox->clipTool();
 }
 
 bool SwitchableMapViewContainer::rotateObjectsToolActive() const {
-  return m_toolBox->rotateObjectsToolActive();
+    return m_toolBox->rotateObjectsToolActive();
 }
 
 bool SwitchableMapViewContainer::canToggleRotateObjectsTool() const {
-  return rotateObjectsToolActive() || kdl::mem_lock(m_document)->hasSelectedNodes();
+    return rotateObjectsToolActive() || kdl::mem_lock(m_document)->hasSelectedNodes();
 }
 
 void SwitchableMapViewContainer::toggleRotateObjectsTool() {
-  assert(canToggleRotateObjectsTool());
-  m_toolBox->toggleRotateObjectsTool();
+    assert(canToggleRotateObjectsTool());
+    m_toolBox->toggleRotateObjectsTool();
 }
 
 bool SwitchableMapViewContainer::scaleObjectsToolActive() const {
-  return m_toolBox->scaleObjectsToolActive();
+    return m_toolBox->scaleObjectsToolActive();
 }
 
 bool SwitchableMapViewContainer::shearObjectsToolActive() const {
-  return m_toolBox->shearObjectsToolActive();
+    return m_toolBox->shearObjectsToolActive();
 }
 
 bool SwitchableMapViewContainer::canToggleScaleObjectsTool() const {
-  return scaleObjectsToolActive() || kdl::mem_lock(m_document)->hasSelectedNodes();
+    return scaleObjectsToolActive() || kdl::mem_lock(m_document)->hasSelectedNodes();
 }
 
 void SwitchableMapViewContainer::toggleScaleObjectsTool() {
-  assert(canToggleScaleObjectsTool());
-  m_toolBox->toggleScaleObjectsTool();
+    assert(canToggleScaleObjectsTool());
+    m_toolBox->toggleScaleObjectsTool();
 }
 
 bool SwitchableMapViewContainer::canToggleShearObjectsTool() const {
-  return shearObjectsToolActive() || kdl::mem_lock(m_document)->hasSelectedNodes();
+    return shearObjectsToolActive() || kdl::mem_lock(m_document)->hasSelectedNodes();
 }
 
 void SwitchableMapViewContainer::toggleShearObjectsTool() {
-  assert(canToggleShearObjectsTool());
-  m_toolBox->toggleShearObjectsTool();
+    assert(canToggleShearObjectsTool());
+    m_toolBox->toggleShearObjectsTool();
 }
 
 bool SwitchableMapViewContainer::canToggleVertexTools() const {
-  return vertexToolActive() || edgeToolActive() || faceToolActive() || kdl::mem_lock(m_document)->selectedNodes().hasOnlyBrushes();
+    return vertexToolActive() || edgeToolActive() || faceToolActive() || kdl::mem_lock(m_document)->selectedNodes().hasOnlyBrushes();
 }
 
 bool SwitchableMapViewContainer::anyVertexToolActive() const {
-  return vertexToolActive() || edgeToolActive() || faceToolActive();
+    return vertexToolActive() || edgeToolActive() || faceToolActive();
 }
 
 bool SwitchableMapViewContainer::vertexToolActive() const {
-  return m_toolBox->vertexToolActive();
+    return m_toolBox->vertexToolActive();
 }
 
 bool SwitchableMapViewContainer::edgeToolActive() const {
-  return m_toolBox->edgeToolActive();
+    return m_toolBox->edgeToolActive();
 }
 
 bool SwitchableMapViewContainer::faceToolActive() const {
-  return m_toolBox->faceToolActive();
+    return m_toolBox->faceToolActive();
 }
 
 void SwitchableMapViewContainer::toggleVertexTool() {
-  assert(canToggleVertexTools());
-  m_toolBox->toggleVertexTool();
+    assert(canToggleVertexTools());
+    m_toolBox->toggleVertexTool();
 }
 
 void SwitchableMapViewContainer::toggleEdgeTool() {
-  assert(canToggleVertexTools());
-  m_toolBox->toggleEdgeTool();
+    assert(canToggleVertexTools());
+    m_toolBox->toggleEdgeTool();
 }
 
 void SwitchableMapViewContainer::toggleFaceTool() {
-  assert(canToggleVertexTools());
-  m_toolBox->toggleFaceTool();
+    assert(canToggleVertexTools());
+    m_toolBox->toggleFaceTool();
 }
 
 VertexTool &SwitchableMapViewContainer::vertexTool() {
-  return m_toolBox->vertexTool();
+    return m_toolBox->vertexTool();
 }
 
 EdgeTool &SwitchableMapViewContainer::edgeTool() {
-  return m_toolBox->edgeTool();
+    return m_toolBox->edgeTool();
 }
 
 FaceTool &SwitchableMapViewContainer::faceTool() {
-  return m_toolBox->faceTool();
+    return m_toolBox->faceTool();
 }
 
 MapViewToolBox &SwitchableMapViewContainer::mapViewToolBox() {
-  return *m_toolBox;
+    return *m_toolBox;
 }
 
 bool SwitchableMapViewContainer::canMoveCameraToNextTracePoint() const {
-  auto document = kdl::mem_lock(m_document);
-  if (const auto *pointFile = document->pointFile()) {
-    return pointFile->hasNextPoint();
-  }
-  return false;
+    auto document = kdl::mem_lock(m_document);
+    if (const auto *pointFile = document->pointFile()) {
+        return pointFile->hasNextPoint();
+    }
+    return false;
 }
 
 bool SwitchableMapViewContainer::canMoveCameraToPreviousTracePoint() const {
-  auto document = kdl::mem_lock(m_document);
-  if (const auto *pointFile = document->pointFile()) {
-    return pointFile->hasPreviousPoint();
-  }
-  return false;
+    auto document = kdl::mem_lock(m_document);
+    if (const auto *pointFile = document->pointFile()) {
+        return pointFile->hasPreviousPoint();
+    }
+    return false;
 }
 
 void SwitchableMapViewContainer::moveCameraToNextTracePoint() {
-  auto document = kdl::mem_lock(m_document);
-  assert(document->isPointFileLoaded());
+    auto document = kdl::mem_lock(m_document);
+    assert(document->isPointFileLoaded());
 
-  if (auto *pointFile = document->pointFile()) {
-    pointFile->advance();
-    m_mapView->moveCameraToCurrentTracePoint();
-  }
+    if (auto *pointFile = document->pointFile()) {
+        pointFile->advance();
+        m_mapView->moveCameraToCurrentTracePoint();
+    }
 }
 
 void SwitchableMapViewContainer::moveCameraToPreviousTracePoint() {
-  auto document = kdl::mem_lock(m_document);
-  assert(document->isPointFileLoaded());
+    auto document = kdl::mem_lock(m_document);
+    assert(document->isPointFileLoaded());
 
-  if (auto *pointFile = document->pointFile()) {
-    pointFile->retreat();
-    m_mapView->moveCameraToCurrentTracePoint();
-  }
+    if (auto *pointFile = document->pointFile()) {
+        pointFile->retreat();
+        m_mapView->moveCameraToCurrentTracePoint();
+    }
 }
 
 bool SwitchableMapViewContainer::canMaximizeCurrentView() const {
-  return m_mapView->canMaximizeCurrentView();
+    return m_mapView->canMaximizeCurrentView();
 }
 
 bool SwitchableMapViewContainer::currentViewMaximized() const {
-  return m_mapView->currentViewMaximized();
+    return m_mapView->currentViewMaximized();
 }
 
 void SwitchableMapViewContainer::toggleMaximizeCurrentView() {
-  m_mapView->toggleMaximizeCurrentView();
+    m_mapView->toggleMaximizeCurrentView();
 }
 
 void SwitchableMapViewContainer::connectObservers() {
-  m_notifierConnection += m_toolBox->refreshViewsNotifier.connect(
-      this, &SwitchableMapViewContainer::refreshViews
-  );
+    m_notifierConnection += m_toolBox->refreshViewsNotifier.connect(
+        this, &SwitchableMapViewContainer::refreshViews);
 }
 
 void SwitchableMapViewContainer::refreshViews(Tool &) {
-  // NOTE: it doesn't work to call QWidget::update() here. The actual OpenGL view is a
-  // QWindow embedded in the widget hierarchy with QWidget::createWindowContainer(), and
-  // we need to call QWindow::requestUpdate().
-  m_mapView->refreshViews();
+    // NOTE: it doesn't work to call QWidget::update() here. The actual OpenGL view is a
+    // QWindow embedded in the widget hierarchy with QWidget::createWindowContainer(), and
+    // we need to call QWindow::requestUpdate().
+    m_mapView->refreshViews();
 }
 
 void SwitchableMapViewContainer::doInstallActivationTracker(MapViewActivationTracker &activationTracker) {
-  m_mapView->installActivationTracker(activationTracker);
+    m_mapView->installActivationTracker(activationTracker);
 }
 
 bool SwitchableMapViewContainer::doGetIsCurrent() const {
-  return m_mapView->isCurrent();
+    return m_mapView->isCurrent();
 }
 
 MapViewBase *SwitchableMapViewContainer::doGetFirstMapViewBase() {
-  return m_mapView->firstMapViewBase();
+    return m_mapView->firstMapViewBase();
 }
 
 bool SwitchableMapViewContainer::doCanSelectTall() {
-  return m_mapView->canSelectTall();
+    return m_mapView->canSelectTall();
 }
 
 void SwitchableMapViewContainer::doSelectTall() {
-  m_mapView->selectTall();
+    m_mapView->selectTall();
 }
 
 vm::vec3 SwitchableMapViewContainer::doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
-  return m_mapView->pasteObjectsDelta(bounds, referenceBounds);
+    return m_mapView->pasteObjectsDelta(bounds, referenceBounds);
 }
 
 void SwitchableMapViewContainer::doReset2dCameras(const Renderer::Camera &masterCamera, const bool animate) {
-  m_mapView->reset2dCameras(masterCamera, animate);
+    m_mapView->reset2dCameras(masterCamera, animate);
 }
 
 void SwitchableMapViewContainer::doFocusCameraOnSelection(const bool animate) {
-  m_mapView->focusCameraOnSelection(animate);
+    m_mapView->focusCameraOnSelection(animate);
 }
 
 void SwitchableMapViewContainer::doMoveCameraToPosition(const vm::vec3f &position, const bool animate) {
-  m_mapView->moveCameraToPosition(position, animate);
+    m_mapView->moveCameraToPosition(position, animate);
 }
 
 void SwitchableMapViewContainer::doMoveCameraToCurrentTracePoint() {
-  m_mapView->moveCameraToCurrentTracePoint();
+    m_mapView->moveCameraToCurrentTracePoint();
 }
 
 void SwitchableMapViewContainer::doFlashSelection() {
-  m_mapView->flashSelection();
+    m_mapView->flashSelection();
 }
 
 bool SwitchableMapViewContainer::doCancelMouseDrag() {
-  return m_mapView->cancelMouseDrag();
+    return m_mapView->cancelMouseDrag();
 }
 
 void SwitchableMapViewContainer::doRefreshViews() {
-  m_mapView->refreshViews();
+    m_mapView->refreshViews();
 }
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

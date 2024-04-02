@@ -38,43 +38,43 @@ static const Type String = 1 << 3;
 static const Type Comma = 1 << 4;
 static const Type CParenthesis = 1 << 5;
 static const Type Eof = 1 << 6;
-} // namespace MdlToken
+}// namespace MdlToken
 
 class LegacyModelDefinitionTokenizer : public Tokenizer<MdlToken::Type> {
 public:
-  LegacyModelDefinitionTokenizer(std::string_view str, size_t line, size_t column);
+    LegacyModelDefinitionTokenizer(std::string_view str, size_t line, size_t column);
 
 private:
-  static const std::string WordDelims;
+    static const std::string WordDelims;
 
-  Token emitToken() override;
+    Token emitToken() override;
 };
 
 
 class LegacyModelDefinitionParser : public Parser<MdlToken::Type> {
 private:
-  using Token = LegacyModelDefinitionTokenizer::Token;
-  LegacyModelDefinitionTokenizer m_tokenizer;
+    using Token = LegacyModelDefinitionTokenizer::Token;
+    LegacyModelDefinitionTokenizer m_tokenizer;
 
 public:
-  LegacyModelDefinitionParser(std::string_view str, size_t line, size_t column);
+    LegacyModelDefinitionParser(std::string_view str, size_t line, size_t column);
 
-  TokenizerState tokenizerState() const;
+    TokenizerState tokenizerState() const;
 
 public:
-  EL::Expression parse(ParserStatus &status);
+    EL::Expression parse(ParserStatus &status);
 
 private:
-  EL::Expression parseModelDefinition(ParserStatus &status);
+    EL::Expression parseModelDefinition(ParserStatus &status);
 
-  EL::Expression parseStaticModelDefinition(ParserStatus &status);
+    EL::Expression parseStaticModelDefinition(ParserStatus &status);
 
-  EL::Expression parseDynamicModelDefinition(ParserStatus &status);
+    EL::Expression parseDynamicModelDefinition(ParserStatus &status);
 
-  EL::Expression parseNamedValue(ParserStatus &status, const std::string &name);
+    EL::Expression parseNamedValue(ParserStatus &status, const std::string &name);
 
 private:
-  TokenNameMap tokenNames() const override;
+    TokenNameMap tokenNames() const override;
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

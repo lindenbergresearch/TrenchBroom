@@ -24,188 +24,174 @@
 
 #include "catch2.h"
 
-namespace kdl
-{
-TEST_CASE("transform_iterator_test.operator_less_than")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK_FALSE(std::begin(t1) < std::end(t1));
+namespace kdl {
+TEST_CASE("transform_iterator_test.operator_less_than") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK_FALSE(std::begin(t1) < std::end(t1));
 
-  const auto v2 = std::vector<int>({1});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
+    const auto v2 = std::vector<int>({1});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
 
-  auto it = std::begin(t2);
-  auto end = std::end(t2);
-  CHECK(it < end);
+    auto it = std::begin(t2);
+    auto end = std::end(t2);
+    CHECK(it < end);
 
-  ++it;
-  CHECK_FALSE(it < end);
+    ++it;
+    CHECK_FALSE(it < end);
 }
 
-TEST_CASE("transform_iterator_test.operator_greater_than")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK_FALSE(std::end(t1) > std::begin(t1));
+TEST_CASE("transform_iterator_test.operator_greater_than") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK_FALSE(std::end(t1) > std::begin(t1));
 
-  const auto v2 = std::vector<int>({1});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
+    const auto v2 = std::vector<int>({1});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
 
-  auto it = std::begin(t2);
-  auto end = std::end(t2);
-  CHECK(end > it);
+    auto it = std::begin(t2);
+    auto end = std::end(t2);
+    CHECK(end > it);
 
-  ++it;
-  CHECK_FALSE(end > it);
+    ++it;
+    CHECK_FALSE(end > it);
 }
 
-TEST_CASE("transform_iterator_test.operator_equal")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK(std::begin(t1) == std::end(t1));
+TEST_CASE("transform_iterator_test.operator_equal") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK(std::begin(t1) == std::end(t1));
 
-  const auto v2 = std::vector<int>({1});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
+    const auto v2 = std::vector<int>({1});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
 
-  auto it = std::begin(t2);
-  auto end = std::end(t2);
-  CHECK_FALSE(it == end);
+    auto it = std::begin(t2);
+    auto end = std::end(t2);
+    CHECK_FALSE(it == end);
 
-  ++it;
-  CHECK(it == end);
+    ++it;
+    CHECK(it == end);
 }
 
-TEST_CASE("transform_iterator_test.operator_not_equal")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK_FALSE(std::begin(t1) != std::end(t1));
+TEST_CASE("transform_iterator_test.operator_not_equal") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK_FALSE(std::begin(t1) != std::end(t1));
 
-  const auto v2 = std::vector<int>({1});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
+    const auto v2 = std::vector<int>({1});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
 
-  auto it = std::begin(t2);
-  auto end = std::end(t2);
-  CHECK(it != end);
+    auto it = std::begin(t2);
+    auto end = std::end(t2);
+    CHECK(it != end);
 
-  ++it;
-  CHECK_FALSE(it != end);
+    ++it;
+    CHECK_FALSE(it != end);
 }
 
-TEST_CASE("transform_iterator_test.operator_prefix_increment")
-{
-  const auto v = std::vector<int>({1});
-  const auto t = transform_adapter(v, [](const auto& i) { return i + 2; });
-  CHECK(++std::begin(t) == std::end(t));
+TEST_CASE("transform_iterator_test.operator_prefix_increment") {
+    const auto v = std::vector<int>({1});
+    const auto t = transform_adapter(v, [](const auto &i) { return i + 2; });
+    CHECK(++std::begin(t) == std::end(t));
 }
 
-TEST_CASE("transform_iterator_test.operator_prefix_decrement")
-{
-  const auto v = std::vector<int>({1});
-  const auto t = transform_adapter(v, [](const auto& i) { return i + 2; });
-  CHECK(--std::end(t) == std::begin(t));
+TEST_CASE("transform_iterator_test.operator_prefix_decrement") {
+    const auto v = std::vector<int>({1});
+    const auto t = transform_adapter(v, [](const auto &i) { return i + 2; });
+    CHECK(--std::end(t) == std::begin(t));
 }
 
-TEST_CASE("transform_iterator_test.operator_postfix_increment")
-{
-  const auto v = std::vector<int>({1});
-  const auto t = transform_adapter(v, [](const auto& i) { return i + 2; });
+TEST_CASE("transform_iterator_test.operator_postfix_increment") {
+    const auto v = std::vector<int>({1});
+    const auto t = transform_adapter(v, [](const auto &i) { return i + 2; });
 
-  auto it = std::begin(t);
-  CHECK(it++ == std::begin(t));
-  CHECK(it == std::end(t));
+    auto it = std::begin(t);
+    CHECK(it++ == std::begin(t));
+    CHECK(it == std::end(t));
 }
 
-TEST_CASE("transform_iterator_test.operator_postfix_decrement")
-{
-  const auto v = std::vector<int>({1});
-  const auto t = transform_adapter(v, [](const auto& i) { return i + 2; });
+TEST_CASE("transform_iterator_test.operator_postfix_decrement") {
+    const auto v = std::vector<int>({1});
+    const auto t = transform_adapter(v, [](const auto &i) { return i + 2; });
 
-  auto it = std::end(t);
-  CHECK(it-- == std::end(t));
-  CHECK(it == std::begin(t));
+    auto it = std::end(t);
+    CHECK(it-- == std::end(t));
+    CHECK(it == std::begin(t));
 }
 
-TEST_CASE("transform_iterator_test.operator_star")
-{
-  const auto v = std::vector<int>({1});
-  const auto t = transform_adapter(v, [](const auto& i) { return i + 2; });
-  CHECK(*std::begin(t) == 3);
+TEST_CASE("transform_iterator_test.operator_star") {
+    const auto v = std::vector<int>({1});
+    const auto t = transform_adapter(v, [](const auto &i) { return i + 2; });
+    CHECK(*std::begin(t) == 3);
 }
 
-TEST_CASE("transform_adapter_test.empty")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK(t1.empty());
+TEST_CASE("transform_adapter_test.empty") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK(t1.empty());
 
-  const auto v2 = std::vector<int>({1, 2, 3});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
-  CHECK_FALSE(t2.empty());
+    const auto v2 = std::vector<int>({1, 2, 3});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
+    CHECK_FALSE(t2.empty());
 }
 
-TEST_CASE("transform_adapter_test.size")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK(t1.size() == 0u);
+TEST_CASE("transform_adapter_test.size") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK(t1.size() == 0u);
 
-  const auto v2 = std::vector<int>({1, 2, 3});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
-  CHECK(t2.size() == 3u);
+    const auto v2 = std::vector<int>({1, 2, 3});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
+    CHECK(t2.size() == 3u);
 }
 
-TEST_CASE("transform_adapter_test.iterators")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK(std::end(t1) == std::begin(t1));
+TEST_CASE("transform_adapter_test.iterators") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK(std::end(t1) == std::begin(t1));
 
-  const auto v2 = std::vector<int>({1, 2, 3});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
+    const auto v2 = std::vector<int>({1, 2, 3});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
 
-  auto it = std::begin(t2);
-  auto end = std::end(t2);
-  CHECK(end != it);
-  CHECK(*it == 3);
+    auto it = std::begin(t2);
+    auto end = std::end(t2);
+    CHECK(end != it);
+    CHECK(*it == 3);
 
-  ++it;
-  CHECK(end != it);
-  CHECK(*it == 4);
+    ++it;
+    CHECK(end != it);
+    CHECK(*it == 4);
 
-  ++it;
-  CHECK(end != it);
-  CHECK(*it == 5);
+    ++it;
+    CHECK(end != it);
+    CHECK(*it == 5);
 
-  ++it;
-  CHECK(end == it);
+    ++it;
+    CHECK(end == it);
 }
 
-TEST_CASE("transform_adapter_test.reverse_iterators")
-{
-  const auto v1 = std::vector<int>({});
-  const auto t1 = transform_adapter(v1, [](const auto& i) { return i + 2; });
-  CHECK(std::rend(t1) == std::rbegin(t1));
+TEST_CASE("transform_adapter_test.reverse_iterators") {
+    const auto v1 = std::vector<int>({});
+    const auto t1 = transform_adapter(v1, [](const auto &i) { return i + 2; });
+    CHECK(std::rend(t1) == std::rbegin(t1));
 
-  const auto v2 = std::vector<int>({1, 2, 3});
-  const auto t2 = transform_adapter(v2, [](const auto& i) { return i + 2; });
+    const auto v2 = std::vector<int>({1, 2, 3});
+    const auto t2 = transform_adapter(v2, [](const auto &i) { return i + 2; });
 
-  auto it = std::rbegin(t2);
-  auto end = std::rend(t2);
-  CHECK(end != it);
-  CHECK(*it == 5);
+    auto it = std::rbegin(t2);
+    auto end = std::rend(t2);
+    CHECK(end != it);
+    CHECK(*it == 5);
 
-  ++it;
-  CHECK(end != it);
-  CHECK(*it == 4);
+    ++it;
+    CHECK(end != it);
+    CHECK(*it == 4);
 
-  ++it;
-  CHECK(end != it);
-  CHECK(*it == 3);
+    ++it;
+    CHECK(end != it);
+    CHECK(*it == 3);
 
-  ++it;
-  CHECK(end == it);
+    ++it;
+    CHECK(end == it);
 }
-} // namespace kdl
+}// namespace kdl

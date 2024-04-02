@@ -32,22 +32,22 @@ class LayerNode;
 namespace View {
 class SetCurrentLayerCommand : public UndoableCommand {
 private:
-  Model::LayerNode *m_currentLayer;
-  Model::LayerNode *m_oldCurrentLayer;
+    Model::LayerNode *m_currentLayer;
+    Model::LayerNode *m_oldCurrentLayer;
 
 public:
-  static std::unique_ptr<SetCurrentLayerCommand> set(Model::LayerNode *layer);
+    static std::unique_ptr<SetCurrentLayerCommand> set(Model::LayerNode *layer);
 
-  SetCurrentLayerCommand(Model::LayerNode *layer);
+    SetCurrentLayerCommand(Model::LayerNode *layer);
 
 private:
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-  std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
-  bool doCollateWith(UndoableCommand &command) override;
+    bool doCollateWith(UndoableCommand &command) override;
 
-deleteCopyAndMove(SetCurrentLayerCommand);
+    deleteCopyAndMove(SetCurrentLayerCommand);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

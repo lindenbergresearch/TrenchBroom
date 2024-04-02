@@ -23,5 +23,5 @@ varying vec4 modelCoordinates;
 
 void main(void) {
     gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
-	modelCoordinates = gl_Vertex;
+    modelCoordinates = gl_Vertex;
 }

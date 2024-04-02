@@ -29,43 +29,43 @@ namespace TrenchBroom {
 namespace View {
 class MultiCompletionLineEdit : public QLineEdit {
 private:
-  QCompleter *m_multiCompleter;
-  QRegularExpression m_leftDelimiter;
-  QRegularExpression m_rightDelimiter;
+    QCompleter *m_multiCompleter;
+    QRegularExpression m_leftDelimiter;
+    QRegularExpression m_rightDelimiter;
 
 public:
-  explicit MultiCompletionLineEdit(QWidget *parent = nullptr);
+    explicit MultiCompletionLineEdit(QWidget *parent = nullptr);
 
-  explicit MultiCompletionLineEdit(const QString &contents, QWidget *parent = nullptr);
+    explicit MultiCompletionLineEdit(const QString &contents, QWidget *parent = nullptr);
 
-  ~MultiCompletionLineEdit() override;
+    ~MultiCompletionLineEdit() override;
 
 public:
-  void setWordDelimiter(const QRegularExpression &leftDelimiter);
+    void setWordDelimiter(const QRegularExpression &leftDelimiter);
 
-  void setWordDelimiters(const QRegularExpression &leftDelimiter, const QRegularExpression &rightDelimiter);
+    void setWordDelimiters(const QRegularExpression &leftDelimiter, const QRegularExpression &rightDelimiter);
 
-  void setMultiCompleter(QCompleter *completer);
+    void setMultiCompleter(QCompleter *completer);
 
 protected:
-  void keyPressEvent(QKeyEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
-  void updateCompleter(bool showCompleter);
+    void updateCompleter(bool showCompleter);
 
-  int findLeftBoundary() const;
+    int findLeftBoundary() const;
 
-  int findRightBoundary() const;
+    int findRightBoundary() const;
 
-  int findFirstMatch(const QString &str, const QRegularExpression &expression) const;
+    int findFirstMatch(const QString &str, const QRegularExpression &expression) const;
 
-  int findLastMatch(const QString &str, const QRegularExpression &expression) const;
+    int findLastMatch(const QString &str, const QRegularExpression &expression) const;
 
 private slots:
 
-  void triggerCompletion();
+    void triggerCompletion();
 
-  void insertCompletion(const QString &string);
+    void insertCompletion(const QString &string);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

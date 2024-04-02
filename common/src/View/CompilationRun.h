@@ -43,35 +43,35 @@ class MapDocument;
 
 
 class CompilationRun : public QObject {
-Q_OBJECT
+    Q_OBJECT
 private:
-  CompilationRunner *m_currentRun{nullptr};
+    CompilationRunner *m_currentRun{nullptr};
 
 public:
-  ~CompilationRun() override;
+    ~CompilationRun() override;
 
-  bool running() const;
+    bool running() const;
 
-  void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
+    void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
 
-  void test(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
+    void test(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput);
 
-  void terminate();
-
-private:
-  bool doIsRunning() const;
-
-  void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput, bool test);
+    void terminate();
 
 private:
-  std::string buildWorkDir(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document);
+    bool doIsRunning() const;
 
-  void cleanup();
+    void run(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document, QTextEdit *currentOutput, bool test);
+
+private:
+    std::string buildWorkDir(const Model::CompilationProfile &profile, std::shared_ptr<MapDocument> document);
+
+    void cleanup();
 
 signals:
 
-  void compilationStarted();
+    void compilationStarted();
 
-  void compilationEnded();
+    void compilationEnded();
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

@@ -26,120 +26,101 @@
 #include <iterator>
 #include <utility>
 
-namespace kdl
-{
+namespace kdl {
 
-template <typename I, typename Predicate>
-class grouped_iterator
-{
+template<typename I, typename Predicate>
+class grouped_iterator {
 public:
-  using iterator_category = std::bidirectional_iterator_tag;
-  using value_type = range<I>;
-  using difference_type = typename I::difference_type;
-  using pointer = value_type*;
-  using reference = value_type&;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = range<I>;
+    using difference_type = typename I::difference_type;
+    using pointer = value_type *;
+    using reference = value_type &;
 
 private:
-  range<I> m_range;
-  Predicate m_predicate;
-  range<I> m_group;
+    range<I> m_range;
+    Predicate m_predicate;
+    range<I> m_group;
 
 public:
-  grouped_iterator(range<I> range, Predicate predicate)
-    : m_range{std::move(range)}
-    , m_predicate{std::move(predicate)}
-    , m_group{
-        m_range.begin() != m_range.end()
-          ? find_next(m_range.begin(), m_range.end(), m_predicate)
-          : m_range}
-  {
-  }
-
-  bool operator<(const grouped_iterator& other) const
-  {
-    return m_group.begin() < other.m_group.begin();
-  }
-  bool operator>(const grouped_iterator& other) const
-  {
-    return m_group.begin() > other.m_group.begin();
-  }
-  bool operator==(const grouped_iterator& other) const
-  {
-    return m_group.begin() == other.m_group.begin();
-  }
-  bool operator!=(const grouped_iterator& other) const { return !(*this == other); }
-
-  // prefix
-  grouped_iterator& operator++()
-  {
-    if (m_group.begin() != m_range.end())
-    {
-      m_group = find_next(m_group.end(), m_range.end(), m_predicate);
+    grouped_iterator(range<I> range, Predicate predicate)
+        : m_range{std::move(range)}, m_predicate{std::move(predicate)}, m_group{
+                                                                            m_range.begin() != m_range.end()
+                                                                                ? find_next(m_range.begin(), m_range.end(), m_predicate)
+                                                                                : m_range} {
     }
-    return *this;
-  }
-  grouped_iterator& operator--()
-  {
-    if (m_group.begin() != m_range.begin())
-    {
-      m_group = find_prev(m_range.begin(), m_group.begin(), m_predicate);
+
+    bool operator<(const grouped_iterator &other) const {
+        return m_group.begin() < other.m_group.begin();
     }
-    return *this;
-  }
+    bool operator>(const grouped_iterator &other) const {
+        return m_group.begin() > other.m_group.begin();
+    }
+    bool operator==(const grouped_iterator &other) const {
+        return m_group.begin() == other.m_group.begin();
+    }
+    bool operator!=(const grouped_iterator &other) const { return !(*this == other); }
 
-  // postfix
-  grouped_iterator operator++(int)
-  {
-    auto result = grouped_iterator{*this};
-    ++*this;
-    return result;
-  }
-  grouped_iterator operator--(int)
-  {
-    auto result = grouped_iterator{*this};
-    --*this;
-    return result;
-  }
+    // prefix
+    grouped_iterator &operator++() {
+        if (m_group.begin() != m_range.end()) {
+            m_group = find_next(m_group.end(), m_range.end(), m_predicate);
+        }
+        return *this;
+    }
+    grouped_iterator &operator--() {
+        if (m_group.begin() != m_range.begin()) {
+            m_group = find_prev(m_range.begin(), m_group.begin(), m_predicate);
+        }
+        return *this;
+    }
 
-  value_type operator*() { return m_group; }
+    // postfix
+    grouped_iterator operator++(int) {
+        auto result = grouped_iterator{*this};
+        ++*this;
+        return result;
+    }
+    grouped_iterator operator--(int) {
+        auto result = grouped_iterator{*this};
+        --*this;
+        return result;
+    }
+
+    value_type operator*() { return m_group; }
 
 private:
-  static range<I> find_prev(I range_begin, I group_begin, const Predicate& predicate)
-  {
-    assert(group_begin != range_begin);
+    static range<I> find_prev(I range_begin, I group_begin, const Predicate &predicate) {
+        assert(group_begin != range_begin);
 
-    auto group_end = group_begin;
-    group_begin = std::prev(group_end);
-    while (group_begin != range_begin && predicate(std::prev(group_begin), group_begin))
-    {
-      --group_begin;
+        auto group_end = group_begin;
+        group_begin = std::prev(group_end);
+        while (group_begin != range_begin && predicate(std::prev(group_begin), group_begin)) {
+            --group_begin;
+        }
+
+        return {group_begin, group_end};
     }
 
-    return {group_begin, group_end};
-  }
+    static range<I> find_next(I group_end, I range_end, const Predicate &predicate) {
+        auto group_begin = group_end;
+        while (group_end != range_end && predicate(*group_begin, *group_end)) {
+            ++group_end;
+        }
 
-  static range<I> find_next(I group_end, I range_end, const Predicate& predicate)
-  {
-    auto group_begin = group_end;
-    while (group_end != range_end && predicate(*group_begin, *group_end))
-    {
-      ++group_end;
+        return {group_begin, group_end};
     }
-
-    return {group_begin, group_end};
-  }
 };
 
-template <typename I, typename Predicate>
+template<typename I, typename Predicate>
 grouped_iterator(I, Predicate) -> grouped_iterator<I, Predicate>;
 
-template <typename C, typename Predicate>
-auto make_grouped_range(const C& c, Predicate predicate)
-{
-  return range{
-    grouped_iterator{range{c.begin(), c.end()}, predicate},
-    grouped_iterator{range{c.end(), c.end()}, predicate},
-  };
+template<typename C, typename Predicate>
+auto make_grouped_range(const C &c, Predicate predicate) {
+    return range{
+        grouped_iterator{range{c.begin(), c.end()}, predicate},
+        grouped_iterator{range{c.end(), c.end()}, predicate},
+    };
 }
 
-} // namespace kdl
+}// namespace kdl

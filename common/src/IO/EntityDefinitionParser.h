@@ -31,7 +31,7 @@ class PropertyDefinition;
 
 
 class EntityDefinition;
-} // namespace TrenchBroom::Assets
+}// namespace TrenchBroom::Assets
 
 namespace TrenchBroom::IO {
 struct EntityDefinitionClassInfo;
@@ -46,17 +46,17 @@ std::vector<EntityDefinitionClassInfo> resolveInheritance(ParserStatus &status, 
 
 class EntityDefinitionParser {
 private:
-  Color m_defaultEntityColor;
+    Color m_defaultEntityColor;
 
 public:
-  explicit EntityDefinitionParser(const Color &defaultEntityColor);
+    explicit EntityDefinitionParser(const Color &defaultEntityColor);
 
-  virtual ~EntityDefinitionParser();
+    virtual ~EntityDefinitionParser();
 
-  std::vector<std::unique_ptr<Assets::EntityDefinition>> parseDefinitions(ParserStatus &status);
+    std::vector<std::unique_ptr<Assets::EntityDefinition>> parseDefinitions(ParserStatus &status);
 
 private:
-  virtual std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) = 0;
+    virtual std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) = 0;
 };
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

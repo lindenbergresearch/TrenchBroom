@@ -49,7 +49,7 @@ class PatchNode;
 
 
 class WorldNode;
-} // namespace Model
+}// namespace Model
 
 namespace IO {
 /**
@@ -69,31 +69,31 @@ namespace IO {
  */
 class NodeSerializer {
 protected:
-  using ObjectNo = unsigned int;
+    using ObjectNo = unsigned int;
 
 private:
-  ObjectNo m_entityNo;
-  ObjectNo m_brushNo;
+    ObjectNo m_entityNo;
+    ObjectNo m_brushNo;
 
-  bool m_exporting;
+    bool m_exporting;
 
 public:
-  NodeSerializer();
+    NodeSerializer();
 
-  virtual ~NodeSerializer();
+    virtual ~NodeSerializer();
 
 protected:
-  ObjectNo entityNo() const;
+    ObjectNo entityNo() const;
 
-  ObjectNo brushNo() const;
-
-public:
-  bool exporting() const;
-
-  void setExporting(bool exporting);
+    ObjectNo brushNo() const;
 
 public:
-  /**
+    bool exporting() const;
+
+    void setExporting(bool exporting);
+
+public:
+    /**
    * Prepares to serialize the given nodes and all of their children.
    * The order is ignored.
    *
@@ -103,77 +103,75 @@ public:
    * Any nodes serialized after calling beginFile() must have either been
    * in the rootNodes vector or be a descendant of one of these nodes.
    */
-  void beginFile(const std::vector<const Model::Node *> &rootNodes);
+    void beginFile(const std::vector<const Model::Node *> &rootNodes);
 
-  void endFile();
-
-public:
-  void defaultLayer(const Model::WorldNode &world);
-
-  void customLayer(const Model::LayerNode *layer);
-
-  void group(const Model::GroupNode *group, const std::vector<Model::EntityProperty> &parentProperties);
-
-  void entity(
-      const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties,
-      const Model::Node *brushParent
-  );
-
-  void entity(
-      const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties,
-      const std::vector<Model::BrushNode *> &entityBrushes
-  );
-
-private:
-  void beginEntity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &extraAttributes);
-
-  void beginEntity(const Model::Node *node);
-
-  void endEntity(const Model::Node *node);
-
-  void entityProperties(const std::vector<Model::EntityProperty> &properties);
-
-  void entityProperty(const Model::EntityProperty &property);
-
-  void brushes(const std::vector<Model::BrushNode *> &brushNodes);
-
-  void brush(const Model::BrushNode *brushNode);
-
-  void patch(const Model::PatchNode *patchNode);
+    void endFile();
 
 public:
-  void brushFaces(const std::vector<Model::BrushFace> &faces);
+    void defaultLayer(const Model::WorldNode &world);
+
+    void customLayer(const Model::LayerNode *layer);
+
+    void group(const Model::GroupNode *group, const std::vector<Model::EntityProperty> &parentProperties);
+
+    void entity(
+        const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties,
+        const Model::Node *brushParent);
+
+    void entity(
+        const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties,
+        const std::vector<Model::BrushNode *> &entityBrushes);
 
 private:
-  void brushFace(const Model::BrushFace &face);
+    void beginEntity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &extraAttributes);
+
+    void beginEntity(const Model::Node *node);
+
+    void endEntity(const Model::Node *node);
+
+    void entityProperties(const std::vector<Model::EntityProperty> &properties);
+
+    void entityProperty(const Model::EntityProperty &property);
+
+    void brushes(const std::vector<Model::BrushNode *> &brushNodes);
+
+    void brush(const Model::BrushNode *brushNode);
+
+    void patch(const Model::PatchNode *patchNode);
 
 public:
-  std::vector<Model::EntityProperty> parentProperties(const Model::Node *groupNode);
+    void brushFaces(const std::vector<Model::BrushFace> &faces);
 
 private:
-  std::vector<Model::EntityProperty> layerProperties(const Model::LayerNode *layerNode);
+    void brushFace(const Model::BrushFace &face);
 
-  std::vector<Model::EntityProperty> groupProperties(const Model::GroupNode *groupNode);
+public:
+    std::vector<Model::EntityProperty> parentProperties(const Model::Node *groupNode);
+
+private:
+    std::vector<Model::EntityProperty> layerProperties(const Model::LayerNode *layerNode);
+
+    std::vector<Model::EntityProperty> groupProperties(const Model::GroupNode *groupNode);
 
 protected:
-  std::string escapeEntityProperties(const std::string &str) const;
+    std::string escapeEntityProperties(const std::string &str) const;
 
 private:
-  virtual void doBeginFile(const std::vector<const Model::Node *> &nodes) = 0;
+    virtual void doBeginFile(const std::vector<const Model::Node *> &nodes) = 0;
 
-  virtual void doEndFile() = 0;
+    virtual void doEndFile() = 0;
 
-  virtual void doBeginEntity(const Model::Node *node) = 0;
+    virtual void doBeginEntity(const Model::Node *node) = 0;
 
-  virtual void doEndEntity(const Model::Node *node) = 0;
+    virtual void doEndEntity(const Model::Node *node) = 0;
 
-  virtual void doEntityProperty(const Model::EntityProperty &property) = 0;
+    virtual void doEntityProperty(const Model::EntityProperty &property) = 0;
 
-  virtual void doBrush(const Model::BrushNode *brushNode) = 0;
+    virtual void doBrush(const Model::BrushNode *brushNode) = 0;
 
-  virtual void doBrushFace(const Model::BrushFace &face) = 0;
+    virtual void doBrushFace(const Model::BrushFace &face) = 0;
 
-  virtual void doPatch(const Model::PatchNode *patchNode) = 0;
+    virtual void doPatch(const Model::PatchNode *patchNode) = 0;
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

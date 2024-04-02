@@ -24,18 +24,15 @@
 #include <regex>
 #include <string>
 
-namespace kdl
-{
+namespace kdl {
 
-inline std::string regex_escape(const std::string& str)
-{
-  static const auto chars = std::regex{R"([\.\^\$\-\+\(\)\[\]\{\}\|\?\*)"};
-  return std::regex_replace(str, chars, "\\$&");
+inline std::string regex_escape(const std::string &str) {
+    static const auto chars = std::regex{R"([\.\^\$\-\+\(\)\[\]\{\}\|\?\*)"};
+    return std::regex_replace(str, chars, "\\$&");
 }
 
-inline std::string regex_escape(const std::filesystem::path& path)
-{
-  return regex_escape(path.string());
+inline std::string regex_escape(const std::filesystem::path &path) {
+    return regex_escape(path.string());
 }
 
-} // namespace kdl
+}// namespace kdl

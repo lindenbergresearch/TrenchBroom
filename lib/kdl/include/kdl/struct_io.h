@@ -25,72 +25,63 @@
 
 #include <ostream>
 
-namespace kdl
-{
+namespace kdl {
 
-class struct_stream
-{
+class struct_stream {
 private:
-  enum class expected
-  {
-    type_name,
-    attr_name,
-    attr_value
-  };
+    enum class expected {
+        type_name,
+        attr_name,
+        attr_value
+    };
 
-  std::ostream& m_str;
-  expected m_expected = expected::type_name;
-  bool m_first_attr = true;
+    std::ostream &m_str;
+    expected m_expected = expected::type_name;
+    bool m_first_attr = true;
 
 public:
-  explicit struct_stream(std::ostream& str)
-    : m_str{str}
-  {
-  }
+    explicit struct_stream(std::ostream &str)
+        : m_str{str} {
+    }
 
-  ~struct_stream() { m_str << "}"; }
+    ~struct_stream() { m_str << "}"; }
 
-  template <typename T>
-  friend struct_stream& operator<<(struct_stream& lhs, const T& rhs)
-  {
-    append_to_stream(lhs, rhs);
-    return lhs;
-  }
+    template<typename T>
+    friend struct_stream &operator<<(struct_stream &lhs, const T &rhs) {
+        append_to_stream(lhs, rhs);
+        return lhs;
+    }
 
-  template <typename T>
-  friend struct_stream& operator<<(struct_stream&& lhs, const T& rhs)
-  {
-    append_to_stream(lhs, rhs);
-    return lhs;
-  }
+    template<typename T>
+    friend struct_stream &operator<<(struct_stream &&lhs, const T &rhs) {
+        append_to_stream(lhs, rhs);
+        return lhs;
+    }
 
 private:
-  template <typename T>
-  static void append_to_stream(struct_stream& lhs, const T& rhs)
-  {
-    switch (lhs.m_expected)
-    {
-    case expected::type_name:
-      lhs.m_str << make_streamable(rhs);
-      lhs.m_str << "{";
-      lhs.m_expected = expected::attr_name;
-      break;
-    case expected::attr_name:
-      if (!lhs.m_first_attr)
-      {
-        lhs.m_str << ", ";
-      }
-      lhs.m_first_attr = false;
-      lhs.m_str << make_streamable(rhs);
-      lhs.m_str << ": ";
-      lhs.m_expected = expected::attr_value;
-      break;
-    case expected::attr_value:
-      lhs.m_str << make_streamable(rhs);
-      lhs.m_expected = expected::attr_name;
-      break;
+    template<typename T>
+    static void append_to_stream(struct_stream &lhs, const T &rhs) {
+        switch (lhs.m_expected) {
+            case expected::type_name:
+                lhs.m_str << make_streamable(rhs);
+                lhs.m_str << "{";
+                lhs.m_expected = expected::attr_name;
+                break;
+            case expected::attr_name:
+                if (!lhs.m_first_attr) {
+                    lhs.m_str << ", ";
+                }
+                lhs.m_first_attr = false;
+                lhs.m_str << make_streamable(rhs);
+                lhs.m_str << ": ";
+                lhs.m_expected = expected::attr_value;
+                break;
+            case expected::attr_value:
+                lhs.m_str << make_streamable(rhs);
+                lhs.m_expected = expected::attr_name;
+                break;
+        }
     }
-  }
 };
 
-} // namespace kdl
+}// namespace kdl

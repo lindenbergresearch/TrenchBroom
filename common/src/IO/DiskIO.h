@@ -54,47 +54,51 @@ Result<std::vector<std::filesystem::path>> find(const std::filesystem::path &pat
 
 Result<std::shared_ptr<CFile>> openFile(const std::filesystem::path &path);
 
-template<typename Stream, typename F> auto withStream(
-    const std::filesystem::path &path, const std::ios::openmode mode, const F &function
-) -> kdl::wrap_result_t<decltype(function(std::declval<Stream &>())), Error> {
-  using FnResultType = decltype(function(std::declval<Stream &>()));
-  using ResultType = kdl::wrap_result_t<FnResultType, Error>;
-  try {
-    auto stream = Stream{path, mode};
-    if (! stream) {
-      return ResultType{Error{"Could not open stream for file '" + path.string() + "'"}};
+template<typename Stream, typename F>
+auto withStream(
+    const std::filesystem::path &path, const std::ios::openmode mode, const F &function) -> kdl::wrap_result_t<decltype(function(std::declval<Stream &>())), Error> {
+    using FnResultType = decltype(function(std::declval<Stream &>()));
+    using ResultType = kdl::wrap_result_t<FnResultType, Error>;
+    try {
+        auto stream = Stream{path, mode};
+        if (!stream) {
+            return ResultType{Error{"Could not open stream for file '" + path.string() + "'"}};
+        }
+        if constexpr (kdl::is_result_v<FnResultType>) {
+            if constexpr (std::is_same_v<typename FnResultType::value_type, void>) {
+                return function(stream).and_then([]() { return ResultType{}; });
+            } else {
+                return function(stream).and_then([](auto x) { return ResultType{std::move(x)}; });
+            }
+        } else if constexpr (std::is_same_v<typename ResultType::value_type, void>) {
+            function(stream);
+            return ResultType{};
+        } else {
+            return ResultType{function(stream)};
+        }
+    } catch (const std::filesystem::filesystem_error &e) {
+        return ResultType{Error{"Could not open stream for file '" + path.string() + "': " + e.what()}};
     }
-    if constexpr (kdl::is_result_v<FnResultType>) {
-      if constexpr (std::is_same_v<typename FnResultType::value_type, void>) {
-        return function(stream).and_then([]() { return ResultType{}; });
-      } else {
-        return function(stream).and_then([](auto x) { return ResultType{std::move(x)}; });
-      }
-    } else if constexpr (std::is_same_v<typename ResultType::value_type, void>) {
-      function(stream);
-      return ResultType{};
-    } else {
-      return ResultType{function(stream)};
-    }
-  } catch (const std::filesystem::filesystem_error &e) {
-    return ResultType{Error{"Could not open stream for file '" + path.string() + "': " + e.what()}};
-  }
 }
 
-template<typename F> auto withInputStream(const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
-  return withStream<std::ifstream>(path, mode, function);
+template<typename F>
+auto withInputStream(const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
+    return withStream<std::ifstream>(path, mode, function);
 }
 
-template<typename F> auto withInputStream(const std::filesystem::path &path, const F &function) {
-  return withStream<std::ifstream>(path, std::ios_base::in, function);
+template<typename F>
+auto withInputStream(const std::filesystem::path &path, const F &function) {
+    return withStream<std::ifstream>(path, std::ios_base::in, function);
 }
 
-template<typename F> auto withOutputStream(const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
-  return withStream<std::ofstream>(path, mode, function);
+template<typename F>
+auto withOutputStream(const std::filesystem::path &path, const std::ios::openmode mode, const F &function) {
+    return withStream<std::ofstream>(path, mode, function);
 }
 
-template<typename F> auto withOutputStream(const std::filesystem::path &path, const F &function) {
-  return withStream<std::ofstream>(path, std::ios_base::out, function);
+template<typename F>
+auto withOutputStream(const std::filesystem::path &path, const F &function) {
+    return withStream<std::ofstream>(path, std::ios_base::out, function);
 }
 
 Result<bool> createDirectory(const std::filesystem::path &path);
@@ -107,5 +111,5 @@ Result<void> moveFile(const std::filesystem::path &sourcePath, const std::filesy
 
 std::filesystem::path resolvePath(const std::vector<std::filesystem::path> &searchPaths, const std::filesystem::path &path);
 
-} // namespace Disk
-} // namespace TrenchBroom::IO
+}// namespace Disk
+}// namespace TrenchBroom::IO

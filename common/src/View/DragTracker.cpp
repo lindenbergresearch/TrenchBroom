@@ -38,5 +38,5 @@ void DragTracker::setRenderOptions(const InputState &, Renderer::RenderContext &
 
 void DragTracker::render(const InputState &, Renderer::RenderContext &, Renderer::RenderBatch &) const {
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

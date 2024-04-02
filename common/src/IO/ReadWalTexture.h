@@ -36,4 +36,4 @@ class Reader;
 
 Result<Assets::Texture, ReadTextureError> readWalTexture(std::string name, Reader &reader, const std::optional<Assets::Palette> &palette);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

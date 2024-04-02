@@ -27,20 +27,20 @@ PreferencePane::PreferencePane(QWidget *parent) : QWidget(parent) {
 PreferencePane::~PreferencePane() = default;
 
 bool PreferencePane::canResetToDefaults() {
-  return doCanResetToDefaults();
+    return doCanResetToDefaults();
 }
 
 void PreferencePane::resetToDefaults() {
-  doResetToDefaults();
-  updateControls();
+    doResetToDefaults();
+    updateControls();
 }
 
 void PreferencePane::updateControls() {
-  doUpdateControls();
+    doUpdateControls();
 }
 
 bool PreferencePane::validate() {
-  return doValidate();
+    return doValidate();
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

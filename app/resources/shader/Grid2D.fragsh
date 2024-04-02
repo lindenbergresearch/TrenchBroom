@@ -41,5 +41,5 @@ void main() {
         float lineWidthFactor = 2.0 / CameraZoom;
         float gridValue = grid(modelCoordinates.xyz, Normal.xyz, GridSize, minGridSize, lineWidthFactor * GridWidth, MajorDivisionSize);
         gl_FragColor = vec4(GridColor.xyz, gridValue * alpha);
-	}
+    }
 }

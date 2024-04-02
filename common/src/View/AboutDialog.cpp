@@ -30,34 +30,34 @@ namespace View {
 AboutDialog *AboutDialog::instance = nullptr;
 
 void AboutDialog::showAboutDialog() {
-  if (! AboutDialog::instance) {
-    AboutDialog::instance = new AboutDialog{};
-    AboutDialog::instance->show();
-  } else {
-    AboutDialog::instance->show();
-    AboutDialog::instance->raise();
-  }
+    if (!AboutDialog::instance) {
+        AboutDialog::instance = new AboutDialog{};
+        AboutDialog::instance->show();
+    } else {
+        AboutDialog::instance->show();
+        AboutDialog::instance->raise();
+    }
 }
 
 void AboutDialog::closeAboutDialog() {
-  if (AboutDialog::instance) {
-    AboutDialog::instance->close();
-  }
+    if (AboutDialog::instance) {
+        AboutDialog::instance->close();
+    }
 }
 
 AboutDialog::~AboutDialog() {
-  instance = nullptr;
+    instance = nullptr;
 }
 
 AboutDialog::AboutDialog() {
-  // This makes it so the About dialog doesn't prevent the application from quitting
-  setAttribute(Qt::WA_QuitOnClose, false);
-  createGui();
+    // This makes it so the About dialog doesn't prevent the application from quitting
+    setAttribute(Qt::WA_QuitOnClose, false);
+    createGui();
 }
 
 void AboutDialog::createGui() {
-  const QString creditsString = tr(
-      R"(
+    const QString creditsString = tr(
+        R"(
 github.com/TrenchBroom/TrenchBroom<br />
 <br />
 <b>Developers</b><br />
@@ -103,24 +103,23 @@ CMake (Cross platform build manager)<br />
 Vcpkg (C/C++ dependency manager)<br />
 Pandoc (Universal document converter)<br />
 Source Sans Pro (Font)<br />
-Font Awesome 5 Free (Icons)<br />)"
-  );
-  setWindowIconTB(this);
+Font Awesome 5 Free (Icons)<br />)");
+    setWindowIconTB(this);
 
-  auto *infoPanel = new AppInfoPanel{};
-  auto *creditsText = new QLabel{creditsString};
-  creditsText->setWordWrap(true);
-  creditsText->setMaximumWidth(300);
+    auto *infoPanel = new AppInfoPanel{};
+    auto *creditsText = new QLabel{creditsString};
+    creditsText->setWordWrap(true);
+    creditsText->setMaximumWidth(300);
 
-  auto *layout = new QHBoxLayout{};
-  layout->setSizeConstraint(QLayout::SetFixedSize);
-  layout->setContentsMargins(0, 20, 0, 20);
-  layout->addSpacing(50);
-  layout->addWidget(infoPanel);
-  layout->addSpacing(50);
-  layout->addWidget(creditsText);
-  layout->addSpacing(50);
-  setLayout(layout);
+    auto *layout = new QHBoxLayout{};
+    layout->setSizeConstraint(QLayout::SetFixedSize);
+    layout->setContentsMargins(0, 20, 0, 20);
+    layout->addSpacing(50);
+    layout->addWidget(infoPanel);
+    layout->addSpacing(50);
+    layout->addWidget(creditsText);
+    layout->addSpacing(50);
+    setLayout(layout);
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

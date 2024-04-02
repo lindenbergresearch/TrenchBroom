@@ -22,40 +22,37 @@
 
 #include <utility>
 
-namespace kdl
-{
+namespace kdl {
 /**
  * Invokes a lambda when going out of scope.
  *
  * @tparam L the type of the lambda to invoke
  */
-template <typename L>
-class invoke_later
-{
+template<typename L>
+class invoke_later {
 private:
-  L m_lambda;
+    L m_lambda;
 
 public:
-  /**
+    /**
    * Creates an instance that invokes the given lambda when going out of scope.
    *
    * @param lambda the lambda to invoke
    */
-  template <typename LL>
-  explicit invoke_later(LL&& lambda)
-    : m_lambda(std::forward<LL>(lambda))
-  {
-  }
+    template<typename LL>
+    explicit invoke_later(LL &&lambda)
+        : m_lambda(std::forward<LL>(lambda)) {
+    }
 
-  /**
+    /**
    * Invokes the lambda.
    */
-  ~invoke_later() { m_lambda(); }
+    ~invoke_later() { m_lambda(); }
 };
 
 /**
  * Deduction guide.
  */
-template <typename LL>
-invoke_later(const LL& lambda_now) -> invoke_later<LL>;
-} // namespace kdl
+template<typename LL>
+invoke_later(const LL &lambda_now) -> invoke_later<LL>;
+}// namespace kdl

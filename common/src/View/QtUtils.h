@@ -100,20 +100,26 @@ enum class MapTextEncoding;
 
 class SyncHeightEventFilter : public QObject {
 private:
-  QPointer<QWidget> m_primary;
-  QPointer<QWidget> m_secondary;
+    QPointer<QWidget> m_primary;
+    QPointer<QWidget> m_secondary;
 
 public:
-  SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent = nullptr);
+    SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent = nullptr);
 
-  ~SyncHeightEventFilter() override;
+    ~SyncHeightEventFilter() override;
 
-  bool eventFilter(QObject *target, QEvent *event) override;
+    bool eventFilter(QObject *target, QEvent *event) override;
 };
 
 
 enum class FileDialogDir {
-  Map, TextureCollection, CompileTool, Engine, EntityDefinition, GamePath, Resources
+    Map,
+    TextureCollection,
+    CompileTool,
+    Engine,
+    EntityDefinition,
+    GamePath,
+    Resources
 };
 
 /**
@@ -131,20 +137,22 @@ void saveWindowGeometry(QWidget *window);
 
 void restoreWindowGeometry(QWidget *window);
 
-template<typename T> void saveWindowState(const T *window) {
-  ensure(window != nullptr, "window must not be null");
+template<typename T>
+void saveWindowState(const T *window) {
+    ensure(window != nullptr, "window must not be null");
 
-  const auto path = windowSettingsPath(window, "State");
-  auto settings = QSettings{};
-  settings.setValue(path, window->saveState());
+    const auto path = windowSettingsPath(window, "State");
+    auto settings = QSettings{};
+    settings.setValue(path, window->saveState());
 }
 
-template<typename T> void restoreWindowState(T *window) {
-  ensure(window != nullptr, "window must not be null");
+template<typename T>
+void restoreWindowState(T *window) {
+    ensure(window != nullptr, "window must not be null");
 
-  const auto path = windowSettingsPath(window, "State");
-  auto settings = QSettings{};
-  window->restoreState(settings.value(path).toByteArray());
+    const auto path = windowSettingsPath(window, "State");
+    auto settings = QSettings{};
+    window->restoreState(settings.value(path).toByteArray());
 }
 
 /**
@@ -182,38 +190,41 @@ QLayout *wrapDialogButtonBox(QLayout *buttonBox);
 
 void addToMiniToolBarLayout(QBoxLayout *layout);
 
-template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest);
+template<typename... Rest>
+void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest);
 
-template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, QWidget *first, Rest... rest) {
-  layout->addWidget(first);
-  addToMiniToolBarLayout(layout, rest...);
+template<typename... Rest>
+void addToMiniToolBarLayout(QBoxLayout *layout, QWidget *first, Rest... rest) {
+    layout->addWidget(first);
+    addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
-  layout->addSpacing(first - LayoutConstants::NarrowHMargin);
-  addToMiniToolBarLayout(layout, rest...);
+template<typename... Rest>
+void addToMiniToolBarLayout(QBoxLayout *layout, int first, Rest... rest) {
+    layout->addSpacing(first - LayoutConstants::NarrowHMargin);
+    addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest> QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
-  auto *layout = new QHBoxLayout{};
-  layout->setContentsMargins(
-      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
-  );
-  layout->setSpacing(LayoutConstants::NarrowHMargin);
-  addToMiniToolBarLayout(layout, first, rest...);
-  layout->addStretch(1);
-  return layout;
+template<typename... Rest>
+QLayout *createMiniToolBarLayout(QWidget *first, Rest... rest) {
+    auto *layout = new QHBoxLayout{};
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+    layout->setSpacing(LayoutConstants::NarrowHMargin);
+    addToMiniToolBarLayout(layout, first, rest...);
+    layout->addStretch(1);
+    return layout;
 }
 
-template<typename... Rest> QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
-  auto *layout = new QHBoxLayout{};
-  layout->setContentsMargins(
-      LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0
-  );
-  layout->setSpacing(LayoutConstants::NarrowHMargin);
-  layout->addStretch(1);
-  addToMiniToolBarLayout(layout, first, rest...);
-  return layout;
+template<typename... Rest>
+QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest... rest) {
+    auto *layout = new QHBoxLayout{};
+    layout->setContentsMargins(
+        LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+    layout->setSpacing(LayoutConstants::NarrowHMargin);
+    layout->addStretch(1);
+    addToMiniToolBarLayout(layout, first, rest...);
+    return layout;
 }
 
 void setHint(QLineEdit *ctrl, const char *hint);
@@ -292,26 +303,26 @@ void checkButtonInGroup(QButtonGroup *group, const QString &objectName, bool che
  */
 void insertTitleBarSeparator(QVBoxLayout *layout);
 
-template<typename I> QStringList toQStringList(I cur, I end) {
-  auto result = QStringList{};
-  std::transform(
-      cur, end, std::back_inserter(result), [](const auto &str) {
-        return QString::fromStdString(str);
-      }
-  );
-  return result;
+template<typename I>
+QStringList toQStringList(I cur, I end) {
+    auto result = QStringList{};
+    std::transform(
+        cur, end, std::back_inserter(result), [](const auto &str) {
+            return QString::fromStdString(str);
+        });
+    return result;
 }
 
 
 class AutoResizeRowsEventFilter : public QObject {
-Q_OBJECT
+    Q_OBJECT
 private:
-  QTableView *m_tableView;
+    QTableView *m_tableView;
 
 public:
-  explicit AutoResizeRowsEventFilter(QTableView *tableView);
+    explicit AutoResizeRowsEventFilter(QTableView *tableView);
 
-  bool eventFilter(QObject *watched, QEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 };
 
 
@@ -334,5 +345,5 @@ std::string mapStringFromUnicode(MapTextEncoding encoding, const QString &string
  *         (e.g. "Ctrl" on Windows or the Command symbol on macOS)
  */
 QString nativeModifierLabel(int modifier);
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

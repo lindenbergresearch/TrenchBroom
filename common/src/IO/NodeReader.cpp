@@ -39,31 +39,27 @@ namespace TrenchBroom {
 namespace IO {
 NodeReader::NodeReader(
     std::string_view str, const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat,
-    const Model::EntityPropertyConfig &entityPropertyConfig
-) : MapReader{
-    str, sourceMapFormat, targetMapFormat, entityPropertyConfig
-} {
+    const Model::EntityPropertyConfig &entityPropertyConfig) : MapReader{
+                                                                   str, sourceMapFormat, targetMapFormat, entityPropertyConfig} {
 }
 
 std::vector<Model::Node *> NodeReader::read(
     const std::string &str, const Model::MapFormat preferredMapFormat, const vm::bbox3 &worldBounds, const Model::EntityPropertyConfig &entityPropertyConfig,
-    ParserStatus &status
-) {
-  // Try preferred format first
-  for (const auto compatibleMapFormat : Model::compatibleFormats(preferredMapFormat)) {
-    if (auto result = readAsFormat(
-          compatibleMapFormat, preferredMapFormat, str, worldBounds, entityPropertyConfig, status
-      );
-        ! result.empty()) {
-      for (const auto &error : Model::initializeLinkIds(result)) {
-        status.error("Could not restore linked groups: " + error.msg);
-      }
-      return result;
+    ParserStatus &status) {
+    // Try preferred format first
+    for (const auto compatibleMapFormat: Model::compatibleFormats(preferredMapFormat)) {
+        if (auto result = readAsFormat(
+                compatibleMapFormat, preferredMapFormat, str, worldBounds, entityPropertyConfig, status);
+            !result.empty()) {
+            for (const auto &error: Model::initializeLinkIds(result)) {
+                status.error("Could not restore linked groups: " + error.msg);
+            }
+            return result;
+        }
     }
-  }
 
-  // All formats failed
-  return {};
+    // All formats failed
+    return {};
 }
 
 /**
@@ -77,58 +73,55 @@ std::vector<Model::Node *> NodeReader::read(
  */
 std::vector<Model::Node *> NodeReader::readAsFormat(
     const Model::MapFormat sourceMapFormat, const Model::MapFormat targetMapFormat, const std::string &str, const vm::bbox3 &worldBounds,
-    const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status
-) {
-  {
-    auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig};
-    try {
-      reader.readEntities(worldBounds, status);
-      status.info(
-          "Parsed successfully as " + Model::formatName(sourceMapFormat) + " entities"
-      );
-      return reader.m_nodes;
-    } catch (const ParserException &e) {
-      status.info(
-          "Couldn't parse as " + Model::formatName(sourceMapFormat) + " entities: " + e.what());
-      kdl::vec_clear_and_delete(reader.m_nodes);
+    const Model::EntityPropertyConfig &entityPropertyConfig, ParserStatus &status) {
+    {
+        auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig};
+        try {
+            reader.readEntities(worldBounds, status);
+            status.info(
+                "Parsed successfully as " + Model::formatName(sourceMapFormat) + " entities");
+            return reader.m_nodes;
+        } catch (const ParserException &e) {
+            status.info(
+                "Couldn't parse as " + Model::formatName(sourceMapFormat) + " entities: " + e.what());
+            kdl::vec_clear_and_delete(reader.m_nodes);
+        }
     }
-  }
 
-  {
-    auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig};
-    try {
-      reader.readBrushes(worldBounds, status);
-      status.info(
-          "Parsed successfully as " + Model::formatName(sourceMapFormat) + " brushes"
-      );
-      return reader.m_nodes;
-    } catch (const ParserException &e) {
-      status.info(
-          "Couldn't parse as " + Model::formatName(sourceMapFormat) + " brushes: " + e.what());
-      kdl::vec_clear_and_delete(reader.m_nodes);
+    {
+        auto reader = NodeReader{str, sourceMapFormat, targetMapFormat, entityPropertyConfig};
+        try {
+            reader.readBrushes(worldBounds, status);
+            status.info(
+                "Parsed successfully as " + Model::formatName(sourceMapFormat) + " brushes");
+            return reader.m_nodes;
+        } catch (const ParserException &e) {
+            status.info(
+                "Couldn't parse as " + Model::formatName(sourceMapFormat) + " brushes: " + e.what());
+            kdl::vec_clear_and_delete(reader.m_nodes);
+        }
     }
-  }
-  return {};
+    return {};
 }
 
 Model::Node *NodeReader::onWorldNode(std::unique_ptr<Model::WorldNode>, ParserStatus &) {
-  // we create a fake layer node instead of using a proper world node
-  // layers can contain any node we might parse
-  auto *layerNode = new Model::LayerNode{Model::Layer{""}};
-  m_nodes.insert(std::begin(m_nodes), layerNode);
-  return layerNode;
+    // we create a fake layer node instead of using a proper world node
+    // layers can contain any node we might parse
+    auto *layerNode = new Model::LayerNode{Model::Layer{""}};
+    m_nodes.insert(std::begin(m_nodes), layerNode);
+    return layerNode;
 }
 
 void NodeReader::onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &) {
-  m_nodes.push_back(layerNode.release());
+    m_nodes.push_back(layerNode.release());
 }
 
 void NodeReader::onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &) {
-  if (parentNode != nullptr) {
-    parentNode->addChild(node.release());
-  } else {
-    m_nodes.push_back(node.release());
-  }
+    if (parentNode != nullptr) {
+        parentNode->addChild(node.release());
+    } else {
+        m_nodes.push_back(node.release());
+    }
 }
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

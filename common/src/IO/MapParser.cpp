@@ -28,4 +28,4 @@ namespace TrenchBroom {
 namespace IO {
 MapParser::~MapParser() = default;
 }
-} // namespace TrenchBroom
+}// namespace TrenchBroom

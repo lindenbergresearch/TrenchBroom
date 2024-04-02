@@ -37,35 +37,35 @@ extern const std::string CPU_COUNT;
 extern const std::string GAME_DIR_PATH;
 extern const std::string MODS;
 extern const std::string APP_DIR_PATH;
-} // namespace CompilationVariableNames
+}// namespace CompilationVariableNames
 
 class CommonVariables : public EL::VariableTable {
 protected:
-  explicit CommonVariables(std::shared_ptr<MapDocument> document);
+    explicit CommonVariables(std::shared_ptr<MapDocument> document);
 };
 
 
 class CommonCompilationVariables : public CommonVariables {
 protected:
-  explicit CommonCompilationVariables(std::shared_ptr<MapDocument> document);
+    explicit CommonCompilationVariables(std::shared_ptr<MapDocument> document);
 };
 
 
 class CompilationWorkDirVariables : public CommonCompilationVariables {
 public:
-  explicit CompilationWorkDirVariables(std::shared_ptr<MapDocument> document);
+    explicit CompilationWorkDirVariables(std::shared_ptr<MapDocument> document);
 };
 
 
 class CompilationVariables : public CommonCompilationVariables {
 public:
-  CompilationVariables(std::shared_ptr<MapDocument> document, const std::string &workDir);
+    CompilationVariables(std::shared_ptr<MapDocument> document, const std::string &workDir);
 };
 
 
 class LaunchGameEngineVariables : public CommonVariables {
 public:
-  explicit LaunchGameEngineVariables(std::shared_ptr<MapDocument> document);
+    explicit LaunchGameEngineVariables(std::shared_ptr<MapDocument> document);
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

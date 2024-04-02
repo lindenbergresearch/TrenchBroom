@@ -57,23 +57,23 @@ size_t mipSize(size_t width, size_t height, size_t mipLevel);
 
 
 struct ReadTextureError {
-  std::string textureName;
-  std::string msg;
+    std::string textureName;
+    std::string msg;
 
-  kdl_reflect_decl(ReadTextureError, textureName, msg);
+    kdl_reflect_decl(ReadTextureError, textureName, msg);
 };
 
 
 inline auto makeReadTextureErrorHandler(const FileSystem &fs, Logger &logger) {
-  return kdl::overload(
-      [&](Error e) {
-        logger.error() << "Could not open texture file: " << e.msg;
-        return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
-      }, [&](ReadTextureError e) {
-        logger.error() << "Could not read texture '" << e.textureName << "': " << e.msg;
-        return Result<Assets::Texture>{loadDefaultTexture(fs, e.textureName, logger)};
-      }
-  );
+    return kdl::overload(
+        [&](Error e) {
+            logger.error() << "Could not open texture file: " << e.msg;
+            return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
+        },
+        [&](ReadTextureError e) {
+            logger.error() << "Could not read texture '" << e.textureName << "': " << e.msg;
+            return Result<Assets::Texture>{loadDefaultTexture(fs, e.textureName, logger)};
+        });
 }
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

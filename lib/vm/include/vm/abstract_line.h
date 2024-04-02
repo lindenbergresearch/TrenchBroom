@@ -25,8 +25,7 @@
 
 #include <cstddef>
 
-namespace vm
-{
+namespace vm {
 /*
  * An abstract line is a generalization of lines in space. Thereby, a line can be bounded
  * or unbounded in either direction. The following concepts arise:
@@ -54,11 +53,10 @@ namespace vm
  * @param point the point to project
  * @return the distance from the origin to the orthogonal projection of the given point
  */
-template <typename AL>
+template<typename AL>
 constexpr typename AL::component_type distance_to_projected_point(
-  const AL& abstract_line, const vec<typename AL::component_type, AL::size>& point)
-{
-  return dot(point - abstract_line.get_origin(), abstract_line.get_direction());
+    const AL &abstract_line, const vec<typename AL::component_type, AL::size> &point) {
+    return dot(point - abstract_line.get_origin(), abstract_line.get_direction());
 }
 
 /**
@@ -69,11 +67,10 @@ constexpr typename AL::component_type distance_to_projected_point(
  * @param distance the distance of the point
  * @return the point
  */
-template <typename AL>
+template<typename AL>
 constexpr vec<typename AL::component_type, AL::size> point_at_distance(
-  const AL& abstract_line, const typename AL::component_type distance)
-{
-  return abstract_line.get_origin() + abstract_line.get_direction() * distance;
+    const AL &abstract_line, const typename AL::component_type distance) {
+    return abstract_line.get_origin() + abstract_line.get_direction() * distance;
 }
 
 /**
@@ -83,11 +80,10 @@ constexpr vec<typename AL::component_type, AL::size> point_at_distance(
  * @param point the point to project
  * @return the projected point
  */
-template <typename AL>
+template<typename AL>
 constexpr vec<typename AL::component_type, AL::size> project_point(
-  const AL& abstract_line, const vec<typename AL::component_type, AL::size>& point)
-{
-  return point_at_distance(
-    abstract_line, distance_to_projected_point(abstract_line, point));
+    const AL &abstract_line, const vec<typename AL::component_type, AL::size> &point) {
+    return point_at_distance(
+        abstract_line, distance_to_projected_point(abstract_line, point));
 }
-} // namespace vm
+}// namespace vm

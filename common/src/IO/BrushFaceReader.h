@@ -42,7 +42,7 @@ enum class MapFormat;
 
 
 class Node;
-} // namespace Model
+}// namespace Model
 
 namespace IO {
 class ParserStatus;
@@ -53,21 +53,21 @@ class ParserStatus;
  */
 class BrushFaceReader : public MapReader {
 private:
-  std::vector<Model::BrushFace> m_brushFaces;
+    std::vector<Model::BrushFace> m_brushFaces;
 
 public:
-  BrushFaceReader(const std::string &str, Model::MapFormat sourceAndTargetMapFormat);
+    BrushFaceReader(const std::string &str, Model::MapFormat sourceAndTargetMapFormat);
 
-  std::vector<Model::BrushFace> read(const vm::bbox3 &worldBounds, ParserStatus &status);
+    std::vector<Model::BrushFace> read(const vm::bbox3 &worldBounds, ParserStatus &status);
 
-private: // implement MapReader interface
-  Model::Node *onWorldNode(std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) override;
+private:// implement MapReader interface
+    Model::Node *onWorldNode(std::unique_ptr<Model::WorldNode> worldNode, ParserStatus &status) override;
 
-  void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &status) override;
+    void onLayerNode(std::unique_ptr<Model::Node> layerNode, ParserStatus &status) override;
 
-  void onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status) override;
+    void onNode(Model::Node *parentNode, std::unique_ptr<Model::Node> node, ParserStatus &status) override;
 
-  void onBrushFace(Model::BrushFace face, ParserStatus &status) override;
+    void onBrushFace(Model::BrushFace face, ParserStatus &status) override;
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

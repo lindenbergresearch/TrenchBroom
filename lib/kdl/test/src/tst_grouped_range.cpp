@@ -19,70 +19,60 @@
 */
 
 #include "kdl/grouped_range.h"
-#include "kdl/range_io.h" // IWYU pragma: keep
+#include "kdl/range_io.h"// IWYU pragma: keep
 
 #include <vector>
 
 #include "catch2.h"
 
-namespace kdl
-{
+namespace kdl {
 
-namespace
-{
-template <typename T, typename D>
-auto make_window(const std::vector<T>& v, const D offset, const D length)
-{
-  return range{std::next(v.begin(), offset), std::next(v.begin(), offset + length)};
+namespace {
+template<typename T, typename D>
+auto make_window(const std::vector<T> &v, const D offset, const D length) {
+    return range{std::next(v.begin(), offset), std::next(v.begin(), offset + length)};
 }
-} // namespace
+}// namespace
 
-TEST_CASE("grouped_range")
-{
-  SECTION("Empty range")
-  {
-    auto v = std::vector<int>{};
-    auto r = make_grouped_range(v, [](const auto& lhs, const auto& rhs) {
-      return (lhs < 2 && rhs < 2) || (lhs >= 2 && rhs >= 2 && lhs < 4 && rhs < 4)
-             || (lhs >= 4 && rhs >= 4);
-    });
+TEST_CASE("grouped_range") {
+    SECTION("Empty range") {
+        auto v = std::vector<int>{};
+        auto r = make_grouped_range(v, [](const auto &lhs, const auto &rhs) {
+            return (lhs < 2 && rhs < 2) || (lhs >= 2 && rhs >= 2 && lhs < 4 && rhs < 4) || (lhs >= 4 && rhs >= 4);
+        });
 
-    const auto expected = std::vector<decltype(make_window(v, 0, 0))>{};
+        const auto expected = std::vector<decltype(make_window(v, 0, 0))>{};
 
-    CHECK(r == range{expected.begin(), expected.end()});
-  }
+        CHECK(r == range{expected.begin(), expected.end()});
+    }
 
-  SECTION("Range with one group")
-  {
-    auto v = std::vector<int>{0, 1};
-    auto r = make_grouped_range(v, [](const auto& lhs, const auto& rhs) {
-      return (lhs < 2 && rhs < 2) || (lhs >= 2 && rhs >= 2 && lhs < 4 && rhs < 4)
-             || (lhs >= 4 && rhs >= 4);
-    });
+    SECTION("Range with one group") {
+        auto v = std::vector<int>{0, 1};
+        auto r = make_grouped_range(v, [](const auto &lhs, const auto &rhs) {
+            return (lhs < 2 && rhs < 2) || (lhs >= 2 && rhs >= 2 && lhs < 4 && rhs < 4) || (lhs >= 4 && rhs >= 4);
+        });
 
-    const auto expected = std::vector{
-      make_window(v, 0, 2),
-    };
+        const auto expected = std::vector{
+            make_window(v, 0, 2),
+        };
 
-    CHECK(r == range{expected.begin(), expected.end()});
-  }
+        CHECK(r == range{expected.begin(), expected.end()});
+    }
 
-  SECTION("Range with three groups")
-  {
-    auto v = std::vector<int>{0, 1, 2, 3, 4};
-    auto r = make_grouped_range(v, [](const auto& lhs, const auto& rhs) {
-      return (lhs < 2 && rhs < 2) || (lhs >= 2 && rhs >= 2 && lhs < 4 && rhs < 4)
-             || (lhs >= 4 && rhs >= 4);
-    });
+    SECTION("Range with three groups") {
+        auto v = std::vector<int>{0, 1, 2, 3, 4};
+        auto r = make_grouped_range(v, [](const auto &lhs, const auto &rhs) {
+            return (lhs < 2 && rhs < 2) || (lhs >= 2 && rhs >= 2 && lhs < 4 && rhs < 4) || (lhs >= 4 && rhs >= 4);
+        });
 
-    const auto expected = std::vector{
-      make_window(v, 0, 2),
-      make_window(v, 2, 2),
-      make_window(v, 4, 1),
-    };
+        const auto expected = std::vector{
+            make_window(v, 0, 2),
+            make_window(v, 2, 2),
+            make_window(v, 4, 1),
+        };
 
-    CHECK(r == range{expected.begin(), expected.end()});
-  }
+        CHECK(r == range{expected.begin(), expected.end()});
+    }
 }
 
-} // namespace kdl
+}// namespace kdl

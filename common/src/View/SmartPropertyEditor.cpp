@@ -36,40 +36,40 @@ SmartPropertyEditor::SmartPropertyEditor(std::weak_ptr<MapDocument> document, QW
 SmartPropertyEditor::~SmartPropertyEditor() {}
 
 void SmartPropertyEditor::activate(const std::string &propertyKey) {
-  assert(! m_active);
-  m_propertyKey = propertyKey;
-  m_active = true;
+    assert(!m_active);
+    m_propertyKey = propertyKey;
+    m_active = true;
 }
 
 void SmartPropertyEditor::update(const std::vector<Model::EntityNodeBase *> &nodes) {
-  m_nodes = nodes;
-  doUpdateVisual(m_nodes);
+    m_nodes = nodes;
+    doUpdateVisual(m_nodes);
 }
 
 void SmartPropertyEditor::deactivate() {
-  m_active = false;
-  m_propertyKey = "";
+    m_active = false;
+    m_propertyKey = "";
 }
 
 bool SmartPropertyEditor::usesPropertyKey(const std::string &propertyKey) const {
-  return m_propertyKey == propertyKey;
+    return m_propertyKey == propertyKey;
 }
 
 std::shared_ptr<MapDocument> SmartPropertyEditor::document() const {
-  return kdl::mem_lock(m_document);
+    return kdl::mem_lock(m_document);
 }
 
 const std::string &SmartPropertyEditor::propertyKey() const {
-  return m_propertyKey;
+    return m_propertyKey;
 }
 
 const std::vector<Model::EntityNodeBase *> SmartPropertyEditor::nodes() const {
-  return m_nodes;
+    return m_nodes;
 }
 
 void SmartPropertyEditor::addOrUpdateProperty(const std::string &value) {
-  assert(m_active);
-  document()->setProperty(m_propertyKey, value);
+    assert(m_active);
+    document()->setProperty(m_propertyKey, value);
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

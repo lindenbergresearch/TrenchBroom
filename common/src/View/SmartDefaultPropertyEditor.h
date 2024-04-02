@@ -33,12 +33,12 @@ class MapDocument;
  * Placeholder for when there is no smart editor. Just an empty QWidget.
  */
 class SmartDefaultPropertyEditor : public SmartPropertyEditor {
-Q_OBJECT
+    Q_OBJECT
 public:
-  explicit SmartDefaultPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+    explicit SmartDefaultPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
 private:
-  void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
+    void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

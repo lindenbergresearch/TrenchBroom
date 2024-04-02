@@ -26,9 +26,9 @@ varying vec3 modelNormal;
 varying vec4 faceColor;
 
 void main(void) {
-	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	modelCoordinates = gl_Vertex;
-	modelNormal = gl_Normal;
-	faceColor = Color;
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    modelCoordinates = gl_Vertex;
+    modelNormal = gl_Normal;
+    faceColor = Color;
 }

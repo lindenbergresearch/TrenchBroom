@@ -42,53 +42,60 @@ class BrushNode;
 
 
 class Node;
-} // namespace TrenchBroom::Model
+}// namespace TrenchBroom::Model
 
 namespace TrenchBroom::View {
 
 class SelectionCommand : public UndoableCommand {
 private:
-  enum class Action {
-    SelectNodes, SelectFaces, SelectAllNodes, SelectAllFaces, ConvertToFaces, DeselectNodes, DeselectFaces, DeselectAll
-  };
+    enum class Action {
+        SelectNodes,
+        SelectFaces,
+        SelectAllNodes,
+        SelectAllFaces,
+        ConvertToFaces,
+        DeselectNodes,
+        DeselectFaces,
+        DeselectAll
+    };
 
-  Action m_action;
+    Action m_action;
 
-  std::vector<Model::Node *> m_nodes;
-  std::vector<Model::BrushFaceReference> m_faceRefs;
+    std::vector<Model::Node *> m_nodes;
+    std::vector<Model::BrushFaceReference> m_faceRefs;
 
-  std::vector<Model::Node *> m_previouslySelectedNodes;
-  std::vector<Model::BrushFaceReference> m_previouslySelectedFaceRefs;
+    std::vector<Model::Node *> m_previouslySelectedNodes;
+    std::vector<Model::BrushFaceReference> m_previouslySelectedFaceRefs;
 
 public:
-  static std::unique_ptr<SelectionCommand> select(std::vector<Model::Node *> nodes);
+    static std::unique_ptr<SelectionCommand> select(std::vector<Model::Node *> nodes);
 
-  static std::unique_ptr<SelectionCommand> select(std::vector<Model::BrushFaceHandle> faces);
+    static std::unique_ptr<SelectionCommand> select(std::vector<Model::BrushFaceHandle> faces);
 
-  static std::unique_ptr<SelectionCommand> convertToFaces();
+    static std::unique_ptr<SelectionCommand> convertToFaces();
 
-  static std::unique_ptr<SelectionCommand> selectAllNodes();
+    static std::unique_ptr<SelectionCommand> selectAllNodes();
 
-  static std::unique_ptr<SelectionCommand> selectAllFaces();
+    static std::unique_ptr<SelectionCommand> selectAllFaces();
 
-  static std::unique_ptr<SelectionCommand> deselect(std::vector<Model::Node *> nodes);
+    static std::unique_ptr<SelectionCommand> deselect(std::vector<Model::Node *> nodes);
 
-  static std::unique_ptr<SelectionCommand> deselect(std::vector<Model::BrushFaceHandle> faces);
+    static std::unique_ptr<SelectionCommand> deselect(std::vector<Model::BrushFaceHandle> faces);
 
-  static std::unique_ptr<SelectionCommand> deselectAll();
+    static std::unique_ptr<SelectionCommand> deselectAll();
 
-  SelectionCommand(Action action, std::vector<Model::Node *> nodes, std::vector<Model::BrushFaceHandle> faces);
+    SelectionCommand(Action action, std::vector<Model::Node *> nodes, std::vector<Model::BrushFaceHandle> faces);
 
-  ~SelectionCommand() override;
+    ~SelectionCommand() override;
 
 private:
-  static std::string makeName(Action action, size_t nodeCount, size_t faceCount);
+    static std::string makeName(Action action, size_t nodeCount, size_t faceCount);
 
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-  std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
-deleteCopyAndMove(SelectionCommand);
+    deleteCopyAndMove(SelectionCommand);
 };
 
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

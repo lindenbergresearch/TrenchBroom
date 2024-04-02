@@ -45,30 +45,30 @@ class MapDocument;
  * List of all games with the ability to edit game path, compile tools for each game
  */
 class GamesPreferencePane : public PreferencePane {
-Q_OBJECT
+    Q_OBJECT
 private:
-  MapDocument *m_document;
-  GameListBox *m_gameListBox;
-  QStackedWidget *m_stackedWidget;
-  QWidget *m_defaultPage;
-  GamePreferencePane *m_currentGamePage;
+    MapDocument *m_document;
+    GameListBox *m_gameListBox;
+    QStackedWidget *m_stackedWidget;
+    QWidget *m_defaultPage;
+    GamePreferencePane *m_currentGamePage;
 
 public:
-  explicit GamesPreferencePane(MapDocument *document, QWidget *parent = nullptr);
+    explicit GamesPreferencePane(MapDocument *document, QWidget *parent = nullptr);
 
 private:
-  void createGui();
+    void createGui();
 
 private:
-  void showUserConfigDirClicked();
+    void showUserConfigDirClicked();
 
-  bool doCanResetToDefaults() override;
+    bool doCanResetToDefaults() override;
 
-  void doResetToDefaults() override;
+    void doResetToDefaults() override;
 
-  void doUpdateControls() override;
+    void doUpdateControls() override;
 
-  bool doValidate() override;
+    bool doValidate() override;
 };
 
 
@@ -76,42 +76,42 @@ private:
  * Widget for configuring a single game
  */
 class GamePreferencePane : public QWidget {
-Q_OBJECT
+    Q_OBJECT
 private:
-  std::string m_gameName;
-  QLineEdit *m_gamePathText;
-  QPushButton *m_chooseGamePathButton;
-  std::vector<std::tuple<std::string, QLineEdit *>> m_toolPathEditors;
+    std::string m_gameName;
+    QLineEdit *m_gamePathText;
+    QPushButton *m_chooseGamePathButton;
+    std::vector<std::tuple<std::string, QLineEdit *>> m_toolPathEditors;
 
 public:
-  explicit GamePreferencePane(const std::string &gameName, QWidget *parent = nullptr);
+    explicit GamePreferencePane(const std::string &gameName, QWidget *parent = nullptr);
 
 private:
-  void createGui();
+    void createGui();
 
 private:
-  void currentGameChanged(const QString &gameName);
+    void currentGameChanged(const QString &gameName);
 
-  void chooseGamePathClicked();
+    void chooseGamePathClicked();
 
-  void updateGamePath(const QString &str);
+    void updateGamePath(const QString &str);
 
-  void configureEnginesClicked();
+    void configureEnginesClicked();
 
 public:
-  const std::string &gameName() const;
+    const std::string &gameName() const;
 
-  /**
+    /**
    * Refresh controls from GameFactory
    */
-  void updateControls();
+    void updateControls();
 
 signals:
 
-  /**
+    /**
    * Emitted by GamePreferencePane after changing a preference
    */
-  void requestUpdate();
+    void requestUpdate();
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

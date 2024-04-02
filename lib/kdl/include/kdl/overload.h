@@ -22,8 +22,7 @@
 
 #include <utility>
 
-namespace kdl
-{
+namespace kdl {
 /**
  * Creates a type that inherits from all of its type parameters and `operator()` from each
  * supertype. Can be used with std::visit to create on-the-fly visitors from lambdas. So
@@ -33,22 +32,19 @@ namespace kdl
  *
  * @tparam Ts the lambdas to inherit from
  */
-template <typename... Ts>
-struct overload_impl : Ts...
-{
-  using Ts::operator()...;
-  overload_impl(Ts&&... ts)
-    : Ts(std::forward<Ts>(ts))...
-  {
-  }
+template<typename... Ts>
+struct overload_impl : Ts... {
+    using Ts::operator()...;
+    overload_impl(Ts &&...ts)
+        : Ts(std::forward<Ts>(ts))... {
+    }
 };
 
 /**
  * Factory function to create an overload.
  */
-template <typename... Ts>
-auto overload(Ts&&... ts)
-{
-  return overload_impl<Ts...>{std::forward<Ts>(ts)...};
+template<typename... Ts>
+auto overload(Ts &&...ts) {
+    return overload_impl<Ts...>{std::forward<Ts>(ts)...};
 }
-} // namespace kdl
+}// namespace kdl

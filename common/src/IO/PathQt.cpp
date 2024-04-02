@@ -22,15 +22,15 @@
 namespace TrenchBroom {
 namespace IO {
 QString pathAsQString(const std::filesystem::path &path) {
-  return QString::fromStdString(path.string());
+    return QString::fromStdString(path.string());
 }
 
 QString pathAsGenericQString(const std::filesystem::path &path) {
-  return QString::fromStdString(path.generic_string());
+    return QString::fromStdString(path.generic_string());
 }
 
 std::filesystem::path pathFromQString(const QString &path) {
-  return std::filesystem::path{path.toStdString()};
+    return std::filesystem::path{path.toStdString()};
 }
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

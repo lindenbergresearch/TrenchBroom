@@ -35,7 +35,7 @@ namespace TrenchBroom {
 namespace Model {
 enum class LockState;
 enum class VisibilityState;
-} // namespace Model
+}// namespace Model
 
 namespace View {
 class CommandProcessor;
@@ -50,108 +50,107 @@ class CommandProcessor;
  */
 class MapDocumentCommandFacade : public MapDocument {
 private:
-  std::unique_ptr<CommandProcessor> m_commandProcessor;
+    std::unique_ptr<CommandProcessor> m_commandProcessor;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
 public:
-  static std::shared_ptr<MapDocument> newMapDocument();
+    static std::shared_ptr<MapDocument> newMapDocument();
 
 private:
-  MapDocumentCommandFacade();
+    MapDocumentCommandFacade();
 
 public:
-  ~MapDocumentCommandFacade() override;
+    ~MapDocumentCommandFacade() override;
 
-public: // selection modification
-  void performSelect(const std::vector<Model::Node *> &nodes);
+public:// selection modification
+    void performSelect(const std::vector<Model::Node *> &nodes);
 
-  void performSelect(const std::vector<Model::BrushFaceHandle> &faces);
+    void performSelect(const std::vector<Model::BrushFaceHandle> &faces);
 
-  void performSelectAllNodes();
+    void performSelectAllNodes();
 
-  void performSelectAllBrushFaces();
+    void performSelectAllBrushFaces();
 
-  void performConvertToBrushFaceSelection();
+    void performConvertToBrushFaceSelection();
 
-  void performDeselect(const std::vector<Model::Node *> &nodes);
+    void performDeselect(const std::vector<Model::Node *> &nodes);
 
-  void performDeselect(const std::vector<Model::BrushFaceHandle> &faces);
+    void performDeselect(const std::vector<Model::BrushFaceHandle> &faces);
 
-  void performDeselectAll();
+    void performDeselectAll();
 
-public: // adding and removing nodes
-  void performAddNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
+public:// adding and removing nodes
+    void performAddNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
 
-  void performRemoveNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
+    void performRemoveNodes(const std::map<Model::Node *, std::vector<Model::Node *>> &nodes);
 
-  std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> performReplaceChildren(
-      std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> nodes
-  );
+    std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> performReplaceChildren(
+        std::vector<std::pair<Model::Node *, std::vector<std::unique_ptr<Model::Node>>>> nodes);
 
-public: // swapping node contents
-  void performSwapNodeContents(std::vector<std::pair<Model::Node *, Model::NodeContents>> &nodesToSwap);
+public:// swapping node contents
+    void performSwapNodeContents(std::vector<std::pair<Model::Node *, Model::NodeContents>> &nodesToSwap);
 
-public: // Node Visibility
-  std::map<Model::Node *, Model::VisibilityState> setVisibilityState(const std::vector<Model::Node *> &nodes, Model::VisibilityState visibilityState);
+public:// Node Visibility
+    std::map<Model::Node *, Model::VisibilityState> setVisibilityState(const std::vector<Model::Node *> &nodes, Model::VisibilityState visibilityState);
 
-  std::map<Model::Node *, Model::VisibilityState> setVisibilityEnsured(const std::vector<Model::Node *> &nodes);
+    std::map<Model::Node *, Model::VisibilityState> setVisibilityEnsured(const std::vector<Model::Node *> &nodes);
 
-  void restoreVisibilityState(const std::map<Model::Node *, Model::VisibilityState> &nodes);
+    void restoreVisibilityState(const std::map<Model::Node *, Model::VisibilityState> &nodes);
 
-  std::map<Model::Node *, Model::LockState> setLockState(const std::vector<Model::Node *> &nodes, Model::LockState lockState);
+    std::map<Model::Node *, Model::LockState> setLockState(const std::vector<Model::Node *> &nodes, Model::LockState lockState);
 
-  void restoreLockState(const std::map<Model::Node *, Model::LockState> &nodes);
+    void restoreLockState(const std::map<Model::Node *, Model::LockState> &nodes);
 
-public: // layers
-  using MapDocument::performSetCurrentLayer;
+public:// layers
+    using MapDocument::performSetCurrentLayer;
 
 public:
-  void performPushGroup(Model::GroupNode *group);
+    void performPushGroup(Model::GroupNode *group);
 
-  void performPopGroup();
+    void performPopGroup();
 
 private:
-  void doSetIssueHidden(const Model::Issue &issue, bool hidden) override;
+    void doSetIssueHidden(const Model::Issue &issue, bool hidden) override;
 
-public: // modification count
-  void incModificationCount(size_t delta = 1);
+public:// modification count
+    void incModificationCount(size_t delta = 1);
 
-  void decModificationCount(size_t delta = 1);
+    void decModificationCount(size_t delta = 1);
 
-private: // notification
-  void connectObservers();
+private:// notification
+    void connectObservers();
 
-  void documentWasNewed(MapDocument *document);
+    void documentWasNewed(MapDocument *document);
 
-  void documentWasLoaded(MapDocument *document);
+    void documentWasLoaded(MapDocument *document);
 
-private: // implement MapDocument interface
-  bool isCurrentDocumentStateObservable() const override;
+private:// implement MapDocument interface
+    bool isCurrentDocumentStateObservable() const override;
 
-  bool doCanUndoCommand() const override;
+    bool doCanUndoCommand() const override;
 
-  bool doCanRedoCommand() const override;
+    bool doCanRedoCommand() const override;
 
-  const std::string &doGetUndoCommandName() const override;
+    const std::string &doGetUndoCommandName() const override;
 
-  const std::string &doGetRedoCommandName() const override;
+    const std::string &doGetRedoCommandName() const override;
 
-  void doUndoCommand() override;
+    void doUndoCommand() override;
 
-  void doRedoCommand() override;
+    void doRedoCommand() override;
 
-  void doClearCommandProcessor() override;
+    void doClearCommandProcessor() override;
 
-  void doStartTransaction(std::string name, TransactionScope scope) override;
+    void doStartTransaction(std::string name, TransactionScope scope) override;
 
-  void doCommitTransaction() override;
+    void doCommitTransaction() override;
 
-  void doRollbackTransaction() override;
+    void doRollbackTransaction() override;
 
-  std::unique_ptr<CommandResult> doExecute(std::unique_ptr<Command> command) override;
+    std::unique_ptr<CommandResult> doExecute(std::unique_ptr<Command> command) override;
 
-  std::unique_ptr<CommandResult> doExecuteAndStore(std::unique_ptr<UndoableCommand> command) override;
+    std::unique_ptr<CommandResult> doExecuteAndStore(std::unique_ptr<UndoableCommand> command) override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

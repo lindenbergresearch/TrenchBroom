@@ -44,11 +44,11 @@ class Grid;
  * The state of a drag.
  */
 struct DragState {
-  vm::vec3 initialHandlePosition;
-  vm::vec3 currentHandlePosition;
-  vm::vec3 handleOffset;
+    vm::vec3 initialHandlePosition;
+    vm::vec3 currentHandlePosition;
+    vm::vec3 handleOffset;
 
-  kdl_reflect_decl(DragState, initialHandlePosition, currentHandlePosition, handleOffset);
+    kdl_reflect_decl(DragState, initialHandlePosition, currentHandlePosition, handleOffset);
 };
 
 /**
@@ -64,7 +64,8 @@ using HandlePositionProposer = std::function<std::optional<vm::vec3>(const Input
  * position.
  */
 enum class ResetInitialHandlePosition {
-  Keep, Reset
+    Keep,
+    Reset
 };
 
 /**
@@ -74,8 +75,8 @@ enum class ResetInitialHandlePosition {
  * updated to the current handle position.
  */
 struct UpdateDragConfig {
-  HandlePositionProposer proposeHandlePosition;
-  ResetInitialHandlePosition resetInitialHandlePosition;
+    HandlePositionProposer proposeHandlePosition;
+    ResetInitialHandlePosition resetInitialHandlePosition;
 };
 
 /**
@@ -83,12 +84,12 @@ struct UpdateDragConfig {
  * reacts to a drag event.
  */
 enum class DragStatus {
-  /** The drag should continue. */
-  Continue, /** The drag should continue, but the current event could not be applied to
+    /** The drag should continue. */
+    Continue, /** The drag should continue, but the current event could not be applied to
              * the object being dragged. The current handle position is not updated in
              * this case. */
-  Deny,     /** The drag should be cancelled. */
-  End
+    Deny,     /** The drag should be cancelled. */
+    End
 };
 
 
@@ -97,9 +98,9 @@ enum class DragStatus {
  * to the different events that can arise during a drag.
  */
 struct HandleDragTrackerDelegate {
-  virtual ~HandleDragTrackerDelegate() = default;
+    virtual ~HandleDragTrackerDelegate() = default;
 
-  /**
+    /**
    * Called once when the drag starts. Use this function to start a transaction if
    * necessary.
    *
@@ -109,9 +110,9 @@ struct HandleDragTrackerDelegate {
    * @param initialHitPoint the hit point (as passed to the drag tracker's constructor)
    * @return a function that maps the input state and drag state to a handle position
    */
-  virtual HandlePositionProposer start(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint) = 0;
+    virtual HandlePositionProposer start(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint) = 0;
 
-  /**
+    /**
    * Called every time when a new proposed handle position is computed by the drag
    * tracker. This function should be used to update the object being dragged.
    *
@@ -129,9 +130,9 @@ struct HandleDragTrackerDelegate {
    * @return a value of DragStatus that instructs the drag tracker on how to continue with
    * the drag
    */
-  virtual DragStatus drag(const InputState &inputState, const DragState &dragState, const vm::vec3 &proposedHandlePosition) = 0;
+    virtual DragStatus drag(const InputState &inputState, const DragState &dragState, const vm::vec3 &proposedHandlePosition) = 0;
 
-  /**
+    /**
    * Called when the drag ends successfully, i.e. if the drag callback returned
    * DragStatus::End or if the user released the mouse button. This function should commit
    * any transactions.
@@ -139,17 +140,17 @@ struct HandleDragTrackerDelegate {
    * @param inputState the current input state
    * @param dragState the current drag state
    */
-  virtual void end(const InputState &inputState, const DragState &dragState) = 0;
+    virtual void end(const InputState &inputState, const DragState &dragState) = 0;
 
-  /**
+    /**
    * Called when the drag is cancelled, i.e. if the user hit the escape key, or if the
    * window loses focus.
    *
    * @param dragState the current drag state
    */
-  virtual void cancel(const DragState &dragState) = 0;
+    virtual void cancel(const DragState &dragState) = 0;
 
-  /**
+    /**
    * Called when any modifier key is pressed or released. Can be overridden to update the
    * function that the drag tracker uses to compute proposed handle positions. For
    * example, a tool might change how the handle position is snapped mid drag when a
@@ -163,17 +164,17 @@ struct HandleDragTrackerDelegate {
    * @return a struct with a new function to propose handle positions, and an instruction
    * whether or not to update the initial handle position
    */
-  virtual std::optional<UpdateDragConfig> modifierKeyChange(const InputState &inputState, const DragState &dragState);
+    virtual std::optional<UpdateDragConfig> modifierKeyChange(const InputState &inputState, const DragState &dragState);
 
-  /**
+    /**
    * Calls if the mouse wheel is scrolled during a drag.
    *
    * @param inputState the current input state
    * @param dragState the current drag state
    */
-  virtual void mouseScroll(const InputState &inputState, const DragState &dragState);
+    virtual void mouseScroll(const InputState &inputState, const DragState &dragState);
 
-  /**
+    /**
    * Called once prior to rendering. The given input state and render context correspond
    * to the view being rendered, which may be a different view than the one in which the
    * drag is taking place.
@@ -181,9 +182,9 @@ struct HandleDragTrackerDelegate {
    * @param inputState the current input state of the view being rendered
    * @param renderContext the render context of the view being rendered
    */
-  virtual void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
+    virtual void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
 
-  /**
+    /**
    * Called once in a render pass. The given input state, render context and render batch
    * correspond to the view being rendered, which may be a different view than the one in
    * which the drag is taking place.
@@ -193,9 +194,8 @@ struct HandleDragTrackerDelegate {
    * @param renderContext the render context of the view being rendered
    * @param renderBatch the render batch of the view being rendered
    */
-  virtual void render(
-      const InputState &inputState, const DragState &dragState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch
-  ) const;
+    virtual void render(
+        const InputState &inputState, const DragState &dragState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
 };
 
 
@@ -226,40 +226,36 @@ struct HandleDragTrackerDelegate {
  * example, in a 3D view, the user may hold a modifier key to switch between dragging
  * horizontally and vertically.
  */
-template<typename Delegate> class HandleDragTracker : public DragTracker {
+template<typename Delegate>
+class HandleDragTracker : public DragTracker {
 private:
-  enum class IdenticalPositionPolicy {
-    SkipDrag, ForceDrag
-  };
+    enum class IdenticalPositionPolicy {
+        SkipDrag,
+        ForceDrag
+    };
 
-  static_assert(
-      std::is_base_of_v<HandleDragTrackerDelegate, Delegate>, "Delegate must extend HandleDragTrackerDelegate"
-  );
-  Delegate m_delegate;
+    static_assert(
+        std::is_base_of_v<HandleDragTrackerDelegate, Delegate>, "Delegate must extend HandleDragTrackerDelegate");
+    Delegate m_delegate;
 
-  DragState m_dragState;
-  HandlePositionProposer m_proposeHandlePosition;
+    DragState m_dragState;
+    HandlePositionProposer m_proposeHandlePosition;
 
 public:
-  /**
+    /**
    * Creates a new handle drag tracker with the given delegate.
    */
-  HandleDragTracker(Delegate delegate, const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint) :
-      m_delegate{std::move(delegate)}, m_dragState{
-      initialHandlePosition, initialHandlePosition, initialHandlePosition - initialHitPoint
-  }, m_proposeHandlePosition{
-      m_delegate.start(
-          inputState, m_dragState.initialHandlePosition, m_dragState.handleOffset
-      )
-  } {
-  }
+    HandleDragTracker(Delegate delegate, const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint) : m_delegate{std::move(delegate)}, m_dragState{
+                                                                                                                                                                                      initialHandlePosition, initialHandlePosition, initialHandlePosition - initialHitPoint},
+                                                                                                                                                 m_proposeHandlePosition{m_delegate.start(inputState, m_dragState.initialHandlePosition, m_dragState.handleOffset)} {
+    }
 
-  /**
+    /**
    * Returns the current drag state. Exposed for testing.
    */
-  const DragState &dragState() const { return m_dragState; }
+    const DragState &dragState() const { return m_dragState; }
 
-  /**
+    /**
    * React to modifier key changes. This is delegated to the delegate, and if it returns a
    * new handle position proposer function, the drag tracker's proposer function is
    * replaced. Optionally, the initial handle position is updated according to the value
@@ -268,88 +264,87 @@ public:
    * If a new proposer function is returned by the delegate, it is called with the current
    * drag state and drag() is called with the new proposed handle position.
    */
-  void modifierKeyChange(const InputState &inputState) override {
-    if (auto dragConfig = m_delegate.modifierKeyChange(inputState, m_dragState)) {
-      if (dragConfig->resetInitialHandlePosition == ResetInitialHandlePosition::Reset) {
-        const auto newInitialHandlePosition = dragConfig->proposeHandlePosition(inputState, m_dragState);
-        if (! newInitialHandlePosition) {
-          return;
+    void modifierKeyChange(const InputState &inputState) override {
+        if (auto dragConfig = m_delegate.modifierKeyChange(inputState, m_dragState)) {
+            if (dragConfig->resetInitialHandlePosition == ResetInitialHandlePosition::Reset) {
+                const auto newInitialHandlePosition = dragConfig->proposeHandlePosition(inputState, m_dragState);
+                if (!newInitialHandlePosition) {
+                    return;
+                }
+
+                m_dragState.initialHandlePosition = *newInitialHandlePosition;
+            }
+
+            m_proposeHandlePosition = std::move(dragConfig->proposeHandlePosition);
+
+            assertResult(drag(inputState, IdenticalPositionPolicy::ForceDrag));
         }
-
-        m_dragState.initialHandlePosition = *newInitialHandlePosition;
-      }
-
-      m_proposeHandlePosition = std::move(dragConfig->proposeHandlePosition);
-
-      assertResult(drag(inputState, IdenticalPositionPolicy::ForceDrag));
     }
-  }
 
-  /**
+    /**
    * Forward the scroll event to the delegate.
    */
-  void mouseScroll(const InputState &inputState) override {
-    m_delegate.mouseScroll(inputState, m_dragState);
-  }
+    void mouseScroll(const InputState &inputState) override {
+        m_delegate.mouseScroll(inputState, m_dragState);
+    }
 
-  /**
+    /**
    * Called when the mouse is moved during a drag. Delegates to the delegate to apply
    * changes to the objects being dragged.
    *
    * Returns true to indicate succes. If this function returns false, the drag ends and
    * end() is called.
    */
-  bool drag(const InputState &inputState) override {
-    return drag(inputState, IdenticalPositionPolicy::SkipDrag);
-  }
+    bool drag(const InputState &inputState) override {
+        return drag(inputState, IdenticalPositionPolicy::SkipDrag);
+    }
 
-  /**
+    /**
    * Called when the drag ends normally (e.g. by releasing a mouse button) or if drag()
    * returns false. The delegate should commit any changes made in result of the drag.
    */
-  void end(const InputState &inputState) override {
-    m_delegate.end(inputState, m_dragState);
-  }
+    void end(const InputState &inputState) override {
+        m_delegate.end(inputState, m_dragState);
+    }
 
-  /**
+    /**
    * Called when the drag ends abnormally (e.g. by hitting escape during a drag). The
    * delegate should undo any changes made in result of the drag.
    */
-  void cancel() override { m_delegate.cancel(m_dragState); }
+    void cancel() override { m_delegate.cancel(m_dragState); }
 
-  /**
+    /**
    * Called during the drag to allow the delegate to set render options.
    */
-  void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override {
-    m_delegate.setRenderOptions(inputState, renderContext);
-  }
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override {
+        m_delegate.setRenderOptions(inputState, renderContext);
+    }
 
-  /**
+    /**
    * Called during the drag to allow the delegate to render into the corresponding view.
    */
-  void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const override {
-    m_delegate.render(inputState, m_dragState, renderContext, renderBatch);
-  }
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const override {
+        m_delegate.render(inputState, m_dragState, renderContext, renderBatch);
+    }
 
 private:
-  bool drag(const InputState &inputState, const IdenticalPositionPolicy identicalPositionPolicy) {
-    const auto proposedHandlePosition = m_proposeHandlePosition(inputState, m_dragState);
-    if (! proposedHandlePosition
-        || (*proposedHandlePosition == m_dragState.currentHandlePosition && identicalPositionPolicy == IdenticalPositionPolicy::SkipDrag)) {
-      return true;
-    }
+    bool drag(const InputState &inputState, const IdenticalPositionPolicy identicalPositionPolicy) {
+        const auto proposedHandlePosition = m_proposeHandlePosition(inputState, m_dragState);
+        if (!proposedHandlePosition || (*proposedHandlePosition == m_dragState.currentHandlePosition && identicalPositionPolicy == IdenticalPositionPolicy::SkipDrag)) {
+            return true;
+        }
 
-    const auto dragResult = m_delegate.drag(inputState, m_dragState, *proposedHandlePosition);
-    if (dragResult == DragStatus::End) {
-      return false;
-    }
+        const auto dragResult = m_delegate.drag(inputState, m_dragState, *proposedHandlePosition);
+        if (dragResult == DragStatus::End) {
+            return false;
+        }
 
-    if (dragResult == DragStatus::Continue) {
-      m_dragState.currentHandlePosition = *proposedHandlePosition;
-    }
+        if (dragResult == DragStatus::Continue) {
+            m_dragState.currentHandlePosition = *proposedHandlePosition;
+        }
 
-    return true;
-  }
+        return true;
+    }
 };
 
 
@@ -361,12 +356,11 @@ private:
  * @param initialHandlePosition the initial handle position
  * @param initialHitPoint the initial hit point
  */
-template<typename Delegate> std::unique_ptr<HandleDragTracker<Delegate>> createHandleDragTracker(
-    Delegate delegate, const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint
-) {
-  return std::make_unique<HandleDragTracker<Delegate>>(
-      std::move(delegate), inputState, initialHandlePosition, initialHitPoint
-  );
+template<typename Delegate>
+std::unique_ptr<HandleDragTracker<Delegate>> createHandleDragTracker(
+    Delegate delegate, const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint) {
+    return std::make_unique<HandleDragTracker<Delegate>>(
+        std::move(delegate), inputState, initialHandlePosition, initialHitPoint);
 }
 
 /**
@@ -467,5 +461,5 @@ HandlePositionProposer makeBrushFaceHandleProposer(const Grid &grid);
  * Composes a drag handle picker and a drag handle snapper into one function.
  */
 HandlePositionProposer makeHandlePositionProposer(DragHandlePicker pickHandlePosition, DragHandleSnapper snapHandlePosition);
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

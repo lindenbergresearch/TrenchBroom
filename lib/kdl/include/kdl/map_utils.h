@@ -25,8 +25,7 @@
 #include <map>
 #include <vector>
 
-namespace kdl
-{
+namespace kdl {
 /**
  * Returns a vector containing copies of the given map's keys. The keys are returned in
  * the order in which they are stored in the given map.
@@ -35,17 +34,15 @@ namespace kdl
  * @param m the map
  * @return a vector containing the keys
  */
-template <typename Map>
-auto map_keys(const Map& m)
-{
-  using T = std::remove_cv_t<std::remove_reference_t<decltype(std::get<0>(*m.begin()))>>;
-  auto result = std::vector<T>{};
-  result.reserve(m.size());
-  for (const auto& [key, value] : m)
-  {
-    result.push_back(key);
-  }
-  return result;
+template<typename Map>
+auto map_keys(const Map &m) {
+    using T = std::remove_cv_t<std::remove_reference_t<decltype(std::get<0>(*m.begin()))>>;
+    auto result = std::vector<T>{};
+    result.reserve(m.size());
+    for (const auto &[key, value]: m) {
+        result.push_back(key);
+    }
+    return result;
 }
 
 /**
@@ -56,17 +53,15 @@ auto map_keys(const Map& m)
  * @param m the map
  * @return a vector containing the values
  */
-template <typename Map>
-auto map_values(const Map& m)
-{
-  using T = std::remove_cv_t<std::remove_reference_t<decltype(std::get<1>(*m.begin()))>>;
-  auto result = std::vector<T>{};
-  result.reserve(m.size());
-  for (const auto& [key, value] : m)
-  {
-    result.push_back(value);
-  }
-  return result;
+template<typename Map>
+auto map_values(const Map &m) {
+    using T = std::remove_cv_t<std::remove_reference_t<decltype(std::get<1>(*m.begin()))>>;
+    auto result = std::vector<T>{};
+    result.reserve(m.size());
+    for (const auto &[key, value]: m) {
+        result.push_back(value);
+    }
+    return result;
 }
 
 /**
@@ -88,34 +83,28 @@ auto map_values(const Map& m)
  * @param value_cmp the value comparator
  * @return an int indicating the result of the comparison
  */
-template <typename K, typename V, typename C, typename D = std::less<V>>
+template<typename K, typename V, typename C, typename D = std::less<V>>
 int map_lexicographical_compare(
-  const std::map<K, V, C>& map1, const std::map<K, V, C>& map2, const D& value_cmp = D())
-{
-  const auto key_cmp = C();
-  return kdl::range_lexicographical_compare(
-    std::begin(map1),
-    std::end(map1),
-    std::begin(map2),
-    std::end(map2),
-    [&key_cmp, &value_cmp](const auto& lhs, const auto& rhs) {
-      const K& lhs_key = lhs.first;
-      const K& rhs_key = rhs.first;
-      if (key_cmp(lhs_key, rhs_key))
-      {
-        return true;
-      }
-      else if (key_cmp(rhs_key, lhs_key))
-      {
-        return false;
-      }
-      else
-      {
-        const V& lhs_value = lhs.second;
-        const V& rhs_value = rhs.second;
-        return value_cmp(lhs_value, rhs_value);
-      }
-    });
+    const std::map<K, V, C> &map1, const std::map<K, V, C> &map2, const D &value_cmp = D()) {
+    const auto key_cmp = C();
+    return kdl::range_lexicographical_compare(
+        std::begin(map1),
+        std::end(map1),
+        std::begin(map2),
+        std::end(map2),
+        [&key_cmp, &value_cmp](const auto &lhs, const auto &rhs) {
+            const K &lhs_key = lhs.first;
+            const K &rhs_key = rhs.first;
+            if (key_cmp(lhs_key, rhs_key)) {
+                return true;
+            } else if (key_cmp(rhs_key, lhs_key)) {
+                return false;
+            } else {
+                const V &lhs_value = lhs.second;
+                const V &rhs_value = rhs.second;
+                return value_cmp(lhs_value, rhs_value);
+            }
+        });
 }
 
 /**
@@ -138,16 +127,14 @@ int map_lexicographical_compare(
  * @param valueCmp the value comparator
  * @return true if the given maps are equivalent and false otherwise
  */
-template <typename K, typename V, typename C, typename D = std::less<V>>
+template<typename K, typename V, typename C, typename D = std::less<V>>
 bool map_is_equivalent(
-  const std::map<K, V, C>& map1, const std::map<K, V, C>& map2, const D& valueCmp = D())
-{
-  if (map1.size() != map2.size())
-  {
-    return false;
-  }
+    const std::map<K, V, C> &map1, const std::map<K, V, C> &map2, const D &valueCmp = D()) {
+    if (map1.size() != map2.size()) {
+        return false;
+    }
 
-  return map_lexicographical_compare(map1, map2, valueCmp) == 0;
+    return map_lexicographical_compare(map1, map2, valueCmp) == 0;
 }
 
 /**
@@ -161,18 +148,14 @@ bool map_is_equivalent(
  * @param default_value the value to return if the given key is not found
  * @return the value of the given key in the given map, or the given default value
  */
-template <typename K, typename V>
-const V& map_find_or_default(const std::map<K, V>& m, const K& k, const V& default_value)
-{
-  auto it = m.find(k);
-  if (it == std::end(m))
-  {
-    return default_value;
-  }
-  else
-  {
-    return it->second;
-  }
+template<typename K, typename V>
+const V &map_find_or_default(const std::map<K, V> &m, const K &k, const V &default_value) {
+    auto it = m.find(k);
+    if (it == std::end(m)) {
+        return default_value;
+    } else {
+        return it->second;
+    }
 }
 
 /**
@@ -188,16 +171,15 @@ const V& map_find_or_default(const std::map<K, V>& m, const K& k, const V& defau
  * @return a map containing the union of the key / value pairs from both maps, with
  * duplicate keys retaining the values from the second map
  */
-template <typename K, typename V, typename C, typename A>
+template<typename K, typename V, typename C, typename A>
 std::map<K, V, C, A> map_union(
-  const std::map<K, V, C, A>& m1, const std::map<K, V, C, A>& m2)
-{
-  std::map<K, V, C, A> result;
-  result.insert(
-    std::begin(m2),
-    std::end(m2)); // insert doesn't overwrite, so we need to insert m2 first
-  result.insert(std::begin(m1), std::end(m1));
-  return result;
+    const std::map<K, V, C, A> &m1, const std::map<K, V, C, A> &m2) {
+    std::map<K, V, C, A> result;
+    result.insert(
+        std::begin(m2),
+        std::end(m2));// insert doesn't overwrite, so we need to insert m2 first
+    result.insert(std::begin(m1), std::end(m1));
+    return result;
 }
 
 /**
@@ -215,26 +197,21 @@ std::map<K, V, C, A> map_union(
  * @return a map that contains all keys from both maps, with the values appended as
  * described above
  */
-template <typename K, typename V, typename C>
+template<typename K, typename V, typename C>
 std::map<K, std::vector<V>, C> map_merge(
-  const std::map<K, std::vector<V>, C>& m1, const std::map<K, std::vector<V>, C>& m2)
-{
-  if (m1.empty())
-  {
-    return m2;
-  }
-  else if (m2.empty())
-  {
-    return m1;
-  }
+    const std::map<K, std::vector<V>, C> &m1, const std::map<K, std::vector<V>, C> &m2) {
+    if (m1.empty()) {
+        return m2;
+    } else if (m2.empty()) {
+        return m1;
+    }
 
-  auto result = m1;
-  for (const auto& [key, from] : m2)
-  {
-    std::vector<V>& into = result[key];
-    into.insert(std::end(into), std::begin(from), std::end(from));
-  }
-  return result;
+    auto result = m1;
+    for (const auto &[key, from]: m2) {
+        std::vector<V> &into = result[key];
+        into.insert(std::end(into), std::begin(from), std::end(from));
+    }
+    return result;
 }
 
 /**
@@ -247,13 +224,11 @@ std::map<K, std::vector<V>, C> map_merge(
  * @param m the map
  * @param deleter the deleter to apply
  */
-template <typename K, typename V, typename D = deleter<V*>>
-void map_clear_and_delete(std::map<K, std::vector<V*>>& m, const D& deleter = D())
-{
-  for (auto& [key, value] : m)
-  {
-    kdl::col_delete_all(value, deleter);
-  }
-  m.clear();
+template<typename K, typename V, typename D = deleter<V *>>
+void map_clear_and_delete(std::map<K, std::vector<V *>> &m, const D &deleter = D()) {
+    for (auto &[key, value]: m) {
+        kdl::col_delete_all(value, deleter);
+    }
+    m.clear();
 }
-} // namespace kdl
+}// namespace kdl

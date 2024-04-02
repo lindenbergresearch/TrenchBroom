@@ -25,24 +25,22 @@
 
 #include "catch2.h"
 
-namespace kdl
-{
-TEST_CASE("pair_iterator")
-{
-  using Catch::Matchers::UnorderedEquals;
+namespace kdl {
+TEST_CASE("pair_iterator") {
+    using Catch::Matchers::UnorderedEquals;
 
-  using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
-  const auto& [range, expected] = GENERATE(values<T>({
-    {{}, {}},
-    {{1}, {}},
-    {{1, 2}, {{1, 2}}},
-    {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
-  }));
+    using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
+    const auto &[range, expected] = GENERATE(values<T>({
+        {{}, {}},
+        {{1}, {}},
+        {{1, 2}, {{1, 2}}},
+        {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
+    }));
 
-  CAPTURE(range);
+    CAPTURE(range);
 
-  const auto r = make_pair_range(range);
-  const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
-  CHECK_THAT(v, UnorderedEquals(expected));
+    const auto r = make_pair_range(range);
+    const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
+    CHECK_THAT(v, UnorderedEquals(expected));
 }
-} // namespace kdl
+}// namespace kdl

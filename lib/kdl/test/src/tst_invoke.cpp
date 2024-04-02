@@ -22,28 +22,25 @@
 
 #include "catch2.h"
 
-namespace kdl
-{
-TEST_CASE("invoke_test.invoke_later_lvalue")
-{
-  bool invoked = false;
-  auto lambda = [&invoked]() { invoked = true; };
+namespace kdl {
+TEST_CASE("invoke_test.invoke_later_lvalue") {
+    bool invoked = false;
+    auto lambda = [&invoked]() { invoked = true; };
 
-  {
-    invoke_later i(lambda);
-    CHECK_FALSE(invoked);
-  }
-  CHECK(invoked);
+    {
+        invoke_later i(lambda);
+        CHECK_FALSE(invoked);
+    }
+    CHECK(invoked);
 }
 
-TEST_CASE("invoke_test.invoke_later_rvalue")
-{
-  bool invoked = false;
+TEST_CASE("invoke_test.invoke_later_rvalue") {
+    bool invoked = false;
 
-  {
-    invoke_later i([&invoked]() { invoked = true; });
-    CHECK_FALSE(invoked);
-  }
-  CHECK(invoked);
+    {
+        invoke_later i([&invoked]() { invoked = true; });
+        CHECK_FALSE(invoked);
+    }
+    CHECK(invoked);
 }
-} // namespace kdl
+}// namespace kdl

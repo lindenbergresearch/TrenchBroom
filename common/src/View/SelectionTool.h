@@ -52,26 +52,26 @@ std::vector<Model::Node *> hitsToNodesWithGroupPicking(const std::vector<Model::
 
 class SelectionTool : public ToolController, public Tool {
 private:
-  std::weak_ptr<MapDocument> m_document;
+    std::weak_ptr<MapDocument> m_document;
 
 public:
-  explicit SelectionTool(std::weak_ptr<MapDocument> document);
+    explicit SelectionTool(std::weak_ptr<MapDocument> document);
 
-  Tool &tool() override;
+    Tool &tool() override;
 
-  const Tool &tool() const override;
+    const Tool &tool() const override;
 
-  bool mouseClick(const InputState &inputState) override;
+    bool mouseClick(const InputState &inputState) override;
 
-  bool mouseDoubleClick(const InputState &inputState) override;
+    bool mouseDoubleClick(const InputState &inputState) override;
 
-  void mouseScroll(const InputState &inputState) override;
+    void mouseScroll(const InputState &inputState) override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
 
-  bool cancel() override;
+    bool cancel() override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

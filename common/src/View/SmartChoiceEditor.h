@@ -46,22 +46,22 @@ class MapDocument;
 
 
 class SmartChoiceEditor : public SmartPropertyEditor {
-Q_OBJECT
+    Q_OBJECT
 private:
-  QComboBox *m_comboBox;
-  bool m_ignoreEditTextChanged;
+    QComboBox *m_comboBox;
+    bool m_ignoreEditTextChanged;
 
 public:
-  explicit SmartChoiceEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+    explicit SmartChoiceEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-  void comboBoxActivated(int index);
+    void comboBoxActivated(int index);
 
-  void comboBoxEditTextChanged(const QString &text);
+    void comboBoxEditTextChanged(const QString &text);
 
 private:
-  void createGui();
+    void createGui();
 
-  void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
+    void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

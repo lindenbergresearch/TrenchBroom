@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/"
+     style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <g id="g3" transform="matrix(0.642857,0,0,0.546429,1.71429,-90.1822)">
-        <path id="rect836" d="M31.167,198.373L31.167,175.627L0.833,175.627L0.833,198.373L31.167,198.373ZM30,177L2,177L2,197L30,197L30,177Z" style="fill:white;"/>
+        <path id="rect836"
+              d="M31.167,198.373L31.167,175.627L0.833,175.627L0.833,198.373L31.167,198.373ZM30,177L2,177L2,197L30,197L30,177Z"
+              style="fill:white;"/>
         <g>
             <rect id="rect838" x="4" y="180" width="3" height="2" style="fill:white;"/>
             <rect id="rect838-3" x="8" y="180" width="2" height="2" style="fill:white;"/>

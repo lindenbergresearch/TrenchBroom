@@ -2,7 +2,6 @@
 
 @media only screen and (max-width: 930px) {
     /* Code, Figure and Table */
-
     pre, figure, table {
         max-width: max-content;
         margin-left: auto;
@@ -10,23 +9,20 @@
     }
 
     /* List */
-
     dl dd {
         margin-left: var(--spacing-x15000);
     }
-    
+
     ol, ul {
         margin-left: var(--spacing-x15000);
     }
 
     /* Figure */
-
     figure {
         display: block;
     }
 
     /* Image */
-
     p img {
         display: block;
         float: inherit;
@@ -34,13 +30,11 @@
     }
 
     /* Table of Contents & Content */
-
     body #toc, body #content {
         margin-left: 50px;
     }
 
     /* Table of Contents */
-
     body #toc_toggler {
         display: flex;
     }
@@ -57,7 +51,6 @@
     }
 
     /* Content Version */
-
     body #content_version #content_version_details img {
         display: none;
     }
@@ -76,13 +69,11 @@
     }
 
     /* Table of Contents and Content */
-
     body #toc_toggler, body #toc, body #content {
         padding: var(--spacing-x10000);
     }
 
     /* Back to Top */
-
     body #content a[href="#"] {
         display: none;
     }

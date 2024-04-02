@@ -32,4 +32,4 @@ class Reader;
 
 Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reader &reader);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

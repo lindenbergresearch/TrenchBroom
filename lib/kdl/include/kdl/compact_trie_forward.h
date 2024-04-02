@@ -20,8 +20,7 @@
 
 #pragma once
 
-namespace kdl
-{
-template <typename V>
+namespace kdl {
+template<typename V>
 class compact_trie;
 }

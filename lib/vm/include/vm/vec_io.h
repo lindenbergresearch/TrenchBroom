@@ -28,34 +28,27 @@
 #include <string>
 #include <string_view>
 
-namespace vm
-{
-namespace detail
-{
-template <typename T, std::size_t S>
-std::optional<vec<T, S>> doParse(const std::string_view str, size_t& pos)
-{
-  constexpr auto blank = " \t\n\r()";
+namespace vm {
+namespace detail {
+template<typename T, std::size_t S>
+std::optional<vec<T, S>> doParse(const std::string_view str, size_t &pos) {
+    constexpr auto blank = " \t\n\r()";
 
-  auto result = vec<T, S>{};
-  for (std::size_t i = 0; i < S; ++i)
-  {
-    if ((pos = str.find_first_not_of(blank, pos)) == std::string::npos)
-    {
-      return std::nullopt;
+    auto result = vec<T, S>{};
+    for (std::size_t i = 0; i < S; ++i) {
+        if ((pos = str.find_first_not_of(blank, pos)) == std::string::npos) {
+            return std::nullopt;
+        }
+        result[i] = static_cast<T>(std::atof(str.data() + pos));
+        if ((pos = str.find_first_of(blank, pos)) == std::string::npos) {
+            if (i < S - 1) {
+                return std::nullopt;
+            }
+        }
     }
-    result[i] = static_cast<T>(std::atof(str.data() + pos));
-    if ((pos = str.find_first_of(blank, pos)) == std::string::npos)
-    {
-      if (i < S - 1)
-      {
-        return std::nullopt;
-      }
-    }
-  }
-  return result;
+    return result;
 }
-} // namespace detail
+}// namespace detail
 
 /**
  * Parses the given string representation. The syntax of the given string is as follows
@@ -71,11 +64,10 @@ std::optional<vec<T, S>> doParse(const std::string_view str, size_t& pos)
  * @param str the string to parse
  * @return the vector parsed from the string
  */
-template <typename T, std::size_t S>
-std::optional<vec<T, S>> parse(const std::string_view str)
-{
-  std::size_t pos = 0;
-  return detail::doParse<T, S>(str, pos);
+template<typename T, std::size_t S>
+std::optional<vec<T, S>> parse(const std::string_view str) {
+    std::size_t pos = 0;
+    return detail::doParse<T, S>(str, pos);
 }
 
 /**
@@ -95,22 +87,19 @@ std::optional<vec<T, S>> parse(const std::string_view str)
  * @param str the string to parse
  * @param out the output iterator add the parsed vectors to
  */
-template <typename T, std::size_t S, typename O>
-void parse_all(const std::string_view str, O out)
-{
-  constexpr auto blank = " \t\n\r,;";
+template<typename T, std::size_t S, typename O>
+void parse_all(const std::string_view str, O out) {
+    constexpr auto blank = " \t\n\r,;";
 
-  std::size_t pos = 0;
-  while (pos != std::string::npos)
-  {
-    if (const auto result = detail::doParse<T, S>(str, pos))
-    {
-      out = *result;
-      ++out;
+    std::size_t pos = 0;
+    while (pos != std::string::npos) {
+        if (const auto result = detail::doParse<T, S>(str, pos)) {
+            out = *result;
+            ++out;
+        }
+        pos = str.find_first_of(blank, pos);
+        pos = str.find_first_not_of(blank, pos);
     }
-    pos = str.find_first_of(blank, pos);
-    pos = str.find_first_not_of(blank, pos);
-  }
 }
 
 /**
@@ -122,17 +111,14 @@ void parse_all(const std::string_view str, O out)
  * @param vec the vector to print
  * @return the given output stream
  */
-template <typename T, std::size_t S>
-std::ostream& operator<<(std::ostream& stream, const vec<T, S>& vec)
-{
-  if constexpr (S > 0)
-  {
-    stream << vec[0];
-    for (size_t i = 1; i < S; ++i)
-    {
-      stream << " " << vec[i];
+template<typename T, std::size_t S>
+std::ostream &operator<<(std::ostream &stream, const vec<T, S> &vec) {
+    if constexpr (S > 0) {
+        stream << vec[0];
+        for (size_t i = 1; i < S; ++i) {
+            stream << " " << vec[i];
+        }
     }
-  }
-  return stream;
+    return stream;
 }
-} // namespace vm
+}// namespace vm

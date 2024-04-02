@@ -40,18 +40,18 @@ namespace TrenchBroom::IO {
 
 class GameConfigParser : public ConfigParserBase {
 private:
-  EL::IntegerType m_version;
+    EL::IntegerType m_version;
 
 public:
-  explicit GameConfigParser(std::string_view str, const std::filesystem::path &path = {});
+    explicit GameConfigParser(std::string_view str, const std::filesystem::path &path = {});
 
-  Model::GameConfig parse();
+    Model::GameConfig parse();
 
-deleteCopyAndMove(GameConfigParser);
+    deleteCopyAndMove(GameConfigParser);
 };
 
 
 std::optional<vm::bbox3> parseSoftMapBoundsString(const std::string &string);
 
 std::string serializeSoftMapBoundsString(const vm::bbox3 &bounds);
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

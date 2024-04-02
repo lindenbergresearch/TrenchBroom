@@ -34,5 +34,5 @@ class EvaluationContext;
 
 
 class VariableStore;
-} // namespace EL
-} // namespace TrenchBroom
+}// namespace EL
+}// namespace TrenchBroom

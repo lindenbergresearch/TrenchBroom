@@ -31,5 +31,5 @@ QString pathAsQString(const std::filesystem::path &path);
 QString pathAsGenericQString(const std::filesystem::path &path);
 
 std::filesystem::path pathFromQString(const QString &path);
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom

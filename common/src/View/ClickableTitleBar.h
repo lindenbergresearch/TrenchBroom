@@ -31,21 +31,21 @@ class BorderLine;
 
 
 class ClickableTitleBar : public TitleBar {
-Q_OBJECT
+    Q_OBJECT
 private:
-  QLabel *m_stateText = nullptr;
+    QLabel *m_stateText = nullptr;
 
 public:
-  ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
+    ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
 
-  void setStateText(const QString &stateText);
+    void setStateText(const QString &stateText);
 
 signals:
 
-  void titleBarClicked();
+    void titleBarClicked();
 
 protected:
-  void mousePressEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 };
 
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

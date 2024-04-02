@@ -20,13 +20,11 @@
 
 #pragma once
 
-namespace kdl
-{
-struct deletable
-{
-  bool& deleted;
+namespace kdl {
+struct deletable {
+    bool &deleted;
 
-  deletable(bool& i_deleted);
-  ~deletable();
+    deletable(bool &i_deleted);
+    ~deletable();
 };
-} // namespace kdl
+}// namespace kdl

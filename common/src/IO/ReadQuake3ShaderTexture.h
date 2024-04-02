@@ -38,4 +38,4 @@ class FileSystem;
  */
 Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(std::string shaderName, const File &file, const FileSystem &fs);
 
-} // namespace TrenchBroom::IO
+}// namespace TrenchBroom::IO

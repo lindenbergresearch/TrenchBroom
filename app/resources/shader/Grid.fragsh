@@ -29,7 +29,7 @@ float getSoftStripes(float value, float gridSize, float stripeSize, float majorD
     float triMajor = abs(2.0 * fract(mainVal * mValue) - 1.0);
     float isMajor = majorDivisionSize > 0 ? step(1.0 - mValue, triMajor) : 0;
 
-    float outIntensity = isMajor * 1.0 + 0.85; // tweak intensities here
+    float outIntensity = isMajor * 1.0 + 0.85;// tweak intensities here
     float sSize = stripeSize;
 
     float triangle = abs(2.0 * fract(mainVal) - 1.0);
@@ -92,7 +92,7 @@ float gridFloor(float size) {
  */
 float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorDivisionSize) {
     float lineWidth = (gridSize < 1.0 ? (1.0 / 32.0)
-                       : (gridSize < 4.0 ? 0.25 : 0.5)) * lineWidthFactor;
+    : (gridSize < 4.0 ? 0.25 : 0.5)) * lineWidthFactor;
 
     // magic number to make the grid fade sooner, preventing aliasing
     float minGridSizeToRender = minGridSize * 2.0;
@@ -109,13 +109,13 @@ float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float li
     float gridRatio = 1.0 / baseGridSize;
     float gridRatio2 = 1.0 / nextGridSize;
 
-    vec2 baseCoords; // coordinates used for overlay creation
+    vec2 baseCoords;// coordinates used for overlay creation
 
     if (abs(normal.x) > abs(normal.y)) {
         if (abs(normal.x) > abs(normal.z))
-            baseCoords = coords.yz;
+        baseCoords = coords.yz;
         else
-            baseCoords = coords.xy;
+        baseCoords = coords.xy;
     } else if (abs(normal.y) > abs(normal.z)) {
         baseCoords = coords.xz;
     } else {

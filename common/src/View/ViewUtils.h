@@ -49,4 +49,4 @@ std::string queryGroupName(QWidget *parent, const std::string &suggestion);
 
 std::string queryLayerName(QWidget *parent, const std::string &suggestion);
 
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

@@ -57,15 +57,15 @@ class ScaleObjectsToolPage;
  */
 class BBoxSide {
 public:
-  vm::vec3 normal;
+    vm::vec3 normal;
 
-  static bool validSideNormal(const vm::vec3 &n);
+    static bool validSideNormal(const vm::vec3 &n);
 
-  explicit BBoxSide(const vm::vec3 &n);
+    explicit BBoxSide(const vm::vec3 &n);
 
-  bool operator<(const BBoxSide &other) const;
+    bool operator<(const BBoxSide &other) const;
 
-  bool operator==(const BBoxSide &other) const;
+    bool operator==(const BBoxSide &other) const;
 };
 
 
@@ -75,13 +75,13 @@ public:
  */
 class BBoxCorner {
 public:
-  vm::vec3 corner;
+    vm::vec3 corner;
 
-  static bool validCorner(const vm::vec3 &c);
+    static bool validCorner(const vm::vec3 &c);
 
-  explicit BBoxCorner(const vm::vec3 &c);
+    explicit BBoxCorner(const vm::vec3 &c);
 
-  bool operator==(const BBoxCorner &other) const;
+    bool operator==(const BBoxCorner &other) const;
 };
 
 
@@ -91,17 +91,18 @@ public:
  */
 class BBoxEdge {
 public:
-  vm::vec3 point0;
-  vm::vec3 point1;
+    vm::vec3 point0;
+    vm::vec3 point1;
 
-  explicit BBoxEdge(const vm::vec3 &p0, const vm::vec3 &p1);
+    explicit BBoxEdge(const vm::vec3 &p0, const vm::vec3 &p1);
 
-  bool operator==(const BBoxEdge &other) const;
+    bool operator==(const BBoxEdge &other) const;
 };
 
 
 enum class AnchorPos {
-  Opposite, Center
+    Opposite,
+    Center
 };
 
 
@@ -111,24 +112,24 @@ enum class AnchorPos {
  */
 class ProportionalAxes {
 private:
-  std::bitset<3> m_bits;
+    std::bitset<3> m_bits;
 
 public:
-  ProportionalAxes(bool xProportional, bool yProportional, bool zProportional);
+    ProportionalAxes(bool xProportional, bool yProportional, bool zProportional);
 
-  static ProportionalAxes All();
+    static ProportionalAxes All();
 
-  static ProportionalAxes None();
+    static ProportionalAxes None();
 
-  void setAxisProportional(size_t axis, bool proportional);
+    void setAxisProportional(size_t axis, bool proportional);
 
-  bool isAxisProportional(size_t axis) const;
+    bool isAxisProportional(size_t axis) const;
 
-  bool allAxesProportional() const;
+    bool allAxesProportional() const;
 
-  bool operator==(const ProportionalAxes &other) const;
+    bool operator==(const ProportionalAxes &other) const;
 
-  bool operator!=(const ProportionalAxes &other) const;
+    bool operator!=(const ProportionalAxes &other) const;
 };
 
 
@@ -200,12 +201,11 @@ vm::line3 handleLineForHit(const vm::bbox3 &bboxAtDragStart, const Model::Hit &h
  * side, edge, or corner handle was grabbed.
  */
 vm::bbox3 moveBBoxForHit(
-    const vm::bbox3 &bboxAtDragStart, const Model::Hit &dragStartHit, const vm::vec3 &delta, const ProportionalAxes &proportional, AnchorPos anchor
-);
+    const vm::bbox3 &bboxAtDragStart, const Model::Hit &dragStartHit, const vm::vec3 &delta, const ProportionalAxes &proportional, AnchorPos anchor);
 
 struct BackSide {
-  FloatType distAlongRay;
-  vm::vec3 pickedSideNormal;
+    FloatType distAlongRay;
+    vm::vec3 pickedSideNormal;
 };
 
 /**
@@ -223,90 +223,90 @@ BackSide pickBackSideOfBox(const vm::ray3 &pickRay, const Renderer::Camera &came
 
 class ScaleObjectsTool : public Tool {
 public:
-  static const Model::HitType::Type ScaleToolSideHitType;
-  static const Model::HitType::Type ScaleToolEdgeHitType;
-  static const Model::HitType::Type ScaleToolCornerHitType;
+    static const Model::HitType::Type ScaleToolSideHitType;
+    static const Model::HitType::Type ScaleToolEdgeHitType;
+    static const Model::HitType::Type ScaleToolCornerHitType;
 
 private:
-  std::weak_ptr<MapDocument> m_document;
-  ScaleObjectsToolPage *m_toolPage;
-  bool m_resizing;
-  AnchorPos m_anchorPos;
-  vm::bbox3 m_bboxAtDragStart;
-  Model::Hit m_dragStartHit; // contains the drag type (side/edge/corner)
-  vm::vec3 m_dragCumulativeDelta;
-  ProportionalAxes m_proportionalAxes;
+    std::weak_ptr<MapDocument> m_document;
+    ScaleObjectsToolPage *m_toolPage;
+    bool m_resizing;
+    AnchorPos m_anchorPos;
+    vm::bbox3 m_bboxAtDragStart;
+    Model::Hit m_dragStartHit;// contains the drag type (side/edge/corner)
+    vm::vec3 m_dragCumulativeDelta;
+    ProportionalAxes m_proportionalAxes;
 
 public:
-  explicit ScaleObjectsTool(std::weak_ptr<MapDocument> document);
+    explicit ScaleObjectsTool(std::weak_ptr<MapDocument> document);
 
-  ~ScaleObjectsTool() override;
+    ~ScaleObjectsTool() override;
 
-  bool doActivate() override;
+    bool doActivate() override;
 
-  const Grid &grid() const;
+    const Grid &grid() const;
 
-  const Model::Hit &dragStartHit() const;
+    const Model::Hit &dragStartHit() const;
 
-  bool applies() const;
+    bool applies() const;
 
-  void pickBackSides(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
+    void pickBackSides(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
-  void pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
+    void pick2D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
-  void pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
-
-public:
-  vm::bbox3 bounds() const;
+    void pick3D(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
 
 public:
-  std::vector<vm::polygon3f> polygonsHighlightedByDrag() const;
+    vm::bbox3 bounds() const;
 
-  bool hasDragSide() const;
+public:
+    std::vector<vm::polygon3f> polygonsHighlightedByDrag() const;
 
-  vm::polygon3f dragSide() const;
+    bool hasDragSide() const;
 
-  bool hasDragEdge() const;
+    vm::polygon3f dragSide() const;
 
-  vm::segment3f dragEdge() const;
+    bool hasDragEdge() const;
 
-  bool hasDragCorner() const;
+    vm::segment3f dragEdge() const;
 
-  vm::vec3f dragCorner() const;
+    bool hasDragCorner() const;
 
-  bool hasDragAnchor() const;
+    vm::vec3f dragCorner() const;
 
-  vm::vec3f dragAnchor() const;
+    bool hasDragAnchor() const;
 
-  /**
+    vm::vec3f dragAnchor() const;
+
+    /**
    * Returns the bbox at the start of the drag. Only allowed to call while m_resizing is
    * true.
    */
-  vm::bbox3 bboxAtDragStart() const;
+    vm::bbox3 bboxAtDragStart() const;
 
-  std::vector<vm::vec3> cornerHandles() const;
+    std::vector<vm::vec3> cornerHandles() const;
 
-  void updatePickedHandle(const Model::PickResult &pickResult);
+    void updatePickedHandle(const Model::PickResult &pickResult);
 
-  void setAnchorPos(AnchorPos pos);
+    void setAnchorPos(AnchorPos pos);
 
-  AnchorPos anchorPos() const;
+    AnchorPos anchorPos() const;
 
-  void setProportionalAxes(const ProportionalAxes &proportionalAxes);
+    void setProportionalAxes(const ProportionalAxes &proportionalAxes);
 
-  const ProportionalAxes &proportionalAxes() const;
+    const ProportionalAxes &proportionalAxes() const;
 
 public:
-  void startScaleWithHit(const Model::Hit &hit);
+    void startScaleWithHit(const Model::Hit &hit);
 
-  void scaleByDelta(const vm::vec3 &delta);
+    void scaleByDelta(const vm::vec3 &delta);
 
-  void commitScale();
+    void commitScale();
 
-  void cancelScale();
+    void cancelScale();
 
 private:
-  QWidget *doCreatePage(QWidget *parent) override;
+    QWidget *doCreatePage(QWidget *parent) override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

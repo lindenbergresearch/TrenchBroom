@@ -8,4 +8,4 @@ if (COMPILER_IS_MSVC)
     target_include_directories(stackwalker
             SYSTEM INTERFACE ${LIB_STACKWALKER_INCLUDE_DIR}
             PRIVATE ${LIB_STACKWALKER_INCLUDE_DIR})
-endif()
+endif ()

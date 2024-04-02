@@ -37,20 +37,20 @@ class UVViewHelper;
 
 class UVOffsetTool : public ToolController, public Tool {
 private:
-  std::weak_ptr<MapDocument> m_document;
-  const UVViewHelper &m_helper;
+    std::weak_ptr<MapDocument> m_document;
+    const UVViewHelper &m_helper;
 
 public:
-  UVOffsetTool(std::weak_ptr<MapDocument> document, const UVViewHelper &helper);
+    UVOffsetTool(std::weak_ptr<MapDocument> document, const UVViewHelper &helper);
 
 private:
-  Tool &tool() override;
+    Tool &tool() override;
 
-  const Tool &tool() const override;
+    const Tool &tool() const override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  bool cancel() override;
+    bool cancel() override;
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

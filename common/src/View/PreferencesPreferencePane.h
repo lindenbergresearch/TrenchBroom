@@ -17,29 +17,29 @@ class ColorModel;
 
 
 class PreferencesPreferencePane : public PreferencePane {
-Q_OBJECT
+    Q_OBJECT
 private:
-  QTableView *m_table;
-  PreferenceModel *m_model;
-  QSortFilterProxyModel *m_proxy;
-  QLabel *infoLabel;
-  QPushButton *restoreDefaultButton;
-  QPushButton *setValueButton;
+    QTableView *m_table;
+    PreferenceModel *m_model;
+    QSortFilterProxyModel *m_proxy;
+    QLabel *infoLabel;
+    QPushButton *restoreDefaultButton;
+    QPushButton *setValueButton;
 
 public:
-  explicit PreferencesPreferencePane(QWidget *parent = nullptr);
+    explicit PreferencesPreferencePane(QWidget *parent = nullptr);
 
 private:
-  bool doCanResetToDefaults() override;
+    bool doCanResetToDefaults() override;
 
-  void doResetToDefaults() override;
+    void doResetToDefaults() override;
 
-  void doUpdateControls() override;
+    void doUpdateControls() override;
 
-  bool doValidate() override;
+    bool doValidate() override;
 
-  void updateLabel();
+    void updateLabel();
 
-  QHBoxLayout *getControlButtonLayout();
+    QHBoxLayout *getControlButtonLayout();
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

@@ -22,7 +22,10 @@
 namespace TrenchBroom {
 namespace View {
 enum class MapViewLayout {
-  OnePane, TwoPanes, ThreePanes, FourPanes
+    OnePane,
+    TwoPanes,
+    ThreePanes,
+    FourPanes
 };
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

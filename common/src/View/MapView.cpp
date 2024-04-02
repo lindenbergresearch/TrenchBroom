@@ -28,60 +28,60 @@ namespace TrenchBroom::View {
 MapView::~MapView() = default;
 
 void MapView::setContainer(MapViewContainer *container) {
-  m_container = container;
+    m_container = container;
 }
 
 void MapView::installActivationTracker(MapViewActivationTracker &activationTracker) {
-  doInstallActivationTracker(activationTracker);
+    doInstallActivationTracker(activationTracker);
 }
 
 bool MapView::isCurrent() const {
-  return doGetIsCurrent();
+    return doGetIsCurrent();
 }
 
 MapViewBase *MapView::firstMapViewBase() {
-  return doGetFirstMapViewBase();
+    return doGetFirstMapViewBase();
 }
 
 bool MapView::canSelectTall() {
-  return doCanSelectTall();
+    return doCanSelectTall();
 }
 
 void MapView::selectTall() {
-  doSelectTall();
+    doSelectTall();
 }
 
 vm::vec3 MapView::pasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
-  return doGetPasteObjectsDelta(bounds, referenceBounds);
+    return doGetPasteObjectsDelta(bounds, referenceBounds);
 }
 
 void MapView::reset2dCameras(const Renderer::Camera &masterCamera, const bool animate) {
-  doReset2dCameras(masterCamera, animate);
+    doReset2dCameras(masterCamera, animate);
 }
 
 void MapView::focusCameraOnSelection(const bool animate) {
-  doFocusCameraOnSelection(animate);
+    doFocusCameraOnSelection(animate);
 }
 
 void MapView::moveCameraToPosition(const vm::vec3f &position, const bool animate) {
-  doMoveCameraToPosition(position, animate);
+    doMoveCameraToPosition(position, animate);
 }
 
 void MapView::moveCameraToCurrentTracePoint() {
-  doMoveCameraToCurrentTracePoint();
+    doMoveCameraToCurrentTracePoint();
 }
 
 bool MapView::cancelMouseDrag() {
-  return doCancelMouseDrag();
+    return doCancelMouseDrag();
 }
 
 void MapView::cycleMapView() {
-  if (m_container != nullptr) {
-    m_container->cycleChildMapView(this);
-  }
+    if (m_container != nullptr) {
+        m_container->cycleChildMapView(this);
+    }
 }
 
 void MapView::refreshViews() {
-  doRefreshViews();
+    doRefreshViews();
 }
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

@@ -24,7 +24,7 @@ namespace View {
 ViewEffectsService::~ViewEffectsService() {}
 
 void ViewEffectsService::flashSelection() {
-  doFlashSelection();
+    doFlashSelection();
 }
-} // namespace View
-} // namespace TrenchBroom
+}// namespace View
+}// namespace TrenchBroom

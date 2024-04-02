@@ -50,4 +50,4 @@ void setPortable();
 void setPortable(bool newState);
 
 bool isPortable();
-} // namespace TrenchBroom::IO::SystemPaths
+}// namespace TrenchBroom::IO::SystemPaths

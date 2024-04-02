@@ -46,23 +46,22 @@ class MapViewToolBox;
 
 class OnePaneMapView : public MultiPaneMapView {
 private:
-  Logger *m_logger;
-  std::weak_ptr<MapDocument> m_document;
+    Logger *m_logger;
+    std::weak_ptr<MapDocument> m_document;
 
-  CyclingMapView *m_mapView = nullptr;
+    CyclingMapView *m_mapView = nullptr;
 
 public:
-  explicit OnePaneMapView(
-      std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger,
-      QWidget *parent = nullptr
-  );
+    explicit OnePaneMapView(
+        std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger,
+        QWidget *parent = nullptr);
 
 private:
-  void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager);
+    void createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager);
 
-private: // implement MultiPaneMapView subclassing interface
-  void doMaximizeView(MapView *view) override;
+private:// implement MultiPaneMapView subclassing interface
+    void doMaximizeView(MapView *view) override;
 
-  void doRestoreViews() override;
+    void doRestoreViews() override;
 };
-} // namespace TrenchBroom::View
+}// namespace TrenchBroom::View

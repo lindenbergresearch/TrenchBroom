@@ -34,16 +34,16 @@ namespace TrenchBroom {
 namespace IO {
 class GameEngineConfigParser : public ConfigParserBase {
 public:
-  GameEngineConfigParser(std::string_view str, std::filesystem::path path);
+    GameEngineConfigParser(std::string_view str, std::filesystem::path path);
 
-  Model::GameEngineConfig parse();
+    Model::GameEngineConfig parse();
 
 private:
-  std::vector<Model::GameEngineProfile> parseProfiles(const EL::Value &value) const;
+    std::vector<Model::GameEngineProfile> parseProfiles(const EL::Value &value) const;
 
-  Model::GameEngineProfile parseProfile(const EL::Value &value) const;
+    Model::GameEngineProfile parseProfile(const EL::Value &value) const;
 
-deleteCopyAndMove(GameEngineConfigParser);
+    deleteCopyAndMove(GameEngineConfigParser);
 };
-} // namespace IO
-} // namespace TrenchBroom
+}// namespace IO
+}// namespace TrenchBroom
