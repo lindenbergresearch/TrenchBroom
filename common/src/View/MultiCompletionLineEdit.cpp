@@ -27,6 +27,8 @@
 #include <QShortcut>
 #include <QtGlobal>
 
+#include "view/QtUtils.h"
+
 namespace TrenchBroom {
 namespace View {
 MultiCompletionLineEdit::MultiCompletionLineEdit(QWidget *parent) : MultiCompletionLineEdit(QString(), parent) {
@@ -65,8 +67,7 @@ void MultiCompletionLineEdit::setMultiCompleter(QCompleter *completer) {
     m_multiCompleter = completer;
     if (m_multiCompleter != nullptr) {
         m_multiCompleter->setWidget(this);
-        connect(
-            m_multiCompleter, QOverload<const QString &>::of(&QCompleter::activated), this, &MultiCompletionLineEdit::insertCompletion);
+        connect(m_multiCompleter, QOverload<const QString &>::of(&QCompleter::activated), this, &MultiCompletionLineEdit::insertCompletion);
     }
 }
 
@@ -100,8 +101,8 @@ void MultiCompletionLineEdit::updateCompleter(const bool showCompleter) {
 
     if (showCompleter) {
         QRect cr = cursorRect();
-        cr.setWidth(
-            m_multiCompleter->popup()->sizeHintForColumn(0) + m_multiCompleter->popup()->verticalScrollBar()->sizeHint().width());
+        makeMono(m_multiCompleter->popup(), font().pointSize());
+        cr.setWidth(m_multiCompleter->popup()->sizeHintForColumn(0) + m_multiCompleter->popup()->verticalScrollBar()->sizeHint().width());
         m_multiCompleter->complete(cr);
     }
 }
