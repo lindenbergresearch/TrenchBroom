@@ -474,3 +474,15 @@ QPushButton:selected {
     border: 2px solid $HIGHLIGHT_COLOR$;
     color: $TEXT_COLOR$;
 }
+
+
+QWidget#ControlListBoxItem {
+    border: none;
+    background: transparent;
+}
+
+QWidget#ControlListBoxItemSelected {
+    border: 6px solid #7e56c2;
+    color: #0000DD;
+    background: #00A000;
+}

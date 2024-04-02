@@ -66,6 +66,17 @@ void ControlListBoxItemRenderer::setSelected(const bool selected, const QListWid
       continue;
     }
   }
+
+//  setBackgroundRole(selected ? QPalette::Highlight : QPalette::Base);
+//
+//  // by default, we just change the appearance of all labels
+//  auto children = findChildren<QLabel *>();
+//  for (auto *child : children) {
+//    const auto dontUpdate = child->property(ControlListBox::LabelColorShouldNotUpdateWhenSelected);
+//    if (dontUpdate.isValid() && dontUpdate.canConvert(QMetaType::Bool) && dontUpdate.toBool()) {
+//      continue;
+//    }
+//  }
 }
 
 // ControlListBoxItemRendererWrapper
@@ -104,9 +115,11 @@ ControlListBox::ControlListBox(const QString &emptyText, const QMargins &itemMar
   m_listWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
   // m_listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  connect(
-      m_listWidget, &QListWidget::itemSelectionChanged, this, &ControlListBox::listItemSelectionChanged
-  );
+
+  connect(m_listWidget, &QListWidget::itemSelectionChanged, this, &ControlListBox::listItemSelectionChanged);
+
+  m_listWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(m_listWidget, &QWidget::customContextMenuRequested, this, &ControlListBox::contextMenuRequested);
 
   m_emptyTextLabel->setWordWrap(true);
   m_emptyTextLabel->setDisabled(true);
@@ -163,8 +176,7 @@ void ControlListBox::reload() {
   // This was causing a crash in LayerListBox's selectedRowChanged() override
   // if you clicked on a layer and then opened a new map on Windows.
   // As a workaround, unset the current row before clearing the list.
-  m_listWidget->setCurrentRow(- 1);
-
+  m_listWidget->setCurrentRow(-1);
   m_listWidget->clear();
 
   const auto count = itemCount();
@@ -264,11 +276,28 @@ void ControlListBox::listItemSelectionChanged() {
     }
   }
 
-  if (! wasAnyRowSelected) {
-    selectedRowChanged(- 1);
+  if (!wasAnyRowSelected) {
+    selectedRowChanged(-1);
   }
 
   emit itemSelectionChanged();
+}
+
+void ControlListBox::contextMenuRequested(const QPoint &pos) {
+
+}
+
+bool ControlListBox::isMultiSelection() const {
+  return m_multiSelection;
+}
+
+void ControlListBox::setMultiSelection(bool MMultiSelection) {
+  m_multiSelection = MMultiSelection;
+  if(m_multiSelection) {
+    m_listWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  } else {
+    m_listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+  }
 }
 } // namespace View
 } // namespace TrenchBroom

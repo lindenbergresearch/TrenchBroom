@@ -24,6 +24,9 @@
 #include "View/TabBook.h"
 #include "View/LayerEditor.h"
 #include "View/MapSearchListBox.h"
+#include "View/TitledPanel.h"
+#include "View/MapView.h"
+#include "View/Inspector.h"
 
 #include <memory>
 #include <optional>
@@ -60,23 +63,27 @@ class MapDocument;
 class MapInspector : public TabBookPage {
 Q_OBJECT
 private:
-  CollapsibleTitledPanel *m_mapPropertiesEditor;
-  CollapsibleTitledPanel *m_modEditor;
+  CollapsibleTitledPanel *m_mapPropertiesEditorPanel;
+  CollapsibleTitledPanel *m_modEditorPanel;
+  CollapsibleTitledPanel *m_mapSearchPanel;
+  TitledPanel *m_layerEditorPanel;
+
   QSplitter *m_splitter;
   LayerEditor *m_layerEditor;
   MapSearchListBox *m_mapSearchListBox;
   QLineEdit *m_searchBoxEdit;
-  QPushButton *m_searchButton;
+  MapView *m_mapView;
+  Inspector *m_inspector;
 
 public:
-  explicit MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit MapInspector(std::weak_ptr<MapDocument> document,MapView *mapView, Inspector *inspector, QWidget *parent = nullptr);
 
   ~MapInspector();
 
 private:
   void createGui(std::weak_ptr<MapDocument> document);
 
-  QWidget *createLayerEditor(std::weak_ptr<MapDocument> document);
+  TitledPanel *createLayerEditor(std::weak_ptr<MapDocument> document);
 
   CollapsibleTitledPanel *createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
 

@@ -39,7 +39,7 @@ Inspector::Inspector(std::weak_ptr<MapDocument> document, GLContextManager &cont
   setObjectName("Inspector_Widget");
 
   m_tabs = new QTabWidget(this);
-  m_mapInspector = new MapInspector(document, mapView);
+  m_mapInspector = new MapInspector(document, mapView, this);
   m_entityInspector = new EntityInspector(document, contextManager);
   m_faceInspector = new FaceInspector(document, contextManager);
 

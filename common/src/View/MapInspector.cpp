@@ -26,6 +26,7 @@
 #include <QRadioButton>
 
 #include "Model/EntityProperties.h"
+#include "Model/EntityNodeIndex.h"
 #include "Model/WorldNode.h"
 #include "View/BorderLine.h"
 #include "View/ClickableLabel.h"
@@ -36,8 +37,10 @@
 #include "View/QtUtils.h"
 #include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
+#include "View/MapView.h"
 #include "View/MapSearchListBox.h"
 #include "View/Splitter.h"
+#include "View/Inspector.h"
 #include "IO/ResourceUtils.h"
 
 #include <kdl/memory_utils.h>
@@ -51,45 +54,44 @@ namespace TrenchBroom {
 namespace View {
 // MapInspector
 
-MapInspector::MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent) : TabBookPage(parent), m_mapPropertiesEditor(nullptr), m_modEditor(nullptr) {
+MapInspector::MapInspector(std::weak_ptr<MapDocument> document,MapView *mapView, Inspector *inspector, QWidget *parent) :
+    TabBookPage(parent), m_mapPropertiesEditorPanel(nullptr), m_modEditorPanel(nullptr), m_mapView(mapView), m_inspector(inspector) {
   createGui(document);
   setObjectName("MapInspector_Widget");
 }
 
 MapInspector::~MapInspector() {
-  saveWindowState(m_mapPropertiesEditor);
-  saveWindowState(m_modEditor);
+  saveWindowState(m_mapPropertiesEditorPanel);
+  saveWindowState(m_modEditorPanel);
+  saveWindowState(m_mapSearchPanel);
 }
 
 void MapInspector::createGui(std::weak_ptr<MapDocument> document) {
-  m_mapPropertiesEditor = createMapPropertiesEditor(document);
-  m_modEditor = createModEditor(document);
-  auto layerEditor = createLayerEditor(document);
-  auto mapSearchListBox = createSearchList(document);
+  m_mapPropertiesEditorPanel = createMapPropertiesEditor(document);
+  m_modEditorPanel = createModEditor(document);
+  m_layerEditorPanel = createLayerEditor(document);
+  m_mapSearchPanel = createSearchList(document);
 
   m_splitter = new Splitter(Qt::Vertical);
   m_splitter->setObjectName("MapProperties_Splitter");
 
-  m_splitter->addWidget(layerEditor);
-  m_splitter->addWidget(mapSearchListBox);
+  m_splitter->addWidget(m_layerEditorPanel);
+  m_splitter->addWidget(m_mapSearchPanel);
 
-  // when the window resizes, keep the attribute editor size constant
-  m_splitter->setStretchFactor(0, 0);
-  m_splitter->setStretchFactor(1, 1);
-
-  layerEditor->setMinimumSize(100, 150);
-  mapSearchListBox->setMinimumSize(100, 150);
+  m_layerEditorPanel->setMinimumSize(100, 150);
+  m_mapSearchPanel->setMinimumSize(100, 150);
 
   auto *sizer = new QVBoxLayout();
   sizer->setContentsMargins(0, 0, 0, 0);
   sizer->setSpacing(LayoutConstants::NarrowVMargin);
   sizer->addWidget(m_splitter, 1);
-  sizer->addWidget(m_mapPropertiesEditor, 0);
-  sizer->addWidget(m_modEditor, 0);
+  sizer->addWidget(m_mapPropertiesEditorPanel, 0);
+  sizer->addWidget(m_modEditorPanel, 0);
+
   setLayout(sizer);
 }
 
-QWidget *MapInspector::createLayerEditor(std::weak_ptr<MapDocument> document) {
+TitledPanel *MapInspector::createLayerEditor(std::weak_ptr<MapDocument> document) {
   TitledPanel *titledPanel = new TitledPanel(tr("Layers"));
   m_layerEditor = new LayerEditor(document);
 
@@ -137,21 +139,19 @@ CollapsibleTitledPanel *MapInspector::createSearchList(std::weak_ptr<MapDocument
   CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Search"));
   titledPanel->setObjectName("MapInspector_SearchBoxPanel");
 
-  m_mapSearchListBox = new MapSearchListBox(document);
-
-  auto *v_layout = new QVBoxLayout();
-
+  m_mapSearchListBox = new MapSearchListBox(document, m_mapView, m_inspector);
+  auto *layout = new QVBoxLayout();
   m_searchBoxEdit = createSearchBox();
-  m_searchButton = new QPushButton{tr("Group")};
 
-  auto *h_layout = new QHBoxLayout();
-  h_layout->addWidget(m_searchBoxEdit);
-  h_layout->addWidget(m_searchButton);
+  connect(m_searchBoxEdit, &QLineEdit::textEdited, m_mapSearchListBox, &MapSearchListBox::triggerSearch);
 
-  v_layout->setContentsMargins(0, 0, 0, 0);
-  v_layout->addLayout(h_layout);
-  v_layout->addWidget(m_mapSearchListBox, 1);
-  titledPanel->getPanel()->setLayout(v_layout);
+  layout->setContentsMargins(
+      LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin
+  );
+
+  layout->addWidget(m_searchBoxEdit);
+  layout->addWidget(m_mapSearchListBox, 1);
+  titledPanel->getPanel()->setLayout(layout);
 
   restoreWindowState(titledPanel);
 
@@ -343,7 +343,7 @@ void MapPropertiesEditor::createGui() {
 QLineEdit *MapInspector::createSearchBox() {
   auto *widget = new QLineEdit{};
   widget->setClearButtonEnabled(true);
-  widget->setPlaceholderText(QLineEdit::tr("Search..."));
+  widget->setPlaceholderText(QLineEdit::tr("Search Entities"));
 
   const auto icon = IO::loadSVGIcon("Search.svg", 16);
   widget->addAction(icon, QLineEdit::LeadingPosition);

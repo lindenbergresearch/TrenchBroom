@@ -86,6 +86,7 @@ private:
   QLabel *m_emptyTextLabel;
   QMargins m_itemMargins;
   bool m_showSeparator;
+  bool m_multiSelection;
 
 public:
   ControlListBox(const QString &emptyText, const QMargins &itemMargins, bool showSeparator, QWidget *parent = nullptr);
@@ -101,6 +102,10 @@ public:
   int currentRow() const;
 
   void setCurrentRow(int currentRow);
+
+  bool isMultiSelection() const;
+
+  void setMultiSelection(bool MMultiSelection);
 
 protected:
   /**
@@ -137,6 +142,8 @@ private:
   virtual void selectedRowChanged(int index);
 
   virtual void doubleClicked(size_t index);
+
+  virtual void contextMenuRequested(const QPoint &pos);
 
 private slots:
 
