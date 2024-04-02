@@ -30,7 +30,10 @@ namespace TrenchBroom {
 namespace View {
 namespace Fonts {
 QFont fixedWidthFont() {
+    auto size = TrenchBroomApp::instance().getUIFont().pointSize();
     auto font = TrenchBroomApp::instance().getConsoleFont();
+    font.setPointSize(size);
+
     return font;
 }
 }// namespace Fonts
