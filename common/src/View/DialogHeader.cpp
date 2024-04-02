@@ -55,11 +55,10 @@ void DialogHeader::createGui() {
 
     m_iconLabel = new QLabel{};
     m_textLabel = new QLabel{};
-    makeHeader(m_textLabel);
+    makeBigger(makeTitle(m_textLabel), 3);
 
     auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(
-        LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin, LayoutConstants::WideHMargin, LayoutConstants::MediumVMargin);
+    layout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
     layout->setSpacing(LayoutConstants::MediumHMargin);
     layout->addWidget(m_iconLabel, 0, Qt::AlignLeft | Qt::AlignVCenter);
     layout->addWidget(m_textLabel, 1, Qt::AlignLeft | Qt::AlignVCenter);
