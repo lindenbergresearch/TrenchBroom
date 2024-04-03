@@ -208,9 +208,13 @@ int getCommonFieldHeight() {
     return fontsize + 2 * LayoutConstants::MediumVMargin;
 }
 
-QWidget *makeDefault(QWidget *widget) {
+QWidget *makeDefault(QWidget *widget, bool resetFont) {
     const auto &app = TrenchBroomApp::instance();
-    widget->setFont(QFont{});
+
+    if (resetFont) {
+        widget->setFont(QFont{});
+    }
+
     widget->setPalette(app.palette());
     return widget;
 }

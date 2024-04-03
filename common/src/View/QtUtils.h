@@ -233,7 +233,7 @@ void centerOnScreen(QWidget *window);
 
 int getCommonFieldHeight();
 
-QWidget *makeDefault(QWidget *widget);
+QWidget *makeDefault(QWidget *widget, bool resetFont = true);
 
 QWidget *makeEmphasized(QWidget *widget);
 
