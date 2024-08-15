@@ -185,6 +185,12 @@ QPushButton#TextureBrowser_smallPushButton {
     min-height: 18px;
 }
 
+QPushButton#LaunchGameEngineDialog_smallPushButton {
+    padding: 3px $MEDIUM_V_MARGIN$ 3px $MEDIUM_V_MARGIN$;
+    min-width: 40px;
+    min-height: 18px;
+}
+
 QPushButton#ViewEditor_smallPushButton {
     padding: 3px $MEDIUM_V_MARGIN$ 3px $MEDIUM_V_MARGIN$;
     min-width: 65px;
