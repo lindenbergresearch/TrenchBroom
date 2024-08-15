@@ -42,8 +42,7 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
     m_tabs->setTabPosition(QTabWidget::TabPosition::North);
 
     auto *sizer = new QVBoxLayout();
-    sizer->setContentsMargins(
-        0, LayoutConstants::MediumVMargin, 0, LayoutConstants::NoMargin);
+    sizer->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, LayoutConstants::NoMargin);
     sizer->addWidget(m_tabs);
     sizer->addWidget(new BorderLine());
     setLayout(sizer);
@@ -51,6 +50,13 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
 
 Console *InfoPanel::console() const {
     return m_console;
+}
+int InfoPanel::createDynamicTabPage(TextConsoleTabPage *page) {
+    if (page) {
+        return m_tabs->addTab(page, page->getCaption());
+    }
+
+    return -1;
 }
 }// namespace View
 }// namespace TrenchBroom

@@ -19,10 +19,13 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include <QTabWidget>
 #include <QWidget>
 
-#include <memory>
+#include "TextConsoleTabPage.h"
 
 namespace TrenchBroom {
 class Logger;
@@ -47,9 +50,12 @@ private:
     Console *m_console;
     QTabWidget *m_tabs;
     IssueBrowser *m_issueBrowser;
+    std::vector<TextConsoleTabPage *> dynamicPages;
 
 public:
     explicit InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+
+    int createDynamicTabPage(TextConsoleTabPage *page);
 
     Console *console() const;
 };

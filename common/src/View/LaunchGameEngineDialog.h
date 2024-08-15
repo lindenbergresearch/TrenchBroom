@@ -23,6 +23,7 @@
 
 #include "Model/GameEngineConfig.h"
 #include "View/CompilationVariables.h"
+#include "View/ElidedLabel.h"
 
 #include <memory>
 
@@ -36,8 +37,6 @@ struct GameEngineProfile;
 
 namespace View {
 class GameEngineProfileListBox;
-
-
 class MultiCompletionLineEdit;
 
 
@@ -54,8 +53,11 @@ private:
     GameEngineProfileListBox *m_gameEngineList{nullptr};
     MultiCompletionLineEdit *m_parameterText{nullptr};
     QPushButton *m_launchButton{nullptr};
+    QPushButton *m_testButton{nullptr};
     Model::GameEngineProfile *m_lastProfile{nullptr};
     Model::GameEngineConfig m_config;
+    ElidedLabel *m_commandLine;
+    bool m_dumpToConsole;
 
 public:
     explicit LaunchGameEngineDialog(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
@@ -64,6 +66,8 @@ private:
     void createGui();
 
     void reloadConfig();
+
+    void updateCommandLine();
 
     LaunchGameEngineVariables variables() const;
 
@@ -76,6 +80,8 @@ private slots:
     void editGameEngines();
 
     void launchEngine();
+
+    void testCommandLine();
 
 public slots:// QDialog overrides
     void done(int r) override;
