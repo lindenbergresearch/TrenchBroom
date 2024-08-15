@@ -485,6 +485,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/ViewUtils.cpp
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.cpp
         ${COMMON_SOURCE_DIR}/View/MapSearchListBox.cpp
+        ${COMMON_SOURCE_DIR}/View/TextConsoleTabPage.cpp
 )
 
 set(COMMON_HEADER
