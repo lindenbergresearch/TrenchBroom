@@ -27,8 +27,10 @@
 #include <functional>
 #include <memory>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class VertexArray;
 
 
@@ -38,9 +40,11 @@ class VertexArray;
  * offset and a length. When rendered using a vertex array, each of the ranges is rendered
  * using the vertices in the array at the range recorded here.
  */
-class IndexRangeMap {
+class IndexRangeMap
+{
 private:
-  struct IndicesAndCounts {
+  struct IndicesAndCounts
+  {
     /**
      * The offsets of the ranges stored here.
      */
@@ -62,7 +66,7 @@ private:
 
     void add(PrimType primType, size_t index, size_t count, bool dynamicGrowth);
 
-    void add(const IndicesAndCounts &other, bool dynamicGrowth);
+    void add(const IndicesAndCounts& other, bool dynamicGrowth);
   };
 
   using PrimTypeToIndexData = kdl::enum_array<IndicesAndCounts, PrimType, PrimTypeCount>;
@@ -77,7 +81,8 @@ public:
    * To record the correct sizes, call the inc method with the same parameters for every
    * expected call to the add method of the index range map itself.
    */
-  class Size {
+  class Size
+  {
   private:
     friend class IndexRangeMap;
 
@@ -92,10 +97,10 @@ public:
      *
      * @param other the size to increase by
      */
-    void inc(const Size &other);
+    void inc(const Size& other);
 
   private:
-    void initialize(PrimTypeToIndexData &data) const;
+    void initialize(PrimTypeToIndexData& data) const;
   };
 
 private:
@@ -115,7 +120,7 @@ public:
    *
    * @param size the sizes to initialize this range map to
    */
-  explicit IndexRangeMap(const Size &size);
+  explicit IndexRangeMap(const Size& size);
 
   /**
    * Creates a new index range map containing a single range of the given primitive type,
@@ -149,7 +154,7 @@ public:
    *
    * @param other the index range map to add
    */
-  void add(const IndexRangeMap &other);
+  void add(const IndexRangeMap& other);
 
   /**
    * Renders the primitives stored in this index range map using the vertices in the given
@@ -157,14 +162,15 @@ public:
    *
    * @param vertexArray the vertex array to render with
    */
-  void render(VertexArray &vertexArray) const;
+  void render(VertexArray& vertexArray) const;
 
   /**
    * Invokes the given function for each primitive stored in this map.
    *
    * @param func the function to invoke
    */
-  void forEachPrimitive(std::function<void(PrimType, size_t index, size_t count)> func) const;
+  void forEachPrimitive(
+    std::function<void(PrimType, size_t index, size_t count)> func) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

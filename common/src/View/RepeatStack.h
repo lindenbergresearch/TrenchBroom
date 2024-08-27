@@ -22,8 +22,10 @@
 #include <functional>
 #include <vector>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 /**
  * A stack of actions (C++ callables) that can be repeatedly executed as a whole.
  *
@@ -34,33 +36,34 @@ namespace View {
  * The stack can be cleared immediately or it can be primed to be cleared automatically
  * when the next action is pushed to the stack.
  */
-class RepeatStack {
+class RepeatStack
+{
 public:
-    using RepeatableAction = std::function<void()>;
-    using Transaction = std::vector<RepeatableAction>;
+  using RepeatableAction = std::function<void()>;
+  using Transaction = std::vector<RepeatableAction>;
 
 private:
-    std::vector<RepeatableAction> m_stack;
-    /**
+  std::vector<RepeatableAction> m_stack;
+  /**
    * If nonempty, the last element is the currently open transaction.
    */
-    std::vector<Transaction> m_openTransactionsStack;
-    bool m_clearOnNextPush;
-    mutable bool m_repeating;
+  std::vector<Transaction> m_openTransactionsStack;
+  bool m_clearOnNextPush;
+  mutable bool m_repeating;
 
 public:
-    /**
+  /**
    * Creates a new instance.
    */
-    RepeatStack();
+  RepeatStack();
 
-    /**
+  /**
    * Returns the number of repeatable actions on this repeat stack.
    * Doesn't count open transactions.
    */
-    size_t size() const;
+  size_t size() const;
 
-    /**
+  /**
    * Adds the given repeatable action to this repeat stack.
    *
    * If a transaction is open, the action is added to the transaction.
@@ -71,9 +74,9 @@ public:
    *
    * @param repeatableAction the action to add
    */
-    void push(RepeatableAction repeatableAction);
+  void push(RepeatableAction repeatableAction);
 
-    /**
+  /**
    * Repeats the actions on this stack in the order in which they were added.
    *
    * No new actions will be added to the stack while it is repeating, so the list of
@@ -81,18 +84,18 @@ public:
    *
    * Has no effect if any transaction is currently open.
    */
-    void repeat() const;
+  void repeat() const;
 
-    /**
+  /**
    * Clears all repeatable actions on this stack.
    *
    * The stack must not be repeating actions when this function is called.
    *
    * Has no effect if any transaction is currently open.
    */
-    void clear();
+  void clear();
 
-    /**
+  /**
    * Prime the stack so that it is cleared when the next action is pushed
    * (to the main stack, not to an open transaction).
    *
@@ -102,10 +105,10 @@ public:
    *
    * Has no effect if any transaction is currently open.
    */
-    void clearOnNextPush();
+  void clearOnNextPush();
 
-public:// transactions
-    /**
+public: // transactions
+  /**
    * Start a transaction (pushes an open transaction onto the transactions stack.)
    *
    * The main use of transactions is you can call rollbackTransaction()
@@ -113,25 +116,25 @@ public:// transactions
    *
    * Has no effect if we are currently repeating actions.
    */
-    void startTransaction();
+  void startTransaction();
 
-    /**
+  /**
    * Closes the currently open transaction. If there is a parent transaction,
    * pushes it to the end of that transaction, which becomes the new currently open
    * transaction, otherwise pushes it to the end of the main action stack.
    *
    * Has no effect if we are currently repeating actions.
    */
-    void commitTransaction();
+  void commitTransaction();
 
-    /**
+  /**
    * Clear all repeatable actions/transactions in the currently open transaction.
    * The transaction remains open, i.e. you still need to call commitTransaction()
    * or can push more actions.
    *
    * Has no effect if we are currently repeating actions.
    */
-    void rollbackTransaction();
+  void rollbackTransaction();
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

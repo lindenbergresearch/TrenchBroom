@@ -26,7 +26,8 @@
 
 #include <ostream>
 
-namespace vm {
+namespace vm
+{
 /**
  * Prints a textual representation of the given ray on the given stream.
  *
@@ -36,9 +37,10 @@ namespace vm {
  * @param ray the ray to print
  * @return the given stream
  */
-template<typename T, size_t S>
-std::ostream &operator<<(std::ostream &stream, const ray<T, S> &ray) {
-    stream << "{ origin: (" << ray.origin << "), direction: (" << ray.direction << ") }";
-    return stream;
+template <typename T, size_t S>
+std::ostream& operator<<(std::ostream& stream, const ray<T, S>& ray)
+{
+  stream << "{ origin: (" << ray.origin << "), direction: (" << ray.direction << ") }";
+  return stream;
 }
-}// namespace vm
+} // namespace vm

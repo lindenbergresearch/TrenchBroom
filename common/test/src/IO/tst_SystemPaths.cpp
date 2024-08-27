@@ -22,38 +22,47 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("Portable flag begins false") {
-CHECK (SystemPaths::isPortable()
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("Portable flag begins false")
+{
+  CHECK(
+    SystemPaths::isPortable()
 
-== false);
+    == false);
 }
 
-TEST_CASE("Portable flag is changed by setPortable") {
-CHECK (SystemPaths::isPortable()
+TEST_CASE("Portable flag is changed by setPortable")
+{
+  CHECK(
+    SystemPaths::isPortable()
 
-== false);
+    == false);
 
-SystemPaths::setPortable();
+  SystemPaths::setPortable();
 
-CHECK (SystemPaths::isPortable()
+  CHECK(
+    SystemPaths::isPortable()
 
-== true);
-// cleanup
-SystemPaths::setPortable(false);
+    == true);
+  // cleanup
+  SystemPaths::setPortable(false);
 }
 
 TEST_CASE("userDataDirectory is changed by setPortable")
 {
-auto initialDataDir = SystemPaths::userDataDirectory().string();
+  auto initialDataDir = SystemPaths::userDataDirectory().string();
 
-SystemPaths::setPortable();
+  SystemPaths::setPortable();
 
-CHECK (SystemPaths::userDataDirectory()
+  CHECK(
+    SystemPaths::userDataDirectory()
 
-!= initialDataDir);
-// cleanup
-SystemPaths::setPortable(false);
-}} // namespace IO
+    != initialDataDir);
+  // cleanup
+  SystemPaths::setPortable(false);
+}
+} // namespace IO
 } // namespace TrenchBroom

@@ -27,15 +27,18 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Preferences {
+namespace TrenchBroom
+{
+namespace Preferences
+{
 // NOTE: any QKeySequence preferences must be functions like CameraFly*
 // because QKeySequence docs specify that you can't create an instance before QApplication
 
 // NOTE: When adding a new preference here, always update the staticPreferences()
 // implementation
 
-enum LengthUnitDisplay {
+enum LengthUnitDisplay
+{
   Units,   /* common units used by Quake (standard) */
   Metric,  /* metric system used for interfacing 3rd party systems and engines */
   Combined /* combined */
@@ -69,7 +72,7 @@ extern Preference<Color> XAxisColor;
 extern Preference<Color> YAxisColor;
 extern Preference<Color> ZAxisColor;
 
-Preference<Color> &axisColor(vm::axis::type axis);
+Preference<Color>& axisColor(vm::axis::type axis);
 
 /* --- UNITS CONVERSATION ---------------------------- */
 extern Preference<int> LengthUnitSystem;
@@ -228,17 +231,17 @@ extern Preference<bool> Link2DCameras;
 static constexpr auto MinCameraFlyMoveSpeed = 0.1f;
 static constexpr auto MaxCameraFlyMoveSpeed = 10.0f;
 
-extern Preference<QKeySequence> &CameraFlyForward();
+extern Preference<QKeySequence>& CameraFlyForward();
 
-extern Preference<QKeySequence> &CameraFlyBackward();
+extern Preference<QKeySequence>& CameraFlyBackward();
 
-extern Preference<QKeySequence> &CameraFlyLeft();
+extern Preference<QKeySequence>& CameraFlyLeft();
 
-extern Preference<QKeySequence> &CameraFlyRight();
+extern Preference<QKeySequence>& CameraFlyRight();
 
-extern Preference<QKeySequence> &CameraFlyUp();
+extern Preference<QKeySequence>& CameraFlyUp();
 
-extern Preference<QKeySequence> &CameraFlyDown();
+extern Preference<QKeySequence>& CameraFlyDown();
 
 /* --- MAP VIEW--------------------------------------- */
 extern Preference<bool> ShowEntityClassnames;
@@ -300,15 +303,15 @@ extern Preference<QString> EntityLinkMode;
  * Returns all Preferences declared in this file. Needed for migrating preference formats
  * or if we wanted to do a Path to Preference lookup.
  */
-const std::vector<PreferenceBase *> &staticPreferences();
+const std::vector<PreferenceBase*>& staticPreferences();
 
-const std::map<std::filesystem::path, PreferenceBase *> &staticPreferencesMap();
+const std::map<std::filesystem::path, PreferenceBase*>& staticPreferencesMap();
 
 /**
  * Returns the subset of staticPreferences() that are key sequences, used by
  * dump-shortcuts.
  */
-std::vector<Preference<QKeySequence> *> keyPreferences();
+std::vector<Preference<QKeySequence>*> keyPreferences();
 
 extern DynamicPreferencePattern<QString> GamesPath;
 extern DynamicPreferencePattern<QString> GamesToolPath;
@@ -319,6 +322,6 @@ extern DynamicPreferencePattern<QKeySequence> TagsDisable;
 extern DynamicPreferencePattern<QKeySequence> FiltersEntitiesToggleVisible;
 extern DynamicPreferencePattern<QKeySequence> EntitiesCreate;
 
-const std::vector<DynamicPreferencePatternBase *> &dynaimcPreferencePatterns();
+const std::vector<DynamicPreferencePatternBase*>& dynaimcPreferencePatterns();
 } // namespace Preferences
 } // namespace TrenchBroom

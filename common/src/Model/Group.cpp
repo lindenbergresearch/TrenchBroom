@@ -23,30 +23,38 @@
 
 #include "vm/mat_io.h"
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
 kdl_reflect_impl(Group);
 
-Group::Group(std::string name) : m_name{std::move(name)} {
+Group::Group(std::string name)
+  : m_name{std::move(name)}
+{
 }
 
-const std::string &Group::name() const {
+const std::string& Group::name() const
+{
   return m_name;
 }
 
-void Group::setName(std::string name) {
+void Group::setName(std::string name)
+{
   m_name = std::move(name);
 }
 
-const vm::mat4x4 &Group::transformation() const {
+const vm::mat4x4& Group::transformation() const
+{
   return m_transformation;
 }
 
-void Group::setTransformation(const vm::mat4x4 &transformation) {
+void Group::setTransformation(const vm::mat4x4& transformation)
+{
   m_transformation = transformation;
 }
 
-void Group::transform(const vm::mat4x4 &transformation) {
+void Group::transform(const vm::mat4x4& transformation)
+{
   m_transformation = transformation * m_transformation;
 }
 

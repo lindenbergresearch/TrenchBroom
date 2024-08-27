@@ -29,8 +29,10 @@
 #include <iosfwd>
 #include <vector>
 
-namespace TrenchBroom::Model {
-class PointTrace {
+namespace TrenchBroom::Model
+{
+class PointTrace
+{
 private:
   std::vector<vm::vec3f> m_points;
   size_t m_current;
@@ -42,9 +44,9 @@ public:
 
   bool hasPreviousPoint() const;
 
-  const std::vector<vm::vec3f> &points() const;
+  const std::vector<vm::vec3f>& points() const;
 
-  const vm::vec3f &currentPoint() const;
+  const vm::vec3f& currentPoint() const;
 
   const vm::vec3f currentDirection() const;
 
@@ -56,5 +58,5 @@ public:
 };
 
 
-Result<PointTrace> loadPointFile(std::istream &stream);
+Result<PointTrace> loadPointFile(std::istream& stream);
 } // namespace TrenchBroom::Model

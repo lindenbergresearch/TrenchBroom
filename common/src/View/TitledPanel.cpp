@@ -25,34 +25,50 @@
 #include "View/TitleBar.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom {
-namespace View {
-TitledPanel::TitledPanel(const QString &title, QWidget *parent, bool boldTitle, bool subtitle, bool fillBackground) : QWidget(parent), m_titleBar(nullptr), m_panel(nullptr) {
-    m_titleBar = new TitleBar(title, boldTitle, subtitle);
-    m_panel = new QWidget();
+namespace TrenchBroom
+{
+namespace View
+{
+TitledPanel::TitledPanel(
+  const QString& title,
+  QWidget* parent,
+  bool boldTitle,
+  bool subtitle,
+  bool fillBackground)
+  : QWidget(parent)
+  , m_titleBar(nullptr)
+  , m_panel(nullptr)
+{
+  m_titleBar = new TitleBar(title, boldTitle, subtitle);
+  m_panel = new QWidget();
 
-    if (fillBackground) {
-        m_panel->setAutoFillBackground(true);
-        m_panel->setBackgroundRole(QPalette::Window);
-    }
+  if (fillBackground)
+  {
+    m_panel->setAutoFillBackground(true);
+    m_panel->setBackgroundRole(QPalette::Window);
+  }
 
-    auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(m_titleBar);
-    layout->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
-    setLayout(layout);
+  auto* layout = new QVBoxLayout();
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  layout->addWidget(m_titleBar);
+  layout->addWidget(m_panel, Qt::AlignmentFlag::AlignRight);
+  setLayout(layout);
 }
 
-TitledPanel::TitledPanel(const QString &title, const bool boldTitle, bool subtitle) : TitledPanel(title, nullptr, boldTitle, subtitle) {
+TitledPanel::TitledPanel(const QString& title, const bool boldTitle, bool subtitle)
+  : TitledPanel(title, nullptr, boldTitle, subtitle)
+{
 }
 
-TitleBar *TitledPanel::getTitleBar() const {
-    return m_titleBar;
+TitleBar* TitledPanel::getTitleBar() const
+{
+  return m_titleBar;
 }
 
-QWidget *TitledPanel::getPanel() const {
-    return m_panel;
+QWidget* TitledPanel::getPanel() const
+{
+  return m_panel;
 }
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

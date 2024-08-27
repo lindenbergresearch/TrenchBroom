@@ -42,15 +42,18 @@ class QSortFilterProxyModel;
 
 class QToolButton;
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class EntityNode;
 
 
 class Node;
-}// namespace Model
+} // namespace Model
 
-namespace View {
+namespace View
+{
 class EntityPropertyModel;
 
 
@@ -63,9 +66,10 @@ class MapDocument;
 class Selection;
 
 
-struct PropertyGridSelection {
-    std::string propertyKey;
-    int column;
+struct PropertyGridSelection
+{
+  std::string propertyKey;
+  int column;
 };
 
 
@@ -73,69 +77,71 @@ struct PropertyGridSelection {
  * Panel with the entity property table, and the toolbar below it (add/remove icons,
  * "show default properties" checkbox, etc.)
  */
-class EntityPropertyGrid : public QWidget {
-    Q_OBJECT
+class EntityPropertyGrid : public QWidget
+{
+  Q_OBJECT
 private:
-    std::weak_ptr<MapDocument> m_document;
+  std::weak_ptr<MapDocument> m_document;
 
-    EntityPropertyModel *m_model;
-    QSortFilterProxyModel *m_proxyModel;
-    EntityPropertyTable *m_table;
-    QToolButton *m_addProtectedPropertyButton;
-    QToolButton *m_addPropertyButton;
-    QToolButton *m_removePropertiesButton;
-    QToolButton *m_setDefaultPropertiesButton;
-    QCheckBox *m_showDefaultPropertiesCheckBox;
-    std::vector<PropertyGridSelection> m_selectionBackup;
+  EntityPropertyModel* m_model;
+  QSortFilterProxyModel* m_proxyModel;
+  EntityPropertyTable* m_table;
+  QToolButton* m_addProtectedPropertyButton;
+  QToolButton* m_addPropertyButton;
+  QToolButton* m_removePropertiesButton;
+  QToolButton* m_setDefaultPropertiesButton;
+  QCheckBox* m_showDefaultPropertiesCheckBox;
+  std::vector<PropertyGridSelection> m_selectionBackup;
 
-    NotifierConnection m_notifierConnection;
+  NotifierConnection m_notifierConnection;
 
 public:
-    explicit EntityPropertyGrid(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit EntityPropertyGrid(
+    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
 private:
-    void backupSelection();
+  void backupSelection();
 
-    void restoreSelection();
+  void restoreSelection();
 
-    void addProperty(bool defaultToProtected);
+  void addProperty(bool defaultToProtected);
 
-    void removeSelectedProperties();
+  void removeSelectedProperties();
 
-    bool canRemoveSelectedProperties() const;
+  bool canRemoveSelectedProperties() const;
 
-    std::vector<int> selectedRowsAndCursorRow() const;
-
-private:
-    void createGui(std::weak_ptr<MapDocument> document);
-
-    void connectObservers();
-
-    void documentWasNewed(MapDocument *document);
-
-    void documentWasLoaded(MapDocument *document);
-
-    void nodesDidChange(const std::vector<Model::Node *> &nodes);
-
-    void selectionWillChange();
-
-    void selectionDidChange(const Selection &selection);
-
-    void entityDefinitionsOrModsDidChange();
+  std::vector<int> selectedRowsAndCursorRow() const;
 
 private:
-    void ensureSelectionVisible();
+  void createGui(std::weak_ptr<MapDocument> document);
 
-    void updateControls();
+  void connectObservers();
 
-    void updateControlsEnabled();
+  void documentWasNewed(MapDocument* document);
+
+  void documentWasLoaded(MapDocument* document);
+
+  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+
+  void selectionWillChange();
+
+  void selectionDidChange(const Selection& selection);
+
+  void entityDefinitionsOrModsDidChange();
+
+private:
+  void ensureSelectionVisible();
+
+  void updateControls();
+
+  void updateControlsEnabled();
 
 public:
-    std::string selectedRowName() const;
+  std::string selectedRowName() const;
 
 signals:
 
-    void currentRowChanged();
+  void currentRowChanged();
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

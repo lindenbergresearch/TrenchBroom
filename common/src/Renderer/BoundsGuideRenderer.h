@@ -28,13 +28,17 @@
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class MapDocument; // FIXME: Renderer should not depend on View
 }
 
-namespace Renderer {
-class BoundsGuideRenderer : public DirectRenderable {
+namespace Renderer
+{
+class BoundsGuideRenderer : public DirectRenderable
+{
 private:
   static const FloatType SpikeLength;
 
@@ -47,14 +51,14 @@ private:
 public:
   explicit BoundsGuideRenderer(std::weak_ptr<View::MapDocument> document);
 
-  void setColor(const Color &color);
+  void setColor(const Color& color);
 
-  void setBounds(const vm::bbox3 &bounds);
+  void setBounds(const vm::bbox3& bounds);
 
 private:
-  void doPrepareVertices(VboManager &vboManager) override;
+  void doPrepareVertices(VboManager& vboManager) override;
 
-  void doRender(RenderContext &renderContext) override;
+  void doRender(RenderContext& renderContext) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

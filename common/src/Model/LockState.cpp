@@ -23,15 +23,22 @@
 
 #include <iostream>
 
-namespace TrenchBroom {
-namespace Model {
-std::ostream &operator<<(std::ostream &str, const LockState state) {
-  switch (state) {
-  case LockState::Inherited:str << "Inherited";
+namespace TrenchBroom
+{
+namespace Model
+{
+std::ostream& operator<<(std::ostream& str, const LockState state)
+{
+  switch (state)
+  {
+  case LockState::Inherited:
+    str << "Inherited";
     break;
-  case LockState::Locked:str << "Locked";
+  case LockState::Locked:
+    str << "Locked";
     break;
-  case LockState::Unlocked:str << "Unlocked";
+  case LockState::Unlocked:
+    str << "Unlocked";
     break;
     switchDefault();
   }

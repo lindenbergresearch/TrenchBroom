@@ -25,29 +25,33 @@
 
 #include "catch2.h"
 
-namespace kdl {
-TEST_CASE("product_iterator") {
-    using Catch::Matchers::UnorderedEquals;
+namespace kdl
+{
+TEST_CASE("product_iterator")
+{
+  using Catch::Matchers::UnorderedEquals;
 
 
-    SECTION("with a single range") {
-        using T = std::tuple<std::vector<int>, std::vector<std::tuple<int>>>;
-        const auto &[range, expected] = GENERATE(values<T>({
-            {{}, {}},
-            {{1}, {{1}}},
-            {{1, 2}, {{1}, {2}}},
-        }));
+  SECTION("with a single range")
+  {
+    using T = std::tuple<std::vector<int>, std::vector<std::tuple<int>>>;
+    const auto& [range, expected] = GENERATE(values<T>({
+      {{}, {}},
+      {{1}, {{1}}},
+      {{1, 2}, {{1}, {2}}},
+    }));
 
-        const auto r = make_product_range(range);
-        const auto v = std::vector<std::tuple<int>>(r.begin(), r.end());
-        CHECK_THAT(v, UnorderedEquals(expected));
-    }
+    const auto r = make_product_range(range);
+    const auto v = std::vector<std::tuple<int>>(r.begin(), r.end());
+    CHECK_THAT(v, UnorderedEquals(expected));
+  }
 
-    SECTION("with two ranges") {
-        using T =
-            std::tuple<std::vector<int>, std::vector<char>, std::vector<std::tuple<int, char>>>;
+  SECTION("with two ranges")
+  {
+    using T =
+      std::tuple<std::vector<int>, std::vector<char>, std::vector<std::tuple<int, char>>>;
 
-        // clang-format off
+    // clang-format off
     const auto& 
     [range1,    range2,     expected] = GENERATE(values<T>({
     {{},        {},         {}},
@@ -58,26 +62,28 @@ TEST_CASE("product_iterator") {
                              {2, 'a'}, {2, 'b'}, 
                              {3, 'a'}, {3, 'b'}}},
     }));
-        // clang-format on
+    // clang-format on
 
-        const auto r = make_product_range(range1, range2);
-        const auto v = std::vector<std::tuple<int, char>>(r.begin(), r.end());
-        CHECK_THAT(v, UnorderedEquals(expected));
-    }
+    const auto r = make_product_range(range1, range2);
+    const auto v = std::vector<std::tuple<int, char>>(r.begin(), r.end());
+    CHECK_THAT(v, UnorderedEquals(expected));
+  }
 
-    SECTION("with three ranges") {
-        enum class X {
-            x,
-            y
-        };
+  SECTION("with three ranges")
+  {
+    enum class X
+    {
+      x,
+      y
+    };
 
-        using T = std::tuple<
-            std::vector<int>,
-            std::vector<char>,
-            std::vector<X>,
-            std::vector<std::tuple<int, char, X>>>;
+    using T = std::tuple<
+      std::vector<int>,
+      std::vector<char>,
+      std::vector<X>,
+      std::vector<std::tuple<int, char, X>>>;
 
-        // clang-format off
+    // clang-format off
     const auto& 
     [range1, range2,     range3,       expected] = GENERATE(values<T>({
     {{},     {},         {},           {}},
@@ -87,11 +93,11 @@ TEST_CASE("product_iterator") {
                                         {2, 'a', X::x}, {2, 'a', X::y},
                                         {2, 'b', X::x}, {2, 'b', X::y},}},
     }));
-        // clang-format on
+    // clang-format on
 
-        const auto r = make_product_range(range1, range2, range3);
-        const auto v = std::vector<std::tuple<int, char, X>>(r.begin(), r.end());
-        CHECK_THAT(v, UnorderedEquals(expected));
-    }
+    const auto r = make_product_range(range1, range2, range3);
+    const auto v = std::vector<std::tuple<int, char, X>>(r.begin(), r.end());
+    CHECK_THAT(v, UnorderedEquals(expected));
+  }
 }
-}// namespace kdl
+} // namespace kdl

@@ -28,63 +28,80 @@
 #include "View/QtUtils.h"
 #include "View/Splitter.h"
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 TwoPaneMapView::TwoPaneMapView(
-    std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager, Logger *logger,
-    QWidget *parent) : MultiPaneMapView{parent}, m_logger{
-                                                     logger},
-                       m_document(std::move(document)) {
-    createGui(toolBox, mapRenderer, contextManager);
+  std::weak_ptr<MapDocument> document,
+  MapViewToolBox& toolBox,
+  Renderer::MapRenderer& mapRenderer,
+  GLContextManager& contextManager,
+  Logger* logger,
+  QWidget* parent)
+  : MultiPaneMapView{parent}
+  , m_logger{logger}
+  , m_document(std::move(document))
+{
+  createGui(toolBox, mapRenderer, contextManager);
 }
 
-TwoPaneMapView::~TwoPaneMapView() {
-    saveWindowState(m_splitter);
+TwoPaneMapView::~TwoPaneMapView()
+{
+  saveWindowState(m_splitter);
 }
 
-void TwoPaneMapView::createGui(MapViewToolBox &toolBox, Renderer::MapRenderer &mapRenderer, GLContextManager &contextManager) {
+void TwoPaneMapView::createGui(
+  MapViewToolBox& toolBox,
+  Renderer::MapRenderer& mapRenderer,
+  GLContextManager& contextManager)
+{
 
-    // See comment in CyclingMapView::createGui
-    m_splitter = new Splitter{};
-    m_splitter->setObjectName("TwoPaneMapView_Splitter");
+  // See comment in CyclingMapView::createGui
+  m_splitter = new Splitter{};
+  m_splitter->setObjectName("TwoPaneMapView_Splitter");
 
-    auto *layout = new QHBoxLayout{};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    setLayout(layout);
-    layout->addWidget(m_splitter);
+  auto* layout = new QHBoxLayout{};
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+  setLayout(layout);
+  layout->addWidget(m_splitter);
 
-    m_mapView3D = new MapView3D{m_document, toolBox, mapRenderer, contextManager, m_logger};
-    m_mapView2D = new CyclingMapView{m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_2D, m_logger};
+  m_mapView3D = new MapView3D{m_document, toolBox, mapRenderer, contextManager, m_logger};
+  m_mapView2D = new CyclingMapView{
+    m_document, toolBox, mapRenderer, contextManager, CyclingMapView::View_2D, m_logger};
 
-    m_mapView3D->linkCamera(m_linkHelper);
-    m_mapView2D->linkCamera(m_linkHelper);
+  m_mapView3D->linkCamera(m_linkHelper);
+  m_mapView2D->linkCamera(m_linkHelper);
 
-    addMapView(m_mapView3D);
-    addMapView(m_mapView2D);
+  addMapView(m_mapView3D);
+  addMapView(m_mapView2D);
 
-    m_splitter->addWidget(m_mapView3D);
-    m_splitter->addWidget(m_mapView2D);
+  m_splitter->addWidget(m_mapView3D);
+  m_splitter->addWidget(m_mapView2D);
 
-    // Configure minimum child sizes and initial splitter position at 50%
-    m_mapView2D->setMinimumSize(100, 100);
-    m_mapView3D->setMinimumSize(100, 100);
-    m_splitter->setSizes(QList<int>{1, 1});
+  // Configure minimum child sizes and initial splitter position at 50%
+  m_mapView2D->setMinimumSize(100, 100);
+  m_mapView3D->setMinimumSize(100, 100);
+  m_splitter->setSizes(QList<int>{1, 1});
 
-    restoreWindowState(m_splitter);
+  restoreWindowState(m_splitter);
 }
 
-void TwoPaneMapView::doMaximizeView(MapView *view) {
-    assert(view == m_mapView2D || view == m_mapView3D);
-    if (view == m_mapView2D) {
-        m_mapView3D->hide();
-    }
-    if (view == m_mapView3D) {
-        m_mapView2D->hide();
-    }
+void TwoPaneMapView::doMaximizeView(MapView* view)
+{
+  assert(view == m_mapView2D || view == m_mapView3D);
+  if (view == m_mapView2D)
+  {
+    m_mapView3D->hide();
+  }
+  if (view == m_mapView3D)
+  {
+    m_mapView2D->hide();
+  }
 }
 
-void TwoPaneMapView::doRestoreViews() {
-    m_mapView3D->show();
-    m_mapView2D->show();
+void TwoPaneMapView::doRestoreViews()
+{
+  m_mapView3D->show();
+  m_mapView2D->show();
 }
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

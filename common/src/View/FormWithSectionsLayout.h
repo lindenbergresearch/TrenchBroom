@@ -23,42 +23,47 @@
 
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 
 static const int RowIndent = LayoutConstants::NoMargin;
 
 
-class FormWithSectionsLayout : public QFormLayout {
+class FormWithSectionsLayout : public QFormLayout
+{
 public:
-    using QFormLayout::QFormLayout;
+  using QFormLayout::QFormLayout;
 
-    void addSection(const QString &title, const QString &info = "");
+  void addSection(const QString& title, const QString& info = "");
 
-    // Since these functions are not virtual, we can only hide the inherited ones.
-    void addRow(QWidget *label, QWidget *field, QWidget *additional = nullptr);
+  // Since these functions are not virtual, we can only hide the inherited ones.
+  void addRow(QWidget* label, QWidget* field, QWidget* additional = nullptr);
 
-    void addRow(QWidget *label, QLayout *field, QLayout *additional = nullptr);
+  void addRow(QWidget* label, QLayout* field, QLayout* additional = nullptr);
 
-    void addRow(const QString &labelText, QWidget *field, QWidget *additional = nullptr);
+  void addRow(const QString& labelText, QWidget* field, QWidget* additional = nullptr);
 
-    void addRow(const QString &labelText, QLayout *field, QLayout *additional = nullptr);
+  void addRow(const QString& labelText, QLayout* field, QLayout* additional = nullptr);
 
-    void addRow(QWidget *field);
+  void addRow(QWidget* field);
 
-    void addRow(QLayout *field);
+  void addRow(QLayout* field);
 
-    void insertRow(int row, QWidget *label, QWidget *field, QWidget *additional = nullptr);
+  void insertRow(int row, QWidget* label, QWidget* field, QWidget* additional = nullptr);
 
-    void insertRow(int row, QWidget *label, QLayout *field, QLayout *additional = nullptr);
+  void insertRow(int row, QWidget* label, QLayout* field, QLayout* additional = nullptr);
 
-    void insertRow(int row, const QString &labelText, QWidget *field, QWidget *additional = nullptr);
+  void insertRow(
+    int row, const QString& labelText, QWidget* field, QWidget* additional = nullptr);
 
-    void insertRow(int row, const QString &labelText, QLayout *field, QLayout *additional = nullptr);
+  void insertRow(
+    int row, const QString& labelText, QLayout* field, QLayout* additional = nullptr);
 
-    void insertRow(int row, QWidget *field, QWidget *additional = nullptr);
+  void insertRow(int row, QWidget* field, QWidget* additional = nullptr);
 
-    void insertRow(int row, QLayout *field, QLayout *additional = nullptr);
+  void insertRow(int row, QLayout* field, QLayout* additional = nullptr);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

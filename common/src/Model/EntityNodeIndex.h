@@ -26,21 +26,28 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class EntityNodeBase;
 
 
 class EntityProperty;
 
 
-using EntityNodeStringIndex = kdl::compact_trie<EntityNodeBase *>;
+using EntityNodeStringIndex = kdl::compact_trie<EntityNodeBase*>;
 
 
-class EntityNodeIndexQuery {
+class EntityNodeIndexQuery
+{
 public:
-  typedef enum {
-    Type_Exact, Type_Prefix, Type_Numbered, Type_Any
+  typedef enum
+  {
+    Type_Exact,
+    Type_Prefix,
+    Type_Numbered,
+    Type_Any
   } Type;
 
 private:
@@ -48,26 +55,27 @@ private:
   std::string m_pattern;
 
 public:
-  static EntityNodeIndexQuery exact(const std::string &pattern);
+  static EntityNodeIndexQuery exact(const std::string& pattern);
 
-  static EntityNodeIndexQuery prefix(const std::string &pattern);
+  static EntityNodeIndexQuery prefix(const std::string& pattern);
 
-  static EntityNodeIndexQuery numbered(const std::string &pattern);
+  static EntityNodeIndexQuery numbered(const std::string& pattern);
 
   static EntityNodeIndexQuery any();
 
-  std::set<EntityNodeBase *> execute(const EntityNodeStringIndex &index) const;
+  std::set<EntityNodeBase*> execute(const EntityNodeStringIndex& index) const;
 
-  bool execute(const EntityNodeBase *node, const std::string &value) const;
+  bool execute(const EntityNodeBase* node, const std::string& value) const;
 
-  std::vector<Model::EntityProperty> execute(const EntityNodeBase *node) const;
+  std::vector<Model::EntityProperty> execute(const EntityNodeBase* node) const;
 
 private:
-  explicit EntityNodeIndexQuery(Type type, const std::string &pattern = "");
+  explicit EntityNodeIndexQuery(Type type, const std::string& pattern = "");
 };
 
 
-class EntityNodeIndex {
+class EntityNodeIndex
+{
 private:
   std::unique_ptr<EntityNodeStringIndex> m_keyIndex;
   std::unique_ptr<EntityNodeStringIndex> m_valueIndex;
@@ -77,21 +85,25 @@ public:
 
   ~EntityNodeIndex();
 
-  void addEntityNode(EntityNodeBase *node);
+  void addEntityNode(EntityNodeBase* node);
 
-  void removeEntityNode(EntityNodeBase *node);
+  void removeEntityNode(EntityNodeBase* node);
 
-  void addProperty(EntityNodeBase *node, const std::string &key, const std::string &value);
+  void addProperty(
+    EntityNodeBase* node, const std::string& key, const std::string& value);
 
-  void removeProperty(EntityNodeBase *node, const std::string &key, const std::string &value);
+  void removeProperty(
+    EntityNodeBase* node, const std::string& key, const std::string& value);
 
-  std::vector<EntityNodeBase *> findEntityNodes(const EntityNodeIndexQuery &keyQuery, const std::string &value) const;
+  std::vector<EntityNodeBase*> findEntityNodes(
+    const EntityNodeIndexQuery& keyQuery, const std::string& value) const;
 
-  std::vector<EntityNodeBase *> findEntity(const std::string &value, const std::string &name, const bool exact = false) const;
+  std::vector<EntityNodeBase*> findEntity(
+    const std::string& value, const std::string& name, const bool exact = false) const;
 
   std::vector<std::string> allKeys() const;
 
-  std::vector<std::string> allValuesForKeys(const EntityNodeIndexQuery &keyQuery) const;
+  std::vector<std::string> allValuesForKeys(const EntityNodeIndexQuery& keyQuery) const;
 };
 } // namespace Model
 } // namespace TrenchBroom

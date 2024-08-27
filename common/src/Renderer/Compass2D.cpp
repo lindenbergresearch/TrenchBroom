@@ -25,24 +25,34 @@
 #include "RenderContext.h"
 #include "RenderUtils.h"
 
-namespace TrenchBroom {
-namespace Renderer {
-void Compass2D::doRenderCompass(RenderContext &renderContext, const vm::mat4x4f &transform) {
-  const auto &camera = renderContext.camera();
+namespace TrenchBroom
+{
+namespace Renderer
+{
+void Compass2D::doRenderCompass(
+  RenderContext& renderContext, const vm::mat4x4f& transform)
+{
+  const auto& camera = renderContext.camera();
   const auto axis = vm::find_abs_max_component(camera.direction());
 
-  auto axisColorX = modifyAlpha(pref(Preferences::XAxisColor), pref(Preferences::CompassTransparency));
-  auto axisColorY = modifyAlpha(pref(Preferences::YAxisColor), pref(Preferences::CompassTransparency));
-  auto axisColorZ = modifyAlpha(pref(Preferences::ZAxisColor), pref(Preferences::CompassTransparency));
+  auto axisColorX =
+    modifyAlpha(pref(Preferences::XAxisColor), pref(Preferences::CompassTransparency));
+  auto axisColorY =
+    modifyAlpha(pref(Preferences::YAxisColor), pref(Preferences::CompassTransparency));
+  auto axisColorZ =
+    modifyAlpha(pref(Preferences::ZAxisColor), pref(Preferences::CompassTransparency));
 
-  auto &prefs = PreferenceManager::instance();
-  if (axis != vm::axis::z) {
+  auto& prefs = PreferenceManager::instance();
+  if (axis != vm::axis::z)
+  {
     renderSolidAxis(renderContext, transform, axisColorZ);
   }
-  if (axis != vm::axis::x) {
+  if (axis != vm::axis::x)
+  {
     renderSolidAxis(renderContext, transform * vm::mat4x4f::rot_90_y_ccw(), axisColorX);
   }
-  if (axis != vm::axis::y) {
+  if (axis != vm::axis::y)
+  {
     renderSolidAxis(renderContext, transform * vm::mat4x4f::rot_90_x_cw(), axisColorY);
   }
 }

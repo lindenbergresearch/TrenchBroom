@@ -23,12 +23,15 @@
 
 #include <map>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class Texture;
 }
 
-namespace Renderer {
+namespace Renderer
+{
 class TextureRenderFunc;
 
 
@@ -44,12 +47,13 @@ class VertexArray;
  * The primitives are grouped per texture to avoid costly texture switches during
  * rendering.
  */
-class TexturedIndexRangeMap {
+class TexturedIndexRangeMap
+{
 public:
   using Texture = Assets::Texture;
 
 private:
-  using TextureToIndexRangeMap = std::map<const Texture *, IndexRangeMap>;
+  using TextureToIndexRangeMap = std::map<const Texture*, IndexRangeMap>;
   using TextureToIndexRangeMapPtr = std::shared_ptr<TextureToIndexRangeMap>;
 
 public:
@@ -61,11 +65,12 @@ public:
    * To record the correct sizes, call the inc method with the same parameters for every
    * expected call to the add method of the index range map itself.
    */
-  class Size {
+  class Size
+  {
   private:
     friend class TexturedIndexRangeMap;
 
-    using TextureToSize = std::map<const Texture *, IndexRangeMap::Size>;
+    using TextureToSize = std::map<const Texture*, IndexRangeMap::Size>;
     TextureToSize m_sizes;
     TextureToSize::iterator m_current;
 
@@ -82,21 +87,21 @@ public:
      * @param primType the primitive type
      * @param vertexCount the number of vertices to count
      */
-    void inc(const Texture *texture, PrimType primType, size_t vertexCount = 1);
+    void inc(const Texture* texture, PrimType primType, size_t vertexCount = 1);
 
     /**
      * Increase the storage by the given size.
      *
      * @param other the size to increase by
      */
-    void inc(const Size &other);
+    void inc(const Size& other);
 
   private:
-    IndexRangeMap::Size &findCurrent(const Texture *texture);
+    IndexRangeMap::Size& findCurrent(const Texture* texture);
 
-    bool isCurrent(const Texture *texture) const;
+    bool isCurrent(const Texture* texture) const;
 
-    void initialize(TextureToIndexRangeMap &data) const;
+    void initialize(TextureToIndexRangeMap& data) const;
   };
 
 private:
@@ -116,7 +121,7 @@ public:
    *
    * @param size the sizes to initialize this range map to
    */
-  explicit TexturedIndexRangeMap(const Size &size);
+  explicit TexturedIndexRangeMap(const Size& size);
 
   /**
    * Creates a new index range map containing the given primitives with the given texture.
@@ -124,7 +129,7 @@ public:
    * @param texture the texture
    * @param primitives an index range map containing the primitives
    */
-  TexturedIndexRangeMap(const Texture *texture, IndexRangeMap primitives);
+  TexturedIndexRangeMap(const Texture* texture, IndexRangeMap primitives);
 
   /**
    * Creates a new index range map containing a single range of the given primitive type
@@ -135,7 +140,8 @@ public:
    * @param index the start index of the range
    * @param vertexCount the number of vertices in the range
    */
-  TexturedIndexRangeMap(const Texture *texture, PrimType primType, size_t index, size_t vertexCount);
+  TexturedIndexRangeMap(
+    const Texture* texture, PrimType primType, size_t index, size_t vertexCount);
 
   /**
    * Records a range of primitives at the given index with the given length and using the
@@ -146,7 +152,7 @@ public:
    * @param index the start index of the range
    * @param vertexCount the number of vertices in the range
    */
-  void add(const Texture *texture, PrimType primType, size_t index, size_t vertexCount);
+  void add(const Texture* texture, PrimType primType, size_t index, size_t vertexCount);
 
   /**
    * Records ranges of primitives using the given texture.
@@ -154,14 +160,14 @@ public:
    * @param texture the texture to use
    * @param primitives an index range map containing the primitives
    */
-  void add(const Texture *texture, IndexRangeMap primitives);
+  void add(const Texture* texture, IndexRangeMap primitives);
 
   /**
    * Adds all ranges stored in the given textured index range map to this one.
    *
    * @param other the textured index range map to add
    */
-  void add(const TexturedIndexRangeMap &other);
+  void add(const TexturedIndexRangeMap& other);
 
   /**
    * Renders the primitives stored in this index range map using the vertices in the given
@@ -169,7 +175,7 @@ public:
    *
    * @param vertexArray the vertex array to render with
    */
-  void render(VertexArray &vertexArray);
+  void render(VertexArray& vertexArray);
 
   /**
    * Renders the primitives stored in this index range map using the vertices in the given
@@ -180,19 +186,21 @@ public:
    * @param vertexArray the vertex array to render with
    * @param func the texture callbacks
    */
-  void render(VertexArray &vertexArray, TextureRenderFunc &func);
+  void render(VertexArray& vertexArray, TextureRenderFunc& func);
 
   /**
    * Invokes the given function for each primitive stored in this map.
    *
    * @param func the function to invoke
    */
-  void forEachPrimitive(std::function<void(const Texture *texture, PrimType, size_t index, size_t count)> func) const;
+  void forEachPrimitive(
+    std::function<void(const Texture* texture, PrimType, size_t index, size_t count)>
+      func) const;
 
 private:
-  IndexRangeMap &findCurrent(const Texture *texture);
+  IndexRangeMap& findCurrent(const Texture* texture);
 
-  bool isCurrent(const Texture *texture) const;
+  bool isCurrent(const Texture* texture) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

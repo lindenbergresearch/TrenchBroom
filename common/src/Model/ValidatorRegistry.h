@@ -24,24 +24,27 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class IssueQuickFix;
 
 
 class Validator;
 
 
-class ValidatorRegistry {
+class ValidatorRegistry
+{
 private:
   std::vector<std::unique_ptr<Validator>> m_validators;
 
 public:
   ~ValidatorRegistry();
 
-  std::vector<const Validator *> registeredValidators() const;
+  std::vector<const Validator*> registeredValidators() const;
 
-  std::vector<const IssueQuickFix *> quickFixes(IssueType issueTypes) const;
+  std::vector<const IssueQuickFix*> quickFixes(IssueType issueTypes) const;
 
   void registerValidator(const std::unique_ptr<Validator> validator);
 

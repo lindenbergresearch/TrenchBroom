@@ -25,12 +25,16 @@
 
 #include <ostream>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 /**
  * Appends a textual representation of the given vertices' position to the given stream.
  */
-template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ostream &stream, const Polyhedron_Vertex<T, FP, VP> &vertex) {
+template <typename T, typename FP, typename VP>
+std::ostream& operator<<(std::ostream& stream, const Polyhedron_Vertex<T, FP, VP>& vertex)
+{
   stream << vertex.position();
   return stream;
 }
@@ -38,16 +42,24 @@ template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ost
 /**
  * Prints a textual description of the given edge to the given output stream.
  */
-template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ostream &stream, const Polyhedron_Edge<T, FP, VP> &edge) {
-  if (edge.firstEdge() != nullptr) {
+template <typename T, typename FP, typename VP>
+std::ostream& operator<<(std::ostream& stream, const Polyhedron_Edge<T, FP, VP>& edge)
+{
+  if (edge.firstEdge() != nullptr)
+  {
     stream << *edge.firstEdge()->origin();
-  } else {
+  }
+  else
+  {
     stream << "NULL";
   }
   stream << " <--> ";
-  if (edge.secondEdge() != nullptr) {
+  if (edge.secondEdge() != nullptr)
+  {
     stream << *edge.secondEdge()->origin();
-  } else {
+  }
+  else
+  {
     stream << "NULL";
   }
   return stream;
@@ -56,11 +68,16 @@ template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ost
 /**
  * Prints a textual description of the given half edge to the given output stream.
  */
-template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ostream &stream, const Polyhedron_HalfEdge<T, FP, VP> &edge) {
+template <typename T, typename FP, typename VP>
+std::ostream& operator<<(std::ostream& stream, const Polyhedron_HalfEdge<T, FP, VP>& edge)
+{
   stream << *edge.origin() << " --> ";
-  if (edge.destination() != nullptr) {
+  if (edge.destination() != nullptr)
+  {
     stream << *edge.destination();
-  } else {
+  }
+  else
+  {
     stream << "NULL";
   }
   return stream;
@@ -69,8 +86,11 @@ template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ost
 /**
  * Prints a textual description of the face to the given output stream.
  */
-template<typename T, typename FP, typename VP> std::ostream &operator<<(std::ostream &stream, const Polyhedron_Face<T, FP, VP> &face) {
-  for (const Polyhedron_HalfEdge<T, FP, VP> *edge : face.boundary()) {
+template <typename T, typename FP, typename VP>
+std::ostream& operator<<(std::ostream& stream, const Polyhedron_Face<T, FP, VP>& face)
+{
+  for (const Polyhedron_HalfEdge<T, FP, VP>* edge : face.boundary())
+  {
     stream << *edge << "\n";
   }
   return stream;

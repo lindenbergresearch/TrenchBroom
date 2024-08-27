@@ -21,24 +21,27 @@
 
 #include <QDialog>
 
-namespace TrenchBroom {
-namespace View {
-class AboutDialog : public QDialog {
-    Q_OBJECT
+namespace TrenchBroom
+{
+namespace View
+{
+class AboutDialog : public QDialog
+{
+  Q_OBJECT
 private:
-    static AboutDialog *instance;
+  static AboutDialog* instance;
 
 public:
-    static void showAboutDialog();
+  static void showAboutDialog();
 
-    static void closeAboutDialog();
+  static void closeAboutDialog();
 
-    ~AboutDialog() override;
+  ~AboutDialog() override;
 
 private:
-    AboutDialog();
+  AboutDialog();
 
-    void createGui();
+  void createGui();
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

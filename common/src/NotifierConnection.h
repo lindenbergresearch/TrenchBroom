@@ -22,7 +22,8 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class NotifierStateBase;
 
 
@@ -31,7 +32,8 @@ class NotifierStateBase;
  *
  * All connections are disconnected when an instance of this class is destroyed.
  */
-class NotifierConnection {
+class NotifierConnection
+{
 private:
   std::vector<std::tuple<std::weak_ptr<NotifierStateBase>, size_t>> m_connections;
 
@@ -47,13 +49,13 @@ public:
    */
   NotifierConnection(std::weak_ptr<NotifierStateBase> notifier, const size_t id);
 
-  NotifierConnection(const NotifierConnection &) = delete;
+  NotifierConnection(const NotifierConnection&) = delete;
 
-  NotifierConnection(NotifierConnection &&) noexcept;
+  NotifierConnection(NotifierConnection&&) noexcept;
 
-  NotifierConnection &operator=(const NotifierConnection &) = delete;
+  NotifierConnection& operator=(const NotifierConnection&) = delete;
 
-  NotifierConnection &operator=(NotifierConnection &&) noexcept;
+  NotifierConnection& operator=(NotifierConnection&&) noexcept;
 
   /**
    * Disconnects all connected observers.
@@ -64,7 +66,7 @@ public:
    * Transfers the connections from the given instance to this one. The given instance
    * will lose its connections.
    */
-  NotifierConnection &operator+=(NotifierConnection &&other);
+  NotifierConnection& operator+=(NotifierConnection&& other);
 
   /**
    * Disconnects all connected observers.

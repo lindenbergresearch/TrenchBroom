@@ -24,8 +24,10 @@
 #include <cstddef>
 #include <iterator>
 
-namespace vm {
-namespace detail {
+namespace vm
+{
+namespace detail
+{
 /**
  * Swaps the given values.
  *
@@ -33,11 +35,12 @@ namespace detail {
  * @param lhs the left hand side
  * @param rhs the right hand side
  */
-template<class T>
-constexpr void swap(T &lhs, T &rhs) {
-    auto tmp = std::move(lhs);
-    lhs = std::move(rhs);
-    rhs = std::move(tmp);
+template <class T>
+constexpr void swap(T& lhs, T& rhs)
+{
+  auto tmp = std::move(lhs);
+  lhs = std::move(rhs);
+  rhs = std::move(tmp);
 }
 
 /**
@@ -47,9 +50,10 @@ constexpr void swap(T &lhs, T &rhs) {
  * @param lhs the left hand side
  * @param rhs the right hand side
  */
-template<class I>
-constexpr void iter_swap(I lhs, I rhs) {
-    swap(*lhs, *rhs);
+template <class I>
+constexpr void iter_swap(I lhs, I rhs)
+{
+  swap(*lhs, *rhs);
 }
 
 /**
@@ -62,21 +66,25 @@ constexpr void iter_swap(I lhs, I rhs) {
  * @param cmp the comparator, which must induce a strict weak ordering on the elements in
  * the given range
  */
-template<typename I, typename C>
-constexpr void sort(I left, I right, const C &cmp) {
-    if (left < right) {
-        auto mid = left;
+template <typename I, typename C>
+constexpr void sort(I left, I right, const C& cmp)
+{
+  if (left < right)
+  {
+    auto mid = left;
 
-        for (auto i = std::next(left); i < right; ++i) {
-            if (cmp(*i, *left)) {
-                iter_swap(++mid, i);
-            }
-        }
-
-        iter_swap(left, mid);
-        sort(left, mid, cmp);
-        sort(std::next(mid), right, cmp);
+    for (auto i = std::next(left); i < right; ++i)
+    {
+      if (cmp(*i, *left))
+      {
+        iter_swap(++mid, i);
+      }
     }
+
+    iter_swap(left, mid);
+    sort(left, mid, cmp);
+    sort(std::next(mid), right, cmp);
+  }
 }
-}// namespace detail
-}// namespace vm
+} // namespace detail
+} // namespace vm

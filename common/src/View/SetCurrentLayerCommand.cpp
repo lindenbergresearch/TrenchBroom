@@ -21,31 +21,45 @@
 
 #include "View/MapDocumentCommandFacade.h"
 
-namespace TrenchBroom {
-namespace View {
-std::unique_ptr<SetCurrentLayerCommand> SetCurrentLayerCommand::set(Model::LayerNode *layer) {
-    return std::make_unique<SetCurrentLayerCommand>(layer);
+namespace TrenchBroom
+{
+namespace View
+{
+std::unique_ptr<SetCurrentLayerCommand> SetCurrentLayerCommand::set(
+  Model::LayerNode* layer)
+{
+  return std::make_unique<SetCurrentLayerCommand>(layer);
 }
 
-SetCurrentLayerCommand::SetCurrentLayerCommand(Model::LayerNode *layer) : UndoableCommand("Set Current Layer", false), m_currentLayer(layer), m_oldCurrentLayer(nullptr) {
+SetCurrentLayerCommand::SetCurrentLayerCommand(Model::LayerNode* layer)
+  : UndoableCommand("Set Current Layer", false)
+  , m_currentLayer(layer)
+  , m_oldCurrentLayer(nullptr)
+{
 }
 
-std::unique_ptr<CommandResult> SetCurrentLayerCommand::doPerformDo(MapDocumentCommandFacade *document) {
-    m_oldCurrentLayer = document->performSetCurrentLayer(m_currentLayer);
-    return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> SetCurrentLayerCommand::doPerformDo(
+  MapDocumentCommandFacade* document)
+{
+  m_oldCurrentLayer = document->performSetCurrentLayer(m_currentLayer);
+  return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> SetCurrentLayerCommand::doPerformUndo(MapDocumentCommandFacade *document) {
-    document->performSetCurrentLayer(m_oldCurrentLayer);
-    return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> SetCurrentLayerCommand::doPerformUndo(
+  MapDocumentCommandFacade* document)
+{
+  document->performSetCurrentLayer(m_oldCurrentLayer);
+  return std::make_unique<CommandResult>(true);
 }
 
-bool SetCurrentLayerCommand::doCollateWith(UndoableCommand &command) {
-    if (auto *other = dynamic_cast<SetCurrentLayerCommand *>(&command)) {
-        m_currentLayer = other->m_currentLayer;
-        return true;
-    }
-    return false;
+bool SetCurrentLayerCommand::doCollateWith(UndoableCommand& command)
+{
+  if (auto* other = dynamic_cast<SetCurrentLayerCommand*>(&command))
+  {
+    m_currentLayer = other->m_currentLayer;
+    return true;
+  }
+  return false;
 }
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

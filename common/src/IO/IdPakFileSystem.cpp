@@ -30,46 +30,53 @@
 
 #include <string>
 
-namespace TrenchBroom::IO {
-namespace PakLayout {
+namespace TrenchBroom::IO
+{
+namespace PakLayout
+{
 static const size_t HeaderAddress = 0x0;
 static const size_t HeaderMagicLength = 0x4;
 static const size_t EntryLength = 0x40;
 static const size_t EntryNameLength = 0x38;
 static const std::string HeaderMagic = "PACK";
-}// namespace PakLayout
+} // namespace PakLayout
 
-Result<void> IdPakFileSystem::doReadDirectory() {
-    try {
-        char magic[PakLayout::HeaderMagicLength];
+Result<void> IdPakFileSystem::doReadDirectory()
+{
+  try
+  {
+    char magic[PakLayout::HeaderMagicLength];
 
-        auto reader = m_file->reader();
-        reader.seekForward(PakLayout::HeaderAddress);
-        reader.read(magic, PakLayout::HeaderMagicLength);
+    auto reader = m_file->reader();
+    reader.seekForward(PakLayout::HeaderAddress);
+    reader.read(magic, PakLayout::HeaderMagicLength);
 
-        const auto directoryAddress = reader.readSize<int32_t>();
-        const auto directorySize = reader.readSize<int32_t>();
-        const auto entryCount = directorySize / PakLayout::EntryLength;
+    const auto directoryAddress = reader.readSize<int32_t>();
+    const auto directorySize = reader.readSize<int32_t>();
+    const auto entryCount = directorySize / PakLayout::EntryLength;
 
-        reader.seekFromBegin(directoryAddress);
+    reader.seekFromBegin(directoryAddress);
 
-        for (size_t i = 0; i < entryCount; ++i) {
-            const auto entryName = reader.readString(PakLayout::EntryNameLength);
-            const auto entryAddress = reader.readSize<int32_t>();
-            const auto entrySize = reader.readSize<int32_t>();
+    for (size_t i = 0; i < entryCount; ++i)
+    {
+      const auto entryName = reader.readString(PakLayout::EntryNameLength);
+      const auto entryAddress = reader.readSize<int32_t>();
+      const auto entrySize = reader.readSize<int32_t>();
 
-            const auto entryPath = std::filesystem::path{kdl::str_to_lower(entryName)};
-            auto entryFile = std::static_pointer_cast<File>(
-                std::make_shared<FileView>(m_file, entryAddress, entrySize));
-            addFile(
-                entryPath, [entryFile = std::move(entryFile)]() -> Result<std::shared_ptr<File>> {
-                    return entryFile;
-                });
-        }
-
-        return kdl::void_success;
-    } catch (const ReaderException &e) {
-        return Error{e.what()};
+      const auto entryPath = std::filesystem::path{kdl::str_to_lower(entryName)};
+      auto entryFile = std::static_pointer_cast<File>(
+        std::make_shared<FileView>(m_file, entryAddress, entrySize));
+      addFile(
+        entryPath, [entryFile = std::move(entryFile)]() -> Result<std::shared_ptr<File>> {
+          return entryFile;
+        });
     }
+
+    return kdl::void_success;
+  }
+  catch (const ReaderException& e)
+  {
+    return Error{e.what()};
+  }
 }
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

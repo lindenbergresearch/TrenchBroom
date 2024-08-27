@@ -27,15 +27,18 @@
 
 #include <vm/bbox.h>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class RenderBatch;
 
 
 class RenderContext;
 
 
-class SelectionBoundsRenderer {
+class SelectionBoundsRenderer
+{
   static const float AXIS_LABEL_DIM_FACTOR;
 
 private:
@@ -47,23 +50,24 @@ private:
 
   class MinMaxTextAnchor3D;
 
-  QString formatDimension(const float value, const int digits = 2, const QString &suffix = "");
+  QString formatDimension(
+    const float value, const int digits = 2, const QString& suffix = "");
 
 public:
-  SelectionBoundsRenderer(const vm::bbox3 &bounds);
+  SelectionBoundsRenderer(const vm::bbox3& bounds);
 
-  void render(RenderContext &renderContext, RenderBatch &renderBatch);
+  void render(RenderContext& renderContext, RenderBatch& renderBatch);
 
 private:
-  void renderBounds(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderBounds(RenderContext& renderContext, RenderBatch& renderBatch);
 
-  void renderSize(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderSize(RenderContext& renderContext, RenderBatch& renderBatch);
 
-  void renderSize2D(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderSize2D(RenderContext& renderContext, RenderBatch& renderBatch);
 
-  void renderSize3D(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderSize3D(RenderContext& renderContext, RenderBatch& renderBatch);
 
-  void renderMinMax(RenderContext &renderContext, RenderBatch &renderBatch);
+  void renderMinMax(RenderContext& renderContext, RenderBatch& renderBatch);
 
   const std::string getFormattedUnitsString(float value_units);
 };

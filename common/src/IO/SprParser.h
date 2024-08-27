@@ -25,12 +25,15 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class Palette;
 }
 
-namespace IO {
+namespace IO
+{
 class File;
 
 
@@ -40,21 +43,23 @@ class FileSystem;
 class Reader;
 
 
-class SprParser : public EntityModelParser {
+class SprParser : public EntityModelParser
+{
 private:
-    std::string m_name;
-    const Reader &m_reader;
-    const Assets::Palette &m_palette;
+  std::string m_name;
+  const Reader& m_reader;
+  const Assets::Palette& m_palette;
 
 public:
-    SprParser(std::string name, const Reader &reader, const Assets::Palette &palette);
+  SprParser(std::string name, const Reader& reader, const Assets::Palette& palette);
 
-    static bool canParse(const std::filesystem::path &path, Reader reader);
+  static bool canParse(const std::filesystem::path& path, Reader reader);
 
 private:
-    std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger &logger) override;
+  std::unique_ptr<Assets::EntityModel> doInitializeModel(Logger& logger) override;
 
-    void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
+  void doLoadFrame(
+    size_t frameIndex, Assets::EntityModel& model, Logger& logger) override;
 };
-}// namespace IO
-}// namespace TrenchBroom
+} // namespace IO
+} // namespace TrenchBroom

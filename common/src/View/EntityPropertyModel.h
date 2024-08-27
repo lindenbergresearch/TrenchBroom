@@ -30,96 +30,117 @@
 #include <tuple>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class EntityNodeBase;
 }
 
-namespace View {
+namespace View
+{
 class MapDocument;
 
 
-enum class ValueType {
-    /**
+enum class ValueType
+{
+  /**
    * No entities have this key set; the provided value is the default from the entity
    * definition
    */
-    Unset,               /**
-   * All entities have the same value set for this key
-   */
-    SingleValue,         /**
-   * 1+ entities have this key unset, the rest have the same value set
-   */
-    SingleValueAndUnset, /**
-   * Two or more entities have different values for this key
-   */
-    MultipleValues
+  Unset,               /**
+                        * All entities have the same value set for this key
+                        */
+  SingleValue,         /**
+                        * 1+ entities have this key unset, the rest have the same value set
+                        */
+  SingleValueAndUnset, /**
+                        * Two or more entities have different values for this key
+                        */
+  MultipleValues
 };
 
-std::ostream &operator<<(std::ostream &lhs, const ValueType &rhs);
+std::ostream& operator<<(std::ostream& lhs, const ValueType& rhs);
 
-enum class PropertyProtection {
-    NotProtectable,
-    Protected,
-    NotProtected,
-    Mixed
+enum class PropertyProtection
+{
+  NotProtectable,
+  Protected,
+  NotProtected,
+  Mixed
 };
 
-std::ostream &operator<<(std::ostream &lhs, const PropertyProtection &rhs);
+std::ostream& operator<<(std::ostream& lhs, const PropertyProtection& rhs);
 
 
 /**
  * Viewmodel (as in MVVM) for a single row in the table
  */
-class PropertyRow {
+class PropertyRow
+{
 private:
-    std::string m_key;
-    std::string m_value;
-    ValueType m_valueType;
+  std::string m_key;
+  std::string m_value;
+  ValueType m_valueType;
 
-    bool m_keyMutable;
-    bool m_valueMutable;
-    PropertyProtection m_protected;
-    std::string m_tooltip;
+  bool m_keyMutable;
+  bool m_valueMutable;
+  PropertyProtection m_protected;
+  std::string m_tooltip;
 
 public:
-    PropertyRow();
+  PropertyRow();
 
-    PropertyRow(std::string key, const Model::EntityNodeBase *node);
+  PropertyRow(std::string key, const Model::EntityNodeBase* node);
 
-    void merge(const Model::EntityNodeBase *other);
+  void merge(const Model::EntityNodeBase* other);
 
-    const std::string &key() const;
+  const std::string& key() const;
 
-    std::string value() const;
+  std::string value() const;
 
-    bool keyMutable() const;
+  bool keyMutable() const;
 
-    bool valueMutable() const;
+  bool valueMutable() const;
 
-    PropertyProtection isProtected() const;
+  PropertyProtection isProtected() const;
 
-    const std::string &tooltip() const;
+  const std::string& tooltip() const;
 
-    bool isDefault() const;
+  bool isDefault() const;
 
-    bool multi() const;
+  bool multi() const;
 
-    bool subset() const;
+  bool subset() const;
 
-    static PropertyRow rowForEntityNodes(const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes);
+  static PropertyRow rowForEntityNodes(
+    const std::string& key, const std::vector<Model::EntityNodeBase*>& nodes);
 
-    static std::vector<std::string> allKeys(const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties);
+  static std::vector<std::string> allKeys(
+    const std::vector<Model::EntityNodeBase*>& nodes,
+    bool showDefaultRows,
+    bool showPreservedProperties);
 
-    static std::map<std::string, PropertyRow> rowsForEntityNodes(
-        const std::vector<Model::EntityNodeBase *> &nodes, bool showDefaultRows, bool showPreservedProperties);
+  static std::map<std::string, PropertyRow> rowsForEntityNodes(
+    const std::vector<Model::EntityNodeBase*>& nodes,
+    bool showDefaultRows,
+    bool showPreservedProperties);
 
-    /**
+  /**
    * Suggests a new, unused property name of the form "property X".
    */
-    static std::string newPropertyKeyForEntityNodes(const std::vector<Model::EntityNodeBase *> &nodes);
+  static std::string newPropertyKeyForEntityNodes(
+    const std::vector<Model::EntityNodeBase*>& nodes);
 
-    kdl_reflect_decl(PropertyRow, m_key, m_value, m_valueType, m_keyMutable, m_valueMutable, m_protected, m_tooltip);
+  kdl_reflect_decl(
+    PropertyRow,
+    m_key,
+    m_value,
+    m_valueType,
+    m_keyMutable,
+    m_valueMutable,
+    m_protected,
+    m_tooltip);
 };
 
 
@@ -141,83 +162,91 @@ public:
  * The order of m_rows is not significant; it's expected that there is a sort proxy model
  * used on top of this model.
  */
-class EntityPropertyModel : public QAbstractTableModel {
-    Q_OBJECT
+class EntityPropertyModel : public QAbstractTableModel
+{
+  Q_OBJECT
 public:
-    static const int ColumnProtected = 0;
-    static const int ColumnKey = 1;
-    static const int ColumnValue = 2;
-    static const int NumColumns = 3;
+  static const int ColumnProtected = 0;
+  static const int ColumnKey = 1;
+  static const int ColumnValue = 2;
+  static const int NumColumns = 3;
 
 private:
-    std::vector<PropertyRow> m_rows;
-    bool m_showDefaultRows;
-    bool m_shouldShowProtectedProperties;
-    std::weak_ptr<MapDocument> m_document;
+  std::vector<PropertyRow> m_rows;
+  bool m_showDefaultRows;
+  bool m_shouldShowProtectedProperties;
+  std::weak_ptr<MapDocument> m_document;
 
 public:
-    explicit EntityPropertyModel(std::weak_ptr<MapDocument> document, QObject *parent);
+  explicit EntityPropertyModel(std::weak_ptr<MapDocument> document, QObject* parent);
 
-    bool showDefaultRows() const;
+  bool showDefaultRows() const;
 
-    void setShowDefaultRows(bool showDefaultRows);
+  void setShowDefaultRows(bool showDefaultRows);
 
-    bool shouldShowProtectedProperties() const;
+  bool shouldShowProtectedProperties() const;
 
-    void setRows(const std::map<std::string, PropertyRow> &newRows);
+  void setRows(const std::map<std::string, PropertyRow>& newRows);
 
-    const PropertyRow *dataForModelIndex(const QModelIndex &index) const;
+  const PropertyRow* dataForModelIndex(const QModelIndex& index) const;
 
-    int rowForPropertyKey(const std::string &propertyKey) const;
+  int rowForPropertyKey(const std::string& propertyKey) const;
 
-public:// for autocompletion
-    QStringList getCompletions(const QModelIndex &index) const;
+public: // for autocompletion
+  QStringList getCompletions(const QModelIndex& index) const;
 
-private:// autocompletion helpers
-    std::vector<std::string> propertyKeys(int row, int count) const;
+private: // autocompletion helpers
+  std::vector<std::string> propertyKeys(int row, int count) const;
 
-    std::vector<std::string> getAllPropertyKeys() const;
+  std::vector<std::string> getAllPropertyKeys() const;
 
-    std::vector<std::string> getAllValuesForPropertyKeys(const std::vector<std::string> &propertyKeys) const;
+  std::vector<std::string> getAllValuesForPropertyKeys(
+    const std::vector<std::string>& propertyKeys) const;
 
-    std::vector<std::string> getAllClassnames() const;
+  std::vector<std::string> getAllClassnames() const;
 
 public slots:
 
-    void updateFromMapDocument();
+  void updateFromMapDocument();
 
-public:// QAbstractTableModel overrides
-    int rowCount(const QModelIndex &parent) const override;
+public: // QAbstractTableModel overrides
+  int rowCount(const QModelIndex& parent) const override;
 
-    int columnCount(const QModelIndex &parent) const override;
+  int columnCount(const QModelIndex& parent) const override;
 
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-    QVariant data(const QModelIndex &index, int role) const override;
+  QVariant data(const QModelIndex& index, int role) const override;
 
-    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+  bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-private:// helpers
-    bool hasRowWithPropertyKey(const std::string &propertyKey) const;
+private: // helpers
+  bool hasRowWithPropertyKey(const std::string& propertyKey) const;
 
-    bool renameProperty(size_t rowIndex, const std::string &newKey, const std::vector<Model::EntityNodeBase *> &nodes);
+  bool renameProperty(
+    size_t rowIndex,
+    const std::string& newKey,
+    const std::vector<Model::EntityNodeBase*>& nodes);
 
-    bool updateProperty(size_t rowIndex, const std::string &newValue, const std::vector<Model::EntityNodeBase *> &nodes);
+  bool updateProperty(
+    size_t rowIndex,
+    const std::string& newValue,
+    const std::vector<Model::EntityNodeBase*>& nodes);
 
-    bool setProtectedProperty(size_t rowIndex, bool newValue);
+  bool setProtectedProperty(size_t rowIndex, bool newValue);
 
-public:// EntityPropertyGrid helpers
-    std::string propertyKey(int row) const;
+public: // EntityPropertyGrid helpers
+  std::string propertyKey(int row) const;
 
-    bool canRemove(int rowIndexInt);
+  bool canRemove(int rowIndexInt);
 
-    /**
+  /**
    * Return the desired sort order for these two rows.
    * Used by EntitySortFilterProxyModel to sort the rows.
    */
-    bool lessThan(size_t rowIndexA, size_t rowIndexB) const;
+  bool lessThan(size_t rowIndexA, size_t rowIndexB) const;
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

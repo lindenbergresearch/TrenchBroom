@@ -34,35 +34,44 @@
 #include <variant>
 #include <vector>
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 
-enum class TextureType {
+enum class TextureType
+{
   Opaque, /**
-   * Modifies texture uploading to support mask textures.
-   */
+           * Modifies texture uploading to support mask textures.
+           */
   Masked
 };
 
-std::ostream &operator<<(std::ostream &lhs, const TextureType &rhs);
+std::ostream& operator<<(std::ostream& lhs, const TextureType& rhs);
 
-enum class TextureCulling {
-  Default, None, Front, Back, Both
+enum class TextureCulling
+{
+  Default,
+  None,
+  Front,
+  Back,
+  Both
 };
 
-std::ostream &operator<<(std::ostream &lhs, const TextureCulling &rhs);
+std::ostream& operator<<(std::ostream& lhs, const TextureCulling& rhs);
 
 
-struct TextureBlendFunc {
-  enum class Enable {
+struct TextureBlendFunc
+{
+  enum class Enable
+  {
     /**
      * Don't change GL_BLEND and don't change the blend function.
      */
     UseDefault, /**
-     * Don't change GL_BLEND, but set the blend function.
-     */
+                 * Don't change GL_BLEND, but set the blend function.
+                 */
     UseFactors, /**
-     * Set GL_BLEND to off.
-     */
+                 * Set GL_BLEND to off.
+                 */
     DisableBlend
   };
 
@@ -74,10 +83,11 @@ struct TextureBlendFunc {
 };
 
 
-std::ostream &operator<<(std::ostream &lhs, const TextureBlendFunc::Enable &rhs);
+std::ostream& operator<<(std::ostream& lhs, const TextureBlendFunc::Enable& rhs);
 
 
-struct Q2Data {
+struct Q2Data
+{
   int flags;
   int contents;
   int value;
@@ -88,10 +98,11 @@ struct Q2Data {
 
 using GameData = std::variant<std::monostate, Q2Data>;
 
-std::ostream &operator<<(std::ostream &lhs, const GameData &rhs);
+std::ostream& operator<<(std::ostream& lhs, const GameData& rhs);
 
 
-class Texture {
+class Texture
+{
 private:
   using Buffer = TextureBuffer;
   using BufferList = std::vector<Buffer>;
@@ -127,47 +138,77 @@ private:
 
   GameData m_gameData;
 
-  kdl_reflect_decl(Texture, m_name, m_absolutePath, m_relativePath, m_width, m_height, m_averageColor, m_usageCount, m_overridden, m_format, m_type,
-      m_surfaceParms, m_culling, m_blendFunc, m_gameData);
+  kdl_reflect_decl(
+    Texture,
+    m_name,
+    m_absolutePath,
+    m_relativePath,
+    m_width,
+    m_height,
+    m_averageColor,
+    m_usageCount,
+    m_overridden,
+    m_format,
+    m_type,
+    m_surfaceParms,
+    m_culling,
+    m_blendFunc,
+    m_gameData);
 
 public:
   Texture(
-      std::string name, size_t width, size_t height, const Color &averageColor, Buffer &&buffer, GLenum format, TextureType type,
-      GameData gameData = std::monostate{}
-  );
+    std::string name,
+    size_t width,
+    size_t height,
+    const Color& averageColor,
+    Buffer&& buffer,
+    GLenum format,
+    TextureType type,
+    GameData gameData = std::monostate{});
 
   Texture(
-      std::string name, size_t width, size_t height, const Color &averageColor, BufferList buffers, GLenum format, TextureType type,
-      GameData gameData = std::monostate{}
-  );
+    std::string name,
+    size_t width,
+    size_t height,
+    const Color& averageColor,
+    BufferList buffers,
+    GLenum format,
+    TextureType type,
+    GameData gameData = std::monostate{});
 
-  Texture(std::string name, size_t width, size_t height, GLenum format = GL_RGB, TextureType type = TextureType::Opaque, GameData gameData = std::monostate{});
+  Texture(
+    std::string name,
+    size_t width,
+    size_t height,
+    GLenum format = GL_RGB,
+    TextureType type = TextureType::Opaque,
+    GameData gameData = std::monostate{});
 
-  Texture(const Texture &) = delete;
+  Texture(const Texture&) = delete;
 
-  Texture &operator=(const Texture &) = delete;
+  Texture& operator=(const Texture&) = delete;
 
-  Texture(Texture &&other);
+  Texture(Texture&& other);
 
-  Texture &operator=(Texture &&other);
+  Texture& operator=(Texture&& other);
 
   ~Texture();
 
   static TextureType selectTextureType(bool masked);
 
-  const std::string &name() const;
+  const std::string& name() const;
 
   /**
    * Absolute path of the texture
    */
-  const std::filesystem::path &absolutePath() const;
+  const std::filesystem::path& absolutePath() const;
 
   void setAbsolutePath(std::filesystem::path absolutePath);
 
   /**
    * Relative path of the texture in the game filesystem
    */
-  const std::filesystem::path &relativePath() const;
+  const std::filesystem::path& relativePath() const;
 
   void setRelativePath(std::filesystem::path relativePath);
 
@@ -175,13 +216,13 @@ public:
 
   size_t height() const;
 
-  const Color &averageColor() const;
+  const Color& averageColor() const;
 
   bool masked() const;
 
   void setOpaque();
 
-  const std::set<std::string> &surfaceParms() const;
+  const std::set<std::string>& surfaceParms() const;
 
   void setSurfaceParms(std::set<std::string> surfaceParms);
 
@@ -193,7 +234,7 @@ public:
 
   void disableBlend();
 
-  const GameData &gameData() const;
+  const GameData& gameData() const;
 
   size_t usageCount() const;
 
@@ -220,7 +261,7 @@ public: // exposed for tests only
    * Returns the texture data in the format returned by format().
    * Once prepare() is called, this will be an empty vector.
    */
-  const BufferList &buffersIfUnprepared() const;
+  const BufferList& buffersIfUnprepared() const;
 
   /**
    * Will be one of GL_RGB, GL_BGR, GL_RGBA, GL_BGRA.

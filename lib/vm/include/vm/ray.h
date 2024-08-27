@@ -27,71 +27,79 @@
 #include "vm/util.h"
 #include "vm/vec.h"
 
-namespace vm {
+namespace vm
+{
 /**
  * A ray, represented by the origin and direction.
  *
  * @tparam T the component type
  * @tparam S the number of components
  */
-template<typename T, size_t S>
-class ray {
+template <typename T, size_t S>
+class ray
+{
 public:
-    using component_type = T;
-    static constexpr std::size_t size = S;
+  using component_type = T;
+  static constexpr std::size_t size = S;
 
 public:
-    vec<T, S> origin;
-    vec<T, S> direction;
+  vec<T, S> origin;
+  vec<T, S> direction;
 
-    /**
+  /**
    * Creates a new ray with all components initialized to 0.
    */
-    constexpr ray()
-        : origin(vec<T, S>::zero()), direction(vec<T, S>::zero()) {
-    }
+  constexpr ray()
+    : origin(vec<T, S>::zero())
+    , direction(vec<T, S>::zero())
+  {
+  }
 
-    // Copy and move constructors
-    ray(const ray<T, S> &other) = default;
-    ray(ray<T, S> &&other) noexcept = default;
+  // Copy and move constructors
+  ray(const ray<T, S>& other) = default;
+  ray(ray<T, S>&& other) noexcept = default;
 
-    // Assignment operators
-    ray<T, S> &operator=(const ray<T, S> &other) = default;
-    ray<T, S> &operator=(ray<T, S> &&other) noexcept = default;
+  // Assignment operators
+  ray<T, S>& operator=(const ray<T, S>& other) = default;
+  ray<T, S>& operator=(ray<T, S>&& other) noexcept = default;
 
-    /**
+  /**
    * Creates a new ray by copying the values from the given ray. If the given ray has a
    * different component type, the values are converted using static_cast.
    *
    * @tparam U the component type of the given ray
    * @param other the ray to copy the values from
    */
-    template<typename U>
-    explicit constexpr ray(const ray<U, S> &other)
-        : origin(vec<T, S>(other.origin)), direction(vec<T, S>(other.direction)) {
-    }
+  template <typename U>
+  explicit constexpr ray(const ray<U, S>& other)
+    : origin(vec<T, S>(other.origin))
+    , direction(vec<T, S>(other.direction))
+  {
+  }
 
-    /**
+  /**
    * Creates a new ray with the given origin and direction.
    *
    * @param i_origin the origin
    * @param i_direction the direction
    */
-    constexpr ray(const vec<T, S> &i_origin, const vec<T, S> &i_direction)
-        : origin(i_origin), direction(i_direction) {
-    }
+  constexpr ray(const vec<T, S>& i_origin, const vec<T, S>& i_direction)
+    : origin(i_origin)
+    , direction(i_direction)
+  {
+  }
 
-    /**
+  /**
    * Returns the origin of this ray.
    */
-    constexpr vec<T, S> get_origin() const { return origin; }
+  constexpr vec<T, S> get_origin() const { return origin; }
 
-    /**
+  /**
    * Returns the direction of this ray.
    */
-    constexpr vec<T, S> get_direction() const { return direction; }
+  constexpr vec<T, S> get_direction() const { return direction; }
 
-    /**
+  /**
    * Transforms this line using the given transformation matrix. The translational part is
    * not applied to the direction, and the direction is normalized after the
    * transformation has been applied.
@@ -99,13 +107,14 @@ public:
    * @param transform the transformation to apply
    * @return the transformed ray
    */
-    ray<T, S> transform(const mat<T, S + 1, S + 1> &transform) const {
-        const auto newOrigin = transform * origin;
-        const auto newDirection = normalize(strip_translation(transform) * direction);
-        return ray<T, S>(newOrigin, newDirection);
-    }
+  ray<T, S> transform(const mat<T, S + 1, S + 1>& transform) const
+  {
+    const auto newOrigin = transform * origin;
+    const auto newDirection = normalize(strip_translation(transform) * direction);
+    return ray<T, S>(newOrigin, newDirection);
+  }
 
-    /**
+  /**
    * Transforms this line using the given transformation matrix at compile time. The
    * translational part is not applied to the direction, and the direction is normalized
    * after the transformation has been applied.
@@ -113,13 +122,14 @@ public:
    * @param transform the transformation to apply
    * @return the transformed ray
    */
-    constexpr ray<T, S> transform_c(const mat<T, S + 1, S + 1> &transform) const {
-        const auto newOrigin = transform * origin;
-        const auto newDirection = normalize_c(strip_translation(transform) * direction);
-        return ray<T, S>(newOrigin, newDirection);
-    }
+  constexpr ray<T, S> transform_c(const mat<T, S + 1, S + 1>& transform) const
+  {
+    const auto newOrigin = transform * origin;
+    const auto newDirection = normalize_c(strip_translation(transform) * direction);
+    return ray<T, S>(newOrigin, newDirection);
+  }
 
-    /**
+  /**
    * Determines the position of the given point in relation to the origin and direction of
    * this ray. Suppose that the ray determines a plane that splits the space into two half
    * spaces. The plane position is determined byhte origin and the plane normal is
@@ -134,16 +144,22 @@ public:
    * @param point the point to check
    * @return a value indicating the relative position of the given point
    */
-    constexpr plane_status point_status(const vec<T, S> &point) const {
-        const auto scale = dot(direction, point - origin);
-        if (scale > constants<T>::point_status_epsilon()) {
-            return plane_status::above;
-        } else if (scale < -constants<T>::point_status_epsilon()) {
-            return plane_status::below;
-        } else {
-            return plane_status::inside;
-        }
+  constexpr plane_status point_status(const vec<T, S>& point) const
+  {
+    const auto scale = dot(direction, point - origin);
+    if (scale > constants<T>::point_status_epsilon())
+    {
+      return plane_status::above;
     }
+    else if (scale < -constants<T>::point_status_epsilon())
+    {
+      return plane_status::below;
+    }
+    else
+    {
+      return plane_status::inside;
+    }
+  }
 };
 
 /**
@@ -156,9 +172,11 @@ public:
  * @param epsilon the epsilon value
  * @return true if all components of the given rays are equal, and false otherwise
  */
-template<typename T, size_t S>
-constexpr bool is_equal(const ray<T, S> &lhs, const ray<T, S> &rhs, const T epsilon) {
-    return is_equal(lhs.origin, rhs.origin, epsilon) && is_equal(lhs.direction, rhs.direction, epsilon);
+template <typename T, size_t S>
+constexpr bool is_equal(const ray<T, S>& lhs, const ray<T, S>& rhs, const T epsilon)
+{
+  return is_equal(lhs.origin, rhs.origin, epsilon)
+         && is_equal(lhs.direction, rhs.direction, epsilon);
 }
 
 /**
@@ -170,9 +188,10 @@ constexpr bool is_equal(const ray<T, S> &lhs, const ray<T, S> &rhs, const T epsi
  * @param rhs the second ray
  * @return true if the given rays are identical and false otherwise
  */
-template<typename T, size_t S>
-constexpr bool operator==(const ray<T, S> &lhs, const ray<T, S> &rhs) {
-    return lhs.origin == rhs.origin && lhs.direction == rhs.direction;
+template <typename T, size_t S>
+constexpr bool operator==(const ray<T, S>& lhs, const ray<T, S>& rhs)
+{
+  return lhs.origin == rhs.origin && lhs.direction == rhs.direction;
 }
 
 /**
@@ -184,8 +203,9 @@ constexpr bool operator==(const ray<T, S> &lhs, const ray<T, S> &rhs) {
  * @param rhs the second ray
  * @return false if the given rays are identical and true otherwise
  */
-template<typename T, size_t S>
-constexpr bool operator!=(const ray<T, S> &lhs, const ray<T, S> &rhs) {
-    return lhs.origin != rhs.origin || lhs.direction != rhs.direction;
+template <typename T, size_t S>
+constexpr bool operator!=(const ray<T, S>& lhs, const ray<T, S>& rhs)
+{
+  return lhs.origin != rhs.origin || lhs.direction != rhs.direction;
 }
-}// namespace vm
+} // namespace vm

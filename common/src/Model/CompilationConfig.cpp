@@ -21,8 +21,10 @@
 
 #include "kdl/reflection_impl.h"
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 
 kdl_reflect_impl(CompilationConfig);
 

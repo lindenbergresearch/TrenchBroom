@@ -24,56 +24,76 @@
 
 #include <string>
 
-namespace TrenchBroom {
-namespace View {
-UndoableCommand::UndoableCommand(std::string name, const bool updateModificationCount) : Command{std::move(name)}, m_modificationCount{updateModificationCount ? 1u : 0u} {
+namespace TrenchBroom
+{
+namespace View
+{
+UndoableCommand::UndoableCommand(std::string name, const bool updateModificationCount)
+  : Command{std::move(name)}
+  , m_modificationCount{updateModificationCount ? 1u : 0u}
+{
 }
 
 UndoableCommand::~UndoableCommand() {}
 
-std::unique_ptr<CommandResult> UndoableCommand::performDo(MapDocumentCommandFacade *document) {
-    auto result = Command::performDo(document);
-    if (result->success()) {
-        setModificationCount(document);
-    }
-    return result;
+std::unique_ptr<CommandResult> UndoableCommand::performDo(
+  MapDocumentCommandFacade* document)
+{
+  auto result = Command::performDo(document);
+  if (result->success())
+  {
+    setModificationCount(document);
+  }
+  return result;
 }
 
-std::unique_ptr<CommandResult> UndoableCommand::performUndo(MapDocumentCommandFacade *document) {
-    m_state = CommandState::Undoing;
-    auto result = doPerformUndo(document);
-    if (result->success()) {
-        resetModificationCount(document);
-        m_state = CommandState::Default;
-    } else {
-        m_state = CommandState::Done;
-    }
-    return result;
+std::unique_ptr<CommandResult> UndoableCommand::performUndo(
+  MapDocumentCommandFacade* document)
+{
+  m_state = CommandState::Undoing;
+  auto result = doPerformUndo(document);
+  if (result->success())
+  {
+    resetModificationCount(document);
+    m_state = CommandState::Default;
+  }
+  else
+  {
+    m_state = CommandState::Done;
+  }
+  return result;
 }
 
-bool UndoableCommand::collateWith(UndoableCommand &command) {
-    assert(&command != this);
-    if (doCollateWith(command)) {
-        m_modificationCount += command.m_modificationCount;
-        return true;
-    }
-    return false;
+bool UndoableCommand::collateWith(UndoableCommand& command)
+{
+  assert(&command != this);
+  if (doCollateWith(command))
+  {
+    m_modificationCount += command.m_modificationCount;
+    return true;
+  }
+  return false;
 }
 
-bool UndoableCommand::doCollateWith(UndoableCommand &) {
-    return false;
+bool UndoableCommand::doCollateWith(UndoableCommand&)
+{
+  return false;
 }
 
-void UndoableCommand::setModificationCount(MapDocumentCommandFacade *document) {
-    if (document && m_modificationCount) {
-        document->incModificationCount(m_modificationCount);
-    }
+void UndoableCommand::setModificationCount(MapDocumentCommandFacade* document)
+{
+  if (document && m_modificationCount)
+  {
+    document->incModificationCount(m_modificationCount);
+  }
 }
 
-void UndoableCommand::resetModificationCount(MapDocumentCommandFacade *document) {
-    if (document) {
-        document->decModificationCount(m_modificationCount);
-    }
+void UndoableCommand::resetModificationCount(MapDocumentCommandFacade* document)
+{
+  if (document)
+  {
+    document->decModificationCount(m_modificationCount);
+  }
 }
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

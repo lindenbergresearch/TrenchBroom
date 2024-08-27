@@ -24,11 +24,13 @@
 
 #include <vm/forward.h>
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 class Camera;
 }
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class MapViewActivationTracker;
 
 
@@ -38,72 +40,76 @@ class MapViewBase;
 class MapViewContainer;
 
 
-class MapView : public ViewEffectsService {
+class MapView : public ViewEffectsService
+{
 private:
-    MapViewContainer *m_container = nullptr;
+  MapViewContainer* m_container = nullptr;
 
 public:
-    ~MapView() override;
+  ~MapView() override;
 
-    void setContainer(MapViewContainer *container);
+  void setContainer(MapViewContainer* container);
 
-    void installActivationTracker(MapViewActivationTracker &activationTracker);
+  void installActivationTracker(MapViewActivationTracker& activationTracker);
 
-    bool isCurrent() const;
+  bool isCurrent() const;
 
-    MapViewBase *firstMapViewBase();
+  MapViewBase* firstMapViewBase();
 
-    bool canSelectTall();
+  bool canSelectTall();
 
-    void selectTall();
+  void selectTall();
 
-    vm::vec3 pasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const;
+  vm::vec3 pasteObjectsDelta(
+    const vm::bbox3& bounds, const vm::bbox3& referenceBounds) const;
 
-    void reset2dCameras(const Renderer::Camera &masterCamera, bool animate);
+  void reset2dCameras(const Renderer::Camera& masterCamera, bool animate);
 
-    void focusCameraOnSelection(bool animate);
+  void focusCameraOnSelection(bool animate);
 
-    void moveCameraToPosition(const vm::vec3f &position, bool animate);
+  void moveCameraToPosition(const vm::vec3f& position, bool animate);
 
-    void moveCameraToCurrentTracePoint();
+  void moveCameraToCurrentTracePoint();
 
-    bool cancelMouseDrag();
+  bool cancelMouseDrag();
 
-    /**
+  /**
    * If the parent of this view is a CyclingMapView, cycle to the
    * next child, otherwise do nothing.
    */
-    void cycleMapView();
+  void cycleMapView();
 
-    /**
+  /**
    * Requests repaint of the managed map views. Note, this must be used instead of
    * QWidget::update()
    */
-    void refreshViews();
+  void refreshViews();
 
 private:
-    virtual void doInstallActivationTracker(MapViewActivationTracker &activationTracker) = 0;
+  virtual void doInstallActivationTracker(
+    MapViewActivationTracker& activationTracker) = 0;
 
-    virtual bool doGetIsCurrent() const = 0;
+  virtual bool doGetIsCurrent() const = 0;
 
-    virtual MapViewBase *doGetFirstMapViewBase() = 0;
+  virtual MapViewBase* doGetFirstMapViewBase() = 0;
 
-    virtual bool doCanSelectTall() = 0;
+  virtual bool doCanSelectTall() = 0;
 
-    virtual void doSelectTall() = 0;
+  virtual void doSelectTall() = 0;
 
-    virtual vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const = 0;
+  virtual vm::vec3 doGetPasteObjectsDelta(
+    const vm::bbox3& bounds, const vm::bbox3& referenceBounds) const = 0;
 
-    virtual void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) = 0;
+  virtual void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) = 0;
 
-    virtual void doFocusCameraOnSelection(bool animate) = 0;
+  virtual void doFocusCameraOnSelection(bool animate) = 0;
 
-    virtual void doMoveCameraToPosition(const vm::vec3f &position, bool animate) = 0;
+  virtual void doMoveCameraToPosition(const vm::vec3f& position, bool animate) = 0;
 
-    virtual void doMoveCameraToCurrentTracePoint() = 0;
+  virtual void doMoveCameraToCurrentTracePoint() = 0;
 
-    virtual bool doCancelMouseDrag() = 0;
+  virtual bool doCancelMouseDrag() = 0;
 
-    virtual void doRefreshViews() = 0;
+  virtual void doRefreshViews() = 0;
 };
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

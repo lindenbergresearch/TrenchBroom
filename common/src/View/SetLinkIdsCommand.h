@@ -27,28 +27,33 @@
 #include <tuple>
 #include <vector>
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 class Node;
-}// namespace TrenchBroom::Model
+} // namespace TrenchBroom::Model
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 
-class SetLinkIdsCommand : public UndoableCommand {
+class SetLinkIdsCommand : public UndoableCommand
+{
 protected:
-    std::vector<std::tuple<Model::Node *, std::string>> m_linkIds;
+  std::vector<std::tuple<Model::Node*, std::string>> m_linkIds;
 
 public:
-    SetLinkIdsCommand(const std::string &name, std::vector<std::tuple<Model::Node *, std::string>> linkIds);
+  SetLinkIdsCommand(
+    const std::string& name, std::vector<std::tuple<Model::Node*, std::string>> linkIds);
 
-    ~SetLinkIdsCommand() override;
+  ~SetLinkIdsCommand() override;
 
-    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
+  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
 
-    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
+  std::unique_ptr<CommandResult> doPerformUndo(
+    MapDocumentCommandFacade* document) override;
 
-    bool doCollateWith(UndoableCommand &command) override;
+  bool doCollateWith(UndoableCommand& command) override;
 
-    deleteCopyAndMove(SetLinkIdsCommand);
+  deleteCopyAndMove(SetLinkIdsCommand);
 };
 
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

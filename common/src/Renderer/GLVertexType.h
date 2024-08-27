@@ -24,8 +24,10 @@
 
 #include <vm/forward.h>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class ShaderProgram;
 
 
@@ -35,7 +37,8 @@ class ShaderProgram;
  *
  * @tparam AttrTypes the vertex attribute types
  */
-template<typename... AttrTypes> struct GLVertexType;
+template <typename... AttrTypes>
+struct GLVertexType;
 
 
 /**
@@ -46,7 +49,9 @@ template<typename... AttrTypes> struct GLVertexType;
  * @tparam AttrType the type of the first vertex attribute
  * @tparam AttrTypeRest the types of the remaining vertex attributes
  */
-template<typename AttrType, typename... AttrTypeRest> struct GLVertexType<AttrType, AttrTypeRest...> {
+template <typename AttrType, typename... AttrTypeRest>
+struct GLVertexType<AttrType, AttrTypeRest...>
+{
   using Vertex = GLVertex<AttrType, AttrTypeRest...>;
   static const size_t Size = sizeof(Vertex);
 
@@ -56,7 +61,8 @@ template<typename AttrType, typename... AttrTypeRest> struct GLVertexType<AttrTy
    * @param program current shader program
    * @param baseOffset the base offset into the corresponding vertex buffer
    */
-  static void setup(ShaderProgram *program, const size_t baseOffset) {
+  static void setup(ShaderProgram* program, const size_t baseOffset)
+  {
     doSetup(program, 0, Size, baseOffset);
   }
 
@@ -65,7 +71,7 @@ template<typename AttrType, typename... AttrTypeRest> struct GLVertexType<AttrTy
    *
    * @param program current shader program
    */
-  static void cleanup(ShaderProgram *program) { doCleanup(program, 0); }
+  static void cleanup(ShaderProgram* program) { doCleanup(program, 0); }
 
   /**
    * Sets up the vertex buffer pointer for the first vertex attribute type and delegates
@@ -77,11 +83,12 @@ template<typename AttrType, typename... AttrTypeRest> struct GLVertexType<AttrTy
    * @param stride the stride of the vertex buffer pointer to be set up here
    * @param offset the offset of the vertex buffer pointer to be set up here
    */
-  static void doSetup(ShaderProgram *program, const size_t index, const size_t stride, const size_t offset) {
+  static void doSetup(
+    ShaderProgram* program, const size_t index, const size_t stride, const size_t offset)
+  {
     AttrType::setup(program, index, stride, offset);
     GLVertexType<AttrTypeRest...>::doSetup(
-        program, index + 1, stride, offset + AttrType::Size
-    );
+      program, index + 1, stride, offset + AttrType::Size);
   }
 
   /**
@@ -94,7 +101,8 @@ template<typename AttrType, typename... AttrTypeRest> struct GLVertexType<AttrTy
    * @param program current shader program
    * @param index the index of the attribute to be cleaned up here
    */
-  static void doCleanup(ShaderProgram *program, const size_t index) {
+  static void doCleanup(ShaderProgram* program, const size_t index)
+  {
     GLVertexType<AttrTypeRest...>::doCleanup(program, index + 1);
     AttrType::cleanup(program, index);
   }
@@ -102,7 +110,7 @@ template<typename AttrType, typename... AttrTypeRest> struct GLVertexType<AttrTy
   // Non-instantiable
   GLVertexType() = delete;
 
-deleteCopyAndMove(GLVertexType);
+  deleteCopyAndMove(GLVertexType);
 };
 
 
@@ -113,7 +121,9 @@ deleteCopyAndMove(GLVertexType);
  *
  * @tparam AttrType the type of the vertex attribute
  */
-template<typename AttrType> struct GLVertexType<AttrType> {
+template <typename AttrType>
+struct GLVertexType<AttrType>
+{
   using Vertex = GLVertex<AttrType>;
   static const size_t Size = sizeof(Vertex);
 
@@ -123,7 +133,8 @@ template<typename AttrType> struct GLVertexType<AttrType> {
    * @param program current shader program
    * @param baseOffset the base offset into the corresponding vertex buffer
    */
-  static void setup(ShaderProgram *program, const size_t baseOffset) {
+  static void setup(ShaderProgram* program, const size_t baseOffset)
+  {
     doSetup(program, 0, Size, baseOffset);
   }
 
@@ -132,7 +143,7 @@ template<typename AttrType> struct GLVertexType<AttrType> {
    *
    * @param program current shader program
    */
-  static void cleanup(ShaderProgram *program) { doCleanup(program, 0); }
+  static void cleanup(ShaderProgram* program) { doCleanup(program, 0); }
 
   /**
    * Sets up the vertex buffer pointer for the vertex attribute type. Do not call this
@@ -143,7 +154,9 @@ template<typename AttrType> struct GLVertexType<AttrType> {
    * @param stride the stride of the vertex buffer pointer to be set up here
    * @param offset the offset of the vertex buffer pointer to be set up here
    */
-  static void doSetup(ShaderProgram *program, const size_t index, const size_t stride, const size_t offset) {
+  static void doSetup(
+    ShaderProgram* program, const size_t index, const size_t stride, const size_t offset)
+  {
     AttrType::setup(program, index, stride, offset);
   }
 
@@ -154,28 +167,42 @@ template<typename AttrType> struct GLVertexType<AttrType> {
    * @param program current shader program
    * @param index the index of the attribute to be cleaned up here
    */
-  static void doCleanup(ShaderProgram *program, const size_t index) {
+  static void doCleanup(ShaderProgram* program, const size_t index)
+  {
     AttrType::cleanup(program, index);
   }
 
   // Non-instantiable
   GLVertexType() = delete;
 
-deleteCopyAndMove(GLVertexType);
+  deleteCopyAndMove(GLVertexType);
 };
 
-namespace GLVertexTypes {
+namespace GLVertexTypes
+{
 using P2 = GLVertexType<GLVertexAttributeTypes::P2>;
 using P3 = GLVertexType<GLVertexAttributeTypes::P3>;
 using P2C4 = GLVertexType<GLVertexAttributeTypes::P2, GLVertexAttributeTypes::C4>;
 using P3C4 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::C4>;
 using P2T2 = GLVertexType<GLVertexAttributeTypes::P2, GLVertexAttributeTypes::T02>;
 using P3T2 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::T02>;
-using P2T2C4 = GLVertexType<GLVertexAttributeTypes::P2, GLVertexAttributeTypes::T02, GLVertexAttributeTypes::C4>;
-using P3T2C4 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::T02, GLVertexAttributeTypes::C4>;
+using P2T2C4 = GLVertexType<
+  GLVertexAttributeTypes::P2,
+  GLVertexAttributeTypes::T02,
+  GLVertexAttributeTypes::C4>;
+using P3T2C4 = GLVertexType<
+  GLVertexAttributeTypes::P3,
+  GLVertexAttributeTypes::T02,
+  GLVertexAttributeTypes::C4>;
 using P3N = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N>;
-using P3NC4 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N, GLVertexAttributeTypes::C4>;
-using P3NT2 = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N, GLVertexAttributeTypes::T02>;
+using P3NC4 = GLVertexType<
+  GLVertexAttributeTypes::P3,
+  GLVertexAttributeTypes::N,
+  GLVertexAttributeTypes::C4>;
+using P3NT2 = GLVertexType<
+  GLVertexAttributeTypes::P3,
+  GLVertexAttributeTypes::N,
+  GLVertexAttributeTypes::T02>;
 } // namespace GLVertexTypes
 } // namespace Renderer
 } // namespace TrenchBroom

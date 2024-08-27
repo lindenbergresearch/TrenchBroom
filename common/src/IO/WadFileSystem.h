@@ -24,19 +24,21 @@
 
 #include <filesystem>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class FileSystem;
 
 
 class OwningBufferFile;
 
 
-class WadFileSystem : public ImageFileSystem<OwningBufferFile> {
+class WadFileSystem : public ImageFileSystem<OwningBufferFile>
+{
 public:
-    explicit WadFileSystem(std::shared_ptr<CFile> file);
+  explicit WadFileSystem(std::shared_ptr<CFile> file);
 
 private:
-    Result<void> doReadDirectory() override;
+  Result<void> doReadDirectory() override;
 };
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

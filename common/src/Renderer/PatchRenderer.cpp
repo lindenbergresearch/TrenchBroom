@@ -43,100 +43,134 @@
 #include <vm/forward.h>
 #include <vm/vec.h>
 
-namespace TrenchBroom {
-namespace Renderer {
-PatchRenderer::PatchRenderer(const Model::EditorContext &editorContext) : m_editorContext{editorContext}, m_grayscale{false}, m_tint{false}, m_alpha{1.0f} {
+namespace TrenchBroom
+{
+namespace Renderer
+{
+PatchRenderer::PatchRenderer(const Model::EditorContext& editorContext)
+  : m_editorContext{editorContext}
+  , m_grayscale{false}
+  , m_tint{false}
+  , m_alpha{1.0f}
+{
 }
 
-void PatchRenderer::setDefaultColor(const Color &faceColor) {
+void PatchRenderer::setDefaultColor(const Color& faceColor)
+{
   m_defaultColor = faceColor;
 }
 
-void PatchRenderer::setGrayscale(const bool grayscale) {
+void PatchRenderer::setGrayscale(const bool grayscale)
+{
   m_grayscale = grayscale;
 }
 
-void PatchRenderer::setTint(const bool tint) {
+void PatchRenderer::setTint(const bool tint)
+{
   m_tint = tint;
 }
 
-void PatchRenderer::setTintColor(const Color &color) {
+void PatchRenderer::setTintColor(const Color& color)
+{
   m_tintColor = color;
 }
 
-void PatchRenderer::setTransparencyAlpha(const float alpha) {
+void PatchRenderer::setTransparencyAlpha(const float alpha)
+{
   m_alpha = alpha;
 }
 
-void PatchRenderer::setShowEdges(const bool showEdges) {
+void PatchRenderer::setShowEdges(const bool showEdges)
+{
   m_showEdges = showEdges;
 }
 
-void PatchRenderer::setEdgeColor(const Color &edgeColor) {
+void PatchRenderer::setEdgeColor(const Color& edgeColor)
+{
   m_edgeColor = edgeColor;
 }
 
-void PatchRenderer::setShowOccludedEdges(const bool showOccludedEdges) {
+void PatchRenderer::setShowOccludedEdges(const bool showOccludedEdges)
+{
   m_showOccludedEdges = showOccludedEdges;
 }
 
-void PatchRenderer::setOccludedEdgeColor(const Color &occludedEdgeColor) {
+void PatchRenderer::setOccludedEdgeColor(const Color& occludedEdgeColor)
+{
   m_occludedEdgeColor = occludedEdgeColor;
 }
 
-void PatchRenderer::invalidate() {
+void PatchRenderer::invalidate()
+{
   m_valid = false;
 }
 
-void PatchRenderer::clear() {
+void PatchRenderer::clear()
+{
   m_patchNodes.clear();
   invalidate();
 }
 
-void PatchRenderer::addPatch(const Model::PatchNode *patchNode) {
-  if (m_patchNodes.insert(patchNode).second) {
+void PatchRenderer::addPatch(const Model::PatchNode* patchNode)
+{
+  if (m_patchNodes.insert(patchNode).second)
+  {
     invalidate();
   }
 }
 
-void PatchRenderer::removePatch(const Model::PatchNode *patchNode) {
-  if (auto it = m_patchNodes.find(patchNode); it != std::end(m_patchNodes)) {
+void PatchRenderer::removePatch(const Model::PatchNode* patchNode)
+{
+  if (auto it = m_patchNodes.find(patchNode); it != std::end(m_patchNodes))
+  {
     m_patchNodes.erase(it);
     invalidate();
   }
 }
 
-void PatchRenderer::invalidatePatch(const Model::PatchNode *) {
+void PatchRenderer::invalidatePatch(const Model::PatchNode*)
+{
   invalidate();
 }
 
-void PatchRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
-  if (! m_valid) {
+void PatchRenderer::render(RenderContext& renderContext, RenderBatch& renderBatch)
+{
+  if (!m_valid)
+  {
     validate();
   }
 
-  if (renderContext.showFaces()) {
+  if (renderContext.showFaces())
+  {
     renderBatch.add(this);
   }
 
-  if (renderContext.showEdges()) {
-    if (m_showOccludedEdges) {
+  if (renderContext.showEdges())
+  {
+    if (m_showOccludedEdges)
+    {
       m_edgeRenderer.renderOnTop(renderBatch, m_occludedEdgeColor);
     }
     m_edgeRenderer.render(renderBatch, m_edgeColor);
   }
 }
 
-static TexturedIndexArrayRenderer buildMeshRenderer(const std::vector<const Model::PatchNode *> &patchNodes, const Model::EditorContext &editorContext) {
+static TexturedIndexArrayRenderer buildMeshRenderer(
+  const std::vector<const Model::PatchNode*>& patchNodes,
+  const Model::EditorContext& editorContext)
+{
   size_t vertexCount = 0u;
   auto indexArrayMapSize = TexturedIndexArrayMap::Size{};
 
-  for (const auto *patchNode : patchNodes) {
-    if (editorContext.visible(patchNode)) {
+  for (const auto* patchNode : patchNodes)
+  {
+    if (editorContext.visible(patchNode))
+    {
       vertexCount += patchNode->grid().pointRowCount * patchNode->grid().pointColumnCount;
 
-      const auto *texture = patchNode->patch().texture();
-      const auto quadCount = patchNode->grid().quadRowCount() * patchNode->grid().quadColumnCount();
+      const auto* texture = patchNode->patch().texture();
+      const auto quadCount =
+        patchNode->grid().quadRowCount() * patchNode->grid().quadColumnCount();
       indexArrayMapSize.inc(texture, PrimType::Triangles, 6u * quadCount);
     }
   }
@@ -148,32 +182,40 @@ static TexturedIndexArrayRenderer buildMeshRenderer(const std::vector<const Mode
   auto indexArrayMapBuilder = TexturedIndexArrayMapBuilder{indexArrayMapSize};
   using Index = TexturedIndexArrayMapBuilder::Index;
 
-  for (const auto *patchNode : patchNodes) {
-    if (editorContext.visible(patchNode)) {
+  for (const auto* patchNode : patchNodes)
+  {
+    if (editorContext.visible(patchNode))
+    {
       const auto vertexOffset = vertices.size();
 
-      const auto &grid = patchNode->grid();
-      auto gridVertices = kdl::vec_transform(
-          grid.points, [](const auto &p) {
-            return Vertex{vm::vec3f{p.position}, vm::vec3f{p.normal}, vm::vec2f{p.texCoords}};
-          }
-      );
+      const auto& grid = patchNode->grid();
+      auto gridVertices = kdl::vec_transform(grid.points, [](const auto& p) {
+        return Vertex{vm::vec3f{p.position}, vm::vec3f{p.normal}, vm::vec2f{p.texCoords}};
+      });
       vertices = kdl::vec_concat(std::move(vertices), std::move(gridVertices));
 
-      const auto *texture = patchNode->patch().texture();
+      const auto* texture = patchNode->patch().texture();
 
       const auto pointsPerRow = grid.pointColumnCount;
-      for (size_t row = 0u; row < grid.quadRowCount(); ++ row) {
-        for (size_t col = 0u; col < grid.quadColumnCount(); ++ col) {
+      for (size_t row = 0u; row < grid.quadRowCount(); ++row)
+      {
+        for (size_t col = 0u; col < grid.quadColumnCount(); ++col)
+        {
           const auto i0 = vertexOffset + row * pointsPerRow + col;
           const auto i1 = vertexOffset + row * pointsPerRow + col + 1u;
           const auto i2 = vertexOffset + (row + 1u) * pointsPerRow + col + 1u;
           const auto i3 = vertexOffset + (row + 1u) * pointsPerRow + col;
 
           indexArrayMapBuilder.addTriangle(
-              texture, static_cast<Index>(i0), static_cast<Index>(i1), static_cast<Index>(i2));
+            texture,
+            static_cast<Index>(i0),
+            static_cast<Index>(i1),
+            static_cast<Index>(i2));
           indexArrayMapBuilder.addTriangle(
-              texture, static_cast<Index>(i2), static_cast<Index>(i3), static_cast<Index>(i0));
+            texture,
+            static_cast<Index>(i2),
+            static_cast<Index>(i3),
+            static_cast<Index>(i0));
         }
       }
     }
@@ -181,25 +223,37 @@ static TexturedIndexArrayRenderer buildMeshRenderer(const std::vector<const Mode
 
   auto vertexArray = VertexArray::move(std::move(vertices));
   auto indexArray = IndexArray::move(std::move(indexArrayMapBuilder.indices()));
-  return TexturedIndexArrayRenderer{std::move(vertexArray), std::move(indexArray), std::move(indexArrayMapBuilder.ranges())};
+  return TexturedIndexArrayRenderer{
+    std::move(vertexArray),
+    std::move(indexArray),
+    std::move(indexArrayMapBuilder.ranges())};
 }
 
-static DirectEdgeRenderer buildEdgeRenderer(const std::vector<const Model::PatchNode *> &patchNodes, const Model::EditorContext &editorContext) {
+static DirectEdgeRenderer buildEdgeRenderer(
+  const std::vector<const Model::PatchNode*>& patchNodes,
+  const Model::EditorContext& editorContext)
+{
   size_t vertexCount = 0u;
   auto indexRangeMapSize = IndexRangeMap::Size{};
 
-  for (const auto *patchNode : patchNodes) {
-    if (editorContext.visible(patchNode)) {
-      vertexCount += (patchNode->grid().pointRowCount + patchNode->grid().pointColumnCount - 2u) * 2u;
+  for (const auto* patchNode : patchNodes)
+  {
+    if (editorContext.visible(patchNode))
+    {
+      vertexCount +=
+        (patchNode->grid().pointRowCount + patchNode->grid().pointColumnCount - 2u) * 2u;
       indexRangeMapSize.inc(PrimType::LineLoop, vertexCount);
     }
   }
 
-  auto indexRangeMapBuilder = IndexRangeMapBuilder<GLVertexTypes::P3>{vertexCount, indexRangeMapSize};
+  auto indexRangeMapBuilder =
+    IndexRangeMapBuilder<GLVertexTypes::P3>{vertexCount, indexRangeMapSize};
 
-  for (const auto *patchNode : patchNodes) {
-    if (editorContext.visible(patchNode)) {
-      const auto &grid = patchNode->grid();
+  for (const auto* patchNode : patchNodes)
+  {
+    if (editorContext.visible(patchNode))
+    {
+      const auto& grid = patchNode->grid();
 
       auto edgeLoopVertices = std::vector<GLVertexTypes::P3::Vertex>{};
       edgeLoopVertices.reserve((grid.pointRowCount + grid.pointColumnCount - 2u) * 2u);
@@ -215,23 +269,27 @@ static DirectEdgeRenderer buildEdgeRenderer(const std::vector<const Model::Patch
       size_t row = t;
       size_t col = l;
 
-      while (col < r) {
-        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row, col ++).position});
+      while (col < r)
+      {
+        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row, col++).position});
       }
       assert(row == t && col == r);
 
-      while (row < b) {
-        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row ++, col).position});
+      while (row < b)
+      {
+        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row++, col).position});
       }
       assert(row == b && col == r);
 
-      while (col > l) {
-        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row, col --).position});
+      while (col > l)
+      {
+        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row, col--).position});
       }
       assert(row == b && col == l);
 
-      while (row > t) {
-        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row --, col).position});
+      while (row > t)
+      {
+        edgeLoopVertices.emplace_back(vm::vec3f{grid.point(row--, col).position});
       }
       assert(row == t && col == l);
 
@@ -244,8 +302,10 @@ static DirectEdgeRenderer buildEdgeRenderer(const std::vector<const Model::Patch
   return DirectEdgeRenderer{std::move(vertexArray), std::move(indexRangeMap)};
 }
 
-void PatchRenderer::validate() {
-  if (! m_valid) {
+void PatchRenderer::validate()
+{
+  if (!m_valid)
+  {
     m_patchMeshRenderer = buildMeshRenderer(m_patchNodes.get_data(), m_editorContext);
     m_edgeRenderer = buildEdgeRenderer(m_patchNodes.get_data(), m_editorContext);
 
@@ -253,44 +313,58 @@ void PatchRenderer::validate() {
   }
 }
 
-void PatchRenderer::prepareVerticesAndIndices(VboManager &vboManager) {
+void PatchRenderer::prepareVerticesAndIndices(VboManager& vboManager)
+{
   m_patchMeshRenderer.prepare(vboManager);
 }
 
-namespace {
-struct RenderFunc : public TextureRenderFunc {
-  ActiveShader &shader;
+namespace
+{
+struct RenderFunc : public TextureRenderFunc
+{
+  ActiveShader& shader;
   bool applyTexture;
-  const Color &defaultColor;
+  const Color& defaultColor;
 
-  RenderFunc(ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor) :
-      shader{i_shader}, applyTexture{i_applyTexture}, defaultColor{i_defaultColor} {
+  RenderFunc(
+    ActiveShader& i_shader, const bool i_applyTexture, const Color& i_defaultColor)
+    : shader{i_shader}
+    , applyTexture{i_applyTexture}
+    , defaultColor{i_defaultColor}
+  {
   }
 
-  void before(const Assets::Texture *texture) override {
+  void before(const Assets::Texture* texture) override
+  {
     shader.set("GridColor", gridColorForTexture(texture));
-    if (texture != nullptr) {
+    if (texture != nullptr)
+    {
       texture->activate();
       shader.set("ApplyTexture", applyTexture);
       shader.set("Color", texture->averageColor());
-    } else {
+    }
+    else
+    {
       shader.set("ApplyTexture", false);
       shader.set("Color", defaultColor);
     }
   }
 
-  void after(const Assets::Texture *texture) override {
-    if (texture != nullptr) {
+  void after(const Assets::Texture* texture) override
+  {
+    if (texture != nullptr)
+    {
       texture->deactivate();
     }
   }
 };
 } // namespace
 
-void PatchRenderer::doRender(RenderContext &context) {
-  auto &shaderManager = context.shaderManager();
+void PatchRenderer::doRender(RenderContext& context)
+{
+  auto& shaderManager = context.shaderManager();
   auto shader = ActiveShader{shaderManager, Shaders::FaceShader};
-  auto &prefs = PreferenceManager::instance();
+  auto& prefs = PreferenceManager::instance();
 
   const bool applyTexture = context.showTextures();
   const bool shadeFaces = context.shadeFaces();
@@ -305,7 +379,8 @@ void PatchRenderer::doRender(RenderContext &context) {
   shader.set("ApplyTexture", applyTexture);
   shader.set("Texture", 0);
   shader.set("ApplyTinting", m_tint);
-  if (m_tint) {
+  if (m_tint)
+  {
     shader.set("TintColor", m_tintColor);
   }
   shader.set("GrayScale", m_grayscale);
@@ -314,14 +389,16 @@ void PatchRenderer::doRender(RenderContext &context) {
   shader.set("ShowFog", showFog);
   shader.set("Alpha", 1.0);
   shader.set("EnableMasked", false);
-  shader.set("ShowSoftMapBounds", ! context.softMapBounds().is_empty());
+  shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
   shader.set("SoftMapBoundsMin", context.softMapBounds().min);
   shader.set("SoftMapBoundsMax", context.softMapBounds().max);
   shader.set(
-      "SoftMapBoundsColor", vm::vec4f{
-          prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f
-      }
-  );
+    "SoftMapBoundsColor",
+    vm::vec4f{
+      prefs.get(Preferences::SoftMapBoundsColor).r(),
+      prefs.get(Preferences::SoftMapBoundsColor).g(),
+      prefs.get(Preferences::SoftMapBoundsColor).b(),
+      0.1f});
 
   auto func = RenderFunc{shader, applyTexture, m_defaultColor};
   /*

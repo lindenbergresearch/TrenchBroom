@@ -34,628 +34,612 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace View {
-TEST_CASE_METHOD(MapDocumentTest,
-"CsgTest.csgConvexMergeBrushes") {
-const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
-
-auto *entity = new Model::EntityNode{Model::Entity{}};
-document->addNodes( {{
-document->
-
-parentForNodes(),
-
+namespace TrenchBroom
 {
-entity
-}
-}
-});
-
-auto *brushNode1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 64, 64)), "texture").value());
-auto *brushNode2 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
-document->addNodes({
+namespace View
 {
-entity, {
-brushNode1}}});
-document->addNodes({
+TEST_CASE_METHOD(MapDocumentTest, "CsgTest.csgConvexMergeBrushes")
 {
-document->
+  const Model::BrushBuilder builder(
+    document->world()->mapFormat(), document->worldBounds());
 
-parentForNodes(),
+  auto* entity = new Model::EntityNode{Model::Entity{}};
+  document->addNodes(
+    {{document->
 
-{
-brushNode2}}});
-CHECK(entity
-->
+      parentForNodes(),
 
-children()
+      {entity}}});
 
-.
+  auto* brushNode1 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 64, 64)), "texture")
+      .value());
+  auto* brushNode2 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 64, 64)), "texture")
+      .value());
+  document->addNodes({{entity, {brushNode1}}});
+  document->addNodes(
+    {{document->
 
-size()
+      parentForNodes(),
 
-== 1u);
+      {brushNode2}}});
+  CHECK(
+    entity
+      ->
 
-document->selectNodes({
-brushNode1, brushNode2});
-CHECK(document
-->
+    children()
 
-csgConvexMerge()
+      .
 
-);
-CHECK(entity
-->
+    size()
 
-children()
+    == 1u);
 
-.
+  document->selectNodes({brushNode1, brushNode2});
+  CHECK(document->
 
-size()
+        csgConvexMerge()
 
-== 1u); // added to the parent of the first brush
+  );
+  CHECK(
+    entity
+      ->
 
-auto *brush3 = entity->children().front();
-CHECK(brush3
-->
+    children()
 
-logicalBounds()
+      .
 
-==
-vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)
-));
+    size()
+
+    == 1u); // added to the parent of the first brush
+
+  auto* brush3 = entity->children().front();
+  CHECK(
+    brush3->
+
+    logicalBounds()
+
+    == vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)));
 }
 
-TEST_CASE_METHOD(MapDocumentTest,
-"CsgTest.csgConvexMergeFaces")
+TEST_CASE_METHOD(MapDocumentTest, "CsgTest.csgConvexMergeFaces")
 {
-const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
+  const Model::BrushBuilder builder(
+    document->world()->mapFormat(), document->worldBounds());
 
-auto *entity = new Model::EntityNode{Model::Entity{}};
-document->addNodes({
-{
-document->
+  auto* entity = new Model::EntityNode{Model::Entity{}};
+  document->addNodes(
+    {{document->
 
-parentForNodes(),
+      parentForNodes(),
 
-{
-entity}}});
+      {entity}}});
 
-auto *brushNode1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 64, 64)), "texture").value());
-auto *brushNode2 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
-document->addNodes({
-{
-entity, {
-brushNode1}}});
-document->addNodes({
-{
-document->
+  auto* brushNode1 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 64, 64)), "texture")
+      .value());
+  auto* brushNode2 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 64, 64)), "texture")
+      .value());
+  document->addNodes({{entity, {brushNode1}}});
+  document->addNodes(
+    {{document->
 
-parentForNodes(),
+      parentForNodes(),
 
-{
-brushNode2}}});
-CHECK(entity
-->
+      {brushNode2}}});
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto faceIndex = 0u;
-const auto &face1 = brushNode1->brush().face(faceIndex);
-const auto &face2 = brushNode2->brush().face(faceIndex);
+  const auto faceIndex = 0u;
+  const auto& face1 = brushNode1->brush().face(faceIndex);
+  const auto& face2 = brushNode2->brush().face(faceIndex);
 
-document->selectBrushFaces({
-{
-brushNode1, faceIndex},
-{
-brushNode2, faceIndex}}
-);
-CHECK(document
-->
+  document->selectBrushFaces({{brushNode1, faceIndex}, {brushNode2, faceIndex}});
+  CHECK(document->
 
-csgConvexMerge()
+        csgConvexMerge()
 
-);
-CHECK(entity
-->
+  );
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 2u); // added to the parent of the first brush, original brush is not deleted
+    == 2u); // added to the parent of the first brush, original brush is not deleted
 
-auto *brush3 = entity->children().back();
+  auto* brush3 = entity->children().back();
 
-// check our assumption about the order of the entities' children
-assert(brush3 != brushNode1);
-assert(brush3 != brushNode2);
+  // check our assumption about the order of the entities' children
+  assert(brush3 != brushNode1);
+  assert(brush3 != brushNode2);
 
-const auto face1Verts = face1.vertexPositions();
-const auto face2Verts = face2.vertexPositions();
+  const auto face1Verts = face1.vertexPositions();
+  const auto face2Verts = face2.vertexPositions();
 
-const auto bounds = vm::merge(
-    vm::bbox3::merge_all(std::begin(face1Verts), std::end(face1Verts)), vm::bbox3::merge_all(std::begin(face2Verts), std::end(face2Verts)));
+  const auto bounds = vm::merge(
+    vm::bbox3::merge_all(std::begin(face1Verts), std::end(face1Verts)),
+    vm::bbox3::merge_all(std::begin(face2Verts), std::end(face2Verts)));
 
-CHECK(brush3
-->
+  CHECK(
+    brush3->
 
-logicalBounds()
+    logicalBounds()
 
-== bounds);
+    == bounds);
 }
 
-TEST_CASE_METHOD(ValveMapDocumentTest,
-"ValveMapDocumentTest.csgConvexMergeTexturing")
+TEST_CASE_METHOD(ValveMapDocumentTest, "ValveMapDocumentTest.csgConvexMergeTexturing")
 {
-const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
+  const Model::BrushBuilder builder(
+    document->world()->mapFormat(), document->worldBounds());
 
-Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
-document->addNodes({
-{
-document->
+  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
+  document->addNodes(
+    {{document->
 
-parentForNodes(),
+      parentForNodes(),
 
-{
-entity}}});
+      {entity}}});
 
-Model::ParallelTexCoordSystem texAlignment(vm::vec3(1, 0, 0), vm::vec3(0, 1, 0));
-auto texAlignmentSnapshot = texAlignment.takeSnapshot();
+  Model::ParallelTexCoordSystem texAlignment(vm::vec3(1, 0, 0), vm::vec3(0, 1, 0));
+  auto texAlignmentSnapshot = texAlignment.takeSnapshot();
 
-Model::Brush brush1 = builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 64, 64)), "texture").value();
-brush1.
-face(*brush1
-.
+  Model::Brush brush1 =
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 64, 64)), "texture")
+      .value();
+  brush1
+    .face(*brush1.
 
-findFace (vm::vec3::pos_z())
+           findFace(vm::vec3::pos_z())
 
-).
-restoreTexCoordSystemSnapshot(*texAlignmentSnapshot);
+            )
+    .restoreTexCoordSystemSnapshot(*texAlignmentSnapshot);
 
-Model::Brush brush2 = builder.createCuboid(vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 64, 64)), "texture").value();
-brush2.
-face(*brush2
-.
+  Model::Brush brush2 =
+    builder.createCuboid(vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 64, 64)), "texture")
+      .value();
+  brush2
+    .face(*brush2.
 
-findFace (vm::vec3::pos_z())
+           findFace(vm::vec3::pos_z())
 
-).
-restoreTexCoordSystemSnapshot(*texAlignmentSnapshot);
+            )
+    .restoreTexCoordSystemSnapshot(*texAlignmentSnapshot);
 
-Model::BrushNode *brushNode1 = new Model::BrushNode(std::move(brush1));
-Model::BrushNode *brushNode2 = new Model::BrushNode(std::move(brush2));
+  Model::BrushNode* brushNode1 = new Model::BrushNode(std::move(brush1));
+  Model::BrushNode* brushNode2 = new Model::BrushNode(std::move(brush2));
 
-document->addNodes({
-{
-entity, {
-brushNode1}}});
-document->addNodes({
-{
-entity, {
-brushNode2}}});
-CHECK(entity
-->
+  document->addNodes({{entity, {brushNode1}}});
+  document->addNodes({{entity, {brushNode2}}});
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-document->selectNodes({
-brushNode1, brushNode2});
-CHECK(document
-->
+  document->selectNodes({brushNode1, brushNode2});
+  CHECK(document->
 
-csgConvexMerge()
+        csgConvexMerge()
 
-);
-CHECK(entity
-->
+  );
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-Model::BrushNode *brushNode3 = static_cast<Model::BrushNode *>(entity->children()[0]);
-const Model::Brush &brush3 = brushNode3->brush();
+  Model::BrushNode* brushNode3 = static_cast<Model::BrushNode*>(entity->children()[0]);
+  const Model::Brush& brush3 = brushNode3->brush();
 
-const Model::BrushFace &top = brush3.face(*brush3.findFace(vm::vec3::pos_z()));
-CHECK(top
-.
+  const Model::BrushFace& top = brush3.face(*brush3.findFace(vm::vec3::pos_z()));
+  CHECK(
+    top.
 
-textureXAxis()
+    textureXAxis()
 
-== vm::vec3(1, 0, 0));
-CHECK(top
-.
+    == vm::vec3(1, 0, 0));
+  CHECK(
+    top.
 
-textureYAxis()
+    textureYAxis()
 
-== vm::vec3(0, 1, 0));
+    == vm::vec3(0, 1, 0));
 }
 
-TEST_CASE_METHOD(ValveMapDocumentTest,
-"ValveMapDocumentTest.csgSubtractTexturing")
+TEST_CASE_METHOD(ValveMapDocumentTest, "ValveMapDocumentTest.csgSubtractTexturing")
 {
-const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
+  const Model::BrushBuilder builder(
+    document->world()->mapFormat(), document->worldBounds());
 
-Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
-document->addNodes({
-{
-document->
+  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
+  document->addNodes(
+    {{document->
 
-parentForNodes(),
+      parentForNodes(),
 
-{
-entity}}});
+      {entity}}});
 
-Model::ParallelTexCoordSystem texAlignment(vm::vec3(1, 0, 0), vm::vec3(0, 1, 0));
-auto texAlignmentSnapshot = texAlignment.takeSnapshot();
+  Model::ParallelTexCoordSystem texAlignment(vm::vec3(1, 0, 0), vm::vec3(0, 1, 0));
+  auto texAlignmentSnapshot = texAlignment.takeSnapshot();
 
-Model::Brush brush1 = builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value();
-Model::Brush brush2 = builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 32)), "texture").value();
-brush2.
-face(*brush2
-.
+  Model::Brush brush1 =
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
+      .value();
+  Model::Brush brush2 =
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 32)), "texture")
+      .value();
+  brush2
+    .face(*brush2.
 
-findFace (vm::vec3::pos_z())
+           findFace(vm::vec3::pos_z())
 
-).
-restoreTexCoordSystemSnapshot(*texAlignmentSnapshot);
+            )
+    .restoreTexCoordSystemSnapshot(*texAlignmentSnapshot);
 
-Model::BrushNode *brushNode1 = new Model::BrushNode(std::move(brush1));
-Model::BrushNode *brushNode2 = new Model::BrushNode(std::move(brush2));
+  Model::BrushNode* brushNode1 = new Model::BrushNode(std::move(brush1));
+  Model::BrushNode* brushNode2 = new Model::BrushNode(std::move(brush2));
 
-document->addNodes({
-{
-entity, {
-brushNode1}}});
-document->addNodes({
-{
-entity, {
-brushNode2}}});
-CHECK(entity
-->
+  document->addNodes({{entity, {brushNode1}}});
+  document->addNodes({{entity, {brushNode2}}});
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-// we want to compute brush1 - brush2
-document->selectNodes({
-brushNode2});
-CHECK(document
-->
+  // we want to compute brush1 - brush2
+  document->selectNodes({brushNode2});
+  CHECK(document->
 
-csgSubtract()
+        csgSubtract()
 
-);
-CHECK(entity
-->
+  );
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-Model::BrushNode *brushNode3 = static_cast<Model::BrushNode *>(entity->children()[0]);
-const Model::Brush &brush3 = brushNode3->brush();
+  Model::BrushNode* brushNode3 = static_cast<Model::BrushNode*>(entity->children()[0]);
+  const Model::Brush& brush3 = brushNode3->brush();
 
-CHECK(brushNode3
-->
+  CHECK(
+    brushNode3->
 
-logicalBounds()
+    logicalBounds()
 
-==
-vm::bbox3(vm::vec3(0, 0, 32), vm::vec3(64, 64, 64)
-));
+    == vm::bbox3(vm::vec3(0, 0, 32), vm::vec3(64, 64, 64)));
 
-// the texture alignment from the top of brush2 should have transferred
-// to the bottom face of brush3
-const Model::BrushFace &top = brush3.face(*brush3.findFace(vm::vec3::neg_z()));
-CHECK(top
-.
+  // the texture alignment from the top of brush2 should have transferred
+  // to the bottom face of brush3
+  const Model::BrushFace& top = brush3.face(*brush3.findFace(vm::vec3::neg_z()));
+  CHECK(
+    top.
 
-textureXAxis()
+    textureXAxis()
 
-== vm::vec3(1, 0, 0));
-CHECK(top
-.
+    == vm::vec3(1, 0, 0));
+  CHECK(
+    top.
 
-textureYAxis()
+    textureYAxis()
 
-== vm::vec3(0, 1, 0));
+    == vm::vec3(0, 1, 0));
 }
 
-TEST_CASE_METHOD(MapDocumentTest,
-"CsgTest.csgSubtractMultipleBrushes")
+TEST_CASE_METHOD(MapDocumentTest, "CsgTest.csgSubtractMultipleBrushes")
 {
-const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
+  const Model::BrushBuilder builder(
+    document->world()->mapFormat(), document->worldBounds());
 
-auto *entity = new Model::EntityNode{Model::Entity{}};
-document->addNodes({
-{
-document->
+  auto* entity = new Model::EntityNode{Model::Entity{}};
+  document->addNodes(
+    {{document->
 
-parentForNodes(),
+      parentForNodes(),
 
-{
-entity}}});
+      {entity}}});
 
-Model::BrushNode *minuend = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
-Model::BrushNode *subtrahend1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 32, 64)), "texture").value());
-Model::BrushNode *subtrahend2 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(32, 32, 0), vm::vec3(64, 64, 64)), "texture").value());
+  Model::BrushNode* minuend = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
+      .value());
+  Model::BrushNode* subtrahend1 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(32, 32, 64)), "texture")
+      .value());
+  Model::BrushNode* subtrahend2 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(32, 32, 0), vm::vec3(64, 64, 64)), "texture")
+      .value());
 
-document->addNodes({
-{
-entity, {
-minuend, subtrahend1, subtrahend2}}});
-CHECK(entity
-->
+  document->addNodes({{entity, {minuend, subtrahend1, subtrahend2}}});
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 3u);
+    == 3u);
 
-// we want to compute minuend - {subtrahend1, subtrahend2}
-document->selectNodes({
-subtrahend1, subtrahend2});
-CHECK(document
-->
+  // we want to compute minuend - {subtrahend1, subtrahend2}
+  document->selectNodes({subtrahend1, subtrahend2});
+  CHECK(document->
 
-csgSubtract()
+        csgSubtract()
 
-);
-CHECK(entity
-->
+  );
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-auto *remainder1 = dynamic_cast<Model::BrushNode *>(entity->children()[0]);
-auto *remainder2 = dynamic_cast<Model::BrushNode *>(entity->children()[1]);
-CHECK(remainder1
-!= nullptr);
-CHECK(remainder2
-!= nullptr);
+  auto* remainder1 = dynamic_cast<Model::BrushNode*>(entity->children()[0]);
+  auto* remainder2 = dynamic_cast<Model::BrushNode*>(entity->children()[1]);
+  CHECK(remainder1 != nullptr);
+  CHECK(remainder2 != nullptr);
 
-const auto expectedBBox1 = vm::bbox3(vm::vec3(0, 32, 0), vm::vec3(32, 64, 64));
-const auto expectedBBox2 = vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 32, 64));
+  const auto expectedBBox1 = vm::bbox3(vm::vec3(0, 32, 0), vm::vec3(32, 64, 64));
+  const auto expectedBBox2 = vm::bbox3(vm::vec3(32, 0, 0), vm::vec3(64, 32, 64));
 
-if (remainder1->
+  if (
+    remainder1->
 
-logicalBounds()
+    logicalBounds()
 
-!= expectedBBox1) {
-std::swap(remainder1, remainder2
-);
+    != expectedBBox1)
+  {
+    std::swap(remainder1, remainder2);
+  }
+
+  CHECK(
+    remainder1->
+
+    logicalBounds()
+
+    == expectedBBox1);
+  CHECK(
+    remainder2->
+
+    logicalBounds()
+
+    == expectedBBox2);
 }
 
-CHECK(remainder1
-->
-
-logicalBounds()
-
-== expectedBBox1);
-CHECK(remainder2
-->
-
-logicalBounds()
-
-== expectedBBox2);
-}
-
-TEST_CASE_METHOD(MapDocumentTest,
-"CsgTest.csgSubtractAndUndoRestoresSelection")
+TEST_CASE_METHOD(MapDocumentTest, "CsgTest.csgSubtractAndUndoRestoresSelection")
 {
-const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
+  const Model::BrushBuilder builder(
+    document->world()->mapFormat(), document->worldBounds());
 
-auto *entity = new Model::EntityNode{Model::Entity{}};
-document->addNodes({
-{
-document->
+  auto* entity = new Model::EntityNode{Model::Entity{}};
+  document->addNodes(
+    {{document->
 
-parentForNodes(),
+      parentForNodes(),
 
-{
-entity}}});
+      {entity}}});
 
-Model::BrushNode *subtrahend1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
-document->addNodes({
-{
-entity, {
-subtrahend1}}});
+  Model::BrushNode* subtrahend1 = new Model::BrushNode(
+    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
+      .value());
+  document->addNodes({{entity, {subtrahend1}}});
 
-document->selectNodes({
-subtrahend1});
-CHECK(document
-->
+  document->selectNodes({subtrahend1});
+  CHECK(document->
 
-csgSubtract()
+        csgSubtract()
 
-);
-CHECK(entity
-->
+  );
+  CHECK(
+    entity
+      ->
 
-children()
+    children()
 
-.
+      .
 
-size()
+    size()
 
-== 0u);
-CHECK(document
-->
+    == 0u);
+  CHECK(document
+          ->
 
-selectedNodes()
+        selectedNodes()
 
-.
+          .
 
-empty()
+        empty()
 
-);
+  );
 
-// check that the selection is restored after undo
-document->
+  // check that the selection is restored after undo
+  document->
 
-undoCommand();
+    undoCommand();
 
-CHECK(document
-->
+  CHECK(document
+          ->
 
-selectedNodes()
+        selectedNodes()
 
-.
+          .
 
-hasOnlyBrushes()
+        hasOnlyBrushes()
 
-);
-CHECK_THAT(document
-->
+  );
+  CHECK_THAT(
+    document
+      ->
 
-selectedNodes()
+    selectedNodes()
 
-.
+      .
 
-brushes(), Catch::Equals(std::vector<Model::BrushNode *>{subtrahend1})
+    brushes(),
+    Catch::Equals(std::vector<Model::BrushNode*>{subtrahend1})
 
-);
+  );
 }
 
 // Test for https://github.com/TrenchBroom/TrenchBroom/issues/3755
 TEST_CASE("CsgTest.csgSubtractFailure")
 {
-auto [document, game, gameConfig] = View::loadMapDocument("fixture/test/View/MapDocumentTest/csgSubtractFailure.map", "Quake", Model::MapFormat::Valve);
+  auto [document, game, gameConfig] = View::loadMapDocument(
+    "fixture/test/View/MapDocumentTest/csgSubtractFailure.map",
+    "Quake",
+    Model::MapFormat::Valve);
 
-REQUIRE(document
-->currentLayer()->childCount() == 2);
-auto *subtrahend = dynamic_cast<Model::BrushNode *>(document->currentLayer()->children().at(1));
-REQUIRE(subtrahend);
-REQUIRE(subtrahend
-->
+  REQUIRE(document->currentLayer()->childCount() == 2);
+  auto* subtrahend =
+    dynamic_cast<Model::BrushNode*>(document->currentLayer()->children().at(1));
+  REQUIRE(subtrahend);
+  REQUIRE(subtrahend
+            ->
 
-brush()
+          brush()
 
-.findFace("clip").
+            .findFace("clip")
+            .
 
-has_value()
+          has_value()
 
-);
+  );
 
-// select the second object in the default layer (a clip brush) and subtract
-document->selectNodes({
-subtrahend});
-CHECK(document
-->
+  // select the second object in the default layer (a clip brush) and subtract
+  document->selectNodes({subtrahend});
+  CHECK(document->
 
-csgSubtract()
+        csgSubtract()
 
-);
+  );
 
-REQUIRE(document
-->currentLayer()->childCount() == 1);
-auto *result = dynamic_cast<Model::BrushNode *>(document->currentLayer()->children().at(0));
+  REQUIRE(document->currentLayer()->childCount() == 1);
+  auto* result =
+    dynamic_cast<Model::BrushNode*>(document->currentLayer()->children().at(0));
 
-CHECK_THAT(result
-->
+  CHECK_THAT(
+    result
+      ->
 
-brush()
+    brush()
 
-.
+      .
 
-vertexPositions(), UnorderedApproxVecMatches(
-    std::vector<vm::vec3>{{- 2852, 372, 248}, {- 2854, 372, 256}, {- 2854, 364, 256}, {- 2852, 364, 248}, {- 2840, 372, 248}, {- 2843.2, 372, 256},
-                          {- 2843.2, 364, 256}, {- 2840, 364, 248}}, 0.001
-)
+    vertexPositions(),
+    UnorderedApproxVecMatches(
+      std::vector<vm::vec3>{
+        {-2852, 372, 248},
+        {-2854, 372, 256},
+        {-2854, 364, 256},
+        {-2852, 364, 248},
+        {-2840, 372, 248},
+        {-2843.2, 372, 256},
+        {-2843.2, 364, 256},
+        {-2840, 364, 248}},
+      0.001)
 
-);
+  );
 }
 
 TEST_CASE("CsgTest.csgHollow")
 {
-auto [document, game, gameConfig] = View::loadMapDocument("fixture/test/View/MapDocumentTest/csgHollow.map", "Quake", Model::MapFormat::Valve);
+  auto [document, game, gameConfig] = View::loadMapDocument(
+    "fixture/test/View/MapDocumentTest/csgHollow.map", "Quake", Model::MapFormat::Valve);
 
-REQUIRE(document
-->currentLayer()->childCount() == 2);
-REQUIRE(!document->
+  REQUIRE(document->currentLayer()->childCount() == 2);
+  REQUIRE(!document->
 
-modified()
+           modified()
 
-);
+  );
 
-SECTION("A brush too small to be hollowed doesn't block the command")
-{
-document->
+  SECTION("A brush too small to be hollowed doesn't block the command")
+  {
+    document->
 
-selectAllNodes();
+      selectAllNodes();
 
-CHECK(document
-->
+    CHECK(document->
 
-csgHollow()
+          csgHollow()
 
-);
+    );
 
-// One cube is too small to hollow, so it's left untouched.
-// The other is hollowed into 6 brushes.
-CHECK(document
-->currentLayer()->childCount() == 7);
-CHECK(document
-->
+    // One cube is too small to hollow, so it's left untouched.
+    // The other is hollowed into 6 brushes.
+    CHECK(document->currentLayer()->childCount() == 7);
+    CHECK(document->
 
-modified()
+          modified()
 
-);
-}SECTION("If no brushes are hollowed, the transaction isn't committed")
-{
-auto *smallBrushNode = document->currentLayer()->children().at(0);
-document->selectNodes({
-smallBrushNode});
+    );
+  }
+  SECTION("If no brushes are hollowed, the transaction isn't committed")
+  {
+    auto* smallBrushNode = document->currentLayer()->children().at(0);
+    document->selectNodes({smallBrushNode});
 
-CHECK(!document->
+    CHECK(!document->
 
-csgHollow()
+           csgHollow()
 
-);
-CHECK(document
-->currentLayer()->childCount() == 2);
-CHECK(!document->
+    );
+    CHECK(document->currentLayer()->childCount() == 2);
+    CHECK(!document->
 
-modified()
+           modified()
 
-);
-}}} // namespace View
+    );
+  }
+}
+} // namespace View
 } // namespace TrenchBroom

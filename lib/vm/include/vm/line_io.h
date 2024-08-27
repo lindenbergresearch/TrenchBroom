@@ -26,7 +26,8 @@
 
 #include <ostream>
 
-namespace vm {
+namespace vm
+{
 /**
  * Prints a textual representation of the given line to the given stream.
  *
@@ -36,9 +37,10 @@ namespace vm {
  * @param line the line to print
  * @return the given stream
  */
-template<typename T, size_t S>
-std::ostream &operator<<(std::ostream &stream, const line<T, S> &line) {
-    stream << "{ point: (" << line.point << "), direction: (" << line.direction << ") }";
-    return stream;
+template <typename T, size_t S>
+std::ostream& operator<<(std::ostream& stream, const line<T, S>& line)
+{
+  stream << "{ point: (" << line.point << "), direction: (" << line.direction << ") }";
+  return stream;
 }
-}// namespace vm
+} // namespace vm

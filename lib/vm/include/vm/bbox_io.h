@@ -26,7 +26,8 @@
 
 #include <ostream>
 
-namespace vm {
+namespace vm
+{
 /**
  * Prints a textual representation of the given bounding box onto the given stream.
  *
@@ -36,9 +37,10 @@ namespace vm {
  * @param bbox the bounding box to print
  * @return the given stream
  */
-template<typename T, std::size_t S>
-std::ostream &operator<<(std::ostream &stream, const bbox<T, S> &bbox) {
-    stream << "{ min: (" << bbox.min << "), max: (" << bbox.max << ") }";
-    return stream;
+template <typename T, std::size_t S>
+std::ostream& operator<<(std::ostream& stream, const bbox<T, S>& bbox)
+{
+  stream << "{ min: (" << bbox.min << "), max: (" << bbox.max << ") }";
+  return stream;
 }
-}// namespace vm
+} // namespace vm

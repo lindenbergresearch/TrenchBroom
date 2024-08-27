@@ -31,7 +31,8 @@
 #include <tuple>
 #include <vector>
 
-namespace vm {
+namespace vm
+{
 /**
  * Multiplies the given list of vectors with the given matrix.
  *
@@ -42,15 +43,17 @@ namespace vm {
  * @param rhs the matrix
  * @return a list of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t R, std::size_t C>
+template <typename T, std::size_t R, std::size_t C>
 std::vector<vec<T, C>> operator*(
-    const mat<T, R, C> &lhs, const std::vector<vec<T, C>> &rhs) {
-    std::vector<vec<T, C>> result;
-    result.reserve(rhs.size());
-    for (const auto &v: rhs) {
-        result.push_back(lhs * v);
-    }
-    return result;
+  const mat<T, R, C>& lhs, const std::vector<vec<T, C>>& rhs)
+{
+  std::vector<vec<T, C>> result;
+  result.reserve(rhs.size());
+  for (const auto& v : rhs)
+  {
+    result.push_back(lhs * v);
+  }
+  return result;
 }
 
 /**
@@ -64,14 +67,16 @@ std::vector<vec<T, C>> operator*(
  * @param rhs the matrix
  * @return an array of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t N, std::size_t R, std::size_t C>
+template <typename T, std::size_t N, std::size_t R, std::size_t C>
 constexpr std::array<vec<T, C>, N> operator*(
-    const mat<T, R, C> &lhs, const std::array<vec<T, C>, N> &rhs) {
-    std::array<vec<T, C>, N> result{};
-    for (std::size_t i = 0u; i < N; ++i) {
-        result[i] = lhs * rhs[i];
-    }
-    return result;
+  const mat<T, R, C>& lhs, const std::array<vec<T, C>, N>& rhs)
+{
+  std::array<vec<T, C>, N> result{};
+  for (std::size_t i = 0u; i < N; ++i)
+  {
+    result[i] = lhs * rhs[i];
+  }
+  return result;
 }
 
 /**
@@ -84,15 +89,17 @@ constexpr std::array<vec<T, C>, N> operator*(
  * @param rhs the matrix
  * @return a list of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t R, std::size_t C>
+template <typename T, std::size_t R, std::size_t C>
 std::vector<vec<T, C - 1>> operator*(
-    const mat<T, R, C> &lhs, const std::vector<vec<T, C - 1>> &rhs) {
-    std::vector<vec<T, C - 1>> result;
-    result.reserve(rhs.size());
-    for (const auto &v: rhs) {
-        result.push_back(lhs * v);
-    }
-    return result;
+  const mat<T, R, C>& lhs, const std::vector<vec<T, C - 1>>& rhs)
+{
+  std::vector<vec<T, C - 1>> result;
+  result.reserve(rhs.size());
+  for (const auto& v : rhs)
+  {
+    result.push_back(lhs * v);
+  }
+  return result;
 }
 
 /**
@@ -106,14 +113,16 @@ std::vector<vec<T, C - 1>> operator*(
  * @param rhs the matrix
  * @return an array of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t N, std::size_t R, std::size_t C>
+template <typename T, std::size_t N, std::size_t R, std::size_t C>
 constexpr std::array<vec<T, C - 1>, N> operator*(
-    const mat<T, R, C> &lhs, const std::array<vec<T, C - 1>, N> &rhs) {
-    std::array<vec<T, C - 1>, N> result{};
-    for (std::size_t i = 0u; i < N; ++i) {
-        result[i] = lhs * rhs[i];
-    }
-    return result;
+  const mat<T, R, C>& lhs, const std::array<vec<T, C - 1>, N>& rhs)
+{
+  std::array<vec<T, C - 1>, N> result{};
+  for (std::size_t i = 0u; i < N; ++i)
+  {
+    result[i] = lhs * rhs[i];
+  }
+  return result;
 }
 
 /**
@@ -126,15 +135,17 @@ constexpr std::array<vec<T, C - 1>, N> operator*(
  * @param rhs the matrix
  * @return a list of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t R, std::size_t C>
+template <typename T, std::size_t R, std::size_t C>
 std::vector<vec<T, R>> operator*(
-    const std::vector<vec<T, R>> &lhs, const mat<T, R, C> &rhs) {
-    std::vector<vec<T, R>> result;
-    result.reserve(lhs.size());
-    for (const auto &v: lhs) {
-        result.push_back(v * rhs);
-    }
-    return result;
+  const std::vector<vec<T, R>>& lhs, const mat<T, R, C>& rhs)
+{
+  std::vector<vec<T, R>> result;
+  result.reserve(lhs.size());
+  for (const auto& v : lhs)
+  {
+    result.push_back(v * rhs);
+  }
+  return result;
 }
 
 /**
@@ -148,14 +159,16 @@ std::vector<vec<T, R>> operator*(
  * @param rhs the matrix
  * @return an array of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t N, std::size_t R, std::size_t C>
+template <typename T, std::size_t N, std::size_t R, std::size_t C>
 constexpr std::array<vec<T, R>, N> operator*(
-    const std::array<vec<T, R>, N> &lhs, const mat<T, R, C> &rhs) {
-    std::array<vec<T, R>, N> result{};
-    for (std::size_t i = 0u; i < N; ++i) {
-        result[i] = lhs[i] * rhs;
-    }
-    return result;
+  const std::array<vec<T, R>, N>& lhs, const mat<T, R, C>& rhs)
+{
+  std::array<vec<T, R>, N> result{};
+  for (std::size_t i = 0u; i < N; ++i)
+  {
+    result[i] = lhs[i] * rhs;
+  }
+  return result;
 }
 
 /**
@@ -168,15 +181,17 @@ constexpr std::array<vec<T, R>, N> operator*(
  * @param rhs the matrix
  * @return a list of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t R, std::size_t C>
+template <typename T, std::size_t R, std::size_t C>
 std::vector<vec<T, R - 1>> operator*(
-    const std::vector<vec<T, R - 1>> &lhs, const mat<T, R, C> &rhs) {
-    std::vector<vec<T, R - 1>> result;
-    result.reserve(lhs.size());
-    for (const auto &v: lhs) {
-        result.push_back(v * rhs);
-    }
-    return result;
+  const std::vector<vec<T, R - 1>>& lhs, const mat<T, R, C>& rhs)
+{
+  std::vector<vec<T, R - 1>> result;
+  result.reserve(lhs.size());
+  for (const auto& v : lhs)
+  {
+    result.push_back(v * rhs);
+  }
+  return result;
 }
 
 /**
@@ -190,14 +205,16 @@ std::vector<vec<T, R - 1>> operator*(
  * @param rhs the matrix
  * @return a list of the the products of the given vectors and the given matrix
  */
-template<typename T, std::size_t N, std::size_t R, std::size_t C>
+template <typename T, std::size_t N, std::size_t R, std::size_t C>
 constexpr std::array<vec<T, R - 1>, N> operator*(
-    const std::array<vec<T, R - 1>, N> &lhs, const mat<T, R, C> &rhs) {
-    std::array<vec<T, R - 1>, N> result{};
-    for (std::size_t i = 0u; i < N; ++i) {
-        result[i] = lhs[i] * rhs;
-    }
-    return result;
+  const std::array<vec<T, R - 1>, N>& lhs, const mat<T, R, C>& rhs)
+{
+  std::array<vec<T, R - 1>, N> result{};
+  for (std::size_t i = 0u; i < N; ++i)
+  {
+    result[i] = lhs[i] * rhs;
+  }
+  return result;
 }
 
 /**
@@ -212,35 +229,36 @@ constexpr std::array<vec<T, R - 1>, N> operator*(
  * @param height the viewport height
  * @return the perspective transformation matrix
  */
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> perspective_matrix(
-    const T fov, const T nearPlane, const T farPlane, const int width, const int height) {
-    const auto vFrustum =
-        std::tan(to_radians(fov) / static_cast<T>(2.0)) * static_cast<T>(0.75) * nearPlane;
-    const auto hFrustum = vFrustum * static_cast<T>(width) / static_cast<T>(height);
-    const auto depth = farPlane - nearPlane;
+  const T fov, const T nearPlane, const T farPlane, const int width, const int height)
+{
+  const auto vFrustum =
+    std::tan(to_radians(fov) / static_cast<T>(2.0)) * static_cast<T>(0.75) * nearPlane;
+  const auto hFrustum = vFrustum * static_cast<T>(width) / static_cast<T>(height);
+  const auto depth = farPlane - nearPlane;
 
-    constexpr auto zero = static_cast<T>(0.0);
-    constexpr auto one = static_cast<T>(1.0);
-    constexpr auto two = static_cast<T>(2.0);
+  constexpr auto zero = static_cast<T>(0.0);
+  constexpr auto one = static_cast<T>(1.0);
+  constexpr auto two = static_cast<T>(2.0);
 
-    return mat<T, 4, 4>(
-        nearPlane / hFrustum,
-        zero,
-        zero,
-        zero,
-        zero,
-        nearPlane / vFrustum,
-        zero,
-        zero,
-        zero,
-        zero,
-        -(farPlane + nearPlane) / depth,
-        -two * farPlane * nearPlane / depth,
-        zero,
-        zero,
-        -one,
-        zero);
+  return mat<T, 4, 4>(
+    nearPlane / hFrustum,
+    zero,
+    zero,
+    zero,
+    zero,
+    nearPlane / vFrustum,
+    zero,
+    zero,
+    zero,
+    zero,
+    -(farPlane + nearPlane) / depth,
+    -two * farPlane * nearPlane / depth,
+    zero,
+    zero,
+    -one,
+    zero);
 }
 
 /**
@@ -257,39 +275,40 @@ constexpr mat<T, 4, 4> perspective_matrix(
  * @param bottom the screen coordinate of the bottom border of the viewport
  * @return the orthographic transformation matrix
  */
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> ortho_matrix(
-    const T nearPlane,
-    const T farPlane,
-    const T left,
-    const T top,
-    const T right,
-    const T bottom) {
-    const auto width = right - left;
-    const auto height = top - bottom;
-    const auto depth = farPlane - nearPlane;
+  const T nearPlane,
+  const T farPlane,
+  const T left,
+  const T top,
+  const T right,
+  const T bottom)
+{
+  const auto width = right - left;
+  const auto height = top - bottom;
+  const auto depth = farPlane - nearPlane;
 
-    constexpr auto zero = static_cast<T>(0.0);
-    constexpr auto one = static_cast<T>(1.0);
-    constexpr auto two = static_cast<T>(2.0);
+  constexpr auto zero = static_cast<T>(0.0);
+  constexpr auto one = static_cast<T>(1.0);
+  constexpr auto two = static_cast<T>(2.0);
 
-    return mat<T, 4, 4>(
-        two / width,
-        zero,
-        zero,
-        -(left + right) / width,
-        zero,
-        two / height,
-        zero,
-        -(top + bottom) / height,
-        zero,
-        zero,
-        -two / depth,
-        -(farPlane + nearPlane) / depth,
-        zero,
-        zero,
-        zero,
-        one);
+  return mat<T, 4, 4>(
+    two / width,
+    zero,
+    zero,
+    -(left + right) / width,
+    zero,
+    two / height,
+    zero,
+    -(top + bottom) / height,
+    zero,
+    zero,
+    -two / depth,
+    -(farPlane + nearPlane) / depth,
+    zero,
+    zero,
+    zero,
+    one);
 }
 
 /**
@@ -301,32 +320,33 @@ constexpr mat<T, 4, 4> ortho_matrix(
  * @param up the up vector
  * @return the view transformation matrix
  */
-template<typename T>
-constexpr mat<T, 4, 4> view_matrix(const vec<T, 3> &direction, const vec<T, 3> &up) {
-    const auto &f = direction;
-    const auto s = cross(f, up);
-    const auto u = cross(s, f);
+template <typename T>
+constexpr mat<T, 4, 4> view_matrix(const vec<T, 3>& direction, const vec<T, 3>& up)
+{
+  const auto& f = direction;
+  const auto s = cross(f, up);
+  const auto u = cross(s, f);
 
-    constexpr auto zero = static_cast<T>(0.0);
-    constexpr auto one = static_cast<T>(1.0);
+  constexpr auto zero = static_cast<T>(0.0);
+  constexpr auto one = static_cast<T>(1.0);
 
-    return mat<T, 4, 4>(
-        s[0],
-        s[1],
-        s[2],
-        zero,
-        u[0],
-        u[1],
-        u[2],
-        zero,
-        -f[0],
-        -f[1],
-        -f[2],
-        zero,
-        zero,
-        zero,
-        zero,
-        one);
+  return mat<T, 4, 4>(
+    s[0],
+    s[1],
+    s[2],
+    zero,
+    u[0],
+    u[1],
+    u[2],
+    zero,
+    -f[0],
+    -f[1],
+    -f[2],
+    zero,
+    zero,
+    zero,
+    zero,
+    one);
 }
 
 /**
@@ -340,27 +360,28 @@ constexpr mat<T, 4, 4> view_matrix(const vec<T, 3> &direction, const vec<T, 3> &
  * @param yaw the yaw angle (in radians)
  * @return the rotation matrix
  */
-template<typename T>
-mat<T, 4, 4> rotation_matrix(const T roll, const T pitch, const T yaw) {
-    constexpr auto I = static_cast<T>(1.0);
-    constexpr auto O = static_cast<T>(0.0);
+template <typename T>
+mat<T, 4, 4> rotation_matrix(const T roll, const T pitch, const T yaw)
+{
+  constexpr auto I = static_cast<T>(1.0);
+  constexpr auto O = static_cast<T>(0.0);
 
-    const auto Cr = std::cos(roll);
-    const auto Sr = std::sin(roll);
-    const mat<T, 4, 4> R(
-        +I, +O, +O, +O, +O, +Cr, -Sr, +O, +O, +Sr, +Cr, +O, +O, +O, +O, +I);
+  const auto Cr = std::cos(roll);
+  const auto Sr = std::sin(roll);
+  const mat<T, 4, 4> R(
+    +I, +O, +O, +O, +O, +Cr, -Sr, +O, +O, +Sr, +Cr, +O, +O, +O, +O, +I);
 
-    const auto Cp = std::cos(pitch);
-    const auto Sp = std::sin(pitch);
-    const mat<T, 4, 4> P(
-        +Cp, +O, +Sp, +O, +O, +I, +O, +O, -Sp, +O, +Cp, +O, +O, +O, +O, +I);
+  const auto Cp = std::cos(pitch);
+  const auto Sp = std::sin(pitch);
+  const mat<T, 4, 4> P(
+    +Cp, +O, +Sp, +O, +O, +I, +O, +O, -Sp, +O, +Cp, +O, +O, +O, +O, +I);
 
-    const auto Cy = std::cos(yaw);
-    const auto Sy = std::sin(yaw);
-    const mat<T, 4, 4> Y(
-        +Cy, -Sy, +O, +O, +Sy, +Cy, +O, +O, +O, +O, +I, +O, +O, +O, +O, +I);
+  const auto Cy = std::cos(yaw);
+  const auto Sy = std::sin(yaw);
+  const mat<T, 4, 4> Y(
+    +Cy, -Sy, +O, +O, +Sy, +Cy, +O, +O, +O, +O, +I, +O, +O, +O, +O, +I);
 
-    return Y * P * R;
+  return Y * P * R;
 }
 
 /**
@@ -372,32 +393,39 @@ mat<T, 4, 4> rotation_matrix(const T roll, const T pitch, const T yaw) {
  * @param rotMat the rotation matrix (must contain only rotation)
  * @return the roll, pitch, yaw in radians
  */
-template<typename T>
-vec<T, 3> rotation_matrix_to_euler_angles(const mat<T, 4, 4> &rotMat) {
-    // From: http://www.gregslabaugh.net/publications/euler.pdf
-    // Their notation is row-major, and uses 1-based row/column indices, whereas TB is
-    // column-major and 0-based. They use phi=yaw, theta=pitch, psi=roll
+template <typename T>
+vec<T, 3> rotation_matrix_to_euler_angles(const mat<T, 4, 4>& rotMat)
+{
+  // From: http://www.gregslabaugh.net/publications/euler.pdf
+  // Their notation is row-major, and uses 1-based row/column indices, whereas TB is
+  // column-major and 0-based. They use phi=yaw, theta=pitch, psi=roll
 
-    T theta, psi, phi;
+  T theta, psi, phi;
 
-    if (abs(rotMat[0][2]) != T(1.0)) {
-        theta = -std::asin(rotMat[0][2]);
-        const auto cosTheta = std::cos(theta);
+  if (abs(rotMat[0][2]) != T(1.0))
+  {
+    theta = -std::asin(rotMat[0][2]);
+    const auto cosTheta = std::cos(theta);
 
-        psi = std::atan2(rotMat[1][2] / cosTheta, rotMat[2][2] / cosTheta);
-        phi = std::atan2(rotMat[0][1] / cosTheta, rotMat[0][0] / cosTheta);
-    } else {
-        phi = 0.0;
-        if (rotMat[0][2] == T(-1.0)) {
-            theta = vm::constants<T>::half_pi();
-            psi = std::atan2(rotMat[1][0], rotMat[2][0]);
-        } else {
-            theta = -vm::constants<T>::half_pi();
-            psi = std::atan2(-rotMat[1][0], -rotMat[2][0]);
-        }
+    psi = std::atan2(rotMat[1][2] / cosTheta, rotMat[2][2] / cosTheta);
+    phi = std::atan2(rotMat[0][1] / cosTheta, rotMat[0][0] / cosTheta);
+  }
+  else
+  {
+    phi = 0.0;
+    if (rotMat[0][2] == T(-1.0))
+    {
+      theta = vm::constants<T>::half_pi();
+      psi = std::atan2(rotMat[1][0], rotMat[2][0]);
     }
+    else
+    {
+      theta = -vm::constants<T>::half_pi();
+      psi = std::atan2(-rotMat[1][0], -rotMat[2][0]);
+    }
+  }
 
-    return vec<T, 3>(psi, theta, phi);
+  return vec<T, 3>(psi, theta, phi);
 }
 
 /**
@@ -409,44 +437,45 @@ vec<T, 3> rotation_matrix_to_euler_angles(const mat<T, 4, 4> &rotMat) {
  * @param angle the rotation angle (in radians)
  * @return the rotation matrix
  */
-template<typename T>
-mat<T, 4, 4> rotation_matrix(const vec<T, 3> &axis, const T angle) {
-    const auto s = std::sin(-angle);
-    const auto c = std::cos(-angle);
-    const auto i = static_cast<T>(1.0) - c;
+template <typename T>
+mat<T, 4, 4> rotation_matrix(const vec<T, 3>& axis, const T angle)
+{
+  const auto s = std::sin(-angle);
+  const auto c = std::cos(-angle);
+  const auto i = static_cast<T>(1.0) - c;
 
-    const auto ix = i * axis[0];
-    const auto ix2 = ix * axis[0];
-    const auto ixy = ix * axis[1];
-    const auto ixz = ix * axis[2];
+  const auto ix = i * axis[0];
+  const auto ix2 = ix * axis[0];
+  const auto ixy = ix * axis[1];
+  const auto ixz = ix * axis[2];
 
-    const auto iy = i * axis[1];
-    const auto iy2 = iy * axis[1];
-    const auto iyz = iy * axis[2];
+  const auto iy = i * axis[1];
+  const auto iy2 = iy * axis[1];
+  const auto iyz = iy * axis[2];
 
-    const auto iz2 = i * axis[2] * axis[2];
+  const auto iz2 = i * axis[2] * axis[2];
 
-    const auto sx = s * axis[0];
-    const auto sy = s * axis[1];
-    const auto sz = s * axis[2];
+  const auto sx = s * axis[0];
+  const auto sy = s * axis[1];
+  const auto sz = s * axis[2];
 
-    return mat<T, 4, 4>(
-        ix2 + c,
-        ixy + sz,
-        ixz - sy,
-        0,
-        ixy - sz,
-        iy2 + c,
-        iyz + sx,
-        0,
-        ixz + sy,
-        iyz - sx,
-        iz2 + c,
-        0,
-        0,
-        0,
-        0,
-        1);
+  return mat<T, 4, 4>(
+    ix2 + c,
+    ixy + sz,
+    ixz - sy,
+    0,
+    ixy - sz,
+    iy2 + c,
+    iyz + sx,
+    0,
+    ixz + sy,
+    iyz - sx,
+    iz2 + c,
+    0,
+    0,
+    0,
+    0,
+    1);
 }
 
 /**
@@ -459,37 +488,38 @@ mat<T, 4, 4> rotation_matrix(const vec<T, 3> &axis, const T angle) {
  * @param quat the quaternion
  * @return the rotation matrix
  */
-template<typename T>
-constexpr mat<T, 4, 4> rotation_matrix(const quat<T> &quat) {
-    constexpr auto one = static_cast<T>(1);
-    constexpr auto two = static_cast<T>(2);
+template <typename T>
+constexpr mat<T, 4, 4> rotation_matrix(const quat<T>& quat)
+{
+  constexpr auto one = static_cast<T>(1);
+  constexpr auto two = static_cast<T>(2);
 
-    const auto x = quat.v[0];
-    const auto y = quat.v[1];
-    const auto z = quat.v[2];
-    const auto w = quat.r;
+  const auto x = quat.v[0];
+  const auto y = quat.v[1];
+  const auto z = quat.v[2];
+  const auto w = quat.r;
 
-    const auto x2 = x * x;
-    const auto y2 = y * y;
-    const auto z2 = z * z;
+  const auto x2 = x * x;
+  const auto y2 = y * y;
+  const auto z2 = z * z;
 
-    return mat<T, 4, 4>(
-        one - two * (y2 + z2),
-        two * (x * y - z * w),
-        two * (x * z + y * w),
-        0,
-        two * (x * y + z * w),
-        one - two * (x2 + z2),
-        two * (y * z - x * w),
-        0,
-        two * (x * z - y * w),
-        two * (y * z + x * w),
-        one - two * (x2 + y2),
-        0,
-        0,
-        0,
-        0,
-        1);
+  return mat<T, 4, 4>(
+    one - two * (y2 + z2),
+    two * (x * y - z * w),
+    two * (x * z + y * w),
+    0,
+    two * (x * y + z * w),
+    one - two * (x2 + z2),
+    two * (y * z - x * w),
+    0,
+    two * (x * z - y * w),
+    two * (y * z + x * w),
+    one - two * (x2 + y2),
+    0,
+    0,
+    0,
+    0,
+    1);
 }
 
 /**
@@ -501,9 +531,10 @@ constexpr mat<T, 4, 4> rotation_matrix(const quat<T> &quat) {
  * @param to the vector to rotate onto
  * @return the rotation matrix
  */
-template<typename T>
-constexpr mat<T, 4, 4> rotation_matrix(const vec<T, 3> &from, const vec<T, 3> &to) {
-    return rotation_matrix(quat<T>(from, to));
+template <typename T>
+constexpr mat<T, 4, 4> rotation_matrix(const vec<T, 3>& from, const vec<T, 3>& to)
+{
+  return rotation_matrix(quat<T>(from, to));
 }
 
 /**
@@ -514,13 +545,15 @@ constexpr mat<T, 4, 4> rotation_matrix(const vec<T, 3> &from, const vec<T, 3> &t
  * @param delta the deltas by which to translate
  * @return the translation matrix
  */
-template<typename T, std::size_t S>
-constexpr mat<T, S + 1, S + 1> translation_matrix(const vec<T, S> &delta) {
-    mat<T, S + 1, S + 1> translation;
-    for (size_t i = 0; i < S; ++i) {
-        translation[S][i] = delta[i];
-    }
-    return translation;
+template <typename T, std::size_t S>
+constexpr mat<T, S + 1, S + 1> translation_matrix(const vec<T, S>& delta)
+{
+  mat<T, S + 1, S + 1> translation;
+  for (size_t i = 0; i < S; ++i)
+  {
+    translation[S][i] = delta[i];
+  }
+  return translation;
 }
 
 /**
@@ -532,13 +565,15 @@ constexpr mat<T, S + 1, S + 1> translation_matrix(const vec<T, S> &delta) {
  * @param m the transformation matrix
  * @return the translation matrix
  */
-template<typename T, std::size_t S>
-constexpr mat<T, S, S> translation_matrix(const mat<T, S, S> &m) {
-    mat<T, S, S> result;
-    for (size_t i = 0; i < S - 1; ++i) {
-        result[S - 1][i] = m[S - 1][i];
-    }
-    return result;
+template <typename T, std::size_t S>
+constexpr mat<T, S, S> translation_matrix(const mat<T, S, S>& m)
+{
+  mat<T, S, S> result;
+  for (size_t i = 0; i < S - 1; ++i)
+  {
+    result[S - 1][i] = m[S - 1][i];
+  }
+  return result;
 }
 
 /**
@@ -549,13 +584,15 @@ constexpr mat<T, S, S> translation_matrix(const mat<T, S, S> &m) {
  * @param m the transformation matrix
  * @return the transformation matrix without its translation part
  */
-template<typename T, std::size_t S>
-constexpr mat<T, S, S> strip_translation(const mat<T, S, S> &m) {
-    mat<T, S, S> result(m);
-    for (size_t i = 0; i < S - 1; ++i) {
-        result[S - 1][i] = static_cast<T>(0.0);
-    }
-    return result;
+template <typename T, std::size_t S>
+constexpr mat<T, S, S> strip_translation(const mat<T, S, S>& m)
+{
+  mat<T, S, S> result(m);
+  for (size_t i = 0; i < S - 1; ++i)
+  {
+    result[S - 1][i] = static_cast<T>(0.0);
+  }
+  return result;
 }
 
 /**
@@ -566,13 +603,15 @@ constexpr mat<T, S, S> strip_translation(const mat<T, S, S> &m) {
  * @param factors the scaling factors
  * @return the scaling matrix
  */
-template<typename T, std::size_t S>
-constexpr mat<T, S + 1, S + 1> scaling_matrix(const vec<T, S> &factors) {
-    mat<T, S + 1, S + 1> scaling;
-    for (size_t i = 0; i < S; ++i) {
-        scaling[i][i] = factors[i];
-    }
-    return scaling;
+template <typename T, std::size_t S>
+constexpr mat<T, S + 1, S + 1> scaling_matrix(const vec<T, S>& factors)
+{
+  mat<T, S + 1, S + 1> scaling;
+  for (size_t i = 0; i < S; ++i)
+  {
+    scaling[i][i] = factors[i];
+  }
+  return scaling;
 }
 
 /**
@@ -582,18 +621,20 @@ constexpr mat<T, S + 1, S + 1> scaling_matrix(const vec<T, S> &factors) {
  * @param axis the axis along which to mirror
  * @return the mirroring axis
  */
-template<typename T>
-constexpr mat<T, 4, 4> mirror_matrix(const axis::type axis) {
-    switch (axis) {
-        case axis::x:
-            return mat<T, 4, 4>::mirror_x();
-        case axis::y:
-            return mat<T, 4, 4>::mirror_y();
-        case axis::z:
-            return mat<T, 4, 4>::mirror_z();
-        default:
-            return mat<T, 4, 4>::identity();
-    }
+template <typename T>
+constexpr mat<T, 4, 4> mirror_matrix(const axis::type axis)
+{
+  switch (axis)
+  {
+  case axis::x:
+    return mat<T, 4, 4>::mirror_x();
+  case axis::y:
+    return mat<T, 4, 4>::mirror_y();
+  case axis::z:
+    return mat<T, 4, 4>::mirror_z();
+  default:
+    return mat<T, 4, 4>::identity();
+  }
 }
 
 /**
@@ -611,13 +652,14 @@ constexpr mat<T, 4, 4> mirror_matrix(const axis::type axis) {
  * coordinate system
  * @return the transformation matrix
  */
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> coordinate_system_matrix(
-    const vec<T, 3> &x, const vec<T, 3> &y, const vec<T, 3> &z, const vec<T, 3> &o) {
-    const auto result = invert(mat<T, 4, 4>(
-        x[0], y[0], z[0], o[0], x[1], y[1], z[1], o[1], x[2], y[2], z[2], o[2], 0, 0, 0, 1));
-    assert(std::get<0>(result));
-    return std::get<1>(result);
+  const vec<T, 3>& x, const vec<T, 3>& y, const vec<T, 3>& z, const vec<T, 3>& o)
+{
+  const auto result = invert(mat<T, 4, 4>(
+    x[0], y[0], z[0], o[0], x[1], y[1], z[1], o[1], x[2], y[2], z[2], o[2], 0, 0, 0, 1));
+  assert(std::get<0>(result));
+  return std::get<1>(result);
 }
 
 /**
@@ -631,30 +673,32 @@ constexpr mat<T, 4, 4> coordinate_system_matrix(
  * @param direction the projection direction
  * @return the transformation matrix
  */
-template<typename T>
+template <typename T>
 mat<T, 4, 4> plane_projection_matrix(
-    const T distance, const vec<T, 3> &normal, const vec<T, 3> &direction) {
-    // create some coordinate system where the X and Y axes are contained within the plane
-    // and the Z axis is the projection direction
-    vec<T, 3> xAxis;
+  const T distance, const vec<T, 3>& normal, const vec<T, 3>& direction)
+{
+  // create some coordinate system where the X and Y axes are contained within the plane
+  // and the Z axis is the projection direction
+  vec<T, 3> xAxis;
 
-    switch (find_abs_max_component(normal)) {
-        case axis::x:
-            xAxis = normalize(cross(normal, vec<T, 3>::pos_z()));
-            break;
-        default:
-            xAxis = normalize(cross(normal, vec<T, 3>::pos_x()));
-            break;
-    }
+  switch (find_abs_max_component(normal))
+  {
+  case axis::x:
+    xAxis = normalize(cross(normal, vec<T, 3>::pos_z()));
+    break;
+  default:
+    xAxis = normalize(cross(normal, vec<T, 3>::pos_x()));
+    break;
+  }
 
-    const auto yAxis = normalize(cross(normal, xAxis));
-    const auto &zAxis = direction;
+  const auto yAxis = normalize(cross(normal, xAxis));
+  const auto& zAxis = direction;
 
-    assert(is_unit(xAxis, constants<T>::almost_zero()));
-    assert(is_unit(yAxis, constants<T>::almost_zero()));
-    assert(is_unit(zAxis, constants<T>::almost_zero()));
+  assert(is_unit(xAxis, constants<T>::almost_zero()));
+  assert(is_unit(yAxis, constants<T>::almost_zero()));
+  assert(is_unit(zAxis, constants<T>::almost_zero()));
 
-    return coordinate_system_matrix(xAxis, yAxis, zAxis, distance * normal);
+  return coordinate_system_matrix(xAxis, yAxis, zAxis, distance * normal);
 }
 
 /**
@@ -667,9 +711,10 @@ mat<T, 4, 4> plane_projection_matrix(
  * @param normal the normal of the plane
  * @return the transformation matrix
  */
-template<typename T>
-mat<T, 4, 4> plane_projection_matrix(const T distance, const vec<T, 3> &normal) {
-    return plane_projection_matrix(distance, normal, normal);
+template <typename T>
+mat<T, 4, 4> plane_projection_matrix(const T distance, const vec<T, 3>& normal)
+{
+  return plane_projection_matrix(distance, normal, normal);
 }
 
 /**
@@ -692,76 +737,95 @@ mat<T, 4, 4> plane_projection_matrix(const T distance, const vec<T, 3> &normal) 
  * @param Szy amount by which to share the Z axis in direction of the Y axis
  * @return the shearing matrix
  */
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> shear_matrix(
-    const T Sxy, const T Sxz, const T Syx, const T Syz, const T Szx, const T Szy) {
-    return mat<T, 4, 4>(1, Syx, Szx, 0, Sxy, 1, Szy, 0, Sxz, Syz, 1, 0, 0, 0, 0, 1);
+  const T Sxy, const T Sxz, const T Syx, const T Syz, const T Szx, const T Szy)
+{
+  return mat<T, 4, 4>(1, Syx, Szx, 0, Sxy, 1, Szy, 0, Sxz, Syz, 1, 0, 0, 0, 0, 1);
 }
 
 // TODO: add documentation and tests
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> scale_bbox_matrix(
-    const bbox<T, 3> &oldBBox, const bbox<T, 3> &newBBox) {
-    const auto scaleFactors = newBBox.size() / oldBBox.size();
-    return translation_matrix(newBBox.min) * scaling_matrix(scaleFactors) * translation_matrix(-oldBBox.min);
+  const bbox<T, 3>& oldBBox, const bbox<T, 3>& newBBox)
+{
+  const auto scaleFactors = newBBox.size() / oldBBox.size();
+  return translation_matrix(newBBox.min) * scaling_matrix(scaleFactors)
+         * translation_matrix(-oldBBox.min);
 }
 
 // TODO: add documentation and tests
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> scale_bbox_matrix_with_anchor(
-    const bbox<T, 3> &oldBBox, const vec<T, 3> &newSize, const vec<T, 3> &anchorPoint) {
-    const auto scaleFactors = newSize / oldBBox.size();
-    return translation_matrix(anchorPoint) * scaling_matrix(scaleFactors) * translation_matrix(-anchorPoint);
+  const bbox<T, 3>& oldBBox, const vec<T, 3>& newSize, const vec<T, 3>& anchorPoint)
+{
+  const auto scaleFactors = newSize / oldBBox.size();
+  return translation_matrix(anchorPoint) * scaling_matrix(scaleFactors)
+         * translation_matrix(-anchorPoint);
 }
 
 // TODO: add documentation and tests
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> shear_bbox_matrix(
-    const bbox<T, 3> &box, const vec<T, 3> &sideToShear, const vec<T, 3> &delta) {
-    const auto oldSize = box.size();
+  const bbox<T, 3>& box, const vec<T, 3>& sideToShear, const vec<T, 3>& delta)
+{
+  const auto oldSize = box.size();
 
-    // shearMatrix(const T Sxy, const T Sxz, const T Syx, const T Syz, const T Szx, const T
-    // Szy) {
-    mat<T, 4, 4> shearMat;
-    if (sideToShear == vec<T, 3>::pos_x()) {
-        const auto relativeDelta = delta / oldSize.x();
-        shearMat = shear_matrix(relativeDelta.y(), relativeDelta.z(), 0., 0., 0., 0.);
-    } else if (sideToShear == vec<T, 3>::neg_x()) {
-        const auto relativeDelta = delta / oldSize.x();
-        shearMat = shear_matrix(-relativeDelta.y(), -relativeDelta.z(), 0., 0., 0., 0.);
-    } else if (sideToShear == vec<T, 3>::pos_y()) {
-        const auto relativeDelta = delta / oldSize.y();
-        shearMat = shear_matrix(0., 0., relativeDelta.x(), relativeDelta.z(), 0., 0.);
-    } else if (sideToShear == vec<T, 3>::neg_y()) {
-        const auto relativeDelta = delta / oldSize.y();
-        shearMat = shear_matrix(0., 0., -relativeDelta.x(), -relativeDelta.z(), 0., 0.);
-    } else if (sideToShear == vec<T, 3>::pos_z()) {
-        const auto relativeDelta = delta / oldSize.z();
-        shearMat = shear_matrix(0., 0., 0., 0., relativeDelta.x(), relativeDelta.y());
-    } else if (sideToShear == vec<T, 3>::neg_z()) {
-        const auto relativeDelta = delta / oldSize.z();
-        shearMat = shear_matrix(0., 0., 0., 0., -relativeDelta.x(), -relativeDelta.y());
+  // shearMatrix(const T Sxy, const T Sxz, const T Syx, const T Syz, const T Szx, const T
+  // Szy) {
+  mat<T, 4, 4> shearMat;
+  if (sideToShear == vec<T, 3>::pos_x())
+  {
+    const auto relativeDelta = delta / oldSize.x();
+    shearMat = shear_matrix(relativeDelta.y(), relativeDelta.z(), 0., 0., 0., 0.);
+  }
+  else if (sideToShear == vec<T, 3>::neg_x())
+  {
+    const auto relativeDelta = delta / oldSize.x();
+    shearMat = shear_matrix(-relativeDelta.y(), -relativeDelta.z(), 0., 0., 0., 0.);
+  }
+  else if (sideToShear == vec<T, 3>::pos_y())
+  {
+    const auto relativeDelta = delta / oldSize.y();
+    shearMat = shear_matrix(0., 0., relativeDelta.x(), relativeDelta.z(), 0., 0.);
+  }
+  else if (sideToShear == vec<T, 3>::neg_y())
+  {
+    const auto relativeDelta = delta / oldSize.y();
+    shearMat = shear_matrix(0., 0., -relativeDelta.x(), -relativeDelta.z(), 0., 0.);
+  }
+  else if (sideToShear == vec<T, 3>::pos_z())
+  {
+    const auto relativeDelta = delta / oldSize.z();
+    shearMat = shear_matrix(0., 0., 0., 0., relativeDelta.x(), relativeDelta.y());
+  }
+  else if (sideToShear == vec<T, 3>::neg_z())
+  {
+    const auto relativeDelta = delta / oldSize.z();
+    shearMat = shear_matrix(0., 0., 0., 0., -relativeDelta.x(), -relativeDelta.y());
+  }
+
+  // grab any vertex on side that is opposite the one being sheared.
+  const auto sideOppositeToShearSide = -sideToShear;
+  vec<T, 3> vertOnOppositeSide;
+  [[maybe_unused]] bool didGrab = false;
+  auto visitor = [&](
+                   const vec<T, 3>& p0,
+                   const vec<T, 3>&,
+                   const vec<T, 3>&,
+                   const vec<T, 3>&,
+                   const vec<T, 3>& n) {
+    if (n == sideOppositeToShearSide)
+    {
+      vertOnOppositeSide = p0;
+      didGrab = true;
     }
+  };
+  box.for_each_face(visitor);
+  assert(didGrab);
 
-    // grab any vertex on side that is opposite the one being sheared.
-    const auto sideOppositeToShearSide = -sideToShear;
-    vec<T, 3> vertOnOppositeSide;
-    [[maybe_unused]] bool didGrab = false;
-    auto visitor = [&](
-                       const vec<T, 3> &p0,
-                       const vec<T, 3> &,
-                       const vec<T, 3> &,
-                       const vec<T, 3> &,
-                       const vec<T, 3> &n) {
-        if (n == sideOppositeToShearSide) {
-            vertOnOppositeSide = p0;
-            didGrab = true;
-        }
-    };
-    box.for_each_face(visitor);
-    assert(didGrab);
-
-    return translation_matrix(vertOnOppositeSide) * shearMat * translation_matrix(-vertOnOppositeSide);
+  return translation_matrix(vertOnOppositeSide) * shearMat
+         * translation_matrix(-vertOnOppositeSide);
 }
 
 /**
@@ -784,83 +848,86 @@ constexpr mat<T, 4, 4> shear_bbox_matrix(
  * specified by output points 0, 1, 2
  * @return a 4x4 matrix that performs the requested mapping of points
  */
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> points_transformation_matrix(
-    const vec<T, 3> &onPlane0In,
-    const vec<T, 3> &onPlane1In,
-    const vec<T, 3> &onPlane2In,
-    const vec<T, 3> &offPlaneIn,
-    const vec<T, 3> &onPlane0Out,
-    const vec<T, 3> &onPlane1Out,
-    const vec<T, 3> &onPlane2Out,
-    const vec<T, 3> &offPlaneOut) {
+  const vec<T, 3>& onPlane0In,
+  const vec<T, 3>& onPlane1In,
+  const vec<T, 3>& onPlane2In,
+  const vec<T, 3>& offPlaneIn,
+  const vec<T, 3>& onPlane0Out,
+  const vec<T, 3>& onPlane1Out,
+  const vec<T, 3>& onPlane2Out,
+  const vec<T, 3>& offPlaneOut)
+{
 
-    // To simplify the matrix problem, translate the 4 input points so onPlane0In is at
-    // origin and the 4 output points so onPlane0Out is at the origin. Then, compensate for
-    // the translation at the end.
-    const auto vec0In = onPlane1In - onPlane0In;
-    const auto vec1In = onPlane2In - onPlane0In;
-    const auto vec2In = offPlaneIn - onPlane0In;
+  // To simplify the matrix problem, translate the 4 input points so onPlane0In is at
+  // origin and the 4 output points so onPlane0Out is at the origin. Then, compensate for
+  // the translation at the end.
+  const auto vec0In = onPlane1In - onPlane0In;
+  const auto vec1In = onPlane2In - onPlane0In;
+  const auto vec2In = offPlaneIn - onPlane0In;
 
-    const auto vec0Out = onPlane1Out - onPlane0Out;
-    const auto vec1Out = onPlane2Out - onPlane0Out;
-    const auto vec2Out = offPlaneOut - onPlane0Out;
+  const auto vec0Out = onPlane1Out - onPlane0Out;
+  const auto vec1Out = onPlane2Out - onPlane0Out;
+  const auto vec2Out = offPlaneOut - onPlane0Out;
 
-    // Set up a system of equations that will find the upper-left 3x3 part of a 4x4 affine
-    // matrix with no translation.
+  // Set up a system of equations that will find the upper-left 3x3 part of a 4x4 affine
+  // matrix with no translation.
 
-    // A*X=B
+  // A*X=B
 
-    const vec<T, 9> B{
-        vec0Out.x(),
-        vec0Out.y(),
-        vec0Out.z(),
-        vec1Out.x(),
-        vec1Out.y(),
-        vec1Out.z(),
-        vec2Out.x(),
-        vec2Out.y(),
-        vec2Out.z(),
-    };
+  const vec<T, 9> B{
+    vec0Out.x(),
+    vec0Out.y(),
+    vec0Out.z(),
+    vec1Out.x(),
+    vec1Out.y(),
+    vec1Out.z(),
+    vec2Out.x(),
+    vec2Out.y(),
+    vec2Out.z(),
+  };
 
-    const mat<T, 9, 9> A{
-        vec0In.x(), vec0In.y(), vec0In.z(), 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, vec0In.x(), vec0In.y(),
-        vec0In.z(), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, vec0In.x(), vec0In.y(), vec0In.z(), vec1In.x(),
-        vec1In.y(), vec1In.z(), 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, vec1In.x(), vec1In.y(), vec1In.z(),
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, vec1In.x(), vec1In.y(), vec1In.z(), vec2In.x(), vec2In.y(),
-        vec2In.z(), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, vec2In.x(), vec2In.y(), vec2In.z(), 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0, vec2In.x(), vec2In.y(), vec2In.z()};
+  const mat<T, 9, 9> A{
+    vec0In.x(), vec0In.y(), vec0In.z(), 0.0,        0.0,        0.0,        0.0,
+    0.0,        0.0,        0.0,        0.0,        0.0,        vec0In.x(), vec0In.y(),
+    vec0In.z(), 0.0,        0.0,        0.0,        0.0,        0.0,        0.0,
+    0.0,        0.0,        0.0,        vec0In.x(), vec0In.y(), vec0In.z(), vec1In.x(),
+    vec1In.y(), vec1In.z(), 0.0,        0.0,        0.0,        0.0,        0.0,
+    0.0,        0.0,        0.0,        0.0,        vec1In.x(), vec1In.y(), vec1In.z(),
+    0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,
+    0.0,        0.0,        vec1In.x(), vec1In.y(), vec1In.z(), vec2In.x(), vec2In.y(),
+    vec2In.z(), 0.0,        0.0,        0.0,        0.0,        0.0,        0.0,
+    0.0,        0.0,        0.0,        vec2In.x(), vec2In.y(), vec2In.z(), 0.0,
+    0.0,        0.0,        0.0,        0.0,        0.0,        0.0,        0.0,
+    0.0,        vec2In.x(), vec2In.y(), vec2In.z()};
 
-    const auto [success, X] = lup_solve(A, B);
-    if (!success) {
-        return mat<T, 4, 4>::fill(nan<T>());
-    }
+  const auto [success, X] = lup_solve(A, B);
+  if (!success)
+  {
+    return mat<T, 4, 4>::fill(nan<T>());
+  }
 
-    const mat<T, 4, 4> xformWithoutTranslation(
-        X[0],
-        X[1],
-        X[2],
-        0.0,
-        X[3],
-        X[4],
-        X[5],
-        0.0,
-        X[6],
-        X[7],
-        X[8],
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.0);
+  const mat<T, 4, 4> xformWithoutTranslation(
+    X[0],
+    X[1],
+    X[2],
+    0.0,
+    X[3],
+    X[4],
+    X[5],
+    0.0,
+    X[6],
+    X[7],
+    X[8],
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0);
 
-    return translation_matrix(onPlane0Out) * xformWithoutTranslation * translation_matrix(-onPlane0In);
+  return translation_matrix(onPlane0Out) * xformWithoutTranslation
+         * translation_matrix(-onPlane0In);
 }
 
 /**
@@ -880,28 +947,29 @@ constexpr mat<T, 4, 4> points_transformation_matrix(
  * @param onPlane2Out what input point 2 should be mapped to
  * @return a 4x4 matrix that performs the requested mapping of points
  */
-template<typename T>
+template <typename T>
 constexpr mat<T, 4, 4> points_transformation_matrix(
-    const vec<T, 3> &onPlane0In,
-    const vec<T, 3> &onPlane1In,
-    const vec<T, 3> &onPlane2In,
-    const vec<T, 3> &onPlane0Out,
-    const vec<T, 3> &onPlane1Out,
-    const vec<T, 3> &onPlane2Out) {
+  const vec<T, 3>& onPlane0In,
+  const vec<T, 3>& onPlane1In,
+  const vec<T, 3>& onPlane2In,
+  const vec<T, 3>& onPlane0Out,
+  const vec<T, 3>& onPlane1Out,
+  const vec<T, 3>& onPlane2Out)
+{
 
-    const auto offPlaneIn =
-        onPlane0In + normalize(cross(onPlane1In - onPlane0In, onPlane2In - onPlane0In));
-    const auto offPlaneOut =
-        onPlane0Out + normalize(cross(onPlane1Out - onPlane0Out, onPlane2Out - onPlane0Out));
+  const auto offPlaneIn =
+    onPlane0In + normalize(cross(onPlane1In - onPlane0In, onPlane2In - onPlane0In));
+  const auto offPlaneOut =
+    onPlane0Out + normalize(cross(onPlane1Out - onPlane0Out, onPlane2Out - onPlane0Out));
 
-    return points_transformation_matrix(
-        onPlane0In,
-        onPlane1In,
-        onPlane2In,
-        offPlaneIn,
-        onPlane0Out,
-        onPlane1Out,
-        onPlane2Out,
-        offPlaneOut);
+  return points_transformation_matrix(
+    onPlane0In,
+    onPlane1In,
+    onPlane2In,
+    offPlaneIn,
+    onPlane0Out,
+    onPlane1Out,
+    onPlane2Out,
+    offPlaneOut);
 }
-}// namespace vm
+} // namespace vm

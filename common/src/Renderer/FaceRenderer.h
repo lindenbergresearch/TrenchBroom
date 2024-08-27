@@ -29,12 +29,15 @@
 #include <memory>
 #include <unordered_map>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class Texture;
 }
 
-namespace Renderer {
+namespace Renderer
+{
 class BrushIndexArray;
 
 
@@ -44,7 +47,8 @@ class BrushVertexArray;
 class RenderBatch;
 
 
-struct PointLight {
+struct PointLight
+{
   vm::vec3f Intensity;
   vm::vec3f Position;
   float AttenuationConstant = 0.9f;
@@ -53,11 +57,13 @@ struct PointLight {
 };
 
 
-class FaceRenderer : public IndexedRenderable {
+class FaceRenderer : public IndexedRenderable
+{
 private:
   struct RenderFunc;
 
-  using TextureToBrushIndicesMap = const std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
+  using TextureToBrushIndicesMap =
+    const std::unordered_map<const Assets::Texture*, std::shared_ptr<BrushIndexArray>>;
 
   std::shared_ptr<BrushVertexArray> m_vertexArray;
   std::shared_ptr<TextureToBrushIndicesMap> m_indexArrayMap;
@@ -70,31 +76,34 @@ private:
 public:
   FaceRenderer();
 
-  FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor);
+  FaceRenderer(
+    std::shared_ptr<BrushVertexArray> vertexArray,
+    std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
+    const Color& faceColor);
 
-  FaceRenderer(const FaceRenderer &other);
+  FaceRenderer(const FaceRenderer& other);
 
-  FaceRenderer &operator=(FaceRenderer other);
+  FaceRenderer& operator=(FaceRenderer other);
 
-  friend void swap(FaceRenderer &left, FaceRenderer &right);
+  friend void swap(FaceRenderer& left, FaceRenderer& right);
 
   void setGrayscale(bool grayscale);
 
   void setTint(bool tint);
 
-  void setTintColor(const Color &color);
+  void setTintColor(const Color& color);
 
   void setAlpha(float alpha);
 
-  void render(RenderBatch &renderBatch);
+  void render(RenderBatch& renderBatch);
 
 private:
-  void prepareVerticesAndIndices(VboManager &vboManager) override;
+  void prepareVerticesAndIndices(VboManager& vboManager) override;
 
-  void doRender(RenderContext &context) override;
+  void doRender(RenderContext& context) override;
 };
 
 
-void swap(FaceRenderer &left, FaceRenderer &right);
+void swap(FaceRenderer& left, FaceRenderer& right);
 } // namespace Renderer
 } // namespace TrenchBroom

@@ -29,8 +29,10 @@
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 /**
  * Represents an array of indices. Optionally, multiple instances of this class can share
  * the same data. Index arrays can be copied around without incurring the cost of copying
@@ -40,9 +42,11 @@ namespace Renderer {
  * method. Furthermore, an index array can be rendered by calling the provided render
  * method.
  */
-class IndexArray {
+class IndexArray
+{
 private:
-  class BaseHolder {
+  class BaseHolder
+  {
   public:
     using Ptr = std::shared_ptr<BaseHolder>;
 
@@ -52,7 +56,7 @@ private:
 
     virtual size_t sizeInBytes() const = 0;
 
-    virtual void prepare(VboManager &vboManager) = 0;
+    virtual void prepare(VboManager& vboManager) = 0;
 
     virtual void setup() = 0;
 
@@ -65,13 +69,15 @@ private:
     virtual void doRender(PrimType primType, size_t offset, size_t count) const = 0;
   };
 
-  template<typename Index> class Holder : public BaseHolder {
+  template <typename Index>
+  class Holder : public BaseHolder
+  {
   protected:
     using IndexList = std::vector<Index>;
 
   private:
-    VboManager *m_vboManager;
-    Vbo *m_vbo;
+    VboManager* m_vboManager;
+    Vbo* m_vbo;
     size_t m_indexCount;
 
   public:
@@ -79,15 +85,18 @@ private:
 
     size_t sizeInBytes() const override { return sizeof(Index) * m_indexCount; }
 
-    virtual void prepare(VboManager &vboManager) override {
-      if (m_indexCount > 0 && m_vbo == nullptr) {
+    virtual void prepare(VboManager& vboManager) override
+    {
+      if (m_indexCount > 0 && m_vbo == nullptr)
+      {
         m_vboManager = &vboManager;
         m_vbo = vboManager.allocateVbo(VboType::ElementArrayBuffer, sizeInBytes());
         m_vbo->writeBuffer(0, doGetIndices());
       }
     }
 
-    void setup() override {
+    void setup() override
+    {
       ensure(m_vbo != nullptr, "block is null");
       m_vbo->bind();
     }
@@ -95,29 +104,41 @@ private:
     void cleanup() override { m_vbo->unbind(); }
 
   protected:
-    Holder(const size_t indexCount) : m_vboManager{nullptr}, m_vbo{nullptr}, m_indexCount{indexCount} {
+    Holder(const size_t indexCount)
+      : m_vboManager{nullptr}
+      , m_vbo{nullptr}
+      , m_indexCount{indexCount}
+    {
     }
 
-    virtual ~Holder() override {
+    virtual ~Holder() override
+    {
       // TODO: Revisit this revisiting OpenGL resource management. We should not store the
       // VboManager, since it represents a safe time to delete the OpenGL buffer object.
-      if (m_vbo != nullptr) {
+      if (m_vbo != nullptr)
+      {
         m_vboManager->destroyVbo(m_vbo);
         m_vbo = nullptr;
       }
     }
 
   private:
-    void doRender(PrimType primType, size_t offset, size_t count) const override {
+    void doRender(PrimType primType, size_t offset, size_t count) const override
+    {
       glAssert(glDrawElements(
-          toGL(primType), static_cast<GLsizei>(count), GL_UNSIGNED_INT, reinterpret_cast<void *>(offset * 4u)));
+        toGL(primType),
+        static_cast<GLsizei>(count),
+        GL_UNSIGNED_INT,
+        reinterpret_cast<void*>(offset * 4u)));
     }
 
   private:
-    virtual const IndexList &doGetIndices() const = 0;
+    virtual const IndexList& doGetIndices() const = 0;
   };
 
-  template<typename Index> class ByValueHolder : public Holder<Index> {
+  template <typename Index>
+  class ByValueHolder : public Holder<Index>
+  {
   public:
     using IndexList = typename Holder<Index>::IndexList;
 
@@ -125,31 +146,40 @@ private:
     IndexList m_indices;
 
   public:
-    ByValueHolder(IndexList indices) : Holder<Index>{indices.size()}, m_indices{std::move(indices)} {
+    ByValueHolder(IndexList indices)
+      : Holder<Index>{indices.size()}
+      , m_indices{std::move(indices)}
+    {
     }
 
-    void prepare(VboManager &vboManager) {
+    void prepare(VboManager& vboManager)
+    {
       Holder<Index>::prepare(vboManager);
       kdl::vec_clear_to_zero(m_indices);
     }
 
   private:
-    const IndexList &doGetIndices() const { return m_indices; }
+    const IndexList& doGetIndices() const { return m_indices; }
   };
 
-  template<typename Index> class ByRefHolder : public Holder<Index> {
+  template <typename Index>
+  class ByRefHolder : public Holder<Index>
+  {
   public:
     using IndexList = typename Holder<Index>::IndexList;
 
   private:
-    const IndexList &m_indices;
+    const IndexList& m_indices;
 
   public:
-    ByRefHolder(const IndexList &indices) : Holder<Index>{indices.size()}, m_indices{indices} {
+    ByRefHolder(const IndexList& indices)
+      : Holder<Index>{indices.size()}
+      , m_indices{indices}
+    {
     }
 
   private:
-    const IndexList &doGetIndices() const { return m_indices; }
+    const IndexList& doGetIndices() const { return m_indices; }
   };
 
 private:
@@ -171,7 +201,9 @@ public:
    * @param indices the indices to copy
    * @return the index array
    */
-  template<typename Index> static IndexArray copy(const std::vector<Index> &indices) {
+  template <typename Index>
+  static IndexArray copy(const std::vector<Index>& indices)
+  {
     return IndexArray(BaseHolder::Ptr(new ByValueHolder<Index>(indices)));
   }
 
@@ -183,7 +215,9 @@ public:
    * @param indices the indices to swap
    * @return the index array
    */
-  template<typename Index> static IndexArray move(std::vector<Index> &&indices) {
+  template <typename Index>
+  static IndexArray move(std::vector<Index>&& indices)
+  {
     return IndexArray(BaseHolder::Ptr(new ByValueHolder<Index>(std::move(indices))));
   }
 
@@ -200,7 +234,9 @@ public:
    * @param indices the indices to copy
    * @return the index array
    */
-  template<typename Index> static IndexArray ref(const std::vector<Index> &indices) {
+  template <typename Index>
+  static IndexArray ref(const std::vector<Index>& indices)
+  {
     return IndexArray(BaseHolder::Ptr(new ByRefHolder<Index>(indices)));
   }
 
@@ -239,7 +275,7 @@ public:
    * @param vboManager the vertex buffer object to upload the contents of this index array
    * into
    */
-  void prepare(VboManager &vboManager);
+  void prepare(VboManager& vboManager);
 
   /**
    * Sets this index array up for rendering. If this index array is only rendered once,

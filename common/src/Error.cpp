@@ -21,7 +21,8 @@
 
 #include <kdl/reflection_impl.h>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 
 kdl_reflect_impl(Error);
 } // namespace TrenchBroom

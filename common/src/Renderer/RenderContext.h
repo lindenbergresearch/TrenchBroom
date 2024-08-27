@@ -24,8 +24,10 @@
 
 #include "vm/bbox.h"
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class Camera;
 
 
@@ -35,23 +37,30 @@ class FontManager;
 class ShaderManager;
 
 
-enum class RenderMode {
-  Render3D, Render2D
+enum class RenderMode
+{
+  Render3D,
+  Render2D
 };
 
 
-class RenderContext {
+class RenderContext
+{
 private:
-  enum class ShowSelectionGuide {
-    Show, Hide, ForceShow, ForceHide
+  enum class ShowSelectionGuide
+  {
+    Show,
+    Hide,
+    ForceShow,
+    ForceHide
   };
 
   // general context for any rendering view
   RenderMode m_renderMode;
-  const Camera &m_camera;
+  const Camera& m_camera;
   Transformation m_transformation;
-  FontManager &m_fontManager;
-  ShaderManager &m_shaderManager;
+  FontManager& m_fontManager;
+  ShaderManager& m_shaderManager;
 
   // settings for any map rendering view
   bool m_showTextures;
@@ -80,19 +89,23 @@ private:
   vm::bbox3f m_sofMapBounds;
 
 public:
-  RenderContext(RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager);
+  RenderContext(
+    RenderMode renderMode,
+    const Camera& camera,
+    FontManager& fontManager,
+    ShaderManager& shaderManager);
 
   bool render2D() const;
 
   bool render3D() const;
 
-  const Camera &camera() const;
+  const Camera& camera() const;
 
-  Transformation &transformation();
+  Transformation& transformation();
 
-  FontManager &fontManager();
+  FontManager& fontManager();
 
-  ShaderManager &shaderManager();
+  ShaderManager& shaderManager();
 
   bool showTextures() const;
 
@@ -142,9 +155,9 @@ public:
 
   void setShowGrid(bool showGrid);
 
-  const vm::bbox3f &softMapBounds() const;
+  const vm::bbox3f& softMapBounds() const;
 
-  void setSoftMapBounds(const vm::bbox3f &softMapBounds);
+  void setSoftMapBounds(const vm::bbox3f& softMapBounds);
 
   FloatType gridSize() const;
 
@@ -176,9 +189,9 @@ private:
   void setShowSelectionGuide(ShowSelectionGuide showSelectionGuide);
 
 private:
-  RenderContext(const RenderContext &other);
+  RenderContext(const RenderContext& other);
 
-  RenderContext &operator=(const RenderContext &other);
+  RenderContext& operator=(const RenderContext& other);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

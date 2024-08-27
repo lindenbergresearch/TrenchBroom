@@ -26,9 +26,12 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
-struct GameEngineConfig {
+namespace TrenchBroom
+{
+namespace Model
+{
+struct GameEngineConfig
+{
   std::vector<GameEngineProfile> profiles;
 
   kdl_reflect_decl(GameEngineConfig, profiles);

@@ -23,9 +23,12 @@
 
 #include <vector>
 
-namespace TrenchBroom {
-namespace Renderer {
-class FontGlyph {
+namespace TrenchBroom
+{
+namespace Renderer
+{
+class FontGlyph
+{
 private:
   float m_x;
   float m_y;
@@ -36,7 +39,12 @@ private:
 public:
   FontGlyph(size_t x, size_t y, size_t w, size_t h, size_t a);
 
-  void appendVertices(std::vector<vm::vec2f> &vertices, int xOffset, int yOffset, size_t textureSize, bool clockwise) const;
+  void appendVertices(
+    std::vector<vm::vec2f>& vertices,
+    int xOffset,
+    int yOffset,
+    size_t textureSize,
+    bool clockwise) const;
 
   int advance() const;
 };

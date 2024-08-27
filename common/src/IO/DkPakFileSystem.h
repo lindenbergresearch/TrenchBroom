@@ -25,15 +25,17 @@
 #include <filesystem>
 #include <memory>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class CFile;
 
 
-class DkPakFileSystem : public ImageFileSystem<CFile> {
+class DkPakFileSystem : public ImageFileSystem<CFile>
+{
 public:
-    using ImageFileSystem::ImageFileSystem;
+  using ImageFileSystem::ImageFileSystem;
 
 private:
-    Result<void> doReadDirectory() override;
+  Result<void> doReadDirectory() override;
 };
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

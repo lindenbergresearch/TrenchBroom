@@ -21,12 +21,15 @@
 
 #include <cstdint>
 
-namespace TrenchBroom {
-namespace Model {
-namespace HitType {
+namespace TrenchBroom
+{
+namespace Model
+{
+namespace HitType
+{
 using Type = uint64_t;
 constexpr Type NoType = 0u;
-constexpr Type AnyType = ~ NoType;
+constexpr Type AnyType = ~NoType;
 
 Type freeType();
 } // namespace HitType

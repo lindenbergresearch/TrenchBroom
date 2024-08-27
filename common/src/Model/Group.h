@@ -27,9 +27,11 @@
 
 #include <string>
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
-class Group {
+class Group
+{
 private:
   std::string m_name;
 
@@ -40,15 +42,15 @@ private:
 public:
   explicit Group(std::string name);
 
-  const std::string &name() const;
+  const std::string& name() const;
 
   void setName(std::string name);
 
-  const vm::mat4x4 &transformation() const;
+  const vm::mat4x4& transformation() const;
 
-  void setTransformation(const vm::mat4x4 &transformation);
+  void setTransformation(const vm::mat4x4& transformation);
 
-  void transform(const vm::mat4x4 &transformation);
+  void transform(const vm::mat4x4& transformation);
 };
 
 } // namespace TrenchBroom::Model

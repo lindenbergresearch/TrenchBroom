@@ -26,14 +26,17 @@
 
 #include <string>
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 class Texture;
 }
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class Reader;
 
 
-Result<Assets::Texture, ReadTextureError> readWalTexture(std::string name, Reader &reader, const std::optional<Assets::Palette> &palette);
+Result<Assets::Texture, ReadTextureError> readWalTexture(
+  std::string name, Reader& reader, const std::optional<Assets::Palette>& palette);
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

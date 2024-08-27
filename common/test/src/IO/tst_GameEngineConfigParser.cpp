@@ -29,83 +29,91 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
+namespace TrenchBroom
+{
+namespace IO
+{
 
-TEST_CASE("GameEngineConfigParserTest.parseBlankConfig") {
-const auto config = R"(   )";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK_THROWS_AS(parser
-.
+TEST_CASE("GameEngineConfigParserTest.parseBlankConfig")
+{
+  const auto config = R"(   )";
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
-TEST_CASE("GameEngineConfigParserTest.parseEmptyConfig") {
-const auto config = R"( { } )";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK_THROWS_AS(parser
-.
+TEST_CASE("GameEngineConfigParserTest.parseEmptyConfig")
+{
+  const auto config = R"( { } )";
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseEmptyConfigWithTrailingGarbage")
 {
-const auto config = R"(  {  } asdf)";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK_THROWS_AS(parser
-.
+  const auto config = R"(  {  } asdf)";
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseMissingProfiles")
 {
-const auto config = R"(  { 'version' : 1 } )";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK_THROWS_AS(parser
-.
+  const auto config = R"(  { 'version' : 1 } )";
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseMissingVersion")
 {
-const auto config = R"(  { 'profiles': {} } )";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK_THROWS_AS(parser
-.
+  const auto config = R"(  { 'profiles': {} } )";
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseEmptyProfiles")
 {
-const auto config = R"(  { 'version': 1, 'profiles': [] } )";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK(parser
-.
+  const auto config = R"(  { 'version': 1, 'profiles': [] } )";
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::GameEngineConfig{
-});
+    == Model::GameEngineConfig{});
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseOneProfileWithMissingAttributes")
 {
-const auto config = R"(
+  const auto config = R"(
 {
 	"profiles": [
 		{
@@ -114,18 +122,19 @@ const auto config = R"(
 	"version": 1
 }
 )";
-auto parser = GameEngineConfigParser{config, {}};
-CHECK_THROWS_AS(parser
-.
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("GameEngineConfigParserTest.parseTwoProfiles")
 {
-const auto config = R"(
+  const auto config = R"(
 {
 	"profiles": [
 		{
@@ -145,17 +154,15 @@ const auto config = R"(
 }
 )";
 
-auto parser = GameEngineConfigParser{config, {}};
-CHECK(parser
-.
+  auto parser = GameEngineConfigParser{config, {}};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-==
-Model::GameEngineConfig{
-{
-{
-"winquake", R"(C:\Quake\winquake.exe)", "-flag1 -flag2"}, {
-"glquake", R"(C:\Quake\glquake.exe)", "-flag3 -flag4"}}});
-}} // namespace IO
+    == Model::GameEngineConfig{
+      {{"winquake", R"(C:\Quake\winquake.exe)", "-flag1 -flag2"},
+       {"glquake", R"(C:\Quake\glquake.exe)", "-flag3 -flag4"}}});
+}
+} // namespace IO
 } // namespace TrenchBroom

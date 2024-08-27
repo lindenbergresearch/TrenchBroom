@@ -23,40 +23,47 @@
 
 #include <cstddef> // for size_t
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class Vbo;
 
 
 class ShaderManager;
 
 
-enum class VboType {
-  ArrayBuffer, ElementArrayBuffer
+enum class VboType
+{
+  ArrayBuffer,
+  ElementArrayBuffer
 };
 
-enum class VboUsage {
-  StaticDraw, DynamicDraw
+enum class VboUsage
+{
+  StaticDraw,
+  DynamicDraw
 };
 
 
-class VboManager {
+class VboManager
+{
 private:
   size_t m_peakVboCount;
   size_t m_currentVboCount;
   size_t m_currentVboSize;
-  ShaderManager *m_shaderManager;
+  ShaderManager* m_shaderManager;
 
 public:
-  explicit VboManager(ShaderManager *shaderManager);
+  explicit VboManager(ShaderManager* shaderManager);
 
   /**
    * Immediately creates and binds to an OpenGL buffer of the given type and capacity.
    * The contents are initially unspecified. See Vbo class.
    */
-  Vbo *allocateVbo(VboType type, size_t capacity, VboUsage usage = VboUsage::StaticDraw);
+  Vbo* allocateVbo(VboType type, size_t capacity, VboUsage usage = VboUsage::StaticDraw);
 
-  void destroyVbo(Vbo *vbo);
+  void destroyVbo(Vbo* vbo);
 
   size_t peakVboCount() const;
 
@@ -64,7 +71,7 @@ public:
 
   size_t currentVboSize() const;
 
-  ShaderManager &shaderManager();
+  ShaderManager& shaderManager();
 };
 } // namespace Renderer
 } // namespace TrenchBroom

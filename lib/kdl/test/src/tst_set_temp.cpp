@@ -22,63 +22,69 @@
 
 #include "catch2.h"
 
-namespace kdl {
-TEST_CASE("set_temp_test.set_unset") {
-    int value = 0;
-    {
-        set_temp s(value, 1);
-        CHECK(value == 1);
-    }
-    CHECK(value == 0);
-}
-
-TEST_CASE("set_temp_test.set_unset_bool") {
-    bool value = false;
-    {
-        set_temp s(value, true);
-        CHECK(value);
-    }
-    CHECK_FALSE(value);
-
-    {
-        set_temp s(value);
-        CHECK(value);
-
-        {
-            set_temp t(value, false);
-            CHECK_FALSE(value);
-        }
-        CHECK(value);
-    }
-    CHECK_FALSE(value);
-}
-
-TEST_CASE("set_later_test.set") {
-    int value = 0;
-
-    {
-        set_later s(value, 1);
-        CHECK(value == 0);
-    }
+namespace kdl
+{
+TEST_CASE("set_temp_test.set_unset")
+{
+  int value = 0;
+  {
+    set_temp s(value, 1);
     CHECK(value == 1);
+  }
+  CHECK(value == 0);
 }
 
-TEST_CASE("inc_temp.inc_dec") {
-    int value = 0;
+TEST_CASE("set_temp_test.set_unset_bool")
+{
+  bool value = false;
+  {
+    set_temp s(value, true);
+    CHECK(value);
+  }
+  CHECK_FALSE(value);
+
+  {
+    set_temp s(value);
+    CHECK(value);
 
     {
-        inc_temp i(value);
-        CHECK(value == 1);
+      set_temp t(value, false);
+      CHECK_FALSE(value);
     }
-    CHECK(value == 0);
+    CHECK(value);
+  }
+  CHECK_FALSE(value);
 }
 
-TEST_CASE("dec_temp.dec_inc") {
-    int value = 0;
-    {
-        dec_temp d(value);
-        CHECK(value == -1);
-    }
+TEST_CASE("set_later_test.set")
+{
+  int value = 0;
+
+  {
+    set_later s(value, 1);
     CHECK(value == 0);
+  }
+  CHECK(value == 1);
 }
-}// namespace kdl
+
+TEST_CASE("inc_temp.inc_dec")
+{
+  int value = 0;
+
+  {
+    inc_temp i(value);
+    CHECK(value == 1);
+  }
+  CHECK(value == 0);
+}
+
+TEST_CASE("dec_temp.dec_inc")
+{
+  int value = 0;
+  {
+    dec_temp d(value);
+    CHECK(value == -1);
+  }
+  CHECK(value == 0);
+}
+} // namespace kdl

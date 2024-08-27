@@ -22,42 +22,46 @@
 
 #include <algorithm>
 
-namespace kdl {
+namespace kdl
+{
 
 /**
  * A range with begin and end members.
  *
  * @tparam I the types of the individual iterators
  */
-template<typename I>
-struct range {
-    using value_type = typename I::value_type;
-    using iterator = I;
+template <typename I>
+struct range
+{
+  using value_type = typename I::value_type;
+  using iterator = I;
 
-    I m_begin;
-    I m_end;
+  I m_begin;
+  I m_end;
 
-    I begin() const { return m_begin; }
+  I begin() const { return m_begin; }
 
-    I end() const { return m_end; }
+  I end() const { return m_end; }
 
-    auto front() const { return *m_begin; }
-    auto back() const { return *std::prev(m_end); }
+  auto front() const { return *m_begin; }
+  auto back() const { return *std::prev(m_end); }
 
-    bool empty() const { return m_begin == m_end; }
+  bool empty() const { return m_begin == m_end; }
 
-    template<typename I2>
-    bool operator==(const range<I2> &other) const {
-        return std::equal(m_begin, m_end, other.m_begin, other.m_end);
-    }
+  template <typename I2>
+  bool operator==(const range<I2>& other) const
+  {
+    return std::equal(m_begin, m_end, other.m_begin, other.m_end);
+  }
 
-    template<typename I2>
-    bool operator!=(const range<I2> &other) const {
-        return !(*this == other);
-    }
+  template <typename I2>
+  bool operator!=(const range<I2>& other) const
+  {
+    return !(*this == other);
+  }
 };
 
-template<typename I>
+template <typename I>
 range(I, I) -> range<I>;
 
-}// namespace kdl
+} // namespace kdl

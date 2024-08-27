@@ -23,16 +23,18 @@
 #include <cassert>
 #include <memory>
 
-namespace kdl {
+namespace kdl
+{
 /**
  * Checks whether the given shared pointer is expired. Always returns false.
  *
  * @tparam T the type of the pointee
  * @return false
  */
-template<typename T>
-bool mem_expired(const std::shared_ptr<T> & /* ptr */) {
-    return false;
+template <typename T>
+bool mem_expired(const std::shared_ptr<T>& /* ptr */)
+{
+  return false;
 }
 
 /**
@@ -42,9 +44,10 @@ bool mem_expired(const std::shared_ptr<T> & /* ptr */) {
  * @param ptr the pointer to check
  * @return true if the given pointer is expired, and false otherwise
  */
-template<typename T>
-bool mem_expired(const std::weak_ptr<T> &ptr) {
-    return ptr.expired();
+template <typename T>
+bool mem_expired(const std::weak_ptr<T>& ptr)
+{
+  return ptr.expired();
 }
 
 /**
@@ -54,9 +57,10 @@ bool mem_expired(const std::weak_ptr<T> &ptr) {
  * @param ptr the pointer to check
  * @return the given pointer
  */
-template<typename T>
-std::shared_ptr<T> mem_lock(std::shared_ptr<T> ptr) {
-    return ptr;
+template <typename T>
+std::shared_ptr<T> mem_lock(std::shared_ptr<T> ptr)
+{
+  return ptr;
 }
 
 /**
@@ -68,9 +72,10 @@ std::shared_ptr<T> mem_lock(std::shared_ptr<T> ptr) {
  * @param ptr the pointer to lock
  * @return the underlying shared pointer
  */
-template<typename T>
-std::shared_ptr<T> mem_lock(std::weak_ptr<T> ptr) {
-    assert(!mem_expired(ptr));
-    return ptr.lock();
+template <typename T>
+std::shared_ptr<T> mem_lock(std::weak_ptr<T> ptr)
+{
+  assert(!mem_expired(ptr));
+  return ptr.lock();
 }
-}// namespace kdl
+} // namespace kdl

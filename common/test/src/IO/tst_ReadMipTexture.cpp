@@ -37,12 +37,14 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 
-TEST_CASE("readIdMipTexture") {
-using TexInfo = std::tuple<std::string, size_t, size_t>;
+TEST_CASE("readIdMipTexture")
+{
+  using TexInfo = std::tuple<std::string, size_t, size_t>;
 
-// clang-format off
+  // clang-format off
 const auto [textureName, width, height] = GENERATE(
     values<TexInfo>(
         {{"cr8_czg_1", 64, 64}, {"cr8_czg_2", 64, 64}, {"cr8_czg_3", 64, 128}, {"cr8_czg_4", 64, 128}, {"cr8_czg_5", 64, 128}, {"speedM_1", 128, 128},
@@ -51,108 +53,104 @@ const auto [textureName, width, height] = GENERATE(
          {"crackpipes", 128, 128}, {"bongs2", 128, 128}, {"blowjob_machine", 128, 128}, {"lasthopeofhuman", 128, 128},
         }
     ));
-// clang-format on
+  // clang-format on
 
-const auto palettePath = "fixture/test/palette.lmp";
-auto fs = DiskFileSystem{std::filesystem::current_path()};
-auto paletteFile = fs.openFile("fixture/test/palette.lmp").value();
-const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
+  const auto palettePath = "fixture/test/palette.lmp";
+  auto fs = DiskFileSystem{std::filesystem::current_path()};
+  auto paletteFile = fs.openFile("fixture/test/palette.lmp").value();
+  const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
 
-auto logger = NullLogger{};
+  auto logger = NullLogger{};
 
-const auto wadPath = std::filesystem::current_path() / "fixture/test/IO/Wad/cr8_czg.wad";
-auto wadFS = WadFileSystem{Disk::openFile(wadPath).value()};
-REQUIRE(wadFS
-.
+  const auto wadPath =
+    std::filesystem::current_path() / "fixture/test/IO/Wad/cr8_czg.wad";
+  auto wadFS = WadFileSystem{Disk::openFile(wadPath).value()};
+  REQUIRE(wadFS
+            .
 
-reload()
+          reload()
 
-.
+            .
 
-is_success()
+          is_success()
 
-);
+  );
 
-const auto file = wadFS.openFile(textureName + ".D").value();
-auto reader = file->reader().buffer();
-const auto texture = readIdMipTexture(textureName, reader, palette).value();
+  const auto file = wadFS.openFile(textureName + ".D").value();
+  auto reader = file->reader().buffer();
+  const auto texture = readIdMipTexture(textureName, reader, palette).value();
 
-CHECK(texture
-.
+  CHECK(
+    texture.
 
-name()
+    name()
 
-== textureName);
-CHECK(texture
-.
+    == textureName);
+  CHECK(
+    texture.
 
-width()
+    width()
 
-== width);
-CHECK(texture
-.
+    == width);
+  CHECK(
+    texture.
 
-height()
+    height()
 
-== height);
+    == height);
 }
 
 TEST_CASE("readHlMipTexture")
 {
-using TexInfo = std::tuple<std::string, size_t, size_t>;
+  using TexInfo = std::tuple<std::string, size_t, size_t>;
 
-// clang-format off
+  // clang-format off
 const auto [textureName, width, height] = GENERATE(
     values<TexInfo>(
         {{"bongs2", 128, 128}, {"blowjob_machine", 128, 128},}
     ));
-// clang-format on
+  // clang-format on
 
-auto fs = DiskFileSystem{std::filesystem::current_path()};
+  auto fs = DiskFileSystem{std::filesystem::current_path()};
 
-auto logger = TestLogger{};
+  auto logger = TestLogger{};
 
-const auto wadPath = std::filesystem::current_path() / "fixture/test/IO/HL/hl.wad";
-auto wadFS = WadFileSystem{Disk::openFile(wadPath).value()};
-REQUIRE(wadFS
-.
+  const auto wadPath = std::filesystem::current_path() / "fixture/test/IO/HL/hl.wad";
+  auto wadFS = WadFileSystem{Disk::openFile(wadPath).value()};
+  REQUIRE(wadFS
+            .
 
-reload()
+          reload()
 
-.
+            .
 
-is_success()
+          is_success()
 
-);
+  );
 
-const auto file = wadFS.openFile(textureName + ".C").value();
-auto reader = file->reader().buffer();
-const auto texture = readHlMipTexture(textureName, reader).value();
+  const auto file = wadFS.openFile(textureName + ".C").value();
+  auto reader = file->reader().buffer();
+  const auto texture = readHlMipTexture(textureName, reader).value();
 
-CHECK(logger
-.
-countMessages(LogLevel::Error)
-== 0);
-CHECK(logger
-.
-countMessages(LogLevel::Warn)
-== 0);
-CHECK(texture
-.
+  CHECK(logger.countMessages(LogLevel::Error) == 0);
+  CHECK(logger.countMessages(LogLevel::Warn) == 0);
+  CHECK(
+    texture.
 
-name()
+    name()
 
-== textureName);
-CHECK(texture
-.
+    == textureName);
+  CHECK(
+    texture.
 
-width()
+    width()
 
-== width);
-CHECK(texture
-.
+    == width);
+  CHECK(
+    texture.
 
-height()
+    height()
 
-== height);
-}} // namespace TrenchBroom::IO
+    == height);
+}
+} // namespace TrenchBroom::IO

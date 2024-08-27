@@ -27,83 +27,90 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("CompilationConfigParserTest.parseBlankConfig") {
-const auto config = "   ";
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("CompilationConfigParserTest.parseBlankConfig")
+{
+  const auto config = "   ";
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
-TEST_CASE("CompilationConfigParserTest.parseEmptyConfig") {
-const auto config = "  {  } ";
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+TEST_CASE("CompilationConfigParserTest.parseEmptyConfig")
+{
+  const auto config = "  {  } ";
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseEmptyConfigWithTrailingGarbage")
 {
-const auto config = "  {  } asdf";
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  const auto config = "  {  } asdf";
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseMissingProfiles")
 {
-const auto config = "  { 'version' : 1 } ";
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  const auto config = "  { 'version' : 1 } ";
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseMissingVersion")
 {
-const auto config = "  { 'profiles': {} } ";
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  const auto config = "  { 'profiles': {} } ";
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseEmptyProfiles")
 {
-const auto config = "  { 'version': 1, 'profiles': [] } ";
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  const auto config = "  { 'version': 1, 'profiles': [] } ";
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-}});
+    == Model::CompilationConfig{{}});
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithMissingNameAndMissingTasks")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -111,18 +118,19 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndMissingTasks")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -132,18 +140,19 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithMissingNameAndEmptyTasks")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -153,18 +162,19 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndEmptyTasks")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -176,22 +186,20 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"A profile", "", {
-}},}});
+    == Model::CompilationConfig{{
+      {"A profile", "", {}},
+    }});
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneInvalidTask")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -203,18 +211,19 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneTaskWithUnknownType")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -226,18 +235,20 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
-TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneCopyTaskWithMissingSource")
+TEST_CASE(
+  "CompilationConfigParserTest.parseOneProfileWithNameAndOneCopyTaskWithMissingSource")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -249,18 +260,20 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
-TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneCopyTaskWithMissingTarget")
+TEST_CASE(
+  "CompilationConfigParserTest.parseOneProfileWithNameAndOneCopyTaskWithMissingTarget")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -272,18 +285,20 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
-TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneDeleteTaskWithMissingTarget")
+TEST_CASE(
+  "CompilationConfigParserTest.parseOneProfileWithNameAndOneDeleteTaskWithMissingTarget")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -295,18 +310,19 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneCopyTask")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -318,23 +334,24 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"A profile", "", {
-Model::CompilationCopyFiles{
-true, "the source", "the target"},}},}});
+    == Model::CompilationConfig{{
+      {"A profile",
+       "",
+       {
+         Model::CompilationCopyFiles{true, "the source", "the target"},
+       }},
+    }});
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneRenameTask")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -346,23 +363,24 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"A profile", "", {
-Model::CompilationRenameFile{
-true, "the source", "the target"},}},}});
+    == Model::CompilationConfig{{
+      {"A profile",
+       "",
+       {
+         Model::CompilationRenameFile{true, "the source", "the target"},
+       }},
+    }});
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneDeleteTask")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -374,23 +392,25 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"A profile", "", {
-Model::CompilationDeleteFiles{
-true, "the target"},}},}});
+    == Model::CompilationConfig{{
+      {"A profile",
+       "",
+       {
+         Model::CompilationDeleteFiles{true, "the target"},
+       }},
+    }});
 }
 
-TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneToolTaskWithMissingTool")
+TEST_CASE(
+  "CompilationConfigParserTest.parseOneProfileWithNameAndOneToolTaskWithMissingTool")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -402,19 +422,21 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
-TEST_CASE("CompilationConfigParserTest."
-"parseOneProfileWithNameAndOneToolTaskWithMissingParameters")
+TEST_CASE(
+  "CompilationConfigParserTest."
+  "parseOneProfileWithNameAndOneToolTaskWithMissingParameters")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [
@@ -426,18 +448,19 @@ const auto config = R"(
   ]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK_THROWS_AS(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK_THROWS_AS(
+    parser.
 
-parse(), ParserException
+    parse(),
+    ParserException
 
-);
+  );
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndOneToolTask")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'unexpectedKey': '',
@@ -454,23 +477,24 @@ const auto config = R"(
     }]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"A profile", "", {
-Model::CompilationRunTool{
-true, "tyrbsp.exe", "this and that", false},}},}});
+    == Model::CompilationConfig{{
+      {"A profile",
+       "",
+       {
+         Model::CompilationRunTool{true, "tyrbsp.exe", "this and that", false},
+       }},
+    }});
 }
 
 TEST_CASE("CompilationConfigParserTest.parseOneProfileWithNameAndFourTasks")
 {
-const auto config = R"(
+  const auto config = R"(
 {
   'version': 1,
   'profiles': [{
@@ -502,32 +526,28 @@ const auto config = R"(
   }]
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"A profile", "", {
-Model::CompilationRunTool{
-true, "tyrbsp.exe", "this and that", true
-}, Model::CompilationCopyFiles{
-false, "the source", "the target"}, Model::CompilationRenameFile{
-true, "the source", "the target"},
-Model::CompilationDeleteFiles{
-false, "some other target"
-},
-}},
-}});
+    == Model::CompilationConfig{{
+      {"A profile",
+       "",
+       {
+         Model::CompilationRunTool{true, "tyrbsp.exe", "this and that", true},
+         Model::CompilationCopyFiles{false, "the source", "the target"},
+         Model::CompilationRenameFile{true, "the source", "the target"},
+         Model::CompilationDeleteFiles{false, "some other target"},
+       }},
+    }});
 }
 
 TEST_CASE("CompilationConfigParserTest.parseUnescapedBackslashes")
 {
-// https://github.com/TrenchBroom/TrenchBroom/issues/1437
-const auto config = R"(
+  // https://github.com/TrenchBroom/TrenchBroom/issues/1437
+  const auto config = R"(
 {
   "profiles": [{
     "name": "Full Compile",
@@ -541,20 +561,20 @@ const auto config = R"(
   "version": 1
 })";
 
-auto parser = CompilationConfigParser{config};
-CHECK(parser
-.
+  auto parser = CompilationConfigParser{config};
+  CHECK(
+    parser.
 
-parse()
+    parse()
 
-== Model::CompilationConfig{
-{
-{
-"Full Compile", "${MAP_DIR_PATH}", {
-Model::CompilationCopyFiles{
-true, "${WORK_DIR_PATH}/${MAP_BASE_NAME}.bsp", R"(C:\quake2\chaos\maps\)"
-},
-}},
-}});
-}} // namespace IO
+    == Model::CompilationConfig{{
+      {"Full Compile",
+       "${MAP_DIR_PATH}",
+       {
+         Model::CompilationCopyFiles{
+           true, "${WORK_DIR_PATH}/${MAP_BASE_NAME}.bsp", R"(C:\quake2\chaos\maps\)"},
+       }},
+    }});
+}
+} // namespace IO
 } // namespace TrenchBroom

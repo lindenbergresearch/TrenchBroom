@@ -35,76 +35,75 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace EL {
+namespace TrenchBroom
+{
+namespace EL
+{
 using V = Value;
 
-static Value evaluate(const std::string &expression, const MapType &variables = {}) {
+static Value evaluate(const std::string& expression, const MapType& variables = {})
+{
   const auto context = EvaluationContext{VariableTable{variables}};
   return IO::ELParser::parseStrict(expression).evaluate(context);
 }
 
-TEST_CASE("ExpressionTest.testValueLiterals") {
-using T = std::tuple<std::string, Value>;
+TEST_CASE("ExpressionTest.testValueLiterals")
+{
+  using T = std::tuple<std::string, Value>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, expectedValue] = GENERATE(
     values<T>(
         {{"true", Value{true}}, {"false", Value{false}}, {"'asdf'", Value{"asdf"}}, {"2", Value{2}}, {"-2", Value{- 2}},
          {"[2, 3]", Value{ArrayType{Value{2}, Value{3}}}}, {"{k1:2, k2:3}", Value{MapType{{"k1", Value{2}}, {"k2", Value{3}}}}},
         }
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression);
+  CAPTURE(expression);
 
-CHECK(evaluate(expression)
-== expectedValue);
+  CHECK(evaluate(expression) == expectedValue);
 }
 
-TEST_CASE("ExpressionTest.testVariableExpression") {
-using T = std::tuple<std::string, MapType, Value>;
+TEST_CASE("ExpressionTest.testVariableExpression")
+{
+  using T = std::tuple<std::string, MapType, Value>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, variables, expectedValue] = GENERATE(
     values<T>(
         {{"x", {{"x", Value{true}}}, Value{true}}, {"x", {{"y", Value{true}}}, Value::Undefined}, {"x", {{"x", Value{7}}}, Value{7}},
          {"x", {}, Value::Undefined},
         }
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression, variables
-);
+  CAPTURE(expression, variables);
 
-CHECK(evaluate(expression, variables)
-== expectedValue);
+  CHECK(evaluate(expression, variables) == expectedValue);
 }
 
 TEST_CASE("ExpressionTest.testArrayExpression")
 {
-using T = std::tuple<std::string, MapType, ArrayType>;
+  using T = std::tuple<std::string, MapType, ArrayType>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, variables, expectedValue] = GENERATE(
     values<T>(
         {{"[]", {}, {}}, {"[1, 2, 3]", {}, {Value{1}, Value{2}, Value{3}}}, {"[1, 2, x]", {{"x", Value{"test"}}}, {Value{1}, Value{2}, Value{"test"}}},}
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression, variables
-);
+  CAPTURE(expression, variables);
 
-CHECK(evaluate(expression, variables)
-== Value{
-expectedValue});
+  CHECK(evaluate(expression, variables) == Value{expectedValue});
 }
 
 TEST_CASE("ExpressionTest.testMapExpression")
 {
-using T = std::tuple<std::string, MapType, MapType>;
+  using T = std::tuple<std::string, MapType, MapType>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, variables, expectedValue] = GENERATE(
     values<T>(
         {{"{}", {}, {}}, {"{k: true}", {}, {{"k", Value{true}}}},
@@ -112,21 +111,18 @@ const auto [expression, variables, expectedValue] = GENERATE(
          {"{k1: 'asdf', k2: x}", {{"x", Value{55}}}, {{"k1", Value{"asdf"}}, {"k2", Value{55}}}},
         }
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression, variables
-);
+  CAPTURE(expression, variables);
 
-CHECK(evaluate(expression, variables)
-== Value{
-expectedValue});
+  CHECK(evaluate(expression, variables) == Value{expectedValue});
 }
 
 TEST_CASE("ExpressionTest.testOperators")
 {
-using T = std::tuple<std::string, std::variant<Value, EvaluationError>>;
+  using T = std::tuple<std::string, std::variant<Value, EvaluationError>>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, expectedValueOrError] = GENERATE(
     values<T>(
         {
@@ -340,27 +336,26 @@ const auto [expression, expectedValueOrError] = GENERATE(
             {"true -> 'asdf'", Value{"asdf"}}, {"false -> 'asdf'", Value::Undefined}, {"false -> x[-1]", Value::Undefined},
         }
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression);
+  CAPTURE(expression);
 
-if (
-std::holds_alternative<Value>(expectedValueOrError)
-) {
-const auto expectedValue = std::get<Value>(expectedValueOrError);
-CHECK(evaluate(expression)
-== expectedValue);
+  if (std::holds_alternative<Value>(expectedValueOrError))
+  {
+    const auto expectedValue = std::get<Value>(expectedValueOrError);
+    CHECK(evaluate(expression) == expectedValue);
+  }
+  else
+  {
+    CHECK_THROWS_AS(evaluate(expression), EvaluationError);
+  }
 }
-else {
-CHECK_THROWS_AS(evaluate(expression), EvaluationError
-);
-}}
 
 TEST_CASE("ExpressionTest.testOperatorPrecedence")
 {
-using T = std::tuple<std::string, Value>;
+  using T = std::tuple<std::string, Value>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, expectedValue] = GENERATE(
     values<T>(
         {{"1 + 2 - 3", Value{1.0 + 2.0 - 3.0}}, {"1 - 2 + 3", Value{1.0 - 2.0 + 3.0}}, {"2 * 3 + 4", Value{2.0 * 3.0 + 4.0}},
@@ -378,19 +373,18 @@ const auto [expression, expectedValue] = GENERATE(
          {"true && false -> true", Value::Undefined}, {"true && true -> false", Value{false}}, {"2 + 3 < 2 + 4 -> 6 % 5", Value{1}},
         }
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression);
+  CAPTURE(expression);
 
-CHECK(evaluate(expression)
-== expectedValue);
+  CHECK(evaluate(expression) == expectedValue);
 }
 
 TEST_CASE("ExpressionTest.testOptimize")
 {
-using T = std::tuple<std::string, Expression>;
+  using T = std::tuple<std::string, Expression>;
 
-// clang-format off
+  // clang-format off
 const auto [expression, expectedExpression] = GENERATE(
     values<T>(
         {{"3 + 7", Expression{LiteralExpression{Value{10}}, 0, 0}},
@@ -402,15 +396,17 @@ const auto [expression, expectedExpression] = GENERATE(
             }}, {"{a:1, b:2, c:3}", Expression{LiteralExpression{Value{MapType{{"a", Value{1}}, {"b", Value{2}}, {"c", Value{3}}}}}, 0, 0}},
         }
     ));
-// clang-format on
+  // clang-format on
 
-CAPTURE(expression);
+  CAPTURE(expression);
 
-CHECK(IO::ELParser::parseStrict(expression)
-.
+  CHECK(
+    IO::ELParser::parseStrict(expression)
+      .
 
-optimize()
+    optimize()
 
-== expectedExpression);
-}} // namespace EL
+    == expectedExpression);
+}
+} // namespace EL
 } // namespace TrenchBroom

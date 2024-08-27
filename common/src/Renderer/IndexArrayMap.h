@@ -24,8 +24,10 @@
 
 #include <unordered_map>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class IndexArray;
 
 
@@ -41,13 +43,15 @@ class IndexArray;
  * When the render method is called, the stored ranges are rendered by issuing the
  * appropriate calls with the corresponding recorded range data.
  */
-class IndexArrayMap {
+class IndexArrayMap
+{
 private:
   /**
    * And index array range, consisting of the offset and the number of indices contained
    * in the range. The capacity is only recorded for debugging purposes.
    */
-  struct IndexArrayRange {
+  struct IndexArrayRange
+  {
     size_t offset;
     size_t capacity;
     size_t count;
@@ -68,7 +72,8 @@ public:
    * To record the correct sizes, call the inc method with the same parameters for every
    * expected call to the add method of the index array map itself.
    */
-  class Size {
+  class Size
+  {
   private:
     friend class IndexArrayMap;
 
@@ -95,7 +100,7 @@ public:
      *
      * @param other the size to increase by
      */
-    void inc(const Size &other);
+    void inc(const Size& other);
 
     /**
      * The total number of indices that have been accounted for.
@@ -105,7 +110,7 @@ public:
     size_t indexCount() const;
 
   private:
-    void initialize(PrimTypeToRangeMap &ranges, size_t baseOffset) const;
+    void initialize(PrimTypeToRangeMap& ranges, size_t baseOffset) const;
   };
 
 private:
@@ -118,7 +123,7 @@ public:
    *
    * @param size the sizes of the index array map to initialize to
    */
-  explicit IndexArrayMap(const Size &size);
+  explicit IndexArrayMap(const Size& size);
 
   /**
    * Creates a new empty index array map and initializes the internal data structures to
@@ -129,7 +134,7 @@ public:
    * @param baseOffset the base offset for all primitive indices recorded in this index
    * array range map
    */
-  IndexArrayMap(const Size &size, size_t baseOffset);
+  IndexArrayMap(const Size& size, size_t baseOffset);
 
   /**
    * Returns the size of this index array map. An index array map initialized with the
@@ -156,7 +161,7 @@ public:
    *
    * @param indexArray the index array to render
    */
-  void render(IndexArray &indexArray) const;
+  void render(IndexArray& indexArray) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

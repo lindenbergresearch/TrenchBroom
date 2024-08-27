@@ -23,12 +23,15 @@
 
 #include <string>
 
-namespace TrenchBroom {
-namespace View {
-class CurrentGameIndicator : public DialogHeader {
-    Q_OBJECT
+namespace TrenchBroom
+{
+namespace View
+{
+class CurrentGameIndicator : public DialogHeader
+{
+  Q_OBJECT
 public:
-    explicit CurrentGameIndicator(const std::string &gameName, QWidget *parent = nullptr);
+  explicit CurrentGameIndicator(const std::string& gameName, QWidget* parent = nullptr);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

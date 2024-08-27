@@ -23,38 +23,44 @@
 
 #include <cstddef>
 
-namespace vm {
-enum class side {
-    front,
-    back,
-    both
+namespace vm
+{
+enum class side
+{
+  front,
+  back,
+  both
 };
 
-enum class direction {
-    forward,
-    backward,
-    left,
-    right,
-    up,
-    down
+enum class direction
+{
+  forward,
+  backward,
+  left,
+  right,
+  up,
+  down
 };
 
-enum class rotation_axis {
-    roll,
-    pitch,
-    yaw
+enum class rotation_axis
+{
+  roll,
+  pitch,
+  yaw
 };
 
-enum class plane_status {
-    above,
-    below,
-    inside
+enum class plane_status
+{
+  above,
+  below,
+  inside
 };
 
-namespace axis {
+namespace axis
+{
 using type = size_t;
 static const type x = 0;
 static const type y = 1;
 static const type z = 2;
-}// namespace axis
-}// namespace vm
+} // namespace axis
+} // namespace vm

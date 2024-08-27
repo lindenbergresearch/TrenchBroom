@@ -26,7 +26,8 @@
 
 #include <ostream>
 
-namespace vm {
+namespace vm
+{
 /**
  * Prints a textual representation of the given plane to the given stream.
  *
@@ -36,9 +37,10 @@ namespace vm {
  * @param plane the plane to print
  * @return the given stream
  */
-template<typename T, std::size_t S>
-std::ostream &operator<<(std::ostream &stream, const plane<T, S> &plane) {
-    stream << "{ normal: (" << plane.normal << "), distance: " << plane.distance << " }";
-    return stream;
+template <typename T, std::size_t S>
+std::ostream& operator<<(std::ostream& stream, const plane<T, S>& plane)
+{
+  stream << "{ normal: (" << plane.normal << "), distance: " << plane.distance << " }";
+  return stream;
 }
-}// namespace vm
+} // namespace vm

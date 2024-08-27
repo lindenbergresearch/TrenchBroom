@@ -24,7 +24,8 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
 struct BrushNodeFacePair;
 
@@ -35,20 +36,23 @@ class MapFacade;
 class Node;
 
 
-class PushSelection {
+class PushSelection
+{
 private:
-  MapFacade &m_facade;
-  std::vector<Node *> m_nodes;
+  MapFacade& m_facade;
+  std::vector<Node*> m_nodes;
   std::vector<BrushFaceHandle> m_faces;
 
 public:
-  template<typename T> explicit PushSelection(const std::shared_ptr<T> &facade)
-      : PushSelection{facade.get()} {
+  template <typename T>
+  explicit PushSelection(const std::shared_ptr<T>& facade)
+    : PushSelection{facade.get()}
+  {
   }
 
-  explicit PushSelection(MapFacade *facade);
+  explicit PushSelection(MapFacade* facade);
 
-  explicit PushSelection(MapFacade &facade);
+  explicit PushSelection(MapFacade& facade);
 
   ~PushSelection();
 };

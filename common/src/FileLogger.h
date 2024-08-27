@@ -29,22 +29,24 @@
 
 class QString;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 
-class FileLogger : public Logger {
+class FileLogger : public Logger
+{
 private:
   std::ofstream m_stream;
 
 public:
-  explicit FileLogger(const std::filesystem::path &filePath);
+  explicit FileLogger(const std::filesystem::path& filePath);
 
-  static FileLogger &instance();
+  static FileLogger& instance();
 
 private:
-  void doLog(LogLevel level, const std::string &message) override;
+  void doLog(LogLevel level, const std::string& message) override;
 
-  void doLog(LogLevel level, const QString &message) override;
+  void doLog(LogLevel level, const QString& message) override;
 
-deleteCopyAndMove(FileLogger);
+  deleteCopyAndMove(FileLogger);
 };
 } // namespace TrenchBroom

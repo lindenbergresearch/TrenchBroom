@@ -28,7 +28,8 @@
 #include <optional>
 #include <vector>
 
-namespace kdl {
+namespace kdl
+{
 /**
  * Folds the given range of results into a single result with a vector of success values
  * or an error. If given void results, the result is a void result again. The returned
@@ -36,69 +37,84 @@ namespace kdl {
  *
  * If any of the given results contains an error, that error is returned.
  */
-template<typename I>
-auto fold_results(I cur, I end) {
-    using in_result_type = typename std::iterator_traits<I>::value_type;
-    using in_value_type = typename in_result_type::value_type;
+template <typename I>
+auto fold_results(I cur, I end)
+{
+  using in_result_type = typename std::iterator_traits<I>::value_type;
+  using in_value_type = typename in_result_type::value_type;
 
-    if constexpr (std::is_same_v<in_value_type, void>) {
-        using out_result_type = typename in_result_type::template with_value_type<void>;
+  if constexpr (std::is_same_v<in_value_type, void>)
+  {
+    using out_result_type = typename in_result_type::template with_value_type<void>;
 
-        while (cur != end) {
-            if (cur->is_error()) {
-                return *cur;
-            }
-            ++cur;
-        }
-
-        return out_result_type{};
-    } else {
-        using vector_type = std::vector<in_value_type>;
-        using out_result_type =
-            typename in_result_type::template with_value_type<vector_type>;
-        using i_category = typename std::iterator_traits<I>::iterator_category;
-
-        auto result_vector = vector_type{};
-        if constexpr (std::is_same_v<i_category, std::random_access_iterator_tag>) {
-            result_vector.reserve(static_cast<std::size_t>(end - cur));
-        }
-
-        while (cur != end) {
-            if constexpr (in_result_type::error_count > 0) {
-                if (cur->is_error()) {
-                    return std::visit(
-                        [](auto &&e) { return out_result_type{std::forward<decltype(e)>(e)}; },
-                        std::move(*cur).error());
-                }
-            }
-
-            result_vector.push_back(std::move(*cur).value());
-            ++cur;
-        }
-
-        return out_result_type{std::move(result_vector)};
+    while (cur != end)
+    {
+      if (cur->is_error())
+      {
+        return *cur;
+      }
+      ++cur;
     }
-}
 
-template<typename C>
-auto fold_results(C &&c) {
-    return fold_results(std::begin(c), std::end(c));
-}
+    return out_result_type{};
+  }
+  else
+  {
+    using vector_type = std::vector<in_value_type>;
+    using out_result_type =
+      typename in_result_type::template with_value_type<vector_type>;
+    using i_category = typename std::iterator_traits<I>::iterator_category;
 
-template<typename I, typename F>
-auto select_first(I cur, I end, const F &f)
-    -> std::optional<typename decltype(f(*cur))::value_type> {
-    while (cur != end) {
-        auto result = f(*cur++);
-        if (result.is_success()) {
-            return std::move(result).value();
-        }
+    auto result_vector = vector_type{};
+    if constexpr (std::is_same_v<i_category, std::random_access_iterator_tag>)
+    {
+      result_vector.reserve(static_cast<std::size_t>(end - cur));
     }
-    return std::nullopt;
+
+    while (cur != end)
+    {
+      if constexpr (in_result_type::error_count > 0)
+      {
+        if (cur->is_error())
+        {
+          return std::visit(
+            [](auto&& e) { return out_result_type{std::forward<decltype(e)>(e)}; },
+            std::move(*cur).error());
+        }
+      }
+
+      result_vector.push_back(std::move(*cur).value());
+      ++cur;
+    }
+
+    return out_result_type{std::move(result_vector)};
+  }
 }
 
-template<typename C, typename F>
-auto select_first(C &&c, const F &f) {
-    return select_first(std::begin(c), std::end(c), f);
+template <typename C>
+auto fold_results(C&& c)
+{
+  return fold_results(std::begin(c), std::end(c));
 }
-}// namespace kdl
+
+template <typename I, typename F>
+auto select_first(I cur, I end, const F& f)
+  -> std::optional<typename decltype(f(*cur))::value_type>
+{
+  while (cur != end)
+  {
+    auto result = f(*cur++);
+    if (result.is_success())
+    {
+      return std::move(result).value();
+    }
+  }
+  return std::nullopt;
+}
+
+template <typename C, typename F>
+auto select_first(C&& c, const F& f)
+{
+  return select_first(std::begin(c), std::end(c), f);
+}
+} // namespace kdl

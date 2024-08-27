@@ -34,55 +34,90 @@
 #include "Renderer/Shaders.h"
 #include "StringUtils.h"
 
-namespace TrenchBroom {
-namespace Renderer {
-struct FaceRenderer::RenderFunc : public TextureRenderFunc {
-  ActiveShader &shader;
+namespace TrenchBroom
+{
+namespace Renderer
+{
+struct FaceRenderer::RenderFunc : public TextureRenderFunc
+{
+  ActiveShader& shader;
   bool applyTexture;
-  const Color &defaultColor;
+  const Color& defaultColor;
 
-  RenderFunc(ActiveShader &i_shader, const bool i_applyTexture, const Color &i_defaultColor) :
-      shader(i_shader), applyTexture(i_applyTexture), defaultColor(i_defaultColor) {
+  RenderFunc(
+    ActiveShader& i_shader, const bool i_applyTexture, const Color& i_defaultColor)
+    : shader(i_shader)
+    , applyTexture(i_applyTexture)
+    , defaultColor(i_defaultColor)
+  {
   }
 
-  void before(const Assets::Texture *texture) override {
-    if (texture != nullptr) {
+  void before(const Assets::Texture* texture) override
+  {
+    if (texture != nullptr)
+    {
       texture->activate();
       shader.set("ApplyTexture", applyTexture);
       shader.set("Color", texture->averageColor());
-    } else {
+    }
+    else
+    {
       shader.set("ApplyTexture", false);
       shader.set("Color", defaultColor);
     }
   }
 
-  void after(const Assets::Texture *texture) override {
-    if (texture != nullptr) {
+  void after(const Assets::Texture* texture) override
+  {
+    if (texture != nullptr)
+    {
       texture->deactivate();
     }
   }
 };
 
 
-FaceRenderer::FaceRenderer() : m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+FaceRenderer::FaceRenderer()
+  : m_grayscale(false)
+  , m_tint(false)
+  , m_alpha(1.0f)
+{
 }
 
-FaceRenderer::FaceRenderer(std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap, const Color &faceColor) :
-    m_vertexArray(std::move(vertexArray)), m_indexArrayMap(std::move(indexArrayMap)), m_faceColor(faceColor), m_grayscale(false), m_tint(false), m_alpha(1.0f) {
+FaceRenderer::FaceRenderer(
+  std::shared_ptr<BrushVertexArray> vertexArray,
+  std::shared_ptr<TextureToBrushIndicesMap> indexArrayMap,
+  const Color& faceColor)
+  : m_vertexArray(std::move(vertexArray))
+  , m_indexArrayMap(std::move(indexArrayMap))
+  , m_faceColor(faceColor)
+  , m_grayscale(false)
+  , m_tint(false)
+  , m_alpha(1.0f)
+{
 }
 
-FaceRenderer::FaceRenderer(const FaceRenderer &other) :
-    IndexedRenderable(other), m_vertexArray(other.m_vertexArray), m_indexArrayMap(other.m_indexArrayMap), m_faceColor(other.m_faceColor),
-    m_grayscale(other.m_grayscale), m_tint(other.m_tint), m_tintColor(other.m_tintColor), m_alpha(other.m_alpha) {
+FaceRenderer::FaceRenderer(const FaceRenderer& other)
+  : IndexedRenderable(other)
+  , m_vertexArray(other.m_vertexArray)
+  , m_indexArrayMap(other.m_indexArrayMap)
+  , m_faceColor(other.m_faceColor)
+  , m_grayscale(other.m_grayscale)
+  , m_tint(other.m_tint)
+  , m_tintColor(other.m_tintColor)
+  , m_alpha(other.m_alpha)
+{
 }
 
-FaceRenderer &FaceRenderer::operator=(FaceRenderer other) {
+FaceRenderer& FaceRenderer::operator=(FaceRenderer other)
+{
   using std::swap;
   swap(*this, other);
   return *this;
 }
 
-void swap(FaceRenderer &left, FaceRenderer &right) {
+void swap(FaceRenderer& left, FaceRenderer& right)
+{
   using std::swap;
   swap(left.m_vertexArray, right.m_vertexArray);
   swap(left.m_indexArrayMap, right.m_indexArrayMap);
@@ -93,42 +128,51 @@ void swap(FaceRenderer &left, FaceRenderer &right) {
   swap(left.m_alpha, right.m_alpha);
 }
 
-void FaceRenderer::setGrayscale(const bool grayscale) {
+void FaceRenderer::setGrayscale(const bool grayscale)
+{
   m_grayscale = grayscale;
 }
 
-void FaceRenderer::setTint(const bool tint) {
+void FaceRenderer::setTint(const bool tint)
+{
   m_tint = tint;
 }
 
-void FaceRenderer::setTintColor(const Color &color) {
+void FaceRenderer::setTintColor(const Color& color)
+{
   m_tintColor = color;
 }
 
-void FaceRenderer::setAlpha(const float alpha) {
+void FaceRenderer::setAlpha(const float alpha)
+{
   m_alpha = alpha;
 }
 
-void FaceRenderer::render(RenderBatch &renderBatch) {
+void FaceRenderer::render(RenderBatch& renderBatch)
+{
   renderBatch.add(this);
 }
 
-void FaceRenderer::prepareVerticesAndIndices(VboManager &vboManager) {
+void FaceRenderer::prepareVerticesAndIndices(VboManager& vboManager)
+{
   m_vertexArray->prepare(vboManager);
 
-  for (const auto &[texture, brushIndexHolderPtr] : *m_indexArrayMap) {
+  for (const auto& [texture, brushIndexHolderPtr] : *m_indexArrayMap)
+  {
     brushIndexHolderPtr->prepare(vboManager);
   }
 }
 
-void FaceRenderer::doRender(RenderContext &context) {
+void FaceRenderer::doRender(RenderContext& context)
+{
   if (m_indexArrayMap->empty())
     return;
 
-  if (m_vertexArray->setupVertices()) {
-    ShaderManager &shaderManager = context.shaderManager();
+  if (m_vertexArray->setupVertices())
+  {
+    ShaderManager& shaderManager = context.shaderManager();
     ActiveShader shader(shaderManager, Shaders::FaceShader);
-    PreferenceManager &prefs = PreferenceManager::instance();
+    PreferenceManager& prefs = PreferenceManager::instance();
 
     float gridLineWidth = pref(Preferences::GridLineWidth);
     int autoBrightnessType = pref(Preferences::FaceAutoBrightness);
@@ -203,23 +247,27 @@ void FaceRenderer::doRender(RenderContext &context) {
 
     shader.set("Alpha", m_alpha);
     shader.set("EnableMasked", false);
-    shader.set("ShowSoftMapBounds", ! context.softMapBounds().is_empty());
+    shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
     shader.set("SoftMapBoundsMin", context.softMapBounds().min);
     shader.set("SoftMapBoundsMax", context.softMapBounds().max);
 
     auto boundsColor = prefs.get(Preferences::SoftMapBoundsColor);
 
     shader.set(
-        "SoftMapBoundsColor", vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
+      "SoftMapBoundsColor",
+      vm::vec4f(boundsColor.r(), boundsColor.g(), boundsColor.b(), 0.1f));
 
     RenderFunc func(shader, applyTexture, m_faceColor);
 
-    if (m_alpha < 1.0f) {
+    if (m_alpha < 1.0f)
+    {
       glAssert(glDepthMask(GL_FALSE));
     }
 
-    for (const auto &[texture, brushIndexHolderPtr] : *m_indexArrayMap) {
-      if (! brushIndexHolderPtr->hasValidIndices()) {
+    for (const auto& [texture, brushIndexHolderPtr] : *m_indexArrayMap)
+    {
+      if (!brushIndexHolderPtr->hasValidIndices())
+      {
         continue;
       }
 
@@ -236,7 +284,8 @@ void FaceRenderer::doRender(RenderContext &context) {
       func.after(texture);
     }
 
-    if (m_alpha < 1.0f) {
+    if (m_alpha < 1.0f)
+    {
       glAssert(glDepthMask(GL_TRUE));
     }
 

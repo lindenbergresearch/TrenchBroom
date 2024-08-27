@@ -20,13 +20,16 @@
 
 #include "test_utils.h"
 
-namespace kdl {
-deletable::deletable(bool &i_deleted)
-    : deleted(i_deleted) {
-    deleted = false;
+namespace kdl
+{
+deletable::deletable(bool& i_deleted)
+  : deleted(i_deleted)
+{
+  deleted = false;
 }
 
-deletable::~deletable() {
-    deleted = true;
+deletable::~deletable()
+{
+  deleted = true;
 }
-}// namespace kdl
+} // namespace kdl

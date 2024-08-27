@@ -37,8 +37,10 @@
 #include <vm/mat_ext.h>
 #include <vm/vec.h>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 const float TextRenderer::DefaultMaxViewDistance = 768.0f;
 const float TextRenderer::DefaultMinZoomFactor = 0.5f;
 const vm::vec2f TextRenderer::DefaultInset = vm::vec2f(3.0f, 1.0f);
@@ -46,38 +48,58 @@ const size_t TextRenderer::RectCornerSegments = 6;
 const float TextRenderer::RectCornerRadius = 2.0f;
 
 TextRenderer::Entry::Entry(
-    std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor, const Color &i_backgroundColor,
-    const AttrString &i_string
-) : size(i_size), offset(i_offset), textColor(i_textColor), backgroundColor(i_backgroundColor), string(i_string) {
+  std::vector<vm::vec2f>& i_vertices,
+  const vm::vec2f& i_size,
+  const vm::vec3f& i_offset,
+  const Color& i_textColor,
+  const Color& i_backgroundColor,
+  const AttrString& i_string)
+  : size(i_size)
+  , offset(i_offset)
+  , textColor(i_textColor)
+  , backgroundColor(i_backgroundColor)
+  , string(i_string)
+{
   using std::swap;
   swap(vertices, i_vertices);
 }
 
-bool TextRenderer::Entry::valueInRange(float value, float min, float max) {
+bool TextRenderer::Entry::valueInRange(float value, float min, float max)
+{
   return (value >= min) && (value <= max);
 }
 
-bool TextRenderer::Entry::overlapsWith(const TextRenderer::Entry &entry) {
+bool TextRenderer::Entry::overlapsWith(const TextRenderer::Entry& entry)
+{
   bool xOverlap =
-      valueInRange(offset.x(), entry.offset.x(), entry.offset.x() + entry.size.x()) || valueInRange(entry.offset.x(), offset.x(), offset.x() + size.x());
+    valueInRange(offset.x(), entry.offset.x(), entry.offset.x() + entry.size.x())
+    || valueInRange(entry.offset.x(), offset.x(), offset.x() + size.x());
 
   bool yOverlap =
-      valueInRange(offset.y(), entry.offset.y(), entry.offset.y() + entry.size.y()) || valueInRange(entry.offset.y(), offset.y(), offset.y() + size.y());
+    valueInRange(offset.y(), entry.offset.y(), entry.offset.y() + entry.size.y())
+    || valueInRange(entry.offset.y(), offset.y(), offset.y() + size.y());
 
   return xOverlap && yOverlap;
 }
 
-TextRenderer::EntryCollection::EntryCollection() : textVertexCount(0), rectVertexCount(0) {
+TextRenderer::EntryCollection::EntryCollection()
+  : textVertexCount(0)
+  , rectVertexCount(0)
+{
 }
 
-bool TextRenderer::EntryCollection::overlaps(TextRenderer::Entry &entry) {
-  for (const Entry &e : entries) {
+bool TextRenderer::EntryCollection::overlaps(TextRenderer::Entry& entry)
+{
+  for (const Entry& e : entries)
+  {
     // don't compare it to self
-    if (&e == &entry) {
+    if (&e == &entry)
+    {
       continue;
     }
 
-    if (entry.overlapsWith(e)) {
+    if (entry.overlapsWith(e))
+    {
       return true;
     }
   }
@@ -85,80 +107,124 @@ bool TextRenderer::EntryCollection::overlaps(TextRenderer::Entry &entry) {
   return false;
 }
 
-void TextRenderer::EntryCollection::addEntry(TextRenderer::Entry &entry) {
+void TextRenderer::EntryCollection::addEntry(TextRenderer::Entry& entry)
+{
   entries.push_back(entry);
   updateLayout();
 }
 
-void TextRenderer::EntryCollection::updateLayout() {
+void TextRenderer::EntryCollection::updateLayout()
+{
   auto correctionShift = vm::vec3f(3.f, 5.f, 0.f);
-  Entry &last = entries.back();
+  Entry& last = entries.back();
 
-  while (overlaps(last)) {
+  while (overlaps(last))
+  {
     last.offset = last.offset + correctionShift;
   }
 }
 
-TextRenderer::TextRenderer(const FontDescriptor &fontDescriptor, const float maxViewDistance, const float minZoomFactor, const vm::vec2f &inset) :
-    m_fontDescriptor(fontDescriptor), m_maxViewDistance(maxViewDistance), m_minZoomFactor(minZoomFactor), m_inset(inset) {
+TextRenderer::TextRenderer(
+  const FontDescriptor& fontDescriptor,
+  const float maxViewDistance,
+  const float minZoomFactor,
+  const vm::vec2f& inset)
+  : m_fontDescriptor(fontDescriptor)
+  , m_maxViewDistance(maxViewDistance)
+  , m_minZoomFactor(minZoomFactor)
+  , m_inset(inset)
+{
 }
 
 void TextRenderer::renderString(
-    RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position
-) {
+  RenderContext& renderContext,
+  const Color& textColor,
+  const Color& backgroundColor,
+  const AttrString& string,
+  const TextAnchor& position)
+{
   renderString(renderContext, textColor, backgroundColor, string, position, false);
 }
 
 void TextRenderer::renderStringOnTop(
-    RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position
-) {
+  RenderContext& renderContext,
+  const Color& textColor,
+  const Color& backgroundColor,
+  const AttrString& string,
+  const TextAnchor& position)
+{
   renderString(renderContext, textColor, backgroundColor, string, position, true);
 }
 
 void TextRenderer::renderString(
-    RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position, const bool onTop
-) {
+  RenderContext& renderContext,
+  const Color& textColor,
+  const Color& backgroundColor,
+  const AttrString& string,
+  const TextAnchor& position,
+  const bool onTop)
+{
 
   m_maxViewDistance = pref(Preferences::TextRendererMaxDistance);
-  const Camera &camera = renderContext.camera();
+  const Camera& camera = renderContext.camera();
   const float distance = camera.perpendicularDistanceTo(position.position(camera));
   if (distance <= 0.0f)
     return;
 
-  if (! isVisible(renderContext, string, position, distance, onTop))
+  if (!isVisible(renderContext, string, position, distance, onTop))
     return;
 
-  FontManager &fontManager = renderContext.fontManager();
-  TextureFont &font = fontManager.font(m_fontDescriptor);
+  FontManager& fontManager = renderContext.fontManager();
+  TextureFont& font = fontManager.font(m_fontDescriptor);
 
   std::vector<vm::vec2f> vertices = font.quads(string, true);
   const float alphaFactor = computeAlphaFactor(renderContext, distance, onTop);
   const vm::vec2f size = font.measure(string);
   const vm::vec3f offset = position.offset(camera, size);
 
-  if (onTop) {
+  if (onTop)
+  {
     addEntry(
-        m_entriesOnTop, Entry(
-            vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a()), string
-        ));
-  } else {
+      m_entriesOnTop,
+      Entry(
+        vertices,
+        size,
+        floor(offset),
+        Color(textColor, alphaFactor * textColor.a()),
+        Color(backgroundColor, alphaFactor * backgroundColor.a()),
+        string));
+  }
+  else
+  {
     addEntry(
-        m_entries, Entry(
-            vertices, size, floor(offset), Color(textColor, alphaFactor * textColor.a()), Color(backgroundColor, alphaFactor * backgroundColor.a()), string
-        ));
+      m_entries,
+      Entry(
+        vertices,
+        size,
+        floor(offset),
+        Color(textColor, alphaFactor * textColor.a()),
+        Color(backgroundColor, alphaFactor * backgroundColor.a()),
+        string));
   }
 }
 
-bool TextRenderer::isVisible(RenderContext &renderContext, const AttrString &string, const TextAnchor &position, const float distance, const bool onTop) const {
-  if (! onTop) {
+bool TextRenderer::isVisible(
+  RenderContext& renderContext,
+  const AttrString& string,
+  const TextAnchor& position,
+  const float distance,
+  const bool onTop) const
+{
+  if (!onTop)
+  {
     if (renderContext.render3D() && distance > m_maxViewDistance)
       return false;
     if (renderContext.render2D() && renderContext.camera().zoom() < m_minZoomFactor)
       return false;
   }
 
-  const Camera &camera = renderContext.camera();
-  const Camera::Viewport &viewport = camera.viewport();
+  const Camera& camera = renderContext.camera();
+  const Camera::Viewport& viewport = camera.viewport();
 
   const vm::vec2f size = stringSize(renderContext, string);
   const vm::vec2f offset = vm::vec2f(position.offset(camera, size)) - m_inset;
@@ -167,18 +233,23 @@ bool TextRenderer::isVisible(RenderContext &renderContext, const AttrString &str
   return viewport.contains(offset.x(), offset.y(), actualSize.x(), actualSize.y());
 }
 
-float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const float distance, const bool onTop) const {
+float TextRenderer::computeAlphaFactor(
+  const RenderContext& renderContext, const float distance, const bool onTop) const
+{
   if (onTop)
     return 1.0f;
 
   auto fadeoutPos = pref(Preferences::TextRendererFadeOutFactor) * m_maxViewDistance;
 
-  if (renderContext.render3D()) {
+  if (renderContext.render3D())
+  {
     const float a = m_maxViewDistance - distance;
     if (a > fadeoutPos)
       return 1.0f;
     return a / fadeoutPos;
-  } else {
+  }
+  else
+  {
     const float z = renderContext.camera().zoom();
     const float d = z - m_minZoomFactor;
     if (d > 0.3f)
@@ -187,31 +258,38 @@ float TextRenderer::computeAlphaFactor(const RenderContext &renderContext, const
   }
 }
 
-void TextRenderer::addEntry(EntryCollection &collection, const Entry &entry) {
+void TextRenderer::addEntry(EntryCollection& collection, const Entry& entry)
+{
   collection.entries.push_back(entry);
   collection.textVertexCount += entry.vertices.size();
   collection.rectVertexCount += roundedRect2DVertexCount(RectCornerSegments);
 }
 
-vm::vec2f TextRenderer::stringSize(RenderContext &renderContext, const AttrString &string) const {
-  FontManager &fontManager = renderContext.fontManager();
-  TextureFont &font = fontManager.font(m_fontDescriptor);
+vm::vec2f TextRenderer::stringSize(
+  RenderContext& renderContext, const AttrString& string) const
+{
+  FontManager& fontManager = renderContext.fontManager();
+  TextureFont& font = fontManager.font(m_fontDescriptor);
   return round(font.measure(string));
 }
 
-void TextRenderer::doPrepareVertices(VboManager &vboManager) {
+void TextRenderer::doPrepareVertices(VboManager& vboManager)
+{
   prepare(m_entries, false, vboManager);
   prepare(m_entriesOnTop, true, vboManager);
 }
 
-void TextRenderer::prepare(EntryCollection &collection, const bool onTop, VboManager &vboManager) {
+void TextRenderer::prepare(
+  EntryCollection& collection, const bool onTop, VboManager& vboManager)
+{
   std::vector<TextVertex> textVertices;
   textVertices.reserve(collection.textVertexCount);
 
   std::vector<RectVertex> rectVertices;
   rectVertices.reserve(collection.rectVertexCount);
 
-  for (const Entry &entry : collection.entries) {
+  for (const Entry& entry : collection.entries)
+  {
     addEntry(entry, onTop, textVertices, rectVertices);
   }
 
@@ -222,37 +300,49 @@ void TextRenderer::prepare(EntryCollection &collection, const bool onTop, VboMan
   collection.rectArray.prepare(vboManager);
 }
 
-void TextRenderer::addEntry(const Entry &entry, const bool /* onTop */, std::vector<TextVertex> &textVertices, std::vector<RectVertex> &rectVertices) {
-  const std::vector<vm::vec2f> &stringVertices = entry.vertices;
-  const vm::vec2f &stringSize = entry.size;
+void TextRenderer::addEntry(
+  const Entry& entry,
+  const bool /* onTop */,
+  std::vector<TextVertex>& textVertices,
+  std::vector<RectVertex>& rectVertices)
+{
+  const std::vector<vm::vec2f>& stringVertices = entry.vertices;
+  const vm::vec2f& stringSize = entry.size;
 
-  const vm::vec3f &offset = entry.offset;
+  const vm::vec3f& offset = entry.offset;
 
-  const Color &textColor = entry.textColor;
-  const Color &rectColor = entry.backgroundColor;
+  const Color& textColor = entry.textColor;
+  const Color& rectColor = entry.backgroundColor;
 
-  for (size_t i = 0; i < stringVertices.size() / 2; ++ i) {
-    const vm::vec2f &position2 = stringVertices[2 * i];
-    const vm::vec2f &texCoords = stringVertices[2 * i + 1];
+  for (size_t i = 0; i < stringVertices.size() / 2; ++i)
+  {
+    const vm::vec2f& position2 = stringVertices[2 * i];
+    const vm::vec2f& texCoords = stringVertices[2 * i + 1];
     textVertices.emplace_back(
-        vm::vec3f(position2 + offset.xy(), - offset.z()), texCoords, textColor
-    );
+      vm::vec3f(position2 + offset.xy(), -offset.z()), texCoords, textColor);
   }
 
-  const std::vector<vm::vec2f> rect = roundedRect2D(stringSize + 2.0f * m_inset, RectCornerRadius, RectCornerSegments);
+  const std::vector<vm::vec2f> rect =
+    roundedRect2D(stringSize + 2.0f * m_inset, RectCornerRadius, RectCornerSegments);
 
-  for (size_t i = 0; i < rect.size(); ++ i) {
-    const vm::vec2f &vertex = rect[i];
+  for (size_t i = 0; i < rect.size(); ++i)
+  {
+    const vm::vec2f& vertex = rect[i];
     rectVertices.emplace_back(
-        vm::vec3f(vertex + offset.xy() + stringSize / 2.0f, - offset.z()), rectColor
-    );
+      vm::vec3f(vertex + offset.xy() + stringSize / 2.0f, -offset.z()), rectColor);
   }
 }
 
-void TextRenderer::doRender(RenderContext &renderContext) {
-  const Camera::Viewport &viewport = renderContext.camera().viewport();
+void TextRenderer::doRender(RenderContext& renderContext)
+{
+  const Camera::Viewport& viewport = renderContext.camera().viewport();
   const vm::mat4x4f projection = vm::ortho_matrix(
-      0.0f, 1.0f, static_cast<float>(viewport.x), static_cast<float>(viewport.height), static_cast<float>(viewport.width), static_cast<float>(viewport.y));
+    0.0f,
+    1.0f,
+    static_cast<float>(viewport.x),
+    static_cast<float>(viewport.height),
+    static_cast<float>(viewport.width),
+    static_cast<float>(viewport.y));
   const vm::mat4x4f view = vm::view_matrix(vm::vec3f::neg_z(), vm::vec3f::pos_y());
   ReplaceTransformation ortho(renderContext.transformation(), projection, view);
 
@@ -263,15 +353,15 @@ void TextRenderer::doRender(RenderContext &renderContext) {
   glAssert(glEnable(GL_DEPTH_TEST));
 }
 
-void TextRenderer::render(EntryCollection &collection, RenderContext &renderContext) {
-  FontManager &fontManager = renderContext.fontManager();
-  TextureFont &font = fontManager.font(m_fontDescriptor);
+void TextRenderer::render(EntryCollection& collection, RenderContext& renderContext)
+{
+  FontManager& fontManager = renderContext.fontManager();
+  TextureFont& font = fontManager.font(m_fontDescriptor);
 
   glAssert(glDisable(GL_TEXTURE_2D));
 
   ActiveShader backgroundShader(
-      renderContext.shaderManager(), Shaders::TextBackgroundShader
-  );
+    renderContext.shaderManager(), Shaders::TextBackgroundShader);
   collection.rectArray.render(PrimType::Triangles);
 
   glAssert(glEnable(GL_TEXTURE_2D));

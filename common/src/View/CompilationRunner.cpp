@@ -48,390 +48,536 @@
 #include <filesystem>
 #include <string>
 
-namespace TrenchBroom::View {
-CompilationTaskRunner::CompilationTaskRunner(CompilationContext &context) : m_context{context} {
+namespace TrenchBroom::View
+{
+CompilationTaskRunner::CompilationTaskRunner(CompilationContext& context)
+  : m_context{context}
+{
 }
 
 CompilationTaskRunner::~CompilationTaskRunner() = default;
 
-void CompilationTaskRunner::execute() {
-    doExecute();
+void CompilationTaskRunner::execute()
+{
+  doExecute();
 }
 
-void CompilationTaskRunner::terminate() {
-    doTerminate();
+void CompilationTaskRunner::terminate()
+{
+  doTerminate();
 }
 
-std::string CompilationTaskRunner::interpolate(const std::string &spec) {
-    try {
-        return m_context.interpolate(spec);
-    } catch (const Exception &e) {
-        m_context.pushSystemMessage(
-            "==> Could not interpolate expression '" + QString::fromStdString(spec) + "': " + e.what() + "\n", QColor{"#ff3824"});
-        throw;
-    }
+std::string CompilationTaskRunner::interpolate(const std::string& spec)
+{
+  try
+  {
+    return m_context.interpolate(spec);
+  }
+  catch (const Exception& e)
+  {
+    m_context.pushSystemMessage(
+      "==> Could not interpolate expression '" + QString::fromStdString(spec)
+        + "': " + e.what() + "\n",
+      QColor{"#ff3824"});
+    throw;
+  }
 }
 
-CompilationExportMapTaskRunner::CompilationExportMapTaskRunner(CompilationContext &context, Model::CompilationExportMap task) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationExportMapTaskRunner::CompilationExportMapTaskRunner(
+  CompilationContext& context, Model::CompilationExportMap task)
+  : CompilationTaskRunner{context}
+  , m_task{std::move(task)}
+{
 }
 
 CompilationExportMapTaskRunner::~CompilationExportMapTaskRunner() = default;
 
-void CompilationExportMapTaskRunner::doExecute() {
-    emit start();
+void CompilationExportMapTaskRunner::doExecute()
+{
+  emit start();
 
-    const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
-    m_context.pushSystemMessage(
-        "==> Exporting map file '" + IO::pathAsQString(targetPath) + "'\n");
+  const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
+  m_context.pushSystemMessage(
+    "==> Exporting map file '" + IO::pathAsQString(targetPath) + "'\n");
 
-    if (!m_context.test()) {
-        IO::Disk::createDirectory(targetPath.parent_path()).and_then([&](auto) {
-                                                               const auto options = IO::MapExportOptions{targetPath};
-                                                               const auto document = m_context.document();
-                                                               return document->exportDocumentAs(options);
-                                                           })
-            .transform([&]() { emit end(); })
-            .transform_error([&](auto e) {
-                m_context.pushSystemMessage(
-                    "==> Could not export map file '" + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"});
-                emit error();
-            });
-    } else {
-        emit end();
-    }
+  if (!m_context.test())
+  {
+    IO::Disk::createDirectory(targetPath.parent_path())
+      .and_then([&](auto) {
+        const auto options = IO::MapExportOptions{targetPath};
+        const auto document = m_context.document();
+        return document->exportDocumentAs(options);
+      })
+      .transform([&]() { emit end(); })
+      .transform_error([&](auto e) {
+        m_context.pushSystemMessage(
+          "==> Could not export map file '" + IO::pathAsQString(targetPath)
+            + "': " + QString::fromStdString(e.msg) + "\n",
+          QColor{"#ff3824"});
+        emit error();
+      });
+  }
+  else
+  {
+    emit end();
+  }
 }
 
 void CompilationExportMapTaskRunner::doTerminate() {}
 
-CompilationCopyFilesTaskRunner::CompilationCopyFilesTaskRunner(CompilationContext &context, Model::CompilationCopyFiles task) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationCopyFilesTaskRunner::CompilationCopyFilesTaskRunner(
+  CompilationContext& context, Model::CompilationCopyFiles task)
+  : CompilationTaskRunner{context}
+  , m_task{std::move(task)}
+{
 }
 
 CompilationCopyFilesTaskRunner::~CompilationCopyFilesTaskRunner() = default;
 
-void CompilationCopyFilesTaskRunner::doExecute() {
-    emit start();
+void CompilationCopyFilesTaskRunner::doExecute()
+{
+  emit start();
 
-    const auto sourcePath = std::filesystem::path{interpolate(m_task.sourceSpec)};
-    const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
+  const auto sourcePath = std::filesystem::path{interpolate(m_task.sourceSpec)};
+  const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
 
-    const auto sourceDirPath = sourcePath.parent_path();
-    const auto sourcePathMatcher = kdl::lift_and(
-        IO::makePathInfoPathMatcher({IO::PathInfo::File}), IO::makeFilenamePathMatcher(sourcePath.filename().string()));
+  const auto sourceDirPath = sourcePath.parent_path();
+  const auto sourcePathMatcher = kdl::lift_and(
+    IO::makePathInfoPathMatcher({IO::PathInfo::File}),
+    IO::makeFilenamePathMatcher(sourcePath.filename().string()));
 
-    IO::Disk::find(sourceDirPath, IO::TraversalMode::Flat, sourcePathMatcher).and_then([&](const auto &pathsToCopy) {
-                                                                                 const auto pathStrsToCopy = kdl::vec_transform(
-                                                                                     pathsToCopy, [](const auto &path) { return "'" + path.string() + "'"; });
+  IO::Disk::find(sourceDirPath, IO::TraversalMode::Flat, sourcePathMatcher)
+    .and_then([&](const auto& pathsToCopy) {
+      const auto pathStrsToCopy = kdl::vec_transform(
+        pathsToCopy, [](const auto& path) { return "'" + path.string() + "'"; });
 
-                                                                                 m_context.pushSystemMessage(
-                                                                                     "==> Copying to '" + IO::pathAsQString(targetPath) + "/': " + QString::fromStdString(kdl::str_join(pathStrsToCopy, ", ")) + "\n");
-                                                                                 if (!m_context.test()) {
-                                                                                     return IO::Disk::createDirectory(targetPath).and_then([&](auto) {
-                                                                                         return kdl::fold_results(
-                                                                                             kdl::vec_transform(
-                                                                                                 pathsToCopy, [&](const auto &pathToCopy) {
-                                                                                                     return IO::Disk::copyFile(pathToCopy, targetPath);
-                                                                                                 }));
-                                                                                     });
-                                                                                 }
-                                                                                 return Result<void>{};
-                                                                             })
-        .transform([&]() { emit end(); })
-        .transform_error([&](auto e) {
-            m_context.pushSystemMessage(
-                "==> Could not copy '" + IO::pathAsQString(sourcePath) + "' to '" + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n",
-                QColor{"#ff3824"});
-            emit error();
+      m_context.pushSystemMessage(
+        "==> Copying to '" + IO::pathAsQString(targetPath)
+        + "/': " + QString::fromStdString(kdl::str_join(pathStrsToCopy, ", ")) + "\n");
+      if (!m_context.test())
+      {
+        return IO::Disk::createDirectory(targetPath).and_then([&](auto) {
+          return kdl::fold_results(
+            kdl::vec_transform(pathsToCopy, [&](const auto& pathToCopy) {
+              return IO::Disk::copyFile(pathToCopy, targetPath);
+            }));
         });
+      }
+      return Result<void>{};
+    })
+    .transform([&]() { emit end(); })
+    .transform_error([&](auto e) {
+      m_context.pushSystemMessage(
+        "==> Could not copy '" + IO::pathAsQString(sourcePath) + "' to '"
+          + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n",
+        QColor{"#ff3824"});
+      emit error();
+    });
 }
 
 void CompilationCopyFilesTaskRunner::doTerminate() {}
 
-CompilationRenameFileTaskRunner::CompilationRenameFileTaskRunner(CompilationContext &context, Model::CompilationRenameFile task) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationRenameFileTaskRunner::CompilationRenameFileTaskRunner(
+  CompilationContext& context, Model::CompilationRenameFile task)
+  : CompilationTaskRunner{context}
+  , m_task{std::move(task)}
+{
 }
 
 CompilationRenameFileTaskRunner::~CompilationRenameFileTaskRunner() = default;
 
-void CompilationRenameFileTaskRunner::doExecute() {
-    emit start();
+void CompilationRenameFileTaskRunner::doExecute()
+{
+  emit start();
 
-    const auto sourcePath = std::filesystem::path{interpolate(m_task.sourceSpec)};
-    const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
+  const auto sourcePath = std::filesystem::path{interpolate(m_task.sourceSpec)};
+  const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
 
-    m_context.pushSystemMessage(
-        "==> Renaming '" + IO::pathAsQString(sourcePath) + "' to '" + IO::pathAsQString(targetPath) + "'\n");
-    if (!m_context.test()) {
-        IO::Disk::createDirectory(targetPath.parent_path()).and_then([&](auto) { return IO::Disk::moveFile(sourcePath, targetPath); }).transform([&]() { emit end(); }).transform_error([&](auto e) {
-            m_context.pushSystemMessage(
-                "==> Could not rename '" + IO::pathAsQString(sourcePath) + "' to '" + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"});
-            emit error();
-        });
-    } else {
-        emit end();
-    }
+  m_context.pushSystemMessage(
+    "==> Renaming '" + IO::pathAsQString(sourcePath) + "' to '"
+    + IO::pathAsQString(targetPath) + "'\n");
+  if (!m_context.test())
+  {
+    IO::Disk::createDirectory(targetPath.parent_path())
+      .and_then([&](auto) { return IO::Disk::moveFile(sourcePath, targetPath); })
+      .transform([&]() { emit end(); })
+      .transform_error([&](auto e) {
+        m_context.pushSystemMessage(
+          "==> Could not rename '" + IO::pathAsQString(sourcePath) + "' to '"
+            + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg)
+            + "\n",
+          QColor{"#ff3824"});
+        emit error();
+      });
+  }
+  else
+  {
+    emit end();
+  }
 }
 
 void CompilationRenameFileTaskRunner::doTerminate() {}
 
-CompilationDeleteFilesTaskRunner::CompilationDeleteFilesTaskRunner(CompilationContext &context, Model::CompilationDeleteFiles task) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationDeleteFilesTaskRunner::CompilationDeleteFilesTaskRunner(
+  CompilationContext& context, Model::CompilationDeleteFiles task)
+  : CompilationTaskRunner{context}
+  , m_task{std::move(task)}
+{
 }
 
 CompilationDeleteFilesTaskRunner::~CompilationDeleteFilesTaskRunner() = default;
 
-void CompilationDeleteFilesTaskRunner::doExecute() {
-    emit start();
+void CompilationDeleteFilesTaskRunner::doExecute()
+{
+  emit start();
 
-    const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
-    const auto targetDirPath = targetPath.parent_path();
-    const auto targetPathMatcher = kdl::lift_and(
-        IO::makePathInfoPathMatcher({IO::PathInfo::File}), IO::makeFilenamePathMatcher(targetPath.filename().string()));
+  const auto targetPath = std::filesystem::path{interpolate(m_task.targetSpec)};
+  const auto targetDirPath = targetPath.parent_path();
+  const auto targetPathMatcher = kdl::lift_and(
+    IO::makePathInfoPathMatcher({IO::PathInfo::File}),
+    IO::makeFilenamePathMatcher(targetPath.filename().string()));
 
-    IO::Disk::find(targetDirPath, IO::TraversalMode::Recursive, targetPathMatcher).transform([&](const auto &pathsToDelete) {
-                                                                                      const auto pathStrsToDelete = kdl::vec_transform(
-                                                                                          pathsToDelete, [](const auto &path) { return "'" + path.string() + "'"; });
-                                                                                      m_context.pushSystemMessage(
-                                                                                          "==> Deleting: " + QString::fromStdString(kdl::str_join(pathStrsToDelete, ", ")) + "\n");
+  IO::Disk::find(targetDirPath, IO::TraversalMode::Recursive, targetPathMatcher)
+    .transform([&](const auto& pathsToDelete) {
+      const auto pathStrsToDelete = kdl::vec_transform(
+        pathsToDelete, [](const auto& path) { return "'" + path.string() + "'"; });
+      m_context.pushSystemMessage(
+        "==> Deleting: " + QString::fromStdString(kdl::str_join(pathStrsToDelete, ", "))
+        + "\n");
 
-                                                                                      if (!m_context.test()) {
-                                                                                          return kdl::fold_results(kdl::vec_transform(pathsToDelete, IO::Disk::deleteFile));
-                                                                                      }
-                                                                                      return Result<std::vector<bool>>{std::vector<bool>{}};
-                                                                                  })
-        .transform([&](auto) { emit end(); })
-        .transform_error([&](auto e) {
-            m_context.pushSystemMessage(
-                "==> Could not delete '" + IO::pathAsQString(targetPath) + "': " + QString::fromStdString(e.msg) + "\n", QColor{"#ff3824"});
-            emit error();
-        });
+      if (!m_context.test())
+      {
+        return kdl::fold_results(kdl::vec_transform(pathsToDelete, IO::Disk::deleteFile));
+      }
+      return Result<std::vector<bool>>{std::vector<bool>{}};
+    })
+    .transform([&](auto) { emit end(); })
+    .transform_error([&](auto e) {
+      m_context.pushSystemMessage(
+        "==> Could not delete '" + IO::pathAsQString(targetPath)
+          + "': " + QString::fromStdString(e.msg) + "\n",
+        QColor{"#ff3824"});
+      emit error();
+    });
 }
 
 void CompilationDeleteFilesTaskRunner::doTerminate() {}
 
-CompilationRunToolTaskRunner::CompilationRunToolTaskRunner(CompilationContext &context, Model::CompilationRunTool task) : CompilationTaskRunner{context}, m_task{std::move(task)} {
+CompilationRunToolTaskRunner::CompilationRunToolTaskRunner(
+  CompilationContext& context, Model::CompilationRunTool task)
+  : CompilationTaskRunner{context}
+  , m_task{std::move(task)}
+{
 }
 
 CompilationRunToolTaskRunner::~CompilationRunToolTaskRunner() = default;
 
-void CompilationRunToolTaskRunner::doExecute() {
-    startProcess();
+void CompilationRunToolTaskRunner::doExecute()
+{
+  startProcess();
 }
 
-void CompilationRunToolTaskRunner::doTerminate() {
-    if (m_process) {
-        disconnect(
-            m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred);
-        disconnect(
-            m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished);
-        m_process->kill();
-        m_context.pushSystemMessage("\n\n==> Terminated\n");
-    }
+void CompilationRunToolTaskRunner::doTerminate()
+{
+  if (m_process)
+  {
+    disconnect(
+      m_process,
+      &QProcess::errorOccurred,
+      this,
+      &CompilationRunToolTaskRunner::processErrorOccurred);
+    disconnect(
+      m_process,
+      QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+      this,
+      &CompilationRunToolTaskRunner::processFinished);
+    m_process->kill();
+    m_context.pushSystemMessage("\n\n==> Terminated\n");
+  }
 }
 
-void CompilationRunToolTaskRunner::startProcess() {
-    assert(m_process == nullptr);
+void CompilationRunToolTaskRunner::startProcess()
+{
+  assert(m_process == nullptr);
 
-    emit start();
-    try {
-        const auto workDir = m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH);
-        const auto cmd = this->cmd();
+  emit start();
+  try
+  {
+    const auto workDir = m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH);
+    const auto cmd = this->cmd();
 
-        m_context.pushSystemMessage(
-            "==> Executing: " + QString::fromStdString(cmd) + "\n", QColor{"#0eceef"});
-
-        if (!m_context.test()) {
-            m_process = new QProcess{this};
-            connect(
-                m_process, &QProcess::errorOccurred, this, &CompilationRunToolTaskRunner::processErrorOccurred);
-            connect(
-                m_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &CompilationRunToolTaskRunner::processFinished);
-            connect(
-                m_process, &QProcess::readyReadStandardError, this, &CompilationRunToolTaskRunner::processReadyReadStandardError);
-            connect(
-                m_process, &QProcess::readyReadStandardOutput, this, &CompilationRunToolTaskRunner::processReadyReadStandardOutput);
-
-            m_process->setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-            m_process->setWorkingDirectory(QString::fromStdString(workDir));
-            m_process->start(QString::fromStdString(cmd));
-            if (!m_process->waitForStarted()) {
-                emit error();
-            }
-        } else {
-            emit end();
-        }
-    } catch (const Exception &) {
-        emit error();
-    }
-}
-
-std::string CompilationRunToolTaskRunner::cmd() {
-    const auto toolPath = std::filesystem::path{interpolate(m_task.toolSpec)};
-    const auto parameters = interpolate(m_task.parameterSpec);
-    if (parameters.empty()) {
-        return "\"" + toolPath.string() + "\"";
-    } else if (toolPath.empty()) {
-        return "";
-    } else {
-        return "\"" + toolPath.string() + "\" " + parameters;
-    }
-}
-
-void CompilationRunToolTaskRunner::processErrorOccurred(const QProcess::ProcessError processError) {
     m_context.pushSystemMessage(
-        "==> Error '" + QString(QMetaEnum::fromType<QProcess::ProcessError>().valueToKey(processError)) + "' occurred when communicating with process\n\n",
-        QColor{"#ff3824"});
+      "==> Executing: " + QString::fromStdString(cmd) + "\n", QColor{"#0eceef"});
+
+    if (!m_context.test())
+    {
+      m_process = new QProcess{this};
+      connect(
+        m_process,
+        &QProcess::errorOccurred,
+        this,
+        &CompilationRunToolTaskRunner::processErrorOccurred);
+      connect(
+        m_process,
+        QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        this,
+        &CompilationRunToolTaskRunner::processFinished);
+      connect(
+        m_process,
+        &QProcess::readyReadStandardError,
+        this,
+        &CompilationRunToolTaskRunner::processReadyReadStandardError);
+      connect(
+        m_process,
+        &QProcess::readyReadStandardOutput,
+        this,
+        &CompilationRunToolTaskRunner::processReadyReadStandardOutput);
+
+      m_process->setProcessEnvironment(QProcessEnvironment::systemEnvironment());
+      m_process->setWorkingDirectory(QString::fromStdString(workDir));
+      m_process->start(QString::fromStdString(cmd));
+      if (!m_process->waitForStarted())
+      {
+        emit error();
+      }
+    }
+    else
+    {
+      emit end();
+    }
+  }
+  catch (const Exception&)
+  {
     emit error();
+  }
 }
 
-void CompilationRunToolTaskRunner::processFinished(const int exitCode, const QProcess::ExitStatus exitStatus) {
-    switch (exitStatus) {
-        case QProcess::NormalExit:
-            if (exitCode == 0 || !m_task.treatNonZeroResultCodeAsError) {
-                m_context.pushSystemMessage(
-                    "==> Successfully finished execution. \n\n", QColor{"#00FF00"});
-                emit end();
-            } else {
-                m_context.pushSystemMessage(
-                    "==> Finished execution with exit code: " + QString::fromStdString(std::to_string(exitCode)) + "!\n", QColor{"#CCCD00"});
-                if (m_task.treatNonZeroResultCodeAsError) {
-                    m_context.pushSystemMessage(
-                        "==> Aborting execution due to errors!\n\n", QColor{"#ff3824"});
-                    emit error();
-                } else {
-                    emit end();
-                }
-            }
-            break;
-        case QProcess::CrashExit:
-            m_context.pushSystemMessage(
-                "==> Crashed with exit code: " + QString::fromStdString(std::to_string(exitCode)) + "\n\n", QColor{"#ff3824"});
-            emit error();
-            break;
+std::string CompilationRunToolTaskRunner::cmd()
+{
+  const auto toolPath = std::filesystem::path{interpolate(m_task.toolSpec)};
+  const auto parameters = interpolate(m_task.parameterSpec);
+  if (parameters.empty())
+  {
+    return "\"" + toolPath.string() + "\"";
+  }
+  else if (toolPath.empty())
+  {
+    return "";
+  }
+  else
+  {
+    return "\"" + toolPath.string() + "\" " + parameters;
+  }
+}
+
+void CompilationRunToolTaskRunner::processErrorOccurred(
+  const QProcess::ProcessError processError)
+{
+  m_context.pushSystemMessage(
+    "==> Error '"
+      + QString(QMetaEnum::fromType<QProcess::ProcessError>().valueToKey(processError))
+      + "' occurred when communicating with process\n\n",
+    QColor{"#ff3824"});
+  emit error();
+}
+
+void CompilationRunToolTaskRunner::processFinished(
+  const int exitCode, const QProcess::ExitStatus exitStatus)
+{
+  switch (exitStatus)
+  {
+  case QProcess::NormalExit:
+    if (exitCode == 0 || !m_task.treatNonZeroResultCodeAsError)
+    {
+      m_context.pushSystemMessage(
+        "==> Successfully finished execution. \n\n", QColor{"#00FF00"});
+      emit end();
     }
-}
-
-void CompilationRunToolTaskRunner::processReadyReadStandardError() {
-    if (m_process != nullptr) {
-        const QByteArray bytes = m_process->readAllStandardError();
-        m_context << QString::fromLocal8Bit(bytes);
+    else
+    {
+      m_context.pushSystemMessage(
+        "==> Finished execution with exit code: "
+          + QString::fromStdString(std::to_string(exitCode)) + "!\n",
+        QColor{"#CCCD00"});
+      if (m_task.treatNonZeroResultCodeAsError)
+      {
+        m_context.pushSystemMessage(
+          "==> Aborting execution due to errors!\n\n", QColor{"#ff3824"});
+        emit error();
+      }
+      else
+      {
+        emit end();
+      }
     }
+    break;
+  case QProcess::CrashExit:
+    m_context.pushSystemMessage(
+      "==> Crashed with exit code: " + QString::fromStdString(std::to_string(exitCode))
+        + "\n\n",
+      QColor{"#ff3824"});
+    emit error();
+    break;
+  }
 }
 
-void CompilationRunToolTaskRunner::processReadyReadStandardOutput() {
-    if (m_process != nullptr) {
-        const QByteArray bytes = m_process->readAllStandardOutput();
-        m_context << QString::fromLocal8Bit(bytes);
-    }
+void CompilationRunToolTaskRunner::processReadyReadStandardError()
+{
+  if (m_process != nullptr)
+  {
+    const QByteArray bytes = m_process->readAllStandardError();
+    m_context << QString::fromLocal8Bit(bytes);
+  }
 }
 
-CompilationRunner::CompilationRunner(CompilationContext context, const Model::CompilationProfile &profile, QObject *parent) : QObject{parent}, m_context{std::move(context)}, m_taskRunners{
-                                                                                                                                                                                  createTaskRunners(m_context, profile)},
-                                                                                                                              m_currentTask{std::end(m_taskRunners)} {
+void CompilationRunToolTaskRunner::processReadyReadStandardOutput()
+{
+  if (m_process != nullptr)
+  {
+    const QByteArray bytes = m_process->readAllStandardOutput();
+    m_context << QString::fromLocal8Bit(bytes);
+  }
+}
+
+CompilationRunner::CompilationRunner(
+  CompilationContext context, const Model::CompilationProfile& profile, QObject* parent)
+  : QObject{parent}
+  , m_context{std::move(context)}
+  , m_taskRunners{createTaskRunners(m_context, profile)}
+  , m_currentTask{std::end(m_taskRunners)}
+{
 }
 
 CompilationRunner::~CompilationRunner() = default;
 
-CompilationRunner::TaskRunnerList CompilationRunner::createTaskRunners(CompilationContext &context, const Model::CompilationProfile &profile) {
-    auto result = TaskRunnerList{};
-    for (const auto &task: profile.tasks) {
-        std::visit(
-            kdl::overload(
-                [&](const Model::CompilationExportMap &exportMap) {
-                    if (exportMap.enabled) {
-                        result.push_back(
-                            std::make_unique<CompilationExportMapTaskRunner>(context, exportMap));
-                    }
-                },
-                [&](const Model::CompilationCopyFiles &copyFiles) {
-                    if (copyFiles.enabled) {
-                        result.push_back(
-                            std::make_unique<CompilationCopyFilesTaskRunner>(context, copyFiles));
-                    }
-                },
-                [&](const Model::CompilationRenameFile &renameFile) {
-                    if (renameFile.enabled) {
-                        result.push_back(
-                            std::make_unique<CompilationRenameFileTaskRunner>(context, renameFile));
-                    }
-                },
-                [&](const Model::CompilationDeleteFiles &deleteFiles) {
-                    if (deleteFiles.enabled) {
-                        result.push_back(
-                            std::make_unique<CompilationDeleteFilesTaskRunner>(context, deleteFiles));
-                    }
-                },
-                [&](const Model::CompilationRunTool &runTool) {
-                    if (runTool.enabled) {
-                        result.push_back(
-                            std::make_unique<CompilationRunToolTaskRunner>(context, runTool));
-                    }
-                }),
-            task);
-    }
-    return result;
+CompilationRunner::TaskRunnerList CompilationRunner::createTaskRunners(
+  CompilationContext& context, const Model::CompilationProfile& profile)
+{
+  auto result = TaskRunnerList{};
+  for (const auto& task : profile.tasks)
+  {
+    std::visit(
+      kdl::overload(
+        [&](const Model::CompilationExportMap& exportMap) {
+          if (exportMap.enabled)
+          {
+            result.push_back(
+              std::make_unique<CompilationExportMapTaskRunner>(context, exportMap));
+          }
+        },
+        [&](const Model::CompilationCopyFiles& copyFiles) {
+          if (copyFiles.enabled)
+          {
+            result.push_back(
+              std::make_unique<CompilationCopyFilesTaskRunner>(context, copyFiles));
+          }
+        },
+        [&](const Model::CompilationRenameFile& renameFile) {
+          if (renameFile.enabled)
+          {
+            result.push_back(
+              std::make_unique<CompilationRenameFileTaskRunner>(context, renameFile));
+          }
+        },
+        [&](const Model::CompilationDeleteFiles& deleteFiles) {
+          if (deleteFiles.enabled)
+          {
+            result.push_back(
+              std::make_unique<CompilationDeleteFilesTaskRunner>(context, deleteFiles));
+          }
+        },
+        [&](const Model::CompilationRunTool& runTool) {
+          if (runTool.enabled)
+          {
+            result.push_back(
+              std::make_unique<CompilationRunToolTaskRunner>(context, runTool));
+          }
+        }),
+      task);
+  }
+  return result;
 }
 
-void CompilationRunner::execute() {
-    assert(!running());
+void CompilationRunner::execute()
+{
+  assert(!running());
 
-    m_currentTask = std::begin(m_taskRunners);
-    if (m_currentTask == std::end(m_taskRunners)) {
-        return;
-    }
-    bindEvents(*m_currentTask->get());
+  m_currentTask = std::begin(m_taskRunners);
+  if (m_currentTask == std::end(m_taskRunners))
+  {
+    return;
+  }
+  bindEvents(*m_currentTask->get());
 
-    emit compilationStarted();
+  emit compilationStarted();
 
-    const auto workDir = QString::fromStdString(
-        m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH));
-    if (!QDir{workDir}.exists()) {
-        m_context.pushSystemMessage(
-            "==> Error: working directory '" + workDir + "' does not exist\n", QColor{"#ff3824"});
-    } else {
-        m_context.pushSystemMessage(
-            "==> Using working directory '" + workDir + "'\n", QColor{"#f0ff26"});
-    }
-    m_currentTask->get()->execute();
+  const auto workDir = QString::fromStdString(
+    m_context.variableValue(CompilationVariableNames::WORK_DIR_PATH));
+  if (!QDir{workDir}.exists())
+  {
+    m_context.pushSystemMessage(
+      "==> Error: working directory '" + workDir + "' does not exist\n",
+      QColor{"#ff3824"});
+  }
+  else
+  {
+    m_context.pushSystemMessage(
+      "==> Using working directory '" + workDir + "'\n", QColor{"#f0ff26"});
+  }
+  m_currentTask->get()->execute();
 }
 
-void CompilationRunner::terminate() {
-    assert(running());
+void CompilationRunner::terminate()
+{
+  assert(running());
+  unbindEvents(*m_currentTask->get());
+  m_currentTask->get()->terminate();
+  m_currentTask = std::end(m_taskRunners);
+
+  emit compilationEnded();
+}
+
+bool CompilationRunner::running() const
+{
+  return m_currentTask != std::end(m_taskRunners);
+}
+
+void CompilationRunner::bindEvents(CompilationTaskRunner& runner) const
+{
+  connect(&runner, &CompilationTaskRunner::error, this, &CompilationRunner::taskError);
+  connect(&runner, &CompilationTaskRunner::end, this, &CompilationRunner::taskEnd);
+}
+
+void CompilationRunner::unbindEvents(CompilationTaskRunner& runner) const
+{
+  runner.disconnect(this);
+}
+
+void CompilationRunner::taskError()
+{
+  if (running())
+  {
     unbindEvents(*m_currentTask->get());
-    m_currentTask->get()->terminate();
     m_currentTask = std::end(m_taskRunners);
-
     emit compilationEnded();
+  }
 }
 
-bool CompilationRunner::running() const {
-    return m_currentTask != std::end(m_taskRunners);
-}
-
-void CompilationRunner::bindEvents(CompilationTaskRunner &runner) const {
-    connect(&runner, &CompilationTaskRunner::error, this, &CompilationRunner::taskError);
-    connect(&runner, &CompilationTaskRunner::end, this, &CompilationRunner::taskEnd);
-}
-
-void CompilationRunner::unbindEvents(CompilationTaskRunner &runner) const {
-    runner.disconnect(this);
-}
-
-void CompilationRunner::taskError() {
-    if (running()) {
-        unbindEvents(*m_currentTask->get());
-        m_currentTask = std::end(m_taskRunners);
-        emit compilationEnded();
+void CompilationRunner::taskEnd()
+{
+  if (running())
+  {
+    unbindEvents(*m_currentTask->get());
+    ++m_currentTask;
+    if (m_currentTask != std::end(m_taskRunners))
+    {
+      bindEvents(*m_currentTask->get());
+      m_currentTask->get()->execute();
     }
-}
-
-void CompilationRunner::taskEnd() {
-    if (running()) {
-        unbindEvents(*m_currentTask->get());
-        ++m_currentTask;
-        if (m_currentTask != std::end(m_taskRunners)) {
-            bindEvents(*m_currentTask->get());
-            m_currentTask->get()->execute();
-        } else {
-            emit compilationEnded();
-        }
+    else
+    {
+      emit compilationEnded();
     }
+  }
 }
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

@@ -26,7 +26,8 @@
 #include <array>
 #include <vector>
 
-namespace vm {
+namespace vm
+{
 /**
  * Adds the given vector to each of the vectors in the given vector.
  *
@@ -37,14 +38,16 @@ namespace vm {
  * @return a vector containing the sum of each of the vectors in the given vector with the
  * right hand vector
  */
-template<typename T, std::size_t S>
-std::vector<vec<T, S>> operator+(const std::vector<vec<T, S>> &lhs, const vec<T, S> &rhs) {
-    std::vector<vec<T, S>> result;
-    result.reserve(lhs.size());
-    for (const auto &vec: lhs) {
-        result.push_back(vec + rhs);
-    }
-    return result;
+template <typename T, std::size_t S>
+std::vector<vec<T, S>> operator+(const std::vector<vec<T, S>>& lhs, const vec<T, S>& rhs)
+{
+  std::vector<vec<T, S>> result;
+  result.reserve(lhs.size());
+  for (const auto& vec : lhs)
+  {
+    result.push_back(vec + rhs);
+  }
+  return result;
 }
 
 /**
@@ -58,14 +61,16 @@ std::vector<vec<T, S>> operator+(const std::vector<vec<T, S>> &lhs, const vec<T,
  * @return an array containing the sum of each of the vectors in the given array with the
  * right hand vector
  */
-template<typename T, std::size_t S, std::size_t N>
+template <typename T, std::size_t S, std::size_t N>
 constexpr std::array<vec<T, S>, N> operator+(
-    const std::array<vec<T, S>, N> &lhs, const vec<T, S> &rhs) {
-    auto result = std::array<vec<T, S>, N>{};
-    for (std::size_t i = 0; i < N; ++i) {
-        result[i] = lhs[i] + rhs;
-    }
-    return result;
+  const std::array<vec<T, S>, N>& lhs, const vec<T, S>& rhs)
+{
+  auto result = std::array<vec<T, S>, N>{};
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    result[i] = lhs[i] + rhs;
+  }
+  return result;
 }
 
 /**
@@ -78,9 +83,10 @@ constexpr std::array<vec<T, S>, N> operator+(
  * @return a vector containing the sum of each of the vectors in the given vector with the
  * left hand vector
  */
-template<typename T, std::size_t S>
-std::vector<vec<T, S>> operator+(const vec<T, S> &lhs, const std::vector<vec<T, S>> &rhs) {
-    return rhs + lhs;
+template <typename T, std::size_t S>
+std::vector<vec<T, S>> operator+(const vec<T, S>& lhs, const std::vector<vec<T, S>>& rhs)
+{
+  return rhs + lhs;
 }
 
 /**
@@ -94,10 +100,11 @@ std::vector<vec<T, S>> operator+(const vec<T, S> &lhs, const std::vector<vec<T, 
  * @return an array containing the sum of each of the vectors in the given array with the
  * left hand vector
  */
-template<typename T, std::size_t S, std::size_t N>
+template <typename T, std::size_t S, std::size_t N>
 constexpr std::array<vec<T, S>, N> operator+(
-    const vec<T, S> &lhs, const std::array<vec<T, S>, N> &rhs) {
-    return rhs + lhs;
+  const vec<T, S>& lhs, const std::array<vec<T, S>, N>& rhs)
+{
+  return rhs + lhs;
 }
 
 /**
@@ -110,14 +117,16 @@ constexpr std::array<vec<T, S>, N> operator+(
  * @return a range containing the scalar product of each vector in the given vector with
  * the given scalar
  */
-template<typename T, std::size_t S>
-std::vector<vec<T, S>> operator*(const std::vector<vec<T, S>> &lhs, const T rhs) {
-    std::vector<vec<T, S>> result;
-    result.reserve(lhs.size());
-    for (const auto &vec: lhs) {
-        result.push_back(vec * rhs);
-    }
-    return result;
+template <typename T, std::size_t S>
+std::vector<vec<T, S>> operator*(const std::vector<vec<T, S>>& lhs, const T rhs)
+{
+  std::vector<vec<T, S>> result;
+  result.reserve(lhs.size());
+  for (const auto& vec : lhs)
+  {
+    result.push_back(vec * rhs);
+  }
+  return result;
 }
 
 /**
@@ -130,14 +139,16 @@ std::vector<vec<T, S>> operator*(const std::vector<vec<T, S>> &lhs, const T rhs)
  * @return an array containing the scalar product of each vector in the given array with
  * the given scalar
  */
-template<typename T, std::size_t S, std::size_t N>
+template <typename T, std::size_t S, std::size_t N>
 constexpr std::array<vec<T, S>, N> operator*(
-    const std::array<vec<T, S>, N> &lhs, const T rhs) {
-    auto result = std::array<vec<T, S>, N>{};
-    for (std::size_t i = 0u; i < N; ++i) {
-        result[i] = lhs[i] * rhs;
-    }
-    return result;
+  const std::array<vec<T, S>, N>& lhs, const T rhs)
+{
+  auto result = std::array<vec<T, S>, N>{};
+  for (std::size_t i = 0u; i < N; ++i)
+  {
+    result[i] = lhs[i] * rhs;
+  }
+  return result;
 }
 
 /**
@@ -150,9 +161,10 @@ constexpr std::array<vec<T, S>, N> operator*(
  * @return a vector containing the scalar product of each vector in the given vector with
  * the given scalar
  */
-template<typename T, std::size_t S>
-std::vector<vec<T, S>> operator*(const T lhs, const std::vector<vec<T, S>> &rhs) {
-    return rhs * lhs;
+template <typename T, std::size_t S>
+std::vector<vec<T, S>> operator*(const T lhs, const std::vector<vec<T, S>>& rhs)
+{
+  return rhs * lhs;
 }
 
 /**
@@ -165,9 +177,10 @@ std::vector<vec<T, S>> operator*(const T lhs, const std::vector<vec<T, S>> &rhs)
  * @return an array containing the scalar product of each vector in the given array with
  * the given scalar
  */
-template<typename T, std::size_t S, std::size_t N>
+template <typename T, std::size_t S, std::size_t N>
 constexpr std::array<vec<T, S>, N> operator*(
-    const T lhs, const std::array<vec<T, S>, N> &rhs) {
-    return rhs * lhs;
+  const T lhs, const std::array<vec<T, S>, N>& rhs)
+{
+  return rhs * lhs;
 }
-}// namespace vm
+} // namespace vm

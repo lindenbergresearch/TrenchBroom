@@ -37,63 +37,65 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("Md3ParserTest.loadFailure_2659") {
-// see https://github.com/TrenchBroom/TrenchBroom/issues/2659
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("Md3ParserTest.loadFailure_2659")
+{
+  // see https://github.com/TrenchBroom/TrenchBroom/issues/2659
 
-NullLogger logger;
-const auto shaderSearchPath = "scripts";
-const auto textureSearchPaths = std::vector<std::filesystem::path>{"models"};
-auto fs = VirtualFileSystem{};
-fs.mount("",
+  NullLogger logger;
+  const auto shaderSearchPath = "scripts";
+  const auto textureSearchPaths = std::vector<std::filesystem::path>{"models"};
+  auto fs = VirtualFileSystem{};
+  fs.mount(
+    "",
 
-std::make_unique<DiskFileSystem> (std::filesystem::current_path()
+    std::make_unique<DiskFileSystem>(
+      std::filesystem::current_path()
 
-/ "fixture/test/IO/Md3/armor"));
-fs.mount("",
-createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger
-).
+      / "fixture/test/IO/Md3/armor"));
+  fs.mount(
+    "",
+    createImageFileSystem<Quake3ShaderFileSystem>(
+      fs, shaderSearchPath, textureSearchPaths, logger)
+      .
 
-value()
+    value()
 
-);
+  );
 
-const auto md3Path = "models/armor_red.md3";
-const auto md3File = fs.openFile(md3Path).value();
+  const auto md3Path = "models/armor_red.md3";
+  const auto md3File = fs.openFile(md3Path).value();
 
-auto reader = md3File->reader().buffer();
-auto parser = Md3Parser{"armor_red", reader, fs};
-auto model = std::unique_ptr<Assets::EntityModel>(parser.initializeModel(logger));
+  auto reader = md3File->reader().buffer();
+  auto parser = Md3Parser{"armor_red", reader, fs};
+  auto model = std::unique_ptr<Assets::EntityModel>(parser.initializeModel(logger));
 
-CHECK(model
-!= nullptr);
+  CHECK(model != nullptr);
 
-CHECK(model
-->
+  CHECK(
+    model->
 
-frameCount()
+    frameCount()
 
-== 30u);
-CHECK(model
-->
+    == 30u);
+  CHECK(
+    model->
 
-surfaceCount()
+    surfaceCount()
 
-== 2u);
+    == 2u);
 
-for (
-size_t i = 0;
-i<model->
+  for (size_t i = 0; i < model->
 
-frameCount();
+                         frameCount();
 
-++i) {
-CHECK_NOTHROW(parser
-.
-loadFrame(i, *model, logger
-));
-}
+       ++i)
+  {
+    CHECK_NOTHROW(parser.loadFrame(i, *model, logger));
+  }
 }
 } // namespace IO
 } // namespace TrenchBroom

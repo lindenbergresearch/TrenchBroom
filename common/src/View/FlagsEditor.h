@@ -27,44 +27,50 @@
 
 class QCheckBox;
 
-namespace TrenchBroom {
-namespace View {
-class FlagsEditor : public QWidget {
-    Q_OBJECT
+namespace TrenchBroom
+{
+namespace View
+{
+class FlagsEditor : public QWidget
+{
+  Q_OBJECT
 private:
-    using CheckBoxList = std::vector<QCheckBox *>;
-    using ValueList = std::vector<int>;
+  using CheckBoxList = std::vector<QCheckBox*>;
+  using ValueList = std::vector<int>;
 
-    size_t m_numCols;
-    CheckBoxList m_checkBoxes;
-    ValueList m_values;
+  size_t m_numCols;
+  CheckBoxList m_checkBoxes;
+  ValueList m_values;
 
 public:
-    explicit FlagsEditor(size_t numCols, QWidget *parent = nullptr);
+  explicit FlagsEditor(size_t numCols, QWidget* parent = nullptr);
 
-    void setFlags(const QStringList &labels, const QStringList &tooltips = QStringList());
+  void setFlags(const QStringList& labels, const QStringList& tooltips = QStringList());
 
-    void setFlags(const QList<int> &values, const QStringList &labels, const QStringList &tooltips = QStringList());
+  void setFlags(
+    const QList<int>& values,
+    const QStringList& labels,
+    const QStringList& tooltips = QStringList());
 
-    void setFlagValue(int set, int mixed = 0);
+  void setFlagValue(int set, int mixed = 0);
 
-    size_t getNumFlags() const;
+  size_t getNumFlags() const;
 
-    bool isFlagSet(size_t index) const;
+  bool isFlagSet(size_t index) const;
 
-    bool isFlagMixed(size_t index) const;
+  bool isFlagMixed(size_t index) const;
 
-    int getSetFlagValue() const;
+  int getSetFlagValue() const;
 
-    int getMixedFlagValue() const;
+  int getMixedFlagValue() const;
 
-    QString getFlagLabel(size_t index) const;
+  QString getFlagLabel(size_t index) const;
 
-    int lineHeight() const;
+  int lineHeight() const;
 
 signals:
 
-    /**
+  /**
    * Sent when a checkbox is clicked.
    * If (value & setFlag) != 0 it means the checkbox's bit value was just set, otherwise
    * it was unset.
@@ -76,7 +82,7 @@ signals:
    * @param mixedFlag the bitwise OR of the values of all currently mixed checkboxes (same
    * as `getMixedFlagValue()`)
    */
-    void flagChanged(size_t index, int value, int setFlag, int mixedFlag);
+  void flagChanged(size_t index, int value, int setFlag, int mixedFlag);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

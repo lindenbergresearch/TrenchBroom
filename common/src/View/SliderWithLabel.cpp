@@ -26,77 +26,103 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-#include <cmath>// for std::log10
+#include <cmath> // for std::log10
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 SliderWithLabel::SliderWithLabel(
-    const int minimum, const int maximum, const float factor, const QString &format, const int maxSliderWidth, const int minLabelWidth, QWidget *parent) : QWidget(parent), m_slider(createSlider(minimum, maximum)), m_label(new QLabel()), m_factor(factor), m_format(format) {
-    // get maximum label bounding
-    const auto min_size = m_label->fontMetrics().boundingRect(getValueLabel(minimum));
-    const auto max_size = m_label->fontMetrics().boundingRect(getValueLabel(maximum));
-    const auto max_width = std::max(std::max(min_size.width(), max_size.width()) + 1, minLabelWidth);
+  const int minimum,
+  const int maximum,
+  const float factor,
+  const QString& format,
+  const int maxSliderWidth,
+  const int minLabelWidth,
+  QWidget* parent)
+  : QWidget(parent)
+  , m_slider(createSlider(minimum, maximum))
+  , m_label(new QLabel())
+  , m_factor(factor)
+  , m_format(format)
+{
+  // get maximum label bounding
+  const auto min_size = m_label->fontMetrics().boundingRect(getValueLabel(minimum));
+  const auto max_size = m_label->fontMetrics().boundingRect(getValueLabel(maximum));
+  const auto max_width =
+    std::max(std::max(min_size.width(), max_size.width()) + 1, minLabelWidth);
 
-    m_label->setMinimumWidth(max_width);
-    m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    m_label->setText(getValueLabel(m_slider->value()));
+  m_label->setMinimumWidth(max_width);
+  m_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+  m_label->setText(getValueLabel(m_slider->value()));
 
-    if (maxSliderWidth > 0) {
-        setMaximumSliderWidth(maxSliderWidth);
-    }
+  if (maxSliderWidth > 0)
+  {
+    setMaximumSliderWidth(maxSliderWidth);
+  }
 
-    auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(QMargins());
-    layout->setSpacing(LayoutConstants::MediumHMargin);
-    layout->addWidget(m_slider, 1);
-    layout->addWidget(m_label);
-    setLayout(layout);
+  auto* layout = new QHBoxLayout();
+  layout->setContentsMargins(QMargins());
+  layout->setSpacing(LayoutConstants::MediumHMargin);
+  layout->addWidget(m_slider, 1);
+  layout->addWidget(m_label);
+  setLayout(layout);
 
-    connect(m_slider, &QSlider::valueChanged, this, &SliderWithLabel::valueChangedInternal);
+  connect(m_slider, &QSlider::valueChanged, this, &SliderWithLabel::valueChangedInternal);
 }
 
-int SliderWithLabel::value() const {
-    return m_slider->value();
+int SliderWithLabel::value() const
+{
+  return m_slider->value();
 }
 
-float SliderWithLabel::ratio() const {
-    return getSliderRatio(m_slider);
+float SliderWithLabel::ratio() const
+{
+  return getSliderRatio(m_slider);
 }
 
-void SliderWithLabel::setValue(const int value) {
-    m_slider->setValue(value);
+void SliderWithLabel::setValue(const int value)
+{
+  m_slider->setValue(value);
 }
 
-void SliderWithLabel::setRatio(const float ratio) {
-    setSliderRatio(m_slider, ratio);
+void SliderWithLabel::setRatio(const float ratio)
+{
+  setSliderRatio(m_slider, ratio);
 }
 
-void SliderWithLabel::valueChangedInternal(const int value) {
-    m_label->setText(getValueLabel(m_slider->value()));
-    emit valueChanged(value);
+void SliderWithLabel::valueChangedInternal(const int value)
+{
+  m_label->setText(getValueLabel(m_slider->value()));
+  emit valueChanged(value);
 }
 
-QString SliderWithLabel::getValueLabel(const int value) {
-    QString labelText;
+QString SliderWithLabel::getValueLabel(const int value)
+{
+  QString labelText;
 
-    if (m_factor != 0) {
-        // use decimal numbers if factor is set != zero
-        float factorized = float(value) * m_factor;
-        QString fmt = m_format.isEmpty() ? "%.2f" : m_format;
-        labelText = labelText.sprintf(fmt.toStdString().c_str(), factorized);
-    } else {
-        // use int by default, if factor == zero
-        QString fmt = m_format.isEmpty() ? "%d" : m_format;
-        labelText = labelText.sprintf(fmt.toStdString().c_str(), value);
-        ;
-    }
+  if (m_factor != 0)
+  {
+    // use decimal numbers if factor is set != zero
+    float factorized = float(value) * m_factor;
+    QString fmt = m_format.isEmpty() ? "%.2f" : m_format;
+    labelText = labelText.sprintf(fmt.toStdString().c_str(), factorized);
+  }
+  else
+  {
+    // use int by default, if factor == zero
+    QString fmt = m_format.isEmpty() ? "%d" : m_format;
+    labelText = labelText.sprintf(fmt.toStdString().c_str(), value);
+    ;
+  }
 
-    return labelText;
+  return labelText;
 }
 
-void SliderWithLabel::setMaximumSliderWidth(const int width) {
-    m_slider->setMaximumWidth(width);
-    setMaximumWidth(width + LayoutConstants::MediumHMargin + m_label->minimumWidth());
+void SliderWithLabel::setMaximumSliderWidth(const int width)
+{
+  m_slider->setMaximumWidth(width);
+  setMaximumWidth(width + LayoutConstants::MediumHMargin + m_label->minimumWidth());
 }
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

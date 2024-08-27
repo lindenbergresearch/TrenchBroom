@@ -31,145 +31,199 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::Model {
-const std::string &Game::gameName() const {
+namespace TrenchBroom::Model
+{
+const std::string& Game::gameName() const
+{
   return doGameName();
 }
 
-bool Game::isGamePathPreference(const std::filesystem::path &prefPath) const {
-  const GameFactory &gameFactory = GameFactory::instance();
+bool Game::isGamePathPreference(const std::filesystem::path& prefPath) const
+{
+  const GameFactory& gameFactory = GameFactory::instance();
   return gameFactory.isGamePathPreference(gameName(), prefPath);
 }
 
-std::filesystem::path Game::gamePath() const {
+std::filesystem::path Game::gamePath() const
+{
   return doGamePath();
 }
 
-void Game::setGamePath(const std::filesystem::path &gamePath, Logger &logger) {
+void Game::setGamePath(const std::filesystem::path& gamePath, Logger& logger)
+{
   doSetGamePath(gamePath, logger);
 }
 
-void Game::setAdditionalSearchPaths(const std::vector<std::filesystem::path> &searchPaths, Logger &logger) {
+void Game::setAdditionalSearchPaths(
+  const std::vector<std::filesystem::path>& searchPaths, Logger& logger)
+{
   doSetAdditionalSearchPaths(searchPaths, logger);
 }
 
-Game::PathErrors Game::checkAdditionalSearchPaths(const std::vector<std::filesystem::path> &searchPaths) const {
+Game::PathErrors Game::checkAdditionalSearchPaths(
+  const std::vector<std::filesystem::path>& searchPaths) const
+{
   return doCheckAdditionalSearchPaths(searchPaths);
 }
 
-const CompilationConfig &Game::compilationConfig() {
+const CompilationConfig& Game::compilationConfig()
+{
   return doCompilationConfig();
 }
 
-size_t Game::maxPropertyLength() const {
+size_t Game::maxPropertyLength() const
+{
   return doMaxPropertyLength();
 }
 
-const std::vector<SmartTag> &Game::smartTags() const {
+const std::vector<SmartTag>& Game::smartTags() const
+{
   return doSmartTags();
 }
 
-std::optional<vm::bbox3> Game::softMapBounds() const {
+std::optional<vm::bbox3> Game::softMapBounds() const
+{
   return doSoftMapBounds();
 }
 
-Game::SoftMapBounds Game::extractSoftMapBounds(const Entity &entity) const {
+Game::SoftMapBounds Game::extractSoftMapBounds(const Entity& entity) const
+{
   return doExtractSoftMapBounds(entity);
 }
 
-Result<std::unique_ptr<WorldNode>> Game::newMap(const MapFormat format, const vm::bbox3 &worldBounds, Logger &logger) const {
+Result<std::unique_ptr<WorldNode>> Game::newMap(
+  const MapFormat format, const vm::bbox3& worldBounds, Logger& logger) const
+{
   return doNewMap(format, worldBounds, logger);
 }
 
 Result<std::unique_ptr<WorldNode>> Game::loadMap(
-    const MapFormat format, const vm::bbox3 &worldBounds, const std::filesystem::path &path, Logger &logger
-) const {
+  const MapFormat format,
+  const vm::bbox3& worldBounds,
+  const std::filesystem::path& path,
+  Logger& logger) const
+{
   return doLoadMap(format, worldBounds, path, logger);
 }
 
-Result<void> Game::writeMap(WorldNode &world, const std::filesystem::path &path) const {
+Result<void> Game::writeMap(WorldNode& world, const std::filesystem::path& path) const
+{
   return doWriteMap(world, path);
 }
 
-Result<void> Game::exportMap(WorldNode &world, const IO::ExportOptions &options) const {
+Result<void> Game::exportMap(WorldNode& world, const IO::ExportOptions& options) const
+{
   return doExportMap(world, options);
 }
 
-std::vector<Node *> Game::parseNodes(const std::string &str, const MapFormat mapFormat, const vm::bbox3 &worldBounds, Logger &logger) const {
+std::vector<Node*> Game::parseNodes(
+  const std::string& str,
+  const MapFormat mapFormat,
+  const vm::bbox3& worldBounds,
+  Logger& logger) const
+{
   return doParseNodes(str, mapFormat, worldBounds, logger);
 }
 
-std::vector<BrushFace> Game::parseBrushFaces(const std::string &str, const MapFormat mapFormat, const vm::bbox3 &worldBounds, Logger &logger) const {
+std::vector<BrushFace> Game::parseBrushFaces(
+  const std::string& str,
+  const MapFormat mapFormat,
+  const vm::bbox3& worldBounds,
+  Logger& logger) const
+{
   return doParseBrushFaces(str, mapFormat, worldBounds, logger);
 }
 
-void Game::writeNodesToStream(WorldNode &world, const std::vector<Node *> &nodes, std::ostream &stream) const {
+void Game::writeNodesToStream(
+  WorldNode& world, const std::vector<Node*>& nodes, std::ostream& stream) const
+{
   doWriteNodesToStream(world, nodes, stream);
 }
 
-void Game::writeBrushFacesToStream(WorldNode &world, const std::vector<BrushFace> &faces, std::ostream &stream) const {
+void Game::writeBrushFacesToStream(
+  WorldNode& world, const std::vector<BrushFace>& faces, std::ostream& stream) const
+{
   doWriteBrushFacesToStream(world, faces, stream);
 }
 
-void Game::loadTextureCollections(Assets::TextureManager &textureManager) const {
+void Game::loadTextureCollections(Assets::TextureManager& textureManager) const
+{
   doLoadTextureCollections(textureManager);
 }
 
-const std::optional<std::string> &Game::wadProperty() const {
+const std::optional<std::string>& Game::wadProperty() const
+{
   return doGetWadProperty();
 }
 
-void Game::reloadWads(const std::filesystem::path &documentPath, const std::vector<std::filesystem::path> &wadPaths, Logger &logger) {
+void Game::reloadWads(
+  const std::filesystem::path& documentPath,
+  const std::vector<std::filesystem::path>& wadPaths,
+  Logger& logger)
+{
   doReloadWads(documentPath, wadPaths, logger);
 }
 
-Result<void> Game::reloadShaders() {
+Result<void> Game::reloadShaders()
+{
   return doReloadShaders();
 }
 
-bool Game::isEntityDefinitionFile(const std::filesystem::path &path) const {
+bool Game::isEntityDefinitionFile(const std::filesystem::path& path) const
+{
   return doIsEntityDefinitionFile(path);
 }
 
-std::vector<Assets::EntityDefinitionFileSpec> Game::allEntityDefinitionFiles() const {
+std::vector<Assets::EntityDefinitionFileSpec> Game::allEntityDefinitionFiles() const
+{
   return doAllEntityDefinitionFiles();
 }
 
-Assets::EntityDefinitionFileSpec Game::extractEntityDefinitionFile(const Entity &entity) const {
+Assets::EntityDefinitionFileSpec Game::extractEntityDefinitionFile(
+  const Entity& entity) const
+{
   return doExtractEntityDefinitionFile(entity);
 }
 
 std::filesystem::path Game::findEntityDefinitionFile(
-    const Assets::EntityDefinitionFileSpec &spec, const std::vector<std::filesystem::path> &searchPaths
-) const {
+  const Assets::EntityDefinitionFileSpec& spec,
+  const std::vector<std::filesystem::path>& searchPaths) const
+{
   return doFindEntityDefinitionFile(spec, searchPaths);
 }
 
-Result<std::vector<std::string>> Game::availableMods() const {
+Result<std::vector<std::string>> Game::availableMods() const
+{
   return doAvailableMods();
 }
 
-std::vector<std::string> Game::extractEnabledMods(const Entity &entity) const {
+std::vector<std::string> Game::extractEnabledMods(const Entity& entity) const
+{
   return doExtractEnabledMods(entity);
 }
 
-std::string Game::defaultMod() const {
+std::string Game::defaultMod() const
+{
   return doDefaultMod();
 }
 
-const FlagsConfig &Game::surfaceFlags() const {
+const FlagsConfig& Game::surfaceFlags() const
+{
   return doSurfaceFlags();
 }
 
-const FlagsConfig &Game::contentFlags() const {
+const FlagsConfig& Game::contentFlags() const
+{
   return doContentFlags();
 }
 
-const BrushFaceAttributes &Game::defaultFaceAttribs() const {
+const BrushFaceAttributes& Game::defaultFaceAttribs() const
+{
   return doDefaultFaceAttribs();
 }
 
-const std::vector<CompilationTool> &Game::compilationTools() const {
+const std::vector<CompilationTool>& Game::compilationTools() const
+{
   return doCompilationTools();
 }
 } // namespace TrenchBroom::Model

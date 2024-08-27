@@ -8,10 +8,9 @@ This file is part of TrenchBroom.
      the Free Software Foundation, either version 3 of the License, or
                                     (at your option) any later version.
 
-                                    TrenchBroom is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+                                    TrenchBroom is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
@@ -31,22 +30,26 @@ class QString;
 
 class QStringList;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 }
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class MapDocument;
 
 
-void combineFlags(size_t numFlags, int newFlagValue, int &setFlags, int &mixedFlags);
+void combineFlags(size_t numFlags, int newFlagValue, int& setFlags, int& mixedFlags);
 
-bool loadEntityDefinitionFile(std::weak_ptr<MapDocument> document, QWidget *parent, const QString &path);
+bool loadEntityDefinitionFile(
+  std::weak_ptr<MapDocument> document, QWidget* parent, const QString& path);
 
-size_t loadEntityDefinitionFile(std::weak_ptr<MapDocument> document, QWidget *parent, const QStringList &pathStrs);
+size_t loadEntityDefinitionFile(
+  std::weak_ptr<MapDocument> document, QWidget* parent, const QStringList& pathStrs);
 
-std::string queryGroupName(QWidget *parent, const std::string &suggestion);
+std::string queryGroupName(QWidget* parent, const std::string& suggestion);
 
-std::string queryLayerName(QWidget *parent, const std::string &suggestion);
+std::string queryLayerName(QWidget* parent, const std::string& suggestion);
 
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

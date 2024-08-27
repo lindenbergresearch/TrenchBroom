@@ -37,95 +37,100 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("Md3ParserTest.loadValidMd3") {
-auto logger = NullLogger{};
-const auto shaderSearchPath = "scripts";
-const auto textureSearchPaths = std::vector<std::filesystem::path>{"models"};
-auto fs = VirtualFileSystem{};
-fs.mount("",
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("Md3ParserTest.loadValidMd3")
+{
+  auto logger = NullLogger{};
+  const auto shaderSearchPath = "scripts";
+  const auto textureSearchPaths = std::vector<std::filesystem::path>{"models"};
+  auto fs = VirtualFileSystem{};
+  fs.mount(
+    "",
 
-std::make_unique<DiskFileSystem> (std::filesystem::current_path()
+    std::make_unique<DiskFileSystem>(
+      std::filesystem::current_path()
 
-/ "fixture/test/IO/Md3/bfg"));
-fs.mount("",
-createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger
-).
+      / "fixture/test/IO/Md3/bfg"));
+  fs.mount(
+    "",
+    createImageFileSystem<Quake3ShaderFileSystem>(
+      fs, shaderSearchPath, textureSearchPaths, logger)
+      .
 
-value()
+    value()
 
-);
+  );
 
-const auto md3Path = "models/weapons2/bfg/bfg.md3";
-const auto md3File = fs.openFile(md3Path).value();
+  const auto md3Path = "models/weapons2/bfg/bfg.md3";
+  const auto md3File = fs.openFile(md3Path).value();
 
-auto reader = md3File->reader().buffer();
-auto parser = Md3Parser("bfg", reader, fs);
-auto model = std::unique_ptr<Assets::EntityModel>(parser.initializeModel(logger));
-parser.loadFrame(0, *model, logger);
+  auto reader = md3File->reader().buffer();
+  auto parser = Md3Parser("bfg", reader, fs);
+  auto model = std::unique_ptr<Assets::EntityModel>(parser.initializeModel(logger));
+  parser.loadFrame(0, *model, logger);
 
-CHECK(model
-!= nullptr);
+  CHECK(model != nullptr);
 
-CHECK(model
-->
+  CHECK(
+    model->
 
-frameCount()
+    frameCount()
 
-== 1u);
-CHECK(model
-->
+    == 1u);
+  CHECK(
+    model->
 
-surfaceCount()
+    surfaceCount()
 
-== 2u);
+    == 2u);
 
-const auto *frame = model->frame("MilkShape 3D");
-CHECK(frame
-!= nullptr);
-CHECK(vm::is_equal(vm::bbox3f(vm::vec3f(- 10.234375, - 10.765625, - 9.4375), vm::vec3f(30.34375, 10.765625, 11.609375)), frame->bounds(), 0.01f)
-);
+  const auto* frame = model->frame("MilkShape 3D");
+  CHECK(frame != nullptr);
+  CHECK(vm::is_equal(
+    vm::bbox3f(
+      vm::vec3f(-10.234375, -10.765625, -9.4375),
+      vm::vec3f(30.34375, 10.765625, 11.609375)),
+    frame->bounds(),
+    0.01f));
 
-const auto *surface1 = model->surface("x_bfg");
-CHECK(surface1
-!= nullptr);
-CHECK(surface1
-->
+  const auto* surface1 = model->surface("x_bfg");
+  CHECK(surface1 != nullptr);
+  CHECK(
+    surface1->
 
-frameCount()
+    frameCount()
 
-== 1u);
-CHECK(surface1
-->
+    == 1u);
+  CHECK(
+    surface1->
 
-skinCount()
+    skinCount()
 
-== 1u);
+    == 1u);
 
-const auto *skin1 = surface1->skin("models/weapons2/bfg/LDAbfg");
-CHECK(skin1
-!= nullptr);
+  const auto* skin1 = surface1->skin("models/weapons2/bfg/LDAbfg");
+  CHECK(skin1 != nullptr);
 
-const auto *surface2 = model->surface("x_fx");
-CHECK(surface2
-!= nullptr);
-CHECK(surface2
-->
+  const auto* surface2 = model->surface("x_fx");
+  CHECK(surface2 != nullptr);
+  CHECK(
+    surface2->
 
-frameCount()
+    frameCount()
 
-== 1u);
-CHECK(surface2
-->
+    == 1u);
+  CHECK(
+    surface2->
 
-skinCount()
+    skinCount()
 
-== 1u);
+    == 1u);
 
-const auto *skin2 = surface2->skin("models/weapons2/bfg/LDAbfg_z");
-CHECK(skin2
-!= nullptr);
+  const auto* skin2 = surface2->skin("models/weapons2/bfg/LDAbfg_z");
+  CHECK(skin2 != nullptr);
 }
 } // namespace IO
 } // namespace TrenchBroom

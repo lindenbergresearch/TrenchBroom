@@ -24,15 +24,18 @@
 
 #include <vector>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 /**
  * Builds an index array map by recording rendering primitives. The recorded data can be
  * used to create an index array that can be uploaded to video card memory, and to render
  * the recorded primitives with the indices from that array using the constructed index
  * array map.
  */
-class IndexArrayMapBuilder {
+class IndexArrayMapBuilder
+{
 public:
   using Index = GLuint;
   using IndexList = std::vector<Index>;
@@ -48,28 +51,28 @@ public:
    *
    * @param size the size to initialize to
    */
-  explicit IndexArrayMapBuilder(const IndexArrayMap::Size &size);
+  explicit IndexArrayMapBuilder(const IndexArrayMap::Size& size);
 
   /**
    * Returns the recorded indices.
    *
    * @return the recorded indices
    */
-  const IndexList &indices() const;
+  const IndexList& indices() const;
 
   /**
    * Returns the recorded indices.
    *
    * @return the recorded indices
    */
-  IndexList &indices();
+  IndexList& indices();
 
   /**
    * Returns the recorded index ranges for the primitives that were added.
    *
    * @return the recorded index ranges
    */
-  const IndexArrayMap &ranges() const;
+  const IndexArrayMap& ranges() const;
 
   /**
    * Adds a point, represented by a vertex in a vertex array at the given index.
@@ -84,7 +87,7 @@ public:
    *
    * @param indices the indices to record
    */
-  void addPoints(const IndexList &indices);
+  void addPoints(const IndexList& indices);
 
   /**
    * Adds a line, represented by the vertices in a vertex array at the given two indices.
@@ -101,7 +104,7 @@ public:
    *
    * @param indices a list of indices containing the pairs of vertex indices to record
    */
-  void addLines(const IndexList &indices);
+  void addLines(const IndexList& indices);
 
   /**
    * Adds a triangle, represented by the vertices in a vertex array at the given indices.
@@ -119,7 +122,7 @@ public:
    *
    * @param indices a list of indices containing the triples of vertex indices to record
    */
-  void addTriangles(const IndexList &indices);
+  void addTriangles(const IndexList& indices);
 
   /**
    * Adds a quad, represented by the vertices in a vertex array at the given indices.
@@ -139,7 +142,7 @@ public:
    * @param indices a list of indices containing the four-tuples of vertex indices to
    * record
    */
-  void addQuads(const IndexList &indices);
+  void addQuads(const IndexList& indices);
 
   /**
    * Adds multiple quads by adding a range of indices specified by the given base index
@@ -162,7 +165,7 @@ public:
    *
    * @param indices the indices of the vertices making up the polygon to add
    */
-  void addPolygon(const IndexList &indices);
+  void addPolygon(const IndexList& indices);
 
   /**
    * Adds a polygon with indices computed from the given range. The polygons vertices are
@@ -176,7 +179,7 @@ public:
   void addPolygon(Index baseIndex, size_t vertexCount);
 
 private:
-  void add(PrimType primType, const IndexList &indices);
+  void add(PrimType primType, const IndexList& indices);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

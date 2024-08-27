@@ -25,12 +25,18 @@
 #include <filesystem>
 #include <string>
 
-namespace TrenchBroom {
-namespace Assets {
-class EntityDefinitionFileSpec {
+namespace TrenchBroom
+{
+namespace Assets
+{
+class EntityDefinitionFileSpec
+{
 private:
-  enum class Type {
-    Builtin, External, Unset
+  enum class Type
+  {
+    Builtin,
+    External,
+    Unset
   };
 
   Type m_type;
@@ -39,19 +45,22 @@ private:
 public:
   EntityDefinitionFileSpec();
 
-  static EntityDefinitionFileSpec parse(const std::string &str);
+  static EntityDefinitionFileSpec parse(const std::string& str);
 
-  static EntityDefinitionFileSpec builtin(const std::filesystem::path &path);
+  static EntityDefinitionFileSpec builtin(const std::filesystem::path& path);
 
-  static EntityDefinitionFileSpec external(const std::filesystem::path &path);
+  static EntityDefinitionFileSpec external(const std::filesystem::path& path);
 
   static EntityDefinitionFileSpec unset();
 
-  friend bool operator<(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+  friend bool operator<(
+    const EntityDefinitionFileSpec& lhs, const EntityDefinitionFileSpec& rhs);
 
-  friend bool operator==(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+  friend bool operator==(
+    const EntityDefinitionFileSpec& lhs, const EntityDefinitionFileSpec& rhs);
 
-  friend bool operator!=(const EntityDefinitionFileSpec &lhs, const EntityDefinitionFileSpec &rhs);
+  friend bool operator!=(
+    const EntityDefinitionFileSpec& lhs, const EntityDefinitionFileSpec& rhs);
 
   bool valid() const;
 
@@ -59,12 +68,12 @@ public:
 
   bool external() const;
 
-  const std::filesystem::path &path() const;
+  const std::filesystem::path& path() const;
 
   std::string asString() const;
 
 private:
-  EntityDefinitionFileSpec(Type type, const std::filesystem::path &path);
+  EntityDefinitionFileSpec(Type type, const std::filesystem::path& path);
 };
 } // namespace Assets
 } // namespace TrenchBroom

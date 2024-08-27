@@ -25,7 +25,8 @@
 #include <string>
 #include <string_view>
 
-namespace kdl {
+namespace kdl
+{
 /**
  * A string containing all characters which are considered whitespace.
  */
@@ -45,8 +46,9 @@ constexpr auto EscapeChar = '\\';
  * @return the string
  */
 inline std::string str_select(
-    const bool predicate, const std::string_view positive, const std::string_view negative) {
-    return std::string(predicate ? positive : negative);
+  const bool predicate, const std::string_view positive, const std::string_view negative)
+{
+  return std::string(predicate ? positive : negative);
 }
 
 /**
@@ -58,10 +60,11 @@ inline std::string str_select(
  * @param plural the string to return otherwise
  * @return one of the given strings depending on the given count
  */
-template<typename C>
+template <typename C>
 inline std::string str_plural(
-    const C count, const std::string_view singular, const std::string_view plural) {
-    return str_select(count == static_cast<C>(1), singular, plural);
+  const C count, const std::string_view singular, const std::string_view plural)
+{
+  return str_select(count == static_cast<C>(1), singular, plural);
 }
 
 /**
@@ -77,16 +80,17 @@ inline std::string str_plural(
  * @return one of the given strings depending on the given count, with the given prefix
  * and suffix
  */
-template<typename C>
+template <typename C>
 std::string str_plural(
-    const std::string_view prefix,
-    const C count,
-    const std::string_view singular,
-    const std::string_view plural,
-    const std::string_view suffix = "") {
-    std::stringstream result;
-    result << prefix << str_plural(count, singular, plural) << suffix;
-    return result.str();
+  const std::string_view prefix,
+  const C count,
+  const std::string_view singular,
+  const std::string_view plural,
+  const std::string_view suffix = "")
+{
+  std::stringstream result;
+  result << prefix << str_plural(count, singular, plural) << suffix;
+  return result.str();
 }
 
 /**
@@ -99,22 +103,26 @@ std::string str_plural(
  * @return the trimmed string
  */
 inline std::string str_trim(
-    const std::string_view s, const std::string_view chars = Whitespace) {
-    if (s.empty() || chars.empty()) {
-        return std::string(s);
-    }
+  const std::string_view s, const std::string_view chars = Whitespace)
+{
+  if (s.empty() || chars.empty())
+  {
+    return std::string(s);
+  }
 
-    const auto first = s.find_first_not_of(chars);
-    if (first == std::string::npos) {
-        return "";
-    }
+  const auto first = s.find_first_not_of(chars);
+  if (first == std::string::npos)
+  {
+    return "";
+  }
 
-    const auto last = s.find_last_not_of(chars);
-    if (first > last) {
-        return "";
-    }
+  const auto last = s.find_last_not_of(chars);
+  if (first > last)
+  {
+    return "";
+  }
 
-    return std::string(s.substr(first, last - first + 1));
+  return std::string(s.substr(first, last - first + 1));
 }
 
 /**
@@ -123,12 +131,16 @@ inline std::string str_trim(
  * @param c the character to convert
  * @return the converted character
  */
-inline char str_to_lower(const char c) {
-    if (c < 'A' || c > 'Z') {
-        return c;
-    } else {
-        return static_cast<char>(c + 'a' - 'A');
-    }
+inline char str_to_lower(const char c)
+{
+  if (c < 'A' || c > 'Z')
+  {
+    return c;
+  }
+  else
+  {
+    return static_cast<char>(c + 'a' - 'A');
+  }
 }
 
 /**
@@ -137,12 +149,16 @@ inline char str_to_lower(const char c) {
  * @param c the character to convert
  * @return the converted character
  */
-inline char str_to_upper(const char c) {
-    if (c < 'a' || c > 'z') {
-        return c;
-    } else {
-        return static_cast<char>(c - 'a' + 'A');
-    }
+inline char str_to_upper(const char c)
+{
+  if (c < 'a' || c > 'z')
+  {
+    return c;
+  }
+  else
+  {
+    return static_cast<char>(c - 'a' + 'A');
+  }
 }
 
 /**
@@ -151,15 +167,17 @@ inline char str_to_upper(const char c) {
  * @param str the string to convert
  * @return the converted string
  */
-inline std::string str_to_lower(const std::string_view str) {
-    auto result = std::string();
-    result.reserve(str.size());
+inline std::string str_to_lower(const std::string_view str)
+{
+  auto result = std::string();
+  result.reserve(str.size());
 
-    for (const auto c: str) {
-        result.push_back(str_to_lower(c));
-    }
+  for (const auto c : str)
+  {
+    result.push_back(str_to_lower(c));
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -168,15 +186,17 @@ inline std::string str_to_lower(const std::string_view str) {
  * @param str the string to convert
  * @return the converted string
  */
-inline std::string str_to_upper(const std::string_view str) {
-    auto result = std::string();
-    result.reserve(str.size());
+inline std::string str_to_upper(const std::string_view str)
+{
+  auto result = std::string();
+  result.reserve(str.size());
 
-    for (const auto c: str) {
-        result.push_back(str_to_upper(c));
-    }
+  for (const auto c : str)
+  {
+    result.push_back(str_to_upper(c));
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -191,25 +211,32 @@ inline std::string str_to_upper(const std::string_view str) {
  * @return the capitalized string
  */
 inline std::string str_capitalize(
-    const std::string_view str, const std::string_view delims = Whitespace) {
-    auto result = std::string();
-    result.reserve(str.size());
+  const std::string_view str, const std::string_view delims = Whitespace)
+{
+  auto result = std::string();
+  result.reserve(str.size());
 
-    bool initial = true;
-    for (const auto c: str) {
-        if (delims.find(c) != std::string::npos) {
-            initial = true;
-            result.push_back(c);
-        } else if (initial) {
-            result.push_back(str_to_upper(c));
-            initial = false;
-        } else {
-            result.push_back(c);
-            initial = false;
-        }
+  bool initial = true;
+  for (const auto c : str)
+  {
+    if (delims.find(c) != std::string::npos)
+    {
+      initial = true;
+      result.push_back(c);
     }
+    else if (initial)
+    {
+      result.push_back(str_to_upper(c));
+      initial = false;
+    }
+    else
+    {
+      result.push_back(c);
+      initial = false;
+    }
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -222,19 +249,23 @@ inline std::string str_capitalize(
  * @return the escaped string
  */
 inline std::string str_escape(
-    const std::string_view str, const std::string_view chars, char esc = EscapeChar) {
-    if (str.empty()) {
-        return "";
-    }
+  const std::string_view str, const std::string_view chars, char esc = EscapeChar)
+{
+  if (str.empty())
+  {
+    return "";
+  }
 
-    std::stringstream buffer;
-    for (const auto c: str) {
-        if (c == esc || chars.find_first_of(c) != std::string::npos) {
-            buffer << esc;
-        }
-        buffer << c;
+  std::stringstream buffer;
+  for (const auto c : str)
+  {
+    if (c == esc || chars.find_first_of(c) != std::string::npos)
+    {
+      buffer << esc;
     }
-    return buffer.str();
+    buffer << c;
+  }
+  return buffer.str();
 }
 
 /**
@@ -252,32 +283,40 @@ inline std::string str_escape(
  * @return the escaped string
  */
 inline std::string str_escape_if_necessary(
-    const std::string_view str, const std::string_view chars, char esc = EscapeChar) {
-    assert(chars.find(esc) == std::string::npos);
+  const std::string_view str, const std::string_view chars, char esc = EscapeChar)
+{
+  assert(chars.find(esc) == std::string::npos);
 
-    if (str.empty()) {
-        return "";
+  if (str.empty())
+  {
+    return "";
+  }
+
+  std::stringstream buffer;
+  auto escaped = false;
+  for (const auto c : str)
+  {
+    const auto needsEscaping = (chars.find(c) != std::string::npos);
+    if (needsEscaping)
+    {
+      // if 'c' is not prefixed by 'esc', insert an 'esc'
+      if (!escaped)
+      {
+        buffer << esc;
+      }
     }
 
-    std::stringstream buffer;
-    auto escaped = false;
-    for (const auto c: str) {
-        const auto needsEscaping = (chars.find(c) != std::string::npos);
-        if (needsEscaping) {
-            // if 'c' is not prefixed by 'esc', insert an 'esc'
-            if (!escaped) {
-                buffer << esc;
-            }
-        }
-
-        if (c == esc) {
-            escaped = !escaped;
-        } else {
-            escaped = false;
-        }
-        buffer << c;
+    if (c == esc)
+    {
+      escaped = !escaped;
     }
-    return buffer.str();
+    else
+    {
+      escaped = false;
+    }
+    buffer << c;
+  }
+  return buffer.str();
 }
 
 /**
@@ -290,33 +329,42 @@ inline std::string str_escape_if_necessary(
  * @return the unescaped string
  */
 inline std::string str_unescape(
-    const std::string_view str, const std::string_view chars, char esc = EscapeChar) {
-    if (str.empty()) {
-        return "";
-    }
+  const std::string_view str, const std::string_view chars, char esc = EscapeChar)
+{
+  if (str.empty())
+  {
+    return "";
+  }
 
-    std::stringstream buffer;
-    auto escaped = false;
-    for (const auto c: str) {
-        if (c == esc) {
-            if (escaped) {
-                buffer << c;
-            }
-            escaped = !escaped;
-        } else {
-            if (escaped && chars.find_first_of(c) == std::string::npos) {
-                buffer << '\\';
-            }
-            buffer << c;
-            escaped = false;
-        }
+  std::stringstream buffer;
+  auto escaped = false;
+  for (const auto c : str)
+  {
+    if (c == esc)
+    {
+      if (escaped)
+      {
+        buffer << c;
+      }
+      escaped = !escaped;
     }
-
-    if (escaped) {
+    else
+    {
+      if (escaped && chars.find_first_of(c) == std::string::npos)
+      {
         buffer << '\\';
+      }
+      buffer << c;
+      escaped = false;
     }
+  }
 
-    return buffer.str();
+  if (escaped)
+  {
+    buffer << '\\';
+  }
+
+  return buffer.str();
 }
 
 /**
@@ -328,8 +376,9 @@ inline std::string str_unescape(
  * otherwise
  */
 inline bool str_is_blank(
-    const std::string_view str, const std::string_view whitespace = Whitespace) {
-    return str.find_first_not_of(whitespace) == std::string::npos;
+  const std::string_view str, const std::string_view whitespace = Whitespace)
+{
+  return str.find_first_not_of(whitespace) == std::string::npos;
 }
 
 /**
@@ -340,12 +389,15 @@ inline bool str_is_blank(
  * @return true if the given string consists of only numeric characters, and false
  * otherwise.
  */
-inline bool str_is_numeric(const std::string_view str) {
-    for (const auto c: str) {
-        if (c < '0' || c > '9') {
-            return false;
-        }
+inline bool str_is_numeric(const std::string_view str)
+{
+  for (const auto c : str)
+  {
+    if (c < '0' || c > '9')
+    {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
-}// namespace kdl
+} // namespace kdl

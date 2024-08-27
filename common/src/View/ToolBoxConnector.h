@@ -26,12 +26,15 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class PickResult;
 }
 
-namespace Renderer {
+namespace Renderer
+{
 class Camera;
 
 
@@ -39,9 +42,10 @@ class RenderBatch;
 
 
 class RenderContext;
-}// namespace Renderer
+} // namespace Renderer
 
-namespace View {
+namespace View
+{
 class PickRequest;
 
 
@@ -54,105 +58,107 @@ class ToolBox;
 class ToolChain;
 
 
-class ToolBoxConnector : public InputEventProcessor {
+class ToolBoxConnector : public InputEventProcessor
+{
 private:
-    ToolBox *m_toolBox;
-    ToolChain *m_toolChain;
+  ToolBox* m_toolBox;
+  ToolChain* m_toolChain;
 
-    InputState m_inputState;
+  InputState m_inputState;
 
-    float m_lastMouseX;
-    float m_lastMouseY;
-    bool m_ignoreNextDrag;
-
-public:
-    ToolBoxConnector();
-
-    ~ToolBoxConnector() override;
+  float m_lastMouseX;
+  float m_lastMouseY;
+  bool m_ignoreNextDrag;
 
 public:
-    const vm::ray3 &pickRay() const;
+  ToolBoxConnector();
 
-    const Model::PickResult &pickResult() const;
+  ~ToolBoxConnector() override;
 
-    void updatePickResult();
+public:
+  const vm::ray3& pickRay() const;
+
+  const Model::PickResult& pickResult() const;
+
+  void updatePickResult();
 
 protected:
-    void setToolBox(ToolBox &toolBox);
+  void setToolBox(ToolBox& toolBox);
 
-    void addTool(std::unique_ptr<ToolController> tool);
+  void addTool(std::unique_ptr<ToolController> tool);
 
-public:// drag and drop
-    bool dragEnter(float x, float y, const std::string &text);
+public: // drag and drop
+  bool dragEnter(float x, float y, const std::string& text);
 
-    bool dragMove(float x, float y, const std::string &text);
+  bool dragMove(float x, float y, const std::string& text);
 
-    void dragLeave();
+  void dragLeave();
 
-    bool dragDrop(float x, float y, const std::string &text);
+  bool dragDrop(float x, float y, const std::string& text);
 
-public:// cancel
-    bool cancel();
+public: // cancel
+  bool cancel();
 
-protected:// rendering
-    void setRenderOptions(Renderer::RenderContext &renderContext);
+protected: // rendering
+  void setRenderOptions(Renderer::RenderContext& renderContext);
 
-    void renderTools(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+  void renderTools(
+    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
 
 private:
-    ModifierKeyState modifierKeys();
+  ModifierKeyState modifierKeys();
 
-    bool setModifierKeys();
+  bool setModifierKeys();
 
 protected:
-    bool clearModifierKeys();
+  bool clearModifierKeys();
 
-    void updateModifierKeys();
-
-private:
-    void showPopupMenu();
-
-public:// implement InputEventProcessor interface
-    void processEvent(const KeyEvent &event) override;
-
-    void processEvent(const MouseEvent &event) override;
-
-    void processEvent(const CancelEvent &event) override;
+  void updateModifierKeys();
 
 private:
-    void processMouseButtonDown(const MouseEvent &event);
+  void showPopupMenu();
 
-    void processMouseButtonUp(const MouseEvent &event);
+public: // implement InputEventProcessor interface
+  void processEvent(const KeyEvent& event) override;
 
-    void processMouseClick(const MouseEvent &event);
+  void processEvent(const MouseEvent& event) override;
 
-    void processMouseDoubleClick(const MouseEvent &event);
+  void processEvent(const CancelEvent& event) override;
 
-    void processMouseMotion(const MouseEvent &event);
+private:
+  void processMouseButtonDown(const MouseEvent& event);
 
-    void processScroll(const MouseEvent &event);
+  void processMouseButtonUp(const MouseEvent& event);
 
-    void processDragStart(const MouseEvent &event);
+  void processMouseClick(const MouseEvent& event);
 
-    void processDrag(const MouseEvent &event);
+  void processMouseDoubleClick(const MouseEvent& event);
 
-    void processDragEnd(const MouseEvent &event);
+  void processMouseMotion(const MouseEvent& event);
 
-    MouseButtonState mouseButton(const MouseEvent &event);
+  void processScroll(const MouseEvent& event);
 
-    void mouseMoved(float x, float y);
+  void processDragStart(const MouseEvent& event);
+
+  void processDrag(const MouseEvent& event);
+
+  void processDragEnd(const MouseEvent& event);
+
+  MouseButtonState mouseButton(const MouseEvent& event);
+
+  void mouseMoved(float x, float y);
 
 public:
-    bool cancelDrag();
+  bool cancelDrag();
 
 private:
-    virtual PickRequest doGetPickRequest(float x, float y) const = 0;
+  virtual PickRequest doGetPickRequest(float x, float y) const = 0;
 
-    virtual Model::PickResult doPick(const vm::ray3 &pickRay) const = 0;
+  virtual Model::PickResult doPick(const vm::ray3& pickRay) const = 0;
 
-    virtual void doShowPopupMenu();
+  virtual void doShowPopupMenu();
 
-    deleteCopyAndMove(ToolBoxConnector);
+  deleteCopyAndMove(ToolBoxConnector);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

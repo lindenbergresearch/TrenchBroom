@@ -21,7 +21,8 @@
 
 #include <optional>
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
 class BrushNode;
 
@@ -51,67 +52,89 @@ class WorldNode;
 #endif
 
 
-class NodeVisitor {
+class NodeVisitor
+{
 protected:
   NodeVisitor();
 
 public:
   virtual ~NodeVisitor();
 
-  virtual void visit(WorldNode *world) = 0;
+  virtual void visit(WorldNode* world) = 0;
 
-  virtual void visit(LayerNode *layer) = 0;
+  virtual void visit(LayerNode* layer) = 0;
 
-  virtual void visit(GroupNode *group) = 0;
+  virtual void visit(GroupNode* group) = 0;
 
-  virtual void visit(EntityNode *entity) = 0;
+  virtual void visit(EntityNode* entity) = 0;
 
-  virtual void visit(BrushNode *brush) = 0;
+  virtual void visit(BrushNode* brush) = 0;
 
-  virtual void visit(PatchNode *patch) = 0;
+  virtual void visit(PatchNode* patch) = 0;
 };
 
 
-class ConstNodeVisitor {
+class ConstNodeVisitor
+{
 protected:
   ConstNodeVisitor();
 
 public:
   virtual ~ConstNodeVisitor();
 
-  virtual void visit(const WorldNode *world) = 0;
+  virtual void visit(const WorldNode* world) = 0;
 
-  virtual void visit(const LayerNode *layer) = 0;
+  virtual void visit(const LayerNode* layer) = 0;
 
-  virtual void visit(const GroupNode *group) = 0;
+  virtual void visit(const GroupNode* group) = 0;
 
-  virtual void visit(const EntityNode *entity) = 0;
+  virtual void visit(const EntityNode* entity) = 0;
 
-  virtual void visit(const BrushNode *brush) = 0;
+  virtual void visit(const BrushNode* brush) = 0;
 
-  virtual void visit(const PatchNode *patch) = 0;
+  virtual void visit(const PatchNode* patch) = 0;
 };
 
 
-template<typename L, typename N, typename Enable = void> struct NodeLambdaInvokeResult {
+template <typename L, typename N, typename Enable = void>
+struct NodeLambdaInvokeResult
+{
   using type = std::invoke_result_t<L, N>;
 };
 
-template<typename L, typename N> struct NodeLambdaInvokeResult<L, N, typename std::enable_if_t<std::is_invocable_v<L, const L &, N>>> {
-  using type = std::invoke_result_t<L, const L &, N>;
+template <typename L, typename N>
+struct NodeLambdaInvokeResult<
+  L,
+  N,
+  typename std::enable_if_t<std::is_invocable_v<L, const L&, N>>>
+{
+  using type = std::invoke_result_t<L, const L&, N>;
 };
 
-template<typename L, typename N> using NodeLambdaInvokeResult_t = typename NodeLambdaInvokeResult<L, N>::type;
+template <typename L, typename N>
+using NodeLambdaInvokeResult_t = typename NodeLambdaInvokeResult<L, N>::type;
 
-template<typename L> using NodeLambdaResultType = std::conditional_t<std::is_same_v<NodeLambdaInvokeResult_t<L, WorldNode *>, void>, void, NodeLambdaInvokeResult_t<L, WorldNode *>>;
+template <typename L>
+using NodeLambdaResultType = std::conditional_t<
+  std::is_same_v<NodeLambdaInvokeResult_t<L, WorldNode*>, void>,
+  void,
+  NodeLambdaInvokeResult_t<L, WorldNode*>>;
 
-template<typename L> struct NodeLambdaHasResult : std::conditional_t<std::is_same_v<NodeLambdaResultType<L>, void>, std::false_type, std::true_type> {
+template <typename L>
+struct NodeLambdaHasResult : std::conditional_t<
+                               std::is_same_v<NodeLambdaResultType<L>, void>,
+                               std::false_type,
+                               std::true_type>
+{
 };
 
-template<typename L> inline constexpr bool NodeLambdaHasResult_v = NodeLambdaHasResult<L>::value;
+template <typename L>
+inline constexpr bool NodeLambdaHasResult_v = NodeLambdaHasResult<L>::value;
 
 
-template<typename L> class NodeLambdaVisitorResult {
+template <typename L>
+class NodeLambdaVisitorResult
+{
 public:
   using R = NodeLambdaResultType<L>;
 
@@ -119,64 +142,85 @@ private:
   std::optional<R> m_result;
 
 public:
-  R &&result() { return std::move(m_result).value(); }
+  R&& result() { return std::move(m_result).value(); }
 
 protected:
-  void setResult(R &&result) { m_result = std::move(result); }
+  void setResult(R&& result) { m_result = std::move(result); }
 };
 
 
-class NodeLambdaVisitorNoResult {
+class NodeLambdaVisitorNoResult
+{
 public:
   void result() {}
 };
 
 
-template<typename L> class NodeLambdaVisitor : public NodeVisitor, public std::conditional_t<NodeLambdaHasResult_v<L>, NodeLambdaVisitorResult<L>, NodeLambdaVisitorNoResult> {
+template <typename L>
+class NodeLambdaVisitor : public NodeVisitor,
+                          public std::conditional_t<
+                            NodeLambdaHasResult_v<L>,
+                            NodeLambdaVisitorResult<L>,
+                            NodeLambdaVisitorNoResult>
+{
 private:
-  const L &m_lambda;
+  const L& m_lambda;
 
 public:
-  explicit NodeLambdaVisitor(const L &lambda) : m_lambda{lambda} {
+  explicit NodeLambdaVisitor(const L& lambda)
+    : m_lambda{lambda}
+  {
   }
 
 private:
-  void visit(WorldNode *world) override { doVisit(world); }
+  void visit(WorldNode* world) override { doVisit(world); }
 
-  void visit(LayerNode *layer) override { doVisit(layer); }
+  void visit(LayerNode* layer) override { doVisit(layer); }
 
-  void visit(GroupNode *group) override { doVisit(group); }
+  void visit(GroupNode* group) override { doVisit(group); }
 
-  void visit(EntityNode *entity) override { doVisit(entity); }
+  void visit(EntityNode* entity) override { doVisit(entity); }
 
-  void visit(BrushNode *brush) override { doVisit(brush); }
+  void visit(BrushNode* brush) override { doVisit(brush); }
 
-  void visit(PatchNode *patch) override { doVisit(patch); }
+  void visit(PatchNode* patch) override { doVisit(patch); }
 
-  template<typename N> void doVisit(N *node) {
-    constexpr bool invokableWithAnyPointerType = std::is_invocable_v<L, int *> || std::is_invocable_v<L, const L &, int *>;
+  template <typename N>
+  void doVisit(N* node)
+  {
+    constexpr bool invokableWithAnyPointerType =
+      std::is_invocable_v<L, int*> || std::is_invocable_v<L, const L&, int*>;
     static_assert(
-        ! invokableWithAnyPointerType, "Don't use auto* to generate node visitors, this can lead to hard to detect "
-                                       "errors."
-    );
+      !invokableWithAnyPointerType,
+      "Don't use auto* to generate node visitors, this can lead to hard to detect "
+      "errors.");
 
-    constexpr bool invokableWithLambdaAndNode = std::is_invocable_v<L, const L &, N *>;
-    constexpr bool invokableWithNode = std::is_invocable_v<L, N *>;
+    constexpr bool invokableWithLambdaAndNode = std::is_invocable_v<L, const L&, N*>;
+    constexpr bool invokableWithNode = std::is_invocable_v<L, N*>;
 
     static_assert(
-        ! (invokableWithNode && invokableWithLambdaAndNode), "Visitor implements both lambda and non-lambda overloads for the given node type"
-    );
+      !(invokableWithNode && invokableWithLambdaAndNode),
+      "Visitor implements both lambda and non-lambda overloads for the given node type");
 
-    if constexpr (invokableWithLambdaAndNode) {
-      if constexpr (NodeLambdaHasResult_v<L>) {
+    if constexpr (invokableWithLambdaAndNode)
+    {
+      if constexpr (NodeLambdaHasResult_v<L>)
+      {
         NodeLambdaVisitorResult<L>::setResult(m_lambda(m_lambda, node));
-      } else {
+      }
+      else
+      {
         m_lambda(m_lambda, node);
       }
-    } else {
-      if constexpr (NodeLambdaHasResult_v<L>) {
+    }
+    else
+    {
+      if constexpr (NodeLambdaHasResult_v<L>)
+      {
         NodeLambdaVisitorResult<L>::setResult(m_lambda(node));
-      } else {
+      }
+      else
+      {
         m_lambda(node);
       }
     }
@@ -184,55 +228,76 @@ private:
 };
 
 
-template<typename L> class ConstNodeLambdaVisitor : public ConstNodeVisitor, public std::conditional_t<NodeLambdaHasResult_v<L>, NodeLambdaVisitorResult<L>, NodeLambdaVisitorNoResult> {
+template <typename L>
+class ConstNodeLambdaVisitor : public ConstNodeVisitor,
+                               public std::conditional_t<
+                                 NodeLambdaHasResult_v<L>,
+                                 NodeLambdaVisitorResult<L>,
+                                 NodeLambdaVisitorNoResult>
+{
 private:
-  const L &m_lambda;
+  const L& m_lambda;
 
 public:
-  explicit ConstNodeLambdaVisitor(const L &lambda) : m_lambda{lambda} {
+  explicit ConstNodeLambdaVisitor(const L& lambda)
+    : m_lambda{lambda}
+  {
   }
 
 private:
-  void visit(const WorldNode *world) override { doVisit(world); }
+  void visit(const WorldNode* world) override { doVisit(world); }
 
-  void visit(const LayerNode *layer) override { doVisit(layer); }
+  void visit(const LayerNode* layer) override { doVisit(layer); }
 
-  void visit(const GroupNode *group) override { doVisit(group); }
+  void visit(const GroupNode* group) override { doVisit(group); }
 
-  void visit(const EntityNode *entity) override { doVisit(entity); }
+  void visit(const EntityNode* entity) override { doVisit(entity); }
 
-  void visit(const BrushNode *brush) override { doVisit(brush); }
+  void visit(const BrushNode* brush) override { doVisit(brush); }
 
-  void visit(const PatchNode *patch) override { doVisit(patch); }
+  void visit(const PatchNode* patch) override { doVisit(patch); }
 
-  template<typename N> void doVisit(const N *node) {
-    constexpr bool invokableWithAnyPointerType = std::is_invocable_v<L, int *> || std::is_invocable_v<L, const L &, int *>;
+  template <typename N>
+  void doVisit(const N* node)
+  {
+    constexpr bool invokableWithAnyPointerType =
+      std::is_invocable_v<L, int*> || std::is_invocable_v<L, const L&, int*>;
     static_assert(
-        ! invokableWithAnyPointerType, "Don't use auto* to generate node visitors, this can lead to hard to detect "
-                                       "errors."
-    );
+      !invokableWithAnyPointerType,
+      "Don't use auto* to generate node visitors, this can lead to hard to detect "
+      "errors.");
 
-    constexpr bool invokableWithLambdaAndNode = std::is_invocable_v<L, const L &, const N *>;
-    constexpr bool invokableWithNode = std::is_invocable_v<L, const N *>;
-
-    static_assert(
-        ! (invokableWithNode && invokableWithLambdaAndNode), "Visitor implements both lambda and non-lambda overloads for the given node type"
-    );
+    constexpr bool invokableWithLambdaAndNode =
+      std::is_invocable_v<L, const L&, const N*>;
+    constexpr bool invokableWithNode = std::is_invocable_v<L, const N*>;
 
     static_assert(
-        ! (! invokableWithNode && ! invokableWithLambdaAndNode), "Visitor must take node by const pointer"
-    );
+      !(invokableWithNode && invokableWithLambdaAndNode),
+      "Visitor implements both lambda and non-lambda overloads for the given node type");
 
-    if constexpr (invokableWithLambdaAndNode) {
-      if constexpr (NodeLambdaHasResult_v<L>) {
+    static_assert(
+      !(!invokableWithNode && !invokableWithLambdaAndNode),
+      "Visitor must take node by const pointer");
+
+    if constexpr (invokableWithLambdaAndNode)
+    {
+      if constexpr (NodeLambdaHasResult_v<L>)
+      {
         NodeLambdaVisitorResult<L>::setResult(m_lambda(m_lambda, node));
-      } else {
+      }
+      else
+      {
         m_lambda(m_lambda, node);
       }
-    } else {
-      if constexpr (NodeLambdaHasResult_v<L>) {
+    }
+    else
+    {
+      if constexpr (NodeLambdaHasResult_v<L>)
+      {
         NodeLambdaVisitorResult<L>::setResult(m_lambda(node));
-      } else {
+      }
+      else
+      {
         m_lambda(node);
       }
     }

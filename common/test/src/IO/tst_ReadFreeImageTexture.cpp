@@ -32,56 +32,63 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 
-static auto loadTexture(const std::string &name) {
-  auto diskFS = DiskFileSystem{std::filesystem::current_path() / "fixture/test/IO/Image/"};
+static auto loadTexture(const std::string& name)
+{
+  auto diskFS =
+    DiskFileSystem{std::filesystem::current_path() / "fixture/test/IO/Image/"};
 
   const auto file = diskFS.openFile(name).value();
   auto reader = file->reader().buffer();
   return readFreeImageTexture(name, reader);
 }
 
-static void assertTexture(const std::string &name, const size_t width, const size_t height) {
-  loadTexture(name).transform(
-      [&](const auto &texture) {
-        CHECK(texture.name() == name);
-        CHECK(texture.width() == width);
-        CHECK(texture.height() == height);
-        CHECK((GL_BGRA == texture.format() || GL_RGBA == texture.format()));
-        CHECK(texture.type() == Assets::TextureType::Opaque);
-      }
-  ).transform_error([](const auto &) { FAIL(); });
+static void assertTexture(
+  const std::string& name, const size_t width, const size_t height)
+{
+  loadTexture(name)
+    .transform([&](const auto& texture) {
+      CHECK(texture.name() == name);
+      CHECK(texture.width() == width);
+      CHECK(texture.height() == height);
+      CHECK((GL_BGRA == texture.format() || GL_RGBA == texture.format()));
+      CHECK(texture.type() == Assets::TextureType::Opaque);
+    })
+    .transform_error([](const auto&) { FAIL(); });
 }
 
-TEST_CASE("ReadFreeImageTextureTest.testLoadPngs") {
-assertTexture("5x5.png", 5, 5);
-assertTexture("707x710.png", 707, 710);
+TEST_CASE("ReadFreeImageTextureTest.testLoadPngs")
+{
+  assertTexture("5x5.png", 5, 5);
+  assertTexture("707x710.png", 707, 710);
 }
 
 TEST_CASE("ReadFreeImageTextureTest.testLoadCorruptPng")
 {
-CHECK(loadTexture("corruptPngTest.png")
-.
+  CHECK(loadTexture("corruptPngTest.png")
+          .
 
-is_error()
+        is_error()
 
-);
+  );
 }
 
 TEST_CASE("ReadFreeImageTextureTest.testLoad16BitPng")
 {
-// we don't support this format currently
-CHECK(loadTexture("16bitGrayscale.png")
-.
+  // we don't support this format currently
+  CHECK(loadTexture("16bitGrayscale.png")
+          .
 
-is_error()
+        is_error()
 
-);
+  );
 }
 
 // https://github.com/TrenchBroom/TrenchBroom/issues/2474
-static void testImageContents(const Assets::Texture &texture, const ColorMatch match) {
+static void testImageContents(const Assets::Texture& texture, const ColorMatch match)
+{
   const std::size_t w = 64u;
   const std::size_t h = 64u;
 
@@ -91,15 +98,22 @@ static void testImageContents(const Assets::Texture &texture, const ColorMatch m
   CHECK((GL_BGRA == texture.format() || GL_RGBA == texture.format()));
   CHECK(texture.type() == Assets::TextureType::Opaque);
 
-  for (std::size_t y = 0; y < h; ++ y) {
-    for (std::size_t x = 0; x < w; ++ x) {
-      if (x == 0 && y == 0) {
+  for (std::size_t y = 0; y < h; ++y)
+  {
+    for (std::size_t x = 0; x < w; ++x)
+    {
+      if (x == 0 && y == 0)
+      {
         // top left pixel is red
         checkColor(texture, x, y, 255, 0, 0, 255, match);
-      } else if (x == (w - 1) && y == (h - 1)) {
+      }
+      else if (x == (w - 1) && y == (h - 1))
+      {
         // bottom right pixel is green
         checkColor(texture, x, y, 0, 255, 0, 255, match);
-      } else {
+      }
+      else
+      {
         // others are 161, 161, 161
         checkColor(texture, x, y, 161, 161, 161, 255, match);
       }
@@ -109,99 +123,102 @@ static void testImageContents(const Assets::Texture &texture, const ColorMatch m
 
 TEST_CASE("ReadFreeImageTextureTest.testPNGContents")
 {
-testImageContents(loadTexture("pngContentsTest.png")
-.
+  testImageContents(
+    loadTexture("pngContentsTest.png")
+      .
 
-value(), ColorMatch::Exact
+    value(),
+    ColorMatch::Exact
 
-);
+  );
 }
 
 TEST_CASE("ReadFreeImageTextureTest.testJPGContents")
 {
-testImageContents(loadTexture("jpgContentsTest.jpg")
-.
+  testImageContents(
+    loadTexture("jpgContentsTest.jpg")
+      .
 
-value(), ColorMatch::Approximate
+    value(),
+    ColorMatch::Approximate
 
-);
+  );
 }
 
 TEST_CASE("ReadFreeImageTextureTest.alphaMaskTest")
 {
-const auto texture = loadTexture("alphaMaskTest.png").value();
-const std::size_t w = 25u;
-const std::size_t h = 10u;
+  const auto texture = loadTexture("alphaMaskTest.png").value();
+  const std::size_t w = 25u;
+  const std::size_t h = 10u;
 
-CHECK(texture
-.
+  CHECK(
+    texture.
 
-width()
+    width()
 
-== w);
-CHECK(texture
-.
+    == w);
+  CHECK(
+    texture.
 
-height()
+    height()
 
-== h);
-CHECK(texture
-.
+    == h);
+  CHECK(
+    texture
+      .
 
-buffersIfUnprepared()
+    buffersIfUnprepared()
 
-.
+      .
 
-size()
+    size()
 
-== 1u);
-CHECK((GL_BGRA == texture.
+    == 1u);
+  CHECK(
+    (GL_BGRA
+       == texture.
 
-format()
+          format()
 
-|| GL_RGBA == texture.
+     || GL_RGBA
+          == texture.
 
-format()
+             format()
 
-));
-CHECK(texture
-.
+       ));
+  CHECK(
+    texture.
 
-type()
+    type()
 
-== Assets::TextureType::Masked);
+    == Assets::TextureType::Masked);
 
-auto &mip0Data = texture.buffersIfUnprepared().at(0);
-CHECK(mip0Data
-.
+  auto& mip0Data = texture.buffersIfUnprepared().at(0);
+  CHECK(
+    mip0Data.
 
-size()
+    size()
 
-==
-w *h
-* 4);
+    == w * h * 4);
 
-for (
-std::size_t y = 0;
-y<h;
-++y) {
-for (
-std::size_t x = 0;
-x<w;
-++x) {
-if (x == 0 && y == 0) {
-// top left pixel is green opaque
-CHECK(getComponentOfPixel(texture, x, y, Component::R)
-== 0 /* R */);
-CHECK(getComponentOfPixel(texture, x, y, Component::G)
-== 255 /* G */);
-CHECK(getComponentOfPixel(texture, x, y, Component::B)
-== 0 /* B */);
-CHECK(getComponentOfPixel(texture, x, y, Component::A)
-== 255 /* A */);
+  for (std::size_t y = 0; y < h; ++y)
+  {
+    for (std::size_t x = 0; x < w; ++x)
+    {
+      if (x == 0 && y == 0)
+      {
+        // top left pixel is green opaque
+        CHECK(getComponentOfPixel(texture, x, y, Component::R) == 0 /* R */);
+        CHECK(getComponentOfPixel(texture, x, y, Component::G) == 255 /* G */);
+        CHECK(getComponentOfPixel(texture, x, y, Component::B) == 0 /* B */);
+        CHECK(getComponentOfPixel(texture, x, y, Component::A) == 255 /* A */);
+      }
+      else
+      {
+        // others are fully transparent (RGB values are unknown)
+        CHECK(getComponentOfPixel(texture, x, y, Component::A) == 0 /* A */);
+      }
+    }
+  }
 }
-else {
-// others are fully transparent (RGB values are unknown)
-CHECK(getComponentOfPixel(texture, x, y, Component::A)
-== 0 /* A */);
-}}}}} // namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

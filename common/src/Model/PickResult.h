@@ -28,15 +28,18 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class CompareHits;
 
 
 class HitQuery;
 
 
-class PickResult {
+class PickResult
+{
 private:
   std::vector<Hit> m_hits;
   std::shared_ptr<CompareHits> m_compare;
@@ -48,7 +51,7 @@ public:
 
   PickResult();
 
-defineCopyAndMove(PickResult);
+  defineCopyAndMove(PickResult);
 
   ~PickResult();
 
@@ -60,13 +63,13 @@ defineCopyAndMove(PickResult);
 
   size_t size() const;
 
-  void addHit(const Hit &hit);
+  void addHit(const Hit& hit);
 
-  const std::vector<Hit> &all() const;
+  const std::vector<Hit>& all() const;
 
-  const Hit &first(const HitFilter &filter) const;
+  const Hit& first(const HitFilter& filter) const;
 
-  std::vector<Hit> all(const HitFilter &filter) const;
+  std::vector<Hit> all(const HitFilter& filter) const;
 
   void clear();
 };

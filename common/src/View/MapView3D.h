@@ -31,131 +31,154 @@
 
 class QKeyEvent;
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
 
-namespace Renderer {
+namespace Renderer
+{
 class PerspectiveCamera;
 }
 
-namespace View {
+namespace View
+{
 class FlyModeHelper;
 
 
-class MapView3D : public MapViewBase {
-    Q_OBJECT
+class MapView3D : public MapViewBase
+{
+  Q_OBJECT
 private:
-    std::unique_ptr<Renderer::PerspectiveCamera> m_camera;
-    std::unique_ptr<FlyModeHelper> m_flyModeHelper;
-    bool m_ignoreCameraChangeEvents;
+  std::unique_ptr<Renderer::PerspectiveCamera> m_camera;
+  std::unique_ptr<FlyModeHelper> m_flyModeHelper;
+  bool m_ignoreCameraChangeEvents;
 
-    NotifierConnection m_notifierConnection;
+  NotifierConnection m_notifierConnection;
 
 public:
-    MapView3D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, Logger *logger);
+  MapView3D(
+    std::weak_ptr<MapDocument> document,
+    MapViewToolBox& toolBox,
+    Renderer::MapRenderer& renderer,
+    GLContextManager& contextManager,
+    Logger* logger);
 
-    ~MapView3D() override;
+  ~MapView3D() override;
 
 private:
-    void initializeCamera();
+  void initializeCamera();
 
-    void initializeToolChain(MapViewToolBox &toolBox);
+  void initializeToolChain(MapViewToolBox& toolBox);
 
-private:// notification
-    void connectObservers();
+private: // notification
+  void connectObservers();
 
-    void cameraDidChange(const Renderer::Camera *camera);
+  void cameraDidChange(const Renderer::Camera* camera);
 
-    void saveCameraState(MapDocument *document);
+  void saveCameraState(MapDocument* document);
 
-    void loadCameraState(MapDocument *document);
+  void loadCameraState(MapDocument* document);
 
-    void preferenceDidChange(const std::filesystem::path &path);
+  void preferenceDidChange(const std::filesystem::path& path);
 
-    void documentWasLoaded(MapDocument *);
+  void documentWasLoaded(MapDocument*);
 
-    void documentWasSaved(MapDocument *);
+  void documentWasSaved(MapDocument*);
 
-protected:// QWidget overrides
-    void keyPressEvent(QKeyEvent *event) override;
+protected: // QWidget overrides
+  void keyPressEvent(QKeyEvent* event) override;
 
-    void keyReleaseEvent(QKeyEvent *event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
 
-    void focusInEvent(QFocusEvent *event) override;
+  void focusInEvent(QFocusEvent* event) override;
 
-    void focusOutEvent(QFocusEvent *event) override;
+  void focusOutEvent(QFocusEvent* event) override;
 
-protected:// QOpenGLWidget overrides
-    void initializeGL() override;
+protected: // QOpenGLWidget overrides
+  void initializeGL() override;
 
-private:// interaction events
-    void bindEvents();
+private: // interaction events
+  void bindEvents();
 
-private:// other events
-    void updateFlyMode();
+private: // other events
+  void updateFlyMode();
 
-    void resetFlyModeKeys();
+  void resetFlyModeKeys();
 
-private:// implement ToolBoxConnector interface
-    PickRequest doGetPickRequest(float x, float y) const override;
+private: // implement ToolBoxConnector interface
+  PickRequest doGetPickRequest(float x, float y) const override;
 
-    Model::PickResult doPick(const vm::ray3 &pickRay) const override;
+  Model::PickResult doPick(const vm::ray3& pickRay) const override;
 
-private:// implement RenderView interface
-    void doUpdateViewport(int x, int y, int width, int height) override;
+private: // implement RenderView interface
+  void doUpdateViewport(int x, int y, int width, int height) override;
 
-private:// implement MapView interface
-    vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
+private: // implement MapView interface
+  vm::vec3 doGetPasteObjectsDelta(
+    const vm::bbox3& bounds, const vm::bbox3& referenceBounds) const override;
 
-    bool doCanSelectTall() override;
+  bool doCanSelectTall() override;
 
-    void doSelectTall() override;
+  void doSelectTall() override;
 
-    void doReset2dCameras(const Renderer::Camera &masterCamera, bool animate) override;
+  void doReset2dCameras(const Renderer::Camera& masterCamera, bool animate) override;
 
-    void doFocusCameraOnSelection(bool animate) override;
+  void doFocusCameraOnSelection(bool animate) override;
 
-    void doFocusCameraOnEntityByName(const std::string name);
+  void doFocusCameraOnEntityByName(const std::string name);
 
-    vm::vec3f focusCameraOnObjectsPosition(const std::vector<Model::Node *> &nodes);
+  vm::vec3f focusCameraOnObjectsPosition(const std::vector<Model::Node*>& nodes);
 
-    void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
+  void doMoveCameraToPosition(const vm::vec3f& position, bool animate) override;
 
-    void animateCamera(const vm::vec3f &position, const vm::vec3f &direction, const vm::vec3f &up, float zoom, int duration = DefaultCameraAnimationDuration);
+  void animateCamera(
+    const vm::vec3f& position,
+    const vm::vec3f& direction,
+    const vm::vec3f& up,
+    float zoom,
+    int duration = DefaultCameraAnimationDuration);
 
-    void doMoveCameraToCurrentTracePoint() override;
+  void doMoveCameraToCurrentTracePoint() override;
 
-private:// implement MapViewBase interface
-    vm::vec3 doGetMoveDirection(vm::direction direction) const override;
+private: // implement MapViewBase interface
+  vm::vec3 doGetMoveDirection(vm::direction direction) const override;
 
-    size_t doGetFlipAxis(const vm::direction direction) const override;
+  size_t doGetFlipAxis(const vm::direction direction) const override;
 
-    vm::vec3 doComputePointEntityPosition(const vm::bbox3 &bounds) const override;
+  vm::vec3 doComputePointEntityPosition(const vm::bbox3& bounds) const override;
 
-    ActionContext::Type doGetActionContext() const override;
+  ActionContext::Type doGetActionContext() const override;
 
-    ActionView doGetActionView() const override;
+  ActionView doGetActionView() const override;
 
-    bool doCancel() override;
+  bool doCancel() override;
 
-    Renderer::RenderMode doGetRenderMode() override;
+  Renderer::RenderMode doGetRenderMode() override;
 
-    Renderer::Camera &doGetCamera() override;
+  Renderer::Camera& doGetCamera() override;
 
-    void doPreRender() override;
+  void doPreRender() override;
 
-    void doRenderGrid(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+  void doRenderGrid(
+    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
 
-    void doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+  void doRenderMap(
+    Renderer::MapRenderer& renderer,
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch) override;
 
-    void doRenderTools(MapViewToolBox &toolBox, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+  void doRenderTools(
+    MapViewToolBox& toolBox,
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch) override;
 
-    void doRenderSoftWorldBounds(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+  void doRenderSoftWorldBounds(
+    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) override;
 
-    bool doBeforePopupMenu() override;
+  bool doBeforePopupMenu() override;
 
-public:// implement CameraLinkableView interface
-    void linkCamera(CameraLinkHelper &linkHelper) override;
+public: // implement CameraLinkableView interface
+  void linkCamera(CameraLinkHelper& linkHelper) override;
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

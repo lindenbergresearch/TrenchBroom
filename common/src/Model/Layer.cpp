@@ -23,63 +23,80 @@
 
 #include "vm/vec_io.h"
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
 kdl_reflect_impl(Layer);
 
-Layer::Layer(std::string name, const bool defaultLayer) : m_defaultLayer{defaultLayer}, m_name{std::move(name)} {
+Layer::Layer(std::string name, const bool defaultLayer)
+  : m_defaultLayer{defaultLayer}
+  , m_name{std::move(name)}
+{
 }
 
-bool Layer::defaultLayer() const {
+bool Layer::defaultLayer() const
+{
   return m_defaultLayer;
 }
 
-const std::string &Layer::name() const {
+const std::string& Layer::name() const
+{
   return m_name;
 }
 
-void Layer::setName(std::string name) {
+void Layer::setName(std::string name)
+{
   m_name = std::move(name);
 }
 
-bool Layer::hasSortIndex() const {
+bool Layer::hasSortIndex() const
+{
   return m_sortIndex.has_value();
 }
 
-int Layer::sortIndex() const {
-  if (defaultLayer()) {
+int Layer::sortIndex() const
+{
+  if (defaultLayer())
+  {
     return defaultLayerSortIndex();
   }
 
   return m_sortIndex.value_or(invalidSortIndex());
 }
 
-void Layer::setSortIndex(const int sortIndex) {
+void Layer::setSortIndex(const int sortIndex)
+{
   m_sortIndex = sortIndex;
 }
 
-const std::optional<Color> &Layer::color() const {
+const std::optional<Color>& Layer::color() const
+{
   return m_color;
 }
 
-void Layer::setColor(const Color &color) {
+void Layer::setColor(const Color& color)
+{
   m_color = color;
 }
 
-bool Layer::omitFromExport() const {
+bool Layer::omitFromExport() const
+{
   return m_omitFromExport;
 }
 
-void Layer::setOmitFromExport(const bool omitFromExport) {
+void Layer::setOmitFromExport(const bool omitFromExport)
+{
   m_omitFromExport = omitFromExport;
 }
 
-int Layer::invalidSortIndex() {
+int Layer::invalidSortIndex()
+{
   return std::numeric_limits<int>::max();
 }
 
-int Layer::defaultLayerSortIndex() {
-  return - 1;
+int Layer::defaultLayerSortIndex()
+{
+  return -1;
 }
 
 } // namespace TrenchBroom::Model

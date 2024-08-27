@@ -24,12 +24,15 @@
 
 #include "kdl/bitset.h"
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class EntityDefinition;
 }
 
-namespace Model {
+namespace Model
+{
 class EntityNodeBase;
 
 
@@ -60,14 +63,15 @@ class PatchNode;
 class WorldNode;
 
 
-class EditorContext {
+class EditorContext
+{
 private:
   TagType::Type m_hiddenTags;
   kdl::bitset m_hiddenEntityDefinitions;
 
   bool m_blockSelection;
 
-  Model::GroupNode *m_currentGroup;
+  Model::GroupNode* m_currentGroup;
 
 public:
   Notifier<> editorContextDidChangeNotifier;
@@ -81,72 +85,72 @@ public:
 
   void setHiddenTags(TagType::Type hiddenTags);
 
-  bool entityDefinitionHidden(const Model::EntityNodeBase *entityNode) const;
+  bool entityDefinitionHidden(const Model::EntityNodeBase* entityNode) const;
 
-  bool entityDefinitionHidden(const Assets::EntityDefinition *definition) const;
+  bool entityDefinitionHidden(const Assets::EntityDefinition* definition) const;
 
-  void setEntityDefinitionHidden(const Assets::EntityDefinition *definition, bool hidden);
+  void setEntityDefinitionHidden(const Assets::EntityDefinition* definition, bool hidden);
 
   bool blockSelection() const;
 
   void setBlockSelection(bool blockSelection);
 
 public:
-  Model::GroupNode *currentGroup() const;
+  Model::GroupNode* currentGroup() const;
 
-  void pushGroup(Model::GroupNode *groupNode);
+  void pushGroup(Model::GroupNode* groupNode);
 
   void popGroup();
 
 public:
-  bool visible(const Model::Node *node) const;
+  bool visible(const Model::Node* node) const;
 
-  bool visible(const Model::WorldNode *worldNode) const;
+  bool visible(const Model::WorldNode* worldNode) const;
 
-  bool visible(const Model::LayerNode *layerNode) const;
+  bool visible(const Model::LayerNode* layerNode) const;
 
-  bool visible(const Model::GroupNode *groupNode) const;
+  bool visible(const Model::GroupNode* groupNode) const;
 
-  bool visible(const Model::EntityNode *entityNode) const;
+  bool visible(const Model::EntityNode* entityNode) const;
 
-  bool visible(const Model::BrushNode *brushNode) const;
+  bool visible(const Model::BrushNode* brushNode) const;
 
-  bool visible(const Model::BrushNode *brushNode, const Model::BrushFace &face) const;
+  bool visible(const Model::BrushNode* brushNode, const Model::BrushFace& face) const;
 
-  bool visible(const Model::PatchNode *patchNode) const;
+  bool visible(const Model::PatchNode* patchNode) const;
 
 private:
-  bool anyChildVisible(const Model::Node *node) const;
+  bool anyChildVisible(const Model::Node* node) const;
 
 public:
-  bool editable(const Model::Node *node) const;
+  bool editable(const Model::Node* node) const;
 
-  bool editable(const Model::BrushNode *brushNode, const Model::BrushFace &face) const;
+  bool editable(const Model::BrushNode* brushNode, const Model::BrushFace& face) const;
 
-  bool selectable(const Model::Node *node) const;
+  bool selectable(const Model::Node* node) const;
 
-  bool selectable(const Model::WorldNode *worldNode) const;
+  bool selectable(const Model::WorldNode* worldNode) const;
 
-  bool selectable(const Model::LayerNode *layerNode) const;
+  bool selectable(const Model::LayerNode* layerNode) const;
 
-  bool selectable(const Model::GroupNode *groupNode) const;
+  bool selectable(const Model::GroupNode* groupNode) const;
 
-  bool selectable(const Model::EntityNode *entityNode) const;
+  bool selectable(const Model::EntityNode* entityNode) const;
 
-  bool selectable(const Model::BrushNode *brushNode) const;
+  bool selectable(const Model::BrushNode* brushNode) const;
 
-  bool selectable(const Model::BrushNode *brushNode, const Model::BrushFace &face) const;
+  bool selectable(const Model::BrushNode* brushNode, const Model::BrushFace& face) const;
 
-  bool selectable(const Model::PatchNode *patchNode) const;
+  bool selectable(const Model::PatchNode* patchNode) const;
 
   bool canChangeSelection() const;
 
-  bool inOpenGroup(const Model::Object *object) const;
+  bool inOpenGroup(const Model::Object* object) const;
 
 private:
-  EditorContext(const EditorContext &);
+  EditorContext(const EditorContext&);
 
-  EditorContext &operator=(const EditorContext &);
+  EditorContext& operator=(const EditorContext&);
 };
 } // namespace Model
 } // namespace TrenchBroom

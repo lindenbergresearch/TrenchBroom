@@ -34,43 +34,60 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class PropertyDefinition;
 }
 
-namespace IO {
-enum class EntityDefinitionClassType {
-    PointClass,
-    BrushClass,
-    BaseClass
+namespace IO
+{
+enum class EntityDefinitionClassType
+{
+  PointClass,
+  BrushClass,
+  BaseClass
 };
 
-std::ostream &operator<<(std::ostream &str, EntityDefinitionClassType type);
+std::ostream& operator<<(std::ostream& str, EntityDefinitionClassType type);
 
 
-struct EntityDefinitionClassInfo {
-    EntityDefinitionClassType type;
-    size_t line;
-    size_t column;
-    std::string name;
+struct EntityDefinitionClassInfo
+{
+  EntityDefinitionClassType type;
+  size_t line;
+  size_t column;
+  std::string name;
 
-    std::optional<std::string> description;
-    std::optional<Color> color;
-    std::optional<vm::bbox3> size;
-    std::optional<Assets::ModelDefinition> modelDefinition;
-    std::optional<Assets::DecalDefinition> decalDefinition;
+  std::optional<std::string> description;
+  std::optional<Color> color;
+  std::optional<vm::bbox3> size;
+  std::optional<Assets::ModelDefinition> modelDefinition;
+  std::optional<Assets::DecalDefinition> decalDefinition;
 
-    std::vector<std::shared_ptr<Assets::PropertyDefinition>> propertyDefinitions;
-    std::vector<std::string> superClasses;
+  std::vector<std::shared_ptr<Assets::PropertyDefinition>> propertyDefinitions;
+  std::vector<std::string> superClasses;
 
-    kdl_reflect_decl(EntityDefinitionClassInfo, type, line, column, name, description, color, size, modelDefinition, decalDefinition, propertyDefinitions,
-                     superClasses);
+  kdl_reflect_decl(
+    EntityDefinitionClassInfo,
+    type,
+    line,
+    column,
+    name,
+    description,
+    color,
+    size,
+    modelDefinition,
+    decalDefinition,
+    propertyDefinitions,
+    superClasses);
 };
 
 
 bool addPropertyDefinition(
-    std::vector<std::shared_ptr<Assets::PropertyDefinition>> &propertyDefinitions, std::shared_ptr<Assets::PropertyDefinition> propertyDefinition);
+  std::vector<std::shared_ptr<Assets::PropertyDefinition>>& propertyDefinitions,
+  std::shared_ptr<Assets::PropertyDefinition> propertyDefinition);
 
-}// namespace IO
-}// namespace TrenchBroom
+} // namespace IO
+} // namespace TrenchBroom

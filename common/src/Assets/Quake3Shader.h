@@ -24,11 +24,15 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Assets {
-class Quake3ShaderStage {
+namespace TrenchBroom
+{
+namespace Assets
+{
+class Quake3ShaderStage
+{
 public:
-  struct BlendFunc {
+  struct BlendFunc
+  {
     std::string srcFactor;
     std::string destFactor;
 
@@ -59,19 +63,25 @@ public:
 };
 
 
-bool operator==(const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs);
+bool operator==(
+  const Quake3ShaderStage::BlendFunc& lhs, const Quake3ShaderStage::BlendFunc& rhs);
 
-bool operator!=(const Quake3ShaderStage::BlendFunc &lhs, const Quake3ShaderStage::BlendFunc &rhs);
+bool operator!=(
+  const Quake3ShaderStage::BlendFunc& lhs, const Quake3ShaderStage::BlendFunc& rhs);
 
-bool operator==(const Quake3ShaderStage &lhs, const Quake3ShaderStage &rhs);
+bool operator==(const Quake3ShaderStage& lhs, const Quake3ShaderStage& rhs);
 
-bool operator!=(const Quake3ShaderStage &lhs, const Quake3ShaderStage &rhs);
+bool operator!=(const Quake3ShaderStage& lhs, const Quake3ShaderStage& rhs);
 
 
-class Quake3Shader {
+class Quake3Shader
+{
 public:
-  enum class Culling {
-    Front, Back, None
+  enum class Culling
+  {
+    Front,
+    Back,
+    None
   };
 
 public:
@@ -83,12 +93,12 @@ public:
   std::vector<Quake3ShaderStage> stages = {};
 
 public:
-  Quake3ShaderStage &addStage();
+  Quake3ShaderStage& addStage();
 };
 
 
-bool operator==(const Quake3Shader &lhs, const Quake3Shader &rhs);
+bool operator==(const Quake3Shader& lhs, const Quake3Shader& rhs);
 
-bool operator!=(const Quake3Shader &lhs, const Quake3Shader &rhs);
+bool operator!=(const Quake3Shader& lhs, const Quake3Shader& rhs);
 } // namespace Assets
 } // namespace TrenchBroom

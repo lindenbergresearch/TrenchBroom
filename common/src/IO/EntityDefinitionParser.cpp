@@ -32,44 +32,66 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 static const auto DefaultSize = vm::bbox3(-8, +8);
 
-EntityDefinitionParser::EntityDefinitionParser(const Color &defaultEntityColor) : m_defaultEntityColor{defaultEntityColor} {
+EntityDefinitionParser::EntityDefinitionParser(const Color& defaultEntityColor)
+  : m_defaultEntityColor{defaultEntityColor}
+{
 }
 
 EntityDefinitionParser::~EntityDefinitionParser() {}
 
 static std::shared_ptr<Assets::PropertyDefinition> mergeAttributes(
-    const Assets::PropertyDefinition &inheritingClassAttribute, const Assets::PropertyDefinition &superClassAttribute) {
-    assert(inheritingClassAttribute.key() == superClassAttribute.key());
+  const Assets::PropertyDefinition& inheritingClassAttribute,
+  const Assets::PropertyDefinition& superClassAttribute)
+{
+  assert(inheritingClassAttribute.key() == superClassAttribute.key());
 
-    // for now, only merge spawnflags
-    if (superClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty && inheritingClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty && superClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags && inheritingClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags) {
+  // for now, only merge spawnflags
+  if (
+    superClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty
+    && inheritingClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty
+    && superClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags
+    && inheritingClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags)
+  {
 
-        const auto &name = inheritingClassAttribute.key();
-        auto result = std::make_shared<Assets::FlagsPropertyDefinition>(name);
+    const auto& name = inheritingClassAttribute.key();
+    auto result = std::make_shared<Assets::FlagsPropertyDefinition>(name);
 
-        const auto &baseclassFlags = static_cast<const Assets::FlagsPropertyDefinition &>(superClassAttribute);
-        const auto &classFlags = static_cast<const Assets::FlagsPropertyDefinition &>(inheritingClassAttribute);
+    const auto& baseclassFlags =
+      static_cast<const Assets::FlagsPropertyDefinition&>(superClassAttribute);
+    const auto& classFlags =
+      static_cast<const Assets::FlagsPropertyDefinition&>(inheritingClassAttribute);
 
-        for (int i = 0; i < 24; ++i) {
-            const auto *baseclassFlag = baseclassFlags.option(static_cast<int>(1 << i));
-            const auto *classFlag = classFlags.option(static_cast<int>(1 << i));
+    for (int i = 0; i < 24; ++i)
+    {
+      const auto* baseclassFlag = baseclassFlags.option(static_cast<int>(1 << i));
+      const auto* classFlag = classFlags.option(static_cast<int>(1 << i));
 
-            if (baseclassFlag != nullptr && classFlag == nullptr) {
-                result->addOption(
-                    baseclassFlag->value(), baseclassFlag->shortDescription(), baseclassFlag->longDescription(), baseclassFlag->isDefault());
-            } else if (classFlag != nullptr) {
-                result->addOption(
-                    classFlag->value(), classFlag->shortDescription(), classFlag->longDescription(), classFlag->isDefault());
-            }
-        }
-
-        return result;
+      if (baseclassFlag != nullptr && classFlag == nullptr)
+      {
+        result->addOption(
+          baseclassFlag->value(),
+          baseclassFlag->shortDescription(),
+          baseclassFlag->longDescription(),
+          baseclassFlag->isDefault());
+      }
+      else if (classFlag != nullptr)
+      {
+        result->addOption(
+          classFlag->value(),
+          classFlag->shortDescription(),
+          classFlag->longDescription(),
+          classFlag->isDefault());
+      }
     }
 
-    return nullptr;
+    return result;
+  }
+
+  return nullptr;
 }
 
 /**
@@ -80,42 +102,59 @@ static std::shared_ptr<Assets::PropertyDefinition> mergeAttributes(
  * - spawnflags are merged together
  * - model definitions are merged together
  */
-static void inheritAttributes(EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass) {
-    if (!inheritingClass.description) {
-        inheritingClass.description = superClass.description;
-    }
-    if (!inheritingClass.color) {
-        inheritingClass.color = superClass.color;
-    }
-    if (!inheritingClass.size) {
-        inheritingClass.size = superClass.size;
-    }
+static void inheritAttributes(
+  EntityDefinitionClassInfo& inheritingClass, const EntityDefinitionClassInfo& superClass)
+{
+  if (!inheritingClass.description)
+  {
+    inheritingClass.description = superClass.description;
+  }
+  if (!inheritingClass.color)
+  {
+    inheritingClass.color = superClass.color;
+  }
+  if (!inheritingClass.size)
+  {
+    inheritingClass.size = superClass.size;
+  }
 
-    for (const auto &attribute: superClass.propertyDefinitions) {
-        auto it = std::find_if(
-            std::begin(inheritingClass.propertyDefinitions), std::end(inheritingClass.propertyDefinitions),
-            [&](const auto &a) { return a->key() == attribute->key(); });
-        if (it == std::end(inheritingClass.propertyDefinitions)) {
-            inheritingClass.propertyDefinitions.push_back(attribute);
-        } else {
-            auto mergedAttribute = mergeAttributes(**it, *attribute);
-            if (mergedAttribute != nullptr) {
-                *it = mergedAttribute;
-            }
-        }
+  for (const auto& attribute : superClass.propertyDefinitions)
+  {
+    auto it = std::find_if(
+      std::begin(inheritingClass.propertyDefinitions),
+      std::end(inheritingClass.propertyDefinitions),
+      [&](const auto& a) { return a->key() == attribute->key(); });
+    if (it == std::end(inheritingClass.propertyDefinitions))
+    {
+      inheritingClass.propertyDefinitions.push_back(attribute);
     }
+    else
+    {
+      auto mergedAttribute = mergeAttributes(**it, *attribute);
+      if (mergedAttribute != nullptr)
+      {
+        *it = mergedAttribute;
+      }
+    }
+  }
 
-    if (!inheritingClass.modelDefinition) {
-        inheritingClass.modelDefinition = superClass.modelDefinition;
-    } else if (superClass.modelDefinition) {
-        inheritingClass.modelDefinition->append(*superClass.modelDefinition);
-    }
+  if (!inheritingClass.modelDefinition)
+  {
+    inheritingClass.modelDefinition = superClass.modelDefinition;
+  }
+  else if (superClass.modelDefinition)
+  {
+    inheritingClass.modelDefinition->append(*superClass.modelDefinition);
+  }
 
-    if (!inheritingClass.decalDefinition) {
-        inheritingClass.decalDefinition = superClass.decalDefinition;
-    } else if (superClass.decalDefinition) {
-        inheritingClass.decalDefinition->append(*superClass.decalDefinition);
-    }
+  if (!inheritingClass.decalDefinition)
+  {
+    inheritingClass.decalDefinition = superClass.decalDefinition;
+  }
+  else if (superClass.decalDefinition)
+  {
+    inheritingClass.decalDefinition->append(*superClass.decalDefinition);
+  }
 }
 
 /**
@@ -151,21 +190,28 @@ static void inheritAttributes(EntityDefinitionClassInfo &inheritingClass, const 
  * from the inheriting class to the given super class
  *
  */
-template<typename F>
+template <typename F>
 static void inheritFromAndRecurse(
-    ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass, const F &findClassInfos,
-    std::unordered_set<std::string> &visited) {
-    if (!visited.insert(superClass.name).second) {
-        status.error(
-            inheritingClass.line, inheritingClass.column, "Entity definition class hierarchy contains a cycle");
-        return;
-    }
+  ParserStatus& status,
+  EntityDefinitionClassInfo& inheritingClass,
+  const EntityDefinitionClassInfo& superClass,
+  const F& findClassInfos,
+  std::unordered_set<std::string>& visited)
+{
+  if (!visited.insert(superClass.name).second)
+  {
+    status.error(
+      inheritingClass.line,
+      inheritingClass.column,
+      "Entity definition class hierarchy contains a cycle");
+    return;
+  }
 
-    inheritAttributes(inheritingClass, superClass);
-    findSuperClassesAndInheritFrom(
-        status, inheritingClass, superClass, findClassInfos, visited);
+  inheritAttributes(inheritingClass, superClass);
+  findSuperClassesAndInheritFrom(
+    status, inheritingClass, superClass, findClassInfos, visited);
 
-    visited.erase(superClass.name);
+  visited.erase(superClass.name);
 }
 
 /**
@@ -204,44 +250,63 @@ static void inheritFromAndRecurse(
  * @param visited a set that contains the names of the classes visited so far on the path
  * from the inheriting class to the given super class
  */
-template<typename F>
+template <typename F>
 static void findSuperClassesAndInheritFrom(
-    ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &classWithSuperClasses, const F &findClassInfos,
-    std::unordered_set<std::string> &visited) {
-    const auto selectSuperClass = [&](const auto &potentialSuperClasses) -> const EntityDefinitionClassInfo * {
-        if (potentialSuperClasses.size() == 1u) {
-            return potentialSuperClasses.front();
-        } else if (potentialSuperClasses.size() > 1u) {
-            // find a super class with the same class type as the inheriting class
-            for (const auto *potentialSuperClass: potentialSuperClasses) {
-                if (potentialSuperClass->type == inheritingClass.type) {
-                    return potentialSuperClass;
-                }
-            }
-
-            if (inheritingClass.type != EntityDefinitionClassType::BaseClass) {
-                // find a super class of type BaseClass
-                for (const auto *potentialSuperClass: potentialSuperClasses) {
-                    if (potentialSuperClass->type == EntityDefinitionClassType::BaseClass) {
-                        return potentialSuperClass;
-                    }
-                }
-            }
-        }
-
-        return nullptr;
-    };
-
-    for (const auto &nextSuperClassName: classWithSuperClasses.superClasses) {
-        const auto *nextSuperClass = selectSuperClass(findClassInfos(nextSuperClassName));
-        if (nextSuperClass == nullptr) {
-            status.error(
-                classWithSuperClasses.line, classWithSuperClasses.column, "No matching super class found for '" + nextSuperClassName + "'");
-        } else {
-            inheritFromAndRecurse(
-                status, inheritingClass, *nextSuperClass, findClassInfos, visited);
-        }
+  ParserStatus& status,
+  EntityDefinitionClassInfo& inheritingClass,
+  const EntityDefinitionClassInfo& classWithSuperClasses,
+  const F& findClassInfos,
+  std::unordered_set<std::string>& visited)
+{
+  const auto selectSuperClass =
+    [&](const auto& potentialSuperClasses) -> const EntityDefinitionClassInfo* {
+    if (potentialSuperClasses.size() == 1u)
+    {
+      return potentialSuperClasses.front();
     }
+    else if (potentialSuperClasses.size() > 1u)
+    {
+      // find a super class with the same class type as the inheriting class
+      for (const auto* potentialSuperClass : potentialSuperClasses)
+      {
+        if (potentialSuperClass->type == inheritingClass.type)
+        {
+          return potentialSuperClass;
+        }
+      }
+
+      if (inheritingClass.type != EntityDefinitionClassType::BaseClass)
+      {
+        // find a super class of type BaseClass
+        for (const auto* potentialSuperClass : potentialSuperClasses)
+        {
+          if (potentialSuperClass->type == EntityDefinitionClassType::BaseClass)
+          {
+            return potentialSuperClass;
+          }
+        }
+      }
+    }
+
+    return nullptr;
+  };
+
+  for (const auto& nextSuperClassName : classWithSuperClasses.superClasses)
+  {
+    const auto* nextSuperClass = selectSuperClass(findClassInfos(nextSuperClassName));
+    if (nextSuperClass == nullptr)
+    {
+      status.error(
+        classWithSuperClasses.line,
+        classWithSuperClasses.column,
+        "No matching super class found for '" + nextSuperClassName + "'");
+    }
+    else
+    {
+      inheritFromAndRecurse(
+        status, inheritingClass, *nextSuperClass, findClassInfos, visited);
+    }
+  }
 }
 
 /**
@@ -260,13 +325,16 @@ static void findSuperClassesAndInheritFrom(
  * @return a copy of the given inheriting class, with all attributes it inherits from its
  * super classes added
  */
-template<typename F>
+template <typename F>
 static EntityDefinitionClassInfo resolveInheritance(
-    ParserStatus &status, EntityDefinitionClassInfo inheritingClass, const F &findClassInfos) {
-    auto visited = std::unordered_set<std::string>();
-    findSuperClassesAndInheritFrom(
-        status, inheritingClass, inheritingClass, findClassInfos, visited);
-    return inheritingClass;
+  ParserStatus& status,
+  EntityDefinitionClassInfo inheritingClass,
+  const F& findClassInfos)
+{
+  auto visited = std::unordered_set<std::string>();
+  findSuperClassesAndInheritFrom(
+    status, inheritingClass, inheritingClass, findClassInfos, visited);
+  return inheritingClass;
 }
 
 /**
@@ -275,32 +343,44 @@ static EntityDefinitionClassInfo resolveInheritance(
  * types point and brush each. That is, any duplicate is redundant with the exception of
  * overloaded point and brush classes.
  */
-static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos) {
-    std::vector<EntityDefinitionClassInfo> result;
-    result.reserve(classInfos.size());
+static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(
+  ParserStatus& status, const std::vector<EntityDefinitionClassInfo>& classInfos)
+{
+  std::vector<EntityDefinitionClassInfo> result;
+  result.reserve(classInfos.size());
 
-    const auto getMask = [](const auto type) { return 1 << static_cast<int>(type); };
+  const auto getMask = [](const auto type) { return 1 << static_cast<int>(type); };
 
-    const auto baseClassMask = getMask(EntityDefinitionClassType::BaseClass);
+  const auto baseClassMask = getMask(EntityDefinitionClassType::BaseClass);
 
-    std::unordered_map<std::string, int> seen;
-    for (const auto &classInfo: classInfos) {
-        auto &seenMask = seen[classInfo.name];
-        const auto classMask = getMask(classInfo.type);
+  std::unordered_map<std::string, int> seen;
+  for (const auto& classInfo : classInfos)
+  {
+    auto& seenMask = seen[classInfo.name];
+    const auto classMask = getMask(classInfo.type);
 
-        if (classMask & seenMask) {
-            status.warn(
-                classInfo.line, classInfo.column, "Duplicate class info '" + classInfo.name + "'");
-        } else if ((seenMask & baseClassMask) || (seenMask != 0 && (classMask & baseClassMask))) {
-            status.warn(
-                classInfo.line, classInfo.column, "Redundant class info '" + classInfo.name + "'");
-        } else {
-            result.push_back(classInfo);
-            seenMask |= classMask;
-        }
+    if (classMask & seenMask)
+    {
+      status.warn(
+        classInfo.line,
+        classInfo.column,
+        "Duplicate class info '" + classInfo.name + "'");
     }
+    else if ((seenMask & baseClassMask) || (seenMask != 0 && (classMask & baseClassMask)))
+    {
+      status.warn(
+        classInfo.line,
+        classInfo.column,
+        "Redundant class info '" + classInfo.name + "'");
+    }
+    else
+    {
+      result.push_back(classInfo);
+      seenMask |= classMask;
+    }
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -310,69 +390,96 @@ static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(ParserStatu
  *
  * Exposed for testing.
  */
-std::vector<EntityDefinitionClassInfo> resolveInheritance(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos) {
-    const auto filteredClassInfos = filterRedundantClasses(status, classInfos);
-    const auto findClassInfos = [&](const auto &name) -> std::vector<const EntityDefinitionClassInfo *> {
-        std::vector<const EntityDefinitionClassInfo *> result;
-        for (const auto &classInfo: filteredClassInfos) {
-            if (classInfo.name == name) {
-                result.push_back(&classInfo);
-            }
-        }
-        return result;
-    };
-
-    std::vector<EntityDefinitionClassInfo> result;
-    for (const auto &classInfo: filteredClassInfos) {
-        if (classInfo.type != EntityDefinitionClassType::BaseClass) {
-            result.push_back(resolveInheritance(status, classInfo, findClassInfos));
-        }
+std::vector<EntityDefinitionClassInfo> resolveInheritance(
+  ParserStatus& status, const std::vector<EntityDefinitionClassInfo>& classInfos)
+{
+  const auto filteredClassInfos = filterRedundantClasses(status, classInfos);
+  const auto findClassInfos =
+    [&](const auto& name) -> std::vector<const EntityDefinitionClassInfo*> {
+    std::vector<const EntityDefinitionClassInfo*> result;
+    for (const auto& classInfo : filteredClassInfos)
+    {
+      if (classInfo.name == name)
+      {
+        result.push_back(&classInfo);
+      }
     }
     return result;
+  };
+
+  std::vector<EntityDefinitionClassInfo> result;
+  for (const auto& classInfo : filteredClassInfos)
+  {
+    if (classInfo.type != EntityDefinitionClassType::BaseClass)
+    {
+      result.push_back(resolveInheritance(status, classInfo, findClassInfos));
+    }
+  }
+  return result;
 }
 
-namespace {
-std::unique_ptr<Assets::EntityDefinition> createDefinition(EntityDefinitionClassInfo classInfo, const Color &defaultEntityColor) {
-    auto name = std::move(classInfo.name);
-    auto color = std::move(classInfo.color).value_or(defaultEntityColor);
-    auto size = std::move(classInfo.size).value_or(DefaultSize);
-    auto description = std::move(classInfo.description).value_or("");
-    auto propertyDefinitions = std::move(classInfo.propertyDefinitions);
-    auto modelDefinition = std::move(classInfo.modelDefinition).value_or(Assets::ModelDefinition{});
-    auto decalDefinition = std::move(classInfo.decalDefinition).value_or(Assets::DecalDefinition{});
+namespace
+{
+std::unique_ptr<Assets::EntityDefinition> createDefinition(
+  EntityDefinitionClassInfo classInfo, const Color& defaultEntityColor)
+{
+  auto name = std::move(classInfo.name);
+  auto color = std::move(classInfo.color).value_or(defaultEntityColor);
+  auto size = std::move(classInfo.size).value_or(DefaultSize);
+  auto description = std::move(classInfo.description).value_or("");
+  auto propertyDefinitions = std::move(classInfo.propertyDefinitions);
+  auto modelDefinition =
+    std::move(classInfo.modelDefinition).value_or(Assets::ModelDefinition{});
+  auto decalDefinition =
+    std::move(classInfo.decalDefinition).value_or(Assets::DecalDefinition{});
 
-    switch (classInfo.type) {
-        case EntityDefinitionClassType::PointClass:
-            return std::make_unique<Assets::PointEntityDefinition>(
-                std::move(name), color, size, std::move(description), std::move(propertyDefinitions), std::move(modelDefinition), std::move(decalDefinition));
-        case EntityDefinitionClassType::BrushClass:
-            return std::make_unique<Assets::BrushEntityDefinition>(
-                std::move(name), color, std::move(description), std::move(propertyDefinitions));
-        case EntityDefinitionClassType::BaseClass:
-            return nullptr;
-            switchDefault();
-    };
+  switch (classInfo.type)
+  {
+  case EntityDefinitionClassType::PointClass:
+    return std::make_unique<Assets::PointEntityDefinition>(
+      std::move(name),
+      color,
+      size,
+      std::move(description),
+      std::move(propertyDefinitions),
+      std::move(modelDefinition),
+      std::move(decalDefinition));
+  case EntityDefinitionClassType::BrushClass:
+    return std::make_unique<Assets::BrushEntityDefinition>(
+      std::move(name), color, std::move(description), std::move(propertyDefinitions));
+  case EntityDefinitionClassType::BaseClass:
+    return nullptr;
+    switchDefault();
+  };
 }
 
 std::vector<std::unique_ptr<Assets::EntityDefinition>> createDefinitions(
-    ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos, const Color &defaultEntityColor) {
-    const auto resolvedClasses = resolveInheritance(status, filterRedundantClasses(status, classInfos));
+  ParserStatus& status,
+  const std::vector<EntityDefinitionClassInfo>& classInfos,
+  const Color& defaultEntityColor)
+{
+  const auto resolvedClasses =
+    resolveInheritance(status, filterRedundantClasses(status, classInfos));
 
-    auto result = std::vector<std::unique_ptr<Assets::EntityDefinition>>{};
-    for (auto classInfo: resolvedClasses) {
-        if (auto definition = createDefinition(std::move(classInfo), defaultEntityColor)) {
-            result.push_back(std::move(definition));
-        }
+  auto result = std::vector<std::unique_ptr<Assets::EntityDefinition>>{};
+  for (auto classInfo : resolvedClasses)
+  {
+    if (auto definition = createDefinition(std::move(classInfo), defaultEntityColor))
+    {
+      result.push_back(std::move(definition));
     }
+  }
 
-    return result;
+  return result;
 }
 
-}// namespace
+} // namespace
 
-std::vector<std::unique_ptr<Assets::EntityDefinition>> EntityDefinitionParser::parseDefinitions(ParserStatus &status) {
-    const auto classInfos = parseClassInfos(status);
-    return createDefinitions(status, classInfos, m_defaultEntityColor);
+std::vector<std::unique_ptr<Assets::EntityDefinition>> EntityDefinitionParser::
+  parseDefinitions(ParserStatus& status)
+{
+  const auto classInfos = parseClassInfos(status);
+  return createDefinitions(status, classInfos, m_defaultEntityColor);
 }
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

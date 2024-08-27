@@ -24,45 +24,50 @@
 
 #include <string>
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 class Quake3Shader;
 
 
 class Quake3ShaderStage;
-}// namespace TrenchBroom::Assets
+} // namespace TrenchBroom::Assets
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class ParserStatus;
 
-namespace Quake3ShaderToken {
+namespace Quake3ShaderToken
+{
 using Type = unsigned int;
-static const Type Number = 1 << 1;  // decimal number
-static const Type String = 1 << 2;  // string
-static const Type Variable = 1 << 3;// variable starting with $
-static const Type OBrace = 1 << 4;  // opening brace: {
-static const Type CBrace = 1 << 5;  // closing brace: }
-static const Type Comment = 1 << 6; // line comment starting with //
-static const Type Eol = 1 << 7;     // end of line
-static const Type Eof = 1 << 8;     // end of file
-}// namespace Quake3ShaderToken
+static const Type Number = 1 << 1;   // decimal number
+static const Type String = 1 << 2;   // string
+static const Type Variable = 1 << 3; // variable starting with $
+static const Type OBrace = 1 << 4;   // opening brace: {
+static const Type CBrace = 1 << 5;   // closing brace: }
+static const Type Comment = 1 << 6;  // line comment starting with //
+static const Type Eol = 1 << 7;      // end of line
+static const Type Eof = 1 << 8;      // end of file
+} // namespace Quake3ShaderToken
 
-class Quake3ShaderTokenizer : public Tokenizer<Quake3ShaderToken::Type> {
+class Quake3ShaderTokenizer : public Tokenizer<Quake3ShaderToken::Type>
+{
 public:
-    explicit Quake3ShaderTokenizer(std::string_view str);
+  explicit Quake3ShaderTokenizer(std::string_view str);
 
 private:
-    Token emitToken() override;
+  Token emitToken() override;
 };
 
 
-class Quake3ShaderParser : public Parser<Quake3ShaderToken::Type> {
+class Quake3ShaderParser : public Parser<Quake3ShaderToken::Type>
+{
 private:
-    Quake3ShaderTokenizer m_tokenizer;
+  Quake3ShaderTokenizer m_tokenizer;
 
 public:
-    explicit Quake3ShaderParser(std::string_view str);
+  explicit Quake3ShaderParser(std::string_view str);
 
-    /**
+  /**
    * Parses a Quake 3 shader and returns the value of the qer_editorimage entry.
    *
    * @return the value of the qer_editorimage entry or an empty string if no such value
@@ -70,23 +75,23 @@ public:
    *
    * @throws ParserException if the shader is not well-formed
    */
-    std::vector<Assets::Quake3Shader> parse(ParserStatus &status);
+  std::vector<Assets::Quake3Shader> parse(ParserStatus& status);
 
 private:
-    void parseTexture(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseTexture(Assets::Quake3Shader& shader, ParserStatus& status);
 
-    void parseBody(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseBody(Assets::Quake3Shader& shader, ParserStatus& status);
 
-    void parseStage(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseStage(Assets::Quake3Shader& shader, ParserStatus& status);
 
-    void parseBodyEntry(Assets::Quake3Shader &shader, ParserStatus &status);
+  void parseBodyEntry(Assets::Quake3Shader& shader, ParserStatus& status);
 
-    void parseStageEntry(Assets::Quake3ShaderStage &stage, ParserStatus &status);
+  void parseStageEntry(Assets::Quake3ShaderStage& stage, ParserStatus& status);
 
-    void skipRemainderOfEntry();
+  void skipRemainderOfEntry();
 
 private:
-    TokenNameMap tokenNames() const override;
+  TokenNameMap tokenNames() const override;
 };
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

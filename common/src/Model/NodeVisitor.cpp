@@ -19,7 +19,8 @@
 
 #include "NodeVisitor.h"
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
 NodeVisitor::NodeVisitor() = default;
 

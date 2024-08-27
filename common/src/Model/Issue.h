@@ -24,8 +24,10 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class BrushFace;
 
 
@@ -38,15 +40,16 @@ class EntityNodeBase;
 class Node;
 
 
-class Issue {
+class Issue
+{
 protected:
   size_t m_seqId;
   IssueType m_type;
-  Node &m_node;
+  Node& m_node;
   std::string m_description;
 
 public:
-  explicit Issue(IssueType type, Node &node, std::string description);
+  explicit Issue(IssueType type, Node& node, std::string description);
 
   virtual ~Issue();
 
@@ -54,13 +57,13 @@ public:
 
   size_t lineNumber() const;
 
-  const std::string &description() const;
+  const std::string& description() const;
 
   IssueType type() const;
 
-  Node &node() const;
+  Node& node() const;
 
-  bool addSelectableNodes(std::vector<Model::Node *> &nodes) const;
+  bool addSelectableNodes(std::vector<Model::Node*>& nodes) const;
 
   bool hidden() const;
 
@@ -72,36 +75,43 @@ private: // subclassing interface
 };
 
 
-class BrushFaceIssue : public Issue {
+class BrushFaceIssue : public Issue
+{
 private:
   size_t m_faceIndex;
 
 public:
-  BrushFaceIssue(IssueType type, BrushNode &node, size_t faceIndex, std::string description);
+  BrushFaceIssue(
+    IssueType type, BrushNode& node, size_t faceIndex, std::string description);
 
   ~BrushFaceIssue() override;
 
   size_t faceIndex() const;
 
-  const BrushFace &face() const;
+  const BrushFace& face() const;
 
 private:
   size_t doGetLineNumber() const override;
 };
 
 
-class EntityPropertyIssue : public Issue {
+class EntityPropertyIssue : public Issue
+{
 private:
   std::string m_propertyKey;
 
 public:
-  EntityPropertyIssue(IssueType type, EntityNodeBase &entityNode, std::string propertyKey, std::string description);
+  EntityPropertyIssue(
+    IssueType type,
+    EntityNodeBase& entityNode,
+    std::string propertyKey,
+    std::string description);
 
   ~EntityPropertyIssue() override;
 
-  const std::string &propertyKey() const;
+  const std::string& propertyKey() const;
 
-  const std::string &propertyValue() const;
+  const std::string& propertyValue() const;
 };
 } // namespace Model
 } // namespace TrenchBroom

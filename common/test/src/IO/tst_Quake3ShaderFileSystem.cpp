@@ -31,95 +31,96 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("Quake3ShaderFileSystemTest.testShaderLinking") {
-auto logger = NullLogger{};
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("Quake3ShaderFileSystemTest.testShaderLinking")
+{
+  auto logger = NullLogger{};
 
-const auto workDir = std::filesystem::current_path();
-const auto testDir = workDir / "fixture/test/IO/Shader/fs/linking";
-const auto fallbackDir = testDir / "fallback";
-const auto texturePrefix = std::filesystem::path{"textures"};
-const auto shaderSearchPath = std::filesystem::path{"scripts"};
-const auto textureSearchPaths = std::vector<std::filesystem::path>{texturePrefix};
+  const auto workDir = std::filesystem::current_path();
+  const auto testDir = workDir / "fixture/test/IO/Shader/fs/linking";
+  const auto fallbackDir = testDir / "fallback";
+  const auto texturePrefix = std::filesystem::path{"textures"};
+  const auto shaderSearchPath = std::filesystem::path{"scripts"};
+  const auto textureSearchPaths = std::vector<std::filesystem::path>{texturePrefix};
 
-// We need to mount the fallback dir so that we can find "__TB_empty.png" which is
-// automatically linked when no editor image is available.
-auto fs = VirtualFileSystem{};
-fs.mount("",
-std::make_unique<DiskFileSystem>(fallbackDir)
-);
-fs.mount("",
-std::make_unique<DiskFileSystem>(testDir)
-);
-fs.mount("",
-createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger
-).
+  // We need to mount the fallback dir so that we can find "__TB_empty.png" which is
+  // automatically linked when no editor image is available.
+  auto fs = VirtualFileSystem{};
+  fs.mount("", std::make_unique<DiskFileSystem>(fallbackDir));
+  fs.mount("", std::make_unique<DiskFileSystem>(testDir));
+  fs.mount(
+    "",
+    createImageFileSystem<Quake3ShaderFileSystem>(
+      fs, shaderSearchPath, textureSearchPaths, logger)
+      .
 
-value()
+    value()
 
-);
+  );
 
-CHECK_THAT(fs
-.
-find(texturePrefix
-/ "test", TraversalMode::Flat, makeExtensionPathMatcher( {
-""
-}
-)), MatchesPathsResult( {
-texturePrefix / "test/editor_image", texturePrefix / "test/not_existing", texturePrefix / "test/not_existing2", texturePrefix / "test/test",
-texturePrefix / "test/test2",
-}
-));
+  CHECK_THAT(
+    fs.find(texturePrefix / "test", TraversalMode::Flat, makeExtensionPathMatcher({""})),
+    MatchesPathsResult({
+      texturePrefix / "test/editor_image",
+      texturePrefix / "test/not_existing",
+      texturePrefix / "test/not_existing2",
+      texturePrefix / "test/test",
+      texturePrefix / "test/test2",
+    }));
 
-CHECK_THAT(fs
-.
-find(texturePrefix, TraversalMode::Recursive, makeExtensionPathMatcher({""})
-), MatchesPathsResult({
-texturePrefix / "__TB_empty", texturePrefix / "test", texturePrefix / "test/editor_image", texturePrefix / "test/not_existing",
-texturePrefix / "test/not_existing2", texturePrefix / "test/test", texturePrefix / "test/test2",
-}
-));
+  CHECK_THAT(
+    fs.find(texturePrefix, TraversalMode::Recursive, makeExtensionPathMatcher({""})),
+    MatchesPathsResult({
+      texturePrefix / "__TB_empty",
+      texturePrefix / "test",
+      texturePrefix / "test/editor_image",
+      texturePrefix / "test/not_existing",
+      texturePrefix / "test/not_existing2",
+      texturePrefix / "test/test",
+      texturePrefix / "test/test2",
+    }));
 }
 
 TEST_CASE("Quake3ShaderFileSystemTest.testSkipMalformedFiles")
 {
-auto logger = NullLogger{};
+  auto logger = NullLogger{};
 
-// There is one malformed shader script, this should be skipped.
+  // There is one malformed shader script, this should be skipped.
 
-const auto workDir = std::filesystem::current_path();
-const auto testDir = workDir / "fixture/test/IO/Shader/fs/failing";
-const auto fallbackDir = testDir / "fallback";
-const auto texturePrefix = std::filesystem::path{"textures"};
-const auto shaderSearchPath = std::filesystem::path{"scripts"};
-const auto textureSearchPaths = std::vector<std::filesystem::path>{texturePrefix};
+  const auto workDir = std::filesystem::current_path();
+  const auto testDir = workDir / "fixture/test/IO/Shader/fs/failing";
+  const auto fallbackDir = testDir / "fallback";
+  const auto texturePrefix = std::filesystem::path{"textures"};
+  const auto shaderSearchPath = std::filesystem::path{"scripts"};
+  const auto textureSearchPaths = std::vector<std::filesystem::path>{texturePrefix};
 
-// We need to mount the fallback dir so that we can find "__TB_empty.png" which is
-// automatically linked when no editor image is available.
-auto fs = VirtualFileSystem{};
-fs.mount("",
-std::make_unique<DiskFileSystem>(fallbackDir)
-);
-fs.mount("",
-std::make_unique<DiskFileSystem>(testDir)
-);
-fs.mount("",
-createImageFileSystem<Quake3ShaderFileSystem>(fs, shaderSearchPath, textureSearchPaths, logger
-).
+  // We need to mount the fallback dir so that we can find "__TB_empty.png" which is
+  // automatically linked when no editor image is available.
+  auto fs = VirtualFileSystem{};
+  fs.mount("", std::make_unique<DiskFileSystem>(fallbackDir));
+  fs.mount("", std::make_unique<DiskFileSystem>(testDir));
+  fs.mount(
+    "",
+    createImageFileSystem<Quake3ShaderFileSystem>(
+      fs, shaderSearchPath, textureSearchPaths, logger)
+      .
 
-value()
+    value()
 
-);
+  );
 
-CHECK_THAT(fs
-.
-find(texturePrefix
-/ "test", TraversalMode::Flat, makeExtensionPathMatcher({
-""})), MatchesPathsResult({
-texturePrefix / "test/editor_image", texturePrefix / "test/not_existing", texturePrefix / "test/not_existing2", texturePrefix / "test/test",
-texturePrefix / "test/test2",
+  CHECK_THAT(
+    fs.find(texturePrefix / "test", TraversalMode::Flat, makeExtensionPathMatcher({""})),
+    MatchesPathsResult({
+      texturePrefix / "test/editor_image",
+      texturePrefix / "test/not_existing",
+      texturePrefix / "test/not_existing2",
+      texturePrefix / "test/test",
+      texturePrefix / "test/test2",
+    }));
 }
-));
-}} // namespace IO
+} // namespace IO
 } // namespace TrenchBroom

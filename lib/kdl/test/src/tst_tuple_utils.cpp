@@ -22,52 +22,58 @@
 
 #include "catch2.h"
 
-namespace kdl {
-struct move_only {
-    move_only() = default;
-    move_only(const move_only &) = delete;
-    move_only(move_only &&) = default;
+namespace kdl
+{
+struct move_only
+{
+  move_only() = default;
+  move_only(const move_only&) = delete;
+  move_only(move_only&&) = default;
 };
 
-TEST_CASE("tup_capture") {
-    SECTION("Capturing single objects") {
-        auto str = std::string{};
-        const auto cstr = std::string{};
+TEST_CASE("tup_capture")
+{
+  SECTION("Capturing single objects")
+  {
+    auto str = std::string{};
+    const auto cstr = std::string{};
 
-        static_assert(
-            std::is_same_v<decltype(tup_capture(std::string{})), std::tuple<std::string>>,
-            "rvalues must be captured by value");
-        static_assert(
-            std::is_same_v<decltype(tup_capture(str)), std::tuple<std::string &>>,
-            "lvalue references must be captured by by lvalue reference");
-        static_assert(
-            std::is_same_v<decltype(tup_capture(cstr)), std::tuple<const std::string &>>,
-            "const lvalue references must be captured by const lvalue reference");
+    static_assert(
+      std::is_same_v<decltype(tup_capture(std::string{})), std::tuple<std::string>>,
+      "rvalues must be captured by value");
+    static_assert(
+      std::is_same_v<decltype(tup_capture(str)), std::tuple<std::string&>>,
+      "lvalue references must be captured by by lvalue reference");
+    static_assert(
+      std::is_same_v<decltype(tup_capture(cstr)), std::tuple<const std::string&>>,
+      "const lvalue references must be captured by const lvalue reference");
 
-        tup_capture(move_only{});// rvalues are moved
-    }
+    tup_capture(move_only{}); // rvalues are moved
+  }
 
-    SECTION("Capturing primitive types") {
-        int i = 1;
-        const size_t y = 2;
+  SECTION("Capturing primitive types")
+  {
+    int i = 1;
+    const size_t y = 2;
 
-        static_assert(
-            std::is_same_v<decltype(tup_capture(i)), std::tuple<int &>>,
-            "rvalues must be captured by value");
-        static_assert(
-            std::is_same_v<decltype(tup_capture(y)), std::tuple<const size_t &>>,
-            "rvalues must be captured by value");
-    }
+    static_assert(
+      std::is_same_v<decltype(tup_capture(i)), std::tuple<int&>>,
+      "rvalues must be captured by value");
+    static_assert(
+      std::is_same_v<decltype(tup_capture(y)), std::tuple<const size_t&>>,
+      "rvalues must be captured by value");
+  }
 
-    SECTION("Capturing multiple values") {
-        int i = 1;
-        const auto cstr = std::string{};
+  SECTION("Capturing multiple values")
+  {
+    int i = 1;
+    const auto cstr = std::string{};
 
-        static_assert(
-            std::is_same_v<
-                decltype(tup_capture(std::string{}, i, cstr)),
-                std::tuple<std::string, int &, const std::string &>>,
-            "can capture multiple arguments");
-    }
+    static_assert(
+      std::is_same_v<
+        decltype(tup_capture(std::string{}, i, cstr)),
+        std::tuple<std::string, int&, const std::string&>>,
+      "can capture multiple arguments");
+  }
 }
-}// namespace kdl
+} // namespace kdl

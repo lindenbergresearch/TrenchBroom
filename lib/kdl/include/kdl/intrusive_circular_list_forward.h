@@ -20,9 +20,10 @@
 
 #pragma once
 
-namespace kdl {
-template<typename T>
+namespace kdl
+{
+template <typename T>
 class intrusive_circular_link;
-template<typename T, typename GetLink>
+template <typename T, typename GetLink>
 class intrusive_circular_list;
-}// namespace kdl
+} // namespace kdl

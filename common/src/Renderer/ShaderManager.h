@@ -27,11 +27,13 @@
 #include <string>
 #include <unordered_map>
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 class ShaderConfig;
 
 
-class ShaderManager {
+class ShaderManager
+{
 private:
   friend class ShaderProgram;
 
@@ -40,20 +42,20 @@ private:
 
   ShaderCache m_shaders;
   ShaderProgramCache m_programs;
-  ShaderProgram *m_currentProgram{nullptr};
+  ShaderProgram* m_currentProgram{nullptr};
 
 public:
-  Result<void> loadProgram(const ShaderConfig &config);
+  Result<void> loadProgram(const ShaderConfig& config);
 
-  ShaderProgram &program(const ShaderConfig &config);
+  ShaderProgram& program(const ShaderConfig& config);
 
-  ShaderProgram *currentProgram();
+  ShaderProgram* currentProgram();
 
 private:
-  void setCurrentProgram(ShaderProgram *program);
+  void setCurrentProgram(ShaderProgram* program);
 
-  Result<ShaderProgram> createProgram(const ShaderConfig &config);
+  Result<ShaderProgram> createProgram(const ShaderConfig& config);
 
-  Result<std::reference_wrapper<Shader>> loadShader(const std::string &name, GLenum type);
+  Result<std::reference_wrapper<Shader>> loadShader(const std::string& name, GLenum type);
 };
 } // namespace TrenchBroom::Renderer

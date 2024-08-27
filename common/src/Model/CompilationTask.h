@@ -26,9 +26,12 @@
 #include <string>
 #include <variant>
 
-namespace TrenchBroom {
-namespace Model {
-struct CompilationExportMap {
+namespace TrenchBroom
+{
+namespace Model
+{
+struct CompilationExportMap
+{
   bool enabled;
   std::string targetSpec;
 
@@ -36,7 +39,8 @@ struct CompilationExportMap {
 };
 
 
-struct CompilationCopyFiles {
+struct CompilationCopyFiles
+{
   bool enabled;
   std::string sourceSpec;
   std::string targetSpec;
@@ -45,7 +49,8 @@ struct CompilationCopyFiles {
 };
 
 
-struct CompilationRenameFile {
+struct CompilationRenameFile
+{
   bool enabled;
   std::string sourceSpec;
   std::string targetSpec;
@@ -54,7 +59,8 @@ struct CompilationRenameFile {
 };
 
 
-struct CompilationDeleteFiles {
+struct CompilationDeleteFiles
+{
   bool enabled;
   std::string targetSpec;
 
@@ -62,19 +68,26 @@ struct CompilationDeleteFiles {
 };
 
 
-struct CompilationRunTool {
+struct CompilationRunTool
+{
   bool enabled;
   std::string toolSpec;
   std::string parameterSpec;
   bool treatNonZeroResultCodeAsError;
 
-  kdl_reflect_decl(CompilationRunTool, enabled, toolSpec, parameterSpec, treatNonZeroResultCodeAsError);
+  kdl_reflect_decl(
+    CompilationRunTool, enabled, toolSpec, parameterSpec, treatNonZeroResultCodeAsError);
 };
 
 
-using CompilationTask = std::variant<CompilationExportMap, CompilationCopyFiles, CompilationRenameFile, CompilationDeleteFiles, CompilationRunTool>;
+using CompilationTask = std::variant<
+  CompilationExportMap,
+  CompilationCopyFiles,
+  CompilationRenameFile,
+  CompilationDeleteFiles,
+  CompilationRunTool>;
 
-std::ostream &operator<<(std::ostream &lhs, const CompilationTask &rhs);
+std::ostream& operator<<(std::ostream& lhs, const CompilationTask& rhs);
 
 } // namespace Model
 } // namespace TrenchBroom

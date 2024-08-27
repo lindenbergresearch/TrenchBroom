@@ -26,19 +26,23 @@
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class PickResult;
 }
 
-namespace Renderer {
+namespace Renderer
+{
 class RenderBatch;
 
 
 class RenderContext;
-}// namespace Renderer
+} // namespace Renderer
 
-namespace View {
+namespace View
+{
 class DragTracker;
 
 
@@ -48,30 +52,34 @@ class MapDocument;
 class UVViewHelper;
 
 
-class UVScaleTool : public ToolController, public Tool {
+class UVScaleTool : public ToolController, public Tool
+{
 public:
-    static const Model::HitType::Type XHandleHitType;
-    static const Model::HitType::Type YHandleHitType;
+  static const Model::HitType::Type XHandleHitType;
+  static const Model::HitType::Type YHandleHitType;
 
 private:
-    std::weak_ptr<MapDocument> m_document;
-    UVViewHelper &m_helper;
+  std::weak_ptr<MapDocument> m_document;
+  UVViewHelper& m_helper;
 
 public:
-    UVScaleTool(std::weak_ptr<MapDocument> document, UVViewHelper &helper);
+  UVScaleTool(std::weak_ptr<MapDocument> document, UVViewHelper& helper);
 
 private:
-    Tool &tool() override;
+  Tool& tool() override;
 
-    const Tool &tool() const override;
+  const Tool& tool() const override;
 
-    void pick(const InputState &inputState, Model::PickResult &pickResult) override;
+  void pick(const InputState& inputState, Model::PickResult& pickResult) override;
 
-    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
+  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
 
-    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+  void render(
+    const InputState& inputState,
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch) override;
 
-    bool cancel() override;
+  bool cancel() override;
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

@@ -23,77 +23,86 @@
 #include <functional>
 #include <utility>
 
-namespace kdl {
+namespace kdl
+{
 /** Manage a generic resource.
  *
  * Takes the resource and a deleter that cleans up the resource. The deleter is called
  * for the resource upon construction unless the resource has been moved from or
  * release() was called.
  */
-template<typename R>
-class resource {
-    using Deleter = std::function<void(R &)>;
+template <typename R>
+class resource
+{
+  using Deleter = std::function<void(R&)>;
 
 private:
-    R m_resource;
-    Deleter m_deleter;
+  R m_resource;
+  Deleter m_deleter;
 
 public:
-    /**
+  /**
    * Creates a resource that wraps the given object and uses the given deleter.
    */
-    resource(R resource, Deleter deleter)
-        : m_resource{std::move(resource)}, m_deleter{std::move(deleter)} {
-    }
+  resource(R resource, Deleter deleter)
+    : m_resource{std::move(resource)}
+    , m_deleter{std::move(deleter)}
+  {
+  }
 
-    resource(const resource &) = delete;
-    resource &operator=(const resource &) = delete;
+  resource(const resource&) = delete;
+  resource& operator=(const resource&) = delete;
 
-    resource(resource &&other)
-        : m_resource{std::move(other.m_resource)}, m_deleter{std::exchange(other.m_deleter, [](auto) {})} {
-    }
+  resource(resource&& other)
+    : m_resource{std::move(other.m_resource)}
+    , m_deleter{std::exchange(other.m_deleter, [](auto) {})}
+  {
+  }
 
-    resource &operator=(resource &&other) {
-        m_resource = std::move(other.m_resource);
-        m_deleter = std::exchange(other.m_deleter, [](auto) {});
-        return *this;
-    }
+  resource& operator=(resource&& other)
+  {
+    m_resource = std::move(other.m_resource);
+    m_deleter = std::exchange(other.m_deleter, [](auto) {});
+    return *this;
+  }
 
-    ~resource() { m_deleter(m_resource); }
+  ~resource() { m_deleter(m_resource); }
 
-    /**
+  /**
    * Assign a new resource to this object. The current resource is destroyed before the
    * new resource is assigned.
    */
-    resource &operator=(R resource) {
-        m_deleter(m_resource);
-        m_resource = std::move(resource);
-        return *this;
-    }
+  resource& operator=(R resource)
+  {
+    m_deleter(m_resource);
+    m_resource = std::move(resource);
+    return *this;
+  }
 
-    // NOLINTNEXTLINE
-    operator bool() const { return bool(m_resource); }
+  // NOLINTNEXTLINE
+  operator bool() const { return bool(m_resource); }
 
-    R &operator*() { return m_resource; }
-    const R &operator*() const { return m_resource; }
+  R& operator*() { return m_resource; }
+  const R& operator*() const { return m_resource; }
 
-    R &operator->() { return m_resource; }
-    const R &operator->() const { return m_resource; }
+  R& operator->() { return m_resource; }
+  const R& operator->() const { return m_resource; }
 
-    R &get() { return m_resource; }
-    const R &get() const { return m_resource; }
+  R& get() { return m_resource; }
+  const R& get() const { return m_resource; }
 
-    /**
+  /**
    * Return the resource. The resource will no longer be managed by this object. The
    * caller is responsible for any required cleanup.
    */
-    R release() {
-        m_deleter = [](auto) {};
-        return std::move(m_resource);
-    }
+  R release()
+  {
+    m_deleter = [](auto) {};
+    return std::move(m_resource);
+  }
 };
 
-template<typename R, typename Deleter>
+template <typename R, typename Deleter>
 resource(R, Deleter) -> resource<R>;
 
-}// namespace kdl
+} // namespace kdl

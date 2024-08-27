@@ -24,50 +24,57 @@
 
 #include "catch2.h"
 
-namespace kdl {
-TEST_CASE("lift_and") {
-    const auto f1 = [](int a, int b, int) { return a == b; };
-    const auto f2 = [](int, int b, int c) { return b == c; };
+namespace kdl
+{
+TEST_CASE("lift_and")
+{
+  const auto f1 = [](int a, int b, int) { return a == b; };
+  const auto f2 = [](int, int b, int c) { return b == c; };
 
-    SECTION("Lambdas") {
-        const auto f1_and_f2 = lift_and(f1, f2);
+  SECTION("Lambdas")
+  {
+    const auto f1_and_f2 = lift_and(f1, f2);
 
-        CHECK(f1_and_f2(1, 1, 1));
-        CHECK_FALSE(f1_and_f2(1, 1, 2));
-        CHECK_FALSE(f1_and_f2(1, 2, 2));
-        CHECK_FALSE(f1_and_f2(1, 2, 3));
-    }
+    CHECK(f1_and_f2(1, 1, 1));
+    CHECK_FALSE(f1_and_f2(1, 1, 2));
+    CHECK_FALSE(f1_and_f2(1, 2, 2));
+    CHECK_FALSE(f1_and_f2(1, 2, 3));
+  }
 
-    SECTION("std::function") {
-        const auto f1_and_f2 = lift_and(std::function{f1}, std::function{f2});
+  SECTION("std::function")
+  {
+    const auto f1_and_f2 = lift_and(std::function{f1}, std::function{f2});
 
-        CHECK(f1_and_f2(1, 1, 1));
-        CHECK_FALSE(f1_and_f2(1, 1, 2));
-        CHECK_FALSE(f1_and_f2(1, 2, 2));
-        CHECK_FALSE(f1_and_f2(1, 2, 3));
-    }
+    CHECK(f1_and_f2(1, 1, 1));
+    CHECK_FALSE(f1_and_f2(1, 1, 2));
+    CHECK_FALSE(f1_and_f2(1, 2, 2));
+    CHECK_FALSE(f1_and_f2(1, 2, 3));
+  }
 }
 
-TEST_CASE("lift_or") {
-    const auto f1 = [](int a, int b, int) { return a == b; };
-    const auto f2 = [](int, int b, int c) { return b == c; };
+TEST_CASE("lift_or")
+{
+  const auto f1 = [](int a, int b, int) { return a == b; };
+  const auto f2 = [](int, int b, int c) { return b == c; };
 
-    SECTION("Lambdas") {
-        const auto f1_or_f2 = lift_or(f1, f2);
+  SECTION("Lambdas")
+  {
+    const auto f1_or_f2 = lift_or(f1, f2);
 
-        CHECK(f1_or_f2(1, 1, 1));
-        CHECK(f1_or_f2(1, 1, 2));
-        CHECK(f1_or_f2(1, 2, 2));
-        CHECK_FALSE(f1_or_f2(1, 2, 3));
-    }
+    CHECK(f1_or_f2(1, 1, 1));
+    CHECK(f1_or_f2(1, 1, 2));
+    CHECK(f1_or_f2(1, 2, 2));
+    CHECK_FALSE(f1_or_f2(1, 2, 3));
+  }
 
-    SECTION("std::function") {
-        const auto f1_or_f2 = lift_or(std::function{f1}, std::function{f2});
+  SECTION("std::function")
+  {
+    const auto f1_or_f2 = lift_or(std::function{f1}, std::function{f2});
 
-        CHECK(f1_or_f2(1, 1, 1));
-        CHECK(f1_or_f2(1, 1, 2));
-        CHECK(f1_or_f2(1, 2, 2));
-        CHECK_FALSE(f1_or_f2(1, 2, 3));
-    }
+    CHECK(f1_or_f2(1, 1, 1));
+    CHECK(f1_or_f2(1, 1, 2));
+    CHECK(f1_or_f2(1, 2, 2));
+    CHECK_FALSE(f1_or_f2(1, 2, 3));
+  }
 }
-}// namespace kdl
+} // namespace kdl

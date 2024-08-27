@@ -22,13 +22,15 @@
 #include "vm/forward.h"
 #include "vm/scalar.h"
 
-namespace vm {
+namespace vm
+{
 // from https://www.fluentcpp.com/2017/10/27/function-aliases-cpp/
-#define ALIAS_TEMPLATE_FUNCTION(name, func)                                           \
-    template<typename... Args>                                                        \
-    inline auto name(Args &&...args) -> decltype(func(std::forward<Args>(args)...)) { \
-        return func(std::forward<Args>(args)...);                                     \
-    }
+#define ALIAS_TEMPLATE_FUNCTION(name, func)                                              \
+  template <typename... Args>                                                            \
+  inline auto name(Args&&... args) -> decltype(func(std::forward<Args>(args)...))        \
+  {                                                                                      \
+    return func(std::forward<Args>(args)...);                                            \
+  }
 
 #ALIAS_TEMPLATE_FUNCTION(radians, to_radians)
 #ALIAS_TEMPLATE_FUNCTION(degrees, to_degrees)
@@ -59,4 +61,4 @@ using mat3x4 = mat<T, 4, 3>;
 using mat4x2 = mat<T, 2, 4>;
 using mat4x3 = mat<T, 3, 4>;
 using mat4x4 = mat<T, 4, 4>;
-}// namespace vm
+} // namespace vm

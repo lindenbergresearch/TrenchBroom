@@ -29,14 +29,18 @@
 #include <string>
 #include <string_view>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 class Texture;
 }
 
-namespace Model {
+namespace Model
+{
 
-class BrushFaceAttributes {
+class BrushFaceAttributes
+{
 public:
   static const std::string NoTextureName;
 
@@ -56,27 +60,36 @@ private:
 public:
   explicit BrushFaceAttributes(std::string_view textureName);
 
-  BrushFaceAttributes(const BrushFaceAttributes &other);
+  BrushFaceAttributes(const BrushFaceAttributes& other);
 
-  BrushFaceAttributes(std::string_view textureName, const BrushFaceAttributes &other);
+  BrushFaceAttributes(std::string_view textureName, const BrushFaceAttributes& other);
 
-  BrushFaceAttributes &operator=(BrushFaceAttributes other);
+  BrushFaceAttributes& operator=(BrushFaceAttributes other);
 
-  kdl_reflect_decl(BrushFaceAttributes, m_textureName, m_offset, m_scale, m_rotation, m_surfaceContents, m_surfaceFlags, m_surfaceValue, m_color);
+  kdl_reflect_decl(
+    BrushFaceAttributes,
+    m_textureName,
+    m_offset,
+    m_scale,
+    m_rotation,
+    m_surfaceContents,
+    m_surfaceFlags,
+    m_surfaceValue,
+    m_color);
 
-  friend void swap(BrushFaceAttributes &lhs, BrushFaceAttributes &rhs);
+  friend void swap(BrushFaceAttributes& lhs, BrushFaceAttributes& rhs);
 
-  const std::string &textureName() const;
+  const std::string& textureName() const;
 
-  const vm::vec2f &offset() const;
+  const vm::vec2f& offset() const;
 
   float xOffset() const;
 
   float yOffset() const;
 
-  vm::vec2f modOffset(const vm::vec2f &offset, const vm::vec2f &textureSize) const;
+  vm::vec2f modOffset(const vm::vec2f& offset, const vm::vec2f& textureSize) const;
 
-  const vm::vec2f &scale() const;
+  const vm::vec2f& scale() const;
 
   float xScale() const;
 
@@ -86,27 +99,27 @@ public:
 
   bool hasSurfaceAttributes() const;
 
-  const std::optional<int> &surfaceContents() const;
+  const std::optional<int>& surfaceContents() const;
 
-  const std::optional<int> &surfaceFlags() const;
+  const std::optional<int>& surfaceFlags() const;
 
-  const std::optional<float> &surfaceValue() const;
+  const std::optional<float>& surfaceValue() const;
 
   bool hasColor() const;
 
-  const std::optional<Color> &color() const;
+  const std::optional<Color>& color() const;
 
   bool valid() const;
 
-  bool setTextureName(const std::string &textureName);
+  bool setTextureName(const std::string& textureName);
 
-  bool setOffset(const vm::vec2f &offset);
+  bool setOffset(const vm::vec2f& offset);
 
   bool setXOffset(float xOffset);
 
   bool setYOffset(float yOffset);
 
-  bool setScale(const vm::vec2f &scale);
+  bool setScale(const vm::vec2f& scale);
 
   bool setXScale(float xScale);
 
@@ -114,13 +127,13 @@ public:
 
   bool setRotation(float rotation);
 
-  bool setSurfaceContents(const std::optional<int> &surfaceContents);
+  bool setSurfaceContents(const std::optional<int>& surfaceContents);
 
-  bool setSurfaceFlags(const std::optional<int> &surfaceFlags);
+  bool setSurfaceFlags(const std::optional<int>& surfaceFlags);
 
-  bool setSurfaceValue(const std::optional<float> &surfaceValue);
+  bool setSurfaceValue(const std::optional<float>& surfaceValue);
 
-  bool setColor(const std::optional<Color> &color);
+  bool setColor(const std::optional<Color>& color);
 };
 
 } // namespace Model

@@ -29,7 +29,8 @@
 #include <optional>
 #include <vector>
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 class BrushFace;
 
 
@@ -40,9 +41,10 @@ class Node;
 
 
 class PickResult;
-}// namespace TrenchBroom::Model
+} // namespace TrenchBroom::Model
 
-namespace TrenchBroom::Renderer {
+namespace TrenchBroom::Renderer
+{
 class BrushRenderer;
 
 
@@ -53,9 +55,10 @@ class RenderBatch;
 
 
 class RenderContext;
-}// namespace TrenchBroom::Renderer
+} // namespace TrenchBroom::Renderer
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class Grid;
 
 
@@ -68,129 +71,148 @@ class Selection;
 class ClipStrategy;
 
 
-class ClipTool : public Tool {
+class ClipTool : public Tool
+{
 public:
-    static const Model::HitType::Type PointHitType;
+  static const Model::HitType::Type PointHitType;
 
 private:
-    enum class ClipSide {
-        Front,
-        Both,
-        Back
-    };
+  enum class ClipSide
+  {
+    Front,
+    Both,
+    Back
+  };
 
 private:
-    std::weak_ptr<MapDocument> m_document;
+  std::weak_ptr<MapDocument> m_document;
 
-    ClipSide m_clipSide = ClipSide::Front;
-    std::unique_ptr<ClipStrategy> m_strategy;
+  ClipSide m_clipSide = ClipSide::Front;
+  std::unique_ptr<ClipStrategy> m_strategy;
 
-    std::map<Model::Node *, std::vector<Model::Node *>> m_frontBrushes;
-    std::map<Model::Node *, std::vector<Model::Node *>> m_backBrushes;
+  std::map<Model::Node*, std::vector<Model::Node*>> m_frontBrushes;
+  std::map<Model::Node*, std::vector<Model::Node*>> m_backBrushes;
 
-    std::unique_ptr<Renderer::BrushRenderer> m_remainingBrushRenderer;
-    std::unique_ptr<Renderer::BrushRenderer> m_clippedBrushRenderer;
+  std::unique_ptr<Renderer::BrushRenderer> m_remainingBrushRenderer;
+  std::unique_ptr<Renderer::BrushRenderer> m_clippedBrushRenderer;
 
-    bool m_ignoreNotifications = false;
-    bool m_dragging = false;
+  bool m_ignoreNotifications = false;
+  bool m_dragging = false;
 
-    NotifierConnection m_notifierConnection;
-
-public:
-    explicit ClipTool(std::weak_ptr<MapDocument> document);
-
-    ~ClipTool() override;
-
-    const Grid &grid() const;
-
-    void toggleSide();
-
-    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult);
-
-    void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
-
-private:
-    void renderBrushes(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
-
-    void renderStrategy(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const Model::PickResult &pickResult);
+  NotifierConnection m_notifierConnection;
 
 public:
-    void renderFeedback(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const vm::vec3 &point) const;
+  explicit ClipTool(std::weak_ptr<MapDocument> document);
+
+  ~ClipTool() override;
+
+  const Grid& grid() const;
+
+  void toggleSide();
+
+  void pick(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult);
+
+  void render(
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch,
+    const Model::PickResult& pickResult);
+
+private:
+  void renderBrushes(
+    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch);
+
+  void renderStrategy(
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch,
+    const Model::PickResult& pickResult);
 
 public:
-    bool hasBrushes() const;
-
-    bool canClip() const;
-
-    void performClip();
-
-private:
-    std::map<Model::Node *, std::vector<Model::Node *>> clipBrushes();
+  void renderFeedback(
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch,
+    const vm::vec3& point) const;
 
 public:
-    vm::vec3 defaultClipPointPos() const;
+  bool hasBrushes() const;
 
-    bool canAddPoint(const vm::vec3 &point) const;
+  bool canClip() const;
 
-    bool hasPoints() const;
-
-    void addPoint(const vm::vec3 &point, const std::vector<vm::vec3> &helpVectors);
-
-    bool canRemoveLastPoint() const;
-
-    bool removeLastPoint();
-
-    std::optional<std::tuple<vm::vec3, vm::vec3>> beginDragPoint(const Model::PickResult &pickResult);
-
-    void beginDragLastPoint();
-
-    bool dragPoint(const vm::vec3 &newPosition, const std::vector<vm::vec3> &helpVectors);
-
-    void endDragPoint();
-
-    void cancelDragPoint();
-
-    void setFace(const Model::BrushFaceHandle &face);
-
-    bool reset();
+  void performClip();
 
 private:
-    void resetStrategy();
+  std::map<Model::Node*, std::vector<Model::Node*>> clipBrushes();
 
-    void update();
+public:
+  vm::vec3 defaultClipPointPos() const;
 
-    void clearBrushes();
+  bool canAddPoint(const vm::vec3& point) const;
 
-    void updateBrushes();
+  bool hasPoints() const;
 
-    void setFaceAttributes(const std::vector<Model::BrushFace> &faces, Model::BrushFace &toSet) const;
+  void addPoint(const vm::vec3& point, const std::vector<vm::vec3>& helpVectors);
 
-    void clearRenderers();
+  bool canRemoveLastPoint() const;
 
-    void updateRenderers();
+  bool removeLastPoint();
 
-    void addBrushesToRenderer(const std::map<Model::Node *, std::vector<Model::Node *>> &map, Renderer::BrushRenderer &renderer);
+  std::optional<std::tuple<vm::vec3, vm::vec3>> beginDragPoint(
+    const Model::PickResult& pickResult);
 
-    bool keepFrontBrushes() const;
+  void beginDragLastPoint();
 
-    bool keepBackBrushes() const;
+  bool dragPoint(const vm::vec3& newPosition, const std::vector<vm::vec3>& helpVectors);
+
+  void endDragPoint();
+
+  void cancelDragPoint();
+
+  void setFace(const Model::BrushFaceHandle& face);
+
+  bool reset();
 
 private:
-    bool doActivate() override;
+  void resetStrategy();
 
-    bool doDeactivate() override;
+  void update();
 
-    bool doRemove();
+  void clearBrushes();
 
-    void connectObservers();
+  void updateBrushes();
 
-    void selectionDidChange(const Selection &selection);
+  void setFaceAttributes(
+    const std::vector<Model::BrushFace>& faces, Model::BrushFace& toSet) const;
 
-    void nodesWillChange(const std::vector<Model::Node *> &nodes);
+  void clearRenderers();
 
-    void nodesDidChange(const std::vector<Model::Node *> &nodes);
+  void updateRenderers();
 
-    void brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &nodes);
+  void addBrushesToRenderer(
+    const std::map<Model::Node*, std::vector<Model::Node*>>& map,
+    Renderer::BrushRenderer& renderer);
+
+  bool keepFrontBrushes() const;
+
+  bool keepBackBrushes() const;
+
+private:
+  bool doActivate() override;
+
+  bool doDeactivate() override;
+
+  bool doRemove();
+
+  void connectObservers();
+
+  void selectionDidChange(const Selection& selection);
+
+  void nodesWillChange(const std::vector<Model::Node*>& nodes);
+
+  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+
+  void brushFacesDidChange(const std::vector<Model::BrushFaceHandle>& nodes);
 };
 
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

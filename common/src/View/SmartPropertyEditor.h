@@ -25,48 +25,53 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class EntityNodeBase;
 }
 
-namespace View {
+namespace View
+{
 class MapDocument;
 
 
-class SmartPropertyEditor : public QWidget {
-    Q_OBJECT
+class SmartPropertyEditor : public QWidget
+{
+  Q_OBJECT
 private:
-    std::weak_ptr<MapDocument> m_document;
+  std::weak_ptr<MapDocument> m_document;
 
-    std::string m_propertyKey;
-    std::vector<Model::EntityNodeBase *> m_nodes;
-    bool m_active;
+  std::string m_propertyKey;
+  std::vector<Model::EntityNodeBase*> m_nodes;
+  bool m_active;
 
 public:
-    explicit SmartPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit SmartPropertyEditor(
+    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
-    ~SmartPropertyEditor() override;
+  ~SmartPropertyEditor() override;
 
-    bool usesPropertyKey(const std::string &propertyKey) const;
+  bool usesPropertyKey(const std::string& propertyKey) const;
 
-    void activate(const std::string &propertyKey);
+  void activate(const std::string& propertyKey);
 
-    void update(const std::vector<Model::EntityNodeBase *> &nodes);
+  void update(const std::vector<Model::EntityNodeBase*>& nodes);
 
-    void deactivate();
+  void deactivate();
 
 protected:
-    std::shared_ptr<MapDocument> document() const;
+  std::shared_ptr<MapDocument> document() const;
 
-    const std::string &propertyKey() const;
+  const std::string& propertyKey() const;
 
-    const std::vector<Model::EntityNodeBase *> nodes() const;
+  const std::vector<Model::EntityNodeBase*> nodes() const;
 
-    void addOrUpdateProperty(const std::string &value);
+  void addOrUpdateProperty(const std::string& value);
 
 private:
-    virtual void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) = 0;
+  virtual void doUpdateVisual(const std::vector<Model::EntityNodeBase*>& nodes) = 0;
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

@@ -35,101 +35,99 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("FgdParserTest.parseIncludedFgdFiles") {
-const auto basePath = std::filesystem::current_path() / "fixture/games/";
-const auto cfgFiles = Disk::find(basePath, TraversalMode::Recursive, makeExtensionPathMatcher({".fgd"})).value();
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("FgdParserTest.parseIncludedFgdFiles")
+{
+  const auto basePath = std::filesystem::current_path() / "fixture/games/";
+  const auto cfgFiles =
+    Disk::find(basePath, TraversalMode::Recursive, makeExtensionPathMatcher({".fgd"}))
+      .value();
 
-for (
-const auto &path
-: cfgFiles) {
-CAPTURE(path);
+  for (const auto& path : cfgFiles)
+  {
+    CAPTURE(path);
 
-auto file = Disk::openFile(path).value();
-auto reader = file->reader().buffer();
+    auto file = Disk::openFile(path).value();
+    auto reader = file->reader().buffer();
 
-auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
+    auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
 
-auto status = TestParserStatus{};
-CHECK_NOTHROW(parser
-.
-parseDefinitions(status)
-);
+    auto status = TestParserStatus{};
+    CHECK_NOTHROW(parser.parseDefinitions(status));
 
-/* Disabled because our files are full of previously undetected problems
-if (status.countStatus(LogLevel::Warn) > 0u) {
-    UNSCOPED_INFO("Parsing FGD file " << path.string() << " produced warnings");
-    for (const auto& message : status.messages(LogLevel::Warn)) {
-        UNSCOPED_INFO(message);
+    /* Disabled because our files are full of previously undetected problems
+    if (status.countStatus(LogLevel::Warn) > 0u) {
+        UNSCOPED_INFO("Parsing FGD file " << path.string() << " produced warnings");
+        for (const auto& message : status.messages(LogLevel::Warn)) {
+            UNSCOPED_INFO(message);
+        }
+        CHECK(status.countStatus(LogLevel::Warn) == 0u);
     }
-    CHECK(status.countStatus(LogLevel::Warn) == 0u);
-}
 
-if (status.countStatus(LogLevel::Error) > 0u) {
-    UNSCOPED_INFO("Parsing FGD file " << path.string() << " produced errors");
-    for (const auto& message : status.messages(LogLevel::Error)) {
-        UNSCOPED_INFO(message);
+    if (status.countStatus(LogLevel::Error) > 0u) {
+        UNSCOPED_INFO("Parsing FGD file " << path.string() << " produced errors");
+        for (const auto& message : status.messages(LogLevel::Error)) {
+            UNSCOPED_INFO(message);
+        }
+        CHECK(status.countStatus(LogLevel::Error) == 0u);
     }
-    CHECK(status.countStatus(LogLevel::Error) == 0u);
-}
-*/
-}
+    */
+  }
 }
 
 TEST_CASE("FgdParserTest.parseEmptyFile")
 {
-const auto file = "";
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  const auto file = "";
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(definitions.
 
-empty()
+        empty()
 
-);
-kdl::vec_clear_and_delete(definitions);
+  );
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseWhitespaceFile")
 {
-const auto file = "     \n  \t \n  ";
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  const auto file = "     \n  \t \n  ";
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(definitions.
 
-empty()
+        empty()
 
-);
-kdl::vec_clear_and_delete(definitions);
+  );
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseCommentsFile")
 {
-const auto file = R"(// asdfasdfasdf
+  const auto file = R"(// asdfasdfasdf
 //kj3k4jkdjfkjdf
 )";
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(definitions.
 
-empty()
+        empty()
 
-);
-kdl::vec_clear_and_delete(definitions);
+  );
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseEmptyFlagDescription")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass color(0 255 0) size(-2 -2 -12, 2 2 12) = light_mine1 : 
     "Dusty fluorescent light fixture"
     [
@@ -140,22 +138,22 @@ const auto file = R"(
     ]
     // 0221 - changed inheritance from "light" to "light_min1"
 )";
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
-kdl::vec_clear_and_delete(definitions);
+    == 1u);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseSolidClass")
 {
-const auto file = R"-(
+  const auto file = R"-(
     @SolidClass = worldspawn : "World entity"
     [
        message(string) : "Text on entering the world"
@@ -171,58 +169,57 @@ const auto file = R"-(
        _sun_mangle(string) : "Sun mangle (Yaw pitch roll)"
     ])-";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::BrushEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::BrushEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "worldspawn");
-CHECK(definition
-->
+    == "worldspawn");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "World entity");
+    == "World entity");
 
-const auto &propertyDefinitions = definition->propertyDefinitions();
-CHECK(propertyDefinitions
-.
+  const auto& propertyDefinitions = definition->propertyDefinitions();
+  CHECK(
+    propertyDefinitions.
 
-size()
+    size()
 
-== 6u);
+    == 6u);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parsePointClass")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
     	use(string) : "self.use"
@@ -232,58 +229,57 @@ const auto file = R"(
     	touch(string) : "self.touch"
     ])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-const auto &propertyDefinitions = definition->propertyDefinitions();
-CHECK(propertyDefinitions
-.
+  const auto& propertyDefinitions = definition->propertyDefinitions();
+  CHECK(
+    propertyDefinitions.
 
-size()
+    size()
 
-== 5u);
+    == 5u);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseBaseProperty")
 {
-const auto file = R"(
+  const auto file = R"(
     @baseclass = Appearflags [
     	spawnflags(Flags) =
     	[
@@ -295,22 +291,21 @@ const auto file = R"(
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(definitions.
 
-empty()
+        empty()
 
-);
-kdl::vec_clear_and_delete(definitions);
+  );
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parsePointClassWithBaseClasses")
 {
-const auto file = R"(
+  const auto file = R"(
     @baseclass = Appearflags [
     	spawnflags(Flags) =
     	[
@@ -335,58 +330,57 @@ const auto file = R"(
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-const auto &propertyDefinitions = definition->propertyDefinitions();
-CHECK(propertyDefinitions
-.
+  const auto& propertyDefinitions = definition->propertyDefinitions();
+  CHECK(
+    propertyDefinitions.
 
-size()
+    size()
 
-== 9u);
+    == 9u);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parsePointClassWithUnknownClassProperties")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass unknown1 unknown2(spaghetti) = info_notnull : "Wildcard entity" // I love you
     [
     	use(string) : "self.use"
@@ -397,230 +391,227 @@ const auto file = R"(
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-const auto &propertyDefinitions = definition->propertyDefinitions();
-CHECK(propertyDefinitions
-.
+  const auto& propertyDefinitions = definition->propertyDefinitions();
+  CHECK(
+    propertyDefinitions.
 
-size()
+    size()
 
-== 5u);
+    == 5u);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseType_TargetSourcePropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
     	targetname(target_source) : "Source" : : "A long description" 
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-const auto &propertyDefinitions = definition->propertyDefinitions();
-CHECK(propertyDefinitions
-.
+  const auto& propertyDefinitions = definition->propertyDefinitions();
+  CHECK(
+    propertyDefinitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-auto propertyDefinition = propertyDefinitions[0];
-CHECK(propertyDefinition
-->
+  auto propertyDefinition = propertyDefinitions[0];
+  CHECK(
+    propertyDefinition->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::TargetSourceProperty);
-CHECK(propertyDefinition
-->
+    == Assets::PropertyDefinitionType::TargetSourceProperty);
+  CHECK(
+    propertyDefinition->
 
-key()
+    key()
 
-== "targetname");
-CHECK(propertyDefinition
-->
+    == "targetname");
+  CHECK(
+    propertyDefinition->
 
-shortDescription()
+    shortDescription()
 
-== "Source");
-CHECK(propertyDefinition
-->
+    == "Source");
+  CHECK(
+    propertyDefinition->
 
-longDescription()
+    longDescription()
 
-== "A long description");
+    == "A long description");
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseType_TargetDestinationPropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
     	target(target_destination) : "Target" 
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-const auto &propertyDefinitions = definition->propertyDefinitions();
-CHECK(propertyDefinitions
-.
+  const auto& propertyDefinitions = definition->propertyDefinitions();
+  CHECK(
+    propertyDefinitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-auto propertyDefinition = propertyDefinitions[0];
-CHECK(propertyDefinition
-->
+  auto propertyDefinition = propertyDefinitions[0];
+  CHECK(
+    propertyDefinition->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::TargetDestinationProperty);
-CHECK(propertyDefinition
-->
+    == Assets::PropertyDefinitionType::TargetDestinationProperty);
+  CHECK(
+    propertyDefinition->
 
-key()
+    key()
 
-== "target");
-CHECK(propertyDefinition
-->
+    == "target");
+  CHECK(
+    propertyDefinition->
 
-shortDescription()
+    shortDescription()
 
-== "Target");
-CHECK(propertyDefinition
-->
+    == "Target");
+  CHECK(propertyDefinition
+          ->
 
-longDescription()
+        longDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
+  );
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseStringPropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
        message(string) : "Text on entering the world" : : "Long description 1"
@@ -628,134 +619,132 @@ const auto file = R"(
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-CHECK(definition
-->
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-const auto *propertyDefinition1 = definition->propertyDefinition("message");
-CHECK(propertyDefinition1
-!= nullptr);
-CHECK(propertyDefinition1
-->
+  const auto* propertyDefinition1 = definition->propertyDefinition("message");
+  CHECK(propertyDefinition1 != nullptr);
+  CHECK(
+    propertyDefinition1->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::StringProperty);
+    == Assets::PropertyDefinitionType::StringProperty);
 
-const auto *stringPropertyDefinition1 = static_cast<const Assets::StringPropertyDefinition *>(propertyDefinition1);
-CHECK(stringPropertyDefinition1
-->
+  const auto* stringPropertyDefinition1 =
+    static_cast<const Assets::StringPropertyDefinition*>(propertyDefinition1);
+  CHECK(
+    stringPropertyDefinition1->
 
-key()
+    key()
 
-== "message");
-CHECK(stringPropertyDefinition1
-->
+    == "message");
+  CHECK(
+    stringPropertyDefinition1->
 
-shortDescription()
+    shortDescription()
 
-== "Text on entering the world");
-CHECK(stringPropertyDefinition1
-->
+    == "Text on entering the world");
+  CHECK(
+    stringPropertyDefinition1->
 
-longDescription()
+    longDescription()
 
-== "Long description 1");
-CHECK_FALSE(stringPropertyDefinition1
-->
+    == "Long description 1");
+  CHECK_FALSE(stringPropertyDefinition1->
 
-hasDefaultValue()
+              hasDefaultValue()
 
-);
+  );
 
-const auto *propertyDefinition2 = definition->propertyDefinition("message2");
-CHECK(propertyDefinition2
-!= nullptr);
-CHECK(propertyDefinition2
-->
+  const auto* propertyDefinition2 = definition->propertyDefinition("message2");
+  CHECK(propertyDefinition2 != nullptr);
+  CHECK(
+    propertyDefinition2->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::StringProperty);
+    == Assets::PropertyDefinitionType::StringProperty);
 
-const auto *stringPropertyDefinition2 = static_cast<const Assets::StringPropertyDefinition *>(propertyDefinition2);
-CHECK(stringPropertyDefinition2
-->
+  const auto* stringPropertyDefinition2 =
+    static_cast<const Assets::StringPropertyDefinition*>(propertyDefinition2);
+  CHECK(
+    stringPropertyDefinition2->
 
-key()
+    key()
 
-== "message2");
-CHECK(stringPropertyDefinition2
-->
+    == "message2");
+  CHECK(
+    stringPropertyDefinition2->
 
-shortDescription()
+    shortDescription()
 
-== "With a default value");
-CHECK(stringPropertyDefinition2
-->
+    == "With a default value");
+  CHECK(
+    stringPropertyDefinition2->
 
-longDescription()
+    longDescription()
 
-== "Long description 2");
-CHECK(stringPropertyDefinition2
-->
+    == "Long description 2");
+  CHECK(stringPropertyDefinition2->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(stringPropertyDefinition2
-->
+  );
+  CHECK(
+    stringPropertyDefinition2->
 
-defaultValue()
+    defaultValue()
 
-== "DefaultValue");
+    == "DefaultValue");
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 /**
@@ -765,302 +754,298 @@ kdl::vec_clear_and_delete(definitions);
  */
 TEST_CASE("FgdParserTest.parseStringPropertyDefinition_IntDefault")
 {
-const auto file = R"(@PointClass = info_notnull : "Wildcard entity"
+  const auto file = R"(@PointClass = info_notnull : "Wildcard entity"
 [
     name(string) : "Description" : 3
     other(string) : "" : 1.5
 ])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-CHECK(definition
-->
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-const auto *propertyDefinition1 = definition->propertyDefinition("name");
-CHECK(propertyDefinition1
-!= nullptr);
-CHECK(propertyDefinition1
-->
+  const auto* propertyDefinition1 = definition->propertyDefinition("name");
+  CHECK(propertyDefinition1 != nullptr);
+  CHECK(
+    propertyDefinition1->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::StringProperty);
+    == Assets::PropertyDefinitionType::StringProperty);
 
-const auto *stringPropertyDefinition1 = static_cast<const Assets::StringPropertyDefinition *>(propertyDefinition1);
-CHECK(stringPropertyDefinition1
-->
+  const auto* stringPropertyDefinition1 =
+    static_cast<const Assets::StringPropertyDefinition*>(propertyDefinition1);
+  CHECK(
+    stringPropertyDefinition1->
 
-key()
+    key()
 
-== "name");
-CHECK(stringPropertyDefinition1
-->
+    == "name");
+  CHECK(
+    stringPropertyDefinition1->
 
-shortDescription()
+    shortDescription()
 
-== "Description");
-CHECK(stringPropertyDefinition1
-->
+    == "Description");
+  CHECK(stringPropertyDefinition1
+          ->
 
-longDescription()
+        longDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(stringPropertyDefinition1
-->
+  );
+  CHECK(stringPropertyDefinition1->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(stringPropertyDefinition1
-->
+  );
+  CHECK(
+    stringPropertyDefinition1->
 
-defaultValue()
+    defaultValue()
 
-== "3");
+    == "3");
 
-const auto *propertyDefinition2 = definition->propertyDefinition("other");
-CHECK(propertyDefinition2
-!= nullptr);
-CHECK(propertyDefinition2
-->
+  const auto* propertyDefinition2 = definition->propertyDefinition("other");
+  CHECK(propertyDefinition2 != nullptr);
+  CHECK(
+    propertyDefinition2->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::StringProperty);
+    == Assets::PropertyDefinitionType::StringProperty);
 
-const auto *stringPropertyDefinition2 = static_cast<const Assets::StringPropertyDefinition *>(propertyDefinition2);
-CHECK(stringPropertyDefinition2
-->
+  const auto* stringPropertyDefinition2 =
+    static_cast<const Assets::StringPropertyDefinition*>(propertyDefinition2);
+  CHECK(
+    stringPropertyDefinition2->
 
-key()
+    key()
 
-== "other");
-CHECK(stringPropertyDefinition2
-->
+    == "other");
+  CHECK(stringPropertyDefinition2
+          ->
 
-shortDescription()
+        shortDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(stringPropertyDefinition2
-->
+  );
+  CHECK(stringPropertyDefinition2
+          ->
 
-longDescription()
+        longDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(stringPropertyDefinition2
-->
+  );
+  CHECK(stringPropertyDefinition2->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(stringPropertyDefinition2
-->
+  );
+  CHECK(
+    stringPropertyDefinition2->
 
-defaultValue()
+    defaultValue()
 
-== "1.5");
+    == "1.5");
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseIntegerPropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
        sounds(integer) : "CD track to play" : : "Longer description"
        sounds2(integer) : "CD track to play with default" : 2 : "Longer description"
     ])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-CHECK(definition
-->
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-const auto *propertyDefinition1 = definition->propertyDefinition("sounds");
-CHECK(propertyDefinition1
-!= nullptr);
-CHECK(propertyDefinition1
-->
+  const auto* propertyDefinition1 = definition->propertyDefinition("sounds");
+  CHECK(propertyDefinition1 != nullptr);
+  CHECK(
+    propertyDefinition1->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::IntegerProperty);
+    == Assets::PropertyDefinitionType::IntegerProperty);
 
-const auto *intPropertyDefinition1 = static_cast<const Assets::IntegerPropertyDefinition *>(propertyDefinition1);
-CHECK(intPropertyDefinition1
-->
+  const auto* intPropertyDefinition1 =
+    static_cast<const Assets::IntegerPropertyDefinition*>(propertyDefinition1);
+  CHECK(
+    intPropertyDefinition1->
 
-key()
+    key()
 
-== "sounds");
-CHECK(intPropertyDefinition1
-->
+    == "sounds");
+  CHECK(
+    intPropertyDefinition1->
 
-shortDescription()
+    shortDescription()
 
-== "CD track to play");
-CHECK(intPropertyDefinition1
-->
+    == "CD track to play");
+  CHECK(
+    intPropertyDefinition1->
 
-longDescription()
+    longDescription()
 
-== "Longer description");
-CHECK_FALSE(intPropertyDefinition1
-->
+    == "Longer description");
+  CHECK_FALSE(intPropertyDefinition1->
 
-hasDefaultValue()
+              hasDefaultValue()
 
-);
+  );
 
-const auto *propertyDefinition2 = definition->propertyDefinition("sounds2");
-CHECK(propertyDefinition2
-!= nullptr);
-CHECK(propertyDefinition2
-->
+  const auto* propertyDefinition2 = definition->propertyDefinition("sounds2");
+  CHECK(propertyDefinition2 != nullptr);
+  CHECK(
+    propertyDefinition2->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::IntegerProperty);
+    == Assets::PropertyDefinitionType::IntegerProperty);
 
-const auto *intPropertyDefinition2 = static_cast<const Assets::IntegerPropertyDefinition *>(propertyDefinition2);
-CHECK(intPropertyDefinition2
-->
+  const auto* intPropertyDefinition2 =
+    static_cast<const Assets::IntegerPropertyDefinition*>(propertyDefinition2);
+  CHECK(
+    intPropertyDefinition2->
 
-key()
+    key()
 
-== "sounds2");
-CHECK(intPropertyDefinition2
-->
+    == "sounds2");
+  CHECK(
+    intPropertyDefinition2->
 
-shortDescription()
+    shortDescription()
 
-== "CD track to play with default");
-CHECK(intPropertyDefinition2
-->
+    == "CD track to play with default");
+  CHECK(
+    intPropertyDefinition2->
 
-longDescription()
+    longDescription()
 
-== "Longer description");
-CHECK(intPropertyDefinition2
-->
+    == "Longer description");
+  CHECK(intPropertyDefinition2->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(intPropertyDefinition2
-->
+  );
+  CHECK(
+    intPropertyDefinition2->
 
-defaultValue()
+    defaultValue()
 
-== 2);
+    == 2);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseReadOnlyPropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
        sounds(integer) readonly : "CD track to play" : : "Longer description"
@@ -1068,51 +1053,50 @@ const auto file = R"(
     description"
     ])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-const auto *propertyDefinition1 = definition->propertyDefinition("sounds");
-CHECK(propertyDefinition1
-->
+  const auto* propertyDefinition1 = definition->propertyDefinition("sounds");
+  CHECK(propertyDefinition1->
 
-readOnly()
+        readOnly()
 
-);
+  );
 
-const auto *propertyDefinition2 = definition->propertyDefinition("sounds2");
-CHECK_FALSE(propertyDefinition2
-->
+  const auto* propertyDefinition2 = definition->propertyDefinition("sounds2");
+  CHECK_FALSE(propertyDefinition2->
 
-readOnly()
+              readOnly()
 
-);
+  );
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseFloatPropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
        test(float) : "Some test propertyDefinition" : : "Longer description 1"
@@ -1120,139 +1104,138 @@ const auto file = R"(
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});;
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  ;
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-CHECK(definition
-->
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 2u);
+    == 2u);
 
-const auto *propertyDefinition1 = definition->propertyDefinition("test");
-CHECK(propertyDefinition1
-!= nullptr);
-CHECK(propertyDefinition1
-->
+  const auto* propertyDefinition1 = definition->propertyDefinition("test");
+  CHECK(propertyDefinition1 != nullptr);
+  CHECK(
+    propertyDefinition1->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::FloatProperty);
+    == Assets::PropertyDefinitionType::FloatProperty);
 
-const auto *floatPropertyDefinition1 = static_cast<const Assets::FloatPropertyDefinition *>(propertyDefinition1);
-CHECK(floatPropertyDefinition1
-->
+  const auto* floatPropertyDefinition1 =
+    static_cast<const Assets::FloatPropertyDefinition*>(propertyDefinition1);
+  CHECK(
+    floatPropertyDefinition1->
 
-key()
+    key()
 
-== "test");
-CHECK(floatPropertyDefinition1
-->
+    == "test");
+  CHECK(
+    floatPropertyDefinition1->
 
-shortDescription()
+    shortDescription()
 
-== "Some test propertyDefinition");
-CHECK(floatPropertyDefinition1
-->
+    == "Some test propertyDefinition");
+  CHECK(
+    floatPropertyDefinition1->
 
-longDescription()
+    longDescription()
 
-== "Longer description 1");
-CHECK_FALSE(floatPropertyDefinition1
-->
+    == "Longer description 1");
+  CHECK_FALSE(floatPropertyDefinition1->
 
-hasDefaultValue()
+              hasDefaultValue()
 
-);
+  );
 
-const auto *propertyDefinition2 = definition->propertyDefinition("test2");
-CHECK(propertyDefinition2
-!= nullptr);
-CHECK(propertyDefinition2
-->
+  const auto* propertyDefinition2 = definition->propertyDefinition("test2");
+  CHECK(propertyDefinition2 != nullptr);
+  CHECK(
+    propertyDefinition2->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::FloatProperty);
+    == Assets::PropertyDefinitionType::FloatProperty);
 
-const auto *floatPropertyDefinition2 = static_cast<const Assets::FloatPropertyDefinition *>(propertyDefinition2);
-CHECK(floatPropertyDefinition2
-->
+  const auto* floatPropertyDefinition2 =
+    static_cast<const Assets::FloatPropertyDefinition*>(propertyDefinition2);
+  CHECK(
+    floatPropertyDefinition2->
 
-key()
+    key()
 
-== "test2");
-CHECK(floatPropertyDefinition2
-->
+    == "test2");
+  CHECK(
+    floatPropertyDefinition2->
 
-shortDescription()
+    shortDescription()
 
-== "Some test propertyDefinition with default");
-CHECK(floatPropertyDefinition2
-->
+    == "Some test propertyDefinition with default");
+  CHECK(
+    floatPropertyDefinition2->
 
-longDescription()
+    longDescription()
 
-== "Longer description 2");
-CHECK(floatPropertyDefinition2
-->
+    == "Longer description 2");
+  CHECK(floatPropertyDefinition2->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(floatPropertyDefinition2
-->
+  );
+  CHECK(
+    floatPropertyDefinition2->
 
-defaultValue()
+    defaultValue()
 
-== 2.7f);
+    == 2.7f);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseChoicePropertyDefinition")
 {
-const auto file = R"-(
+  const auto file = R"-(
             @PointClass = info_notnull : "Wildcard entity" // I love you\n
 [
     worldtype(choices) : "Ambience" : : "Long description 1" =
@@ -1287,318 +1270,303 @@ const auto file = R"-(
 ]
             )-";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});;
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  ;
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-CHECK(definition
-->
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 5u);
+    == 5u);
 
-const auto *propertyDefinition1 = definition->propertyDefinition("worldtype");
-CHECK(propertyDefinition1
-!= nullptr);
-CHECK(propertyDefinition1
-->
+  const auto* propertyDefinition1 = definition->propertyDefinition("worldtype");
+  CHECK(propertyDefinition1 != nullptr);
+  CHECK(
+    propertyDefinition1->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::ChoiceProperty);
+    == Assets::PropertyDefinitionType::ChoiceProperty);
 
-const auto *choicePropertyDefinition1 = static_cast<const Assets::ChoicePropertyDefinition *>(propertyDefinition1);
-CHECK(choicePropertyDefinition1
-->
+  const auto* choicePropertyDefinition1 =
+    static_cast<const Assets::ChoicePropertyDefinition*>(propertyDefinition1);
+  CHECK(
+    choicePropertyDefinition1->
 
-key()
+    key()
 
-== "worldtype");
-CHECK(choicePropertyDefinition1
-->
+    == "worldtype");
+  CHECK(
+    choicePropertyDefinition1->
 
-shortDescription()
+    shortDescription()
 
-== "Ambience");
-CHECK(choicePropertyDefinition1
-->
+    == "Ambience");
+  CHECK(
+    choicePropertyDefinition1->
 
-longDescription()
+    longDescription()
 
-== "Long description 1");
-CHECK_FALSE(choicePropertyDefinition1
-->
+    == "Long description 1");
+  CHECK_FALSE(choicePropertyDefinition1->
 
-hasDefaultValue()
+              hasDefaultValue()
 
-);
+  );
 
-CHECK(choicePropertyDefinition1
-->
+  CHECK(
+    choicePropertyDefinition1->
 
-options()
+    options()
 
-== std::vector<Assets::ChoicePropertyOption>{
-{
-"0", "Medieval"},
-{
-"1", "Metal (runic)"},
-{
-"2", "Base"},
-});
+    == std::vector<Assets::ChoicePropertyOption>{
+      {"0", "Medieval"},
+      {"1", "Metal (runic)"},
+      {"2", "Base"},
+    });
 
-const auto *propertyDefinition2 = definition->propertyDefinition("worldtype2");
-CHECK(propertyDefinition2
-!= nullptr);
-CHECK(propertyDefinition2
-->
+  const auto* propertyDefinition2 = definition->propertyDefinition("worldtype2");
+  CHECK(propertyDefinition2 != nullptr);
+  CHECK(
+    propertyDefinition2->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::ChoiceProperty);
+    == Assets::PropertyDefinitionType::ChoiceProperty);
 
-const auto *choicePropertyDefinition2 = static_cast<const Assets::ChoicePropertyDefinition *>(propertyDefinition2);
-CHECK(choicePropertyDefinition2
-->
+  const auto* choicePropertyDefinition2 =
+    static_cast<const Assets::ChoicePropertyDefinition*>(propertyDefinition2);
+  CHECK(
+    choicePropertyDefinition2->
 
-key()
+    key()
 
-== "worldtype2");
-CHECK(choicePropertyDefinition2
-->
+    == "worldtype2");
+  CHECK(
+    choicePropertyDefinition2->
 
-shortDescription()
+    shortDescription()
 
-== "Ambience with default");
-CHECK(choicePropertyDefinition2
-->
+    == "Ambience with default");
+  CHECK(
+    choicePropertyDefinition2->
 
-longDescription()
+    longDescription()
 
-== "Long description 2");
-CHECK(choicePropertyDefinition2
-->
+    == "Long description 2");
+  CHECK(choicePropertyDefinition2->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(choicePropertyDefinition2
-->
+  );
+  CHECK(
+    choicePropertyDefinition2->
 
-defaultValue()
+    defaultValue()
 
-== "1");
+    == "1");
 
-CHECK(choicePropertyDefinition2
-->
+  CHECK(
+    choicePropertyDefinition2->
 
-options()
+    options()
 
-== std::vector<Assets::ChoicePropertyOption>{
-{
-"0", "Medieval"},
-{
-"1", "Metal (runic)"},
-});
+    == std::vector<Assets::ChoicePropertyOption>{
+      {"0", "Medieval"},
+      {"1", "Metal (runic)"},
+    });
 
-const auto *propertyDefinition3 = definition->propertyDefinition("puzzle_id");
-const auto *choicePropertyDefinition3 = static_cast<const Assets::ChoicePropertyDefinition *>(propertyDefinition3);
-CHECK(choicePropertyDefinition3
-->
+  const auto* propertyDefinition3 = definition->propertyDefinition("puzzle_id");
+  const auto* choicePropertyDefinition3 =
+    static_cast<const Assets::ChoicePropertyDefinition*>(propertyDefinition3);
+  CHECK(
+    choicePropertyDefinition3->
 
-key()
+    key()
 
-== "puzzle_id");
-CHECK(choicePropertyDefinition3
-->
+    == "puzzle_id");
+  CHECK(
+    choicePropertyDefinition3->
 
-shortDescription()
+    shortDescription()
 
-== "Puzzle id");
-CHECK(choicePropertyDefinition3
-->
+    == "Puzzle id");
+  CHECK(choicePropertyDefinition3
+          ->
 
-longDescription()
+        longDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(choicePropertyDefinition3
-->
+  );
+  CHECK(choicePropertyDefinition3->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(choicePropertyDefinition3
-->
+  );
+  CHECK(
+    choicePropertyDefinition3->
 
-defaultValue()
+    defaultValue()
 
-== "cskey");
+    == "cskey");
 
-CHECK(choicePropertyDefinition3
-->
+  CHECK(
+    choicePropertyDefinition3->
 
-options()
+    options()
 
-== std::vector<Assets::ChoicePropertyOption>{
-{
-"keep3", "Mill key"},
-{
-"cskey", "Castle key"},
-{
-"scrol", "Disrupt Magic Scroll"},
-});
+    == std::vector<Assets::ChoicePropertyOption>{
+      {"keep3", "Mill key"},
+      {"cskey", "Castle key"},
+      {"scrol", "Disrupt Magic Scroll"},
+    });
 
-const auto *propertyDefinition4 = definition->propertyDefinition("floaty");
-const auto *choicePropertyDefinition4 = static_cast<const Assets::ChoicePropertyDefinition *>(propertyDefinition4);
-CHECK(choicePropertyDefinition4
-->
+  const auto* propertyDefinition4 = definition->propertyDefinition("floaty");
+  const auto* choicePropertyDefinition4 =
+    static_cast<const Assets::ChoicePropertyDefinition*>(propertyDefinition4);
+  CHECK(
+    choicePropertyDefinition4->
 
-key()
+    key()
 
-== "floaty");
-CHECK(choicePropertyDefinition4
-->
+    == "floaty");
+  CHECK(
+    choicePropertyDefinition4->
 
-shortDescription()
+    shortDescription()
 
-== "Floaty");
-CHECK(choicePropertyDefinition4
-->
+    == "Floaty");
+  CHECK(choicePropertyDefinition4
+          ->
 
-longDescription()
+        longDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(choicePropertyDefinition4
-->
+  );
+  CHECK(choicePropertyDefinition4->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(choicePropertyDefinition4
-->
+  );
+  CHECK(
+    choicePropertyDefinition4->
 
-defaultValue()
+    defaultValue()
 
-== "2.3");
+    == "2.3");
 
-CHECK(choicePropertyDefinition4
-->
+  CHECK(
+    choicePropertyDefinition4->
 
-options()
+    options()
 
-== std::vector<Assets::ChoicePropertyOption>{
-{
-"1.0", "Something"},
-{
-"2.3", "Something else"},
-{
-"0.1", "Yet more"},
-});
+    == std::vector<Assets::ChoicePropertyOption>{
+      {"1.0", "Something"},
+      {"2.3", "Something else"},
+      {"0.1", "Yet more"},
+    });
 
-const auto *propertyDefinition5 = definition->propertyDefinition("negative");
-const auto *choicePropertyDefinition5 = static_cast<const Assets::ChoicePropertyDefinition *>(propertyDefinition5);
-CHECK(choicePropertyDefinition5
-->
+  const auto* propertyDefinition5 = definition->propertyDefinition("negative");
+  const auto* choicePropertyDefinition5 =
+    static_cast<const Assets::ChoicePropertyDefinition*>(propertyDefinition5);
+  CHECK(
+    choicePropertyDefinition5->
 
-key()
+    key()
 
-== "negative");
-CHECK(choicePropertyDefinition5
-->
+    == "negative");
+  CHECK(
+    choicePropertyDefinition5->
 
-shortDescription()
+    shortDescription()
 
-== "Negative values");
-CHECK(choicePropertyDefinition5
-->
+    == "Negative values");
+  CHECK(choicePropertyDefinition5
+          ->
 
-longDescription()
+        longDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(choicePropertyDefinition5
-->
+  );
+  CHECK(choicePropertyDefinition5->
 
-hasDefaultValue()
+        hasDefaultValue()
 
-);
-CHECK(choicePropertyDefinition5
-->
+  );
+  CHECK(
+    choicePropertyDefinition5->
 
-defaultValue()
+    defaultValue()
 
-== "-1");
+    == "-1");
 
-CHECK(choicePropertyDefinition5
-->
+  CHECK(
+    choicePropertyDefinition5->
 
-options()
+    options()
 
-== std::vector<Assets::ChoicePropertyOption>{
-{
-"-2", "Something"},
-{
-"-1", "Something else"},
-{
-"1",  "Yet more"},
-});
+    == std::vector<Assets::ChoicePropertyOption>{
+      {"-2", "Something"},
+      {"-1", "Something else"},
+      {"1", "Yet more"},
+    });
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseFlagsPropertyDefinition")
 {
-const auto file = R"(
+  const auto file = R"(
     @PointClass = info_notnull : "Wildcard entity" // I love you
     [
     	spawnflags(Flags) =
@@ -1611,146 +1579,157 @@ const auto file = R"(
     ]
 )";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions[0];
-CHECK(definition
-->
+  const auto* definition = definitions[0];
+  CHECK(
+    definition->
 
-type()
+    type()
 
-== Assets::EntityDefinitionType::PointEntity);
-CHECK(definition
-->
+    == Assets::EntityDefinitionType::PointEntity);
+  CHECK(
+    definition->
 
-name()
+    name()
 
-== "info_notnull");
-CHECK(definition
-->
+    == "info_notnull");
+  CHECK(
+    definition->
 
-color()
+    color()
 
-== Color{
-1.0f, 1.0f, 1.0f, 1.0f});;
-CHECK(definition
-->
+    == Color{1.0f, 1.0f, 1.0f, 1.0f});
+  ;
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== "Wildcard entity");
+    == "Wildcard entity");
 
-CHECK(definition
-->
+  CHECK(
+    definition
+      ->
 
-propertyDefinitions()
+    propertyDefinitions()
 
-.
+      .
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *propertyDefinition = definition->propertyDefinition("spawnflags");
-CHECK(propertyDefinition
-!= nullptr);
-CHECK(propertyDefinition
-->
+  const auto* propertyDefinition = definition->propertyDefinition("spawnflags");
+  CHECK(propertyDefinition != nullptr);
+  CHECK(
+    propertyDefinition->
 
-type()
+    type()
 
-== Assets::PropertyDefinitionType::FlagsProperty);
+    == Assets::PropertyDefinitionType::FlagsProperty);
 
-const auto *flagsPropertyDefinition = static_cast<const Assets::FlagsPropertyDefinition *>(propertyDefinition);
-CHECK(flagsPropertyDefinition
-->
+  const auto* flagsPropertyDefinition =
+    static_cast<const Assets::FlagsPropertyDefinition*>(propertyDefinition);
+  CHECK(
+    flagsPropertyDefinition->
 
-key()
+    key()
 
-== "spawnflags");
-CHECK(flagsPropertyDefinition
-->
+    == "spawnflags");
+  CHECK(flagsPropertyDefinition
+          ->
 
-shortDescription()
+        shortDescription()
 
-.
+          .
 
-empty()
+        empty()
 
-);
-CHECK(flagsPropertyDefinition
-->
+  );
+  CHECK(
+    flagsPropertyDefinition->
 
-defaultValue()
+    defaultValue()
 
-== 2560);
+    == 2560);
 
-CHECK(flagsPropertyDefinition
-->
+  CHECK(
+    flagsPropertyDefinition->
 
-options()
+    options()
 
-== std::vector<Assets::FlagsPropertyOption>{
-{
-256,  "Not on Easy",       "", false},
-{
-512,  "Not on Normal",     "", true},
-{
-1024, "Not on Hard",       "", false},
-{
-2048, "Not in Deathmatch", "", true},
-});
+    == std::vector<Assets::FlagsPropertyOption>{
+      {256, "Not on Easy", "", false},
+      {512, "Not on Normal", "", true},
+      {1024, "Not on Hard", "", false},
+      {2048, "Not in Deathmatch", "", true},
+    });
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
-static const auto FgdModelDefinitionTemplate = R"(@PointClass model(${MODEL}) = item_shells : "Shells" [])";
+static const auto FgdModelDefinitionTemplate =
+  R"(@PointClass model(${MODEL}) = item_shells : "Shells" [])";
 
 using Assets::assertModelDefinition;
 
 TEST_CASE("FgdParserTest.parseLegacyStaticModelDefinition")
 {
-static const auto ModelDefinition = R"(":maps/b_shell0.bsp", ":maps/b_shell1.bsp" spawnflags = 1)";
+  static const auto ModelDefinition =
+    R"(":maps/b_shell0.bsp", ":maps/b_shell1.bsp" spawnflags = 1)";
 
-assertModelDefinition<FgdParser>(Assets::ModelSpecification{"maps/b_shell0.bsp", 0, 0}, ModelDefinition, FgdModelDefinitionTemplate
-);
-assertModelDefinition<FgdParser>(Assets::ModelSpecification{"maps/b_shell1.bsp", 0, 0}, ModelDefinition, FgdModelDefinitionTemplate,
-"{ 'spawnflags': 1 }"
-);
+  assertModelDefinition<FgdParser>(
+    Assets::ModelSpecification{"maps/b_shell0.bsp", 0, 0},
+    ModelDefinition,
+    FgdModelDefinitionTemplate);
+  assertModelDefinition<FgdParser>(
+    Assets::ModelSpecification{"maps/b_shell1.bsp", 0, 0},
+    ModelDefinition,
+    FgdModelDefinitionTemplate,
+    "{ 'spawnflags': 1 }");
 }
 
 TEST_CASE("FgdParserTest.parseLegacyDynamicModelDefinition")
 {
-static const auto ModelDefinition = R"(pathKey = "model" skinKey = "skin" frameKey = "frame")";
+  static const auto ModelDefinition =
+    R"(pathKey = "model" skinKey = "skin" frameKey = "frame")";
 
-assertModelDefinition<FgdParser>(Assets::ModelSpecification{"maps/b_shell1.bsp", 0, 0}, ModelDefinition, FgdModelDefinitionTemplate,
-"{ 'model': 'maps/b_shell1.bsp' }"
-);
-assertModelDefinition<FgdParser>(Assets::ModelSpecification{"maps/b_shell1.bsp", 1, 2}, ModelDefinition, FgdModelDefinitionTemplate,
-"{ 'model': 'maps/b_shell1.bsp', 'skin': 1, 'frame': 2 }"
-);
+  assertModelDefinition<FgdParser>(
+    Assets::ModelSpecification{"maps/b_shell1.bsp", 0, 0},
+    ModelDefinition,
+    FgdModelDefinitionTemplate,
+    "{ 'model': 'maps/b_shell1.bsp' }");
+  assertModelDefinition<FgdParser>(
+    Assets::ModelSpecification{"maps/b_shell1.bsp", 1, 2},
+    ModelDefinition,
+    FgdModelDefinitionTemplate,
+    "{ 'model': 'maps/b_shell1.bsp', 'skin': 1, 'frame': 2 }");
 }
 
 TEST_CASE("FgdParserTest.parseELModelDefinition")
 {
-static const auto ModelDefinition = R"({{ spawnflags == 1 -> 'maps/b_shell1.bsp', 'maps/b_shell0.bsp' }})";
+  static const auto ModelDefinition =
+    R"({{ spawnflags == 1 -> 'maps/b_shell1.bsp', 'maps/b_shell0.bsp' }})";
 
-assertModelDefinition<FgdParser>(Assets::ModelSpecification{"maps/b_shell0.bsp", 0, 0}, ModelDefinition, FgdModelDefinitionTemplate
-);
+  assertModelDefinition<FgdParser>(
+    Assets::ModelSpecification{"maps/b_shell0.bsp", 0, 0},
+    ModelDefinition,
+    FgdModelDefinitionTemplate);
 }
 
 TEST_CASE("FgdParserTest.parseLegacyModelWithParseError")
 {
-const auto file = R"(
+  const auto file = R"(
 @PointClass base(Monster) size(-16 -16 -24, 16 16 40) model(":progs/polyp.mdl" 0 153, ":progs/polyp.mdl" startonground = "1") = monster_polyp: "Polyp"
 [
   startonground(choices) : "Starting pose" : 0 =
@@ -1760,241 +1739,223 @@ const auto file = R"(
   ]
 ])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseMissingBounds")
 {
-const auto file = R"(
+  const auto file = R"(
 @PointClass model({"path" : ":progs/goddess-statue.mdl" }) =
 decor_goddess_statue : "Goddess Statue" []
 )";
 
-auto parser = FgdParser(file, Color{1.0f, 1.0f, 1.0f, 1.0f});
+  auto parser = FgdParser(file, Color{1.0f, 1.0f, 1.0f, 1.0f});
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto definition = static_cast<Assets::PointEntityDefinition *>(definitions[0]);
-CHECK(definition
-->
+  const auto definition = static_cast<Assets::PointEntityDefinition*>(definitions[0]);
+  CHECK(
+    definition->
 
-bounds()
+    bounds()
 
-== vm::bbox3d{
-{
--8.0, -8.0, -8.0},
-{
-8.0,  8.0,  8.0}});
+    == vm::bbox3d{{-8.0, -8.0, -8.0}, {8.0, 8.0, 8.0}});
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseInvalidBounds")
 {
-const auto file = R"(
+  const auto file = R"(
 @PointClass size(32 32 0, -32 -32 256) model({"path" : ":progs/goddess-statue.mdl" }) =
 decor_goddess_statue : "Goddess Statue" [])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = static_cast<Assets::PointEntityDefinition *>(definitions[0]);
-CHECK(definition
-->
+  const auto* definition = static_cast<Assets::PointEntityDefinition*>(definitions[0]);
+  CHECK(
+    definition->
 
-bounds()
+    bounds()
 
-== vm::bbox3d{
-{
--32.0, -32.0, 0.0},
-{
-32.0,  32.0,  256.0}});
+    == vm::bbox3d{{-32.0, -32.0, 0.0}, {32.0, 32.0, 256.0}});
 
-kdl::vec_clear_and_delete(definitions);
+  kdl::vec_clear_and_delete(definitions);
 }
 
 TEST_CASE("FgdParserTest.parseInvalidModel")
 {
-const auto file = R"(@PointClass
+  const auto file = R"(@PointClass
 size(-16 -16 -24, 16 16 40)
 model({1}) =
 decor_goddess_statue : "Goddess Statue" [])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-CHECK_THROWS_WITH([&]() {
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-kdl::vec_clear_and_delete(definitions);
-}(), Catch::Matchers::StartsWith("At line 3, column 8:"));
+  CHECK_THROWS_WITH(
+    [&]() {
+      auto status = TestParserStatus{};
+      auto definitions = parser.parseDefinitions(status);
+      kdl::vec_clear_and_delete(definitions);
+    }(),
+    Catch::Matchers::StartsWith("At line 3, column 8:"));
 }
 
 TEST_CASE("FgdParserTest.parseErrorAfterModel")
 {
-const auto file = R"(@PointClass
+  const auto file = R"(@PointClass
 size(-16 -16 -24, 16 16 40)
 model({"path"
        : ":progs/goddess-statue.mdl" }) = decor_goddess_statue ; "Goddess Statue" [])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-CHECK_THROWS_WITH([&]() {
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-kdl::vec_clear_and_delete(definitions);
-}(), Catch::Matchers::StartsWith("At line 4, column 64:"));
+  CHECK_THROWS_WITH(
+    [&]() {
+      auto status = TestParserStatus{};
+      auto definitions = parser.parseDefinitions(status);
+      kdl::vec_clear_and_delete(definitions);
+    }(),
+    Catch::Matchers::StartsWith("At line 4, column 64:"));
 }
 
 TEST_CASE("FgdParserTest.parseInclude")
 {
-const auto path = std::filesystem::current_path() / "fixture/test/IO/Fgd/parseInclude/host.fgd";
-auto file = Disk::openFile(path).value();
-auto reader = file->reader().buffer();
+  const auto path =
+    std::filesystem::current_path() / "fixture/test/IO/Fgd/parseInclude/host.fgd";
+  auto file = Disk::openFile(path).value();
+  auto reader = file->reader().buffer();
 
-auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
+  auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
 
-auto status = TestParserStatus{};
-auto defs = parser.parseDefinitions(status);
-CHECK(defs
-.
+  auto status = TestParserStatus{};
+  auto defs = parser.parseDefinitions(status);
+  CHECK(
+    defs.
 
-size()
+    size()
 
-== 2u);
-CHECK(std::any_of(
-    std::begin(defs), std::end(defs), [](const auto *def) {
-      return def->name() == "worldspawn";
-    }
-)
-);
-CHECK(std::any_of(
-    std::begin(defs), std::end(defs), [](const auto *def) {
-      return def->name() == "info_player_start";
-    }
-)
-);
+    == 2u);
+  CHECK(std::any_of(std::begin(defs), std::end(defs), [](const auto* def) {
+    return def->name() == "worldspawn";
+  }));
+  CHECK(std::any_of(std::begin(defs), std::end(defs), [](const auto* def) {
+    return def->name() == "info_player_start";
+  }));
 
-kdl::vec_clear_and_delete(defs);
+  kdl::vec_clear_and_delete(defs);
 }
 
 TEST_CASE("FgdParserTest.parseNestedInclude")
 {
-const auto path = std::filesystem::current_path() / "fixture/test/IO/Fgd/parseNestedInclude/host.fgd";
-auto file = Disk::openFile(path).value();
-auto reader = file->reader().buffer();
+  const auto path =
+    std::filesystem::current_path() / "fixture/test/IO/Fgd/parseNestedInclude/host.fgd";
+  auto file = Disk::openFile(path).value();
+  auto reader = file->reader().buffer();
 
-auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
+  auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
 
-auto status = TestParserStatus{};
-auto defs = parser.parseDefinitions(status);
-CHECK(defs
-.
+  auto status = TestParserStatus{};
+  auto defs = parser.parseDefinitions(status);
+  CHECK(
+    defs.
 
-size()
+    size()
 
-== 3u);
-CHECK(std::any_of(
-    std::begin(defs), std::end(defs), [](const auto *def) {
-      return def->name() == "worldspawn";
-    }
-)
-);
-CHECK(std::any_of(
-    std::begin(defs), std::end(defs), [](const auto *def) {
-      return def->name() == "info_player_start";
-    }
-)
-);
-CHECK(std::any_of(
-    std::begin(defs), std::end(defs), [](const auto *def) {
-      return def->name() == "info_player_coop";
-    }
-)
-);
+    == 3u);
+  CHECK(std::any_of(std::begin(defs), std::end(defs), [](const auto* def) {
+    return def->name() == "worldspawn";
+  }));
+  CHECK(std::any_of(std::begin(defs), std::end(defs), [](const auto* def) {
+    return def->name() == "info_player_start";
+  }));
+  CHECK(std::any_of(std::begin(defs), std::end(defs), [](const auto* def) {
+    return def->name() == "info_player_coop";
+  }));
 
-kdl::vec_clear_and_delete(defs);
+  kdl::vec_clear_and_delete(defs);
 }
 
 TEST_CASE("FgdParserTest.parseRecursiveInclude")
 {
-const auto path = std::filesystem::current_path() / "fixture/test/IO/Fgd/parseRecursiveInclude/host.fgd";
-auto file = Disk::openFile(path).value();
-auto reader = file->reader().buffer();
+  const auto path = std::filesystem::current_path()
+                    / "fixture/test/IO/Fgd/parseRecursiveInclude/host.fgd";
+  auto file = Disk::openFile(path).value();
+  auto reader = file->reader().buffer();
 
-auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
+  auto parser = FgdParser{reader.stringView(), Color{1.0f, 1.0f, 1.0f, 1.0f}, path};
 
-auto status = TestParserStatus{};
-auto defs = parser.parseDefinitions(status);
-CHECK(defs
-.
+  auto status = TestParserStatus{};
+  auto defs = parser.parseDefinitions(status);
+  CHECK(
+    defs.
 
-size()
+    size()
 
-== 1u);
-CHECK(std::any_of(
-    std::begin(defs), std::end(defs), [](const auto *def) {
-      return def->name() == "worldspawn";
-    }
-)
-);
+    == 1u);
+  CHECK(std::any_of(std::begin(defs), std::end(defs), [](const auto* def) {
+    return def->name() == "worldspawn";
+  }));
 
-kdl::vec_clear_and_delete(defs);
+  kdl::vec_clear_and_delete(defs);
 }
 
 TEST_CASE("FgdParserTest.parseStringContinuations")
 {
-const auto file = R"(
+  const auto file = R"(
 @PointClass = cont_description :
   "This is an example description for"+
   " this example entity. It will appear"+
   " in the help dialog for this entity"
 [])";
 
-auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
+  auto parser = FgdParser{file, Color{1.0f, 1.0f, 1.0f, 1.0f}};
 
-auto status = TestParserStatus{};
-auto definitions = parser.parseDefinitions(status);
-CHECK(definitions
-.
+  auto status = TestParserStatus{};
+  auto definitions = parser.parseDefinitions(status);
+  CHECK(
+    definitions.
 
-size()
+    size()
 
-== 1u);
+    == 1u);
 
-const auto *definition = definitions.front();
-CHECK(definition
-->
+  const auto* definition = definitions.front();
+  CHECK(
+    definition->
 
-description()
+    description()
 
-== R"(This is an example description for this example entity. It will appear in the help dialog for this entity)");
+    == R"(This is an example description for this example entity. It will appear in the help dialog for this entity)");
 
-kdl::vec_clear_and_delete(definitions);
-}} // namespace IO
+  kdl::vec_clear_and_delete(definitions);
+}
+} // namespace IO
 } // namespace TrenchBroom

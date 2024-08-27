@@ -24,12 +24,14 @@
 #include <filesystem>
 #include <string_view>
 
-namespace TrenchBroom {
-namespace IO {
-QString pathAsQString(const std::filesystem::path &path);
+namespace TrenchBroom
+{
+namespace IO
+{
+QString pathAsQString(const std::filesystem::path& path);
 
-QString pathAsGenericQString(const std::filesystem::path &path);
+QString pathAsGenericQString(const std::filesystem::path& path);
 
-std::filesystem::path pathFromQString(const QString &path);
-}// namespace IO
-}// namespace TrenchBroom
+std::filesystem::path pathFromQString(const QString& path);
+} // namespace IO
+} // namespace TrenchBroom

@@ -30,12 +30,15 @@
 
 class QPushButton;
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 struct GameEngineProfile;
 }
 
-namespace View {
+namespace View
+{
 class GameEngineProfileListBox;
 class MultiCompletionLineEdit;
 
@@ -47,47 +50,49 @@ class MultiCompletionLineEdit;
  * A "Configure Engines..." button opens GameEngineDialog for editing the
  * name/path of engines.
  */
-class LaunchGameEngineDialog : public QDialog {
+class LaunchGameEngineDialog : public QDialog
+{
 private:
-    std::weak_ptr<MapDocument> m_document;
-    GameEngineProfileListBox *m_gameEngineList{nullptr};
-    MultiCompletionLineEdit *m_parameterText{nullptr};
-    QPushButton *m_launchButton{nullptr};
-    QPushButton *m_testButton{nullptr};
-    Model::GameEngineProfile *m_lastProfile{nullptr};
-    Model::GameEngineConfig m_config;
-    ElidedLabel *m_commandLine;
-    bool m_dumpToConsole;
+  std::weak_ptr<MapDocument> m_document;
+  GameEngineProfileListBox* m_gameEngineList{nullptr};
+  MultiCompletionLineEdit* m_parameterText{nullptr};
+  QPushButton* m_launchButton{nullptr};
+  QPushButton* m_testButton{nullptr};
+  Model::GameEngineProfile* m_lastProfile{nullptr};
+  Model::GameEngineConfig m_config;
+  ElidedLabel* m_commandLine;
+  bool m_dumpToConsole;
 
 public:
-    explicit LaunchGameEngineDialog(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit LaunchGameEngineDialog(
+    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
 private:
-    void createGui();
+  void createGui();
 
-    void reloadConfig();
+  void reloadConfig();
 
-    void updateCommandLine();
+  void updateCommandLine();
 
-    LaunchGameEngineVariables variables() const;
+  LaunchGameEngineVariables variables() const;
 
 private slots:
 
-    void gameEngineProfileChanged();
+  void gameEngineProfileChanged();
 
-    void parametersChanged(const QString &text);
+  void parametersChanged(const QString& text);
 
-    void editGameEngines();
+  void editGameEngines();
 
-    void launchEngine();
+  void launchEngine();
 
-    void testCommandLine();
+  void testCommandLine();
 
-public slots:// QDialog overrides
-    void done(int r) override;
+public slots: // QDialog overrides
+  void done(int r) override;
 
 private:
-    void saveConfig();
+  void saveConfig();
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

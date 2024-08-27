@@ -25,15 +25,18 @@
 #include <filesystem>
 #include <vector>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 class Logger;
-}// namespace TrenchBroom
+} // namespace TrenchBroom
 
-namespace TrenchBroom::Assets {
+namespace TrenchBroom::Assets
+{
 class Quake3Shader;
 }
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 
 /**
  * Parses Quake 3 shader scripts found in a file system and makes the shader objects
@@ -42,15 +45,16 @@ namespace TrenchBroom::IO {
  * Also scans for textures available at a list of search paths and generates shaders for
  * such textures which do not already have a shader by the same name.
  */
-class Quake3ShaderFileSystem : public ImageFileSystemBase {
+class Quake3ShaderFileSystem : public ImageFileSystemBase
+{
 private:
-    const FileSystem &m_fs;
-    std::filesystem::path m_shaderSearchPath;
-    std::vector<std::filesystem::path> m_textureSearchPaths;
-    Logger &m_logger;
+  const FileSystem& m_fs;
+  std::filesystem::path m_shaderSearchPath;
+  std::vector<std::filesystem::path> m_textureSearchPaths;
+  Logger& m_logger;
 
 public:
-    /**
+  /**
    * Creates a new instance at the given base path that uses the given file system to find
    * shaders and shader image resources. The shader search path is used to find the shader
    * scripts. The given texture search paths are recursively searched for textures, and
@@ -63,18 +67,24 @@ public:
    * @param textureSearchPaths the paths at which to search for texture images
    * @param logger the logger to use
    */
-    Quake3ShaderFileSystem(const FileSystem &fs, std::filesystem::path shaderSearchPath, std::vector<std::filesystem::path> textureSearchPaths, Logger &logger);
+  Quake3ShaderFileSystem(
+    const FileSystem& fs,
+    std::filesystem::path shaderSearchPath,
+    std::vector<std::filesystem::path> textureSearchPaths,
+    Logger& logger);
 
 private:
-    Result<void> doReadDirectory() override;
+  Result<void> doReadDirectory() override;
 
-    Result<std::vector<Assets::Quake3Shader>> loadShaders() const;
+  Result<std::vector<Assets::Quake3Shader>> loadShaders() const;
 
-    Result<void> linkShaders(std::vector<Assets::Quake3Shader> &shaders);
+  Result<void> linkShaders(std::vector<Assets::Quake3Shader>& shaders);
 
-    void linkTextures(const std::vector<std::filesystem::path> &textures, std::vector<Assets::Quake3Shader> &shaders);
+  void linkTextures(
+    const std::vector<std::filesystem::path>& textures,
+    std::vector<Assets::Quake3Shader>& shaders);
 
-    void linkStandaloneShaders(std::vector<Assets::Quake3Shader> &shaders);
+  void linkStandaloneShaders(std::vector<Assets::Quake3Shader>& shaders);
 };
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

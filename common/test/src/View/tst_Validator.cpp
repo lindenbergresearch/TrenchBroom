@@ -35,71 +35,77 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace View {
-TEST_CASE_METHOD(MapDocumentTest,
-"ValidatorTest.emptyProperty") {
-Model::EntityNode *entityNode = document->createPointEntity(m_pointEntityDef, vm::vec3::zero());
+namespace TrenchBroom
+{
+namespace View
+{
+TEST_CASE_METHOD(MapDocumentTest, "ValidatorTest.emptyProperty")
+{
+  Model::EntityNode* entityNode =
+    document->createPointEntity(m_pointEntityDef, vm::vec3::zero());
 
-document->
+  document->
 
-deselectAll();
+    deselectAll();
 
-document->selectNodes( {
-entityNode
-}
-);
-document->setProperty("", "");
-REQUIRE(entityNode
-->
+  document->selectNodes({entityNode});
+  document->setProperty("", "");
+  REQUIRE(entityNode
+            ->
 
-entity()
+          entity()
 
-.hasProperty(""));
+            .hasProperty(""));
 
-auto validators = std::vector<const Model::Validator *>{new Model::EmptyPropertyKeyValidator(), new Model::EmptyPropertyValueValidator()};
-
-
-class AcceptAllIssues {
-public:
-  bool operator()(const Model::Issue *) const { return true; }
-};
+  auto validators = std::vector<const Model::Validator*>{
+    new Model::EmptyPropertyKeyValidator(), new Model::EmptyPropertyValueValidator()};
 
 
-auto issues = std::vector<const Model::Issue *>{};
-document->world()->
-accept(kdl::overload(
-    [&](auto &&thisLambda, Model::WorldNode *w) {
+  class AcceptAllIssues
+  {
+  public:
+    bool operator()(const Model::Issue*) const { return true; }
+  };
+
+
+  auto issues = std::vector<const Model::Issue*>{};
+  document->world()->accept(kdl::overload(
+    [&](auto&& thisLambda, Model::WorldNode* w) {
       issues = kdl::vec_concat(std::move(issues), w->issues(validators));
       w->visitChildren(thisLambda);
-    }, [&](auto &&thisLambda, Model::LayerNode *l) {
+    },
+    [&](auto&& thisLambda, Model::LayerNode* l) {
       issues = kdl::vec_concat(std::move(issues), l->issues(validators));
       l->visitChildren(thisLambda);
-    }, [&](auto &&thisLambda, Model::GroupNode *g) {
+    },
+    [&](auto&& thisLambda, Model::GroupNode* g) {
       issues = kdl::vec_concat(std::move(issues), g->issues(validators));
       g->visitChildren(thisLambda);
-    }, [&](auto &&thisLambda, Model::EntityNode *e) {
+    },
+    [&](auto&& thisLambda, Model::EntityNode* e) {
       issues = kdl::vec_concat(std::move(issues), e->issues(validators));
       e->visitChildren(thisLambda);
-    }, [&](Model::BrushNode *b) {
+    },
+    [&](Model::BrushNode* b) {
       issues = kdl::vec_concat(std::move(issues), b->issues(validators));
-    }, [&](Model::PatchNode *p) {
+    },
+    [&](Model::PatchNode* p) {
       issues = kdl::vec_concat(std::move(issues), p->issues(validators));
-    }
-)
-);
+    }));
 
-REQUIRE(2 == issues.
+  REQUIRE(
+    2
+    == issues.
 
-size()
+       size()
 
-);
+  );
 
-const Model::Issue *issue0 = issues.at(0);
-const Model::Issue *issue1 = issues.at(1);
+  const Model::Issue* issue0 = issues.at(0);
+  const Model::Issue* issue1 = issues.at(1);
 
-// Should be one EmptyPropertyNameIssue and one EmptyPropertyValueIssue
-CHECK(((issue0
+  // Should be one EmptyPropertyNameIssue and one EmptyPropertyValueIssue
+  CHECK(((issue0
 ->
 
 type()
@@ -135,26 +141,27 @@ type()
 
 )));
 
-auto fixes = document->world()->quickFixes(issue0->type());
-REQUIRE(1 == fixes.
+  auto fixes = document->world()->quickFixes(issue0->type());
+  REQUIRE(
+    1
+    == fixes.
 
-size()
+       size()
 
-);
+  );
 
-const auto *quickFix = fixes.at(0);
-quickFix->
-apply(*document, std::vector<const Model::Issue *>{issue0}
-);
+  const auto* quickFix = fixes.at(0);
+  quickFix->apply(*document, std::vector<const Model::Issue*>{issue0});
 
-// The fix should have deleted the property
-CHECK(!entityNode->
+  // The fix should have deleted the property
+  CHECK(!entityNode
+           ->
 
-entity()
+         entity()
 
-.hasProperty(""));
+           .hasProperty(""));
 
-kdl::vec_clear_and_delete(validators);
+  kdl::vec_clear_and_delete(validators);
 }
 } // namespace View
 } // namespace TrenchBroom

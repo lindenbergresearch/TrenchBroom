@@ -27,37 +27,40 @@ class QKeySequence;
 
 class QAbstractButton;
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class LimitedKeySequenceEdit;
 
 
-class KeySequenceEdit : public QWidget {
-    Q_OBJECT
-    Q_PROPERTY(QKeySequence keySequence READ keySequence WRITE setKeySequence NOTIFY
-                   keySequenceChanged USER true)
+class KeySequenceEdit : public QWidget
+{
+  Q_OBJECT
+  Q_PROPERTY(QKeySequence keySequence READ keySequence WRITE setKeySequence NOTIFY
+               keySequenceChanged USER true)
 private:
-    LimitedKeySequenceEdit *m_keySequenceEdit;
-    QAbstractButton *m_clearButton;
+  LimitedKeySequenceEdit* m_keySequenceEdit;
+  QAbstractButton* m_clearButton;
 
 public:
-    explicit KeySequenceEdit(QWidget *parent = nullptr);
+  explicit KeySequenceEdit(QWidget* parent = nullptr);
 
-    explicit KeySequenceEdit(size_t maxCount, QWidget *parent = nullptr);
+  explicit KeySequenceEdit(size_t maxCount, QWidget* parent = nullptr);
 
-    const QKeySequence keySequence() const;
+  const QKeySequence keySequence() const;
 
 public slots:
 
-    void setKeySequence(const QKeySequence &keySequence);
+  void setKeySequence(const QKeySequence& keySequence);
 
-    void clear();
+  void clear();
 
 signals:
 
-    void editingFinished();
+  void editingFinished();
 
-    void keySequenceChanged(const QKeySequence &keySequence);
+  void keySequenceChanged(const QKeySequence& keySequence);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

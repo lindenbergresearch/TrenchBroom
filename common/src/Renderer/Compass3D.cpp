@@ -25,12 +25,19 @@
 
 #include <vm/mat.h>
 
-namespace TrenchBroom {
-namespace Renderer {
-void Compass3D::doRenderCompass(RenderContext &renderContext, const vm::mat4x4f &transform) {
-  auto axisColorX = modifyAlpha(pref(Preferences::XAxisColor), pref(Preferences::CompassTransparency));
-  auto axisColorY = modifyAlpha(pref(Preferences::YAxisColor), pref(Preferences::CompassTransparency));
-  auto axisColorZ = modifyAlpha(pref(Preferences::ZAxisColor), pref(Preferences::CompassTransparency));
+namespace TrenchBroom
+{
+namespace Renderer
+{
+void Compass3D::doRenderCompass(
+  RenderContext& renderContext, const vm::mat4x4f& transform)
+{
+  auto axisColorX =
+    modifyAlpha(pref(Preferences::XAxisColor), pref(Preferences::CompassTransparency));
+  auto axisColorY =
+    modifyAlpha(pref(Preferences::YAxisColor), pref(Preferences::CompassTransparency));
+  auto axisColorZ =
+    modifyAlpha(pref(Preferences::ZAxisColor), pref(Preferences::CompassTransparency));
 
   renderSolidAxis(renderContext, transform, axisColorZ);
   renderSolidAxis(renderContext, transform * vm::mat4x4f::rot_90_y_ccw(), axisColorX);

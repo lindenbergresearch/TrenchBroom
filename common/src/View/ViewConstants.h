@@ -28,9 +28,12 @@ class QFont;
 
 class QWidget;
 
-namespace TrenchBroom {
-namespace View {
-namespace LayoutConstants {
+namespace TrenchBroom
+{
+namespace View
+{
+namespace LayoutConstants
+{
 #if defined _WIN32
 static const int DialogOuterMargin = 10;
 static const int DialogButtonTopMargin = 10;
@@ -72,7 +75,7 @@ static const int ChoiceLeftMargin = 1;
 static const int ChoiceSizeDelta = 1;
 static const int TextBoxInnerMargin = 0;
 static const int TabBarBarLeftMargin = 10;
-static const int ToggleButtonStyle = 0x08000000;// wxBORDER_SUNKEN
+static const int ToggleButtonStyle = 0x08000000; // wxBORDER_SUNKEN
 #else
 static const int DialogOuterMargin = 10;
 static const int DialogButtonTopMargin = 10;
@@ -98,13 +101,15 @@ static const int ToggleButtonStyle = 0;
 static const int NoMargin = 0;
 static const int MinPreferenceLabelWidth = 100;
 static const int HighlightBoxMargin = 5;
-}// namespace LayoutConstants
+} // namespace LayoutConstants
 
-namespace Fonts {
+namespace Fonts
+{
 QFont fixedWidthFont();
 }
 
-namespace Colors {
+namespace Colors
+{
 QColor defaultText();
 
 QColor highlightText();
@@ -117,9 +122,9 @@ QColor disabledText();
 
 QColor disabledCellText();
 
-QColor disabledText(const QWidget *widget);
+QColor disabledText(const QWidget* widget);
 
 QColor window();
-}// namespace Colors
-}// namespace View
-}// namespace TrenchBroom
+} // namespace Colors
+} // namespace View
+} // namespace TrenchBroom

@@ -25,33 +25,38 @@
 #include <filesystem>
 #include <variant>
 
-namespace TrenchBroom {
-namespace IO {
-struct MapExportOptions {
-    std::filesystem::path exportPath;
+namespace TrenchBroom
+{
+namespace IO
+{
+struct MapExportOptions
+{
+  std::filesystem::path exportPath;
 
-    kdl_reflect_decl(MapExportOptions, exportPath);
+  kdl_reflect_decl(MapExportOptions, exportPath);
 };
 
 
-enum class ObjMtlPathMode {
-    RelativeToGamePath,
-    RelativeToExportPath
+enum class ObjMtlPathMode
+{
+  RelativeToGamePath,
+  RelativeToExportPath
 };
 
-std::ostream &operator<<(std::ostream &lhs, ObjMtlPathMode rhs);
+std::ostream& operator<<(std::ostream& lhs, ObjMtlPathMode rhs);
 
 
-struct ObjExportOptions {
-    std::filesystem::path exportPath;
-    ObjMtlPathMode mtlPathMode;
+struct ObjExportOptions
+{
+  std::filesystem::path exportPath;
+  ObjMtlPathMode mtlPathMode;
 
-    kdl_reflect_decl(ObjExportOptions, exportPath, mtlPathMode);
+  kdl_reflect_decl(ObjExportOptions, exportPath, mtlPathMode);
 };
 
 
 using ExportOptions = std::variant<MapExportOptions, ObjExportOptions>;
 
-std::ostream &operator<<(std::ostream &lhs, const ExportOptions &rhs);
-}// namespace IO
-}// namespace TrenchBroom
+std::ostream& operator<<(std::ostream& lhs, const ExportOptions& rhs);
+} // namespace IO
+} // namespace TrenchBroom

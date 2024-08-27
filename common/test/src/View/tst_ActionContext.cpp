@@ -21,14 +21,16 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace View {
-TEST_CASE("actionContextMatches_WithMask") {
-using T = std::tuple<ActionContext::Type, ActionContext::Type, ActionContext::Type, bool>;
-const auto [lhs, rhs, mask, expected] = GENERATE(
-    values<T>(
-        {
-            // clang-format off
+namespace TrenchBroom
+{
+namespace View
+{
+TEST_CASE("actionContextMatches_WithMask")
+{
+  using T =
+    std::tuple<ActionContext::Type, ActionContext::Type, ActionContext::Type, bool>;
+  const auto [lhs, rhs, mask, expected] = GENERATE(values<T>({
+    // clang-format off
             {ActionContext::View3D, ActionContext::View2D, ActionContext::AnyView, false},
             {ActionContext::View3D, ActionContext::View3D, ActionContext::AnyView, true},
             {ActionContext::View3D, ActionContext::View3D, ActionContext::AnyTool, false},
@@ -37,23 +39,19 @@ const auto [lhs, rhs, mask, expected] = GENERATE(
             {ActionContext::AnyView, ActionContext::View3D, ActionContext::AnyTool, false},
             {ActionContext::RotateTool, ActionContext::Any, ActionContext::AnyTool, true},
             {ActionContext::View3D, ActionContext::AnyTool, ActionContext::AnyTool, false},
-            // clang-format on
-        }
-    ));
+    // clang-format on
+  }));
 
-CAPTURE(actionContextName(lhs), actionContextName(rhs), actionContextName(mask)
-);
+  CAPTURE(actionContextName(lhs), actionContextName(rhs), actionContextName(mask));
 
-CHECK(actionContextMatches(lhs, rhs, mask)
-== expected);
+  CHECK(actionContextMatches(lhs, rhs, mask) == expected);
 }
 
-TEST_CASE("actionContextMatches") {
-using T = std::tuple<ActionContext::Type, ActionContext::Type, bool>;
-const auto [lhs, rhs, expected] = GENERATE(
-    values<T>(
-        {
-            // clang-format off
+TEST_CASE("actionContextMatches")
+{
+  using T = std::tuple<ActionContext::Type, ActionContext::Type, bool>;
+  const auto [lhs, rhs, expected] = GENERATE(values<T>({
+    // clang-format off
             // required context                                                                 actual context
             {ActionContext::Any, ActionContext::View2D | ActionContext::NoSelection | ActionContext::NoTool, true},
             {ActionContext::Any, ActionContext::View3D | ActionContext::NoSelection | ActionContext::NoTool, true},
@@ -191,15 +189,12 @@ const auto [lhs, rhs, expected] = GENERATE(
                 ActionContext::AnyView | ActionContext::NodeSelection | ActionContext::AnyTool,
                 ActionContext::View3D | ActionContext::NodeSelection | ActionContext::RotateTool, true
             },
-            // clang-format on
-        }
-    ));
+    // clang-format on
+  }));
 
-CAPTURE(actionContextName(lhs), actionContextName(rhs)
-);
+  CAPTURE(actionContextName(lhs), actionContextName(rhs));
 
-CHECK(actionContextMatches(lhs, rhs)
-== expected);
+  CHECK(actionContextMatches(lhs, rhs) == expected);
 }
 } // namespace View
 } // namespace TrenchBroom

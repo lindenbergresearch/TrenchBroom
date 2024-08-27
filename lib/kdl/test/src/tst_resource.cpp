@@ -22,89 +22,97 @@
 
 #include "catch2.h"
 
-namespace kdl {
-TEST_CASE("resource") {
-    auto deleter_calls = std::vector<int>{};
-    auto deleter = [&](const auto i) {
-        deleter_calls.push_back(i);
-        ;
-    };
+namespace kdl
+{
+TEST_CASE("resource")
+{
+  auto deleter_calls = std::vector<int>{};
+  auto deleter = [&](const auto i) {
+    deleter_calls.push_back(i);
+    ;
+  };
 
-    SECTION("destructor calls deleter") {
-        {
-            auto r = resource{1, deleter};
-            REQUIRE(deleter_calls.empty());
-        }
-
-        CHECK(deleter_calls == std::vector<int>{1});
+  SECTION("destructor calls deleter")
+  {
+    {
+      auto r = resource{1, deleter};
+      REQUIRE(deleter_calls.empty());
     }
 
-    SECTION("move constructor") {
-        {
-            auto r = resource{1, deleter};
-            REQUIRE(deleter_calls.empty());
+    CHECK(deleter_calls == std::vector<int>{1});
+  }
 
-            {
-                auto s = resource{std::move(r)};
-                CHECK(*s == 1);
-                REQUIRE(deleter_calls.empty());
-            }
+  SECTION("move constructor")
+  {
+    {
+      auto r = resource{1, deleter};
+      REQUIRE(deleter_calls.empty());
 
-            CHECK(deleter_calls == std::vector<int>{1});
-        }
+      {
+        auto s = resource{std::move(r)};
+        CHECK(*s == 1);
+        REQUIRE(deleter_calls.empty());
+      }
 
-        CHECK(deleter_calls == std::vector<int>{1});
+      CHECK(deleter_calls == std::vector<int>{1});
     }
 
-    SECTION("move assignment") {
-        {
-            auto r = resource{1, deleter};
-            REQUIRE(deleter_calls.empty());
+    CHECK(deleter_calls == std::vector<int>{1});
+  }
 
-            {
-                auto s = std::move(r);
-                CHECK(*s == 1);
-                REQUIRE(deleter_calls.empty());
-            }
+  SECTION("move assignment")
+  {
+    {
+      auto r = resource{1, deleter};
+      REQUIRE(deleter_calls.empty());
 
-            CHECK(deleter_calls == std::vector<int>{1});
-        }
+      {
+        auto s = std::move(r);
+        CHECK(*s == 1);
+        REQUIRE(deleter_calls.empty());
+      }
 
-        CHECK(deleter_calls == std::vector<int>{1});
+      CHECK(deleter_calls == std::vector<int>{1});
     }
 
-    SECTION("value assignment") {
-        {
-            auto r = resource{1, deleter};
-            REQUIRE(deleter_calls.empty());
+    CHECK(deleter_calls == std::vector<int>{1});
+  }
 
-            r = 2;
-            CHECK(*r == 2);
-            CHECK(deleter_calls == std::vector<int>{1});
-        }
+  SECTION("value assignment")
+  {
+    {
+      auto r = resource{1, deleter};
+      REQUIRE(deleter_calls.empty());
 
-        CHECK(deleter_calls == std::vector<int>{1, 2});
+      r = 2;
+      CHECK(*r == 2);
+      CHECK(deleter_calls == std::vector<int>{1});
     }
 
-    SECTION("operator bool") {
-        CHECK(bool(resource{1, [](auto) {}}));
-        CHECK_FALSE(bool(resource{0, [](auto) {}}));
+    CHECK(deleter_calls == std::vector<int>{1, 2});
+  }
 
-        const auto i = 0;
-        CHECK(bool(resource{&i, [](auto) {}}));
-        CHECK_FALSE(bool(resource{static_cast<int *>(nullptr), [](auto) {}}));
+  SECTION("operator bool")
+  {
+    CHECK(bool(resource{1, [](auto) {}}));
+    CHECK_FALSE(bool(resource{0, [](auto) {}}));
+
+    const auto i = 0;
+    CHECK(bool(resource{&i, [](auto) {}}));
+    CHECK_FALSE(bool(resource{static_cast<int*>(nullptr), [](auto) {}}));
+  }
+
+  SECTION("release")
+  {
+    {
+      auto r = resource{1, deleter};
+      REQUIRE(deleter_calls.empty());
+
+      CHECK(r.release() == 1);
+      CHECK(deleter_calls.empty());
     }
 
-    SECTION("release") {
-        {
-            auto r = resource{1, deleter};
-            REQUIRE(deleter_calls.empty());
-
-            CHECK(r.release() == 1);
-            CHECK(deleter_calls.empty());
-        }
-
-        CHECK(deleter_calls.empty());
-    }
+    CHECK(deleter_calls.empty());
+  }
 }
-}// namespace kdl
+} // namespace kdl

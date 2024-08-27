@@ -5,9 +5,10 @@
 #include <functional>
 #include <map>
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 
-static const char *const REPLACEMENT_TOKEN = "$";
+static const char* const REPLACEMENT_TOKEN = "$";
 
 
 /**
@@ -15,7 +16,8 @@ static const char *const REPLACEMENT_TOKEN = "$";
  * Replaces template-style placeholder with given replacement functions for
  * creating dynamic qss scripts.
  */
-struct QSSBuilder {
+struct QSSBuilder
+{
 
 public:
   /**
@@ -23,7 +25,7 @@ public:
    * @param path The path to the qss file.
    * @return A new instance of a QSS Builder or null if not successfully.
    */
-  static QSSBuilder *fromFile(const std::filesystem::path &path);
+  static QSSBuilder* fromFile(const std::filesystem::path& path);
 
   void update();
 
@@ -31,13 +33,13 @@ public:
    * Returns the raw input text. (template)
    * @return
    */
-  const QString &getText() const;
+  const QString& getText() const;
 
   /**
    * Sets the input text. (template)
    * @param text QString with qss sources.
    */
-  void setText(const QString &text);
+  void setText(const QString& text);
 
   /**
    * Adds a replacement function for transforming a placeholder to a concrete value.
@@ -51,7 +53,7 @@ public:
    *
    * @return Result as QString.
    */
-  const QString &getRenderedText() const;
+  const QString& getRenderedText() const;
 
 private:
   QString text;

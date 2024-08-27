@@ -8,10 +8,9 @@ This file is part of TrenchBroom.
      the Free Software Foundation, either version 3 of the License, or
                                     (at your option) any later version.
 
-                                    TrenchBroom is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+                                    TrenchBroom is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
@@ -29,30 +28,32 @@ class QKeyEvent;
 
 class QCloseEvent;
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 
 class GameEngineProfileManager;
 
 
 /**
-* Dialog for editing game engine profiles (name/path, not parameters).
-*/
-class GameEngineDialog : public QDialog {
-    Q_OBJECT
+ * Dialog for editing game engine profiles (name/path, not parameters).
+ */
+class GameEngineDialog : public QDialog
+{
+  Q_OBJECT
 private:
-    const std::string m_gameName;
-    GameEngineProfileManager *m_profileManager = nullptr;
+  const std::string m_gameName;
+  GameEngineProfileManager* m_profileManager = nullptr;
 
 public:
-    explicit GameEngineDialog(std::string gameName, QWidget *parent = nullptr);
+  explicit GameEngineDialog(std::string gameName, QWidget* parent = nullptr);
 
-public slots:// QDialog overrides
-    void done(int r) override;
+public slots: // QDialog overrides
+  void done(int r) override;
 
 private:
-    void createGui();
+  void createGui();
 
-    void saveConfig();
+  void saveConfig();
 };
 
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

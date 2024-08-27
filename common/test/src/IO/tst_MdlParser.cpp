@@ -32,72 +32,73 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom {
-namespace IO {
-TEST_CASE("MdlParserTest.loadValidMdl") {
-auto logger = NullLogger{};
+namespace TrenchBroom
+{
+namespace IO
+{
+TEST_CASE("MdlParserTest.loadValidMdl")
+{
+  auto logger = NullLogger{};
 
-const auto palettePath = "fixture/test/palette.lmp";
-auto fs = DiskFileSystem{std::filesystem::current_path()};
-auto paletteFile = fs.openFile("fixture/test/palette.lmp").value();
-const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
+  const auto palettePath = "fixture/test/palette.lmp";
+  auto fs = DiskFileSystem{std::filesystem::current_path()};
+  auto paletteFile = fs.openFile("fixture/test/palette.lmp").value();
+  const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
 
-const auto mdlPath = std::filesystem::current_path() / "fixture/test/IO/Mdl/armor.mdl";
-const auto mdlFile = Disk::openFile(mdlPath).value();
+  const auto mdlPath = std::filesystem::current_path() / "fixture/test/IO/Mdl/armor.mdl";
+  const auto mdlFile = Disk::openFile(mdlPath).value();
 
-auto reader = mdlFile->reader().buffer();
-auto parser = MdlParser("armor", reader, palette);
-auto model = parser.initializeModel(logger);
-parser.loadFrame(0, *model, logger);
+  auto reader = mdlFile->reader().buffer();
+  auto parser = MdlParser("armor", reader, palette);
+  auto model = parser.initializeModel(logger);
+  parser.loadFrame(0, *model, logger);
 
-CHECK(model
-!= nullptr);
-CHECK(model
-->
+  CHECK(model != nullptr);
+  CHECK(
+    model->
 
-surfaceCount()
+    surfaceCount()
 
-== 1u);
-CHECK(model
-->
+    == 1u);
+  CHECK(
+    model->
 
-frameCount()
+    frameCount()
 
-== 1u);
+    == 1u);
 
-const auto surfaces = model->surfaces();
-const auto &surface = *surfaces.front();
-CHECK(surface
-.
+  const auto surfaces = model->surfaces();
+  const auto& surface = *surfaces.front();
+  CHECK(
+    surface.
 
-skinCount()
+    skinCount()
 
-== 3u);
-CHECK(surface
-.
+    == 3u);
+  CHECK(
+    surface.
 
-frameCount()
+    frameCount()
 
-== 1u);
+    == 1u);
 }
 
-TEST_CASE("MdlParserTest.loadInvalidMdl") {
-auto logger = NullLogger{};
+TEST_CASE("MdlParserTest.loadInvalidMdl")
+{
+  auto logger = NullLogger{};
 
-const auto palettePath = "fixture/test/palette.lmp";
-auto fs = DiskFileSystem{std::filesystem::current_path()};
-auto paletteFile = fs.openFile("fixture/test/palette.lmp").value();
-const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
+  const auto palettePath = "fixture/test/palette.lmp";
+  auto fs = DiskFileSystem{std::filesystem::current_path()};
+  auto paletteFile = fs.openFile("fixture/test/palette.lmp").value();
+  const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
 
-const auto mdlPath = std::filesystem::current_path() / "fixture/test/IO/Mdl/invalid.mdl";
-const auto mdlFile = Disk::openFile(mdlPath).value();
+  const auto mdlPath =
+    std::filesystem::current_path() / "fixture/test/IO/Mdl/invalid.mdl";
+  const auto mdlFile = Disk::openFile(mdlPath).value();
 
-auto reader = mdlFile->reader().buffer();
-auto parser = MdlParser("armor", reader, palette);
-CHECK_THROWS_AS(parser
-.
-initializeModel(logger), AssetException
-);
+  auto reader = mdlFile->reader().buffer();
+  auto parser = MdlParser("armor", reader, palette);
+  CHECK_THROWS_AS(parser.initializeModel(logger), AssetException);
 }
 } // namespace IO
 } // namespace TrenchBroom

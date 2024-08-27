@@ -31,97 +31,113 @@
 
 #include "catch2.h"
 
-namespace kdl {
-TEST_CASE("for 0") {
-    bool ran = false;
-    kdl::parallel_for(0, [&](size_t) { ran = true; });
-    CHECK(!ran);
+namespace kdl
+{
+TEST_CASE("for 0")
+{
+  bool ran = false;
+  kdl::parallel_for(0, [&](size_t) { ran = true; });
+  CHECK(!ran);
 }
 
-TEST_CASE("for 10000") {
-    constexpr size_t TestSize = 10'000;
+TEST_CASE("for 10000")
+{
+  constexpr size_t TestSize = 10'000;
 
-    std::array<std::atomic<size_t>, TestSize> indices;
-    for (size_t i = 0; i < TestSize; ++i) {
-        indices[i] = 0;
+  std::array<std::atomic<size_t>, TestSize> indices;
+  for (size_t i = 0; i < TestSize; ++i)
+  {
+    indices[i] = 0;
+  }
+
+  // fill `indices` with 1, ..., TestSize
+  bool failed = false;
+  kdl::parallel_for(indices.size(), [&](const size_t i) {
+    if (i >= TestSize)
+    {
+      failed = true;
+      return;
     }
-
-    // fill `indices` with 1, ..., TestSize
-    bool failed = false;
-    kdl::parallel_for(indices.size(), [&](const size_t i) {
-        if (i >= TestSize) {
-            failed = true;
-            return;
-        }
-        const size_t oldValue = std::atomic_fetch_add(&indices[i], i + 1);
-        if (oldValue != 0) {
-            failed = true;
-        }
-    });
-
-    CHECK(!failed);
-    for (size_t i = 0; i < TestSize; ++i) {
-        const size_t expected = (i + 1);
-        CHECK(indices[i] == expected);
+    const size_t oldValue = std::atomic_fetch_add(&indices[i], i + 1);
+    if (oldValue != 0)
+    {
+      failed = true;
     }
+  });
+
+  CHECK(!failed);
+  for (size_t i = 0; i < TestSize; ++i)
+  {
+    const size_t expected = (i + 1);
+    CHECK(indices[i] == expected);
+  }
 }
 
-TEST_CASE("transform") {
-    const auto L = [](const int &v) { return v * 10; };
+TEST_CASE("transform")
+{
+  const auto L = [](const int& v) { return v * 10; };
 
-    CHECK(std::vector<int>{} == kdl::vec_parallel_transform(std::vector<int>{}, L));
-    CHECK(
-        std::vector<int>{10, 20, 30} == kdl::vec_parallel_transform(std::vector<int>{1, 2, 3}, L));
+  CHECK(std::vector<int>{} == kdl::vec_parallel_transform(std::vector<int>{}, L));
+  CHECK(
+    std::vector<int>{10, 20, 30}
+    == kdl::vec_parallel_transform(std::vector<int>{1, 2, 3}, L));
 }
 
-TEST_CASE("transform_many") {
-    std::vector<int> input;
-    std::vector<std::string> expected;
+TEST_CASE("transform_many")
+{
+  std::vector<int> input;
+  std::vector<std::string> expected;
 
-    for (int i = 0; i < 10000; ++i) {
-        input.push_back(i);
-        expected.push_back(std::to_string(i));
-    }
+  for (int i = 0; i < 10000; ++i)
+  {
+    input.push_back(i);
+    expected.push_back(std::to_string(i));
+  }
 
-    CHECK(expected == kdl::vec_parallel_transform(input, [](int i) {
-              return std::to_string(i);
-          }));
+  CHECK(expected == kdl::vec_parallel_transform(input, [](int i) {
+          return std::to_string(i);
+        }));
 }
 
-TEST_CASE("overhead for small work batches") {
-    constexpr size_t OuterLoop = 1'000;
-    constexpr size_t InnerLoop = 10;
-    auto counter = std::atomic<size_t>{0};
-    const auto startTime = std::chrono::high_resolution_clock::now();
+TEST_CASE("overhead for small work batches")
+{
+  constexpr size_t OuterLoop = 1'000;
+  constexpr size_t InnerLoop = 10;
+  auto counter = std::atomic<size_t>{0};
+  const auto startTime = std::chrono::high_resolution_clock::now();
 
-    SECTION("sequential") {
-        for (size_t i = 0; i < OuterLoop * InnerLoop; ++i) {
-            std::atomic_fetch_add(&counter, static_cast<size_t>(1));
-        }
-
-        const auto endTime = std::chrono::high_resolution_clock::now();
-        std::cout << "sequential took "
-                  << std::chrono::duration_cast<std::chrono::microseconds>(
-                         endTime - startTime)
-                         .count()
-                  << "us\n";
+  SECTION("sequential")
+  {
+    for (size_t i = 0; i < OuterLoop * InnerLoop; ++i)
+    {
+      std::atomic_fetch_add(&counter, static_cast<size_t>(1));
     }
 
-    SECTION("run parallel_for on batches of 10") {
-        for (size_t i = 0; i < OuterLoop; ++i) {
-            kdl::parallel_for(InnerLoop, [&](const size_t) {
-                std::atomic_fetch_add(&counter, static_cast<size_t>(1));
-            });
-        }
+    const auto endTime = std::chrono::high_resolution_clock::now();
+    std::cout << "sequential took "
+              << std::chrono::duration_cast<std::chrono::microseconds>(
+                   endTime - startTime)
+                   .count()
+              << "us\n";
+  }
 
-        const auto endTime = std::chrono::high_resolution_clock::now();
-        std::cout << "small batches took "
-                  << std::chrono::duration_cast<std::chrono::microseconds>(
-                         endTime - startTime)
-                         .count()
-                  << "us\n";
+  SECTION("run parallel_for on batches of 10")
+  {
+    for (size_t i = 0; i < OuterLoop; ++i)
+    {
+      kdl::parallel_for(InnerLoop, [&](const size_t) {
+        std::atomic_fetch_add(&counter, static_cast<size_t>(1));
+      });
     }
 
-    CHECK(static_cast<size_t>(counter) == OuterLoop * InnerLoop);
+    const auto endTime = std::chrono::high_resolution_clock::now();
+    std::cout << "small batches took "
+              << std::chrono::duration_cast<std::chrono::microseconds>(
+                   endTime - startTime)
+                   .count()
+              << "us\n";
+  }
+
+  CHECK(static_cast<size_t>(counter) == OuterLoop * InnerLoop);
 }
-}// namespace kdl
+} // namespace kdl

@@ -8,10 +8,9 @@ This file is part of TrenchBroom.
      the Free Software Foundation, either version 3 of the License, or
                                     (at your option) any later version.
 
-                                    TrenchBroom is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+                                    TrenchBroom is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
@@ -26,11 +25,13 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 class QAbstractButton;
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 struct GameEngineProfile;
-}// namespace TrenchBroom::Model
+} // namespace TrenchBroom::Model
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 
 class GameEngineProfileEditor;
 
@@ -39,28 +40,30 @@ class GameEngineProfileListBox;
 
 
 /**
-* Widget for editing game engine profiles (name/path, not parameters).
-*/
-class GameEngineProfileManager : public QWidget {
-    Q_OBJECT
+ * Widget for editing game engine profiles (name/path, not parameters).
+ */
+class GameEngineProfileManager : public QWidget
+{
+  Q_OBJECT
 private:
-    Model::GameEngineConfig m_config;
-    GameEngineProfileListBox *m_profileList = nullptr;
-    GameEngineProfileEditor *m_profileEditor = nullptr;
-    QAbstractButton *m_removeProfileButton = nullptr;
+  Model::GameEngineConfig m_config;
+  GameEngineProfileListBox* m_profileList = nullptr;
+  GameEngineProfileEditor* m_profileEditor = nullptr;
+  QAbstractButton* m_removeProfileButton = nullptr;
 
 public:
-    explicit GameEngineProfileManager(Model::GameEngineConfig config, QWidget *parent = nullptr);
+  explicit GameEngineProfileManager(
+    Model::GameEngineConfig config, QWidget* parent = nullptr);
 
-    const Model::GameEngineConfig &config() const;
+  const Model::GameEngineConfig& config() const;
 
 private slots:
 
-    void addProfile();
+  void addProfile();
 
-    void removeProfile();
+  void removeProfile();
 
-    void currentProfileChanged(Model::GameEngineProfile *profile);
+  void currentProfileChanged(Model::GameEngineProfile* profile);
 };
 
-}// namespace TrenchBroom::View
+} // namespace TrenchBroom::View

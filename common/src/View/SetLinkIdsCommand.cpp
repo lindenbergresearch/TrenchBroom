@@ -33,48 +33,56 @@
 #include "kdl/result.h"
 #include "kdl/vector_utils.h"
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 
-SetLinkIdsCommand::SetLinkIdsCommand(const std::string &name, std::vector<std::tuple<Model::Node *, std::string>> linkIds) : UndoableCommand{name, true}, m_linkIds{std::move(linkIds)} {
+SetLinkIdsCommand::SetLinkIdsCommand(
+  const std::string& name, std::vector<std::tuple<Model::Node*, std::string>> linkIds)
+  : UndoableCommand{name, true}
+  , m_linkIds{std::move(linkIds)}
+{
 }
 
 SetLinkIdsCommand::~SetLinkIdsCommand() = default;
 
-namespace {
-auto setLinkIds(const std::vector<std::tuple<Model::Node *, std::string>> &linkIds) {
-    return kdl::vec_transform(
-        linkIds, [](const auto &nodeAndLinkId) {
-            auto *node = std::get<Model::Node *>(nodeAndLinkId);
-            const auto &linkId = std::get<std::string>(nodeAndLinkId);
-            return node->accept(
-                kdl::overload(
-                    [&](const Model::WorldNode *) -> std::tuple<Model::Node *, std::string> {
-                        ensure(false, "no unexpected world node");
-                    },
-                    [](const Model::LayerNode *) -> std::tuple<Model::Node *, std::string> {
-                        ensure(false, "no unexpected layer node");
-                    },
-                    [&](Model::Object *object) -> std::tuple<Model::Node *, std::string> {
-                        auto oldLinkId = object->linkId();
-                        object->setLinkId(std::move(linkId));
-                        return {node, std::move(oldLinkId)};
-                    }));
-        });
+namespace
+{
+auto setLinkIds(const std::vector<std::tuple<Model::Node*, std::string>>& linkIds)
+{
+  return kdl::vec_transform(linkIds, [](const auto& nodeAndLinkId) {
+    auto* node = std::get<Model::Node*>(nodeAndLinkId);
+    const auto& linkId = std::get<std::string>(nodeAndLinkId);
+    return node->accept(kdl::overload(
+      [&](const Model::WorldNode*) -> std::tuple<Model::Node*, std::string> {
+        ensure(false, "no unexpected world node");
+      },
+      [](const Model::LayerNode*) -> std::tuple<Model::Node*, std::string> {
+        ensure(false, "no unexpected layer node");
+      },
+      [&](Model::Object* object) -> std::tuple<Model::Node*, std::string> {
+        auto oldLinkId = object->linkId();
+        object->setLinkId(std::move(linkId));
+        return {node, std::move(oldLinkId)};
+      }));
+  });
 }
-}// namespace
+} // namespace
 
-std::unique_ptr<CommandResult> SetLinkIdsCommand::doPerformDo(MapDocumentCommandFacade *) {
-    m_linkIds = setLinkIds(m_linkIds);
-    return std::make_unique<CommandResult>(true);
-}
-
-std::unique_ptr<CommandResult> SetLinkIdsCommand::doPerformUndo(MapDocumentCommandFacade *) {
-    m_linkIds = setLinkIds(m_linkIds);
-    return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> SetLinkIdsCommand::doPerformDo(MapDocumentCommandFacade*)
+{
+  m_linkIds = setLinkIds(m_linkIds);
+  return std::make_unique<CommandResult>(true);
 }
 
-bool SetLinkIdsCommand::doCollateWith(UndoableCommand &) {
-    return false;
+std::unique_ptr<CommandResult> SetLinkIdsCommand::doPerformUndo(MapDocumentCommandFacade*)
+{
+  m_linkIds = setLinkIds(m_linkIds);
+  return std::make_unique<CommandResult>(true);
 }
 
-}// namespace TrenchBroom::View
+bool SetLinkIdsCommand::doCollateWith(UndoableCommand&)
+{
+  return false;
+}
+
+} // namespace TrenchBroom::View

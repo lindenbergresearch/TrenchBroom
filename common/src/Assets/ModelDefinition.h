@@ -30,30 +30,36 @@
 #include <iosfwd>
 #include <optional>
 
-namespace TrenchBroom {
-namespace Assets {
+namespace TrenchBroom
+{
+namespace Assets
+{
 
-namespace ModelSpecificationKeys {
+namespace ModelSpecificationKeys
+{
 constexpr auto Path = "path";
 constexpr auto Skin = "skin";
 constexpr auto Frame = "frame";
 constexpr auto Scale = "scale";
 } // namespace ModelSpecificationKeys
 
-struct ModelSpecification {
+struct ModelSpecification
+{
   std::filesystem::path path;
   size_t skinIndex;
   size_t frameIndex;
 
   ModelSpecification();
 
-  ModelSpecification(const std::filesystem::path &path, size_t skinIndex, size_t frameIndex);
+  ModelSpecification(
+    const std::filesystem::path& path, size_t skinIndex, size_t frameIndex);
 
   kdl_reflect_decl(ModelSpecification, path, skinIndex, frameIndex);
 };
 
 
-class ModelDefinition {
+class ModelDefinition
+{
 private:
   EL::Expression m_expression;
 
@@ -75,7 +81,7 @@ public:
    *
    * @throws EL::Exception if the expression could not be evaluated
    */
-  ModelSpecification modelSpecification(const EL::VariableStore &variableStore) const;
+  ModelSpecification modelSpecification(const EL::VariableStore& variableStore) const;
 
   /**
    * Evaluates the model expresion.
@@ -94,7 +100,9 @@ public:
    *
    * @throws EL::Exception if the expression could not be evaluated
    */
-  vm::vec3 scale(const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression) const;
+  vm::vec3 scale(
+    const EL::VariableStore& variableStore,
+    const std::optional<EL::Expression>& defaultScaleExpression) const;
 
   kdl_reflect_decl(ModelDefinition, m_expression);
 };
@@ -105,7 +113,8 @@ public:
  * an error occurs.
  */
 vm::vec3 safeGetModelScale(
-    const ModelDefinition &definition, const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression
-);
+  const ModelDefinition& definition,
+  const EL::VariableStore& variableStore,
+  const std::optional<EL::Expression>& defaultScaleExpression);
 } // namespace Assets
 } // namespace TrenchBroom

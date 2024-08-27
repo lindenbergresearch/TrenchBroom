@@ -22,60 +22,77 @@
 #include "Model/GroupNode.h"
 #include "Uuid.h"
 
-namespace TrenchBroom::Model {
+namespace TrenchBroom::Model
+{
 
-Object::Object() : m_linkId{generateUuid()} {
+Object::Object()
+  : m_linkId{generateUuid()}
+{
 }
 
 Object::~Object() = default;
 
-const std::string &Object::linkId() const {
+const std::string& Object::linkId() const
+{
   return m_linkId;
 }
 
-void Object::setLinkId(std::string linkId) {
+void Object::setLinkId(std::string linkId)
+{
   m_linkId = std::move(linkId);
 }
 
-void Object::cloneLinkId(const Object &original, const SetLinkId linkIdPolicy) {
-  switch (linkIdPolicy) {
-  case SetLinkId::keep:setLinkId(original.linkId());
+void Object::cloneLinkId(const Object& original, const SetLinkId linkIdPolicy)
+{
+  switch (linkIdPolicy)
+  {
+  case SetLinkId::keep:
+    setLinkId(original.linkId());
     break;
-  case SetLinkId::generate:setLinkId(generateUuid());
+  case SetLinkId::generate:
+    setLinkId(generateUuid());
     break;
   }
 }
 
-Node *Object::container() {
+Node* Object::container()
+{
   return doGetContainer();
 }
 
-const Node *Object::container() const {
-  return const_cast<Object *>(this)->container();
+const Node* Object::container() const
+{
+  return const_cast<Object*>(this)->container();
 }
 
-LayerNode *Object::containingLayer() {
+LayerNode* Object::containingLayer()
+{
   return doGetContainingLayer();
 }
 
-const LayerNode *Object::containingLayer() const {
-  return const_cast<Object *>(this)->containingLayer();
+const LayerNode* Object::containingLayer() const
+{
+  return const_cast<Object*>(this)->containingLayer();
 }
 
-GroupNode *Object::containingGroup() {
+GroupNode* Object::containingGroup()
+{
   return doGetContainingGroup();
 }
 
-const GroupNode *Object::containingGroup() const {
-  return const_cast<Object *>(this)->containingGroup();
+const GroupNode* Object::containingGroup() const
+{
+  return const_cast<Object*>(this)->containingGroup();
 }
 
-bool Object::containedInGroup() const {
+bool Object::containedInGroup() const
+{
   return containingGroup() != nullptr;
 }
 
-bool Object::containingGroupOpened() const {
-  const auto *group = containingGroup();
+bool Object::containingGroupOpened() const
+{
+  const auto* group = containingGroup();
   return group == nullptr || group->opened();
 }
 

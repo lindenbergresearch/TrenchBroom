@@ -33,39 +33,45 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace IO {
-std::ostream &operator<<(std::ostream &str, const EntityDefinitionClassType type) {
-    switch (type) {
-        case EntityDefinitionClassType::BaseClass:
-            str << "BaseClass";
-            break;
-        case EntityDefinitionClassType::PointClass:
-            str << "PointClass";
-            break;
-        case EntityDefinitionClassType::BrushClass:
-            str << "BrushClass";
-            break;
-            switchDefault();
-    }
-    return str;
+namespace TrenchBroom
+{
+namespace IO
+{
+std::ostream& operator<<(std::ostream& str, const EntityDefinitionClassType type)
+{
+  switch (type)
+  {
+  case EntityDefinitionClassType::BaseClass:
+    str << "BaseClass";
+    break;
+  case EntityDefinitionClassType::PointClass:
+    str << "PointClass";
+    break;
+  case EntityDefinitionClassType::BrushClass:
+    str << "BrushClass";
+    break;
+    switchDefault();
+  }
+  return str;
 }
 
 kdl_reflect_impl(EntityDefinitionClassInfo);
 
 bool addPropertyDefinition(
-    std::vector<std::shared_ptr<Assets::PropertyDefinition>> &propertyDefinitions, std::shared_ptr<Assets::PropertyDefinition> propertyDefinition) {
-    assert(propertyDefinition != nullptr);
-    if (kdl::vec_contains(
-            propertyDefinitions, [&](const auto &a) {
-                return a->key() == propertyDefinition->key();
-            })) {
-        return false;
-    }
+  std::vector<std::shared_ptr<Assets::PropertyDefinition>>& propertyDefinitions,
+  std::shared_ptr<Assets::PropertyDefinition> propertyDefinition)
+{
+  assert(propertyDefinition != nullptr);
+  if (kdl::vec_contains(propertyDefinitions, [&](const auto& a) {
+        return a->key() == propertyDefinition->key();
+      }))
+  {
+    return false;
+  }
 
-    propertyDefinitions.push_back(std::move(propertyDefinition));
-    return true;
+  propertyDefinitions.push_back(std::move(propertyDefinition));
+  return true;
 }
 
-}// namespace IO
-}// namespace TrenchBroom
+} // namespace IO
+} // namespace TrenchBroom

@@ -19,8 +19,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-namespace TrenchBroom {
-[[noreturn]] void ensureFailed(const char *file, int line, const char *condition, const char *message);
+namespace TrenchBroom
+{
+[[noreturn]] void ensureFailed(
+  const char* file, int line, const char* condition, const char* message);
 }
 
 // These are ugly but necessary to stringify an expression, see:

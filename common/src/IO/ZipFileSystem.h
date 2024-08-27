@@ -26,21 +26,23 @@
 
 #include <mutex>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 class CFile;
 
 
-class ZipFileSystem : public ImageFileSystem<CFile> {
+class ZipFileSystem : public ImageFileSystem<CFile>
+{
 private:
-    mz_zip_archive m_archive;
-    std::mutex m_mutex;
+  mz_zip_archive m_archive;
+  std::mutex m_mutex;
 
 public:
-    using ImageFileSystem::ImageFileSystem;
+  using ImageFileSystem::ImageFileSystem;
 
-    ~ZipFileSystem() override;
+  ~ZipFileSystem() override;
 
 private:
-    Result<void> doReadDirectory() override;
+  Result<void> doReadDirectory() override;
 };
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

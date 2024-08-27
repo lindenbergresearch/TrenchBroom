@@ -20,10 +20,11 @@
 
 #pragma once
 
-namespace kdl {
+namespace kdl
+{
 /**
  * Forward declaration, see result.h for details.
  */
-template<typename Value, typename... Errors>
+template <typename Value, typename... Errors>
 class [[nodiscard]] result;
-}// namespace kdl
+} // namespace kdl

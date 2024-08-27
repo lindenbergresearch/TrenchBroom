@@ -27,8 +27,10 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom
+{
+namespace Model
+{
 class BrushFace;
 
 
@@ -36,52 +38,61 @@ class BrushNode;
 
 
 class PickResult;
-}// namespace Model
+} // namespace Model
 
-namespace Renderer {
+namespace Renderer
+{
 class RenderBatch;
 
 
 class RenderContext;
-}// namespace Renderer
+} // namespace Renderer
 
-namespace View {
+namespace View
+{
 class ClipTool;
 
 
-class ClipToolControllerBase : public ToolControllerGroup {
+class ClipToolControllerBase : public ToolControllerGroup
+{
 protected:
-    ClipTool &m_tool;
+  ClipTool& m_tool;
 
 protected:
-    explicit ClipToolControllerBase(ClipTool &tool);
+  explicit ClipToolControllerBase(ClipTool& tool);
 
-    virtual ~ClipToolControllerBase() override;
+  virtual ~ClipToolControllerBase() override;
 
 private:
-    Tool &tool() override;
+  Tool& tool() override;
 
-    const Tool &tool() const override;
+  const Tool& tool() const override;
 
-    void pick(const InputState &inputState, Model::PickResult &pickResult) override;
+  void pick(const InputState& inputState, Model::PickResult& pickResult) override;
 
-    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override;
+  void setRenderOptions(
+    const InputState& inputState, Renderer::RenderContext& renderContext) const override;
 
-    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) override;
+  void render(
+    const InputState& inputState,
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch) override;
 
-    bool cancel() override;
+  bool cancel() override;
 };
 
 
-class ClipToolController2D : public ClipToolControllerBase {
+class ClipToolController2D : public ClipToolControllerBase
+{
 public:
-    explicit ClipToolController2D(ClipTool &tool);
+  explicit ClipToolController2D(ClipTool& tool);
 };
 
 
-class ClipToolController3D : public ClipToolControllerBase {
+class ClipToolController3D : public ClipToolControllerBase
+{
 public:
-    explicit ClipToolController3D(ClipTool &tool);
+  explicit ClipToolController3D(ClipTool& tool);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

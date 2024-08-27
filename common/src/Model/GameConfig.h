@@ -38,9 +38,12 @@
 #include <variant>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
-struct MapFormatConfig {
+namespace TrenchBroom
+{
+namespace Model
+{
+struct MapFormatConfig
+{
   std::string format;
   std::filesystem::path initialMap;
 
@@ -48,7 +51,8 @@ struct MapFormatConfig {
 };
 
 
-struct PackageFormatConfig {
+struct PackageFormatConfig
+{
   std::vector<std::string> extensions;
   std::string format;
 
@@ -56,7 +60,8 @@ struct PackageFormatConfig {
 };
 
 
-struct FileSystemConfig {
+struct FileSystemConfig
+{
   std::filesystem::path searchPath;
   PackageFormatConfig packageFormat;
 
@@ -64,7 +69,8 @@ struct FileSystemConfig {
 };
 
 
-struct TextureConfig {
+struct TextureConfig
+{
   std::filesystem::path root;
   std::vector<std::string> extensions;
   std::filesystem::path palette;
@@ -73,21 +79,25 @@ struct TextureConfig {
   // Glob patterns used to match texture names for exclusion
   std::vector<std::string> excludes;
 
-  kdl_reflect_decl(TextureConfig, root, extensions, palette, property, shaderSearchPath, excludes);
+  kdl_reflect_decl(
+    TextureConfig, root, extensions, palette, property, shaderSearchPath, excludes);
 };
 
 
-struct EntityConfig {
+struct EntityConfig
+{
   std::vector<std::filesystem::path> defFilePaths;
   Color defaultColor;
   std::optional<EL::Expression> scaleExpression;
   bool setDefaultProperties;
 
-  kdl_reflect_decl(EntityConfig, defFilePaths, defaultColor, scaleExpression, setDefaultProperties);
+  kdl_reflect_decl(
+    EntityConfig, defFilePaths, defaultColor, scaleExpression, setDefaultProperties);
 };
 
 
-struct FlagConfig {
+struct FlagConfig
+{
   std::string name;
   std::string description;
   int value;
@@ -96,20 +106,22 @@ struct FlagConfig {
 };
 
 
-struct FlagsConfig {
+struct FlagsConfig
+{
   std::vector<FlagConfig> flags;
 
   kdl_reflect_decl(FlagsConfig, flags);
 
-  int flagValue(const std::string &flagName) const;
+  int flagValue(const std::string& flagName) const;
 
   std::string flagName(size_t index) const;
 
-  std::vector<std::string> flagNames(int mask = ~ 0) const;
+  std::vector<std::string> flagNames(int mask = ~0) const;
 };
 
 
-struct FaceAttribsConfig {
+struct FaceAttribsConfig
+{
   FlagsConfig surfaceFlags;
   FlagsConfig contentFlags;
   BrushFaceAttributes defaults{BrushFaceAttributes::NoTextureName};
@@ -118,7 +130,8 @@ struct FaceAttribsConfig {
 };
 
 
-struct CompilationTool {
+struct CompilationTool
+{
   std::string name;
   std::optional<std::string> description;
 
@@ -126,7 +139,8 @@ struct CompilationTool {
 };
 
 
-struct GameConfig {
+struct GameConfig
+{
   std::string name;
   std::filesystem::path path;
   std::filesystem::path icon;
@@ -147,12 +161,29 @@ struct GameConfig {
 
   size_t maxPropertyLength{1023};
 
-  kdl_reflect_decl(GameConfig, name, path, icon, experimental, fileFormats, fileSystemConfig, textureConfig, entityConfig, faceAttribsConfig, smartTags,
-      softMapBounds, compilationTools, compilationConfig, gameEngineConfig, compilationConfigParseFailed, gameEngineConfigParseFailed, maxPropertyLength);
+  kdl_reflect_decl(
+    GameConfig,
+    name,
+    path,
+    icon,
+    experimental,
+    fileFormats,
+    fileSystemConfig,
+    textureConfig,
+    entityConfig,
+    faceAttribsConfig,
+    smartTags,
+    softMapBounds,
+    compilationTools,
+    compilationConfig,
+    gameEngineConfig,
+    compilationConfigParseFailed,
+    gameEngineConfigParseFailed,
+    maxPropertyLength);
 
-  std::filesystem::path findInitialMap(const std::string &formatName) const;
+  std::filesystem::path findInitialMap(const std::string& formatName) const;
 
-  std::filesystem::path findConfigFile(const std::filesystem::path &filePath) const;
+  std::filesystem::path findConfigFile(const std::filesystem::path& filePath) const;
 };
 } // namespace Model
 } // namespace TrenchBroom

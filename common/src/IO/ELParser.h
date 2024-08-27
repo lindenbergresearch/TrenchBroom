@@ -32,8 +32,10 @@
 #include <iosfwd>
 #include <string>
 
-namespace TrenchBroom::IO {
-namespace ELToken {
+namespace TrenchBroom::IO
+{
+namespace ELToken
+{
 using Type = uint64_t;
 constexpr auto Name = Type{1} << 1;
 constexpr auto String = Type{1} << 2;
@@ -77,84 +79,89 @@ constexpr auto Literal = String | Number | Boolean | Null;
 constexpr auto UnaryOperator = Addition | Subtraction | LogicalNegation | BitwiseNegation;
 constexpr auto SimpleTerm = Name | Literal | OParen | OBracket | OBrace | UnaryOperator;
 constexpr auto CompoundTerm =
-    Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd | BitwiseXOr | BitwiseOr | BitwiseShiftLeft | BitwiseShiftRight;
-}// namespace ELToken
+  Addition | Subtraction | Multiplication | Division | Modulus | LogicalAnd | LogicalOr
+  | Less | LessOrEqual | Equal | NotEqual | GreaterOrEqual | Greater | Case | BitwiseAnd
+  | BitwiseXOr | BitwiseOr | BitwiseShiftLeft | BitwiseShiftRight;
+} // namespace ELToken
 
-class ELTokenizer : public Tokenizer<ELToken::Type> {
+class ELTokenizer : public Tokenizer<ELToken::Type>
+{
 private:
-    const std::string &NumberDelim() const;
+  const std::string& NumberDelim() const;
 
-    const std::string &IntegerDelim() const;
+  const std::string& IntegerDelim() const;
 
 public:
-    ELTokenizer(std::string_view str, size_t line, size_t column);
+  ELTokenizer(std::string_view str, size_t line, size_t column);
 
 public:
-    void appendUntil(const std::string &pattern, std::stringstream &str);
+  void appendUntil(const std::string& pattern, std::stringstream& str);
 
 private:
-    Token emitToken() override;
+  Token emitToken() override;
 };
 
 
-class ELParser : public Parser<ELToken::Type> {
+class ELParser : public Parser<ELToken::Type>
+{
 public:
-    enum class Mode {
-        Strict,
-        Lenient
-    };
+  enum class Mode
+  {
+    Strict,
+    Lenient
+  };
 
 protected:
-    ELParser::Mode m_mode;
-    ELTokenizer m_tokenizer;
-    using Token = ELTokenizer::Token;
+  ELParser::Mode m_mode;
+  ELTokenizer m_tokenizer;
+  using Token = ELTokenizer::Token;
 
 public:
-    ELParser(ELParser::Mode mode, std::string_view str, size_t line = 1, size_t column = 1);
+  ELParser(ELParser::Mode mode, std::string_view str, size_t line = 1, size_t column = 1);
 
-    TokenizerState tokenizerState() const;
+  TokenizerState tokenizerState() const;
 
-    static EL::Expression parseStrict(const std::string &str);
+  static EL::Expression parseStrict(const std::string& str);
 
-    static EL::Expression parseLenient(const std::string &str);
+  static EL::Expression parseLenient(const std::string& str);
 
-    EL::Expression parse();
-
-private:
-    EL::Expression parseExpression();
-
-    EL::Expression parseGroupedTerm();
-
-    EL::Expression parseTerm();
-
-    EL::Expression parseSimpleTermOrSwitch();
-
-    EL::Expression parseSimpleTermOrSubscript();
-
-    EL::Expression parseSimpleTerm();
-
-    EL::Expression parseSubscript(EL::Expression lhs);
-
-    EL::Expression parseVariable();
-
-    EL::Expression parseLiteral();
-
-    EL::Expression parseArray();
-
-    EL::Expression parseExpressionOrRange();
-
-    EL::Expression parseExpressionOrAnyRange();
-
-    EL::Expression parseMap();
-
-    EL::Expression parseUnaryOperator();
-
-    EL::Expression parseSwitch();
-
-    EL::Expression parseCompoundTerm(EL::Expression lhs);
+  EL::Expression parse();
 
 private:
-    TokenNameMap tokenNames() const override;
+  EL::Expression parseExpression();
+
+  EL::Expression parseGroupedTerm();
+
+  EL::Expression parseTerm();
+
+  EL::Expression parseSimpleTermOrSwitch();
+
+  EL::Expression parseSimpleTermOrSubscript();
+
+  EL::Expression parseSimpleTerm();
+
+  EL::Expression parseSubscript(EL::Expression lhs);
+
+  EL::Expression parseVariable();
+
+  EL::Expression parseLiteral();
+
+  EL::Expression parseArray();
+
+  EL::Expression parseExpressionOrRange();
+
+  EL::Expression parseExpressionOrAnyRange();
+
+  EL::Expression parseMap();
+
+  EL::Expression parseUnaryOperator();
+
+  EL::Expression parseSwitch();
+
+  EL::Expression parseCompoundTerm(EL::Expression lhs);
+
+private:
+  TokenNameMap tokenNames() const override;
 };
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

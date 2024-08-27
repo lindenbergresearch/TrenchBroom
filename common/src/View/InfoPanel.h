@@ -19,18 +19,20 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include <QTabWidget>
 #include <QWidget>
 
 #include "TextConsoleTabPage.h"
 
-namespace TrenchBroom {
+#include <memory>
+#include <vector>
+
+namespace TrenchBroom
+{
 class Logger;
 
-namespace View {
+namespace View
+{
 class Console;
 
 
@@ -43,21 +45,22 @@ class MapDocument;
 class TabBook;
 
 
-class InfoPanel : public QWidget {
-    Q_OBJECT
+class InfoPanel : public QWidget
+{
+  Q_OBJECT
 private:
-    //   TabBook *m_tabBook;
-    Console *m_console;
-    QTabWidget *m_tabs;
-    IssueBrowser *m_issueBrowser;
-    std::vector<TextConsoleTabPage *> dynamicPages;
+  //   TabBook *m_tabBook;
+  Console* m_console;
+  QTabWidget* m_tabs;
+  IssueBrowser* m_issueBrowser;
+  std::vector<TextConsoleTabPage*> dynamicPages;
 
 public:
-    explicit InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+  explicit InfoPanel(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
 
-    int createDynamicTabPage(TextConsoleTabPage *page);
+  int createDynamicTabPage(TextConsoleTabPage* page);
 
-    Console *console() const;
+  Console* console() const;
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

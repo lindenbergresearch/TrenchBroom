@@ -27,47 +27,50 @@ class QWidget;
 
 class QStackedLayout;
 
-namespace TrenchBroom {
-namespace View {
-class Tool {
+namespace TrenchBroom
+{
+namespace View
+{
+class Tool
+{
 private:
-    bool m_active;
+  bool m_active;
 
-    QStackedLayout *m_book;
-    int m_pageIndex;
+  QStackedLayout* m_book;
+  int m_pageIndex;
 
 public:
-    Notifier<Tool &> toolActivatedNotifier;
-    Notifier<Tool &> toolDeactivatedNotifier;
-    Notifier<Tool &> refreshViewsNotifier;
-    Notifier<Tool &> toolHandleSelectionChangedNotifier;
+  Notifier<Tool&> toolActivatedNotifier;
+  Notifier<Tool&> toolDeactivatedNotifier;
+  Notifier<Tool&> refreshViewsNotifier;
+  Notifier<Tool&> toolHandleSelectionChangedNotifier;
 
 protected:
-    explicit Tool(bool initiallyActive);
+  explicit Tool(bool initiallyActive);
 
 public:
-    virtual ~Tool();
+  virtual ~Tool();
 
-    bool active() const;
+  bool active() const;
 
-    bool activate();
+  bool activate();
 
-    bool deactivate();
+  bool deactivate();
 
-    void refreshViews();
+  void refreshViews();
 
-    void notifyToolHandleSelectionChanged();
+  void notifyToolHandleSelectionChanged();
 
-    void createPage(QStackedLayout *book);
+  void createPage(QStackedLayout* book);
 
-    void showPage();
+  void showPage();
 
 private:
-    virtual bool doActivate();
+  virtual bool doActivate();
 
-    virtual bool doDeactivate();
+  virtual bool doDeactivate();
 
-    virtual QWidget *doCreatePage(QWidget *parent);
+  virtual QWidget* doCreatePage(QWidget* parent);
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

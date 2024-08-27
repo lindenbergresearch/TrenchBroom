@@ -23,13 +23,14 @@
 
 #include <cstddef>
 
-namespace vm {
+namespace vm
+{
 enum class side;
 enum class direction;
 enum class rotation_axis;
 enum class plane_status;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class vec;
 
 using vec1f = vec<float, 1>;
@@ -60,7 +61,7 @@ using vec4l = vec<long, 4>;
 using vec4s = vec<size_t, 4>;
 using vec4b = vec<bool, 4>;
 
-template<typename T, size_t R, size_t C>
+template <typename T, size_t R, size_t C>
 class mat;
 
 using mat2x2f = mat<float, 2, 2>;
@@ -70,13 +71,13 @@ using mat2x2d = mat<double, 2, 2>;
 using mat3x3d = mat<double, 3, 3>;
 using mat4x4d = mat<double, 4, 4>;
 
-template<typename T>
+template <typename T>
 class quat;
 
 using quatf = quat<float>;
 using quatd = quat<double>;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class bbox;
 
 using bbox1f = bbox<float, 1>;
@@ -86,25 +87,25 @@ using bbox2d = bbox<double, 2>;
 using bbox3f = bbox<float, 3>;
 using bbox3d = bbox<double, 3>;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class line;
 
 using line3f = line<float, 3>;
 using line3d = line<double, 3>;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class plane;
 
 using plane3f = plane<float, 3>;
 using plane3d = plane<double, 3>;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class ray;
 
 using ray3f = ray<float, 3>;
 using ray3d = ray<double, 3>;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class segment;
 
 using segment3d = segment<double, 3>;
@@ -112,11 +113,11 @@ using segment3f = segment<float, 3>;
 using segment2d = segment<double, 2>;
 using segment2f = segment<float, 2>;
 
-template<typename T, size_t S>
+template <typename T, size_t S>
 class polygon;
 
 using polygon2f = polygon<float, 2>;
 using polygon2d = polygon<double, 2>;
 using polygon3f = polygon<float, 3>;
 using polygon3d = polygon<double, 3>;
-}// namespace vm
+} // namespace vm

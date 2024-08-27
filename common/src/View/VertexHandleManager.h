@@ -34,427 +34,483 @@
 #include <map>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Renderer {
+namespace TrenchBroom
+{
+namespace Renderer
+{
 class Camera;
 }
 
-namespace View {
+namespace View
+{
 class Grid;
 
 
-class VertexHandleManagerBase {
+class VertexHandleManagerBase
+{
 public:
-    virtual ~VertexHandleManagerBase();
+  virtual ~VertexHandleManagerBase();
 
 public:
-    /**
+  /**
    * Adds all handles of the the given range of brushes to this handle manager.
    *
    * @tparam I the type of the given range iterators
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-    template<typename I>
-    void addHandles(I cur, I end) {
-        while (cur != end) {
-            addHandles(*cur);
-            ++cur;
-        }
+  template <typename I>
+  void addHandles(I cur, I end)
+  {
+    while (cur != end)
+    {
+      addHandles(*cur);
+      ++cur;
     }
+  }
 
-    /**
+  /**
    * Adds all handles of the given brush to this handle manager.
    *
    * @param brushNode the brush whose handles to add
    */
-    virtual void addHandles(const Model::BrushNode *brushNode) = 0;
+  virtual void addHandles(const Model::BrushNode* brushNode) = 0;
 
-    /**
+  /**
    * Removes all handles of the given range of brushes from this handle manager.
    *
    * @tparam I the type of the range iterators
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-    template<typename I>
-    void removeHandles(I cur, I end) {
-        while (cur != end) {
-            removeHandles(*cur);
-            ++cur;
-        }
+  template <typename I>
+  void removeHandles(I cur, I end)
+  {
+    while (cur != end)
+    {
+      removeHandles(*cur);
+      ++cur;
     }
+  }
 
-    /**
+  /**
    * Removes all handles of the given brush from this handle manager.
    *
    * @param brushNode the brush whose handles to remove
    */
-    virtual void removeHandles(const Model::BrushNode *brushNode) = 0;
+  virtual void removeHandles(const Model::BrushNode* brushNode) = 0;
 };
 
 
-template<typename H>
-class VertexHandleManagerBaseT : public VertexHandleManagerBase {
+template <typename H>
+class VertexHandleManagerBaseT : public VertexHandleManagerBase
+{
 public:
-    using Handle = H;
-    using HandleList = std::vector<H>;
+  using Handle = H;
+  using HandleList = std::vector<H>;
 
 private:
 protected:
-    /**
+  /**
    * Represents the status of a handle, i.e., how many duplicates exist at the same
    * coordinates and whether or not all of these are selected.
    */
-    struct HandleInfo {
-        size_t count;
-        bool selected;
+  struct HandleInfo
+  {
+    size_t count;
+    bool selected;
 
-        HandleInfo() : count(0), selected(false) {
-        }
+    HandleInfo()
+      : count(0)
+      , selected(false)
+    {
+    }
 
-        /**
+    /**
      * Sets this handle to selected.
      *
      * @return true if and only if this handle was not previously selected
      */
-        bool select() {
-            const bool result = !selected;
-            selected = true;
-            return result;
-        }
+    bool select()
+    {
+      const bool result = !selected;
+      selected = true;
+      return result;
+    }
 
-        /**
+    /**
      * Sets this handle to deselected.
      *
      * @return true if and only if this handle was previously selected
      */
-        bool deselect() {
-            const bool result = selected;
-            selected = false;
-            return result;
-        }
+    bool deselect()
+    {
+      const bool result = selected;
+      selected = false;
+      return result;
+    }
 
-        /**
+    /**
      * Toggles the selection state of this handle.
      *
      * @return true if and only if this handle was previously selected
      */
-        bool toggle() {
-            selected = !selected;
-            return selected;
-        }
-
-        /**
-     * Increments the number of handles at the same coordinates.
-     */
-        void inc() { ++count; }
-
-        /**
-     * Deccrements the number of handles at the same coordinates.
-     */
-        void dec() { --count; }
-    };
-
-    using HandleMap = std::map<H, HandleInfo>;
-    using HandleEntry = typename HandleMap::value_type;
-
-    /**
-   * Maps a handle position to its info.
-   */
-    HandleMap m_handles;
-
-    /**
-   * The total number of selected handles, not counting duplicates.
-   */
-    size_t m_selectedHandleCount;
-
-public:
-    VertexHandleManagerBaseT() : m_selectedHandleCount(0) {
+    bool toggle()
+    {
+      selected = !selected;
+      return selected;
     }
 
-    virtual ~VertexHandleManagerBaseT() {}
+    /**
+     * Increments the number of handles at the same coordinates.
+     */
+    void inc() { ++count; }
+
+    /**
+     * Deccrements the number of handles at the same coordinates.
+     */
+    void dec() { --count; }
+  };
+
+  using HandleMap = std::map<H, HandleInfo>;
+  using HandleEntry = typename HandleMap::value_type;
+
+  /**
+   * Maps a handle position to its info.
+   */
+  HandleMap m_handles;
+
+  /**
+   * The total number of selected handles, not counting duplicates.
+   */
+  size_t m_selectedHandleCount;
 
 public:
-    /**
+  VertexHandleManagerBaseT()
+    : m_selectedHandleCount(0)
+  {
+  }
+
+  virtual ~VertexHandleManagerBaseT() {}
+
+public:
+  /**
    * Returns the hit type value of the picking hits reported by this manager.
    *
    * @return the hit type value
    */
-    virtual Model::HitType::Type hitType() const = 0;
+  virtual Model::HitType::Type hitType() const = 0;
 
-    /**
+  /**
    * The total number of selected handles, not counting duplicates.
    *
    * @return the total number of selected handles
    */
-    size_t selectedHandleCount() const { return m_selectedHandleCount; }
+  size_t selectedHandleCount() const { return m_selectedHandleCount; }
 
-    /**
+  /**
    * The total number of unselected handles, not counting duplicates.
    *
    * @return the total number of unselected handles
    */
-    size_t unselectedHandleCount() const {
-        return totalHandleCount() - selectedHandleCount();
-    }
+  size_t unselectedHandleCount() const
+  {
+    return totalHandleCount() - selectedHandleCount();
+  }
 
-    /**
+  /**
    * The total number of handles, selected or not, not counting duplicates.
    *
    * @return the total number of handles
    */
-    size_t totalHandleCount() const { return m_handles.size(); }
+  size_t totalHandleCount() const { return m_handles.size(); }
 
 public:
-    /**
+  /**
    * Returns all handles contained in this manager.
    *
    * @return a list containing all handles
    */
-    HandleList allHandles() const {
-        HandleList result;
-        result.reserve(totalHandleCount());
-        collectHandles(
-            [](const HandleInfo & /* info */) { return true; }, std::back_inserter(result));
-        return result;
-    }
+  HandleList allHandles() const
+  {
+    HandleList result;
+    result.reserve(totalHandleCount());
+    collectHandles(
+      [](const HandleInfo& /* info */) { return true; }, std::back_inserter(result));
+    return result;
+  }
 
-    /**
+  /**
    * Returns all selected handles contained in this manager.
    *
    * @return a list containing all selected handles
    */
-    HandleList selectedHandles() const {
-        HandleList result;
-        result.reserve(selectedHandleCount());
-        collectHandles(
-            [](const HandleInfo &info) { return info.selected; }, std::back_inserter(result));
-        return result;
-    }
+  HandleList selectedHandles() const
+  {
+    HandleList result;
+    result.reserve(selectedHandleCount());
+    collectHandles(
+      [](const HandleInfo& info) { return info.selected; }, std::back_inserter(result));
+    return result;
+  }
 
-    /**
+  /**
    * Returns all unselected handles contained in this manager.
    *
    * @return a list containing all unselected handles
    */
-    HandleList unselectedHandles() const {
-        HandleList result;
-        result.reserve(unselectedHandleCount());
-        collectHandles(
-            [](const HandleInfo &info) { return !info.selected; }, std::back_inserter(result));
-        return result;
-    }
+  HandleList unselectedHandles() const
+  {
+    HandleList result;
+    result.reserve(unselectedHandleCount());
+    collectHandles(
+      [](const HandleInfo& info) { return !info.selected; }, std::back_inserter(result));
+    return result;
+  }
 
 private:
-    template<typename T, typename O>
-    void collectHandles(const T &test, O out) const {
-        for (const auto &[handle, info]: m_handles) {
-            if (test(info)) {
-                out++ = handle;
-            }
-        }
+  template <typename T, typename O>
+  void collectHandles(const T& test, O out) const
+  {
+    for (const auto& [handle, info] : m_handles)
+    {
+      if (test(info))
+      {
+        out++ = handle;
+      }
     }
+  }
 
 public:
-    /**
+  /**
    * Indicates whether the given handle is contained in this manager.
    *
    * @param handle the handle to check
    * @return true if and only if the given handle is contained in this manager
    */
-    bool contains(const Handle &handle) const { return m_handles.count(handle) > 0; }
+  bool contains(const Handle& handle) const { return m_handles.count(handle) > 0; }
 
-    /**
+  /**
    * Indicates whether the given handle is selected.
    *
    * @param handle the handle to check
    * @return true if and only if the given handle is contained in this manager and it is
    * selected
    */
-    bool selected(const Handle &handle) const {
-        const auto it = m_handles.find(handle);
-        if (it == std::end(m_handles))
-            return false;
-        return it->second.selected;
-    }
+  bool selected(const Handle& handle) const
+  {
+    const auto it = m_handles.find(handle);
+    if (it == std::end(m_handles))
+      return false;
+    return it->second.selected;
+  }
 
-    /**
+  /**
    * Indicates whether any handle is currently selected.
    *
    * @return true if and only if any handle is selected
    */
-    bool anySelected() const { return selectedHandleCount() > 0; }
+  bool anySelected() const { return selectedHandleCount() > 0; }
 
-    /**
+  /**
    * Indicates whether all handles are currently selected
    * @return true if and only if all handles are selected
    */
-    bool allSelected() const { return selectedHandleCount() == totalHandleCount(); }
+  bool allSelected() const { return selectedHandleCount() == totalHandleCount(); }
 
 public:
-    /**
+  /**
    * Adds the given handle to this manager.
    *
    * @param handle the handle to add
    */
-    void add(const Handle &handle) {
-        m_handles[handle].inc();// unknown value gets value constructed, which for HandleInfo
-                                // means its default constructor is called
-    }
+  void add(const Handle& handle)
+  {
+    m_handles[handle].inc(); // unknown value gets value constructed, which for HandleInfo
+                             // means its default constructor is called
+  }
 
-    /**
+  /**
    * Removes the given handle from this manager.
    *
    * @param handle the handle to remove
    * @return true if the given handle was contained in this manager (and therefore
    * removed) and false otherwise
    */
-    bool remove(const Handle &handle) {
-        const auto it = m_handles.find(handle);
-        if (it != std::end(m_handles)) {
-            HandleInfo &info = it->second;
-            info.dec();
+  bool remove(const Handle& handle)
+  {
+    const auto it = m_handles.find(handle);
+    if (it != std::end(m_handles))
+    {
+      HandleInfo& info = it->second;
+      info.dec();
 
-            if (info.count == 0) {
-                deselect(info);
-                m_handles.erase(it);
-            }
-            return true;
-        }
-
-        return false;
+      if (info.count == 0)
+      {
+        deselect(info);
+        m_handles.erase(it);
+      }
+      return true;
     }
 
-    /**
+    return false;
+  }
+
+  /**
    * Removes all handles from this manager.
    */
-    void clear() {
-        m_handles.clear();
-        m_selectedHandleCount = 0;
-    }
+  void clear()
+  {
+    m_handles.clear();
+    m_selectedHandleCount = 0;
+  }
 
-    /**
+  /**
    * Selects the given range of handles.
    *
    * @tparam I the type of the range iterator
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-    template<typename I>
-    void select(I cur, I end) {
-        while (cur != end) {
-            select(*cur);
-            ++cur;
-        }
+  template <typename I>
+  void select(I cur, I end)
+  {
+    while (cur != end)
+    {
+      select(*cur);
+      ++cur;
     }
+  }
 
-    /**
+  /**
    * Selects the given handle. If the given handle is not contained in this manager or if
    * it is selected, nothing happens.
    *
    * @param handle the handle to select
    */
-    void select(const Handle &handle) {
-        forEachCloseHandle(handle, [this](HandleInfo &info) { select(info); });
-    }
+  void select(const Handle& handle)
+  {
+    forEachCloseHandle(handle, [this](HandleInfo& info) { select(info); });
+  }
 
-    /**
+  /**
    * Deselects the given range of handles.
    *
    * @tparam I the type of the range iterators
    * @param cur the beginning of the range
    * @param end the end of the range
    */
-    template<typename I>
-    void deselect(I cur, I end) {
-        while (cur != end) {
-            deselect(*cur);
-            ++cur;
-        }
+  template <typename I>
+  void deselect(I cur, I end)
+  {
+    while (cur != end)
+    {
+      deselect(*cur);
+      ++cur;
     }
+  }
 
-    /**
+  /**
    * Deselects the given handle. If the handle is not contained in this manager or if it
    * is not selected, nothing happens.
    *
    * @param handle the handle to deselect
    */
-    void deselect(const Handle &handle) {
-        forEachCloseHandle(handle, [this](HandleInfo &info) { deselect(info); });
-    }
+  void deselect(const Handle& handle)
+  {
+    forEachCloseHandle(handle, [this](HandleInfo& info) { deselect(info); });
+  }
 
-    /**
+  /**
    * Deselects all currently selected handles
    */
-    void deselectAll() {
-        for (auto &[handle, info]: m_handles) {
-            deselect(info);
-        }
+  void deselectAll()
+  {
+    for (auto& [handle, info] : m_handles)
+    {
+      deselect(info);
     }
+  }
 
-    /**
+  /**
    * Toggles the selection of the given range of handles.
    *
    * @tparam I the type of the range iterators
    * @param begin the beginning of the range
    * @param end the end of the range
    */
-    template<typename I>
-    void toggle(I begin, I end) {
-        using SelectionState = std::map<Handle, bool>;
-        SelectionState selectionState;
+  template <typename I>
+  void toggle(I begin, I end)
+  {
+    using SelectionState = std::map<Handle, bool>;
+    SelectionState selectionState;
 
-        for (auto cur = begin; cur != end; ++cur) {
-            selectionState[*cur] = selected(*cur);
-        }
-
-        for (auto cur = begin; cur != end; ++cur) {
-            if (selectionState[*cur]) {
-                deselect(*cur);
-            } else {
-                select(*cur);
-            }
-        }
+    for (auto cur = begin; cur != end; ++cur)
+    {
+      selectionState[*cur] = selected(*cur);
     }
+
+    for (auto cur = begin; cur != end; ++cur)
+    {
+      if (selectionState[*cur])
+      {
+        deselect(*cur);
+      }
+      else
+      {
+        select(*cur);
+      }
+    }
+  }
 
 private:
-    template<typename F>
-    void forEachCloseHandle(const H &otherHandle, F fun) {
-        static const auto epsilon = 0.001 * 0.001;
-        for (auto &[handle, info]: m_handles) {
-            if (compare(otherHandle, handle, epsilon) == 0) {
-                fun(info);
-            }
-        }
+  template <typename F>
+  void forEachCloseHandle(const H& otherHandle, F fun)
+  {
+    static const auto epsilon = 0.001 * 0.001;
+    for (auto& [handle, info] : m_handles)
+    {
+      if (compare(otherHandle, handle, epsilon) == 0)
+      {
+        fun(info);
+      }
     }
+  }
 
-    void select(HandleInfo &info) {
-        if (info.select()) {
-            assert(selectedHandleCount() < totalHandleCount());
-            ++m_selectedHandleCount;
-        }
+  void select(HandleInfo& info)
+  {
+    if (info.select())
+    {
+      assert(selectedHandleCount() < totalHandleCount());
+      ++m_selectedHandleCount;
     }
+  }
 
-    void deselect(HandleInfo &info) {
-        if (info.deselect()) {
-            assert(m_selectedHandleCount > 0);
-            --m_selectedHandleCount;
-        }
+  void deselect(HandleInfo& info)
+  {
+    if (info.deselect())
+    {
+      assert(m_selectedHandleCount > 0);
+      --m_selectedHandleCount;
     }
+  }
 
-    void toggle(HandleInfo &info) {
-        if (info.toggle()) {
-            assert(selectedHandleCount() < totalHandleCount());
-            ++m_selectedHandleCount;
-        } else {
-            assert(m_selectedHandleCount > 0);
-            --m_selectedHandleCount;
-        }
+  void toggle(HandleInfo& info)
+  {
+    if (info.toggle())
+    {
+      assert(selectedHandleCount() < totalHandleCount());
+      ++m_selectedHandleCount;
     }
+    else
+    {
+      assert(m_selectedHandleCount > 0);
+      --m_selectedHandleCount;
+    }
+  }
 
 public:
-    /**
+  /**
    * Applies the given picking test to all handles in this manager and adds all hits to
    * the given picking result.
    *
@@ -463,18 +519,21 @@ public:
    * @param test the picking test to apply
    * @param pickResult the pick result to add hits to
    */
-    template<typename P>
-    void pick(const P &test, Model::PickResult &pickResult) const {
-        for (const auto &[handle, info]: m_handles) {
-            const auto hit = test(handle);
-            if (hit.isMatch()) {
-                pickResult.addHit(hit);
-            }
-        }
+  template <typename P>
+  void pick(const P& test, Model::PickResult& pickResult) const
+  {
+    for (const auto& [handle, info] : m_handles)
+    {
+      const auto hit = test(handle);
+      if (hit.isMatch())
+      {
+        pickResult.addHit(hit);
+      }
     }
+  }
 
 public:
-    /**
+  /**
    * Finds and returns all brushes in the given range which are incident to the given
    * handle.
    *
@@ -484,14 +543,16 @@ public:
    * @param end the end of the range of brushes
    * @return a set of all brushes that are incident to the given handle
    */
-    template<typename I>
-    std::vector<Model::BrushNode *> findIncidentBrushes(const Handle &handle, I begin, I end) const {
-        kdl::vector_set<Model::BrushNode *> result;
-        findIncidentBrushes(handle, begin, end, std::inserter(result, result.end()));
-        return result.release_data();
-    }
+  template <typename I>
+  std::vector<Model::BrushNode*> findIncidentBrushes(
+    const Handle& handle, I begin, I end) const
+  {
+    kdl::vector_set<Model::BrushNode*> result;
+    findIncidentBrushes(handle, begin, end, std::inserter(result, result.end()));
+    return result.release_data();
+  }
 
-    /**
+  /**
    * Finds and returns all brushes in the given range which are incident to any handle in
    * the given range.
    *
@@ -503,17 +564,20 @@ public:
    * @param bEnd the end of the range of brushes
    * @return a set containing all incident brushes
    */
-    template<typename I1, typename I2>
-    std::vector<Model::BrushNode *> findIncidentBrushes(I1 hBegin, I1 hEnd, I2 bBegin, I2 bEnd) const {
-        kdl::vector_set<Model::BrushNode *> result;
-        auto out = std::inserter(result, std::end(result));
-        for (auto hCur = hBegin; hCur != hEnd; ++hCur) {
-            findIncidentBrushes(*hCur, bBegin, bEnd, out);
-        }
-        return result.release_data();
+  template <typename I1, typename I2>
+  std::vector<Model::BrushNode*> findIncidentBrushes(
+    I1 hBegin, I1 hEnd, I2 bBegin, I2 bEnd) const
+  {
+    kdl::vector_set<Model::BrushNode*> result;
+    auto out = std::inserter(result, std::end(result));
+    for (auto hCur = hBegin; hCur != hEnd; ++hCur)
+    {
+      findIncidentBrushes(*hCur, bBegin, bEnd, out);
     }
+    return result.release_data();
+  }
 
-    /**
+  /**
    * Finds all brushes in the given range which are incident to the given handle.
    *
    * @tparam I the type of the range iterators
@@ -523,40 +587,45 @@ public:
    * @param end the end of the range of brushes
    * @param out an output iterator that accepts the incident brushes
    */
-    template<typename I, typename O>
-    void findIncidentBrushes(const Handle &handle, I begin, I end, O out) const {
-        for (auto cur = begin; cur != end; ++cur) {
-            if (isIncident(handle, *cur)) {
-                out++ = *cur;
-            }
-        }
+  template <typename I, typename O>
+  void findIncidentBrushes(const Handle& handle, I begin, I end, O out) const
+  {
+    for (auto cur = begin; cur != end; ++cur)
+    {
+      if (isIncident(handle, *cur))
+      {
+        out++ = *cur;
+      }
     }
+  }
 
 private:
-    /**
+  /**
    * Checks whether the given brush is incident to the given handle.
    *
    * @param handle the handle to check
    * @param brushNode the brush to check
    * @return true if and only if the given brush is incident to the given handle
    */
-    virtual bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const = 0;
+  virtual bool isIncident(
+    const Handle& handle, const Model::BrushNode* brushNode) const = 0;
 };
 
 
 /**
  * Manages vertex handles. A vertex handle is a 3D point.
  */
-class VertexHandleManager : public VertexHandleManagerBaseT<vm::vec3> {
+class VertexHandleManager : public VertexHandleManagerBaseT<vm::vec3>
+{
 public:
-    static const Model::HitType::Type HandleHitType;
+  static const Model::HitType::Type HandleHitType;
 
 public:
-    using VertexHandleManagerBase::addHandles;
-    using VertexHandleManagerBase::removeHandles;
+  using VertexHandleManagerBase::addHandles;
+  using VertexHandleManagerBase::removeHandles;
 
 public:
-    /**
+  /**
    * Picks all vertex handles hit by the given picking ray in the context of the given
    * camera, and adds the hits to the given picking result.
    *
@@ -564,17 +633,20 @@ public:
    * @param camera the camera
    * @param pickResult the picking result to add the hits to
    */
-    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
+  void pick(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult) const;
 
 public:
-    void addHandles(const Model::BrushNode *brushNode) override;
+  void addHandles(const Model::BrushNode* brushNode) override;
 
-    void removeHandles(const Model::BrushNode *brushNode) override;
+  void removeHandles(const Model::BrushNode* brushNode) override;
 
-    Model::HitType::Type hitType() const override;
+  Model::HitType::Type hitType() const override;
 
 private:
-    bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const override;
+  bool isIncident(const Handle& handle, const Model::BrushNode* brushNode) const override;
 };
 
 
@@ -587,17 +659,18 @@ private:
  * where the edge handles intersect with a grid plane. Such handles are not added to this
  * manager explicitly, but are computed on the fly.
  */
-class EdgeHandleManager : public VertexHandleManagerBaseT<vm::segment3> {
+class EdgeHandleManager : public VertexHandleManagerBaseT<vm::segment3>
+{
 public:
-    static const Model::HitType::Type HandleHitType;
-    using HitType = std::tuple<vm::segment3, vm::vec3>;
+  static const Model::HitType::Type HandleHitType;
+  using HitType = std::tuple<vm::segment3, vm::vec3>;
 
 public:
-    using VertexHandleManagerBase::addHandles;
-    using VertexHandleManagerBase::removeHandles;
+  using VertexHandleManagerBase::addHandles;
+  using VertexHandleManagerBase::removeHandles;
 
 public:
-    /**
+  /**
    * Picks a virtual handle at any position where an edge handle intersects with any grid
    * plane. These virtual handles are points, but they are computed on the fly from the
    * edge handles contained in this manager.
@@ -607,26 +680,33 @@ public:
    * @param grid the current grid
    * @param pickResult the picking result to add the hits to
    */
-    void pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const;
+  void pickGridHandle(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    const Grid& grid,
+    Model::PickResult& pickResult) const;
 
-    /**
+  /**
    * Picks the center point of the edge handles contained in this manager.
    *
    * @param pickRay the picking ray
    * @param camera the camera
    * @param pickResult the picking result to add the hits to
    */
-    void pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
+  void pickCenterHandle(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult) const;
 
 public:
-    void addHandles(const Model::BrushNode *brushNode) override;
+  void addHandles(const Model::BrushNode* brushNode) override;
 
-    void removeHandles(const Model::BrushNode *brushNode) override;
+  void removeHandles(const Model::BrushNode* brushNode) override;
 
-    Model::HitType::Type hitType() const override;
+  Model::HitType::Type hitType() const override;
 
 private:
-    bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const override;
+  bool isIncident(const Handle& handle, const Model::BrushNode* brushNode) const override;
 };
 
 
@@ -639,17 +719,18 @@ private:
  * where the face handles intersect with two grid planes. Such handles are not added to
  * this manager explicitly, but are computed on the fly.
  */
-class FaceHandleManager : public VertexHandleManagerBaseT<vm::polygon3> {
+class FaceHandleManager : public VertexHandleManagerBaseT<vm::polygon3>
+{
 public:
-    static const Model::HitType::Type HandleHitType;
-    using HitType = std::tuple<vm::polygon3, vm::vec3>;
+  static const Model::HitType::Type HandleHitType;
+  using HitType = std::tuple<vm::polygon3, vm::vec3>;
 
 public:
-    using VertexHandleManagerBase::addHandles;
-    using VertexHandleManagerBase::removeHandles;
+  using VertexHandleManagerBase::addHandles;
+  using VertexHandleManagerBase::removeHandles;
 
 public:
-    /**
+  /**
    * Picks a virtual handle at any position where a face handle intersects with any two
    * grid planes. These virtual handles are points, but they are computed on the fly from
    * the face handles contained in this manager.
@@ -659,26 +740,33 @@ public:
    * @param grid the current grid
    * @param pickResult the picking result to add the hits to
    */
-    void pickGridHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, const Grid &grid, Model::PickResult &pickResult) const;
+  void pickGridHandle(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    const Grid& grid,
+    Model::PickResult& pickResult) const;
 
-    /**
+  /**
    * Picks the center point of the face handles contained in this manager.
    *
    * @param pickRay the picking ray
    * @param camera the camera
    * @param pickResult the picking result to add the hits to
    */
-    void pickCenterHandle(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const;
+  void pickCenterHandle(
+    const vm::ray3& pickRay,
+    const Renderer::Camera& camera,
+    Model::PickResult& pickResult) const;
 
 public:
-    void addHandles(const Model::BrushNode *brushNode) override;
+  void addHandles(const Model::BrushNode* brushNode) override;
 
-    void removeHandles(const Model::BrushNode *brushNode) override;
+  void removeHandles(const Model::BrushNode* brushNode) override;
 
-    Model::HitType::Type hitType() const override;
+  Model::HitType::Type hitType() const override;
 
 private:
-    bool isIncident(const Handle &handle, const Model::BrushNode *brushNode) const override;
+  bool isIncident(const Handle& handle, const Model::BrushNode* brushNode) const override;
 };
-}// namespace View
-}// namespace TrenchBroom
+} // namespace View
+} // namespace TrenchBroom

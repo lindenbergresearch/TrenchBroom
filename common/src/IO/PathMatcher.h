@@ -24,12 +24,13 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::IO {
+namespace TrenchBroom::IO
+{
 
 enum class PathInfo;
 
-using GetPathInfo = std::function<PathInfo(const std::filesystem::path &)>;
-using PathMatcher = std::function<bool(const std::filesystem::path &, const GetPathInfo &)>;
+using GetPathInfo = std::function<PathInfo(const std::filesystem::path&)>;
+using PathMatcher = std::function<bool(const std::filesystem::path&, const GetPathInfo&)>;
 
 PathMatcher makeExtensionPathMatcher(std::vector<std::string> extensions);
 
@@ -37,6 +38,6 @@ PathMatcher makeFilenamePathMatcher(std::string filename);
 
 PathMatcher makePathInfoPathMatcher(std::vector<PathInfo> pathInfos);
 
-bool matchAnyPath(const std::filesystem::path &path, const GetPathInfo &getPathInfo);
+bool matchAnyPath(const std::filesystem::path& path, const GetPathInfo& getPathInfo);
 
-}// namespace TrenchBroom::IO
+} // namespace TrenchBroom::IO

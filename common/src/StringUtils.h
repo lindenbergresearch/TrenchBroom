@@ -1,7 +1,8 @@
 #pragma once
 #include "string"
 
-namespace TrenchBroom {
+namespace TrenchBroom
+{
 
 /**
  * @brief Replacement function of 'stringf' from v0.6.x
@@ -17,7 +18,8 @@ namespace TrenchBroom {
  * https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
  *
  */
-inline std::string stringf(const char *const zcFormat, ...) {
+inline std::string stringf(const char* const zcFormat, ...)
+{
   // initialize use of the variable argument array
   va_list vaArgs;
   va_start(vaArgs, zcFormat);
