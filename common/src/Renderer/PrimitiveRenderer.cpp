@@ -235,6 +235,38 @@ void PrimitiveRenderer::renderCoordinateSystemYZ(
   renderLine(z, lineWidth, occlusionPolicy, start, end);
 }
 
+/*
+void PrimitiveRenderer::renderCoordinateSystem3D(
+const Color &x, const Color &y, const Color &z, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds) {
+vm::vec3f start, end;
+int gap = 20;
+vm::vec3f gapX = vm::vec3f(0.f, gap, 0.f);
+vm::vec3f gapY = vm::vec3f(gap, 0.f, 0.f);
+
+int lenX = int(bounds.size().x()/2.f/ static_cast<float>(gap));
+int lenY = int(bounds.size().y()/2.f/ static_cast<float>(gap));
+
+coordinateSystemVerticesX(bounds, start, end);
+renderLine(x, lineWidth, occlusionPolicy, start, end);
+
+for (int i = -lenX; i <= lenX; i++)
+renderLine(x, lineWidth*0.75f, occlusionPolicy, start + gapX * vm::vec3f(0, 2.f * i, 0), end + gapX * vm::vec3f(0, 2.f * i, 0));
+
+coordinateSystemVerticesY(bounds, start, end);
+renderLine(y, lineWidth, occlusionPolicy, start, end);
+
+for (int i = -lenY; i <= lenY; i++)
+renderLine(y, lineWidth*0.75f, occlusionPolicy, start + gapY * vm::vec3f(2.f * i,0, 0), end + gapY * vm::vec3f(2.f * i,0, 0));
+
+
+//  coordinateSystemVerticesY(bounds, start, end);
+//  renderLine(y, lineWidth, occlusionPolicy, start, end);
+//
+coordinateSystemVerticesZ(bounds, start, end);
+renderLine(z, lineWidth, occlusionPolicy, start, end);
+}
+*/
+
 void PrimitiveRenderer::renderCoordinateSystem3D(
     const Color &x, const Color &y, const Color &z, const float lineWidth, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds
 ) {

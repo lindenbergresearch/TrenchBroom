@@ -883,6 +883,7 @@ void MapViewBase::setupGL(Renderer::RenderContext &context) {
         glAssert(glDisable(GL_MULTISAMPLE));
     }
     glAssert(glEnable(GL_BLEND));
+    glAssert(glEnable(GL_LINE_SMOOTH));
     glAssert(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     glAssert(glShadeModel(GL_SMOOTH));
 }
@@ -950,7 +951,8 @@ void MapViewBase::renderCompass(Renderer::RenderBatch &renderBatch) {
 void MapViewBase::renderFPS(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     if (pref(Preferences::ShowFPS)) {
         auto renderService = Renderer::RenderService{renderContext, renderBatch};
-        renderService.renderHeadsUp(m_currentFPS);
+        renderService.setBackgroundColor(Color(0.f, 0.f, 0.f, 0.25f));
+        renderService.renderLeftScreen(m_currentFPS);
     }
 }
 

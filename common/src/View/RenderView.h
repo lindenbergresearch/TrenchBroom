@@ -125,7 +125,7 @@ protected:
 
     int depthBits() const;
 
-    bool multisample() const;
+    int multisample() const;
 
 protected:// QOpenGLWidget overrides
     void initializeGL() override;

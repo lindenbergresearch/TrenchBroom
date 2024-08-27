@@ -58,44 +58,51 @@ void LinkRenderer::renderLines(RenderContext &renderContext) {
   auto shader = ActiveShader{renderContext.shaderManager(), Shaders::LinkLineShader};
   shader.set("CameraPosition", renderContext.camera().position());
   shader.set("IsOrtho", renderContext.camera().orthographicProjection());
-  shader.set("MaxDistance", 6000.0f);
+  shader.set("MaxDistance", 500.0f); //<- todo: add to preferences
 
+  glAssert(glLineWidth(1.75f));//<- todo: add to preferences
   glAssert(glDisable(GL_DEPTH_TEST));
-  shader.set("Alpha", 0.4f);
+  shader.set("Alpha", 0.25f);
   m_lines.render(PrimType::Lines);
 
   glAssert(glEnable(GL_DEPTH_TEST));
   shader.set("Alpha", 1.0f);
   m_lines.render(PrimType::Lines);
+  glAssert(glLineWidth(1.0f));
 }
 
 void LinkRenderer::renderArrows(RenderContext &renderContext) {
   auto shader = ActiveShader{renderContext.shaderManager(), Shaders::LinkArrowShader};
   shader.set("CameraPosition", renderContext.camera().position());
   shader.set("IsOrtho", renderContext.camera().orthographicProjection());
-  shader.set("MaxDistance", 6000.0f);
+  shader.set("MaxDistance", 500.0f);//<- todo: add to preferences
   shader.set("Zoom", renderContext.camera().zoom());
 
+  glAssert(glLineWidth(1.75f));//<- todo: add to preferences
   glAssert(glDisable(GL_DEPTH_TEST));
-  shader.set("Alpha", 0.4f);
+  shader.set("Alpha", 0.25f);
   m_arrows.render(PrimType::Lines);
 
   glAssert(glEnable(GL_DEPTH_TEST));
   shader.set("Alpha", 1.0f);
   m_arrows.render(PrimType::Lines);
+  glAssert(glLineWidth(1.0f));
 }
 
 static void addArrow(std::vector<LinkRenderer::ArrowVertex> &arrows, const vm::vec4f &color, const vm::vec3f &arrowPosition, const vm::vec3f &lineDir) {
-  arrows.emplace_back(vm::vec3f{0, 3, 0}, color, arrowPosition, lineDir);
+  arrows.emplace_back(vm::vec3f{0, 2.25, 0}, color, arrowPosition, lineDir);
   arrows.emplace_back(vm::vec3f{9, 0, 0}, color, arrowPosition, lineDir);
 
   arrows.emplace_back(vm::vec3f{9, 0, 0}, color, arrowPosition, lineDir);
-  arrows.emplace_back(vm::vec3f{0, - 3, 0}, color, arrowPosition, lineDir);
+  arrows.emplace_back(vm::vec3f{0, - 2.25, 0}, color, arrowPosition, lineDir);
 }
 
 static std::vector<LinkRenderer::ArrowVertex> getArrows(const std::vector<LinkRenderer::LineVertex> &links) {
   assert((links.size() % 2) == 0);
   auto arrows = std::vector<LinkRenderer::ArrowVertex>{};
+
+  float arrowDistance = 100.f;
+
   for (size_t i = 0; i < links.size(); i += 2) {
     const auto &startVertex = links[i];
     const auto &endVertex = links[i + 1];
@@ -105,24 +112,32 @@ static std::vector<LinkRenderer::ArrowVertex> getArrows(const std::vector<LinkRe
     const auto lineDir = lineVec / lineLength;
     const auto color = getVertexComponent<1>(startVertex);
 
-    if (lineLength < 512) {
-      const auto arrowPosition = getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
-      addArrow(arrows, color, arrowPosition, lineDir);
-    } else if (lineLength < 1024) {
-      const auto arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec * 0.2f);
-      const auto arrowPosition2 = getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
+    size_t arrowsNum = size_t(lineLength / arrowDistance);
 
-      addArrow(arrows, color, arrowPosition1, lineDir);
-      addArrow(arrows, color, arrowPosition2, lineDir);
-    } else {
-      const auto arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec * 0.1f);
-      const auto arrowPosition2 = getVertexComponent<0>(startVertex) + (lineVec * 0.4f);
-      const auto arrowPosition3 = getVertexComponent<0>(startVertex) + (lineVec * 0.7f);
-
-      addArrow(arrows, color, arrowPosition1, lineDir);
-      addArrow(arrows, color, arrowPosition2, lineDir);
-      addArrow(arrows, color, arrowPosition3, lineDir);
+    for (size_t j = 0; j < arrowsNum; j++) {
+        float fact = 1.f / (float)j;
+        const auto arrowPosition = getVertexComponent<0>(startVertex) + (lineVec * fact);
+        addArrow(arrows, color, arrowPosition, lineDir);
     }
+
+//    if (lineLength < 512) {
+//      const auto arrowPosition = getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
+//      addArrow(arrows, color, arrowPosition, lineDir);
+//    } else if (lineLength < 1024) {
+//      const auto arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec * 0.2f);
+//      const auto arrowPosition2 = getVertexComponent<0>(startVertex) + (lineVec * 0.6f);
+//
+//      addArrow(arrows, color, arrowPosition1, lineDir);
+//      addArrow(arrows, color, arrowPosition2, lineDir);
+//    } else {
+//      const auto arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec * 0.1f);
+//      const auto arrowPosition2 = getVertexComponent<0>(startVertex) + (lineVec * 0.4f);
+//      const auto arrowPosition3 = getVertexComponent<0>(startVertex) + (lineVec * 0.7f);
+//
+//      addArrow(arrows, color, arrowPosition1, lineDir);
+//      addArrow(arrows, color, arrowPosition2, lineDir);
+//      addArrow(arrows, color, arrowPosition3, lineDir);
+//    }
   }
   return arrows;
 }

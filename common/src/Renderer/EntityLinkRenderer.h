@@ -35,7 +35,7 @@ namespace TrenchBroom::Renderer {
 class EntityLinkRenderer : public LinkRenderer {
   std::weak_ptr<View::MapDocument> m_document;
 
-  Color m_defaultColor = {0.5f, 1.0f, 0.5f, 1.0f};
+  Color m_defaultColor = {0.9f, 1.0f, 0.0f, 1.0f};//<- todo: add to preferences
   Color m_selectedColor = {1.0f, 0.0f, 0.0f, 1.0f};
 
 public:

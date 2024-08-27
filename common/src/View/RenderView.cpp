@@ -86,12 +86,14 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpe
     m_focusColor = palette.color(QPalette::Highlight);
     m_frameColor = palette.color(QPalette::Midlight);
 
+    setUpdateBehavior(PartialUpdate);
+
     // FPS counter
     QTimer *fpsCounter = new QTimer(this);
 
     connect(
         fpsCounter, &QTimer::timeout, [&]() {
-            avgFps = (avgFps + m_framesRendered * 2) * 0.5;
+            avgFps = (avgFps + m_framesRendered) / 2.f;
             m_framesRendered = 0;
 
             auto frameT = 1.f / avgFps;
@@ -106,14 +108,15 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent) : QOpe
 
             if (context()) {
                 appendix =
-                    " | swbuff: " + std::to_string(int(context()->format().swapBehavior())) + " | swap: " + std::to_string(int(context()->format().swapInterval()));
+                    "\nswbuff: " + std::to_string(int(context()->format().swapBehavior())) +
+                    " \nswap: " + std::to_string(int(context()->format().swapInterval()));
             }
 
             m_currentFPS =
-                std::string("FPS=") + std::to_string(int(avgFps)) + " frames=" + std::to_string(m_totalFrames) + " max=" + std::to_string(maxFrameTime * 1000.0) + "ms. | " + std::to_string(m_glContext->vboManager().currentVboCount()) + " VBOs (" + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak) mem: " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + "k @ " + std::to_string(glWidth) + "x" + std::to_string(glHeight) + " | depth: " + std::to_string(depthBits()) + " | msamples: " + std::to_string(multisample()) + appendix;
+                std::string("FPS: ") + std::to_string(int(avgFps)) + "\nframes: " + std::to_string(m_totalFrames) + "\nmax: " + std::to_string(maxFrameTime * 1000.0) + "ms\nsize: " + std::to_string(m_glContext->vboManager().currentVboCount()) + " VBOs: (" + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak)\nmem: " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + "k @ " + std::to_string(glWidth) + "x" + std::to_string(glHeight) + "\ndepth: " + std::to_string(depthBits()) + "\nmsamples: " + std::to_string(multisample()) + appendix;
         });
 
-    fpsCounter->start(500);
+    fpsCounter->start(1000);
     setMouseTracking(true);         // request mouse move events even when no button is held down
     setFocusPolicy(Qt::StrongFocus);// accept focus by clicking or tab
 }
@@ -201,10 +204,10 @@ int RenderView::depthBits() const {
     }
 }
 
-bool RenderView::multisample() const {
+int RenderView::multisample() const {
     if (this->context()) {
         const auto format = this->context()->format();
-        return format.samples() != -1;
+        return format.samples();
     } else {
         return 0;
     }

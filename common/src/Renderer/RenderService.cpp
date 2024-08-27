@@ -50,6 +50,22 @@ Renderer::FontDescriptor makeRenderServiceFont() {
       pref(Preferences::RendererFontPath), static_cast<size_t>(pref(Preferences::RendererFontSize)));
 }
 
+class RenderService::LeftScreenTextAnchor : public TextAnchor {
+private:
+    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
+        vm::vec3f off = getOffset(camera);
+        return vm::vec3f(off.x(), off.y() - size.y(), off.z());
+    }
+
+    vm::vec3f position(const Camera &camera) const override {
+        return camera.unproject(getOffset(camera));
+    }
+
+    vm::vec3f getOffset(const Camera &camera) const {
+        const auto h = static_cast<float>(camera.viewport().height);
+        return vm::vec3f(25.0f, h - 20.0f, 0.f);
+    }
+};
 
 class RenderService::HeadsUpTextAnchor : public TextAnchor {
 private:
@@ -130,6 +146,11 @@ void RenderService::renderString(const AttrString &string, const TextAnchor &pos
   }
 }
 
+void RenderService::renderLeftScreen(const AttrString &string) {
+    m_textRenderer->renderStringOnTop(
+        m_renderContext, m_foregroundColor, m_backgroundColor, string, LeftScreenTextAnchor());
+}
+
 void RenderService::renderHeadsUp(const AttrString &string) {
   m_textRenderer->renderStringOnTop(
       m_renderContext, m_foregroundColor, m_backgroundColor, string, HeadsUpTextAnchor());
@@ -145,6 +166,12 @@ void RenderService::renderString(const std::string &string, const TextAnchor &po
 
 void RenderService::renderHeadsUp(const std::string &string) {
   renderHeadsUp(AttrString(string));
+}
+
+void RenderService::renderLeftScreen(const std::string &string) {
+    auto str = AttrString(string);
+
+    renderLeftScreen(str);
 }
 
 void RenderService::renderHandles(const std::vector<vm::vec3f> &positions) {
@@ -347,5 +374,6 @@ void RenderService::flush() {
   m_renderBatch.addOneShot(m_pointHandleRenderer.release());
   m_renderBatch.addOneShot(m_textRenderer.release());
 }
+
 } // namespace Renderer
 } // namespace TrenchBroom

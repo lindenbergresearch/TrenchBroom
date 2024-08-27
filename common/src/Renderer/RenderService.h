@@ -62,6 +62,7 @@ private:
   using CullingPolicy = PrimitiveRendererCullingPolicy;
 
   class HeadsUpTextAnchor;
+  class LeftScreenTextAnchor;
 
   RenderContext &m_renderContext;
   RenderBatch &m_renderBatch;
@@ -104,11 +105,15 @@ deleteCopyAndMove(RenderService);
 
   void renderHeadsUp(const AttrString &string);
 
+  void renderLeftScreen(const AttrString &string);
+
   void renderString(const std::string &string, const vm::vec3f &position);
 
   void renderString(const std::string &string, const TextAnchor &position);
 
   void renderHeadsUp(const std::string &string);
+
+  void renderLeftScreen(const std::string &string);
 
   void renderHandles(const std::vector<vm::vec3f> &positions);
 

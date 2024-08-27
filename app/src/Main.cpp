@@ -37,18 +37,21 @@ int main(int argc, char *argv[]) {
     // Set OpenGL defaults
     // Needs to be done here before QApplication is created
     // (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
-    //  QSurfaceFormat format;
-    //  format.setDepthBufferSize(32);
-    //  format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
-    //  format.setSwapInterval(0);
-    //  format.setSamples(8);
-    //  QSurfaceFormat::setDefaultFormat(format);
+//      QSurfaceFormat format;
+//      format.setDepthBufferSize(24);
+//      format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+//      format.setSwapInterval(1);
+//      format.setSamples(4);
+//      QSurfaceFormat::setDefaultFormat(format);
+
+    int bufferBits = 16;
 
     QSurfaceFormat format;
-    format.setDepthBufferSize(24);
-    format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
+    format.setDepthBufferSize(bufferBits);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     format.setSwapInterval(1);
-    format.setSamples(4);
+    format.setSamples(16);
+
     QSurfaceFormat::setDefaultFormat(format);
 
     // Makes all QOpenGLWidget in the application share a single context

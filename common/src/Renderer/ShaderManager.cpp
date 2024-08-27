@@ -27,6 +27,7 @@
 #include "kdl/vector_utils.h"
 #include <kdl/result.h>
 #include <kdl/result_fold.h>
+#include "qlogging.h"
 
 #include <cassert>
 #include <filesystem>
@@ -35,6 +36,8 @@
 namespace TrenchBroom::Renderer {
 
 Result<void> ShaderManager::loadProgram(const ShaderConfig &config) {
+    qInfo() << "loading shader:" << config.name().c_str();
+
   return createProgram(config).and_then(
       [&](auto program) -> Result<void> {
         if (! m_programs.emplace(config.name(), std::move(program)).second) {
