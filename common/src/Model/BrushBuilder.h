@@ -24,7 +24,8 @@
 #include "Model/Polyhedron3.h"
 #include "Result.h"
 
-#include "vm/bbox.h"
+#include "vm/bbox.h" // IWYU pragma: keep
+#include "vm/util.h"
 
 #include <string>
 #include <vector>
@@ -32,13 +33,14 @@
 namespace TrenchBroom::Model
 {
 class Brush;
-
-
 class ModelFactory;
-
-
 enum class MapFormat;
 
+enum class RadiusMode
+{
+  ToEdge,
+  ToVertex,
+};
 
 class BrushBuilder
 {
@@ -49,50 +51,79 @@ private:
 
 public:
   BrushBuilder(MapFormat mapFormat, const vm::bbox3& worldBounds);
-
   BrushBuilder(
     MapFormat mapFormat,
     const vm::bbox3& worldBounds,
-    const BrushFaceAttributes& defaultAttribs);
+    BrushFaceAttributes defaultAttribs);
 
-  Result<Brush> createCube(FloatType size, const std::string& textureName) const;
-
+  Result<Brush> createCube(FloatType size, const std::string& materialName) const;
   Result<Brush> createCube(
     FloatType size,
-    const std::string& leftTexture,
-    const std::string& rightTexture,
-    const std::string& frontTexture,
-    const std::string& backTexture,
-    const std::string& topTexture,
-    const std::string& bottomTexture) const;
+    const std::string& leftMaterial,
+    const std::string& rightMaterial,
+    const std::string& frontMaterial,
+    const std::string& backMaterial,
+    const std::string& topMaterial,
+    const std::string& bottomMaterial) const;
 
-  Result<Brush> createCuboid(const vm::vec3& size, const std::string& textureName) const;
-
+  Result<Brush> createCuboid(const vm::vec3& size, const std::string& materialName) const;
   Result<Brush> createCuboid(
     const vm::vec3& size,
-    const std::string& leftTexture,
-    const std::string& rightTexture,
-    const std::string& frontTexture,
-    const std::string& backTexture,
-    const std::string& topTexture,
-    const std::string& bottomTexture) const;
+    const std::string& leftMaterial,
+    const std::string& rightMaterial,
+    const std::string& frontMaterial,
+    const std::string& backMaterial,
+    const std::string& topMaterial,
+    const std::string& bottomMaterial) const;
 
   Result<Brush> createCuboid(
-    const vm::bbox3& bounds, const std::string& textureName) const;
-
+    const vm::bbox3& bounds, const std::string& materialName) const;
   Result<Brush> createCuboid(
     const vm::bbox3& bounds,
-    const std::string& leftTexture,
-    const std::string& rightTexture,
-    const std::string& frontTexture,
-    const std::string& backTexture,
-    const std::string& topTexture,
-    const std::string& bottomTexture) const;
+    const std::string& leftMaterial,
+    const std::string& rightMaterial,
+    const std::string& frontMaterial,
+    const std::string& backMaterial,
+    const std::string& topMaterial,
+    const std::string& bottomMaterial) const;
+
+  Result<Brush> createCylinder(
+    const vm::bbox3& bounds,
+    size_t numSides,
+    RadiusMode radiusMode,
+    vm::axis::type axis,
+    const std::string& textureName) const;
+
+  Result<std::vector<Brush>> createHollowCylinder(
+    const vm::bbox3& bounds,
+    FloatType thickness,
+    size_t numSides,
+    RadiusMode radiusMode,
+    vm::axis::type axis,
+    const std::string& textureName) const;
+
+
+  Result<Brush> createCone(
+    const vm::bbox3& bounds,
+    size_t numSides,
+    RadiusMode radiusMode,
+    vm::axis::type axis,
+    const std::string& textureName) const;
+
+  Result<Brush> createUVSphere(
+    const vm::bbox3& bounds,
+    size_t numSides,
+    size_t numRings,
+    RadiusMode radiusMode,
+    vm::axis::type axis,
+    const std::string& textureName) const;
+
+  Result<Brush> createIcoSphere(
+    const vm::bbox3& bounds, size_t iterations, const std::string& textureName) const;
 
   Result<Brush> createBrush(
-    const std::vector<vm::vec3>& points, const std::string& textureName) const;
-
+    const std::vector<vm::vec3>& points, const std::string& materialName) const;
   Result<Brush> createBrush(
-    const Polyhedron3& polyhedron, const std::string& textureName) const;
+    const Polyhedron3& polyhedron, const std::string& materialName) const;
 };
 } // namespace TrenchBroom::Model

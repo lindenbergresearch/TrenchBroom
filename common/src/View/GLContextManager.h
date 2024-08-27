@@ -29,11 +29,7 @@ namespace TrenchBroom
 namespace Renderer
 {
 class FontManager;
-
-
 class ShaderManager;
-
-
 class VboManager;
 } // namespace Renderer
 
@@ -59,17 +55,13 @@ private:
 
 public:
   GLContextManager();
-
   ~GLContextManager();
 
   bool initialized() const;
-
   bool initialize();
 
   Renderer::VboManager& vboManager();
-
   Renderer::FontManager& fontManager();
-
   Renderer::ShaderManager& shaderManager();
 
   deleteCopyAndMove(GLContextManager);

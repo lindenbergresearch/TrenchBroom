@@ -19,7 +19,7 @@
 
 #include "ActionContext.h"
 
-#include <kdl/string_utils.h>
+#include "kdl/string_utils.h"
 
 #include <string>
 #include <vector>
@@ -104,7 +104,7 @@ std::string actionContextName(const ActionContext::Type actionContext)
     {
       actionContexts.emplace_back("no tool");
     }
-    if (actionContext & ActionContext::CreateComplexBrushTool)
+    if (actionContext & ActionContext::AssembleBrushTool)
     {
       actionContexts.emplace_back("brush tool");
     }

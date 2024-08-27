@@ -44,7 +44,7 @@
 #include "View/CameraTool2D.h"
 #include "View/ClipToolController.h"
 #include "View/CreateEntityToolController.h"
-#include "View/CreateSimpleBrushToolController2D.h"
+#include "View/DrawShapeToolController2D.h"
 #include "View/EdgeTool.h"
 #include "View/EdgeToolController.h"
 #include "View/ExtrudeToolController.h"
@@ -62,10 +62,10 @@
 #include "View/VertexTool.h"
 #include "View/VertexToolController.h"
 
-#include <kdl/overload.h>
-#include <kdl/result.h>
+#include "kdl/overload.h"
+#include "kdl/result.h"
 
-#include <vm/util.h>
+#include "vm/util.h"
 
 #include <memory>
 #include <vector>
@@ -81,7 +81,7 @@ MapView2D::MapView2D(
   GLContextManager& contextManager,
   ViewPlane viewPlane,
   Logger* logger)
-  : MapViewBase(logger, document, toolBox, renderer, contextManager)
+  : MapViewBase(document, toolBox, renderer, contextManager, logger)
   , m_camera(std::make_unique<Renderer::OrthographicCamera>())
 {
   connectObservers();
@@ -147,8 +147,8 @@ void MapView2D::initializeToolChain(MapViewToolBox& toolBox)
   addTool(std::make_unique<FaceToolController>(toolBox.faceTool()));
   addTool(std::make_unique<CreateEntityToolController2D>(toolBox.createEntityTool()));
   addTool(std::make_unique<SelectionTool>(m_document));
-  addTool(std::make_unique<CreateSimpleBrushToolController2D>(
-    toolBox.createSimpleBrushTool(), m_document));
+  addTool(
+    std::make_unique<DrawShapeToolController2D>(toolBox.drawShapeTool(), m_document));
 }
 
 void MapView2D::connectObservers()
@@ -206,15 +206,7 @@ vm::vec3 MapView2D::doGetPasteObjectsDelta(
                         : referenceBounds.max;
   const auto dragPlane = vm::plane3(anchor, -pickRay.direction);
 
-  const auto distance = vm::intersect_ray_plane(pickRay, dragPlane);
-  if (vm::is_nan(distance))
-  {
-    return vm::vec3::zero();
-  }
-  else
-  {
-    return grid.moveDeltaForBounds(dragPlane, bounds, worldBounds, pickRay);
-  }
+  return grid.moveDeltaForBounds(dragPlane, bounds, worldBounds, pickRay);
 }
 
 bool MapView2D::doCanSelectTall()
@@ -369,15 +361,7 @@ vm::vec3 MapView2D::doComputePointEntityPosition(const vm::bbox3& bounds) const
                           : referenceBounds.max;
     const auto dragPlane = vm::plane3(anchor, -pickRay.direction);
 
-    const auto distance = vm::intersect_ray_plane(pickRay, dragPlane);
-    if (vm::is_nan(distance))
-    {
-      return vm::vec3::zero();
-    }
-    else
-    {
-      return grid.moveDeltaForBounds(dragPlane, bounds, worldBounds, pickRay);
-    }
+    return grid.moveDeltaForBounds(dragPlane, bounds, worldBounds, pickRay);
   }
 }
 

@@ -40,7 +40,7 @@
 #include "View/ThreePaneMapView.h"
 #include "View/TwoPaneMapView.h"
 
-#include <kdl/memory_utils.h>
+#include "kdl/memory_utils.h"
 
 namespace TrenchBroom::View
 {
@@ -120,8 +120,8 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId)
   installActivationTracker(*m_activationTracker);
 
   auto* layout = new QVBoxLayout{};
-  layout->setContentsMargins(0, LayoutConstants::NarrowHMargin, 0, 0);
-  layout->setSpacing(LayoutConstants::NarrowHMargin);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
 
   layout->addWidget(m_mapViewBar);
   layout->addWidget(m_mapView, 1);
@@ -132,7 +132,7 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId)
 
 bool SwitchableMapViewContainer::anyToolActive() const
 {
-  return createComplexBrushToolActive() || clipToolActive() || rotateObjectsToolActive()
+  return assembleBrushToolActive() || clipToolActive() || rotateObjectsToolActive()
          || scaleObjectsToolActive() || shearObjectsToolActive() || anyVertexToolActive();
 }
 
@@ -141,20 +141,20 @@ void SwitchableMapViewContainer::deactivateTool()
   m_toolBox->deactivateAllTools();
 }
 
-bool SwitchableMapViewContainer::createComplexBrushToolActive() const
+bool SwitchableMapViewContainer::assembleBrushToolActive() const
 {
-  return m_toolBox->createComplexBrushToolActive();
+  return m_toolBox->assembleBrushToolActive();
 }
 
-bool SwitchableMapViewContainer::canToggleCreateComplexBrushTool() const
+bool SwitchableMapViewContainer::canToggleAssembleBrushTool() const
 {
   return true;
 }
 
-void SwitchableMapViewContainer::toggleCreateComplexBrushTool()
+void SwitchableMapViewContainer::toggleAssembleBrushTool()
 {
-  assert(canToggleCreateComplexBrushTool());
-  m_toolBox->toggleCreateComplexBrushTool();
+  assert(canToggleAssembleBrushTool());
+  m_toolBox->toggleAssembleBrushTool();
 }
 
 bool SwitchableMapViewContainer::clipToolActive() const
