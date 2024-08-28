@@ -23,51 +23,46 @@
 
 #include "View/MapView.h"
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class MapViewActivationTracker;
-
 
 class MapViewBase;
 
-
-class MapViewContainer : public QWidget, public MapView
-{
+class MapViewContainer : public QWidget, public MapView {
   Q_OBJECT
-public:
-  explicit MapViewContainer(QWidget* parent);
+  public:
+    explicit MapViewContainer(QWidget *parent);
 
-  ~MapViewContainer() override;
+    ~MapViewContainer() override;
 
-public:
-  bool canMaximizeCurrentView() const;
+  public:
+    bool canMaximizeCurrentView() const;
 
-  bool currentViewMaximized() const;
+    bool currentViewMaximized() const;
 
-  void toggleMaximizeCurrentView();
+    void toggleMaximizeCurrentView();
 
-protected:
-  /**
-   * Returns the current map view. This is the map view which had last received focus.
-   *
-   * @return the current map view
-   */
-  MapView* currentMapView() const;
+  protected:
+    /**
+     * Returns the current map view. This is the map view which had last received focus.
+     *
+     * @return the current map view
+     */
+    MapView *currentMapView() const;
 
-private: // implement MapView interface
-  vm::vec3 doGetPasteObjectsDelta(
-    const vm::bbox3& bounds, const vm::bbox3& referenceBounds) const override;
+  private: // implement MapView interface
+    vm::vec3 doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const override;
 
-private: // subclassing interface
-  virtual bool doCanMaximizeCurrentView() const = 0;
+  private: // subclassing interface
+    virtual bool doCanMaximizeCurrentView() const = 0;
 
-  virtual bool doCurrentViewMaximized() const = 0;
+    virtual bool doCurrentViewMaximized() const = 0;
 
-  virtual void doToggleMaximizeCurrentView() = 0;
+    virtual void doToggleMaximizeCurrentView() = 0;
 
-  virtual MapView* doGetCurrentMapView() const = 0;
+    virtual MapView *doGetCurrentMapView() const = 0;
 
-public:
-  virtual void cycleChildMapView(MapView* after) = 0;
+  public:
+    virtual void cycleChildMapView(MapView *after) = 0;
 };
 } // namespace TrenchBroom::View

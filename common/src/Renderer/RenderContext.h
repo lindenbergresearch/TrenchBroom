@@ -24,174 +24,157 @@
 
 #include "vm/bbox.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Camera;
-
 
 class FontManager;
 
-
 class ShaderManager;
 
-
-enum class RenderMode
-{
-  Render3D,
-  Render2D
+enum class RenderMode {
+  Render3D, Render2D
 };
 
+class RenderContext {
+  private:
+    enum class ShowSelectionGuide {
+      Show, Hide, ForceShow, ForceHide
+    };
 
-class RenderContext
-{
-private:
-  enum class ShowSelectionGuide
-  {
-    Show,
-    Hide,
-    ForceShow,
-    ForceHide
-  };
+    // general context for any rendering view
+    RenderMode m_renderMode;
+    const Camera &m_camera;
+    Transformation m_transformation;
+    FontManager &m_fontManager;
+    ShaderManager &m_shaderManager;
 
-  // general context for any rendering view
-  RenderMode m_renderMode;
-  const Camera& m_camera;
-  Transformation m_transformation;
-  FontManager& m_fontManager;
-  ShaderManager& m_shaderManager;
+    // settings for any map rendering view
+    bool m_showTextures;
+    bool m_showFaces;
+    bool m_showEdges;
+    bool m_shadeFaces;
 
-  // settings for any map rendering view
-  bool m_showTextures;
-  bool m_showFaces;
-  bool m_showEdges;
-  bool m_shadeFaces;
+    bool m_showPointEntities;
+    bool m_showPointEntityModels;
+    bool m_showEntityClassnames;
 
-  bool m_showPointEntities;
-  bool m_showPointEntityModels;
-  bool m_showEntityClassnames;
+    bool m_showGroupBounds;
+    bool m_showBrushEntityBounds;
+    bool m_showPointEntityBounds;
 
-  bool m_showGroupBounds;
-  bool m_showBrushEntityBounds;
-  bool m_showPointEntityBounds;
+    bool m_showFog;
 
-  bool m_showFog;
+    bool m_showGrid;
+    FloatType m_gridSize;
+    float m_dpiScale;
 
-  bool m_showGrid;
-  FloatType m_gridSize;
-  float m_dpiScale;
+    bool m_hideSelection;
+    bool m_tintSelection;
 
-  bool m_hideSelection;
-  bool m_tintSelection;
+    ShowSelectionGuide m_showSelectionGuide;
+    vm::bbox3f m_sofMapBounds;
 
-  ShowSelectionGuide m_showSelectionGuide;
-  vm::bbox3f m_sofMapBounds;
+  public:
+    RenderContext(RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager);
 
-public:
-  RenderContext(
-    RenderMode renderMode,
-    const Camera& camera,
-    FontManager& fontManager,
-    ShaderManager& shaderManager);
+    bool render2D() const;
 
-  bool render2D() const;
+    bool render3D() const;
 
-  bool render3D() const;
+    const Camera &camera() const;
 
-  const Camera& camera() const;
+    Transformation &transformation();
 
-  Transformation& transformation();
+    FontManager &fontManager();
 
-  FontManager& fontManager();
+    ShaderManager &shaderManager();
 
-  ShaderManager& shaderManager();
+    bool showTextures() const;
 
-  bool showTextures() const;
+    void setShowTextures(bool showTextures);
 
-  void setShowTextures(bool showTextures);
+    bool showFaces() const;
 
-  bool showFaces() const;
+    void setShowFaces(bool showFaces);
 
-  void setShowFaces(bool showFaces);
+    bool showEdges() const;
 
-  bool showEdges() const;
+    void setShowEdges(bool showEdges);
 
-  void setShowEdges(bool showEdges);
+    bool shadeFaces() const;
 
-  bool shadeFaces() const;
+    void setShadeFaces(bool shadeFaces);
 
-  void setShadeFaces(bool shadeFaces);
+    bool showPointEntities() const;
 
-  bool showPointEntities() const;
+    void setShowPointEntities(bool showPointEntities);
 
-  void setShowPointEntities(bool showPointEntities);
+    bool showPointEntityModels() const;
 
-  bool showPointEntityModels() const;
+    void setShowPointEntityModels(bool showPointEntityModels);
 
-  void setShowPointEntityModels(bool showPointEntityModels);
+    bool showEntityClassnames() const;
 
-  bool showEntityClassnames() const;
+    void setShowEntityClassnames(bool showEntityClassnames);
 
-  void setShowEntityClassnames(bool showEntityClassnames);
+    bool showGroupBounds() const;
 
-  bool showGroupBounds() const;
+    void setShowGroupBounds(bool showGroupBounds);
 
-  void setShowGroupBounds(bool showGroupBounds);
+    bool showBrushEntityBounds() const;
 
-  bool showBrushEntityBounds() const;
+    void setShowBrushEntityBounds(bool showBrushEntityBounds);
 
-  void setShowBrushEntityBounds(bool showBrushEntityBounds);
+    bool showPointEntityBounds() const;
 
-  bool showPointEntityBounds() const;
+    void setShowPointEntityBounds(bool showPointEntityBounds);
 
-  void setShowPointEntityBounds(bool showPointEntityBounds);
+    bool showFog() const;
 
-  bool showFog() const;
+    void setShowFog(bool showFog);
 
-  void setShowFog(bool showFog);
+    bool showGrid() const;
 
-  bool showGrid() const;
+    void setShowGrid(bool showGrid);
 
-  void setShowGrid(bool showGrid);
+    const vm::bbox3f &softMapBounds() const;
 
-  const vm::bbox3f& softMapBounds() const;
+    void setSoftMapBounds(const vm::bbox3f &softMapBounds);
 
-  void setSoftMapBounds(const vm::bbox3f& softMapBounds);
+    FloatType gridSize() const;
 
-  FloatType gridSize() const;
+    void setGridSize(FloatType gridSize);
 
-  void setGridSize(FloatType gridSize);
+    float dpiScale() const;
 
-  float dpiScale() const;
+    void setDpiScale(float dpiScale);
 
-  void setDpiScale(float dpiScale);
+    bool hideSelection() const;
 
-  bool hideSelection() const;
+    void setHideSelection();
 
-  void setHideSelection();
+    bool tintSelection() const;
 
-  bool tintSelection() const;
+    void clearTintSelection();
 
-  void clearTintSelection();
+    bool showSelectionGuide() const;
 
-  bool showSelectionGuide() const;
+    void setShowSelectionGuide();
 
-  void setShowSelectionGuide();
+    void setHideSelectionGuide();
 
-  void setHideSelectionGuide();
+    void setForceShowSelectionGuide();
 
-  void setForceShowSelectionGuide();
+    void setForceHideSelectionGuide();
 
-  void setForceHideSelectionGuide();
+  private:
+    void setShowSelectionGuide(ShowSelectionGuide showSelectionGuide);
 
-private:
-  void setShowSelectionGuide(ShowSelectionGuide showSelectionGuide);
+  private:
+    RenderContext(const RenderContext &other);
 
-private:
-  RenderContext(const RenderContext& other);
-
-  RenderContext& operator=(const RenderContext& other);
+    RenderContext &operator=(const RenderContext &other);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

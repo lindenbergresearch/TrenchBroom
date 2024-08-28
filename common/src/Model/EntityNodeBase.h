@@ -28,208 +28,184 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class PropertyDefinition;
-
 
 class EntityDefinition;
 } // namespace TrenchBroom::Assets
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
-const Assets::EntityDefinition* selectEntityDefinition(
-  const std::vector<EntityNodeBase*>& nodes);
+const Assets::EntityDefinition *selectEntityDefinition(const std::vector<EntityNodeBase *> &nodes);
 
-const Assets::PropertyDefinition* propertyDefinition(
-  const EntityNodeBase* node, const std::string& key);
+const Assets::PropertyDefinition *propertyDefinition(const EntityNodeBase *node, const std::string &key);
 
-const Assets::PropertyDefinition* selectPropertyDefinition(
-  const std::string& key, const std::vector<EntityNodeBase*>& nodes);
+const Assets::PropertyDefinition *selectPropertyDefinition(const std::string &key, const std::vector<EntityNodeBase *> &nodes);
 
-std::string selectPropertyValue(
-  const std::string& key, const std::vector<EntityNodeBase*>& nodes);
+std::string selectPropertyValue(const std::string &key, const std::vector<EntityNodeBase *> &nodes);
 
+class EntityNodeBase : public Node {
+  protected:
+    explicit EntityNodeBase(Entity entity);
 
-class EntityNodeBase : public Node
-{
-protected:
-  explicit EntityNodeBase(Entity entity);
+    Entity m_entity;
 
-  Entity m_entity;
-
-  std::vector<EntityNodeBase*> m_linkSources;
-  std::vector<EntityNodeBase*> m_linkTargets;
-  std::vector<EntityNodeBase*> m_killSources;
-  std::vector<EntityNodeBase*> m_killTargets;
-
-public:
-  ~EntityNodeBase() override;
-
-public: // entity access
-  const Entity& entity() const;
-
-  Entity setEntity(Entity entity);
-
-public: // definition
-  void setDefinition(Assets::EntityDefinition* definition);
-
-private: // property management internals
-  class NotifyPropertyChange
-  {
-  private:
-    NotifyNodeChange m_nodeChange;
-    EntityNodeBase& m_node;
-    vm::bbox3 m_oldPhysicalBounds;
+    std::vector<EntityNodeBase *> m_linkSources;
+    std::vector<EntityNodeBase *> m_linkTargets;
+    std::vector<EntityNodeBase *> m_killSources;
+    std::vector<EntityNodeBase *> m_killTargets;
 
   public:
-    explicit NotifyPropertyChange(EntityNodeBase& node);
+    ~EntityNodeBase() override;
 
-    ~NotifyPropertyChange();
-  };
+  public: // entity access
+    const Entity &entity() const;
 
-  void propertiesWillChange();
+    Entity setEntity(Entity entity);
 
-  void propertiesDidChange(const vm::bbox3& oldPhysicalBounds);
+  public: // definition
+    void setDefinition(Assets::EntityDefinition *definition);
 
-private: // bulk update after property changes
-  void updateIndexAndLinks(const std::vector<EntityProperty>& newProperties);
+  private: // property management internals
+    class NotifyPropertyChange {
+      private:
+        NotifyNodeChange m_nodeChange;
+        EntityNodeBase &m_node;
+        vm::bbox3 m_oldPhysicalBounds;
 
-  void updatePropertyIndex(
-    const std::vector<EntityProperty>& oldProperties,
-    const std::vector<EntityProperty>& newProperties);
+      public:
+        explicit NotifyPropertyChange(EntityNodeBase &node);
 
-  void updateLinks(
-    const std::vector<EntityProperty>& oldProperties,
-    const std::vector<EntityProperty>& newProperties);
+        ~NotifyPropertyChange();
+    };
 
-private: // search index management
-  void addPropertiesToIndex();
+    void propertiesWillChange();
 
-  void removePropertiesFromIndex();
+    void propertiesDidChange(const vm::bbox3 &oldPhysicalBounds);
 
-  void addPropertyToIndex(const std::string& key, const std::string& value);
+  private: // bulk update after property changes
+    void updateIndexAndLinks(const std::vector<EntityProperty> &newProperties);
 
-  void removePropertyFromIndex(const std::string& key, const std::string& value);
+    void updatePropertyIndex(const std::vector<EntityProperty> &oldProperties, const std::vector<EntityProperty> &newProperties);
 
-  void updatePropertyIndex(
-    const std::string& oldKey,
-    const std::string& oldValue,
-    const std::string& newKey,
-    const std::string& newValue);
+    void updateLinks(const std::vector<EntityProperty> &oldProperties, const std::vector<EntityProperty> &newProperties);
 
-public: // link management
-  const std::vector<EntityNodeBase*>& linkSources() const;
+  private: // search index management
+    void addPropertiesToIndex();
 
-  const std::vector<EntityNodeBase*>& linkTargets() const;
+    void removePropertiesFromIndex();
 
-  const std::vector<EntityNodeBase*>& killSources() const;
+    void addPropertyToIndex(const std::string &key, const std::string &value);
 
-  const std::vector<EntityNodeBase*>& killTargets() const;
+    void removePropertyFromIndex(const std::string &key, const std::string &value);
 
-  vm::vec3 linkSourceAnchor() const;
+    void updatePropertyIndex(const std::string &oldKey, const std::string &oldValue, const std::string &newKey, const std::string &newValue);
 
-  vm::vec3 linkTargetAnchor() const;
+  public: // link management
+    const std::vector<EntityNodeBase *> &linkSources() const;
 
-  bool hasMissingSources() const;
+    const std::vector<EntityNodeBase *> &linkTargets() const;
 
-  std::vector<std::string> findMissingLinkTargets() const;
+    const std::vector<EntityNodeBase *> &killSources() const;
 
-  std::vector<std::string> findMissingKillTargets() const;
+    const std::vector<EntityNodeBase *> &killTargets() const;
 
-private: // link management internals
-  void findMissingTargets(
-    const std::string& prefix, std::vector<std::string>& result) const;
+    vm::vec3 linkSourceAnchor() const;
 
-  void addLinks(const std::string& name, const std::string& value);
+    vm::vec3 linkTargetAnchor() const;
 
-  void removeLinks(const std::string& name, const std::string& value);
+    bool hasMissingSources() const;
 
-  void updateLinks(
-    const std::string& oldName,
-    const std::string& oldValue,
-    const std::string& newName,
-    const std::string& newValue);
+    std::vector<std::string> findMissingLinkTargets() const;
 
-  void addLinkTargets(const std::string& targetname);
+    std::vector<std::string> findMissingKillTargets() const;
 
-  void addKillTargets(const std::string& targetname);
+  private: // link management internals
+    void findMissingTargets(const std::string &prefix, std::vector<std::string> &result) const;
 
-  void removeLinkTargets(const std::string& targetname);
+    void addLinks(const std::string &name, const std::string &value);
 
-  void removeKillTargets(const std::string& targetname);
+    void removeLinks(const std::string &name, const std::string &value);
 
-  void addAllLinkSources(const std::string& targetname);
+    void updateLinks(const std::string &oldName, const std::string &oldValue, const std::string &newName, const std::string &newValue);
 
-  void addAllLinkTargets();
+    void addLinkTargets(const std::string &targetname);
 
-  void addAllKillSources(const std::string& targetname);
+    void addKillTargets(const std::string &targetname);
 
-  void addAllKillTargets();
+    void removeLinkTargets(const std::string &targetname);
 
-  void addLinkTargets(const std::vector<EntityNodeBase*>& targets);
+    void removeKillTargets(const std::string &targetname);
 
-  void addKillTargets(const std::vector<EntityNodeBase*>& targets);
+    void addAllLinkSources(const std::string &targetname);
 
-  void addLinkSources(const std::vector<EntityNodeBase*>& sources);
+    void addAllLinkTargets();
 
-  void addKillSources(const std::vector<EntityNodeBase*>& sources);
+    void addAllKillSources(const std::string &targetname);
 
-  void removeAllLinkSources();
+    void addAllKillTargets();
 
-  void removeAllLinkTargets();
+    void addLinkTargets(const std::vector<EntityNodeBase *> &targets);
 
-  void removeAllKillSources();
+    void addKillTargets(const std::vector<EntityNodeBase *> &targets);
 
-  void removeAllKillTargets();
+    void addLinkSources(const std::vector<EntityNodeBase *> &sources);
 
-  void removeAllLinks();
+    void addKillSources(const std::vector<EntityNodeBase *> &sources);
 
-  void addAllLinks();
+    void removeAllLinkSources();
 
-  void addLinkSource(EntityNodeBase* node);
+    void removeAllLinkTargets();
 
-  void addLinkTarget(EntityNodeBase* node);
+    void removeAllKillSources();
 
-  void addKillSource(EntityNodeBase* node);
+    void removeAllKillTargets();
 
-  void addKillTarget(EntityNodeBase* node);
+    void removeAllLinks();
 
-  void removeLinkSource(EntityNodeBase* node);
+    void addAllLinks();
 
-  void removeLinkTarget(EntityNodeBase* node);
+    void addLinkSource(EntityNodeBase *node);
 
-  void removeKillSource(EntityNodeBase* node);
+    void addLinkTarget(EntityNodeBase *node);
 
-  void removeKillTarget(EntityNodeBase* node);
+    void addKillSource(EntityNodeBase *node);
 
-protected:
-  EntityNodeBase();
+    void addKillTarget(EntityNodeBase *node);
 
-private: // implemenation of node interface
-  const std::string& doGetName() const override;
+    void removeLinkSource(EntityNodeBase *node);
 
-  void doAncestorWillChange() override;
+    void removeLinkTarget(EntityNodeBase *node);
 
-  void doAncestorDidChange() override;
+    void removeKillSource(EntityNodeBase *node);
 
-private: // subclassing interface
-  virtual void doPropertiesDidChange(const vm::bbox3& oldBounds) = 0;
+    void removeKillTarget(EntityNodeBase *node);
 
-  virtual vm::vec3 doGetLinkSourceAnchor() const = 0;
+  protected:
+    EntityNodeBase();
 
-  virtual vm::vec3 doGetLinkTargetAnchor() const = 0;
+  private: // implemenation of node interface
+    const std::string &doGetName() const override;
 
-private: // hide copy constructor and assignment operator
-  EntityNodeBase(const EntityNodeBase&);
+    void doAncestorWillChange() override;
 
-  EntityNodeBase& operator=(const EntityNodeBase&);
+    void doAncestorDidChange() override;
+
+  private: // subclassing interface
+    virtual void doPropertiesDidChange(const vm::bbox3 &oldBounds) = 0;
+
+    virtual vm::vec3 doGetLinkSourceAnchor() const = 0;
+
+    virtual vm::vec3 doGetLinkTargetAnchor() const = 0;
+
+  private: // hide copy constructor and assignment operator
+    EntityNodeBase(const EntityNodeBase &);
+
+    EntityNodeBase &operator=(const EntityNodeBase &);
 };
 
+bool operator==(const EntityNodeBase &lhs, const EntityNodeBase &rhs);
 
-bool operator==(const EntityNodeBase& lhs, const EntityNodeBase& rhs);
-
-bool operator!=(const EntityNodeBase& lhs, const EntityNodeBase& rhs);
+bool operator!=(const EntityNodeBase &lhs, const EntityNodeBase &rhs);
 
 } // namespace TrenchBroom::Model

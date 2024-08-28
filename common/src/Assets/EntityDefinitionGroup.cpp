@@ -25,35 +25,26 @@
 
 #include <string>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 
-EntityDefinitionGroup::EntityDefinitionGroup(
-  std::string name, std::vector<EntityDefinition*> definitions)
-  : m_name{std::move(name)}
-  , m_definitions{std::move(definitions)}
-{
+EntityDefinitionGroup::EntityDefinitionGroup(std::string name, std::vector<EntityDefinition *> definitions)
+    : m_name{std::move(name)}, m_definitions{std::move(definitions)} {
 }
 
-const std::string& EntityDefinitionGroup::name() const
-{
-  return m_name;
+const std::string &EntityDefinitionGroup::name() const {
+    return m_name;
 }
 
-const std::string EntityDefinitionGroup::displayName() const
-{
-  return !m_name.empty() ? kdl::str_capitalize(m_name) : "Misc";
+const std::string EntityDefinitionGroup::displayName() const {
+    return !m_name.empty() ? kdl::str_capitalize(m_name) : "Misc";
 }
 
-const std::vector<EntityDefinition*>& EntityDefinitionGroup::definitions() const
-{
-  return m_definitions;
+const std::vector<EntityDefinition *> &EntityDefinitionGroup::definitions() const {
+    return m_definitions;
 }
 
-std::vector<EntityDefinition*> EntityDefinitionGroup::definitions(
-  const EntityDefinitionType type, const EntityDefinitionSortOrder order) const
-{
-  return EntityDefinition::filterAndSort(m_definitions, type, order);
+std::vector<EntityDefinition *> EntityDefinitionGroup::definitions(const EntityDefinitionType type, const EntityDefinitionSortOrder order) const {
+    return EntityDefinition::filterAndSort(m_definitions, type, order);
 }
 
 } // namespace TrenchBroom::Assets

@@ -21,47 +21,40 @@
 
 #include <QWidget>
 
-
 class QStackedLayout;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class TabBar;
 
-
-class TabBookPage : public QWidget
-{
+class TabBookPage : public QWidget {
   Q_OBJECT
-public:
-  explicit TabBookPage(QWidget* parent = nullptr);
+  public:
+    explicit TabBookPage(QWidget *parent = nullptr);
 
-  virtual ~TabBookPage();
+    virtual ~TabBookPage();
 
-  virtual QWidget* createTabBarPage(QWidget* parent);
+    virtual QWidget *createTabBarPage(QWidget *parent);
 };
 
-
-class TabBook : public QWidget
-{
+class TabBook : public QWidget {
   Q_OBJECT
-private:
-  TabBar* m_tabBar;
-  QStackedLayout* m_tabBook;
+  private:
+    TabBar *m_tabBar;
+    QStackedLayout *m_tabBook;
 
-public:
-  explicit TabBook(QWidget* parent = nullptr);
+  public:
+    explicit TabBook(QWidget *parent = nullptr);
 
-  TabBar* tabBar();
+    TabBar *tabBar();
 
-  void addPage(TabBookPage* page, const QString& title);
+    void addPage(TabBookPage *page, const QString &title);
 
-  void switchToPage(int index);
+    void switchToPage(int index);
 
-signals:
+  signals:
 
-  void pageChanged(int page);
+    void pageChanged(int page);
 };
 } // namespace View
 } // namespace TrenchBroom

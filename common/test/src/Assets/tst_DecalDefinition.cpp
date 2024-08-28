@@ -31,8 +31,8 @@ namespace Assets {
 
 namespace {
 DecalDefinition makeDecalDefinition(const std::string &expression) {
-  auto parser = IO::ELParser{IO::ELParser::Mode::Strict, expression};
-  return DecalDefinition{parser.parse()};
+    auto parser = IO::ELParser{IO::ELParser::Mode::Strict, expression};
+    return DecalDefinition{parser.parse()};
 }
 } // namespace
 
@@ -63,15 +63,12 @@ TEST_CASE("DecalDefinitionTest.decalSpecification")
 using T = std::tuple<std::string, std::map<std::string, EL::Value>, DecalSpecification>;
 
 // clang-format off
-const auto [expression, variables, expectedDecalSpecification] = GENERATE(
-    values<T>(
-        {{R"("decal1")", {}, {"decal1"}}, {R"({ texture: "decal2" })", {}, {"decal2"}},
+const auto [expression, variables, expectedDecalSpecification] = GENERATE(values<T>({{R"("decal1")", {}, {"decal1"}}, {R"({ texture: "decal2" })", {}, {"decal2"}},
 
-         {
-             R"({ texture: texture })", {{"texture", EL::Value{"decal3"}}}, {"decal3"}},
+                                                                                     {
+                                                                                         R"({ texture: texture })", {{"texture", EL::Value{"decal3"}}}, {"decal3"}},
 
-        }
-    ));
+                                                                                    }));
 // clang-format on
 
 CAPTURE(expression, variables
@@ -91,14 +88,11 @@ TEST_CASE("DecalDefinitionTest.defaultDecalSpecification")
 using T = std::tuple<std::string, DecalSpecification>;
 
 // clang-format off
-const auto [expression, expectedDecalSpecification] = GENERATE(
-    values<T>(
-        {{R"("decal1")", {"decal1"}}, {R"({ texture: "decal2" })", {"decal2"}},
+const auto [expression, expectedDecalSpecification] = GENERATE(values<T>({{R"("decal1")", {"decal1"}}, {R"({ texture: "decal2" })", {"decal2"}},
 
-         {R"({ texture: texture })", {}},
+                                                                          {R"({ texture: texture })", {}},
 
-        }
-    ));
+                                                                         }));
 // clang-format on
 
 CAPTURE(expression);

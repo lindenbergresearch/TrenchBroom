@@ -26,36 +26,32 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class CachingLogger : public Logger
-{
-private:
-  struct Message
-  {
+namespace TrenchBroom {
+namespace View {
+class CachingLogger : public Logger {
+  private:
+    struct Message {
+      public:
+        LogLevel level;
+        QString str;
+
+        Message(LogLevel i_level, const QString &i_str);
+    };
+
+    using MessageList = std::vector<Message>;
+
+    MessageList m_cachedMessages;
+    Logger *m_logger;
+
   public:
-    LogLevel level;
-    QString str;
+    CachingLogger();
 
-    Message(LogLevel i_level, const QString& i_str);
-  };
+    void setParentLogger(Logger *logger);
 
-  using MessageList = std::vector<Message>;
+  private:
+    void doLog(LogLevel level, const std::string &message) override;
 
-  MessageList m_cachedMessages;
-  Logger* m_logger;
-
-public:
-  CachingLogger();
-
-  void setParentLogger(Logger* logger);
-
-private:
-  void doLog(LogLevel level, const std::string& message) override;
-
-  void doLog(LogLevel level, const QString& message) override;
+    void doLog(LogLevel level, const QString &message) override;
 };
 } // namespace View
 } // namespace TrenchBroom

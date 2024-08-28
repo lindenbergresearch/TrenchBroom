@@ -23,49 +23,45 @@
 
 #include <vector>
 
-
 class QColor;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class ColorTable : public QWidget
-{
+namespace TrenchBroom {
+namespace View {
+class ColorTable : public QWidget {
   Q_OBJECT
-private:
-  int m_cellSize;
-  int m_cellSpacing;
-  std::vector<QColor> m_colors;
-  std::vector<QColor> m_selectedColors;
+  private:
+    int m_cellSize;
+    int m_cellSpacing;
+    std::vector<QColor> m_colors;
+    std::vector<QColor> m_selectedColors;
 
-public:
-  explicit ColorTable(int cellSize, QWidget* parent = nullptr);
+  public:
+    explicit ColorTable(int cellSize, QWidget *parent = nullptr);
 
-  void setColors(const std::vector<QColor>& colors);
+    void setColors(const std::vector<QColor> &colors);
 
-  void setSelection(const std::vector<QColor>& colors);
+    void setSelection(const std::vector<QColor> &colors);
 
-protected: // QWidget overrides
-  void paintEvent(QPaintEvent* event) override;
+  protected: // QWidget overrides
+    void paintEvent(QPaintEvent *event) override;
 
-  void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
-public: // QWidget overrides
-  bool hasHeightForWidth() const override;
+  public: // QWidget overrides
+    bool hasHeightForWidth() const override;
 
-  int heightForWidth(int w) const override;
+    int heightForWidth(int w) const override;
 
-private:
-  int computeCols(int width) const;
+  private:
+    int computeCols(int width) const;
 
-  int computeRows(int cols) const;
+    int computeRows(int cols) const;
 
-  int computeHeight(int rows) const;
+    int computeHeight(int rows) const;
 
-signals:
+  signals:
 
-  void colorTableSelected(QColor color);
+    void colorTableSelected(QColor color);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -28,8 +28,7 @@ std::size_t TestLogger::countMessages(const LogLevel level) const {
     const auto it = m_messages.find(level);
     if (it == std::end(m_messages)) {
         return 0u;
-    }
-    else {
+    } else {
         return it->second;
     }
 }

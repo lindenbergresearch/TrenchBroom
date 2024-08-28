@@ -22,82 +22,68 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class PickResult;
 }
 
-namespace TrenchBroom::Renderer
-{
+namespace TrenchBroom::Renderer {
 class RenderBatch;
-
 
 class RenderContext;
 } // namespace TrenchBroom::Renderer
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class DragTracker;
-
 
 class DropTracker;
 
-
 class InputState;
-
 
 class ToolController;
 
+class ToolChain {
+  private:
+    std::unique_ptr<ToolController> m_tool;
+    std::unique_ptr<ToolChain> m_suffix;
 
-class ToolChain
-{
-private:
-  std::unique_ptr<ToolController> m_tool;
-  std::unique_ptr<ToolChain> m_suffix;
+  public:
+    ToolChain();
 
-public:
-  ToolChain();
+    ~ToolChain();
 
-  ~ToolChain();
+    void append(std::unique_ptr<ToolController> controller);
 
-  void append(std::unique_ptr<ToolController> controller);
+    void pick(const InputState &inputState, Model::PickResult &pickResult);
 
-  void pick(const InputState& inputState, Model::PickResult& pickResult);
+    void modifierKeyChange(const InputState &inputState);
 
-  void modifierKeyChange(const InputState& inputState);
+    void mouseDown(const InputState &inputState);
 
-  void mouseDown(const InputState& inputState);
+    void mouseUp(const InputState &inputState);
 
-  void mouseUp(const InputState& inputState);
+    bool mouseClick(const InputState &inputState);
 
-  bool mouseClick(const InputState& inputState);
+    bool mouseDoubleClick(const InputState &inputState);
 
-  bool mouseDoubleClick(const InputState& inputState);
+    void mouseScroll(const InputState &inputState);
 
-  void mouseScroll(const InputState& inputState);
+    void mouseMove(const InputState &inputState);
 
-  void mouseMove(const InputState& inputState);
+    std::unique_ptr<DragTracker> startMouseDrag(const InputState &inputState);
 
-  std::unique_ptr<DragTracker> startMouseDrag(const InputState& inputState);
+    bool shouldAcceptDrop(const InputState &inputState, const std::string &payload) const;
 
-  bool shouldAcceptDrop(const InputState& inputState, const std::string& payload) const;
+    std::unique_ptr<DropTracker> dragEnter(const InputState &inputState, const std::string &payload);
 
-  std::unique_ptr<DropTracker> dragEnter(
-    const InputState& inputState, const std::string& payload);
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
 
-  void setRenderOptions(
-    const InputState& inputState, Renderer::RenderContext& renderContext) const;
+    void render(const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
-  void render(
-    const InputState& inputState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch);
+    bool cancel();
 
-  bool cancel();
+  private:
+    bool checkInvariant() const;
 
-private:
-  bool checkInvariant() const;
-
-  bool chainEndsHere() const;
+    bool chainEndsHere() const;
 };
 } // namespace TrenchBroom::View

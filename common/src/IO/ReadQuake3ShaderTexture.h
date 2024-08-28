@@ -24,20 +24,16 @@
 
 #include <string>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class File;
 
-
 class FileSystem;
-
 
 /**
  * Loads a texture that represents a Quake 3 shader from the file system. Uses a given
  * file system to locate the actual editor image for the shader. The shader is expected to
  * be readily parsed and available as a virtual object file in the file system.
  */
-Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(
-  std::string shaderName, const File& file, const FileSystem& fs);
+Result<Assets::Texture, ReadTextureError> readQuake3ShaderTexture(std::string shaderName, const File &file, const FileSystem &fs);
 
 } // namespace TrenchBroom::IO

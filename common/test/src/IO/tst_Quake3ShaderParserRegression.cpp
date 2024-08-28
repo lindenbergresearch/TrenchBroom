@@ -30,14 +30,10 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
-TEST_CASE("Quake3ShaderParserTest.parseShadersWithCommentTerminatingBlockEntry")
-{
-  const std::string data(
-    R"(
+namespace TrenchBroom {
+namespace IO {
+TEST_CASE("Quake3ShaderParserTest.parseShadersWithCommentTerminatingBlockEntry") {
+const std::string data(R"(
 waterBubble
 {
     sort	underwater
@@ -52,34 +48,38 @@ waterBubble
 }
 
 )");
-  Quake3ShaderParser parser(data);
-  TestParserStatus status;
-  CHECK_NOTHROW(parser.parse(status));
+Quake3ShaderParser parser(data);
+TestParserStatus status;
+CHECK_NOTHROW(parser
+.
+parse(status)
+);
 }
 
-TEST_CASE("Quake3ShaderParserTest.parseShadersWithInvalidWhitespace")
-{
-  // see https://github.com/TrenchBroom/TrenchBroom/issues/2537
-  // The file contains a carriage return without a consecutive line feed, which tripped
-  // the parser.
+TEST_CASE("Quake3ShaderParserTest.parseShadersWithInvalidWhitespace") {
+// see https://github.com/TrenchBroom/TrenchBroom/issues/2537
+// The file contains a carriage return without a consecutive line feed, which tripped
+// the parser.
 
-  const auto workDir = std::filesystem::current_path();
-  auto fs = DiskFileSystem(workDir / "fixture/test/IO/Shader/parser");
-  auto testFile = fs.openFile("am_cf_models.shader").value();
-  auto reader = testFile->reader().buffer();
+const auto workDir = std::filesystem::current_path();
+auto fs = DiskFileSystem(workDir / "fixture/test/IO/Shader/parser");
+auto testFile = fs.openFile("am_cf_models.shader").value();
+auto reader = testFile->reader().buffer();
 
-  Quake3ShaderParser parser(reader.stringView());
-  TestParserStatus status;
-  CHECK_NOTHROW(parser.parse(status));
+Quake3ShaderParser parser(reader.stringView());
+TestParserStatus status;
+CHECK_NOTHROW(parser
+.
+parse(status)
+);
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseShaderAbsolutePath")
 {
-  // see https://github.com/TrenchBroom/TrenchBroom/issues/2633
-  // apparently, the Q3 engine can handle this
+// see https://github.com/TrenchBroom/TrenchBroom/issues/2633
+// apparently, the Q3 engine can handle this
 
-  const std::string data(
-    R"(
+const std::string data(R"(
 /textures/eerie/ironcrosslt2_10000
 {
     qer_editorimage textures/gothic_light/ironcrosslt2.tga
@@ -88,28 +88,29 @@ TEST_CASE("Quake3ShaderParserTest.parseShaderAbsolutePath")
 
 })");
 
-  Quake3ShaderParser parser(data);
-  TestParserStatus status;
+Quake3ShaderParser parser(data);
+TestParserStatus status;
 
-  CHECK_THAT(
-    parser.parse(status),
-    Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
-      "textures/eerie/ironcrosslt2_10000",      // shaderPath
-      "textures/gothic_light/ironcrosslt2.tga", // editorImage
-      "",                                       // lightImage
-      Assets::Quake3Shader::Culling::Front,     // culling
-      {},                                       // surfaceParms
-      {}                                        // stages
-    }}));
+CHECK_THAT(
+    parser
+.
+parse(status), Catch::UnorderedEquals(std::vector<Assets::Quake3Shader>{{
+                                                                            "textures/eerie/ironcrosslt2_10000",      // shaderPath
+                                                                            "textures/gothic_light/ironcrosslt2.tga", // editorImage
+                                                                            "",                                       // lightImage
+                                                                            Assets::Quake3Shader::Culling::Front,     // culling
+                                                                            {},                                       // surfaceParms
+                                                                            {}                                        // stages
+                                                                        }})
+);
 }
 
 TEST_CASE("Quake3ShaderParserTest.parseShaderWithMissingCBrace")
 {
-  // see https://github.com/TrenchBroom/TrenchBroom/issues/2663
-  // Quake 3 allows this, too.
+// see https://github.com/TrenchBroom/TrenchBroom/issues/2663
+// Quake 3 allows this, too.
 
-  const std::string data(
-    R"(
+const std::string data(R"(
 textures/evil3_floors/t-flr_oddtile_drty
 {
         {
@@ -125,9 +126,11 @@ textures/evil3_floors/cemtiledrk_mhbrk
 }
 )");
 
-  Quake3ShaderParser parser(data);
-  TestParserStatus status;
-  CHECK_NOTHROW(parser.parse(status));
-}
-} // namespace IO
+Quake3ShaderParser parser(data);
+TestParserStatus status;
+CHECK_NOTHROW(parser
+.
+parse(status)
+);
+}} // namespace IO
 } // namespace TrenchBroom

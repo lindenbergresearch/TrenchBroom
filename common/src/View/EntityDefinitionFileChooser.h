@@ -25,79 +25,69 @@
 
 #include <memory>
 
-
 class QPushButton;
-
 
 class QListWidget;
 
-
 class QLabel;
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
 class MapDocument;
 
-
-class SingleSelectionListWidget : public QListWidget
-{
+class SingleSelectionListWidget : public QListWidget {
   Q_OBJECT
-private:
-  bool m_allowDeselectAll;
+  private:
+    bool m_allowDeselectAll;
 
-public:
-  explicit SingleSelectionListWidget(QWidget* parent = nullptr);
+  public:
+    explicit SingleSelectionListWidget(QWidget *parent = nullptr);
 
-  void setAllowDeselectAll(bool allow);
+    void setAllowDeselectAll(bool allow);
 
-  bool allowDeselectAll() const;
+    bool allowDeselectAll() const;
 
-protected: // QAbstractItemView overrides
-  void selectionChanged(
-    const QItemSelection& selected, const QItemSelection& deselected) override;
-  // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
-  // QEvent* event) const override;
+  protected: // QAbstractItemView overrides
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
+    // QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const
+    // QEvent* event) const override;
 };
 
-
-class EntityDefinitionFileChooser : public QWidget
-{
+class EntityDefinitionFileChooser : public QWidget {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
+  private:
+    std::weak_ptr<MapDocument> m_document;
 
-  SingleSelectionListWidget* m_builtin = nullptr;
-  QLabel* m_externalLabel = nullptr;
-  QPushButton* m_browseExternal = nullptr;
-  QPushButton* m_reloadExternal = nullptr;
+    SingleSelectionListWidget *m_builtin = nullptr;
+    QLabel *m_externalLabel = nullptr;
+    QPushButton *m_browseExternal = nullptr;
+    QPushButton *m_reloadExternal = nullptr;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
-public:
-  explicit EntityDefinitionFileChooser(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit EntityDefinitionFileChooser(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-private:
-  void createGui();
+  private:
+    void createGui();
 
-  void bindEvents();
+    void bindEvents();
 
-  void connectObservers();
+    void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
+    void documentWasNewed(MapDocument *document);
 
-  void documentWasLoaded(MapDocument* document);
+    void documentWasLoaded(MapDocument *document);
 
-  void entityDefinitionsDidChange();
+    void entityDefinitionsDidChange();
 
-  void updateControls();
+    void updateControls();
 
-  void builtinSelectionChanged();
+    void builtinSelectionChanged();
 
-  void chooseExternalClicked();
+    void chooseExternalClicked();
 
-  void reloadExternalClicked();
+    void reloadExternalClicked();
 };
 
 } // namespace TrenchBroom::View

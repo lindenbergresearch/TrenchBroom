@@ -23,80 +23,63 @@
 
 #include "vm/vec_io.h"
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
 kdl_reflect_impl(Layer);
 
-Layer::Layer(std::string name, const bool defaultLayer)
-  : m_defaultLayer{defaultLayer}
-  , m_name{std::move(name)}
-{
+Layer::Layer(std::string name, const bool defaultLayer) : m_defaultLayer{defaultLayer}, m_name{std::move(name)} {
 }
 
-bool Layer::defaultLayer() const
-{
-  return m_defaultLayer;
+bool Layer::defaultLayer() const {
+    return m_defaultLayer;
 }
 
-const std::string& Layer::name() const
-{
-  return m_name;
+const std::string &Layer::name() const {
+    return m_name;
 }
 
-void Layer::setName(std::string name)
-{
-  m_name = std::move(name);
+void Layer::setName(std::string name) {
+    m_name = std::move(name);
 }
 
-bool Layer::hasSortIndex() const
-{
-  return m_sortIndex.has_value();
+bool Layer::hasSortIndex() const {
+    return m_sortIndex.has_value();
 }
 
-int Layer::sortIndex() const
-{
-  if (defaultLayer())
-  {
-    return defaultLayerSortIndex();
-  }
+int Layer::sortIndex() const {
+    if (defaultLayer()) {
+        return defaultLayerSortIndex();
+    }
 
-  return m_sortIndex.value_or(invalidSortIndex());
+    return m_sortIndex.value_or(invalidSortIndex());
 }
 
-void Layer::setSortIndex(const int sortIndex)
-{
-  m_sortIndex = sortIndex;
+void Layer::setSortIndex(const int sortIndex) {
+    m_sortIndex = sortIndex;
 }
 
-const std::optional<Color>& Layer::color() const
-{
-  return m_color;
+const std::optional<Color> &Layer::color() const {
+    return m_color;
 }
 
-void Layer::setColor(const Color& color)
-{
-  m_color = color;
+void Layer::setColor(const Color &color) {
+    m_color = color;
 }
 
-bool Layer::omitFromExport() const
-{
-  return m_omitFromExport;
+bool Layer::omitFromExport() const {
+    return m_omitFromExport;
 }
 
-void Layer::setOmitFromExport(const bool omitFromExport)
-{
-  m_omitFromExport = omitFromExport;
+void Layer::setOmitFromExport(const bool omitFromExport) {
+    m_omitFromExport = omitFromExport;
 }
 
-int Layer::invalidSortIndex()
-{
-  return std::numeric_limits<int>::max();
+int Layer::invalidSortIndex() {
+    return std::numeric_limits<int>::max();
 }
 
-int Layer::defaultLayerSortIndex()
-{
-  return -1;
+int Layer::defaultLayerSortIndex() {
+    return -1;
 }
 
 } // namespace TrenchBroom::Model

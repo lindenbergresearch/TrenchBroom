@@ -42,736 +42,793 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
+namespace TrenchBroom {
+namespace View {
+TEST_CASE_METHOD(MapDocumentTest,
+"PickingTest.pickSingleBrush") {
+// delete default brush
+document->
+
+selectAllNodes();
+
+document->
+
+deleteObjects();
+
+const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
+
+auto *brushNode1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
+document->addNodes( {{
+document->
+
+parentForNodes(),
 {
-namespace View
-{
-TEST_CASE_METHOD(MapDocumentTest, "PickingTest.pickSingleBrush")
-{
-  // delete default brush
-  document->
+brushNode1
+}
+}
+});
 
-    selectAllNodes();
+Model::PickResult pickResult;
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult
+);
 
-  document->
-
-    deleteObjects();
-
-  const Model::BrushBuilder builder(
-    document->world()->mapFormat(), document->worldBounds());
-
-  auto* brushNode1 = new Model::BrushNode(
-    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
-      .value());
-  document->addNodes(
-    {{document->
-
-      parentForNodes(),
-
-      {brushNode1}}});
-
-  Model::PickResult pickResult;
-  document->pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult);
-
-  auto hits = pickResult.all();
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  const auto& brush1 = brushNode1->brush();
-  CHECK(
-    Model::hitToFaceHandle(hits.front())
-      ->
-
-    face()
-
-    == brush1.face(*brush1.
-
-                    findFace(vm::vec3::neg_x())
-
-                     ));
-  CHECK(
+auto hits = pickResult.all();
+CHECK(
     hits
-      .
+.
 
-    front()
+size()
 
-      .
+== 1u);
 
-    distance()
+const auto &brush1 = brushNode1->brush();
+CHECK(
+    Model::hitToFaceHandle(hits.front())
+->
 
-    == vm::approx(32.0));
+face()
 
-  pickResult.
+== brush1.
+face(*brush1
+.
 
-    clear();
+findFace (vm::vec3::neg_x())
 
-  document->pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::neg_x()), pickResult);
-  CHECK(pickResult
-          .
+));
+CHECK(
+    hits
+.
 
-        all()
+front()
 
-          .
+.
 
-        empty()
+distance()
 
-  );
+== vm::approx(32.0));
+
+pickResult.
+
+clear();
+
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::neg_x()), pickResult
+);
+CHECK(pickResult
+.
+
+all()
+
+.
+
+empty()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "PickingTest.pickSingleEntity")
+TEST_CASE_METHOD(MapDocumentTest,
+"PickingTest.pickSingleEntity")
 {
-  // delete default brush
-  document->
+// delete default brush
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  document->
+document->
 
-    deleteObjects();
+deleteObjects();
 
-  Model::EntityNode* ent1 = new Model::EntityNode{Model::Entity{}};
-  document->addNodes(
-    {{document->
+Model::EntityNode *ent1 = new Model::EntityNode{Model::Entity{}};
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {ent1}}});
+{
+ent1}}});
 
-  const auto origin = ent1->entity().origin();
-  const auto bounds = ent1->logicalBounds();
+const auto origin = ent1->entity().origin();
+const auto bounds = ent1->logicalBounds();
 
-  const auto rayOrigin =
-    origin + vm::vec3(-32.0, bounds.size().y() / 2.0, bounds.size().z() / 2.0);
+const auto rayOrigin = origin + vm::vec3(-32.0, bounds.size().y() / 2.0, bounds.size().z() / 2.0);
 
-  Model::PickResult pickResult;
-  document->pick(vm::ray3(rayOrigin, vm::vec3::pos_x()), pickResult);
+Model::PickResult pickResult;
+document->
+pick(vm::ray3(rayOrigin, vm::vec3::pos_x()), pickResult
+);
 
-  auto hits = pickResult.all();
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  CHECK(
+auto hits = pickResult.all();
+CHECK(
     hits
-      .
+.
 
-    front()
+size()
 
-      .
+== 1u);
 
-    target<Model::EntityNode*>()
-
-    == ent1);
-  CHECK(
+CHECK(
     hits
-      .
+.
 
-    front()
+front()
 
-      .
+.
 
-    distance()
+target<Model::EntityNode *>()
 
-    == vm::approx(
-      32.0
-      - bounds
-            .
+== ent1);
+CHECK(
+    hits
+.
 
-          size()
+front()
 
-            .
+.
 
-          x()
+distance()
 
-          / 2.0));
+== vm::approx(
+32.0
+- bounds
+.
 
-  pickResult.
+size()
 
-    clear();
+.
 
-  document->pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::neg_x()), pickResult);
-  CHECK(pickResult
-          .
+x()
 
-        all()
+/ 2.0));
 
-          .
+pickResult.
 
-        empty()
+clear();
 
-  );
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::neg_x()), pickResult
+);
+CHECK(pickResult
+.
+
+all()
+
+.
+
+empty()
+
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "PickingTest.pickSimpleGroup")
+TEST_CASE_METHOD(MapDocumentTest,
+"PickingTest.pickSimpleGroup")
 {
-  using namespace Model::HitFilters;
+using namespace Model::HitFilters;
 
-  // delete default brush
-  document->
+// delete default brush
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  document->
+document->
 
-    deleteObjects();
+deleteObjects();
 
-  const Model::BrushBuilder builder(
-    document->world()->mapFormat(), document->worldBounds());
+const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
 
-  auto* brushNode1 = new Model::BrushNode(
-    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode1}}});
+{
+brushNode1}}});
 
-  auto* brushNode2 = new Model::BrushNode(
-    builder
-      .createCuboid(
-        vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 128)),
-        "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode2 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 128)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode2}}});
+{
+brushNode2}}});
 
-  document->
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  auto* group = document->groupSelection("test");
+auto *group = document->groupSelection("test");
 
-  Model::PickResult pickResult;
-  document->pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult);
+Model::PickResult pickResult;
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult
+);
 
-  // picking a grouped object when the containing group is closed should return the
-  // object, which is converted to the group when hitsToNodesWithGroupPicking() is used.
-  auto hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  const auto& brush1 = brushNode1->brush();
-  CHECK(
-    Model::hitToFaceHandle(hits.front())
-      ->
-
-    face()
-
-    == brush1.face(*brush1.
-
-                    findFace(vm::vec3::neg_x())
-
-                     ));
-  CHECK(
+// picking a grouped object when the containing group is closed should return the
+// object, which is converted to the group when hitsToNodesWithGroupPicking() is used.
+auto hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
     hits
-      .
+.
 
-    front()
+size()
 
-      .
+== 1u);
 
-    distance()
-
-    == vm::approx(32.0));
-
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node*>{group}));
-
-  // hitting both objects in the group should return the group only once
-  pickResult.
-
-    clear();
-
-  document->pick(vm::ray3(vm::vec3(32, 32, -32), vm::vec3::pos_z()), pickResult);
-
-  hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
-
-    size()
-
-    == 2u);
-
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node*>{group}));
-
-  // hitting the group bounds doesn't count as a hit
-  pickResult.
-
-    clear();
-
-  document->pick(vm::ray3(vm::vec3(-32, 0, 96), vm::vec3::pos_x()), pickResult);
-
-  hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(hits.
-
-        empty()
-
-  );
-
-  // hitting a grouped object when the containing group is open should return the object
-  // only
-  document->openGroup(group);
-
-  pickResult.
-
-    clear();
-
-  document->pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult);
-
-  hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  CHECK(
+const auto &brush1 = brushNode1->brush();
+CHECK(
     Model::hitToFaceHandle(hits.front())
-      ->
+->
 
-    face()
+face()
 
-    == brush1.face(*brush1.
+== brush1.
+face(*brush1
+.
 
-                    findFace(vm::vec3::neg_x())
+findFace (vm::vec3::neg_x())
 
-                     ));
-  CHECK(
+));
+CHECK(
     hits
-      .
+.
 
-    front()
+front()
 
-      .
+.
 
-    distance()
+distance()
 
-    == vm::approx(32.0));
+== vm::approx(32.0));
 
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits),
-    Catch::Equals(std::vector<Model::Node*>{brushNode1}));
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{group})
+);
+
+// hitting both objects in the group should return the group only once
+pickResult.
+
+clear();
+
+document->
+pick(vm::ray3(vm::vec3(32, 32, -32), vm::vec3::pos_z()), pickResult
+);
+
+hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
+    hits
+.
+
+size()
+
+== 2u);
+
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{group})
+);
+
+// hitting the group bounds doesn't count as a hit
+pickResult.
+
+clear();
+
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 96), vm::vec3::pos_x()), pickResult
+);
+
+hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(hits
+.
+
+empty()
+
+);
+
+// hitting a grouped object when the containing group is open should return the object
+// only
+document->
+openGroup(group);
+
+pickResult.
+
+clear();
+
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult
+);
+
+hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
+    hits
+.
+
+size()
+
+== 1u);
+
+CHECK(
+    Model::hitToFaceHandle(hits.front())
+->
+
+face()
+
+== brush1.
+face(*brush1
+.
+
+findFace (vm::vec3::neg_x())
+
+));
+CHECK(
+    hits
+.
+
+front()
+
+.
+
+distance()
+
+== vm::approx(32.0));
+
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{brushNode1})
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "PickingTest.pickNestedGroup")
+TEST_CASE_METHOD(MapDocumentTest,
+"PickingTest.pickNestedGroup")
 {
-  using namespace Model::HitFilters;
+using namespace Model::HitFilters;
 
-  // delete default brush
-  document->
+// delete default brush
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  document->
+document->
 
-    deleteObjects();
+deleteObjects();
 
-  const Model::BrushBuilder builder(
-    document->world()->mapFormat(), document->worldBounds());
+const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
 
-  auto* brushNode1 = new Model::BrushNode(
-    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode1}}});
+{
+brushNode1}}});
 
-  auto* brushNode2 = new Model::BrushNode(
-    builder
-      .createCuboid(
-        vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 128)),
-        "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode2 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 128)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode2}}});
+{
+brushNode2}}});
 
-  document->
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  auto* innerGroup = document->groupSelection("inner");
+auto *innerGroup = document->groupSelection("inner");
 
-  document->
+document->
 
-    deselectAll();
+deselectAll();
 
-  auto* brushNode3 = new Model::BrushNode(
-    builder
-      .createCuboid(
-        vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 256)),
-        "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode3 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 256)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode3}}});
+{
+brushNode3}}});
 
-  document->
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  auto* outerGroup = document->groupSelection("outer");
+auto *outerGroup = document->groupSelection("outer");
 
-  const vm::ray3 highRay(vm::vec3(-32, 0, 256 + 32), vm::vec3::pos_x());
-  const vm::ray3 lowRay(vm::vec3(-32, 0, +32), vm::vec3::pos_x());
+const vm::ray3 highRay(vm::vec3(-32, 0, 256 + 32), vm::vec3::pos_x());
+const vm::ray3 lowRay(vm::vec3(-32, 0, +32), vm::vec3::pos_x());
 
-  /*
-   *          Z
-   *         /|\
-   *          |
-   *          | ______________
-   *          | |   ______   |
-   *  hiRay *-->|   | b3 |   |
-   *          | |   |____|   |
-   *          | |            |
-   *          | |   outer    |
-   *          | | __________ |
-   *          | | | ______ | |
-   *          | | | | b2 | | |
-   *          | | | |____| | |
-   *          | | |        | |
-   *          | | |  inner | |
-   *          | | | ______ | |
-   * lowRay *-->| | | b1 | | |
-   *        0_| | | |____| | |
-   *          | | |________| |
-   *          | |____________|
-   * ---------|--------------------> X
-   *                |
-   *                0
-   */
+/*
+ *          Z
+ *         /|\
+ *          |
+ *          | ______________
+ *          | |   ______   |
+ *  hiRay *-->|   | b3 |   |
+ *          | |   |____|   |
+ *          | |            |
+ *          | |   outer    |
+ *          | | __________ |
+ *          | | | ______ | |
+ *          | | | | b2 | | |
+ *          | | | |____| | |
+ *          | | |        | |
+ *          | | |  inner | |
+ *          | | | ______ | |
+ * lowRay *-->| | | b1 | | |
+ *        0_| | | |____| | |
+ *          | | |________| |
+ *          | |____________|
+ * ---------|--------------------> X
+ *                |
+ *                0
+ */
 
-  /*
-   * world
-   * * outer (closed)
-   *   * inner (closed)
-   *     * brush1
-   *     * brush2
-   *   * brush3
-   */
+/*
+ * world
+ * * outer (closed)
+ *   * inner (closed)
+ *     * brush1
+ *     * brush2
+ *   * brush3
+ */
 
-  Model::PickResult pickResult;
+Model::PickResult pickResult;
 
-  // hitting a grouped object when the containing group is open should return the object
-  // only
-  document->openGroup(outerGroup);
+// hitting a grouped object when the containing group is open should return the object
+// only
+document->
+openGroup(outerGroup);
 
-  /*
-   * world
-   * * outer (open)
-   *   * inner (closed)
-   *     * brush1
-   *     * brush2
-   *   * brush3
-   */
+/*
+ * world
+ * * outer (open)
+ *   * inner (closed)
+ *     * brush1
+ *     * brush2
+ *   * brush3
+ */
 
-  pickResult.
+pickResult.
 
-    clear();
+clear();
 
-  document->pick(highRay, pickResult);
+document->
+pick(highRay, pickResult
+);
 
-  auto hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  const auto& brush3 = brushNode3->brush();
-  CHECK(
-    Model::hitToFaceHandle(hits.front())
-      ->
-
-    face()
-
-    == brush3.face(*brush3.
-
-                    findFace(vm::vec3::neg_x())
-
-                     ));
-  CHECK(
+auto hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
     hits
-      .
+.
 
-    front()
+size()
 
-      .
+== 1u);
 
-    distance()
-
-    == vm::approx(32.0));
-
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits),
-    Catch::Equals(std::vector<Model::Node*>{brushNode3}));
-
-  // hitting the brush in the inner group should return the inner group when
-  // hitsToNodesWithGroupPicking() is used
-  pickResult.
-
-    clear();
-
-  document->pick(lowRay, pickResult);
-
-  hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  const auto& brush1 = brushNode1->brush();
-  CHECK(
+const auto &brush3 = brushNode3->brush();
+CHECK(
     Model::hitToFaceHandle(hits.front())
-      ->
+->
 
-    face()
+face()
 
-    == brush1.face(*brush1.
+== brush3.
+face(*brush3
+.
 
-                    findFace(vm::vec3::neg_x())
+findFace (vm::vec3::neg_x())
 
-                     ));
-  CHECK(
+));
+CHECK(
     hits
-      .
+.
 
-    front()
+front()
 
-      .
+.
 
-    distance()
+distance()
 
-    == vm::approx(32.0));
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits),
-    Catch::Equals(std::vector<Model::Node*>{innerGroup}));
+== vm::approx(32.0));
 
-  // open the inner group, too. hitsToNodesWithGroupPicking() should no longer return
-  // groups, since all groups are open.
-  document->openGroup(innerGroup);
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{brushNode3})
+);
 
-  /*
-   * world
-   * * outer (open)
-   *   * inner (open)
-   *     * brush1
-   *     * brush2
-   *   * brush3
-   */
+// hitting the brush in the inner group should return the inner group when
+// hitsToNodesWithGroupPicking() is used
+pickResult.
 
-  CHECK(innerGroup->
+clear();
 
-        opened()
+document->
+pick(lowRay, pickResult
+);
 
-  );
-  CHECK_FALSE(outerGroup->
+hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
+    hits
+.
 
-              opened()
+size()
 
-  );
-  CHECK(outerGroup->
+== 1u);
 
-        hasOpenedDescendant()
-
-  );
-
-  // pick a brush in the outer group
-  pickResult.
-
-    clear();
-
-  document->pick(highRay, pickResult);
-
-  hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  CHECK(
+const auto &brush1 = brushNode1->brush();
+CHECK(
     Model::hitToFaceHandle(hits.front())
-      ->
+->
 
-    face()
+face()
 
-    == brush3.face(*brush3.
+== brush1.
+face(*brush1
+.
 
-                    findFace(vm::vec3::neg_x())
+findFace (vm::vec3::neg_x())
 
-                     ));
-  CHECK(
+));
+CHECK(
     hits
-      .
+.
 
-    front()
+front()
 
-      .
+.
 
-    distance()
+distance()
 
-    == vm::approx(32.0));
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits),
-    Catch::Equals(std::vector<Model::Node*>{brushNode3}));
+== vm::approx(32.0));
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{innerGroup})
+);
 
-  // pick a brush in the inner group
-  pickResult.
+// open the inner group, too. hitsToNodesWithGroupPicking() should no longer return
+// groups, since all groups are open.
+document->
+openGroup(innerGroup);
 
-    clear();
+/*
+ * world
+ * * outer (open)
+ *   * inner (open)
+ *     * brush1
+ *     * brush2
+ *   * brush3
+ */
 
-  document->pick(lowRay, pickResult);
+CHECK(innerGroup
+->
 
-  hits = pickResult.all(type(Model::BrushNode::BrushHitType));
-  CHECK(
-    hits.
+opened()
 
-    size()
+);
+CHECK_FALSE(outerGroup
+->
 
-    == 1u);
+opened()
 
-  CHECK(
+);
+CHECK(outerGroup
+->
+
+hasOpenedDescendant()
+
+);
+
+// pick a brush in the outer group
+pickResult.
+
+clear();
+
+document->
+pick(highRay, pickResult
+);
+
+hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
+    hits
+.
+
+size()
+
+== 1u);
+
+CHECK(
     Model::hitToFaceHandle(hits.front())
-      ->
+->
 
-    face()
+face()
 
-    == brush1.face(*brush1.
+== brush3.
+face(*brush3
+.
 
-                    findFace(vm::vec3::neg_x())
+findFace (vm::vec3::neg_x())
 
-                     ));
-  CHECK(
+));
+CHECK(
     hits
-      .
+.
 
-    front()
+front()
 
-      .
+.
 
-    distance()
+distance()
 
-    == vm::approx(32.0));
-  CHECK_THAT(
-    hitsToNodesWithGroupPicking(hits),
-    Catch::Equals(std::vector<Model::Node*>{brushNode1}));
+== vm::approx(32.0));
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{brushNode3})
+);
+
+// pick a brush in the inner group
+pickResult.
+
+clear();
+
+document->
+pick(lowRay, pickResult
+);
+
+hits = pickResult.all(type(Model::BrushNode::BrushHitType));
+CHECK(
+    hits
+.
+
+size()
+
+== 1u);
+
+CHECK(
+    Model::hitToFaceHandle(hits.front())
+->
+
+face()
+
+== brush1.
+face(*brush1
+.
+
+findFace (vm::vec3::neg_x())
+
+));
+CHECK(
+    hits
+.
+
+front()
+
+.
+
+distance()
+
+== vm::approx(32.0));
+CHECK_THAT(
+    hitsToNodesWithGroupPicking(hits), Catch::Equals(std::vector<Model::Node *>{brushNode1})
+);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "PickingTest.pickBrushEntity")
+TEST_CASE_METHOD(MapDocumentTest,
+"PickingTest.pickBrushEntity")
 {
-  // delete default brush
-  document->
+// delete default brush
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  document->
+document->
 
-    deleteObjects();
+deleteObjects();
 
-  const Model::BrushBuilder builder(
-    document->world()->mapFormat(), document->worldBounds());
+const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds());
 
-  auto* brushNode1 = new Model::BrushNode(
-    builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode1 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode1}}});
+{
+brushNode1}}});
 
-  auto* brushNode2 = new Model::BrushNode(
-    builder
-      .createCuboid(
-        vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 128)),
-        "texture")
-      .value());
-  document->addNodes(
-    {{document->
+auto *brushNode2 = new Model::BrushNode(builder.createCuboid(vm::bbox3(vm::vec3(0, 0, 0), vm::vec3(64, 64, 64)).translate(vm::vec3(0, 0, 128)), "texture").value());
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brushNode2}}});
+{
+brushNode2}}});
 
-  document->
+document->
 
-    selectAllNodes();
+selectAllNodes();
 
-  document->createBrushEntity(m_brushEntityDef);
-  document->
+document->
+createBrushEntity(m_brushEntityDef);
+document->
 
-    deselectAll();
+deselectAll();
 
-  Model::PickResult pickResult;
+Model::PickResult pickResult;
 
-  // picking entity brushes should only return the brushes and not the entity
-  document->pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult);
+// picking entity brushes should only return the brushes and not the entity
+document->
+pick(vm::ray3(vm::vec3(-32, 0, 0), vm::vec3::pos_x()), pickResult
+);
 
-  auto hits = pickResult.all();
-  CHECK(
-    hits.
-
-    size()
-
-    == 1u);
-
-  const auto& brush1 = brushNode1->brush();
-  CHECK(
-    Model::hitToFaceHandle(hits.front())
-      ->
-
-    face()
-
-    == brush1.face(*brush1.
-
-                    findFace(vm::vec3::neg_x())
-
-                     ));
-  CHECK(
+auto hits = pickResult.all();
+CHECK(
     hits
-      .
+.
 
-    front()
+size()
 
-      .
+== 1u);
 
-    distance()
+const auto &brush1 = brushNode1->brush();
+CHECK(
+    Model::hitToFaceHandle(hits.front())
+->
 
-    == vm::approx(32.0));
-}
-} // namespace View
+face()
+
+== brush1.
+face(*brush1
+.
+
+findFace (vm::vec3::neg_x())
+
+));
+CHECK(
+    hits
+.
+
+front()
+
+.
+
+distance()
+
+== vm::approx(32.0));
+}} // namespace View
 } // namespace TrenchBroom

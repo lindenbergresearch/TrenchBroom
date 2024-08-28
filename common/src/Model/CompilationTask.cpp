@@ -21,10 +21,8 @@
 
 #include "kdl/reflection_impl.h"
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 
 kdl_reflect_impl(CompilationExportMap);
 
@@ -36,10 +34,9 @@ kdl_reflect_impl(CompilationDeleteFiles);
 
 kdl_reflect_impl(CompilationRunTool);
 
-std::ostream& operator<<(std::ostream& lhs, const CompilationTask& rhs)
-{
-  std::visit([&](const auto& x) { lhs << x; }, rhs);
-  return lhs;
+std::ostream &operator<<(std::ostream &lhs, const CompilationTask &rhs) {
+    std::visit([&](const auto &x) { lhs << x; }, rhs);
+    return lhs;
 }
 
 } // namespace Model

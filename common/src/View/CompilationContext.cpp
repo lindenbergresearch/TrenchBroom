@@ -25,37 +25,24 @@
 
 #include <kdl/memory_utils.h>
 
-namespace TrenchBroom::View
-{
-CompilationContext::CompilationContext(
-  std::weak_ptr<MapDocument> document,
-  const EL::VariableStore& variables,
-  TextOutputAdapter output,
-  bool test)
-  : m_document{std::move(document)}
-  , m_variables{variables.clone()}
-  , m_output{std::move(output)}
-  , m_test{test}
-{
+namespace TrenchBroom::View {
+CompilationContext::CompilationContext(std::weak_ptr<MapDocument> document, const EL::VariableStore &variables, TextOutputAdapter output, bool test)
+    : m_document{std::move(document)}, m_variables{variables.clone()}, m_output{std::move(output)}, m_test{test} {
 }
 
-std::shared_ptr<MapDocument> CompilationContext::document() const
-{
-  return kdl::mem_lock(m_document);
+std::shared_ptr<MapDocument> CompilationContext::document() const {
+    return kdl::mem_lock(m_document);
 }
 
-bool CompilationContext::test() const
-{
-  return m_test;
+bool CompilationContext::test() const {
+    return m_test;
 }
 
-std::string CompilationContext::interpolate(const std::string& input) const
-{
-  return EL::interpolate(input, EL::EvaluationContext{*m_variables});
+std::string CompilationContext::interpolate(const std::string &input) const {
+    return EL::interpolate(input, EL::EvaluationContext{*m_variables});
 }
 
-std::string CompilationContext::variableValue(const std::string& variableName) const
-{
-  return m_variables->value(variableName).convertTo(EL::ValueType::String).stringValue();
+std::string CompilationContext::variableValue(const std::string &variableName) const {
+    return m_variables->value(variableName).convertTo(EL::ValueType::String).stringValue();
 }
 } // namespace TrenchBroom::View

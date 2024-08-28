@@ -30,21 +30,18 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace IO
-{
-class GameEngineConfigParser : public ConfigParserBase
-{
-public:
-  GameEngineConfigParser(std::string_view str, std::filesystem::path path);
+namespace TrenchBroom {
+namespace IO {
+class GameEngineConfigParser : public ConfigParserBase {
+  public:
+    GameEngineConfigParser(std::string_view str, std::filesystem::path path);
 
-  Model::GameEngineConfig parse();
+    Model::GameEngineConfig parse();
 
-private:
-  std::vector<Model::GameEngineProfile> parseProfiles(const EL::Value& value) const;
+  private:
+    std::vector<Model::GameEngineProfile> parseProfiles(const EL::Value &value) const;
 
-  Model::GameEngineProfile parseProfile(const EL::Value& value) const;
+    Model::GameEngineProfile parseProfile(const EL::Value &value) const;
 
   deleteCopyAndMove(GameEngineConfigParser);
 };

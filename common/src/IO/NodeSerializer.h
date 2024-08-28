@@ -25,36 +25,26 @@
 #include <unordered_map>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushNode;
-
 
 class BrushFace;
 
-
 class EntityProperty;
-
 
 class GroupNode;
 
-
 class LayerNode;
-
 
 class Node;
 
-
 class PatchNode;
-
 
 class WorldNode;
 } // namespace Model
 
-namespace IO
-{
+namespace IO {
 /**
  * Interface for stream-based serialization of a map, with public functions to
  * write different types of nodes to the output stream.
@@ -70,121 +60,107 @@ namespace IO
  *
  * You may not reuse the NodeSerializer after that point.
  */
-class NodeSerializer
-{
-protected:
-  using ObjectNo = unsigned int;
+class NodeSerializer {
+  protected:
+    using ObjectNo = unsigned int;
 
-private:
-  ObjectNo m_entityNo;
-  ObjectNo m_brushNo;
+  private:
+    ObjectNo m_entityNo;
+    ObjectNo m_brushNo;
 
-  bool m_exporting;
+    bool m_exporting;
 
-public:
-  NodeSerializer();
+  public:
+    NodeSerializer();
 
-  virtual ~NodeSerializer();
+    virtual ~NodeSerializer();
 
-protected:
-  ObjectNo entityNo() const;
+  protected:
+    ObjectNo entityNo() const;
 
-  ObjectNo brushNo() const;
+    ObjectNo brushNo() const;
 
-public:
-  bool exporting() const;
+  public:
+    bool exporting() const;
 
-  void setExporting(bool exporting);
+    void setExporting(bool exporting);
 
-public:
-  /**
-   * Prepares to serialize the given nodes and all of their children.
-   * The order is ignored.
-   *
-   * The rootNodes parameter allows subclasses to optionally precompute the
-   * serializations of all nodes in parallel.
-   *
-   * Any nodes serialized after calling beginFile() must have either been
-   * in the rootNodes vector or be a descendant of one of these nodes.
-   */
-  void beginFile(const std::vector<const Model::Node*>& rootNodes);
+  public:
+    /**
+     * Prepares to serialize the given nodes and all of their children.
+     * The order is ignored.
+     *
+     * The rootNodes parameter allows subclasses to optionally precompute the
+     * serializations of all nodes in parallel.
+     *
+     * Any nodes serialized after calling beginFile() must have either been
+     * in the rootNodes vector or be a descendant of one of these nodes.
+     */
+    void beginFile(const std::vector<const Model::Node *> &rootNodes);
 
-  void endFile();
+    void endFile();
 
-public:
-  void defaultLayer(const Model::WorldNode& world);
+  public:
+    void defaultLayer(const Model::WorldNode &world);
 
-  void customLayer(const Model::LayerNode* layer);
+    void customLayer(const Model::LayerNode *layer);
 
-  void group(
-    const Model::GroupNode* group,
-    const std::vector<Model::EntityProperty>& parentProperties);
+    void group(const Model::GroupNode *group, const std::vector<Model::EntityProperty> &parentProperties);
 
-  void entity(
-    const Model::Node* node,
-    const std::vector<Model::EntityProperty>& properties,
-    const std::vector<Model::EntityProperty>& parentProperties,
-    const Model::Node* brushParent);
+    void entity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties, const Model::Node *brushParent);
 
-  void entity(
-    const Model::Node* node,
-    const std::vector<Model::EntityProperty>& properties,
-    const std::vector<Model::EntityProperty>& parentProperties,
-    const std::vector<Model::BrushNode*>& entityBrushes);
+    void entity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &parentProperties, const std::vector<Model::BrushNode *> &entityBrushes);
 
-private:
-  void beginEntity(
-    const Model::Node* node,
-    const std::vector<Model::EntityProperty>& properties,
-    const std::vector<Model::EntityProperty>& extraAttributes);
+  private:
+    void beginEntity(const Model::Node *node, const std::vector<Model::EntityProperty> &properties, const std::vector<Model::EntityProperty> &extraAttributes);
 
-  void beginEntity(const Model::Node* node);
+    void beginEntity(const Model::Node *node);
 
-  void endEntity(const Model::Node* node);
+    void endEntity(const Model::Node *node);
 
-  void entityProperties(const std::vector<Model::EntityProperty>& properties);
+    void entityProperties(const std::vector<Model::EntityProperty> &properties);
 
-  void entityProperty(const Model::EntityProperty& property);
+    void entityProperty(const Model::EntityProperty &property);
 
-  void brushes(const std::vector<Model::BrushNode*>& brushNodes);
+    void brushes(const std::vector<Model::BrushNode *> &brushNodes);
 
-  void brush(const Model::BrushNode* brushNode);
+    void brush(const Model::BrushNode *brushNode);
 
-  void patch(const Model::PatchNode* patchNode);
+    void patch(const Model::PatchNode *patchNode);
 
-public:
-  void brushFaces(const std::vector<Model::BrushFace>& faces);
+  public:
+    void brushFaces(const std::vector<Model::BrushFace> &faces);
 
-private:
-  void brushFace(const Model::BrushFace& face);
+  private:
+    void brushFace(const Model::BrushFace &face);
 
-public:
-  std::vector<Model::EntityProperty> parentProperties(const Model::Node* groupNode);
+  public:
+    std::vector<Model::EntityProperty> parentProperties(const Model::Node *groupNode);
 
-private:
-  std::vector<Model::EntityProperty> layerProperties(const Model::LayerNode* layerNode);
+  private:
+    std::vector<Model::EntityProperty> layerProperties(const Model::LayerNode *layerNode);
 
-  std::vector<Model::EntityProperty> groupProperties(const Model::GroupNode* groupNode);
+    std::vector<Model::EntityProperty> groupProperties(const Model::GroupNode *groupNode);
 
-protected:
-  std::string escapeEntityProperties(const std::string& str) const;
+  protected:
+    std::string escapeEntityProperties(const std::string &str) const;
 
-private:
-  virtual void doBeginFile(const std::vector<const Model::Node*>& nodes) = 0;
+  private:
+    virtual void doBeginFile(const std::vector<const Model::Node *> &nodes) = 0;
 
-  virtual void doEndFile() = 0;
+    virtual void doEndFile() = 0;
 
-  virtual void doBeginEntity(const Model::Node* node) = 0;
+    virtual void doBeginEntity(const Model::Node *node) = 0;
 
-  virtual void doEndEntity(const Model::Node* node) = 0;
+    virtual void doEndEntity(const Model::Node *node) = 0;
 
-  virtual void doEntityProperty(const Model::EntityProperty& property) = 0;
+    virtual void doEntityProperty(const Model::EntityProperty &property) = 0;
 
-  virtual void doBrush(const Model::BrushNode* brushNode) = 0;
+    virtual void doBrush(const Model::BrushNode *brushNode) = 0;
 
-  virtual void doBrushFace(const Model::BrushFace& face) = 0;
+    virtual void doBrushFace(const Model::BrushFace &face) = 0;
 
-  virtual void doPatch(const Model::PatchNode* patchNode) = 0;
+    virtual void doPatch(const Model::PatchNode *patchNode) = 0;
 };
 } // namespace IO
 } // namespace TrenchBroom

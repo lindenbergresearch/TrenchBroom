@@ -19,21 +19,15 @@
 
 #pragma once
 
-namespace TrenchBroom
-{
-namespace EL
-{
+namespace TrenchBroom {
+namespace EL {
 class Value;
-
 
 enum class ValueType;
 
-
 class Expression;
 
-
 class EvaluationContext;
-
 
 class VariableStore;
 } // namespace EL

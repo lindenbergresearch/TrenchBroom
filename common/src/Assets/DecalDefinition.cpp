@@ -31,75 +31,56 @@
 #include "vm/scalar.h"
 #include "vm/vec_io.h"
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 
-namespace
-{
-std::string textureName(const EL::Value& value)
-{
-  using namespace std::string_literals;
-  return value.type() == EL::ValueType::String ? value.stringValue() : ""s;
+namespace {
+std::string textureName(const EL::Value &value) {
+    using namespace std::string_literals;
+    return value.type() == EL::ValueType::String ? value.stringValue() : ""s;
 }
 
-DecalSpecification convertToDecal(const EL::Value& value)
-{
-  switch (value.type())
-  {
-  case EL::ValueType::Map:
-    return {textureName(value[DecalSpecificationKeys::Texture])};
-  case EL::ValueType::String:
-    return {textureName(value)};
-  case EL::ValueType::Boolean:
-  case EL::ValueType::Number:
-  case EL::ValueType::Array:
-  case EL::ValueType::Range:
-  case EL::ValueType::Null:
-  case EL::ValueType::Undefined:
-    break;
-  }
+DecalSpecification convertToDecal(const EL::Value &value) {
+    switch (value.type()) {
+    case EL::ValueType::Map:return {textureName(value[DecalSpecificationKeys::Texture])};
+    case EL::ValueType::String:return {textureName(value)};
+    case EL::ValueType::Boolean:
+    case EL::ValueType::Number:
+    case EL::ValueType::Array:
+    case EL::ValueType::Range:
+    case EL::ValueType::Null:
+    case EL::ValueType::Undefined:break;
+    }
 
-  return {};
+    return {};
 }
 } // namespace
 
 kdl_reflect_impl(DecalSpecification);
 
-DecalDefinition::DecalDefinition()
-  : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0}
-{
+DecalDefinition::DecalDefinition() : m_expression{EL::LiteralExpression{EL::Value::Undefined}, 0, 0} {
 }
 
-DecalDefinition::DecalDefinition(const size_t line, const size_t column)
-  : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column}
-{
+DecalDefinition::DecalDefinition(const size_t line, const size_t column) : m_expression{EL::LiteralExpression{EL::Value::Undefined}, line, column} {
 }
 
-DecalDefinition::DecalDefinition(EL::Expression expression)
-  : m_expression{std::move(expression)}
-{
+DecalDefinition::DecalDefinition(EL::Expression expression) : m_expression{std::move(expression)} {
 }
 
-void DecalDefinition::append(const DecalDefinition& other)
-{
-  const auto line = m_expression.line();
-  const auto column = m_expression.column();
+void DecalDefinition::append(const DecalDefinition &other) {
+    const auto line = m_expression.line();
+    const auto column = m_expression.column();
 
-  auto cases = std::vector<EL::Expression>{std::move(m_expression), other.m_expression};
-  m_expression = EL::Expression{EL::SwitchExpression{std::move(cases)}, line, column};
+    auto cases = std::vector<EL::Expression>{std::move(m_expression), other.m_expression};
+    m_expression = EL::Expression{EL::SwitchExpression{std::move(cases)}, line, column};
 }
 
-DecalSpecification DecalDefinition::decalSpecification(
-  const EL::VariableStore& variableStore) const
-{
-  return convertToDecal(m_expression.evaluate(EL::EvaluationContext{variableStore}));
+DecalSpecification DecalDefinition::decalSpecification(const EL::VariableStore &variableStore) const {
+    return convertToDecal(m_expression.evaluate(EL::EvaluationContext{variableStore}));
 }
 
-DecalSpecification DecalDefinition::defaultDecalSpecification() const
-{
-  return decalSpecification(EL::NullVariableStore{});
+DecalSpecification DecalDefinition::defaultDecalSpecification() const {
+    return decalSpecification(EL::NullVariableStore{});
 }
 
 kdl_reflect_impl(DecalDefinition);

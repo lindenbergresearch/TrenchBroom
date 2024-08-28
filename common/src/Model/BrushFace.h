@@ -39,297 +39,252 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::Assets
-{
+namespace TrenchBroom::Assets {
 class Texture;
 }
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class TexCoordSystem;
 
-
 class TexCoordSystemSnapshot;
-
 
 enum class WrapStyle;
 enum class MapFormat;
 
+class BrushFace : public Taggable {
+  public:
+    /*
+     * The order of points, when looking from outside the face:
+     *
+     * 1
+     * |
+     * |
+     * |
+     * |
+     * 0-----------2
+     */
+    using Points = std::array<vm::vec3, 3u>;
+
+  private:
+    /**
+     * For use in VertexList transformation below.
+     */
+    struct TransformHalfEdgeToVertex {
+      const BrushVertex *operator()(const BrushHalfEdge *halfEdge) const;
+    };
+
+    /**
+     * For use in EdgeList transformation below.
+     */
+    struct TransformHalfEdgeToEdge {
+      const BrushEdge *operator()(const BrushHalfEdge *halfEdge) const;
+    };
 
-class BrushFace : public Taggable
-{
-public:
-  /*
-   * The order of points, when looking from outside the face:
-   *
-   * 1
-   * |
-   * |
-   * |
-   * |
-   * 0-----------2
-   */
-  using Points = std::array<vm::vec3, 3u>;
-
-private:
-  /**
-   * For use in VertexList transformation below.
-   */
-  struct TransformHalfEdgeToVertex
-  {
-    const BrushVertex* operator()(const BrushHalfEdge* halfEdge) const;
-  };
-
-  /**
-   * For use in EdgeList transformation below.
-   */
-  struct TransformHalfEdgeToEdge
-  {
-    const BrushEdge* operator()(const BrushHalfEdge* halfEdge) const;
-  };
-
-public:
-  using VertexList = kdl::transform_adapter<BrushHalfEdgeList, TransformHalfEdgeToVertex>;
-  using EdgeList = kdl::transform_adapter<BrushHalfEdgeList, TransformHalfEdgeToEdge>;
-
-private:
-  BrushFace::Points m_points;
-  vm::plane3 m_boundary;
-  BrushFaceAttributes m_attributes;
-
-  Assets::AssetReference<Assets::Texture> m_textureReference;
-  std::unique_ptr<TexCoordSystem> m_texCoordSystem;
-  BrushFaceGeometry* m_geometry;
-
-  mutable size_t m_lineNumber;
-  mutable size_t m_lineCount;
-  bool m_selected;
-
-  // brush renderer
-  mutable bool m_markedToRenderFace;
-
-public:
-  BrushFace(const BrushFace& other);
-
-  BrushFace(BrushFace&& other) noexcept;
-
-  BrushFace& operator=(BrushFace other) noexcept;
-
-  friend void swap(BrushFace& lhs, BrushFace& rhs) noexcept;
-
-  ~BrushFace();
-
-  kdl_reflect_decl(BrushFace, m_points, m_boundary, m_attributes, m_textureReference);
-
-  /**
-   * Creates a face using TB's default texture projection for the given map format and the
-   * given plane.
-   *
-   * Used when creating new faces when we don't have a particular texture alignment to
-   * request. On Valve format maps, this differs from createFromStandard() by creating a
-   * face-aligned texture projection, whereas createFromStandard() creates an axis-aligned
-   * texture projection.
-   *
-   * The returned face has a TexCoordSystem matching the given format.
-   */
-  static Result<BrushFace> create(
-    const vm::vec3& point0,
-    const vm::vec3& point1,
-    const vm::vec3& point2,
-    const BrushFaceAttributes& attributes,
-    MapFormat mapFormat);
-
-  /**
-   * Creates a face from a Standard texture projection, converting it to Valve if
-   * necessary.
-   *
-   * Used when loading/pasting a Standard format map.
-   *
-   * The returned face has a TexCoordSystem matching the given format.
-   */
-  static Result<BrushFace> createFromStandard(
-    const vm::vec3& point0,
-    const vm::vec3& point1,
-    const vm::vec3& point2,
-    const BrushFaceAttributes& attributes,
-    MapFormat mapFormat);
+  public:
+    using VertexList = kdl::transform_adapter<BrushHalfEdgeList, TransformHalfEdgeToVertex>;
+    using EdgeList = kdl::transform_adapter<BrushHalfEdgeList, TransformHalfEdgeToEdge>;
 
-  /**
-   * Creates a face from a Valve texture projection, converting it to Standard if
-   * necessary.
-   *
-   * Used when loading/pasting a Valve format map.
-   *
-   * The returned face has a TexCoordSystem matching the given format.
-   */
-  static Result<BrushFace> createFromValve(
-    const vm::vec3& point1,
-    const vm::vec3& point2,
-    const vm::vec3& point3,
-    const BrushFaceAttributes& attributes,
-    const vm::vec3& texAxisX,
-    const vm::vec3& texAxisY,
-    MapFormat mapFormat);
+  private:
+    BrushFace::Points m_points;
+    vm::plane3 m_boundary;
+    BrushFaceAttributes m_attributes;
 
-  static Result<BrushFace> create(
-    const vm::vec3& point0,
-    const vm::vec3& point1,
-    const vm::vec3& point2,
-    const BrushFaceAttributes& attributes,
-    std::unique_ptr<TexCoordSystem> texCoordSystem);
+    Assets::AssetReference<Assets::Texture> m_textureReference;
+    std::unique_ptr<TexCoordSystem> m_texCoordSystem;
+    BrushFaceGeometry *m_geometry;
 
-  BrushFace(
-    const BrushFace::Points& points,
-    const vm::plane3& boundary,
-    const BrushFaceAttributes& attributes,
-    std::unique_ptr<TexCoordSystem> texCoordSystem);
+    mutable size_t m_lineNumber;
+    mutable size_t m_lineCount;
+    bool m_selected;
 
-  static void sortFaces(std::vector<BrushFace>& faces);
+    // brush renderer
+    mutable bool m_markedToRenderFace;
 
-  std::unique_ptr<TexCoordSystemSnapshot> takeTexCoordSystemSnapshot() const;
+  public:
+    BrushFace(const BrushFace &other);
 
-  void restoreTexCoordSystemSnapshot(const TexCoordSystemSnapshot& coordSystemSnapshot);
+    BrushFace(BrushFace &&other) noexcept;
 
-  void copyTexCoordSystemFromFace(
-    const TexCoordSystemSnapshot& coordSystemSnapshot,
-    const BrushFaceAttributes& attributes,
-    const vm::plane3& sourceFacePlane,
-    WrapStyle wrapStyle);
+    BrushFace &operator=(BrushFace other) noexcept;
 
-  const BrushFace::Points& points() const;
+    friend void swap(BrushFace &lhs, BrushFace &rhs) noexcept;
 
-  const vm::plane3& boundary() const;
+    ~BrushFace();
 
-  const vm::vec3& normal() const;
+    kdl_reflect_decl(BrushFace, m_points, m_boundary, m_attributes, m_textureReference);
 
-  vm::vec3 center() const;
+    /**
+     * Creates a face using TB's default texture projection for the given map format and the
+     * given plane.
+     *
+     * Used when creating new faces when we don't have a particular texture alignment to
+     * request. On Valve format maps, this differs from createFromStandard() by creating a
+     * face-aligned texture projection, whereas createFromStandard() creates an axis-aligned
+     * texture projection.
+     *
+     * The returned face has a TexCoordSystem matching the given format.
+     */
+    static Result<BrushFace> create(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, MapFormat mapFormat);
 
-  vm::vec3 boundsCenter() const;
+    /**
+     * Creates a face from a Standard texture projection, converting it to Valve if
+     * necessary.
+     *
+     * Used when loading/pasting a Standard format map.
+     *
+     * The returned face has a TexCoordSystem matching the given format.
+     */
+    static Result<BrushFace> createFromStandard(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, MapFormat mapFormat);
 
-  FloatType projectedArea(vm::axis::type axis) const;
+    /**
+     * Creates a face from a Valve texture projection, converting it to Standard if
+     * necessary.
+     *
+     * Used when loading/pasting a Valve format map.
+     *
+     * The returned face has a TexCoordSystem matching the given format.
+     */
+    static Result<BrushFace> createFromValve(const vm::vec3 &point1, const vm::vec3 &point2, const vm::vec3 &point3, const BrushFaceAttributes &attributes, const vm::vec3 &texAxisX, const vm::vec3 &texAxisY, MapFormat mapFormat);
 
-  FloatType area() const;
+    static Result<BrushFace> create(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem);
 
-  bool coplanarWith(const vm::plane3d& plane) const;
+    BrushFace(const BrushFace::Points &points, const vm::plane3 &boundary, const BrushFaceAttributes &attributes, std::unique_ptr<TexCoordSystem> texCoordSystem);
 
-  const BrushFaceAttributes& attributes() const;
+    static void sortFaces(std::vector<BrushFace> &faces);
 
-  void setAttributes(const BrushFaceAttributes& attributes);
+    std::unique_ptr<TexCoordSystemSnapshot> takeTexCoordSystemSnapshot() const;
 
-  bool setAttributes(const BrushFace& other);
+    void restoreTexCoordSystemSnapshot(const TexCoordSystemSnapshot &coordSystemSnapshot);
 
-  int resolvedSurfaceContents() const;
+    void copyTexCoordSystemFromFace(const TexCoordSystemSnapshot &coordSystemSnapshot, const BrushFaceAttributes &attributes, const vm::plane3 &sourceFacePlane, WrapStyle wrapStyle);
 
-  int resolvedSurfaceFlags() const;
+    const BrushFace::Points &points() const;
 
-  float resolvedSurfaceValue() const;
+    const vm::plane3 &boundary() const;
 
-  Color resolvedColor() const;
+    const vm::vec3 &normal() const;
 
-  void resetTexCoordSystemCache();
+    vm::vec3 center() const;
 
-  const TexCoordSystem& texCoordSystem() const;
+    vm::vec3 boundsCenter() const;
 
-  const Assets::Texture* texture() const;
+    FloatType projectedArea(vm::axis::type axis) const;
 
-  vm::vec2f textureSize() const;
+    FloatType area() const;
 
-  vm::vec2f modOffset(const vm::vec2f& offset) const;
+    bool coplanarWith(const vm::plane3d &plane) const;
 
-  bool setTexture(Assets::Texture* texture);
+    const BrushFaceAttributes &attributes() const;
 
-  vm::vec3 textureXAxis() const;
+    void setAttributes(const BrushFaceAttributes &attributes);
 
-  vm::vec3 textureYAxis() const;
+    bool setAttributes(const BrushFace &other);
 
-  void resetTextureAxes();
+    int resolvedSurfaceContents() const;
 
-  void resetTextureAxesToParaxial();
+    int resolvedSurfaceFlags() const;
 
-  void convertToParaxial();
+    float resolvedSurfaceValue() const;
 
-  void convertToParallel();
+    Color resolvedColor() const;
 
-  void moveTexture(const vm::vec3& up, const vm::vec3& right, const vm::vec2f& offset);
+    void resetTexCoordSystemCache();
 
-  void rotateTexture(float angle);
+    const TexCoordSystem &texCoordSystem() const;
 
-  void shearTexture(const vm::vec2f& factors);
+    const Assets::Texture *texture() const;
 
-  void flipTexture(
-    const vm::vec3& cameraUp,
-    const vm::vec3& cameraRight,
-    vm::direction cameraRelativeFlipDirection);
+    vm::vec2f textureSize() const;
 
-  Result<void> transform(const vm::mat4x4& transform, bool lockTexture);
+    vm::vec2f modOffset(const vm::vec2f &offset) const;
 
-  void invert();
+    bool setTexture(Assets::Texture *texture);
 
-  Result<void> updatePointsFromVertices();
+    vm::vec3 textureXAxis() const;
 
-  vm::mat4x4 projectToBoundaryMatrix() const;
+    vm::vec3 textureYAxis() const;
 
-  vm::mat4x4 toTexCoordSystemMatrix(
-    const vm::vec2f& offset, const vm::vec2f& scale, bool project) const;
+    void resetTextureAxes();
 
-  vm::mat4x4 fromTexCoordSystemMatrix(
-    const vm::vec2f& offset, const vm::vec2f& scale, bool project) const;
+    void resetTextureAxesToParaxial();
 
-  float measureTextureAngle(const vm::vec2f& center, const vm::vec2f& point) const;
+    void convertToParaxial();
 
-  size_t vertexCount() const;
+    void convertToParallel();
 
-  EdgeList edges() const;
+    void moveTexture(const vm::vec3 &up, const vm::vec3 &right, const vm::vec2f &offset);
 
-  VertexList vertices() const;
+    void rotateTexture(float angle);
 
-  std::vector<vm::vec3> vertexPositions() const;
+    void shearTexture(const vm::vec2f &factors);
 
-  bool hasVertices(
-    const vm::polygon3& vertices, FloatType epsilon = static_cast<FloatType>(0.0)) const;
+    void flipTexture(const vm::vec3 &cameraUp, const vm::vec3 &cameraRight, vm::direction cameraRelativeFlipDirection);
 
-  vm::polygon3 polygon() const;
+    Result<void> transform(const vm::mat4x4 &transform, bool lockTexture);
 
-public:
-  BrushFaceGeometry* geometry() const;
+    void invert();
 
-  void setGeometry(BrushFaceGeometry* geometry);
+    Result<void> updatePointsFromVertices();
 
-  size_t lineNumber() const;
+    vm::mat4x4 projectToBoundaryMatrix() const;
 
-  void setFilePosition(size_t lineNumber, size_t lineCount) const;
+    vm::mat4x4 toTexCoordSystemMatrix(const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
 
-  bool selected() const;
+    vm::mat4x4 fromTexCoordSystemMatrix(const vm::vec2f &offset, const vm::vec2f &scale, bool project) const;
 
-  void select();
+    float measureTextureAngle(const vm::vec2f &center, const vm::vec2f &point) const;
 
-  void deselect();
+    size_t vertexCount() const;
 
-  vm::vec2f textureCoords(const vm::vec3& point) const;
+    EdgeList edges() const;
 
-  FloatType intersectWithRay(const vm::ray3& ray) const;
+    VertexList vertices() const;
 
-private:
-  Result<void> setPoints(
-    const vm::vec3& point0, const vm::vec3& point1, const vm::vec3& point2);
+    std::vector<vm::vec3> vertexPositions() const;
 
-  void correctPoints();
+    bool hasVertices(const vm::polygon3 &vertices, FloatType epsilon = static_cast<FloatType>(0.0)) const;
 
-public: // brush renderer
-  /**
-   * This is used to cache results of evaluating the BrushRenderer Filter.
-   * It's only valid within a call to `BrushRenderer::validateBrush`.
-   *
-   * @param marked    whether the face is going to be rendered.
-   */
-  void setMarked(bool marked) const;
+    vm::polygon3 polygon() const;
 
-  bool isMarked() const;
+  public:
+    BrushFaceGeometry *geometry() const;
 
-private: // implement Taggable interface
-  void doAcceptTagVisitor(TagVisitor& visitor) override;
+    void setGeometry(BrushFaceGeometry *geometry);
 
-  void doAcceptTagVisitor(ConstTagVisitor& visitor) const override;
+    size_t lineNumber() const;
+
+    void setFilePosition(size_t lineNumber, size_t lineCount) const;
+
+    bool selected() const;
+
+    void select();
+
+    void deselect();
+
+    vm::vec2f textureCoords(const vm::vec3 &point) const;
+
+    FloatType intersectWithRay(const vm::ray3 &ray) const;
+
+  private:
+    Result<void> setPoints(const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2);
+
+    void correctPoints();
+
+  public: // brush renderer
+    /**
+     * This is used to cache results of evaluating the BrushRenderer Filter.
+     * It's only valid within a call to `BrushRenderer::validateBrush`.
+     *
+     * @param marked    whether the face is going to be rendered.
+     */
+    void setMarked(bool marked) const;
+
+    bool isMarked() const;
+
+  private: // implement Taggable interface
+    void doAcceptTagVisitor(TagVisitor &visitor) override;
+
+    void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 };
 
 } // namespace TrenchBroom::Model

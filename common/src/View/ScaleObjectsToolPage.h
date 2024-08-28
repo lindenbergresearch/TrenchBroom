@@ -29,67 +29,56 @@
 #include <memory>
 #include <optional>
 
-
 class QComboBox;
-
 
 class QStackedLayout;
 
-
 class QLineEdit;
-
 
 class QComboBox;
 
-
 class QAbstractButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
-
 
 class Selection;
 
-
-class ScaleObjectsToolPage : public QWidget
-{
+class ScaleObjectsToolPage : public QWidget {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
+  private:
+    std::weak_ptr<MapDocument> m_document;
 
-  QStackedLayout* m_book;
+    QStackedLayout *m_book;
 
-  QLineEdit* m_sizeTextBox;
-  QLineEdit* m_factorsTextBox;
+    QLineEdit *m_sizeTextBox;
+    QLineEdit *m_factorsTextBox;
 
-  QComboBox* m_scaleFactorsOrSize;
-  QAbstractButton* m_button;
+    QComboBox *m_scaleFactorsOrSize;
+    QAbstractButton *m_button;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
-public:
-  explicit ScaleObjectsToolPage(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit ScaleObjectsToolPage(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-  void activate();
+    void activate();
 
-private:
-  void connectObservers();
+  private:
+    void connectObservers();
 
-  void createGui();
+    void createGui();
 
-  void updateGui();
+    void updateGui();
 
-  bool canScale() const;
+    bool canScale() const;
 
-  std::optional<vm::vec3> getScaleFactors() const;
+    std::optional<vm::vec3> getScaleFactors() const;
 
-  void selectionDidChange(const Selection& selection);
+    void selectionDidChange(const Selection &selection);
 
-  void applyScale();
+    void applyScale();
 };
 } // namespace View
 } // namespace TrenchBroom

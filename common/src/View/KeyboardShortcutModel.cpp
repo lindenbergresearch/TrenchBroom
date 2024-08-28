@@ -33,292 +33,220 @@
 #include <functional>
 #include <set>
 
-namespace TrenchBroom
-{
-namespace View
-{
-KeyboardShortcutModel::ActionInfo::ActionInfo(
-  const std::filesystem::path& i_displayPath, const Action& i_action)
-  : displayPath(i_displayPath)
-  , action(i_action)
-{
+namespace TrenchBroom {
+namespace View {
+KeyboardShortcutModel::ActionInfo::ActionInfo(const std::filesystem::path &i_displayPath, const Action &i_action)
+    : displayPath(i_displayPath), action(i_action) {
 }
 
-KeyboardShortcutModel::KeyboardShortcutModel(MapDocument* document, QObject* parent)
-  : QAbstractTableModel(parent)
-  , m_document(document)
-{
-  initializeActions();
-  updateConflicts();
+KeyboardShortcutModel::KeyboardShortcutModel(MapDocument *document, QObject *parent) : QAbstractTableModel(parent), m_document(document) {
+    initializeActions();
+    updateConflicts();
 }
 
-void KeyboardShortcutModel::reset()
-{
-  m_actions.clear();
-  initializeActions();
-  updateConflicts();
-  if (totalActionCount() > 0)
-  {
-    emit dataChanged(createIndex(0, 0), createIndex(totalActionCount() - 1, 2));
-  }
-}
-
-int KeyboardShortcutModel::rowCount(const QModelIndex& /* parent */) const
-{
-  return totalActionCount();
-}
-
-int KeyboardShortcutModel::columnCount(const QModelIndex& /* parent */) const
-{
-  // Shortcut, Context, Description
-  return 3;
-}
-
-QVariant KeyboardShortcutModel::headerData(
-  const int section, const Qt::Orientation orientation, const int role) const
-{
-  if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-  {
-    if (section == 0)
-    {
-      return QString("Shortcut");
+void KeyboardShortcutModel::reset() {
+    m_actions.clear();
+    initializeActions();
+    updateConflicts();
+    if (totalActionCount() > 0) {
+        emit dataChanged(createIndex(0, 0), createIndex(totalActionCount() - 1, 2));
     }
-    else if (section == 1)
-    {
-      return QString("Context");
+}
+
+int KeyboardShortcutModel::rowCount(const QModelIndex & /* parent */) const {
+    return totalActionCount();
+}
+
+int KeyboardShortcutModel::columnCount(const QModelIndex & /* parent */) const {
+    // Shortcut, Context, Description
+    return 3;
+}
+
+QVariant KeyboardShortcutModel::headerData(const int section, const Qt::Orientation orientation, const int role) const {
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        if (section == 0) {
+            return QString("Shortcut");
+        } else if (section == 1) {
+            return QString("Context");
+        } else {
+            return QString("Description");
+        }
+    } else {
+        return QVariant();
     }
-    else
-    {
-      return QString("Description");
+}
+
+QVariant KeyboardShortcutModel::data(const QModelIndex &index, const int role) const {
+    if (!checkIndex(index)) {
+        return QVariant();
     }
-  }
-  else
-  {
-    return QVariant();
-  }
-}
-
-QVariant KeyboardShortcutModel::data(const QModelIndex& index, const int role) const
-{
-  if (!checkIndex(index))
-  {
-    return QVariant();
-  }
-  if (role == Qt::DisplayRole || role == Qt::EditRole)
-  {
-    const auto& actionInfo = this->actionInfo(index.row());
-    if (index.column() == 0)
-    {
-      return actionInfo.action.keySequence();
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
+        const auto &actionInfo = this->actionInfo(index.row());
+        if (index.column() == 0) {
+            return actionInfo.action.keySequence();
+        } else if (index.column() == 1) {
+            return QString::fromStdString(actionContextName(actionInfo.action.actionContext()));
+        } else {
+            return QString::fromStdString(actionInfo.displayPath.generic_string());
+        }
+    } else if (role == Qt::ForegroundRole) {
+        if (hasConflicts(index)) {
+            return QBrush(Qt::red);
+        }
+        return QVariant();
+    } else {
+        return QVariant();
     }
-    else if (index.column() == 1)
-    {
-      return QString::fromStdString(actionContextName(actionInfo.action.actionContext()));
+}
+
+bool KeyboardShortcutModel::setData(const QModelIndex &index, const QVariant &value, const int role) {
+    if (!checkIndex(index) || role != Qt::EditRole) {
+        return false;
     }
-    else
-    {
-      return QString::fromStdString(actionInfo.displayPath.generic_string());
+
+    // We take a copy here on purpose in order to set the key further below.
+    auto &actionInfo = this->actionInfo(index.row());
+    actionInfo.action.setKeySequence(value.value<QKeySequence>());
+
+    updateConflicts();
+
+    emit dataChanged(index, index, {Qt::DisplayRole, role});
+    return true;
+}
+
+Qt::ItemFlags KeyboardShortcutModel::flags(const QModelIndex &index) const {
+    if (!checkIndex(index)) {
+        return Qt::ItemIsEnabled;
     }
-  }
-  else if (role == Qt::ForegroundRole)
-  {
-    if (hasConflicts(index))
-    {
-      return QBrush(Qt::red);
+    if (index.column() == 0) {
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    } else {
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
     }
-    return QVariant();
-  }
-  else
-  {
-    return QVariant();
-  }
 }
 
-bool KeyboardShortcutModel::setData(
-  const QModelIndex& index, const QVariant& value, const int role)
-{
-  if (!checkIndex(index) || role != Qt::EditRole)
-  {
-    return false;
-  }
-
-  // We take a copy here on purpose in order to set the key further below.
-  auto& actionInfo = this->actionInfo(index.row());
-  actionInfo.action.setKeySequence(value.value<QKeySequence>());
-
-  updateConflicts();
-
-  emit dataChanged(index, index, {Qt::DisplayRole, role});
-  return true;
+bool KeyboardShortcutModel::hasConflicts() const {
+    return !m_conflicts.empty();
 }
 
-Qt::ItemFlags KeyboardShortcutModel::flags(const QModelIndex& index) const
-{
-  if (!checkIndex(index))
-  {
-    return Qt::ItemIsEnabled;
-  }
-  if (index.column() == 0)
-  {
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
-  }
-  else
-  {
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-  }
+bool KeyboardShortcutModel::hasConflicts(const QModelIndex &index) const {
+    if (!checkIndex(index)) {
+        return false;
+    }
+
+    return kdl::wrap_set(m_conflicts).count(index.row()) > 0u;
 }
 
-bool KeyboardShortcutModel::hasConflicts() const
-{
-  return !m_conflicts.empty();
+void KeyboardShortcutModel::initializeActions() {
+    initializeMenuActions();
+    initializeViewActions();
+    if (m_document != nullptr) {
+        initializeTagActions();
+        initializeEntityDefinitionActions();
+    }
 }
 
-bool KeyboardShortcutModel::hasConflicts(const QModelIndex& index) const
-{
-  if (!checkIndex(index))
-  {
-    return false;
-  }
+class KeyboardShortcutModel::MenuActionVisitor : public MenuVisitor {
+  private:
+    std::vector<ActionInfo> &m_actions;
+    std::filesystem::path m_currentPath;
 
-  return kdl::wrap_set(m_conflicts).count(index.row()) > 0u;
-}
+  public:
+    explicit MenuActionVisitor(std::vector<ActionInfo> &actions) : m_actions(actions) {
+    }
 
-void KeyboardShortcutModel::initializeActions()
-{
-  initializeMenuActions();
-  initializeViewActions();
-  if (m_document != nullptr)
-  {
-    initializeTagActions();
-    initializeEntityDefinitionActions();
-  }
-}
+    void visit(const Menu &menu) override {
+        m_currentPath = m_currentPath / menu.name();
+        menu.visitEntries(*this);
+        m_currentPath = m_currentPath.parent_path();
+    }
 
+    void visit(const MenuSeparatorItem &) override {}
 
-class KeyboardShortcutModel::MenuActionVisitor : public MenuVisitor
-{
-private:
-  std::vector<ActionInfo>& m_actions;
-  std::filesystem::path m_currentPath;
-
-public:
-  explicit MenuActionVisitor(std::vector<ActionInfo>& actions)
-    : m_actions(actions)
-  {
-  }
-
-  void visit(const Menu& menu) override
-  {
-    m_currentPath = m_currentPath / menu.name();
-    menu.visitEntries(*this);
-    m_currentPath = m_currentPath.parent_path();
-  }
-
-  void visit(const MenuSeparatorItem&) override {}
-
-  void visit(const MenuActionItem& item) override
-  {
-    m_actions.emplace_back(
-      m_currentPath / IO::pathFromQString(item.label()), item.action());
-  }
+    void visit(const MenuActionItem &item) override {
+        m_actions.emplace_back(m_currentPath / IO::pathFromQString(item.label()), item.action());
+    }
 };
 
-
-void KeyboardShortcutModel::initializeMenuActions()
-{
-  MenuActionVisitor visitor(m_actions);
-  const auto& actionManager = ActionManager::instance();
-  actionManager.visitMainMenu(visitor);
+void KeyboardShortcutModel::initializeMenuActions() {
+    MenuActionVisitor visitor(m_actions);
+    const auto &actionManager = ActionManager::instance();
+    actionManager.visitMainMenu(visitor);
 }
 
-void KeyboardShortcutModel::initializeViewActions()
-{
-  const auto& actionManager = ActionManager::instance();
-  actionManager.visitMapViewActions([this](const Action& action) {
-    m_actions.emplace_back("Map View" / IO::pathFromQString(action.label()), action);
-  });
+void KeyboardShortcutModel::initializeViewActions() {
+    const auto &actionManager = ActionManager::instance();
+    actionManager.visitMapViewActions([this](const Action &action) {
+        m_actions.emplace_back("Map View" / IO::pathFromQString(action.label()), action);
+    });
 }
 
-void KeyboardShortcutModel::initializeTagActions()
-{
-  assert(m_document != nullptr);
-  m_document->visitTagActions([this](const Action& action) {
-    m_actions.emplace_back("Tags" / IO::pathFromQString(action.label()), action);
-  });
+void KeyboardShortcutModel::initializeTagActions() {
+    assert(m_document != nullptr);
+    m_document->visitTagActions([this](const Action &action) {
+        m_actions.emplace_back("Tags" / IO::pathFromQString(action.label()), action);
+    });
 }
 
-void KeyboardShortcutModel::initializeEntityDefinitionActions()
-{
-  assert(m_document != nullptr);
-  m_document->visitEntityDefinitionActions([this](const Action& action) {
-    m_actions.emplace_back(
-      "Entity Definitions" / IO::pathFromQString(action.label()), action);
-  });
+void KeyboardShortcutModel::initializeEntityDefinitionActions() {
+    assert(m_document != nullptr);
+    m_document->visitEntityDefinitionActions([this](const Action &action) {
+        m_actions.emplace_back("Entity Definitions" / IO::pathFromQString(action.label()), action);
+    });
 }
 
-void KeyboardShortcutModel::updateConflicts()
-{
-  using ConflictEntry = std::pair<std::reference_wrapper<const ActionInfo>, int>;
-  const auto cmp = [](const ConflictEntry& lhs, const ConflictEntry& rhs) {
-    const auto& lhsAction = lhs.first.get().action;
-    const auto& rhsAction = rhs.first.get().action;
-    if (actionContextMatches(lhsAction.actionContext(), rhsAction.actionContext()))
-    {
-      // if the two have the same sequence, they would be in conflict, so we compare the
-      // sequences
-      const auto lhsKeySequence = lhsAction.keySequence();
-      const auto rhsKeySequence = rhsAction.keySequence();
-      return lhsKeySequence < rhsKeySequence;
+void KeyboardShortcutModel::updateConflicts() {
+    using ConflictEntry = std::pair<std::reference_wrapper<const ActionInfo>, int>;
+    const auto cmp = [](const ConflictEntry &lhs, const ConflictEntry &rhs) {
+        const auto &lhsAction = lhs.first.get().action;
+        const auto &rhsAction = rhs.first.get().action;
+        if (actionContextMatches(lhsAction.actionContext(), rhsAction.actionContext())) {
+            // if the two have the same sequence, they would be in conflict, so we compare the
+            // sequences
+            const auto lhsKeySequence = lhsAction.keySequence();
+            const auto rhsKeySequence = rhsAction.keySequence();
+            return lhsKeySequence < rhsKeySequence;
+        } else {
+            // otherwise, we just compare by the action context
+            return lhsAction.actionContext() < rhsAction.actionContext();
+        }
+    };
+    std::set<ConflictEntry, decltype(cmp)> entrySet(cmp);
+
+    m_conflicts.clear();
+    auto conflictSet = kdl::wrap_set(m_conflicts);
+
+    for (int row = 0; row < totalActionCount(); ++row) {
+        const auto &actionInfo = this->actionInfo(row);
+        const auto keySequence = actionInfo.action.keySequence();
+        if (keySequence.count() > 0) {
+            auto [it, noConflict] = entrySet.insert(std::make_pair(std::cref(actionInfo), row));
+            if (!noConflict) {
+                // found a duplicate, so there are conflicts
+                const auto otherRow = it->second;
+                conflictSet.insert(row);
+                conflictSet.insert(otherRow);
+
+                const auto index = createIndex(row, 0);
+                const auto otherIndex = createIndex(otherRow, 0);
+                emit dataChanged(index, index, {Qt::DisplayRole});
+                emit dataChanged(otherIndex, otherIndex, {Qt::DisplayRole});
+            }
+        }
     }
-    else
-    {
-      // otherwise, we just compare by the action context
-      return lhsAction.actionContext() < rhsAction.actionContext();
-    }
-  };
-  std::set<ConflictEntry, decltype(cmp)> entrySet(cmp);
-
-  m_conflicts.clear();
-  auto conflictSet = kdl::wrap_set(m_conflicts);
-
-  for (int row = 0; row < totalActionCount(); ++row)
-  {
-    const auto& actionInfo = this->actionInfo(row);
-    const auto keySequence = actionInfo.action.keySequence();
-    if (keySequence.count() > 0)
-    {
-      auto [it, noConflict] = entrySet.insert(std::make_pair(std::cref(actionInfo), row));
-      if (!noConflict)
-      {
-        // found a duplicate, so there are conflicts
-        const auto otherRow = it->second;
-        conflictSet.insert(row);
-        conflictSet.insert(otherRow);
-
-        const auto index = createIndex(row, 0);
-        const auto otherIndex = createIndex(otherRow, 0);
-        emit dataChanged(index, index, {Qt::DisplayRole});
-        emit dataChanged(otherIndex, otherIndex, {Qt::DisplayRole});
-      }
-    }
-  }
 }
 
-const KeyboardShortcutModel::ActionInfo& KeyboardShortcutModel::actionInfo(
-  const int index) const
-{
-  assert(index < totalActionCount());
-  return m_actions[static_cast<size_t>(index)];
+const KeyboardShortcutModel::ActionInfo &KeyboardShortcutModel::actionInfo(const int index) const {
+    assert(index < totalActionCount());
+    return m_actions[static_cast<size_t>(index)];
 }
 
-int KeyboardShortcutModel::totalActionCount() const
-{
-  return static_cast<int>(m_actions.size());
+int KeyboardShortcutModel::totalActionCount() const {
+    return static_cast<int>(m_actions.size());
 }
 
-bool KeyboardShortcutModel::checkIndex(const QModelIndex& index) const
-{
-  return index.isValid() && index.column() < 3 && index.row() < totalActionCount();
+bool KeyboardShortcutModel::checkIndex(const QModelIndex &index) const {
+    return index.isValid() && index.column() < 3 && index.row() < totalActionCount();
 }
 } // namespace View
 } // namespace TrenchBroom

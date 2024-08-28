@@ -34,115 +34,97 @@
 #include <optional>
 #include <vector>
 
-
 class QWidget;
-
 
 class QCheckBox;
 
-
 class QLabel;
-
 
 class QLineEdit;
 
-
 class QRadioButton;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Node;
 }
 
-namespace View
-{
+namespace View {
 class CollapsibleTitledPanel;
-
 
 class MapDocument;
 
-
-class MapInspector : public TabBookPage
-{
+class MapInspector : public TabBookPage {
   Q_OBJECT
-private:
-  CollapsibleTitledPanel* m_mapPropertiesEditorPanel;
-  CollapsibleTitledPanel* m_modEditorPanel;
-  CollapsibleTitledPanel* m_mapSearchPanel;
-  TitledPanel* m_layerEditorPanel;
+  private:
+    CollapsibleTitledPanel *m_mapPropertiesEditorPanel;
+    CollapsibleTitledPanel *m_modEditorPanel;
+    CollapsibleTitledPanel *m_mapSearchPanel;
+    TitledPanel *m_layerEditorPanel;
 
-  QSplitter* m_splitter;
-  LayerEditor* m_layerEditor;
-  MapSearchListBox* m_mapSearchListBox;
-  QLineEdit* m_searchBoxEdit;
-  MapView* m_mapView;
-  Inspector* m_inspector;
+    QSplitter *m_splitter;
+    LayerEditor *m_layerEditor;
+    MapSearchListBox *m_mapSearchListBox;
+    QLineEdit *m_searchBoxEdit;
+    MapView *m_mapView;
+    Inspector *m_inspector;
 
-public:
-  explicit MapInspector(
-    std::weak_ptr<MapDocument> document,
-    MapView* mapView,
-    Inspector* inspector,
-    QWidget* parent = nullptr);
+  public:
+    explicit MapInspector(std::weak_ptr<MapDocument> document, MapView *mapView, Inspector *inspector, QWidget *parent = nullptr);
 
-  ~MapInspector();
+    ~MapInspector();
 
-private:
-  void createGui(std::weak_ptr<MapDocument> document);
+  private:
+    void createGui(std::weak_ptr<MapDocument> document);
 
-  TitledPanel* createLayerEditor(std::weak_ptr<MapDocument> document);
+    TitledPanel *createLayerEditor(std::weak_ptr<MapDocument> document);
 
-  CollapsibleTitledPanel* createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
+    CollapsibleTitledPanel *createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
 
-  CollapsibleTitledPanel* createModEditor(std::weak_ptr<MapDocument> document);
+    CollapsibleTitledPanel *createModEditor(std::weak_ptr<MapDocument> document);
 
-  CollapsibleTitledPanel* createSearchList(std::weak_ptr<MapDocument> document);
+    CollapsibleTitledPanel *createSearchList(std::weak_ptr<MapDocument> document);
 
-  QLineEdit* createSearchBox();
+    QLineEdit *createSearchBox();
 };
-
 
 /**
  * Currently just the soft bounds editor
  */
-class MapPropertiesEditor : public QWidget
-{
+class MapPropertiesEditor : public QWidget {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
-  bool m_updatingGui;
+  private:
+    std::weak_ptr<MapDocument> m_document;
+    bool m_updatingGui;
 
-  QRadioButton* m_softBoundsDisabled;
-  QRadioButton* m_softBoundsFromGame;
-  QLabel* m_softBoundsFromGameMinLabel;
-  QLabel* m_softBoundsFromGameMaxLabel;
-  QRadioButton* m_softBoundsFromMap;
-  QLineEdit* m_softBoundsFromMapMinEdit;
-  QLineEdit* m_softBoundsFromMapMaxEdit;
+    QRadioButton *m_softBoundsDisabled;
+    QRadioButton *m_softBoundsFromGame;
+    QLabel *m_softBoundsFromGameMinLabel;
+    QLabel *m_softBoundsFromGameMaxLabel;
+    QRadioButton *m_softBoundsFromMap;
+    QLineEdit *m_softBoundsFromMapMinEdit;
+    QLineEdit *m_softBoundsFromMapMaxEdit;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
-public:
-  explicit MapPropertiesEditor(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit MapPropertiesEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-private:
-  std::optional<vm::bbox3> parseLineEdits();
+  private:
+    std::optional<vm::bbox3> parseLineEdits();
 
-  void createGui();
+    void createGui();
 
-private:
-  void connectObservers();
+  private:
+    void connectObservers();
 
-  void documentWasNewed(MapDocument* document);
+    void documentWasNewed(MapDocument *document);
 
-  void documentWasLoaded(MapDocument* document);
+    void documentWasLoaded(MapDocument *document);
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+    void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void updateGui();
+    void updateGui();
 };
 } // namespace View
 } // namespace TrenchBroom

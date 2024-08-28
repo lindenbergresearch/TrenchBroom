@@ -27,107 +27,100 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class EditorContext;
-
 
 class GroupNode;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class RenderBatch;
-
 
 class RenderContext;
 
+class GroupRenderer {
+  private:
+    class GroupNameAnchor;
 
-class GroupRenderer
-{
-private:
-  class GroupNameAnchor;
+    const Model::EditorContext &m_editorContext;
+    kdl::vector_set<const Model::GroupNode *> m_groups;
 
-  const Model::EditorContext& m_editorContext;
-  kdl::vector_set<const Model::GroupNode*> m_groups;
+    DirectEdgeRenderer m_boundsRenderer;
+    bool m_boundsValid;
 
-  DirectEdgeRenderer m_boundsRenderer;
-  bool m_boundsValid;
+    bool m_overrideColors;
+    bool m_showOverlays;
+    Color m_overlayTextColor;
+    Color m_overlayBackgroundColor;
+    bool m_showOccludedOverlays;
+    Color m_boundsColor;
+    bool m_showOccludedBounds;
+    Color m_occludedBoundsColor;
 
-  bool m_overrideColors;
-  bool m_showOverlays;
-  Color m_overlayTextColor;
-  Color m_overlayBackgroundColor;
-  bool m_showOccludedOverlays;
-  Color m_boundsColor;
-  bool m_showOccludedBounds;
-  Color m_occludedBoundsColor;
+  public:
+    GroupRenderer(const Model::EditorContext &editorContext);
 
-public:
-  GroupRenderer(const Model::EditorContext& editorContext);
+    /**
+     * Equivalent to invalidateGroup() on all added groups.
+     */
+    void invalidate();
 
-  /**
-   * Equivalent to invalidateGroup() on all added groups.
-   */
-  void invalidate();
+    /**
+     * Equivalent to removeGroup() on all added groups.
+     */
+    void clear();
 
-  /**
-   * Equivalent to removeGroup() on all added groups.
-   */
-  void clear();
+    /**
+     * Adds a group. Calling with an already-added group is allowed, but ignored (not
+     * guaranteed to invalidate it).
+     */
+    void addGroup(const Model::GroupNode *group);
 
-  /**
-   * Adds a group. Calling with an already-added group is allowed, but ignored (not
-   * guaranteed to invalidate it).
-   */
-  void addGroup(const Model::GroupNode* group);
+    /**
+     * Removes a group. Calling with an unknown group is allowed, but ignored.
+     */
+    void removeGroup(const Model::GroupNode *group);
 
-  /**
-   * Removes a group. Calling with an unknown group is allowed, but ignored.
-   */
-  void removeGroup(const Model::GroupNode* group);
+    /**
+     * Causes cached renderer data to be rebuilt for the given group (on the next render()
+     * call).
+     */
+    void invalidateGroup(const Model::GroupNode *group);
 
-  /**
-   * Causes cached renderer data to be rebuilt for the given group (on the next render()
-   * call).
-   */
-  void invalidateGroup(const Model::GroupNode* group);
+    void setOverrideColors(bool overrideColors);
 
-  void setOverrideColors(bool overrideColors);
+    void setShowOverlays(bool showOverlays);
 
-  void setShowOverlays(bool showOverlays);
+    void setOverlayTextColor(const Color &overlayTextColor);
 
-  void setOverlayTextColor(const Color& overlayTextColor);
+    void setOverlayBackgroundColor(const Color &overlayBackgroundColor);
 
-  void setOverlayBackgroundColor(const Color& overlayBackgroundColor);
+    void setShowOccludedOverlays(bool showOccludedOverlays);
 
-  void setShowOccludedOverlays(bool showOccludedOverlays);
+    void setBoundsColor(const Color &boundsColor);
 
-  void setBoundsColor(const Color& boundsColor);
+    void setShowOccludedBounds(bool showOccludedBounds);
 
-  void setShowOccludedBounds(bool showOccludedBounds);
+    void setOccludedBoundsColor(const Color &occludedBoundsColor);
 
-  void setOccludedBoundsColor(const Color& occludedBoundsColor);
+  public: // rendering
+    void render(RenderContext &renderContext, RenderBatch &renderBatch);
 
-public: // rendering
-  void render(RenderContext& renderContext, RenderBatch& renderBatch);
+  private:
+    void renderBounds(RenderContext &renderContext, RenderBatch &renderBatch);
 
-private:
-  void renderBounds(RenderContext& renderContext, RenderBatch& renderBatch);
+    void renderNames(RenderContext &renderContext, RenderBatch &renderBatch);
 
-  void renderNames(RenderContext& renderContext, RenderBatch& renderBatch);
+    void invalidateBounds();
 
-  void invalidateBounds();
+    void validateBounds();
 
-  void validateBounds();
+    bool shouldRenderGroup(const Model::GroupNode &group) const;
 
-  bool shouldRenderGroup(const Model::GroupNode& group) const;
+    AttrString groupString(const Model::GroupNode &group) const;
 
-  AttrString groupString(const Model::GroupNode& group) const;
-
-  Color groupColor(const Model::GroupNode& group) const;
+    Color groupColor(const Model::GroupNode &group) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

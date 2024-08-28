@@ -44,59 +44,51 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 namespace TrenchBroom::View {
 using namespace std::chrono_literals;
 
-
 class ExecuteTask {
-private:
-  CompilationTaskRunner &m_runner;
-  std::mutex m_mutex;
-  std::condition_variable m_condition;
+  private:
+    CompilationTaskRunner &m_runner;
+    std::mutex m_mutex;
+    std::condition_variable m_condition;
 
-public:
-  bool started = false;
-  bool errored = false;
-  bool ended = false;
+  public:
+    bool started = false;
+    bool errored = false;
+    bool ended = false;
 
-  explicit ExecuteTask(CompilationTaskRunner &runner) : m_runner{runner} {
-    QObject::connect(
-        &m_runner, &CompilationTaskRunner::start, [&]() {
-          started = true;
-          auto lock = std::unique_lock<std::mutex>{m_mutex};
-          m_condition.notify_all();
-        }
-    );
-    QObject::connect(
-        &m_runner, &CompilationTaskRunner::error, [&]() {
-          errored = true;
-          auto lock = std::unique_lock<std::mutex>{m_mutex};
-          m_condition.notify_all();
-        }
-    );
-    QObject::connect(
-        &m_runner, &CompilationTaskRunner::end, [&]() {
-          ended = true;
-          auto lock = std::unique_lock<std::mutex>{m_mutex};
-          m_condition.notify_all();
-        }
-    );
-  }
-
-  bool executeAndWait(const std::chrono::milliseconds timeout) {
-    m_runner.execute();
-
-    const auto endTime = std::chrono::system_clock::now() + timeout;
-    while (std::chrono::system_clock::now() < endTime) {
-      TrenchBroomApp::instance().processEvents();
-
-      auto lock = std::unique_lock<std::mutex>{m_mutex};
-      if (m_condition.wait_for(lock, 50ms, [&]() { return errored || ended; })) {
-        return true;
-      }
+    explicit ExecuteTask(CompilationTaskRunner &runner) : m_runner{runner} {
+        QObject::connect(&m_runner, &CompilationTaskRunner::start, [&]() {
+            started = true;
+            auto lock = std::unique_lock<std::mutex>{m_mutex};
+            m_condition.notify_all();
+        });
+        QObject::connect(&m_runner, &CompilationTaskRunner::error, [&]() {
+            errored = true;
+            auto lock = std::unique_lock<std::mutex>{m_mutex};
+            m_condition.notify_all();
+        });
+        QObject::connect(&m_runner, &CompilationTaskRunner::end, [&]() {
+            ended = true;
+            auto lock = std::unique_lock<std::mutex>{m_mutex};
+            m_condition.notify_all();
+        });
     }
 
-    return false;
-  }
-};
+    bool executeAndWait(const std::chrono::milliseconds timeout) {
+        m_runner.execute();
 
+        const auto endTime = std::chrono::system_clock::now() + timeout;
+        while (std::chrono::system_clock::now() < endTime) {
+            TrenchBroomApp::instance().processEvents();
+
+            auto lock = std::unique_lock<std::mutex>{m_mutex};
+            if (m_condition.wait_for(lock, 50ms, [&]() { return errored || ended; })) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+};
 
 TEST_CASE_METHOD(MapDocumentTest,
 "CompilationRunToolTaskRunner.runMissingTool") {
@@ -174,7 +166,7 @@ CHECK(exec
 .ended == !treatNonZeroResultCodeAsError);
 }
 
-#if ! defined(_WIN32) || defined(NDEBUG)
+#if !defined(_WIN32) || defined(NDEBUG)
 // std::abort pops up a dialog when run in debug mode on Windows
 TEST_CASE_METHOD(MapDocumentTest,
 "CompilationRunToolTaskRunner.toolAborts")
@@ -455,9 +447,7 @@ fileExists(should_not_exist)
 
 TEST_CASE("CompilationRunner.interpolateToolsVariables")
 {
-auto [document, game, gameConfig] = View::loadMapDocument(
-    "fixture/test/View/MapDocumentTest/valveFormatMapWithoutFormatTag.map", "Quake", Model::MapFormat::Unknown
-);
+auto [document, game, gameConfig] = View::loadMapDocument("fixture/test/View/MapDocumentTest/valveFormatMapWithoutFormatTag.map", "Quake", Model::MapFormat::Unknown);
 const auto testWorkDir = std::string{"/some/path"};
 auto variables = CompilationVariables{document, testWorkDir};
 auto output = QTextEdit{};

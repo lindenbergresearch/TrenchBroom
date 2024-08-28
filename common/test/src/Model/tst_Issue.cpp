@@ -43,11 +43,10 @@
 namespace TrenchBroom {
 namespace Model {
 class TestIssue : public Issue {
-public:
-  TestIssue(Node &node) : Issue{0, node, ""} {
-  }
+  public:
+    TestIssue(Node &node) : Issue{0, node, ""} {
+    }
 };
-
 
 TEST_CASE("Issue.addSelectableNodes") {
 const auto worldBounds = vm::bbox3{8192.0};
@@ -78,14 +77,14 @@ innerGroupNode, pointEntityNode, brushNode, brushEntityNode, patchNode
 );
 
 const auto getSelectableNodes = [](const auto &issue) {
-  auto nodes = std::vector<Node *>{};
-  issue.addSelectableNodes(nodes);
-  return nodes;
+    auto nodes = std::vector<Node *>{};
+    issue.addSelectableNodes(nodes);
+    return nodes;
 };
 
 const auto hasSelectableNodes = [](const auto &issue) {
-  auto nodes = std::vector<Node *>{};
-  return issue.addSelectableNodes(nodes);
+    auto nodes = std::vector<Node *>{};
+    return issue.addSelectableNodes(nodes);
 };
 
 CHECK_FALSE(hasSelectableNodes(TestIssue{outerGroupNode})
@@ -95,56 +94,44 @@ CHECK_THAT(getSelectableNodes(TestIssue{outerGroupNode}), Catch::Matchers::Unord
 
 CHECK(hasSelectableNodes(TestIssue{*innerGroupNode})
 );
-CHECK_THAT(getSelectableNodes(TestIssue{*innerGroupNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        innerGroupNode
-    }
-)
+CHECK_THAT(getSelectableNodes(TestIssue{*innerGroupNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    innerGroupNode
+})
 );
 
 CHECK(hasSelectableNodes(TestIssue{*pointEntityNode})
 );
-CHECK_THAT(getSelectableNodes(TestIssue{*pointEntityNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        pointEntityNode
-    }
-)
+CHECK_THAT(getSelectableNodes(TestIssue{*pointEntityNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    pointEntityNode
+})
 );
 
 CHECK(hasSelectableNodes(TestIssue{*brushNode})
 );
-CHECK_THAT(getSelectableNodes(TestIssue{*brushNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        brushNode
-    }
-)
+CHECK_THAT(getSelectableNodes(TestIssue{*brushNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    brushNode
+})
 );
 
 CHECK(hasSelectableNodes(TestIssue{*brushEntityNode})
 );
-CHECK_THAT(getSelectableNodes(TestIssue{*brushEntityNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        entityBrushNode
-    }
-)
+CHECK_THAT(getSelectableNodes(TestIssue{*brushEntityNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    entityBrushNode
+})
 );
 
 CHECK(hasSelectableNodes(TestIssue{*entityBrushNode})
 );
-CHECK_THAT(getSelectableNodes(TestIssue{*entityBrushNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        entityBrushNode
-    }
-)
+CHECK_THAT(getSelectableNodes(TestIssue{*entityBrushNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    entityBrushNode
+})
 );
 
 CHECK(hasSelectableNodes(TestIssue{*patchNode})
 );
-CHECK_THAT(getSelectableNodes(TestIssue{*patchNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        patchNode
-    }
-)
+CHECK_THAT(getSelectableNodes(TestIssue{*patchNode}), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    patchNode
+})
 );
 }
 } // namespace Model

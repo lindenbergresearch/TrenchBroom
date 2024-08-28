@@ -26,68 +26,49 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class FaceInspector;
-
 
 class EntityInspector;
 
-
 class GLContextManager;
-
 
 class MapDocument;
 
-
 class MapInspector;
-
 
 class MapViewBar;
 
-
 class SyncHeightEventFilter;
-
 
 class TabBook;
 
-
-enum class InspectorPage
-{
-  Map = 0,
-  Face = 1,
-  Entity = 2
+enum class InspectorPage {
+  Map = 0, Face = 1, Entity = 2
 };
 
-
-class Inspector : public QWidget
-{
+class Inspector : public QWidget {
   Q_OBJECT
-private:
-  QTabWidget* m_tabs;
-  MapInspector* m_mapInspector;
-  EntityInspector* m_entityInspector;
-  FaceInspector* m_faceInspector;
-  MapView* m_mapView;
+  private:
+    QTabWidget *m_tabs;
+    MapInspector *m_mapInspector;
+    EntityInspector *m_entityInspector;
+    FaceInspector *m_faceInspector;
+    MapView *m_mapView;
 
-  SyncHeightEventFilter* m_syncTabBarEventFilter;
+    SyncHeightEventFilter *m_syncTabBarEventFilter;
 
-public:
-  Inspector(
-    std::weak_ptr<MapDocument> document,
-    GLContextManager& contextManager,
-    MapView* mapView,
-    QWidget* parent = nullptr);
+  public:
+    Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, MapView *mapView, QWidget *parent = nullptr);
 
-  void connectTopWidgets(MapViewBar* mapViewBar);
+    void connectTopWidgets(MapViewBar *mapViewBar);
 
-  void switchToPage(InspectorPage page);
+    void switchToPage(InspectorPage page);
 
-  bool cancelMouseDrag();
+    bool cancelMouseDrag();
 
-  FaceInspector* faceInspector();
+    FaceInspector *faceInspector();
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -27,71 +27,58 @@
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
-SwitchableTitledPanel::SwitchableTitledPanel(
-  const QString& title, const std::array<QString, 2>& stateTexts, QWidget* parent)
-  : QWidget{parent}
-  , m_titleBar{new ClickableTitleBar{title, stateTexts[1]}}
-  , m_divider{new BorderLine{}}
-  , m_stackedLayout{new QStackedLayout{}}
-  , m_panels{{{new QWidget{}, stateTexts[1]}, {new QWidget{}, stateTexts[0]}}}
-{
-  m_stackedLayout->addWidget(m_panels[0].panel);
-  m_stackedLayout->addWidget(m_panels[1].panel);
+SwitchableTitledPanel::SwitchableTitledPanel(const QString &title, const std::array<QString, 2> &stateTexts, QWidget *parent)
+    : QWidget{parent}, m_titleBar{new ClickableTitleBar{title, stateTexts[1]}}, m_divider{new BorderLine{}}, m_stackedLayout{new QStackedLayout{}}, m_panels{{{new QWidget{}, stateTexts[1]}, {new QWidget{}, stateTexts[0]}}} {
+    m_stackedLayout->addWidget(m_panels[0].panel);
+    m_stackedLayout->addWidget(m_panels[1].panel);
 
-  auto* outerLayout = new QVBoxLayout{};
-  outerLayout->setContentsMargins(0, 0, 0, 0);
-  outerLayout->setSpacing(0);
-  outerLayout->addWidget(m_titleBar, 0);
-  outerLayout->addWidget(m_divider, 0);
-  outerLayout->addLayout(m_stackedLayout, 1);
-  setLayout(outerLayout);
+    auto *outerLayout = new QVBoxLayout{};
+    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->setSpacing(0);
+    outerLayout->addWidget(m_titleBar, 0);
+    outerLayout->addWidget(m_divider, 0);
+    outerLayout->addLayout(m_stackedLayout, 1);
+    setLayout(outerLayout);
 
-  connect(m_titleBar, &ClickableTitleBar::titleBarClicked, this, [=]() {
-    setCurrentIndex(1 - currentIndex());
-  });
+    connect(m_titleBar, &ClickableTitleBar::titleBarClicked, this, [=]() {
+        setCurrentIndex(1 - currentIndex());
+    });
 }
 
-QWidget* SwitchableTitledPanel::getPanel(const size_t index) const
-{
-  assert(index < 2);
-  return m_panels[index].panel;
+QWidget *SwitchableTitledPanel::getPanel(const size_t index) const {
+    assert(index < 2);
+    return m_panels[index].panel;
 }
 
-size_t SwitchableTitledPanel::currentIndex() const
-{
-  return size_t(m_stackedLayout->currentIndex());
+size_t SwitchableTitledPanel::currentIndex() const {
+    return size_t(m_stackedLayout->currentIndex());
 }
 
-void SwitchableTitledPanel::setCurrentIndex(const size_t index)
-{
-  m_stackedLayout->setCurrentIndex(int(index));
-  m_titleBar->setStateText(m_panels[index].stateText);
+void SwitchableTitledPanel::setCurrentIndex(const size_t index) {
+    m_stackedLayout->setCurrentIndex(int(index));
+    m_titleBar->setStateText(m_panels[index].stateText);
 }
 
-QByteArray SwitchableTitledPanel::saveState() const
-{
-  auto result = QByteArray{};
-  auto stream = QDataStream{&result, QIODevice::WriteOnly};
-  stream << int(currentIndex());
-  return result;
+QByteArray SwitchableTitledPanel::saveState() const {
+    auto result = QByteArray{};
+    auto stream = QDataStream{&result, QIODevice::WriteOnly};
+    stream << int(currentIndex());
+    return result;
 }
 
-bool SwitchableTitledPanel::restoreState(const QByteArray& state)
-{
-  auto stream = QDataStream{state};
-  int currentIndex;
-  stream >> currentIndex;
+bool SwitchableTitledPanel::restoreState(const QByteArray &state) {
+    auto stream = QDataStream{state};
+    int currentIndex;
+    stream >> currentIndex;
 
-  if (stream.status() == QDataStream::Ok && currentIndex >= 0 && currentIndex < 2)
-  {
-    setCurrentIndex(size_t(currentIndex));
-    return true;
-  }
+    if (stream.status() == QDataStream::Ok && currentIndex >= 0 && currentIndex < 2) {
+        setCurrentIndex(size_t(currentIndex));
+        return true;
+    }
 
-  return false;
+    return false;
 }
 
 } // namespace TrenchBroom::View

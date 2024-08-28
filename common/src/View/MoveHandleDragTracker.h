@@ -39,24 +39,19 @@
 #include <memory>
 #include <type_traits>
 
-namespace TrenchBroom
-{
-namespace View
-{
-enum class SnapMode
-{
+namespace TrenchBroom {
+namespace View {
+enum class SnapMode {
   /** Snap the delta between a previous and the proposed handle position. */
   Relative, /** Snap the proposed handle position to absolute values. */
   Absolute
 };
 
-
 /**
  * The move tracker's delegate. Provides callbacks which can be overridden to react to the
  * different events that can arise.
  */
-struct MoveHandleDragTrackerDelegate
-{
+struct MoveHandleDragTrackerDelegate {
   virtual ~MoveHandleDragTrackerDelegate() = default;
 
   /**
@@ -76,10 +71,7 @@ struct MoveHandleDragTrackerDelegate
    * @param proposedHandlePosition handle position the next proposed handle position
    * @return a value of DragStatus that instructs the move tracker on how to continue
    */
-  virtual DragStatus move(
-    const InputState& inputState,
-    const DragState& dragState,
-    const vm::vec3& proposedHandlePosition) = 0;
+  virtual DragStatus move(const InputState &inputState, const DragState &dragState, const vm::vec3 &proposedHandlePosition) = 0;
 
   /**
    * Called when the move ends successfully, i.e. if the move callback returned
@@ -89,7 +81,7 @@ struct MoveHandleDragTrackerDelegate
    * @param inputState the current input state
    * @param dragState the current drag state
    */
-  virtual void end(const InputState& inputState, const DragState& dragState) = 0;
+  virtual void end(const InputState &inputState, const DragState &dragState) = 0;
 
   /**
    * Called when the move is cancelled, i.e. if the user hit the escape key, or if the
@@ -97,7 +89,7 @@ struct MoveHandleDragTrackerDelegate
    *
    * @param dragState the current drag state
    */
-  virtual void cancel(const DragState& dragState) = 0;
+  virtual void cancel(const DragState &dragState) = 0;
 
   /**
    * Calls if the mouse wheel is scrolled during a move.
@@ -105,7 +97,7 @@ struct MoveHandleDragTrackerDelegate
    * @param inputState the current input state
    * @param dragState the current drag state
    */
-  virtual void mouseScroll(const InputState& inputState, const DragState& dragState);
+  virtual void mouseScroll(const InputState &inputState, const DragState &dragState);
 
   /**
    * Called once prior to rendering. The given input state and render context correspond
@@ -115,8 +107,7 @@ struct MoveHandleDragTrackerDelegate
    * @param inputState the current input state of the view being rendered
    * @param renderContext the render context of the view being rendered
    */
-  virtual void setRenderOptions(
-    const InputState& inputState, Renderer::RenderContext& renderContext) const;
+  virtual void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const;
 
   /**
    * Called once in a render pass. The given input state, render context and render batch
@@ -128,11 +119,7 @@ struct MoveHandleDragTrackerDelegate
    * @param renderContext the render context of the view being rendered
    * @param renderBatch the render batch of the view being rendered
    */
-  virtual void render(
-    const InputState& inputState,
-    const DragState& dragState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch) const;
+  virtual void render(const InputState &inputState, const DragState &dragState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
 
   /**
    * Returns a handle snapper. This is called once when the move start and when a modifier
@@ -143,10 +130,8 @@ struct MoveHandleDragTrackerDelegate
    * @param inputState the current input state
    * @param snapMode the snap mode -- relative or absolute
    */
-  virtual DragHandleSnapper makeDragHandleSnapper(
-    const InputState& inputState, SnapMode snapMode) const = 0;
+  virtual DragHandleSnapper makeDragHandleSnapper(const InputState &inputState, SnapMode snapMode) const = 0;
 };
-
 
 /**
  * A drag delegate that implements TrenchBroom's usual pattern for moving objects.
@@ -188,353 +173,242 @@ struct MoveHandleDragTrackerDelegate
  * move trace is a set of lines parallel to the coordinate system axes (one for each
  * axes). It illustrates the total movement of the handle being moved.
  */
-template <typename Delegate>
-class MoveHandleDragDelegate : public HandleDragTrackerDelegate
-{
-private:
-  static_assert(
-    std::is_base_of_v<MoveHandleDragTrackerDelegate, Delegate>,
-    "Delegate must extend MoveHandleDragTrackerDelegate");
+template<typename Delegate> class MoveHandleDragDelegate : public HandleDragTrackerDelegate {
+  private:
+    static_assert(std::is_base_of_v<MoveHandleDragTrackerDelegate, Delegate>, "Delegate must extend MoveHandleDragTrackerDelegate");
 
-  /** The different modes of moving. */
-  enum class MoveMode
-  {
-    /** A vertical move (3D views only) */
-    Vertical, /** A constricted move (move along only one axis of a horizontal plane) */
-    Constricted, /** Default move mode (X/Y plane for 3D views, orthogonal plane for 2D
+    /** The different modes of moving. */
+    enum class MoveMode {
+      /** A vertical move (3D views only) */
+      Vertical, /** A constricted move (move along only one axis of a horizontal plane) */
+      Constricted, /** Default move mode (X/Y plane for 3D views, orthogonal plane for 2D
                 views) */
-    Default
-  };
+      Default
+    };
 
-  Delegate m_delegate;
+    Delegate m_delegate;
 
-  MoveMode m_lastMoveMode{MoveMode::Default};
-  SnapMode m_lastSnapMode{SnapMode::Relative};
-  size_t m_lastConstrictedMoveAxis{0};
+    MoveMode m_lastMoveMode{MoveMode::Default};
+    SnapMode m_lastSnapMode{SnapMode::Relative};
+    size_t m_lastConstrictedMoveAxis{0};
 
-public:
-  /**
-   * Creates a new delegate for HandleDragTracker. The given delegate must extend
-   * MoveHandleDragTrackerDelegate and is used to implement the actual effects and refine
-   * the behavior of this delegate.
-   */
-  MoveHandleDragDelegate(Delegate delegate)
-    : m_delegate{std::move(delegate)}
-  {
-  }
-
-  /**
-   * Called when the drag starts.
-   *
-   * Returns a handle proposer constructed according to the modifier keys held.
-   */
-  HandlePositionProposer start(
-    const InputState& inputState,
-    const vm::vec3& initialHandlePosition,
-    const vm::vec3& handleOffset) override
-  {
-    const bool verticalMove = isVerticalMove(inputState);
-    m_lastMoveMode = verticalMove ? MoveMode::Vertical : MoveMode::Default;
-    m_lastSnapMode = snapMode(inputState);
-
-    auto dragHandlePicker =
-      verticalMove
-        ? makeVerticalDragHandlePicker(inputState, initialHandlePosition, handleOffset)
-        : makeDefaultDragHandlePicker(inputState, initialHandlePosition, handleOffset);
-
-    return makeHandlePositionProposer(
-      std::move(dragHandlePicker),
-      m_delegate.makeDragHandleSnapper(inputState, m_lastSnapMode));
-  }
-
-  /**
-   * Forwards to the delegate's drag() function.
-   */
-  DragStatus drag(
-    const InputState& inputState,
-    const DragState& dragState,
-    const vm::vec3& proposedHandlePosition) override
-  {
-    return m_delegate.move(inputState, dragState, proposedHandlePosition);
-  }
-
-  /**
-   * Forwards to the delegate's end() function.
-   */
-  void end(const InputState& inputState, const DragState& dragState) override
-  {
-    m_delegate.end(inputState, dragState);
-  }
-
-  /**
-   * Forwards to the delegate's cancel() function.
-   */
-  void cancel(const DragState& dragState) override { m_delegate.cancel(dragState); }
-
-  /**
-   * Updates the handle proposer function and the drag state according to the modifier
-   * keys held.
-   */
-  std::optional<UpdateDragConfig> modifierKeyChange(
-    const InputState& inputState, const DragState& dragState) override
-  {
-    const auto nextMoveMode = moveMode(inputState, dragState);
-    const auto nextSnapMode = snapMode(inputState);
-
-    if (nextMoveMode != m_lastMoveMode)
-    {
-      const auto resetInitialHandlePosition =
-        (m_lastMoveMode == MoveMode::Vertical ? ResetInitialHandlePosition::Reset
-                                              : ResetInitialHandlePosition::Keep);
-
-      if (nextMoveMode == MoveMode::Constricted)
-      {
-        m_lastConstrictedMoveAxis = vm::find_abs_max_component(
-          dragState.currentHandlePosition - dragState.initialHandlePosition);
-      }
-      m_lastMoveMode = nextMoveMode;
-      m_lastSnapMode = nextSnapMode;
-
-      return UpdateDragConfig{
-        makeHandlePositionProposer(
-          makeDragHandlePicker(nextMoveMode, inputState, dragState),
-          m_delegate.makeDragHandleSnapper(inputState, m_lastSnapMode)),
-        resetInitialHandlePosition};
-    }
-    else if (nextSnapMode != m_lastSnapMode)
-    {
-      m_lastSnapMode = nextSnapMode;
-      return UpdateDragConfig{
-        makeHandlePositionProposer(
-          makeDragHandlePicker(nextMoveMode, inputState, dragState),
-          m_delegate.makeDragHandleSnapper(inputState, m_lastSnapMode)),
-        ResetInitialHandlePosition::Keep};
+  public:
+    /**
+     * Creates a new delegate for HandleDragTracker. The given delegate must extend
+     * MoveHandleDragTrackerDelegate and is used to implement the actual effects and refine
+     * the behavior of this delegate.
+     */
+    MoveHandleDragDelegate(Delegate delegate) : m_delegate{std::move(delegate)} {
     }
 
-    return std::nullopt;
-  }
+    /**
+     * Called when the drag starts.
+     *
+     * Returns a handle proposer constructed according to the modifier keys held.
+     */
+    HandlePositionProposer start(const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &handleOffset) override {
+        const bool verticalMove = isVerticalMove(inputState);
+        m_lastMoveMode = verticalMove ? MoveMode::Vertical : MoveMode::Default;
+        m_lastSnapMode = snapMode(inputState);
 
-  /**
-   * Forwards to the delegate's mouseScroll() function.
-   */
-  void mouseScroll(const InputState& inputState, const DragState& dragState) override
-  {
-    m_delegate.mouseScroll(inputState, dragState);
-  }
+        auto dragHandlePicker = verticalMove ? makeVerticalDragHandlePicker(inputState, initialHandlePosition, handleOffset) : makeDefaultDragHandlePicker(inputState, initialHandlePosition, handleOffset);
 
-  /**
-   * Forwards to the delegate's setRenderOptions() function.
-   */
-  void setRenderOptions(
-    const InputState& inputState, Renderer::RenderContext& renderContext) const override
-  {
-    m_delegate.setRenderOptions(inputState, renderContext);
-  }
+        return makeHandlePositionProposer(std::move(dragHandlePicker), m_delegate.makeDragHandleSnapper(inputState, m_lastSnapMode));
+    }
 
-  /**
-   * Renders a move trace and then forwards to the delegate's render() function.
-   */
-  void render(
-    const InputState& inputState,
-    const DragState& dragState,
-    Renderer::RenderContext& renderContext,
-    Renderer::RenderBatch& renderBatch) const override
-  {
-    if (dragState.currentHandlePosition != dragState.initialHandlePosition)
-    {
-      const auto vec = dragState.currentHandlePosition - dragState.initialHandlePosition;
+    /**
+     * Forwards to the delegate's drag() function.
+     */
+    DragStatus drag(const InputState &inputState, const DragState &dragState, const vm::vec3 &proposedHandlePosition) override {
+        return m_delegate.move(inputState, dragState, proposedHandlePosition);
+    }
 
-      auto renderService = Renderer::RenderService{renderContext, renderBatch};
-      renderService.setShowOccludedObjects();
-      renderService.setBackgroundColor(pref(Preferences::InfoOverlayBackgroundColor));
+    /**
+     * Forwards to the delegate's end() function.
+     */
+    void end(const InputState &inputState, const DragState &dragState) override {
+        m_delegate.end(inputState, dragState);
+    }
 
-      const auto stages = std::array<vm::vec3, 3>{
-        vec * vm::vec3::pos_x(),
-        vec * vm::vec3::pos_y(),
-        vec * vm::vec3::pos_z(),
-      };
+    /**
+     * Forwards to the delegate's cancel() function.
+     */
+    void cancel(const DragState &dragState) override { m_delegate.cancel(dragState); }
 
-      const auto colors = std::array<Color, 3>{
-        pref(Preferences::XAxisColor),
-        pref(Preferences::YAxisColor),
-        pref(Preferences::ZAxisColor),
-      };
+    /**
+     * Updates the handle proposer function and the drag state according to the modifier
+     * keys held.
+     */
+    std::optional<UpdateDragConfig> modifierKeyChange(const InputState &inputState, const DragState &dragState) override {
+        const auto nextMoveMode = moveMode(inputState, dragState);
+        const auto nextSnapMode = snapMode(inputState);
 
-      const auto lineWidths = std::array<float, 3>{
-        m_lastMoveMode == MoveMode::Constricted && m_lastConstrictedMoveAxis == 0 ? 2.0f
-                                                                                  : 1.0f,
-        m_lastMoveMode == MoveMode::Constricted && m_lastConstrictedMoveAxis == 1 ? 2.0f
-                                                                                  : 1.0f,
-        m_lastMoveMode == MoveMode::Constricted && m_lastConstrictedMoveAxis == 2 ? 2.0f
-                                                                                  : 1.0f,
-      };
+        if (nextMoveMode != m_lastMoveMode) {
+            const auto resetInitialHandlePosition = (m_lastMoveMode == MoveMode::Vertical ? ResetInitialHandlePosition::Reset : ResetInitialHandlePosition::Keep);
 
-      static const auto axisLabels = std::array<std::string, 3>{"x: ", "y: ", "z: "};
-      auto lastPos = dragState.initialHandlePosition;
-      auto unitsDisplayType =
-        (Preferences::LengthUnitDisplay)pref(Preferences::LengthUnitSystem);
+            if (nextMoveMode == MoveMode::Constricted) {
+                m_lastConstrictedMoveAxis = vm::find_abs_max_component(dragState.currentHandlePosition - dragState.initialHandlePosition);
+            }
+            m_lastMoveMode = nextMoveMode;
+            m_lastSnapMode = nextSnapMode;
 
-      for (size_t i = 0; i < 3; ++i)
-      {
-        const auto& stage = stages[i];
-
-        if (stage != vm::vec3::zero())
-        {
-          const auto curPos = lastPos + stage;
-          const auto midPoint = (lastPos + curPos) / 2.0;
-          const auto axis_label = axisLabels[i];
-          std::string units_str;
-
-          switch (unitsDisplayType)
-          {
-          case Preferences::Units:
-            units_str = fmt::format("{}{}", axis_label, kdl::str_to_string(stage[i]));
-            break;
-          case Preferences::Metric:
-            units_str = fmt::format(
-              "{}{:.1f}m",
-              axis_label,
-              stage[i] / pref(Preferences::MetricConversationFactor));
-            break;
-          case Preferences::Combined:
-            units_str = fmt::format(
-              "{}{}u ({:.1f}m)",
-              axis_label,
-              kdl::str_to_string(stage[i]),
-              stage[i] / pref(Preferences::MetricConversationFactor));
-          }
-
-          renderService.setForegroundColor(colors[i]);
-          renderService.setLineWidth(lineWidths[i]);
-          renderService.renderLine(vm::vec3f{lastPos}, vm::vec3f{curPos});
-
-          renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
-          renderService.renderString(
-            units_str,
-            Renderer::SimpleTextAnchor{
-              vm::vec3f{midPoint}, Renderer::TextAlignment::Bottom});
-
-          lastPos = curPos;
+            return UpdateDragConfig{
+                makeHandlePositionProposer(makeDragHandlePicker(nextMoveMode, inputState, dragState), m_delegate.makeDragHandleSnapper(inputState, m_lastSnapMode)), resetInitialHandlePosition
+            };
+        } else if (nextSnapMode != m_lastSnapMode) {
+            m_lastSnapMode = nextSnapMode;
+            return UpdateDragConfig{
+                makeHandlePositionProposer(makeDragHandlePicker(nextMoveMode, inputState, dragState), m_delegate.makeDragHandleSnapper(inputState, m_lastSnapMode)), ResetInitialHandlePosition::Keep
+            };
         }
-      }
+
+        return std::nullopt;
     }
 
-    m_delegate.render(inputState, dragState, renderContext, renderBatch);
-  }
-
-private:
-  static MoveMode moveMode(const InputState& inputState, const DragState& dragState)
-  {
-    if (isVerticalMove(inputState))
-    {
-      return MoveMode::Vertical;
-    }
-    else if (isConstrictedMove(inputState, dragState))
-    {
-      return MoveMode::Constricted;
-    }
-    else
-    {
-      return MoveMode::Default;
-    }
-  }
-
-  static bool isVerticalMove(const InputState& inputState)
-  {
-    const Renderer::Camera& camera = inputState.camera();
-    return camera.perspectiveProjection()
-           && inputState.checkModifierKey(MK_Yes, ModifierKeys::MKAlt);
-  }
-
-  static bool isConstrictedMove(const InputState& inputState, const DragState& dragState)
-  {
-    if (inputState.checkModifierKey(MK_Yes, ModifierKeys::MKShift))
-    {
-      const auto delta =
-        dragState.currentHandlePosition - dragState.initialHandlePosition;
-      return vm::get_abs_max_component(delta, 0) != vm::get_abs_max_component(delta, 1);
+    /**
+     * Forwards to the delegate's mouseScroll() function.
+     */
+    void mouseScroll(const InputState &inputState, const DragState &dragState) override {
+        m_delegate.mouseScroll(inputState, dragState);
     }
 
-    return false;
-  }
-
-  static SnapMode snapMode(const InputState& inputState)
-  {
-    return inputState.checkModifierKey(MK_Yes, ModifierKeys::MKCtrlCmd)
-             ? SnapMode::Absolute
-             : SnapMode::Relative;
-  }
-
-  static DragHandlePicker makeDragHandlePicker(
-    const MoveMode moveMode, const InputState& inputState, const DragState& dragState)
-  {
-    switch (moveMode)
-    {
-    case MoveMode::Vertical:
-      return makeVerticalDragHandlePicker(
-        inputState, dragState.currentHandlePosition, dragState.handleOffset);
-    case MoveMode::Constricted:
-      return makeConstrictedDragHandlePicker(dragState);
-    case MoveMode::Default:
-      return makeDefaultDragHandlePicker(
-        inputState, dragState.currentHandlePosition, dragState.handleOffset);
-      switchDefault();
+    /**
+     * Forwards to the delegate's setRenderOptions() function.
+     */
+    void setRenderOptions(const InputState &inputState, Renderer::RenderContext &renderContext) const override {
+        m_delegate.setRenderOptions(inputState, renderContext);
     }
-  }
 
-  static DragHandlePicker makeVerticalDragHandlePicker(
-    [[maybe_unused]] const InputState& inputState,
-    const vm::vec3& origin,
-    const vm::vec3& handleOffset)
-  {
-    assert(inputState.camera().perspectiveProjection());
+    /**
+     * Renders a move trace and then forwards to the delegate's render() function.
+     */
+    void render(const InputState &inputState, const DragState &dragState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const override {
+        if (dragState.currentHandlePosition != dragState.initialHandlePosition) {
+            const auto vec = dragState.currentHandlePosition - dragState.initialHandlePosition;
 
-    const auto axis = vm::vec3::pos_z();
-    return makeLineHandlePicker(vm::line3{origin, axis}, handleOffset);
-  }
+            auto renderService = Renderer::RenderService{renderContext, renderBatch};
+            renderService.setShowOccludedObjects();
+            renderService.setBackgroundColor(pref(Preferences::InfoOverlayBackgroundColor));
 
-  static DragHandlePicker makeConstrictedDragHandlePicker(const DragState& dragState)
-  {
-    const auto delta = dragState.currentHandlePosition - dragState.initialHandlePosition;
-    const auto axis = vm::get_abs_max_component_axis(delta);
-    return makeLineHandlePicker(
-      vm::line3{dragState.initialHandlePosition, axis}, dragState.handleOffset);
-  }
+            const auto stages = std::array<vm::vec3, 3>{
+                vec * vm::vec3::pos_x(), vec * vm::vec3::pos_y(), vec * vm::vec3::pos_z(),
+            };
 
-  static DragHandlePicker makeDefaultDragHandlePicker(
-    const InputState& inputState, const vm::vec3& origin, const vm::vec3& handleOffset)
-  {
-    const auto& camera = inputState.camera();
-    const auto axis = camera.perspectiveProjection()
-                        ? vm::vec3::pos_z()
-                        : vm::vec3(vm::get_abs_max_component_axis(camera.direction()));
-    return makePlaneHandlePicker(vm::plane3{origin, axis}, handleOffset);
-  }
+            const auto colors = std::array<Color, 3>{
+                pref(Preferences::XAxisColor), pref(Preferences::YAxisColor), pref(Preferences::ZAxisColor),
+            };
+
+            const auto lineWidths = std::array<float, 3>{
+                m_lastMoveMode == MoveMode::Constricted && m_lastConstrictedMoveAxis == 0 ? 2.0f : 1.0f, m_lastMoveMode == MoveMode::Constricted && m_lastConstrictedMoveAxis == 1 ? 2.0f : 1.0f, m_lastMoveMode == MoveMode::Constricted && m_lastConstrictedMoveAxis == 2 ? 2.0f : 1.0f,
+            };
+
+            static const auto axisLabels = std::array<std::string, 3>{"x: ", "y: ", "z: "};
+            auto lastPos = dragState.initialHandlePosition;
+            auto unitsDisplayType = (Preferences::LengthUnitDisplay) pref(Preferences::LengthUnitSystem);
+
+            for (size_t i = 0; i < 3; ++i) {
+                const auto &stage = stages[i];
+
+                if (stage != vm::vec3::zero()) {
+                    const auto curPos = lastPos + stage;
+                    const auto midPoint = (lastPos + curPos) / 2.0;
+                    const auto axis_label = axisLabels[i];
+                    std::string units_str;
+
+                    switch (unitsDisplayType) {
+                    case Preferences::Units:units_str = fmt::format("{}{}", axis_label, kdl::str_to_string(stage[i]));
+                        break;
+                    case Preferences::Metric: units_str = fmt::format("{}{:.1f}m", axis_label, stage[i] / pref(Preferences::MetricConversationFactor));
+                        break;
+                    case Preferences::Combined: units_str = fmt::format("{}{}u ({:.1f}m)", axis_label, kdl::str_to_string(stage[i]), stage[i] / pref(Preferences::MetricConversationFactor));
+                    }
+
+                    renderService.setForegroundColor(colors[i]);
+                    renderService.setLineWidth(lineWidths[i]);
+                    renderService.renderLine(vm::vec3f{lastPos}, vm::vec3f{curPos});
+
+                    renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
+                    renderService.renderString(units_str, Renderer::SimpleTextAnchor{
+                        vm::vec3f{midPoint}, Renderer::TextAlignment::Bottom
+                    });
+
+                    lastPos = curPos;
+                }
+            }
+        }
+
+        m_delegate.render(inputState, dragState, renderContext, renderBatch);
+    }
+
+  private:
+    static MoveMode moveMode(const InputState &inputState, const DragState &dragState) {
+        if (isVerticalMove(inputState)) {
+            return MoveMode::Vertical;
+        } else if (isConstrictedMove(inputState, dragState)) {
+            return MoveMode::Constricted;
+        } else {
+            return MoveMode::Default;
+        }
+    }
+
+    static bool isVerticalMove(const InputState &inputState) {
+        const Renderer::Camera &camera = inputState.camera();
+        return camera.perspectiveProjection() && inputState.checkModifierKey(MK_Yes, ModifierKeys::MKAlt);
+    }
+
+    static bool isConstrictedMove(const InputState &inputState, const DragState &dragState) {
+        if (inputState.checkModifierKey(MK_Yes, ModifierKeys::MKShift)) {
+            const auto delta = dragState.currentHandlePosition - dragState.initialHandlePosition;
+            return vm::get_abs_max_component(delta, 0) != vm::get_abs_max_component(delta, 1);
+        }
+
+        return false;
+    }
+
+    static SnapMode snapMode(const InputState &inputState) {
+        return inputState.checkModifierKey(MK_Yes, ModifierKeys::MKCtrlCmd) ? SnapMode::Absolute : SnapMode::Relative;
+    }
+
+    static DragHandlePicker makeDragHandlePicker(const MoveMode moveMode, const InputState &inputState, const DragState &dragState) {
+        switch (moveMode) {
+        case MoveMode::Vertical: return makeVerticalDragHandlePicker(inputState, dragState.currentHandlePosition, dragState.handleOffset);
+        case MoveMode::Constricted:return makeConstrictedDragHandlePicker(dragState);
+        case MoveMode::Default: return makeDefaultDragHandlePicker(inputState, dragState.currentHandlePosition, dragState.handleOffset);
+            switchDefault();
+        }
+    }
+
+    static DragHandlePicker makeVerticalDragHandlePicker([[maybe_unused]] const InputState &inputState, const vm::vec3 &origin, const vm::vec3 &handleOffset) {
+        assert(inputState.camera().perspectiveProjection());
+
+        const auto axis = vm::vec3::pos_z();
+        return makeLineHandlePicker(vm::line3{origin, axis}, handleOffset);
+    }
+
+    static DragHandlePicker makeConstrictedDragHandlePicker(const DragState &dragState) {
+        const auto delta = dragState.currentHandlePosition - dragState.initialHandlePosition;
+        const auto axis = vm::get_abs_max_component_axis(delta);
+        return makeLineHandlePicker(vm::line3{dragState.initialHandlePosition, axis}, dragState.handleOffset);
+    }
+
+    static DragHandlePicker makeDefaultDragHandlePicker(const InputState &inputState, const vm::vec3 &origin, const vm::vec3 &handleOffset) {
+        const auto &camera = inputState.camera();
+        const auto axis = camera.perspectiveProjection() ? vm::vec3::pos_z() : vm::vec3(vm::get_abs_max_component_axis(camera.direction()));
+        return makePlaneHandlePicker(vm::plane3{origin, axis}, handleOffset);
+    }
 };
-
 
 /**
  * Creates a new handle drag tracker that uses a MoveHandleDragDelegate, which in turn
  * uses the given delegate.
  */
-template <typename Delegate>
-std::unique_ptr<HandleDragTracker<MoveHandleDragDelegate<Delegate>>>
-createMoveHandleDragTracker(
-  Delegate delegate,
-  const InputState& inputState,
-  const vm::vec3& initialHandlePosition,
-  const vm::vec3& initialHitPoint)
-{
-  return std::make_unique<HandleDragTracker<MoveHandleDragDelegate<Delegate>>>(
-    MoveHandleDragDelegate{std::move(delegate)},
-    inputState,
-    initialHandlePosition,
-    initialHitPoint);
+template<typename Delegate> std::unique_ptr<HandleDragTracker<MoveHandleDragDelegate<Delegate>>> createMoveHandleDragTracker(Delegate delegate, const InputState &inputState, const vm::vec3 &initialHandlePosition, const vm::vec3 &initialHitPoint) {
+    return std::make_unique<HandleDragTracker<MoveHandleDragDelegate<Delegate>>>(MoveHandleDragDelegate{std::move(delegate)}, inputState, initialHandlePosition, initialHitPoint);
 }
 
 /**
  * Returns a relative or an absolute handle snapper according to the given snap mode.
  */
-DragHandleSnapper makeDragHandleSnapperFromSnapMode(const Grid& grid, SnapMode snapMode);
+DragHandleSnapper makeDragHandleSnapperFromSnapMode(const Grid &grid, SnapMode snapMode);
 } // namespace View
 } // namespace TrenchBroom

@@ -19,116 +19,71 @@
 
 #include "Shaders.h"
 
-namespace TrenchBroom::Renderer::Shaders
-{
+namespace TrenchBroom::Renderer::Shaders {
 const ShaderConfig Grid2DShader = ShaderConfig{
-  "2D Grid",
-  {"Grid2D.vertsh"},
-  {"Grid.fragsh", "Grid2D.fragsh"},
+    "2D Grid", {"Grid2D.vertsh"}, {"Grid.fragsh", "Grid2D.fragsh"},
 };
 const ShaderConfig VaryingPCShader = ShaderConfig{
-  "Varying Position / Color",
-  {"VaryingPC.vertsh"},
-  {"VaryingPC.fragsh"},
+    "Varying Position / Color", {"VaryingPC.vertsh"}, {"VaryingPC.fragsh"},
 };
 const ShaderConfig VaryingPUniformCShader = ShaderConfig{
-  "Varying Position / Uniform Color",
-  {"VaryingPUniformC.vertsh"},
-  {"VaryingPC.fragsh"},
+    "Varying Position / Uniform Color", {"VaryingPUniformC.vertsh"}, {"VaryingPC.fragsh"},
 };
 const ShaderConfig MiniMapEdgeShader = ShaderConfig{
-  "MiniMap Edges",
-  {"MiniMapEdge.vertsh"},
-  {"MiniMapEdge.fragsh"},
+    "MiniMap Edges", {"MiniMapEdge.vertsh"}, {"MiniMapEdge.fragsh"},
 };
 const ShaderConfig EntityModelShader = ShaderConfig{
-  "Entity Model",
-  {"EntityModel.vertsh"},
-  {"MapBounds.fragsh", "EntityModel.fragsh"},
+    "Entity Model", {"EntityModel.vertsh"}, {"MapBounds.fragsh", "EntityModel.fragsh"},
 };
 const ShaderConfig FaceShader = ShaderConfig{
-  "Face",
-  {"Face.vertsh"},
-  {"Grid.fragsh", "MapBounds.fragsh", "Face.fragsh"},
+    "Face", {"Face.vertsh"}, {"Grid.fragsh", "MapBounds.fragsh", "Face.fragsh"},
 };
 const ShaderConfig PatchShader = ShaderConfig{
-  "Patch",
-  {"Face.vertsh"},
-  {"Grid.fragsh", "MapBounds.fragsh", "Face.fragsh"},
+    "Patch", {"Face.vertsh"}, {"Grid.fragsh", "MapBounds.fragsh", "Face.fragsh"},
 };
 const ShaderConfig EdgeShader = ShaderConfig{
-  "Edge",
-  {"Edge.vertsh"},
-  {"MapBounds.fragsh", "Edge.fragsh"},
+    "Edge", {"Edge.vertsh"}, {"MapBounds.fragsh", "Edge.fragsh"},
 };
 const ShaderConfig ColoredTextShader = ShaderConfig{
-  "Colored Text",
-  {"ColoredText.vertsh"},
-  {"Text.fragsh"},
+    "Colored Text", {"ColoredText.vertsh"}, {"Text.fragsh"},
 };
 const ShaderConfig TextShader = ShaderConfig{
-  "Text",
-  {"Text.vertsh"},
-  {"Text.fragsh"},
+    "Text", {"Text.vertsh"}, {"Text.fragsh"},
 };
 const ShaderConfig TextBackgroundShader = ShaderConfig{
-  "Text Background",
-  {"TextBackground.vertsh"},
-  {"TextBackground.fragsh"},
+    "Text Background", {"TextBackground.vertsh"}, {"TextBackground.fragsh"},
 };
 const ShaderConfig TextureBrowserShader = ShaderConfig{
-  "Texture Browser",
-  {"TextureBrowser.vertsh"},
-  {"TextureBrowser.fragsh"},
+    "Texture Browser", {"TextureBrowser.vertsh"}, {"TextureBrowser.fragsh"},
 };
 const ShaderConfig TextureBrowserBorderShader = ShaderConfig{
-  "Texture Browser Border",
-  {"TextureBrowserBorder.vertsh"},
-  {"TextureBrowserBorder.fragsh"},
+    "Texture Browser Border", {"TextureBrowserBorder.vertsh"}, {"TextureBrowserBorder.fragsh"},
 };
 const ShaderConfig HandleShader = ShaderConfig{
-  "Handle",
-  {"Handle.vertsh"},
-  {"Handle.fragsh"},
+    "Handle", {"Handle.vertsh"}, {"Handle.fragsh"},
 };
 const ShaderConfig ColoredHandleShader = ShaderConfig{
-  "Colored Handle",
-  {"ColoredHandle.vertsh"},
-  {"Handle.fragsh"},
+    "Colored Handle", {"ColoredHandle.vertsh"}, {"Handle.fragsh"},
 };
 const ShaderConfig CompassShader = ShaderConfig{
-  "Compass",
-  {"Compass.vertsh"},
-  {"Compass.fragsh"},
+    "Compass", {"Compass.vertsh"}, {"Compass.fragsh"},
 };
 const ShaderConfig CompassOutlineShader = ShaderConfig{
-  "Compass Outline",
-  {"CompassOutline.vertsh"},
-  {"Compass.fragsh"},
+    "Compass Outline", {"CompassOutline.vertsh"}, {"Compass.fragsh"},
 };
 const ShaderConfig CompassBackgroundShader = ShaderConfig{
-  "Compass Background",
-  {"VaryingPUniformC.vertsh"},
-  {"VaryingPC.fragsh"},
+    "Compass Background", {"VaryingPUniformC.vertsh"}, {"VaryingPC.fragsh"},
 };
 const ShaderConfig LinkLineShader = ShaderConfig{
-  "Link Line",
-  {"LinkLine.vertsh"},
-  {"LinkLine.fragsh"},
+    "Link Line", {"LinkLine.vertsh"}, {"LinkLine.fragsh"},
 };
 const ShaderConfig LinkArrowShader = ShaderConfig{
-  "Link Arrow",
-  {"LinkArrow.vertsh"},
-  {"LinkArrow.fragsh"},
+    "Link Arrow", {"LinkArrow.vertsh"}, {"LinkArrow.fragsh"},
 };
 const ShaderConfig TriangleShader = ShaderConfig{
-  "Shaded Triangles",
-  {"Triangle.vertsh"},
-  {"Triangle.fragsh"},
+    "Shaded Triangles", {"Triangle.vertsh"}, {"Triangle.fragsh"},
 };
 const ShaderConfig UVViewShader = ShaderConfig{
-  "UV View",
-  {"UVView.vertsh"},
-  {"UVView.fragsh"},
+    "UV View", {"UVView.vertsh"}, {"UVView.fragsh"},
 };
 } // namespace TrenchBroom::Renderer::Shaders

@@ -37,172 +37,158 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class BrushRendererBrushCache;
 }
 
-namespace Model
-{
+namespace Model {
 class BrushFace;
-
 
 class GroupNode;
 
-
 class LayerNode;
-
 
 class ModelFactory;
 
+class BrushNode : public Node, public Object {
+  public:
+    static const HitType::Type BrushHitType;
 
-class BrushNode : public Node, public Object
-{
-public:
-  static const HitType::Type BrushHitType;
+  public:
+    using VertexList = BrushVertexList;
+    using EdgeList = BrushEdgeList;
 
-public:
-  using VertexList = BrushVertexList;
-  using EdgeList = BrushEdgeList;
+  private:
+    mutable std::unique_ptr<Renderer::BrushRendererBrushCache> m_brushRendererBrushCache; // unique_ptr for breaking header dependencies
+    Brush m_brush;               // must be destroyed before the brush renderer cache
+    size_t m_selectedFaceCount = 0u;
 
-private:
-  mutable std::unique_ptr<Renderer::BrushRendererBrushCache>
-    m_brushRendererBrushCache; // unique_ptr for breaking header dependencies
-  Brush m_brush;               // must be destroyed before the brush renderer cache
-  size_t m_selectedFaceCount = 0u;
+  public:
+    explicit BrushNode(Brush brush);
 
-public:
-  explicit BrushNode(Brush brush);
+    ~BrushNode() override;
 
-  ~BrushNode() override;
+  public:
+    EntityNodeBase *entity();
 
-public:
-  EntityNodeBase* entity();
+    const EntityNodeBase *entity() const;
 
-  const EntityNodeBase* entity() const;
+    const Brush &brush() const;
 
-  const Brush& brush() const;
+    Brush setBrush(Brush brush);
 
-  Brush setBrush(Brush brush);
+    bool hasSelectedFaces() const;
 
-  bool hasSelectedFaces() const;
+    void selectFace(size_t faceIndex);
 
-  void selectFace(size_t faceIndex);
+    void deselectFace(size_t faceIndex);
 
-  void deselectFace(size_t faceIndex);
+    void updateFaceTags(size_t faceIndex, TagManager &tagManager);
 
-  void updateFaceTags(size_t faceIndex, TagManager& tagManager);
+    void setFaceTexture(size_t faceIndex, Assets::Texture *texture);
 
-  void setFaceTexture(size_t faceIndex, Assets::Texture* texture);
+    bool contains(const Node *node) const;
 
-  bool contains(const Node* node) const;
+    bool intersects(const Node *node) const;
 
-  bool intersects(const Node* node) const;
+  private:
+    void clearSelectedFaces();
 
-private:
-  void clearSelectedFaces();
+    void updateSelectedFaceCount();
 
-  void updateSelectedFaceCount();
+  private: // implement Node interface
+    const std::string &doGetName() const override;
 
-private: // implement Node interface
-  const std::string& doGetName() const override;
+    const vm::bbox3 &doGetLogicalBounds() const override;
 
-  const vm::bbox3& doGetLogicalBounds() const override;
+    const vm::bbox3 &doGetPhysicalBounds() const override;
 
-  const vm::bbox3& doGetPhysicalBounds() const override;
+    FloatType doGetProjectedArea(vm::axis::type axis) const override;
 
-  FloatType doGetProjectedArea(vm::axis::type axis) const override;
+    Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
 
-  Node* doClone(const vm::bbox3& worldBounds, SetLinkId setLinkIds) const override;
+    bool doCanAddChild(const Node *child) const override;
 
-  bool doCanAddChild(const Node* child) const override;
+    bool doCanRemoveChild(const Node *child) const override;
 
-  bool doCanRemoveChild(const Node* child) const override;
+    bool doRemoveIfEmpty() const override;
 
-  bool doRemoveIfEmpty() const override;
+    bool doShouldAddToSpacialIndex() const override;
 
-  bool doShouldAddToSpacialIndex() const override;
+    bool doSelectable() const override;
 
-  bool doSelectable() const override;
+    void doAccept(NodeVisitor &visitor) override;
 
-  void doAccept(NodeVisitor& visitor) override;
+    void doAccept(ConstNodeVisitor &visitor) const override;
 
-  void doAccept(ConstNodeVisitor& visitor) const override;
+  private: // implement Object interface
+    void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
 
-private: // implement Object interface
-  void doPick(
-    const EditorContext& editorContext,
-    const vm::ray3& ray,
-    PickResult& pickResult) override;
+    void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
-  void doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result) override;
+    std::optional<std::tuple<FloatType, size_t>> findFaceHit(const vm::ray3 &ray) const;
 
-  std::optional<std::tuple<FloatType, size_t>> findFaceHit(const vm::ray3& ray) const;
+    Node *doGetContainer() override;
 
-  Node* doGetContainer() override;
+    LayerNode *doGetContainingLayer() override;
 
-  LayerNode* doGetContainingLayer() override;
+    GroupNode *doGetContainingGroup() override;
 
-  GroupNode* doGetContainingGroup() override;
+  public: // renderer cache
+    /**
+     * Only exposed to be called by BrushFace
+     */
+    void invalidateVertexCache();
 
-public: // renderer cache
-  /**
-   * Only exposed to be called by BrushFace
-   */
-  void invalidateVertexCache();
+    Renderer::BrushRendererBrushCache &brushRendererBrushCache() const;
 
-  Renderer::BrushRendererBrushCache& brushRendererBrushCache() const;
+  private: // implement Taggable interface
+  public:
+    void initializeTags(TagManager &tagManager) override;
 
-private: // implement Taggable interface
-public:
-  void initializeTags(TagManager& tagManager) override;
+    void clearTags() override;
 
-  void clearTags() override;
+    void updateTags(TagManager &tagManager) override;
 
-  void updateTags(TagManager& tagManager) override;
+    /**
+     * Indicates whether all of the faces of this brush have any of the given tags.
+     *
+     * @param tagMask the tags to check
+     * @return true whether all faces of this brush have any of the given tags
+     */
+    bool allFacesHaveAnyTagInMask(TagType::Type tagMask) const;
 
-  /**
-   * Indicates whether all of the faces of this brush have any of the given tags.
-   *
-   * @param tagMask the tags to check
-   * @return true whether all faces of this brush have any of the given tags
-   */
-  bool allFacesHaveAnyTagInMask(TagType::Type tagMask) const;
+    /**
+     * Indicates whether any of the faces of this brush have any tags.
+     *
+     * @return true whether any faces of this brush have any tags
+     */
+    bool anyFaceHasAnyTag() const;
 
-  /**
-   * Indicates whether any of the faces of this brush have any tags.
-   *
-   * @return true whether any faces of this brush have any tags
-   */
-  bool anyFaceHasAnyTag() const;
+    /**
+     * Indicates whether any of the faces of this brush have any of the given tags.
+     *
+     * @param tagMask the tags to check
+     * @return true whether any faces of this brush have any of the given tags
+     */
+    bool anyFacesHaveAnyTagInMask(TagType::Type tagMask) const;
 
-  /**
-   * Indicates whether any of the faces of this brush have any of the given tags.
-   *
-   * @param tagMask the tags to check
-   * @return true whether any faces of this brush have any of the given tags
-   */
-  bool anyFacesHaveAnyTagInMask(TagType::Type tagMask) const;
+  private:
+    void doAcceptTagVisitor(TagVisitor &visitor) override;
 
-private:
-  void doAcceptTagVisitor(TagVisitor& visitor) override;
+    void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 
-  void doAcceptTagVisitor(ConstTagVisitor& visitor) const override;
-
-private:
+  private:
   deleteCopyAndMove(BrushNode);
 };
 
+bool operator==(const BrushNode &lhs, const BrushNode &rhs);
 
-bool operator==(const BrushNode& lhs, const BrushNode& rhs);
-
-bool operator!=(const BrushNode& lhs, const BrushNode& rhs);
+bool operator!=(const BrushNode &lhs, const BrushNode &rhs);
 } // namespace Model
 } // namespace TrenchBroom

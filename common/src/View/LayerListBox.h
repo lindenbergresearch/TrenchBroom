@@ -25,126 +25,112 @@
 #include <memory>
 #include <vector>
 
-
 class QLabel;
-
 
 class QAbstractButton;
 
-
 class QListWidget;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class LayerNode;
-
 
 class Node;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class MapDocument;
 
-
-class LayerListBoxWidget : public ControlListBoxItemRenderer
-{
+class LayerListBoxWidget : public ControlListBoxItemRenderer {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
-  Model::LayerNode* m_layer;
-  QAbstractButton* m_activeButton;
-  QLabel* m_nameText;
-  QLabel* m_infoText;
-  QAbstractButton* m_omitFromExportButton;
-  QAbstractButton* m_hiddenButton;
-  QAbstractButton* m_lockButton;
+  private:
+    std::weak_ptr<MapDocument> m_document;
+    Model::LayerNode *m_layer;
+    QAbstractButton *m_activeButton;
+    QLabel *m_nameText;
+    QLabel *m_infoText;
+    QAbstractButton *m_omitFromExportButton;
+    QAbstractButton *m_hiddenButton;
+    QAbstractButton *m_lockButton;
 
-public:
-  LayerListBoxWidget(
-    std::weak_ptr<MapDocument> document,
-    Model::LayerNode* layer,
-    QWidget* parent = nullptr);
+  public:
+    LayerListBoxWidget(std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent = nullptr);
 
-  void updateItem() override;
+    void updateItem() override;
 
-private:
-  void updateLayerItem();
+  private:
+    void updateLayerItem();
 
-public:
-  Model::LayerNode* layer() const;
+  public:
+    Model::LayerNode *layer() const;
 
-private:
-  bool eventFilter(QObject* target, QEvent* event) override;
+  private:
+    bool eventFilter(QObject *target, QEvent *event) override;
 
-signals:
+  signals:
 
-  void layerActiveClicked(Model::LayerNode* layer);
+    void layerActiveClicked(Model::LayerNode *layer);
 
-  void layerOmitFromExportToggled(Model::LayerNode* layer);
+    void layerOmitFromExportToggled(Model::LayerNode *layer);
 
-  void layerVisibilityToggled(Model::LayerNode* layer);
+    void layerVisibilityToggled(Model::LayerNode *layer);
 
-  void layerLockToggled(Model::LayerNode* layer);
+    void layerLockToggled(Model::LayerNode *layer);
 
-  void layerDoubleClicked(Model::LayerNode* layer);
+    void layerDoubleClicked(Model::LayerNode *layer);
 
-  void layerRightClicked(Model::LayerNode* layer);
+    void layerRightClicked(Model::LayerNode *layer);
 };
 
-
-class LayerListBox : public ControlListBox
-{
+class LayerListBox : public ControlListBox {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
+  private:
+    std::weak_ptr<MapDocument> m_document;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
-public:
-  explicit LayerListBox(std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit LayerListBox(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-  Model::LayerNode* selectedLayer() const;
+    Model::LayerNode *selectedLayer() const;
 
-  void setSelectedLayer(Model::LayerNode* layer);
+    void setSelectedLayer(Model::LayerNode *layer);
 
-private:
-  size_t itemCount() const override;
+  private:
+    size_t itemCount() const override;
 
-  ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
+    ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;
 
-  void selectedRowChanged(int index) override;
+    void selectedRowChanged(int index) override;
 
-private:
-  void connectObservers();
+  private:
+    void connectObservers();
 
-  void documentDidChange(MapDocument* document);
+    void documentDidChange(MapDocument *document);
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+    void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void currentLayerDidChange(const Model::LayerNode* layer);
+    void currentLayerDidChange(const Model::LayerNode *layer);
 
-  const LayerListBoxWidget* widgetAtRow(int row) const;
+    const LayerListBoxWidget *widgetAtRow(int row) const;
 
-  Model::LayerNode* layerForRow(int row) const;
+    Model::LayerNode *layerForRow(int row) const;
 
-  std::vector<Model::LayerNode*> layers() const;
+    std::vector<Model::LayerNode *> layers() const;
 
-signals:
+  signals:
 
-  void layerSelected(Model::LayerNode* layer);
+    void layerSelected(Model::LayerNode *layer);
 
-  void layerSetCurrent(Model::LayerNode* layer);
+    void layerSetCurrent(Model::LayerNode *layer);
 
-  void layerRightClicked(Model::LayerNode* layer);
+    void layerRightClicked(Model::LayerNode *layer);
 
-  void layerOmitFromExportToggled(Model::LayerNode* layer);
+    void layerOmitFromExportToggled(Model::LayerNode *layer);
 
-  void layerVisibilityToggled(Model::LayerNode* layer);
+    void layerVisibilityToggled(Model::LayerNode *layer);
 
-  void layerLockToggled(Model::LayerNode* layer);
+    void layerLockToggled(Model::LayerNode *layer);
 };
 } // namespace View
 } // namespace TrenchBroom

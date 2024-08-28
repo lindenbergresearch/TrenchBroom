@@ -30,91 +30,78 @@
 #include <iosfwd>
 #include <optional>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 
-namespace ModelSpecificationKeys
-{
+namespace ModelSpecificationKeys {
 constexpr auto Path = "path";
 constexpr auto Skin = "skin";
 constexpr auto Frame = "frame";
 constexpr auto Scale = "scale";
 } // namespace ModelSpecificationKeys
 
-struct ModelSpecification
-{
+struct ModelSpecification {
   std::filesystem::path path;
   size_t skinIndex;
   size_t frameIndex;
 
   ModelSpecification();
 
-  ModelSpecification(
-    const std::filesystem::path& path, size_t skinIndex, size_t frameIndex);
+  ModelSpecification(const std::filesystem::path &path, size_t skinIndex, size_t frameIndex);
 
   kdl_reflect_decl(ModelSpecification, path, skinIndex, frameIndex);
 };
 
+class ModelDefinition {
+  private:
+    EL::Expression m_expression;
 
-class ModelDefinition
-{
-private:
-  EL::Expression m_expression;
+  public:
+    ModelDefinition();
 
-public:
-  ModelDefinition();
+    ModelDefinition(size_t line, size_t column);
 
-  ModelDefinition(size_t line, size_t column);
+    explicit ModelDefinition(EL::Expression expression);
 
-  explicit ModelDefinition(EL::Expression expression);
+    void append(ModelDefinition other);
 
-  void append(ModelDefinition other);
+    /**
+     * Evaluates the model expresion, using the given variable store to interpolate
+     * variables.
+     *
+     * @param variableStore the variable store to use when interpolating variables
+     * @return the model specification
+     *
+     * @throws EL::Exception if the expression could not be evaluated
+     */
+    ModelSpecification modelSpecification(const EL::VariableStore &variableStore) const;
 
-  /**
-   * Evaluates the model expresion, using the given variable store to interpolate
-   * variables.
-   *
-   * @param variableStore the variable store to use when interpolating variables
-   * @return the model specification
-   *
-   * @throws EL::Exception if the expression could not be evaluated
-   */
-  ModelSpecification modelSpecification(const EL::VariableStore& variableStore) const;
+    /**
+     * Evaluates the model expresion.
+     *
+     * @return the model specification
+     *
+     * @throws EL::Exception if the expression could not be evaluated
+     */
+    ModelSpecification defaultModelSpecification() const;
 
-  /**
-   * Evaluates the model expresion.
-   *
-   * @return the model specification
-   *
-   * @throws EL::Exception if the expression could not be evaluated
-   */
-  ModelSpecification defaultModelSpecification() const;
+    /**
+     * Evaluates the model expression using the given variable store to interpolate
+     * variables, and returns the scale value configured for the model, if any. If the model
+     * expression doesn't have its own scale expression, then the given scale expression is
+     * used instead.
+     *
+     * @throws EL::Exception if the expression could not be evaluated
+     */
+    vm::vec3 scale(const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression) const;
 
-  /**
-   * Evaluates the model expression using the given variable store to interpolate
-   * variables, and returns the scale value configured for the model, if any. If the model
-   * expression doesn't have its own scale expression, then the given scale expression is
-   * used instead.
-   *
-   * @throws EL::Exception if the expression could not be evaluated
-   */
-  vm::vec3 scale(
-    const EL::VariableStore& variableStore,
-    const std::optional<EL::Expression>& defaultScaleExpression) const;
-
-  kdl_reflect_decl(ModelDefinition, m_expression);
+    kdl_reflect_decl(ModelDefinition, m_expression);
 };
-
 
 /**
  * Returns the model scale value for the given parameters or a default scale of 1, 1, 1 if
  * an error occurs.
  */
-vm::vec3 safeGetModelScale(
-  const ModelDefinition& definition,
-  const EL::VariableStore& variableStore,
-  const std::optional<EL::Expression>& defaultScaleExpression);
+vm::vec3 safeGetModelScale(const ModelDefinition &definition, const EL::VariableStore &variableStore, const std::optional<EL::Expression> &defaultScaleExpression);
 } // namespace Assets
 } // namespace TrenchBroom

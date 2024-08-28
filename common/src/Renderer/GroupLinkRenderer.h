@@ -25,24 +25,20 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument; // FIXME: Renderer should not depend on View
 }
 
-namespace Renderer
-{
-class GroupLinkRenderer : public LinkRenderer
-{
-  std::weak_ptr<View::MapDocument> m_document;
+namespace Renderer {
+class GroupLinkRenderer : public LinkRenderer {
+    std::weak_ptr<View::MapDocument> m_document;
 
-public:
-  GroupLinkRenderer(std::weak_ptr<View::MapDocument> document);
+  public:
+    GroupLinkRenderer(std::weak_ptr<View::MapDocument> document);
 
-private:
-  std::vector<LinkRenderer::LineVertex> getLinks() override;
+  private:
+    std::vector<LinkRenderer::LineVertex> getLinks() override;
 
   deleteCopy(GroupLinkRenderer);
 };

@@ -44,228 +44,164 @@
 #include <vm/vec.h>
 #include <vm/vec_io.h>
 
-namespace TrenchBroom
-{
-namespace View
-{
-RotateObjectsToolPage::RotateObjectsToolPage(
-  std::weak_ptr<MapDocument> document, RotateObjectsTool& tool, QWidget* parent)
-  : QWidget{parent}
-  , m_document{std::move(document)}
-  , m_tool{tool}
-  , m_recentlyUsedCentersList{nullptr}
-  , m_resetCenterButton{nullptr}
-  , m_angle{nullptr}
-  , m_axis{nullptr}
-  , m_rotateButton{nullptr}
-  , m_updateAnglePropertyAfterTransformCheckBox{nullptr}
-{
-  createGui();
-  connectObservers();
-  m_angle->setValue(vm::to_degrees(m_tool.angle()));
+namespace TrenchBroom {
+namespace View {
+RotateObjectsToolPage::RotateObjectsToolPage(std::weak_ptr<MapDocument> document, RotateObjectsTool &tool, QWidget *parent)
+    : QWidget{parent}, m_document{std::move(document)}, m_tool{tool}, m_recentlyUsedCentersList{nullptr}, m_resetCenterButton{nullptr}, m_angle{nullptr}, m_axis{nullptr}, m_rotateButton{nullptr}, m_updateAnglePropertyAfterTransformCheckBox{nullptr} {
+    createGui();
+    connectObservers();
+    m_angle->setValue(vm::to_degrees(m_tool.angle()));
 }
 
-void RotateObjectsToolPage::connectObservers()
-{
-  auto document = kdl::mem_lock(m_document);
-  m_notifierConnection += document->selectionDidChangeNotifier.connect(
-    this, &RotateObjectsToolPage::selectionDidChange);
-  m_notifierConnection += document->documentWasNewedNotifier.connect(
-    this, &RotateObjectsToolPage::documentWasNewedOrLoaded);
-  m_notifierConnection += document->documentWasLoadedNotifier.connect(
-    this, &RotateObjectsToolPage::documentWasNewedOrLoaded);
+void RotateObjectsToolPage::connectObservers() {
+    auto document = kdl::mem_lock(m_document);
+    m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &RotateObjectsToolPage::selectionDidChange);
+    m_notifierConnection += document->documentWasNewedNotifier.connect(this, &RotateObjectsToolPage::documentWasNewedOrLoaded);
+    m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &RotateObjectsToolPage::documentWasNewedOrLoaded);
 }
 
-void RotateObjectsToolPage::setAxis(const vm::axis::type axis)
-{
-  m_axis->setCurrentIndex(static_cast<int>(axis));
+void RotateObjectsToolPage::setAxis(const vm::axis::type axis) {
+    m_axis->setCurrentIndex(static_cast<int>(axis));
 }
 
-void RotateObjectsToolPage::setRecentlyUsedCenters(const std::vector<vm::vec3>& centers)
-{
-  m_recentlyUsedCentersList->clear();
+void RotateObjectsToolPage::setRecentlyUsedCenters(const std::vector<vm::vec3> &centers) {
+    m_recentlyUsedCentersList->clear();
 
-  for (auto it = centers.rbegin(), end = centers.rend(); it != end; ++it)
-  {
-    m_recentlyUsedCentersList->addItem(QString::fromStdString(kdl::str_to_string(*it)));
-  }
+    for (auto it = centers.rbegin(), end = centers.rend(); it != end; ++it) {
+        m_recentlyUsedCentersList->addItem(QString::fromStdString(kdl::str_to_string(*it)));
+    }
 
-  if (m_recentlyUsedCentersList->count() > 0)
-  {
-    m_recentlyUsedCentersList->setCurrentIndex(0);
-  }
+    if (m_recentlyUsedCentersList->count() > 0) {
+        m_recentlyUsedCentersList->setCurrentIndex(0);
+    }
 }
 
-void RotateObjectsToolPage::setCurrentCenter(const vm::vec3& center)
-{
-  m_recentlyUsedCentersList->setCurrentText(
-    QString::fromStdString(kdl::str_to_string(center)));
+void RotateObjectsToolPage::setCurrentCenter(const vm::vec3 &center) {
+    m_recentlyUsedCentersList->setCurrentText(QString::fromStdString(kdl::str_to_string(center)));
 }
 
-void RotateObjectsToolPage::createGui()
-{
-  auto* centerText = new QLabel{tr("Center")};
-  m_recentlyUsedCentersList = new QComboBox{};
-  m_recentlyUsedCentersList->setMinimumContentsLength(16);
-  m_recentlyUsedCentersList->setEditable(true);
+void RotateObjectsToolPage::createGui() {
+    auto *centerText = new QLabel{tr("Center")};
+    m_recentlyUsedCentersList = new QComboBox{};
+    m_recentlyUsedCentersList->setMinimumContentsLength(16);
+    m_recentlyUsedCentersList->setEditable(true);
 
-  m_resetCenterButton = new QPushButton{tr("Reset")};
-  m_resetCenterButton->setToolTip(tr(
-    "Reset the position of the rotate handle to the center of the current selection."));
+    m_resetCenterButton = new QPushButton{tr("Reset")};
+    m_resetCenterButton->setToolTip(tr("Reset the position of the rotate handle to the center of the current selection."));
 
-  auto* text1 = new QLabel{tr("Rotate objects")};
-  auto* text2 = new QLabel{tr("degs about")};
-  auto* text3 = new QLabel{tr("axis")};
-  m_angle = new SpinControl{this};
-  m_angle->setRange(-360.0, 360.0);
-  m_angle->setValue(vm::to_degrees(m_tool.angle()));
+    auto *text1 = new QLabel{tr("Rotate objects")};
+    auto *text2 = new QLabel{tr("degs about")};
+    auto *text3 = new QLabel{tr("axis")};
+    m_angle = new SpinControl{this};
+    m_angle->setRange(-360.0, 360.0);
+    m_angle->setValue(vm::to_degrees(m_tool.angle()));
 
-  m_axis = new QComboBox{};
-  m_axis->addItem("X");
-  m_axis->addItem("Y");
-  m_axis->addItem("Z");
-  m_axis->setCurrentIndex(2);
+    m_axis = new QComboBox{};
+    m_axis->addItem("X");
+    m_axis->addItem("Y");
+    m_axis->addItem("Z");
+    m_axis->setCurrentIndex(2);
 
-  m_rotateButton = new QPushButton{tr("Apply")};
+    m_rotateButton = new QPushButton{tr("Apply")};
 
-  m_updateAnglePropertyAfterTransformCheckBox =
-    new QCheckBox{tr("Update entity properties")};
+    m_updateAnglePropertyAfterTransformCheckBox = new QCheckBox{tr("Update entity properties")};
 
-  connect(
-    m_recentlyUsedCentersList,
-    QOverload<const QString&>::of(&QComboBox::activated),
-    this,
-    &RotateObjectsToolPage::centerChanged);
-  connect(
-    m_resetCenterButton,
-    &QAbstractButton::clicked,
-    this,
-    &RotateObjectsToolPage::resetCenterClicked);
-  connect(
-    m_angle,
-    QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-    this,
-    &RotateObjectsToolPage::angleChanged);
-  connect(
-    m_rotateButton,
-    &QAbstractButton::clicked,
-    this,
-    &RotateObjectsToolPage::rotateClicked);
-  connect(
-    m_updateAnglePropertyAfterTransformCheckBox,
-    &QCheckBox::clicked,
-    this,
-    &RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked);
+    connect(m_recentlyUsedCentersList, QOverload<const QString &>::of(&QComboBox::activated), this, &RotateObjectsToolPage::centerChanged);
+    connect(m_resetCenterButton, &QAbstractButton::clicked, this, &RotateObjectsToolPage::resetCenterClicked);
+    connect(m_angle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &RotateObjectsToolPage::angleChanged);
+    connect(m_rotateButton, &QAbstractButton::clicked, this, &RotateObjectsToolPage::rotateClicked);
+    connect(m_updateAnglePropertyAfterTransformCheckBox, &QCheckBox::clicked, this, &RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked);
 
-  auto* layout = new QHBoxLayout{};
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->setSpacing(0);
+    auto *layout = new QHBoxLayout{};
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
-  layout->addWidget(centerText, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::MediumHMargin);
-  layout->addWidget(m_recentlyUsedCentersList, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::MediumHMargin);
-  layout->addWidget(m_resetCenterButton, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::WideHMargin);
-  layout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0);
-  layout->addSpacing(LayoutConstants::WideHMargin);
-  layout->addWidget(text1, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::NarrowHMargin);
-  layout->addWidget(m_angle, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::NarrowHMargin);
-  layout->addWidget(text2, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::NarrowHMargin);
-  layout->addWidget(m_axis, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::NarrowHMargin);
-  layout->addWidget(text3, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::NarrowHMargin);
-  layout->addWidget(m_rotateButton, 0, Qt::AlignVCenter);
-  layout->addSpacing(LayoutConstants::WideHMargin);
-  layout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0);
-  layout->addSpacing(LayoutConstants::WideHMargin);
-  layout->addWidget(m_updateAnglePropertyAfterTransformCheckBox);
-  layout->addStretch(1);
+    layout->addWidget(centerText, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::MediumHMargin);
+    layout->addWidget(m_recentlyUsedCentersList, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::MediumHMargin);
+    layout->addWidget(m_resetCenterButton, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::WideHMargin);
+    layout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0);
+    layout->addSpacing(LayoutConstants::WideHMargin);
+    layout->addWidget(text1, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::NarrowHMargin);
+    layout->addWidget(m_angle, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::NarrowHMargin);
+    layout->addWidget(text2, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::NarrowHMargin);
+    layout->addWidget(m_axis, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::NarrowHMargin);
+    layout->addWidget(text3, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::NarrowHMargin);
+    layout->addWidget(m_rotateButton, 0, Qt::AlignVCenter);
+    layout->addSpacing(LayoutConstants::WideHMargin);
+    layout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0);
+    layout->addSpacing(LayoutConstants::WideHMargin);
+    layout->addWidget(m_updateAnglePropertyAfterTransformCheckBox);
+    layout->addStretch(1);
 
-  setLayout(layout);
+    setLayout(layout);
 
-  updateGui();
+    updateGui();
 }
 
-void RotateObjectsToolPage::updateGui()
-{
-  const auto& grid = kdl::mem_lock(m_document)->grid();
-  m_angle->setIncrements(vm::to_degrees(grid.angle()), 90.0, 1.0);
+void RotateObjectsToolPage::updateGui() {
+    const auto &grid = kdl::mem_lock(m_document)->grid();
+    m_angle->setIncrements(vm::to_degrees(grid.angle()), 90.0, 1.0);
 
-  auto document = kdl::mem_lock(m_document);
-  m_rotateButton->setEnabled(document->hasSelectedNodes());
+    auto document = kdl::mem_lock(m_document);
+    m_rotateButton->setEnabled(document->hasSelectedNodes());
 
-  if (const auto* worldNode = document->world())
-  {
-    m_updateAnglePropertyAfterTransformCheckBox->setChecked(
-      worldNode->entityPropertyConfig().updateAnglePropertyAfterTransform);
-  }
+    if (const auto *worldNode = document->world()) {
+        m_updateAnglePropertyAfterTransformCheckBox->setChecked(worldNode->entityPropertyConfig().updateAnglePropertyAfterTransform);
+    }
 }
 
-void RotateObjectsToolPage::selectionDidChange(const Selection&)
-{
-  updateGui();
+void RotateObjectsToolPage::selectionDidChange(const Selection &) {
+    updateGui();
 }
 
-void RotateObjectsToolPage::documentWasNewedOrLoaded(MapDocument*)
-{
-  updateGui();
+void RotateObjectsToolPage::documentWasNewedOrLoaded(MapDocument *) {
+    updateGui();
 }
 
-void RotateObjectsToolPage::centerChanged()
-{
-  if (
-    const auto center =
-      vm::parse<FloatType, 3>(m_recentlyUsedCentersList->currentText().toStdString()))
-  {
-    m_tool.setRotationCenter(*center);
-  }
+void RotateObjectsToolPage::centerChanged() {
+    if (const auto center = vm::parse<FloatType, 3>(m_recentlyUsedCentersList->currentText().toStdString())) {
+        m_tool.setRotationCenter(*center);
+    }
 }
 
-void RotateObjectsToolPage::resetCenterClicked()
-{
-  m_tool.resetRotationCenter();
+void RotateObjectsToolPage::resetCenterClicked() {
+    m_tool.resetRotationCenter();
 }
 
-void RotateObjectsToolPage::angleChanged(double value)
-{
-  const auto newAngleDegs = vm::correct(value);
-  m_angle->setValue(newAngleDegs);
-  m_tool.setAngle(vm::to_radians(newAngleDegs));
+void RotateObjectsToolPage::angleChanged(double value) {
+    const auto newAngleDegs = vm::correct(value);
+    m_angle->setValue(newAngleDegs);
+    m_tool.setAngle(vm::to_radians(newAngleDegs));
 }
 
-void RotateObjectsToolPage::rotateClicked()
-{
-  const auto center = m_tool.rotationCenter();
-  const auto axis = getAxis();
-  const auto angle = vm::to_radians(m_angle->value());
+void RotateObjectsToolPage::rotateClicked() {
+    const auto center = m_tool.rotationCenter();
+    const auto axis = getAxis();
+    const auto angle = vm::to_radians(m_angle->value());
 
-  auto document = kdl::mem_lock(m_document);
-  document->rotateObjects(center, axis, angle);
+    auto document = kdl::mem_lock(m_document);
+    document->rotateObjects(center, axis, angle);
 }
 
-void RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked()
-{
-  auto document = kdl::mem_lock(m_document);
-  document->world()->entityPropertyConfig().updateAnglePropertyAfterTransform =
-    m_updateAnglePropertyAfterTransformCheckBox->isChecked();
+void RotateObjectsToolPage::updateAnglePropertyAfterTransformClicked() {
+    auto document = kdl::mem_lock(m_document);
+    document->world()->entityPropertyConfig().updateAnglePropertyAfterTransform = m_updateAnglePropertyAfterTransformCheckBox->isChecked();
 }
 
-vm::vec3 RotateObjectsToolPage::getAxis() const
-{
-  switch (m_axis->currentIndex())
-  {
-  case 0:
-    return vm::vec3::pos_x();
-  case 1:
-    return vm::vec3::pos_y();
-  default:
-    return vm::vec3::pos_z();
-  }
+vm::vec3 RotateObjectsToolPage::getAxis() const {
+    switch (m_axis->currentIndex()) {
+    case 0:return vm::vec3::pos_x();
+    case 1:return vm::vec3::pos_y();
+    default:return vm::vec3::pos_z();
+    }
 }
 } // namespace View
 } // namespace TrenchBroom

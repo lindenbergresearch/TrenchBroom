@@ -24,14 +24,11 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class MapDocument;
 
-namespace CompilationVariableNames
-{
+namespace CompilationVariableNames {
 extern const std::string WORK_DIR_PATH;
 extern const std::string MAP_DIR_PATH;
 extern const std::string MAP_BASE_NAME;
@@ -42,38 +39,29 @@ extern const std::string MODS;
 extern const std::string APP_DIR_PATH;
 } // namespace CompilationVariableNames
 
-class CommonVariables : public EL::VariableTable
-{
-protected:
-  explicit CommonVariables(std::shared_ptr<MapDocument> document);
+class CommonVariables : public EL::VariableTable {
+  protected:
+    explicit CommonVariables(std::shared_ptr<MapDocument> document);
 };
 
-
-class CommonCompilationVariables : public CommonVariables
-{
-protected:
-  explicit CommonCompilationVariables(std::shared_ptr<MapDocument> document);
+class CommonCompilationVariables : public CommonVariables {
+  protected:
+    explicit CommonCompilationVariables(std::shared_ptr<MapDocument> document);
 };
 
-
-class CompilationWorkDirVariables : public CommonCompilationVariables
-{
-public:
-  explicit CompilationWorkDirVariables(std::shared_ptr<MapDocument> document);
+class CompilationWorkDirVariables : public CommonCompilationVariables {
+  public:
+    explicit CompilationWorkDirVariables(std::shared_ptr<MapDocument> document);
 };
 
-
-class CompilationVariables : public CommonCompilationVariables
-{
-public:
-  CompilationVariables(std::shared_ptr<MapDocument> document, const std::string& workDir);
+class CompilationVariables : public CommonCompilationVariables {
+  public:
+    CompilationVariables(std::shared_ptr<MapDocument> document, const std::string &workDir);
 };
 
-
-class LaunchGameEngineVariables : public CommonVariables
-{
-public:
-  explicit LaunchGameEngineVariables(std::shared_ptr<MapDocument> document);
+class LaunchGameEngineVariables : public CommonVariables {
+  public:
+    explicit LaunchGameEngineVariables(std::shared_ptr<MapDocument> document);
 };
 } // namespace View
 } // namespace TrenchBroom

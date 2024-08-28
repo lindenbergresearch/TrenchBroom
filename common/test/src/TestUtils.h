@@ -52,8 +52,7 @@ bool UVListsEqual(const std::vector<vm::vec2f> &uvs, const std::vector<vm::vec2f
 
 namespace IO {
 
-template<typename FS>
-auto openFS(const std::filesystem::path &path) {
+template<typename FS> auto openFS(const std::filesystem::path &path) {
     return Disk::openFile(path).and_then([](auto file) { return createImageFileSystem<FS>(std::move(file)); }).value();
 }
 
@@ -146,10 +145,10 @@ int getComponentOfPixel(const Assets::Texture &texture, std::size_t x, std::size
 void checkColor(const Assets::Texture &texture, std::size_t x, std::size_t y, int r, int g, int b, int a, ColorMatch match = ColorMatch::Exact);
 
 class GlobMatcher : public Catch::MatcherBase<std::string> {
-private:
+  private:
     std::string m_glob;
 
-public:
+  public:
     explicit GlobMatcher(const std::string &glob);
 
     bool match(const std::string &value) const override;
@@ -164,13 +163,12 @@ GlobMatcher MatchesGlob(const std::string &glob);
  * ignoring order of the `std::vector`s, and checking equality of `vm::vec<T,S>`s with an
  * epsilon.
  */
-template<typename T, std::size_t S>
-class UnorderedApproxVecMatcher : public Catch::MatcherBase<std::vector<vm::vec<T, S>>> {
-private:
+template<typename T, std::size_t S> class UnorderedApproxVecMatcher : public Catch::MatcherBase<std::vector<vm::vec<T, S>>> {
+  private:
     std::vector<vm::vec<T, S>> m_expected;
     T m_epsilon;
 
-public:
+  public:
     explicit UnorderedApproxVecMatcher(const std::vector<vm::vec<T, S>> &expected, const T epsilon) : m_expected(expected), m_epsilon(epsilon) {
     }
 
@@ -179,7 +177,7 @@ public:
             return false;
         }
 
-        for (auto &actualElement: actual) {
+        for (auto &actualElement : actual) {
             bool foundMatch = false;
 
             for (size_t i = 0; i < m_expected.size(); ++i) {
@@ -210,8 +208,7 @@ public:
     }
 };
 
-template<typename T, std::size_t S>
-UnorderedApproxVecMatcher<T, S> UnorderedApproxVecMatches(const std::vector<vm::vec<T, S>> &actual, const T epsilon) {
+template<typename T, std::size_t S> UnorderedApproxVecMatcher<T, S> UnorderedApproxVecMatches(const std::vector<vm::vec<T, S>> &actual, const T epsilon) {
     return UnorderedApproxVecMatcher(actual, epsilon);
 }
 } // namespace TrenchBroom

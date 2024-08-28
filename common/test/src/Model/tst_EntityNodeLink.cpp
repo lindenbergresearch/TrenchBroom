@@ -157,9 +157,7 @@ world.defaultLayer()->
 addChild(targetNode2);
 
 sourceNode->
-setEntity(Entity(
-    {}, {{EntityPropertyKeys::Target + "1", "target_name1"}, {EntityPropertyKeys::Target + "2", "target_name2"}}
-)
+setEntity(Entity({}, {{EntityPropertyKeys::Target + "1", "target_name1"}, {EntityPropertyKeys::Target + "2", "target_name2"}})
 );
 
 // here we need to query for all entities having a numbered "target" property,

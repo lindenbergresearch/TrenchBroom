@@ -31,15 +31,13 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
-TEST_CASE_METHOD(ValveMapDocumentTest, "ClipToolTest")
-{
-  // https://github.com/TrenchBroom/TrenchBroom/issues/4461
-  SECTION("Clipped brushes get new link IDs")
-  {
-    const auto data = R"(// entity 0
+TEST_CASE_METHOD(ValveMapDocumentTest,
+"ClipToolTest") {
+// https://github.com/TrenchBroom/TrenchBroom/issues/4461
+SECTION("Clipped brushes get new link IDs") {
+const auto data = R"(// entity 0
 {
 "mapversion" "220"
 "wad" ""
@@ -55,77 +53,92 @@ TEST_CASE_METHOD(ValveMapDocumentTest, "ClipToolTest")
 }
 }
 )";
-    REQUIRE(document->paste(data) == PasteType::Node);
+REQUIRE(document
+->
+paste(data)
+== PasteType::Node);
 
-    const auto* defaultLayer = document->world()->defaultLayer();
+const auto *defaultLayer = document->world()->defaultLayer();
 
-    const auto* originalBrushNode =
-      dynamic_cast<const Model::BrushNode*>(defaultLayer->children().front());
-    REQUIRE(originalBrushNode);
+const auto *originalBrushNode = dynamic_cast<const Model::BrushNode *>(defaultLayer->children().front());
+REQUIRE(originalBrushNode);
 
-    const auto originalLinkId = originalBrushNode->linkId();
+const auto originalLinkId = originalBrushNode->linkId();
 
-    auto tool = ClipTool{document};
-    REQUIRE(tool.
+auto tool = ClipTool{document};
+REQUIRE(tool
+.
 
-            activate()
+activate()
 
-    );
+);
 
-    tool.addPoint(vm::vec3{0, 16, 16}, {});
-    tool.addPoint(vm::vec3{0, -16, 16}, {});
-    tool.addPoint(vm::vec3{0, -64, 0}, {});
-
-    REQUIRE(tool.
-
-            canClip()
-
-    );
-    tool.
-
-      toggleSide();
-
-    tool.
-
-      performClip();
-
-    REQUIRE(
-      defaultLayer->
-
-      childCount()
-
-      == 2);
-    const auto* clippedBrushNode1 =
-      dynamic_cast<const Model::BrushNode*>(defaultLayer->children().front());
-    const auto* clippedBrushNode2 =
-      dynamic_cast<const Model::BrushNode*>(defaultLayer->children().back());
-
-    REQUIRE(clippedBrushNode1);
-    REQUIRE(clippedBrushNode2);
-
-    CHECK(
-      clippedBrushNode1->
-
-      linkId()
-
-      != originalLinkId);
-    CHECK(
-      clippedBrushNode2->
-
-      linkId()
-
-      != originalLinkId);
-    CHECK(
-      clippedBrushNode1->
-
-      linkId()
-
-      != clippedBrushNode2->
-
-         linkId()
-
-    );
-  }
+tool.
+addPoint(vm::vec3{0, 16, 16},
+{
 }
+);
+tool.
+addPoint(vm::vec3{0, -16, 16},
+{
+});
+tool.
+addPoint(vm::vec3{0, -64, 0},
+{
+});
+
+REQUIRE(tool
+.
+
+canClip()
+
+);
+tool.
+
+toggleSide();
+
+tool.
+
+performClip();
+
+REQUIRE(
+    defaultLayer
+->
+
+childCount()
+
+== 2);
+const auto *clippedBrushNode1 = dynamic_cast<const Model::BrushNode *>(defaultLayer->children().front());
+const auto *clippedBrushNode2 = dynamic_cast<const Model::BrushNode *>(defaultLayer->children().back());
+
+REQUIRE(clippedBrushNode1);
+REQUIRE(clippedBrushNode2);
+
+CHECK(
+    clippedBrushNode1
+->
+
+linkId()
+
+!= originalLinkId);
+CHECK(
+    clippedBrushNode2
+->
+
+linkId()
+
+!= originalLinkId);
+CHECK(
+    clippedBrushNode1
+->
+
+linkId()
+
+!= clippedBrushNode2->
+
+linkId()
+
+);
+}}
 
 } // namespace TrenchBroom::View

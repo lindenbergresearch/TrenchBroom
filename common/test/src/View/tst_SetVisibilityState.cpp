@@ -45,7 +45,6 @@ document->addNodes( {{
 document->
 
 parentForNodes(),
-
 {
 nodeToHide
 }
@@ -61,16 +60,14 @@ hidden()
 AND_GIVEN("Another top level node that should be isolated")
 {
 using CreateNode = std::function<Model::Node *(const MapDocumentTest &)>;
-const auto createNode = GENERATE_COPY(
-    CreateNode{
-        [](const auto &test) {
-          auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
-          groupNode->addChild(test.createBrushNode());
-          return groupNode;
-        }}, CreateNode{[](const auto &) { return new Model::EntityNode{Model::Entity{}}; }}, CreateNode{
-        [](const auto &test) { return test.createBrushNode(); }}, CreateNode{
-        [](const auto &test) { return test.createPatchNode(); }}
-);
+const auto createNode = GENERATE_COPY(CreateNode{
+    [](const auto &test) {
+        auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
+        groupNode->addChild(test.createBrushNode());
+        return groupNode;
+    }}, CreateNode{[](const auto &) { return new Model::EntityNode{Model::Entity{}}; }}, CreateNode{
+    [](const auto &test) { return test.createBrushNode(); }}, CreateNode{
+    [](const auto &test) { return test.createPatchNode(); }});
 
 auto *nodeToIsolate = createNode(*this);
 document->addNodes({

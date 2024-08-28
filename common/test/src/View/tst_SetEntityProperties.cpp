@@ -45,9 +45,7 @@ TEST_CASE_METHOD(ValveMapDocumentTest,
 // ones
 m_pointEntityDef = new Assets::PointEntityDefinition("point_entity", Color(), vm::bbox3(16.0), "this is a point entity", {}, {});
 
-Assets::PointEntityDefinition *largeEntityDef = new Assets::PointEntityDefinition(
-    "large_entity", Color(), vm::bbox3(64.0), "this is a point entity", {}, {}
-);
+Assets::PointEntityDefinition *largeEntityDef = new Assets::PointEntityDefinition("large_entity", Color(), vm::bbox3(64.0), "this is a point entity", {}, {});
 document->
 setEntityDefinitions(std::vector<Assets::EntityDefinition *>{m_pointEntityDef, largeEntityDef}
 );
@@ -58,7 +56,6 @@ document->addNodes( {{
 document->
 
 parentForNodes(),
-
 {
 entityNode
 }
@@ -250,11 +247,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "some_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "some_key"
+})
 
 );
 
@@ -284,11 +279,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "some_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "some_key"
+})
 
 );
 
@@ -323,11 +316,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "some_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "some_key"
+})
 
 );
 }}
@@ -560,10 +551,8 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "another_value"}, {"yet_another_key", "yet_another_value"},
-    }
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "another_value"}, {"yet_another_key", "yet_another_value"},
+})
 
 );
 
@@ -577,10 +566,8 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"yet_another_key", "yet_another_value"},
-    }
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"yet_another_key", "yet_another_value"},
+})
 
 );
 CHECK_THAT(linkedEntityNode
@@ -590,10 +577,8 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "another_value"}, {"yet_another_key", "yet_another_value"},
-    }
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "another_value"}, {"yet_another_key", "yet_another_value"},
+})
 
 );
 }}
@@ -693,11 +678,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "some_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "some_key"
+})
 
 );
 REQUIRE_THAT(entityNode
@@ -707,9 +690,7 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_other_value"}, {"another_key", "another_value"}}
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_other_value"}, {"another_key", "another_value"}})
 
 );
 
@@ -720,11 +701,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "another_key", "yet_another_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "another_key", "yet_another_key"
+})
 
 );
 REQUIRE_THAT(linkedEntityNode
@@ -734,9 +713,7 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"another_key", "yet_another_value"}, {"yet_another_key", "and_yet_another_value"}}
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"another_key", "yet_another_value"}, {"yet_another_key", "and_yet_another_value"}})
 
 );
 
@@ -780,11 +757,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "some_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "some_key"
+})
 
 );
 CHECK_THAT(entityNode
@@ -794,9 +769,7 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_other_value"}, {"another_key", "another_value"}, {"yet_another_key", "and_yet_another_value"}}
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_other_value"}, {"another_key", "another_value"}, {"yet_another_key", "and_yet_another_value"}})
 
 );
 
@@ -817,9 +790,7 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"another_key", "another_value"}, {"yet_another_key", "and_yet_another_value"}}
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"another_key", "another_value"}, {"yet_another_key", "and_yet_another_value"}})
 
 );
 
@@ -838,11 +809,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "some_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "some_key"
+})
 
 );
 CHECK_THAT(entityNode
@@ -852,9 +821,7 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_other_value"}, {"another_key", "another_value"}}
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_other_value"}, {"another_key", "another_value"}})
 
 );
 
@@ -865,11 +832,9 @@ entity()
 
 .
 
-protectedProperties(), Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "another_key", "yet_another_key"
-    }
-)
+protectedProperties(), Catch::UnorderedEquals(std::vector<std::string>{
+    "another_key", "yet_another_key"
+})
 
 );
 CHECK_THAT(linkedEntityNode
@@ -879,9 +844,7 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"another_key", "yet_another_value"}, {"yet_another_key", "and_yet_another_value"}}
-)
+properties(), Catch::UnorderedEquals(std::vector<Model::EntityProperty>{{"some_key", "some_value"}, {"another_key", "yet_another_value"}, {"yet_another_key", "and_yet_another_value"}})
 
 );
 }

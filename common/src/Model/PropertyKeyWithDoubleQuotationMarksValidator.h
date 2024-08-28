@@ -23,18 +23,14 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class PropertyKeyWithDoubleQuotationMarksValidator : public Validator
-{
-public:
-  PropertyKeyWithDoubleQuotationMarksValidator();
+namespace TrenchBroom {
+namespace Model {
+class PropertyKeyWithDoubleQuotationMarksValidator : public Validator {
+  public:
+    PropertyKeyWithDoubleQuotationMarksValidator();
 
-private:
-  void doValidate(EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues)
-    const override;
+  private:
+    void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

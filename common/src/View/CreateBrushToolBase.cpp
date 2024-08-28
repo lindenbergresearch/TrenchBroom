@@ -28,90 +28,71 @@
 
 #include <kdl/memory_utils.h>
 
-namespace TrenchBroom
-{
-namespace View
-{
-CreateBrushToolBase::CreateBrushToolBase(
-  const bool initiallyActive, std::weak_ptr<MapDocument> document)
-  : Tool(initiallyActive)
-  , m_document(document)
-  , m_brush(nullptr)
-  , m_brushRenderer(new Renderer::BrushRenderer())
-{
+namespace TrenchBroom {
+namespace View {
+CreateBrushToolBase::CreateBrushToolBase(const bool initiallyActive, std::weak_ptr<MapDocument> document)
+    : Tool(initiallyActive), m_document(document), m_brush(nullptr), m_brushRenderer(new Renderer::BrushRenderer()) {
 }
 
-CreateBrushToolBase::~CreateBrushToolBase()
-{
-  delete m_brushRenderer;
-  delete m_brush;
+CreateBrushToolBase::~CreateBrushToolBase() {
+    delete m_brushRenderer;
+    delete m_brush;
 }
 
-const Grid& CreateBrushToolBase::grid() const
-{
-  return kdl::mem_lock(m_document)->grid();
+const Grid &CreateBrushToolBase::grid() const {
+    return kdl::mem_lock(m_document)->grid();
 }
 
-void CreateBrushToolBase::createBrush()
-{
-  if (m_brush != nullptr)
-  {
-    auto document = kdl::mem_lock(m_document);
+void CreateBrushToolBase::createBrush() {
+    if (m_brush != nullptr) {
+        auto document = kdl::mem_lock(m_document);
 
-    auto transaction = Transaction{document, "Create Brush"};
-    document->deselectAll();
-    document->addNodes({{document->parentForNodes(), {m_brush}}});
-    document->selectNodes({m_brush});
-    transaction.commit();
+        auto transaction = Transaction{document, "Create Brush"};
+        document->deselectAll();
+        document->addNodes({{document->parentForNodes(), {m_brush}}});
+        document->selectNodes({m_brush});
+        transaction.commit();
 
+        m_brush = nullptr;
+        doBrushWasCreated();
+    }
+}
+
+void CreateBrushToolBase::cancel() {
+    delete m_brush;
     m_brush = nullptr;
-    doBrushWasCreated();
-  }
 }
 
-void CreateBrushToolBase::cancel()
-{
-  delete m_brush;
-  m_brush = nullptr;
+void CreateBrushToolBase::render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    if (m_brush != nullptr) {
+        renderBrush(renderContext, renderBatch);
+    }
 }
 
-void CreateBrushToolBase::render(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
-  if (m_brush != nullptr)
-  {
-    renderBrush(renderContext, renderBatch);
-  }
+void CreateBrushToolBase::renderBrush(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    ensure(m_brush != nullptr, "brush is null");
+
+    m_brushRenderer->setFaceColor(pref(Preferences::FaceColor));
+    m_brushRenderer->setEdgeColor(pref(Preferences::SelectedEdgeColor));
+    m_brushRenderer->setShowEdges(true);
+    m_brushRenderer->setShowOccludedEdges(true);
+    m_brushRenderer->setOccludedEdgeColor(Color(pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
+    m_brushRenderer->setTint(true);
+    m_brushRenderer->setTintColor(pref(Preferences::SelectedFaceColor));
+    m_brushRenderer->setForceTransparent(true);
+    m_brushRenderer->setTransparencyAlpha(0.7f);
+
+    m_brushRenderer->clear();
+    m_brushRenderer->addBrush(m_brush);
+    m_brushRenderer->render(renderContext, renderBatch);
+
+    Renderer::SelectionBoundsRenderer boundsRenderer(m_brush->logicalBounds());
+    boundsRenderer.render(renderContext, renderBatch);
 }
 
-void CreateBrushToolBase::renderBrush(
-  Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch)
-{
-  ensure(m_brush != nullptr, "brush is null");
-
-  m_brushRenderer->setFaceColor(pref(Preferences::FaceColor));
-  m_brushRenderer->setEdgeColor(pref(Preferences::SelectedEdgeColor));
-  m_brushRenderer->setShowEdges(true);
-  m_brushRenderer->setShowOccludedEdges(true);
-  m_brushRenderer->setOccludedEdgeColor(Color(
-    pref(Preferences::SelectedEdgeColor), pref(Preferences::OccludedSelectedEdgeAlpha)));
-  m_brushRenderer->setTint(true);
-  m_brushRenderer->setTintColor(pref(Preferences::SelectedFaceColor));
-  m_brushRenderer->setForceTransparent(true);
-  m_brushRenderer->setTransparencyAlpha(0.7f);
-
-  m_brushRenderer->clear();
-  m_brushRenderer->addBrush(m_brush);
-  m_brushRenderer->render(renderContext, renderBatch);
-
-  Renderer::SelectionBoundsRenderer boundsRenderer(m_brush->logicalBounds());
-  boundsRenderer.render(renderContext, renderBatch);
-}
-
-void CreateBrushToolBase::updateBrush(Model::BrushNode* brush)
-{
-  delete m_brush;
-  m_brush = brush;
+void CreateBrushToolBase::updateBrush(Model::BrushNode *brush) {
+    delete m_brush;
+    m_brush = brush;
 }
 
 void CreateBrushToolBase::doBrushWasCreated() {}

@@ -31,8 +31,8 @@
 namespace TrenchBroom {
 namespace Assets {
 static ModelDefinition makeModelDefinition(const std::string &expression) {
-  auto parser = IO::ELParser{IO::ELParser::Mode::Strict, expression};
-  return ModelDefinition{parser.parse()};
+    auto parser = IO::ELParser{IO::ELParser::Mode::Strict, expression};
+    return ModelDefinition{parser.parse()};
 }
 
 TEST_CASE("ModelDefinitionTest.append") {
@@ -62,38 +62,35 @@ TEST_CASE("ModelDefinitionTest.modelSpecification")
 using T = std::tuple<std::string, std::map<std::string, EL::Value>, ModelSpecification>;
 
 // clang-format off
-const auto [expression, variables, expectedModelSpecification] = GENERATE(
-    values<T>(
-        {{R"("maps/b_shell0.bsp")", {}, {"maps/b_shell0.bsp", 0, 0}}, {R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2 })", {}, {"maps/b_shell0.bsp", 1, 2}},
+const auto [expression, variables, expectedModelSpecification] = GENERATE(values<T>({{R"("maps/b_shell0.bsp")", {}, {"maps/b_shell0.bsp", 0, 0}}, {R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2 })", {}, {"maps/b_shell0.bsp", 1, 2}},
 
-         {
-             R"({{
+                                                                                     {
+                                                                                         R"({{
       spawnflags == 1 -> "maps/b_shell0.bsp",
                           "maps/b_shell1.bsp"
   }})", {}, {"maps/b_shell1.bsp", 0, 0}},
 
-         {
-             R"({{
+                                                                                     {
+                                                                                         R"({{
       spawnflags == 1 -> "maps/b_shell0.bsp",
                           "maps/b_shell1.bsp"
   }})", {{
-                          "spawnflags", EL::Value{
-                 1
-             }}}, {"maps/b_shell0.bsp", 0, 0}},
+                                                                                                      "spawnflags", EL::Value{
+                                                                                             1
+                                                                                         }}}, {"maps/b_shell0.bsp", 0, 0}},
 
-         {
-             R"({path: model, skin: skin, frame: frame})", {{
-                                                                "model", EL::Value{
-                 "maps/b_shell0.bsp"
-             }}, {
-                                                                "skin", EL::Value{
-                 1
-             }}, {
-                                                                "frame", EL::Value{
-                 2
-             }}}, {"maps/b_shell0.bsp", 1, 2}},
-        }
-    ));
+                                                                                     {
+                                                                                         R"({path: model, skin: skin, frame: frame})", {{
+                                                                                                                                            "model", EL::Value{
+                                                                                             "maps/b_shell0.bsp"
+                                                                                         }}, {
+                                                                                                                                            "skin", EL::Value{
+                                                                                             1
+                                                                                         }}, {
+                                                                                                                                            "frame", EL::Value{
+                                                                                             2
+                                                                                         }}}, {"maps/b_shell0.bsp", 1, 2}},
+                                                                                    }));
 // clang-format on
 
 CAPTURE(expression, variables
@@ -111,19 +108,16 @@ TEST_CASE("ModelDefinitionTest.defaultModelSpecification")
 using T = std::tuple<std::string, ModelSpecification>;
 
 // clang-format off
-const auto [expression, expectedModelSpecification] = GENERATE(
-    values<T>(
-        {{R"("maps/b_shell0.bsp")", {"maps/b_shell0.bsp", 0, 0}}, {R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2 })", {"maps/b_shell0.bsp", 1, 2}},
+const auto [expression, expectedModelSpecification] = GENERATE(values<T>({{R"("maps/b_shell0.bsp")", {"maps/b_shell0.bsp", 0, 0}}, {R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2 })", {"maps/b_shell0.bsp", 1, 2}},
 
-         {
-             R"({{
+                                                                          {
+                                                                              R"({{
       spawnflags == 1 -> "maps/b_shell0.bsp",
                           "maps/b_shell1.bsp"
   }})", {"maps/b_shell1.bsp", 0, 0}},
 
-         {R"({path: model, skin: skin, frame: frame})", {}},
-        }
-    ));
+                                                                          {R"({path: model, skin: skin, frame: frame})", {}},
+                                                                         }));
 // clang-format on
 
 CAPTURE(expression);
@@ -142,41 +136,38 @@ TEST_CASE("ModelDefinitionTest.scale")
 using T = std::tuple<std::string, std::optional<std::string>, vm::vec3>;
 
 // clang-format off
-const auto [expression, globalScaleExpressionStr, expectedScale] = GENERATE(
-    values<T>(
-        {{
-             R"("maps/b_shell0.bsp")", std::nullopt, vm::vec3{
-                1, 1, 1
-            }}, {
-             R"("maps/b_shell0.bsp")", R"(2)", vm::vec3{
-                2, 2, 2
-            }}, {
-             R"("maps/b_shell0.bsp")", R"(modelscale)", vm::vec3{
-                4, 4, 4
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: 1.5 })", std::nullopt, vm::vec3{
-                1.5, 1.5, 1.5
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: 1.5 })", R"(modelscale)", vm::vec3{
-                1.5, 1.5, 1.5
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: '1.5' })", std::nullopt, vm::vec3{
-                1.5, 1.5, 1.5
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: '1 2 3' })", std::nullopt, vm::vec3{
-                1, 2, 3
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: modelscale })", std::nullopt, vm::vec3{
-                4, 4, 4
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: [modelscale, modelscale_vec] })", std::nullopt, vm::vec3{
-                4, 4, 4
-            }}, {
-             R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: [modelscale_vec, modelscale] })", std::nullopt, vm::vec3{
-                5, 6, 7
-            }},
-        }
-    ));
+const auto [expression, globalScaleExpressionStr, expectedScale] = GENERATE(values<T>({{
+                                                                                           R"("maps/b_shell0.bsp")", std::nullopt, vm::vec3{
+        1, 1, 1
+    }}, {
+                                                                                           R"("maps/b_shell0.bsp")", R"(2)", vm::vec3{
+        2, 2, 2
+    }}, {
+                                                                                           R"("maps/b_shell0.bsp")", R"(modelscale)", vm::vec3{
+        4, 4, 4
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: 1.5 })", std::nullopt, vm::vec3{
+        1.5, 1.5, 1.5
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: 1.5 })", R"(modelscale)", vm::vec3{
+        1.5, 1.5, 1.5
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: '1.5' })", std::nullopt, vm::vec3{
+        1.5, 1.5, 1.5
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: '1 2 3' })", std::nullopt, vm::vec3{
+        1, 2, 3
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: modelscale })", std::nullopt, vm::vec3{
+        4, 4, 4
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: [modelscale, modelscale_vec] })", std::nullopt, vm::vec3{
+        4, 4, 4
+    }}, {
+                                                                                           R"({ path: "maps/b_shell0.bsp", skin: 1, frame: 2, scale: [modelscale_vec, modelscale] })", std::nullopt, vm::vec3{
+        5, 6, 7
+    }},
+                                                                                      }));
 // clang-format on
 
 CAPTURE(expression, globalScaleExpressionStr

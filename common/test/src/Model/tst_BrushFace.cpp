@@ -56,7 +56,7 @@ namespace Model {
 TEST_CASE("BrushFaceTest.constructWithValidPoints") {
 const vm::vec3 p0(0.0, 0.0, 4.0);
 const vm::vec3 p1(1.0, 0.0, 4.0);
-const vm::vec3 p2(0.0, - 1.0, 4.0);
+const vm::vec3 p2(0.0, -1.0, 4.0);
 
 const BrushFaceAttributes attribs("");
 BrushFace face = BrushFace::create(p0, p1, p2, attribs, std::make_unique<ParaxialTexCoordSystem>(p0, p1, p2, attribs)).value();
@@ -120,7 +120,7 @@ TEST_CASE("BrushFaceTest.textureUsageCount")
 {
 const vm::vec3 p0(0.0, 0.0, 4.0);
 const vm::vec3 p1(1.0, 0.0, 4.0);
-const vm::vec3 p2(0.0, - 1.0, 4.0);
+const vm::vec3 p2(0.0, -1.0, 4.0);
 Assets::Texture texture("testTexture", 64, 64);
 Assets::Texture texture2("testTexture2", 64, 64);
 
@@ -229,7 +229,7 @@ TEST_CASE("BrushFaceTest.projectedArea")
 const auto worldBounds = vm::bbox3{8192.0};
 const auto builder = BrushBuilder{MapFormat::Standard, worldBounds};
 
-auto brush = builder.createCuboid(vm::bbox3(vm::vec3(- 64, - 64, - 64), vm::vec3(64, 64, 64)), "texture").value();
+auto brush = builder.createCuboid(vm::bbox3(vm::vec3(-64, -64, -64), vm::vec3(64, 64, 64)), "texture").value();
 REQUIRE(brush
 .
 transform(worldBounds, vm::rotation_matrix(0.0, 0.0, vm::to_radians(45.0)),
@@ -277,36 +277,36 @@ projectedArea(vm::axis::z)
 }
 
 static void getFaceVertsAndTexCoords(const BrushFace &face, std::vector<vm::vec3> *vertPositions, std::vector<vm::vec2f> *vertTexCoords) {
-  for (const auto *vertex : face.vertices()) {
-    vertPositions->push_back(vertex->position());
-    if (vertTexCoords != nullptr) {
-      vertTexCoords->push_back(face.textureCoords(vm::vec3(vertex->position())));
+    for (const auto *vertex : face.vertices()) {
+        vertPositions->push_back(vertex->position());
+        if (vertTexCoords != nullptr) {
+            vertTexCoords->push_back(face.textureCoords(vm::vec3(vertex->position())));
+        }
     }
-  }
 }
 
 static void resetFaceTextureAlignment(BrushFace &face) {
-  BrushFaceAttributes attributes = face.attributes();
-  attributes.setXOffset(0.0);
-  attributes.setYOffset(0.0);
-  attributes.setRotation(0.0);
-  attributes.setXScale(1.0);
-  attributes.setYScale(1.0);
+    BrushFaceAttributes attributes = face.attributes();
+    attributes.setXOffset(0.0);
+    attributes.setYOffset(0.0);
+    attributes.setRotation(0.0);
+    attributes.setXScale(1.0);
+    attributes.setYScale(1.0);
 
-  face.setAttributes(attributes);
-  face.resetTextureAxes();
+    face.setAttributes(attributes);
+    face.resetTextureAxes();
 }
 
 /**
  * Assumes the UV's have been divided by the texture size.
  */
 static void checkUVListsEqual(const std::vector<vm::vec2f> &uvs, const std::vector<vm::vec2f> &transformedVertUVs, const BrushFace &face) {
-  // We require a texture, so that face.textureSize() returns a correct value and not 1x1,
-  // and so face.textureCoords() returns UV's that are divided by the texture size.
-  // Otherwise, the UV comparisons below could spuriously pass.
-  REQUIRE(face.texture() != nullptr);
+    // We require a texture, so that face.textureSize() returns a correct value and not 1x1,
+    // and so face.textureCoords() returns UV's that are divided by the texture size.
+    // Otherwise, the UV comparisons below could spuriously pass.
+    REQUIRE(face.texture() != nullptr);
 
-  CHECK(UVListsEqual(uvs, transformedVertUVs));
+    CHECK(UVListsEqual(uvs, transformedVertUVs));
 }
 
 /**
@@ -317,62 +317,62 @@ static void checkUVListsEqual(const std::vector<vm::vec2f> &uvs, const std::vect
  */
 static void checkTextureLockOffWithTransform(const vm::mat4x4 &transform, const BrushFace &origFace) {
 
-  // reset alignment, transform the face (texture lock off)
-  BrushFace face = origFace;
-  resetFaceTextureAlignment(face);
-  REQUIRE(face.transform(transform, false).is_success());
-  face.resetTexCoordSystemCache();
+    // reset alignment, transform the face (texture lock off)
+    BrushFace face = origFace;
+    resetFaceTextureAlignment(face);
+    REQUIRE(face.transform(transform, false).is_success());
+    face.resetTexCoordSystemCache();
 
-  // reset alignment, transform the face (texture lock off), then reset the alignment
-  // again
-  BrushFace resetFace = origFace;
-  resetFaceTextureAlignment(resetFace);
-  REQUIRE(resetFace.transform(transform, false).is_success());
-  resetFaceTextureAlignment(resetFace);
+    // reset alignment, transform the face (texture lock off), then reset the alignment
+    // again
+    BrushFace resetFace = origFace;
+    resetFaceTextureAlignment(resetFace);
+    REQUIRE(resetFace.transform(transform, false).is_success());
+    resetFaceTextureAlignment(resetFace);
 
-  // UVs of the verts of `face` and `resetFace` should be the same now
+    // UVs of the verts of `face` and `resetFace` should be the same now
 
-  std::vector<vm::vec3> verts;
-  getFaceVertsAndTexCoords(origFace, &verts, nullptr);
+    std::vector<vm::vec3> verts;
+    getFaceVertsAndTexCoords(origFace, &verts, nullptr);
 
-  // transform the verts
-  std::vector<vm::vec3> transformedVerts;
-  for (size_t i = 0; i < verts.size(); i ++) {
-    transformedVerts.push_back(transform * verts[i]);
-  }
+    // transform the verts
+    std::vector<vm::vec3> transformedVerts;
+    for (size_t i = 0; i < verts.size(); i++) {
+        transformedVerts.push_back(transform * verts[i]);
+    }
 
-  // get UV of each transformed vert using `face` and `resetFace`
-  std::vector<vm::vec2f> face_UVs, resetFace_UVs;
-  for (size_t i = 0; i < verts.size(); i ++) {
-    face_UVs.push_back(face.textureCoords(transformedVerts[i]));
-    resetFace_UVs.push_back(resetFace.textureCoords(transformedVerts[i]));
-  }
+    // get UV of each transformed vert using `face` and `resetFace`
+    std::vector<vm::vec2f> face_UVs, resetFace_UVs;
+    for (size_t i = 0; i < verts.size(); i++) {
+        face_UVs.push_back(face.textureCoords(transformedVerts[i]));
+        resetFace_UVs.push_back(resetFace.textureCoords(transformedVerts[i]));
+    }
 
-  checkUVListsEqual(face_UVs, resetFace_UVs, face);
+    checkUVListsEqual(face_UVs, resetFace_UVs, face);
 }
 
 static void checkFaceUVsEqual(const BrushFace &face, const BrushFace &other) {
-  std::vector<vm::vec3> verts;
-  std::vector<vm::vec2f> faceUVs;
-  std::vector<vm::vec2f> otherFaceUVs;
+    std::vector<vm::vec3> verts;
+    std::vector<vm::vec2f> faceUVs;
+    std::vector<vm::vec2f> otherFaceUVs;
 
-  for (const auto *vertex : face.vertices()) {
-    verts.push_back(vertex->position());
+    for (const auto *vertex : face.vertices()) {
+        verts.push_back(vertex->position());
 
-    const vm::vec3 position(vertex->position());
-    faceUVs.push_back(face.textureCoords(position));
-    otherFaceUVs.push_back(other.textureCoords(position));
-  }
+        const vm::vec3 position(vertex->position());
+        faceUVs.push_back(face.textureCoords(position));
+        otherFaceUVs.push_back(other.textureCoords(position));
+    }
 
-  checkUVListsEqual(faceUVs, otherFaceUVs, face);
+    checkUVListsEqual(faceUVs, otherFaceUVs, face);
 }
 
 static void checkBrushUVsEqual(const Brush &brush, const Brush &other) {
-  assert(brush.faceCount() == other.faceCount());
+    assert(brush.faceCount() == other.faceCount());
 
-  for (size_t i = 0; i < brush.faceCount(); ++ i) {
-    checkFaceUVsEqual(brush.face(i), other.face(i));
-  }
+    for (size_t i = 0; i < brush.faceCount(); ++i) {
+        checkFaceUVsEqual(brush.face(i), other.face(i));
+    }
 }
 
 /**
@@ -383,38 +383,38 @@ static void checkBrushUVsEqual(const Brush &brush, const Brush &other) {
  * i.e. checks that texture lock worked.
  */
 static void checkTextureLockOnWithTransform(const vm::mat4x4 &transform, const BrushFace &origFace) {
-  std::vector<vm::vec3> verts;
-  std::vector<vm::vec2f> uvs;
-  getFaceVertsAndTexCoords(origFace, &verts, &uvs);
-  CHECK(verts.size() >= 3u);
+    std::vector<vm::vec3> verts;
+    std::vector<vm::vec2f> uvs;
+    getFaceVertsAndTexCoords(origFace, &verts, &uvs);
+    CHECK(verts.size() >= 3u);
 
-  // transform the face
-  BrushFace face = origFace;
-  REQUIRE(face.transform(transform, true).is_success());
-  face.resetTexCoordSystemCache();
+    // transform the face
+    BrushFace face = origFace;
+    REQUIRE(face.transform(transform, true).is_success());
+    face.resetTexCoordSystemCache();
 
-  // transform the verts
-  std::vector<vm::vec3> transformedVerts;
-  for (size_t i = 0; i < verts.size(); i ++) {
-    transformedVerts.push_back(transform * verts[i]);
-  }
+    // transform the verts
+    std::vector<vm::vec3> transformedVerts;
+    for (size_t i = 0; i < verts.size(); i++) {
+        transformedVerts.push_back(transform * verts[i]);
+    }
 
-  // ask the transformed face for the UVs at the transformed verts
-  std::vector<vm::vec2f> transformedVertUVs;
-  for (size_t i = 0; i < verts.size(); i ++) {
-    transformedVertUVs.push_back(face.textureCoords(transformedVerts[i]));
-  }
+    // ask the transformed face for the UVs at the transformed verts
+    std::vector<vm::vec2f> transformedVertUVs;
+    for (size_t i = 0; i < verts.size(); i++) {
+        transformedVertUVs.push_back(face.textureCoords(transformedVerts[i]));
+    }
 
 #if 0
-  printf("transformed face attribs: scale %f %f, rotation %f, offset %f %f\n",
-         face.attributes().scale().x(),
-         face.attributes().scale().y(),
-         face.attributes().rotation(),
-         face.attributes().offset().x(),
-         face.attributes().offset().y());
+    printf("transformed face attribs: scale %f %f, rotation %f, offset %f %f\n",
+           face.attributes().scale().x(),
+           face.attributes().scale().y(),
+           face.attributes().rotation(),
+           face.attributes().offset().x(),
+           face.attributes().offset().y());
 #endif
 
-  checkUVListsEqual(uvs, transformedVertUVs, face);
+    checkUVListsEqual(uvs, transformedVertUVs, face);
 }
 
 /**
@@ -423,43 +423,43 @@ static void checkTextureLockOnWithTransform(const vm::mat4x4 &transform, const B
  * stable after these transformations.
  */
 template<class L> static void doWithTranslationAnd90DegreeRotations(L &&lambda) {
-  for (int i = 0; i < (1 << 7); i ++) {
-    vm::mat4x4 xform;
+    for (int i = 0; i < (1 << 7); i++) {
+        vm::mat4x4 xform;
 
-    const bool translate = (i & (1 << 0)) != 0;
+        const bool translate = (i & (1 << 0)) != 0;
 
-    const bool rollMinus180 = (i & (1 << 1)) != 0;
-    const bool pitchMinus180 = (i & (1 << 2)) != 0;
-    const bool yawMinus180 = (i & (1 << 3)) != 0;
+        const bool rollMinus180 = (i & (1 << 1)) != 0;
+        const bool pitchMinus180 = (i & (1 << 2)) != 0;
+        const bool yawMinus180 = (i & (1 << 3)) != 0;
 
-    const bool rollPlus90 = (i & (1 << 4)) != 0;
-    const bool pitchPlus90 = (i & (1 << 5)) != 0;
-    const bool yawPlus90 = (i & (1 << 6)) != 0;
+        const bool rollPlus90 = (i & (1 << 4)) != 0;
+        const bool pitchPlus90 = (i & (1 << 5)) != 0;
+        const bool yawPlus90 = (i & (1 << 6)) != 0;
 
-    // translations
+        // translations
 
-    if (translate) {
-      xform = vm::translation_matrix(vm::vec3(100.0, 100.0, 100.0)) * xform;
+        if (translate) {
+            xform = vm::translation_matrix(vm::vec3(100.0, 100.0, 100.0)) * xform;
+        }
+
+        // -180 / -90 / 90 degree rotations
+
+        if (rollMinus180)
+            xform = vm::rotation_matrix(vm::to_radians(-180.0), 0.0, 0.0) * xform;
+        if (pitchMinus180)
+            xform = vm::rotation_matrix(0.0, vm::to_radians(-180.0), 0.0) * xform;
+        if (yawMinus180)
+            xform = vm::rotation_matrix(0.0, 0.0, vm::to_radians(-180.0)) * xform;
+
+        if (rollPlus90)
+            xform = vm::rotation_matrix(vm::to_radians(90.0), 0.0, 0.0) * xform;
+        if (pitchPlus90)
+            xform = vm::rotation_matrix(0.0, vm::to_radians(90.0), 0.0) * xform;
+        if (yawPlus90)
+            xform = vm::rotation_matrix(0.0, 0.0, vm::to_radians(90.0)) * xform;
+
+        lambda(xform);
     }
-
-    // -180 / -90 / 90 degree rotations
-
-    if (rollMinus180)
-      xform = vm::rotation_matrix(vm::to_radians(- 180.0), 0.0, 0.0) * xform;
-    if (pitchMinus180)
-      xform = vm::rotation_matrix(0.0, vm::to_radians(- 180.0), 0.0) * xform;
-    if (yawMinus180)
-      xform = vm::rotation_matrix(0.0, 0.0, vm::to_radians(- 180.0)) * xform;
-
-    if (rollPlus90)
-      xform = vm::rotation_matrix(vm::to_radians(90.0), 0.0, 0.0) * xform;
-    if (pitchPlus90)
-      xform = vm::rotation_matrix(0.0, vm::to_radians(90.0), 0.0) * xform;
-    if (yawPlus90)
-      xform = vm::rotation_matrix(0.0, 0.0, vm::to_radians(90.0)) * xform;
-
-    lambda(xform);
-  }
 }
 
 /**
@@ -467,27 +467,27 @@ template<class L> static void doWithTranslationAnd90DegreeRotations(L &&lambda) 
  * in each axis alone, as well as in all combinations of axes.
  */
 template<class L> static void doMultiAxisRotations(const double degrees, L &&lambda) {
-  const double rotateRadians = vm::to_radians(degrees);
+    const double rotateRadians = vm::to_radians(degrees);
 
-  for (int i = 0; i < (1 << 3); i ++) {
-    vm::mat4x4 xform;
+    for (int i = 0; i < (1 << 3); i++) {
+        vm::mat4x4 xform;
 
-    const bool testRoll = (i & (1 << 0)) != 0;
-    const bool testPitch = (i & (1 << 1)) != 0;
-    const bool testYaw = (i & (1 << 2)) != 0;
+        const bool testRoll = (i & (1 << 0)) != 0;
+        const bool testPitch = (i & (1 << 1)) != 0;
+        const bool testYaw = (i & (1 << 2)) != 0;
 
-    if (testRoll) {
-      xform = vm::rotation_matrix(rotateRadians, 0.0, 0.0) * xform;
+        if (testRoll) {
+            xform = vm::rotation_matrix(rotateRadians, 0.0, 0.0) * xform;
+        }
+        if (testPitch) {
+            xform = vm::rotation_matrix(0.0, rotateRadians, 0.0) * xform;
+        }
+        if (testYaw) {
+            xform = vm::rotation_matrix(0.0, 0.0, rotateRadians) * xform;
+        }
+
+        lambda(xform);
     }
-    if (testPitch) {
-      xform = vm::rotation_matrix(0.0, rotateRadians, 0.0) * xform;
-    }
-    if (testYaw) {
-      xform = vm::rotation_matrix(0.0, 0.0, rotateRadians) * xform;
-    }
-
-    lambda(xform);
-  }
 }
 
 /**
@@ -495,72 +495,70 @@ template<class L> static void doMultiAxisRotations(const double degrees, L &&lam
  * rotations of the given angle in degrees in +/- pitch, yaw, and roll.
  */
 template<class L> static void doWithSingleAxisRotations(const double degrees, L &&lambda) {
-  const double rotateRadians = vm::to_radians(degrees);
+    const double rotateRadians = vm::to_radians(degrees);
 
-  for (int i = 0; i < 6; i ++) {
-    vm::mat4x4 xform;
+    for (int i = 0; i < 6; i++) {
+        vm::mat4x4 xform;
 
-    switch (i) {
-    case 0:xform = vm::rotation_matrix(rotateRadians, 0.0, 0.0) * xform;
-      break;
-    case 1:xform = vm::rotation_matrix(- rotateRadians, 0.0, 0.0) * xform;
-      break;
-    case 2:xform = vm::rotation_matrix(0.0, rotateRadians, 0.0) * xform;
-      break;
-    case 3:xform = vm::rotation_matrix(0.0, - rotateRadians, 0.0) * xform;
-      break;
-    case 4:xform = vm::rotation_matrix(0.0, 0.0, rotateRadians) * xform;
-      break;
-    case 5:xform = vm::rotation_matrix(0.0, 0.0, - rotateRadians) * xform;
-      break;
+        switch (i) {
+        case 0:xform = vm::rotation_matrix(rotateRadians, 0.0, 0.0) * xform;
+            break;
+        case 1:xform = vm::rotation_matrix(-rotateRadians, 0.0, 0.0) * xform;
+            break;
+        case 2:xform = vm::rotation_matrix(0.0, rotateRadians, 0.0) * xform;
+            break;
+        case 3:xform = vm::rotation_matrix(0.0, -rotateRadians, 0.0) * xform;
+            break;
+        case 4:xform = vm::rotation_matrix(0.0, 0.0, rotateRadians) * xform;
+            break;
+        case 5:xform = vm::rotation_matrix(0.0, 0.0, -rotateRadians) * xform;
+            break;
+        }
+
+        lambda(xform);
     }
-
-    lambda(xform);
-  }
 }
 
 static void checkTextureLockOffWithTranslation(const BrushFace &origFace) {
-  vm::mat4x4 xform = vm::translation_matrix(vm::vec3(100.0, 100.0, 100.0));
-  checkTextureLockOffWithTransform(xform, origFace);
+    vm::mat4x4 xform = vm::translation_matrix(vm::vec3(100.0, 100.0, 100.0));
+    checkTextureLockOffWithTransform(xform, origFace);
 }
 
 template<class L> static void doWithScale(const vm::vec3 &scaleFactors, L &&lambda) {
-  vm::mat4x4 xform = vm::scaling_matrix(scaleFactors);
-  lambda(xform);
+    vm::mat4x4 xform = vm::scaling_matrix(scaleFactors);
+    lambda(xform);
 }
 
 template<class L> static void doWithShear(L &&lambda) {
-  // shear the x axis towards the y axis
-  vm::mat4x4 xform = vm::shear_matrix(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  lambda(xform);
+    // shear the x axis towards the y axis
+    vm::mat4x4 xform = vm::shear_matrix(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    lambda(xform);
 }
 
 template<class L> static void doWithTextureLockTestTransforms(const bool doParallelTests, L &&lambda) {
-  doWithTranslationAnd90DegreeRotations(lambda);
-  doWithSingleAxisRotations(30, lambda);
-  doWithSingleAxisRotations(45, lambda);
+    doWithTranslationAnd90DegreeRotations(lambda);
+    doWithSingleAxisRotations(30, lambda);
+    doWithSingleAxisRotations(45, lambda);
 
-  // rotation on multiple axes simultaneously is only expected to work on
-  // ParallelTexCoordSystem
-  if (doParallelTests) {
-    doMultiAxisRotations(30.0, lambda);
-    doMultiAxisRotations(45.0, lambda);
+    // rotation on multiple axes simultaneously is only expected to work on
+    // ParallelTexCoordSystem
+    if (doParallelTests) {
+        doMultiAxisRotations(30.0, lambda);
+        doMultiAxisRotations(45.0, lambda);
 
-    doWithShear(lambda);
-  }
+        doWithShear(lambda);
+    }
 
-  doWithScale(vm::vec3(2, 2, 1), lambda);
-  doWithScale(vm::vec3(2, 2, - 1), lambda);
+    doWithScale(vm::vec3(2, 2, 1), lambda);
+    doWithScale(vm::vec3(2, 2, -1), lambda);
 }
 
 static void checkTextureLockForFace(const BrushFace &origFace, const bool doParallelTests) {
-  doWithTextureLockTestTransforms(
-      doParallelTests, [&](const vm::mat4x4 &xform) {
+    doWithTextureLockTestTransforms(doParallelTests, [&](const vm::mat4x4 &xform) {
         checkTextureLockOnWithTransform(xform, origFace);
-      }
-  );
+    });
 
-  checkTextureLockOffWithTranslation(origFace);
+    checkTextureLockOffWithTranslation(origFace);
 }
 
 /**
@@ -568,58 +566,58 @@ static void checkTextureLockForFace(const BrushFace &origFace, const bool doPara
  * texturing when texture lock is off.
  */
 static void checkTextureLockOffWithVerticalFlip(const Brush &cube) {
-  const vm::mat4x4 transform = vm::mirror_matrix<double>(vm::axis::z);
-  const auto origFaceIndex = cube.findFace(vm::vec3::pos_x());
-  REQUIRE(origFaceIndex);
-  const BrushFace &origFace = cube.face(*origFaceIndex);
+    const vm::mat4x4 transform = vm::mirror_matrix<double>(vm::axis::z);
+    const auto origFaceIndex = cube.findFace(vm::vec3::pos_x());
+    REQUIRE(origFaceIndex);
+    const BrushFace &origFace = cube.face(*origFaceIndex);
 
-  // transform the face (texture lock off)
-  BrushFace face = origFace;
-  REQUIRE(face.transform(transform, false).is_success());
-  face.resetTexCoordSystemCache();
+    // transform the face (texture lock off)
+    BrushFace face = origFace;
+    REQUIRE(face.transform(transform, false).is_success());
+    face.resetTexCoordSystemCache();
 
-  // UVs of the verts of `face` and `origFace` should be the same now
+    // UVs of the verts of `face` and `origFace` should be the same now
 
-  // get UV of each vert using `face` and `resetFace`
-  std::vector<vm::vec2f> face_UVs, origFace_UVs;
-  for (const auto vert : origFace.vertices()) {
-    face_UVs.push_back(face.textureCoords(vert->position()));
-    origFace_UVs.push_back(origFace.textureCoords(vert->position()));
-  }
+    // get UV of each vert using `face` and `resetFace`
+    std::vector<vm::vec2f> face_UVs, origFace_UVs;
+    for (const auto vert : origFace.vertices()) {
+        face_UVs.push_back(face.textureCoords(vert->position()));
+        origFace_UVs.push_back(origFace.textureCoords(vert->position()));
+    }
 
-  checkUVListsEqual(face_UVs, origFace_UVs, face);
+    checkUVListsEqual(face_UVs, origFace_UVs, face);
 }
 
 static void checkTextureLockOffWithScale(const Brush &cube) {
-  const vm::vec3 mins(cube.bounds().min);
+    const vm::vec3 mins(cube.bounds().min);
 
-  // translate the cube mins to the origin, scale by 2 in the X axis, then translate back
-  const vm::mat4x4 transform = vm::translation_matrix(mins) * vm::scaling_matrix(vm::vec3(2.0, 1.0, 1.0)) * vm::translation_matrix(- 1.0 * mins);
-  const auto origFaceIndex = cube.findFace(vm::vec3::neg_y());
-  REQUIRE(origFaceIndex);
-  const BrushFace &origFace = cube.face(*origFaceIndex);
+    // translate the cube mins to the origin, scale by 2 in the X axis, then translate back
+    const vm::mat4x4 transform = vm::translation_matrix(mins) * vm::scaling_matrix(vm::vec3(2.0, 1.0, 1.0)) * vm::translation_matrix(-1.0 * mins);
+    const auto origFaceIndex = cube.findFace(vm::vec3::neg_y());
+    REQUIRE(origFaceIndex);
+    const BrushFace &origFace = cube.face(*origFaceIndex);
 
-  // transform the face (texture lock off)
-  BrushFace face = origFace;
-  REQUIRE(face.transform(transform, false).is_success());
-  face.resetTexCoordSystemCache();
+    // transform the face (texture lock off)
+    BrushFace face = origFace;
+    REQUIRE(face.transform(transform, false).is_success());
+    face.resetTexCoordSystemCache();
 
-  // get UV at mins; should be equal
-  const vm::vec2f left_origTC = origFace.textureCoords(mins);
-  const vm::vec2f left_transformedTC = face.textureCoords(mins);
-  CHECK(texCoordsEqual(left_origTC, left_transformedTC));
+    // get UV at mins; should be equal
+    const vm::vec2f left_origTC = origFace.textureCoords(mins);
+    const vm::vec2f left_transformedTC = face.textureCoords(mins);
+    CHECK(texCoordsEqual(left_origTC, left_transformedTC));
 
-  // get UVs at mins, plus the X size of the cube
-  const vm::vec2f right_origTC = origFace.textureCoords(mins + vm::vec3(cube.bounds().size().x(), 0, 0));
-  const vm::vec2f right_transformedTC = face.textureCoords(mins + vm::vec3(2.0 * cube.bounds().size().x(), 0, 0));
+    // get UVs at mins, plus the X size of the cube
+    const vm::vec2f right_origTC = origFace.textureCoords(mins + vm::vec3(cube.bounds().size().x(), 0, 0));
+    const vm::vec2f right_transformedTC = face.textureCoords(mins + vm::vec3(2.0 * cube.bounds().size().x(), 0, 0));
 
-  // this assumes that the U axis of the texture was scaled (i.e. the texture is oriented
-  // upright)
-  const vm::vec2f orig_U_width = right_origTC - left_origTC;
-  const vm::vec2f transformed_U_width = right_transformedTC - left_transformedTC;
+    // this assumes that the U axis of the texture was scaled (i.e. the texture is oriented
+    // upright)
+    const vm::vec2f orig_U_width = right_origTC - left_origTC;
+    const vm::vec2f transformed_U_width = right_transformedTC - left_transformedTC;
 
-  CHECK(transformed_U_width.x() == vm::approx(orig_U_width.x() * 2.0f));
-  CHECK(transformed_U_width.y() == vm::approx(orig_U_width.y()));
+    CHECK(transformed_U_width.x() == vm::approx(orig_U_width.x() * 2.0f));
+    CHECK(transformed_U_width.y() == vm::approx(orig_U_width.y()));
 }
 
 TEST_CASE("BrushFaceTest.testSetRotation_Paraxial")
@@ -718,20 +716,18 @@ checkTextureLockOffWithScale(cube);
 // https://github.com/TrenchBroom/TrenchBroom/issues/2001
 TEST_CASE("BrushFaceTest.testValveRotation")
 {
-const std::string data(
-    "{\n"
-    "\"classname\" \"worldspawn\"\n"
-    "{\n"
-    "( 24 8 48 ) ( 32 16 -16 ) ( 24 -8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] -0 1 1\n"
-    "( 8 -8 48 ) ( -0 -16 -16 ) ( 8 8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] -0 1 1\n"
-    "( 8 8 48 ) ( -0 16 -16 ) ( 24 8 48 ) tlight11 [ 1 0 0 -0 ] [ 0 0 -1 56 ] -0 1 1\n"
-    "( 24 -8 48 ) ( 32 -16 -16 ) ( 8 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 0 -1 56 ] -0 1 1\n"
-    "( 8 -8 48 ) ( 8 8 48 ) ( 24 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 -1 0 48 ] -0 1 1\n"
-    "( -0 16 -16 ) ( -0 -16 -16 ) ( 32 16 -16 ) tlight11 [ -1 0 0 -0 ] [ 0 -1 0 48 ] -0 "
-    "1 1\n"
-    "}\n"
-    "}\n"
-);
+const std::string data("{\n"
+                       "\"classname\" \"worldspawn\"\n"
+                       "{\n"
+                       "( 24 8 48 ) ( 32 16 -16 ) ( 24 -8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] -0 1 1\n"
+                       "( 8 -8 48 ) ( -0 -16 -16 ) ( 8 8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] -0 1 1\n"
+                       "( 8 8 48 ) ( -0 16 -16 ) ( 24 8 48 ) tlight11 [ 1 0 0 -0 ] [ 0 0 -1 56 ] -0 1 1\n"
+                       "( 24 -8 48 ) ( 32 -16 -16 ) ( 8 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 0 -1 56 ] -0 1 1\n"
+                       "( 8 -8 48 ) ( 8 8 48 ) ( 24 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 -1 0 48 ] -0 1 1\n"
+                       "( -0 16 -16 ) ( -0 -16 -16 ) ( 32 16 -16 ) tlight11 [ -1 0 0 -0 ] [ 0 -1 0 48 ] -0 "
+                       "1 1\n"
+                       "}\n"
+                       "}\n");
 
 const vm::bbox3 worldBounds(4096.0);
 
@@ -846,26 +842,24 @@ kdl::vec_clear_and_delete(nodes);
 // https://github.com/TrenchBroom/TrenchBroom/issues/1995
 TEST_CASE("BrushFaceTest.testCopyTexCoordSystem")
 {
-const std::string data(
-    "{\n"
-    "    \"classname\" \"worldspawn\"\n"
-    "    {\n"
-    "        ( 24 8 48 ) ( 32 16 -16 ) ( 24 -8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] "
-    "-0 1 1\n"
-    "        ( 8 -8 48 ) ( -0 -16 -16 ) ( 8 8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] -0 "
-    "1 1\n"
-    "        ( 8 8 48 ) ( -0 16 -16 ) ( 24 8 48 ) tlight11 [ 1 0 0 -0 ] [ 0 0 -1 56 ] -0 "
-    "1 1\n"
-    "        ( 24 -8 48 ) ( 32 -16 -16 ) ( 8 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 0 -1 56 ] "
-    "-0 1 1\n"
-    "        ( 8 -8 48 ) ( 8 8 48 ) ( 24 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 -1 0 48 ] -0 1 "
-    "1\n"
-    "        ( -0 16 -16 ) ( -0 -16 -16 ) ( 32 16 -16 ) tlight11 [ -1 0 0 -0 ] [ 0 -1 0 "
-    "48 ] -0 1 "
-    "1\n"
-    "    }\n"
-    "}\n"
-);
+const std::string data("{\n"
+                       "    \"classname\" \"worldspawn\"\n"
+                       "    {\n"
+                       "        ( 24 8 48 ) ( 32 16 -16 ) ( 24 -8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] "
+                       "-0 1 1\n"
+                       "        ( 8 -8 48 ) ( -0 -16 -16 ) ( 8 8 48 ) tlight11 [ 0 1 0 0 ] [ 0 0 -1 56 ] -0 "
+                       "1 1\n"
+                       "        ( 8 8 48 ) ( -0 16 -16 ) ( 24 8 48 ) tlight11 [ 1 0 0 -0 ] [ 0 0 -1 56 ] -0 "
+                       "1 1\n"
+                       "        ( 24 -8 48 ) ( 32 -16 -16 ) ( 8 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 0 -1 56 ] "
+                       "-0 1 1\n"
+                       "        ( 8 -8 48 ) ( 8 8 48 ) ( 24 -8 48 ) tlight11 [ 1 0 0 0 ] [ 0 -1 0 48 ] -0 1 "
+                       "1\n"
+                       "        ( -0 16 -16 ) ( -0 -16 -16 ) ( 32 16 -16 ) tlight11 [ -1 0 0 -0 ] [ 0 -1 0 "
+                       "48 ] -0 1 "
+                       "1\n"
+                       "    }\n"
+                       "}\n");
 
 const vm::bbox3 worldBounds(4096.0);
 
@@ -964,7 +958,7 @@ CHECK(posXFace
 textureXAxis()
 
 ==
-vm::approx(vm::vec3(0.030303030303030123, 0.96969696969696961, - 0.24242424242424243)
+vm::approx(vm::vec3(0.030303030303030123, 0.96969696969696961, -0.24242424242424243)
 ));
 CHECK(posXFace
 ->
@@ -972,7 +966,7 @@ CHECK(posXFace
 textureYAxis()
 
 ==
-vm::approx(vm::vec3(- 0.0037296037296037088, - 0.24242424242424243, - 0.97016317016317011)
+vm::approx(vm::vec3(-0.0037296037296037088, -0.24242424242424243, -0.97016317016317011)
 ));
 
 // copy texturing from the negYFace to posXFace using the projection method
@@ -1014,8 +1008,7 @@ kdl::vec_clear_and_delete(nodes);
 // https://github.com/TrenchBroom/TrenchBroom/issues/2315
 TEST_CASE("BrushFaceTest.move45DegreeFace")
 {
-const std::string data(
-    R"(
+const std::string data(R"(
 // entity 0
 {
 "classname" "worldspawn"
@@ -1028,8 +1021,7 @@ const std::string data(
 ( 32 -64 16 ) ( 48 -48 16 ) ( 48 -48 144 ) __TB_empty [ -0.707107 -0.707107 0 0 ] [ 0 0 -1 0 ] 0 1 1
 }
 }
-)"
-);
+)");
 
 const vm::bbox3 worldBounds(4096.0);
 
@@ -1043,12 +1035,12 @@ CHECK(brushNode
 Brush brush = brushNode->brush();
 
 // find the face
-const auto angledFaceIndex = brush.findFace(vm::vec3(- 0.70710678118654746, 0.70710678118654746, 0));
+const auto angledFaceIndex = brush.findFace(vm::vec3(-0.70710678118654746, 0.70710678118654746, 0));
 REQUIRE(angledFaceIndex);
 
 CHECK(brush
 .
-moveBoundary(worldBounds, *angledFaceIndex, vm::vec3(- 7.9999999999999973, 7.9999999999999973, 0),
+moveBoundary(worldBounds, *angledFaceIndex, vm::vec3(-7.9999999999999973, 7.9999999999999973, 0),
 true).
 
 is_success()
@@ -1067,32 +1059,28 @@ BrushBuilder valveBuilder(MapFormat::Valve, worldBounds);
 
 Assets::Texture texture("testTexture", 64, 64);
 
-const Brush startingCube = standardBuilder.createCube(128.0, "").transform(
-    [&](Brush &&brush) {
-      for (size_t i = 0; i < brush.faceCount(); ++ i) {
+const Brush startingCube = standardBuilder.createCube(128.0, "").transform([&](Brush &&brush) {
+    for (size_t i = 0; i < brush.faceCount(); ++i) {
         BrushFace &face = brush.face(i);
         face.setTexture(&texture);
-      }
-      return std::move(brush);
     }
-).value();
+    return std::move(brush);
+}).value();
 
 auto testTransform = [&](const vm::mat4x4 &transform) {
-  auto standardCube = startingCube;
-  REQUIRE(standardCube.transform(worldBounds, transform, true).is_success());
-  CHECK(
-      dynamic_cast<const ParaxialTexCoordSystem *>(
-          &standardCube.face(0).texCoordSystem()));
+    auto standardCube = startingCube;
+    REQUIRE(standardCube.transform(worldBounds, transform, true).is_success());
+    CHECK(dynamic_cast<const ParaxialTexCoordSystem *>(
+              &standardCube.face(0).texCoordSystem()));
 
-  const Brush valveCube = standardCube.convertToParallel();
-  CHECK(dynamic_cast<const ParallelTexCoordSystem *>(&valveCube.face(0).texCoordSystem()));
-  checkBrushUVsEqual(standardCube, valveCube);
+    const Brush valveCube = standardCube.convertToParallel();
+    CHECK(dynamic_cast<const ParallelTexCoordSystem *>(&valveCube.face(0).texCoordSystem()));
+    checkBrushUVsEqual(standardCube, valveCube);
 
-  const Brush standardCubeRoundTrip = valveCube.convertToParaxial();
-  CHECK(
-      dynamic_cast<const ParaxialTexCoordSystem *>(
-          &standardCubeRoundTrip.face(0).texCoordSystem()));
-  checkBrushUVsEqual(standardCube, standardCubeRoundTrip);
+    const Brush standardCubeRoundTrip = valveCube.convertToParaxial();
+    CHECK(dynamic_cast<const ParaxialTexCoordSystem *>(
+              &standardCubeRoundTrip.face(0).texCoordSystem()));
+    checkBrushUVsEqual(standardCube, standardCubeRoundTrip);
 };
 
 // NOTE: intentionally include the shear/multi-axis rotations which won't work properly
@@ -1104,8 +1092,7 @@ doWithTextureLockTestTransforms(true, testTransform);
 
 TEST_CASE("BrushFaceTest.flipTexture")
 {
-const std::string data(
-    R"(
+const std::string data(R"(
 // entity 0
 {
 "mapversion" "220"
@@ -1120,8 +1107,7 @@ const std::string data(
 ( 64 64 16 ) ( 64 64 17 ) ( 64 65 16 ) skip [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 1 1
 }
 }
-)"
-);
+)");
 
 const vm::bbox3 worldBounds(4096.0);
 
@@ -1148,7 +1134,7 @@ scale()
 SECTION("Default camera angle")
 {
 const auto cameraUp = vm::vec3(0.284427, 0.455084, 0.843801);
-const auto cameraRight = vm::vec3(0.847998, - 0.529999, 0);
+const auto cameraRight = vm::vec3(0.847998, -0.529999, 0);
 
 SECTION("Left flip")
 {
@@ -1186,8 +1172,8 @@ scale()
 
 SECTION("Camera is aimed at +x")
 {
-const auto cameraUp = vm::vec3(0.419431, - 0.087374, 0.903585);
-const auto cameraRight = vm::vec3(- 0.203938, - 0.978984, 0);
+const auto cameraUp = vm::vec3(0.419431, -0.087374, 0.903585);
+const auto cameraRight = vm::vec3(-0.203938, -0.978984, 0);
 
 SECTION("left arrow (does vertical flip)")
 {

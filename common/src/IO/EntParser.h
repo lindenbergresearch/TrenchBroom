@@ -24,24 +24,20 @@
 #include <string_view>
 #include <vector>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 struct EntityDefinitionClassInfo;
-
 
 class ParserStatus;
 
+class EntParser : public EntityDefinitionParser {
+  private:
+    std::string_view m_str;
 
-class EntParser : public EntityDefinitionParser
-{
-private:
-  std::string_view m_str;
+  public:
+    EntParser(std::string_view str, const Color &defaultEntityColor);
 
-public:
-  EntParser(std::string_view str, const Color& defaultEntityColor);
-
-private:
-  std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus& status) override;
+  private:
+    std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) override;
 };
 
 } // namespace TrenchBroom::IO

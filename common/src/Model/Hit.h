@@ -27,64 +27,45 @@
 
 #include <any>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class Hit
-{
-public:
-  static const Hit NoHit;
+namespace TrenchBroom {
+namespace Model {
+class Hit {
+  public:
+    static const Hit NoHit;
 
-private:
-  HitType::Type m_type;
-  FloatType m_distance;
-  vm::vec3 m_hitPoint;
-  std::any m_target;
-  FloatType m_error;
+  private:
+    HitType::Type m_type;
+    FloatType m_distance;
+    vm::vec3 m_hitPoint;
+    std::any m_target;
+    FloatType m_error;
 
-public:
-  template <typename T>
-  Hit(
-    const HitType::Type type,
-    const FloatType distance,
-    const vm::vec3& hitPoint,
-    T target,
-    const FloatType error = 0.0)
-    : m_type(type)
-    , m_distance(distance)
-    , m_hitPoint(hitPoint)
-    , m_target(std::move(target))
-    , m_error(error)
-  {
-  }
+  public:
+    template<typename T> Hit(const HitType::Type type, const FloatType distance, const vm::vec3 &hitPoint, T target, const FloatType error = 0.0)
+        : m_type(type), m_distance(distance), m_hitPoint(hitPoint), m_target(std::move(target)), m_error(error) {
+    }
 
-  bool isMatch() const;
+    bool isMatch() const;
 
-  HitType::Type type() const;
+    HitType::Type type() const;
 
-  bool hasType(HitType::Type typeMask) const;
+    bool hasType(HitType::Type typeMask) const;
 
-  FloatType distance() const;
+    FloatType distance() const;
 
-  const vm::vec3& hitPoint() const;
+    const vm::vec3 &hitPoint() const;
 
-  FloatType error() const;
+    FloatType error() const;
 
-  template <typename T>
-  T target() const
-  {
-    return std::any_cast<T>(m_target);
-  }
+    template<typename T> T target() const {
+        return std::any_cast<T>(m_target);
+    }
 };
 
+Hit selectClosest(const Hit &first, const Hit &second);
 
-Hit selectClosest(const Hit& first, const Hit& second);
-
-template <typename... Hits>
-Hit selectClosest(const Hit& first, const Hits&... rest)
-{
-  return selectClosest(first, selectClosest(rest...));
+template<typename... Hits> Hit selectClosest(const Hit &first, const Hits &... rest) {
+    return selectClosest(first, selectClosest(rest...));
 }
 } // namespace Model
 } // namespace TrenchBroom

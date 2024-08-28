@@ -34,8 +34,7 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::IO::DefToken
-{
+namespace TrenchBroom::IO::DefToken {
 using Type = unsigned int;
 static const Type Integer = 1 << 0;      // integer number
 static const Type Decimal = 1 << 1;      // decimal number
@@ -55,63 +54,58 @@ static const Type Minus = 1 << 15;       // minus sign: -
 static const Type Eof = 1 << 16;         // end of file
 } // namespace TrenchBroom::IO::DefToken
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-class DefTokenizer : public Tokenizer<DefToken::Type>
-{
-public:
-  explicit DefTokenizer(std::string_view str);
+class DefTokenizer : public Tokenizer<DefToken::Type> {
+  public:
+    explicit DefTokenizer(std::string_view str);
 
-private:
-  static const std::string WordDelims;
+  private:
+    static const std::string WordDelims;
 
-  Token emitToken() override;
+    Token emitToken() override;
 };
 
+class DefParser : public EntityDefinitionParser, public Parser<DefToken::Type> {
+  private:
+    using Token = DefTokenizer::Token;
 
-class DefParser : public EntityDefinitionParser, public Parser<DefToken::Type>
-{
-private:
-  using Token = DefTokenizer::Token;
+    DefTokenizer m_tokenizer;
+    std::map<std::string, EntityDefinitionClassInfo> m_baseClasses;
 
-  DefTokenizer m_tokenizer;
-  std::map<std::string, EntityDefinitionClassInfo> m_baseClasses;
+  public:
+    DefParser(std::string_view str, const Color &defaultEntityColor);
 
-public:
-  DefParser(std::string_view str, const Color& defaultEntityColor);
+  private:
+    TokenNameMap tokenNames() const override;
 
-private:
-  TokenNameMap tokenNames() const override;
+    std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus &status) override;
 
-  std::vector<EntityDefinitionClassInfo> parseClassInfos(ParserStatus& status) override;
+    std::optional<EntityDefinitionClassInfo> parseClassInfo(ParserStatus &status);
 
-  std::optional<EntityDefinitionClassInfo> parseClassInfo(ParserStatus& status);
+    std::unique_ptr<Assets::PropertyDefinition> parseSpawnflags(ParserStatus &status);
 
-  std::unique_ptr<Assets::PropertyDefinition> parseSpawnflags(ParserStatus& status);
+    void parseProperties(ParserStatus &status, EntityDefinitionClassInfo &classInfo);
 
-  void parseProperties(ParserStatus& status, EntityDefinitionClassInfo& classInfo);
+    bool parseProperty(ParserStatus &status, EntityDefinitionClassInfo &classInfo);
 
-  bool parseProperty(ParserStatus& status, EntityDefinitionClassInfo& classInfo);
+    void parseDefaultProperty(ParserStatus &status);
 
-  void parseDefaultProperty(ParserStatus& status);
+    std::string parseBaseProperty(ParserStatus &status);
 
-  std::string parseBaseProperty(ParserStatus& status);
+    std::unique_ptr<Assets::PropertyDefinition> parseChoicePropertyDefinition(ParserStatus &status);
 
-  std::unique_ptr<Assets::PropertyDefinition> parseChoicePropertyDefinition(
-    ParserStatus& status);
+    Assets::ModelDefinition parseModelDefinition(ParserStatus &status);
 
-  Assets::ModelDefinition parseModelDefinition(ParserStatus& status);
+    std::string parseDescription();
 
-  std::string parseDescription();
+    vm::vec3 parseVector(ParserStatus &status);
 
-  vm::vec3 parseVector(ParserStatus& status);
+    vm::bbox3 parseBounds(ParserStatus &status);
 
-  vm::bbox3 parseBounds(ParserStatus& status);
+    Color parseColor(ParserStatus &status);
 
-  Color parseColor(ParserStatus& status);
-
-  Token nextTokenIgnoringNewlines();
+    Token nextTokenIgnoringNewlines();
 };
 
 } // namespace TrenchBroom::IO

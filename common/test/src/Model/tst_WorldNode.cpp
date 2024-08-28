@@ -363,11 +363,9 @@ contains(patchNode)
 REQUIRE_THAT(nodeTree
 .
 
-find_containers(vm::vec3d::zero()), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        entityNode, brushNode, patchNode
-    }
-)
+find_containers(vm::vec3d::zero()), Catch::UnorderedEquals(std::vector<Node *>{
+    entityNode, brushNode, patchNode
+})
 
 );
 REQUIRE_THAT(nodeTree

@@ -35,17 +35,17 @@ namespace View {
 TEST_CASE_METHOD(MapDocumentTest,
 "UpdateLinkedGroupsCommandTest.collateWith") {
 const auto createLinkedGroup = [&]() {
-  auto *brushNode = createBrushNode();
-  document->addNodes({{document->parentForNodes(), {brushNode}}});
-  document->selectNodes({brushNode});
+    auto *brushNode = createBrushNode();
+    document->addNodes({{document->parentForNodes(), {brushNode}}});
+    document->selectNodes({brushNode});
 
-  auto *groupNode = document->groupSelection("group");
-  document->selectNodes({groupNode});
+    auto *groupNode = document->groupSelection("group");
+    document->selectNodes({groupNode});
 
-  auto *linkedGroupNode = document->createLinkedDuplicate();
-  document->deselectAll();
+    auto *linkedGroupNode = document->createLinkedDuplicate();
+    document->deselectAll();
 
-  return std::make_tuple(groupNode, linkedGroupNode);
+    return std::make_tuple(groupNode, linkedGroupNode);
 };
 
 auto [groupNode1, linkedGroupNode1] = createLinkedGroup();

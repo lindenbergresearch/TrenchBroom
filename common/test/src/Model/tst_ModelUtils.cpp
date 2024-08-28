@@ -278,17 +278,13 @@ addChild(entityNode);
 
 CHECK_THAT(findLinkedGroups(worldNode, "asdf"), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{})
 );
-CHECK_THAT(findLinkedGroups(worldNode, "group1"), Catch::Matchers::UnorderedEquals(
-    std::vector<Model::GroupNode *>{
-        groupNode1, linkedGroupNode1_1
-    }
-)
+CHECK_THAT(findLinkedGroups(worldNode, "group1"), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{
+    groupNode1, linkedGroupNode1_1
+})
 );
-CHECK_THAT(findLinkedGroups(worldNode, "group2"), Catch::Matchers::UnorderedEquals(
-    std::vector<Model::GroupNode *>{
-        groupNode2, linkedGroupNode2_1, linkedGroupNode2_2
-    }
-)
+CHECK_THAT(findLinkedGroups(worldNode, "group2"), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{
+    groupNode2, linkedGroupNode2_1, linkedGroupNode2_2
+})
 );
 }
 
@@ -333,11 +329,9 @@ auto *entityNode = new EntityNode{Entity{}};
 worldNode.defaultLayer()->
 addChild(entityNode);
 
-CHECK_THAT(findAllLinkedGroups(worldNode), Catch::Matchers::UnorderedEquals(
-    std::vector<Model::GroupNode *>{
-        groupNode1, linkedGroupNode1_1, groupNode2, linkedGroupNode2_1, linkedGroupNode2_2
-    }
-)
+CHECK_THAT(findAllLinkedGroups(worldNode), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{
+    groupNode1, linkedGroupNode1_1, groupNode2, linkedGroupNode2_1, linkedGroupNode2_2
+})
 );
 }
 
@@ -376,35 +370,25 @@ CHECK_THAT(collectParents({layerNode}), Catch::UnorderedEquals(std::vector<Node 
 );
 CHECK_THAT(collectParents({outerGroupNode}), Catch::UnorderedEquals(std::vector<Node *>{&worldNode, layerNode})
 );
-CHECK_THAT(collectParents({innerGroupNode}), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        &worldNode, layerNode, outerGroupNode
-    }
-)
+CHECK_THAT(collectParents({innerGroupNode}), Catch::UnorderedEquals(std::vector<Node *>{
+    &worldNode, layerNode, outerGroupNode
+})
 );
-CHECK_THAT(collectParents({entityNode}), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        &worldNode, layerNode, outerGroupNode, innerGroupNode
-    }
-)
+CHECK_THAT(collectParents({entityNode}), Catch::UnorderedEquals(std::vector<Node *>{
+    &worldNode, layerNode, outerGroupNode, innerGroupNode
+})
 );
-CHECK_THAT(collectParents({brushNode}), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        &worldNode, layerNode, outerGroupNode, innerGroupNode
-    }
-)
+CHECK_THAT(collectParents({brushNode}), Catch::UnorderedEquals(std::vector<Node *>{
+    &worldNode, layerNode, outerGroupNode, innerGroupNode
+})
 );
-CHECK_THAT(collectParents({patchNode}), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        &worldNode, layerNode, outerGroupNode
-    }
-)
+CHECK_THAT(collectParents({patchNode}), Catch::UnorderedEquals(std::vector<Node *>{
+    &worldNode, layerNode, outerGroupNode
+})
 );
-CHECK_THAT(collectParents({brushNode, patchNode}), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        &worldNode, layerNode, outerGroupNode, innerGroupNode
-    }
-)
+CHECK_THAT(collectParents({brushNode, patchNode}), Catch::UnorderedEquals(std::vector<Node *>{
+    &worldNode, layerNode, outerGroupNode, innerGroupNode
+})
 );
 }
 
@@ -448,29 +432,21 @@ worldNode
     + patchNode
 */
 
-CHECK_THAT(collectNodes({&worldNode}), Catch::Equals(
-    std::vector<Node *>{
-        &worldNode, worldNode.defaultLayer(), layerNode, outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
-    }
-)
+CHECK_THAT(collectNodes({&worldNode}), Catch::Equals(std::vector<Node *>{
+    &worldNode, worldNode.defaultLayer(), layerNode, outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
+})
 );
-CHECK_THAT(collectNodes({layerNode}), Catch::Equals(
-    std::vector<Node *>{
-        layerNode, outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
-    }
-)
+CHECK_THAT(collectNodes({layerNode}), Catch::Equals(std::vector<Node *>{
+    layerNode, outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
+})
 );
-CHECK_THAT(collectNodes({outerGroupNode}), Catch::Equals(
-    std::vector<Node *>{
-        outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
-    }
-)
+CHECK_THAT(collectNodes({outerGroupNode}), Catch::Equals(std::vector<Node *>{
+    outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
+})
 );
-CHECK_THAT(collectNodes({innerGroupNode}), Catch::Equals(
-    std::vector<Node *>{
-        innerGroupNode, entityNode, brushNode
-    }
-)
+CHECK_THAT(collectNodes({innerGroupNode}), Catch::Equals(std::vector<Node *>{
+    innerGroupNode, entityNode, brushNode
+})
 );
 CHECK_THAT(collectNodes({entityNode}), Catch::Equals(std::vector<Node *>{entityNode})
 );
@@ -478,11 +454,9 @@ CHECK_THAT(collectNodes({brushNode}), Catch::Equals(std::vector<Node *>{brushNod
 );
 CHECK_THAT(collectNodes({patchNode}), Catch::Equals(std::vector<Node *>{patchNode})
 );
-CHECK_THAT(collectNodes({innerGroupNode, outerGroupNode}), Catch::Equals(
-    std::vector<Node *>{
-        innerGroupNode, entityNode, brushNode, outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
-    }
-)
+CHECK_THAT(collectNodes({innerGroupNode, outerGroupNode}), Catch::Equals(std::vector<Node *>{
+    innerGroupNode, entityNode, brushNode, outerGroupNode, innerGroupNode, entityNode, brushNode, patchNode
+})
 );
 }
 
@@ -590,32 +564,24 @@ intersects(&patchNode)
 
 const auto allNodes = std::vector<Node *>{&worldNode, &layerNode, &groupNode, &entityNode, &brushNode, &patchNode};
 
-CHECK_THAT(collectTouchingNodes(allNodes, {&touchesAll}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK_THAT(collectTouchingNodes(allNodes, {&touchesAll}), Catch::Matchers::Equals(std::vector<Node *>{
+    &groupNode, &entityNode, &brushNode, &patchNode
+})
 );
 
 CHECK_THAT(collectTouchingNodes(allNodes, {&touchesNothing}), Catch::Matchers::Equals(std::vector<Node *>{})
 );
 
-CHECK_THAT(collectTouchingNodes(allNodes, {&touchesBrush}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        &brushNode
-    }
-)
+CHECK_THAT(collectTouchingNodes(allNodes, {&touchesBrush}), Catch::Matchers::Equals(std::vector<Node *>{
+    &brushNode
+})
 );
 
-CHECK_THAT(collectTouchingNodes(
-    allNodes, {
-        &touchesBrush, &touchesAll
-    }
-), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK_THAT(collectTouchingNodes(allNodes, {
+    &touchesBrush, &touchesAll
+}), Catch::Matchers::Equals(std::vector<Node *>{
+    &groupNode, &entityNode, &brushNode, &patchNode
+})
 );
 }
 
@@ -666,7 +632,7 @@ contains(&patchNode)
 );
 
 auto containsNothing = BrushNode{containsAll.brush()};
-transformNode(containsNothing, vm::translation_matrix(vm::vec3d{- 64, 0, 0}), worldBounds
+transformNode(containsNothing, vm::translation_matrix(vm::vec3d{-64, 0, 0}), worldBounds
 );
 REQUIRE_FALSE(containsNothing
 .
@@ -721,32 +687,24 @@ contains(&patchNode)
 
 const auto allNodes = std::vector<Node *>{&worldNode, &layerNode, &groupNode, &entityNode, &brushNode, &patchNode};
 
-CHECK_THAT(collectContainedNodes(allNodes, {&containsAll}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK_THAT(collectContainedNodes(allNodes, {&containsAll}), Catch::Matchers::Equals(std::vector<Node *>{
+    &groupNode, &entityNode, &brushNode, &patchNode
+})
 );
 
 CHECK_THAT(collectContainedNodes(allNodes, {&containsNothing}), Catch::Matchers::Equals(std::vector<Node *>{})
 );
 
-CHECK_THAT(collectContainedNodes(allNodes, {&containsPatch}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        &patchNode
-    }
-)
+CHECK_THAT(collectContainedNodes(allNodes, {&containsPatch}), Catch::Matchers::Equals(std::vector<Node *>{
+    &patchNode
+})
 );
 
-CHECK_THAT(collectContainedNodes(
-    allNodes, {
-        &containsPatch, &containsAll
-    }
-), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK_THAT(collectContainedNodes(allNodes, {
+    &containsPatch, &containsAll
+}), Catch::Matchers::Equals(std::vector<Node *>{
+    &groupNode, &entityNode, &brushNode, &patchNode
+})
 );
 }
 
@@ -803,39 +761,31 @@ select();
 CHECK_THAT(collectSelectedNodes({&worldNode}), Catch::Matchers::Equals(std::vector<Node *>{brushNode, patchNode})
 );
 
-CHECK_THAT(collectSelectedNodes({outerGroupNode}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        brushNode, patchNode
-    }
-)
+CHECK_THAT(collectSelectedNodes({outerGroupNode}), Catch::Matchers::Equals(std::vector<Node *>{
+    brushNode, patchNode
+})
 );
 
 CHECK_THAT(collectSelectedNodes({innerGroupNode}), Catch::Matchers::Equals(std::vector<Node *>{brushNode})
 );
 
-CHECK_THAT(collectSelectedNodes({innerGroupNode, patchNode}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        brushNode, patchNode
-    }
-)
+CHECK_THAT(collectSelectedNodes({innerGroupNode, patchNode}), Catch::Matchers::Equals(std::vector<Node *>{
+    brushNode, patchNode
+})
 );
 
-CHECK_THAT(collectSelectedNodes({outerGroupNode, innerGroupNode}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        brushNode, patchNode, brushNode
-    }
-)
+CHECK_THAT(collectSelectedNodes({outerGroupNode, innerGroupNode}), Catch::Matchers::Equals(std::vector<Node *>{
+    brushNode, patchNode, brushNode
+})
 );
 
 innerGroupNode->
 
 select();
 
-CHECK_THAT(collectSelectedNodes({outerGroupNode, innerGroupNode}), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        innerGroupNode, brushNode, patchNode, innerGroupNode, brushNode
-    }
-)
+CHECK_THAT(collectSelectedNodes({outerGroupNode, innerGroupNode}), Catch::Matchers::Equals(std::vector<Node *>{
+    innerGroupNode, brushNode, patchNode, innerGroupNode, brushNode
+})
 );
 }
 
@@ -873,40 +823,30 @@ auto editorContext = EditorContext{};
 CHECK_THAT(collectSelectableNodes({}, editorContext), Catch::Matchers::Equals(std::vector<Node *>{})
 );
 
-CHECK_THAT(collectSelectableNodes({&worldNode}, editorContext), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        outerGroupNode
-    }
-)
+CHECK_THAT(collectSelectableNodes({&worldNode}, editorContext), Catch::Matchers::Equals(std::vector<Node *>{
+    outerGroupNode
+})
 );
 
 editorContext.
 pushGroup(outerGroupNode);
-CHECK_THAT(collectSelectableNodes({&worldNode}, editorContext), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        innerGroupNode, patchNode
-    }
-)
+CHECK_THAT(collectSelectableNodes({&worldNode}, editorContext), Catch::Matchers::Equals(std::vector<Node *>{
+    innerGroupNode, patchNode
+})
 );
 
 editorContext.
 pushGroup(innerGroupNode);
-CHECK_THAT(collectSelectableNodes({&worldNode}, editorContext), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        outerGroupNode
-    }
-)
+CHECK_THAT(collectSelectableNodes({&worldNode}, editorContext), Catch::Matchers::Equals(std::vector<Node *>{
+    outerGroupNode
+})
 );
 
-CHECK_THAT(collectSelectableNodes(
-    {
-        &worldNode, innerGroupNode
-    }, editorContext
-), Catch::Matchers::Equals(
-    std::vector<Node *>{
-        outerGroupNode, entityNode, brushNode
-    }
-)
+CHECK_THAT(collectSelectableNodes({
+                                      &worldNode, innerGroupNode
+                                  }, editorContext), Catch::Matchers::Equals(std::vector<Node *>{
+    outerGroupNode, entityNode, brushNode
+})
 );
 }
 
@@ -941,9 +881,7 @@ addChild(brushNode);
 brushNode->selectFace(0);
 brushNode->selectFace(1);
 
-CHECK_THAT(collectSelectedBrushFaces({&worldNode}), Catch::Matchers::UnorderedEquals(
-    std::vector<Model::BrushFaceHandle>{{brushNode, 0}, {brushNode, 1}}
-)
+CHECK_THAT(collectSelectedBrushFaces({&worldNode}), Catch::Matchers::UnorderedEquals(std::vector<Model::BrushFaceHandle>{{brushNode, 0}, {brushNode, 1}})
 );
 }
 
@@ -1134,22 +1072,18 @@ auto patchNode = PatchNode{
 
 SECTION("Filter brush nodes")
 {
-CHECK(filterBrushNodes(
-    {
-        &worldNode, &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK(filterBrushNodes({
+                           &worldNode, &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
+                       })
 == std::vector<Model::BrushNode *>{
 &brushNode});
 }
 
 SECTION("Filter entity nodes")
 {
-CHECK(filterEntityNodes(
-    {
-        &worldNode, &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK(filterEntityNodes({
+                            &worldNode, &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
+                        })
 == std::vector<Model::EntityNode *>{
 &entityNode});
 }}} // namespace Model

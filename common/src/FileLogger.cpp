@@ -28,43 +28,31 @@
 #include <cassert>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace
-{
-std::ofstream openLogFile(const std::filesystem::path& path)
-{
-  return IO::Disk::createDirectory(path.parent_path())
-    .transform([&](auto) { return std::ofstream{path, std::ios::out}; })
-    .if_error([](const auto& e) {
-      throw std::runtime_error{"Could not open log file: " + e.msg};
-    })
-    .value();
+namespace TrenchBroom {
+namespace {
+std::ofstream openLogFile(const std::filesystem::path &path) {
+    return IO::Disk::createDirectory(path.parent_path()).transform([&](auto) { return std::ofstream{path, std::ios::out}; }).if_error([](const auto &e) {
+        throw std::runtime_error{"Could not open log file: " + e.msg};
+    }).value();
 }
 } // namespace
-FileLogger::FileLogger(const std::filesystem::path& filePath)
-  : m_stream{openLogFile(filePath)}
-{
-  ensure(m_stream, "log file could not be opened");
+FileLogger::FileLogger(const std::filesystem::path &filePath) : m_stream{openLogFile(filePath)} {
+    ensure(m_stream, "log file could not be opened");
 }
 
-FileLogger& FileLogger::instance()
-{
-  static FileLogger Instance(IO::SystemPaths::logFilePath());
-  return Instance;
+FileLogger &FileLogger::instance() {
+    static FileLogger Instance(IO::SystemPaths::logFilePath());
+    return Instance;
 }
 
-void FileLogger::doLog(const LogLevel /* level */, const std::string& message)
-{
-  assert(m_stream);
-  if (m_stream)
-  {
-    m_stream << message << std::endl;
-  }
+void FileLogger::doLog(const LogLevel /* level */, const std::string &message) {
+    assert(m_stream);
+    if (m_stream) {
+        m_stream << message << std::endl;
+    }
 }
 
-void FileLogger::doLog(const LogLevel level, const QString& message)
-{
-  log(level, message.toStdString());
+void FileLogger::doLog(const LogLevel level, const QString &message) {
+    log(level, message.toStdString());
 }
 } // namespace TrenchBroom

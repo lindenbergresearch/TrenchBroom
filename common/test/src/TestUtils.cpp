@@ -114,37 +114,12 @@ TEST_CASE("TestUtilsTest.testTexCoordsEqual")
 
 TEST_CASE("TestUtilsTest.UVListsEqual")
 {
-    CHECK(UVListsEqual({{0, 0},
-                        {1, 0},
-                        {0, 1}}, {{0, 0},
-                                  {1, 0},
-                                  {0, 1}}
-    ));
-    CHECK(UVListsEqual({{0, 0},
-                        {1, 0},
-                        {0, 1}}, {{10, 0},
-                                  {11, 0},
-                                  {10, 1}}
-    )); // translation by whole texture increments OK
+    CHECK(UVListsEqual({{0, 0}, {1, 0}, {0, 1}}, {{0, 0}, {1, 0}, {0, 1}}));
+    CHECK(UVListsEqual({{0, 0}, {1, 0}, {0, 1}}, {{10, 0}, {11, 0}, {10, 1}})); // translation by whole texture increments OK
 
-    CHECK_FALSE(UVListsEqual({{0, 0},
-                              {1, 0},
-                              {0, 1}}, {{10.5, 0},
-                                        {11.5, 0},
-                                        {10.5, 1}}
-    )); // translation by partial texture increments not OK
-    CHECK_FALSE(UVListsEqual({{0, 0},
-                              {1, 0},
-                              {0, 1}}, {{0, 0},
-                                        {0, 1},
-                                        {1, 0}}
-    )); // wrong order
-    CHECK_FALSE(UVListsEqual({{0, 0},
-                              {1, 0},
-                              {0, 1}}, {{0, 0},
-                                        {2, 0},
-                                        {0, 2}}
-    )); // unwanted scaling
+    CHECK_FALSE(UVListsEqual({{0, 0}, {1, 0}, {0, 1}}, {{10.5, 0}, {11.5, 0}, {10.5, 1}})); // translation by partial texture increments not OK
+    CHECK_FALSE(UVListsEqual({{0, 0}, {1, 0}, {0, 1}}, {{0, 0}, {0, 1}, {1, 0}})); // wrong order
+    CHECK_FALSE(UVListsEqual({{0, 0}, {1, 0}, {0, 1}}, {{0, 0}, {2, 0}, {0, 2}})); // unwanted scaling
 }
 
 TEST_CASE("TestUtilsTest.pointExactlyIntegral")
@@ -162,9 +137,8 @@ namespace IO {
 std::string readTextFile(const std::filesystem::path &path) {
     const auto fixedPath = Disk::fixPath(path);
     return Disk::withInputStream(fixedPath, [](auto &stream) {
-          return std::string{(std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>()};
-        }
-    ).value();
+        return std::string{(std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>()};
+    }).value();
 }
 } // namespace IO
 
@@ -194,8 +168,7 @@ void assertTexture(const std::string &expected, const BrushNode *brushNode, cons
     return assertTexture(expected, brushNode, std::vector<vm::vec3d>({v1, v2, v3}));
 }
 
-void
-assertTexture(const std::string &expected, const BrushNode *brushNode, const vm::vec3d &v1, const vm::vec3d &v2, const vm::vec3d &v3, const vm::vec3d &v4) {
+void assertTexture(const std::string &expected, const BrushNode *brushNode, const vm::vec3d &v1, const vm::vec3d &v2, const vm::vec3d &v3, const vm::vec3d &v4) {
     return assertTexture(expected, brushNode, std::vector<vm::vec3d>({v1, v2, v3, v4}));
 }
 
@@ -237,27 +210,26 @@ void assertTexture(const std::string &expected, const Brush &brush, const vm::po
 
 void transformNode(Node &node, const vm::mat4x4 &transformation, const vm::bbox3 &worldBounds) {
     node.accept(kdl::overload([](const WorldNode *) {}, [](const LayerNode *) {}, [&](auto &&thisLambda, GroupNode *groupNode) {
-          auto group = groupNode->group();
-          group.transform(transformation);
-          groupNode->setGroup(std::move(group));
+        auto group = groupNode->group();
+        group.transform(transformation);
+        groupNode->setGroup(std::move(group));
 
-          groupNode->visitChildren(thisLambda);
-        }, [&](auto &&thisLambda, EntityNode *entityNode) {
-          auto entity = entityNode->entity();
-          entity.transform(entityNode->entityPropertyConfig(), transformation);
-          entityNode->setEntity(std::move(entity));
+        groupNode->visitChildren(thisLambda);
+    }, [&](auto &&thisLambda, EntityNode *entityNode) {
+        auto entity = entityNode->entity();
+        entity.transform(entityNode->entityPropertyConfig(), transformation);
+        entityNode->setEntity(std::move(entity));
 
-          entityNode->visitChildren(thisLambda);
-        }, [&](BrushNode *brushNode) {
-          auto brush = brushNode->brush();
-          REQUIRE(brush.transform(worldBounds, transformation, false).is_success());
-          brushNode->setBrush(std::move(brush));
-        }, [&](PatchNode *patchNode) {
-          auto patch = patchNode->patch();
-          patch.transform(transformation);
-          patchNode->setPatch(std::move(patch));
-        }
-    ));
+        entityNode->visitChildren(thisLambda);
+    }, [&](BrushNode *brushNode) {
+        auto brush = brushNode->brush();
+        REQUIRE(brush.transform(worldBounds, transformation, false).is_success());
+        brushNode->setBrush(std::move(brush));
+    }, [&](PatchNode *patchNode) {
+        auto patch = patchNode->patch();
+        patch.transform(transformation);
+        patchNode->setPatch(std::move(patch));
+    }));
 }
 
 GameAndConfig loadGame(const std::string &gameName) {
@@ -275,7 +247,7 @@ GameAndConfig loadGame(const std::string &gameName) {
 }
 
 const Model::BrushFace *findFaceByPoints(const std::vector<Model::BrushFace> &faces, const vm::vec3 &point0, const vm::vec3 &point1, const vm::vec3 &point2) {
-    for (const Model::BrushFace &face: faces) {
+    for (const Model::BrushFace &face : faces) {
         if (face.points()[0] == point0 && face.points()[1] == point1 && face.points()[2] == point2)
             return &face;
     }
@@ -312,9 +284,8 @@ DocumentGameConfig loadMapDocument(const std::filesystem::path &mapPath, const s
     auto [document, game, gameConfig] = newMapDocument(gameName, mapFormat);
 
     document->loadDocument(mapFormat, document->worldBounds(), document->game(), std::filesystem::current_path() / mapPath).transform_error([](auto e) {
-          throw std::runtime_error{e.msg};
-        }
-    );
+        throw std::runtime_error{e.msg};
+    });
 
     return {std::move(document), std::move(game), std::move(gameConfig)};
 }
@@ -324,9 +295,8 @@ DocumentGameConfig newMapDocument(const std::string &gameName, const Model::MapF
 
     auto document = MapDocumentCommandFacade::newMapDocument();
     document->newDocument(mapFormat, vm::bbox3(8192.0), game).transform_error([](auto e) {
-          throw std::runtime_error{e.msg};
-        }
-    );
+        throw std::runtime_error{e.msg};
+    });
 
     return {std::move(document), std::move(game), std::move(gameConfig)};
 }
@@ -340,34 +310,25 @@ int getComponentOfPixel(const Assets::Texture &texture, const std::size_t x, con
     std::size_t componentIndex = 0;
     if (format == GL_RGBA) {
         switch (component) {
-            case Component::R:
-                componentIndex = 0u;
-                break;
-            case Component::G:
-                componentIndex = 1u;
-                break;
-            case Component::B:
-                componentIndex = 2u;
-                break;
-            case Component::A:
-                componentIndex = 3u;
-                break;
+        case Component::R:componentIndex = 0u;
+            break;
+        case Component::G:componentIndex = 1u;
+            break;
+        case Component::B:componentIndex = 2u;
+            break;
+        case Component::A:componentIndex = 3u;
+            break;
         }
-    }
-    else {
+    } else {
         switch (component) {
-            case Component::R:
-                componentIndex = 2u;
-                break;
-            case Component::G:
-                componentIndex = 1u;
-                break;
-            case Component::B:
-                componentIndex = 0u;
-                break;
-            case Component::A:
-                componentIndex = 3u;
-                break;
+        case Component::R:componentIndex = 2u;
+            break;
+        case Component::G:componentIndex = 1u;
+            break;
+        case Component::B:componentIndex = 0u;
+            break;
+        case Component::A:componentIndex = 3u;
+            break;
         }
     }
 
@@ -381,9 +342,7 @@ int getComponentOfPixel(const Assets::Texture &texture, const std::size_t x, con
         mip0Data[(texture.width() * 4u * y) + (x * 4u) + componentIndex]);
 }
 
-void
-checkColor(const Assets::Texture &texture, const std::size_t x, const std::size_t y, const int r, const int g, const int b, const int a, const ColorMatch match
-) {
+void checkColor(const Assets::Texture &texture, const std::size_t x, const std::size_t y, const int r, const int g, const int b, const int a, const ColorMatch match) {
 
     const auto actualR = getComponentOfPixel(texture, x, y, Component::R);
     const auto actualG = getComponentOfPixel(texture, x, y, Component::G);
@@ -396,8 +355,7 @@ checkColor(const Assets::Texture &texture, const std::size_t x, const std::size_
         CHECK(std::abs(g - actualG) <= 5);
         CHECK(std::abs(b - actualB) <= 5);
         CHECK(a == actualA);
-    }
-    else {
+    } else {
         CHECK(r == actualR);
         CHECK(g == actualG);
         CHECK(b == actualB);
@@ -428,16 +386,9 @@ TEST_CASE("TestUtilsTest.testUnorderedApproxVecMatcher")
 {
     using V = std::vector<vm::vec3>;
     CHECK_THAT((V{{1, 1, 1}}), UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01}}, 0.02));
-    CHECK_THAT((
-        V{{0, 0, 0},
-          {1, 1, 1}}
-    ), UnorderedApproxVecMatches(V{{1.01,  1.01,  1.01},
-                                   {-0.01, -0.01, -0.01}}, 0.02
-    ));
+    CHECK_THAT((V{{0, 0, 0}, {1, 1, 1}}), UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01}, {-0.01, -0.01, -0.01}}, 0.02));
 
-    CHECK_THAT((V{{1, 1, 1}}), !UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01},
-                                                            {1,    1,    1}}, 0.02
-    )); // different number of elements
+    CHECK_THAT((V{{1, 1, 1}}), !UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01}, {1, 1, 1}}, 0.02)); // different number of elements
     CHECK_THAT((V{{1, 1, 1}}), !UnorderedApproxVecMatches(V{{1.05, 1.01, 1.01}}, 0.02)); // too far
 }
 } // namespace TrenchBroom

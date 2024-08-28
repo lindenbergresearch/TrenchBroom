@@ -28,23 +28,20 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
-TEST_CASE("ResourceUtilsTest.loadDefaultTexture")
-{
-  auto fs = std::make_shared<DiskFileSystem>(
-    std::filesystem::current_path() / "fixture/test/IO/ResourceUtils/assets");
-  NullLogger logger;
+namespace TrenchBroom {
+namespace IO {
+TEST_CASE("ResourceUtilsTest.loadDefaultTexture") {
+auto fs = std::make_shared<DiskFileSystem>(std::filesystem::current_path() / "fixture/test/IO/ResourceUtils/assets");
+NullLogger logger;
 
-  auto texture = loadDefaultTexture(*fs, "some_name", logger);
-  CHECK(
-    texture.
+auto texture = loadDefaultTexture(*fs, "some_name", logger);
+CHECK(
+    texture
+.
 
-    name()
+name()
 
-    == "some_name");
+== "some_name");
 }
 } // namespace IO
 } // namespace TrenchBroom

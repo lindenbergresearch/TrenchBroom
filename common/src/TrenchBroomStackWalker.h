@@ -21,15 +21,13 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
-class TrenchBroomStackWalker
-{
-public:
+namespace TrenchBroom {
+class TrenchBroomStackWalker {
+  public:
 #if defined(_WIN32) && defined(_MSC_VER)
-  static std::string getStackTraceFromContext(void* context);
+    static std::string getStackTraceFromContext(void* context);
 #endif
 
-  static std::string getStackTrace();
+    static std::string getStackTrace();
 };
 } // namespace TrenchBroom

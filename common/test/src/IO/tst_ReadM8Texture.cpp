@@ -33,55 +33,51 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
-TEST_CASE("ReadM8TextureTest.testBasicLoading")
-{
-  auto fs = DiskFileSystem{std::filesystem::current_path()};
-  const auto file = fs.openFile("fixture/test/IO/M8/test.m8").value();
+namespace TrenchBroom {
+namespace IO {
+TEST_CASE("ReadM8TextureTest.testBasicLoading") {
+auto fs = DiskFileSystem{std::filesystem::current_path()};
+const auto file = fs.openFile("fixture/test/IO/M8/test.m8").value();
 
-  auto reader = file->reader().buffer();
-  auto texture = readM8Texture("test", reader).value();
+auto reader = file->reader().buffer();
+auto texture = readM8Texture("test", reader).value();
 
-  CHECK(
-    "test"
-    == texture.
+CHECK(
+"test"
+== texture.
 
-       name()
+name()
 
-  );
-  CHECK(
-    64
-    == texture.
+);
+CHECK(
+64
+== texture.
 
-       width()
+width()
 
-  );
-  CHECK(
-    64
-    == texture.
+);
+CHECK(
+64
+== texture.
 
-       height()
+height()
 
-  );
+);
 
-  for (size_t y = 0; y < 64; ++y)
-  {
-    for (size_t x = 0; x < 64; ++x)
-    {
-      // One pixel is blue, the others are black
-      if (x == 4 && y == 1)
-      {
-        checkColor(texture, x, y, 20, 20, 138, 255);
-      }
-      else
-      {
-        checkColor(texture, x, y, 0, 0, 0, 255);
-      }
-    }
-  }
+for (
+size_t y = 0;
+y < 64; ++y) {
+for (
+size_t x = 0;
+x < 64; ++x) {
+// One pixel is blue, the others are black
+if (x == 4 && y == 1) {
+checkColor(texture, x, y,
+20, 20, 138, 255);
 }
-} // namespace IO
+else {
+checkColor(texture, x, y,
+0, 0, 0, 255);
+}
+}}}} // namespace IO
 } // namespace TrenchBroom

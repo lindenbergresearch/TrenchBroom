@@ -28,742 +28,939 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
+namespace TrenchBroom {
+namespace View {
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.reparentLayerToLayer") {
+Model::LayerNode *layer1 = new Model::LayerNode(Model::Layer("Layer 1"));
+document->addNodes( {{
+document->
+
+world(),
 {
-namespace View
+layer1
+}
+}
+});
+
+Model::LayerNode *layer2 = new Model::LayerNode(Model::Layer("Layer 2"));
+document->addNodes(
 {
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.reparentLayerToLayer")
 {
-  Model::LayerNode* layer1 = new Model::LayerNode(Model::Layer("Layer 1"));
-  document->addNodes(
-    {{document->
+document->
 
-      world(),
+world(),
 
-      {layer1}}});
+{
+layer2}}});
 
-  Model::LayerNode* layer2 = new Model::LayerNode(Model::Layer("Layer 2"));
-  document->addNodes(
-    {{document->
-
-      world(),
-
-      {layer2}}});
-
-  CHECK_FALSE(document->reparentNodes({{layer2, {layer1}}}));
+CHECK_FALSE(document
+->reparentNodes({
+{
+layer2, {
+layer1}}}));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.reparentBetweenLayers")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.reparentBetweenLayers")
 {
-  Model::LayerNode* oldParent = new Model::LayerNode(Model::Layer("Layer 1"));
-  document->addNodes(
-    {{document->
+Model::LayerNode *oldParent = new Model::LayerNode(Model::Layer("Layer 1"));
+document->addNodes(
+{
+{
+document->
 
-      world(),
+world(),
 
-      {oldParent}}});
+{
+oldParent}}});
 
-  Model::LayerNode* newParent = new Model::LayerNode(Model::Layer("Layer 2"));
-  document->addNodes(
-    {{document->
+Model::LayerNode *newParent = new Model::LayerNode(Model::Layer("Layer 2"));
+document->addNodes(
+{
+{
+document->
 
-      world(),
+world(),
 
-      {newParent}}});
+{
+newParent}}});
 
-  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
-  document->addNodes({{oldParent, {entity}}});
+Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+oldParent, {
+entity}}});
 
-  assert(entity->parent() == oldParent);
-  CHECK(document->reparentNodes({{newParent, {entity}}}));
-  CHECK(
-    entity->
+assert(entity->parent() == oldParent);
+CHECK(document
+->reparentNodes({
+{
+newParent, {
+entity}}}));
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == newParent);
+== newParent);
 
-  document->
+document->
 
-    undoCommand();
+undoCommand();
 
-  CHECK(
-    entity->
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == oldParent);
+== oldParent);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.reparentGroupToItself")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.reparentGroupToItself")
 {
-  Model::GroupNode* group = new Model::GroupNode(Model::Group("Group"));
-  document->addNodes(
-    {{document->
+Model::GroupNode *group = new Model::GroupNode(Model::Group("Group"));
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {group}}});
+{
+group}}});
 
-  CHECK_FALSE(document->reparentNodes({{group, {group}}}));
+CHECK_FALSE(document
+->reparentNodes({
+{
+group, {
+group}}}));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.reparentGroupToChild")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.reparentGroupToChild")
 {
-  Model::GroupNode* outer = new Model::GroupNode(Model::Group("Outer"));
-  document->addNodes(
-    {{document->
+Model::GroupNode *outer = new Model::GroupNode(Model::Group("Outer"));
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {outer}}});
+{
+outer}}});
 
-  Model::GroupNode* inner = new Model::GroupNode(Model::Group("Inner"));
-  document->addNodes({{outer, {inner}}});
+Model::GroupNode *inner = new Model::GroupNode(Model::Group("Inner"));
+document->addNodes({
+{
+outer, {
+inner}}});
 
-  CHECK_FALSE(document->reparentNodes({{inner, {outer}}}));
+CHECK_FALSE(document
+->reparentNodes({
+{
+inner, {
+outer}}}));
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.removeEmptyGroup")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.removeEmptyGroup")
 {
-  Model::GroupNode* group = new Model::GroupNode(Model::Group("Group"));
-  document->addNodes(
-    {{document->
+Model::GroupNode *group = new Model::GroupNode(Model::Group("Group"));
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {group}}});
+{
+group}}});
 
-  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
-  document->addNodes({{group, {entity}}});
+Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+group, {
+entity}}});
 
-  CHECK(document->reparentNodes(
-    {{document->
+CHECK(document
+->reparentNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {entity}}}));
-  CHECK(
-    entity->
+{
+entity}}}));
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    group->
+);
+CHECK(
+    group
+->
 
-    parent()
+parent()
 
-    == nullptr);
+== nullptr);
 
-  document->
+document->
 
-    undoCommand();
+undoCommand();
 
-  CHECK(
-    group->
+CHECK(
+    group
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    entity->
+);
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == group);
+== group);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.recursivelyRemoveEmptyGroups")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.recursivelyRemoveEmptyGroups")
 {
-  Model::GroupNode* outer = new Model::GroupNode(Model::Group("Outer"));
-  document->addNodes(
-    {{document->
+Model::GroupNode *outer = new Model::GroupNode(Model::Group("Outer"));
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {outer}}});
+{
+outer}}});
 
-  Model::GroupNode* inner = new Model::GroupNode(Model::Group("Inner"));
-  document->addNodes({{outer, {inner}}});
+Model::GroupNode *inner = new Model::GroupNode(Model::Group("Inner"));
+document->addNodes({
+{
+outer, {
+inner}}});
 
-  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
-  document->addNodes({{inner, {entity}}});
+Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+inner, {
+entity}}});
 
-  CHECK(document->reparentNodes(
-    {{document->
+CHECK(document
+->reparentNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {entity}}}));
-  CHECK(
-    entity->
+{
+entity}}}));
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    inner->
+);
+CHECK(
+    inner
+->
 
-    parent()
+parent()
 
-    == nullptr);
-  CHECK(
-    outer->
+== nullptr);
+CHECK(
+    outer
+->
 
-    parent()
+parent()
 
-    == nullptr);
+== nullptr);
 
-  document->
+document->
 
-    undoCommand();
+undoCommand();
 
-  CHECK(
-    outer->
+CHECK(
+    outer
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    inner->
+);
+CHECK(
+    inner
+->
 
-    parent()
+parent()
 
-    == outer);
-  CHECK(
-    entity->
+== outer);
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == inner);
+== inner);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.removeEmptyEntity")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.removeEmptyEntity")
 {
-  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
-  document->addNodes(
-    {{document->
+Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {entity}}});
+{
+entity}}});
 
-  Model::BrushNode* brush = createBrushNode();
-  document->addNodes({{entity, {brush}}});
+Model::BrushNode *brush = createBrushNode();
+document->addNodes({
+{
+entity, {
+brush}}});
 
-  CHECK(document->reparentNodes(
-    {{document->
+CHECK(document
+->reparentNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brush}}}));
-  CHECK(
-    brush->
+{
+brush}}}));
+CHECK(
+    brush
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    entity->
+);
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == nullptr);
+== nullptr);
 
-  document->
+document->
 
-    undoCommand();
+undoCommand();
 
-  CHECK(
-    entity->
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    brush->
+);
+CHECK(
+    brush
+->
 
-    parent()
+parent()
 
-    == entity);
+== entity);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.removeEmptyGroupAndEntity")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.removeEmptyGroupAndEntity")
 {
-  Model::GroupNode* group = new Model::GroupNode(Model::Group("Group"));
-  document->addNodes(
-    {{document->
+Model::GroupNode *group = new Model::GroupNode(Model::Group("Group"));
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {group}}});
+{
+group}}});
 
-  Model::EntityNode* entity = new Model::EntityNode{Model::Entity{}};
-  document->addNodes({{group, {entity}}});
+Model::EntityNode *entity = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+group, {
+entity}}});
 
-  Model::BrushNode* brush = createBrushNode();
-  document->addNodes({{entity, {brush}}});
+Model::BrushNode *brush = createBrushNode();
+document->addNodes({
+{
+entity, {
+brush}}});
 
-  CHECK(document->reparentNodes(
-    {{document->
+CHECK(document
+->reparentNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {brush}}}));
-  CHECK(
-    brush->
+{
+brush}}}));
+CHECK(
+    brush
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    group->
+);
+CHECK(
+    group
+->
 
-    parent()
+parent()
 
-    == nullptr);
-  CHECK(
-    entity->
+== nullptr);
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == nullptr);
+== nullptr);
 
-  document->
+document->
 
-    undoCommand();
+undoCommand();
 
-  CHECK(
-    group->
+CHECK(
+    group
+->
 
-    parent()
+parent()
 
-    == document->
+== document->
 
-       parentForNodes()
+parentForNodes()
 
-  );
-  CHECK(
-    entity->
+);
+CHECK(
+    entity
+->
 
-    parent()
+parent()
 
-    == group);
-  CHECK(
-    brush->
+== group);
+CHECK(
+    brush
+->
 
-    parent()
+parent()
 
-    == entity);
+== entity);
 }
 
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.updateLinkedGroups")
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.updateLinkedGroups")
 {
-  auto* groupNode = new Model::GroupNode{Model::Group{"group"}};
-  auto* brushNode = createBrushNode();
-  groupNode->addChild(brushNode);
-  document->addNodes(
-    {{document->
+auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
+auto *brushNode = createBrushNode();
+groupNode->
+addChild(brushNode);
+document->addNodes(
+{
+{
+document->
 
-      parentForNodes(),
+parentForNodes(),
 
-      {groupNode}}});
+{
+groupNode}}});
 
-  document->selectNodes({groupNode});
-  auto* linkedGroupNode = document->createLinkedDuplicate();
-  document->
+document->selectNodes({
+groupNode});
+auto *linkedGroupNode = document->createLinkedDuplicate();
+document->
 
-    deselectAll();
+deselectAll();
 
-  document->selectNodes({linkedGroupNode});
-  document->translateObjects(vm::vec3(32.0, 0.0, 0.0));
-  document->
+document->selectNodes({
+linkedGroupNode});
+document->
+translateObjects(vm::vec3(32.0, 0.0, 0.0)
+);
+document->
 
-    deselectAll();
+deselectAll();
 
-  SECTION("Move node into group node")
-  {
-    auto* entityNode = new Model::EntityNode{Model::Entity{}};
-    document->addNodes(
-      {{document->
+SECTION("Move node into group node")
+{
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes(
+{
+{
+document->
 
-        parentForNodes(),
+parentForNodes(),
 
-        {entityNode}}});
+{
+entityNode}}});
 
-    REQUIRE(
-      groupNode->
+REQUIRE(
+    groupNode
+->
 
-      childCount()
+childCount()
 
-      == 1u);
-    REQUIRE(
-      linkedGroupNode->
+== 1u);
+REQUIRE(
+    linkedGroupNode
+->
 
-      childCount()
+childCount()
 
-      == 1u);
+== 1u);
 
-    document->reparentNodes({{groupNode, {entityNode}}});
+document->reparentNodes({
+{
+groupNode, {
+entityNode}}});
 
-    CHECK(
-      groupNode->
+CHECK(
+    groupNode
+->
 
-      childCount()
+childCount()
 
-      == 2u);
-    CHECK(
-      linkedGroupNode->
+== 2u);
+CHECK(
+    linkedGroupNode
+->
 
-      childCount()
+childCount()
 
-      == 2u);
+== 2u);
 
-    auto* linkedEntityNode =
-      dynamic_cast<Model::EntityNode*>(linkedGroupNode->children().back());
-    CHECK(linkedEntityNode != nullptr);
+auto *linkedEntityNode = dynamic_cast<Model::EntityNode *>(linkedGroupNode->children().back());
+CHECK(linkedEntityNode
+!= nullptr);
 
-    CHECK(
-      linkedEntityNode->
+CHECK(
+    linkedEntityNode
+->
 
-      physicalBounds()
+physicalBounds()
 
-      == entityNode
-           ->
+== entityNode
+->
 
-         physicalBounds()
+physicalBounds()
 
-           .transform(linkedGroupNode
-                        ->
+.
+transform(linkedGroupNode
+->
 
-                      group()
+group()
 
-                        .
+.
 
-                      transformation()
+transformation()
 
-                        ));
+));
 
-    document->
+document->
 
-      undoCommand();
+undoCommand();
 
-    CHECK(
-      entityNode->
+CHECK(
+    entityNode
+->
 
-      parent()
+parent()
 
-      == document->
+== document->
 
-         parentForNodes()
+parentForNodes()
 
-    );
-    CHECK(
-      groupNode->
+);
+CHECK(
+    groupNode
+->
 
-      childCount()
+childCount()
 
-      == 1u);
-    CHECK(
-      linkedGroupNode->
+== 1u);
+CHECK(
+    linkedGroupNode
+->
 
-      childCount()
+childCount()
 
-      == 1u);
-  }
+== 1u);
+}
 
-  SECTION("Move node out of group node")
-  {
-    auto* entityNode = new Model::EntityNode{Model::Entity{}};
-    document->addNodes({{groupNode, {entityNode}}});
+SECTION("Move node out of group node")
+{
+auto *entityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes({
+{
+groupNode, {
+entityNode}}});
 
-    REQUIRE(
-      groupNode->
+REQUIRE(
+    groupNode
+->
 
-      childCount()
+childCount()
 
-      == 2u);
-    REQUIRE(
-      linkedGroupNode->
+== 2u);
+REQUIRE(
+    linkedGroupNode
+->
 
-      childCount()
+childCount()
 
-      == 2u);
+== 2u);
 
-    document->reparentNodes(
-      {{document->
+document->reparentNodes(
+{
+{
+document->
 
-        parentForNodes(),
+parentForNodes(),
 
-        {entityNode}}});
+{
+entityNode}}});
 
-    CHECK(
-      entityNode->
+CHECK(
+    entityNode
+->
 
-      parent()
+parent()
 
-      == document->
+== document->
 
-         parentForNodes()
+parentForNodes()
 
-    );
-    CHECK(
-      groupNode->
+);
+CHECK(
+    groupNode
+->
 
-      childCount()
+childCount()
 
-      == 1u);
-    CHECK(
-      linkedGroupNode->
+== 1u);
+CHECK(
+    linkedGroupNode
+->
 
-      childCount()
+childCount()
 
-      == 1u);
+== 1u);
 
-    document->
+document->
 
-      undoCommand();
+undoCommand();
 
-    CHECK(
-      entityNode->
+CHECK(
+    entityNode
+->
 
-      parent()
+parent()
 
-      == groupNode);
-    CHECK(
-      groupNode->
+== groupNode);
+CHECK(
+    groupNode
+->
 
-      childCount()
+childCount()
 
-      == 2u);
-    CHECK(
-      linkedGroupNode->
+== 2u);
+CHECK(
+    linkedGroupNode
+->
 
-      childCount()
+childCount()
 
-      == 2u);
-  }
+== 2u);
+}}
+
+TEST_CASE_METHOD(
+    MapDocumentTest,
+"RemoveNodesTest.updateLinkedGroupsAfterRecursiveDelete")
+{
+auto *outerGroupNode = new Model::GroupNode(Model::Group("outer"));
+document->addNodes(
+{
+{
+document->
+
+parentForNodes(),
+
+{
+outerGroupNode}}});
+
+document->
+openGroup(outerGroupNode);
+
+auto *outerEntityNode = new Model::EntityNode{Model::Entity{}};
+auto *innerGroupNode = new Model::GroupNode{Model::Group{"inner"}};
+document->addNodes(
+{
+{
+document->
+
+parentForNodes(),
+
+{
+outerEntityNode, innerGroupNode}}});
+
+document->
+openGroup(innerGroupNode);
+
+auto *innerEntityNode = new Model::EntityNode{Model::Entity{}};
+document->addNodes(
+{
+{
+document->
+
+parentForNodes(),
+
+{
+innerEntityNode}}});
+
+document->
+
+closeGroup();
+
+document->
+
+closeGroup();
+
+document->selectNodes({
+outerGroupNode});
+
+auto *linkedOuterGroupNode = document->createLinkedDuplicate();
+
+document->
+
+deselectAll();
+
+document->reparentNodes(
+{
+{
+document->
+
+parentForNodes(),
+
+{
+innerEntityNode}}});
+REQUIRE(
+    outerGroupNode
+->
+
+children()
+
+== std::vector<Model::Node *>{
+outerEntityNode});
+CHECK(
+    linkedOuterGroupNode
+->
+
+childCount()
+
+== outerGroupNode->
+
+childCount()
+
+);
+
+document->
+
+undoCommand();
+
+CHECK(
+    linkedOuterGroupNode
+->
+
+childCount()
+
+== outerGroupNode->
+
+childCount()
+
+);
+
+document->
+
+redoCommand();
+
+CHECK(
+    linkedOuterGroupNode
+->
+
+childCount()
+
+== outerGroupNode->
+
+childCount()
+
+);
+}
+
+TEST_CASE_METHOD(MapDocumentTest,
+"ReparentNodesTest.updateLinkedGroupsFails")
+{
+auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
+document->addNodes(
+{
+{
+document->
+
+parentForNodes(),
+
+{
+groupNode}}});
+
+document->selectNodes({
+groupNode});
+auto *linkedGroupNode = document->createLinkedDuplicate();
+document->
+
+deselectAll();
+
+// adding a brush to the linked group node will fail because it will go out of world
+// bounds
+document->selectNodes({
+linkedGroupNode});
+document->
+translateObjects(document
+->
+
+worldBounds()
+
+.max);
+document->
+
+deselectAll();
+
+auto *brushNode = createBrushNode();
+document->addNodes(
+{
+{
+document->
+
+parentForNodes(),
+
+{
+brushNode}}});
+
+CHECK_FALSE(document
+->reparentNodes({
+{
+groupNode, {
+brushNode}}}));
+
+CHECK(
+    groupNode
+->
+
+childCount()
+
+== 0u);
+CHECK(
+    linkedGroupNode
+->
+
+childCount()
+
+== 0u);
 }
 
 TEST_CASE_METHOD(
-  MapDocumentTest, "RemoveNodesTest.updateLinkedGroupsAfterRecursiveDelete")
+    MapDocumentTest,
+"ReparentNodesTest.updateLinkedGroupsFailsAfterMovingNodeBetweenLinkedGroups")
 {
-  auto* outerGroupNode = new Model::GroupNode(Model::Group("outer"));
-  document->addNodes(
-    {{document->
+auto *groupNode = new Model::GroupNode{Model::Group{"group"}};
+auto *brushNode = createBrushNode();
+groupNode->
+addChild(brushNode);
 
-      parentForNodes(),
-
-      {outerGroupNode}}});
-
-  document->openGroup(outerGroupNode);
-
-  auto* outerEntityNode = new Model::EntityNode{Model::Entity{}};
-  auto* innerGroupNode = new Model::GroupNode{Model::Group{"inner"}};
-  document->addNodes(
-    {{document->
-
-      parentForNodes(),
-
-      {outerEntityNode, innerGroupNode}}});
-
-  document->openGroup(innerGroupNode);
-
-  auto* innerEntityNode = new Model::EntityNode{Model::Entity{}};
-  document->addNodes(
-    {{document->
-
-      parentForNodes(),
-
-      {innerEntityNode}}});
-
-  document->
-
-    closeGroup();
-
-  document->
-
-    closeGroup();
-
-  document->selectNodes({outerGroupNode});
-
-  auto* linkedOuterGroupNode = document->createLinkedDuplicate();
-
-  document->
-
-    deselectAll();
-
-  document->reparentNodes(
-    {{document->
-
-      parentForNodes(),
-
-      {innerEntityNode}}});
-  REQUIRE(
-    outerGroupNode->
-
-    children()
-
-    == std::vector<Model::Node*>{outerEntityNode});
-  CHECK(
-    linkedOuterGroupNode->
-
-    childCount()
-
-    == outerGroupNode->
-
-       childCount()
-
-  );
-
-  document->
-
-    undoCommand();
-
-  CHECK(
-    linkedOuterGroupNode->
-
-    childCount()
-
-    == outerGroupNode->
-
-       childCount()
-
-  );
-
-  document->
-
-    redoCommand();
-
-  CHECK(
-    linkedOuterGroupNode->
-
-    childCount()
-
-    == outerGroupNode->
-
-       childCount()
-
-  );
-}
-
-TEST_CASE_METHOD(MapDocumentTest, "ReparentNodesTest.updateLinkedGroupsFails")
+document->addNodes(
 {
-  auto* groupNode = new Model::GroupNode{Model::Group{"group"}};
-  document->addNodes(
-    {{document->
-
-      parentForNodes(),
-
-      {groupNode}}});
-
-  document->selectNodes({groupNode});
-  auto* linkedGroupNode = document->createLinkedDuplicate();
-  document->
-
-    deselectAll();
-
-  // adding a brush to the linked group node will fail because it will go out of world
-  // bounds
-  document->selectNodes({linkedGroupNode});
-  document->translateObjects(document
-                               ->
-
-                             worldBounds()
-
-                               .max);
-  document->
-
-    deselectAll();
-
-  auto* brushNode = createBrushNode();
-  document->addNodes(
-    {{document->
-
-      parentForNodes(),
-
-      {brushNode}}});
-
-  CHECK_FALSE(document->reparentNodes({{groupNode, {brushNode}}}));
-
-  CHECK(
-    groupNode->
-
-    childCount()
-
-    == 0u);
-  CHECK(
-    linkedGroupNode->
-
-    childCount()
-
-    == 0u);
-}
-
-TEST_CASE_METHOD(
-  MapDocumentTest,
-  "ReparentNodesTest.updateLinkedGroupsFailsAfterMovingNodeBetweenLinkedGroups")
 {
-  auto* groupNode = new Model::GroupNode{Model::Group{"group"}};
-  auto* brushNode = createBrushNode();
-  groupNode->addChild(brushNode);
+document->
 
-  document->addNodes(
-    {{document->
+parentForNodes(),
 
-      parentForNodes(),
+{
+groupNode}}});
 
-      {groupNode}}});
+document->selectNodes({
+groupNode});
+auto *linkedGroupNode = document->createLinkedDuplicate();
+document->
 
-  document->selectNodes({groupNode});
-  auto* linkedGroupNode = document->createLinkedDuplicate();
-  document->
+deselectAll();
 
-    deselectAll();
+CHECK_FALSE(document
+->reparentNodes({
+{
+linkedGroupNode, {
+brushNode}}}));
 
-  CHECK_FALSE(document->reparentNodes({{linkedGroupNode, {brushNode}}}));
+CHECK(
+    groupNode
+->
 
-  CHECK(
-    groupNode->
+childCount()
 
-    childCount()
+== 1u);
+CHECK(
+    linkedGroupNode
+->
 
-    == 1u);
-  CHECK(
-    linkedGroupNode->
+childCount()
 
-    childCount()
-
-    == 1u);
-}
-} // namespace View
+== 1u);
+}} // namespace View
 } // namespace TrenchBroom

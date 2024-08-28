@@ -66,7 +66,7 @@ TEST_CASE("CameraTest.testOrbitWhileInverted")
 {
 PerspectiveCamera c;
 c.
-setDirection(vm::vec3f(1, 0, 0), vm::vec3f(0, 0, - 1)
+setDirection(vm::vec3f(1, 0, 0), vm::vec3f(0, 0, -1)
 );
 
 c.

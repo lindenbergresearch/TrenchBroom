@@ -24,71 +24,57 @@
 #include <vm/bbox.h>
 #include <vm/plane.h>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class Camera;
 
-
 class RenderBatch;
-
 
 class RenderContext;
 } // namespace Renderer
 
-namespace View
-{
-class Lasso
-{
-private:
-  const Renderer::Camera& m_camera;
-  const FloatType m_distance;
-  const vm::vec3 m_start;
-  vm::vec3 m_cur;
+namespace View {
+class Lasso {
+  private:
+    const Renderer::Camera &m_camera;
+    const FloatType m_distance;
+    const vm::vec3 m_start;
+    vm::vec3 m_cur;
 
-public:
-  Lasso(const Renderer::Camera& camera, FloatType distance, const vm::vec3& point);
+  public:
+    Lasso(const Renderer::Camera &camera, FloatType distance, const vm::vec3 &point);
 
-  void update(const vm::vec3& point);
+    void update(const vm::vec3 &point);
 
-  template <typename I, typename O>
-  void selected(I cur, I end, O out) const
-  {
-    const auto plane = getPlane();
-    const auto box = getBox(getTransform());
-    while (cur != end)
-    {
-      if (selects(*cur, plane, box))
-      {
-        out = *cur;
-      }
-      ++cur;
+    template<typename I, typename O> void selected(I cur, I end, O out) const {
+        const auto plane = getPlane();
+        const auto box = getBox(getTransform());
+        while (cur != end) {
+            if (selects(*cur, plane, box)) {
+                out = *cur;
+            }
+            ++cur;
+        }
     }
-  }
 
-private:
-  bool selects(
-    const vm::vec3& point, const vm::plane3& plane, const vm::bbox2& box) const;
+  private:
+    bool selects(const vm::vec3 &point, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-  bool selects(
-    const vm::segment3& edge, const vm::plane3& plane, const vm::bbox2& box) const;
+    bool selects(const vm::segment3 &edge, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-  bool selects(
-    const vm::polygon3& polygon, const vm::plane3& plane, const vm::bbox2& box) const;
+    bool selects(const vm::polygon3 &polygon, const vm::plane3 &plane, const vm::bbox2 &box) const;
 
-  vm::vec3 project(const vm::vec3& point, const vm::plane3& plane) const;
+    vm::vec3 project(const vm::vec3 &point, const vm::plane3 &plane) const;
 
-public:
-  void render(
-    Renderer::RenderContext& renderContext, Renderer::RenderBatch& renderBatch) const;
+  public:
+    void render(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) const;
 
-private:
-  vm::plane3 getPlane() const;
+  private:
+    vm::plane3 getPlane() const;
 
-  vm::mat4x4 getTransform() const;
+    vm::mat4x4 getTransform() const;
 
-  vm::bbox2 getBox(const vm::mat4x4& transform) const;
+    vm::bbox2 getBox(const vm::mat4x4 &transform) const;
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -21,33 +21,24 @@
 
 #include <QWidget>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class BorderPanel : public QWidget
-{
+namespace TrenchBroom {
+namespace View {
+class BorderPanel : public QWidget {
   Q_OBJECT
-public:
-  enum Sides
-  {
-    TopSide = 1,
-    RightSide = 2,
-    BottomSide = 4,
-    LeftSide = 8,
-    AllSides = TopSide | RightSide | BottomSide | LeftSide
-  };
+  public:
+    enum Sides {
+      TopSide = 1, RightSide = 2, BottomSide = 4, LeftSide = 8, AllSides = TopSide | RightSide | BottomSide | LeftSide
+    };
 
-private:
-  int m_borders;
-  int m_thickness;
+  private:
+    int m_borders;
+    int m_thickness;
 
-public:
-  explicit BorderPanel(
-    Sides borders = AllSides, int thickness = 1, QWidget* parent = nullptr);
+  public:
+    explicit BorderPanel(Sides borders = AllSides, int thickness = 1, QWidget *parent = nullptr);
 
-protected:
-  void paintEvent(QPaintEvent* event) override;
+  protected:
+    void paintEvent(QPaintEvent *event) override;
 };
 } // namespace View
 } // namespace TrenchBroom

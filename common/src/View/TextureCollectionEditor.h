@@ -27,86 +27,79 @@
 #include <memory>
 #include <vector>
 
-
 class QListWidget;
-
 
 class QAbstractButton;
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class Node;
 }
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class MapDocument;
 
-
-class TextureCollectionEditor : public QWidget
-{
+class TextureCollectionEditor : public QWidget {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
+  private:
+    std::weak_ptr<MapDocument> m_document;
 
-  QListWidget* m_availableCollectionsList = nullptr;
-  QListWidget* m_enabledCollectionsList = nullptr;
+    QListWidget *m_availableCollectionsList = nullptr;
+    QListWidget *m_enabledCollectionsList = nullptr;
 
-  QAbstractButton* m_addCollectionsButton = nullptr;
-  QAbstractButton* m_removeCollectionsButton = nullptr;
-  QAbstractButton* m_reloadCollectionsButton = nullptr;
+    QAbstractButton *m_addCollectionsButton = nullptr;
+    QAbstractButton *m_removeCollectionsButton = nullptr;
+    QAbstractButton *m_reloadCollectionsButton = nullptr;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
-public:
-  explicit TextureCollectionEditor(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit TextureCollectionEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-private:
-  void addSelectedTextureCollections();
+  private:
+    void addSelectedTextureCollections();
 
-  void removeSelectedTextureCollections();
+    void removeSelectedTextureCollections();
 
-  void reloadTextureCollections();
+    void reloadTextureCollections();
 
-  void availableTextureCollectionSelectionChanged();
+    void availableTextureCollectionSelectionChanged();
 
-  void enabledTextureCollectionSelectionChanged();
+    void enabledTextureCollectionSelectionChanged();
 
-  bool canAddTextureCollections() const;
+    bool canAddTextureCollections() const;
 
-  bool canRemoveTextureCollections() const;
+    bool canRemoveTextureCollections() const;
 
-  bool canReloadTextureCollections() const;
+    bool canReloadTextureCollections() const;
 
-private:
-  void createGui();
+  private:
+    void createGui();
 
-  void updateButtons();
+    void updateButtons();
 
-  void connectObservers();
+    void connectObservers();
 
-  void documentWasNewedOrLoaded(MapDocument*);
+    void documentWasNewedOrLoaded(MapDocument *);
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+    void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void textureCollectionsDidChange();
+    void textureCollectionsDidChange();
 
-  void modsDidChange();
+    void modsDidChange();
 
-  void preferenceDidChange(const std::filesystem::path& path);
+    void preferenceDidChange(const std::filesystem::path &path);
 
-  void updateAllTextureCollections();
+    void updateAllTextureCollections();
 
-  void updateAvailableTextureCollections();
+    void updateAvailableTextureCollections();
 
-  void updateEnabledTextureCollections();
+    void updateEnabledTextureCollections();
 
-  void updateListBox(QListWidget* box, const std::vector<std::filesystem::path>& paths);
+    void updateListBox(QListWidget *box, const std::vector<std::filesystem::path> &paths);
 
-  std::vector<std::filesystem::path> availableTextureCollections() const;
+    std::vector<std::filesystem::path> availableTextureCollections() const;
 
-  std::vector<std::filesystem::path> enabledTextureCollections() const;
+    std::vector<std::filesystem::path> enabledTextureCollections() const;
 };
 
 } // namespace TrenchBroom::View

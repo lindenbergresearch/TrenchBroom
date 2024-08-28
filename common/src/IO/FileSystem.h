@@ -27,94 +27,75 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 class File;
 
-
 class FileSystem;
-
 
 enum class PathInfo;
 enum class TraversalMode;
 
+class FileSystem {
+  public:
+    virtual ~FileSystem();
 
-class FileSystem
-{
-public:
-  virtual ~FileSystem();
+    /** Return an absolute path for the given relative path.
+     *
+     * @return an absolute path or an error if the given path is already an absolute path or
+     * if the given path is invalid
+     */
+    virtual Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const = 0;
 
-  /** Return an absolute path for the given relative path.
-   *
-   * @return an absolute path or an error if the given path is already an absolute path or
-   * if the given path is invalid
-   */
-  virtual Result<std::filesystem::path> makeAbsolute(
-    const std::filesystem::path& path) const = 0;
+    /** Indicates whether the given path denotes a file, a directory, or is unknown.
+     */
+    virtual PathInfo pathInfo(const std::filesystem::path &path) const = 0;
 
-  /** Indicates whether the given path denotes a file, a directory, or is unknown.
-   */
-  virtual PathInfo pathInfo(const std::filesystem::path& path) const = 0;
+    /** Returns a vector of paths listing the contents of the directory  at the given path
+     * that satisfy the given path matcher. The returned paths are relative to the root of
+     * this file system.
+     *
+     * @param path the path to the directory to search
+     * @param traversalMode the traversal mode
+     * @param pathMatcher only return paths that satisfy this path matcher
+     */
+    Result<std::vector<std::filesystem::path>> find(const std::filesystem::path &path, TraversalMode traversalMode, const PathMatcher &pathMatcher = matchAnyPath) const;
 
-  /** Returns a vector of paths listing the contents of the directory  at the given path
-   * that satisfy the given path matcher. The returned paths are relative to the root of
-   * this file system.
-   *
-   * @param path the path to the directory to search
-   * @param traversalMode the traversal mode
-   * @param pathMatcher only return paths that satisfy this path matcher
-   */
-  Result<std::vector<std::filesystem::path>> find(
-    const std::filesystem::path& path,
-    TraversalMode traversalMode,
-    const PathMatcher& pathMatcher = matchAnyPath) const;
+    /** Open a file at the given path and return it.
+     */
+    Result<std::shared_ptr<File>> openFile(const std::filesystem::path &path) const;
 
-  /** Open a file at the given path and return it.
-   */
-  Result<std::shared_ptr<File>> openFile(const std::filesystem::path& path) const;
+  protected:
+    virtual Result<std::vector<std::filesystem::path>> doFind(const std::filesystem::path &path, TraversalMode traversalMode) const = 0;
 
-protected:
-  virtual Result<std::vector<std::filesystem::path>> doFind(
-    const std::filesystem::path& path, TraversalMode traversalMode) const = 0;
-
-  virtual Result<std::shared_ptr<File>> doOpenFile(
-    const std::filesystem::path& path) const = 0;
+    virtual Result<std::shared_ptr<File>> doOpenFile(const std::filesystem::path &path) const = 0;
 };
 
+class WritableFileSystem : public virtual FileSystem {
+  public:
+    ~WritableFileSystem() override;
 
-class WritableFileSystem : public virtual FileSystem
-{
-public:
-  ~WritableFileSystem() override;
+    Result<void> createFileAtomic(const std::filesystem::path &path, const std::string &contents);
 
-  Result<void> createFileAtomic(
-    const std::filesystem::path& path, const std::string& contents);
+    Result<void> createFile(const std::filesystem::path &path, const std::string &contents);
 
-  Result<void> createFile(const std::filesystem::path& path, const std::string& contents);
+    Result<bool> createDirectory(const std::filesystem::path &path);
 
-  Result<bool> createDirectory(const std::filesystem::path& path);
+    Result<bool> deleteFile(const std::filesystem::path &path);
 
-  Result<bool> deleteFile(const std::filesystem::path& path);
+    Result<void> copyFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath);
 
-  Result<void> copyFile(
-    const std::filesystem::path& sourcePath, const std::filesystem::path& destPath);
+    Result<void> moveFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath);
 
-  Result<void> moveFile(
-    const std::filesystem::path& sourcePath, const std::filesystem::path& destPath);
+  private:
+    virtual Result<void> doCreateFile(const std::filesystem::path &path, const std::string &contents) = 0;
 
-private:
-  virtual Result<void> doCreateFile(
-    const std::filesystem::path& path, const std::string& contents) = 0;
+    virtual Result<bool> doCreateDirectory(const std::filesystem::path &path) = 0;
 
-  virtual Result<bool> doCreateDirectory(const std::filesystem::path& path) = 0;
+    virtual Result<bool> doDeleteFile(const std::filesystem::path &path) = 0;
 
-  virtual Result<bool> doDeleteFile(const std::filesystem::path& path) = 0;
+    virtual Result<void> doCopyFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) = 0;
 
-  virtual Result<void> doCopyFile(
-    const std::filesystem::path& sourcePath, const std::filesystem::path& destPath) = 0;
-
-  virtual Result<void> doMoveFile(
-    const std::filesystem::path& sourcePath, const std::filesystem::path& destPath) = 0;
+    virtual Result<void> doMoveFile(const std::filesystem::path &sourcePath, const std::filesystem::path &destPath) = 0;
 };
 
 } // namespace TrenchBroom::IO

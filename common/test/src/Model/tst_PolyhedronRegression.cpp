@@ -48,13 +48,9 @@ using EdgeInfo = std::pair<vm::vec3d, vm::vec3d>;
 using EdgeInfoList = std::vector<EdgeInfo>;
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints") {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 64.0, - 45.5049, - 34.4752), vm::vec3d(- 64.0, - 43.6929, - 48.0), vm::vec3d(- 64.0, 20.753, - 34.4752), vm::vec3d(- 64.0, 64.0, - 48.0),
-        vm::vec3d(- 63.7297, 22.6264, - 48.0), vm::vec3d(- 57.9411, 22.6274, - 37.9733), vm::vec3d(- 44.6031, - 39.1918, - 48.0),
-        vm::vec3d(- 43.5959, - 39.1918, - 46.2555),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-64.0, -45.5049, -34.4752), vm::vec3d(-64.0, -43.6929, -48.0), vm::vec3d(-64.0, 20.753, -34.4752), vm::vec3d(-64.0, 64.0, -48.0), vm::vec3d(-63.7297, 22.6264, -48.0), vm::vec3d(-57.9411, 22.6274, -37.9733), vm::vec3d(-44.6031, -39.1918, -48.0), vm::vec3d(-43.5959, -39.1918, -46.2555),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -66,12 +62,9 @@ vertexCount()
 }
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints2") {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 64.0, 48.7375, - 34.4752), vm::vec3d(- 64.0, 64.0, - 48.0), vm::vec3d(- 64.0, 64.0, - 34.4752), vm::vec3d(- 63.7297, 22.6264, - 48.0),
-        vm::vec3d(- 57.9411, 22.6274, - 37.9733), vm::vec3d(- 40.5744, 28.0, - 48.0), vm::vec3d(- 40.5744, 64.0, - 48.0),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-64.0, 48.7375, -34.4752), vm::vec3d(-64.0, 64.0, -48.0), vm::vec3d(-64.0, 64.0, -34.4752), vm::vec3d(-63.7297, 22.6264, -48.0), vm::vec3d(-57.9411, 22.6274, -37.9733), vm::vec3d(-40.5744, 28.0, -48.0), vm::vec3d(-40.5744, 64.0, -48.0),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -97,12 +90,9 @@ hasVertex(v)
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints3")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 64, - 64, - 48), vm::vec3d(- 64, 22.5637, - 48), vm::vec3d(- 64, 64, - 48), vm::vec3d(- 63.7297, 22.6264, - 48),
-        vm::vec3d(- 57.9411, 22.6274, - 37.9733), vm::vec3d(- 44.6031, - 39.1918, - 48), vm::vec3d(- 43.5959, - 39.1918, - 46.2555),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-64, -64, -48), vm::vec3d(-64, 22.5637, -48), vm::vec3d(-64, 64, -48), vm::vec3d(-63.7297, 22.6264, -48), vm::vec3d(-57.9411, 22.6274, -37.9733), vm::vec3d(-44.6031, -39.1918, -48), vm::vec3d(-43.5959, -39.1918, -46.2555),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -115,14 +105,9 @@ vertexCount()
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints4")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 64, 64, - 48), vm::vec3d(- 43.5959, - 39.1918, - 46.2555), vm::vec3d(- 40.5744, - 38.257, - 48), vm::vec3d(- 36.9274, - 64, - 48),
-        vm::vec3d(1.58492, - 39.1918, 32), vm::vec3d(9.2606, - 64, 32), vm::vec3d(12.8616, - 64, 32), vm::vec3d(12.8616, - 36.5751, 32),
-        vm::vec3d(26.7796, - 22.6274, - 48), vm::vec3d(39.5803, - 64, - 48), vm::vec3d(57.9411, - 22.6274, 5.9733), vm::vec3d(64, - 64, - 5.70392),
-        vm::vec3d(64, - 64, 2.47521), vm::vec3d(64, - 48.7375, 2.47521),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-64, 64, -48), vm::vec3d(-43.5959, -39.1918, -46.2555), vm::vec3d(-40.5744, -38.257, -48), vm::vec3d(-36.9274, -64, -48), vm::vec3d(1.58492, -39.1918, 32), vm::vec3d(9.2606, -64, 32), vm::vec3d(12.8616, -64, 32), vm::vec3d(12.8616, -36.5751, 32), vm::vec3d(26.7796, -22.6274, -48), vm::vec3d(39.5803, -64, -48), vm::vec3d(57.9411, -22.6274, 5.9733), vm::vec3d(64, -64, -5.70392), vm::vec3d(64, -64, 2.47521), vm::vec3d(64, -48.7375, 2.47521),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -135,12 +120,9 @@ vertexCount()
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints5")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 64, - 64, - 64), vm::vec3d(- 64, - 64, 64), vm::vec3d(- 64, - 32, 64), vm::vec3d(- 32, - 64, - 64), vm::vec3d(- 32, - 64, 64),
-        vm::vec3d(- 32, - 0, - 64), vm::vec3d(- 32, - 0, 64), vm::vec3d(- 0, - 32, - 64), vm::vec3d(- 0, - 32, 64), vm::vec3d(64, - 64, - 64),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-64, -64, -64), vm::vec3d(-64, -64, 64), vm::vec3d(-64, -32, 64), vm::vec3d(-32, -64, -64), vm::vec3d(-32, -64, 64), vm::vec3d(-32, -0, -64), vm::vec3d(-32, -0, 64), vm::vec3d(-0, -32, -64), vm::vec3d(-0, -32, 64), vm::vec3d(64, -64, -64),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -153,12 +135,9 @@ vertexCount()
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints6")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 32, - 16, - 32), vm::vec3d(- 32, 16, - 32), vm::vec3d(- 32, 16, - 0), vm::vec3d(- 16, - 16, - 32), vm::vec3d(- 16, - 16, - 0),
-        vm::vec3d(- 16, 16, - 32), vm::vec3d(- 16, 16, - 0), vm::vec3d(32, - 16, - 32),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-32, -16, -32), vm::vec3d(-32, 16, -32), vm::vec3d(-32, 16, -0), vm::vec3d(-16, -16, -32), vm::vec3d(-16, -16, -0), vm::vec3d(-16, 16, -32), vm::vec3d(-16, 16, -0), vm::vec3d(32, -16, -32),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -171,12 +150,9 @@ vertexCount()
 
 TEST_CASE("PolyhedronTest.convexHullWithFailingPoints7")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(12.8616, - 36.5751, 32), vm::vec3d(57.9411, - 22.6274, 5.9733), vm::vec3d(64, - 64, 2.47521), vm::vec3d(64, - 64, 32),
-        vm::vec3d(64, - 48.7375, 2.47521), vm::vec3d(64, - 24.7084, 32), vm::vec3d(64, - 22.6274, 16.4676), vm::vec3d(64, 64, 32),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(12.8616, -36.5751, 32), vm::vec3d(57.9411, -22.6274, 5.9733), vm::vec3d(64, -64, 2.47521), vm::vec3d(64, -64, 32), vm::vec3d(64, -48.7375, 2.47521), vm::vec3d(64, -24.7084, 32), vm::vec3d(64, -22.6274, 16.4676), vm::vec3d(64, 64, 32),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -192,15 +168,9 @@ TEST_CASE("PolyhedronTest.convexHullWithFailingPoints8")
 // Cause of https://github.com/TrenchBroom/TrenchBroom/issues/1469
 // See also BrushTest.subtractTruncatedCones
 
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(- 22.364439661516872, 9.2636542228362799, 32), vm::vec3d(- 21.333333333333332, 11.049582771255995, 32),
-        vm::vec3d(- 20.235886048009661, 12.95041722806517, 32), vm::vec3d(- 19.126943405596094, 11.042945924655637, 32),
-        vm::vec3d(- 18.31934864142023, 14.056930615671543, 32), vm::vec3d(- 17.237604305873624, 9.9521354859295226, 7.4256258352417603),
-        vm::vec3d(- 16, 6.6274169975893429, - 0), vm::vec3d(- 15.999999999999998, 9.2376043067828455, - 0),
-        vm::vec3d(- 14.345207554102323, 8.2822094434885454, - 0), vm::vec3d(- 13.739511480972288, 10.542697961743528, - 0),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(-22.364439661516872, 9.2636542228362799, 32), vm::vec3d(-21.333333333333332, 11.049582771255995, 32), vm::vec3d(-20.235886048009661, 12.95041722806517, 32), vm::vec3d(-19.126943405596094, 11.042945924655637, 32), vm::vec3d(-18.31934864142023, 14.056930615671543, 32), vm::vec3d(-17.237604305873624, 9.9521354859295226, 7.4256258352417603), vm::vec3d(-16, 6.6274169975893429, -0), vm::vec3d(-15.999999999999998, 9.2376043067828455, -0), vm::vec3d(-14.345207554102323, 8.2822094434885454, -0), vm::vec3d(-13.739511480972288, 10.542697961743528, -0),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -717,15 +687,13 @@ p7, p5, p6}));
 
 TEST_CASE("PolyhedronTest.testAdd8PointsCrash")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        // a horizontal rectangle
-        vm::vec3d(0, 0, 0), vm::vec3d(0, 32, 0), vm::vec3d(32, 32, 0), vm::vec3d(32, 0, 0),
+const auto vertices = std::vector<vm::vec3>({
+                                                // a horizontal rectangle
+                                                vm::vec3d(0, 0, 0), vm::vec3d(0, 32, 0), vm::vec3d(32, 32, 0), vm::vec3d(32, 0, 0),
 
-        // a vertical rectangle
-        vm::vec3d(32, 16, 16), vm::vec3d(32, 16, 32), vm::vec3d(32, 32, 32), vm::vec3d(32, 32, 16),
-    }
-);
+                                                // a vertical rectangle
+                                                vm::vec3d(32, 16, 16), vm::vec3d(32, 16, 32), vm::vec3d(32, 32, 32), vm::vec3d(32, 32, 16),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -738,12 +706,9 @@ vertexCount()
 
 TEST_CASE("PolyhedronTest.crashWhileAddingPoints1")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(224, 336, 0), vm::vec3d(272, 320, 0), vm::vec3d(- 96, 352, 128), vm::vec3d(192, 192, 128), vm::vec3d(256, 256, 128), vm::vec3d(320, 480, 128),
-        vm::vec3d(320, 256, 128),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(224, 336, 0), vm::vec3d(272, 320, 0), vm::vec3d(-96, 352, 128), vm::vec3d(192, 192, 128), vm::vec3d(256, 256, 128), vm::vec3d(320, 480, 128), vm::vec3d(320, 256, 128),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -876,13 +841,9 @@ p6, p14, p15, p9}));
 
 TEST_CASE("PolyhedronTest.crashWhileAddingPoints3")
 {
-const auto vertices = std::vector<vm::vec3>(
-    {
-        vm::vec3d(256, 39, 160), vm::vec3d(256, 0, 160), vm::vec3d(256, 0, 64), vm::vec3d(256, 39, 64), vm::vec3d(0, 0, 160), vm::vec3d(0, 32, 160),
-        vm::vec3d(0, 0, 64), vm::vec3d(0, 32, 64), vm::vec3d(0, 0, 0), vm::vec3d(0, 32, 0), vm::vec3d(256, 32, 0), vm::vec3d(256, 0, 0), vm::vec3d(0, 39, 64),
-        vm::vec3d(0, 39, 160), vm::vec3d(0, 39, 0),
-    }
-);
+const auto vertices = std::vector<vm::vec3>({
+                                                vm::vec3d(256, 39, 160), vm::vec3d(256, 0, 160), vm::vec3d(256, 0, 64), vm::vec3d(256, 39, 64), vm::vec3d(0, 0, 160), vm::vec3d(0, 32, 160), vm::vec3d(0, 0, 64), vm::vec3d(0, 32, 64), vm::vec3d(0, 0, 0), vm::vec3d(0, 32, 0), vm::vec3d(256, 32, 0), vm::vec3d(256, 0, 0), vm::vec3d(0, 39, 64), vm::vec3d(0, 39, 160), vm::vec3d(0, 39, 0),
+                                            });
 
 const Polyhedron3d p(vertices);
 CHECK(p
@@ -902,10 +863,10 @@ TEST_CASE("PolyhedronTest.crashWhileAddingPoints4")
 //       |
 // p1 .  |  . p4
 //
-const vm::vec3d p1(- 1, - 1, 0);
-const vm::vec3d p2(- 1, + 1, 0);
-const vm::vec3d p3(+ 1, + 1, 0);
-const vm::vec3d p4(+ 1, - 1, 0);
+const vm::vec3d p1(-1, -1, 0);
+const vm::vec3d p2(-1, +1, 0);
+const vm::vec3d p3(+1, +1, 0);
+const vm::vec3d p4(+1, -1, 0);
 const vm::vec3d p5(0, 0, 0);
 
 Polyhedron3d p({p1, p2, p3, p4, p5});
@@ -942,7 +903,7 @@ std::back_inserter(polyVertices)
 );
 
 Polyhedron3d poly(polyVertices);
-const vm::plane3d plane(- 19.170582845718307, vm::vec3d(0.88388309419256438, 0.30618844562885328, - 0.35355241699635576));
+const vm::plane3d plane(-19.170582845718307, vm::vec3d(0.88388309419256438, 0.30618844562885328, -0.35355241699635576));
 
 CHECK_NOTHROW(poly
 .
@@ -957,51 +918,46 @@ TEST_CASE("PolyhedronTest.clipWithInvalidSeam")
 
 Polyhedron3d poly{
     // create a huge cube
-    8192.0 * vm::vec3d(- 1.0, - 1.0, - 1.0), 8192.0 * vm::vec3d(- 1.0, - 1.0, + 1.0), 8192.0 * vm::vec3d(- 1.0, + 1.0, - 1.0),
-    8192.0 * vm::vec3d(- 1.0, + 1.0, + 1.0), 8192.0 * vm::vec3d(+ 1.0, - 1.0, - 1.0), 8192.0 * vm::vec3d(+ 1.0, - 1.0, + 1.0),
-    8192.0 * vm::vec3d(+ 1.0, + 1.0, - 1.0), 8192.0 * vm::vec3d(+ 1.0, + 1.0, + 1.0),
+    8192.0 * vm::vec3d(-1.0, -1.0, -1.0), 8192.0 * vm::vec3d(-1.0, -1.0, +1.0), 8192.0 * vm::vec3d(-1.0, +1.0, -1.0), 8192.0 * vm::vec3d(-1.0, +1.0, +1.0), 8192.0 * vm::vec3d(+1.0, -1.0, -1.0), 8192.0 * vm::vec3d(+1.0, -1.0, +1.0), 8192.0 * vm::vec3d(+1.0, +1.0, -1.0), 8192.0 * vm::vec3d(+1.0, +1.0, +1.0),
 };
 
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 459.0, 1579.0, - 115.0), vm::vec3d(- 483.0, 1371.0, 131.0), vm::vec3d(- 184.0, 1428.0, 237.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-459.0, 1579.0, -115.0), vm::vec3d(-483.0, 1371.0, 131.0), vm::vec3d(-184.0, 1428.0, 237.0)))
 );
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 184.0, 1428.0, 237.0), vm::vec3d(- 184.0, 1513.0, 396.0), vm::vec3d(- 184.0, 1777.0, 254.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-184.0, 1428.0, 237.0), vm::vec3d(-184.0, 1513.0, 396.0), vm::vec3d(-184.0, 1777.0, 254.0)))
 );
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 484.0, 1513.0, 395.0), vm::vec3d(- 483.0, 1371.0, 131.0), vm::vec3d(- 483.0, 1777.0, 253.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-484.0, 1513.0, 395.0), vm::vec3d(-483.0, 1371.0, 131.0), vm::vec3d(-483.0, 1777.0, 253.0)))
 );
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 483.0, 1371.0, 131.0), vm::vec3d(- 459.0, 1579.0, - 115.0), vm::vec3d(- 483.0, 1777.0, 253.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-483.0, 1371.0, 131.0), vm::vec3d(-459.0, 1579.0, -115.0), vm::vec3d(-483.0, 1777.0, 253.0)))
 );
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 184.0, 1513.0, 396.0), vm::vec3d(- 484.0, 1513.0, 395.0), vm::vec3d(- 184.0, 1777.0, 254.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-184.0, 1513.0, 396.0), vm::vec3d(-484.0, 1513.0, 395.0), vm::vec3d(-184.0, 1777.0, 254.0)))
 );
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 184.0, 1777.0, 254.0), vm::vec3d(- 483.0, 1777.0, 253.0), vm::vec3d(- 183.0, 1692.0, 95.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-184.0, 1777.0, 254.0), vm::vec3d(-483.0, 1777.0, 253.0), vm::vec3d(-183.0, 1692.0, 95.0)))
 );
 poly.
-clip(std::get<1>(
-    vm::from_points(vm::vec3d(- 483.0, 1777.0, 253.0), vm::vec3d(- 459.0, 1579.0, - 115.0), vm::vec3d(- 183.0, 1692.0, 95.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-483.0, 1777.0, 253.0), vm::vec3d(-459.0, 1579.0, -115.0), vm::vec3d(-183.0, 1692.0, 95.0)))
 ); //  Assertion failure here!
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 483.0, 1371.0, 131.0), vm::vec3d(- 484.0, 1513.0, 395.0), vm::vec3d(- 184.0, 1513.0, 396.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-483.0, 1371.0, 131.0), vm::vec3d(-484.0, 1513.0, 395.0), vm::vec3d(-184.0, 1513.0, 396.0)))
 );
 poly.
-clip(std::get<1>(vm::from_points(vm::vec3d(- 483.0, 1371.0, 131.0), vm::vec3d(- 184.0, 1513.0, 396.0), vm::vec3d(- 184.0, 1428.0, 237.0)))
+clip(std::get<1>(vm::from_points(vm::vec3d(-483.0, 1371.0, 131.0), vm::vec3d(-184.0, 1513.0, 396.0), vm::vec3d(-184.0, 1428.0, 237.0)))
 );
 }
 
 TEST_CASE("PolyhedronTest.subtractFailWithMissingFragments")
 {
 const std::vector<vm::vec3d> minuendVertices{
-    vm::vec3d(- 1056, 864, - 192), vm::vec3d(- 1024, 896, - 192), vm::vec3d(- 1024, 1073, - 192), vm::vec3d(- 1056, 1080, - 192),
-    vm::vec3d(- 1024, 1073, - 416), vm::vec3d(- 1024, 896, - 416), vm::vec3d(- 1056, 864, - 416), vm::vec3d(- 1056, 1080, - 416)
+    vm::vec3d(-1056, 864, -192), vm::vec3d(-1024, 896, -192), vm::vec3d(-1024, 1073, -192), vm::vec3d(-1056, 1080, -192), vm::vec3d(-1024, 1073, -416), vm::vec3d(-1024, 896, -416), vm::vec3d(-1056, 864, -416), vm::vec3d(-1056, 1080, -416)
 };
 
 const std::vector<vm::vec3d> subtrahendVertices{
-    vm::vec3d(- 1088, 960, - 288), vm::vec3d(- 1008, 960, - 288), vm::vec3d(- 1008, 1024, - 288), vm::vec3d(- 1088, 1024, - 288),
-    vm::vec3d(- 1008, 1024, - 400), vm::vec3d(- 1008, 960, - 400), vm::vec3d(- 1088, 960, - 400), vm::vec3d(- 1088, 1024, - 400)
+    vm::vec3d(-1088, 960, -288), vm::vec3d(-1008, 960, -288), vm::vec3d(-1008, 1024, -288), vm::vec3d(-1088, 1024, -288), vm::vec3d(-1008, 1024, -400), vm::vec3d(-1008, 960, -400), vm::vec3d(-1088, 960, -400), vm::vec3d(-1088, 1024, -400)
 };
 
 const Polyhedron3d minuend(minuendVertices);
@@ -1046,7 +1002,7 @@ size()
 TEST_CASE("PolyhedronTest.addVertexToPolygonAndAllFacesCoplanar")
 {
 auto p = Polyhedron3d{
-    vm::vec3{- 64.0, 64.0, - 16.0}, vm::vec3{64.0, 64.0, - 16.0}, vm::vec3{22288.0, 18208.0, 16.0}, vm::vec3{
+    vm::vec3{-64.0, 64.0, -16.0}, vm::vec3{64.0, 64.0, -16.0}, vm::vec3{22288.0, 18208.0, 16.0}, vm::vec3{
         22288.0, 18336.0, 16.0
     }, // does not get added due to all incident faces being coplanar
     vm::vec3{22416.0, 18336.0, 16.0},

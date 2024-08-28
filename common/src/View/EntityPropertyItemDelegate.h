@@ -21,48 +21,34 @@
 
 #include <QStyledItemDelegate>
 
-
 class QLineEdit;
-
 
 class QSortFilterProxyModel;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class EntityPropertyModel;
-
 
 class EntityPropertyTable;
 
-
-class EntityPropertyItemDelegate : public QStyledItemDelegate
-{
+class EntityPropertyItemDelegate : public QStyledItemDelegate {
   Q_OBJECT
-private:
-  EntityPropertyTable* m_table;
-  const EntityPropertyModel* m_model;
-  const QSortFilterProxyModel* m_proxyModel;
+  private:
+    EntityPropertyTable *m_table;
+    const EntityPropertyModel *m_model;
+    const QSortFilterProxyModel *m_proxyModel;
 
-public:
-  EntityPropertyItemDelegate(
-    EntityPropertyTable* table,
-    const EntityPropertyModel* model,
-    const QSortFilterProxyModel* proxyModel,
-    QWidget* parent = nullptr);
+  public:
+    EntityPropertyItemDelegate(EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent = nullptr);
 
-  QWidget* createEditor(
-    QWidget* parent,
-    const QStyleOptionViewItem& option,
-    const QModelIndex& index) const override;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
-private:
-  void setupCompletions(QLineEdit* lineEdit, const QModelIndex& index) const;
+  private:
+    void setupCompletions(QLineEdit *lineEdit, const QModelIndex &index) const;
 
-  QStringList getCompletions(const QModelIndex& index) const;
+    QStringList getCompletions(const QModelIndex &index) const;
 };
 } // namespace View
 } // namespace TrenchBroom

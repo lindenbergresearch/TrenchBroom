@@ -114,11 +114,9 @@ size()
 
 == 4);
 
-const auto skiesCollection = std::find_if(
-    textureCollections.begin(), textureCollections.end(), [](const auto &c) {
-      return c.path() == "textures/skies/hub1";
-    }
-);
+const auto skiesCollection = std::find_if(textureCollections.begin(), textureCollections.end(), [](const auto &c) {
+    return c.path() == "textures/skies/hub1";
+});
 
 CHECK(skiesCollection
 != textureCollections.
@@ -132,11 +130,9 @@ const auto skiesTextureNames = kdl::vec_transform(skiesCollection->textures(), [
 CHECK_THAT(skiesTextureNames, Catch::UnorderedEquals(std::vector<std::string>{"skies/hub1/dusk",})
 );
 
-const auto testCollection = std::find_if(
-    textureCollections.begin(), textureCollections.end(), [](const auto &c) {
-      return c.path() == "textures/test";
-    }
-);
+const auto testCollection = std::find_if(textureCollections.begin(), textureCollections.end(), [](const auto &c) {
+    return c.path() == "textures/test";
+});
 
 CHECK(testCollection
 != textureCollections.
@@ -147,11 +143,9 @@ end()
 
 const auto testTextureNames = kdl::vec_transform(testCollection->textures(), [](const auto &texture) { return texture.name(); });
 
-CHECK_THAT(testTextureNames, Catch::UnorderedEquals(
-    std::vector<std::string>{
-        "test/test", "test/not_existing", "test/editor_image", "test/not_existing2", "test/test2",
-    }
-)
+CHECK_THAT(testTextureNames, Catch::UnorderedEquals(std::vector<std::string>{
+    "test/test", "test/not_existing", "test/editor_image", "test/not_existing2", "test/test2",
+})
 );
 }} // namespace Model
 } // namespace TrenchBroom

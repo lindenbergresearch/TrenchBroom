@@ -27,30 +27,28 @@
 
 #include <string>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
-class Group
-{
-private:
-  std::string m_name;
+class Group {
+  private:
+    std::string m_name;
 
-  vm::mat4x4 m_transformation;
+    vm::mat4x4 m_transformation;
 
-  kdl_reflect_decl(Group, m_name, m_transformation);
+    kdl_reflect_decl(Group, m_name, m_transformation);
 
-public:
-  explicit Group(std::string name);
+  public:
+    explicit Group(std::string name);
 
-  const std::string& name() const;
+    const std::string &name() const;
 
-  void setName(std::string name);
+    void setName(std::string name);
 
-  const vm::mat4x4& transformation() const;
+    const vm::mat4x4 &transformation() const;
 
-  void setTransformation(const vm::mat4x4& transformation);
+    void setTransformation(const vm::mat4x4 &transformation);
 
-  void transform(const vm::mat4x4& transformation);
+    void transform(const vm::mat4x4 &transformation);
 };
 
 } // namespace TrenchBroom::Model

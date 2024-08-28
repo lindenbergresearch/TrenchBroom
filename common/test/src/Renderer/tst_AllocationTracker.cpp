@@ -775,7 +775,7 @@ static constexpr size_t NumBrushes = 64'000;
 
 // between 12 and 140, inclusive.
 static size_t getBrushSizeFromRandEngine(std::mt19937 &engine) {
-  return 12 + (4 * (engine() % 33));
+    return 12 + (4 * (engine() % 33));
 }
 
 /**
@@ -783,20 +783,20 @@ static size_t getBrushSizeFromRandEngine(std::mt19937 &engine) {
  * std::shuffle because we want the same results on all C++ implementations.
  */
 template<typename T> static void shuffle(std::vector<T> &vec, std::mt19937 &engine) {
-  // https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
-  const size_t vecSize = vec.size();
-  if (vecSize < 2) {
-    return;
-  }
+    // https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
+    const size_t vecSize = vec.size();
+    if (vecSize < 2) {
+        return;
+    }
 
-  for (size_t i = 0; i <= (vecSize - 2); ++ i) {
-    // pick j to be a random integer in [i, vecSize)
-    const size_t rangeExclusive = (vecSize - i);
-    // Note, this has modulo bias, but it's good enough for generating test cases
-    const size_t j = (engine() % rangeExclusive);
+    for (size_t i = 0; i <= (vecSize - 2); ++i) {
+        // pick j to be a random integer in [i, vecSize)
+        const size_t rangeExclusive = (vecSize - i);
+        // Note, this has modulo bias, but it's good enough for generating test cases
+        const size_t j = (engine() % rangeExclusive);
 
-    std::swap(vec[i], vec[j]);
-  }
+        std::swap(vec[i], vec[j]);
+    }
 }
 
 TEST_CASE("AllocationTrackerTest.testShuffle")

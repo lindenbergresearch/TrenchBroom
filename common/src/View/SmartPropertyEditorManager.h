@@ -27,76 +27,61 @@
 #include <string>
 #include <vector>
 
-
 class QStackedLayout;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class EntityNodeBase;
-
 
 class Node;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class MapDocument;
-
 
 class Selection;
 
-
 class SmartPropertyEditor;
 
+using SmartPropertyEditorMatcher = std::function<bool(const std::string &, const std::vector<Model::EntityNodeBase *> &)>;
 
-using SmartPropertyEditorMatcher =
-  std::function<bool(const std::string&, const std::vector<Model::EntityNodeBase*>&)>;
+class SmartPropertyEditorManager : public QWidget {
+  private:
+    std::weak_ptr<MapDocument> m_document;
 
+    std::vector<std::tuple<SmartPropertyEditorMatcher, SmartPropertyEditor *>> m_editors;
+    std::string m_propertyKey;
+    QStackedLayout *m_stackedLayout{nullptr};
 
-class SmartPropertyEditorManager : public QWidget
-{
-private:
-  std::weak_ptr<MapDocument> m_document;
+    NotifierConnection m_notifierConnection;
 
-  std::vector<std::tuple<SmartPropertyEditorMatcher, SmartPropertyEditor*>> m_editors;
-  std::string m_propertyKey;
-  QStackedLayout* m_stackedLayout{nullptr};
+  public:
+    explicit SmartPropertyEditorManager(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-  NotifierConnection m_notifierConnection;
+    void switchEditor(const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes);
 
-public:
-  explicit SmartPropertyEditorManager(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+    bool isDefaultEditorActive() const;
 
-  void switchEditor(
-    const std::string& propertyKey, const std::vector<Model::EntityNodeBase*>& nodes);
+  private:
+    SmartPropertyEditor *activeEditor() const;
 
-  bool isDefaultEditorActive() const;
+    void createEditors();
 
-private:
-  SmartPropertyEditor* activeEditor() const;
+    void connectObservers();
 
-  void createEditors();
+    void selectionDidChange(const Selection &selection);
 
-  void connectObservers();
+    void nodesDidChange(const std::vector<Model::Node *> &nodes);
 
-  void selectionDidChange(const Selection& selection);
+    SmartPropertyEditor *selectEditor(const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes) const;
 
-  void nodesDidChange(const std::vector<Model::Node*>& nodes);
+    SmartPropertyEditor *defaultEditor() const;
 
-  SmartPropertyEditor* selectEditor(
-    const std::string& propertyKey,
-    const std::vector<Model::EntityNodeBase*>& nodes) const;
+    void activateEditor(SmartPropertyEditor *editor, const std::string &propertyKey);
 
-  SmartPropertyEditor* defaultEditor() const;
+    void deactivateEditor();
 
-  void activateEditor(SmartPropertyEditor* editor, const std::string& propertyKey);
-
-  void deactivateEditor();
-
-  void updateEditor();
+    void updateEditor();
 };
 } // namespace View
 } // namespace TrenchBroom

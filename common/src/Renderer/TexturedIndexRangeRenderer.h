@@ -25,83 +25,68 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Renderer
-{
+namespace Renderer {
 class VboManager;
-
 
 class TextureRenderFunc;
 
+class TexturedRenderer {
+  public:
+    virtual ~TexturedRenderer();
 
-class TexturedRenderer
-{
-public:
-  virtual ~TexturedRenderer();
+    virtual bool empty() const = 0;
 
-  virtual bool empty() const = 0;
+    virtual void prepare(VboManager &vboManager) = 0;
 
-  virtual void prepare(VboManager& vboManager) = 0;
+    virtual void render() = 0;
 
-  virtual void render() = 0;
-
-  virtual void render(TextureRenderFunc& func) = 0;
+    virtual void render(TextureRenderFunc &func) = 0;
 };
 
+class TexturedIndexRangeRenderer : public TexturedRenderer {
+  private:
+    VertexArray m_vertexArray;
+    TexturedIndexRangeMap m_indexRange;
 
-class TexturedIndexRangeRenderer : public TexturedRenderer
-{
-private:
-  VertexArray m_vertexArray;
-  TexturedIndexRangeMap m_indexRange;
+  public:
+    TexturedIndexRangeRenderer();
 
-public:
-  TexturedIndexRangeRenderer();
+    TexturedIndexRangeRenderer(const VertexArray &vertexArray, const TexturedIndexRangeMap &indexRange);
 
-  TexturedIndexRangeRenderer(
-    const VertexArray& vertexArray, const TexturedIndexRangeMap& indexRange);
+    TexturedIndexRangeRenderer(const VertexArray &vertexArray, const Assets::Texture *texture, const IndexRangeMap &indexRange);
 
-  TexturedIndexRangeRenderer(
-    const VertexArray& vertexArray,
-    const Assets::Texture* texture,
-    const IndexRangeMap& indexRange);
+    ~TexturedIndexRangeRenderer() override;
 
-  ~TexturedIndexRangeRenderer() override;
+    bool empty() const override;
 
-  bool empty() const override;
+    void prepare(VboManager &vboManager) override;
 
-  void prepare(VboManager& vboManager) override;
+    void render() override;
 
-  void render() override;
-
-  void render(TextureRenderFunc& func) override;
+    void render(TextureRenderFunc &func) override;
 };
 
+class MultiTexturedIndexRangeRenderer : public TexturedRenderer {
+  private:
+    std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> m_renderers;
 
-class MultiTexturedIndexRangeRenderer : public TexturedRenderer
-{
-private:
-  std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> m_renderers;
+  public:
+    MultiTexturedIndexRangeRenderer(std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers);
 
-public:
-  MultiTexturedIndexRangeRenderer(
-    std::vector<std::unique_ptr<TexturedIndexRangeRenderer>> renderers);
+    ~MultiTexturedIndexRangeRenderer() override;
 
-  ~MultiTexturedIndexRangeRenderer() override;
+    bool empty() const override;
 
-  bool empty() const override;
+    void prepare(VboManager &vboManager) override;
 
-  void prepare(VboManager& vboManager) override;
+    void render() override;
 
-  void render() override;
-
-  void render(TextureRenderFunc& func) override;
+    void render(TextureRenderFunc &func) override;
 };
 } // namespace Renderer
 } // namespace TrenchBroom

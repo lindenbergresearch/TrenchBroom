@@ -44,7 +44,6 @@ document->addNodes( {{
 document->
 
 parentForNodes(),
-
 {
 brushNode
 }
@@ -834,9 +833,7 @@ TEST_CASE("ChangeBrushFaceAttributesTest.Quake2IntegrationTest")
 const int WaterFlag = 32;
 const int LavaFlag = 8;
 
-auto [document, game, gameConfig] = View::loadMapDocument(
-    "fixture/test/View/ChangeBrushFaceAttributesTest/lavaAndWater.map", "Quake2", Model::MapFormat::Unknown
-);
+auto [document, game, gameConfig] = View::loadMapDocument("fixture/test/View/ChangeBrushFaceAttributesTest/lavaAndWater.map", "Quake2", Model::MapFormat::Unknown);
 REQUIRE(document
 ->
 

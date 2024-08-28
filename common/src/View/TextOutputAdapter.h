@@ -25,16 +25,12 @@
 
 #include <TrenchBroomApp.h>
 
-
 class QTextEdit;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 
-namespace Ascii
-{
+namespace Ascii {
 static QChar ESC = 0x1b; // Escape character
 static QChar BEL = 0x07; // Terminal bell
 static QChar BS = 0x08;  // Backspace
@@ -56,49 +52,44 @@ static QChar SCREEN_CMD_END = 'm';
  * - Interprets CR and LF control characters.
  * - Scroll bar follows output, unless it's manually raised.
  */
-class TextOutputAdapter
-{
-private:
-  QTextEdit* m_textEdit;
-  QTextCursor m_insertionCursor;
+class TextOutputAdapter {
+  private:
+    QTextEdit *m_textEdit;
+    QTextCursor m_insertionCursor;
 
-public:
-  explicit TextOutputAdapter(QTextEdit* textEdit);
+  public:
+    explicit TextOutputAdapter(QTextEdit *textEdit);
 
-  template <typename T>
-  void pushSystemMessage(const T& t, const QColor& color = QColor{"#FFFFFF"})
-  {
-    QString string;
-    QTextStream stream(&string);
-    stream << t;
+    template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
+        QString string;
+        QTextStream stream(&string);
+        stream << t;
 
-    auto format = QTextCharFormat{};
-    auto font = TrenchBroomApp::instance().getConsoleFont();
-    font.setBold(true);
-    format.setFont(font);
-    format.setFontPointSize(TrenchBroomApp::instance().getConsoleFont().pointSize());
-    format.setForeground(QBrush{color});
-    m_insertionCursor.insertText(string, format);
-  }
+        auto format = QTextCharFormat{};
+        auto font = TrenchBroomApp::instance().getConsoleFont();
+        font.setBold(true);
+        format.setFont(font);
+        format.setFontPointSize(TrenchBroomApp::instance().getConsoleFont().pointSize());
+        format.setForeground(QBrush{color});
+        m_insertionCursor.insertText(string, format);
+    }
 
-  /**
-   * Appends the given value to the text widget.
-   * Objects are formatted using QTextStream.
-   */
-  template <typename T>
-  TextOutputAdapter& operator<<(const T& t)
-  {
-    QString string;
-    QTextStream stream(&string);
-    stream << t;
-    appendString(string);
-    return *this;
-  }
+    /**
+     * Appends the given value to the text widget.
+     * Objects are formatted using QTextStream.
+     */
+    template<typename T> TextOutputAdapter &operator<<(const T &t) {
+        QString string;
+        QTextStream stream(&string);
+        stream << t;
+        appendString(string);
+        return *this;
+    }
 
-private:
-  void appendString(const QString& string);
+  private:
+    void appendString(const QString &string);
 
-  QTextCharFormat& decodeVT100Command(const QString& string, QTextCharFormat& format);
+    QTextCharFormat &decodeVT100Command(const QString &string, QTextCharFormat &format);
 };
 } // namespace View
 } // namespace TrenchBroom

@@ -50,289 +50,222 @@
 #include <unordered_map>
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
-GroupNode::GroupNode(Group group)
-  : m_group{std::move(group)}
-{
+GroupNode::GroupNode(Group group) : m_group{std::move(group)} {
 }
 
-const Group& GroupNode::group() const
-{
-  return m_group;
+const Group &GroupNode::group() const {
+    return m_group;
 }
 
-Group GroupNode::setGroup(Group group)
-{
-  using std::swap;
-  swap(m_group, group);
-  return group;
+Group GroupNode::setGroup(Group group) {
+    using std::swap;
+    swap(m_group, group);
+    return group;
 }
 
-bool GroupNode::opened() const
-{
-  return m_editState == EditState::Open;
+bool GroupNode::opened() const {
+    return m_editState == EditState::Open;
 }
 
-bool GroupNode::hasOpenedDescendant() const
-{
-  return m_editState == EditState::DescendantOpen;
+bool GroupNode::hasOpenedDescendant() const {
+    return m_editState == EditState::DescendantOpen;
 }
 
-bool GroupNode::closed() const
-{
-  return m_editState == EditState::Closed;
+bool GroupNode::closed() const {
+    return m_editState == EditState::Closed;
 }
 
-void GroupNode::open()
-{
-  assert(m_editState == EditState::Closed);
-  setEditState(EditState::Open);
-  openAncestors();
+void GroupNode::open() {
+    assert(m_editState == EditState::Closed);
+    setEditState(EditState::Open);
+    openAncestors();
 }
 
-void GroupNode::close()
-{
-  assert(m_editState == EditState::Open);
-  setEditState(EditState::Closed);
-  closeAncestors();
+void GroupNode::close() {
+    assert(m_editState == EditState::Open);
+    setEditState(EditState::Closed);
+    closeAncestors();
 }
 
-const std::optional<IdType>& GroupNode::persistentId() const
-{
-  return m_persistentId;
+const std::optional<IdType> &GroupNode::persistentId() const {
+    return m_persistentId;
 }
 
-void GroupNode::setPersistentId(const IdType persistentId)
-{
-  m_persistentId = persistentId;
+void GroupNode::setPersistentId(const IdType persistentId) {
+    m_persistentId = persistentId;
 }
 
-void GroupNode::resetPersistentId()
-{
-  m_persistentId = std::nullopt;
+void GroupNode::resetPersistentId() {
+    m_persistentId = std::nullopt;
 }
 
-bool GroupNode::hasPendingChanges() const
-{
-  return m_hasPendingChanges;
+bool GroupNode::hasPendingChanges() const {
+    return m_hasPendingChanges;
 }
 
-void GroupNode::setHasPendingChanges(const bool hasPendingChanges)
-{
-  m_hasPendingChanges = hasPendingChanges;
+void GroupNode::setHasPendingChanges(const bool hasPendingChanges) {
+    m_hasPendingChanges = hasPendingChanges;
 }
 
-void GroupNode::setEditState(const EditState editState)
-{
-  m_editState = editState;
+void GroupNode::setEditState(const EditState editState) {
+    m_editState = editState;
 }
 
-void GroupNode::setAncestorEditState(const EditState editState)
-{
-  visitParent(kdl::overload(
-    [=](auto&& thisLambda, WorldNode* world) -> void { world->visitParent(thisLambda); },
-    [=](auto&& thisLambda, LayerNode* layer) -> void { layer->visitParent(thisLambda); },
-    [=](auto&& thisLambda, GroupNode* group) -> void {
-      group->setEditState(editState);
-      group->visitParent(thisLambda);
-    },
-    [=](
-      auto&& thisLambda, EntityNode* entity) -> void { entity->visitParent(thisLambda); },
-    [=](auto&& thisLambda, BrushNode* brush) -> void { brush->visitParent(thisLambda); },
-    [=](
-      auto&& thisLambda, PatchNode* patch) -> void { patch->visitParent(thisLambda); }));
+void GroupNode::setAncestorEditState(const EditState editState) {
+    visitParent(kdl::overload([=](auto &&thisLambda, WorldNode *world) -> void { world->visitParent(thisLambda); }, [=](auto &&thisLambda, LayerNode *layer) -> void { layer->visitParent(thisLambda); }, [=](auto &&thisLambda, GroupNode *group) -> void {
+        group->setEditState(editState);
+        group->visitParent(thisLambda);
+    }, [=](auto &&thisLambda, EntityNode *entity) -> void { entity->visitParent(thisLambda); }, [=](auto &&thisLambda, BrushNode *brush) -> void { brush->visitParent(thisLambda); }, [=](auto &&thisLambda, PatchNode *patch) -> void { patch->visitParent(thisLambda); }));
 }
 
-void GroupNode::openAncestors()
-{
-  setAncestorEditState(EditState::DescendantOpen);
+void GroupNode::openAncestors() {
+    setAncestorEditState(EditState::DescendantOpen);
 }
 
-void GroupNode::closeAncestors()
-{
-  setAncestorEditState(EditState::Closed);
+void GroupNode::closeAncestors() {
+    setAncestorEditState(EditState::Closed);
 }
 
-const std::string& GroupNode::doGetName() const
-{
-  return m_group.name();
+const std::string &GroupNode::doGetName() const {
+    return m_group.name();
 }
 
-const vm::bbox3& GroupNode::doGetLogicalBounds() const
-{
-  if (!m_boundsValid)
-  {
-    validateBounds();
-  }
-  return m_logicalBounds;
+const vm::bbox3 &GroupNode::doGetLogicalBounds() const {
+    if (!m_boundsValid) {
+        validateBounds();
+    }
+    return m_logicalBounds;
 }
 
-const vm::bbox3& GroupNode::doGetPhysicalBounds() const
-{
-  if (!m_boundsValid)
-  {
-    validateBounds();
-  }
-  return m_physicalBounds;
+const vm::bbox3 &GroupNode::doGetPhysicalBounds() const {
+    if (!m_boundsValid) {
+        validateBounds();
+    }
+    return m_physicalBounds;
 }
 
-FloatType GroupNode::doGetProjectedArea(const vm::axis::type) const
-{
-  return static_cast<FloatType>(0);
+FloatType GroupNode::doGetProjectedArea(const vm::axis::type) const {
+    return static_cast<FloatType>(0);
 }
 
-Node* GroupNode::doClone(
-  const vm::bbox3& /* worldBounds */, const SetLinkId setLinkIds) const
-{
-  auto result = std::make_unique<GroupNode>(m_group);
-  result->cloneLinkId(*this, setLinkIds);
-  cloneAttributes(result.get());
-  return result.release();
+Node *GroupNode::doClone(const vm::bbox3 & /* worldBounds */, const SetLinkId setLinkIds) const {
+    auto result = std::make_unique<GroupNode>(m_group);
+    result->cloneLinkId(*this, setLinkIds);
+    cloneAttributes(result.get());
+    return result.release();
 }
 
-namespace
-{
+namespace {
 /** Check whether the given parent node or any of its ancestors and the given group node
  *  or any of its descendants have the same link id.
  */
-bool checkRecursiveLinkedGroups(const Node& parentNode, const GroupNode& groupNodeToAdd)
-{
-  const auto ancestorLinkedGroupIds =
-    kdl::vec_sort(collectParentLinkedGroupIds(parentNode));
-  const auto linkedGroupIdsToAdd = collectLinkedGroupIds(groupNodeToAdd);
+bool checkRecursiveLinkedGroups(const Node &parentNode, const GroupNode &groupNodeToAdd) {
+    const auto ancestorLinkedGroupIds = kdl::vec_sort(collectParentLinkedGroupIds(parentNode));
+    const auto linkedGroupIdsToAdd = collectLinkedGroupIds(groupNodeToAdd);
 
-  return kdl::set_has_shared_element(ancestorLinkedGroupIds, linkedGroupIdsToAdd);
+    return kdl::set_has_shared_element(ancestorLinkedGroupIds, linkedGroupIdsToAdd);
 }
 } // namespace
 
-bool GroupNode::doCanAddChild(const Node* child) const
-{
-  return child->accept(kdl::overload(
-    [](const WorldNode*) { return false; },
-    [](const LayerNode*) { return false; },
-    [&](const GroupNode* groupNode) {
-      return !checkRecursiveLinkedGroups(*this, *groupNode);
-    },
-    [](const EntityNode*) { return true; },
-    [](const BrushNode*) { return true; },
-    [](const PatchNode*) { return true; }));
+bool GroupNode::doCanAddChild(const Node *child) const {
+    return child->accept(kdl::overload([](const WorldNode *) { return false; }, [](const LayerNode *) { return false; }, [&](const GroupNode *groupNode) {
+        return !checkRecursiveLinkedGroups(*this, *groupNode);
+    }, [](const EntityNode *) { return true; }, [](const BrushNode *) { return true; }, [](const PatchNode *) { return true; }));
 }
 
-bool GroupNode::doCanRemoveChild(const Node* /* child */) const
-{
-  return true;
+bool GroupNode::doCanRemoveChild(const Node * /* child */) const {
+    return true;
 }
 
-bool GroupNode::doRemoveIfEmpty() const
-{
-  return true;
+bool GroupNode::doRemoveIfEmpty() const {
+    return true;
 }
 
-bool GroupNode::doShouldAddToSpacialIndex() const
-{
-  return false;
+bool GroupNode::doShouldAddToSpacialIndex() const {
+    return false;
 }
 
-void GroupNode::doChildWasAdded(Node* /* node */)
-{
-  nodePhysicalBoundsDidChange();
+void GroupNode::doChildWasAdded(Node * /* node */) {
+    nodePhysicalBoundsDidChange();
 }
 
-void GroupNode::doChildWasRemoved(Node* /* node */)
-{
-  nodePhysicalBoundsDidChange();
+void GroupNode::doChildWasRemoved(Node * /* node */) {
+    nodePhysicalBoundsDidChange();
 }
 
-void GroupNode::doNodePhysicalBoundsDidChange()
-{
-  invalidateBounds();
+void GroupNode::doNodePhysicalBoundsDidChange() {
+    invalidateBounds();
 }
 
-void GroupNode::doChildPhysicalBoundsDidChange()
-{
-  invalidateBounds();
-  nodePhysicalBoundsDidChange();
+void GroupNode::doChildPhysicalBoundsDidChange() {
+    invalidateBounds();
+    nodePhysicalBoundsDidChange();
 }
 
-bool GroupNode::doSelectable() const
-{
-  return true;
+bool GroupNode::doSelectable() const {
+    return true;
 }
 
-void GroupNode::doPick(const EditorContext&, const vm::ray3& /* ray */, PickResult&)
-{
-  // For composite nodes (Groups, brush entities), pick rays don't hit the group
-  // but instead just the primitives inside (brushes, point entities).
-  // This avoids a potential performance trap where we'd have to exhaustively
-  // test many objects if most of the map was inside groups, but it means
-  // the pick results need to be postprocessed to account for groups (if desired).
-  // See: https://github.com/TrenchBroom/TrenchBroom/issues/2742
+void GroupNode::doPick(const EditorContext &, const vm::ray3 & /* ray */, PickResult &) {
+    // For composite nodes (Groups, brush entities), pick rays don't hit the group
+    // but instead just the primitives inside (brushes, point entities).
+    // This avoids a potential performance trap where we'd have to exhaustively
+    // test many objects if most of the map was inside groups, but it means
+    // the pick results need to be postprocessed to account for groups (if desired).
+    // See: https://github.com/TrenchBroom/TrenchBroom/issues/2742
 }
 
-void GroupNode::doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result)
-{
-  if (logicalBounds().contains(point))
-  {
-    result.push_back(this);
-  }
+void GroupNode::doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) {
+    if (logicalBounds().contains(point)) {
+        result.push_back(this);
+    }
 
-  for (auto* child : Node::children())
-  {
-    child->findNodesContaining(point, result);
-  }
+    for (auto *child : Node::children()) {
+        child->findNodesContaining(point, result);
+    }
 }
 
-void GroupNode::doAccept(NodeVisitor& visitor)
-{
-  visitor.visit(this);
+void GroupNode::doAccept(NodeVisitor &visitor) {
+    visitor.visit(this);
 }
 
-void GroupNode::doAccept(ConstNodeVisitor& visitor) const
-{
-  visitor.visit(this);
+void GroupNode::doAccept(ConstNodeVisitor &visitor) const {
+    visitor.visit(this);
 }
 
-Node* GroupNode::doGetContainer()
-{
-  return parent();
+Node *GroupNode::doGetContainer() {
+    return parent();
 }
 
-LayerNode* GroupNode::doGetContainingLayer()
-{
-  return findContainingLayer(this);
+LayerNode *GroupNode::doGetContainingLayer() {
+    return findContainingLayer(this);
 }
 
-GroupNode* GroupNode::doGetContainingGroup()
-{
-  return findContainingGroup(this);
+GroupNode *GroupNode::doGetContainingGroup() {
+    return findContainingGroup(this);
 }
 
-void GroupNode::invalidateBounds()
-{
-  m_boundsValid = false;
+void GroupNode::invalidateBounds() {
+    m_boundsValid = false;
 }
 
-void GroupNode::validateBounds() const
-{
-  m_logicalBounds = computeLogicalBounds(children(), vm::bbox3{0.0});
-  m_physicalBounds = computePhysicalBounds(children(), vm::bbox3{0.0});
-  m_boundsValid = true;
+void GroupNode::validateBounds() const {
+    m_logicalBounds = computeLogicalBounds(children(), vm::bbox3{0.0});
+    m_physicalBounds = computePhysicalBounds(children(), vm::bbox3{0.0});
+    m_boundsValid = true;
 }
 
-void GroupNode::doAcceptTagVisitor(TagVisitor& visitor)
-{
-  visitor.visit(*this);
+void GroupNode::doAcceptTagVisitor(TagVisitor &visitor) {
+    visitor.visit(*this);
 }
 
-void GroupNode::doAcceptTagVisitor(ConstTagVisitor& visitor) const
-{
-  visitor.visit(*this);
+void GroupNode::doAcceptTagVisitor(ConstTagVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
-bool compareGroupNodesByLinkId(const GroupNode* lhs, const GroupNode* rhs)
-{
-  return lhs->linkId() < rhs->linkId();
+bool compareGroupNodesByLinkId(const GroupNode *lhs, const GroupNode *rhs) {
+    return lhs->linkId() < rhs->linkId();
 }
 } // namespace TrenchBroom::Model

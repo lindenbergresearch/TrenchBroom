@@ -23,32 +23,27 @@
 
 #include "View/TitleBar.h"
 
-
 class QLabel;
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class BorderLine;
 
-
-class ClickableTitleBar : public TitleBar
-{
+class ClickableTitleBar : public TitleBar {
   Q_OBJECT
-private:
-  QLabel* m_stateText = nullptr;
+  private:
+    QLabel *m_stateText = nullptr;
 
-public:
-  ClickableTitleBar(
-    const QString& title, const QString& stateText, QWidget* parent = nullptr);
+  public:
+    ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
 
-  void setStateText(const QString& stateText);
+    void setStateText(const QString &stateText);
 
-signals:
+  signals:
 
-  void titleBarClicked();
+    void titleBarClicked();
 
-protected:
-  void mousePressEvent(QMouseEvent* event) override;
+  protected:
+    void mousePressEvent(QMouseEvent *event) override;
 };
 
 } // namespace TrenchBroom::View

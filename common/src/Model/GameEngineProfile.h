@@ -24,12 +24,9 @@
 #include <filesystem>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-struct GameEngineProfile
-{
+namespace TrenchBroom {
+namespace Model {
+struct GameEngineProfile {
   std::string name;
   std::filesystem::path path;
   std::string parameterSpec;

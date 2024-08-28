@@ -60,7 +60,6 @@ document->addNodes( {{
 document->
 
 parentForNodes(),
-
 {
 brushNode
 }

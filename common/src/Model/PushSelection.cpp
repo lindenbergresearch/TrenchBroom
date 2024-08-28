@@ -24,32 +24,21 @@
 
 #include <cassert>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
-PushSelection::PushSelection(MapFacade* facade)
-  : PushSelection{*facade}
-{
+PushSelection::PushSelection(MapFacade *facade) : PushSelection{*facade} {
 }
 
-PushSelection::PushSelection(MapFacade& facade)
-  : m_facade{facade}
-  , m_nodes{m_facade.selectedNodes().nodes()}
-  , m_faces{m_facade.selectedBrushFaces()}
-{
+PushSelection::PushSelection(MapFacade &facade) : m_facade{facade}, m_nodes{m_facade.selectedNodes().nodes()}, m_faces{m_facade.selectedBrushFaces()} {
 }
 
-PushSelection::~PushSelection()
-{
-  m_facade.deselectAll();
-  if (!m_nodes.empty() && m_facade.selectedNodes().nodes() != m_nodes)
-  {
-    m_facade.selectNodes(m_nodes);
-  }
-  else if (!m_faces.empty() && m_facade.selectedBrushFaces() != m_faces)
-  {
-    m_facade.selectBrushFaces(m_faces);
-  }
+PushSelection::~PushSelection() {
+    m_facade.deselectAll();
+    if (!m_nodes.empty() && m_facade.selectedNodes().nodes() != m_nodes) {
+        m_facade.selectNodes(m_nodes);
+    } else if (!m_faces.empty() && m_facade.selectedBrushFaces() != m_faces) {
+        m_facade.selectBrushFaces(m_faces);
+    }
 }
 
 } // namespace TrenchBroom::Model

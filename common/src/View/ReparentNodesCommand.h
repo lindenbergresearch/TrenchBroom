@@ -26,38 +26,28 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class GroupNode;
-
 
 class Node;
 } // namespace Model
 
-namespace View
-{
-class ReparentNodesCommand : public UpdateLinkedGroupsCommandBase
-{
-private:
-  std::map<Model::Node*, std::vector<Model::Node*>> m_nodesToAdd;
-  std::map<Model::Node*, std::vector<Model::Node*>> m_nodesToRemove;
+namespace View {
+class ReparentNodesCommand : public UpdateLinkedGroupsCommandBase {
+  private:
+    std::map<Model::Node *, std::vector<Model::Node *>> m_nodesToAdd;
+    std::map<Model::Node *, std::vector<Model::Node *>> m_nodesToRemove;
 
-public:
-  static std::unique_ptr<ReparentNodesCommand> reparent(
-    std::map<Model::Node*, std::vector<Model::Node*>> nodesToAdd,
-    std::map<Model::Node*, std::vector<Model::Node*>> nodesToRemove);
+  public:
+    static std::unique_ptr<ReparentNodesCommand> reparent(std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove);
 
-  ReparentNodesCommand(
-    std::map<Model::Node*, std::vector<Model::Node*>> nodesToAdd,
-    std::map<Model::Node*, std::vector<Model::Node*>> nodesToRemove);
+    ReparentNodesCommand(std::map<Model::Node *, std::vector<Model::Node *>> nodesToAdd, std::map<Model::Node *, std::vector<Model::Node *>> nodesToRemove);
 
-private:
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
+  private:
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-  std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
   deleteCopyAndMove(ReparentNodesCommand);
 };

@@ -31,66 +31,60 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 static const auto fixturePath = "fixture/test/IO/Wal";
 
-TEST_CASE("readWalTexture")
-{
-  const auto palettePath = "fixture/test/colormap.pcx";
-  auto fs = DiskFileSystem{std::filesystem::current_path()};
-  auto paletteFile = fs.openFile("fixture/test/colormap.pcx").value();
-  const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
+TEST_CASE("readWalTexture") {
+const auto palettePath = "fixture/test/colormap.pcx";
+auto fs = DiskFileSystem{std::filesystem::current_path()};
+auto paletteFile = fs.openFile("fixture/test/colormap.pcx").value();
+const auto palette = Assets::loadPalette(*paletteFile, palettePath).value();
 
-  using TexInfo = std::tuple<std::filesystem::path, size_t, size_t, Assets::GameData>;
+using TexInfo = std::tuple<std::filesystem::path, size_t, size_t, Assets::GameData>;
 
-  // clang-format off
-const auto [path, width, height, gameData] = GENERATE(
-    values<TexInfo>(
-        {{"rtz/b_pv_v1a1.wal", 128, 256, Assets::Q2Data{0, 0, 0}}, {"rtz/b_pv_v1a2.wal", 128, 256, Assets::Q2Data{0, 0, 0}},
-         {"rtz/b_pv_v1a3.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"rtz/b_rc_v16.wal", 128, 128, Assets::Q2Data{0, 0, 0}},
-         {"rtz/b_rc_v16w.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"rtz/b_rc_v28.wal", 128, 64, Assets::Q2Data{0, 0, 0}},
-         {"rtz/b_rc_v4.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"lavatest.wal", 64, 64, Assets::Q2Data{9, 8, 700}},
-         {"watertest.wal", 64, 64, Assets::Q2Data{9, 32, 120}},
-        }
-    ));
-  // clang-format on
+// clang-format off
+const auto [path, width, height, gameData] = GENERATE(values<TexInfo>({{"rtz/b_pv_v1a1.wal", 128, 256, Assets::Q2Data{0, 0, 0}}, {"rtz/b_pv_v1a2.wal", 128, 256, Assets::Q2Data{0, 0, 0}}, {"rtz/b_pv_v1a3.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"rtz/b_rc_v16.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"rtz/b_rc_v16w.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"rtz/b_rc_v28.wal", 128, 64, Assets::Q2Data{0, 0, 0}}, {"rtz/b_rc_v4.wal", 128, 128, Assets::Q2Data{0, 0, 0}}, {"lavatest.wal", 64, 64, Assets::Q2Data{9, 8, 700}}, {"watertest.wal", 64, 64, Assets::Q2Data{9, 32, 120}},
+                                                                      }));
+// clang-format on
 
-  INFO(path);
-  INFO(width);
-  INFO(height);
+INFO(path);
+INFO(width);
+INFO(height);
 
-  const auto file = fs.openFile(fixturePath / path).value();
-  auto reader = file->reader().buffer();
+const auto file = fs.openFile(fixturePath / path).value();
+auto reader = file->reader().buffer();
 
-  const auto name = path.stem().generic_string();
-  const auto texture = readWalTexture(name, reader, palette).value();
-  CHECK(
-    texture.
+const auto name = path.stem().generic_string();
+const auto texture = readWalTexture(name, reader, palette).value();
+CHECK(
+    texture
+.
 
-    name()
+name()
 
-    == name);
-  CHECK(
-    texture.
+== name);
+CHECK(
+    texture
+.
 
-    width()
+width()
 
-    == width);
-  CHECK(
-    texture.
+== width);
+CHECK(
+    texture
+.
 
-    height()
+height()
 
-    == height);
-  CHECK(
-    texture.
+== height);
+CHECK(
+    texture
+.
 
-    gameData()
+gameData()
 
-    == gameData);
+== gameData);
 }
 } // namespace IO
 } // namespace TrenchBroom

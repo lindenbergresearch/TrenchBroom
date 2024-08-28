@@ -26,7 +26,7 @@
 
 namespace TrenchBroom {
 class Observed {
-public:
+  public:
     Notifier<> noArgNotifier;
     Notifier<const int &> oneArgNotifier;
     Notifier<const int &, const int &> twoArgNotifier;
@@ -39,7 +39,7 @@ public:
 };
 
 class Observer {
-public:
+  public:
     int notify0Calls;
     std::vector<int> notify1Calls;
     std::vector<std::tuple<int, int>> notify2Calls;

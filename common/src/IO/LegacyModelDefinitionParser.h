@@ -25,14 +25,11 @@
 
 #include <string_view>
 
-namespace TrenchBroom
-{
-namespace IO
-{
+namespace TrenchBroom {
+namespace IO {
 class ParserStatus;
 
-namespace MdlToken
-{
+namespace MdlToken {
 using Type = size_t;
 static const Type Integer = 1 << 0;
 static const Type Equality = 1 << 1;
@@ -43,43 +40,40 @@ static const Type CParenthesis = 1 << 5;
 static const Type Eof = 1 << 6;
 } // namespace MdlToken
 
-class LegacyModelDefinitionTokenizer : public Tokenizer<MdlToken::Type>
-{
-public:
-  LegacyModelDefinitionTokenizer(std::string_view str, size_t line, size_t column);
+class LegacyModelDefinitionTokenizer : public Tokenizer<MdlToken::Type> {
+  public:
+    LegacyModelDefinitionTokenizer(std::string_view str, size_t line, size_t column);
 
-private:
-  static const std::string WordDelims;
+  private:
+    static const std::string WordDelims;
 
-  Token emitToken() override;
+    Token emitToken() override;
 };
 
+class LegacyModelDefinitionParser : public Parser<MdlToken::Type> {
+  private:
+    using Token = LegacyModelDefinitionTokenizer::Token;
+    LegacyModelDefinitionTokenizer m_tokenizer;
 
-class LegacyModelDefinitionParser : public Parser<MdlToken::Type>
-{
-private:
-  using Token = LegacyModelDefinitionTokenizer::Token;
-  LegacyModelDefinitionTokenizer m_tokenizer;
+  public:
+    LegacyModelDefinitionParser(std::string_view str, size_t line, size_t column);
 
-public:
-  LegacyModelDefinitionParser(std::string_view str, size_t line, size_t column);
+    TokenizerState tokenizerState() const;
 
-  TokenizerState tokenizerState() const;
+  public:
+    EL::Expression parse(ParserStatus &status);
 
-public:
-  EL::Expression parse(ParserStatus& status);
+  private:
+    EL::Expression parseModelDefinition(ParserStatus &status);
 
-private:
-  EL::Expression parseModelDefinition(ParserStatus& status);
+    EL::Expression parseStaticModelDefinition(ParserStatus &status);
 
-  EL::Expression parseStaticModelDefinition(ParserStatus& status);
+    EL::Expression parseDynamicModelDefinition(ParserStatus &status);
 
-  EL::Expression parseDynamicModelDefinition(ParserStatus& status);
+    EL::Expression parseNamedValue(ParserStatus &status, const std::string &name);
 
-  EL::Expression parseNamedValue(ParserStatus& status, const std::string& name);
-
-private:
-  TokenNameMap tokenNames() const override;
+  private:
+    TokenNameMap tokenNames() const override;
 };
 } // namespace IO
 } // namespace TrenchBroom

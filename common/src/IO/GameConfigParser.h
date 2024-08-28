@@ -32,29 +32,25 @@
 #include <string_view>
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class BrushFaceAttributes;
 }
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-class GameConfigParser : public ConfigParserBase
-{
-private:
-  EL::IntegerType m_version;
+class GameConfigParser : public ConfigParserBase {
+  private:
+    EL::IntegerType m_version;
 
-public:
-  explicit GameConfigParser(std::string_view str, const std::filesystem::path& path = {});
+  public:
+    explicit GameConfigParser(std::string_view str, const std::filesystem::path &path = {});
 
-  Model::GameConfig parse();
+    Model::GameConfig parse();
 
   deleteCopyAndMove(GameConfigParser);
 };
 
+std::optional<vm::bbox3> parseSoftMapBoundsString(const std::string &string);
 
-std::optional<vm::bbox3> parseSoftMapBoundsString(const std::string& string);
-
-std::string serializeSoftMapBoundsString(const vm::bbox3& bounds);
+std::string serializeSoftMapBoundsString(const vm::bbox3 &bounds);
 } // namespace TrenchBroom::IO

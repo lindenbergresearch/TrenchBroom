@@ -26,185 +26,105 @@
 #include <map>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class ActiveShader;
 
-
-template <typename VertexSpec>
-class IndexRangeMapBuilder;
-
+template<typename VertexSpec> class IndexRangeMapBuilder;
 
 class IndexRangeRenderer;
 
-
-enum class PrimitiveRendererOcclusionPolicy
-{
-  Hide,
-  Show,
-  Transparent
+enum class PrimitiveRendererOcclusionPolicy {
+  Hide, Show, Transparent
 };
 
-enum class PrimitiveRendererCullingPolicy
-{
-  CullBackfaces,
-  ShowBackfaces
+enum class PrimitiveRendererCullingPolicy {
+  CullBackfaces, ShowBackfaces
 };
 
-
-class PrimitiveRenderer : public DirectRenderable
-{
-public:
-private:
-  using Vertex = GLVertexTypes::P3::Vertex;
-
-  class LineRenderAttributes
-  {
+class PrimitiveRenderer : public DirectRenderable {
+  public:
   private:
-    Color m_color;
-    float m_lineWidth;
-    int m_dashSize;
-    unsigned short m_pattern;
-    bool m_dashed;
-    PrimitiveRendererOcclusionPolicy m_occlusionPolicy;
+    using Vertex = GLVertexTypes::P3::Vertex;
+
+    class LineRenderAttributes {
+      private:
+        Color m_color;
+        float m_lineWidth;
+        int m_dashSize;
+        unsigned short m_pattern;
+        bool m_dashed;
+        PrimitiveRendererOcclusionPolicy m_occlusionPolicy;
+
+      public:
+        LineRenderAttributes(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, int dashSize = 1, unsigned short pattern = 0x0000, bool dashed = false);
+
+        bool operator<(const LineRenderAttributes &other) const;
+
+        void render(IndexRangeRenderer &renderer, ActiveShader &shader, float dpiScale) const;
+    };
+
+    using LineMeshMap = std::map<LineRenderAttributes, IndexRangeMapBuilder<Vertex::Type>>;
+    LineMeshMap m_lineMeshes;
+
+    using LineMeshRendererMap = std::map<LineRenderAttributes, IndexRangeRenderer>;
+    LineMeshRendererMap m_lineMeshRenderers;
+
+    class TriangleRenderAttributes {
+      private:
+        Color m_color;
+        PrimitiveRendererOcclusionPolicy m_occlusionPolicy;
+        PrimitiveRendererCullingPolicy m_cullingPolicy;
+
+      public:
+        TriangleRenderAttributes(const Color &color, PrimitiveRendererOcclusionPolicy occlusionPolicy, PrimitiveRendererCullingPolicy cullingPolicy);
+
+        bool operator<(const TriangleRenderAttributes &other) const;
+
+        void render(IndexRangeRenderer &renderer, ActiveShader &shader) const;
+    };
+
+    using TriangleMeshMap = std::map<TriangleRenderAttributes, IndexRangeMapBuilder<Vertex::Type>>;
+    TriangleMeshMap m_triangleMeshes;
+
+    using TriangleMeshRendererMap = std::map<TriangleRenderAttributes, IndexRangeRenderer>;
+    TriangleMeshRendererMap m_triangleMeshRenderers;
 
   public:
-    LineRenderAttributes(
-      const Color& color,
-      float lineWidth,
-      PrimitiveRendererOcclusionPolicy occlusionPolicy,
-      int dashSize = 1,
-      unsigned short pattern = 0x0000,
-      bool dashed = false);
+    void renderLine(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::vec3f &start, const vm::vec3f &end);
 
-    bool operator<(const LineRenderAttributes& other) const;
+    void renderLines(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions);
 
-    void render(IndexRangeRenderer& renderer, ActiveShader& shader, float dpiScale) const;
-  };
+    void renderDashedLines(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions, int factor, unsigned short pattern);
 
-  using LineMeshMap = std::map<LineRenderAttributes, IndexRangeMapBuilder<Vertex::Type>>;
-  LineMeshMap m_lineMeshes;
+    void renderLineStrip(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions);
 
-  using LineMeshRendererMap = std::map<LineRenderAttributes, IndexRangeRenderer>;
-  LineMeshRendererMap m_lineMeshRenderers;
+    void renderCoordinateSystemXY(const Color &x, const Color &y, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds);
 
-  class TriangleRenderAttributes
-  {
+    void renderCoordinateSystemXZ(const Color &x, const Color &z, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds);
+
+    void renderCoordinateSystemYZ(const Color &y, const Color &z, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds);
+
+    void renderCoordinateSystem3D(const Color &x, const Color &y, const Color &z, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const vm::bbox3f &bounds);
+
+    void renderPolygon(const Color &color, float lineWidth, PrimitiveRendererOcclusionPolicy occlusionPolicy, const std::vector<vm::vec3f> &positions);
+
+    void renderFilledPolygon(const Color &color, PrimitiveRendererOcclusionPolicy occlusionPolicy, PrimitiveRendererCullingPolicy cullingPolicy, const std::vector<vm::vec3f> &positions);
+
+    void renderCylinder(const Color &color, float radius, size_t segments, PrimitiveRendererOcclusionPolicy occlusionPolicy, PrimitiveRendererCullingPolicy cullingPolicy, const vm::vec3f &start, const vm::vec3f &end);
+
   private:
-    Color m_color;
-    PrimitiveRendererOcclusionPolicy m_occlusionPolicy;
-    PrimitiveRendererCullingPolicy m_cullingPolicy;
+    void doPrepareVertices(VboManager &vboManager) override;
 
-  public:
-    TriangleRenderAttributes(
-      const Color& color,
-      PrimitiveRendererOcclusionPolicy occlusionPolicy,
-      PrimitiveRendererCullingPolicy cullingPolicy);
+    void prepareLines(VboManager &vboManager);
 
-    bool operator<(const TriangleRenderAttributes& other) const;
+    void prepareTriangles(VboManager &vboManager);
 
-    void render(IndexRangeRenderer& renderer, ActiveShader& shader) const;
-  };
+    void doRender(RenderContext &renderContext) override;
 
-  using TriangleMeshMap =
-    std::map<TriangleRenderAttributes, IndexRangeMapBuilder<Vertex::Type>>;
-  TriangleMeshMap m_triangleMeshes;
+    void renderLines(RenderContext &renderContext);
 
-  using TriangleMeshRendererMap = std::map<TriangleRenderAttributes, IndexRangeRenderer>;
-  TriangleMeshRendererMap m_triangleMeshRenderers;
-
-public:
-  void renderLine(
-    const Color& color,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const vm::vec3f& start,
-    const vm::vec3f& end);
-
-  void renderLines(
-    const Color& color,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const std::vector<vm::vec3f>& positions);
-
-  void renderDashedLines(
-    const Color& color,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const std::vector<vm::vec3f>& positions,
-    int factor,
-    unsigned short pattern);
-
-  void renderLineStrip(
-    const Color& color,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const std::vector<vm::vec3f>& positions);
-
-  void renderCoordinateSystemXY(
-    const Color& x,
-    const Color& y,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const vm::bbox3f& bounds);
-
-  void renderCoordinateSystemXZ(
-    const Color& x,
-    const Color& z,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const vm::bbox3f& bounds);
-
-  void renderCoordinateSystemYZ(
-    const Color& y,
-    const Color& z,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const vm::bbox3f& bounds);
-
-  void renderCoordinateSystem3D(
-    const Color& x,
-    const Color& y,
-    const Color& z,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const vm::bbox3f& bounds);
-
-  void renderPolygon(
-    const Color& color,
-    float lineWidth,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    const std::vector<vm::vec3f>& positions);
-
-  void renderFilledPolygon(
-    const Color& color,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    PrimitiveRendererCullingPolicy cullingPolicy,
-    const std::vector<vm::vec3f>& positions);
-
-  void renderCylinder(
-    const Color& color,
-    float radius,
-    size_t segments,
-    PrimitiveRendererOcclusionPolicy occlusionPolicy,
-    PrimitiveRendererCullingPolicy cullingPolicy,
-    const vm::vec3f& start,
-    const vm::vec3f& end);
-
-private:
-  void doPrepareVertices(VboManager& vboManager) override;
-
-  void prepareLines(VboManager& vboManager);
-
-  void prepareTriangles(VboManager& vboManager);
-
-  void doRender(RenderContext& renderContext) override;
-
-  void renderLines(RenderContext& renderContext);
-
-  void renderTriangles(RenderContext& renderContext);
+    void renderTriangles(RenderContext &renderContext);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

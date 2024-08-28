@@ -21,53 +21,43 @@
 
 #include "View/ControlListBox.h"
 
-
 class QLabel;
-
 
 class QPixmap;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class ElidedLabel;
 
-
-class ImageListBoxItemRenderer : public ControlListBoxItemRenderer
-{
+class ImageListBoxItemRenderer : public ControlListBoxItemRenderer {
   Q_OBJECT
-private:
-  ElidedLabel* m_titleLabel;
-  ElidedLabel* m_subtitleLabel;
-  QLabel* m_imageLabel;
+  private:
+    ElidedLabel *m_titleLabel;
+    ElidedLabel *m_subtitleLabel;
+    QLabel *m_imageLabel;
 
-public:
-  ImageListBoxItemRenderer(
-    const QString& title, const QString& subtitle, const QPixmap& image, QWidget* parent);
+  public:
+    ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent);
 
-  void updateItem() override;
+    void updateItem() override;
 };
 
-
-class ImageListBox : public ControlListBox
-{
+class ImageListBox : public ControlListBox {
   Q_OBJECT
-public:
-  explicit ImageListBox(
-    const QString& emptyText, bool showSeparator, QWidget* parent = nullptr);
+  public:
+    explicit ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
-private:
-  ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) override;
+  private:
+    ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;
 
-private:
-  friend class ImageListBoxItemRenderer;
+  private:
+    friend class ImageListBoxItemRenderer;
 
-  virtual QPixmap image(size_t index) const;
+    virtual QPixmap image(size_t index) const;
 
-  virtual QString title(size_t index) const = 0;
+    virtual QString title(size_t index) const = 0;
 
-  virtual QString subtitle(size_t index) const = 0;
+    virtual QString subtitle(size_t index) const = 0;
 };
 } // namespace View
 } // namespace TrenchBroom

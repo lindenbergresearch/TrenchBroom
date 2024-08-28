@@ -31,169 +31,153 @@
 #include <string>
 #include <vector>
 
-
 class QMenu;
-
 
 class QSettings;
 
-
 class QTimer;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace View
-{
+namespace View {
 class ExecutableEvent;
-
 
 class FrameManager;
 
-
 class RecentDocuments;
-
 
 class WelcomeWindow;
 
+class Timer {
+  public:
+    static const Timer appstart;
 
-class Timer
-{
-public:
-  static const Timer appstart;
+    Timer() : m_start(t_highres_clock::now()) {
+    }
 
-  Timer()
-    : m_start(t_highres_clock::now())
-  {
-  }
+    void reset();
 
-  void reset();
+    double elapsed() const;
 
-  double elapsed() const;
-
-private:
-  typedef std::chrono::high_resolution_clock t_highres_clock;
-  typedef std::chrono::duration<double, std::ratio<1>> t_duration_second;
-  std::chrono::time_point<t_highres_clock> m_start;
+  private:
+    typedef std::chrono::high_resolution_clock t_highres_clock;
+    typedef std::chrono::duration<double, std::ratio<1>> t_duration_second;
+    std::chrono::time_point<t_highres_clock> m_start;
 };
 
-
-class TrenchBroomApp : public QApplication
-{
+class TrenchBroomApp : public QApplication {
   Q_OBJECT
-private:
-  std::unique_ptr<FrameManager> m_frameManager;
-  std::unique_ptr<RecentDocuments> m_recentDocuments;
-  std::unique_ptr<WelcomeWindow> m_welcomeWindow;
-  QTimer* m_recentDocumentsReloadTimer;
-  QFont m_UI_Font, m_ConsoleFont, m_RenderFont;
-  QSSBuilder* builder = nullptr;
-  MapFrame* currentMapFrame = nullptr;
+  private:
+    std::unique_ptr<FrameManager> m_frameManager;
+    std::unique_ptr<RecentDocuments> m_recentDocuments;
+    std::unique_ptr<WelcomeWindow> m_welcomeWindow;
+    QTimer *m_recentDocumentsReloadTimer;
+    QFont m_UI_Font, m_ConsoleFont, m_RenderFont;
+    QSSBuilder *builder = nullptr;
+    MapFrame *currentMapFrame = nullptr;
 
-public:
-  MapFrame* getCurrentMapFrame() const;
+  public:
+    MapFrame *getCurrentMapFrame() const;
 
-  void setCurrentMapFrame(MapFrame* currentMapFrame);
+    void setCurrentMapFrame(MapFrame *currentMapFrame);
 
-public:
-  const QFont& getMUiFont() const;
+  public:
+    const QFont &getMUiFont() const;
 
-  void setMUiFont(const QFont& mUiFont);
+    void setMUiFont(const QFont &mUiFont);
 
-  const QFont& getMConsoleFont() const;
+    const QFont &getMConsoleFont() const;
 
-  void setMConsoleFont(const QFont& mConsoleFont);
+    void setMConsoleFont(const QFont &mConsoleFont);
 
-  const QFont& getMRenderFont() const;
+    const QFont &getMRenderFont() const;
 
-  void setMRenderFont(const QFont& mRenderFont);
+    void setMRenderFont(const QFont &mRenderFont);
 
-public:
-  TrenchBroomApp(int& argc, char** argv);
+  public:
+    TrenchBroomApp(int &argc, char **argv);
 
-  ~TrenchBroomApp() override;
+    ~TrenchBroomApp() override;
 
-  const QFont& getUIFont() const;
+    const QFont &getUIFont() const;
 
-  const QFont& getConsoleFont() const;
+    const QFont &getConsoleFont() const;
 
-  const QFont& getRenderFont() const;
+    const QFont &getRenderFont() const;
 
-  static TrenchBroomApp& instance();
+    static TrenchBroomApp &instance();
 
-  void parseCommandLineAndShowFrame();
+    void parseCommandLineAndShowFrame();
 
-  FrameManager* frameManager();
+    FrameManager *frameManager();
 
-private:
-  static QPalette darkPalette();
+  private:
+    static QPalette darkPalette();
 
-  bool loadStyleSheets();
+    bool loadStyleSheets();
 
-  void loadStyle();
+    void loadStyle();
 
-public:
-  void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
+  public:
+    void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
 
-  QFont loadFont(const std::filesystem::path& path, const int size);
+    QFont loadFont(const std::filesystem::path &path, const int size);
 
-  std::vector<std::filesystem::path> recentDocuments() const;
+    std::vector<std::filesystem::path> recentDocuments() const;
 
-  void addRecentDocumentMenu(QMenu& menu);
+    void addRecentDocumentMenu(QMenu &menu);
 
-  void removeRecentDocumentMenu(QMenu& menu);
+    void removeRecentDocumentMenu(QMenu &menu);
 
-  void updateRecentDocument(const std::filesystem::path& path);
+    void updateRecentDocument(const std::filesystem::path &path);
 
-  bool openDocument(const std::filesystem::path& path);
+    bool openDocument(const std::filesystem::path &path);
 
-  void openPreferences();
+    void openPreferences();
 
-  void openAbout();
+    void openAbout();
 
-  bool initializeGameFactory();
+    bool initializeGameFactory();
 
-  bool newDocument();
+    bool newDocument();
 
-  void openDocument();
+    void openDocument();
 
-  void showManual();
+    void showManual();
 
-  void showPreferences();
+    void showPreferences();
 
-  void showAboutDialog();
+    void showAboutDialog();
 
-  void debugShowCrashReportDialog();
+    void debugShowCrashReportDialog();
 
-  bool notify(QObject* receiver, QEvent* event) override;
+    bool notify(QObject *receiver, QEvent *event) override;
 
 #ifdef __APPLE__
 
-  bool event(QEvent* event) override;
+    bool event(QEvent *event) override;
 
 #endif
 
-  void openFilesOrWelcomeFrame(const QStringList& fileNames);
+    void openFilesOrWelcomeFrame(const QStringList &fileNames);
 
-public:
-  void showWelcomeWindow();
+  public:
+    void showWelcomeWindow();
 
-  void closeWelcomeWindow();
+    void closeWelcomeWindow();
 
-private:
-  static bool useSDI();
+  private:
+    static bool useSDI();
 
-signals:
+  signals:
 
-  void recentDocumentsDidChange();
+    void recentDocumentsDidChange();
 };
-
 
 void setCrashReportGUIEnbled(bool guiEnabled);
 
-[[noreturn]] void reportCrashAndExit(
-  const std::string& stacktrace, const std::string& reason);
+[[noreturn]] void reportCrashAndExit(const std::string &stacktrace, const std::string &reason);
 
 bool isReportingCrash();
 } // namespace View

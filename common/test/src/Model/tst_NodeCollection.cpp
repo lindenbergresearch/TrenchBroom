@@ -505,11 +505,9 @@ REQUIRE_THAT(std::vector<Node *>(nodeCollection.begin(), nodeCollection.end()), 
 nodeCollection.addNodes({
 &layerNode, &groupNode, &entityNode, &brushNode, &patchNode});
 
-CHECK_THAT(std::vector<Node *>(nodeCollection.begin(), nodeCollection.end()), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+CHECK_THAT(std::vector<Node *>(nodeCollection.begin(), nodeCollection.end()), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
+})
 );
 }
 
@@ -541,11 +539,9 @@ nodeCollection.addNodes({
 CHECK_THAT(nodeCollection
 .
 
-nodes(), Catch::Matchers::UnorderedEquals(
-    std::vector<Node *>{
-        &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
-    }
-)
+nodes(), Catch::Matchers::UnorderedEquals(std::vector<Node *>{
+    &layerNode, &groupNode, &entityNode, &brushNode, &patchNode
+})
 
 );
 

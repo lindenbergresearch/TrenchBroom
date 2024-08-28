@@ -21,31 +21,28 @@
 
 #include <QKeySequenceEdit>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class LimitedKeySequenceEdit : public QKeySequenceEdit
-{
+namespace TrenchBroom {
+namespace View {
+class LimitedKeySequenceEdit : public QKeySequenceEdit {
   Q_OBJECT
-public:
-  static const size_t MaxCount = 4;
+  public:
+    static const size_t MaxCount = 4;
 
-private:
-  size_t m_maxCount;
-  size_t m_count;
+  private:
+    size_t m_maxCount;
+    size_t m_count;
 
-public:
-  explicit LimitedKeySequenceEdit(QWidget* parent = nullptr);
+  public:
+    explicit LimitedKeySequenceEdit(QWidget *parent = nullptr);
 
-  explicit LimitedKeySequenceEdit(size_t maxCount, QWidget* parent = nullptr);
+    explicit LimitedKeySequenceEdit(size_t maxCount, QWidget *parent = nullptr);
 
-protected:
-  void keyPressEvent(QKeyEvent* event) override;
+  protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
-private slots:
+  private slots:
 
-  void resetCount();
+    void resetCount();
 };
 } // namespace View
 } // namespace TrenchBroom

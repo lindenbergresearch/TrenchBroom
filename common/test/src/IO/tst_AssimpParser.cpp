@@ -29,40 +29,41 @@
 
 #include "Catch2.h"
 
-namespace TrenchBroom
-{
-namespace IO
-{
-TEST_CASE("AssimpParserTest.loadBlenderModel")
-{
-  auto logger = NullLogger{};
+namespace TrenchBroom {
+namespace IO {
+TEST_CASE("AssimpParserTest.loadBlenderModel") {
+auto logger = NullLogger{};
 
-  const auto basePath = std::filesystem::current_path() / "fixture/test/IO/assimp";
-  auto fs = std::make_shared<DiskFileSystem>(basePath);
+const auto basePath = std::filesystem::current_path() / "fixture/test/IO/assimp";
+auto fs = std::make_shared<DiskFileSystem>(basePath);
 
-  auto assimpParser = AssimpParser{"cube.dae", *fs};
+auto assimpParser = AssimpParser{"cube.dae", *fs};
 
-  auto model = assimpParser.initializeModel(logger);
-  CHECK(model != nullptr);
+auto model = assimpParser.initializeModel(logger);
+CHECK(model
+!= nullptr);
 
-  CHECK(
-    model->
+CHECK(
+    model
+->
 
-    frameCount()
+frameCount()
 
-    == 1);
-  CHECK(
-    model->
+== 1);
+CHECK(
+    model
+->
 
-    surfaceCount()
+surfaceCount()
 
-    == 1);
-  CHECK(
-    model->surface(0).
+== 1);
+CHECK(
+    model
+->surface(0).
 
-    skinCount()
+skinCount()
 
-    == 1);
+== 1);
 }
 } // namespace IO
 } // namespace TrenchBroom

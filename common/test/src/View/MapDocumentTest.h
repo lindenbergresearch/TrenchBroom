@@ -26,71 +26,57 @@
 #include <memory>
 #include <string>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class BrushEntityDefinition;
-
 
 class PointEntityDefinition;
 } // namespace Assets
 
-namespace Model
-{
+namespace Model {
 class Brush;
 
-
 class PatchNode;
-
 
 class TestGame;
 } // namespace Model
 
-namespace View
-{
-class MapDocumentTest
-{
-private:
-  Model::MapFormat m_mapFormat;
+namespace View {
+class MapDocumentTest {
+  private:
+    Model::MapFormat m_mapFormat;
 
-protected:
-  std::shared_ptr<Model::TestGame> game;
-  std::shared_ptr<MapDocument> document;
-  Assets::PointEntityDefinition* m_pointEntityDef;
-  Assets::BrushEntityDefinition* m_brushEntityDef;
+  protected:
+    std::shared_ptr<Model::TestGame> game;
+    std::shared_ptr<MapDocument> document;
+    Assets::PointEntityDefinition *m_pointEntityDef;
+    Assets::BrushEntityDefinition *m_brushEntityDef;
 
-protected:
-  MapDocumentTest();
+  protected:
+    MapDocumentTest();
 
-  explicit MapDocumentTest(Model::MapFormat mapFormat);
+    explicit MapDocumentTest(Model::MapFormat mapFormat);
 
-private:
-  void SetUp();
+  private:
+    void SetUp();
 
-protected:
-  virtual ~MapDocumentTest();
+  protected:
+    virtual ~MapDocumentTest();
 
-public:
-  Model::BrushNode* createBrushNode(
-    const std::string& textureName = "texture",
-    const std::function<void(Model::Brush&)>& brushFunc = [](Model::Brush&) {}) const;
+  public:
+    Model::BrushNode *createBrushNode(const std::string &textureName = "texture", const std::function<void(Model::Brush &)> &brushFunc = [](Model::Brush &) {}) const;
 
-  Model::PatchNode* createPatchNode(const std::string& textureName = "texture") const;
+    Model::PatchNode *createPatchNode(const std::string &textureName = "texture") const;
 };
 
-
-class ValveMapDocumentTest : public MapDocumentTest
-{
-protected:
-  ValveMapDocumentTest();
+class ValveMapDocumentTest : public MapDocumentTest {
+  protected:
+    ValveMapDocumentTest();
 };
 
-
-class Quake3MapDocumentTest : public MapDocumentTest
-{
-public:
-  Quake3MapDocumentTest();
+class Quake3MapDocumentTest : public MapDocumentTest {
+  public:
+    Quake3MapDocumentTest();
 };
 } // namespace View
 } // namespace TrenchBroom

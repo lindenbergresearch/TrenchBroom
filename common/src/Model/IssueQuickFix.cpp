@@ -27,59 +27,44 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-IssueQuickFix::IssueQuickFix(std::string description, MultiIssueFix fix)
-  : m_description{std::move(description)}
-  , m_fix{std::move(fix)}
-{
+namespace TrenchBroom {
+namespace Model {
+IssueQuickFix::IssueQuickFix(std::string description, MultiIssueFix fix) : m_description{std::move(description)}, m_fix{std::move(fix)} {
 }
 
-IssueQuickFix::IssueQuickFix(
-  IssueType issueType, std::string description, SingleIssueFix fix)
-  : IssueQuickFix{
-      std::move(description),
-      [=](MapFacade& facade, const std::vector<const Issue*>& issues) {
-        for (const auto* issue : issues)
-        {
-          if (issue->type() == issueType)
-          {
-            fix(facade, *issue);
-          }
+IssueQuickFix::IssueQuickFix(IssueType issueType, std::string description, SingleIssueFix fix) : IssueQuickFix{
+    std::move(description), [=](MapFacade &facade, const std::vector<const Issue *> &issues) {
+        for (const auto *issue : issues) {
+            if (issue->type() == issueType) {
+                fix(facade, *issue);
+            }
         }
-      }}
-{
+    }} {
 }
 
 IssueQuickFix::~IssueQuickFix() = default;
 
-const std::string& IssueQuickFix::description() const
-{
-  return m_description;
+const std::string &IssueQuickFix::description() const {
+    return m_description;
 }
 
-void IssueQuickFix::apply(
-  MapFacade& facade, const std::vector<const Issue*>& issues) const
-{
-  m_fix(facade, issues);
+void IssueQuickFix::apply(MapFacade &facade, const std::vector<const Issue *> &issues) const {
+    m_fix(facade, issues);
 }
 
-IssueQuickFix makeDeleteNodesQuickFix()
-{
-  return {"Delete Objects", [](MapFacade& facade, const std::vector<const Issue*>&) {
+IssueQuickFix makeDeleteNodesQuickFix() {
+    return {
+        "Delete Objects", [](MapFacade &facade, const std::vector<const Issue *> &) {
             facade.deleteObjects();
-          }};
+        }};
 }
 
-IssueQuickFix makeRemoveEntityPropertiesQuickFix(const IssueType type)
-{
-  return {type, "Delete Property", [](MapFacade& facade, const Issue& issue) {
+IssueQuickFix makeRemoveEntityPropertiesQuickFix(const IssueType type) {
+    return {
+        type, "Delete Property", [](MapFacade &facade, const Issue &issue) {
             const auto pushSelection = PushSelection{facade};
 
-            const auto& entityPropertyIssue =
-              static_cast<const EntityPropertyIssue&>(issue);
+            const auto &entityPropertyIssue = static_cast<const EntityPropertyIssue &>(issue);
 
             // If world node is affected, the selection will fail, but if nothing is
             // selected, the removeProperty call will correctly affect worldspawn
@@ -88,21 +73,17 @@ IssueQuickFix makeRemoveEntityPropertiesQuickFix(const IssueType type)
             facade.deselectAll();
             facade.selectNodes({&issue.node()});
             facade.removeProperty(entityPropertyIssue.propertyKey());
-          }};
+        }};
 }
 
-IssueQuickFix makeTransformEntityPropertiesQuickFix(
-  const IssueType type,
-  std::string description,
-  std::function<std::string(const std::string&)> keyTransform,
-  std::function<std::string(const std::string&)> valueTransform)
-{
-  return {type, std::move(description), [=](MapFacade& facade, const Issue& issue) {
+IssueQuickFix makeTransformEntityPropertiesQuickFix(const IssueType type, std::string description, std::function<std::string(const std::string &)> keyTransform, std::function<std::string(const std::string &)> valueTransform) {
+    return {
+        type, std::move(description), [=](MapFacade &facade, const Issue &issue) {
             const auto pushSelection = PushSelection{facade};
 
-            const auto& propIssue = static_cast<const EntityPropertyIssue&>(issue);
-            const auto& oldkey = propIssue.propertyKey();
-            const auto& oldValue = propIssue.propertyValue();
+            const auto &propIssue = static_cast<const EntityPropertyIssue &>(issue);
+            const auto &oldkey = propIssue.propertyKey();
+            const auto &oldValue = propIssue.propertyValue();
             const auto newKey = keyTransform(oldkey);
             const auto newValue = valueTransform(oldValue);
 
@@ -113,22 +94,17 @@ IssueQuickFix makeTransformEntityPropertiesQuickFix(
             facade.deselectAll();
             facade.selectNodes({&issue.node()});
 
-            if (newKey.empty())
-            {
-              facade.removeProperty(propIssue.propertyKey());
+            if (newKey.empty()) {
+                facade.removeProperty(propIssue.propertyKey());
+            } else {
+                if (newKey != oldkey) {
+                    facade.renameProperty(oldkey, newKey);
+                }
+                if (newValue != oldValue) {
+                    facade.setProperty(newKey, newValue);
+                }
             }
-            else
-            {
-              if (newKey != oldkey)
-              {
-                facade.renameProperty(oldkey, newKey);
-              }
-              if (newValue != oldValue)
-              {
-                facade.setProperty(newKey, newValue);
-              }
-            }
-          }};
+        }};
 }
 } // namespace Model
 } // namespace TrenchBroom

@@ -26,20 +26,17 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class EnableDisableTagCallback : public QObject, public Model::TagMatcherCallback
-{
+namespace TrenchBroom {
+namespace View {
+class EnableDisableTagCallback : public QObject, public Model::TagMatcherCallback {
   Q_OBJECT
-private:
-  size_t m_selectedOption;
+  private:
+    size_t m_selectedOption;
 
-public:
-  explicit EnableDisableTagCallback();
+  public:
+    explicit EnableDisableTagCallback();
 
-  size_t selectOption(const std::vector<std::string>& options) override;
+    size_t selectOption(const std::vector<std::string> &options) override;
 };
 } // namespace View
 } // namespace TrenchBroom

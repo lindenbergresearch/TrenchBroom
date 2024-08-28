@@ -24,32 +24,27 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class GroupNode;
 }
 
-namespace View
-{
-class CurrentGroupCommand : public UndoableCommand
-{
-private:
-  Model::GroupNode* m_group;
+namespace View {
+class CurrentGroupCommand : public UndoableCommand {
+  private:
+    Model::GroupNode *m_group;
 
-public:
-  static std::unique_ptr<CurrentGroupCommand> push(Model::GroupNode* group);
+  public:
+    static std::unique_ptr<CurrentGroupCommand> push(Model::GroupNode *group);
 
-  static std::unique_ptr<CurrentGroupCommand> pop();
+    static std::unique_ptr<CurrentGroupCommand> pop();
 
-  explicit CurrentGroupCommand(Model::GroupNode* group);
+    explicit CurrentGroupCommand(Model::GroupNode *group);
 
-private:
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
+  private:
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-  std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
   deleteCopyAndMove(CurrentGroupCommand);
 };

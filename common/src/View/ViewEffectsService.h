@@ -19,19 +19,16 @@
 
 #pragma once
 
-namespace TrenchBroom
-{
-namespace View
-{
-class ViewEffectsService
-{
-public:
-  virtual ~ViewEffectsService();
+namespace TrenchBroom {
+namespace View {
+class ViewEffectsService {
+  public:
+    virtual ~ViewEffectsService();
 
-  void flashSelection();
+    void flashSelection();
 
-private:
-  virtual void doFlashSelection() = 0;
+  private:
+    virtual void doFlashSelection() = 0;
 };
 } // namespace View
 } // namespace TrenchBroom

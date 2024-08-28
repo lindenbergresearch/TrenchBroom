@@ -54,7 +54,6 @@ document->addNodes( {{
 document->
 
 parentForNodes(),
-
 {
 entityNode
 }
@@ -564,7 +563,7 @@ canRepeatCommands()
 
 // this command will replace the command on the repeat stack
 document->
-translateObjects(vm::vec3(- 1, - 2, - 3)
+translateObjects(vm::vec3(-1, -2, -3)
 );
 CHECK(document
 ->

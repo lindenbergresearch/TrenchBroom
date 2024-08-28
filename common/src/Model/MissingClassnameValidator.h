@@ -23,18 +23,14 @@
 
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-class MissingClassnameValidator : public Validator
-{
-public:
-  MissingClassnameValidator();
+namespace TrenchBroom {
+namespace Model {
+class MissingClassnameValidator : public Validator {
+  public:
+    MissingClassnameValidator();
 
-private:
-  void doValidate(EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues)
-    const override;
+  private:
+    void doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

@@ -35,586 +35,550 @@
 #include <memory>
 #include <string>
 
-
 class QAction;
-
 
 class QComboBox;
 
-
 class QDialog;
-
 
 class QDropEvent;
 
-
 class QMenuBar;
-
 
 class QLabel;
 
-
 class QSplitter;
-
 
 class QTimer;
 
-
 class QToolBar;
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 
-namespace Assets
-{
+namespace Assets {
 class Texture;
 }
 
-namespace Model
-{
+namespace Model {
 class Game;
 
-
 class GroupNode;
-
 
 class LayerNode;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class Action;
-
 
 class Autosaver;
 
-
 class Console;
-
 
 class FrameManager;
 
-
 class GLContextManager;
-
 
 class InfoPanel;
 
-
 class Inspector;
-
 
 enum class InspectorPage;
 
-
 class MapDocument;
-
 
 class MapViewBase;
 
-
 class ObjExportDialog;
-
 
 enum class PasteType;
 
-
 class SignalDelayer;
-
 
 class SwitchableMapViewContainer;
 
-
 class Tool;
 
-
-class MapFrame : public QMainWindow
-{
+class MapFrame : public QMainWindow {
   Q_OBJECT
-private:
-  FrameManager* m_frameManager;
-  std::shared_ptr<MapDocument> m_document;
+  private:
+    FrameManager *m_frameManager;
+    std::shared_ptr<MapDocument> m_document;
 
-  std::chrono::time_point<std::chrono::system_clock> m_lastInputTime;
-  std::unique_ptr<Autosaver> m_autosaver;
-  QTimer* m_autosaveTimer;
+    std::chrono::time_point<std::chrono::system_clock> m_lastInputTime;
+    std::unique_ptr<Autosaver> m_autosaver;
+    QTimer *m_autosaveTimer;
 
-  QToolBar* m_toolBar;
+    QToolBar *m_toolBar;
 
-  QSplitter* m_hSplitter;
-  QSplitter* m_vSplitter;
+    QSplitter *m_hSplitter;
+    QSplitter *m_vSplitter;
 
-  std::unique_ptr<GLContextManager> m_contextManager;
-  SwitchableMapViewContainer* m_mapView;
-  /**
-   * Last focused MapViewBase. It's a QPointer to handle changing from e.g. a 2-pane map
-   * view to 1-pane.
-   */
-  QPointer<MapViewBase> m_currentMapView;
-  InfoPanel* m_infoPanel;
-  Console* m_console;
-  Inspector* m_inspector;
+    std::unique_ptr<GLContextManager> m_contextManager;
+    SwitchableMapViewContainer *m_mapView;
+    /**
+     * Last focused MapViewBase. It's a QPointer to handle changing from e.g. a 2-pane map
+     * view to 1-pane.
+     */
+    QPointer<MapViewBase> m_currentMapView;
+    InfoPanel *m_infoPanel;
+    Console *m_console;
+    Inspector *m_inspector;
 
-  QComboBox* m_gridChoice;
-  QLabel* m_statusBarLabel;
+    QComboBox *m_gridChoice;
+    QLabel *m_statusBarLabel;
 
-  QPointer<QDialog> m_compilationDialog;
-  QPointer<ObjExportDialog> m_objExportDialog;
+    QPointer<QDialog> m_compilationDialog;
+    QPointer<ObjExportDialog> m_objExportDialog;
 
-  NotifierConnection m_notifierConnection;
+    NotifierConnection m_notifierConnection;
 
-private: // shortcuts
-  using ActionMap = std::map<const Action*, QAction*>;
-  ActionMap m_actionMap;
+  private: // shortcuts
+    using ActionMap = std::map<const Action *, QAction *>;
+    ActionMap m_actionMap;
 
-private: // special menu entries
-  QMenu* m_recentDocumentsMenu;
-  QAction* m_undoAction;
-  QAction* m_redoAction;
+  private: // special menu entries
+    QMenu *m_recentDocumentsMenu;
+    QAction *m_undoAction;
+    QAction *m_redoAction;
 
-private:
-  SignalDelayer* m_updateTitleSignalDelayer;
-  SignalDelayer* m_updateActionStateSignalDelayer;
-  SignalDelayer* m_updateStatusBarSignalDelayer;
+  private:
+    SignalDelayer *m_updateTitleSignalDelayer;
+    SignalDelayer *m_updateActionStateSignalDelayer;
+    SignalDelayer *m_updateStatusBarSignalDelayer;
 
-public:
-  MapFrame(FrameManager* frameManager, std::shared_ptr<MapDocument> document);
+  public:
+    MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> document);
 
-  ~MapFrame() override;
+    ~MapFrame() override;
 
-  void positionOnScreen(QWidget* reference);
+    void positionOnScreen(QWidget *reference);
 
-  std::shared_ptr<MapDocument> document() const;
+    std::shared_ptr<MapDocument> document() const;
 
-public: // getters and such
-  Logger& logger() const;
+  public: // getters and such
+    Logger &logger() const;
 
-  QAction* findAction(const std::filesystem::path& path);
+    QAction *findAction(const std::filesystem::path &path);
 
-private: // title bar contents
-  void updateTitle();
+  private: // title bar contents
+    void updateTitle();
 
-  void updateTitleDelayed();
+    void updateTitleDelayed();
 
-private: // menu bar
-  void createMenus();
+  private: // menu bar
+    void createMenus();
 
-  void updateShortcuts();
+    void updateShortcuts();
 
-  void updateActionState();
+    void updateActionState();
 
-  void updateActionStateDelayed();
+    void updateActionStateDelayed();
 
-  void updateUndoRedoActions();
+    void updateUndoRedoActions();
 
-  void addRecentDocumentsMenu();
+    void addRecentDocumentsMenu();
 
-  void removeRecentDocumentsMenu();
+    void removeRecentDocumentsMenu();
 
-  void updateRecentDocumentsMenu();
+    void updateRecentDocumentsMenu();
 
-private: // tool bar
-  class ToolBarBuilder;
+  private: // tool bar
+    class ToolBarBuilder;
 
-  void createToolBar();
+    void createToolBar();
 
-  void updateToolBarWidgets();
+    void updateToolBarWidgets();
 
-private: // status bar
-  void createStatusBar();
+  private: // status bar
+    void createStatusBar();
 
-  void updateStatusBar();
+    void updateStatusBar();
 
-  void updateStatusBarDelayed();
+    void updateStatusBarDelayed();
 
-private: // gui creation
-  void createGui();
+  private: // gui creation
+    void createGui();
 
-private: // notification handlers
-  void connectObservers();
+  private: // notification handlers
+    void connectObservers();
 
-  void documentWasCleared(View::MapDocument* document);
+    void documentWasCleared(View::MapDocument *document);
 
-  void documentDidChange(View::MapDocument* document);
+    void documentDidChange(View::MapDocument *document);
 
-  void documentModificationStateDidChange();
+    void documentModificationStateDidChange();
 
-  void transactionDone(const std::string&);
+    void transactionDone(const std::string &);
 
-  void transactionUndone(const std::string&);
+    void transactionUndone(const std::string &);
 
-  void preferenceDidChange(const std::filesystem::path& path);
+    void preferenceDidChange(const std::filesystem::path &path);
 
-  void gridDidChange();
+    void gridDidChange();
 
-  void toolActivated(Tool& tool);
+    void toolActivated(Tool &tool);
 
-  void toolDeactivated(Tool& tool);
+    void toolDeactivated(Tool &tool);
 
-  void toolHandleSelectionChanged(Tool& tool);
+    void toolHandleSelectionChanged(Tool &tool);
 
-  void selectionDidChange(const Selection& selection);
+    void selectionDidChange(const Selection &selection);
 
-  void currentLayerDidChange(const TrenchBroom::Model::LayerNode* layer);
+    void currentLayerDidChange(const TrenchBroom::Model::LayerNode *layer);
 
-  void groupWasOpened(Model::GroupNode* group);
+    void groupWasOpened(Model::GroupNode *group);
 
-  void groupWasClosed(Model::GroupNode* group);
+    void groupWasClosed(Model::GroupNode *group);
 
-  void nodeVisibilityDidChange(const std::vector<Model::Node*>& nodes);
+    void nodeVisibilityDidChange(const std::vector<Model::Node *> &nodes);
 
-  void editorContextDidChange();
+    void editorContextDidChange();
 
-  void pointFileDidChange();
+    void pointFileDidChange();
 
-  void portalFileDidChange();
+    void portalFileDidChange();
 
-private: // menu event handlers
-  void bindEvents();
+  private: // menu event handlers
+    void bindEvents();
 
-public:
-  Result<bool> newDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat);
+  public:
+    Result<bool> newDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat);
 
-  Result<bool> openDocument(
-    std::shared_ptr<Model::Game> game,
-    Model::MapFormat mapFormat,
-    const std::filesystem::path& path);
+    Result<bool> openDocument(std::shared_ptr<Model::Game> game, Model::MapFormat mapFormat, const std::filesystem::path &path);
 
-  void updateToolbar();
+    void updateToolbar();
 
-  void updateGridSizeComboBox();
+    void updateGridSizeComboBox();
 
-  bool saveDocument();
+    bool saveDocument();
 
-  bool saveDocumentAs();
+    bool saveDocumentAs();
 
-  void revertDocument();
+    void revertDocument();
 
-  bool exportDocumentAsObj();
+    bool exportDocumentAsObj();
 
-  bool exportDocumentAsMap();
+    bool exportDocumentAsMap();
 
-  bool exportDocument(const IO::ExportOptions& options);
+    bool exportDocument(const IO::ExportOptions &options);
 
-private:
-  bool confirmOrDiscardChanges();
+  private:
+    bool confirmOrDiscardChanges();
 
-  bool confirmRevertDocument();
+    bool confirmRevertDocument();
 
-public:
-  void loadPointFile();
+  public:
+    void loadPointFile();
 
-  void reloadPointFile();
+    void reloadPointFile();
 
-  void unloadPointFile();
+    void unloadPointFile();
 
-  bool canReloadPointFile() const;
+    bool canReloadPointFile() const;
 
-  bool canUnloadPortalFile() const;
+    bool canUnloadPortalFile() const;
 
-  void loadPortalFile();
+    void loadPortalFile();
 
-  void reloadPortalFile();
+    void reloadPortalFile();
 
-  void unloadPortalFile();
+    void unloadPortalFile();
 
-  bool canReloadPortalFile() const;
+    bool canReloadPortalFile() const;
 
-  bool canUnloadPointFile() const;
+    bool canUnloadPointFile() const;
 
-  void reloadTextureCollections();
+    void reloadTextureCollections();
 
-  void reloadEntityDefinitions();
+    void reloadEntityDefinitions();
 
-  void closeDocument();
+    void closeDocument();
 
-  void undo();
+    void undo();
 
-  void redo();
+    void redo();
 
-  bool canUndo() const;
+    bool canUndo() const;
 
-  bool canRedo() const;
+    bool canRedo() const;
 
-  void repeatLastCommands();
+    void repeatLastCommands();
 
-  void clearRepeatableCommands();
+    void clearRepeatableCommands();
 
-  bool hasRepeatableCommands() const;
+    bool hasRepeatableCommands() const;
 
-  void cutSelection();
+    void cutSelection();
 
-  void copySelection();
+    void copySelection();
 
-  void copyToClipboard();
+    void copyToClipboard();
 
-  bool canCutSelection() const;
+    bool canCutSelection() const;
 
-  bool canCopySelection() const;
+    bool canCopySelection() const;
 
-  void pasteAtCursorPosition();
+    void pasteAtCursorPosition();
 
-  void pasteAtOriginalPosition();
+    void pasteAtOriginalPosition();
 
-  PasteType paste();
+    PasteType paste();
 
-  bool canPaste() const;
+    bool canPaste() const;
 
-  void duplicateSelection();
+    void duplicateSelection();
 
-  bool canDuplicateSelectino() const;
+    bool canDuplicateSelectino() const;
 
-  void deleteSelection();
+    void deleteSelection();
 
-  bool canDeleteSelection() const;
+    bool canDeleteSelection() const;
 
-  void selectAll();
+    void selectAll();
 
-  void selectSiblings();
+    void selectSiblings();
 
-  void selectTouching();
+    void selectTouching();
 
-  void selectInside();
+    void selectInside();
 
-  void selectTall();
+    void selectTall();
 
-  void selectByLineNumber();
+    void selectByLineNumber();
 
-  void selectInverse();
+    void selectInverse();
 
-  void selectNone();
+    void selectNone();
 
-  bool canSelect() const;
+    bool canSelect() const;
 
-  bool canSelectSiblings() const;
+    bool canSelectSiblings() const;
 
-  bool canSelectByBrush() const;
+    bool canSelectByBrush() const;
 
-  bool canSelectTall() const;
+    bool canSelectTall() const;
 
-  bool canDeselect() const;
+    bool canDeselect() const;
 
-  bool canChangeSelection() const;
+    bool canChangeSelection() const;
 
-  bool canSelectInverse() const;
+    bool canSelectInverse() const;
 
-  void groupSelectedObjects();
+    void groupSelectedObjects();
 
-  bool canGroupSelectedObjects() const;
+    bool canGroupSelectedObjects() const;
 
-  void ungroupSelectedObjects();
+    void ungroupSelectedObjects();
 
-  bool canUngroupSelectedObjects() const;
+    bool canUngroupSelectedObjects() const;
 
-  void renameSelectedGroups();
+    void renameSelectedGroups();
 
-  bool canRenameSelectedGroups() const;
+    bool canRenameSelectedGroups() const;
 
-  bool anyToolActive() const;
+    bool anyToolActive() const;
 
-  void toggleCreateComplexBrushTool();
+    void toggleCreateComplexBrushTool();
 
-  bool canToggleCreateComplexBrushTool() const;
+    bool canToggleCreateComplexBrushTool() const;
 
-  bool createComplexBrushToolActive() const;
+    bool createComplexBrushToolActive() const;
 
-  void toggleClipTool();
+    void toggleClipTool();
 
-  bool canToggleClipTool() const;
+    bool canToggleClipTool() const;
 
-  bool clipToolActive() const;
+    bool clipToolActive() const;
 
-  void toggleRotateObjectsTool();
+    void toggleRotateObjectsTool();
 
-  bool canToggleRotateObjectsTool() const;
+    bool canToggleRotateObjectsTool() const;
 
-  bool rotateObjectsToolActive() const;
+    bool rotateObjectsToolActive() const;
 
-  void toggleScaleObjectsTool();
+    void toggleScaleObjectsTool();
 
-  bool canToggleScaleObjectsTool() const;
+    bool canToggleScaleObjectsTool() const;
 
-  bool scaleObjectsToolActive() const;
+    bool scaleObjectsToolActive() const;
 
-  void toggleShearObjectsTool();
+    void toggleShearObjectsTool();
 
-  bool canToggleShearObjectsTool() const;
+    bool canToggleShearObjectsTool() const;
 
-  bool shearObjectsToolActive() const;
+    bool shearObjectsToolActive() const;
 
-  bool anyVertexToolActive() const;
+    bool anyVertexToolActive() const;
 
-  void toggleVertexTool();
+    void toggleVertexTool();
 
-  bool canToggleVertexTool() const;
+    bool canToggleVertexTool() const;
 
-  bool vertexToolActive() const;
+    bool vertexToolActive() const;
 
-  void toggleEdgeTool();
+    void toggleEdgeTool();
 
-  bool canToggleEdgeTool() const;
+    bool canToggleEdgeTool() const;
 
-  bool edgeToolActive() const;
+    bool edgeToolActive() const;
 
-  void toggleFaceTool();
+    void toggleFaceTool();
 
-  bool canToggleFaceTool() const;
+    bool canToggleFaceTool() const;
 
-  bool faceToolActive() const;
+    bool faceToolActive() const;
 
-  void csgConvexMerge();
+    void csgConvexMerge();
 
-  bool canDoCsgConvexMerge() const;
+    bool canDoCsgConvexMerge() const;
 
-  void csgSubtract();
+    void csgSubtract();
 
-  bool canDoCsgSubtract() const;
+    bool canDoCsgSubtract() const;
 
-  void csgHollow();
+    void csgHollow();
 
-  bool canDoCsgHollow() const;
+    bool canDoCsgHollow() const;
 
-  void csgIntersect();
+    void csgIntersect();
 
-  bool canDoCsgIntersect() const;
+    bool canDoCsgIntersect() const;
 
-  void snapVerticesToInteger();
+    void snapVerticesToInteger();
 
-  void snapVerticesToGrid();
+    void snapVerticesToGrid();
 
-  bool canSnapVertices() const;
+    bool canSnapVertices() const;
 
-  void replaceTexture();
+    void replaceTexture();
 
-  void toggleTextureLock();
+    void toggleTextureLock();
 
-  void toggleUVLock();
+    void toggleUVLock();
 
-  void toggleShowGrid();
+    void toggleShowGrid();
 
-  void toggleSnapToGrid();
+    void toggleSnapToGrid();
 
-  void incGridSize();
+    void incGridSize();
 
-  bool canIncGridSize() const;
+    bool canIncGridSize() const;
 
-  void decGridSize();
+    void decGridSize();
 
-  bool canDecGridSize() const;
+    bool canDecGridSize() const;
 
-  void setGridSize(int size);
+    void setGridSize(int size);
 
-  void setMajorGridDivision(int size);
+    void setMajorGridDivision(int size);
 
-  bool isMajorGridDivisionVisible(int size);
+    bool isMajorGridDivisionVisible(int size);
 
-  void moveCameraToNextPoint();
+    void moveCameraToNextPoint();
 
-  bool canMoveCameraToNextPoint() const;
+    bool canMoveCameraToNextPoint() const;
 
-  void moveCameraToPreviousPoint();
+    void moveCameraToPreviousPoint();
 
-  bool canMoveCameraToPreviousPoint() const;
+    bool canMoveCameraToPreviousPoint() const;
 
-  void reset2dCameras();
+    void reset2dCameras();
 
-  void focusCameraOnSelection();
+    void focusCameraOnSelection();
 
-  bool canFocusCamera() const;
+    bool canFocusCamera() const;
 
-  void moveCameraToPosition();
+    void moveCameraToPosition();
 
-  void isolateSelection();
+    void isolateSelection();
 
-  bool canIsolateSelection() const;
+    bool canIsolateSelection() const;
 
-  void hideSelection();
+    void hideSelection();
 
-  bool canHideSelection() const;
+    bool canHideSelection() const;
 
-  void showAll();
+    void showAll();
 
-  void switchToInspectorPage(InspectorPage page);
+    void switchToInspectorPage(InspectorPage page);
 
-  void toggleToolbar();
+    void toggleToolbar();
 
-  bool toolbarVisible() const;
+    bool toolbarVisible() const;
 
-  void toggleInfoPanel();
+    void toggleInfoPanel();
 
-  bool infoPanelVisible() const;
+    bool infoPanelVisible() const;
 
-  void toggleInspector();
+    void toggleInspector();
 
-  bool inspectorVisible() const;
+    bool inspectorVisible() const;
 
-  void toggleMaximizeCurrentView();
+    void toggleMaximizeCurrentView();
 
-  bool currentViewMaximized();
+    bool currentViewMaximized();
 
-  void showCompileDialog();
+    void showCompileDialog();
 
-  bool closeCompileDialog();
+    bool closeCompileDialog();
 
-  void showLaunchEngineDialog();
+    void showLaunchEngineDialog();
 
-  bool canRevealTexture() const;
+    bool canRevealTexture() const;
 
-  void revealTexture();
+    void revealTexture();
 
-  void revealTexture(const Assets::Texture* texture);
+    void revealTexture(const Assets::Texture *texture);
 
-  void debugPrintVertices();
+    void debugPrintVertices();
 
-  void debugCreateBrush();
+    void debugCreateBrush();
 
-  void debugCreateCube();
+    void debugCreateCube();
 
-  void debugClipBrush();
+    void debugClipBrush();
 
-  void debugCrash();
+    void debugCrash();
 
-  void debugThrowExceptionDuringCommand();
+    void debugThrowExceptionDuringCommand();
 
-  void debugSetWindowSize();
+    void debugSetWindowSize();
 
-  void debugShowPalette();
+    void debugShowPalette();
 
-  void focusChange(QWidget* oldFocus, QWidget* newFocus);
+    void focusChange(QWidget *oldFocus, QWidget *newFocus);
 
-  MapViewBase* currentMapViewBase();
+    MapViewBase *currentMapViewBase();
 
-private:
-  bool canCompile() const;
+  private:
+    bool canCompile() const;
 
-  bool canLaunch() const;
+    bool canLaunch() const;
 
-public: // drag and drop
-  void dragEnterEvent(QDragEnterEvent* event) override;
+  public: // drag and drop
+    void dragEnterEvent(QDragEnterEvent *event) override;
 
-  void dropEvent(QDropEvent* event) override;
+    void dropEvent(QDropEvent *event) override;
 
-protected: // other event handlers
-  void changeEvent(QEvent* event) override;
+  protected: // other event handlers
+    void changeEvent(QEvent *event) override;
 
-  void closeEvent(QCloseEvent* event) override;
+    void closeEvent(QCloseEvent *event) override;
 
-public: // event filter (suppress autosave for user input events)
-  bool eventFilter(QObject* target, QEvent* event) override;
+  public: // event filter (suppress autosave for user input events)
+    bool eventFilter(QObject *target, QEvent *event) override;
 
-private:
-  void triggerAutosave();
+  private:
+    void triggerAutosave();
 };
 
-
-class DebugPaletteWindow : public QDialog
-{
+class DebugPaletteWindow : public QDialog {
   Q_OBJECT
-public:
-  DebugPaletteWindow(QWidget* parent = nullptr);
+  public:
+    DebugPaletteWindow(QWidget *parent = nullptr);
 
-  virtual ~DebugPaletteWindow();
+    virtual ~DebugPaletteWindow();
 };
 } // namespace View
 } // namespace TrenchBroom

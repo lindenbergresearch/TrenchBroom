@@ -25,37 +25,32 @@
 #include <vm/forward.h>
 #include <vm/vec.h>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class OrthographicCamera;
 }
 
-namespace View
-{
+namespace View {
 class DragTracker;
 
+class CameraTool2D : public ToolController, public Tool {
+  private:
+    Renderer::OrthographicCamera &m_camera;
+    vm::vec2f m_lastMousePos;
 
-class CameraTool2D : public ToolController, public Tool
-{
-private:
-  Renderer::OrthographicCamera& m_camera;
-  vm::vec2f m_lastMousePos;
+  public:
+    explicit CameraTool2D(Renderer::OrthographicCamera &camera);
 
-public:
-  explicit CameraTool2D(Renderer::OrthographicCamera& camera);
+  private:
+    Tool &tool() override;
 
-private:
-  Tool& tool() override;
+    const Tool &tool() const override;
 
-  const Tool& tool() const override;
+    void mouseScroll(const InputState &inputState) override;
 
-  void mouseScroll(const InputState& inputState) override;
+    std::unique_ptr<DragTracker> acceptMouseDrag(const InputState &inputState) override;
 
-  std::unique_ptr<DragTracker> acceptMouseDrag(const InputState& inputState) override;
-
-  bool cancel() override;
+    bool cancel() override;
 };
 } // namespace View
 } // namespace TrenchBroom

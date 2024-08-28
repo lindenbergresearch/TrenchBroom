@@ -37,49 +37,37 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
-namespace
-{
+namespace TrenchBroom {
+namespace Model {
+namespace {
 static const auto Type = freeIssueType();
 
+class MissingModIssue : public Issue {
+  private:
+    std::string m_mod;
 
-class MissingModIssue : public Issue
-{
-private:
-  std::string m_mod;
+  public:
+    MissingModIssue(EntityNodeBase &entityNode, std::string mod, std::string description)
+        : Issue{Type, entityNode, std::move(description)}, m_mod{std::move(mod)} {
+    }
 
-public:
-  MissingModIssue(EntityNodeBase& entityNode, std::string mod, std::string description)
-    : Issue{Type, entityNode, std::move(description)}
-    , m_mod{std::move(mod)}
-  {
-  }
-
-  const std::string& mod() const { return m_mod; }
+    const std::string &mod() const { return m_mod; }
 };
 
-
-std::vector<std::string> removeMissingMods(
-  std::vector<std::string> mods, const std::vector<const Issue*>& issues)
-{
-  for (const auto* issue : issues)
-  {
-    if (issue->type() == Type)
-    {
-      const auto* modIssue = static_cast<const MissingModIssue*>(issue);
-      const auto& missingMod = modIssue->mod();
-      mods = kdl::vec_erase(std::move(mods), missingMod);
+std::vector<std::string> removeMissingMods(std::vector<std::string> mods, const std::vector<const Issue *> &issues) {
+    for (const auto *issue : issues) {
+        if (issue->type() == Type) {
+            const auto *modIssue = static_cast<const MissingModIssue *>(issue);
+            const auto &missingMod = modIssue->mod();
+            mods = kdl::vec_erase(std::move(mods), missingMod);
+        }
     }
-  }
-  return mods;
+    return mods;
 }
 
-IssueQuickFix makeRemoveModsQuickFix()
-{
-  return {"Remove Mod", [](MapFacade& facade, const std::vector<const Issue*>& issues) {
+IssueQuickFix makeRemoveModsQuickFix() {
+    return {
+        "Remove Mod", [](MapFacade &facade, const std::vector<const Issue *> &issues) {
             const auto pushSelection = PushSelection{facade};
 
             // If nothing is selected, property changes will affect only world.
@@ -88,50 +76,39 @@ IssueQuickFix makeRemoveModsQuickFix()
             const auto oldMods = facade.mods();
             const auto newMods = removeMissingMods(oldMods, issues);
             facade.setMods(newMods);
-          }};
+        }};
 }
 } // namespace
 
-MissingModValidator::MissingModValidator(std::weak_ptr<Game> game)
-  : Validator{Type, "Missing mod directory"}
-  , m_game{std::move(game)}
-{
-  addQuickFix(makeRemoveModsQuickFix());
+MissingModValidator::MissingModValidator(std::weak_ptr<Game> game) : Validator{Type, "Missing mod directory"}, m_game{std::move(game)} {
+    addQuickFix(makeRemoveModsQuickFix());
 }
 
-void MissingModValidator::doValidate(
-  EntityNodeBase& entityNode, std::vector<std::unique_ptr<Issue>>& issues) const
-{
-  if (entityNode.entity().classname() != EntityPropertyValues::WorldspawnClassname)
-  {
-    return;
-  }
+void MissingModValidator::doValidate(EntityNodeBase &entityNode, std::vector<std::unique_ptr<Issue>> &issues) const {
+    if (entityNode.entity().classname() != EntityPropertyValues::WorldspawnClassname) {
+        return;
+    }
 
-  if (kdl::mem_expired(m_game))
-  {
-    return;
-  }
+    if (kdl::mem_expired(m_game)) {
+        return;
+    }
 
-  auto game = kdl::mem_lock(m_game);
-  auto mods = game->extractEnabledMods(entityNode.entity());
+    auto game = kdl::mem_lock(m_game);
+    auto mods = game->extractEnabledMods(entityNode.entity());
 
-  if (mods == m_lastMods)
-  {
-    return;
-  }
+    if (mods == m_lastMods) {
+        return;
+    }
 
-  const auto additionalSearchPaths =
-    kdl::vec_transform(mods, [](const auto& mod) { return std::filesystem::path{mod}; });
-  const auto errors = game->checkAdditionalSearchPaths(additionalSearchPaths);
+    const auto additionalSearchPaths = kdl::vec_transform(mods, [](const auto &mod) { return std::filesystem::path{mod}; });
+    const auto errors = game->checkAdditionalSearchPaths(additionalSearchPaths);
 
-  for (const auto& [searchPath, message] : errors)
-  {
-    const auto mod = searchPath.string();
-    issues.push_back(std::make_unique<MissingModIssue>(
-      entityNode, mod, "Mod '" + mod + "' could not be used: " + message));
-  }
+    for (const auto &[searchPath, message] : errors) {
+        const auto mod = searchPath.string();
+        issues.push_back(std::make_unique<MissingModIssue>(entityNode, mod, "Mod '" + mod + "' could not be used: " + message));
+    }
 
-  m_lastMods = std::move(mods);
+    m_lastMods = std::move(mods);
 }
 } // namespace Model
 } // namespace TrenchBroom

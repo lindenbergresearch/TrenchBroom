@@ -33,13 +33,13 @@
 namespace TrenchBroom {
 namespace View {
 static void updatePickState(InputState &inputState, const Renderer::Camera &camera, const MapDocument &document) {
-  Model::PickResult pickResult = Model::PickResult::byDistance();
-  const PickRequest pickRequest(vm::ray3(camera.pickRay(static_cast<float>(inputState.mouseX()), static_cast<float>(inputState.mouseY()))), camera);
+    Model::PickResult pickResult = Model::PickResult::byDistance();
+    const PickRequest pickRequest(vm::ray3(camera.pickRay(static_cast<float>(inputState.mouseX()), static_cast<float>(inputState.mouseY()))), camera);
 
-  document.pick(pickRequest.pickRay(), pickResult);
+    document.pick(pickRequest.pickRay(), pickResult);
 
-  inputState.setPickRequest(pickRequest);
-  inputState.setPickResult(std::move(pickResult));
+    inputState.setPickRequest(pickRequest);
+    inputState.setPickResult(std::move(pickResult));
 }
 
 // https://github.com/TrenchBroom/TrenchBroom/issues/2602
@@ -84,11 +84,11 @@ grid()
 const Renderer::Camera::Viewport viewport(0, 0, 1920, 1080);
 
 // Camera at 0 -160 64 looking towards +y
-Renderer::PerspectiveCamera camera(90.0f, 1.0f, 8000.0f, viewport, vm::vec3f(0.0f, - 160.0f, 64.0f), vm::vec3f::pos_y(), vm::vec3f::pos_z());
+Renderer::PerspectiveCamera camera(90.0f, 1.0f, 8000.0f, viewport, vm::vec3f(0.0f, -160.0f, 64.0f), vm::vec3f::pos_y(), vm::vec3f::pos_z());
 
 // The following test places these 2 clip points
-const auto clipPoint1 = vm::vec3(- 16, - 16, 52);
-const auto clipPoint2 = vm::vec3(20, - 16, 52);
+const auto clipPoint1 = vm::vec3(-16, -16, 52);
+const auto clipPoint2 = vm::vec3(20, -16, 52);
 
 auto clipPoint1ScreenSpace = vm::vec2f(camera.project(vm::vec3f(clipPoint1)));
 auto clipPoint2ScreenSpace = vm::vec2f(camera.project(vm::vec3f(clipPoint2)));
@@ -210,7 +210,7 @@ CHECK(brush
 logicalBounds()
 
 ==
-vm::bbox3(vm::vec3(- 16, - 16, 52), vm::vec3(20, 16, 72)
+vm::bbox3(vm::vec3(-16, -16, 52), vm::vec3(20, 16, 72)
 ));
 }
 } // namespace View

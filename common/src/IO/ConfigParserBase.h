@@ -25,31 +25,28 @@
 #include <filesystem>
 #include <string>
 
-namespace TrenchBroom::IO
-{
+namespace TrenchBroom::IO {
 
-class ConfigParserBase
-{
-private:
-  ELParser m_parser;
+class ConfigParserBase {
+  private:
+    ELParser m_parser;
 
-protected:
-  std::filesystem::path m_path;
+  protected:
+    std::filesystem::path m_path;
 
-protected:
-  explicit ConfigParserBase(std::string_view str, std::filesystem::path path = {});
+  protected:
+    explicit ConfigParserBase(std::string_view str, std::filesystem::path path = {});
 
-public:
-  virtual ~ConfigParserBase();
+  public:
+    virtual ~ConfigParserBase();
 
-protected:
-  EL::Expression parseConfigFile();
+  protected:
+    EL::Expression parseConfigFile();
 };
 
+void expectType(const EL::Value &value, EL::ValueType type);
 
-void expectType(const EL::Value& value, EL::ValueType type);
+void expectStructure(const EL::Value &value, const std::string &structure);
 
-void expectStructure(const EL::Value& value, const std::string& structure);
-
-void expectMapEntry(const EL::Value& value, const std::string& key, EL::ValueType type);
+void expectMapEntry(const EL::Value &value, const std::string &key, EL::ValueType type);
 } // namespace TrenchBroom::IO

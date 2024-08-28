@@ -83,23 +83,20 @@ TEST_CASE("BrushNodeTest.hasSelectedFaces") {
 const vm::bbox3 worldBounds(4096.0);
 
 // build a cube with length 16 at the origin
-BrushNode brush(
-    Brush::create(
-        worldBounds, {
-            // left
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, 1.0)),
-            // right
-            createParaxial(vm::vec3(16.0, 0.0, 0.0), vm::vec3(16.0, 0.0, 1.0), vm::vec3(16.0, 1.0, 0.0)),
-            // front
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0)),
-            // back
-            createParaxial(vm::vec3(0.0, 16.0, 0.0), vm::vec3(1.0, 16.0, 0.0), vm::vec3(0.0, 16.0, 1.0)),
-            // top
-            createParaxial(vm::vec3(0.0, 0.0, 16.0), vm::vec3(0.0, 1.0, 16.0), vm::vec3(1.0, 0.0, 16.0)),
-            // bottom
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0)),
-        }
-    ).value());
+BrushNode brush(Brush::create(worldBounds, {
+    // left
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, 1.0)),
+    // right
+    createParaxial(vm::vec3(16.0, 0.0, 0.0), vm::vec3(16.0, 0.0, 1.0), vm::vec3(16.0, 1.0, 0.0)),
+    // front
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0)),
+    // back
+    createParaxial(vm::vec3(0.0, 16.0, 0.0), vm::vec3(1.0, 16.0, 0.0), vm::vec3(0.0, 16.0, 1.0)),
+    // top
+    createParaxial(vm::vec3(0.0, 0.0, 16.0), vm::vec3(0.0, 1.0, 16.0), vm::vec3(1.0, 0.0, 16.0)),
+    // bottom
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0)),
+}).value());
 
 CHECK(!brush.
 
@@ -248,8 +245,7 @@ transformNode(brushNode, vm::rotation_matrix(0.0, 0.0, vm::to_radians(45.0)), wo
 // clang-format off
 auto patchNode = Model::PatchNode{
     Model::BezierPatch{
-        3, 5, {{{32, 0, 16}, {32, 32, 16}, {0, 32, 16}, {- 32, 32, 16}, {- 32, 0, 16}, {32, 0, 0}, {32, 32, 0}, {0, 32, 0}, {- 32, 32, 0}, {- 32, 0, 0},
-                {32, 0, - 16}, {32, 32, - 16}, {0, 32, - 16}, {- 32, 32, - 16}, {- 32, 0, - 16},
+        3, 5, {{{32, 0, 16}, {32, 32, 16}, {0, 32, 16}, {-32, 32, 16}, {-32, 0, 16}, {32, 0, 0}, {32, 32, 0}, {0, 32, 0}, {-32, 32, 0}, {-32, 0, 0}, {32, 0, -16}, {32, 32, -16}, {0, 32, -16}, {-32, 32, -16}, {-32, 0, -16},
                }}, "some_texture"
     }};
 // clang-format on
@@ -259,7 +255,7 @@ CHECK_FALSE(brushNode
 contains(&patchNode)
 );
 
-transformNode(patchNode, vm::translation_matrix(vm::vec3{0, - 8, 0}), worldBounds
+transformNode(patchNode, vm::translation_matrix(vm::vec3{0, -8, 0}), worldBounds
 );
 CHECK(brushNode
 .
@@ -288,8 +284,7 @@ transformNode(brushNode, vm::rotation_matrix(0.0, 0.0, vm::to_radians(45.0)), wo
 // clang-format off
 auto patchNode = Model::PatchNode{
     Model::BezierPatch{
-        3, 5, {{{32, 0, 16}, {32, 32, 16}, {0, 32, 16}, {- 32, 32, 16}, {- 32, 0, 16}, {32, 0, 0}, {32, 32, 0}, {0, 32, 0}, {- 32, 32, 0}, {- 32, 0, 0},
-                {32, 0, - 16}, {32, 32, - 16}, {0, 32, - 16}, {- 32, 32, - 16}, {- 32, 0, - 16},
+        3, 5, {{{32, 0, 16}, {32, 32, 16}, {0, 32, 16}, {-32, 32, 16}, {-32, 0, 16}, {32, 0, 0}, {32, 32, 0}, {0, 32, 0}, {-32, 32, 0}, {-32, 0, 0}, {32, 0, -16}, {32, 32, -16}, {0, 32, -16}, {-32, 32, -16}, {-32, 0, -16},
                }}, "some_texture"
     }};
 // clang-format on
@@ -301,7 +296,7 @@ intersects(&patchNode)
 
 SECTION("Brush contains patch")
 {
-transformNode(patchNode, vm::translation_matrix(vm::vec3{0, - 8, 0}), worldBounds
+transformNode(patchNode, vm::translation_matrix(vm::vec3{0, -8, 0}), worldBounds
 );
 CHECK(brushNode
 .
@@ -311,7 +306,7 @@ intersects(&patchNode)
 
 SECTION("Patch sticks out of top of brush")
 {
-transformNode(patchNode, vm::translation_matrix(vm::vec3{0, - 8, 32}), worldBounds
+transformNode(patchNode, vm::translation_matrix(vm::vec3{0, -8, 32}), worldBounds
 );
 CHECK(brushNode
 .
@@ -321,7 +316,7 @@ intersects(&patchNode)
 
 SECTION("Patch is above brush")
 {
-transformNode(patchNode, vm::translation_matrix(vm::vec3{0, - 8, 64}), worldBounds
+transformNode(patchNode, vm::translation_matrix(vm::vec3{0, -8, 64}), worldBounds
 );
 CHECK_FALSE(brushNode
 .
@@ -342,7 +337,7 @@ intersects(&patchNode)
 SECTION("Brush does not contain any grid points, but patch intersects")
 {
 auto thinBrushNode = Model::BrushNode{
-    builder.createCuboid(vm::bbox3d{vm::vec3d{1, - 64, - 64}, vm::vec3d{2, 64, 64}}, "some_texture").value()
+    builder.createCuboid(vm::bbox3d{vm::vec3d{1, -64, -64}, vm::vec3d{2, 64, 64}}, "some_texture").value()
 };
 for (
 const auto &point
@@ -372,27 +367,24 @@ const vm::bbox3 worldBounds(4096.0);
 const auto editorContext = EditorContext{};
 
 // build a cube with length 16 at the origin
-BrushNode brush(
-    Brush::create(
-        worldBounds, {
-            // left
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, 1.0)),
-            // right
-            createParaxial(vm::vec3(16.0, 0.0, 0.0), vm::vec3(16.0, 0.0, 1.0), vm::vec3(16.0, 1.0, 0.0)),
-            // front
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0)),
-            // back
-            createParaxial(vm::vec3(0.0, 16.0, 0.0), vm::vec3(1.0, 16.0, 0.0), vm::vec3(0.0, 16.0, 1.0)),
-            // top
-            createParaxial(vm::vec3(0.0, 0.0, 16.0), vm::vec3(0.0, 1.0, 16.0), vm::vec3(1.0, 0.0, 16.0)),
-            // bottom
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0)),
-        }
-    ).value());
+BrushNode brush(Brush::create(worldBounds, {
+    // left
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, 1.0)),
+    // right
+    createParaxial(vm::vec3(16.0, 0.0, 0.0), vm::vec3(16.0, 0.0, 1.0), vm::vec3(16.0, 1.0, 0.0)),
+    // front
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0)),
+    // back
+    createParaxial(vm::vec3(0.0, 16.0, 0.0), vm::vec3(1.0, 16.0, 0.0), vm::vec3(0.0, 16.0, 1.0)),
+    // top
+    createParaxial(vm::vec3(0.0, 0.0, 16.0), vm::vec3(0.0, 1.0, 16.0), vm::vec3(1.0, 0.0, 16.0)),
+    // bottom
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0)),
+}).value());
 
 PickResult hits1;
 brush.
-pick(editorContext, vm::ray3(vm::vec3(8.0, - 8.0, 8.0), vm::vec3::pos_y()), hits1
+pick(editorContext, vm::ray3(vm::vec3(8.0, -8.0, 8.0), vm::vec3::pos_y()), hits1
 );
 CHECK(hits1
 .
@@ -425,7 +417,7 @@ vm::vec3::neg_y()
 
 PickResult hits2;
 brush.
-pick(editorContext, vm::ray3(vm::vec3(8.0, - 8.0, 8.0), vm::vec3::neg_y()), hits2
+pick(editorContext, vm::ray3(vm::vec3(8.0, -8.0, 8.0), vm::vec3::neg_y()), hits2
 );
 CHECK(hits2
 .
@@ -440,23 +432,20 @@ TEST_CASE("BrushNodeTest.clone")
 const vm::bbox3 worldBounds(4096.0);
 
 // build a cube with length 16 at the origin
-BrushNode original(
-    Brush::create(
-        worldBounds, {
-            // left
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, 1.0)),
-            // right
-            createParaxial(vm::vec3(16.0, 0.0, 0.0), vm::vec3(16.0, 0.0, 1.0), vm::vec3(16.0, 1.0, 0.0)),
-            // front
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0)),
-            // back
-            createParaxial(vm::vec3(0.0, 16.0, 0.0), vm::vec3(1.0, 16.0, 0.0), vm::vec3(0.0, 16.0, 1.0)),
-            // top
-            createParaxial(vm::vec3(0.0, 0.0, 16.0), vm::vec3(0.0, 1.0, 16.0), vm::vec3(1.0, 0.0, 16.0)),
-            // bottom
-            createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0)),
-        }
-    ).value());
+BrushNode original(Brush::create(worldBounds, {
+    // left
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0), vm::vec3(0.0, 0.0, 1.0)),
+    // right
+    createParaxial(vm::vec3(16.0, 0.0, 0.0), vm::vec3(16.0, 0.0, 1.0), vm::vec3(16.0, 1.0, 0.0)),
+    // front
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(0.0, 0.0, 1.0), vm::vec3(1.0, 0.0, 0.0)),
+    // back
+    createParaxial(vm::vec3(0.0, 16.0, 0.0), vm::vec3(1.0, 16.0, 0.0), vm::vec3(0.0, 16.0, 1.0)),
+    // top
+    createParaxial(vm::vec3(0.0, 0.0, 16.0), vm::vec3(0.0, 1.0, 16.0), vm::vec3(1.0, 0.0, 16.0)),
+    // bottom
+    createParaxial(vm::vec3(0.0, 0.0, 0.0), vm::vec3(1.0, 0.0, 0.0), vm::vec3(0.0, 1.0, 0.0)),
+}).value());
 
 BrushNode *clone = original.clone(worldBounds);
 

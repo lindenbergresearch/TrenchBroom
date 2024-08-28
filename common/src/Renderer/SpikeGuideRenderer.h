@@ -30,58 +30,52 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Picker;
 }
 
-namespace View
-{
+namespace View {
 // FIXME: Renderer should not depend on View
 class MapDocument;
 } // namespace View
 
-namespace Renderer
-{
-class SpikeGuideRenderer : public DirectRenderable
-{
-private:
-  Color m_color;
+namespace Renderer {
+class SpikeGuideRenderer : public DirectRenderable {
+  private:
+    Color m_color;
 
-  using SpikeVertex = GLVertexTypes::P3C4::Vertex;
-  using PointVertex = GLVertexTypes::P3C4::Vertex;
+    using SpikeVertex = GLVertexTypes::P3C4::Vertex;
+    using PointVertex = GLVertexTypes::P3C4::Vertex;
 
-  std::vector<SpikeVertex> m_spikeVertices;
-  std::vector<PointVertex> m_pointVertices;
+    std::vector<SpikeVertex> m_spikeVertices;
+    std::vector<PointVertex> m_pointVertices;
 
-  VertexArray m_spikeArray;
-  VertexArray m_pointArray;
+    VertexArray m_spikeArray;
+    VertexArray m_pointArray;
 
-  bool m_valid;
+    bool m_valid;
 
-public:
-  SpikeGuideRenderer();
+  public:
+    SpikeGuideRenderer();
 
-  void setColor(const Color& color);
+    void setColor(const Color &color);
 
-  void add(
-    const vm::ray3& ray, FloatType length, std::shared_ptr<View::MapDocument> document);
+    void add(const vm::ray3 &ray, FloatType length, std::shared_ptr<View::MapDocument> document);
 
-  void clear();
+    void clear();
 
-private:
-  void doPrepareVertices(VboManager& vboManager) override;
+  private:
+    void doPrepareVertices(VboManager &vboManager) override;
 
-  void doRender(RenderContext& renderContext) override;
+    void doRender(RenderContext &renderContext) override;
 
-private:
-  void addPoint(const vm::vec3& position);
+  private:
+    void addPoint(const vm::vec3 &position);
 
-  void addSpike(const vm::ray3& ray, FloatType length, FloatType maxLength);
+    void addSpike(const vm::ray3 &ray, FloatType length, FloatType maxLength);
 
-  void validate();
+    void validate();
 };
 } // namespace Renderer
 } // namespace TrenchBroom

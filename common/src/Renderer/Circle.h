@@ -24,52 +24,32 @@
 #include <vm/forward.h>
 #include <vm/util.h>
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
-class Circle
-{
-private:
-  VertexArray m_array;
-  bool m_filled;
+namespace TrenchBroom {
+namespace Renderer {
+class Circle {
+  private:
+    VertexArray m_array;
+    bool m_filled;
 
-public:
-  Circle(float radius, size_t segments, bool filled);
+  public:
+    Circle(float radius, size_t segments, bool filled);
 
-  Circle(float radius, size_t segments, bool filled, float startAngle, float angleLength);
+    Circle(float radius, size_t segments, bool filled, float startAngle, float angleLength);
 
-  Circle(
-    float radius,
-    size_t segments,
-    bool filled,
-    vm::axis::type axis,
-    const vm::vec3f& startAxis,
-    const vm::vec3f& endAxis);
+    Circle(float radius, size_t segments, bool filled, vm::axis::type axis, const vm::vec3f &startAxis, const vm::vec3f &endAxis);
 
-  Circle(
-    float radius,
-    size_t segments,
-    bool filled,
-    vm::axis::type axis,
-    float startAngle,
-    float angleLength);
+    Circle(float radius, size_t segments, bool filled, vm::axis::type axis, float startAngle, float angleLength);
 
-  bool prepared() const;
+    bool prepared() const;
 
-  void prepare(VboManager& vboManager);
+    void prepare(VboManager &vboManager);
 
-  void render();
+    void render();
 
-private:
-  void init3D(
-    float radius,
-    size_t segments,
-    vm::axis::type axis,
-    float startAngle,
-    float angleLength);
+  private:
+    void init3D(float radius, size_t segments, vm::axis::type axis, float startAngle, float angleLength);
 
-  void init2D(float radius, size_t segments, float startAngle, float angleLength);
+    void init2D(float radius, size_t segments, float startAngle, float angleLength);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

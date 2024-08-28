@@ -24,28 +24,25 @@
 
 #include <memory>
 
-namespace TrenchBroom
-{
-namespace View
-{
-class CreateComplexBrushTool : public CreateBrushToolBase
-{
-private:
-  std::unique_ptr<Model::Polyhedron3> m_polyhedron;
+namespace TrenchBroom {
+namespace View {
+class CreateComplexBrushTool : public CreateBrushToolBase {
+  private:
+    std::unique_ptr<Model::Polyhedron3> m_polyhedron;
 
-public:
-  CreateComplexBrushTool(std::weak_ptr<MapDocument> document);
+  public:
+    CreateComplexBrushTool(std::weak_ptr<MapDocument> document);
 
-  const Model::Polyhedron3& polyhedron() const;
+    const Model::Polyhedron3 &polyhedron() const;
 
-  void update(const Model::Polyhedron3& polyhedron);
+    void update(const Model::Polyhedron3 &polyhedron);
 
-private:
-  bool doActivate() override;
+  private:
+    bool doActivate() override;
 
-  bool doDeactivate() override;
+    bool doDeactivate() override;
 
-  void doBrushWasCreated() override;
+    void doBrushWasCreated() override;
 };
 } // namespace View
 } // namespace TrenchBroom

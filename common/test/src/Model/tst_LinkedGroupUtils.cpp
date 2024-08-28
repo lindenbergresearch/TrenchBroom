@@ -93,16 +93,12 @@ CHECK_THAT(
     collectGroupsWithLinkId({&worldNode}, "asdf"), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{})
 );
 CHECK_THAT(
-    collectGroupsWithLinkId({&worldNode}, "group1"), Catch::Matchers::UnorderedEquals(
-    std::vector<Model::GroupNode *>{groupNode1, linkedGroupNode1_1}
-)
+    collectGroupsWithLinkId({&worldNode}, "group1"), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{groupNode1, linkedGroupNode1_1})
 );
 CHECK_THAT(
-    collectGroupsWithLinkId({&worldNode}, "group2"), Catch::Matchers::UnorderedEquals(
-    std::vector<Model::GroupNode *>{
-        groupNode2, linkedGroupNode2_1, linkedGroupNode2_2
-    }
-)
+    collectGroupsWithLinkId({&worldNode}, "group2"), Catch::Matchers::UnorderedEquals(std::vector<Model::GroupNode *>{
+    groupNode2, linkedGroupNode2_1, linkedGroupNode2_2
+})
 );
 }
 
@@ -776,9 +772,9 @@ CHECK(e
 }
 
 static void setGroupName(GroupNode &groupNode, const std::string &name) {
-  auto group = groupNode.group();
-  group.setName(name);
-  groupNode.setGroup(std::move(group));
+    auto group = groupNode.group();
+    group.setName(name);
+    groupNode.setGroup(std::move(group));
 }
 
 TEST_CASE("GroupNode.updateLinkedGroupsAndPreserveNestedGroupNames")
@@ -790,15 +786,13 @@ auto *innerGroupNode = new GroupNode{Group{"innerGroupNode"}};
 outerGroupNode.
 addChild(innerGroupNode);
 
-auto innerGroupNodeClone = std::unique_ptr<GroupNode>(
-    static_cast<GroupNode *>(
-        innerGroupNode->cloneRecursively(worldBounds, SetLinkId::keep)));
+auto innerGroupNodeClone = std::unique_ptr<GroupNode>(static_cast<GroupNode *>(
+                                                          innerGroupNode->cloneRecursively(worldBounds, SetLinkId::keep)));
 setGroupName(*innerGroupNodeClone,
 "innerGroupNodeClone");
 
-auto outerGroupNodeClone = std::unique_ptr<GroupNode>(
-    static_cast<GroupNode *>(
-        outerGroupNode.cloneRecursively(worldBounds, SetLinkId::keep)));
+auto outerGroupNodeClone = std::unique_ptr<GroupNode>(static_cast<GroupNode *>(
+                                                          outerGroupNode.cloneRecursively(worldBounds, SetLinkId::keep)));
 setGroupName(*outerGroupNodeClone,
 "outerGroupNodeClone");
 
@@ -891,46 +885,43 @@ properties(), Catch::Equals(sourceEntityNode->entity().properties())
 using T = std::tuple<std::vector<std::string>, std::vector<std::string>, std::vector<EntityProperty>, std::vector<EntityProperty>, std::vector<EntityProperty>>;
 
 // clang-format off
-const auto [srcProtProperties, trgtProtProperties, sourceProperties, targetProperties, expectedProperties] = GENERATE(
-    values<T>(
-        {
-            // properties remain unchanged
-            {{}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+const auto [srcProtProperties, trgtProtProperties, sourceProperties, targetProperties, expectedProperties] = GENERATE(values<T>({
+                                                                                                                                    // properties remain unchanged
+                                                                                                                                    {{}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            // property was added to source
-            {{}, {}, {{"some_key", "some_value"}}, {}, {{"some_key", "some_value"}}},
+                                                                                                                                    // property was added to source
+                                                                                                                                    {{}, {}, {{"some_key", "some_value"}}, {}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
+                                                                                                                                    {{}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
 
-            {{"some_key"}, {}, {{"some_key", "some_value"}}, {}, {}},
+                                                                                                                                    {{"some_key"}, {}, {{"some_key", "some_value"}}, {}, {}},
 
-            {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
+                                                                                                                                    {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
 
-            // property was changed in source
-            {{}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "other_value"}}},
+                                                                                                                                    // property was changed in source
+                                                                                                                                    {{}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "other_value"}}},
 
-            {{"some_key"}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            // property was removed in source
-            {{}, {}, {}, {{"some_key", "some_value"}}, {}},
+                                                                                                                                    // property was removed in source
+                                                                                                                                    {{}, {}, {}, {{"some_key", "some_value"}}, {}},
 
-            {{"some_key"}, {}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
-        }
-    ));
+                                                                                                                                    {{"some_key"}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                }));
 // clang-format on
 
 CAPTURE(
@@ -1113,10 +1104,8 @@ entity()
 
 .
 
-properties(), Catch::UnorderedEquals(
-    std::vector<EntityProperty>{{"light", "500"},
-    }
-)
+properties(), Catch::UnorderedEquals(std::vector<EntityProperty>{{"light", "500"},
+})
 
 );
 CHECK_THAT(
@@ -1139,90 +1128,74 @@ FAIL();
 
 namespace {
 auto *createPatchNode() {
-  // clang-format off
-  return new PatchNode{
-      BezierPatch{
-          3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-      }};
-  // clang-format on
+    // clang-format off
+    return new PatchNode{
+        BezierPatch{
+            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
+        }};
+    // clang-format on
 }
 
 template<typename K, typename V, typename S> auto getValue(const std::unordered_map<K, V> &m, const S &key) {
-  const auto it = m.find(key);
-  return it != m.end() ? std::optional{it->second} : std::nullopt;
+    const auto it = m.find(key);
+    return it != m.end() ? std::optional{it->second} : std::nullopt;
 }
 
 std::unordered_map<const Node *, std::string> getLinkIds(const Node &node) {
-  auto result = std::unordered_map<const Node *, std::string>{};
-  node.accept(
-      kdl::overload(
-          [](auto &&thisLambda, const WorldNode *worldNode) {
-            worldNode->visitChildren(thisLambda);
-          }, [](auto &&thisLambda, const LayerNode *layerNode) {
-            layerNode->visitChildren(thisLambda);
-          }, [&](auto &&thisLambda, const GroupNode *groupNode) {
-            result[groupNode] = groupNode->linkId();
-            groupNode->visitChildren(thisLambda);
-          }, [&](auto &&thisLambda, const EntityNode *entityNode) {
-            result[entityNode] = entityNode->linkId();
-            entityNode->visitChildren(thisLambda);
-          }, [&](const BrushNode *brushNode) { result[brushNode] = brushNode->linkId(); },
-          [&](const PatchNode *patchNode) { result[patchNode] = patchNode->linkId(); }
-      ));
-  return result;
+    auto result = std::unordered_map<const Node *, std::string>{};
+    node.accept(kdl::overload([](auto &&thisLambda, const WorldNode *worldNode) {
+        worldNode->visitChildren(thisLambda);
+    }, [](auto &&thisLambda, const LayerNode *layerNode) {
+        layerNode->visitChildren(thisLambda);
+    }, [&](auto &&thisLambda, const GroupNode *groupNode) {
+        result[groupNode] = groupNode->linkId();
+        groupNode->visitChildren(thisLambda);
+    }, [&](auto &&thisLambda, const EntityNode *entityNode) {
+        result[entityNode] = entityNode->linkId();
+        entityNode->visitChildren(thisLambda);
+    }, [&](const BrushNode *brushNode) { result[brushNode] = brushNode->linkId(); }, [&](const PatchNode *patchNode) { result[patchNode] = patchNode->linkId(); }));
+    return result;
 }
 
-
 class LinkIdMatcher : public Catch::MatcherBase<const WorldNode &> {
-  std::vector<std::vector<const Node *>> m_expected;
+    std::vector<std::vector<const Node *>> m_expected;
 
-public:
-  explicit LinkIdMatcher(std::vector<std::vector<const Node *>> expected) : m_expected{std::move(expected)} {
-  }
+  public:
+    explicit LinkIdMatcher(std::vector<std::vector<const Node *>> expected) : m_expected{std::move(expected)} {
+    }
 
-  bool match(const WorldNode &worldNode) const override {
-    const auto linkIds = getLinkIds(worldNode);
-    const auto count = std::accumulate(
-        m_expected.begin(), m_expected.end(), size_t(0), [](const auto c, const auto &nodesWithSameLinkId) {
-          return c + nodesWithSameLinkId.size();
-        }
-    );
+    bool match(const WorldNode &worldNode) const override {
+        const auto linkIds = getLinkIds(worldNode);
+        const auto count = std::accumulate(m_expected.begin(), m_expected.end(), size_t(0), [](const auto c, const auto &nodesWithSameLinkId) {
+            return c + nodesWithSameLinkId.size();
+        });
 
-    const auto expectedLinkIds = kdl::vec_transform(
-        m_expected, [&](const auto &nodesWithSameLinkId) {
-          return getValue(linkIds, nodesWithSameLinkId.front());
-        }
-    );
+        const auto expectedLinkIds = kdl::vec_transform(m_expected, [&](const auto &nodesWithSameLinkId) {
+            return getValue(linkIds, nodesWithSameLinkId.front());
+        });
 
-    return linkIds.size() == count && kdl::all_of(
-        m_expected, [&](const auto &nodesWithSameLinkId) {
-          if (nodesWithSameLinkId.empty()) {
-            return false;
-          }
+        return linkIds.size() == count && kdl::all_of(m_expected, [&](const auto &nodesWithSameLinkId) {
+            if (nodesWithSameLinkId.empty()) {
+                return false;
+            }
 
-          const auto linkId = getValue(linkIds, nodesWithSameLinkId.front());
-          return linkId && kdl::all_of(
-              nodesWithSameLinkId, [&](auto *entity) {
+            const auto linkId = getValue(linkIds, nodesWithSameLinkId.front());
+            return linkId && kdl::all_of(nodesWithSameLinkId, [&](auto *entity) {
                 return getValue(linkIds, entity) == linkId;
-              }
-          );
-        }
-    ) && kdl::none_of(
-        kdl::make_pair_range(expectedLinkIds), [](const auto &linkIdPair) {
-          const auto &[linkId1, linkId2] = linkIdPair;
-          return linkId1 == linkId2;
-        }
-    );
-  }
+            });
+        }) && kdl::none_of(kdl::make_pair_range(expectedLinkIds), [](const auto &linkIdPair) {
+            const auto &[linkId1, linkId2] = linkIdPair;
+            return linkId1 == linkId2;
+        });
+    }
 
-  std::string describe() const override {
-    return "matches " + ::Catch::Detail::stringify(m_expected);
-  }
+    std::string describe() const override {
+        return "matches " + ::Catch::Detail::stringify(m_expected);
+    }
 };
 
-
 auto MatchesLinkIds(std::vector<std::vector<const Node *>> expected) {
-  return LinkIdMatcher{std::move(expected)};
+    return LinkIdMatcher{std::move(expected)};
 }
 
 } // namespace
@@ -1284,12 +1257,8 @@ linkedOuterGroupNode->addChildren(
 linkedOuterEntityNode, linkedOuterBrushNode, linkedInnerGroupNode});
 
 REQUIRE_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode}, {outerBrushNode},
-     {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerEntityNode},
-     {linkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerEntityNode}, {linkedInnerPatchNode},
+                              })
 );
 
 SECTION("With two groups")
@@ -1302,12 +1271,8 @@ empty()
 );
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode, linkedOuterEntityNode},
-     {outerBrushNode, linkedOuterBrushNode}, {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode, linkedInnerEntityNode},
-     {innerPatchNode, linkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode, linkedOuterEntityNode}, {outerBrushNode, linkedOuterBrushNode}, {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode, linkedInnerEntityNode}, {innerPatchNode, linkedInnerPatchNode},
+                              })
 );
 }
 
@@ -1342,13 +1307,8 @@ empty()
 );
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode, linkedOuterGroupNode2},
-     {outerEntityNode, linkedOuterEntityNode, linkedOuterEntityNode2}, {outerBrushNode, linkedOuterBrushNode, linkedOuterBrushNode2},
-     {innerGroupNode, linkedInnerGroupNode, linkedInnerGroupNode2}, {innerEntityNode, linkedInnerEntityNode, linkedInnerEntityNode2},
-     {innerPatchNode, linkedInnerPatchNode, linkedInnerPatchNode2},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode, linkedOuterGroupNode2}, {outerEntityNode, linkedOuterEntityNode, linkedOuterEntityNode2}, {outerBrushNode, linkedOuterBrushNode, linkedOuterBrushNode2}, {innerGroupNode, linkedInnerGroupNode, linkedInnerGroupNode2}, {innerEntityNode, linkedInnerEntityNode, linkedInnerEntityNode2}, {innerPatchNode, linkedInnerPatchNode, linkedInnerPatchNode2},
+                              })
 );
 }
 
@@ -1365,12 +1325,8 @@ empty()
 );
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode, linkedOuterEntityNode},
-     {outerBrushNode, linkedOuterBrushNode}, {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode, linkedInnerEntityNode},
-     {innerPatchNode, linkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode, linkedOuterEntityNode}, {outerBrushNode, linkedOuterBrushNode}, {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode, linkedInnerEntityNode}, {innerPatchNode, linkedInnerPatchNode},
+                              })
 );
 }
 
@@ -1390,12 +1346,8 @@ layerNode.addChildren({
 topLevelLinkedInnerGroupNode});
 
 REQUIRE_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode}, {outerBrushNode},
-     {innerGroupNode, linkedInnerGroupNode, topLevelLinkedInnerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode},
-     {linkedInnerEntityNode}, {linkedInnerPatchNode}, {topLevelLinkedInnerEntityNode}, {topLevelLinkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode, linkedInnerGroupNode, topLevelLinkedInnerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerEntityNode}, {linkedInnerPatchNode}, {topLevelLinkedInnerEntityNode}, {topLevelLinkedInnerPatchNode},
+                              })
 );
 
 CHECK(initializeLinkIds({&worldNode})
@@ -1406,12 +1358,8 @@ empty()
 );
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode, linkedOuterEntityNode},
-     {outerBrushNode, linkedOuterBrushNode}, {innerGroupNode, linkedInnerGroupNode, topLevelLinkedInnerGroupNode},
-     {innerEntityNode, linkedInnerEntityNode, topLevelLinkedInnerEntityNode}, {innerPatchNode, linkedInnerPatchNode, topLevelLinkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode, linkedOuterGroupNode}, {outerEntityNode, linkedOuterEntityNode}, {outerBrushNode, linkedOuterBrushNode}, {innerGroupNode, linkedInnerGroupNode, topLevelLinkedInnerGroupNode}, {innerEntityNode, linkedInnerEntityNode, topLevelLinkedInnerEntityNode}, {innerPatchNode, linkedInnerPatchNode, topLevelLinkedInnerPatchNode},
+                              })
 );
 }}
 
@@ -1426,11 +1374,8 @@ Error{
 "Inconsistent linked group structure"}});
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode},
-     {linkedOuterGroupNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterGroupNode},
+                              })
 );
 }
 
@@ -1446,11 +1391,8 @@ Error{
 "Inconsistent linked group structure"}});
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode},
-     {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode},
+                              })
 );
 }
 
@@ -1463,18 +1405,13 @@ linkedInnerGroupNode->addChildren({
 linkedInnerPatchNode});
 
 CHECK_THAT(
-    initializeLinkIds({&worldNode}), Catch::UnorderedEquals(
-    std::vector{
-        Error{"Inconsistent linked group structure"}, Error{"Inconsistent linked group structure"}}
-)
+    initializeLinkIds({&worldNode}), Catch::UnorderedEquals(std::vector{
+    Error{"Inconsistent linked group structure"}, Error{"Inconsistent linked group structure"}})
 );
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode},
-     {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerGroupNode}, {linkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerGroupNode}, {linkedInnerPatchNode},
+                              })
 );
 }
 
@@ -1493,11 +1430,8 @@ Error{
 "Inconsistent linked group structure"}});
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode, linkedInnerGroupNode},
-     {innerEntityNode, linkedInnerEntityNode}, {innerPatchNode, linkedInnerPatchNode}, {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode, linkedInnerGroupNode}, {innerEntityNode, linkedInnerEntityNode}, {innerPatchNode, linkedInnerPatchNode}, {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode},
+                              })
 );
 }
 
@@ -1510,18 +1444,13 @@ linkedOuterGroupNode->addChildren(
 linkedOuterEntityNode, linkedOuterBrushNode, linkedInnerGroupNode});
 
 CHECK_THAT(
-    initializeLinkIds({&worldNode}), Catch::UnorderedEquals(
-    std::vector{
-        Error{"Inconsistent linked group structure"}, Error{"Inconsistent linked group structure"}}
-)
+    initializeLinkIds({&worldNode}), Catch::UnorderedEquals(std::vector{
+    Error{"Inconsistent linked group structure"}, Error{"Inconsistent linked group structure"}})
 );
 
 CHECK_THAT(
-    worldNode, MatchesLinkIds(
-    {{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode},
-     {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerGroupNode}, {linkedInnerEntityNode}, {linkedInnerPatchNode},
-    }
-)
+    worldNode, MatchesLinkIds({{unlinkedGroupNode}, {unlinkedEntityNode}, {outerGroupNode}, {outerEntityNode}, {outerBrushNode}, {innerGroupNode}, {innerEntityNode}, {innerPatchNode}, {linkedOuterGroupNode}, {linkedOuterEntityNode}, {linkedOuterBrushNode}, {linkedInnerGroupNode}, {linkedInnerEntityNode}, {linkedInnerPatchNode},
+                              })
 );
 }}}
 

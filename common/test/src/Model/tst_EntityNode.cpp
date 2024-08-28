@@ -230,28 +230,26 @@ projectedArea(vm::axis::z)
 
 static const std::string TestClassname = "something";
 
-
 class EntityNodeTest {
-protected:
-  vm::bbox3d m_worldBounds;
-  EntityNode *m_entity;
-  WorldNode *m_world;
+  protected:
+    vm::bbox3d m_worldBounds;
+    EntityNode *m_entity;
+    WorldNode *m_world;
 
-  EntityNodeTest() {
-    m_worldBounds = vm::bbox3d(8192.0);
-    m_entity = new EntityNode({}, {{EntityPropertyKeys::Classname, TestClassname}});
-    m_world = new WorldNode({}, {}, MapFormat::Standard);
-  }
-
-  virtual ~EntityNodeTest() {
-    // Only some of the tests add the entity to the world
-    if (m_entity->parent() == nullptr) {
-      delete m_entity;
+    EntityNodeTest() {
+        m_worldBounds = vm::bbox3d(8192.0);
+        m_entity = new EntityNode({}, {{EntityPropertyKeys::Classname, TestClassname}});
+        m_world = new WorldNode({}, {}, MapFormat::Standard);
     }
-    delete m_world;
-  }
-};
 
+    virtual ~EntityNodeTest() {
+        // Only some of the tests add the entity to the world
+        if (m_entity->parent() == nullptr) {
+            delete m_entity;
+        }
+        delete m_world;
+    }
+};
 
 TEST_CASE_METHOD(EntityNodeTest,
 "EntityNodeTest.originUpdateWithSetProperties")

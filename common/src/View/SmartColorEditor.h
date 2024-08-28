@@ -24,65 +24,54 @@
 #include <memory>
 #include <vector>
 
-
 class QColor;
-
 
 class QWidget;
 
-
 class QPushButton;
-
 
 class QRadioButton;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class ColorButton;
-
 
 class ColorTable;
 
-
 class MapDocument;
 
-
-class SmartColorEditor : public SmartPropertyEditor
-{
+class SmartColorEditor : public SmartPropertyEditor {
   Q_OBJECT
-private:
-  static const size_t ColorHistoryCellSize = 15;
-  using wxColorList = std::vector<QColor>;
+  private:
+    static const size_t ColorHistoryCellSize = 15;
+    using wxColorList = std::vector<QColor>;
 
-  QRadioButton* m_floatRadio;
-  QRadioButton* m_byteRadio;
-  ColorButton* m_colorPicker;
-  ColorTable* m_colorHistory;
+    QRadioButton *m_floatRadio;
+    QRadioButton *m_byteRadio;
+    ColorButton *m_colorPicker;
+    ColorTable *m_colorHistory;
 
-public:
-  explicit SmartColorEditor(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit SmartColorEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-private:
-  void createGui();
+  private:
+    void createGui();
 
-  void doUpdateVisual(const std::vector<Model::EntityNodeBase*>& nodes) override;
+    void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
 
-  void updateColorRange(const std::vector<Model::EntityNodeBase*>& nodes);
+    void updateColorRange(const std::vector<Model::EntityNodeBase *> &nodes);
 
-  void updateColorHistory();
+    void updateColorHistory();
 
-  void setColor(const QColor& wxColor) const;
+    void setColor(const QColor &wxColor) const;
 
-  void floatRangeRadioButtonClicked();
+    void floatRangeRadioButtonClicked();
 
-  void byteRangeRadioButtonClicked();
+    void byteRangeRadioButtonClicked();
 
-  void colorPickerChanged(const QColor& color);
+    void colorPickerChanged(const QColor &color);
 
-  void colorTableSelected(QColor color);
+    void colorTableSelected(QColor color);
 };
 } // namespace View
 } // namespace TrenchBroom

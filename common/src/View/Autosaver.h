@@ -24,59 +24,50 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <filesystem>
 #include <memory>
 
-namespace TrenchBroom
-{
+namespace TrenchBroom {
 class Logger;
 } // namespace TrenchBroom
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class Command;
-
 
 class MapDocument;
 
-
 IO::PathMatcher makeBackupPathMatcher(std::filesystem::path mapBasename);
 
+class Autosaver {
+  private:
+    using Clock = std::chrono::system_clock;
 
-class Autosaver
-{
-private:
-  using Clock = std::chrono::system_clock;
+    std::weak_ptr<MapDocument> m_document;
 
-  std::weak_ptr<MapDocument> m_document;
+    /**
+     * The time after which a new autosave is attempted, in seconds.
+     */
+    std::chrono::milliseconds m_saveInterval;
 
-  /**
-   * The time after which a new autosave is attempted, in seconds.
-   */
-  std::chrono::milliseconds m_saveInterval;
+    /**
+     * The maximum number of backups to create. When this number is exceeded, old backups
+     * are deleted until the number of backups is equal to the number of backups again.
+     */
+    size_t m_maxBackups;
 
-  /**
-   * The maximum number of backups to create. When this number is exceeded, old backups
-   * are deleted until the number of backups is equal to the number of backups again.
-   */
-  size_t m_maxBackups;
+    /**
+     * The time at which the last autosave has succeeded.
+     */
+    std::chrono::time_point<Clock> m_lastSaveTime;
 
-  /**
-   * The time at which the last autosave has succeeded.
-   */
-  std::chrono::time_point<Clock> m_lastSaveTime;
+    /**
+     * The modification count that was last recorded.
+     */
+    size_t m_lastModificationCount;
 
-  /**
-   * The modification count that was last recorded.
-   */
-  size_t m_lastModificationCount;
+  public:
+    explicit Autosaver(std::weak_ptr<MapDocument> document, std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000), size_t maxBackups = 50);
 
-public:
-  explicit Autosaver(
-    std::weak_ptr<MapDocument> document,
-    std::chrono::milliseconds saveInterval = std::chrono::milliseconds(10 * 60 * 1000),
-    size_t maxBackups = 50);
+    void triggerAutosave(Logger &logger);
 
-  void triggerAutosave(Logger& logger);
-
-private:
-  void autosave(Logger& logger, std::shared_ptr<View::MapDocument> document);
+  private:
+    void autosave(Logger &logger, std::shared_ptr<View::MapDocument> document);
 };
 } // namespace TrenchBroom::View

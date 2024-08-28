@@ -22,38 +22,33 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-
 class QKeyEvent;
-
 
 class QCloseEvent;
 
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 
 class GameEngineProfileManager;
-
 
 /**
  * Dialog for editing game engine profiles (name/path, not parameters).
  */
-class GameEngineDialog : public QDialog
-{
+class GameEngineDialog : public QDialog {
   Q_OBJECT
-private:
-  const std::string m_gameName;
-  GameEngineProfileManager* m_profileManager = nullptr;
+  private:
+    const std::string m_gameName;
+    GameEngineProfileManager *m_profileManager = nullptr;
 
-public:
-  explicit GameEngineDialog(std::string gameName, QWidget* parent = nullptr);
+  public:
+    explicit GameEngineDialog(std::string gameName, QWidget *parent = nullptr);
 
-public slots: // QDialog overrides
-  void done(int r) override;
+  public slots: // QDialog overrides
+    void done(int r) override;
 
-private:
-  void createGui();
+  private:
+    void createGui();
 
-  void saveConfig();
+    void saveConfig();
 };
 
 } // namespace TrenchBroom::View

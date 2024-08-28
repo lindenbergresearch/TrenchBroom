@@ -68,12 +68,9 @@ TEST_CASE("node_address")
 
     SECTION("to_bounds")
     {
-        CHECK(node_address{0, 0, 0, 0}.to_bounds(16.0) == vm::bbox3d{{0,  0,  0},
-                                                                     {16, 16, 16}});
-        CHECK(node_address{0, 0, 0, 1}.to_bounds(16.0) == vm::bbox3d{{0,  0,  0},
-                                                                     {32, 32, 32}});
-        CHECK(node_address{-2, 2, 4, 1}.to_bounds(16.0) == vm::bbox3d{{-32, 32, 64},
-                                                                      {0,   64, 96}});
+        CHECK(node_address{0, 0, 0, 0}.to_bounds(16.0) == vm::bbox3d{{0, 0, 0}, {16, 16, 16}});
+        CHECK(node_address{0, 0, 0, 1}.to_bounds(16.0) == vm::bbox3d{{0, 0, 0}, {32, 32, 32}});
+        CHECK(node_address{-2, 2, 4, 1}.to_bounds(16.0) == vm::bbox3d{{-32, 32, 64}, {0, 64, 96}});
     }
 
     SECTION("get_address")
@@ -218,28 +215,14 @@ TEST_CASE("node_address")
 
     SECTION("get_container")
     {
-        CHECK(get_container({{2, 2, 2},
-                             {6, 6, 6}}, 32.0
-        ) == node_address{0, 0, 0, 0});
-        CHECK(get_container({{-4, -4, -4},
-                             {-2, -2, -2}}, 32.0
-        ) == node_address{-1, -1, -1, 0});
-        CHECK(get_container({{42, 42, 42},
-                             {46, 46, 46}}, 32.0
-        ) == node_address{1, 1, 1, 0});
+        CHECK(get_container({{2, 2, 2}, {6, 6, 6}}, 32.0) == node_address{0, 0, 0, 0});
+        CHECK(get_container({{-4, -4, -4}, {-2, -2, -2}}, 32.0) == node_address{-1, -1, -1, 0});
+        CHECK(get_container({{42, 42, 42}, {46, 46, 46}}, 32.0) == node_address{1, 1, 1, 0});
 
-        CHECK(get_container({{-6, -6, -6},
-                             {2,  2,  2}}, 32.0
-        ) == node_address{-1, -1, -1, 1});
-        CHECK(get_container({{-2, -2, -2},
-                             {2,  2,  2}}, 32.0
-        ) == node_address{-1, -1, -1, 1});
-        CHECK(get_container({{-2, 2, 2},
-                             {2,  4, 4}}, 32.0
-        ) == node_address{-1, -1, -1, 1});
-        CHECK(get_container({{-42, -42, -42},
-                             {2,   2,   2}}, 32.0
-        ) == node_address{-2, -2, -2, 2});
+        CHECK(get_container({{-6, -6, -6}, {2, 2, 2}}, 32.0) == node_address{-1, -1, -1, 1});
+        CHECK(get_container({{-2, -2, -2}, {2, 2, 2}}, 32.0) == node_address{-1, -1, -1, 1});
+        CHECK(get_container({{-2, 2, 2}, {2, 4, 4}}, 32.0) == node_address{-1, -1, -1, 1});
+        CHECK(get_container({{-42, -42, -42}, {2, 2, 2}}, 32.0) == node_address{-2, -2, -2, 2});
     }
 }
 } // namespace detail
@@ -255,242 +238,139 @@ TEST_CASE("octree.insert")
 
     SECTION("inserting into root node")
     {
-        tree.insert({{-2, 0, 0},
-                     {5,  3, 6}}, 1
-        );
+        tree.insert({{-2, 0, 0}, {5, 3, 6}}, 1);
         CHECK(tree == octree<double, int>{
-            32.0, leaf_node{{-1, -1, -1, 1},
-                            {1}}});
+            32.0, leaf_node{{-1, -1, -1, 1}, {1}}});
 
-        tree.insert({{-32, -32, -32},
-                     {32,  32,  32}}, 2
-        );
+        tree.insert({{-32, -32, -32}, {32, 32, 32}}, 2);
         CHECK(tree == octree<double, int>{
-            32.0, leaf_node{{-1, -1, -1, 1},
-                            {1,  2}}});
+            32.0, leaf_node{{-1, -1, -1, 1}, {1, 2}}});
 
-        tree.insert({{-33, -32, -32},
-                     {32,  32,  32}}, 3
-        );
+        tree.insert({{-33, -32, -32}, {32, 32, 32}}, 3);
         CHECK(tree == octree<double, int>{
-            32.0, leaf_node{{-2, -2, -2, 2},
-                            {1,  2,  3}}});
+            32.0, leaf_node{{-2, -2, -2, 2}, {1, 2, 3}}});
     }
-
 
     SECTION("expanding root node")
     {
-        tree.insert({{16, 16, -16},
-                     {17, 17, -15}}, 1
-        );
+        tree.insert({{16, 16, -16}, {17, 17, -15}}, 1);
         CHECK(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -1, 0},
-                          {1}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, 0, 1},
-                          {}}}
-            )
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -1, 0}, {1}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                leaf_node{{0, 0, 0, 1}, {}}})
             }});
 
-        tree.insert({{-120, 130, -48},
-                     {-116, 140, -40}}, 2
-        );
+        tree.insert({{-120, 130, -48}, {-116, 140, -40}}, 2);
     }
-
 
     SECTION("inserting into quadrants")
     {
         SECTION("inserting skips unnecessary inner nodes")
         {
-            tree.insert({{2, 2, 2},
-                         {3, 3, 3}}, 1
-            );
+            tree.insert({{2, 2, 2}, {3, 3, 3}}, 1);
             CHECK(tree == octree<double, int>{
                 32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                    leaf_node{{-2, -2, -2, 1},
-                              {}}}, node{
-                    leaf_node{{0, -2, -2, 1},
-                              {}}}, node{
-                    leaf_node{{-2, 0, -2, 1},
-                              {}}}, node{
-                    leaf_node{{0, 0, -2, 1},
-                              {}}}, node{
-                    leaf_node{{-2, -2, 0, 1},
-                              {}}}, node{
-                    leaf_node{{0, -2, 0, 1},
-                              {}}}, node{
-                    leaf_node{{-2, 0, 0, 1},
-                              {}}}, node{
-                    leaf_node{{0, 0, 0, 0},
-                              {1}}}
-                )
+                    leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                    leaf_node{{0, -2, -2, 1}, {}}}, node{
+                    leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                    leaf_node{{0, 0, -2, 1}, {}}}, node{
+                    leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                    leaf_node{{0, -2, 0, 1}, {}}}, node{
+                    leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                    leaf_node{{0, 0, 0, 0}, {1}}})
                 }});
 
-            tree.insert({{3, 3, 3},
-                         {4, 4, 4}}, 2
-            );
+            tree.insert({{3, 3, 3}, {4, 4, 4}}, 2);
             CHECK(tree == octree<double, int>{
                 32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                    leaf_node{{-2, -2, -2, 1},
-                              {}}}, node{
-                    leaf_node{{0, -2, -2, 1},
-                              {}}}, node{
-                    leaf_node{{-2, 0, -2, 1},
-                              {}}}, node{
-                    leaf_node{{0, 0, -2, 1},
-                              {}}}, node{
-                    leaf_node{{-2, -2, 0, 1},
-                              {}}}, node{
-                    leaf_node{{0, -2, 0, 1},
-                              {}}}, node{
-                    leaf_node{{-2, 0, 0, 1},
-                              {}}}, node{
-                    leaf_node{{0, 0, 0, 0},
-                              {1, 2}}}
-                )
+                    leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                    leaf_node{{0, -2, -2, 1}, {}}}, node{
+                    leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                    leaf_node{{0, 0, -2, 1}, {}}}, node{
+                    leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                    leaf_node{{0, -2, 0, 1}, {}}}, node{
+                    leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                    leaf_node{{0, 0, 0, 0}, {1, 2}}})
                 }});
 
             SECTION("skipped inner nodes are created as needed")
             {
                 SECTION("when inserting into quadrant 7 of skipped node")
                 {
-                    tree.insert({{33, 33, 33},
-                                 {34, 34, 34}}, 3
-                    );
+                    tree.insert({{33, 33, 33}, {34, 34, 34}}, 3);
                     CHECK(tree == octree<double, int>{
                         32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                            leaf_node{{-2, -2, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{0, -2, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, 0, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{0, 0, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, -2, 0, 1},
-                                      {}}}, node{
-                            leaf_node{{0, -2, 0, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, 0, 0, 1},
-                                      {}}}, node{
+                            leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                            leaf_node{{0, -2, -2, 1}, {}}}, node{
+                            leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                            leaf_node{{0, 0, -2, 1}, {}}}, node{
+                            leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                            leaf_node{{0, -2, 0, 1}, {}}}, node{
+                            leaf_node{{-2, 0, 0, 1}, {}}}, node{
                             inner_node{{0, 0, 0, 1}, {}, kdl::vec_from(node{
-                                leaf_node{{0, 0, 0, 0},
-                                          {1, 2}}}, node{
-                                leaf_node{{1, 0, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 1, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 1, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 0, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 0, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 1, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 1, 1, 0},
-                                          {3}}}
-                            )
-                            }}
-                        )
+                                leaf_node{{0, 0, 0, 0}, {1, 2}}}, node{
+                                leaf_node{{1, 0, 0, 0}, {}}}, node{
+                                leaf_node{{0, 1, 0, 0}, {}}}, node{
+                                leaf_node{{1, 1, 0, 0}, {}}}, node{
+                                leaf_node{{0, 0, 1, 0}, {}}}, node{
+                                leaf_node{{1, 0, 1, 0}, {}}}, node{
+                                leaf_node{{0, 1, 1, 0}, {}}}, node{
+                                leaf_node{{1, 1, 1, 0}, {3}}})
+                            }})
                         }});
                 }
 
                 SECTION("when inserting into quadrant 1 of skipped node")
                 {
-                    tree.insert({{33, 3, 3},
-                                 {34, 4, 4}}, 3
-                    );
+                    tree.insert({{33, 3, 3}, {34, 4, 4}}, 3);
                     CHECK(tree == octree<double, int>{
                         32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                            leaf_node{{-2, -2, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{0, -2, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, 0, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{0, 0, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, -2, 0, 1},
-                                      {}}}, node{
-                            leaf_node{{0, -2, 0, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, 0, 0, 1},
-                                      {}}}, node{
+                            leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                            leaf_node{{0, -2, -2, 1}, {}}}, node{
+                            leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                            leaf_node{{0, 0, -2, 1}, {}}}, node{
+                            leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                            leaf_node{{0, -2, 0, 1}, {}}}, node{
+                            leaf_node{{-2, 0, 0, 1}, {}}}, node{
                             inner_node{{0, 0, 0, 1}, {}, kdl::vec_from(node{
-                                leaf_node{{0, 0, 0, 0},
-                                          {1, 2}}}, node{
-                                leaf_node{{1, 0, 0, 0},
-                                          {3}}}, node{
-                                leaf_node{{0, 1, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 1, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 0, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 0, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 1, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 1, 1, 0},
-                                          {}}}
-                            )
-                            }}
-                        )
+                                leaf_node{{0, 0, 0, 0}, {1, 2}}}, node{
+                                leaf_node{{1, 0, 0, 0}, {3}}}, node{
+                                leaf_node{{0, 1, 0, 0}, {}}}, node{
+                                leaf_node{{1, 1, 0, 0}, {}}}, node{
+                                leaf_node{{0, 0, 1, 0}, {}}}, node{
+                                leaf_node{{1, 0, 1, 0}, {}}}, node{
+                                leaf_node{{0, 1, 1, 0}, {}}}, node{
+                                leaf_node{{1, 1, 1, 0}, {}}})
+                            }})
                         }});
                 }SECTION("when inserting into skipped node directly")
                 {
-                    tree.insert({{31, 31, 31},
-                                 {34, 34, 34}}, 3
-                    );
+                    tree.insert({{31, 31, 31}, {34, 34, 34}}, 3);
                     CHECK(tree == octree<double, int>{
                         32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                            leaf_node{{-2, -2, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{0, -2, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, 0, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{0, 0, -2, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, -2, 0, 1},
-                                      {}}}, node{
-                            leaf_node{{0, -2, 0, 1},
-                                      {}}}, node{
-                            leaf_node{{-2, 0, 0, 1},
-                                      {}}}, node{
+                            leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                            leaf_node{{0, -2, -2, 1}, {}}}, node{
+                            leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                            leaf_node{{0, 0, -2, 1}, {}}}, node{
+                            leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                            leaf_node{{0, -2, 0, 1}, {}}}, node{
+                            leaf_node{{-2, 0, 0, 1}, {}}}, node{
                             inner_node{{0, 0, 0, 1}, {3}, kdl::vec_from(node{
-                                leaf_node{{0, 0, 0, 0},
-                                          {1, 2}}}, node{
-                                leaf_node{{1, 0, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 1, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 1, 0, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 0, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 0, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{0, 1, 1, 0},
-                                          {}}}, node{
-                                leaf_node{{1, 1, 1, 0},
-                                          {}}}
-                            )
-                            }}
-                        )
+                                leaf_node{{0, 0, 0, 0}, {1, 2}}}, node{
+                                leaf_node{{1, 0, 0, 0}, {}}}, node{
+                                leaf_node{{0, 1, 0, 0}, {}}}, node{
+                                leaf_node{{1, 1, 0, 0}, {}}}, node{
+                                leaf_node{{0, 0, 1, 0}, {}}}, node{
+                                leaf_node{{1, 0, 1, 0}, {}}}, node{
+                                leaf_node{{0, 1, 1, 0}, {}}}, node{
+                                leaf_node{{1, 1, 1, 0}, {}}})
+                            }})
                         }});
                 }
             }
@@ -502,40 +382,23 @@ TEST_CASE("octree.remove")
 {
     auto tree = octree<double, int>{
         32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-            leaf_node{{-2, -2, -2, 1},
-                      {}}}, node{
-            leaf_node{{0, -2, -2, 1},
-                      {}}}, node{
-            leaf_node{{-2, 0, -2, 1},
-                      {}}}, node{
-            leaf_node{{0, 0, -2, 1},
-                      {}}}, node{
-            leaf_node{{-2, -2, 0, 1},
-                      {}}}, node{
-            leaf_node{{0, -2, 0, 1},
-                      {}}}, node{
-            leaf_node{{-2, 0, 0, 1},
-                      {}}}, node{
+            leaf_node{{-2, -2, -2, 1}, {}}}, node{
+            leaf_node{{0, -2, -2, 1}, {}}}, node{
+            leaf_node{{-2, 0, -2, 1}, {}}}, node{
+            leaf_node{{0, 0, -2, 1}, {}}}, node{
+            leaf_node{{-2, -2, 0, 1}, {}}}, node{
+            leaf_node{{0, -2, 0, 1}, {}}}, node{
+            leaf_node{{-2, 0, 0, 1}, {}}}, node{
             inner_node{{0, 0, 0, 1}, {3}, kdl::vec_from(node{
-                leaf_node{{0, 0, 0, 0},
-                          {1, 2}}}, node{
-                leaf_node{{1, 0, 0, 0},
-                          {}}}, node{
-                leaf_node{{0, 1, 0, 0},
-                          {}}}, node{
-                leaf_node{{1, 1, 0, 0},
-                          {}}}, node{
-                leaf_node{{0, 0, 1, 0},
-                          {}}}, node{
-                leaf_node{{1, 0, 1, 0},
-                          {}}}, node{
-                leaf_node{{0, 1, 1, 0},
-                          {}}}, node{
-                leaf_node{{1, 1, 1, 0},
-                          {}}}
-            )
-            }}
-        )
+                leaf_node{{0, 0, 0, 0}, {1, 2}}}, node{
+                leaf_node{{1, 0, 0, 0}, {}}}, node{
+                leaf_node{{0, 1, 0, 0}, {}}}, node{
+                leaf_node{{1, 1, 0, 0}, {}}}, node{
+                leaf_node{{0, 0, 1, 0}, {}}}, node{
+                leaf_node{{1, 0, 1, 0}, {}}}, node{
+                leaf_node{{0, 1, 1, 0}, {}}}, node{
+                leaf_node{{1, 1, 1, 0}, {}}})
+            }})
         }};
 
     SECTION("remove in insertion order")
@@ -543,62 +406,36 @@ TEST_CASE("octree.remove")
         tree.remove(1);
         CHECK(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -2, 1}, {}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
                 inner_node{{0, 0, 0, 1}, {3}, kdl::vec_from(node{
-                    leaf_node{{0, 0, 0, 0},
-                              {2}}}, node{
-                    leaf_node{{1, 0, 0, 0},
-                              {}}}, node{
-                    leaf_node{{0, 1, 0, 0},
-                              {}}}, node{
-                    leaf_node{{1, 1, 0, 0},
-                              {}}}, node{
-                    leaf_node{{0, 0, 1, 0},
-                              {}}}, node{
-                    leaf_node{{1, 0, 1, 0},
-                              {}}}, node{
-                    leaf_node{{0, 1, 1, 0},
-                              {}}}, node{
-                    leaf_node{{1, 1, 1, 0},
-                              {}}}
-                )
-                }}
-            )
+                    leaf_node{{0, 0, 0, 0}, {2}}}, node{
+                    leaf_node{{1, 0, 0, 0}, {}}}, node{
+                    leaf_node{{0, 1, 0, 0}, {}}}, node{
+                    leaf_node{{1, 1, 0, 0}, {}}}, node{
+                    leaf_node{{0, 0, 1, 0}, {}}}, node{
+                    leaf_node{{1, 0, 1, 0}, {}}}, node{
+                    leaf_node{{0, 1, 1, 0}, {}}}, node{
+                    leaf_node{{1, 1, 1, 0}, {}}})
+                }})
             }});
 
         tree.remove(2);
         CHECK(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, 0, 1},
-                          {3}}}
-            )
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -2, 1}, {}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                leaf_node{{0, 0, 0, 1}, {3}}})
             }});
 
         tree.remove(3);
@@ -610,45 +447,27 @@ TEST_CASE("octree.remove")
         tree.remove(3);
         CHECK(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, 0, 0},
-                          {1, 2}}}
-            )
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -2, 1}, {}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                leaf_node{{0, 0, 0, 0}, {1, 2}}})
             }});
 
         tree.remove(2);
         CHECK(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, 0, 0},
-                          {1}}}
-            )
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -2, 1}, {}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                leaf_node{{0, 0, 0, 0}, {1}}})
             }});
 
         tree.remove(1);
@@ -660,14 +479,10 @@ TEST_CASE("octree.insert_duplicate")
 {
     auto tree = octree<double, int>{32.0};
 
-    tree.insert(vm::bbox3d{{0, 0, 0},
-                           {2, 1, 1}}, 1
-    );
+    tree.insert(vm::bbox3d{{0, 0, 0}, {2, 1, 1}}, 1);
     REQUIRE(tree.contains(1));
 
-    CHECK_THROWS_AS(tree.insert(vm::bbox3d{{0, 0, 0},
-                                           {2, 1, 1}}, 1
-    ), NodeTreeException);
+    CHECK_THROWS_AS(tree.insert(vm::bbox3d{{0, 0, 0}, {2, 1, 1}}, 1), NodeTreeException);
 
     CHECK(tree.contains(1));
     CHECK_FALSE(tree.empty());
@@ -682,15 +497,9 @@ TEST_CASE("octree.contains")
     CHECK_FALSE(tree.contains(2));
     CHECK_FALSE(tree.contains(3));
 
-    tree.insert(vm::bbox3d{{0,  0,  0},
-                           {16, 16, 16}}, 1
-    );
-    tree.insert(vm::bbox3d{{16, 16, 16},
-                           {32, 32, 32}}, 2
-    );
-    tree.insert(vm::bbox3d{{-16, -16, -16},
-                           {0,   0,   0}}, 3
-    );
+    tree.insert(vm::bbox3d{{0, 0, 0}, {16, 16, 16}}, 1);
+    tree.insert(vm::bbox3d{{16, 16, 16}, {32, 32, 32}}, 2);
+    tree.insert(vm::bbox3d{{-16, -16, -16}, {0, 0, 0}}, 3);
 
     CHECK_FALSE(tree.contains(0));
     CHECK(tree.contains(1));
@@ -704,51 +513,32 @@ TEST_CASE("octree.find_intersectors")
 
     SECTION("empty tree")
     {
-        CHECK(tree.find_intersectors({{0, 0, 0},
-                                      {1, 0, 0}}
-        ).empty());
+        CHECK(tree.find_intersectors({{0, 0, 0}, {1, 0, 0}}).empty());
     }
 
     SECTION("single node")
     {
-        tree.insert({{32, 32, 32},
-                     {64, 64, 64}}, 1
-        );
+        tree.insert({{32, 32, 32}, {64, 64, 64}}, 1);
         REQUIRE(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
-                leaf_node{{1, 1, 1, 0},
-                          {1}}}
-            )
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -2, 1}, {}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                leaf_node{{1, 1, 1, 0}, {1}}})
             }});
 
         // the leaf that contains the data does not contain the ray origin
-        CHECK(tree.find_intersectors({{48, 48, 0},
-                                      {0,  0,  -1}}
-        ).empty());
+        CHECK(tree.find_intersectors({{48, 48, 0}, {0, 0, -1}}).empty());
 
         // the leaf that contains the data contains the ray origin
-        CHECK(tree.find_intersectors({{48, 48, 48},
-                                      {0,  0,  -1}}
-        ) == std::vector<int>{1});
+        CHECK(tree.find_intersectors({{48, 48, 48}, {0, 0, -1}}) == std::vector<int>{1});
 
         // the leaf that contains the data is hit by the ray
-        CHECK(tree.find_intersectors({{48, 48, 0},
-                                      {0,  0,  1}}
-        ) == std::vector<int>{1});
+        CHECK(tree.find_intersectors({{48, 48, 0}, {0, 0, 1}}) == std::vector<int>{1});
     }
 }
 
@@ -763,28 +553,17 @@ TEST_CASE("octree.find_containers")
 
     SECTION("single node")
     {
-        tree.insert({{32, 32, 32},
-                     {64, 64, 64}}, 1
-        );
+        tree.insert({{32, 32, 32}, {64, 64, 64}}, 1);
         REQUIRE(tree == octree<double, int>{
             32.0, inner_node{{-2, -2, -2, 2}, {}, kdl::vec_from(node{
-                leaf_node{{-2, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{0, 0, -2, 1},
-                          {}}}, node{
-                leaf_node{{-2, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{0, -2, 0, 1},
-                          {}}}, node{
-                leaf_node{{-2, 0, 0, 1},
-                          {}}}, node{
-                leaf_node{{1, 1, 1, 0},
-                          {1}}}
-            )
+                leaf_node{{-2, -2, -2, 1}, {}}}, node{
+                leaf_node{{0, -2, -2, 1}, {}}}, node{
+                leaf_node{{-2, 0, -2, 1}, {}}}, node{
+                leaf_node{{0, 0, -2, 1}, {}}}, node{
+                leaf_node{{-2, -2, 0, 1}, {}}}, node{
+                leaf_node{{0, -2, 0, 1}, {}}}, node{
+                leaf_node{{-2, 0, 0, 1}, {}}}, node{
+                leaf_node{{1, 1, 1, 0}, {1}}})
             }});
 
         // the leaf that contains the data does not contain the point

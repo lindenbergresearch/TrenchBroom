@@ -73,21 +73,19 @@ CHECK_FALSE(checkLinkedGroupsToUpdate({&groupNode1, &linkedGroupNode})
 class UpdateLinkedGroupsHelperTest : public MapDocumentTest {
 };
 
-
 TEST_CASE_METHOD(UpdateLinkedGroupsHelperTest,
 "UpdateLinkedGroupsHelperTest.ownership") {
 class TestNode : public Model::EntityNode {
-private:
-  bool &m_deleted;
+  private:
+    bool &m_deleted;
 
-public:
-  TestNode(Model::Entity entity, bool &deleted) : EntityNode(std::move(entity)), m_deleted(deleted) {
-    m_deleted = false;
-  }
+  public:
+    TestNode(Model::Entity entity, bool &deleted) : EntityNode(std::move(entity)), m_deleted(deleted) {
+        m_deleted = false;
+    }
 
-  ~TestNode() override { m_deleted = true; };
+    ~TestNode() override { m_deleted = true; };
 };
-
 
 auto *groupNode = new Model::GroupNode{Model::Group{""}};
 setLinkedGroupId(*groupNode,
@@ -104,7 +102,6 @@ document->addNodes( {{
 document->
 
 parentForNodes(),
-
 {
 groupNode, linkedNode
 }
@@ -339,34 +336,30 @@ translate(vm::vec3(32.0, 0.0, 0.0)
 }
 
 static void setGroupName(Model::GroupNode &groupNode, const std::string &name) {
-  auto group = groupNode.group();
-  group.setName(name);
-  groupNode.setGroup(std::move(group));
+    auto group = groupNode.group();
+    group.setName(name);
+    groupNode.setGroup(std::move(group));
 }
 
 static Model::GroupNode *findGroupByName(Model::Node &node, const std::string &name) {
-  const auto visitChildren = [&](auto &&lambda, Model::Node *n) -> Model::GroupNode * {
-    for (auto *child : n->children()) {
-      if (auto *result = child->accept(lambda)) {
-        return result;
-      }
-    }
-    return nullptr;
-  };
-  return node.accept(
-      kdl::overload(
-          [&](auto &&thisLambda, Model::WorldNode *worldNode) -> Model::GroupNode * {
-            return visitChildren(thisLambda, worldNode);
-          }, [&](auto &&thisLambda, Model::LayerNode *layerNode) -> Model::GroupNode * {
-            return visitChildren(thisLambda, layerNode);
-          }, [&](auto &&thisLambda, Model::GroupNode *groupNode) -> Model::GroupNode * {
-            if (groupNode->name() == name) {
-              return groupNode;
+    const auto visitChildren = [&](auto &&lambda, Model::Node *n) -> Model::GroupNode * {
+        for (auto *child : n->children()) {
+            if (auto *result = child->accept(lambda)) {
+                return result;
             }
-            return visitChildren(thisLambda, groupNode);
-          }, [](Model::EntityNode *) -> Model::GroupNode * { return nullptr; }, [](Model::BrushNode *) -> Model::GroupNode * { return nullptr; },
-          [](Model::PatchNode *) -> Model::GroupNode * { return nullptr; }
-      ));
+        }
+        return nullptr;
+    };
+    return node.accept(kdl::overload([&](auto &&thisLambda, Model::WorldNode *worldNode) -> Model::GroupNode * {
+        return visitChildren(thisLambda, worldNode);
+    }, [&](auto &&thisLambda, Model::LayerNode *layerNode) -> Model::GroupNode * {
+        return visitChildren(thisLambda, layerNode);
+    }, [&](auto &&thisLambda, Model::GroupNode *groupNode) -> Model::GroupNode * {
+        if (groupNode->name() == name) {
+            return groupNode;
+        }
+        return visitChildren(thisLambda, groupNode);
+    }, [](Model::EntityNode *) -> Model::GroupNode * { return nullptr; }, [](Model::BrushNode *) -> Model::GroupNode * { return nullptr; }, [](Model::PatchNode *) -> Model::GroupNode * { return nullptr; }));
 }
 
 TEST_CASE_METHOD(UpdateLinkedGroupsHelperTest,

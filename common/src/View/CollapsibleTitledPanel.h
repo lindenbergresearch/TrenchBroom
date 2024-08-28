@@ -23,65 +23,56 @@
 
 #include "View/TitleBar.h"
 
-
 class QLabel;
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 class BorderLine;
 
-
-class CollapsibleTitleBar : public TitleBar
-{
+class CollapsibleTitleBar : public TitleBar {
   Q_OBJECT
-private:
-  QLabel* m_stateText;
+  private:
+    QLabel *m_stateText;
 
-public:
-  CollapsibleTitleBar(
-    const QString& title, const QString& stateText, QWidget* parent = nullptr);
+  public:
+    CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
 
-  void setStateText(const QString& stateText);
+    void setStateText(const QString &stateText);
 
-signals:
+  signals:
 
-  void titleBarClicked();
+    void titleBarClicked();
 
-protected:
-  void mousePressEvent(QMouseEvent* event) override;
+  protected:
+    void mousePressEvent(QMouseEvent *event) override;
 };
 
-
-class CollapsibleTitledPanel : public QWidget
-{
+class CollapsibleTitledPanel : public QWidget {
   Q_OBJECT
-private:
-  CollapsibleTitleBar* m_titleBar;
-  QWidget* m_panel;
-  bool m_expanded;
+  private:
+    CollapsibleTitleBar *m_titleBar;
+    QWidget *m_panel;
+    bool m_expanded;
 
-public:
-  explicit CollapsibleTitledPanel(
-    const QString& title, bool initiallyExpanded = true, QWidget* parent = nullptr);
+  public:
+    explicit CollapsibleTitledPanel(const QString &title, bool initiallyExpanded = true, QWidget *parent = nullptr);
 
-  QWidget* getPanel() const;
+    QWidget *getPanel() const;
 
-  void expand();
+    void expand();
 
-  void collapse();
+    void collapse();
 
-  bool expanded() const;
+    bool expanded() const;
 
-  void setExpanded(bool expanded);
+    void setExpanded(bool expanded);
 
-  QByteArray saveState() const;
+    QByteArray saveState() const;
 
-  bool restoreState(const QByteArray& state);
+    bool restoreState(const QByteArray &state);
 
-private:
-  void updateExpanded();
+  private:
+    void updateExpanded();
 };
 } // namespace View
 } // namespace TrenchBroom

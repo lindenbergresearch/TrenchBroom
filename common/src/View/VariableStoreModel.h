@@ -25,35 +25,29 @@
 #include <string>
 #include <vector>
 
-
 class QModelIndex;
-
 
 class QVariant;
 
-namespace TrenchBroom
-{
-namespace EL
-{
+namespace TrenchBroom {
+namespace EL {
 class VariableStore;
 }
-namespace View
-{
-class VariableStoreModel : public QAbstractListModel
-{
+namespace View {
+class VariableStoreModel : public QAbstractListModel {
   Q_OBJECT
-private:
-  std::unique_ptr<EL::VariableStore> m_variables;
-  std::vector<std::string> m_variableNames;
+  private:
+    std::unique_ptr<EL::VariableStore> m_variables;
+    std::vector<std::string> m_variableNames;
 
-public:
-  explicit VariableStoreModel(const EL::VariableStore& variables);
+  public:
+    explicit VariableStoreModel(const EL::VariableStore &variables);
 
-  ~VariableStoreModel() override;
+    ~VariableStoreModel() override;
 
-  int rowCount(const QModelIndex& parent) const override;
+    int rowCount(const QModelIndex &parent) const override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
 };
 } // namespace View
 } // namespace TrenchBroom

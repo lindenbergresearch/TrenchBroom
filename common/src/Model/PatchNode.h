@@ -31,22 +31,16 @@
 
 #include <optional>
 
-namespace TrenchBroom
-{
-namespace Assets
-{
+namespace TrenchBroom {
+namespace Assets {
 class Texture;
 }
 
-namespace Model
-{
+namespace Model {
 class EntityNodeBase;
 
-
-struct PatchGrid
-{
-  struct Point
-  {
+struct PatchGrid {
+  struct Point {
     vm::vec3 position;
     vm::vec2 texCoords;
     vm::vec3 normal;
@@ -59,7 +53,7 @@ struct PatchGrid
   std::vector<Point> points;
   vm::bbox3 bounds;
 
-  const Point& point(size_t row, size_t col) const;
+  const Point &point(size_t row, size_t col) const;
 
   size_t quadRowCount() const;
 
@@ -68,84 +62,75 @@ struct PatchGrid
   kdl_reflect_decl(PatchGrid, pointRowCount, pointColumnCount, points, bounds);
 };
 
+// public for testing
+std::vector<vm::vec3> computeGridNormals(std::vector<BezierPatch::Point> patchGrid, size_t pointRowCount, size_t pointColumnCount);
 
 // public for testing
-std::vector<vm::vec3> computeGridNormals(
-  std::vector<BezierPatch::Point> patchGrid,
-  size_t pointRowCount,
-  size_t pointColumnCount);
+PatchGrid makePatchGrid(const BezierPatch &patch, size_t subdivisionsPerSurface);
 
-// public for testing
-PatchGrid makePatchGrid(const BezierPatch& patch, size_t subdivisionsPerSurface);
+class PatchNode : public Node, public Object {
+  public:
+    static const HitType::Type PatchHitType;
 
+  private:
+    BezierPatch m_patch;
+    PatchGrid m_grid;
 
-class PatchNode : public Node, public Object
-{
-public:
-  static const HitType::Type PatchHitType;
+  public:
+    explicit PatchNode(BezierPatch patch);
 
-private:
-  BezierPatch m_patch;
-  PatchGrid m_grid;
+    EntityNodeBase *entity();
 
-public:
-  explicit PatchNode(BezierPatch patch);
+    const EntityNodeBase *entity() const;
 
-  EntityNodeBase* entity();
+    const BezierPatch &patch() const;
 
-  const EntityNodeBase* entity() const;
+    BezierPatch setPatch(BezierPatch patch);
 
-  const BezierPatch& patch() const;
+    void setTexture(Assets::Texture *texture);
 
-  BezierPatch setPatch(BezierPatch patch);
+    const PatchGrid &grid() const;
 
-  void setTexture(Assets::Texture* texture);
+  private: // implement Node interface
+    const std::string &doGetName() const override;
 
-  const PatchGrid& grid() const;
+    const vm::bbox3 &doGetLogicalBounds() const override;
 
-private: // implement Node interface
-  const std::string& doGetName() const override;
+    const vm::bbox3 &doGetPhysicalBounds() const override;
 
-  const vm::bbox3& doGetLogicalBounds() const override;
+    FloatType doGetProjectedArea(vm::axis::type axis) const override;
 
-  const vm::bbox3& doGetPhysicalBounds() const override;
+    Node *doClone(const vm::bbox3 &worldBounds, SetLinkId setLinkIds) const override;
 
-  FloatType doGetProjectedArea(vm::axis::type axis) const override;
+    bool doCanAddChild(const Node *child) const override;
 
-  Node* doClone(const vm::bbox3& worldBounds, SetLinkId setLinkIds) const override;
+    bool doCanRemoveChild(const Node *child) const override;
 
-  bool doCanAddChild(const Node* child) const override;
+    bool doRemoveIfEmpty() const override;
 
-  bool doCanRemoveChild(const Node* child) const override;
+    bool doShouldAddToSpacialIndex() const override;
 
-  bool doRemoveIfEmpty() const override;
+    bool doSelectable() const override;
 
-  bool doShouldAddToSpacialIndex() const override;
+    void doPick(const EditorContext &editorContext, const vm::ray3 &ray, PickResult &pickResult) override;
 
-  bool doSelectable() const override;
+    void doFindNodesContaining(const vm::vec3 &point, std::vector<Node *> &result) override;
 
-  void doPick(
-    const EditorContext& editorContext,
-    const vm::ray3& ray,
-    PickResult& pickResult) override;
+    void doAccept(NodeVisitor &visitor) override;
 
-  void doFindNodesContaining(const vm::vec3& point, std::vector<Node*>& result) override;
+    void doAccept(ConstNodeVisitor &visitor) const override;
 
-  void doAccept(NodeVisitor& visitor) override;
+  private: // implement Object interface
+    Node *doGetContainer() override;
 
-  void doAccept(ConstNodeVisitor& visitor) const override;
+    LayerNode *doGetContainingLayer() override;
 
-private: // implement Object interface
-  Node* doGetContainer() override;
+    GroupNode *doGetContainingGroup() override;
 
-  LayerNode* doGetContainingLayer() override;
+  private: // implement Taggable interface
+    void doAcceptTagVisitor(TagVisitor &visitor) override;
 
-  GroupNode* doGetContainingGroup() override;
-
-private: // implement Taggable interface
-  void doAcceptTagVisitor(TagVisitor& visitor) override;
-
-  void doAcceptTagVisitor(ConstTagVisitor& visitor) const override;
+    void doAcceptTagVisitor(ConstTagVisitor &visitor) const override;
 };
 } // namespace Model
 } // namespace TrenchBroom

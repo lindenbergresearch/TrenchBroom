@@ -49,159 +49,158 @@
 namespace TrenchBroom {
 namespace Model {
 class EditorContextTest {
-protected:
-  vm::bbox3d worldBounds;
-  WorldNode worldNode;
-  EditorContext context;
+  protected:
+    vm::bbox3d worldBounds;
+    WorldNode worldNode;
+    EditorContext context;
 
-  EditorContextTest() : worldBounds{8192.0}, worldNode{{}, {}, MapFormat::Quake3} {
-  }
+    EditorContextTest() : worldBounds{8192.0}, worldNode{{}, {}, MapFormat::Quake3} {
+    }
 
-public:
-  GroupNode *createTopLevelGroup() {
-    GroupNode *group;
-    std::tie(group, std::ignore) = createGroupedBrush();
-    return group;
-  }
+  public:
+    GroupNode *createTopLevelGroup() {
+        GroupNode *group;
+        std::tie(group, std::ignore) = createGroupedBrush();
+        return group;
+    }
 
-  EntityNode *createTopLevelPointEntity() {
-    auto *entityNode = new EntityNode{Entity{}};
-    worldNode.defaultLayer()->addChild(entityNode);
-    return entityNode;
-  }
+    EntityNode *createTopLevelPointEntity() {
+        auto *entityNode = new EntityNode{Entity{}};
+        worldNode.defaultLayer()->addChild(entityNode);
+        return entityNode;
+    }
 
-  std::tuple<EntityNode *, BrushNode *> createTopLevelBrushEntity() {
-    BrushBuilder builder(worldNode.mapFormat(), worldBounds);
-    auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
-    auto *entityNode = new EntityNode{Entity{}};
-    entityNode->addChild(brushNode);
-    worldNode.defaultLayer()->addChild(entityNode);
-    return std::make_tuple(entityNode, brushNode);
-  }
+    std::tuple<EntityNode *, BrushNode *> createTopLevelBrushEntity() {
+        BrushBuilder builder(worldNode.mapFormat(), worldBounds);
+        auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
+        auto *entityNode = new EntityNode{Entity{}};
+        entityNode->addChild(brushNode);
+        worldNode.defaultLayer()->addChild(entityNode);
+        return std::make_tuple(entityNode, brushNode);
+    }
 
-  std::tuple<EntityNode *, PatchNode *> createTopLevelPatchEntity() {
-    // clang-format off
-    auto *patchNode = new PatchNode{
-        BezierPatch{
-            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-        }};
-    // clang-format on
+    std::tuple<EntityNode *, PatchNode *> createTopLevelPatchEntity() {
+        // clang-format off
+        auto *patchNode = new PatchNode{
+            BezierPatch{
+                3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
+            }};
+        // clang-format on
 
-    auto *entityNode = new EntityNode{Entity{}};
-    entityNode->addChild(patchNode);
-    worldNode.defaultLayer()->addChild(entityNode);
-    return std::make_tuple(entityNode, patchNode);
-  }
+        auto *entityNode = new EntityNode{Entity{}};
+        entityNode->addChild(patchNode);
+        worldNode.defaultLayer()->addChild(entityNode);
+        return std::make_tuple(entityNode, patchNode);
+    }
 
-  BrushNode *createTopLevelBrush() {
-    BrushBuilder builder(worldNode.mapFormat(), worldBounds);
-    auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
-    worldNode.defaultLayer()->addChild(brushNode);
-    return brushNode;
-  }
+    BrushNode *createTopLevelBrush() {
+        BrushBuilder builder(worldNode.mapFormat(), worldBounds);
+        auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
+        worldNode.defaultLayer()->addChild(brushNode);
+        return brushNode;
+    }
 
-  PatchNode *createTopLevelPatch() {
-    // clang-format off
-    auto *patchNode = new PatchNode{
-        BezierPatch{
-            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-        }};
-    // clang-format on
+    PatchNode *createTopLevelPatch() {
+        // clang-format off
+        auto *patchNode = new PatchNode{
+            BezierPatch{
+                3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
+            }};
+        // clang-format on
 
-    worldNode.defaultLayer()->addChild(patchNode);
-    return patchNode;
-  }
+        worldNode.defaultLayer()->addChild(patchNode);
+        return patchNode;
+    }
 
-  std::tuple<GroupNode *, GroupNode *> createNestedGroup() {
-    GroupNode *outerGroup;
-    GroupNode *innerGroup;
-    std::tie(outerGroup, innerGroup, std::ignore) = createdNestedGroupedBrush();
+    std::tuple<GroupNode *, GroupNode *> createNestedGroup() {
+        GroupNode *outerGroup;
+        GroupNode *innerGroup;
+        std::tie(outerGroup, innerGroup, std::ignore) = createdNestedGroupedBrush();
 
-    return std::make_tuple(outerGroup, innerGroup);
-  }
+        return std::make_tuple(outerGroup, innerGroup);
+    }
 
-  std::tuple<GroupNode *, BrushNode *> createGroupedBrush() {
-    BrushBuilder builder(worldNode.mapFormat(), worldBounds);
-    auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
-    auto *groupNode = new GroupNode{Group{"somegroup"}};
+    std::tuple<GroupNode *, BrushNode *> createGroupedBrush() {
+        BrushBuilder builder(worldNode.mapFormat(), worldBounds);
+        auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
+        auto *groupNode = new GroupNode{Group{"somegroup"}};
 
-    groupNode->addChild(brushNode);
-    worldNode.defaultLayer()->addChild(groupNode);
+        groupNode->addChild(brushNode);
+        worldNode.defaultLayer()->addChild(groupNode);
 
-    return std::make_tuple(groupNode, brushNode);
-  }
+        return std::make_tuple(groupNode, brushNode);
+    }
 
-  std::tuple<GroupNode *, EntityNode *> createGroupedPointEntity() {
-    auto *entityNode = new EntityNode{Entity{}};
-    auto *groupNode = new GroupNode{Group{"somegroup"}};
+    std::tuple<GroupNode *, EntityNode *> createGroupedPointEntity() {
+        auto *entityNode = new EntityNode{Entity{}};
+        auto *groupNode = new GroupNode{Group{"somegroup"}};
 
-    groupNode->addChild(entityNode);
-    worldNode.defaultLayer()->addChild(groupNode);
+        groupNode->addChild(entityNode);
+        worldNode.defaultLayer()->addChild(groupNode);
 
-    return std::make_tuple(groupNode, entityNode);
-  }
+        return std::make_tuple(groupNode, entityNode);
+    }
 
-  std::tuple<GroupNode *, PatchNode *> createGroupedPatch() {
-    // clang-format off
-    auto *patchNode = new PatchNode{
-        BezierPatch{
-            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-        }};
-    // clang-format on
+    std::tuple<GroupNode *, PatchNode *> createGroupedPatch() {
+        // clang-format off
+        auto *patchNode = new PatchNode{
+            BezierPatch{
+                3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
+            }};
+        // clang-format on
 
-    auto *groupNode = new GroupNode{Group{"somegroup"}};
+        auto *groupNode = new GroupNode{Group{"somegroup"}};
 
-    groupNode->addChild(patchNode);
-    worldNode.defaultLayer()->addChild(groupNode);
+        groupNode->addChild(patchNode);
+        worldNode.defaultLayer()->addChild(groupNode);
 
-    return std::make_tuple(groupNode, patchNode);
-  }
+        return std::make_tuple(groupNode, patchNode);
+    }
 
-  std::tuple<GroupNode *, EntityNode *, BrushNode *> createGroupedBrushEntity() {
-    BrushBuilder builder(worldNode.mapFormat(), worldBounds);
-    auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
-    auto *entityNode = new EntityNode{Entity{}};
-    auto *groupNode = new GroupNode{Group{"somegroup"}};
+    std::tuple<GroupNode *, EntityNode *, BrushNode *> createGroupedBrushEntity() {
+        BrushBuilder builder(worldNode.mapFormat(), worldBounds);
+        auto *brushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
+        auto *entityNode = new EntityNode{Entity{}};
+        auto *groupNode = new GroupNode{Group{"somegroup"}};
 
-    entityNode->addChild(brushNode);
-    groupNode->addChild(entityNode);
-    worldNode.defaultLayer()->addChild(groupNode);
+        entityNode->addChild(brushNode);
+        groupNode->addChild(entityNode);
+        worldNode.defaultLayer()->addChild(groupNode);
 
-    return std::make_tuple(groupNode, entityNode, brushNode);
-  }
+        return std::make_tuple(groupNode, entityNode, brushNode);
+    }
 
-  std::tuple<GroupNode *, EntityNode *, PatchNode *> createGroupedPatchEntity() {
-    // clang-format off
-    auto *patchNode = new PatchNode{
-        BezierPatch{
-            3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
-        }};
-    // clang-format on
+    std::tuple<GroupNode *, EntityNode *, PatchNode *> createGroupedPatchEntity() {
+        // clang-format off
+        auto *patchNode = new PatchNode{
+            BezierPatch{
+                3, 3, {{0, 0, 0}, {1, 0, 1}, {2, 0, 0}, {0, 1, 1}, {1, 1, 2}, {2, 1, 1}, {0, 2, 0}, {1, 2, 1}, {2, 2, 0}}, "texture"
+            }};
+        // clang-format on
 
-    auto *entityNode = new EntityNode{Entity{}};
-    auto *groupNode = new GroupNode{Group{"somegroup"}};
+        auto *entityNode = new EntityNode{Entity{}};
+        auto *groupNode = new GroupNode{Group{"somegroup"}};
 
-    entityNode->addChild(patchNode);
-    groupNode->addChild(entityNode);
-    worldNode.defaultLayer()->addChild(groupNode);
+        entityNode->addChild(patchNode);
+        groupNode->addChild(entityNode);
+        worldNode.defaultLayer()->addChild(groupNode);
 
-    return std::make_tuple(groupNode, entityNode, patchNode);
-  }
+        return std::make_tuple(groupNode, entityNode, patchNode);
+    }
 
-  std::tuple<GroupNode *, GroupNode *, BrushNode *> createdNestedGroupedBrush() {
-    BrushBuilder builder(worldNode.mapFormat(), worldBounds);
-    auto *innerBrushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
-    auto *innerGroupNode = new GroupNode{Group{"inner"}};
-    auto *outerGroupNode = new GroupNode{Group{"outer"}};
+    std::tuple<GroupNode *, GroupNode *, BrushNode *> createdNestedGroupedBrush() {
+        BrushBuilder builder(worldNode.mapFormat(), worldBounds);
+        auto *innerBrushNode = new BrushNode{builder.createCube(32.0, "sometex").value()};
+        auto *innerGroupNode = new GroupNode{Group{"inner"}};
+        auto *outerGroupNode = new GroupNode{Group{"outer"}};
 
-    innerGroupNode->addChild(innerBrushNode);
-    outerGroupNode->addChild(innerGroupNode);
-    worldNode.defaultLayer()->addChild(outerGroupNode);
+        innerGroupNode->addChild(innerBrushNode);
+        outerGroupNode->addChild(innerGroupNode);
+        worldNode.defaultLayer()->addChild(outerGroupNode);
 
-    return std::make_tuple(outerGroupNode, innerGroupNode, innerBrushNode);
-  }
+        return std::make_tuple(outerGroupNode, innerGroupNode, innerBrushNode);
+    }
 };
-
 
 constexpr auto V_Inherited = VisibilityState::Inherited;
 constexpr auto V_Hidden = VisibilityState::Hidden;
@@ -218,12 +217,8 @@ SECTION("World") {
 using T = std::tuple<VisibilityState, LockState, bool, bool, bool>;
 
 // clang-format off
-const auto [wrldVisState, wrldLckState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, true, true, false}, {V_Hidden, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, false, true, false},
-        }
-    ));
+const auto [wrldVisState, wrldLckState, visible, editable, selectable] = GENERATE(values<T>({{V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, true, true, false}, {V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, false, true, false},
+                                                                                            }));
 // clang-format on
 
 CAPTURE(wrldVisState, wrldLckState
@@ -252,33 +247,14 @@ SECTION("Layer") {
 using T = std::tuple<VisibilityState, LockState, VisibilityState, LockState, bool, bool, bool>;
 
 // clang-format off
-const auto [wrldVisState, wrldLckState, layrVisState, layrLckState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+const auto [wrldVisState, wrldLckState, layrVisState, layrLckState, visible, editable, selectable] = GENERATE(values<T>({{V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false},
-         {V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, false}, {V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false},
-         {V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, false},
-         {V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false},
-         {V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                         {V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, false}, {V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, false}, {V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Hidden, L_Locked, V_Inherited, L_Inherited, false, false, false}, {V_Hidden, L_Locked, V_Inherited, L_Locked, false, false, false},
-         {V_Hidden, L_Locked, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Locked, V_Shown, L_Inherited, true, false, false},
-         {V_Hidden, L_Locked, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Locked, V_Shown, L_Unlocked, true, true, false},
-         {V_Hidden, L_Locked, V_Hidden, L_Inherited, false, false, false}, {V_Hidden, L_Locked, V_Hidden, L_Locked, false, false, false},
-         {V_Hidden, L_Locked, V_Hidden, L_Unlocked, false, true, false},
-        }
-    ));
+                                                                                                                         {V_Hidden, L_Locked, V_Inherited, L_Inherited, false, false, false}, {V_Hidden, L_Locked, V_Inherited, L_Locked, false, false, false}, {V_Hidden, L_Locked, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Locked, V_Shown, L_Inherited, true, false, false}, {V_Hidden, L_Locked, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Locked, V_Shown, L_Unlocked, true, true, false}, {V_Hidden, L_Locked, V_Hidden, L_Inherited, false, false, false}, {V_Hidden, L_Locked, V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Locked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                        }));
 // clang-format on
 
 auto *layerNode = worldNode.defaultLayer();
@@ -315,138 +291,12 @@ SECTION("Top Level Group")
 using T = std::tuple<VisibilityState, LockState, bool, bool, VisibilityState, LockState, VisibilityState, bool, bool, bool>;
 
 // clang-format off
-const auto [wrldVisState, wrldLckState, open, selected, grpVisState, grpLckState, childVisState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{V_Shown, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Shown, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Shown, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Shown, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Locked, V_Shown, false, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Shown, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Inherited, V_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Inherited, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Inherited, V_Shown, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Shown, true, true, true},
-         {V_Shown, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Hidden, true, true, true},
-         {V_Shown, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Shown, true, true, true},
-         {V_Shown, L_Unlocked, true, false, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Shown, L_Unlocked, true, false, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Unlocked, true, false, V_Hidden, L_Locked, V_Shown, false, false, false},
-         {V_Shown, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Shown, false, true, false},
-         {V_Shown, L_Unlocked, true, false, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Unlocked, true, false, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Unlocked, true, false, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {V_Shown, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Shown, true, true, false},
+const auto [wrldVisState, wrldLckState, open, selected, grpVisState, grpLckState, childVisState, visible, editable, selectable] = GENERATE(values<T>({{V_Shown, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Inherited, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Shown, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Inherited, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Shown, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Shown, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Locked, V_Shown, false, false, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Shown, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Inherited, V_Inherited, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Inherited, V_Shown, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Inherited, true, true, true}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Shown, true, true, true}, {V_Shown, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Inherited, true, true, true}, {V_Shown, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Hidden, true, true, true}, {V_Shown, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Shown, true, true, true}, {V_Shown, L_Unlocked, true, false, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Unlocked, true, false, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, true, false, V_Hidden, L_Locked, V_Shown, false, false, false}, {V_Shown, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Shown, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Shown, false, true, false}, {V_Shown, L_Unlocked, true, false, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Unlocked, true, false, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, true, false, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Inherited, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Inherited, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Inherited, V_Shown, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Unlocked, V_Inherited, true, true, true},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Locked, false, false, V_Inherited, L_Unlocked, V_Shown, true, true, true},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Inherited, V_Inherited, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Inherited, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Inherited, V_Shown, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Locked, V_Shown, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Locked, false, false, V_Hidden, L_Unlocked, V_Shown, false, true, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Inherited, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Inherited, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Inherited, V_Shown, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Unlocked, V_Inherited, true, true, true},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Locked, false, false, V_Shown, L_Unlocked, V_Shown, true, true, true},
-         {V_Shown, L_Locked, false, true, V_Shown, L_Unlocked, V_Inherited, true, true, true},
-         {V_Shown, L_Locked, false, true, V_Shown, L_Unlocked, V_Hidden, true, true, true},
-         {V_Shown, L_Locked, false, true, V_Shown, L_Unlocked, V_Shown, true, true, true},
-         {V_Shown, L_Locked, true, false, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Shown, L_Locked, true, false, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, true, false, V_Hidden, L_Locked, V_Shown, false, false, false},
-         {V_Shown, L_Locked, true, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Shown, L_Locked, true, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Locked, true, false, V_Hidden, L_Unlocked, V_Shown, false, true, false},
-         {V_Shown, L_Locked, true, false, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, true, false, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, true, false, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Locked, true, false, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {V_Shown, L_Locked, true, false, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Locked, true, false, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                                      {V_Shown, L_Locked, false, false, V_Inherited, L_Inherited, V_Inherited, true, false, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Inherited, V_Shown, true, false, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Unlocked, V_Inherited, true, true, true}, {V_Shown, L_Locked, false, false, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, false, false, V_Inherited, L_Unlocked, V_Shown, true, true, true}, {V_Shown, L_Locked, false, false, V_Hidden, L_Inherited, V_Inherited, false, false, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Inherited, V_Shown, false, false, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Locked, V_Shown, false, false, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, false, false, V_Hidden, L_Unlocked, V_Shown, false, true, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Inherited, V_Inherited, true, false, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Inherited, V_Shown, true, false, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Unlocked, V_Inherited, true, true, true}, {V_Shown, L_Locked, false, false, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, false, false, V_Shown, L_Unlocked, V_Shown, true, true, true}, {V_Shown, L_Locked, false, true, V_Shown, L_Unlocked, V_Inherited, true, true, true}, {V_Shown, L_Locked, false, true, V_Shown, L_Unlocked, V_Hidden, true, true, true}, {V_Shown, L_Locked, false, true, V_Shown, L_Unlocked, V_Shown, true, true, true}, {V_Shown, L_Locked, true, false, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Locked, true, false, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, true, false, V_Hidden, L_Locked, V_Shown, false, false, false}, {V_Shown, L_Locked, true, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Shown, L_Locked, true, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, true, false, V_Hidden, L_Unlocked, V_Shown, false, true, false}, {V_Shown, L_Locked, true, false, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Locked, true, false, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, true, false, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, true, false, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Locked, true, false, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, true, false, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Shown, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Locked, V_Inherited, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Locked, V_Shown, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Shown, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Shown, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Locked, V_Shown, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Shown, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Inherited, V_Inherited, true, true, true},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Inherited, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Inherited, V_Shown, true, true, true},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Inherited, true, true, true},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Shown, true, true, true},
-         {V_Hidden, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Inherited, true, true, true},
-         {V_Hidden, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Hidden, true, true, true},
-         {V_Hidden, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Shown, true, true, true},
-         {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Locked, V_Shown, false, false, false},
-         {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Shown, false, true, false},
-         {V_Hidden, L_Unlocked, true, false, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Hidden, L_Unlocked, true, false, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, true, false, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Hidden, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {V_Hidden, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Shown, true, true, false},
-        }
-    ));
+                                                                                                                                                      {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Inherited, V_Shown, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Locked, V_Inherited, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Locked, V_Shown, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Inherited, L_Unlocked, V_Shown, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Inherited, V_Shown, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Locked, V_Shown, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Hidden, L_Unlocked, V_Shown, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Inherited, V_Inherited, true, true, true}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Inherited, V_Shown, true, true, true}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Inherited, true, true, true}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, false, false, V_Shown, L_Unlocked, V_Shown, true, true, true}, {V_Hidden, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Inherited, true, true, true}, {V_Hidden, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Hidden, true, true, true}, {V_Hidden, L_Unlocked, false, true, V_Shown, L_Unlocked, V_Shown, true, true, true}, {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Locked, V_Shown, false, false, false}, {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, true, false, V_Hidden, L_Unlocked, V_Shown, false, true, false}, {V_Hidden, L_Unlocked, true, false, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Hidden, L_Unlocked, true, false, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, true, false, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Hidden, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Hidden, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, true, false, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                                     }));
 // clang-format on
 
 auto [groupNode, brushNode] = createGroupedBrush();
@@ -498,74 +348,18 @@ SECTION("Top Level Brush Entity, Patch Entity")
 using T = std::tuple<VisibilityState, LockState, VisibilityState, LockState, VisibilityState, bool, bool, bool>;
 
 // clang-format off
-const auto [wrldVisState, wrldLckState, entVisState, entLockState, childVisState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, true, true, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, true, true, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+const auto [wrldVisState, wrldLckState, entVisState, entLockState, childVisState, visible, editable, selectable] = GENERATE(values<T>({{V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {V_Shown, L_Locked, V_Inherited, L_Inherited, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, V_Inherited, L_Inherited, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, V_Inherited, L_Inherited, V_Shown, true, false, false},
-         {V_Shown, L_Locked, V_Inherited, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, V_Inherited, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Inherited, true, true, false},
-         {V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {V_Shown, L_Locked, V_Hidden, L_Inherited, V_Inherited, false, false, false},
-         {V_Shown, L_Locked, V_Hidden, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Inherited, V_Shown, true, false, false},
-         {V_Shown, L_Locked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, V_Hidden, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {V_Shown, L_Locked, V_Shown, L_Inherited, V_Inherited, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Inherited, V_Hidden, false, false, false},
-         {V_Shown, L_Locked, V_Shown, L_Inherited, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {V_Shown, L_Locked, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, V_Shown, true, false, false},
-         {V_Shown, L_Locked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {V_Shown, L_Locked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                       {V_Shown, L_Locked, V_Inherited, L_Inherited, V_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Inherited, L_Inherited, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {V_Shown, L_Locked, V_Hidden, L_Inherited, V_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Inherited, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {V_Shown, L_Locked, V_Shown, L_Inherited, V_Inherited, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Inherited, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Shown, L_Inherited, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Inherited, false, false, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false},
-         {V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false},
-         {V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
-        }
-    ));
+                                                                                                                                       {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Inherited, false, false, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                      }));
 // clang-format on
 
 using GetNodes = std::function<std::tuple<EntityNode *, Node *>(EditorContextTest & )>;
-const GetNodes getNodes = GENERATE_COPY(
-    GetNodes{
-        [](auto &test) { return test.createTopLevelBrushEntity(); }}, GetNodes{
-        [](auto &test) { return test.createTopLevelPatchEntity(); }}
-);
+const GetNodes getNodes = GENERATE_COPY(GetNodes{
+    [](auto &test) { return test.createTopLevelBrushEntity(); }}, GetNodes{
+    [](auto &test) { return test.createTopLevelPatchEntity(); }});
 
 auto [entityNode, childNode] = getNodes(*this);
 
@@ -608,39 +402,12 @@ SECTION("Top Level Point Entity")
 using T = std::tuple<VisibilityState, LockState, bool, VisibilityState, LockState, bool, bool, bool>;
 
 // clang-format off
-const auto [wrldVisState, wrldLckState, prefValue, entVisState, entLckState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{V_Shown, L_Unlocked, true, V_Inherited, L_Inherited, true, true, true}, {V_Shown, L_Unlocked, true, V_Inherited, L_Locked, true, false, false},
-         {V_Shown, L_Unlocked, true, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Unlocked, true, V_Shown, L_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, true, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, true, V_Shown, L_Unlocked, true, true, true},
-         {V_Shown, L_Unlocked, true, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, true, V_Hidden, L_Locked, false, false, false},
-         {V_Shown, L_Unlocked, true, V_Hidden, L_Unlocked, false, true, false}, {V_Shown, L_Unlocked, false, V_Inherited, L_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, false, V_Inherited, L_Locked, false, false, false}, {V_Shown, L_Unlocked, false, V_Inherited, L_Unlocked, false, true, false},
-         {V_Shown, L_Unlocked, false, V_Shown, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, false, V_Shown, L_Locked, false, false, false},
-         {V_Shown, L_Unlocked, false, V_Shown, L_Unlocked, false, true, false}, {V_Shown, L_Unlocked, false, V_Hidden, L_Inherited, false, true, false},
-         {V_Shown, L_Unlocked, false, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Unlocked, false, V_Hidden, L_Unlocked, false, true, false},
+const auto [wrldVisState, wrldLckState, prefValue, entVisState, entLckState, visible, editable, selectable] = GENERATE(values<T>({{V_Shown, L_Unlocked, true, V_Inherited, L_Inherited, true, true, true}, {V_Shown, L_Unlocked, true, V_Inherited, L_Locked, true, false, false}, {V_Shown, L_Unlocked, true, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Unlocked, true, V_Shown, L_Inherited, true, true, true}, {V_Shown, L_Unlocked, true, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, true, V_Shown, L_Unlocked, true, true, true}, {V_Shown, L_Unlocked, true, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, true, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Unlocked, true, V_Hidden, L_Unlocked, false, true, false}, {V_Shown, L_Unlocked, false, V_Inherited, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, false, V_Inherited, L_Locked, false, false, false}, {V_Shown, L_Unlocked, false, V_Inherited, L_Unlocked, false, true, false}, {V_Shown, L_Unlocked, false, V_Shown, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, false, V_Shown, L_Locked, false, false, false}, {V_Shown, L_Unlocked, false, V_Shown, L_Unlocked, false, true, false}, {V_Shown, L_Unlocked, false, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, false, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Unlocked, false, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Shown, L_Locked, true, V_Inherited, L_Inherited, true, false, false}, {V_Shown, L_Locked, true, V_Inherited, L_Locked, true, false, false},
-         {V_Shown, L_Locked, true, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Locked, true, V_Shown, L_Inherited, true, false, false},
-         {V_Shown, L_Locked, true, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Locked, true, V_Shown, L_Unlocked, true, true, true},
-         {V_Shown, L_Locked, true, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, true, V_Hidden, L_Locked, false, false, false},
-         {V_Shown, L_Locked, true, V_Hidden, L_Unlocked, false, true, false}, {V_Shown, L_Locked, false, V_Inherited, L_Inherited, false, false, false},
-         {V_Shown, L_Locked, false, V_Inherited, L_Locked, false, false, false}, {V_Shown, L_Locked, false, V_Inherited, L_Unlocked, false, true, false},
-         {V_Shown, L_Locked, false, V_Shown, L_Inherited, false, false, false}, {V_Shown, L_Locked, false, V_Shown, L_Locked, false, false, false},
-         {V_Shown, L_Locked, false, V_Shown, L_Unlocked, false, true, false}, {V_Shown, L_Locked, false, V_Hidden, L_Inherited, false, false, false},
-         {V_Shown, L_Locked, false, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Locked, false, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                                  {V_Shown, L_Locked, true, V_Inherited, L_Inherited, true, false, false}, {V_Shown, L_Locked, true, V_Inherited, L_Locked, true, false, false}, {V_Shown, L_Locked, true, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Locked, true, V_Shown, L_Inherited, true, false, false}, {V_Shown, L_Locked, true, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Locked, true, V_Shown, L_Unlocked, true, true, true}, {V_Shown, L_Locked, true, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, true, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Locked, true, V_Hidden, L_Unlocked, false, true, false}, {V_Shown, L_Locked, false, V_Inherited, L_Inherited, false, false, false}, {V_Shown, L_Locked, false, V_Inherited, L_Locked, false, false, false}, {V_Shown, L_Locked, false, V_Inherited, L_Unlocked, false, true, false}, {V_Shown, L_Locked, false, V_Shown, L_Inherited, false, false, false}, {V_Shown, L_Locked, false, V_Shown, L_Locked, false, false, false}, {V_Shown, L_Locked, false, V_Shown, L_Unlocked, false, true, false}, {V_Shown, L_Locked, false, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, false, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Locked, false, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Hidden, L_Unlocked, true, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, true, V_Inherited, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, true, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, true, V_Shown, L_Inherited, true, true, true},
-         {V_Hidden, L_Unlocked, true, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Unlocked, true, V_Shown, L_Unlocked, true, true, true},
-         {V_Hidden, L_Unlocked, true, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, true, V_Hidden, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, true, V_Hidden, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, false, V_Inherited, L_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, false, V_Inherited, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, false, V_Inherited, L_Unlocked, false, true, false},
-         {V_Hidden, L_Unlocked, false, V_Shown, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, V_Shown, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, false, V_Shown, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, false, V_Hidden, L_Inherited, false, true, false},
-         {V_Hidden, L_Unlocked, false, V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, false, V_Hidden, L_Unlocked, false, true, false},
-        }
-    ));
+                                                                                                                                  {V_Hidden, L_Unlocked, true, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, true, V_Inherited, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, true, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, true, V_Shown, L_Inherited, true, true, true}, {V_Hidden, L_Unlocked, true, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Unlocked, true, V_Shown, L_Unlocked, true, true, true}, {V_Hidden, L_Unlocked, true, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, true, V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, true, V_Hidden, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, false, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, V_Inherited, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, false, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, false, V_Shown, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, V_Shown, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, false, V_Shown, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, false, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, false, V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, false, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                                 }));
 // clang-format on
 
 auto *entityNode = createTopLevelPointEntity();
@@ -679,34 +446,17 @@ SECTION("Top Level Brush, Patch")
 using T = std::tuple<VisibilityState, LockState, VisibilityState, LockState, bool, bool, bool>;
 
 // clang-format off
-const auto [wrldVisState, wrldLckState, nodeVisState, nodeLckState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
-         {V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+const auto [wrldVisState, wrldLckState, nodeVisState, nodeLckState, visible, editable, selectable] = GENERATE(values<T>({{V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true}, {V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false},
-         {V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false},
-         {V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, true},
-         {V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false},
-         {V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                         {V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false}, {V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, true}, {V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, true}, {V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false}, {V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
 
-         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-        }
-    ));
+                                                                                                                         {V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, true}, {V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                        }));
 // clang-format on
 
 using GetNode = std::function<Node * (EditorContextTest & )>;
-const GetNode getNode = GENERATE_COPY(
-    GetNode{[](auto &test) { return test.createTopLevelBrush(); }}, GetNode{
-        [](auto &test) { return test.createTopLevelPatch(); }}
-);
+const GetNode getNode = GENERATE_COPY(GetNode{[](auto &test) { return test.createTopLevelBrush(); }}, GetNode{
+    [](auto &test) { return test.createTopLevelPatch(); }});
 
 auto *node = getNode(*this);
 
@@ -749,116 +499,16 @@ SECTION("Nested group")
 using T = std::tuple<bool, bool, bool, bool, VisibilityState, LockState, VisibilityState, LockState, bool, bool, bool>;
 
 // clang-format off
-const auto [outOpen, innOpen, outSel, innSel, outVisState, outLckState, innVisState, innLckState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{false, false, false, false, V_Hidden, L_Locked, V_Inherited, L_Inherited, false, false, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Inherited, L_Locked, false, false, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Inherited, L_Unlocked, false, true, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Hidden, L_Inherited, false, false, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Hidden, L_Locked, false, false, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Hidden, L_Unlocked, false, true, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Shown, L_Inherited, true, false, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Shown, L_Locked, true, false, false},
-         {false, false, false, false, V_Hidden, L_Locked, V_Shown, L_Unlocked, true, true, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {false, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Shown, L_Locked, true, false, false},
-         {false, false, false, false, V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {false, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
+const auto [outOpen, innOpen, outSel, innSel, outVisState, outLckState, innVisState, innLckState, visible, editable, selectable] = GENERATE(values<T>({{false, false, false, false, V_Hidden, L_Locked, V_Inherited, L_Inherited, false, false, false}, {false, false, false, false, V_Hidden, L_Locked, V_Inherited, L_Locked, false, false, false}, {false, false, false, false, V_Hidden, L_Locked, V_Inherited, L_Unlocked, false, true, false}, {false, false, false, false, V_Hidden, L_Locked, V_Hidden, L_Inherited, false, false, false}, {false, false, false, false, V_Hidden, L_Locked, V_Hidden, L_Locked, false, false, false}, {false, false, false, false, V_Hidden, L_Locked, V_Hidden, L_Unlocked, false, true, false}, {false, false, false, false, V_Hidden, L_Locked, V_Shown, L_Inherited, true, false, false}, {false, false, false, false, V_Hidden, L_Locked, V_Shown, L_Locked, true, false, false}, {false, false, false, false, V_Hidden, L_Locked, V_Shown, L_Unlocked, true, true, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {false, false, false, false, V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {false, false, false, false, V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false}, {false, false, false, false, V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, false}, {false, false, false, false, V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {false, false, false, false, V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false}, {false, false, false, false, V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false}, {false, false, false, false, V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false}, {false, false, false, false, V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {false, false, false, false, V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
 
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {false, false, true, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {false, false, true, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
+                                                                                                                                                       {false, false, true, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, false, true, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, false, true, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
 
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {true, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {true, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
+                                                                                                                                                       {true, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {true, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {true, false, false, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, true}, {true, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {true, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {true, false, false, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {true, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {true, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {true, false, false, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {true, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {true, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {true, false, false, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
 
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {true, true, false, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false},
-         {true, true, false, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
+                                                                                                                                                       {true, true, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {true, true, false, false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {true, true, false, false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
 
-         {true, false, false, true, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, true, true, true},
-         {true, false, false, true, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, true, true, true},
-         {true, false, false, true, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, true, true, true},
-         {true, false, false, true, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, true, true, true},
-         {true, false, false, true, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {true, false, false, true, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
-         {true, false, false, true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true},
-         {true, false, false, true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true},
-         {true, false, false, true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, true, true, true},
-         {true, false, false, true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, true, true, true},
-         {true, false, false, true, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {true, false, false, true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
-        }
-    ));
+                                                                                                                                                       {true, false, false, true, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {true, false, false, true, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {true, false, false, true, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, true, true, true}, {true, false, false, true, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, true, true, true}, {true, false, false, true, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {true, false, false, true, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, true}, {true, false, false, true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {true, false, false, true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {true, false, false, true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, true, true, true}, {true, false, false, true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, true, true, true}, {true, false, false, true, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {true, false, false, true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
+                                                                                                                                                      }));
 // clang-format on
 
 auto [outerGroupNode, innerGroupNode, brushNode] = createdNestedGroupedBrush();
@@ -924,42 +574,21 @@ SECTION("Grouped Point Entity, Grouped Brush, Grouped Patch")
 using T = std::tuple<bool, VisibilityState, LockState, VisibilityState, LockState, bool, bool, bool>;
 
 // clang-format off
-const auto [grpOpen, grpVisState, grpLckState, entVisState, entLckState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+const auto [grpOpen, grpVisState, grpLckState, entVisState, entLckState, visible, editable, selectable] = GENERATE(values<T>({{false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
 
-         {false, V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, false}, {false, V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                              {false, V_Shown, L_Locked, V_Inherited, L_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Locked, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, true, true, false}, {false, V_Shown, L_Locked, V_Shown, L_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Locked, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Unlocked, true, true, false}, {false, V_Shown, L_Locked, V_Hidden, L_Inherited, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Locked, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, false, true, false},
 
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                              {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, false, false, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, false, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, true, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, true, false, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, true, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
 
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
-        }
-    ));
+                                                                                                                              {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, true, true, true}, {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, true, false, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, true, true, true}, {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, true, true, true}, {true, V_Shown, L_Unlocked, V_Shown, L_Locked, true, false, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, true, true, true}, {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, false, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, false, false, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, false, true, false},
+                                                                                                                             }));
 // clang-format on
 
 using GetNodes = std::function<std::tuple<GroupNode *, Node *>(EditorContextTest & )>;
-const GetNodes getNodes = GENERATE_COPY(
-    GetNodes{
-        [](auto &test) { return test.createGroupedPointEntity(); }}, GetNodes{
-        [](auto &test) { return test.createGroupedBrush(); }}, GetNodes{
-        [](auto &test) { return test.createGroupedPatch(); }}
-);
+const GetNodes getNodes = GENERATE_COPY(GetNodes{
+    [](auto &test) { return test.createGroupedPointEntity(); }}, GetNodes{
+    [](auto &test) { return test.createGroupedBrush(); }}, GetNodes{
+    [](auto &test) { return test.createGroupedPatch(); }});
 
 auto [groupNode, childNode] = getNodes(*this);
 
@@ -1003,129 +632,20 @@ SECTION("Grouped Brush Entity, Patch Entity")
 using T = std::tuple<bool, VisibilityState, LockState, VisibilityState, LockState, VisibilityState, bool, bool, bool>;
 
 // clang-format off
-const auto [grpOpen, grpVisState, grpLckState, entVisState, entLockState, childVisState, visible, editable, selectable] = GENERATE(
-    values<T>(
-        {{false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Inherited, true, false, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+const auto [grpOpen, grpVisState, grpLckState, entVisState, entLockState, childVisState, visible, editable, selectable] = GENERATE(values<T>({{false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Inherited, true, false, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {false, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {false, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {false, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {false, V_Shown, L_Locked, V_Inherited, L_Inherited, V_Inherited, true, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Inherited, V_Hidden, false, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Inherited, V_Shown, true, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Locked, V_Inherited, true, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Inherited, true, true, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Inherited, V_Inherited, false, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Inherited, V_Hidden, false, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Inherited, V_Shown, true, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Locked, V_Shown, true, false, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Inherited, V_Inherited, true, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Inherited, V_Hidden, false, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Inherited, V_Shown, true, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Locked, V_Shown, true, false, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Shown, L_Locked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                              {false, V_Shown, L_Locked, V_Inherited, L_Inherited, V_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Inherited, V_Hidden, false, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Inherited, V_Shown, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Locked, V_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Locked, V_Shown, true, false, false}, {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Inherited, true, true, false}, {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {false, V_Shown, L_Locked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {false, V_Shown, L_Locked, V_Hidden, L_Inherited, V_Inherited, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Inherited, V_Hidden, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Inherited, V_Shown, true, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Locked, V_Shown, true, false, false}, {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {false, V_Shown, L_Locked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {false, V_Shown, L_Locked, V_Shown, L_Inherited, V_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Inherited, V_Hidden, false, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Inherited, V_Shown, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Locked, V_Inherited, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Locked, V_Hidden, false, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Locked, V_Shown, true, false, false}, {false, V_Shown, L_Locked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {false, V_Shown, L_Locked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {false, V_Shown, L_Locked, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Inherited, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                              {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Inherited, false, false, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {false, V_Hidden, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {false, V_Hidden, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {false, V_Hidden, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
 
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Inherited, true, false, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false},
-         {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
-        }
-    ));
+                                                                                                                                              {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Inherited, true, true, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Hidden, false, true, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Inherited, V_Shown, true, true, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Inherited, true, false, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Hidden, false, false, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Locked, V_Shown, true, false, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Inherited, true, true, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Hidden, false, true, false}, {true, V_Shown, L_Unlocked, V_Inherited, L_Unlocked, V_Shown, true, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Inherited, false, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Hidden, false, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Inherited, V_Shown, true, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Inherited, false, false, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Hidden, false, false, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Locked, V_Shown, true, false, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Inherited, false, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Hidden, false, true, false}, {true, V_Shown, L_Unlocked, V_Hidden, L_Unlocked, V_Shown, true, true, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Inherited, true, true, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Hidden, false, true, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Inherited, V_Shown, true, true, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Inherited, true, false, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Hidden, false, false, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Locked, V_Shown, true, false, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Inherited, true, true, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Hidden, false, true, false}, {true, V_Shown, L_Unlocked, V_Shown, L_Unlocked, V_Shown, true, true, false},
+                                                                                                                                             }));
 // clang-format on
 
 using GetNodes = std::function<std::tuple<GroupNode *, EntityNode *, Node *>(EditorContextTest & )>;
-const GetNodes getNodes = GENERATE_COPY(
-    GetNodes{
-        [](auto &test) { return test.createGroupedBrushEntity(); }}, GetNodes{
-        [](auto &test) { return test.createGroupedPatchEntity(); }}
-);
+const GetNodes getNodes = GENERATE_COPY(GetNodes{
+    [](auto &test) { return test.createGroupedBrushEntity(); }}, GetNodes{
+    [](auto &test) { return test.createGroupedPatchEntity(); }});
 
 auto [groupNode, entityNode, childNode] = getNodes(*this);
 

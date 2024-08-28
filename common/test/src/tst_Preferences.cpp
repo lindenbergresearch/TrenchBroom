@@ -41,7 +41,6 @@
 
 #include "Catch2.h"
 
-
 inline std::ostream &operator<<(std::ostream &lhs, const QJsonValue &rhs) {
     lhs << rhs.toString().toStdString();
     return lhs;
@@ -143,8 +142,7 @@ TEST_CASE("PreferencesTest.read")
     CHECK(parsePreferencesFromJson(QByteArray(R"({"foo": "bar"})")).is_success());
     CHECK(parsePreferencesFromJson(QByteArray("{}")).is_success());
 
-    readPreferencesFromFile("fixture/test/preferences-v2.json").transform([](const std::map<std::filesystem::path, QJsonValue> &prefs) { testPrefs(prefs); }
-    ).transform_error([](const auto &) { FAIL_CHECK(); });
+    readPreferencesFromFile("fixture/test/preferences-v2.json").transform([](const std::map<std::filesystem::path, QJsonValue> &prefs) { testPrefs(prefs); }).transform_error([](const auto &) { FAIL_CHECK(); });
 }
 
 TEST_CASE("PreferencesTest.testWriteRead")
@@ -153,29 +151,25 @@ TEST_CASE("PreferencesTest.testWriteRead")
 
     const QByteArray serialized = writePreferencesToJson(fromFile);
     parsePreferencesFromJson(serialized).transform([&](const std::map<std::filesystem::path, QJsonValue> &prefs) {
-          CHECK(fromFile == prefs);
-        }
-    ).transform_error([](const auto &) { FAIL_CHECK(); });
+        CHECK(fromFile == prefs);
+    }).transform_error([](const auto &) { FAIL_CHECK(); });
 }
 
 /**
  * Helper template so we don't need to use out parameters in the tests
  */
-template<class Serializer, class PrimitiveType>
-static std::optional<PrimitiveType> maybeDeserialize(const QJsonValue &string) {
+template<class Serializer, class PrimitiveType> static std::optional<PrimitiveType> maybeDeserialize(const QJsonValue &string) {
     const auto serializer = Serializer{};
     auto result = PrimitiveType{};
     return serializer.readFromJson(string, result) ? std::optional{result} : std::nullopt;
 }
 
-template<class Serializer, class PrimitiveType>
-static QJsonValue serialize(const PrimitiveType &value) {
+template<class Serializer, class PrimitiveType> static QJsonValue serialize(const PrimitiveType &value) {
     const auto serializer = Serializer{};
     return serializer.writeToJson(value);
 }
 
-template<class Serializer, class PrimitiveType>
-static void testSerialize(const QJsonValue &str, const PrimitiveType &value) {
+template<class Serializer, class PrimitiveType> static void testSerialize(const QJsonValue &str, const PrimitiveType &value) {
     const auto testDeserializeOption = maybeDeserialize<Serializer, PrimitiveType>(str);
     const auto testSerialize = serialize<Serializer, PrimitiveType>(value);
 
@@ -240,52 +234,14 @@ TEST_CASE("PreferencesTest.testWxViewShortcutsAndMenuShortcutsRecognized")
         //            "Controls/Map view/Move rotation center backward; Move rotation center
         //            up", "Controls/Map view/Move rotation center forward; Move rotation
         //            center down",
-        "Controls/Map view/Move objects up; Move objects forward", "Controls/Map view/Move objects down; Move objects backward",
-        "Controls/Map view/Move objects left", "Controls/Map view/Move objects right", "Controls/Map view/Move objects backward; Move objects up",
-        "Controls/Map view/Move objects forward; Move objects down", "Controls/Map view/Roll objects clockwise",
-        "Controls/Map view/Roll objects counter-clockwise", "Controls/Map view/Yaw objects clockwise", "Controls/Map view/Yaw objects counter-clockwise",
-        "Controls/Map view/Pitch objects clockwise", "Controls/Map view/Pitch objects counter-clockwise", "Controls/Map view/Flip objects horizontally",
-        "Controls/Map view/Flip objects vertically", "Controls/Map view/Duplicate and move objects up; Duplicate and move objects forward",
-        "Controls/Map view/Duplicate and move objects down; Duplicate and move objects "
-        "backward", "Controls/Map view/Duplicate and move objects left", "Controls/Map view/Duplicate and move objects right",
-        "Controls/Map view/Duplicate and move objects backward; Duplicate and move objects "
-        "up", "Controls/Map view/Duplicate and move objects forward; Duplicate and move objects "
-              "down", "Controls/Map view/Move textures up", "Controls/Map view/Move textures up (fine)", "Controls/Map view/Move textures up (coarse)",
-        "Controls/Map view/Move textures down", "Controls/Map view/Move textures down (fine)", "Controls/Map view/Move textures down (coarse)",
-        "Controls/Map view/Move textures left", "Controls/Map view/Move textures left (fine)", "Controls/Map view/Move textures left (coarse)",
-        "Controls/Map view/Move textures right", "Controls/Map view/Move textures right (fine)", "Controls/Map view/Move textures right (coarse)",
-        "Controls/Map view/Rotate textures clockwise", "Controls/Map view/Rotate textures clockwise (fine)",
-        "Controls/Map view/Rotate textures clockwise (coarse)", "Controls/Map view/Rotate textures counter-clockwise",
-        "Controls/Map view/Rotate textures counter-clockwise (fine)", "Controls/Map view/Rotate textures counter-clockwise (coarse)",
-        "Controls/Map view/Cycle map view", "Controls/Map view/Reset camera zoom", "Controls/Map view/Cancel", "Controls/Map view/Deactivate current tool",
-        "Controls/Map view/Make structural", "Controls/Map view/View Filter > Toggle show entity classnames",
-        "Controls/Map view/View Filter > Toggle show group bounds", "Controls/Map view/View Filter > Toggle show brush entity bounds",
-        "Controls/Map view/View Filter > Toggle show point entity bounds", "Controls/Map view/View Filter > Toggle show point entities",
-        "Controls/Map view/View Filter > Toggle show point entity models", "Controls/Map view/View Filter > Toggle show brushes",
-        "Controls/Map view/View Filter > Show textures", "Controls/Map view/View Filter > Hide textures", "Controls/Map view/View Filter > Hide faces",
-        "Controls/Map view/View Filter > Shade faces", "Controls/Map view/View Filter > Use fog", "Controls/Map view/View Filter > Show edges",
-        "Controls/Map view/View Filter > Show all entity links", "Controls/Map view/View Filter > Show transitively selected entity links",
-        "Controls/Map view/View Filter > Show directly selected entity links", "Controls/Map view/View Filter > Hide entity links",
-        "Menu/File/Export/Wavefront OBJ...", "Menu/File/Load Point File...", "Menu/File/Reload Point File", "Menu/File/Unload Point File",
-        "Menu/File/Load Portal File...", "Menu/File/Reload Portal File", "Menu/File/Unload Portal File", "Menu/File/Reload Texture Collections",
-        "Menu/File/Reload Entity Definitions", "Menu/Edit/Repeat", "Menu/Edit/Paste at Original Position", "Menu/Edit/Clear Repeatable Commands",
-        "Menu/Edit/Duplicate", "Menu/Edit/Delete", "Menu/Edit/Select All", "Menu/Edit/Select Siblings", "Menu/Edit/Select Touching", "Menu/Edit/Select Inside",
-        "Menu/Edit/Select Tall", "Menu/Edit/Select by Line Number", "Menu/Edit/Select None", "Menu/Edit/Group", "Menu/Edit/Ungroup",
-        "Menu/Edit/Tools/Brush Tool", "Menu/Edit/Tools/Clip Tool", "Menu/Edit/Tools/Rotate Tool", "Menu/Edit/Tools/Scale Tool", "Menu/Edit/Tools/Shear Tool",
-        "Menu/Edit/Tools/Vertex Tool", "Menu/Edit/Tools/Edge Tool", "Menu/Edit/Tools/Face Tool", "Menu/Edit/CSG/Convex Merge", "Menu/Edit/CSG/Subtract",
-        "Menu/Edit/CSG/Hollow", "Menu/Edit/CSG/Intersect", "Menu/Edit/Snap Vertices to Integer", "Menu/Edit/Snap Vertices to Grid", "Menu/Edit/Texture Lock",
-        "Menu/Edit/UV Lock", "Menu/Edit/Replace Texture...", "Menu/View/Grid/Show Grid", "Menu/View/Grid/Snap to Grid", "Menu/View/Grid/Increase Grid Size",
-        "Menu/View/Grid/Decrease Grid Size", "Menu/View/Grid/Set Grid Size 0.125", "Menu/View/Grid/Set Grid Size 0.25", "Menu/View/Grid/Set Grid Size 0.5",
-        "Menu/View/Grid/Set Grid Size 1", "Menu/View/Grid/Set Grid Size 2", "Menu/View/Grid/Set Grid Size 4", "Menu/View/Grid/Set Grid Size 8",
-        "Menu/View/Grid/Set Grid Size 16", "Menu/View/Grid/Set Grid Size 32", "Menu/View/Grid/Set Grid Size 64", "Menu/View/Grid/Set Grid Size 128",
-        "Menu/View/Grid/Set Grid Size 256", "Menu/View/Camera/Move to Next Point", "Menu/View/Camera/Move to Previous Point",
-        "Menu/View/Camera/Focus on Selection", "Menu/View/Camera/Move Camera to...", "Menu/View/Isolate", "Menu/View/Hide", "Menu/View/Show All",
-        "Menu/View/Switch to Map Inspector", "Menu/View/Switch to Entity Inspector", "Menu/View/Switch to Face Inspector", "Menu/View/Toggle Info Panel",
-        "Menu/View/Toggle Inspector", "Menu/View/Maximize Current View", "Menu/Run/Compile...", "Menu/Run/Launch...",
+        "Controls/Map view/Move objects up; Move objects forward", "Controls/Map view/Move objects down; Move objects backward", "Controls/Map view/Move objects left", "Controls/Map view/Move objects right", "Controls/Map view/Move objects backward; Move objects up", "Controls/Map view/Move objects forward; Move objects down", "Controls/Map view/Roll objects clockwise", "Controls/Map view/Roll objects counter-clockwise", "Controls/Map view/Yaw objects clockwise", "Controls/Map view/Yaw objects counter-clockwise", "Controls/Map view/Pitch objects clockwise", "Controls/Map view/Pitch objects counter-clockwise", "Controls/Map view/Flip objects horizontally", "Controls/Map view/Flip objects vertically", "Controls/Map view/Duplicate and move objects up; Duplicate and move objects forward", "Controls/Map view/Duplicate and move objects down; Duplicate and move objects "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            "backward", "Controls/Map view/Duplicate and move objects left", "Controls/Map view/Duplicate and move objects right", "Controls/Map view/Duplicate and move objects backward; Duplicate and move objects "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   "up", "Controls/Map view/Duplicate and move objects forward; Duplicate and move objects "
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "down", "Controls/Map view/Move textures up", "Controls/Map view/Move textures up (fine)", "Controls/Map view/Move textures up (coarse)", "Controls/Map view/Move textures down", "Controls/Map view/Move textures down (fine)", "Controls/Map view/Move textures down (coarse)", "Controls/Map view/Move textures left", "Controls/Map view/Move textures left (fine)", "Controls/Map view/Move textures left (coarse)", "Controls/Map view/Move textures right", "Controls/Map view/Move textures right (fine)", "Controls/Map view/Move textures right (coarse)", "Controls/Map view/Rotate textures clockwise", "Controls/Map view/Rotate textures clockwise (fine)", "Controls/Map view/Rotate textures clockwise (coarse)", "Controls/Map view/Rotate textures counter-clockwise", "Controls/Map view/Rotate textures counter-clockwise (fine)", "Controls/Map view/Rotate textures counter-clockwise (coarse)", "Controls/Map view/Cycle map view", "Controls/Map view/Reset camera zoom", "Controls/Map view/Cancel", "Controls/Map view/Deactivate current tool", "Controls/Map view/Make structural", "Controls/Map view/View Filter > Toggle show entity classnames", "Controls/Map view/View Filter > Toggle show group bounds", "Controls/Map view/View Filter > Toggle show brush entity bounds", "Controls/Map view/View Filter > Toggle show point entity bounds", "Controls/Map view/View Filter > Toggle show point entities", "Controls/Map view/View Filter > Toggle show point entity models", "Controls/Map view/View Filter > Toggle show brushes", "Controls/Map view/View Filter > Show textures", "Controls/Map view/View Filter > Hide textures", "Controls/Map view/View Filter > Hide faces", "Controls/Map view/View Filter > Shade faces", "Controls/Map view/View Filter > Use fog", "Controls/Map view/View Filter > Show edges", "Controls/Map view/View Filter > Show all entity links", "Controls/Map view/View Filter > Show transitively selected entity links", "Controls/Map view/View Filter > Show directly selected entity links", "Controls/Map view/View Filter > Hide entity links", "Menu/File/Export/Wavefront OBJ...", "Menu/File/Load Point File...", "Menu/File/Reload Point File", "Menu/File/Unload Point File", "Menu/File/Load Portal File...", "Menu/File/Reload Portal File", "Menu/File/Unload Portal File", "Menu/File/Reload Texture Collections", "Menu/File/Reload Entity Definitions", "Menu/Edit/Repeat", "Menu/Edit/Paste at Original Position", "Menu/Edit/Clear Repeatable Commands", "Menu/Edit/Duplicate", "Menu/Edit/Delete", "Menu/Edit/Select All", "Menu/Edit/Select Siblings", "Menu/Edit/Select Touching", "Menu/Edit/Select Inside", "Menu/Edit/Select Tall", "Menu/Edit/Select by Line Number", "Menu/Edit/Select None", "Menu/Edit/Group", "Menu/Edit/Ungroup", "Menu/Edit/Tools/Brush Tool", "Menu/Edit/Tools/Clip Tool", "Menu/Edit/Tools/Rotate Tool", "Menu/Edit/Tools/Scale Tool", "Menu/Edit/Tools/Shear Tool", "Menu/Edit/Tools/Vertex Tool", "Menu/Edit/Tools/Edge Tool", "Menu/Edit/Tools/Face Tool", "Menu/Edit/CSG/Convex Merge", "Menu/Edit/CSG/Subtract", "Menu/Edit/CSG/Hollow", "Menu/Edit/CSG/Intersect", "Menu/Edit/Snap Vertices to Integer", "Menu/Edit/Snap Vertices to Grid", "Menu/Edit/Texture Lock", "Menu/Edit/UV Lock", "Menu/Edit/Replace Texture...", "Menu/View/Grid/Show Grid", "Menu/View/Grid/Snap to Grid", "Menu/View/Grid/Increase Grid Size", "Menu/View/Grid/Decrease Grid Size", "Menu/View/Grid/Set Grid Size 0.125", "Menu/View/Grid/Set Grid Size 0.25", "Menu/View/Grid/Set Grid Size 0.5", "Menu/View/Grid/Set Grid Size 1", "Menu/View/Grid/Set Grid Size 2", "Menu/View/Grid/Set Grid Size 4", "Menu/View/Grid/Set Grid Size 8", "Menu/View/Grid/Set Grid Size 16", "Menu/View/Grid/Set Grid Size 32", "Menu/View/Grid/Set Grid Size 64", "Menu/View/Grid/Set Grid Size 128", "Menu/View/Grid/Set Grid Size 256", "Menu/View/Camera/Move to Next Point", "Menu/View/Camera/Move to Previous Point", "Menu/View/Camera/Focus on Selection", "Menu/View/Camera/Move Camera to...", "Menu/View/Isolate", "Menu/View/Hide", "Menu/View/Show All", "Menu/View/Switch to Map Inspector", "Menu/View/Switch to Entity Inspector", "Menu/View/Switch to Face Inspector", "Menu/View/Toggle Info Panel", "Menu/View/Toggle Inspector", "Menu/View/Maximize Current View", "Menu/Run/Compile...", "Menu/Run/Launch...",
     };
 
     auto &actionsMap = View::ActionManager::instance().actionsMap();
-    for (const auto &preferenceKey: preferenceKeys) {
+    for (const auto &preferenceKey : preferenceKeys) {
         CAPTURE(preferenceKey);
 
         const auto preferencePath = preferenceKey;
@@ -306,7 +262,7 @@ TEST_CASE("PreferencesTest.testWxEntityShortcuts")
         "Entities/monster_hell_knight/Create", "Entities/monster_hell_knight/Toggle" // new in 2020.1
     };
 
-    for (const auto &preferenceKey: preferenceKeys) {
+    for (const auto &preferenceKey : preferenceKeys) {
         CAPTURE(preferenceKey);
         CHECK(kdl::vec_contains(actualPrefPaths, preferenceKey));
     }
@@ -324,7 +280,7 @@ TEST_CASE("PreferencesTest.testWxTagShortcuts")
         "Filters/Tags/Detail/Toggle Visible", "Tags/Detail/Disable", "Tags/Detail/Enable",
     };
 
-    for (const auto &preferenceKey: preferenceKeys) {
+    for (const auto &preferenceKey : preferenceKeys) {
         CAPTURE(preferenceKey);
         CHECK(kdl::vec_contains(actualPrefPaths, preferenceKey));
     }

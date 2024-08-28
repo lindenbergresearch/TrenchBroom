@@ -27,10 +27,8 @@
 
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 class BrushNode;
-
 
 /**
  * A brush face reference creates a persistent reference to a face that has a specific
@@ -41,38 +39,35 @@ class BrushNode;
  * the resolved face might not be the same as the face which the reference was created
  * with.
  */
-class BrushFaceReference
-{
-private:
-  BrushNode* m_node;
-  vm::plane3 m_facePlane;
+class BrushFaceReference {
+  private:
+    BrushNode *m_node;
+    vm::plane3 m_facePlane;
 
-public:
-  /**
-   * Creates a new reference to the given face.
-   *
-   * @param node the containing brush node, must not be null
-   * @param face the face to reference
-   */
-  BrushFaceReference(Model::BrushNode* node, const Model::BrushFace& face);
+  public:
+    /**
+     * Creates a new reference to the given face.
+     *
+     * @param node the containing brush node, must not be null
+     * @param face the face to reference
+     */
+    BrushFaceReference(Model::BrushNode *node, const Model::BrushFace &face);
 
-  /**
-   * Resolves the referenced brush face or an error if this reference cannot be resolved.
-   */
-  Result<BrushFaceHandle> resolve() const;
+    /**
+     * Resolves the referenced brush face or an error if this reference cannot be resolved.
+     */
+    Result<BrushFaceHandle> resolve() const;
 };
-
 
 /**
  * Returns a vector of brush face references for faces represented by the given handles.
  */
-std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle>& handles);
+std::vector<BrushFaceReference> createRefs(const std::vector<BrushFaceHandle> &handles);
 
 /**
  * Returns a vector brush face handles representing the faces to which the given face
  * references are resolved or an error if any reference cannot be resolved.
  */
-Result<std::vector<BrushFaceHandle>> resolveAllRefs(
-  const std::vector<BrushFaceReference>& faceRefs);
+Result<std::vector<BrushFaceHandle>> resolveAllRefs(const std::vector<BrushFaceReference> &faceRefs);
 
 } // namespace TrenchBroom::Model

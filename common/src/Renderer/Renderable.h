@@ -21,56 +21,47 @@
 
 #include "Macros.h"
 
-namespace TrenchBroom
-{
-namespace Renderer
-{
+namespace TrenchBroom {
+namespace Renderer {
 class RenderContext;
-
 
 class VboManager;
 
+class Renderable {
+  public:
+    Renderable() = default;
 
-class Renderable
-{
-public:
-  Renderable() = default;
+    virtual ~Renderable() = default;
 
-  virtual ~Renderable() = default;
+    void render(RenderContext &renderContext);
 
-  void render(RenderContext& renderContext);
-
-private:
-  virtual void doRender(RenderContext& renderContext) = 0;
+  private:
+    virtual void doRender(RenderContext &renderContext) = 0;
 
   defineCopyAndMove(Renderable);
 };
 
+class DirectRenderable : public Renderable {
+  public:
+    DirectRenderable() = default;
 
-class DirectRenderable : public Renderable
-{
-public:
-  DirectRenderable() = default;
+    ~DirectRenderable() override = default;
 
-  ~DirectRenderable() override = default;
+    void prepareVertices(VboManager &vboManager);
 
-  void prepareVertices(VboManager& vboManager);
-
-private:
-  virtual void doPrepareVertices(VboManager& vboManager) = 0;
+  private:
+    virtual void doPrepareVertices(VboManager &vboManager) = 0;
 
   defineCopyAndMove(DirectRenderable);
 };
 
+class IndexedRenderable : public Renderable {
+  public:
+    IndexedRenderable() = default;
 
-class IndexedRenderable : public Renderable
-{
-public:
-  IndexedRenderable() = default;
+    ~IndexedRenderable() override = default;
 
-  ~IndexedRenderable() override = default;
-
-  virtual void prepareVerticesAndIndices(VboManager& vboManager) = 0;
+    virtual void prepareVerticesAndIndices(VboManager &vboManager) = 0;
 
   defineCopyAndMove(IndexedRenderable);
 };

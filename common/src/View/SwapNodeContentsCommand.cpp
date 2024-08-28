@@ -27,50 +27,36 @@
 #include <kdl/result.h>
 #include <kdl/vector_utils.h>
 
-namespace TrenchBroom
-{
-namespace View
-{
-SwapNodeContentsCommand::SwapNodeContentsCommand(
-  const std::string& name,
-  std::vector<std::pair<Model::Node*, Model::NodeContents>> nodes)
-  : UpdateLinkedGroupsCommandBase(name, true)
-  , m_nodes(std::move(nodes))
-{
+namespace TrenchBroom {
+namespace View {
+SwapNodeContentsCommand::SwapNodeContentsCommand(const std::string &name, std::vector<std::pair<Model::Node *, Model::NodeContents>> nodes)
+    : UpdateLinkedGroupsCommandBase(name, true), m_nodes(std::move(nodes)) {
 }
 
 SwapNodeContentsCommand::~SwapNodeContentsCommand() = default;
 
-std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformDo(
-  MapDocumentCommandFacade* document)
-{
-  document->performSwapNodeContents(m_nodes);
-  return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformDo(MapDocumentCommandFacade *document) {
+    document->performSwapNodeContents(m_nodes);
+    return std::make_unique<CommandResult>(true);
 }
 
-std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformUndo(
-  MapDocumentCommandFacade* document)
-{
-  document->performSwapNodeContents(m_nodes);
-  return std::make_unique<CommandResult>(true);
+std::unique_ptr<CommandResult> SwapNodeContentsCommand::doPerformUndo(MapDocumentCommandFacade *document) {
+    document->performSwapNodeContents(m_nodes);
+    return std::make_unique<CommandResult>(true);
 }
 
-bool SwapNodeContentsCommand::doCollateWith(UndoableCommand& command)
-{
-  if (auto* other = dynamic_cast<SwapNodeContentsCommand*>(&command))
-  {
-    auto myNodes =
-      kdl::vec_transform(m_nodes, [](const auto& pair) { return pair.first; });
-    auto theirNodes =
-      kdl::vec_transform(other->m_nodes, [](const auto& pair) { return pair.first; });
+bool SwapNodeContentsCommand::doCollateWith(UndoableCommand &command) {
+    if (auto *other = dynamic_cast<SwapNodeContentsCommand *>(&command)) {
+        auto myNodes = kdl::vec_transform(m_nodes, [](const auto &pair) { return pair.first; });
+        auto theirNodes = kdl::vec_transform(other->m_nodes, [](const auto &pair) { return pair.first; });
 
-    kdl::vec_sort(myNodes);
-    kdl::vec_sort(theirNodes);
+        kdl::vec_sort(myNodes);
+        kdl::vec_sort(theirNodes);
 
-    return myNodes == theirNodes;
-  }
+        return myNodes == theirNodes;
+    }
 
-  return false;
+    return false;
 }
 } // namespace View
 } // namespace TrenchBroom

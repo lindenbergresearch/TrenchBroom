@@ -28,77 +28,62 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom::Model
-{
+namespace TrenchBroom::Model {
 
 class BrushFaceHandle;
 
-
 class Node;
-
 
 class GroupNode;
 
-
 class BrushNode;
-
 
 class EntityNode;
 
-
 class LayerNode;
-
 
 class EditorContext;
 
-
 HitType::Type nodeHitType();
 
-LayerNode* findContainingLayer(Node* node);
+LayerNode *findContainingLayer(Node *node);
 
-std::vector<LayerNode*> collectContainingLayersUserSorted(
-  const std::vector<Node*>& nodes);
+std::vector<LayerNode *> collectContainingLayersUserSorted(const std::vector<Node *> &nodes);
 
-GroupNode* findContainingGroup(Node* node);
+GroupNode *findContainingGroup(Node *node);
 
-const GroupNode* findContainingGroup(const Node* node);
+const GroupNode *findContainingGroup(const Node *node);
 
 /**
  * Searches the ancestor chain of `node` for the outermost closed group and returns
  * it if one is found, otherwise returns nullptr.
  */
-GroupNode* findOutermostClosedGroup(Node* node);
+GroupNode *findOutermostClosedGroup(Node *node);
 
-const GroupNode* findOutermostClosedGroup(const Node* node);
+const GroupNode *findOutermostClosedGroup(const Node *node);
 
-std::vector<GroupNode*> collectGroups(const std::vector<Node*>& nodes);
+std::vector<GroupNode *> collectGroups(const std::vector<Node *> &nodes);
 
-std::map<Node*, std::vector<Node*>> parentChildrenMap(const std::vector<Node*>& nodes);
+std::map<Node *, std::vector<Node *>> parentChildrenMap(const std::vector<Node *> &nodes);
 
-std::vector<Node*> collectTouchingNodes(
-  const std::vector<Node*>& nodes, const std::vector<BrushNode*>& brushes);
+std::vector<Node *> collectTouchingNodes(const std::vector<Node *> &nodes, const std::vector<BrushNode *> &brushes);
 
-std::vector<Node*> collectContainedNodes(
-  const std::vector<Node*>& nodes, const std::vector<BrushNode*>& brushes);
+std::vector<Node *> collectContainedNodes(const std::vector<Node *> &nodes, const std::vector<BrushNode *> &brushes);
 
-std::vector<Node*> collectSelectedNodes(const std::vector<Node*>& nodes);
+std::vector<Node *> collectSelectedNodes(const std::vector<Node *> &nodes);
 
-std::vector<Node*> collectSelectableNodes(
-  const std::vector<Node*>& nodes, const EditorContext& editorContext);
+std::vector<Node *> collectSelectableNodes(const std::vector<Node *> &nodes, const EditorContext &editorContext);
 
-std::vector<BrushFaceHandle> collectSelectedBrushFaces(const std::vector<Node*>& nodes);
+std::vector<BrushFaceHandle> collectSelectedBrushFaces(const std::vector<Node *> &nodes);
 
-std::vector<BrushFaceHandle> collectSelectableBrushFaces(
-  const std::vector<Node*>& nodes, const EditorContext& editorContext);
+std::vector<BrushFaceHandle> collectSelectableBrushFaces(const std::vector<Node *> &nodes, const EditorContext &editorContext);
 
-vm::bbox3 computeLogicalBounds(
-  const std::vector<Node*>& nodes, const vm::bbox3& defaultBounds = vm::bbox3());
+vm::bbox3 computeLogicalBounds(const std::vector<Node *> &nodes, const vm::bbox3 &defaultBounds = vm::bbox3());
 
-vm::bbox3 computePhysicalBounds(
-  const std::vector<Node*>& nodes, const vm::bbox3& defaultBounds = vm::bbox3());
+vm::bbox3 computePhysicalBounds(const std::vector<Node *> &nodes, const vm::bbox3 &defaultBounds = vm::bbox3());
 
-std::vector<BrushNode*> filterBrushNodes(const std::vector<Node*>& nodes);
+std::vector<BrushNode *> filterBrushNodes(const std::vector<Node *> &nodes);
 
-std::vector<EntityNode*> filterEntityNodes(const std::vector<Node*>& nodes);
+std::vector<EntityNode *> filterEntityNodes(const std::vector<Node *> &nodes);
 
 } // namespace TrenchBroom::Model

@@ -27,52 +27,41 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class Node;
-
 
 enum class VisibilityState;
 } // namespace Model
 
-namespace View
-{
-class SetVisibilityCommand : public UndoableCommand
-{
-private:
-  enum class Action
-  {
-    Reset,
-    Hide,
-    Show,
-    Ensure
-  };
+namespace View {
+class SetVisibilityCommand : public UndoableCommand {
+  private:
+    enum class Action {
+      Reset, Hide, Show, Ensure
+    };
 
-  std::vector<Model::Node*> m_nodes;
-  Action m_action;
-  std::map<Model::Node*, Model::VisibilityState> m_oldState;
+    std::vector<Model::Node *> m_nodes;
+    Action m_action;
+    std::map<Model::Node *, Model::VisibilityState> m_oldState;
 
-public:
-  static std::unique_ptr<SetVisibilityCommand> show(std::vector<Model::Node*> nodes);
+  public:
+    static std::unique_ptr<SetVisibilityCommand> show(std::vector<Model::Node *> nodes);
 
-  static std::unique_ptr<SetVisibilityCommand> hide(std::vector<Model::Node*> nodes);
+    static std::unique_ptr<SetVisibilityCommand> hide(std::vector<Model::Node *> nodes);
 
-  static std::unique_ptr<SetVisibilityCommand> ensureVisible(
-    std::vector<Model::Node*> nodes);
+    static std::unique_ptr<SetVisibilityCommand> ensureVisible(std::vector<Model::Node *> nodes);
 
-  static std::unique_ptr<SetVisibilityCommand> reset(std::vector<Model::Node*> nodes);
+    static std::unique_ptr<SetVisibilityCommand> reset(std::vector<Model::Node *> nodes);
 
-  SetVisibilityCommand(std::vector<Model::Node*> nodes, Action action);
+    SetVisibilityCommand(std::vector<Model::Node *> nodes, Action action);
 
-private:
-  static std::string makeName(Action action);
+  private:
+    static std::string makeName(Action action);
 
-  std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade* document) override;
+    std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override;
 
-  std::unique_ptr<CommandResult> doPerformUndo(
-    MapDocumentCommandFacade* document) override;
+    std::unique_ptr<CommandResult> doPerformUndo(MapDocumentCommandFacade *document) override;
 
   deleteCopyAndMove(SetVisibilityCommand);
 };

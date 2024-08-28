@@ -12,39 +12,30 @@
 
 #include <string>
 
-namespace TrenchBroom
-{
-namespace View
-{
+namespace TrenchBroom {
+namespace View {
 
+View::TextConsoleTabPage::TextConsoleTabPage(QWidget *parent) : TabBookPage(parent) {
+    m_consoleWidget = new QTextEdit();
+    m_consoleWidget->setReadOnly(true);
+    m_consoleWidget->setWordWrapMode(QTextOption::NoWrap);
 
-View::TextConsoleTabPage::TextConsoleTabPage(QWidget* parent)
-  : TabBookPage(parent)
-{
-  m_consoleWidget = new QTextEdit();
-  m_consoleWidget->setReadOnly(true);
-  m_consoleWidget->setWordWrapMode(QTextOption::NoWrap);
-
-  QVBoxLayout* sizer = new QVBoxLayout();
-  sizer->setContentsMargins(0, 0, 0, 0);
-  sizer->addWidget(m_consoleWidget);
-  setLayout(sizer);
+    QVBoxLayout *sizer = new QVBoxLayout();
+    sizer->setContentsMargins(0, 0, 0, 0);
+    sizer->addWidget(m_consoleWidget);
+    setLayout(sizer);
 }
-const QString& TextConsoleTabPage::getCaption() const
-{
-  return caption;
+const QString &TextConsoleTabPage::getCaption() const {
+    return caption;
 }
-void TextConsoleTabPage::setCaption(const QString& Caption)
-{
-  caption = Caption;
+void TextConsoleTabPage::setCaption(const QString &Caption) {
+    caption = Caption;
 }
-QTextEdit* TextConsoleTabPage::getConsoleWidget() const
-{
-  return m_consoleWidget;
+QTextEdit *TextConsoleTabPage::getConsoleWidget() const {
+    return m_consoleWidget;
 }
-void TextConsoleTabPage::setConsoleWidget(QTextEdit* MConsoleWidget)
-{
-  m_consoleWidget = MConsoleWidget;
+void TextConsoleTabPage::setConsoleWidget(QTextEdit *MConsoleWidget) {
+    m_consoleWidget = MConsoleWidget;
 }
 } // namespace View
 } // namespace TrenchBroom

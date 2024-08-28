@@ -77,170 +77,166 @@ struct DoAncestorDidChange {
 
 using ExpectedCall = std::variant<DoCanAddChild, DoCanRemoveChild, DoParentWillChange, DoParentDidChange, DoAncestorWillChange, DoAncestorDidChange>;
 
-
 class MockNode : public Node {
-private:
-  mutable std::vector<ExpectedCall> m_expectedCalls;
+  private:
+    mutable std::vector<ExpectedCall> m_expectedCalls;
 
-public:
-  /**
-   * Sets an expectation that the given member function will be called. Some of the
-   * variant cases include a value to return when that function is called, or checks to
-   * perform on the function arguments.
-   *
-   * The expectations set this way are all mandatory and must be called in the order they
-   * are set.
-   */
-  void expectCall(ExpectedCall call) { m_expectedCalls.push_back(std::move(call)); }
+  public:
+    /**
+     * Sets an expectation that the given member function will be called. Some of the
+     * variant cases include a value to return when that function is called, or checks to
+     * perform on the function arguments.
+     *
+     * The expectations set this way are all mandatory and must be called in the order they
+     * are set.
+     */
+    void expectCall(ExpectedCall call) { m_expectedCalls.push_back(std::move(call)); }
 
-  ~MockNode() {
-    // If this fails, it means a call that was expected was not made
-    CHECK(m_expectedCalls.empty());
-  }
+    ~MockNode() {
+        // If this fails, it means a call that was expected was not made
+        CHECK(m_expectedCalls.empty());
+    }
 
-private:
-  template<class T> T popCall() const {
-    CHECK_FALSE(m_expectedCalls.empty());
-    T expectedCall = std::get<T>(kdl::vec_pop_front(m_expectedCalls));
-    return expectedCall;
-  }
+  private:
+    template<class T> T popCall() const {
+        CHECK_FALSE(m_expectedCalls.empty());
+        T expectedCall = std::get<T>(kdl::vec_pop_front(m_expectedCalls));
+        return expectedCall;
+    }
 
-private: // implement Node interface
-  Node *doClone(const vm::bbox3 & /* worldBounds */) const override {
-    return new MockNode();
-  }
+  private: // implement Node interface
+    Node *doClone(const vm::bbox3 & /* worldBounds */) const override {
+        return new MockNode();
+    }
 
-  const std::string &doGetName() const override {
-    static const std::string name("some name");
-    return name;
-  }
+    const std::string &doGetName() const override {
+        static const std::string name("some name");
+        return name;
+    }
 
-  const vm::bbox3 &doGetLogicalBounds() const override {
-    static const vm::bbox3 bounds;
-    return bounds;
-  }
+    const vm::bbox3 &doGetLogicalBounds() const override {
+        static const vm::bbox3 bounds;
+        return bounds;
+    }
 
-  const vm::bbox3 &doGetPhysicalBounds() const override {
-    static const vm::bbox3 bounds;
-    return bounds;
-  }
+    const vm::bbox3 &doGetPhysicalBounds() const override {
+        static const vm::bbox3 bounds;
+        return bounds;
+    }
 
-  FloatType doGetProjectedArea(const vm::axis::type) const override {
-    return static_cast<FloatType>(0);
-  }
+    FloatType doGetProjectedArea(const vm::axis::type) const override {
+        return static_cast<FloatType>(0);
+    }
 
-  bool doCanAddChild(const Node *child) const override {
-    auto call = popCall<DoCanAddChild>();
-    CHECK(child == call.expectedChild);
-    return call.valueToReturn;
-  }
+    bool doCanAddChild(const Node *child) const override {
+        auto call = popCall<DoCanAddChild>();
+        CHECK(child == call.expectedChild);
+        return call.valueToReturn;
+    }
 
-  bool doCanRemoveChild(const Node *child) const override {
-    auto call = popCall<DoCanRemoveChild>();
-    CHECK(child == call.expectedChild);
-    return call.valueToReturn;
-  }
+    bool doCanRemoveChild(const Node *child) const override {
+        auto call = popCall<DoCanRemoveChild>();
+        CHECK(child == call.expectedChild);
+        return call.valueToReturn;
+    }
 
-  bool doRemoveIfEmpty() const override { return false; }
+    bool doRemoveIfEmpty() const override { return false; }
 
-  bool doShouldAddToSpacialIndex() const override { return true; }
+    bool doShouldAddToSpacialIndex() const override { return true; }
 
-  void doParentWillChange() override { popCall<DoParentWillChange>(); }
+    void doParentWillChange() override { popCall<DoParentWillChange>(); }
 
-  void doParentDidChange() override { popCall<DoParentDidChange>(); }
+    void doParentDidChange() override { popCall<DoParentDidChange>(); }
 
-  bool doSelectable() const override { return false; }
+    bool doSelectable() const override { return false; }
 
-  void doAncestorWillChange() override { popCall<DoAncestorWillChange>(); }
+    void doAncestorWillChange() override { popCall<DoAncestorWillChange>(); }
 
-  void doAncestorDidChange() override { popCall<DoAncestorDidChange>(); }
+    void doAncestorDidChange() override { popCall<DoAncestorDidChange>(); }
 
-  void doPick(const EditorContext &, const vm::ray3 & /*ray*/, PickResult & /*pickResult*/) override {
-  }
+    void doPick(const EditorContext &, const vm::ray3 & /*ray*/, PickResult & /*pickResult*/) override {
+    }
 
-  void doFindNodesContaining(const vm::vec3 & /*point*/, std::vector<Node *> & /*result*/) override {
-  }
+    void doFindNodesContaining(const vm::vec3 & /*point*/, std::vector<Node *> & /*result*/) override {
+    }
 
-  void doAccept(NodeVisitor & /*visitor*/) override {}
+    void doAccept(NodeVisitor & /*visitor*/) override {}
 
-  void doAccept(ConstNodeVisitor & /*visitor*/) const override {}
+    void doAccept(ConstNodeVisitor & /*visitor*/) const override {}
 
-  void doAcceptTagVisitor(TagVisitor & /* visitor */) override {}
+    void doAcceptTagVisitor(TagVisitor & /* visitor */) override {}
 
-  void doAcceptTagVisitor(ConstTagVisitor & /* visitor */) const override {}
+    void doAcceptTagVisitor(ConstTagVisitor & /* visitor */) const override {}
 };
-
 
 class TestNode : public Node {
-private: // implement Node interface
-  Node *doClone(const vm::bbox3 & /* worldBounds */) const override {
-    return new TestNode();
-  }
+  private: // implement Node interface
+    Node *doClone(const vm::bbox3 & /* worldBounds */) const override {
+        return new TestNode();
+    }
 
-  const std::string &doGetName() const override {
-    static const std::string name("some name");
-    return name;
-  }
+    const std::string &doGetName() const override {
+        static const std::string name("some name");
+        return name;
+    }
 
-  const vm::bbox3 &doGetLogicalBounds() const override {
-    static const vm::bbox3 bounds;
-    return bounds;
-  }
+    const vm::bbox3 &doGetLogicalBounds() const override {
+        static const vm::bbox3 bounds;
+        return bounds;
+    }
 
-  const vm::bbox3 &doGetPhysicalBounds() const override {
-    static const vm::bbox3 bounds;
-    return bounds;
-  }
+    const vm::bbox3 &doGetPhysicalBounds() const override {
+        static const vm::bbox3 bounds;
+        return bounds;
+    }
 
-  FloatType doGetProjectedArea(const vm::axis::type) const override {
-    return static_cast<FloatType>(0);
-  }
+    FloatType doGetProjectedArea(const vm::axis::type) const override {
+        return static_cast<FloatType>(0);
+    }
 
-  bool doCanAddChild(const Node * /* child */) const override { return true; }
+    bool doCanAddChild(const Node * /* child */) const override { return true; }
 
-  bool doCanRemoveChild(const Node * /* child */) const override { return true; }
+    bool doCanRemoveChild(const Node * /* child */) const override { return true; }
 
-  bool doRemoveIfEmpty() const override { return false; }
+    bool doRemoveIfEmpty() const override { return false; }
 
-  bool doShouldAddToSpacialIndex() const override { return true; }
+    bool doShouldAddToSpacialIndex() const override { return true; }
 
-  bool doSelectable() const override { return true; }
+    bool doSelectable() const override { return true; }
 
-  void doParentWillChange() override {}
+    void doParentWillChange() override {}
 
-  void doParentDidChange() override {}
+    void doParentDidChange() override {}
 
-  void doAncestorWillChange() override {}
+    void doAncestorWillChange() override {}
 
-  void doAncestorDidChange() override {}
+    void doAncestorDidChange() override {}
 
-  void doPick(const EditorContext &, const vm::ray3 & /* ray */, PickResult & /* pickResult */) override {
-  }
+    void doPick(const EditorContext &, const vm::ray3 & /* ray */, PickResult & /* pickResult */) override {
+    }
 
-  void doFindNodesContaining(const vm::vec3 & /* point */, std::vector<Node *> & /* result */) override {
-  }
+    void doFindNodesContaining(const vm::vec3 & /* point */, std::vector<Node *> & /* result */) override {
+    }
 
-  void doAccept(NodeVisitor & /* visitor */) override {}
+    void doAccept(NodeVisitor & /* visitor */) override {}
 
-  void doAccept(ConstNodeVisitor & /* visitor */) const override {}
+    void doAccept(ConstNodeVisitor & /* visitor */) const override {}
 
-  void doAcceptTagVisitor(TagVisitor & /* visitor */) override {}
+    void doAcceptTagVisitor(TagVisitor & /* visitor */) override {}
 
-  void doAcceptTagVisitor(ConstTagVisitor & /* visitor */) const override {}
+    void doAcceptTagVisitor(ConstTagVisitor & /* visitor */) const override {}
 };
-
 
 class DestroyableNode : public TestNode {
-private:
-  bool &m_destroyed;
+  private:
+    bool &m_destroyed;
 
-public:
-  explicit DestroyableNode(bool &destroyed) : m_destroyed(destroyed) {
-  }
+  public:
+    explicit DestroyableNode(bool &destroyed) : m_destroyed(destroyed) {
+    }
 
-  ~DestroyableNode() override { m_destroyed = true; }
+    ~DestroyableNode() override { m_destroyed = true; }
 };
-
 
 TEST_CASE("NodeTest.destroyChild") {
 TestNode *root = new TestNode();
@@ -547,11 +543,9 @@ CHECK(oldChildren
 size()
 
 == 2u);
-CHECK_THAT(kdl::vec_transform(oldChildren, [](const auto &c) { return c.get(); }), Catch::UnorderedEquals(
-    std::vector<Node *>{
-        child1, child2
-    }
-)
+CHECK_THAT(kdl::vec_transform(oldChildren, [](const auto &c) { return c.get(); }), Catch::UnorderedEquals(std::vector<Node *>{
+    child1, child2
+})
 );
 CHECK(child1
 ->
@@ -1016,26 +1010,20 @@ enum class Visited {
 };
 
 [[maybe_unused]] static std::ostream &operator<<(std::ostream &str, const Visited visited) {
-  switch (visited) {
-  case Visited::World:return str << "World";
-  case Visited::Layer:return str << "Layer";
-  case Visited::Group:return str << "Group";
-  case Visited::Entity:return str << "Entity";
-  case Visited::Brush:return str << "Brush";
-  case Visited::Patch:return str << "Patch";
-    switchDefault();
-  }
+    switch (visited) {
+    case Visited::World:return str << "World";
+    case Visited::Layer:return str << "Layer";
+    case Visited::Group:return str << "Group";
+    case Visited::Entity:return str << "Entity";
+    case Visited::Brush:return str << "Brush";
+    case Visited::Patch:return str << "Patch";
+        switchDefault();
+    }
 }
 
-const auto nodeTestVisitor = kdl::overload(
-    [](WorldNode *) { return Visited::World; }, [](LayerNode *) { return Visited::Layer; }, [](GroupNode *) { return Visited::Group; },
-    [](EntityNode *) { return Visited::Entity; }, [](BrushNode *) { return Visited::Brush; }, [](PatchNode *) { return Visited::Patch; }
-);
+const auto nodeTestVisitor = kdl::overload([](WorldNode *) { return Visited::World; }, [](LayerNode *) { return Visited::Layer; }, [](GroupNode *) { return Visited::Group; }, [](EntityNode *) { return Visited::Entity; }, [](BrushNode *) { return Visited::Brush; }, [](PatchNode *) { return Visited::Patch; });
 
-const auto constNodeTestVisitor = kdl::overload(
-    [](const WorldNode *) { return Visited::World; }, [](const LayerNode *) { return Visited::Layer; }, [](const GroupNode *) { return Visited::Group; },
-    [](const EntityNode *) { return Visited::Entity; }, [](const BrushNode *) { return Visited::Brush; }, [](const PatchNode *) { return Visited::Patch; }
-);
+const auto constNodeTestVisitor = kdl::overload([](const WorldNode *) { return Visited::World; }, [](const LayerNode *) { return Visited::Layer; }, [](const GroupNode *) { return Visited::Group; }, [](const EntityNode *) { return Visited::Entity; }, [](const BrushNode *) { return Visited::Brush; }, [](const PatchNode *) { return Visited::Patch; });
 
 TEST_CASE("NodeTest.accept")
 {
@@ -1048,13 +1036,9 @@ EntityNode entity{{}};
 BrushNode brush(BrushBuilder(world.mapFormat(), worldBounds).createCube(32.0, "texture").value());
 
 // clang-format off
-PatchNode patch(
-    BezierPatch(
-        3, 3, {
-            BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{},
-            BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{},
-        }, "texture"
-    ));
+PatchNode patch(BezierPatch(3, 3, {
+    BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{}, BezierPatch::Point{},
+}, "texture"));
 // clang-format on
 
 SECTION("Non const nodes accept non const visitor")
@@ -1171,31 +1155,26 @@ groupNode->
 addChild(groupEntityNode);
 
 const auto collectRecursively = [](auto &node) {
-  auto result = std::vector<Node *>{};
-  node.accept(
-      kdl::overload(
-          [&](auto &&thisLambda, WorldNode *w) {
-            result.push_back(w);
-            w->visitChildren(thisLambda);
-          }, [&](auto &&thisLambda, LayerNode *l) {
-            result.push_back(l);
-            l->visitChildren(thisLambda);
-          }, [&](auto &&thisLambda, GroupNode *g) {
-            result.push_back(g);
-            g->visitChildren(thisLambda);
-          }, [&](auto &&thisLambda, EntityNode *e) {
-            result.push_back(e);
-            e->visitChildren(thisLambda);
-          }, [&](BrushNode *b) { result.push_back(b); }, [&](PatchNode *p) { result.push_back(p); }
-      ));
-  return result;
+    auto result = std::vector<Node *>{};
+    node.accept(kdl::overload([&](auto &&thisLambda, WorldNode *w) {
+        result.push_back(w);
+        w->visitChildren(thisLambda);
+    }, [&](auto &&thisLambda, LayerNode *l) {
+        result.push_back(l);
+        l->visitChildren(thisLambda);
+    }, [&](auto &&thisLambda, GroupNode *g) {
+        result.push_back(g);
+        g->visitChildren(thisLambda);
+    }, [&](auto &&thisLambda, EntityNode *e) {
+        result.push_back(e);
+        e->visitChildren(thisLambda);
+    }, [&](BrushNode *b) { result.push_back(b); }, [&](PatchNode *p) { result.push_back(p); }));
+    return result;
 };
 
-CHECK_THAT(collectRecursively(world), Catch::Equals(
-    std::vector<Node *>{
-        &world, layer, entityNode1, entityNode2, groupNode, groupEntityNode
-    }
-)
+CHECK_THAT(collectRecursively(world), Catch::Equals(std::vector<Node *>{
+    &world, layer, entityNode1, entityNode2, groupNode, groupEntityNode
+})
 );
 CHECK_THAT(collectRecursively(*groupNode), Catch::Equals(std::vector<Node *>{groupNode, groupEntityNode})
 );
@@ -1237,11 +1216,7 @@ visitParent(constNodeTestVisitor)
 }
 
 static auto makeCollectVisitedNodesVisitor(std::vector<Node *> &visited) {
-  return kdl::overload(
-      [&](WorldNode *world) { visited.push_back(world); }, [&](LayerNode *layer) { visited.push_back(layer); },
-      [&](GroupNode *group) { visited.push_back(group); }, [&](EntityNode *entity) { visited.push_back(entity); },
-      [&](BrushNode *brush) { visited.push_back(brush); }, [&](PatchNode *patch) { visited.push_back(patch); }
-  );
+    return kdl::overload([&](WorldNode *world) { visited.push_back(world); }, [&](LayerNode *layer) { visited.push_back(layer); }, [&](GroupNode *group) { visited.push_back(group); }, [&](EntityNode *entity) { visited.push_back(entity); }, [&](BrushNode *brush) { visited.push_back(brush); }, [&](PatchNode *patch) { visited.push_back(patch); });
 }
 
 TEST_CASE("NodeTest.visitAll")
@@ -1410,21 +1385,20 @@ resolvePath(NodePath{{}}
 TEST_CASE("NodeTest.entityPropertyConfig")
 {
 class RootNode : public TestNode {
-private:
-  EntityPropertyConfig m_entityPropertyConfig;
+  private:
+    EntityPropertyConfig m_entityPropertyConfig;
 
-public:
-  explicit RootNode(EntityPropertyConfig entityPropertyConfig) : m_entityPropertyConfig{
-      std::move(entityPropertyConfig)
-  } {
-  }
+  public:
+    explicit RootNode(EntityPropertyConfig entityPropertyConfig) : m_entityPropertyConfig{
+        std::move(entityPropertyConfig)
+    } {
+    }
 
-private:
-  const EntityPropertyConfig &doGetEntityPropertyConfig() const override {
-    return m_entityPropertyConfig;
-  }
+  private:
+    const EntityPropertyConfig &doGetEntityPropertyConfig() const override {
+        return m_entityPropertyConfig;
+    }
 };
-
 
 const auto config = EntityPropertyConfig{{{EL::LiteralExpression{EL::Value{2.0}}, 0, 0}}};
 auto root = std::make_unique<RootNode>(config);

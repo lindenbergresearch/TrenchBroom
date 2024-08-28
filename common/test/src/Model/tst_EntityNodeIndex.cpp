@@ -31,11 +31,11 @@
 namespace TrenchBroom {
 namespace Model {
 static std::vector<EntityNodeBase *> findExactExact(const EntityNodeIndex &index, const std::string &name, const std::string &value) {
-  return index.findEntityNodes(EntityNodeIndexQuery::exact(name), value);
+    return index.findEntityNodes(EntityNodeIndexQuery::exact(name), value);
 }
 
 static std::vector<EntityNodeBase *> findNumberedExact(const EntityNodeIndex &index, const std::string &name, const std::string &value) {
-  return index.findEntityNodes(EntityNodeIndexQuery::numbered(name), value);
+    return index.findEntityNodes(EntityNodeIndexQuery::numbered(name), value);
 }
 
 TEST_CASE("EntityNodeIndexTest.addEntityNode") {
@@ -43,9 +43,7 @@ EntityNodeIndex index;
 
 EntityNode *entity1 = new EntityNode({}, {{"test", "somevalue"}});
 
-EntityNode *entity2 = new EntityNode(
-    {}, {{"test", "somevalue"}, {"other", "someothervalue"}}
-);
+EntityNode *entity2 = new EntityNode({}, {{"test", "somevalue"}, {"other", "someothervalue"}});
 
 index.
 addEntityNode(entity1);
@@ -92,9 +90,7 @@ EntityNodeIndex index;
 
 EntityNode *entity1 = new EntityNode({}, {{"test", "somevalue"}});
 
-EntityNode *entity2 = new EntityNode(
-    {}, {{"test", "somevalue"}, {"other", "someothervalue"}}
-);
+EntityNode *entity2 = new EntityNode({}, {{"test", "somevalue"}, {"other", "someothervalue"}});
 
 index.
 addEntityNode(entity1);
@@ -138,10 +134,8 @@ index.
 addEntityNode(entity2);
 
 entity2->
-setEntity(Entity(
-    {}, {{"test", "somevalue"}, {"other", "someothervalue"},
-    }
-)
+setEntity(Entity({}, {{"test", "somevalue"}, {"other", "someothervalue"},
+})
 );
 index.
 addProperty(entity2,
@@ -188,9 +182,7 @@ EntityNodeIndex index;
 
 EntityNode *entity1 = new EntityNode({}, {{"test", "somevalue"}});
 
-EntityNode *entity2 = new EntityNode(
-    {}, {{"test", "somevalue"}, {"other", "someothervalue"}}
-);
+EntityNode *entity2 = new EntityNode({}, {{"test", "somevalue"}, {"other", "someothervalue"}});
 
 index.
 addEntityNode(entity1);
@@ -230,9 +222,7 @@ TEST_CASE("EntityNodeIndexTest.addNumberedEntityProperty")
 {
 EntityNodeIndex index;
 
-EntityNode *entity1 = new EntityNode(
-    {}, {{"test1", "somevalue"}, {"test2", "somevalue"}}
-);
+EntityNode *entity1 = new EntityNode({}, {{"test1", "somevalue"}, {"test2", "somevalue"}});
 
 index.
 addEntityNode(entity1);
@@ -291,9 +281,7 @@ EntityNodeIndex index;
 
 EntityNode *entity1 = new EntityNode({}, {{"test", "somevalue"}});
 
-EntityNode *entity2 = new EntityNode(
-    {}, {{"test", "somevalue"}, {"other", "someothervalue"}}
-);
+EntityNode *entity2 = new EntityNode({}, {{"test", "somevalue"}, {"other", "someothervalue"}});
 
 index.
 addEntityNode(entity1);
@@ -314,9 +302,7 @@ EntityNodeIndex index;
 
 EntityNode *entity1 = new EntityNode({}, {{"test", "somevalue"}});
 
-EntityNode *entity2 = new EntityNode(
-    {}, {{"test", "somevalue2"}, {"other", "someothervalue"}}
-);
+EntityNode *entity2 = new EntityNode({}, {{"test", "somevalue2"}, {"other", "someothervalue"}});
 
 index.
 addEntityNode(entity1);

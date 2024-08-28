@@ -52,7 +52,7 @@ loadFrame(path,
 
 Assets::EntityModelFrame *frame = model->frames().at(0);
 
-const auto box = vm::bbox3f(vm::vec3f::fill(- 32), vm::vec3f::fill(32));
+const auto box = vm::bbox3f(vm::vec3f::fill(-32), vm::vec3f::fill(32));
 CHECK(box
 == frame->
 
@@ -62,13 +62,13 @@ bounds()
 
 // test some hitting rays
 for (
-int x = - 45;
+int x = -45;
 x <= 45; x += 15) {
 for (
-int y = - 45;
+int y = -45;
 y <= 45; y += 15) {
 for (
-int z = - 45;
+int z = -45;
 z <= 45; z += 15) {
 // shoot a ray from (x, y, z) to (0, 0, 0), it will hit the box
 const auto startPoint = vm::vec3f(x, y, z);
@@ -91,7 +91,7 @@ Approx(treeDist)
 }}
 
 // test a missing ray
-const auto missRay = vm::ray3f(vm::vec3f(0, - 33, - 33), vm::vec3f::pos_y());
+const auto missRay = vm::ray3f(vm::vec3f(0, -33, -33), vm::vec3f::pos_y());
 CHECK(vm::is_nan(frame->intersect(missRay))
 );
 
@@ -101,17 +101,17 @@ CHECK (vm::is_nan(vm::intersect_ray_bbox(missRay, box))
 }
 
 static Texture makeDummyTexture(const std::string &name) {
-  return Texture{name, 1, 1, Color::zero(), TextureBuffer{4}, GL_RGBA, TextureType::Opaque};
+    return Texture{name, 1, 1, Color::zero(), TextureBuffer{4}, GL_RGBA, TextureType::Opaque};
 }
 
 static Renderer::IndexRangeMapBuilder <EntityModelVertex::Type> makeDummyBuilder() {
-  auto size = Renderer::IndexRangeMap::Size{};
-  size.inc(Renderer::PrimType::Triangles, 1);
+    auto size = Renderer::IndexRangeMap::Size{};
+    size.inc(Renderer::PrimType::Triangles, 1);
 
-  auto builder = Renderer::IndexRangeMapBuilder < EntityModelVertex::Type > {3, size};
-  builder.addTriangle(EntityModelVertex{}, EntityModelVertex{}, EntityModelVertex{});
+    auto builder = Renderer::IndexRangeMapBuilder < EntityModelVertex::Type > {3, size};
+    builder.addTriangle(EntityModelVertex{}, EntityModelVertex{}, EntityModelVertex{});
 
-  return builder;
+    return builder;
 }
 
 TEST_CASE("EntityModelTest.buildRenderer.defaultSkinIndex")

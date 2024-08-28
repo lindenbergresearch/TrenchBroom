@@ -23,7 +23,7 @@
 
 namespace TrenchBroom {
 class TestPreferenceManager : public PreferenceManager {
-public:
+  public:
     TestPreferenceManager() = default;
 
     void initialize() override;
@@ -34,7 +34,7 @@ public:
 
     void discardChanges() override;
 
-private:
+  private:
     void validatePreference(PreferenceBase &) override;
 
     void savePreference(PreferenceBase &) override;

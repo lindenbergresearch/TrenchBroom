@@ -5,31 +5,27 @@
 
 #include <string>
 
-
 class QTextEdit;
 class QString;
 class QWidget;
 
-namespace TrenchBroom
-{
-namespace View
-{
-class TextConsoleTabPage : public TabBookPage
-{
-private:
-  QTextEdit* m_consoleWidget;
-  QString caption;
+namespace TrenchBroom {
+namespace View {
+class TextConsoleTabPage : public TabBookPage {
+  private:
+    QTextEdit *m_consoleWidget;
+    QString caption;
 
-public:
-  TextConsoleTabPage(QWidget* parent = nullptr);
+  public:
+    TextConsoleTabPage(QWidget *parent = nullptr);
 
-  const QString& getCaption() const;
-  void setCaption(const QString& Caption);
+    const QString &getCaption() const;
+    void setCaption(const QString &Caption);
 
-  QTextEdit* getConsoleWidget() const;
-  void setConsoleWidget(QTextEdit* MConsoleWidget);
+    QTextEdit *getConsoleWidget() const;
+    void setConsoleWidget(QTextEdit *MConsoleWidget);
 
-private:
+  private:
 };
 } // namespace View
 } // namespace TrenchBroom

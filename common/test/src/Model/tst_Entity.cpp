@@ -82,8 +82,7 @@ SECTION("Updates cached model transformation") {
 auto config = EntityPropertyConfig{{{EL::LiteralExpression{EL::Value{2.0}}, 0, 0}}};
 auto definition = Assets::PointEntityDefinition{
     "some_name", Color{}, vm::bbox3{32.0}, "", {}, Assets::ModelDefinition{{
-                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0,
-                                                                               0
+                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0, 0
                                                                            }}};
 
 auto entity = Entity{};
@@ -122,21 +121,13 @@ const auto propertyConfig = EntityPropertyConfig{};
 
 auto definition = Assets::PointEntityDefinition{
     "some_name", Color{}, vm::bbox3{32.0}, "", {
-        std::make_shared<Assets::StringPropertyDefinition>("some_prop", "", "", ! true(readOnly)),
-        std::make_shared<Assets::StringPropertyDefinition>("some_default_prop", "", "", ! true(readOnly), "value"),
+        std::make_shared<Assets::StringPropertyDefinition>("some_prop", "", "", !true(readOnly)), std::make_shared<Assets::StringPropertyDefinition>("some_default_prop", "", "", !true(readOnly), "value"),
     }, {}};
 
 using T = std::tuple<std::vector<EntityProperty>, SetDefaultPropertyMode, std::vector<EntityProperty>>;
 
-const auto [initialProperties, mode, expectedProperties] = GENERATE(
-    values<T>(
-        {{{}, SetDefaultPropertyMode::SetExisting, std::vector<EntityProperty>{}}, {{}, SetDefaultPropertyMode::SetMissing, {{"some_default_prop", "value"}}},
-         {{}, SetDefaultPropertyMode::SetAll, {{"some_default_prop", "value"}}},
-         {{{"some_default_prop", "other_value"}}, SetDefaultPropertyMode::SetExisting, {{"some_default_prop", "value"}}},
-         {{{"some_default_prop", "other_value"}}, SetDefaultPropertyMode::SetMissing, {{"some_default_prop", "other_value"}}},
-         {{{"some_default_prop", "other_value"}}, SetDefaultPropertyMode::SetAll, {{"some_default_prop", "value"}}},
-        }
-    ));
+const auto [initialProperties, mode, expectedProperties] = GENERATE(values<T>({{{}, SetDefaultPropertyMode::SetExisting, std::vector<EntityProperty>{}}, {{}, SetDefaultPropertyMode::SetMissing, {{"some_default_prop", "value"}}}, {{}, SetDefaultPropertyMode::SetAll, {{"some_default_prop", "value"}}}, {{{"some_default_prop", "other_value"}}, SetDefaultPropertyMode::SetExisting, {{"some_default_prop", "value"}}}, {{{"some_default_prop", "other_value"}}, SetDefaultPropertyMode::SetMissing, {{"some_default_prop", "other_value"}}}, {{{"some_default_prop", "other_value"}}, SetDefaultPropertyMode::SetAll, {{"some_default_prop", "value"}}},
+                                                                              }));
 
 auto entity = Entity{propertyConfig, initialProperties};
 setDefaultProperties(propertyConfig, definition, entity, mode
@@ -212,13 +203,11 @@ vm::scaling_matrix(vm::vec3{2, 2, 2}
 
 TEST_CASE("EntityTest.modelSpecification")
 {
-auto modelExpression = IO::ELParser::parseStrict(
-    R"({{
+auto modelExpression = IO::ELParser::parseStrict(R"({{
       spawnflags == 0 -> "maps/b_shell0.bsp",
       spawnflags == 1 -> "maps/b_shell1.bsp",
                          "maps/b_shell2.bsp"
-  }})"
-);
+  }})");
 
 auto definition = Assets::PointEntityDefinition{
     "some_name", Color(), vm::bbox3(32.0), "", {}, Assets::ModelDefinition{modelExpression}};
@@ -359,8 +348,7 @@ TEST_CASE("EntityTest.renameProperty")
 // needs to be created here so that it is destroyed last
 auto definition = Assets::PointEntityDefinition{
     "some_name", Color{}, vm::bbox3{32.0}, "", {}, Assets::ModelDefinition{{
-                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0,
-                                                                               0
+                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0, 0
                                                                            }}};
 
 Entity entity;
@@ -463,8 +451,7 @@ TEST_CASE("EntityTest.removeProperty")
 // needs to be created here so that it is destroyed last
 auto definition = Assets::PointEntityDefinition{
     "some_name", Color{}, vm::bbox3{32.0}, "", {}, Assets::ModelDefinition{{
-                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0,
-                                                                               0
+                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0, 0
                                                                            }}};
 
 Entity entity;
@@ -814,8 +801,7 @@ TEST_CASE("EntityTest.setOrigin")
 // needs to be created here so that it is destroyed last
 auto definition = Assets::PointEntityDefinition{
     "some_name", Color{}, vm::bbox3{32.0}, "", {}, Assets::ModelDefinition{{
-                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0,
-                                                                               0
+                                                                               EL::MapExpression{{{"scale", {EL::VariableExpression{"modelscale"}, 0, 0}}}}, 0, 0
                                                                            }}};
 
 Entity entity;

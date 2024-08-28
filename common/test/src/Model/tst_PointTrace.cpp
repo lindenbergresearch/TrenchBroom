@@ -184,42 +184,39 @@ TEST_CASE("loadPointFile")
 {
 using T = std::tuple<std::string, Result < PointTrace>>;
 // clang-format off
-const auto [file, expectedTrace] = GENERATE(
-    values<T>(
-        {{
-             R"()", Error{
-                "PointFile must contain at least two points"
-            }}, {
-             R"(asdf)", Error{
-                "PointFile must contain at least two points"
-            }}, {
-             R"(1)", Error{
-                "PointFile must contain at least two points"
-            }}, {
-             R"(1 2)", Error{
-                "PointFile must contain at least two points"
-            }}, {
-             R"(1 2 3)", Error{
-                "PointFile must contain at least two points"
-            }}, {
-             R"(
+const auto [file, expectedTrace] = GENERATE(values<T>({{
+                                                           R"()", Error{
+        "PointFile must contain at least two points"
+    }}, {
+                                                           R"(asdf)", Error{
+        "PointFile must contain at least two points"
+    }}, {
+                                                           R"(1)", Error{
+        "PointFile must contain at least two points"
+    }}, {
+                                                           R"(1 2)", Error{
+        "PointFile must contain at least two points"
+    }}, {
+                                                           R"(1 2 3)", Error{
+        "PointFile must contain at least two points"
+    }}, {
+                                                           R"(
     1 2 3
     4 5 6
   )", PointTrace{{{1, 2, 3}, {4, 5, 6},}}}, {
-             R"(
+                                                           R"(
     0 0 1
     0 0 1
     4 5 6
     4 5 6
   )", PointTrace{{{0, 0, 1}, {4, 5, 6},}}}, {
-             R"(
+                                                           R"(
     0 0 1
     0 0 2
     0 0 3
     4 5 6
   )", PointTrace{{{0, 0, 1}, {0, 0, 3}, {4, 5, 6},}}},
-        }
-    ));
+                                                      }));
 // clang-format on
 
 auto stream = std::istringstream{file};

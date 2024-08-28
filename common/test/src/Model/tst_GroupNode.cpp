@@ -1034,7 +1034,7 @@ REQUIRE(groupNodeClone
 children()
 
 .front()->logicalBounds() ==
-vm::bbox3(vm::vec3(8192.0 - 16.0, - 8.0, - 8.0), vm::vec3(8192.0, 8.0, 8.0)
+vm::bbox3(vm::vec3(8192.0 - 16.0, -8.0, -8.0), vm::vec3(8192.0, 8.0, 8.0)
 ));
 
 transformNode(*entityNode, vm::translation_matrix(vm::vec3(1.0, 0.0, 0.0)), worldBounds
@@ -1071,9 +1071,9 @@ CHECK(e
 }
 
 static void setGroupName(GroupNode &groupNode, const std::string &name) {
-  auto group = groupNode.group();
-  group.setName(name);
-  groupNode.setGroup(std::move(group));
+    auto group = groupNode.group();
+    group.setName(name);
+    groupNode.setGroup(std::move(group));
 }
 
 TEST_CASE("GroupNodeTest.updateLinkedGroupsAndPreserveNestedGroupNames")
@@ -1179,46 +1179,43 @@ properties(), Catch::Equals(sourceEntityNode->entity().properties())
 using T = std::tuple<std::vector<std::string>, std::vector<std::string>, std::vector<EntityProperty>, std::vector<EntityProperty>, std::vector<EntityProperty>>;
 
 // clang-format off
-const auto [srcProtProperties, trgtProtProperties, sourceProperties, targetProperties, expectedProperties] = GENERATE(
-    values<T>(
-        {
-            // properties remain unchanged
-            {{}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+const auto [srcProtProperties, trgtProtProperties, sourceProperties, targetProperties, expectedProperties] = GENERATE(values<T>({
+                                                                                                                                    // properties remain unchanged
+                                                                                                                                    {{}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            // property was added to source
-            {{}, {}, {{"some_key", "some_value"}}, {}, {{"some_key", "some_value"}}},
+                                                                                                                                    // property was added to source
+                                                                                                                                    {{}, {}, {{"some_key", "some_value"}}, {}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
+                                                                                                                                    {{}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
 
-            {{"some_key"}, {}, {{"some_key", "some_value"}}, {}, {}},
+                                                                                                                                    {{"some_key"}, {}, {{"some_key", "some_value"}}, {}, {}},
 
-            {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
+                                                                                                                                    {{"some_key"}, {"some_key"}, {{"some_key", "some_value"}}, {}, {}},
 
-            // property was changed in source
-            {{}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "other_value"}}},
+                                                                                                                                    // property was changed in source
+                                                                                                                                    {{}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "other_value"}}},
 
-            {{"some_key"}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {"some_key"}, {{"some_key", "other_value"}}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            // property was removed in source
-            {{}, {}, {}, {{"some_key", "some_value"}}, {}},
+                                                                                                                                    // property was removed in source
+                                                                                                                                    {{}, {}, {}, {{"some_key", "some_value"}}, {}},
 
-            {{"some_key"}, {}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{"some_key"}, {}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                    {{}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
 
-            {{"some_key"}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
-        }
-    ));
+                                                                                                                                    {{"some_key"}, {"some_key"}, {}, {{"some_key", "some_value"}}, {{"some_key", "some_value"}}},
+                                                                                                                                }));
 // clang-format on
 
 CAPTURE(srcProtProperties, trgtProtProperties, sourceProperties, targetProperties, expectedProperties

@@ -23,95 +23,84 @@
 
 #include <memory>
 
-
 class QAbstractButton;
-
 
 class QLineEdit;
 
-
 class QStackedWidget;
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 struct CompilationProfile;
 } // namespace Model
 
-namespace View
-{
+namespace View {
 class CompilationTaskListBox;
-
 
 class MapDocument;
 
-
 class MultiCompletionLineEdit;
-
 
 /**
  * Editor UI for a single compilation profile.
  */
-class CompilationProfileEditor : public QWidget
-{
+class CompilationProfileEditor : public QWidget {
   Q_OBJECT
-private:
-  std::weak_ptr<MapDocument> m_document;
-  Model::CompilationProfile* m_profile{nullptr};
-  QStackedWidget* m_stackedWidget{nullptr};
-  QLineEdit* m_nameTxt{nullptr};
-  MultiCompletionLineEdit* m_workDirTxt{nullptr};
-  CompilationTaskListBox* m_taskList{nullptr};
-  QAbstractButton* m_addTaskButton{nullptr};
-  QAbstractButton* m_removeTaskButton{nullptr};
-  QAbstractButton* m_moveTaskUpButton{nullptr};
-  QAbstractButton* m_moveTaskDownButton{nullptr};
+  private:
+    std::weak_ptr<MapDocument> m_document;
+    Model::CompilationProfile *m_profile{nullptr};
+    QStackedWidget *m_stackedWidget{nullptr};
+    QLineEdit *m_nameTxt{nullptr};
+    MultiCompletionLineEdit *m_workDirTxt{nullptr};
+    CompilationTaskListBox *m_taskList{nullptr};
+    QAbstractButton *m_addTaskButton{nullptr};
+    QAbstractButton *m_removeTaskButton{nullptr};
+    QAbstractButton *m_moveTaskUpButton{nullptr};
+    QAbstractButton *m_moveTaskDownButton{nullptr};
 
-public:
-  explicit CompilationProfileEditor(
-    std::weak_ptr<MapDocument> document, QWidget* parent = nullptr);
+  public:
+    explicit CompilationProfileEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-private:
-  QWidget* createEditorPage(QWidget* parent);
+  private:
+    QWidget *createEditorPage(QWidget *parent);
 
-private slots:
+  private slots:
 
-  void nameChanged(const QString& text);
+    void nameChanged(const QString &text);
 
-  void workDirChanged(const QString& text);
+    void workDirChanged(const QString &text);
 
-  void addTask();
+    void addTask();
 
-  void removeTask();
+    void removeTask();
 
-  void removeTask(int index);
+    void removeTask(int index);
 
-  void duplicateTask(int index);
+    void duplicateTask(int index);
 
-  void moveTaskUp();
+    void moveTaskUp();
 
-  void moveTaskUp(int index);
+    void moveTaskUp(int index);
 
-  void moveTaskDown();
+    void moveTaskDown();
 
-  void moveTaskDown(int index);
+    void moveTaskDown(int index);
 
-  void taskSelectionChanged();
+    void taskSelectionChanged();
 
-public:
-  void setProfile(Model::CompilationProfile* profile);
+  public:
+    void setProfile(Model::CompilationProfile *profile);
 
-private:
-  void refresh();
+  private:
+    void refresh();
 
-signals:
+  signals:
 
-  /**
-   * Emitted when the profile name/working directory change, or tasks are
-   * added/removed/reordered.
-   */
-  void profileChanged();
+    /**
+     * Emitted when the profile name/working directory change, or tasks are
+     * added/removed/reordered.
+     */
+    void profileChanged();
 };
 } // namespace View
 } // namespace TrenchBroom

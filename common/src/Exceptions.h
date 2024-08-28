@@ -22,97 +22,75 @@
 #include <exception>
 #include <string>
 
-namespace TrenchBroom
-{
-class Exception : public std::exception
-{
-protected:
-  std::string m_msg;
+namespace TrenchBroom {
+class Exception : public std::exception {
+  protected:
+    std::string m_msg;
 
-public:
-  Exception() noexcept;
+  public:
+    Exception() noexcept;
 
-  explicit Exception(std::string str) noexcept;
+    explicit Exception(std::string str) noexcept;
 
-  const char* what() const noexcept override;
+    const char *what() const noexcept override;
 };
 
-
-class BrushFaceReferenceException : public Exception
-{
-public:
-  using Exception::Exception;
+class BrushFaceReferenceException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class EntityAttributeException : public Exception
-{
-public:
-  using Exception::Exception;
+class EntityAttributeException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
+class ParserException : public Exception {
+  public:
+    using Exception::Exception;
 
-class ParserException : public Exception
-{
-public:
-  using Exception::Exception;
+    ParserException(size_t line, size_t column, const std::string &str = "");
 
-  ParserException(size_t line, size_t column, const std::string& str = "");
+    explicit ParserException(size_t line, const std::string &str = "");
 
-  explicit ParserException(size_t line, const std::string& str = "");
+  private:
+    static std::string buildMessage(size_t line, size_t column, const std::string &str);
 
-private:
-  static std::string buildMessage(size_t line, size_t column, const std::string& str);
-
-  static std::string buildMessage(size_t line, const std::string& str);
+    static std::string buildMessage(size_t line, const std::string &str);
 };
 
-
-class VboException : public Exception
-{
-public:
-  using Exception::Exception;
+class VboException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class AssetException : public Exception
-{
-public:
-  using Exception::Exception;
+class AssetException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class CommandProcessorException : public Exception
-{
-public:
-  using Exception::Exception;
+class CommandProcessorException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class RenderException : public Exception
-{
-public:
-  using Exception::Exception;
+class RenderException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class NodeTreeException : public Exception
-{
-public:
-  using Exception::Exception;
+class NodeTreeException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class GameException : public Exception
-{
-public:
-  using Exception::Exception;
+class GameException : public Exception {
+  public:
+    using Exception::Exception;
 };
 
-
-class FileFormatException : public Exception
-{
-public:
-  using Exception::Exception;
+class FileFormatException : public Exception {
+  public:
+    using Exception::Exception;
 };
 } // namespace TrenchBroom

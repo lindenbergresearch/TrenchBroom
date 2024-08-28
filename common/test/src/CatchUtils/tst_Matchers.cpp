@@ -34,7 +34,7 @@ UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01}},
 0.02));
 CHECK_THAT((V{{0, 0, 0}, {1, 1, 1}}
 ),
-UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01}, {- 0.01, - 0.01, - 0.01}},
+UnorderedApproxVecMatches(V{{1.01, 1.01, 1.01}, {-0.01, -0.01, -0.01}},
 0.02));
 
 CHECK_THAT((V{{1, 1, 1}}

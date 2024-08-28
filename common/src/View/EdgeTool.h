@@ -28,57 +28,47 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom
-{
-namespace Model
-{
+namespace TrenchBroom {
+namespace Model {
 class BrushNode;
-
 
 class PickResult;
 } // namespace Model
 
-namespace Renderer
-{
+namespace Renderer {
 class Camera;
 }
 
-namespace View
-{
-class EdgeTool : public VertexToolBase<vm::segment3>
-{
-private:
-  std::unique_ptr<EdgeHandleManager> m_edgeHandles;
+namespace View {
+class EdgeTool : public VertexToolBase<vm::segment3> {
+  private:
+    std::unique_ptr<EdgeHandleManager> m_edgeHandles;
 
-public:
-  EdgeTool(std::weak_ptr<MapDocument> document);
+  public:
+    EdgeTool(std::weak_ptr<MapDocument> document);
 
-public:
-  std::vector<Model::BrushNode*> findIncidentBrushes(const vm::segment3& handle) const;
+  public:
+    std::vector<Model::BrushNode *> findIncidentBrushes(const vm::segment3 &handle) const;
 
-private:
-  using VertexToolBase::findIncidentBrushes;
+  private:
+    using VertexToolBase::findIncidentBrushes;
 
-public:
-  void pick(
-    const vm::ray3& pickRay,
-    const Renderer::Camera& camera,
-    Model::PickResult& pickResult) const override;
+  public:
+    void pick(const vm::ray3 &pickRay, const Renderer::Camera &camera, Model::PickResult &pickResult) const override;
 
-public:
-  EdgeHandleManager& handleManager() override;
+  public:
+    EdgeHandleManager &handleManager() override;
 
-  const EdgeHandleManager& handleManager() const override;
+    const EdgeHandleManager &handleManager() const override;
 
-public:
-  std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(
-    const std::vector<Model::Hit>& hits) const override;
+  public:
+    std::tuple<vm::vec3, vm::vec3> handlePositionAndHitPoint(const std::vector<Model::Hit> &hits) const override;
 
-  MoveResult move(const vm::vec3& delta) override;
+    MoveResult move(const vm::vec3 &delta) override;
 
-  std::string actionName() const override;
+    std::string actionName() const override;
 
-  void removeSelection();
+    void removeSelection();
 };
 } // namespace View
 } // namespace TrenchBroom

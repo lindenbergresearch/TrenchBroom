@@ -22,95 +22,82 @@
 #include <sstream>
 #include <string>
 
-
 class QString;
 
-namespace TrenchBroom
-{
-enum class LogLevel
-{
-  Debug,
-  Info,
-  Warn,
-  Error
+namespace TrenchBroom {
+enum class LogLevel {
+  Debug, Info, Warn, Error
 };
 
+class Logger {
+  public:
+    class stream {
+      private:
+        Logger *m_logger;
+        LogLevel m_logLevel;
+        std::stringstream m_buf;
 
-class Logger
-{
-public:
-  class stream
-  {
+      public:
+        stream(Logger *logger, LogLevel logLevel);
+
+        ~stream();
+
+      public:
+        template<typename T> stream &operator<<(T &&arg) {
+            m_buf << std::forward<T>(arg);
+            return *this;
+        }
+    };
+
+  public:
+    virtual ~Logger();
+
+    stream debug();
+
+    void debug(const char *message);
+
+    void debug(const std::string &message);
+
+    void debug(const QString &message);
+
+    stream info();
+
+    void info(const char *message);
+
+    void info(const std::string &message);
+
+    void info(const QString &message);
+
+    stream warn();
+
+    void warn(const char *message);
+
+    void warn(const std::string &message);
+
+    void warn(const QString &message);
+
+    stream error();
+
+    void error(const char *message);
+
+    void error(const std::string &message);
+
+    void error(const QString &message);
+
+    void log(LogLevel level, const std::string &message);
+
+    void log(LogLevel level, const QString &message);
+
   private:
-    Logger* m_logger;
-    LogLevel m_logLevel;
-    std::stringstream m_buf;
+    virtual void doLog(LogLevel level, const std::string &message) = 0;
 
-  public:
-    stream(Logger* logger, LogLevel logLevel);
-
-    ~stream();
-
-  public:
-    template <typename T>
-    stream& operator<<(T&& arg)
-    {
-      m_buf << std::forward<T>(arg);
-      return *this;
-    }
-  };
-
-public:
-  virtual ~Logger();
-
-  stream debug();
-
-  void debug(const char* message);
-
-  void debug(const std::string& message);
-
-  void debug(const QString& message);
-
-  stream info();
-
-  void info(const char* message);
-
-  void info(const std::string& message);
-
-  void info(const QString& message);
-
-  stream warn();
-
-  void warn(const char* message);
-
-  void warn(const std::string& message);
-
-  void warn(const QString& message);
-
-  stream error();
-
-  void error(const char* message);
-
-  void error(const std::string& message);
-
-  void error(const QString& message);
-
-  void log(LogLevel level, const std::string& message);
-
-  void log(LogLevel level, const QString& message);
-
-private:
-  virtual void doLog(LogLevel level, const std::string& message) = 0;
-
-  virtual void doLog(LogLevel level, const QString& message) = 0;
+    virtual void doLog(LogLevel level, const QString &message) = 0;
 };
 
+class NullLogger : public Logger {
+  private:
+    void doLog(LogLevel level, const std::string &message) override;
 
-class NullLogger : public Logger
-{
-private:
-  void doLog(LogLevel level, const std::string& message) override;
-
-  void doLog(LogLevel level, const QString& message) override;
+    void doLog(LogLevel level, const QString &message) override;
 };
 } // namespace TrenchBroom
