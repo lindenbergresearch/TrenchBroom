@@ -33,10 +33,10 @@ namespace View {
 ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const QString &subtitle, const QPixmap &image, QWidget *parent)
     : ControlListBoxItemRenderer(parent), m_titleLabel(nullptr), m_subtitleLabel(nullptr), m_imageLabel(nullptr) {
     m_titleLabel = new ElidedLabel(title, Qt::ElideMiddle);
-    makeEmphasized(m_titleLabel);
-    m_titleLabel->setStyleSheet("color: palette(BrightText);");
+    m_titleLabel->setObjectName("ImageListBoxItemRenderer_m_titleLabel");
 
     m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
+    m_subtitleLabel->setObjectName("ImageListBoxItemRenderer_m_subtitleLabel");
     makeSubTitle(m_subtitleLabel);
 
     auto *imageAndTextLayout = new QHBoxLayout();
