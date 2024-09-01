@@ -22,13 +22,14 @@
 #include <QWidget>
 
 class QLabel;
-
 class QListWidget;
-
 class QListWidgetItem;
 
 namespace TrenchBroom {
 namespace View {
+
+/* ------------------------------------------------------------------------------------------- */
+
 class ControlListBoxItemRenderer : public QWidget {
   Q_OBJECT
   protected:
@@ -54,6 +55,8 @@ class ControlListBoxItemRenderer : public QWidget {
     void doubleClicked(size_t index);
 };
 
+/* ------------------------------------------------------------------------------------------- */
+
 /**
  * Wraps a renderer and adds a separator line at the bottom.
  */
@@ -69,6 +72,8 @@ class ControlListBoxItemRendererWrapper : public QWidget {
 
     const ControlListBoxItemRenderer *renderer() const;
 };
+
+/* ------------------------------------------------------------------------------------------- */
 
 class ControlListBox : public QWidget {
   Q_OBJECT
