@@ -58,27 +58,30 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const Q
 }
 
 void ImageListBoxItemRenderer::updateItem() {
-    QObject *element = this->parent();
+    // Traverse up the parent hierarchy to find the ImageListBox
     ImageListBox *listBox = nullptr;
-    do {
+    for (QObject *element = this->parent(); element != nullptr; element = element->parent()) {
         listBox = dynamic_cast<ImageListBox *>(element);
-        element = element->parent();
-    } while (listBox == nullptr && element != nullptr);
-    if (listBox != nullptr) {
+        if (listBox != nullptr)
+            break;
+    }
+
+    // Update labels and image if the listBox was found
+    if (listBox) {
         m_titleLabel->setText(listBox->title(m_index));
         m_subtitleLabel->setText(listBox->subtitle(m_index));
         m_imageLabel->setPixmap(listBox->image(m_index));
     }
 }
 
-ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, false, parent) {
+ImageListBox::ImageListBox(const QString &emptyText, bool showSeparator, QWidget *parent) : ControlListBox(emptyText, showSeparator, parent) {
 }
 
 ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, const size_t index) {
     return new ImageListBoxItemRenderer(title(index), subtitle(index), image(index), parent);
 }
 
-QPixmap ImageListBox::image(const size_t /* index */) const {
+QPixmap ImageListBox::image(const size_t index) const {
     return QPixmap();
 }
 } // namespace View
