@@ -95,6 +95,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/IO/SystemPaths.cpp
         ${COMMON_SOURCE_DIR}/IO/TextureUtils.cpp
         ${COMMON_SOURCE_DIR}/IO/TraversalMode.cpp
+        ${COMMON_SOURCE_DIR}/IO/VectorIcon.cpp
         ${COMMON_SOURCE_DIR}/IO/VirtualFileSystem.cpp
         ${COMMON_SOURCE_DIR}/IO/WadFileSystem.cpp
         ${COMMON_SOURCE_DIR}/IO/WorldReader.cpp
@@ -486,6 +487,8 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.cpp
         ${COMMON_SOURCE_DIR}/View/MapSearchListBox.cpp
         ${COMMON_SOURCE_DIR}/View/TextConsoleTabPage.cpp
+        src/IO/VectorIcon.cpp
+        src/IO/VectorIcon.h
 )
 
 set(COMMON_HEADER
@@ -592,6 +595,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/IO/Token.h
         ${COMMON_SOURCE_DIR}/IO/Tokenizer.h
         ${COMMON_SOURCE_DIR}/IO/TraversalMode.h
+        ${COMMON_SOURCE_DIR}/IO/VectorIcon.h
         ${COMMON_SOURCE_DIR}/IO/VirtualFileSystem.h
         ${COMMON_SOURCE_DIR}/IO/WadFileSystem.h
         ${COMMON_SOURCE_DIR}/IO/WorldReader.h
@@ -1021,6 +1025,8 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/ViewUtils.h
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.h
         ${COMMON_SOURCE_DIR}/View/MapSearchListBox.h
+        src/IO/VectorIcon.cpp
+        src/IO/VectorIcon.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
