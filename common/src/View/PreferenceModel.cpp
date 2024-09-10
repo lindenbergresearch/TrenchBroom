@@ -3,6 +3,7 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "QtUtils.h"
+#include "Logger.h"
 #include "TrenchBroomApp.h"
 
 #include <kdl/path_utils.h>
@@ -46,13 +47,20 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
 
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
-        case Index:return QString{}.sprintf("%d", index.row());
-        case Context:return QString::fromStdString(kdl::path_front(preferenceBase->path()).string());
-        case Path: return QString::fromStdString(kdl::path_pop_front(preferenceBase->path()).generic_string());
-        case Type:return std::get<0>(info);
-        case Default:return std::get<1>(info);
-        case Value:return std::get<2>(info);
-        default:return "?";
+            case Index:
+                return QString{}.sprintf("%d", index.row());
+            case Context:
+                return QString::fromStdString(kdl::path_front(preferenceBase->path()).string());
+            case Path:
+                return QString::fromStdString(kdl::path_pop_front(preferenceBase->path()).generic_string());
+            case Type:
+                return std::get<0>(info);
+            case Default:
+                return std::get<1>(info);
+            case Value:
+                return std::get<2>(info);
+            default:
+                return "?";
         }
     }
 
@@ -69,7 +77,8 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
     // set foreground color
     if (role == Qt::ForegroundRole) {
         // invalid
-        if (!preferenceBase->valid() && (index.column() == Value || index.column() == Default || index.column() == Type)) {
+        if (!preferenceBase->valid() &&
+            (index.column() == Value || index.column() == Default || index.column() == Type)) {
             return QBrush(COLOR_ROLE(BrightText));
         }
 
@@ -177,6 +186,12 @@ StringTuple3 PreferenceModel::getInfo(PreferenceBase *preferenceBase) const {
         value = pref(*preference).toString();
         defaultValue = preference->defaultValue().toString();
     };
+
+    if (Preference<LogLevel> *preference = dynamic_cast<Preference<LogLevel> *>(preferenceBase)) {
+        name = "LogLevel";
+        value = levelAttributes[pref(*preference)].label;
+        defaultValue = levelAttributes[preference->defaultValue()].label;
+    }
 
     return StringTuple3(name, defaultValue, value);
 }
