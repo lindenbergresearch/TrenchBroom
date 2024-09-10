@@ -236,7 +236,7 @@ QString LogMessage::format(bool detailed, bool colored) const {
     if (detailed) {
         msgStr += QString::fromStdString(
             stringf(
-                "[%8.4f] %s - %s",
+                "[%09.3f] %s %s",
                 time,
                 attr.label.toStdString().c_str(),
                 message.toStdString().c_str()
