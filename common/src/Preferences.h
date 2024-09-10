@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Color.h"
+#include "Logger.h"
 #include "Preference.h"
 
 #include <vm/util.h>
@@ -43,11 +44,14 @@ enum LengthUnitDisplay {
 
 extern Preference<int> MapViewLayout;
 
-QString systemTheme();
+//QString systemTheme();
+//
+//QString darkTheme();
+//
+//extern Preference<QString> Theme;
 
-QString darkTheme();
+extern Preference<LogLevel> AppLogLevel;
 
-extern Preference<QString> Theme;
 
 /* --- VIEW ------------------------------------------ */
 extern Preference<bool> ShowFocusIndicator;
