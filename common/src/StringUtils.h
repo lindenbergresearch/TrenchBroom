@@ -1,4 +1,5 @@
 #pragma once
+
 #include "string"
 
 namespace TrenchBroom {
@@ -11,7 +12,7 @@ namespace TrenchBroom {
  *
  * This is used as replacement for the dropped 'stringf'
  * function from string.cpp used in Rack 0.6.x.
- * It just covers the functionality but uses a quite differen
+ * It just covers the functionality but uses a quite different
  * code found at:
  *
  * https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
@@ -32,10 +33,10 @@ inline std::string stringf(const char *const zcFormat, ...) {
 
     // return a formatted string without risking memory mismanagement
     // and without assuming any compiler or platform specific behavior
-    std::vector<char> zc(iLen + 1);
+    std::vector<char> zc(uint32_t(iLen) + 1UL);
     std::vsnprintf(zc.data(), zc.size(), zcFormat, vaArgs);
     va_end(vaArgs);
 
-    return std::string(zc.data(), iLen);
+    return std::string(zc.data(), uint32_t(iLen));
 }
 } // namespace TrenchBroom
