@@ -25,6 +25,8 @@
 
 #include "Chrono.h"
 #include "StringUtils.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 
 class QString;
@@ -118,15 +120,16 @@ class Logger {
 
         ~LogStream();
 
-        template<typename T>
-        LogStream &operator<<(T &&arg) {
-            m_buf << std::forward<T>(arg);
-            return *this;
-        }
 
         // Specialization for QString
         LogStream &operator<<(const QString &arg) {
             m_buf << arg.toStdString();  // Convert QString to std::string
+            return *this;
+        }
+
+        template<typename T>
+        LogStream &operator<<(T &&arg) {
+            m_buf << std::forward<T>(arg);
             return *this;
         }
     };
@@ -192,12 +195,7 @@ class Logger {
     void log(LogLevel level, const QString &message);
 
   private:
-    LogLevel m_logLevel =
-        #ifdef NDEBUG
-        LogLevel::Trace;
-    #else
-    LogLevel::Info;
-    #endif
+    LogLevel m_logLevel = pref(Preferences::AppLogLevel);
 
     LogMessage *createLogMessage(LogLevel level, const QString &message);
 
