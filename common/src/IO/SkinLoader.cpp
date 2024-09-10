@@ -21,9 +21,6 @@
 
 #include "Assets/Palette.h"
 #include "Assets/Texture.h"
-#include "Ensure.h"
-#include "Error.h"
-#include "Exceptions.h"
 #include "IO/File.h"
 #include "IO/FileSystem.h"
 #include "IO/PathInfo.h"
@@ -34,7 +31,6 @@
 #include "Logger.h"
 
 #include "kdl/path_utils.h"
-#include "kdl/result.h"
 
 #include <string>
 
@@ -49,21 +45,23 @@ Assets::Texture loadSkin(const std::filesystem::path &path, const FileSystem &fs
     return fs.openFile(path).and_then([&](auto file) -> Result<Assets::Texture, ReadTextureError> {
         const auto extension = kdl::str_to_lower(path.extension().string());
         auto reader = file->reader().buffer();
-        return extension == ".wal" ? readWalTexture(path.stem().string(), reader, palette) : readFreeImageTexture(path.stem().string(), reader);
+        return extension == ".wal" ? readWalTexture(path.stem().string(), reader, palette)
+                                   : readFreeImageTexture(path.stem().string(), reader);
     }).transform_error([&](auto e) -> Assets::Texture {
-        logger.error() << "Could not load skin '" << path << "': " << e.msg;
+        logger.error() << "Unable to load skin: '" << path << "': " << e.msg;
         return loadDefaultTexture(fs, path.stem().string(), logger);
     }).value();
 }
 
 Assets::Texture loadShader(const std::filesystem::path &path, const FileSystem &fs, Logger &logger) {
     const auto pathWithoutExtension = kdl::path_remove_extension(path);
-    auto actualPath = !path.empty() && fs.pathInfo(pathWithoutExtension) == PathInfo::File ? pathWithoutExtension : path;
+    auto actualPath =
+        !path.empty() && fs.pathInfo(pathWithoutExtension) == PathInfo::File ? pathWithoutExtension : path;
     const auto name = path.generic_string();
 
-    logger.debug() << "Loading shader '" << path << "'";
+    defaultQtLogger.debug() << "Loading shader: '" << path << "'";
     return fs.openFile(actualPath).and_then([&](auto file) { return readQuake3ShaderTexture(name, *file, fs); }).transform_error([&](auto e) {
-        logger.error() << "Could not load shader '" << path << "': " << e.msg;
+        defaultQtLogger.error() << "Unable to load shader: '" << path << "': " << e.msg;
         return loadDefaultTexture(fs, name, logger);
     }).value();
 }
