@@ -29,13 +29,6 @@
 namespace TrenchBroom {
 namespace Preferences {
 
-//QString systemTheme() {
-//    return QStringLiteral("System");
-//}
-//
-//QString darkTheme() {
-//    return QStringLiteral("Dark");
-//}
 
 Preference<LogLevel> AppLogLevel("Application Logger Level", LogLevel::Debug);
 

@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <vector>
 
+
 namespace TrenchBroom {
 namespace Preferences {
 // NOTE: any QKeySequence preferences must be functions like CameraFly*
@@ -44,14 +45,7 @@ enum LengthUnitDisplay {
 
 extern Preference<int> MapViewLayout;
 
-//QString systemTheme();
-//
-//QString darkTheme();
-//
-//extern Preference<QString> Theme;
-
-extern Preference<LogLevel> AppLogLevel;
-
+extern Preference<TrenchBroom::LogLevel> AppLogLevel;
 
 /* --- VIEW ------------------------------------------ */
 extern Preference<bool> ShowFocusIndicator;
