@@ -157,6 +157,14 @@ LogMessage *Logger::createLogMessage(LogLevel level, const QString &message) {
     return new LogMessage{level, message};
 }
 
+LogLevel Logger::logLevel() const {
+    return m_logLevel;
+}
+
+void Logger::setLogLevel(LogLevel logLevel) {
+    m_logLevel = logLevel;
+}
+
 /* ------------------------------------------------------------------------------------------- */
 
 void NullLogger::doLog(const LogLevel level, const LogMessage *) {}

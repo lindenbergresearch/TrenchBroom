@@ -25,9 +25,6 @@
 
 #include "Chrono.h"
 #include "StringUtils.h"
-#include "Preferences.h"
-#include "PreferenceManager.h"
-
 
 class QString;
 
@@ -194,8 +191,12 @@ class Logger {
 
     void log(LogLevel level, const QString &message);
 
+    LogLevel logLevel() const;
+
+    void setLogLevel(LogLevel logLevel);
+
   private:
-    LogLevel m_logLevel = pref(Preferences::AppLogLevel);
+    LogLevel m_logLevel = LogLevel::Debug;
 
     LogMessage *createLogMessage(LogLevel level, const QString &message);
 
