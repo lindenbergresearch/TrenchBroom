@@ -31,7 +31,9 @@
 namespace TrenchBroom {
 namespace {
 std::ofstream openLogFile(const std::filesystem::path &path) {
-    return IO::Disk::createDirectory(path.parent_path()).transform([&](auto) { return std::ofstream{path, std::ios::out}; }).if_error([](const auto &e) {
+    return IO::Disk::createDirectory(path.parent_path()).transform([&](auto) {
+        return std::ofstream{path, std::ios_base::app};
+    }).if_error([](const auto &e) {
         throw std::runtime_error{"Could not open log file: " + e.msg};
     }).value();
 }
@@ -45,14 +47,11 @@ FileLogger &FileLogger::instance() {
     return Instance;
 }
 
-void FileLogger::doLog(const LogLevel /* level */, const std::string &message) {
+
+void FileLogger::doLog(const LogLevel level, const LogMessage *message) {
     assert(m_stream);
     if (m_stream) {
-        m_stream << message << std::endl;
+        m_stream << message->format(true, false).toStdString() << std::endl;
     }
-}
-
-void FileLogger::doLog(const LogLevel level, const QString &message) {
-    log(level, message.toStdString());
 }
 } // namespace TrenchBroom
