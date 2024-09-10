@@ -144,6 +144,8 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     setApplicationName("TrenchBroom Nova");
 
+    defaultQtLogger.setLogLevel(pref(Preferences::AppLogLevel));
+
     logger().info() << "TrenchBroom Nova " << VERSION_STR;
     logger().info() << "Build: " << BUILD_ID_STR;
     logger().info() << "Qt Version: " << qVersion();
