@@ -7,7 +7,7 @@
 
 namespace TrenchBroom {
 
-static const char *const REPLACEMENT_TOKEN = "$";
+static const char *const REPLACEMENT_TOKEN = "#";
 
 /**
  * Simple dynamic Qt Style-Sheet Builder.

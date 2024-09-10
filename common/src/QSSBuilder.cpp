@@ -1,4 +1,5 @@
 #include "QSSBuilder.h"
+#include "Logger.h"
 
 #include "IO/DiskIO.h"
 #include "IO/PathInfo.h"
@@ -16,12 +17,12 @@ QSSBuilder *QSSBuilder::fromFile(const std::filesystem::path &path) {
         builder->setText(QTextStream{&file}.readAll());
 
         if (!builder->text.isNull() || !builder->text.isEmpty()) {
-            qInfo() << "Created builder from file: " << path.c_str();
+            defaultQtLogger.info() << "Created builder from file: " << path;
             return builder;
         }
     }
 
-    qWarning() << "Unable to create builder from file: " << path.c_str();
+    defaultQtLogger.warn() << "Unable to create builder from file: " << path;
     return nullptr;
 }
 
@@ -42,12 +43,13 @@ void QSSBuilder::update() {
     renderedText = text;
 
     for (const auto &item : repl_table) {
-        auto source = REPLACEMENT_TOKEN + item.first + REPLACEMENT_TOKEN;
+        const auto source = REPLACEMENT_TOKEN + item.first;
         std::function<QString()> repl = item.second;
-        auto replacement = repl();
+        const auto replacement = repl();
 
         if (!replacement.isEmpty()) {
             renderedText.replace(source, replacement);
+            defaultQtLogger.trace() << "replaced: '" << source << "' with: '" << replacement << "'";
         }
     }
 }
