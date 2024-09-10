@@ -35,8 +35,6 @@ class QMenu;
 
 class QSettings;
 
-class QTimer;
-
 namespace TrenchBroom {
 class Logger;
 
@@ -48,23 +46,6 @@ class FrameManager;
 class RecentDocuments;
 
 class WelcomeWindow;
-
-class Timer {
-  public:
-    static const Timer appstart;
-
-    Timer() : m_start(t_highres_clock::now()) {
-    }
-
-    void reset();
-
-    double elapsed() const;
-
-  private:
-    typedef std::chrono::high_resolution_clock t_highres_clock;
-    typedef std::chrono::duration<double, std::ratio<1>> t_duration_second;
-    std::chrono::time_point<t_highres_clock> m_start;
-};
 
 class TrenchBroomApp : public QApplication {
   Q_OBJECT
@@ -81,6 +62,8 @@ class TrenchBroomApp : public QApplication {
     MapFrame *getCurrentMapFrame() const;
 
     void setCurrentMapFrame(MapFrame *currentMapFrame);
+
+    Logger &logger() const;
 
   public:
     const QFont &getMUiFont() const;
