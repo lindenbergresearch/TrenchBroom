@@ -23,7 +23,7 @@
 #include "Error.h"
 #include "IO/SystemPaths.h"
 #include "Renderer/ShaderConfig.h"
-#include "qlogging.h"
+#include "Logger.h"
 
 #include "kdl/vector_utils.h"
 #include <kdl/result.h>
@@ -36,12 +36,15 @@
 namespace TrenchBroom::Renderer {
 
 Result<void> ShaderManager::loadProgram(const ShaderConfig &config) {
-    qInfo() << "loading shader:" << config.name().c_str();
+    defaultQtLogger.info() << "loading shader:" << config.name();
 
     return createProgram(config).and_then([&](auto program) -> Result<void> {
         if (!m_programs.emplace(config.name(), std::move(program)).second) {
-            return Error{"Shader program '" + config.name() + "' already loaded"};
+            auto msg = "Shader program: '" + config.name() + "' already loaded!";
+            defaultQtLogger.error() << msg;
+            return Error{msg};
         }
+
         return kdl::void_success;
     });
 }
