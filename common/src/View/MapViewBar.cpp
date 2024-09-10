@@ -50,7 +50,7 @@ void MapViewBar::createGui(std::weak_ptr<MapDocument> document) {
     m_viewEditor = new ViewPopupEditor(std::move(document));
 
 #ifdef __APPLE__
-    const auto vMargin = pref(Preferences::Theme) == Preferences::darkTheme() ? LayoutConstants::MediumVMargin : 0;
+    const auto vMargin = 0;
 #else
     const auto vMargin = LayoutConstants::MediumVMargin;
 #endif
