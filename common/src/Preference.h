@@ -24,6 +24,7 @@
 #include <QTextStream>
 
 #include "Macros.h"
+#include "Logger.h"
 #include "View/KeyboardShortcut.h"
 
 #include "vm/forward.h"
@@ -63,6 +64,8 @@ class PreferenceSerializer {
 
     bool readFromJson(const QJsonValue &in, QString &out) const;
 
+    bool readFromJson(const QJsonValue &in, LogLevel &out) const;
+
     QJsonValue writeToJson(bool in) const;
 
     QJsonValue writeToJson(const Color &in) const;
@@ -78,6 +81,8 @@ class PreferenceSerializer {
     QJsonValue writeToJson(const QKeySequence &in) const;
 
     QJsonValue writeToJson(const QString &in) const;
+
+    QJsonValue writeToJson(const LogLevel in) const;
 };
 
 class PreferenceBase {
