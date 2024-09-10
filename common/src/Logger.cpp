@@ -18,45 +18,61 @@
  */
 
 #include "Logger.h"
+#include "StringUtils.h"
 
 #include <QString>
 
 #include <string>
 
 namespace TrenchBroom {
-Logger::stream::stream(Logger *logger, const LogLevel logLevel) : m_logger(logger), m_logLevel(logLevel) {
+Logger::LogStream::LogStream(Logger *logger, const LogLevel logLevel) : m_logger(logger), m_logLevel(logLevel) {
 }
 
-Logger::stream::~stream() {
+Logger::LogStream::~LogStream() {
     m_logger->log(m_logLevel, m_buf.str());
 }
 
+
+/* ------------------------------------------------------------------------------------------- */
+
+
 Logger::~Logger() {}
 
-Logger::stream Logger::debug() {
-    return Logger::stream(this, LogLevel::Debug);
+Logger::LogStream Logger::trace() {
+    return Logger::LogStream(this, LogLevel::Trace);
 }
 
-void Logger::debug([[maybe_unused]] const char *message) {
-#ifndef NDEBUG
+void Logger::trace(const char *message) {
+    trace(QString(message));
+}
+
+void Logger::trace(const std::string &message) {
+    log(LogLevel::Trace, message);
+}
+
+void Logger::trace(const QString &message) {
+    log(LogLevel::Trace, message);
+}
+
+Logger::LogStream Logger::debug() {
+    return Logger::LogStream(this, LogLevel::Debug);
+}
+
+
+void Logger::debug(const char *message) {
     debug(QString(message));
-#endif
 }
 
-void Logger::debug([[maybe_unused]] const std::string &message) {
-#ifndef NDEBUG
+void Logger::debug(const std::string &message) {
     log(LogLevel::Debug, message);
-#endif
 }
 
-void Logger::debug([[maybe_unused]] const QString &message) {
-#ifndef NDEBUG
+void Logger::debug(const QString &message) {
     log(LogLevel::Debug, message);
-#endif
 }
 
-Logger::stream Logger::info() {
-    return stream(this, LogLevel::Info);
+Logger::LogStream Logger::info() {
+    return LogStream(this, LogLevel::Info);
 }
 
 void Logger::info(const char *message) {
@@ -71,8 +87,8 @@ void Logger::info(const QString &message) {
     log(LogLevel::Info, message);
 }
 
-Logger::stream Logger::warn() {
-    return stream(this, LogLevel::Warn);
+Logger::LogStream Logger::warn() {
+    return LogStream(this, LogLevel::Warn);
 }
 
 void Logger::warn(const char *message) {
@@ -87,8 +103,8 @@ void Logger::warn(const QString &message) {
     log(LogLevel::Warn, message);
 }
 
-Logger::stream Logger::error() {
-    return stream(this, LogLevel::Error);
+Logger::LogStream Logger::error() {
+    return LogStream(this, LogLevel::Error);
 }
 
 void Logger::error(const char *message) {
@@ -103,21 +119,131 @@ void Logger::error(const QString &message) {
     log(LogLevel::Error, message);
 }
 
+
 void Logger::log(const LogLevel level, const std::string &message) {
-#ifdef NDEBUG
-    if (level != LogLevel::Debug)
-#endif
-        doLog(level, message);
+    log(level, QString::fromStdString(message));
 }
 
 void Logger::log(const LogLevel level, const QString &message) {
-#ifdef NDEBUG
-    if (level != LogLevel::Debug)
-#endif
-        doLog(level, message);
+    // check if log-level is active
+    if (level < m_logLevel) {
+        return;
+    }
+
+    // create log-message
+    auto *msg = createLogMessage(level, message);
+    // add to cache
+    LogMessageCache::add(msg);
+
+    // call subclass implementation
+    doLog(level, msg);
+
 }
 
-void NullLogger::doLog(const LogLevel /* level */, const std::string & /* message */) {}
+void Logger::log(const LogLevel level, const LogMessage *message) {
+    // check if log-level is active
+    if (level < m_logLevel) {
+        return;
+    }
 
-void NullLogger::doLog(const LogLevel /* level */, const QString & /* message */) {}
+    // call subclass implementation
+    doLog(level, message);
+}
+
+/* ------------------------------------------------------------------------------------------- */
+
+
+LogMessage *Logger::createLogMessage(LogLevel level, const QString &message) {
+    return new LogMessage{level, message};
+}
+
+/* ------------------------------------------------------------------------------------------- */
+
+void NullLogger::doLog(const LogLevel level, const LogMessage *) {}
+
+/* ------------------------------------------------------------------------------------------- */
+
+
+void DefaultQtLogger::doLog(LogLevel level, const LogMessage *message) {
+    switch (level) {
+        case LogLevel::Trace:
+            qDebug().noquote() << message->format(true, m_coloredOut);
+            break;
+        case LogLevel::Debug:
+            qDebug().noquote() << message->format(true, m_coloredOut);
+            break;
+        case LogLevel::Info:
+            qInfo().noquote() << message->format(true, m_coloredOut);
+            break;
+        case LogLevel::Warn:
+            qWarning().noquote() << message->format(true, m_coloredOut);
+            break;
+        case LogLevel::Error:
+            qCritical().noquote() << message->format(true, m_coloredOut);
+            break;
+    }
+}
+
+bool DefaultQtLogger::coloredOut() const {
+    return m_coloredOut;
+}
+
+void DefaultQtLogger::setColoredOut(bool mColoredOut) {
+    m_coloredOut = mColoredOut;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+
+std::map<size_t, LogMessage *> LogMessageCache::cache{};
+size_t LogMessageCache::m_id{0};
+
+
+void LogMessageCache::add(LogMessage *logMessage) {
+    cache[m_id++] = logMessage;
+}
+
+LogMessage *LogMessageCache::get(size_t id) {
+    return cache[id];
+}
+
+void LogMessageCache::clear() {
+    cache.clear();
+}
+
+size_t LogMessageCache::size() {
+    return cache.size();
+}
+
+size_t LogMessageCache::currentID() {
+    return m_id;
+}
+
+QString LogMessage::format(bool detailed, bool colored) const {
+    auto attr = levelAttributes[level];
+    QString msgStr =
+        colored ?
+        attr.format :
+        QString{};
+
+    if (detailed) {
+        msgStr += QString::fromStdString(
+            stringf(
+                "[%8.4f] %s - %s",
+                time,
+                attr.label.toStdString().c_str(),
+                message.toStdString().c_str()
+            )
+        );
+    } else {
+        // just the plain message without details
+        msgStr += message;
+    }
+
+    if (colored) {
+        // reset color
+        msgStr += "\033[0m";
+    }
+
+    return msgStr;
+}
 } // namespace TrenchBroom

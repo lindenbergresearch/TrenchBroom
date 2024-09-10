@@ -21,30 +21,112 @@
 
 #include <sstream>
 #include <string>
+#include <map>
+
+#include "Chrono.h"
+#include "StringUtils.h"
+
 
 class QString;
 
 namespace TrenchBroom {
+
+/* ------------------------------------------------------------------------------------------- */
+
+/**
+ * Log-Levels.
+ */
 enum class LogLevel {
-  Debug, Info, Warn, Error
+  Trace, Debug, Info, Warn, Error
 };
 
+/**
+ * Attributes of a certain Log-Level.
+ */
+struct LogLevelAttr {
+  QString label;
+  QString format;
+};
+
+/**
+ * Definition of the level attributes.
+ */
+static std::map<LogLevel, LogLevelAttr> levelAttributes = {
+    {LogLevel::Trace, {"Trace", "\033[1;90m"}},
+    {LogLevel::Debug, {"Debug", "\033[1;36m"}},
+    {LogLevel::Info, {"Info ", "\033[1;97m"}},
+    {LogLevel::Warn, {"Warn ", "\033[1;33m"}},
+    {LogLevel::Error, {"Error", "\033[1;31m"}},
+};
+
+/**
+ * A LogMessage struct.
+ */
+struct LogMessage {
+  LogLevel level;
+  QString message;
+  double time = Chrono::time();
+  uint8_t group = 0x00;
+
+
+  /**
+   * Returns the log-message in a detailed form.
+   * @param colored If true console color-codes are added.
+   * @return The formatted log-message.
+   */
+  inline QString format(bool detailed = true, bool colored = true) const;
+};
+
+/**
+ * Simple LogMessage cache.
+ */
+class LogMessageCache {
+  public:
+    static void add(LogMessage *logMessage);
+
+    static LogMessage *get(size_t id);
+
+    static void clear();
+
+    static size_t size();
+
+    static size_t currentID();
+
+  private:
+    static std::map<size_t, LogMessage *> cache;
+    static size_t m_id;
+};
+
+
+/**
+ * Abstract basic logger class.
+ */
 class Logger {
   public:
-    class stream {
+    /**
+     * LogStream class for add stream like handling
+     * to log-messages.
+     */
+    class LogStream {
       private:
         Logger *m_logger;
         LogLevel m_logLevel;
         std::stringstream m_buf;
 
       public:
-        stream(Logger *logger, LogLevel logLevel);
+        LogStream(Logger *logger, LogLevel logLevel);
 
-        ~stream();
+        ~LogStream();
 
-      public:
-        template<typename T> stream &operator<<(T &&arg) {
+        template<typename T>
+        LogStream &operator<<(T &&arg) {
             m_buf << std::forward<T>(arg);
+            return *this;
+        }
+
+        // Specialization for QString
+        LogStream &operator<<(const QString &arg) {
+            m_buf << arg.toStdString();  // Convert QString to std::string
             return *this;
         }
     };
@@ -52,7 +134,9 @@ class Logger {
   public:
     virtual ~Logger();
 
-    stream debug();
+    // --- DEBUG -------------------------------------- //
+
+    LogStream debug();
 
     void debug(const char *message);
 
@@ -60,7 +144,9 @@ class Logger {
 
     void debug(const QString &message);
 
-    stream info();
+    // --- INFO --------------------------------------- //
+
+    LogStream info();
 
     void info(const char *message);
 
@@ -68,7 +154,9 @@ class Logger {
 
     void info(const QString &message);
 
-    stream warn();
+    // --- WARNING ------------------------------------ //
+
+    LogStream warn();
 
     void warn(const char *message);
 
@@ -76,28 +164,74 @@ class Logger {
 
     void warn(const QString &message);
 
-    stream error();
+    // --- ERROR -------------------------------------- //
+
+    LogStream error();
 
     void error(const char *message);
 
     void error(const std::string &message);
 
     void error(const QString &message);
+   // --- ERROR -------------------------------------- //
+
+    LogStream trace();
+
+    void trace(const char *message);
+
+    void trace(const std::string &message);
+
+    void trace(const QString &message);
+
+    // --- LOGGER ------------------------------------- //
 
     void log(LogLevel level, const std::string &message);
+
+    void log(LogLevel level, const LogMessage *message);
 
     void log(LogLevel level, const QString &message);
 
   private:
-    virtual void doLog(LogLevel level, const std::string &message) = 0;
+    LogLevel m_logLevel =
+        #ifdef NDEBUG
+        LogLevel::Trace;
+    #else
+    LogLevel::Info;
+    #endif
 
-    virtual void doLog(LogLevel level, const QString &message) = 0;
+    LogMessage *createLogMessage(LogLevel level, const QString &message);
+
+    virtual void doLog(LogLevel level, const LogMessage *message) = 0;
 };
+
+/* ------------------------------------------------------------------------------------------- */
 
 class NullLogger : public Logger {
   private:
-    void doLog(LogLevel level, const std::string &message) override;
 
-    void doLog(LogLevel level, const QString &message) override;
+    void doLog(LogLevel level, const LogMessage *message) override;
 };
+
+/* ------------------------------------------------------------------------------------------- */
+
+
+class DefaultQtLogger : public Logger {
+  private:
+    void doLog(LogLevel level, const LogMessage *message) override;
+
+    bool coloredOut() const;
+
+    void setColoredOut(bool mColoredOut);
+
+  private:
+    bool m_coloredOut = true;
+    QString m_prefix;
+    QString m_rawMessage;
+};
+
+/**
+ * Default static instance.
+ */
+static DefaultQtLogger defaultQtLogger = DefaultQtLogger();
+
 } // namespace TrenchBroom
