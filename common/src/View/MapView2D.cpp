@@ -74,6 +74,7 @@ namespace TrenchBroom {
 namespace View {
 MapView2D::MapView2D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, ViewPlane viewPlane, Logger *logger)
     : MapViewBase(logger, document, toolBox, renderer, contextManager), m_camera(std::make_unique<Renderer::OrthographicCamera>()) {
+    bindEvents();
     connectObservers();
     initializeCamera(viewPlane);
     initializeToolChain(toolBox);
@@ -153,6 +154,19 @@ Model::PickResult MapView2D::doPick(const vm::ray3 &pickRay) const {
 void MapView2D::initializeGL() {
     MapViewBase::initializeGL();
     setCompass(std::make_unique<Renderer::Compass2D>());
+}
+
+
+void MapView2D::bindEvents() {
+    // Fly mode animation
+    connect(this, &QOpenGLWidget::frameSwapped, this, &MapView2D::updateFlyMode);
+}
+
+void MapView2D::updateFlyMode() {
+    m_framesRendered++;
+    m_totalFrames++;
+
+    update();
 }
 
 void MapView2D::doUpdateViewport(const int x, const int y, const int width, const int height) {

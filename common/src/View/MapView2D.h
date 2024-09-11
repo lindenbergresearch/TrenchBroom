@@ -79,6 +79,12 @@ class MapView2D : public MapViewBase {
   protected: // QOpenGLWidget overrides
     void initializeGL() override;
 
+  private: // interaction events
+    void bindEvents();
+
+  private: // other events
+    void updateFlyMode();
+
   private: // implement RenderView interface
     void doUpdateViewport(int x, int y, int width, int height) override;
 
