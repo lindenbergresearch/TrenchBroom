@@ -144,11 +144,12 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     setApplicationName("TrenchBroom Nova");
 
-    defaultQtLogger.setLogLevel(pref(Preferences::AppLogLevel));
+    defaultQtLogger.setLogLevel(LogLevel::Trace);
 
-    logger().info() << "TrenchBroom Nova " << VERSION_STR;
-    logger().info() << "Build: " << BUILD_ID_STR;
-    logger().info() << "Qt Version: " << qVersion();
+    logger().info() << "TrenchBroom Nova " << getBuildVersion().toStdString();
+    logger().info() << "Build : " << getBuildIdStr().toStdString();
+    logger().info() << "OS    : " << QSysInfo::prettyProductName().toStdString();
+    logger().info() << "Qt    : v" << qVersion();
 
 
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
@@ -304,39 +305,50 @@ bool TrenchBroomApp::loadStyleSheets() {
     if (!builder) {
         builder = QSSBuilder::fromFile(path);
 
-        if (!builder)
+        if (!builder) {
             return false;
+        }
 
         builder->addReplacement("TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::WindowText);
         });
+
         builder->addReplacement("DISABLED_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::WindowText, QPalette::ColorGroup::Disabled);
         });
+
         builder->addReplacement("DISABLED_BUTTON_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Button, QPalette::ColorGroup::Disabled);
         });
+
         builder->addReplacement("HIGHLIGHTED_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::HighlightedText);
         });
+
         builder->addReplacement("BRIGHT_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::BrightText);
         });
+
         builder->addReplacement("PLACEHOLDER_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::PlaceholderText);
         });
+
         builder->addReplacement("WINDOW_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Window);
         });
+
         builder->addReplacement("BUTTON_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Button);
         });
+
         builder->addReplacement("BUTTON_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::ButtonText);
         });
+
         builder->addReplacement("BASE_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Base);
         });
+
         builder->addReplacement("ALTERNATE_BASE_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::AlternateBase);
         });
@@ -344,15 +356,19 @@ bool TrenchBroomApp::loadStyleSheets() {
         builder->addReplacement("LIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Light);
         });
+
         builder->addReplacement("MIDLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Midlight);
         });
+
         builder->addReplacement("MID_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid);
         });
+
         builder->addReplacement("DARK_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Dark);
         });
+
         builder->addReplacement("SHADOW_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Shadow);
         });
@@ -360,19 +376,39 @@ bool TrenchBroomApp::loadStyleSheets() {
         builder->addReplacement("BRIGHT_HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, 130);
         });
+
+        builder->addReplacement("LIGHT_HIGHLIGHT_COLOR", []() {
+            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, 80);
+        });
+
         builder->addReplacement("HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight);
         });
+
         builder->addReplacement("MID_HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -130);
+            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -180);
         });
+
         builder->addReplacement("DARK_HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -150);
+            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -200);
         });
+
+        /* ------------------------------------------------------------------------------------------- */
+
+        builder->addReplacement("BORDER_RADIUS", []() {
+            return QString::asprintf("%dpx", LayoutConstants::BorderRadius);
+        });
+
+        builder->addReplacement("BORDER_SIZE", []() {
+            return QString::asprintf("%dpx", LayoutConstants::BorderSize);
+        });
+
+        /* ------------------------------------------------------------------------------------------- */
 
         builder->addReplacement("NARROW_V_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::NarrowVMargin);
         });
+
         builder->addReplacement("NARROW_H_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin);
         });
@@ -380,6 +416,7 @@ bool TrenchBroomApp::loadStyleSheets() {
         builder->addReplacement("MEDIUM_V_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::MediumVMargin);
         });
+
         builder->addReplacement("MEDIUM_H_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::MediumHMargin);
         });
@@ -387,28 +424,36 @@ bool TrenchBroomApp::loadStyleSheets() {
         builder->addReplacement("WIDE_V_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::WideVMargin);
         });
+
         builder->addReplacement("WIDE_H_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
         });
 
+        /* ------------------------------------------------------------------------------------------- */
+
         builder->addReplacement("UI_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::UIFontSize));
         });
+
         builder->addReplacement("UI_MID_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::UIFontSize) - 1);
         });
+
         builder->addReplacement("UI_SMALL_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::UIFontSize) - 2);
         });
+
         builder->addReplacement("UI_TITLE_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::UIFontSize) + 1);
         });
         builder->addReplacement("RENDER_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::RendererFontSize));
         });
+
         builder->addReplacement("CONSOLE_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::ConsoleFontSize));
         });
+
         builder->addReplacement("TOOLBAR_ICON_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::ToolBarIconsSize));
         });
@@ -871,6 +916,7 @@ void reportCrashAndExit(const std::string &stacktrace, const std::string &reason
 
     // get the crash report as a string
     const auto report = makeCrashReport(stacktrace, reason);
+    defaultQtLogger.error() << report;
 
     // write it to the crash log file
     const auto basePath = crashReportBasePath();
