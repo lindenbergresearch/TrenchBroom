@@ -148,7 +148,7 @@ QHBoxLayout *PreferencesPreferencePane::getControlButtonLayout() {
     setValueButton->setObjectName("PreferencesPreferencePane_smallPushButton");
     makeSmall(setValueButton);
 
-    auto label = new QLabel("To enable changed preferences you may have to restart Trenchbroom.");
+    auto label = new QLabel("To enable changed preferences you may have to restart TrenchBroom.");
     makeInfo(label);
 
     buttonLayout->addWidget(label, 1);
