@@ -28,7 +28,7 @@
 
 namespace TrenchBroom::View {
 RecentDocumentListBox::RecentDocumentListBox(QWidget *parent)
-    : ImageListBox{"No Recent Documents", true, parent}, m_documentIcon{IO::loadPixmapResource("DocIcon.png")} {
+    : ImageListBox{"No Recent Documents", false, parent}, m_documentIcon{IO::loadSVGIcon("document.svg", 20).pixmap(24,24,QIcon::Active, QIcon::On)} {
     auto &app = View::TrenchBroomApp::instance();
     connect(&app, &TrenchBroomApp::recentDocumentsDidChange, this, &RecentDocumentListBox::recentDocumentsDidChange);
     reload();
