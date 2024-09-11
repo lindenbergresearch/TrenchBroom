@@ -30,75 +30,65 @@
 #include "View/MapDocument.h"
 #include "View/MapDocumentCommandFacade.h"
 #include "View/MapFrame.h"
+#include "View/RenderView.h"
 
 extern void qt_set_sequence_auto_mnemonic(bool b);
 
-int main(int argc, char* argv[])
-{
-  // Set OpenGL defaults
-  // Needs to be done here before QApplication is created
-  // (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
-  //      QSurfaceFormat format;
-  //      format.setDepthBufferSize(24);
-  //      format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-  //      format.setSwapInterval(1);
-  //      format.setSamples(4);
-  //      QSurfaceFormat::setDefaultFormat(format);
+int main(int argc, char *argv[]) {
+    // Makes all QOpenGLWidget in the application share a single context
+    // (default behaviour would be for QOpenGLWidget's in a single top-level window to share
+    // a context.) see: http://doc.qt.io/qt-5/qopenglwidget.html#context-sharing
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    QSettings::setDefaultFormat(QSettings::IniFormat);
 
-  int bufferBits = 16;
-
-  QSurfaceFormat format;
-  format.setDepthBufferSize(bufferBits);
-  format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-  format.setSwapInterval(1);
-  format.setSamples(16);
-
-  QSurfaceFormat::setDefaultFormat(format);
-
-  // Makes all QOpenGLWidget in the application share a single context
-  // (default behaviour would be for QOpenGLWidget's in a single top-level window to share
-  // a context.) see: http://doc.qt.io/qt-5/qopenglwidget.html#context-sharing
-  QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-
-  // Set up Hi DPI scaling
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    // Set up Hi DPI scaling
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-  // Enables non-integer scaling (e.g. 150% scaling on Windows)
-  QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
-    Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    // Enables non-integer scaling (e.g. 150% scaling on Windows)
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 #endif
 
-  // Workaround bug in Qt's Ctrl+Click = RMB emulation (a macOS feature.)
-  // In Qt 5.13.0 / macOS 10.14.6, Ctrl+trackpad click+Drag produces no mouse events at
-  // all, but it should produce RMB down/move events. This environment variable disables
-  // Qt's emulation so we can implement it ourselves in InputEventRecorder::recordEvent
-  qputenv("QT_MAC_DONT_OVERRIDE_CTRL_LMB", "1");
+    // Workaround bug in Qt's Ctrl+Click = RMB emulation (a macOS feature.)
+    // In Qt 5.13.0 / macOS 10.14.6, Ctrl+trackpad click+Drag produces no mouse events at
+    // all, but it should produce RMB down/move events. This environment variable disables
+    // Qt's emulation so we can implement it ourselves in InputEventRecorder::recordEvent
+    qputenv("QT_MAC_DONT_OVERRIDE_CTRL_LMB", "1");
 
-  // Disable Qt OpenGL buglist; since we require desktop OpenGL 2.1 there's no point in
-  // having Qt disable it (also we've had reports of some Intel drivers being blocked that
-  // actually work with TB.)
-  qputenv("QT_OPENGL_BUGLIST", ":/opengl_buglist.json");
+    // Disable Qt OpenGL buglist; since we require desktop OpenGL 2.1 there's no point in
+    // having Qt disable it (also we've had reports of some Intel drivers being blocked that
+    // actually work with TB.)
+    qputenv("QT_OPENGL_BUGLIST", ":/opengl_buglist.json");
 
-  // parse portable arg out manually at first to ensure it's set before any settings load
-  if (argc > 1)
-  {
-    for (int i = 1; i < argc; i++)
-    {
-      if (strcmp(argv[i], "--portable") == 0)
-      {
-        TrenchBroom::IO::SystemPaths::setPortable();
-        QSettings::setPath(
-          QSettings::IniFormat, QSettings::UserScope, QString("./config"));
-      }
+    // parse portable arg out manually at first to ensure it's set before any settings load
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
+            if (strcmp(argv[i], "--portable") == 0) {
+                TrenchBroom::IO::SystemPaths::setPortable();
+                QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QString("./config"));
+            }
+        }
     }
-  }
 
-  // PreferenceManager is destroyed by TrenchBroomApp::~TrenchBroomApp()
-  TrenchBroom::PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
-  TrenchBroom::View::TrenchBroomApp app(argc, argv);
+    // PreferenceManager is destroyed by TrenchBroomApp::~TrenchBroomApp()
+    TrenchBroom::PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
+    TrenchBroom::View::TrenchBroomApp app(argc, argv);
 
-  app.parseCommandLineAndShowFrame();
-  return app.exec();
+    // Set OpenGL defaults
+    // Needs to be done here before QApplication is created
+    // (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
+    //TODO: add to preferences
+    QSurfaceFormat format;
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setColorSpace(QSurfaceFormat::sRGBColorSpace);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    format.setDepthBufferSize(32);
+    format.setSwapInterval(1);
+    format.setSamples(8);
+
+    QSurfaceFormat::setDefaultFormat(format);
+    TrenchBroom::View::RenderView::setFormat(format);
+
+    app.parseCommandLineAndShowFrame();
+    return app.exec();
 }
