@@ -246,26 +246,30 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         }
     }
 
+    QStringList fontSizesBig = {
+        "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"
+    };
+
+    QStringList fontSizesSmall = {
+        "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32"
+    };
+
     m_rendererFontSizeCombo = new QComboBox{};
-    m_rendererFontSizeCombo->setEditable(true);
+    m_rendererFontSizeCombo->setEditable(false);
     m_rendererFontSizeCombo->setToolTip("Sets the font size for various labels in the editing views.");
-    m_rendererFontSizeCombo->addItems({
-                                          "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"
-                                      });
+    m_rendererFontSizeCombo->addItems(fontSizesBig);
     m_rendererFontSizeCombo->setValidator(new QIntValidator{1, 96, m_rendererFontSizeCombo});
 
     m_UIFontSizeCombo = new QComboBox{};
-    m_UIFontSizeCombo->setEditable(true);
+    m_UIFontSizeCombo->setEditable(false);
     m_UIFontSizeCombo->setToolTip("Sets the font size UI elements.");
-    m_UIFontSizeCombo->addItems({"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"});
+    m_UIFontSizeCombo->addItems(fontSizesSmall);
     m_UIFontSizeCombo->setValidator(new QIntValidator{1, 20, m_UIFontSizeCombo});
 
     m_ConsoleFontSizeCombo = new QComboBox{};
-    m_ConsoleFontSizeCombo->setEditable(true);
+    m_ConsoleFontSizeCombo->setEditable(false);
     m_ConsoleFontSizeCombo->setToolTip("Sets the font size for the console panel.");
-    m_ConsoleFontSizeCombo->addItems({
-                                         "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "32", "36", "40", "48", "56", "64", "72"
-                                     });
+    m_ConsoleFontSizeCombo->addItems(fontSizesBig);
     m_ConsoleFontSizeCombo->setValidator(new QIntValidator{1, 96, m_ConsoleFontSizeCombo});
 
     m_ToolbarIconSizeCombo = new QComboBox{};
