@@ -132,7 +132,6 @@ MapFrame::MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> docu
     updateUndoRedoActions();
     updateToolBarWidgets();
 
-    m_document->setParentLogger(m_console);
     m_document->setViewEffectsService(m_mapView);
 
     m_autosaveTimer = new QTimer(this);
@@ -155,10 +154,6 @@ MapFrame::~MapFrame() {
         renderView->makeCurrent();
     }
 
-    // The MapDocument's CachingLogger has a pointer to m_console, which
-    // is about to be destroyed (DestroyChildren()). Clear the pointer
-    // so we don't try to log to a dangling pointer (#1885).
-    m_document->setParentLogger(nullptr);
 
     m_mapView->deactivateTool();
 
@@ -173,9 +168,7 @@ MapFrame::~MapFrame() {
     const auto children = this->children();
     qDeleteAll(std::rbegin(children), std::rend(children));
 
-    // let's trigger a final autosave before releasing the document
-    NullLogger logger;
-    m_autosaver->triggerAutosave(logger);
+    m_autosaver->triggerAutosave(defaultQtLogger);
 
     m_document->setViewEffectsService(nullptr);
     m_document.reset();
@@ -385,6 +378,7 @@ class MapFrame::ToolBarBuilder : public MenuBuilderBase, public MenuVisitor {
     void visit(const MenuActionItem &item) override {
         const auto &tAction = item.action();
         QAction *qAction = findOrCreateQAction(&tAction);
+
         m_toolBar.addAction(qAction);
     }
 };

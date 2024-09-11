@@ -29,7 +29,7 @@
 #include "Notifier.h"
 #include "NotifierConnection.h"
 #include "Result.h"
-#include "View/CachingLogger.h"
+#include "Logger.h"
 
 #include "vm/bbox.h"
 #include "vm/forward.h"
@@ -129,7 +129,7 @@ struct PortalFile {
   std::filesystem::path path;
 };
 
-class MapDocument : public Model::MapFacade, public CachingLogger {
+class MapDocument : public Model::MapFacade, public DefaultQtLogger {
   public:
     static const vm::bbox3 DefaultWorldBounds;
     static const std::string DefaultDocumentName;
