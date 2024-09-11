@@ -39,6 +39,7 @@
 #include "IO/PathQt.h"
 #include "IO/SystemPaths.h"
 #include "Preferences.h"
+#include "Logger.h"
 #include "View/Actions.h"
 
 #include <string>
@@ -72,7 +73,7 @@ bool shouldSaveInstantly() {
 AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_fileSystemWatcher{nullptr}, m_fileReadWriteDisabled{false} {
     m_saveTimer.setSingleShot(true);
     connect(&m_saveTimer, &QTimer::timeout, this, [this] {
-        qDebug() << "Saving preferences";
+        defaultQtLogger.debug() << "Saving preferences";
         saveChangesImmediately();
     });
 }
@@ -92,7 +93,7 @@ void AppPreferenceManager::initialize() {
     m_fileSystemWatcher = new QFileSystemWatcher{this};
     if (m_fileSystemWatcher->addPath(m_preferencesFilePath)) {
         connect(m_fileSystemWatcher, &QFileSystemWatcher::QFileSystemWatcher::fileChanged, this, [this]() {
-            qDebug() << "Reloading preferences after file change";
+            defaultQtLogger.debug() << "Reloading preferences after file change";
             loadCacheFromDisk();
         });
     }
@@ -150,6 +151,7 @@ void AppPreferenceManager::showErrorAndDisableFileReadWrite(const QString &reaso
                             "Further settings changes will not be saved this session.").arg(reason).arg(m_preferencesFilePath).arg(suggestion);
 
     QTimer::singleShot(0, [=] {
+        defaultQtLogger.error() << message.toStdString();
         auto dialog = QMessageBox(QMessageBox::Icon::Critical, tr("TrenchBroom"), message, QMessageBox::Ok);
         dialog.exec();
     });
