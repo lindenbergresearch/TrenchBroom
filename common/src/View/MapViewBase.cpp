@@ -166,25 +166,25 @@ void MapViewBase::createActionsAndUpdatePicking() {
 
 void MapViewBase::nodesDidChange(const std::vector<Model::Node *> &) {
     updatePickResult();
-    update();
+    //update();
 }
 
 void MapViewBase::toolChanged(Tool &) {
     updatePickResult();
     updateActionStates();
-    update();
+    //update();
 }
 
 void MapViewBase::commandDone(Command &) {
     updateActionStatesDelayed();
     updatePickResult();
-    update();
+    //update();
 }
 
 void MapViewBase::commandUndone(UndoableCommand &) {
     updateActionStatesDelayed();
     updatePickResult();
-    update();
+    //update();
 }
 
 void MapViewBase::selectionDidChange(const Selection &) {
@@ -192,34 +192,34 @@ void MapViewBase::selectionDidChange(const Selection &) {
 }
 
 void MapViewBase::textureCollectionsDidChange() {
-    update();
+    //update();
 }
 
 void MapViewBase::entityDefinitionsDidChange() {
     createActions();
     updateActionStates();
-    update();
+    //update();
 }
 
 void MapViewBase::modsDidChange() {
-    update();
+    //update();
 }
 
 void MapViewBase::editorContextDidChange() {
-    update();
+    //update();
 }
 
 void MapViewBase::gridDidChange() {
-    update();
+    //update();
 }
 
 void MapViewBase::pointFileDidChange() {
-    update();
+    //update();
 }
 
 void MapViewBase::portalFileDidChange() {
     invalidatePortalFileRenderer();
-    update();
+    //update();
 }
 
 void MapViewBase::preferenceDidChange(const std::filesystem::path &path) {
@@ -228,12 +228,12 @@ void MapViewBase::preferenceDidChange(const std::filesystem::path &path) {
     }
 
     updateActionBindings();
-    update();
+    //update();
 }
 
 void MapViewBase::documentDidChange(MapDocument *) {
     createActionsAndUpdatePicking();
-    update();
+    //update();
 }
 
 void MapViewBase::createActions() {
@@ -290,7 +290,7 @@ void MapViewBase::triggerAction(const Action &action) {
 }
 
 void MapViewBase::triggerAmbiguousAction(const QString &label) {
-    qDebug() << "Ambiguous action triggered: " << label;
+    defaultQtLogger.warn() << "Ambiguous action triggered: " << label;
 }
 
 void MapViewBase::move(const vm::direction direction) {
@@ -308,7 +308,7 @@ void MapViewBase::moveRotationCenter(const vm::direction direction) {
     const auto &grid = document->grid();
     const auto delta = moveDirection(direction) * static_cast<FloatType>(grid.actualSize());
     m_toolBox.moveRotationCenter(delta);
-    update();
+    //update();
 }
 
 void MapViewBase::moveVertices(const vm::direction direction) {
@@ -725,13 +725,13 @@ void MapViewBase::focusInEvent(QFocusEvent *event) {
     // (needed because of QOpenGLWindow; see comment in
     // createAndRegisterShortcut)
     updateModifierKeys();
-    update();
+    //update();
     RenderView::focusInEvent(event);
 }
 
 void MapViewBase::focusOutEvent(QFocusEvent *event) {
     clearModifierKeys();
-    update();
+    //update();
     RenderView::focusOutEvent(event);
 }
 
@@ -766,7 +766,7 @@ bool MapViewBase::doCancelMouseDrag() {
 }
 
 void MapViewBase::doRefreshViews() {
-    update();
+    //update();
 }
 
 void MapViewBase::initializeGL() {
