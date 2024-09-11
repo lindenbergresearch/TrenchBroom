@@ -201,6 +201,7 @@ extern Preference<Color> UITextColor;
 extern Preference<float> UIBrightness;
 
 /* --- LOGGING COLORS -------------------------------- */
+extern Preference<Color> TraceDebugColor;
 extern Preference<Color> LogDebugColor;
 extern Preference<Color> LogInfoColor;
 extern Preference<Color> LogWarningColor;
