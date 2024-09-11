@@ -30,11 +30,12 @@ namespace TrenchBroom {
 namespace Preferences {
 
 
-Preference<LogLevel> AppLogLevel("Application Logger Level", LogLevel::Debug);
+/* --- LOGGER ---------------------------------------- */
 
+Preference<LogLevel> AppLogLevel("Editor/LogLevel", LogLevel::Info);
 
 /* --- VIEW ------------------------------------------ */
-//Preference<QString> Theme("Theme", darkTheme());
+
 Preference<int> MapViewLayout("Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane));
 Preference<bool> ShowFocusIndicator("Renderer/Show focus indicator", true);
 Preference<float> ViewFrameWidth("Renderer/View frame width", 2.0f);
