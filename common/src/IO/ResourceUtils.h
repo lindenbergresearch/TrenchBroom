@@ -41,10 +41,10 @@ namespace TrenchBroom::IO {
 class FileSystem;
 
 // Svg render oversampling for quality improvement
-static const int OverSampleFactor = 4;
+static const int OverSampleFactor = 1;
 
 // icon blending
-static const float DefaultIconAlpha = 0.7f;
+static const float DefaultIconAlpha = 1.0f;
 
 /**
  * Loads a default texture file from the given file system. If the default texture cannot

@@ -67,41 +67,114 @@ Assets::Texture loadDefaultTexture(const FileSystem &fs, std::string name, Logge
     return Assets::Texture{std::move(name), 32, 32};
 }
 
+
+/* ------------------------------------------------------------------------------------------- */
+
+
 static QString imagePathToString(const std::filesystem::path &imagePath) {
-    const auto fullPath = imagePath.is_absolute() ? imagePath : SystemPaths::findResourceFile("images" / imagePath);
+    const auto fullPath =
+        imagePath.is_absolute() ?
+        imagePath :
+        SystemPaths::findResourceFile("images" / imagePath);
+
     return pathAsQString(fullPath);
 }
+
 
 QPixmap loadPixmapResource(const std::filesystem::path &imagePath) {
     return QPixmap{imagePathToString(imagePath)};
 }
 
-QImage createDisabledState(const QImage &image) {
-    // Convert to greyscale, divide the opacity by 3
+
+static QImage recolorSvgIcon(const QImage &image, float boost = 1.0f, float alphaFact = 1.f) {
     auto disabledImage = image.convertToFormat(QImage::Format_ARGB32);
+
     const auto w = disabledImage.width();
     const auto h = disabledImage.height();
+
     for (int y = 0; y < h; ++y) {
         auto *row = reinterpret_cast<QRgb *>(disabledImage.scanLine(y));
+
         for (int x = 0; x < w; ++x) {
-            const auto oldPixel = row[x];
-            const auto grey = (qRed(oldPixel) + qGreen(oldPixel) + qBlue(oldPixel)) / 3;
-            const auto alpha = qAlpha(oldPixel) / 3;
-            row[x] = qRgba(grey, grey, grey, alpha);
+            const auto pixel = row[x];
+
+            const auto red = qRed(pixel);
+            const auto blue = qGreen(pixel);
+            const auto green = qBlue(pixel);
+            const int alpha = qAlpha(pixel) > 0 ? qRound(alphaFact * 255.f) : 0;
+
+            row[x] = qRgba(std::min(qRound((float) red * boost), 255), std::min(qRound((float) blue * boost), 255), std::min(qRound((float) green * boost), 255), alpha);
         }
     }
 
     return disabledImage;
 }
 
+
+static float analyseBrightness(const QImage &image) {
+    auto qimage = image.convertToFormat(QImage::Format_ARGB32);
+
+    const auto w = qimage.width();
+    const auto h = qimage.height();
+
+    float delta = 0;
+
+    for (int y = 0; y < h; ++y) {
+        auto *row = reinterpret_cast<QRgb *>(qimage.scanLine(y));
+        for (int x = 0; x < w; ++x) {
+            const auto pixel = row[x];
+
+            float uniq = float(qRed(pixel) + qGreen(pixel) + qBlue(pixel)) / 3.f;
+            const float alpha = float(qAlpha(pixel)) / 255.f;
+
+            if (uniq >= 0) {
+                delta += uniq * alpha;
+            }
+        }
+    }
+
+    return (delta == 0) ? 0 : delta / float(w * h);
+}
+
+
+static QImage normaliseBrightness(const QImage &image, float absBrightness, float alpha = 1.f) {
+    const auto theta = 1.f + (analyseBrightness(image) / 255.f);
+    return recolorSvgIcon(image, theta * absBrightness, alpha);
+}
+
+
+static QImage makeGrayscale(const QImage &image, float alpha = 1.f) {
+    auto disabledImage = image.convertToFormat(QImage::Format_ARGB32);
+
+    const auto w = disabledImage.width();
+    const auto h = disabledImage.height();
+
+    for (int y = 0; y < h; ++y) {
+        auto *row = reinterpret_cast<QRgb *>(disabledImage.scanLine(y));
+        for (int x = 0; x < w; ++x) {
+            const auto oldPixel = row[x];
+            const auto grey = (qRed(oldPixel) + qGreen(oldPixel) + qBlue(oldPixel)) / 3;
+            row[x] = qRgba(grey, grey, grey, qRound(alpha * (float) qAlpha(oldPixel)));
+        }
+    }
+
+    return disabledImage;
+}
+
+
+static QImage createDisabledState(const QImage &image) {
+    return makeGrayscale(image, 0.25f);
+}
+
+
 static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::State state, const bool invert, const qreal devicePixelRatio, int size, float opacity = DefaultIconAlpha) {
     if (!svgSource.isValid()) {
         return;
     }
 
-    auto image = QImage{
-        int(size * devicePixelRatio * OverSampleFactor), int(size * devicePixelRatio * OverSampleFactor), QImage::Format_ARGB32_Premultiplied
-    };
+    auto image = normaliseBrightness(QImage{
+        int(size * devicePixelRatio * OverSampleFactor), int(size * devicePixelRatio * OverSampleFactor), QImage::Format_ARGB32
+    }, 1.f, opacity);
 
     image.fill(Qt::transparent);
 
@@ -120,6 +193,7 @@ static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::S
     icon.addPixmap(QPixmap::fromImage(image).scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), QIcon::Normal, state);
     icon.addPixmap(QPixmap::fromImage(createDisabledState(image)).scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), QIcon::Disabled, state);
 }
+
 
 QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
     // Simple caching layer.
