@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QComboBox>
 #include <QPushButton>
 
 #include "FormWithSectionsLayout.h"
@@ -197,6 +198,28 @@ void PreferenceEditDialog::loadPreference(QVBoxLayout *layout) {
         innerLayout->addLayout(std::get<1>(valueComp));
     }
 
+   /**
+    * LogLevel type
+    */
+    if (IS_TYPE(LogLevel, preference, m_preference)) {
+        m_typeLabel->setText("LogLevel");
+
+        // set label value (default value)
+        ((QLabel *) m_defaultValueWidget)->setText(levelAttributes[preference->defaultValue()].label);
+
+        auto valueComp = createCompound<QComboBox>(tr("Log-Level"), 110, 220, lineHeight);
+        m_valueWidget = std::get<0>(valueComp);
+        QComboBox *box = (QComboBox*)m_valueWidget;
+
+        for (int j = 0; j <= int(LogLevel::Error); ++j) {
+            box->addItem(levelAttributes[(LogLevel)j].label, j);
+        }
+
+        innerLayout->addLayout(std::get<1>(defaultComp));
+        innerLayout->addWidget(new BorderLine);
+        innerLayout->addLayout(std::get<1>(valueComp));
+    }
+
     layout->addLayout(innerLayout);
 }
 
@@ -204,6 +227,7 @@ void PreferenceEditDialog::updateValue() {
     auto &prefs = PreferenceManager::instance();
     QString valueStr;
     bool valueBool;
+    LogLevel valLogLevel;
     auto failed = false;
     QString msg = "";
 
@@ -211,6 +235,8 @@ void PreferenceEditDialog::updateValue() {
         valueStr = ((QLineEdit *) m_valueWidget)->text();
     } else if (dynamic_cast<QCheckBox *>(m_valueWidget)) {
         valueBool = ((QCheckBox *) m_valueWidget)->isChecked();
+    } else if (dynamic_cast<QComboBox *>(m_valueWidget)) {
+        valLogLevel = (LogLevel)((QComboBox*)m_valueWidget)->currentIndex();
     }
 
     if (IS_TYPE(std::filesystem::path, preference, m_preference)) {
@@ -250,6 +276,10 @@ void PreferenceEditDialog::updateValue() {
 
     if (IS_TYPE(bool, preference, m_preference)) {
         failed = !prefs.set(*preference, valueBool);
+    }
+
+    if (IS_TYPE(LogLevel, preference, m_preference)) {
+        failed = !prefs.set(*preference, valLogLevel);
     }
 
     if (failed) {
