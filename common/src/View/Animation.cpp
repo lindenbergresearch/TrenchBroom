@@ -95,7 +95,7 @@ std::unique_ptr<AnimationCurve> Animation::createAnimationCurve(const Curve curv
 
 // AnimationManager
 
-const int AnimationManager::AnimationUpdateRateHz = 60;
+const int AnimationManager::AnimationUpdateRateHz = 60*4;
 
 AnimationManager::AnimationManager(QObject *parent) : QObject(parent), m_timer(new QTimer(this)) {
     connect(m_timer, &QTimer::timeout, this, &AnimationManager::onTimerTick);
