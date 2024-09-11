@@ -49,9 +49,7 @@ class CachingLogger : public Logger {
     void setParentLogger(Logger *logger);
 
   private:
-    void doLog(LogLevel level, const std::string &message) override;
-
-    void doLog(LogLevel level, const QString &message) override;
+    void doLog(LogLevel level, const LogMessage *message) override;
 };
 } // namespace View
 } // namespace TrenchBroom

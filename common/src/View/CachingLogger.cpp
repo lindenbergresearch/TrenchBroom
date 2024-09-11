@@ -31,24 +31,35 @@ CachingLogger::CachingLogger() : m_logger(nullptr) {
 
 void CachingLogger::setParentLogger(Logger *logger) {
     m_logger = logger;
+    std::cout << "cached: " << m_cachedMessages.size() << " messages" << std::endl;
+
+    log(LogLevel::Info, QString::fromStdString("flushing logger cache..."));
+
     if (m_logger != nullptr) {
         for (const Message &message : m_cachedMessages) {
             log(message.level, message.str);
         }
+
         m_cachedMessages.clear();
+        log(LogLevel::Info, QString::fromStdString("flushing logger cache done."));
+
     }
 }
 
-void CachingLogger::doLog(const LogLevel level, const std::string &message) {
-    doLog(level, QString::fromStdString(message));
+void CachingLogger::doLog(LogLevel level, const LogMessage *message) {
+
 }
 
-void CachingLogger::doLog(const LogLevel level, const QString &message) {
-    if (m_logger == nullptr) {
-        m_cachedMessages.push_back(Message(level, message));
-    } else {
-        m_logger->log(level, message);
-    }
-}
+//void CachingLogger::doLog(const LogLevel level, const std::string &message) {
+//    doLog(level, QString::fromStdString(message));
+//}
+//
+//void CachingLogger::doLog(const LogLevel level, const QString &message) {
+//    if (m_logger == nullptr) {
+//        m_cachedMessages.push_back(Message(level, "CACHED "+message));
+//    } else {
+//        m_logger->log(level, "! "+message);
+//    }
+//}
 } // namespace View
 } // namespace TrenchBroom
