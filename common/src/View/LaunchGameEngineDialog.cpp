@@ -316,6 +316,7 @@ void LaunchGameEngineDialog::updateCommandLine() {
     }
 }
 
+
 void LaunchGameEngineDialog::testCommandLine() {
     try {
         const auto *profile = m_gameEngineList->selectedProfile();
