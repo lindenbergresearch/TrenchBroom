@@ -40,9 +40,8 @@ class FileLogger : public Logger {
     static FileLogger &instance();
 
   private:
-    void doLog(LogLevel level, const std::string &message) override;
 
-    void doLog(LogLevel level, const QString &message) override;
+    void doLog(LogLevel level, const LogMessage *message) override;
 
   deleteCopyAndMove(FileLogger);
 };
