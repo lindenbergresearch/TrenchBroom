@@ -29,8 +29,7 @@
 #endif
 
 // the noinline is so you can see the timeLambda when profiling
-template<class L>
-TB_NOINLINE static void timeLambda(L &&lambda, const std::string &message) {
+template<class L> TB_NOINLINE static void timeLambda(L &&lambda, const std::string &message) {
     const auto start = std::chrono::high_resolution_clock::now();
     lambda();
     const auto end = std::chrono::high_resolution_clock::now();
