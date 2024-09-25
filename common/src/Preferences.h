@@ -171,6 +171,7 @@ extern Preference<Color> GridColor2D;
 extern Preference<int> TextureMinFilter;
 extern Preference<int> TextureMagFilter;
 extern Preference<bool> EnableMSAA;
+extern Preference<bool> EnableAnisotropicFilter;
 extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
