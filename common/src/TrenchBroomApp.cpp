@@ -144,13 +144,18 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     setApplicationName("TrenchBroom Nova");
 
-    defaultQtLogger.setLogLevel(LogLevel::Trace);
 
-    logger().info() << "TrenchBroom Nova " << getBuildVersion().toStdString();
-    logger().info() << "Build : " << getBuildIdStr().toStdString();
-    logger().info() << "OS    : " << QSysInfo::prettyProductName().toStdString();
+    const LogLevel logLevel = pref(Preferences::AppLogLevel);
+    const QString label = levelAttributes[logLevel].label;
+    defaultQtLogger.setLogLevel(logLevel);
+
+    logger().info() << "TrenchBroom Nova " << getBuildVersion();
+    logger().info() << "Build : " << getBuildIdStr();
+    logger().info() << "OS    : " << QSysInfo::prettyProductName();
     logger().info() << "Qt    : v" << qVersion();
 
+
+    logger().info() << "Current log-level is set to: " << label;
 
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
     // which would cause preferences to move from where they were with wx
