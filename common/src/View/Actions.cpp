@@ -485,6 +485,7 @@ void ActionManager::createViewActions() {
     createAction(std::filesystem::path{"Controls/Map view/View Filter > Hide faces"}, QObject::tr("Hide Faces"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->hideFaces(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
     createAction(std::filesystem::path{"Controls/Map view/View Filter > Shade faces"}, QObject::tr("Toggle Shade Faces"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShadeFaces(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
     createAction(std::filesystem::path{"Controls/Map view/View Filter > Use fog"}, QObject::tr("Toggle Show Fog"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowFog(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
+    createAction(std::filesystem::path{"Controls/Map view/View Filter > Use anisotropy filter"}, QObject::tr("Enable Anisotropy Filtering"), ActionContext::Any, QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_A), [](ActionExecutionContext &context) { context.view()->toggleAnisotropy(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
     //    createAction(std::filesystem::path{
     //            "Controls/Map view/View Filter > Use Lightning"
     //        }, QObject::tr("Use lightning (experimental)"), ActionContext::Any, Qt::CTRL +
