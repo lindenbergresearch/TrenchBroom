@@ -172,6 +172,7 @@ extern Preference<int> TextureMinFilter;
 extern Preference<int> TextureMagFilter;
 extern Preference<bool> EnableMSAA;
 extern Preference<bool> EnableAnisotropicFilter;
+extern Preference<float> AnisotropicFilterValue;
 extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
