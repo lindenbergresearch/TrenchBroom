@@ -115,7 +115,7 @@ void AppPreferenceManager::saveChanges() {
     m_unsavedPreferences.clear();
 
     if (!m_fileReadWriteDisabled) {
-        m_saveTimer.start(500);
+        m_saveTimer.start(100);
     }
 }
 
