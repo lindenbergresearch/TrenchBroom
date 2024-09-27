@@ -129,7 +129,7 @@ struct PortalFile {
   std::filesystem::path path;
 };
 
-class MapDocument : public Model::MapFacade, public DefaultQtLogger {
+class MapDocument : public Model::MapFacade, public Logger {
   public:
     static const vm::bbox3 DefaultWorldBounds;
     static const std::string DefaultDocumentName;
@@ -235,6 +235,7 @@ class MapDocument : public Model::MapFacade, public DefaultQtLogger {
 
   private:
     NotifierConnection m_notifierConnection;
+    Logger *m_logger = nullptr;
 
   protected:
     MapDocument();
@@ -244,6 +245,10 @@ class MapDocument : public Model::MapFacade, public DefaultQtLogger {
 
   public: // accessors and such
     Logger &logger();
+
+    void setLogger(Logger *logger);
+
+    void doLog(LogLevel level, const LogMessage *message) override;
 
     std::shared_ptr<Model::Game> game() const override;
 

@@ -23,13 +23,14 @@
 #include <string>
 #include <map>
 
+#include <QString>
+
 #include "Chrono.h"
 #include "StringUtils.h"
 
 class QString;
 
 namespace TrenchBroom {
-
 /* ------------------------------------------------------------------------------------------- */
 
 /**
@@ -102,31 +103,104 @@ class LogMessageCache {
  */
 class Logger {
   public:
-    /**
-     * LogStream class for add stream like handling
-     * to log-messages.
-     */
+
+#include <QString>
+#include <sstream>
+#include <string>
+
+#include <QString>
+#include <sstream>
+#include <string>
+#include <type_traits>
+
+/**
+ * @class LogStream
+ * @brief A logging stream class that provides an interface for logging messages using stream syntax.
+ *
+ * This class enables logging with a syntax similar to C++ stream insertion (<<) operators.
+ * It supports logging various data types, including std::string, QString, and primitive types.
+ * Messages are buffered in a stringstream and logged upon destruction.
+ */
     class LogStream {
       private:
-        Logger *m_logger;
-        LogLevel m_logLevel;
-        std::stringstream m_buf;
+        Logger *m_logger;         ///< Pointer to the Logger instance.
+        LogLevel m_logLevel;      ///< The log level for the current message.
+        std::stringstream m_buf;  ///< Buffer for the log message.
 
       public:
-        LogStream(Logger *logger, LogLevel logLevel);
+        /**
+         * @brief Constructs a LogStream object.
+         *
+         * @param logger Pointer to the Logger instance that will handle the output.
+         * @param logLevel The severity level of the log message.
+         */
+        LogStream(Logger *logger, LogLevel logLevel)
+            : m_logger(logger), m_logLevel(logLevel) {}
 
-        ~LogStream();
+        /**
+         * @brief Destructor for LogStream.
+         *
+         * The destructor automatically sends the buffered message to the logger when
+         * the LogStream object goes out of scope.
+         */
+        ~LogStream() {
+            // Send the accumulated message in the buffer to the logger
+            m_logger->log(m_logLevel, m_buf.str());
+        }
 
+        /**
+         * @brief Stream insertion operator for general types.
+         *
+         * This templated operator allows insertion of various types into the log stream,
+         * excluding QString and std::string, which have explicit overloads.
+         *
+         * @tparam T The type of the argument to be inserted.
+         * @param arg The value to be inserted into the log stream.
+         * @return Reference to the current LogStream object to allow chaining.
+         */
+        template<typename T, typename std::enable_if<!std::is_same<T, QString>::value, int>::type = 0>
+        LogStream &operator<<(T &&arg) {
+            m_buf << std::forward<T>(arg);
+            return *this;
+        }
 
-        // Specialization for QString
+        /**
+         * @brief Stream insertion operator for std::string.
+         *
+         * Allows insertion of std::string into the log stream.
+         *
+         * @param arg The std::string to be inserted.
+         * @return Reference to the current LogStream object to allow chaining.
+         */
+        LogStream &operator<<(const std::string &arg) {
+            m_buf << arg;  // std::string is directly compatible with std::stringstream
+            return *this;
+        }
+
+        /**
+         * @brief Stream insertion operator for QString.
+         *
+         * Allows insertion of QString into the log stream by converting it to std::string.
+         * This overload ensures QString is converted before inserting it into the stringstream.
+         *
+         * @param arg The QString to be inserted.
+         * @return Reference to the current LogStream object to allow chaining.
+         */
         LogStream &operator<<(const QString &arg) {
             m_buf << arg.toStdString();  // Convert QString to std::string
             return *this;
         }
 
-        template<typename T>
-        LogStream &operator<<(T &&arg) {
-            m_buf << std::forward<T>(arg);
+        /**
+         * @brief Stream insertion operator for C-style strings.
+         *
+         * Allows insertion of const char* (C-style strings) into the log stream.
+         *
+         * @param arg The C-style string to be inserted.
+         * @return Reference to the current LogStream object to allow chaining.
+         */
+        LogStream &operator<<(const char *arg) {
+            m_buf << arg;  // const char* is compatible with std::stringstream
             return *this;
         }
     };
@@ -173,7 +247,8 @@ class Logger {
     void error(const std::string &message);
 
     void error(const QString &message);
-   // --- ERROR -------------------------------------- //
+
+    // --- ERROR -------------------------------------- //
 
     LogStream trace();
 
@@ -207,7 +282,6 @@ class Logger {
 
 class NullLogger : public Logger {
   private:
-
     void doLog(LogLevel level, const LogMessage *message) override;
 };
 
@@ -232,5 +306,4 @@ class DefaultQtLogger : public Logger {
  * Default static instance.
  */
 static DefaultQtLogger defaultQtLogger = DefaultQtLogger();
-
 } // namespace TrenchBroom

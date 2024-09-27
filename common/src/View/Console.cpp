@@ -40,26 +40,20 @@ Console::Console(QWidget *parent) : TabBookPage(parent) {
     m_textView->setReadOnly(true);
     m_textView->setWordWrapMode(QTextOption::NoWrap);
 
-    QVBoxLayout *sizer = new QVBoxLayout();
-    sizer->setContentsMargins(0, 0, 0, 0);
-    sizer->addWidget(m_textView);
-    setLayout(sizer);
+    auto *layout = new QVBoxLayout();
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_textView);
+    setLayout(layout);
+
+    setLogLevel(pref(Preferences::AppLogLevel));
 }
 
-void Console::doLog(const LogLevel level, const std::string &message) {
-    doLog(level, QString::fromStdString(message));
-}
 
-void Console::doLog(const LogLevel level, const QString &message) {
-    if (!message.isEmpty()) {
-        logToDebugOut(level, message);
-        logToConsole(level, message);
-        FileLogger::instance().log(level, message);
-    }
-}
-
-void Console::logToDebugOut(const LogLevel /* level */, const QString &message) {
-    qDebug("[%8.4f] %s", Timer::appstart.elapsed(), message.toStdString().c_str());
+void Console::doLog(const LogLevel level, const LogMessage *message) {
+    logToConsole(level, message->format(false, false));
+    // redirect to default logger
+    defaultQtLogger.log(level, message);
+    FileLogger::instance().log(level, message->format(true, false));
 }
 
 void Console::logToConsole(const LogLevel level, const QString &message) {
@@ -67,14 +61,21 @@ void Console::logToConsole(const LogLevel level, const QString &message) {
     // which is the background of text entry widgets
     QTextCharFormat format;
     switch (level) {
-    case LogLevel::Debug:format.setForeground(QBrush(toQColor(pref(Preferences::LogDebugColor))));
-        break;
-    case LogLevel::Info:format.setForeground(QBrush(toQColor(pref(Preferences::LogInfoColor))));
-        break;
-    case LogLevel::Warn:format.setForeground(QBrush(toQColor(pref(Preferences::LogWarningColor))));
-        break;
-    case LogLevel::Error:format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
-        break;
+        case LogLevel::Trace:
+            format.setForeground(QBrush(toQColor(pref(Preferences::TraceDebugColor))));
+            break;
+        case LogLevel::Debug:
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogDebugColor))));
+            break;
+        case LogLevel::Info:
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogInfoColor))));
+            break;
+        case LogLevel::Warn:
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogWarningColor))));
+            break;
+        case LogLevel::Error:
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
+            break;
     }
 
     format.setFont(TrenchBroomApp::instance().getConsoleFont());
@@ -86,5 +87,7 @@ void Console::logToConsole(const LogLevel level, const QString &message) {
 
     m_textView->moveCursor(QTextCursor::MoveOperation::End);
 }
+
+Console::~Console() {}
 } // namespace View
 } // namespace TrenchBroom

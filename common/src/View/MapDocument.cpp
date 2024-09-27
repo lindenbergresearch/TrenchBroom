@@ -327,7 +327,20 @@ MapDocument::~MapDocument() {
 }
 
 Logger &MapDocument::logger() {
-    return defaultQtLogger;
+    return *this;
+}
+
+void MapDocument::setLogger(Logger *logger) {
+    m_logger = logger;
+}
+
+void MapDocument::doLog(LogLevel level, const LogMessage *message) {
+    // proxy logger - not nice, but works for now
+    if (m_logger) {
+        m_logger->log(level, message);
+    } else {
+        defaultQtLogger.log(level, message);
+    }
 }
 
 std::shared_ptr<Model::Game> MapDocument::game() const {

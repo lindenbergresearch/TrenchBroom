@@ -314,6 +314,7 @@ void MapFrame::createGui() {
 
     m_infoPanel = new InfoPanel(m_document);
     m_console = m_infoPanel->console();
+    document()->setLogger(m_console);
 
     m_mapView = new SwitchableMapViewContainer(m_console, m_document, *m_contextManager);
     m_currentMapView = m_mapView->firstMapViewBase();

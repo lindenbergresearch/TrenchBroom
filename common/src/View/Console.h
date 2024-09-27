@@ -39,12 +39,11 @@ class Console : public TabBookPage, public Logger {
   public:
     explicit Console(QWidget *parent = nullptr);
 
+    ~Console() override;
+
   private:
-    void doLog(LogLevel level, const std::string &message) override;
 
-    void doLog(LogLevel level, const QString &message) override;
-
-    void logToDebugOut(LogLevel level, const QString &message);
+    void doLog(LogLevel level, const LogMessage *message) override;
 
     void logToConsole(LogLevel level, const QString &message);
 };
