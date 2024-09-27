@@ -87,7 +87,6 @@ int main(int argc, char *argv[]) {
     format.setSamples(8);
 
     QSurfaceFormat::setDefaultFormat(format);
-    TrenchBroom::View::RenderView::setFormat(format);
 
     app.parseCommandLineAndShowFrame();
     return app.exec();
