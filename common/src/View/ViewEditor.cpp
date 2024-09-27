@@ -678,7 +678,7 @@ void ViewEditor::refreshRendererPanel() {
     auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
     m_shadeAmount->setValue(static_cast<int>(shadeAmount));
 
-    auto brightness = int(vm::round(100.0f * (pref(Preferences::Brightness) - 1.0f)));
+    auto brightness = int(vm::round(100.0f * (pref(Preferences::Brightness))));
     m_brightnessSlider->setValue(brightness);
 }
 
@@ -856,7 +856,7 @@ void ViewEditor::shadeLevelChanged(const int value) {
 
 void ViewEditor::brightnessChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
-    prefs.set(Preferences::Brightness, (float(value) / 100.0f) + 1.0f);
+    prefs.set(Preferences::Brightness, (float(value) / 100.0f));
 }
 
 void ViewEditor::dashedBoundsChanged(bool checked) {
