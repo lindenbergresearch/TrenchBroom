@@ -20,7 +20,8 @@
 #include "Texture.h"
 
 #include "Assets/TextureBuffer.h"
-#include "Assets/TextureCollection.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
 #include "Macros.h"
 #include "Renderer/GL.h"
 
@@ -248,6 +249,14 @@ void Texture::prepare(const GLuint textureId, const int minFilter, const int mag
     if (!m_buffers.empty()) {
         const auto compressed = isCompressedFormat(m_format);
 
+       bool enableAnisotropy = pref(Preferences::EnableAnisotropicFilter);
+       GLfloat anisotropyValue = pref(Preferences::AnisotropicFilterValue);
+       GLfloat maxAnisotrophyValue = 0.0;
+
+       if (enableAnisotropy && anisotropyValue <= 0) {
+           glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotrophyValue);
+       }
+
         glAssert(glPixelStorei(GL_UNPACK_SWAP_BYTES, false));
         glAssert(glPixelStorei(GL_UNPACK_LSB_FIRST, false));
         glAssert(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
@@ -260,6 +269,10 @@ void Texture::prepare(const GLuint textureId, const int minFilter, const int mag
         glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter));
         glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+        if (enableAnisotropy) {
+            glAssert(glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, std::max(maxAnisotrophyValue, anisotropyValue)));
+        }
 
         if (m_type == TextureType::Masked) {
             // masked textures don't work well with automatic mipmaps, so we force

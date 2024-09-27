@@ -692,6 +692,28 @@ void MapViewBase::toggleShowFog() {
     togglePref(Preferences::ShowFog);
 }
 
+void MapViewBase::logAnisotropyInfo() {
+    bool enableAnisotropy = pref(Preferences::EnableAnisotropicFilter);
+    GLfloat anisotropyValue = pref(Preferences::AnisotropicFilterValue);
+    GLfloat maxAnisotrophyValue = 0.0;
+
+    if (enableAnisotropy && anisotropyValue <= 0) {
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotrophyValue);
+    }
+
+    m_logger->info() << "Anisotropic Filtering : " << kdl::str_select(enableAnisotropy, "enabled", "disabled");
+
+    if (enableAnisotropy) {
+        m_logger->info() << "Anisotropic Value     : " << int(std::max(anisotropyValue, maxAnisotrophyValue)) << "x";
+    }
+}
+
+void MapViewBase::toggleAnisotropy() {
+    togglePref(Preferences::EnableAnisotropicFilter);
+    logAnisotropyInfo();
+    findMapFrame(this)->reloadTextureCollections();
+}
+
 void MapViewBase::toggleShowEdges() {
     togglePref(Preferences::ShowEdges);
 }
@@ -771,9 +793,10 @@ void MapViewBase::doRefreshViews() {
 
 void MapViewBase::initializeGL() {
     if (doInitializeGL()) {
-        m_logger->info() << "Renderer info: " << GLContextManager::GLRenderer << " version " << GLContextManager::GLVersion << " from " << GLContextManager::GLVendor;
-        m_logger->info() << "Depth buffer bits: " << depthBits();
-        m_logger->info() << "Multisampling " << kdl::str_select(multisample(), "enabled", "disabled");
+        m_logger->info() << "Renderer info         : " << GLContextManager::GLRenderer << " version " << GLContextManager::GLVersion << " from " << GLContextManager::GLVendor;
+        m_logger->info() << "Depth buffer bits     : " << depthBits();
+        m_logger->info() << "Multisampling         : " << kdl::str_select(multisample(), "enabled", "disabled");
+        logAnisotropyInfo();
     }
 }
 
@@ -847,7 +870,6 @@ void MapViewBase::setupGL(Renderer::RenderContext &context) {
     glAssert(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     glAssert(glShadeModel(GL_SMOOTH));
 }
-
 void MapViewBase::renderCoordinateSystem(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     if (pref(Preferences::ShowAxes)) {
         auto document = kdl::mem_lock(m_document);

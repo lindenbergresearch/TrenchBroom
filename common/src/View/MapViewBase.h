@@ -352,6 +352,10 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
 
     void toggleShowFog();
 
+    void logAnisotropyInfo();
+
+    void toggleAnisotropy();
+
     void toggleShowEdges();
 
     void showAllEntityLinks();
