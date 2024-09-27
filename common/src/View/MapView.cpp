@@ -27,11 +27,11 @@
 namespace TrenchBroom::View {
 MapView::~MapView() = default;
 
-void MapView::setContainer(MapViewContainer *container) {
+void MapView::setContainer(MapViewContainer* container) {
     m_container = container;
 }
 
-void MapView::installActivationTracker(MapViewActivationTracker &activationTracker) {
+void MapView::installActivationTracker(MapViewActivationTracker&activationTracker) {
     doInstallActivationTracker(activationTracker);
 }
 
@@ -39,7 +39,7 @@ bool MapView::isCurrent() const {
     return doGetIsCurrent();
 }
 
-MapViewBase *MapView::firstMapViewBase() {
+MapViewBase* MapView::firstMapViewBase() {
     return doGetFirstMapViewBase();
 }
 
@@ -51,11 +51,11 @@ void MapView::selectTall() {
     doSelectTall();
 }
 
-vm::vec3 MapView::pasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
+vm::vec3 MapView::pasteObjectsDelta(const vm::bbox3&bounds, const vm::bbox3&referenceBounds) const {
     return doGetPasteObjectsDelta(bounds, referenceBounds);
 }
 
-void MapView::reset2dCameras(const Renderer::Camera &masterCamera, const bool animate) {
+void MapView::reset2dCameras(const Renderer::Camera&masterCamera, const bool animate) {
     doReset2dCameras(masterCamera, animate);
 }
 
@@ -63,7 +63,7 @@ void MapView::focusCameraOnSelection(const bool animate) {
     doFocusCameraOnSelection(animate);
 }
 
-void MapView::moveCameraToPosition(const vm::vec3f &position, const bool animate) {
+void MapView::moveCameraToPosition(const vm::vec3f&position, const bool animate) {
     doMoveCameraToPosition(position, animate);
 }
 
