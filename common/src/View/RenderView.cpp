@@ -31,6 +31,7 @@
 #include "View/GLContextManager.h"
 #include "View/InputEvent.h"
 #include "View/QtUtils.h"
+#include "Assets/Texture.h"
 
 /*
  * - glew requires it is included before <OpenGL/gl.h>
@@ -80,11 +81,12 @@
 
 namespace TrenchBroom {
 namespace View {
+
 RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
     : QOpenGLWidget(parent), m_glContext(&contextManager), boxFilter(32), m_framesRendered(0) {
 
     auto palette = QPalette{};
-    m_focusColor = palette.color(QPalette::Highlight);
+    m_focusColor = palette.color(QPalette::Highlight).darker();
     m_frameColor = palette.color(QPalette::Midlight);
 
     setUpdateBehavior(PartialUpdate);
@@ -110,7 +112,16 @@ RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
             appendix = "\nswbuff: " + std::to_string(int(context()->format().swapBehavior())) + " \nswap: " + std::to_string(int(context()->format().swapInterval()));
         }
 
-        m_currentFPS = std::string("FPS: ") + std::to_string(int(avgFps)) + "\nframes: " + std::to_string(m_totalFrames) + "\nmax: " + std::to_string(maxFrameTime * 1000.0) + "ms\nsize: " + std::to_string(m_glContext->vboManager().currentVboCount()) + " VBOs: (" + std::to_string(m_glContext->vboManager().peakVboCount()) + " peak)\nmem: " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) + "k @ " + std::to_string(glWidth) + "x" + std::to_string(glHeight) + "\ndepth: " + std::to_string(depthBits()) + "\nmsamples: " + std::to_string(multisample()) + appendix;
+        m_currentFPS = std::string("FPS: ") + std::to_string(int(avgFps)) +
+            "\nframes: " + std::to_string(m_totalFrames) +
+            "\nmax: " + std::to_string(maxFrameTime * 1000.0) +
+            "ms\nsize: " + std::to_string(m_glContext->vboManager().currentVboCount()) +
+            " VBOs: (" + std::to_string(m_glContext->vboManager().peakVboCount()) +
+            " peak)\nmem: " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) +
+            "k @ " + std::to_string(glWidth) + "x" + std::to_string(glHeight) +
+            "\ndepth: " + std::to_string(depthBits()) +
+            "\nmsamples: " + std::to_string(multisample())+ appendix;
+          //  "\nanisotropy: " + std::to_string(int(Assets::Texture::anisotropy))+ "x" + appendix;
     });
 
     fpsCounter->start(1000);
