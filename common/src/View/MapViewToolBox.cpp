@@ -21,7 +21,7 @@
 
 #include "Model/EditorContext.h"
 #include "View/ClipTool.h"
-#include "View/CreateComplexBrushTool.h"
+#include "View/AssembleBrushTool.h"
 #include "View/CreateEntityTool.h"
 #include "View/DrawShapeTool.h"
 #include "View/EdgeTool.h"
@@ -47,7 +47,7 @@ ClipTool &MapViewToolBox::clipTool() {
     return *m_clipTool;
 }
 
-CreateComplexBrushTool &MapViewToolBox::createComplexBrushTool() {
+AssembleBrushTool &MapViewToolBox::createComplexBrushTool() {
     return *m_createComplexBrushTool;
 }
 
@@ -206,7 +206,7 @@ void MapViewToolBox::moveVertices(const vm::vec3 &delta) {
 
 void MapViewToolBox::createTools(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl) {
     m_clipTool = std::make_unique<ClipTool>(document);
-    m_createComplexBrushTool = std::make_unique<CreateComplexBrushTool>(document);
+    m_createComplexBrushTool = std::make_unique<AssembleBrushTool>(document);
     m_createEntityTool = std::make_unique<CreateEntityTool>(document);
     m_createSimpleBrushTool = std::make_unique<DrawShapeTool>(document);
     m_moveObjectsTool = std::make_unique<MoveObjectsTool>(document);

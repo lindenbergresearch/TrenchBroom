@@ -31,7 +31,7 @@ namespace TrenchBroom {
 namespace View {
 class ClipTool;
 
-class CreateComplexBrushTool;
+class AssembleBrushTool;
 
 class CreateEntityTool;
 
@@ -60,7 +60,7 @@ class MapViewToolBox : public ToolBox {
     std::weak_ptr<MapDocument> m_document;
 
     std::unique_ptr<ClipTool> m_clipTool;
-    std::unique_ptr<CreateComplexBrushTool> m_createComplexBrushTool;
+    std::unique_ptr<AssembleBrushTool> m_createComplexBrushTool;
     std::unique_ptr<CreateEntityTool> m_createEntityTool;
     std::unique_ptr<DrawShapeTool> m_createSimpleBrushTool;
     std::unique_ptr<MoveObjectsTool> m_moveObjectsTool;
@@ -82,7 +82,7 @@ class MapViewToolBox : public ToolBox {
   public: // tools
     ClipTool &clipTool();
 
-    CreateComplexBrushTool &createComplexBrushTool();
+    AssembleBrushTool &createComplexBrushTool();
 
     CreateEntityTool &createEntityTool();
 
