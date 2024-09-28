@@ -50,7 +50,7 @@
 #include "View/ClipToolController.h"
 #include "View/CreateComplexBrushToolController3D.h"
 #include "View/CreateEntityToolController.h"
-#include "View/CreateSimpleBrushToolController3D.h"
+#include "View/DrawShapeToolController3D.h"
 #include "View/EdgeTool.h"
 #include "View/EdgeToolController.h"
 #include "View/ExtrudeToolController.h"
@@ -112,7 +112,7 @@ void MapView3D::initializeToolChain(MapViewToolBox &toolBox) {
     addTool(std::make_unique<CreateEntityToolController3D>(toolBox.createEntityTool()));
     addTool(std::make_unique<SetBrushFaceAttributesTool>(m_document));
     addTool(std::make_unique<SelectionTool>(m_document));
-    addTool(std::make_unique<CreateSimpleBrushToolController3D>(toolBox.createSimpleBrushTool(), m_document));
+    addTool(std::make_unique<DrawShapeToolController3D>(toolBox.createSimpleBrushTool(), m_document));
 }
 
 void MapView3D::connectObservers() {

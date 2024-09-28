@@ -23,7 +23,7 @@
 #include "View/ClipTool.h"
 #include "View/CreateComplexBrushTool.h"
 #include "View/CreateEntityTool.h"
-#include "View/CreateSimpleBrushTool.h"
+#include "View/DrawShapeTool.h"
 #include "View/EdgeTool.h"
 #include "View/ExtrudeTool.h"
 #include "View/FaceTool.h"
@@ -55,7 +55,7 @@ CreateEntityTool &MapViewToolBox::createEntityTool() {
     return *m_createEntityTool;
 }
 
-CreateSimpleBrushTool &MapViewToolBox::createSimpleBrushTool() {
+DrawShapeTool &MapViewToolBox::createSimpleBrushTool() {
     return *m_createSimpleBrushTool;
 }
 
@@ -208,7 +208,7 @@ void MapViewToolBox::createTools(std::weak_ptr<MapDocument> document, QStackedLa
     m_clipTool = std::make_unique<ClipTool>(document);
     m_createComplexBrushTool = std::make_unique<CreateComplexBrushTool>(document);
     m_createEntityTool = std::make_unique<CreateEntityTool>(document);
-    m_createSimpleBrushTool = std::make_unique<CreateSimpleBrushTool>(document);
+    m_createSimpleBrushTool = std::make_unique<DrawShapeTool>(document);
     m_moveObjectsTool = std::make_unique<MoveObjectsTool>(document);
     m_extrudeTool = std::make_unique<ExtrudeTool>(document);
     m_rotateObjectsTool = std::make_unique<RotateObjectsTool>(document);

@@ -17,10 +17,10 @@
  along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreateSimpleBrushToolController2D.h"
+#include "DrawShapeToolController2D.h"
 
 #include "Renderer/Camera.h"
-#include "View/CreateSimpleBrushTool.h"
+#include "View/DrawShapeTool.h"
 #include "View/Grid.h"
 #include "View/HandleDragTracker.h"
 #include "View/InputState.h"
@@ -35,27 +35,27 @@
 
 namespace TrenchBroom {
 namespace View {
-CreateSimpleBrushToolController2D::CreateSimpleBrushToolController2D(CreateSimpleBrushTool &tool, std::weak_ptr<MapDocument> document)
+DrawShapeToolController2D::DrawShapeToolController2D(DrawShapeTool &tool, std::weak_ptr<MapDocument> document)
     : m_tool{tool}, m_document{document} {
 }
 
-Tool &CreateSimpleBrushToolController2D::tool() {
+Tool &DrawShapeToolController2D::tool() {
     return m_tool;
 }
 
-const Tool &CreateSimpleBrushToolController2D::tool() const {
+const Tool &DrawShapeToolController2D::tool() const {
     return m_tool;
 }
 
 namespace {
 class CreateSimpleBrushDragDelegate : public HandleDragTrackerDelegate {
   private:
-    CreateSimpleBrushTool &m_tool;
+    DrawShapeTool &m_tool;
     vm::bbox3 m_worldBounds;
     vm::bbox3 m_referenceBounds;
 
   public:
-    CreateSimpleBrushDragDelegate(CreateSimpleBrushTool &tool, const vm::bbox3 &worldBounds, const vm::bbox3 &referenceBounds)
+    CreateSimpleBrushDragDelegate(DrawShapeTool &tool, const vm::bbox3 &worldBounds, const vm::bbox3 &referenceBounds)
         : m_tool{tool}, m_worldBounds{worldBounds}, m_referenceBounds{referenceBounds} {
     }
 
@@ -121,7 +121,7 @@ class CreateSimpleBrushDragDelegate : public HandleDragTrackerDelegate {
 };
 } // namespace
 
-std::unique_ptr<DragTracker> CreateSimpleBrushToolController2D::acceptMouseDrag(const InputState &inputState) {
+std::unique_ptr<DragTracker> DrawShapeToolController2D::acceptMouseDrag(const InputState &inputState) {
     if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
         return nullptr;
     }
@@ -149,7 +149,7 @@ std::unique_ptr<DragTracker> CreateSimpleBrushToolController2D::acceptMouseDrag(
     }, inputState, initialHandlePosition, initialHandlePosition);
 }
 
-bool CreateSimpleBrushToolController2D::cancel() {
+bool DrawShapeToolController2D::cancel() {
     return false;
 }
 } // namespace View

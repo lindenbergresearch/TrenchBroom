@@ -17,7 +17,7 @@
  along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreateSimpleBrushTool.h"
+#include "DrawShapeTool.h"
 
 #include "Error.h"
 #include "Exceptions.h"
@@ -34,10 +34,10 @@
 
 namespace TrenchBroom {
 namespace View {
-CreateSimpleBrushTool::CreateSimpleBrushTool(std::weak_ptr<MapDocument> document) : CreateBrushToolBase(true, document) {
+DrawShapeTool::DrawShapeTool(std::weak_ptr<MapDocument> document) : CreateBrushToolBase(true, document) {
 }
 
-void CreateSimpleBrushTool::update(const vm::bbox3 &bounds) {
+void DrawShapeTool::update(const vm::bbox3 &bounds) {
     auto document = kdl::mem_lock(m_document);
     const auto game = document->game();
     const auto builder = Model::BrushBuilder(document->world()->mapFormat(), document->worldBounds(), game->defaultFaceAttribs());

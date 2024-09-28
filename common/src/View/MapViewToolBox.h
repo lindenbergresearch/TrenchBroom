@@ -35,7 +35,7 @@ class CreateComplexBrushTool;
 
 class CreateEntityTool;
 
-class CreateSimpleBrushTool;
+class DrawShapeTool;
 
 class MoveObjectsTool;
 
@@ -62,7 +62,7 @@ class MapViewToolBox : public ToolBox {
     std::unique_ptr<ClipTool> m_clipTool;
     std::unique_ptr<CreateComplexBrushTool> m_createComplexBrushTool;
     std::unique_ptr<CreateEntityTool> m_createEntityTool;
-    std::unique_ptr<CreateSimpleBrushTool> m_createSimpleBrushTool;
+    std::unique_ptr<DrawShapeTool> m_createSimpleBrushTool;
     std::unique_ptr<MoveObjectsTool> m_moveObjectsTool;
     std::unique_ptr<ExtrudeTool> m_extrudeTool;
     std::unique_ptr<RotateObjectsTool> m_rotateObjectsTool;
@@ -86,7 +86,7 @@ class MapViewToolBox : public ToolBox {
 
     CreateEntityTool &createEntityTool();
 
-    CreateSimpleBrushTool &createSimpleBrushTool();
+    DrawShapeTool &createSimpleBrushTool();
 
     MoveObjectsTool &moveObjectsTool();
 
