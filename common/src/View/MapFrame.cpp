@@ -1348,18 +1348,18 @@ bool MapFrame::anyToolActive() const {
     return m_mapView->anyToolActive();
 }
 
-void MapFrame::toggleCreateComplexBrushTool() {
-    if (canToggleCreateComplexBrushTool()) {
-        m_mapView->toggleCreateComplexBrushTool();
+void MapFrame::toggleAssembleBrushTool() {
+    if (canToggleAssembleBrushTool()) {
+        m_mapView->toggleAssembleBrushTool();
     }
 }
 
-bool MapFrame::canToggleCreateComplexBrushTool() const {
-    return m_mapView->canToggleCreateComplexBrushTool();
+bool MapFrame::canToggleAssembleBrushTool() const {
+    return m_mapView->canToggleAssembleBrushTool();
 }
 
-bool MapFrame::createComplexBrushToolActive() const {
-    return m_mapView->createComplexBrushToolActive();
+bool MapFrame::assembleBrushToolActive() const {
+    return m_mapView->assembleBrushToolActive();
 }
 
 void MapFrame::toggleClipTool() {

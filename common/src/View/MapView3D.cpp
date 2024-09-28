@@ -104,7 +104,7 @@ void MapView3D::initializeToolChain(MapViewToolBox &toolBox) {
     addTool(std::make_unique<ScaleObjectsToolController3D>(toolBox.scaleObjectsTool(), m_document));
     addTool(std::make_unique<ShearObjectsToolController3D>(toolBox.shearObjectsTool(), m_document));
     addTool(std::make_unique<ExtrudeToolController3D>(toolBox.extrudeTool()));
-    addTool(std::make_unique<AssembleBrushToolController3D>(toolBox.createComplexBrushTool()));
+    addTool(std::make_unique<AssembleBrushToolController3D>(toolBox.assembleBrushTool()));
     addTool(std::make_unique<ClipToolController3D>(toolBox.clipTool()));
     addTool(std::make_unique<VertexToolController>(toolBox.vertexTool()));
     addTool(std::make_unique<EdgeToolController>(toolBox.edgeTool()));

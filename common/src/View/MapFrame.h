@@ -379,11 +379,11 @@ class MapFrame : public QMainWindow {
 
     bool anyToolActive() const;
 
-    void toggleCreateComplexBrushTool();
+    void toggleAssembleBrushTool();
 
-    bool canToggleCreateComplexBrushTool() const;
+    bool canToggleAssembleBrushTool() const;
 
-    bool createComplexBrushToolActive() const;
+    bool assembleBrushToolActive() const;
 
     void toggleClipTool();
 

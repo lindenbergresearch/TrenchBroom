@@ -247,7 +247,7 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void resetTexturesToWorld();
 
   public: // tool mode actions
-    void createComplexBrush();
+    void assembleBrush();
 
     void toggleClipSide();
 

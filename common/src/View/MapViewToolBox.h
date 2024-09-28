@@ -60,7 +60,7 @@ class MapViewToolBox : public ToolBox {
     std::weak_ptr<MapDocument> m_document;
 
     std::unique_ptr<ClipTool> m_clipTool;
-    std::unique_ptr<AssembleBrushTool> m_createComplexBrushTool;
+    std::unique_ptr<AssembleBrushTool> m_assembleBrushTool;
     std::unique_ptr<CreateEntityTool> m_createEntityTool;
     std::unique_ptr<DrawShapeTool> m_createSimpleBrushTool;
     std::unique_ptr<MoveObjectsTool> m_moveObjectsTool;
@@ -82,7 +82,7 @@ class MapViewToolBox : public ToolBox {
   public: // tools
     ClipTool &clipTool();
 
-    AssembleBrushTool &createComplexBrushTool();
+    AssembleBrushTool &assembleBrushTool();
 
     CreateEntityTool &createEntityTool();
 
@@ -104,11 +104,11 @@ class MapViewToolBox : public ToolBox {
 
     FaceTool &faceTool();
 
-    void toggleCreateComplexBrushTool();
+    void toggleAssembleBrushTool();
 
-    bool createComplexBrushToolActive() const;
+    bool assembleBrushToolActive() const;
 
-    void performCreateComplexBrush();
+    void performAssembleBrush();
 
     void toggleClipTool();
 

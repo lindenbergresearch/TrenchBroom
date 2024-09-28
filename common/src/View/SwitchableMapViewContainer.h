@@ -95,11 +95,11 @@ class SwitchableMapViewContainer : public QWidget, public MapView {
 
     void deactivateTool();
 
-    bool createComplexBrushToolActive() const;
+    bool assembleBrushToolActive() const;
 
-    bool canToggleCreateComplexBrushTool() const;
+    bool canToggleAssembleBrushTool() const;
 
-    void toggleCreateComplexBrushTool();
+    void toggleAssembleBrushTool();
 
     bool clipToolActive() const;
 
