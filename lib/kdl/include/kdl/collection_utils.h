@@ -211,10 +211,8 @@ bool range_is_equivalent(
   if constexpr (
     std::is_convertible_v<
       typename std::iterator_traits<I1>::iterator_category,
-      std::random_access_iterator_tag>
-    && std::is_convertible_v<
-      typename std::iterator_traits<I2>::iterator_category,
-      std::random_access_iterator_tag>)
+      std::
+        random_access_iterator_tag> && std::is_convertible_v<typename std::iterator_traits<I2>::iterator_category, std::random_access_iterator_tag>)
   {
     if (last1 - first1 != last2 - first2)
     {

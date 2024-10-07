@@ -1,5 +1,5 @@
 /*
- Copyright 2023 Kristian Duske
+ Copyright 2024 Kristian Duske
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -18,31 +18,35 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include "kdl/pair_iterator.h"
-#include "kdl/std_io.h" // IWYU pragma: keep
+#pragma once
 
-#include <vector>
-
-#include "catch2.h"
+#include <functional>
 
 namespace kdl
 {
-TEST_CASE("pair_iterator")
+
+template <typename T>
+auto combine_hash(const T hash)
 {
-  using Catch::Matchers::UnorderedEquals;
-
-  using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
-  const auto [range, expected] = GENERATE(values<T>({
-    {{}, {}},
-    {{1}, {}},
-    {{1, 2}, {{1, 2}}},
-    {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
-  }));
-
-  CAPTURE(range);
-
-  const auto r = make_pair_range(range);
-  const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
-  CHECK_THAT(v, UnorderedEquals(expected));
+  return hash;
 }
+
+template <typename T, typename Rest>
+auto combine_hash(const T hash, const Rest& rest)
+{
+  return hash ^ combine_hash(rest) << 1;
+}
+
+template <typename A>
+auto hash(const A& a)
+{
+  return std::hash<A>{}(a);
+}
+
+template <typename A, typename... Rest>
+auto hash(const A& arg, const Rest&... rest)
+{
+  return combine_hash(hash(arg), hash(rest...));
+}
+
 } // namespace kdl

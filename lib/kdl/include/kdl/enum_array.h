@@ -65,23 +65,23 @@ public:
   }
 
   /**
- * Returns a const reference to the element at the given index.
- *
- * Precondition: index < Size
+   * Returns a const reference to the element at the given index.
+   *
+   * Precondition: index < Size
 
- * @param index the index
- * @return a const reference to the element at the given index
- */
+   * @param index the index
+   * @return a const reference to the element at the given index
+   */
   const T& operator[](const Enum index) const { return get(index); }
 
   /**
- * Returns a reference to the element at the given index.
- *
- * Precondition: index < Size
+   * Returns a reference to the element at the given index.
+   *
+   * Precondition: index < Size
 
- * @param index the index
- * @return a reference to the element at the given index
- */
+   * @param index the index
+   * @return a reference to the element at the given index
+   */
   T& operator[](const Enum index) { return get(index); }
 
   /**

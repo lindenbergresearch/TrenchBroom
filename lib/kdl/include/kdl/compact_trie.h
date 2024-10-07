@@ -301,23 +301,23 @@ private:
     void insert(const std::string_view key, const V& value) const
     {
       /*
- Possible cases for insertion:
-  index: 01234567 |   | #m_key: 6
-  m_key: target   | ^ | #key | conditions              | todo
- =================|===|======|=========================|======
-  case:  key:     |   |      |                         |
-     0:  blah     | 0 | 4    | ^ = 0                   | this is the root node, find
- or create child 'blah' and insert there; ^        |   |      | | 1:  targetli | 6 |
- 8    | ^ < #key AND ^ = #m_key | try insert in all children, if none match, create
- child 'li' and insert there; ^  |   |      |                         | 2:  tarus |
- 3 | 5    | ^ < #key AND ^ < #m_key | split this node in 'tar' and 'get'; create
- child 'us' and insert there; ^     |   |      |                         | 3:  tar
- | 3 | 3    | ^ = #key AND ^ < #m_key | split this node in 'tar' and 'get'; insert
- here; return true; ^     |   |      | | 4:  target   | 6 | 6    | ^ = #key AND ^ =
- #m_key | insert here; return true; ^  |   |      |                         |
- ==================================================================================
-  ^ indicates where key and m_key first differ
- */
+       Possible cases for insertion:
+        index: 01234567 |   | #m_key: 6
+        m_key: target   | ^ | #key | conditions              | todo
+       =================|===|======|=========================|======
+        case:  key:     |   |      |                         |
+           0:  blah     | 0 | 4    | ^ = 0                   | this is the root node, find
+       or create child 'blah' and insert there; ^        |   |      | | 1:  targetli | 6 |
+       8    | ^ < #key AND ^ = #m_key | try insert in all children, if none match, create
+       child 'li' and insert there; ^  |   |      |                         | 2:  tarus |
+       3 | 5    | ^ < #key AND ^ < #m_key | split this node in 'tar' and 'get'; create
+       child 'us' and insert there; ^     |   |      |                         | 3:  tar
+       | 3 | 3    | ^ = #key AND ^ < #m_key | split this node in 'tar' and 'get'; insert
+       here; return true; ^     |   |      | | 4:  target   | 6 | 6    | ^ = #key AND ^ =
+       #m_key | insert here; return true; ^  |   |      |                         |
+       ==================================================================================
+        ^ indicates where key and m_key first differ
+       */
 
       // find the index of the first character where the given key and this node's key
       // differ
