@@ -806,7 +806,7 @@ Result<bool> MapFrame::openDocument(std::shared_ptr<Model::Game> game, const Mod
     return m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform([&]() {
         const auto endTime = std::chrono::high_resolution_clock::now();
 
-        logger().info() << "Loaded " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << "ms";
+        logger().info() << "Loaded: " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << "ms.";
 
         return true;
     });
@@ -819,7 +819,7 @@ bool MapFrame::saveDocument() {
             m_document->saveDocument();
             const auto endTime = std::chrono::high_resolution_clock::now();
 
-            logger().info() << "Saved " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << "ms";
+            logger().info() << "Saved: " << m_document->path() << " in " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << "ms.";
             return true;
         } else {
             return saveDocumentAs();

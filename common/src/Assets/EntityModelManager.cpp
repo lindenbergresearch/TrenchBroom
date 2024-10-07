@@ -130,7 +130,7 @@ EntityModel *EntityModelManager::model(const std::filesystem::path &path) const 
         auto *model = pos->second.get();
         m_unpreparedModels.push_back(model);
 
-        m_logger.debug() << "Loaded entity model " << path;
+        m_logger.debug() << "Loaded entity model: " << path;
 
         return model;
     } catch (const GameException &e) {

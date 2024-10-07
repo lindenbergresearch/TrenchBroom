@@ -497,7 +497,7 @@ Result<void> MapDocument::newDocument(const Model::MapFormat mapFormat, const vm
 }
 
 Result<void> MapDocument::loadDocument(const Model::MapFormat mapFormat, const vm::bbox3 &worldBounds, std::shared_ptr<Model::Game> game, const std::filesystem::path &path) {
-    info("Loading document from " + path.string());
+    info() << "Loading document from: " << path;
 
     clearRepeatableCommands();
     doClearCommandProcessor();
@@ -759,7 +759,7 @@ void MapDocument::loadPointFile(std::filesystem::path path) {
 
     IO::Disk::withInputStream(path, [&](auto &stream) {
         return Model::loadPointFile(stream).transform([&](auto trace) {
-            info() << "Loaded point file " << path;
+            info() << "Loaded point file: " << path;
             m_pointFile = PointFile{std::move(trace), std::move(path)};
             pointFileWasLoadedNotifier();
         });
@@ -803,12 +803,12 @@ void MapDocument::loadPortalFile(std::filesystem::path path) {
 
     IO::Disk::withInputStream(path, [&](auto &stream) {
         return Model::loadPortalFile(stream).transform([&](auto portalFile) {
-            info() << "Loaded portal file " << path;
+            info() << "Loaded portal file: " << path;
             m_portalFile = {std::move(portalFile), std::move(path)};
             portalFileWasLoadedNotifier();
         });
     }).transform_error([&](auto e) {
-        error() << "Couldn't load portal file " << path << ": " << e.msg;
+        error() << "Couldn't load portal file: " << path << ": " << e.msg;
         m_portalFile = std::nullopt;
     });
 }
@@ -3275,13 +3275,13 @@ void MapDocument::loadEntityDefinitions() {
     auto status = IO::SimpleParserStatus{logger()};
 
     m_entityDefinitionManager->loadDefinitions(path, *m_game, status).transform([&]() {
-        info("Loaded entity definition file " + path.filename().string());
+        info("Loaded entity definition file: " + path.filename().string());
         createEntityDefinitionActions();
     }).transform_error([&](auto e) {
         if (spec.builtin()) {
-            error() << "Could not load builtin entity definition file '" << spec.path() << "': " << e.msg;
+            error() << "Could not load builtin entity definition file: '" << spec.path() << "': " << e.msg;
         } else {
-            error() << "Could not load external entity definition file '" << spec.path() << "': " << e.msg;
+            error() << "Could not load external entity definition file: '" << spec.path() << "': " << e.msg;
         }
     });
 }

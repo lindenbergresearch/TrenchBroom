@@ -73,12 +73,12 @@ void TextureManager::setTextureCollections(const std::vector<std::filesystem::pa
         if (it == collections.end() || !it->loaded()) {
             IO::loadTextureCollection(path, fs, textureConfig, m_logger).transform_error([&](const auto &error) {
                 if (it == collections.end()) {
-                    m_logger.error() << "Could not load texture collection '" << path << "': " << error.msg;
+                    m_logger.error() << "Could not load texture collection: " << path << " -> " << error.msg;
                 }
                 return Assets::TextureCollection{path};
             }).transform([&](auto collection) {
                 if (!collection.textures().empty()) {
-                    m_logger.info() << "Loaded texture collection '" << path << "'";
+                    m_logger.info() << "Loaded texture collection: " << path << ".";
                 }
                 addTextureCollection(std::move(collection));
             });

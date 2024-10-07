@@ -93,7 +93,7 @@ void GameFileSystem::addGameFileSystems(const GameConfig &config, const std::fil
 }
 
 void GameFileSystem::addFileSystemPath(const std::filesystem::path &path, Logger &logger) {
-    logger.info() << "Adding file system path " << path;
+    logger.info() << "Adding file system path: " << path;
     mount("", std::make_unique<IO::DiskFileSystem>(path));
 }
 
@@ -130,7 +130,7 @@ void GameFileSystem::addFileSystemPackages(const GameConfig &config, const std::
                 return diskFS.makeAbsolute(packagePath).and_then([&](const auto &absPackagePath) {
                     return createImageFileSystem(packageFormat, absPackagePath);
                 }).transform([&](auto fs) {
-                    logger.info() << "Adding file system package " << packagePath;
+                    logger.info() << "Adding file system package: " << packagePath;
                     mount("", std::move(fs));
                 });
             }));
