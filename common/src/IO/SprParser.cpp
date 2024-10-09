@@ -24,6 +24,7 @@
 #include "Assets/Texture.h"
 #include "Color.h"
 #include "Error.h"
+#include "Logger.h"
 #include "Exceptions.h"
 #include "IO/Reader.h"
 #include "Renderer/IndexRangeMapBuilder.h"
@@ -38,7 +39,11 @@
 
 namespace TrenchBroom {
 namespace IO {
-SprParser::SprParser(std::string name, const Reader &reader, const Assets::Palette &palette) : m_name{std::move(name)}, m_reader{reader}, m_palette{palette} {
+
+const float SprParser::SCALE_FACTOR_SPRITE = 0.5f;
+
+SprParser::SprParser(std::string name, const Reader &reader, const Assets::Palette &palette) : m_name{
+    std::move(name)}, m_reader{reader}, m_palette{palette} {
 }
 
 bool SprParser::canParse(const std::filesystem::path &path, Reader reader) {
@@ -68,7 +73,8 @@ static SprPicture parsePicture(Reader &reader, const Assets::Palette &palette) {
 
     Assets::TextureBuffer rgbaImage(4 * width * height);
     auto averageColor = Color{};
-    palette.indexedToRgba(reader, width * height, rgbaImage, Assets::PaletteTransparency::Index255Transparent, averageColor);
+    palette.indexedToRgba(reader,
+                          width * height, rgbaImage, Assets::PaletteTransparency::Index255Transparent, averageColor);
 
     return SprPicture{{
                           "", width, height, averageColor, std::move(rgbaImage), GL_RGBA, Assets::TextureType::Masked
@@ -156,16 +162,18 @@ static std::vector<unsigned char> processGoldsourcePalette(const RenderMode mode
 
         // Add the alpha channel
         switch (mode) {
-        case RenderMode::Normal:processed.push_back(0xFF);
-            break;
-        case RenderMode::Additive:
-        case RenderMode::IndexAlpha: {
-            const auto average = std::round(static_cast<float>(r + g + b) / 3.0f);
-            processed.push_back(static_cast<unsigned char>(average));
-            break;
-        }
-        case RenderMode::AlphaTest:processed.push_back(static_cast<unsigned char>(i == 0xFF ? 0 : 0xFF));
-            break;
+            case RenderMode::Normal:
+                processed.push_back(0xFF);
+                break;
+            case RenderMode::Additive:
+            case RenderMode::IndexAlpha: {
+                const auto average = std::round(static_cast<float>(r + g + b) / 3.0f);
+                processed.push_back(static_cast<unsigned char>(average));
+                break;
+            }
+            case RenderMode::AlphaTest:
+                processed.push_back(static_cast<unsigned char>(i == 0xFF ? 0 : 0xFF));
+                break;
         }
     }
 
@@ -182,10 +190,12 @@ static Assets::Palette parseEmbeddedPalette(Reader &reader, const RenderMode ren
     auto data = std::vector<unsigned char>(paletteSize * 3);
     reader.read(data.data(), data.size());
     data = processGoldsourcePalette(renderMode, data);
-    return Assets::makePalette(data, Assets::PaletteColorFormat::Rgba).if_error([](const auto &e) { throw AssetException{e.msg}; }).value();
+    return Assets::makePalette(data, Assets::PaletteColorFormat::Rgba).if_error([](const auto &e) {
+        throw AssetException{e.msg};
+    }).value();
 }
 
-std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* logger */) {
+std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger &logger) {
     // see https://www.gamers.org/dEngine/quake/spec/quake-spec34/qkspec_6.htm#CSPRF
 
     // Half-Life sprites (SPR version 2) are the same as Quake sprites, except
@@ -208,17 +218,64 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
 
     auto renderMode = RenderMode::IndexAlpha;
 
+    std::string mode;
+    std::string orientation;
+
     const auto orientationType = parseSpriteOrientationType(reader);
     if (version == 2) {
         renderMode = parseSpriteRenderMode(reader);
     }
 
+    switch (renderMode) {
+        case RenderMode::Normal:
+            mode = "Normal";
+            break;
+        case RenderMode::Additive:
+            mode = "Additive";
+            break;
+        case RenderMode::IndexAlpha:
+            mode = "IndexAlpha";
+            break;
+        case RenderMode::AlphaTest:
+            mode = "AlphaTest";
+            break;
+        default:
+            mode = "Unknown";
+    }
+
+    switch (orientationType) {
+        case Assets::Orientation::Oriented:
+            orientation = "Oriented";
+            break;
+        case Assets::Orientation::FacingUpright:
+            orientation = "FacingUpright";
+            break;
+        case Assets::Orientation::ViewPlaneParallelOriented:
+            orientation = "ViewPlaneParallelOriented";
+            break;
+        case Assets::Orientation::ViewPlaneParallel:
+            orientation = "ViewPlaneParallel";
+            break;
+        case Assets::Orientation::ViewPlaneParallelUpright:
+            orientation = "ViewPlaneParallelUpright";
+            break;
+        default:
+            mode = "Unknown";
+    }
+
     /* const auto radius = */ reader.readFloat<float>();
-    /* const auto maxWidth = */ reader.readSize<int32_t>();
-    /* const auto maxHeight = */ reader.readSize<int32_t>();
+    const auto maxWidth = reader.readSize<int32_t>();
+    const auto maxHeight = reader.readSize<int32_t>();
     const auto frameCount = reader.readSize<int32_t>();
     /* const auto beamLength = */ reader.readFloat<float>();
     /* const auto synchtype = */ reader.readInt<int32_t>();
+
+    logger.info() << "Loading sprite: '" + m_name << "' " <<
+                  "size=(" << maxWidth << ", " << maxHeight << ") " <<
+                  "format=" << ((version == 1) ? "Quake" : "Half-Life") <<
+                  " render-mode=" << mode <<
+                  " orientation=" << orientation;
+
 
     Assets::Palette palette = m_palette;
     if (version == 2) {
@@ -240,10 +297,12 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
         auto pictureFrame = parsePictureFrame(reader, palette);
         textures.push_back(std::move(pictureFrame.texture));
 
-        const auto w = static_cast<float>(pictureFrame.width);
-        const auto h = static_cast<float>(pictureFrame.height);
-        const auto x1 = static_cast<float>(pictureFrame.x);
-        const auto y1 = static_cast<float>(pictureFrame.y) - h;
+        const auto w = static_cast<float>(pictureFrame.width) * SCALE_FACTOR_SPRITE;
+        const auto h = static_cast<float>(pictureFrame.height) * SCALE_FACTOR_SPRITE;
+        const auto x1 = static_cast<float>(static_cast<float>(pictureFrame.x) +
+                                           static_cast<float>(pictureFrame.width) * SCALE_FACTOR_SPRITE * 0.5f);
+        const auto y1 = static_cast<float>(static_cast<float>(pictureFrame.y) -
+                                           static_cast<float>(pictureFrame.height) * SCALE_FACTOR_SPRITE * 0.5f) - h;
         const auto x2 = x1 + w;
         const auto y2 = y1 + h;
 
@@ -252,9 +311,13 @@ std::unique_ptr<Assets::EntityModel> SprParser::doInitializeModel(Logger & /* lo
         auto &modelFrame = model->loadFrame(i, std::to_string(i), {bboxMin, bboxMax});
 
         const auto triangles = std::vector<Assets::EntityModelVertex>{
-            Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}}, Assets::EntityModelVertex{{x1, y2, 0}, {0, 0}}, Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}},
+            Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}},
+            Assets::EntityModelVertex{{x1, y2, 0}, {0, 0}},
+            Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}},
 
-            Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}}, Assets::EntityModelVertex{{x2, y1, 0}, {1, 1}}, Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}},
+            Assets::EntityModelVertex{{x2, y2, 0}, {1, 0}},
+            Assets::EntityModelVertex{{x2, y1, 0}, {1, 1}},
+            Assets::EntityModelVertex{{x1, y1, 0}, {0, 1}},
         };
 
         auto size = Renderer::IndexRangeMap::Size{};

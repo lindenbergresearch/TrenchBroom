@@ -39,6 +39,7 @@ class Reader;
 
 class SprParser : public EntityModelParser {
   private:
+    static const float SCALE_FACTOR_SPRITE;
     std::string m_name;
     const Reader &m_reader;
     const Assets::Palette &m_palette;
