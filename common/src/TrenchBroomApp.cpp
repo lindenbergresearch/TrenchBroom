@@ -434,6 +434,18 @@ bool TrenchBroomApp::loadStyleSheets() {
             return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
         });
 
+        builder->addReplacement("NARROW_MARGIN", []() {
+            return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin);
+        });
+
+        builder->addReplacement("MEDIUM_MARGIN", []() {
+            return QString::asprintf("%dpx", LayoutConstants::MediumHMargin);
+        });
+
+        builder->addReplacement("WIDE_MARGIN", []() {
+            return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
+        });
+
         /* ------------------------------------------------------------------------------------------- */
 
         builder->addReplacement("UI_FONT_SIZE", []() {
