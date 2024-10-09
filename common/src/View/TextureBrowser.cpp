@@ -106,7 +106,9 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
     browserPanelSizer->addWidget(m_scrollBar, 0);
     browserPanel->setLayout(browserPanelSizer);
 
-    m_sortOrderChoice = new QComboBox{};
+    m_sortOrderChoice = new QComboBox();
+    m_sortOrderChoice->setObjectName("TextureBrowser_smallComboBox");
+    makeSmall(m_sortOrderChoice);
     m_sortOrderChoice->addItem(tr("Name"), QVariant::fromValue(TextureSortOrder::Name));
     m_sortOrderChoice->addItem(tr("Usage"), QVariant::fromValue(TextureSortOrder::Usage));
     m_sortOrderChoice->setCurrentIndex(0);
@@ -116,15 +118,19 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
         m_view->setSortOrder(sortOrder);
     });
 
-    m_groupButton = new QPushButton{tr("Group")};
-    m_groupButton->setToolTip(tr("Group textures by texture collection"));
+    m_groupButton = new QPushButton(tr("Group"));
+    m_groupButton->setObjectName("TextureBrowser_smallPushButton");
+    makeSmall(m_groupButton);
+    m_groupButton->setToolTip(tr("Group entity definitions by category"));
     m_groupButton->setCheckable(true);
     connect(m_groupButton, &QAbstractButton::clicked, this, [=]() {
         m_view->setGroup(m_groupButton->isChecked());
     });
 
-    m_usedButton = new QPushButton{tr("Used")};
-    m_usedButton->setToolTip(tr("Only show textures currently in use"));
+    m_usedButton = new QPushButton(tr("Used"));
+    m_usedButton->setObjectName("TextureBrowser_smallPushButton");
+    makeSmall(m_usedButton);
+    m_usedButton->setToolTip(tr("Only show entity definitions currently in use"));
     m_usedButton->setCheckable(true);
     connect(m_usedButton, &QAbstractButton::clicked, this, [=]() {
         m_view->setHideUnused(m_usedButton->isChecked());
@@ -134,6 +140,7 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
     connect(m_filterBox, &QLineEdit::textEdited, this, [=]() {
         m_view->setFilterText(m_filterBox->text().toStdString());
     });
+
 
     auto *controlLayout = new QHBoxLayout{};
     controlLayout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
