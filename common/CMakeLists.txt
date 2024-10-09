@@ -489,6 +489,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/TextConsoleTabPage.cpp
         ${COMMON_SOURCE_DIR}/IO/VectorIcon.cpp
         ${COMMON_SOURCE_DIR}/Chrono.cpp
+        ${COMMON_SOURCE_DIR}/View/BoxFilter.cpp
 )
 
 set(COMMON_HEADER
@@ -1027,6 +1028,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/MapSearchListBox.h
         ${COMMON_SOURCE_DIR}/IO/VectorIcon.h
         ${COMMON_SOURCE_DIR}/Chrono.h
+        ${COMMON_SOURCE_DIR}/View/BoxFilter.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
