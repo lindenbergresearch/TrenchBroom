@@ -490,6 +490,9 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/IO/VectorIcon.cpp
         ${COMMON_SOURCE_DIR}/Chrono.cpp
         ${COMMON_SOURCE_DIR}/View/BoxFilter.cpp
+        ${COMMON_SOURCE_DIR}/StringUtils.cpp
+        ${COMMON_SOURCE_DIR}/Time.cpp
+
 )
 
 set(COMMON_HEADER
@@ -1029,9 +1032,12 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/IO/VectorIcon.h
         ${COMMON_SOURCE_DIR}/Chrono.h
         ${COMMON_SOURCE_DIR}/View/BoxFilter.h
+        ${COMMON_SOURCE_DIR}/Time.h
 )
 
-add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
+add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER}
+        src/Time.cpp
+        src/Time.h)
 set_target_properties(common PROPERTIES AUTOMOC TRUE)
 target_include_directories(common PUBLIC ${COMMON_SOURCE_DIR})
 target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt5::Widgets Qt5::Svg fmt::fmt assimp::assimp)
