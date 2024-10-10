@@ -23,7 +23,6 @@
 #include <QBoxLayout>
 #include <QButtonGroup>
 #include <QColor>
-#include <QDebug>
 #include <QDialog>
 #include <QDir>
 #include <QFont>
@@ -35,13 +34,11 @@
 #include <QResizeEvent>
 #include <QScreen>
 #include <QSettings>
-#include <QStandardPaths>
 #include <QString>
 #include <QStringBuilder>
 #include <QTableView>
 #include <QTextCodec>
 #include <QToolButton>
-#include <QVBoxLayout>
 #include <QWindow>
 #include <QtGlobal>
 
@@ -73,8 +70,8 @@
 namespace TrenchBroom {
 namespace View {
 
-SyncHeightEventFilter::SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent)
-    : QObject{parent}, m_primary{primary}, m_secondary{secondary} {
+SyncHeightEventFilter::SyncHeightEventFilter(QWidget *primary, QWidget *secondary, QObject *parent) : QObject{
+    parent}, m_primary{primary}, m_secondary{secondary} {
     ensure(m_primary != nullptr, "primary is not null");
     ensure(m_secondary != nullptr, "secondary is not null");
 
@@ -102,14 +99,21 @@ bool SyncHeightEventFilter::eventFilter(QObject *target, QEvent *event) {
 
 static QString fileDialogDirToString(const FileDialogDir dir) {
     switch (dir) {
-    case FileDialogDir::Map:return "Map";
-    case FileDialogDir::TextureCollection:return "TextureCollection";
-    case FileDialogDir::CompileTool:return "CompileTool";
-    case FileDialogDir::Engine:return "Engine";
-    case FileDialogDir::EntityDefinition:return "EntityDefinition";
-    case FileDialogDir::GamePath:return "GamePath";
-    case FileDialogDir::Resources:return "Resources";
-        switchDefault();
+        case FileDialogDir::Map:
+            return "Map";
+        case FileDialogDir::TextureCollection:
+            return "TextureCollection";
+        case FileDialogDir::CompileTool:
+            return "CompileTool";
+        case FileDialogDir::Engine:
+            return "Engine";
+        case FileDialogDir::EntityDefinition:
+            return "EntityDefinition";
+        case FileDialogDir::GamePath:
+            return "GamePath";
+        case FileDialogDir::Resources:
+            return "Resources";
+            switchDefault();
     }
 }
 
@@ -145,7 +149,7 @@ QString windowSettingsPath(const QWidget *window, const QString &suffix) {
     return "Windows/" + window->objectName() + "/" + suffix;
 }
 
-void saveWindowGeometry(QWidget * window) {
+void saveWindowGeometry(QWidget *window) {
     ensure(window != nullptr, "window must not be null");
 
     const auto path = windowSettingsPath(window, "Geometry");
@@ -153,7 +157,7 @@ void saveWindowGeometry(QWidget * window) {
     settings.setValue(path, window->saveGeometry());
 }
 
-void restoreWindowGeometry(QWidget * window) {
+void restoreWindowGeometry(QWidget *window) {
     ensure(window != nullptr, "window must not be null");
 
     const auto path = windowSettingsPath(window, "Geometry");
@@ -174,7 +178,7 @@ bool widgetOrChildHasFocus(const QWidget *widget) {
     return false;
 }
 
-MapFrame *findMapFrame(QWidget * widget) {
+MapFrame *findMapFrame(QWidget *widget) {
     return dynamic_cast<MapFrame *>(widget->window());
 }
 
@@ -182,7 +186,7 @@ void setHint(QLineEdit *ctrl, const char *hint) {
     ctrl->setPlaceholderText(hint);
 }
 
-void centerOnScreen(QWidget * window) {
+void centerOnScreen(QWidget *window) {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
     const auto *screen = QGuiApplication::screenAt(window->mapToGlobal({window->width() / 2, 0}));
     if (screen == nullptr) {
@@ -200,73 +204,57 @@ int getCommonFieldHeight() {
     return fontsize + 2 * LayoutConstants::MediumVMargin;
 }
 
-QWidget *makeDefault(QWidget * widget, bool
-resetFont) {
-const auto &app = TrenchBroomApp::instance();
+QWidget *makeDefault(QWidget *widget, bool resetFont) {
+    const auto &app = TrenchBroomApp::instance();
+    if (resetFont) {
+        widget->setFont(QFont{});
+    }
 
-if (resetFont) {
-widget->
-setFont(QFont{}
-);
+    widget->setPalette(app.palette());
+
+    return widget;
 }
 
-widget->
-setPalette(app
-.
-palette()
-);
-return
-widget;
-}
-
-QWidget *makeEmphasized(QWidget * widget) {
+QWidget *makeEmphasized(QWidget *widget) {
     auto font = widget->font();
     font.setBold(true);
     widget->setFont(font);
     return widget;
 }
 
-QWidget *makeItalic(QWidget * widget) {
+QWidget *makeItalic(QWidget *widget) {
     auto font = widget->font();
     font.setItalic(true);
     widget->setFont(font);
     return widget;
 }
 
-QWidget *makeUnemphasized(QWidget * widget) {
+QWidget *makeUnemphasized(QWidget *widget) {
     widget->setFont(QFont{});
     return widget;
 }
 
-QWidget *makeInfo(QWidget * widget) {
+QWidget *makeInfo(QWidget *widget) {
     makeDefault(widget);
     widget = makeSmall(widget);
     return widget;
 }
 
-QWidget *makeSmall(QWidget * widget) {
+QWidget *makeSmall(QWidget *widget) {
     auto font = widget->font();
     font.setPointSize(font.pointSize() - 2);
     widget->setFont(font);
     return widget;
 }
 
-QWidget *makeBigger(QWidget * widget, int
-value)
-{
-auto font = widget->font();
-font.
-setPointSize(font
-.
-pointSize()
-+ value);
-widget->
-setFont(font);
-return
-widget;
+QWidget *makeBigger(QWidget *widget, int value) {
+    auto font = widget->font();
+    font.setPointSize(font.pointSize() + value);
+    widget->setFont(font);
+    return widget;
 }
 
-QWidget *makeTitle(QWidget * widget) {
+QWidget *makeTitle(QWidget *widget) {
     widget->setForegroundRole(QPalette::HighlightedText);
     auto font = widget->font();
     font.setPointSize(int((float) font.pointSize() * 1.5f));
@@ -275,7 +263,7 @@ QWidget *makeTitle(QWidget * widget) {
     return widget;
 }
 
-QWidget *makeSubTitle(QWidget * widget) {
+QWidget *makeSubTitle(QWidget *widget) {
     auto font = widget->font();
     font.setPointSize(font.pointSize() - 1);
     // font.setItalic(true);
@@ -283,7 +271,7 @@ QWidget *makeSubTitle(QWidget * widget) {
     return widget;
 }
 
-QWidget *makeHeader(QWidget * widget) {
+QWidget *makeHeader(QWidget *widget) {
     makeDefault(widget);
     auto font = widget->font();
     font.setPointSize(font.pointSize() * 2);
@@ -292,34 +280,23 @@ QWidget *makeHeader(QWidget * widget) {
     return widget;
 }
 
-QWidget *makePanelTitle(QWidget * widget, bool
-bold,
-bool isSubTitle
-)
-{
+QWidget *makePanelTitle(QWidget *widget, bool bold, bool isSubTitle) {
+    widget->setForegroundRole(QPalette::HighlightedText);
+    auto font = widget->font();
 
-widget->
-setForegroundRole(QPalette::HighlightedText);
-auto font = widget->font();
+    if (bold) {
+        font.setBold(true);
+    }
 
-if (bold)
-font.setBold(true);
-// font.setItalic(true);
+    if (isSubTitle) {
+        font.setPointSize(font.pointSize() - 1);
+    }
 
-if (isSubTitle)
-font.
-setPointSize(font
-.
-pointSize()
-- 1);
-
-widget->
-setFont(font);
-return
-widget;
+    widget->setFont(font);
+    return widget;
 }
 
-QWidget *makeError(QWidget * widget) {
+QWidget *makeError(QWidget *widget) {
     auto palette = widget->palette();
     palette.setColor(QPalette::Normal, QPalette::WindowText, Qt::red);
     palette.setColor(QPalette::Normal, QPalette::Text, Qt::red);
@@ -327,95 +304,43 @@ QWidget *makeError(QWidget * widget) {
     return widget;
 }
 
-QWidget *makeMono(QWidget * widget, int
-size)
-{
-auto font = TrenchBroomApp::instance().getConsoleFont();
-font.
-setPointSize(size);
-widget->
-setFont(font);
-return
-widget;
+QWidget *makeMono(QWidget *widget, int size) {
+    auto font = TrenchBroomApp::instance().getConsoleFont();
+    font.setPointSize(size);
+    widget->setFont(font);
+    return widget;
 }
 
-QWidget *makeSelected(QWidget * widget,
-const QPalette &defaultPalette
-)
-{
-auto palette = widget->palette();
-palette.
-setColor(
-    QPalette::Normal, QPalette::WindowText, defaultPalette
-.
-color(QPalette::Normal, QPalette::HighlightedText
-));
-palette.
-setColor(
-    QPalette::Normal, QPalette::Text, defaultPalette
-.
-color(QPalette::Normal, QPalette::HighlightedText
-));
-widget->
-setPalette(palette);
-return
-widget;
+QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+    palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
+    widget->setPalette(palette);
+    return widget;
 }
 
-QWidget *colorizeWidget(QWidget * widget,
-const QColor &color, QPalette::ColorRole
-role)
-{
-auto palette = widget->palette();
-palette.
-setColor(QPalette::Normal, role, color
-);
-widget->
-setPalette(palette);
-return
-widget;
+QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, role, color);
+    widget->setPalette(palette);
+    return widget;
 }
 
-QWidget *makeBright(QWidget * widget,
-const QPalette &defaultPalette
-)
-{
-auto palette = widget->palette();
-palette.
-setColor(
-    QPalette::Normal, QPalette::Button, defaultPalette
-.
-color(QPalette::Normal, QPalette::Midlight
-));
+QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, QPalette::Button, defaultPalette.color(QPalette::Normal, QPalette::Midlight));
 //    palette.setColor(QPalette::Normal, QPalette::Base,
 //    defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
-widget->
-setPalette(palette);
-return
-widget;
+    widget->setPalette(palette);
+    return widget;
 }
 
-QWidget *makeUnselected(QWidget * widget,
-const QPalette &defaultPalette
-)
-{
-auto palette = widget->palette();
-palette.
-setColor(
-    QPalette::Normal, QPalette::WindowText, defaultPalette
-.
-color(QPalette::Normal, QPalette::WindowText
-));
-palette.
-setColor(
-    QPalette::Normal, QPalette::Text, defaultPalette
-.
-color(QPalette::Normal, QPalette::Text
-));
-widget->
-setPalette(palette);
-return
-widget;
+QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette) {
+    auto palette = widget->palette();
+    palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::WindowText));
+    palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::Text));
+    widget->setPalette(palette);
+    return widget;
 }
 
 Color fromQColor(const QColor &color) {
@@ -452,15 +377,9 @@ QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, int 
     return toStyleSheetRGBA(color, adjustment);
 }
 
-void setStyledBorder(QWidget * widget, int
-width,
-const QColor &color,
-const char *type
-)
-{
-auto qss = QString::asprintf("border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
-widget->
-setStyleSheet(qss);
+void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type) {
+    auto qss = QString::asprintf("border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
+    widget->setStyleSheet(qss);
 }
 
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent) {
@@ -533,7 +452,7 @@ void setSliderRange(QSlider *slider, float length, float value, float offset) {
     setSliderRatio(slider, ratio);
 }
 
-QLayout *wrapDialogButtonBox(QWidget * buttonBox) {
+QLayout *wrapDialogButtonBox(QWidget *buttonBox) {
     auto *innerLayout = new QHBoxLayout{};
     innerLayout->setContentsMargins(LayoutConstants::DialogButtonLeftMargin, LayoutConstants::DialogButtonTopMargin, LayoutConstants::DialogButtonRightMargin, LayoutConstants::DialogButtonBottomMargin);
     innerLayout->setSpacing(0);
@@ -565,36 +484,30 @@ QLayout *wrapDialogButtonBox(QLayout *buttonBox) {
 
 void addToMiniToolBarLayout(QBoxLayout *) {}
 
-void setWindowIconTB(QWidget * window) {
+void setWindowIconTB(QWidget *window) {
     ensure(window != nullptr, "window is null");
     window->setWindowIcon(QIcon{IO::loadPixmapResource("AppIcon.png")});
 }
 
-void setDebugBackgroundColor(QWidget * widget,
-const QColor &color
-)
-{
-auto p = widget->palette();
-p.
-setColor(QPalette::Window, color
-);
+void setDebugBackgroundColor(QWidget *widget, const QColor &color) {
+    auto p = widget->palette();
+    p.setColor(QPalette::Window, color);
 
-widget->setAutoFillBackground(true);
-widget->
-setPalette(p);
+    widget->setAutoFillBackground(true);
+    widget->setPalette(p);
 }
 
-void setDefaultWindowColor(QWidget * widget) {
+void setDefaultWindowColor(QWidget *widget) {
     widget->setAutoFillBackground(true);
     widget->setBackgroundRole(QPalette::Window);
 }
 
-void setBaseWindowColor(QWidget * widget) {
+void setBaseWindowColor(QWidget *widget) {
     widget->setAutoFillBackground(true);
     widget->setBackgroundRole(QPalette::Base);
 }
 
-void setHighlightWindowColor(QWidget * widget) {
+void setHighlightWindowColor(QWidget *widget) {
     widget->setAutoFillBackground(true);
     widget->setBackgroundRole(QPalette::Highlight);
 }
@@ -631,7 +544,8 @@ void insertTitleBarSeparator(QVBoxLayout *layout) {
     unused(layout);
 }
 
-AutoResizeRowsEventFilter::AutoResizeRowsEventFilter(QTableView *tableView) : QObject{tableView}, m_tableView{tableView} {
+AutoResizeRowsEventFilter::AutoResizeRowsEventFilter(QTableView *tableView) : QObject{tableView}, m_tableView{
+    tableView} {
     m_tableView->installEventFilter(this);
 }
 
@@ -649,7 +563,7 @@ void autoResizeRows(QTableView *tableView) {
     tableView->resizeRowsToContents();
 }
 
-void deleteChildWidgetsLaterAndDeleteLayout(QWidget * widget) {
+void deleteChildWidgetsLaterAndDeleteLayout(QWidget *widget) {
     const auto children = widget->findChildren<QWidget *>("", Qt::FindDirectChildrenOnly);
     for (auto *childWidget : children) {
         childWidget->deleteLater();
@@ -667,14 +581,16 @@ void showModelessDialog(QDialog *dialog) {
 
 static QTextCodec *codecForEncoding(const MapTextEncoding encoding) {
     switch (encoding) {
-    case MapTextEncoding::Quake:
-        // Quake uses the full 1-255 range for its bitmap font.
-        // So using a "just assume UTF-8" approach would not work here.
-        // See: https://github.com/TrenchBroom/TrenchBroom/issues/3122
-        return QTextCodec::codecForLocale();
-    case MapTextEncoding::Iso88591:return QTextCodec::codecForName("ISO 8859-1");
-    case MapTextEncoding::Utf8:return QTextCodec::codecForName("UTF-8");
-        switchDefault();
+        case MapTextEncoding::Quake:
+            // Quake uses the full 1-255 range for its bitmap font.
+            // So using a "just assume UTF-8" approach would not work here.
+            // See: https://github.com/TrenchBroom/TrenchBroom/issues/3122
+            return QTextCodec::codecForLocale();
+        case MapTextEncoding::Iso88591:
+            return QTextCodec::codecForName("ISO 8859-1");
+        case MapTextEncoding::Utf8:
+            return QTextCodec::codecForName("UTF-8");
+            switchDefault();
     }
 }
 

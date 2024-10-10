@@ -107,9 +107,9 @@ void updateFileDialogDefaultDirectoryWithDirectory(FileDialogDir type, const QSt
 
 QString windowSettingsPath(const QWidget *window, const QString &suffix = "");
 
-void saveWindowGeometry(QWidget * window);
+void saveWindowGeometry(QWidget *window);
 
-void restoreWindowGeometry(QWidget * window);
+void restoreWindowGeometry(QWidget *window);
 
 template<typename T> void saveWindowState(const T *window) {
     ensure(window != nullptr, "window must not be null");
@@ -134,7 +134,7 @@ bool widgetOrChildHasFocus(const QWidget *widget);
 
 class MapFrame;
 
-MapFrame *findMapFrame(QWidget * widget);
+MapFrame *findMapFrame(QWidget *widget);
 
 QToolButton *createBitmapButton(const std::string &image, const QString &tooltip, QWidget *parent = nullptr);
 
@@ -154,7 +154,7 @@ float getSliderRange(QSlider *slider, float length, float offset = 0.f);
 
 void setSliderRange(QSlider *slider, float length, float value, float offset = 0.f);
 
-QLayout *wrapDialogButtonBox(QWidget * buttonBox);
+QLayout *wrapDialogButtonBox(QWidget *buttonBox);
 
 QLayout *wrapDialogButtonBox(QLayout *buttonBox);
 
@@ -172,93 +172,67 @@ template<typename... Rest> void addToMiniToolBarLayout(QBoxLayout *layout, int f
     addToMiniToolBarLayout(layout, rest...);
 }
 
-template<typename... Rest> QLayout *createMiniToolBarLayout(QWidget * first, Rest...
+template<typename... Rest> QLayout *createMiniToolBarLayout(QWidget *first, Rest...
 rest) {
-auto *layout = new QHBoxLayout{};
-layout->
-setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-0, LayoutConstants::NarrowHMargin, 0);
-layout->
-setSpacing(LayoutConstants::NarrowHMargin);
-addToMiniToolBarLayout(layout, first, rest
-...);
-layout->addStretch(1);
-return
-layout;
+    auto *layout = new QHBoxLayout{};
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+    layout->setSpacing(LayoutConstants::NarrowHMargin);
+    addToMiniToolBarLayout(layout, first, rest
+        ...);
+    layout->addStretch(1);
+    return layout;
 }
 
-template<typename... Rest> QLayout *createMiniToolBarLayoutRightAligned(QWidget * first, Rest...
+template<typename... Rest> QLayout *createMiniToolBarLayoutRightAligned(QWidget *first, Rest...
 rest) {
-auto *layout = new QHBoxLayout{};
-layout->
-setContentsMargins(
-    LayoutConstants::NarrowHMargin,
-0, LayoutConstants::NarrowHMargin, 0);
-layout->
-setSpacing(LayoutConstants::NarrowHMargin);
-layout->addStretch(1);
-addToMiniToolBarLayout(layout, first, rest
-...);
-return
-layout;
+    auto *layout = new QHBoxLayout{};
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
+    layout->setSpacing(LayoutConstants::NarrowHMargin);
+    layout->addStretch(1);
+    addToMiniToolBarLayout(layout, first, rest
+        ...);
+    return layout;
 }
 
 void setHint(QLineEdit *ctrl, const char *hint);
 
-void centerOnScreen(QWidget * window);
+void centerOnScreen(QWidget *window);
 
 int getCommonFieldHeight();
 
-QWidget *makeDefault(QWidget * widget, bool
-resetFont = true
-);
+QWidget *makeDefault(QWidget *widget, bool resetFont = true);
 
-QWidget *makeEmphasized(QWidget * widget);
+QWidget *makeEmphasized(QWidget *widget);
 
-QWidget *makeItalic(QWidget * widget);
+QWidget *makeItalic(QWidget *widget);
 
-QWidget *makeUnemphasized(QWidget * widget);
+QWidget *makeUnemphasized(QWidget *widget);
 
-QWidget *makeInfo(QWidget * widget);
+QWidget *makeInfo(QWidget *widget);
 
-QWidget *makeSmall(QWidget * widget);
+QWidget *makeSmall(QWidget *widget);
 
-QWidget *makeBigger(QWidget * widget, int
-value);
+QWidget *makeBigger(QWidget *widget, int value);
 
-QWidget *makeTitle(QWidget * widget);
+QWidget *makeTitle(QWidget *widget);
 
-QWidget *makeSubTitle(QWidget * widget);
+QWidget *makeSubTitle(QWidget *widget);
 
-QWidget *makeHeader(QWidget * widget);
+QWidget *makeHeader(QWidget *widget);
 
-QWidget *makePanelTitle(QWidget * widget, bool
-bold = false,
-bool isSubTitle = false
-);
+QWidget *makePanelTitle(QWidget *widget, bool bold = false, bool isSubTitle = false);
 
-QWidget *makeError(QWidget * widget);
+QWidget *makeError(QWidget *widget);
 
-QWidget *makeMono(QWidget * widget, int
-size);
+QWidget *makeMono(QWidget *widget, int size);
 
-QWidget *colorizeWidget(QWidget * widget,
-const QColor &color, QPalette::ColorRole
-role = QPalette::ColorRole::Text
-);
+QWidget *colorizeWidget(QWidget *widget, const QColor &color, QPalette::ColorRole role = QPalette::ColorRole::Text);
 
-QWidget *makeSelected(QWidget * widget,
-const QPalette &defaultPalette
-);
+QWidget *makeSelected(QWidget *widget, const QPalette &defaultPalette);
 
-QWidget *makeBright(QWidget * widget,
-const QPalette &defaultPalette
-);
+QWidget *makeBright(QWidget *widget, const QPalette &defaultPalette);
 
-QWidget *makeUnselected(QWidget * widget,
-const QPalette &defaultPalette
-);
+QWidget *makeUnselected(QWidget *widget, const QPalette &defaultPalette);
 
 Color fromQColor(const QColor &color);
 
@@ -274,23 +248,17 @@ QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, QPal
 
 QString toStyleSheetRGBA(const QPalette &palette, QPalette::ColorRole role, int adjustment = 0);
 
-void setStyledBorder(QWidget * widget, int
-width,
-const QColor &color,
-const char *type = "solid"
-);
+void setStyledBorder(QWidget *widget, int width, const QColor &color, const char *type = "solid");
 
-void setWindowIconTB(QWidget * window);
+void setWindowIconTB(QWidget *window);
 
-void setDebugBackgroundColor(QWidget * widget,
-const QColor &color
-);
+void setDebugBackgroundColor(QWidget *widget, const QColor &color);
 
-void setDefaultWindowColor(QWidget * widget);
+void setDefaultWindowColor(QWidget *widget);
 
-void setBaseWindowColor(QWidget * widget);
+void setBaseWindowColor(QWidget *widget);
 
-void setHighlightWindowColor(QWidget * widget);
+void setHighlightWindowColor(QWidget *widget);
 
 QLineEdit *createSearchBox();
 
@@ -325,7 +293,7 @@ class AutoResizeRowsEventFilter : public QObject {
 
 void autoResizeRows(QTableView *tableView);
 
-void deleteChildWidgetsLaterAndDeleteLayout(QWidget * widget);
+void deleteChildWidgetsLaterAndDeleteLayout(QWidget *widget);
 
 void showModelessDialog(QDialog *dialog);
 
