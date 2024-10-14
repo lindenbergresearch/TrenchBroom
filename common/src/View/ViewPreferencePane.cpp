@@ -204,7 +204,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
         // default system font
         QFont font;
-        m_rendererFontCombo->addItem("[system: " + font.defaultFamily() + "]");
+        //m_rendererFontCombo->addItem("[system: " + font.defaultFamily() + "]");
         m_UIFontCombo->addItem("[system: " + font.defaultFamily() + "]");
         m_ConsoleFontCombo->addItem("[system: " + font.defaultFamily() + "]");
         font_files.push_back(font.defaultFamily().toStdString());
