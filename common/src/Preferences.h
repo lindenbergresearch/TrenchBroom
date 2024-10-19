@@ -44,8 +44,8 @@ enum LengthUnitDisplay {
 };
 
 extern Preference<int> MapViewLayout;
-
 extern Preference<TrenchBroom::LogLevel> AppLogLevel;
+extern Preference<int> AutoSaveInterval;
 
 /* --- VIEW ------------------------------------------ */
 extern Preference<bool> ShowFocusIndicator;
