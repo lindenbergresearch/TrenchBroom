@@ -64,19 +64,27 @@ Result<Brush> BrushBuilder::createCuboid(const vm::bbox3 &bounds, const std::str
 }
 
 Result<Brush> BrushBuilder::createCuboid(const vm::bbox3 &bounds, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture) const {
-    const auto specs = std::vector<std::tuple<vm::vec3, vm::vec3, vm::vec3, BrushFaceAttributes>>({{
-                                                                                                       bounds.min, bounds.min + vm::vec3::pos_y(), bounds.min + vm::vec3::pos_z(), {leftTexture, m_defaultAttribs}}, // left
-                                                                                                   {
-                                                                                                       bounds.max, bounds.max + vm::vec3::pos_z(), bounds.max + vm::vec3::pos_y(), {rightTexture, m_defaultAttribs}}, // right
-                                                                                                   {
-                                                                                                       bounds.min, bounds.min + vm::vec3::pos_z(), bounds.min + vm::vec3::pos_x(), {frontTexture, m_defaultAttribs}}, // front
-                                                                                                   {
-                                                                                                       bounds.max, bounds.max + vm::vec3::pos_x(), bounds.max + vm::vec3::pos_z(), {backTexture, m_defaultAttribs}}, // back
-                                                                                                   {
-                                                                                                       bounds.max, bounds.max + vm::vec3::pos_y(), bounds.max + vm::vec3::pos_x(), {topTexture, m_defaultAttribs}}, // top
-                                                                                                   {
-                                                                                                       bounds.min, bounds.min + vm::vec3::pos_x(), bounds.min + vm::vec3::pos_y(), {bottomTexture, m_defaultAttribs}}, // bottom
-                                                                                                  });
+    const auto specs = std::vector<std::tuple<vm::vec3, vm::vec3, vm::vec3, BrushFaceAttributes>>
+        ({{
+              bounds.min, bounds.min + vm::vec3::pos_y(), bounds.min + vm::vec3::pos_z(),
+              {leftTexture, m_defaultAttribs}}, // left
+          {
+              bounds.max, bounds.max + vm::vec3::pos_z(), bounds.max + vm::vec3::pos_y(),
+              {rightTexture, m_defaultAttribs}}, // right
+          {
+              bounds.min, bounds.min + vm::vec3::pos_z(), bounds.min + vm::vec3::pos_x(),
+              {frontTexture, m_defaultAttribs}}, // front
+          {
+              bounds.max, bounds.max + vm::vec3::pos_x(), bounds.max + vm::vec3::pos_z(),
+              {backTexture, m_defaultAttribs}}, // back
+          {
+              bounds.max, bounds.max + vm::vec3::pos_y(), bounds.max + vm::vec3::pos_x(),
+              {topTexture, m_defaultAttribs}}, // top
+          {
+              bounds.min, bounds.min + vm::vec3::pos_x(), bounds.min + vm::vec3::pos_y(),
+              {bottomTexture, m_defaultAttribs}}, // bottom
+         }
+        );
 
     return kdl::fold_results(kdl::vec_transform(specs, [&](const auto spec) {
         const auto &[p1, p2, p3, attrs] = spec;
