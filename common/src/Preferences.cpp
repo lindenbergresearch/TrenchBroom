@@ -60,10 +60,13 @@ Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1
 
 Preference<Color> &axisColor(vm::axis::type axis) {
     switch (axis) {
-    case vm::axis::x:return Preferences::XAxisColor;
-    case vm::axis::y:return Preferences::YAxisColor;
-    case vm::axis::z:
-    default:return Preferences::ZAxisColor;
+        case vm::axis::x:
+            return Preferences::XAxisColor;
+        case vm::axis::y:
+            return Preferences::YAxisColor;
+        case vm::axis::z:
+        default:
+            return Preferences::ZAxisColor;
     }
 }
 
@@ -322,7 +325,24 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
-      &AutoSaveInterval, &TraceDebugColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor, &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &ShowFPS, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem, &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor, &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias, &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor, &SelectionBoundsColor, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds, &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &SelectionBoundsShowMinMax, &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha, &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor, &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor, &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor, &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &GridUnitSystem, &TextureMinFilter, &TextureMagFilter, &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor, &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor, &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed, &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras, &CameraFlyForward(), &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &EnableLightning, &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes, &EntityLinkMode
+        &AutoSaveInterval, &TraceDebugColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
+        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &ShowFPS, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
+        &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
+        &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias,
+        &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
+        &SelectionBoundsColor, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
+        &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &SelectionBoundsShowMinMax, &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha,
+        &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor,
+        &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor,
+        &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor,
+        &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &GridUnitSystem, &TextureMinFilter, &TextureMagFilter,
+        &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
+        &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
+        &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
+        &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,
+        &CameraFlyForward(), &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &EnableLightning,
+        &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
+        &EntityLinkMode
     };
 
     return list;
