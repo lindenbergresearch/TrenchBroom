@@ -24,11 +24,12 @@
 #include "Renderer/TextureFont.h"
 
 #include <string>
+#include <memory>
+#include <algorithm>
 
 namespace TrenchBroom {
 namespace Renderer {
-FontManager::FontManager() : m_factory(std::make_unique<FreeTypeFontFactory>()) {
-}
+FontManager::FontManager() : m_factory(std::make_unique<FreeTypeFontFactory>()) {}
 
 FontManager::~FontManager() = default;
 
@@ -37,22 +38,29 @@ void FontManager::clearCache() {
 }
 
 TextureFont &FontManager::font(const FontDescriptor &fontDescriptor) {
-    auto it = m_cache.lower_bound(fontDescriptor);
-    if (it == std::end(m_cache) || it->first.compare(fontDescriptor) != 0) {
-        it = m_cache.insert(it, std::make_pair(fontDescriptor, m_factory->createFont(fontDescriptor)));
+    auto [it, inserted] = m_cache.try_emplace(fontDescriptor, nullptr);
+    if (inserted) {
+        it->second = m_factory->createFont(fontDescriptor);
     }
-
     return *it->second;
 }
 
-FontDescriptor FontManager::selectFontSize(const FontDescriptor &fontDescriptor, const std::string &string, const float maxWidth, const size_t minFontSize) {
+FontDescriptor FontManager::selectFontSize(const FontDescriptor &fontDescriptor, const std::string &text, float maxWidth, size_t minFontSize) {
     FontDescriptor actualDescriptor = fontDescriptor;
-    vm::vec2f actualBounds = font(actualDescriptor).measure(string);
+    auto actualBounds = font(actualDescriptor).measure(text);
+
     while (actualBounds.x() > maxWidth && actualDescriptor.size() > minFontSize) {
         actualDescriptor = FontDescriptor(actualDescriptor.path(), actualDescriptor.size() - 1);
-        actualBounds = font(actualDescriptor).measure(string);
+        actualBounds = font(actualDescriptor).measure(text);
     }
     return actualDescriptor;
+}
+
+FontDescriptor FontManager::selectFontSize(const FontDescriptor &fontDescriptor, float distance, float maxDistance, int min, int max) {
+    float m = static_cast<float>(min - max) / maxDistance;
+    int size = std::clamp(static_cast<int>(m * distance + max), min, max);
+
+    return FontDescriptor(fontDescriptor.path(), static_cast<size_t>(size));
 }
 } // namespace Renderer
 } // namespace TrenchBroom
