@@ -29,13 +29,16 @@ AttrString::LineFunc::~LineFunc() {}
 
 void AttrString::LineFunc::process(const std::string &str, const Justify justify) {
     switch (justify) {
-    case Justify::Left:justifyLeft(str);
-        break;
-    case Justify::Right:justifyRight(str);
-        break;
-    case Justify::Center:center(str);
-        break;
-        switchDefault();
+        case Justify::Left:
+            justifyLeft(str);
+            break;
+        case Justify::Right:
+            justifyRight(str);
+            break;
+        case Justify::Center:
+            center(str);
+            break;
+            switchDefault();
     }
 }
 
@@ -91,6 +94,16 @@ void AttrString::appendRightJustified(const std::string &string) {
 
 void AttrString::appendCentered(const std::string &string) {
     m_lines.push_back(Line(string, Justify::Center));
+}
+
+std::string AttrString::str() {
+    std::string tmp{};
+
+    for (auto &item : m_lines) {
+        tmp = tmp + item.string;
+    }
+
+    return tmp;
 }
 } // namespace Renderer
 } // namespace TrenchBroom

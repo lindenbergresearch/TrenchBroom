@@ -62,6 +62,8 @@ class AttrString {
 
     AttrString(const std::string &string);
 
+    std::string str();
+
     bool operator<(const AttrString &other) const;
 
     int compare(const AttrString &other) const;
