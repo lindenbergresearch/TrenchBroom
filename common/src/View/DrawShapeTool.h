@@ -20,19 +20,18 @@
 #pragma once
 
 #include "FloatType.h"
-#include "View/CreateBrushToolBase.h"
+#include "View/CreateBrushesToolBase.h"
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom::View
+{
 class MapDocument;
 
-class DrawShapeTool : public CreateBrushToolBase {
-  public:
-    explicit DrawShapeTool(std::weak_ptr<MapDocument> document);
-
-    void update(const vm::bbox3 &bounds);
+class DrawShapeTool : public CreateBrushesToolBase
+{
+public:
+  explicit DrawShapeTool(std::weak_ptr<MapDocument> document);
+  void update(const vm::bbox3& bounds);
 };
-} // namespace View
-} // namespace TrenchBroom
+} // namespace TrenchBroom::View

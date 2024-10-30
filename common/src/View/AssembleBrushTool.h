@@ -20,29 +20,28 @@
 #pragma once
 
 #include "Model/Polyhedron3.h"
-#include "View/CreateBrushToolBase.h"
+#include "View/CreateBrushesToolBase.h"
 
 #include <memory>
 
-namespace TrenchBroom {
-namespace View {
-class AssembleBrushTool : public CreateBrushToolBase {
-  private:
-    std::unique_ptr<Model::Polyhedron3> m_polyhedron;
+namespace TrenchBroom::View
+{
 
-  public:
-    AssembleBrushTool(std::weak_ptr<MapDocument> document);
+class AssembleBrushTool : public CreateBrushesToolBase
+{
+private:
+  std::unique_ptr<Model::Polyhedron3> m_polyhedron;
 
-    const Model::Polyhedron3 &polyhedron() const;
+public:
+  explicit AssembleBrushTool(std::weak_ptr<MapDocument> document);
 
-    void update(const Model::Polyhedron3 &polyhedron);
+  const Model::Polyhedron3& polyhedron() const;
+  void update(const Model::Polyhedron3& polyhedron);
 
-  private:
-    bool doActivate() override;
-
-    bool doDeactivate() override;
-
-    void doBrushWasCreated() override;
+private:
+  bool doActivate() override;
+  bool doDeactivate() override;
+  void doBrushesWereCreated() override;
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

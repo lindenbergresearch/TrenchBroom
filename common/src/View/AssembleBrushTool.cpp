@@ -19,23 +19,22 @@
 
 #include "AssembleBrushTool.h"
 
-#include "Error.h"
-#include "Exceptions.h"
+#include "Error.h" // IWYU pragma: keep
 #include "Model/BrushBuilder.h"
 #include "Model/BrushNode.h"
 #include "Model/Game.h"
 #include "Model/Polyhedron.h"
 #include "Model/WorldNode.h"
-#include "PreferenceManager.h"
 #include "View/MapDocument.h"
 
-#include <kdl/memory_utils.h>
-#include <kdl/result.h>
+#include "kdl/memory_utils.h"
+#include "kdl/result.h"
+#include "kdl/vector_utils.h"
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom::View {
+
 AssembleBrushTool::AssembleBrushTool(std::weak_ptr<MapDocument> document)
-    : CreateBrushToolBase(false, document), m_polyhedron(std::make_unique<Model::Polyhedron3>()) {
+    : CreateBrushesToolBase{false, std::move(document)}, m_polyhedron{std::make_unique<Model::Polyhedron3>()} {
 }
 
 const Model::Polyhedron3 &AssembleBrushTool::polyhedron() const {
@@ -47,29 +46,36 @@ void AssembleBrushTool::update(const Model::Polyhedron3 &polyhedron) {
     if (m_polyhedron->closed()) {
         auto document = kdl::mem_lock(m_document);
         const auto game = document->game();
-        const Model::BrushBuilder builder(document->world()->mapFormat(), document->worldBounds(), game->defaultFaceAttribs());
+        const auto builder = Model::BrushBuilder{
+            document->world()->mapFormat(),
+            document->worldBounds(),
+            game->defaultFaceAttribs()};
 
-        builder.createBrush(*m_polyhedron, document->currentTextureName()).transform([&](auto b) { updateBrush(new Model::BrushNode(std::move(b))); }).transform_error([&](auto e) {
-            updateBrush(nullptr);
+        builder.createBrush(*m_polyhedron, document->currentTextureName())
+        | kdl::transform([&](auto b) {
+            updateBrushes(kdl::vec_from(std::make_unique<Model::BrushNode>(std::move(b))));
+        })
+        | kdl::transform_error([&](auto e) {
+            clearBrushes();
             document->error() << "Could not update brush: " << e.msg;
         });
     } else {
-        updateBrush(nullptr);
+        clearBrushes();
     }
 }
 
 bool AssembleBrushTool::doActivate() {
-    update(Model::Polyhedron3());
+    update(Model::Polyhedron3{});
     return true;
 }
 
 bool AssembleBrushTool::doDeactivate() {
-    update(Model::Polyhedron3());
+    update(Model::Polyhedron3{});
     return true;
 }
 
-void AssembleBrushTool::doBrushWasCreated() {
-    update(Model::Polyhedron3());
+void AssembleBrushTool::doBrushesWereCreated() {
+    update(Model::Polyhedron3{});
 }
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View
