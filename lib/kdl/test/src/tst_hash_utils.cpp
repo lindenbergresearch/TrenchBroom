@@ -1,5 +1,5 @@
 /*
- Copyright 2023 Kristian Duske
+ Copyright 2024 Kristian Duske
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -18,31 +18,21 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include "kdl/pair_iterator.h"
-#include "kdl/std_io.h" // IWYU pragma: keep
+#include "kdl/hash_utils.h"
 
-#include <vector>
+#include <string>
 
 #include "catch2.h"
 
 namespace kdl
 {
-TEST_CASE("pair_iterator")
+
+using namespace std::string_literals;
+
+TEST_CASE("hash")
 {
-  using Catch::Matchers::UnorderedEquals;
-
-  using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
-  const auto [range, expected] = GENERATE(values<T>({
-    {{}, {}},
-    {{1}, {}},
-    {{1, 2}, {{1, 2}}},
-    {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
-  }));
-
-  CAPTURE(range);
-
-  const auto r = make_pair_range(range);
-  const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
-  CHECK_THAT(v, UnorderedEquals(expected));
+  CHECK(hash("asdf"s, 12322) == (hash("asdf"s) ^ hash(12322) << 1));
+  CHECK(hash("asdf"s, 12322, "hello"s) == (hash("asdf"s) ^ (hash(12322, "hello"s) << 1)));
 }
+
 } // namespace kdl

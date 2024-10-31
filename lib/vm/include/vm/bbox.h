@@ -210,7 +210,7 @@ private:
   /**
    * This constructor is used by the builder to create an invalid bbox.
    */
-  constexpr bbox(const bool)
+  explicit constexpr bbox(const bool)
     : min(vec<T, S>::fill(T(1)))
     , max(vec<T, S>::fill(T(0)))
   {
@@ -390,12 +390,12 @@ public:
   }
 
   /**
- * Checks whether the given bounding box intersects with this bounding box.
+   * Checks whether the given bounding box intersects with this bounding box.
 
- * @param b the second bounding box
- * @return true if the given bounding box intersects with this bounding box and false
- otherwise
- */
+   * @param b the second bounding box
+   * @return true if the given bounding box intersects with this bounding box and false
+   otherwise
+   */
   constexpr bool intersects(const bbox<T, S>& b) const
   {
     for (size_t i = 0; i < S; ++i)
