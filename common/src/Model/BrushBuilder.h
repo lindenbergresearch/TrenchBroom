@@ -25,6 +25,8 @@
 #include "Result.h"
 
 #include "vm/bbox.h"
+#include "vm/mat.h"
+#include "vm/mat_ext.h"
 
 #include <string>
 #include <vector>
@@ -35,6 +37,11 @@ class Brush;
 class ModelFactory;
 
 enum class MapFormat;
+
+enum class RadiusMode {
+  ToEdge,
+  ToVertex,
+};
 
 class BrushBuilder {
   private:
@@ -58,6 +65,8 @@ class BrushBuilder {
     Result<Brush> createCuboid(const vm::bbox3 &bounds, const std::string &textureName) const;
 
     Result<Brush> createCuboid(const vm::bbox3 &bounds, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture) const;
+
+    Result<Brush> createCylinder(const vm::bbox3 &bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string &textureName) const;
 
     Result<Brush> createBrush(const std::vector<vm::vec3> &points, const std::string &textureName) const;
 

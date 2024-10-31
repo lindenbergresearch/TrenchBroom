@@ -30,133 +30,117 @@
 #include <vector>
 
 class QWindow;
-
 class QFocusEvent;
-
 class QMouseEvent;
 
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom::Model
+{
 class PickResult;
 }
 
-namespace Renderer {
+namespace TrenchBroom::Renderer
+{
 class RenderBatch;
-
 class RenderContext;
-} // namespace Renderer
+} // namespace TrenchBroom::Renderer
 
-namespace View {
+namespace TrenchBroom::View
+{
+
 class DragTracker;
-
 class DropTracker;
-
 class InputState;
-
 class Tool;
-
 class ToolController;
-
 class ToolChain;
 
-class ToolBox : public QObject {
+class ToolBox : public QObject
+{
   Q_OBJECT
-  private:
-    std::unique_ptr<DragTracker> m_dragTracker;
-    std::unique_ptr<DropTracker> m_dropTracker;
-    Tool *m_modalTool;
+private:
+  std::unique_ptr<DragTracker> m_dragTracker;
+  std::unique_ptr<DropTracker> m_dropTracker;
+  Tool* m_modalTool = nullptr;
 
-    using ToolList = std::vector<Tool *>;
-    using ToolMap = std::map<Tool *, ToolList>;
-    ToolMap m_suppressedTools;
+  std::map<Tool*, std::vector<Tool*>> m_suppressedTools;
 
-    bool m_enabled;
+  bool m_enabled = true;
 
-    NotifierConnection m_notifierConnection;
+  NotifierConnection m_notifierConnection;
 
-  public:
-    Notifier<Tool &> toolActivatedNotifier;
-    Notifier<Tool &> toolDeactivatedNotifier;
-    Notifier<Tool &> refreshViewsNotifier;
-    Notifier<Tool &> toolHandleSelectionChangedNotifier;
+public:
+  Notifier<Tool&> toolActivatedNotifier;
+  Notifier<Tool&> toolDeactivatedNotifier;
+  Notifier<Tool&> refreshViewsNotifier;
+  Notifier<Tool&> toolHandleSelectionChangedNotifier;
 
-  public:
-    ToolBox();
+public:
+  ToolBox();
+  ~ToolBox() override;
 
-    ~ToolBox();
+protected:
+  void addTool(Tool& tool);
 
-  protected:
-    void addTool(Tool &tool);
+public: // picking
+  void pick(
+    ToolChain* chain, const InputState& inputState, Model::PickResult& pickResult);
 
-  public: // picking
-    void pick(ToolChain *chain, const InputState &inputState, Model::PickResult &pickResult);
+public: // event handling
+  bool dragEnter(ToolChain* chain, const InputState& inputState, const std::string& text);
+  bool dragMove(ToolChain* chain, const InputState& inputState, const std::string& text);
+  void dragLeave(ToolChain* chain, const InputState& inputState);
+  bool dragDrop(ToolChain* chain, const InputState& inputState, const std::string& text);
 
-  public: // event handling
-    bool dragEnter(ToolChain *chain, const InputState &inputState, const std::string &text);
+  void modifierKeyChange(ToolChain* chain, const InputState& inputState);
+  void mouseDown(ToolChain* chain, const InputState& inputState) const;
+  void mouseUp(ToolChain* chain, const InputState& inputState) const;
+  bool mouseClick(ToolChain* chain, const InputState& inputState) const;
+  void mouseDoubleClick(ToolChain* chain, const InputState& inputState) const;
+  void mouseMove(ToolChain* chain, const InputState& inputState) const;
 
-    bool dragMove(ToolChain *chain, const InputState &inputState, const std::string &text);
+  bool dragging() const;
+  void startMouseDrag(ToolChain* chain, const InputState& inputState);
+  bool mouseDrag(const InputState& inputState);
+  void endMouseDrag(const InputState& inputState);
+  void cancelMouseDrag();
 
-    void dragLeave(ToolChain *chain, const InputState &inputState);
+  void mouseScroll(ToolChain* chain, const InputState& inputState);
 
-    bool dragDrop(ToolChain *chain, const InputState &inputState, const std::string &text);
+  bool cancel(ToolChain* chain);
 
-    void modifierKeyChange(ToolChain *chain, const InputState &inputState);
+public: // tool management
+  /**
+   * Suppress a tool when another becomes active. The suppressed tool becomes temporarily
+   * deactivated.
+   *
+   * @param suppressedTool the tool that becomes supressed while the other is active
+   * @param primaryTool the tool that controls when the suppressed tool is deactivated
+   */
+  void suppressWhileActive(Tool& suppressedTool, Tool& primaryTool);
 
-    void mouseDown(ToolChain *chain, const InputState &inputState);
+  bool anyToolActive() const;
+  Tool* activeTool();
+  void toggleTool(Tool& tool);
+  void deactivateAllTools();
 
-    void mouseUp(ToolChain *chain, const InputState &inputState);
+  bool enabled() const;
+  void enable();
+  void disable();
 
-    bool mouseClick(ToolChain *chain, const InputState &inputState);
+public: // rendering
+  void setRenderOptions(
+    ToolChain* chain,
+    const InputState& inputState,
+    Renderer::RenderContext& renderContext);
+  void renderTools(
+    ToolChain* chain,
+    const InputState& inputState,
+    Renderer::RenderContext& renderContext,
+    Renderer::RenderBatch& renderBatch);
 
-    void mouseDoubleClick(ToolChain *chain, const InputState &inputState);
-
-    void mouseMove(ToolChain *chain, const InputState &inputState);
-
-    bool dragging() const;
-
-    void startMouseDrag(ToolChain *chain, const InputState &inputState);
-
-    bool mouseDrag(const InputState &inputState);
-
-    void endMouseDrag(const InputState &inputState);
-
-    void cancelMouseDrag();
-
-    void mouseScroll(ToolChain *chain, const InputState &inputState);
-
-    bool cancel(ToolChain *chain);
-
-  public: // tool management
-    /**
-     * Suppress a tool when another becomes active. The suppressed tool becomes temporarily
-     * deactivated.
-     *
-     * @param suppressedTool the tool that becomes supressed while the other is active
-     * @param primaryTool the tool that controls when the suppressed tool is deactivated
-     */
-    void suppressWhileActive(Tool &suppressedTool, Tool &primaryTool);
-
-    bool anyToolActive() const;
-
-    void toggleTool(Tool &tool);
-
-    void deactivateAllTools();
-
-    bool enabled() const;
-
-    void enable();
-
-    void disable();
-
-  public: // rendering
-    void setRenderOptions(ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext);
-
-    void renderTools(ToolChain *chain, const InputState &inputState, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
-
-  private:
-    bool activateTool(Tool &tool);
-
-    void deactivateTool(Tool &tool);
+private:
+  void activateTool(Tool& tool);
+  void deactivateTool(Tool& tool);
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::View

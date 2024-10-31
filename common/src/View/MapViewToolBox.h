@@ -27,148 +27,111 @@
 
 class QStackedLayout;
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom
+{
+namespace View
+{
 class ClipTool;
-
 class AssembleBrushTool;
-
 class CreateEntityTool;
-
 class DrawShapeTool;
-
 class MoveObjectsTool;
-
 class ExtrudeTool;
-
 class RotateObjectsTool;
-
 class ScaleObjectsTool;
-
 class ShearObjectsTool;
-
 class VertexTool;
-
 class EdgeTool;
-
 class FaceTool;
-
 class MapDocument;
+class Selection;
 
-class MapViewToolBox : public ToolBox {
-  private:
-    std::weak_ptr<MapDocument> m_document;
+class MapViewToolBox : public ToolBox
+{
+private:
+  std::weak_ptr<MapDocument> m_document;
 
-    std::unique_ptr<ClipTool> m_clipTool;
-    std::unique_ptr<AssembleBrushTool> m_assembleBrushTool;
-    std::unique_ptr<CreateEntityTool> m_createEntityTool;
-    std::unique_ptr<DrawShapeTool> m_createSimpleBrushTool;
-    std::unique_ptr<MoveObjectsTool> m_moveObjectsTool;
-    std::unique_ptr<ExtrudeTool> m_extrudeTool;
-    std::unique_ptr<RotateObjectsTool> m_rotateObjectsTool;
-    std::unique_ptr<ScaleObjectsTool> m_scaleObjectsTool;
-    std::unique_ptr<ShearObjectsTool> m_shearObjectsTool;
-    std::unique_ptr<VertexTool> m_vertexTool;
-    std::unique_ptr<EdgeTool> m_edgeTool;
-    std::unique_ptr<FaceTool> m_faceTool;
+  std::unique_ptr<ClipTool> m_clipTool;
+  std::unique_ptr<AssembleBrushTool> m_assembleBrushTool;
+  std::unique_ptr<CreateEntityTool> m_createEntityTool;
+  std::unique_ptr<DrawShapeTool> m_drawShapeTool;
+  std::unique_ptr<MoveObjectsTool> m_moveObjectsTool;
+  std::unique_ptr<ExtrudeTool> m_extrudeTool;
+  std::unique_ptr<RotateObjectsTool> m_rotateObjectsTool;
+  std::unique_ptr<ScaleObjectsTool> m_scaleObjectsTool;
+  std::unique_ptr<ShearObjectsTool> m_shearObjectsTool;
+  std::unique_ptr<VertexTool> m_vertexTool;
+  std::unique_ptr<EdgeTool> m_edgeTool;
+  std::unique_ptr<FaceTool> m_faceTool;
 
-    NotifierConnection m_notifierConnection;
+  NotifierConnection m_notifierConnection;
 
-  public:
-    MapViewToolBox(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl);
+public:
+  MapViewToolBox(std::weak_ptr<MapDocument> document, QStackedLayout* bookCtrl);
+  ~MapViewToolBox() override;
 
-    ~MapViewToolBox() override;
+public: // tools
+  ClipTool& clipTool();
+  AssembleBrushTool& assembleBrushTool();
+  CreateEntityTool& createEntityTool();
+  DrawShapeTool& drawShapeTool();
+  MoveObjectsTool& moveObjectsTool();
+  ExtrudeTool& extrudeTool();
+  RotateObjectsTool& rotateObjectsTool();
+  ScaleObjectsTool& scaleObjectsTool();
+  ShearObjectsTool& shearObjectsTool();
+  VertexTool& vertexTool();
+  EdgeTool& edgeTool();
+  FaceTool& faceTool();
 
-  public: // tools
-    ClipTool &clipTool();
+  void toggleAssembleBrushTool();
+  bool assembleBrushToolActive() const;
+  void performAssembleBrush();
 
-    AssembleBrushTool &assembleBrushTool();
+  void toggleClipTool();
+  bool clipToolActive() const;
+  void toggleClipSide();
+  void performClip();
+  void removeLastClipPoint();
 
-    CreateEntityTool &createEntityTool();
+  void toggleRotateObjectsTool();
+  bool rotateObjectsToolActive() const;
+  double rotateToolAngle() const;
+  vm::vec3 rotateToolCenter() const;
+  void moveRotationCenter(const vm::vec3& delta);
 
-    DrawShapeTool &createSimpleBrushTool();
+  void toggleScaleObjectsTool();
+  bool scaleObjectsToolActive() const;
 
-    MoveObjectsTool &moveObjectsTool();
+  void toggleShearObjectsTool();
+  bool shearObjectsToolActive() const;
 
-    ExtrudeTool &extrudeTool();
+  bool anyVertexToolActive() const;
 
-    RotateObjectsTool &rotateObjectsTool();
+  void toggleVertexTool();
+  bool vertexToolActive() const;
 
-    ScaleObjectsTool &scaleObjectsTool();
+  void toggleEdgeTool();
+  bool edgeToolActive() const;
 
-    ShearObjectsTool &shearObjectsTool();
+  void toggleFaceTool();
+  bool faceToolActive() const;
 
-    VertexTool &vertexTool();
+  void moveVertices(const vm::vec3& delta);
 
-    EdgeTool &edgeTool();
+private: // Tool related methods
+  void createTools(std::weak_ptr<MapDocument> document, QStackedLayout* bookCtrl);
 
-    FaceTool &faceTool();
+private: // notification
+  void registerTool(Tool& tool, QStackedLayout* bookCtrl);
+  void connectObservers();
+  void toolActivated(Tool& tool);
+  void toolDeactivated(Tool& tool);
+  void updateEditorContext();
+  void documentWasNewedOrLoaded(MapDocument* document);
+  void selectionDidChange(const Selection& selection);
 
-    void toggleAssembleBrushTool();
-
-    bool assembleBrushToolActive() const;
-
-    void performAssembleBrush();
-
-    void toggleClipTool();
-
-    bool clipToolActive() const;
-
-    void toggleClipSide();
-
-    void performClip();
-
-    void removeLastClipPoint();
-
-    void toggleRotateObjectsTool();
-
-    bool rotateObjectsToolActive() const;
-
-    double rotateToolAngle() const;
-
-    vm::vec3 rotateToolCenter() const;
-
-    void moveRotationCenter(const vm::vec3 &delta);
-
-    void toggleScaleObjectsTool();
-
-    bool scaleObjectsToolActive() const;
-
-    void toggleShearObjectsTool();
-
-    bool shearObjectsToolActive() const;
-
-    bool anyVertexToolActive() const;
-
-    void toggleVertexTool();
-
-    bool vertexToolActive() const;
-
-    void toggleEdgeTool();
-
-    bool edgeToolActive() const;
-
-    void toggleFaceTool();
-
-    bool faceToolActive() const;
-
-    void moveVertices(const vm::vec3 &delta);
-
-  private: // Tool related methods
-    void createTools(std::weak_ptr<MapDocument> document, QStackedLayout *bookCtrl);
-
-  private: // notification
-    void registerTool(Tool &tool, QStackedLayout *bookCtrl);
-
-    void connectObservers();
-
-    void toolActivated(Tool &tool);
-
-    void toolDeactivated(Tool &tool);
-
-    void updateEditorContext();
-
-    void documentWasNewedOrLoaded(MapDocument *document);
+  void updateToolPage();
 };
 } // namespace View
 } // namespace TrenchBroom
