@@ -366,6 +366,10 @@ bool TrenchBroomApp::loadStyleSheets() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Midlight);
         });
 
+        builder->addReplacement("MIDHALF_COLOR", []() {
+            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid, 150);
+        });
+
         builder->addReplacement("MID_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid);
         });
@@ -877,16 +881,17 @@ Logger &TrenchBroomApp::logger() const {
 namespace {
 std::string makeCrashReport(const std::string &stacktrace, const std::string &reason) {
     auto ss = std::stringstream{};
-    ss << "OS:\t" << QSysInfo::prettyProductName().toStdString() << std::endl;
-    ss << "Qt:\t" << qVersion() << std::endl;
-    ss << "GL_VENDOR:\t" << GLContextManager::GLVendor << std::endl;
-    ss << "GL_RENDERER:\t" << GLContextManager::GLRenderer << std::endl;
-    ss << "GL_VERSION:\t" << GLContextManager::GLVersion << std::endl;
-    ss << "TrenchBroom Version:\t" << getBuildVersion().toStdString() << std::endl;
-    ss << "TrenchBroom Build:\t" << getBuildIdStr().toStdString() << std::endl;
-    ss << "Reason:\t" << reason << std::endl;
-    ss << "Stack trace:" << std::endl;
-    ss << stacktrace << std::endl;
+    ss << "Operating System    : " << QSysInfo::prettyProductName().toStdString() << std::endl;
+    ss << "Qt Version          : " << qVersion() << std::endl;
+    ss << "GL_VENDOR           : " << GLContextManager::GLVendor << std::endl;
+    ss << "GL_RENDERER         : " << GLContextManager::GLRenderer << std::endl;
+    ss << "GL_VERSION          : " << GLContextManager::GLVersion << std::endl;
+    ss << "TrenchBroom Version : " << getBuildVersion().toStdString() << std::endl;
+    ss << "TrenchBroom Build   : " << getBuildIdStr().toStdString() << std::endl;
+    ss << "Reason              : " << reason << std::endl;
+    ss << "\n--------------- [ stack trace ] ---------------" << std::endl;
+    ss << stacktrace;
+    ss << "--------------- [ stack trace ] ---------------" << std::endl;
     return ss.str();
 }
 
