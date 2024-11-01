@@ -61,8 +61,8 @@
             style="fill:#3f3f3f;fill-opacity:1">
         <path
                 id="path79"
-                fill="#494949"
+                fill="#999999"
                 d="M12,5 L4,5 L8,11"
-                style="fill:#3f3f3f;fill-opacity:1"/>
+                style="fill:#d1d1d1;fill-opacity:1"/>
     </g>
 </svg>
