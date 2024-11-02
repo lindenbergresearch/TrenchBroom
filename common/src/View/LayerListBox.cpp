@@ -47,7 +47,9 @@ LayerListBoxWidget::LayerListBoxWidget(std::weak_ptr<MapDocument> document, Mode
     // names.
     m_nameText->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     m_infoText = new QLabel("");
-    makeInfo(m_infoText);
+
+    m_nameText->setObjectName("LayerListBoxWidget_m_nameText");
+    m_infoText->setObjectName("LayerListBoxWidget_m_infoText");
 
     m_activeButton = new QRadioButton();
     m_omitFromExportButton = createBitmapToggleButton("OmitFromExport.svg", tr("Toggle omit from export"));
@@ -144,7 +146,7 @@ bool LayerListBoxWidget::eventFilter(QObject *target, QEvent *event) {
 
 // LayerListBox
 
-LayerListBox::LayerListBox(std::weak_ptr<MapDocument> document, QWidget *parent) : ControlListBox("", true, parent), m_document(std::move(document)) {
+LayerListBox::LayerListBox(std::weak_ptr<MapDocument> document, QWidget *parent) : ControlListBox("", false, parent), m_document(std::move(document)) {
     connectObservers();
 }
 

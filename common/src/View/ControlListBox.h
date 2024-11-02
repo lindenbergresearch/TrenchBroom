@@ -22,7 +22,9 @@
 #include <QWidget>
 
 class QLabel;
+
 class QListWidget;
+
 class QListWidgetItem;
 
 namespace TrenchBroom {
@@ -66,7 +68,7 @@ class ControlListBoxItemRendererWrapper : public QWidget {
     ControlListBoxItemRenderer *m_renderer;
 
   public:
-    explicit ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, bool showSeparator, QWidget *parent = nullptr);
+    explicit ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, bool showSeparator = false, QWidget *parent = nullptr);
 
     ControlListBoxItemRenderer *renderer();
 
@@ -89,7 +91,7 @@ class ControlListBox : public QWidget {
     bool m_multiSelection;
 
   public:
-    ControlListBox(const QString &emptyText, const QMargins &itemMargins, bool showSeparator, QWidget *parent = nullptr);
+    ControlListBox(const QString &emptyText, const QMargins &itemMargins, bool showSeparator = false, QWidget *parent = nullptr);
 
     ControlListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
 
