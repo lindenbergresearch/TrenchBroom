@@ -86,12 +86,12 @@ struct VertsAndNormals {
   explicit VertsAndNormals(size_t vertexCount);
 };
 
-std::vector<vm::vec3f> sphere3D(float radius, size_t iterations);
+std::vector<vm::vec3f> sphere(const float radius, const size_t iterations);
 
 VertsAndNormals circle3D(float radius, size_t segments);
 
-VertsAndNormals cylinder3D(float radius, float length, size_t segments);
+VertsAndNormals cylinder(const float radius, const float length, const size_t segments);
 
-VertsAndNormals cone3D(float radius, float length, size_t segments);
+VertsAndNormals cone(const float radius, const float length, const size_t segments);
 } // namespace Renderer
 } // namespace TrenchBroom

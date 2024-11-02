@@ -334,7 +334,7 @@ size_t midPoint(std::vector<vm::vec3f> &vertices, MidPointCache &cache, const si
 }
 } // namespace SphereBuilder
 
-std::vector<vm::vec3f> sphere3D(const float radius, const size_t iterations) {
+std::vector<vm::vec3f> sphere(const float radius, const size_t iterations) {
     assert(radius > 0.0f);
     assert(iterations > 0);
 
@@ -434,7 +434,7 @@ VertsAndNormals circle3D(const float radius, const size_t segments) {
     return result;
 }
 
-VertsAndNormals cylinder3D(const float radius, const float length, const size_t segments) {
+VertsAndNormals cylinder(const float radius, const float length, const size_t segments) {
     assert(radius > 0.0f);
     assert(length > 0.0f);
     assert(segments > 2);
@@ -456,7 +456,7 @@ VertsAndNormals cylinder3D(const float radius, const float length, const size_t 
     return result;
 }
 
-VertsAndNormals cone3D(const float radius, const float length, const size_t segments) {
+VertsAndNormals cone(const float radius, const float length, const size_t segments) {
     assert(radius > 0.0f);
     assert(length > 0.0f);
     assert(segments > 2);
