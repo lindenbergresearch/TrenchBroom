@@ -63,7 +63,9 @@ struct TextureMode {
 };
 
 const auto TextureModes = std::array<TextureMode, 6>{
-    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"}, TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"}, TextureMode{GL_LINEAR, GL_LINEAR, "Linear"}, TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"}, TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
+    TextureMode{GL_NEAREST, GL_NEAREST, "Nearest"}, TextureMode{GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST, "Nearest (mipmapped)"},
+    TextureMode{GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST, "Nearest (mipmapped, interpolated)"}, TextureMode{GL_LINEAR, GL_LINEAR, "Linear"}, TextureMode{GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR, "Linear (mipmapped)"},
+    TextureMode{GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, "Linear (mipmapped, interpolated)"},
 };
 
 constexpr int brightnessToUI(const float value) {
@@ -202,13 +204,6 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         m_ConsoleFontCombo->addItem("[default]");
         font_files.push_back("[default]");
 
-        // default system font
-        QFont font;
-        //m_rendererFontCombo->addItem("[system: " + font.defaultFamily() + "]");
-        m_UIFontCombo->addItem("[system: " + font.defaultFamily() + "]");
-        m_ConsoleFontCombo->addItem("[system: " + font.defaultFamily() + "]");
-        font_files.push_back(font.defaultFamily().toStdString());
-
         // search compatible fonts
         auto res = m_fs->find("fonts", IO::TraversalMode::Recursive, IO::makeExtensionPathMatcher({".ttf", ".otf"}));
 
@@ -275,9 +270,11 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_ToolbarIconSizeCombo = new QComboBox{};
     m_ToolbarIconSizeCombo->setEditable(false);
     m_ToolbarIconSizeCombo->setToolTip("Sets the icon size for the main toolbar.");
-    m_ToolbarIconSizeCombo->addItems({
-                                         "14x14", "16x16", "18x18", "20x20", "22x22", "24x24", "26x26", "28x28", "30x30", "32x32"
-                                     });
+    m_ToolbarIconSizeCombo->addItems(
+        {
+            "14x14", "16x16", "18x18", "20x20", "22x22", "24x24", "26x26", "28x28", "30x30", "32x32"
+        }
+    );
 
     /*************************************************************************************************************************/
 
@@ -570,20 +567,27 @@ void ViewPreferencePane::textureBrowserIconSizeChanged(const int index) {
     auto &prefs = PreferenceManager::instance();
 
     switch (index) {
-    case 0:prefs.set(Preferences::TextureBrowserIconSize, 0.25f);
-        break;
-    case 1:prefs.set(Preferences::TextureBrowserIconSize, 0.5f);
-        break;
-    case 2:prefs.set(Preferences::TextureBrowserIconSize, 1.0f);
-        break;
-    case 3:prefs.set(Preferences::TextureBrowserIconSize, 1.5f);
-        break;
-    case 4:prefs.set(Preferences::TextureBrowserIconSize, 2.0f);
-        break;
-    case 5:prefs.set(Preferences::TextureBrowserIconSize, 2.5f);
-        break;
-    case 6:prefs.set(Preferences::TextureBrowserIconSize, 3.0f);
-        break;
+        case 0:
+            prefs.set(Preferences::TextureBrowserIconSize, 0.25f);
+            break;
+        case 1:
+            prefs.set(Preferences::TextureBrowserIconSize, 0.5f);
+            break;
+        case 2:
+            prefs.set(Preferences::TextureBrowserIconSize, 1.0f);
+            break;
+        case 3:
+            prefs.set(Preferences::TextureBrowserIconSize, 1.5f);
+            break;
+        case 4:
+            prefs.set(Preferences::TextureBrowserIconSize, 2.0f);
+            break;
+        case 5:
+            prefs.set(Preferences::TextureBrowserIconSize, 2.5f);
+            break;
+        case 6:
+            prefs.set(Preferences::TextureBrowserIconSize, 3.0f);
+            break;
     }
 }
 
