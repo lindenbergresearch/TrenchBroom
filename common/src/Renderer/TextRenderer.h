@@ -30,6 +30,7 @@
 #include <vm/vec.h>
 
 #include <vector>
+#include <map>
 
 namespace TrenchBroom {
 namespace Renderer {
@@ -41,11 +42,11 @@ class TextAnchor;
 
 class TextRenderer : public DirectRenderable {
   private:
-    static const float DefaultMaxViewDistance;
     static const float DefaultMinZoomFactor;
     static const vm::vec2f DefaultInset;
     static const size_t RectCornerSegments;
     static const float RectCornerRadius;
+    static const bool ExactViewportCheck;
 
     struct Entry {
       std::vector<vm::vec2f> vertices;
@@ -55,28 +56,34 @@ class TextRenderer : public DirectRenderable {
       Color backgroundColor;
       AttrString string;
 
-      Entry(std::vector<vm::vec2f> &i_vertices, const vm::vec2f &i_size, const vm::vec3f &i_offset, const Color &i_textColor, const Color &i_backgroundColor, const AttrString &i_string);
+      Entry(const std::vector<vm::vec2f> &vertices, const vm::vec2f &size, const vm::vec3f &offset, const Color &textColor, const Color &backgroundColor, const AttrString &string);
 
       bool valueInRange(float value, float min, float max);
 
       bool overlapsWith(const Entry &entry);
     };
 
-    using EntryList = std::vector<Entry>;
-
     struct EntryCollection {
-      EntryList entries;
+      EntryCollection();
+
+      std::vector<Entry> entries;
       size_t textVertexCount;
       size_t rectVertexCount;
+      FontDescriptor fontDescriptor;
+      bool onTop;
 
       VertexArray textArray;
       VertexArray rectArray;
 
-      EntryCollection();
+      EntryCollection(const FontDescriptor &fontDescriptor, bool onTop);
+
+      size_t size() {
+          return entries.size();
+      }
 
       bool overlaps(Entry &entry);
 
-      void addEntry(Entry &entry);
+      void addEntry(const Entry &entry);
 
       void updateLayout();
     };
@@ -84,31 +91,31 @@ class TextRenderer : public DirectRenderable {
     using TextVertex = GLVertexTypes::P3T2C4::Vertex;
     using RectVertex = GLVertexTypes::P3C4::Vertex;
 
-    FontDescriptor m_fontDescriptor;
     float m_maxViewDistance;
     float m_minZoomFactor;
     vm::vec2f m_inset;
 
-    EntryCollection m_entries;
-    EntryCollection m_entriesOnTop;
+    std::map<FontDescriptor, EntryCollection> collections;
 
   public:
-    explicit TextRenderer(const FontDescriptor &fontDescriptor, float maxViewDistance = 512.f, float minZoomFactor = DefaultMinZoomFactor, const vm::vec2f &inset = DefaultInset);
+    explicit TextRenderer(float maxViewDistance = 512.f, float minZoomFactor = DefaultMinZoomFactor, const vm::vec2f &inset = DefaultInset);
 
     void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position);
 
     void renderStringOnTop(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position);
 
   private:
-    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position, bool onTop);
+     EntryCollection &getOrCreateCollection(const FontDescriptor &descriptor, bool onTop);
 
-    bool isVisible(RenderContext &renderContext, const AttrString &string, const TextAnchor &position, float distance, bool onTop) const;
+    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, AttrString string, const TextAnchor &position, bool onTop);
+
+    bool isVisible(RenderContext &renderContext,const FontDescriptor &descriptor, const AttrString &string, const TextAnchor &position, float distance, bool onTop) const;
 
     float computeAlphaFactor(const RenderContext &renderContext, float distance, bool onTop) const;
 
     void addEntry(EntryCollection &collection, const Entry &entry);
 
-    vm::vec2f stringSize(RenderContext &renderContext, const AttrString &string) const;
+    vm::vec2f stringSize(RenderContext &renderContext,const FontDescriptor &descriptor, const AttrString &string) const;
 
   private:
     void doPrepareVertices(VboManager &vboManager) override;

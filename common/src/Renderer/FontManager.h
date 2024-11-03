@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Macros.h"
+#include "FontDescriptor.h"
 
 #include <map>
 #include <memory>
@@ -46,6 +47,8 @@ class FontManager {
     TextureFont &font(const FontDescriptor &fontDescriptor);
 
     FontDescriptor selectFontSize(const FontDescriptor &fontDescriptor, const std::string &string, float maxWidth, size_t minFontSize);
+
+    FontDescriptor selectFontSize(const FontDescriptor &fontDescriptor, const float distance, const float maxDistance, const int min, const int max);
 
     void clearCache();
 
