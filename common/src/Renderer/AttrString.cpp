@@ -18,7 +18,7 @@
  */
 
 #include "AttrString.h"
-
+#include "StringUtils.h"
 #include "Macros.h"
 
 #include <algorithm>
@@ -96,7 +96,7 @@ void AttrString::appendCentered(const std::string &string) {
     m_lines.push_back(Line(string, Justify::Center));
 }
 
-std::string AttrString::str() {
+std::string AttrString::str() const {
     std::string tmp{};
 
     for (auto &item : m_lines) {
