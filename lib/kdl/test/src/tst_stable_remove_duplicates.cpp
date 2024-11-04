@@ -1,5 +1,5 @@
 /*
- Copyright 2023 Kristian Duske
+ Copyright 2024 Kristian Duske
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -18,31 +18,34 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include "kdl/pair_iterator.h"
-#include "kdl/std_io.h" // IWYU pragma: keep
+#include "kdl/stable_remove_duplicates.h"
 
+#include <tuple>
 #include <vector>
 
 #include "catch2.h"
 
 namespace kdl
 {
-TEST_CASE("pair_iterator")
-{
-  using Catch::Matchers::UnorderedEquals;
 
-  using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
-  const auto [range, expected] = GENERATE(values<T>({
+TEST_CASE("col_stable_remove_duplicates")
+{
+  using T = std::tuple<std::vector<int>, std::vector<int>>;
+
+  const auto [input, expectedOutput] = GENERATE(values<T>({
     {{}, {}},
-    {{1}, {}},
-    {{1, 2}, {{1, 2}}},
-    {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
+    {{1}, {1}},
+    {{1, 2}, {1, 2}},
+    {{2, 1}, {2, 1}},
+    {{1, 2, 2, 3}, {1, 2, 3}},
+    {{1, 2, 3, 2}, {1, 2, 3}},
+    {{1, 2, 3, 3, 2, 1}, {1, 2, 3}},
+    {{3, 2, 1, 1, 2, 3}, {3, 2, 1}},
   }));
 
-  CAPTURE(range);
+  CAPTURE(input);
 
-  const auto r = make_pair_range(range);
-  const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
-  CHECK_THAT(v, UnorderedEquals(expected));
+  CHECK(col_stable_remove_duplicates(input) == expectedOutput);
 }
+
 } // namespace kdl

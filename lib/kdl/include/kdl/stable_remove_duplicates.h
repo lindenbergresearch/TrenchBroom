@@ -1,5 +1,5 @@
 /*
- Copyright 2023 Kristian Duske
+ Copyright 2024 Kristian Duske
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -18,31 +18,31 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include "kdl/pair_iterator.h"
-#include "kdl/std_io.h" // IWYU pragma: keep
+#pragma once
 
-#include <vector>
-
-#include "catch2.h"
+#include <unordered_set>
 
 namespace kdl
 {
-TEST_CASE("pair_iterator")
+
+template <typename Collection>
+auto col_stable_remove_duplicates(Collection&& v)
 {
-  using Catch::Matchers::UnorderedEquals;
+  using value_type = typename std::decay_t<Collection>::value_type;
+  using set_type = std::unordered_set<value_type>;
 
-  using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
-  const auto [range, expected] = GENERATE(values<T>({
-    {{}, {}},
-    {{1}, {}},
-    {{1, 2}, {{1, 2}}},
-    {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
-  }));
+  auto set = set_type{};
+  auto result = Collection{};
 
-  CAPTURE(range);
+  for (auto& x : v)
+  {
+    if (set.insert(x).second)
+    {
+      result.push_back(std::move(x));
+    }
+  }
 
-  const auto r = make_pair_range(range);
-  const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
-  CHECK_THAT(v, UnorderedEquals(expected));
+  return result;
 }
+
 } // namespace kdl

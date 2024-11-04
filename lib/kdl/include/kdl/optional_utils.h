@@ -1,5 +1,5 @@
 /*
- Copyright 2023 Kristian Duske
+ Copyright 2024 Kristian Duske
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -18,31 +18,31 @@
  DEALINGS IN THE SOFTWARE.
 */
 
-#include "kdl/pair_iterator.h"
-#include "kdl/std_io.h" // IWYU pragma: keep
+#pragma once
 
-#include <vector>
-
-#include "catch2.h"
+#include <optional>
 
 namespace kdl
 {
-TEST_CASE("pair_iterator")
+
+template <typename T, typename F>
+auto optional_and_then(std::optional<T> o, const F& f) -> decltype(f(*o))
 {
-  using Catch::Matchers::UnorderedEquals;
-
-  using T = std::tuple<std::vector<int>, std::vector<std::tuple<int, int>>>;
-  const auto [range, expected] = GENERATE(values<T>({
-    {{}, {}},
-    {{1}, {}},
-    {{1, 2}, {{1, 2}}},
-    {{1, 2, 3}, {{1, 2}, {1, 3}, {2, 3}}},
-  }));
-
-  CAPTURE(range);
-
-  const auto r = make_pair_range(range);
-  const auto v = std::vector<std::tuple<int, int>>(r.begin(), r.end());
-  CHECK_THAT(v, UnorderedEquals(expected));
+  if (o)
+  {
+    return f(*o);
+  }
+  return std::nullopt;
 }
+
+template <typename T, typename F>
+auto optional_transform(std::optional<T> o, const F& f) -> decltype(std::optional{f(*o)})
+{
+  if (o)
+  {
+    return std::optional{f(*o)};
+  }
+  return std::nullopt;
+}
+
 } // namespace kdl
