@@ -96,17 +96,17 @@ size_t GameListBox::itemCount() const {
     return m_gameInfos.size();
 }
 
-QPixmap GameListBox::image(size_t index) const {
+const QPixmap &GameListBox::image(size_t index) const {
     ensure(index < m_gameInfos.size(), "index out of range");
     return m_gameInfos[index].image;
 }
 
-QString GameListBox::title(const size_t n) const {
+const QString GameListBox::title(const size_t n) const {
     ensure(n < m_gameInfos.size(), "index out of range");
     return m_gameInfos[n].title;
 }
 
-QString GameListBox::subtitle(const size_t n) const {
+const QString GameListBox::subtitle(const size_t n) const {
     ensure(n < m_gameInfos.size(), "index out of range");
     return m_gameInfos[n].subtitle;
 }

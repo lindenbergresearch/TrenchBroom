@@ -59,11 +59,11 @@ class GameListBox : public ImageListBox {
   private:
     size_t itemCount() const override;
 
-    QPixmap image(size_t index) const override;
+    const QPixmap &image(size_t index) const override;
 
-    QString title(size_t index) const override;
+    const QString title(size_t index) const override;
 
-    QString subtitle(size_t index) const override;
+    const QString subtitle(size_t index) const override;
 
     void selectedRowChanged(int index) override;
 
