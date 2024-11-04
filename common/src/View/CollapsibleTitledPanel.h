@@ -35,7 +35,7 @@ class CollapsibleTitleBar : public TitleBar {
     QLabel *m_stateText;
 
   public:
-    CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
+    CollapsibleTitleBar(const QString &title, QWidget *parent = nullptr);
 
     void setStateText(const QString &stateText);
 

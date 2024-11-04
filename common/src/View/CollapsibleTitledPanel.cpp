@@ -30,13 +30,10 @@ namespace TrenchBroom {
 namespace View {
 // CollapsibleTitleBar
 
-CollapsibleTitleBar::CollapsibleTitleBar(const QString &title, const QString &stateText, QWidget *parent)
-    : TitleBar(title, parent), m_stateText(new QLabel(stateText)) {
+CollapsibleTitleBar::CollapsibleTitleBar(const QString &title, QWidget *parent) : TitleBar(title, parent), m_stateText(new QLabel("")) {
     setObjectName("CollapsibleTitleBar");
-    m_stateText->setFont(m_titleText->font());
-    makeInfo(m_stateText);
-    m_stateText->setContentsMargins(0, 0, LayoutConstants::MediumHMargin, 0);
-
+    m_stateText->setObjectName("CollapsibleTitleBar_m_stateText");
+    m_titleText->setObjectName("CollapsibleTitleBar_m_titleText");
     layout()->addWidget(m_stateText);
 }
 
@@ -50,7 +47,7 @@ void CollapsibleTitleBar::mousePressEvent(QMouseEvent * /* event */) {
 
 // CollapsibleTitledPanel
 CollapsibleTitledPanel::CollapsibleTitledPanel(const QString &title, const bool initiallyExpanded, QWidget *parent)
-    : QWidget(parent), m_titleBar(new CollapsibleTitleBar(title, "hide")), m_panel(new QWidget()), m_expanded(initiallyExpanded) {
+    : QWidget(parent), m_titleBar(new CollapsibleTitleBar(title)), m_panel(new QWidget()), m_expanded(initiallyExpanded) {
 
     m_panel->setAutoFillBackground(true);
     m_panel->setBackgroundRole(QPalette::Window);
@@ -117,10 +114,12 @@ bool CollapsibleTitledPanel::restoreState(const QByteArray &state) {
 void CollapsibleTitledPanel::updateExpanded() {
     if (m_expanded) {
         m_panel->show();
-        m_titleBar->setStateText(tr("hide"));
+        m_titleBar->setStateText(tr("-"));
+        m_titleBar->setToolTip("Hide Panel");
     } else {
         m_panel->hide();
-        m_titleBar->setStateText(tr("show"));
+        m_titleBar->setStateText(tr("+"));
+        m_titleBar->setToolTip("Show Panel");
     }
 }
 } // namespace View

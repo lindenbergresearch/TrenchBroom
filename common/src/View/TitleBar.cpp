@@ -34,7 +34,7 @@ TitleBar::TitleBar(const QString &title, QWidget *parent, const bool boldTitle, 
     setObjectName("TitleBar");
     m_titleText = new QLabel(title);
     m_titleText->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    m_titleText->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::NoMargin, LayoutConstants::NoMargin, LayoutConstants::NoMargin);
+    m_titleText->setObjectName("TitleBar_m_titleText");
 
     if (!subtitle) {
         setAutoFillBackground(true);
