@@ -9,8 +9,8 @@
                   style="fill:none;fill-rule:nonzero;stroke:rgb(0,109,208);stroke-width:1px;"/>
         </g>
         <path id="path1524" d="M11.5,1040.86L20.5,1031.86"
-              style="fill:none;fill-rule:nonzero;stroke:rgb(0,109,208);stroke-width:1px;stroke-dasharray:2,1,2,1;"/>
+              style="fill:none;fill-rule:nonzero;stroke:rgb(0,109,208);stroke-width:2px;stroke-dasharray:2,1,2,1;"/>
         <rect id="rect826" x="3.5" y="1040.86" width="8" height="8"
-              style="fill:none;stroke:rgb(127,127,127);stroke-width:1px;"/>
+              style="fill:none;stroke:rgb(187,187,187);stroke-width:1.1px;"/>
     </g>
 </svg>

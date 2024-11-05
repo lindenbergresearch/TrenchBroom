@@ -88,7 +88,7 @@
             id="layer1"
             transform="translate(0,-1028.3623)">
         <rect
-                style="fill:#7f7f7f;fill-opacity:0.24705882;stroke:#7f7f7f;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:10;stroke-opacity:1"
+                style="fill:#7f7f7f;fill-opacity:0.24705882;stroke:#AAAAAA;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:10;stroke-opacity:1"
                 id="rect826"
                 width="17"
                 height="17"
