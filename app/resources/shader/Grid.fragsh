@@ -22,17 +22,17 @@
 float getSoftStripes(float value, float gridSize, float stripeSize, float majorDivisionSize) {
     float mainVal = value * gridSize;
     float filterWidth = fwidth(value);
-    float edge = filterWidth * gridSize * 2.0;
+    float edge = filterWidth * gridSize * 2.0f;
 
     // major line shading, currently set to place a major line every 64 units
-    float mValue = 1.0 / (majorDivisionSize * gridSize);
-    float triMajor = abs(2.0 * fract(mainVal * mValue) - 1.0);
-    float isMajor = majorDivisionSize > 0 ? step(1.0 - mValue, triMajor) : 0;
+    float mValue = 1.0f / (majorDivisionSize * gridSize);
+    float triMajor = abs(2.0f * fract(mainVal * mValue) - 1.0f);
+    float isMajor = majorDivisionSize > 0 ? step(1.0f - mValue, triMajor) : 0.0f;
 
-    float outIntensity = isMajor * 1.0 + 0.85;// tweak intensities here
+    float outIntensity = isMajor * 1.0f + 0.85f;// tweak intensities here
     float sSize = stripeSize;
 
-    float triangle = abs(2.0 * fract(mainVal) - 1.0);
+    float triangle = abs(2.0f * fract(mainVal) - 1.0f);
     return smoothstep(sSize - edge, sSize + edge, triangle) * outIntensity;
 }
 
@@ -49,8 +49,8 @@ float getSoftStripes(float value, float gridSize, float stripeSize, float majorD
 float gridLinesSoft(vec2 inCoords, float gridRatio, float gridRatio2, float lineWidth, float gridBlend, float majorDivisionSize) {
     float stripeRatio = lineWidth * gridRatio;
     float stripeRatio2 = lineWidth * gridRatio2;
-    float stripeSize = 1.0 - stripeRatio;
-    float stripeSize2 = 1.0 - stripeRatio2;
+    float stripeSize = 1.0f - stripeRatio;
+    float stripeSize2 = 1.0f - stripeRatio2;
 
     float theGrid, nextGrid;
 
@@ -61,14 +61,14 @@ float gridLinesSoft(vec2 inCoords, float gridRatio, float gridRatio2, float line
 
     theGrid = mix(theGrid, nextGrid, gridBlend);
 
-    return theGrid * 0.5;
+    return theGrid * 0.5f;
 }
 
 /**
  * Given a valid grid size, returns the next larger one.
  */
 float gridNextLarger(float size) {
-    return 2.0 * size;
+    return 2.0f * size;
 }
 
 /**
@@ -91,11 +91,11 @@ float gridFloor(float size) {
  * @return opacity of the grid line to draw on this fragment, in [0..1]
  */
 float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorDivisionSize) {
-    float lineWidth = (gridSize < 1.0 ? (1.0 / 32.0)
-    : (gridSize < 4.0 ? 0.25 : 0.5)) * lineWidthFactor;
+    float lineWidth = (gridSize < 1.0f ? (1.0f / 32.0f)
+    : (gridSize < 4.0f ? 0.25f : 0.5f)) * lineWidthFactor;
 
     // magic number to make the grid fade sooner, preventing aliasing
-    float minGridSizeToRender = minGridSize * 2.0;
+    float minGridSizeToRender = minGridSize * 2.0f;
 
     float baseGridSize = gridFloor(minGridSizeToRender);
     if (gridSize > baseGridSize) {
@@ -106,8 +106,8 @@ float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float li
     // This is 0 if we want to render just baseGridSize, and 1 if we want to fully render at nextGridSize
     float gridBlend = smoothstep(baseGridSize, nextGridSize, minGridSizeToRender);
 
-    float gridRatio = 1.0 / baseGridSize;
-    float gridRatio2 = 1.0 / nextGridSize;
+    float gridRatio = 1.0f / baseGridSize;
+    float gridRatio2 = 1.0f / nextGridSize;
 
     vec2 baseCoords;// coordinates used for overlay creation
 

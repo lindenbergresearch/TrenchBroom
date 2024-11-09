@@ -34,11 +34,11 @@ varying vec4 modelCoordinates;
 float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorDivisionSize);
 
 void main() {
-    float alpha = clamp(GridAlpha, 0.05, 1.0);
+    float alpha = clamp(GridAlpha, 0.05f, 1.0f);
 
-    if (RenderGrid && alpha > 0.0) {
-        float minGridSize = 5.0 / CameraZoom;
-        float lineWidthFactor = 2.0 / CameraZoom;
+    if (RenderGrid && alpha > 0.0f) {
+        float minGridSize = 5.0f / CameraZoom;
+        float lineWidthFactor = 2.0f / CameraZoom;
         float gridValue = grid(modelCoordinates.xyz, Normal.xyz, GridSize, minGridSize, lineWidthFactor * GridWidth, MajorDivisionSize);
         gl_FragColor = vec4(GridColor.xyz, gridValue * alpha);
     }

@@ -33,14 +33,14 @@ void main(void) {
     gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
 
     vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-    float NdotL = max(dot(normal, LightDirection), 0.0);// cosine of normal and light direction
+    float NdotL = max(dot(normal, LightDirection), 0.0f);// cosine of normal and light direction
 
     vec4 diffuse = NdotL * LightDiffuse * MaterialDiffuse;
     vec4 ambient = GlobalAmbient * MaterialAmbient;
 
     vec3 eyeVector = normalize(CameraPosition - gl_Vertex.xyz);
     vec3 halfVector = normalize(eyeVector - LightDirection);
-    float NdotHV = max(-dot(normal, halfVector), 0.0);
+    float NdotHV = max(-dot(normal, halfVector), 0.0f);
     vec4 specular = MaterialSpecular * LightSpecular * pow(NdotHV, MaterialShininess);
 
     gl_FrontColor = (diffuse + ambient + specular);

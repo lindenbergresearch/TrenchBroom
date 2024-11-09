@@ -30,5 +30,5 @@ void main() {
     gl_FragColor = Color;
     if (any(lessThan(vertexWorldPosition.xyz, BoundsMin)) ||
     any(greaterThan(vertexWorldPosition.xyz, BoundsMax)))
-    gl_FragColor.a = 0.05;
+    gl_FragColor.a = 0.05f;
 }

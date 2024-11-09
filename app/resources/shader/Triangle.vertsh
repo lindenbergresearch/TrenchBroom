@@ -30,10 +30,9 @@ varying vec3 viewVector;
 
 void main(void) {
     gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
-    if (UseColor)
-    vertexColor = Color;
-    else
-    vertexColor = gl_Color;
+    if (UseColor) {vertexColor = Color;}
+    else {vertexColor = gl_Color;}
+
     modelNormal = gl_Normal;
     viewVector = CameraPosition - gl_Vertex.xyz;
 }

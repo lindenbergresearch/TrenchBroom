@@ -33,16 +33,16 @@ void main() {
     gl_FragColor = vertexColor;
 
     if (ApplyTinting) {
-        float brightnessCorrection = 1.0 / max(max(abs(TintColor.r), abs(TintColor.g)), abs(TintColor.b));
+        float brightnessCorrection = 1.0f / max(max(abs(TintColor.r), abs(TintColor.g)), abs(TintColor.b));
         gl_FragColor = vec4((gl_FragColor.rgb + TintColor.rgb * TintColor.a) * 0.5f, gl_FragColor.a);
-        gl_FragColor = clamp(brightnessCorrection * gl_FragColor, 0.0, 1.0);
+        gl_FragColor = clamp(brightnessCorrection * gl_FragColor, 0.0f, 1.0f);
     } else {
         gl_FragColor.a = Alpha;
     }
 
     // angular dimming ( can be controlled with dimStrength )
     float dimStrength = ShadeLevel;
-    float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0 - dimStrength);
+    float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0f - dimStrength);
 
     gl_FragColor.rgb *= angleDim;
 }

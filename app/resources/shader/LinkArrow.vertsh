@@ -29,7 +29,7 @@ attribute vec3 lineDir;
 varying float distanceFromCamera;
 varying vec4 color;
 
-const float almostZero = 0.001;
+const float almostZero = 0.001f;
 
 struct Quat {
     float r;
@@ -55,18 +55,18 @@ Quat makeQuat(vec3 from, vec3 to) {
     float cosAngle = dot(from, to);
 
     // check for `from` and `to` equal
-    if (eqEpsilon(cosAngle, 1.0, almostZero)) {
-        return setRotation(vec3(0.0, 0.0, 1.0), 0.0);
+    if (eqEpsilon(cosAngle, 1.0f, almostZero)) {
+        return setRotation(vec3(0.0f, 0.0f, 1.0f), 0.0f);
     }
 
     // check for `from` and `to` opposite
-    if (eqEpsilon(cosAngle, -1.0, almostZero)) {
+    if (eqEpsilon(cosAngle, -1.0f, almostZero)) {
         // need to find a rotation axis that is perpendicular to `from`
-        vec3 axis = cross(from, vec3(0.0, 0.0, 1.0));
-        if (dot(axis, axis) < 0.01) {
-            axis = cross(from, vec3(1.0, 0.0, 0.0));
+        vec3 axis = cross(from, vec3(0.0f, 0.0f, 1.0f));
+        if (dot(axis, axis) < 0.01f) {
+            axis = cross(from, vec3(1.0f, 0.0f, 0.0f));
         }
-        return setRotation(normalize(axis), radians(180.0));
+        return setRotation(normalize(axis), radians(180.0f));
     }
 
     vec3 axis = normalize(cross(from, to));
@@ -99,7 +99,7 @@ Quat conjugated(Quat left) {
 
 vec3 quatMult(Quat left, vec3 right) {
     Quat p;
-    p.r = 0.0;
+    p.r = 0.0f;
     p.v = right;
     p = quatMult(quatMult(left, p), conjugated(left));
     return p.v;
@@ -111,21 +111,21 @@ vec3 quatMult(Quat left, vec3 right) {
  */
 float measureAngle(vec3 vec, vec3 axis, vec3 up) {
     float cosAngle = dot(vec, axis);
-    if (eqEpsilon(+cosAngle, 1.0, almostZero)) {
-        return 0.0;
+    if (eqEpsilon(+ cosAngle, 1.0f, almostZero)) {
+        return 0.0f;
     }
-    if (eqEpsilon(-cosAngle, 1.0, almostZero)) {
-        return radians(180.0);
+    if (eqEpsilon(-cosAngle, 1.0f, almostZero)) {
+        return radians(180.0f);
     }
     vec3 crossProd = cross(axis, vec);
     if (dot(crossProd, up) > -almostZero) {
         return acos(cosAngle);
     }
-    return radians(360.0) - acos(cosAngle);
+    return radians(360.0f) - acos(cosAngle);
 }
 
 void main(void) {
-    Quat rotateFromPosXToLineDir = makeQuat(vec3(1.0, 0.0, 0.0), lineDir);
+    Quat rotateFromPosXToLineDir = makeQuat(vec3(1.0f, 0.0f, 0.0f), lineDir);
 
     // the above will point the arrow along the line, but we also want to roll it so it faces the camera.
     // see: http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/#how-do-i-find-the-rotation-between-2-vectors-
@@ -133,7 +133,7 @@ void main(void) {
     vec3 desiredRight = cross(lineDir, desiredUp);
     desiredUp = normalize(cross(desiredRight, lineDir));// make desiredUp perpendicular to the lineDir
 
-    vec3 currentUp = quatMult(rotateFromPosXToLineDir, vec3(0.0, 0.0, 1.0));
+    vec3 currentUp = quatMult(rotateFromPosXToLineDir, vec3(0.0f, 0.0f, 1.0f));
 
     // We want to specifically rotate about `lineDir` only, so can't use makeQuat() (which picks the rotation axis itself
     // and could accidentally flip the arrow the wrong way instead of rolling it 180 degrees.)
@@ -142,16 +142,16 @@ void main(void) {
     distanceFromCamera = length(CameraPosition - arrowPosition);
 
     // scale up as you get further away, to a maximum of 4x at 2048 units away
-    float scaleFactor = 1.0;
+    float scaleFactor = 1.0f;
     if (IsOrtho) {
-        scaleFactor = clamp(1.0 / Zoom, 1.0, 4.0);
+        scaleFactor = clamp(1.0f / Zoom, 1.0f, 4.0f);
     } else {
-        scaleFactor = mix(1.0, 4.0, smoothstep(0.0, 2048.0, distanceFromCamera));
+        scaleFactor = mix(1.0f, 4.0f, smoothstep(0.0f, 2048.0f, distanceFromCamera));
     }
 
     // now apply the scale, rotations, and translation to gl_Vertex
     vec3 worldVert = arrowPosition + quatMult(quatMult(fixUp, rotateFromPosXToLineDir), gl_Vertex.xyz * scaleFactor);
 
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(worldVert, 1.0);
+    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(worldVert, 1.0f);
     color = gl_Color;
 }

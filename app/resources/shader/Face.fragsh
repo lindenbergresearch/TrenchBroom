@@ -79,43 +79,43 @@ void main() {
 
     // Assume alpha masked or opaque.
     // TODO: Make this optional if we gain support for translucent textures
-    if (EnableMasked && gl_FragColor.a < 0.5) {
+    if (EnableMasked && gl_FragColor.a < 0.5f) {
         discard;
     }
 
-    if (!EnableLighting){
+    if (!EnableLighting) {
         gl_FragColor = vec4(vec3(Brightness * gl_FragColor), gl_FragColor.a);
     }
 
-    gl_FragColor = clamp(gl_FragColor, 0.0, 1.0);
+    gl_FragColor = clamp(gl_FragColor, 0.0f, 1.0f);
     gl_FragColor.a = Alpha;
 
     if (GrayScale) {
-        float gray = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
+        float gray = dot(gl_FragColor.rgb, vec3(0.299f, 0.587f, 0.114f));
         gl_FragColor = vec4(gray, gray, gray, gl_FragColor.a);
     }
 
     if (ApplyTinting) {
-        gl_FragColor = vec4((gl_FragColor.rgb + TintColor.rgb * TintColor.a)*0.5f, gl_FragColor.a);
-        float brightnessCorrection = 1.0;
+        gl_FragColor = vec4((gl_FragColor.rgb + TintColor.rgb * TintColor.a) * 0.5f, gl_FragColor.a);
+        float brightnessCorrection = 1.0f;
 
         // average color brightness
-        if (AutoBrightnessType == 1){
-            brightnessCorrection = 0.33 / ((abs(TintColor.r) + abs(TintColor.g) + abs(TintColor.b)) / 3.0);
+        if (AutoBrightnessType == 1) {
+            brightnessCorrection = 0.33f / ((abs(TintColor.r) + abs(TintColor.g) + abs(TintColor.b)) / 3.0f);
         }
 
         // peak color brightness
         if (AutoBrightnessType == 2) {
-            brightnessCorrection = 1.0 / max(max(abs(TintColor.r), abs(TintColor.g)), abs(TintColor.b));
+            brightnessCorrection = 1.0f / max(max(abs(TintColor.r), abs(TintColor.g)), abs(TintColor.b));
         }
 
-        gl_FragColor = clamp(brightnessCorrection * gl_FragColor, 0.0, 1.0);
+        gl_FragColor = clamp(brightnessCorrection * gl_FragColor, 0.0f, 1.0f);
     }
 
     if (ShadeFaces) {
         // angular dimming ( can be controlled with dimStrength )
-        float dimStrength = clamp(ShadeLevel, 0.0, 1.0);
-        float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0 - dimStrength);
+        float dimStrength = clamp(ShadeLevel, 0.0f, 1.0f);
+        float angleDim = dot(normalize(viewVector), normalize(modelNormal)) * dimStrength + (1.0f - dimStrength);
 
         gl_FragColor.rgb *= angleDim;
     }
@@ -129,24 +129,24 @@ void main() {
         float fogScale = FogScale;
         float fogMinDistance = FogMinDistance;
 
-        float fogFactor = max(distance - fogMinDistance, 0.0) * fogScale;
+        float fogFactor = max(distance - fogMinDistance, 0.0f) * fogScale;
 
-        if (FogType>0) {
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp((gl_FragCoord.z / gl_FragCoord.w) * fogScale + fogBias, 0.0, maxFogAmount));
+        if (FogType > 0) {
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp((gl_FragCoord.z / gl_FragCoord.w) * fogScale + fogBias, 0.0f, maxFogAmount));
         }
         else {
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp(fogFactor + fogBias, 0.0, maxFogAmount));
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp(fogFactor + fogBias, 0.0f, maxFogAmount));
         }
     }
 
-    if (RenderGrid && GridAlpha > 0.0) {
+    if (RenderGrid && GridAlpha > 0.0f) {
         vec3 coords = modelCoordinates.xyz;
 
         // get the maximum distance in world space between this and the neighbouring fragments
         float maxWorldSpaceChange = max(length(dFdx(coords)), length(dFdy(coords)));
 
         // apply the Nyquist theorem to get the smallest grid size that would make sense to render for this fragment
-        float minGridSize = 2.0 * maxWorldSpaceChange;
+        float minGridSize = 2.0f * maxWorldSpaceChange;
 
         float gridValue = grid(coords, modelNormal.xyz, GridSize, minGridSize, GridLineWidth, MajorDivisionSize);
         gl_FragColor.rgb = mix(gl_FragColor.rgb, GridColor, gridValue * GridAlpha);
@@ -156,9 +156,9 @@ void main() {
         vec3 N = normalize(modelNormal.xyz);
         vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
 
-        vec3 _lightColor = vec3(0, 0, 0);;
+        vec3 _lightColor = vec3(0.0f, 0.0f, 0.0f);;
 
-        for (int i=0; i < NumLights; i++) {
+        for (int i = 0; i < NumLights; i++) {
             PointLight light = lights[i];
 
             float Distance = length(light.Position - modelCoordinates.xyz);
@@ -169,8 +169,8 @@ void main() {
 
             // light parts
             vec3 Ia = AmbientLight;
-            vec3 Id = vec3(0, 0, 0);
-            vec3 Is = vec3(0, 0, 0);
+            vec3 Id = vec3(0.0f, 0.0f, 0.0f);
+            vec3 Is = vec3(0.0f, 0.0f, 0.0f);
 
             vec3 L = normalize(light.Position - modelCoordinates.xyz);
             vec3 R = normalize(reflect(-L, N));
@@ -180,10 +180,10 @@ void main() {
             float Attenuation = 1.0f / (light.AttenuationConstant + linearAttenuation + quadraticAttenuation);
 
             // diffuse Intensity
-            Id = light.Intensity * max(0, dot(N, L)) * Attenuation;
+            Id = light.Intensity * max(0.0f, dot(N, L)) * Attenuation;
 
             // specular intensity
-            light.Intensity * max(0, max(0, dot(R, V))) * Attenuation;
+            light.Intensity * max(0.0f, max(0.0f, dot(R, V))) * Attenuation;
 
             // final fragment color
             vec3 color = clamp(Ia + Id + Is, 0.0f, 2.25f);
