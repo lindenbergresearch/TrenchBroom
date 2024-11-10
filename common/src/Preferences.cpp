@@ -18,9 +18,7 @@
  */
 
 #include "Preferences.h"
-
 #include <QKeySequence>
-
 #include "View/MapViewLayout.h"
 
 #include <vm/util.h>
@@ -40,7 +38,6 @@ Preference<int> AutoSaveInterval("Editor/Autosave Interval", 1000);
 
 Preference<int> MapViewLayout("Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane));
 Preference<bool> ShowFocusIndicator("Renderer/Show focus indicator", true);
-Preference<float> ViewFrameWidth("Renderer/View frame width", 2.0f);
 Preference<Color> SoftMapBoundsColor("Renderer/Colors/Soft map bounds color", Color(241, 125, 37));
 Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38));
 Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
@@ -91,18 +88,18 @@ Preference<Color> TutorialOverlayBackgroundColor("Renderer/Colors/Tutorial overl
 
 /* --- FACES ----------------------------------------- */
 Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.1f, 0.11f, 0.12f, 1.0f));
-Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.f, 0.101961f, 0.109804f, 0.607843f));
+Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.f, 0.102f, 0.11f, 0.3f));
 Preference<Color> LockedFaceColor("Renderer/Colors/Locked faces", Color(0.5f, 0.6f, 0.1f, 1.0f));
-Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.75f);
+Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.55f);
 
 /* --- EDGES ----------------------------------------- */
-Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(1.0f, 1.0f, 1.0f, 0.35f));
-Preference<Color> OccludedSelectedEdgeColor("Renderer/Colors/Occluded Selected Edges", Color(1.0f, 0.0f, 0.0156863f, 0.215686f));
+Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.6f, 0.6f, 0.6f, 1.0f));
+Preference<Color> OccludedSelectedEdgeColor("Renderer/Colors/Occluded Selected Edges", Color(1.0f, 0.0f, 0.01f, 0.25f));
 Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 0.6f));
 Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.15f);
 Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.3f);
 Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.12f);
-Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.7f, 0.7f, 0.7f, 0.7f));
+Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.9f, 0.7f, 0.7f, 0.7f));
 Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.9f, 0.0f, 0.0f, 1.0f));
 
 /* --- SELECTION BOUNDS ------------------------------ */
@@ -190,6 +187,13 @@ Preference<int> BrowserFontSize("Browser/Font size", 12);
 Preference<int> UIFontSize("Editor/UI Font size", 13);
 Preference<int> ConsoleFontSize("Editor/Console Font size", 12);
 
+Renderer::FontDescriptor getDefaultRenderFont() {
+    return Renderer::FontDescriptor(
+        RendererFontPath.valid() ? RendererFontPath.value() : RendererFontPath.defaultValue(),
+        RendererFontSize.valid() ? size_t(RendererFontSize.value()) : size_t(RendererFontSize.defaultValue())
+    );
+}
+
 Preference<int> ToolBarIconsSize("Editor/Toolbar Icon Size", 24);
 
 Preference<Color> BrowserTextColor("Browser/Text color", Color(1.0f, 1.0f, 1.0f, 1.0f));
@@ -203,7 +207,7 @@ Preference<Color> TextureBrowserUsedColor("Texture Browser/Used color", Color(1.
 
 /* --- UI COLORS  ------------------------------------ */
 Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.221f, 0.4359f, 0.7875f));
-Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f, 0.117f, 0.125f));
+Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f * 0.8f, 0.117f * 0.8f, 0.125f * 0.8f));
 Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color(0.7f, 0.7f, 0.7f));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
 
@@ -288,7 +292,7 @@ QString faceRenderModeSkip() {
 
 // shade
 Preference<bool> ShadeFaces("Map view/Shade faces", true);
-Preference<float> ShadeLevel("Map view/Shade Level", 0.3f);
+Preference<float> ShadeLevel("Map view/Shade Level", 0.35f);
 
 // fog settings
 Preference<bool> ShowFog("Map view/Show Fog", true);
