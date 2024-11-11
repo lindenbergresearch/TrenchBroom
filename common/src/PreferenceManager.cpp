@@ -19,7 +19,6 @@
 
 #include "PreferenceManager.h"
 
-#include <QDebug>
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QJsonDocument>
@@ -32,7 +31,6 @@
 #include <QSettings>
 #endif
 
-#include <QStandardPaths>
 #include <QStringBuilder>
 #include <QTimer>
 
@@ -47,6 +45,10 @@
 
 namespace TrenchBroom {
 // PreferenceManager
+
+static const int SAVE_TIMER_MILLIS = 250;
+static const char *const PREFERENCES_FILENAME = "Preferences.json";
+static const char *const LOCK_FILE_SUFFIX = ".lck";
 
 std::unique_ptr<PreferenceManager> PreferenceManager::m_instance;
 bool PreferenceManager::m_initialized = false;
@@ -70,10 +72,9 @@ bool shouldSaveInstantly() {
 }
 } // namespace
 
-AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_fileSystemWatcher{nullptr}, m_fileReadWriteDisabled{false} {
+AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_lockReload{false}, m_fileSystemWatcher{nullptr}, m_fileReadWriteDisabled{false} {
     m_saveTimer.setSingleShot(true);
     connect(&m_saveTimer, &QTimer::timeout, this, [this] {
-        defaultQtLogger.debug() << "Saving preferences";
         saveChangesImmediately();
     });
 }
@@ -93,8 +94,12 @@ void AppPreferenceManager::initialize() {
     m_fileSystemWatcher = new QFileSystemWatcher{this};
     if (m_fileSystemWatcher->addPath(m_preferencesFilePath)) {
         connect(m_fileSystemWatcher, &QFileSystemWatcher::QFileSystemWatcher::fileChanged, this, [this]() {
-            defaultQtLogger.debug() << "Reloading preferences after file change";
-            loadCacheFromDisk();
+            // do not immediately reload changes from disk after saving it
+            if (!reloadLocked()) {
+                loadCacheFromDisk();
+            }
+
+            unlockReload();
         });
     }
 }
@@ -102,6 +107,7 @@ void AppPreferenceManager::initialize() {
 bool AppPreferenceManager::saveInstantly() const {
     return m_saveInstantly;
 }
+
 
 void AppPreferenceManager::saveChanges() {
     if (m_unsavedPreferences.empty()) {
@@ -115,7 +121,7 @@ void AppPreferenceManager::saveChanges() {
     m_unsavedPreferences.clear();
 
     if (!m_fileReadWriteDisabled) {
-        m_saveTimer.start(100);
+        m_saveTimer.start(SAVE_TIMER_MILLIS);
     }
 }
 
@@ -129,6 +135,9 @@ void AppPreferenceManager::discardChanges() {
 }
 
 void AppPreferenceManager::saveChangesImmediately() {
+    lockReload();
+    defaultQtLogger.debug() << "Saving preferences to: " << m_preferencesFilePath.toStdString();
+
     writePreferencesToFile(m_preferencesFilePath, m_cache).transform_error(kdl::overload([&](const PreferenceErrors::FileAccessError &) {
         // This happens e.g. if you don't have read permissions for
         // m_preferencesFilePath
@@ -200,6 +209,8 @@ void AppPreferenceManager::loadCacheFromDisk() {
 
     const auto oldPrefs = m_cache;
 
+    defaultQtLogger.debug() << "Reloading preferences upon file change from: " << m_preferencesFilePath.toStdString();;
+
     // Reload m_cache
     readPreferencesFromFile(m_preferencesFilePath).transform([&](std::map<std::filesystem::path, QJsonValue> &&prefs) {
         m_cache = std::move(prefs);
@@ -263,6 +274,7 @@ void AppPreferenceManager::loadPreferenceFromCache(PreferenceBase &pref) {
 
         // FIXME: trigger writing to disk
     }
+
     pref.setValid(true);
 }
 
@@ -298,6 +310,22 @@ void AppPreferenceManager::savePreference(PreferenceBase &preference) {
     }
 }
 
+bool AppPreferenceManager::reloadLocked() const {
+    return m_lockReload;
+}
+
+void AppPreferenceManager::setLockReload(bool lockReload) {
+    m_lockReload = lockReload;
+}
+
+void AppPreferenceManager::lockReload() {
+    m_lockReload = true;
+}
+
+void AppPreferenceManager::unlockReload() {
+    m_lockReload = false;
+}
+
 // helpers
 
 void togglePref(Preference<bool> &preference) {
@@ -306,13 +334,15 @@ void togglePref(Preference<bool> &preference) {
     prefs.saveChanges();
 }
 
+
 QString preferenceFilePath() {
-    return IO::pathAsQString(IO::SystemPaths::userDataDirectory() / "Preferences.json");
+    return IO::pathAsQString(IO::SystemPaths::userDataDirectory() / PREFERENCES_FILENAME);
 }
 
 namespace {
+
 QLockFile getLockFile(const QString &preferenceFilePath) {
-    const auto lockFilePath = preferenceFilePath + ".lck";
+    const auto lockFilePath = preferenceFilePath + LOCK_FILE_SUFFIX;
     return QLockFile{lockFilePath};
 }
 } // namespace

@@ -144,6 +144,7 @@ class AppPreferenceManager : public PreferenceManager {
     bool m_saveInstantly;
     UnsavedPreferences m_unsavedPreferences;
     QTimer m_saveTimer;
+    bool m_lockReload;
 
     /**
      * This should always be in sync with what is on disk.
@@ -192,6 +193,16 @@ class AppPreferenceManager : public PreferenceManager {
     void validatePreference(PreferenceBase &) override;
 
     void savePreference(PreferenceBase &) override;
+
+  public:
+    bool reloadLocked() const;
+
+    void setLockReload(bool lockReload);
+
+    void lockReload();
+
+    void unlockReload();
+
 
   deleteCopyAndMove(AppPreferenceManager);
 };
