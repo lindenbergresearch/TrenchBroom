@@ -28,11 +28,12 @@ class FontDescriptor {
   private:
     std::filesystem::path m_path;
     size_t m_size;
+    size_t m_lineHeightOffs;
     unsigned char m_minChar;
     unsigned char m_maxChar;
 
   public:
-    FontDescriptor(const std::filesystem::path &path, const size_t size, unsigned char minChar = ' ', unsigned char maxChar = '~');
+    FontDescriptor(const std::filesystem::path &path, const size_t size,const size_t lineHeightOffs = 0, unsigned char minChar = ' ', unsigned char maxChar = '~');
 
     int compare(const FontDescriptor &other) const;
 
@@ -49,6 +50,8 @@ class FontDescriptor {
     unsigned char maxChar() const;
 
     unsigned char charCount() const;
+
+    size_t lineHeightOffs() const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom
