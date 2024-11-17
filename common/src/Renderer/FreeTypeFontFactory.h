@@ -47,9 +47,9 @@ class FreeTypeFontFactory : public FontFactory {
 
     std::pair<FT_Face, IO::BufferedReader> loadFont(const FontDescriptor &fontDescriptor);
 
-    std::unique_ptr<TextureFont> buildFont(FT_Face face, unsigned char firstChar, unsigned char charCount);
+    std::unique_ptr<TextureFont> buildFont(FT_Face face, unsigned char firstChar, unsigned char charCount,size_t lineHeightOffs);
 
-    Metrics computeMetrics(FT_Face face, unsigned char firstChar, unsigned char charCount) const;
+    Metrics computeMetrics(FT_Face face, unsigned char firstChar, unsigned char charCount,size_t lineHeightOffs) const;
 };
 } // namespace Renderer
 } // namespace TrenchBroom
