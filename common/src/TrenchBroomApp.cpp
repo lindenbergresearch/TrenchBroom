@@ -157,6 +157,11 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     logger().info() << "Current log-level is set to: " << label;
 
+    if (pref(Preferences::DebugMode)) {
+        logger().info() << "*** Operating in DEBUG MODE ***";
+
+    }
+
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
     // which would cause preferences to move from where they were with wx
     setOrganizationName("");
