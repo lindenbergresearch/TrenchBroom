@@ -44,6 +44,7 @@ Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f,
 Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
 Preference<bool> ShowFPS("Renderer/Show FPS", false);
+Preference<bool> DebugMode("Editor/Enable DebugMode", false);
 
 Preference<float> TextRendererMaxDistance("Renderer/Maximum text visibility", 135.f);
 Preference<float> TextRendererFadeOutFactor("Renderer/Text fadeout factor", 0.0f);
@@ -51,9 +52,9 @@ Preference<float> TextRendererFadeOutFactor("Renderer/Text fadeout factor", 0.0f
 /* --- AXIS ------------------------------------------ */
 Preference<bool> ShowAxes("Renderer/Show axes", true);
 Preference<float> AxisLength("Renderer/Axis length", 512.0f);
-Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.8f, 0.1f, 0.2f, 1.0f));
-Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.8f, 0.1f, 1.0f));
-Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.8f, 1.0f));
+Preference<Color> XAxisColor("Renderer/Colors/X axis", Color(0.9f, 0.1f, 0.2f, 1.0f));
+Preference<Color> YAxisColor("Renderer/Colors/Y axis", Color(0.2f, 0.9f, 0.1f, 1.0f));
+Preference<Color> ZAxisColor("Renderer/Colors/Z axis", Color(0.0f, 0.3f, 0.9f, 1.0f));
 
 Preference<Color> &axisColor(vm::axis::type axis) {
     switch (axis) {
@@ -75,7 +76,7 @@ Preference<int> UnitsMaxDigits("Renderer/Units Maximum Digits", 2);
 /* --- COMPASS---------------------------------------- */
 Preference<Color> CompassBackgroundColor("Renderer/Colors/Compass background", Color(0.1f, 0.1f, 0.1f, 0.1f));
 Preference<Color> CompassBackgroundOutlineColor("Renderer/Colors/Compass background outline", Color(0.3f, 0.3f, 0.3f, 0.5f));
-Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.5f);
+Preference<float> CompassTransparency("Renderer/Colors/Compass transparency", 0.4f);
 Preference<float> CompassScale("Renderer/Colors/Compass scale", 1.5f);
 
 Preference<Color> CameraFrustumColor("Renderer/Colors/Camera frustum", Color(0.0f, 1.0f, 1.0f, 1.0f));
@@ -206,9 +207,9 @@ Preference<Color> TextureBrowserSelectedColor("Texture Browser/Selected color", 
 Preference<Color> TextureBrowserUsedColor("Texture Browser/Used color", Color(1.0f, 0.7f, 0.7f, 0.7f));
 
 /* --- UI COLORS  ------------------------------------ */
-Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.221f, 0.4359f, 0.7875f));
-Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f * 0.8f, 0.117f * 0.8f, 0.125f * 0.8f));
-Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color(0.7f, 0.7f, 0.7f));
+Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.221f*0.7f, 0.4359f*0.8f, 0.7875f*1.0f));
+Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f * 0.9f, 0.117f * 0.9f, 0.125f * 0.9f));
+Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color(0.7f, 0.71f, 0.73f));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
 
 /* --- LOGGING COLORS -------------------------------- */
@@ -330,7 +331,7 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
         &AutoSaveInterval, &TraceDebugColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
-        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &ShowFPS, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
+        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
         &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
         &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias,
         &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,

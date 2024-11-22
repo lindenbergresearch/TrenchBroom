@@ -23,6 +23,8 @@
 #include "Logger.h"
 #include "Preference.h"
 
+#include "Renderer/FontDescriptor.h"
+
 #include <vm/util.h>
 
 #include <filesystem>
@@ -49,13 +51,13 @@ extern Preference<int> AutoSaveInterval;
 
 /* --- VIEW ------------------------------------------ */
 extern Preference<bool> ShowFocusIndicator;
-extern Preference<float> ViewFrameWidth;
 extern Preference<Color> SoftMapBoundsColor;
 extern Preference<Color> BackgroundColor;
 extern Preference<Color> PointFileColor;
 extern Preference<Color> PortalFileBorderColor;
 extern Preference<Color> PortalFileFillColor;
 extern Preference<bool> ShowFPS;
+extern Preference<bool> DebugMode;
 
 extern Preference<float> TextRendererMaxDistance;
 extern Preference<float> TextRendererFadeOutFactor;
@@ -185,6 +187,8 @@ extern Preference<int> BrowserFontSize;
 extern Preference<int> UIFontSize;
 extern Preference<int> ConsoleFontSize;
 
+Renderer::FontDescriptor getDefaultRenderFont();
+
 extern Preference<int> ToolBarIconsSize;
 
 extern Preference<Color> BrowserTextColor;
@@ -269,15 +273,6 @@ extern Preference<float> FogMinDistance;
 extern Preference<float> FogScale;
 extern Preference<float> FogBias;
 extern Preference<int> FogType;
-
-/*
- * uniform vec3 FogColor;
-uniform float FogMaxAmount;
-uniform float FogMinDistance;
-uniform float FogScale;
-uniform float FogBias;
- *
- * */
 
 extern Preference<QString> FaceRenderMode;
 extern Preference<bool> ShowEdges;
