@@ -56,6 +56,15 @@ extern Preference<Color> BackgroundColor;
 extern Preference<Color> PointFileColor;
 extern Preference<Color> PortalFileBorderColor;
 extern Preference<Color> PortalFileFillColor;
+
+/* --- RENDERER  ------------------------------------- */
+extern Preference<int> RendererSwapBehavior;
+extern Preference<int> RendererSwapInterval;
+extern Preference<int> RendererColorSpace;
+extern Preference<int> RendererSamples;
+extern Preference<int> RendererDepthBufferSize;
+
+
 extern Preference<bool> ShowFPS;
 extern Preference<bool> DebugMode;
 

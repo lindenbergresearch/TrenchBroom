@@ -19,6 +19,7 @@
 
 #include "Preferences.h"
 #include <QKeySequence>
+#include <QSurfaceFormat>
 #include "View/MapViewLayout.h"
 
 #include <vm/util.h>
@@ -43,6 +44,14 @@ Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38
 Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
 Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
+
+/* --- RENDERER  ------------------------------------- */
+Preference<int> RendererSwapBehavior("Renderer/SwapBehavior", QSurfaceFormat::DoubleBuffer);
+Preference<int> RendererSwapInterval("Renderer/SwapInterval", 1);
+Preference<int> RendererColorSpace("Renderer/ColorSpace", QSurfaceFormat::sRGBColorSpace);
+Preference<int> RendererSamples("Renderer/Samples", 8);
+Preference<int> RendererDepthBufferSize("Renderer/DepthBufferSize", 32);
+
 Preference<bool> ShowFPS("Renderer/Show FPS", false);
 Preference<bool> DebugMode("Editor/Enable DebugMode", false);
 
@@ -331,7 +340,7 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
         &AutoSaveInterval, &TraceDebugColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
-        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
+        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor,&RendererSwapBehavior, &RendererSwapInterval,&RendererSamples,&RendererColorSpace,&RendererDepthBufferSize, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
         &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
         &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias,
         &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
