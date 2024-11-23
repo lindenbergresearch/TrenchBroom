@@ -119,9 +119,9 @@ LONG WINAPI TrenchBroomUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionPt
 
 #endif
 
+
 TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv} {
     using namespace std::chrono_literals;
-
     // When this flag is enabled, font and palette changes propagate as though the user had
     // manually called the corresponding QWidget methods.
     setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
@@ -144,23 +144,59 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     setApplicationName("TrenchBroom Nova");
 
-
     const LogLevel logLevel = pref(Preferences::AppLogLevel);
     const QString label = levelAttributes[logLevel].label;
     defaultQtLogger.setLogLevel(logLevel);
 
-    logger().info() << "TrenchBroom Nova " << getBuildVersion();
+    logger().info() << applicationName() << getBuildVersion();
     logger().info() << "Build : " << getBuildIdStr();
     logger().info() << "OS    : " << QSysInfo::prettyProductName();
     logger().info() << "Qt    : v" << qVersion();
-
 
     logger().info() << "Current log-level is set to: " << label;
 
     if (pref(Preferences::DebugMode)) {
         logger().info() << "*** Operating in DEBUG MODE ***";
-
     }
+
+    std::string colorSpace{};
+    switch (pref(Preferences::RendererColorSpace)) {
+        case QSurfaceFormat::ColorSpace::DefaultColorSpace:
+            colorSpace = "DefaultColorSpace";
+            break;
+        case QSurfaceFormat::ColorSpace::sRGBColorSpace:
+            colorSpace = "sRGBColorSpace";
+            break;
+        default:
+            colorSpace = "UnknownColorSpace";
+    }
+
+    std::string swapBehavior{};
+    switch (pref(Preferences::RendererSwapBehavior)) {
+        case QSurfaceFormat::SwapBehavior::SingleBuffer:
+            swapBehavior = "SingleBuffer";
+            break;
+        case QSurfaceFormat::SwapBehavior::DoubleBuffer:
+            swapBehavior = "DoubleBuffer";
+            break;
+        case QSurfaceFormat::SwapBehavior::TripleBuffer:
+            swapBehavior = "TripleBuffer";
+            break;
+        case QSurfaceFormat::SwapBehavior::DefaultSwapBehavior:
+            swapBehavior = "SingleBuffer";
+            break;
+        default:
+            swapBehavior = "UnknownSwapBehavior";
+    }
+
+    logger().info() << "Setting SurfaceFormat Options: ";
+    logger().info() << "Color Buffer  : " << pref(Preferences::RendererDepthBufferSize) << "bit";
+    logger().info() << "Color Space   : " << colorSpace;
+    logger().info() << "MSAA Samples  : " << pref(Preferences::RendererSamples);
+    logger().info() << "Swap Behavior : " << swapBehavior;
+    logger().info() << "Swap Interval : " << pref(Preferences::RendererSwapInterval);
+
+
 
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
     // which would cause preferences to move from where they were with wx
