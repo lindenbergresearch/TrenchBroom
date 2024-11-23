@@ -24,15 +24,37 @@
 #include <QtGlobal>
 
 #include "IO/SystemPaths.h"
-#include "Model/GameFactory.h"
 #include "PreferenceManager.h"
 #include "TrenchBroomApp.h"
 #include "View/MapDocument.h"
-#include "View/MapDocumentCommandFacade.h"
-#include "View/MapFrame.h"
 #include "View/RenderView.h"
+#include "Preferences.h"
+#include "QSSBuilder.h"
+#include "Logger.h"
+
+using namespace TrenchBroom;
 
 extern void qt_set_sequence_auto_mnemonic(bool b);
+
+Logger &logger() {
+    return defaultQtLogger;
+}
+
+/**
+ * Set OpenGL defaults
+ * Needs to be done here before QApplication is created
+ * (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
+ */
+void setupFormatOptions() {
+    QSurfaceFormat format;
+    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setColorSpace((QSurfaceFormat::ColorSpace) pref(Preferences::RendererColorSpace));
+    format.setSwapBehavior((QSurfaceFormat::SwapBehavior) pref(Preferences::RendererSwapBehavior));
+    format.setDepthBufferSize(pref(Preferences::RendererDepthBufferSize));
+    format.setSwapInterval(pref(Preferences::RendererSwapInterval));
+    format.setSamples(pref(Preferences::RendererSamples));
+    QSurfaceFormat::setDefaultFormat(format);
+}
 
 int main(int argc, char *argv[]) {
     // Makes all QOpenGLWidget in the application share a single context
@@ -64,30 +86,16 @@ int main(int argc, char *argv[]) {
     if (argc > 1) {
         for (int i = 1; i < argc; i++) {
             if (strcmp(argv[i], "--portable") == 0) {
-                TrenchBroom::IO::SystemPaths::setPortable();
+                IO::SystemPaths::setPortable();
                 QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QString("./config"));
             }
         }
     }
 
     // PreferenceManager is destroyed by TrenchBroomApp::~TrenchBroomApp()
-    TrenchBroom::PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
-    TrenchBroom::View::TrenchBroomApp app(argc, argv);
-
-    // Set OpenGL defaults
-    // Needs to be done here before QApplication is created
-    // (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
-    //TODO: add to preferences
-    QSurfaceFormat format;
-    format.setRenderableType(QSurfaceFormat::OpenGL);
-    format.setColorSpace(QSurfaceFormat::sRGBColorSpace);
-    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    format.setDepthBufferSize(32);
-    format.setSwapInterval(1);
-    format.setSamples(8);
-
-    QSurfaceFormat::setDefaultFormat(format);
-
+    PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
+    setupFormatOptions();
+    View::TrenchBroomApp app(argc, argv);
     app.parseCommandLineAndShowFrame();
     return app.exec();
 }
