@@ -293,7 +293,10 @@ void AppPreferenceManager::savePreferenceToCache(PreferenceBase &pref) {
 }
 
 void AppPreferenceManager::validatePreference(PreferenceBase &preference) {
-    ensure(qApp->thread() == QThread::currentThread(), "PreferenceManager can only be used on the main thread");
+    // fix getting preferences before main app is created (for QSurfaceFormat options)
+    if (qApp) {
+        ensure(qApp->thread() == QThread::currentThread(), "PreferenceManager can only be used on the main thread");
+    }
 
     if (!preference.valid()) {
         loadPreferenceFromCache(preference);
