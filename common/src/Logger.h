@@ -25,6 +25,8 @@
 
 #include <QString>
 
+#include <type_traits>
+
 #include "Chrono.h"
 #include "StringUtils.h"
 
@@ -52,11 +54,11 @@ struct LogLevelAttr {
  * Definition of the level attributes.
  */
 static std::map<LogLevel, LogLevelAttr> levelAttributes = {
-    {LogLevel::Trace, {"Trace", "\033[1;90m"}},
-    {LogLevel::Debug, {"Debug", "\033[1;36m"}},
-    {LogLevel::Info, {"Info ", "\033[1;97m"}},
-    {LogLevel::Warn, {"Warn ", "\033[1;33m"}},
-    {LogLevel::Error, {"Error", "\033[1;31m"}},
+    {LogLevel::Trace, {"Trace", "\033[0;90m"}},
+    {LogLevel::Debug, {"Debug", "\033[0;36m"}},
+    {LogLevel::Info, {"Info ", "\033[0;97m"}},
+    {LogLevel::Warn, {"Warn ", "\033[0;33m"}},
+    {LogLevel::Error, {"Error", "\033[0;31m"}},
 };
 
 /**
@@ -103,24 +105,14 @@ class LogMessageCache {
  */
 class Logger {
   public:
-
-#include <QString>
-#include <sstream>
-#include <string>
-
-#include <QString>
-#include <sstream>
-#include <string>
-#include <type_traits>
-
-/**
- * @class LogStream
- * @brief A logging stream class that provides an interface for logging messages using stream syntax.
- *
- * This class enables logging with a syntax similar to C++ stream insertion (<<) operators.
- * It supports logging various data types, including std::string, QString, and primitive types.
- * Messages are buffered in a stringstream and logged upon destruction.
- */
+    /**
+     * @class LogStream
+     * @brief A logging stream class that provides an interface for logging messages using stream syntax.
+     *
+     * This class enables logging with a syntax similar to C++ stream insertion (<<) operators.
+     * It supports logging various data types, including std::string, QString, and primitive types.
+     * Messages are buffered in a stringstream and logged upon destruction.
+     */
     class LogStream {
       private:
         Logger *m_logger;         ///< Pointer to the Logger instance.
