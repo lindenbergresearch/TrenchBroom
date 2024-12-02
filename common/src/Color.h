@@ -33,7 +33,7 @@ class Color : public vm::vec<float, 4> {
 
     Color();
 
-    Color(const std::string &colorCode);
+    Color(const char *colorCode);
 
     Color(const vec<float, 4> &v);
 

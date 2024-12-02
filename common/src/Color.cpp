@@ -122,8 +122,9 @@ void Color::rgbToHSB(const float r, const float g, const float b, float &h, floa
 Color::Color(QColor qColor) : vec<float, 4>(qColor.redF(), qColor.greenF(), qColor.blueF(), qColor.alphaF()) {
 }
 
-Color::Color(const std::string &colorCode) {
-    auto *buffer = Color::parseHtmlColor(colorCode);
+Color::Color(const char *colorCode) {
+    std::string str(colorCode);
+    auto *buffer = Color::parseHtmlColor(str);
     this->v[0] = buffer[0]; // red
     this->v[1] = buffer[1]; // green
     this->v[2] = buffer[2]; // blue
@@ -137,13 +138,27 @@ float *Color::parseHtmlColor(const std::string &htmlColor) {
         return std::move(buffer);
     }
 
-    std::istringstream(htmlColor.substr(1, 2)) >> std::hex >> buffer[0]; // red
-    std::istringstream(htmlColor.substr(3, 2)) >> std::hex >> buffer[1]; // green
-    std::istringstream(htmlColor.substr(5, 2)) >> std::hex >> buffer[2]; // blue
+    auto str_r = htmlColor.substr(1, 2);
+    auto str_g = htmlColor.substr(3, 2);
+    auto str_b = htmlColor.substr(5, 2);
+
+    int r, g, b;
+
+    std::istringstream(str_r) >> std::hex >> r; // red
+    std::istringstream(str_g) >> std::hex >> g; // green
+    std::istringstream(str_b) >> std::hex >> b; // blue
+
+    buffer[0] = float(r) / 255.0f;
+    buffer[1] = float(g) / 255.0f;
+    buffer[2] = float(b) / 255.0f;
 
     // testing for optional alpha
     if (htmlColor.size() == 9) {
-        std::istringstream(htmlColor.substr(7, 2)) >> std::hex >> buffer[3];
+        auto str_a = htmlColor.substr(7, 2);
+        int a;
+
+        std::istringstream(str_a) >> std::hex >> a;
+        buffer[3] = float(a) / 255.0f;
     }
 
     return std::move(buffer);
