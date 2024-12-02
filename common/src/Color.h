@@ -33,6 +33,8 @@ class Color : public vm::vec<float, 4> {
 
     Color();
 
+    Color(const std::string &colorCode);
+
     Color(const vec<float, 4> &v);
 
     Color(float r, float g, float b, float a = 1.0f);
@@ -88,5 +90,8 @@ class Color : public vm::vec<float, 4> {
     }
 
     static void rgbToHSB(float r, float g, float b, float &h, float &s, float &br);
+
+
+    static float *parseHtmlColor(const std::string &htmlColor);
 };
 } // namespace TrenchBroom

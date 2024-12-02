@@ -121,4 +121,31 @@ void Color::rgbToHSB(const float r, const float g, const float b, float &h, floa
 
 Color::Color(QColor qColor) : vec<float, 4>(qColor.redF(), qColor.greenF(), qColor.blueF(), qColor.alphaF()) {
 }
+
+Color::Color(const std::string &colorCode) {
+    auto *buffer = Color::parseHtmlColor(colorCode);
+    this->v[0] = buffer[0]; // red
+    this->v[1] = buffer[1]; // green
+    this->v[2] = buffer[2]; // blue
+    this->v[3] = buffer[3]; // alpha
+}
+
+float *Color::parseHtmlColor(const std::string &htmlColor) {
+    float buffer[4]{0, 0, 0, 1.0f}; // set alpha by default to 1.0f
+
+    if ((htmlColor.size() != 7 && htmlColor.size() != 9) || htmlColor[0] != '#') {
+        return std::move(buffer);
+    }
+
+    std::istringstream(htmlColor.substr(1, 2)) >> std::hex >> buffer[0]; // red
+    std::istringstream(htmlColor.substr(3, 2)) >> std::hex >> buffer[1]; // green
+    std::istringstream(htmlColor.substr(5, 2)) >> std::hex >> buffer[2]; // blue
+
+    // testing for optional alpha
+    if (htmlColor.size() == 9) {
+        std::istringstream(htmlColor.substr(7, 2)) >> std::hex >> buffer[3];
+    }
+
+    return std::move(buffer);
+}
 } // namespace TrenchBroom
