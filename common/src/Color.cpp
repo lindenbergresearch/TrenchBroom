@@ -124,43 +124,42 @@ Color::Color(QColor qColor) : vec<float, 4>(qColor.redF(), qColor.greenF(), qCol
 
 Color::Color(const char *colorCode) {
     std::string str(colorCode);
-    auto *buffer = Color::parseHtmlColor(str);
+    float buffer[4];
+    Color::parseHtmlColor(str, buffer);
     this->v[0] = buffer[0]; // red
     this->v[1] = buffer[1]; // green
     this->v[2] = buffer[2]; // blue
     this->v[3] = buffer[3]; // alpha
 }
 
-float *Color::parseHtmlColor(const std::string &htmlColor) {
-    float buffer[4]{0, 0, 0, 1.0f}; // set alpha by default to 1.0f
+void Color::parseHtmlColor(const std::string &htmlColor, float *buffer) {
+    buffer[0] = 0.f;
+    buffer[1] = 0.f;
+    buffer[2] = 0.f;
+    buffer[3] = 1.f;
 
     if ((htmlColor.size() != 7 && htmlColor.size() != 9) || htmlColor[0] != '#') {
-        return std::move(buffer);
+        buffer[0] = 1.f; // do some red as error
+        return;
     }
 
     auto str_r = htmlColor.substr(1, 2);
     auto str_g = htmlColor.substr(3, 2);
     auto str_b = htmlColor.substr(5, 2);
 
-    int r, g, b;
+    int red = std::stoi(str_r, nullptr, 16);
+    int green = std::stoi(str_g, nullptr, 16);
+    int blue = std::stoi(str_b, nullptr, 16);
 
-    std::istringstream(str_r) >> std::hex >> r; // red
-    std::istringstream(str_g) >> std::hex >> g; // green
-    std::istringstream(str_b) >> std::hex >> b; // blue
-
-    buffer[0] = float(r) / 255.0f;
-    buffer[1] = float(g) / 255.0f;
-    buffer[2] = float(b) / 255.0f;
+    buffer[0] = float(red) / 255.0f;
+    buffer[1] = float(green) / 255.0f;
+    buffer[2] = float(blue) / 255.0f;
 
     // testing for optional alpha
     if (htmlColor.size() == 9) {
         auto str_a = htmlColor.substr(7, 2);
-        int a;
-
-        std::istringstream(str_a) >> std::hex >> a;
-        buffer[3] = float(a) / 255.0f;
+        int alpha = std::stoi(str_a, nullptr, 16);
+        buffer[3] = float(alpha) / 255.0f;
     }
-
-    return std::move(buffer);
 }
 } // namespace TrenchBroom

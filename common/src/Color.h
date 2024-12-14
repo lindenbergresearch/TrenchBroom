@@ -92,6 +92,6 @@ class Color : public vm::vec<float, 4> {
     static void rgbToHSB(float r, float g, float b, float &h, float &s, float &br);
 
 
-    static float *parseHtmlColor(const std::string &htmlColor);
+    static void parseHtmlColor(const std::string &htmlColor, float *buffer);
 };
 } // namespace TrenchBroom
