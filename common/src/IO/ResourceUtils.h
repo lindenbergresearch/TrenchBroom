@@ -41,10 +41,14 @@ namespace TrenchBroom::IO {
 class FileSystem;
 
 // Svg render oversampling for quality improvement
-static const int OverSampleFactor = 1;
+static const int OverSampleFactor = 4;
 
 // icon blending
 static const float DefaultIconAlpha = 1.0f;
+
+// default texture
+static const char *const DEFAULT_TEXTURE_FILE = "textures/__TB_empty.png";
+
 
 /**
  * Loads a default texture file from the given file system. If the default texture cannot
@@ -56,11 +60,11 @@ static const float DefaultIconAlpha = 1.0f;
  */
 Assets::Texture loadDefaultTexture(const FileSystem &fs, std::string name, Logger &logger);
 
-QPixmap loadPixmapResource(const std::filesystem::path &imagePath);
+const QPixmap &loadPixmapResource(const std::filesystem::path &imagePath);
 
 /**
  * Loads an SVG image into a QIcon
  */
-QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size);
+const QIcon &loadSVGIcon(const std::filesystem::path &imagePath, int size);
 
 } // namespace TrenchBroom::IO

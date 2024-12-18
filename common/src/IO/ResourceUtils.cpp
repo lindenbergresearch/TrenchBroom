@@ -39,6 +39,7 @@
 #include "IO/ReadFreeImageTexture.h"
 #include "IO/SystemPaths.h"
 #include "Logger.h"
+#include "GenericCache.h"
 
 #include "kdl/result.h"
 #include "kdl/set_temp.h"
@@ -48,28 +49,29 @@
 
 namespace TrenchBroom::IO {
 
+// cache rendered svg images/icons
+static auto pixmapCache = Cache<std::filesystem::path, QPixmap>{};
+static auto iconCache = Cache<std::filesystem::path, QIcon>{};
+
 Assets::Texture loadDefaultTexture(const FileSystem &fs, std::string name, Logger &logger) {
     // recursion guard
     static auto executing = false;
     if (!executing) {
         const auto set_executing = kdl::set_temp{executing};
-
-        return fs.openFile("textures/__TB_empty.png").and_then([&](auto file) {
+        return fs.openFile(DEFAULT_TEXTURE_FILE).and_then([&](auto file) {
             auto reader = file->reader().buffer();
             return readFreeImageTexture(name, reader);
         }).transform_error([&](auto e) {
             logger.error() << "Could not load default texture: " << e.msg;
             return Assets::Texture{std::move(name), 32, 32};
         }).value();
-    } else {
-        logger.error() << "Could not load default texture";
     }
+
     return Assets::Texture{std::move(name), 32, 32};
 }
 
 
 /* ------------------------------------------------------------------------------------------- */
-
 
 static QString imagePathToString(const std::filesystem::path &imagePath) {
     const auto fullPath =
@@ -81,8 +83,16 @@ static QString imagePathToString(const std::filesystem::path &imagePath) {
 }
 
 
-QPixmap loadPixmapResource(const std::filesystem::path &imagePath) {
-    return QPixmap{imagePathToString(imagePath)};
+const QPixmap &loadPixmapResource(const std::filesystem::path &imagePath) {
+    if (pixmapCache.contains(imagePath)) {
+        return pixmapCache[imagePath];
+    }
+
+    defaultQtLogger.debug() << "Loading pixmap: " << imagePathToString(imagePath);
+    auto pixmap = QPixmap{imagePathToString(imagePath)};
+
+    pixmapCache.insert(imagePath, pixmap);
+    return pixmapCache[imagePath];
 }
 
 
@@ -97,13 +107,17 @@ static QImage recolorSvgIcon(const QImage &image, float boost = 1.0f, float alph
 
         for (int x = 0; x < w; ++x) {
             const auto pixel = row[x];
-
             const auto red = qRed(pixel);
             const auto blue = qGreen(pixel);
             const auto green = qBlue(pixel);
-            const int alpha = qAlpha(pixel) > 0 ? qRound(alphaFact * 255.f) : 0;
+            const auto alpha = qAlpha(pixel) > 0 ? qRound(alphaFact * float(qAlpha(pixel))) : 0;
 
-            row[x] = qRgba(std::min(qRound((float) red * boost), 255), std::min(qRound((float) blue * boost), 255), std::min(qRound((float) green * boost), 255), alpha);
+            row[x] = qRgba(
+                std::min(qRound((float) red * boost), 255),
+                std::min(qRound((float) blue * boost), 255),
+                std::min(qRound((float) green * boost), 255),
+                alpha
+            );
         }
     }
 
@@ -112,15 +126,15 @@ static QImage recolorSvgIcon(const QImage &image, float boost = 1.0f, float alph
 
 
 static float analyseBrightness(const QImage &image) {
-    auto qimage = image.convertToFormat(QImage::Format_ARGB32);
+    auto qImage = image.convertToFormat(QImage::Format_ARGB32);
 
-    const auto w = qimage.width();
-    const auto h = qimage.height();
+    const auto w = qImage.width();
+    const auto h = qImage.height();
 
     float delta = 0;
 
     for (int y = 0; y < h; ++y) {
-        auto *row = reinterpret_cast<QRgb *>(qimage.scanLine(y));
+        auto *row = reinterpret_cast<QRgb *>(qImage.scanLine(y));
         for (int x = 0; x < w; ++x) {
             const auto pixel = row[x];
 
@@ -137,7 +151,7 @@ static float analyseBrightness(const QImage &image) {
 }
 
 
-static QImage normaliseBrightness(const QImage &image, float absBrightness, float alpha = 1.f) {
+static QImage normaliseBrightness(const QImage &image, float absBrightness = 1.f, float alpha = 1.f) {
     const auto theta = 1.f + (analyseBrightness(image) / 255.f);
     return recolorSvgIcon(image, theta * absBrightness, alpha);
 }
@@ -163,7 +177,7 @@ static QImage makeGrayscale(const QImage &image, float alpha = 1.f) {
 
 
 static QImage createDisabledState(const QImage &image) {
-    return makeGrayscale(image, 0.25f);
+    return makeGrayscale(image, 0.35f);
 }
 
 
@@ -172,9 +186,11 @@ static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::S
         return;
     }
 
-    auto image = normaliseBrightness(QImage{
-        int(size * devicePixelRatio * OverSampleFactor), int(size * devicePixelRatio * OverSampleFactor), QImage::Format_ARGB32
-    }, 1.f, opacity);
+    auto image = QImage{
+        int(size * devicePixelRatio * OverSampleFactor),
+        int(size * devicePixelRatio * OverSampleFactor),
+        QImage::Format_ARGB32
+    };
 
     image.fill(Qt::transparent);
 
@@ -190,34 +206,35 @@ static void renderSvgToIcon(QSvgRenderer &svgSource, QIcon &icon, const QIcon::S
         image.invertPixels();
     }
 
-    icon.addPixmap(QPixmap::fromImage(image).scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), QIcon::Normal, state);
-    icon.addPixmap(QPixmap::fromImage(createDisabledState(image)).scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation), QIcon::Disabled, state);
+    image = normaliseBrightness(image, 0.9f);
+
+    auto pixmapNormal = QPixmap::fromImage(image).scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    auto pixmapDisabled = QPixmap::fromImage(createDisabledState(image)).scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+    icon.addPixmap(pixmapNormal, QIcon::Normal, state);
+    icon.addPixmap(pixmapDisabled, QIcon::Disabled, state);
 }
 
 
-QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
+const QIcon &loadSVGIcon(const std::filesystem::path &imagePath, int size) {
     // Simple caching layer.
     // Without it, the .svg files would be read from disk and decoded each time this is
     // called, which is slow. We never evict from the cache which is assumed to be OK
     // because this is just used for icons and there's a relatively small set of them.
     ensure(qApp->thread() == QThread::currentThread(), "loadIconResourceQt can only be used on the main thread");
 
-    static auto cache = std::map<std::filesystem::path, QIcon>{};
-    if (const auto it = cache.find(imagePath); it != cache.end()) {
-        return it->second;
+    if (iconCache.contains(imagePath)) {
+        return iconCache[imagePath];
     }
 
-    const auto invert =
-#ifdef DISABLE_RECOLORING_ICON
-        false;
-#else
-    const auto palette = QPalette{};
-  const auto windowColor = palette.color(QPalette::Active, QPalette::Window);
-  windowColor.lightness() <= 127;
-#endif
+    if (imagePathToString(imagePath).isEmpty()) {
+        defaultQtLogger.debug() << "Loading svg-image pair: " << (imagePath.parent_path() / imagePath.stem() += "_*.svg");
+    } else {
+        defaultQtLogger.debug() << "Loading svg-image: " << imagePath;
+    }
 
     // Cache miss, load the icon
-    auto result = QIcon{};
+    auto qIcon = QIcon{};
 
     if (!imagePath.empty()) {
         const auto onPath = imagePathToString(imagePath.parent_path() / imagePath.stem() += "_on.svg");
@@ -227,33 +244,33 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size) {
         if (!onPath.isEmpty() && !offPath.isEmpty()) {
             auto onRenderer = QSvgRenderer{onPath};
             if (!onRenderer.isValid()) {
-                qWarning() << "Failed to load SVG " << onPath;
+                defaultQtLogger.warn() << "Failed to load SVG: " << onPath;
             }
 
             auto offRenderer = QSvgRenderer{offPath};
             if (!offRenderer.isValid()) {
-                qWarning() << "Failed to load SVG " << offPath;
+                defaultQtLogger.warn() << "Failed to load SVG: " << offPath;
             }
 
-            renderSvgToIcon(onRenderer, result, QIcon::On, invert, 1.0, size);
-            renderSvgToIcon(onRenderer, result, QIcon::On, invert, 2.0, size);
-            renderSvgToIcon(offRenderer, result, QIcon::Off, invert, 1.0, size);
-            renderSvgToIcon(offRenderer, result, QIcon::Off, invert, 2.0, size);
+            renderSvgToIcon(onRenderer, qIcon, QIcon::On, false, 1.0, size);
+            renderSvgToIcon(onRenderer, qIcon, QIcon::On, false, 2.0, size);
+            renderSvgToIcon(offRenderer, qIcon, QIcon::Off, false, 1.0, size);
+            renderSvgToIcon(offRenderer, qIcon, QIcon::Off, false, 2.0, size);
         } else if (!imagePathString.isEmpty()) {
             auto renderer = QSvgRenderer{imagePathString};
             if (!renderer.isValid()) {
-                qWarning() << "Failed to load SVG " << imagePathString;
+                defaultQtLogger.warn() << "Failed to load SVG: " << imagePathString;
             }
 
-            renderSvgToIcon(renderer, result, QIcon::Off, invert, 1.0, size);
-            renderSvgToIcon(renderer, result, QIcon::Off, invert, 2.0, size);
+            renderSvgToIcon(renderer, qIcon, QIcon::Off, false, 1.0, size);
+            renderSvgToIcon(renderer, qIcon, QIcon::Off, false, 2.0, size);
         } else {
-            qWarning() << "Couldn't find image for path: " << pathAsQString(imagePath);
+            defaultQtLogger.warn() << "Couldn't find image for path: " << pathAsQString(imagePath);
         }
     }
 
-    cache[imagePath] = result;
-    return result;
+    iconCache.insert(imagePath, qIcon);
+    return iconCache[imagePath];
 }
 
 } // namespace TrenchBroom::IO
