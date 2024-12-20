@@ -490,15 +490,16 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.cpp
         ${COMMON_SOURCE_DIR}/View/MapSearchListBox.cpp
         ${COMMON_SOURCE_DIR}/View/TextConsoleTabPage.cpp
+        ${COMMON_SOURCE_DIR}/View/TBWidget.cpp
+        ${COMMON_SOURCE_DIR}/View/StatusBar.cpp
         ${COMMON_SOURCE_DIR}/IO/VectorIcon.cpp
         ${COMMON_SOURCE_DIR}/Chrono.cpp
         ${COMMON_SOURCE_DIR}/View/BoxFilter.cpp
         ${COMMON_SOURCE_DIR}/StringUtils.cpp
-        ${COMMON_SOURCE_DIR}/Time.cpp
+        ${COMMON_SOURCE_DIR}/TimeUtil.cpp
+        ${COMMON_SOURCE_DIR}/macos_utils.mm
         ${COMMON_SOURCE_DIR}/Renderer/TextEntity.cpp
         ${COMMON_SOURCE_DIR}/Renderer/TextEntityRenderer.cpp
-
-
 )
 
 set(COMMON_HEADER
@@ -1038,12 +1039,15 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/ViewUtils.h
         ${COMMON_SOURCE_DIR}/View/WelcomeWindow.h
         ${COMMON_SOURCE_DIR}/View/MapSearchListBox.h
+        ${COMMON_SOURCE_DIR}/View/TBWidget.h
+        ${COMMON_SOURCE_DIR}/View/StatusBar.h
         ${COMMON_SOURCE_DIR}/IO/VectorIcon.h
         ${COMMON_SOURCE_DIR}/Chrono.h
         ${COMMON_SOURCE_DIR}/View/BoxFilter.h
-        ${COMMON_SOURCE_DIR}/Time.h
+        ${COMMON_SOURCE_DIR}/TimeUtil.h
         ${COMMON_SOURCE_DIR}/Renderer/TextEntity.h
         ${COMMON_SOURCE_DIR}/Renderer/TextEntityRenderer.h
+        ${COMMON_SOURCE_DIR}/GenericCache.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
@@ -1107,15 +1111,19 @@ else ()
 endif ()
 
 # Organize files into IDE folders
-source_group(TREE "${COMMON_SOURCE_DIR}" FILES ${COMMON_SOURCE} ${COMMON_HEADER})
+source_group(TREE "${COMMON_SOURCE_DIR}" FILES ${COMMON_SOURCE} ${COMMON_HEADER} ${COMMON_SOURCE_DIR}/macos_utils.mm)
 
 if (WIN32)
     target_link_libraries(common PRIVATE stackwalker)
 endif ()
 
+
 if (APPLE)
     # Silence macOS OpenGL deprecation warnings
     target_compile_definitions(common PUBLIC GL_SILENCE_DEPRECATION)
+    target_link_libraries(common PRIVATE "-framework AppKit")
+    set_source_files_properties(macos_utils.mm PROPERTIES LANGUAGE OBJCXX)
+    target_compile_options(common PRIVATE -fobjc-arc)
 endif ()
 
 set_compiler_config(common)
