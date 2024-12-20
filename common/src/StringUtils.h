@@ -139,4 +139,13 @@ struct Stats {
  */
 std::string replaceAllChars(std::string str, char ch);
 
+/**
+ * @brief Selects the correct suffix depending on the amount of the given quantity.
+ * @param count The amount to test.
+ * @param singular The singular term.
+ * @param plural The plural term.
+ * @return
+ */
+std::string numberWithSuffix(size_t count, const std::string &singular, const std::string &plural);
+
 } // namespace TrenchBroom

@@ -246,6 +246,10 @@ std::string stringf(const char *const zcFormat, ...) {
     return std::string(zc.data(), uint32_t(iLen));
 }
 
+std::string numberWithSuffix(size_t count, const std::string &singular, const std::string &plural) {
+    return std::to_string(count) + " " + (count != 1 ? plural : singular);
+}
+
 BoxStats::BoxStats(size_t size) : m_pos(0), m_length(static_cast<size_t>(pow(2, size))), m_mask(m_length - 1) {
     m_data.reserve(m_length);
 }
