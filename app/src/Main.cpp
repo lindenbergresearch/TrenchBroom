@@ -26,10 +26,8 @@
 #include "IO/SystemPaths.h"
 #include "PreferenceManager.h"
 #include "TrenchBroomApp.h"
-#include "View/MapDocument.h"
 #include "View/RenderView.h"
 #include "Preferences.h"
-#include "QSSBuilder.h"
 #include "Logger.h"
 
 using namespace TrenchBroom;
@@ -60,12 +58,13 @@ int main(int argc, char *argv[]) {
     // Makes all QOpenGLWidget in the application share a single context
     // (default behaviour would be for QOpenGLWidget's in a single top-level window to share
     // a context.) see: http://doc.qt.io/qt-5/qopenglwidget.html#context-sharing
-    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+   // QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
     // Set up Hi DPI scaling
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     // Enables non-integer scaling (e.g. 150% scaling on Windows)
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
