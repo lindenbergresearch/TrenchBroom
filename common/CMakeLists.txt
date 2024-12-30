@@ -500,6 +500,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/macos_utils.mm
         ${COMMON_SOURCE_DIR}/Renderer/TextEntity.cpp
         ${COMMON_SOURCE_DIR}/Renderer/TextEntityRenderer.cpp
+        ${COMMON_SOURCE_DIR}/IO/ImageProcessor.cpp
 )
 
 set(COMMON_HEADER
@@ -1048,6 +1049,7 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/Renderer/TextEntity.h
         ${COMMON_SOURCE_DIR}/Renderer/TextEntityRenderer.h
         ${COMMON_SOURCE_DIR}/GenericCache.h
+        ${COMMON_SOURCE_DIR}/IO/ImageProcessor.h
 )
 
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
