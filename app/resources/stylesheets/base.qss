@@ -3,13 +3,122 @@
  * Modified Fusion Theme
  */
 
+QMainWindow#MapFrame {
+    min-width: 1280px;
+    min-height: 768px;
+}
+
+/* ---------------------------------------------------------------------------------- */
+/* --- STATUSBAR--------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------- */
+
+QStatusBar {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-top: 1px solid #MIDLIGHT_COLOR;
+    background: #WINDOW_COLOR;
+   /* min-height: 25px;*/
+    background-color: #WINDOW_COLOR;
+}
+
+QWidget#StatusBarManager {
+    margin-left: 0px;
+}
+
+QWidget#StatusBar_LeftLayout,
+QWidget#StatusBar_CenterLayout,
+QWidget#StatusBar_RightLayout {
+/*    border: 1px solid yellow;*/
+    text-align: center;
+}
+
+
+QWidget#StatusBarWidget {
+/*   border: 1px solid cyan;*/
+   color: #TEXT_COLOR;
+   font-size: #UI_SMALL_FONT_SIZE;
+   text-align: center;
+}
+
+
 /* ---------------------------------------------------------------------------------- */
 /* --- LIST/TABLE ------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------- */
-/*  margin-top, margin-right, margin-bottom, and margin-left */
 
-QTableView {
+QHeaderView {
+    background-color: #MIDLIGHT_COLOR;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    font-size: #UI_MID_FONT_SIZE;
+    font-style: bold;
+    min-height: 22px;
+}
+
+QHeaderView::section {
+    border: 1px solid #DARK_COLOR;
+    text-align: center;
+}
+
+QHeaderView:disabled {
+    background-color: #DARK_COLOR;
+}
+
+QTableWidget {
+    gridline-color: #MIDLIGHT_COLOR;
+}
+
+
+QWidget#TitleBar, QWidget#ClickableTitleBar, QWidget#CollapsibleTitleBar   {
+    background-color: #MIDLIGHT_COLOR;
+    border: 2px solid #DARK_COLOR;
+    min-height: 22px;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    font-size: UI_MID_FONT_SIZE;
+    font-style: bold;
+}
+
+
+/*QWidget#ClickableTitleBar  {*/
+/*    background-color: #MIDLIGHT_COLOR;*/
+/*    border: 2px solid #DARK_COLOR;*/
+/*    min-height: 22px;*/
+/*}*/
+
+
+/*QWidget#CollapsibleTitleBar  {*/
+/*    background-color: #MIDLIGHT_COLOR;*/
+/*    border: 2px solid #DARK_COLOR;*/
+/*    min-height: 22px;*/
+/*}*/
+
+
+QWidget#SubTitleBar {
+    background-color: #DARK_COLOR;
+    color: #TEXT_COLOR;
+    min-height: 22px;
+}
+
+
+QLabel#CollapsibleTitleBar_m_stateText {
+    font-size: #UI_TITLE_FONT_SIZE;
+    color: #TEXT_COLOR;
     border: none;
+    font-style: bold;
+    margin: 0px;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+QLabel:hover#CollapsibleTitleBar_m_stateText {
+    color: white;
+    font-size: #UI_TITLE_FONT_SIZE;
+    font-style: bold;
+    font-weight: 700;
+}
+
+QLabel#CollapsibleTitleBar_m_titleText {
+    margin-left: 30px;
 }
 
 
@@ -41,10 +150,20 @@ QWidget#ImageListBoxItemRenderer_m_titleLabel {
 
 QWidget#ImageListBoxItemRenderer_m_subtitleLabel {
     color: #TEXT_COLOR;
-    font-size: UI_SMALL_FONT_SIZE;
+    font-size: #UI_SMALL_FONT_SIZE;
     border: none;
 }
 
+QWidget#LayerListBoxWidget_m_nameText {
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    border: none;
+}
+
+QWidget#LayerListBoxWidget_m_infoText {
+    color: #TEXT_COLOR;
+    font-size: #UI_SMALL_FONT_SIZE;
+    border: none;
+}
 
 /* ---------------------------------------------------------------------------------- */
 /* --- SPLITTER --------------------------------------------------------------------- */
@@ -87,7 +206,7 @@ QTextEdit {
 /* ---------------------------------------------------------------------------------- */
 
 QComboBox {
-    min-height: 15px;
+    min-height: 16px;
     min-width: 50px;
     padding-right: 8px;
     background-color: #MID_COLOR;
@@ -96,7 +215,8 @@ QComboBox {
 }
 
 QComboBox QAbstractItemView {
-    padding: 2px;
+    padding: 0px;
+    margin: 4px;
     border: 1px solid #MID_COLOR;
     border-radius: #BORDER_RADIUS;
     background-color: #DARK_COLOR;
@@ -107,10 +227,8 @@ QComboBox::item:selected:active {
 }
 
 QComboBox::drop-down {
-/*    subcontrol-origin: padding;*/
-/*    subcontrol-position: top right;*/
     padding-left: 2px;
-    width: 14px;
+    min-width: 14px;
     background-color: #MIDLIGHT_COLOR;
     border-left: none;
     border-right: 2px solid #MIDLIGHT_COLOR;
@@ -138,7 +256,7 @@ QComboBox#TextureBrowser_smallComboBox {
 /* ---------------------------------------------------------------------------------- */
 
 QAbstractSpinBox {
-    border: 1px solid #HIGHLIGHT_COLOR;
+    border: 1px solid #MIDLIGHT_COLOR;
     border-radius: 2px;
 }
 
@@ -146,9 +264,18 @@ QAbstractSpinBox {
 /* --- EDIT FIELD ------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------- */
 
-QCheckBox:selected {
-    color: #HIGHLIGHT_COLOR;
-}
+/*QCheckBox::indicator {*/
+/*    background-color: #WINDOW_COLOR;*/
+/*    border: 1px solid #MIDLIGHT_COLOR;*/
+/*    border-radius: 2px;*/
+/*}*/
+
+/*QCheckBox::indicator:checked {*/
+/*    background-color: #HIGHLIGHT_COLOR;*/
+/*    border: 1px solid #MIDLIGHT_COLOR;*/
+/*    border-radius: 2px;*/
+/*     image: url(":down.svg");*/
+/*}*/
 
 QLineEdit {
     padding: 2px 0px 3px 2px;
@@ -165,30 +292,21 @@ QWidget#MapPropertiesEditor {
 /* --- TOOLBAR ---------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------- */
 
-/*QWidget#TitleBar {*/
-/*    font-size: #UI_MID_FONT_SIZE;*/
-/*}*/
-
-/*QWidget#CollapsibleTitleBar {*/
-/*    font-size: #UI_MID_FONT_SIZE;*/
-/*}*/
-
-
 QWidget#ToolBar_GridChoice {
     height: #TOOLBAR_ICON_SIZE;
 }
 
-QMainWindow::separator {
-    background-color: #455364;
-    border: 0px solid #19232D;
-    spacing: 0px;
-    padding: 2px;
-}
+/*QMainWindow::separator {*/
+/*    background-color: #455364;*/
+/*    border: 2px solid #AA0000;*/
+/*    spacing: 0px;*/
+/*    padding: 2px;*/
+/*}*/
 
 QToolBar {
     border: none;
     border-bottom: 1px solid #MIDLIGHT_COLOR;
-    margin: 2px 5px 0px 5px;
+    margin: 6px 2px 0px 2px;
     padding: 1px;
 }
 
@@ -212,11 +330,10 @@ QToolButton#ToolButton_PreferenceDialog {
 /* ---------------------------------------------------------------------------------- */
 
 QToolTip {
-    border: 1px outset #BUTTON_COLOR;
-    color: #BUTTON_TEXT_COLOR;
+    border: 1px solid #MIDLIGHT_COLOR;
+    padding: 2px;
+    color: #HIGHLIGHTED_TEXT_COLOR;
     font-size: #UI_SMALL_FONT_SIZE;
-    padding: #NARROW_MARGIN;
-    border-radius: #MEDIUM_MARGIN;
 }
 
 /* ---------------------------------------------------------------------------------- */
@@ -227,13 +344,13 @@ QMenu {
     background-color: #BASE_COLOR;
     border: none;
     color: #BUTTON_TEXT_COLOR;
-    margin: #NARROW_MARGIN 6px #NARROW_MARGIN 6px;
+    margin: #NARROW_MARGIN 4px #NARROW_MARGIN 4px;
     font-size: #UI_FONT_SIZE;
 }
 
 QMenu::item {
     padding: 3px #WIDE_MARGIN 3px #WIDE_MARGIN;
-    margin: #NARROW_MARGIN;
+    margin: 0px;
     border: 1px solid transparent;
     min-width: 100px;
     min-height: 14px;
@@ -257,18 +374,10 @@ QMenu::separator {
     background: #MIDLIGHT_COLOR;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- STATUSBAR--------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
 
-QStatusBar {
-    background: #DARK_HIGHLIGHT_COLOR;
-    color: #HIGHLIGHTED_TEXT_COLOR;
-    min-height: 25px;
-}
-
+/* ---------------------------------------------------------------------------------- */
 /* --- INSPECTOR SMALL WIDGETS------------------------------------------------------- */
-
+/* ---------------------------------------------------------------------------------- */
 QComboBox#TextureBrowser_smallComboBox {
     padding: 3px 3px 3px 2px;
     min-width: 60px;
@@ -304,33 +413,61 @@ QPushButton#PreferenceEditDialog_toolButton {
     min-height: 18px;
 }
 
+QPushButton#WelcomeWindow_Button_Left {
+    padding: 6px;
+    border-radius: 6px;
+    border-right: 1px solid #BASE_COLOR;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QPushButton#WelcomeWindow_Button_Middle {
+    padding: 6px;
+    border-radius: 6px;
+    border-left: 1px solid #BASE_COLOR;
+    border-right: 1px solid #BASE_COLOR;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+QPushButton#WelcomeWindow_Button_Right {
+    padding: 6px;
+    border-radius: 6px;
+    border-left: 1px solid #BASE_COLOR;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+
 /* ---------------------------------------------------------------------------------- */
 /* --- TAB-WIDGET ------------------------------------------------------------------- */
 /* ---------------------------------------------------------------------------------- */
-
 QTabWidget::pane {
     border: 1px solid #MIDLIGHT_COLOR;
 }
 
 QTabWidget::tab-bar {
-    alignment: left;
+    alignment: center;
 }
 
 QTabWidget#InfoPanelTabWidget::tab-bar {
     alignment: left;
 }
 
+
 QTabBar::tab {
     background-color: #WINDOW_COLOR;
     color: #TEXT_COLOR;
-    border: 2px solid #MIDHALF_COLOR;
+    border: 0px solid #MIDHALF_COLOR;
 
-    border-top-left-radius: #BORDER_RADIUS;
-    border-top-right-radius: #BORDER_RADIUS;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px;
 
-    min-height: 22px;
+    min-height: 24px;
     min-width: 80px;
     margin-right: 1px;
     margin-left: 1px;
@@ -343,21 +480,20 @@ QTabBar::tab {
 QTabBar::tab:hover {
     color: #HIGHLIGHTED_TEXT_COLOR;
     background-color: #MIDHALF_COLOR;
-    border: 2px solid #MIDHALF_COLOR;
+    border: 1px solid #MIDHALF_COLOR;
 }
 
 QTabBar::tab:selected {
-    border-top: 1px solid #LIGHT_COLOR;
-    border-left: 1px solid #LIGHT_COLOR;
-    border-right: 1px solid #LIGHT_COLOR;
-    border-bottom: 1px solid #HIGHLIGHT_COLOR;
+    border-top: 0px solid #LIGHT_COLOR;
+    border-left: 0px solid #LIGHT_COLOR;
+    border-right: 0px solid #LIGHT_COLOR;
+    border-bottom: 2px solid #HIGHLIGHT_COLOR;
     font-style: bold;
-    background-color: #MIDLIGHT_COLOR;
+    background-color: #LIGHT_COLOR;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
-
-QTabBar#InfoPanelTabWidget::tab {
+QTabBar#InfoPanelTabBar::tab {
     border-top-left-radius: 1px;
     border-top-right-radius: 1px;
     min-height: 14px;
@@ -370,7 +506,7 @@ QTabBar#InfoPanelTabWidget::tab {
     font-size: #UI_SMALL_FONT_SIZE;
 }
 
-QTabBar#InfoPanelTabWidget::tab:selected {
+QTabBar#InfoPanelTabBar::tab:selected {
     border-bottom: 1px solid #HIGHLIGHT_COLOR;
 }
 
@@ -469,12 +605,13 @@ QScrollBar::sub-line:vertical {
 
 QToolButton {
     color: #TEXT_COLOR;
-    border-radius: 4px;
-    padding: 3px 2px 2px 3px;
-    outline: none;
+/*    background-color: #MIDHALF_COLOR;*/
+    border-radius: 3px;
+    padding: 2px 1px 1px 2px;
     border: none;
     margin-left: 0px;
     margin-right: 0px;
+    margin-bottom: 0px;
 }
 
 QToolButton:disabled {
