@@ -216,13 +216,13 @@ Preference<Color> TextureBrowserSelectedColor("Texture Browser/Selected color", 
 Preference<Color> TextureBrowserUsedColor("Texture Browser/Used color", Color(1.0f, 0.7f, 0.7f, 0.7f));
 
 /* --- UI COLORS  ------------------------------------ */
-Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color(0.221f*0.7f, 0.4359f*0.8f, 0.7875f*1.0f));
-Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color(0.107f * 0.9f, 0.117f * 0.9f, 0.125f * 0.9f));
-Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color(0.7f, 0.71f, 0.73f));
+Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color("#0D52C8"));
+Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color("#191B1D"));
+Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color("#AAAFAF"));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
 
 /* --- LOGGING COLORS -------------------------------- */
-Preference<Color> TraceDebugColor("Editor/Colors/LogLevel Debug", Color(0.4f, 0.4f, 0.4f));
+Preference<Color> LogTraceColor("Editor/Colors/LogLevel Trace", Color(0.4f, 0.4f, 0.4f));
 Preference<Color> LogDebugColor("Editor/Colors/LogLevel Debug", Color(0.0f, 0.6f, 0.68f));
 Preference<Color> LogInfoColor("Editor/Colors/LogLevel Info", Color(0.8f, 0.8f, 0.8f));
 Preference<Color> LogWarningColor("Editor/Colors/LogLevel Warning", Color(0.78f, 0.72f, 0.1f));
@@ -339,8 +339,8 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
-        &AutoSaveInterval, &TraceDebugColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
-        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor,&RendererSwapBehavior, &RendererSwapInterval,&RendererSamples,&RendererColorSpace,&RendererDepthBufferSize, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
+        &AutoSaveInterval, &LogTraceColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
+        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &RendererSwapBehavior, &RendererSwapInterval, &RendererSamples, &RendererColorSpace, &RendererDepthBufferSize, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
         &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
         &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias,
         &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,

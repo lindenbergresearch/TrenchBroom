@@ -46,7 +46,7 @@ enum LengthUnitDisplay {
 };
 
 extern Preference<int> MapViewLayout;
-extern Preference<TrenchBroom::LogLevel> AppLogLevel;
+extern Preference<LogLevel> AppLogLevel;
 extern Preference<int> AutoSaveInterval;
 
 /* --- VIEW ------------------------------------------ */
@@ -216,7 +216,7 @@ extern Preference<Color> UITextColor;
 extern Preference<float> UIBrightness;
 
 /* --- LOGGING COLORS -------------------------------- */
-extern Preference<Color> TraceDebugColor;
+extern Preference<Color> LogTraceColor;
 extern Preference<Color> LogDebugColor;
 extern Preference<Color> LogInfoColor;
 extern Preference<Color> LogWarningColor;
