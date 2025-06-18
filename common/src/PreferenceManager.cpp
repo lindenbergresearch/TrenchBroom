@@ -263,9 +263,9 @@ void AppPreferenceManager::loadPreferenceFromCache(PreferenceBase &pref) {
 
     const auto jsonValue = it->second;
     if (!pref.loadFromJson(format, jsonValue)) {
-        // FIXME: Log to TB console
+
         const auto variantValue = jsonValue.toVariant();
-        qDebug() << "Failed to load preference " << IO::pathAsGenericQString(pref.path()) << " from JSON value: " << variantValue.toString() << " (" << variantValue.typeName() << ")";
+        defaultQtLogger.error() << "Failed to load preference: " << IO::pathAsGenericQString(pref.path()) << " from JSON value: " << variantValue.toString() << " (" << variantValue.typeName() << ")";
 
         pref.resetToDefault();
 
