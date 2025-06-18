@@ -33,6 +33,7 @@
 #include "Preferences.h"
 #include "QSSBuilder.h"
 #include "Logger.h"
+#include "macos_utils.h"
 #include "Result.h"
 #include "Version.h"
 #include "TrenchBroomStackWalker.h"
@@ -127,7 +128,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
 
     // Don't show icons in menus, they are scaled down and don't look very good.
-    setAttribute(Qt::AA_DontShowIconsInMenus);
+//    setAttribute(Qt::AA_DontShowIconsInMenus);
 
 #if defined(_WIN32) && defined(_MSC_VER)
     // with MSVC, set our own handler for segfaults so we can access the context
@@ -148,12 +149,13 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     const QString label = levelAttributes[logLevel].label;
     defaultQtLogger.setLogLevel(logLevel);
 
+
     logger().info() << applicationName() << getBuildVersion();
     logger().info() << "Build : " << getBuildIdStr();
     logger().info() << "OS    : " << QSysInfo::prettyProductName();
     logger().info() << "Qt    : v" << qVersion();
 
-    logger().info() << "Current log-level is set to: " << label;
+    logger().info() << "Current log-level is set to " << label;
 
     if (pref(Preferences::DebugMode)) {
         logger().info() << "*** Operating in DEBUG MODE ***";
@@ -196,14 +198,13 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     logger().info() << "Swap Behavior : " << swapBehavior;
     logger().info() << "Swap Interval : " << pref(Preferences::RendererSwapInterval);
 
-
-
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
     // which would cause preferences to move from where they were with wx
     setOrganizationName("");
     setOrganizationDomain("io.github.trenchbroom");
 
     if (!initializeGameFactory()) {
+        defaultQtLogger.error() << "Unable to initialize GameFactory!";
         QCoreApplication::exit(1);
         return;
     }
@@ -522,8 +523,9 @@ bool TrenchBroomApp::loadStyleSheets() {
     }
 
     builder->update();
+    logger().info() << "Load dynamic rendered stylesheets...";
 
-    logger().info() << "Setting DynamicStyleSheets to main application...";
+    qApp->style()->unpolish(qApp);
     qApp->setStyleSheet(builder->getRenderedText());
 
     return true;
@@ -550,15 +552,13 @@ void TrenchBroomApp::loadStyle() {
         }
 
         int styleHint(StyleHint hint, const QStyleOption *option = nullptr, const QWidget *widget = nullptr, QStyleHintReturn *returnData = nullptr) const override {
-            return hint == QStyle::SH_MenuBar_AltKeyNavigation ? 0
-                                                               : QProxyStyle::styleHint(hint, option, widget, returnData);
+            return hint == QStyle::SH_MenuBar_AltKeyNavigation ? 0 : QProxyStyle::styleHint(hint, option, widget, returnData);
         }
     };
 
     setStyle(new TrenchBroomProxyStyle{"Fusion"});
     setPalette(darkPalette());
     qApp->setPalette(darkPalette());
-
 }
 
 std::vector<std::filesystem::path> TrenchBroomApp::recentDocuments() const {
@@ -644,9 +644,7 @@ bool TrenchBroomApp::initializeGameFactory() {
     auto &gameFactory = Model::GameFactory::instance();
     return gameFactory.initialize(gamePathConfig).transform([](auto errors) {
         if (!errors.empty()) {
-            const auto msg = fmt::format(R"(Some game configurations could not be loaded. The following errors occurred:
-
-{})", kdl::str_join(errors, "\n\n"));
+            const auto msg = fmt::format(R"(Some game configurations could not be loaded. The following errors occurred: {})", kdl::str_join(errors, "\n\n"));
 
             QMessageBox::critical(nullptr, "TrenchBroom", QString::fromStdString(msg), QMessageBox::Ok);
             defaultQtLogger.error() << msg;
@@ -791,6 +789,7 @@ void TrenchBroomApp::showWelcomeWindow() {
         // must be initialized after m_recentDocuments!
         m_welcomeWindow = std::make_unique<WelcomeWindow>();
     }
+
     m_welcomeWindow->show();
 }
 
@@ -849,9 +848,8 @@ QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const int size
     if (database.hasFamily(path.string().c_str())) {
         logger().info() << "Using system font: " << path.string().c_str();
         QFont font(path.string().c_str(), size);
-        font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
+        font.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
         font.setStyleStrategy(QFont::PreferQuality);
-        font.setStyleHint(QFont::StyleHint::Monospace);
 
         return font;
     }
@@ -878,7 +876,6 @@ QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const int size
     QFont font(font_family[0], size);
     font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
     font.setStyleStrategy(QFont::PreferQuality);
-    font.setStyleHint(QFont::StyleHint::Monospace);
 
     return font;
 }
@@ -922,6 +919,7 @@ Logger &TrenchBroomApp::logger() const {
 namespace {
 std::string makeCrashReport(const std::string &stacktrace, const std::string &reason) {
     auto ss = std::stringstream{};
+    ss << std::endl;
     ss << "Operating System    : " << QSysInfo::prettyProductName().toStdString() << std::endl;
     ss << "Qt Version          : " << qVersion() << std::endl;
     ss << "GL_VENDOR           : " << GLContextManager::GLVendor << std::endl;
@@ -929,10 +927,10 @@ std::string makeCrashReport(const std::string &stacktrace, const std::string &re
     ss << "GL_VERSION          : " << GLContextManager::GLVersion << std::endl;
     ss << "TrenchBroom Version : " << getBuildVersion().toStdString() << std::endl;
     ss << "TrenchBroom Build   : " << getBuildIdStr().toStdString() << std::endl;
-    ss << "Reason              : " << reason << std::endl;
-    ss << "\n--------------- [ stack trace ] ---------------" << std::endl;
+    ss << "Reason              : " << reason << std::endl << std::endl;
+    ss << "[ stack trace ]" << std::endl;
     ss << stacktrace;
-    ss << "--------------- [ stack trace ] ---------------" << std::endl;
+    ss << "[ stack trace ]" << std::endl;
     return ss.str();
 }
 
@@ -979,6 +977,7 @@ void reportCrashAndExit(const std::string &stacktrace, const std::string &reason
 
     // get the crash report as a string
     const auto report = makeCrashReport(stacktrace, reason);
+    defaultQtLogger.error() << "***** Fatal Error: " << reason << "*****";
     defaultQtLogger.error() << report;
 
     // write it to the crash log file
