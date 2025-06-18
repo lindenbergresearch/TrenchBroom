@@ -108,7 +108,6 @@ bool PreferenceSerializer::readFromJson(const QJsonValue &in, QString &out) cons
     if (!in.isString()) {
         return false;
     }
-
     out = in.toString();
     return true;
 }
@@ -173,7 +172,7 @@ QJsonValue PreferenceSerializer::writeToJson(const QString &in) const {
 }
 
 QJsonValue PreferenceSerializer::writeToJson(const LogLevel in) const {
-    return toJson(int(in));
+    return {int(in)};
 }
 
 PreferenceBase::PreferenceBase() = default;
