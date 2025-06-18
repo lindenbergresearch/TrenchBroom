@@ -84,7 +84,7 @@ class PreferenceManager : public QObject {
         const auto &prefPtr = it->second;
         auto *prefBase = prefPtr.get();
         auto *pref = dynamic_cast<Preference<T> *>(prefBase);
-        ensure(pref != nullptr, ("Preference " + path.string() + " must be of the expected type").c_str());
+        ensure(pref != nullptr, ("Preference: " + path.string() + " must be of the expected type").c_str());
         return *pref;
     }
 
