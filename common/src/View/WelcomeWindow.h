@@ -22,6 +22,7 @@
 #include <QMainWindow>
 
 #include <filesystem>
+#include "macos_utils.h"
 
 class QPushButton;
 
@@ -57,6 +58,19 @@ class WelcomeWindow : public QMainWindow {
     void openSettings();
 
     void openDocument(const std::filesystem::path &path);
+
+  protected:
+    void paintEvent(QPaintEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
+
+    void mouseReleaseEvent(QMouseEvent *event) override;
+
+    void mouseMoveEvent(QMouseEvent *event) override;
+
+  private:
+    bool m_dragging = false;
+    QPoint m_dragPosition;
 };
 } // namespace View
 } // namespace TrenchBroom

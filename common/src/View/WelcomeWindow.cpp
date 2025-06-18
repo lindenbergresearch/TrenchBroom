@@ -22,6 +22,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QScreen>
 #include <QPushButton>
 
 #include "IO/PathQt.h"
@@ -30,30 +31,32 @@
 #include "View/BorderLine.h"
 #include "View/QtUtils.h"
 #include "View/RecentDocumentListBox.h"
-#include "View/TitleBar.h"
-#include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
 
 namespace TrenchBroom::View {
-WelcomeWindow::WelcomeWindow()
-    : QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
+
+static constexpr QSize WELCOME_WINDOW_BUTTON_SIZE = QSize{20, 20};
+
+WelcomeWindow::WelcomeWindow() :
+    QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
+    setUnifiedTitleAndToolBarOnMac(true);
     createGui();
 }
 
 void WelcomeWindow::createGui() {
     setWindowIconTB(this);
-    setWindowTitle("Welcome to TrenchBroom");
-    setWindowFlags(Qt::WindowStaysOnTopHint);
+    //setWindowTitle("Welcome to " + QGuiApplication::applicationName());
+
+    setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
     setWindowModality(Qt::ApplicationModal);
 
     m_recentDocumentListBox = new RecentDocumentListBox{};
     m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
-    //  m_recentDocumentListBox->setSizePolicy(QSizePolicy::Expanding,
-    //  QSizePolicy::Expanding);
 
     connect(m_recentDocumentListBox, &RecentDocumentListBox::loadRecentDocument, this, &WelcomeWindow::openDocument);
 
-    auto panelLayout = new QVBoxLayout;
+
+    auto panelLayout = new QVBoxLayout{};
     panelLayout->setContentsMargins(0, 0, 0, 0);
     panelLayout->setSpacing(0);
     panelLayout->addWidget(m_recentDocumentListBox);
@@ -67,9 +70,19 @@ void WelcomeWindow::createGui() {
     innerLayout->addWidget(appPanel);
     innerLayout->addLayout(panelLayout);
 
+
     auto *container = new QWidget{};
     auto *outerLayout = new QVBoxLayout{};
-    outerLayout->setContentsMargins(QMargins{});
+
+    outerLayout->setContentsMargins(
+        QMargins{
+            LayoutConstants::NarrowHMargin,
+            LayoutConstants::NarrowHMargin,
+            LayoutConstants::NarrowHMargin,
+            LayoutConstants::NarrowHMargin
+        }
+    );
+
     outerLayout->setSpacing(0);
 
     outerLayout->addLayout(innerLayout);
@@ -86,15 +99,30 @@ QWidget *WelcomeWindow::createAppPanel() {
     auto *appPanel = new QWidget{};
     auto *infoPanel = new AppInfoPanel{appPanel};
 
-    m_createNewDocumentButton = new QPushButton{"New..."};
+    m_createNewDocumentButton = new QPushButton{this};
     m_createNewDocumentButton->setToolTip("Create a new map document.");
-    m_openOtherDocumentButton = new QPushButton{"Open..."};
-    m_openOtherDocumentButton->setToolTip("Open an existing map document.");
+    m_createNewDocumentButton->setObjectName("WelcomeWindow_Button_Left");
+    m_createNewDocumentButton->setIcon(IO::loadSVGIcon("note_add_2.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
+    m_createNewDocumentButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
 
-    m_openSettingsButton = new QPushButton{"Settings"};
-    m_openSettingsButton->setToolTip("Setup Trenchbroom.");
-    m_quitApplicationButton = new QPushButton{"Quit"};
-    m_quitApplicationButton->setToolTip("Quit Trenchbroom.");
+
+    m_openOtherDocumentButton = new QPushButton{this};
+    m_openOtherDocumentButton->setToolTip("Open an existing map document.");
+    m_openOtherDocumentButton->setObjectName("WelcomeWindow_Button_Middle");
+    m_openOtherDocumentButton->setIcon(IO::loadSVGIcon("folder_open.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
+    m_openOtherDocumentButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
+
+    m_openSettingsButton = new QPushButton{this};
+    m_openSettingsButton->setToolTip("Setup TrenchBroom.");
+    m_openSettingsButton->setObjectName("WelcomeWindow_Button_Middle");
+    m_openSettingsButton->setIcon(IO::loadSVGIcon("build_circle.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
+    m_openSettingsButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
+
+    m_quitApplicationButton = new QPushButton{this};
+    m_quitApplicationButton->setToolTip("Quit TrenchBroom.");
+    m_quitApplicationButton->setObjectName("WelcomeWindow_Button_Right");
+    m_quitApplicationButton->setIcon(IO::loadSVGIcon("power_settings_circle.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
+    m_quitApplicationButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
 
     connect(m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument);
     connect(m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument);
@@ -102,8 +130,8 @@ QWidget *WelcomeWindow::createAppPanel() {
     connect(m_openSettingsButton, &QPushButton::clicked, this, &WelcomeWindow::openSettings);
 
     auto *buttonLayout = new QHBoxLayout{};
-    buttonLayout->setContentsMargins(0, 0, 0, 0);
-    buttonLayout->setSpacing(LayoutConstants::NarrowHMargin);
+    buttonLayout->setContentsMargins(60, 0, 60, 0);
+    buttonLayout->setSpacing(LayoutConstants::NoMargin);
     buttonLayout->addStretch();
     buttonLayout->addWidget(m_createNewDocumentButton);
     buttonLayout->addWidget(m_openOtherDocumentButton);
@@ -117,7 +145,7 @@ QWidget *WelcomeWindow::createAppPanel() {
     outerLayout->addWidget(infoPanel);
     outerLayout->addSpacing(20);
     outerLayout->addLayout(buttonLayout);
-    outerLayout->addSpacing(20);
+    outerLayout->addSpacing(50);
     appPanel->setLayout(outerLayout);
     appPanel->setFixedWidth(400);
 
@@ -132,7 +160,7 @@ void WelcomeWindow::createNewDocument() {
 }
 
 void WelcomeWindow::openOtherDocument() {
-    const auto pathStr = QFileDialog::getOpenFileName(nullptr, tr("Open Map"), fileDialogDefaultDirectory(FileDialogDir::Map), "Map files (*.map);;Any files (*.*)");
+    const auto pathStr = QFileDialog::getOpenFileName(nullptr, tr("Open Map Document"), fileDialogDefaultDirectory(FileDialogDir::Map), "Map files (*.map);;Any files (*.*)");
     const auto path = IO::pathFromQString(pathStr);
 
     if (!path.empty()) {
@@ -157,4 +185,32 @@ void WelcomeWindow::openSettings() {
     auto &app = TrenchBroomApp::instance();
     app.openPreferences();
 }
+
+void WelcomeWindow::paintEvent(QPaintEvent *event) {
+    QWidget::paintEvent(event);
+    setWindowTitleBarColor(this->windowHandle(), QPalette{}.color(QPalette::ColorRole::Window));
+}
+
+void WelcomeWindow::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) {
+        m_dragging = true;
+        m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+        event->accept();
+    }
+}
+
+void WelcomeWindow::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton) {
+        m_dragging = false;
+        event->accept();
+    }
+}
+
+void WelcomeWindow::mouseMoveEvent(QMouseEvent *event) {
+    if (m_dragging && event->buttons() & Qt::LeftButton) {
+        move(event->globalPos() - m_dragPosition);
+        event->accept();
+    }
+}
+
 } // namespace TrenchBroom::View
