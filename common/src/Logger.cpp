@@ -19,6 +19,8 @@
 
 #include "Logger.h"
 #include "StringUtils.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
 
 #include <QString>
 
@@ -118,8 +120,9 @@ void Logger::log(const LogLevel level, const std::string &message) {
 }
 
 void Logger::log(const LogLevel level, const QString &message) {
-    // check if log-level is active
-    if (level < m_logLevel) {
+    // use the local log-level if set for this logger, else use the global
+    auto actualLevel = m_logLevel > LogLevel::None ? m_logLevel : pref(Preferences::AppLogLevel);
+    if (level < actualLevel) {
         return;
     }
 
@@ -134,8 +137,10 @@ void Logger::log(const LogLevel level, const QString &message) {
 }
 
 void Logger::log(const LogLevel level, const LogMessage *message) {
-    // check if log-level is active
-    if (level < m_logLevel) {
+    // use the local log-level if set for this logger, else use the global
+    auto actualLevel = m_logLevel > LogLevel::None ? m_logLevel : pref(Preferences::AppLogLevel);
+
+    if (level < actualLevel) {
         return;
     }
 
@@ -160,7 +165,12 @@ void Logger::setLogLevel(LogLevel logLevel) {
 
 /* ------------------------------------------------------------------------------------------- */
 
-void NullLogger::doLog(const LogLevel level, const LogMessage *) {}
+void NullLogger::doLog(const LogLevel level, const LogMessage *message) {
+    // trace(message->message);
+    defaultQtLogger.trace() << message->message;
+//    if (message && message->message.size()>0)
+  //  printf("TRACE: %s\n", message->message.toStdString().c_str());
+}
 
 /* ------------------------------------------------------------------------------------------- */
 
@@ -182,6 +192,8 @@ void DefaultQtLogger::doLog(LogLevel level, const LogMessage *message) {
         case LogLevel::Error:
             qCritical().noquote() << message->format(true, m_coloredOut);
             break;
+        case LogLevel::None:
+            break;
     }
 }
 
@@ -195,12 +207,12 @@ void DefaultQtLogger::setColoredOut(bool mColoredOut) {
 
 /* ------------------------------------------------------------------------------------------- */
 
-std::map<size_t, LogMessage *> LogMessageCache::cache{};
-size_t LogMessageCache::m_id{0};
+std::vector<LogMessage *> LogMessageCache::cache{};
+size_t LogMessageCache::m_id{};
 
 
 void LogMessageCache::add(LogMessage *logMessage) {
-    cache[m_id++] = logMessage;
+    cache.push_back(logMessage);
 }
 
 LogMessage *LogMessageCache::get(size_t id) {
