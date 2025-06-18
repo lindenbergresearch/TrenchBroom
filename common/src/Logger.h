@@ -39,7 +39,7 @@ namespace TrenchBroom {
  * Log-Levels.
  */
 enum class LogLevel {
-  Trace, Debug, Info, Warn, Error
+  None, Trace, Debug, Info, Warn, Error
 };
 
 /**
@@ -54,11 +54,12 @@ struct LogLevelAttr {
  * Definition of the level attributes.
  */
 static std::map<LogLevel, LogLevelAttr> levelAttributes = {
-    {LogLevel::Trace, {"Trace", "\033[0;90m"}},
-    {LogLevel::Debug, {"Debug", "\033[0;36m"}},
-    {LogLevel::Info, {"Info ", "\033[0;97m"}},
-    {LogLevel::Warn, {"Warn ", "\033[0;33m"}},
-    {LogLevel::Error, {"Error", "\033[0;31m"}},
+    {LogLevel::None, {"NONE", "\033[0;90m"}},
+    {LogLevel::Trace, {"TRACE", "\033[0;35m"}},
+    {LogLevel::Debug, {"DEBUG", "\033[0;36m"}},
+    {LogLevel::Info, {"INFO ", "\033[0;97m"}},
+    {LogLevel::Warn, {"WARN ", "\033[0;33m"}},
+    {LogLevel::Error, {"ERROR", "\033[0;31m"}},
 };
 
 /**
@@ -95,7 +96,7 @@ class LogMessageCache {
     static size_t currentID();
 
   private:
-    static std::map<size_t, LogMessage *> cache;
+    static std::vector<LogMessage *> cache;
     static size_t m_id;
 };
 
@@ -240,7 +241,7 @@ class Logger {
 
     void error(const QString &message);
 
-    // --- ERROR -------------------------------------- //
+    // --- TRACE -------------------------------------- //
 
     LogStream trace();
 
