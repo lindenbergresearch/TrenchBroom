@@ -120,6 +120,9 @@ template<typename T, typename U> class octree {
       detail::node_address address;
       std::vector<U> data;
 
+      leaf_node(const detail::node_address& addr, std::vector<U> data)
+          : address(addr), data(std::move(data)) {}
+
       leaf_node(const leaf_node &) = delete;
 
       leaf_node(leaf_node &&) noexcept = default;

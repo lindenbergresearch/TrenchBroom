@@ -55,7 +55,7 @@ Result<kdl::resource<std::FILE *>> openPathAsFILE(const std::filesystem::path &p
 #ifdef _WIN32
         _wfopen(path.wstring().c_str(), std::wstring{mode.begin(), mode.end()}.c_str());
 #else
-        fopen(path.u8string().c_str(), mode.c_str());
+        fopen(reinterpret_cast<const char*>(path.u8string().c_str()), mode.c_str());
 #endif
 
     if (!file) {
