@@ -27,7 +27,7 @@ namespace vm
 // from https://www.fluentcpp.com/2017/10/27/function-aliases-cpp/
 #define ALIAS_TEMPLATE_FUNCTION(name, func)                                              \
   template <typename... Args>                                                            \
-  inline auto name(Args&&... args)->decltype(func(std::forward<Args>(args)...))          \
+  inline auto name(Args&&... args) -> decltype(func(std::forward<Args>(args)...))        \
   {                                                                                      \
     return func(std::forward<Args>(args)...);                                            \
   }

@@ -603,28 +603,28 @@ public:
   }
 
   /**
-   * Inserts a copy of the given value using the given hint to speed up insertion. If the
-   given hint points to the
-   * position of the first element that compares greater than the given value, then this
-   function need not perform a
-   * search for the insert position. If the given hint does not point to such a value,
-   then the insert position is
-   * determined by a binary search.
-   *
-   * If this set already contains a value that is equivalent to the given value, nothing
-   happens.
-   *
-   * Postcondition: this set contains a value equivalent to the given value and its size
-   has increased by one if the
-   * given value could be inserted
+ * Inserts a copy of the given value using the given hint to speed up insertion. If the
+ given hint points to the
+ * position of the first element that compares greater than the given value, then this
+ function need not perform a
+ * search for the insert position. If the given hint does not point to such a value,
+ then the insert position is
+ * determined by a binary search.
+ *
+ * If this set already contains a value that is equivalent to the given value, nothing
+ happens.
+ *
+ * Postcondition: this set contains a value equivalent to the given value and its size
+ has increased by one if the
+ * given value could be inserted
 
-   * @param hint an iterator pointing to the first element of this set that is greater
-   than the given value, or the
-   * end iterator if no such value exists
-   * @param value the value to insert
-   * @return an iterator pointing to the inserted value, or to the value that prevented
-   insertion
-   */
+ * @param hint an iterator pointing to the first element of this set that is greater
+ than the given value, or the
+ * end iterator if no such value exists
+ * @param value the value to insert
+ * @return an iterator pointing to the inserted value, or to the value that prevented
+ insertion
+ */
   iterator insert(const_iterator hint, const value_type& value)
   {
     const auto result = do_insert(hint, value).first;
@@ -633,29 +633,29 @@ public:
   }
 
   /**
-   * Inserts the given value using the given hint to speed up insertion. If the given hint
-   points to the position of
-   * the first element that compares greater than the given value, then this function need
-   not perform a search for
-   * the insert position. If the given hint does not point to such a value, then the
-   insert position is determined by
-   * a binary search.
-   *
-   * If this set already contains a value that is equivalent to the given value, nothing
-   happens. If the value could
-   * be inserted, it will have been moved into this set.
-   *
-   * Postcondition: this set contains a value equivalent to the given value and its size
-   has increased by one if the
-   * given value could be inserted
+ * Inserts the given value using the given hint to speed up insertion. If the given hint
+ points to the position of
+ * the first element that compares greater than the given value, then this function need
+ not perform a search for
+ * the insert position. If the given hint does not point to such a value, then the
+ insert position is determined by
+ * a binary search.
+ *
+ * If this set already contains a value that is equivalent to the given value, nothing
+ happens. If the value could
+ * be inserted, it will have been moved into this set.
+ *
+ * Postcondition: this set contains a value equivalent to the given value and its size
+ has increased by one if the
+ * given value could be inserted
 
-   * @param hint an iterator pointing to the first element of this set that is greater
-   than the given value, or the
-   * end iterator if no such value exists
-   * @param value the value to insert
-   * @return an iterator pointing to the inserted value, or to the value that prevented
-   insertion
-   */
+ * @param hint an iterator pointing to the first element of this set that is greater
+ than the given value, or the
+ * end iterator if no such value exists
+ * @param value the value to insert
+ * @return an iterator pointing to the inserted value, or to the value that prevented
+ insertion
+ */
   iterator insert(const_iterator hint, value_type&& value)
   {
     const auto result = do_insert(hint, std::move(value)).first;
@@ -664,17 +664,17 @@ public:
   }
 
   /**
-   * Inserts the values from the given range [first, last) into this set.
-   *
-   * Postcondition: for each value in the given range, this set contains an equivalent
-   value and its size has
-   * increased by one if the by the number of unique values in the given range which were
-   not present in this set
+ * Inserts the values from the given range [first, last) into this set.
+ *
+ * Postcondition: for each value in the given range, this set contains an equivalent
+ value and its size has
+ * increased by one if the by the number of unique values in the given range which were
+ not present in this set
 
-   * @tparam I the iterator type
-   * @param first the beginning of the range of values to insert
-   * @param last the end of the range of values to insert (past-the-end iterator)
-   */
+ * @tparam I the iterator type
+ * @param first the beginning of the range of values to insert
+ * @param last the end of the range of values to insert (past-the-end iterator)
+ */
   template <typename I>
   void insert(I first, I last)
   {
@@ -687,23 +687,23 @@ public:
   }
 
   /**
-   * Inserts the values from the given range [first, last) into this set. The given count
-   can be used to avoid costly
-   * reallocations of the underlying vector. It should be at least the number of unique
-   items in the given range which
-   * are not yet present in this set.
-   *
-   * Postcondition: for each value in the given range, this set contains an equivalent
-   value and its size has
-   * increased by one if the by the number of unique values in the given range which were
-   not present in this set
+ * Inserts the values from the given range [first, last) into this set. The given count
+ can be used to avoid costly
+ * reallocations of the underlying vector. It should be at least the number of unique
+ items in the given range which
+ * are not yet present in this set.
+ *
+ * Postcondition: for each value in the given range, this set contains an equivalent
+ value and its size has
+ * increased by one if the by the number of unique values in the given range which were
+ not present in this set
 
-   * @tparam I the iterator type
-   * @param count the value by which to increase the underlying vector's capacity before
-   insertion
-   * @param first the beginning of the range of values to insert
-   * @param last the end of the range of values to insert (past-the-end iterator)
-   */
+ * @tparam I the iterator type
+ * @param count the value by which to increase the underlying vector's capacity before
+ insertion
+ * @param first the beginning of the range of values to insert
+ * @param last the end of the range of values to insert (past-the-end iterator)
+ */
   template <typename I>
   void insert(const size_type count, I first, I last)
   {
@@ -798,16 +798,16 @@ public:
   }
 
   /**
-   * Erases the value at the given position from this set. If the given position is not
-   valid in this set, then the
-   * behavior is undefined.
-   *
-   * Postcondition: the set does not contain the value that was previously at the given
-   position the size has
-   * decreased by one
+ * Erases the value at the given position from this set. If the given position is not
+ valid in this set, then the
+ * behavior is undefined.
+ *
+ * Postcondition: the set does not contain the value that was previously at the given
+ position the size has
+ * decreased by one
 
-   * @param pos the position of the value to erase from this set
-   */
+ * @param pos the position of the value to erase from this set
+ */
   void erase(const_iterator pos)
   {
     m_data.erase(pos);
@@ -815,18 +815,18 @@ public:
   }
 
   /**
-   * Erases all values in the given range [first, last) from this set. If the given range
-   is not valid for this set,
-   * then the behavior is undefined.
-   *
-   * Postcondition: the set does not contain any of the values in the given range, and the
-   size has decreased by the
-   * length of the given range
+ * Erases all values in the given range [first, last) from this set. If the given range
+ is not valid for this set,
+ * then the behavior is undefined.
+ *
+ * Postcondition: the set does not contain any of the values in the given range, and the
+ size has decreased by the
+ * length of the given range
 
-   * @param first the start of the range to erase
-   * @param last the end of the range to erase (past-the-end iterator)
-   * @return an iterator to the value following the last erased value
-   */
+ * @param first the start of the range to erase
+ * @param last the end of the range to erase (past-the-end iterator)
+ * @return an iterator to the value following the last erased value
+ */
   iterator erase(const_iterator first, const_iterator last)
   {
     const auto result = m_data.erase(first, last);

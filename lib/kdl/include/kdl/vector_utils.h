@@ -1,5 +1,5 @@
 /*
- Copyright 2010-2019 Kristian Duske
+ Copyright (C) 2010 Kristian Duske
 
  Permission is hereby granted, free of charge, to any person obtaining a copy of this
  software and associated documentation files (the "Software"), to deal in the Software
@@ -22,14 +22,11 @@
 
 #include "kdl/collection_utils.h"
 
-// Note: all except <cassert> are included by <vector> anyway, so there's no point in
-// splitting this up further
-#include <algorithm> // for std::sort, std::unique, std::find, std::find_if, std::remove, std::remove_if
+#include <algorithm>
 #include <cassert>
-#include <functional> // for std::less
-#include <iterator>   // std::back_inserter
-#include <optional>
-#include <type_traits> // for std::less
+#include <functional>
+#include <iterator>
+#include <type_traits>
 #include <vector>
 
 namespace kdl
@@ -43,7 +40,7 @@ struct has_std_size : std::false_type
 
 template <typename C>
 struct has_std_size<std::void_t<decltype(std::size(std::declval<C>()))>, C>
-  : std::true_type
+    : std::true_type
 {
 };
 
@@ -57,7 +54,7 @@ struct has_size_member : std::false_type
 
 template <typename C>
 struct has_size_member<std::void_t<decltype(std::declval<C>().size())>, C>
-  : std::true_type
+    : std::true_type
 {
 };
 
@@ -68,24 +65,24 @@ inline constexpr bool has_size_member_v = has_size_member<void, C>::value;
 template <typename V, typename C>
 void vec_reserve_to(V& v, const C& c)
 {
-  if constexpr (detail::has_std_size_v<C>)
-  {
-    v.reserve(std::size_t(std::size(c)));
-  }
-  else if constexpr (detail::has_size_member_v<C>)
-  {
-    v.reserve(std::size_t(c.size()));
-  }
+    if constexpr (detail::has_std_size_v<C>)
+    {
+        v.reserve(std::size_t(std::size(c)));
+    }
+    else if constexpr (detail::has_size_member_v<C>)
+    {
+        v.reserve(std::size_t(c.size()));
+    }
 }
 
 template <typename T, typename... Rest>
 std::vector<T> vec_from(T t, Rest... rest)
 {
-  auto result = std::vector<T>{};
-  result.reserve(sizeof...(rest) + 1);
-  result.push_back(std::move(t));
-  (..., result.push_back(std::move(rest)));
-  return result;
+    auto result = std::vector<T>{};
+    result.reserve(sizeof...(rest) + 1);
+    result.push_back(std::move(t));
+    (..., result.push_back(std::move(rest)));
+    return result;
 }
 
 /**
@@ -101,10 +98,10 @@ std::vector<T> vec_from(T t, Rest... rest)
 template <typename T, typename I>
 const T& vec_at(const std::vector<T>& v, const I index)
 {
-  assert(index >= 0);
-  const auto index_s = static_cast<typename std::vector<T>::size_type>(index);
-  assert(index_s < v.size());
-  return v[index_s];
+    assert(index >= 0);
+    const auto index_s = static_cast<typename std::vector<T>::size_type>(index);
+    assert(index_s < v.size());
+    return v[index_s];
 }
 
 /**
@@ -120,10 +117,10 @@ const T& vec_at(const std::vector<T>& v, const I index)
 template <typename T, typename I>
 T& vec_at(std::vector<T>& v, const I index)
 {
-  assert(index >= 0);
-  const auto index_s = static_cast<typename std::vector<T>::size_type>(index);
-  assert(index_s < v.size());
-  return v[index_s];
+    assert(index >= 0);
+    const auto index_s = static_cast<typename std::vector<T>::size_type>(index);
+    assert(index_s < v.size());
+    return v[index_s];
 }
 
 /**
@@ -138,10 +135,10 @@ T& vec_at(std::vector<T>& v, const I index)
 template <typename T>
 T vec_pop_back(std::vector<T>& v)
 {
-  assert(!v.empty());
-  T result = std::move(v.back());
-  v.pop_back();
-  return result;
+    assert(!v.empty());
+    T result = std::move(v.back());
+    v.pop_back();
+    return result;
 }
 
 /**
@@ -156,10 +153,10 @@ T vec_pop_back(std::vector<T>& v)
 template <typename T>
 T vec_pop_front(std::vector<T>& v)
 {
-  assert(!v.empty());
-  T result = std::move(v.front());
-  v.erase(v.begin(), v.begin() + 1);
-  return result;
+    assert(!v.empty());
+    T result = std::move(v.front());
+    v.erase(v.begin(), v.begin() + 1);
+    return result;
 }
 
 /**
@@ -178,23 +175,23 @@ T vec_pop_front(std::vector<T>& v)
 template <typename O, typename T, typename A>
 std::vector<O*> vec_dynamic_cast(std::vector<T*, A> v)
 {
-  if constexpr (std::is_same_v<T, O>)
-  {
-    return v;
-  }
-  else
-  {
-    auto result = std::vector<O*>{};
-    result.reserve(v.size());
-    for (auto& e : v)
+    if constexpr (std::is_same_v<T, O>)
     {
-      if (auto o = dynamic_cast<O*>(e))
-      {
-        result.push_back(std::move(o));
-      }
+        return v;
     }
-    return result;
-  }
+    else
+    {
+        auto result = std::vector<O*>{};
+        result.reserve(v.size());
+        for (auto& e : v)
+        {
+            if (auto o = dynamic_cast<O*>(e))
+            {
+                result.push_back(std::move(o));
+            }
+        }
+        return result;
+    }
 }
 
 /**
@@ -213,20 +210,20 @@ std::vector<O*> vec_dynamic_cast(std::vector<T*, A> v)
 template <typename O, typename T, typename A>
 std::vector<O> vec_static_cast(std::vector<T, A> v)
 {
-  if constexpr (std::is_same_v<T, O>)
-  {
-    return v;
-  }
-  else
-  {
-    auto result = std::vector<O>{};
-    result.reserve(v.size());
-    for (auto& e : v)
+    if constexpr (std::is_same_v<T, O>)
     {
-      result.push_back(static_cast<O>(e));
+        return v;
     }
-    return result;
-  }
+    else
+    {
+        auto result = std::vector<O>{};
+        result.reserve(v.size());
+        for (auto& e : v)
+        {
+            result.push_back(static_cast<O>(e));
+        }
+        return result;
+    }
 }
 
 /**
@@ -291,13 +288,13 @@ std::optional<typename std::vector<T, A>::size_type> vec_index_of(
  * @return true if the given vector contains an element that satisfies the given predicate
  */
 template <
-  typename T,
-  typename A,
-  typename P,
-  typename std::enable_if_t<std::is_invocable_r_v<bool, P, const T&>>* = nullptr>
+    typename T,
+    typename A,
+    typename P,
+    typename std::enable_if_t<std::is_invocable_r_v<bool, P, const T&>>* = nullptr>
 bool vec_contains(const std::vector<T, A>& v, P&& p)
 {
-  return vec_index_of(v, std::forward<P>(p)).has_value();
+    return std::find_if(v.begin(), v.end(), p) != v.end();
 }
 
 /**
@@ -313,7 +310,7 @@ bool vec_contains(const std::vector<T, A>& v, P&& p)
 template <typename T, typename A, typename X>
 bool vec_contains(const std::vector<T, A>& v, const X& x)
 {
-  return vec_index_of(v, x).has_value();
+    return std::find(v.begin(), v.end(), x) != v.end();
 }
 
 namespace detail
@@ -326,30 +323,30 @@ void vec_concat(std::vector<T, A>&)
 template <typename T, typename A, typename Arg>
 void vec_concat(std::vector<T, A>& v1, const Arg& arg)
 {
-  v1.insert(std::end(v1), std::begin(arg), std::end(arg));
+    v1.insert(std::end(v1), std::begin(arg), std::end(arg));
 }
 
 template <typename T, typename A, typename Arg, typename... Rest>
 void vec_concat(std::vector<T, A>& v1, const Arg& arg, Rest&&... rest)
 {
-  vec_concat(v1, arg);
-  vec_concat(v1, std::forward<Rest>(rest)...);
+    vec_concat(v1, arg);
+    vec_concat(v1, std::forward<Rest>(rest)...);
 }
 
 template <typename T, typename A, typename Arg>
 void vec_concat(std::vector<T, A>& v1, Arg&& arg)
 {
-  for (auto& x : arg)
-  {
-    v1.push_back(std::move(x));
-  }
+    for (auto& x : arg)
+    {
+        v1.push_back(std::move(x));
+    }
 }
 
 template <typename T, typename A, typename Arg, typename... Rest>
 void vec_concat(std::vector<T, A>& v1, Arg&& arg, Rest&&... rest)
 {
-  vec_concat(v1, std::forward<Arg>(arg));
-  vec_concat(v1, std::forward<Rest>(rest)...);
+    vec_concat(v1, std::forward<Arg>(arg));
+    vec_concat(v1, std::forward<Rest>(rest)...);
 }
 } // namespace detail
 
@@ -367,9 +364,9 @@ void vec_concat(std::vector<T, A>& v1, Arg&& arg, Rest&&... rest)
 template <typename T, typename A, typename... Args>
 std::vector<T, A> vec_concat(std::vector<T, A> v, Args... args)
 {
-  v.reserve(kdl::col_total_size(v, args...));
-  detail::vec_concat(v, std::move(args)...);
-  return v;
+    v.reserve(kdl::col_total_size(v, args...));
+    detail::vec_concat(v, std::move(args)...);
+    return v;
 }
 
 /**
@@ -385,9 +382,9 @@ std::vector<T, A> vec_concat(std::vector<T, A> v, Args... args)
 template <typename T, typename A, typename... Args>
 auto vec_push_back(std::vector<T, A> v, Args... args)
 {
-  v.reserve(v.size() + sizeof...(args));
-  (..., v.push_back(std::forward<Args>(args)));
-  return v;
+    v.reserve(v.size() + sizeof...(args));
+    (..., v.push_back(std::forward<Args>(args)));
+    return v;
 }
 
 /**
@@ -406,19 +403,19 @@ auto vec_push_back(std::vector<T, A> v, Args... args)
  */
 template <typename T, typename A>
 std::vector<T, A> vec_slice(
-  const std::vector<T, A>& v, const std::size_t offset, const std::size_t count)
+    const std::vector<T, A>& v, const std::size_t offset, const std::size_t count)
 {
-  assert(offset + count <= v.size());
+    assert(offset + count <= v.size());
 
-  std::vector<T, A> result;
-  result.reserve(count);
+    std::vector<T, A> result;
+    result.reserve(count);
 
-  for (std::size_t i = 0u; i < count; ++i)
-  {
-    result.push_back(v[i + offset]);
-  }
+    for (std::size_t i = 0u; i < count; ++i)
+    {
+        result.push_back(v[i + offset]);
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -437,19 +434,19 @@ std::vector<T, A> vec_slice(
  */
 template <typename T, typename A>
 std::vector<T, A> vec_slice(
-  std::vector<T, A>&& v, const std::size_t offset, const std::size_t count)
+    std::vector<T, A>&& v, const std::size_t offset, const std::size_t count)
 {
-  assert(offset + count <= v.size());
+    assert(offset + count <= v.size());
 
-  std::vector<T, A> result;
-  result.reserve(count);
+    std::vector<T, A> result;
+    result.reserve(count);
 
-  for (std::size_t i = 0u; i < count; ++i)
-  {
-    result.push_back(std::move(v[i + offset]));
-  }
+    for (std::size_t i = 0u; i < count; ++i)
+    {
+        result.push_back(std::move(v[i + offset]));
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -468,8 +465,8 @@ std::vector<T, A> vec_slice(
 template <typename T, typename A>
 std::vector<T, A> vec_slice_prefix(const std::vector<T, A>& v, const std::size_t count)
 {
-  assert(count <= v.size());
-  return vec_slice(v, 0u, count);
+    assert(count <= v.size());
+    return vec_slice(v, 0u, count);
 }
 
 /**
@@ -488,8 +485,8 @@ std::vector<T, A> vec_slice_prefix(const std::vector<T, A>& v, const std::size_t
 template <typename T, typename A>
 std::vector<T, A> vec_slice_prefix(std::vector<T, A>&& v, const std::size_t count)
 {
-  assert(count <= v.size());
-  return vec_slice(std::move(v), 0u, count);
+    assert(count <= v.size());
+    return vec_slice(std::move(v), 0u, count);
 }
 
 /**
@@ -508,8 +505,8 @@ std::vector<T, A> vec_slice_prefix(std::vector<T, A>&& v, const std::size_t coun
 template <typename T, typename A>
 std::vector<T, A> vec_slice_suffix(const std::vector<T, A>& v, const std::size_t count)
 {
-  assert(count <= v.size());
-  return vec_slice(v, v.size() - count, count);
+    assert(count <= v.size());
+    return vec_slice(v, v.size() - count, count);
 }
 
 /**
@@ -528,8 +525,8 @@ std::vector<T, A> vec_slice_suffix(const std::vector<T, A>& v, const std::size_t
 template <typename T, typename A>
 std::vector<T, A> vec_slice_suffix(std::vector<T, A>&& v, const std::size_t count)
 {
-  assert(count <= v.size());
-  return vec_slice(std::move(v), v.size() - count, count);
+    assert(count <= v.size());
+    return vec_slice(std::move(v), v.size() - count, count);
 }
 
 /**
@@ -546,8 +543,8 @@ std::vector<T, A> vec_slice_suffix(std::vector<T, A>&& v, const std::size_t coun
 template <typename T, typename A, typename X>
 std::vector<T, A> vec_erase(std::vector<T, A> v, const X& x)
 {
-  v.erase(std::remove(std::begin(v), std::end(v), x), std::end(v));
-  return v;
+    v.erase(std::remove(std::begin(v), std::end(v), x), std::end(v));
+    return v;
 }
 
 /**
@@ -564,8 +561,8 @@ std::vector<T, A> vec_erase(std::vector<T, A> v, const X& x)
 template <typename T, typename A, typename P>
 std::vector<T, A> vec_erase_if(std::vector<T, A> v, const P& predicate)
 {
-  v.erase(std::remove_if(std::begin(v), std::end(v), predicate), std::end(v));
-  return v;
+    v.erase(std::remove_if(std::begin(v), std::end(v), predicate), std::end(v));
+    return v;
 }
 
 /**
@@ -584,13 +581,13 @@ std::vector<T, A> vec_erase_if(std::vector<T, A> v, const P& predicate)
  */
 template <typename T, typename A>
 std::vector<T, A> vec_erase_at(
-  std::vector<T, A> v, const typename std::vector<T, A>::size_type i)
+    std::vector<T, A> v, const typename std::vector<T, A>::size_type i)
 {
-  assert(i < v.size());
-  auto it =
-    std::next(std::begin(v), static_cast<typename std::vector<T, A>::difference_type>(i));
-  v.erase(it);
-  return v;
+    assert(i < v.size());
+    auto it =
+        std::next(std::begin(v), static_cast<typename std::vector<T, A>::difference_type>(i));
+    v.erase(it);
+    return v;
 }
 
 /**
@@ -607,11 +604,11 @@ std::vector<T, A> vec_erase_at(
 template <typename T, typename A, typename C>
 std::vector<T, A> vec_erase_all(std::vector<T, A> v, const C& c)
 {
-  for (const auto& x : c)
-  {
-    v = vec_erase(std::move(v), x);
-  }
-  return v;
+    for (const auto& x : c)
+    {
+        v = vec_erase(std::move(v), x);
+    }
+    return v;
 }
 
 /**
@@ -628,8 +625,8 @@ std::vector<T, A> vec_erase_all(std::vector<T, A> v, const C& c)
 template <typename T, typename A, typename Compare = std::less<T>>
 std::vector<T, A> vec_sort(std::vector<T, A> v, const Compare& cmp = Compare())
 {
-  std::sort(std::begin(v), std::end(v), cmp);
-  return v;
+    std::sort(std::begin(v), std::end(v), cmp);
+    return v;
 }
 
 /**
@@ -646,13 +643,13 @@ std::vector<T, A> vec_sort(std::vector<T, A> v, const Compare& cmp = Compare())
  */
 template <typename T, typename A, typename Compare = std::less<T>>
 std::vector<T, A> vec_sort_and_remove_duplicates(
-  std::vector<T, A> v, const Compare& cmp = Compare())
+    std::vector<T, A> v, const Compare& cmp = Compare())
 {
-  std::sort(std::begin(v), std::end(v), cmp);
-  v.erase(
-    std::unique(std::begin(v), std::end(v), kdl::equivalence<T, Compare>(cmp)),
-    std::end(v));
-  return v;
+    std::sort(std::begin(v), std::end(v), cmp);
+    v.erase(
+        std::unique(std::begin(v), std::end(v), kdl::equivalence<T, Compare>(cmp)),
+        std::end(v));
+    return v;
 }
 
 /**
@@ -668,24 +665,24 @@ std::vector<T, A> vec_sort_and_remove_duplicates(
  * @return a vector containing the elements that passed the predicate
  */
 template <
-  typename Range,
-  typename Predicate,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Predicate, const T&>>* = nullptr>
+    typename Range,
+    typename Predicate,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Predicate, const T&>>* = nullptr>
 auto vec_filter(Range range, Predicate&& predicate)
 {
-  auto result = std::vector<T>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<T>{};
+    vec_reserve_to(result, range);
 
-  for (auto& x : range)
-  {
-    if (predicate(x))
+    for (auto& x : range)
     {
-      result.push_back(std::move(x));
+        if (predicate(x))
+        {
+            result.push_back(std::move(x));
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
 /**
@@ -704,25 +701,25 @@ auto vec_filter(Range range, Predicate&& predicate)
  * @return a vector containing the elements that passed the predicate
  */
 template <
-  typename Range,
-  typename Predicate,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Predicate, const T&, std::size_t>>* =
+    typename Range,
+    typename Predicate,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Predicate, const T&, std::size_t>>* =
     nullptr>
 auto vec_filter(Range range, Predicate&& predicate)
 {
-  auto result = std::vector<T>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<T>{};
+    vec_reserve_to(result, range);
 
-  for (std::size_t i = 0u; i < std::size(range); ++i)
-  {
-    if (predicate(range[i], i))
+    for (std::size_t i = 0u; i < std::size(range); ++i)
     {
-      result.push_back(std::move(range[i]));
+        if (predicate(range[i], i))
+        {
+            result.push_back(std::move(range[i]));
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
 /**
@@ -741,33 +738,33 @@ auto vec_filter(Range range, Predicate&& predicate)
  * @return a vector containing the transformed values
  */
 template <
-  typename Range,
-  typename Transform,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Transform, const T&>>* = nullptr>
+    typename Range,
+    typename Transform,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Transform, const T&>>* = nullptr>
 auto vec_transform(const Range& range, Transform&& transform)
 {
-  using ResultType = decltype(transform(std::declval<const T&>()));
+    using ResultType = decltype(transform(std::declval<const T&>()));
 
-  auto result = std::vector<ResultType>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<ResultType>{};
+    vec_reserve_to(result, range);
 
-  if constexpr (std::is_reference_v<decltype(*range.begin())>)
-  {
-    for (const auto& x : range)
+    if constexpr (std::is_reference_v<decltype(*range.begin())>)
     {
-      result.push_back(transform(x));
+        for (const auto& x : range)
+        {
+            result.push_back(transform(x));
+        }
     }
-  }
-  else
-  {
-    for (auto x : range)
+    else
     {
-      result.push_back(transform(x));
+        for (auto x : range)
+        {
+            result.push_back(transform(x));
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
 /**
@@ -788,25 +785,25 @@ auto vec_transform(const Range& range, Transform&& transform)
  * @return a vector containing the transformed values
  */
 template <
-  typename Range,
-  typename Transform,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Transform, const T&, std::size_t>>* =
+    typename Range,
+    typename Transform,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Transform, const T&, std::size_t>>* =
     nullptr>
 auto vec_transform(const Range& range, Transform&& transform)
 {
-  using ResultType =
-    decltype(transform(std::declval<const T&>(), std::declval<std::size_t>()));
+    using ResultType =
+        decltype(transform(std::declval<const T&>(), std::declval<std::size_t>()));
 
-  auto result = std::vector<ResultType>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<ResultType>{};
+    vec_reserve_to(result, range);
 
-  for (std::size_t i = 0u; i < std::size(range); ++i)
-  {
-    result.push_back(transform(range[i], i));
-  }
+    for (std::size_t i = 0u; i < std::size(range); ++i)
+    {
+        result.push_back(transform(range[i], i));
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -824,33 +821,33 @@ auto vec_transform(const Range& range, Transform&& transform)
  * @return a vector containing the transformed values
  */
 template <
-  typename Range,
-  typename Transform,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Transform, T&>>* = nullptr>
+    typename Range,
+    typename Transform,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Transform, T&>>* = nullptr>
 auto vec_transform(Range& range, Transform&& transform)
 {
-  using ResultType = decltype(transform(std::declval<T&>()));
+    using ResultType = decltype(transform(std::declval<T&>()));
 
-  auto result = std::vector<ResultType>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<ResultType>{};
+    vec_reserve_to(result, range);
 
-  if constexpr (std::is_reference_v<decltype(*range.begin())>)
-  {
-    for (auto& x : range)
+    if constexpr (std::is_reference_v<decltype(*range.begin())>)
     {
-      result.push_back(transform(x));
+        for (auto& x : range)
+        {
+            result.push_back(transform(x));
+        }
     }
-  }
-  else
-  {
-    for (auto x : range)
+    else
     {
-      result.push_back(transform(x));
+        for (auto x : range)
+        {
+            result.push_back(transform(x));
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
 /**
@@ -871,23 +868,23 @@ auto vec_transform(Range& range, Transform&& transform)
  * @return a vector containing the transformed values
  */
 template <
-  typename Range,
-  typename Transform,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Transform, T&, std::size_t>>* = nullptr>
+    typename Range,
+    typename Transform,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Transform, T&, std::size_t>>* = nullptr>
 auto vec_transform(Range& range, Transform&& transform)
 {
-  using ResultType = decltype(transform(std::declval<T&>(), std::declval<std::size_t>()));
+    using ResultType = decltype(transform(std::declval<T&>(), std::declval<std::size_t>()));
 
-  auto result = std::vector<ResultType>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<ResultType>{};
+    vec_reserve_to(result, range);
 
-  for (std::size_t i = 0u; i < std::size(range); ++i)
-  {
-    result.push_back(transform(range[i], i));
-  }
+    for (std::size_t i = 0u; i < std::size(range); ++i)
+    {
+        result.push_back(transform(range[i], i));
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -905,23 +902,23 @@ auto vec_transform(Range& range, Transform&& transform)
  * @return a vector containing the transformed values
  */
 template <
-  typename Range,
-  typename Transform,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Transform, T&&>>* = nullptr>
+    typename Range,
+    typename Transform,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Transform, T&&>>* = nullptr>
 auto vec_transform(Range&& range, Transform&& transform)
 {
-  using ResultType = decltype(transform(std::declval<T&&>()));
+    using ResultType = decltype(transform(std::declval<T&&>()));
 
-  auto result = std::vector<ResultType>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<ResultType>{};
+    vec_reserve_to(result, range);
 
-  for (auto&& x : range)
-  {
-    result.push_back(transform(std::move(x)));
-  }
+    for (auto&& x : range)
+    {
+        result.push_back(transform(std::move(x)));
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -942,24 +939,24 @@ auto vec_transform(Range&& range, Transform&& transform)
  * @return a vector containing the transformed values
  */
 template <
-  typename Range,
-  typename Transform,
-  typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
-  typename std::enable_if_t<std::is_invocable_v<Transform, T&&, std::size_t>>* = nullptr>
+    typename Range,
+    typename Transform,
+    typename T = std::decay_t<decltype(*std::declval<Range>().begin())>,
+    typename std::enable_if_t<std::is_invocable_v<Transform, T&&, std::size_t>>* = nullptr>
 auto vec_transform(Range&& range, Transform&& transform)
 {
-  using ResultType =
-    decltype(transform(std::declval<T&&>(), std::declval<std::size_t>()));
+    using ResultType =
+        decltype(transform(std::declval<T&&>(), std::declval<std::size_t>()));
 
-  auto result = std::vector<ResultType>{};
-  vec_reserve_to(result, range);
+    auto result = std::vector<ResultType>{};
+    vec_reserve_to(result, range);
 
-  for (std::size_t i = 0u; i < std::size(range); ++i)
-  {
-    result.push_back(transform(std::move(range[i]), i));
-  }
+    for (std::size_t i = 0u; i < std::size(range); ++i)
+    {
+        result.push_back(transform(std::move(range[i]), i));
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -978,21 +975,21 @@ auto vec_transform(Range&& range, Transform&& transform)
 template <typename T, typename A1, typename A2>
 auto vec_flatten(std::vector<std::vector<T, A1>, A2> vec)
 {
-  std::size_t totalSize = 0u;
-  for (const auto& nested : vec)
-  {
-    totalSize += nested.size();
-  }
+    std::size_t totalSize = 0u;
+    for (const auto& nested : vec)
+    {
+        totalSize += nested.size();
+    }
 
-  auto result = std::vector<T, A1>{};
-  result.reserve(totalSize);
+    auto result = std::vector<T, A1>{};
+    result.reserve(totalSize);
 
-  for (auto& nested : vec)
-  {
-    result = vec_concat(std::move(result), std::move(nested));
-  }
+    for (auto& nested : vec)
+    {
+        result = vec_concat(std::move(result), std::move(nested));
+    }
 
-  return result;
+    return result;
 }
 
 /**
@@ -1015,26 +1012,26 @@ auto vec_flatten(std::vector<std::vector<T, A1>, A2> vec)
  * @return a vector containing the set difference of s1 and s2.
  */
 template <
-  typename S1,
-  typename S2,
-  typename C =
+    typename S1,
+    typename S2,
+    typename C =
     std::less<std::common_type_t<typename S1::value_type, typename S2::value_type>>>
 auto set_difference(const S1& s1, const S2& s2, const C& c = C{})
 {
-  using T1 = typename S1::value_type;
-  using T2 = typename S2::value_type;
-  using T = std::common_type_t<T1, T2>;
+    using T1 = typename S1::value_type;
+    using T2 = typename S2::value_type;
+    using T = std::common_type_t<T1, T2>;
 
-  std::vector<T> result;
-  result.reserve(s1.size());
-  std::set_difference(
-    std::begin(s1),
-    std::end(s1),
-    std::begin(s2),
-    std::end(s2),
-    std::back_inserter(result),
-    c);
-  return result;
+    std::vector<T> result;
+    result.reserve(s1.size());
+    std::set_difference(
+        std::begin(s1),
+        std::end(s1),
+        std::begin(s2),
+        std::end(s2),
+        std::back_inserter(result),
+        c);
+    return result;
 }
 
 /**
@@ -1058,26 +1055,26 @@ auto set_difference(const S1& s1, const S2& s2, const C& c = C{})
  * @return a vector containing the set union of s1 and s2.
  */
 template <
-  typename S1,
-  typename S2,
-  typename C =
+    typename S1,
+    typename S2,
+    typename C =
     std::less<std::common_type_t<typename S1::value_type, typename S2::value_type>>>
 auto set_union(const S1& s1, const S2& s2, const C& c = C{})
 {
-  using T1 = typename S1::value_type;
-  using T2 = typename S2::value_type;
-  using T = typename std::common_type<T1, T2>::type;
+    using T1 = typename S1::value_type;
+    using T2 = typename S2::value_type;
+    using T = typename std::common_type_t<T1, T2>;
 
-  std::vector<T> result;
-  result.reserve(s1.size() + s2.size());
-  std::set_union(
-    std::begin(s1),
-    std::end(s1),
-    std::begin(s2),
-    std::end(s2),
-    std::back_inserter(result),
-    c);
-  return result;
+    std::vector<T> result;
+    result.reserve(s1.size() + s2.size());
+    std::set_union(
+        std::begin(s1),
+        std::end(s1),
+        std::begin(s2),
+        std::end(s2),
+        std::back_inserter(result),
+        c);
+    return result;
 }
 
 /**
@@ -1099,26 +1096,26 @@ auto set_union(const S1& s1, const S2& s2, const C& c = C{})
  * @return a vector containing the set union of s1 and s2.
  */
 template <
-  typename S1,
-  typename S2,
-  typename C =
+    typename S1,
+    typename S2,
+    typename C =
     std::less<std::common_type_t<typename S1::value_type, typename S2::value_type>>>
 auto set_intersection(const S1& s1, const S2& s2, const C& c = C{})
 {
-  using T1 = typename S1::value_type;
-  using T2 = typename S2::value_type;
-  using T = typename std::common_type<T1, T2>::type;
+    using T1 = typename S1::value_type;
+    using T2 = typename S2::value_type;
+    using T = typename std::common_type_t<T1, T2>;
 
-  std::vector<T> result;
-  result.reserve(s1.size() + s2.size());
-  std::set_intersection(
-    std::begin(s1),
-    std::end(s1),
-    std::begin(s2),
-    std::end(s2),
-    std::back_inserter(result),
-    c);
-  return result;
+    std::vector<T> result;
+    result.reserve(s1.size() + s2.size());
+    std::set_intersection(
+        std::begin(s1),
+        std::end(s1),
+        std::begin(s2),
+        std::end(s2),
+        std::back_inserter(result),
+        c);
+    return result;
 }
 
 /**
@@ -1132,31 +1129,31 @@ auto set_intersection(const S1& s1, const S2& s2, const C& c = C{})
  * @return true if the given sets have a shared element and false otherwise
  */
 template <
-  typename S1,
-  typename S2,
-  typename C =
+    typename S1,
+    typename S2,
+    typename C =
     std::less<std::common_type_t<typename S1::value_type, typename S2::value_type>>>
 auto set_has_shared_element(const S1& s1, const S2& s2, const C& cmp = C{})
 {
-  auto it1 = std::begin(s1);
-  auto it2 = std::begin(s2);
-  while (it1 != std::end(s1) && it2 != std::end(s2))
-  {
-    if (cmp(*it1, *it2))
+    auto it1 = std::begin(s1);
+    auto it2 = std::begin(s2);
+    while (it1 != std::end(s1) && it2 != std::end(s2))
     {
-      ++it1;
+        if (cmp(*it1, *it2))
+        {
+            ++it1;
+        }
+        else if (cmp(*it2, *it1))
+        {
+            ++it2;
+        }
+        else
+        {
+            return true;
+        }
     }
-    else if (cmp(*it2, *it1))
-    {
-      ++it2;
-    }
-    else
-    {
-      return true;
-    }
-  }
 
-  return false;
+    return false;
 }
 
 /**
@@ -1168,8 +1165,8 @@ auto set_has_shared_element(const S1& s1, const S2& s2, const C& cmp = C{})
 template <typename T>
 void vec_clear_to_zero(std::vector<T>& v)
 {
-  v.clear();
-  v.shrink_to_fit();
+    v.clear();
+    v.shrink_to_fit();
 }
 
 /**
@@ -1182,7 +1179,8 @@ void vec_clear_to_zero(std::vector<T>& v)
 template <typename T, typename D = deleter<T*>>
 void vec_clear_and_delete(std::vector<T*>& v, const D& deleter = D())
 {
-  kdl::col_delete_all(v, deleter);
-  v.clear();
+    kdl::col_delete_all(v, deleter);
+    v.clear();
 }
+
 } // namespace kdl

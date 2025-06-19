@@ -25,7 +25,6 @@
 #include "vm/vec.h"
 
 #include <cassert>
-#include <optional>
 #include <tuple>
 
 namespace vm
@@ -949,11 +948,11 @@ namespace detail
  * @tparam T the component type
  * @tparam S the number of components
  * @param a the matrix to decompose
- * @return tuple of L and U packed into a single matrix and the compressed permutation
- * matrix or nullopt if a decomposition doesn't exist.
+ * @return {true, L and U packed into a single matrix, compressed permutation matrix}
+ *         or {false, unspecified, unspecified} if a decomposition doesn't exist.
  */
 template <typename T, std::size_t S>
-constexpr std::optional<std::tuple<mat<T, S, S>, vec<size_t, S>>> lup_find_decomposition(
+constexpr std::tuple<bool, mat<T, S, S>, vec<size_t, S>> lup_find_decomposition(
   mat<T, S, S> a)
 {
   vec<size_t, S> pi;
@@ -975,7 +974,7 @@ constexpr std::optional<std::tuple<mat<T, S, S>, vec<size_t, S>>> lup_find_decom
     }
     if (p < 1.0e-15)
     {
-      return std::nullopt;
+      return {false, mat<T, S, S>(), vec<size_t, S>()};
     }
     swap(pi[k], pi[kPrime]);
     for (std::size_t i = 0; i < S; ++i)
@@ -991,7 +990,7 @@ constexpr std::optional<std::tuple<mat<T, S, S>, vec<size_t, S>>> lup_find_decom
       }
     }
   }
-  return std::tuple{a, pi};
+  return {true, a, pi};
 }
 
 /**
@@ -1045,14 +1044,18 @@ constexpr vec<T, S> lup_solve_internal(
  * be found
  */
 template <typename T, std::size_t S>
-constexpr std::optional<vec<T, S>> lup_solve(const mat<T, S, S>& a, const vec<T, S>& b)
+constexpr std::tuple<bool, vec<T, S>> lup_solve(const mat<T, S, S>& a, const vec<T, S>& b)
 {
-  if (const auto decomp = detail::lup_find_decomposition(a))
+  const auto decomp = detail::lup_find_decomposition(a);
+  const bool success = std::get<0>(decomp);
+  if (!success)
   {
-    const auto [lu, pi] = *decomp;
-    return detail::lup_solve_internal(lu, pi, b);
+    return std::make_tuple(false, vec<T, S>());
   }
-  return std::nullopt;
+
+  const auto lu = std::get<1>(decomp);
+  const auto pi = std::get<2>(decomp);
+  return std::make_tuple(true, detail::lup_solve_internal(lu, pi, b));
 }
 
 /**
@@ -1064,18 +1067,21 @@ constexpr std::optional<vec<T, S>> lup_solve(const mat<T, S, S>& a, const vec<T,
  * @tparam T the component type
  * @tparam S the number of components
  * @param m the matrix to invert
- * @return the inverted matrix or nullopt if it isn't invertible
+ * @return a pair of a boolean and a matrix such that the boolean indicates whether the
+ * matrix is invertible, and if so, the matrix is the inverted given matrix
  */
 template <typename T, std::size_t S>
-constexpr std::optional<mat<T, S, S>> invert(const mat<T, S, S>& m)
+constexpr std::tuple<bool, mat<T, S, S>> invert(const mat<T, S, S>& m)
 {
   const auto decomp = detail::lup_find_decomposition(m);
-  if (!decomp)
+  const bool success = std::get<0>(decomp);
+  if (!success)
   {
-    return std::nullopt;
+    return std::make_tuple(false, mat<T, S, S>::identity());
   }
 
-  const auto [lu, pi] = *decomp;
+  const auto lu = std::get<1>(decomp);
+  const auto pi = std::get<2>(decomp);
 
   mat<T, S, S> result;
   for (std::size_t i = 0; i < S; ++i)
@@ -1085,6 +1091,6 @@ constexpr std::optional<mat<T, S, S>> invert(const mat<T, S, S>& m)
 
     result[i] = detail::lup_solve_internal(lu, pi, targetColumn);
   }
-  return result;
+  return std::make_tuple(true, result);
 }
 } // namespace vm

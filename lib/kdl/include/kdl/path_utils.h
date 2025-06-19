@@ -48,7 +48,10 @@ inline std::filesystem::path path_front(const std::filesystem::path& path)
 
 inline std::filesystem::path path_to_lower(const std::filesystem::path& path)
 {
-  return std::filesystem::path{str_to_lower(path.string())};
+    const auto s = path.u8string(); // std::u8string
+    std::string converted(s.begin(), s.end()); // u8char -> char
+
+    return std::filesystem::path{str_to_lower(converted)};
 }
 
 inline std::filesystem::path path_clip(

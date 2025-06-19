@@ -124,8 +124,8 @@ public:
     }
 
     /*
-     Advance until we found the next valid value.
-     */
+ Advance until we found the next valid value.
+ */
     void advance()
     {
       if (!has_more())
