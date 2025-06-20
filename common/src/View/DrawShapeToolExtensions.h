@@ -35,49 +35,163 @@ namespace TrenchBroom::View
 {
 class MapDocument;
 
-class DrawShapeToolCuboidExtension : public DrawShapeToolExtension
+class DrawShapeToolExtensionPage : public QWidget
 {
-public:
-  const std::string& name() const override;
-  QWidget* createToolPage(QWidget* parent) override;
-  Result<std::vector<Model::Brush>> createBrushes(
-    const vm::bbox3& bounds,
-    vm::axis::type axis,
-    const MapDocument& document) const override;
+  public:
+    explicit DrawShapeToolExtensionPage(QWidget* parent = nullptr);
+
+  protected:
+    void addWidget(QWidget* widget);
+
+  Q_OBJECT
 };
 
-struct CylinderParameters
+
+class DrawShapeToolCuboidExtension : public DrawShapeToolExtension
+{
+  public:
+    const std::string& name() const override;
+    QWidget* createToolPage(QWidget* parent) override;
+    Result<std::vector<Model::Brush>> createBrushes(
+        const vm::bbox3& bounds,
+        vm::axis::type axis,
+        const MapDocument& document) const override;
+};
+
+struct CircularShapeParameters
 {
   size_t numSides;
   Model::RadiusMode radiusMode;
 };
 
-class DrawShapeToolCylinderExtensionPage : public QWidget
+class DrawShapeToolCircularShapeExtensionPage : public DrawShapeToolExtensionPage
 {
-public:
-  explicit DrawShapeToolCylinderExtensionPage(
-    CylinderParameters& parameters, QWidget* parent = nullptr);
+  public:
+    explicit DrawShapeToolCircularShapeExtensionPage(
+        CircularShapeParameters& parameters, QWidget* parent = nullptr);
 
-private:
-  CylinderParameters& m_parameters;
+  private:
+    CircularShapeParameters& m_parameters;
+
+  Q_OBJECT
+};
+
+struct CylinderShapeParameters : public CircularShapeParameters
+{
+  bool hollow;
+  FloatType thickness;
+};
+
+class DrawShapeToolCylinderShapeExtensionPage
+    : public DrawShapeToolCircularShapeExtensionPage
+{
+  public:
+    explicit DrawShapeToolCylinderShapeExtensionPage(
+        CylinderShapeParameters& parameters, QWidget* parent = nullptr);
+
+  private:
+    CylinderShapeParameters& m_parameters;
 
   Q_OBJECT
 };
 
 class DrawShapeToolCylinderExtension : public DrawShapeToolExtension
 {
-public:
-  DrawShapeToolCylinderExtension();
+  public:
+    DrawShapeToolCylinderExtension();
 
-  const std::string& name() const override;
-  QWidget* createToolPage(QWidget* parent) override;
-  Result<std::vector<Model::Brush>> createBrushes(
-    const vm::bbox3& bounds,
-    vm::axis::type axis,
-    const MapDocument& document) const override;
+    const std::string& name() const override;
+    QWidget* createToolPage(QWidget* parent) override;
+    Result<std::vector<Model::Brush>> createBrushes(
+        const vm::bbox3& bounds,
+        vm::axis::type axis,
+        const MapDocument& document) const override;
 
-private:
-  CylinderParameters m_parameters;
+  private:
+    CylinderShapeParameters m_parameters;
+};
+
+class DrawShapeToolConeExtension : public DrawShapeToolExtension
+{
+  public:
+    DrawShapeToolConeExtension();
+
+    const std::string& name() const override;
+    QWidget* createToolPage(QWidget* parent) override;
+    Result<std::vector<Model::Brush>> createBrushes(
+        const vm::bbox3& bounds,
+        vm::axis::type axis,
+        const MapDocument& document) const override;
+
+  private:
+    CircularShapeParameters m_parameters;
+};
+
+struct IcoSphereShapeParameters
+{
+  size_t accuracy;
+};
+
+class DrawShapeToolIcoSphereShapeExtensionPage : public DrawShapeToolExtensionPage
+{
+  public:
+    explicit DrawShapeToolIcoSphereShapeExtensionPage(
+        IcoSphereShapeParameters& parameters, QWidget* parent = nullptr);
+
+  private:
+    IcoSphereShapeParameters& m_parameters;
+
+  Q_OBJECT
+};
+
+class DrawShapeToolIcoSphereExtension : public DrawShapeToolExtension
+{
+  public:
+    DrawShapeToolIcoSphereExtension();
+
+    const std::string& name() const override;
+    QWidget* createToolPage(QWidget* parent) override;
+    Result<std::vector<Model::Brush>> createBrushes(
+        const vm::bbox3& bounds,
+        vm::axis::type axis,
+        const MapDocument& document) const override;
+
+  private:
+    IcoSphereShapeParameters m_parameters;
+};
+
+struct UVSphereShapeParameters : public CircularShapeParameters
+{
+  size_t numRings;
+};
+
+class DrawShapeToolUVSphereShapeExtensionPage
+    : public DrawShapeToolCircularShapeExtensionPage
+{
+  public:
+    explicit DrawShapeToolUVSphereShapeExtensionPage(
+        UVSphereShapeParameters& parameters, QWidget* parent = nullptr);
+
+  private:
+    UVSphereShapeParameters& m_parameters;
+
+  Q_OBJECT
+};
+
+class DrawShapeToolUVSphereExtension : public DrawShapeToolExtension
+{
+  public:
+    DrawShapeToolUVSphereExtension();
+
+    const std::string& name() const override;
+    QWidget* createToolPage(QWidget* parent) override;
+    Result<std::vector<Model::Brush>> createBrushes(
+        const vm::bbox3& bounds,
+        vm::axis::type axis,
+        const MapDocument& document) const override;
+
+  private:
+    UVSphereShapeParameters m_parameters;
 };
 
 std::vector<std::unique_ptr<DrawShapeToolExtension>> createDrawShapeToolExtensions();

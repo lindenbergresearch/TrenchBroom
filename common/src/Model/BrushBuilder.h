@@ -52,7 +52,7 @@ class BrushBuilder {
   public:
     BrushBuilder(MapFormat mapFormat, const vm::bbox3 &worldBounds);
 
-    BrushBuilder(MapFormat mapFormat, const vm::bbox3 &worldBounds, const BrushFaceAttributes &defaultAttribs);
+    BrushBuilder(MapFormat mapFormat, const vm::bbox3 &worldBounds, BrushFaceAttributes defaultAttribs);
 
     Result<Brush> createCube(FloatType size, const std::string &textureName) const;
 
@@ -67,6 +67,26 @@ class BrushBuilder {
     Result<Brush> createCuboid(const vm::bbox3 &bounds, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture) const;
 
     Result<Brush> createCylinder(const vm::bbox3 &bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string &textureName) const;
+
+    Result<std::vector<Brush>> createHollowCylinder(
+        const vm::bbox3 &bounds,
+        FloatType thickness,
+        size_t numSides,
+        RadiusMode radiusMode,
+        vm::axis::type axis,
+        const std::string &textureName) const;
+
+    Result<Brush> createCone(const vm::bbox3 &bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string &textureName) const;
+
+    Result<Brush> createUVSphere(
+        const vm::bbox3& bounds,
+        size_t numSides,
+        size_t numRings,
+        RadiusMode radiusMode,
+        vm::axis::type axis,
+        const std::string& textureName) const;
+
+    Result<Brush> createIcoSphere(const vm::bbox3 &bounds, size_t iterations, const std::string &textureName) const;
 
     Result<Brush> createBrush(const std::vector<vm::vec3> &points, const std::string &textureName) const;
 

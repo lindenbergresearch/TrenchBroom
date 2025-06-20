@@ -31,37 +31,36 @@
 
 class QWidget;
 
-namespace TrenchBroom::View {
+namespace TrenchBroom::View
+{
 class MapDocument;
 
-class DrawShapeToolExtension {
-  public:
-    virtual ~DrawShapeToolExtension();
-
-    virtual const std::string &name() const = 0;
-
-    virtual QWidget *createToolPage(QWidget *parent = nullptr) = 0;
-
-    virtual Result<std::vector<Model::Brush>> createBrushes(
-        const vm::bbox3 &bounds, vm::axis::type axis, const MapDocument &document) const = 0;
+class DrawShapeToolExtension
+{
+public:
+  virtual ~DrawShapeToolExtension();
+  virtual const std::string& name() const = 0;
+  virtual QWidget* createToolPage(QWidget* parent = nullptr) = 0;
+  virtual Result<std::vector<Model::Brush>> createBrushes(
+    const vm::bbox3& bounds, vm::axis::type axis, const MapDocument& document) const = 0;
 };
 
-class DrawShapeToolExtensionManager {
-  public:
-    Notifier<size_t> currentExtensionDidChangeNotifier;
+class DrawShapeToolExtensionManager
+{
+public:
+  Notifier<size_t> currentExtensionDidChangeNotifier;
 
-    explicit DrawShapeToolExtensionManager(
-        std::vector<std::unique_ptr<DrawShapeToolExtension>> extensions);
+  explicit DrawShapeToolExtensionManager(
+    std::vector<std::unique_ptr<DrawShapeToolExtension>> extensions);
 
-    const std::vector<DrawShapeToolExtension *> extensions() const;
+  const std::vector<DrawShapeToolExtension*> extensions() const;
 
-    DrawShapeToolExtension &currentExtension();
+  DrawShapeToolExtension& currentExtension();
+  bool setCurrentExtensionIndex(size_t currentExtensionIndex);
 
-    bool setCurrentExtensionIndex(size_t currentExtensionIndex);
-
-  private:
-    std::vector<std::unique_ptr<DrawShapeToolExtension>> m_extensions;
-    size_t m_currentExtensionIndex = 0;
+private:
+  std::vector<std::unique_ptr<DrawShapeToolExtension>> m_extensions;
+  size_t m_currentExtensionIndex = 0;
 };
 
 } // namespace TrenchBroom::View
