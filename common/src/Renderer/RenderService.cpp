@@ -43,49 +43,11 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-Renderer::FontDescriptor makeRenderServiceFont();
 
-Renderer::FontDescriptor makeRenderServiceFont() {
-    return Renderer::FontDescriptor(pref(Preferences::RendererFontPath), static_cast<size_t>(pref(Preferences::RendererFontSize)));
-}
 
-class RenderService::LeftScreenTextAnchor : public TextAnchor {
-  private:
-    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
-        vm::vec3f off = getOffset(camera);
-        return vm::vec3f(off.x(), off.y() - size.y(), off.z());
-    }
-
-    vm::vec3f position(const Camera &camera) const override {
-        return camera.unproject(getOffset(camera));
-    }
-
-    vm::vec3f getOffset(const Camera &camera) const {
-        const auto h = static_cast<float>(camera.viewport().height);
-        return vm::vec3f(25.0f, h - 20.0f, 0.f);
-    }
-};
-
-class RenderService::HeadsUpTextAnchor : public TextAnchor {
-  private:
-    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
-        vm::vec3f off = getOffset(camera);
-        return vm::vec3f(off.x() - size.x() / 2.0f, off.y() - size.y(), off.z());
-    }
-
-    vm::vec3f position(const Camera &camera) const override {
-        return camera.unproject(getOffset(camera));
-    }
-
-    vm::vec3f getOffset(const Camera &camera) const {
-        const auto w = static_cast<float>(camera.viewport().width);
-        const auto h = static_cast<float>(camera.viewport().height);
-        return vm::vec3f(w / 2.0f, h - 20.0f, 0.f);
-    }
-};
-
-RenderService::RenderService(RenderContext &renderContext, RenderBatch &renderBatch)
-    : m_renderContext(renderContext), m_renderBatch(renderBatch), m_textRenderer(std::make_unique<TextRenderer>(makeRenderServiceFont())), m_pointHandleRenderer(std::make_unique<PointHandleRenderer>()), m_primitiveRenderer(std::make_unique<PrimitiveRenderer>()), m_foregroundColor(1.0f, 1.0f, 1.0f, 1.0f), m_backgroundColor(0.0f, 0.0f, 0.0f, 1.0f), m_lineWidth(1.0f), m_occlusionPolicy(PrimitiveRendererOcclusionPolicy::Transparent), m_cullingPolicy(PrimitiveRendererCullingPolicy::CullBackfaces) {
+RenderService::RenderService(RenderContext &renderContext, RenderBatch &renderBatch) :
+    m_renderContext(renderContext), m_renderBatch(renderBatch), m_textEntityRenderer(std::make_unique<TextEntityRenderer>()), m_pointHandleRenderer(std::make_unique<PointHandleRenderer>()), m_primitiveRenderer(std::make_unique<PrimitiveRenderer>()), m_foregroundColor(1.0f, 1.0f, 1.0f, 1.0f)
+    , m_backgroundColor(0.0f, 0.0f, 0.0f, 1.0f), m_lineWidth(1.0f), m_occlusionPolicy(PrimitiveRendererOcclusionPolicy::Transparent), m_cullingPolicy(PrimitiveRendererCullingPolicy::CullBackfaces) {
 }
 
 RenderService::~RenderService() {
@@ -128,20 +90,96 @@ void RenderService::renderString(const AttrString &string, const vm::vec3f &posi
     renderString(string, SimpleTextAnchor(position, TextAlignment::Bottom, vm::vec2f(0.0f, 16.0f)));
 }
 
-void RenderService::renderString(const AttrString &string, const TextAnchor &position) {
-    if (m_occlusionPolicy != PrimitiveRendererOcclusionPolicy::Hide) {
-        m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, position);
-    } else {
-        m_textRenderer->renderString(m_renderContext, m_foregroundColor, m_backgroundColor, string, position);
+void RenderService::renderCornerScreen(const std::string &string, ScreenCorner corner, vm::vec2f offset, const FontDescriptor &fontDescriptor) {
+    TextAnchor *anchor;
+
+    switch (corner) {
+        case TOP_LEFT:anchor = new LeftTopScreenTextAnchor{offset};
+            break;
+        case TOP_RIGHT:anchor = new RightTopScreenTextAnchor{offset};
+            break;
+        case BOTTOM_LEFT:anchor = new LeftBottomScreenTextAnchor{offset};
+            break;
+        case BOTTOM_RIGHT:anchor = new RightBottomScreenTextAnchor{offset};
+            break;
     }
+
+    TextEntity textEntity{
+        AttrString(string),
+        anchor,
+        vm::vec2f(3.5, 3),
+        true,
+        fontDescriptor,
+        m_foregroundColor,
+        m_backgroundColor,
+        0.5f,
+        false,
+        6, 3
+    };
+
+    renderText(textEntity);
+}
+
+void RenderService::renderString(const std::string &string, const TextAnchor &position, FontDescriptor fontDescriptor) {
+    TextEntity textEntity{
+        AttrString(string),
+        &position
+    };
+
+    textEntity.setForeground(m_foregroundColor);
+    textEntity.setBackground(m_backgroundColor);
+
+    if (m_occlusionPolicy != PrimitiveRendererOcclusionPolicy::Hide) {
+        textEntity.setOnTop(true);
+    }
+
+    renderText(textEntity);
+}
+
+void RenderService::renderString(const AttrString &string, const TextAnchor &position) {
+    TextEntity textEntity{
+        string,
+        &position
+    };
+
+    textEntity.setForeground(m_foregroundColor);
+    textEntity.setBackground(m_backgroundColor);
+
+    if (m_occlusionPolicy != PrimitiveRendererOcclusionPolicy::Hide) {
+        textEntity.setOnTop(true);
+    }
+
+    renderText(textEntity);
 }
 
 void RenderService::renderLeftScreen(const AttrString &string) {
-    m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, LeftScreenTextAnchor());
+    TextEntity textEntity{
+        string,
+        new LeftTopScreenTextAnchor(vm::vec2f{20, 20}),
+        vm::vec2f(12.f, 12.f),
+        true,
+        FontDescriptor{"fonts/JetBrainsMono-Bold.ttf", 12, 4},
+        Color(0.9f, 0.9f, 1.f, 0.85f),
+        Color(0.f, 0.f, 0.2f, 0.3f),
+        0.5f,
+        false,
+        12, 10.f
+    };
+
+    renderText(textEntity);
 }
 
 void RenderService::renderHeadsUp(const AttrString &string) {
-    m_textRenderer->renderStringOnTop(m_renderContext, m_foregroundColor, m_backgroundColor, string, HeadsUpTextAnchor());
+    TextEntity textEntity{
+        string,
+        new HeadsUpTextAnchor()
+    };
+
+    textEntity.setForeground(m_foregroundColor);
+    textEntity.setBackground(m_backgroundColor);
+    textEntity.setOnTop(true);
+
+    renderText(textEntity);
 }
 
 void RenderService::renderString(const std::string &string, const vm::vec3f &position) {
@@ -150,6 +188,10 @@ void RenderService::renderString(const std::string &string, const vm::vec3f &pos
 
 void RenderService::renderString(const std::string &string, const TextAnchor &position) {
     renderString(AttrString(string), position);
+}
+
+void RenderService::renderText(TextEntity &entity) {
+    m_textEntityRenderer->addTextEntity(entity, m_renderContext);
 }
 
 void RenderService::renderHeadsUp(const std::string &string) {
@@ -233,12 +275,12 @@ void RenderService::renderCoordinateSystem(const vm::bbox3f &bounds) {
     if (m_renderContext.render2D()) {
         const Camera &camera = m_renderContext.camera();
         switch (vm::find_abs_max_component(camera.direction())) {
-        case vm::axis::x: m_primitiveRenderer->renderCoordinateSystemYZ(y, z, m_lineWidth, m_occlusionPolicy, bounds);
-            break;
-        case vm::axis::y: m_primitiveRenderer->renderCoordinateSystemXZ(x, z, m_lineWidth, m_occlusionPolicy, bounds);
-            break;
-        default: m_primitiveRenderer->renderCoordinateSystemXY(x, y, m_lineWidth, m_occlusionPolicy, bounds);
-            break;
+            case vm::axis::x:m_primitiveRenderer->renderCoordinateSystemYZ(y, z, m_lineWidth, m_occlusionPolicy, bounds);
+                break;
+            case vm::axis::y:m_primitiveRenderer->renderCoordinateSystemXZ(x, z, m_lineWidth, m_occlusionPolicy, bounds);
+                break;
+            default:m_primitiveRenderer->renderCoordinateSystemXY(x, y, m_lineWidth, m_occlusionPolicy, bounds);
+                break;
         }
     } else {
         m_primitiveRenderer->renderCoordinateSystem3D(x, y, z, m_lineWidth, m_occlusionPolicy, bounds);
@@ -320,8 +362,15 @@ void RenderService::renderFilledCircle(const vm::vec3f &position, const vm::axis
 void RenderService::flush() {
     m_renderBatch.addOneShot(m_primitiveRenderer.release());
     m_renderBatch.addOneShot(m_pointHandleRenderer.release());
-    m_renderBatch.addOneShot(m_textRenderer.release());
+    m_renderBatch.addOneShot(m_textEntityRenderer.release());
 }
+
+float RenderService::distanceToEntity(const Camera &camera, const Model::EntityNode *entityNode) {
+    auto center = entityNode->logicalBounds().center();
+    auto position = vm::vec3f(center.x(), center.y(), center.z());
+    return camera.perpendicularDistanceTo(position);
+}
+
 
 } // namespace Renderer
 } // namespace TrenchBroom

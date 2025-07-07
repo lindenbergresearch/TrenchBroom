@@ -25,6 +25,9 @@
 #include <vm/constants.h>
 #include <vm/forward.h>
 #include <vm/util.h>
+#include "Renderer/FontDescriptor.h"
+#include "Renderer/TextEntityRenderer.h"
+#include "Renderer/EntityRenderer.h"
 
 #include <memory>
 #include <vector>
@@ -48,17 +51,131 @@ class TextAnchor;
 
 class TextRenderer;
 
-class RenderService {
+enum ScreenCorner {
+  TOP_LEFT,
+  TOP_RIGHT,
+  BOTTOM_LEFT,
+  BOTTOM_RIGHT
+};
+
+class LeftTopScreenTextAnchor : public TextAnchor {
+    vm::vec2f m_extra;
+
+  public:
+    LeftTopScreenTextAnchor(const vm::vec2f &extra = vm::vec2f{}) : m_extra(extra) {}
+
   private:
+    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
+        vm::vec3f off = getOffset(camera);
+        return vm::vec3f(off.x(), off.y() - size.y(), off.z());
+    }
+
+    vm::vec3f position(const Camera &camera) const override {
+        return camera.unproject(getOffset(camera));
+    }
+
+    vm::vec3f getOffset(const Camera &camera) const {
+        const auto h = static_cast<float>(camera.viewport().height);
+        return vm::vec3f(m_extra.x(), h - m_extra.y(), 0.f);
+    }
+};
+
+class RightTopScreenTextAnchor : public TextAnchor {
+    vm::vec2f m_extra;
+
+  public:
+    RightTopScreenTextAnchor(const vm::vec2f &extra = vm::vec2f{}) : m_extra(extra) {}
+
+  private:
+    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
+        vm::vec3f off = getOffset(camera);
+        return vm::vec3f(off.x()-size.x(), off.y() - size.y(), off.z());
+    }
+
+    vm::vec3f position(const Camera &camera) const override {
+        return camera.unproject(getOffset(camera));
+    }
+
+    vm::vec3f getOffset(const Camera &camera) const {
+        const auto h = static_cast<float>(camera.viewport().height);
+        const auto w = static_cast<float>(camera.viewport().width);
+        return vm::vec3f(w- m_extra.x(), h - m_extra.y(), 0.f);
+    }
+};
+
+class RightBottomScreenTextAnchor : public TextAnchor {
+    vm::vec2f m_extra;
+
+  public:
+    RightBottomScreenTextAnchor(const vm::vec2f &extra = vm::vec2f{}) : m_extra(extra) {}
+
+  private:
+    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
+        vm::vec3f off = getOffset(camera);
+        return vm::vec3f(off.x()-size.x(), off.y(), off.z());
+    }
+
+    vm::vec3f position(const Camera &camera) const override {
+        return camera.unproject(getOffset(camera));
+    }
+
+    vm::vec3f getOffset(const Camera &camera) const {
+        const auto h = static_cast<float>(camera.viewport().height);
+        const auto w = static_cast<float>(camera.viewport().width);
+        return vm::vec3f(w- m_extra.x(), m_extra.y(), 0.f);
+    }
+};
+
+class LeftBottomScreenTextAnchor : public TextAnchor {
+    vm::vec2f m_extra;
+
+  public:
+    LeftBottomScreenTextAnchor(const vm::vec2f &extra = vm::vec2f{}) : m_extra(extra) {}
+
+  private:
+    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
+        vm::vec3f off = getOffset(camera);
+        return vm::vec3f(off.x(), off.y(), off.z());
+    }
+
+    vm::vec3f position(const Camera &camera) const override {
+        return camera.unproject(getOffset(camera));
+    }
+
+    vm::vec3f getOffset(const Camera &camera) const {
+        return vm::vec3f(m_extra.x(), m_extra.y(), 0.f);
+    }
+};
+
+
+class HeadsUpTextAnchor : public TextAnchor {
+  private:
+    vm::vec3f offset(const Camera &camera, const vm::vec2f &size) const override {
+        vm::vec3f off = getOffset(camera);
+        return vm::vec3f(off.x() - size.x() / 2.0f, off.y() - size.y(), off.z());
+    }
+
+    vm::vec3f position(const Camera &camera) const override {
+        return camera.unproject(getOffset(camera));
+    }
+
+    vm::vec3f getOffset(const Camera &camera) const {
+        const auto w = static_cast<float>(camera.viewport().width);
+        const auto h = static_cast<float>(camera.viewport().height);
+        return vm::vec3f(w / 2.0f, h - 20.0f, 0.f);
+    }
+};
+
+
+class RenderService {
+  public:
     using OcclusionPolicy = PrimitiveRendererOcclusionPolicy;
     using CullingPolicy = PrimitiveRendererCullingPolicy;
 
-    class HeadsUpTextAnchor;
-    class LeftScreenTextAnchor;
-
     RenderContext &m_renderContext;
     RenderBatch &m_renderBatch;
-    std::unique_ptr<TextRenderer> m_textRenderer;
+    //  std::unique_ptr<TextRenderer> m_textRenderer;
+    std::unique_ptr<TextEntityRenderer> m_textEntityRenderer;
     std::unique_ptr<PointHandleRenderer> m_pointHandleRenderer;
     std::unique_ptr<PrimitiveRenderer> m_primitiveRenderer;
 
@@ -93,6 +210,8 @@ class RenderService {
 
     void renderString(const AttrString &string, const vm::vec3f &position);
 
+    void renderCornerScreen(const std::string &string, ScreenCorner corner, vm::vec2f offset, const FontDescriptor &fontDescriptor);
+
     void renderString(const AttrString &string, const TextAnchor &position);
 
     void renderHeadsUp(const AttrString &string);
@@ -103,7 +222,11 @@ class RenderService {
 
     void renderString(const std::string &string, const TextAnchor &position);
 
+    void renderString(const std::string &string, const TextAnchor &position, FontDescriptor fontDescriptor);
+
     void renderHeadsUp(const std::string &string);
+
+    void renderText(TextEntity &entity);
 
     void renderLeftScreen(const std::string &string);
 
@@ -148,6 +271,13 @@ class RenderService {
     void renderFilledCircle(const vm::vec3f &position, vm::axis::type normal, size_t segments, float radius, const vm::vec3f &startAxis, const vm::vec3f &endAxis);
 
     void renderFilledCircle(const vm::vec3f &position, vm::axis::type normal, size_t segments, float radius, float startAngle = 0.0f, float angleLength = vm::Cf::two_pi());
+
+    // static helper
+
+    /* ------------------------------------------------------------------------------------------- */
+
+    static float distanceToEntity(const Camera &camera, const Model::EntityNode *entityNode);
+
 
   private:
     void flush();

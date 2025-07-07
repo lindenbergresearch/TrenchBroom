@@ -225,4 +225,5 @@ bool TextEntity::prepared() const {
 const TextAnchor *TextEntity::anchor() const {
     return m_anchor;
 }
+
 }

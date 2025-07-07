@@ -25,6 +25,9 @@
 #include "Renderer/GLVertexType.h"
 #include "Renderer/Renderable.h"
 #include "Renderer/VertexArray.h"
+#include "Renderer/TextAnchor.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
 
 #include <vm/forward.h>
 #include <vm/vec.h>
@@ -38,7 +41,10 @@ class AttrString;
 
 class RenderContext;
 
-class TextAnchor;
+static const Color DefaultTextForegroundColor = Color(1.f, 1.f, 1.f, 1.f);
+static const Color DefaultTextBackgroundColor = Color(0, 0, 0, 0);
+
+/* ------------------------------------------------------------------------------------------- */
 
 class TextRenderer : public DirectRenderable {
   private:
@@ -48,6 +54,9 @@ class TextRenderer : public DirectRenderable {
     static const float RectCornerRadius;
     static const bool ExactViewportCheck;
 
+    /**
+     *
+     */
     struct Entry {
       std::vector<vm::vec2f> vertices;
       vm::vec2f size;
@@ -63,6 +72,9 @@ class TextRenderer : public DirectRenderable {
       bool overlapsWith(const Entry &entry);
     };
 
+    /**
+     *
+     */
     struct EntryCollection {
       EntryCollection();
 
@@ -88,6 +100,8 @@ class TextRenderer : public DirectRenderable {
       void updateLayout();
     };
 
+    /* ------------------------------------------------------------------------------------------- */
+
     using TextVertex = GLVertexTypes::P3T2C4::Vertex;
     using RectVertex = GLVertexTypes::P3C4::Vertex;
 
@@ -100,29 +114,29 @@ class TextRenderer : public DirectRenderable {
   public:
     explicit TextRenderer(float maxViewDistance = 512.f, float minZoomFactor = DefaultMinZoomFactor, const vm::vec2f &inset = DefaultInset);
 
-    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position);
+    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position, FontDescriptor fontDescriptor);
 
-    void renderStringOnTop(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position);
+    void renderStringOnTop(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, const AttrString &string, const TextAnchor &position, FontDescriptor fontDescriptor);
 
   private:
-     EntryCollection &getOrCreateCollection(const FontDescriptor &descriptor, bool onTop);
+    EntryCollection &getOrCreateCollection(const FontDescriptor &descriptor, bool onTop);
 
-    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, AttrString string, const TextAnchor &position, bool onTop);
+    void renderString(RenderContext &renderContext, const Color &textColor, const Color &backgroundColor, AttrString string, const TextAnchor &position, bool onTop, FontDescriptor fontDescriptor);
 
-    bool isVisible(RenderContext &renderContext,const FontDescriptor &descriptor, const AttrString &string, const TextAnchor &position, float distance, bool onTop) const;
+    bool isVisible(RenderContext &renderContext, const FontDescriptor &descriptor, const AttrString &string, const TextAnchor &position, float distance, bool onTop) const;
 
     float computeAlphaFactor(const RenderContext &renderContext, float distance, bool onTop) const;
 
-    void addEntry(EntryCollection &collection, const Entry &entry);
+    void addCollectionEntry(EntryCollection &collection, const Entry &entry);
 
-    vm::vec2f stringSize(RenderContext &renderContext,const FontDescriptor &descriptor, const AttrString &string) const;
+    vm::vec2f stringSize(RenderContext &renderContext, const FontDescriptor &descriptor, const AttrString &string) const;
 
   private:
     void doPrepareVertices(VboManager &vboManager) override;
 
     void prepare(EntryCollection &collection, bool onTop, VboManager &vboManager);
 
-    void addEntry(const Entry &entry, bool onTop, std::vector<TextVertex> &textVertices, std::vector<RectVertex> &rectVertices);
+    void prepareRenderVertices(const Entry &entry, const bool onTop, std::vector<TextVertex> &textVertices, std::vector<RectVertex> &rectVertices);
 
     void doRender(RenderContext &renderContext) override;
 
