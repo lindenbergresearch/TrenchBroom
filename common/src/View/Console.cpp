@@ -19,7 +19,6 @@
 
 #include "Console.h"
 
-#include <QDebug>
 #include <QScrollBar>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -29,40 +28,37 @@
 #include "Preferences.h"
 #include "TrenchBroomApp.h"
 #include "View/QtUtils.h"
-#include "View/ViewConstants.h"
 
-#include <string>
-
-namespace TrenchBroom {
-namespace View {
-Console::Console(QWidget *parent) : TabBookPage(parent) {
+namespace TrenchBroom::View {
+Console::Console(QWidget* parent) : TabBookPage(parent) {
     m_textView = new QTextEdit();
     m_textView->setReadOnly(true);
     m_textView->setWordWrapMode(QTextOption::NoWrap);
 
-    auto *layout = new QVBoxLayout();
+    auto* layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_textView);
     setLayout(layout);
-
     setLogLevel(pref(Preferences::AppLogLevel));
 }
 
 
-void Console::doLog(const LogLevel level, const LogMessage *message) {
+Console::~Console() {}
+
+void Console::doLog(const LogLevel level, const LogMessage* message) {
     logToConsole(level, message->format(false, false));
     // redirect to default logger
     defaultQtLogger.log(level, message);
     FileLogger::instance().log(level, message->format(true, false));
 }
 
-void Console::logToConsole(const LogLevel level, const QString &message) {
+void Console::logToConsole(const LogLevel level, const QString& message) const {
     // NOTE: QPalette::Text is the correct color role for contrast against QPalette::Base
     // which is the background of text entry widgets
     QTextCharFormat format;
     switch (level) {
         case LogLevel::Trace:
-            format.setForeground(QBrush(toQColor(pref(Preferences::TraceDebugColor))));
+            format.setForeground(QBrush(toQColor(pref(Preferences::LogTraceColor))));
             break;
         case LogLevel::Debug:
             format.setForeground(QBrush(toQColor(pref(Preferences::LogDebugColor))));
@@ -76,10 +72,11 @@ void Console::logToConsole(const LogLevel level, const QString &message) {
         case LogLevel::Error:
             format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
             break;
+        case LogLevel::None:
+            break;
     }
 
     format.setFont(TrenchBroomApp::instance().getConsoleFont());
-
     QTextCursor cursor(m_textView->document());
     cursor.movePosition(QTextCursor::MoveOperation::End);
     cursor.insertText(message, format);
@@ -87,7 +84,4 @@ void Console::logToConsole(const LogLevel level, const QString &message) {
 
     m_textView->moveCursor(QTextCursor::MoveOperation::End);
 }
-
-Console::~Console() {}
-} // namespace View
-} // namespace TrenchBroom
+}
