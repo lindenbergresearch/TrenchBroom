@@ -31,33 +31,35 @@
 #include "View/ClickableLabel.h"
 #include "View/GetVersion.h"
 #include "View/QtUtils.h"
+#include "TrenchBroomApp.h"
 
 namespace TrenchBroom::View {
-AppInfoPanel::AppInfoPanel(QWidget *parent) : QWidget{parent} {
-    createGui();
-}
+AppInfoPanel::AppInfoPanel(QWidget* parent) : QWidget{parent} { createGui(); }
 
 void AppInfoPanel::createGui() {
-    QPixmap appIconImage = IO::loadPixmapResource("AppIcon_Glow.png");
-    QLabel *appIcon = new QLabel{};
-    appIcon->setPixmap(appIconImage);
+    const QPixmap appIconImage = IO::loadPixmapResource("AppIcon_Glow.png");
+    const auto scaledImage = appIconImage.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    QLabel *appName = new QLabel{tr("TrenchBroom Nova")};
-    makeHeader(appName);
-    makeItalic(appName);
+    QLabel* appIcon = new QLabel{this};
+    appIcon->setPixmap(scaledImage);
+
+    const auto sui_generis_font = TrenchBroomApp::instance().loadFont("fonts/rabanera.ttf", 32);
+
+    QLabel* appName = new QLabel{QApplication::applicationName(), this};
+    appName->setFont(sui_generis_font);
     appName->setForegroundRole(QPalette::HighlightedText);
 
-    BorderLine *appLine = new BorderLine{BorderLine::Direction::Horizontal};
-    appLine->setLineWidth(3);
-    QLabel *appClaim = new QLabel{tr("Level Editor")};
+    BorderLine* appLine = new BorderLine{BorderLine::Direction::Horizontal};
+    QLabel* appClaim = new QLabel{tr("Level Editor")};
     makeEmphasized(appClaim);
+    appClaim->setForegroundRole(QPalette::HighlightedText);
 
-    QLabel *appHint = new QLabel{tr("eXperimental Version")};
+    QLabel* appHint = new QLabel{tr("eXperimental Version")};
     makeEmphasized(appHint);
 
-    ClickableLabel *version = new ClickableLabel{tr("Version ") % getBuildVersion()};
-    ClickableLabel *build = new ClickableLabel{tr("Build ") % getBuildIdStr()};
-    ClickableLabel *qtVersion = new ClickableLabel{tr("Qt ") % QString::fromLocal8Bit(qVersion())};
+    ClickableLabel* version = new ClickableLabel{tr("Version ") % getBuildVersion()};
+    ClickableLabel* build = new ClickableLabel{tr("Build ") % getBuildIdStr()};
+    ClickableLabel* qtVersion = new ClickableLabel{tr("Qt ") % QString::fromLocal8Bit(qVersion())};
 
     makeInfo(version);
     makeInfo(build);
@@ -73,13 +75,13 @@ void AppInfoPanel::createGui() {
     connect(build, &ClickableLabel::clicked, this, &AppInfoPanel::versionInfoClicked);
     connect(qtVersion, &ClickableLabel::clicked, this, &AppInfoPanel::versionInfoClicked);
 
-    auto *layout = new QVBoxLayout{};
+    auto* layout = new QVBoxLayout{this};
     layout->setContentsMargins(20, 20, 20, 20);
     layout->setSpacing(LayoutConstants::MediumVMargin);
     layout->addStretch();
     layout->addWidget(appIcon, 0, Qt::AlignHCenter | Qt::AlignVCenter);
     layout->addWidget(appName, 0, Qt::AlignHCenter | Qt::AlignVCenter);
-    layout->addWidget(appHint, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    // layout->addWidget(appHint, 0, Qt::AlignHCenter | Qt::AlignVCenter);
     layout->addWidget(appLine);
     layout->addWidget(appClaim, 0, Qt::AlignHCenter | Qt::AlignVCenter);
     layout->addWidget(version, 0, Qt::AlignHCenter | Qt::AlignVCenter);
@@ -91,7 +93,7 @@ void AppInfoPanel::createGui() {
 }
 
 void AppInfoPanel::versionInfoClicked() {
-    QClipboard *clipboard = QApplication::clipboard();
+    QClipboard* clipboard = QApplication::clipboard();
     const QString str = tr("TrenchBroom ") % getBuildVersion() % tr(" Build ") % getBuildIdStr();
     clipboard->setText(str);
 }

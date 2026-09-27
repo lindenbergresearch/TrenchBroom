@@ -23,13 +23,12 @@
 
 namespace TrenchBroom::View {
 class AppInfoPanel : public QWidget {
-  Q_OBJECT
-  public:
-    explicit AppInfoPanel(QWidget *parent = nullptr);
+    Q_OBJECT public:
+    explicit AppInfoPanel(QWidget* parent = nullptr);
 
-  private:
+private:
     void createGui();
 
-    void versionInfoClicked();
+    static void versionInfoClicked();
 };
 } // namespace TrenchBroom::View
