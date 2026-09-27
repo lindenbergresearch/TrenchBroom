@@ -20,11 +20,11 @@
 #include "BoxFilter.h"
 
 namespace TrenchBroom::View {
-QPointF BoxFilter::average() {
-    int c = 0;
-    QPointF sum = QPointF(0, 0);
+QPointF BoxFilter::average() const {
+    auto c = 0;
+    auto sum = QPointF(0, 0);
 
-    for (QPointF *item : samples) {
+    for (const QPointF* item: samples) {
         if (item != nullptr) {
             sum = QPointF(sum.x() + item->x(), sum.y() + item->y());
             c++;
@@ -36,20 +36,14 @@ QPointF BoxFilter::average() {
 
 void BoxFilter::reset() {
     samples.clear();
-    for (size_t i = 0; i < m_size; ++i) {
-        samples.push_back(nullptr);
-    }
+    for (size_t i = 0; i < m_size; ++i) { samples.push_back(nullptr); }
 }
 
-void BoxFilter::add(QPointF *point) {
-    if (++m_index >= m_length) {
-        m_index = 0;
-    }
+void BoxFilter::add(QPointF* point) {
+    if (++m_index >= m_length) { m_index = 0; }
 
-    if (samples[m_index] != nullptr)
-        delete samples[m_index];
+    if (samples[m_index] != nullptr) delete samples[m_index];
 
     samples[m_index] = point;
 }
-
 }
