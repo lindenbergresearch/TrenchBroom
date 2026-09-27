@@ -24,20 +24,19 @@
 
 using FloatType = double;
 
-namespace vm
-{
-using vec3 = vm::vec<FloatType, 3>;
-using vec2 = vm::vec<FloatType, 2>;
-using mat4x4 = vm::mat<FloatType, 4, 4>;
-using quat3 = vm::quat<FloatType>;
-using line3 = vm::line<FloatType, 3>;
-using line2 = vm::line<FloatType, 2>;
-using ray3 = vm::ray<FloatType, 3>;
-using segment3 = vm::segment<FloatType, 3>;
-using plane3 = vm::plane<FloatType, 3>;
-using polygon3 = vm::polygon<FloatType, 3>;
-using bbox3 = vm::bbox<FloatType, 3>;
-using bbox2 = vm::bbox<FloatType, 2>;
+namespace vm {
+using vec3 = vec<FloatType, 3>;
+using vec2 = vec<FloatType, 2>;
+using mat4x4 = mat<FloatType, 4, 4>;
+using quat3 = quat<FloatType>;
+using line3 = line<FloatType, 3>;
+using line2 = line<FloatType, 2>;
+using ray3 = ray<FloatType, 3>;
+using segment3 = segment<FloatType, 3>;
+using plane3 = plane<FloatType, 3>;
+using polygon3 = polygon<FloatType, 3>;
+using bbox3 = bbox<FloatType, 3>;
+using bbox2 = bbox<FloatType, 2>;
 
 using C = constants<FloatType>;
 } // namespace vm
