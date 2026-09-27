@@ -21,56 +21,46 @@
 
 #include <QVBoxLayout>
 
-#include "IO/ResourceUtils.h"
 #include "QTabBar.h"
 #include "QTabWidget"
 #include "View/EntityInspector.h"
 #include "View/FaceInspector.h"
 #include "View/MapInspector.h"
+#include "View/LayerInspector.h"
 #include "View/MapViewBar.h"
 #include "View/QtUtils.h"
-#include "View/TabBar.h"
-#include "View/TabBook.h"
 
-namespace TrenchBroom {
-namespace View {
-Inspector::Inspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, MapView *mapView, QWidget *parent)
+namespace TrenchBroom::View {
+Inspector::Inspector(const std::weak_ptr<MapDocument>& document, GLContextManager& contextManager, MapView* mapView, QWidget* parent)
     : QWidget(parent), m_tabs(nullptr), m_mapInspector(nullptr), m_entityInspector(nullptr), m_faceInspector(nullptr), m_mapView(mapView), m_syncTabBarEventFilter(nullptr) {
     setObjectName("Inspector_Widget");
 
     m_tabs = new QTabWidget(this);
-    m_mapInspector = new MapInspector(document, mapView, this);
+    m_layerInspector = new LayerInspector(document, mapView, this);
+    m_mapInspector = new MapInspector(document);
     m_entityInspector = new EntityInspector(document, contextManager);
     m_faceInspector = new FaceInspector(document, contextManager);
 
+    m_tabs->addTab(m_layerInspector, "Layer");
     m_tabs->addTab(m_mapInspector, "Map");
     m_tabs->addTab(m_faceInspector, "Face");
     m_tabs->addTab(m_entityInspector, "Entity");
 
-    auto *layout = new QVBoxLayout();
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::MediumVMargin, 0, LayoutConstants::NarrowHMargin);
+    auto* layout = new QVBoxLayout();
+    layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::WideVMargin, LayoutConstants::NoMargin, LayoutConstants::NarrowHMargin);
     layout->addWidget(m_tabs);
     setLayout(layout);
 }
 
-void Inspector::connectTopWidgets(MapViewBar *mapViewBar) {
-    if (m_syncTabBarEventFilter != nullptr) {
-        delete std::exchange(m_syncTabBarEventFilter, nullptr);
-    }
+void Inspector::connectTopWidgets(MapViewBar* mapViewBar) {
+    if (m_syncTabBarEventFilter != nullptr) { delete std::exchange(m_syncTabBarEventFilter, nullptr); }
 
     m_syncTabBarEventFilter = new SyncHeightEventFilter(mapViewBar, m_tabs->tabBar(), this);
 }
 
-void Inspector::switchToPage(const InspectorPage page) {
-    m_tabs->setCurrentIndex(static_cast<int>(page));
-}
+void Inspector::switchToPage(const InspectorPage page) const { m_tabs->setCurrentIndex(static_cast<int>(page)); }
 
-bool Inspector::cancelMouseDrag() {
-    return m_faceInspector->cancelMouseDrag();
-}
+bool Inspector::cancelMouseDrag() const { return m_faceInspector->cancelMouseDrag(); }
 
-FaceInspector *Inspector::faceInspector() {
-    return m_faceInspector;
+FaceInspector* Inspector::faceInspector() const { return m_faceInspector; }
 }
-} // namespace View
-} // namespace TrenchBroom
