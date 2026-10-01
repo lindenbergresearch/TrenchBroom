@@ -4,18 +4,24 @@ cmake_minimum_required(VERSION 3.14)
 
 # Fix warning with Ninja and cotire (see https://github.com/sakra/cotire/issues/81)
 if(POLICY CMP0058)
-  cmake_policy(SET CMP0058 NEW)
+    cmake_policy(SET CMP0058 NEW)
 endif()
 
 # Instruct cmake not to set default warning levels for MSVC projects (cmake 3.15 or higher)
 if(POLICY CMP0092)
-  cmake_policy(SET CMP0092 NEW)
+    cmake_policy(SET CMP0092 NEW)
 endif()
 
 if(POLICY CMP0063)
-  cmake_policy(SET CMP0063 NEW)
+    cmake_policy(SET CMP0063 NEW)
 endif()
 
+# Set policy CMP0167 to NEW for Boost handling
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
+
+# Specify vcpkg toolchain for dependency management
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
 set(VCPKG_OVERLAY_PORTS "${CMAKE_SOURCE_DIR}/vcpkg-overlay-ports/freeimage;${CMAKE_SOURCE_DIR}/vcpkg-overlay-ports/openexr")
 
@@ -29,23 +35,23 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Set TrenchBroom item as default single startup project (NOTE: CMake 3.6 and newer)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT TrenchBroom)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Using C and CXX because GLEW is C
-project(TrenchBroom C CXX)
+project(TrenchBroom C CXX OBJCXX)
 
 # Configure CCache if available and requested
 if(TB_ENABLE_CCACHE)
-  find_program(CCACHE_PATH ccache)
+    find_program(CCACHE_PATH ccache)
 
-  if(CCACHE_PATH)
-    message(STATUS "Found ccache: ${CCACHE_PATH}")
+    if(CCACHE_PATH)
+        message(STATUS "Found ccache: ${CCACHE_PATH}")
 
-    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PATH}")
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PATH}")
-  endif(CCACHE_PATH)
+        set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PATH}")
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PATH}")
+    endif(CCACHE_PATH)
 endif(TB_ENABLE_CCACHE)
 
 # Compiler detection
@@ -54,35 +60,31 @@ set(COMPILER_IS_GNU FALSE)
 set(COMPILER_IS_MSVC FALSE)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  set(COMPILER_IS_CLANG TRUE)
+    set(COMPILER_IS_CLANG TRUE)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(COMPILER_IS_GNU TRUE)
+    set(COMPILER_IS_GNU TRUE)
 elseif(MSVC EQUAL 1)
-  set(COMPILER_IS_MSVC TRUE)
+    set(COMPILER_IS_MSVC TRUE)
 else()
-  message(FATAL_ERROR "Unsupported compiler detected.")
+    message(FATAL_ERROR "Unsupported compiler detected.")
 endif()
 
 # Request 8MB stack on Windows. (NOTE: /STACK should be used on .exe targets only.)
-# Default is 1MB and we need more for our current AABB builder on large maps (https://github.com/TrenchBroom/TrenchBroom/issues/2803)
 if(COMPILER_IS_MSVC)
-  set(TB_STACK_SIZE 8388608)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:${TB_STACK_SIZE}")
-
-  # This might work in CMake 3.13 and avoid a global setting, but we are on 3.12 for now
-  # target_link_options(common INTERFACE "/STACK:${TB_STACK_SIZE}")
+    set(TB_STACK_SIZE 8388608)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:${TB_STACK_SIZE}")
 endif()
 
 # Enable ASAN if possible and requested
 if(TB_ENABLE_ASAN)
-  message(STATUS "Enabling ASan")
+    message(STATUS "Enabling ASan")
 
-  if(COMPILER_IS_CLANG OR COMPILER_IS_GNU)
-    add_compile_options(-fsanitize=address)
-    add_link_options(-fsanitize=address)
-  else()
-    message(WARNING "TB isn't set up to enable ASan for compiler ${CMAKE_CXX_COMPILER_ID}")
-  endif()
+    if(COMPILER_IS_CLANG OR COMPILER_IS_GNU)
+        add_compile_options(-fsanitize=address)
+        add_link_options(-fsanitize=address)
+    else()
+        message(WARNING "TB isn't set up to enable ASan for compiler ${CMAKE_CXX_COMPILER_ID}")
+    endif()
 endif()
 
 include(cmake/Utils.cmake)
@@ -91,22 +93,21 @@ include(cmake/Utils.cmake)
 find_package(Git)
 
 if(NOT GIT_FOUND)
-  message(FATAL_ERROR "Could not find git")
+    message(FATAL_ERROR "Could not find git")
 endif()
 
 # Find Pandoc
 if(NOT PANDOC_PATH)
-  find_program(PANDOC_PATH NAMES "pandoc" DOC "Pandoc program location")
+    find_program(PANDOC_PATH NAMES "pandoc" DOC "Pandoc program location")
 
-  if(PANDOC_PATH STREQUAL "PANDOC_PATH-NOTFOUND")
-    message(FATAL_ERROR "Could not find pandoc")
-  else()
-    message(STATUS "Found Pandoc: ${PANDOC_PATH}")
-  endif()
+    if(PANDOC_PATH STREQUAL "PANDOC_PATH-NOTFOUND")
+        message(FATAL_ERROR "Could not find pandoc")
+    else()
+        message(STATUS "Found Pandoc: ${PANDOC_PATH}")
+    endif()
 endif()
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
+# Prevent overriding the parent project's compiler/linker settings on Windows
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # Prevent gtest from being installed
@@ -120,6 +121,10 @@ find_package(fmt CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(miniz CONFIG REQUIRED)
 find_package(tinyxml2 CONFIG REQUIRED)
+
+#find_package(Boost REQUIRED COMPONENTS stacktrace_basic stacktrace_noop)
+#include_directories(${Boost_INCLUDE_DIRS})
+#link_directories(${Boost_LIBRARY_DIRS})
 
 # Find Qt and OpenGL
 find_package(OpenGL REQUIRED)
@@ -148,3 +153,6 @@ add_subdirectory(dump-shortcuts)
 add_subdirectory(return-exitCode)
 add_subdirectory(common)
 add_subdirectory(app)
+
+# Link Boost libraries to the relevant targets
+#target_link_libraries(app PRIVATE Boost::stacktrace_basic Boost::stacktrace_noop)
