@@ -89,31 +89,33 @@ endmacro(SET_XCODE_ATTRIBUTES)
 
 macro(set_compiler_config TARGET)
     if (COMPILER_IS_CLANG)
-        target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Wconversion -Wshadow-all -Wnon-virtual-dtor -Wmissing-prototypes -pedantic)
-        target_compile_options(${TARGET} PRIVATE -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-format-nonliteral -Wno-used-but-marked-unused)
-
+        # target_compile_options(${TARGET} PRIVATE -Wconversion -Wshadow-all -Wnon-virtual-dtor -Wmissing-prototypes)
+        # target_compile_options(${TARGET} PRIVATE -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-format-nonliteral -Wno-used-but-marked-unused)
+        target_compile_options(${TARGET} PRIVATE -Wall)
+        target_compile_options(${TARGET} PRIVATE -Ofast)
+        target_compile_options(${TARGET} PRIVATE "$<$<CONFIG:RELEASE>:-O3>")
         # disable C++98 compatibility warnings
-        target_compile_options(${TARGET} PRIVATE -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-c++98-compat-bind-to-temporary-copy)
+        #  target_compile_options(${TARGET} PRIVATE -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-c++98-compat-bind-to-temporary-copy)
 
         # FIXME: investigate further and turn off these warnings if possible
-        target_compile_options(${TARGET} PRIVATE -Wno-weak-vtables -Wno-weak-template-vtables)
-        target_compile_options(${TARGET} PRIVATE "$<$<CONFIG:RELEASE>:-O3>")
+        #   target_compile_options(${TARGET} PRIVATE -Wno-weak-vtables -Wno-weak-template-vtables)
+        #   target_compile_options(${TARGET} PRIVATE "$<$<CONFIG:RELEASE>:-O3>")
 
         # FIXME: Remove once we switch to Xcode 10
-        target_compile_options(${TARGET} PRIVATE -Wno-missing-braces)
+        #   target_compile_options(${TARGET} PRIVATE -Wno-missing-braces)
 
         # FIXME: Suppress warnings in moc generated files:
-        target_compile_options(${TARGET} PRIVATE -Wno-redundant-parens)
+        #  target_compile_options(${TARGET} PRIVATE -Wno-redundant-parens)
 
         # Disable a warning in clang when using PCH:
-        target_compile_options(${TARGET} PRIVATE -Wno-pragma-system-header-outside-header)
+        #  target_compile_options(${TARGET} PRIVATE -Wno-pragma-system-header-outside-header)
 
         if (${CMAKE_VERSION} VERSION_EQUAL "3.24.1")
             # Disable missing prototype for automoc files, see https://gitlab.kitware.com/cmake/cmake/-/merge_requests/7558
             set_source_files_properties("${TARGET}_autogen/mocs_compilation.cpp" PROPERTIES COMPILE_FLAGS "-Wno-missing-prototypes")
         endif ()
     elseif (COMPILER_IS_GNU)
-        target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Wconversion -Wshadow=local -Wnon-virtual-dtor -Wmissing-declarations -pedantic)
+        target_compile_options(${TARGET} PRIVATE -Ofast)
         target_compile_options(${TARGET} PRIVATE "$<$<CONFIG:RELEASE>:-O3>")
 
         # FIXME: enable -Wcpp once we found a workaround for glew / QOpenGLWindow problem, see RenderView.h
