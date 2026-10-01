@@ -35,7 +35,7 @@ class Color : public vm::vec<float, 4> {
 
     Color(const char *colorCode);
 
-    Color(const vec<float, 4> &v);
+    Color(const vec &v);
 
     Color(float r, float g, float b, float a = 1.0f);
 
@@ -47,7 +47,7 @@ class Color : public vm::vec<float, 4> {
 
     Color(int r, int g, int b, int a = 0xFF);
 
-    Color(QColor qColor);
+    Color(const QColor& qColor);
 
     float r() const;
 

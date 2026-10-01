@@ -26,67 +26,65 @@
 #include <sstream>
 
 namespace TrenchBroom {
-std::optional<Color> Color::parse(const std::string &str) {
-    if (const auto c4 = vm::parse<float, 4>(str)) {
-        return Color(c4->x(), c4->y(), c4->z(), c4->w());
-    } else if (const auto c3 = vm::parse<float, 3>(str)) {
-        return Color(c3->x(), c3->y(), c3->z());
-    } else {
-        return std::nullopt;
-    }
+std::optional<Color> Color::parse(const std::string& str) {
+    if (const auto c4 = vm::parse<float, 4>(str)) { return Color(c4->x(), c4->y(), c4->z(), c4->w()); }
+    if (const auto c3 = vm::parse<float, 3>(str)) { return Color(c3->x(), c3->y(), c3->z()); }
+    return std::nullopt;
 }
 
 std::string Color::toString() const {
     std::stringstream ss;
-    if (a() == 1.0f) {
-        ss << this->xyz();
-    } else {
-        ss << this;
-    }
+    if (a() == 1.0f) { ss << this->xyz(); }
+    else { ss << this; }
+
     return ss.str();
 }
 
-Color::Color() : vec<float, 4>(0.0f, 0.0f, 0.0f, 0.0f) {
+Color::Color() : vec(0.0f, 0.0f, 0.0f, 0.0f) {}
+
+Color::Color(const char* colorCode) {
+    const std::string str(colorCode);
+    float buffer[4];
+    parseHtmlColor(str, buffer);
+
+    this->v[0] = buffer[0]; // red
+    this->v[1] = buffer[1]; // green
+    this->v[2] = buffer[2]; // blue
+    this->v[3] = buffer[3]; // alpha
 }
 
-Color::Color(const vec<float, 4> &i_v) : vec<float, 4>(i_v) {
-}
+Color::Color(const vec& v) : vec(v) {}
 
-Color::Color(const float r, const float g, const float b, const float a) : vec<float, 4>(r, g, b, a) {
-}
+Color::Color(const float r, const float g, const float b, const float a) : vec(r, g, b, a) {}
 
-Color::Color(const Color &color, const float a) : vec<float, 4>(color.r(), color.g(), color.b(), a) {
-}
+Color::Color(const Color& color, const float a) : vec(color.r(), color.g(), color.b(), a) {}
 
 Color::Color(const unsigned char r, const unsigned char g, const unsigned char b, const unsigned char a)
-    : vec<float, 4>(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f) {
-}
-
-Color::Color(const int r, const int g, const int b, const int a)
-    : vec<float, 4>(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f) {
-}
+    : vec(
+        static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f,
+        static_cast<float>(a) / 255.0f
+    ) {}
 
 Color::Color(const int r, const int g, const int b, const float a)
-    : vec<float, 4>(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, a) {
-}
+    : vec(static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, a) {}
 
-float Color::r() const {
-    return x();
-}
+Color::Color(const int r, const int g, const int b, const int a)
+    : vec(
+        static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f,
+        static_cast<float>(a) / 255.0f
+    ) {}
 
-float Color::g() const {
-    return y();
-}
+Color::Color(const QColor& qColor) : vec(qColor.redF(), qColor.greenF(), qColor.blueF(), qColor.alphaF()) {}
 
-float Color::b() const {
-    return z();
-}
+float Color::r() const { return x(); }
 
-float Color::a() const {
-    return w();
-}
+float Color::g() const { return y(); }
 
-void Color::rgbToHSB(const float r, const float g, const float b, float &h, float &s, float &br) {
+float Color::b() const { return z(); }
+
+float Color::a() const { return w(); }
+
+void Color::rgbToHSB(const float r, const float g, const float b, float& h, float& s, float& br) {
     assert(r >= 0.0f && r <= 1.0f);
     assert(g >= 0.0f && g <= 1.0f);
     assert(b >= 0.0f && b <= 1.0f);
@@ -96,43 +94,23 @@ void Color::rgbToHSB(const float r, const float g, const float b, float &h, floa
     const float dist = max - min;
 
     br = max;
-    if (br != 0.0f)
-        s = dist / max;
-    else
-        s = 0.0f;
+    if (br != 0.0f) s = dist / max;
+    else s = 0.0f;
 
-    if (s == 0.0f) {
-        h = 0.0f;
-    } else {
+    if (s == 0.0f) { h = 0.0f; }
+    else {
         const float rc = (max - r) / dist;
         const float gc = (max - g) / dist;
         const float bc = (max - b) / dist;
-        if (r == max)
-            h = bc - gc;
-        else if (g == max)
-            h = 2.0f + rc - bc;
-        else
-            h = 4.0f + gc - rc;
+        if (r == max) h = bc - gc;
+        else if (g == max) h = 2.0f + rc - bc;
+        else h = 4.0f + gc - rc;
         h = h / 6.0f;
-        if (h < 0)
-            h = h + 1.0f;
+        if (h < 0) h = h + 1.0f;
     }
 }
 
-Color::Color(QColor qColor) : vec<float, 4>(qColor.redF(), qColor.greenF(), qColor.blueF(), qColor.alphaF()) {
-}
-
-Color::Color(const char *colorCode) {
-    std::string str(colorCode);
-    float buffer[4];
-    Color::parseHtmlColor(str, buffer);
-    this->v[0] = buffer[0]; // red
-    this->v[1] = buffer[1]; // green
-    this->v[2] = buffer[2]; // blue
-    this->v[3] = buffer[3]; // alpha
-}
-
-void Color::parseHtmlColor(const std::string &htmlColor, float *buffer) {
+void Color::parseHtmlColor(const std::string& htmlColor, float* buffer) {
     buffer[0] = 0.f;
     buffer[1] = 0.f;
     buffer[2] = 0.f;
@@ -143,22 +121,21 @@ void Color::parseHtmlColor(const std::string &htmlColor, float *buffer) {
         return;
     }
 
-    auto str_r = htmlColor.substr(1, 2);
-    auto str_g = htmlColor.substr(3, 2);
-    auto str_b = htmlColor.substr(5, 2);
+    const auto str_r = htmlColor.substr(1, 2);
+    const auto str_g = htmlColor.substr(3, 2);
+    const auto str_b = htmlColor.substr(5, 2);
 
-    int red = std::stoi(str_r, nullptr, 16);
-    int green = std::stoi(str_g, nullptr, 16);
-    int blue = std::stoi(str_b, nullptr, 16);
+    const int red = std::stoi(str_r, nullptr, 16);
+    const int green = std::stoi(str_g, nullptr, 16);
+    const int blue = std::stoi(str_b, nullptr, 16);
 
     buffer[0] = float(red) / 255.0f;
     buffer[1] = float(green) / 255.0f;
     buffer[2] = float(blue) / 255.0f;
 
     // testing for optional alpha
-    if (htmlColor.size() == 9) {
-        auto str_a = htmlColor.substr(7, 2);
-        int alpha = std::stoi(str_a, nullptr, 16);
+    if (htmlColor.size() == 9) { const auto str_a = htmlColor.substr(7, 2);
+        const int alpha = std::stoi(str_a, nullptr, 16);
         buffer[3] = float(alpha) / 255.0f;
     }
 }
