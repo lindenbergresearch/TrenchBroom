@@ -21,21 +21,22 @@
 #include <QtMath>
 
 namespace TrenchBroom::IO {
+ImagePixelProcessor::ImagePixelProcessor(const QImage& image, const QImage::Format targetFormat)
+    : m_sourceImage(image),
+      m_targetFormat(targetFormat == QImage::Format_Invalid ? image.format() : targetFormat),
+      m_processed(false) {}
 
 void ImagePixelProcessor::process() {
     preProcess();
 
     // Convert to target format if specified
-    if (m_targetFormat != QImage::Format_Invalid && m_sourceImage.format() != m_targetFormat) {
-        m_targetImage = m_sourceImage.convertToFormat(m_targetFormat);
-    } else {
-        m_targetImage = m_sourceImage;
-    }
+    if (m_targetFormat != QImage::Format_Invalid && m_sourceImage.format() != m_targetFormat) { m_targetImage = m_sourceImage.convertToFormat(m_targetFormat); }
+    else { m_targetImage = m_sourceImage; }
 
 
     // Iterate over each pixel
-    for (int y = 0; y < m_targetImage.height(); ++y) {
-        for (int x = 0; x < m_targetImage.width(); ++x) {
+    for (auto y = 0; y < m_targetImage.height(); ++y) {
+        for (auto x = 0; x < m_targetImage.width(); ++x) {
             QPoint location{x, y};
             PixelColor pixelColor{m_targetImage.pixelColor(location)};
 
@@ -48,18 +49,14 @@ void ImagePixelProcessor::process() {
     m_processed = true;
 }
 
-QImage &ImagePixelProcessor::process(QImage &image) {
+QImage& ImagePixelProcessor::process(const QImage& image) {
     m_sourceImage = image;
     process();
 
     return m_targetImage;
 }
 
-ImagePixelProcessor::ImagePixelProcessor(const QImage &image, const QImage::Format targetFormat) :
-    m_sourceImage(image), m_targetFormat(targetFormat == QImage::Format_Invalid ? image.format() : targetFormat), m_processed(false) {
-}
-
-QImage &ImagePixelProcessor::run() {
+QImage& ImagePixelProcessor::run() {
     process();
 
     return m_targetImage;
@@ -68,24 +65,19 @@ QImage &ImagePixelProcessor::run() {
 /* ------------------------------------------------------------------------------------------- */
 
 
-QColor GrayScaleProcessor::processPixel(const QPoint &location, PixelColor &pixelColor) {
-    return pixelColor.setSaturation(0);
-}
+GrayScaleProcessor::GrayScaleProcessor(const QImage& image, const QImage::Format targetFormat) : ImagePixelProcessor(image, targetFormat) {}
 
-GrayScaleProcessor::GrayScaleProcessor(const QImage &image, const QImage::Format targetFormat) : ImagePixelProcessor(image, targetFormat) {}
+QColor GrayScaleProcessor::processPixel(const QPoint& location, PixelColor& pixelColor) { return pixelColor.setSaturation(0); }
 
-void GrayScaleProcessor::preProcess() {
+void GrayScaleProcessor::preProcess() {}
 
-}
-
-void GrayScaleProcessor::postProcess() {
-
-}
+void GrayScaleProcessor::postProcess() {}
 
 /* ------------------------------------------------------------------------------------------- */
 
-ResizeSharpenProcessor::ResizeSharpenProcessor(const QImage &image, QImage::Format targetFormat, float sharpenStrength) :
-    ImagePixelProcessor(image, targetFormat), m_sharpenStrength(sharpenStrength) {
+ResizeSharpenProcessor::ResizeSharpenProcessor(const QImage& image, const QImage::Format targetFormat, const float sharpenStrength)
+    : ImagePixelProcessor(image, targetFormat),
+      m_sharpenStrength(sharpenStrength) {
     kernel = {
         {0, -1, 0},
         {-1, 5, -1},
@@ -93,20 +85,23 @@ ResizeSharpenProcessor::ResizeSharpenProcessor(const QImage &image, QImage::Form
     };
 }
 
-QColor ResizeSharpenProcessor::processPixel(const QPoint &location, PixelColor &pixelData) {
-    int x = location.x();
-    int y = location.y();
+double ResizeSharpenProcessor::sharpenStrength() const { return m_sharpenStrength; }
+
+void ResizeSharpenProcessor::setSharpenStrength(const double sharpenStrength) { m_sharpenStrength = sharpenStrength; }
+
+QColor ResizeSharpenProcessor::processPixel(const QPoint& location, PixelColor& pixelData) {
+    const int x = location.x();
+    const int y = location.y();
 
     double r = 0, g = 0, b = 0;
 
     for (int ky = -1; ky <= 1; ++ky) {
         for (int kx = -1; kx <= 1; ++kx) {
-            int nx = x + kx;
-            int ny = y + ky;
+            const int nx = x + kx;
 
-            if (nx >= 0 && ny >= 0 && nx < width() && ny < height()) {
+            if (const int ny = y + ky; nx >= 0 && ny >= 0 && nx < width() && ny < height()) {
                 QColor neighborColor = image().pixelColor(nx, ny);
-                auto weight = kernel[ky + 1][kx + 1];
+                const auto weight = kernel[ky + 1][kx + 1];
 
                 r += neighborColor.redF() * weight;
                 g += neighborColor.greenF() * weight;
@@ -122,27 +117,29 @@ QColor ResizeSharpenProcessor::processPixel(const QPoint &location, PixelColor &
     return QColor::fromRgbF(r, g, b, pixelData.alpha());
 }
 
-double ResizeSharpenProcessor::sharpenStrength() const {
-    return m_sharpenStrength;
-}
-
-void ResizeSharpenProcessor::setSharpenStrength(double sharpenStrength) {
-    m_sharpenStrength = sharpenStrength;
-}
-
 void ResizeSharpenProcessor::preProcess() {}
 
 void ResizeSharpenProcessor::postProcess() {}
 
 /* ------------------------------------------------------------------------------------------- */
 
-ImageStatisticsAnalyser::ImageStatisticsAnalyser(const QImage &image, QImage::Format targetFormat) :
-    ImagePixelProcessor(image, targetFormat) {}
+ImageStatisticsAnalyser::ImageStatisticsAnalyser(const QImage& image, const QImage::Format targetFormat)
+    : ImagePixelProcessor(image, targetFormat), rgbColor{}, m_weightedSum{0}, m_avgBrightness{0}, m_avgLightness{0}, m_avgLuminance{0} {}
 
-QColor ImageStatisticsAnalyser::processPixel(const QPoint &location, PixelColor &pixelData) {
-    double lum = 0.299 * pixelData.red() + 0.587 * pixelData.green() + 0.114 * pixelData.blue();
-    double light = pixelData.lightness();
-    double bright = (pixelData.red() + pixelData.green() + pixelData.blue()) / 3.;
+double ImageStatisticsAnalyser::avgBrightness() const { return m_avgBrightness; }
+
+double ImageStatisticsAnalyser::avgLightness() const { return m_avgLightness; }
+
+double ImageStatisticsAnalyser::avgLuminance() const { return m_avgLuminance; }
+
+int ImageStatisticsAnalyser::colorCount() const { return m_colors.size(); }
+
+int ImageStatisticsAnalyser::rgbColorCount() const { return m_rgbColors.size(); }
+
+QColor ImageStatisticsAnalyser::processPixel(const QPoint& location, PixelColor& pixelData) {
+    const double lum = 0.299 * pixelData.red() + 0.587 * pixelData.green() + 0.114 * pixelData.blue();
+    const double light = pixelData.lightness();
+    const double bright = (pixelData.red() + pixelData.green() + pixelData.blue()) / 3.;
 
     m_avgLuminance += lum * pixelData.alpha();
     m_avgLightness += light * pixelData.alpha();
@@ -150,23 +147,15 @@ QColor ImageStatisticsAnalyser::processPixel(const QPoint &location, PixelColor 
 
     m_weightedSum += pixelData.alpha();
 
-    if (!m_colors.contains(pixelData)) {
-        m_colors[pixelData] = 1;
-    } else {
-        m_colors[pixelData]++;
-    }
+    if (!m_colors.contains(pixelData)) { m_colors[pixelData] = 1; }
+    else { m_colors[pixelData]++; }
 
     rgbColor.rgb[0] = static_cast<uint8_t>(pixelData.red());
     rgbColor.rgb[1] = static_cast<uint8_t>(pixelData.green());
     rgbColor.rgb[2] = static_cast<uint8_t>(pixelData.blue());
 
-    auto colorCode = rgbColor.color;
-
-    if (!m_rgbColors.contains(colorCode)) {
-        m_rgbColors[colorCode] = 1;
-    } else {
-        m_rgbColors[colorCode]++;
-    }
+    if (const auto colorCode = rgbColor.color; !m_rgbColors.contains(colorCode)) { m_rgbColors[colorCode] = 1; }
+    else { m_rgbColors[colorCode]++; }
 
     return pixelData;
 }
@@ -184,48 +173,32 @@ void ImageStatisticsAnalyser::postProcess() {
     m_avgBrightness = m_avgBrightness / m_weightedSum;
 }
 
-double ImageStatisticsAnalyser::avgBrightness() const {
-    return m_avgBrightness;
-}
-
-double ImageStatisticsAnalyser::avgLightness() const {
-    return m_avgLightness;
-}
-
-double ImageStatisticsAnalyser::avgLuminance() const {
-    return m_avgLuminance;
-}
-
-int ImageStatisticsAnalyser::colorCount() {
-    return m_colors.size();
-}
-
-int ImageStatisticsAnalyser::rgbColorCount() {
-    return m_rgbColors.size();
-}
-
 /* ------------------------------------------------------------------------------------------- */
 
 
-QColor BrightnessNormalizer::processPixel(const QPoint &location, PixelColor &pixelData) {
-    return pixelData * m_correctionFactor;
-}
+BrightnessNormalizer::BrightnessNormalizer(const QImage& image, const QImage::Format targetFormat, const double averageBrightness, const double targetBrightness)
+    : ImagePixelProcessor(image, targetFormat),
+      m_targetBrightness(targetBrightness),
+      m_averageBrightness(averageBrightness), m_correctionFactor{0} {}
 
-void BrightnessNormalizer::preProcess() {
-    m_correctionFactor = m_targetBrightness / m_averageBrightness;
-}
+BrightnessNormalizer::BrightnessNormalizer(const double targetBrightness, const double averageBrightness)
+    : m_targetBrightness(targetBrightness),
+      m_averageBrightness(averageBrightness), m_correctionFactor{0} {}
 
+QColor BrightnessNormalizer::processPixel(const QPoint& location, PixelColor& pixelData) { return pixelData * m_correctionFactor; }
+
+void BrightnessNormalizer::preProcess() { m_correctionFactor = m_targetBrightness / m_averageBrightness; }
 void BrightnessNormalizer::postProcess() {}
 
-BrightnessNormalizer::BrightnessNormalizer(const QImage &image, const QImage::Format targetFormat, double averageBrightness, double targetBrightness) :
-    ImagePixelProcessor(image, targetFormat), m_targetBrightness(targetBrightness), m_averageBrightness(averageBrightness) {}
-
-BrightnessNormalizer::BrightnessNormalizer(double targetBrightness, double averageBrightness) :
-    ImagePixelProcessor(), m_targetBrightness(targetBrightness), m_averageBrightness(averageBrightness) {}
-
 /* ------------------------------------------------------------------------------------------- */
 
-QColor RecolorImageProcessor::processPixel(const QPoint &location, PixelColor &pixelData) {
+RecolorImageProcessor::RecolorImageProcessor(const QImage& image, const QImage::Format targetFormat, const QColor& color, const double intensity)
+    : ImagePixelProcessor(image, targetFormat), m_color(color), m_intensity(intensity) {}
+
+RecolorImageProcessor::RecolorImageProcessor(const QColor& color, const double intensity)
+    : m_color(color), m_intensity(intensity) {}
+
+QColor RecolorImageProcessor::processPixel(const QPoint& location, PixelColor& pixelData) {
     auto target = PixelColor{m_color} * m_intensity;
     auto sourceColor = pixelData * (1.0 - m_intensity);
 
@@ -233,12 +206,5 @@ QColor RecolorImageProcessor::processPixel(const QPoint &location, PixelColor &p
 }
 
 void RecolorImageProcessor::preProcess() {}
-
 void RecolorImageProcessor::postProcess() {}
-
-RecolorImageProcessor::RecolorImageProcessor(const QImage &image, const QImage::Format targetFormat, const QColor &color, double intensity)
-    : ImagePixelProcessor(image, targetFormat), m_color(color), m_intensity(intensity) {}
-
-RecolorImageProcessor::RecolorImageProcessor(const QColor &color, double intensity)
-    : ImagePixelProcessor(), m_color(color), m_intensity(intensity) {}
 }

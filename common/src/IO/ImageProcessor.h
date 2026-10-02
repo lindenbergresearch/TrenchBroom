@@ -20,13 +20,11 @@
 
 #include <QImage>
 #include <QColor>
-#include <QPoint>
 #include <QMap>
 
 #include "PixelColor.h"
 
 namespace TrenchBroom::IO {
-
 /**
  * @class ImagePixelProcessor
  * @brief Provides a framework for pixel-by-pixel image processing.
@@ -35,14 +33,16 @@ namespace TrenchBroom::IO {
  * to define specific behavior for individual pixels.
  */
 class ImagePixelProcessor {
-  public:
+public:
+    virtual ~ImagePixelProcessor() = default;
+
     /**
      * Constructor to initialize the processor with an image and an optional target format.
      *
      * @param image The input QImage to process.
      * @param targetFormat The format to which the image should be converted before processing.
      */
-    explicit ImagePixelProcessor(const QImage &image = QImage{}, const QImage::Format targetFormat = QImage::Format::Format_Invalid);
+    explicit ImagePixelProcessor(const QImage& image = QImage{}, const QImage::Format targetFormat = QImage::Format::Format_Invalid);
 
     /**
      * Implicit conversation to a QImage.
@@ -55,13 +55,13 @@ class ImagePixelProcessor {
     }
 
 
-    QImage operator^(ImagePixelProcessor &other) {
+    QImage operator^(ImagePixelProcessor& other) {
         m_sourceImage = other;
         if (!m_processed) process();
         return m_targetImage;
     }
 
-    QImage operator^(ImagePixelProcessor *other) {
+    QImage operator^(const ImagePixelProcessor* other) {
         m_sourceImage = other->m_sourceImage;
         if (!m_processed) process();
         return m_targetImage;
@@ -80,9 +80,9 @@ class ImagePixelProcessor {
      * @param image The new QImage to process.
      * @return A new QImage with the processed pixels.
      */
-    QImage &process(QImage &image);
+    QImage& process(const QImage& image);
 
-    QImage &run();
+    QImage& run();
 
     /**
      * Shorthand operator to add the ability to use the image processor like a function call.
@@ -90,12 +90,9 @@ class ImagePixelProcessor {
      * @param image The image to process.
      * @return The processed image.
      */
-    QImage operator()(QImage &image) {
-        return process(image);
-    }
+    QImage operator()(const QImage& image) { return process(image); }
 
-
-  protected:
+protected:
     /**
      * Virtual method to define custom pixel processing logic.
      *
@@ -103,7 +100,7 @@ class ImagePixelProcessor {
      * @param pixelData The detailed data of the current pixel.
      * @return The processed QColor for the pixel.
      */
-    virtual QColor processPixel(const QPoint &location, PixelColor &pixelData) = 0;
+    virtual QColor processPixel(const QPoint& location, PixelColor& pixelData) = 0;
 
     /**
      * Gets called before any processing is done.
@@ -115,28 +112,17 @@ class ImagePixelProcessor {
      */
     virtual void postProcess() = 0;
 
-  public:
-    int width() {
-        return m_sourceImage.width();
-    }
+public:
+    int width() const { return m_sourceImage.width(); }
+    int height() const { return m_sourceImage.height(); }
+    size_t size() { return size_t(width() * height()); }
+    QImage& image() { return m_sourceImage; }
 
-    int height() {
-        return m_sourceImage.height();
-    }
-
-    size_t size() {
-        return size_t(width() * height());
-    }
-
-    QImage &image() {
-        return m_sourceImage;
-    }
-
-  private:
-    QImage m_sourceImage;          // The input image to be processed
-    QImage m_targetImage;          // The processed image
+private:
+    QImage m_sourceImage; // The input image to be processed
+    QImage m_targetImage; // The processed image
     QImage::Format m_targetFormat; // Optional target format for the image
-    bool m_processed;              // Mark if the images has been processed
+    bool m_processed; // Mark if the images has been processed
 };
 
 /* ------------------------------------------------------------------------------------------- */
@@ -144,29 +130,24 @@ class ImagePixelProcessor {
 using IPList = QList<ImagePixelProcessor *>;
 
 class ImageProcessors {
-  public:
-    ImageProcessors(const QImage &sourceImage) :
-        m_sourceImage(sourceImage), m_processed(false) {}
+public:
+    ImageProcessors(const QImage& sourceImage) : m_sourceImage(sourceImage), m_processed(false) {}
 
     operator QImage &() {
         if (!m_processed) process();
         return m_targetImage;
     }
 
-    void add(ImagePixelProcessor *pixelProcessor) {
-        m_ipList.push_back(pixelProcessor);
-    }
+    void add(ImagePixelProcessor* pixelProcessor) { m_ipList.push_back(pixelProcessor); }
 
     void process() {
         m_targetImage = m_sourceImage;
-        for (auto *processor : m_ipList) {
-            m_targetImage = processor->process(m_targetImage);
-        }
+        for (auto* processor: m_ipList) { m_targetImage = processor->process(m_targetImage); }
 
         m_processed = true;
     }
 
-    QImage &run(const QImage sourceImage) {
+    QImage& run(const QImage& sourceImage) {
         m_sourceImage = sourceImage;
 
         process();
@@ -174,36 +155,18 @@ class ImageProcessors {
         return m_targetImage;
     }
 
-    bool processed() const {
-        return m_processed;
-    }
+    bool processed() const { return m_processed; }
+    void setProcessed(const bool processed) { m_processed = processed; }
+    const QImage& sourceImage() const { return m_sourceImage; }
+    void setSourceImage(const QImage& sourceImage) { m_sourceImage = sourceImage; }
+    const QImage& targetImage() const { return m_targetImage; }
+    void setTargetImage(const QImage& targetImage) { m_targetImage = targetImage; }
 
-    void setProcessed(bool processed) {
-        m_processed = processed;
-    }
-
-    const QImage &sourceImage() const {
-        return m_sourceImage;
-    }
-
-    void setSourceImage(const QImage &sourceImage) {
-        m_sourceImage = sourceImage;
-    }
-
-    const QImage &targetImage() const {
-        return m_targetImage;
-    }
-
-    void setTargetImage(const QImage &targetImage) {
-        m_targetImage = targetImage;
-    }
-
-  private:
+private:
     IPList m_ipList;
     QImage m_targetImage;
     QImage m_sourceImage;
     bool m_processed;
-
 };
 
 
@@ -211,35 +174,29 @@ class ImageProcessors {
 
 
 class GrayScaleProcessor : public ImagePixelProcessor {
-  public:
-    GrayScaleProcessor(const QImage &image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid);
+public:
+    explicit GrayScaleProcessor(const QImage& image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid);
 
-  protected:
-    QColor processPixel(const QPoint &location, PixelColor &pixelColor) override;
-
+protected:
+    QColor processPixel(const QPoint& location, PixelColor& pixelColor) override;
     void preProcess() override;
-
     void postProcess() override;
 };
 
 /* ------------------------------------------------------------------------------------------- */
 
 class ResizeSharpenProcessor : public ImagePixelProcessor {
-  public:
-    ResizeSharpenProcessor(const QImage &image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid, float sharpenStrength = 1.2f);
-
+public:
+    explicit ResizeSharpenProcessor(const QImage& image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid, float sharpenStrength = 1.2f);
     double sharpenStrength() const;
-
     void setSharpenStrength(double sharpenStrength);
 
-  protected:
-    QColor processPixel(const QPoint &location, PixelColor &pixelData) override;
-
+protected:
+    QColor processPixel(const QPoint& location, PixelColor& pixelData) override;
     void preProcess() override;
-
     void postProcess() override;
 
-  private:
+private:
     QVector<QVector<float>> kernel;
     double m_sharpenStrength;
 };
@@ -247,57 +204,48 @@ class ResizeSharpenProcessor : public ImagePixelProcessor {
 /* ------------------------------------------------------------------------------------------- */
 
 class ImageStatisticsAnalyser : public ImagePixelProcessor {
-  public:
-    ImageStatisticsAnalyser(const QImage &image = QImage{}, const QImage::Format targetFormat = QImage::Format_Invalid);
-
+public:
+    explicit ImageStatisticsAnalyser(const QImage& image = QImage{}, const QImage::Format targetFormat = QImage::Format_Invalid);
     double avgBrightness() const;
-
     double avgLightness() const;
-
     double avgLuminance() const;
+    int colorCount() const;
+    int rgbColorCount() const;
 
-    int colorCount();
-
-    int rgbColorCount();
-
-  private:
-
-    union rgb {
-      uint32_t color;
-      uint8_t rgb[3];
+private:
+    union _rgb {
+        uint32_t color;
+        uint8_t rgb[3];
     } rgbColor;
 
     double m_weightedSum;
     double m_avgBrightness;
     double m_avgLightness;
     double m_avgLuminance;
+
     QMap<QRgb, int> m_colors{};
     QMap<QRgb, uint32_t> m_rgbColors{};
 
-  protected:
-    QColor processPixel(const QPoint &location, PixelColor &pixelData) override;
-
+protected:
+    QColor processPixel(const QPoint& location, PixelColor& pixelData) override;
     void preProcess() override;
-
     void postProcess() override;
 };
 
 /* ------------------------------------------------------------------------------------------- */
 
 class BrightnessNormalizer : public ImagePixelProcessor {
-  public:
-    BrightnessNormalizer(const QImage &image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid, double averageBrightness = 0.0, double targetBrightness = 1.0);
+public:
+    explicit BrightnessNormalizer(const QImage& image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid, double averageBrightness = 0.0, double targetBrightness = 1.0);
 
     BrightnessNormalizer(double targetBrightness, double averageBrightness);
 
-  protected:
-    QColor processPixel(const QPoint &location, PixelColor &pixelData) override;
-
+protected:
+    QColor processPixel(const QPoint& location, PixelColor& pixelData) override;
     void preProcess() override;
-
     void postProcess() override;
 
-  private:
+private:
     double m_targetBrightness;
     double m_averageBrightness;
     double m_correctionFactor;
@@ -306,21 +254,20 @@ class BrightnessNormalizer : public ImagePixelProcessor {
 /* ------------------------------------------------------------------------------------------- */
 
 class RecolorImageProcessor : public ImagePixelProcessor {
-  public:
-    RecolorImageProcessor(const QImage &image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid, const QColor &color = QColorConstants::White, double intensity = 0.0);
+public:
+    explicit RecolorImageProcessor(
+        const QImage& image = QImage{}, QImage::Format targetFormat = QImage::Format_Invalid, const QColor& color = QColorConstants::White, double intensity = 0.0
+    );
 
-    RecolorImageProcessor(const QColor &color, double intensity);
+    RecolorImageProcessor(const QColor& color, double intensity);
 
-  protected:
-    QColor processPixel(const QPoint &location, PixelColor &pixelData) override;
-
+protected:
+    QColor processPixel(const QPoint& location, PixelColor& pixelData) override;
     void preProcess() override;
-
     void postProcess() override;
 
-  private:
+private:
     QColor m_color;
     double m_intensity;
 };
-
 }
