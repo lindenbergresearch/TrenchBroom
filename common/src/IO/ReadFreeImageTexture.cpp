@@ -110,7 +110,7 @@ Result<Assets::Texture, ReadTextureError> readFreeImageTextureFromMemory(std::st
 
         if (!checkTextureDimensions(imageWidth, imageHeight)) {
             return ReadTextureError{
-                std::move(name), fmt::format("Invalid texture dimensions: {}*{}", imageWidth, imageHeight)
+                std::move(name), fmt::format("Invalid texture dimensions: {}px x {}px", imageWidth, imageHeight)
             };
         }
 
