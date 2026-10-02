@@ -22,8 +22,6 @@
 #include "Result.h"
 
 #include <filesystem>
-#include <iosfwd>
-#include <string>
 #include <vector>
 
 namespace TrenchBroom {
@@ -41,8 +39,7 @@ struct TextureConfig;
 namespace TrenchBroom::IO {
 class FileSystem;
 
-Result<std::vector<std::filesystem::path>> findTextureCollections(const FileSystem &gameFS, const Model::TextureConfig &textureConfig);
+Result<std::vector<std::filesystem::path>> findTextureCollections(const FileSystem& gameFS, const Model::TextureConfig& textureConfig);
 
-Result<Assets::TextureCollection> loadTextureCollection(const std::filesystem::path &path, const FileSystem &gameFS, const Model::TextureConfig &textureConfig, Logger &logger);
-
+Result<Assets::TextureCollection> loadTextureCollection(const std::filesystem::path& path, const FileSystem& gameFS, const Model::TextureConfig& textureConfig, Logger& logger);
 } // namespace TrenchBroom::IO
