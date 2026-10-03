@@ -31,7 +31,6 @@ namespace TrenchBroom::Renderer {
 class ShaderConfig;
 
 class ShaderManager {
-  private:
     friend class ShaderProgram;
 
     using ShaderCache = std::unordered_map<std::string, Shader>;
@@ -46,7 +45,7 @@ class ShaderManager {
 
     ShaderProgram &program(const ShaderConfig &config);
 
-    ShaderProgram *currentProgram();
+    ShaderProgram *currentProgram() const;
 
   private:
     void setCurrentProgram(ShaderProgram *program);

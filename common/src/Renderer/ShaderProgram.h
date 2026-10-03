@@ -24,74 +24,59 @@
 #include "Result.h"
 
 #include <vm/forward.h>
+#include <vm/vec.h>
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace TrenchBroom::Renderer {
-
 class ShaderManager;
 
 class Shader;
 
 class ShaderProgram {
-  private:
     using UniformVariableCache = std::unordered_map<std::string, GLint>;
     using AttributeLocationCache = std::unordered_map<std::string, GLint>;
 
     std::string m_name;
-
     GLuint m_programId;
 
     mutable UniformVariableCache m_variableCache;
     mutable AttributeLocationCache m_attributeCache;
+    std::unordered_map<std::string, std::vector<vm::vec4f>> m_vec4ArrayCache;
+    std::unordered_map<GLint, GLint> m_intCache;
 
-  public:
+public:
     ShaderProgram(std::string name, GLuint programId);
-
-  deleteCopy(ShaderProgram);
-
-    ShaderProgram(ShaderProgram &&other) noexcept;
-
-    ShaderProgram &operator=(ShaderProgram &&other) noexcept;
-
+    ShaderProgram(ShaderProgram&& other) noexcept;
     ~ShaderProgram();
 
-    void attach(Shader &shader) const;
+    ShaderProgram& operator=(ShaderProgram&& other) noexcept;
+    deleteCopy(ShaderProgram);
 
+    void attach(const Shader& shader) const;
     Result<void> link();
+    void activate(ShaderManager& shaderManager);
+    static void deactivate(ShaderManager& shaderManager);
 
-    void activate(ShaderManager &shaderManager);
+    void set(const std::string& name, bool value);
+    void set(const std::string& name, int value);
+    void set(const std::string& name, size_t value);
+    void set(const std::string& name, float value);
+    void set(const std::string& name, double value);
+    void set(const std::string& name, const vm::vec2f& value) const;
+    void set(const std::string& name, const vm::vec3f& value) const;
+    void set(const std::string& name, const vm::vec4f& value) const;
+    void setVec4Array(const std::string& name, const std::vector<vm::vec4f>& values);
+    void set(const std::string& name, const vm::mat2x2f& value) const;
+    void set(const std::string& name, const vm::mat3x3f& value) const;
+    void set(const std::string& name, const vm::mat4x4f& value) const;
 
-    void deactivate(ShaderManager &shaderManager);
+    GLint findAttributeLocation(const std::string& name) const;
 
-    void set(const std::string &name, bool value);
-
-    void set(const std::string &name, int value);
-
-    void set(const std::string &name, size_t value);
-
-    void set(const std::string &name, float value);
-
-    void set(const std::string &name, double value);
-
-    void set(const std::string &name, const vm::vec2f &value);
-
-    void set(const std::string &name, const vm::vec3f &value);
-
-    void set(const std::string &name, const vm::vec4f &value);
-
-    void set(const std::string &name, const vm::mat2x2f &value);
-
-    void set(const std::string &name, const vm::mat3x3f &value);
-
-    void set(const std::string &name, const vm::mat4x4f &value);
-
-    GLint findAttributeLocation(const std::string &name) const;
-
-  private:
-    GLint findUniformLocation(const std::string &name) const;
-
+private:
+    GLint findUniformLocation(const std::string& name) const;
     bool checkActive() const;
 };
 
