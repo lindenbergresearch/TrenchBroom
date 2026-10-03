@@ -42,6 +42,7 @@ class GLContextManager {
 
   private:
     bool m_initialized;
+    float m_maxAnisotropy = 1.0f;
 
     std::string m_glVendor;
     std::string m_glRenderer;
@@ -57,6 +58,8 @@ class GLContextManager {
     ~GLContextManager();
 
     bool initialized() const;
+
+    float maxAnisotropy() const;
 
     bool initialize();
 
