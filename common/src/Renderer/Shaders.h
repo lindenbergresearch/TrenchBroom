@@ -25,6 +25,7 @@ namespace TrenchBroom::Renderer::Shaders {
 extern const ShaderConfig Grid2DShader;
 extern const ShaderConfig VaryingPCShader;
 extern const ShaderConfig VaryingPUniformCShader;
+extern const ShaderConfig SelectionGuideShader;
 extern const ShaderConfig MiniMapEdgeShader;
 extern const ShaderConfig EntityModelShader;
 extern const ShaderConfig FaceShader;
