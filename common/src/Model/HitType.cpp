@@ -18,21 +18,15 @@
  */
 
 #include "HitType.h"
-
 #include "Ensure.h"
-
 #include <cstddef>
 
-namespace TrenchBroom {
-namespace Model {
-namespace HitType {
+namespace TrenchBroom::Model::HitType {
 Type freeType() {
-    static const std::size_t Bits = (sizeof(Type) * 8);
+    static constexpr std::size_t Bits = sizeof(Type) * 8;
     static std::size_t currentShift = 0;
 
     ensure(currentShift <= Bits, "No more hit types");
     return Type(1) << currentShift++;
 }
-} // namespace HitType
-} // namespace Model
-} // namespace TrenchBroom
+}
