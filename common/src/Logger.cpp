@@ -23,36 +23,17 @@
 #include "PreferenceManager.h"
 
 #include <QString>
-
 #include <string>
 
 namespace TrenchBroom {
-
 /* ------------------------------------------------------------------------------------------- */
 
 
 Logger::~Logger() {}
 
-Logger::LogStream Logger::trace() {
-    return Logger::LogStream(this, LogLevel::Trace);
-}
-
-void Logger::trace(const char *message) {
-    trace(QString(message));
-}
-
-void Logger::trace(const std::string &message) {
-    log(LogLevel::Trace, message);
-}
-
-void Logger::trace(const QString &message) {
-    log(LogLevel::Trace, message);
-}
-
 Logger::LogStream Logger::debug() {
-    return Logger::LogStream(this, LogLevel::Debug);
+    return LogStream(this, LogLevel::Debug);
 }
-
 
 void Logger::debug(const char *message) {
     debug(QString(message));
@@ -69,6 +50,7 @@ void Logger::debug(const QString &message) {
 Logger::LogStream Logger::info() {
     return LogStream(this, LogLevel::Info);
 }
+
 
 void Logger::info(const char *message) {
     info(QString(message));
@@ -114,17 +96,49 @@ void Logger::error(const QString &message) {
     log(LogLevel::Error, message);
 }
 
+Logger::LogStream Logger::trace() {
+    return LogStream(this, LogLevel::Trace);
+}
+
+void Logger::trace(const char *message) {
+    trace(QString(message));
+}
+
+void Logger::trace(const std::string &message) {
+    log(LogLevel::Trace, message);
+}
+
+void Logger::trace(const QString &message) {
+    log(LogLevel::Trace, message);
+}
+
+LogLevel Logger::resolveLogLevel() {
+    if (m_logLevel == LogLevel::None) {
+        // if current loglevel still not initialized but preferences manager available
+        // do read loglevel from preferences
+        if (PreferenceManager::isInitialized()) {
+            m_logLevel = pref(Preferences::AppLogLevel);
+        } else {
+            // not initialized return debug loglevel
+            return LogLevel::Debug;
+        }
+    }
+
+    return m_logLevel;
+}
+
 
 void Logger::log(const LogLevel level, const std::string &message) {
     log(level, QString::fromStdString(message));
 }
 
+void Logger::log(const LogLevel level, const LogMessage *message) {
+    // call subclass implementation
+    if (canLog(level)) doLog(level, message);
+}
+
 void Logger::log(const LogLevel level, const QString &message) {
-    // use the local log-level if set for this logger, else use the global
-    auto actualLevel = m_logLevel > LogLevel::None ? m_logLevel : pref(Preferences::AppLogLevel);
-    if (level < actualLevel) {
-        return;
-    }
+    if (!canLog(level)) return;
 
     // create log-message
     auto *msg = createLogMessage(level, message);
@@ -133,25 +147,12 @@ void Logger::log(const LogLevel level, const QString &message) {
 
     // call subclass implementation
     doLog(level, msg);
-
-}
-
-void Logger::log(const LogLevel level, const LogMessage *message) {
-    // use the local log-level if set for this logger, else use the global
-    auto actualLevel = m_logLevel > LogLevel::None ? m_logLevel : pref(Preferences::AppLogLevel);
-
-    if (level < actualLevel) {
-        return;
-    }
-
-    // call subclass implementation
-    doLog(level, message);
 }
 
 /* ------------------------------------------------------------------------------------------- */
 
 
-LogMessage *Logger::createLogMessage(LogLevel level, const QString &message) {
+LogMessage *Logger::createLogMessage(const LogLevel level, const QString &message) {
     return new LogMessage{level, message};
 }
 
@@ -159,23 +160,22 @@ LogLevel Logger::logLevel() const {
     return m_logLevel;
 }
 
-void Logger::setLogLevel(LogLevel logLevel) {
+void Logger::setLogLevel(const LogLevel logLevel) {
     m_logLevel = logLevel;
 }
 
-/* ------------------------------------------------------------------------------------------- */
-
-void NullLogger::doLog(const LogLevel level, const LogMessage *message) {
-    // trace(message->message);
-    defaultQtLogger.trace() << message->message;
-//    if (message && message->message.size()>0)
-  //  printf("TRACE: %s\n", message->message.toStdString().c_str());
+bool Logger::canLog(const LogLevel &msgLevel) {
+    return msgLevel >= resolveLogLevel();
 }
 
 /* ------------------------------------------------------------------------------------------- */
 
+void NullLogger::doLog(const LogLevel level, const LogMessage *message) {}
 
-void DefaultQtLogger::doLog(LogLevel level, const LogMessage *message) {
+/* ------------------------------------------------------------------------------------------- */
+
+
+void DefaultQtLogger::doLog(const LogLevel level, const LogMessage *message) {
     switch (level) {
         case LogLevel::Trace:
             qDebug().noquote() << message->format(true, m_coloredOut);
@@ -201,49 +201,22 @@ bool DefaultQtLogger::coloredOut() const {
     return m_coloredOut;
 }
 
-void DefaultQtLogger::setColoredOut(bool mColoredOut) {
+void DefaultQtLogger::setColoredOut(const bool mColoredOut) {
     m_coloredOut = mColoredOut;
 }
 
 /* ------------------------------------------------------------------------------------------- */
 
-std::vector<LogMessage *> LogMessageCache::cache{};
-size_t LogMessageCache::m_id{};
-
-
-void LogMessageCache::add(LogMessage *logMessage) {
-    cache.push_back(logMessage);
-}
-
-LogMessage *LogMessageCache::get(size_t id) {
-    return cache[id];
-}
-
-void LogMessageCache::clear() {
-    cache.clear();
-}
-
-size_t LogMessageCache::size() {
-    return cache.size();
-}
-
-size_t LogMessageCache::currentID() {
-    return m_id;
-}
-
-QString LogMessage::format(bool detailed, bool colored) const {
-    auto attr = levelAttributes[level];
-    QString msgStr =
-        colored ?
-        attr.format :
-        QString{};
+QString LogMessage::format(const bool detailed, const bool colored) const {
+    auto [label, format] = levelAttributes[level];
+    auto msgStr = colored ? format : QString{};
 
     if (detailed) {
         msgStr += QString::fromStdString(
             stringf(
                 "[%09.3f] %s %s",
                 time,
-                attr.label.toStdString().c_str(),
+                label.toStdString().c_str(),
                 message.toStdString().c_str()
             )
         );
@@ -259,4 +232,29 @@ QString LogMessage::format(bool detailed, bool colored) const {
 
     return msgStr;
 }
+
+void LogMessageCache::add(LogMessage *logMessage) {
+    cache.push_back(logMessage);
+}
+
+
+LogMessage *LogMessageCache::get(const size_t id) {
+    return cache[id];
+}
+
+void LogMessageCache::clear() {
+    cache.clear();
+}
+
+size_t LogMessageCache::size() {
+    return cache.size();
+}
+
+size_t LogMessageCache::currentID() {
+    return m_id;
+}
+
+std::vector<LogMessage *> LogMessageCache::cache{};
+
+size_t LogMessageCache::m_id{};
 } // namespace TrenchBroom

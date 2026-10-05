@@ -24,11 +24,9 @@
 #include <map>
 
 #include <QString>
-
 #include <type_traits>
 
 #include "Chrono.h"
-#include "StringUtils.h"
 
 class QString;
 
@@ -39,45 +37,53 @@ namespace TrenchBroom {
  * Log-Levels.
  */
 enum class LogLevel {
-  None, Trace, Debug, Info, Warn, Error
+   None = -1,
+   Trace = 1,
+   Debug,
+   Info,
+   Warn,
+   Error
 };
 
 /**
  * Attributes of a certain Log-Level.
  */
 struct LogLevelAttr {
-  QString label;
-  QString format;
+   QString label;
+   QString format;
 };
 
 /**
  * Definition of the level attributes.
  */
+// @formatter:off
 static std::map<LogLevel, LogLevelAttr> levelAttributes = {
-    {LogLevel::None, {"NONE", "\033[0;90m"}},
-    {LogLevel::Trace, {"TRACE", "\033[0;35m"}},
-    {LogLevel::Debug, {"DEBUG", "\033[0;36m"}},
-    {LogLevel::Info, {"INFO ", "\033[0;97m"}},
-    {LogLevel::Warn, {"WARN ", "\033[0;33m"}},
-    {LogLevel::Error, {"ERROR", "\033[0;31m"}},
+    {LogLevel::None,    {"NONE",  "\033[0;90m"}},
+    {LogLevel::Trace,   {"TRACE", "\033[0;35m"}},
+    {LogLevel::Debug,   {"DEBUG", "\033[0;36m"}},
+    {LogLevel::Info,    {" INFO", "\033[0;97m"}},
+    {LogLevel::Warn,    {" WARN", "\033[0;33m"}},
+    {LogLevel::Error,   {"ERROR", "\033[0;31m"}},
 };
+// @formatter:on
 
 /**
  * A LogMessage struct.
  */
 struct LogMessage {
-  LogLevel level;
-  QString message;
-  double time = Chrono::time();
-  uint8_t group = 0x00;
+   LogLevel level;
+   QString message;
+   double time = Chrono::time();
+   uint8_t group = 0x00;
 
 
-  /**
-   * Returns the log-message in a detailed form.
-   * @param colored If true console color-codes are added.
-   * @return The formatted log-message.
-   */
-  inline QString format(bool detailed = true, bool colored = true) const;
+   /**
+    * Returns the log-message in a detailed form.
+    * @param detailed Print detailed format
+    * @param colored If true console color-codes are added.
+    * @return The formatted log-message.
+    */
+   inline QString format(bool detailed = true, bool colored = true) const;
 };
 
 /**
@@ -86,13 +92,9 @@ struct LogMessage {
 class LogMessageCache {
   public:
     static void add(LogMessage *logMessage);
-
     static LogMessage *get(size_t id);
-
     static void clear();
-
     static size_t size();
-
     static size_t currentID();
 
   private:
@@ -115,10 +117,9 @@ class Logger {
      * Messages are buffered in a stringstream and logged upon destruction.
      */
     class LogStream {
-      private:
-        Logger *m_logger;         ///< Pointer to the Logger instance.
-        LogLevel m_logLevel;      ///< The log level for the current message.
-        std::stringstream m_buf;  ///< Buffer for the log message.
+        Logger *m_logger; ///< Pointer to the Logger instance.
+        LogLevel m_logLevel; ///< The log level of the current message.
+        std::stringstream m_buf; ///< Buffer of the log message.
 
       public:
         /**
@@ -127,7 +128,7 @@ class Logger {
          * @param logger Pointer to the Logger instance that will handle the output.
          * @param logLevel The severity level of the log message.
          */
-        LogStream(Logger *logger, LogLevel logLevel)
+        LogStream(Logger *logger, const LogLevel logLevel)
             : m_logger(logger), m_logLevel(logLevel) {}
 
         /**
@@ -151,7 +152,7 @@ class Logger {
          * @param arg The value to be inserted into the log stream.
          * @return Reference to the current LogStream object to allow chaining.
          */
-        template<typename T, typename std::enable_if<!std::is_same<T, QString>::value, int>::type = 0>
+        template<typename T, std::enable_if_t<!std::is_same_v<T, QString>, int> = 0>
         LogStream &operator<<(T &&arg) {
             m_buf << std::forward<T>(arg);
             return *this;
@@ -166,7 +167,7 @@ class Logger {
          * @return Reference to the current LogStream object to allow chaining.
          */
         LogStream &operator<<(const std::string &arg) {
-            m_buf << arg;  // std::string is directly compatible with std::stringstream
+            m_buf << arg; // std::string is directly compatible with std::stringstream
             return *this;
         }
 
@@ -180,7 +181,7 @@ class Logger {
          * @return Reference to the current LogStream object to allow chaining.
          */
         LogStream &operator<<(const QString &arg) {
-            m_buf << arg.toStdString();  // Convert QString to std::string
+            m_buf << arg.toStdString(); // Convert QString to std::string
             return *this;
         }
 
@@ -193,80 +194,64 @@ class Logger {
          * @return Reference to the current LogStream object to allow chaining.
          */
         LogStream &operator<<(const char *arg) {
-            m_buf << arg;  // const char* is compatible with std::stringstream
+            m_buf << arg; // const char* is compatible with std::string stream
             return *this;
         }
     };
 
-  public:
     virtual ~Logger();
 
     // --- DEBUG -------------------------------------- //
 
     LogStream debug();
-
     void debug(const char *message);
-
     void debug(const std::string &message);
-
     void debug(const QString &message);
 
     // --- INFO --------------------------------------- //
 
     LogStream info();
-
     void info(const char *message);
-
     void info(const std::string &message);
-
     void info(const QString &message);
 
     // --- WARNING ------------------------------------ //
 
     LogStream warn();
-
     void warn(const char *message);
-
     void warn(const std::string &message);
-
     void warn(const QString &message);
 
     // --- ERROR -------------------------------------- //
 
     LogStream error();
-
     void error(const char *message);
-
     void error(const std::string &message);
-
     void error(const QString &message);
 
     // --- TRACE -------------------------------------- //
 
     LogStream trace();
-
     void trace(const char *message);
-
     void trace(const std::string &message);
-
     void trace(const QString &message);
 
     // --- LOGGER ------------------------------------- //
+    LogLevel resolveLogLevel();
+
+    bool canLog(const LogLevel &msgLevel);
 
     void log(LogLevel level, const std::string &message);
-
     void log(LogLevel level, const LogMessage *message);
-
     void log(LogLevel level, const QString &message);
 
     LogLevel logLevel() const;
-
     void setLogLevel(LogLevel logLevel);
 
   private:
-    LogLevel m_logLevel = LogLevel::Debug;
+    LogLevel m_logLevel = LogLevel::None;
 
-    LogMessage *createLogMessage(LogLevel level, const QString &message);
+    static LogMessage *createLogMessage(LogLevel level, const QString &message);
 
     virtual void doLog(LogLevel level, const LogMessage *message) = 0;
 };
@@ -274,7 +259,6 @@ class Logger {
 /* ------------------------------------------------------------------------------------------- */
 
 class NullLogger : public Logger {
-  private:
     void doLog(LogLevel level, const LogMessage *message) override;
 };
 
@@ -282,14 +266,11 @@ class NullLogger : public Logger {
 
 
 class DefaultQtLogger : public Logger {
-  private:
     void doLog(LogLevel level, const LogMessage *message) override;
 
     bool coloredOut() const;
-
     void setColoredOut(bool mColoredOut);
 
-  private:
     bool m_coloredOut = true;
     QString m_prefix;
     QString m_rawMessage;
@@ -298,5 +279,5 @@ class DefaultQtLogger : public Logger {
 /**
  * Default static instance.
  */
-static DefaultQtLogger defaultQtLogger = DefaultQtLogger();
+static auto defaultQtLogger = DefaultQtLogger();
 } // namespace TrenchBroom
