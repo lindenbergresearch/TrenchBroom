@@ -34,7 +34,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <iostream>
+#include <cxxabi.h>
 
 namespace TrenchBroom {
 #ifdef _WIN32
@@ -102,24 +103,70 @@ std::string TrenchBroomStackWalker::getStackTrace()
 #endif
 #else
 
-std::string TrenchBroomStackWalker::getStackTrace() {
-    const int MaxDepth = 256;
-    void *callstack[MaxDepth];
-    const int frames = backtrace(callstack, MaxDepth);
+/* ------------------------------------------------------------------------------------------- */
 
-    // copy into a vector
-    std::vector<void *> framesVec(callstack, callstack + frames);
-    if (framesVec.empty())
-        return "";
+/**
+ * Translates the given internal mangled C++ ID into a readable form.
+ *
+ * @param mangled_name The identifier as string to demangle.
+ * @return A readable, demangled name.
+ */
+std::string demangleSymbol(const std::string &mangled_name) {
+    int status = 0;
+    char *demangled = abi::__cxa_demangle(mangled_name.c_str(), nullptr, nullptr, &status);
+    if (status == 0 && demangled != nullptr) {
+        std::string result(demangled);
+        std::free(demangled);
+        return result;
+    }
+
+    return mangled_name;
+}
+
+
+/**
+ * Collects the stack trace of the current thread and returns
+ * it as printable string.
+ *
+ * @return Stacktrace as multiline string.
+ */
+std::string TrenchBroomStackWalker::getStackTrace() {
+    void *callstack[MAX_CALL_STACK_FRAMES];
+    const int frames = backtrace(callstack, MAX_CALL_STACK_FRAMES);
+
+    if (frames <= 0) { return ""; }
+
+    char **strs = backtrace_symbols(callstack, frames);
+    if (!strs) { return ""; }
 
     std::stringstream ss;
-    char **strs = backtrace_symbols(&framesVec.front(), static_cast<int>(framesVec.size()));
-    for (size_t i = 0; i < framesVec.size(); i++) {
-        ss << strs[i] << std::endl;
+
+    for (int i = 0; i < frames; i++) {
+        std::string line(strs[i]);
+
+        // macOS format: "index  binary_name  address  mangled_name + offset"
+        // Find the start of the mangled token (on macOS, C++ symbols start with '_Z')
+        size_t symbolStart = line.find(" _Z");
+        if (symbolStart != std::string::npos) {
+            symbolStart += 1; // Move past the space to the start of '_'
+
+            // Find the end of the token (terminated by a space before the '+' sign)
+            size_t symbolEnd = line.find(" +", symbolStart);
+            if (symbolEnd != std::string::npos) {
+                std::string mangled = line.substr(symbolStart, symbolEnd - symbolStart);
+                std::string demangled = demangleSymbol(mangled);
+
+                // Reconstruct the line replacing the mangled token with the demangled one
+                line.replace(symbolStart, symbolEnd - symbolStart, demangled);
+            }
+        }
+
+        ss << line << "\n";
     }
-    free(strs);
+
+    std::free(strs);
     return ss.str();
 }
 
 #endif
-} // namespace TrenchBroom
+}

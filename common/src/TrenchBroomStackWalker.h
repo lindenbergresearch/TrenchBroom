@@ -22,12 +22,15 @@
 #include <string>
 
 namespace TrenchBroom {
+
 class TrenchBroomStackWalker {
+    static constexpr auto MAX_CALL_STACK_FRAMES = 256;
+
   public:
-#if defined(_WIN32) && defined(_MSC_VER)
+    #if defined(_WIN32) && defined(_MSC_VER)
     static std::string getStackTraceFromContext(void* context);
-#endif
+    #endif
 
     static std::string getStackTrace();
 };
-} // namespace TrenchBroom
+}
