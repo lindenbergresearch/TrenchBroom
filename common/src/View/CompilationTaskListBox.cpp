@@ -40,6 +40,7 @@
 #include "View/TitledPanel.h"
 #include "View/VariableStoreModel.h"
 #include "View/ViewConstants.h"
+#include "TrenchBroomApp.h"
 
 #include <kdl/memory_utils.h>
 #include <kdl/overload.h>
@@ -48,7 +49,8 @@ namespace TrenchBroom::View {
 // CompilationTaskEditorBase
 
 CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_ptr<MapDocument> document, Model::CompilationProfile &profile, Model::CompilationTask &task, QWidget *parent)
-    : ControlListBoxItemRenderer{parent}, m_title{std::move(title)}, m_document{std::move(document)}, m_profile{profile}, m_task{task} {
+    : ControlListBoxItemRenderer{parent}, m_title{std::move(title)}, m_document{std::move(document)}, m_profile{
+    profile}, m_task{task} {
     // request customContextMenuRequested() to be emitted
     setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -122,7 +124,8 @@ void CompilationTaskEditorBase::updateItem() {
 void CompilationTaskEditorBase::updateCompleter(QCompleter *completer) {
     auto workDir = std::string{};
     try {
-        workDir = EL::interpolate(m_profile.workDirSpec, EL::EvaluationContext{CompilationWorkDirVariables{kdl::mem_lock(m_document)}});
+        workDir = EL::interpolate(m_profile.workDirSpec, EL::EvaluationContext{
+            CompilationWorkDirVariables{kdl::mem_lock(m_document)}});
     } catch (const Exception &) {
     }
 
@@ -136,14 +139,14 @@ CompilationExportMapTaskEditor::CompilationExportMapTaskEditor(std::weak_ptr<Map
     : CompilationTaskEditorBase{"Export Map", std::move(document), profile, task, parent} {
     assert(std::holds_alternative<Model::CompilationExportMap>(task));
 
-    auto *formLayout = new QFormLayout{};
+    auto *formLayout = new QFormLayout{this};
     formLayout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::WideVMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
     formLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
     formLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     addMainLayout(formLayout);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(Fonts::fixedWidthFont());
+    m_targetEditor->setFont(APP.getConsoleFont());
     m_targetEditor->setToolTip(R"(The path of the exported file.
 Variables are allowed.)");
     setupCompleter(m_targetEditor);
@@ -182,7 +185,7 @@ CompilationCopyFilesTaskEditor::CompilationCopyFilesTaskEditor(std::weak_ptr<Map
     addMainLayout(formLayout);
 
     m_sourceEditor = new MultiCompletionLineEdit{};
-    m_sourceEditor->setFont(Fonts::fixedWidthFont());
+    m_sourceEditor->setFont(APP.getConsoleFont());
     m_sourceEditor->setToolTip(R"(The file(s) to copy.
 
 Use wildcards (*,?) in the filename to specify more than one file.
@@ -191,7 +194,7 @@ Variables are allowed.)");
     formLayout->addRow("Source File Path", m_sourceEditor);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(Fonts::fixedWidthFont());
+    m_targetEditor->setFont(APP.getConsoleFont());
     m_targetEditor->setToolTip(R"(The directory to copy the files to.
 
 The directory is recursively created if it does not exist.
@@ -243,7 +246,7 @@ CompilationRenameFileTaskEditor::CompilationRenameFileTaskEditor(std::weak_ptr<M
     addMainLayout(formLayout);
 
     m_sourceEditor = new MultiCompletionLineEdit{};
-    m_sourceEditor->setFont(Fonts::fixedWidthFont());
+    m_sourceEditor->setFont(APP.getConsoleFont());
     m_sourceEditor->setToolTip(R"(The file to rename or move.
 
 Wildcards are not supported.
@@ -252,7 +255,7 @@ Variables are allowed.)");
     formLayout->addRow("Source File Path", m_sourceEditor);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(Fonts::fixedWidthFont());
+    m_targetEditor->setFont(APP.getConsoleFont());
     m_targetEditor->setToolTip(R"(The new path for the file.
 
 The path must end in a filename.
@@ -305,7 +308,7 @@ CompilationDeleteFilesTaskEditor::CompilationDeleteFilesTaskEditor(std::weak_ptr
     addMainLayout(formLayout);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(Fonts::fixedWidthFont());
+    m_targetEditor->setFont(APP.getConsoleFont());
     m_targetEditor->setToolTip(R"(The file(s) to delete.
 
 Use wildcards (*,?) in the filename to specify more than one file.
@@ -348,7 +351,7 @@ CompilationRunToolTaskEditor::CompilationRunToolTaskEditor(std::weak_ptr<MapDocu
     addMainLayout(formLayout);
 
     m_toolEditor = new MultiCompletionLineEdit{};
-    m_toolEditor->setFont(Fonts::fixedWidthFont());
+    m_toolEditor->setFont(APP.getConsoleFont());
     m_toolEditor->setToolTip(R"(The absolute path to the executable of the tool that should be run.
 
 The working "directory is set to the profile's working directory if configured.
@@ -367,7 +370,7 @@ Variables are allowed.)");
     formLayout->addRow("Tool Path", toolLayout);
 
     m_parametersEditor = new MultiCompletionLineEdit{};
-    m_parametersEditor->setFont(Fonts::fixedWidthFont());
+    m_parametersEditor->setFont(APP.getConsoleFont());
     m_parametersEditor->setToolTip(R"(The parameters that should be passed to the tool when it is executed.
 Variables are allowed.)");
 
@@ -399,7 +402,8 @@ void CompilationRunToolTaskEditor::updateItem() {
     }
 
     if (m_treatNonZeroResultCodeAsError->isChecked() != task().treatNonZeroResultCodeAsError) {
-        m_treatNonZeroResultCodeAsError->setCheckState(task().treatNonZeroResultCodeAsError ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+        m_treatNonZeroResultCodeAsError->setCheckState(task().treatNonZeroResultCodeAsError ? Qt::CheckState::Checked
+                                                                                            : Qt::CheckState::Unchecked);
     }
 }
 
@@ -435,7 +439,8 @@ void CompilationRunToolTaskEditor::treatNonZeroResultCodeAsErrorChanged(const in
 // CompilationTaskListBox
 
 CompilationTaskListBox::CompilationTaskListBox(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : ControlListBox{"Click the '+' button to create a task.", QMargins{}, false, parent}, m_document{std::move(document)} {
+    : ControlListBox{"Click the '+' button to create a task.", QMargins{}, false, parent}, m_document{
+    std::move(document)} {
 }
 
 void CompilationTaskListBox::setProfile(Model::CompilationProfile *profile) {
