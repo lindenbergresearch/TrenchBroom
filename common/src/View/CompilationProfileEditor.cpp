@@ -36,13 +36,15 @@
 #include "View/TitledPanel.h"
 #include "View/VariableStoreModel.h"
 #include "View/ViewConstants.h"
+#include "TrenchBroomApp.h"
 
 #include <kdl/memory_utils.h>
 #include <kdl/vector_utils.h>
 
 namespace TrenchBroom {
 namespace View {
-CompilationProfileEditor::CompilationProfileEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget{parent}, m_document{std::move(document)} {
+CompilationProfileEditor::CompilationProfileEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget{
+    parent}, m_document{std::move(document)} {
     setBaseWindowColor(this);
 
     m_stackedWidget = new QStackedWidget{this};
@@ -71,7 +73,7 @@ QWidget *CompilationProfileEditor::createEditorPage(QWidget *parent) {
 
     m_workDirTxt->setMultiCompleter(completer);
     m_workDirTxt->setWordDelimiters(QRegularExpression{"\\$"}, QRegularExpression{"\\}"});
-    m_workDirTxt->setFont(Fonts::fixedWidthFont());
+    m_workDirTxt->setFont(APP.getConsoleFont());
     m_workDirTxt->setToolTip(R"(A working directory for the compilation profile. Variables are allowed.)");
 
     auto *upperLayout = new QFormLayout{};
@@ -91,7 +93,7 @@ QWidget *CompilationProfileEditor::createEditorPage(QWidget *parent) {
     taskListLayout->addWidget(m_taskList);
     panel->getPanel()->setLayout(taskListLayout);
 
-    m_addTaskButton = createBitmapButton("Add.svg", "Add task");
+    m_addTaskButton = createBitmapButton("Add.svg", "Add a task");
     m_removeTaskButton = createBitmapButton("Remove.svg", "Remove the selected task");
     m_moveTaskUpButton = createBitmapButton("Up.svg", "Move the selected task up");
     m_moveTaskDownButton = createBitmapButton("Down.svg", "Move the selected task down");
@@ -118,11 +120,11 @@ QWidget *CompilationProfileEditor::createEditorPage(QWidget *parent) {
         const auto index = static_cast<int>(*kdl::vec_index_of(m_profile->tasks, task));
 
         auto menu = QMenu{this};
-        auto *moveUpAction = menu.addAction(tr("Move Up"), this, [=]() { moveTaskUp(index); });
-        auto *moveDownAction = menu.addAction(tr("Move Down"), this, [=]() { moveTaskDown(index); });
+        auto *moveUpAction = menu.addAction(tr("Move Up"), this, [=, this]() { moveTaskUp(index); });
+        auto *moveDownAction = menu.addAction(tr("Move Down"), this, [=, this]() { moveTaskDown(index); });
         menu.addSeparator();
-        menu.addAction(tr("Duplicate"), this, [=]() { duplicateTask(index); });
-        menu.addAction(tr("Remove"), this, [=]() { removeTask(index); });
+        menu.addAction(tr("Duplicate"), this, [=, this]() { duplicateTask(index); });
+        menu.addAction(tr("Remove"), this, [=, this]() { removeTask(index); });
 
         moveUpAction->setEnabled(index > 0);
         moveDownAction->setEnabled(static_cast<size_t>(index + 1) < m_profile->tasks.size());
@@ -276,7 +278,8 @@ void CompilationProfileEditor::refresh() {
     m_addTaskButton->setEnabled(m_profile);
     m_removeTaskButton->setEnabled(m_profile && m_taskList->currentRow() >= 0);
     m_moveTaskUpButton->setEnabled(m_profile && m_taskList->currentRow() > 0);
-    m_moveTaskDownButton->setEnabled(m_profile && m_taskList->currentRow() >= 0 && m_taskList->currentRow() < static_cast<int>(m_profile->tasks.size()) - 1);
+    m_moveTaskDownButton->setEnabled(m_profile && m_taskList->currentRow() >= 0 &&
+                                     m_taskList->currentRow() < static_cast<int>(m_profile->tasks.size()) - 1);
 }
 } // namespace View
 } // namespace TrenchBroom
