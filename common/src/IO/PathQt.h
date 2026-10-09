@@ -26,10 +26,10 @@
 
 namespace TrenchBroom {
 namespace IO {
-QString pathAsQString(const std::filesystem::path &path);
+QString pathAsQString(const std::filesystem::path &path, const std::string &emptyPlaceholder = "");
 
 QString pathAsGenericQString(const std::filesystem::path &path);
 
 std::filesystem::path pathFromQString(const QString &path);
-} // namespace IO
-} // namespace TrenchBroom
+}
+}

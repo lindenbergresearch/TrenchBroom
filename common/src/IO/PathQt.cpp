@@ -21,7 +21,8 @@
 
 namespace TrenchBroom {
 namespace IO {
-QString pathAsQString(const std::filesystem::path &path) {
+QString pathAsQString(const std::filesystem::path &path, const std::string &emptyPlaceholder) {
+    if (path.empty()) return QString::fromStdString(emptyPlaceholder);
     return QString::fromStdString(path.string());
 }
 
