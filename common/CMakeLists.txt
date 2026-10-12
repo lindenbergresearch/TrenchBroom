@@ -90,6 +90,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/IO/ResourceUtils.cpp
         ${COMMON_SOURCE_DIR}/IO/SimpleParserStatus.cpp
         ${COMMON_SOURCE_DIR}/IO/SkinLoader.cpp
+        ${COMMON_SOURCE_DIR}/IO/Skybox.cpp
         ${COMMON_SOURCE_DIR}/IO/SprParser.cpp
         ${COMMON_SOURCE_DIR}/IO/StandardMapParser.cpp
         ${COMMON_SOURCE_DIR}/IO/SystemPaths.cpp
@@ -209,6 +210,10 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Renderer/EntityDecalRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/EntityModelRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/EntityRenderer.cpp
+        ${COMMON_SOURCE_DIR}/Renderer/SpatialLightMesh.cpp
+        ${COMMON_SOURCE_DIR}/Renderer/Lighting.cpp
+        ${COMMON_SOURCE_DIR}/Renderer/LightingOcclusion.cpp
+        ${COMMON_SOURCE_DIR}/Renderer/PreviewLightmap.cpp
         ${COMMON_SOURCE_DIR}/Renderer/FaceRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/FontDescriptor.cpp
         ${COMMON_SOURCE_DIR}/Renderer/FontFactory.cpp
@@ -248,6 +253,7 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/Renderer/ShaderProgram.cpp
         ${COMMON_SOURCE_DIR}/Renderer/Shaders.cpp
         ${COMMON_SOURCE_DIR}/Renderer/Sphere.cpp
+        ${COMMON_SOURCE_DIR}/Renderer/SkyRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/SpikeGuideRenderer.cpp
         ${COMMON_SOURCE_DIR}/Renderer/TextAnchor.cpp
         ${COMMON_SOURCE_DIR}/Renderer/TextRenderer.cpp
@@ -277,7 +283,6 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/BorderLine.cpp
         ${COMMON_SOURCE_DIR}/View/BorderPanel.cpp
         ${COMMON_SOURCE_DIR}/View/BrushVertexCommands.cpp
-        ${COMMON_SOURCE_DIR}/View/CachingLogger.cpp
         ${COMMON_SOURCE_DIR}/View/CameraAnimation.cpp
         ${COMMON_SOURCE_DIR}/View/CameraLinkHelper.cpp
         ${COMMON_SOURCE_DIR}/View/CameraTool2D.cpp
@@ -311,6 +316,9 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/Console.cpp
         ${COMMON_SOURCE_DIR}/View/ContainerBar.cpp
         ${COMMON_SOURCE_DIR}/View/ControlListBox.cpp
+        ${COMMON_SOURCE_DIR}/View/ContextOverlay.cpp
+        ${COMMON_SOURCE_DIR}/View/ContextOverlayData.cpp
+        ${COMMON_SOURCE_DIR}/View/ContextOverlayTemplate.cpp
         ${COMMON_SOURCE_DIR}/View/ControlListBox.cpp
         ${COMMON_SOURCE_DIR}/View/CrashDialog.cpp
         ${COMMON_SOURCE_DIR}/View/CreateBrushesToolBase.cpp
@@ -382,7 +390,14 @@ set(COMMON_SOURCE
         ${COMMON_SOURCE_DIR}/View/Lasso.cpp
         ${COMMON_SOURCE_DIR}/View/LaunchGameEngineDialog.cpp
         ${COMMON_SOURCE_DIR}/View/LayerEditor.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerInspector.cpp
         ${COMMON_SOURCE_DIR}/View/LayerListBox.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerTreeItemRenderer.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerTreeLayerRenderer.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerTreeGroupRenderer.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerTreeEntityRenderer.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerTreeBrushRenderer.cpp
+        ${COMMON_SOURCE_DIR}/View/LayerTreePatchRenderer.cpp
         ${COMMON_SOURCE_DIR}/View/LimitedKeySequenceEdit.cpp
         ${COMMON_SOURCE_DIR}/View/MainMenuBuilder.cpp
         ${COMMON_SOURCE_DIR}/View/MapDocument.cpp
@@ -825,7 +840,6 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/BorderLine.h
         ${COMMON_SOURCE_DIR}/View/BorderPanel.h
         ${COMMON_SOURCE_DIR}/View/BrushVertexCommands.h
-        ${COMMON_SOURCE_DIR}/View/CachingLogger.h
         ${COMMON_SOURCE_DIR}/View/CameraAnimation.h
         ${COMMON_SOURCE_DIR}/View/CameraLinkHelper.h
         ${COMMON_SOURCE_DIR}/View/CameraTool2D.h
@@ -859,6 +873,9 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/Console.h
         ${COMMON_SOURCE_DIR}/View/ContainerBar.h
         ${COMMON_SOURCE_DIR}/View/ControlListBox.h
+        ${COMMON_SOURCE_DIR}/View/ContextOverlay.h
+        ${COMMON_SOURCE_DIR}/View/ContextOverlayData.h
+        ${COMMON_SOURCE_DIR}/View/ContextOverlayTemplate.h
         ${COMMON_SOURCE_DIR}/View/CrashDialog.h
         ${COMMON_SOURCE_DIR}/View/CreateBrushesToolBase.h
         ${COMMON_SOURCE_DIR}/View/AssembleBrushTool.h
@@ -929,7 +946,9 @@ set(COMMON_HEADER
         ${COMMON_SOURCE_DIR}/View/Lasso.h
         ${COMMON_SOURCE_DIR}/View/LaunchGameEngineDialog.h
         ${COMMON_SOURCE_DIR}/View/LayerEditor.h
+        ${COMMON_SOURCE_DIR}/View/LayerInspector.h
         ${COMMON_SOURCE_DIR}/View/LayerListBox.h
+        ${COMMON_SOURCE_DIR}/View/LayerTreeItemRenderer.h
         ${COMMON_SOURCE_DIR}/View/LimitedKeySequenceEdit.h
         ${COMMON_SOURCE_DIR}/View/MainMenuBuilder.h
         ${COMMON_SOURCE_DIR}/View/MapDocument.h
