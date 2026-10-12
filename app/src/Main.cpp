@@ -20,7 +20,6 @@
 #include <QApplication>
 #include <QSettings>
 #include <QString>
-#include <QSurfaceFormat>
 #include <QtGlobal>
 
 #include "IO/SystemPaths.h"
@@ -28,28 +27,23 @@
 #include "TrenchBroomApp.h"
 #include "View/RenderView.h"
 #include "Preferences.h"
-#include "Logger.h"
 
 using namespace TrenchBroom;
 
 extern void qt_set_sequence_auto_mnemonic(bool b);
-
-Logger &logger() {
-    return defaultQtLogger;
-}
 
 /**
  * Set OpenGL defaults
  * Needs to be done here before QApplication is created
  * (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
  */
-void setupFormatOptions() {
+static void setupFormatOptions() {
     QSurfaceFormat format;
-    format.setRenderableType(QSurfaceFormat::OpenGL);
+    format.setRenderableType(QSurfaceFormat::DefaultRenderableType);
     format.setColorSpace((QSurfaceFormat::ColorSpace) pref(Preferences::RendererColorSpace));
-    format.setSwapBehavior((QSurfaceFormat::SwapBehavior) pref(Preferences::RendererSwapBehavior));
+    format.setSwapBehavior(QSurfaceFormat::SwapBehavior::TripleBuffer);
     format.setDepthBufferSize(pref(Preferences::RendererDepthBufferSize));
-    format.setSwapInterval(pref(Preferences::RendererSwapInterval));
+    format.setSwapInterval(0);
     format.setSamples(pref(Preferences::RendererSamples));
     QSurfaceFormat::setDefaultFormat(format);
 }
@@ -58,13 +52,14 @@ int main(int argc, char *argv[]) {
     // Makes all QOpenGLWidget in the application share a single context
     // (default behaviour would be for QOpenGLWidget's in a single top-level window to share
     // a context.) see: http://doc.qt.io/qt-5/qopenglwidget.html#context-sharing
-   // QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    // QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
     // Set up Hi DPI scaling
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     // Enables non-integer scaling (e.g. 150% scaling on Windows)
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
@@ -76,7 +71,7 @@ int main(int argc, char *argv[]) {
     // Qt's emulation so we can implement it ourselves in InputEventRecorder::recordEvent
     qputenv("QT_MAC_DONT_OVERRIDE_CTRL_LMB", "1");
 
-    // Disable Qt OpenGL buglist; since we require desktop OpenGL 2.1 there's no point in
+    // Disable Qt OpenGL bug list; since we require desktop OpenGL 2.1 there's no point in
     // having Qt disable it (also we've had reports of some Intel drivers being blocked that
     // actually work with TB.)
     qputenv("QT_OPENGL_BUGLIST", ":/opengl_buglist.json");
@@ -94,7 +89,9 @@ int main(int argc, char *argv[]) {
     // PreferenceManager is destroyed by TrenchBroomApp::~TrenchBroomApp()
     PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
     setupFormatOptions();
+
     View::TrenchBroomApp app(argc, argv);
     app.parseCommandLineAndShowFrame();
+
     return app.exec();
 }
