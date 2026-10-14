@@ -24,7 +24,6 @@
 #include <QVariant>
 
 #include "IO/PathQt.h"
-#include "Notifier.h"
 #include "View/QtUtils.h"
 
 #include <kdl/vector_utils.h>
@@ -38,6 +37,7 @@ std::vector<std::filesystem::path> loadRecentDocuments(const size_t max) {
     for (size_t i = 0; i < max; ++i) {
         const auto key = QString::fromStdString("RecentDocuments/" + std::to_string(i));
         const auto value = settings.value(key);
+
         if (value.isValid()) {
             result.push_back(IO::pathFromQString(value.toString()));
         } else {
@@ -80,18 +80,21 @@ void RecentDocuments::reload() {
 void RecentDocuments::addMenu(QMenu &menu) {
     clearMenu(menu);
     createMenuItems(menu);
-    m_menus.push_back(&menu);
+    if (std::find(m_menus.begin(), m_menus.end(), &menu) == m_menus.end()) {
+        m_menus.push_back(&menu);
+    }
 }
 
 void RecentDocuments::removeMenu(QMenu &menu) {
+    std::erase_if(m_menus, [&](const auto &registered) { return !registered || registered.data() == &menu; });
     clearMenu(menu);
-    m_menus = kdl::vec_erase(std::move(m_menus), &menu);
 }
 
 void RecentDocuments::updatePath(const std::filesystem::path &path) {
     const auto previousDocuments = m_filteredDocuments;
     insertPath(path);
     saveToConfig();
+
     if (m_filteredDocuments != previousDocuments) {
         updateMenus();
         emit didChange();
@@ -134,13 +137,21 @@ void RecentDocuments::insertPath(const std::filesystem::path &path) {
     if (m_recentDocuments.size() > m_maxSize) {
         m_recentDocuments.pop_back();
     }
+
     updateFilteredDocuments();
 }
 
 void RecentDocuments::updateMenus() {
-    for (auto *menu : m_menus) {
-        clearMenu(*menu);
-        createMenuItems(*menu);
+    std::erase_if(m_menus, [](const auto &menu) { return menu.isNull(); });
+    // Clearing actions can invoke callbacks that unregister or destroy other menus.
+    const auto menus = m_menus;
+    for (const auto &menu : menus) {
+        if (menu) {
+            clearMenu(*menu);
+            if (menu) {
+                createMenuItems(*menu);
+            }
+        }
     }
 }
 
@@ -150,7 +161,11 @@ void RecentDocuments::clearMenu(QMenu &menu) {
 
 void RecentDocuments::createMenuItems(QMenu &menu) {
     for (const auto &path : m_filteredDocuments) {
-        menu.addAction(IO::pathAsQString(path.filename()), [this, path]() { loadDocument(path); });
+        menu.addAction(IO::pathAsQString(path.filename()), this, [this, path]() {
+            // Opening a map can rebuild this menu and delete this action and its capture.
+            const auto documentPath = path;
+            emit loadDocument(documentPath);
+        });
     }
 }
 

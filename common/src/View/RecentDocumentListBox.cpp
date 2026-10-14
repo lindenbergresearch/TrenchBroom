@@ -43,18 +43,18 @@ size_t RecentDocumentListBox::itemCount() const {
     return app.recentDocuments().size();
 }
 
-QPixmap RecentDocumentListBox::image(const size_t /* index */) const {
+const QPixmap &RecentDocumentListBox::image(const size_t /* index */) const {
     return m_documentIcon;
 }
 
-QString RecentDocumentListBox::title(const size_t index) const {
+const QString RecentDocumentListBox::title(const size_t index) const {
     const auto &app = View::TrenchBroomApp::instance();
     const auto &recentDocuments = app.recentDocuments();
     ensure(index < recentDocuments.size(), "index out of range");
     return IO::pathAsQString(recentDocuments[index].filename());
 }
 
-QString RecentDocumentListBox::subtitle(const size_t index) const {
+const QString RecentDocumentListBox::subtitle(const size_t index) const {
     const auto &app = View::TrenchBroomApp::instance();
     const auto &recentDocuments = app.recentDocuments();
     ensure(index < recentDocuments.size(), "index out of range");

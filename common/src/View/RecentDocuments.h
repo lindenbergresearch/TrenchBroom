@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QObject>
+#include <QPointer>
 
 #include "Notifier.h"
 
@@ -37,7 +38,7 @@ void saveRecentDocuments(const std::vector<std::filesystem::path> &paths);
 class RecentDocuments : public QObject {
   Q_OBJECT
   private:
-    using MenuList = std::vector<QMenu *>;
+    using MenuList = std::vector<QPointer<QMenu>>;
     MenuList m_menus;
 
     size_t m_maxSize;
@@ -51,34 +52,24 @@ class RecentDocuments : public QObject {
     std::vector<std::filesystem::path> recentDocuments() const;
 
     void reload();
-
     void addMenu(QMenu &menu);
-
     void removeMenu(QMenu &menu);
-
     void updatePath(const std::filesystem::path &path);
-
     void removePath(const std::filesystem::path &path);
 
   private:
     void loadFromConfig();
-
     void saveToConfig();
 
     std::vector<std::filesystem::path> updateFilteredDocuments();
 
     void insertPath(const std::filesystem::path &path);
-
     void updateMenus();
-
     void clearMenu(QMenu &menu);
-
     void createMenuItems(QMenu &menu);
 
   signals:
-
     void loadDocument(const std::filesystem::path &path) const;
-
     void didChange();
 };
 } // namespace TrenchBroom::View

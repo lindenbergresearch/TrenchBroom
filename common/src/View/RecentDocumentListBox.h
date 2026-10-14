@@ -35,18 +35,14 @@ class RecentDocumentListBox : public ImageListBox {
     explicit RecentDocumentListBox(QWidget *parent = nullptr);
 
   private slots:
-
     void recentDocumentsDidChange();
 
   private:
     size_t itemCount() const override;
 
-    QPixmap image(size_t index) const override;
-
-    QString title(size_t index) const override;
-
-    QString subtitle(size_t index) const override;
-
+    const QPixmap &image(size_t index) const override;
+    const QString title(size_t index) const override;
+    const QString subtitle(size_t index) const override;
     void doubleClicked(size_t index) override;
 
   signals:
