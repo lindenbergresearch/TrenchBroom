@@ -4,8 +4,8 @@ set(APP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(APP_RESOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 
 set(APP_SOURCE
-        "${APP_SOURCE_DIR}/Main.cpp"
-        "${APP_RESOURCE_DIR}/qrc/resources.qrc")
+    "${APP_SOURCE_DIR}/Main.cpp"
+    "${APP_RESOURCE_DIR}/qrc/resources.qrc")
 
 # OS X app bundle configuration, must happen before the executable is added
 if (APPLE)
@@ -23,6 +23,18 @@ if (APPLE)
     file(GLOB_RECURSE MACOSX_FONT_FILES "${APP_RESOURCE_DIR}/fonts/*.*")
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_FONT_FILES})
     set_source_files_properties(${MACOSX_FONT_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/fonts)
+
+    # Configure cursor
+    file(GLOB_RECURSE MACOSX_CURSOR_FILES RELATIVE ${APP_RESOURCE_DIR}/cursor "${APP_RESOURCE_DIR}/cursor/*.*")
+
+    # Set correct locations for cursor files
+    foreach (CURSOR_FILE ${MACOSX_CURSOR_FILES})
+        get_filename_component(CURSOR_FILE_DIR "${CURSOR_FILE}" DIRECTORY)
+        set(CURSOR_FILE "${APP_RESOURCE_DIR}/cursor/${CURSOR_FILE}")
+
+        set(APP_SOURCE ${APP_SOURCE} ${CURSOR_FILE})
+        set_source_files_properties(${CURSOR_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/cursor/${CURSOR_FILE_DIR} HEADER_FILE_ONLY ON)
+    endforeach ()
 
     # Configure default resources
     # Collect all default resources
@@ -67,14 +79,15 @@ if (APPLE)
     # Configure shaders
     # Collect all shaders
     file(GLOB_RECURSE MACOSX_SHADER_FILES
-            "${APP_RESOURCE_DIR}/shader/*.fragsh"
-            "${APP_RESOURCE_DIR}/shader/*.vertsh")
+         "${APP_RESOURCE_DIR}/shader/*.fragsh"
+         "${APP_RESOURCE_DIR}/shader/*.vertsh")
+
     set_source_files_properties(${MACOSX_SHADER_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/shader)
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_SHADER_FILES})
 
     # Configure Qt stylesheets
     file(GLOB_RECURSE MACOSX_STYLESHEET_FILES
-            "${APP_RESOURCE_DIR}/stylesheets/*.qss")
+         "${APP_RESOURCE_DIR}/stylesheets/*.qss")
     set_source_files_properties(${MACOSX_STYLESHEET_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/stylesheets)
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_STYLESHEET_FILES})
 
@@ -144,7 +157,7 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
             string(REPLACE "qmake" "macdeployqt" TB_MACDEPLOYQT_PATH "${TB_QMAKE_PATH}")
 
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                    COMMAND "${TB_MACDEPLOYQT_PATH}" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../..")
+                               COMMAND "${TB_MACDEPLOYQT_PATH}" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../..")
         endif ()
     endif ()
 
@@ -152,27 +165,27 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
     if (WIN32)
         # Copy icons to target dir
         add_custom_command(TARGET ${APP_TARGET_NAME} PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/AppIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
-                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/DocIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
-                COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/WindowIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}")
+                           COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/AppIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
+                           COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/DocIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
+                           COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/WindowIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}")
 
         # Copy DLLs to app directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:assimp::assimp>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freeimage::FreeImage>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freetype>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:tinyxml2::tinyxml2>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:miniz::miniz>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fmt::fmt>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:GLEW::GLEW>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
-                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles")
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:assimp::assimp>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freeimage::FreeImage>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freetype>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:tinyxml2::tinyxml2>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:miniz::miniz>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fmt::fmt>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:GLEW::GLEW>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
+                           COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles")
     endif ()
 
     # Generate a small stripped PDB for release builds so we get stack traces with symbols
@@ -192,51 +205,51 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
     if (WIN32 OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD")
         # Copy button images to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/graphics/images" "${APP_RESOURCE_DEST_DIR}/images")
+                           COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/graphics/images" "${APP_RESOURCE_DEST_DIR}/images")
 
         # Copy fonts to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/fonts" "${APP_RESOURCE_DEST_DIR}/fonts")
+                           COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/fonts" "${APP_RESOURCE_DEST_DIR}/fonts")
 
         # Copy default resources to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/defaults/" "${APP_RESOURCE_DEST_DIR}/defaults")
+                           COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/defaults/" "${APP_RESOURCE_DEST_DIR}/defaults")
 
         # Copy game files to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games/" "${APP_RESOURCE_DEST_DIR}/games")
+                           COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games/" "${APP_RESOURCE_DEST_DIR}/games")
 
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             # Copy untested game files to resources directory
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games-testing/" "${APP_RESOURCE_DEST_DIR}/games")
+                               COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/games-testing/" "${APP_RESOURCE_DEST_DIR}/games")
         endif ()
 
         # Copy shader files to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/shader" "${APP_RESOURCE_DEST_DIR}/shader")
+                           COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/shader" "${APP_RESOURCE_DEST_DIR}/shader")
 
         # Copy Qt stylesheet files to resources directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_RESOURCE_DEST_DIR}/stylesheets/"
-                COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/stylesheets" "${APP_RESOURCE_DEST_DIR}/stylesheets")
+                           COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_RESOURCE_DEST_DIR}/stylesheets/"
+                           COMMAND ${CMAKE_COMMAND} -E copy_directory "${APP_RESOURCE_DIR}/stylesheets" "${APP_RESOURCE_DEST_DIR}/stylesheets")
 
         if (${SHOULD_BUILD_MANUAL})
             # Copy manual files to resource directory
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_RESOURCE_DEST_DIR}/manual/"
-                    COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_RESOURCE_DEST_DIR}/manual/images"
-                    COMMAND ${CMAKE_COMMAND} -E copy "${INDEX_OUTPUT_PATH}" "${APP_RESOURCE_DEST_DIR}/manual/"
-                    COMMAND ${CMAKE_COMMAND} -E copy "${DOC_MANUAL_SHORTCUTS_JS_TARGET_ABSOLUTE}" "${APP_RESOURCE_DEST_DIR}/manual/")
+                               COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_RESOURCE_DEST_DIR}/manual/"
+                               COMMAND ${CMAKE_COMMAND} -E make_directory "${APP_RESOURCE_DEST_DIR}/manual/images"
+                               COMMAND ${CMAKE_COMMAND} -E copy "${INDEX_OUTPUT_PATH}" "${APP_RESOURCE_DEST_DIR}/manual/"
+                               COMMAND ${CMAKE_COMMAND} -E copy "${DOC_MANUAL_SHORTCUTS_JS_TARGET_ABSOLUTE}" "${APP_RESOURCE_DEST_DIR}/manual/")
 
             foreach (MANUAL_FILE ${DOC_MANUAL_TARGET_FILES_ABSOLUTE})
                 add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy ${MANUAL_FILE} "${APP_RESOURCE_DEST_DIR}/manual/")
+                                   COMMAND ${CMAKE_COMMAND} -E copy ${MANUAL_FILE} "${APP_RESOURCE_DEST_DIR}/manual/")
             endforeach (MANUAL_FILE)
 
             foreach (MANUAL_IMAGE_FILE ${DOC_MANUAL_TARGET_IMAGE_FILES_ABSOLUTE})
                 add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy ${MANUAL_IMAGE_FILE} "${APP_RESOURCE_DEST_DIR}/manual/images/")
+                                   COMMAND ${CMAKE_COMMAND} -E copy ${MANUAL_IMAGE_FILE} "${APP_RESOURCE_DEST_DIR}/manual/images/")
             endforeach (MANUAL_IMAGE_FILE)
         endif ()
     endif ()
