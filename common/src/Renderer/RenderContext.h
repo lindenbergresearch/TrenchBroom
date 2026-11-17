@@ -29,6 +29,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+class ScreenLabelLayout;
 class Camera;
 
 class FontManager;
@@ -80,6 +81,7 @@ class RenderContext {
 
     ShowSelectionGuide m_showSelectionGuide;
     vm::bbox3f m_sofMapBounds;
+    std::shared_ptr<ScreenLabelLayout> m_labelLayout;
 
   public:
     RenderContext(RenderMode renderMode, const Camera &camera, FontManager &fontManager, ShaderManager &shaderManager);
@@ -89,6 +91,7 @@ class RenderContext {
     bool render3D() const;
 
     const Camera &camera() const;
+    const std::shared_ptr<ScreenLabelLayout>& labelLayout() const;
 
     Transformation &transformation();
 

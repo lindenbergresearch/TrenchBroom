@@ -34,46 +34,33 @@ class LinkRenderer : public DirectRenderable {
   public:
     using LineVertex = GLVertexTypes::P3C4::Vertex;
 
-    struct ArrowPositionName {
-      static inline const auto name = std::string{"arrowPosition"};
-    };
+    using RibbonVertex = GLVertexType<GLVertexAttributeTypes::P3, GLVertexAttributeTypes::N, GLVertexAttributeTypes::T02, GLVertexAttributeTypes::C4>::Vertex;
+    static std::vector<RibbonVertex> buildLinkVertices(const std::vector<LineVertex>& links);
 
-    struct LineDirName {
-      static inline const auto name = std::string{"lineDir"};
-    };
-
-    using ArrowVertex = GLVertexType<GLVertexAttributeTypes::P3, // vertex of the arrow (exposed in shader as gl_Vertex)
-                                     GLVertexAttributeTypes::C4, // arrow color (exposed in shader as gl_Color)
-                                     GLVertexAttributeUser<ArrowPositionName, GL_FLOAT, 3, false>,    // arrow position
-                                     GLVertexAttributeUser<LineDirName, GL_FLOAT, 3, false>>::Vertex; // direction the
-    // arrow is pointing
   private:
     VertexArray m_lines;
-    VertexArray m_arrows;
 
     bool m_valid = false;
 
   public:
     LinkRenderer();
 
-    void render(RenderContext &renderContext, RenderBatch &renderBatch);
+    void render(RenderContext& renderContext, RenderBatch& renderBatch);
 
     void invalidate();
 
   private:
-    void doPrepareVertices(VboManager &vboManager) override;
+    void doPrepareVertices(VboManager& vboManager) override;
 
-    void doRender(RenderContext &renderContext) override;
+    void doRender(RenderContext& renderContext) override;
 
-    void renderLines(RenderContext &renderContext);
-
-    void renderArrows(RenderContext &renderContext);
+    virtual bool useEntityLinkSettings() const { return false; }
 
     void validate();
 
     virtual std::vector<LinkRenderer::LineVertex> getLinks() = 0;
 
-  deleteCopy(LinkRenderer);
+    deleteCopy(LinkRenderer);
 };
 
 } // namespace TrenchBroom::Renderer

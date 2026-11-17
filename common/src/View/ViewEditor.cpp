@@ -24,6 +24,7 @@
 #include <QGridLayout>
 #include <QFormLayout>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QTabWidget>
 #include <QLabel>
 #include <QPushButton>
@@ -694,6 +695,30 @@ QWidget* ViewEditor::createLinksPanel(QWidget* parent) {
     auto* layout = new QVBoxLayout(panel->getPanel());
     for (auto* button : m_entityLinkRadioGroup->buttons())
         layout->addWidget(button);
+    auto* form = new QFormLayout;
+    const auto add = [&](const QString& label, const char* name, Preference<float>& preference, double minimum, double maximum, double step, const QString& suffix, double factor = 1.0) {
+        auto* spin = new QDoubleSpinBox;
+        spin->setObjectName(name);
+        spin->setRange(minimum, maximum);
+        spin->setSingleStep(step);
+        spin->setDecimals(step < 1 ? 1 : 0);
+        spin->setSuffix(suffix);
+        spin->setKeyboardTracking(false);
+        auto* prefPtr = &preference;
+        connect(spin, qOverload<double>(&QDoubleSpinBox::valueChanged), this, [prefPtr,factor](double value) { setPref(*prefPtr,float(value/factor)); });
+        form->addRow(label,spin);
+        return spin;
+    };
+    m_linkWidth = add(tr("Line width"),"ViewEntityLinkWidth",Preferences::EntityLinkWidth,0.5,16,0.5,tr(" px"));
+    m_linkSpeed = add(tr("Animation speed"),"ViewEntityLinkSpeed",Preferences::EntityLinkSpeed,0,1000,4,tr(" px/s"));
+    m_linkSpeed->setSpecialValueText(tr("Disabled"));
+    m_linkSpacing = add(tr("Arrow spacing"),"ViewEntityLinkSpacing",Preferences::EntityLinkSpacing,16,512,4,tr(" px"));
+    m_linkDistance = add(tr("Maximum camera distance"),"ViewEntityLinkDistance",Preferences::EntityLinkDistance,0,1000000,128,tr(" units"));
+    m_linkDistance->setSpecialValueText(tr("Unlimited"));
+    m_linkDistance->setToolTip(tr("3D view: fade links by the distance from the camera to each visible part of the connection. 0 means unlimited."));
+    m_linkOccludedAlpha = add(tr("Behind objects"),"ViewEntityLinkOccludedAlpha",Preferences::EntityLinkOccludedAlpha,0,100,5,tr("%"),100);
+    m_linkOccludedAlpha->setSpecialValueText(tr("Hidden"));
+    layout->addLayout(form);
     layout->addWidget(m_showSoftBoundsCheckBox);
     return panel;
 }
@@ -809,6 +834,11 @@ void ViewEditor::refreshRendererPanel() {
     m_showEdgesCheckBox->setChecked(pref(Preferences::ShowEdges));
     m_showSkyCheckBox->setChecked(pref(Preferences::ShowSky));
     checkButtonInGroup(m_entityLinkRadioGroup, pref(Preferences::EntityLinkMode), true);
+    for (const auto& pair : {std::pair{m_linkWidth,&Preferences::EntityLinkWidth},std::pair{m_linkSpeed,&Preferences::EntityLinkSpeed},std::pair{m_linkSpacing,&Preferences::EntityLinkSpacing},std::pair{m_linkDistance,&Preferences::EntityLinkDistance},std::pair{m_linkOccludedAlpha,&Preferences::EntityLinkOccludedAlpha}}) {
+        const QSignalBlocker blocker{pair.first};
+        pair.first->setValue(pref(*pair.second)*(pair.second==&Preferences::EntityLinkOccludedAlpha?100.0:1.0));
+        pair.first->setEnabled(pref(Preferences::EntityLinkMode)!=Preferences::entityLinkModeNone());
+    }
     m_showSoftBoundsCheckBox->setChecked(pref(Preferences::ShowSoftMapBounds));
 
     auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
@@ -991,6 +1021,11 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::ShowPointEntities);
     prefs.resetToDefault(Preferences::ShowBrushes);
     prefs.resetToDefault(Preferences::EntityLinkMode);
+    prefs.resetToDefault(Preferences::EntityLinkWidth);
+    prefs.resetToDefault(Preferences::EntityLinkSpeed);
+    prefs.resetToDefault(Preferences::EntityLinkSpacing);
+    prefs.resetToDefault(Preferences::EntityLinkDistance);
+    prefs.resetToDefault(Preferences::EntityLinkOccludedAlpha);
     prefs.saveChanges();
     const auto document = kdl::mem_lock(m_document);
     if (!document->grid().visible()) document->grid().toggleVisible();

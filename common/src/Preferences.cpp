@@ -379,6 +379,11 @@ QString entityLinkModeNone() {
 }
 
 Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
+Preference<float> EntityLinkWidth("Renderer/Entity links/Width",2.f);
+Preference<float> EntityLinkSpeed("Renderer/Entity links/Animation speed",48.f);
+Preference<float> EntityLinkSpacing("Renderer/Entity links/Arrow spacing",72.f);
+Preference<float> EntityLinkDistance("Renderer/Entity links/Maximum camera distance",2048.f);
+Preference<float> EntityLinkOccludedAlpha("Renderer/Entity links/Occluded alpha",0.15f);
 
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
@@ -410,7 +415,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &EditorConfiguration,
         &AnimateSelectedEntityModels, &AnimateNearbyEntityModels, &EntityModelAnimationDistance, &EntityModelAnimationSpeed,
         &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowSky, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
-        &EntityLinkMode
+        &EntityLinkMode, &EntityLinkWidth, &EntityLinkSpeed, &EntityLinkSpacing, &EntityLinkDistance, &EntityLinkOccludedAlpha
     };
 
     return list;

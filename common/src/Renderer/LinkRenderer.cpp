@@ -17,6 +17,11 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "LinkRenderer.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
+#include <algorithm>
+#include <chrono>
+#include <cmath>
 
 #include "Renderer/ActiveShader.h"
 #include "Renderer/Camera.h"
@@ -27,130 +32,73 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "Renderer/Shaders.h"
 
 namespace TrenchBroom::Renderer {
-
 LinkRenderer::LinkRenderer() = default;
-
-void LinkRenderer::render(RenderContext &, RenderBatch &renderBatch) {
-    renderBatch.add(this);
+void LinkRenderer::render(RenderContext&, RenderBatch& batch) {
+    batch.add(this);
 }
-
 void LinkRenderer::invalidate() {
     m_valid = false;
 }
-
-void LinkRenderer::doPrepareVertices(VboManager &vboManager) {
+void LinkRenderer::doPrepareVertices(VboManager& manager) {
     if (!m_valid) {
         validate();
-
-        m_lines.prepare(vboManager);
-        m_arrows.prepare(vboManager);
+        m_lines.prepare(manager);
     }
 }
-
-void LinkRenderer::doRender(RenderContext &renderContext) {
-    assert(m_valid);
-    renderLines(renderContext);
-    renderArrows(renderContext);
-}
-
-void LinkRenderer::renderLines(RenderContext &renderContext) {
-    auto shader = ActiveShader{renderContext.shaderManager(), Shaders::LinkLineShader};
-    shader.set("CameraPosition", renderContext.camera().position());
-    shader.set("IsOrtho", renderContext.camera().orthographicProjection());
-    shader.set("MaxDistance", 500.0f); //<- todo: add to preferences
-
-    glAssert(glLineWidth(1.75f)); //<- todo: add to preferences
-    glAssert(glDisable(GL_DEPTH_TEST));
-    shader.set("Alpha", 0.25f);
-    m_lines.render(PrimType::Lines);
-
+void LinkRenderer::doRender(RenderContext& context) {
+    if (m_lines.empty()) return;
+    const auto& viewport = context.camera().viewport();
+    if (viewport.width <= 0 || viewport.height <= 0) return;
+    const auto entity = useEntityLinkSettings();
+    const auto sane = [](float value, float fallback, float low, float high) { return std::clamp(std::isfinite(value) ? value : fallback, low, high); };
+    const auto width = entity ? sane(pref(Preferences::EntityLinkWidth), 2, 0.5f, 16) : 1.75f;
+    const auto speed = entity ? sane(pref(Preferences::EntityLinkSpeed), 48, 0, 1000) : 0.f;
+    const auto spacing = entity ? sane(pref(Preferences::EntityLinkSpacing), 72, 16, 512) : 72.f;
+    const auto distance = entity ? sane(pref(Preferences::EntityLinkDistance), 2048, 0, 1000000) : 500.f;
+    const auto occluded = entity ? sane(pref(Preferences::EntityLinkOccludedAlpha), 0.15f, 0, 1) : 0.25f;
+    const auto dpi = context.dpiScale();
+    const auto seconds = std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    glAssert(glPushAttrib(GL_ENABLE_BIT | GL_POLYGON_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
+    glAssert(glEnable(GL_BLEND));
+    glAssert(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    glAssert(glDisable(GL_CULL_FACE));
+    glAssert(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+    glAssert(glDepthMask(GL_FALSE));
+    auto shader = ActiveShader{context.shaderManager(), Shaders::LinkLineShader};
+    shader.set("ViewportSize", vm::vec2f{float(viewport.width), float(viewport.height)} * dpi);
+    shader.set("Width", width * dpi);
+    shader.set("ArrowSize", std::max(10.f, width * 3.f) * dpi);
+    shader.set("Spacing", spacing * dpi);
+    shader.set("Phase", float(std::fmod(seconds * double(speed), double(spacing))) * dpi);
+    shader.set("CameraPosition", context.camera().position());
+    shader.set("MaxDistance", distance);
+    shader.set("IsOrtho", context.camera().orthographicProjection());
     glAssert(glEnable(GL_DEPTH_TEST));
-    shader.set("Alpha", 1.0f);
-    m_lines.render(PrimType::Lines);
-    glAssert(glLineWidth(1.0f));
-}
-
-void LinkRenderer::renderArrows(RenderContext &renderContext) {
-    auto shader = ActiveShader{renderContext.shaderManager(), Shaders::LinkArrowShader};
-    shader.set("CameraPosition", renderContext.camera().position());
-    shader.set("IsOrtho", renderContext.camera().orthographicProjection());
-    shader.set("MaxDistance", 500.0f); //<- todo: add to preferences
-    shader.set("Zoom", renderContext.camera().zoom());
-
-    glAssert(glLineWidth(1.75f)); //<- todo: add to preferences
-    glAssert(glDisable(GL_DEPTH_TEST));
-    shader.set("Alpha", 0.25f);
-    m_arrows.render(PrimType::Lines);
-
-    glAssert(glEnable(GL_DEPTH_TEST));
-    shader.set("Alpha", 1.0f);
-    m_arrows.render(PrimType::Lines);
-    glAssert(glLineWidth(1.0f));
-}
-
-static void addArrow(std::vector<LinkRenderer::ArrowVertex> &arrows, const vm::vec4f &color, const vm::vec3f &arrowPosition, const vm::vec3f &lineDir) {
-    arrows.emplace_back(vm::vec3f{0, 2.25, 0}, color, arrowPosition, lineDir);
-    arrows.emplace_back(vm::vec3f{9, 0, 0}, color, arrowPosition, lineDir);
-
-    arrows.emplace_back(vm::vec3f{9, 0, 0}, color, arrowPosition, lineDir);
-    arrows.emplace_back(vm::vec3f{0, -2.25, 0}, color, arrowPosition, lineDir);
-}
-
-static std::vector<LinkRenderer::ArrowVertex> getArrows(const std::vector<LinkRenderer::LineVertex> &links) {
-    assert((links.size() % 2) == 0);
-    auto arrows = std::vector<LinkRenderer::ArrowVertex>{};
-
-    float arrowDistance = 100.f;
-
-    for (size_t i = 0; i < links.size(); i += 2) {
-        const auto &startVertex = links[i];
-        const auto &endVertex = links[i + 1];
-
-        const auto lineVec = (getVertexComponent<0>(endVertex) - getVertexComponent<0>(startVertex));
-        const auto lineLength = length(lineVec);
-        const auto lineDir = lineVec / lineLength;
-        const auto color = getVertexComponent<1>(startVertex);
-
-        size_t arrowsNum = size_t(lineLength / arrowDistance);
-
-        for (size_t j = 0; j < arrowsNum; j++) {
-            float fact = 1.f / (float) j;
-            const auto arrowPosition = getVertexComponent<0>(startVertex) + (lineVec * fact);
-            addArrow(arrows, color, arrowPosition, lineDir);
-        }
-
-        //    if (lineLength < 512) {
-        //      const auto arrowPosition = getVertexComponent<0>(startVertex) + (lineVec *
-        //      0.6f); addArrow(arrows, color, arrowPosition, lineDir);
-        //    } else if (lineLength < 1024) {
-        //      const auto arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec *
-        //      0.2f); const auto arrowPosition2 = getVertexComponent<0>(startVertex) +
-        //      (lineVec * 0.6f);
-        //
-        //      addArrow(arrows, color, arrowPosition1, lineDir);
-        //      addArrow(arrows, color, arrowPosition2, lineDir);
-        //    } else {
-        //      const auto arrowPosition1 = getVertexComponent<0>(startVertex) + (lineVec *
-        //      0.1f); const auto arrowPosition2 = getVertexComponent<0>(startVertex) +
-        //      (lineVec * 0.4f); const auto arrowPosition3 =
-        //      getVertexComponent<0>(startVertex) + (lineVec * 0.7f);
-        //
-        //      addArrow(arrows, color, arrowPosition1, lineDir);
-        //      addArrow(arrows, color, arrowPosition2, lineDir);
-        //      addArrow(arrows, color, arrowPosition3, lineDir);
-        //    }
+    if (occluded > 0) {
+        glAssert(glDepthFunc(GL_GREATER));
+        shader.set("Alpha", occluded);
+        m_lines.render(PrimType::Triangles);
     }
-    return arrows;
+    glAssert(glDepthFunc(GL_LEQUAL));
+    shader.set("Alpha", 1.f);
+    m_lines.render(PrimType::Triangles);
+    glAssert(glPopAttrib());
 }
-
+std::vector<LinkRenderer::RibbonVertex> LinkRenderer::buildLinkVertices(const std::vector<LineVertex>& links) {
+    std::vector<RibbonVertex> vertices;
+    vertices.reserve(links.size() * 3);
+    for (size_t i = 0; i + 1 < links.size(); i += 2) {
+        const auto a = getVertexComponent<0>(links[i]), b = getVertexComponent<0>(links[i + 1]);
+        const auto delta = b - a;
+        const auto length2 = vm::dot(delta, delta);
+        if (!std::isfinite(length2) || length2 < 0.000001f) continue;
+        for (const auto& corner : {vm::vec2f{-1, -1}, vm::vec2f{1, -1}, vm::vec2f{1, 1}, vm::vec2f{-1, -1}, vm::vec2f{1, 1}, vm::vec2f{-1, 1}})
+            vertices.emplace_back(a, b, corner, getVertexComponent<1>(links[corner.x() < 0 ? i : i + 1]));
+    }
+    return vertices;
+}
 void LinkRenderer::validate() {
-    auto links = getLinks();
-    auto arrows = getArrows(links);
-
-    m_lines = VertexArray::move(std::move(links));
-    m_arrows = VertexArray::move(std::move(arrows));
-
+    m_lines = VertexArray::move(buildLinkVertices(getLinks()));
     m_valid = true;
 }
-
 } // namespace TrenchBroom::Renderer

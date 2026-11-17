@@ -29,6 +29,7 @@
 
 #include <vm/forward.h>
 #include <vm/vec.h>
+#include <cmath>
 
 
 namespace TrenchBroom::Renderer {
@@ -44,18 +45,23 @@ TextEntity::TextEntity(const AttrString &text, const TextAnchor *anchor, const v
 }
 
 bool TextEntity::setup(RenderContext &renderContext) {
+    m_valid = false;
+    m_visible = false;
     const auto &camera = renderContext.camera();
-    m_distance = camera.perpendicularDistanceTo(m_anchor->position(camera));
+    m_worldAnchored = dynamic_cast<const TextAnchor3D*>(m_anchor) != nullptr;
+    // Orthographic labels and fixed HUD text do not depend on a camera-plane
+    // distance. In 3D, reject labels behind the camera before projection.
+    m_distance = m_worldAnchored && renderContext.render3D() ? camera.perpendicularDistanceTo(m_anchor->position(camera)) : 0.0f;
     auto &font = renderContext.getTextureFont(m_fontDescriptor);
     m_prepared = true;
 
     // test for negative distance
-    if (m_distance < 0.0f) {
+    if (!std::isfinite(m_distance) || (m_worldAnchored && renderContext.render3D() && m_distance <= 0.0f)) {
         return false;
     }
 
     // if not on top (show always) test for valid bounds
-    if (!m_onTop) {
+    if (!m_onTop && m_worldAnchored) {
         if (renderContext.render3D() && m_distance > pref(Preferences::TextRendererMaxDistance)) {
             return false;
         }

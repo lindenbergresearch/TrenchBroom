@@ -36,6 +36,7 @@
 
 #include <vector>
 #include <map>
+#include <optional>
 
 namespace TrenchBroom::Renderer {
 
@@ -83,8 +84,9 @@ class TextEntity {
     FontDescriptor m_fontDescriptor;
     TrenchBroom::Color m_foreground;
     TrenchBroom::Color m_background;
-    bool m_visible;
-    bool m_valid;
+    bool m_visible = false;
+    bool m_valid = false;
+    bool m_worldAnchored = false;
     bool m_prepared;
     bool m_exactViewportMeasure;
     float m_minZoomFactor;
@@ -95,6 +97,8 @@ class TextEntity {
     float m_distance;
     size_t m_rectCornerSegments;
     float m_rectCornerRadius;
+    int m_layoutPriority = 0;
+    std::optional<size_t> m_layoutId;
 
     /* ------------------------------------------------------------------------------------------- */
 
@@ -114,6 +118,11 @@ class TextEntity {
     /* ------------------------------------------------------------------------------------------- */
 
     bool setup(RenderContext &renderContext);
+    bool worldAnchored() const { return m_worldAnchored; }
+    int layoutPriority() const { return m_layoutPriority; }
+    void setLayoutPriority(int priority) { m_layoutPriority = priority; }
+    void setLayoutId(size_t id) { m_layoutId = id; }
+    std::optional<size_t> layoutId() const { return m_layoutId; }
 
     /* ------------------------------------------------------------------------------------------- */
 

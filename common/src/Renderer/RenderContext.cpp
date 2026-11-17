@@ -18,6 +18,7 @@
  */
 
 #include "RenderContext.h"
+#include "Renderer/ScreenLabelLayout.h"
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
@@ -37,7 +38,8 @@ namespace TrenchBroom::Renderer {
           m_showPointEntityModels(true), m_showEntityClassnames(true), m_showGroupBounds(true),
           m_showBrushEntityBounds(true), m_showPointEntityBounds(true),
           m_showFog(false), m_showGrid(true), m_gridSize(4), m_dpiScale(1.0), m_hideSelection(false),
-          m_tintSelection(true), m_showSelectionGuide(ShowSelectionGuide::Hide) {
+          m_tintSelection(true), m_showSelectionGuide(ShowSelectionGuide::Hide),
+          m_labelLayout(std::make_shared<ScreenLabelLayout>(QRectF{double(camera.viewport().x),double(camera.viewport().y),double(camera.viewport().width),double(camera.viewport().height)})) {
     }
 
     bool RenderContext::render2D() const {
@@ -51,6 +53,7 @@ namespace TrenchBroom::Renderer {
     const Camera& RenderContext::camera() const {
         return m_camera;
     }
+    const std::shared_ptr<ScreenLabelLayout>& RenderContext::labelLayout() const { return m_labelLayout; }
 
     Transformation& RenderContext::transformation() {
         return m_transformation;

@@ -191,6 +191,7 @@ void RenderService::renderString(const std::string &string, const TextAnchor &po
 }
 
 void RenderService::renderText(TextEntity &entity) {
+    entity.setLayoutPriority(m_textLayoutPriority);
     m_textEntityRenderer->addTextEntity(entity, m_renderContext);
 }
 

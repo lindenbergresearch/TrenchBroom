@@ -540,6 +540,8 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/macos_utils.mm
     ${COMMON_SOURCE_DIR}/Renderer/TextEntity.cpp
     ${COMMON_SOURCE_DIR}/Renderer/TextEntityRenderer.cpp
+    ${COMMON_SOURCE_DIR}/Renderer/ScreenLabelLayout.cpp
+    ${COMMON_SOURCE_DIR}/Renderer/ScreenLabelLayout.h
     ${COMMON_SOURCE_DIR}/IO/ImageProcessor.cpp
     ${COMMON_SOURCE_DIR}/IO/PixelColor.cpp
     src/IO/Cursors.cpp

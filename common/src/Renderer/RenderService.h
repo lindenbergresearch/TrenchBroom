@@ -180,6 +180,7 @@ class RenderService {
     std::unique_ptr<PrimitiveRenderer> m_primitiveRenderer;
 
     Color m_foregroundColor;
+    int m_textLayoutPriority = 0;
     Color m_backgroundColor;
     float m_lineWidth;
     OcclusionPolicy m_occlusionPolicy;
@@ -193,6 +194,7 @@ class RenderService {
   deleteCopyAndMove(RenderService);
 
     void setForegroundColor(const Color &foregroundColor);
+    void setTextLayoutPriority(int priority) { m_textLayoutPriority = priority; }
 
     void setBackgroundColor(const Color &backgroundColor);
 

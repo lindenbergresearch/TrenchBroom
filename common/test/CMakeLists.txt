@@ -21,6 +21,7 @@ set(COMMON_TEST_UTILS_SOURCE
 )
 
 set(COMMON_TEST_SOURCE
+        "${COMMON_TEST_SOURCE_DIR}/Renderer/tst_Annotations.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Assets/tst_AssetUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Assets/tst_EntityModel.cpp"
         "${COMMON_TEST_SOURCE_DIR}/Assets/tst_EntityModelAnimation.cpp"

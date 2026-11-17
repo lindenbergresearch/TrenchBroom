@@ -358,6 +358,7 @@ void SelectionBoundsRenderer::renderSize2D(RenderContext& renderContext, RenderB
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
+    renderService.setTextLayoutPriority(20);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
     renderService.setShowOccludedObjects();
     auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
@@ -384,6 +385,7 @@ void SelectionBoundsRenderer::renderSize3D(RenderContext& renderContext, RenderB
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
+    renderService.setTextLayoutPriority(20);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
     renderService.setShowOccludedObjects();
     auto alpha = pref(Preferences::WeakInfoOverlayBackgroundAlpha);
@@ -405,6 +407,7 @@ void SelectionBoundsRenderer::renderMinMax(RenderContext& renderContext, RenderB
     std::stringstream buffer;
 
     RenderService renderService(renderContext, renderBatch);
+    renderService.setTextLayoutPriority(20);
     renderService.setForegroundColor(pref(Preferences::InfoOverlayTextColor));
     renderService.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
     renderService.setShowOccludedObjects();

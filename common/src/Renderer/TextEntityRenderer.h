@@ -18,6 +18,7 @@
 #include <map>
 
 namespace TrenchBroom::Renderer {
+class ScreenLabelLayout;
 
 using TextVertexList = std::vector<GLVertexTypes::P3T2C4::Vertex>;
 using RectVertexList = std::vector<GLVertexTypes::P3C4::Vertex>;
@@ -42,6 +43,7 @@ class TextEntityRenderer : public DirectRenderable {
 
   private:
     EntityMap m_entityCache;
+    std::shared_ptr<ScreenLabelLayout> m_labelLayout;
   public:
     TextEntityRenderer();
 

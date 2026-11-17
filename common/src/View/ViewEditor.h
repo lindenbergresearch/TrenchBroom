@@ -36,6 +36,7 @@ class QTabWidget;
 class QWidget;
 
 class QButtonGroup;
+class QDoubleSpinBox;
 
 namespace TrenchBroom {
 namespace Assets {
@@ -147,6 +148,7 @@ class ViewEditor : public QWidget {
     SliderWithLabel *m_brightnessSlider;
 
     QButtonGroup *m_entityLinkRadioGroup;
+    QDoubleSpinBox *m_linkWidth = nullptr, *m_linkSpeed = nullptr, *m_linkSpacing = nullptr, *m_linkDistance = nullptr, *m_linkOccludedAlpha = nullptr;
 
     QCheckBox *m_showSoftBoundsCheckBox;
 

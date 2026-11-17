@@ -48,6 +48,27 @@ protected:
 };
 }
 
+TEST_CASE_METHOD(ViewEditorTest, "Entity link controls persist animation and visibility settings", "[view-editor][annotations]") {
+    const auto width = TemporarilySetPref{Preferences::EntityLinkWidth, 2.f};
+    const auto speed = TemporarilySetPref{Preferences::EntityLinkSpeed, 48.f};
+    const auto distance = TemporarilySetPref{Preferences::EntityLinkDistance, 2048.f};
+    const auto opacity = TemporarilySetPref{Preferences::EntityLinkOccludedAlpha, 0.15f};
+    const auto mode = TemporarilySetPref{Preferences::EntityLinkMode, Preferences::entityLinkModeDirect()};
+    newMap();
+    CHECK(control<QDoubleSpinBox>("ViewEntityLinkWidth")->value() == Approx(2));
+    control<QDoubleSpinBox>("ViewEntityLinkWidth")->setValue(3.5);
+    CHECK(pref(Preferences::EntityLinkWidth) == Approx(3.5));
+    control<QDoubleSpinBox>("ViewEntityLinkSpeed")->setValue(0);
+    CHECK(pref(Preferences::EntityLinkSpeed) == 0);
+    control<QDoubleSpinBox>("ViewEntityLinkDistance")->setValue(0);
+    CHECK(pref(Preferences::EntityLinkDistance) == 0);
+    control<QDoubleSpinBox>("ViewEntityLinkOccludedAlpha")->setValue(25);
+    CHECK(pref(Preferences::EntityLinkOccludedAlpha) == Approx(0.25));
+    setPref(Preferences::EntityLinkMode, Preferences::entityLinkModeNone());
+    PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::EntityLinkMode.path());
+    CHECK_FALSE(control<QDoubleSpinBox>("ViewEntityLinkSpeed")->isEnabled());
+}
+
 TEST_CASE_METHOD(ViewEditorTest, "Grid view controls follow preferences and document state", "[view-editor]") {
     const auto alpha = TemporarilySetPref{Preferences::GridAlpha, 0.53f};
     const auto width = TemporarilySetPref{Preferences::GridLineWidth, 2.25f};

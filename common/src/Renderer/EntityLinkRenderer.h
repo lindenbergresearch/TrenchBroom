@@ -45,6 +45,7 @@ class EntityLinkRenderer : public LinkRenderer {
     void setSelectedColor(const Color &color);
 
   private:
+    bool useEntityLinkSettings() const override { return true; }
     std::vector<LinkRenderer::LineVertex> getLinks() override;
 
   deleteCopy(EntityLinkRenderer);

@@ -336,6 +336,7 @@ QString entityLinkModeDirect();
 QString entityLinkModeNone();
 
 extern Preference<QString> EntityLinkMode;
+extern Preference<float> EntityLinkWidth, EntityLinkSpeed, EntityLinkSpacing, EntityLinkDistance, EntityLinkOccludedAlpha;
 
 /**
  * Returns all Preferences declared in this file. Needed for migrating preference formats

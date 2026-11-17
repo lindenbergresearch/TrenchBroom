@@ -8,6 +8,7 @@
 #include "PrimType.h"
 #include "FontManager.h"
 #include "TextureFont.h"
+#include "Renderer/ScreenLabelLayout.h"
 
 
 namespace TrenchBroom::Renderer {
@@ -66,6 +67,12 @@ void TextEntityRenderer::addTextEntity(TextEntity textEntity, RenderContext &ren
     }
 
     if (textEntity.valid()) {
+        m_labelLayout = renderContext.labelLayout();
+        const auto origin = textEntity.offset().xy() - textEntity.inset();
+        const auto size = textEntity.size() + 2.0f * textEntity.inset();
+        const auto movable = textEntity.worldAnchored();
+        textEntity.setLayoutId(m_labelLayout->add({QRectF{origin.x(),origin.y(),size.x(),size.y()},
+            movable ? textEntity.layoutPriority() + (textEntity.onTop() ? 10 : 0) : 1000, textEntity.distance(),movable}));
         auto it = m_entityCache.find(textEntity.fontDescriptor());
 
         if (it != m_entityCache.end()) {
@@ -104,6 +111,12 @@ void TextEntityRenderer::prepareVertexCache(VboManager &vboManager) {
         TextVertexList topTextVertexList{};
 
         for (TextEntity entity : item.second) {
+            if (entity.layoutId() && m_labelLayout) {
+                const auto& placement = m_labelLayout->placement(*entity.layoutId());
+                if (!placement.visible) continue;
+                const auto offset = entity.offset();
+                entity.setOffset(vm::vec3f{std::floor(float(placement.bounds.x())+entity.inset().x()),std::floor(float(placement.bounds.y())+entity.inset().y()),offset.z()});
+            }
             if (entity.onTop()) {
                 computeEntityVertices(entity, topTextVertexList, topRectVertexList);
             } else {

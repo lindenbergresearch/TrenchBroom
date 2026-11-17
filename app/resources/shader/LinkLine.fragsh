@@ -1,35 +1,29 @@
 #version 120
-
-/*
- Copyright (C) 2010-2017 Kristian Duske
- 
- This file is part of TrenchBroom.
- 
- TrenchBroom is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- 
- TrenchBroom is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
- */
-
-uniform float MaxDistance;
+uniform float Width;
+uniform float ArrowSize;
+uniform float Spacing;
+uniform float Phase;
 uniform float Alpha;
+uniform float MaxDistance;
 uniform bool IsOrtho;
-
-varying float distanceFromCamera;
-varying vec4 color;
-
-void main() {
-    float scale = 1.0f;
-    if (!IsOrtho) {
-        scale = (1.0f - clamp(distanceFromCamera / MaxDistance * 0.2f + 0.25f, 0.0f, 1.0f));// * 0.35 + 0.65);
+uniform vec3 CameraPosition;
+varying vec2 linkPosition;
+varying float linkLength;
+varying vec4 linkColor;
+varying vec4 worldCoordinates;
+void main(){
+    float y=abs(linkPosition.y);
+    float base=1.0-smoothstep(Width*0.5-0.75,Width*0.5+0.75,y);
+    // Each V has its tip in +X: source -> target. Phase changes without rebuilding buffers.
+    float x=mod(linkPosition.x-Phase+Spacing*0.5,Spacing)-Spacing*0.5;
+    float arrowDistance=abs(x+y*1.5)/sqrt(3.25)-Width*0.5;
+    float arrow=(1.0-smoothstep(-0.75,0.75,arrowDistance))*(1.0-smoothstep(ArrowSize*0.5-0.75,ArrowSize*0.5+0.75,y));
+    float caps=smoothstep(-0.75,0.75,linkPosition.x)*(1.0-smoothstep(linkLength-0.75,linkLength+0.75,linkPosition.x));
+    float coverage=max(base*0.45,arrow)*caps;
+    if(!IsOrtho && MaxDistance>0.0){
+        float distanceToCamera=length(worldCoordinates.xyz/worldCoordinates.w-CameraPosition);
+        coverage*=1.0-smoothstep(MaxDistance*0.8,MaxDistance,distanceToCamera);
     }
-    gl_FragColor = vec4(color.rgb, color.a * (1.0f - clamp(distanceFromCamera / MaxDistance + 0.15f, 0.0f, 1.0f)) * Alpha);
+    if(coverage<=0.001)discard;
+    gl_FragColor=vec4(linkColor.rgb,linkColor.a*Alpha*coverage);
 }
