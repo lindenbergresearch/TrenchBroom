@@ -1,0 +1,207 @@
+---- qbsp / ericw-tools 2.0.0-alpha8 ----
+
+--- Options Summary ---
+    "verbose" was set to "1" (from command line)
+
+Input file: /Users/patricklindenberg/Development/TrenchBroom/common/benchmark/fixture/AABBTree/ne_ruins.map
+Output file: /Users/patricklindenberg/Development/TrenchBroom/common/benchmark/fixture/AABBTree/ne_ruins.bsp
+
+INFO: using built-in palette.
+Loaded 'ne_ruins.map' from archive ''
+Added wad '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad' with 96 lumps
+WARNING: ne_ruins.map[line 30419]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 30438]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 35139]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 35148]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 35344]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 35780]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 81623]: brush has multiple face contents (LAVA vs SOLID), the former will be used.
+WARNING: ne_ruins.map[line 81631]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+WARNING: ne_ruins.map[line 81638]: brush has multiple face contents (LAVA vs SOLID), the former will be used.
+WARNING: ne_ruins.map[line 81648]: brush has multiple face contents (LAVA vs SOLID), the former will be used.
+WARNING: ne_ruins.map[line 81659]: brush has multiple face contents (SOLID vs LAVA), the former will be used.
+     2,438 entities
+        78 unique textures
+     1,697 texinfos
+    20,060 unique planes
+
+INFO: world extents calculated to 8392 units
+     23,422 brushes
+         36 brushes offset by origins
+    135,425 sides
+     48,819 side bevels
+
+           18 texture frames added
+Loaded 'skip' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '*lavaskip' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'e7trim32' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wall1_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'brickwall7' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'trims2b' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'floor3' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'brickwall2c' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'danger128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wall3_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'trims2a' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'plankfloor' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'beam07' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'clip' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'key03_2' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'brickwall4' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wdwall_12_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'mfloor64' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'floor1_bl' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'e7trim16' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'brickwall10' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'vllge1_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'rock45_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'walldeco2' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'pillars1' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'ceiling1_3_ne' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'black' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'metal2_5ne' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'crate1_64' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'floor2' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wd28_dc' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'stoneblock_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wall2_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'arch3' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'trims1d' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'trims1a' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wdwall_test_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'arch8' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'dr07_1' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'beam01' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'stonewal01_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'brickwall8' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'ne_snow' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'ne_snrock' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'sky_cloudy' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+0_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '*water2' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '*waterskip' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'trims1c' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'metalj3_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'mwindo_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'deco4' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'beamcarv' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'plate2_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'panel5_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'wd27_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'dstone_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'floor4' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'plate2_64' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'deco9' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'ne_blandtrim' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'trigger' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'metal9_2' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'rune1_7' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'rune1_6' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+0lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '*lava1' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'cop1_2' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+0shoot' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'rune1_4' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'ice3' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'grid_red' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'rune1_5' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'rune1_1' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'metalt2_8' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'deco1' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'key03_1' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded 'hwall1_128' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+1_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+2_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+3_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+4_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+5_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+6_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+7_fall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+1lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+2lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+3lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+4lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+5lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+6lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+7lavfall' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+1shoot' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+2shoot' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+3shoot' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Loaded '+ashoot' from archive '/Users/patricklindenberg/Downloads/ne_ruins/ex/maps/ne_ruins.wad'
+Processing hull 0...
+        14 WATER | DETAIL brushes
+         8 SKY brushes
+        27 LAVA | DETAIL brushes
+    11,675 SOLID brushes
+    11,724 brushes total
+    68,822 visible sides
+INFO: calculating BSP for 11724 brushes with 68822 sides
+    11,724 brushes
+    52,133 visible faces
+    16,689 non-visible faces
+    105,966 nodes
+     14,263 non-visible nodes
+     73,979 expensive split nodes
+     31,987 mid-split nodes
+    105,967 leaves
+        551 WATER | DETAIL leafs
+        335 SKY leafs
+         44 LAVA | DETAIL leafs
+     55,570 SOLID leafs
+     49,467 EMPTY leafs
+    105,967 leafs total
+    32 max tree height
+    21 avg tree height
+    52 tiny portals
+    421,579 tree portals
+WARNING: Reached occupant "monster_zombie2" at (2528 32 1400), no filling performed.
+Leak file written to ne_ruins.pts
+            8 portals written to ne_ruins.leak.prt
+    52 tiny portals
+    421,579 tree portals
+    129,621 sides visible
+    128,590 makefaces
+     24,297 merged
+      8,511 subdivided
+    8,878 nodes pruned
+       551 WATER | DETAIL leafs
+       335 SKY leafs
+        44 LAVA | DETAIL leafs
+    46,692 SOLID leafs
+    49,467 EMPTY leafs
+    97,089 leafs total
+    32 max tree height
+    20 avg tree height
+     35,737 edges added by tjunctions
+     90,298 faces optimized through MWT
+    218,281 triangles computed from MWT
+      8,179 faces created via optimization of MWT triangles
+    221,859 edges
+    103,143 faces
+Processing hull 1...
+Processing hull 2...
+LIMITS EXCEEDED ON dnode_t::children
+NOTE: limits exceeded for Quake BSP - switching to Quake BSP2
+Writing ne_ruins.bsp as Quake BSP2 bsp2
+Wrote ne_ruins.bsp
+
+count   lump name    byte size 
+    451 models            28864
+  28432 planes           568640
+ 131330 vertexes        1575960
+ 129390 nodes           5693160
+   1501 texinfos          60040
+ 131051 faces           3669428
+ 527708 clipnodes       6332496
+  83150 leafs           3658600
+ 143185 marksurfaces     572740
+ 279694 edges           2237552
+ 542760 surfedges       2171040
+     96 textures        2493028
+        lightdata             0
+        visdata               0
+        entdata          199972
+
+15.855s seconds elapsed
+
+

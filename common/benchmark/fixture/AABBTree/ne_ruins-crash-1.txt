@@ -1,0 +1,24 @@
+Operating System    : macOS 15.1
+Qt Version          : 5.15.13
+GL_VENDOR           : Apple
+GL_RENDERER         : Apple M2 Max
+GL_VERSION          : 2.1 Metal - 89.3
+TrenchBroom Version : 2023.1
+TrenchBroom Build   : v2023.1-802-g4820df8da-dirty Debug macOS
+Reason              : SIGSEGV
+
+--------------- [ stack trace ] ---------------
+0   TrenchBroom                         0x000000010454f960 _ZN11TrenchBroom22TrenchBroomStackWalker13getStackTraceEv + 64
+1   TrenchBroom                         0x00000001045432ac _ZN11TrenchBroom4ViewL12CrashHandlerEi + 24
+2   libsystem_platform.dylib            0x0000000185414184 _sigtramp + 56
+3   TrenchBroom                         0x00000001043c6cb8 _ZN11TrenchBroom6Logger3logENS_8LogLevelERK7QString + 304
+4   TrenchBroom                         0x00000001043c6b2c _ZN11TrenchBroom6Logger3logENS_8LogLevelERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE + 108
+5   TrenchBroom                         0x00000001042a8b88 _ZN11TrenchBroom6Logger9LogStreamD2Ev + 64
+6   TrenchBroom                         0x00000001042f8568 _ZZN11TrenchBroom2IO27makeReadTextureErrorHandlerERKNS0_10FileSystemERNS_6LoggerEENKUlNS0_16ReadTextureErrorEE_clES6_ + 176
+7   TrenchBroom                         0x00000001042f844c _ZNKSt3__116__variant_detail12__visitation9__variant15__value_visitorIN3kdl13overload_implIJZNOS4_6resultIN11TrenchBroom6Assets7TextureEJNS7_5ErrorENS7_2IO16ReadTextureErrorEEE7or_elseINS5_IJZNSB_27makeReadTextureErrorHandlerERKNSB_10FileSystemERNS7_6LoggerEEUlSA_E_ZNSB_27makeReadTextureErrorHandlerESH_SJ_EUlSC_E_EEEEEDaRKT_EUlOS9_E_ZNOSE_ISM_EESN_SQ_EUlOSO_E_EEEEclB8ne180100IJNS0_5__altILm2ESC_EEEEEDcDpOT_ + 80
+8   TrenchBroom                         0x000000010435b41c _ZNSt3__112__async_funcIZN3kdl12parallel_forIZNS1_22vec_parallel_transformINS_4__fs10filesystem4pathEZZN11TrenchBroom2IO21loadTextureCollectionERKS6_RKNS8_10FileSystemERKNS7_5Model13TextureConfigERNS7_6LoggerEENK3$_1clINS_6vectorIS6_NS_9allocatorIS6_EEEENS_8functionIFNS1_6resultINS7_6Assets7TextureEJNS8_16ReadTextureErrorEEEERKNS8_4FileESA_EEEEEDaT_RKT0_EUlS12_E_EES11_NSM_IS12_NSN_IS12_EEEEOS13_EUlmE_EEvmOS12_EUlvE_JEEclB8ne180100Ev + 312
+9   TrenchBroom                         0x000000010435b27c _ZNSt3__119__async_assoc_stateIvNS_12__async_funcIZN3kdl12parallel_forIZNS2_22vec_parallel_transformINS_4__fs10filesystem4pathEZZN11TrenchBroom2IO21loadTextureCollectionERKS7_RKNS9_10FileSystemERKNS8_5Model13TextureConfigERNS8_6LoggerEENK3$_1clINS_6vectorIS7_NS_9allocatorIS7_EEEENS_8functionIFNS2_6resultINS8_6Assets7TextureEJNS9_16ReadTextureErrorEEEERKNS9_4FileESB_EEEEEDaT_RKT0_EUlS13_E_EES12_NSN_IS13_NSO_IS13_EEEEOS14_EUlmE_EEvmOS13_EUlvE_JEEEE9__executeEv + 28
+10  TrenchBroom                         0x000000010435bda0 _ZNSt3__114__thread_proxyB8ne180100INS_5tupleIJNS_10unique_ptrINS_15__thread_structENS_14default_deleteIS3_EEEEMNS_19__async_assoc_stateIvNS_12__async_funcIZN3kdl12parallel_forIZNS9_22vec_parallel_transformINS_4__fs10filesystem4pathEZZN11TrenchBroom2IO21loadTextureCollectionERKSE_RKNSG_10FileSystemERKNSF_5Model13TextureConfigERNSF_6LoggerEENK3$_1clINS_6vectorISE_NS_9allocatorISE_EEEENS_8functionIFNS9_6resultINSF_6Assets7TextureEJNSG_16ReadTextureErrorEEEERKNSG_4FileESI_EEEEEDaT_RKT0_EUlS1A_E_EES19_NSU_IS1A_NSV_IS1A_EEEEOS1B_EUlmE_EEvmOS1A_EUlvE_JEEEEEFvvEPS1M_EEEEEPvS1R_ + 72
+11  libsystem_pthread.dylib             0x00000001853df2e4 _pthread_start + 136
+12  libsystem_pthread.dylib             0x00000001853da0fc thread_start + 8
+--------------- [ stack trace ] ---------------

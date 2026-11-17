@@ -1,0 +1,106 @@
+Operating System    : macOS 15.1
+Qt Version          : 5.15.13
+GL_VENDOR           : Apple
+GL_RENDERER         : Apple M2 Max
+GL_VERSION          : 2.1 Metal - 89.3
+TrenchBroom Version : 2023.1
+TrenchBroom Build   : v2023.1-796-gf5feb22e4-dirty Debug macOS
+Reason              : SIGSEGV
+
+--------------- [ stack trace ] ---------------
+0   TrenchBroom                         0x000000010511eb0c _ZN11TrenchBroom22TrenchBroomStackWalker13getStackTraceEv + 56
+1   TrenchBroom                         0x00000001050ce7c4 _ZN11TrenchBroom4ViewL12CrashHandlerEi + 24
+2   libsystem_platform.dylib            0x0000000185414184 _sigtramp + 56
+3   TrenchBroom                         0x000000010552224c _ZN11TrenchBroom4View16MultiPaneMapView15doCanSelectTallEv + 64
+4   TrenchBroom                         0x000000010552224c _ZN11TrenchBroom4View16MultiPaneMapView15doCanSelectTallEv + 64
+5   TrenchBroom                         0x00000001054bc120 _ZN11TrenchBroom4View7MapView13canSelectTallEv + 32
+6   TrenchBroom                         0x00000001055b80d4 _ZN11TrenchBroom4View26SwitchableMapViewContainer15doCanSelectTallEv + 32
+7   TrenchBroom                         0x00000001054bc120 _ZN11TrenchBroom4View7MapView13canSelectTallEv + 32
+8   TrenchBroom                         0x00000001054883c0 _ZNK11TrenchBroom4View8MapFrame13canSelectTallEv + 104
+9   TrenchBroom                         0x0000000105168204 _ZZN11TrenchBroom4View13ActionManager14createEditMenuEvENK4$_29clERNS0_22ActionExecutionContextE + 56
+10  TrenchBroom                         0x00000001051680c8 _ZNK11TrenchBroom4View12LambdaActionIZNS0_13ActionManager14createEditMenuEvE4$_28ZNS2_14createEditMenuEvE4$_29KZNS2_12createActionIS3_S4_EEPKNS0_6ActionERKNSt3__14__fs10filesystem4pathERK7QStringmRK12QKeySequenceRKT_RKT0_SE_SH_EUlRNS0_22ActionExecutionContextEE_E7enabledESS_ + 72
+11  TrenchBroom                         0x000000010547ffd0 _ZN11TrenchBroom4View8MapFrame17updateActionStateEv + 256
+12  TrenchBroom                         0x0000000105484c14 _ZN11TrenchBroom4View8MapFrame11focusChangeEP7QWidgetS3_ + 160
+13  TrenchBroom                         0x00000001054ab62c _ZN9QtPrivate11FunctorCallINS_11IndexesListIJLi0ELi1EEEENS_4ListIJP7QWidgetS5_EEEvMN11TrenchBroom4View8MapFrameEFvS5_S5_EE4callESB_PS9_PPv + 172
+14  TrenchBroom                         0x00000001054ab548 _ZN9QtPrivate15FunctionPointerIMN11TrenchBroom4View8MapFrameEFvP7QWidgetS5_EE4callINS_4ListIJS5_S5_EEEvEEvS7_PS3_PPv + 80
+15  TrenchBroom                         0x00000001054ab450 _ZN9QtPrivate11QSlotObjectIMN11TrenchBroom4View8MapFrameEFvP7QWidgetS5_ENS_4ListIJS5_S5_EEEvE4implEiPNS_15QSlotObjectBaseEP7QObjectPPvPb + 176
+16  QtCore                              0x000000010c1118a0 _ZN11QMetaObject8activateEP7QObjectPKS_iPPv + 3240
+17  QtWidgets                           0x000000010b995d0c _ZN19QApplicationPrivate14setFocusWidgetEP7QWidgetN2Qt11FocusReasonE + 504
+18  QtWidgets                           0x000000010b9c0aa4 _ZN7QWidget10clearFocusEv + 340
+19  QtWidgets                           0x000000010b9c074c _ZN7QWidgetD2Ev + 768
+20  TrenchBroom                         0x00000001055383b4 _ZN11TrenchBroom4View10RenderViewD2Ev + 144
+21  TrenchBroom                         0x00000001054d8fe0 _ZN11TrenchBroom4View11MapViewBaseD2Ev + 204
+22  TrenchBroom                         0x00000001054c71fc _ZN11TrenchBroom4View9MapView3DD2Ev + 120
+23  TrenchBroom                         0x00000001054c7228 _ZN11TrenchBroom4View9MapView3DD1Ev + 28
+24  TrenchBroom                         0x00000001054c72e0 _ZN11TrenchBroom4View9MapView3DD0Ev + 28
+25  QtCore                              0x000000010c109f28 _ZN14QObjectPrivate14deleteChildrenEv + 288
+26  QtWidgets                           0x000000010b9c08b0 _ZN7QWidgetD2Ev + 1124
+27  TrenchBroom                         0x00000001054fa7cc _ZN11TrenchBroom4View16MapViewContainerD2Ev + 40
+28  TrenchBroom                         0x00000001049cf198 _ZN11TrenchBroom4View14CyclingMapViewD2Ev + 104
+29  TrenchBroom                         0x00000001049c8608 _ZN11TrenchBroom4View14CyclingMapViewD1Ev + 28
+30  TrenchBroom                         0x00000001049c8634 _ZN11TrenchBroom4View14CyclingMapViewD0Ev + 28
+31  QtCore                              0x000000010c109f28 _ZN14QObjectPrivate14deleteChildrenEv + 288
+32  QtWidgets                           0x000000010b9c08b0 _ZN7QWidgetD2Ev + 1124
+33  TrenchBroom                         0x00000001054fa7cc _ZN11TrenchBroom4View16MapViewContainerD2Ev + 40
+34  TrenchBroom                         0x0000000105521c04 _ZN11TrenchBroom4View16MultiPaneMapViewD2Ev + 84
+35  TrenchBroom                         0x0000000105526abc _ZN11TrenchBroom4View14OnePaneMapViewD2Ev + 72
+36  TrenchBroom                         0x00000001055269a4 _ZN11TrenchBroom4View14OnePaneMapViewD1Ev + 28
+37  TrenchBroom                         0x00000001055269d0 _ZN11TrenchBroom4View14OnePaneMapViewD0Ev + 28
+38  TrenchBroom                         0x00000001055b6234 _ZN11TrenchBroom4View26SwitchableMapViewContainer15switchToMapViewENS0_13MapViewLayoutE + 88
+39  TrenchBroom                         0x0000000105483d14 _ZN11TrenchBroom4View8MapFrame19preferenceDidChangeERKNSt3__14__fs10filesystem4pathE + 108
+40  TrenchBroom                         0x000000010549b018 _ZNSt3__18__invokeB8ne180100IRKMN11TrenchBroom4View8MapFrameEFvRKNS_4__fs10filesystem4pathEERKPS3_JS8_EvEEDTcldsdeclsr3stdE7declvalIT0_EEclsr3stdE7declvalIT_EEspclsr3stdE7declvalIT1_EEEEOSH_OSG_DpOSI_ + 140
+41  TrenchBroom                         0x000000010549af80 _ZNSt3__16invokeB8ne180100IRKMN11TrenchBroom4View8MapFrameEFvRKNS_4__fs10filesystem4pathEEJRKPS3_S8_EEENS_13invoke_resultIT_JDpT0_EE4typeEOSH_DpOSI_ + 40
+42  TrenchBroom                         0x000000010549af4c _ZZN11TrenchBroom8NotifierIJRKNSt3__14__fs10filesystem4pathEEE7connectINS_4View8MapFrameEMSA_FvS6_EEENS_18NotifierConnectionEPT_T0_ENKUlDpOT_E_clIJS6_EEEDaSJ_ + 40
+43  TrenchBroom                         0x000000010549af18 _ZNSt3__18__invokeB8ne180100IRZN11TrenchBroom8NotifierIJRKNS_4__fs10filesystem4pathEEE7connectINS1_4View8MapFrameEMSB_FvS7_EEENS1_18NotifierConnectionEPT_T0_EUlDpOT_E_JS7_EEEDTclclsr3stdE7declvalISF_EEspclsr3stdE7declvalIT0_EEEEOSF_DpOSN_ + 32
+44  TrenchBroom                         0x000000010549aec8 _ZNSt3__128__invoke_void_return_wrapperIvLb1EE6__callB8ne180100IJRZN11TrenchBroom8NotifierIJRKNS_4__fs10filesystem4pathEEE7connectINS3_4View8MapFrameEMSD_FvS9_EEENS3_18NotifierConnectionEPT_T0_EUlDpOT_E_S9_EEEvSM_ + 32
+45  TrenchBroom                         0x000000010549ae9c _ZNSt3__110__function12__alloc_funcIZN11TrenchBroom8NotifierIJRKNS_4__fs10filesystem4pathEEE7connectINS2_4View8MapFrameEMSC_FvS8_EEENS2_18NotifierConnectionEPT_T0_EUlDpOT_E_NS_9allocatorISM_EEFvS8_EEclB8ne180100ES8_ + 36
+46  TrenchBroom                         0x0000000105499ea0 _ZNSt3__110__function6__funcIZN11TrenchBroom8NotifierIJRKNS_4__fs10filesystem4pathEEE7connectINS2_4View8MapFrameEMSC_FvS8_EEENS2_18NotifierConnectionEPT_T0_EUlDpOT_E_NS_9allocatorISM_EEFvS8_EEclES8_ + 36
+47  TrenchBroom                         0x0000000104dc4b88 _ZNKSt3__110__function12__value_funcIFvRKNS_4__fs10filesystem4pathEEEclB8ne180100ES6_ + 76
+48  TrenchBroom                         0x0000000104dc26d8 _ZNKSt3__18functionIFvRKNS_4__fs10filesystem4pathEEEclES5_ + 32
+49  TrenchBroom                         0x0000000104dc23fc _ZN11TrenchBroom8NotifierIJRKNSt3__14__fs10filesystem4pathEEE13NotifierState6notifyIJS6_EEEvDpOT_ + 148
+50  TrenchBroom                         0x0000000104dc2344 _ZN11TrenchBroom8NotifierIJRKNSt3__14__fs10filesystem4pathEEE6notifyIJS6_EEEvDpOT_ + 36
+51  TrenchBroom                         0x0000000104dc2314 _ZN11TrenchBroom8NotifierIJRKNSt3__14__fs10filesystem4pathEEEclIJS6_EEEvDpOT_ + 32
+52  TrenchBroom                         0x0000000104f896d0 _ZN11TrenchBroom20AppPreferenceManager11saveChangesEv + 176
+53  TrenchBroom                         0x0000000104f8b1e0 _ZN11TrenchBroom20AppPreferenceManager14savePreferenceERNS_14PreferenceBaseE + 160
+54  TrenchBroom                         0x00000001051f61ac _ZN11TrenchBroom17PreferenceManager3setIiEEbRNS_10PreferenceIT_EERKS3_ + 152
+55  TrenchBroom                         0x000000010548d8f8 _ZN11TrenchBroom4View8MapFrame16changeViewLayoutEi + 56
+56  TrenchBroom                         0x000000010517dde8 _ZZN11TrenchBroom4View13ActionManager14createViewMenuEvENK4$_92clERNS0_22ActionExecutionContextE + 36
+57  TrenchBroom                         0x000000010517dc94 _ZNK11TrenchBroom4View12LambdaActionIZNS0_13ActionManager14createViewMenuEvE4$_92ZNS2_14createViewMenuEvE4$_93ZNS2_14createViewMenuEvE4$_94E7executeERNS0_22ActionExecutionContextE + 68
+58  TrenchBroom                         0x00000001054978e8 _ZZN11TrenchBroom4View8MapFrame11createMenusEvENK3$_0clERKNS0_6ActionE + 76
+59  TrenchBroom                         0x0000000105497890 _ZNSt3__18__invokeB8ne180100IRZN11TrenchBroom4View8MapFrame11createMenusEvE3$_0JRKNS2_6ActionEEEEDTclclsr3stdE7declvalIT_EEspclsr3stdE7declvalIT0_EEEEOS9_DpOSA_ + 32
+60  TrenchBroom                         0x0000000105497840 _ZNSt3__128__invoke_void_return_wrapperIvLb1EE6__callB8ne180100IJRZN11TrenchBroom4View8MapFrame11createMenusEvE3$_0RKNS4_6ActionEEEEvDpOT_ + 32
+61  TrenchBroom                         0x0000000105497814 _ZNSt3__110__function12__alloc_funcIZN11TrenchBroom4View8MapFrame11createMenusEvE3$_0NS_9allocatorIS5_EEFvRKNS3_6ActionEEEclB8ne180100ESA_ + 36
+62  TrenchBroom                         0x0000000105496690 _ZNSt3__110__function6__funcIZN11TrenchBroom4View8MapFrame11createMenusEvE3$_0NS_9allocatorIS5_EEFvRKNS3_6ActionEEEclESA_ + 36
+63  TrenchBroom                         0x000000010514b698 _ZNKSt3__110__function12__value_funcIFvRKN11TrenchBroom4View6ActionEEEclB8ne180100ES6_ + 76
+64  TrenchBroom                         0x00000001051258ac _ZNKSt3__18functionIFvRKN11TrenchBroom4View6ActionEEEclES5_ + 32
+65  TrenchBroom                         0x0000000105393378 _ZZN11TrenchBroom4View15MenuBuilderBase19findOrCreateQActionEPKNS0_6ActionEENK3$_0clEv + 28
+66  TrenchBroom                         0x0000000105393340 _ZN9QtPrivate11FunctorCallINS_11IndexesListIJEEENS_4ListIJEEEvZN11TrenchBroom4View15MenuBuilderBase19findOrCreateQActionEPKNS6_6ActionEE3$_0E4callERSB_PPv + 28
+67  TrenchBroom                         0x00000001053932e0 _ZN9QtPrivate7FunctorIZN11TrenchBroom4View15MenuBuilderBase19findOrCreateQActionEPKNS2_6ActionEE3$_0Li0EE4callINS_4ListIJEEEvEEvRS7_PvPSD_ + 36
+68  TrenchBroom                         0x000000010539327c _ZN9QtPrivate18QFunctorSlotObjectIZN11TrenchBroom4View15MenuBuilderBase19findOrCreateQActionEPKNS2_6ActionEE3$_0Li0ENS_4ListIJEEEvE4implEiPNS_15QSlotObjectBaseEP7QObjectPPvPb + 168
+69  QtCore                              0x000000010c1118a0 _ZN11QMetaObject8activateEP7QObjectPKS_iPPv + 3240
+70  QtWidgets                           0x000000010b98eda4 _ZN7QAction8activateENS_11ActionEventE + 308
+71  QtCore                              0x000000010c10a7e4 _ZN7QObject5eventEP6QEvent + 596
+72  QtWidgets                           0x000000010b99836c _ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent + 292
+73  QtWidgets                           0x000000010b999878 _ZN12QApplication6notifyEP7QObjectP6QEvent + 508
+74  TrenchBroom                         0x00000001050d41e8 _ZN11TrenchBroom4View14TrenchBroomApp6notifyEP7QObjectP6QEvent + 40
+75  QtCore                              0x000000010c0e2d90 _ZN16QCoreApplication15notifyInternal2EP7QObjectP6QEvent + 212
+76  QtCore                              0x000000010c0e3f90 _ZN23QCoreApplicationPrivate16sendPostedEventsEP7QObjectiP11QThreadData + 492
+77  libqcocoa.dylib                     0x000000010ebc754c qt_plugin_instance + 203928
+78  libqcocoa.dylib                     0x000000010ebc7dfc qt_plugin_instance + 206152
+79  CoreFoundation                      0x00000001854c5d34 __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 28
+80  CoreFoundation                      0x00000001854c5cc8 __CFRunLoopDoSource0 + 176
+81  CoreFoundation                      0x00000001854c5a2c __CFRunLoopDoSources0 + 244
+82  CoreFoundation                      0x00000001854c45c8 __CFRunLoopRun + 840
+83  CoreFoundation                      0x00000001854c3bc4 CFRunLoopRunSpecific + 588
+84  HIToolbox                           0x0000000190933f64 RunCurrentEventLoopInMode + 292
+85  HIToolbox                           0x0000000190939d54 ReceiveNextEventCommon + 636
+86  HIToolbox                           0x0000000190939eb8 _BlockUntilNextEventMatchingListInModeWithFilter + 76
+87  AppKit                              0x0000000188fefa08 _DPSNextEvent + 660
+88  AppKit                              0x000000018992fe0c -[NSApplication(NSEventRouting) _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 688
+89  AppKit                              0x0000000188fe2ae0 -[NSApplication run] + 480
+90  libqcocoa.dylib                     0x000000010ebc6b08 qt_plugin_instance + 201300
+91  QtCore                              0x000000010c0df234 _ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE + 544
+92  QtCore                              0x000000010c0e34f0 _ZN16QCoreApplication4execEv + 204
+93  TrenchBroom                         0x0000000105685168 main + 584
+94  dyld                                0x000000018505c274 start + 2840
+--------------- [ stack trace ] ---------------

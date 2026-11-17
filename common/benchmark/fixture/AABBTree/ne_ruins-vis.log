@@ -1,0 +1,12 @@
+---- vis / ericw-tools 2.0.0-alpha8 ----
+
+--- Options Summary ---
+
+LoadBSPFile: 'ne_ruins.bsp'
+BSP is version Quake BSP2 bsp2
+INFO: using built-in palette.
+************ ERROR ************
+LoadPrtFile: unknown header/empty portal file ne_ruins.prt
+
+
+
