@@ -738,7 +738,9 @@ void LayerListBox::showContextMenu(QTreeWidgetItem *item, const QPoint &globalPo
         menu.addAction(tr("Select in editor"), this, [this] { selectInDocument(true); })->setEnabled(!selectionNodes().empty());
         menu.addAction(tr("Focus in editor"), this, [this, item] { focusItem(item); });
         addContextMenuAction(menu,*ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath), [this] {
-            savePrefabDialog(m_document.lock(), selectedTreeNodes(), this);
+            const auto& action = *ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath);
+            if (action.commandId() == SaveSelectionAsPrefabActionPath) savePrefabDialog(m_document.lock(), selectedTreeNodes(), this);
+            else if (auto* frame = findMapFrame(this)) { ActionExecutionContext context{frame, frame->currentMapViewBase()}; action.execute(context); }
         },hasPrefabSelection());
         menu.addSeparator();
         menu.addAction(tr("Delete"), this, &LayerListBox::deleteSelection)->setEnabled(!removableSelection().empty());

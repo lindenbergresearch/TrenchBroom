@@ -25,6 +25,9 @@
 #include "Ensure.h"
 #include "Macros.h"
 #include "View/ActionContext.h"
+#include "View/EditorConfiguration.h"
+#include "Notifier.h"
+#include "NotifierConnection.h"
 
 #include <filesystem>
 #include <functional>
@@ -80,6 +83,11 @@ class Action {
     QKeySequence m_defaultShortcut;
     std::filesystem::path m_iconPath;
     QString m_statusTip;
+    bool m_configured = false;
+    bool m_enabledByConfiguration = true;
+    int m_targets = MainMenuTarget | PopupMenuTarget | MainToolbarTarget | EditorToolbarTarget;
+    std::optional<QKeySequence> m_configuredShortcut;
+    QString m_commandId;
 
   public:
     Action(const std::filesystem::path &preferencePath, const QString &label, ActionContext::Type actionContext, const QKeySequence &defaultShortcut, const std::filesystem::path &iconPath, const QString &statusTip);
@@ -93,6 +101,11 @@ class Action {
     ActionContext::Type actionContext() const;
 
     QKeySequence keySequence() const;
+    QKeySequence defaultKeySequence() const { return m_defaultShortcut; }
+    int targets() const { return m_targets; }
+    bool configured() const { return m_configured; }
+    bool enabledByConfiguration() const { return m_enabledByConfiguration; }
+    QString commandId() const;
 
     void setKeySequence(const QKeySequence &keySequence) const;
 
@@ -236,6 +249,7 @@ class Menu : public MenuEntry {
     void accept(MenuVisitor &visitor) const override;
 
     void visitEntries(MenuVisitor &visitor) const;
+    const auto& entries() const { return m_entries; }
 
   deleteCopyAndMove(Menu);
 };
@@ -261,6 +275,17 @@ class ActionManager {
      * These will hold pointers to the actions in m_actions.
      */
     std::unique_ptr<Menu> m_toolBar;
+    std::map<std::filesystem::path, std::unique_ptr<Action>> m_commands;
+    std::vector<std::unique_ptr<Menu>> m_nativeMenus;
+    EditorConfiguration m_defaults, m_configuration;
+    NotifierConnection m_configurationConnection;
+    bool m_configurationPending = false;
+    bool m_actionsPending = false;
+
+    void initializeConfiguration();
+    void applyConfiguration(EditorConfiguration configuration);
+    void rebuildConfiguredMenus();
+    void queueConfigurationChanged();
 
   private:
     ActionManager();
@@ -268,7 +293,21 @@ class ActionManager {
   public:
   deleteCopyAndMove(ActionManager);
 
-    static const ActionManager &instance();
+    static ActionManager &instance();
+    Notifier<> configurationDidChangeNotifier;
+    Notifier<> actionsDidChangeNotifier;
+    const EditorConfiguration& configuration() const { return m_configuration; }
+    const EditorConfiguration& defaultConfiguration() const { return m_defaults; }
+    QStringList commandIds() const;
+    const Action* command(const QString& id) const;
+    const Action* action(const QString& id) const;
+    bool isBuiltin(const QString& id) const;
+    bool setConfiguration(const EditorConfiguration& configuration, QStringList& errors);
+    bool reloadConfiguration();
+    void setActionShortcut(const Action& action, const QKeySequence& shortcut);
+    void resetActionShortcut(const Action& action);
+    void resetActionConfiguration();
+    void resetToolbarConfiguration();
 
     /**
      * Note, unlike createAction(), these are not registered / owned by the ActionManager.

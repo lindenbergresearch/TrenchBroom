@@ -80,6 +80,7 @@ enum class RenderMode;
 } // namespace Renderer
 
 namespace View {
+enum class DrawShapeKind;
 class Action;
 
 class AnimationManager;
@@ -268,6 +269,8 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void cancel();
 
     void deactivateTool();
+    void selectBrushShape(DrawShapeKind kind);
+    bool brushShapeSelected(DrawShapeKind kind) const;
 
   public: // reparenting objects
     void addSelectedObjectsToGroup();

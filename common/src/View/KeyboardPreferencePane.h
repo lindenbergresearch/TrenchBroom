@@ -20,6 +20,7 @@
 #pragma once
 
 #include "View/PreferencePane.h"
+#include "NotifierConnection.h"
 
 class QWidget;
 
@@ -39,6 +40,7 @@ class KeyboardPreferencePane : public PreferencePane {
     QTableView *m_table;
     KeyboardShortcutModel *m_model;
     QSortFilterProxyModel *m_proxy;
+    NotifierConnection m_actionConnection;
 
   public:
     explicit KeyboardPreferencePane(MapDocument *document, QWidget *parent = nullptr);

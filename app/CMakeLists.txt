@@ -38,7 +38,7 @@ if (APPLE)
 
     # Configure default resources
     # Collect all default resources
-    file(GLOB_RECURSE MACOSX_DEFAULT_FILES RELATIVE ${APP_RESOURCE_DIR}/defaults "${APP_RESOURCE_DIR}/defaults/*")
+    file(GLOB_RECURSE MACOSX_DEFAULT_FILES CONFIGURE_DEPENDS RELATIVE ${APP_RESOURCE_DIR}/defaults "${APP_RESOURCE_DIR}/defaults/*")
 
     # Set correct locations for default resources
     foreach (DEFAULT_FILE ${MACOSX_DEFAULT_FILES})

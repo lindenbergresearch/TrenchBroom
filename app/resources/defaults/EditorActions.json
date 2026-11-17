@@ -1,0 +1,2762 @@
+{
+    "actions": [
+        {
+            "command": "Controls/Map view/Cancel",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Cancel",
+            "label": "Cancel",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Create brush",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Create brush",
+            "label": "Create Brush",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Cycle map view",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Cycle map view",
+            "label": "Cycle View",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Deactivate current tool",
+            "enabled": true,
+            "icon": "Pointer.svg",
+            "id": "Controls/Map view/Deactivate current tool",
+            "label": "Select",
+            "menuPath": "Edit/Tools",
+            "order": 0,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Duplicate and move objects backward; Duplicate and move objects up",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Duplicate and move objects backward; Duplicate and move objects up",
+            "label": "Duplicate and Move Up",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Duplicate and move objects down; Duplicate and move objects backward",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Duplicate and move objects down; Duplicate and move objects backward",
+            "label": "Duplicate and Move Backward",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Duplicate and move objects forward; Duplicate and move objects down",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Duplicate and move objects forward; Duplicate and move objects down",
+            "label": "Duplicate and Move Down",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Duplicate and move objects left",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Duplicate and move objects left",
+            "label": "Duplicate and Move Left",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Duplicate and move objects right",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Duplicate and move objects right",
+            "label": "Duplicate and Move Right",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Duplicate and move objects up; Duplicate and move objects forward",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Duplicate and move objects up; Duplicate and move objects forward",
+            "label": "Duplicate and Move Forward",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Flip objects horizontally",
+            "enabled": true,
+            "icon": "FlipHorizontally.svg",
+            "id": "Controls/Map view/Flip objects horizontally",
+            "label": "Flip Horizontally",
+            "menuPath": "Edit",
+            "order": 17,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 3,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Flip objects vertically",
+            "enabled": true,
+            "icon": "FlipVertically.svg",
+            "id": "Controls/Map view/Flip objects vertically",
+            "label": "Flip Vertically",
+            "menuPath": "Edit",
+            "order": 18,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 3,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Flip textures horizontally",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Flip textures horizontally",
+            "label": "Flip textures horizontally",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Flip textures vertically",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Flip textures vertically",
+            "label": "Flip textures vertically",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Make structural",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Make structural",
+            "label": "Make Structural",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move objects backward; Move objects up",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move objects backward; Move objects up",
+            "label": "Move Up",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move objects down; Move objects backward",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move objects down; Move objects backward",
+            "label": "Move Backward",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move objects forward; Move objects down",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move objects forward; Move objects down",
+            "label": "Move Down",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move objects left",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move objects left",
+            "label": "Move Left",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move objects right",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move objects right",
+            "label": "Move Right",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move objects up; Move objects forward",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move objects up; Move objects forward",
+            "label": "Move Forward",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures down",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures down",
+            "label": "Move Textures Down",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures down (coarse)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures down (coarse)",
+            "label": "Move Textures Down (Coarse)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures down (fine)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures down (fine)",
+            "label": "Move Textures Down (Fine)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures left",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures left",
+            "label": "Move Textures Left",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures left (coarse)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures left (coarse)",
+            "label": "Move Textures Left (Coarse)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures left (fine)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures left (fine)",
+            "label": "Move Textures Left (Fine)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures right",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures right",
+            "label": "Move Textures Right",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures right (coarse)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures right (coarse)",
+            "label": "Move Textures Right (Coarse)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures right (fine)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures right (fine)",
+            "label": "Move Textures Right (Fine)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures up",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures up",
+            "label": "Move Textures Up",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures up (coarse)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures up (coarse)",
+            "label": "Move Textures Up (Coarse)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Move textures up (fine)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Move textures up (fine)",
+            "label": "Move Textures Up (Fine)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Perform clip",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Perform clip",
+            "label": "Perform Clip",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Pitch objects clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Pitch objects clockwise",
+            "label": "Pitch Clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Pitch objects counter-clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Pitch objects counter-clockwise",
+            "label": "Pitch Counter-clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Reset camera zoom",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Reset camera zoom",
+            "label": "Reset Camera Zoom",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Reset texture alignment",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Reset texture alignment",
+            "label": "Reset texture alignment",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Reset texture alignment to world aligned",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Reset texture alignment to world aligned",
+            "label": "Reset texture alignment to world aligned",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Reveal in texture browser",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Reveal in texture browser",
+            "label": "Reveal in texture browser",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Roll objects clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Roll objects clockwise",
+            "label": "Roll Clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Roll objects counter-clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Roll objects counter-clockwise",
+            "label": "Roll Counter-clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Rotate textures clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Rotate textures clockwise",
+            "label": "Rotate Textures Clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Rotate textures clockwise (coarse)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Rotate textures clockwise (coarse)",
+            "label": "Rotate Textures Clockwise (Coarse)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Rotate textures clockwise (fine)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Rotate textures clockwise (fine)",
+            "label": "Rotate Textures Clockwise (Fine)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Rotate textures counter-clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Rotate textures counter-clockwise",
+            "label": "Rotate Textures Counter-clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Rotate textures counter-clockwise (coarse)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Rotate textures counter-clockwise (coarse)",
+            "label": "Rotate Textures Counter-clockwise (Coarse)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Rotate textures counter-clockwise (fine)",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Rotate textures counter-clockwise (fine)",
+            "label": "Rotate Textures Counter-clockwise (Fine)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Toggle clip side",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Toggle clip side",
+            "label": "Toggle Clip Side",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Hide entity links",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Hide entity links",
+            "label": "Hide All Entity Links",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Hide faces",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Hide faces",
+            "label": "Hide Faces",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Hide textures",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Hide textures",
+            "label": "Hide Textures",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Shade faces",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Shade faces",
+            "label": "Toggle Shade Faces",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Show all entity links",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Show all entity links",
+            "label": "Show All Entity Links",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Show directly selected entity links",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Show directly selected entity links",
+            "label": "Show Directly Selected Entity Links",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Show edges",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Show edges",
+            "label": "Toggle Show Edges",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Show textures",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Show textures",
+            "label": "Show Textures",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Show transitively selected entity links",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Show transitively selected entity links",
+            "label": "Show Transitively Selected Entity Links",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show brush entity bounds",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show brush entity bounds",
+            "label": "Toggle Show Brush Entity Bounds",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show brushes",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show brushes",
+            "label": "Toggle Show Brushes",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show entity classnames",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show entity classnames",
+            "label": "Toggle Show Entity Classnames",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show group bounds",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show group bounds",
+            "label": "Toggle Show Group Bounds",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show point entities",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show point entities",
+            "label": "Toggle Show Point Entities",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show point entity bounds",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show point entity bounds",
+            "label": "Toggle Show Point Entity Bounds",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Toggle show point entity models",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Toggle show point entity models",
+            "label": "Toggle Show Point Entity Models",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Use Lightning",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Use Lightning",
+            "label": "Use lightning (experimental)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Use anisotropy filter",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Use anisotropy filter",
+            "label": "Enable Anisotropy Filtering",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/View Filter > Use fog",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/View Filter > Use fog",
+            "label": "Toggle Show Fog",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Yaw objects clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Yaw objects clockwise",
+            "label": "Yaw Clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Controls/Map view/Yaw objects counter-clockwise",
+            "enabled": true,
+            "icon": "",
+            "id": "Controls/Map view/Yaw objects counter-clockwise",
+            "label": "Yaw Counter-clockwise",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Editor/Create/Arch",
+            "enabled": true,
+            "icon": "ShapeTool_Arch.svg",
+            "id": "Editor/Create/Arch",
+            "label": "Create Arch",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/Cone",
+            "enabled": true,
+            "icon": "ShapeTool_Cone.svg",
+            "id": "Editor/Create/Cone",
+            "label": "Create Cone",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/Cuboid",
+            "enabled": true,
+            "icon": "ShapeTool_Cuboid.svg",
+            "id": "Editor/Create/Cuboid",
+            "label": "Create Cuboid",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/Cylinder",
+            "enabled": true,
+            "icon": "ShapeTool_Cylinder.svg",
+            "id": "Editor/Create/Cylinder",
+            "label": "Create Cylinder",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/IcoSphere",
+            "enabled": true,
+            "icon": "ShapeTool_IcoSphere.svg",
+            "id": "Editor/Create/IcoSphere",
+            "label": "Create Spheroid (Icosahedron)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/Rock",
+            "enabled": true,
+            "icon": "ShapeTool_Rock.svg",
+            "id": "Editor/Create/Rock",
+            "label": "Create Rock",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/Stairs",
+            "enabled": true,
+            "icon": "ShapeTool_Stairs.svg",
+            "id": "Editor/Create/Stairs",
+            "label": "Create Stairs",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Editor/Create/UVSphere",
+            "enabled": true,
+            "icon": "ShapeTool_UVSphere.svg",
+            "id": "Editor/Create/UVSphere",
+            "label": "Create Spheroid (UV)",
+            "menuPath": "Editor Actions",
+            "order": 10000,
+            "targets": [
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Activate Create and select this brush shape"
+        },
+        {
+            "command": "Menu/Edit/CSG/Convex Merge",
+            "enabled": true,
+            "icon": "ConvexMerge.svg",
+            "id": "Menu/Edit/CSG/Convex Merge",
+            "label": "Convex Merge",
+            "menuPath": "Edit/CSG",
+            "order": 22,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 4,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/CSG/Hollow",
+            "enabled": true,
+            "icon": "Hollow.svg",
+            "id": "Menu/Edit/CSG/Hollow",
+            "label": "Hollow",
+            "menuPath": "Edit/CSG",
+            "order": 19,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 4,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/CSG/Intersect",
+            "enabled": true,
+            "icon": "Intersect.svg",
+            "id": "Menu/Edit/CSG/Intersect",
+            "label": "Intersect",
+            "menuPath": "Edit/CSG",
+            "order": 21,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 4,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/CSG/Subtract",
+            "enabled": true,
+            "icon": "Subtract.svg",
+            "id": "Menu/Edit/CSG/Subtract",
+            "label": "Subtract",
+            "menuPath": "Edit/CSG",
+            "order": 20,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 4,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Clear Protected Properties",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Clear Protected Properties",
+            "label": "Clear Protected Properties",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Clear Repeatable Commands",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Clear Repeatable Commands",
+            "label": "Clear Repeatable Commands",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Copy",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Copy",
+            "label": "Copy",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Create Linked Duplicate",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Create Linked Duplicate",
+            "label": "Create Linked Duplicate",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "popupMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Cut",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Cut",
+            "label": "Cut",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Delete",
+            "enabled": true,
+            "icon": "Delete.svg",
+            "id": "Menu/Edit/Delete",
+            "label": "Delete",
+            "menuPath": "Edit",
+            "order": 13,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 3,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Duplicate",
+            "enabled": true,
+            "icon": "DuplicateObjects.svg",
+            "id": "Menu/Edit/Duplicate",
+            "label": "Duplicate",
+            "menuPath": "Edit",
+            "order": 14,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 3,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Group",
+            "enabled": true,
+            "icon": "Group.svg",
+            "id": "Menu/Edit/Group",
+            "label": "Group Selected Objects",
+            "menuPath": "Edit",
+            "order": 15,
+            "targets": [
+                "mainMenu",
+                "popupMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 3,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Paste",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Paste",
+            "label": "Paste",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Paste at Original Position",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Paste at Original Position",
+            "label": "Paste at Original Position",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Redo",
+            "enabled": true,
+            "icon": "Redo.svg",
+            "id": "Menu/Edit/Redo",
+            "label": "Redo",
+            "menuPath": "Edit",
+            "order": 8,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 1,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Repeat",
+            "enabled": true,
+            "icon": "Repeat.svg",
+            "id": "Menu/Edit/Repeat",
+            "label": "Repeat Last Commands",
+            "menuPath": "Edit",
+            "order": 9,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 1,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Replace Texture...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Replace Texture...",
+            "label": "Replace Texture...",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Save Selection as Prefab",
+            "enabled": true,
+            "icon": "Prefab.svg",
+            "id": "Menu/Edit/Save Selection as Prefab",
+            "label": "Save Selection as Prefab…",
+            "menuPath": "Edit",
+            "order": 29,
+            "targets": [
+                "mainMenu",
+                "popupMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 7,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select All",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select All",
+            "label": "Select All",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select Inside",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select Inside",
+            "label": "Select Inside",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select Inverse",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select Inverse",
+            "label": "Select Inverse",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select Linked Groups",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select Linked Groups",
+            "label": "Select Linked Groups",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "popupMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select None",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select None",
+            "label": "Select None",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select Siblings",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select Siblings",
+            "label": "Select Siblings",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select Tall",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select Tall",
+            "label": "Select Tall",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select Touching",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select Touching",
+            "label": "Select Touching",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Select by Line Number",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Select by Line Number",
+            "label": "Select by Line Number...",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Separate Linked Groups",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Separate Linked Groups",
+            "label": "Separate Selected Groups",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "popupMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Snap Vertices to Grid",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Snap Vertices to Grid",
+            "label": "Snap Vertices to Grid",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Snap Vertices to Integer",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Edit/Snap Vertices to Integer",
+            "label": "Snap Vertices to Integer",
+            "menuPath": "Edit",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Texture Lock",
+            "enabled": true,
+            "icon": "TextureLock.svg",
+            "id": "Menu/Edit/Texture Lock",
+            "label": "Texture Lock",
+            "menuPath": "Edit",
+            "order": 23,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 5,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Brush Tool",
+            "enabled": true,
+            "icon": "BrushTool.svg",
+            "id": "Menu/Edit/Tools/Brush Tool",
+            "label": "Brush Tool",
+            "menuPath": "Edit/Tools",
+            "order": 2,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Clip Tool",
+            "enabled": true,
+            "icon": "ClipTool.svg",
+            "id": "Menu/Edit/Tools/Clip Tool",
+            "label": "Clip Tool",
+            "menuPath": "Edit/Tools",
+            "order": 3,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Create Tool",
+            "enabled": true,
+            "icon": "ShapeTool_Cuboid.svg",
+            "id": "Menu/Edit/Tools/Create Tool",
+            "label": "Create",
+            "menuPath": "Edit/Tools",
+            "order": 1,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": "Create brushes using the shape palette"
+        },
+        {
+            "command": "Menu/Edit/Tools/Edge Tool",
+            "enabled": true,
+            "icon": "EdgeTool.svg",
+            "id": "Menu/Edit/Tools/Edge Tool",
+            "label": "Edge Tool",
+            "menuPath": "Edit/Tools",
+            "order": 5,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Face Tool",
+            "enabled": true,
+            "icon": "FaceTool.svg",
+            "id": "Menu/Edit/Tools/Face Tool",
+            "label": "Face Tool",
+            "menuPath": "Edit/Tools",
+            "order": 6,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Rotate Tool",
+            "enabled": true,
+            "icon": "RotateTool.svg",
+            "id": "Menu/Edit/Tools/Rotate Tool",
+            "label": "Rotate Tool",
+            "menuPath": "Edit/Tools",
+            "order": 10,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 2,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Scale Tool",
+            "enabled": true,
+            "icon": "ScaleTool.svg",
+            "id": "Menu/Edit/Tools/Scale Tool",
+            "label": "Scale Tool",
+            "menuPath": "Edit/Tools",
+            "order": 11,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 2,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Shear Tool",
+            "enabled": true,
+            "icon": "ShearTool.svg",
+            "id": "Menu/Edit/Tools/Shear Tool",
+            "label": "Shear Tool",
+            "menuPath": "Edit/Tools",
+            "order": 12,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 2,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Tools/Vertex Tool",
+            "enabled": true,
+            "icon": "VertexTool.svg",
+            "id": "Menu/Edit/Tools/Vertex Tool",
+            "label": "Vertex Tool",
+            "menuPath": "Edit/Tools",
+            "order": 4,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 0,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/UV Lock",
+            "enabled": true,
+            "icon": "UVLock.svg",
+            "id": "Menu/Edit/UV Lock",
+            "label": "UV Lock",
+            "menuPath": "Edit",
+            "order": 24,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 5,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Undo",
+            "enabled": true,
+            "icon": "Undo.svg",
+            "id": "Menu/Edit/Undo",
+            "label": "Undo",
+            "menuPath": "Edit",
+            "order": 7,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 1,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Edit/Ungroup",
+            "enabled": true,
+            "icon": "view_module.svg",
+            "id": "Menu/Edit/Ungroup",
+            "label": "Ungroup Selected Objects",
+            "menuPath": "Edit",
+            "order": 16,
+            "targets": [
+                "mainMenu",
+                "popupMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 3,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/About TrenchBroom",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/About TrenchBroom",
+            "label": "About TrenchBroom",
+            "menuPath": "Help",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Close",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Close",
+            "label": "Close Document",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Export/Map...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Export/Map...",
+            "label": "Map...",
+            "menuPath": "File/Export",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Exports the current map to a .map file. Layers marked Omit From Export will be omitted."
+        },
+        {
+            "command": "Menu/File/Export/Wavefront OBJ...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Export/Wavefront OBJ...",
+            "label": "Wavefront OBJ...",
+            "menuPath": "File/Export",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Load Point File...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Load Point File...",
+            "label": "Load Point File...",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Load Portal File...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Load Portal File...",
+            "label": "Load Portal File...",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/New",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/New",
+            "label": "New Document",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Open...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Open...",
+            "label": "Open Document...",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Preferences...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Preferences...",
+            "label": "Preferences...",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Reload Entity Definitions",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Reload Entity Definitions",
+            "label": "Reload Entity Definitions",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Reload Point File",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Reload Point File",
+            "label": "Reload Point File",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Reload Portal File",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Reload Portal File",
+            "label": "Reload Portal File",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Reload Texture Collections",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Reload Texture Collections",
+            "label": "Reload Texture Collections",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Revert",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Revert",
+            "label": "Revert Document",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": "Discards any unsaved changes and reloads the map file."
+        },
+        {
+            "command": "Menu/File/Save",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Save",
+            "label": "Save Document",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Save as...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Save as...",
+            "label": "Save Document as...",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Unload Point File",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Unload Point File",
+            "label": "Unload Point File",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/File/Unload Portal File",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/File/Unload Portal File",
+            "label": "Unload Portal File",
+            "menuPath": "File",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Help/TrenchBroom Manual",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/Help/TrenchBroom Manual",
+            "label": "TrenchBroom Manual",
+            "menuPath": "Help",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Run/Compile...",
+            "enabled": true,
+            "icon": "Compile.svg",
+            "id": "Menu/Run/Compile...",
+            "label": "Compile Map...",
+            "menuPath": "Run",
+            "order": 33,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 9,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/Run/Launch...",
+            "enabled": true,
+            "icon": "Run.svg",
+            "id": "Menu/Run/Launch...",
+            "label": "Launch Engine...",
+            "menuPath": "Run",
+            "order": 34,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 9,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Camera/Focus on Selection",
+            "enabled": true,
+            "icon": "reset_focus.svg",
+            "id": "Menu/View/Camera/Focus on Selection",
+            "label": "Focus Camera on Selection",
+            "menuPath": "View/Camera",
+            "order": 25,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 6,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Camera/Move Camera to...",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Camera/Move Camera to...",
+            "label": "Move Camera to...",
+            "menuPath": "View/Camera",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Camera/Move to Next Point",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Camera/Move to Next Point",
+            "label": "Move Camera to Next Point",
+            "menuPath": "View/Camera",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Camera/Move to Previous Point",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Camera/Move to Previous Point",
+            "label": "Move Camera to Previous Point",
+            "menuPath": "View/Camera",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Camera/Reset 2D Cameras",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Camera/Reset 2D Cameras",
+            "label": "Reset 2D Cameras",
+            "menuPath": "View/Camera",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Decrease Grid Size",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Decrease Grid Size",
+            "label": "Decrease Grid Size",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Hide Major Grid Division",
+            "enabled": true,
+            "icon": "Dummy.svg",
+            "id": "Menu/View/Grid/Hide Major Grid Division",
+            "label": "Hide Major Grid Division",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Increase Grid Size",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Increase Grid Size",
+            "label": "Increase Grid Size",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Normal Major Grid Division",
+            "enabled": true,
+            "icon": "Dummy.svg",
+            "id": "Menu/View/Grid/Normal Major Grid Division",
+            "label": "Normal Major Grid Division",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 0.125",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 0.125",
+            "label": "Set Grid Size 0.125",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 0.25",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 0.25",
+            "label": "Set Grid Size 0.25",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 0.5",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 0.5",
+            "label": "Set Grid Size 0.5",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 1",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 1",
+            "label": "Set Grid Size 1",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 128",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 128",
+            "label": "Set Grid Size 128",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 16",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 16",
+            "label": "Set Grid Size 16",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 2",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 2",
+            "label": "Set Grid Size 2",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 256",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 256",
+            "label": "Set Grid Size 256",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 32",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 32",
+            "label": "Set Grid Size 32",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 4",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 4",
+            "label": "Set Grid Size 4",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 64",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 64",
+            "label": "Set Grid Size 64",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Set Grid Size 8",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Grid/Set Grid Size 8",
+            "label": "Set Grid Size 8",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Show Grid",
+            "enabled": true,
+            "icon": "Grid.svg",
+            "id": "Menu/View/Grid/Show Grid",
+            "label": "Show Grid",
+            "menuPath": "View/Grid",
+            "order": 31,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 8,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Small Major Grid Division",
+            "enabled": true,
+            "icon": "Dummy.svg",
+            "id": "Menu/View/Grid/Small Major Grid Division",
+            "label": "Small Major Grid Division",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Snap to Grid",
+            "enabled": true,
+            "icon": "SnapToGrid.svg",
+            "id": "Menu/View/Grid/Snap to Grid",
+            "label": "Snap to Grid",
+            "menuPath": "View/Grid",
+            "order": 32,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 8,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Grid/Wide Major Grid Division",
+            "enabled": true,
+            "icon": "Dummy.svg",
+            "id": "Menu/View/Grid/Wide Major Grid Division",
+            "label": "Wide Major Grid Division",
+            "menuPath": "View/Grid",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Hide",
+            "enabled": true,
+            "icon": "visibility_off.svg",
+            "id": "Menu/View/Hide",
+            "label": "Hide Selection",
+            "menuPath": "View",
+            "order": 27,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 6,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Isolate",
+            "enabled": true,
+            "icon": "view_in_ar.svg",
+            "id": "Menu/View/Isolate",
+            "label": "Isolate Selection",
+            "menuPath": "View",
+            "order": 26,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 6,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Maximize Current View",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Maximize Current View",
+            "label": "Maximize Current View",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Set four pane layout",
+            "enabled": true,
+            "icon": "looks_4.svg",
+            "id": "Menu/View/Set four pane layout",
+            "label": "Four Pane Layout",
+            "menuPath": "View",
+            "order": 38,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 10,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Set single pane layout",
+            "enabled": true,
+            "icon": "looks_one.svg",
+            "id": "Menu/View/Set single pane layout",
+            "label": "Single Pane Layout",
+            "menuPath": "View",
+            "order": 35,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 10,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Set three pane layout",
+            "enabled": true,
+            "icon": "looks_3.svg",
+            "id": "Menu/View/Set three pane layout",
+            "label": "Three Pane Layout",
+            "menuPath": "View",
+            "order": 37,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 10,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Set two pane layout",
+            "enabled": true,
+            "icon": "looks_two.svg",
+            "id": "Menu/View/Set two pane layout",
+            "label": "Two Pane Layout",
+            "menuPath": "View",
+            "order": 36,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 10,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Show All",
+            "enabled": true,
+            "icon": "visibility.svg",
+            "id": "Menu/View/Show All",
+            "label": "Show All",
+            "menuPath": "View",
+            "order": 28,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 6,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Show Prefab Browser",
+            "enabled": true,
+            "icon": "PrefabViewTiles.svg",
+            "id": "Menu/View/Show Prefab Browser",
+            "label": "Show Prefab Browser",
+            "menuPath": "View",
+            "order": 30,
+            "targets": [
+                "mainMenu",
+                "mainToolbar",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 7,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Switch to Entity Inspector",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Switch to Entity Inspector",
+            "label": "Show Entity Browser",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Switch to Face Inspector",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Switch to Face Inspector",
+            "label": "Show Face Attributes",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Switch to Layer Inspector",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Switch to Layer Inspector",
+            "label": "Show Layers",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Switch to Map Inspector",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Switch to Map Inspector",
+            "label": "Show Map Properties",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Switch to Properties Inspector",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Switch to Properties Inspector",
+            "label": "Show Properties",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Toggle Info Panel",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Toggle Info Panel",
+            "label": "Toggle Info Panel",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Toggle Inspector",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Toggle Inspector",
+            "label": "Toggle Inspector",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        },
+        {
+            "command": "Menu/View/Toggle Toolbar",
+            "enabled": true,
+            "icon": "",
+            "id": "Menu/View/Toggle Toolbar",
+            "label": "Toggle Toolbar",
+            "menuPath": "View",
+            "order": 10000,
+            "targets": [
+                "mainMenu",
+                "editorToolbar"
+            ],
+            "toolbarGroup": 100,
+            "tooltip": ""
+        }
+    ],
+    "sides": {
+        "bottom": "sequential",
+        "left": "sequential",
+        "right": "sequential",
+        "top": "sequential"
+    },
+    "toolbars": [
+        {
+            "actions": [
+                "Editor/Create/Cuboid",
+                "Editor/Create/Stairs",
+                "Editor/Create/Arch",
+                "Editor/Create/Cylinder",
+                "Editor/Create/Cone",
+                "Editor/Create/UVSphere",
+                "Editor/Create/IcoSphere",
+                "Editor/Create/Rock"
+            ],
+            "alignment": "center",
+            "edge": "left",
+            "enabled": true,
+            "iconSize": 24,
+            "id": "brush-shapes",
+            "label": "Create",
+            "minimumIconSize": 12
+        }
+    ],
+    "version": 1
+}

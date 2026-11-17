@@ -66,6 +66,7 @@
 #include "Model/PatchNode.h"
 #include "Model/WorldNode.h"
 #include "PreferenceManager.h"
+#include "ThemeManager.h"
 #include "Preferences.h"
 #include "TrenchBroomApp.h"
 #include "View/Actions.h"
@@ -253,10 +254,14 @@ void MapFrame::createMenus() {
 
     const auto &actionManager = ActionManager::instance();
     actionManager.visitMainMenu(menuBuilder);
+    menuBuilder.ensureAllActions();
+    for (const auto& [action, qt] : m_actionMap) {
+        if (action->targets() & (MainMenuTarget | MainToolbarTarget)) addAction(qt); else removeAction(qt);
+    }
 
     m_recentDocumentsMenu = menuBuilder.recentDocumentsMenu;
-    m_undoAction = menuBuilder.undoAction;
-    m_redoAction = menuBuilder.redoAction;
+    m_undoAction = findAction("Menu/Edit/Undo");
+    m_redoAction = findAction("Menu/Edit/Redo");
 
     addRecentDocumentsMenu();
 }
@@ -265,13 +270,21 @@ void MapFrame::updateShortcuts() {
     for (auto [tAction, qAction] : m_actionMap) {
         MenuBuilderBase::updateActionKeySeqeunce(qAction, tAction);
     }
+    updateUndoRedoActions();
+}
+
+void MapFrame::rebuildActionWidgets() {
+    const auto menus = menuBar()->findChildren<QMenu*>(QString{}, Qt::FindDirectChildrenOnly);
+    menuBar()->clear();
+    for (auto* menu : menus) delete menu;
+    createMenus(); updateToolbar(); updateShortcuts(); updateActionState();
 }
 
 void MapFrame::updateActionState() {
     ActionExecutionContext context(this, currentMapViewBase());
 
     for (auto [tAction, qAction] : m_actionMap) {
-        if (qAction == m_undoAction || qAction == m_redoAction) {
+        if ((qAction == m_undoAction && tAction->commandId() == "Menu/Edit/Undo") || (qAction == m_redoAction && tAction->commandId() == "Menu/Edit/Redo")) {
             // These are handled specially for performance reasons.
             continue;
         }
@@ -309,23 +322,23 @@ void MapFrame::updateActionStateDelayed() {
 
 void MapFrame::updateUndoRedoActions() {
     const auto document = kdl::mem_lock(m_document);
-    if (m_undoAction != nullptr) {
+    const auto* undoDefinition = ActionManager::instance().action("Menu/Edit/Undo");
+    const auto* redoDefinition = ActionManager::instance().action("Menu/Edit/Redo");
+    if (m_undoAction != nullptr && undoDefinition && undoDefinition->commandId() == "Menu/Edit/Undo") {
         if (document->canUndoCommand()) {
-            const auto text = "Undo " + document->undoCommandName();
-            m_undoAction->setText(QString::fromStdString(text));
-            m_undoAction->setEnabled(true);
+            m_undoAction->setText(undoDefinition->label() + ' ' + QString::fromStdString(document->undoCommandName()));
+            m_undoAction->setEnabled(undoDefinition->enabledByConfiguration());
         } else {
-            m_undoAction->setText("Undo");
+            m_undoAction->setText(undoDefinition->label());
             m_undoAction->setEnabled(false);
         }
     }
-    if (m_redoAction != nullptr) {
+    if (m_redoAction != nullptr && redoDefinition && redoDefinition->commandId() == "Menu/Edit/Redo") {
         if (document->canRedoCommand()) {
-            const auto text = "Redo " + document->redoCommandName();
-            m_redoAction->setText(QString::fromStdString(text));
-            m_redoAction->setEnabled(true);
+            m_redoAction->setText(redoDefinition->label() + ' ' + QString::fromStdString(document->redoCommandName()));
+            m_redoAction->setEnabled(redoDefinition->enabledByConfiguration());
         } else {
-            m_redoAction->setText("Redo");
+            m_redoAction->setText(redoDefinition->label());
             m_redoAction->setEnabled(false);
         }
     }
@@ -497,6 +510,7 @@ void MapFrame::updateGridSizeComboBox() {
 void MapFrame::updateToolbar() {
     if (m_toolBar) {
         removeToolBar(m_toolBar);
+        m_toolBar->hide(); m_toolBar->deleteLater(); m_toolBar = nullptr;
         createToolBar();
     }
 }
@@ -742,6 +756,7 @@ void MapFrame::updateStatusBarDelayed() const {
 }
 
 void MapFrame::connectObservers() {
+    m_notifierConnection += ActionManager::instance().actionsDidChangeNotifier.connect(this, &MapFrame::rebuildActionWidgets);
     PreferenceManager &prefs = PreferenceManager::instance();
     m_notifierConnection += prefs.preferenceDidChangeNotifier.connect(this, &MapFrame::preferenceDidChange);
 
@@ -813,6 +828,9 @@ void MapFrame::transactionUndone(const std::string & /* name */) {
 }
 
 void MapFrame::preferenceDidChange(const std::filesystem::path &path) {
+    // Appearance updates are handled by the theme manager. They do not change
+    // key bindings or selection statistics (which may cover thousands of nodes).
+    if (ThemeManager::isRelevantPreference(path)) return;
     if (path == Preferences::GridUnitSystem.path() || path == Preferences::MetricConversationFactor.path())
         updateGridSizeComboBox();
     if (path == Preferences::MapViewLayout.path()) {

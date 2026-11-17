@@ -197,23 +197,29 @@ void ContextOverlay::updateContent() {
         html += "<p><small>" + tr("Overlay configuration error: %1").arg(m_configurationError).toHtmlEscaped() + "</small></p>";
     if (html != text()) setText(html);
     place();
-    show();
+    if (!property("toolbarSpaceUnavailable").toBool()) show();
     raise();
 }
 
 void ContextOverlay::place() {
     const auto* view = parentWidget();
-    const int margin = std::min({m_theme.margin, view->width() / 4, view->height() / 4});
-    const int width = std::max(1, std::min(m_theme.width, view->width() - 2 * margin));
+    auto available = view->rect();
+    const auto insets = view->property("editorToolbarInsets").toList();
+    if (insets.size() == 4) available.adjust(insets[0].toInt(), insets[1].toInt(), -insets[2].toInt(), -insets[3].toInt());
+    const auto noSpace = available.width() < 80 || available.height() < 30;
+    setProperty("toolbarSpaceUnavailable", noSpace);
+    if (noSpace) { hide(); return; }
+    const int margin = std::min({m_theme.margin, available.width() / 4, available.height() / 4});
+    const int width = std::max(1, std::min(m_theme.width, available.width() - 2 * margin));
     setFixedWidth(width);
-    const int height = std::max(1, std::min(heightForWidth(width), view->height() - 2 * margin));
+    const int height = std::max(1, std::min(heightForWidth(width), available.height() - 2 * margin));
     resize(width, height);
-    move(view->width() - width - margin, margin);
+    move(available.right() + 1 - width - margin, available.y() + margin);
 }
 
 bool ContextOverlay::eventFilter(QObject* watched, QEvent* event) {
     if (watched == parentWidget()) {
-        if (event->type() == QEvent::Resize) place();
+        if (event->type() == QEvent::Resize || event->type() == QEvent::DynamicPropertyChange) { place(); scheduleUpdate(); }
         else if (event->type() == QEvent::Show || event->type() == QEvent::MouseButtonRelease
                  || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::KeyRelease)
             scheduleUpdate();

@@ -45,12 +45,11 @@ KeyboardShortcutModel::KeyboardShortcutModel(MapDocument *document, QObject *par
 }
 
 void KeyboardShortcutModel::reset() {
+    beginResetModel();
     m_actions.clear();
     initializeActions();
     updateConflicts();
-    if (totalActionCount() > 0) {
-        emit dataChanged(createIndex(0, 0), createIndex(totalActionCount() - 1, 2));
-    }
+    endResetModel();
 }
 
 int KeyboardShortcutModel::rowCount(const QModelIndex & /* parent */) const {

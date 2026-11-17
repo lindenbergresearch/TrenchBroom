@@ -83,7 +83,9 @@ AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstant
 AppPreferenceManager::~AppPreferenceManager() {
     if (m_saveTimer.isActive()) {
         m_saveTimer.stop();
-        saveChangesImmediately();
+        // The singleton pointer is already reset. Logger preferences and modal
+        // error dialogs are unavailable while flushing committed values here.
+        saveChangesImmediately(false);
     }
 }
 
@@ -135,17 +137,19 @@ void AppPreferenceManager::discardChanges() {
     invalidatePreferences();
 }
 
-void AppPreferenceManager::saveChangesImmediately() {
+void AppPreferenceManager::saveChangesImmediately(const bool reportErrors) {
     lockReload();
-    defaultQtLogger.debug() << "Saving preferences to: " << m_preferencesFilePath.toStdString();
+    if (reportErrors) defaultQtLogger.debug() << "Saving preferences to: " << m_preferencesFilePath.toStdString();
 
     writePreferencesToFile(m_preferencesFilePath, m_cache).transform_error(kdl::overload([&](const PreferenceErrors::FileAccessError &) {
         // This happens e.g. if you don't have read permissions for
         // m_preferencesFilePath
-        showErrorAndDisableFileReadWrite(tr("A file IO error occurred while attempting to write the preference file:"), tr("ensure the file is writable"));
+        if (reportErrors) showErrorAndDisableFileReadWrite(tr("A file IO error occurred while attempting to write the preference file:"), tr("ensure the file is writable"));
+        else qWarning().noquote() << "Could not save preferences during shutdown:" << m_preferencesFilePath;
     }, [&](const PreferenceErrors::LockFileError &) {
         // This happens if the lock file couldn't be acquired
-        showErrorAndDisableFileReadWrite(tr("Could not acquire lock file for reading the preference file:"), tr("check for stale lock files"));
+        if (reportErrors) showErrorAndDisableFileReadWrite(tr("Could not acquire lock file for reading the preference file:"), tr("check for stale lock files"));
+        else qWarning().noquote() << "Could not lock preferences during shutdown:" << m_preferencesFilePath;
     }));
 }
 

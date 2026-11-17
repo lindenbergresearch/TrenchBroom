@@ -41,6 +41,7 @@ namespace View {
 KeyboardPreferencePane::KeyboardPreferencePane(MapDocument *document, QWidget *parent)
     : PreferencePane(parent), m_table(nullptr), m_model(nullptr), m_proxy(nullptr) {
     m_model = new KeyboardShortcutModel(document, this);
+    m_actionConnection = ActionManager::instance().actionsDidChangeNotifier.connect([this] { m_model->reset(); });
     m_proxy = new QSortFilterProxyModel(this);
     m_proxy->setSourceModel(m_model);
     m_proxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -101,7 +102,7 @@ void KeyboardPreferencePane::doResetToDefaults() {
 }
 
 void KeyboardPreferencePane::doUpdateControls() {
-    m_table->update();
+    m_model->reset();
 }
 
 bool KeyboardPreferencePane::doValidate() {

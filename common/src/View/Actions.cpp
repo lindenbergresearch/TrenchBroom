@@ -18,6 +18,8 @@
  */
 
 #include "Actions.h"
+#include "IO/PathQt.h"
+#include "View/DrawShapeToolExtension.h"
 
 #include <QKeySequence>
 #include <QString>
@@ -50,10 +52,13 @@ QAction* addContextMenuAction(QMenu& menu, const Action& action, const std::func
     auto* result = menu.addAction(action.hasIcon() ? IO::loadSVGIcon(action.iconPath(),16) : QIcon{},
         pref(Preferences::ContextMenuShortcuts) ? label : action.label());
     result->setProperty("tbContextFullLabel",label);
+    result->setProperty("tbActionId", IO::pathAsQString(action.preferencePath()));
+    result->setVisible((action.targets() & PopupMenuTarget) != 0);
     result->setProperty("tbContextDisplayedLabel",result->text());
     result->setShortcutVisibleInContextMenu(pref(Preferences::ContextMenuShortcuts));
+    result->setCheckable(action.checkable());
     result->setIconVisibleInMenu(pref(Preferences::ContextMenuIcons));
-    result->setEnabled(enabled); result->setStatusTip(action.statusTip());
+    result->setEnabled(enabled && action.enabledByConfiguration()); result->setStatusTip(action.statusTip());
     QObject::connect(result,&QAction::triggered,&menu,execute);
     return result;
 }
@@ -69,7 +74,7 @@ ActionExecutionContext::ActionExecutionContext(MapFrame *mapFrame, MapViewBase *
 }
 
 bool ActionExecutionContext::hasDocument() const {
-    return m_frame != nullptr;
+    return m_frame != nullptr && m_frame->document()->world() != nullptr;
 }
 
 bool ActionExecutionContext::hasActionContext(const ActionContext::Type actionContext) const {
@@ -120,24 +125,29 @@ ActionContext::Type Action::actionContext() const {
 }
 
 QKeySequence Action::keySequence() const {
+    if (m_configuredShortcut) return *m_configuredShortcut;
     auto &prefs = PreferenceManager::instance();
     auto &pref = prefs.dynamicPreference(m_preferencePath, QKeySequence(m_defaultShortcut));
     return prefs.get(pref);
 }
 
 void Action::setKeySequence(const QKeySequence &keySequence) const {
+    if (m_configured) { ActionManager::instance().setActionShortcut(*this, keySequence); return; }
     auto &prefs = PreferenceManager::instance();
     auto &pref = prefs.dynamicPreference(m_preferencePath, QKeySequence(m_defaultShortcut));
     prefs.set(pref, keySequence);
 }
 
 void Action::resetKeySequence() const {
+    if (m_configured) { ActionManager::instance().resetActionShortcut(*this); return; }
     setKeySequence(m_defaultShortcut);
 }
 
 bool Action::hasIcon() const {
     return !m_iconPath.empty();
 }
+
+QString Action::commandId() const { return m_commandId.isEmpty() ? IO::pathAsQString(m_preferencePath) : m_commandId; }
 
 const std::filesystem::path &Action::iconPath() const {
     assert(hasIcon());
@@ -227,10 +237,11 @@ void Menu::visitEntries(MenuVisitor &visitor) const {
 
 ActionManager::ActionManager() {
     initialize();
+    initializeConfiguration();
 }
 
-const ActionManager &ActionManager::instance() {
-    static const auto instance = ActionManager();
+ActionManager &ActionManager::instance() {
+    static auto instance = ActionManager();
     return instance;
 }
 
@@ -330,7 +341,7 @@ void ActionManager::visitMapViewActions(const ActionVisitor &visitor) const {
     for (const auto &[path, actionPtr] : m_actions) {
         unused(path);
         const Action *tAction = actionPtr.get();
-        if (v.menuActions.find(tAction) == v.menuActions.end()) {
+        if (m_configuration.actions.contains(IO::pathAsQString(path)) && (tAction->targets() & (MainMenuTarget | MainToolbarTarget)) == 0) {
             // This action is not used in a menu, so visit it
             visitor(*actionPtr);
         }
@@ -350,12 +361,13 @@ class ActionManager::ResetMenuVisitor : public MenuVisitor {
 };
 
 void ActionManager::resetAllKeySequences() const {
-    ResetMenuVisitor menuVisitor;
-    visitMainMenu(menuVisitor);
-    visitToolBarActions(menuVisitor);
-
-    auto actionVisitor = [](const Action &action) { action.resetKeySequence(); };
-    visitMapViewActions(actionVisitor);
+    auto config = m_configuration;
+    for (auto& definition : config.actions) {
+        const auto* native = command(definition.id);
+        definition.shortcut = m_defaults.actions.value(definition.id).shortcut.value_or(native ? native->defaultKeySequence() : QKeySequence{});
+    }
+    QStringList errors;
+    ActionManager::instance().setConfiguration(config, errors);
 }
 
 void ActionManager::initialize() {
@@ -365,6 +377,17 @@ void ActionManager::initialize() {
 }
 
 void ActionManager::createViewActions() {
+    DrawShapeToolParameters shapeParameters;
+    const std::array<const char*, 8> shapeIds{"Cuboid", "Stairs", "Arch", "Cylinder", "Cone", "UVSphere", "IcoSphere", "Rock"};
+    for (size_t i = 0; i < DrawShapeKinds.size(); ++i) {
+        const auto kind = DrawShapeKinds[i];
+        DrawShapeToolExtension extension{kind, shapeParameters};
+        createAction(std::filesystem::path{"Editor/Create"} / shapeIds[i], QObject::tr("Create %1").arg(QString::fromStdString(extension.name())), ActionContext::Any, QKeySequence{},
+            [kind](ActionExecutionContext& context) { context.view()->selectBrushShape(kind); },
+            [](ActionExecutionContext& context) { return context.hasDocument(); },
+            [kind](ActionExecutionContext& context) { return context.hasDocument() && context.view()->brushShapeSelected(kind); },
+            extension.iconPath(), QObject::tr("Activate Create and select this brush shape"));
+    }
     /* ========== Editing Actions ========== */
     /* ========== Tool Specific Actions ========== */
     createAction(

@@ -402,6 +402,15 @@ QWidget[inspectorDropHighlight="false"] {
 
 /* ==== LIST ROWS ==== */
 
+/* Preference lists share the same surface as the Games list. Selection states
+   below apply to all item views, including searchable combo-box popups. */
+QListWidget#controlListBox_listWidget,
+QListWidget[preferencesList="true"] {
+    background-color: ${color.base};
+    alternate-background-color: ${color.base.alternate};
+    color: ${color.text};
+}
+
 QAbstractItemView::item:selected:active {
     border-radius: ${length.radius.border};
     border-style: solid;
@@ -544,6 +553,11 @@ QSplitter {
 
 /* ==== CHECKBOX ==== */
 
+/* All preferences, including the editor customization panes, use this surface. */
+QCheckBox {
+    background: transparent;
+}
+
 QCheckBox#entityDefinition_checkboxWidget {
     margin-left: 16px;
 }
@@ -573,6 +587,19 @@ QComboBox {
     background-color: ${color.mid};
     border: 1px solid ${color.midlight};
     border-radius: ${length.radius.border};
+}
+
+/* The search field is part of its combo, rather than a separately framed
+   line edit. Keep this shared so every editable selector uses the same theme. */
+QComboBox QLineEdit,
+QComboBox QLineEdit:focus,
+QAbstractSpinBox QLineEdit,
+QAbstractSpinBox QLineEdit:focus {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    min-height: 0;
 }
 
 QComboBox#ToolBar_GridChoice {
@@ -648,6 +675,57 @@ QLineEdit {
     border-radius: 4px;
 }
 
+/* Spin fields share the same input surface in every preferences pane. */
+QAbstractSpinBox {
+    background-color: ${color.base};
+    color: ${color.text};
+    padding: 2px;
+    min-height: 20px;
+    border: 1px solid ${color.midlight};
+    border-radius: 4px;
+}
+QAbstractSpinBox:focus {
+    border-color: ${color.highlight};
+}
+QAbstractSpinBox:disabled {
+    background-color: ${color.dark};
+    color: ${color.text.disabled};
+}
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
+    subcontrol-origin: border;
+    width: 16px;
+    border: none;
+    border-left: 1px solid ${color.midlight};
+    background: transparent;
+}
+QAbstractSpinBox::up-button { subcontrol-position: top right; }
+QAbstractSpinBox::down-button { subcontrol-position: bottom right; }
+QAbstractSpinBox::up-button:hover, QAbstractSpinBox::down-button:hover {
+    background-color: ${color.midlight};
+}
+QAbstractSpinBox::up-arrow { image: url(":up.svg"); width: 10px; height: 10px; }
+QAbstractSpinBox::down-arrow { image: url(":down.svg"); width: 10px; height: 10px; }
+
+/* The searchable selectors use one filtered popup for typing and the arrow. */
+QComboBox[searchable="true"] {
+    qproperty-matchForeground: ${color.text.highlighted};
+    qproperty-matchBackground: ${color.midlight};
+}
+QListView#SearchableComboPopup {
+    background-color: ${color.base};
+    color: ${color.text};
+    selection-background-color: ${color.highlight};
+    selection-color: ${color.text.highlighted};
+    border: 1px solid ${color.midlight};
+    border-radius: ${length.radius.border};
+    min-width: 360px;
+    max-width: 720px;
+}
+QListView#SearchableComboPopup::item {
+    padding: 2px 4px;
+    border-radius: ${length.radius.border};
+}
+
 QLineEdit:focus {
     border: 1px solid ${color.highlight};
 }
@@ -685,7 +763,8 @@ QToolBar#ToolBar_PreferenceDialog {
     text-align: center;
 }
 
-QToolBar#InspectorToolToolbar {
+QToolBar#InspectorToolToolbar,
+QToolBar[inspectorToolbar="true"] {
     background-color: ${color.window};
     border-bottom: 1px solid ${color.light};
     margin: 0px;
@@ -1036,9 +1115,9 @@ QScrollBar::sub-line:vertical {
 
 QToolButton {
     color: ${color.text};
-    border-radius: 3px;
-    padding: 2px 1px 1px 2px;
-    border: none;
+    border-radius: 2px;
+    padding: 3px;
+    border: 1px solid ${color.midlight};
     margin-left: 0px;
     margin-right: 0px;
     margin-bottom: 0px;
@@ -1049,7 +1128,7 @@ QToolButton:disabled {
 }
 
 QToolButton:checked {
-    background-color: ${color.dark};
+      background-color: ${color.midlight};
       border-color: ${color.midlight};
       color: ${color.text.highlighted};
 }
@@ -1116,6 +1195,7 @@ QToolButton#toolButton_borderless::menu-indicator {
 }
 
 QToolBar#InspectorToolToolbar QToolButton,
+QToolBar[inspectorToolbar="true"] QToolButton,
 QWidget#InspectorWindowTitle QToolButton {
     background-color: transparent;
     border: 1px solid transparent;
@@ -1127,11 +1207,13 @@ QWidget#InspectorWindowTitle QToolButton {
     qproperty-iconSize: 16px 16px;
 }
 
-QToolBar#InspectorToolToolbar QToolButton[layerTreeControl] {
+QToolBar#InspectorToolToolbar QToolButton[layerTreeControl],
+QToolBar[inspectorToolbar="true"] QToolButton[layerTreeControl] {
     padding: 0px;
 }
 
-QToolBar#InspectorToolToolbar QPushButton {
+QToolBar#InspectorToolToolbar QPushButton,
+QToolBar[inspectorToolbar="true"] QPushButton {
     background-color: transparent;
     border: 1px solid ${color.midlight};
     border-radius: 4px;
@@ -1142,40 +1224,51 @@ QToolBar#InspectorToolToolbar QPushButton {
     font-size: ${length.font.small};
 }
 
-QToolBar#InspectorToolToolbar {
+QToolBar#InspectorToolToolbar,
+QToolBar[inspectorToolbar="true"] {
     border-top: none;
     margin: 0;
 }
 
 QToolBar#InspectorToolToolbar QToolButton:hover:enabled,
+QToolBar[inspectorToolbar="true"] QToolButton:hover:enabled,
 QToolBar#InspectorToolToolbar QPushButton:hover:enabled,
+QToolBar[inspectorToolbar="true"] QPushButton:hover:enabled,
 QWidget#InspectorWindowTitle QToolButton:hover:enabled {
     background-color: ${color.midlight};
 }
 
 QToolBar#InspectorToolToolbar QToolButton:pressed,
+QToolBar[inspectorToolbar="true"] QToolButton:pressed,
 QToolBar#InspectorToolToolbar QPushButton:pressed,
+QToolBar[inspectorToolbar="true"] QPushButton:pressed,
 QWidget#InspectorWindowTitle QToolButton:pressed {
     background-color: ${color.mid};
 }
 
 QToolBar#InspectorToolToolbar QToolButton:checked,
-QToolBar#InspectorToolToolbar QPushButton:checked {
+QToolBar[inspectorToolbar="true"] QToolButton:checked,
+QToolBar#InspectorToolToolbar QPushButton:checked,
+QToolBar[inspectorToolbar="true"] QPushButton:checked {
     background-color: ${color.dark};
     border-color: ${color.midlight};
     color: ${color.text.highlighted};
 }
 
 QToolBar#InspectorToolToolbar QToolButton:disabled,
-QToolBar#InspectorToolToolbar QPushButton:disabled {
+QToolBar[inspectorToolbar="true"] QToolButton:disabled,
+QToolBar#InspectorToolToolbar QPushButton:disabled,
+QToolBar[inspectorToolbar="true"] QPushButton:disabled {
     color: ${color.text.disabled};
 }
 
-QToolBar#InspectorToolToolbar QToolButton[popupMode="1"] {
+QToolBar#InspectorToolToolbar QToolButton[popupMode="1"],
+QToolBar[inspectorToolbar="true"] QToolButton[popupMode="1"] {
     padding-right: 22px;
 }
 
-QToolBar#InspectorToolToolbar QToolButton[popupMode="1"]::menu-button {
+QToolBar#InspectorToolToolbar QToolButton[popupMode="1"]::menu-button,
+QToolBar[inspectorToolbar="true"] QToolButton[popupMode="1"]::menu-button {
     subcontrol-origin: border;
     subcontrol-position: top right;
     width: 16px;
@@ -1185,14 +1278,16 @@ QToolBar#InspectorToolToolbar QToolButton[popupMode="1"]::menu-button {
     border-radius: 0;
 }
 
-QToolBar#InspectorToolToolbar QComboBox {
+QToolBar#InspectorToolToolbar QComboBox,
+QToolBar[inspectorToolbar="true"] QComboBox {
     background-color: ${color.dark};
     font-size: ${length.font.small};
     margin: 0;
     padding: 0;
 }
 
-QToolBar#InspectorToolToolbar QCheckBox {
+QToolBar#InspectorToolToolbar QCheckBox,
+QToolBar[inspectorToolbar="true"] QCheckBox {
      background-color: ${color.dark};
     margin: 0;
     padding: 0;
@@ -1318,24 +1413,30 @@ QTextEdit#CrashLogView, QTextEdit#CrashStackTraceView {
 QWidget#ShapeToolPage {
     padding: 2px;
 }
+
 QStackedWidget#ShapeToolParameters {
     border: none;
     background: transparent;
 }
+
 QWidget#ShapeToolPage QSpinBox, QWidget#ShapeToolPage QDoubleSpinBox {
     min-width: 64px;
 }
+
 QWidget#ShapeToolPage QSpinBox#ShapeRockSeed {
     min-width: 110px;
 }
+
 QWidget#ShapeToolPage QToolButton {
     qproperty-iconSize: 20px 20px;
     padding: 3px;
 }
+
 QWidget#ShapeToolPage QToolButton:checked {
     background-color: ${color.midlight};
     border: 1px solid ${color.highlight};
 }
+
 QWidget#ShapeToolPage QPushButton#ShapeToolApply {
     padding: 4px 10px;
 }
@@ -1346,6 +1447,86 @@ QWidget#ShapeToolPage QPushButton#ShapeToolApply {
    Icon size and all visual states are independent of the parameters toolbar.
    overlayOpacity affects the entire panel; rgba controls its background separately.
 */
+/* Editor toolbars: common geometry, with a separate visual style per edge. */
+QFrame#EditorToolbar {
+    qproperty-panelPadding: 6;
+    qproperty-buttonPadding: 4;
+    qproperty-buttonSpacing: 4;
+    qproperty-edgeMargin: 12;
+    qproperty-toolbarGap: 6;
+    border: 1px solid ${color.mid};
+    border-radius: ${length.radius.border};
+}
+
+QFrame#EditorToolbar[position="left"] { background-color: ${color.base}; }
+QFrame#EditorToolbar[position="right"] { background-color: ${color.base}; }
+QFrame#EditorToolbar[position="top"] { background-color: ${color.base}; }
+QFrame#EditorToolbar[position="bottom"] { background-color: ${color.base}; }
+QFrame#EditorToolbar QToolButton {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: ${length.radius.border};
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+QFrame#EditorToolbar QToolButton:hover { background-color: ${color.base.alternate}; border-color: ${color.mid}; }
+QFrame#EditorToolbar QToolButton:checked { background-color: ${color.highlight}; color: ${color.text.highlighted}; }
+QFrame#EditorToolbar QToolButton:pressed { background-color: ${color.highlight}; }
+QFrame#EditorToolbarSeparator { color: ${color.mid}; background: transparent; border: none; }
+
+/* ==== EDITOR CUSTOMIZATION PREFERENCES ==== */
+
+/* Shared preference form width; FormWithSectionsLayout supplies the same
+   section headers and field margins used by View preferences. */
+QWidget[preferenceForm="true"] {
+    max-width: 760px;
+}
+QKeySequenceEdit#EditorActionShortcut {
+    max-width: 220px;
+}
+
+QListWidget#EditorConfigurationList, QListWidget#EditorToolbarAssignedActions { border: none; }
+QListWidget#EditorConfigurationList::item, QListWidget#EditorToolbarAssignedActions::item {
+    min-height: 28px;
+    padding: 3px 6px;
+    border-radius: ${length.radius.border};
+}
+QLabel#EditorConfigurationError { color: ${color.text}; padding: 8px; background: ${color.base.alternate}; border-radius: ${length.radius.border}; }
+
+/* SVG picker tiles inherit list surfaces and selection states above. */
+QListWidget#EditorIconGrid {
+    border: none;
+    qproperty-iconSize: 40px 40px;
+}
+
+QListWidget#EditorIconGrid::item {
+    padding: 4px;
+    border-radius: ${length.radius.border};
+}
+
+QListWidget#EditorIconGrid::item:hover:!selected {
+    background-color: ${color.base.alternate};
+}
+
+QLabel#EditorIconPreview {
+    background-color: ${color.base};
+    border: 1px solid ${color.midlight};
+    border-radius: ${length.radius.border};
+    padding: 3px;
+}
+
+QLabel#EditorIconName {
+    color: ${color.text.highlighted};
+}
+
+QLabel#EditorIconCount {
+    color: ${color.text.detail};
+    font-size: ${length.font.small};
+}
+
 QFrame#BrushShapePalette {
     qproperty-edgeMargin: 12;
     qproperty-panelPadding: 6;
@@ -1355,11 +1536,13 @@ QFrame#BrushShapePalette {
     border: 1px solid ${color.shapePalette.border};
     border-radius: 10px;
 }
+
 QWidget#BrushShapePaletteContent, QScrollArea#BrushShapePaletteScroll,
 QScrollArea#BrushShapePaletteScroll > QWidget > QWidget {
     background: transparent;
     border: none;
 }
+
 QFrame#BrushShapePalette QToolButton {
     qproperty-iconSize: 28px 28px;
     padding: 5px;
@@ -1368,14 +1551,17 @@ QFrame#BrushShapePalette QToolButton {
     border-radius: 6px;
     background: transparent;
 }
+
 QFrame#BrushShapePalette QToolButton:hover {
     background-color: ${color.shapePalette.hover.background};
     border-color: ${color.shapePalette.hover.border};
 }
+
 QFrame#BrushShapePalette QToolButton:checked {
     background-color: ${color.midlight};
     border-color: ${color.highlight};
 }
+
 QFrame#BrushShapePalette QToolButton:pressed {
     background-color: ${color.highlight};
 }

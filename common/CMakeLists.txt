@@ -280,6 +280,19 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/AboutDialog.cpp
     ${COMMON_SOURCE_DIR}/View/ActionContext.cpp
     ${COMMON_SOURCE_DIR}/View/Actions.cpp
+    ${COMMON_SOURCE_DIR}/View/EditorActionRegistry.cpp
+    ${COMMON_SOURCE_DIR}/View/EditorConfiguration.cpp
+    ${COMMON_SOURCE_DIR}/View/EditorConfiguration.h
+    ${COMMON_SOURCE_DIR}/View/EditorCustomizationPreferencePane.cpp
+    ${COMMON_SOURCE_DIR}/View/EditorCustomizationPreferencePane.h
+    ${COMMON_SOURCE_DIR}/View/SearchableComboBox.cpp
+    ${COMMON_SOURCE_DIR}/View/SearchableComboBox.h
+    ${COMMON_SOURCE_DIR}/View/IconSelectionDialog.cpp
+    ${COMMON_SOURCE_DIR}/View/IconSelectionDialog.h
+    ${COMMON_SOURCE_DIR}/View/EditorToolbars.cpp
+    ${COMMON_SOURCE_DIR}/View/EditorToolbars.h
+    ${COMMON_SOURCE_DIR}/View/EditorToolbarLayout.cpp
+    ${COMMON_SOURCE_DIR}/View/EditorToolbarLayout.h
     ${COMMON_SOURCE_DIR}/View/AddRemoveNodesCommand.cpp
     ${COMMON_SOURCE_DIR}/View/Animation.cpp
     ${COMMON_SOURCE_DIR}/View/AppInfoPanel.cpp

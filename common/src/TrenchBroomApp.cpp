@@ -305,6 +305,18 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
             qtAction->setChecked(tbAction->checked(context));
         }
     }
+    m_themeConnection += ActionManager::instance().actionsDidChangeNotifier.connect([this] {
+        const auto menus = m_defaultMenuBar->findChildren<QMenu*>(QString{}, Qt::FindDirectChildrenOnly);
+        m_defaultMenuBar->clear(); for (auto* menu : menus) delete menu;
+        const auto oldActions = m_defaultMenuBar->findChildren<QAction*>(QString{}, Qt::FindDirectChildrenOnly);
+        for (auto* action : oldActions) delete action;
+        auto bindings = std::map<const Action*, QAction*>{};
+        MainMenuBuilder builder{*m_defaultMenuBar, bindings, [](const Action& action) { ActionExecutionContext context{nullptr, nullptr}; action.execute(context); }};
+        ActionManager::instance().visitMainMenu(builder);
+        if (builder.recentDocumentsMenu) addRecentDocumentMenu(*builder.recentDocumentsMenu);
+        ActionExecutionContext context{nullptr, nullptr};
+        for (const auto& [action, qt] : bindings) { qt->setEnabled(action->enabled(context)); if (qt->isCheckable()) qt->setChecked(action->checked(context)); }
+    });
     #endif
 }
 

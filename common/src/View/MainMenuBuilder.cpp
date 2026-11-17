@@ -18,6 +18,7 @@
  */
 
 #include "MainMenuBuilder.h"
+#include <algorithm>
 
 #include <QMenuBar>
 
@@ -28,12 +29,15 @@
 
 namespace TrenchBroom {
 namespace View {
-MenuBuilderBase::MenuBuilderBase(MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn) : m_actions(actions), m_triggerFn(triggerFn) {
+MenuBuilderBase::MenuBuilderBase(MenuBuilderBase::ActionMap &actions, const TriggerFn &triggerFn, QObject* owner) : m_actions(actions), m_triggerFn(triggerFn), m_owner{owner} {
 }
 
 MenuBuilderBase::~MenuBuilderBase() = default;
 
 void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tAction) {
+    qAction->setText(tAction->label()); qAction->setCheckable(tAction->checkable()); qAction->setStatusTip(tAction->statusTip());
+    qAction->setIcon(tAction->hasIcon() ? IO::loadSVGIcon(tAction->iconPath(), pref(Preferences::ToolBarIconsSize)) : QIcon{});
+    qAction->setProperty("tbActionId", QString::fromStdString(tAction->preferencePath().generic_string()));
     if (!tAction->keySequence().isEmpty()) {
         const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label(), tAction->keySequence().toString(QKeySequence::NativeText));
         qAction->setToolTip(tooltip);
@@ -41,7 +45,8 @@ void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tA
         qAction->setToolTip(tAction->label());
     }
 
-    qAction->setShortcut(tAction->keySequence());
+    qAction->setShortcut((tAction->targets() & (MainMenuTarget | MainToolbarTarget)) ? tAction->keySequence() : QKeySequence{});
+    if (!tAction->statusTip().isEmpty()) qAction->setToolTip(qAction->toolTip() + '\n' + tAction->statusTip());
 }
 
 QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
@@ -53,7 +58,7 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
         }
     }
 
-    auto *qAction = new QAction(tAction->label());
+    auto *qAction = new QAction(tAction->label(), m_owner);
     qAction->setProperty("tbRegisteredAction",true);
     qAction->setCheckable(tAction->checkable());
     if (tAction->hasIcon()) {
@@ -72,7 +77,11 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
 }
 
 MainMenuBuilder::MainMenuBuilder(QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn)
-    : MenuBuilderBase(actions, triggerFn), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr), undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
+    : MenuBuilderBase(actions, triggerFn, &menuBar), m_menuBar(menuBar), m_currentMenu(nullptr), recentDocumentsMenu(nullptr), undoAction(nullptr), redoAction(nullptr), pasteAction(nullptr), pasteAtOriginalPositionAction(nullptr) {
+}
+
+void MainMenuBuilder::ensureAllActions() {
+    for (const auto& [path, action] : ActionManager::instance().actionsMap()) { unused(path); findOrCreateQAction(action.get()); }
 }
 
 void MainMenuBuilder::visit(const Menu &menu) {
@@ -89,8 +98,14 @@ void MainMenuBuilder::visit(const Menu &menu) {
     }
 
     m_currentMenu->setProperty("tbMainMenu",true);
+    auto* tracked = m_currentMenu;
+    QObject::connect(tracked, &QMenu::aboutToShow, tracked, [tracked] { tracked->setProperty("tbMenuOpen", true); });
+    QObject::connect(tracked, &QMenu::aboutToHide, tracked, [tracked] { tracked->setProperty("tbMenuOpen", false); });
 
     menu.visitEntries(*this);
+    const auto entries = m_currentMenu->actions();
+    const auto hasItems = std::any_of(entries.begin(), entries.end(), [](const auto* action) { return action->isVisible() && !action->isSeparator(); });
+    m_currentMenu->menuAction()->setVisible(hasItems || menu.entryType() == MenuEntryType::Menu_RecentDocuments);
     m_currentMenu = parentMenu;
 }
 

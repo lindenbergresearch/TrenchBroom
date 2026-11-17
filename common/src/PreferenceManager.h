@@ -73,8 +73,8 @@ class PreferenceManager : public QObject {
     }
 
     static void destroyInstance() {
-        m_instance.reset();
         m_initialized = false;
+        m_instance.reset();
     }
 
     static bool isInitialized() { return m_initialized; }
@@ -175,7 +175,7 @@ class AppPreferenceManager : public PreferenceManager {
     void discardChanges() override;
 
   private:
-    void saveChangesImmediately();
+    void saveChangesImmediately(bool reportErrors = true);
     void markAsUnsaved(PreferenceBase &preference);
     void showErrorAndDisableFileReadWrite(const QString &reason, const QString &suggestion);
     void loadCacheFromDisk();

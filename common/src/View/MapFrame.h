@@ -207,6 +207,7 @@ class MapFrame : public QMainWindow {
     class ToolBarBuilder;
 
     void createToolBar();
+    void rebuildActionWidgets();
 
     void updateToolBarWidgets() const;
 

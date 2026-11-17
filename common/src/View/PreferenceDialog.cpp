@@ -35,6 +35,8 @@
 #include "View/ColorsPreferencePane.h"
 #include "View/GamesPreferencePane.h"
 #include "View/KeyboardPreferencePane.h"
+#include "View/EditorCustomizationPreferencePane.h"
+#include "View/Actions.h"
 #include "View/MousePreferencePane.h"
 #include "View/PreferencePane.h"
 #include "View/PreferencesPreferencePane.h"
@@ -68,6 +70,7 @@ void PreferenceDialog::closeEvent(QCloseEvent *event) {
     auto &prefs = PreferenceManager::instance();
     if (!prefs.saveInstantly()) {
         prefs.discardChanges();
+        ActionManager::instance().reloadConfiguration();
         TrenchBroomApp::instance().reloadStyle(true, true);
     }
 
@@ -117,6 +120,14 @@ void PreferenceDialog::createGui() {
         switchToPane(PrefPane_Advanced);
         highlightToolButton("Advanced");
     });
+    m_toolButtonActions["Editor Actions"] = m_toolBar->addAction(IO::loadSVGIcon("KeyboardPreferences.svg", 32), tr("Editor Actions"), [this] {
+        switchToPane(PrefPane_EditorActions); highlightToolButton("Editor Actions");
+    });
+    m_toolButtonActions["Editor Toolbar"] = m_toolBar->addAction(IO::loadSVGIcon("flex_wrap.svg", 32), tr("Editor Toolbar"), [this] {
+        switchToPane(PrefPane_EditorToolbar); highlightToolButton("Editor Toolbar");
+    });
+    m_toolBar->removeAction(m_toolButtonActions["Advanced"]);
+    m_toolBar->addAction(m_toolButtonActions["Advanced"]);
 
     // Don't display tooltips for pane switcher buttons...
     for (auto *button : m_toolBar->findChildren<QToolButton *>()) {
@@ -133,6 +144,8 @@ void PreferenceDialog::createGui() {
     m_stackedWidget->addWidget(new ColorsPreferencePane());
     m_stackedWidget->addWidget(new MousePreferencePane());
     m_stackedWidget->addWidget(new KeyboardPreferencePane(m_document.get()));
+    m_stackedWidget->addWidget(new EditorCustomizationPreferencePane(false));
+    m_stackedWidget->addWidget(new EditorCustomizationPreferencePane(true));
     m_stackedWidget->addWidget(new PreferencesPreferencePane());
 
     highlightToolButton("Games");
@@ -144,6 +157,9 @@ void PreferenceDialog::createGui() {
         , this);
 
     auto *resetButton = m_buttonBox->button(QDialogButtonBox::RestoreDefaults);
+    // Enter in a preferences field must never reset the current pane.
+    resetButton->setAutoDefault(false);
+    resetButton->setDefault(false);
     connect(resetButton, &QPushButton::clicked, this, &PreferenceDialog::resetToDefaults);
 
 #if !defined __APPLE__

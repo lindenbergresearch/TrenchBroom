@@ -42,7 +42,8 @@ class PreferenceDialog : public QDialog {
   Q_OBJECT
   private:
     enum PrefPane {
-      PrefPane_First = 0, PrefPane_Games = 0, PrefPane_View = 1, PrefPane_Colors = 2, PrefPane_Mouse = 3, PrefPane_Keyboard = 4, PrefPane_Advanced = 5, PrefPane_Last = 6
+      PrefPane_First = 0, PrefPane_Games = 0, PrefPane_View = 1, PrefPane_Colors = 2, PrefPane_Mouse = 3, PrefPane_Keyboard = 4,
+      PrefPane_EditorActions = 5, PrefPane_EditorToolbar = 6, PrefPane_Advanced = 7, PrefPane_Last = 8
     };
 
     static const QString WINDOW_TITLE;

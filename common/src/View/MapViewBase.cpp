@@ -18,7 +18,10 @@
  */
 
 #include "MapViewBase.h"
-#include "View/BrushShapePalette.h"
+#include "View/EditorToolbars.h"
+#include <QPointer>
+#include <QScopeGuard>
+#include "View/DrawShapeTool.h"
 
 #include <kdl/set_temp.h>
 
@@ -115,7 +118,8 @@ void MapViewBase::setCompass(std::unique_ptr<Renderer::Compass> compass) {
 
 void MapViewBase::mapViewBaseVirtualInit() {
     createActionsAndUpdatePicking();
-    new BrushShapePalette(m_toolBox,this);
+    new EditorToolbars(m_toolBox, *this);
+    m_notifierConnection += ActionManager::instance().actionsDidChangeNotifier.connect([this] { createActionsAndUpdatePicking(); updateActionStates(); });
 }
 
 MapViewBase::~MapViewBase() {
@@ -572,6 +576,20 @@ void MapViewBase::cancel() {
 
 void MapViewBase::deactivateTool() {
     m_toolBox.deactivateAllTools();
+}
+
+void MapViewBase::selectBrushShape(const DrawShapeKind kind) {
+    if (m_toolBox.dragging()) m_toolBox.cancelMouseDrag();
+    if (!m_toolBox.createToolActive()) m_toolBox.toggleCreateTool();
+    // Activation intentionally defaults to Cuboid. Apply the clicked shape
+    // afterwards so opening Create cannot overwrite the user's choice.
+    m_toolBox.drawShapeTool().extensionManager().setCurrentExtension(kind);
+    setFocus(Qt::MouseFocusReason);
+    update();
+}
+
+bool MapViewBase::brushShapeSelected(const DrawShapeKind kind) const {
+    return m_toolBox.createToolActive() && m_toolBox.drawShapeTool().extensionManager().currentExtension().kind() == kind;
 }
 
 void MapViewBase::createPointEntity() {
@@ -1104,7 +1122,10 @@ void MapViewBase::showPopupMenuForSelection(const QPoint &globalPosition, QActio
 }
 
 void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromInspector, QAction* deleteAction, QAction* sourceAction) {
-    const auto source = kdl::set_temp(m_popupFromInspector, fromInspector);
+    const QPointer<MapViewBase> lifetime{this};
+    const auto previous = m_popupFromInspector;
+    m_popupFromInspector = fromInspector;
+    const auto source = qScopeGuard([lifetime, previous] { if (lifetime) lifetime->m_popupFromInspector = previous; });
     if (!doBeforePopupMenu()) {
         return;
     }
@@ -1119,13 +1140,17 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
     auto *mapFrame = findMapFrame(this);
 
     auto menu = new QMenu{this};
+    const QPointer<QMenu> menuLifetime{menu};
+    connect(menu, &QMenu::aboutToShow, menu, [menu] { menu->setProperty("tbMenuOpen", true); });
+    connect(menu, &QMenu::aboutToHide, menu, [menu] { menu->setProperty("tbMenuOpen", false); });
 
     // A tree click can change selection and open this menu in the same event.
     mapFrame->updateActionState();
     const auto addMainMenuAction = [&](const auto &path) -> QAction * {
         auto *groupAction = mapFrame->findAction(path);
         assert(groupAction != nullptr);
-        menu->addAction(groupAction);
+        const auto& action = *ActionManager::instance().actionsMap().at(path);
+        if (action.targets() & PopupMenuTarget) menu->addAction(groupAction);
         return groupAction;
     };
 
@@ -1153,9 +1178,9 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
     addMainMenuAction("Menu/Edit/Create Linked Duplicate");
     addMainMenuAction("Menu/Edit/Select Linked Groups");
     addMainMenuAction("Menu/Edit/Separate Linked Groups");
-    addContextMenuAction(*menu,*ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath),[this,document] {
-        savePrefabDialog(document,prefabSelection(*document),this);
-    },document->hasSelectedNodes() || document->hasSelectedBrushFaces());
+    const auto* prefabAction = ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath).get();
+    ActionExecutionContext prefabContext{mapFrame, this};
+    addContextMenuAction(*menu, *prefabAction, [this, prefabAction] { triggerAction(*prefabAction); }, prefabAction->enabled(prefabContext));
     menu->addSeparator();
 
     // Layer operations
@@ -1232,8 +1257,22 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
     if (sourceAction) { menu->addSeparator(); menu->addAction(sourceAction); }
     if (deleteAction) { menu->addSeparator(); menu->addAction(deleteAction); }
 
+    auto context = ActionExecutionContext{mapFrame, this};
+    QStringList present;
+    for (auto* action : menu->actions()) present << action->property("tbActionId").toString();
+    auto added = false;
+    for (const auto& definition : ActionManager::instance().configuration().actions) {
+        if (!(definition.targets & PopupMenuTarget) || present.contains(definition.id)) continue;
+        const auto* action = ActionManager::instance().action(definition.id);
+        if (!action) continue;
+        if (!added) { menu->addSeparator(); added = true; }
+        auto* qtAction = addContextMenuAction(*menu, *action, [this, action] { triggerAction(*action); }, action->enabled(context));
+        if (action->checkable()) qtAction->setChecked(action->checked(context));
+    }
+
     menu->exec(globalPosition);
-    delete menu;
+    if (menuLifetime) delete menuLifetime.data();
+    if (!lifetime) return;
 
     // Generate a synthetic mouse move event to update the mouse position after the popup
     // menu closes.

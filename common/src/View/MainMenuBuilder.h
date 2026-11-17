@@ -40,9 +40,10 @@ class MenuBuilderBase {
     using TriggerFn = std::function<void(const Action &)>;
     ActionMap &m_actions;
     TriggerFn m_triggerFn;
+    QObject* m_owner;
 
   protected:
-    MenuBuilderBase(ActionMap &actions, const TriggerFn &triggerFn);
+    MenuBuilderBase(ActionMap &actions, const TriggerFn &triggerFn, QObject* owner = nullptr);
 
   public:
     virtual ~MenuBuilderBase();
@@ -72,6 +73,7 @@ class MainMenuBuilder : public MenuVisitor, public MenuBuilderBase {
 
   public:
     MainMenuBuilder(QMenuBar &menuBar, ActionMap &actions, const TriggerFn &triggerFn);
+    void ensureAllActions();
 
     void visit(const Menu &menu) override;
 

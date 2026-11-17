@@ -285,6 +285,7 @@ extern Preference<bool> ShowGroupBounds;
 extern Preference<bool> ShowBrushEntityBounds;
 extern Preference<bool> ShowPointEntityBounds;
 extern Preference<bool> ShowPointEntityModels;
+extern Preference<QString> EditorConfiguration;
 extern Preference<bool> AnimateSelectedEntityModels;
 extern Preference<bool> AnimateNearbyEntityModels;
 extern Preference<float> EntityModelAnimationDistance;
