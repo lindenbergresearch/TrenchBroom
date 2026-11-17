@@ -18,7 +18,9 @@
  */
 
 #include "MapViewBase.h"
+#include "Renderer/SelectionBoundsRenderer.h"
 #include "View/EditorToolbars.h"
+#include <QApplication>
 #include <QPointer>
 #include <QScopeGuard>
 #include "View/DrawShapeTool.h"
@@ -1414,6 +1416,25 @@ void MapViewBase::removeSelectedObjectsFromGroup() {
     }
     document->selectNodes(nodes);
     transaction.commit();
+}
+
+void MapViewBase::renderHoveredObjectBounds(Renderer::RenderContext& context, Renderer::RenderBatch& batch) {
+    if (!pref(Preferences::ObjectBoundsOnHover) || !pref(Preferences::ShowObjectBoundsSelectionBounds)) return;
+    const auto cursor = mapFromGlobal(QCursor::pos());
+    if (!rect().contains(cursor) || QApplication::widgetAt(QCursor::pos()) != this) return;
+    const auto doc = m_document.lock();
+    if (!doc || !doc->world()) return;
+    auto hits = context.render2D() ? Model::PickResult::bySize(vm::find_abs_max_component(camera().direction())) : Model::PickResult::byDistance();
+    doc->pick(vm::ray3(camera().pickRay(float(cursor.x()), float(cursor.y()))), hits);
+    using namespace Model::HitFilters;
+    const auto& hit = hits.first(type(Model::nodeHitType()));
+    if (!hit.isMatch()) return;
+    auto* node = Model::hitToNode(hit);
+    if (!node || !node->visible()) return;
+    if (auto* entity = dynamic_cast<Model::EntityNode*>(node->parent())) node = entity;
+    if (auto* group = Model::findOutermostClosedGroup(node)) node = group;
+    Renderer::SelectionBoundsRenderer bounds(node->logicalBounds());
+    bounds.renderObjectBounds(context, batch);
 }
 
 Model::Node *MapViewBase::findNewGroupForObjects(const std::vector<Model::Node *> &nodes) const {

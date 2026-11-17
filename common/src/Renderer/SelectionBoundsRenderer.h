@@ -51,6 +51,7 @@ public:
     explicit SelectionBoundsRenderer(const vm::bbox3& bounds, bool draw3DVolume = true);
 
     void render(RenderContext& renderContext, RenderBatch& renderBatch);
+    void renderObjectBounds(RenderContext& context, RenderBatch& batch) { renderBounds(context, batch); }
 
 private:
     void renderBounds(RenderContext& renderContext, RenderBatch& renderBatch);

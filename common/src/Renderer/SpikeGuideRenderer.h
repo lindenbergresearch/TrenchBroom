@@ -40,6 +40,7 @@ namespace TrenchBroom {namespace Model {
     } // namespace View
 
     namespace Renderer {
+    class RenderBatch;
     class SpikeGuideRenderer : public DirectRenderable {
     private:
         Color m_color;
@@ -57,6 +58,11 @@ namespace TrenchBroom {namespace Model {
         };
 
         std::vector<SurfacePoint> m_surfacePoints;
+        struct Intersection {
+            vm::vec3f start, end;
+            double distance;
+        };
+        std::vector<Intersection> m_intersections;
 
         VertexArray m_spikeArray;
         VertexArray m_pointArray;
@@ -72,6 +78,7 @@ namespace TrenchBroom {namespace Model {
         void add(const vm::ray3& ray, FloatType length, const std::shared_ptr<View::MapDocument>& document);
 
         void clear();
+        void renderDistances(RenderContext& context, RenderBatch& batch) const;
 
     private:
         void doPrepareVertices(VboManager& vboManager) override;

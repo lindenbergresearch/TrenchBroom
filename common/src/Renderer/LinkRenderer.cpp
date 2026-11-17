@@ -68,8 +68,8 @@ void LinkRenderer::doRender(RenderContext& context) {
     shader.set("ViewportSize", vm::vec2f{float(viewport.width), float(viewport.height)} * dpi);
     shader.set("Width", width * dpi);
     shader.set("ArrowSize", std::max(10.f, width * 3.f) * dpi);
-    shader.set("Spacing", spacing * dpi);
-    shader.set("Phase", float(std::fmod(seconds * double(speed), double(spacing))) * dpi);
+    shader.set("Spacing", spacing);
+    shader.set("Phase", float(std::fmod(seconds * double(speed), double(spacing))));
     shader.set("CameraPosition", context.camera().position());
     shader.set("MaxDistance", distance);
     shader.set("IsOrtho", context.camera().orthographicProjection());

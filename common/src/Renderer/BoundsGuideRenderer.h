@@ -36,8 +36,6 @@ class MapDocument; // FIXME: Renderer should not depend on View
 namespace Renderer {
 class BoundsGuideRenderer : public DirectRenderable {
   private:
-    static const FloatType SpikeLength;
-
     std::weak_ptr<View::MapDocument> m_document;
 
     Color m_color;
@@ -50,6 +48,7 @@ class BoundsGuideRenderer : public DirectRenderable {
     void setColor(const Color &color);
 
     void setBounds(const vm::bbox3 &bounds);
+    void renderDistances(RenderContext& context, RenderBatch& batch) const;
 
   private:
     void doPrepareVertices(VboManager &vboManager) override;

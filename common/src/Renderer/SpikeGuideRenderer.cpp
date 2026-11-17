@@ -33,6 +33,8 @@
 #include "Renderer/RenderContext.h"
 #include "Renderer/RenderUtils.h"
 #include "Renderer/Shaders.h"
+#include "Renderer/RenderService.h"
+#include "Renderer/TextAnchor.h"
 #include "View/MapDocument.h"
 
 #include <vm/forward.h>
@@ -62,6 +64,7 @@ void SpikeGuideRenderer::add(const vm::ray3& ray, const FloatType length, const 
         if (hit.distance() <= length) {
             const auto& face = hit.target<Model::BrushFaceHandle>().face();
             addSurfacePoint(hit.hitPoint(), face.normal());
+            m_intersections.push_back({vm::vec3f(ray.origin), vm::vec3f(hit.hitPoint()), hit.distance()});
         }
         addSpike(ray, vm::min(length, hit.distance()));
     }
@@ -74,10 +77,58 @@ void SpikeGuideRenderer::clear() {
     m_spikeVertices.clear();
     m_points.clear();
     m_surfacePoints.clear();
+    m_intersections.clear();
     m_spikeArray = VertexArray();
     m_pointArray = VertexArray();
     m_surfacePointArray = VertexArray();
     m_valid = true;
+}
+
+namespace {
+    class GuideDistanceAnchor : public TextAnchor3D {
+        vm::vec3f m_position;
+        float m_offset;
+
+      public:
+        GuideDistanceAnchor(vm::vec3f position, float offset) : m_position(position), m_offset(offset) {}
+
+      private:
+        vm::vec3f basePosition() const override { return m_position; }
+        TextAlignment::Type alignment() const override { return TextAlignment::Center; }
+        vm::vec2f extraOffsets(TextAlignment::Type) const override { return {0, m_offset}; }
+    };
+    std::string guideDistanceText(double distance) {
+        const auto digits = std::clamp(pref(Preferences::UnitsMaxDigits), 0, 6);
+        const auto number = [&](double v) { return QString::number(v, 'f', std::trunc(v) == v ? 0 : digits); };
+        const auto configuredFactor = pref(Preferences::MetricConversationFactor);
+        const auto factor = std::isfinite(configuredFactor) && configuredFactor > 0 ? configuredFactor : 32.0f;
+        const auto units = number(distance);
+        const auto metric = number(distance / factor) + "m";
+        switch (pref(Preferences::LengthUnitSystem)) {
+        case Preferences::Metric:
+            return metric.toStdString();
+        case Preferences::Combined:
+            return (units + " [" + metric + "]").toStdString();
+        default:
+            return units.toStdString();
+        }
+    }
+} // namespace
+void SpikeGuideRenderer::renderDistances(RenderContext& context, RenderBatch& batch) const {
+    if (!pref(Preferences::SelectionBoundsShowDistances)) return;
+    RenderService service(context, batch);
+    service.setTextLayoutPriority(5);
+    service.setForegroundColor(pref(Preferences::SelectionBoundsDistanceColor));
+    service.setBackgroundColor(Color(pref(Preferences::InfoOverlayBackgroundColor), pref(Preferences::WeakInfoOverlayBackgroundAlpha)));
+    service.setShowOccludedObjects();
+    const auto font = FontDescriptor(Preferences::getDefaultRenderFont().path(), size_t(std::clamp(pref(Preferences::SelectionBoundsDistanceFontSize), 6, 64)));
+    const auto mode = std::clamp(pref(Preferences::SelectionBoundsDistancePosition), 0, 2);
+    const auto fraction = mode == 0 ? 0.1f : mode == 2 ? 0.9f : 0.5f;
+    const auto offset = float(std::clamp(pref(Preferences::SelectionBoundsDistanceOffset), -100, 100));
+    for (const auto& intersection : m_intersections) {
+        GuideDistanceAnchor anchor(intersection.start + (intersection.end - intersection.start) * fraction, offset);
+        service.renderString(guideDistanceText(intersection.distance), anchor, font);
+    }
 }
 
 void SpikeGuideRenderer::doPrepareVertices(VboManager& vboManager) {
@@ -97,7 +148,7 @@ void SpikeGuideRenderer::doRender(RenderContext& renderContext) {
     shader.set("ViewportSize", vm::vec2f(float(viewport.width), float(viewport.height)) * scale);
     setOverlaySizeScaling(shader, renderContext);
     const auto dashSize = float(std::clamp(pref(Preferences::SelectionBoundsDashedSize), 1, 256));
-    shader.set("DashSize", dashSize * scale);
+    shader.set("DashSize", dashSize);
 
     // A shared monotonic clock keeps views in sync and avoids float precision loss
     // after long editing sessions. Zero speed leaves both styles fully static.
@@ -105,7 +156,7 @@ void SpikeGuideRenderer::doRender(RenderContext& renderContext) {
     const auto seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - animationStart).count();
     const auto configuredSpeed = pref(Preferences::SelectionBoundsAnimationSpeed);
     const auto speed = std::isfinite(configuredSpeed) ? std::clamp(configuredSpeed, 0.0f, 100.0f) : 0.0f;
-    shader.set("DashOffset", float(std::fmod(seconds * speed * 32.0, dashSize * 16.0)) * scale);
+    shader.set("DashOffset", float(std::fmod(seconds * speed * 32.0, dashSize * 16.0)));
     const auto pulse = speed > 0.0f
         ? float(0.725 + 0.275 * std::cos(std::fmod(seconds * speed, 1.0) * 2.0 * vm::Cd::pi()))
         : 1.0f;
@@ -138,7 +189,7 @@ void SpikeGuideRenderer::doRender(RenderContext& renderContext) {
     shader.set("Color", pref(Preferences::SelectionBoundsPointColor));
     shader.set("Width", std::max(0.0f, pref(Preferences::SelectionBoundsPointSize)) * scale);
     shader.set("Dashed", false);
-    if (pref(Preferences::SelectionBoundsPointSize) > 0.0f) m_pointArray.render(PrimType::Triangles);
+    if (pref(Preferences::SelectionBoundsCornerMarkers) && pref(Preferences::SelectionBoundsPointSize) > 0.0f) m_pointArray.render(PrimType::Triangles);
 
     // These quads lie in the hit face's plane; the fragment shader cuts out an X.
     shader.set("MarkerMode", 2);

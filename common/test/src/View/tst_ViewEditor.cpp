@@ -7,6 +7,7 @@
 #include "Preferences.h"
 #include "View/Actions.h"
 #include "View/Grid.h"
+#include "View/ColorButton.h"
 #include "View/MapDocument.h"
 #include "View/MapDocumentCommandFacade.h"
 #include "View/ViewEditor.h"
@@ -155,6 +156,47 @@ TEST_CASE_METHOD(ViewEditorTest, "View settings retain their page when rebuilt a
     // The tool can also be created after a map has already loaded.
     ViewEditor another(document);
     CHECK(another.findChild<QTabWidget*>("ViewSettingsTabs"));
+}
+
+TEST_CASE_METHOD(ViewEditorTest, "Bounds controls persist independent markers range hover and distance labels", "[view-editor][annotations]") {
+    const auto corners = TemporarilySetPref{Preferences::SelectionBoundsCornerMarkers, true};
+    const auto length = TemporarilySetPref{Preferences::SelectionBoundsGuideLength, 1024.f};
+    const auto range = TemporarilySetPref{Preferences::SelectionBoundsGuideDistance, 0.f};
+    const auto distances = TemporarilySetPref{Preferences::SelectionBoundsShowDistances, false};
+    const auto font = TemporarilySetPref{Preferences::SelectionBoundsDistanceFontSize, 12};
+    const auto offset = TemporarilySetPref{Preferences::SelectionBoundsDistanceOffset, 10};
+    const auto position = TemporarilySetPref{Preferences::SelectionBoundsDistancePosition, 1};
+    const auto hover = TemporarilySetPref{Preferences::ObjectBoundsOnHover, false};
+    const auto color = TemporarilySetPref{Preferences::SelectionBoundsDistanceColor, Color{1, 1, 0, 1}};
+    newMap();
+    control<QCheckBox>("BoundsCornerMarkers")->click();
+    CHECK_FALSE(pref(Preferences::SelectionBoundsCornerMarkers));
+    control<QCheckBox>("ObjectBoundsOnHover")->click();
+    CHECK(pref(Preferences::ObjectBoundsOnHover));
+    control<QCheckBox>("BoundsShowDistances")->click();
+    CHECK(pref(Preferences::SelectionBoundsShowDistances));
+    control<QDoubleSpinBox>("BoundsGuideLength")->setValue(512);
+    CHECK(pref(Preferences::SelectionBoundsGuideLength) == 512.f);
+    control<QDoubleSpinBox>("BoundsGuideDistance")->setValue(2048);
+    CHECK(pref(Preferences::SelectionBoundsGuideDistance) == 2048.f);
+    control<QDoubleSpinBox>("BoundsDistanceFontSize")->setValue(18);
+    CHECK(pref(Preferences::SelectionBoundsDistanceFontSize) == 18);
+    control<QDoubleSpinBox>("BoundsDistanceOffset")->setValue(-12);
+    CHECK(pref(Preferences::SelectionBoundsDistanceOffset) == -12);
+    control<QComboBox>("BoundsDistancePosition")->setCurrentIndex(2);
+    CHECK(pref(Preferences::SelectionBoundsDistancePosition) == 2);
+    control<ColorButton>("BoundsDistanceColor")->setColor(QColor("#88ccff"));
+    CHECK(pref(Preferences::SelectionBoundsDistanceColor) == Color(QColor("#88ccff")));
+    control<QPushButton>("ViewSettingsReset")->click();
+    CHECK(pref(Preferences::SelectionBoundsCornerMarkers) == Preferences::SelectionBoundsCornerMarkers.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsGuideLength) == Preferences::SelectionBoundsGuideLength.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsGuideDistance) == Preferences::SelectionBoundsGuideDistance.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsShowDistances) == Preferences::SelectionBoundsShowDistances.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsDistanceFontSize) == Preferences::SelectionBoundsDistanceFontSize.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsDistanceOffset) == Preferences::SelectionBoundsDistanceOffset.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsDistancePosition) == Preferences::SelectionBoundsDistancePosition.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsDistanceColor) == Preferences::SelectionBoundsDistanceColor.defaultValue());
+    CHECK_FALSE(control<QCheckBox>("ObjectBoundsOnHover")->isChecked());
 }
 
 TEST_CASE("Main toolbar additions reuse registered actions and available icons", "[view-editor]") {

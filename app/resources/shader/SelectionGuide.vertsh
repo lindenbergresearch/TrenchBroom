@@ -7,23 +7,24 @@ uniform int MarkerMode;
 
 varying vec2 guidePosition;
 varying vec2 guideExtent;
+varying vec2 guideDistance;
 
 float overlayScale(vec4 clipPosition);
 float overlayPixelsPerWorldUnit(vec4 clipPosition);
 
 // Clip before dividing by w, including guides that cross the camera plane.
-bool clipDepthPlane(inout vec4 start, inout vec4 end, float side) {
+bool clipDepthPlane(inout vec4 start, inout vec4 end, inout vec3 wa, inout vec3 wb, float side) {
     float a = start.w + side * start.z;
     float b = end.w + side * end.z;
 
     if (a < 0.0 && b < 0.0)
         return false;
 
-    if (a < 0.0)
-        start = mix(start, end, a / (a - b));
-
-    else if (b < 0.0)
-        end = mix(start, end, a / (a - b));
+    if (a < 0.0) {
+        float t=a/(a-b); start=mix(start,end,t); wa=mix(wa,wb,t);
+    } else if (b < 0.0) {
+        float t=a/(a-b); end=mix(start,end,t); wb=mix(wa,wb,t);
+    }
 
     return true;
 }
@@ -32,6 +33,7 @@ void main() {
     vec2 corner = gl_MultiTexCoord0.xy;
     vec4 start = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
     guidePosition = vec2(0.0);
+    guideDistance = vec2(0.0,1.0);
     guideExtent = vec2(0.0);
     gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
 
@@ -60,8 +62,9 @@ void main() {
     }
 
     // The second endpoint is stored in the normal attribute (untransformed).
-    vec4 end = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(gl_Normal, 1.0);
-    if (!clipDepthPlane(start, end, 1.0) || !clipDepthPlane(start, end, -1.0))
+    vec3 originalStart=gl_Vertex.xyz, wa=originalStart, wb=gl_Normal;
+    vec4 end = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(wb, 1.0);
+    if (!clipDepthPlane(start, end, wa, wb, 1.0) || !clipDepthPlane(start, end, wa, wb, -1.0))
         return;
 
     if (start.w <= 0.0 || end.w <= 0.0)
@@ -80,6 +83,9 @@ void main() {
     guidePosition = corner * (guideExtent + vec2(1.0));
     vec2 offset = direction * corner.x + normal * guidePosition.y;
     vec3 endpoint = corner.x < 0.0 ? a : b;
+    float w=corner.x<0.0 ? start.w : end.w;
+    float distance=length((corner.x<0.0 ? wa : wb)-originalStart);
+    guideDistance=vec2(distance/w,1.0/w);
 
     // w=1 makes pixel distances interpolate linearly, also in perspective views.
     gl_Position = vec4(endpoint, 1.0);

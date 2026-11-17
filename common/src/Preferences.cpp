@@ -132,6 +132,15 @@ Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.9f, 0.
 Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.9f, 0.0f, 0.0f, 1.0f));
 
 /* --- SELECTION BOUNDS ------------------------------ */
+Preference<bool> SelectionBoundsCornerMarkers("Renderer/Selection bounds corner markers", true);
+Preference<float> SelectionBoundsGuideLength("Renderer/Selection bounds guide length", 1024.0f);
+Preference<float> SelectionBoundsGuideDistance("Renderer/Selection bounds maximum camera distance", 0.0f);
+Preference<bool> SelectionBoundsShowDistances("Renderer/Selection bounds show distances", false);
+Preference<Color> SelectionBoundsDistanceColor("Renderer/Colors/Selection guide distances", Color(0.95f, 0.9f, 0.5f, 1.0f));
+Preference<int> SelectionBoundsDistanceFontSize("Renderer/Selection bounds distance font size", 12);
+Preference<int> SelectionBoundsDistancePosition("Renderer/Selection bounds distance position", 1);
+Preference<int> SelectionBoundsDistanceOffset("Renderer/Selection bounds distance label offset", 10);
+Preference<bool> ObjectBoundsOnHover("Renderer/Object bounds on hover", false);
 Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.f, 0.f, 0.0156863f, 0.592157f));
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 0.6f);
 Preference<float> SelectionBoundsFillAlpha("Renderer/Selection bounds fill alpha", 0.15f);
@@ -398,7 +407,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
         &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias,
         &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &GridAxisColorMix, &ShadeGrid, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
-        &SelectionBoundsColor, &SelectionBoundsFillAlpha, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
+        &SelectionBoundsCornerMarkers, &SelectionBoundsGuideLength, &SelectionBoundsGuideDistance, &SelectionBoundsShowDistances, &SelectionBoundsDistanceColor, &SelectionBoundsDistanceFontSize, &SelectionBoundsDistancePosition, &SelectionBoundsDistanceOffset, &ObjectBoundsOnHover, &SelectionBoundsColor, &SelectionBoundsFillAlpha, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
         &OverlayScaleFactor, &OverlayMinimumScale, &OverlayMaximumScale, &SelectionBoundsAnimationSpeed, &SelectionBoundsPattern,&UIErrorColor, &UIWarningColor,&RendererDefaultCursor,
         &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &SelectionBoundsShowMinMax, &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha,
         &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor,

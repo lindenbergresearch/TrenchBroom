@@ -490,6 +490,7 @@ void MapView3D::doRenderGrid(Renderer::RenderContext &, Renderer::RenderBatch &)
 
 void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     renderer.render(renderContext, renderBatch);
+    renderHoveredObjectBounds(renderContext, renderBatch);
 
     auto document = kdl::mem_lock(m_document);
     if (renderContext.showSelectionGuide() && document->hasSelectedNodes()) {
@@ -504,6 +505,12 @@ void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderCon
         Renderer::SelectionBoundsRenderer boundsRenderer(bounds, !redundantVolume);
         boundsRenderer.render(renderContext, renderBatch);
 
+        const auto limit = pref(Preferences::SelectionBoundsGuideDistance);
+        auto nearest = vm::vec3f(bounds.min);
+        for (size_t axis = 0; axis < 3; ++axis)
+            nearest[axis] = std::clamp(camera().position()[axis], float(bounds.min[axis]), float(bounds.max[axis]));
+        if (std::isfinite(limit) && limit > 0 && vm::squared_length(nearest - camera().position()) > limit * limit) return;
+
         Renderer::BoundsGuideRenderer *guideRenderer = new Renderer::BoundsGuideRenderer(m_document);
 
         // draw guides half transparent
@@ -511,6 +518,7 @@ void MapView3D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderCon
         guideRenderer->setColor(guideColor);
 
         guideRenderer->setBounds(bounds);
+        guideRenderer->renderDistances(renderContext, renderBatch);
         renderBatch.addOneShot(guideRenderer);
     }
 }

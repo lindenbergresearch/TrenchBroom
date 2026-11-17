@@ -132,6 +132,15 @@ extern Preference<float> OccludedSelectedEdgeAlpha;
 extern Preference<Color> LockedEdgeColor;
 
 /* --- SELECTION BOUNDS ------------------------------ */
+extern Preference<bool> SelectionBoundsCornerMarkers;
+extern Preference<float> SelectionBoundsGuideLength;
+extern Preference<float> SelectionBoundsGuideDistance;
+extern Preference<bool> SelectionBoundsShowDistances;
+extern Preference<Color> SelectionBoundsDistanceColor;
+extern Preference<int> SelectionBoundsDistanceFontSize;
+extern Preference<int> SelectionBoundsDistancePosition;
+extern Preference<int> SelectionBoundsDistanceOffset;
+extern Preference<bool> ObjectBoundsOnHover;
 extern Preference<Color> SelectionBoundsColor;
 extern Preference<Color> SelectionBoundsPointColor;
 extern Preference<float> SelectionBoundsAlpha;

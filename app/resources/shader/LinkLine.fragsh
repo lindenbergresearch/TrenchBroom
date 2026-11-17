@@ -11,11 +11,14 @@ varying vec2 linkPosition;
 varying float linkLength;
 varying vec4 linkColor;
 varying vec4 worldCoordinates;
+varying vec2 linkDistance;
 void main(){
     float y=abs(linkPosition.y);
     float base=1.0-smoothstep(Width*0.5-0.75,Width*0.5+0.75,y);
     // Each V has its tip in +X: source -> target. Phase changes without rebuilding buffers.
-    float x=mod(linkPosition.x-Phase+Spacing*0.5,Spacing)-Spacing*0.5;
+    float position=linkDistance.x/linkDistance.y;
+    float unitsPerPixel=max(length(vec2(dFdx(position),dFdy(position))),0.00001);
+    float x=(mod(position-Phase+Spacing*0.5,Spacing)-Spacing*0.5)/unitsPerPixel;
     float arrowDistance=abs(x+y*1.5)/sqrt(3.25)-Width*0.5;
     float arrow=(1.0-smoothstep(-0.75,0.75,arrowDistance))*(1.0-smoothstep(ArrowSize*0.5-0.75,ArrowSize*0.5+0.75,y));
     float caps=smoothstep(-0.75,0.75,linkPosition.x)*(1.0-smoothstep(linkLength-0.75,linkLength+0.75,linkPosition.x));

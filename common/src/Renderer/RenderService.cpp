@@ -126,6 +126,7 @@ void RenderService::renderString(const std::string &string, const TextAnchor &po
         &position
     };
 
+    textEntity.setFontDescriptor(fontDescriptor);
     textEntity.setForeground(m_foregroundColor);
     textEntity.setBackground(m_backgroundColor);
 

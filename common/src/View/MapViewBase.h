@@ -404,6 +404,7 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void doRefreshViews() override;
 
   protected: // RenderView overrides
+    void renderHoveredObjectBounds(Renderer::RenderContext& context, Renderer::RenderBatch& batch);
     void initializeGL() override;
 
   private: // implement RenderView interface

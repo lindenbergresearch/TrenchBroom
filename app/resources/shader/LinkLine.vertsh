@@ -8,6 +8,7 @@ varying vec2 linkPosition;
 varying float linkLength;
 varying vec4 linkColor;
 varying vec4 worldCoordinates;
+varying vec2 linkDistance;
 bool clipPlane(inout vec4 a,inout vec4 b,inout vec3 wa,inout vec3 wb,float side) {
     float da=a.w+side*a.z, db=b.w+side*b.z;
     if(da<0.0 && db<0.0)return false;
@@ -17,7 +18,8 @@ bool clipPlane(inout vec4 a,inout vec4 b,inout vec3 wa,inout vec3 wb,float side)
 }
 void main(){
     gl_Position=vec4(2.0,2.0,2.0,1.0);linkPosition=vec2(0.0);linkLength=0.0;linkColor=gl_Color;worldCoordinates=vec4(0.0,0.0,0.0,1.0);
-    vec3 wa=gl_Vertex.xyz,wb=gl_Normal;
+    linkDistance=vec2(0.0,1.0);
+    vec3 originalStart=gl_Vertex.xyz,wa=originalStart,wb=gl_Normal;
     // Reject distant connections before rasterization, including long links
     // whose endpoints are far away but whose middle passes near the camera.
     if (!IsOrtho && MaxDistance > 0.0) {
@@ -39,4 +41,5 @@ void main(){
     gl_Position.xy+=(direction*corner.x+normal*linkPosition.y)*2.0/ViewportSize;
     float w=first?a.w:b.w;
     worldCoordinates=vec4((first?wa:wb)/w,1.0/w);
+    linkDistance=vec2(length((first?wa:wb)-originalStart)/w,1.0/w);
 }

@@ -307,7 +307,7 @@ SelectionBoundsRenderer::SelectionBoundsRenderer(const vm::bbox3& bounds, const 
 void SelectionBoundsRenderer::render(RenderContext& renderContext, RenderBatch& renderBatch) {
     bool showObjectBounds = pref(Preferences::ShowObjectBoundsSelectionBounds);
 
-    if (showObjectBounds && (renderContext.render2D() || m_draw3DVolume)) { renderBounds(renderContext, renderBatch); }
+    if (showObjectBounds && !pref(Preferences::ObjectBoundsOnHover) && (renderContext.render2D() || m_draw3DVolume)) { renderBounds(renderContext, renderBatch); }
 
     renderSize(renderContext, renderBatch);
 
@@ -421,16 +421,6 @@ void SelectionBoundsRenderer::renderMinMax(RenderContext& renderContext, RenderB
 }
 
 QString SelectionBoundsRenderer::formatDimension(const float value, const int digits, const QString& suffix) {
-    auto isInt = (value - std::trunc(value) == 0);
-    QString str = "";
-
-    if (isInt) { str = (new QString)->sprintf("%d%s", (int)value, suffix.toStdString().c_str()); }
-    else {
-        const char* raw_format_str = "%%.%df%%s";
-        auto format_str = (new QString)->sprintf(raw_format_str, digits).toStdString();
-        str = (new QString)->sprintf(format_str.c_str(), value, suffix.toStdString().c_str());
-    }
-
-    return str;
+    return QString::number(value,'f',std::trunc(value)==value ? 0 : std::clamp(digits,0,6)) + suffix;
 }
 } // namespace TrenchBroom::Renderer

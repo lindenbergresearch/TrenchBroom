@@ -52,6 +52,7 @@
 #include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
 #include "View/Grid.h"
+#include "View/ColorButton.h"
 
 #include <kdl/memory_utils.h>
 
@@ -486,7 +487,7 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
 
     layout->addSpacing(LayoutConstants::WideVMargin);
 
-    m_selectionBoundsDashSize = new SliderWithLabel(2, 10, 0.0f, "%dpx", 0, 45, this);
+    m_selectionBoundsDashSize = new SliderWithLabel(1, 128, 0.0f, "%d u", 0, 45, this);
     m_selectionBoundsIntersectionSize = new SliderWithLabel(2, 20, 0.0f, "%dpx", 0, 45, this);
     m_selectionBoundsWidth = new SliderWithLabel(10, 300, 10e-3f, "%.1f px", 0, 45, this);
 
@@ -500,6 +501,49 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
 
     layout->addWidget(new QLabel{tr("Line width")});
     layout->addWidget(m_selectionBoundsWidth);
+
+    const auto toggle = [&](const char* name, const QString& label, Preference<bool>& preference) {
+        auto* box = new QCheckBox(label, panel);
+        box->setObjectName(name);
+        box->setChecked(pref(preference));
+        connect(box, &QCheckBox::toggled, this, [&preference](bool value) { setPref(preference, value); });
+        layout->addWidget(box);
+    };
+    const auto number = [&](const char* name, const QString& label, auto& preference, double low, double high, const QString& suffix) {
+        using Value = std::decay_t<decltype(pref(preference))>;
+        auto* field = new QDoubleSpinBox(panel);
+        field->setObjectName(name);
+        field->setRange(low, high);
+        field->setDecimals(0);
+        field->setKeyboardTracking(false);
+        field->setSuffix(suffix);
+        field->setValue(pref(preference));
+        connect(field, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [&preference](double value) { setPref(preference, Value(value)); });
+        layout->addWidget(new QLabel(label));
+        layout->addWidget(field);
+        return field;
+    };
+    toggle("BoundsCornerMarkers", tr("Show markers on selection corners"), Preferences::SelectionBoundsCornerMarkers);
+    toggle("ObjectBoundsOnHover", tr("Object bounds on hover only (also unselected objects)"), Preferences::ObjectBoundsOnHover);
+    number("BoundsGuideLength", tr("Maximum guide length"), Preferences::SelectionBoundsGuideLength, 1, 1000000, tr(" units"));
+    auto* range = number("BoundsGuideDistance", tr("Maximum camera distance"), Preferences::SelectionBoundsGuideDistance, 0, 1000000, tr(" units"));
+    range->setSpecialValueText(tr("Unlimited"));
+    toggle("BoundsShowDistances", tr("Show distances to hit surfaces"), Preferences::SelectionBoundsShowDistances);
+    number("BoundsDistanceFontSize", tr("Distance font size"), Preferences::SelectionBoundsDistanceFontSize, 6, 64, tr(" px"));
+    number("BoundsDistanceOffset", tr("Distance label offset"), Preferences::SelectionBoundsDistanceOffset, -100, 100, tr(" px"));
+    auto* position = new QComboBox(panel);
+    position->setObjectName("BoundsDistancePosition");
+    position->addItems({tr("Near selection"), tr("Middle of guide"), tr("Near hit surface")});
+    position->setCurrentIndex(std::clamp(pref(Preferences::SelectionBoundsDistancePosition), 0, 2));
+    connect(position, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [](int value) { setPref(Preferences::SelectionBoundsDistancePosition, value); });
+    layout->addWidget(new QLabel(tr("Distance label position")));
+    layout->addWidget(position);
+    auto* color = new ColorButton(panel);
+    color->setObjectName("BoundsDistanceColor");
+    color->setColor(toQColor(pref(Preferences::SelectionBoundsDistanceColor)));
+    connect(color, &ColorButton::colorChanged, this, [](const QColor& value) { setPref(Preferences::SelectionBoundsDistanceColor, Color(value)); });
+    layout->addWidget(new QLabel(tr("Distance label color")));
+    layout->addWidget(color);
 
     layout->addStretch();
     layout->addWidget(new BorderLine);
@@ -710,9 +754,9 @@ QWidget* ViewEditor::createLinksPanel(QWidget* parent) {
         return spin;
     };
     m_linkWidth = add(tr("Line width"),"ViewEntityLinkWidth",Preferences::EntityLinkWidth,0.5,16,0.5,tr(" px"));
-    m_linkSpeed = add(tr("Animation speed"),"ViewEntityLinkSpeed",Preferences::EntityLinkSpeed,0,1000,4,tr(" px/s"));
+    m_linkSpeed = add(tr("Animation speed"), "ViewEntityLinkSpeed", Preferences::EntityLinkSpeed, 0, 1000, 4, tr(" units/s"));
     m_linkSpeed->setSpecialValueText(tr("Disabled"));
-    m_linkSpacing = add(tr("Arrow spacing"),"ViewEntityLinkSpacing",Preferences::EntityLinkSpacing,16,512,4,tr(" px"));
+    m_linkSpacing = add(tr("Arrow spacing"), "ViewEntityLinkSpacing", Preferences::EntityLinkSpacing, 16, 512, 4, tr(" units"));
     m_linkDistance = add(tr("Maximum camera distance"),"ViewEntityLinkDistance",Preferences::EntityLinkDistance,0,1000000,128,tr(" units"));
     m_linkDistance->setSpecialValueText(tr("Unlimited"));
     m_linkDistance->setToolTip(tr("3D view: fade links by the distance from the camera to each visible part of the connection. 0 means unlimited."));
@@ -881,6 +925,33 @@ void ViewEditor::refreshFogPanel() {
 }
 
 void ViewEditor::refreshSelectionBoundsPanel() {
+    const auto check = [&](const char* name, bool value) {
+        if (auto* box = findChild<QCheckBox*>(name)) {
+            QSignalBlocker block(box);
+            box->setChecked(value);
+        }
+    };
+    const auto number = [&](const char* name, double value) {
+        if (auto* box = findChild<QDoubleSpinBox*>(name)) {
+            QSignalBlocker block(box);
+            box->setValue(value);
+        }
+    };
+    check("BoundsCornerMarkers", pref(Preferences::SelectionBoundsCornerMarkers));
+    check("ObjectBoundsOnHover", pref(Preferences::ObjectBoundsOnHover));
+    check("BoundsShowDistances", pref(Preferences::SelectionBoundsShowDistances));
+    number("BoundsGuideLength", pref(Preferences::SelectionBoundsGuideLength));
+    number("BoundsGuideDistance", pref(Preferences::SelectionBoundsGuideDistance));
+    number("BoundsDistanceFontSize", pref(Preferences::SelectionBoundsDistanceFontSize));
+    number("BoundsDistanceOffset", pref(Preferences::SelectionBoundsDistanceOffset));
+    if (auto* box = findChild<QComboBox*>("BoundsDistancePosition")) {
+        QSignalBlocker block(box);
+        box->setCurrentIndex(std::clamp(pref(Preferences::SelectionBoundsDistancePosition), 0, 2));
+    }
+    if (auto* box = findChild<ColorButton*>("BoundsDistanceColor")) {
+        QSignalBlocker block(box);
+        box->setColor(toQColor(pref(Preferences::SelectionBoundsDistanceColor)));
+    }
     m_selectionBoundsShowObjectBounds->setChecked(pref(Preferences::ShowObjectBoundsSelectionBounds));
     m_selectionBoundsIntersectionMode->setChecked(pref(Preferences::SelectionBoundsIntersectionMode));
     m_selectionBoundsUseDashedBounds->setChecked(pref(Preferences::SelectionBoundsDashedLines));
@@ -1000,6 +1071,15 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::GridAlpha);
     prefs.resetToDefault(Preferences::GridLineWidth);
     prefs.resetToDefault(Preferences::GridUnitSystem);
+    prefs.resetToDefault(Preferences::SelectionBoundsCornerMarkers);
+    prefs.resetToDefault(Preferences::SelectionBoundsGuideLength);
+    prefs.resetToDefault(Preferences::SelectionBoundsGuideDistance);
+    prefs.resetToDefault(Preferences::SelectionBoundsShowDistances);
+    prefs.resetToDefault(Preferences::SelectionBoundsDistanceColor);
+    prefs.resetToDefault(Preferences::SelectionBoundsDistanceFontSize);
+    prefs.resetToDefault(Preferences::SelectionBoundsDistancePosition);
+    prefs.resetToDefault(Preferences::SelectionBoundsDistanceOffset);
+    prefs.resetToDefault(Preferences::ObjectBoundsOnHover);
     prefs.resetToDefault(Preferences::SelectionBoundsDashedLines);
     prefs.resetToDefault(Preferences::SelectionBoundsDashedSize);
     prefs.resetToDefault(Preferences::SelectionBoundsLineWidth);

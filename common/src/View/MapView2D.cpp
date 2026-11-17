@@ -339,6 +339,7 @@ void MapView2D::doRenderGrid(Renderer::RenderContext &, Renderer::RenderBatch &r
 
 void MapView2D::doRenderMap(Renderer::MapRenderer &renderer, Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     renderer.render(renderContext, renderBatch);
+    renderHoveredObjectBounds(renderContext,renderBatch);
 
     auto document = kdl::mem_lock(m_document);
     if (renderContext.showSelectionGuide() && document->hasSelectedNodes()) {

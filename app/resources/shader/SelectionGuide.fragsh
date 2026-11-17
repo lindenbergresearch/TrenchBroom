@@ -10,6 +10,7 @@ uniform int MarkerMode;
 
 varying vec2 guidePosition;
 varying vec2 guideExtent;
+varying vec2 guideDistance;
 
 float patternBit(float cell) {
     float index = mod(cell, 16.0);
@@ -37,7 +38,8 @@ float dashCoverage(float position) {
             distance = min(distance, DashSize - within);
     }
 
-    return 1.0 - smoothstep(-0.75, 0.75, distance);
+    float smoothing=max(0.0001,0.75*length(vec2(dFdx(position),dFdy(position))));
+    return 1.0 - smoothstep(-smoothing, smoothing, distance);
 }
 
 void main() {
@@ -57,9 +59,9 @@ void main() {
         coverage = 1.0 - smoothstep(-smoothing, smoothing, distance);
     } else if (MarkerMode == 0) {
         if (Dashed) {
-            // Anchor the phase at the destination, so clipping the origin does
-            // not shift the pattern. Subtraction moves fragments toward the hit.
-            coverage *= dashCoverage(guidePosition.x - guideExtent.x - DashOffset);
+            // Perspective-correct distance from the original world-space source.
+            // Camera projection and near-plane clipping cannot reset this phase.
+            coverage *= dashCoverage(guideDistance.x/guideDistance.y - DashOffset);
         } else {
             coverage *= PulseAlpha;
         }
