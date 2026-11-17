@@ -1,0 +1,83 @@
+
+
+			DAGON COLLECTIVE LICENSING PRODUCT
+
+This Graphic Products is licensed under the DAGON COLLECTIVE PRODUCT LICENSING, VERSION 1.0
+You can use this products only for personal usage, you can bought the
+
+
+-------------------------------------------------------------------------------------------------------
+THE PRODUCT DETAILS
+-------------------------------------------------------------------------------------------------------
+
+NAME			: PERADABAN
+PRODUCT TYPE		: FONT
+PRODUCT LICENSE		: PERSONAL USAGE, 1.0
+CREATED BY		: DAGON COLLECTIVE TEAM
+COPYRIGHTED IN		: SEPT 30, 2020
+
+
+------------------------------------- PREAMBLE ---------------------------------------------------------
+
+
+The product of DAGON COLLECTIVE is estabilished by our standarization of licensing the product in many
+graphic needs such as FONTS, PATTERNS, LAYOUTS, DIGITAL ARTS, and MOCKUPS. Under this license, the user 
+can use the products as personal usage such as studies purposes, modified and redistributed only for
+personal purposes as long as they are not sold by themselves.
+
+Every materials of this product bundle(s) are originally build under the products Author(s) who contributed
+in this projects on behalf the DAGON COLLECTIVE.
+
+------------------------------------- DEFINITION -------------------------------------------------------
+
+	a. Font Software
+	   The Font was create and released by software from the owned first party, including the
+	   Copyrights and the Graphic Products.
+
+	b. Reserved Font Name
+	   The Font name refers to the name specified as such after the copyright statement(s).
+
+	c. The Originals Product
+	   Original Products is contained in this bundles such as font and the license
+
+	d. Modified Version
+	   Mofified the products refer to any derivative made by adding to, deleting, or substituting
+	   -- in part or in whole -- any of the components as the Original Product Version, by changing
+	   formats or by porting the Products to a new environtment
+
+	e. Author
+	   The Authors of Product refer to any designer, engineer, programmer, technical writer or other
+	   person who contributed to this product.
+
+
+
+------------------------------------- PERMISION AND CONDITION ------------------------------------------
+
+
+Permission is hereby granted, free for personal usage on behalf the copyrights by the subjects 
+to the following rules from this license.
+
+	a. Usability
+	   - The products usage is only in terms of personal purposing such as studies the products,
+	   modified the products and redistributed . This products is prohibited to be selled by any 
+	   purpose, for example resell this products under this licensing, using the products 
+	   for commercial purposes.
+
+	   - No Modified Version of this products may use the Reserved Font Name(s) unless explicit written
+	   permission is granted by corresponding Copyright Holder. This restriction only applies to the
+	   primary products name as presented to the users
+	   
+	   - The name(s) of the Copyright Holder(s) or the Author(s) of this products shall not be used to
+	   promote, endorse or advertise any Modified Version, except to acknowledge the contribution(s) of
+	   the Copyright Holder(s) and the Author(s) or with their explicit written permission.
+
+	b. Distribution
+	   - The products can be distributed by porting the product to the new environment such as other
+	   computer or software user(s). As long as not to be sold by themselves.
+
+	
+
+------------------------------------- TERMINATION ------------------------------------------------------
+
+This license becomes null and void if any condition are not met.
+
