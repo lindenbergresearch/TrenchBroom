@@ -32,6 +32,10 @@
 namespace TrenchBroom::IO {
 FileSystem::~FileSystem() = default;
 
+Result<void> FileSystem::reload() {
+    return kdl::void_success;
+}
+
 Result<std::vector<std::filesystem::path>> FileSystem::find(const std::filesystem::path& path, const TraversalMode traversalMode, const PathMatcher& pathMatcher) const {
     if (path.is_absolute()) { return Error{"Path '" + path.string() + "' is absolute"}; }
 

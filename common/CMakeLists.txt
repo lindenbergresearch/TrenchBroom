@@ -39,6 +39,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/IO/ConfigParserBase.cpp
     ${COMMON_SOURCE_DIR}/IO/DefParser.cpp
     ${COMMON_SOURCE_DIR}/IO/DiskFileSystem.cpp
+    ${COMMON_SOURCE_DIR}/IO/CachedFileTree.h
     ${COMMON_SOURCE_DIR}/IO/DiskIO.cpp
     ${COMMON_SOURCE_DIR}/IO/DkmParser.cpp
     ${COMMON_SOURCE_DIR}/IO/DkPakFileSystem.cpp

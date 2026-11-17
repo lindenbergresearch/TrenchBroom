@@ -24,6 +24,7 @@
 #include "IO/PathInfo.h"
 
 #include "kdl/path_utils.h"
+#include "kdl/path_hash.h"
 #include "kdl/result.h"
 #include "kdl/result_fold.h"
 #include "kdl/vector_utils.h"
@@ -60,6 +61,14 @@ bool operator==(const VirtualMountPointId &lhs, const VirtualMountPointId &rhs) 
 
 bool operator!=(const VirtualMountPointId &lhs, const VirtualMountPointId &rhs) {
     return !(lhs == rhs);
+}
+
+Result<void> VirtualFileSystem::reload() {
+    for (const auto& mountPoint : m_mountPoints) {
+        auto result = mountPoint.mountedFileSystem->reload();
+        if (result.is_error()) return result;
+    }
+    return kdl::void_success;
 }
 
 Result<std::filesystem::path> VirtualFileSystem::makeAbsolute(const std::filesystem::path &path) const {
@@ -140,19 +149,19 @@ Result<std::vector<std::filesystem::path>> VirtualFileSystem::doFind(const std::
         }
 
         auto result = std::vector<std::filesystem::path>{};
-        auto lastOccurrence = std::unordered_map<std::string, size_t>{};
+        auto lastOccurrence = std::unordered_map<std::filesystem::path, size_t, kdl::path_hash>{};
 
         for (size_t i = 0; i < nestedPaths.size(); ++i) {
             const auto &paths = nestedPaths[i];
             for (const auto &p : paths) {
-                lastOccurrence[p.generic_string()] = i;
+                lastOccurrence[kdl::path_to_lower(p)] = i;
             }
         }
 
         for (size_t i = 0; i < nestedPaths.size(); ++i) {
             auto &paths = nestedPaths[i];
             for (auto &p : paths) {
-                if (lastOccurrence[p.generic_string()] == i) {
+                if (lastOccurrence[kdl::path_to_lower(p)] == i) {
                     result.push_back(std::move(p));
                 }
             }
@@ -179,6 +188,10 @@ Result<std::shared_ptr<File>> VirtualFileSystem::doOpenFile(const std::filesyste
 WritableVirtualFileSystem::WritableVirtualFileSystem(VirtualFileSystem virtualFs, std::unique_ptr<WritableFileSystem> writableFs)
     : m_virtualFs{std::move(virtualFs)}, m_writableFs{*writableFs} {
     m_virtualFs.mount(std::filesystem::path{}, std::move(writableFs));
+}
+
+Result<void> WritableVirtualFileSystem::reload() {
+    return m_virtualFs.reload();
 }
 
 Result<std::filesystem::path> WritableVirtualFileSystem::makeAbsolute(const std::filesystem::path &path) const {

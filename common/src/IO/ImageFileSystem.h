@@ -22,6 +22,7 @@
 #include "Ensure.h"
 #include "Error.h"
 #include "IO/FileSystem.h"
+#include "IO/CachedFileTree.h"
 #include "Result.h"
 
 #include "kdl/result.h"
@@ -39,18 +40,9 @@ class File;
 
 using GetImageFile = std::function<Result<std::shared_ptr<File>>()>;
 
-struct ImageFileEntry {
-  std::filesystem::path name;
-  GetImageFile getFile;
-};
-
-struct ImageDirectoryEntry;
-using ImageEntry = std::variant<ImageDirectoryEntry, ImageFileEntry>;
-
-struct ImageDirectoryEntry {
-  std::filesystem::path name;
-  std::vector<ImageEntry> entries;
-};
+using ImageFileEntry = CachedFileEntry<GetImageFile>;
+using ImageDirectoryEntry = CachedDirectoryEntry<GetImageFile>;
+using ImageEntry = CachedEntry<GetImageFile>;
 
 class ImageFileSystemBase : public FileSystem {
   protected:
@@ -66,7 +58,7 @@ class ImageFileSystemBase : public FileSystem {
     /**
      * Reload this file system.
      */
-    Result<void> reload();
+    Result<void> reload() override;
 
   protected:
     void addFile(const std::filesystem::path &path, GetImageFile getFile);

@@ -503,8 +503,7 @@ Result<std::vector<std::string>> GameImpl::doAvailableMods() const {
     }
 
     const auto &defaultMod = m_config.fileSystemConfig.searchPath.filename().string();
-    const auto fs = IO::DiskFileSystem{m_gamePath};
-    return fs.find("", IO::TraversalMode::Flat, IO::makePathInfoPathMatcher({IO::PathInfo::Directory})).transform([](auto subDirs) {
+    return IO::Disk::find(m_gamePath, IO::TraversalMode::Flat, IO::makePathInfoPathMatcher({IO::PathInfo::Directory})).transform([](auto subDirs) {
         return kdl::vec_transform(std::move(subDirs), [](auto subDir) { return subDir.filename().string(); });
     }).transform([&](auto mods) {
         return kdl::vec_filter(std::move(mods), [&](const auto &mod) {

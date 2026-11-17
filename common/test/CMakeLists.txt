@@ -34,6 +34,8 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_CompilationConfigParser.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_DefParser.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_DiskFileSystem.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/IO/tst_DiskCache.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/IO/tst_GameFileSystemCache.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_ArchiveNames.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_DiskIO.cpp"
         "${COMMON_TEST_SOURCE_DIR}/IO/tst_ELParser.cpp"

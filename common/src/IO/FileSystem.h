@@ -39,6 +39,9 @@ class FileSystem {
 public:
     virtual ~FileSystem();
 
+    /** Refresh cached directory information after external changes. */
+    virtual Result<void> reload();
+
     /** Return an absolute path for the given relative path.
      *
      * @return an absolute path or an error if the given path is already an absolute path or

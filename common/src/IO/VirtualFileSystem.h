@@ -53,6 +53,8 @@ class VirtualFileSystem : public FileSystem {
     std::vector<VirtualMountPoint> m_mountPoints;
 
   public:
+    Result<void> reload() override;
+
     Result<std::filesystem::path> makeAbsolute(const std::filesystem::path &path) const override;
 
     PathInfo pathInfo(const std::filesystem::path &path) const override;
@@ -76,6 +78,8 @@ class WritableVirtualFileSystem : public WritableFileSystem {
 
   public:
     WritableVirtualFileSystem(VirtualFileSystem virtualFs, std::unique_ptr<WritableFileSystem> writableFs);
+
+    Result<void> reload() override;
 
     using FileSystem::find;
 

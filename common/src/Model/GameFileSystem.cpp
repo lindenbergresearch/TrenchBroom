@@ -45,6 +45,7 @@ namespace TrenchBroom::Model {
 void GameFileSystem::initialize(const GameConfig &config, const std::filesystem::path &gamePath, const std::vector<std::filesystem::path> &additionalSearchPaths, Logger &logger) {
     unmountAll();
     m_shaderFS = nullptr;
+    m_wadMountPoints.clear();
 
     addDefaultAssetPaths(config, logger);
 
@@ -55,7 +56,9 @@ void GameFileSystem::initialize(const GameConfig &config, const std::filesystem:
 }
 
 Result<void> GameFileSystem::reloadShaders() {
-    return m_shaderFS ? m_shaderFS->reload() : Result<void>{};
+    // Refresh backing directories and packages before shader discovery. The
+    // shader mount is added after those mounts, so reload() preserves that order.
+    return reload();
 }
 
 void GameFileSystem::reloadWads(const std::filesystem::path &rootPath, const std::vector<std::filesystem::path> &wadSearchPaths, const std::vector<std::filesystem::path> &wadPaths, Logger &logger) {
@@ -124,12 +127,11 @@ void GameFileSystem::addFileSystemPackages(const GameConfig &config, const std::
     const auto &packageFormat = packageFormatConfig.format;
 
     if (IO::Disk::pathInfo(searchPath) == IO::PathInfo::Directory) {
-        const auto diskFS = IO::DiskFileSystem{searchPath};
-        diskFS.find(std::filesystem::path{}, IO::TraversalMode::Flat, IO::makeExtensionPathMatcher(packageExtensions)).and_then([&](auto packagePaths) {
-            return kdl::fold_results(kdl::vec_transform(std::move(packagePaths), [&](auto packagePath) {
-                return diskFS.makeAbsolute(packagePath).and_then([&](const auto &absPackagePath) {
-                    return createImageFileSystem(packageFormat, absPackagePath);
-                }).transform([&](auto fs) {
+        // Only enumerate the top-level packages here. Building another recursive
+        // disk cache would repeat the scan already performed by the mounted fs.
+        IO::Disk::find(searchPath, IO::TraversalMode::Flat, IO::makeExtensionPathMatcher(packageExtensions)).and_then([&](auto packagePaths) {
+            return kdl::fold_results(kdl::vec_transform(std::move(packagePaths), [&](const auto& packagePath) {
+                return createImageFileSystem(packageFormat, packagePath).transform([&](auto fs) {
                     logger.info() << "Adding file system package: " << packagePath;
                     mount("", std::move(fs));
                 });
