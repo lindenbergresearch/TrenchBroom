@@ -1,12 +1,19 @@
 #include "View/BrushUpstreamTest.h"
 #include "Preferences.h"
+#include "View/ViewPreferencePane.h"
+#include "View/PreferenceDialog.h"
+#include "View/PopupWindow.h"
 #include "View/GLContextManager.h"
 #include "View/MapViewBase.h"
 #include "View/MapViewLayout.h"
 #include "View/SwitchableMapViewContainer.h"
 #include "View/CyclingMapView.h"
+#include "View/Splitter.h"
 #include "Renderer/Camera.h"
 #include <QApplication>
+#include <QLabel>
+#include <QScreen>
+#include <QSpinBox>
 #include <map>
 #include <tuple>
 
@@ -65,4 +72,59 @@ TEST_CASE_METHOD(BrushUpstreamTest, "Cycling 2D and 3D views does not refocus th
     for (int i = 0; i < children.size(); ++i)
         CHECK(children[i]->camera().position() == positions[size_t(i)]);
 }
+TEST_CASE("Splitter exposes styled grips and restores collapsed sizes", "[view-state]") {
+    Splitter splitter(Qt::Horizontal);
+    splitter.addWidget(new QLabel("A"));
+    splitter.addWidget(new QLabel("B"));
+    splitter.resize(600, 300);
+    splitter.show();
+    QApplication::processEvents();
+    splitter.setSizes({200, 400});
+    const auto before = splitter.sizes();
+    auto* handle = qobject_cast<SplitterHandle*>(splitter.handle(1));
+    REQUIRE(handle);
+    handle->setStyleSheet("TrenchBroom--View--SplitterHandle { qproperty-gripColor: #aabbcc; qproperty-gripSpacing: 7; qproperty-gripDotSize: 3; }");
+    handle->ensurePolished();
+    CHECK(handle->gripColor() == QColor("#aabbcc"));
+    CHECK(handle->gripSpacing() == 7);
+    CHECK(handle->gripDotSize() == 3);
+    splitter.collapse(Splitter::First);
+    CHECK(splitter.isCollapsed(Splitter::First));
+    splitter.collapse(Splitter::Second);
+    CHECK(splitter.isCollapsed(Splitter::First));
+    splitter.expand();
+    CHECK(splitter.sizes() == before);
+}
+TEST_CASE_METHOD(BrushUpstreamTest, "Dialog size settings are editable and bound to the available screen", "[view-state]") {
+    const auto prefWidth = TemporarilySetPref{Preferences::PreferencesWindowWidth, 900};
+    const auto prefHeight = TemporarilySetPref{Preferences::PreferencesWindowHeight, 680};
+    const auto viewWidth = TemporarilySetPref{Preferences::ViewDetailsWindowWidth, 640};
+    const auto viewHeight = TemporarilySetPref{Preferences::ViewDetailsWindowHeight, 480};
+    ViewPreferencePane pane;
+    auto* width = pane.findChild<QSpinBox*>("PreferencesWindowWidth");
+    auto* height = pane.findChild<QSpinBox*>("ViewDetailsWindowHeight");
+    REQUIRE(width);
+    REQUIRE(height);
+    CHECK(width->value() == 900);
+    CHECK(height->value() == 480);
+    width->setValue(1024);
+    height->setValue(500);
+    CHECK(pref(Preferences::PreferencesWindowWidth) == 1024);
+    CHECK(pref(Preferences::ViewDetailsWindowHeight) == 500);
+    PreferenceDialog dialog(document);
+    CHECK(dialog.width() == std::min(1024, dialog.screen()->availableGeometry().width() - 40));
+    CHECK(dialog.height() == std::min(680, dialog.screen()->availableGeometry().height() - 40));
+    PopupWindow popup;
+    popup.setObjectName("ViewDetailsPopup");
+    popup.show();
+    QApplication::processEvents();
+    CHECK(popup.size() == QSize(640, 500).boundedTo(popup.screen()->availableGeometry().size() - QSize(32, 32)));
+    QLabel reference;
+    reference.resize(100, 30);
+    reference.move(-500, -500);
+    popup.positionTouchingWidget(&reference);
+    CHECK(popup.screen()->availableGeometry().contains(popup.geometry()));
+    popup.hide();
+}
+
 } // namespace TrenchBroom::View

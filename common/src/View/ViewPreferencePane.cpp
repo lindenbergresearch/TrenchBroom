@@ -18,6 +18,8 @@
  */
 
 #include "ViewPreferencePane.h"
+#include <QSpinBox>
+#include <QSignalBlocker>
 
 #include <QBoxLayout>
 #include <QCheckBox>
@@ -413,6 +415,22 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow(tr("Icons"),m_contextMenuIcons);
     layout->addRow(tr("Shortcuts"),m_contextMenuShortcuts);
 
+    layout->addSection(tr("Dialog Sizes"));
+    const auto dialogSize = [&](const char* name, const QString& label, Preference<int>& setting, int low, int high) {
+        auto* field = new QSpinBox(this);
+        field->setObjectName(name);
+        field->setRange(low, high);
+        field->setSuffix(tr(" px"));
+        field->setKeyboardTracking(false);
+        field->setValue(pref(setting));
+        connect(field, QOverload<int>::of(&QSpinBox::valueChanged), this, [&setting](int value) { setPref(setting, value); });
+        layout->addRow(label, field);
+    };
+    dialogSize("PreferencesWindowWidth", tr("Preferences width"), Preferences::PreferencesWindowWidth, 480, 3840);
+    dialogSize("PreferencesWindowHeight", tr("Preferences height"), Preferences::PreferencesWindowHeight, 360, 2160);
+    dialogSize("ViewDetailsWindowWidth", tr("View Settings width"), Preferences::ViewDetailsWindowWidth, 480, 3840);
+    dialogSize("ViewDetailsWindowHeight", tr("View Settings height"), Preferences::ViewDetailsWindowHeight, 360, 2160);
+
     layout->addSection("Fonts");
     layout->addRow("UI Font", m_UIFontCombo, m_UIFontSizeCombo);
     layout->addRow(tr("Minimum UI size"), m_UIFontMinimumSize);
@@ -561,6 +579,10 @@ void ViewPreferencePane::doResetToDefaults() {
     unBindEvents();
 
     auto &prefs = PreferenceManager::instance();
+    prefs.resetToDefault(Preferences::PreferencesWindowWidth);
+    prefs.resetToDefault(Preferences::PreferencesWindowHeight);
+    prefs.resetToDefault(Preferences::ViewDetailsWindowWidth);
+    prefs.resetToDefault(Preferences::ViewDetailsWindowHeight);
     prefs.resetToDefault(Preferences::MapViewLayout);
     prefs.resetToDefault(Preferences::Link2DCameras);
     prefs.resetToDefault(Preferences::Brightness);
@@ -590,6 +612,17 @@ void ViewPreferencePane::doResetToDefaults() {
 }
 
 void ViewPreferencePane::doUpdateControls() {
+    const auto dialogSize = [&](const char* name, int value) {
+        if (auto* field = findChild<QSpinBox*>(name)) {
+            QSignalBlocker block(field);
+            field->setValue(value);
+        }
+    };
+    dialogSize("PreferencesWindowWidth", pref(Preferences::PreferencesWindowWidth));
+    dialogSize("PreferencesWindowHeight", pref(Preferences::PreferencesWindowHeight));
+    dialogSize("ViewDetailsWindowWidth", pref(Preferences::ViewDetailsWindowWidth));
+    dialogSize("ViewDetailsWindowHeight", pref(Preferences::ViewDetailsWindowHeight));
+
     unBindEvents();
 
     m_layoutCombo->setCurrentIndex(pref(Preferences::MapViewLayout));

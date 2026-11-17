@@ -18,6 +18,7 @@
  */
 
 #include "Inspector.h"
+#include "View/Splitter.h"
 
 #include "View/EntityInspector.h"
 #include "View/EntityPropertyEditor.h"
@@ -404,7 +405,7 @@ private:
         scroll->setFrameShape(QFrame::NoFrame);
         scroll->setWidgetResizable(true);
         scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        auto* stack = new QSplitter(Qt::Vertical);
+        auto* stack = new Splitter(Qt::Vertical);
         stack->setObjectName(left ? "Inspector_LeftStack" : "Inspector_RightStack");
         stack->setChildrenCollapsible(false);
         stack->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);

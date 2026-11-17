@@ -20,50 +20,70 @@
 #pragma once
 
 #include <QSplitter>
+#include <QColor>
+#include <algorithm>
 
 namespace TrenchBroom::View {
 class SplitterHandle : public QSplitterHandle {
     Q_OBJECT
+    Q_PROPERTY(QColor gripColor READ gripColor WRITE setGripColor)
+    Q_PROPERTY(int gripSpacing READ gripSpacing WRITE setGripSpacing)
+    Q_PROPERTY(int gripDotSize READ gripDotSize WRITE setGripDotSize)
+    QColor m_gripColor;
+    int m_gripSpacing = 5;
+    int m_gripDotSize = 2;
 
-public:
-    explicit SplitterHandle(Qt::Orientation orientation, QSplitter *parent = nullptr);
+  public:
+    explicit SplitterHandle(Qt::Orientation orientation, QSplitter* parent = nullptr);
     QSize sizeHint() const override;
+    QColor gripColor() const { return m_gripColor; }
+    int gripSpacing() const { return m_gripSpacing; }
+    int gripDotSize() const { return m_gripDotSize; }
+    void setGripColor(QColor color) {
+        m_gripColor = color;
+        update();
+    }
+    void setGripSpacing(int spacing) {
+        m_gripSpacing = std::clamp(spacing, 1, 32);
+        update();
+    }
+    void setGripDotSize(int size) {
+        m_gripDotSize = std::clamp(size, 1, 12);
+        update();
+    }
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
+  protected:
+    void paintEvent(QPaintEvent* event) override;
 };
 
 /* ------------------------------------------------------------------------------------------- */
 
-
 class Splitter : public QSplitter {
     Q_OBJECT
 
-public:
-    enum Face: int { Any = -1, First = 0, Second = 1 };
+  public:
+    enum Face : int { Any = -1, First = 0, Second = 1 };
 
-    explicit Splitter(Qt::Orientation orientation, QWidget *parent = nullptr);
-    explicit Splitter(QWidget *parent = nullptr);
+    explicit Splitter(Qt::Orientation orientation, QWidget* parent = nullptr);
+    explicit Splitter(QWidget* parent = nullptr);
 
     void collapse(Face face);
-    void expand() const;
+    void expand();
     bool isCollapsed(Face face = Any) const;
 
-protected:
-    QSplitterHandle *createHandle() override;
+  protected:
+    QSplitterHandle* createHandle() override;
 
-private:
-    std::vector<int> storedSizes{ 2 };
+  private:
+    QList<int> storedSizes;
     void saveSize();
-    void restoreSize() const;
-
+    void restoreSize();
 
 #ifdef __APPLE__
-    // on macOS, the widgets are not repainted properly when the splitter moves, so we force
-//     // them to repaint
-private slots:
+    // On macOS, force child repaints while moving the splitter.
+  private slots:
     void doSplitterMoved() const;
 
 #endif
 };
-}
+} // namespace TrenchBroom::View

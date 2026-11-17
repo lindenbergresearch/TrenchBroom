@@ -1,4 +1,5 @@
 #include "View/EditorCustomizationPreferencePane.h"
+#include "View/Splitter.h"
 #include "IO/PathQt.h"
 #include "IO/ResourceUtils.h"
 #include "IO/SystemPaths.h"
@@ -112,7 +113,7 @@ EditorCustomizationPreferencePane::EditorCustomizationPreferencePane(bool toolba
     scroll->setFrameShape(QFrame::NoFrame);
     scroll->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     scroll->setWidget(m_form);
-    auto* splitter = new QSplitter;
+    auto* splitter = new Splitter;
     splitter->addWidget(left);
     splitter->addWidget(scroll);
     splitter->setStretchFactor(1, 1);

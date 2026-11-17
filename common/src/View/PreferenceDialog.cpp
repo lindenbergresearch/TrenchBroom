@@ -26,6 +26,7 @@
 #include <QStackedWidget>
 #include <QToolBar>
 #include <QToolButton>
+#include <QScreen>
 
 #include "IO/ResourceUtils.h"
 #include "PreferenceManager.h"
@@ -58,6 +59,9 @@ PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidge
     setWindowIconTB(this);
     createGui();
     switchToPane(PrefPane_First);
+    setObjectName("PreferenceDialog");
+    const auto available = screen()->availableGeometry().size() - QSize(40, 40);
+    resize(QSize(std::clamp(pref(Preferences::PreferencesWindowWidth), 480, 3840), std::clamp(pref(Preferences::PreferencesWindowHeight), 360, 2160)).boundedTo(available));
 }
 
 void PreferenceDialog::closeEvent(QCloseEvent *event) {

@@ -26,34 +26,38 @@
 #include "Logger.h"
 
 namespace TrenchBroom::View {
-SplitterHandle::SplitterHandle(const Qt::Orientation orientation, QSplitter *parent) : QSplitterHandle(orientation, parent) {}
+SplitterHandle::SplitterHandle(const Qt::Orientation orientation, QSplitter* parent) : QSplitterHandle(orientation, parent) {}
 
 QSize SplitterHandle::sizeHint() const {
-    return QSize(3, 3);
+    return QSplitterHandle::sizeHint();
 }
 
-void SplitterHandle::paintEvent(QPaintEvent *event) {
+void SplitterHandle::paintEvent(QPaintEvent* event) {
+    QSplitterHandle::paintEvent(event);
     QPainter painter(this);
-    painter.setPen(Qt::SolidLine);
-    painter.fillRect(event->rect(), QBrush(palette().color(QPalette::Midlight)));
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(m_gripColor.isValid() ? m_gripColor : palette().color(QPalette::Mid));
+    const auto center = QPointF(rect().center());
+    for (int i = -1; i <= 1; ++i) {
+        const auto offset = orientation() == Qt::Horizontal ? QPointF(0, i * m_gripSpacing) : QPointF(i * m_gripSpacing, 0);
+        painter.drawEllipse(center + offset, m_gripDotSize * 0.5, m_gripDotSize * 0.5);
+    }
 }
 
-Splitter::Splitter(const Qt::Orientation orientation, QWidget *parent)
-    : QSplitter(orientation, parent) {
+Splitter::Splitter(const Qt::Orientation orientation, QWidget* parent) : QSplitter(orientation, parent) {
 #ifdef __APPLE__
     connect(this, &QSplitter::splitterMoved, this, &Splitter::doSplitterMoved);
 #endif
 }
 
-Splitter::Splitter(QWidget *parent)
-    : QSplitter(parent) {
+Splitter::Splitter(QWidget* parent) : QSplitter(parent) {
 #ifdef __APPLE__
     connect(this, &QSplitter::splitterMoved, this, &Splitter::doSplitterMoved);
 #endif
 }
 
-
-static std::string getName(const Splitter::Face &face) {
+static std::string getName(const Splitter::Face& face) {
     if (face == Splitter::Face::Any) return "Any";
     if (face == Splitter::Face::First) return "First";
     if (face == Splitter::Face::Second) return "Second";
@@ -62,29 +66,20 @@ static std::string getName(const Splitter::Face &face) {
 }
 
 void Splitter::collapse(const Face face) {
-    defaultQtLogger.trace() << "called: before collapse(" << getName(face) << ")" << " - isCollapsed() = " << isCollapsed();
-    // if any already collapsed do return
-    if (isCollapsed())
-        return;
-
+    if (count() != 2 || (face != First && face != Second) || isCollapsed()) return;
     saveSize();
-    sizes()[face] = 0;
-    sizes()[(face + 1) % 2] = 9999;
-
-    defaultQtLogger.trace() << "called: after collapse() " << " size(" << getName(face) << ") is " << sizes()[face] << " size(" << getName(
-        static_cast<Face>((face + 1) % 2)
-    ) << ") is " << sizes()[(face + 1) % 2];
+    auto values = sizes();
+    values[(face + 1) % 2] += values[face];
+    values[face] = 0;
+    setSizes(values);
 }
 
-void Splitter::expand() const {
-    defaultQtLogger.trace() << "called: expand() - isCollapsed() = " << isCollapsed();
-    if (!isCollapsed()) return;
-    restoreSize();
+void Splitter::expand() {
+    if (isCollapsed()) restoreSize();
 }
 
 bool Splitter::isCollapsed(const Face face) const {
-    if (sizes().size() < 2)
-        return false;
+    if (sizes().size() < 2) return false;
 
     // if no index was provided, just return the information
     // if ANY of them is collapsed
@@ -98,29 +93,24 @@ bool Splitter::isCollapsed(const Face face) const {
     return sizes()[face] <= 0;
 }
 
-QSplitterHandle *Splitter::createHandle() {
+QSplitterHandle* Splitter::createHandle() {
     return new SplitterHandle(orientation(), this);
 }
 
 void Splitter::saveSize() {
-    defaultQtLogger.trace() << "save sizes: First =" << sizes()[0] << " Second =" << sizes()[1];
-    storedSizes[0] = sizes()[0];
-    storedSizes[1] = sizes()[1];
+    storedSizes = sizes();
 }
 
-void Splitter::restoreSize() const {
-    defaultQtLogger.trace() << "restore sizes: First =" << storedSizes[0] << " Second =" << storedSizes[1];
-    sizes()[0] = storedSizes[0];
-    sizes()[1] = storedSizes[1];
-    defaultQtLogger.trace() << "restored sizes: First =" << sizes()[0] << " Second =" << sizes()[1];
+void Splitter::restoreSize() {
+    if (storedSizes.size() == count()) setSizes(storedSizes);
 }
 
 #ifdef __APPLE__
 void Splitter::doSplitterMoved() const {
     for (auto i = 0; i < count(); ++i) {
-        auto *widget = this->widget(i);
+        auto* widget = this->widget(i);
         widget->repaint();
     }
 }
 #endif
-}
+} // namespace TrenchBroom::View

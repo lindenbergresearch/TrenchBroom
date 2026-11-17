@@ -23,6 +23,10 @@
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QWindow>
+#include <QScreen>
+#include "Preferences.h"
+#include "PreferenceManager.h"
+#include <algorithm>
 
 namespace TrenchBroom {
 namespace View {
@@ -36,31 +40,12 @@ void PopupWindow::positionTouchingWidget(QWidget *refWidget) {
     const QRect refWidgetRectOnScreen = QRect(refWidget->mapToGlobal(QPoint(0, 0)), refWidget->size());
     const QSize ourSize = size();
 
-    // Figure out y position on screen
-    int y;
-    if (refWidgetRectOnScreen.bottom() + ourSize.height() <= screenGeom.bottom()) { // fits below?
-        y = refWidgetRectOnScreen.bottom();
-    } else if (refWidgetRectOnScreen.top() - ourSize.height() >= 0) { // fits above?
-        y = refWidgetRectOnScreen.top() - ourSize.height();
-    } else { // otherwise put it as low as possible, but make sure the top is visible
-        const auto bottom = std::min(refWidgetRectOnScreen.bottom() + ourSize.height(), screenGeom.bottom());
-        const auto top = bottom - ourSize.height();
-        y = std::max(top, 0);
-    }
-
-    // Figure out the x position on screen
-    int x;
-    if (refWidgetRectOnScreen.right() - ourSize.width() >= 0) { // fits left?
-        x = refWidgetRectOnScreen.right() - ourSize.width();
-    } else if (refWidgetRectOnScreen.left() + ourSize.width() <= screenGeom.right()) { // fits right?
-        x = refWidgetRectOnScreen.left();
-    } else { // otherwise put it as far to the left as possible, but make sure the left is visible
-        x = std::max(refWidgetRectOnScreen.left() - ourSize.width(), 0);
-    }
-
-    // Now map x, y from global to our parent's coordinates
-    const QPoint desiredPointInParentCoords = mapToParent(mapFromGlobal(QPoint(x, y)));
-    setGeometry(QRect(desiredPointInParentCoords, ourSize));
+    const auto bounded = ourSize.boundedTo(screenGeom.size());
+    const auto desiredY = refWidgetRectOnScreen.bottom() + bounded.height() <= screenGeom.bottom() ? refWidgetRectOnScreen.bottom() + 1 : refWidgetRectOnScreen.top() - bounded.height();
+    const auto x = std::clamp(refWidgetRectOnScreen.right() - bounded.width() + 1, screenGeom.left(), screenGeom.right() - bounded.width() + 1);
+    const auto y = std::clamp(desiredY, screenGeom.top(), screenGeom.bottom() - bounded.height() + 1);
+    // Popup windows use screen coordinates, including monitors left/above the primary screen.
+    setGeometry(QRect(QPoint(x, y), bounded));
 }
 
 void PopupWindow::closeEvent(QCloseEvent *) {
@@ -68,6 +53,10 @@ void PopupWindow::closeEvent(QCloseEvent *) {
 }
 
 void PopupWindow::showEvent(QShowEvent *) {
+    if (objectName() == "ViewDetailsPopup") {
+        const auto available = screen()->availableGeometry().size() - QSize(32, 32);
+        resize(QSize(std::clamp(pref(Preferences::ViewDetailsWindowWidth), 480, 3840), std::clamp(pref(Preferences::ViewDetailsWindowHeight), 360, 2160)).boundedTo(available));
+    }
     emit visibilityChanged(true);
 }
 } // namespace View

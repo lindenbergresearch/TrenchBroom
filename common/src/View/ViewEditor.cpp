@@ -1195,6 +1195,7 @@ ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *p
     auto *popupSizer = new QVBoxLayout();
     popupSizer->setContentsMargins(0, 0, 0, 0);
     popupSizer->addWidget(editorContainer);
+    m_button->GetPopupWindow()->setObjectName("ViewDetailsPopup");
     m_button->GetPopupWindow()->setLayout(popupSizer);
 
     auto *sizer = new QHBoxLayout();

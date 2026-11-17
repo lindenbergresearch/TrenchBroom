@@ -612,8 +612,19 @@ QWidget#PrefabCard[selected="true"] QWidget#PrefabDimensions {
 QSplitter {
     padding: 0px;
     margin: 0px;
-    background-color: ${color.window};
+    background-color: ${color.dark};
+    qproperty-handleWidth: 8;
     border: none;
+}
+
+/* Splitter handles: width/background apply to all splitters. The custom editor
+   handles additionally expose the color, spacing and diameter of their grip dots. */
+QSplitter::handle { background-color: ${color.dark}; }
+QSplitter::handle:hover { background-color: ${color.midlight}; }
+TrenchBroom--View--SplitterHandle {
+    qproperty-gripColor: ${color.mid};
+    qproperty-gripSpacing: 5;
+    qproperty-gripDotSize: 2;
 }
 
 /* ==== CHECKBOX ==== */
