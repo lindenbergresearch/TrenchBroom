@@ -32,6 +32,7 @@
 #include "kdl/reflection_impl.h"
 
 #include <algorithm>
+#include <functional>
 #include <vector>
 
 namespace TrenchBroom {
@@ -180,39 +181,25 @@ void NodeCollection::addNode(Node *node) {
 }
 
 static const auto doRemoveNodes = [](auto &nodes, auto &layers, auto &groups, auto &entities, auto &brushes, auto &patches, auto cur, auto end) {
-    auto nodeEnd = std::end(nodes);
-    auto layerEnd = std::end(layers);
-    auto groupEnd = std::end(groups);
-    auto entityEnd = std::end(entities);
-    auto brushEnd = std::end(brushes);
-    auto patchEnd = std::end(patches);
+    if (cur == end) return;
 
-    while (cur != end) {
-        (*cur)->accept(kdl::overload([](WorldNode *) {}, [&](LayerNode *layer) {
-            nodeEnd = std::remove(std::begin(nodes), nodeEnd, layer);
-            layerEnd = std::remove(std::begin(layers), layerEnd, layer);
-        }, [&](GroupNode *group) {
-            nodeEnd = std::remove(std::begin(nodes), nodeEnd, group);
-            groupEnd = std::remove(std::begin(groups), groupEnd, group);
-        }, [&](EntityNode *entity) {
-            nodeEnd = std::remove(std::begin(nodes), nodeEnd, entity);
-            entityEnd = std::remove(std::begin(entities), entityEnd, entity);
-        }, [&](BrushNode *brush) {
-            nodeEnd = std::remove(std::begin(nodes), nodeEnd, brush);
-            brushEnd = std::remove(std::begin(brushes), brushEnd, brush);
-        }, [&](PatchNode *patch) {
-            nodeEnd = std::remove(std::begin(nodes), nodeEnd, patch);
-            patchEnd = std::remove(std::begin(patches), patchEnd, patch);
-        }));
-        ++cur;
-    }
-
-    nodes.erase(nodeEnd, std::end(nodes));
-    layers.erase(layerEnd, std::end(layers));
-    groups.erase(groupEnd, std::end(groups));
-    entities.erase(entityEnd, std::end(entities));
-    brushes.erase(brushEnd, std::end(brushes));
-    patches.erase(patchEnd, std::end(patches));
+    // Copy before changing any list: callers may pass nodes() itself. Use the
+    // standard pointer total order, including pointers to unrelated objects.
+    auto removed = std::vector<Node*>(cur, end);
+    const auto less = std::less<Node*>{};
+    std::sort(removed.begin(), removed.end(), less);
+    removed.erase(std::unique(removed.begin(), removed.end()), removed.end());
+    const auto erase = [&](auto& list) {
+        list.erase(std::remove_if(list.begin(), list.end(), [&](Node* node) {
+            return std::binary_search(removed.begin(), removed.end(), node, less);
+        }), list.end());
+    };
+    erase(nodes);
+    erase(layers);
+    erase(groups);
+    erase(entities);
+    erase(brushes);
+    erase(patches);
 };
 
 void NodeCollection::removeNodes(const std::vector<Node *> &nodes) {

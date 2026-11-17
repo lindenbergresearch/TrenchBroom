@@ -18,6 +18,8 @@
  */
 
 #include "MapDocumentCommandFacade.h"
+#include <algorithm>
+#include <functional>
 
 #include "Assets/EntityDefinitionFileSpec.h"
 #include "Assets/TextureManager.h"
@@ -191,7 +193,16 @@ void MapDocumentCommandFacade::performDeselect(const std::vector<Model::BrushFac
         }
     }
 
-    m_selectedBrushFaces = kdl::vec_erase_all(std::move(m_selectedBrushFaces), deselected);
+    if (!deselected.empty()) {
+        const auto less = [](const Model::BrushFaceHandle& a, const Model::BrushFaceHandle& b) {
+            return a.node() == b.node() ? a.faceIndex() < b.faceIndex() : std::less<Model::BrushNode*>{}(a.node(), b.node());
+        };
+        auto removed = deselected;
+        std::sort(removed.begin(), removed.end(), less);
+        m_selectedBrushFaces.erase(std::remove_if(m_selectedBrushFaces.begin(), m_selectedBrushFaces.end(), [&](const auto& face) {
+            return std::binary_search(removed.begin(), removed.end(), face, less);
+        }), m_selectedBrushFaces.end());
+    }
 
     Selection selection;
     selection.addDeselectedBrushFaces(deselected);
