@@ -325,6 +325,9 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
     ${COMMON_SOURCE_DIR}/View/Command.cpp
     ${COMMON_SOURCE_DIR}/View/CommandProcessor.cpp
+    ${COMMON_SOURCE_DIR}/View/CommandHistory.h
+    ${COMMON_SOURCE_DIR}/View/HistoryEditor.h
+    ${COMMON_SOURCE_DIR}/View/HistoryEditor.cpp
     ${COMMON_SOURCE_DIR}/View/CompilationContext.cpp
     ${COMMON_SOURCE_DIR}/View/CompilationDialog.cpp
     ${COMMON_SOURCE_DIR}/View/CompilationProfileEditor.cpp

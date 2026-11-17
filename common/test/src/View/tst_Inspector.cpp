@@ -5,6 +5,7 @@
 #include "View/EntityPropertyEditor.h"
 #include "View/GLContextManager.h"
 #include "View/Inspector.h"
+#include "View/HistoryEditor.h"
 #include "View/MapDocumentCommandFacade.h"
 #include "View/RenderView.h"
 #include "View/SwitchableTitledPanel.h"
@@ -226,7 +227,8 @@ TEST_CASE_METHOD(InspectorSettingsScope, "Inspector starts with independent tool
     InspectorFixture f;
     CHECK(f.left->count() == 0);
     CHECK(f.inspector->leftPane()->isHidden());
-    CHECK(f.right->count() == 10);
+    CHECK(f.right->count() == 11);
+    REQUIRE(f.inspector->findChild<HistoryEditor*>());
     CHECK(f.host.findChildren<QTabWidget*>().empty());
     for (auto* tabs : f.host.findChildren<QTabBar*>("InspectorToolTabs")) {
         CHECK(tabs->isHidden());
@@ -510,7 +512,7 @@ TEST_CASE_METHOD(InspectorSettingsScope, "Inspector restores ordered stacks, tab
 
     restored.inspector->resetToolLayout();
     CHECK(restored.left->count() == 0);
-    CHECK(restored.right->count() == 10);
+    CHECK(restored.right->count() == 11);
     CHECK(restored.inspector->leftPane()->isHidden());
     CHECK(InspectorFixture::groupOf(search) != InspectorFixture::groupOf(layers));
     CHECK(mods->window() == &restored.host);
@@ -632,7 +634,7 @@ TEST_CASE_METHOD(InspectorSettingsScope, "The old inspector layout migrates to f
     CHECK(f.inspector->leftPane()->isAncestorOf(f.mapProperties()));
     CHECK(f.inspector->isAncestorOf(f.search()));
     CHECK(f.left->count() == 2);
-    CHECK(f.right->count() == 8);
+    CHECK(f.right->count() == 9);
     CHECK(f.host.findChildren<QTabWidget*>().empty());
     CHECK(InspectorFixture::groupTabs(f.layers())->isHidden());
 }

@@ -18,6 +18,7 @@
  */
 
 #pragma once
+#include "View/CommandHistory.h"
 #include "View/BrushComponentSelection.h"
 
 #include "FloatType.h"
@@ -182,6 +183,7 @@ protected:
 
 public: // notification
     Notifier<> componentSelectionDidChangeNotifier;
+    Notifier<> commandHistoryDidChangeNotifier;
     Notifier<Command &> commandDoNotifier;
     Notifier<Command &> commandDoneNotifier;
     Notifier<Command &> commandDoFailedNotifier;
@@ -761,6 +763,8 @@ public: // debug commands
 
 public: // command processing
     bool canUndoCommand() const;
+    virtual CommandHistory commandHistory() const { return {}; }
+    virtual size_t commandHistoryPosition() const { return 0; }
 
     bool canRedoCommand() const;
 

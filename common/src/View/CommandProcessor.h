@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Notifier.h"
+#include "View/CommandHistory.h"
 
 #include <chrono>
 #include <memory>
@@ -106,6 +107,9 @@ class CommandProcessor {
     explicit CommandProcessor(MapDocumentCommandFacade *document, std::chrono::milliseconds collationInterval = std::chrono::milliseconds{1000});
 
     ~CommandProcessor();
+    CommandHistory history() const;
+    size_t historyPosition() const { return m_undoStack.size(); }
+    Notifier<> historyDidChangeNotifier;
 
     /**
      * Notifies observers when a command is going to be executed.

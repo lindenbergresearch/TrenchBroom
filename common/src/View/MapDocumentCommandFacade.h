@@ -61,6 +61,8 @@ class MapDocumentCommandFacade : public MapDocument {
 
   public:
     ~MapDocumentCommandFacade() override;
+    CommandHistory commandHistory() const override;
+    size_t commandHistoryPosition() const override;
 
   public: // selection modification
     void performSelect(const std::vector<Model::Node *> &nodes);

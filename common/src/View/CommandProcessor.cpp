@@ -124,6 +124,16 @@ CommandProcessor::CommandProcessor(MapDocumentCommandFacade *document, const std
 
 CommandProcessor::~CommandProcessor() = default;
 
+CommandHistory CommandProcessor::history() const {
+    CommandHistory result;
+    result.reserve(m_undoStack.size() + m_redoStack.size());
+    for (const auto& command : m_undoStack)
+        result.push_back({command->name(), command->timestamp(), true});
+    for (auto it = m_redoStack.rbegin(); it != m_redoStack.rend(); ++it)
+        result.push_back({(*it)->name(), (*it)->timestamp(), false});
+    return result;
+}
+
 bool CommandProcessor::canUndo() const {
     return m_transactionStack.empty() && !m_undoStack.empty();
 }
@@ -150,6 +160,7 @@ const std::string &CommandProcessor::redoCommandName() const {
 
 void CommandProcessor::startTransaction(std::string name, const TransactionScope scope) {
     m_transactionStack.emplace_back(std::move(name), scope);
+    historyDidChangeNotifier();
 }
 
 void CommandProcessor::commitTransaction() {
@@ -157,6 +168,7 @@ void CommandProcessor::commitTransaction() {
         throw CommandProcessorException{"No transaction is currently executing"};
     } else {
         createAndStoreTransaction();
+        historyDidChangeNotifier();
     }
 }
 
@@ -170,6 +182,7 @@ void CommandProcessor::rollbackTransaction() {
         undoCommand(**it);
     }
     transaction.commands.clear();
+    historyDidChangeNotifier();
 }
 
 bool CommandProcessor::isCurrentDocumentStateObservable() const {
@@ -181,6 +194,7 @@ std::unique_ptr<CommandResult> CommandProcessor::execute(std::unique_ptr<Command
     if (result->success()) {
         m_undoStack.clear();
         m_redoStack.clear();
+        historyDidChangeNotifier();
     }
     return result;
 }
@@ -202,6 +216,7 @@ std::unique_ptr<CommandResult> CommandProcessor::undo() {
             pushToRedoStack(std::move(command));
             transactionUndoneNotifier(commandName);
         }
+        historyDidChangeNotifier();
         return result;
     }
 }
@@ -217,6 +232,7 @@ std::unique_ptr<CommandResult> CommandProcessor::redo() {
         if (result->success()) {
             assertResult(pushToUndoStack(std::move(command), false));
         }
+        historyDidChangeNotifier();
         return result;
     }
 }
@@ -227,6 +243,7 @@ void CommandProcessor::clear() {
     m_undoStack.clear();
     m_redoStack.clear();
     m_lastCommandTimestamp = std::chrono::time_point<std::chrono::system_clock>();
+    historyDidChangeNotifier();
 }
 
 CommandProcessor::SubmitAndStoreResult CommandProcessor::executeAndStoreCommand(std::unique_ptr<UndoableCommand> command, const bool collate) {
@@ -237,6 +254,7 @@ CommandProcessor::SubmitAndStoreResult CommandProcessor::executeAndStoreCommand(
 
     const auto commandStored = storeCommand(std::move(command), collate);
     m_redoStack.clear();
+    historyDidChangeNotifier();
     return SubmitAndStoreResult(std::move(commandResult), commandStored);
 }
 

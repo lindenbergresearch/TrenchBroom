@@ -56,6 +56,7 @@ bool UndoableCommand::collateWith(UndoableCommand &command) {
     assert(&command != this);
     if (doCollateWith(command)) {
         m_modificationCount += command.m_modificationCount;
+        m_timestamp = command.m_timestamp;
         return true;
     }
     return false;

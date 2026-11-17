@@ -501,6 +501,7 @@ void MapDocumentCommandFacade::decModificationCount(const size_t delta) {
 }
 
 void MapDocumentCommandFacade::connectObservers() {
+    m_notifierConnection += m_commandProcessor->historyDidChangeNotifier.connect(commandHistoryDidChangeNotifier);
     m_notifierConnection += m_commandProcessor->commandDoNotifier.connect(commandDoNotifier);
     m_notifierConnection += m_commandProcessor->commandDoneNotifier.connect(commandDoneNotifier);
     m_notifierConnection += m_commandProcessor->commandDoFailedNotifier.connect(commandDoFailedNotifier);
@@ -514,6 +515,10 @@ void MapDocumentCommandFacade::connectObservers() {
 bool MapDocumentCommandFacade::isCurrentDocumentStateObservable() const {
     return m_commandProcessor->isCurrentDocumentStateObservable();
 }
+
+CommandHistory MapDocumentCommandFacade::commandHistory() const { return m_commandProcessor->history(); }
+
+size_t MapDocumentCommandFacade::commandHistoryPosition() const { return m_commandProcessor->historyPosition(); }
 
 bool MapDocumentCommandFacade::doCanUndoCommand() const {
     return m_commandProcessor->canUndo();

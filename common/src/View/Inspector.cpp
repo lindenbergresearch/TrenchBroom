@@ -26,6 +26,7 @@
 #include "View/LayerInspector.h"
 #include "View/MapInspector.h"
 #include "View/PrefabBrowser.h"
+#include "View/HistoryEditor.h"
 #include "View/TitleBar.h"
 #include "View/TitledPanel.h"
 
@@ -915,6 +916,11 @@ Inspector::Inspector(const std::weak_ptr<MapDocument>& document, GLContextManage
     prefabLayout->setContentsMargins(0, 0, 0, 0);
     prefabLayout->addWidget(new PrefabBrowser(document, mapView));
 
+    auto* history = new TitledPanel(tr("History"), this);
+    auto* historyLayout = new QVBoxLayout(history->getPanel());
+    historyLayout->setContentsMargins(0, 0, 0, 0);
+    historyLayout->addWidget(new HistoryEditor(document));
+
     m_toolLayout = std::make_unique<ToolLayout>(*this);
     m_toolLayout->addTools("layer", layers->toolSections());
     m_toolLayout->addTools("map", map->toolSections());
@@ -922,6 +928,7 @@ Inspector::Inspector(const std::weak_ptr<MapDocument>& document, GLContextManage
     m_toolLayout->addTools("entity", entities->toolSections());
     m_toolLayout->addTools("properties", {{"properties", tr("Properties"), properties, properties->getTitleBar()}});
     m_toolLayout->addTools("entity", {{"prefabs", tr("Prefab"), prefabs, prefabs->getTitleBar(), 2}});
+    m_toolLayout->addTools("map", {{"history", tr("History"), history, history->getTitleBar(), 2}});
     m_toolLayout->restore();
 }
 

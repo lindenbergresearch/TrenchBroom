@@ -23,6 +23,7 @@
 #include "View/Command.h"
 
 #include <memory>
+#include <chrono>
 #include <string>
 
 namespace TrenchBroom {
@@ -32,12 +33,14 @@ class MapDocumentCommandFacade;
 class UndoableCommand : public Command {
   private:
     size_t m_modificationCount;
+    std::chrono::system_clock::time_point m_timestamp = std::chrono::system_clock::now();
 
   protected:
     UndoableCommand(std::string name, bool updateModificationCount);
 
   public:
     virtual ~UndoableCommand();
+    std::chrono::system_clock::time_point timestamp() const { return m_timestamp; }
 
     std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document) override;
 
