@@ -34,13 +34,21 @@ protected:
     const int previousCapacity = IconCache::maxEntries();
     const int previousPixmapLimit = QPixmapCache::cacheLimit();
     const QPalette previousPalette = qApp->palette();
+    const bool previousNormalize = IconAppearance::instance().normalizeBrightness();
+    const qreal previousBrightness = IconAppearance::instance().brightness();
 
-    VectorIconTest() { IconCache::resetCache(); }
+    VectorIconTest() {
+        IconCache::resetCache();
+        // Geometry and source-color tests compare against unmodified Qt SVGs.
+        IconAppearance::instance().setNormalizeBrightness(false);
+    }
     ~VectorIconTest() {
         IconCache::resetCache();
         IconCache::setMaxEntries(previousCapacity);
         QPixmapCache::setCacheLimit(previousPixmapLimit);
         qApp->setPalette(previousPalette);
+        IconAppearance::instance().setNormalizeBrightness(previousNormalize);
+        IconAppearance::instance().setBrightness(previousBrightness);
     }
 
     std::filesystem::path path(const QString& name) const { return pathFromQString(directory.filePath(name)); }
@@ -203,6 +211,113 @@ TEST_CASE_METHOD(VectorIconTest, "Disabled vector icons are darker and QSS chang
     const auto lighter = center(QIcon::Disabled);
     CHECK(lighter.red() == Approx(100).margin(1)); CHECK(lighter != dark);
     CHECK(center(QIcon::Normal) == QColor(200,150,100));
+}
+
+TEST_CASE_METHOD(VectorIconTest, "VectorIcon normalizes dark white and black sources to the configured peak", "[VectorIcon][brightness]") {
+    auto& appearance = IconAppearance::instance();
+    appearance.setNormalizeBrightness(true);
+    appearance.setBrightness(0.75);
+    for (const auto* color : {"#404040", "#ffffff", "#000000"}) {
+        CAPTURE(color);
+        const auto icon = VectorIcon(solid(QString(color) + ".svg", color)).icon();
+        const auto center = paintIcon(icon, {24, 24}, 2).pixelColor(24, 24);
+        CHECK(center.red() == Approx(191).margin(1));
+        CHECK(center.green() == center.red());
+        CHECK(center.blue() == center.red());
+        CHECK(center.alpha() == 255);
+    }
+}
+
+TEST_CASE_METHOD(VectorIconTest, "Normalized icons preserve hue opacity and antialiased edges", "[VectorIcon][brightness]") {
+    auto& appearance = IconAppearance::instance();
+    appearance.setNormalizeBrightness(true);
+    appearance.setBrightness(0.75);
+    const auto icon = VectorIcon(write("translucent.svg", R"(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" fill="#204080" fill-opacity="0.5"/></svg>)")).icon();
+    const auto image = paintIcon(icon, {24, 24}, 2);
+    const auto center = image.pixelColor(24, 24);
+    CHECK(center.red() == Approx(48).margin(2));
+    CHECK(center.green() == Approx(96).margin(2));
+    CHECK(center.blue() == Approx(191).margin(2));
+    CHECK(center.alpha() == Approx(128).margin(1));
+    CHECK(image.pixelColor(0, 0).alpha() == 0);
+
+    const auto circle = [&](const QString& name, const QByteArray& fill) {
+        return VectorIcon(write(name, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\"><circle cx=\"8.2\" cy=\"8.2\" r=\"6.3\" fill=\"" + fill + "\"/></svg>")).icon();
+    };
+    const auto dark = paintIcon(circle("dark.svg", "#202020"), {24, 24}, 1.5);
+    const auto white = paintIcon(circle("white.svg", "#ffffff"), {24, 24}, 1.5);
+    int edgePixels = 0;
+    for (auto y = 0; y < dark.height(); ++y) {
+        for (auto x = 0; x < dark.width(); ++x) {
+            const auto a = dark.pixel(x, y), b = white.pixel(x, y);
+            REQUIRE(qAlpha(a) == qAlpha(b));
+            REQUIRE(std::abs(qRed(a) - qRed(b)) <= 1);
+            if (qAlpha(a) > 0 && qAlpha(a) < 255) ++edgePixels;
+        }
+    }
+    CHECK(edgePixels > 0);
+}
+
+TEST_CASE_METHOD(VectorIconTest, "Brightness changes reuse SVGs and update held icons and checked variants", "[VectorIcon][brightness]") {
+    auto& appearance = IconAppearance::instance();
+    const auto oldStyle = appearance.styleSheet();
+    const auto restore = qScopeGuard([&] { appearance.setStyleSheet(oldStyle); });
+    solid("vary_on.svg", "#202020");
+    solid("vary_off.svg", "#ffffff");
+    const auto icon = VectorIcon(path("vary.svg")).icon();
+    const auto key = icon.cacheKey();
+    appearance.setStyleSheet("QWidget#IconAppearance { qproperty-normalizeBrightness: true; qproperty-brightness: 0.75; }");
+    CHECK(paintIcon(icon, {16, 16}, 1, QIcon::On).pixelColor(8, 8).red() == Approx(191).margin(1));
+    CHECK(paintIcon(icon, {16, 16}, 1, QIcon::Off).pixelColor(8, 8).red() == Approx(191).margin(1));
+    REQUIRE(QFile::remove(pathAsQString(path("vary_on.svg"))));
+    REQUIRE(QFile::remove(pathAsQString(path("vary_off.svg"))));
+    for (const auto factor : {0.5, 1.0, 0.0}) {
+        appearance.setBrightness(factor);
+        for (const auto state : {QIcon::On, QIcon::Off}) {
+            const auto result = paintIcon(icon, {48, 48}, 2, state);
+            CHECK(result.size() == QSize(96, 96));
+            CHECK(result.pixelColor(48, 48).red() == Approx(qRound(255 * factor)).margin(1));
+            CHECK(result.pixelColor(48, 48).alpha() == 255);
+        }
+        CHECK(icon.cacheKey() == key);
+        CHECK(IconCache::size() == 1);
+    }
+}
+
+TEST_CASE_METHOD(VectorIconTest, "Tinted and disabled icons apply brightness before disabled dimming", "[VectorIcon][brightness]") {
+    auto& appearance = IconAppearance::instance();
+    const auto oldDisabled = appearance.disabledBrightness(), oldOpacity = appearance.disabledOpacity();
+    const auto restore = qScopeGuard([&] { appearance.setDisabledBrightness(oldDisabled); appearance.setDisabledOpacity(oldOpacity); });
+    appearance.setNormalizeBrightness(true);
+    appearance.setBrightness(0.75);
+    appearance.setDisabledBrightness(0.25);
+    appearance.setDisabledOpacity(1);
+    const auto icon = VectorIcon(solid("tinted.svg", "#111111")).icon(QColor{32, 64, 128});
+    const auto normal = paintIcon(icon, {16, 16}).pixelColor(8, 8);
+    CHECK(normal.red() == Approx(48).margin(1));
+    CHECK(normal.green() == Approx(96).margin(1));
+    CHECK(normal.blue() == Approx(191).margin(1));
+    const auto disabled = icon.pixmap({16, 16}, QIcon::Disabled).toImage().pixelColor(8, 8);
+    CHECK(disabled.blue() == Approx(48).margin(1));
+    CHECK(disabled.alpha() == 255);
+}
+
+TEST_CASE("Icon brightness measurement ignores margins and weak edge pixels", "[VectorIcon][brightness]") {
+    QImage image{8, 8, QImage::Format_RGBA64_Premultiplied};
+    image.fill(Qt::transparent);
+    CHECK(measureIconBrightness(image) == 0);
+    image.setPixelColor(4, 4, QColor{64, 32, 16});
+    image.setPixelColor(0, 0, QColor{255, 255, 255, 1});
+    CHECK(measureIconBrightness(image) == Approx(64.0 / 255).margin(0.0001));
+    const auto oldAlpha = image.pixelColor(0, 0).alpha();
+    normalizeIconBrightness(image, measureIconBrightness(image), 0.75);
+    CHECK(image.pixelColor(4, 4).red() == Approx(191).margin(1));
+    CHECK(image.pixelColor(0, 0).alpha() == oldAlpha);
+    CHECK(image.pixelColor(7, 7).alpha() == 0);
+    QImage empty;
+    CHECK(measureIconBrightness(empty) == 0);
+    normalizeIconBrightness(empty, 0, 1);
+    CHECK(empty.isNull());
 }
 
 TEST_CASE_METHOD(VectorIconTest, "VectorIcon failures return safe values and do not poison other requests", "[VectorIcon]") {

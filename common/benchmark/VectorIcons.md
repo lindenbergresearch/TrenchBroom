@@ -3,8 +3,11 @@
 `IO::VectorIcon` is the shared entry point behind `loadSVGIcon` and SVG requests
 through `loadPixmapResource`. Its QIcon engine keeps the parsed SVG source and
 renders at the physical pixel size required by the widget or painter. Widget
-sizes remain logical pixels. No fixed set of 1x/2x bitmaps, extra sharpening or
-brightness normalization is applied.
+sizes remain logical pixels. No fixed set of 1x/2x bitmaps or extra sharpening is
+applied. Each source/checked variant has its peak RGB brightness measured once;
+the QSS-controlled `number.icon.brightness` factor then normalizes the rasterized
+icon (default 0.75). Alpha and relative color proportions are preserved. A 16-bit
+intermediate avoids amplified rounding artifacts on antialiased edges.
 
 ## Ownership and limits
 
@@ -15,11 +18,13 @@ brightness normalization is applied.
   reset affects subsequent loads, including retries of missing/edited files.
 - Qt's bounded `QPixmapCache` owns raster results. Keys include source identity,
   pixel dimensions, device pixel ratio, mode, checked state, application palette
-  and style. This cache's existing global memory limit is respected, not enlarged.
+  and style, tint, normalization and disabled-state factors. This cache's existing
+  global memory limit is respected, not enlarged.
 - Paths are normalized lexically; resource lookups and parsing occur only on
   source-cache misses. All cache and rendering operations use the GUI thread.
-- On/off variants represent checked state. Disabled/selected appearances use the
-  current Qt style. Missing variants fall back to the base SVG or surviving state.
+- On/off variants represent checked state. Disabled appearances apply the
+  configured dimming after normalization; selected appearances use the current Qt
+  style. Missing variants fall back to the base SVG or surviving state.
 
 A small source cache is worthwhile because tree delegates and toolbars request
 the same assets repeatedly. Using Qt's raster cache avoids a second unbounded
@@ -30,11 +35,14 @@ collection of images at every size and density.
 `common/test/src/IO/tst_VectorIcon.cpp` provides the `[VectorIcon]` tests and an
 opt-in `[VectorIconBenchmark]` timing comparison. Pixel comparisons render sizes
 12–96 at densities 1, 1.25, 1.5, 2 and 3 against direct QSvgRenderer output. Other
-checks cover aspect ratio, original colors/alpha, painter transforms, state
+checks cover aspect ratio, original colors/alpha with normalization disabled,
+normalized brightness across dark/white/black sources, hue/alpha and edge
+preservation, live factors on held icons, painter transforms, state
 fallback, palette changes, cache eviction/reset, detached QIcons, invalid files,
 real application icons, and bitmap callers.
 
-In a local macOS ARM64 Release run (Qt 5.15.18), loading and painting a 24-logical-
+Before brightness normalization was added, in a local macOS ARM64 Release run
+(Qt 5.15.18), loading and painting a 24-logical-
 pixel test icon at 2x took approximately 44 microseconds without reuse and 3.2
 microseconds with warm caches (about 14x faster). The comparison includes parsing,
 resource/variant lookup, rasterization and composition; it is a small isolated

@@ -86,8 +86,9 @@ if (APPLE)
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_SHADER_FILES})
 
     # Configure Qt stylesheets
-    file(GLOB_RECURSE MACOSX_STYLESHEET_FILES
-         "${APP_RESOURCE_DIR}/stylesheets/*.qss")
+    file(GLOB_RECURSE MACOSX_STYLESHEET_FILES CONFIGURE_DEPENDS
+         "${APP_RESOURCE_DIR}/stylesheets/*.qss"
+         "${APP_RESOURCE_DIR}/stylesheets/*.json")
     set_source_files_properties(${MACOSX_STYLESHEET_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/stylesheets)
     set(APP_SOURCE ${APP_SOURCE} ${MACOSX_STYLESHEET_FILES})
 

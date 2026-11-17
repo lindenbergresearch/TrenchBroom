@@ -19,6 +19,7 @@
 
 #include "View/TrenchBroomProxyStyle.h"
 #include "IO/VectorIcon.h"
+#include "ThemeManager.h"
 #include "View/QtUtils.h"
 
 #include <QEvent>
@@ -99,7 +100,7 @@ void TrenchBroomProxyStyle::drawPrimitive(const PrimitiveElement element,
         painter->setPen(QPen(option->palette.color(QPalette::Midlight), 1));
         painter->setBrush(option->palette.brush(tip ? QPalette::ToolTipBase : QPalette::Base));
         const auto rect = QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5);
-        const auto radius = tip ? ToolTipCornerRadius : MenuCornerRadius;
+        const auto radius = ThemeManager::instance().number(tip ? "length.radius.tooltip" : "length.radius.menu", tip ? ToolTipCornerRadius : MenuCornerRadius);
         painter->drawRoundedRect(rect, radius, radius);
         painter->restore();
         return;

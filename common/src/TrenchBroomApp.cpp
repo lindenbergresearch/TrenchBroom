@@ -70,6 +70,9 @@
 #include <QDesktopServices>
 #include <QEvent>
 #include <QFile>
+#include <QFileInfo>
+#include <QFileSystemWatcher>
+#include <QDateTime>
 #include <QFileDialog>
 #include <QFontDatabase>
 #include <QMenuBar>
@@ -96,32 +99,10 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace TrenchBroom::View {
-namespace {
-QFont fontForStyleSheet(QFont font) {
-    // A named face overrides QSS family/weight/style in Qt 5. Keep the selected
-    // family, weight and style, letting Qt match the face after QSS is applied.
-    font.setStyleName({});
-    return font;
-}
-
-QString fontWeightForStyleSheet(const QFont& font) {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    // Qt 5's QSS parser divides numeric weights by eight.
-    return QString::number(font.weight() * 8);
-#else
-    return QString::number(font.weight());
-#endif
-}
-
-QString fontStyleForStyleSheet(const QFont& font) {
-    if (font.style() == QFont::StyleOblique) return "oblique";
-    return font.italic() ? "italic" : "normal";
-}
-}
-
 /* ------------------------------------------------------------------------------------------- */
 
 /**
@@ -237,21 +218,41 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
         return;
     }
 
-    m_UI_Font = loadFont(pref(Preferences::UIFontPath), uiFontPixelSize());
-    m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
-    m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
+    refreshThemeFonts();
 
     /* ------------------------------------------------------------------------------------------- */
     loadStyle();
     QApplication::setFont(fontForStyleSheet(m_UI_Font));
 
     if (!loadStyleSheets()) {
-        logger().info() << "Shutdown due to init failure.";
-        QCoreApplication::exit(1);
-        return;
+        // A broken editable stylesheet must not leave the application half
+        // constructed. Keep a usable base UI so the file can be corrected.
+        auto fallback = ThemeManager::preferenceValues(m_UI_Font, m_ConsoleFont, m_RenderFont);
+        setPalette(fallback.palette);
+        ThemeManager::instance().publish(std::move(fallback));
+        logger().warn() << "UI theme could not be loaded; using the base style until it is corrected.";
     }
 
     /* ------------------------------------------------------------------------------------------- */
+
+    m_themeRefreshTimer = new QTimer{this};
+    m_themeRefreshTimer->setSingleShot(true);
+    connect(m_themeRefreshTimer, &QTimer::timeout, this, [this] {
+        reloadStyle(true, true);
+        watchThemeFiles();
+    });
+    m_themeConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect([this](const auto& path) {
+        if (ThemeManager::isRelevantPreference(path)) queueThemeRefresh();
+    });
+    m_themeWatcher = new QFileSystemWatcher{this};
+    connect(m_themeWatcher, &QFileSystemWatcher::fileChanged, this, [this] { queueThemeRefresh(); });
+    connect(m_themeWatcher, &QFileSystemWatcher::directoryChanged, this, [this] {
+        // A preferences save in the same directory is not a theme change.
+        const auto old = m_themeFileStamps;
+        watchThemeFiles();
+        if (old != m_themeFileStamps) queueThemeRefresh();
+    });
+    watchThemeFiles();
 
     // these must be initialized here and not earlier
     m_frameManager = std::make_unique<FrameManager>(useSDI());
@@ -308,7 +309,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 }
 
 TrenchBroomApp::~TrenchBroomApp() {
-    delete m_qssBuilder;
+    m_themeConnection.disconnect();
     PreferenceManager::destroyInstance();
 }
 
@@ -322,343 +323,111 @@ FrameManager *TrenchBroomApp::frameManager() {
     return m_frameManager.get();
 }
 
-QPalette TrenchBroomApp::darkPalette() {
-    const auto brightness = pref(Preferences::UIBrightness);
-    constexpr auto contrast = 1.0f; // internal
-
-    const auto hl_color = pref(Preferences::UIHighlightColor);
-    const auto tint_color = pref(Preferences::UIWindowTintColor);
-    const auto text_color = pref(Preferences::UITextColor);
-
-    const auto windowColor = toQColor(tint_color, brightness);
-    const auto textColor = toQColor(text_color, brightness);
-    const auto highlightColor = toQColor(hl_color, brightness);
-
-    // Build an initial palette based on the button color
-    auto palette = QPalette{windowColor};
-
-    // Window colors
-    palette.setColor(QPalette::Active, QPalette::Window, windowColor.lighter(int(130.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::Window, windowColor.lighter(int(130.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Window, windowColor.darker(int(260.f * contrast)));
-
-    // List box backgrounds, text entry backgrounds, menu backgrounds
-    palette.setColor(QPalette::Base, windowColor.darker(int(125.f * contrast)));
-    palette.setColor(QPalette::AlternateBase, windowColor.darker(int(160.f * contrast)));
-
-    // Placeholder text color
-    palette.setColor(QPalette::Active, QPalette::PlaceholderText, textColor.darker(int(150.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::PlaceholderText, textColor.darker(int(170.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::PlaceholderText, textColor.darker(int(210.f * contrast)));
-
-    // Button text
-    palette.setColor(QPalette::Active, QPalette::ButtonText, textColor.lighter(int(100.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::ButtonText, textColor.lighter(int(100.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, textColor.darker(int(200.f * contrast)));
-
-    // Button
-    palette.setColor(QPalette::Active, QPalette::Button, windowColor.lighter(int(190.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::Button, windowColor.lighter(int(190.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Button, windowColor.darker(int(100.f * contrast)));
-
-    // WindowText is supposed to be against QPalette::Window
-    palette.setColor(QPalette::Active, QPalette::WindowText, textColor);
-    palette.setColor(QPalette::Inactive, QPalette::WindowText, textColor);
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, textColor.darker(int(200.f * contrast)));
-
-    // Menu text, text edit text, table cell text
-    palette.setColor(QPalette::Active, QPalette::Text, textColor.darker(int(100.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::Text, textColor.darker(int(100.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Text, textColor.darker(int(200.f * contrast)));
-
-    palette.setColor(QPalette::Active, QPalette::BrightText, textColor.lighter(int(200.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::BrightText, textColor.lighter(int(200.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::BrightText, textColor.darker(int(100.f * contrast)));
-
-    // Disabled menu item text shadow
-    palette.setColor(QPalette::Light, windowColor.lighter(int(240.f * contrast)));
-    palette.setColor(QPalette::Midlight, windowColor.lighter(int(210.f * contrast)));
-    palette.setColor(QPalette::Mid, windowColor);
-    palette.setColor(QPalette::Dark, windowColor.darker(int(100.f * contrast)));
-    palette.setColor(QPalette::Shadow, windowColor.darker(int(650.f * contrast)));
-
-    // Highlight (selected list box row, selected grid cell background, selected tab text)
-    palette.setColor(QPalette::Active, QPalette::Highlight, highlightColor);
-    palette.setColor(QPalette::Inactive, QPalette::Highlight, windowColor.lighter(int(200.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Highlight, windowColor.lighter(int(100.f * contrast)));
-
-    // Text of highlighted elements
-    palette.setColor(QPalette::Active, QPalette::HighlightedText, textColor.lighter(int(150.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::HighlightedText, textColor.lighter(int(150.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::HighlightedText, textColor.darker(int(130.f * contrast)));
-
-    return palette;
-}
-
 bool TrenchBroomApp::loadStyleSheets() {
-    const auto path = IO::SystemPaths::findResourceFile("stylesheets/base.qss");
     m_qssLoadedSuccessful = true;
-
-    logger().info() << "Loading Qt dynamic stylesheets from: " << path.relative_path();
-
-    auto pMsgHandler = [](QtMsgType type, const QMessageLogContext &context, const QString &msg) -> void {
-        // Qt stylesheet warnings usually contain "QSS" or "StyleSheet"
-        if (type == QtWarningMsg) {
-            LOG.error("Error loading style: " + msg);
-            APP.m_qssErrors.push_back(msg);
-            APP.m_qssLoadedSuccessful = false;
-        } else {
-            // Output to console normally as well
-            printf("%s\n", qPrintable(msg));
-        }
+    m_qssErrors.clear();
+    const auto path = IO::SystemPaths::findResourceFile("stylesheets/base.qss");
+    const auto defaults = IO::SystemPaths::findResourceFile("stylesheets/theme.json");
+    const auto overrides = IO::SystemPaths::userDataDirectory() / "theme.json";
+    auto snapshot = ThemeSnapshot{};
+    auto errors = QStringList{};
+    const auto report = [&](const QStringList& messages) {
+        for (const auto& message : messages) logger().error() << message.toStdString();
     };
+    if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, overrides, snapshot, errors)) {
+        report(errors);
+        // An invalid personal override must not prevent starting the editor.
+        // Live edits keep the complete last valid theme instead.
+        if (!ThemeManager::instance().current().values.isEmpty()) return false;
+        errors.clear();
+        if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, {}, snapshot, errors)) { report(errors); return false; }
+    }
+    if (!m_qssBuilder.loadFile(path) || !m_qssBuilder.update(snapshot.values)) {
+        report(m_qssBuilder.errors());
+        return false;
+    }
 
+    const auto oldStyle = styleSheet();
+    const auto oldPalette = palette();
+    const auto oldFont = font();
+    const auto uiFont = fontForStyleSheet(m_UI_Font);
+    const auto& current = ThemeManager::instance().current();
+    const auto paletteChanged = current.values.isEmpty() || current.palette != snapshot.palette;
+    if (paletteChanged) setPalette(snapshot.palette);
+    if (oldFont != uiFont) QApplication::setFont(uiFont);
 
-    if (!m_qssBuilder) {
-        if (!(m_qssBuilder = QSSBuilder::fromFile(path))) {
+    if (oldStyle != m_qssBuilder.getRenderedText()) {
+        // Qt reports parsing errors lazily. Only capture actual QSS diagnostics;
+        // unrelated warnings (fonts, drivers, etc.) are not stylesheet failures.
+        const auto handler = [](QtMsgType type, const QMessageLogContext&, const QString& message) {
+            if (type == QtWarningMsg && (message.contains("stylesheet", Qt::CaseInsensitive)
+                || message.startsWith("Unknown property", Qt::CaseInsensitive))) {
+                APP.m_qssErrors.push_back(message);
+                APP.m_qssLoadedSuccessful = false;
+            } else {
+                fprintf(stderr, "%s\n", message.toUtf8().constData());
+            }
+        };
+        const auto oldHandler = qInstallMessageHandler(handler);
+        setStyleSheet(m_qssBuilder.getRenderedText());
+        auto probe = QMenu{};
+        probe.ensurePolished();
+        qInstallMessageHandler(oldHandler);
+        if (!m_qssLoadedSuccessful) {
+            QApplication::setFont(oldFont);
+            setPalette(oldPalette);
+            setStyleSheet(oldStyle);
+            for (const auto& message : m_qssErrors) logger().error() << path.string() << ": " << message.toStdString();
             return false;
         }
-
-        m_qssBuilder->addReplacement("TEXT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::WindowText);
-        });
-
-        m_qssBuilder->addReplacement("DISABLED_TEXT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::WindowText, QPalette::ColorGroup::Disabled);
-        });
-
-        m_qssBuilder->addReplacement("DISABLED_BUTTON_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Button, QPalette::ColorGroup::Disabled);
-        });
-
-        m_qssBuilder->addReplacement("HIGHLIGHTED_TEXT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::HighlightedText);
-        });
-
-        m_qssBuilder->addReplacement("BRIGHT_TEXT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::BrightText);
-        });
-
-        m_qssBuilder->addReplacement("PLACEHOLDER_TEXT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::PlaceholderText);
-        });
-
-        m_qssBuilder->addReplacement("WINDOW_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Window);
-        });
-
-        m_qssBuilder->addReplacement("BUTTON_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Button);
-        });
-
-        m_qssBuilder->addReplacement("BUTTON_TEXT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::ButtonText);
-        });
-
-        m_qssBuilder->addReplacement("BASE_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Base);
-        });
-
-        m_qssBuilder->addReplacement("ALTERNATE_BASE_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::AlternateBase);
-        });
-
-        m_qssBuilder->addReplacement("LIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Light);
-        });
-
-        m_qssBuilder->addReplacement("MIDLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Midlight);
-        });
-
-        m_qssBuilder->addReplacement("MIDHALF_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid, 150);
-        });
-
-        m_qssBuilder->addReplacement("MID_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid);
-        });
-
-        m_qssBuilder->addReplacement("DARK_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Dark);
-        });
-
-        m_qssBuilder->addReplacement("SHADOW_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Shadow);
-        });
-
-        m_qssBuilder->addReplacement("BRIGHT_HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, 130);
-        });
-
-        m_qssBuilder->addReplacement("LIGHT_HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, 80);
-        });
-
-        m_qssBuilder->addReplacement("HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight);
-        });
-
-        m_qssBuilder->addReplacement("MID_HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -180);
-        });
-
-        m_qssBuilder->addReplacement("DARK_HIGHLIGHT_COLOR", []() {
-            return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -200);
-        });
-
-        /* ------------------------------------------------------------------------------------------- */
-
-        m_qssBuilder->addReplacement("BORDER_RADIUS", []() {
-            return QString::asprintf("%dpx", LayoutConstants::BorderRadius);
-        });
-
-        m_qssBuilder->addReplacement("MENU_CORNER_RADIUS", []() {
-            return QString::number(TrenchBroomProxyStyle::MenuCornerRadius) + "px";
-        });
-        m_qssBuilder->addReplacement("TOOLTIP_CORNER_RADIUS", []() {
-            return QString::number(TrenchBroomProxyStyle::ToolTipCornerRadius) + "px";
-        });
-
-        m_qssBuilder->addReplacement("BORDER_SIZE", []() {
-            return QString::asprintf("%dpx", LayoutConstants::BorderSize);
-        });
-
-        /* ------------------------------------------------------------------------------------------- */
-
-        m_qssBuilder->addReplacement("NARROW_V_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::NarrowVMargin);
-        });
-
-        m_qssBuilder->addReplacement("NARROW_H_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin);
-        });
-
-        m_qssBuilder->addReplacement("MEDIUM_V_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::MediumVMargin);
-        });
-
-        m_qssBuilder->addReplacement("MEDIUM_H_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::MediumHMargin);
-        });
-
-        m_qssBuilder->addReplacement("WIDE_V_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::WideVMargin);
-        });
-
-        m_qssBuilder->addReplacement("WIDE_H_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
-        });
-
-        m_qssBuilder->addReplacement("NARROW_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin);
-        });
-
-        m_qssBuilder->addReplacement("MEDIUM_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::MediumHMargin);
-        });
-
-        m_qssBuilder->addReplacement("WIDE_MARGIN", []() {
-            return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
-        });
-
-        /* ------------------------------------------------------------------------------------------- */
-
-        m_qssBuilder->addReplacement("UI_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", uiFontPixelSize());
-        });
-
-        m_qssBuilder->addReplacement("UI_MID_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", uiFontPixelSize(-1));
-        });
-
-        m_qssBuilder->addReplacement("UI_SMALL_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", uiFontPixelSize(-2));
-        });
-
-        m_qssBuilder->addReplacement("UI_DETAIL_TEXT_COLOR", []() {
-            auto color = qApp->palette().color(QPalette::WindowText);
-            color.setAlphaF(color.alphaF() * std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f));
-            return toStyleSheetRGBA(color);
-        });
-        m_qssBuilder->addReplacement("UI_ERROR_COLOR", [] { return toStyleSheetRGBA(toQColor(pref(Preferences::UIErrorColor))); });
-
-        m_qssBuilder->addReplacement("UI_TITLE_FONT_SIZE", []() { return QString::asprintf("%dpx", qRound(uiFontPixelSize() * 1.4)); });
-        m_qssBuilder->addReplacement("UI_HEADER_FONT_SIZE", [] { return QString::number(uiFontPixelSize() * 2) + "px"; });
-        m_qssBuilder->addReplacement("UI_DIALOG_TITLE_FONT_SIZE", [] { return QString::number(qRound(uiFontPixelSize() * 1.4) + 2) + "px"; });
-        m_qssBuilder->addReplacement("UI_FONT_FAMILY", [this] {
-            auto family = m_UI_Font.family();
-            family.replace('\\', "\\\\").replace('\"', "\\\"");
-            return family;
-        });
-        m_qssBuilder->addReplacement("UI_FONT_WEIGHT", [this] { return fontWeightForStyleSheet(m_UI_Font); });
-        m_qssBuilder->addReplacement("UI_FONT_STYLE", [this] { return fontStyleForStyleSheet(m_UI_Font); });
-        m_qssBuilder->addReplacement("CONSOLE_FONT_FAMILY", [this] {
-            auto family = m_ConsoleFont.family();
-            family.replace('\\', "\\\\").replace('\"', "\\\"");
-            return family;
-        });
-        m_qssBuilder->addReplacement("CONSOLE_FONT_WEIGHT", [this] { return fontWeightForStyleSheet(m_ConsoleFont); });
-        m_qssBuilder->addReplacement("CONSOLE_FONT_STYLE", [this] { return fontStyleForStyleSheet(m_ConsoleFont); });
-        m_qssBuilder->addReplacement("RENDER_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::RendererFontSize));
-        });
-
-        m_qssBuilder->addReplacement("CONSOLE_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::ConsoleFontSize));
-        });
-
-        m_qssBuilder->addReplacement("TOOLBAR_ICON_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::ToolBarIconsSize));
-        });
     }
-
-    m_qssBuilder->update();
-    m_qssLoadedSuccessful = !m_qssBuilder->getRenderedText().isEmpty();
-
-    //! install the interceptor hook to monitor startup
-    auto oldHandler = qInstallMessageHandler(pMsgHandler);
-
-    qApp->style()->unpolish(qApp);
-    qApp->setStyleSheet(m_qssBuilder->getRenderedText());
-
-    //! just a dummy to create a widget which initialized
-    //! style sheets to see if it was loaded correctly
-    auto test = QMenu{};
-
-    //! restore the old message handler
-    qInstallMessageHandler(oldHandler);
-
-    if (!m_qssLoadedSuccessful) {
-        QString msg =
-            QString{"Error while loading stylesheets from: "} +
-            QString{path.filename().string().c_str()} + '\n';
-
-        for (const auto &item : m_qssErrors) {
-            msg += "warning: " + item + "\n";
-        }
-
-        auto ret = QMessageBox::critical(
-            &test, qApp->applicationName(), msg,
-            QMessageBox::Abort | QMessageBox::Ignore,
-            QMessageBox::Abort
-        );
-
-        return ret == QMessageBox::Ignore;
-    }
-
+    ThemeManager::instance().publish(std::move(snapshot));
     return true;
 }
 
 void TrenchBroomApp::loadStyle() {
-    logger().info() << "Setup Style and Palette...";
-    delete m_qssBuilder;
-    m_qssBuilder = nullptr;
+    // Keep the base style and its popup policies alive across theme changes.
+    if (!m_proxyStyle) {
+        m_proxyStyle = new TrenchBroomProxyStyle{"Fusion"};
+        setStyle(m_proxyStyle);
+    }
+}
 
-    m_proxyStyle = new TrenchBroomProxyStyle{"Fusion"};
-    setStyle(m_proxyStyle);
-    setPalette(darkPalette());
-    qApp->setPalette(darkPalette());
+void TrenchBroomApp::refreshThemeFonts() {
+    const auto refresh = [&](auto& loadedPath, auto& loadedSize, QFont& font, const auto& path, const int size) {
+        if (loadedPath == path && loadedSize == size) return;
+        font = loadFont(path, size);
+        loadedPath = path;
+        loadedSize = size;
+    };
+    refresh(m_loadedUIFontPath, m_loadedUIFontSize, m_UI_Font, pref(Preferences::UIFontPath), uiFontPixelSize());
+    refresh(m_loadedConsoleFontPath, m_loadedConsoleFontSize, m_ConsoleFont, pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
+    refresh(m_loadedRenderFontPath, m_loadedRenderFontSize, m_RenderFont, pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
+}
+
+void TrenchBroomApp::queueThemeRefresh(const int delayMs) {
+    if (m_themeRefreshTimer) m_themeRefreshTimer->start(std::max(0, delayMs));
+}
+
+void TrenchBroomApp::requestThemeRefresh(const int delayMs) { queueThemeRefresh(delayMs); }
+
+void TrenchBroomApp::watchThemeFiles() {
+    if (!m_themeWatcher) return;
+    const std::filesystem::path paths[] = {
+        IO::SystemPaths::findResourceFile("stylesheets/base.qss"),
+        IO::SystemPaths::findResourceFile("stylesheets/theme.json"),
+        IO::SystemPaths::userDataDirectory() / "theme.json"
+    };
+    for (const auto& path : paths) {
+        if (path.empty()) continue;
+        const auto file = QFileInfo{IO::pathAsQString(path)};
+        m_themeFileStamps[file.absoluteFilePath()] = file.exists()
+            ? QString::number(file.size()) + '/' + QString::number(file.lastModified().toMSecsSinceEpoch()) : QString{};
+        if (file.exists() && !m_themeWatcher->files().contains(file.absoluteFilePath()))
+            m_themeWatcher->addPath(file.absoluteFilePath());
+        if (QFileInfo::exists(file.absolutePath()) && !m_themeWatcher->directories().contains(file.absolutePath()))
+            m_themeWatcher->addPath(file.absolutePath());
+    }
 }
 
 std::vector<std::filesystem::path> TrenchBroomApp::recentDocuments() const {
@@ -917,20 +686,20 @@ bool TrenchBroomApp::useSDI() {
 }
 
 void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
-    if (reloadFonts) {
-        m_UI_Font = loadFont(pref(Preferences::UIFontPath), uiFontPixelSize());
-        m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
-        m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
+    const auto previousFonts = std::make_tuple(m_UI_Font, m_ConsoleFont, m_RenderFont,
+        m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
+        m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize);
+    if (reloadFonts) refreshThemeFonts();
+    if (reloadStyleSheets) {
+        if (!loadStyleSheets()) {
+            std::tie(m_UI_Font, m_ConsoleFont, m_RenderFont,
+                m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
+                m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize) = previousFonts;
+        }
     }
-
-    loadStyle();
-    QApplication::setFont(fontForStyleSheet(m_UI_Font));
-    if (reloadStyleSheets) loadStyleSheets();
-
-    for (auto* widget : QApplication::allWidgets()) {
-        // Hidden controls can otherwise retain font attributes from the previous
-        // stylesheet after the underlying application style has been replaced.
-        repolishWidget(widget);
+    else {
+        const auto uiFont = fontForStyleSheet(m_UI_Font);
+        if (QApplication::font() != uiFont) QApplication::setFont(uiFont);
     }
 }
 

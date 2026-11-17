@@ -44,6 +44,7 @@ class QMenu;
 class QMenuBar;
 
 class QSettings;
+class QFileSystemWatcher;
 
 namespace TrenchBroom {
 class Logger;
@@ -128,8 +129,14 @@ class TrenchBroomApp : public QApplication {
 
     QTimer *m_recentDocumentsReloadTimer;
     QFont m_UI_Font, m_ConsoleFont, m_RenderFont;
-    QSSBuilder *m_qssBuilder = nullptr;
-    QProxyStyle *m_proxyStyle;
+    QSSBuilder m_qssBuilder;
+    QProxyStyle *m_proxyStyle = nullptr;
+    NotifierConnection m_themeConnection;
+    QTimer* m_themeRefreshTimer = nullptr;
+    QFileSystemWatcher* m_themeWatcher = nullptr;
+    QMap<QString, QString> m_themeFileStamps;
+    std::filesystem::path m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath;
+    int m_loadedUIFontSize = 0, m_loadedConsoleFontSize = 0, m_loadedRenderFontSize = 0;
     MapFrame *m_currentMapFrame;
     SignalHandler m_signalHandler;
 
@@ -155,12 +162,16 @@ class TrenchBroomApp : public QApplication {
     FrameManager *frameManager();
 
   private:
-    static QPalette darkPalette();
     bool loadStyleSheets();
     void loadStyle();
+    void refreshThemeFonts();
+    void queueThemeRefresh(int delayMs = 0);
+    void watchThemeFiles();
 
   public:
     void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
+    // Restart the pending refresh to combine a burst of appearance edits.
+    void requestThemeRefresh(int delayMs = 0);
     QFont loadFont(const std::filesystem::path &path, int size) const;
     std::vector<std::filesystem::path> recentDocuments() const;
     void addRecentDocumentMenu(QMenu &menu);

@@ -273,6 +273,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/Renderer/VertexArray.cpp
     ${COMMON_SOURCE_DIR}/Thread.cpp
     ${COMMON_SOURCE_DIR}/QSSBuilder.cpp
+    ${COMMON_SOURCE_DIR}/ThemeManager.cpp
     ${COMMON_SOURCE_DIR}/TrenchBroomApp.cpp
     ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.cpp
     ${COMMON_SOURCE_DIR}/Uuid.cpp
@@ -845,6 +846,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/Thread.h
     ${COMMON_SOURCE_DIR}/TrenchBroomApp.h
     ${COMMON_SOURCE_DIR}/QSSBuilder.h
+    ${COMMON_SOURCE_DIR}/ThemeManager.h
     ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.h
     ${COMMON_SOURCE_DIR}/Uuid.h
     ${COMMON_SOURCE_DIR}/View/AboutDialog.h

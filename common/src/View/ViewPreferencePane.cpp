@@ -221,7 +221,9 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     viewLayoutLayout->setContentsMargins(0, 0, 0, 0);
 
     m_UIBrightnessSlider = new SliderWithLabel{brightnessToUI(0.5f), brightnessToUI(1.5f), 0, "%d%%", 350, 45};
-    m_UIBrightnessSlider->setToolTip("Sets the contrast for UI controls");
+    m_UIBrightnessSlider->setObjectName("UIBrightness");
+    m_UIBrightnessSlider->setTracking(false);
+    m_UIBrightnessSlider->setToolTip(tr("Sets the contrast for UI controls. Applied when the slider is released."));
 
     m_fovSlider = new SliderWithLabel{50, 150, 0, "%d°", 350, 45};
     m_fovSlider->setToolTip("Sets the field of vision in the 3D editing view.");
@@ -678,7 +680,9 @@ void ViewPreferencePane::link2dCamerasChanged(const int state) {
 void ViewPreferencePane::UIBrightnessChanged(const int value) {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::UIBrightness, brightnessFromUI(value));
-    reloadUIStyle(false);
+    // Also coalesce wheel/key repeats. Never repolish the whole application
+    // synchronously from the slider's valueChanged handler.
+    TrenchBroomApp::instance().requestThemeRefresh(75);
 }
 
 void ViewPreferencePane::fovChanged(const int value) {

@@ -7,6 +7,7 @@
 #include "Model/GroupNode.h"
 #include "Model/LayerNode.h"
 #include "PreferenceManager.h"
+#include "ThemeManager.h"
 #include "TrenchBroomApp.h"
 #include "Preferences.h"
 #include "View/FontUtils.h"
@@ -29,6 +30,9 @@ const std::array<Preference<Color> *, LayerTreeItemDelegate::TypeCount> iconColo
     &Preferences::LayerTreeEntityIconColor,
     &Preferences::LayerTreeBrushIconColor,
     &Preferences::LayerTreePatchIconColor,
+};
+const std::array<const char*, LayerTreeItemDelegate::TypeCount> iconThemeNames{
+    "color.icon.layer", "color.icon.group", "color.icon.entity", "color.icon.brush", "color.icon.patch"
 };
 
 }
@@ -141,7 +145,8 @@ void LayerTreeItemDelegate::updateIcon(QTreeWidgetItem &item, const std::filesys
     if (!changedPreference.empty() && changedPreference != color.path()) return;
 
     const auto source = IO::pathFromQString(item.data(0, IconSourceRole).toString());
-    item.setIcon(0, IO::VectorIcon(source).icon(toQColor(pref(color))));
+    const auto name = item.data(0, TypeGroupRole).isValid() ? "color.icon.typeGroup" : iconThemeNames[type];
+    item.setIcon(0, IO::VectorIcon(source).themedIcon(QString::fromLatin1(name), toQColor(pref(color))));
 }
 
 void LayerTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {

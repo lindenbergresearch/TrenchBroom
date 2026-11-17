@@ -1,6 +1,7 @@
 #include "IO/PathQt.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#include "QSSBuilder.h"
 #include "View/ControlListBox.h"
 #include "View/ElidedLabel.h"
 #include "View/FontUtils.h"
@@ -138,31 +139,19 @@ TEST_CASE_METHOD(FontSettingsScope, "Existing small labels and headings follow l
     QFile source(IO::pathAsQString(fontFile("../stylesheets/base.qss")));
     REQUIRE(source.open(QIODevice::ReadOnly));
     const auto stylesheet = QString::fromUtf8(source.readAll());
-    const auto first = stylesheet.indexOf("/* === TYPOGRAPHY === */");
-    const auto last = stylesheet.indexOf("/* === WINDOW AND STATUS BAR === */");
+    const auto first = stylesheet.indexOf("/* ==== TYPOGRAPHY ==== */");
+    const auto last = stylesheet.indexOf("/* ==== WINDOW AND STATUS BAR ==== */");
     REQUIRE(first >= 0); REQUIRE(last > first);
     const auto applyTypography = [&](const QFont& font) {
         auto text = stylesheet.mid(first, last-first);
-        text.replace("#UI_FONT_FAMILY",font.family());
-        text.replace("#CONSOLE_FONT_FAMILY",font.family());
-        text.replace("#UI_FONT_SIZE",QString::number(uiFontPixelSize())+"px");
-        text.replace("#UI_FONT_WEIGHT","normal");
-        text.replace("#UI_FONT_STYLE","normal");
-        text.replace("#CONSOLE_FONT_SIZE","15px");
-        text.replace("#CONSOLE_FONT_WEIGHT","normal");
-        text.replace("#CONSOLE_FONT_STYLE","normal");
-        text.replace("#UI_SMALL_FONT_SIZE",QString::number(uiFontPixelSize(-2))+"px");
-        text.replace("#UI_MID_FONT_SIZE",QString::number(uiFontPixelSize(-1))+"px");
-        text.replace("#UI_TITLE_FONT_SIZE",QString::number(qRound(uiFontPixelSize()*1.4))+"px");
-        text.replace("#UI_HEADER_FONT_SIZE",QString::number(uiFontPixelSize()*2)+"px");
-        text.replace("#UI_DIALOG_TITLE_FONT_SIZE",QString::number(qRound(uiFontPixelSize()*1.4)+2)+"px");
-        for (const auto* color : {"UI_DETAIL_TEXT_COLOR","HIGHLIGHTED_TEXT_COLOR","TEXT_COLOR","UI_ERROR_COLOR",
-                                  "WINDOW_COLOR","BASE_COLOR","HIGHLIGHT_COLOR","DISABLED_TEXT_COLOR"})
-            text.replace(QString("#")+color,"rgb(210, 210, 210)");
+        auto theme = ThemeManager::preferenceValues(font, font, font);
+        QSSBuilder builder;
+        builder.setText(text);
+        REQUIRE(builder.update(theme.values));
         auto inheritedFont = font;
         inheritedFont.setStyleName({});
         QApplication::setFont(inheritedFont);
-        qApp->setStyleSheet(text);
+        qApp->setStyleSheet(builder.getRenderedText());
     };
 
     const auto inter = loadFont(fontFile("Inter-Regular.otf"), 13);

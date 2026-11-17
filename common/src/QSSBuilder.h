@@ -1,60 +1,32 @@
 #pragma once
 
-#include <QFile>
+#include "ThemeManager.h"
 
-#include <functional>
-#include <map>
+#include <QString>
+#include <QStringList>
+
+#include <filesystem>
 
 namespace TrenchBroom {
-
-static const char *const REPLACEMENT_TOKEN = "#";
-
-/**
- * Simple dynamic Qt Style-Sheet Builder.
- * Replaces template-style placeholder with given replacement functions for
- * creating dynamic qss scripts.
- */
-struct QSSBuilder {
+// A checked, single-pass compiler for ${theme.name} references. Failed updates
+// retain the last valid stylesheet. Literal colors and object selectors are intact.
+class QSSBuilder {
+  private:
+    QString m_text, m_source, m_renderedText, m_compiledSource;
+    QStringList m_errors;
+    ThemeValues m_dependencies;
+    bool m_changed = false;
+    bool m_hasCompiled = false;
+    quint64 m_compilationCount = 0;
 
   public:
-    /**
-     * Creates a build from a given qss file.
-     * @param path The path to the qss file.
-     * @return A new instance of a QSS Builder or null if not successfully.
-     */
-    static QSSBuilder *fromFile(const std::filesystem::path &path);
-
-    void update();
-
-    /**
-     * Returns the raw input text. (template)
-     * @return
-     */
-    const QString &getText() const;
-
-    /**
-     * Sets the input text. (template)
-     * @param text QString with qss sources.
-     */
-    void setText(const QString &text);
-
-    /**
-     * Adds a replacement function for transforming a placeholder to a concrete value.
-     * @param symbol The name of the placeholder without format token.
-     * @param repl_f The replacement function which returns a QString.
-     */
-    void addReplacement(QString symbol, std::function<QString()> repl_f);
-
-    /**
-     * Returns the final rendered text.
-     *
-     * @return Result as QString.
-     */
-    const QString &getRenderedText() const;
-
-  private:
-    QString m_text;
-    QString m_renderedText;
-    std::map<QString, std::function<QString()>> repl_table;
+    bool loadFile(const std::filesystem::path& path);
+    void setText(const QString& text, const QString& source = QStringLiteral("<stylesheet>"));
+    bool update(const ThemeValues& values);
+    const QString& getText() const { return m_text; }
+    const QString& getRenderedText() const { return m_renderedText; }
+    const QStringList& errors() const { return m_errors; }
+    bool changed() const { return m_changed; }
+    quint64 compilationCount() const { return m_compilationCount; }
 };
 } // namespace TrenchBroom

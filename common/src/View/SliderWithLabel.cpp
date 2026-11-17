@@ -53,7 +53,12 @@ SliderWithLabel::SliderWithLabel(const int minimum, const int maximum, const flo
     setLayout(layout);
 
     connect(m_slider, &QSlider::valueChanged, this, &SliderWithLabel::valueChangedInternal);
+    connect(m_slider, &QSlider::sliderMoved, this, [this](const int position) {
+        if (!m_slider->hasTracking()) m_label->setText(getValueLabel(position));
+    });
 }
+
+void SliderWithLabel::setTracking(const bool enabled) { m_slider->setTracking(enabled); }
 
 int SliderWithLabel::value() const {
     return m_slider->value();

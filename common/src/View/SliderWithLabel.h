@@ -47,6 +47,9 @@ class SliderWithLabel : public QWidget {
     float ratio() const;
 
     void setMaximumSliderWidth(const int width);
+    // With tracking off, preview the thumb position in the label but only
+    // notify consumers when Qt commits the value (normally on release).
+    void setTracking(bool enabled);
 
   public slots:
 

@@ -22,7 +22,7 @@
 #include <QProxyStyle>
 
 namespace TrenchBroom::View {
-// Keep these radii in sync with the stylesheet through the QSS replacements.
+// Fallback radii for unthemed widgets; active values come from ThemeManager.
 class TrenchBroomProxyStyle : public QProxyStyle {
 public:
     static constexpr int MenuCornerRadius = 12;

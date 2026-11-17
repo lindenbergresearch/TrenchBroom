@@ -18,6 +18,7 @@
  */
 
 #include "ColorModel.h"
+#include "ThemeManager.h"
 
 #include <QColorDialog>
 
@@ -162,7 +163,8 @@ bool ColorModel::setData(const QModelIndex &index, const QVariant &value, const 
     emit dataChanged(index, index);
 
     // update style
-    TrenchBroomApp::instance().reloadStyle(false);
+    if (ThemeManager::isRelevantPreference(colorPreference->path()))
+        TrenchBroomApp::instance().reloadStyle(false);
 
     return true;
 }

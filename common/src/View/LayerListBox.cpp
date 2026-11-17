@@ -28,6 +28,7 @@
 #include "Model/ModelUtils.h"
 #include "Model/WorldNode.h"
 #include "Preferences.h"
+#include "ThemeManager.h"
 #include "PreferenceManager.h"
 #include "View/MapDocument.h"
 #include "View/NodeSourceDialog.h"
@@ -256,6 +257,7 @@ void LayerListBox::connectObservers() {
         }
         else if (path == Preferences::UIDetailTextOpacity.path()) viewport()->update();
         else if (LayerTreeItemDelegate::isIconColorPreference(path)) {
+            if (!ThemeManager::instance().current().values.isEmpty()) return;
             // Change decorations only: keep the selection, expansion and scroll
             // state, including rows synthesized by grouping.
             const auto blocker = QSignalBlocker(this);
@@ -263,6 +265,10 @@ void LayerListBox::connectObservers() {
                 m_itemDelegate->updateIcon(**item, path);
             }
         }
+    });
+    m_notifierConnection += ThemeManager::instance().themeDidChangeNotifier.connect([this](const QStringList& names) {
+        if (std::any_of(names.begin(), names.end(), [](const auto& name) { return name.startsWith("color.icon."); }))
+            viewport()->update();
     });
 }
 

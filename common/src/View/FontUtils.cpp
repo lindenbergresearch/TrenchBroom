@@ -98,4 +98,10 @@ QFont detailFont(const QFont &source, qreal reduction) {
     font.setStyleName({});
     return font;
 }
+
+QFont fontForStyleSheet(QFont font) {
+    // Qt 5's named font face otherwise overrides family/weight/style from QSS.
+    font.setStyleName({});
+    return font;
+}
 }

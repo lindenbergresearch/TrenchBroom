@@ -19,11 +19,13 @@
 #pragma once
 
 #include <QIcon>
+#include <QColor>
 #include <QWidget>
 #include <filesystem>
 #include <memory>
 
 class QColor;
+class QImage;
 
 namespace TrenchBroom::IO {
 class VectorIcon;
@@ -33,7 +35,11 @@ class IconAppearance : public QWidget {
     Q_OBJECT
     Q_PROPERTY(qreal disabledBrightness READ disabledBrightness WRITE setDisabledBrightness)
     Q_PROPERTY(qreal disabledOpacity READ disabledOpacity WRITE setDisabledOpacity)
+    Q_PROPERTY(qreal brightness READ brightness WRITE setBrightness)
+    Q_PROPERTY(bool normalizeBrightness READ normalizeBrightness WRITE setNormalizeBrightness)
     qreal m_brightness = 0.35, m_opacity = 1.0;
+    qreal m_targetBrightness = 0.75;
+    bool m_normalizeBrightness = true;
     IconAppearance();
 public:
     static IconAppearance& instance();
@@ -41,9 +47,17 @@ public:
     qreal disabledOpacity() const { return m_opacity; }
     void setDisabledBrightness(qreal value);
     void setDisabledOpacity(qreal value);
+    qreal brightness() const { return m_targetBrightness; }
+    bool normalizeBrightness() const { return m_normalizeBrightness; }
+    void setBrightness(qreal value);
+    void setNormalizeBrightness(bool enabled);
 };
 
 QPixmap disabledIconPixmap(const QPixmap& source);
+// Peak RGB brightness of painted pixels. Empty space and weak antialiasing
+// fringes do not affect the measurement. Alpha is never normalized.
+qreal measureIconBrightness(const QImage& image);
+void normalizeIconBrightness(QImage& image, qreal sourceBrightness, qreal targetBrightness);
 
 /**
  * GUI-thread cache of scalable icons, including parsed SVG documents. Entries
@@ -80,6 +94,9 @@ public:
     // Reuse the parsed SVG and preserve its shape/alpha, replacing the painted
     // colors with the supplied tint. An invalid color returns the original.
     QIcon icon(const QColor& tint) const;
+    // The color is resolved while painting, so an existing icon follows theme
+    // changes without rebuilding every item in a large tree.
+    QIcon themedIcon(const QString& colorName, const QColor& fallback = {}) const;
     // Intrinsic SVG size in logical pixels, for callers that need a bitmap.
     QSize defaultSize() const;
     bool isValid() const;
@@ -88,7 +105,7 @@ private:
     friend class IconCache;
     struct Sources;
     class Engine;
-    VectorIcon(std::shared_ptr<Sources> sources, const QColor& tint);
+    VectorIcon(std::shared_ptr<Sources> sources, const QColor& tint, const QString& colorName = {});
     std::shared_ptr<Sources> m_sources;
     QIcon m_icon;
 };
