@@ -27,6 +27,9 @@
 #include "View/MapView.h"
 
 #include <memory>
+#include <array>
+#include <optional>
+#include <vm/vec.h>
 
 namespace TrenchBroom {
 class Logger;
@@ -73,6 +76,11 @@ class SwitchableMapViewContainer : public QWidget, public MapView {
     std::unique_ptr<Renderer::MapRenderer> m_mapRenderer;
 
     MultiPaneMapView *m_mapView = nullptr;
+    struct CameraState {
+        vm::vec3f position, direction, up;
+        float zoom;
+    };
+    std::array<std::optional<CameraState>, 4> m_cameraStates;
     std::unique_ptr<MapViewActivationTracker> m_activationTracker;
 
     NotifierConnection m_notifierConnection;

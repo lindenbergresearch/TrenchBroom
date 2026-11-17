@@ -26,6 +26,8 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/MapRenderer.h"
+#include "Renderer/Camera.h"
+#include "View/MapViewBase.h"
 #include "View/FourPaneMapView.h"
 #include "View/GLContextManager.h"
 #include "View/MapDocument.h"
@@ -65,6 +67,18 @@ bool SwitchableMapViewContainer::active() const {
 }
 
 void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
+    const auto cameraKey = [](const Renderer::Camera& camera) -> size_t { return camera.orthographicProjection() ? 1 + vm::find_abs_max_component(camera.direction()) : 0; };
+    if (m_mapView) {
+        m_mapView->cancelMouseDrag();
+        const auto views = m_mapView->findChildren<MapViewBase*>();
+        // Prefer a visible/current view if a cycling pane also owns hidden views.
+        for (int pass = 0; pass < 2; ++pass)
+            for (auto* view : views) {
+                if (pass == 1 && !view->isVisibleTo(this) && !view->isCurrent()) continue;
+                const auto& camera = view->camera();
+                m_cameraStates[cameraKey(camera)] = CameraState{camera.position(), camera.direction(), camera.up(), camera.zoom()};
+            }
+    }
     m_activationTracker->clear();
 
     // save old pointer for later delete
@@ -100,6 +114,14 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
         switchDefault();
     }
 
+    for (auto* view : m_mapView->findChildren<MapViewBase*>()) {
+        auto& camera = view->camera();
+        if (const auto& state = m_cameraStates[cameraKey(camera)]) {
+            camera.setDirection(state->direction, state->up);
+            camera.setZoom(state->zoom);
+            camera.moveTo(state->position);
+        }
+    }
     installActivationTracker(*m_activationTracker);
 
     auto *layout = new QVBoxLayout{};
