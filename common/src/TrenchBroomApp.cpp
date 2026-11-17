@@ -78,6 +78,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPalette>
+#include <QPointer>
+#include <QScopeGuard>
 #include <QProxyStyle>
 #include <QStandardPaths>
 #include <QSysInfo>
@@ -346,6 +348,7 @@ bool TrenchBroomApp::loadStyleSheets() {
     const auto report = [&](const QStringList& messages) {
         for (const auto& message : messages) logger().error() << message.toStdString();
     };
+
     if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, overrides, snapshot, errors)) {
         report(errors);
         // An invalid personal override must not prevent starting the editor.
@@ -354,6 +357,7 @@ bool TrenchBroomApp::loadStyleSheets() {
         errors.clear();
         if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, {}, snapshot, errors)) { report(errors); return false; }
     }
+
     if (!m_qssBuilder.loadFile(path) || !m_qssBuilder.update(snapshot.values)) {
         report(m_qssBuilder.errors());
         return false;
@@ -365,31 +369,66 @@ bool TrenchBroomApp::loadStyleSheets() {
     const auto uiFont = fontForStyleSheet(m_UI_Font);
     const auto& current = ThemeManager::instance().current();
     const auto paletteChanged = current.values.isEmpty() || current.palette != snapshot.palette;
-    if (paletteChanged) setPalette(snapshot.palette);
-    if (oldFont != uiFont) QApplication::setFont(uiFont);
-
-    if (oldStyle != m_qssBuilder.getRenderedText()) {
+    const auto styleChanged = oldStyle != m_qssBuilder.getRenderedText();
+    if (styleChanged || paletteChanged || oldFont != uiFont) {
+        // Keep the replacement atomic on screen, including floating tools and
+        // Preferences. Preserve windows whose updates were already disabled.
+        std::vector<QPointer<QWidget>> frozen;
+        for (auto* window : topLevelWidgets()) {
+            if (window->isVisible() && window->updatesEnabled()) {
+                frozen.emplace_back(window);
+                window->setUpdatesEnabled(false);
+            }
+        }
+        const auto restoreUpdates = qScopeGuard([&] {
+            for (const auto& window : frozen)
+                if (window) window->setUpdatesEnabled(true);
+        });
         // Qt reports parsing errors lazily. Only capture actual QSS diagnostics;
         // unrelated warnings (fonts, drivers, etc.) are not stylesheet failures.
         const auto handler = [](QtMsgType type, const QMessageLogContext&, const QString& message) {
-            if (type == QtWarningMsg && (message.contains("stylesheet", Qt::CaseInsensitive)
+            // Qt versions/builds report these diagnostics at different levels.
+            if ((type == QtDebugMsg || type == QtWarningMsg) && (message.contains("stylesheet", Qt::CaseInsensitive)
                 || message.startsWith("Unknown property", Qt::CaseInsensitive))) {
-                APP.m_qssErrors.push_back(message);
+                if (std::find(APP.m_qssErrors.begin(), APP.m_qssErrors.end(), message) == APP.m_qssErrors.end()) APP.m_qssErrors.push_back(message);
                 APP.m_qssLoadedSuccessful = false;
             } else {
                 fprintf(stderr, "%s\n", message.toUtf8().constData());
             }
         };
         const auto oldHandler = qInstallMessageHandler(handler);
-        setStyleSheet(m_qssBuilder.getRenderedText());
-        auto probe = QMenu{};
-        probe.ensurePolished();
-        qInstallMessageHandler(oldHandler);
+        const auto restoreHandler = qScopeGuard([&] { qInstallMessageHandler(oldHandler); });
+        const auto reportErrors = [&] {
+            // Our logger itself uses Qt logging. Restore the handler before
+            // reporting, so diagnostics cannot append to the list being read.
+            qInstallMessageHandler(oldHandler);
+            const auto diagnostics = m_qssErrors;
+            for (const auto& message : diagnostics) logger().error() << path.string() << ": " << message.toStdString();
+        };
+        if (styleChanged) {
+            // Check the candidate before modifying the live application.
+            auto probe = QMenu{};
+            probe.setStyleSheet(m_qssBuilder.getRenderedText());
+            probe.ensurePolished();
+            probe.style()->polish(&probe);
+            if (!m_qssLoadedSuccessful) {
+                reportErrors();
+                return false;
+            }
+            // Qt 5's global repolish walks every cached widget AND each of its
+            // descendants, repeatedly visiting deep trees. Replacing the QSS
+            // wrapper keeps our base proxy style but polishes each widget once.
+            if (!oldStyle.isEmpty()) setStyleSheet({});
+        }
+        if (paletteChanged) setPalette(snapshot.palette);
+        if (oldFont != uiFont) QApplication::setFont(uiFont);
+        if (styleChanged) setStyleSheet(m_qssBuilder.getRenderedText());
         if (!m_qssLoadedSuccessful) {
+            setStyleSheet({});
             QApplication::setFont(oldFont);
             setPalette(oldPalette);
             setStyleSheet(oldStyle);
-            for (const auto& message : m_qssErrors) logger().error() << path.string() << ": " << message.toStdString();
+            reportErrors();
             return false;
         }
     }
@@ -698,6 +737,9 @@ bool TrenchBroomApp::useSDI() {
 }
 
 void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
+    // An immediate caller (e.g. Cancel) also consumes any queued preference
+    // refresh, so it cannot repeat the same work on the next event-loop turn.
+    if (m_themeRefreshTimer) m_themeRefreshTimer->stop();
     const auto previousFonts = std::make_tuple(m_UI_Font, m_ConsoleFont, m_RenderFont,
         m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
         m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize);

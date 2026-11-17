@@ -1,19 +1,58 @@
 /**
- * TrenchBroom UI stylesheet. Theme values are checked by QSSBuilder before applying.
- * Colors and shared metrics live in stylesheets/theme.json and Preferences.
- * Use ${color.name}, ${length.name}, ${number.name}; font families are quoted by the compiler.
+ * TrenchBroom: zentrale Gestaltung der Qt-Oberfläche
+ * =================================================
  *
- * Sections: Object source viewer; Typography; Window and status bar; Lists/layer tree; Inspector
- * headers; Prefab browser; Inputs; Toolbars; Popups; Trees/tabs; Buttons;
- * View Settings and specialized widgets.
+ * Werte: stylesheets/theme.json liefert zusätzliche Farben und Maße. An die
+ * Preferences gebundene Werte (z.B. UI-Helligkeit, Schrift, Layer-Iconfarben)
+ * kommen aus ThemeManager. Die persönliche theme.json liegt neben Preferences.json.
+ * Farben: ${color.name}; logische Pixel: ${length.name}; Faktoren: ${number.name}.
+ * Schriftfamilien: ${family.ui}/${family.console}; der Compiler setzt Anführungszeichen.
+ * Änderungen dieser Datei werden automatisch geprüft und übernommen.
  *
- * uiTextRole/uiEmphasized/uiItalic/uiFontFamily/uiTone/uiSurface are semantic roles
- * assigned by QtUtils. Change appearance here, including per-widget overrides.
- * Font-size tokens respect the configured UI minimum. Rule order is preserved
- * so more specific widget/state rules continue to override the shared defaults.
+ * Selektoren lesen:
+ *   QToolBar                  alle Toolbars, auch in Dialogen und Werkzeugfenstern
+ *   QToolBar#MapFrameToolBar   nur das Widget mit diesem objectName
+ *   QWidget[uiTextRole="title"] Widgets mit dieser semantischen Eigenschaft
+ *   QToolButton:checked       Zustand, z.B. :hover, :pressed, :disabled, :focus
+ *   QSpinBox::up-button       Teil eines Controls, kein eigenständiges Widget
+ *   qproperty-iconSize        Qt-Property des genannten Widgets
+ * Spezifische Regeln ergänzen die allgemeinen Regeln. Ihre Reihenfolge ist
+ * absichtlich erhalten; die späteren Werkzeug-Regeln sind gezielte Ausnahmen.
+ *
+ * Schnellfinder: sichtbarer Programmteil -> Suchbegriff in dieser Datei
+ * ------------------------------------------------------------------
+ * Gemeinsame Schriftrollen, Titel, Detailtext  -> TYPOGRAPHY, uiTextRole, uiEmphasized
+ * Untere Statusleiste des MapEditors           -> STATUSBAR, StatusBar_RightLayout
+ * Linke/rechte Inspector-Bereiche              -> INSPECTOR, Inspector_LeftStack
+ * Docking-Titel und schwebende Werkzeuge       -> INSPECTOR HEADERS, InspectorToolTitle
+ * Tabs zusammengefasster Inspector-Werkzeuge   -> InspectorToolTabs
+ * Werkzeugleisten unter den Titeln             -> InspectorToolToolbar, inspectorToolbar
+ * Layer-Baum: Zeilen, Details, Sperren         -> LAYER TREE, LayerTreeRow
+ * Layer-Baum: Aufklapp-Pfeile, Icongrößen      -> LayerTree, branchIndicatorSize
+ * Games-/Such-/Preferences-Listen              -> LIST ROWS, preferencesList
+ * Prefab-Baum, Kacheln, Beschriftungen         -> PREFAB BROWSER, PrefabTiles, PrefabCard
+ * Auswahlfelder, Checkboxen, Zahlenfelder      -> COMBO-BOX, CHECKBOX, EDIT FIELD
+ * Durchsuchbare Command-/Action-Auswahl        -> SearchableComboPopup, searchable
+ * Haupt-Toolbar des Editorfensters             -> TOOLBAR, MapFrameToolBar
+ * Kontextmenüs und Hilfetexte                  -> MENU, TOOLTIP
+ * Scrollleisten und Trennlinien                -> SCROLL BAR, SPLITTER
+ * Preferences Editor Actions/Editor Toolbar    -> EDITOR CUSTOMIZATION PREFERENCES
+ * View Settings aus dem MapEditor              -> VIEW SETTINGS, ViewEditor
+ * Parameter der Brush-Formen über dem Editor   -> BRUSH SHAPE TOOL, ShapeToolPage
+ * Toolbars im MapEditor an allen vier Kanten   -> MAPEDITOR TOOLBARS, EditorToolbar
+ * Quelltext-Dialog für ausgewählte Objekte     -> OBJECT SOURCE VIEWER, nodeSourceText
+ * Kompilier-Aufgaben und Crash-Dialog          -> SPECIALIZED WIDGETS, CompilationTaskCard
+ * Helligkeit/Abdunklung aller SVG-Icons        -> IconAppearance
+ *
+ * Die 3D-Szene (Grid, Brushes, Selection Bounds) wird über Renderer und View Settings
+ * gestaltet. Das Zustands-Overlay im 3D-Editor besitzt zusätzlich seine eigene
+ * Theme-Konfiguration und QSS-Datei; siehe doc/Theme-Verwaltung.md.
  */
 
 /* ==== OBJECT SOURCE VIEWER ==== */
+/* Read-only-Dialog aus dem Layer-Inspektor: Map-Ausschnitt bzw. Entity-Definition.
+   nodeSourceText ist der Textbereich; die qproperty-...Color-Werte steuern dessen
+   Syntax-Highlighting. nodeSourceLocation ist die Quellen-/Positionszeile. */
 QDialog#nodeSourceDialog {
     background-color: ${color.window};
 }
@@ -43,6 +82,11 @@ QPlainTextEdit#nodeSourceText {
 }
 
 /* ==== TYPOGRAPHY ==== */
+/* Gemeinsame Rollen für QtUtils::makeTitle/makeInfo/makeSmall/makeMono usw.
+   uiTextRole: small/info/subtitle/title/header/dialogTitle/brand.
+   uiEmphasized und uiItalic steuern Gewicht und Kursivschrift; uiFontFamily="console"
+   wechselt zum Console-Font. uiSurface färbt Container. Schriftgrößen in ThemeManager
+   berücksichtigen die in Preferences -> View gewählte Mindestgröße. */
 *[uiStyled="true"] {
     font-family: ${family.ui};
     font-size: ${length.font.ui};
@@ -185,6 +229,8 @@ QWidget#StatusBarWidget {
 }
 
 /* ==== INSPECTOR ==== */
+/* Container für die links/rechts angedockten Werkzeugstapel. Abstände und Flächen
+   werden hier gestaltet; Titel, Werkzeugleisten und Tabs haben eigene Regeln unten. */
 
 QWidget#Inspector_LeftStack, QWidget#Inspector_RightStack {
     margin: 0px;
@@ -199,6 +245,8 @@ QWidget#Inspector_Widget, QWidget#Inspector_LeftPane {
 }
 
 /* ==== LIST/TABLE ==== */
+/* Gemeinsame Tabellenköpfe, z.B. Properties und Shortcut-Verwaltung. Die eigentlichen
+   Listeneinträge folgen unter LIST ROWS; der Layer-Baum zeichnet seine Zeilen selbst. */
 
 QHeaderView {
     background-color: ${color.midlight};
@@ -222,6 +270,9 @@ QTableWidget {
 }
 
 /* ==== LAYER TREE ==== */
+/* Werkzeug Layers: hierarchische Einträge für Layer, Gruppen, Entities, Brushes
+   und virtuelle Typgruppen. LayerTreeRow ist eine Zeichenvorlage des Delegates;
+   es wird nicht für jeden Map-Knoten ein eigenes QWidget erzeugt. */
 
 /* The layer tree paints the selection once across the entire row. */
 QTreeWidget#LayerTree {
@@ -341,6 +392,11 @@ QWidget#IconAppearance {
 }
 
 /* ==== INSPECTOR HEADERS ==== */
+/* InspectorToolTitle: ziehbare Titelleiste eines angedockten Werkzeugs.
+   InspectorWindowTitle/InspectorWindowCaption: Leiste eines schwebenden Toolfensters.
+   InspectorToolTabs: Tab-Leiste, wenn mehrere Werkzeuge zu einem Stapel gruppiert sind.
+   inspectorDropHighlight markiert beim Ziehen das aktuelle Andockziel.
+   TitleBar/SubTitleBar bleiben für allgemeine, betitelte Funktionsabschnitte erhalten. */
 QWidget#TitleBar {
     background-color: ${color.base};
     border: none;
@@ -401,6 +457,10 @@ QWidget[inspectorDropHighlight="false"] {
 }
 
 /* ==== LIST ROWS ==== */
+/* controlListBox_listWidget wird u.a. unter Preferences -> Games verwendet.
+   preferencesList="true" verbindet neue Preferences-Listen mit derselben Fläche.
+   ImageListBox-/SearchListBox-Labels sind Haupt-/Detailzeilen älterer Listen-Renderer.
+   Die allgemeine Auswahl unten gilt für Item-Views; LayerTreeRow hat eigene Zustände. */
 
 /* Preference lists share the same surface as the Games list. Selection states
    below apply to all item views, including searchable combo-box popups. */
@@ -441,6 +501,10 @@ QLabel#SearchListBoxItemRenderer_m_infoText {
 }
 
 /* ==== PREFAB BROWSER ==== */
+/* Prefab-Werkzeug: PrefabTree ist die Baumansicht, PrefabTiles die Ordner-/Kachelansicht.
+   PrefabNavigation ist die Navigationszeile. PrefabCard enthält Thumbnail, Namen
+   und Maße; [folder="true"] und [selected="true"] unterscheiden Ordner und Auswahl.
+   PrefabBrightness... gestaltet die Helligkeitsregler der Prefab-Vorschau. */
 
 /* Prefab browser: cards inherit the configured UI font and scale with previews. */
 QTreeWidget#PrefabTree {
@@ -543,6 +607,7 @@ QWidget#PrefabCard[selected="true"] QWidget#PrefabDimensions {
 }
 
 /* ==== SPLITTER ==== */
+/* Verschiebbare Trennbereiche zwischen Editor-/Inspector- und Preferences-Panes. */
 
 QSplitter {
     padding: 0px;
@@ -552,6 +617,8 @@ QSplitter {
 }
 
 /* ==== CHECKBOX ==== */
+/* Alle Checkboxen verwenden diese gemeinsame Basis, auch View und die Editor-
+   Konfiguration. entityDefinition_... sind gezielte Ausnahmen der Entity-Auswahl. */
 
 /* All preferences, including the editor customization panes, use this surface. */
 QCheckBox {
@@ -579,6 +646,9 @@ QTextEdit {
 }
 
 /* ==== COMBO-BOX ==== */
+/* Allgemeine Dropdowns, ihre Popup-Listen und Suchfelder. ToolBar_GridChoice ist
+   die Grid-Größe der Haupt-Toolbar; TextureBrowser_smallComboBox ist der kompakte
+   Textur-Browser-Filter. Die gefilterte Command-/Action-Suche steht unter EDIT FIELD. */
 
 QComboBox {
     min-height: 16px;
@@ -667,6 +737,11 @@ QComboBox#TextureBrowser_smallComboBox {
 }
 
 /* ==== EDIT FIELD ==== */
+/* Eingabefelder und Zahlenfelder in allen Dialogen/Inspector-Werkzeugen.
+   QAbstractSpinBox umfasst QSpinBox und QDoubleSpinBox. Der innere QLineEdit erbt
+   die Fläche des Controls; Fokus/Disabled-Zustände werden hier gemeinsam gestaltet.
+   SearchableComboPopup zeigt Command-/Action-Treffer mit Namen und ID; die
+   qproperty-match...-Farben markieren den Suchbegriff in beiden Zeilen. */
 
 QLineEdit {
     padding: 2px 0px 2px 2px;
@@ -741,6 +816,10 @@ QWidget#MapPropertiesEditor {
 }
 
 /* ==== TOOLBAR ==== */
+/* MapFrameToolBar ist die obere Haupt-Toolbar. ToolBar_PreferenceDialog enthält
+   die Preferences-Kategorien. InspectorToolToolbar und inspectorToolbar="true"
+   teilen die Gestaltung für Inspector- und Konfigurations-Werkzeugleisten;
+   deren Button-Zustände stehen zusätzlich unter TOOLBUTTON. */
 
 QToolBar {
     border: none;
@@ -778,17 +857,19 @@ QToolBar[inspectorToolbar="true"] {
 QToolButton#InspectorToolToolbar {
     margin: 6px;
     padding: 0px;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 
 QToolButton#ToolButton_PreferenceDialog {
     margin: 6px;
-    padding: 0px;
-    margin-bottom: 8px;
+    padding: 4px;
+    margin-bottom: 10px;
 }
 
 /* ==== TOOLTIP ==== */
+/* Tooltips: Außenform/Transparenz kommen zusätzlich vom TrenchBroomProxyStyle.
+   Länge radius.tooltip in theme.json steuert dessen gerundeten Rahmen. */
 
 QToolTip {
     border: 1px solid ${color.midlight};
@@ -800,6 +881,9 @@ QToolTip {
 }
 
 /* ==== MENU ==== */
+/* Kontextmenüs und Dropdown-Menüs der Menüleiste: Zeilen, Auswahl und Trenner.
+   Der Popup-Rahmen wird zusätzlich vom TrenchBroomProxyStyle geglättet; der Radius
+   kommt aus length.radius.menu. Menü-Icons/Shortcuts steuern die Preferences. */
 
 QMenu {
     background-color: ${color.base};
@@ -842,6 +926,8 @@ QMenu::separator {
 }
 
 /* ==== COMPACT CONTROLS ==== */
+/* Kompakte Ausnahmen: Textur-Browser, Launch Game, View Settings, Advanced-
+   Preferences und die drei Dateiauswahl-Schaltflächen des Welcome-Fensters. */
 QComboBox#TextureBrowser_smallComboBox {
     padding: 3px 3px 3px 2px;
     min-width: 60px;
@@ -905,6 +991,8 @@ QPushButton#WelcomeWindow_Button_Right {
 }
 
 /* ==== TREE-WIDGET ==== */
+/* Allgemeine Baumansichten, u.a. Prefab- und Dateilisten. Der Layer-Baum ergänzt
+   bzw. ersetzt diese Darstellung durch die Regeln unter LAYER TREE. */
 
 QTreeView {
     background-color: ${color.base};
@@ -941,9 +1029,12 @@ QTreeView::item:selected:!active {
 }
 
 /* ==== TAB-WIDGET ==== */
+/* Allgemeine Tabs in Dialogen, darunter Toolbar settings/Elements und View Settings.
+   InspectorToolTabs sind gestapelte Inspector-Werkzeuge. InfoPanelTabBar/-TabWidget
+   gehören zum unteren Informations-/Konsolenbereich des Editorfensters. */
 QTabWidget::pane {
     border: none;
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 QTabWidget::tab-bar {
@@ -956,6 +1047,7 @@ QTabWidget#InfoPanelTabWidget::tab-bar {
 
 QTabBar {
     margin-bottom: 0px;
+
 }
 
 QTabBar::tab {
@@ -975,20 +1067,26 @@ QTabBar::tab:hover {
 }
 
 QTabBar::tab:selected {
-    border-bottom: 2px solid ${color.highlight};
     background-color: ${color.light};
     color: ${color.text.highlighted};
 }
 
+QTabBar#InspectorToolTabs {
+    min-height: 18px;
+    max-height: 28px;
+}
+
 QTabBar#InspectorToolTabs::tab {
-    background-color: ${color.window};
+    background-color: rgba(0, 0, 0, 0);
     color: ${color.text};
     border: none;
-    border-bottom: 2px solid transparent;
-    margin: 0;
-    padding: 0 6px;
-    min-height: 24px;
-    max-height: 24px;
+    margin-top: 0px;
+    margin-bottom: 0;
+    padding: 2px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    min-height: 16px;
+    max-height: 28px;
     font-size: ${length.font.subtitle};
 }
 
@@ -997,9 +1095,9 @@ QTabBar#InspectorToolTabs::tab:hover {
 }
 
 QTabBar#InspectorToolTabs::tab:selected {
-    background-color: ${color.light};
-    border-bottom-color: ${color.highlight};
     color: ${color.text.highlighted};
+    background-color: ${color.light};
+    text-style: bold;
 }
 
 QTabBar#InfoPanelTabBar::tab {
@@ -1020,6 +1118,8 @@ QTabBar#InfoPanelTabBar::tab:selected {
 }
 
 /* ==== SCROLL BAR ==== */
+/* Horizontale/vertikale Scrollleisten in Listen, Bäumen und Scroll-Panes.
+   handle ist der Schieber; add-line/sub-line sind die Endbereiche. */
 
 QScrollBar:horizontal {
     height: 10px;
@@ -1112,6 +1212,10 @@ QScrollBar::sub-line:vertical {
 }
 
 /* ==== TOOLBUTTON ==== */
+/* Gemeinsame Icon-Buttons: Hover, gedrückt, aktiviert und deaktiviert.
+   popupMode 0/1/2 unterscheidet verzögertes Menü, geteilten Button und Sofortmenü.
+   toolButton_borderless ist die rahmenlose Variante. Die nachfolgenden Inspector-
+   Selektoren gelten ebenso für die Action-/Toolbar-Verwaltung. */
 
 QToolButton {
     color: ${color.text};
@@ -1295,6 +1399,8 @@ QToolBar[inspectorToolbar="true"] QCheckBox {
 }
 
 /* ==== PUSHBUTTON ==== */
+/* Allgemeine Text-Schaltflächen (z.B. Apply, Cancel, Choose icon...). FolderSelect
+   ist die kompakte Dateiauswahl-Variante. Icon-Helligkeit wird separat gestaltet. */
 
 QPushButton {
     background-color: ${color.button};
@@ -1351,6 +1457,9 @@ QPushButton:selected {
 }
 
 /* ==== VIEW SETTINGS ==== */
+/* Der aus dem MapEditor geöffnete View-Settings-Dialog (nicht Preferences -> View).
+   Die Regeln bestimmen Dialogfläche, seine Kategorien und den Reset-Button;
+   die eigentlichen Checkboxen/Zahlenfelder verwenden die gemeinsame Basis oben. */
 QWidget#ViewEditor {
     min-width: 700px;
     min-height: 480px;
@@ -1375,6 +1484,9 @@ QPushButton#ViewSettingsReset {
 }
 
 /* ==== SPECIALIZED WIDGETS ==== */
+/* ColorSwatch: Farbmuster, CompilationTaskCard/-Title: Kompilier-Aufgaben,
+   EntityDefinitionExternalPath: Pfad zur eingebauten/externen Entity-Definition,
+   CrashLogView/CrashStackTraceView: Textbereiche im Crash-Dialog. */
 QWidget#ColorSwatch {
     min-width: 20px;
     min-height: 15px;
@@ -1410,6 +1522,8 @@ QTextEdit#CrashLogView, QTextEdit#CrashStackTraceView {
 
 
 /* ==== BRUSH SHAPE TOOL ==== */
+/* Parameterleiste des Create-Tools über dem MapEditor (z.B. Segmente, Radius,
+   Rock-Seed). Die Auswahl der Form befindet sich in den MapEditor-Toolbars unten. */
 QWidget#ShapeToolPage {
     padding: 2px;
 }
@@ -1442,11 +1556,12 @@ QWidget#ShapeToolPage QPushButton#ShapeToolApply {
 }
 
 
-/* ==== CREATE: VIEWPORT SHAPE PALETTE ====
-   The palette is anchored to the left center of every map viewport in Create mode.
-   Icon size and all visual states are independent of the parameters toolbar.
-   overlayOpacity affects the entire panel; rgba controls its background separately.
-*/
+/* ==== MAPEDITOR TOOLBARS (Left / Top / Right / Bottom) ==== */
+/* EditorToolbar ist eine frei konfigurierte Toolbar direkt über der Map-Ansicht.
+   position wählt die Kante. Die qproperty-Geometriewerte gehen in die Platzberechnung
+   ein, einschließlich Verkleinerung/Ausblenden bei Platzmangel. EditorToolbarButton
+   erbt Icon, Tooltip und Aktivierung von seiner Action. Die Standard-Toolbar zeigt
+   die Create-Formen auch im Select-Modus. */
 /* Editor toolbars: common geometry, with a separate visual style per edge. */
 QFrame#EditorToolbar {
     qproperty-panelPadding: 6;
@@ -1478,6 +1593,10 @@ QFrame#EditorToolbar QToolButton:pressed { background-color: ${color.highlight};
 QFrame#EditorToolbarSeparator { color: ${color.mid}; background: transparent; border: none; }
 
 /* ==== EDITOR CUSTOMIZATION PREFERENCES ==== */
+/* Preferences -> Editor Actions / Editor Toolbar: rechte Formularbreite,
+   Shortcut-Feld und linke Listen bzw. die Elements-Liste. Die Toolbars nutzen
+   inspectorToolbar="true"; Checkboxen/SpinBoxen/Dropdowns nutzen die Basis oben.
+   EditorIconGrid/-Preview/-Name/-Count gehören zum Dialog Choose icon.... */
 
 /* Shared preference form width; FormWithSectionsLayout supplies the same
    section headers and field margins used by View preferences. */
@@ -1527,6 +1646,8 @@ QLabel#EditorIconCount {
     font-size: ${length.font.small};
 }
 
+/* Legacy-Formenpalette: kompatible Regeln für BrushShapePalette. Die aktuelle
+   MapEditor-Ansicht verwendet die konfigurierbaren EditorToolbar-Regeln oben. */
 QFrame#BrushShapePalette {
     qproperty-edgeMargin: 12;
     qproperty-panelPadding: 6;

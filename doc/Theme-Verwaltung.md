@@ -107,6 +107,23 @@ Stylesheet wird nicht erneut an Qt übergeben. Der zugrunde liegende Qt-Stil ble
 bestehen, und Schriftdateien werden nur bei Änderungen ihrer Auswahl oder Größe
 erneut angefordert.
 
+Bei einer gültigen Änderung ersetzt die Anwendung die Qt-Stylesheet-Hülle in einem
+Durchlauf, statt alle verschachtelten Widget-Bäume wiederholt zu aktualisieren.
+Der Basisstil für gerundete Menüs und Tooltips bleibt erhalten. Sichtbare Fenster
+werden während dieses synchronen Austauschs kurz vom Zeichnen ausgenommen und
+anschließend gemeinsam neu gezeichnet. Eine fehlerhafte QSS-Vorlage wird vor dem
+Austausch an einem separaten Widget geprüft; die bisherige Darstellung bleibt aktiv.
+
+Änderungen an Schrift und Farben werden über denselben kurzen Timer gebündelt.
+Preferences-Kategorien werden beim ersten Aufruf erstellt und für weitere Besuche
+behalten. Dadurch fallen noch unbenutzte Kategorien bei UI-Aktualisierungen nicht
+als zusätzliche Widgets an. Schrift-/Farbänderungen berechnen außerdem keine
+Selektionsstatistiken und erneuern keine Tastenkombinationen des MapEditors.
+
+`base.qss` enthält am Anfang einen Schnellfinder mit der Zuordnung von sichtbaren
+Programmteilen zu Selektoren. Die Abschnitte erklären ihre globalen Regeln,
+werkzeugspezifischen Ausnahmen und die verfügbaren Zustands-/Widget-Eigenschaften.
+
 Layer-Icons lösen ihre Theme-Farbe beim Zeichnen auf. Eine Änderung der Iconfarbe
 ersetzt deshalb weder die Baum-Einträge noch deren Icons und verändert keine Auswahl,
 aufgeklappten Knoten oder Scrollposition. Die vorhandenen begrenzten SVG- und

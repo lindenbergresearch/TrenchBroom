@@ -72,6 +72,7 @@ class PreferenceDialog : public QDialog {
   private:
 
     void createGui();
+    PreferencePane* createPane(PrefPane pane);
 
     void switchToPane(PrefPane pane);
 

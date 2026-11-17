@@ -58,7 +58,6 @@ PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidge
     setWindowIconTB(this);
     createGui();
     switchToPane(PrefPane_First);
-    currentPane()->updateControls();
 }
 
 void PreferenceDialog::closeEvent(QCloseEvent *event) {
@@ -139,14 +138,10 @@ void PreferenceDialog::createGui() {
     }
 
     m_stackedWidget = new QStackedWidget();
-    m_stackedWidget->addWidget(new GamesPreferencePane(m_document.get()));
-    m_stackedWidget->addWidget(new ViewPreferencePane());
-    m_stackedWidget->addWidget(new ColorsPreferencePane());
-    m_stackedWidget->addWidget(new MousePreferencePane());
-    m_stackedWidget->addWidget(new KeyboardPreferencePane(m_document.get()));
-    m_stackedWidget->addWidget(new EditorCustomizationPreferencePane(false));
-    m_stackedWidget->addWidget(new EditorCustomizationPreferencePane(true));
-    m_stackedWidget->addWidget(new PreferencesPreferencePane());
+    // Hidden panes otherwise add hundreds of widgets to every global font and
+    // palette update. Instantiate a pane only on its first visit, then retain it.
+    for (auto index = 0; index < PrefPane_Last; ++index)
+        m_stackedWidget->addWidget(new QWidget);
 
     highlightToolButton("Games");
 
@@ -192,11 +187,33 @@ void PreferenceDialog::createGui() {
     setLayout(layout);
 }
 
+PreferencePane* PreferenceDialog::createPane(const PrefPane pane) {
+    switch (pane) {
+        case PrefPane_Games: return new GamesPreferencePane(m_document.get());
+        case PrefPane_View: return new ViewPreferencePane;
+        case PrefPane_Colors: return new ColorsPreferencePane;
+        case PrefPane_Mouse: return new MousePreferencePane;
+        case PrefPane_Keyboard: return new KeyboardPreferencePane(m_document.get());
+        case PrefPane_EditorActions: return new EditorCustomizationPreferencePane(false);
+        case PrefPane_EditorToolbar: return new EditorCustomizationPreferencePane(true);
+        case PrefPane_Advanced: return new PreferencesPreferencePane;
+        case PrefPane_Last: break;
+    }
+    return nullptr;
+}
+
 void PreferenceDialog::switchToPane(const PrefPane pane) {
-    if (!currentPane()->validate()) {
+    if (currentPane() && !currentPane()->validate()) {
         return;
     }
-
+    if (!dynamic_cast<PreferencePane*>(m_stackedWidget->widget(pane))) {
+        auto* page = createPane(pane);
+        if (!page) return;
+        auto* placeholder = m_stackedWidget->widget(pane);
+        m_stackedWidget->removeWidget(placeholder);
+        delete placeholder;
+        m_stackedWidget->insertWidget(pane, page);
+    }
     m_stackedWidget->setCurrentIndex(pane);
     currentPane()->updateControls();
 
@@ -205,7 +222,7 @@ void PreferenceDialog::switchToPane(const PrefPane pane) {
 }
 
 PreferencePane *PreferenceDialog::currentPane() const {
-    return static_cast<PreferencePane *>(m_stackedWidget->currentWidget());
+    return dynamic_cast<PreferencePane *>(m_stackedWidget->currentWidget());
 }
 
 void PreferenceDialog::resetToDefaults() {

@@ -69,7 +69,7 @@ class ViewPreferencePane : public PreferencePane {
   private:
     void createGui();
 
-    void reloadUIStyle(bool reloadFonts = true);
+    void reloadUIStyle();
 
     void updateFontPreviews();
     void applyUIFont(const std::filesystem::path& path);

@@ -793,8 +793,10 @@ void ViewPreferencePane::renderFontFileChanged(const int index) {
     selectFontSize(*m_rendererFontSizeCombo, pref(Preferences::RendererFontSize));
 }
 
-void ViewPreferencePane::reloadUIStyle(bool reloadFonts) {
-    TrenchBroomApp::instance().reloadStyle(reloadFonts, true);
+void ViewPreferencePane::reloadUIStyle() {
+    // Apply once after the current control/popup has finished processing input.
+    // The app reloads only font faces/sizes that actually changed.
+    TrenchBroomApp::instance().requestThemeRefresh(30);
 }
 
 void ViewPreferencePane::updateFontPreviews() {
@@ -839,7 +841,7 @@ void ViewPreferencePane::editorUIFontMinimumSizeChanged(const int value) {
 
 void ViewPreferencePane::editorUIDetailTextOpacityChanged(const int value) {
     PreferenceManager::instance().set(Preferences::UIDetailTextOpacity, float(value) / 100.0f);
-    reloadUIStyle(false);
+    reloadUIStyle();
     updateFontPreviews();
 }
 
@@ -882,7 +884,7 @@ void ViewPreferencePane::editorToolbarIconSizeChanged(int index) {
         TrenchBroomApp::instance().getCurrentMapFrame()->updateToolbar();
     }
 
-    reloadUIStyle(true);
+    reloadUIStyle();
 }
 
 void ViewPreferencePane::editorFaceAutoBrightnessChanged(int value) {
