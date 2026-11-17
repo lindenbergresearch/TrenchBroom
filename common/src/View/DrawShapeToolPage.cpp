@@ -18,20 +18,17 @@
  */
 
 #include "DrawShapeToolPage.h"
-#include "IO/ResourceUtils.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/Camera.h"
 #include "View/DrawShapeToolExtensions.h"
 #include "View/MapDocument.h"
-#include "View/MoveObjectsToolPage.h"
 #include "View/MapFrame.h"
 #include "View/MapView2D.h"
 #include "View/QtUtils.h"
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QLabel>
-#include <QMenu>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QStackedWidget>
@@ -42,23 +39,12 @@ DrawShapeToolPage::DrawShapeToolPage(std::weak_ptr<MapDocument>, DrawShapeToolEx
     setObjectName("ShapeToolPage");
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    m_quickMove=new MoveObjectsToolPage(manager.document());
-    layout->addWidget(m_quickMove);
     auto* toolbar = new QHBoxLayout;
     toolbar->setContentsMargins(0, 0, 0, 0);
-    toolbar->addWidget(new QLabel(tr("Shape")));
-    m_shapes = createBitmapButton(manager.currentExtension().iconPath(), tr("Choose brush shape"));
-    m_shapes->setObjectName("ShapeToolChoose");
-    m_shapes->setPopupMode(QToolButton::InstantPopup);
-    auto* menu = new QMenu(m_shapes);
+    auto* title = new QLabel(tr("Create"));
+    title->setObjectName("ShapeToolTitle");
+    toolbar->addWidget(title);
     const auto extensions = manager.extensions();
-    for (size_t i = 0; i < extensions.size(); ++i) {
-        auto* action = menu->addAction(IO::loadSVGIcon(extensions[i]->iconPath(), 20), QString::fromStdString(extensions[i]->name()));
-        action->setIconVisibleInMenu(true);
-        connect(action, &QAction::triggered, this, [this, i] { m_manager.setCurrentExtensionIndex(i); });
-    }
-    m_shapes->setMenu(menu);
-    toolbar->addWidget(m_shapes);
     m_group = createBitmapToggleButton("Group.svg", tr("Group the created brushes when a shape has several parts"));
     m_group->setObjectName("ShapeToolGroup");
     toolbar->addWidget(m_group);
@@ -103,10 +89,7 @@ DrawShapeToolPage::DrawShapeToolPage(std::weak_ptr<MapDocument>, DrawShapeToolEx
     refresh();
 }
 void DrawShapeToolPage::refresh() {
-    m_quickMove->setVisible(m_manager.document()->hasSelectedNodes());
     const auto& extension = m_manager.currentExtension();
-    m_shapes->setIcon(IO::loadSVGIcon(extension.iconPath(), 20));
-    m_shapes->setToolTip(QString::fromStdString(extension.name()));
     m_pages->setCurrentIndex(int(extension.kind()));
     const QSignalBlocker a(m_group), b(m_axis);
     m_group->setChecked(pref(Preferences::GroupBrushesCreatedByShapeTool));

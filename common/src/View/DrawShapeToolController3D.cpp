@@ -213,6 +213,8 @@ class DrawShapeDragDelegate : public HandleDragTrackerDelegate {
 std::unique_ptr<DragTracker> DrawShapeToolController3D::acceptMouseDrag(
     const InputState &inputState
 ) {
+    if(!m_tool.active()) return nullptr;
+
     using namespace Model::HitFilters;
 
     if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft)) {
@@ -226,9 +228,6 @@ std::unique_ptr<DragTracker> DrawShapeToolController3D::acceptMouseDrag(
     }
 
     auto document = kdl::mem_lock(m_document);
-    if (document->hasSelection()) {
-        return nullptr;
-    }
 
     const auto &hit = inputState.pickResult().first(type(Model::BrushNode::BrushHitType));
     const auto initialHandlePosition =

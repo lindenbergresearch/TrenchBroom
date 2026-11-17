@@ -29,7 +29,7 @@
 #include <kdl/result.h>
 
 namespace TrenchBroom::View {
-DrawShapeTool::DrawShapeTool(std::weak_ptr<MapDocument> document) : CreateBrushesToolBase(true, document), m_extensionManager(document) {
+DrawShapeTool::DrawShapeTool(std::weak_ptr<MapDocument> document) : CreateBrushesToolBase(false, document), m_extensionManager(document) {
     m_connections += m_extensionManager.applyParametersNotifier.connect([this](auto axis) { applyParameters(axis); });
     const auto updatePreview = [this] {
         if (m_previewBounds) update(*m_previewBounds, m_viewAxis);
@@ -108,14 +108,19 @@ bool DrawShapeTool::applyParameters(vm::axis::type viewAxis) {
     return true;
 }
 bool DrawShapeTool::cancel() {
-    auto document = kdl::mem_lock(m_document);
-    if (document->hasSelection()) return false;
     const auto hadPreview = m_previewBounds.has_value();
     m_previewBounds.reset();
     clearBrushes();
-    const auto changed = m_extensionManager.setCurrentExtensionIndex(0);
     refreshViews();
-    return changed || hadPreview;
+    return hadPreview;
+}
+bool DrawShapeTool::doActivate() {
+    m_extensionManager.setCurrentExtensionIndex(0);
+    return true;
+}
+bool DrawShapeTool::doDeactivate() {
+    cancel();
+    return true;
 }
 QWidget* DrawShapeTool::doCreatePage(QWidget* parent) {
     return new DrawShapeToolPage(m_document, m_extensionManager, parent);

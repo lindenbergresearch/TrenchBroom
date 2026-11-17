@@ -208,6 +208,8 @@ private:
 std::unique_ptr<DragTracker> DrawShapeToolController2D::acceptMouseDrag(
   const InputState& inputState)
 {
+    if(!m_tool.active()) return nullptr;
+
   if (!inputState.mouseButtonsPressed(MouseButtons::MBLeft))
   {
     return nullptr;
@@ -221,17 +223,14 @@ std::unique_ptr<DragTracker> DrawShapeToolController2D::acceptMouseDrag(
   }
 
   auto document = kdl::mem_lock(m_document);
-  if (document->hasSelection())
-  {
-    return nullptr;
-  }
 
   const auto& bounds = document->referenceBounds();
   const auto& camera = inputState.camera();
   const auto plane =
     vm::plane3{bounds.min, vm::vec3{vm::get_abs_max_component_axis(camera.direction())}};
 
-  if (const auto distance = vm::intersect_ray_plane(inputState.pickRay(), plane))
+  const auto distance=vm::intersect_ray_plane(inputState.pickRay(),plane);
+  if (!vm::is_nan(distance))
   {
     const auto initialHandlePosition =
       vm::point_at_distance(inputState.pickRay(), distance);

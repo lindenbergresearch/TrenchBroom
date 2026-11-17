@@ -107,7 +107,7 @@ public: // event handling
 
   void mouseScroll(ToolChain* chain, const InputState& inputState);
 
-  bool cancel(ToolChain* chain);
+  virtual bool cancel(ToolChain* chain);
 
 public: // tool management
   /**

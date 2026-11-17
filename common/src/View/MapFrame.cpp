@@ -1458,6 +1458,9 @@ bool MapFrame::anyToolActive() const {
     return m_mapView->anyToolActive();
 }
 
+void MapFrame::toggleCreateTool() {m_mapView->mapViewToolBox().toggleCreateTool();}
+bool MapFrame::createToolActive() const {return m_mapView->mapViewToolBox().createToolActive();}
+
 void MapFrame::toggleAssembleBrushTool() {
     if (canToggleAssembleBrushTool()) {
         m_mapView->toggleAssembleBrushTool();

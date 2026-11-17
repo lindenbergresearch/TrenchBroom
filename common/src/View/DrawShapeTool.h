@@ -49,6 +49,8 @@ class DrawShapeTool : public CreateBrushesToolBase {
     vm::axis::type m_viewAxis = vm::axis::z;
     NotifierConnection m_connections;
     void doBrushesWereCreated() override;
+    bool doActivate() override;
+    bool doDeactivate() override;
 
     QWidget* doCreatePage(QWidget* parent) override;
 };

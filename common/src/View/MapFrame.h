@@ -399,6 +399,9 @@ class MapFrame : public QMainWindow {
 
     bool anyToolActive() const;
 
+    void toggleCreateTool();
+    bool createToolActive() const;
+
     void toggleAssembleBrushTool();
 
     bool canToggleAssembleBrushTool() const;

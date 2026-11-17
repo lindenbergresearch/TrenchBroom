@@ -84,6 +84,10 @@ public: // tools
   EdgeTool& edgeTool();
   FaceTool& faceTool();
 
+  void toggleCreateTool();
+  bool createToolActive() const;
+  bool cancel(ToolChain* chain) override;
+
   void toggleAssembleBrushTool();
   bool assembleBrushToolActive() const;
   void performAssembleBrush();

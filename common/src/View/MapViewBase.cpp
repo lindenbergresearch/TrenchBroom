@@ -18,6 +18,7 @@
  */
 
 #include "MapViewBase.h"
+#include "View/BrushShapePalette.h"
 
 #include <kdl/set_temp.h>
 
@@ -114,6 +115,7 @@ void MapViewBase::setCompass(std::unique_ptr<Renderer::Compass> compass) {
 
 void MapViewBase::mapViewBaseVirtualInit() {
     createActionsAndUpdatePicking();
+    new BrushShapePalette(m_toolBox,this);
 }
 
 MapViewBase::~MapViewBase() {
@@ -188,6 +190,8 @@ void MapViewBase::nodesDidChange(const std::vector<Model::Node *> &) {
 }
 
 void MapViewBase::toolChanged(Tool &) {
+    if(m_toolBox.createToolActive()) setCursor(Qt::CrossCursor);
+    else unsetCursor();
     updatePickResult();
     updateActionStates();
     triggerFrameSwap();
@@ -830,7 +834,9 @@ ActionContext::Type MapViewBase::actionContext() const {
     const auto derivedContext = doGetActionContext(); // only safe on fully constructed object
 
     ActionContext::Type toolContext = ActionContext::NoTool;
-    if (m_toolBox.assembleBrushToolActive()) {
+    if (m_toolBox.createToolActive()) {
+        toolContext = ActionContext::CreateTool;
+    } else if (m_toolBox.assembleBrushToolActive()) {
         toolContext = ActionContext::AssembleBrushTool;
     } else if (m_toolBox.clipToolActive()) {
         toolContext = ActionContext::ClipTool;

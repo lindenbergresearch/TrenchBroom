@@ -47,8 +47,9 @@ QString typeName(const QString& type) {
 
 QVariantMap contextOverlayData(const MapDocument& document, MapViewToolBox& tools) {
     QString toolId = "select";
-    QString toolName = QObject::tr("Select / Move");
-    if (tools.assembleBrushToolActive()) { toolId = "assemble"; toolName = QObject::tr("Assemble Brush"); }
+    QString toolName = QObject::tr("Select");
+    if (tools.createToolActive()) { toolId="create";toolName=QObject::tr("Create"); }
+    else if (tools.assembleBrushToolActive()) { toolId = "assemble"; toolName = QObject::tr("Assemble Brush"); }
     else if (tools.clipToolActive()) { toolId = "clip"; toolName = QObject::tr("Clip"); }
     else if (tools.rotateObjectsToolActive()) { toolId = "rotate"; toolName = QObject::tr("Rotate"); }
     else if (tools.scaleObjectsToolActive()) { toolId = "scale"; toolName = QObject::tr("Scale"); }
@@ -56,8 +57,6 @@ QVariantMap contextOverlayData(const MapDocument& document, MapViewToolBox& tool
     else if (tools.vertexToolActive()) { toolId = "vertex"; toolName = QObject::tr("Vertex"); }
     else if (tools.edgeToolActive()) { toolId = "edge"; toolName = QObject::tr("Edge"); }
     else if (tools.faceToolActive()) { toolId = "face"; toolName = QObject::tr("Face"); }
-    else if (!document.hasSelectedNodes() && !document.hasSelectedBrushFaces())
-        toolName = QObject::tr("Select / Draw Brush");
 
     QVariantMap tool{{"id", toolId}, {"name", toolName}, {"dragging", tools.dragging()}, {toolId, true}};
     if (toolId == "rotate") {

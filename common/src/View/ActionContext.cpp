@@ -69,6 +69,7 @@ std::string actionContextName(const ActionContext::Type actionContext) {
     } else if ((actionContext & ActionContext::AnyOrNoTool) == ActionContext::AnyTool) {
         actionContexts.emplace_back("any tool");
     } else {
+        if (actionContext & ActionContext::CreateTool) actionContexts.emplace_back("create tool");
         if (actionContext & ActionContext::NoTool) {
             actionContexts.emplace_back("no tool");
         }

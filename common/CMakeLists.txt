@@ -320,6 +320,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/Console.cpp
     ${COMMON_SOURCE_DIR}/View/ContainerBar.cpp
     ${COMMON_SOURCE_DIR}/View/ControlListBox.cpp
+    ${COMMON_SOURCE_DIR}/View/BrushShapePalette.cpp
     ${COMMON_SOURCE_DIR}/View/ContextOverlay.cpp
     ${COMMON_SOURCE_DIR}/View/ContextOverlayData.cpp
     ${COMMON_SOURCE_DIR}/View/ContextOverlayTemplate.cpp
@@ -889,6 +890,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/Console.h
     ${COMMON_SOURCE_DIR}/View/ContainerBar.h
     ${COMMON_SOURCE_DIR}/View/ControlListBox.h
+    ${COMMON_SOURCE_DIR}/View/BrushShapePalette.h
     ${COMMON_SOURCE_DIR}/View/ContextOverlay.h
     ${COMMON_SOURCE_DIR}/View/ContextOverlayData.h
     ${COMMON_SOURCE_DIR}/View/ContextOverlayTemplate.h

@@ -1202,6 +1202,12 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
     editMenu.addSeparator();
 
     auto &toolMenu = editMenu.addMenu("Tools");
+    toolMenu.addItem(createMenuAction(
+        std::filesystem::path{"Menu/Edit/Tools/Create Tool"},QObject::tr("Create"),Qt::Key_N,
+        [](ActionExecutionContext& context) {context.frame()->toggleCreateTool();},
+        [](ActionExecutionContext& context) {return context.hasDocument();},
+        [](ActionExecutionContext& context) {return context.hasDocument() && context.frame()->createToolActive();},
+        std::filesystem::path{"ShapeTool_Cuboid.svg"},QObject::tr("Create brushes using the shape palette")));
     toolMenu.addItem(
         createMenuAction(
             std::filesystem::path{
@@ -1276,7 +1282,7 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
         ));
     toolMenu.addItem(
         createMenuAction(
-            std::filesystem::path{"Controls/Map view/Deactivate current tool"}, QObject::tr("Deactivate Current Tool"),
+            std::filesystem::path{"Controls/Map view/Deactivate current tool"}, QObject::tr("Select"),
             Qt::CTRL +
             Qt::Key_Escape, [](ActionExecutionContext &context) { context.view()->deactivateTool(); }, [](ActionExecutionContext &context) { return context.hasDocument(); }, [](
                 ActionExecutionContext &context
@@ -1815,6 +1821,7 @@ void ActionManager::createRenderViewToolbar(QToolBar *toolBar) {
 void ActionManager::createToolbar() {
     m_toolBar = std::make_unique<Menu>("Tools Toolbar", MenuEntryType::Menu_None);
     m_toolBar->addItem(existingAction(std::filesystem::path{"Controls/Map view/Deactivate current tool"}));
+    m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Create Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Brush Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Clip Tool"}));
     m_toolBar->addItem(existingAction(std::filesystem::path{"Menu/Edit/Tools/Vertex Tool"}));

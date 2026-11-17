@@ -116,6 +116,7 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/View/tst_CopyPaste.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_Csg.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_BrushUpstream.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/View/tst_CreateBrushMode.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_ExtrudeTool.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_FontUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_ViewEditor.cpp"

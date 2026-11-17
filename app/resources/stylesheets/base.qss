@@ -11,87 +11,106 @@
  * so more specific widget/state rules continue to override the shared defaults.
  */
 
-/* === TYPOGRAPHY === */
+/* ==== TYPOGRAPHY ==== */
 *[uiStyled="true"] {
     font-family: "#UI_FONT_FAMILY";
     font-size: #UI_FONT_SIZE;
     font-weight: #UI_FONT_WEIGHT;
     font-style: #UI_FONT_STYLE;
 }
+
 *[uiFontFamily="console"] {
     font-family: "#CONSOLE_FONT_FAMILY";
     font-size: #CONSOLE_FONT_SIZE;
     font-weight: #CONSOLE_FONT_WEIGHT;
     font-style: #CONSOLE_FONT_STYLE;
 }
+
 *[uiTextRole="small"], *[uiTextRole="info"] {
     font-size: #UI_SMALL_FONT_SIZE;
 }
+
 *[uiTextRole="info"] {
     color: #UI_DETAIL_TEXT_COLOR;
 }
+
 *[uiTextRole="subtitle"] {
     font-size: #UI_MID_FONT_SIZE;
 }
+
 *[uiTextRole="title"] {
     font-size: #UI_TITLE_FONT_SIZE;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
+
 *[uiTextRole="header"] {
     font-size: #UI_HEADER_FONT_SIZE;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
+
 *[uiTextRole="dialogTitle"] {
     font-size: #UI_DIALOG_TITLE_FONT_SIZE;
     font-weight: bold;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
+
 *[uiTextRole="brand"] {
     font-family: "Rabanera";
     font-size: 32px;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
+
 *[uiEmphasized="true"] {
     font-weight: bold;
 }
+
 *[uiEmphasized="false"] {
     font-weight: normal;
 }
+
 *[uiItalic="true"] {
     font-style: italic;
 }
+
 *[uiItalic="false"] {
     font-style: normal;
 }
+
 *[uiTone="normal"] {
     color: #TEXT_COLOR;
 }
+
 *[uiTone="highlighted"] {
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
+
 *[uiTone="error"] {
     color: #UI_ERROR_COLOR;
 }
+
 *[uiStyled="true"]:disabled {
     color: #DISABLED_TEXT_COLOR;
 }
+
 *[uiSurface="window"] {
     background-color: #WINDOW_COLOR;
 }
+
 *[uiSurface="base"] {
     background-color: #BASE_COLOR;
 }
+
 *[uiSurface="highlight"] {
     background-color: #HIGHLIGHT_COLOR;
 }
 
-/* === WINDOW AND STATUS BAR === */
+/* ==== WINDOW AND STATUS BAR ==== */
 QMainWindow#MapFrame {
     min-width: 1280px;
     min-height: 768px;
 }
 
-/* === STATUSBAR === */
+/* ==== STATUSBAR ==== */
 
 QStatusBar {
     margin-top: 0px;
@@ -134,6 +153,8 @@ QWidget#StatusBarWidget {
     text-align: center;
 }
 
+/* ==== INSPECTOR ==== */
+
 QWidget#Inspector_LeftStack, QWidget#Inspector_RightStack {
     margin: 0px;
     padding: 0px;
@@ -146,7 +167,7 @@ QWidget#Inspector_Widget, QWidget#Inspector_LeftPane {
     border: none;
 }
 
-/* === LIST/TABLE === */
+/* ==== LIST/TABLE ==== */
 
 QHeaderView {
     background-color: #MIDLIGHT_COLOR;
@@ -169,22 +190,21 @@ QTableWidget {
     gridline-color: #MIDLIGHT_COLOR;
 }
 
-/* === LAYER TREE === */
+/* ==== LAYER TREE ==== */
 
 /* The layer tree paints the selection once across the entire row. */
 QTreeWidget#LayerTree {
     show-decoration-selected: 0;
     qproperty-indentation: 16;
-    qproperty-iconSize: 14px 14px;
-    qproperty-attributeColumnWidth: 24;
+    qproperty-iconSize: 13px 13px;
+    qproperty-attributeColumnWidth: 22;
     /* Disclosure chevrons; indentation controls their clickable column. */
-    qproperty-branchIndicatorSize: 10;
-    qproperty-branchIndicatorColor: #TEXT_COLOR;
-    qproperty-branchIndicatorLineWidth: 1.5;
+    qproperty-branchIndicatorSize: 6;
+    qproperty-branchIndicatorColor: #LIGHT_COLOR;
+    qproperty-branchIndicatorLineWidth: 3.5;
 }
 
 QTreeWidget#LayerTree::item,
-QTreeWidget#LayerTree::item:selected,
 QTreeWidget#LayerTree::item:hover {
     background: transparent;
     border: none;
@@ -200,14 +220,18 @@ QTreeWidget#LayerTree::item:hover {
 QWidget#LayerTreeRow {
     color: #TEXT_COLOR;
     background: transparent;
+
     border: none;
+    border-bottom: 1px solid #WINDOW_COLOR;
     border-radius: 6px;
+
     qproperty-paddingLeft: 4;
     qproperty-paddingTop: 4;
     qproperty-paddingRight: 4;
     qproperty-paddingBottom: 4;
-    qproperty-contentIconSize: 20;
-    qproperty-iconSpacing: 6;
+
+    qproperty-contentIconSize: 24;
+    qproperty-iconSpacing: 4;
     qproperty-lineSpacing: 0;
     qproperty-detailFontReduction: 2;
     qproperty-detailOpacity: -1;
@@ -221,22 +245,30 @@ QWidget#LayerTreeRow[nodeType="layer"] {
     qproperty-paddingTop: 6;
     qproperty-paddingBottom: 6;
 }
+
 QWidget#LayerTreeRow[nodeType="entity"] {
     qproperty-paddingTop: 5;
     qproperty-paddingBottom: 5;
 }
+
 QWidget#LayerTreeRow[nodeType="brush"], QWidget#LayerTreeRow[nodeType="patch"] {
-    qproperty-paddingTop: 3;
-    qproperty-paddingBottom: 3;
+    qproperty-contentIconSize: 18;
+    qproperty-paddingTop: 2;
+    qproperty-paddingBottom: 2;
+    qproperty-detailFontReduction: 2;
+    font-size: #UI_SMALL_FONT_SIZE;
+    border-radius: 3px;
+
+
 }
+
 QWidget#LayerTreeRow[currentLayer="true"] {
     font-weight: bold;
 }
+
 QWidget#LayerTreeRow[selected="true"] {
-    font-style: italic;
     background-color: #HIGHLIGHT_COLOR;
     color: #HIGHLIGHTED_TEXT_COLOR;
-    qproperty-detailFontReduction: 1;
     qproperty-detailOpacity: 1;
     qproperty-detailColor: #HIGHLIGHTED_TEXT_COLOR;
 }
@@ -275,7 +307,7 @@ QWidget#IconAppearance {
     qproperty-disabledOpacity: 1.0;
 }
 
-/* === INSPECTOR HEADERS === */
+/* ==== INSPECTOR HEADERS ==== */
 QWidget#TitleBar {
     background-color: #BASE_COLOR;
     border: none;
@@ -335,7 +367,7 @@ QWidget[inspectorDropHighlight="false"] {
     qproperty-windowOpacity: 1;
 }
 
-/* === LIST ROWS === */
+/* ==== LIST ROWS ==== */
 
 QAbstractItemView::item:selected:active {
     border-radius: #BORDER_RADIUS;
@@ -366,7 +398,7 @@ QLabel#SearchListBoxItemRenderer_m_infoText {
     border: none;
 }
 
-/* === PREFAB BROWSER === */
+/* ==== PREFAB BROWSER ==== */
 
 /* Prefab browser: cards inherit the configured UI font and scale with previews. */
 QTreeWidget#PrefabTree {
@@ -468,7 +500,7 @@ QWidget#PrefabCard[selected="true"] QWidget#PrefabDimensions {
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
-/* === SPLITTER === */
+/* ==== SPLITTER ==== */
 
 QSplitter {
     padding: 0px;
@@ -477,7 +509,7 @@ QSplitter {
     border: none;
 }
 
-/* === CHECKBOX === */
+/* ==== CHECKBOX ==== */
 
 QCheckBox#entityDefinition_checkboxWidget {
     margin-left: 16px;
@@ -488,7 +520,7 @@ QCheckBox#entityDefinition_groupCheckboxWidget {
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
-/* === TEXT-EDIT === */
+/* ==== TEXT-EDIT ==== */
 
 QTextEdit {
     border: none;
@@ -499,7 +531,7 @@ QTextEdit {
     margin-bottom: 2px;
 }
 
-/* === COMBO-BOX === */
+/* ==== COMBO-BOX ==== */
 
 QComboBox {
     min-height: 16px;
@@ -574,7 +606,7 @@ QComboBox#TextureBrowser_smallComboBox {
     min-height: 18px;
 }
 
-/* === EDIT FIELD === */
+/* ==== EDIT FIELD ==== */
 
 QLineEdit {
     padding: 2px 0px 2px 2px;
@@ -597,11 +629,11 @@ QWidget#MapPropertiesEditor {
     font-size: #UI_MID_FONT_SIZE;
 }
 
-/* === TOOLBAR === */
+/* ==== TOOLBAR ==== */
 
 QToolBar {
     border: none;
-    border-bottom: 1px solid #MIDLIGHT_COLOR;
+    border-bottom: 1px solid #LIGHT_COLOR;
     margin: 6px 2px 0px 0px;
     padding: 2px;
 }
@@ -609,6 +641,7 @@ QToolBar {
 QToolBar::separator {
     width: 35px;
     height: #TOOLBAR_ICON_SIZE;
+    color: red;
 }
 
 QToolBar#MapFrameToolBar::separator {
@@ -621,13 +654,21 @@ QToolBar#ToolBar_PreferenceDialog {
 
 QToolBar#InspectorToolToolbar {
     background-color: #WINDOW_COLOR;
-    border-bottom: 2px solid #MIDLIGHT_COLOR;
+    border-bottom: 1px solid #LIGHT_COLOR;
     margin: 0px;
+    padding: 2px;
     padding-left: 6px;
-    spacing: 4px;
+/*    spacing: 4px;*/
     min-height: 32px;
     qproperty-iconSize: 16px 16px;
 }
+
+QToolButton#InspectorToolToolbar {
+    margin: 6px;
+    padding: 0px;
+    margin-bottom: 8px;
+}
+
 
 QToolButton#ToolButton_PreferenceDialog {
     margin: 6px;
@@ -635,7 +676,7 @@ QToolButton#ToolButton_PreferenceDialog {
     margin-bottom: 8px;
 }
 
-/* === TOOLTIP === */
+/* ==== TOOLTIP ==== */
 
 QToolTip {
     border: 1px solid #MIDLIGHT_COLOR;
@@ -646,16 +687,18 @@ QToolTip {
     border-radius: #TOOLTIP_CORNER_RADIUS;
 }
 
-/* === MENU === */
+/* ==== MENU ==== */
 
 QMenu {
     background-color: #BASE_COLOR;
-    border: 2px solid #MIDLIGHT_COLOR;
+    border: 1px solid #MIDLIGHT_COLOR;
     color: #BUTTON_TEXT_COLOR;
     margin: 0px;
     font-size: #UI_FONT_SIZE;
     border-radius: #MENU_CORNER_RADIUS;
     padding: 4px;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 QMenu::item {
@@ -686,7 +729,7 @@ QMenu::separator {
     background: #MIDLIGHT_COLOR;
 }
 
-/* === COMPACT CONTROLS === */
+/* ==== COMPACT CONTROLS ==== */
 QComboBox#TextureBrowser_smallComboBox {
     padding: 3px 3px 3px 2px;
     min-width: 60px;
@@ -749,7 +792,7 @@ QPushButton#WelcomeWindow_Button_Right {
     border-bottom-left-radius: 0px;
 }
 
-/* === TREE-WIDGET === */
+/* ==== TREE-WIDGET ==== */
 
 QTreeView {
     background-color: #BASE_COLOR;
@@ -785,7 +828,7 @@ QTreeView::item:selected:!active {
     background-color: #BASE_COLOR;
 }
 
-/* === TAB-WIDGET === */
+/* ==== TAB-WIDGET ==== */
 QTabWidget::pane {
     border: none;
     margin-top: 0px;
@@ -864,7 +907,7 @@ QTabBar#InfoPanelTabBar::tab:selected {
     border-bottom: 1px solid #HIGHLIGHT_COLOR;
 }
 
-/* === SCROLL BAR === */
+/* ==== SCROLL BAR ==== */
 
 QScrollBar:horizontal {
     height: 10px;
@@ -956,7 +999,7 @@ QScrollBar::sub-line:vertical {
     max-height: 2px;
 }
 
-/* === TOOLBUTTON === */
+/* ==== TOOLBUTTON ==== */
 
 QToolButton {
     color: #TEXT_COLOR;
@@ -973,8 +1016,9 @@ QToolButton:disabled {
 }
 
 QToolButton:checked {
-    background-color: #MIDLIGHT_COLOR;
-    outline: none;
+    background-color: #DARK_COLOR;
+      border-color: #MIDLIGHT_COLOR;
+      color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
 QToolButton:hover {
@@ -986,7 +1030,7 @@ QToolButton:pressed {
 }
 
 QToolButton:selected {
-    background: #MIDLIGHT_COLOR;
+    background: #DARK_COLOR;
     color: #TEXT_COLOR;
 }
 
@@ -1044,7 +1088,7 @@ QWidget#InspectorWindowTitle QToolButton {
     border: 1px solid transparent;
     border-radius: 4px;
     margin: 0;
-    padding: 0;
+    padding: 4px;
     min-width: 16px;
     min-height: 16px;
     qproperty-iconSize: 16px 16px;
@@ -1067,6 +1111,7 @@ QToolBar#InspectorToolToolbar QPushButton {
 
 QToolBar#InspectorToolToolbar {
     border-top: none;
+    margin: 0;
 }
 
 QToolBar#InspectorToolToolbar QToolButton:hover:enabled,
@@ -1083,7 +1128,7 @@ QWidget#InspectorWindowTitle QToolButton:pressed {
 
 QToolBar#InspectorToolToolbar QToolButton:checked,
 QToolBar#InspectorToolToolbar QPushButton:checked {
-    background-color: #MIDLIGHT_COLOR;
+    background-color: #DARK_COLOR;
     border-color: #MIDLIGHT_COLOR;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
@@ -1108,16 +1153,20 @@ QToolBar#InspectorToolToolbar QToolButton[popupMode="1"]::menu-button {
 }
 
 QToolBar#InspectorToolToolbar QComboBox {
+    background-color: #DARK_COLOR;
     font-size: #UI_SMALL_FONT_SIZE;
+    margin: 0;
+    padding: 0;
 }
 
 QToolBar#InspectorToolToolbar QCheckBox {
+     background-color: #DARK_COLOR;
     margin: 0;
     padding: 0;
     font-size: #UI_SMALL_FONT_SIZE;
 }
 
-/* === PUSHBUTTON === */
+/* ==== PUSHBUTTON ==== */
 
 QPushButton {
     background-color: #BUTTON_COLOR;
@@ -1173,7 +1222,7 @@ QPushButton:selected {
     color: #TEXT_COLOR;
 }
 
-/* === VIEW SETTINGS === */
+/* ==== VIEW SETTINGS ==== */
 QWidget#ViewEditor {
     min-width: 700px;
     min-height: 480px;
@@ -1197,7 +1246,7 @@ QPushButton#ViewSettingsReset {
     margin: 4px 8px;
 }
 
-/* === SPECIALIZED WIDGETS === */
+/* ==== SPECIALIZED WIDGETS ==== */
 QWidget#ColorSwatch {
     min-width: 20px;
     min-height: 15px;
@@ -1232,7 +1281,7 @@ QTextEdit#CrashLogView, QTextEdit#CrashStackTraceView {
 }
 
 
-/* === BRUSH SHAPE TOOL === */
+/* ==== BRUSH SHAPE TOOL ==== */
 QWidget#ShapeToolPage {
     padding: 2px;
 }
@@ -1256,4 +1305,44 @@ QWidget#ShapeToolPage QToolButton:checked {
 }
 QWidget#ShapeToolPage QPushButton#ShapeToolApply {
     padding: 4px 10px;
+}
+
+
+/* ==== CREATE: VIEWPORT SHAPE PALETTE ====
+   The palette is anchored to the left center of every map viewport in Create mode.
+   Icon size and all visual states are independent of the parameters toolbar.
+   overlayOpacity affects the entire panel; rgba controls its background separately.
+*/
+QFrame#BrushShapePalette {
+    qproperty-edgeMargin: 12;
+    qproperty-panelPadding: 6;
+    qproperty-buttonSpacing: 4;
+    qproperty-overlayOpacity: 0.94;
+    background-color: rgba(26, 29, 34, 220);
+    border: 1px solid rgba(140, 150, 170, 65);
+    border-radius: 10px;
+}
+QWidget#BrushShapePaletteContent, QScrollArea#BrushShapePaletteScroll,
+QScrollArea#BrushShapePaletteScroll > QWidget > QWidget {
+    background: transparent;
+    border: none;
+}
+QFrame#BrushShapePalette QToolButton {
+    qproperty-iconSize: 28px 28px;
+    padding: 5px;
+    margin: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+}
+QFrame#BrushShapePalette QToolButton:hover {
+    background-color: rgba(120, 135, 160, 50);
+    border-color: rgba(150, 170, 200, 90);
+}
+QFrame#BrushShapePalette QToolButton:checked {
+    background-color: #MIDLIGHT_COLOR;
+    border-color: #HIGHLIGHT_COLOR;
+}
+QFrame#BrushShapePalette QToolButton:pressed {
+    background-color: #HIGHLIGHT_COLOR;
 }

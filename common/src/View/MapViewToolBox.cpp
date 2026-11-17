@@ -93,6 +93,14 @@ FaceTool &MapViewToolBox::faceTool() {
     return *m_faceTool;
 }
 
+void MapViewToolBox::toggleCreateTool() {toggleTool(drawShapeTool());}
+bool MapViewToolBox::createToolActive() const {return m_drawShapeTool->active();}
+bool MapViewToolBox::cancel(ToolChain* chain) {
+    // Escape aborts a pending brush and returns directly to Select.
+    if(createToolActive()) {deactivateAllTools();return true;}
+    return ToolBox::cancel(chain);
+}
+
 void MapViewToolBox::toggleAssembleBrushTool() {
     toggleTool(assembleBrushTool());
 }
@@ -222,32 +230,27 @@ void MapViewToolBox::createTools(
     m_edgeTool = std::make_unique<EdgeTool>(document);
     m_faceTool = std::make_unique<FaceTool>(document);
 
-    addExclusiveToolGroup({&assembleBrushTool(),&rotateObjectsTool(),&scaleObjectsTool(),&shearObjectsTool(),&clipTool()});
-    addExclusiveToolGroup({&assembleBrushTool(),&vertexTool(),&edgeTool(),&faceTool(),&clipTool()});
+    addExclusiveToolGroup({&drawShapeTool(),&assembleBrushTool(),&rotateObjectsTool(),&scaleObjectsTool(),&shearObjectsTool(),&clipTool()});
+    addExclusiveToolGroup({&drawShapeTool(),&assembleBrushTool(),&vertexTool(),&edgeTool(),&faceTool(),&clipTool()});
     suppressWhileActive(moveObjectsTool(), assembleBrushTool());
     suppressWhileActive(extrudeTool(), assembleBrushTool());
-    suppressWhileActive(drawShapeTool(), assembleBrushTool());
     suppressWhileActive(moveObjectsTool(), rotateObjectsTool());
     suppressWhileActive(extrudeTool(), rotateObjectsTool());
-    suppressWhileActive(drawShapeTool(), rotateObjectsTool());
     suppressWhileActive(moveObjectsTool(), scaleObjectsTool());
     suppressWhileActive(extrudeTool(), scaleObjectsTool());
-    suppressWhileActive(drawShapeTool(), scaleObjectsTool());
     suppressWhileActive(moveObjectsTool(), shearObjectsTool());
     suppressWhileActive(extrudeTool(), shearObjectsTool());
-    suppressWhileActive(drawShapeTool(), shearObjectsTool());
     suppressWhileActive(moveObjectsTool(), vertexTool());
     suppressWhileActive(extrudeTool(), vertexTool());
-    suppressWhileActive(drawShapeTool(), vertexTool());
     suppressWhileActive(moveObjectsTool(), edgeTool());
     suppressWhileActive(extrudeTool(), edgeTool());
-    suppressWhileActive(drawShapeTool(), edgeTool());
     suppressWhileActive(moveObjectsTool(), faceTool());
     suppressWhileActive(extrudeTool(), faceTool());
-    suppressWhileActive(drawShapeTool(), faceTool());
     suppressWhileActive(moveObjectsTool(), clipTool());
     suppressWhileActive(extrudeTool(), clipTool());
-    suppressWhileActive(drawShapeTool(), clipTool());
+
+    suppressWhileActive(moveObjectsTool(),drawShapeTool());
+    suppressWhileActive(extrudeTool(),drawShapeTool());
 
     registerTool(moveObjectsTool(), bookCtrl);
     registerTool(rotateObjectsTool(), bookCtrl);
@@ -298,7 +301,7 @@ void MapViewToolBox::toolDeactivated(Tool &) {
 void MapViewToolBox::updateEditorContext() {
     auto document = kdl::mem_lock(m_document);
     Model::EditorContext &editorContext = document->editorContext();
-    editorContext.setBlockSelection(assembleBrushToolActive());
+    editorContext.setBlockSelection(assembleBrushToolActive() || createToolActive());
 }
 
 void MapViewToolBox::documentWasNewedOrLoaded(MapDocument *) {
@@ -314,9 +317,7 @@ void MapViewToolBox::updateToolPage() {
     if (auto *activeTool = this->activeTool()) {
         activeTool->showPage();
     } else {
-        // Keep shape parameters and Apply reachable while inspecting a selection.
-        // The shape page also contains the existing Quick Move controls.
-        drawShapeTool().showPage();
+        moveObjectsTool().showPage();
     }
 }
 

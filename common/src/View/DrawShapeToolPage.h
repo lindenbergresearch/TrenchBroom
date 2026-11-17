@@ -32,8 +32,6 @@ class MapDocument;
 class DrawShapeToolPage : public QWidget {
     Q_OBJECT
     DrawShapeToolExtensionManager& m_manager;
-    QWidget* m_quickMove = nullptr;
-    QToolButton* m_shapes = nullptr;
     QToolButton* m_group = nullptr;
     QComboBox* m_axis = nullptr;
     QLabel* m_axisLabel = nullptr;
