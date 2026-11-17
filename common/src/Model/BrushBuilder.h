@@ -44,7 +44,6 @@ enum class RadiusMode {
 };
 
 class BrushBuilder {
-  private:
     MapFormat m_mapFormat;
     const vm::bbox3 m_worldBounds;
     const BrushFaceAttributes m_defaultAttribs;

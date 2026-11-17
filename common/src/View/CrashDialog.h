@@ -23,16 +23,29 @@
 
 #include <filesystem>
 #include <string>
+#include <QTextEdit>
+#include "TrenchBroomApp.h"
 
 namespace TrenchBroom {
 namespace View {
 class CrashDialog : public QDialog {
   Q_OBJECT
   public:
-    CrashDialog(const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath);
+    CrashDialog(CrashReport *crashReport);
 
   private:
-    void createGui(const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath);
+    void createGui();
+
+    void createInfoTab();
+    QWidget *createStackTraceView();
+    QWidget *createLogView();
+
+
+    QTextEdit *m_stackTraceView;
+    QTextEdit *m_logFileView;
+
+    CrashReport *m_crashReport;
+    QTabWidget* m_tabs;
 };
 } // namespace View
 } // namespace TrenchBroom

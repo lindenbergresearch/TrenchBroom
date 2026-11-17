@@ -96,14 +96,18 @@ void AttrString::appendCentered(const std::string &string) {
     m_lines.push_back(Line(string, Justify::Center));
 }
 
-std::string AttrString::str() const {
-    std::string tmp{};
+std::string AttrString::raw() const {
+    std::string tmp;
 
-    for (auto &item : m_lines) {
-        tmp = tmp + item.string;
+    for (auto &line : m_lines) {
+        tmp += line.string;
     }
 
     return tmp;
+}
+
+bool AttrString::empty() const {
+    return raw().empty();
 }
 } // namespace Renderer
 } // namespace TrenchBroom

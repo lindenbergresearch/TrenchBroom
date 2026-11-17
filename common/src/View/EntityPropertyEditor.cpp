@@ -41,9 +41,9 @@
 namespace TrenchBroom {
 namespace View {
 EntityPropertyEditor::EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)}, m_splitter{nullptr}, m_propertyGrid{nullptr}, m_smartEditorManager{nullptr}, m_documentationText{nullptr}, m_currentDefinition{nullptr} {
+    : QWidget{parent}, m_document{std::move(document)}, m_splitter{nullptr}, m_propertyGrid{nullptr}, m_smartEditorManager{nullptr}, m_documentationText{nullptr} {
     createGui(m_document);
-    connectObservers();
+    updateDocumentationAndSmartEditor();
 }
 
 EntityPropertyEditor::~EntityPropertyEditor() {
@@ -52,30 +52,6 @@ EntityPropertyEditor::~EntityPropertyEditor() {
 
 void EntityPropertyEditor::OnCurrentRowChanged() {
     updateDocumentationAndSmartEditor();
-}
-
-void EntityPropertyEditor::connectObservers() {
-    auto document = kdl::mem_lock(m_document);
-    m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &EntityPropertyEditor::selectionDidChange);
-    m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &EntityPropertyEditor::nodesDidChange);
-}
-
-void EntityPropertyEditor::selectionDidChange(const Selection &) {
-    updateIfSelectedEntityDefinitionChanged();
-}
-
-void EntityPropertyEditor::nodesDidChange(const std::vector<Model::Node *> &) {
-    updateIfSelectedEntityDefinitionChanged();
-}
-
-void EntityPropertyEditor::updateIfSelectedEntityDefinitionChanged() {
-    auto document = kdl::mem_lock(m_document);
-    const auto *entityDefinition = Model::selectEntityDefinition(document->allSelectedEntityNodes());
-
-    if (entityDefinition != m_currentDefinition) {
-        m_currentDefinition = entityDefinition;
-        updateDocumentationAndSmartEditor();
-    }
 }
 
 void EntityPropertyEditor::updateDocumentationAndSmartEditor() {
@@ -88,7 +64,17 @@ void EntityPropertyEditor::updateDocumentationAndSmartEditor() {
 
     // collapse the splitter if needed
     m_documentationText->setHidden(m_documentationText->document()->isEmpty());
-    m_smartEditorManager->setHidden(m_smartEditorManager->isDefaultEditorActive());
+    const auto showSmartEditor = !m_smartEditorManager->isDefaultEditorActive();
+    m_smartEditorManager->setVisible(showSmartEditor);
+    if (showSmartEditor) {
+        // A restored splitter state can leave the pane collapsed even though it is visible.
+        auto sizes = m_splitter->sizes();
+        const auto minimumHeight = m_smartEditorManager->minimumHeight();
+        if (sizes[1] < minimumHeight) {
+            sizes[1] = minimumHeight;
+            m_splitter->setSizes(sizes);
+        }
+    }
 
     updateMinimumSize();
 }

@@ -21,6 +21,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <QCompleter>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QFontInfo>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProcess>
@@ -43,11 +44,10 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "View/QtUtils.h"
 #include "View/VariableStoreModel.h"
 #include "View/ViewConstants.h"
+#include "TrenchBroomApp.h"
 
 #include "kdl/memory_utils.h"
 #include "kdl/string_utils.h"
-
-#include <string>
 
 namespace TrenchBroom {
 namespace View {
@@ -61,7 +61,7 @@ void LaunchGameEngineDialog::createGui() {
 
     m_dumpToConsole = true;
     m_commandLine = new ElidedLabel{"", Qt::ElideRight, this};
-    makeMono(m_commandLine, font().pointSize());
+    makeMono(m_commandLine);
 
     auto document = kdl::mem_lock(m_document);
     const auto &gameName = document->game()->gameName();
@@ -93,10 +93,9 @@ void LaunchGameEngineDialog::createGui() {
     parameterLabel->setContentsMargins(LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
 
     m_parameterText = new MultiCompletionLineEdit{};
-    m_parameterText->setFont(Fonts::fixedWidthFont());
+    makeMono(m_parameterText);
     m_parameterText->setMultiCompleter(new QCompleter{new VariableStoreModel{variables()}});
     m_parameterText->setWordDelimiters(QRegularExpression{"\\$"}, QRegularExpression{"\\}"});
-    // makeBigger(m_parameterText, 1);
 
     auto *midLeftLayout = new QVBoxLayout{};
     midLeftLayout->setContentsMargins(0, 0, 0, 0);

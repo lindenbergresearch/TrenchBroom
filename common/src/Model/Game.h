@@ -48,7 +48,10 @@ class EntityDefinitionFileSpec;
 class TextureManager;
 } // namespace TrenchBroom::Assets
 
+namespace TrenchBroom::IO { class FileSystem; }
+
 namespace TrenchBroom::Model {
+struct TextureConfig;
 class EntityNodeBase;
 
 class BrushFace;
@@ -69,6 +72,9 @@ class WorldNode;
 
 class Game : public IO::EntityDefinitionLoader, public IO::EntityModelLoader {
   public:
+    // Read-only game resources, including enabled mods and package archives.
+    virtual const IO::FileSystem* fileSystem() const { return nullptr; }
+    virtual const TextureConfig* textureConfig() const { return nullptr; }
     const std::string &gameName() const;
 
     bool isGamePathPreference(const std::filesystem::path &prefPath) const;

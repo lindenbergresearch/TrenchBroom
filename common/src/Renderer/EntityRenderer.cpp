@@ -24,11 +24,8 @@
 #include "AttrString.h"
 #include "FloatType.h"
 #include "Model/EditorContext.h"
-#include "Model/Entity.h"
 #include "Model/EntityNode.h"
-#include "PreferenceManager.h"
 #include "Preferences.h"
-#include "Renderer/Camera.h"
 #include "Renderer/GLVertexType.h"
 #include "Renderer/PrimType.h"
 #include "Renderer/RenderBatch.h"
@@ -37,7 +34,6 @@
 #include "Renderer/TextAnchor.h"
 #include "StringUtils.h"
 
-#include <vm/forward.h>
 #include <vm/mat.h>
 #include <vm/mat_ext.h>
 #include <vm/scalar.h>
@@ -47,13 +43,13 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-class EntityRenderer::EntityClassnameAnchor : public TextAnchor3D {
+class EntityRenderer::EntityClassNameAnchor : public TextAnchor3D {
   private:
     const Model::EntityNode *m_entity;
 
   public:
-    EntityClassnameAnchor(const Model::EntityNode *entity) : m_entity(entity) {
-    }
+    EntityClassNameAnchor(const Model::EntityNode *entity) :
+        m_entity(entity) {}
 
   private:
     vm::vec3f basePosition() const override {
@@ -66,8 +62,10 @@ class EntityRenderer::EntityClassnameAnchor : public TextAnchor3D {
     TextAlignment::Type alignment() const override { return TextAlignment::Bottom; }
 };
 
-EntityRenderer::EntityRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext)
-    : m_entityModelManager(entityModelManager), m_editorContext(editorContext), m_modelRenderer(logger, m_entityModelManager, m_editorContext), m_boundsValid(false), m_showOverlays(true), m_showOccludedOverlays(false), m_tint(false), m_overrideBoundsColor(false), m_showOccludedBounds(false), m_showAngles(false), m_showHiddenEntities(false) {
+EntityRenderer::EntityRenderer(Logger &logger, Assets::EntityModelManager &entityModelManager, const Model::EditorContext &editorContext) :
+    m_entityModelManager(entityModelManager), m_editorContext(editorContext), m_modelRenderer(logger, m_entityModelManager, m_editorContext),
+    m_boundsValid(false), m_showOverlays(true), m_showOccludedOverlays(false), m_tint(false), m_overrideBoundsColor(false), m_showOccludedBounds(false),
+    m_showAngles(false), m_showHiddenEntities(false) {
 }
 
 void EntityRenderer::invalidate() {
@@ -214,18 +212,28 @@ void EntityRenderer::renderModels(RenderContext &renderContext, RenderBatch &ren
 
 void EntityRenderer::renderClassnames(RenderContext &renderContext, RenderBatch &renderBatch) {
     if (m_showOverlays && renderContext.showEntityClassnames()) {
-        Renderer::RenderService renderService(renderContext, renderBatch);
+
+        RenderService renderService(renderContext, renderBatch);
         renderService.setForegroundColor(m_overlayTextColor);
         renderService.setBackgroundColor(m_overlayBackgroundColor);
 
-        for (const Model::EntityNode *entity : m_entities) {
-            if (m_showHiddenEntities || m_editorContext.visible(entity)) {
+        for (const auto *entity : m_entities.get_data()) {
+            if (!entity->selected()) {
+                auto distance = RenderService::distanceToEntity(renderContext.camera(), entity);
+                if (distance <= 0 || distance > pref(Preferences::TextRendererMaxDistance) * 1.2f) {
+                    continue;
+                }
+            }
+
+            if (m_showHiddenEntities || m_editorContext.visible(entity) || entity->selected()) {
                 if (entity->containingGroup() == nullptr || entity->containingGroup() == m_editorContext.currentGroup()) {
-                    if (m_showOccludedOverlays)
+                    if (m_showOccludedOverlays) {
                         renderService.setShowOccludedObjects();
-                    else
+                    } else {
                         renderService.setHideOccludedObjects();
-                    renderService.renderString(entityString(entity), EntityClassnameAnchor(entity));
+                    }
+
+                    renderService.renderString(entityString(entity), EntityClassNameAnchor(entity));
                 }
             }
         }
@@ -238,14 +246,21 @@ void EntityRenderer::renderAngles(RenderContext &renderContext, RenderBatch &ren
     }
 
     static const auto maxDistance2 = 500.0f * 500.0f;
-    const auto arrow = arrowHead(9.0f, 6.0f);
+    const auto arrow = arrowHead(7.0f, 3.0f);
 
     RenderService renderService(renderContext, renderBatch);
     renderService.setShowOccludedObjectsTransparent();
     renderService.setForegroundColor(m_angleColor);
 
     std::vector<vm::vec3f> vertices(3);
+    std::vector<vm::vec3f> vertices2(3);
+
     for (const auto *entityNode : m_entities) {
+        auto distance = RenderService::distanceToEntity(renderContext.camera(), entityNode);
+        if (distance <= 0 || distance > pref(Preferences::TextRendererMaxDistance) * 1.2f) {
+            continue;
+        }
+
         if (!m_showHiddenEntities && !m_editorContext.visible(entityNode)) {
             continue;
         }
@@ -271,11 +286,18 @@ void EntityRenderer::renderAngles(RenderContext &renderContext, RenderBatch &ren
         const auto rotZ = rotation * vm::vec3f::pos_z();
         const auto angle = -vm::measure_angle(rotZ, onPlane, direction);
         const auto matrix = vm::translation_matrix(center) * vm::rotation_matrix(direction, angle) * rotation * vm::translation_matrix(16.0f * vm::vec3f::pos_x());
+        const auto matrix2 = vm::translation_matrix(center) * vm::rotation_matrix(direction, angle + 90) * rotation * vm::translation_matrix(16.0f * vm::vec3f::pos_x());
 
         for (size_t i = 0; i < 3; ++i) {
             vertices[i] = matrix * arrow[i];
         }
-        renderService.renderPolygonOutline(vertices);
+
+        for (size_t i = 0; i < 3; ++i) {
+            vertices2[i] = matrix2 * arrow[i];
+        }
+
+        renderService.renderFilledPolygon(vertices);
+        renderService.renderFilledPolygon(vertices2);
     }
 }
 
@@ -407,11 +429,11 @@ void EntityRenderer::validateBounds() {
 
 AttrString EntityRenderer::entityString(const Model::EntityNode *entityNode) const {
     const auto &classname = "<" + entityNode->entity().classname() + ">";
-    // const auto center = entityNode->logicalBounds().center();
+    const auto center = entityNode->logicalBounds().center();
 
     AttrString str;
     str.appendCentered(classname);
-    // str.appendCentered(stringf("[%.0f %.0f %.0f]", center.x(), center.y(), center.z()));
+    //str.appendCentered(stringf("[%.0f %.0f %.0f]", center.x(), center.y(), center.z()));
     return str;
 }
 
@@ -423,5 +445,7 @@ const Color &EntityRenderer::boundsColor(const Model::EntityNode *entityNode) co
         return definition->color();
     }
 }
+
+
 } // namespace Renderer
 } // namespace TrenchBroom

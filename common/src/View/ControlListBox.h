@@ -22,38 +22,33 @@
 #include <QWidget>
 
 class QLabel;
-
 class QListWidget;
-
 class QListWidgetItem;
 
-namespace TrenchBroom {
-namespace View {
-
+namespace TrenchBroom::View {
+class SignalDelayer;
 /* ------------------------------------------------------------------------------------------- */
 
 class ControlListBoxItemRenderer : public QWidget {
-  Q_OBJECT
-  protected:
+    Q_OBJECT
+
+protected:
     size_t m_index;
 
-  public:
-    explicit ControlListBoxItemRenderer(QWidget *parent = nullptr);
+public:
+    explicit ControlListBoxItemRenderer(QWidget* parent = nullptr);
 
     ~ControlListBoxItemRenderer() override;
-
     void setIndex(size_t index);
 
-  protected:
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
+protected:
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 
-  public:
+public:
     virtual void updateItem();
+    virtual void setSelected(bool selected, const QListWidget* listWidget);
 
-    virtual void setSelected(bool selected, const QListWidget *listWidget);
-
-  signals:
-
+signals:
     void doubleClicked(size_t index);
 };
 
@@ -63,53 +58,49 @@ class ControlListBoxItemRenderer : public QWidget {
  * Wraps a renderer and adds a separator line at the bottom.
  */
 class ControlListBoxItemRendererWrapper : public QWidget {
-  Q_OBJECT
-  private:
-    ControlListBoxItemRenderer *m_renderer;
+    Q_OBJECT
 
-  public:
-    explicit ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer *renderer, bool showSeparator = false, QWidget *parent = nullptr);
+    ControlListBoxItemRenderer* m_renderer;
 
-    ControlListBoxItemRenderer *renderer();
+public:
+    explicit ControlListBoxItemRendererWrapper(ControlListBoxItemRenderer* renderer, bool showSeparator = false, QWidget* parent = nullptr);
 
-    const ControlListBoxItemRenderer *renderer() const;
+    ControlListBoxItemRenderer* renderer();
+    const ControlListBoxItemRenderer* renderer() const;
 };
 
 /* ------------------------------------------------------------------------------------------- */
 
 class ControlListBox : public QWidget {
-  Q_OBJECT
-  public:
-    static constexpr auto LabelColorShouldNotUpdateWhenSelected = "LabelColorShouldNotUpdateWhenSelected";
+    Q_OBJECT
 
-  private:
-    QListWidget *m_listWidget;
-    QWidget *m_emptyTextContainer;
-    QLabel *m_emptyTextLabel;
+public:
+    // static constexpr auto LabelColorShouldNotUpdateWhenSelected = "LabelColorShouldNotUpdateWhenSelected";
+
+private:
+    QListWidget* m_listWidget;
+    QWidget* m_emptyTextContainer;
+    QLabel* m_emptyTextLabel;
     QMargins m_itemMargins;
     bool m_showSeparator;
     bool m_multiSelection;
+    SignalDelayer* m_rowSizeRefresh;
 
-  public:
-    ControlListBox(const QString &emptyText, const QMargins &itemMargins, bool showSeparator = false, QWidget *parent = nullptr);
+public:
+    ControlListBox(const QString& emptyText, const QMargins& itemMargins, bool showSeparator = false, QWidget* parent = nullptr);
+    ControlListBox(const QString& emptyText, bool showSeparator, QWidget* parent = nullptr);
 
-    ControlListBox(const QString &emptyText, bool showSeparator, QWidget *parent = nullptr);
-
-    void setEmptyText(const QString &emptyText);
-
-    void setItemMargins(const QMargins &itemMargins);
-
+    void setEmptyText(const QString& emptyText) const;
+    void setItemMargins(const QMargins& itemMargins);
     int count() const;
-
     int currentRow() const;
-
-    void setCurrentRow(int currentRow);
-
+    void setCurrentRow(int currentRow) const;
     bool isMultiSelection() const;
-
     void setMultiSelection(bool MMultiSelection);
 
-  protected:
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
     /**
      * Deletes all item renderers, re-fetches the item count from `itemCount()`, and
      * rebuilds the item renderers using `createItemRenderer()`.
@@ -125,35 +116,24 @@ class ControlListBox : public QWidget {
      */
     void updateItems();
 
-    const ControlListBoxItemRenderer *renderer(int i) const;
+    const ControlListBoxItemRenderer* renderer(int i) const;
+    ControlListBoxItemRenderer* renderer(int i);
+    ControlListBoxItemRendererWrapper* wrapper(int i) const;
+    ControlListBoxItemRendererWrapper* wrapper(int i);
 
-    ControlListBoxItemRenderer *renderer(int i);
+private:
+    void addItemRenderer(ControlListBoxItemRenderer* renderer);
 
-    ControlListBoxItemRendererWrapper *wrapper(int i) const;
-
-    ControlListBoxItemRendererWrapper *wrapper(int i);
-
-  private:
-    void addItemRenderer(ControlListBoxItemRenderer *renderer);
-
-  private:
     virtual size_t itemCount() const = 0;
-
-    virtual ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) = 0;
-
+    virtual ControlListBoxItemRenderer* createItemRenderer(QWidget* parent, size_t index) = 0;
     virtual void selectedRowChanged(int index);
-
     virtual void doubleClicked(size_t index);
+    virtual void contextMenuRequested(const QPoint& pos);
 
-    virtual void contextMenuRequested(const QPoint &pos);
-
-  private slots:
-
+private slots:
     void listItemSelectionChanged();
 
-  signals:
-
+signals:
     void itemSelectionChanged();
 };
-} // namespace View
-} // namespace TrenchBroom
+}

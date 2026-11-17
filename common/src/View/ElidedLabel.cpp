@@ -20,6 +20,7 @@
 #include "ElidedLabel.h"
 
 #include <QBoxLayout>
+#include <QEvent>
 #include <QLabel>
 #include <QResizeEvent>
 
@@ -56,6 +57,14 @@ void ElidedLabel::updateElidedText(const int width) {
 
 QSize ElidedLabel::minimumSizeHint() const {
     return QSize(-1, m_label->sizeHint().height());
+}
+
+void ElidedLabel::changeEvent(QEvent *event) {
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange) {
+        updateElidedText(contentsRect().width());
+        updateGeometry();
+    }
 }
 
 void ElidedLabel::resizeEvent(QResizeEvent *event) {

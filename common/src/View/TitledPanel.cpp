@@ -18,17 +18,12 @@
  */
 
 #include "TitledPanel.h"
-
 #include <QVBoxLayout>
-
-#include "View/BorderLine.h"
 #include "View/TitleBar.h"
-#include "View/ViewConstants.h"
 
-namespace TrenchBroom {
-namespace View {
-TitledPanel::TitledPanel(const QString &title, QWidget *parent, bool boldTitle, bool subtitle, bool fillBackground)
-    : QWidget(parent), m_titleBar(nullptr), m_panel(nullptr) {
+namespace TrenchBroom::View {
+TitledPanel::TitledPanel(const QString& title, QWidget* parent, const bool boldTitle, const bool subtitle, const bool fillBackground)
+    : QWidget{parent}, m_titleBar{nullptr}, m_panel{nullptr} {
     m_titleBar = new TitleBar(title, boldTitle, subtitle);
     m_panel = new QWidget();
 
@@ -37,7 +32,7 @@ TitledPanel::TitledPanel(const QString &title, QWidget *parent, bool boldTitle, 
         m_panel->setBackgroundRole(QPalette::Window);
     }
 
-    auto *layout = new QVBoxLayout();
+    auto* layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(m_titleBar);
@@ -45,15 +40,14 @@ TitledPanel::TitledPanel(const QString &title, QWidget *parent, bool boldTitle, 
     setLayout(layout);
 }
 
-TitledPanel::TitledPanel(const QString &title, const bool boldTitle, bool subtitle) : TitledPanel(title, nullptr, boldTitle, subtitle) {
-}
+TitledPanel::TitledPanel(const QString& title, const bool boldTitle, const bool subtitle)
+    : TitledPanel(title, nullptr, boldTitle, subtitle) {}
 
-TitleBar *TitledPanel::getTitleBar() const {
+TitleBar* TitledPanel::getTitleBar() const {
     return m_titleBar;
 }
 
-QWidget *TitledPanel::getPanel() const {
+QWidget* TitledPanel::getPanel() const {
     return m_panel;
 }
-} // namespace View
-} // namespace TrenchBroom
+}

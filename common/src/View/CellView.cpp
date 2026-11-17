@@ -1,20 +1,22 @@
 /*
-Copyright (C) 2010-2017 Kristian Duske
+ Copyright (C) 2010-2017 Kristian Duske
 
-This file is part of TrenchBroom.
+ This file is part of TrenchBroom.
 
-   TrenchBroom is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-     the Free Software Foundation, either version 3 of the License, or
-                                    (at your option) any later version.
+ TrenchBroom is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-                                    TrenchBroom is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ TrenchBroom is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU General Public License
+ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 #include "CellView.h"
 
@@ -326,6 +328,7 @@ void CellView::setupGL() {
     glAssert(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     glAssert(glEnable(GL_CULL_FACE));
     glAssert(glEnable(GL_DEPTH_TEST));
+    glAssert(glEnable(GL_LINE_SMOOTH));
     glAssert(glDepthFunc(GL_LEQUAL));
     glAssert(glShadeModel(GL_SMOOTH));
 }
@@ -383,8 +386,8 @@ auto collectStringVertices(CellLayout &layout, const float y, const float height
                     for (const auto &cell : row.cells()) {
                         const auto &cellTitle = cell.title();
                         const auto textureNameBounds = cell.titleBounds();
-                        const auto textureNameFont = fontManager.selectFontSize(defaultFont, cellTitle, textureNameBounds.width, 6);
-                        const auto &font = fontManager.font(textureNameFont);
+                        const auto textureNameFont = fontManager.selectFontSize(defaultFont, cellTitle, textureNameBounds.width, 8);
+                        const auto &font = fontManager.font(defaultFont);
                         const auto textureNameSize = font.measure(cellTitle);
 
                         const auto textureNameX = textureNameBounds.left() + std::max((textureNameBounds.width - textureNameSize.x()) / 2.0f, 0.0f);
@@ -400,7 +403,7 @@ auto collectStringVertices(CellLayout &layout, const float y, const float height
                             std::begin(cellTitleQuads), std::end(cellTitleQuads), 1, 2
                         }, kdl::skip_iterator{std::begin(textColor), std::end(textColor), 0, 0});
 
-                        auto &allTextureNameVertices = stringVertices[textureNameFont];
+                        auto &allTextureNameVertices = stringVertices[defaultFont];
                         allTextureNameVertices = kdl::vec_concat(std::move(allTextureNameVertices), textureNameVertices);
                     }
                 }

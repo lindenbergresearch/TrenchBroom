@@ -19,9 +19,9 @@
 
 #include "UVEditor.h"
 
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QSpinBox>
+#include <QToolBar>
 #include <QToolButton>
 #include <QtGlobal>
 
@@ -75,41 +75,40 @@ void UVEditor::createGui(GLContextManager &contextManager) {
     connect(m_rotateTextureCCWButton, &QAbstractButton::clicked, this, &UVEditor::rotateTextureCCWClicked);
     connect(m_rotateTextureCWButton, &QAbstractButton::clicked, this, &UVEditor::rotateTextureCWClicked);
 
-    auto *gridLabel = new QLabel("Grid ");
-    makeEmphasized(gridLabel);
     m_xSubDivisionEditor = new QSpinBox();
     m_xSubDivisionEditor->setRange(1, 16);
     m_xSubDivisionEditor->setValue(1);
+    m_xSubDivisionEditor->setToolTip(tr("Horizontal grid subdivisions"));
 
     m_ySubDivisionEditor = new QSpinBox();
     m_ySubDivisionEditor->setRange(1, 16);
     m_ySubDivisionEditor->setValue(1);
+    m_ySubDivisionEditor->setToolTip(tr("Vertical grid subdivisions"));
 
     connect(m_xSubDivisionEditor, QOverload<int>::of(&QSpinBox::valueChanged), this, &UVEditor::subDivisionChanged);
     connect(m_ySubDivisionEditor, QOverload<int>::of(&QSpinBox::valueChanged), this, &UVEditor::subDivisionChanged);
 
-    auto *bottomLayout = new QHBoxLayout();
-    bottomLayout->setContentsMargins(LayoutConstants::NarrowHMargin, 0, LayoutConstants::NarrowHMargin, 0);
-    bottomLayout->setSpacing(LayoutConstants::NarrowHMargin);
-    bottomLayout->addWidget(m_resetTextureButton);
-    bottomLayout->addWidget(m_resetTextureToWorldButton);
-    bottomLayout->addWidget(m_flipTextureHButton);
-    bottomLayout->addWidget(m_flipTextureVButton);
-    bottomLayout->addWidget(m_rotateTextureCCWButton);
-    bottomLayout->addWidget(m_rotateTextureCWButton);
-    bottomLayout->addStretch();
-    bottomLayout->addWidget(gridLabel);
-    bottomLayout->addWidget(new QLabel("X:"));
-    bottomLayout->addWidget(m_xSubDivisionEditor);
-    bottomLayout->addSpacing(LayoutConstants::MediumHMargin - LayoutConstants::NarrowHMargin);
-    bottomLayout->addWidget(new QLabel("Y:"));
-    bottomLayout->addWidget(m_ySubDivisionEditor);
+    auto* toolbar = createInspectorToolBar(this);
+    toolbar->addWidget(m_resetTextureButton);
+    toolbar->addWidget(m_resetTextureToWorldButton);
+    toolbar->addWidget(m_flipTextureHButton);
+    toolbar->addWidget(m_flipTextureVButton);
+    toolbar->addWidget(m_rotateTextureCCWButton);
+    toolbar->addWidget(m_rotateTextureCWButton);
+    auto* gridXLabel = new QLabel(tr("Grid X:"));
+    gridXLabel->setBuddy(m_xSubDivisionEditor);
+    toolbar->addWidget(gridXLabel);
+    toolbar->addWidget(m_xSubDivisionEditor);
+    auto* gridYLabel = new QLabel(tr("Y:"));
+    gridYLabel->setBuddy(m_ySubDivisionEditor);
+    toolbar->addWidget(gridYLabel);
+    toolbar->addWidget(m_ySubDivisionEditor);
 
     auto *outerLayout = new QVBoxLayout();
     outerLayout->setContentsMargins(0, 0, 0, 0);
-    outerLayout->setSpacing(LayoutConstants::NarrowVMargin);
+    outerLayout->setSpacing(0);
+    outerLayout->addWidget(toolbar);
     outerLayout->addWidget(m_uvView, 1);
-    outerLayout->addLayout(bottomLayout);
     setLayout(outerLayout);
 
     updateButtons();

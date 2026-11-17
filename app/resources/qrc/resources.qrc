@@ -2,5 +2,8 @@
 <RCC version="1.0">
     <qresource>
         <file>opengl_buglist.json</file>
+        <file alias="down.svg">../graphics/images/Down.svg</file>
+
+
     </qresource>
 </RCC>

@@ -22,6 +22,9 @@
 #include "GL.h"
 #include "Macros.h"
 #include "Vbo.h"
+#include "VertexArray.h"
+
+#include <vm/bbox.h>
 
 #include <algorithm> // for std::max
 
@@ -53,6 +56,31 @@ static GLenum usageToOpenGL(const VboUsage usage) {
 // VboManager
 
 VboManager::VboManager(ShaderManager *shaderManager) : m_peakVboCount(0u), m_currentVboCount(0u), m_currentVboSize(0u), m_shaderManager(shaderManager) {
+}
+
+VboManager::~VboManager() = default;
+
+VertexArray &VboManager::unitCubeVertices() {
+    if (!m_unitCubeVertices) {
+        using Vertex = GLVertexTypes::P3::Vertex;
+        auto vertices = std::vector<Vertex>{};
+        vertices.reserve(36);
+        const auto cube = vm::bbox3f(vm::vec3f::zero(), vm::vec3f::fill(1.0f));
+        cube.for_each_face([&](const auto &a, const auto &b, const auto &c, const auto &d, const auto &) {
+            vertices.emplace_back(a);
+            vertices.emplace_back(b);
+            vertices.emplace_back(c);
+            vertices.emplace_back(a);
+            vertices.emplace_back(c);
+            vertices.emplace_back(d);
+        });
+        m_unitCubeVertices = std::make_unique<VertexArray>(VertexArray::move(std::move(vertices)));
+    }
+    return *m_unitCubeVertices;
+}
+
+void VboManager::clearCachedGeometry() {
+    m_unitCubeVertices.reset();
 }
 
 Vbo *VboManager::allocateVbo(VboType type, const size_t capacity, const VboUsage usage) {

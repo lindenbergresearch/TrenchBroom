@@ -56,6 +56,7 @@ class QLayout;
 class QLineEdit;
 
 class QMainWindow;
+class QMenu;
 
 class QPalette;
 
@@ -67,6 +68,8 @@ class QString;
 
 class QTableView;
 
+class QToolBar;
+
 class QToolButton;
 
 class QVBoxLayout;
@@ -77,6 +80,7 @@ namespace TrenchBroom {
 class Color;
 
 namespace View {
+void prepareContextMenu(QMenu& menu);
 enum class MapTextEncoding;
 
 class SyncHeightEventFilter : public QObject {
@@ -137,6 +141,8 @@ bool widgetOrChildHasFocus(const QWidget* widget);
 class MapFrame;
 
 MapFrame* findMapFrame(QWidget* widget);
+
+QToolBar* createInspectorToolBar(QWidget* parent = nullptr);
 
 QToolButton* createBitmapButton(const std::string& image, const QString& tooltip, QWidget* parent = nullptr);
 
@@ -219,6 +225,10 @@ int getCommonFieldHeight();
 
 QWidget* makeDefault(QWidget* widget, bool resetFont = true);
 
+// Helpers assign semantic QSS roles; presentation is defined in base.qss.
+void repolishWidget(QWidget* widget);
+QWidget* setTextStyleRole(QWidget* widget, const QString& role);
+
 QWidget* makeEmphasized(QWidget* widget);
 
 QWidget* makeItalic(QWidget* widget);
@@ -229,27 +239,21 @@ QWidget* makeInfo(QWidget* widget);
 
 QWidget* makeSmall(QWidget* widget);
 
-QWidget* makeBigger(QWidget* widget, int value);
-
 QWidget* makeTitle(QWidget* widget);
 
 QWidget* makeSubTitle(QWidget* widget);
 
 QWidget* makeHeader(QWidget* widget);
 
-QWidget* makePanelTitle(QWidget* widget, bool bold = false, bool isSubTitle = false);
-
 QWidget* makeError(QWidget* widget);
 
-QWidget* makeMono(QWidget* widget, int size);
+QWidget* makeMono(QWidget* widget);
 
-QWidget* colorizeWidget(QWidget* widget, const QColor& color, QPalette::ColorRole role = QPalette::ColorRole::Text);
+QWidget* makeSelected(QWidget* widget);
 
-QWidget* makeSelected(QWidget* widget, const QPalette& defaultPalette);
+QWidget* makeBright(QWidget* widget);
 
-QWidget* makeBright(QWidget* widget, const QPalette& defaultPalette);
-
-QWidget* makeUnselected(QWidget* widget, const QPalette& defaultPalette);
+QWidget* makeUnselected(QWidget* widget);
 
 Color fromQColor(const QColor& color);
 
@@ -265,7 +269,6 @@ QString toStyleSheetRGBA(const QPalette& palette, QPalette::ColorRole role, QPal
 
 QString toStyleSheetRGBA(const QPalette& palette, QPalette::ColorRole role, int adjustment = 0);
 
-void setStyledBorder(QWidget* widget, int width, const QColor& color, const char* type = "solid");
 
 void setWindowIconTB(QWidget* window);
 

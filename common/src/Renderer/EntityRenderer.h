@@ -20,6 +20,8 @@
 #pragma once
 
 #include "Color.h"
+#include "Model/EntityNode.h"
+#include "Renderer/Camera.h"
 #include "Renderer/EdgeRenderer.h"
 #include "Renderer/EntityModelRenderer.h"
 #include "Renderer/Renderable.h"
@@ -49,7 +51,7 @@ class AttrString;
 
 class EntityRenderer {
   private:
-    class EntityClassnameAnchor;
+    class EntityClassNameAnchor;
 
     Assets::EntityModelManager &m_entityModelManager;
     const Model::EditorContext &m_editorContext;
@@ -165,6 +167,9 @@ class EntityRenderer {
     AttrString entityString(const Model::EntityNode *entityNode) const;
 
     const Color &boundsColor(const Model::EntityNode *entityNode) const;
+
+
+
 };
 } // namespace Renderer
 } // namespace TrenchBroom

@@ -18,6 +18,8 @@
  */
 
 #include <QMenu>
+#include <QMenuBar>
+#include <QPointer>
 #include <QSettings>
 #include <QtTest/QSignalSpy>
 
@@ -25,7 +27,7 @@
 
 #include "kdl/vector_utils.h"
 
-#include "Catch2.h"
+#include <catch2/catch.hpp>
 
 namespace TrenchBroom::View
 {
@@ -526,5 +528,68 @@ TEST_CASE("RecentDocuments")
 
     );
   }
+}
+TEST_CASE("RecentDocuments ignores menus destroyed with their parent", "[recent-documents]")
+{
+  saveRecentDocuments({"first.map", "second.map", "third.map"});
+  RecentDocuments recentDocuments{5, [](const auto&) { return true; }};
+  recentDocuments.reload();
+  {
+    // Reproduce the former macOS startup menu's lifetime.
+    QMenuBar menuBar;
+    recentDocuments.addMenu(*menuBar.addMenu("Recent"));
+  }
+  QMenu liveMenu;
+  recentDocuments.addMenu(liveMenu);
+  QSignalSpy changed{&recentDocuments, SIGNAL(didChange())};
+  recentDocuments.updatePath("first.map");
+  CHECK(changed.count() == 0);
+  recentDocuments.updatePath("second.map");
+  CHECK(changed.count() == 1);
+  CHECK(getTexts(liveMenu.actions()) == std::vector<QString>{"second.map", "first.map", "third.map"});
+  CHECK(loadRecentDocuments(5) == std::vector<std::filesystem::path>{"second.map", "first.map", "third.map"});
+
+  recentDocuments.removePath("first.map");
+  CHECK(getTexts(liveMenu.actions()) == std::vector<QString>{"second.map", "third.map"});
+  saveRecentDocuments({"third.map", "second.map"});
+  recentDocuments.reload();
+  CHECK(getTexts(liveMenu.actions()) == std::vector<QString>{"third.map", "second.map"});
+}
+
+TEST_CASE("RecentDocuments retains the opened path while rebuilding its menu", "[recent-documents]")
+{
+  const auto first = std::filesystem::path{"maps/first-document-with-a-long-filename.map"};
+  const auto second = std::filesystem::path{"maps/second-document-with-a-long-filename.map"};
+  saveRecentDocuments({first, second});
+  RecentDocuments recentDocuments{5, [](const auto&) { return true; }};
+  recentDocuments.reload();
+  QMenu menu;
+  recentDocuments.addMenu(menu);
+  QPointer<QAction> action = menu.actions().at(1);
+  bool loaded = false;
+  QObject::connect(&recentDocuments, &RecentDocuments::loadDocument, &menu,
+    [&](const std::filesystem::path& path) {
+      CHECK(path == second);
+      recentDocuments.updatePath(path); // Deletes the action that emitted this signal.
+      CHECK(action.isNull());
+      CHECK(path == second);
+      loaded = true;
+    });
+  action->trigger();
+  CHECK(loaded);
+  CHECK(recentDocuments.recentDocuments() == std::vector<std::filesystem::path>{second, first});
+}
+
+TEST_CASE("RecentDocuments disconnects actions when the manager is destroyed", "[recent-documents]")
+{
+  QMenu menu;
+  {
+    RecentDocuments recentDocuments{5, [](const auto&) { return true; }};
+    recentDocuments.updatePath("first.map");
+    recentDocuments.addMenu(menu);
+  }
+  REQUIRE(menu.actions().size() == 1);
+  menu.actions().front()->trigger(); // The menu can safely outlive the manager.
+  CHECK(menu.actions().front()->text() == "first.map");
 }
 } // namespace TrenchBroom::View

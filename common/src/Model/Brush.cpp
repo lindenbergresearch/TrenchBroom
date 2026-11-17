@@ -159,6 +159,15 @@ std::optional<size_t> Brush::findFace(const vm::vec3 &normal) const {
     });
 }
 
+bool Brush::isAxisAlignedBox() const {
+    if (faceCount() != 6) return false;
+    for (size_t axis = 0; axis < 3; ++axis) {
+        const auto normal = vm::vec3::axis(axis);
+        if (!findFace(normal) || !findFace(-normal)) return false;
+    }
+    return true;
+}
+
 std::optional<size_t> Brush::findFace(const vm::plane3 &boundary) const {
     return kdl::vec_index_of(m_faces, [&](const BrushFace &face) {
         return vm::is_equal(face.boundary(), boundary, vm::C::almost_zero());

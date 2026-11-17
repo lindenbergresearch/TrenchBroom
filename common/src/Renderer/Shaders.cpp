@@ -38,6 +38,12 @@ const auto VaryingPUniformCShader = ShaderConfig{
     {"VaryingPC.fragsh"},
 };
 
+const auto SelectionBoundsShader = ShaderConfig{
+    "Selection Bounds",
+    {"SelectionBounds.vertsh"},
+    {"AngleShading.fragsh", "SelectionBounds.fragsh"},
+};
+
 const auto SelectionGuideShader = ShaderConfig{
     "Selection Guides",
     {"OverlaySize.vertsh", "SelectionGuide.vertsh"},
@@ -56,16 +62,21 @@ const auto EntityModelShader = ShaderConfig{
     {"Lighting.fragsh", "MapBounds.fragsh", "EntityModel.fragsh"},
 };
 
+const auto SkyboxShader = ShaderConfig{
+    "Skybox", {"Skybox.vertsh"},
+    {"Sky.fragsh", "Skybox.fragsh"}
+};
+
 const auto FaceShader = ShaderConfig{
     "Face",
     {"Face.vertsh"},
-    {"Lighting.fragsh", "Grid.fragsh", "MapBounds.fragsh", "Face.fragsh"},
+    {"Sky.fragsh", "Lighting.fragsh", "Grid.fragsh", "MapBounds.fragsh", "AngleShading.fragsh", "Face.fragsh"},
 };
 
 const auto PatchShader = ShaderConfig{
     "Patch",
     {"Face.vertsh"},
-    {"Lighting.fragsh", "Grid.fragsh", "MapBounds.fragsh", "Face.fragsh"},
+    {"Sky.fragsh", "Lighting.fragsh", "Grid.fragsh", "MapBounds.fragsh", "AngleShading.fragsh", "Face.fragsh"},
 };
 
 const auto EdgeShader = ShaderConfig{

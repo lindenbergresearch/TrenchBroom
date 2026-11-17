@@ -141,6 +141,7 @@ class EntityPropertyModel : public QAbstractTableModel {
     static const int ColumnKey = 1;
     static const int ColumnValue = 2;
     static const int NumColumns = 3;
+    static constexpr int SingleLineRole = Qt::UserRole + 1;
 
   private:
     std::vector<PropertyRow> m_rows;

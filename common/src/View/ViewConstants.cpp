@@ -21,22 +21,22 @@
 
 #include <QColor>
 #include <QDebug>
-#include <QFont>
 #include <QWidget>
 
 #include "TrenchBroomApp.h"
 
 namespace TrenchBroom {
 namespace View {
-namespace Fonts {
-QFont fixedWidthFont() {
-    auto size = TrenchBroomApp::instance().getUIFont().pointSize();
-    auto font = TrenchBroomApp::instance().getConsoleFont();
-    font.setPointSize(size);
 
-    return font;
-}
-} // namespace Fonts
+//namespace Fonts {
+//QFont fixedWidthFont() {
+//    auto size = TrenchBroomApp::instance().getUIFont().pointSize();
+//    auto font = TrenchBroomApp::instance().getConsoleFont();
+//    font.setPointSize(size);
+//
+//    return font;
+//}
+//} // namespace Fonts
 
 namespace Colors {
 QColor defaultText() {
@@ -68,22 +68,6 @@ QColor disabledText() {
 QColor midlight() {
     QPalette pal;
     QColor result = pal.color(QPalette::Disabled, QPalette::Midlight);
-    return result;
-}
-
-/**
- * Table cell/text edit widget disabled text. Intended for use against a QPalette::Base
- * background.
- */
-QColor disabledCellText() {
-    QPalette pal;
-    QColor result = pal.color(QPalette::Disabled, QPalette::Text);
-    return result;
-}
-
-QColor disabledText(const QWidget *widget) {
-    const QPalette &pal = widget->palette();
-    QColor result = pal.color(QPalette::Disabled, QPalette::WindowText);
     return result;
 }
 

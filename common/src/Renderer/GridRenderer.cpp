@@ -29,6 +29,8 @@
 #include "Renderer/ShaderManager.h"
 #include "Renderer/Shaders.h"
 
+#include <algorithm>
+
 #include <vm/bbox.h>
 #include <vm/vec.h>
 
@@ -66,17 +68,25 @@ void GridRenderer::doPrepareVertices(VboManager &vboManager) {
     m_vertexArray.prepare(vboManager);
 }
 
+void configureGridAxisColors(ActiveShader &shader) {
+    shader.set("GridAxisColorMix", std::clamp(pref(Preferences::GridAxisColorMix), 0.0f, 1.0f));
+    shader.set("GridXAxisColor", pref(Preferences::XAxisColor));
+    shader.set("GridYAxisColor", pref(Preferences::YAxisColor));
+    shader.set("GridZAxisColor", pref(Preferences::ZAxisColor));
+}
+
 void GridRenderer::doRender(RenderContext &renderContext) {
     if (renderContext.showGrid()) {
         const auto &camera = renderContext.camera();
 
         ActiveShader shader(renderContext.shaderManager(), Shaders::Grid2DShader);
+        configureGridAxisColors(shader);
         shader.set("Normal", -camera.direction());
         shader.set("RenderGrid", renderContext.showGrid());
         shader.set("GridSize", static_cast<float>(renderContext.gridSize()));
         shader.set("GridAlpha", pref(Preferences::GridAlpha) * 0.75f);
         shader.set("GridColor", pref(Preferences::GridColor2D));
-        shader.set("GridWidth", pref(Preferences::GridLineWidth));
+        shader.set("GridWidth", std::max(1.0f, pref(Preferences::GridLineWidth)) * renderContext.dpiScale());
         shader.set("MajorDivisionSize", pref(Preferences::GridMajorDivisionSize));
         shader.set("CameraZoom", camera.zoom());
 

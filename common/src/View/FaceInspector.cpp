@@ -18,6 +18,9 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "FaceInspector.h"
 
+#include <QStyle>
+#include <QToolBar>
+
 #include <QLabel>
 #include <QVBoxLayout>
 
@@ -33,10 +36,11 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "View/FaceAttribsEditor.h"
 #include "View/MapDocument.h"
 #include "View/QtUtils.h"
-#include "View/Splitter.h"
 #include "View/SwitchableTitledPanel.h"
 #include "View/TextureBrowser.h"
 #include "View/TextureCollectionEditor.h"
+#include "View/TitleBar.h"
+#include "View/TitledPanel.h"
 
 #include "kdl/memory_utils.h"
 
@@ -44,55 +48,56 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom::View {
 FaceInspector::FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent)
-    : TabBookPage{parent}, m_document{std::move(document)} {
+    : QWidget(parent), m_document{std::move(document)} {
     createGui(contextManager);
     connectObservers();
 }
 
-FaceInspector::~FaceInspector() {
-    saveWindowState(m_splitter);
+std::vector<InspectorToolSection> FaceInspector::toolSections() const {
+    return {
+        {QStringLiteral("face-attributes"), tr("Face Attributes"), m_faceAttributesPanel,
+            m_faceAttributesPanel ? m_faceAttributesPanel->getTitleBar() : nullptr, 0},
+        {QStringLiteral("texture-browser"), tr("Texture Browser"), m_textureBrowserPanel,
+            m_textureBrowserPanel ? m_textureBrowserPanel->getTitleBar() : nullptr, 1},
+    };
 }
 
 bool FaceInspector::cancelMouseDrag() {
-    return m_faceAttribsEditor->cancelMouseDrag();
+    return m_faceAttribsEditor && m_faceAttribsEditor->cancelMouseDrag();
 }
 
 void FaceInspector::revealTexture(const Assets::Texture *texture) {
-    m_textureBrowser->revealTexture(texture);
-    m_textureBrowser->setSelectedTexture(texture);
+    if (m_textureBrowser) {
+        m_textureBrowserPanel->setCurrentIndex(0);
+        m_textureBrowser->revealTexture(texture);
+        m_textureBrowser->setSelectedTexture(texture);
+    }
 }
 
 void FaceInspector::createGui(GLContextManager &contextManager) {
-    m_splitter = new Splitter{Qt::Vertical};
-    m_splitter->setObjectName("FaceInspector_Splitter");
+    m_faceAttributesPanel = createFaceAttribsEditor(contextManager);
+    m_textureBrowserPanel = createTextureBrowser(contextManager);
+    connect(m_textureBrowser.data(), &TextureBrowser::textureSelected, this, &FaceInspector::textureSelected);
 
-    m_splitter->addWidget(createFaceAttribsEditor(contextManager));
-    m_splitter->addWidget(createTextureBrowser(contextManager));
-
-    // when the window resizes, the browser should get extra space
-    m_splitter->setStretchFactor(0, 0);
-    m_splitter->setStretchFactor(1, 1);
-
-    auto *layout = new QVBoxLayout{};
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(m_splitter, 1);
-    setLayout(layout);
-
-    connect(m_textureBrowser, &TextureBrowser::textureSelected, this, &FaceInspector::textureSelected);
-
-    restoreWindowState(m_splitter);
 }
 
-QWidget *FaceInspector::createFaceAttribsEditor(GLContextManager &contextManager) {
+TitledPanel *FaceInspector::createFaceAttribsEditor(GLContextManager &contextManager) {
+    auto* panel = new TitledPanel(tr("Face Attributes"), this);
+    panel->setObjectName("FaceInspector_AttributesPanel");
     m_faceAttribsEditor = new FaceAttribsEditor{m_document, contextManager};
-    return m_faceAttribsEditor;
+
+    auto* layout = new QVBoxLayout(panel->getPanel());
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_faceAttribsEditor);
+    return panel;
 }
 
-QWidget *FaceInspector::createTextureBrowser(GLContextManager &contextManager) {
-    auto *panel = new SwitchableTitledPanel{tr("Texture Browser"), {{tr("Browser"), tr("Settings")}}};
+SwitchableTitledPanel *FaceInspector::createTextureBrowser(GLContextManager &contextManager) {
+    auto *panel = new SwitchableTitledPanel(tr("Texture Browser"), this);
+    panel->setObjectName("FaceInspector_TextureBrowserPanel");
 
     m_textureBrowser = new TextureBrowser{m_document, contextManager};
+    m_textureBrowser->setToolBarAtTop();
 
     auto *textureBrowserLayout = new QVBoxLayout{};
     textureBrowserLayout->setContentsMargins(0, 0, 0, 0);
@@ -109,6 +114,15 @@ QWidget *FaceInspector::createTextureBrowser(GLContextManager &contextManager) {
     textureCollectionEditorLayout->addWidget(m_textureBrowserInfo, 0);
 
     panel->getPanel(1)->setLayout(textureCollectionEditorLayout);
+
+    const auto addModeAction = [panel](QToolBar* toolbar, QStyle::StandardPixmap icon, const QString& text, size_t mode) {
+        auto* action = new QAction(panel->style()->standardIcon(icon), text, toolbar);
+        action->setObjectName("InspectorTextureModeAction");
+        toolbar->insertAction(toolbar->actions().value(0), action);
+        QObject::connect(action, &QAction::triggered, panel, [panel, mode] { panel->setCurrentIndex(mode); });
+    };
+    addModeAction(m_textureBrowser->toolBar(), QStyle::SP_FileDialogDetailedView, tr("Settings"), 1);
+    addModeAction(textureCollectionEditor->toolBar(), QStyle::SP_FileDialogContentsView, tr("Browser"), 0);
 
     return panel;
 }
@@ -169,6 +183,8 @@ void FaceInspector::connectObservers() {
 void FaceInspector::documentWasNewedOrOpened(MapDocument *document) {
     const auto &game = *document->game();
     const auto &gameConfig = Model::GameFactory::instance().gameConfig(game.gameName());
-    m_textureBrowserInfo->setVisible(gameConfig.textureConfig.property != std::nullopt);
+    if (m_textureBrowserInfo) {
+        m_textureBrowserInfo->setVisible(gameConfig.textureConfig.property != std::nullopt);
+    }
 }
 } // namespace TrenchBroom::View

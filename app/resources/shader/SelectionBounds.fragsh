@@ -1,0 +1,33 @@
+#version 120
+
+uniform vec4 Color;
+uniform float ShadeLevel;
+uniform float DpiScale;
+varying vec3 boxPosition;
+varying vec3 viewVector;
+
+float angularShade(vec3 viewVector, vec3 normal, float strength);
+
+void main() {
+    vec3 dx = dFdx(boxPosition);
+    vec3 dy = dFdy(boxPosition);
+    // Each face has one constant coordinate. This normal faces the viewer,
+    // including when the viewer is inside the box.
+    vec3 normal = normalize(cross(dx, dy));
+    vec3 footprint = sqrt(dx * dx + dy * dy);
+    vec3 distanceToEdge = min(boxPosition, 1.0 - boxPosition) / max(footprint, vec3(0.0000001));
+    distanceToEdge = mix(distanceToEdge, vec3(1.0e6), step(vec3(0.5), abs(normal)));
+
+    // Distances are in screen pixels. Ignore triangle diagonals, and reinforce
+    // corners where both of the face's real edges are nearby.
+    float nearest = min(distanceToEdge.x, min(distanceToEdge.y, distanceToEdge.z));
+    float second = max(min(distanceToEdge.x, distanceToEdge.y),
+                       min(max(distanceToEdge.x, distanceToEdge.y), distanceToEdge.z));
+    float edge = 1.0 - smoothstep(0.9 * DpiScale, 2.2 * DpiScale, nearest);
+    float corner = 1.0 - smoothstep(2.2 * DpiScale, 3.4 * DpiScale, second);
+
+    float shade = angularShade(viewVector, normal, ShadeLevel);
+    vec3 color = mix(Color.rgb, vec3(1.0), 0.18 * edge + 0.14 * corner) * shade;
+    float edgeAlpha = clamp(sqrt(Color.a) * (1.35 + 0.45 * corner), Color.a, 1.0);
+    gl_FragColor = vec4(color, mix(Color.a, edgeAlpha, max(edge, corner)));
+}

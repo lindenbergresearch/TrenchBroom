@@ -154,21 +154,22 @@ template<GLenum D, size_t S> class GLVertexAttributeColor {
  * @tparam D the vertex component type
  * @tparam S the number of components
  */
-template<GLenum D, size_t S> class GLVertexAttributeTexCoord0 {
+template<GLenum D, size_t S, GLenum Unit = GL_TEXTURE0> class GLVertexAttributeTexCoord0 {
   public:
     using ComponentType = typename GLType<D>::Type;
     using ElementType = vm::vec<ComponentType, S>;
     static const size_t Size = sizeof(ElementType);
 
     static void setup(ShaderProgram * /* program */, const size_t /* index */, const size_t stride, const size_t offset) {
-        glAssert(glClientActiveTexture(GL_TEXTURE0));
+        glAssert(glClientActiveTexture(Unit));
         glAssert(glEnableClientState(GL_TEXTURE_COORD_ARRAY));
         glAssert(glTexCoordPointer(static_cast<GLint>(S), D, static_cast<GLsizei>(stride), reinterpret_cast<GLvoid *>(offset)));
     }
 
     static void cleanup(ShaderProgram * /* program */, const size_t /* index */) {
-        glAssert(glClientActiveTexture(GL_TEXTURE0));
+        glAssert(glClientActiveTexture(Unit));
         glAssert(glDisableClientState(GL_TEXTURE_COORD_ARRAY));
+        glAssert(glClientActiveTexture(GL_TEXTURE0));
     }
 
     // Non-instantiable
@@ -182,6 +183,7 @@ using P2 = GLVertexAttributePosition<GL_FLOAT, 2>;
 using P3 = GLVertexAttributePosition<GL_FLOAT, 3>;
 using N = GLVertexAttributeNormal<GL_FLOAT, 3>;
 using T02 = GLVertexAttributeTexCoord0<GL_FLOAT, 2>;
+using T12 = GLVertexAttributeTexCoord0<GL_FLOAT, 2, GL_TEXTURE1>;
 using C4 = GLVertexAttributeColor<GL_FLOAT, 4>;
 } // namespace GLVertexAttributeTypes
 } // namespace Renderer

@@ -97,6 +97,8 @@ class Brush {
 
     size_t faceCount() const;
 
+    bool isAxisAlignedBox() const;
+
     const std::vector<BrushFace> &faces() const;
 
     std::vector<BrushFace> &faces();

@@ -19,28 +19,19 @@
 
 #include "MapInspector.h"
 
-#include <QGridLayout>
-#include <QHBoxLayout>
+#include <QComboBox>
+#include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QRadioButton>
+#include <QToolBar>
 
-#include "IO/ResourceUtils.h"
-#include "Model/EntityNodeIndex.h"
 #include "Model/EntityProperties.h"
 #include "Model/WorldNode.h"
-#include "View/BorderLine.h"
-#include "View/ClickableLabel.h"
-#include "View/CollapsibleTitledPanel.h"
-#include "View/Inspector.h"
-#include "View/LayerEditor.h"
+#include "View/TitledPanel.h"
 #include "View/MapDocument.h"
-#include "View/MapSearchListBox.h"
-#include "View/MapView.h"
 #include "View/ModEditor.h"
 #include "View/QtUtils.h"
-#include "View/Splitter.h"
-#include "View/TitledPanel.h"
+#include "View/TitleBar.h"
 #include "View/ViewConstants.h"
 
 #include <kdl/memory_utils.h>
@@ -54,57 +45,28 @@ namespace TrenchBroom {
 namespace View {
 // MapInspector
 
-MapInspector::MapInspector(std::weak_ptr<MapDocument> document, MapView *mapView, Inspector *inspector, QWidget *parent)
-    : TabBookPage(parent), m_mapPropertiesEditorPanel(nullptr), m_modEditorPanel(nullptr), m_mapView(mapView), m_inspector(inspector) {
+MapInspector::MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent)
+    : QWidget(parent) {
     createGui(document);
     setObjectName("MapInspector_Widget");
 }
 
-MapInspector::~MapInspector() {
-    saveWindowState(m_mapPropertiesEditorPanel);
-    saveWindowState(m_modEditorPanel);
-    saveWindowState(m_mapSearchPanel);
+std::vector<InspectorToolSection> MapInspector::toolSections() const {
+    return {
+        {QStringLiteral("map-properties"), tr("Map Properties"), m_mapPropertiesEditorPanel,
+         m_mapPropertiesEditorPanel ? m_mapPropertiesEditorPanel->getTitleBar() : nullptr, 0},
+        {QStringLiteral("mods"), tr("Mods"), m_modEditorPanel,
+         m_modEditorPanel ? m_modEditorPanel->getTitleBar() : nullptr, 1},
+    };
 }
 
 void MapInspector::createGui(std::weak_ptr<MapDocument> document) {
     m_mapPropertiesEditorPanel = createMapPropertiesEditor(document);
     m_modEditorPanel = createModEditor(document);
-    m_layerEditorPanel = createLayerEditor(document);
-    m_mapSearchPanel = createSearchList(document);
-
-    m_splitter = new Splitter(Qt::Vertical);
-    m_splitter->setObjectName("MapProperties_Splitter");
-
-    m_splitter->addWidget(m_layerEditorPanel);
-    m_splitter->addWidget(m_mapSearchPanel);
-
-    m_layerEditorPanel->setMinimumSize(100, 150);
-    m_mapSearchPanel->setMinimumSize(100, 150);
-
-    auto *sizer = new QVBoxLayout();
-    sizer->setContentsMargins(0, 0, 0, 0);
-    sizer->setSpacing(LayoutConstants::NarrowVMargin);
-    sizer->addWidget(m_splitter, 1);
-    sizer->addWidget(m_mapPropertiesEditorPanel, 0);
-    sizer->addWidget(m_modEditorPanel, 0);
-
-    setLayout(sizer);
 }
 
-TitledPanel *MapInspector::createLayerEditor(std::weak_ptr<MapDocument> document) {
-    TitledPanel *titledPanel = new TitledPanel(tr("Layers"));
-    m_layerEditor = new LayerEditor(document);
-
-    auto *sizer = new QVBoxLayout();
-    sizer->setContentsMargins(0, 0, 0, 0);
-    sizer->addWidget(m_layerEditor, 1);
-    titledPanel->getPanel()->setLayout(sizer);
-
-    return titledPanel;
-}
-
-CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(std::weak_ptr<MapDocument> document) {
-    CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Map Properties"));
+TitledPanel *MapInspector::createMapPropertiesEditor(std::weak_ptr<MapDocument> document) {
+    TitledPanel *titledPanel = new TitledPanel(tr("Map Properties"), this);
     titledPanel->setObjectName("MapInspector_MapPropertiesPanel");
 
     auto *editor = new MapPropertiesEditor(document);
@@ -114,13 +76,11 @@ CollapsibleTitledPanel *MapInspector::createMapPropertiesEditor(std::weak_ptr<Ma
     sizer->addWidget(editor, 1);
     titledPanel->getPanel()->setLayout(sizer);
 
-    restoreWindowState(titledPanel);
-
     return titledPanel;
 }
 
-CollapsibleTitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument> document) {
-    CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Mods"));
+TitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument> document) {
+    TitledPanel *titledPanel = new TitledPanel(tr("Mods"), this);
     titledPanel->setObjectName("MapInspector_ModsPanel");
 
     ModEditor *modEditor = new ModEditor(document);
@@ -130,36 +90,13 @@ CollapsibleTitledPanel *MapInspector::createModEditor(std::weak_ptr<MapDocument>
     sizer->addWidget(modEditor, 1);
     titledPanel->getPanel()->setLayout(sizer);
 
-    restoreWindowState(titledPanel);
-
-    return titledPanel;
-}
-
-CollapsibleTitledPanel *MapInspector::createSearchList(std::weak_ptr<MapDocument> document) {
-    CollapsibleTitledPanel *titledPanel = new CollapsibleTitledPanel(tr("Search"));
-    titledPanel->setObjectName("MapInspector_SearchBoxPanel");
-
-    m_mapSearchListBox = new MapSearchListBox(document, m_mapView, m_inspector);
-    auto *layout = new QVBoxLayout();
-    m_searchBoxEdit = createSearchBox();
-
-    connect(m_searchBoxEdit, &QLineEdit::textEdited, m_mapSearchListBox, &MapSearchListBox::triggerSearch);
-
-    layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
-
-    layout->addWidget(m_searchBoxEdit);
-    layout->addWidget(m_mapSearchListBox, 1);
-    titledPanel->getPanel()->setLayout(layout);
-
-    restoreWindowState(titledPanel);
-
     return titledPanel;
 }
 
 // MapPropertiesEditor
 
 MapPropertiesEditor::MapPropertiesEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_updatingGui(false), m_softBoundsDisabled(nullptr), m_softBoundsFromGame(nullptr), m_softBoundsFromGameMinLabel(nullptr), m_softBoundsFromGameMaxLabel(nullptr), m_softBoundsFromMap(nullptr), m_softBoundsFromMapMinEdit(nullptr), m_softBoundsFromMapMaxEdit(nullptr) {
+    : QWidget(parent), m_document(document), m_updatingGui(false), m_softBoundsFromGameMinLabel(nullptr), m_softBoundsFromGameMaxLabel(nullptr), m_softBoundsFromMapMinEdit(nullptr), m_softBoundsFromMapMaxEdit(nullptr) {
     createGui();
     connectObservers();
 }
@@ -193,114 +130,57 @@ std::optional<vm::bbox3> MapPropertiesEditor::parseLineEdits() {
 }
 
 void MapPropertiesEditor::createGui() {
-    setPalette(qApp->palette());
-    setAutoFillBackground(true);
-    setBackgroundRole(QPalette::ColorRole::Window);
     setObjectName("MapPropertiesEditor");
+    setAttribute(Qt::WA_StyledBackground);
 
-    m_softBoundsDisabled = new QRadioButton();
-    auto *softBoundsDisabledLabel = new ClickableLabel(tr("Soft bounds disabled"));
+    auto *toolbar = createInspectorToolBar();
+    auto *caption = new QLabel(tr("Soft bounds"));
+    m_boundsMode = new QComboBox();
+    caption->setBuddy(m_boundsMode);
+    m_boundsMode->setAccessibleName(caption->text());
+    m_boundsMode->addItems({tr("Disabled"), tr("Game default"), tr("Custom")});
+    toolbar->addWidget(caption);
+    toolbar->addWidget(m_boundsMode);
 
-    m_softBoundsFromGame = new QRadioButton();
     m_softBoundsFromGameMinLabel = new QLabel();
     m_softBoundsFromGameMaxLabel = new QLabel();
-    auto *softBoundsFromGameLabel = new ClickableLabel(tr("Use game default"));
-
-    auto *minCaptionLabel = new QLabel(tr("Min:"));
-    auto *maxCaptionLabel = new QLabel(tr("Max:"));
-
-    makeInfo(minCaptionLabel);
-    makeInfo(maxCaptionLabel);
     makeInfo(m_softBoundsFromGameMinLabel);
     makeInfo(m_softBoundsFromGameMaxLabel);
-
-    auto *softBoundsFromGameValueLayout = new QHBoxLayout();
-    softBoundsFromGameValueLayout->setContentsMargins(0, 0, 0, 0);
-    softBoundsFromGameValueLayout->setSpacing(LayoutConstants::MediumHMargin);
-    softBoundsFromGameValueLayout->addWidget(minCaptionLabel);
-    softBoundsFromGameValueLayout->addWidget(m_softBoundsFromGameMinLabel);
-    softBoundsFromGameValueLayout->addWidget(maxCaptionLabel);
-    softBoundsFromGameValueLayout->addWidget(m_softBoundsFromGameMaxLabel);
-    softBoundsFromGameValueLayout->addStretch(1);
-
-    auto *softBoundsFromGameLayout = new QVBoxLayout();
-    softBoundsFromGameLayout->setContentsMargins(0, 0, 0, 0);
-    softBoundsFromGameLayout->setSpacing(LayoutConstants::NarrowVMargin);
-    softBoundsFromGameLayout->addWidget(softBoundsFromGameLabel);
-    softBoundsFromGameLayout->addLayout(softBoundsFromGameValueLayout);
-
-    m_softBoundsFromMap = new QRadioButton();
-    auto *softBoundsFromMapLabel = new ClickableLabel(tr("Use custom bounds"));
     m_softBoundsFromMapMinEdit = new QLineEdit();
-    m_softBoundsFromMapMinEdit->setPlaceholderText("min");
     m_softBoundsFromMapMaxEdit = new QLineEdit();
-    m_softBoundsFromMapMaxEdit->setPlaceholderText("max");
 
-    auto *softBoundsFromMapValueLayout = new QHBoxLayout();
-    softBoundsFromMapValueLayout->setSpacing(LayoutConstants::MediumHMargin);
-    softBoundsFromMapValueLayout->addWidget(m_softBoundsFromMapMinEdit);
-    softBoundsFromMapValueLayout->addWidget(m_softBoundsFromMapMaxEdit);
-    softBoundsFromMapValueLayout->addStretch(1);
+    auto *fields = new QFormLayout();
+    fields->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin,
+                               LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin);
+    fields->addRow(tr("Game minimum"), m_softBoundsFromGameMinLabel);
+    fields->addRow(tr("Game maximum"), m_softBoundsFromGameMaxLabel);
+    fields->addRow(tr("Custom minimum"), m_softBoundsFromMapMinEdit);
+    fields->addRow(tr("Custom maximum"), m_softBoundsFromMapMaxEdit);
 
-    auto *softBoundsFromMapLayout = new QVBoxLayout();
-    softBoundsFromMapLayout->setContentsMargins(0, 0, 0, 0);
-    softBoundsFromMapLayout->setSpacing(LayoutConstants::NarrowVMargin);
-    softBoundsFromMapLayout->addWidget(softBoundsFromMapLabel);
-    softBoundsFromMapLayout->addLayout(softBoundsFromMapValueLayout);
+    auto *box = new QVBoxLayout(this);
+    box->setContentsMargins(0, 0, 0, 0);
+    box->addWidget(toolbar);
+    box->addLayout(fields);
 
-    auto *gridLayout = new QGridLayout();
-    gridLayout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin);
-    gridLayout->setHorizontalSpacing(LayoutConstants::NarrowHMargin);
-    gridLayout->setVerticalSpacing(LayoutConstants::MediumVMargin);
-
-    gridLayout->addWidget(m_softBoundsDisabled, 0, 0, Qt::AlignTop);
-    gridLayout->addWidget(softBoundsDisabledLabel, 0, 1, Qt::AlignTop);
-    gridLayout->addWidget(m_softBoundsFromGame, 1, 0, Qt::AlignTop);
-    gridLayout->addLayout(softBoundsFromGameLayout, 1, 1, Qt::AlignTop);
-    gridLayout->addWidget(m_softBoundsFromMap, 2, 0, Qt::AlignTop);
-    gridLayout->addLayout(softBoundsFromMapLayout, 2, 1, Qt::AlignTop);
-
-    setLayout(gridLayout);
-
-    connect(softBoundsDisabledLabel, &ClickableLabel::clicked, m_softBoundsDisabled, &QAbstractButton::click);
-    connect(softBoundsFromGameLabel, &ClickableLabel::clicked, m_softBoundsFromGame, &QAbstractButton::click);
-    connect(softBoundsFromMapLabel, &ClickableLabel::clicked, m_softBoundsFromMap, &QAbstractButton::click);
-
-    connect(m_softBoundsDisabled, &QAbstractButton::clicked, this, [this](const bool checked) {
+    connect(m_boundsMode, qOverload<int>(&QComboBox::activated), this, [this](int mode) {
         auto document = kdl::mem_lock(m_document);
-        if (checked) {
+        if (!document) return;
+        if (mode == Disabled) {
             document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, std::nullopt});
-        }
-    });
-    connect(m_softBoundsFromGame, &QAbstractButton::clicked, this, [this](const bool checked) {
-        auto document = kdl::mem_lock(m_document);
-        if (checked) {
+        } else if (mode == GameDefault) {
             document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Game, std::nullopt});
-        }
-    });
-    connect(m_softBoundsFromMap, &QAbstractButton::clicked, this, [this](const bool checked) {
-        auto document = kdl::mem_lock(m_document);
-
-        m_softBoundsFromMapMinEdit->setEnabled(true);
-        m_softBoundsFromMapMaxEdit->setEnabled(true);
-
-        if (checked) {
-            const std::optional<vm::bbox3> parsed = parseLineEdits();
-            // Only commit the change to the document right now if both text fields can be
-            // parsed. Otherwise, it will be committed below in textEditingFinished once both
-            // text fields have a valid value entered.
-            if (parsed.has_value()) {
-                document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, parsed.value()});
-            }
+        } else {
+            m_softBoundsFromMapMinEdit->setEnabled(true);
+            m_softBoundsFromMapMaxEdit->setEnabled(true);
+            // Commit custom bounds once both fields contain a valid box.
+            if (const auto parsed = parseLineEdits())
+                document->setSoftMapBounds({Model::Game::SoftMapBoundsType::Map, *parsed});
         }
     });
 
     const auto textEditingFinished = [this]() {
-        // QLineEdit::editingFinished is emitted not just in response to user actions,
-        // but also e.g. if another radio button is clicked and the min/max line edits get
-        // disabled. So unfortunately we need to check if we are inside updateGui() and avoid
-        // committing a change in that case.
-        if (m_updatingGui) {
+        // Disabling the fields can also emit editingFinished.
+        if (m_updatingGui || m_boundsMode->currentIndex() != Custom) {
             return;
         }
         auto document = kdl::mem_lock(m_document);
@@ -314,16 +194,6 @@ void MapPropertiesEditor::createGui() {
     connect(m_softBoundsFromMapMaxEdit, &QLineEdit::editingFinished, this, textEditingFinished);
 
     updateGui();
-}
-
-QLineEdit *MapInspector::createSearchBox() {
-    auto *widget = new QLineEdit{};
-    widget->setClearButtonEnabled(true);
-    widget->setPlaceholderText(QLineEdit::tr("Search Entities"));
-
-    const auto icon = IO::loadSVGIcon("Search.svg", 16);
-    widget->addAction(icon, QLineEdit::LeadingPosition);
-    return widget;
 }
 
 void MapPropertiesEditor::connectObservers() {
@@ -393,12 +263,12 @@ void MapPropertiesEditor::updateGui() {
     const auto bounds = document->softMapBounds();
 
     if (bounds.source == Model::Game::SoftMapBoundsType::Map && !bounds.bounds.has_value()) {
-        m_softBoundsDisabled->setChecked(true);
+        m_boundsMode->setCurrentIndex(Disabled);
 
         m_softBoundsFromMapMinEdit->setEnabled(false);
         m_softBoundsFromMapMaxEdit->setEnabled(false);
     } else if (bounds.source == Model::Game::SoftMapBoundsType::Map) {
-        m_softBoundsFromMap->setChecked(true);
+        m_boundsMode->setCurrentIndex(Custom);
 
         m_softBoundsFromMapMinEdit->setEnabled(true);
         m_softBoundsFromMapMaxEdit->setEnabled(true);
@@ -406,7 +276,7 @@ void MapPropertiesEditor::updateGui() {
         m_softBoundsFromMapMinEdit->setText(formatVec(bounds.bounds, false));
         m_softBoundsFromMapMaxEdit->setText(formatVec(bounds.bounds, true));
     } else {
-        m_softBoundsFromGame->setChecked(true);
+        m_boundsMode->setCurrentIndex(GameDefault);
 
         m_softBoundsFromMapMinEdit->setEnabled(false);
         m_softBoundsFromMapMaxEdit->setEnabled(false);

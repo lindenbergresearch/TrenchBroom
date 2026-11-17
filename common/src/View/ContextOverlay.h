@@ -19,6 +19,7 @@ class ContextOverlay : public QLabel {
         QString selection;
         ContextOverlayTemplate content;
     };
+
     struct Theme {
         int width = 340;
         int margin = 16;

@@ -18,128 +18,79 @@
  */
 #pragma once
 
-#include <map>
+#include <QIcon>
+#include <QWidget>
+#include <filesystem>
+#include <memory>
+
+class QColor;
 
 namespace TrenchBroom::IO {
+class VectorIcon;
 
-/* ------------------------------------------------------------------------------------------- */
+// One hidden application-wide QSS proxy, shared by SVG and raster icons.
+class IconAppearance : public QWidget {
+    Q_OBJECT
+    Q_PROPERTY(qreal disabledBrightness READ disabledBrightness WRITE setDisabledBrightness)
+    Q_PROPERTY(qreal disabledOpacity READ disabledOpacity WRITE setDisabledOpacity)
+    qreal m_brightness = 0.35, m_opacity = 1.0;
+    IconAppearance();
+public:
+    static IconAppearance& instance();
+    qreal disabledBrightness() const { return m_brightness; }
+    qreal disabledOpacity() const { return m_opacity; }
+    void setDisabledBrightness(qreal value);
+    void setDisabledOpacity(qreal value);
+};
 
-class SVGIcon;
-
-static const char *const SVG_ON_POSTFIX = "_on.svg";
-static const char *const SVG_OFF_POSTFIX = "_off.svg";
-
+QPixmap disabledIconPixmap(const QPixmap& source);
 
 /**
- *
+ * GUI-thread cache of scalable icons, including parsed SVG documents. Entries
+ * are evicted least recently used; QIcon copies held by widgets remain valid.
+ * Rasterizations use Qt's separate, memory-bounded QPixmapCache.
  */
 class IconCache {
-  private:
-    /** icon cache */
-    static std::map<QString, SVGIcon *> iconCache;
+public:
+    static constexpr int DefaultMaxEntries = 256;
+    static int size();
+    static int maxEntries();
+    static void setMaxEntries(int count);
 
-  public:
-    /**
-     * Test if the given icon is already cached.
-     * @param path Path to the source filename.
-     * @return True if cached, false otherwise.
-     */
-    static bool isCached(const QString &path);
-
-
-    /**
-     * Pushed a new icon to cache.
-     * @param path The associated source file path.
-     * @param icon The icon to cache.
-     */
-    static void push(const QString &path, SVGIcon *icon);
-
-
-    /**
-     * Pulls an icon from cache.
-     * @param path The associated source file path.
-     * @return An instance of SVGIcon if found in cache.
-     */
-    static SVGIcon *pop(const QString &path);
-
-    /**
-     * Resets the comlete cache.
-     */
+    // Reload files on the next load. Existing QIcons retain their SVG snapshot;
+    // their rasterizations age out of QPixmapCache normally. No dangling refs.
     static void resetCache();
 
-};
-
-/* ------------------------------------------------------------------------------------------- */
-
-/**
- * Type of the specific icon resource.
- */
-enum IconVariant {
-  Single,
-  IconOn,
-  IconOff
+private:
+    friend class VectorIcon;
+    static VectorIcon load(const std::filesystem::path& path);
 };
 
 /**
- * Scalable Vector Graphics based icon class.
+ * A resolution-independent SVG icon. A base.svg may have base_on.svg and
+ * base_off.svg variants, mapped to QIcon::On and Off (not enabled/disabled).
+ * Relative paths resolve in the application's images resources; absolute paths
+ * and Qt resource paths are also supported. Missing/invalid files yield a null
+ * icon. All operations, including painting, belong to the GUI thread.
  */
-class SVGIcon {
-  public:
-    SVGIcon(const std::filesystem::path &path);
-
-    static SVGIcon *fromPath(const std::filesystem::path &path);
-
-    const QIcon &icon() const;
-
-    const QList<QSize> &sizes() const;
-
-    void setSizes(const QList<QSize> &Sizes);
-
-    double targetBrightness() const;
-
-    void setTargetBrightness(double TargetBrightness);
-
-    double adjustmentFactor() const;
-
-    void setAdjustmentFactor(double AdjustmentFactor);
-
-    QString iconPath(const IconVariant variant) const;
-
-    bool grayscale();
-
-    bool normalized();
-
-    bool isVariant() const;
-
-    bool isSingle() const;
-
+class VectorIcon {
+public:
+    explicit VectorIcon(const std::filesystem::path& path);
+    QIcon icon() const;
+    // Reuse the parsed SVG and preserve its shape/alpha, replacing the painted
+    // colors with the supplied tint. An invalid color returns the original.
+    QIcon icon(const QColor& tint) const;
+    // Intrinsic SVG size in logical pixels, for callers that need a bitmap.
+    QSize defaultSize() const;
     bool isValid() const;
 
-    void setGrayscale(bool m_grayscale);
-
-    void setNormalized(bool m_normalized);
-
-  private:
-    void renderVariant(const IconVariant variant);
-
-    double calculateAverageBrightness(const QImage &image);
-
-    QImage normalizeBrightness(const QImage &image);
-
-    QImage convertToGrayscale(const QImage &image);
-
-    static QString filePathToString(const std::filesystem::path &imagePath);
-
-    const std::filesystem::path &m_path;
-
-    QIcon m_icon{};
-    QList<QSize> m_sizes{};
-
-    bool m_grayscale = false;
-    bool m_normalized = false;
-
-    double m_targetBrightness = 128.0;
-    double m_adjustmentFactor = 1.0;
+private:
+    friend class IconCache;
+    struct Sources;
+    class Engine;
+    VectorIcon(std::shared_ptr<Sources> sources, const QColor& tint);
+    std::shared_ptr<Sources> m_sources;
+    QIcon m_icon;
 };
 
-}
+} // namespace TrenchBroom::IO

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2010-2017 Kristian Duske
+ Copyright (C) 2024 Kristian Duske
 
  This file is part of TrenchBroom.
 
@@ -19,37 +19,26 @@
 
 #pragma once
 
-#include <QString>
+#include "EL/Expression.h"
+#include "EL/Value.h"
+#include "FileLocation.h"
 
-#include "Logger.h"
+#include <optional>
+#include <unordered_map>
 
-#include <string>
-#include <vector>
+namespace TrenchBroom::EL
+{
 
-namespace TrenchBroom {
-namespace View {
-class CachingLogger : public Logger {
-  private:
-    struct Message {
-      public:
-        LogLevel level;
-        QString str;
+class EvaluationTrace
+{
+private:
+  std::unordered_map<Value, ExpressionNode> m_data;
 
-        Message(LogLevel i_level, const QString &i_str);
-    };
+public:
+  std::optional<ExpressionNode> getExpression(const Value& value) const;
+  std::optional<FileLocation> getLocation(const Value& value) const;
 
-    using MessageList = std::vector<Message>;
-
-    MessageList m_cachedMessages;
-    Logger *m_logger;
-
-  public:
-    CachingLogger();
-
-    void setParentLogger(Logger *logger);
-
-  private:
-    void doLog(LogLevel level, const LogMessage *message) override;
+  void addTrace(const Value& value, const ExpressionNode& expression);
 };
-} // namespace View
-} // namespace TrenchBroom
+
+} // namespace TrenchBroom::EL

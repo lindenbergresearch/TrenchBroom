@@ -97,7 +97,7 @@ Result<std::vector<std::filesystem::path>> find(const std::filesystem::path &pat
     }
 
     if (error) {
-        return Error{"Failed to open '" + fixedPath.string() + "': " + error.message()};
+        return Error{"Failed to open: " + fixedPath.string() + ": " + error.message()};
     }
     return kdl::vec_filter(result, [&](const auto &p) { return pathMatcher(p, pathInfo); });
 }
@@ -106,7 +106,7 @@ Result<std::shared_ptr<CFile>> openFile(const std::filesystem::path &path) {
     const auto fixedPath = fixPath(path);
     if (pathInfo(fixedPath) != PathInfo::File) {
         return Error{
-            "Failed to open '" + fixedPath.string() + "': path does not denote a file"
+            "Failed to open: " + fixedPath.string() + ": path does not denote a file"
         };
     }
 
@@ -120,7 +120,7 @@ Result<bool> createDirectory(const std::filesystem::path &path) {
     if (!error) {
         return created;
     }
-    return Error{"Failed to create '" + fixedPath.string() + "': " + error.message()};
+    return Error{"Failed to create: " + fixedPath.string() + ": " + error.message()};
 }
 
 Result<bool> deleteFile(const std::filesystem::path &path) {
@@ -128,7 +128,7 @@ Result<bool> deleteFile(const std::filesystem::path &path) {
     switch (pathInfo(fixedPath)) {
     case PathInfo::Directory:
         return Error{
-            "Failed to delete '" + fixedPath.string() + "': path denotes a directory"
+            "Failed to delete: " + fixedPath.string() + ": path denotes a directory"
         };
     case PathInfo::File: {
         auto error = std::error_code{};
@@ -136,7 +136,7 @@ Result<bool> deleteFile(const std::filesystem::path &path) {
             return true;
         }
         if (error) {
-            return Error{"Failed to delete '" + fixedPath.string() + "': " + error.message()};
+            return Error{"Failed to delete: " + fixedPath.string() + ": " + error.message()};
         }
         return false;
     }
@@ -156,7 +156,7 @@ Result<void> copyFile(const std::filesystem::path &sourcePath, const std::filesy
     auto error = std::error_code{};
     if (!std::filesystem::copy_file(fixedSourcePath, fixedDestPath, std::filesystem::copy_options::overwrite_existing, error) || error) {
         return Error{
-            "Failed to copy '" + fixedSourcePath.string() + "' to '" + fixedDestPath.string() + "': " + error.message()
+            "Failed to copy: " + fixedSourcePath.string() + " to " + fixedDestPath.string() + ": " + error.message()
         };
     }
 
@@ -180,7 +180,7 @@ Result<void> moveFile(const std::filesystem::path &sourcePath, const std::filesy
     std::filesystem::rename(fixedSourcePath, fixedDestPath, error);
     if (error) {
         return Error{
-            "Failed to move '" + fixedSourcePath.string() + "' to '" + fixedDestPath.string() + "': " + error.message()
+            "Failed to move: " + fixedSourcePath.string() + " to " + fixedDestPath.string() + ": " + error.message()
         };
     }
 

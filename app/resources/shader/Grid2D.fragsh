@@ -31,15 +31,15 @@ uniform vec3 Normal;
 
 varying vec4 modelCoordinates;
 
-float grid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorDivisionSize);
+vec4 sampleGrid(vec3 coords, vec3 normal, float gridSize, float minGridSize, float lineWidthFactor, float majorDivisionSize, vec3 baseColor);
 
 void main() {
-    float alpha = clamp(GridAlpha, 0.05f, 1.0f);
-
-    if (RenderGrid && alpha > 0.0f) {
-        float minGridSize = 5.0f / CameraZoom;
-        float lineWidthFactor = 2.0f / CameraZoom;
-        float gridValue = grid(modelCoordinates.xyz, Normal.xyz, GridSize, minGridSize, lineWidthFactor * GridWidth, MajorDivisionSize);
-        gl_FragColor = vec4(GridColor.xyz, gridValue * alpha);
-    }
+    float alpha = clamp(GridAlpha, 0.0, 1.0);
+    if (!RenderGrid || alpha <= 0.0)
+        discard;
+    float minGridSize = 6.0 / max(CameraZoom, 0.000001);
+    vec4 gridSample = sampleGrid(modelCoordinates.xyz, Normal, GridSize, minGridSize, GridWidth, MajorDivisionSize, GridColor.rgb);
+    if (gridSample.a <= 0.0)
+        discard;
+    gl_FragColor = vec4(gridSample.rgb, gridSample.a * alpha * GridColor.a);
 }

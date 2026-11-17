@@ -46,9 +46,9 @@
 namespace TrenchBroom {
 // PreferenceManager
 
-static const int SAVE_TIMER_MILLIS = 250;
-static const char *const PREFERENCES_FILENAME = "Preferences.json";
-static const char *const LOCK_FILE_SUFFIX = ".lck";
+static constexpr auto SAVE_TIMER_MILLIS = 250;
+static constexpr auto PREFERENCES_FILENAME = "Preferences.json";
+static constexpr auto LOCK_FILE_SUFFIX = ".lck";
 
 std::unique_ptr<PreferenceManager> PreferenceManager::m_instance;
 bool PreferenceManager::m_initialized = false;
@@ -72,7 +72,8 @@ bool shouldSaveInstantly() {
 }
 } // namespace
 
-AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_lockReload{false}, m_fileSystemWatcher{nullptr}, m_fileReadWriteDisabled{false} {
+AppPreferenceManager::AppPreferenceManager() : m_saveInstantly{shouldSaveInstantly()}, m_lockReload{
+    false}, m_fileSystemWatcher{nullptr}, m_fileReadWriteDisabled{false} {
     m_saveTimer.setSingleShot(true);
     connect(&m_saveTimer, &QTimer::timeout, this, [this] {
         saveChangesImmediately();
@@ -93,7 +94,7 @@ void AppPreferenceManager::initialize() {
 
     m_fileSystemWatcher = new QFileSystemWatcher{this};
     if (m_fileSystemWatcher->addPath(m_preferencesFilePath)) {
-        connect(m_fileSystemWatcher, &QFileSystemWatcher::QFileSystemWatcher::fileChanged, this, [this]() {
+        connect(m_fileSystemWatcher, &QFileSystemWatcher::QFileSystemWatcher::fileChanged, this, [this] {
             // do not immediately reload changes from disk after saving it
             if (!reloadLocked()) {
                 loadCacheFromDisk();
@@ -265,7 +266,9 @@ void AppPreferenceManager::loadPreferenceFromCache(PreferenceBase &pref) {
     if (!pref.loadFromJson(format, jsonValue)) {
 
         const auto variantValue = jsonValue.toVariant();
-        defaultQtLogger.error() << "Failed to load preference: " << IO::pathAsGenericQString(pref.path()) << " from JSON value: " << variantValue.toString() << " (" << variantValue.typeName() << ")";
+        defaultQtLogger.error() << "Failed to load preference: " << IO::pathAsGenericQString(pref.path())
+                                << " from JSON value: " << variantValue.toString() << " (" << variantValue.typeName()
+                                << ")";
 
         pref.resetToDefault();
 

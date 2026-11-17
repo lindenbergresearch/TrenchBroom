@@ -24,6 +24,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QScrollBar>
+#include <QToolBar>
 #include <QtGlobal>
 
 #include "Assets/EntityDefinition.h"
@@ -77,7 +78,6 @@ void EntityBrowser::createGui(GLContextManager &contextManager) {
 
     m_sortOrderChoice = new QComboBox();
     m_sortOrderChoice->setObjectName("TextureBrowser_smallComboBox");
-    makeSmall(m_sortOrderChoice);
     m_sortOrderChoice->addItem(tr("Name"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Name));
     m_sortOrderChoice->addItem(tr("Usage"), QVariant::fromValue(Assets::EntityDefinitionSortOrder::Usage));
     m_sortOrderChoice->setCurrentIndex(0);
@@ -90,7 +90,6 @@ void EntityBrowser::createGui(GLContextManager &contextManager) {
 
     m_groupButton = new QPushButton(tr("Group"));
     m_groupButton->setObjectName("TextureBrowser_smallPushButton");
-    makeSmall(m_groupButton);
     m_groupButton->setToolTip(tr("Group entity definitions by category"));
     m_groupButton->setCheckable(true);
     connect(m_groupButton, &QAbstractButton::clicked, this, [=]() {
@@ -99,7 +98,6 @@ void EntityBrowser::createGui(GLContextManager &contextManager) {
 
     m_usedButton = new QPushButton(tr("Used"));
     m_usedButton->setObjectName("TextureBrowser_smallPushButton");
-    makeSmall(m_usedButton);
     m_usedButton->setToolTip(tr("Only show entity definitions currently in use"));
     m_usedButton->setCheckable(true);
     connect(m_usedButton, &QAbstractButton::clicked, this, [=]() {
@@ -111,19 +109,18 @@ void EntityBrowser::createGui(GLContextManager &contextManager) {
         m_view->setFilterText(m_filterBox->text().toStdString());
     });
 
-    auto *controlSizer = new QHBoxLayout();
-    controlSizer->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
-    controlSizer->setSpacing(LayoutConstants::NarrowHMargin);
-    controlSizer->addWidget(m_sortOrderChoice, 0);
-    controlSizer->addWidget(m_groupButton, 0);
-    controlSizer->addWidget(m_usedButton, 0);
-    controlSizer->addWidget(m_filterBox, 1);
+    auto* toolbar = createInspectorToolBar(this);
+    toolbar->addWidget(m_sortOrderChoice);
+    toolbar->addWidget(m_groupButton);
+    toolbar->addWidget(m_usedButton);
+    m_filterBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    toolbar->addWidget(m_filterBox);
 
     auto *outerSizer = new QVBoxLayout();
     outerSizer->setContentsMargins(0, 0, 0, 0);
     outerSizer->setSpacing(0);
+    outerSizer->addWidget(toolbar);
     outerSizer->addWidget(browserPanel, 1);
-    outerSizer->addLayout(controlSizer, 0);
 
     setLayout(outerSizer);
 }

@@ -28,7 +28,10 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+class ActiveShader;
 class OrthographicCamera;
+
+void configureGridAxisColors(ActiveShader &shader);
 
 class RenderContext;
 

@@ -46,6 +46,8 @@ MapView *MapViewContainer::currentMapView() const {
 
 vm::vec3 MapViewContainer::doGetPasteObjectsDelta(const vm::bbox3 &bounds, const vm::bbox3 &referenceBounds) const {
     auto *current = currentMapView();
+    // A tool-window insertion can happen before a render view has received focus.
+    if (!current) current = const_cast<MapViewContainer*>(this)->firstMapViewBase();
     ensure(current != nullptr, "current is nullptr");
     return current->pasteObjectsDelta(bounds, referenceBounds);
 }

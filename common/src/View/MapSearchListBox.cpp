@@ -2,10 +2,8 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QListWidgetItem>
 #include <QMenu>
 #include <QMouseEvent>
-#include <QRadioButton>
 #include <QTreeWidget>
 
 #include "Model/EntityNode.h"
@@ -15,14 +13,14 @@
 #include "View/MapDocument.h"
 #include "View/QtUtils.h"
 #include "ViewConstants.h"
+#include "StringUtils.h"
+#include "TrenchBroomApp.h"
 
 #include <kdl/memory_utils.h>
 
 #include <vm/vec_io.h>
 
-namespace TrenchBroom {
-namespace View {
-
+namespace TrenchBroom::View {
 /* ---------------------------------------------------------------------------- */
 
 SearchListBoxItemRenderer::SearchListBoxItemRenderer(std::weak_ptr<MapDocument> document, MapView *mapView, Model::EntityNodeBase *node, QWidget *parent)
@@ -31,17 +29,18 @@ SearchListBoxItemRenderer::SearchListBoxItemRenderer(std::weak_ptr<MapDocument> 
 
     m_nameText = new QLabel{};
     m_infoText = new QLabel{};
-    auto panel = new QWidget{};
+    m_infoText->setObjectName("SearchListBoxItemRenderer_m_infoText");
+    const auto panel = new QWidget{this};
 
-    m_nameText->setFont(Fonts::fixedWidthFont());
-    // m_infoText->setFont(Fonts::fixedWidthFont());
+    makeMono(m_nameText);
 
     if (m_node != nullptr) {
-        auto num_properties = m_node->entity().properties().size();
+        const auto num_properties = m_node->entity().properties().size();
 
         std::stringstream origin;
-        origin << "@(" << m_node->physicalBounds().center() << ") " << num_properties << ((num_properties != 1) ? " attributes" : " attribute");
-        auto str_origin = QString::fromStdString(origin.str());
+        origin << "@(" << m_node->physicalBounds().center() << ") " << num_properties
+               << ((num_properties != 1) ? " attributes" : " attribute");
+        const auto str_origin = QString::fromStdString(origin.str());
 
         m_nameText->setText(QString::fromStdString(m_node->entity().classname()));
         m_infoText->setText(str_origin);
@@ -55,7 +54,7 @@ SearchListBoxItemRenderer::SearchListBoxItemRenderer(std::weak_ptr<MapDocument> 
     m_infoText->installEventFilter(this);
     makeSmall(m_infoText);
     makeEmphasized(m_nameText);
-    makeSelected(m_nameText, QPalette{});
+    makeSelected(m_nameText);
 
     auto *textLayout = new QVBoxLayout();
     textLayout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, 0, LayoutConstants::NarrowVMargin);
@@ -72,19 +71,17 @@ SearchListBoxItemRenderer::SearchListBoxItemRenderer(std::weak_ptr<MapDocument> 
     setLayout(itemLayout);
 }
 
-void SearchListBoxItemRenderer::updateItem() {
-    ControlListBoxItemRenderer::updateItem();
-}
+void SearchListBoxItemRenderer::updateItem() { ControlListBoxItemRenderer::updateItem(); }
 
 bool SearchListBoxItemRenderer::eventFilter(QObject *target, QEvent *event) {
     if (event->type() == QEvent::MouseButtonDblClick) {
-        auto *mouseEvent = static_cast<QMouseEvent *>(event);
+        const auto *mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
             emit itemDoubleClicked();
             return true;
         }
     } else if (event->type() == QEvent::MouseButtonRelease) {
-        auto *mouseEvent = static_cast<QMouseEvent *>(event);
+        const auto *mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
             emit itemRightClicked();
             return true;
@@ -94,29 +91,21 @@ bool SearchListBoxItemRenderer::eventFilter(QObject *target, QEvent *event) {
     return QObject::eventFilter(target, event);
 }
 
-QLabel *SearchListBoxItemRenderer::getNameText() const {
-    return m_nameText;
-}
+QLabel *SearchListBoxItemRenderer::getNameText() const { return m_nameText; }
 
-void SearchListBoxItemRenderer::setNameText(QLabel *MNameText) {
-    m_nameText = MNameText;
-}
+void SearchListBoxItemRenderer::setNameText(QLabel *MNameText) { m_nameText = MNameText; }
 
-QLabel *SearchListBoxItemRenderer::getInfoText() const {
-    return m_infoText;
-}
+QLabel *SearchListBoxItemRenderer::getInfoText() const { return m_infoText; }
 
-void SearchListBoxItemRenderer::setInfoText(QLabel *MInfoText) {
-    m_infoText = MInfoText;
-}
+void SearchListBoxItemRenderer::setInfoText(QLabel *MInfoText) { m_infoText = MInfoText; }
 
 void SearchListBoxItemRenderer::itemRightClicked() {}
 
-void SearchListBoxItemRenderer::itemDoubleClicked() {
-    auto document = kdl::mem_lock(m_document);
-    std::vector<Model::Node *> nodes;
+void SearchListBoxItemRenderer::itemDoubleClicked() const {
+    const auto document = kdl::mem_lock(m_document);
 
     if (m_node) {
+        std::vector<Model::Node *> nodes;
         nodes.push_back(m_node);
 
         document->deselectAll();
@@ -127,18 +116,20 @@ void SearchListBoxItemRenderer::itemDoubleClicked() {
 
 /* ---------------------------------------------------------------------------- */
 
-MapSearchListBox::MapSearchListBox(std::weak_ptr<MapDocument> document, MapView *mapView, Inspector *inspector, QWidget *parent)
-    : ControlListBox("", false, parent), m_document(std::move(document)), m_mapView(mapView), m_inspector(inspector) {
+MapSearchListBox::MapSearchListBox(std::weak_ptr<MapDocument> document, MapView *mapView, Inspector *inspector, QWidget *parent, QLabel *label)
+    : ControlListBox("", false, parent), m_document(std::move(document)), m_mapView(mapView), m_inspector(inspector), m_searchResults(label) {
     setEmptyText("No objects found.");
     m_searchTimer = new QTimer(this);
     m_searchTimer->setTimerType(Qt::TimerType::CoarseTimer);
     m_searchTimer->setSingleShot(true);
 
+    updateSearchLabel();
     connect(m_searchTimer, &QTimer::timeout, this, &MapSearchListBox::searchTimerTigger);
+    connectObservers();
 }
 
-ControlListBoxItemRenderer *MapSearchListBox::createItemRenderer(QWidget *parent, size_t index) {
-    auto document = kdl::mem_lock(m_document);
+ControlListBoxItemRenderer *MapSearchListBox::createItemRenderer(QWidget *parent, const size_t index) {
+    const auto document = kdl::mem_lock(m_document);
     Model::EntityNodeBase *node = m_searchResult.at(index);
 
     return new SearchListBoxItemRenderer{document, m_mapView, node, parent};
@@ -147,7 +138,17 @@ ControlListBoxItemRenderer *MapSearchListBox::createItemRenderer(QWidget *parent
 void MapSearchListBox::selectedRowChanged(int index) {}
 
 void MapSearchListBox::connectObservers() {
-    auto document = kdl::mem_lock(m_document);
+    const auto document = kdl::mem_lock(m_document);
+    // Search rows contain node pointers too. Drop them before deletion/replacement.
+    const auto clearResults = [this] {
+        m_searchTimer->stop();
+        m_searchResult.clear();
+        updateSearchLabel();
+        reload();
+    };
+
+    m_notifierConnection += document->documentWillBeClearedNotifier.connect([clearResults](auto *) { clearResults(); });
+    m_notifierConnection += document->nodesWillBeRemovedNotifier.connect([clearResults](const auto &) { clearResults(); });
     m_notifierConnection += document->documentWasNewedNotifier.connect(this, &MapSearchListBox::documentDidChange);
     m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &MapSearchListBox::documentDidChange);
     m_notifierConnection += document->documentWasClearedNotifier.connect(this, &MapSearchListBox::documentDidChange);
@@ -158,21 +159,21 @@ void MapSearchListBox::connectObservers() {
     m_notifierConnection += document->nodeLockingDidChangeNotifier.connect(this, &MapSearchListBox::nodesDidChange);
 }
 
-void MapSearchListBox::documentDidChange(MapDocument *document) {
-    // TODO: implement
-}
+void MapSearchListBox::documentDidChange(MapDocument *) const { m_searchTimer->start(0); }
 
-void MapSearchListBox::nodesDidChange(const std::vector<Model::Node *> &) {
-    // TODO: implement
-}
+void MapSearchListBox::nodesDidChange(const std::vector<Model::Node *> &) const { if (!m_searchPhrase.isEmpty()) m_searchTimer->start(150); }
 
-size_t MapSearchListBox::itemCount() const {
-    return m_searchResult.size();
-}
+size_t MapSearchListBox::itemCount() const { return m_searchResult.size(); }
 
 void MapSearchListBox::updateSearch(const QString &searchPhrase) {
     m_searchPhrase = searchPhrase;
     const auto document = kdl::mem_lock(m_document);
+    m_searchResult.clear();
+    if (!document->world()) {
+        updateSearchLabel();
+        reload();
+        return;
+    }
     const auto nodeIndex = &document->world()->entityNodeIndex();
 
     QString searchValue = "";
@@ -184,28 +185,25 @@ void MapSearchListBox::updateSearch(const QString &searchPhrase) {
             searchClass = splitted[0];
             searchValue = splitted[1];
         }
-    } else {
-        searchValue = searchPhrase;
-    }
+    } else { searchValue = searchPhrase; }
 
-    if (searchValue.size() > 2) {
-        m_searchResult = nodeIndex->findEntity(searchClass.toStdString(), searchValue.toStdString());
-    }
+    if (searchValue.size() >
+        0) { m_searchResult = nodeIndex->findEntity(searchClass.toStdString(), searchValue.toStdString()); }
 
+    updateSearchLabel();
     reload();
 }
 
-void MapSearchListBox::searchTimerTigger() {
-    updateSearch(m_searchPhrase);
-}
+void MapSearchListBox::searchTimerTigger() { updateSearch(m_searchPhrase); }
 
 void MapSearchListBox::triggerSearch(const QString &phrase) {
     m_searchTimer->stop();
 
-    if (phrase.isEmpty() || phrase.size() <= 2) {
+    if (phrase.isEmpty() || phrase.size() <= 0) {
         m_searchPhrase = phrase;
         m_searchResult.clear();
 
+        updateSearchLabel();
         reload();
         return;
     }
@@ -227,11 +225,10 @@ void MapSearchListBox::contextMenuRequested(const QPoint &pos) {
     popupMenu->popup(this->mapToGlobal(pos));
 }
 
-void MapSearchListBox::selectNodeInDocument() {
-    auto document = kdl::mem_lock(m_document);
-    auto node = nodeForCurrentRowIndex();
+void MapSearchListBox::selectNodeInDocument() const {
+    const auto document = kdl::mem_lock(m_document);
 
-    if (node) {
+    if (const auto node = nodeForCurrentRowIndex()) {
         std::vector<Model::Node *> nodes;
         nodes.push_back(node);
 
@@ -240,25 +237,28 @@ void MapSearchListBox::selectNodeInDocument() {
     }
 }
 
-Model::EntityNodeBase *MapSearchListBox::nodeForCurrentRowIndex() {
-    size_t index = static_cast<size_t>(currentRow());
+Model::EntityNodeBase *MapSearchListBox::nodeForCurrentRowIndex() const {
+    const auto index = static_cast<size_t>(currentRow());
 
-    if (m_searchResult.size() > index) {
-        return m_searchResult[static_cast<unsigned long>(index)];
-    }
+    if (m_searchResult.size() > index) { return m_searchResult[index]; }
 
     return nullptr;
 }
 
-void MapSearchListBox::focusSelectedNode() {
+void MapSearchListBox::focusSelectedNode() const {
     selectNodeInDocument();
     m_mapView->focusCameraOnSelection(true);
 }
 
-void MapSearchListBox::showNodeAttributes() {
+void MapSearchListBox::showNodeAttributes() const {
     selectNodeInDocument();
-    m_inspector->switchToPage(InspectorPage::Entity);
+    m_inspector->revealTool(QStringLiteral("properties"));
 }
 
-} // namespace View
-} // namespace TrenchBroom
+void MapSearchListBox::updateSearchLabel() const {
+    if (itemCount() > 0) {
+        const auto s = stringf("Found: %d", itemCount());
+        m_searchResults->setText(QString::fromStdString(s));
+    } else { m_searchResults->setText("Found: -"); }
+}
+}

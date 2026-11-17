@@ -65,7 +65,7 @@ inline auto makeReadTextureErrorHandler(const FileSystem &fs, Logger &logger) {
         logger.error() << "Could not open texture file: " << e.msg;
         return Result<Assets::Texture>{loadDefaultTexture(fs, "", logger)};
     }, [&](ReadTextureError e) {
-        logger.error() << "Could not read texture '" << e.textureName << "': " << e.msg;
+        logger.error() << "Could not read texture: '" << e.textureName << "': " << e.msg;
         return Result<Assets::Texture>{loadDefaultTexture(fs, e.textureName, logger)};
     });
 }

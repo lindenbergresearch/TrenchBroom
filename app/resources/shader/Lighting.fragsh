@@ -1,0 +1,101 @@
+#version 120
+
+// Sixteen relevant lights per spatial region, independent of total map lights.
+// The common linear point-light path uses only two vec4s per light. Complex
+// falloffs, spots and suns use five; combined CPU selection is bounded to 16.
+const int maxLights = 16; // Renderer/Lighting.h
+uniform vec4 LinearLights[32];
+uniform vec4 OtherLights[80];
+uniform int NumLinearLights;
+uniform int NumLights;
+uniform bool EnableLighting;
+uniform vec3 AmbientLight;
+uniform vec3 MinimumLight;
+uniform float LightScale;
+uniform float LightGamma;
+
+float lightBrightness(float brightness, float type, vec4 falloff, float distance) {
+    if (type > 1.5) return brightness;
+    float d = distance * falloff.x;
+    float mode = falloff.y;
+    if (mode < 0.5) {
+        if (falloff.z > 0.0)
+            return brightness * max(0.0, 1.0 - distance / falloff.z);
+        return sign(brightness) * max(0.0, abs(brightness) - d);
+    }
+    if (mode < 1.5) return brightness * 128.0 / max(d, 1.0);
+    if (mode < 2.5) return brightness * 16384.0 / max(d * d, 1.0);
+    if (mode < 4.5) return brightness;
+    return brightness * 16384.0 / ((d + 128.0) * (d + 128.0));
+}
+
+vec3 previewLightResponse(vec3 light) {
+    vec3 lit = max(light * LightScale, vec3(0.0));
+    if (abs(LightGamma - 1.0) > 0.0001)
+        lit = pow(min(lit, vec3(1024.0)), vec3(1.0 / max(LightGamma, 0.1)));
+    // Quake's overbright range is bounded. Preserve the hue of bright sources
+    // instead of allowing accumulated lights to wash the texture out to white.
+    float peak = max(max(lit.r, lit.g), lit.b);
+    if (peak > 2.0) lit *= 2.0 / peak;
+    return max(lit, AmbientLight);
+}
+
+vec3 previewLighting(vec3 position, vec3 normal) {
+    vec3 N = normal * inversesqrt(max(dot(normal, normal), 0.000000000001));
+    vec3 total = vec3(0.0);
+    vec3 minimum = MinimumLight;
+    for (int i = 0; i < maxLights; ++i) {
+        if (i >= NumLinearLights) break;
+        vec4 source = LinearLights[i * 2];
+        vec4 color = LinearLights[i * 2 + 1];
+        vec3 delta = source.xyz - position;
+        float d2 = dot(delta, delta);
+        float incidence = dot(N, delta);
+        if (incidence <= 0.0 || d2 >= source.w * source.w) continue;
+        float invDistance = inversesqrt(max(d2, 0.000001));
+        float diffuse = mix(1.0, incidence * invDistance, color.w);
+        total += color.rgb * (diffuse * max(0.0, 1.0 - d2 * invDistance / source.w));
+    }
+    for (int i = 0; i < maxLights; ++i) {
+        if (i >= NumLights) break;
+        vec4 source = OtherLights[i * 5];
+        vec4 color = OtherLights[i * 5 + 1];
+        vec4 directionCone = OtherLights[i * 5 + 2];
+        vec4 falloff = OtherLights[i * 5 + 3];
+        float innerConeCos = OtherLights[i * 5 + 4].x;
+        float distance = 0.0;
+        vec3 L = -directionCone.xyz;
+        bool localMin = falloff.y > 3.5 && falloff.y < 4.5 && source.w < 1.5;
+        if (source.w < 1.5) {
+            vec3 delta = source.xyz - position;
+            float d2 = dot(delta, delta);
+            if (falloff.y < 0.5) {
+                float radius = falloff.z > 0.0 ? falloff.z
+                    : abs(color.w) / max(falloff.x, 0.000001);
+                if (d2 >= radius * radius) continue;
+            }
+            if (!localMin && dot(N, delta) <= 0.0) continue;
+            float invDistance = inversesqrt(max(d2, 0.000001));
+            distance = d2 * invDistance;
+            L = delta * invDistance;
+        }
+        float amount = lightBrightness(color.w, source.w, falloff, distance);
+        if (amount == 0.0) continue;
+        float cone = 1.0;
+        if (source.w > 0.5 && source.w < 1.5) {
+            float angle = dot(-L, directionCone.xyz);
+            if (angle < directionCone.w) continue;
+            float width = innerConeCos - directionCone.w;
+            if (width > 0.000001)
+                cone = clamp((angle - directionCone.w) / width, 0.0, 1.0);
+        }
+        if (localMin) {
+            minimum = max(minimum, color.rgb * max(amount, 0.0) * cone);
+        } else {
+            float incidence = dot(N, L);
+            if (incidence <= 0.0) continue;
+            total += color.rgb * (amount * mix(1.0, incidence, falloff.w) * cone);
+        }
+    }
+    return previewLightResponse(max(total, minimum));
+}

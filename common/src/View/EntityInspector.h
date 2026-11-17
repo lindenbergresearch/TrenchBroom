@@ -19,45 +19,41 @@
 
 #pragma once
 
-#include "View/TabBook.h"
+#include "View/InspectorToolSection.h"
+#include <QWidget>
+
+#include <QPointer>
 
 #include <memory>
+#include <vector>
 
-class QSplitter;
 
 namespace TrenchBroom {
 namespace View {
-class CollapsibleTitledPanel;
 
-class EntityBrowser;
-
-class EntityPropertyEditor;
+class TitledPanel;
 
 class GLContextManager;
 
 class MapDocument;
 
-class EntityInspector : public TabBookPage {
+class EntityInspector : public QWidget {
   Q_OBJECT
   private:
-    QSplitter *m_splitter;
-    EntityPropertyEditor *m_attributeEditor;
-    EntityBrowser *m_entityBrowser;
-    CollapsibleTitledPanel *m_entityDefinitionFileChooser;
+    QPointer<TitledPanel> m_entityBrowserPanel;
+    QPointer<TitledPanel> m_entityDefinitionFileChooser;
 
   public:
     EntityInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
-    ~EntityInspector() override;
+    std::vector<InspectorToolSection> toolSections() const;
 
   private:
     void createGui(std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-    QWidget *createAttributeEditor(QWidget *parent, std::weak_ptr<MapDocument> document);
+    TitledPanel *createEntityBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
 
-    QWidget *createEntityBrowser(QWidget *parent, std::weak_ptr<MapDocument> document, GLContextManager &contextManager);
-
-    CollapsibleTitledPanel *createEntityDefinitionFileChooser(QWidget *parent, std::weak_ptr<MapDocument> document);
+    TitledPanel *createEntityDefinitionFileChooser(QWidget *parent, std::weak_ptr<MapDocument> document);
 };
 } // namespace View
 } // namespace TrenchBroom

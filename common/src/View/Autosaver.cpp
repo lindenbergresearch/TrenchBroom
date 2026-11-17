@@ -35,7 +35,6 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "kdl/string_utils.h"
 #include "kdl/vector_utils.h"
 
-#include <algorithm> // for std::sort
 #include <cassert>
 
 namespace TrenchBroom::View {
@@ -57,8 +56,10 @@ Autosaver::Autosaver(std::weak_ptr<MapDocument> document, const std::chrono::mil
 void Autosaver::triggerAutosave(Logger &logger) {
     if (!kdl::mem_expired(m_document)) {
         auto document = kdl::mem_lock(m_document);
+
         if (document->modified() && document->modificationCount() != m_lastModificationCount && Clock::now() - m_lastSaveTime >= m_saveInterval && document->persistent()) {
             autosave(logger, document);
+            logger.trace() << "auto save document: " << document->filename();
         }
     }
 }

@@ -27,8 +27,8 @@
 
 #include "IO/PathQt.h"
 #include "TrenchBroomApp.h"
+#include "IO/ResourceUtils.h"
 #include "View/AppInfoPanel.h"
-#include "View/BorderLine.h"
 #include "View/QtUtils.h"
 #include "View/RecentDocumentListBox.h"
 #include "View/ViewConstants.h"
@@ -38,7 +38,8 @@ namespace TrenchBroom::View {
 static constexpr QSize WELCOME_WINDOW_BUTTON_SIZE = QSize{20, 20};
 
 WelcomeWindow::WelcomeWindow() :
-    QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
+    QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{
+    nullptr}, m_openOtherDocumentButton{nullptr} {
     setUnifiedTitleAndToolBarOnMac(true);
     createGui();
 }

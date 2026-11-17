@@ -49,10 +49,9 @@ static void setupFormatOptions() {
 }
 
 int main(int argc, char *argv[]) {
-    // Makes all QOpenGLWidget in the application share a single context
-    // (default behaviour would be for QOpenGLWidget's in a single top-level window to share
-    // a context.) see: http://doc.qt.io/qt-5/qopenglwidget.html#context-sharing
-    // QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    // Inspector tools can move between the editor and floating windows.
+    // Keep their OpenGL resources shared when the top-level window changes.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
     // Set up Hi DPI scaling
@@ -87,6 +86,9 @@ int main(int argc, char *argv[]) {
     }
 
     // PreferenceManager is destroyed by TrenchBroomApp::~TrenchBroomApp()
+    std::setlocale(LC_NUMERIC, "C");
+    QCoreApplication::setApplicationName("TrenchBroom Nova");
+
     PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
     setupFormatOptions();
 

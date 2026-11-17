@@ -1,0 +1,6 @@
+#version 120
+
+float angularShade(vec3 viewVector, vec3 normal, float strength) {
+    float facing = clamp(dot(normalize(viewVector), normalize(normal)), 0.0, 1.0);
+    return mix(1.0, facing, clamp(strength, 0.0, 1.0));
+}

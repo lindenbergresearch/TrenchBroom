@@ -45,6 +45,9 @@ class EntityPropertyItemDelegate : public QStyledItemDelegate {
 
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
+  protected:
+    void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const override;
+
   private:
     void setupCompletions(QLineEdit *lineEdit, const QModelIndex &index) const;
 

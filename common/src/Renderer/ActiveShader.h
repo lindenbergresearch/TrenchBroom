@@ -23,25 +23,25 @@
 
 #include <string>
 
-namespace TrenchBroom {
-namespace Renderer {
-class ShaderConfig;
+namespace TrenchBroom {namespace Renderer {
+    class ShaderConfig;
 
-class ShaderManager;
+    class ShaderManager;
 
-class ActiveShader {
-  private:
-    ShaderManager &m_shaderManager;
-    ShaderProgram &m_program;
+    class ActiveShader {
+    private:
+        ShaderManager& m_shaderManager;
+        ShaderProgram& m_program;
 
-  public:
-    ActiveShader(ShaderManager &shaderManager, const ShaderConfig &shaderConfig);
+    public:
+        ActiveShader(ShaderManager& shaderManager, const ShaderConfig& shaderConfig);
 
-    ~ActiveShader();
+        ~ActiveShader();
 
-    template<class T> void set(const std::string &name, const T &value) {
-        m_program.set(name, value);
-    }
-};
-} // namespace Renderer
+        template<class T>
+        void set(const std::string& name, const T& value) { m_program.set(name, value); }
+
+        void setVec4Array(const std::string& name, const std::vector<vm::vec4f>& values) const { m_program.setVec4Array(name, values); }
+    };
+    } // namespace Renderer
 } // namespace TrenchBroom

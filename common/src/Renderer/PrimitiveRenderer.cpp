@@ -67,12 +67,12 @@ bool PrimitiveRenderer::LineRenderAttributes::operator<(const LineRenderAttribut
 void PrimitiveRenderer::LineRenderAttributes::render(IndexRangeRenderer &renderer, ActiveShader &shader, const float dpiScale) const {
     // setup line-attribute
 
-    glAssert(glLineWidth(m_lineWidth * dpiScale));
-
-    if (m_dashed) {
-        glAssert(glEnable(GL_LINE_STIPPLE));
-        glAssert(glLineStipple(m_dashSize, m_pattern));
-    }
+//    glAssert(glLineWidth(m_lineWidth * dpiScale));
+//
+//    if (m_dashed) {
+//        glAssert(glEnable(GL_LINE_STIPPLE));
+//        glAssert(glLineStipple(m_dashSize, m_pattern));
+//    }
 
     switch (m_occlusionPolicy) {
         case PrimitiveRendererOcclusionPolicy::Hide:
@@ -97,11 +97,11 @@ void PrimitiveRenderer::LineRenderAttributes::render(IndexRangeRenderer &rendere
 
     // reset line-attribute
 
-    if (m_dashed) {
-        glAssert(glDisable(GL_LINE_STIPPLE));
-    }
-
-    glAssert(glLineWidth(1.0f));
+//    if (m_dashed) {
+//        glAssert(glDisable(GL_LINE_STIPPLE));
+//    }
+////
+//    glAssert(glLineWidth(1.0f));
 }
 
 PrimitiveRenderer::TriangleRenderAttributes::TriangleRenderAttributes(const Color &color, const PrimitiveRendererOcclusionPolicy occlusionPolicy, const PrimitiveRendererCullingPolicy cullingPolicy)

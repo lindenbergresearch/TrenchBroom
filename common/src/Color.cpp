@@ -139,4 +139,41 @@ void Color::parseHtmlColor(const std::string& htmlColor, float* buffer) {
         buffer[3] = float(alpha) / 255.0f;
     }
 }
+
+Color::operator QColor() const {
+    return View::toQColor(*this);
+}
+
+Color &Color::darker(const float n) {
+    const auto factor = 1.0f - n;
+    for (size_t i = 0; i < 3; i++) {
+        v[i] = v[i] * factor;
+    }
+    return *this;
+}
+
+Color &Color::brighter(const float n) {
+    const auto factor = 1.0f + n;
+    for (size_t i = 0; i < 3; i++) {
+        v[i] = v[i] * factor;
+    }
+    return *this;
+}
+
+Color Color::mixed(const Color &other, const float f) const {
+    return Color(*this).mix(other, f);
+}
+
+Color mixAlpha(const Color &color, const float f) {
+    return Color(color.r(), color.g(), color.b(), f * color.a());
+}
+
+template<typename T>
+Color &Color::mix(const Color &other, const T f) {
+    const float c = static_cast<float>(vm::max(static_cast<T>(0.0), vm::min(static_cast<T>(1.0), f)));
+    const float d = 1.0f - c;
+    for (size_t i = 0; i < 4; i++)
+        v[i] = d * v[i] + c * other[i];
+    return *this;
+}
 } // namespace TrenchBroom

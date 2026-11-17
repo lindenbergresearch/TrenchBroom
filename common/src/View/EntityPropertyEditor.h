@@ -21,8 +21,6 @@
 
 #include <QWidget>
 
-#include "NotifierConnection.h"
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -38,16 +36,10 @@ class PropertyDefinition;
 class EntityDefinition;
 } // namespace Assets
 
-namespace Model {
-class Node;
-}
-
 namespace View {
 class EntityPropertyGrid;
 
 class MapDocument;
-
-class Selection;
 
 class SmartPropertyEditorManager;
 
@@ -63,9 +55,6 @@ class EntityPropertyEditor : public QWidget {
     EntityPropertyGrid *m_propertyGrid;
     SmartPropertyEditorManager *m_smartEditorManager;
     QTextEdit *m_documentationText;
-    const Assets::EntityDefinition *m_currentDefinition;
-
-    NotifierConnection m_notifierConnection;
 
   public:
     explicit EntityPropertyEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
@@ -74,14 +63,6 @@ class EntityPropertyEditor : public QWidget {
 
   private:
     void OnCurrentRowChanged();
-
-    void connectObservers();
-
-    void selectionDidChange(const Selection &selection);
-
-    void nodesDidChange(const std::vector<Model::Node *> &nodes);
-
-    void updateIfSelectedEntityDefinitionChanged();
 
     void updateDocumentationAndSmartEditor();
 

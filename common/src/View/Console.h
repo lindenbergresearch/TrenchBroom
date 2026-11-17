@@ -22,30 +22,24 @@
 #include "Logger.h"
 #include "View/TabBook.h"
 
-#include <string>
-
 class QTextEdit;
 
 class QString;
 
 class QWidget;
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom::View {
 class Console : public TabBookPage, public Logger {
-  private:
-    QTextEdit *m_textView;
+    QTextEdit* m_textView;
 
-  public:
-    explicit Console(QWidget *parent = nullptr);
+public:
+    explicit Console(QWidget* parent = nullptr);
 
     ~Console() override;
 
-  private:
+private:
+    void doLog(LogLevel level, const LogMessage* message) override;
 
-    void doLog(LogLevel level, const LogMessage *message) override;
-
-    void logToConsole(LogLevel level, const QString &message);
+    void logToConsole(LogLevel level, const QString& message) const;
 };
-} // namespace View
-} // namespace TrenchBroom
+}

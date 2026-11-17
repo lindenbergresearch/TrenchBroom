@@ -27,6 +27,7 @@
 #include "View/MapDocument.h"
 #include "View/MapDocumentCommandFacade.h"
 #include "View/MapFrame.h"
+#include "View/QtUtils.h"
 
 #include <cassert>
 #include <memory>
@@ -71,9 +72,8 @@ void FrameManager::onFocusChange(QWidget * /* old */, QWidget *now) {
         return;
     }
 
-    // The QApplication::focusChanged signal also notifies us of focus changes between child
-    // widgets, so get the top-level widget with QWidget::window()
-    auto *frame = dynamic_cast<MapFrame *>(now->window());
+    // Floating inspector tools still belong to their editor frame.
+    auto *frame = findMapFrame(now);
     if (frame != nullptr) {
         auto it = std::find(std::begin(m_frames), std::end(m_frames), frame);
 

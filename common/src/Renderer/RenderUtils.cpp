@@ -20,7 +20,11 @@
 #include "RenderUtils.h"
 
 #include "Assets/Texture.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
+#include "Renderer/ActiveShader.h"
 #include "Renderer/GL.h"
+#include "Renderer/RenderContext.h"
 
 #include <vm/bbox.h>
 #include <vm/forward.h>
@@ -28,10 +32,24 @@
 #include <vm/vec.h>
 
 #include <map>
+#include <algorithm>
+#include <cmath>
 
 namespace TrenchBroom {
 namespace Renderer {
 static const double EdgeOffset = 0.0001;
+
+void setOverlaySizeScaling(ActiveShader &shader, const RenderContext &renderContext) {
+    const auto finitePreference = [](Preference<float> &preference) {
+        const auto value = pref(preference);
+        return std::isfinite(value) ? value : preference.defaultValue();
+    };
+    const auto factor = std::clamp(finitePreference(Preferences::OverlayScaleFactor), 0.0f, 1.0f);
+    const auto minimum = std::clamp(finitePreference(Preferences::OverlayMinimumScale), 0.01f, 100.0f);
+    const auto maximum = std::clamp(finitePreference(Preferences::OverlayMaximumScale), minimum, 100.0f);
+    shader.set("SizeScaling", vm::vec3f(factor, minimum, maximum));
+    shader.set("DpiScale", renderContext.dpiScale());
+}
 
 Color modifyAlpha(const Color &color, float alpha) {
     return Color{color.r(), color.g(), color.b(), alpha};

@@ -41,7 +41,6 @@ class CompilationTaskRunner : public QObject {
   Q_OBJECT
   protected:
     CompilationContext &m_context;
-
   protected:
     explicit CompilationTaskRunner(CompilationContext &context);
 
@@ -53,7 +52,6 @@ class CompilationTaskRunner : public QObject {
     void terminate();
 
   signals:
-
     void start();
 
     void error();

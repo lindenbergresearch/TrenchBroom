@@ -40,6 +40,7 @@
 #include "View/AboutDialog.h"
 #include "View/Actions.h"
 #include "View/Console.h"
+#include "View/FontUtils.h"
 #include "View/CrashDialog.h"
 #include "View/FrameManager.h"
 #include "View/GLContextManager.h"
@@ -50,12 +51,16 @@
 #include "View/MapViewBase.h"
 #include "View/PreferenceDialog.h"
 #include "View/QtUtils.h"
+#include "View/TrenchBroomProxyStyle.h"
 #include "View/RecentDocuments.h"
 #include "View/WelcomeWindow.h"
 
 #ifdef __APPLE__
 
 #include "View/MainMenuBuilder.h"
+#ifndef QT_NO_SESSIONMANAGER
+#include <QSessionManager>
+#endif
 
 #endif
 
@@ -63,6 +68,7 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QEvent>
 #include <QFile>
 #include <QFileDialog>
 #include <QFontDatabase>
@@ -92,10 +98,42 @@
 #include <string>
 #include <vector>
 
-namespace TrenchBroom {
-namespace View {
-
+namespace TrenchBroom::View {
 namespace {
+QFont fontForStyleSheet(QFont font) {
+    // A named face overrides QSS family/weight/style in Qt 5. Keep the selected
+    // family, weight and style, letting Qt match the face after QSS is applied.
+    font.setStyleName({});
+    return font;
+}
+
+QString fontWeightForStyleSheet(const QFont& font) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    // Qt 5's QSS parser divides numeric weights by eight.
+    return QString::number(font.weight() * 8);
+#else
+    return QString::number(font.weight());
+#endif
+}
+
+QString fontStyleForStyleSheet(const QFont& font) {
+    if (font.style() == QFont::StyleOblique) return "oblique";
+    return font.italic() ? "italic" : "normal";
+}
+}
+
+/* ------------------------------------------------------------------------------------------- */
+
+/**
+ * Returns the singleton instance of the application.
+ */
+TrenchBroomApp &TrenchBroomApp::instance() {
+    return *dynamic_cast<TrenchBroomApp *>(qApp);
+}
+
+/* ------------------------------------------------------------------------------------------- */
+
+
 // returns the topmost MapDocument as a shared pointer, or the empty shared pointer
 std::shared_ptr<MapDocument> topDocument() {
     if (const auto *frameManager = TrenchBroomApp::instance().frameManager()) {
@@ -103,63 +141,52 @@ std::shared_ptr<MapDocument> topDocument() {
             return frame->document();
         }
     }
+
     return {};
-}
-} // namespace
-
-
-TrenchBroomApp &TrenchBroomApp::instance() {
-    return *dynamic_cast<TrenchBroomApp *>(qApp);
 }
 
 #if defined(_WIN32) && defined(_MSC_VER)
 LONG WINAPI TrenchBroomUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionPtrs);
 #else
-
 [[noreturn]] static void CrashHandler(int signum);
-
 #endif
 
 
 TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv} {
     using namespace std::chrono_literals;
+
     // When this flag is enabled, font and palette changes propagate as though the user had
     // manually called the corresponding QWidget methods.
     setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
+    setAttribute(Qt::AA_Use96Dpi);
+    setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     // Don't show icons in menus, they are scaled down and don't look very good.
-//    setAttribute(Qt::AA_DontShowIconsInMenus);
+    setAttribute(Qt::AA_DontShowIconsInMenus);
 
-#if defined(_WIN32) && defined(_MSC_VER)
+    m_signalHandler = SignalHandler();
+
+    #if defined(_WIN32) && defined(_MSC_VER)
     // with MSVC, set our own handler for segfaults so we can access the context
     // pointer, to allow StackWalker to read the backtrace.
     // see also: http://crashrpt.sourceforge.net/docs/html/exception_handling.html
     SetUnhandledExceptionFilter(TrenchBroomUnhandledExceptionFilter);
-#else
-    signal(SIGSEGV, CrashHandler);
-#endif
+    #else
+    m_signalHandler.setupHandler(CrashHandler);
+    #endif
 
-    // always set this locale so that we can properly parse floats from text files
-    // regardless of the platforms locale
-    std::setlocale(LC_NUMERIC, "C");
+    logger().info() << "Application   : " << applicationName() << getBuildVersion();
+    logger().info() << "Build         : " << getBuildIdStr();
+    logger().info() << "OS Version    : " << QSysInfo::prettyProductName();
+    logger().info() << "Qt Version    : " << qVersion();
+    logger().info() << "Log Level     : " << levelAttributes[logger().logLevel()].label.toStdString();
 
-    setApplicationName("TrenchBroom Nova");
-
-    const LogLevel logLevel = pref(Preferences::AppLogLevel);
-    const QString label = levelAttributes[logLevel].label;
-    defaultQtLogger.setLogLevel(logLevel);
-
-
-    logger().info() << applicationName() << getBuildVersion();
-    logger().info() << "Build : " << getBuildIdStr();
-    logger().info() << "OS    : " << QSysInfo::prettyProductName();
-    logger().info() << "Qt    : v" << qVersion();
-
-    logger().info() << "Current log-level is set to " << label;
 
     if (pref(Preferences::DebugMode)) {
-        logger().info() << "*** Operating in DEBUG MODE ***";
+        logger().info() << "Debug Mode    : enabled";
     }
+
+    logger().info() << "-";
 
     std::string colorSpace{};
     switch (pref(Preferences::RendererColorSpace)) {
@@ -197,6 +224,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     logger().info() << "MSAA Samples  : " << pref(Preferences::RendererSamples);
     logger().info() << "Swap Behavior : " << swapBehavior;
     logger().info() << "Swap Interval : " << pref(Preferences::RendererSwapInterval);
+    logger().info() << "-";
 
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
     // which would cause preferences to move from where they were with wx
@@ -204,19 +232,26 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     setOrganizationDomain("io.github.trenchbroom");
 
     if (!initializeGameFactory()) {
-        defaultQtLogger.error() << "Unable to initialize GameFactory!";
+        logger().error() << "Unable to initialize GameFactory!";
         QCoreApplication::exit(1);
         return;
     }
 
-    loadStyle();
-    loadStyleSheets();
-
-    m_UI_Font = loadFont(pref(Preferences::UIFontPath), pref(Preferences::UIFontSize));
+    m_UI_Font = loadFont(pref(Preferences::UIFontPath), uiFontPixelSize());
     m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
     m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
 
-    QApplication::setFont(m_UI_Font);
+    /* ------------------------------------------------------------------------------------------- */
+    loadStyle();
+    QApplication::setFont(fontForStyleSheet(m_UI_Font));
+
+    if (!loadStyleSheets()) {
+        logger().info() << "Shutdown due to init failure.";
+        QCoreApplication::exit(1);
+        return;
+    }
+
+    /* ------------------------------------------------------------------------------------------- */
 
     // these must be initialized here and not earlier
     m_frameManager = std::make_unique<FrameManager>(useSDI());
@@ -229,17 +264,33 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     connect(m_recentDocumentsReloadTimer, &QTimer::timeout, m_recentDocuments.get(), &RecentDocuments::reload);
     m_recentDocumentsReloadTimer->start(1s);
 
-#ifdef __APPLE__
-    setQuitOnLastWindowClosed(false);
 
-    auto *menuBar = new QMenuBar{};
+    #ifdef __APPLE__
+    setQuitOnLastWindowClosed(false);
+    #ifndef QT_NO_SESSIONMANAGER
+    // Cocoa commits the session before sending Quit. Close editor frames before their palettes.
+    setFallbackSessionManagementEnabled(false);
+    connect(this, &QGuiApplication::commitDataRequest, this, [this](QSessionManager& session) {
+        if (session.allowsInteraction()) {
+            if (!m_frameManager->closeAllFrames()) {
+                session.cancel();
+            }
+            session.release();
+        }
+    }, Qt::DirectConnection);
+    #endif
+
+    // The parentless macOS menu bar must outlive startup and its registered recent menu.
+    m_defaultMenuBar = std::make_unique<QMenuBar>();
     auto actionMap = std::map<const Action *, QAction *>{};
 
     auto menuBuilder = MainMenuBuilder{
-        *menuBar, actionMap, [](const Action &action) {
+        *m_defaultMenuBar, actionMap,
+        [](const Action &action) {
             auto context = ActionExecutionContext{nullptr, nullptr};
             action.execute(context);
-        }};
+        }
+    };
 
     const auto &actionManager = ActionManager::instance();
     actionManager.visitMainMenu(menuBuilder);
@@ -253,11 +304,11 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
             qtAction->setChecked(tbAction->checked(context));
         }
     }
-
-#endif
+    #endif
 }
 
 TrenchBroomApp::~TrenchBroomApp() {
+    delete m_qssBuilder;
     PreferenceManager::destroyInstance();
 }
 
@@ -273,7 +324,7 @@ FrameManager *TrenchBroomApp::frameManager() {
 
 QPalette TrenchBroomApp::darkPalette() {
     const auto brightness = pref(Preferences::UIBrightness);
-    const auto contrast = 1.0f; // internal
+    constexpr auto contrast = 1.0f; // internal
 
     const auto hl_color = pref(Preferences::UIHighlightColor);
     const auto tint_color = pref(Preferences::UIWindowTintColor);
@@ -346,217 +397,266 @@ QPalette TrenchBroomApp::darkPalette() {
 
 bool TrenchBroomApp::loadStyleSheets() {
     const auto path = IO::SystemPaths::findResourceFile("stylesheets/base.qss");
+    m_qssLoadedSuccessful = true;
 
-    logger().info() << "Loading StyleSheets from: " << path.string().c_str();
+    logger().info() << "Loading Qt dynamic stylesheets from: " << path.relative_path();
 
-    if (!builder) {
-        builder = QSSBuilder::fromFile(path);
+    auto pMsgHandler = [](QtMsgType type, const QMessageLogContext &context, const QString &msg) -> void {
+        // Qt stylesheet warnings usually contain "QSS" or "StyleSheet"
+        if (type == QtWarningMsg) {
+            LOG.error("Error loading style: " + msg);
+            APP.m_qssErrors.push_back(msg);
+            APP.m_qssLoadedSuccessful = false;
+        } else {
+            // Output to console normally as well
+            printf("%s\n", qPrintable(msg));
+        }
+    };
 
-        if (!builder) {
+
+    if (!m_qssBuilder) {
+        if (!(m_qssBuilder = QSSBuilder::fromFile(path))) {
             return false;
         }
 
-        builder->addReplacement("TEXT_COLOR", []() {
+        m_qssBuilder->addReplacement("TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::WindowText);
         });
 
-        builder->addReplacement("DISABLED_TEXT_COLOR", []() {
+        m_qssBuilder->addReplacement("DISABLED_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::WindowText, QPalette::ColorGroup::Disabled);
         });
 
-        builder->addReplacement("DISABLED_BUTTON_COLOR", []() {
+        m_qssBuilder->addReplacement("DISABLED_BUTTON_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Button, QPalette::ColorGroup::Disabled);
         });
 
-        builder->addReplacement("HIGHLIGHTED_TEXT_COLOR", []() {
+        m_qssBuilder->addReplacement("HIGHLIGHTED_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::HighlightedText);
         });
 
-        builder->addReplacement("BRIGHT_TEXT_COLOR", []() {
+        m_qssBuilder->addReplacement("BRIGHT_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::BrightText);
         });
 
-        builder->addReplacement("PLACEHOLDER_TEXT_COLOR", []() {
+        m_qssBuilder->addReplacement("PLACEHOLDER_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::PlaceholderText);
         });
 
-        builder->addReplacement("WINDOW_COLOR", []() {
+        m_qssBuilder->addReplacement("WINDOW_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Window);
         });
 
-        builder->addReplacement("BUTTON_COLOR", []() {
+        m_qssBuilder->addReplacement("BUTTON_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Button);
         });
 
-        builder->addReplacement("BUTTON_TEXT_COLOR", []() {
+        m_qssBuilder->addReplacement("BUTTON_TEXT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::ButtonText);
         });
 
-        builder->addReplacement("BASE_COLOR", []() {
+        m_qssBuilder->addReplacement("BASE_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Base);
         });
 
-        builder->addReplacement("ALTERNATE_BASE_COLOR", []() {
+        m_qssBuilder->addReplacement("ALTERNATE_BASE_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::AlternateBase);
         });
 
-        builder->addReplacement("LIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("LIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Light);
         });
 
-        builder->addReplacement("MIDLIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("MIDLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Midlight);
         });
 
-        builder->addReplacement("MIDHALF_COLOR", []() {
+        m_qssBuilder->addReplacement("MIDHALF_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid, 150);
         });
 
-        builder->addReplacement("MID_COLOR", []() {
+        m_qssBuilder->addReplacement("MID_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Mid);
         });
 
-        builder->addReplacement("DARK_COLOR", []() {
+        m_qssBuilder->addReplacement("DARK_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Dark);
         });
 
-        builder->addReplacement("SHADOW_COLOR", []() {
+        m_qssBuilder->addReplacement("SHADOW_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Shadow);
         });
 
-        builder->addReplacement("BRIGHT_HIGHLIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("BRIGHT_HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, 130);
         });
 
-        builder->addReplacement("LIGHT_HIGHLIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("LIGHT_HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, 80);
         });
 
-        builder->addReplacement("HIGHLIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight);
         });
 
-        builder->addReplacement("MID_HIGHLIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("MID_HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -180);
         });
 
-        builder->addReplacement("DARK_HIGHLIGHT_COLOR", []() {
+        m_qssBuilder->addReplacement("DARK_HIGHLIGHT_COLOR", []() {
             return toStyleSheetRGBA(qApp->palette(), QPalette::ColorRole::Highlight, -200);
         });
 
         /* ------------------------------------------------------------------------------------------- */
 
-        builder->addReplacement("BORDER_RADIUS", []() {
+        m_qssBuilder->addReplacement("BORDER_RADIUS", []() {
             return QString::asprintf("%dpx", LayoutConstants::BorderRadius);
         });
 
-        builder->addReplacement("BORDER_SIZE", []() {
+        m_qssBuilder->addReplacement("MENU_CORNER_RADIUS", []() {
+            return QString::number(TrenchBroomProxyStyle::MenuCornerRadius) + "px";
+        });
+        m_qssBuilder->addReplacement("TOOLTIP_CORNER_RADIUS", []() {
+            return QString::number(TrenchBroomProxyStyle::ToolTipCornerRadius) + "px";
+        });
+
+        m_qssBuilder->addReplacement("BORDER_SIZE", []() {
             return QString::asprintf("%dpx", LayoutConstants::BorderSize);
         });
 
         /* ------------------------------------------------------------------------------------------- */
 
-        builder->addReplacement("NARROW_V_MARGIN", []() {
+        m_qssBuilder->addReplacement("NARROW_V_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::NarrowVMargin);
         });
 
-        builder->addReplacement("NARROW_H_MARGIN", []() {
+        m_qssBuilder->addReplacement("NARROW_H_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin);
         });
 
-        builder->addReplacement("MEDIUM_V_MARGIN", []() {
+        m_qssBuilder->addReplacement("MEDIUM_V_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::MediumVMargin);
         });
 
-        builder->addReplacement("MEDIUM_H_MARGIN", []() {
+        m_qssBuilder->addReplacement("MEDIUM_H_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::MediumHMargin);
         });
 
-        builder->addReplacement("WIDE_V_MARGIN", []() {
+        m_qssBuilder->addReplacement("WIDE_V_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::WideVMargin);
         });
 
-        builder->addReplacement("WIDE_H_MARGIN", []() {
+        m_qssBuilder->addReplacement("WIDE_H_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
         });
 
-        builder->addReplacement("NARROW_MARGIN", []() {
+        m_qssBuilder->addReplacement("NARROW_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::NarrowHMargin);
         });
 
-        builder->addReplacement("MEDIUM_MARGIN", []() {
+        m_qssBuilder->addReplacement("MEDIUM_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::MediumHMargin);
         });
 
-        builder->addReplacement("WIDE_MARGIN", []() {
+        m_qssBuilder->addReplacement("WIDE_MARGIN", []() {
             return QString::asprintf("%dpx", LayoutConstants::WideHMargin);
         });
 
         /* ------------------------------------------------------------------------------------------- */
 
-        builder->addReplacement("UI_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::UIFontSize));
+        m_qssBuilder->addReplacement("UI_FONT_SIZE", []() {
+            return QString::asprintf("%dpx", uiFontPixelSize());
         });
 
-        builder->addReplacement("UI_MID_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::UIFontSize) - 1);
+        m_qssBuilder->addReplacement("UI_MID_FONT_SIZE", []() {
+            return QString::asprintf("%dpx", uiFontPixelSize(-1));
         });
 
-        builder->addReplacement("UI_SMALL_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::UIFontSize) - 2);
+        m_qssBuilder->addReplacement("UI_SMALL_FONT_SIZE", []() {
+            return QString::asprintf("%dpx", uiFontPixelSize(-2));
         });
 
-        builder->addReplacement("UI_TITLE_FONT_SIZE", []() {
-            return QString::asprintf("%dpx", pref(Preferences::UIFontSize) + 1);
+        m_qssBuilder->addReplacement("UI_DETAIL_TEXT_COLOR", []() {
+            auto color = qApp->palette().color(QPalette::WindowText);
+            color.setAlphaF(color.alphaF() * std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f));
+            return toStyleSheetRGBA(color);
         });
-        builder->addReplacement("RENDER_FONT_SIZE", []() {
+        m_qssBuilder->addReplacement("UI_ERROR_COLOR", [] { return toStyleSheetRGBA(toQColor(pref(Preferences::UIErrorColor))); });
+
+        m_qssBuilder->addReplacement("UI_TITLE_FONT_SIZE", []() { return QString::asprintf("%dpx", qRound(uiFontPixelSize() * 1.4)); });
+        m_qssBuilder->addReplacement("UI_HEADER_FONT_SIZE", [] { return QString::number(uiFontPixelSize() * 2) + "px"; });
+        m_qssBuilder->addReplacement("UI_DIALOG_TITLE_FONT_SIZE", [] { return QString::number(qRound(uiFontPixelSize() * 1.4) + 2) + "px"; });
+        m_qssBuilder->addReplacement("UI_FONT_FAMILY", [this] {
+            auto family = m_UI_Font.family();
+            family.replace('\\', "\\\\").replace('\"', "\\\"");
+            return family;
+        });
+        m_qssBuilder->addReplacement("UI_FONT_WEIGHT", [this] { return fontWeightForStyleSheet(m_UI_Font); });
+        m_qssBuilder->addReplacement("UI_FONT_STYLE", [this] { return fontStyleForStyleSheet(m_UI_Font); });
+        m_qssBuilder->addReplacement("CONSOLE_FONT_FAMILY", [this] {
+            auto family = m_ConsoleFont.family();
+            family.replace('\\', "\\\\").replace('\"', "\\\"");
+            return family;
+        });
+        m_qssBuilder->addReplacement("CONSOLE_FONT_WEIGHT", [this] { return fontWeightForStyleSheet(m_ConsoleFont); });
+        m_qssBuilder->addReplacement("CONSOLE_FONT_STYLE", [this] { return fontStyleForStyleSheet(m_ConsoleFont); });
+        m_qssBuilder->addReplacement("RENDER_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::RendererFontSize));
         });
 
-        builder->addReplacement("CONSOLE_FONT_SIZE", []() {
+        m_qssBuilder->addReplacement("CONSOLE_FONT_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::ConsoleFontSize));
         });
 
-        builder->addReplacement("TOOLBAR_ICON_SIZE", []() {
+        m_qssBuilder->addReplacement("TOOLBAR_ICON_SIZE", []() {
             return QString::asprintf("%dpx", pref(Preferences::ToolBarIconsSize));
         });
     }
 
-    builder->update();
-    logger().info() << "Load dynamic rendered stylesheets...";
+    m_qssBuilder->update();
+    m_qssLoadedSuccessful = !m_qssBuilder->getRenderedText().isEmpty();
+
+    //! install the interceptor hook to monitor startup
+    auto oldHandler = qInstallMessageHandler(pMsgHandler);
 
     qApp->style()->unpolish(qApp);
-    qApp->setStyleSheet(builder->getRenderedText());
+    qApp->setStyleSheet(m_qssBuilder->getRenderedText());
+
+    //! just a dummy to create a widget which initialized
+    //! style sheets to see if it was loaded correctly
+    auto test = QMenu{};
+
+    //! restore the old message handler
+    qInstallMessageHandler(oldHandler);
+
+    if (!m_qssLoadedSuccessful) {
+        QString msg =
+            QString{"Error while loading stylesheets from: "} +
+            QString{path.filename().string().c_str()} + '\n';
+
+        for (const auto &item : m_qssErrors) {
+            msg += "warning: " + item + "\n";
+        }
+
+        auto ret = QMessageBox::critical(
+            &test, qApp->applicationName(), msg,
+            QMessageBox::Abort | QMessageBox::Ignore,
+            QMessageBox::Abort
+        );
+
+        return ret == QMessageBox::Ignore;
+    }
 
     return true;
 }
 
 void TrenchBroomApp::loadStyle() {
-    // We can't use auto mnemonics in TrenchBroom. e.g. by default with Qt, Alt+D opens the
-    // "Debug" menu, Alt+S activates the "Show default properties" checkbox in the entity
-    // inspector. Flying with Alt held down and pressing WASD is a fundamental behaviour in
-    // TB, so we can't have shortcuts randomly activating.
-    //
-    // Previously were calling `qt_set_sequence_auto_mnemonic(false);` in main(), but it
-    // turns out we also need to suppress an Alt press followed by release from focusing the
-    // menu bar (https://github.com/TrenchBroom/TrenchBroom/issues/3140), so the following
-    // QProxyStyle disables that completely.
-
     logger().info() << "Setup Style and Palette...";
-    class TrenchBroomProxyStyle : public QProxyStyle {
-      public:
-        explicit TrenchBroomProxyStyle(const QString &key) : QProxyStyle{key} {
-        }
+    delete m_qssBuilder;
+    m_qssBuilder = nullptr;
 
-        explicit TrenchBroomProxyStyle(QStyle *style = nullptr) : QProxyStyle{style} {
-        }
-
-        int styleHint(StyleHint hint, const QStyleOption *option = nullptr, const QWidget *widget = nullptr, QStyleHintReturn *returnData = nullptr) const override {
-            return hint == QStyle::SH_MenuBar_AltKeyNavigation ? 0 : QProxyStyle::styleHint(hint, option, widget, returnData);
-        }
-    };
-
-    setStyle(new TrenchBroomProxyStyle{"Fusion"});
+    m_proxyStyle = new TrenchBroomProxyStyle{"Fusion"};
+    setStyle(m_proxyStyle);
     setPalette(darkPalette());
     qApp->setPalette(darkPalette());
 }
@@ -649,7 +749,7 @@ bool TrenchBroomApp::initializeGameFactory() {
             QMessageBox::critical(nullptr, "TrenchBroom", QString::fromStdString(msg), QMessageBox::Ok);
             defaultQtLogger.error() << msg;
         }
-    }).if_error([](auto e) { defaultQtLogger.error() << e.msg;; }).is_success();
+    }).if_error([](auto e) { defaultQtLogger.error() << e.msg; }).is_success();
 }
 
 bool TrenchBroomApp::newDocument() {
@@ -711,11 +811,18 @@ void TrenchBroomApp::showAboutDialog() {
 }
 
 void TrenchBroomApp::debugShowCrashReportDialog() {
-    const auto reportPath = IO::SystemPaths::userDataDirectory() / "crashreport.txt";
+    const auto repPath = IO::SystemPaths::userDataDirectory() / "crashreport.txt";
     const auto mapPath = IO::SystemPaths::userDataDirectory() / "crashreport.map";
     const auto logPath = IO::SystemPaths::userDataDirectory() / "crashreport.log";
 
-    auto dialog = CrashDialog{"Debug crash", reportPath, mapPath, logPath};
+    auto *report = new CrashReport{
+        SignalType(0xEC, "SIGDEBUG", "Call debug crash report"),
+        repPath,
+        logPath,
+        mapPath
+    };
+
+    auto dialog = CrashDialog{report};
     dialog.exec();
 }
 
@@ -742,14 +849,17 @@ bool TrenchBroomApp::notify(QObject *receiver, QEvent *event) {
         return QApplication::notify(receiver, event);
     } catch (const std::exception &e) {
         // Unfortunately we can't portably get the stack trace of the exception itself
-        TrenchBroom::View::reportCrashAndExit("<uncaught exception>", e.what());
+        TrenchBroom::View::reportCrashAndExit("<uncaught exception>", SignalType(0xEC, "SIGEXCEPT", e.what()));
     }
 #endif
 }
 
-#ifdef __APPLE__
-
 bool TrenchBroomApp::event(QEvent *event) {
+    if (event->type() == QEvent::Quit && m_frameManager && !m_frameManager->closeAllFrames()) {
+        event->ignore();
+        return true;
+    }
+#ifdef __APPLE__
     if (event->type() == QEvent::FileOpen) {
         const auto *openEvent = static_cast<QFileOpenEvent *>(event);
         const auto path = std::filesystem::path{openEvent->file().toStdString()};
@@ -763,10 +873,9 @@ bool TrenchBroomApp::event(QEvent *event) {
             showWelcomeWindow();
         }
     }
+#endif
     return QApplication::event(event);
 }
-
-#endif
 
 void TrenchBroomApp::openFilesOrWelcomeFrame(const QStringList &fileNames) {
     const auto filesToOpen = useSDI() && !fileNames.empty() ? QStringList{fileNames.front()} : fileNames;
@@ -803,30 +912,26 @@ bool TrenchBroomApp::useSDI() {
 #ifdef _WIN32
     return true;
 #else
-    return false;
+    return true;
 #endif
 }
 
 void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
-    if (reloadStyleSheets) {
-        loadStyleSheets();
-    }
-
-    loadStyle();
-
     if (reloadFonts) {
-        m_UI_Font = loadFont(pref(Preferences::UIFontPath), pref(Preferences::UIFontSize));
+        m_UI_Font = loadFont(pref(Preferences::UIFontPath), uiFontPixelSize());
         m_ConsoleFont = loadFont(pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
         m_RenderFont = loadFont(pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
     }
 
-    QApplication::setFont(m_UI_Font);
+    loadStyle();
+    QApplication::setFont(fontForStyleSheet(m_UI_Font));
+    if (reloadStyleSheets) loadStyleSheets();
 
-    for (const auto &widget : QApplication::allWidgets()) {
-        widget->update();
+    for (auto* widget : QApplication::allWidgets()) {
+        // Hidden controls can otherwise retain font attributes from the previous
+        // stylesheet after the underlying application style has been replaced.
+        repolishWidget(widget);
     }
-
-    QCoreApplication::processEvents();
 }
 
 const QFont &TrenchBroomApp::getUIFont() const {
@@ -841,157 +946,117 @@ const QFont &TrenchBroomApp::getRenderFont() const {
     return m_RenderFont;
 }
 
-QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, const int size) {
-    auto file = IO::SystemPaths::findResourceFile(path);
-
-    QFontDatabase database;
-    if (database.hasFamily(path.string().c_str())) {
-        logger().info() << "Using system font: " << path.string().c_str();
-        QFont font(path.string().c_str(), size);
-        font.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-        font.setStyleStrategy(QFont::PreferQuality);
-
-        return font;
-    }
-
-    logger().info() << "Loading font: " << path.string().c_str();
-
-    if (!exists(file)) {
-        logger().warn() << "Font does not exist: " << path.string().c_str();
-        logger().warn() << "Falling back to default font: " << QFont{}.rawName().toStdString();
-
-        return QFont{};
-    }
-
-    int font_id = database.addApplicationFont(file.c_str());
-    auto font_family = database.applicationFontFamilies(font_id);
-
-    if (font_family.empty()) {
-        logger().warn() << "Unable to load font: " << path.string().c_str();
-        logger().warn() << "Falling back to default font: " << QFont{}.rawName().toStdString();
-
-        return QFont{};
-    }
-
-    QFont font(font_family[0], size);
-    font.setHintingPreference(QFont::HintingPreference::PreferFullHinting);
-    font.setStyleStrategy(QFont::PreferQuality);
-
-    return font;
-}
-
-const QFont &TrenchBroomApp::getMUiFont() const {
-    return m_UI_Font;
-}
-
-void TrenchBroomApp::setMUiFont(const QFont &mUiFont) {
-    m_UI_Font = mUiFont;
-}
-
-const QFont &TrenchBroomApp::getMConsoleFont() const {
-    return m_ConsoleFont;
-}
-
-void TrenchBroomApp::setMConsoleFont(const QFont &mConsoleFont) {
-    m_ConsoleFont = mConsoleFont;
-}
-
-const QFont &TrenchBroomApp::getMRenderFont() const {
-    return m_RenderFont;
-}
-
-void TrenchBroomApp::setMRenderFont(const QFont &mRenderFont) {
-    m_RenderFont = mRenderFont;
+QFont TrenchBroomApp::loadFont(const std::filesystem::path& path, int size) const {
+    return View::loadFont(path, size);
 }
 
 MapFrame *TrenchBroomApp::getCurrentMapFrame() const {
-    return currentMapFrame;
+    return m_currentMapFrame;
 }
 
 void TrenchBroomApp::setCurrentMapFrame(MapFrame *currentMapFrame) {
-    TrenchBroomApp::currentMapFrame = currentMapFrame;
+    TrenchBroomApp::m_currentMapFrame = currentMapFrame;
 }
 
 Logger &TrenchBroomApp::logger() const {
     return defaultQtLogger;
 }
 
-namespace {
-std::string makeCrashReport(const std::string &stacktrace, const std::string &reason) {
-    auto ss = std::stringstream{};
-    ss << std::endl;
-    ss << "Operating System    : " << QSysInfo::prettyProductName().toStdString() << std::endl;
-    ss << "Qt Version          : " << qVersion() << std::endl;
-    ss << "GL_VENDOR           : " << GLContextManager::GLVendor << std::endl;
-    ss << "GL_RENDERER         : " << GLContextManager::GLRenderer << std::endl;
-    ss << "GL_VERSION          : " << GLContextManager::GLVersion << std::endl;
-    ss << "TrenchBroom Version : " << getBuildVersion().toStdString() << std::endl;
-    ss << "TrenchBroom Build   : " << getBuildIdStr().toStdString() << std::endl;
-    ss << "Reason              : " << reason << std::endl << std::endl;
-    ss << "[ stack trace ]" << std::endl;
-    ss << stacktrace;
-    ss << "[ stack trace ]" << std::endl;
-    return ss.str();
+QProxyStyle *TrenchBroomApp::getQProxyStyle() const {
+    return m_proxyStyle;
 }
 
-// returns the empty path for unsaved maps, or if we can't determine the current map
-std::filesystem::path savedMapPath() {
+void TrenchBroomApp::setQProxyStyle(QProxyStyle *proxyStyle) {
+    TrenchBroomApp::m_proxyStyle = proxyStyle;
+}
+
+std::stringstream makeCrashReport(const std::string &stacktrace, const std::string &reason) {
+    auto ss = std::stringstream{};
+
+    ss << std::endl;
+    ss << "Reason              : " << reason << std::endl;
+    ss << "TrenchBroom Version : " << getBuildVersion().toStdString() << std::endl;
+    ss << "TrenchBroom Build   : " << getBuildIdStr().toStdString() << std::endl;
+    ss << "Qt Version          : " << qVersion() << std::endl;
+    ss << "Operating System    : " << QSysInfo::prettyProductName().toStdString() << std::endl;
+    ss << "Thread              : " << QThread::currentThread()->currentThreadId() << std::endl;
+
+    if (GLContextManager::isInitialized()) {
+        ss << "OpenGL Vendor       : " << GLContextManager::GLVendor << std::endl;
+        ss << "OpenGL Renderer     : " << GLContextManager::GLRenderer << std::endl;
+        ss << "OpenGL Version      : " << GLContextManager::GLVersion << std::endl;
+    } else {
+        ss << "OpenGL              : " << "<not yet initialized>" << std::endl;
+    }
+
+    ss << "--- [ execution stack trace begin ] ---" << std::endl;
+    ss << stacktrace;
+    ss << "--- [ execution stack trace end ] ---" << std::endl;
+
+    return ss;
+}
+
+std::filesystem::path findCrashReportBasePath() {
     const auto document = topDocument();
-    return document && document->path().is_absolute() ? document->path() : std::filesystem::path{};
+    const auto prefix = "trenchbroom-crash";
+
+    if (document && document->path().is_absolute()) {
+        return document->path().parent_path() / (document->path().stem().string() + "-" + prefix);
+    } else {
+        const auto documentsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString();
+        return std::filesystem::path{documentsPath} / prefix;
+    }
 }
 
 std::filesystem::path crashReportBasePath() {
-    const auto mapPath = savedMapPath();
-    const auto crashLogPath = !mapPath.empty() ? mapPath.parent_path() / mapPath.stem() += "-crash.txt" :
-                              IO::pathFromQString(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)) /
-                              "trenchbroom-crash.txt";
+    const auto timestamp =
+        QDateTime::currentDateTime().
+            toString("yyyyMMdd_hhmmsszzz").
+            toStdString();
 
-    // ensure it doesn't exist
-    auto index = 0;
-    auto testCrashLogPath = crashLogPath;
-    while (IO::Disk::pathInfo(testCrashLogPath) == IO::PathInfo::File) {
-        ++index;
-
-        const auto testCrashLogName = fmt::format("{}-{}.txt", crashLogPath.stem().string(), index);
-        testCrashLogPath = crashLogPath.parent_path() / testCrashLogName;
-    }
-
-    return kdl::path_remove_extension(testCrashLogPath);
+    const auto basePath = findCrashReportBasePath();
+    return (basePath.string() + "-" + timestamp);
 }
 
 bool inReportCrashAndExit = false;
 bool crashReportGuiEnabled = true;
-} // namespace
 
-void setCrashReportGUIEnbled(const bool guiEnabled) {
-    crashReportGuiEnabled = guiEnabled;
-}
-
-void reportCrashAndExit(const std::string &stacktrace, const std::string &reason) {
+/**
+ *
+ * @param stacktrace
+ * @param reason
+ */
+void reportCrashAndExit(const std::string &stacktrace, const SignalType &signalType) {
     // just abort if we reenter reportCrashAndExit (i.e. if it crashes)
     if (inReportCrashAndExit) {
         std::abort();
     }
-
     inReportCrashAndExit = true;
 
     // get the crash report as a string
-    const auto report = makeCrashReport(stacktrace, reason);
-    defaultQtLogger.error() << "***** Fatal Error: " << reason << "*****";
-    defaultQtLogger.error() << report;
+    defaultQtLogger.error() << "FATAL: Abort due to application failure: " << signalType.name << ":";
+
+    std::string line;
+    std::string report{};
+    auto ss = makeCrashReport(stacktrace, signalType.name);
+
+    while (std::getline(ss, line)) {
+        defaultQtLogger.error() << line;
+        report += line + '\n';
+    }
 
     // write it to the crash log file
     const auto basePath = crashReportBasePath();
 
     // ensure the containing directory exists
     IO::Disk::createDirectory(basePath.parent_path()).transform([&](auto) {
-        const auto reportPath = kdl::path_add_extension(basePath, ".txt");
+        auto repPath = kdl::path_add_extension(basePath, ".txt");
         auto logPath = kdl::path_add_extension(basePath, ".log");
         auto mapPath = kdl::path_add_extension(basePath, ".map");
 
-        IO::Disk::withOutputStream(reportPath, [&](auto &stream) {
+        IO::Disk::withOutputStream(repPath, [&](auto &stream) {
             stream << report;
-            defaultQtLogger.error() << "wrote crash log to " << reportPath.string();
+            defaultQtLogger.error() << "wrote crash log to " << repPath.string();
         }).transform_error([](const auto &e) {
             defaultQtLogger.error() << "could not write crash log: " << e.msg;
         });
@@ -1011,16 +1076,19 @@ void reportCrashAndExit(const std::string &stacktrace, const std::string &reason
         }
 
         if (crashReportGuiEnabled) {
-            auto dialog = CrashDialog{reason, reportPath, mapPath, logPath};
+            qApp->style()->unpolish(qApp);
+            qApp->setStyleSheet("");
+
+            auto crashReport = new CrashReport(signalType, repPath, mapPath, logPath);
+            crashReport->stackTrace = QString::fromStdString(ss.str());
+
+            auto dialog = CrashDialog{crashReport};
+            dialog.setWindowFlag(Qt::Tool, true);
             dialog.exec();
         }
     }).transform_error([](const auto &e) {
         defaultQtLogger.error() << "could not create crash folder: " << e.msg;
     });
-
-    // write the crash log to stderr
-    defaultQtLogger.error() << "crash log:";
-    defaultQtLogger.error() << report;
 
     std::abort();
 }
@@ -1039,10 +1107,41 @@ LONG WINAPI TrenchBroomUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionPt
 }
 #else
 
-static void CrashHandler(int /* signum */) {
-    TrenchBroom::View::reportCrashAndExit(TrenchBroom::TrenchBroomStackWalker::getStackTrace(), "SIGSEGV");
+static void CrashHandler(int signum) {
+    TrenchBroom::View::reportCrashAndExit(
+        TrenchBroom::TrenchBroomStackWalker::getStackTrace(), gSignalHandler.sigList[signum]
+    );
 }
 
 #endif
-} // namespace View
-} // namespace TrenchBroom
+
+SignalType::SignalType(int signalNum, const std::string &name, const std::string &description)
+    : signal(signalNum), name(name), description(description) {}
+
+std::string SignalType::toString() const {
+    return stringf("Signal(0x%X, %s, »%s«)", signal, name.c_str(), description.c_str());
+}
+
+bool SignalHandler::setupHandler(void (*func)(int)) {
+    bool result = true;
+
+    for (const auto &item : sigList) {
+        auto res = signal(item.second.signal, func);
+        if (res == SIG_ERR) {
+            defaultQtLogger.warn()
+                << "Unable to setup signal handler: error #"
+                << errno
+                << " while setup "
+                << item.second.toString();
+            result = false;
+        }
+
+        defaultQtLogger.debug() << "Setup signal handler for: " << item.second.name.c_str();
+    }
+
+    return result;
+}
+
+CrashReport::CrashReport(const SignalType &signalType, const std::filesystem::path &reportPath, const std::filesystem::path &logPath, const std::filesystem::path &mapPath)
+    : signalType(signalType), reportPath(reportPath), logPath(logPath), mapPath(mapPath), stackTrace("-"), logContent("-") {}
+}

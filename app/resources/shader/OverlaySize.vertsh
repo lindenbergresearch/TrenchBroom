@@ -1,0 +1,20 @@
+#version 120
+
+uniform vec2 ViewportSize;
+uniform float DpiScale;
+// Scaling exponent, minimum multiplier, maximum multiplier.
+uniform vec3 SizeScaling;
+
+float overlayPixelsPerWorldUnit(vec4 clipPosition) {
+    return abs(gl_ProjectionMatrix[1][1]) * ViewportSize.y * 0.5 /
+        max(clipPosition.w, 0.00001);
+}
+
+float overlayScale(vec4 clipPosition) {
+    // Explicitly bypass the limits at zero: disabling scaling must preserve size.
+    if (SizeScaling.x <= 0.0)
+        return 1.0;
+
+    float projectedScale = overlayPixelsPerWorldUnit(clipPosition) / DpiScale;
+    return clamp(pow(max(projectedScale, 0.00001), SizeScaling.x), SizeScaling.y, SizeScaling.z);
+}

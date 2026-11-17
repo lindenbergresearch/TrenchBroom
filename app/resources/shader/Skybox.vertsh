@@ -1,0 +1,9 @@
+#version 120
+uniform vec3 SkyForward;
+uniform vec3 SkyRight;
+uniform vec3 SkyUp;
+varying vec3 skyDirection;
+void main() {
+    gl_Position = vec4(gl_Vertex.xy, 1.0, 1.0);
+    skyDirection = SkyForward + gl_Vertex.x * SkyRight + gl_Vertex.y * SkyUp;
+}

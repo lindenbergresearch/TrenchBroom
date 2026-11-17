@@ -1,0 +1,66 @@
+/* Qt rich-text CSS. Each template row has its own independently editable class. */
+p {
+    margin: 0 0 3px;
+    font-size: 10pt;
+}
+
+.tool {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.selection-name {
+    font-size: 13pt;
+    font-weight: bold;
+    color: coral;
+}
+
+.selection-type {
+    color: #9fb9d9;
+    margin-bottom: 8px;
+}
+
+.label {
+    color: #ffffff;
+}
+
+.position {
+}
+
+.size {
+}
+
+.orientation {
+}
+
+.group-contents {
+}
+
+.groups {
+}
+
+.entities {
+}
+
+.geometry {
+}
+
+.patches {
+}
+
+.texture-heading {
+    color: #acb8c8;
+    margin-top: 8px;
+}
+
+.textures {
+    font-size: 9pt;
+    color: #c3cedd;
+}
+
+.empty {
+    font-size: 10pt;
+    color: #acb8c8;
+}

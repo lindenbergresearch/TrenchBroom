@@ -35,6 +35,7 @@ class BrushIndexArray;
 class BrushVertexArray;
 
 class RenderBatch;
+struct EdgeRendererMesh;
 
 class EdgeRenderer {
   public:
@@ -128,9 +129,10 @@ class IndexedEdgeRenderer : public EdgeRenderer {
       private:
         std::shared_ptr<BrushVertexArray> m_vertexArray;
         std::shared_ptr<BrushIndexArray> m_indexArray;
+        std::shared_ptr<EdgeRendererMesh> m_mesh;
 
       public:
-        Render(const Params &params, std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<BrushIndexArray> indexArray);
+        Render(const Params &params, std::shared_ptr<BrushVertexArray> vertexArray, std::shared_ptr<BrushIndexArray> indexArray, std::shared_ptr<EdgeRendererMesh> mesh);
 
       private:
         void prepareVerticesAndIndices(VboManager &vboManager) override;
@@ -143,6 +145,7 @@ class IndexedEdgeRenderer : public EdgeRenderer {
   private:
     std::shared_ptr<BrushVertexArray> m_vertexArray;
     std::shared_ptr<BrushIndexArray> m_indexArray;
+    std::shared_ptr<EdgeRendererMesh> m_mesh;
 
   public:
     IndexedEdgeRenderer();

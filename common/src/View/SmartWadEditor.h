@@ -47,30 +47,21 @@ class SmartWadEditor : public SmartPropertyEditor {
     explicit SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
     void addWads();
-
     void removeSelectedWads();
-
     void moveSelectedWadsUp();
-
     void moveSelectedWadsDown();
-
     void reloadWads();
-
     bool canRemoveWads() const;
-
     bool canMoveWadsUp() const;
-
     bool canMoveWadsDown() const;
-
     bool canReloadWads() const;
 
   private:
     void createGui();
-
     void doUpdateVisual(const std::vector<Model::EntityNodeBase *> &nodes) override;
+    void updateWadFileStatus();
 
   private slots:
-
     void updateButtons();
 };
 

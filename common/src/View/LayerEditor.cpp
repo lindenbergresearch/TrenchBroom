@@ -22,19 +22,27 @@
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSignalBlocker>
+#include <QSpinBox>
+#include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidgetAction>
 
 #include "Model/BrushNode.h"
 #include "Model/EntityNode.h"
 #include "Model/GroupNode.h"
 #include "Model/LayerNode.h"
 #include "Model/ModelUtils.h"
+#include "Model/NodeQueries.h"
 #include "Model/WorldNode.h"
-#include "View/BorderLine.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
 #include "View/LayerListBox.h"
 #include "View/MapDocument.h"
 #include "View/QtUtils.h"
+#include "View/PrefabUtils.h"
+#include "View/Actions.h"
 #include "ViewUtils.h"
 
 #include "kdl/memory_utils.h"
@@ -49,11 +57,16 @@
 
 namespace TrenchBroom {
 namespace View {
-LayerEditor::LayerEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
-    : QWidget(parent), m_document(document), m_layerList(nullptr), m_addLayerButton(nullptr), m_removeLayerButton(nullptr), m_moveLayerUpButton(nullptr), m_moveLayerDownButton(nullptr) {
+LayerEditor::LayerEditor(std::weak_ptr<MapDocument> document, MapView *mapView, QWidget *parent)
+    : QWidget(parent), m_document(document), m_layerList(nullptr), m_mapView(mapView), m_addLayerButton(nullptr), m_removeLayerButton(nullptr), m_moveLayerUpButton(nullptr), m_moveLayerDownButton(nullptr) {
     createGui();
-
     updateButtons();
+    updateTreeSettings();
+    m_notifierConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect([this](const auto& path) {
+        if (path == Preferences::LayerTreeGroupByType.path() || path == Preferences::LayerTreeGroupingThreshold.path()
+            || path == Preferences::LayerTreeSyncSelection.path()
+            || path == Preferences::LayerTreeSelectionSyncThreshold.path()) updateTreeSettings();
+    });
 }
 
 void LayerEditor::onSetCurrentLayer(Model::LayerNode *layer) {
@@ -75,6 +88,9 @@ void LayerEditor::onLayerRightClick(Model::LayerNode *layerNode) {
     QAction *makeActiveAction = popupMenu.addAction(tr("Make active layer"), this, [this, layerNode]() { onSetCurrentLayer(layerNode); });
     QAction *moveSelectionToLayerAction = popupMenu.addAction(tr("Move selection to layer"), this, &LayerEditor::onMoveSelectionToLayer);
     QAction *selectAllInLayerAction = popupMenu.addAction(tr("Select all in layer"), this, &LayerEditor::onSelectAllInLayer);
+    addContextMenuAction(popupMenu,*ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath), [this, document] {
+        savePrefabDialog(document, m_layerList->selectedTreeNodes(), this);
+    },m_layerList->hasPrefabSelection());
     popupMenu.addSeparator();
     QAction *toggleLayerVisibleAction = popupMenu.addAction(layerNode->hidden() ? tr("Show layer") : tr("Hide layer"), this, [this, layerNode]() {
         toggleLayerVisible(layerNode);
@@ -120,11 +136,16 @@ bool LayerEditor::canToggleLayerVisible() const {
 
 void LayerEditor::toggleLayerVisible(Model::LayerNode *layer) {
     ensure(layer != nullptr, "layer is null");
-    auto document = kdl::mem_lock(m_document);
-    if (!layer->hidden()) {
-        document->hide(std::vector<Model::Node *>{layer});
-    } else {
-        document->resetVisibility(std::vector<Model::Node *>{layer});
+    toggleNodeVisible(layer);
+}
+
+void LayerEditor::toggleNodeVisible(Model::Node *node) {
+    const auto document = kdl::mem_lock(m_document);
+    if (node->visible()) document->hide({node});
+    else {
+        // One undoable command restores the entire subtree, including children
+        // that were explicitly hidden before their parent was hidden.
+        document->show(Model::collectNodesAndDescendants(std::vector<Model::Node *>{node}));
     }
 }
 
@@ -303,8 +324,11 @@ void LayerEditor::moveLayer(Model::LayerNode *layer, int direction) {
 
 void LayerEditor::onShowAllLayers() {
     auto document = kdl::mem_lock(m_document);
-    const auto layers = document->world()->allLayers();
-    document->resetVisibility(std::vector<Model::Node *>(std::begin(layers), std::end(layers)));
+    auto hiddenLayers = std::vector<Model::Node *>{};
+    for (auto *layer : document->world()->allLayers()) {
+        if (!layer->visible()) hiddenLayers.push_back(layer);
+    }
+    document->show(Model::collectNodesAndDescendants(hiddenLayers));
 }
 
 bool LayerEditor::canShowAllLayers() const {
@@ -370,15 +394,17 @@ Model::LayerNode *LayerEditor::findVisibleAndUnlockedLayer(const Model::LayerNod
 }
 
 void LayerEditor::createGui() {
-    m_layerList = new LayerListBox(m_document, this);
+    m_layerList = new LayerListBox(m_document, m_mapView, this);
     connect(m_layerList, &LayerListBox::layerSetCurrent, this, &LayerEditor::onSetCurrentLayer);
     connect(m_layerList, &LayerListBox::layerRightClicked, this, &LayerEditor::onLayerRightClick);
-    connect(m_layerList, &LayerListBox::layerOmitFromExportToggled, this, &LayerEditor::toggleOmitLayerFromExport);
-    connect(m_layerList, &LayerListBox::layerVisibilityToggled, this, [this](Model::LayerNode *layer) { toggleLayerVisible(layer); });
-    connect(m_layerList, &LayerListBox::layerLockToggled, this, [this](Model::LayerNode *layer) {
-        toggleLayerLocked(layer);
+    connect(m_layerList, &LayerListBox::nodeVisibilityToggled, this, &LayerEditor::toggleNodeVisible);
+    connect(m_layerList, &LayerListBox::nodeLockToggled, this, [this](Model::Node *node) {
+        const auto document = kdl::mem_lock(m_document);
+        if (node->locked()) document->unlock({node});
+        else document->lock({node});
     });
     connect(m_layerList, &LayerListBox::itemSelectionChanged, this, &LayerEditor::updateButtons);
+    connect(m_layerList, &LayerListBox::treeChanged, this, &LayerEditor::updateButtons);
 
     m_addLayerButton = createBitmapButton("Add.svg", tr("Add a new layer from the current selection"));
     m_removeLayerButton = createBitmapButton("Remove.svg", tr("Remove the selected layer and move its objects to the default layer"));
@@ -396,19 +422,75 @@ void LayerEditor::createGui() {
         moveLayer(layer, 1);
     });
 
-    auto *buttonSizer = new QHBoxLayout();
-    buttonSizer->addWidget(m_addLayerButton);
-    buttonSizer->addWidget(m_removeLayerButton);
-    buttonSizer->addWidget(m_moveLayerUpButton);
-    buttonSizer->addWidget(m_moveLayerDownButton);
-    buttonSizer->addStretch(1);
+    m_groupByTypeButton = createBitmapToggleButton("GroupByType.svg", tr("Group objects by type"));
+    m_groupByTypeButton->setAccessibleName(tr("Group objects by type"));
+    m_groupByTypeButton->setProperty("layerTreeControl", "groupByType");
+    m_groupByTypeButton->setPopupMode(QToolButton::MenuButtonPopup);
+    auto* groupingMenu = new QMenu(m_groupByTypeButton);
+    auto* thresholdAction = new QWidgetAction(groupingMenu);
+    m_groupingThreshold = new QSpinBox;
+    m_groupingThreshold->setRange(1, 100000);
+    m_groupingThreshold->setPrefix(tr("More than "));
+    m_groupingThreshold->setSuffix(tr(" objects"));
+    m_groupingThreshold->setKeyboardTracking(false);
+    m_groupingThreshold->setAccessibleName(tr("Type grouping threshold"));
+    m_groupingThreshold->setToolTip(tr("Group matching object types under the same parent when their count exceeds this value."));
+    thresholdAction->setDefaultWidget(m_groupingThreshold);
+    groupingMenu->addAction(thresholdAction);
+    m_groupByTypeButton->setMenu(groupingMenu);
+
+    m_syncSelectionButton = createBitmapToggleButton("SyncSelection.svg", tr("Synchronize tree and editor selection"));
+    m_syncSelectionButton->setAccessibleName(tr("Synchronize tree and editor selection"));
+    m_syncSelectionButton->setProperty("layerTreeControl", "syncSelection");
+    m_syncSelectionButton->setPopupMode(QToolButton::MenuButtonPopup);
+    auto* syncMenu = new QMenu(m_syncSelectionButton);
+    auto* syncThresholdAction = new QWidgetAction(syncMenu);
+    m_selectionSyncThreshold = new QSpinBox;
+    m_selectionSyncThreshold->setRange(1, 100000);
+    m_selectionSyncThreshold->setPrefix(tr("Automatic up to "));
+    m_selectionSyncThreshold->setKeyboardTracking(false);
+    m_selectionSyncThreshold->setAccessibleName(tr("Automatic selection synchronization limit"));
+    m_selectionSyncThreshold->setToolTip(tr("For larger selections, double-click a row in the Layer tree to synchronize."));
+    syncThresholdAction->setDefaultWidget(m_selectionSyncThreshold);
+    syncMenu->addAction(syncThresholdAction);
+    m_syncSelectionButton->setMenu(syncMenu);
+
+    m_groupByTypeButton->setObjectName("layerTreeToggle");
+    m_syncSelectionButton->setObjectName("layerTreeToggle");
+
+    connect(m_groupByTypeButton, &QToolButton::toggled, this, [this](const bool enabled) {
+        setPref(Preferences::LayerTreeGroupByType, enabled);
+        m_layerList->setGroupByType(enabled);
+        updateTreeSettings();
+    });
+    connect(m_groupingThreshold, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](const int value) {
+        setPref(Preferences::LayerTreeGroupingThreshold, value);
+        m_layerList->setGroupingThreshold(value);
+        updateTreeSettings();
+    });
+    connect(m_syncSelectionButton, &QToolButton::toggled, this, [this](const bool enabled) {
+        setPref(Preferences::LayerTreeSyncSelection, enabled);
+        m_layerList->setSelectionSyncEnabled(enabled);
+        updateTreeSettings();
+    });
+    connect(m_selectionSyncThreshold, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](const int value) {
+        setPref(Preferences::LayerTreeSelectionSyncThreshold, value);
+        updateTreeSettings();
+    });
+
+    auto* toolbar = createInspectorToolBar(this);
+    toolbar->addWidget(m_addLayerButton);
+    toolbar->addWidget(m_removeLayerButton);
+    toolbar->addWidget(m_moveLayerUpButton);
+    toolbar->addWidget(m_moveLayerDownButton);
+    toolbar->addWidget(m_groupByTypeButton);
+    toolbar->addWidget(m_syncSelectionButton);
 
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);
     sizer->setSpacing(0);
+    sizer->addWidget(toolbar);
     sizer->addWidget(m_layerList, 1);
-    sizer->addWidget(new BorderLine(BorderLine::Direction::Horizontal), 0);
-    sizer->addLayout(buttonSizer, 0);
     setLayout(sizer);
 }
 
@@ -416,6 +498,22 @@ void LayerEditor::updateButtons() {
     m_removeLayerButton->setEnabled(canRemoveLayer());
     m_moveLayerUpButton->setEnabled(canMoveLayer(-1));
     m_moveLayerDownButton->setEnabled(canMoveLayer(1));
+}
+
+void LayerEditor::updateTreeSettings() {
+    const QSignalBlocker groupBlocker(m_groupByTypeButton);
+    const QSignalBlocker syncBlocker(m_syncSelectionButton);
+    const QSignalBlocker thresholdBlocker(m_groupingThreshold);
+    const QSignalBlocker syncThresholdBlocker(m_selectionSyncThreshold);
+    m_groupByTypeButton->setChecked(pref(Preferences::LayerTreeGroupByType));
+    m_syncSelectionButton->setChecked(pref(Preferences::LayerTreeSyncSelection));
+    m_groupingThreshold->setValue(std::clamp(pref(Preferences::LayerTreeGroupingThreshold), 1, 100000));
+    m_selectionSyncThreshold->setValue(pref(Preferences::LayerTreeSelectionSyncThreshold));
+    m_groupByTypeButton->setToolTip(tr("Type grouping: %1\nClick the icon to toggle. Use the arrow to change the limit (more than %2 objects per parent).")
+        .arg(m_groupByTypeButton->isChecked() ? tr("On") : tr("Off")).arg(m_groupingThreshold->value()));
+    m_syncSelectionButton->setToolTip(tr("Selection synchronization: %1\nClick the icon to toggle or use the arrow to change the limit.\n"
+        "Selections of more than %2 objects synchronize when you double-click a row in the Layer tree.")
+        .arg(m_syncSelectionButton->isChecked() ? tr("On") : tr("Off")).arg(m_selectionSyncThreshold->value()));
 }
 } // namespace View
 } // namespace TrenchBroom

@@ -21,24 +21,26 @@
 
 namespace TrenchBroom {
 
-// Initialize the static start time at the program start.
-std::chrono::high_resolution_clock::time_point Chrono::startTime = std::chrono::high_resolution_clock::now();
+using namespace std::chrono;
 
-std::chrono::high_resolution_clock::duration Chrono::elapsed() {
-    return std::chrono::high_resolution_clock::now() - startTime;
+// Initialize the static start time at the program start.
+const TimePoint Chrono::startTime = Clock::now();
+
+Clock::duration Chrono::elapsed() {
+    return Clock::now() - startTime;
 }
 
-QString Chrono::elapsedFormatted() {
-    qint64 milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed()).count();
-    qint64 seconds = milliseconds / 1000;
-    qint64 minutes = seconds / 60;
-    qint64 hours = minutes / 60;
+QString Chrono::elapsedFormatted(Clock::duration duration) {
+    long millis = duration_cast<milliseconds>(duration).count();
+    long seconds = millis / 1000;
+    long minutes = seconds / 60;
+    long hours = minutes / 60;
 
     QString formattedTime = QString("%1h:%2m:%3s:%4ms")
         .arg(hours)
         .arg(minutes % 60)
         .arg(seconds % 60)
-        .arg(milliseconds % 1000);
+        .arg(millis % 1000);
 
     return formattedTime;
 }
@@ -60,8 +62,4 @@ double Chrono::time() {
     return double(nanoTime()) * 10e-9;
 }
 
-
-void Chrono::start() {
-    startTime = std::chrono::high_resolution_clock::now();
-}
 }

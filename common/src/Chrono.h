@@ -24,6 +24,9 @@
 
 namespace TrenchBroom {
 
+typedef std::chrono::high_resolution_clock::time_point TimePoint;
+typedef std::chrono::high_resolution_clock Clock;
+
 /**
  * @class Chrono
  * @brief A static utility class that records the program start time and provides functions to measure elapsed time in various units.
@@ -33,13 +36,6 @@ namespace TrenchBroom {
  */
 class Chrono {
   public:
-    /**
-     * @brief Initializes the start time at program start.
-     *
-     * This method sets the start time when called. It is typically called once at the beginning of the program.
-     */
-    static void start();
-
     /**
      * @brief Returns the elapsed time since the program started in nanoseconds.
      *
@@ -76,17 +72,17 @@ class Chrono {
      *
      * @return QString The formatted time string.
      */
-    static QString elapsedFormatted();
+    static QString elapsedFormatted(Clock::duration duration = elapsed());
 
   private:
-    static std::chrono::high_resolution_clock::time_point startTime;  ///< Stores the program's start time.
+    static const Clock::time_point startTime;  ///< Stores the program's start time.
 
     /**
      * @brief Helper function to calculate the elapsed time since the start time.
      *
      * @return std::chrono::high_resolution_clock::duration The elapsed duration since the start time.
      */
-    static std::chrono::high_resolution_clock::duration elapsed();
+    static Clock::duration elapsed();
 };
 
 }

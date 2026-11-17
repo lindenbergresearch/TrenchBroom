@@ -22,9 +22,7 @@
 #include "Color.h"
 #include "Logger.h"
 #include "Preference.h"
-
 #include "Renderer/FontDescriptor.h"
-
 #include <vm/util.h>
 
 #include <filesystem>
@@ -33,6 +31,7 @@
 
 namespace TrenchBroom {
 namespace Preferences {
+
 // NOTE: any QKeySequence preferences must be functions like CameraFly*
 // because QKeySequence docs specify that you can't create an instance before QApplication
 
@@ -40,10 +39,12 @@ namespace Preferences {
 // implementation
 
 enum LengthUnitDisplay {
-  Units,   /* common units used by Quake (standard) */
-  Metric,  /* metric system used for interfacing 3rd party systems and engines */
-  Combined /* combined */
+   Units,   /* common units used by Quake (standard) */
+   Metric,  /* metric system used for interfacing 3rd party systems and engines */
+   Combined /* combined */
 };
+
+typedef std::filesystem::path Path;
 
 extern Preference<int> MapViewLayout;
 extern Preference<LogLevel> AppLogLevel;
@@ -60,6 +61,19 @@ extern Preference<Color> PortalFileFillColor;
 /* --- RENDERER  ------------------------------------- */
 extern Preference<int> RendererSwapBehavior;
 extern Preference<int> RendererSwapInterval;
+extern Preference<int> RendererMaxFPS;
+extern Preference<bool> LayerTreeGroupByType;
+extern Preference<int> LayerTreeGroupingThreshold;
+extern Preference<bool> LayerTreeSyncSelection;
+extern Preference<int> LayerTreeSelectionSyncThreshold;
+extern Preference<Color> LayerTreeLayerIconColor;
+extern Preference<Color> LayerTreeGroupIconColor;
+extern Preference<Color> LayerTreeEntityIconColor;
+extern Preference<Color> LayerTreeBrushIconColor;
+extern Preference<Color> LayerTreePatchIconColor;
+extern Preference<Color> LayerTreeTypeGroupIconColor;
+extern Preference<bool> ShowContextOverlay;
+extern Preference<QString> ContextOverlayTheme;
 extern Preference<int> RendererColorSpace;
 extern Preference<int> RendererSamples;
 extern Preference<int> RendererDepthBufferSize;
@@ -110,6 +124,9 @@ extern Preference<Color> SelectedEdgeColor;
 extern Preference<Color> OccludedSelectedEdgeColor;
 extern Preference<float> EdgeLineWidth;
 extern Preference<float> EdgeSelectedLineWidth;
+extern Preference<float> OverlayScaleFactor;
+extern Preference<float> OverlayMinimumScale;
+extern Preference<float> OverlayMaximumScale;
 extern Preference<Color> LockedEdgeColor;
 extern Preference<float> OccludedSelectedEdgeAlpha;
 extern Preference<Color> LockedEdgeColor;
@@ -118,8 +135,10 @@ extern Preference<Color> LockedEdgeColor;
 extern Preference<Color> SelectionBoundsColor;
 extern Preference<Color> SelectionBoundsPointColor;
 extern Preference<float> SelectionBoundsAlpha;
+extern Preference<float> SelectionBoundsFillAlpha;
 extern Preference<float> SelectionBoundsLineWidth;
 extern Preference<float> SelectionBoundsPointSize;
+extern Preference<float> SelectionBoundsAnimationSpeed;
 extern Preference<int> SelectionBoundsPattern;
 extern Preference<bool> SelectionBoundsIntersectionMode;
 extern Preference<bool> SelectionBoundsDashedLines;
@@ -188,12 +207,16 @@ extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
 
 /* --- FONTS ----------------------------------------- */
-extern Preference<std::filesystem::path> RendererFontPath;
-extern Preference<std::filesystem::path> UIFontPath;
-extern Preference<std::filesystem::path> ConsoleFontPath;
+extern Preference<Path> RendererFontPath;
+extern Preference<Path> UIFontPath;
+extern Preference<Path> ConsoleFontPath;
 extern Preference<int> RendererFontSize;
 extern Preference<int> BrowserFontSize;
 extern Preference<int> UIFontSize;
+extern Preference<int> UIFontMinimumSize;
+extern Preference<float> UIDetailTextOpacity;
+extern Preference<bool> ContextMenuIcons;
+extern Preference<bool> ContextMenuShortcuts;
 extern Preference<int> ConsoleFontSize;
 
 Renderer::FontDescriptor getDefaultRenderFont();
@@ -213,7 +236,13 @@ extern Preference<Color> TextureBrowserUsedColor;
 extern Preference<Color> UIHighlightColor;
 extern Preference<Color> UIWindowTintColor;
 extern Preference<Color> UITextColor;
+extern Preference<Color> UIErrorColor;
+extern Preference<Color> UIWarningColor;
 extern Preference<float> UIBrightness;
+
+/* --- UI CURSOR  ------------------------------------ */
+extern Preference<Path> RendererDefaultCursor;
+
 
 /* --- LOGGING COLORS -------------------------------- */
 extern Preference<Color> LogTraceColor;
@@ -243,15 +272,10 @@ static constexpr auto MinCameraFlyMoveSpeed = 0.1f;
 static constexpr auto MaxCameraFlyMoveSpeed = 10.0f;
 
 extern Preference<QKeySequence> &CameraFlyForward();
-
 extern Preference<QKeySequence> &CameraFlyBackward();
-
 extern Preference<QKeySequence> &CameraFlyLeft();
-
 extern Preference<QKeySequence> &CameraFlyRight();
-
 extern Preference<QKeySequence> &CameraFlyUp();
-
 extern Preference<QKeySequence> &CameraFlyDown();
 
 /* --- MAP VIEW--------------------------------------- */
@@ -274,8 +298,11 @@ QString faceRenderModeSkip();
 
 extern Preference<bool> ShadeFaces;
 extern Preference<float> ShadeLevel;
+extern Preference<float> GridAxisColorMix;
+extern Preference<bool> ShadeGrid;
 
 extern Preference<bool> ShowFog;
+extern Preference<bool> ShowSky;
 extern Preference<Color> FogColor;
 extern Preference<float> FogMaxAmount;
 extern Preference<float> FogMinDistance;
@@ -307,7 +334,7 @@ extern Preference<QString> EntityLinkMode;
  */
 const std::vector<PreferenceBase *> &staticPreferences();
 
-const std::map<std::filesystem::path, PreferenceBase *> &staticPreferencesMap();
+const std::map<Path, PreferenceBase *> &staticPreferencesMap();
 
 /**
  * Returns the subset of staticPreferences() that are key sequences, used by

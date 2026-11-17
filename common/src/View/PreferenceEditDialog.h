@@ -4,6 +4,7 @@
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#include "FontUtils.h"
 #include "QtUtils.h"
 
 namespace TrenchBroom {
@@ -42,9 +43,8 @@ class PreferenceEditDialog : public QDialog {
 
         auto layout = new QHBoxLayout{};
 
-        makeMono(instance, QFont{}.pointSize());
-        colorizeWidget(instance, QColor(255, 255, 255, 255), QPalette::ColorRole::Text);
-        colorizeWidget(instance, QColor(255, 255, 255, 255), QPalette::ColorRole::WindowText);
+        makeMono(instance);
+        makeBright(instance);
 
         layout->addWidget(labelWidget);
         layout->addWidget(instance, 1);

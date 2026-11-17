@@ -51,6 +51,7 @@ class ElidedLabel : public QWidget {
     QSize minimumSizeHint() const override;
 
   protected:
+    void changeEvent(QEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 };
 } // namespace View

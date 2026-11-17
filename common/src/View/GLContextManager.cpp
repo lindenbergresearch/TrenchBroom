@@ -42,13 +42,17 @@ std::string GLContextManager::GLVendor = "unknown";
 std::string GLContextManager::GLRenderer = "unknown";
 std::string GLContextManager::GLVersion = "unknown";
 
+bool GLContextManager::s_hasInitialized = false;
+
 GLContextManager::GLContextManager()
-    : m_initialized(false), m_shaderManager(std::make_unique<Renderer::ShaderManager>()),
+    : m_shaderManager(std::make_unique<Renderer::ShaderManager>()),
       m_vboManager(std::make_unique<Renderer::VboManager>(m_shaderManager.get())),
       m_fontManager(std::make_unique<Renderer::FontManager>()) {}
 
 GLContextManager::~GLContextManager() = default;
+
 bool GLContextManager::initialized() const { return m_initialized; }
+
 float GLContextManager::maxAnisotropy() const { return m_maxAnisotropy; }
 
 static void initializeGlew() {
@@ -57,7 +61,7 @@ static void initializeGlew() {
     const GLenum glewState = glewInit();
     if (glewState != GLEW_OK) {
         auto str = std::stringstream();
-        str << "Error initializing glew: " << glewGetErrorString(glewState);
+        str << "Error initializing GLEW: " << glewGetErrorString(glewState);
         throw RenderException(str.str());
     }
 }
@@ -86,10 +90,12 @@ bool GLContextManager::initialize() {
                     Grid2DShader,
                     VaryingPCShader,
                     VaryingPUniformCShader,
+                    SelectionBoundsShader,
                     SelectionGuideShader,
                     MiniMapEdgeShader,
                     EntityModelShader,
                     FaceShader,
+                    SkyboxShader,
                     PatchShader,
                     EdgeShader,
                     ColoredTextShader,
@@ -105,19 +111,23 @@ bool GLContextManager::initialize() {
                     LinkArrowShader,
                     TriangleShader,
                     UVViewShader,
-                }, [&](const auto& shaderConfig) { return m_shaderManager->loadProgram(shaderConfig); }
+                }, [&](const auto &shaderConfig) { return m_shaderManager->loadProgram(shaderConfig); }
             )
-        ).transform_error([&](const auto& e) { throw RenderException{e.msg}; });
+        ).transform_error([&](const auto &e) { throw RenderException{e.msg}; });
 
+        // Each editor frame has its own shader and buffer managers.
         m_initialized = true;
+        s_hasInitialized = true;
         return true;
     }
+
     return false;
 }
 
-Renderer::VboManager& GLContextManager::vboManager() { return *m_vboManager; }
 
-Renderer::FontManager& GLContextManager::fontManager() { return *m_fontManager; }
 
-Renderer::ShaderManager& GLContextManager::shaderManager() { return *m_shaderManager; }
+Renderer::VboManager &GLContextManager::vboManager() { return *m_vboManager; }
+Renderer::FontManager &GLContextManager::fontManager() { return *m_fontManager; }
+Renderer::ShaderManager &GLContextManager::shaderManager() { return *m_shaderManager; }
+
 }

@@ -53,9 +53,10 @@ class MapView3D : public MapViewBase {
     MapView3D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, Logger *logger);
 
     ~MapView3D() override;
+    void focusCameraOnObjects(const std::vector<Model::Node*>& nodes, bool animate);
 
   private:
-    void initializeCamera();
+    void initializeCamera() const;
 
     void initializeToolChain(MapViewToolBox &toolBox);
 
@@ -64,15 +65,15 @@ class MapView3D : public MapViewBase {
 
     void cameraDidChange(const Renderer::Camera *camera);
 
-    void saveCameraState(MapDocument *document);
+    void saveCameraState(const MapDocument *document);
 
-    void loadCameraState(MapDocument *document);
+    void loadCameraState(const MapDocument *document);
 
     void preferenceDidChange(const std::filesystem::path &path);
 
-    void documentWasLoaded(MapDocument *);
+    void documentWasLoaded(const MapDocument *);
 
-    void documentWasSaved(MapDocument *);
+    void documentWasSaved(const MapDocument *);
 
   protected: // QWidget overrides
     void keyPressEvent(QKeyEvent *event) override;
@@ -113,8 +114,6 @@ class MapView3D : public MapViewBase {
 
     void doFocusCameraOnSelection(bool animate) override;
 
-    void doFocusCameraOnEntityByName(const std::string name);
-
     vm::vec3f focusCameraOnObjectsPosition(const std::vector<Model::Node *> &nodes);
 
     void doMoveCameraToPosition(const vm::vec3f &position, bool animate) override;
@@ -124,6 +123,9 @@ class MapView3D : public MapViewBase {
     void doMoveCameraToCurrentTracePoint() override;
 
   private: // implement MapViewBase interface
+
+  private:
+
     vm::vec3 doGetMoveDirection(vm::direction direction) const override;
 
     size_t doGetFlipAxis(const vm::direction direction) const override;

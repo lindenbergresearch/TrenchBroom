@@ -27,7 +27,9 @@
 #include "Model/MapFormat.h"
 #include "NotifierConnection.h"
 #include "Result.h"
-#include "View/Selection.h"
+#include "Selection.h"
+#include "TBWidget.h"
+#include "StatusBar.h"
 
 #include <chrono>
 #include <filesystem>
@@ -83,9 +85,9 @@ class InfoPanel;
 
 class Inspector;
 
-enum class InspectorPage;
 
 class MapDocument;
+class LayerListBox;
 
 class MapViewBase;
 
@@ -98,6 +100,13 @@ class SignalDelayer;
 class SwitchableMapViewContainer;
 
 class Tool;
+
+class StatusBar;
+class StatusBarManager;
+class StatusBarWidget;
+class TextStatusBarWidget;
+class MessageStatusBarWidget;
+class IconLabelStatusBarWidget;
 
 class MapFrame : public QMainWindow {
   Q_OBJECT
@@ -112,6 +121,7 @@ class MapFrame : public QMainWindow {
     QToolBar *m_toolBar;
 
     QSplitter *m_hSplitter;
+    QSplitter *m_leftInspectorSplitter;
     QSplitter *m_vSplitter;
 
     std::unique_ptr<GLContextManager> m_contextManager;
@@ -124,6 +134,10 @@ class MapFrame : public QMainWindow {
     InfoPanel *m_infoPanel;
     Console *m_console;
     Inspector *m_inspector;
+    StatusBarManager *m_statusBarManager;
+    IconLabelStatusBarWidget *m_cameraStatusBarWidget;
+    IconLabelStatusBarWidget *messagesStatusBarWidget;
+    IconLabelStatusBarWidget *m_gridInfoStatusBarWidget;
 
     QComboBox *m_gridChoice;
     QLabel *m_statusBarLabel;
@@ -145,6 +159,7 @@ class MapFrame : public QMainWindow {
   private:
     SignalDelayer *m_updateTitleSignalDelayer;
     SignalDelayer *m_updateActionStateSignalDelayer;
+    QPointer<LayerListBox> m_prefabSelectionTree;
     SignalDelayer *m_updateStatusBarSignalDelayer;
 
   public:
@@ -161,7 +176,14 @@ class MapFrame : public QMainWindow {
 
     QAction *findAction(const std::filesystem::path &path);
 
+    void updateActionState();
+    void saveSelectionAsPrefab();
+    bool canSaveSelectionAsPrefab() const;
+
+    void cameraDidChange(const Renderer::Camera *camera) const;
+
   private: // title bar contents
+    LayerListBox* prefabSelectionTree() const;
     void updateTitle();
 
     void updateTitleDelayed();
@@ -170,8 +192,6 @@ class MapFrame : public QMainWindow {
     void createMenus();
 
     void updateShortcuts();
-
-    void updateActionState();
 
     void updateActionStateDelayed();
 
@@ -188,14 +208,14 @@ class MapFrame : public QMainWindow {
 
     void createToolBar();
 
-    void updateToolBarWidgets();
+    void updateToolBarWidgets() const;
 
   private: // status bar
     void createStatusBar();
 
-    void updateStatusBar();
+    void updateStatusBar() const;
 
-    void updateStatusBarDelayed();
+    void updateStatusBarDelayed() const;
 
   private: // gui creation
     void createGui();
@@ -501,7 +521,7 @@ class MapFrame : public QMainWindow {
 
     void showAll();
 
-    void switchToInspectorPage(InspectorPage page);
+    void revealInspectorTool(const QString& id);
 
     void toggleToolbar();
 
@@ -547,7 +567,11 @@ class MapFrame : public QMainWindow {
 
     void debugShowPalette();
 
+    void debugToggleShowFPS();
+
     void focusChange(QWidget *oldFocus, QWidget *newFocus);
+
+    void changeViewLayout(int count);
 
     MapViewBase *currentMapViewBase();
 
@@ -571,6 +595,9 @@ class MapFrame : public QMainWindow {
 
   private:
     void triggerAutosave();
+
+  protected:
+    void paintEvent(QPaintEvent *event) override;
 };
 
 class DebugPaletteWindow : public QDialog {

@@ -20,6 +20,7 @@
 #include "TextureCollection.h"
 
 #include "Ensure.h"
+#include "Logger.h"
 
 #include "kdl/reflection_impl.h"
 #include "kdl/vector_utils.h"
@@ -97,6 +98,10 @@ bool TextureCollection::prepared() const {
 
 void TextureCollection::prepare(const int minFilter, const int magFilter) {
     assert(!prepared());
+
+    if (!m_path.filename().empty()) {
+        defaultQtLogger.debug() << "Preparing: " << textureCount() << " textures in collection: " << m_path.filename();
+    }
 
     m_textureIds.resize(textureCount());
     if (textureCount() != 0u) {

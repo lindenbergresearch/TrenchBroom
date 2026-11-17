@@ -153,7 +153,7 @@ mat4 getModelMatrix() {
 }
 
 void main(void) {
-    gl_Position = gl_ProjectionMatrix * ViewMatrix * getModelMatrix() * gl_Vertex;
-    worldCoordinates = ModelMatrix * gl_Vertex;
+    worldCoordinates = getModelMatrix() * gl_Vertex;
+    gl_Position = gl_ProjectionMatrix * ViewMatrix * worldCoordinates;
     gl_TexCoord[0] = gl_MultiTexCoord0;
 }

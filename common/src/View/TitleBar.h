@@ -20,19 +20,14 @@
 #pragma once
 
 #include <QWidget>
+#include "TBWidget.h"
 
-class QLabel;
+namespace TrenchBroom::View {
+class TitleBar : public TBWidget {
+    Q_OBJECT
 
-namespace TrenchBroom {
-namespace View {
-class TitleBar : public QWidget {
-  protected:
-    QLabel *m_titleText;
-
-  public:
+public:
     TitleBar(const QString &title, QWidget *parent, bool boldTitle = true, bool subtitle = false);
-
     explicit TitleBar(const QString &title, bool boldTitle = true, bool subtitle = false);
 };
-} // namespace View
-} // namespace TrenchBroom
+}

@@ -23,6 +23,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
+#include <QToolBar>
 #include <QVBoxLayout>
 
 #include "Assets/EntityDefinitionFileSpec.h"
@@ -91,21 +92,25 @@ void EntityDefinitionFileChooser::createGui() {
     externalPanel->setAutoFillBackground(true);
 
     m_externalLabel = new QLabel{tr("use builtin")};
+    m_externalLabel->setObjectName("EntityDefinitionExternalPath");
     m_browseExternal = new QPushButton{tr("Browse...")};
     m_browseExternal->setToolTip(tr("Click to browse for an entity definition file"));
     m_reloadExternal = new QPushButton{tr("Reload")};
     m_reloadExternal->setToolTip(tr("Reload the currently loaded entity definition file"));
 
+    auto* toolbar = createInspectorToolBar(this);
+    toolbar->addWidget(m_browseExternal);
+    toolbar->addWidget(m_reloadExternal);
+
     auto *externalLayout = new QHBoxLayout{};
     externalLayout->addWidget(m_externalLabel, 1);
-    externalLayout->addWidget(m_browseExternal, 0);
-    externalLayout->addWidget(m_reloadExternal, 0);
 
     externalPanel->getPanel()->setLayout(externalLayout);
 
     auto *layout = new QVBoxLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
+    layout->addWidget(toolbar);
     layout->addWidget(builtinPanel, 1);
     layout->addWidget(new BorderLine{}, 0);
     layout->addWidget(externalPanel, 0);
@@ -167,23 +172,14 @@ void EntityDefinitionFileChooser::updateControls() {
         }
         m_externalLabel->setText(tr("use builtin"));
 
-        auto lightText = QPalette{};
-        lightText.setColor(QPalette::WindowText, Colors::disabledText());
-        m_externalLabel->setPalette(lightText);
-
-        auto font = m_externalLabel->font();
-        font.setStyle(QFont::StyleOblique);
-        m_externalLabel->setFont(font);
+        m_externalLabel->setProperty("useBuiltin",true);
+        repolishWidget(m_externalLabel);
     } else {
         m_builtin->clearSelection();
         m_externalLabel->setText(IO::pathAsQString(spec.path()));
 
-        auto normalPal = QPalette{};
-        m_externalLabel->setPalette(normalPal);
-
-        auto font = m_externalLabel->font();
-        font.setStyle(QFont::StyleNormal);
-        m_externalLabel->setFont(font);
+        m_externalLabel->setProperty("useBuiltin",false);
+        repolishWidget(m_externalLabel);
     }
 
     m_reloadExternal->setEnabled(document->entityDefinitionFile().external());

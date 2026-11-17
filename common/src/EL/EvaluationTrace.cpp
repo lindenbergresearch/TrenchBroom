@@ -17,33 +17,29 @@
  along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "EvaluationTrace.h"
 
-#include <QWidget>
+namespace TrenchBroom::EL
+{
 
-#include "View/TitleBar.h"
+std::optional<ExpressionNode> EvaluationTrace::getExpression(const Value& value) const
+{
+  auto it = m_data.find(value);
+  return it != m_data.end() ? std::optional{it->second} : std::nullopt;
+}
 
-class QLabel;
+std::optional<FileLocation> EvaluationTrace::getLocation(const Value& value) const
+{
+  if (const auto expression = getExpression(value))
+  {
+    return expression->location();
+  }
+  return std::nullopt;
+}
 
-namespace TrenchBroom::View {
-class BorderLine;
+void EvaluationTrace::addTrace(const Value& value, const ExpressionNode& expression)
+{
+  m_data.emplace(value, expression);
+}
 
-class ClickableTitleBar : public TitleBar {
-  Q_OBJECT
-  private:
-    QLabel *m_stateText = nullptr;
-
-  public:
-    ClickableTitleBar(const QString &title, const QString &stateText, QWidget *parent = nullptr);
-
-    void setStateText(const QString &stateText);
-
-  signals:
-
-    void titleBarClicked();
-
-  protected:
-    void mousePressEvent(QMouseEvent *event) override;
-};
-
-} // namespace TrenchBroom::View
+} // namespace TrenchBroom::EL

@@ -18,116 +18,109 @@
  */
 #pragma once
 
-#include <map>
-
 #include <QWidget>
-#include <QLayout>
 #include <QTimer>
 
 #include "TBWidget.h"
 #include "MapView.h"
 #include "MapDocument.h"
 #include "MapFrame.h"
-#include "IO/ResourceUtils.h"
 
 namespace TrenchBroom::View {
 class MapFrame;
 
+
+/**
+ * Baseclass for StatusBar Widgets.
+ */
 class StatusBarWidget : public TBWidget {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
-    explicit StatusBarWidget(QWidget *parent, bool decoupled = true);
+public:
+    explicit StatusBarWidget(QWidget* parent, bool decoupled = true);
 
-    void update(const MapDocument &document, MapView *mapView, MapFrame *mapFrame);
+    void update(const MapDocument& document, MapView* mapView, MapFrame* mapFrame);
 
-  protected:
-    virtual void onUpdate(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) = 0;
+protected:
+    virtual void onUpdate(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) = 0;
 
-  private:
+private:
     bool m_decoupled;
 };
 
+/* ------------------------------------------------------------------------------------------- */
+
 using StatusBarWidgetList = std::vector<StatusBarWidget *>;
 
+/**
+ * Handles all operations relating StatusBarWidgets.
+ * The StatusBar is divided into 3 major areas - Left - Middle/Center - Right.
+ */
 class StatusBarManager : public TBWidget {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
-    explicit StatusBarManager(QWidget *parent = nullptr);
+public:
+    explicit StatusBarManager(QWidget* parent = nullptr);
 
-    void update(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) const;
+    void update(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) const;
+    void addLeft(StatusBarWidget* widget);
+    void addCenter(StatusBarWidget* widget);
+    void addRight(StatusBarWidget* widget);
 
-    void addLeft(StatusBarWidget *widget);
+    TBWidget* leftPanel() const;
+    TBWidget* centerPanel() const;
+    TBWidget* rightPanel() const;
 
-    void addCenter(StatusBarWidget *widget);
+    const StatusBarWidgetList& statusBarWidgets() const;
 
-    void addRight(StatusBarWidget *widget);
+private:
+    QHBoxLayout* m_mainLayout;
 
-    TBWidget *leftPanel() const;
-
-    TBWidget *centerPanel() const;
-
-    TBWidget *rightPanel() const;
-
-    const StatusBarWidgetList &statusBarWidgets() const;
-
-  private:
-    QHBoxLayout *m_mainLayout;
-
-    TBWidget *m_leftPanel;
-    TBWidget *m_centerPanel;
-    TBWidget *m_rightPanel;
+    TBWidget* m_leftPanel;
+    TBWidget* m_centerPanel;
+    TBWidget* m_rightPanel;
 
     StatusBarWidgetList m_statusBarWidgets;
 };
 
 class IconLabelStatusBarWidget : public StatusBarWidget {
-  public:
-    IconLabelStatusBarWidget(QWidget *parent, const std::filesystem::path &imagePath);
+public:
+    IconLabelStatusBarWidget(QWidget* parent, const std::filesystem::path& imagePath);
 
-    void setMessage(const QString &msg);
+    void setMessage(const QString& msg);
 
-  protected:
-    void onUpdate(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) override;
-
+protected:
+    void onUpdate(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) override;
     void createGUI();
 
-  private:
+private:
     QString m_message;
-    QLabel *m_label;
-    QLabel *m_icon;
+    QLabel* m_label;
+    QLabel* m_icon;
     QPixmap m_pixmap;
 };
 
 /* ------------------------------------------------------------------------------------------- */
 
 class InfoStatusBarWidget : public StatusBarWidget {
-  public:
-    InfoStatusBarWidget(QWidget *parent);
-
-  private:
+public:
+    InfoStatusBarWidget(QWidget* parent);
 };
 
 /* ------------------------------------------------------------------------------------------- */
 
 class TextStatusBarWidget : public StatusBarWidget {
-  public:
-    TextStatusBarWidget(QWidget *parent) : StatusBarWidget(parent) {
-        createGUI();
-    };
+public:
+    TextStatusBarWidget(QWidget* parent) : StatusBarWidget(parent) { createGUI(); };
 
-    void setText(const QString &text) const {
-        if (m_label) { m_label->setText(text); }
-    }
+    void setText(const QString& text) const { if (m_label) { m_label->setText(text); } }
 
-  protected:
-    void onUpdate(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) override {
-    }
+protected:
+    void onUpdate(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) override {}
 
     void createGUI();
 
-  private:
-    QLabel *m_label;
+private:
+    QLabel* m_label;
 };
 }

@@ -29,6 +29,7 @@
 
 int main(int argc, char **argv) {
     TrenchBroom::PreferenceManager::createInstance<TrenchBroom::TestPreferenceManager>();
+    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     TrenchBroom::View::TrenchBroomApp app(argc, argv);
 
     TrenchBroom::View::setCrashReportGUIEnbled(false);

@@ -22,6 +22,8 @@
 #include <QString>
 #include <QTextCursor>
 #include <QTextStream>
+#include <QScrollBar>
+#include <QTextEdit>
 
 #include <TrenchBroomApp.h>
 
@@ -61,6 +63,8 @@ class TextOutputAdapter {
     explicit TextOutputAdapter(QTextEdit *textEdit);
 
     template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
+        QScrollBar *scrollBar = m_textEdit->verticalScrollBar();
+        const bool wasAtBottom = (scrollBar->value() >= scrollBar->maximum());
         QString string;
         QTextStream stream(&string);
         stream << t;
@@ -69,9 +73,14 @@ class TextOutputAdapter {
         auto font = TrenchBroomApp::instance().getConsoleFont();
         font.setBold(true);
         format.setFont(font);
-        format.setFontPointSize(TrenchBroomApp::instance().getConsoleFont().pointSize());
         format.setForeground(QBrush{color});
         m_insertionCursor.insertText(string, format);
+
+        scrollBar->setValue(scrollBar->maximum());
+
+        if (wasAtBottom) {
+            m_textEdit->verticalScrollBar()->setValue(m_textEdit->verticalScrollBar()->maximum());
+        }
     }
 
     /**

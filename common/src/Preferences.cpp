@@ -30,17 +30,15 @@ namespace Preferences {
 
 
 /* --- LOGGER ---------------------------------------- */
-
 Preference<LogLevel> AppLogLevel("Editor/LogLevel", LogLevel::Info);
 
 /* --- VIEW ------------------------------------------ */
-
 Preference<int> AutoSaveInterval("Editor/Autosave Interval", 1000);
 
 Preference<int> MapViewLayout("Views/Map view layout", static_cast<int>(View::MapViewLayout::OnePane));
 Preference<bool> ShowFocusIndicator("Renderer/Show focus indicator", true);
 Preference<Color> SoftMapBoundsColor("Renderer/Colors/Soft map bounds color", Color(241, 125, 37));
-Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(38, 38, 38));
+Preference<Color> BackgroundColor("Renderer/Colors/Background", Color(30, 35, 39));
 Preference<Color> PointFileColor("Renderer/Colors/Point file", Color(0.0f, 1.0f, 0.0f, 1.0f));
 Preference<Color> PortalFileBorderColor("Renderer/Colors/Portal file border", Color(1.0f, 1.0f, 1.0f, 0.5f));
 Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(1.0f, 0.4f, 0.4f, 0.2f));
@@ -48,6 +46,22 @@ Preference<Color> PortalFileFillColor("Renderer/Colors/Portal file fill", Color(
 /* --- RENDERER  ------------------------------------- */
 Preference<int> RendererSwapBehavior("Renderer/SwapBehavior", QSurfaceFormat::DoubleBuffer);
 Preference<int> RendererSwapInterval("Renderer/SwapInterval", 1);
+Preference<int> RendererMaxFPS("Renderer/Maximum FPS", 120);
+
+Preference<bool> LayerTreeGroupByType("Layer tree/Group by type", false);
+Preference<int> LayerTreeGroupingThreshold("Layer tree/Grouping threshold", 5);
+Preference<bool> LayerTreeSyncSelection("Layer tree/Synchronize selection", true);
+Preference<int> LayerTreeSelectionSyncThreshold("Layer tree/Automatic selection sync limit", 1000);
+
+Preference<Color> LayerTreeLayerIconColor("Layer tree/Layer icon", Color("#708df5"));
+Preference<Color> LayerTreeGroupIconColor("Layer tree/Group icon", Color("#36e5b3"));
+Preference<Color> LayerTreeEntityIconColor("Layer tree/Entity icon", Color("#ef2449"));
+Preference<Color> LayerTreeBrushIconColor("Layer tree/Brush icon", Color("#ffb301"));
+Preference<Color> LayerTreePatchIconColor("Layer tree/Patch icon", Color("#ff8000"));
+Preference<Color> LayerTreeTypeGroupIconColor("Layer tree/Type group icon", Color("#dd9361"));
+
+Preference<bool> ShowContextOverlay("Map view/Context overlay/Enabled", true);
+Preference<QString> ContextOverlayTheme("Map view/Context overlay/Theme directory", "");
 Preference<int> RendererColorSpace("Renderer/ColorSpace", QSurfaceFormat::sRGBColorSpace);
 Preference<int> RendererSamples("Renderer/Samples", 8);
 Preference<int> RendererDepthBufferSize("Renderer/DepthBufferSize", 32);
@@ -100,14 +114,19 @@ Preference<Color> TutorialOverlayBackgroundColor("Renderer/Colors/Tutorial overl
 Preference<Color> FaceColor("Renderer/Colors/Faces", Color(0.1f, 0.11f, 0.12f, 1.0f));
 Preference<Color> SelectedFaceColor("Renderer/Colors/Selected faces", Color(1.f, 0.102f, 0.11f, 0.3f));
 Preference<Color> LockedFaceColor("Renderer/Colors/Locked faces", Color(0.5f, 0.6f, 0.1f, 1.0f));
-Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.55f);
+Preference<float> TransparentFaceAlpha("Renderer/Colors/Transparent faces", 0.45f);
 
 /* --- EDGES ----------------------------------------- */
-Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(0.6f, 0.6f, 0.6f, 1.0f));
+Preference<Color> EdgeColor("Renderer/Colors/Edges", Color(1.0f, 1.0f, 1.0f, 0.2f));
 Preference<Color> OccludedSelectedEdgeColor("Renderer/Colors/Occluded Selected Edges", Color(1.0f, 0.0f, 0.01f, 0.25f));
-Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(1.0f, 0.0f, 0.0f, 0.6f));
-Preference<float> EdgeLineWidth("Renderer/Edge line width", 1.15f);
-Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.3f);
+Preference<Color> SelectedEdgeColor("Renderer/Colors/Selected edges", Color(0.6f, 0.1f, 0.11f, 1.0f));
+Preference<float> EdgeLineWidth("Renderer/Edge line width", 0.76f);
+Preference<float> EdgeSelectedLineWidth("Renderer/Selected edge line width", 1.25f);
+// Factor 0 keeps logical pixel sizes; factor 1 treats the base sizes as map units.
+// The limits are multipliers of each configured line width or marker size.
+Preference<float> OverlayScaleFactor("Renderer/Overlay scale factor", 0.5f);
+Preference<float> OverlayMinimumScale("Renderer/Overlay minimum scale", 0.75f);
+Preference<float> OverlayMaximumScale("Renderer/Overlay maximum scale", 3.0f);
 Preference<float> OccludedSelectedEdgeAlpha("Renderer/Colors/Occluded selected edge alpha", 0.12f);
 Preference<Color> LockedEdgeColor("Renderer/Colors/Locked edges", Color(0.9f, 0.7f, 0.7f, 0.7f));
 Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color(0.9f, 0.0f, 0.0f, 1.0f));
@@ -115,8 +134,11 @@ Preference<Color> UndefinedEntityColor("Renderer/Colors/Undefined entity", Color
 /* --- SELECTION BOUNDS ------------------------------ */
 Preference<Color> SelectionBoundsColor("Renderer/Colors/Selection bounds", Color(1.f, 0.f, 0.0156863f, 0.592157f));
 Preference<float> SelectionBoundsAlpha("Renderer/Colors/Selection bounds alpha", 0.6f);
+Preference<float> SelectionBoundsFillAlpha("Renderer/Selection bounds fill alpha", 0.15f);
 Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.75f);
 Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 10.0f);
+// Speed 1: 32 logical pixels/second for dashes, one pulse/second for solid guides.
+Preference<float> SelectionBoundsAnimationSpeed("Renderer/Selection bounds animation speed", 1.0f);
 Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.0f, 0.0f, 0.6f));
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);
@@ -173,7 +195,7 @@ Preference<float> Brightness("Renderer/Brightness", 2.0f);
 Preference<int> FaceAutoBrightness("Renderer/Brightness mode", 2);
 
 /* --- GRID ------------------------------------------ */
-Preference<float> GridLineWidth("Renderer/Grid/With", 0.1f);
+Preference<float> GridLineWidth("Renderer/Grid/With", 0.75f);
 Preference<float> GridAlpha("Renderer/Grid/Alpha", 0.25f);
 Preference<float> GridMajorDivisionSize("Renderer/Grid/Major division size", 0.0f);
 Preference<int> GridUnitSystem("Renderer/Grid/Units system", LengthUnitDisplay::Units);
@@ -183,19 +205,23 @@ Preference<int> TextureMinFilter("Renderer/Texture mode min filter", 0x2700);
 Preference<int> TextureMagFilter("Renderer/Texture mode mag filter", 0x2600);
 Preference<bool> EnableAnisotropicFilter("Renderer/Enable Anisotropic Filter", true);
 Preference<bool> EnableMSAA("Renderer/Enable multisampling", true);
-Preference<float> AnisotropicFilterValue("Renderer/Anisotropic Filter Value", 0.0);
+Preference<float> AnisotropicFilterValue("Renderer/Anisotropic Filter Value", 16.0);
 
 Preference<bool> TextureLock("Editor/Texture lock", true);
 Preference<bool> UVLock("Editor/UV lock", false);
 
 /* --- FONTS ----------------------------------------- */
-Preference<std::filesystem::path> RendererFontPath("Renderer/Font name", "fonts/Inter-SemiBold.otf");
-Preference<std::filesystem::path> UIFontPath("Editor/UI Font name", "fonts/Inter-Regular.otf");
-Preference<std::filesystem::path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono-VariableFont_wght.ttf");
+Preference<Path> RendererFontPath("Renderer/Font name", "fonts/Inter-SemiBold.otf");
+Preference<Path> UIFontPath("Editor/UI Font name", "fonts/Inter-Regular.otf");
+Preference<Path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono/JetBrainsMono-Regular.ttf");
 Preference<int> RendererFontSize("Renderer/Font size", 12);
 Preference<int> BrowserFontSize("Browser/Font size", 12);
 Preference<int> UIFontSize("Editor/UI Font size", 13);
-Preference<int> ConsoleFontSize("Editor/Console Font size", 12);
+Preference<int> UIFontMinimumSize("Editor/UI Minimum font size", 11);
+Preference<float> UIDetailTextOpacity("Editor/UI Detail text opacity", 0.85f);
+Preference<bool> ContextMenuIcons("Editor/Context menu icons", true);
+Preference<bool> ContextMenuShortcuts("Editor/Context menu shortcuts", true);
+Preference<int> ConsoleFontSize("Editor/Console Font size", 13);
 
 Renderer::FontDescriptor getDefaultRenderFont() {
     return Renderer::FontDescriptor(
@@ -203,8 +229,7 @@ Renderer::FontDescriptor getDefaultRenderFont() {
         RendererFontSize.valid() ? size_t(RendererFontSize.value()) : size_t(RendererFontSize.defaultValue())
     );
 }
-
-Preference<int> ToolBarIconsSize("Editor/Toolbar Icon Size", 24);
+Preference<int> ToolBarIconsSize("Editor/Toolbar Icon Size", 20);
 
 Preference<Color> BrowserTextColor("Browser/Text color", Color(1.0f, 1.0f, 1.0f, 1.0f));
 Preference<Color> BrowserSubTextColor("Browser/Sub text color", Color(0.65f, 0.65f, 0.65f, 1.0f));
@@ -220,6 +245,12 @@ Preference<Color> UIHighlightColor("Editor/Colors/UI Highlight Color", Color("#0
 Preference<Color> UIWindowTintColor("Editor/Colors/UI Window Color Tint", Color("#191B1D"));
 Preference<Color> UITextColor("Editor/Colors/UI Text Color", Color("#AAAFAF"));
 Preference<float> UIBrightness("Editor/Colors/UI Brightness", 1.0f);
+Preference<Color> UIErrorColor("Editor/Colors/UI Error Color", Color("#D26161"));
+Preference<Color> UIWarningColor("Editor/Colors/UI Warning Color", Color("#DBB860"));
+
+Preference<Path> RendererDefaultCursor("Renderer/UI/Default Cursor", {});
+
+
 
 /* --- LOGGING COLORS -------------------------------- */
 Preference<Color> LogTraceColor("Editor/Colors/LogLevel Trace", Color(0.4f, 0.4f, 0.4f));
@@ -283,9 +314,9 @@ Preference<bool> ShowPointEntityBounds("Map view/Show point entity bounds", true
 Preference<bool> ShowPointEntityModels("Map view/Show point entity models", true);
 
 /* --- LIGHTNING -------------------------------------- */
-Preference<bool> EnableLightning("Map view/Enable lightning (experimental)", false);
+Preference<bool> EnableLightning("Map view/Enable lightning (experimental)", true);
 Preference<float> LightningIntensity("Map view/Lightning Intensity", 1.0f);
-Preference<Color> LightningAmbient("Map view/Lightning Ambient", Color{0, 0, 0});
+Preference<Color> LightningAmbient("Map view/Lightning Ambient", Color{0.025f, 0.025f, 0.025f});
 
 // extern Preference<bool> EnableLightning;
 QString faceRenderModeTextured() {
@@ -303,9 +334,12 @@ QString faceRenderModeSkip() {
 // shade
 Preference<bool> ShadeFaces("Map view/Shade faces", true);
 Preference<float> ShadeLevel("Map view/Shade Level", 0.35f);
+Preference<float> GridAxisColorMix("Map view/Grid axis color mix", 0.0f);
+Preference<bool> ShadeGrid("Map view/Shade grid", false);
 
 // fog settings
 Preference<bool> ShowFog("Map view/Show Fog", true);
+Preference<bool> ShowSky("Map view/Show Sky", false);
 Preference<Color> FogColor("Map view/Fog Color", Color{155, 155, 155, 255});
 Preference<float> FogMaxAmount("Map view/Fog Max Amount", 0.10f);
 Preference<float> FogMinDistance("Map view/Fog Min Distance", 512.0f);
@@ -339,31 +373,38 @@ Preference<QString> EntityLinkMode("Map view/Entity link mode", "direct");
 
 const std::vector<PreferenceBase *> &staticPreferences() {
     static const std::vector<PreferenceBase *> list{
+        &LayerTreeGroupByType, &LayerTreeGroupingThreshold, &LayerTreeSyncSelection,
+        &LayerTreeSelectionSyncThreshold,
+        &LayerTreeLayerIconColor, &LayerTreeGroupIconColor, &LayerTreeEntityIconColor,
+        &LayerTreeBrushIconColor, &LayerTreePatchIconColor, &LayerTreeTypeGroupIconColor,
+        &ShowContextOverlay, &ContextOverlayTheme,
         &AutoSaveInterval, &LogTraceColor, &AnisotropicFilterValue, &EnableAnisotropicFilter, &MapViewLayout, &AppLogLevel, &ShowAxes, &BackgroundColor, &AxisLength, &XAxisColor, &YAxisColor, &ZAxisColor,
-        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &RendererSwapBehavior, &RendererSwapInterval, &RendererSamples, &RendererColorSpace, &RendererDepthBufferSize, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
+        &UnitsMaxDigits, &PointFileColor, &PortalFileBorderColor, &ShowObjectBoundsSelectionBounds, &PortalFileFillColor, &RendererSwapBehavior, &RendererSwapInterval, &RendererMaxFPS, &RendererSamples,
+        &RendererColorSpace, &RendererDepthBufferSize, &ShowFPS, &DebugMode, &TextRendererMaxDistance, &TextRendererFadeOutFactor, &LengthUnitSystem,
         &MetricConversationFactor, &SoftMapBoundsColor, &CompassBackgroundColor, &CompassBackgroundOutlineColor, &CompassTransparency, &CompassScale, &CameraFrustumColor, &DefaultGroupColor,
         &TutorialOverlayTextColor, &TutorialOverlayBackgroundColor, &FaceColor, &SelectedFaceColor, &LockedFaceColor, &TransparentFaceAlpha, &EdgeColor, &OccludedSelectedEdgeColor, &FogColor, &FogBias,
-        &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
-        &SelectionBoundsColor, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
+        &FogMaxAmount, &FogMinDistance, &FogType, &FogScale, &SelectedEdgeColor, &ShadeLevel, &GridAxisColorMix, &ShadeGrid, &EdgeLineWidth, &EdgeSelectedLineWidth, &OccludedSelectedEdgeAlpha, &LockedEdgeColor, &UndefinedEntityColor,
+        &SelectionBoundsColor, &SelectionBoundsFillAlpha, &AlwaysShowSelectionBounds, &SelectionBoundsDashedSize, &SelectionBoundsPointColor, &SelectionBoundsPointSize, &SelectionBoundsDashedLines, &ShowHiddenSelectionBounds,
+        &OverlayScaleFactor, &OverlayMinimumScale, &OverlayMaximumScale, &SelectionBoundsAnimationSpeed, &SelectionBoundsPattern,&UIErrorColor, &UIWarningColor,&RendererDefaultCursor,
         &InfoOverlayTextColor, &SelectionBoundsIntersectionMode, &SelectionBoundsLineWidth, &SelectionBoundsShowMinMax, &GroupInfoOverlayTextColor, &InfoOverlayBackgroundColor, &WeakInfoOverlayBackgroundAlpha,
         &SelectedInfoOverlayTextColor, &SelectedInfoOverlayBackgroundColor, &LockedInfoOverlayTextColor, &LockedInfoOverlayBackgroundColor, &HandleRadius, &MaximumHandleDistance, &HandleColor,
         &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor,
         &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor,
         &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &GridUnitSystem, &TextureMinFilter, &TextureMagFilter,
-        &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
+        &TextureLock, &UVLock, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &UIFontMinimumSize, &UIDetailTextOpacity, &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
         &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,
         &CameraFlyForward(), &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &EnableLightning,
-        &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
+        &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowSky, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
         &EntityLinkMode
     };
 
     return list;
 }
 
-const std::map<std::filesystem::path, PreferenceBase *> &staticPreferencesMap() {
-    static std::map<std::filesystem::path, PreferenceBase *> map;
+const std::map<Path, PreferenceBase *> &staticPreferencesMap() {
+    static std::map<Path, PreferenceBase *> map;
 
     if (map.empty()) {
         for (PreferenceBase *pref : staticPreferences()) {

@@ -1,4 +1,5 @@
 #include "PreferenceModel.h"
+#include "FontUtils.h"
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
@@ -69,7 +70,7 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
         // default
         if (index.column() == Value || index.column() == Default) {
             auto font = TrenchBroomApp::instance().getConsoleFont();
-            font.setPointSize(QFont{}.pointSize());
+            font.setPixelSize(uiFontPixelSize());
             return font;
         }
     }

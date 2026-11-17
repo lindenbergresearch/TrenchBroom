@@ -20,7 +20,7 @@
 #pragma once
 
 #include "View/ContainerBar.h"
-
+#include "View/TitledPanel.h"
 #include <memory>
 
 class QStackedLayout;
@@ -39,9 +39,12 @@ class MapViewBar : public ContainerBar {
     std::weak_ptr<MapDocument> m_document;
     QStackedLayout *m_toolBook;
     ViewPopupEditor *m_viewEditor;
+    TitledPanel *m_panel;
 
   public:
     explicit MapViewBar(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+
+    ~MapViewBar() override;
 
     QStackedLayout *toolBook();
 

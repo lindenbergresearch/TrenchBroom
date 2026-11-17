@@ -73,6 +73,8 @@ class VertexArray {
 
         size_t sizeInBytes() const override { return VertexSpec::Size * m_vertexCount; }
 
+        const std::vector<typename VertexSpec::Vertex> &vertices() const { return doGetVertices(); }
+
         void prepare(VboManager &vboManager) override {
             if (m_vertexCount > 0 && m_vbo == nullptr) {
                 m_vboManager = &vboManager;
@@ -206,6 +208,13 @@ class VertexArray {
      * @return true if this vertex array is empty and false otherwise
      */
     bool empty() const;
+
+    // Read the retained CPU data without a GPU readback. Returns null for a
+    // different vertex layout.
+    template<typename VertexSpec> const std::vector<typename VertexSpec::Vertex> *vertices() const {
+        const auto *holder = dynamic_cast<const Holder<VertexSpec> *>(m_holder.get());
+        return holder ? &holder->vertices() : nullptr;
+    }
 
     /**
      * Returns the size of this vertex array in bytes.

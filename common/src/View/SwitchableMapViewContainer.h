@@ -45,7 +45,6 @@ class FaceTool;
 
 class GLContextManager;
 
-class Inspector;
 
 class MapDocument;
 
@@ -78,12 +77,13 @@ class SwitchableMapViewContainer : public QWidget, public MapView {
 
     NotifierConnection m_notifierConnection;
 
+    QWidget *m_topInfoBar;
+
   public:
     SwitchableMapViewContainer(Logger *logger, std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
     ~SwitchableMapViewContainer() override;
 
-    void connectTopWidgets(Inspector *inspector);
 
     void windowActivationStateChanged(bool active);
 
@@ -197,6 +197,8 @@ class SwitchableMapViewContainer : public QWidget, public MapView {
 
   private: // implement ViewEffectsService interface
     void doFlashSelection() override;
+
+
 
   deleteCopyAndMove(SwitchableMapViewContainer);
 };

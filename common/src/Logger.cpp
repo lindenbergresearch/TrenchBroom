@@ -24,6 +24,7 @@
 
 #include <QString>
 #include <string>
+#include <QMessageBox>
 
 namespace TrenchBroom {
 /* ------------------------------------------------------------------------------------------- */
@@ -135,6 +136,14 @@ void Logger::log(const LogLevel level, const std::string &message) {
 void Logger::log(const LogLevel level, const LogMessage *message) {
     // call subclass implementation
     if (canLog(level)) doLog(level, message);
+
+//    if (level == LogLevel::Error) {
+//        QString content = "The following error occurred while running:\n\n" +
+//                          message->format(true, false) +
+//                          "\n\nSee console for more information.";
+//
+//        QMessageBox::critical(nullptr, "TrenchBroom", content, QMessageBox::Ok);
+//    }
 }
 
 void Logger::log(const LogLevel level, const QString &message) {
@@ -173,7 +182,6 @@ bool Logger::canLog(const LogLevel &msgLevel) {
 void NullLogger::doLog(const LogLevel level, const LogMessage *message) {}
 
 /* ------------------------------------------------------------------------------------------- */
-
 
 void DefaultQtLogger::doLog(const LogLevel level, const LogMessage *message) {
     switch (level) {
@@ -257,4 +265,16 @@ size_t LogMessageCache::currentID() {
 std::vector<LogMessage *> LogMessageCache::cache{};
 
 size_t LogMessageCache::m_id{};
-} // namespace TrenchBroom
+
+QString LogMessageCache::dump() {
+    QString text = QString{};
+
+    for (auto *item : cache) {
+        text.append(item->format(true, false));
+        text.append('\n');
+    }
+
+    return text;
+}
+
+}

@@ -21,7 +21,10 @@
 
 #include "FloatType.h"
 #include "Renderer/Transformation.h"
-
+#include "Renderer/TextureFont.h"
+#include "Renderer/FontDescriptor.h"
+#include "Model/EntityNodeBase.h"
+#include "Renderer/Lighting.h"
 #include "vm/bbox.h"
 
 namespace TrenchBroom {
@@ -64,6 +67,7 @@ class RenderContext {
     bool m_showPointEntityBounds;
 
     bool m_showFog;
+    unsigned int m_skyTexture = 0;
 
     bool m_showGrid;
     FloatType m_gridSize;
@@ -71,6 +75,8 @@ class RenderContext {
 
     bool m_hideSelection;
     bool m_tintSelection;
+
+    std::shared_ptr<const PreviewLighting> m_lighting;
 
     ShowSelectionGuide m_showSelectionGuide;
     vm::bbox3f m_sofMapBounds;
@@ -89,6 +95,8 @@ class RenderContext {
     FontManager &fontManager();
 
     ShaderManager &shaderManager();
+
+    TextureFont &getTextureFont(const FontDescriptor &fontDescriptor);
 
     bool showTextures() const;
 
@@ -131,6 +139,8 @@ class RenderContext {
     void setShowPointEntityBounds(bool showPointEntityBounds);
 
     bool showFog() const;
+    unsigned int skyTexture() const { return m_skyTexture; }
+    void setSkyTexture(unsigned int texture) { m_skyTexture = texture; }
 
     void setShowFog(bool showFog);
 
@@ -168,7 +178,11 @@ class RenderContext {
 
     void setForceHideSelectionGuide();
 
-  private:
+    const PreviewLighting& lighting() const;
+
+    void setLighting(std::shared_ptr<const PreviewLighting> lighting);
+
+private:
     void setShowSelectionGuide(ShowSelectionGuide showSelectionGuide);
 
   private:

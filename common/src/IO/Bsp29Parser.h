@@ -44,7 +44,6 @@ class FileSystem;
 class Reader;
 
 class Bsp29Parser : public EntityModelParser {
-  private:
     struct TextureInfo {
       vm::vec3f sAxis;
       vm::vec3f tAxis;
@@ -83,9 +82,9 @@ class Bsp29Parser : public EntityModelParser {
 
     void doLoadFrame(size_t frameIndex, Assets::EntityModel &model, Logger &logger) override;
 
-    std::vector<Assets::Texture> parseTextures(Reader reader, Logger &logger);
+    std::vector<Assets::Texture> parseTextures(Reader reader, Logger &logger) const;
 
-    TextureInfoList parseTextureInfos(Reader reader, size_t textureInfoCount);
+    static TextureInfoList parseTextureInfos(Reader reader, size_t textureInfoCount);
 
     std::vector<vm::vec3f> parseVertices(Reader reader, size_t vertexCount);
 

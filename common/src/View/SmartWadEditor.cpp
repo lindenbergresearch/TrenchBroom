@@ -18,11 +18,17 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "SmartWadEditor.h"
 
+#include <QBrush>
 #include <QFileDialog>
 #include <QListWidget>
 #include <QToolButton>
 
+#include <Preferences.h>
+#include <PreferenceManager.h>
+#include "IO/DiskIO.h"
+#include "IO/PathInfo.h"
 #include "IO/PathQt.h"
+#include "IO/SystemPaths.h"
 #include "Model/EntityNodeBase.h"
 #include "View/BorderLine.h"
 #include "View/ChoosePathTypeDialog.h"
@@ -57,7 +63,8 @@ std::string getWadPathStr(const std::vector<std::filesystem::path> &wadPaths) {
 
 } // namespace
 
-SmartWadEditor::SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor{std::move(document), parent} {
+SmartWadEditor::SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *parent) : SmartPropertyEditor{
+    std::move(document), parent} {
     auto *header = new TitleBar{"Wad Files"};
 
     m_wadPaths = new QListWidget{};
@@ -93,23 +100,37 @@ SmartWadEditor::SmartWadEditor(std::weak_ptr<MapDocument> document, QWidget *par
 }
 
 void SmartWadEditor::addWads() {
-    const auto pathQStr = QFileDialog::getOpenFileName(nullptr, tr("Load Wad File"), fileDialogDefaultDirectory(FileDialogDir::TextureCollection), tr("Wad files (*.wad);;All files (*.*)"));
+    const auto paths = QFileDialog::getOpenFileNames(window(), tr("Load Wad Files"), fileDialogDefaultDirectory(FileDialogDir::TextureCollection), tr("Wad files (*.wad);;All files (*.*)"));
+    if (paths.isEmpty()) {
+        return;
+    }
 
-    if (!pathQStr.isEmpty()) {
-        updateFileDialogDefaultDirectoryWithFilename(FileDialogDir::TextureCollection, pathQStr);
+    updateFileDialogDefaultDirectoryWithFilename(FileDialogDir::TextureCollection, paths.front());
+    const auto doc = document();
+    auto pathDialog = ChoosePathTypeDialog{
+        window(), IO::pathFromQString(paths.front()), doc->path(), doc->game()->gamePath()
+    };
+    if (paths.size() > 1) {
+        pathDialog.setWindowTitle(tr("Path Type for %1 WAD Files").arg(paths.size()));
+    }
+    if (pathDialog.exec() != QDialog::Accepted) {
+        return;
+    }
 
-        const auto absWadPath = IO::pathFromQString(pathQStr);
-        auto pathDialog = ChoosePathTypeDialog{
-            window(), absWadPath, document()->path(), document()->game()->gamePath()
-        };
+    auto wadPaths = getWadPaths(nodes(), propertyKey());
+    const auto firstAddedRow = int(wadPaths.size());
+    for (const auto &path : paths) {
+        const auto absolutePath = IO::pathFromQString(path);
+        const auto convertedPath = convertToPathType(pathDialog.pathType(), absolutePath, doc->path(), doc->game()->gamePath());
+        // A relative path may be unavailable for a file on another drive.
+        wadPaths.push_back(convertedPath.empty() ? absolutePath : convertedPath);
+    }
 
-        const int result = pathDialog.exec();
-        if (result == QDialog::Accepted) {
-            auto wadPaths = getWadPaths(nodes(), propertyKey());
-            wadPaths.push_back(convertToPathType(pathDialog.pathType(), absWadPath, document()->path(), document()->game()->gamePath()));
-
-            document()->setProperty(propertyKey(), getWadPathStr(wadPaths));
-            m_wadPaths->setCurrentRow(m_wadPaths->count() - 1, QItemSelectionModel::ClearAndSelect);
+    // Update the property once so the entire batch is a single undoable change.
+    if (doc->setProperty(propertyKey(), getWadPathStr(wadPaths))) {
+        m_wadPaths->clearSelection();
+        for (int row = firstAddedRow; row < m_wadPaths->count(); ++row) {
+            m_wadPaths->setCurrentRow(row, QItemSelectionModel::Select);
         }
     }
 }
@@ -119,7 +140,13 @@ void SmartWadEditor::removeSelectedWads() {
         return;
     }
 
-    const auto indicesToRemove = kdl::vec_sort(kdl::vec_transform(m_wadPaths->selectedItems(), [&](const auto &selectedItem) { return size_t(m_wadPaths->row(selectedItem)); }), std::greater<size_t>{});
+    const auto indicesToRemove = kdl::vec_sort(
+        kdl::vec_transform(m_wadPaths->selectedItems(),
+                           [&](const auto &selectedItem) {
+                               return size_t(m_wadPaths->row(selectedItem));
+                           }
+        ), std::greater<size_t>{}
+    );
 
     auto wadPaths = getWadPaths(nodes(), propertyKey());
     for (const auto index : indicesToRemove) {
@@ -127,7 +154,10 @@ void SmartWadEditor::removeSelectedWads() {
     }
 
     document()->setProperty(propertyKey(), getWadPathStr(wadPaths));
-    m_wadPaths->setCurrentRow(std::min(int(indicesToRemove.back()), m_wadPaths->count() - 1), QItemSelectionModel::ClearAndSelect);
+    m_wadPaths->setCurrentRow(
+        std::min(int(indicesToRemove.back()),
+                 m_wadPaths->count() - 1), QItemSelectionModel::ClearAndSelect
+    );
 }
 
 void SmartWadEditor::moveSelectedWadsUp() {
@@ -165,6 +195,7 @@ void SmartWadEditor::moveSelectedWadsDown() {
 
 void SmartWadEditor::reloadWads() {
     document()->reloadTextureCollections();
+    updateWadFileStatus();
 }
 
 bool SmartWadEditor::canRemoveWads() const {
@@ -186,7 +217,8 @@ bool SmartWadEditor::canMoveWadsUp() const {
 }
 
 bool SmartWadEditor::canMoveWadsDown() const {
-    return m_wadPaths->selectedItems().size() == 1 && size_t(m_wadPaths->currentRow()) < getWadPaths(nodes(), propertyKey()).size() - 1;
+    return m_wadPaths->selectedItems().size() == 1 &&
+           size_t(m_wadPaths->currentRow()) < getWadPaths(nodes(), propertyKey()).size() - 1;
 }
 
 bool SmartWadEditor::canReloadWads() const {
@@ -203,6 +235,7 @@ void SmartWadEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *> &
     for (const auto &path : getWadPaths(nodes, propertyKey())) {
         m_wadPaths->addItem(IO::pathAsQString(path));
     }
+    updateWadFileStatus();
 
     for (const auto &[index, text] : selectedRows) {
         if (index < m_wadPaths->count() && m_wadPaths->item(index)->text() == text) {
@@ -211,6 +244,29 @@ void SmartWadEditor::doUpdateVisual(const std::vector<Model::EntityNodeBase *> &
             m_wadPaths->clearSelection();
             break;
         }
+    }
+    updateButtons();
+}
+
+void SmartWadEditor::updateWadFileStatus() {
+    if (m_wadPaths->count() == 0) {
+        return;
+    }
+
+    const auto doc = document();
+    // Keep the lookup order in sync with GameImpl::doReloadWads.
+    const auto searchPaths = std::vector{
+        doc->path().parent_path(), doc->game()->gamePath(), IO::SystemPaths::appDirectory()
+    };
+
+    for (int row = 0; row < m_wadPaths->count(); ++row) {
+        auto *item = m_wadPaths->item(row);
+        const auto path = IO::pathFromQString(item->text());
+        const auto resolvedPath = IO::Disk::resolvePath(searchPaths, path);
+        const auto exists = !resolvedPath.empty() && IO::Disk::pathInfo(resolvedPath) == IO::PathInfo::File;
+
+        item->setForeground(exists ? QBrush{} : QBrush{pref(Preferences::UIErrorColor)});
+        item->setToolTip(exists ? IO::pathAsQString(resolvedPath) : tr("WAD file not found: %1").arg(item->text()));
     }
 }
 

@@ -1,0 +1,72 @@
+#version 120
+
+uniform vec4 Color;
+uniform bool Dashed;
+uniform float DashSize;
+uniform vec4 DashPattern[4];
+uniform float DashOffset;
+uniform float PulseAlpha;
+uniform int MarkerMode;
+
+varying vec2 guidePosition;
+varying vec2 guideExtent;
+
+float patternBit(float cell) {
+    float index = mod(cell, 16.0);
+    return DashPattern[int(floor(index / 4.0))][int(mod(index, 4.0))];
+}
+
+float dashCoverage(float position) {
+    float cell = floor(position / DashSize);
+    float within = mod(position, DashSize);
+    float previous = patternBit(cell - 1.0);
+    float next = patternBit(cell + 1.0);
+    float distance;
+
+    if (patternBit(cell) > 0.5) {
+        distance = -100000.0;
+        if (previous < 0.5)
+            distance = -within;
+        if (next < 0.5)
+            distance = max(distance, within - DashSize);
+    } else {
+        distance = 100000.0;
+        if (previous > 0.5)
+            distance = within;
+        if (next > 0.5)
+            distance = min(distance, DashSize - within);
+    }
+
+    return 1.0 - smoothstep(-0.75, 0.75, distance);
+}
+
+void main() {
+    vec2 edge = abs(guidePosition) - guideExtent;
+    float coverage = 1.0 - smoothstep(-0.75, 0.75, max(edge.x, edge.y));
+
+    if (MarkerMode == 2) {
+        // Union of two diagonal capsules: smooth X, without doubled alpha at its
+        // center. Derivatives retain antialiasing when the face is viewed obliquely.
+        float radius = guideExtent.x * 0.18;
+        float arm = (guideExtent.x - radius) * sqrt(2.0);
+        vec2 diagonal = vec2(guidePosition.x + guidePosition.y, guidePosition.y - guidePosition.x) / sqrt(2.0);
+        float d1 = length(vec2(max(abs(diagonal.x) - arm, 0.0), diagonal.y)) - radius;
+        float d2 = length(vec2(max(abs(diagonal.y) - arm, 0.0), diagonal.x)) - radius;
+        float distance = min(d1, d2);
+        float smoothing = max(0.75, 0.5 * fwidth(distance));
+        coverage = 1.0 - smoothstep(-smoothing, smoothing, distance);
+    } else if (MarkerMode == 0) {
+        if (Dashed) {
+            // Anchor the phase at the destination, so clipping the origin does
+            // not shift the pattern. Subtraction moves fragments toward the hit.
+            coverage *= dashCoverage(guidePosition.x - guideExtent.x - DashOffset);
+        } else {
+            coverage *= PulseAlpha;
+        }
+    }
+
+    if (coverage <= 0.0)
+        discard;
+
+    gl_FragColor = vec4(Color.rgb, Color.a * coverage);
+}

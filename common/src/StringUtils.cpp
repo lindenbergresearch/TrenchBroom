@@ -243,7 +243,7 @@ std::string stringf(const char *const zcFormat, ...) {
     std::vsnprintf(zc.data(), zc.size(), zcFormat, vaArgs);
     va_end(vaArgs);
 
-    return std::string(zc.data(), uint32_t(iLen));
+    return {zc.data(), uint32_t(iLen)};
 }
 
 std::string numberWithSuffix(size_t count, const std::string &singular, const std::string &plural) {

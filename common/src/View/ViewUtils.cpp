@@ -84,72 +84,65 @@ size_t loadEntityDefinitionFile(std::weak_ptr<MapDocument> i_document, QWidget *
     return static_cast<size_t>(pathStrs.size());
 }
 
-static std::string queryObjectName(QWidget * parent,
-const QString &objectType,
-const std::string &suggestion
+static std::string queryObjectName(
+    QWidget *parent, const QString &objectType, const std::string &suggestion
 ) {
-while (true) {
-auto ok = false;
-const auto name = QInputDialog::getText(parent, "Enter a name", QObject::tr("%1 Name").arg(objectType), QLineEdit::Normal, QString::fromStdString(suggestion), &ok).toStdString();
+    while (true) {
+        auto ok = false;
+        const auto name = QInputDialog::getText(parent, "Enter a name", QObject::tr("%1 Name").arg(objectType), QLineEdit::Normal, QString::fromStdString(suggestion), &ok).toStdString();
 
-if (!ok) {
-return "";
+        if (!ok) {
+            return "";
+        }
+
+        if (
+            kdl::str_is_blank(name)
+            ) {
+            if (
+                QMessageBox::warning(
+                    parent, "Error", QObject::tr("%1 names cannot be blank.").
+                        arg(objectType), QMessageBox::Ok
+                                         | QMessageBox::Cancel, QMessageBox::Ok
+                )
+                != QMessageBox::Ok) {
+                return "";
+            }
+        } else if (
+            kdl::ci::str_contains(
+                name, "\""
+            )) {
+            if (
+                QMessageBox::warning(
+                    parent, "Error", QObject::tr("%1 names cannot contain double quotes.").
+                        arg(objectType), QMessageBox::Ok
+                                         | QMessageBox::Cancel, QMessageBox::Ok
+                )
+                != QMessageBox::Ok) {
+                return "";
+            }
+        } else {
+            return
+                name;
+        }
+    }
 }
 
-if (
-kdl::str_is_blank(name)
-)
-{
-if (
-QMessageBox::warning(
-    parent,
-"Error",
-QObject::tr("%1 names cannot be blank.").
-arg(objectType), QMessageBox::Ok
-| QMessageBox::Cancel,
-QMessageBox::Ok)
-!= QMessageBox::Ok)
-{
-return "";
-}}
-else if (
-kdl::ci::str_contains(name,
-"\""))
-{
-if (
-QMessageBox::warning(
-    parent,
-"Error",
-QObject::tr("%1 names cannot contain double quotes.").
-arg(objectType), QMessageBox::Ok
-| QMessageBox::Cancel,
-QMessageBox::Ok)
-!= QMessageBox::Ok)
-{
-return "";
-}}
-else
-{
-return
-name;
-}}}
-
-std::string queryGroupName(QWidget * parent,
-const std::string &suggestion
-)
-{
-return
-queryObjectName(parent, QObject::tr("Group"), suggestion
-);
+std::string queryGroupName(
+    QWidget *parent, const std::string &suggestion
+) {
+    return
+        queryObjectName(
+            parent, QObject::tr("Group"), suggestion
+        );
 }
 
-std::string queryLayerName(QWidget * parent,
-const std::string &suggestion
-)
-{
-return
-queryObjectName(parent, QObject::tr("Layer"), suggestion
-);
+std::string queryLayerName(
+    QWidget *parent, const std::string &suggestion
+) {
+    return
+        queryObjectName(
+            parent, QObject::tr("Layer"), suggestion
+        );
 }
 
 } // namespace TrenchBroom::View

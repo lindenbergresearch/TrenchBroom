@@ -60,10 +60,17 @@ class ObjectRenderer;
 class RenderBatch;
 
 class RenderContext;
+struct PreviewLighting;
+class LightingOcclusion;
+class SkyRenderer;
 
 class MapRenderer {
   private:
     std::weak_ptr<View::MapDocument> m_document;
+    std::shared_ptr<const PreviewLighting> m_lighting;
+    std::shared_ptr<const LightingOcclusion> m_lightOcclusion;
+    bool m_lightOcclusionDirty = true;
+    std::unique_ptr<SkyRenderer> m_skyRenderer;
 
     std::unique_ptr<ObjectRenderer> m_defaultRenderer;
     std::unique_ptr<ObjectRenderer> m_selectionRenderer;
@@ -104,6 +111,8 @@ class MapRenderer {
     void restoreSelectionColors();
 
   public: // rendering
+    std::shared_ptr<const PreviewLighting> cacheLighting(PreviewLighting lighting);
+
     void render(RenderContext &renderContext, RenderBatch &renderBatch);
 
   private:

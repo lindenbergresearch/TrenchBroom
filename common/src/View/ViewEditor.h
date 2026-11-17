@@ -30,6 +30,8 @@
 #include <vector>
 
 class QCheckBox;
+class QComboBox;
+class QTabWidget;
 
 class QWidget;
 
@@ -111,6 +113,7 @@ class ViewEditor : public QWidget {
     QCheckBox *m_showEdgesCheckBox;
 
     QCheckBox *m_showFogCheckBox;
+    QCheckBox *m_showSkyCheckBox = nullptr;
     QCheckBox *m_showAlternateFogCheckBox;
     SliderWithLabel *m_fogScaleSlider;
     SliderWithLabel *m_fogMaxAmountSlider;
@@ -126,6 +129,14 @@ class ViewEditor : public QWidget {
     SliderWithLabel *m_selectionBoundsIntersectionSize;
 
     SliderWithLabel *m_shadeAmount;
+    SliderWithLabel *m_gridAxisColorMix = nullptr;
+    QCheckBox *m_shadeGridCheckBox = nullptr;
+    SliderWithLabel *m_gridAlpha = nullptr;
+    SliderWithLabel *m_gridWidth = nullptr;
+    QComboBox *m_gridUnits = nullptr;
+    QCheckBox *m_showGrid = nullptr;
+    QCheckBox *m_snapToGrid = nullptr;
+    QTabWidget *m_tabs = nullptr;
     SliderWithLabel *m_brightnessSlider;
 
     QButtonGroup *m_entityLinkRadioGroup;
@@ -171,6 +182,8 @@ class ViewEditor : public QWidget {
     void createTagFilter(QWidget *parent, const std::vector<Model::SmartTag> &tags);
 
     QWidget *createRendererPanel(QWidget *parent);
+    QWidget *createGridPanel(QWidget *parent);
+    QWidget *createLinksPanel(QWidget *parent);
 
     void refreshGui();
 

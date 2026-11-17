@@ -25,7 +25,6 @@
 #include "IO/EntityModelLoader.h"
 #include "Logger.h"
 #include "Macros.h"
-#include "Model/EntityNode.h"
 #include "Renderer/TexturedIndexRangeRenderer.h"
 
 namespace TrenchBroom {
@@ -85,7 +84,6 @@ Renderer::TexturedRenderer *EntityModelManager::renderer(const Assets::ModelSpec
 
         auto *result = pos->second.get();
         m_unpreparedRenderers.push_back(result);
-        m_logger.debug() << "Constructed entity model renderer for " << spec;
         return result;
     } else {
         m_rendererMismatches.insert(spec);

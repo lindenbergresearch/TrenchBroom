@@ -41,8 +41,9 @@ class GLContextManager {
     static std::string GLVersion;
 
   private:
-    bool m_initialized;
     float m_maxAnisotropy = 1.0f;
+    bool m_initialized = false;
+    static bool s_hasInitialized;
 
     std::string m_glVendor;
     std::string m_glRenderer;
@@ -68,6 +69,8 @@ class GLContextManager {
     Renderer::FontManager &fontManager();
 
     Renderer::ShaderManager &shaderManager();
+
+    static bool isInitialized() { return s_hasInitialized; }
 
   deleteCopyAndMove(GLContextManager);
 };

@@ -20,117 +20,115 @@
 #pragma once
 
 #include "NotifierConnection.h"
-#include "View/ControlListBox.h"
-
+#include <QPersistentModelIndex>
+#include <QTreeWidget>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
-class QLabel;
-
-class QAbstractButton;
-
-class QListWidget;
-
-namespace TrenchBroom {
-namespace Model {
+namespace TrenchBroom::Model {
 class LayerNode;
-
 class Node;
-} // namespace Model
+}
 
-namespace View {
+namespace TrenchBroom::View {
 class MapDocument;
+class MapView;
+class LayerTreeItemDelegate;
+class SignalDelayer;
+class Selection;
 
-class LayerListBoxWidget : public ControlListBoxItemRenderer {
-  Q_OBJECT
-  private:
+// The historical name is retained for the LayerEditor integration. This is now a
+// scene tree, with one item per node and no per-row widgets.
+class LayerListBox : public QTreeWidget {
+    Q_OBJECT
+    Q_PROPERTY(int attributeColumnWidth READ attributeColumnWidth WRITE setAttributeColumnWidth)
+    Q_PROPERTY(int branchIndicatorSize READ branchIndicatorSize WRITE setBranchIndicatorSize)
+    Q_PROPERTY(QColor branchIndicatorColor MEMBER m_branchIndicatorColor)
+    Q_PROPERTY(qreal branchIndicatorLineWidth MEMBER m_branchIndicatorLineWidth)
     std::weak_ptr<MapDocument> m_document;
-    Model::LayerNode *m_layer;
-    QAbstractButton *m_activeButton;
-    QLabel *m_nameText;
-    QLabel *m_infoText;
-    QAbstractButton *m_omitFromExportButton;
-    QAbstractButton *m_hiddenButton;
-    QAbstractButton *m_lockButton;
+    MapView* m_mapView;
+    LayerTreeItemDelegate* m_itemDelegate;
+    std::unordered_map<Model::Node *, QTreeWidgetItem *> m_items;
+    SignalDelayer* m_refresh;
 
-  public:
-    LayerListBoxWidget(std::weak_ptr<MapDocument> document, Model::LayerNode *layer, QWidget *parent = nullptr);
+    bool m_syncingSelection = false;
+    bool m_structureDirty = true;
+    bool m_allItemsDirty = true;
+    bool m_groupByType = false;
+    int m_groupingThreshold = 5;
+    bool m_selectionSyncEnabled = true;
+    bool m_selectionSyncPending = false;
+    bool m_ignoreLeftRelease = false;
+    QPersistentModelIndex m_attributePress;
+    bool m_updatingAttribute = false;
+    int m_attributeColumnWidth = 24;
+    int m_branchIndicatorSize = 10;
+    QColor m_branchIndicatorColor;
+    qreal m_branchIndicatorLineWidth = 1.5;
 
-    void updateItem() override;
-
-  private:
-    void updateLayerItem();
-
-  public:
-    Model::LayerNode *layer() const;
-
-  private:
-    bool eventFilter(QObject *target, QEvent *event) override;
-
-  signals:
-
-    void layerActiveClicked(Model::LayerNode *layer);
-
-    void layerOmitFromExportToggled(Model::LayerNode *layer);
-
-    void layerVisibilityToggled(Model::LayerNode *layer);
-
-    void layerLockToggled(Model::LayerNode *layer);
-
-    void layerDoubleClicked(Model::LayerNode *layer);
-
-    void layerRightClicked(Model::LayerNode *layer);
-};
-
-class LayerListBox : public ControlListBox {
-  Q_OBJECT
-  private:
-    std::weak_ptr<MapDocument> m_document;
-
+    std::unordered_set<Model::Node *> m_changedNodes;
     NotifierConnection m_notifierConnection;
 
-  public:
-    explicit LayerListBox(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+public:
+    explicit LayerListBox(std::weak_ptr<MapDocument> document, MapView* mapView, QWidget* parent = nullptr);
+    Model::LayerNode* selectedLayer() const;
+    void setSelectedLayer(Model::LayerNode* layer);
+    void setGroupByType(bool enabled);
+    void setGroupingThreshold(int threshold);
+    void setSelectionSyncEnabled(bool enabled);
+    bool groupByType() const { return m_groupByType; }
+    int groupingThreshold() const { return m_groupingThreshold; }
+    bool selectionSyncEnabled() const { return m_selectionSyncEnabled; }
+    int attributeColumnWidth() const { return m_attributeColumnWidth; }
+    void setAttributeColumnWidth(int width);
+    int branchIndicatorSize() const { return m_branchIndicatorSize; }
+    void setBranchIndicatorSize(int size);
+    bool hasPrefabSelection() const;
+    std::vector<Model::Node*> selectedTreeNodes() const;
 
-    Model::LayerNode *selectedLayer() const;
-
-    void setSelectedLayer(Model::LayerNode *layer);
-
-  private:
-    size_t itemCount() const override;
-
-    ControlListBoxItemRenderer *createItemRenderer(QWidget *parent, size_t index) override;
-
-    void selectedRowChanged(int index) override;
-
-  private:
+private:
+    enum class Grouping { Type, EntityClass, None };
     void connectObservers();
+    void clearTree();
+    void refreshTree();
+    void synchronizeChildren(QTreeWidgetItem* parent, const std::vector<Model::Node *>& nodes, Grouping grouping = Grouping::Type);
+    void removeItems(const std::vector<Model::Node *>& nodes);
+    void forgetItem(const QTreeWidgetItem* item);
+    void updateItem(QTreeWidgetItem* item) const;
+    void updateItems();
+    void selectInDocument(bool force = false);
+    bool selectionExceedsSyncThreshold() const;
+    static bool consumeSyncBudget(const QTreeWidgetItem& item, size_t& remaining);
+    void documentSelectionChanged(const Selection& change);
+    void toggleAttribute(Model::Node* node, int column);
+    void syncSelectionFromDocument();
+    std::vector<Model::Node *> selectionNodes() const;
+    void focusItem(QTreeWidgetItem* item);
+    void showContextMenu(QTreeWidgetItem* item, const QPoint& globalPosition);
+    std::vector<Model::Node*> removableSelection();
+    void deleteSelection();
+    static Model::Node* nodeForItem(const QTreeWidgetItem* item);
+    static void collectItemNodes(const QTreeWidgetItem* item, std::vector<Model::Node*>& nodes);
 
-    void documentDidChange(MapDocument *document);
+protected:
+    void changeEvent(QEvent* event) override;
+    bool event(QEvent* event) override;
+    void drawRow(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    void drawBranches(QPainter* painter, const QRect& rect, const QModelIndex& index) const override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void contextMenuEvent(QContextMenuEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
 
-    void nodesDidChange(const std::vector<Model::Node *> &nodes);
-
-    void currentLayerDidChange(const Model::LayerNode *layer);
-
-    const LayerListBoxWidget *widgetAtRow(int row) const;
-
-    Model::LayerNode *layerForRow(int row) const;
-
-    std::vector<Model::LayerNode *> layers() const;
-
-  signals:
-
-    void layerSelected(Model::LayerNode *layer);
-
-    void layerSetCurrent(Model::LayerNode *layer);
-
-    void layerRightClicked(Model::LayerNode *layer);
-
-    void layerOmitFromExportToggled(Model::LayerNode *layer);
-
-    void layerVisibilityToggled(Model::LayerNode *layer);
-
-    void layerLockToggled(Model::LayerNode *layer);
+signals:
+    void layerSetCurrent(TrenchBroom::Model::LayerNode* layer);
+    void layerRightClicked(TrenchBroom::Model::LayerNode* layer);
+    void nodeVisibilityToggled(TrenchBroom::Model::Node* node);
+    void nodeLockToggled(TrenchBroom::Model::Node* node);
+    void treeChanged();
 };
-} // namespace View
-} // namespace TrenchBroom
+} // namespace TrenchBroom::View

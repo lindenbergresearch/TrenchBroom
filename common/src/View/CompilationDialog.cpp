@@ -66,7 +66,7 @@ void CompilationDialog::createGui() {
     auto *outputPanel = new TitledPanel{"Output"};
     m_output = new QTextEdit{};
     m_output->setReadOnly(true);
-    m_output->setFont(APP.getConsoleFont());
+    makeMono(m_output);
 
     auto *outputLayout = new QVBoxLayout{};
     outputLayout->setContentsMargins(0, 0, 0, 0);

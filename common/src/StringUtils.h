@@ -17,9 +17,9 @@ namespace TrenchBroom {
  * https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
  *
  */
-inline std::string stringf(const char *const zcFormat, ...);
+inline std::string stringf(const char *zcFormat, ...);
 
-typedef std::pair<std::string, std::string> TStringPair;
+using TStringPair = std::pair<std::string, std::string>;
 
 
 /**

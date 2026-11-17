@@ -48,24 +48,16 @@ class WelcomeWindow : public QMainWindow {
     QWidget *createAppPanel();
 
   private slots:
-
     void createNewDocument();
-
     void openOtherDocument();
-
     void quitApplication();
-
     void openSettings();
-
     void openDocument(const std::filesystem::path &path);
 
   protected:
     void paintEvent(QPaintEvent *event) override;
-
     void mousePressEvent(QMouseEvent *event) override;
-
     void mouseReleaseEvent(QMouseEvent *event) override;
-
     void mouseMoveEvent(QMouseEvent *event) override;
 
   private:

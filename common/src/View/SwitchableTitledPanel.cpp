@@ -22,43 +22,39 @@
 #include <QBoxLayout>
 #include <QStackedLayout>
 
-#include "View/BorderLine.h"
-#include "View/ClickableTitleBar.h"
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
 namespace TrenchBroom::View {
 
-SwitchableTitledPanel::SwitchableTitledPanel(const QString &title, const std::array<QString, 2> &stateTexts, QWidget *parent)
-    : QWidget{parent}, m_titleBar{new ClickableTitleBar{title, stateTexts[1]}}, m_divider{new BorderLine{}}, m_stackedLayout{new QStackedLayout{}}, m_panels{{{new QWidget{}, stateTexts[1]}, {new QWidget{}, stateTexts[0]}}} {
-    m_stackedLayout->addWidget(m_panels[0].panel);
-    m_stackedLayout->addWidget(m_panels[1].panel);
+SwitchableTitledPanel::SwitchableTitledPanel(const QString& title, QWidget* parent)
+    : QWidget(parent)
+    , m_titleBar(new TitleBar(title))
+    , m_stackedLayout(new QStackedLayout())
+    , m_panels{new QWidget(), new QWidget()} {
+    for (auto* panel : m_panels) m_stackedLayout->addWidget(panel);
 
-    auto *outerLayout = new QVBoxLayout{};
-    outerLayout->setContentsMargins(0, 0, 0, 0);
-    outerLayout->setSpacing(0);
-    outerLayout->addWidget(m_titleBar, 0);
-    outerLayout->addWidget(m_divider, 0);
-    outerLayout->addLayout(m_stackedLayout, 1);
-    setLayout(outerLayout);
-
-    connect(m_titleBar, &ClickableTitleBar::titleBarClicked, this, [=]() {
-        setCurrentIndex(1 - currentIndex());
-    });
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(m_titleBar);
+    layout->addLayout(m_stackedLayout, 1);
 }
 
-QWidget *SwitchableTitledPanel::getPanel(const size_t index) const {
-    assert(index < 2);
-    return m_panels[index].panel;
+QWidget* SwitchableTitledPanel::getPanel(size_t index) const {
+    return m_panels.at(index);
 }
 
 size_t SwitchableTitledPanel::currentIndex() const {
     return size_t(m_stackedLayout->currentIndex());
 }
 
-void SwitchableTitledPanel::setCurrentIndex(const size_t index) {
+TitleBar* SwitchableTitledPanel::getTitleBar() const {
+    return m_titleBar;
+}
+
+void SwitchableTitledPanel::setCurrentIndex(size_t index) {
     m_stackedLayout->setCurrentIndex(int(index));
-    m_titleBar->setStateText(m_panels[index].stateText);
 }
 
 QByteArray SwitchableTitledPanel::saveState() const {

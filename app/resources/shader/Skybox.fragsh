@@ -1,0 +1,6 @@
+#version 120
+varying vec3 skyDirection;
+vec3 sampleSky(vec3 worldDirection);
+void main() {
+    gl_FragColor = vec4(sampleSky(skyDirection), 1.0);
+}

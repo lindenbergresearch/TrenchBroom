@@ -32,6 +32,7 @@
 #include "View/GetVersion.h"
 #include "View/QtUtils.h"
 #include "TrenchBroomApp.h"
+#include "View/FontUtils.h"
 
 namespace TrenchBroom::View {
 AppInfoPanel::AppInfoPanel(QWidget* parent) : QWidget{parent} { createGui(); }
@@ -43,16 +44,14 @@ void AppInfoPanel::createGui() {
     QLabel* appIcon = new QLabel{this};
     appIcon->setPixmap(scaledImage);
 
-    const auto sui_generis_font = TrenchBroomApp::instance().loadFont("fonts/rabanera.ttf", 32);
+    TrenchBroomApp::instance().loadFont("fonts/rabanera.ttf", uiFontPixelSize());
 
     QLabel* appName = new QLabel{QApplication::applicationName(), this};
-    appName->setFont(sui_generis_font);
-    appName->setForegroundRole(QPalette::HighlightedText);
+    setTextStyleRole(appName,"brand");
 
     BorderLine* appLine = new BorderLine{BorderLine::Direction::Horizontal};
     QLabel* appClaim = new QLabel{tr("Level Editor")};
     makeEmphasized(appClaim);
-    appClaim->setForegroundRole(QPalette::HighlightedText);
 
     QLabel* appHint = new QLabel{tr("eXperimental Version")};
     makeEmphasized(appHint);

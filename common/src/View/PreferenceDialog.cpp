@@ -40,6 +40,7 @@
 #include "View/PreferencesPreferencePane.h"
 #include "View/QtUtils.h"
 #include "View/ViewPreferencePane.h"
+#include "macos_utils.h"
 
 #include <filesystem>
 
@@ -67,6 +68,7 @@ void PreferenceDialog::closeEvent(QCloseEvent *event) {
     auto &prefs = PreferenceManager::instance();
     if (!prefs.saveInstantly()) {
         prefs.discardChanges();
+        TrenchBroomApp::instance().reloadStyle(true, true);
     }
 
     event->accept();
@@ -225,6 +227,11 @@ void PreferenceDialog::highlightToolButton(QString buttonName, bool highlighted)
             setWindowTitle(WINDOW_TITLE + " - " + buttonName);
         }
     }
+}
+
+void PreferenceDialog::paintEvent(QPaintEvent *event) {
+    QWidget::paintEvent(event);
+    setWindowTitleBarColor(this->windowHandle(), QPalette{}.color(QPalette::ColorRole::Window));
 }
 } // namespace View
 } // namespace TrenchBroom

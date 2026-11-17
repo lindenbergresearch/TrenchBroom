@@ -1,0 +1,5 @@
+#version 120
+uniform samplerCube SkyTexture;
+vec3 sampleSky(vec3 worldDirection) {
+    return textureCube(SkyTexture, worldDirection.xzy).rgb;
+}

@@ -50,6 +50,8 @@ class GameImpl : public Game {
 
   public:
     GameImpl(GameConfig &config, std::filesystem::path gamePath, Logger &logger);
+    const IO::FileSystem* fileSystem() const override { return &m_fs; }
+    const TextureConfig* textureConfig() const override;
 
   private:
     void initializeFileSystem(Logger &logger);

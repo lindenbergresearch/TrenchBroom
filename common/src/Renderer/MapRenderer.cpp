@@ -18,6 +18,7 @@
  */
 
 #include "MapRenderer.h"
+#include "Renderer/SkyRenderer.h"
 
 #include "Assets/EntityDefinitionManager.h"
 #include "Model/Brush.h"
@@ -40,6 +41,7 @@
 #include "Renderer/RenderBatch.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/RenderUtils.h"
+#include "Renderer/LightingOcclusion.h"
 #include "View/MapDocument.h"
 #include "View/Selection.h"
 
@@ -53,7 +55,44 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+std::shared_ptr<const PreviewLighting> MapRenderer::cacheLighting(PreviewLighting lighting) {
+    if (m_lightOcclusionDirty) {
+        const auto document = kdl::mem_lock(m_document);
+        m_lightOcclusion = document->world() ? buildLightingOcclusion(*document->world()) : nullptr;
+        m_lightOcclusionDirty = false;
+    }
+    lighting.occlusion = m_lightOcclusion;
+    // All views share one revision. Occluder edits invalidate lighting even if
+    // the light entities themselves did not change; duplicate notifications do not.
+    if (!m_lighting || m_lighting->lights != lighting.lights
+        || m_lighting->minLight != lighting.minLight
+        || m_lighting->brightnessScale != lighting.brightnessScale
+        || m_lighting->gamma != lighting.gamma || m_lighting->occlusion != lighting.occlusion) {
+        m_lighting = std::make_shared<const PreviewLighting>(std::move(lighting));
+    }
+    return m_lighting;
+}
+
 namespace {
+bool hasOcclusionGeometry(const Model::Node& node, const bool recursive) {
+    const auto geometry = node.accept(kdl::overload(
+        [](const Model::WorldNode*) { return false; },
+        [](const Model::LayerNode*) { return false; },
+        [](const Model::GroupNode*) { return false; },
+        [](const Model::EntityNode* entity) { return !entity->children().empty(); },
+        [](const Model::BrushNode*) { return true; },
+        [](const Model::PatchNode*) { return true; }));
+    if (geometry) return true;
+    return recursive && std::any_of(node.children().begin(), node.children().end(),
+        [](const auto* child) { return hasOcclusionGeometry(*child, true); });
+}
+
+bool hasOcclusionGeometry(const std::vector<Model::Node*>& nodes, const bool recursive) {
+    return std::any_of(nodes.begin(), nodes.end(), [recursive](const auto* node) {
+        return hasOcclusionGeometry(*node, recursive);
+    });
+}
+
 class SelectedBrushRendererFilter : public BrushRenderer::DefaultFilter {
   public:
     explicit SelectedBrushRendererFilter(const Model::EditorContext &context) : DefaultFilter{context} {
@@ -133,6 +172,7 @@ class UnselectedBrushRendererFilter : public BrushRenderer::DefaultFilter {
 
 MapRenderer::MapRenderer(std::weak_ptr<View::MapDocument> document)
     : m_document{std::move(document)}, m_defaultRenderer{createDefaultRenderer(m_document)}, m_selectionRenderer{createSelectionRenderer(m_document)}, m_lockedRenderer{createLockRenderer(m_document)}, m_entityDecalRenderer{createEntityDecalRenderer(m_document)}, m_entityLinkRenderer{std::make_unique<EntityLinkRenderer>(m_document)}, m_groupLinkRenderer{std::make_unique<GroupLinkRenderer>(m_document)} {
+    m_skyRenderer = std::make_unique<SkyRenderer>(m_document);
     connectObservers();
     setupRenderers();
 }
@@ -158,6 +198,10 @@ std::unique_ptr<EntityDecalRenderer> MapRenderer::createEntityDecalRenderer(std:
 }
 
 void MapRenderer::clear() {
+    m_skyRenderer->invalidate();
+    m_lightOcclusionDirty = true;
+    m_lightOcclusion.reset();
+    m_lighting.reset();
     m_defaultRenderer->clear();
     m_selectionRenderer->clear();
     m_lockedRenderer->clear();
@@ -185,6 +229,7 @@ void MapRenderer::restoreSelectionColors() {
 void MapRenderer::render(RenderContext &renderContext, RenderBatch &renderBatch) {
     commitPendingChanges();
     setupGL(renderBatch);
+    m_skyRenderer->render(renderContext, renderBatch);
     renderDefaultOpaque(renderContext, renderBatch);
     renderLockedOpaque(renderContext, renderBatch);
     renderSelectionOpaque(renderContext, renderBatch);
@@ -539,6 +584,7 @@ void MapRenderer::documentWasNewedOrLoaded(View::MapDocument *) {
 }
 
 void MapRenderer::nodesWereAdded(const std::vector<Model::Node *> &nodes) {
+    m_lightOcclusionDirty |= hasOcclusionGeometry(nodes, true);
     for (auto *node : nodes) {
         // The nodes passed in don't include recursive children, so we need to visit them
         // ourselves.
@@ -549,6 +595,7 @@ void MapRenderer::nodesWereAdded(const std::vector<Model::Node *> &nodes) {
 }
 
 void MapRenderer::nodesWereRemoved(const std::vector<Model::Node *> &nodes) {
+    m_lightOcclusionDirty |= hasOcclusionGeometry(nodes, true);
     for (auto *node : nodes) {
         // The nodes passed in don't include recursive children, so we need to visit them
         // ourselves. Otherwise deleting a group doesn't delete the brushes within.
@@ -559,6 +606,7 @@ void MapRenderer::nodesWereRemoved(const std::vector<Model::Node *> &nodes) {
 }
 
 void MapRenderer::nodesDidChange(const std::vector<Model::Node *> &nodes) {
+    m_lightOcclusionDirty |= hasOcclusionGeometry(nodes, false);
     for (auto *node : nodes) {
         // nodesDidChange() will report ancestors changing, e.g. the world and layer are
         // reported as changing when a brush is dragged. So, don't update recursively here as
@@ -594,6 +642,7 @@ void MapRenderer::groupWasClosed(Model::GroupNode *) {
 }
 
 void MapRenderer::brushFacesDidChange(const std::vector<Model::BrushFaceHandle> &faces) {
+    m_lightOcclusionDirty = true;
     for (const auto &face : faces) {
         updateAndInvalidateNode(face.node());
     }
@@ -620,6 +669,7 @@ void MapRenderer::selectionDidChange(const View::Selection &selection) {
 }
 
 void MapRenderer::textureCollectionsWillChange() {
+    m_skyRenderer->invalidate();
     invalidateRenderers(Renderer::All);
 }
 
@@ -630,6 +680,7 @@ void MapRenderer::entityDefinitionsDidChange() {
 }
 
 void MapRenderer::modsDidChange() {
+    m_skyRenderer->invalidate();
     reloadEntityModels();
     invalidateRenderers(Renderer::All);
     invalidateEntityLinkRenderer();
@@ -643,9 +694,11 @@ void MapRenderer::editorContextDidChange() {
 
 void MapRenderer::preferenceDidChange(const std::filesystem::path &path) {
     setupRenderers();
+    if (path == Preferences::ShowSky.path()) m_skyRenderer->invalidate();
 
     auto document = kdl::mem_lock(m_document);
     if (document->isGamePathPreference(path)) {
+        m_skyRenderer->invalidate();
         reloadEntityModels();
         invalidateRenderers(Renderer::All);
         invalidateEntityLinkRenderer();

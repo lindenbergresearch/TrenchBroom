@@ -28,7 +28,6 @@
 #include "Renderer/MapRenderer.h"
 #include "View/FourPaneMapView.h"
 #include "View/GLContextManager.h"
-#include "View/Inspector.h"
 #include "View/MapDocument.h"
 #include "View/MapViewActivationTracker.h"
 #include "View/MapViewBar.h"
@@ -57,10 +56,6 @@ SwitchableMapViewContainer::~SwitchableMapViewContainer() {
     delete m_mapView;
 }
 
-void SwitchableMapViewContainer::connectTopWidgets(Inspector *inspector) {
-    inspector->connectTopWidgets(m_mapViewBar);
-}
-
 void SwitchableMapViewContainer::windowActivationStateChanged(const bool active) {
     m_activationTracker->windowActivationChanged(active);
 }
@@ -72,9 +67,8 @@ bool SwitchableMapViewContainer::active() const {
 void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
     m_activationTracker->clear();
 
-    // NOTE: not all widgets are deleted so we can't use deleteChildWidgetsAndLayout()
-    delete m_mapView;
-    m_mapView = nullptr;
+    // save old pointer for later delete
+    MultiPaneMapView *old = m_mapView;
 
     delete layout();
 
@@ -83,21 +77,25 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
         m_mapView = new OnePaneMapView{
             m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger
         };
+        m_logger->info() << "Switched to one-pane map-view";
         break;
     case MapViewLayout::TwoPanes:
         m_mapView = new TwoPaneMapView{
             m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger
         };
+            m_logger->info() << "Switched to two-pane map-view";
         break;
     case MapViewLayout::ThreePanes:
         m_mapView = new ThreePaneMapView{
             m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger
         };
+            m_logger->info() << "Switched to three-pane map-view";
         break;
     case MapViewLayout::FourPanes:
         m_mapView = new FourPaneMapView{
             m_document, *m_toolBox, *m_mapRenderer, m_contextManager, m_logger
         };
+            m_logger->info() << "Switched to four-pane map-view";
         break;
         switchDefault();
     }
@@ -113,6 +111,8 @@ void SwitchableMapViewContainer::switchToMapView(const MapViewLayout viewId) {
     setLayout(layout);
 
     m_mapView->setFocus();
+
+    delete old;
 }
 
 bool SwitchableMapViewContainer::anyToolActive() const {
@@ -353,4 +353,5 @@ bool SwitchableMapViewContainer::doCancelMouseDrag() {
 void SwitchableMapViewContainer::doRefreshViews() {
     m_mapView->refreshViews();
 }
+
 } // namespace TrenchBroom::View

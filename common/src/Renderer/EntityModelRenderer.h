@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "Renderer/Lighting.h"
 #include "Color.h"
 #include "Renderer/Renderable.h"
 
@@ -52,6 +53,8 @@ class EntityModelRenderer : public DirectRenderable {
     const Model::EditorContext &m_editorContext;
 
     std::unordered_map<const Model::EntityNode *, TexturedRenderer *> m_entities;
+
+    std::unordered_map<const Model::EntityNode*, LightSelection> m_lightSelections;
 
     bool m_applyTinting;
     Color m_tintColor;

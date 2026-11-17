@@ -38,7 +38,7 @@ void PreferenceEditDialog::createGui() {
     layout->addWidget(title);
     layout->addWidget(new BorderLine);
 
-    lineHeight = QFont{}.pointSize() + LayoutConstants::MediumVMargin * 2;
+    lineHeight = fontMetrics().height() + LayoutConstants::MediumVMargin * 2;
 
     // --- components -------------------------------------------
     auto pathComp = createCompound<QLabel>(tr("Path/Context"), 110, 220, lineHeight);
@@ -283,6 +283,7 @@ void PreferenceEditDialog::updateValue() {
     }
 
     if (failed) {
+        defaultQtLogger.warn() << "Unable to store preference: " + msg.toStdString();
         QMessageBox msgBox;
         msgBox.setText("Unable to set preference value.");
         msgBox.setInformativeText(msg);

@@ -1,0 +1,15 @@
+QLabel#EditorContextOverlay {
+    background-color: rgba(24, 28, 35, 148);
+    color: #08edf4;
+    border: 1px solid rgba(169, 186, 208, 25);
+    border-radius: 6px;
+    padding: 10px 10px;
+    font-family: "JetBrains Mono", "Inter", "Arial";
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+/* State-specific styling is possible without changing a template:
+QLabel#EditorContextOverlay[tool="clip"] { border-color: #e9ad68; }
+QLabel#EditorContextOverlay[selection="group"] { border-color: #85b8ed; }
+*/

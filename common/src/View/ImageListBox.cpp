@@ -37,7 +37,6 @@ ImageListBoxItemRenderer::ImageListBoxItemRenderer(const QString &title, const Q
 
     m_subtitleLabel = new ElidedLabel(subtitle, Qt::ElideMiddle);
     m_subtitleLabel->setObjectName("ImageListBoxItemRenderer_m_subtitleLabel");
-    makeSubTitle(m_subtitleLabel);
 
     auto *imageAndTextLayout = new QHBoxLayout();
     imageAndTextLayout->setContentsMargins(0, 0, 0, 0);
@@ -81,7 +80,7 @@ ControlListBoxItemRenderer *ImageListBox::createItemRenderer(QWidget *parent, co
     return new ImageListBoxItemRenderer(title(index), subtitle(index), image(index), parent);
 }
 
-QPixmap ImageListBox::image(const size_t index) const {
+const QPixmap &ImageListBox::image(const size_t index) const {
     return QPixmap();
 }
 } // namespace View

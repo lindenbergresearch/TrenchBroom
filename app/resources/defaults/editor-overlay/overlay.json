@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "width": 340,
+  "margin": 16,
+  "stylesheet": "style.qss",
+  "textStylesheet": "text.css",
+  "template": "default.html",
+  "rules": []
+}

@@ -1,0 +1,13 @@
+#version 120
+
+uniform vec3 BoundsMin;
+uniform vec3 BoundsMax;
+uniform vec3 CameraPosition;
+varying vec3 boxPosition;
+varying vec3 viewVector;
+
+void main() {
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    boxPosition = gl_Vertex.xyz;
+    viewVector = CameraPosition - mix(BoundsMin, BoundsMax, boxPosition);
+}

@@ -31,6 +31,8 @@ class QListWidget;
 
 class QAbstractButton;
 
+class QToolBar;
+
 namespace TrenchBroom::Model {
 class Node;
 }
@@ -49,11 +51,14 @@ class TextureCollectionEditor : public QWidget {
     QAbstractButton *m_addCollectionsButton = nullptr;
     QAbstractButton *m_removeCollectionsButton = nullptr;
     QAbstractButton *m_reloadCollectionsButton = nullptr;
+    QToolBar *m_toolbar = nullptr;
 
     NotifierConnection m_notifierConnection;
 
   public:
     explicit TextureCollectionEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+
+    QToolBar* toolBar() const;
 
   private:
     void addSelectedTextureCollections();

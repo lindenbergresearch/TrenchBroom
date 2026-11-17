@@ -1,0 +1,71 @@
+--------------------------
+
+21.15 Uhr / 07.11.26
+
+Folgende Verbesserungen/Korrekturen:
+
+	1. Wad-File Editor
+       
+       - manchmal lässt sich im Property-Editor der Eintrag mit den WADs zwar selektieren, aber der Smart-Editor wird nicht angezeigt
+       - bei vielen WADs mit langen Pfaden wird die Zeile sehr groß, bitte eine elegantere Methode finden um hier WADs als "Vorschau" anzuzeigen
+         (ggf. nur die Namen der Dateien, bzw. die Ersten etc. - die Details werden ja dann im Smart-Editor angezeigt)
+
+
+    2. Grid-Rendering
+    
+       - zwei neue Optionen für das Grid-Rendering sollen implementiert werden:
+
+       		a) Darstellung der Grid-Linien in der konfigurierten Farbe der jeweiligen Achse.
+       		   Es sind Farbewerte für jede Achse gespeichert, diese sollen verwendet werden, um die Grid-Linie
+       		   je nach ihrer räumlichen Ausrichtung einzufärben. 
+       		   Die Funktion soll parametergesteuert, über einen Wert von 0..1, der die Einfärbung darstellt, implementiert werden.   
+
+       		b) Einbezug der Gridlinien beim Shading (View Settings -> Shade amount)
+       		   Um eine bessere räumlichere Ansicht zu erhalten, soll die Möglichkeit angeboten werden,
+       		   über eine checkbox, dass die Gridlinien beim winkelbasierten Abdunkeln, also Shading, mit einbezogen werden
+
+
+    3. Selection Bounds
+    
+    	- wenn ein Brush oder eine Entity/Gruppe etc. selektiert wurde (und es nicht ein einfacher körper ist, wie z.b. ein rechteck, wo die objectbounds gleich den bounds des objectes sind)
+    	  soll die selectionbox (wenn show objectbounds aktiviert) 
+    		a) mit in das Winkel-Shading eingebunden werden, sonst erkennt man kaum eine räumliche Geometrie 
+    		b) Ecken und Kanten besser dargestellt werden  		      	
+
+--------------------------
+
+22.43 Uhr / 11.11.26
+
+Folgende Verbesserungen/Korrekturen:
+
+
+Folgende Aufgabe: 
+
+Es soll eine neues Werkzeug-Tool-Window implementiert werden namens "Prefab", welches "vorgefertigte" Objekte (Map-Fragmente) enthält. 
+D.h. ich kann im MapEditor eine Selektion als Prefab abspeichern, das Prefab erhält beim speichern einen Namen (der Name kann ein Pfad sein, um Prefabs gruppieren zu können, z.b.: "furniture/couch" "BigRock", "outside/trees/SmallOak" - gruppen werden wenn nicht vorhanden automatisch erstellt) und wird mit einer Vorschau in einem Prefab Browser angezeigt. 
+
+Intern ist es ein Textualer-Ausschnitt (Fragment) einer Map und kann praktisch alles enthalten, was eine Map auch enthalten kann. 
+Die Prefabs werden lokal abgespeichert im Nutzer-Datenverzeichnis indem auch die Preferences Konfig gespeichert wird, in dem Unterverzeichnis: "prefabs". Für jedes Prefab wird ein Verzeichnis angelegt, wo das Map-Fragment inkl. einer Beschreibung als JSON (Label, Path, WadFiles ...) und alle nötigen Abhänigkeiten zu finden sind (ggf. die benutzte Wad für texturen etc.) 
+Aus Performancegründen könnte man auch beim Anlegen des Prefab eine Ansicht rendern und diese als Rasterimage speichern und zur Anzeige im Browser verwenden. 
+
+Folgende visuelle Einstellung sollen sich in der Toolbar des Prefab Tool-Windows befinden: 
+
+    1. Add    -> hinzufügen von der aktuellen Selektion (nur aktiv, wenn etwa selektiert ist) 
+    2. Remove -> entfernen der Prefab aus dem repertoire (nur aktiv, wenn im Prefab Browser etwas ausgewählt ist)  
+    3. insert -> ausgewähltes Prefab einfügen (nur aktiv wenn im Browser etwas ausgewählt ist) -> funktioniert auch mit doppelclick oder per drag and drop in den mapeditor 
+    4. zoom   ->  +/- in % ggf. slider 5. Copy/Link eine Auswahl ob die Prefab beim Einfügen immer kopiert wird, oder wenn möglich eine verlinkte gruppe ist (wo Änderungen an der einen Gruppe auf 
+       alle Auswirkungen hat / nicht auf Prefab nur in aktueller map / muss beim ersten Einfügen kopiert werden) 
+    5. ggf weitere Sinnvolle Toolbar icons / Funktionen
+    
+- Da durch die Pfad "Einsortierung" über die Bennenung Gruppen/Unterverzeichnisse entstehen, sollte nach diesen Gruppiert werden ggf. wie bei Texturen nach WadFile geordnet
+- Im Browser wird für jedes Prefab ein Vorschaubild angezeigt + Namen und die Maße (ggf. kleine Schrift, konfigurierbar via QSS)      
+- Optische Layout Einstellungen sollen soweit es geht und Sinn macht im base.qss als Qt StyleSheet umgesetzt werden für eine Einfache Anpassung ohne Code Änderungen 
+- Im LayerEditor soll es einen Menüpunkt geben, mitdem man die Auswahl, Gruppe, Selektion als Prefab einfügen kann
+- Wenn man von der Selektion einen Namen ableiten kann (Gruppe, Enity etc.) soll diese als editierbarer Vorschlag angezeigt werden beim Anlegen
+
+
+
+
+
+
+

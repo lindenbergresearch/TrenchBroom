@@ -26,7 +26,6 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "View/MapDocument.h"
-#include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 #include "View/ViewEditor.h"
 
@@ -45,7 +44,7 @@ void MapViewBar::createGui(std::weak_ptr<MapDocument> document) {
     setAttribute(Qt::WA_MacSmallSize);
 
     m_toolBook = new QStackedLayout();
-    m_toolBook->setContentsMargins(0, 0, 0, 0);
+    m_toolBook->setAlignment(Qt::AlignVCenter);
 
     m_viewEditor = new ViewPopupEditor(std::move(document));
 
@@ -55,13 +54,32 @@ void MapViewBar::createGui(std::weak_ptr<MapDocument> document) {
     const auto vMargin = LayoutConstants::MediumVMargin;
 #endif
 
-    auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(LayoutConstants::WideHMargin, vMargin, LayoutConstants::WideHMargin, vMargin);
-    layout->setSpacing(LayoutConstants::WideHMargin);
-    layout->addLayout(m_toolBook, 1);
-    layout->addWidget(m_viewEditor, 0, Qt::AlignVCenter);
+    auto *horizontalLayout = new QHBoxLayout{};
+    horizontalLayout->setContentsMargins(LayoutConstants::WideHMargin, vMargin, LayoutConstants::WideHMargin, vMargin);
+    horizontalLayout->setSpacing(LayoutConstants::WideHMargin);
+    horizontalLayout->addLayout(m_toolBook, 1);
+    horizontalLayout->addWidget(m_viewEditor, 0, Qt::AlignVCenter);
 
-    setLayout(layout);
+    if (pref(Preferences::DebugMode) && false) {
+        m_panel = new TitledPanel("DEBUG Panel", this, false, true);
+
+        auto *mainLayout = new QVBoxLayout{};
+        mainLayout->setContentsMargins(
+            LayoutConstants::NoMargin,
+            LayoutConstants::NoMargin,
+            LayoutConstants::NoMargin,
+            LayoutConstants::NoMargin
+        );
+
+        mainLayout->addLayout(horizontalLayout);
+        mainLayout->addWidget(m_panel);
+
+        setLayout(mainLayout);
+    } else {
+        setLayout(horizontalLayout);
+    }
 }
+
+MapViewBar::~MapViewBar() {}
 } // namespace View
 } // namespace TrenchBroom

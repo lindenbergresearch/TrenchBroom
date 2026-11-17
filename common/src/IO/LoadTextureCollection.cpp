@@ -133,6 +133,14 @@ namespace TrenchBroom::IO {namespace {
     }
     } // namespace
 
+    Result<Assets::Texture> loadTexture(const std::filesystem::path& path, const FileSystem& gameFS, const Model::TextureConfig& textureConfig) {
+        return makeReadTextureFunc(gameFS, textureConfig).and_then([&](const auto& read) {
+            return gameFS.openFile(path).and_then([&](const auto& file) {
+                return read(*file, path).or_else([](auto error) -> Result<Assets::Texture> { return Error{std::move(error.msg)}; });
+            });
+        });
+    }
+
     Result<std::vector<std::filesystem::path>> findTextureCollections(const FileSystem& gameFS, const Model::TextureConfig& textureConfig) {
         return gameFS.find(textureConfig.root, TraversalMode::Recursive, makePathInfoPathMatcher({PathInfo::Directory})).transform(
             [&](auto paths) {

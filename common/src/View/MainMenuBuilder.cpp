@@ -35,7 +35,7 @@ MenuBuilderBase::~MenuBuilderBase() = default;
 
 void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tAction) {
     if (!tAction->keySequence().isEmpty()) {
-        const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label()).arg(tAction->keySequence().toString(QKeySequence::NativeText));
+        const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label(), tAction->keySequence().toString(QKeySequence::NativeText));
         qAction->setToolTip(tooltip);
     } else {
         qAction->setToolTip(tAction->label());
@@ -54,11 +54,13 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
     }
 
     auto *qAction = new QAction(tAction->label());
+    qAction->setProperty("tbRegisteredAction",true);
     qAction->setCheckable(tAction->checkable());
     if (tAction->hasIcon()) {
         auto size = pref(Preferences::ToolBarIconsSize);
         qAction->setIcon(IO::loadSVGIcon(tAction->iconPath(), size));
     }
+
     qAction->setStatusTip(tAction->statusTip());
     updateActionKeySeqeunce(qAction, tAction);
 
@@ -85,6 +87,8 @@ void MainMenuBuilder::visit(const Menu &menu) {
     if (menu.entryType() == MenuEntryType::Menu_RecentDocuments) {
         recentDocumentsMenu = m_currentMenu;
     }
+
+    m_currentMenu->setProperty("tbMainMenu",true);
 
     menu.visitEntries(*this);
     m_currentMenu = parentMenu;

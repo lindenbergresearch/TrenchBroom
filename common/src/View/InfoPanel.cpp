@@ -35,8 +35,8 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
     m_issueBrowser = new IssueBrowser(document);
 
     m_tabs = new QTabWidget(this);
-    m_tabs->tabBar()->setObjectName("InfoPanelTabWidget");
-    makeSubTitle(m_tabs);
+    m_tabs->setObjectName("InfoPanelTabWidget");
+    m_tabs->tabBar()->setObjectName("InfoPanelTabBar");
     m_tabs->addTab(m_console, "Console");
     m_tabs->addTab(m_issueBrowser, "Issues");
     m_tabs->setTabPosition(QTabWidget::TabPosition::North);
@@ -44,7 +44,6 @@ InfoPanel::InfoPanel(std::weak_ptr<MapDocument> document, QWidget *parent) : QWi
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, LayoutConstants::NoMargin);
     sizer->addWidget(m_tabs);
-    sizer->addWidget(new BorderLine());
     setLayout(sizer);
 }
 

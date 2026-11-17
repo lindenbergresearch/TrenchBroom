@@ -67,3 +67,71 @@ void setWindowTitleBarColor(QMainWindow* mainWindow, QColor color) {
     QWindow* window = mainWindow->windowHandle();
     setWindowTitleBarColor(window, color);
 }
+
+#include "View/FloatingInspectorTool.h"
+#include <QPointer>
+
+namespace TrenchBroom::View {
+std::function<void()> installMacToolTitleHandler(
+    QWidget& window, std::function<bool(ToolTitleEvent, const QPoint&)> handler, bool alreadyPressed) {
+    __weak NSView* nativeView = (__bridge NSView*)reinterpret_cast<void*>(window.winId());
+    if (!nativeView.window) return {};
+    const QPointer<QWidget> guard(&window);
+    __block bool tracking = alreadyPressed;
+    id monitor = [NSEvent addLocalMonitorForEventsMatchingMask:
+        NSEventMaskLeftMouseDown | NSEventMaskLeftMouseDragged | NSEventMaskLeftMouseUp | NSEventMaskKeyDown
+        handler:^NSEvent*(NSEvent* event) {
+            NSView* view = nativeView;
+            NSWindow* source = view.window;
+            if (!guard || !source) return event;
+            const auto globalPosition = [&] {
+                auto location = event.locationInWindow;
+                if (event.window != source) {
+                    if (event.window) location = [event.window convertPointToScreen:location];
+                    location = [source convertPointFromScreen:location];
+                }
+                const auto point = [view convertPoint:location fromView:nil];
+                return guard->mapToGlobal(QPoint(qRound(point.x), qRound(point.y)));
+            };
+            if (event.type == NSEventTypeLeftMouseDown) {
+                if (alreadyPressed || tracking || event.window != source || event.clickCount != 1) return event;
+                const auto location = event.locationInWindow;
+                const auto content = [source.contentView convertRect:source.contentView.bounds toView:nil];
+                if (location.y < NSMaxY(content)) return event;
+                // Leave the native close/minimize/zoom controls to AppKit.
+                for (const auto buttonType : {NSWindowCloseButton, NSWindowMiniaturizeButton, NSWindowZoomButton}) {
+                    NSButton* button = [source standardWindowButton:buttonType];
+                    if (button && !button.hidden && NSPointInRect(location, [button convertRect:button.bounds toView:nil]))
+                        return event;
+                }
+                tracking = handler(ToolTitleEvent::Press, globalPosition());
+                return tracking ? nil : event;
+            }
+            if (!tracking) return event;
+            if (event.type == NSEventTypeLeftMouseDragged) {
+                tracking = handler(ToolTitleEvent::Move, globalPosition());
+                return tracking ? nil : event;
+            }
+            if (event.type == NSEventTypeLeftMouseUp) {
+                tracking = false;
+                return handler(ToolTitleEvent::Release, globalPosition()) ? nil : event;
+            }
+            if (event.type == NSEventTypeKeyDown && event.keyCode == 53) {
+                tracking = false;
+                return handler(ToolTitleEvent::Cancel, {}) ? nil : event;
+            }
+            return event;
+        }];
+    auto* notifications = NSNotificationCenter.defaultCenter;
+    id resign = [notifications addObserverForName:NSApplicationDidResignActiveNotification object:NSApp queue:nil
+        usingBlock:^(NSNotification*) {
+            if (!guard || !tracking) return;
+            tracking = false;
+            handler(ToolTitleEvent::Cancel, {});
+        }];
+    return [monitor, notifications, resign] {
+        [NSEvent removeMonitor:monitor];
+        [notifications removeObserver:resign];
+    };
+}
+}

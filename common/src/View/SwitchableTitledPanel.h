@@ -28,29 +28,20 @@
 class QStackedLayout;
 
 namespace TrenchBroom::View {
-class BorderLine;
-
-class ClickableTitleBar;
-
 class SwitchableTitledPanel : public QWidget {
   Q_OBJECT
   private:
-    struct SwitchablePanel {
-      QWidget *panel = nullptr;
-      QString stateText;
-    };
-
-    ClickableTitleBar *m_titleBar = nullptr;
-    BorderLine *m_divider = nullptr;
-    QStackedLayout *m_stackedLayout = nullptr;
-    std::array<SwitchablePanel, 2> m_panels;
+    TitleBar* m_titleBar;
+    QStackedLayout* m_stackedLayout;
+    std::array<QWidget*, 2> m_panels;
 
   public:
-    explicit SwitchableTitledPanel(const QString &title, const std::array<QString, 2> &stateTexts, QWidget *parent = nullptr);
+    explicit SwitchableTitledPanel(const QString &title, QWidget *parent = nullptr);
 
     QWidget *getPanel(size_t index) const;
 
     size_t currentIndex() const;
+    TitleBar* getTitleBar() const;
 
     void setCurrentIndex(size_t index);
 

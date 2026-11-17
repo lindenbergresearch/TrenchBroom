@@ -26,6 +26,7 @@
 #include "Macros.h"
 #include "Model/Entity.h"
 #include "Model/EntityNodeBase.h"
+#include "Model/WorldNode.h"
 #include "View/MapDocument.h"
 #include "View/SmartChoiceEditor.h"
 #include "View/SmartColorEditor.h"
@@ -78,13 +79,12 @@ SmartPropertyEditorManager::SmartPropertyEditorManager(std::weak_ptr<MapDocument
     : QWidget{parent}, m_document{std::move(document)}, m_stackedLayout{nullptr} {
     createEditors();
     activateEditor(defaultEditor(), "");
-    connectObservers();
 }
 
 void SmartPropertyEditorManager::switchEditor(const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes) {
     auto *editor = selectEditor(propertyKey, nodes);
     activateEditor(editor, propertyKey);
-    updateEditor();
+    editor->update(nodes);
 }
 
 SmartPropertyEditor *SmartPropertyEditorManager::activeEditor() const {
@@ -98,12 +98,14 @@ bool SmartPropertyEditorManager::isDefaultEditorActive() const {
 void SmartPropertyEditorManager::createEditors() {
     assert(m_editors.empty());
 
+    m_editors.emplace_back([this](const auto &propertyKey, const auto &nodes) {
+        const auto document = kdl::mem_lock(m_document);
+        return nodes.size() == 1 && nodes.front() == document->world() && document->game()
+            && document->game()->wadProperty() == propertyKey;
+    }, new SmartWadEditor{m_document});
     m_editors.emplace_back(makeSmartTypeEditorMatcher(Assets::PropertyDefinitionType::FlagsProperty), new SmartFlagsEditor{m_document});
     m_editors.emplace_back(makeSmartPropertyEditorKeyMatcher({"color", "*_color", "*_color2", "*_colour"}), new SmartColorEditor{m_document});
     m_editors.emplace_back(makeSmartTypeWithSameDefinitionEditorMatcher(Assets::PropertyDefinitionType::ChoiceProperty), new SmartChoiceEditor{m_document});
-    m_editors.emplace_back([&](const auto &propertyKey, const auto &nodes) {
-        return propertyKey == kdl::mem_lock(m_document)->game()->wadProperty() && nodes.size() == 1 && nodes.front()->entity().classname() == Model::EntityPropertyValues::WorldspawnClassname;
-    }, new SmartWadEditor{m_document});
     m_editors.emplace_back([](const auto &, const auto &) { return true; }, new SmartDefaultPropertyEditor{m_document});
 
     m_stackedLayout = new QStackedLayout{};
@@ -112,22 +114,6 @@ void SmartPropertyEditorManager::createEditors() {
         m_stackedLayout->addWidget(editor);
     }
     setLayout(m_stackedLayout);
-}
-
-void SmartPropertyEditorManager::connectObservers() {
-    auto document = kdl::mem_lock(m_document);
-    m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &SmartPropertyEditorManager::selectionDidChange);
-    m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &SmartPropertyEditorManager::nodesDidChange);
-}
-
-void SmartPropertyEditorManager::selectionDidChange(const Selection &) {
-    auto document = kdl::mem_lock(m_document);
-    switchEditor(m_propertyKey, document->allSelectedEntityNodes());
-}
-
-void SmartPropertyEditorManager::nodesDidChange(const std::vector<Model::Node *> &) {
-    auto document = kdl::mem_lock(m_document);
-    switchEditor(m_propertyKey, document->allSelectedEntityNodes());
 }
 
 SmartPropertyEditor *SmartPropertyEditorManager::selectEditor(const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes) const {
@@ -150,9 +136,8 @@ void SmartPropertyEditorManager::activateEditor(SmartPropertyEditor *editor, con
     if (m_stackedLayout->currentWidget() != editor || !activeEditor()->usesPropertyKey(propertyKey)) {
         deactivateEditor();
 
-        m_propertyKey = propertyKey;
         m_stackedLayout->setCurrentWidget(editor);
-        editor->activate(m_propertyKey);
+        editor->activate(propertyKey);
     }
 }
 
@@ -160,14 +145,7 @@ void SmartPropertyEditorManager::deactivateEditor() {
     if (activeEditor()) {
         activeEditor()->deactivate();
         m_stackedLayout->setCurrentIndex(-1);
-        m_propertyKey = "";
     }
 }
 
-void SmartPropertyEditorManager::updateEditor() {
-    if (activeEditor()) {
-        auto document = kdl::mem_lock(m_document);
-        activeEditor()->update(document->allSelectedEntityNodes());
-    }
-}
 } // namespace TrenchBroom::View

@@ -21,6 +21,7 @@
 
 #include <QAbstractItemView>
 #include <QCompleter>
+#include <QFontInfo>
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QScrollBar>
@@ -98,7 +99,7 @@ void MultiCompletionLineEdit::updateCompleter(const bool showCompleter) {
 
     if (showCompleter) {
         QRect cr = cursorRect();
-        makeMono(m_multiCompleter->popup(), font().pointSize());
+        makeMono(m_multiCompleter->popup());
         cr.setWidth(m_multiCompleter->popup()->sizeHintForColumn(0) + m_multiCompleter->popup()->verticalScrollBar()->sizeHint().width());
         m_multiCompleter->complete(cr);
     }

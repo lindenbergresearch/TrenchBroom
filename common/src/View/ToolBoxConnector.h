@@ -70,6 +70,7 @@ class ToolBoxConnector : public InputEventProcessor {
     const Model::PickResult &pickResult() const;
 
     void updatePickResult();
+    void updatePickResult(float x, float y);
 
   protected:
     void setToolBox(ToolBox &toolBox);

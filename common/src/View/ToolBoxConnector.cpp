@@ -61,6 +61,11 @@ void ToolBoxConnector::setToolBox(ToolBox &toolBox) {
     m_toolBox = &toolBox;
 }
 
+void ToolBoxConnector::updatePickResult(float x, float y) {
+    mouseMoved(x, y);
+    updatePickResult();
+}
+
 void ToolBoxConnector::addTool(std::unique_ptr<ToolController> tool) {
     m_toolChain->append(std::move(tool));
 }

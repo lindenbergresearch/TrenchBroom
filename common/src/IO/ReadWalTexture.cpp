@@ -96,7 +96,7 @@ Result<Assets::Texture, ReadTextureError> readQ2Wal(std::string name, Reader &re
 
         if (!checkTextureDimensions(width, height)) {
             return ReadTextureError{
-                std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)
+                std::move(name), fmt::format("Invalid WAL texture dimensions: {}px x {}px", width, height)
             };
         }
 
@@ -129,7 +129,7 @@ Result<Assets::Texture, ReadTextureError> readDkWal(std::string name, Reader &re
 
     try {
         const auto version = reader.readChar<char>();
-        ensure(version == 3, "wal texture has version 3");
+        ensure(version == 3, "WAL texture has version 3");
 
         reader.seekForward(WalLayout::TextureNameLength);
         reader.seekForward(3); // garbage
@@ -139,7 +139,7 @@ Result<Assets::Texture, ReadTextureError> readDkWal(std::string name, Reader &re
 
         if (!checkTextureDimensions(width, height)) {
             return ReadTextureError{
-                std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)
+                std::move(name), fmt::format("Invalid WAL texture dimensions: {}px x {}px", width, height)
             };
         }
 

@@ -23,6 +23,7 @@
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#include "FontUtils.h"
 #include "QtUtils.h"
 #include "TrenchBroomApp.h"
 
@@ -115,7 +116,7 @@ QVariant ColorModel::data(const QModelIndex &index, const int role) const {
         // default
         if (index.column() == Value || index.column() == Default) {
             auto font = TrenchBroomApp::instance().getConsoleFont();
-            font.setPointSize(QFont{}.pointSize());
+            font.setPixelSize(uiFontPixelSize());
             return font;
         }
     }

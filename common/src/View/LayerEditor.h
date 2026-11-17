@@ -20,35 +20,46 @@
 #pragma once
 
 #include <QWidget>
+#include "NotifierConnection.h"
 
 #include <memory>
 #include <string>
 
 class QAbstractButton;
+class QToolButton;
+class QSpinBox;
 
 namespace TrenchBroom {
 namespace Model {
 class LayerNode;
+class Node;
 }
 
 namespace View {
 class LayerListBox;
 
 class MapDocument;
+class MapView;
 
 class LayerEditor : public QWidget {
   Q_OBJECT
   private:
     std::weak_ptr<MapDocument> m_document;
     LayerListBox *m_layerList;
+    MapView *m_mapView;
 
     QAbstractButton *m_addLayerButton;
     QAbstractButton *m_removeLayerButton;
     QAbstractButton *m_moveLayerUpButton;
     QAbstractButton *m_moveLayerDownButton;
+    QToolButton *m_groupByTypeButton = nullptr;
+    QToolButton *m_syncSelectionButton = nullptr;
+    QSpinBox *m_groupingThreshold = nullptr;
+    QSpinBox *m_selectionSyncThreshold = nullptr;
+    NotifierConnection m_notifierConnection;
 
   public:
-    explicit LayerEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+    explicit LayerEditor(std::weak_ptr<MapDocument> document, MapView *mapView, QWidget *parent = nullptr);
 
   private:
     void onSetCurrentLayer(Model::LayerNode *layer);
@@ -64,6 +75,8 @@ class LayerEditor : public QWidget {
     bool canToggleLayerVisible() const;
 
     void toggleLayerVisible(Model::LayerNode *layer);
+
+    void toggleNodeVisible(Model::Node *node);
 
     bool canToggleLayerLocked() const;
 
@@ -111,6 +124,7 @@ class LayerEditor : public QWidget {
     Model::LayerNode *findVisibleAndUnlockedLayer(const Model::LayerNode *except) const;
 
     void createGui();
+    void updateTreeSettings();
 
   private slots:
 

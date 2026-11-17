@@ -107,7 +107,7 @@ void TextureBrowserView::setSelectedTexture(const Assets::Texture *selectedTextu
 }
 
 void TextureBrowserView::revealTexture(const Assets::Texture *texture) {
-    scrollToCell([=](const Cell &cell) {
+    scrollToCell([=, this](const Cell &cell) {
         const auto &cellTexture = cellData(cell);
         return &cellTexture == texture;
     });
@@ -139,7 +139,9 @@ void TextureBrowserView::doReloadLayout(Layout &layout) {
 
     if (m_group) {
         for (const auto *collection : getCollections()) {
-            layout.addGroup(collection->path().u8string(), float(fontSize) + 2.0f);
+            std::u8string u8title = collection->path().u8string();
+            std::string title(u8title.begin(), u8title.end()); // char8_t → char (ASCII-safe)
+            layout.addGroup(title, float(fontSize) + 2.0f);
             addTexturesToLayout(layout, getTextures(*collection), font);
         }
     } else {

@@ -3,9 +3,7 @@
 #include "Model/PatchNode.h"
 
 namespace TrenchBroom::View {
-LayerTreePatchRenderer::LayerTreePatchRenderer() {
-    m_layout.margins = QMargins(4, 3, 4, 3);
-}
+LayerTreePatchRenderer::LayerTreePatchRenderer() = default;
 
 LayerTreeItemContent LayerTreePatchRenderer::content(const Model::Node &node, int ordinal, bool) const {
     const auto &patch = static_cast<const Model::PatchNode &>(node).patch();

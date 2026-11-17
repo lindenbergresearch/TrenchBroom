@@ -21,7 +21,6 @@
 
 #include <QCheckBox>
 #include <QDebug>
-#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QKeySequence>
@@ -30,13 +29,14 @@
 #include <QSortFilterProxyModel>
 #include <QTableView>
 #include <QTimer>
+#include <QSignalBlocker>
+#include <QToolBar>
 #include <QToolButton>
 
 #include "Macros.h"
 #include "Model/EntityNodeBase.h"
 #include "Model/EntityProperties.h"
 #include "Model/Node.h"
-#include "View/BorderLine.h"
 #include "View/EntityPropertyItemDelegate.h"
 #include "View/EntityPropertyModel.h"
 #include "View/EntityPropertyTable.h"
@@ -58,6 +58,7 @@ namespace View {
 EntityPropertyGrid::EntityPropertyGrid(std::weak_ptr<MapDocument> document, QWidget *parent) : QWidget{parent}, m_document{std::move(document)} {
     createGui(m_document);
     connectObservers();
+    updateControls();
 }
 
 void EntityPropertyGrid::backupSelection() {
@@ -74,10 +75,12 @@ void EntityPropertyGrid::backupSelection() {
 }
 
 void EntityPropertyGrid::restoreSelection() {
+    // Selecting an index emits selectionChanged, which rewrites the backup.
+    const auto savedSelection = m_selectionBackup;
     m_table->selectionModel()->clearSelection();
 
     GRID_LOG(qDebug() << "Restore selection");
-    for (const auto &selection : m_selectionBackup) {
+    for (const auto &selection : savedSelection) {
         const auto row = m_model->rowForPropertyKey(selection.propertyKey);
         if (row == -1) {
             GRID_LOG(qDebug() << "Restore selection: couldn't find " << QString::fromStdString(selection.propertyKey));
@@ -209,10 +212,10 @@ void EntityPropertyGrid::createGui(std::weak_ptr<MapDocument> document) {
 
     m_table->verticalHeader()->setVisible(false);
     m_table->horizontalHeader()->setSectionResizeMode(EntityPropertyModel::ColumnProtected, QHeaderView::ResizeToContents);
-    m_table->horizontalHeader()->setSectionResizeMode(EntityPropertyModel::ColumnKey, QHeaderView::ResizeToContents);
+    m_table->horizontalHeader()->setSectionResizeMode(EntityPropertyModel::ColumnKey, QHeaderView::Interactive);
     m_table->horizontalHeader()->setSectionResizeMode(EntityPropertyModel::ColumnValue, QHeaderView::Stretch);
     m_table->horizontalHeader()->setSectionsClickable(false);
-    m_table->setSelectionBehavior(QAbstractItemView::SelectItems);
+    m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     m_addPropertyButton = createBitmapButton("Add.svg", tr("Add a new property (%1)").arg(EntityPropertyTable::insertRowShortcutString()), this);
     connect(m_addPropertyButton, &QAbstractButton::clicked, this, [=](const bool /* checked */) {
@@ -284,16 +287,18 @@ void EntityPropertyGrid::createGui(std::weak_ptr<MapDocument> document) {
         emit currentRowChanged();
     });
 
-    // Shortcuts
-
-    auto *toolBar = createMiniToolBarLayout(m_addPropertyButton, m_addProtectedPropertyButton, m_removePropertiesButton, LayoutConstants::WideHMargin, m_setDefaultPropertiesButton, LayoutConstants::WideHMargin, m_showDefaultPropertiesCheckBox);
+    auto* toolbar = createInspectorToolBar(this);
+    toolbar->addWidget(m_addPropertyButton);
+    toolbar->addWidget(m_addProtectedPropertyButton);
+    toolbar->addWidget(m_removePropertiesButton);
+    toolbar->addWidget(m_setDefaultPropertiesButton);
+    toolbar->addWidget(m_showDefaultPropertiesCheckBox);
 
     auto *layout = new QVBoxLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
+    layout->addWidget(toolbar);
     layout->addWidget(m_table, 1);
-    layout->addWidget(new BorderLine{BorderLine::Direction::Horizontal}, 0);
-    layout->addLayout(toolBar, 0);
     setLayout(layout);
 
     // NOTE: Do not use QAbstractItemView::SelectedClicked.
@@ -307,6 +312,7 @@ void EntityPropertyGrid::connectObservers() {
     m_notifierConnection += document->documentWasNewedNotifier.connect(this, &EntityPropertyGrid::documentWasNewed);
     m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &EntityPropertyGrid::documentWasLoaded);
     m_notifierConnection += document->nodesDidChangeNotifier.connect(this, &EntityPropertyGrid::nodesDidChange);
+    m_notifierConnection += document->entityDefinitionsDidChangeNotifier.connect(this, &EntityPropertyGrid::updateControls);
     m_notifierConnection += document->selectionWillChangeNotifier.connect(this, &EntityPropertyGrid::selectionWillChange);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &EntityPropertyGrid::selectionDidChange);
 }
@@ -336,16 +342,21 @@ void EntityPropertyGrid::updateControls() {
     // selected row in the table, unless it's a key name that exists in worldspawn. To avoid
     // that problem, make a delayed call to update the table.
     QTimer::singleShot(0, this, [&]() {
-        m_model->updateFromMapDocument();
+        {
+            const QSignalBlocker blocker(this);
+            m_model->updateFromMapDocument();
 
-        if (m_table->selectionModel()->selectedIndexes().empty()) {
-            restoreSelection();
+            if (m_table->selectionModel()->selectedIndexes().empty()) {
+                restoreSelection();
+            }
+            ensureSelectionVisible();
+
+            const auto shouldShowProtectedProperties = m_model->shouldShowProtectedProperties();
+            m_table->setColumnHidden(EntityPropertyModel::ColumnProtected, !shouldShowProtectedProperties);
+            m_addProtectedPropertyButton->setHidden(!shouldShowProtectedProperties);
         }
-        ensureSelectionVisible();
-
-        const auto shouldShowProtectedProperties = m_model->shouldShowProtectedProperties();
-        m_table->setColumnHidden(EntityPropertyModel::ColumnProtected, !shouldShowProtectedProperties);
-        m_addProtectedPropertyButton->setHidden(!shouldShowProtectedProperties);
+        // Selection context can change without changing the rows or current index.
+        emit currentRowChanged();
     });
     updateControlsEnabled();
 }
@@ -366,8 +377,12 @@ void EntityPropertyGrid::updateControlsEnabled() {
 }
 
 std::string EntityPropertyGrid::selectedRowName() const {
-    const auto current = m_proxyModel->mapToSource(m_table->currentIndex());
-    const auto *rowModel = m_model->dataForModelIndex(current);
+    const auto* selection = m_table->selectionModel();
+    auto index = selection->currentIndex();
+    if (selection->hasSelection() && !selection->isSelected(index)) {
+        index = selection->selectedIndexes().front();
+    }
+    const auto *rowModel = m_model->dataForModelIndex(m_proxyModel->mapToSource(index));
     return rowModel ? rowModel->key() : "";
 }
 } // namespace View

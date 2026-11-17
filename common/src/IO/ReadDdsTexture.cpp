@@ -132,7 +132,7 @@ Result<Assets::Texture, ReadTextureError> readDdsTexture(std::string name, Reade
 
         if (!checkTextureDimensions(width, height)) {
             return ReadTextureError{
-                std::move(name), fmt::format("Invalid texture dimensions: {}*{}", width, height)
+                std::move(name), fmt::format("Invalid DDS texture dimensions: {}px x {}px", width, height)
             };
         }
 

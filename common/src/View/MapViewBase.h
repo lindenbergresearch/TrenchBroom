@@ -63,6 +63,7 @@ class SmartTag;
 } // namespace Model
 
 namespace Renderer {
+struct PreviewLighting;
 class Camera;
 
 class Compass;
@@ -97,6 +98,8 @@ class Tool;
 
 class UndoableCommand;
 
+static long cnt = 0;
+
 class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, public CameraLinkableView {
   Q_OBJECT
   public:
@@ -105,9 +108,13 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
   protected:
     Logger *m_logger;
     std::weak_ptr<MapDocument> m_document;
+    bool m_popupFromInspector = false;
+    bool m_prefabDrag = false;
     MapViewToolBox &m_toolBox;
-
     std::unique_ptr<AnimationManager> m_animationManager;
+    std::shared_ptr<const Renderer::PreviewLighting> m_previewLighting;
+    bool m_LightInvalidated = true;
+
 
   private:
     Renderer::MapRenderer &m_renderer;
@@ -152,6 +159,8 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void setIsCurrent(bool isCurrent);
 
     Renderer::Camera &camera();
+
+
 
   private:
     void bindEvents();
@@ -358,6 +367,8 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
 
     void toggleShowEdges();
 
+    void toggleEnableLightning();
+
     void showAllEntityLinks();
 
     void showTransitivelySelectedEntityLinks();
@@ -414,6 +425,7 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void renderCompass(Renderer::RenderBatch &renderBatch);
 
     void renderFPS(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
+    void renderViewDescription(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch);
 
   public: // implement InputEventProcessor interface
     void processEvent(const KeyEvent &event) override;
@@ -428,6 +440,12 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
   public slots:
 
     void showPopupMenuLater();
+
+  public:
+    void showPopupMenuForSelection(const QPoint &globalPosition, QAction* deleteAction = nullptr);
+
+  private:
+    void showPopupMenu(const QPoint &globalPosition, bool fromInspector, QAction* deleteAction = nullptr);
 
   protected: // QWidget overrides
     void dragEnterEvent(QDragEnterEvent *event) override;
@@ -452,7 +470,7 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
 
     virtual vm::vec3 doComputePointEntityPosition(const vm::bbox3 &bounds) const = 0;
 
-    virtual ActionContext::Type doGetActionContext() const = 0;
+    virtual ActionContext::Type doGetActionContext() const { return ActionContext::Any; };
 
     virtual ActionView doGetActionView() const = 0;
 

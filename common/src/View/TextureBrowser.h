@@ -36,6 +36,8 @@ class QLineEdit;
 
 class QScrollBar;
 
+class QToolBar;
+
 namespace TrenchBroom::Assets {
 class Texture;
 }
@@ -65,11 +67,15 @@ class TextureBrowser : public QWidget {
     QLineEdit *m_filterBox = nullptr;
     QScrollBar *m_scrollBar = nullptr;
     TextureBrowserView *m_view = nullptr;
+    QToolBar *m_toolbar = nullptr;
 
     NotifierConnection m_notifierConnection;
 
   public:
     TextureBrowser(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
+
+    QToolBar* toolBar() const;
+    void setToolBarAtTop();
 
     const Assets::Texture *selectedTexture() const;
 

@@ -1,0 +1,18 @@
+<p class="tool">{{tool.name}}</p>
+<p class="selection-name">{{selection.name}}</p>
+{{^selection.empty}}
+<p class="selection-type">{{selection.typeName}}</p>
+<p class="position"><span class="label">{{selection.positionLabel}}:</span> {{selection.position.text}}</p>
+<p class="size"><span class="label">Size:</span> {{selection.size.text}}</p>
+{{#selection.orientation}}<p class="orientation"><span class="label">{{selection.orientationLabel}}:</span> {{selection.orientation}}</p>{{/selection.orientation}}
+{{#selection.group}}<p class="group-contents"><span class="label">Contents:</span> {{selection.children}} direct / {{selection.descendants}} total</p>{{/selection.group}}
+{{#counts.groups}}<p class="groups"><span class="label">Groups:</span> {{counts.groups}}</p>{{/counts.groups}}
+{{#counts.entities}}<p class="entities"><span class="label">Entities:</span> {{counts.entities}}</p>{{/counts.entities}}
+{{#counts.brushes}}<p class="geometry"><span class="label">Brushes / Faces:</span> {{counts.brushes}} / {{counts.faces}}</p>{{/counts.brushes}}
+{{#counts.patches}}<p class="patches"><span class="label">Patches:</span> {{counts.patches}}</p>{{/counts.patches}}
+{{#textureCount}}
+<p class="texture-heading">Textures ({{textureCount}})</p>
+<p class="textures">{{textureSummary}}</p>
+{{/textureCount}}
+{{/selection.empty}}
+{{#selection.empty}}<p class="empty">-.</p>{{/selection.empty}}

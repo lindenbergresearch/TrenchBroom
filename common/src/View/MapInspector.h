@@ -19,22 +19,18 @@
 
 #pragma once
 
-#include <QSplitter>
 
 #include "FloatType.h"
 #include "NotifierConnection.h"
-#include "View/Inspector.h"
-#include "View/LayerEditor.h"
-#include "View/MapSearchListBox.h"
-#include "View/MapView.h"
-#include "View/TabBook.h"
-#include "View/TitledPanel.h"
+#include "View/InspectorToolSection.h"
+#include <QWidget>
+
+#include <QPointer>
 
 #include <memory>
 #include <optional>
 #include <vector>
 
-class QWidget;
 
 class QCheckBox;
 
@@ -42,7 +38,7 @@ class QLabel;
 
 class QLineEdit;
 
-class QRadioButton;
+class QComboBox;
 
 namespace TrenchBroom {
 namespace Model {
@@ -50,42 +46,28 @@ class Node;
 }
 
 namespace View {
-class CollapsibleTitledPanel;
+class TitledPanel;
 
 class MapDocument;
 
-class MapInspector : public TabBookPage {
+class MapInspector : public QWidget {
   Q_OBJECT
   private:
-    CollapsibleTitledPanel *m_mapPropertiesEditorPanel;
-    CollapsibleTitledPanel *m_modEditorPanel;
-    CollapsibleTitledPanel *m_mapSearchPanel;
-    TitledPanel *m_layerEditorPanel;
-
-    QSplitter *m_splitter;
-    LayerEditor *m_layerEditor;
-    MapSearchListBox *m_mapSearchListBox;
-    QLineEdit *m_searchBoxEdit;
-    MapView *m_mapView;
-    Inspector *m_inspector;
+    QPointer<TitledPanel> m_mapPropertiesEditorPanel;
+    QPointer<TitledPanel> m_modEditorPanel;
 
   public:
-    explicit MapInspector(std::weak_ptr<MapDocument> document, MapView *mapView, Inspector *inspector, QWidget *parent = nullptr);
+    explicit MapInspector(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
 
-    ~MapInspector();
+    std::vector<InspectorToolSection> toolSections() const;
 
   private:
     void createGui(std::weak_ptr<MapDocument> document);
 
-    TitledPanel *createLayerEditor(std::weak_ptr<MapDocument> document);
+    TitledPanel *createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
 
-    CollapsibleTitledPanel *createMapPropertiesEditor(std::weak_ptr<MapDocument> document);
+    TitledPanel *createModEditor(std::weak_ptr<MapDocument> document);
 
-    CollapsibleTitledPanel *createModEditor(std::weak_ptr<MapDocument> document);
-
-    CollapsibleTitledPanel *createSearchList(std::weak_ptr<MapDocument> document);
-
-    QLineEdit *createSearchBox();
 };
 
 /**
@@ -97,11 +79,10 @@ class MapPropertiesEditor : public QWidget {
     std::weak_ptr<MapDocument> m_document;
     bool m_updatingGui;
 
-    QRadioButton *m_softBoundsDisabled;
-    QRadioButton *m_softBoundsFromGame;
+    enum BoundsMode { Disabled, GameDefault, Custom };
+    QComboBox* m_boundsMode = nullptr;
     QLabel *m_softBoundsFromGameMinLabel;
     QLabel *m_softBoundsFromGameMaxLabel;
-    QRadioButton *m_softBoundsFromMap;
     QLineEdit *m_softBoundsFromMapMinEdit;
     QLineEdit *m_softBoundsFromMapMaxEdit;
 

@@ -130,7 +130,7 @@ std::string demangleSymbol(const std::string &mangled_name) {
  *
  * @return Stacktrace as multiline string.
  */
-std::string TrenchBroomStackWalker::getStackTrace() {
+std::string TrenchBroomStackWalker::getStackTrace(const std::string &prefix) {
     void *callstack[MAX_CALL_STACK_FRAMES];
     const int frames = backtrace(callstack, MAX_CALL_STACK_FRAMES);
 
@@ -161,7 +161,7 @@ std::string TrenchBroomStackWalker::getStackTrace() {
             }
         }
 
-        ss << line << "\n";
+        ss << prefix << line << std::endl;
     }
 
     std::free(strs);

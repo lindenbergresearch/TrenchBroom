@@ -18,6 +18,12 @@
  */
 
 #include "QtUtils.h"
+#include "View/FontUtils.h"
+#include "Preferences.h"
+#include "PreferenceManager.h"
+#include <QAction>
+#include <QMenu>
+#include <QStyle>
 
 #include <QApplication>
 #include <QBoxLayout>
@@ -38,6 +44,7 @@
 #include <QStringBuilder>
 #include <QTableView>
 #include <QTextCodec>
+#include <QToolBar>
 #include <QToolButton>
 #include <QWindow>
 #include <QtGlobal>
@@ -68,6 +75,56 @@
 #endif
 
 namespace TrenchBroom {namespace View {
+    void prepareContextMenu(QMenu& menu) {
+        if (menu.property("tbMainMenu").toBool()) return;
+        const auto icons = pref(Preferences::ContextMenuIcons), shortcuts = pref(Preferences::ContextMenuShortcuts);
+        for (auto* action : menu.actions()) {
+            if (action->property("tbRegisteredAction").toBool() && action->parent() != &menu) {
+                auto* copy = new QAction(&menu);
+                const auto source = QPointer<QAction>(action);
+                const auto sync = [source,copy] {
+                    if (!source) { copy->setEnabled(false); return; }
+                    auto label = source->text();
+                    if (!source->shortcut().isEmpty()) label += '\t' + source->shortcut().toString(QKeySequence::NativeText);
+                    copy->setProperty("tbContextFullLabel",label);
+                    const auto displayed = pref(Preferences::ContextMenuShortcuts) ? label : label.section('\t',0,0);
+                    copy->setProperty("tbContextDisplayedLabel",displayed);
+                    copy->setText(displayed); copy->setIcon(source->icon());
+                    copy->setEnabled(source->isEnabled()); copy->setVisible(source->isVisible());
+                    copy->setCheckable(source->isCheckable()); copy->setChecked(source->isChecked());
+                    copy->setStatusTip(source->statusTip()); copy->setToolTip(source->toolTip());
+                    // The source remains the sole owner of the key binding.
+                    // This menu item only presents its current native key text.
+                };
+                sync();
+                QObject::connect(action,&QAction::changed,copy,sync);
+                QObject::connect(action,&QObject::destroyed,copy,[copy] { copy->setEnabled(false); });
+                QObject::connect(copy,&QAction::triggered,copy,[source] { if (source) source->trigger(); });
+                menu.insertAction(action,copy); menu.removeAction(action); action = copy;
+            }
+            action->setIconVisibleInMenu(icons);
+            action->setShortcutVisibleInContextMenu(shortcuts);
+            // Qt's standard text-edit menus sometimes encode the shortcut in
+            // the label instead of QAction::shortcut(). Preserve it for reuse.
+            auto label = action->text();
+            if (label == action->property("tbContextDisplayedLabel").toString()) label = action->property("tbContextFullLabel").toString();
+            action->setProperty("tbContextFullLabel",label);
+            const auto displayed = shortcuts ? label : label.section('\t',0,0);
+            action->setProperty("tbContextDisplayedLabel",displayed);
+            action->setText(displayed);
+        }
+    }
+
+    namespace {
+        QWidget* styledWidget(QWidget* widget) {
+            if (!widget->property("uiStyled").toBool()) {
+                widget->setProperty("uiStyled", true);
+                widget->setProperty("uiTextRole", "body");
+            }
+            return widget;
+        }
+    }
+
     SyncHeightEventFilter::SyncHeightEventFilter(QWidget* primary, QWidget* secondary, QObject* parent)
         : QObject{
               parent
@@ -90,9 +147,11 @@ namespace TrenchBroom {namespace View {
         if (target == m_primary && event->type() == QEvent::Resize) {
             const auto* sizeEvent = static_cast<QResizeEvent *>(event);
             const auto height = sizeEvent->size().height();
+
             if (m_secondary->height() != height) {
                 m_secondary->setFixedHeight(height);
             }
+
             return false;
         }
         else {
@@ -182,7 +241,10 @@ namespace TrenchBroom {namespace View {
     }
 
     MapFrame* findMapFrame(QWidget* widget) {
-        return dynamic_cast<MapFrame *>(widget->window());
+        for (auto* ancestor = widget; ancestor; ancestor = ancestor->parentWidget()) {
+            if (auto* frame = qobject_cast<MapFrame*>(ancestor)) return frame;
+        }
+        return nullptr;
     }
 
     void setHint(QLineEdit* ctrl, const char* hint) {
@@ -203,148 +265,90 @@ namespace TrenchBroom {namespace View {
     }
 
     int getCommonFieldHeight() {
-        auto fontsize = pref(Preferences::UIFontSize);
+        auto fontsize = uiFontPixelSize();
         return fontsize + 2 * LayoutConstants::MediumVMargin;
     }
 
+    void repolishWidget(QWidget* widget) {
+        widget->style()->unpolish(widget);
+        widget->style()->polish(widget);
+        widget->updateGeometry();
+        widget->update();
+    }
+
+    QWidget* setTextStyleRole(QWidget* widget, const QString& role) {
+        styledWidget(widget)->setProperty("uiTextRole", role);
+        repolishWidget(widget);
+        return widget;
+    }
+
     QWidget* makeDefault(QWidget* widget, bool resetFont) {
-        const auto& app = TrenchBroomApp::instance();
+        styledWidget(widget)->setProperty("uiTone", "normal");
         if (resetFont) {
-            widget->setFont(QFont{});
+            widget->setProperty("uiTextRole", "body");
+            widget->setProperty("uiFontFamily", "ui");
+            widget->setProperty("uiEmphasized", QVariant{});
+            widget->setProperty("uiItalic", QVariant{});
         }
-
-        widget->setPalette(app.palette());
-
+        repolishWidget(widget);
         return widget;
     }
 
     QWidget* makeEmphasized(QWidget* widget) {
-        auto font = widget->font();
-        font.setBold(true);
-        widget->setFont(font);
+        styledWidget(widget)->setProperty("uiEmphasized", true);
+        repolishWidget(widget);
         return widget;
     }
 
     QWidget* makeItalic(QWidget* widget) {
-        auto font = widget->font();
-        font.setItalic(true);
-        widget->setFont(font);
+        styledWidget(widget)->setProperty("uiItalic", true);
+        repolishWidget(widget);
         return widget;
     }
 
     QWidget* makeUnemphasized(QWidget* widget) {
-        widget->setFont(QFont{});
+        styledWidget(widget)->setProperty("uiEmphasized", false);
+        repolishWidget(widget);
         return widget;
     }
 
-    QWidget* makeInfo(QWidget* widget) {
-        makeDefault(widget);
-        widget = makeSmall(widget);
-        return widget;
-    }
-
-    QWidget* makeSmall(QWidget* widget) {
-        auto font = widget->font();
-        font.setPointSize(font.pointSize() - 2);
-        widget->setFont(font);
-        return widget;
-    }
-
-    QWidget* makeBigger(QWidget* widget, int value) {
-        auto font = widget->font();
-        font.setPointSize(font.pointSize() + value);
-        widget->setFont(font);
-        return widget;
-    }
-
+    QWidget* makeInfo(QWidget* widget) { return setTextStyleRole(widget, "info"); }
+    QWidget* makeSmall(QWidget* widget) { return setTextStyleRole(widget, "small"); }
     QWidget* makeTitle(QWidget* widget) {
-        widget->setForegroundRole(QPalette::HighlightedText);
-        auto font = widget->font();
-        font.setPointSize(int((float)font.pointSize() * 1.5f));
-        font.setBold(true);
-        widget->setFont(font);
-        return widget;
+        makeEmphasized(widget);
+        return setTextStyleRole(widget, "title");
     }
-
-    QWidget* makeSubTitle(QWidget* widget) {
-        auto font = widget->font();
-        font.setPointSize(font.pointSize() - 1);
-        // font.setItalic(true);
-        widget->setFont(font);
-        return widget;
-    }
-
+    QWidget* makeSubTitle(QWidget* widget) { return setTextStyleRole(widget, "subtitle"); }
     QWidget* makeHeader(QWidget* widget) {
-        makeDefault(widget);
-        auto font = widget->font();
-        font.setPointSize(font.pointSize() * 2);
-        font.setBold(true);
-        widget->setFont(font);
-        return widget;
-    }
-
-    QWidget* makePanelTitle(QWidget* widget, bool bold, bool isSubTitle) {
-        widget->setForegroundRole(QPalette::HighlightedText);
-        auto font = widget->font();
-
-        if (bold) {
-            font.setBold(true);
-        }
-
-        if (isSubTitle) {
-            font.setPointSize(font.pointSize() - 1);
-        }
-
-        widget->setFont(font);
-        return widget;
+        makeEmphasized(widget);
+        return setTextStyleRole(widget, "header");
     }
 
     QWidget* makeError(QWidget* widget) {
-        auto palette = widget->palette();
-        palette.setColor(QPalette::Normal, QPalette::WindowText, Qt::red);
-        palette.setColor(QPalette::Normal, QPalette::Text, Qt::red);
-        widget->setPalette(palette);
+        styledWidget(widget)->setProperty("uiTone", "error");
+        repolishWidget(widget);
         return widget;
     }
 
-    QWidget* makeMono(QWidget* widget, int size) {
-        auto font = TrenchBroomApp::instance().getConsoleFont();
-        font.setPointSize(size);
-        widget->setFont(font);
+    QWidget* makeMono(QWidget* widget) {
+        styledWidget(widget)->setProperty("uiFontFamily", "console");
+        repolishWidget(widget);
         return widget;
     }
 
-    QWidget* makeSelected(QWidget* widget, const QPalette& defaultPalette) {
-        auto palette = widget->palette();
-        palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
-        palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
-        widget->setPalette(palette);
+    QWidget* makeSelected(QWidget* widget) {
+        styledWidget(widget)->setProperty("uiTone", "highlighted");
+        repolishWidget(widget);
         return widget;
     }
 
-    QWidget* colorizeWidget(QWidget* widget, const QColor& color, QPalette::ColorRole role) {
-        auto palette = widget->palette();
-        palette.setColor(QPalette::Normal, role, color);
-        widget->setPalette(palette);
+    QWidget* makeBright(QWidget* widget) {
+        styledWidget(widget)->setProperty("uiTone", "highlighted");
+        repolishWidget(widget);
         return widget;
     }
 
-    QWidget* makeBright(QWidget* widget, const QPalette& defaultPalette) {
-        auto palette = widget->palette();
-        palette.setColor(QPalette::Normal, QPalette::Button, defaultPalette.color(QPalette::Normal, QPalette::Midlight));
-        //    palette.setColor(QPalette::Normal, QPalette::Base,
-        //    defaultPalette.color(QPalette::Normal, QPalette::HighlightedText));
-        widget->setPalette(palette);
-        return widget;
-    }
-
-    QWidget* makeUnselected(QWidget* widget, const QPalette& defaultPalette) {
-        auto palette = widget->palette();
-        palette.setColor(QPalette::Normal, QPalette::WindowText, defaultPalette.color(QPalette::Normal, QPalette::WindowText));
-        palette.setColor(QPalette::Normal, QPalette::Text, defaultPalette.color(QPalette::Normal, QPalette::Text));
-        widget->setPalette(palette);
-        return widget;
-    }
+    QWidget* makeUnselected(QWidget* widget) { return makeDefault(widget, false); }
 
     Color fromQColor(const QColor& color) {
         return Color(
@@ -383,9 +387,12 @@ namespace TrenchBroom {namespace View {
         return toStyleSheetRGBA(color, adjustment);
     }
 
-    void setStyledBorder(QWidget* widget, int width, const QColor& color, const char* type) {
-        auto qss = QString::asprintf("border: %dpx %s %s;", width, type, toStyleSheetRGBA(color).toStdString().c_str());
-        widget->setStyleSheet(qss);
+    QToolBar* createInspectorToolBar(QWidget* parent) {
+        auto* toolbar = new QToolBar(parent);
+        toolbar->setObjectName("InspectorToolToolbar");
+        toolbar->setMovable(false);
+        toolbar->setFloatable(false);
+        return toolbar;
     }
 
     QToolButton* createBitmapButton(const std::string& image, const QString& tooltip, QWidget* parent) {
@@ -430,7 +437,7 @@ namespace TrenchBroom {namespace View {
         slider->setTickPosition(QSlider::NoTicks);
         slider->setTracking(true);
         slider->setOrientation(Qt::Horizontal);
-        makeBright(slider, QPalette{});
+        makeBright(slider);
 
         return slider;
     }
@@ -506,24 +513,27 @@ namespace TrenchBroom {namespace View {
     }
 
     void setDefaultWindowColor(QWidget* widget) {
-        widget->setAutoFillBackground(true);
-        widget->setBackgroundRole(QPalette::Window);
+        widget->setAttribute(Qt::WA_StyledBackground);
+        widget->setProperty("uiSurface", "window");
+        repolishWidget(widget);
     }
 
     void setBaseWindowColor(QWidget* widget) {
-        widget->setAutoFillBackground(true);
-        widget->setBackgroundRole(QPalette::Base);
+        widget->setAttribute(Qt::WA_StyledBackground);
+        widget->setProperty("uiSurface", "base");
+        repolishWidget(widget);
     }
 
     void setHighlightWindowColor(QWidget* widget) {
-        widget->setAutoFillBackground(true);
-        widget->setBackgroundRole(QPalette::Highlight);
+        widget->setAttribute(Qt::WA_StyledBackground);
+        widget->setProperty("uiSurface", "highlight");
+        repolishWidget(widget);
     }
 
     QLineEdit* createSearchBox() {
         auto* widget = new QLineEdit{};
         widget->setClearButtonEnabled(true);
-        widget->setPlaceholderText(QLineEdit::tr("Search..."));
+        widget->setPlaceholderText(QLineEdit::tr("Search…"));
 
         const auto icon = IO::loadSVGIcon("Search.svg", 16);
         widget->addAction(icon, QLineEdit::LeadingPosition);

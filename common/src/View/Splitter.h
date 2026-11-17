@@ -21,37 +21,49 @@
 
 #include <QSplitter>
 
-namespace TrenchBroom {
-namespace View {
+namespace TrenchBroom::View {
 class SplitterHandle : public QSplitterHandle {
-  Q_OBJECT
-  public:
+    Q_OBJECT
+
+public:
     explicit SplitterHandle(Qt::Orientation orientation, QSplitter *parent = nullptr);
+    QSize sizeHint() const override;
 
-    //  QSize sizeHint() const override;
-
-  protected:
-    // void paintEvent(QPaintEvent *event) override;
+protected:
+    void paintEvent(QPaintEvent *event) override;
 };
 
-class Splitter : public QSplitter {
-  Q_OBJECT
-  public:
-    explicit Splitter(Qt::Orientation orientation, QWidget *parent = nullptr);
+/* ------------------------------------------------------------------------------------------- */
 
+
+class Splitter : public QSplitter {
+    Q_OBJECT
+
+public:
+    enum Face: int { Any = -1, First = 0, Second = 1 };
+
+    explicit Splitter(Qt::Orientation orientation, QWidget *parent = nullptr);
     explicit Splitter(QWidget *parent = nullptr);
 
-  protected:
+    void collapse(Face face);
+    void expand() const;
+    bool isCollapsed(Face face = Any) const;
+
+protected:
     QSplitterHandle *createHandle() override;
+
+private:
+    std::vector<int> storedSizes{ 2 };
+    void saveSize();
+    void restoreSize() const;
+
 
 #ifdef __APPLE__
     // on macOS, the widgets are not repainted properly when the splitter moves, so we force
-    // them to repaint
-  private slots:
-
-    void doSplitterMoved();
+//     // them to repaint
+private slots:
+    void doSplitterMoved() const;
 
 #endif
 };
-} // namespace View
-} // namespace TrenchBroom
+}

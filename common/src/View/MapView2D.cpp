@@ -74,19 +74,24 @@ namespace TrenchBroom {
 namespace View {
 MapView2D::MapView2D(std::weak_ptr<MapDocument> document, MapViewToolBox &toolBox, Renderer::MapRenderer &renderer, GLContextManager &contextManager, ViewPlane viewPlane, Logger *logger)
     : MapViewBase(logger, document, toolBox, renderer, contextManager), m_camera(std::make_unique<Renderer::OrthographicCamera>()) {
-    bindEvents();
     connectObservers();
     initializeCamera(viewPlane);
     initializeToolChain(toolBox);
 
     switch (viewPlane) {
-    case ViewPlane_XY:setObjectName("XY View");
-        break;
-    case ViewPlane_YZ:setObjectName("YZ View");
-        break;
-    case ViewPlane_XZ:setObjectName("XZ View");
-        break;
-        switchDefault();
+        case ViewPlane_XY:
+            m_viewName = "XY Plane";
+            setObjectName(m_viewName);
+            break;
+        case ViewPlane_YZ:
+            m_viewName = "YZ Plane";
+            setObjectName(m_viewName);
+            break;
+        case ViewPlane_XZ:
+            m_viewName = "XZ Plane";
+            setObjectName(m_viewName);
+            break;
+            switchDefault();
     }
 
     mapViewBaseVirtualInit();
@@ -97,15 +102,18 @@ void MapView2D::initializeCamera(const ViewPlane viewPlane) {
     const auto worldBounds = vm::bbox3f(document->worldBounds());
 
     switch (viewPlane) {
-    case MapView2D::ViewPlane_XY:m_camera->setDirection(vm::vec3f::neg_z(), vm::vec3f::pos_y());
-        m_camera->moveTo(vm::vec3f(0.0f, 0.0f, worldBounds.max.z()));
-        break;
-    case MapView2D::ViewPlane_XZ:m_camera->setDirection(vm::vec3f::pos_y(), vm::vec3f::pos_z());
-        m_camera->moveTo(vm::vec3f(0.0f, worldBounds.min.y(), 0.0f));
-        break;
-    case MapView2D::ViewPlane_YZ:m_camera->setDirection(vm::vec3f::neg_x(), vm::vec3f::pos_z());
-        m_camera->moveTo(vm::vec3f(worldBounds.max.x(), 0.0f, 0.0f));
-        break;
+        case MapView2D::ViewPlane_XY:
+            m_camera->setDirection(vm::vec3f::neg_z(), vm::vec3f::pos_y());
+            m_camera->moveTo(vm::vec3f(0.0f, 0.0f, worldBounds.max.z()));
+            break;
+        case MapView2D::ViewPlane_XZ:
+            m_camera->setDirection(vm::vec3f::pos_y(), vm::vec3f::pos_z());
+            m_camera->moveTo(vm::vec3f(0.0f, worldBounds.min.y(), 0.0f));
+            break;
+        case MapView2D::ViewPlane_YZ:
+            m_camera->setDirection(vm::vec3f::neg_x(), vm::vec3f::pos_z());
+            m_camera->moveTo(vm::vec3f(worldBounds.max.x(), 0.0f, 0.0f));
+            break;
     }
     m_camera->setNearPlane(1.0f);
     // NOTE: GridRenderer draws at the far side of the map bounds, so add some extra margin
@@ -126,7 +134,7 @@ void MapView2D::initializeToolChain(MapViewToolBox &toolBox) {
     addTool(std::make_unique<FaceToolController>(toolBox.faceTool()));
     addTool(std::make_unique<CreateEntityToolController2D>(toolBox.createEntityTool()));
     addTool(std::make_unique<SelectionTool>(m_document));
-    addTool(std::make_unique<DrawShapeToolController2D>(toolBox.createSimpleBrushTool(), m_document));
+    addTool(std::make_unique<DrawShapeToolController2D>(toolBox.drawShapeTool(), m_document));
 }
 
 void MapView2D::connectObservers() {
@@ -156,18 +164,6 @@ void MapView2D::initializeGL() {
     setCompass(std::make_unique<Renderer::Compass2D>());
 }
 
-
-void MapView2D::bindEvents() {
-    // Fly mode animation
-    connect(this, &QOpenGLWidget::frameSwapped, this, &MapView2D::updateFlyMode);
-}
-
-void MapView2D::updateFlyMode() {
-    m_framesRendered++;
-    m_totalFrames++;
-
-    update();
-}
 
 void MapView2D::doUpdateViewport(const int x, const int y, const int width, const int height) {
     m_camera->setViewport(Renderer::Camera::Viewport(x, y, width, height));
@@ -253,31 +249,37 @@ vm::vec3 MapView2D::doGetMoveDirection(const vm::direction direction) const {
     // cursor up key is usually bounds to the forward action (which makes sense in 3D), but
     // should move objects "up" in 2D.
     switch (direction) {
-    case vm::direction::forward:return vm::vec3(vm::get_abs_max_component_axis(m_camera->up()));
-    case vm::direction::backward:return vm::vec3(-vm::get_abs_max_component_axis(m_camera->up()));
-    case vm::direction::left:return vm::vec3(-vm::get_abs_max_component_axis(m_camera->right()));
-    case vm::direction::right:return vm::vec3(vm::get_abs_max_component_axis(m_camera->right()));
-    case vm::direction::up:return vm::vec3(-vm::get_abs_max_component_axis(m_camera->direction()));
-    case vm::direction::down:return vm::vec3(vm::get_abs_max_component_axis(m_camera->direction()));
-        switchDefault();
+        case vm::direction::forward:
+            return vm::vec3(vm::get_abs_max_component_axis(m_camera->up()));
+        case vm::direction::backward:
+            return vm::vec3(-vm::get_abs_max_component_axis(m_camera->up()));
+        case vm::direction::left:
+            return vm::vec3(-vm::get_abs_max_component_axis(m_camera->right()));
+        case vm::direction::right:
+            return vm::vec3(vm::get_abs_max_component_axis(m_camera->right()));
+        case vm::direction::up:
+            return vm::vec3(-vm::get_abs_max_component_axis(m_camera->direction()));
+        case vm::direction::down:
+            return vm::vec3(vm::get_abs_max_component_axis(m_camera->direction()));
+            switchDefault();
     }
 }
 
 size_t MapView2D::doGetFlipAxis(const vm::direction direction) const {
     switch (direction) {
-    case vm::direction::forward:
-    case vm::direction::backward:
-        // These are not currently used, but it would be a "forward flip"
-        return vm::find_abs_max_component(m_camera->direction());
-    case vm::direction::left:
-    case vm::direction::right:
-        // Horizontal flip
-        return vm::find_abs_max_component(m_camera->right());
-    case vm::direction::up:
-    case vm::direction::down:
-        // Vertical flip. In 2D views, this corresponds to the vertical axis of the viewport.
-        return vm::find_abs_max_component(m_camera->up());
-        switchDefault();
+        case vm::direction::forward:
+        case vm::direction::backward:
+            // These are not currently used, but it would be a "forward flip"
+            return vm::find_abs_max_component(m_camera->direction());
+        case vm::direction::left:
+        case vm::direction::right:
+            // Horizontal flip
+            return vm::find_abs_max_component(m_camera->right());
+        case vm::direction::up:
+        case vm::direction::down:
+            // Vertical flip. In 2D views, this corresponds to the vertical axis of the viewport.
+            return vm::find_abs_max_component(m_camera->up());
+            switchDefault();
     }
 }
 
@@ -350,13 +352,16 @@ void MapView2D::doRenderTools(MapViewToolBox & /* toolBox */, Renderer::RenderCo
     renderTools(renderContext, renderBatch);
 }
 
-void MapView2D::doRenderExtras(Renderer::RenderContext &, Renderer::RenderBatch &) {}
+void MapView2D::doRenderExtras(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
+    Renderer::RenderService renderService(renderContext, renderBatch);
+}
 
 void MapView2D::doRenderSoftWorldBounds(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch) {
     if (!renderContext.softMapBounds().is_empty()) {
         auto document = kdl::mem_lock(m_document);
 
         Renderer::RenderService renderService(renderContext, renderBatch);
+
         renderService.setForegroundColor(pref(Preferences::SoftMapBoundsColor));
         renderService.renderBounds(renderContext.softMapBounds());
     }
@@ -365,5 +370,6 @@ void MapView2D::doRenderSoftWorldBounds(Renderer::RenderContext &renderContext, 
 void MapView2D::linkCamera(CameraLinkHelper &helper) {
     helper.addCamera(m_camera.get());
 }
+
 } // namespace View
 } // namespace TrenchBroom

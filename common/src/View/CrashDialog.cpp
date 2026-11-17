@@ -19,77 +19,141 @@
 
 #include "CrashDialog.h"
 
-#include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QFontInfo>
 #include <QLabel>
 #include <QPushButton>
-#include <QUrl>
+#include <QMessageBox>
 
 #include "IO/PathQt.h"
+#include "IO/ResourceUtils.h"
 #include "View/DialogHeader.h"
 #include "View/FormWithSectionsLayout.h"
 #include "View/GetVersion.h"
 #include "View/QtUtils.h"
+#include "View/ViewConstants.h"
 
 namespace TrenchBroom::View {
-CrashDialog::CrashDialog(const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath)
-    : QDialog{} {
-    createGui(reason, reportPath, mapPath, logPath);
+
+static const char *const EmptyPlaceholder = "-";
+
+CrashDialog::CrashDialog(CrashReport *crashReport) : QDialog{}, m_crashReport(crashReport) {
+    createGui();
 }
 
-void CrashDialog::createGui(const std::string &reason, const std::filesystem::path &reportPath, const std::filesystem::path &mapPath, const std::filesystem::path &logPath) {
-    setWindowTitle(tr("Crash"));
+void CrashDialog::createGui() {
+    setWindowTitle(qAppName());
 
-    auto *header = new DialogHeader{"Crash Report"};
+    auto icon = IO::loadSVGIcon("bomb.svg", 32);
+    auto *header = new DialogHeader{"Crash Report", icon.pixmap(32, 32), this};
 
-    auto *text1 = new QLabel{
-        tr("TrenchBroom has crashed, but was able to save a crash report,"
-           "a log file and the current state of the map to the following locations.\n\n"
-           "Please create an issue report and upload all three files.")
-    };
+    if (!m_crashReport) {
+        QMessageBox::critical(this, "TrenchBroom", "Unable to resolve crash report data.", QMessageBox::Abort);
+        return;
+    }
+
+    auto *text1 = new QLabel{"TrenchBroom has crashed, but was able to save a crash report."};
     text1->setWordWrap(true);
+    text1->setContentsMargins(
+        LayoutConstants::WideHMargin + 2,
+        LayoutConstants::MediumVMargin,
+        LayoutConstants::MediumHMargin,
+        LayoutConstants::MediumVMargin
+    );
 
-    auto *reasonText = new QLabel{QString::fromStdString(reason)};
-    auto *reportPathText = new QLabel{IO::pathAsQString(reportPath)};
-    auto *mapPathText = new QLabel{IO::pathAsQString(mapPath)};
-    auto *logPathText = new QLabel{IO::pathAsQString(logPath)};
-    auto *versionText = new QLabel{getBuildVersion()};
-    auto *buildText = new QLabel{getBuildIdStr()};
+    setTextStyleRole(text1,"subtitle");
+
+
+    auto *reasonText = new QLabel{QString::fromStdString(m_crashReport->signalType.toString())};
+    makeError(makeEmphasized(reasonText));
+
+    QString buildInfo = getBuildVersion() + " | " + getBuildIdStr() + " | " + getBuildType();
+    auto *buildText = new QLabel{buildInfo};
+
+    auto *reportPathText = new QLabel{IO::pathAsQString(m_crashReport->reportPath, EmptyPlaceholder)};
+    auto *logPathText = new QLabel{IO::pathAsQString(m_crashReport->logPath, EmptyPlaceholder)};
+    auto *mapPathText = new QLabel{IO::pathAsQString(m_crashReport->mapPath, EmptyPlaceholder)};
 
     auto *reportLayout = new FormWithSectionsLayout{};
     reportLayout->setContentsMargins(0, LayoutConstants::MediumVMargin, 0, LayoutConstants::MediumVMargin);
-    reportLayout->setVerticalSpacing(2);
+    reportLayout->setVerticalSpacing(0);
 
-    reportLayout->addRow(text1);
-
-    reportLayout->addSection("Info");
-    reportLayout->addRow("Reason", reasonText);
-    reportLayout->addRow("Version", versionText);
-    reportLayout->addRow("Build", buildText);
+    reportLayout->addSection("Details");
+    reportLayout->addRow("Reason", makeSmall(makeMono(reasonText)));
+    reportLayout->addRow("Build", makeSmall(makeMono(buildText)));
 
     reportLayout->addSection("Files");
-    reportLayout->addRow("Crash Report", reportPathText);
-    reportLayout->addRow("Map File", mapPathText);
-    reportLayout->addRow("Log File", logPathText);
+    reportLayout->addRow("Crash Report", makeSmall(makeMono(reportPathText)));
+    reportLayout->addRow("Log File", makeSmall(makeMono(logPathText)));
+    reportLayout->addRow("Map File", makeSmall(makeMono(mapPathText)));
+
+    createInfoTab();
+
+    auto *tabLayout = new QVBoxLayout{};
+    tabLayout->setContentsMargins(LayoutConstants::WideMargins());
+    tabLayout->addWidget(m_tabs);
 
     auto *buttonBox = new QDialogButtonBox{};
     buttonBox->addButton(QDialogButtonBox::Close);
-    auto *reportButton = buttonBox->addButton(tr("Report"), QDialogButtonBox::AcceptRole);
-
-    connect(reportButton, &QAbstractButton::clicked, this, []() {
-        QDesktopServices::openUrl(QUrl{"https://github.com/TrenchBroom/TrenchBroom/issues/new"});
-    });
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     auto *outerLayout = new QVBoxLayout{};
-    outerLayout->setSizeConstraint(QLayout::SetFixedSize);
-    outerLayout->setContentsMargins(0, 0, 0, 0);
+    outerLayout->setContentsMargins(LayoutConstants::NoMargins());
     outerLayout->addWidget(header);
-    outerLayout->addLayout(reportLayout, 1);
+    outerLayout->addWidget(text1);
+    outerLayout->addLayout(reportLayout);
+    outerLayout->addLayout(tabLayout, 1);
     outerLayout->addLayout(wrapDialogButtonBox(buttonBox));
 
     setLayout(outerLayout);
+}
 
-    // TODO: needs spacing tweaks
+void CrashDialog::createInfoTab() {
+    m_tabs = new QTabWidget{};
+
+    m_tabs->setMinimumWidth(900);
+    m_tabs->setMinimumHeight(350);
+    m_tabs->setContentsMargins(LayoutConstants::NoMargins());
+
+    m_tabs->addTab(createStackTraceView(), "StackTrace");
+    m_tabs->addTab(createLogView(), "Logfile");
+}
+
+QWidget *CrashDialog::createLogView() {
+    m_logFileView = new QTextEdit{};
+    m_logFileView->setReadOnly(true);
+    m_logFileView->setWordWrapMode(QTextOption::NoWrap);
+    m_logFileView->setObjectName("CrashLogView");
+    makeMono(m_logFileView);
+
+    m_logFileView->setText(LogMessageCache::dump());
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(LayoutConstants::NoMargins());
+    layout->addWidget(m_logFileView);
+
+    QWidget *wrapper = new QWidget{this};
+    wrapper->setLayout(layout);
+
+    return wrapper;
+}
+
+QWidget *CrashDialog::createStackTraceView() {
+    m_stackTraceView = new QTextEdit{};
+    m_stackTraceView->setReadOnly(true);
+    m_stackTraceView->setWordWrapMode(QTextOption::NoWrap);
+    makeMono(m_stackTraceView);
+    m_stackTraceView->setObjectName("CrashStackTraceView");
+
+    m_stackTraceView->setText(m_crashReport->stackTrace);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(LayoutConstants::NoMargins());
+    layout->addWidget(m_stackTraceView);
+
+    QWidget *wrapper = new QWidget{this};
+    wrapper->setLayout(layout);
+
+    return wrapper;
 }
 } // namespace TrenchBroom::View

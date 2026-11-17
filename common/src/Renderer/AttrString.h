@@ -24,6 +24,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+
 class AttrString {
   private:
     enum class Justify {
@@ -62,7 +63,9 @@ class AttrString {
 
     AttrString(const std::string &string);
 
-    std::string str() const;
+    std::string raw() const;
+
+    bool empty() const;
 
     bool operator<(const AttrString &other) const;
 

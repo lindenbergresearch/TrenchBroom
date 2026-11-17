@@ -24,11 +24,12 @@
 #include "MapView3D.h"
 #include "MapViewBase.h"
 #include "Renderer/Camera.h"
+#include "IO/ResourceUtils.h"
 
 namespace TrenchBroom::View {
-static TBWidget *createLayoutPanel(const Qt::AlignmentFlag alignmentFlag, const QString &name, QWidget *parent) {
-    auto *widget = new TBWidget{parent};
-    auto *layout = new QHBoxLayout{};
+static TBWidget* createLayoutPanel(const Qt::AlignmentFlag alignmentFlag, const QString& name, QWidget* parent) {
+    auto* widget = new TBWidget{parent};
+    auto* layout = new QHBoxLayout{};
 
     widget->setObjectName("StatusBar_" + name);
     widget->setContentsMargins(0, 0, 0, 0);
@@ -41,7 +42,8 @@ static TBWidget *createLayoutPanel(const Qt::AlignmentFlag alignmentFlag, const 
     return widget;
 }
 
-StatusBarManager::StatusBarManager(QWidget *parent) : TBWidget(parent) {
+StatusBarManager::StatusBarManager(QWidget* parent)
+    : TBWidget(parent) {
     setObjectName("StatusBarManager");
 
     m_mainLayout = new QHBoxLayout(this);
@@ -52,80 +54,57 @@ StatusBarManager::StatusBarManager(QWidget *parent) : TBWidget(parent) {
     m_rightPanel = createLayoutPanel(Qt::AlignRight, "RightLayout", this);
 
 
-
-
     m_mainLayout->addWidget(m_leftPanel);
     m_mainLayout->addWidget(m_centerPanel);
     m_mainLayout->addWidget(m_rightPanel);
     m_mainLayout->setAlignment(Qt::AlignVCenter);
-    m_mainLayout->setContentsMargins(0, 0, 0, 0);
+     m_mainLayout->setContentsMargins(12, 0, 12, 0);
 }
 
-void StatusBarManager::addLeft(StatusBarWidget *widget) {
+void StatusBarManager::update(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) const {
+    for (const auto& item: m_statusBarWidgets) { if (item) item->update(document, mapView, mapFrame); }
+}
+
+void StatusBarManager::addLeft(StatusBarWidget* widget) {
     m_leftPanel->layout()->addWidget(widget);
     m_statusBarWidgets.push_back(widget);
 }
 
-void StatusBarManager::addCenter(StatusBarWidget *widget) {
+void StatusBarManager::addCenter(StatusBarWidget* widget) {
     m_centerPanel->layout()->addWidget(widget);
     m_statusBarWidgets.push_back(widget);
 }
 
-void StatusBarManager::addRight(StatusBarWidget *widget) {
+void StatusBarManager::addRight(StatusBarWidget* widget) {
     m_rightPanel->layout()->addWidget(widget);
     m_statusBarWidgets.push_back(widget);
 }
 
-const StatusBarWidgetList &StatusBarManager::statusBarWidgets() const {
-    return m_statusBarWidgets;
-}
+TBWidget* StatusBarManager::leftPanel() const { return m_leftPanel; }
+TBWidget* StatusBarManager::centerPanel() const { return m_centerPanel; }
+TBWidget* StatusBarManager::rightPanel() const { return m_rightPanel; }
 
-void StatusBarManager::update(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) const {
-    for (const auto &item : m_statusBarWidgets) {
-        if (item) item->update(document, mapView, mapFrame);
-    }
-}
-
-TBWidget *StatusBarManager::leftPanel() const {
-    return m_leftPanel;
-}
-
-TBWidget *StatusBarManager::centerPanel() const {
-    return m_centerPanel;
-}
-
-TBWidget *StatusBarManager::rightPanel() const {
-    return m_rightPanel;
-}
+const StatusBarWidgetList& StatusBarManager::statusBarWidgets() const { return m_statusBarWidgets; }
 
 /* ------------------------------------------------------------------------------------------- */
 
 
-void StatusBarWidget::update(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) {
+StatusBarWidget::StatusBarWidget(QWidget* parent, const bool decoupled) : TBWidget(parent), m_decoupled(decoupled) { setObjectName("StatusBarWidget"); }
+
+void StatusBarWidget::update(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) {
     if (m_decoupled) {
         QTimer::singleShot(
-            0, this, [&]() {
-              onUpdate(document, mapView, mapFrame);
-            }
+            0, this, [&] { onUpdate(document, mapView, mapFrame); }
         );
-    } else {
-        onUpdate(document, mapView, mapFrame);
     }
-}
 
-StatusBarWidget::StatusBarWidget(QWidget *parent, const bool decoupled) : TBWidget(parent), m_decoupled(decoupled) {
-    setObjectName("StatusBarWidget");
+    else { onUpdate(document, mapView, mapFrame); }
 }
 
 /* ------------------------------------------------------------------------------------------- */
 
 
-void IconLabelStatusBarWidget::onUpdate(const MapDocument &document, MapView *mapView, MapFrame *mapFrame) {
-    if (mapView == nullptr || mapFrame == nullptr) {
-        return;
-    }
-
-}
+void IconLabelStatusBarWidget::onUpdate(const MapDocument& document, MapView* mapView, MapFrame* mapFrame) { if (mapView == nullptr || mapFrame == nullptr) { return; } }
 
 void IconLabelStatusBarWidget::createGUI() {
     m_label = new QLabel{this};
@@ -133,7 +112,7 @@ void IconLabelStatusBarWidget::createGUI() {
     m_icon = new QLabel{this};
     m_icon->setPixmap(m_pixmap);
 
-    auto *layout = new QHBoxLayout{};
+    auto* layout = new QHBoxLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_icon);
     layout->addWidget(m_label);
@@ -142,19 +121,17 @@ void IconLabelStatusBarWidget::createGUI() {
     setLayout(layout);
 }
 
-IconLabelStatusBarWidget::IconLabelStatusBarWidget(QWidget *parent, const std::filesystem::path &imagePath) :
-    StatusBarWidget(parent), m_pixmap{IO::loadSVGIcon(imagePath, 16).pixmap(16, 16, QIcon::Active, QIcon::On)} {
-    createGUI();
-}
+IconLabelStatusBarWidget::IconLabelStatusBarWidget(QWidget* parent, const std::filesystem::path& imagePath)
+    : StatusBarWidget(parent), m_pixmap{IO::loadSVGIcon(imagePath, 16).pixmap(16, 16, QIcon::Active, QIcon::On)} { createGUI(); }
 
-void IconLabelStatusBarWidget::setMessage(const QString &msg) {
+void IconLabelStatusBarWidget::setMessage(const QString& msg) {
     m_message = msg;
     m_label->setText(m_message);
 }
 
 
 void TextStatusBarWidget::createGUI() {
-    auto *layout = new QHBoxLayout{};
+    auto* layout = new QHBoxLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
     m_label = new QLabel{};
     layout->addWidget(m_label);
@@ -163,6 +140,5 @@ void TextStatusBarWidget::createGUI() {
 
 /* ------------------------------------------------------------------------------------------- */
 
-InfoStatusBarWidget::InfoStatusBarWidget(QWidget *parent) : StatusBarWidget(parent) {
-}
+InfoStatusBarWidget::InfoStatusBarWidget(QWidget* parent) : StatusBarWidget(parent) {}
 }

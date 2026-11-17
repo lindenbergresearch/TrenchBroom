@@ -81,7 +81,7 @@ void GamesPreferencePane::createGui() {
 
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(LayoutConstants::WideHMargin, LayoutConstants::MediumHMargin * 3, 0, 0);
-    layout->setSpacing(0);
+    layout->setSpacing(5);
     setLayout(layout);
 
     layout->addLayout(glbLayout);
@@ -168,6 +168,7 @@ void GamePreferencePane::createGui() {
     });
 
     auto *chooseGamePathButton = new QPushButton(tr("..."));
+    chooseGamePathButton->setObjectName("FolderSelect");
     connect(chooseGamePathButton, &QPushButton::clicked, this, &GamePreferencePane::chooseGamePathClicked);
 
     auto *configureEnginesButton = new QPushButton(tr("Configure engines..."));
@@ -200,12 +201,13 @@ void GamePreferencePane::createGui() {
         if (tool.description) {
             edit->setToolTip(QString::fromStdString(*tool.description));
         }
-        connect(edit, &QLineEdit::editingFinished, this, [=]() {
+        connect(edit, &QLineEdit::editingFinished, this, [=, this]() {
             Model::GameFactory::instance().setCompilationToolPath(m_gameName, toolName, IO::pathFromQString(edit->text()));
         });
 
         auto *browseButton = new QPushButton("...");
-        connect(browseButton, &QPushButton::clicked, this, [=]() {
+        browseButton->setObjectName("FolderSelect");
+        connect(browseButton, &QPushButton::clicked, this, [=, this]() {
             const QString pathStr = QFileDialog::getOpenFileName(this, tr("%1 Path").arg(QString::fromStdString(toolName)), fileDialogDefaultDirectory(FileDialogDir::CompileTool));
             if (pathStr.isEmpty()) {
                 return;

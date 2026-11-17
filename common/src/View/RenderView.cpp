@@ -22,9 +22,10 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/GLVertexType.h"
+#include "Renderer/ActiveShader.h"
+#include "Renderer/Shaders.h"
 #include "Renderer/PrimType.h"
 #include "Renderer/Transformation.h"
-#include "Renderer/Vbo.h"
 #include "Renderer/VboManager.h"
 #include "Renderer/VertexArray.h"
 #include "TrenchBroomApp.h"
@@ -32,6 +33,7 @@
 #include "View/InputEvent.h"
 #include "View/QtUtils.h"
 #include "Assets/Texture.h"
+
 
 /*
  * - glew requires it is included before <OpenGL/gl.h>
@@ -67,7 +69,9 @@
 #endif
 
 #include <QDateTime>
+#include <QHideEvent>
 #include <QPalette>
+#include <QShowEvent>
 #include <QTimer>
 #include <QWidget>
 
@@ -77,68 +81,67 @@
 #include <vm/mat.h>
 #include <vm/mat_ext.h>
 
-#include <iostream>
+#include <algorithm>
 
 namespace TrenchBroom {
 namespace View {
 
 RenderView::RenderView(GLContextManager &contextManager, QWidget *parent)
-    : QOpenGLWidget(parent), m_glContext(&contextManager), boxFilter(32), m_framesRendered(0) {
-
+    : QOpenGLWidget(parent), m_glContext(&contextManager), m_boxFilter(64) {
     auto palette = QPalette{};
-    m_focusColor = palette.color(QPalette::Highlight).darker();
+    m_focusColor = palette.color(QPalette::Highlight);
     m_frameColor = palette.color(QPalette::Midlight);
+
+    m_focusColor[3] = 0.8f;
 
     setUpdateBehavior(PartialUpdate);
 
-    // FPS counter
-    QTimer *fpsCounter = new QTimer(this);
+    // screen overlay refresh
+    m_timer = new QTimer(this);
+    m_timer->start(250);
 
-    connect(fpsCounter, &QTimer::timeout, [&]() {
-        avgFps = (avgFps + m_framesRendered) / 2.f;
-        m_framesRendered = 0;
+    m_frameClock.start();
+    m_frameTimer = new QTimer(this);
+    m_frameTimer->setSingleShot(true);
+    m_frameTimer->setTimerType(Qt::PreciseTimer);
+    connect(m_frameTimer, &QTimer::timeout, this, &RenderView::scheduleFrame);
+    m_framePreferenceConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect(
+        [this](const std::filesystem::path &path) {
+            if (path == Preferences::RendererMaxFPS.path()) {
+                m_frameTimer->stop();
+                m_nextFrameDeadline = 0;
+                triggerFrameSwap();
+            }
+        });
 
-        auto frameT = 1.f / avgFps;
+    m_lastFrameTime = m_timeUtil.current();
 
-        if (m_totalFrames % 60 * 5 == 0)
-            maxFrameTime = 0;
-
-        if (maxFrameTime < frameT)
-            maxFrameTime = frameT;
-
-        std::basic_string<char> appendix = "";
-
-        if (context()) {
-            appendix = "\nswbuff: " + std::to_string(int(context()->format().swapBehavior())) + " \nswap: " + std::to_string(int(context()->format().swapInterval()));
-        }
-
-        m_currentFPS = std::string("FPS: ") + std::to_string(int(avgFps)) +
-            "\nframes: " + std::to_string(m_totalFrames) +
-            "\nmax: " + std::to_string(maxFrameTime * 1000.0) +
-            "ms\nsize: " + std::to_string(m_glContext->vboManager().currentVboCount()) +
-            " VBOs: (" + std::to_string(m_glContext->vboManager().peakVboCount()) +
-            " peak)\nmem: " + std::to_string(m_glContext->vboManager().currentVboSize() / 1024u) +
-            "k @ " + std::to_string(glWidth) + "x" + std::to_string(glHeight) +
-            "\ndepth: " + std::to_string(depthBits()) +
-            "\nmsamples: " + std::to_string(multisample())+ appendix;
-          //  "\nanisotropy: " + std::to_string(int(Assets::Texture::anisotropy))+ "x" + appendix;
-    });
-
-    fpsCounter->start(1000);
     setMouseTracking(true); // request mouse move events even when no button is held down
     setFocusPolicy(Qt::StrongFocus); // accept focus by clicking or tab
+
+    m_statsTable.setTitle("Render Statistics");
+    m_statsTable.setLabelWidth(22);
+
+    connect(m_timer, &QTimer::timeout, this, &RenderView::timerTriggered);
+    connect(this, &QOpenGLWidget::frameSwapped, this, &RenderView::frameSwappedEvent);
 }
 
-RenderView::~RenderView() = default;
+
+RenderView::~RenderView() {
+    m_framePreferenceConnection.disconnect();
+    m_frameTimer->stop();
+    releaseCachedGeometry();
+    if (context()) disconnect(context(), nullptr, this, nullptr);
+}
 
 void RenderView::keyPressEvent(QKeyEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    // update();
+    triggerFrameSwap();
 }
 
 void RenderView::keyReleaseEvent(QKeyEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    // update();
+    triggerFrameSwap();
 }
 
 QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
@@ -147,46 +150,68 @@ QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widge
     // mapTo takes QPoint, so we just map the origin and subtract that.
     QPointF localPos = event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
 
-    boxFilter.add(new QPointF(localPos.x(), localPos.y()));
+    m_boxFilter.add(new QPointF(localPos.x(), localPos.y()));
 
-    return QMouseEvent(event->type(), boxFilter.average(), event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
+    return QMouseEvent(
+        event->type(), m_boxFilter.average(), event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source()
+    );
 }
 
 void RenderView::mouseDoubleClickEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    // update();
+    triggerFrameSwap();
 }
 
 void RenderView::mouseMoveEvent(QMouseEvent *event) {
     auto length = (size_t) pref(Preferences::CameraLookSmoothing);
 
-    if (boxFilter.length != length) {
-        boxFilter.reset();
-        boxFilter.length = length;
+    if (m_boxFilter.m_length != length) {
+        m_boxFilter.reset();
+        m_boxFilter.m_length = length;
     }
 
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    // update();
+    triggerFrameSwap();
 }
 
 void RenderView::mousePressEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    // update();
+    triggerFrameSwap();
 }
 
 void RenderView::mouseReleaseEvent(QMouseEvent *event) {
     m_eventRecorder.recordEvent(mouseEventWithFullPrecisionLocalPos(this, event));
-    // update();
+    triggerFrameSwap();
 }
 
 void RenderView::wheelEvent(QWheelEvent *event) {
     m_eventRecorder.recordEvent(*event);
-    // update();
+    triggerFrameSwap();
 }
 
 void RenderView::paintGL() {
-    if (TrenchBroom::View::isReportingCrash())
+    if (TrenchBroom::View::isReportingCrash()) {
         return;
+    }
+
+    const auto interval = frameInterval();
+    const auto now = m_frameClock.nsecsElapsed();
+    // Qt and subclasses can request paints without going through triggerFrameSwap.
+    // Gate the actual rendering too; PartialUpdate retains the previous framebuffer.
+    if (!m_forceFrame && interval > 0 && now < m_nextFrameDeadline) {
+        m_framePending = true;
+        scheduleFrame();
+        return;
+    }
+
+    m_frameTimer->stop();
+    m_framePending = false;
+    // Preserve fractional millisecond deadlines instead of accumulating timer
+    // rounding error. Missed frames are dropped rather than rendered in a burst.
+    m_nextFrameDeadline = interval <= 0 ? 0
+        : !m_forceFrame && m_nextFrameDeadline > 0 && now - m_nextFrameDeadline < interval
+            ? m_nextFrameDeadline + interval : now + interval;
+    m_forceFrame = false;
     render();
 }
 
@@ -203,21 +228,18 @@ Renderer::ShaderManager &RenderView::shaderManager() {
 }
 
 int RenderView::depthBits() const {
-    if (this->context()) {
-        const auto format = this->context()->format();
-        return format.depthBufferSize();
-    } else {
-        return 0;
-    }
+    return format().depthBufferSize();
 }
 
 int RenderView::multisample() const {
-    if (this->context()) {
-        const auto format = this->context()->format();
-        return format.samples();
-    } else {
-        return 0;
-    }
+    return format().samples();
+}
+
+float RenderView::effectiveAnisotropy() const {
+    if (!pref(Preferences::EnableAnisotropicFilter)) return 1.0f;
+    const auto requested = pref(Preferences::AnisotropicFilterValue);
+    const auto maximum = m_glContext->maxAnisotropy();
+    return requested <= 0.0f ? maximum : std::clamp(requested, 1.0f, maximum);
 }
 
 void RenderView::initializeGL() {
@@ -225,15 +247,26 @@ void RenderView::initializeGL() {
 }
 
 void RenderView::resizeGL(int w, int h) {
+    m_forceFrame = true; // A resized framebuffer has no previous image to retain.
     // These are in points, not pixels
     doUpdateViewport(0, 0, w, h);
 }
 
 void RenderView::render() {
+    m_totalFrames++;
+    auto now = m_timeUtil.current();
+    auto frameTime = now - m_lastFrameTime;
+    m_fpsStats.push(frameTime);
+    m_lastFrameTime = now;
+
+    const auto t0 = m_timeUtil.current();
     processInput();
     clearBackground();
     doRender();
     renderFocusIndicator();
+    const auto t = m_timeUtil.current() - t0;
+
+    m_renderTimeStats.push(t);
 }
 
 void RenderView::processInput() {
@@ -252,12 +285,8 @@ const Color &RenderView::getBackgroundColor() {
 }
 
 void RenderView::renderFocusIndicator() {
-    if (!doShouldRenderFocusIndicator() || !hasFocus())
-        return;
-
-    const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator);
-    const Color &outer = Color(/*drawFocus ? m_focusColor :*/ m_frameColor);
-    const Color &inner = Color(drawFocus ? m_focusColor : m_frameColor);
+    const auto drawFocus = hasFocus() && pref(Preferences::ShowFocusIndicator) && doShouldRenderFocusIndicator();
+    const auto &frameColor = drawFocus ? m_focusColor : m_frameColor;
 
     const qreal r = devicePixelRatioF();
     const auto w = static_cast<float>(width() * r);
@@ -266,75 +295,176 @@ void RenderView::renderFocusIndicator() {
     glWidth = (int) w;
     glHeight = (int) h;
 
-    // const auto t = pref(Preferences::ViewFrameWidth);
-    const auto t = hasFocus() ? 1.0f : 1.0f;
+    const auto t = 1.25f;
 
     const auto projection = vm::ortho_matrix(-1.0f, 1.0f, 0.0f, 0.0f, static_cast<float>(w), static_cast<float>(h));
     Renderer::Transformation transformation(projection, vm::mat4x4f::identity());
 
+    glAssert(glPushAttrib(GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT));
     glAssert(glDisable(GL_DEPTH_TEST));
+    glAssert(glDisable(GL_CULL_FACE));
+    glAssert(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 
-    using Vertex = Renderer::GLVertexTypes::P3C4::Vertex;
-    auto array = Renderer::VertexArray::move(std::vector<Vertex>({// top
-                                                                     Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w - t, t, 0.0f), inner), Vertex(vm::vec3f(t, t, 0.0f), inner),
+    const auto size = QSize(glWidth, glHeight);
+    if (m_focusIndicatorVertices.empty() || m_focusIndicatorSize != size) {
+        using Vertex = Renderer::GLVertexTypes::P3::Vertex;
+        m_focusIndicatorVertices = Renderer::VertexArray::move(
+            std::vector<Vertex>(
+                {
+                    // top
+                    Vertex(vm::vec3f(0.0f, 0.0f, 0.0f)),
+                    Vertex(vm::vec3f(w, 0.0f, 0.0f)),
+                    Vertex(vm::vec3f(w - t, t, 0.0f)),
+                    Vertex(vm::vec3f(t, t, 0.0f)),
+                    // right
+                    Vertex(vm::vec3f(w, 0.0f, 0.0f)),
+                    Vertex(vm::vec3f(w, h, 0.0f)),
+                    Vertex(vm::vec3f(w - t, h - t, 0.0f)),
+                    Vertex(vm::vec3f(w - t, t, 0.0f)),
+                    // bottom
+                    Vertex(vm::vec3f(w, h, 0.0f)),
+                    Vertex(vm::vec3f(0.0f, h, 0.0f)),
+                    Vertex(vm::vec3f(t, h - t, 0.0f)),
+                    Vertex(vm::vec3f(w - t, h - t, 0.0f)),
+                    // left
+                    Vertex(vm::vec3f(0.0f, h, 0.0f)),
+                    Vertex(vm::vec3f(0.0f, 0.0f, 0.0f)),
+                    Vertex(vm::vec3f(t, t, 0.0f)),
+                    Vertex(vm::vec3f(t, h - t, 0.0f))
+                }
+            )
+        );
+        m_focusIndicatorSize = size;
+    }
+    auto shader = Renderer::ActiveShader(shaderManager(), Renderer::Shaders::VaryingPUniformCShader);
+    shader.set("Color", frameColor);
+    shader.set("ApplyTinting", false);
+    m_focusIndicatorVertices.prepare(vboManager());
+    m_focusIndicatorVertices.render(Renderer::PrimType::Quads);
+    glAssert(glPopAttrib());
+}
 
-                                                                     // right
-                                                                     Vertex(vm::vec3f(w, 0.0f, 0.0f), outer), Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner), Vertex(vm::vec3f(w - t, t, 0.0f), inner),
-
-                                                                     // bottom
-                                                                     Vertex(vm::vec3f(w, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(t, h - t, 0.0f), inner), Vertex(vm::vec3f(w - t, h - t, 0.0f), inner),
-
-                                                                     // left
-                                                                     Vertex(vm::vec3f(0.0f, h, 0.0f), outer), Vertex(vm::vec3f(0.0f, 0.0f, 0.0f), outer), Vertex(vm::vec3f(t, t, 0.0f), inner), Vertex(vm::vec3f(t, h - t, 0.0f), inner)
-                                                                 }));
-
-    array.prepare(vboManager());
-    array.render(Renderer::PrimType::Quads);
-    glAssert(glEnable(GL_DEPTH_TEST));
+void RenderView::releaseCachedGeometry() {
+    auto *glContext = context();
+    if (!glContext || !glContext->isValid()) return;
+    auto *previousContext = QOpenGLContext::currentContext();
+    auto *previousSurface = previousContext ? previousContext->surface() : nullptr;
+    makeCurrent();
+    m_focusIndicatorVertices = {};
+    m_focusIndicatorSize = {};
+    vboManager().clearCachedGeometry();
+    if (previousContext && previousContext != glContext && previousSurface) {
+        previousContext->makeCurrent(previousSurface);
+    } else if (!previousContext) {
+        doneCurrent();
+    }
 }
 
 bool RenderView::doInitializeGL() {
-
+    m_forceFrame = true;
+    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &RenderView::releaseCachedGeometry,
+            Qt::ConnectionType(Qt::DirectConnection | Qt::UniqueConnection));
     return m_glContext->initialize();
 }
 
-void RenderView::doUpdateViewport(const int /* x */, const int /* y */, const int /* width */, const int /* height */) {
+void RenderView::doUpdateViewport(const int x, const int y, const int width, const int height) {
 }
 
-void RenderView::updateEvent() {
-    // //update();
+
+bool RenderView::autoRefresh() const {
+    return m_autoRefresh;
 }
 
-QPointF BoxFilter::average() {
-    int c = 0;
-    QPointF sum = QPointF(0, 0);
+void RenderView::setAutoRefresh(bool autoRefresh) {
+    m_autoRefresh = autoRefresh;
+    if (autoRefresh) triggerFrameSwap();
+}
 
-    for (QPointF *item : samples) {
-        if (item != nullptr) {
-            sum = QPointF(sum.x() + item->x(), sum.y() + item->y());
-            c++;
-        }
+void RenderView::triggerFrameSwap() {
+    m_framePending = true;
+    scheduleFrame();
+}
+
+qint64 RenderView::frameInterval() const {
+    const auto configured = pref(Preferences::RendererMaxFPS);
+    const auto fps = configured < 0 ? Preferences::RendererMaxFPS.defaultValue() : std::min(configured, 1000);
+    return fps == 0 ? 0 : (qint64(1000000000) + fps - 1) / fps;
+}
+
+void RenderView::scheduleFrame() {
+    if (!m_framePending || !isVisible() || TrenchBroom::View::isReportingCrash()) return;
+    const auto remaining = m_forceFrame || frameInterval() == 0 ? qint64(0)
+        : m_nextFrameDeadline - m_frameClock.nsecsElapsed();
+    if (remaining <= 0) {
+        m_frameTimer->stop();
+        update();
+    } else if (!m_frameTimer->isActive()) {
+        // Round up to avoid repeatedly waking before the deadline. No sleeping
+        // or spinning on the GUI thread, and only one pending timer per view.
+        m_frameTimer->start(int((remaining + 999999) / 1000000));
     }
-
-    return c == 0 ? QPoint(0, 0) : QPointF(sum.x() / c, sum.y() / c);
 }
 
-void BoxFilter::reset() {
-    samples.clear();
-    for (size_t i = 0; i < size; ++i) {
-        samples.push_back(nullptr);
-    }
+void RenderView::showEvent(QShowEvent *event) {
+    QOpenGLWidget::showEvent(event);
+    m_forceFrame = true;
+    triggerFrameSwap();
 }
 
-void BoxFilter::add(QPointF *point) {
-    if (++index >= length) {
-        index = 0;
-    }
+void RenderView::hideEvent(QHideEvent *event) {
+    m_frameTimer->stop();
+    QOpenGLWidget::hideEvent(event);
+}
 
-    if (samples[index] != nullptr)
-        delete samples[index];
+void RenderView::frameSwappedEvent() {
+    onFrameSwapped();
+    if (m_autoRefresh) triggerFrameSwap();
+}
 
-    samples[index] = point;
+void RenderView::timerTriggered() {
+    if (!hasFocus()) return;
+
+    m_avgFps = m_fpsStats.average();
+
+    m_statsTable.reset();
+    m_statsTable.addPair("GL Resolution", std::to_string(glWidth) + " x " + std::to_string(glHeight));
+    m_statsTable.addInt("MSAA", multisample());
+    m_statsTable.addInt("Color Depth", depthBits());
+
+    m_statsTable.addBool("Anisotropic Filter", pref(Preferences::EnableAnisotropicFilter));
+    // Timer callbacks do not own a current GL context. Read the cached capability.
+    m_statsTable.addPair("Anisotropic Value", std::to_string(int(effectiveAnisotropy())) + "x");
+
+    m_statsTable.addSeparator();
+
+    const auto averageFrameTime = m_fpsStats.average();
+    m_statsTable.addDouble("FPS", averageFrameTime > 0.0 ? 1.0 / averageFrameTime : 0.0);
+    m_statsTable.addTime("Render-Time", m_renderTimeStats.average(), StatsTable::MILLIS);
+    m_statsTable.addTime("Frame-Time", m_fpsStats.average(), StatsTable::MILLIS);
+    m_statsTable.addLong("Frames", m_totalFrames);
+    m_statsTable.addSeparator();
+    m_statsTable.addTime("Frame-Time min", m_fpsStats.min, StatsTable::MILLIS);
+    m_statsTable.addTime("Frame-Time max", m_fpsStats.max, StatsTable::MILLIS);
+    m_statsTable.addSeparator();
+    m_statsTable.addTime("Render-Time min", m_renderTimeStats.min, StatsTable::MILLIS);
+    m_statsTable.addTime("Render-Time max", m_renderTimeStats.max, StatsTable::MILLIS);
+    m_statsTable.addSeparator();
+    m_statsTable.addLong("VBOs count", (long) m_glContext->vboManager().currentVboCount());
+    m_statsTable.addLong("VBOs Peak", (long) m_glContext->vboManager().peakVboCount());
+    m_statsTable.addMem("VBO Memory", m_glContext->vboManager().currentVboSize());
+
+
+    m_currentFPS = m_statsTable.render(true);
+
+    m_fpsStats.softReset();
+    m_renderTimeStats.softReset();
+}
+
+void RenderView::onFrameSwapped() {
+}
+
+const StatsTable &RenderView::statsTable() const {
+    return m_statsTable;
 }
 } // namespace View
 } // namespace TrenchBroom

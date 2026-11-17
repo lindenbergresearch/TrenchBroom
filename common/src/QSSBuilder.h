@@ -53,8 +53,8 @@ struct QSSBuilder {
     const QString &getRenderedText() const;
 
   private:
-    QString text;
-    QString renderedText;
+    QString m_text;
+    QString m_renderedText;
     std::map<QString, std::function<QString()>> repl_table;
 };
 } // namespace TrenchBroom

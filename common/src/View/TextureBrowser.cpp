@@ -23,6 +23,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QScrollBar>
+#include <QToolBar>
 #include <QVBoxLayout>
 #include <QtGlobal>
 
@@ -108,7 +109,6 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
 
     m_sortOrderChoice = new QComboBox();
     m_sortOrderChoice->setObjectName("TextureBrowser_smallComboBox");
-    makeSmall(m_sortOrderChoice);
     m_sortOrderChoice->addItem(tr("Name"), QVariant::fromValue(TextureSortOrder::Name));
     m_sortOrderChoice->addItem(tr("Usage"), QVariant::fromValue(TextureSortOrder::Usage));
     m_sortOrderChoice->setCurrentIndex(0);
@@ -120,8 +120,7 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
 
     m_groupButton = new QPushButton(tr("Group"));
     m_groupButton->setObjectName("TextureBrowser_smallPushButton");
-    makeSmall(m_groupButton);
-    m_groupButton->setToolTip(tr("Group entity definitions by category"));
+    m_groupButton->setToolTip(tr("Group textures by collection"));
     m_groupButton->setCheckable(true);
     connect(m_groupButton, &QAbstractButton::clicked, this, [=]() {
         m_view->setGroup(m_groupButton->isChecked());
@@ -129,8 +128,7 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
 
     m_usedButton = new QPushButton(tr("Used"));
     m_usedButton->setObjectName("TextureBrowser_smallPushButton");
-    makeSmall(m_usedButton);
-    m_usedButton->setToolTip(tr("Only show entity definitions currently in use"));
+    m_usedButton->setToolTip(tr("Only show textures currently in use"));
     m_usedButton->setCheckable(true);
     connect(m_usedButton, &QAbstractButton::clicked, this, [=]() {
         m_view->setHideUnused(m_usedButton->isChecked());
@@ -142,21 +140,28 @@ void TextureBrowser::createGui(GLContextManager &contextManager) {
     });
 
 
-    auto *controlLayout = new QHBoxLayout{};
-    controlLayout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
-    controlLayout->setSpacing(LayoutConstants::NarrowHMargin);
-    controlLayout->addWidget(m_sortOrderChoice);
-    controlLayout->addWidget(m_groupButton);
-    controlLayout->addWidget(m_usedButton);
-    controlLayout->addWidget(m_filterBox, 1);
+    m_toolbar = createInspectorToolBar(this);
+    m_toolbar->addWidget(m_sortOrderChoice);
+    m_toolbar->addWidget(m_groupButton);
+    m_toolbar->addWidget(m_usedButton);
+    m_filterBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    m_toolbar->addWidget(m_filterBox);
 
     auto *outerLayout = new QVBoxLayout{};
     outerLayout->setContentsMargins(0, 0, 0, 0);
     outerLayout->setSpacing(0);
     outerLayout->addWidget(browserPanel, 1);
-    outerLayout->addLayout(controlLayout, 0);
+    outerLayout->addWidget(m_toolbar);
 
     setLayout(outerLayout);
+}
+
+QToolBar* TextureBrowser::toolBar() const {
+    return m_toolbar;
+}
+
+void TextureBrowser::setToolBarAtTop() {
+    static_cast<QVBoxLayout*>(layout())->insertWidget(0, m_toolbar);
 }
 
 void TextureBrowser::bindEvents() {

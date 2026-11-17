@@ -24,6 +24,7 @@
 #include <QPushButton>
 
 #include "View/ViewConstants.h"
+#include "View/QtUtils.h"
 
 namespace TrenchBroom {
 namespace View {
@@ -32,7 +33,8 @@ ColorButton::ColorButton(QWidget *parent) : QWidget(parent), m_colorIndicator(nu
     m_button = new QPushButton("...");
 
     m_colorIndicator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
-    m_colorIndicator->setMinimumSize(20, 15);
+    m_colorIndicator->setObjectName("ColorSwatch");
+    m_colorIndicator->setAutoFillBackground(true);
 
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(QMargins());
@@ -52,10 +54,10 @@ ColorButton::ColorButton(QWidget *parent) : QWidget(parent), m_colorIndicator(nu
 }
 
 void ColorButton::setColor(const QColor &color) {
-    const auto borderColor = palette().color(QPalette::Active, QPalette::Mid);
     if (color != m_color) {
         m_color = color;
-        m_colorIndicator->setStyleSheet("QWidget { background-color: " + m_color.name() + "; border-radius: 3px; border: 1px solid " + borderColor.name() + ";}");
+        // The swatch displays a data value; its frame and dimensions come from base.qss.
+        m_colorIndicator->setStyleSheet("background-color: " + toStyleSheetRGBA(m_color) + ";");
 
         update();
         emit colorChanged(m_color);

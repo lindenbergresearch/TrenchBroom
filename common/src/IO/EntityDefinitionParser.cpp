@@ -25,9 +25,9 @@
 #include "IO/EntityDefinitionClassInfo.h"
 #include "IO/ParserStatus.h"
 #include "Macros.h"
+#include "Logger.h"
 #include "Model/EntityProperties.h"
 
-#include "kdl/vector_utils.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -35,7 +35,8 @@
 namespace TrenchBroom::IO {
 static const auto DefaultSize = vm::bbox3(-8, +8);
 
-EntityDefinitionParser::EntityDefinitionParser(const Color &defaultEntityColor) : m_defaultEntityColor{defaultEntityColor} {
+EntityDefinitionParser::EntityDefinitionParser(const Color &defaultEntityColor) : m_defaultEntityColor{
+    defaultEntityColor} {
 }
 
 EntityDefinitionParser::~EntityDefinitionParser() {}
@@ -44,7 +45,10 @@ static std::shared_ptr<Assets::PropertyDefinition> mergeAttributes(const Assets:
     assert(inheritingClassAttribute.key() == superClassAttribute.key());
 
     // for now, only merge spawnflags
-    if (superClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty && inheritingClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty && superClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags && inheritingClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags) {
+    if (superClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty &&
+        inheritingClassAttribute.type() == Assets::PropertyDefinitionType::FlagsProperty &&
+        superClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags &&
+        inheritingClassAttribute.key() == Model::EntityPropertyKeys::Spawnflags) {
 
         const auto &name = inheritingClassAttribute.key();
         auto result = std::make_shared<Assets::FlagsPropertyDefinition>(name);
@@ -89,7 +93,9 @@ static void inheritAttributes(EntityDefinitionClassInfo &inheritingClass, const 
     }
 
     for (const auto &attribute : superClass.propertyDefinitions) {
-        auto it = std::find_if(std::begin(inheritingClass.propertyDefinitions), std::end(inheritingClass.propertyDefinitions), [&](const auto &a) { return a->key() == attribute->key(); });
+        auto it = std::find_if(std::begin(inheritingClass.propertyDefinitions), std::end(inheritingClass.propertyDefinitions), [&](const auto &a) {
+            return a->key() == attribute->key();
+        });
         if (it == std::end(inheritingClass.propertyDefinitions)) {
             inheritingClass.propertyDefinitions.push_back(attribute);
         } else {
@@ -222,7 +228,8 @@ template<typename F> static void findSuperClassesAndInheritFrom(ParserStatus &st
     for (const auto &nextSuperClassName : classWithSuperClasses.superClasses) {
         const auto *nextSuperClass = selectSuperClass(findClassInfos(nextSuperClassName));
         if (nextSuperClass == nullptr) {
-            status.error(classWithSuperClasses.line, classWithSuperClasses.column, "No matching super class found for '" + nextSuperClassName + "'");
+            status.error(classWithSuperClasses.line, classWithSuperClasses.column,
+                         "No matching super class found for '" + nextSuperClassName + "'");
         } else {
             inheritFromAndRecurse(status, inheritingClass, *nextSuperClass, findClassInfos, visited);
         }
@@ -322,10 +329,13 @@ std::unique_ptr<Assets::EntityDefinition> createDefinition(EntityDefinitionClass
     auto decalDefinition = std::move(classInfo.decalDefinition).value_or(Assets::DecalDefinition{});
 
     switch (classInfo.type) {
-    case EntityDefinitionClassType::PointClass: return std::make_unique<Assets::PointEntityDefinition>(std::move(name), color, size, std::move(description), std::move(propertyDefinitions), std::move(modelDefinition), std::move(decalDefinition));
-    case EntityDefinitionClassType::BrushClass: return std::make_unique<Assets::BrushEntityDefinition>(std::move(name), color, std::move(description), std::move(propertyDefinitions));
-    case EntityDefinitionClassType::BaseClass:return nullptr;
-        switchDefault();
+        case EntityDefinitionClassType::PointClass:
+            return std::make_unique<Assets::PointEntityDefinition>(std::move(name), color, size, std::move(description), std::move(propertyDefinitions), std::move(modelDefinition), std::move(decalDefinition));
+        case EntityDefinitionClassType::BrushClass:
+            return std::make_unique<Assets::BrushEntityDefinition>(std::move(name), color, std::move(description), std::move(propertyDefinitions));
+        case EntityDefinitionClassType::BaseClass:
+            return nullptr;
+            switchDefault();
     };
 }
 
@@ -334,6 +344,18 @@ std::vector<std::unique_ptr<Assets::EntityDefinition>> createDefinitions(ParserS
 
     auto result = std::vector<std::unique_ptr<Assets::EntityDefinition>>{};
     for (auto classInfo : resolvedClasses) {
+        DefaultQtLogger().debug() <<
+                                  "Entity Classinfo: [[ " << classInfo.name <<
+                                  "]] | type: '" << classInfo.type << "' " <<
+                                  QObject::tr("| center: %1 %2 %3")
+                                      .arg(classInfo.size->center().v[0])
+                                      .arg(classInfo.size->center().v[1])
+                                      .arg(classInfo.size->center().v[2])
+                                  << " | desc: »" << classInfo.description.value_or("-no descr-") << "« | line: " << classInfo.line
+                                  << " | color: "
+                                  << classInfo.color.value_or("-").toString()
+                                  << " | #" << classInfo.propertyDefinitions.size();
+
         if (auto definition = createDefinition(std::move(classInfo), defaultEntityColor)) {
             result.push_back(std::move(definition));
         }

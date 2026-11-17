@@ -312,7 +312,33 @@ const vm::bbox3 MapDocument::DefaultWorldBounds(-32768.0, 32768.0);
 const std::string MapDocument::DefaultDocumentName("unnamed.map");
 
 MapDocument::MapDocument()
-    : m_worldBounds(DefaultWorldBounds), m_world(nullptr), m_entityDefinitionManager(std::make_unique<Assets::EntityDefinitionManager>()), m_entityModelManager(std::make_unique<Assets::EntityModelManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())), m_textureManager(std::make_unique<Assets::TextureManager>(pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter), logger())), m_tagManager(std::make_unique<Model::TagManager>()), m_editorContext(std::make_unique<Model::EditorContext>()), m_grid(std::make_unique<Grid>(4)), m_path(DefaultDocumentName), m_lastSaveModificationCount(0), m_modificationCount(0), m_currentLayer(nullptr), m_currentTextureName(Model::BrushFaceAttributes::NoTextureName), m_lastSelectionBounds(0.0, 32.0), m_selectionBoundsValid(true), m_viewEffectsService(nullptr), m_repeatStack(std::make_unique<RepeatStack>()) {
+    : m_worldBounds(DefaultWorldBounds),
+      m_world(nullptr),
+      m_entityDefinitionManager(std::make_unique<Assets::EntityDefinitionManager>()),
+      m_entityModelManager(
+          std::make_unique<Assets::EntityModelManager>(
+              pref(Preferences::TextureMagFilter),
+              pref(Preferences::TextureMinFilter), logger()
+          )
+      ),
+      m_textureManager(
+          std::make_unique<Assets::TextureManager>(
+              pref(Preferences::TextureMagFilter), pref(Preferences::TextureMinFilter),
+              logger()
+          )
+      ),
+      m_tagManager(std::make_unique<Model::TagManager>()),
+      m_editorContext(std::make_unique<Model::EditorContext>()),
+      m_grid(std::make_unique<Grid>(4)),
+      m_path(DefaultDocumentName),
+      m_lastSaveModificationCount(0),
+      m_modificationCount(0),
+      m_currentLayer(nullptr),
+      m_currentTextureName(Model::BrushFaceAttributes::NoTextureName),
+      m_lastSelectionBounds(0.0, 32.0),
+      m_selectionBoundsValid(true),
+      m_viewEffectsService(nullptr),
+      m_repeatStack(std::make_unique<RepeatStack>()) {
     connectObservers();
 }
 
@@ -740,9 +766,55 @@ bool MapDocument::pasteNodes(const std::vector<Model::Node *> &nodes) {
 
     deselectAll();
     selectNodes(Model::collectSelectableNodes(addedNodes, editorContext()));
-    transaction.commit();
+    return transaction.commit();
+}
 
-    return true;
+Model::GroupNode* MapDocument::insertPrefab(const std::string& fragment, const std::string& name,
+    const std::string& prefabId, bool linked) {
+    auto transaction = Transaction{*this, "Insert Prefab"};
+    std::unique_ptr<Model::GroupNode> group;
+    if (linked) {
+        for (auto* candidate : Model::collectNodesWithLinkId({m_world.get()}, prefabId)) {
+            if (auto* source = dynamic_cast<Model::GroupNode*>(candidate)) {
+                group.reset(static_cast<Model::GroupNode*>(source->cloneRecursively(m_worldBounds, Model::SetLinkId::keep)));
+                break;
+            }
+        }
+    }
+    if (!group) {
+        const auto parsed = m_game->parseNodes(fragment, m_world->mapFormat(), m_worldBounds, logger());
+        if (parsed.empty()) { transaction.cancel(); return nullptr; }
+        const auto nodes = extractNodesToPaste(parsed, parentForNodes());
+        auto objects = std::vector<Model::Node*>{};
+        for (const auto& [parent, children] : nodes) objects.insert(objects.end(), children.begin(), children.end());
+        if (objects.empty()) { transaction.cancel(); return nullptr; }
+        if (objects.size() == 1 && dynamic_cast<Model::GroupNode*>(objects.front()))
+            group.reset(static_cast<Model::GroupNode*>(objects.front()));
+        else {
+            group = std::make_unique<Model::GroupNode>(Model::Group(name));
+            group->addChildren(objects);
+        }
+        // Preserve links inside this prefab, while isolating it from the source map
+        // and independent Copy insertions. Child link IDs must be remapped too.
+        auto ids = std::map<std::string, std::string>{};
+        const auto remap = [&](auto&& self, Model::Node* node) -> void {
+            if (auto* object = dynamic_cast<Model::Object*>(node)) {
+                auto [it, inserted] = ids.try_emplace(object->linkId(), generateUuid());
+                object->setLinkId(it->second);
+            }
+            if (auto* childGroup = dynamic_cast<Model::GroupNode*>(node)) childGroup->resetPersistentId();
+            for (auto* child : node->children()) self(self, child);
+        };
+        remap(remap, group.get());
+        if (linked) group->setLinkId(prefabId);
+        auto value = group->group(); value.setName(name); group->setGroup(std::move(value));
+    }
+    auto* parent = parentForNodes();
+    if (!parent->canAddChild(group.get())) { transaction.cancel(); return nullptr; }
+    auto* inserted = group.release();
+    if (!pasteNodes({inserted})) { transaction.cancel(); return nullptr; }
+    if (!transaction.commit()) return nullptr;
+    return inserted;
 }
 
 bool MapDocument::pasteBrushFaces(const std::vector<Model::BrushFace> &faces) {
@@ -2068,16 +2140,42 @@ bool MapDocument::canSelectAllInLayers(const std::vector<Model::LayerNode *> & /
     return editorContext().canChangeSelection();
 }
 
+static bool hasVisibleContents(const Model::Node* node) {
+    if (node->hasChildren()) {
+        return std::any_of(node->children().begin(), node->children().end(), hasVisibleContents);
+    }
+    return node->visible() && !dynamic_cast<const Model::GroupNode*>(node);
+}
+
 void MapDocument::hide(const std::vector<Model::Node *> nodes) {
     auto transaction = Transaction{*this, "Hide Objects"};
 
-    // Deselect any selected nodes inside `nodes`
-    deselectNodes(Model::collectSelectedNodes(nodes));
+    // Deselect objects and faces in the hidden subtree without issuing empty selection commands.
+    if (hasSelectedNodes()) {
+        const auto selected = Model::collectSelectedNodes(nodes);
+        if (!selected.empty()) deselectNodes(selected);
+    }
+    if (hasSelectedBrushFaces()) {
+        const auto selected = Model::collectSelectedBrushFaces(nodes);
+        if (!selected.empty()) deselectBrushFaces(selected);
+    }
 
     // Reset visibility of any forced shown children of `nodes`
     downgradeShownToInherit(Model::collectDescendants(nodes));
-
     executeAndStore(SetVisibilityCommand::hide(nodes));
+
+    // A selected group is drawn even when its contents are hidden. Keep a
+    // partially visible group selected, but drop empty selection outlines.
+    auto emptyGroups = std::vector<Model::Node*>{};
+    for (const auto* node : nodes) {
+        for (auto* parent = node->parent(); parent; parent = parent->parent()) {
+            if (parent->selected() && dynamic_cast<Model::GroupNode*>(parent)
+                && std::find(emptyGroups.begin(), emptyGroups.end(), parent) == emptyGroups.end()
+                && !hasVisibleContents(parent))
+                emptyGroups.push_back(parent);
+        }
+    }
+    if (!emptyGroups.empty()) deselectNodes(emptyGroups);
     transaction.commit();
 }
 
@@ -3274,14 +3372,14 @@ void MapDocument::loadEntityDefinitions() {
     const auto path = m_game->findEntityDefinitionFile(spec, externalSearchPaths());
     auto status = IO::SimpleParserStatus{logger()};
 
-    m_entityDefinitionManager->loadDefinitions(path, *m_game, status).transform([&]() {
-        info("Loaded entity definition file: " + path.filename().string());
+    m_entityDefinitionManager->loadDefinitions(path, *m_game, status).transform([&] {
+        info("Entity definition file successfully loaded from: " + path.filename().string());
         createEntityDefinitionActions();
     }).transform_error([&](auto e) {
         if (spec.builtin()) {
-            error() << "Could not load builtin entity definition file: '" << spec.path() << "': " << e.msg;
+            error() << "Could not load builtin entity definition file: " << spec.path() << ": " << e.msg;
         } else {
-            error() << "Could not load external entity definition file: '" << spec.path() << "': " << e.msg;
+            error() << "Could not load external entity definition file: " << spec.path() << ": " << e.msg;
         }
     });
 }

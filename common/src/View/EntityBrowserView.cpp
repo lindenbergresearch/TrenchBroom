@@ -274,6 +274,7 @@ void EntityBrowserView::renderModels(Layout &layout, const float y, const float 
     m_entityModelManager.prepare(vboManager());
 
     auto shader = Renderer::ActiveShader{shaderManager(), Renderer::Shaders::EntityModelShader};
+    shader.set("EnableLighting", false); // Browser thumbnails do not use the map lighting.
     shader.set("ApplyTinting", false);
     shader.set("Brightness", pref(Preferences::Brightness));
     shader.set("GrayScale", false);

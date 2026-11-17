@@ -22,12 +22,14 @@
 #include "Renderer/GL.h"
 
 #include <cstddef> // for size_t
+#include <memory>
 
 namespace TrenchBroom {
 namespace Renderer {
 class Vbo;
 
 class ShaderManager;
+class VertexArray;
 
 enum class VboType {
   ArrayBuffer, ElementArrayBuffer
@@ -43,9 +45,17 @@ class VboManager {
     size_t m_currentVboCount;
     size_t m_currentVboSize;
     ShaderManager *m_shaderManager;
+    std::unique_ptr<VertexArray> m_unitCubeVertices;
 
   public:
     explicit VboManager(ShaderManager *shaderManager);
+
+    ~VboManager();
+
+    // Cached per manager/share group, never as a process-wide OpenGL object.
+    VertexArray &unitCubeVertices();
+
+    void clearCachedGeometry();
 
     /**
      * Immediately creates and binds to an OpenGL buffer of the given type and capacity.

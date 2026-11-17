@@ -19,55 +19,40 @@
 
 #pragma once
 
-#include <QTabWidget>
 #include <QWidget>
-
-#include "View/MapView.h"
 
 #include <memory>
 
 namespace TrenchBroom::View {
 class FaceInspector;
-
-class EntityInspector;
-
 class GLContextManager;
-
 class MapDocument;
-
-class MapInspector;
-class LayerInspector;
-
-class MapViewBar;
-
-class SyncHeightEventFilter;
-
-class TabBook;
-
-enum class InspectorPage {
-    Layer = 0, Map = 1, Face = 2, Entity = 3
-};
+class MapView;
 
 class Inspector : public QWidget {
-    Q_OBJECT private:
-    QTabWidget* m_tabs;
-    MapInspector* m_mapInspector;
-    LayerInspector* m_layerInspector;
-    EntityInspector* m_entityInspector;
-    FaceInspector* m_faceInspector;
-    MapView* m_mapView;
+    Q_OBJECT
 
-    SyncHeightEventFilter* m_syncTabBarEventFilter;
+    QWidget* m_leftPane;
+    FaceInspector* m_faceInspector;
+    bool m_panelsVisible = true;
+    class ToolLayout;
+    std::unique_ptr<ToolLayout> m_toolLayout;
 
 public:
     Inspector(const std::weak_ptr<MapDocument>& document, GLContextManager& contextManager, MapView* mapView, QWidget* parent = nullptr);
+    ~Inspector() override;
 
-    void connectTopWidgets(MapViewBar* mapViewBar);
+    void dockToolToSide(const QString& id, bool left, int row = -1);
+    void tabifyTool(const QString& id, const QString& targetId, int index = -1);
+    void floatTool(const QString& id, const QPoint& position);
+    void revealTool(const QString& id);
+    void resetToolLayout();
+    void saveToolLayout() const;
 
-    void switchToPage(InspectorPage page) const;
-
+    QWidget* leftPane() const;
+    void setPanelsVisible(bool visible);
+    bool panelsVisible() const;
     bool cancelMouseDrag() const;
-
     FaceInspector* faceInspector() const;
 };
 }

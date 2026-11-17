@@ -25,6 +25,8 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/ActiveShader.h"
+#include "Renderer/FaceRenderer.h"
+#include "Renderer/SpatialLightMesh.h"
 #include "Renderer/Camera.h"
 #include "Renderer/GLVertexType.h"
 #include "Renderer/IndexRangeMapBuilder.h"
@@ -65,6 +67,7 @@ void PatchRenderer::setTintColor(const Color &color) {
 }
 
 void PatchRenderer::setTransparencyAlpha(const float alpha) {
+    if ((m_alpha < 1.0f) != (alpha < 1.0f)) invalidate();
     m_alpha = alpha;
 }
 
@@ -115,7 +118,7 @@ void PatchRenderer::render(RenderContext &renderContext, RenderBatch &renderBatc
         validate();
     }
 
-    if (renderContext.showFaces()) {
+    if (renderContext.showFaces() && !m_patchMeshRenderer.empty()) {
         renderBatch.add(this);
     }
 
@@ -127,7 +130,8 @@ void PatchRenderer::render(RenderContext &renderContext, RenderBatch &renderBatc
     }
 }
 
-static TexturedIndexArrayRenderer buildMeshRenderer(const std::vector<const Model::PatchNode *> &patchNodes, const Model::EditorContext &editorContext) {
+static TexturedIndexArrayRenderer buildMeshRenderer(const std::vector<const Model::PatchNode *> &patchNodes, const Model::EditorContext &editorContext, SpatialLightMesh& spatialMesh, const bool transparent) {
+    auto spatialBuilder = SpatialLightMeshBuilder{transparent};
     size_t vertexCount = 0u;
     auto indexArrayMapSize = TexturedIndexArrayMap::Size{};
 
@@ -170,12 +174,15 @@ static TexturedIndexArrayRenderer buildMeshRenderer(const std::vector<const Mode
 
                     indexArrayMapBuilder.addTriangle(texture, static_cast<Index>(i0), static_cast<Index>(i1), static_cast<Index>(i2));
                     indexArrayMapBuilder.addTriangle(texture, static_cast<Index>(i2), static_cast<Index>(i3), static_cast<Index>(i0));
+                    spatialBuilder.addTriangle(texture, vertices[i0], vertices[i1], vertices[i2]);
+                    spatialBuilder.addTriangle(texture, vertices[i2], vertices[i3], vertices[i0]);
                 }
             }
         }
     }
 
     auto vertexArray = VertexArray::move(std::move(vertices));
+    spatialMesh = spatialBuilder.build();
     auto indexArray = IndexArray::move(std::move(indexArrayMapBuilder.indices()));
     return TexturedIndexArrayRenderer{
         std::move(vertexArray), std::move(indexArray), std::move(indexArrayMapBuilder.ranges())
@@ -244,7 +251,8 @@ static DirectEdgeRenderer buildEdgeRenderer(const std::vector<const Model::Patch
 
 void PatchRenderer::validate() {
     if (!m_valid) {
-        m_patchMeshRenderer = buildMeshRenderer(m_patchNodes.get_data(), m_editorContext);
+        m_spatialMesh = std::make_shared<SpatialLightMesh>();
+        m_patchMeshRenderer = buildMeshRenderer(m_patchNodes.get_data(), m_editorContext, *m_spatialMesh, m_alpha < 1.0f);
         m_edgeRenderer = buildEdgeRenderer(m_patchNodes.get_data(), m_editorContext);
 
         m_valid = true;
@@ -253,6 +261,7 @@ void PatchRenderer::validate() {
 
 void PatchRenderer::prepareVerticesAndIndices(VboManager &vboManager) {
     m_patchMeshRenderer.prepare(vboManager);
+    if (pref(Preferences::EnableLightning) && m_spatialMesh) m_spatialMesh->prepare(vboManager);
 }
 
 namespace {
@@ -267,6 +276,7 @@ struct RenderFunc : public TextureRenderFunc {
 
   void before(const Assets::Texture *texture) override {
       shader.set("GridColor", gridColorForTexture(texture));
+      shader.set("EnableMasked", applyTexture && texture != nullptr && texture->masked());
       if (texture != nullptr) {
           texture->activate();
           shader.set("ApplyTexture", applyTexture);
@@ -288,51 +298,30 @@ struct RenderFunc : public TextureRenderFunc {
 void PatchRenderer::doRender(RenderContext &context) {
     auto &shaderManager = context.shaderManager();
     auto shader = ActiveShader{shaderManager, Shaders::FaceShader};
-    auto &prefs = PreferenceManager::instance();
-
-    const bool applyTexture = context.showTextures();
-    const bool shadeFaces = context.shadeFaces();
-    const bool showFog = context.showFog();
-
-    glAssert(glEnable(GL_TEXTURE_2D));
-    glAssert(glActiveTexture(GL_TEXTURE0));
-    shader.set("Brightness", prefs.get(Preferences::Brightness));
-    shader.set("RenderGrid", context.showGrid());
-    shader.set("GridSize", static_cast<float>(context.gridSize()));
-    shader.set("GridAlpha", prefs.get(Preferences::GridAlpha));
-    shader.set("ApplyTexture", applyTexture);
-    shader.set("Texture", 0);
+    configureFaceShader(shader, context);
     shader.set("ApplyTinting", m_tint);
-    if (m_tint) {
-        shader.set("TintColor", m_tintColor);
-    }
+    shader.set("TintColor", m_tintColor);
     shader.set("GrayScale", m_grayscale);
-    shader.set("CameraPosition", context.camera().position());
-    shader.set("ShadeFaces", shadeFaces);
-    shader.set("ShowFog", showFog);
-    shader.set("Alpha", 1.0);
-    shader.set("EnableMasked", false);
-    shader.set("ShowSoftMapBounds", !context.softMapBounds().is_empty());
-    shader.set("SoftMapBoundsMin", context.softMapBounds().min);
-    shader.set("SoftMapBoundsMax", context.softMapBounds().max);
-    shader.set("SoftMapBoundsColor", vm::vec4f{
-        prefs.get(Preferences::SoftMapBoundsColor).r(), prefs.get(Preferences::SoftMapBoundsColor).g(), prefs.get(Preferences::SoftMapBoundsColor).b(), 0.1f
-    });
+    shader.set("Alpha", m_alpha);
+
+    glAssert(glActiveTexture(GL_TEXTURE0));
+    glAssert(glEnable(GL_TEXTURE_2D));
+    const auto applyTexture = context.showTextures();
 
     auto func = RenderFunc{shader, applyTexture, m_defaultColor};
-    /*
     if (m_alpha < 1.0f) {
+        glAssert(glPushAttrib(GL_DEPTH_BUFFER_BIT));
         glAssert(glDepthMask(GL_FALSE));
     }
-    */
 
-    m_patchMeshRenderer.render(func);
+    if (context.render3D() && pref(Preferences::EnableLightning) && m_spatialMesh)
+        m_spatialMesh->render(context, shader, func);
+    else
+        m_patchMeshRenderer.render(func);
 
-    /*
     if (m_alpha < 1.0f) {
-        glAssert(glDepthMask(GL_TRUE));
+        glAssert(glPopAttrib());
     }
-    */
 }
 } // namespace Renderer
 } // namespace TrenchBroom

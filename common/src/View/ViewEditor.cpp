@@ -22,10 +22,16 @@
 #include <QButtonGroup>
 #include <QCheckBox>
 #include <QGridLayout>
+#include <QFormLayout>
+#include <QComboBox>
+#include <QTabWidget>
 #include <QLabel>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollArea>
+#include <QSignalBlocker>
+
+#include <algorithm>
 
 #include "Assets/EntityDefinition.h"
 #include "Assets/EntityDefinitionGroup.h"
@@ -44,6 +50,7 @@
 #include "View/SliderWithLabel.h"
 #include "View/TitledPanel.h"
 #include "View/ViewConstants.h"
+#include "View/Grid.h"
 
 #include <kdl/memory_utils.h>
 
@@ -143,7 +150,6 @@ void EntityDefinitionCheckBoxList::createGui() {
         groupCB->setObjectName("entityDefinition_groupCheckboxWidget");
         makeEmphasized(groupCB);
         makeSmall(groupCB);
-        groupCB->setForegroundRole(QPalette::HighlightedText);
 
         connect(groupCB, &QAbstractButton::clicked, this, [this, i](bool checked) {
             this->groupCheckBoxChanged(i, checked);
@@ -213,11 +219,17 @@ void EntityDefinitionCheckBoxList::createGui() {
 
 ViewEditor::ViewEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
     : QWidget(parent), m_document(std::move(document)), m_showEntityClassnamesCheckBox(nullptr), m_showGroupBoundsCheckBox(nullptr), m_showBrushEntityBoundsCheckBox(nullptr), m_showPointEntityBoundsCheckBox(nullptr), m_showPointEntitiesCheckBox(nullptr), m_showPointEntityModelsCheckBox(nullptr), m_entityDefinitionCheckBoxList(nullptr), m_showBrushesCheckBox(nullptr), m_renderModeRadioGroup(nullptr), m_shadeFacesCheckBox(nullptr), m_showEdgesCheckBox(nullptr), m_showFogCheckBox(nullptr), m_entityLinkRadioGroup(nullptr), m_showSoftBoundsCheckBox(nullptr) {
+    setObjectName("ViewEditor");
     connectObservers();
+    if (kdl::mem_lock(m_document)->world()) {
+        createGui();
+        refreshGui();
+    }
 }
 
 void ViewEditor::connectObservers() {
     auto document = kdl::mem_lock(m_document);
+    m_notifierConnection += document->grid().gridDidChangeNotifier.connect(this,&ViewEditor::refreshGui);
     m_notifierConnection += document->documentWasNewedNotifier.connect(this, &ViewEditor::documentWasNewedOrLoaded);
     m_notifierConnection += document->documentWasLoadedNotifier.connect(this, &ViewEditor::documentWasNewedOrLoaded);
     m_notifierConnection += document->editorContextDidChangeNotifier.connect(this, &ViewEditor::editorContextDidChange);
@@ -308,27 +320,56 @@ void ViewEditor::entityDefinitionsDidChange() {
 }
 
 void ViewEditor::preferenceDidChange(const std::filesystem::path &) {
-    // remove to avoid double loading
-    // no refresh on external preferences change (who needs?)
     refreshGui();
 }
 
 void ViewEditor::createGui() {
+    const auto currentTab = m_tabs ? m_tabs->currentIndex() : 0;
     deleteChildWidgetsLaterAndDeleteLayout(this);
-
-    auto *sizer = new QGridLayout();
-    sizer->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin, LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin);
-    sizer->setHorizontalSpacing(LayoutConstants::MediumHMargin);
-    sizer->setVerticalSpacing(LayoutConstants::MediumVMargin);
-
-    sizer->addWidget(createEntityDefinitionsPanel(this), 0, 0, 3, 1);
-    sizer->addWidget(createEntitiesPanel(this), 0, 1);
-    sizer->addWidget(createBrushesPanel(this), 1, 1);
-    sizer->addWidget(createRendererPanel(this), 2, 1);
-    sizer->addWidget(createFogPanel(this), 0, 2);
-    sizer->addWidget(createSelectionBoundsPanel(this), 2, 2);
-
-    setLayout(sizer);
+    delete m_renderModeRadioGroup;
+    m_renderModeRadioGroup = nullptr;
+    delete m_entityLinkRadioGroup;
+    m_entityLinkRadioGroup = nullptr;
+    m_tabs = new QTabWidget;
+    m_tabs->setObjectName("ViewSettingsTabs");
+    const auto page = [&](const QString& title, const QString& name) {
+        auto* content = new QWidget;
+        content->setObjectName(name);
+        auto* scroll = new QScrollArea;
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setWidgetResizable(true);
+        scroll->setWidget(content);
+        m_tabs->addTab(scroll, title);
+        return content;
+    };
+    auto* display = page(tr("Display"), "ViewSettingsDisplay");
+    auto* displayLayout = new QHBoxLayout(display);
+    displayLayout->addWidget(createRendererPanel(display), 1);
+    displayLayout->addWidget(createFogPanel(display), 1, Qt::AlignTop);
+    auto* geometry = page(tr("Grid && Bounds"), "ViewSettingsGeometry");
+    auto* geometryLayout = new QHBoxLayout(geometry);
+    geometryLayout->addWidget(createGridPanel(geometry), 1, Qt::AlignTop);
+    geometryLayout->addWidget(createSelectionBoundsPanel(geometry), 1, Qt::AlignTop);
+    auto* objects = page(tr("Objects"), "ViewSettingsObjects");
+    auto* objectsLayout = new QHBoxLayout(objects);
+    objectsLayout->addWidget(createEntityDefinitionsPanel(objects), 1);
+    auto* filters = new QVBoxLayout;
+    filters->addWidget(createEntitiesPanel(objects));
+    filters->addWidget(createBrushesPanel(objects));
+    filters->addWidget(createLinksPanel(objects));
+    filters->addStretch();
+    objectsLayout->addLayout(filters, 1);
+    auto* reset = new QPushButton(tr("Restore View Defaults"));
+    reset->setObjectName("ViewSettingsReset");
+    connect(reset, &QPushButton::clicked, this, &ViewEditor::restoreDefaultsClicked);
+    auto* footer = new QHBoxLayout;
+    footer->addStretch();
+    footer->addWidget(reset);
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_tabs, 1);
+    layout->addLayout(footer);
+    m_tabs->setCurrentIndex(std::clamp(currentTab, 0, m_tabs->count() - 1));
 }
 
 QWidget *ViewEditor::createEntityDefinitionsPanel(QWidget *parent) {
@@ -347,7 +388,7 @@ QWidget *ViewEditor::createEntityDefinitionsPanel(QWidget *parent) {
 
     layout->setSpacing(0);
     layout->addWidget(m_entityDefinitionCheckBoxList, 1);
-    m_entityDefinitionCheckBoxList->setMinimumWidth(250);
+    m_entityDefinitionCheckBoxList->setObjectName("ViewSettingsEntityDefinitions");
 
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     panel->getPanel()->setLayout(layout);
@@ -384,20 +425,11 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
 
 QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Selection Bounds", parent, false);
-    panel->setMinimumWidth(250);
-    panel->setMinimumHeight(350);
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
 
     layout->setSpacing(0);
-
-    auto *restoreDefaultButton = new QPushButton(tr("Restore Defaults"));
-    restoreDefaultButton->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
-    restoreDefaultButton->setObjectName("ViewEditor_smallPushButton");
-    makeSmall(restoreDefaultButton);
-
-    connect(restoreDefaultButton, &QAbstractButton::clicked, this, &ViewEditor::restoreDefaultsClicked);
 
     m_selectionBoundsAlwaysShowOnSelected = new QCheckBox(tr("Always show selection bounds"));
     m_selectionBoundsAlwaysShowOnSelected->setToolTip(tr("Always show the selected objects selection bounds (else only show on mouse-over)."));
@@ -417,9 +449,9 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
 
     layout->addSpacing(LayoutConstants::WideVMargin);
 
-    m_selectionBoundsDashSize = new SliderWithLabel(2, 10, 0.0f, "%dpx", 220, 15, this);
-    m_selectionBoundsIntersectionSize = new SliderWithLabel(2, 20, 0.0f, "%dpx", 220, 15, this);
-    m_selectionBoundsWidth = new SliderWithLabel(10, 300, 10e-3f, "%.1f px", 220, 15, this);
+    m_selectionBoundsDashSize = new SliderWithLabel(2, 10, 0.0f, "%dpx", 0, 45, this);
+    m_selectionBoundsIntersectionSize = new SliderWithLabel(2, 20, 0.0f, "%dpx", 0, 45, this);
+    m_selectionBoundsWidth = new SliderWithLabel(10, 300, 10e-3f, "%.1f px", 0, 45, this);
 
     layout->addWidget(new QLabel{"Dash size"});
     layout->addWidget(m_selectionBoundsDashSize);
@@ -429,12 +461,11 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
     layout->addWidget(m_selectionBoundsIntersectionSize);
     layout->addSpacing(LayoutConstants::WideVMargin);
 
-    layout->addWidget(new QLabel{"Selection bounds line-with"});
+    layout->addWidget(new QLabel{tr("Line width")});
     layout->addWidget(m_selectionBoundsWidth);
 
-    layout->addStretch(3);
+    layout->addStretch();
     layout->addWidget(new BorderLine);
-    layout->addWidget(restoreDefaultButton, 1, Qt::AlignHCenter | Qt::AlignBottom);
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     panel->getPanel()->setLayout(layout);
@@ -443,15 +474,14 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
 
 QWidget *ViewEditor::createFogPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Fog", parent, false);
-    panel->setMinimumWidth(250);
 
     m_showFogCheckBox = new QCheckBox(tr("Enable fog"));
     m_showAlternateFogCheckBox = new QCheckBox(tr("Alternate Fog Algorithm"));
 
-    m_fogMaxAmountSlider = new SliderWithLabel(1, 100, 0.0f, "%d%", 220, 15, this);
-    m_fogMinDistanceSlider = new SliderWithLabel(16, 2048, 0.0f, "%d", 220, 15, this);
-    m_fogScaleSlider = new SliderWithLabel(1, 100, 0.0f, "%d", 220, 15, this);
-    m_fogBiasSlider = new SliderWithLabel(0, 100, 0.0f, "%d", 220, 15, this);
+    m_fogMaxAmountSlider = new SliderWithLabel(1, 100, 0.0f, "%d%%", 0, 45, this);
+    m_fogMinDistanceSlider = new SliderWithLabel(16, 2048, 0.0f, "%d", 0, 45, this);
+    m_fogScaleSlider = new SliderWithLabel(1, 100, 0.0f, "%d", 0, 45, this);
+    m_fogBiasSlider = new SliderWithLabel(0, 100, 0.0f, "%d", 0, 45, this);
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
@@ -513,7 +543,7 @@ void ViewEditor::createEmptyTagFilter(QWidget *parent) {
     auto *msg = new QLabel(tr("No tags found"));
     makeInfo(msg);
 
-    auto *layout = new QHBoxLayout();
+    auto *layout = new QVBoxLayout();
     layout->setContentsMargins(0, LayoutConstants::WideVMargin, 0, LayoutConstants::WideVMargin);
     layout->setSpacing(0);
     layout->addWidget(msg);
@@ -550,7 +580,6 @@ void ViewEditor::createTagFilter(QWidget *parent, const std::vector<Model::Smart
 QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     TitledPanel *panel = new TitledPanel("Renderer", parent, false);
     QWidget * inner = panel->getPanel();
-    panel->setMinimumHeight(350);
 
     const QList<QString> FaceRenderModes = {"Show textures", "Hide textures", "Hide faces"};
 
@@ -569,32 +598,15 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     }
 
     m_shadeFacesCheckBox = new QCheckBox(tr("Shade faces"));
-    m_shadeAmount = new SliderWithLabel(1, 100, 0.0f, "%d%", 220, 15, this);
-
-    m_brightnessSlider = new SliderWithLabel{25, 300, 0, "%d%%", 220, 15};
+    m_shadeAmount = new SliderWithLabel(1, 100, 0.0f, "%d%%", 0, 45, this);
+    m_brightnessSlider = new SliderWithLabel{25, 300, 0, "%d%%", 0, 45};
     m_brightnessSlider->setToolTip("Sets the brightness for textures and model skins in the 3D editing view.");
 
     m_showEdgesCheckBox = new QCheckBox(tr("Show edges"));
-
-    const QList<QString> EntityLinkModes = {
-        "Show all entity links", "Show transitively selected entity links", "Show directly selected entity links", "Hide entity links"
-    };
-
-    const QList<QString> EntityLinkModesPrefValues = {
-        Preferences::entityLinkModeAll(), Preferences::entityLinkModeTransitive(), Preferences::entityLinkModeDirect(), Preferences::entityLinkModeNone()
-    };
-
-    m_entityLinkRadioGroup = new QButtonGroup(this);
-    for (int i = 0; i < EntityLinkModes.length(); ++i) {
-        const QString &label = EntityLinkModes.at(i);
-        const QString &prefValue = EntityLinkModesPrefValues.at(i);
-
-        auto *radio = new QRadioButton(label);
-        radio->setObjectName(prefValue);
-        m_entityLinkRadioGroup->addButton(radio, i);
-    }
-
-    m_showSoftBoundsCheckBox = new QCheckBox(tr("Show soft bounds"));
+    m_showSkyCheckBox = new QCheckBox(tr("Show map skybox"));
+    m_showSkyCheckBox->setObjectName("showMapSkybox");
+    m_showSkyCheckBox->setToolTip(tr("Preview the map's skybox in the 3D view, using its sky / skyname property and game resources."));
+    connect(m_showSkyCheckBox, &QCheckBox::clicked, this, [](const bool checked) { setPref(Preferences::ShowSky, checked); });
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
@@ -612,12 +624,8 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     layout->addWidget(new QLabel{"Shade amount"});
     layout->addWidget(m_shadeAmount);
     layout->addWidget(m_showEdgesCheckBox);
+    layout->addWidget(m_showSkyCheckBox);
 
-    for (auto *button : m_entityLinkRadioGroup->buttons()) {
-        layout->addWidget(button);
-    }
-
-    layout->addWidget(m_showSoftBoundsCheckBox);
     layout->addSpacing(LayoutConstants::MediumVMargin);
     layout->addSpacing(1);
     layout->addWidget(new BorderLine);
@@ -627,7 +635,81 @@ QWidget *ViewEditor::createRendererPanel(QWidget *parent) {
     return panel;
 }
 
+QWidget* ViewEditor::createLinksPanel(QWidget* parent) {
+    auto* panel = new TitledPanel(tr("Links and Limits"), parent, false);
+    const QList<QString> EntityLinkModes = {"Show all entity links", "Show transitively selected entity links", "Show directly selected entity links",
+                                            "Hide entity links"};
+
+    const QList<QString> EntityLinkModesPrefValues = {Preferences::entityLinkModeAll(), Preferences::entityLinkModeTransitive(),
+                                                      Preferences::entityLinkModeDirect(), Preferences::entityLinkModeNone()};
+
+    m_entityLinkRadioGroup = new QButtonGroup(this);
+    for (int i = 0; i < EntityLinkModes.length(); ++i) {
+        const QString& label = EntityLinkModes.at(i);
+        const QString& prefValue = EntityLinkModesPrefValues.at(i);
+
+        auto* radio = new QRadioButton(label);
+        radio->setObjectName(prefValue);
+        m_entityLinkRadioGroup->addButton(radio, i);
+    }
+
+    m_showSoftBoundsCheckBox = new QCheckBox(tr("Show soft bounds"));
+
+    auto* layout = new QVBoxLayout(panel->getPanel());
+    for (auto* button : m_entityLinkRadioGroup->buttons())
+        layout->addWidget(button);
+    layout->addWidget(m_showSoftBoundsCheckBox);
+    return panel;
+}
+
+QWidget* ViewEditor::createGridPanel(QWidget* parent) {
+    auto* panel = new TitledPanel(tr("Grid"), parent, false);
+    auto* layout = new QFormLayout(panel->getPanel());
+    layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    m_showGrid = new QCheckBox(tr("Show grid"));
+    m_showGrid->setObjectName("ViewGridVisible");
+    m_snapToGrid = new QCheckBox(tr("Snap to grid"));
+    m_snapToGrid->setObjectName("ViewGridSnap");
+    m_gridAlpha = new SliderWithLabel(0, 100, 0, "%d%%");
+    m_gridAlpha->setObjectName("ViewGridOpacity");
+    m_gridWidth = new SliderWithLabel(100, 300, 0.01f, "%.1f px");
+    m_gridWidth->setObjectName("ViewGridWidth");
+    m_gridUnits = new QComboBox;
+    m_gridUnits->setObjectName("ViewGridUnits");
+    m_gridUnits->addItems({tr("Map units"), tr("Meters")});
+    m_shadeGridCheckBox = new QCheckBox(tr("Shade grid lines"));
+    m_shadeGridCheckBox->setToolTip(tr("Apply the face shading angle and shade amount to grid lines in the 3D view."));
+    connect(m_shadeGridCheckBox, &QCheckBox::clicked, this, [](bool checked) { setPref(Preferences::ShadeGrid, checked); });
+
+    m_gridAxisColorMix = new SliderWithLabel(0, 100, 0.0f, "%d%%", 0, 45);
+    m_gridAxisColorMix->setToolTip(tr("Mix the grid color with the X, Y and Z axis colors, based on each line's direction."));
+    connect(m_gridAxisColorMix, &SliderWithLabel::valueChanged, this, [](int value) { setPref(Preferences::GridAxisColorMix, float(value) / 100.0f); });
+
+    m_gridAxisColorMix->setObjectName("ViewGridAxisColorMix");
+    m_shadeGridCheckBox->setObjectName("ViewGridShading");
+    layout->addRow(m_showGrid);
+    layout->addRow(m_snapToGrid);
+    layout->addRow(tr("Opacity"), m_gridAlpha);
+    layout->addRow(tr("Line width"), m_gridWidth);
+    layout->addRow(tr("Axis colors"), m_gridAxisColorMix);
+    layout->addRow(m_shadeGridCheckBox);
+    layout->addRow(tr("Units"), m_gridUnits);
+    connect(m_showGrid, &QCheckBox::clicked, this, [this](bool checked) {
+        auto doc = kdl::mem_lock(m_document);
+        if (doc->grid().visible() != checked) doc->grid().toggleVisible();
+    });
+    connect(m_snapToGrid, &QCheckBox::clicked, this, [this](bool checked) {
+        auto doc = kdl::mem_lock(m_document);
+        if (doc->grid().snap() != checked) doc->grid().toggleSnap();
+    });
+    connect(m_gridAlpha, &SliderWithLabel::valueChanged, this, [](int value) { setPref(Preferences::GridAlpha, value / 100.0f); });
+    connect(m_gridWidth, &SliderWithLabel::valueChanged, this, [](int value) { setPref(Preferences::GridLineWidth, value / 100.0f); });
+    connect(m_gridUnits, qOverload<int>(&QComboBox::currentIndexChanged), this, [](int value) { setPref(Preferences::GridUnitSystem, value); });
+    return panel;
+}
+
 void ViewEditor::refreshGui() {
+    if (!m_tabs) return;
     unBindEvents();
 
     refreshEntityDefinitionsPanel();
@@ -672,11 +754,27 @@ void ViewEditor::refreshRendererPanel() {
     checkButtonInGroup(m_renderModeRadioGroup, pref(Preferences::FaceRenderMode), true);
     m_shadeFacesCheckBox->setChecked(pref(Preferences::ShadeFaces));
     m_showEdgesCheckBox->setChecked(pref(Preferences::ShowEdges));
+    m_showSkyCheckBox->setChecked(pref(Preferences::ShowSky));
     checkButtonInGroup(m_entityLinkRadioGroup, pref(Preferences::EntityLinkMode), true);
     m_showSoftBoundsCheckBox->setChecked(pref(Preferences::ShowSoftMapBounds));
 
     auto shadeAmount = pref(Preferences::ShadeLevel) * 100;
     m_shadeAmount->setValue(static_cast<int>(shadeAmount));
+    const auto document = kdl::mem_lock(m_document);
+    {
+        const QSignalBlocker visible(m_showGrid), snap(m_snapToGrid), alpha(m_gridAlpha), width(m_gridWidth), units(m_gridUnits);
+        m_showGrid->setChecked(document->grid().visible());
+        m_snapToGrid->setChecked(document->grid().snap());
+        m_gridAlpha->setValue(qRound(std::clamp(pref(Preferences::GridAlpha), 0.0f, 1.0f) * 100));
+        m_gridWidth->setValue(qRound(std::clamp(pref(Preferences::GridLineWidth), 1.0f, 3.0f) * 100));
+        m_gridUnits->setCurrentIndex(pref(Preferences::GridUnitSystem));
+    }
+    m_shadeGridCheckBox->setChecked(pref(Preferences::ShadeGrid));
+    m_shadeGridCheckBox->setEnabled(pref(Preferences::ShadeFaces));
+    {
+        const QSignalBlocker blocker(m_gridAxisColorMix);
+        m_gridAxisColorMix->setValue(int(vm::round(100.0f * std::clamp(pref(Preferences::GridAxisColorMix), 0.0f, 1.0f))));
+    }
 
     auto brightness = int(vm::round(100.0f * (pref(Preferences::Brightness))));
     m_brightnessSlider->setValue(brightness);
@@ -809,7 +907,20 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::FaceRenderMode);
     prefs.resetToDefault(Preferences::ShadeFaces);
     prefs.resetToDefault(Preferences::ShadeLevel);
+    prefs.resetToDefault(Preferences::GridAlpha);
+    prefs.resetToDefault(Preferences::GridLineWidth);
+    prefs.resetToDefault(Preferences::GridUnitSystem);
+    prefs.resetToDefault(Preferences::SelectionBoundsDashedLines);
+    prefs.resetToDefault(Preferences::SelectionBoundsDashedSize);
+    prefs.resetToDefault(Preferences::SelectionBoundsLineWidth);
+    prefs.resetToDefault(Preferences::SelectionBoundsPointSize);
+    prefs.resetToDefault(Preferences::ShowObjectBoundsSelectionBounds);
+    prefs.resetToDefault(Preferences::AlwaysShowSelectionBounds);
+    prefs.resetToDefault(Preferences::SelectionBoundsIntersectionMode);
+    prefs.resetToDefault(Preferences::GridAxisColorMix);
+    prefs.resetToDefault(Preferences::ShadeGrid);
     prefs.resetToDefault(Preferences::ShowFog);
+    prefs.resetToDefault(Preferences::ShowSky);
     prefs.resetToDefault(Preferences::FogBias);
     prefs.resetToDefault(Preferences::FogType);
     prefs.resetToDefault(Preferences::FogScale);
@@ -821,6 +932,9 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::ShowBrushes);
     prefs.resetToDefault(Preferences::EntityLinkMode);
     prefs.saveChanges();
+    const auto document = kdl::mem_lock(m_document);
+    if (!document->grid().visible()) document->grid().toggleVisible();
+    if (!document->grid().snap()) document->grid().toggleSnap();
     refreshGui();
 }
 

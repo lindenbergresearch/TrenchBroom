@@ -77,6 +77,7 @@ template<typename T> class VboHolder {
     DirtyRangeTracker m_dirtyRange;
     VboManager *m_vboManager;
     Vbo *m_vbo;
+    size_t m_revision = 0;
 
   private:
     void freeBlock() {
@@ -133,11 +134,13 @@ template<typename T> class VboHolder {
     }
 
     void resize(const size_t newSize) {
+        ++m_revision;
         m_snapshot.resize(newSize);
         m_dirtyRange.expand(newSize);
     }
 
     T *getPointerToWriteElementsTo(const size_t offsetWithinBlock, const size_t elementCount) {
+        ++m_revision;
         assert(offsetWithinBlock + elementCount <= m_snapshot.size());
 
         // mark dirty range
@@ -193,6 +196,10 @@ template<typename T> class VboHolder {
 
     size_t size() const { return m_snapshot.size(); }
 
+    size_t revision() const { return m_revision; }
+
+    const std::vector<T> &elements() const { return m_snapshot; }
+
     void bindBlock() { m_vbo->bind(); }
 
     void unbindBlock() { m_vbo->unbind(); }
@@ -234,6 +241,10 @@ class BrushIndexArray {
      * zeroElementsWithKey() do not count.
      */
     bool hasValidIndices() const;
+
+    size_t revision() const { return m_indexHolder.revision(); }
+
+    const std::vector<GLuint> &indices() const { return m_indexHolder.elements(); }
 
     /**
      * Call this to request writing the given number of indices.
@@ -319,6 +330,10 @@ class BrushVertexArray {
 
   public:
     BrushVertexArray();
+
+    size_t revision() const { return m_vertexHolder.revision(); }
+
+    const std::vector<Vertex> &vertices() const { return m_vertexHolder.elements(); }
 
     /**
      * Call this to request writing the given number of vertices.

@@ -76,27 +76,20 @@ CompilationTaskEditorBase::CompilationTaskEditorBase(QString title, std::weak_pt
     auto layout = new QVBoxLayout;
     layout->setContentsMargins(LayoutConstants::NoMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowVMargin);
 
-    //    layout->addWidget(new BorderLine);
     auto titleLabel = new QLabel{m_title};
     makeSmall(titleLabel);
     makeEmphasized(titleLabel);
 
-    titleLabel->setAutoFillBackground(true);
-    titleLabel->setBackgroundRole(QPalette::ColorRole::Midlight);
-    titleLabel->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::NarrowVMargin, LayoutConstants::NoMargin, LayoutConstants::NarrowVMargin);
+    titleLabel->setObjectName("CompilationTaskTitle");
+    titleLabel->setAttribute(Qt::WA_StyledBackground);
 
     layout->addWidget(titleLabel);
     layout->addLayout(m_taskLayout);
-    // layout->addWidget(new BorderLine);
 
-    auto pal = QPalette{};
-    auto highlight = pal.color(QPalette::ColorRole::Highlight);
-
-    colorizeWidget(this, highlight.darker(250), QPalette::ColorRole::Highlight);
+    setObjectName("CompilationTaskCard");
+    setAttribute(Qt::WA_StyledBackground,true);
 
     setLayout(layout);
-    //    setBaseWindowColor(this);
-    // setBaseWindowColor(titleLabel);
 
     connect(m_enabledCheckbox, &QCheckBox::clicked, this, [&](const bool checked) {
         std::visit([&](auto &t) { t.enabled = checked; }, m_task);
@@ -146,7 +139,7 @@ CompilationExportMapTaskEditor::CompilationExportMapTaskEditor(std::weak_ptr<Map
     addMainLayout(formLayout);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(APP.getConsoleFont());
+    makeMono(m_targetEditor);
     m_targetEditor->setToolTip(R"(The path of the exported file.
 Variables are allowed.)");
     setupCompleter(m_targetEditor);
@@ -185,7 +178,7 @@ CompilationCopyFilesTaskEditor::CompilationCopyFilesTaskEditor(std::weak_ptr<Map
     addMainLayout(formLayout);
 
     m_sourceEditor = new MultiCompletionLineEdit{};
-    m_sourceEditor->setFont(APP.getConsoleFont());
+    makeMono(m_sourceEditor);
     m_sourceEditor->setToolTip(R"(The file(s) to copy.
 
 Use wildcards (*,?) in the filename to specify more than one file.
@@ -194,7 +187,7 @@ Variables are allowed.)");
     formLayout->addRow("Source File Path", m_sourceEditor);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(APP.getConsoleFont());
+    makeMono(m_targetEditor);
     m_targetEditor->setToolTip(R"(The directory to copy the files to.
 
 The directory is recursively created if it does not exist.
@@ -246,7 +239,7 @@ CompilationRenameFileTaskEditor::CompilationRenameFileTaskEditor(std::weak_ptr<M
     addMainLayout(formLayout);
 
     m_sourceEditor = new MultiCompletionLineEdit{};
-    m_sourceEditor->setFont(APP.getConsoleFont());
+    makeMono(m_sourceEditor);
     m_sourceEditor->setToolTip(R"(The file to rename or move.
 
 Wildcards are not supported.
@@ -255,7 +248,7 @@ Variables are allowed.)");
     formLayout->addRow("Source File Path", m_sourceEditor);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(APP.getConsoleFont());
+    makeMono(m_targetEditor);
     m_targetEditor->setToolTip(R"(The new path for the file.
 
 The path must end in a filename.
@@ -308,7 +301,7 @@ CompilationDeleteFilesTaskEditor::CompilationDeleteFilesTaskEditor(std::weak_ptr
     addMainLayout(formLayout);
 
     m_targetEditor = new MultiCompletionLineEdit{};
-    m_targetEditor->setFont(APP.getConsoleFont());
+    makeMono(m_targetEditor);
     m_targetEditor->setToolTip(R"(The file(s) to delete.
 
 Use wildcards (*,?) in the filename to specify more than one file.
@@ -351,7 +344,7 @@ CompilationRunToolTaskEditor::CompilationRunToolTaskEditor(std::weak_ptr<MapDocu
     addMainLayout(formLayout);
 
     m_toolEditor = new MultiCompletionLineEdit{};
-    m_toolEditor->setFont(APP.getConsoleFont());
+    makeMono(m_toolEditor);
     m_toolEditor->setToolTip(R"(The absolute path to the executable of the tool that should be run.
 
 The working "directory is set to the profile's working directory if configured.
@@ -370,7 +363,7 @@ Variables are allowed.)");
     formLayout->addRow("Tool Path", toolLayout);
 
     m_parametersEditor = new MultiCompletionLineEdit{};
-    m_parametersEditor->setFont(APP.getConsoleFont());
+    makeMono(m_parametersEditor);
     m_parametersEditor->setToolTip(R"(The parameters that should be passed to the tool when it is executed.
 Variables are allowed.)");
 

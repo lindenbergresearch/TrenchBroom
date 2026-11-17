@@ -19,8 +19,10 @@
 
 #include "ModEditor.h"
 
+#include <QGridLayout>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -69,11 +71,7 @@ void ModEditor::createGui() {
 
     m_filterBox = createSearchBox();
     m_filterBox->setToolTip(tr("Filter the list of available mods"));
-
-    auto *filterBoxSizer = new QVBoxLayout();
-    filterBoxSizer->setContentsMargins(0, 0, 0, 0);
-    filterBoxSizer->setSpacing(0);
-    filterBoxSizer->addWidget(m_filterBox, 1);
+    m_filterBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     auto *enabledModContainer = new TitledPanel("Enabled", false, true);
     enabledModContainer->setBackgroundRole(QPalette::Base);
@@ -93,17 +91,23 @@ void ModEditor::createGui() {
     m_moveModUpButton = createBitmapButton("Up.svg", tr("Move the selected mod up"));
     m_moveModDownButton = createBitmapButton("Down.svg", tr("Move the selected mod down"));
 
-    auto *toolBar = createMiniToolBarLayout(m_addModsButton, m_removeModsButton, LayoutConstants::WideHMargin, m_moveModUpButton, m_moveModDownButton);
+    auto* toolbar = createInspectorToolBar(this);
+    toolbar->addWidget(m_addModsButton);
+    toolbar->addWidget(m_removeModsButton);
+    toolbar->addWidget(m_moveModUpButton);
+    toolbar->addWidget(m_moveModDownButton);
+    toolbar->addWidget(m_filterBox);
 
     auto *layout = new QGridLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    layout->addWidget(availableModContainer, 0, 0);
-    layout->addWidget(new BorderLine(BorderLine::Direction::Vertical), 0, 1, 3, 1);
-    layout->addWidget(enabledModContainer, 0, 2);
-    layout->addWidget(new BorderLine(BorderLine::Direction::Horizontal), 1, 0, 1, 3);
-    layout->addLayout(filterBoxSizer, 2, 0);
-    layout->addLayout(toolBar, 2, 2);
+    layout->addWidget(toolbar, 0, 0, 1, 3);
+    layout->addWidget(availableModContainer, 1, 0);
+    layout->addWidget(new BorderLine(BorderLine::Direction::Vertical), 1, 1);
+    layout->addWidget(enabledModContainer, 1, 2);
+    layout->setRowStretch(1, 1);
+    layout->setColumnStretch(0, 1);
+    layout->setColumnStretch(2, 1);
 
     setLayout(layout);
 

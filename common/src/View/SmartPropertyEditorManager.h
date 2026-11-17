@@ -21,8 +21,6 @@
 
 #include <QWidget>
 
-#include "NotifierConnection.h"
-
 #include <functional>
 #include <string>
 #include <vector>
@@ -33,13 +31,10 @@ namespace TrenchBroom {
 namespace Model {
 class EntityNodeBase;
 
-class Node;
 } // namespace Model
 
 namespace View {
 class MapDocument;
-
-class Selection;
 
 class SmartPropertyEditor;
 
@@ -50,10 +45,7 @@ class SmartPropertyEditorManager : public QWidget {
     std::weak_ptr<MapDocument> m_document;
 
     std::vector<std::tuple<SmartPropertyEditorMatcher, SmartPropertyEditor *>> m_editors;
-    std::string m_propertyKey;
     QStackedLayout *m_stackedLayout{nullptr};
-
-    NotifierConnection m_notifierConnection;
 
   public:
     explicit SmartPropertyEditorManager(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
@@ -67,12 +59,6 @@ class SmartPropertyEditorManager : public QWidget {
 
     void createEditors();
 
-    void connectObservers();
-
-    void selectionDidChange(const Selection &selection);
-
-    void nodesDidChange(const std::vector<Model::Node *> &nodes);
-
     SmartPropertyEditor *selectEditor(const std::string &propertyKey, const std::vector<Model::EntityNodeBase *> &nodes) const;
 
     SmartPropertyEditor *defaultEditor() const;
@@ -81,7 +67,6 @@ class SmartPropertyEditorManager : public QWidget {
 
     void deactivateEditor();
 
-    void updateEditor();
 };
 } // namespace View
 } // namespace TrenchBroom

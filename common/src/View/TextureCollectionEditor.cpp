@@ -19,7 +19,9 @@
 
 #include "TextureCollectionEditor.h"
 
+#include <QGridLayout>
 #include <QListWidget>
+#include <QToolBar>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -139,17 +141,22 @@ void TextureCollectionEditor::createGui() {
     m_removeCollectionsButton = createBitmapButton("Remove.svg", tr("Disable the selected texture collections"), this);
     m_reloadCollectionsButton = createBitmapButton("Refresh.svg", tr("Reload all enabled texture collections"), this);
 
-    auto *toolBar = createMiniToolBarLayout(m_addCollectionsButton, m_removeCollectionsButton, LayoutConstants::WideHMargin, m_reloadCollectionsButton);
+    m_toolbar = createInspectorToolBar(this);
+    m_toolbar->addWidget(m_addCollectionsButton);
+    m_toolbar->addWidget(m_removeCollectionsButton);
+    m_toolbar->addWidget(m_reloadCollectionsButton);
 
     auto *layout = new QGridLayout{};
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    layout->addWidget(availableCollectionsContainer, 0, 0);
-    layout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 0, 1, 3, 1);
-    layout->addWidget(enabledCollectionsContainer, 0, 2);
-    layout->addWidget(new BorderLine{BorderLine::Direction::Horizontal}, 1, 0, 1, 3);
-    layout->addLayout(toolBar, 2, 2);
+    layout->addWidget(m_toolbar, 0, 0, 1, 3);
+    layout->addWidget(availableCollectionsContainer, 1, 0);
+    layout->addWidget(new BorderLine{BorderLine::Direction::Vertical}, 1, 1);
+    layout->addWidget(enabledCollectionsContainer, 1, 2);
+    layout->setRowStretch(1, 1);
+    layout->setColumnStretch(0, 1);
+    layout->setColumnStretch(2, 1);
 
     setLayout(layout);
 
@@ -162,6 +169,10 @@ void TextureCollectionEditor::createGui() {
     connect(m_addCollectionsButton, &QAbstractButton::clicked, this, &TextureCollectionEditor::addSelectedTextureCollections);
     connect(m_removeCollectionsButton, &QAbstractButton::clicked, this, &TextureCollectionEditor::removeSelectedTextureCollections);
     connect(m_reloadCollectionsButton, &QAbstractButton::clicked, this, &TextureCollectionEditor::reloadTextureCollections);
+}
+
+QToolBar* TextureCollectionEditor::toolBar() const {
+    return m_toolbar;
 }
 
 void TextureCollectionEditor::updateButtons() {

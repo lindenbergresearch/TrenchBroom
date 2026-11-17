@@ -19,13 +19,15 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "NotifierConnection.h"
-#include "View/TabBook.h"
+#include "View/InspectorToolSection.h"
+#include <QWidget>
+
+#include <QPointer>
 
 #include <memory>
+#include <vector>
 
-class QSplitter;
 
-class QWidget;
 
 namespace TrenchBroom {
 namespace Assets {
@@ -33,7 +35,6 @@ class Texture;
 }
 
 namespace View {
-class CollapsibleTitledPanel;
 
 class FaceAttribsEditor;
 
@@ -41,23 +42,26 @@ class GLContextManager;
 
 class MapDocument;
 
+class SwitchableTitledPanel;
 class TextureBrowser;
+class TitledPanel;
 
-class FaceInspector : public TabBookPage {
+class FaceInspector : public QWidget {
   Q_OBJECT
   private:
     std::weak_ptr<MapDocument> m_document;
-    QSplitter *m_splitter{nullptr};
-    FaceAttribsEditor *m_faceAttribsEditor{nullptr};
-    TextureBrowser *m_textureBrowser{nullptr};
-    QWidget *m_textureBrowserInfo{nullptr};
+    QPointer<TitledPanel> m_faceAttributesPanel;
+    QPointer<SwitchableTitledPanel> m_textureBrowserPanel;
+    QPointer<FaceAttribsEditor> m_faceAttribsEditor;
+    QPointer<TextureBrowser> m_textureBrowser;
+    QPointer<QWidget> m_textureBrowserInfo;
 
     NotifierConnection m_notifierConnection;
 
   public:
     FaceInspector(std::weak_ptr<MapDocument> document, GLContextManager &contextManager, QWidget *parent = nullptr);
 
-    ~FaceInspector() override;
+    std::vector<InspectorToolSection> toolSections() const;
 
     bool cancelMouseDrag();
 
@@ -66,9 +70,9 @@ class FaceInspector : public TabBookPage {
   private:
     void createGui(GLContextManager &contextManager);
 
-    QWidget *createFaceAttribsEditor(GLContextManager &contextManager);
+    TitledPanel *createFaceAttribsEditor(GLContextManager &contextManager);
 
-    QWidget *createTextureBrowser(GLContextManager &contextManager);
+    SwitchableTitledPanel *createTextureBrowser(GLContextManager &contextManager);
 
     QWidget *createTextureBrowserInfo();
 

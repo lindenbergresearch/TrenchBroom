@@ -41,6 +41,7 @@
 #include "Model/ModelUtils.h"
 #include "Model/WorldNode.h"
 #include "View/MapDocument.h"
+#include "View/FontUtils.h"
 #include "View/QtUtils.h"
 #include "View/ViewConstants.h"
 
@@ -68,7 +69,9 @@ static bool isPropertyKeyMutable(const Model::Entity &entity, const std::string 
     assert(!Model::isLayer(entity.classname(), entity.properties()));
 
     if (Model::isWorldspawn(entity.classname())) {
-        return !(key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions || key == Model::EntityPropertyKeys::Wad || key == Model::EntityPropertyKeys::EnabledTextureCollections || key == Model::EntityPropertyKeys::SoftMapBounds || key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked || key == Model::EntityPropertyKeys::LayerHidden || key == Model::EntityPropertyKeys::LayerOmitFromExport);
+        return !(key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions || key == Model::EntityPropertyKeys::Wad ||
+                 key == Model::EntityPropertyKeys::EnabledTextureCollections || key == Model::EntityPropertyKeys::SoftMapBounds || key == Model::EntityPropertyKeys::LayerColor ||
+                 key == Model::EntityPropertyKeys::LayerLocked || key == Model::EntityPropertyKeys::LayerHidden || key == Model::EntityPropertyKeys::LayerOmitFromExport);
     }
 
     return true;
@@ -79,7 +82,9 @@ static bool isPropertyValueMutable(const Model::Entity &entity, const std::strin
     assert(!Model::isLayer(entity.classname(), entity.properties()));
 
     if (Model::isWorldspawn(entity.classname())) {
-        return !(key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions || key == Model::EntityPropertyKeys::Wad || key == Model::EntityPropertyKeys::SoftMapBounds || key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked || key == Model::EntityPropertyKeys::LayerHidden || key == Model::EntityPropertyKeys::LayerOmitFromExport);
+        return !(key == Model::EntityPropertyKeys::Classname || key == Model::EntityPropertyKeys::Mods || key == Model::EntityPropertyKeys::EntityDefinitions || key == Model::EntityPropertyKeys::Wad ||
+                 key == Model::EntityPropertyKeys::SoftMapBounds || key == Model::EntityPropertyKeys::LayerColor || key == Model::EntityPropertyKeys::LayerLocked ||
+                 key == Model::EntityPropertyKeys::LayerHidden || key == Model::EntityPropertyKeys::LayerOmitFromExport);
     }
 
     return true;
@@ -103,21 +108,29 @@ static PropertyProtection isPropertyProtected(const Model::EntityNodeBase &entit
 
 std::ostream &operator<<(std::ostream &lhs, const ValueType &rhs) {
     switch (rhs) {
-    case ValueType::Unset:return lhs << "Unset";
-    case ValueType::SingleValue:return lhs << "SingleValue";
-    case ValueType::SingleValueAndUnset:return lhs << "SingleValueAndUnset";
-    case ValueType::MultipleValues:return lhs << "MultipleValues";
-        switchDefault();
+        case ValueType::Unset:
+            return lhs << "Unset";
+        case ValueType::SingleValue:
+            return lhs << "SingleValue";
+        case ValueType::SingleValueAndUnset:
+            return lhs << "SingleValueAndUnset";
+        case ValueType::MultipleValues:
+            return lhs << "MultipleValues";
+            switchDefault();
     }
 }
 
 std::ostream &operator<<(std::ostream &lhs, const PropertyProtection &rhs) {
     switch (rhs) {
-    case PropertyProtection::NotProtectable:return lhs << "NotProtectable";
-    case PropertyProtection::Protected:return lhs << "Protected";
-    case PropertyProtection::NotProtected:return lhs << "NotProtected";
-    case PropertyProtection::Mixed:return lhs << "Mixed";
-        switchDefault();
+        case PropertyProtection::NotProtectable:
+            return lhs << "NotProtectable";
+        case PropertyProtection::Protected:
+            return lhs << "Protected";
+        case PropertyProtection::NotProtected:
+            return lhs << "NotProtected";
+        case PropertyProtection::Mixed:
+            return lhs << "Mixed";
+            switchDefault();
     }
 }
 
@@ -221,12 +234,17 @@ bool PropertyRow::subset() const {
 }
 
 PropertyRow PropertyRow::rowForEntityNodes(const std::string &key, const std::vector<Model::EntityNodeBase *> &nodes) {
-    ensure(!nodes.empty(), "rowForEntityNodes requries a non-empty node list");
+    ensure(!nodes.empty(), "rowForEntityNodes requires a non-empty node list");
 
-    return std::accumulate(std::next(nodes.begin()), nodes.end(), PropertyRow{key, nodes.front()}, [](PropertyRow &lhs, const Model::EntityNodeBase *rhs) {
-        lhs.merge(rhs);
-        return lhs;
-    });
+    PropertyRow initial{key, nodes.front()};
+
+    return std::accumulate(
+        std::next(nodes.begin()), nodes.end(),
+        initial,
+        [](PropertyRow lhs, const Model::EntityNodeBase *rhs) {
+            lhs.merge(rhs);
+            return lhs;
+        });
 }
 
 std::vector<std::string> PropertyRow::allKeys(const std::vector<Model::EntityNodeBase *> &nodes, const bool showDefaultRows, const bool showProtectedProperties) {
@@ -368,7 +386,8 @@ void EntityPropertyModel::setRows(const std::map<std::string, PropertyRow> &newR
         const auto &oldDeletion = oldRowMap.at(diff.removed[0]);
         const auto &newAddition = newRowMap.at(diff.added[0]);
 
-        MODEL_LOG(qDebug() << "EntityPropertyModel::setRows: one row changed: " << mapStringToUnicode(document->encoding(), oldDeletion.key()) << " -> " << mapStringToUnicode(document->encoding(), newAddition.key()));
+        MODEL_LOG(qDebug() << "EntityPropertyModel::setRows: one row changed: " << mapStringToUnicode(document->encoding(), oldDeletion.key()) << " -> "
+                           << mapStringToUnicode(document->encoding(), newAddition.key()));
 
         const auto oldIndex = kdl::vec_index_of(m_rows, oldDeletion);
         ensure(oldIndex, "deleted row must be found");
@@ -619,8 +638,11 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
 
     if (role == Qt::ForegroundRole) {
         if (row.isDefault() || row.subset()) {
-            return QVariant(QBrush(Colors::defaultText()));
+            return QVariant(
+                QBrush(row.keyMutable() ? Colors::defaultText() : Colors::defaultText())
+            );
         }
+
         if (index.column() == ColumnValue) {
             if (row.multi()) {
                 return QVariant(QBrush(Colors::highlight()));
@@ -628,6 +650,7 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
 
             return QVariant(QBrush(Colors::defaultText()));
         }
+
 
         return QVariant(QBrush(Colors::highlightText()));
     }
@@ -638,6 +661,13 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
             font.setItalic(false);
             return QVariant(font);
         }
+
+        if (!row.keyMutable()) {
+            auto font = QFont{};
+            font.setItalic(true);
+            return QVariant(font);
+        }
+
         if (index.column() == ColumnValue) {
             if (row.multi()) {
                 auto font = QFont{};
@@ -646,13 +676,33 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
             }
 
             auto font = QFont{};
-            font.setPointSize(QFont{}.pointSize());
+            font.setPixelSize(uiFontPixelSize());
             return QVariant(font);
         }
 
         auto font = QFont{};
         font.setBold(true);
         return QVariant(font);
+    }
+
+    if (index.column() == ColumnValue && (role == Qt::DisplayRole || role == SingleLineRole)
+        && document->game() && document->game()->wadProperty() == row.key()) {
+        if (role == SingleLineRole) return true;
+        if (!row.multi()) {
+            const auto paths = mapStringToUnicode(document->encoding(), row.value()).split(';', Qt::SkipEmptyParts);
+            QStringList names;
+            const auto visibleCount = std::min(2, paths.size());
+            for (int i = 0; i < visibleCount; ++i) {
+                auto path = paths[i];
+                path.replace('\\', '/');
+                auto name = path.section('/', -1);
+                if (name.size() > 28) name = name.left(16) + QStringLiteral("…") + name.right(11);
+                names.push_back(name);
+            }
+            auto preview = names.join(", ");
+            if (paths.size() > visibleCount) preview += tr(" (+%1 more)").arg(paths.size() - visibleCount);
+            return preview;
+        }
     }
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {

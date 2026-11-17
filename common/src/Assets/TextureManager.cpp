@@ -22,7 +22,6 @@
 #include "Assets/Texture.h"
 #include "Assets/TextureCollection.h"
 #include "Error.h"
-#include "Exceptions.h"
 #include "IO/LoadTextureCollection.h"
 #include "Logger.h"
 
@@ -32,7 +31,6 @@
 #include "kdl/vector_utils.h"
 
 #include <algorithm>
-#include <chrono>
 #include <iterator>
 #include <string>
 #include <vector>
@@ -40,7 +38,8 @@
 namespace TrenchBroom {
 namespace Assets {
 
-TextureManager::TextureManager(int magFilter, int minFilter, Logger &logger) : m_logger{logger}, m_minFilter{minFilter}, m_magFilter{magFilter} {
+TextureManager::TextureManager(int magFilter, int minFilter, Logger &logger) : m_logger{logger}, m_minFilter{
+    minFilter}, m_magFilter{magFilter} {
 }
 
 TextureManager::~TextureManager() = default;
@@ -77,9 +76,6 @@ void TextureManager::setTextureCollections(const std::vector<std::filesystem::pa
                 }
                 return Assets::TextureCollection{path};
             }).transform([&](auto collection) {
-                if (!collection.textures().empty()) {
-                    m_logger.info() << "Loaded texture collection: " << path << ".";
-                }
                 addTextureCollection(std::move(collection));
             });
         } else {
@@ -103,7 +99,26 @@ void TextureManager::addTextureCollection(Assets::TextureCollection collection) 
         m_toPrepare.push_back(index);
     }
 
-    m_logger.debug() << "Added texture collection " << m_collections[index].path();
+    auto size = m_collections[index].textureCount();
+    auto path = m_collections[index].path();
+
+    if (size == 0) {
+        m_logger.info() << "Got no textures in collection #" << index << " " << path;
+    }
+
+    if (size == 1) {
+        m_logger.info() << "Got 1 texture in collection #" << index << " " << path;
+
+    }
+
+    if (size > 1) {
+        m_logger.info() << "Got " << size << " textures in collection #" << index << " " << path;
+
+    }
+
+    if (!collection.loaded()) {
+        m_logger.warn() << "Collection not loaded: " << m_collections[index].path();
+    }
 }
 
 void TextureManager::clear() {
@@ -124,7 +139,11 @@ void TextureManager::setTextureMode(const int minFilter, const int magFilter) {
 
 void TextureManager::commitChanges() {
     resetTextureMode();
-    prepare();
+
+    if (m_toPrepare.size() > 0) {
+        prepare();
+    }
+
     m_toRemove.clear();
 }
 

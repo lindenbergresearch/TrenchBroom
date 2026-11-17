@@ -64,6 +64,12 @@ class PreferenceDialog : public QDialog {
     bool eventFilter(QObject *o, QEvent *e) override;
 
   private:
+
+  protected:
+    void paintEvent(QPaintEvent *event) override;
+
+  private:
+
     void createGui();
 
     void switchToPane(PrefPane pane);

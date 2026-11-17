@@ -58,14 +58,42 @@ struct LogLevelAttr {
  */
 // @formatter:off
 static std::map<LogLevel, LogLevelAttr> levelAttributes = {
-    {LogLevel::None,    {"NONE",  "\033[0;90m"}},
-    {LogLevel::Trace,   {"TRACE", "\033[0;35m"}},
-    {LogLevel::Debug,   {"DEBUG", "\033[0;36m"}},
-    {LogLevel::Info,    {" INFO", "\033[0;97m"}},
-    {LogLevel::Warn,    {" WARN", "\033[0;33m"}},
-    {LogLevel::Error,   {"ERROR", "\033[0;31m"}},
+    {LogLevel::None  , {"NONE " , "\033[0;90m"}},
+    {LogLevel::Trace , {"TRACE" , "\033[0;35m"}},
+    {LogLevel::Debug , {"DEBUG" , "\033[0;36m"}},
+    {LogLevel::Info  , {"INFO " , "\033[0;97m"}},
+    {LogLevel::Warn  , {"WARN " , "\033[0;33m"}},
+    {LogLevel::Error , {"ERROR" , "\033[0;31m"}},
 };
 // @formatter:on
+
+typedef std::chrono::high_resolution_clock::time_point TimePoint;
+typedef std::chrono::high_resolution_clock Clock;
+
+struct TimeStamp {
+   long delta;
+   TimePoint time;
+
+   TimeStamp() : delta(Chrono::nanoTime()), time(Clock::now()) {};
+
+
+   QString deltaFmt() {
+       long milliseconds = std::lround(double(delta) * 10e-6);
+       long seconds = milliseconds / 1000;
+       long minutes = seconds / 60;
+       long hours = minutes / 60;
+
+       QString formattedTime = QString("%1h:%2m:%3s:%4ms")
+           .arg(hours)
+           .arg(minutes % 60)
+           .arg(seconds % 60)
+           .arg(milliseconds % 1000);
+
+       return formattedTime;
+   }
+
+};
+
 
 /**
  * A LogMessage struct.
@@ -96,6 +124,7 @@ class LogMessageCache {
     static void clear();
     static size_t size();
     static size_t currentID();
+    static QString dump();
 
   private:
     static std::vector<LogMessage *> cache;

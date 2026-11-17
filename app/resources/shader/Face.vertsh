@@ -30,12 +30,13 @@ varying vec3 viewVector;
 void main(void) {
     gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
     gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_TexCoord[1] = gl_MultiTexCoord1;
     modelCoordinates = gl_Vertex;
     modelNormal = gl_Normal;
     faceColor = Color;
     viewVector = CameraPosition - gl_Vertex.xyz;
 
-    vec3 N = normalize(modelNormal.xyz);
-    vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
+//    vec3 N = normalize(modelNormal.xyz);
+//    vec3 V = normalize(CameraPosition - modelCoordinates.xyz);
 
 }

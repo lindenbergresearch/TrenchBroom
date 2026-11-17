@@ -45,7 +45,7 @@ void TrenchBroom::ensureFailed(const char *file, const int line, const char *con
     reason << file << ":" << line << ": Condition '" << condition << "' failed: " << message;
 
     const std::string stacktrace = TrenchBroomStackWalker::getStackTrace();
-    TrenchBroom::View::reportCrashAndExit(stacktrace, reason.str());
+    TrenchBroom::View::reportCrashAndExit(stacktrace, View::SignalType(0xEE, "SIGENSURE", reason.str()));
 }
 
 #endif

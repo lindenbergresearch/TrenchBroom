@@ -21,44 +21,23 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QVariant>
 
-#include "View/BorderLine.h"
-#include "View/ControlListBox.h"
-#include "View/QtUtils.h"
-#include "View/ViewConstants.h"
+namespace TrenchBroom::View {
+TitleBar::TitleBar(const QString& title, QWidget* parent, const bool boldTitle, const bool subtitle)
+    : TBWidget(parent) {
+    setObjectName(subtitle ? "SubTitleBar" : "TitleBar");
 
-namespace TrenchBroom {
-namespace View {
-TitleBar::TitleBar(const QString &title, QWidget *parent, const bool boldTitle, bool subtitle) : QWidget(parent), m_titleText(nullptr) {
+    auto* label = new QLabel(title);
+    label->setObjectName("TitleBar_m_titleText");
+    label->setProperty("emphasized", !boldTitle);
 
-    setObjectName("TitleBar");
-    m_titleText = new QLabel(title);
-    m_titleText->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    m_titleText->setObjectName("TitleBar_m_titleText");
-
-    if (!subtitle) {
-        setAutoFillBackground(true);
-        setBackgroundRole(QPalette::Midlight);
-        setForegroundRole(QPalette::Text);
-    }
-    // Tell ControlListBox to not update the title label's color when the selection changes,
-    // in case this widget is used inside of a ControlListBox.
-    m_titleText->setProperty(ControlListBox::LabelColorShouldNotUpdateWhenSelected, true);
-
-    if (boldTitle) {
-        makePanelTitle(m_titleText, false, subtitle);
-    } else {
-        makePanelTitle(m_titleText, true, subtitle);
-    }
-
-    auto *layout = new QHBoxLayout();
+    auto* layout = new QHBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_titleText, 1);
+    layout->setSpacing(0);
+    layout->addWidget(label, 1);
     setLayout(layout);
-    setMinimumHeight(22);
 }
 
-TitleBar::TitleBar(const QString &title, const bool boldTitle, bool subtitle) : TitleBar(title, nullptr, boldTitle, subtitle) {
+TitleBar::TitleBar(const QString& title, const bool boldTitle, const bool subtitle) : TitleBar(title, nullptr, boldTitle, subtitle) {}
 }
-} // namespace View
-} // namespace TrenchBroom

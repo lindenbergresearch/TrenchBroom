@@ -32,7 +32,7 @@ std::string getTextureNameFromPathSuffix(const std::filesystem::path &path, size
     return prefixLength < kdl::path_length(path) ? kdl::path_remove_extension(kdl::path_clip(path, prefixLength)).generic_string() : "";
 }
 
-bool checkTextureDimensions(size_t width, size_t height) {
+bool checkTextureDimensions(const size_t width, const size_t height) {
     return width > 0 && height > 0 && width <= 8192 && height <= 8192;
 }
 

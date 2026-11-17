@@ -47,8 +47,8 @@ class CompilationContext {
 
     std::string variableValue(const std::string &variableName) const;
 
-    template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
-        m_output.pushSystemMessage(t, color);
+    template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}, const QString &suffix = "\n") {
+        m_output.pushSystemMessage(">>> " + t + suffix, color);
         return;
     }
 

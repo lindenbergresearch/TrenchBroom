@@ -21,17 +21,69 @@
 
 uniform vec4 Color;
 uniform bool UseUniformColor;
+uniform vec2 ViewportSize;
+uniform float Width;
 
 varying vec4 worldCoordinates;
 varying vec4 vertexColor;
+varying vec2 edgePosition;
+varying vec2 edgeExtent;
 
-void main(void) {
-    if (UseUniformColor) {
-        vertexColor = Color;
-    } else {
-        vertexColor = gl_Color;
+float overlayScale(vec4 clipPosition);
+
+bool clipDepthPlane(inout vec4 a, inout vec4 b, inout vec3 wa, inout vec3 wb, float side) {
+    float da = a.w + side * a.z;
+    float db = b.w + side * b.z;
+    if (da < 0.0 && db < 0.0)
+        return false;
+    if (da < 0.0) {
+        float t = da / (da - db);
+        a = mix(a, b, t);
+        wa = mix(wa, wb, t);
+    } else if (db < 0.0) {
+        float t = da / (da - db);
+        b = mix(a, b, t);
+        wb = mix(wa, wb, t);
     }
-    gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
-    // Brushes are assumed to be in world space already (Face.vertsh also assumes this)
-    worldCoordinates = gl_Vertex;
+    return true;
+}
+
+void main() {
+    vertexColor = UseUniformColor ? Color : gl_Color;
+    worldCoordinates = vec4(0.0, 0.0, 0.0, 1.0);
+    edgePosition = vec2(0.0);
+    edgeExtent = vec2(0.0);
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+
+    vec3 worldStart = gl_Vertex.xyz;
+    vec3 worldEnd = gl_Normal;
+    vec4 a = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(worldStart, 1.0);
+    vec4 b = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(worldEnd, 1.0);
+    if (!clipDepthPlane(a, b, worldStart, worldEnd, 1.0) ||
+        !clipDepthPlane(a, b, worldStart, worldEnd, -1.0))
+        return;
+    if (a.w <= 0.0 || b.w <= 0.0)
+        return;
+
+    vec3 start = a.xyz / a.w;
+    vec3 end = b.xyz / b.w;
+    vec2 delta = (end.xy - start.xy) * ViewportSize * 0.5;
+    float edgeLength = length(delta);
+    if (edgeLength < 0.001)
+        return;
+
+    vec2 direction = delta / edgeLength;
+    vec2 normal = vec2(-direction.y, direction.x);
+    vec2 corner = gl_MultiTexCoord0.xy;
+    bool atStart = corner.x < 0.0;
+    edgeExtent = vec2(edgeLength * 0.5, Width * overlayScale(atStart ? a : b) * 0.5);
+    float cap = edgeExtent.y + 1.0;
+    edgePosition = corner * vec2(edgeExtent.x + cap, cap);
+    vec2 offset = direction * corner.x * cap + normal * edgePosition.y;
+    gl_Position = vec4(atStart ? start : end, 1.0);
+    gl_Position.xy += offset * 2.0 / ViewportSize;
+
+    // Reconstruct perspective-correct world positions for the map-bounds tint.
+    float w = atStart ? a.w : b.w;
+    worldCoordinates = vec4((atStart ? worldStart : worldEnd) / w, 1.0 / w);
 }

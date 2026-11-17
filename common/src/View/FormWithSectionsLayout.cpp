@@ -50,7 +50,6 @@ void FormWithSectionsLayout::addSection(const QString &title, const QString &inf
     titleLayout->setSpacing(NoMargin);
 
     auto titleLabel = makeTitle(new QLabel(title));
-    titleLabel->setForegroundRole(QPalette::HighlightedText);
     titleLayout->addWidget(titleLabel);
 
     if (!info.isEmpty()) {
@@ -136,7 +135,7 @@ void FormWithSectionsLayout::insertRow(const int row, const QString &labelText, 
 
 void FormWithSectionsLayout::insertRow(int row, QWidget *field, QWidget *additional) {
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(WideHMargin * 2, NoMargin, WideHMargin * 2, NoMargin);
+    layout->setContentsMargins(WideHMargin, NoMargin, WideHMargin, NoMargin);
     layout->addWidget(field);
     if (additional)
         layout->addWidget(additional);
@@ -145,7 +144,7 @@ void FormWithSectionsLayout::insertRow(int row, QWidget *field, QWidget *additio
 
 void FormWithSectionsLayout::insertRow(int row, QLayout *field, QLayout *additional) {
     auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(WideHMargin * 2, NoMargin, WideHMargin * 2, NoMargin);
+    layout->setContentsMargins(WideHMargin, NoMargin, WideHMargin, NoMargin);
     layout->addLayout(field);
     if (additional)
         layout->addLayout(additional);

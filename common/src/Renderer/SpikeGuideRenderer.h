@@ -30,52 +30,61 @@
 #include <memory>
 #include <vector>
 
-namespace TrenchBroom {
-namespace Model {
-class Picker;
-}
+namespace TrenchBroom {namespace Model {
+    class Picker;
+    }
 
-namespace View {
-// FIXME: Renderer should not depend on View
-class MapDocument;
-} // namespace View
+    namespace View {
+    // FIXME: Renderer should not depend on View
+    class MapDocument;
+    } // namespace View
 
-namespace Renderer {
-class SpikeGuideRenderer : public DirectRenderable {
-  private:
-    Color m_color;
+    namespace Renderer {
+    class SpikeGuideRenderer : public DirectRenderable {
+    private:
+        Color m_color;
 
-    using SpikeVertex = GLVertexTypes::P3C4::Vertex;
-    using PointVertex = GLVertexTypes::P3C4::Vertex;
+        // Position and normal carry the two world-space endpoints; UV selects a
+        // corner of the rectangle expanded by the guide shader.
+        using GuideVertex = GLVertexTypes::P3NT2::Vertex;
 
-    std::vector<SpikeVertex> m_spikeVertices;
-    std::vector<PointVertex> m_pointVertices;
+        std::vector<GuideVertex> m_spikeVertices;
+        std::vector<vm::vec3f> m_points;
 
-    VertexArray m_spikeArray;
-    VertexArray m_pointArray;
+        struct SurfacePoint {
+            vm::vec3f position;
+            vm::vec3f normal;
+        };
 
-    bool m_valid;
+        std::vector<SurfacePoint> m_surfacePoints;
 
-  public:
-    SpikeGuideRenderer();
+        VertexArray m_spikeArray;
+        VertexArray m_pointArray;
+        VertexArray m_surfacePointArray;
 
-    void setColor(const Color &color);
+        bool m_valid;
 
-    void add(const vm::ray3 &ray, FloatType length, std::shared_ptr<View::MapDocument> document);
+    public:
+        SpikeGuideRenderer();
 
-    void clear();
+        void setColor(const Color& color);
 
-  private:
-    void doPrepareVertices(VboManager &vboManager) override;
+        void add(const vm::ray3& ray, FloatType length, const std::shared_ptr<View::MapDocument>& document);
 
-    void doRender(RenderContext &renderContext) override;
+        void clear();
 
-  private:
-    void addPoint(const vm::vec3 &position);
+    private:
+        void doPrepareVertices(VboManager& vboManager) override;
 
-    void addSpike(const vm::ray3 &ray, FloatType length, FloatType maxLength);
+        void doRender(RenderContext& renderContext) override;
 
-    void validate();
-};
-} // namespace Renderer
+        void addPoint(const vm::vec3& position);
+
+        void addSurfacePoint(const vm::vec3& position, const vm::vec3& normal);
+
+        void addSpike(const vm::ray3& ray, FloatType length);
+
+        void validate();
+    };
+    } // namespace Renderer
 } // namespace TrenchBroom

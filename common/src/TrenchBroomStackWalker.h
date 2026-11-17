@@ -31,6 +31,6 @@ class TrenchBroomStackWalker {
     static std::string getStackTraceFromContext(void* context);
     #endif
 
-    static std::string getStackTrace();
+  static std::string getStackTrace(const std::string &prefix = "");
 };
 }

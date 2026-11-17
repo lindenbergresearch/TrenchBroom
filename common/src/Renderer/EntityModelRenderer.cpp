@@ -31,7 +31,9 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/ActiveShader.h"
+#include "Renderer/Lighting.h"
 #include "Renderer/Camera.h"
+#include "Renderer/RenderService.h"
 #include "Renderer/RenderBatch.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/ShaderManager.h"
@@ -66,6 +68,7 @@ void EntityModelRenderer::addEntity(const Model::EntityNode *entityNode) {
 
 void EntityModelRenderer::removeEntity(const Model::EntityNode *entityNode) {
     m_entities.erase(entityNode);
+    m_lightSelections.erase(entityNode);
 }
 
 void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
@@ -85,6 +88,7 @@ void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
     } else {
         if (renderer == nullptr) {
             m_entities.erase(it);
+            m_lightSelections.erase(entityNode);
         } else if (it->second != renderer) {
             it->second = renderer;
         }
@@ -93,6 +97,7 @@ void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
 
 void EntityModelRenderer::clear() {
     m_entities.clear();
+    m_lightSelections.clear();
 }
 
 bool EntityModelRenderer::applyTinting() const {
@@ -134,6 +139,7 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
     glAssert(glActiveTexture(GL_TEXTURE0));
 
     auto shader = ActiveShader{renderContext.shaderManager(), Shaders::EntityModelShader};
+    configureLightingShader(shader, renderContext);
     shader.set("Brightness", prefs.get(Preferences::Brightness));
     shader.set("ApplyTinting", m_applyTinting);
     shader.set("TintColor", m_tintColor);
@@ -153,35 +159,31 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
     shader.set("ViewMatrix", renderContext.camera().viewMatrix());
 
     for (const auto &[entityNode, renderer] : m_entities) {
-        //        const Camera &camera = renderContext.camera();
-        //
-        //        vm::vec3f modelCenter = vm::vec3f(
-        //            entityNode->physicalBounds().center().x(),
-        //            entityNode->physicalBounds().center().y(),
-        //            entityNode->physicalBounds().center().z()
-        //        );
-        //
-        //        const float distance = camera.distanceTo(modelCenter);
-        //
-        //       // printf("%s -> %.2f\n", entityNode->name().c_str(), distance);
-        //
-        //       if (distance > 512 || distance < -5) continue;
+//        auto distance = RenderService::distanceToEntity(renderContext.camera(), entityNode);
+//
+//        if (distance > 1024 || distance < -5) {
+//            continue;
+//        }
+
         if (!m_showHiddenEntities && !m_editorContext.visible(entityNode)) {
             continue;
         }
 
-        const auto *model = entityNode->entity().model();
-        if (!model) {
+        if (!entityNode->entity().model()) {
             continue;
         }
 
-        shader.set("Orientation", static_cast<int>(model->orientation()));
+        shader.set("Orientation", static_cast<int>(entityNode->entity().model()->orientation()));
 
         const auto transformation = vm::mat4x4f{entityNode->entity().modelTransformation()};
         const auto multMatrix = MultiplyModelMatrix{renderContext.transformation(), transformation};
 
         shader.set("ModelMatrix", transformation);
 
+        if (renderContext.render3D() && pref(Preferences::EnableLightning)
+            && entityNode->entity().model()->orientation() == Assets::Orientation::Oriented) {
+            configureLightingRegion(shader, renderContext, vm::bbox3f(entityNode->physicalBounds()), m_lightSelections[entityNode], true);
+        }
         renderer->render();
     }
 }

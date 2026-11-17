@@ -33,6 +33,8 @@
 #include <string>
 #include <vector>
 
+class QMenu;
+
 namespace TrenchBroom {
 namespace Assets {
 class EntityDefinition;
@@ -48,6 +50,7 @@ class MapDocument;
 class MapFrame;
 
 class MapViewBase;
+inline constexpr auto SaveSelectionAsPrefabActionPath = "Menu/Edit/Save Selection as Prefab";
 
 class ActionExecutionContext {
   private:
@@ -151,6 +154,8 @@ template<class ExecuteFn, class EnabledFn, class CheckedFn> class LambdaAction :
 };
 
 class Menu;
+
+QAction* addContextMenuAction(QMenu& menu, const Action& action, const std::function<void()>& execute, bool enabled = true);
 
 class MenuSeparatorItem;
 

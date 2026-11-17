@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Result.h"
+#include "Assets/Texture.h"
 
 #include <filesystem>
 #include <vector>
@@ -42,4 +43,8 @@ class FileSystem;
 Result<std::vector<std::filesystem::path>> findTextureCollections(const FileSystem& gameFS, const Model::TextureConfig& textureConfig);
 
 Result<Assets::TextureCollection> loadTextureCollection(const std::filesystem::path& path, const FileSystem& gameFS, const Model::TextureConfig& textureConfig, Logger& logger);
+
+// Decode a single resource without uploading it to OpenGL. Uses the same game
+// palette and format handling as texture collections, including WAD entries.
+Result<Assets::Texture> loadTexture(const std::filesystem::path& path, const FileSystem& gameFS, const Model::TextureConfig& textureConfig);
 } // namespace TrenchBroom::IO

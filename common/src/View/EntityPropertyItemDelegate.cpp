@@ -25,6 +25,7 @@
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
 #include <QTimer>
+#include <QStyleOptionViewItem>
 
 #include "View/EntityPropertyModel.h"
 #include "View/EntityPropertyTable.h"
@@ -36,6 +37,14 @@ namespace TrenchBroom {
 namespace View {
 EntityPropertyItemDelegate::EntityPropertyItemDelegate(EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent)
     : QStyledItemDelegate(parent), m_table(table), m_model(model), m_proxyModel(proxyModel) {
+}
+
+void EntityPropertyItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
+    QStyledItemDelegate::initStyleOption(option, index);
+    if (index.data(EntityPropertyModel::SingleLineRole).toBool()) {
+        option->features.setFlag(QStyleOptionViewItem::WrapText, false);
+        option->textElideMode = Qt::ElideRight;
+    }
 }
 
 QWidget *EntityPropertyItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {

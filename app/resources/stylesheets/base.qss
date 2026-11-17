@@ -1,57 +1,158 @@
 /**
- * Trenchbroom Qt Dynamic Stylesheet
- * Modified Fusion Theme
+ * TrenchBroom UI stylesheet. Process with QSSBuilder before applying.
+ *
+ * Sections: Typography; Window and status bar; Lists/layer tree; Inspector
+ * headers; Prefab browser; Inputs; Toolbars; Popups; Trees/tabs; Buttons;
+ * View Settings and specialized widgets.
+ *
+ * uiTextRole/uiEmphasized/uiItalic/uiFontFamily/uiTone/uiSurface are semantic roles
+ * assigned by QtUtils. Change appearance here, including per-widget overrides.
+ * Font-size tokens respect the configured UI minimum. Rule order is preserved
+ * so more specific widget/state rules continue to override the shared defaults.
  */
 
+/* === TYPOGRAPHY === */
+*[uiStyled="true"] {
+    font-family: "#UI_FONT_FAMILY";
+    font-size: #UI_FONT_SIZE;
+    font-weight: #UI_FONT_WEIGHT;
+    font-style: #UI_FONT_STYLE;
+}
+*[uiFontFamily="console"] {
+    font-family: "#CONSOLE_FONT_FAMILY";
+    font-size: #CONSOLE_FONT_SIZE;
+    font-weight: #CONSOLE_FONT_WEIGHT;
+    font-style: #CONSOLE_FONT_STYLE;
+}
+*[uiTextRole="small"], *[uiTextRole="info"] {
+    font-size: #UI_SMALL_FONT_SIZE;
+}
+*[uiTextRole="info"] {
+    color: #UI_DETAIL_TEXT_COLOR;
+}
+*[uiTextRole="subtitle"] {
+    font-size: #UI_MID_FONT_SIZE;
+}
+*[uiTextRole="title"] {
+    font-size: #UI_TITLE_FONT_SIZE;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+*[uiTextRole="header"] {
+    font-size: #UI_HEADER_FONT_SIZE;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+*[uiTextRole="dialogTitle"] {
+    font-size: #UI_DIALOG_TITLE_FONT_SIZE;
+    font-weight: bold;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+*[uiTextRole="brand"] {
+    font-family: "Rabanera";
+    font-size: 32px;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+*[uiEmphasized="true"] {
+    font-weight: bold;
+}
+*[uiEmphasized="false"] {
+    font-weight: normal;
+}
+*[uiItalic="true"] {
+    font-style: italic;
+}
+*[uiItalic="false"] {
+    font-style: normal;
+}
+*[uiTone="normal"] {
+    color: #TEXT_COLOR;
+}
+*[uiTone="highlighted"] {
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+*[uiTone="error"] {
+    color: #UI_ERROR_COLOR;
+}
+*[uiStyled="true"]:disabled {
+    color: #DISABLED_TEXT_COLOR;
+}
+*[uiSurface="window"] {
+    background-color: #WINDOW_COLOR;
+}
+*[uiSurface="base"] {
+    background-color: #BASE_COLOR;
+}
+*[uiSurface="highlight"] {
+    background-color: #HIGHLIGHT_COLOR;
+}
+
+/* === WINDOW AND STATUS BAR === */
 QMainWindow#MapFrame {
     min-width: 1280px;
     min-height: 768px;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- STATUSBAR--------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === STATUSBAR === */
 
 QStatusBar {
-    margin-top: 2px;
-    margin-bottom: 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
     border-top: 1px solid #MIDLIGHT_COLOR;
     background: #WINDOW_COLOR;
-   /* min-height: 25px;*/
+    min-height: 26px;
     background-color: #WINDOW_COLOR;
 }
 
-QWidget#StatusBarManager {
+QWidget#StatusBar_RightLayout {
+    border-left: 2px solid #MIDLIGHT_COLOR;
+    text-align: left;
+    padding: 0px;
+    padding-left: 0px;
+    margin-right: 0px;
+}
+
+QWidget#StatusBar_LeftLayout {
+    border-right: 2px solid #MIDLIGHT_COLOR;
+    text-align: left;
+    padding-right: 0px;
+    padding: 0px;
     margin-left: 0px;
 }
 
-QWidget#StatusBar_LeftLayout,
-QWidget#StatusBar_CenterLayout,
-QWidget#StatusBar_RightLayout {
-/*    border: 1px solid yellow;*/
+QWidget#StatusBar_CenterLayout {
+    border: none;
+    text-align: center;
+    padding: 0px;
+}
+
+QWidget#StatusBarWidget {
+    border: none;
+    margin: 0px;
+    color: #TEXT_COLOR;
+    font-size: #UI_MID_FONT_SIZE;
     text-align: center;
 }
 
-
-QWidget#StatusBarWidget {
-/*   border: 1px solid cyan;*/
-   color: #TEXT_COLOR;
-   font-size: #UI_SMALL_FONT_SIZE;
-   text-align: center;
+QWidget#Inspector_LeftStack, QWidget#Inspector_RightStack {
+    margin: 0px;
+    padding: 0px;
+    border: none;
 }
 
+QWidget#Inspector_Widget, QWidget#Inspector_LeftPane {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+}
 
-/* ---------------------------------------------------------------------------------- */
-/* --- LIST/TABLE ------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === LIST/TABLE === */
 
 QHeaderView {
     background-color: #MIDLIGHT_COLOR;
     color: #HIGHLIGHTED_TEXT_COLOR;
     font-size: #UI_MID_FONT_SIZE;
-    font-style: bold;
+    font-weight: bold;
     min-height: 22px;
 }
 
@@ -68,65 +169,175 @@ QTableWidget {
     gridline-color: #MIDLIGHT_COLOR;
 }
 
+/* === LAYER TREE === */
 
-QWidget#TitleBar, QWidget#ClickableTitleBar, QWidget#CollapsibleTitleBar   {
-    background-color: #MIDLIGHT_COLOR;
-    border: 2px solid #DARK_COLOR;
-    min-height: 22px;
-    color: #HIGHLIGHTED_TEXT_COLOR;
-    font-size: UI_MID_FONT_SIZE;
-    font-style: bold;
+/* The layer tree paints the selection once across the entire row. */
+QTreeWidget#LayerTree {
+    show-decoration-selected: 0;
+    qproperty-indentation: 16;
+    qproperty-iconSize: 14px 14px;
+    qproperty-attributeColumnWidth: 24;
+    /* Disclosure chevrons; indentation controls their clickable column. */
+    qproperty-branchIndicatorSize: 10;
+    qproperty-branchIndicatorColor: #TEXT_COLOR;
+    qproperty-branchIndicatorLineWidth: 1.5;
 }
 
+QTreeWidget#LayerTree::item,
+QTreeWidget#LayerTree::item:selected,
+QTreeWidget#LayerTree::item:hover {
+    background: transparent;
+    border: none;
+}
 
-/*QWidget#ClickableTitleBar  {*/
-/*    background-color: #MIDLIGHT_COLOR;*/
-/*    border: 2px solid #DARK_COLOR;*/
-/*    min-height: 22px;*/
-/*}*/
+/* Shared layer-row style templates; no widget is created per map object.
+   nodeType: layer, group, entity, brush, patch, typeGroup.
+   States: hidden, locked, selected, currentLayer (all true/false).
+   Standard font/color/background/border rules and the following layout
+   properties apply to the whole row, across all three columns.
+   detailOpacity = -1 uses the UI detail-opacity preference; 0..1 overrides it.
+   An optional qproperty-detailColor overrides the secondary line's color. */
+QWidget#LayerTreeRow {
+    color: #TEXT_COLOR;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    qproperty-paddingLeft: 4;
+    qproperty-paddingTop: 4;
+    qproperty-paddingRight: 4;
+    qproperty-paddingBottom: 4;
+    qproperty-contentIconSize: 20;
+    qproperty-iconSpacing: 6;
+    qproperty-lineSpacing: 0;
+    qproperty-detailFontReduction: 2;
+    qproperty-detailOpacity: -1;
+    qproperty-detailColor: #TEXT_COLOR;
+    qproperty-minimumRowHeight: 0;
+    qproperty-rowInsetX: 2;
+    qproperty-rowInsetY: 1;
+}
 
+QWidget#LayerTreeRow[nodeType="layer"] {
+    qproperty-paddingTop: 6;
+    qproperty-paddingBottom: 6;
+}
+QWidget#LayerTreeRow[nodeType="entity"] {
+    qproperty-paddingTop: 5;
+    qproperty-paddingBottom: 5;
+}
+QWidget#LayerTreeRow[nodeType="brush"], QWidget#LayerTreeRow[nodeType="patch"] {
+    qproperty-paddingTop: 3;
+    qproperty-paddingBottom: 3;
+}
+QWidget#LayerTreeRow[currentLayer="true"] {
+    font-weight: bold;
+}
+QWidget#LayerTreeRow[selected="true"] {
+    font-style: italic;
+    background-color: #HIGHLIGHT_COLOR;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    qproperty-detailFontReduction: 1;
+    qproperty-detailOpacity: 1;
+    qproperty-detailColor: #HIGHLIGHTED_TEXT_COLOR;
+}
 
-/*QWidget#CollapsibleTitleBar  {*/
-/*    background-color: #MIDLIGHT_COLOR;*/
-/*    border: 2px solid #DARK_COLOR;*/
-/*    min-height: 22px;*/
-/*}*/
+/* Keep the state recognizable even in the selected row. */
+QWidget#LayerTreeRow[hidden="true"] {
+    color: #8397ad;
+    qproperty-detailColor: #8397ad;
+    font-style: italic;
+}
+QWidget#LayerTreeRow[locked="true"] {
+    color: #d4a16b;
+    qproperty-detailColor: #d4a16b;
+}
+QWidget#LayerTreeRow[hidden="true"][locked="true"] {
+    color: #ae8ba8;
+    qproperty-detailColor: #ae8ba8;
+}
+QWidget#LayerTreeRow[hidden="true"][selected="true"] {
+    color: #bfd7ee;
+    qproperty-detailColor: #bfd7ee;
+}
+QWidget#LayerTreeRow[locked="true"][selected="true"] {
+    color: #f0c393;
+    qproperty-detailColor: #f0c393;
+}
+QWidget#LayerTreeRow[hidden="true"][locked="true"][selected="true"] {
+    color: #dfbcda;
+    qproperty-detailColor: #dfbcda;
+}
 
+/* Brightness/opacity of disabled SVG and raster icons, each in the range 0..1.
+   Enabled icons retain their original colors. */
+QWidget#IconAppearance {
+    qproperty-disabledBrightness: 0.35;
+    qproperty-disabledOpacity: 1.0;
+}
+
+/* === INSPECTOR HEADERS === */
+QWidget#TitleBar {
+    background-color: #BASE_COLOR;
+    border: none;
+    color: #TEXT_COLOR;
+    min-height: 20px;
+}
 
 QWidget#SubTitleBar {
-    background-color: #DARK_COLOR;
+    background-color: #BASE_COLOR;
     color: #TEXT_COLOR;
-    min-height: 22px;
+    min-height: 20px;
+    font-size: #UI_SMALL_FONT_SIZE;
 }
 
+QLabel#TitleBar_m_titleText {
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    qproperty-alignment: AlignCenter;
+}
 
-QLabel#CollapsibleTitleBar_m_stateText {
-    font-size: #UI_TITLE_FONT_SIZE;
-    color: #TEXT_COLOR;
+QWidget#SubTitleBar QLabel#TitleBar_m_titleText {
+    font-size: #UI_SMALL_FONT_SIZE;
+}
+
+QLabel#TitleBar_m_titleText[emphasized="true"] {
+    font-weight: bold;
+}
+
+/* Inspector headers share a height. Tab padding and the underline are included
+ * in the tab height below. */
+QWidget#InspectorToolTitle,
+QWidget#InspectorWindowTitle,
+QTabBar#InspectorToolTabs {
+    background-color: #BASE_COLOR;
     border: none;
-    font-style: bold;
     margin: 0px;
-    font-weight: 700;
-    margin-left: 2px;
+    padding: 0;
+    min-height: 27px;
+    max-height: 27px;
 }
 
-QLabel:hover#CollapsibleTitleBar_m_stateText {
-    color: white;
-    font-size: #UI_TITLE_FONT_SIZE;
-    font-style: bold;
-    font-weight: 700;
+QWidget#InspectorToolTitle QLabel#TitleBar_m_titleText,
+QLabel#InspectorWindowCaption {
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    font-size: #UI_MID_FONT_SIZE;
+    font-weight: bold;
 }
 
-QLabel#CollapsibleTitleBar_m_titleText {
-    margin-left: 30px;
+QLabel#InspectorWindowCaption {
+    padding-left: 8px;
 }
 
+QWidget[inspectorDropHighlight="true"] {
+    qproperty-windowOpacity: 0.65;
+}
 
-/* ---------------------------------------------------------------------------------- */
-/* --- QWidget ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+QWidget[inspectorDropHighlight="false"] {
+    qproperty-windowOpacity: 1;
+}
 
-QWidget::item:selected:active {
+/* === LIST ROWS === */
+
+QAbstractItemView::item:selected:active {
     border-radius: #BORDER_RADIUS;
     border-style: solid;
     background-color: #HIGHLIGHT_COLOR;
@@ -134,7 +345,7 @@ QWidget::item:selected:active {
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
-QWidget::item:selected:!active {
+QAbstractItemView::item:selected:!active {
     border-radius: #BORDER_RADIUS;
     border-width: #BORDER_SIZE;
     border-style: solid;
@@ -148,36 +359,125 @@ QWidget#ImageListBoxItemRenderer_m_titleLabel {
     border: none;
 }
 
-QWidget#ImageListBoxItemRenderer_m_subtitleLabel {
-    color: #TEXT_COLOR;
+QWidget#ImageListBoxItemRenderer_m_subtitleLabel,
+QLabel#SearchListBoxItemRenderer_m_infoText {
+    color: #UI_DETAIL_TEXT_COLOR;
     font-size: #UI_SMALL_FONT_SIZE;
     border: none;
 }
 
-QWidget#LayerListBoxWidget_m_nameText {
+/* === PREFAB BROWSER === */
+
+/* Prefab browser: cards inherit the configured UI font and scale with previews. */
+QTreeWidget#PrefabTree {
+    background-color: #BASE_COLOR;
+    border: none;
+    outline: none;
+}
+
+QListWidget#PrefabTiles {
+    background-color: #BASE_COLOR;
+    border: none;
+    outline: none;
+    qproperty-spacing: 6;
+}
+
+QListWidget#PrefabTiles::item {
+    border: 1px solid transparent;
+    border-radius: #BORDER_RADIUS;
+}
+
+QListWidget#PrefabTiles::item:hover {
+    background-color: #MIDLIGHT_COLOR;
+}
+
+QListWidget#PrefabTiles::item:selected {
+    background-color: #HIGHLIGHT_COLOR;
+    border-color: #LIGHT_HIGHLIGHT_COLOR;
+}
+
+QWidget#PrefabNavigation {
+    background-color: #WINDOW_COLOR;
+    border-bottom: 1px solid #MIDLIGHT_COLOR;
+}
+
+QFrame#PrefabPreview {
+    background-color: #BASE_COLOR;
+    border: 1px solid #MIDLIGHT_COLOR;
+    border-radius: #BORDER_RADIUS;
+}
+
+QLabel#PrefabPreviewHint {
+    color: #UI_DETAIL_TEXT_COLOR;
+    font-size: #UI_SMALL_FONT_SIZE;
+    background: transparent;
+    border: none;
+}
+
+QWidget#PrefabBrightnessPanel {
+    background: transparent;
+    border: none;
+}
+QLabel#PrefabBrightnessLabel {
+    color: #TEXT_COLOR;
+    font-size: #UI_SMALL_FONT_SIZE;
+    background: transparent;
+    border: none;
+}
+
+QLabel#PrefabLocation {
+    color: #TEXT_COLOR;
+    font-size: #UI_MID_FONT_SIZE;
+    border: none;
+    background: transparent;
+}
+
+QWidget#PrefabCard {
+    background: transparent;
+    border: none;
+}
+
+QLabel#PrefabThumbnail {
+    background-color: #WINDOW_COLOR;
+    border: 1px solid #MIDLIGHT_COLOR;
+    border-radius: #BORDER_RADIUS;
+}
+
+QWidget#PrefabCard[folder="true"] QLabel#PrefabThumbnail {
+    background: transparent;
+    border: none;
+}
+
+QWidget#PrefabName {
+    color: #TEXT_COLOR;
+    font-size: #UI_FONT_SIZE;
+    font-weight: bold;
+    background: transparent;
+    border: none;
+}
+
+QWidget#PrefabDimensions, QLabel#PrefabStatus {
+    color: #UI_DETAIL_TEXT_COLOR;
+    font-size: #UI_SMALL_FONT_SIZE;
+    background: transparent;
+    border: none;
+}
+
+QWidget#PrefabCard[selected="true"] QWidget#PrefabName,
+QWidget#PrefabCard[selected="true"] QWidget#PrefabDimensions {
     color: #HIGHLIGHTED_TEXT_COLOR;
-    border: none;
 }
 
-QWidget#LayerListBoxWidget_m_infoText {
-    color: #TEXT_COLOR;
-    font-size: #UI_SMALL_FONT_SIZE;
-    border: none;
-}
-
-/* ---------------------------------------------------------------------------------- */
-/* --- SPLITTER --------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === SPLITTER === */
 
 QSplitter {
-    min-width: #MEDIUM_H_MARGIN;
-    min-height: #MEDIUM_V_MARGIN;
-    background-color: #DARK_COLOR;
+    padding: 0px;
+    margin: 0px;
+    background-color: #WINDOW_COLOR;
+    border: none;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- CHECKBOX --------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === CHECKBOX === */
 
 QCheckBox#entityDefinition_checkboxWidget {
     margin-left: 16px;
@@ -188,9 +488,7 @@ QCheckBox#entityDefinition_groupCheckboxWidget {
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- TEXT-EDIT -------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === TEXT-EDIT === */
 
 QTextEdit {
     border: none;
@@ -201,9 +499,7 @@ QTextEdit {
     margin-bottom: 2px;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- COMBO-BOX -------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === COMBO-BOX === */
 
 QComboBox {
     min-height: 16px;
@@ -214,6 +510,26 @@ QComboBox {
     border-radius: #BORDER_RADIUS;
 }
 
+QComboBox#ToolBar_GridChoice {
+    min-height: 16px;
+    max-height: 18px;
+    font-size: #UI_SMALL_FONT_SIZE;
+    min-width: 100px;
+    padding: 1px;
+    background-color: #DARK_COLOR;
+    border: 1px solid #MIDLIGHT_COLOR;
+    border-radius: #BORDER_RADIUS;
+}
+
+QComboBox#ToolBar_GridChoice::item {
+    min-width: 100px;
+    padding: 0px;
+    margin: 0px;
+    font-size: #UI_SMALL_FONT_SIZE;
+    min-height: 16px;
+    max-height: 18px;
+}
+
 QComboBox QAbstractItemView {
     padding: 0px;
     margin: 4px;
@@ -222,8 +538,16 @@ QComboBox QAbstractItemView {
     background-color: #DARK_COLOR;
 }
 
-QComboBox::item:selected:active {
+QComboBox::drop-down:active {
+    selection-background-color: #HIGHLIGHT_COLOR;
+    min-width: 14px;
+}
+
+QComboBox#ToolBar_GridChoice::item:selected:active {
     background-color:  #HIGHLIGHT_COLOR;
+    min-width: 100px;
+    min-height: 16px;
+    max-height: 18px;
 }
 
 QComboBox::drop-down {
@@ -236,7 +560,6 @@ QComboBox::drop-down {
     border-bottom-left-radius: 0px;
     border-top-right-radius: 2px;
     border-top-left-radius: 0px;
-
 }
 
 QComboBox::down-arrow {
@@ -251,63 +574,36 @@ QComboBox#TextureBrowser_smallComboBox {
     min-height: 18px;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- SPINBOX ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
-
-QAbstractSpinBox {
-    border: 1px solid #MIDLIGHT_COLOR;
-    border-radius: 2px;
-}
-
-/* ---------------------------------------------------------------------------------- */
-/* --- EDIT FIELD ------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
-
-/*QCheckBox::indicator {*/
-/*    background-color: #WINDOW_COLOR;*/
-/*    border: 1px solid #MIDLIGHT_COLOR;*/
-/*    border-radius: 2px;*/
-/*}*/
-
-/*QCheckBox::indicator:checked {*/
-/*    background-color: #HIGHLIGHT_COLOR;*/
-/*    border: 1px solid #MIDLIGHT_COLOR;*/
-/*    border-radius: 2px;*/
-/*     image: url(":down.svg");*/
-/*}*/
+/* === EDIT FIELD === */
 
 QLineEdit {
-    padding: 2px 0px 3px 2px;
-    min-height: 18px;
+    padding: 2px 0px 2px 2px;
+    min-height: 20px;
     border: 1px solid #MIDLIGHT_COLOR;
     border-radius: 4px;
 }
 
+QLineEdit:focus {
+    border: 1px solid #HIGHLIGHT_COLOR;
+}
+
+QLineEdit:disabled {
+    background-color: #DARK_COLOR;
+    color: #DISABLED_TEXT_COLOR;
+}
+
 QWidget#MapPropertiesEditor {
+    background-color: #WINDOW_COLOR;
     font-size: #UI_MID_FONT_SIZE;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- TOOLBAR ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
-
-QWidget#ToolBar_GridChoice {
-    height: #TOOLBAR_ICON_SIZE;
-}
-
-/*QMainWindow::separator {*/
-/*    background-color: #455364;*/
-/*    border: 2px solid #AA0000;*/
-/*    spacing: 0px;*/
-/*    padding: 2px;*/
-/*}*/
+/* === TOOLBAR === */
 
 QToolBar {
     border: none;
     border-bottom: 1px solid #MIDLIGHT_COLOR;
-    margin: 6px 2px 0px 2px;
-    padding: 1px;
+    margin: 6px 2px 0px 0px;
+    padding: 2px;
 }
 
 QToolBar::separator {
@@ -315,8 +611,22 @@ QToolBar::separator {
     height: #TOOLBAR_ICON_SIZE;
 }
 
+QToolBar#MapFrameToolBar::separator {
+    width: 12px;
+}
+
 QToolBar#ToolBar_PreferenceDialog {
     text-align: center;
+}
+
+QToolBar#InspectorToolToolbar {
+    background-color: #WINDOW_COLOR;
+    border-bottom: 2px solid #MIDLIGHT_COLOR;
+    margin: 0px;
+    padding-left: 6px;
+    spacing: 4px;
+    min-height: 32px;
+    qproperty-iconSize: 16px 16px;
 }
 
 QToolButton#ToolButton_PreferenceDialog {
@@ -325,39 +635,41 @@ QToolButton#ToolButton_PreferenceDialog {
     margin-bottom: 8px;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- TOOLTIP ---------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === TOOLTIP === */
 
 QToolTip {
     border: 1px solid #MIDLIGHT_COLOR;
-    padding: 2px;
+    background-color: #DARK_COLOR;
     color: #HIGHLIGHTED_TEXT_COLOR;
     font-size: #UI_SMALL_FONT_SIZE;
+    padding: 2px;
+    border-radius: #TOOLTIP_CORNER_RADIUS;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- MENU ------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === MENU === */
 
 QMenu {
     background-color: #BASE_COLOR;
-    border: none;
+    border: 2px solid #MIDLIGHT_COLOR;
     color: #BUTTON_TEXT_COLOR;
-    margin: #NARROW_MARGIN 4px #NARROW_MARGIN 4px;
+    margin: 0px;
     font-size: #UI_FONT_SIZE;
+    border-radius: #MENU_CORNER_RADIUS;
+    padding: 4px;
 }
 
 QMenu::item {
     padding: 3px #WIDE_MARGIN 3px #WIDE_MARGIN;
     margin: 0px;
     border: 1px solid transparent;
-    min-width: 100px;
-    min-height: 14px;
+    min-width: 130px;
+    min-height: 15px;
 }
 
 QMenu::item:selected {
-    font-style: bold;
+    background-color: #HIGHLIGHT_COLOR;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+    border-radius: 4px;
 }
 
 QMenu::item:disabled {
@@ -374,10 +686,7 @@ QMenu::separator {
     background: #MIDLIGHT_COLOR;
 }
 
-
-/* ---------------------------------------------------------------------------------- */
-/* --- INSPECTOR SMALL WIDGETS------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === COMPACT CONTROLS === */
 QComboBox#TextureBrowser_smallComboBox {
     padding: 3px 3px 3px 2px;
     min-width: 60px;
@@ -440,56 +749,101 @@ QPushButton#WelcomeWindow_Button_Right {
     border-bottom-left-radius: 0px;
 }
 
+/* === TREE-WIDGET === */
 
-/* ---------------------------------------------------------------------------------- */
-/* --- TAB-WIDGET ------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+QTreeView {
+    background-color: #BASE_COLOR;
+    border: none;
+    color: #TEXT_COLOR;
+    gridline-color: #MIDLIGHT_COLOR;
+    border-radius: 0px;
+}
+
+QTreeView:disabled {
+    color: #DISABLED_TEXT_COLOR;
+}
+
+QTreeView:selected {
+    background-color: #HIGHLIGHT_COLOR;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+
+QTreeView:focus {
+    border: none;
+}
+
+QTreeView::item:pressed {
+    background-color: #346792;
+}
+
+QTreeView::item:selected:active {
+    background-color: #346792;
+}
+
+QTreeView::item:selected:!active {
+    color: #DISABLED_TEXT_COLOR;
+    background-color: #BASE_COLOR;
+}
+
+/* === TAB-WIDGET === */
 QTabWidget::pane {
-    border: 1px solid #MIDLIGHT_COLOR;
+    border: none;
+    margin-top: 0px;
 }
 
 QTabWidget::tab-bar {
-    alignment: center;
+    alignment: left;
 }
 
 QTabWidget#InfoPanelTabWidget::tab-bar {
     alignment: left;
 }
 
+QTabBar {
+    margin-bottom: 0px;
+}
 
 QTabBar::tab {
     background-color: #WINDOW_COLOR;
     color: #TEXT_COLOR;
-    border: 0px solid #MIDHALF_COLOR;
-
-    border-top-left-radius: 1px;
-    border-top-right-radius: 1px;
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
-
-    min-height: 24px;
-    min-width: 80px;
-    margin-right: 1px;
-    margin-left: 1px;
-    margin-bottom: 0px;
-    margin-top: 0px;
-
+    border: none;
+    min-height: 22px;
+    min-width: 70px;
+    margin: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
     font-size: #UI_MID_FONT_SIZE;
 }
 
 QTabBar::tab:hover {
-    color: #HIGHLIGHTED_TEXT_COLOR;
-    background-color: #MIDHALF_COLOR;
-    border: 1px solid #MIDHALF_COLOR;
+    background-color: #MIDLIGHT_COLOR;
 }
 
 QTabBar::tab:selected {
-    border-top: 0px solid #LIGHT_COLOR;
-    border-left: 0px solid #LIGHT_COLOR;
-    border-right: 0px solid #LIGHT_COLOR;
     border-bottom: 2px solid #HIGHLIGHT_COLOR;
-    font-style: bold;
     background-color: #LIGHT_COLOR;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+
+QTabBar#InspectorToolTabs::tab {
+    background-color: #WINDOW_COLOR;
+    color: #TEXT_COLOR;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin: 0;
+    padding: 0 6px;
+    min-height: 24px;
+    max-height: 24px;
+    font-size: #UI_MID_FONT_SIZE;
+}
+
+QTabBar#InspectorToolTabs::tab:hover {
+    background-color: #MIDLIGHT_COLOR;
+}
+
+QTabBar#InspectorToolTabs::tab:selected {
+    background-color: #LIGHT_COLOR;
+    border-bottom-color: #HIGHLIGHT_COLOR;
     color: #HIGHLIGHTED_TEXT_COLOR;
 }
 
@@ -510,61 +864,64 @@ QTabBar#InfoPanelTabBar::tab:selected {
     border-bottom: 1px solid #HIGHLIGHT_COLOR;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- SCROLL BAR ------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === SCROLL BAR === */
 
 QScrollBar:horizontal {
     height: 10px;
     border: none;
     border-radius: 4px;
     margin-bottom: 0px;
-    background-color: transparent;
+    background-color: #BASE_COLOR;
 }
 
 QScrollBar:vertical {
-    background-color: transparent;
     width: 10px;
     margin-right: 0px;
     border: none;
     border-radius: 4px;
+    background-color: #BASE_COLOR;
+}
+
+QScrollBar::handle {
+    margin: 1px;
+    border-radius: 2px;
 }
 
 QScrollBar::handle:horizontal {
     background-color: #MIDHALF_COLOR;
     border: 2px solid #MIDHALF_COLOR;
-    border-radius: 4px;
-    min-width: 15px;
+    max-height: 10px;
+    min-width: 64px;
 }
 
 QScrollBar::handle:horizontal:hover {
-  background-color: #MIDLIGHT_COLOR;
-    border: 2px solid #MIDLIGHT_COLOR;
+    background-color: #LIGHT_COLOR;
+    border: 2px solid #LIGHT_COLOR;
 }
 
 QScrollBar::handle:horizontal:focus {
-  background-color: #MIDLIGHT_COLOR;
-    border: 2px solid #MIDLIGHT_COLOR;
+    background-color: #LIGHT_COLOR;
+    border: 2px solid #LIGHT_COLOR;
 }
 
 QScrollBar::handle:vertical {
     background-color: #MIDHALF_COLOR;
     border: 2px solid #MIDHALF_COLOR;
-    min-height: 15px;
-    border-radius: 4px;
+    min-height: 64px;
+    max-width: 10px;
     padding-left: 0px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 QScrollBar::handle:vertical:hover {
-  background-color: #MIDLIGHT_COLOR;
-    border: 2px solid #MIDLIGHT_COLOR;
+    background-color: #LIGHT_COLOR;
+    border: 2px solid #LIGHT_COLOR;
 }
 
 QScrollBar::handle:vertical:focus {
-  background-color: #MIDLIGHT_COLOR;
-    border: 2px solid #MIDLIGHT_COLOR;
+    background-color: #LIGHT_COLOR;
+    border: 2px solid #LIGHT_COLOR;
 }
 
 QScrollBar::add-line:horizontal {
@@ -599,13 +956,10 @@ QScrollBar::sub-line:vertical {
     max-height: 2px;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- TOOLBUTTON ------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* === TOOLBUTTON === */
 
 QToolButton {
     color: #TEXT_COLOR;
-/*    background-color: #MIDHALF_COLOR;*/
     border-radius: 3px;
     padding: 2px 1px 1px 2px;
     border: none;
@@ -665,17 +1019,18 @@ QToolButton::menu-button:hover {
 }
 
 QToolButton::menu-button:checked:hover {
-    border: 1px solid #MIDLIGHT_COLOR;
+    border: none;
 }
 
 QToolButton#toolButton_borderless {
     padding: 0px;
     margin: 0px;
     border: none;
+    qproperty-iconSize: 16px 16px;
 }
 
 QToolButton#toolButton_borderless:checked {
-    background-color: none;
+    background-color: transparent;
     border: none;
 }
 
@@ -683,9 +1038,86 @@ QToolButton#toolButton_borderless::menu-indicator {
     image: none;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* --- PUSHBUTTON ------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------------- */
+QToolBar#InspectorToolToolbar QToolButton,
+QWidget#InspectorWindowTitle QToolButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin: 0;
+    padding: 0;
+    min-width: 16px;
+    min-height: 16px;
+    qproperty-iconSize: 16px 16px;
+}
+
+QToolBar#InspectorToolToolbar QToolButton[layerTreeControl] {
+    padding: 0px;
+}
+
+QToolBar#InspectorToolToolbar QPushButton {
+    background-color: transparent;
+    border: 1px solid #MIDLIGHT_COLOR;
+    border-radius: 4px;
+    margin: 0;
+    padding: 3px 4px;
+    min-width: 20px;
+    min-height: 16px;
+    font-size: #UI_SMALL_FONT_SIZE;
+}
+
+QToolBar#InspectorToolToolbar {
+    border-top: none;
+}
+
+QToolBar#InspectorToolToolbar QToolButton:hover:enabled,
+QToolBar#InspectorToolToolbar QPushButton:hover:enabled,
+QWidget#InspectorWindowTitle QToolButton:hover:enabled {
+    background-color: #MIDLIGHT_COLOR;
+}
+
+QToolBar#InspectorToolToolbar QToolButton:pressed,
+QToolBar#InspectorToolToolbar QPushButton:pressed,
+QWidget#InspectorWindowTitle QToolButton:pressed {
+    background-color: #MID_COLOR;
+}
+
+QToolBar#InspectorToolToolbar QToolButton:checked,
+QToolBar#InspectorToolToolbar QPushButton:checked {
+    background-color: #MIDLIGHT_COLOR;
+    border-color: #MIDLIGHT_COLOR;
+    color: #HIGHLIGHTED_TEXT_COLOR;
+}
+
+QToolBar#InspectorToolToolbar QToolButton:disabled,
+QToolBar#InspectorToolToolbar QPushButton:disabled {
+    color: #DISABLED_TEXT_COLOR;
+}
+
+QToolBar#InspectorToolToolbar QToolButton[popupMode="1"] {
+    padding-right: 22px;
+}
+
+QToolBar#InspectorToolToolbar QToolButton[popupMode="1"]::menu-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 16px;
+    padding: 0;
+    border: none;
+    border-left: 1px solid #MID_COLOR;
+    border-radius: 0;
+}
+
+QToolBar#InspectorToolToolbar QComboBox {
+    font-size: #UI_SMALL_FONT_SIZE;
+}
+
+QToolBar#InspectorToolToolbar QCheckBox {
+    margin: 0;
+    padding: 0;
+    font-size: #UI_SMALL_FONT_SIZE;
+}
+
+/* === PUSHBUTTON === */
 
 QPushButton {
     background-color: #BUTTON_COLOR;
@@ -697,8 +1129,19 @@ QPushButton {
     min-height: #UI_FONT_SIZE;
     padding: 3px 8px 3px 8px;
     margin: 1px;
-    outline-color: #00b0ff;
-    outline: 3;
+}
+
+QPushButton#FolderSelect {
+    background-color: #BUTTON_COLOR;
+    color: #BUTTON_TEXT_COLOR;
+    border-radius: 1px;
+    border: 1px solid #LIGHT_COLOR;
+    min-width: 25px;
+    min-height: #UI_FONT_SIZE;
+    padding: 3px 8px 3px 8px;
+    margin: 1px;
+    outline-color: #MIDLIGHT_COLOR;
+    outline: 3px;
 }
 
 QPushButton:disabled {
@@ -730,3 +1173,60 @@ QPushButton:selected {
     color: #TEXT_COLOR;
 }
 
+/* === VIEW SETTINGS === */
+QWidget#ViewEditor {
+    min-width: 700px;
+    min-height: 480px;
+    max-width: 1000px;
+    max-height: 640px;
+}
+
+QTabWidget#ViewSettingsTabs::pane {
+    border: none;
+}
+
+QWidget#ViewSettingsDisplay, QWidget#ViewSettingsGeometry, QWidget#ViewSettingsObjects {
+    background: #WINDOW_COLOR;
+}
+
+QWidget#ViewSettingsEntityDefinitions {
+    min-width: 230px;
+}
+
+QPushButton#ViewSettingsReset {
+    margin: 4px 8px;
+}
+
+/* === SPECIALIZED WIDGETS === */
+QWidget#ColorSwatch {
+    min-width: 20px;
+    min-height: 15px;
+    border: 1px solid #MIDLIGHT_COLOR;
+    border-radius: 3px;
+}
+
+QWidget#CompilationTaskCard {
+    background-color: #DARK_HIGHLIGHT_COLOR;
+}
+
+QLabel#CompilationTaskTitle {
+    background-color: #MIDLIGHT_COLOR;
+    padding: #NARROW_V_MARGIN 0 #NARROW_V_MARGIN #MEDIUM_H_MARGIN;
+}
+
+QLabel#EntityDefinitionExternalPath[useBuiltin="true"] {
+    color: #DISABLED_TEXT_COLOR;
+    font-style: italic;
+}
+
+QLabel#EntityDefinitionExternalPath[useBuiltin="false"] {
+    color: #TEXT_COLOR;
+    font-style: normal;
+}
+
+QTextEdit#CrashLogView, QTextEdit#CrashStackTraceView {
+    color: #TEXT_COLOR;
+    background-color: #BASE_COLOR;
+    margin: 0;
+    padding: 0;
+}

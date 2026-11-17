@@ -37,6 +37,7 @@ class PatchNode;
 
 namespace Renderer {
 class RenderBatch;
+class SpatialLightMesh;
 
 class RenderContext;
 
@@ -50,6 +51,7 @@ class PatchRenderer : public IndexedRenderable {
     kdl::vector_set<const Model::PatchNode *> m_patchNodes;
 
     TexturedIndexArrayRenderer m_patchMeshRenderer;
+    std::shared_ptr<SpatialLightMesh> m_spatialMesh;
     DirectEdgeRenderer m_edgeRenderer;
 
     Color m_defaultColor;

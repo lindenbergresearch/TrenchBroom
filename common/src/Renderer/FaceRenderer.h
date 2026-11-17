@@ -40,18 +40,16 @@ class BrushIndexArray;
 class BrushVertexArray;
 
 class RenderBatch;
+class ActiveShader;
 
-struct PointLight {
-  vm::vec3f Intensity;
-  vm::vec3f Position;
-  float AttenuationConstant = 0.9f;
-  float AttenuationLinear = 0.75f;
-  float AttenuationQuadratic = 0.75f;
-};
+// Brush and patch passes share a program; set every common uniform for each pass.
+void configureFaceShader(ActiveShader &shader, const RenderContext &context);
 
 class FaceRenderer : public IndexedRenderable {
   private:
     struct RenderFunc;
+    struct LightingMeshCache;
+    std::shared_ptr<LightingMeshCache> m_lightingMesh;
 
     using TextureToBrushIndicesMap = const std::unordered_map<const Assets::Texture *, std::shared_ptr<BrushIndexArray>>;
 

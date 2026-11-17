@@ -1,0 +1,87 @@
+#version 120
+
+uniform vec2 ViewportSize;
+uniform float Width;
+// 0: guide, 1: selection corner, 2: cross on a hit face.
+uniform int MarkerMode;
+
+varying vec2 guidePosition;
+varying vec2 guideExtent;
+
+float overlayScale(vec4 clipPosition);
+float overlayPixelsPerWorldUnit(vec4 clipPosition);
+
+// Clip before dividing by w, including guides that cross the camera plane.
+bool clipDepthPlane(inout vec4 start, inout vec4 end, float side) {
+    float a = start.w + side * start.z;
+    float b = end.w + side * end.z;
+
+    if (a < 0.0 && b < 0.0)
+        return false;
+
+    if (a < 0.0)
+        start = mix(start, end, a / (a - b));
+
+    else if (b < 0.0)
+        end = mix(start, end, a / (a - b));
+
+    return true;
+}
+
+void main() {
+    vec2 corner = gl_MultiTexCoord0.xy;
+    vec4 start = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;
+    guidePosition = vec2(0.0);
+    guideExtent = vec2(0.0);
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+
+    if (MarkerMode != 0) {
+        if (start.w <= 0.0 || abs(start.z) > start.w)
+            return;
+
+        guideExtent = vec2(Width * overlayScale(start) * 0.5);
+        guidePosition = corner * (guideExtent + vec2(1.0));
+        if (MarkerMode == 2) {
+            // A stable world-space basis keeps the X painted onto the surface,
+            // including sloped faces. It never rotates to face the camera.
+            vec3 normal = normalize(gl_Normal);
+            vec3 reference = abs(normal.z) < 0.9 ? vec3(0.0, 0.0, 1.0) : vec3(0.0, 1.0, 0.0);
+            vec3 tangent = normalize(cross(reference, normal));
+            vec3 bitangent = cross(normal, tangent);
+            vec3 offset = (tangent * guidePosition.x + bitangent * guidePosition.y) /
+                max(overlayPixelsPerWorldUnit(start), 0.00001);
+            gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(gl_Vertex.xyz + offset, 1.0);
+        } else {
+            gl_Position = vec4(start.xyz / start.w, 1.0);
+            gl_Position.xy += guidePosition * 2.0 / ViewportSize;
+        }
+
+        return;
+    }
+
+    // The second endpoint is stored in the normal attribute (untransformed).
+    vec4 end = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(gl_Normal, 1.0);
+    if (!clipDepthPlane(start, end, 1.0) || !clipDepthPlane(start, end, -1.0))
+        return;
+
+    if (start.w <= 0.0 || end.w <= 0.0)
+        return;
+
+    vec3 a = start.xyz / start.w;
+    vec3 b = end.xyz / end.w;
+    vec2 delta = (b.xy - a.xy) * ViewportSize * 0.5;
+    float guideLength = length(delta);
+    if (guideLength < 0.001)
+        return;
+
+    vec2 direction = delta / guideLength;
+    vec2 normal = vec2(-direction.y, direction.x);
+    guideExtent = vec2(guideLength * 0.5, Width * overlayScale(corner.x < 0.0 ? start : end) * 0.5);
+    guidePosition = corner * (guideExtent + vec2(1.0));
+    vec2 offset = direction * corner.x + normal * guidePosition.y;
+    vec3 endpoint = corner.x < 0.0 ? a : b;
+
+    // w=1 makes pixel distances interpolate linearly, also in perspective views.
+    gl_Position = vec4(endpoint, 1.0);
+    gl_Position.xy += offset * 2.0 / ViewportSize;
+}
