@@ -1,115 +1,70 @@
-AccessModifierOffset: -2
+---
+Language: Cpp
+BasedOnStyle: LLVM
+AccessModifierOffset: -4
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: Right
 AlignOperands: true
-AlignTrailingComments: true
-AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Inline
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakAfterReturnType: None
+AlignTrailingComments: false
+AllowShortBlocksOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AlwaysBreakAfterDefinitionReturnType: false
 AlwaysBreakBeforeMultilineStrings: true
-AlwaysBreakTemplateDeclarations: true
-BinPackArguments: false
-BinPackParameters: false
-BraceWrapping:
-  AfterClass: true
-  AfterControlStatement: true
-  AfterEnum: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterObjCDeclaration: true
-  AfterStruct: true
-  AfterUnion: true
+AlwaysBreakTemplateDeclarations: Yes
+BraceWrapping: 
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
   BeforeCatch: true
   BeforeElse: true
-  IndentBraces: false
-  SplitEmptyFunction: true
-  SplitEmptyNamespace: true
-  SplitEmptyRecord: true
+  BeforeLambdaBody: false
+  BeforeWhile: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Custom
 BreakBeforeInheritanceComma: false
-BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
-BreakStringLiterals: true
-ColumnLimit: 90
-CompactNamespaces: false
+ColumnLimit: 190
+CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 2
-ContinuationIndentWidth: 2
-Cpp11BracedListStyle: true
-DerivePointerAlignment: false
-FixNamespaceComments: true
-IndentCaseLabels: false
-IndentWidth: 2
-IndentWrappedFunctionNames: false
-KeepEmptyLinesAtTheStartOfBlocks: true
+IncludeCategories: 
+  - Regex: '^<.*'
+    Priority: 1
+  - Regex: '^".*'
+    Priority: 2
+  - Regex: '.*'
+    Priority: 3
+IncludeIsMainRegex: '([-_](test|unittest))?$'
+IndentCaseLabels: true
+IndentWidth: 4
+InsertNewlineAtEOF: true
+MacroBlockBegin: ''
+MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 2
-NamespaceIndentation: None
+NamespaceIndentation: Inner
 PenaltyBreakBeforeFirstCallParameter: 0
 PenaltyReturnTypeOnItsOwnLine: 1000
 PointerAlignment: Left
-ReflowComments: true
 SortIncludes: true
 SortUsingDeclarations: true
-SpaceAfterCStyleCast: false
-SpaceAfterTemplateKeyword: true
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements
+SpaceAfterTemplateKeyword: false
+SpaceBeforeRangeBasedForLoopColon: false
 SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
+SpacesInConditionalStatement: false
 SpacesInCStyleCastParentheses: false
-SpacesInContainerLiterals: true
 SpacesInParentheses: false
-SpacesInSquareBrackets: false
 Standard: Cpp11
-UseTab: Never
-
-# We must include Qt headers first because of this issue:
-# https://bugreports.qt.io/browse/QTBUG-73263
-# The following configuration groups includes like so:
-# - main include file
-# - Qt includes
-# - TB includes
-# - kdl lib
-# - vm lib
-# - std lib
-# - anything else
-# - catch2
-IncludeBlocks: Regroup
-IncludeCategories:
-  - Regex:           '^<GL/glew\.h>$'
-    Priority:        1
-    CaseSensitive:   true
-  - Regex:           '^<Q.*'
-    Priority:        2
-    CaseSensitive:   true
-  - Regex:           '^<kdl/.*'
-    Priority:        4
-  - Regex:           '^"kdl/.*'
-    Priority:        4
-  - Regex:           '^<vm/.*'
-    Priority:        5
-  - Regex:           '^"vm/.*'
-    Priority:        5
-  - Regex:           '^"CatchUtils/.*'
-    Priority:        10
-  - Regex:           '^<catch2/.*'
-    Priority:        11
-  - Regex:           '^"Catch2.h"'
-    Priority:        11
-  - Regex:           '^".*'
-    Priority:        3
-  - Regex:           '^<.+/.*'
-    Priority:        7
-  - Regex:           '^<.*'
-    Priority:        8
-  - Regex:           '^.*'
-    Priority:        9
+TabWidth: 4
+...
