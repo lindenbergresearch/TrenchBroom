@@ -24,8 +24,10 @@
 #include "IO/File.h"
 
 #include "kdl/result.h"
+#include "kdl/path_utils.h"
 
 #include <memory>
+#include <cstdio>
 #include <string>
 
 namespace TrenchBroom::IO {
@@ -58,7 +60,13 @@ ZipFileSystem::~ZipFileSystem() {
 }
 
 Result<void> ZipFileSystem::doReadDirectory() {
+    const auto loadFileGuard = std::lock_guard{m_mutex};
+    // reload() must release the previous miniz state before initializing it again.
+    mz_zip_reader_end(&m_archive);
     mz_zip_zero_struct(&m_archive);
+    if (std::fseek(m_file->file(), 0, SEEK_SET) != 0) {
+        return Error{"Could not rewind zip archive"};
+    }
 
     if (mz_zip_reader_init_cfile(&m_archive, m_file->file(), m_file->size(), 0) != MZ_TRUE) {
         return Error{"Error calling mz_zip_reader_init_cfile"};
@@ -67,9 +75,10 @@ Result<void> ZipFileSystem::doReadDirectory() {
     const auto numFiles = mz_zip_reader_get_num_files(&m_archive);
     for (mz_uint i = 0; i < numFiles; ++i) {
         if (!mz_zip_reader_is_file_a_directory(&m_archive, i)) {
-            const auto path = std::filesystem::path{filename(m_archive, i)};
+            const auto path = kdl::parse_utf8_or_latin1_path(filename(m_archive, i));
+            if (path.empty()) continue;
             addFile(path, [=]() -> Result<std::shared_ptr<File>> {
-                auto loadFileGoard = std::lock_guard{m_mutex};
+                auto fileLock = std::lock_guard{m_mutex};
 
                 auto stat = mz_zip_archive_file_stat{};
                 if (!mz_zip_reader_file_stat(&m_archive, i, &stat)) {

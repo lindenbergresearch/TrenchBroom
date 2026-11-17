@@ -18,6 +18,7 @@
  */
 
 #include "DkPakFileSystem.h"
+#include "kdl/path_utils.h"
 
 #include "Error.h"
 #include "IO/DiskFileSystem.h"
@@ -112,7 +113,7 @@ Result<void> DkPakFileSystem::doReadDirectory() {
             const auto compressed = reader.readBool<int32_t>();
             const auto entrySize = compressed ? compressedSize : uncompressedSize;
 
-            const auto entryPath = std::filesystem::path(kdl::str_to_lower(entryName));
+            const auto entryPath = kdl::path_to_lower(kdl::parse_utf8_or_latin1_path(entryName));
             auto entryFile = std::make_shared<FileView>(m_file, entryAddress, entrySize);
 
             if (compressed) {

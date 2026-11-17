@@ -31,7 +31,7 @@ class CFile;
 
 class ZipFileSystem : public ImageFileSystem<CFile> {
   private:
-    mz_zip_archive m_archive;
+    mz_zip_archive m_archive{};
     std::mutex m_mutex;
 
   public:

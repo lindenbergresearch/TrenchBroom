@@ -18,6 +18,7 @@
  */
 
 #include "WadFileSystem.h"
+#include "kdl/path_utils.h"
 
 #include "Error.h"
 #include "IO/File.h"
@@ -102,7 +103,7 @@ Result<void> WadFileSystem::doReadDirectory() {
                 continue;
             }
 
-            const auto path = std::filesystem::path{entryName + "." + entryType};
+            const auto path = kdl::parse_utf8_or_latin1_path(entryName + "." + entryType);
             auto file = std::static_pointer_cast<File>(std::make_shared<FileView>(m_file, entryAddress, entrySize));
             addFile(path, [nfile = std::move(file)]() -> Result<std::shared_ptr<File>> {
                 return nfile;

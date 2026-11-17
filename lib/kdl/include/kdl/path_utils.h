@@ -25,9 +25,32 @@
 #include <algorithm>
 #include <filesystem>
 #include <numeric>
+#include <system_error>
 
 namespace kdl
 {
+/** Parse archive names as UTF-8, falling back to Latin-1 on Windows. POSIX
+ * paths retain their original bytes, including names from legacy archives. */
+inline std::filesystem::path parse_utf8_or_latin1_path(const std::string& str)
+{
+#ifdef _WIN32
+  try
+  {
+    return std::filesystem::path{std::u8string{str.begin(), str.end()}};
+  }
+  catch (const std::system_error&)
+  {
+    auto wide = std::wstring(str.size(), L'\0');
+    std::transform(str.begin(), str.end(), wide.begin(), [](const unsigned char c) {
+      return static_cast<wchar_t>(c);
+    });
+    return std::filesystem::path{std::move(wide)};
+  }
+#else
+  return std::filesystem::path{str};
+#endif
+}
+
 inline size_t path_length(const std::filesystem::path& path)
 {
   return size_t(std::distance(path.begin(), path.end()));
@@ -48,10 +71,12 @@ inline std::filesystem::path path_front(const std::filesystem::path& path)
 
 inline std::filesystem::path path_to_lower(const std::filesystem::path& path)
 {
-    const auto s = path.u8string(); // std::u8string
-    std::string converted(s.begin(), s.end()); // u8char -> char
-
-    return std::filesystem::path{str_to_lower(converted)};
+    // Fold only ASCII. Converting through string()/the current code page can
+    // throw on Windows or corrupt UTF-8 and legacy archive names.
+    auto native = path.native();
+    for (auto& c : native)
+        if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+    return std::filesystem::path{std::move(native)};
 }
 
 inline std::filesystem::path path_clip(
