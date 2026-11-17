@@ -66,6 +66,14 @@ const std::string &EntityDefinition::description() const {
     return m_description;
 }
 
+const std::optional<EntityDefinitionSource>& EntityDefinition::source() const {
+    return m_source;
+}
+
+void EntityDefinition::setSource(std::optional<EntityDefinitionSource> source) {
+    m_source = std::move(source);
+}
+
 size_t EntityDefinition::usageCount() const {
     return static_cast<size_t>(m_usageCount);
 }

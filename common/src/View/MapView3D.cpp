@@ -294,6 +294,12 @@ void MapView3D::focusCameraOnObjects(const std::vector<Model::Node*>& nodes, con
     }
 }
 
+static const vm::bbox3& entityCameraFocusBounds(const Model::EntityNode& entity) {
+    // Models can extend well beyond the FGD editing box. Framing just that box
+    // can place the camera inside the model, making it appear to be missing.
+    return pref(Preferences::ShowPointEntityModels) ? entity.physicalBounds() : entity.logicalBounds();
+}
+
 static vm::vec3f computeCameraTargetPosition(const std::vector<Model::Node *> &nodes) {
     auto center = vm::vec3f();
     size_t count = 0u;
@@ -305,7 +311,7 @@ static vm::vec3f computeCameraTargetPosition(const std::vector<Model::Node *> &n
 
     Model::Node::visitAll(nodes, kdl::overload([](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); }, [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); }, [](auto &&thisLambda, Model::GroupNode *group) { group->visitChildren(thisLambda); }, [&](auto &&thisLambda, Model::EntityNode *entity) {
         if (!entity->hasChildren()) {
-            entity->logicalBounds().for_each_vertex(handlePoint);
+            entityCameraFocusBounds(*entity).for_each_vertex(handlePoint);
         } else {
             entity->visitChildren(thisLambda);
         }
@@ -339,7 +345,7 @@ static float computeCameraOffset(const Renderer::Camera &camera, const std::vect
     Model::Node::visitAll(nodes, kdl::overload([](auto &&thisLambda, Model::WorldNode *world) { world->visitChildren(thisLambda); }, [](auto &&thisLambda, Model::LayerNode *layer) { layer->visitChildren(thisLambda); }, [](auto &&thisLambda, Model::GroupNode *group) { group->visitChildren(thisLambda); }, [&](auto &&thisLambda, Model::EntityNode *entity) {
         if (!entity->hasChildren()) {
             for (size_t i = 0u; i < 4u; ++i) {
-                entity->logicalBounds().for_each_vertex([&](const auto &point) { handlePoint(point, frustumPlanes[i]); });
+                entityCameraFocusBounds(*entity).for_each_vertex([&](const auto &point) { handlePoint(point, frustumPlanes[i]); });
             }
         } else {
             entity->visitChildren(thisLambda);

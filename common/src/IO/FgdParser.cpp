@@ -212,14 +212,23 @@ std::optional<EntityDefinitionClassInfo> FgdParser::parseClassInfo(ParserStatus 
     const auto token = expect(status, FgdToken::Word, m_tokenizer.nextToken());
 
     const auto classname = token.data();
+    auto classInfo = std::optional<EntityDefinitionClassInfo>{};
     if (kdl::ci::str_is_equal(classname, "@SolidClass")) {
-        return parseSolidClassInfo(status);
+        classInfo = parseSolidClassInfo(status);
+    } else if (kdl::ci::str_is_equal(classname, "@PointClass")) {
+        classInfo = parsePointClassInfo(status);
+    } else if (kdl::ci::str_is_equal(classname, "@BaseClass")) {
+        classInfo = parseBaseClassInfo(status);
     }
-    if (kdl::ci::str_is_equal(classname, "@PointClass")) {
-        return parsePointClassInfo(status);
-    }
-    if (kdl::ci::str_is_equal(classname, "@BaseClass")) {
-        return parseBaseClassInfo(status);
+    if (classInfo) {
+        auto path = std::filesystem::path{};
+        if (m_fs && !m_paths.empty()) {
+            auto absolute = m_fs->makeAbsolute(m_paths.back());
+            if (absolute.is_success()) path = std::move(absolute).value().lexically_normal();
+        }
+        classInfo->source = Assets::EntityDefinitionSource{
+            std::move(path), token.line(), token.column(), std::string(token.begin(), m_tokenizer.snapshot().cur)};
+        return classInfo;
     }
     if (kdl::ci::str_is_equal(classname, "@Main")) {
         skipMainClass(status);

@@ -52,6 +52,7 @@ class LayerEditor : public QWidget {
     QAbstractButton *m_removeLayerButton;
     QAbstractButton *m_moveLayerUpButton;
     QAbstractButton *m_moveLayerDownButton;
+    QAbstractButton *m_sourceButton = nullptr;
     QToolButton *m_groupByTypeButton = nullptr;
     QToolButton *m_syncSelectionButton = nullptr;
     QSpinBox *m_groupingThreshold = nullptr;

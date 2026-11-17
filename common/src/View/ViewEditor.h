@@ -102,6 +102,9 @@ class ViewEditor : public QWidget {
 
     QCheckBox *m_showPointEntitiesCheckBox;
     QCheckBox *m_showPointEntityModelsCheckBox;
+    QCheckBox *m_previewEntityAudio = nullptr;
+    QCheckBox *m_loopEntityAudio = nullptr;
+    SliderWithLabel *m_entityAudioVolume = nullptr;
 
     EntityDefinitionCheckBoxList *m_entityDefinitionCheckBoxList;
 

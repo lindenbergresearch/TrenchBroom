@@ -30,6 +30,7 @@
 #include "Preferences.h"
 #include "PreferenceManager.h"
 #include "View/MapDocument.h"
+#include "View/NodeSourceDialog.h"
 #include "View/LayerTreeItemRenderer.h"
 #include "View/MapFrame.h"
 #include "View/MapView.h"
@@ -662,6 +663,13 @@ std::vector<Model::Node*> LayerListBox::selectedTreeNodes() const {
     return nodes;
 }
 
+Model::Node* LayerListBox::singleSelectedTreeNode() const {
+    // Do not expand virtual groups with thousands of members just to enable an
+    // inspection command or check whether a single audio entity is selected.
+    const auto items = selectedItems();
+    return items.size() == 1 ? nodeForItem(items.front()) : nullptr;
+}
+
 bool LayerListBox::hasPrefabSelection() const {
     for (const auto* item : selectedItems()) {
         const auto* node = nodeForItem(item);
@@ -695,6 +703,19 @@ void LayerListBox::focusItem(QTreeWidgetItem *item) {
     emit treeChanged();
 }
 
+bool LayerListBox::canShowSelectedSource() const {
+    return singleSelectedTreeNode() != nullptr;
+}
+
+void LayerListBox::showSelectedSource() {
+    const auto document = m_document.lock();
+    const auto* node = singleSelectedTreeNode();
+    if (!document || !node) return;
+    auto* frame = findMapFrame(this);
+    auto* dialog = new NodeSourceDialog{*document, *node, frame ? static_cast<QWidget*>(frame) : window()};
+    dialog->show();
+}
+
 void LayerListBox::showContextMenu(QTreeWidgetItem *item, const QPoint &globalPosition) {
     if (!item) return;
     if (!item->isSelected())
@@ -706,6 +727,8 @@ void LayerListBox::showContextMenu(QTreeWidgetItem *item, const QPoint &globalPo
         // Editor actions operate on the document selection. Offer an explicit
         // transfer instead of silently modifying the selection while browsing.
         QMenu menu;
+        auto* sourceAction = menu.addAction(IO::loadSVGIcon("Source.svg", 16), tr("Show source…"), this, &LayerListBox::showSelectedSource);
+        sourceAction->setEnabled(canShowSelectedSource());
         menu.addAction(tr("Select in editor"), this, [this] { selectInDocument(true); })->setEnabled(!selectionNodes().empty());
         menu.addAction(tr("Focus in editor"), this, [this, item] { focusItem(item); });
         addContextMenuAction(menu,*ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath), [this] {
@@ -719,7 +742,10 @@ void LayerListBox::showContextMenu(QTreeWidgetItem *item, const QPoint &globalPo
             QAction deleteAction(tr("Delete"), this);
             deleteAction.setEnabled(!removableSelection().empty());
             connect(&deleteAction, &QAction::triggered, this, &LayerListBox::deleteSelection);
-            view->showPopupMenuForSelection(globalPosition, &deleteAction);
+            QAction sourceAction(IO::loadSVGIcon("Source.svg", 16), tr("Show source…"), this);
+            sourceAction.setEnabled(canShowSelectedSource());
+            connect(&sourceAction, &QAction::triggered, this, &LayerListBox::showSelectedSource);
+            view->showPopupMenuForSelection(globalPosition, &deleteAction, &sourceAction);
         }
     }
 }

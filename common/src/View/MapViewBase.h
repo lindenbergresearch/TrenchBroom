@@ -442,10 +442,10 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void showPopupMenuLater();
 
   public:
-    void showPopupMenuForSelection(const QPoint &globalPosition, QAction* deleteAction = nullptr);
+    void showPopupMenuForSelection(const QPoint &globalPosition, QAction* deleteAction = nullptr, QAction* sourceAction = nullptr);
 
   private:
-    void showPopupMenu(const QPoint &globalPosition, bool fromInspector, QAction* deleteAction = nullptr);
+    void showPopupMenu(const QPoint &globalPosition, bool fromInspector, QAction* deleteAction = nullptr, QAction* sourceAction = nullptr);
 
   protected: // QWidget overrides
     void dragEnterEvent(QDragEnterEvent *event) override;

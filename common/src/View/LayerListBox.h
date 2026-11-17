@@ -87,6 +87,9 @@ public:
     void setBranchIndicatorSize(int size);
     bool hasPrefabSelection() const;
     std::vector<Model::Node*> selectedTreeNodes() const;
+    Model::Node* singleSelectedTreeNode() const;
+    bool canShowSelectedSource() const;
+    void showSelectedSource();
 
 private:
     enum class Grouping { Type, EntityClass, None };

@@ -117,6 +117,7 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/View/tst_Csg.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_BrushUpstream.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_CreateBrushMode.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/View/tst_EntityExtensions.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_ExtrudeTool.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_FontUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/tst_ViewEditor.cpp"
@@ -213,11 +214,25 @@ macro(configure_test_target TARGET)
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${TARGET}>"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${TARGET}>"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${TARGET}>"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Multimedia>" "$<TARGET_FILE_DIR:${TARGET}>"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Network>" "$<TARGET_FILE_DIR:${TARGET}>"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Test>" "$<TARGET_FILE_DIR:${TARGET}>"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET}>/platforms"
                 COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET}>/styles"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${TARGET}>/platforms"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${TARGET}>/styles")
+        foreach (MEDIA_PLUGIN DSServicePlugin WMFServicePlugin)
+            if (TARGET Qt5::${MEDIA_PLUGIN})
+                add_custom_command(TARGET ${TARGET} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET}>/mediaservice"
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::${MEDIA_PLUGIN}>" "$<TARGET_FILE_DIR:${TARGET}>/mediaservice")
+            endif ()
+        endforeach ()
+        if (TARGET Qt5::QWindowsAudioPlugin)
+            add_custom_command(TARGET ${TARGET} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET}>/audio"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsAudioPlugin>" "$<TARGET_FILE_DIR:${TARGET}>/audio")
+        endif ()
     endif ()
 
     # Copy some resource files required when initializing TrenchBroomApp

@@ -304,6 +304,8 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/PrefabBrowser.cpp
     ${COMMON_SOURCE_DIR}/View/PrefabUtils.cpp
     ${COMMON_SOURCE_DIR}/View/PrefabPreview.cpp
+    ${COMMON_SOURCE_DIR}/View/EntityAudioPreview.cpp
+    ${COMMON_SOURCE_DIR}/View/NodeSourceDialog.cpp
     ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.cpp
     ${COMMON_SOURCE_DIR}/View/PreferenceModel.cpp
     ${COMMON_SOURCE_DIR}/View/Command.cpp
@@ -866,6 +868,8 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/PrefabBrowser.h
     ${COMMON_SOURCE_DIR}/View/PrefabUtils.h
     ${COMMON_SOURCE_DIR}/View/PrefabPreview.h
+    ${COMMON_SOURCE_DIR}/View/EntityAudioPreview.h
+    ${COMMON_SOURCE_DIR}/View/NodeSourceDialog.h
     ${COMMON_SOURCE_DIR}/View/PreferenceEditDialog.h
     ${COMMON_SOURCE_DIR}/View/PreferenceModel.h
     ${COMMON_SOURCE_DIR}/View/ChoosePathTypeDialog.h
@@ -1101,7 +1105,7 @@ set(COMMON_HEADER
 add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
 set_target_properties(common PROPERTIES AUTOMOC TRUE)
 target_include_directories(common PUBLIC ${COMMON_SOURCE_DIR})
-target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt5::Widgets Qt5::Svg fmt::fmt assimp::assimp)
+target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt5::Widgets Qt5::Svg Qt5::Multimedia fmt::fmt assimp::assimp)
 
 # use precompiled headers on CMake 3.16 or later
 if (NOT TB_SUPPRESS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")

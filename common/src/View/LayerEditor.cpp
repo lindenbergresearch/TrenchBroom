@@ -36,6 +36,7 @@
 #include "Model/ModelUtils.h"
 #include "Model/NodeQueries.h"
 #include "Model/WorldNode.h"
+#include "IO/ResourceUtils.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "View/LayerListBox.h"
@@ -85,6 +86,9 @@ void LayerEditor::onLayerRightClick(Model::LayerNode *layerNode) {
     auto document = kdl::mem_lock(m_document);
 
     QMenu popupMenu;
+    auto* sourceAction = popupMenu.addAction(IO::loadSVGIcon("Source.svg", 16), tr("Show source…"), m_layerList, &LayerListBox::showSelectedSource);
+    sourceAction->setEnabled(m_layerList->canShowSelectedSource());
+    popupMenu.addSeparator();
     QAction *makeActiveAction = popupMenu.addAction(tr("Make active layer"), this, [this, layerNode]() { onSetCurrentLayer(layerNode); });
     QAction *moveSelectionToLayerAction = popupMenu.addAction(tr("Move selection to layer"), this, &LayerEditor::onMoveSelectionToLayer);
     QAction *selectAllInLayerAction = popupMenu.addAction(tr("Select all in layer"), this, &LayerEditor::onSelectAllInLayer);
@@ -479,12 +483,16 @@ void LayerEditor::createGui() {
     });
 
     auto* toolbar = createInspectorToolBar(this);
+    m_sourceButton = createBitmapButton("Source.svg", tr("Show source of the selected object (MAP / FGD)"));
+    m_sourceButton->setObjectName("layerShowSource");
+    connect(m_sourceButton, &QAbstractButton::clicked, m_layerList, &LayerListBox::showSelectedSource);
     toolbar->addWidget(m_addLayerButton);
     toolbar->addWidget(m_removeLayerButton);
     toolbar->addWidget(m_moveLayerUpButton);
     toolbar->addWidget(m_moveLayerDownButton);
     toolbar->addWidget(m_groupByTypeButton);
     toolbar->addWidget(m_syncSelectionButton);
+    toolbar->addWidget(m_sourceButton);
 
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);
@@ -495,6 +503,7 @@ void LayerEditor::createGui() {
 }
 
 void LayerEditor::updateButtons() {
+    m_sourceButton->setEnabled(m_layerList->canShowSelectedSource());
     m_removeLayerButton->setEnabled(canRemoveLayer());
     m_moveLayerUpButton->setEnabled(canMoveLayer(-1));
     m_moveLayerDownButton->setEnabled(canMoveLayer(1));

@@ -285,6 +285,9 @@ extern Preference<bool> ShowGroupBounds;
 extern Preference<bool> ShowBrushEntityBounds;
 extern Preference<bool> ShowPointEntityBounds;
 extern Preference<bool> ShowPointEntityModels;
+extern Preference<bool> PreviewEntityAudio;
+extern Preference<bool> LoopEntityAudio;
+extern Preference<int> EntityAudioVolume;
 
 /* --- LIGHTS ---------------------------------------- */
 extern Preference<bool> EnableLightning;

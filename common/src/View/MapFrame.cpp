@@ -70,6 +70,7 @@
 #include "TrenchBroomApp.h"
 #include "View/Actions.h"
 #include "View/Autosaver.h"
+#include "View/EntityAudioPreview.h"
 #include "View/ChoosePathTypeDialog.h"
 #include "View/ClipTool.h"
 #include "View/ColorButton.h"
@@ -137,6 +138,7 @@ MapFrame::MapFrame(FrameManager *frameManager, std::shared_ptr<MapDocument> docu
     createMenus();
     createToolBar();
     createStatusBar();
+    new EntityAudioPreview{m_document, this};
 
     updateShortcuts();
     updateActionState();

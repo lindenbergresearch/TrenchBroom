@@ -182,10 +182,24 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Multimedia>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Network>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
                            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles")
+        foreach (MEDIA_PLUGIN DSServicePlugin WMFServicePlugin)
+            if (TARGET Qt5::${MEDIA_PLUGIN})
+                add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/mediaservice"
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::${MEDIA_PLUGIN}>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/mediaservice")
+            endif ()
+        endforeach ()
+        if (TARGET Qt5::QWindowsAudioPlugin)
+            add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/audio"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsAudioPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/audio")
+        endif ()
     endif ()
 
     # Generate a small stripped PDB for release builds so we get stack traces with symbols

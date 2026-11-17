@@ -23,6 +23,7 @@
 #include "Assets/EntityModel.h"
 #include "Assets/ModelDefinition.h"
 #include "Assets/PropertyDefinition.h"
+#include "EL/ELExceptions.h"
 #include "Model/EntityProperties.h"
 #include "Model/EntityPropertiesVariableStore.h"
 #include "Model/EntityRotation.h"
@@ -38,6 +39,10 @@
 #include "vm/vec_io.h"
 
 #include <algorithm>
+#include <charconv>
+#include <cmath>
+#include <locale>
+#include <sstream>
 
 namespace TrenchBroom::Model {
 
@@ -143,13 +148,48 @@ void Entity::setModel(const EntityPropertyConfig &propertyConfig, const Assets::
     updateCachedProperties(propertyConfig);
 }
 
+namespace {
+size_t modelPropertyIndex(const Entity& entity, const std::string& key) {
+    if (const auto* value = entity.property(key)) {
+        size_t index = 0;
+        const auto result = std::from_chars(value->data(), value->data() + value->size(), index);
+        if (result.ec == std::errc{} && result.ptr == value->data() + value->size()) return index;
+    }
+    return 0;
+}
+
+vm::vec3 propertyModelScale(const Entity& entity) {
+    for (const auto* key : {"modelscale_vec", "modelscale", "scale"}) {
+        const auto* value = entity.property(key);
+        if (!value) continue;
+        auto stream = std::istringstream(*value);
+        stream.imbue(std::locale::classic());
+        auto values = std::vector<FloatType>{};
+        FloatType component;
+        while (stream >> component) values.push_back(component);
+        if (!stream.eof() || (values.size() != 1 && values.size() != 3)
+            || std::any_of(values.begin(), values.end(), [](const auto v) { return !std::isfinite(v); })) continue;
+        return values.size() == 1 ? vm::vec3{values[0], values[0], values[0]} : vm::vec3{values[0], values[1], values[2]};
+    }
+    return vm::vec3{1, 1, 1};
+}
+} // namespace
+
 Assets::ModelSpecification Entity::modelSpecification() const {
+    if (!pointEntity()) return {};
     if (const auto *pointDefinition = dynamic_cast<const Assets::PointEntityDefinition *>(m_definition.get())) {
         const auto variableStore = EntityPropertiesVariableStore{*this};
-        return pointDefinition->modelDefinition().modelSpecification(variableStore);
-    } else {
-        return Assets::ModelSpecification{};
+        auto specification = pointDefinition->modelDefinition().modelSpecification(variableStore);
+        if (!specification.path.empty()) return specification;
     }
+    if (const auto* modelPath = property("model")) {
+        auto path = kdl::str_trim(*modelPath);
+        std::replace(path.begin(), path.end(), '\\', '/');
+        // BSP submodels refer to brushes in the compiled map, not external model files.
+        if (!path.empty() && path.front() != '*' && path.find('\0') == std::string::npos)
+            return Assets::ModelSpecification{std::filesystem::path{path}.lexically_normal(), modelPropertyIndex(*this, "skin"), modelPropertyIndex(*this, "frame")};
+    }
+    return {};
 }
 
 const vm::mat4x4 &Entity::modelTransformation() const {
@@ -347,9 +387,17 @@ void Entity::updateCachedProperties(const EntityPropertyConfig &propertyConfig) 
     m_cachedProperties.origin = parseOrigin(originValue);
     m_cachedProperties.rotation = entityRotation(*this);
 
-    if (const auto *pointDefinition = dynamic_cast<const Assets::PointEntityDefinition *>(m_definition.get())) {
+    const auto* pointDefinition = dynamic_cast<const Assets::PointEntityDefinition*>(m_definition.get());
+    if (pointEntity() && (pointDefinition || hasProperty("model"))) {
         const auto variableStore = EntityPropertiesVariableStore{*this};
-        const auto scale = Assets::safeGetModelScale(pointDefinition->modelDefinition(), variableStore, propertyConfig.defaultModelScaleExpression);
+        const auto emptyDefinition = Assets::ModelDefinition{};
+        const auto& modelDefinition = pointDefinition ? pointDefinition->modelDefinition() : emptyDefinition;
+        auto scale = Assets::safeGetModelScale(modelDefinition, variableStore, propertyConfig.defaultModelScaleExpression);
+        if (!propertyConfig.defaultModelScaleExpression) {
+            try {
+                if (modelDefinition.modelSpecification(variableStore).path.empty()) scale = propertyModelScale(*this);
+            } catch (const EL::Exception&) { /* An invalid FGD expression is reported by the model loader. */ }
+        }
         m_cachedProperties.modelTransformation = vm::translation_matrix(origin()) * rotation() * vm::scaling_matrix(scale);
     } else {
         m_cachedProperties.modelTransformation = vm::mat4x4::identity();

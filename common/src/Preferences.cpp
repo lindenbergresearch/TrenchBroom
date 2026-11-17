@@ -313,6 +313,9 @@ Preference<bool> ShowGroupBounds("Map view/Show group bounds", true);
 Preference<bool> ShowBrushEntityBounds("Map view/Show brush entity bounds", true);
 Preference<bool> ShowPointEntityBounds("Map view/Show point entity bounds", true);
 Preference<bool> ShowPointEntityModels("Map view/Show point entity models", true);
+Preference<bool> PreviewEntityAudio("Map view/Audio preview/Enabled", true);
+Preference<bool> LoopEntityAudio("Map view/Audio preview/Loop", false);
+Preference<int> EntityAudioVolume("Map view/Audio preview/Volume", 60);
 
 /* --- LIGHTNING -------------------------------------- */
 Preference<bool> EnableLightning("Map view/Enable lightning (experimental)", true);
@@ -397,7 +400,9 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,
         &CameraFlyForward(), &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &EnableLightning,
-        &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels, &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowSky, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
+        &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels,
+        &PreviewEntityAudio, &LoopEntityAudio, &EntityAudioVolume,
+        &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowSky, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
         &EntityLinkMode
     };
 

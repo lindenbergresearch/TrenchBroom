@@ -1,7 +1,7 @@
 /**
  * TrenchBroom UI stylesheet. Process with QSSBuilder before applying.
  *
- * Sections: Typography; Window and status bar; Lists/layer tree; Inspector
+ * Sections: Object source viewer; Typography; Window and status bar; Lists/layer tree; Inspector
  * headers; Prefab browser; Inputs; Toolbars; Popups; Trees/tabs; Buttons;
  * View Settings and specialized widgets.
  *
@@ -10,6 +10,35 @@
  * Font-size tokens respect the configured UI minimum. Rule order is preserved
  * so more specific widget/state rules continue to override the shared defaults.
  */
+
+/* ==== OBJECT SOURCE VIEWER ==== */
+QDialog#nodeSourceDialog {
+    background-color: #WINDOW_COLOR;
+}
+
+QLabel#nodeSourceLocation {
+    color: #UI_DETAIL_TEXT_COLOR;
+    font-size: #UI_SMALL_FONT_SIZE;
+}
+
+/* Override font family/size and all syntax colors here. The shared console
+   font is the default; no text or background colors are set in C++. */
+QPlainTextEdit#nodeSourceText {
+    font-family: "#CONSOLE_FONT_FAMILY";
+    font-size: #CONSOLE_FONT_SIZE;
+    color: #TEXT_COLOR;
+    background-color: #282b30;
+    selection-background-color: #475d79;
+    selection-color: #ffffff;
+    border: 1px solid #44494f;
+    border-radius: 4px;
+    padding: 8px;
+    qproperty-keywordColor: #8fc6ee;
+    qproperty-stringColor: #a9cb91;
+    qproperty-numberColor: #dab985;
+    qproperty-commentColor: #828b96;
+    qproperty-propertyColor: #c8ade8;
+}
 
 /* ==== TYPOGRAPHY ==== */
 *[uiStyled="true"] {

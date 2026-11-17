@@ -406,6 +406,16 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
 
     m_showPointEntitiesCheckBox = new QCheckBox(tr("Show point entities"));
     m_showPointEntityModelsCheckBox = new QCheckBox(tr("Show point entity models"));
+    m_previewEntityAudio = new QCheckBox(tr("Preview audio on selection"));
+    m_previewEntityAudio->setObjectName("previewEntityAudio");
+    m_previewEntityAudio->setToolTip(tr("Play the audio file referenced by a single selected point entity."));
+    m_loopEntityAudio = new QCheckBox(tr("Loop audio preview"));
+    m_loopEntityAudio->setObjectName("loopEntityAudio");
+    m_entityAudioVolume = new SliderWithLabel(0, 100, 0, "%d%%");
+    m_entityAudioVolume->setObjectName("entityAudioVolume");
+    connect(m_previewEntityAudio, &QCheckBox::clicked, this, [](const auto enabled) { setPref(Preferences::PreviewEntityAudio, enabled); });
+    connect(m_loopEntityAudio, &QCheckBox::clicked, this, [](const auto enabled) { setPref(Preferences::LoopEntityAudio, enabled); });
+    connect(m_entityAudioVolume, &SliderWithLabel::valueChanged, this, [](const auto volume) { setPref(Preferences::EntityAudioVolume, volume); });
 
     auto *layout = new QVBoxLayout();
     layout->setContentsMargins(LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin, LayoutConstants::NarrowHMargin);
@@ -417,6 +427,11 @@ QWidget *ViewEditor::createEntitiesPanel(QWidget *parent) {
     layout->addWidget(m_showPointEntityBoundsCheckBox);
     layout->addWidget(m_showPointEntitiesCheckBox);
     layout->addWidget(m_showPointEntityModelsCheckBox);
+    layout->addWidget(m_previewEntityAudio);
+    layout->addWidget(m_loopEntityAudio);
+    auto* volumeLayout = new QFormLayout{};
+    volumeLayout->addRow(tr("Audio volume"), m_entityAudioVolume);
+    layout->addLayout(volumeLayout);
     layout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     panel->getPanel()->setLayout(layout);
@@ -735,6 +750,12 @@ void ViewEditor::refreshEntitiesPanel() {
     m_showPointEntityBoundsCheckBox->setChecked(pref(Preferences::ShowPointEntityBounds));
     m_showPointEntitiesCheckBox->setChecked(pref(Preferences::ShowPointEntities));
     m_showPointEntityModelsCheckBox->setChecked(pref(Preferences::ShowPointEntityModels));
+    const QSignalBlocker previewBlocker{m_previewEntityAudio}, loopBlocker{m_loopEntityAudio}, volumeBlocker{m_entityAudioVolume};
+    m_previewEntityAudio->setChecked(pref(Preferences::PreviewEntityAudio));
+    m_loopEntityAudio->setChecked(pref(Preferences::LoopEntityAudio));
+    m_entityAudioVolume->setValue(std::clamp(pref(Preferences::EntityAudioVolume), 0, 100));
+    m_loopEntityAudio->setEnabled(m_previewEntityAudio->isChecked());
+    m_entityAudioVolume->setEnabled(m_previewEntityAudio->isChecked());
 }
 
 void ViewEditor::refreshBrushesPanel() {
@@ -904,6 +925,9 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::ShowBrushEntityBounds);
     prefs.resetToDefault(Preferences::ShowPointEntityBounds);
     prefs.resetToDefault(Preferences::ShowPointEntityModels);
+    prefs.resetToDefault(Preferences::PreviewEntityAudio);
+    prefs.resetToDefault(Preferences::LoopEntityAudio);
+    prefs.resetToDefault(Preferences::EntityAudioVolume);
     prefs.resetToDefault(Preferences::FaceRenderMode);
     prefs.resetToDefault(Preferences::ShadeFaces);
     prefs.resetToDefault(Preferences::ShadeLevel);

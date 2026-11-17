@@ -27,7 +27,9 @@
 #include "vm/bbox.h"
 
 #include <atomic>
+#include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -47,6 +49,13 @@ enum class EntityDefinitionSortOrder {
   Name, Usage
 };
 
+struct EntityDefinitionSource {
+    std::filesystem::path path;
+    size_t line = 0;
+    size_t column = 0;
+    std::string text;
+};
+
 class EntityDefinition {
   private:
     size_t m_index;
@@ -55,6 +64,7 @@ class EntityDefinition {
     std::string m_description;
     std::atomic<size_t> m_usageCount;
     std::vector<std::shared_ptr<PropertyDefinition>> m_propertyDefinitions;
+    std::optional<EntityDefinitionSource> m_source;
 
   public:
     virtual ~EntityDefinition();
@@ -74,6 +84,9 @@ class EntityDefinition {
     const Color &color() const;
 
     const std::string &description() const;
+
+    const std::optional<EntityDefinitionSource>& source() const;
+    void setSource(std::optional<EntityDefinitionSource> source);
 
     size_t usageCount() const;
 

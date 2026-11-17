@@ -1099,11 +1099,11 @@ void MapViewBase::showPopupMenuLater() {
     showPopupMenu(QCursor::pos(), false);
 }
 
-void MapViewBase::showPopupMenuForSelection(const QPoint &globalPosition, QAction* deleteAction) {
-    showPopupMenu(globalPosition, true, deleteAction);
+void MapViewBase::showPopupMenuForSelection(const QPoint &globalPosition, QAction* deleteAction, QAction* sourceAction) {
+    showPopupMenu(globalPosition, true, deleteAction, sourceAction);
 }
 
-void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromInspector, QAction* deleteAction) {
+void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromInspector, QAction* deleteAction, QAction* sourceAction) {
     const auto source = kdl::set_temp(m_popupFromInspector, fromInspector);
     if (!doBeforePopupMenu()) {
         return;
@@ -1229,6 +1229,7 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
     menu->addMenu(pointsMenu);
     menu->addMenu(brushMenu);
 
+    if (sourceAction) { menu->addSeparator(); menu->addAction(sourceAction); }
     if (deleteAction) { menu->addSeparator(); menu->addAction(deleteAction); }
 
     menu->exec(globalPosition);

@@ -3,6 +3,8 @@
     <qresource>
         <file>opengl_buglist.json</file>
         <file alias="down.svg">../graphics/images/Down.svg</file>
+        <file alias="up.svg">../graphics/images/Up.svg</file>
+        <file alias="images/Source.svg">../graphics/images/Source.svg</file>
 
 
         <file alias="images/ShapeTool_UVSphere.svg">../graphics/images/ShapeTool_UVSphere.svg</file>

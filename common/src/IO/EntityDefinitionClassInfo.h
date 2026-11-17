@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Assets/DecalDefinition.h"
+#include "Assets/EntityDefinition.h"
 #include "Assets/ModelDefinition.h"
 #include "Color.h"
 #include "FloatType.h"
@@ -60,6 +61,9 @@ struct EntityDefinitionClassInfo {
 
   std::vector<std::shared_ptr<Assets::PropertyDefinition>> propertyDefinitions;
   std::vector<std::string> superClasses;
+
+  // Origin of this class, rather than the attributes inherited from its base classes.
+  std::optional<Assets::EntityDefinitionSource> source;
 
   kdl_reflect_decl(EntityDefinitionClassInfo, type, line, column, name, description, color, size, modelDefinition, decalDefinition, propertyDefinitions, superClasses);
 };

@@ -328,15 +328,20 @@ std::unique_ptr<Assets::EntityDefinition> createDefinition(EntityDefinitionClass
     auto modelDefinition = std::move(classInfo.modelDefinition).value_or(Assets::ModelDefinition{});
     auto decalDefinition = std::move(classInfo.decalDefinition).value_or(Assets::DecalDefinition{});
 
+    auto definition = std::unique_ptr<Assets::EntityDefinition>{};
     switch (classInfo.type) {
         case EntityDefinitionClassType::PointClass:
-            return std::make_unique<Assets::PointEntityDefinition>(std::move(name), color, size, std::move(description), std::move(propertyDefinitions), std::move(modelDefinition), std::move(decalDefinition));
+            definition = std::make_unique<Assets::PointEntityDefinition>(std::move(name), color, size, std::move(description), std::move(propertyDefinitions), std::move(modelDefinition), std::move(decalDefinition));
+            break;
         case EntityDefinitionClassType::BrushClass:
-            return std::make_unique<Assets::BrushEntityDefinition>(std::move(name), color, std::move(description), std::move(propertyDefinitions));
+            definition = std::make_unique<Assets::BrushEntityDefinition>(std::move(name), color, std::move(description), std::move(propertyDefinitions));
+            break;
         case EntityDefinitionClassType::BaseClass:
             return nullptr;
             switchDefault();
     };
+    definition->setSource(std::move(classInfo.source));
+    return definition;
 }
 
 std::vector<std::unique_ptr<Assets::EntityDefinition>> createDefinitions(ParserStatus &status, const std::vector<EntityDefinitionClassInfo> &classInfos, const Color &defaultEntityColor) {
@@ -348,9 +353,9 @@ std::vector<std::unique_ptr<Assets::EntityDefinition>> createDefinitions(ParserS
                                   "Entity Classinfo: [[ " << classInfo.name <<
                                   "]] | type: '" << classInfo.type << "' " <<
                                   QObject::tr("| center: %1 %2 %3")
-                                      .arg(classInfo.size->center().v[0])
-                                      .arg(classInfo.size->center().v[1])
-                                      .arg(classInfo.size->center().v[2])
+                                      .arg(classInfo.size.value_or(DefaultSize).center().v[0])
+                                      .arg(classInfo.size.value_or(DefaultSize).center().v[1])
+                                      .arg(classInfo.size.value_or(DefaultSize).center().v[2])
                                   << " | desc: »" << classInfo.description.value_or("-no descr-") << "« | line: " << classInfo.line
                                   << " | color: "
                                   << classInfo.color.value_or("-").toString()
