@@ -47,6 +47,8 @@
 #include <assimp/scene.h>
 #include <assimp/types.h>
 #include <fmt/format.h>
+#include <algorithm>
+#include <cmath>
 
 #include <optional>
 #include <string_view>
@@ -264,33 +266,21 @@ std::optional<size_t> getChannelIndex(const aiAnimation &animation, const aiNode
 }
 
 /**
- * Gets the parent bone's channel index as well as its transformation,
- * recursively multiplied by all bones further up the hierarchy.
+ * Computes the animation information for each channel in an
+ * animation sequence at the requested time in animation ticks.
  */
-std::tuple<size_t, aiMatrix4x4> getBoneParentChannelAndTransformation(const aiAnimation &animation, const aiNode &boneNode, const std::vector<aiMatrix4x4> &channelTransforms) {
-    const auto *parentNode = boneNode.mParent;
-    if (!parentNode) {
-        // reached the root node
-        return {-1, aiMatrix4x4{}};
-    }
-
-    if (const auto index = getChannelIndex(animation, *parentNode)) {
-        // we have found the index of this bone in the channel list
-        const auto [parentIndex, parentTransform] = getBoneParentChannelAndTransformation(animation, *parentNode, channelTransforms);
-        unused(parentIndex);
-
-        return {*index, parentTransform * channelTransforms[*index]};
-    }
-
-    // this node is not a bone, use the node's default transformation
-    return {-1, parentNode->mTransformation};
+template <typename Key, typename Value, typename Blend>
+Value animationValue(const Key* keys, const unsigned count, const double time, const Value& fallback, Blend blend) {
+    if (!count) return fallback;
+    if (count == 1 || time <= keys[0].mTime) return keys[0].mValue;
+    const auto* end = std::upper_bound(keys, keys + count, time, [](double t, const Key& key) { return t < key.mTime; });
+    if (end == keys + count) return keys[count - 1].mValue;
+    const auto& start = *(end - 1);
+    const auto span = end->mTime - start.mTime;
+    return blend(start.mValue, end->mValue, span > 0 ? float((time - start.mTime) / span) : 0.f);
 }
 
-/**
- * Computes the animation information for each channel in an
- * animation sequence. Always uses the first frame of the animation.
- */
-std::vector<AssimpBoneInformation> getAnimationInformation(const aiNode &root, const aiAnimation &animation) {
+std::vector<AssimpBoneInformation> getAnimationInformation(const aiNode &root, const aiAnimation &animation, const double time) {
     auto indivTransforms = std::vector<aiMatrix4x4>{};
     indivTransforms.reserve(animation.mNumChannels);
 
@@ -298,9 +288,14 @@ std::vector<AssimpBoneInformation> getAnimationInformation(const aiNode &root, c
     for (unsigned int i = 0; i < animation.mNumChannels; ++i) {
         const auto &channel = *animation.mChannels[i];
 
-        const auto position = channel.mNumPositionKeys > 0 ? channel.mPositionKeys[0].mValue : aiVector3D{0, 0, 0};
-        const auto rotation = channel.mNumRotationKeys > 0 ? channel.mRotationKeys[0].mValue : aiQuaternion{1, 0, 0, 0};
-        const auto scale = channel.mNumScalingKeys > 0 ? channel.mScalingKeys[0].mValue : aiVector3D{1, 1, 1};
+        aiVector3D bindPosition{0, 0, 0}, bindScale{1, 1, 1};
+        aiQuaternion bindRotation;
+        if (const auto* node = root.FindNode(channel.mNodeName)) node->mTransformation.Decompose(bindScale, bindRotation, bindPosition);
+        const auto lerp = [](const aiVector3D& a, const aiVector3D& b, float t) { return a + (b - a) * t; };
+        const auto slerp = [](const aiQuaternion& a, const aiQuaternion& b, float t) { aiQuaternion result; aiQuaternion::Interpolate(result, a, b, t); return result.Normalize(); };
+        const auto position = animationValue(channel.mPositionKeys, channel.mNumPositionKeys, time, bindPosition, lerp);
+        const auto rotation = animationValue(channel.mRotationKeys, channel.mNumRotationKeys, time, bindRotation, slerp);
+        const auto scale = animationValue(channel.mScalingKeys, channel.mNumScalingKeys, time, bindScale, lerp);
 
         // build a transformation matrix from it
         auto mat = aiMatrix4x4{rotation.GetMatrix()};
@@ -325,39 +320,37 @@ std::vector<AssimpBoneInformation> getAnimationInformation(const aiNode &root, c
     auto transforms = std::vector<AssimpBoneInformation>{};
     transforms.reserve(animation.mNumChannels);
 
-    for (unsigned int i = 0; i < animation.mNumChannels; ++i) {
-        const auto &channel = *animation.mChannels[i];
-
-        // traverse the bone hierarchy to compute the global transformation
-        if (const auto *boneNode = root.FindNode(channel.mNodeName)) {
-            const auto [parentId, parentTransform] = getBoneParentChannelAndTransformation(animation, *boneNode, indivTransforms);
-
-            transforms.push_back({
-                                     i, int32_t(parentId), channel.mNodeName, indivTransforms[i], parentTransform * indivTransforms[i]
-                                 });
-        } else {
-            // couldn't find the bone node, something is weird
-            transforms.emplace_back();
-        }
-    }
+    const auto visit = [&](auto&& self, const aiNode& node, const aiMatrix4x4& parent, const int32_t parentIndex) -> void {
+        const auto channel = getChannelIndex(animation, node);
+        const auto local = channel ? indivTransforms[*channel] : node.mTransformation;
+        const auto global = parent * local;
+        const auto index = transforms.size();
+        transforms.push_back({index, parentIndex, node.mName, local, global});
+        for (unsigned i = 0; i < node.mNumChildren; ++i) self(self, *node.mChildren[i], global, int32_t(index));
+    };
+    visit(visit, root, aiMatrix4x4{}, -1);
 
     return transforms;
 }
 
-void processNode(std::vector<AssimpMeshWithTransforms> &meshes, const aiNode &node, const aiScene &scene, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform) {
+void processNode(std::vector<AssimpMeshWithTransforms> &meshes, const aiNode &node, const aiScene &scene, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform, const std::vector<AssimpBoneInformation>& animation) {
+    auto animatedTransform = transform;
+    for (const auto& channel : animation) {
+        if (channel.m_name == node.mName) { animatedTransform = channel.m_globalTransform; break; }
+    }
     for (unsigned int i = 0; i < node.mNumMeshes; ++i) {
         const auto *mesh = scene.mMeshes[node.mMeshes[i]];
-        meshes.push_back({mesh, transform, axisTransform});
+        meshes.push_back({mesh, animatedTransform, axisTransform});
     }
 
     for (unsigned int i = 0; i < node.mNumChildren; ++i) {
-        processNode(meshes, *node.mChildren[i], scene, transform * node.mChildren[i]->mTransformation, axisTransform);
+        processNode(meshes, *node.mChildren[i], scene, animatedTransform * node.mChildren[i]->mTransformation, axisTransform, animation);
     }
 }
 
 const auto AiMdlHl1NodeBodyparts = "<MDL_bodyparts>";
 
-void processRootNode(std::vector<AssimpMeshWithTransforms> &meshes, const aiNode &node, const aiScene &scene, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform) {
+void processRootNode(std::vector<AssimpMeshWithTransforms> &meshes, const aiNode &node, const aiScene &scene, const aiMatrix4x4 &transform, const aiMatrix4x4 &axisTransform, const std::vector<AssimpBoneInformation>& animation) {
     // HL1 models have a slightly different structure than normal, the format consists
     // of multiple body parts, and each body part has one or more submodels. Only one
     // submodel per body part should be rendered at a time.
@@ -382,12 +375,12 @@ void processRootNode(std::vector<AssimpMeshWithTransforms> &meshes, const aiNode
             if (bodypart.mNumChildren > 0) {
                 // currently we don't have a way to know which submodel the user
                 // might want to see, so just use the first one.
-                processNode(meshes, *bodypart.mChildren[0], scene, transform, newAxisTransform);
+                processNode(meshes, *bodypart.mChildren[0], scene, transform, newAxisTransform, animation);
             }
         }
     } else {
         // not a HL1 model, just process like normal
-        processNode(meshes, node, scene, transform, axisTransform);
+        processNode(meshes, node, scene, transform, axisTransform, animation);
     }
 }
 
@@ -458,7 +451,9 @@ std::vector<Assets::EntityModelVertex> computeMeshVertices(const aiMesh &mesh, c
             meshVertices = vertPos;
         }
 
-        meshVertices *= transform;
+        // Weighted vertices already use scene-space bone matrices. Applying
+        // the mesh transform again would move them twice (especially roots).
+        if (!mesh.HasBones() || boneTransforms.empty() || weightsPerVertex[i].empty()) meshVertices *= transform;
         meshVertices *= axisTransform;
 
         vertices.emplace_back(vm::vec3f{meshVertices.x, meshVertices.y, meshVertices.z}, texcoords);
@@ -502,15 +497,17 @@ aiMatrix4x4 getAxisTransform(const aiScene &scene) {
     return aiMatrix4x4{};
 }
 
-Result<void> loadSceneFrame(const aiScene &scene, const size_t frameIndex, Assets::EntityModel &model, const std::string &name) {
+Result<void> loadSceneFrame(const aiScene &scene, const size_t frameIndex, Assets::EntityModel &model, const std::string &name,
+                            const std::optional<size_t> animationIndex = std::nullopt, const double time = 0) {
     // load the animation information for the current "frame" (animation)
-    const auto boneTransforms = frameIndex < scene.mNumAnimations ? getAnimationInformation(*scene.mRootNode, *scene.mAnimations[frameIndex]) : std::vector<AssimpBoneInformation>{};
+    const auto sequence = animationIndex.value_or(frameIndex);
+    const auto boneTransforms = sequence < scene.mNumAnimations ? getAnimationInformation(*scene.mRootNode, *scene.mAnimations[sequence], time) : std::vector<AssimpBoneInformation>{};
 
     auto meshes = std::vector<AssimpMeshWithTransforms>{};
 
     // Assimp files import as y-up. We must multiply the root transform with an axis
     // transform matrix.
-    processRootNode(meshes, *scene.mRootNode, scene, scene.mRootNode->mTransformation, getAxisTransform(scene));
+    processRootNode(meshes, *scene.mRootNode, scene, scene.mRootNode->mTransformation, getAxisTransform(scene), boneTransforms);
 
     // store the mesh data in a list so we can compute the bounding box before creating the
     // frame
@@ -590,13 +587,13 @@ std::unique_ptr<Assets::EntityModel> AssimpParser::doInitializeModel(TrenchBroom
     const auto modelPath = m_path.string();
 
     // Import the file as an Assimp scene and populate our vectors.
-    auto importer = Assimp::Importer{};
-    importer.SetIOHandler(new AssimpIOSystem{m_fs});
+    auto importer = std::make_shared<Assimp::Importer>();
+    importer->SetIOHandler(new AssimpIOSystem{m_fs});
 
-    const auto *scene = importer.ReadFile(modelPath, assimpFlags);
+    const auto *scene = importer->ReadFile(modelPath, assimpFlags);
     if (!scene) {
         throw ParserException{
-            fmt::format("Assimp couldn't import model from '{}': {}", m_path.string(), importer.GetErrorString())
+            fmt::format("Assimp couldn't import model from '{}': {}", m_path.string(), importer->GetErrorString())
         };
     }
 
@@ -608,6 +605,38 @@ std::unique_ptr<Assets::EntityModel> AssimpParser::doInitializeModel(TrenchBroom
     const auto numSequences = std::max(scene->mNumAnimations, 1u);
     for (size_t i = 0; i < numSequences; ++i) {
         model->addFrame();
+    }
+
+    auto samples = std::vector<std::pair<size_t, double>>{};
+    for (size_t i = 0; i < scene->mNumAnimations; ++i) {
+        const auto& sequence = *scene->mAnimations[i];
+        auto moving = false;
+        for (unsigned c = 0; c < sequence.mNumChannels; ++c) {
+            const auto& channel = *sequence.mChannels[c];
+            moving |= channel.mNumPositionKeys > 1 || channel.mNumRotationKeys > 1 || channel.mNumScalingKeys > 1;
+        }
+        const auto ticksPerSecond = std::isfinite(sequence.mTicksPerSecond) && sequence.mTicksPerSecond > 0 ? sequence.mTicksPerSecond : 25;
+        const auto duration = sequence.mDuration / ticksPerSecond;
+        if (!moving || !std::isfinite(duration) || duration <= 0) continue;
+        // Preserve the existing frame/sequence indices used by FGD definitions.
+        // Extra poses are lazy, bounded, and shared by all instances of a model.
+        const auto count = size_t(std::clamp(std::ceil(duration * 20), 2.0, 60.0));
+        auto animation = Assets::EntityModel::Animation{sequence.mName.C_Str(), {i}, {duration / double(count)}};
+        for (size_t j = 1; j < count; ++j) {
+            animation.frames.push_back(model->frameCount());
+            animation.intervals.push_back(duration * double(j + 1) / double(count));
+            model->addFrame();
+            samples.emplace_back(i, sequence.mDuration * double(j) / double(count));
+        }
+        model->addAnimation(std::move(animation));
+    }
+    if (!samples.empty()) {
+        model->setAnimationFrameLoader(numSequences, [importer, scene, poses = std::move(samples), modelPath, numSequences](size_t frame, Assets::EntityModel& target) {
+            const auto [sequence, time] = poses.at(frame - numSequences);
+            loadSceneFrame(*scene, frame, target, modelPath, sequence, time).transform_error([](const auto& error) {
+                throw ParserException{error.msg};
+            });
+        });
     }
 
     // create a surface for each mesh in the scene and assign the skins/materials to it

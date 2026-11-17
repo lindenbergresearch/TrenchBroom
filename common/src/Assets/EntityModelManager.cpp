@@ -41,6 +41,7 @@ void EntityModelManager::clear() {
     m_renderers.clear();
     m_models.clear();
     m_rendererMismatches.clear();
+    m_frameMismatches.clear();
     m_modelMismatches.clear();
 
     m_unpreparedModels.clear();
@@ -100,10 +101,20 @@ const EntityModelFrame *EntityModelManager::frame(const Assets::ModelSpecificati
         return nullptr;
     } else {
         if (!model->frame(spec.frameIndex)->loaded()) {
+            if (m_frameMismatches.count(spec) > 0) return nullptr;
             loadFrame(spec, *model);
+            if (!model->frame(spec.frameIndex)->loaded()) {
+                m_frameMismatches.insert(spec);
+                return nullptr;
+            }
         }
         return model->frame(spec.frameIndex);
     }
+}
+
+const EntityModel::Animation* EntityModelManager::animation(const ModelSpecification& spec) const {
+    const auto* model = safeGetModel(spec.path);
+    return model ? model->animation(spec.frameIndex) : nullptr;
 }
 
 EntityModel *EntityModelManager::model(const std::filesystem::path &path) const {
@@ -153,6 +164,7 @@ std::unique_ptr<EntityModel> EntityModelManager::loadModel(const std::filesystem
 
 void EntityModelManager::loadFrame(const Assets::ModelSpecification &spec, Assets::EntityModel &model) const {
     try {
+        if (model.loadAnimationFrame(spec.frameIndex)) return;
         ensure(m_loader != nullptr, "loader is null");
         m_loader->loadFrame(spec.path, spec.frameIndex, model, m_logger);
     } catch (const Exception &e) {

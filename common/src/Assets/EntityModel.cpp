@@ -33,6 +33,9 @@
 #include "vm/intersection.h"
 
 #include <string>
+#include <algorithm>
+#include <cctype>
+#include <cmath>
 
 namespace TrenchBroom {
 namespace Assets {
@@ -57,8 +60,8 @@ void EntityModelFrame::setSkinOffset(const size_t skinOffset) {
 
 // EntityModel::LoadedFrame
 
-EntityModelLoadedFrame::EntityModelLoadedFrame(const size_t index, const std::string &name, const vm::bbox3f &bounds, const PitchType pitchType, const Orientation orientation)
-    : EntityModelFrame{index}, m_name{name}, m_bounds{bounds}, m_pitchType{pitchType}, m_orientation{orientation}, m_spacialTree{std::make_unique<SpacialTree>(16.0f)} {
+EntityModelLoadedFrame::EntityModelLoadedFrame(const size_t index, const std::string &name, const vm::bbox3f &bounds, const PitchType pitchType, const Orientation orientation, const bool buildPickingTree)
+    : EntityModelFrame{index}, m_name{name}, m_bounds{bounds}, m_pitchType{pitchType}, m_orientation{orientation}, m_spacialTree{buildPickingTree ? std::make_unique<SpacialTree>(16.0f) : nullptr} {
 }
 
 EntityModelLoadedFrame::~EntityModelLoadedFrame() = default;
@@ -85,6 +88,7 @@ Orientation EntityModelLoadedFrame::orientation() const {
 
 float EntityModelLoadedFrame::intersect(const vm::ray3f &ray) const {
     auto closestDistance = vm::nan<float>();
+    if (!m_spacialTree) return closestDistance;
 
     const auto candidates = m_spacialTree->find_intersectors(ray);
     for (const TriNum triNum : candidates) {
@@ -98,6 +102,7 @@ float EntityModelLoadedFrame::intersect(const vm::ray3f &ray) const {
 }
 
 void EntityModelLoadedFrame::addToSpacialTree(const std::vector<EntityModelVertex> &vertices, const Renderer::PrimType primType, const size_t index, const size_t count) {
+    if (!m_spacialTree) return;
     switch (primType) {
     case Renderer::PrimType::Points:
     case Renderer::PrimType::Lines:
@@ -435,7 +440,68 @@ void EntityModel::setTextureMode(const int minFilter, const int magFilter) {
 
 EntityModelFrame &EntityModel::addFrame() {
     m_frames.push_back(std::make_unique<EntityModelUnloadedFrame>(frameCount()));
+    for (auto& surface : m_surfaces) surface->m_meshes.resize(frameCount());
     return *m_frames.back();
+}
+
+double EntityModel::Animation::duration() const { return intervals.empty() ? 0 : intervals.back(); }
+
+size_t EntityModel::Animation::frameAt(double seconds) const {
+    if (frames.empty()) return 0;
+    if (!std::isfinite(seconds) || seconds < 0 || duration() <= 0) return frames.front();
+    seconds = std::fmod(seconds, duration());
+    const auto frame = size_t(std::upper_bound(intervals.begin(), intervals.end(), seconds) - intervals.begin());
+    return frames[std::min(frame, frames.size() - 1)];
+}
+
+void EntityModel::addAnimation(Animation animation) {
+    if (animation.frames.size() < 2 || animation.frames.size() != animation.intervals.size()) return;
+    double previous = 0;
+    for (size_t i = 0; i < animation.frames.size(); ++i) {
+        if (animation.frames[i] >= frameCount() || !std::isfinite(animation.intervals[i]) || animation.intervals[i] <= previous) return;
+        previous = animation.intervals[i];
+    }
+    m_animations.push_back(std::move(animation));
+}
+
+void EntityModel::addAnimationsFromFrameNames(const std::vector<std::string>& names, const double framesPerSecond) {
+    if (!std::isfinite(framesPerSecond) || framesPerSecond <= 0) return;
+    const auto sequence = [](std::string name) {
+        while (!name.empty() && std::isdigit(static_cast<unsigned char>(name.back()))) name.pop_back();
+        std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+        return name;
+    };
+    for (size_t first = 0; first < std::min(names.size(), frameCount());) {
+        const auto name = sequence(names[first]);
+        auto end = first + 1;
+        while (!name.empty() && end < std::min(names.size(), frameCount()) && sequence(names[end]) == name) ++end;
+        auto animation = Animation{name, {}, {}};
+        for (auto i = first; i < end; ++i) {
+            animation.frames.push_back(i);
+            animation.intervals.push_back(double(i - first + 1) / framesPerSecond);
+        }
+        addAnimation(std::move(animation));
+        first = end;
+    }
+}
+
+const EntityModel::Animation* EntityModel::animation(const size_t frameIndex) const {
+    for (const auto& animation : m_animations) {
+        if (std::find(animation.frames.begin(), animation.frames.end(), frameIndex) != animation.frames.end()) return &animation;
+    }
+    return nullptr;
+}
+
+void EntityModel::setAnimationFrameLoader(const size_t firstFrame, std::function<void(size_t, EntityModel&)> loader) {
+    m_animationSource = std::make_unique<AnimationSource>(AnimationSource{firstFrame, std::move(loader)});
+}
+
+bool EntityModel::loadAnimationFrame(const size_t frameIndex) {
+    if (!m_animationSource || frameIndex < m_animationSource->firstFrame) return false;
+    if (frameIndex >= frameCount()) throw AssetException("Animation frame index is out of bounds");
+    if (m_frames[frameIndex]->loaded()) return true;
+    m_animationSource->load(frameIndex, *this);
+    return true;
 }
 
 EntityModelLoadedFrame &EntityModel::loadFrame(const size_t frameIndex, const std::string &name, const vm::bbox3f &bounds) {
@@ -443,7 +509,8 @@ EntityModelLoadedFrame &EntityModel::loadFrame(const size_t frameIndex, const st
         throw AssetException("Frame index " + std::to_string(frameIndex) + " is out of bounds (frame count = " + std::to_string(frameCount()) + ")");
     }
 
-    auto frame = std::make_unique<EntityModelLoadedFrame>(frameIndex, name, bounds, m_pitchType, m_orientation);
+    const auto previewOnly = m_animationSource && frameIndex >= m_animationSource->firstFrame;
+    auto frame = std::make_unique<EntityModelLoadedFrame>(frameIndex, name, bounds, m_pitchType, m_orientation, !previewOnly);
     frame->setSkinOffset(m_frames[frameIndex]->skinOffset());
 
     auto &result = *frame;

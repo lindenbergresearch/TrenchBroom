@@ -31,6 +31,7 @@
 #include "kdl/string_utils.h"
 
 #include <string>
+#include <cmath>
 #include <vector>
 
 namespace TrenchBroom {
@@ -80,15 +81,15 @@ std::unique_ptr<Assets::EntityModel> MdlParser::doInitializeModel(Logger & /* lo
         throw AssetException("Unknown MDL model version: " + std::to_string(version));
     }
 
-    /* const auto scale = */ reader.readVec<float, 3>();
-    /* const auto origin = */ reader.readVec<float, 3>();
+    const auto scale = reader.readVec<float, 3>();
+    const auto origin = reader.readVec<float, 3>();
 
     reader.seekFromBegin(MdlLayout::HeaderNumSkins);
     const auto skinCount = reader.readSize<int32_t>();
     const auto skinWidth = reader.readSize<int32_t>();
     const auto skinHeight = reader.readSize<int32_t>();
-    /* const auto skinVertexCount = */ reader.readSize<int32_t>();
-    /* const auto skinTriangleCount = */ reader.readSize<int32_t>();
+    const auto vertexCount = reader.readSize<int32_t>();
+    const auto triangleCount = reader.readSize<int32_t>();
     const auto frameCount = reader.readSize<int32_t>();
     /* const auto syncType = */ reader.readSize<int32_t>();
     const auto flags = reader.readInt<int32_t>();
@@ -102,6 +103,57 @@ std::unique_ptr<Assets::EntityModel> MdlParser::doInitializeModel(Logger & /* lo
 
     reader.seekFromBegin(MdlLayout::Skins);
     parseSkins(reader, surface, skinCount, skinWidth, skinHeight, flags);
+
+    const auto vertices = parseVertices(reader, vertexCount);
+    const auto triangles = parseTriangles(reader, triangleCount);
+    const auto frameLength = MdlLayout::SimpleFrameName + MdlLayout::SimpleFrameLength + vertexCount * 4;
+    auto names = std::vector<std::string>(frameCount);
+    auto poses = std::vector<std::vector<char>>{};
+    for (size_t i = 0; i < frameCount; ++i) {
+        const auto type = reader.readInt<int32_t>();
+        if (type == 0) {
+            auto frame = reader.subReaderFromCurrent(frameLength);
+            frame.seekForward(MdlLayout::SimpleFrameName);
+            names[i] = frame.readString(MdlLayout::SimpleFrameLength);
+            reader.seekForward(frameLength);
+            continue;
+        }
+        const auto count = reader.readSize<int32_t>();
+        reader.seekForward(8); // packed group bounds
+        auto animation = Assets::EntityModel::Animation{"", {}, {}};
+        double previous = 0;
+        for (size_t j = 0; j < count; ++j) {
+            auto end = double(reader.readFloat<float>());
+            if (!std::isfinite(end) || end <= previous) end = previous + 0.1;
+            animation.intervals.push_back(end);
+            previous = end;
+        }
+        for (size_t j = 0; j < count; ++j) {
+            auto bytes = std::vector<char>(frameLength);
+            reader.read(bytes.data(), bytes.size());
+            if (j == 0) {
+                auto frame = Reader::from(bytes.data(), bytes.data() + bytes.size());
+                frame.seekForward(MdlLayout::SimpleFrameName);
+                animation.name = frame.readString(MdlLayout::SimpleFrameLength);
+                animation.frames.push_back(i);
+            } else {
+                animation.frames.push_back(model->frameCount());
+                model->addFrame();
+                poses.push_back(std::move(bytes));
+            }
+        }
+        model->addAnimation(std::move(animation));
+    }
+    model->addAnimationsFromFrameNames(names);
+    if (!poses.empty()) {
+        // Own the bytes: a reader into a temporary PAK/file buffer cannot outlive
+        // initialization. Render meshes are still created only when needed.
+        model->setAnimationFrameLoader(frameCount, [frames = std::move(poses), vertices, triangles, skinWidth, skinHeight, origin, scale, frameCount](size_t index, Assets::EntityModel& target) {
+            const auto& bytes = frames.at(index - frameCount);
+            auto frame = Reader::from(bytes.data(), bytes.data() + bytes.size());
+            doParseFrame(frame, target, index, target.surface(0), triangles, vertices, skinWidth, skinHeight, origin, scale);
+        });
+    }
 
     return model;
 }
@@ -293,7 +345,7 @@ void MdlParser::doParseFrame(Reader reader, Assets::EntityModel &model, size_t f
     surface.addIndexedMesh(frame, std::move(builder.vertices()), std::move(builder.indices()));
 }
 
-vm::vec3f MdlParser::unpackFrameVertex(const PackedFrameVertex &vertex, const vm::vec3f &origin, const vm::vec3f &scale) const {
+vm::vec3f MdlParser::unpackFrameVertex(const PackedFrameVertex &vertex, const vm::vec3f &origin, const vm::vec3f &scale) {
     vm::vec3f result;
     for (size_t i = 0; i < 3; ++i) {
         result[i] = origin[i] + scale[i] * static_cast<float>(vertex[i]);

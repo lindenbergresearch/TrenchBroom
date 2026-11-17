@@ -781,6 +781,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/Renderer/EntityLinkRenderer.h
     ${COMMON_SOURCE_DIR}/Renderer/EntityDecalRenderer.h
     ${COMMON_SOURCE_DIR}/Renderer/EntityModelRenderer.h
+    ${COMMON_SOURCE_DIR}/Renderer/EntityModelAnimation.h
     ${COMMON_SOURCE_DIR}/Renderer/EntityRenderer.h
     ${COMMON_SOURCE_DIR}/Renderer/FaceRenderer.h
     ${COMMON_SOURCE_DIR}/Renderer/FontDescriptor.h

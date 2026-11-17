@@ -83,9 +83,9 @@ class MdlParser : public EntityModelParser {
 
     void parseFrame(Reader &reader, Assets::EntityModel &model, size_t frameIndex, Assets::EntityModelSurface &surface, const MdlSkinTriangleList &triangles, const MdlSkinVertexList &vertices, size_t skinWidth, size_t skinHeight, const vm::vec3f &origin, const vm::vec3f &scale);
 
-    void doParseFrame(Reader reader, Assets::EntityModel &model, size_t frameIndex, Assets::EntityModelSurface &surface, const MdlSkinTriangleList &triangles, const MdlSkinVertexList &vertices, size_t skinWidth, size_t skinHeight, const vm::vec3f &origin, const vm::vec3f &scale);
+    static void doParseFrame(Reader reader, Assets::EntityModel &model, size_t frameIndex, Assets::EntityModelSurface &surface, const MdlSkinTriangleList &triangles, const MdlSkinVertexList &vertices, size_t skinWidth, size_t skinHeight, const vm::vec3f &origin, const vm::vec3f &scale);
 
-    vm::vec3f unpackFrameVertex(const PackedFrameVertex &vertex, const vm::vec3f &origin, const vm::vec3f &scale) const;
+    static vm::vec3f unpackFrameVertex(const PackedFrameVertex &vertex, const vm::vec3f &origin, const vm::vec3f &scale);
 };
 } // namespace IO
 } // namespace TrenchBroom

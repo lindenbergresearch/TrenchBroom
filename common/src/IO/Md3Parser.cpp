@@ -88,7 +88,7 @@ std::unique_ptr<Assets::EntityModel> Md3Parser::doInitializeModel(Logger &logger
     const auto surfaceCount = reader.readSize<int32_t>();
     /* const auto skinCount = */ reader.readSize<int32_t>();
 
-    /* const auto frameOffset = */ reader.readSize<int32_t>();
+    const auto frameOffset = reader.readSize<int32_t>();
     /* const auto tagOffset = */ reader.readSize<int32_t>();
     const auto surfaceOffset = reader.readSize<int32_t>();
 
@@ -96,6 +96,13 @@ std::unique_ptr<Assets::EntityModel> Md3Parser::doInitializeModel(Logger &logger
     for (size_t i = 0; i < frameCount; ++i) {
         model->addFrame();
     }
+    auto frameNames = std::vector<std::string>{};
+    for (size_t i = 0; i < frameCount; ++i) {
+        auto frame = reader.subReaderFromBegin(frameOffset + i * Md3Layout::FrameLength, Md3Layout::FrameLength);
+        frame.seekForward(Md3Layout::FrameLength - Md3Layout::FrameNameLength);
+        frameNames.push_back(frame.readString(Md3Layout::FrameNameLength));
+    }
+    model->addAnimationsFromFrameNames(frameNames);
 
     parseSurfaces(reader.subReaderFromBegin(surfaceOffset), surfaceCount, *model, logger);
 

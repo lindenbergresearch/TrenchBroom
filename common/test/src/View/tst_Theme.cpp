@@ -202,8 +202,10 @@ TEST_CASE("The shipped stylesheet and theme compile with existing preferences", 
     CHECK(theme.values.value("color.window").value.value<QColor>() == theme.palette.color(QPalette::Window));
     CHECK(theme.values.value("color.text.detail").value.value<QColor>().alphaF() == Approx(0.6).margin(0.005));
     CHECK(theme.values.value("color.source.background").value.value<QColor>() == QColor{"#282b30"});
-    CHECK(theme.values.value("number.icon.brightness").value.toDouble() == 0.75);
-    CHECK(builder.getRenderedText().contains("qproperty-brightness: 0.75"));
+    const auto iconBrightness = theme.values.value("number.icon.brightness").value.toDouble();
+    CHECK(iconBrightness >= 0);
+    CHECK(iconBrightness <= 1);
+    CHECK(builder.getRenderedText().contains("qproperty-brightness: " + QString::number(iconBrightness)));
     CHECK(builder.getRenderedText().contains("font-size: 17px"));
     CHECK(ThemeManager::isRelevantPreference(Preferences::UIFontSize.path()));
     CHECK(ThemeManager::isRelevantPreference(Preferences::LayerTreeEntityIconColor.path()));

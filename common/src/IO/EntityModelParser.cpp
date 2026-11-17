@@ -30,6 +30,7 @@ std::unique_ptr<Assets::EntityModel> EntityModelParser::initializeModel(Logger &
 }
 
 void EntityModelParser::loadFrame(const size_t frameIndex, Assets::EntityModel &model, Logger &logger) {
+    if (model.loadAnimationFrame(frameIndex)) return;
     return doLoadFrame(frameIndex, model, logger);
 }
 

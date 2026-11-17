@@ -20,6 +20,8 @@
 #pragma once
 
 #include "Renderer/Lighting.h"
+#include "Renderer/EntityModelAnimation.h"
+#include "Assets/ModelDefinition.h"
 #include "Color.h"
 #include "Renderer/Renderable.h"
 
@@ -44,6 +46,7 @@ class RenderBatch;
 class ShaderConfig;
 
 class TexturedRenderer;
+class Camera;
 
 class EntityModelRenderer : public DirectRenderable {
   private:
@@ -52,7 +55,18 @@ class EntityModelRenderer : public DirectRenderable {
     Assets::EntityModelManager &m_entityModelManager;
     const Model::EditorContext &m_editorContext;
 
-    std::unordered_map<const Model::EntityNode *, TexturedRenderer *> m_entities;
+    struct ModelEntry {
+        Assets::ModelSpecification specification;
+        TexturedRenderer* renderer;
+        const Assets::EntityModel::Animation* animation;
+        TexturedRenderer* animatedRenderer = nullptr;
+        TexturedRenderer* displayedRenderer = nullptr;
+        size_t animatedFrame = size_t(-1);
+        std::unordered_map<const Camera*, EntityModelAnimationPlayback> playback;
+        ModelEntry(Assets::ModelSpecification spec, TexturedRenderer* base, const Assets::EntityModel::Animation* clip)
+            : specification{std::move(spec)}, renderer{base}, animation{clip} {}
+    };
+    std::unordered_map<const Model::EntityNode*, ModelEntry> m_entities;
 
     std::unordered_map<const Model::EntityNode*, LightSelection> m_lightSelections;
 
@@ -105,7 +119,7 @@ class EntityModelRenderer : public DirectRenderable {
 
     void setShowHiddenEntities(bool showHiddenEntities);
 
-    void render(RenderBatch &renderBatch);
+    void render(RenderContext& renderContext, RenderBatch& renderBatch);
 
   private:
     void doPrepareVertices(VboManager &vboManager) override;

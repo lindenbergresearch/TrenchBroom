@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "Assets/EntityModel.h"
+
 #include "kdl/vector_set.h"
 
 #include <filesystem>
@@ -72,6 +74,7 @@ class EntityModelManager {
     mutable ModelMismatches m_modelMismatches;
     mutable RendererCache m_renderers;
     mutable RendererMismatches m_rendererMismatches;
+    mutable RendererMismatches m_frameMismatches;
 
     mutable ModelList m_unpreparedModels;
     mutable RendererList m_unpreparedRenderers;
@@ -90,6 +93,7 @@ class EntityModelManager {
     Renderer::TexturedRenderer *renderer(const ModelSpecification &spec) const;
 
     const EntityModelFrame *frame(const ModelSpecification &spec) const;
+    const EntityModel::Animation* animation(const ModelSpecification& spec) const;
 
   private:
     EntityModel *model(const std::filesystem::path &path) const;

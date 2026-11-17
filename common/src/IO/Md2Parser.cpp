@@ -89,7 +89,7 @@ std::unique_ptr<Assets::EntityModel> Md2Parser::doInitializeModel(Logger &logger
 
     /*const size_t skinWidth =*/reader.readSize<int32_t>();
     /*const size_t skinHeight =*/reader.readSize<int32_t>();
-    /*const size_t frameSize =*/reader.readSize<int32_t>();
+    const auto frameSize = reader.readSize<int32_t>();
 
     const size_t skinCount = reader.readSize<int32_t>();
     /* const size_t frameVertexCount = */ reader.readSize<int32_t>();
@@ -99,6 +99,9 @@ std::unique_ptr<Assets::EntityModel> Md2Parser::doInitializeModel(Logger &logger
 
     const size_t frameCount = reader.readSize<int32_t>();
     const size_t skinOffset = reader.readSize<int32_t>();
+    reader.readSize<int32_t>(); // texture coordinate offset
+    reader.readSize<int32_t>(); // triangle offset
+    const auto frameOffset = reader.readSize<int32_t>();
 
     const Md2SkinList skins = parseSkins(reader.subReaderFromBegin(skinOffset), skinCount);
 
@@ -106,6 +109,13 @@ std::unique_ptr<Assets::EntityModel> Md2Parser::doInitializeModel(Logger &logger
     for (size_t i = 0; i < frameCount; ++i) {
         model->addFrame();
     }
+    auto frameNames = std::vector<std::string>{};
+    for (size_t i = 0; i < frameCount; ++i) {
+        auto frame = reader.subReaderFromBegin(frameOffset + i * frameSize, frameSize);
+        frame.seekForward(6 * sizeof(float)); // scale and origin
+        frameNames.push_back(frame.readString(16));
+    }
+    model->addAnimationsFromFrameNames(frameNames);
 
     auto &surface = model->addSurface(m_name);
     loadSkins(surface, skins, logger);

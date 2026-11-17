@@ -1,6 +1,7 @@
 #include "Error.h"
 #include "IO/GameConfigParser.h"
 #include "IO/VectorIcon.h"
+#include "IO/ResourceUtils.h"
 #include "Logger.h"
 #include "Model/GameImpl.h"
 #include "Preferences.h"
@@ -12,6 +13,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QTabWidget>
 #include <catch2/catch.hpp>
@@ -82,6 +84,35 @@ TEST_CASE_METHOD(ViewEditorTest, "Grid view controls follow preferences and docu
     setPref(Preferences::ShadeFaces, true);
     PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::ShadeFaces.path());
     CHECK(shading->isEnabled());
+}
+
+TEST_CASE_METHOD(ViewEditorTest, "Model animation controls persist independent triggers and update availability", "[view-editor][model-animation]") {
+    const auto selectedPref = TemporarilySetPref{Preferences::AnimateSelectedEntityModels, true};
+    const auto nearbyPref = TemporarilySetPref{Preferences::AnimateNearbyEntityModels, false};
+    const auto distancePref = TemporarilySetPref{Preferences::EntityModelAnimationDistance, 256.f};
+    const auto speedPref = TemporarilySetPref{Preferences::EntityModelAnimationSpeed, 1.5f};
+    const auto visiblePref = TemporarilySetPref{Preferences::ShowPointEntities, true};
+    const auto modelsPref = TemporarilySetPref{Preferences::ShowPointEntityModels, true};
+    newMap();
+    auto* selected = control<QCheckBox>("animateSelectedEntityModels");
+    auto* nearby = control<QCheckBox>("animateNearbyEntityModels");
+    auto* distance = control<SliderWithLabel>("entityModelAnimationDistance");
+    auto* speed = control<SliderWithLabel>("entityModelAnimationSpeed");
+    CHECK(selected->isChecked()); CHECK_FALSE(nearby->isChecked());
+    CHECK(distance->value() == 256); CHECK_FALSE(distance->isEnabled());
+    CHECK(speed->value() == 150); CHECK(speed->isEnabled());
+    nearby->click(); CHECK(pref(Preferences::AnimateNearbyEntityModels));
+    PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::AnimateNearbyEntityModels.path());
+    CHECK(distance->isEnabled());
+    distance->setValue(768); CHECK(pref(Preferences::EntityModelAnimationDistance) == 768.f);
+    speed->setValue(75); CHECK(pref(Preferences::EntityModelAnimationSpeed) == Approx(.75f));
+    selected->click(); CHECK_FALSE(pref(Preferences::AnimateSelectedEntityModels));
+    nearby->click(); CHECK_FALSE(pref(Preferences::AnimateNearbyEntityModels));
+    PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::AnimateNearbyEntityModels.path());
+    CHECK_FALSE(speed->isEnabled()); CHECK_FALSE(distance->isEnabled());
+    setPref(Preferences::ShowPointEntityModels, false);
+    PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::ShowPointEntityModels.path());
+    CHECK_FALSE(selected->isEnabled()); CHECK_FALSE(nearby->isEnabled());
 }
 
 TEST_CASE_METHOD(ViewEditorTest, "View settings retain their page when rebuilt and restore grid defaults", "[view-editor]") {

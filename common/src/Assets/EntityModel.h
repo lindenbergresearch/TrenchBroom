@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include "Assets/EntityModel_Forward.h"
 
 #include "vm/bbox.h"
@@ -168,7 +170,7 @@ class EntityModelLoadedFrame : public EntityModelFrame {
      * @param pitchType the pitch type
      * @param orientation the orientation
      */
-    EntityModelLoadedFrame(size_t index, const std::string &name, const vm::bbox3f &bounds, PitchType pitchType, Orientation orientation);
+    EntityModelLoadedFrame(size_t index, const std::string &name, const vm::bbox3f &bounds, PitchType pitchType, Orientation orientation, bool buildPickingTree = true);
 
     ~EntityModelLoadedFrame();
 
@@ -211,6 +213,7 @@ class EntityModelTexturedMesh;
  * number of frames in the model.
  */
 class EntityModelSurface {
+    friend class EntityModel;
   private:
     std::string m_name;
     std::vector<std::unique_ptr<EntityModelMesh>> m_meshes;
@@ -324,8 +327,31 @@ class EntityModel {
     std::vector<std::unique_ptr<EntityModelSurface>> m_surfaces;
     PitchType m_pitchType;
     Orientation m_orientation;
+    struct AnimationSource {
+        size_t firstFrame;
+        std::function<void(size_t, EntityModel&)> load;
+    };
+    std::unique_ptr<AnimationSource> m_animationSource;
 
   public:
+    struct Animation {
+        std::string name;
+        std::vector<size_t> frames;
+        // Cumulative end times in seconds, including the end of the loop.
+        std::vector<double> intervals;
+        size_t frameAt(double seconds) const;
+        double duration() const;
+    };
+
+  private:
+    std::vector<Animation> m_animations;
+
+  public:
+    void addAnimation(Animation animation);
+    void addAnimationsFromFrameNames(const std::vector<std::string>& names, double framesPerSecond = 10);
+    const Animation* animation(size_t frameIndex) const;
+    void setAnimationFrameLoader(size_t firstFrame, std::function<void(size_t, EntityModel&)> loader);
+    bool loadAnimationFrame(size_t frameIndex);
     /**
      * Creates a new entity model.
      *

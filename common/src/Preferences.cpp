@@ -313,6 +313,10 @@ Preference<bool> ShowGroupBounds("Map view/Show group bounds", true);
 Preference<bool> ShowBrushEntityBounds("Map view/Show brush entity bounds", true);
 Preference<bool> ShowPointEntityBounds("Map view/Show point entity bounds", true);
 Preference<bool> ShowPointEntityModels("Map view/Show point entity models", true);
+Preference<bool> AnimateSelectedEntityModels("Map view/Model animation/On selection", true);
+Preference<bool> AnimateNearbyEntityModels("Map view/Model animation/Near camera", false);
+Preference<float> EntityModelAnimationDistance("Map view/Model animation/Camera distance", 512.0f);
+Preference<float> EntityModelAnimationSpeed("Map view/Model animation/Speed", 1.0f);
 Preference<bool> PreviewEntityAudio("Map view/Audio preview/Enabled", true);
 Preference<bool> LoopEntityAudio("Map view/Audio preview/Loop", false);
 Preference<int> EntityAudioVolume("Map view/Audio preview/Volume", 60);
@@ -402,6 +406,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &CameraFlyForward(), &CameraFlyBackward(), &CameraFlyLeft(), &CameraFlyRight(), &CameraFlyUp(), &CameraFlyDown(), &ShowEntityClassnames, &ShowGroupBounds, &ShowBrushEntityBounds, &EnableLightning,
         &LightningIntensity, &LightningAmbient, &ShowPointEntityBounds, &ShowPointEntityModels,
         &PreviewEntityAudio, &LoopEntityAudio, &EntityAudioVolume,
+        &AnimateSelectedEntityModels, &AnimateNearbyEntityModels, &EntityModelAnimationDistance, &EntityModelAnimationSpeed,
         &FaceRenderMode, &ShadeFaces, &ShowFog, &ShowSky, &ShowEdges, &ShowSoftMapBounds, &ShowPointEntities, &ShowBrushes,
         &EntityLinkMode
     };

@@ -44,6 +44,7 @@
 #include <vm/mat.h>
 
 #include <vector>
+#include <chrono>
 
 namespace TrenchBroom {
 namespace Renderer {
@@ -62,7 +63,7 @@ void EntityModelRenderer::addEntity(const Model::EntityNode *entityNode) {
 
     auto *renderer = m_entityModelManager.renderer(modelSpec);
     if (renderer != nullptr) {
-        m_entities.emplace(entityNode, renderer);
+        m_entities.emplace(entityNode, ModelEntry{modelSpec, renderer, m_entityModelManager.animation(modelSpec)});
     }
 }
 
@@ -84,13 +85,13 @@ void EntityModelRenderer::updateEntity(const Model::EntityNode *entityNode) {
     }
 
     if (it == std::end(m_entities)) {
-        m_entities.emplace(entityNode, renderer);
+        m_entities.emplace(entityNode, ModelEntry{modelSpec, renderer, m_entityModelManager.animation(modelSpec)});
     } else {
         if (renderer == nullptr) {
             m_entities.erase(it);
             m_lightSelections.erase(entityNode);
-        } else if (it->second != renderer) {
-            it->second = renderer;
+        } else if (it->second.renderer != renderer || it->second.specification != modelSpec) {
+            it->second = ModelEntry{modelSpec, renderer, m_entityModelManager.animation(modelSpec)};
         }
     }
 }
@@ -124,7 +125,30 @@ void EntityModelRenderer::setShowHiddenEntities(const bool showHiddenEntities) {
     m_showHiddenEntities = showHiddenEntities;
 }
 
-void EntityModelRenderer::render(RenderBatch &renderBatch) {
+void EntityModelRenderer::render(RenderContext& renderContext, RenderBatch &renderBatch) {
+    const auto onSelection = pref(Preferences::AnimateSelectedEntityModels);
+    const auto nearCamera = pref(Preferences::AnimateNearbyEntityModels);
+    const auto distance = pref(Preferences::EntityModelAnimationDistance);
+    const auto speed = pref(Preferences::EntityModelAnimationSpeed);
+    const auto now = std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    for (auto& [node, entry] : m_entities) {
+        entry.displayedRenderer = entry.renderer;
+        if (!renderContext.render3D() || !entry.animation) continue;
+        const auto* camera = &renderContext.camera();
+        const auto active = (m_showHiddenEntities || m_editorContext.visible(node))
+            && previewModelAnimation(node->transitivelySelected(), vm::bbox3f{node->physicalBounds()}, camera->position(), onSelection, nearCamera, distance);
+        if (!active) { entry.playback.erase(camera); continue; }
+        const auto frame = entry.playback[camera].frame(*entry.animation, now, speed);
+        if (entry.animatedFrame != frame) {
+            auto spec = entry.specification;
+            spec.frameIndex = frame;
+            const auto* pose = m_entityModelManager.frame(spec);
+            entry.animatedRenderer = pose && pose->loaded() ? m_entityModelManager.renderer(spec) : nullptr;
+            entry.animatedFrame = frame;
+        }
+        if (entry.animatedRenderer) entry.displayedRenderer = entry.animatedRenderer;
+    }
+    // All new poses must be requested before RenderBatch uploads its geometry.
     renderBatch.add(this);
 }
 
@@ -158,7 +182,7 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
     shader.set("CameraUp", renderContext.camera().up());
     shader.set("ViewMatrix", renderContext.camera().viewMatrix());
 
-    for (const auto &[entityNode, renderer] : m_entities) {
+    for (const auto &[entityNode, entry] : m_entities) {
 //        auto distance = RenderService::distanceToEntity(renderContext.camera(), entityNode);
 //
 //        if (distance > 1024 || distance < -5) {
@@ -184,7 +208,7 @@ void EntityModelRenderer::doRender(RenderContext &renderContext) {
             && entityNode->entity().model()->orientation() == Assets::Orientation::Oriented) {
             configureLightingRegion(shader, renderContext, vm::bbox3f(entityNode->physicalBounds()), m_lightSelections[entityNode], true);
         }
-        renderer->render();
+        entry.displayedRenderer->render();
     }
 }
 } // namespace Renderer
