@@ -51,11 +51,12 @@ ScaleObjectsToolPage::ScaleObjectsToolPage(std::weak_ptr<MapDocument> document, 
 void ScaleObjectsToolPage::connectObservers() {
     auto document = kdl::mem_lock(m_document);
     m_notifierConnection += document->selectionDidChangeNotifier.connect(this, &ScaleObjectsToolPage::selectionDidChange);
+    m_notifierConnection += document->componentSelectionDidChangeNotifier.connect([this]{activate();updateGui();});
 }
 
 void ScaleObjectsToolPage::activate() {
     const auto document = kdl::mem_lock(m_document);
-    const auto suggestedSize = document->hasSelectedNodes() ? document->selectionBounds().size() : vm::vec3::zero();
+    const auto suggestedSize = document->hasSelectedNodes() ? document->transformationBounds(true).size() : vm::vec3::zero();
 
     m_sizeTextBox->setText(QString::fromStdString(kdl::str_to_string(suggestedSize)));
     m_factorsTextBox->setText("1.0 1.0 1.0");
@@ -67,22 +68,22 @@ void ScaleObjectsToolPage::createGui() {
     auto *text = new QLabel(tr("Scale objects"));
 
     m_book = new QStackedLayout();
-    m_sizeTextBox = new QLineEdit();
-    m_factorsTextBox = new QLineEdit();
+    m_sizeTextBox = new QLineEdit();m_sizeTextBox->setObjectName("ScaleToolSize");
+    m_factorsTextBox = new QLineEdit();m_factorsTextBox->setObjectName("ScaleToolFactors");
     m_book->addWidget(m_sizeTextBox);
     m_book->addWidget(m_factorsTextBox);
 
     connect(m_sizeTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale);
     connect(m_factorsTextBox, &QLineEdit::returnPressed, this, &ScaleObjectsToolPage::applyScale);
 
-    m_scaleFactorsOrSize = new QComboBox();
+    m_scaleFactorsOrSize = new QComboBox();m_scaleFactorsOrSize->setObjectName("ScaleToolMode");
     m_scaleFactorsOrSize->addItem(tr("to size"));
     m_scaleFactorsOrSize->addItem(tr("by factors"));
 
     m_scaleFactorsOrSize->setCurrentIndex(0);
     connect(m_scaleFactorsOrSize, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), m_book, &QStackedLayout::setCurrentIndex);
 
-    m_button = new QPushButton(tr("Apply"));
+    m_button = new QPushButton(tr("Apply"));m_button->setObjectName("ScaleToolApply");
     connect(m_button, &QAbstractButton::clicked, this, &ScaleObjectsToolPage::applyScale);
 
     auto *layout = new QHBoxLayout();
@@ -112,7 +113,7 @@ std::optional<vm::vec3> ScaleObjectsToolPage::getScaleFactors() const {
     case 0: {
         auto document = kdl::mem_lock(m_document);
         if (const auto desiredSize = vm::parse<FloatType, 3>(m_sizeTextBox->text().toStdString())) {
-            return *desiredSize / document->selectionBounds().size();
+            return *desiredSize / document->transformationBounds(true).size();
         }
         return std::nullopt;
     }
@@ -130,7 +131,7 @@ void ScaleObjectsToolPage::applyScale() {
     }
 
     auto document = kdl::mem_lock(m_document);
-    const auto box = document->selectionBounds();
+    const auto box = document->transformationBounds(true);
     if (const auto scaleFactors = getScaleFactors()) {
         document->scaleObjects(box.center(), *scaleFactors);
     }

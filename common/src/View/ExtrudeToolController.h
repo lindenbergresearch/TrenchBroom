@@ -24,6 +24,7 @@
 
 namespace TrenchBroom {
 namespace Renderer {
+class Camera;
 class DirectEdgeRenderer;
 
 class RenderBatch;
@@ -68,7 +69,7 @@ class ExtrudeToolController : public ToolController {
   private:
     virtual bool doHandleInput(const InputState &inputState) const = 0;
 
-    virtual Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) = 0;
+    virtual Model::Hit doPick(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) = 0;
 };
 
 class ExtrudeToolController2D : public ExtrudeToolController {
@@ -76,7 +77,7 @@ class ExtrudeToolController2D : public ExtrudeToolController {
     explicit ExtrudeToolController2D(ExtrudeTool &tool);
 
   private:
-    Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
+    Model::Hit doPick(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) override;
 
     bool doHandleInput(const InputState &inputState) const override;
 };
@@ -86,7 +87,7 @@ class ExtrudeToolController3D : public ExtrudeToolController {
     explicit ExtrudeToolController3D(ExtrudeTool &tool);
 
   private:
-    Model::Hit doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) override;
+    Model::Hit doPick(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) override;
 
     bool doHandleInput(const InputState &inputState) const override;
 };

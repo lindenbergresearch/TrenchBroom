@@ -18,42 +18,33 @@
  */
 
 #pragma once
-
-#include <QWidget>
-
 #include "NotifierConnection.h"
-
+#include <QWidget>
 #include <memory>
-
 class QComboBox;
-
-class QStackedLayout;
-
+class QPushButton;
+class QStackedWidget;
+class QToolButton;
+class QLabel;
 namespace TrenchBroom::View {
 class DrawShapeToolExtensionManager;
-
 class MapDocument;
-
 class DrawShapeToolPage : public QWidget {
-  Q_OBJECT
-  private:
-    std::weak_ptr<MapDocument> m_document;
-
-    QComboBox *m_extensions = nullptr;
-    QStackedLayout *m_extensionPages = nullptr;
-
-    NotifierConnection m_notifierConnection;
+    Q_OBJECT
+    DrawShapeToolExtensionManager& m_manager;
+    QWidget* m_quickMove = nullptr;
+    QToolButton* m_shapes = nullptr;
+    QToolButton* m_group = nullptr;
+    QComboBox* m_axis = nullptr;
+    QLabel* m_axisLabel = nullptr;
+    QPushButton* m_apply = nullptr;
+    QStackedWidget* m_pages = nullptr;
+    NotifierConnection m_connections;
 
   public:
-    explicit DrawShapeToolPage(
-        std::weak_ptr<MapDocument> document,
-        DrawShapeToolExtensionManager &extensionManager,
-        QWidget *parent = nullptr);
+    DrawShapeToolPage(std::weak_ptr<MapDocument> document, DrawShapeToolExtensionManager& manager, QWidget* parent = nullptr);
 
   private:
-    void createGui(DrawShapeToolExtensionManager &extensionManager);
-
-    void currentExtensionDidChange(size_t index);
+    void refresh();
 };
-
 } // namespace TrenchBroom::View

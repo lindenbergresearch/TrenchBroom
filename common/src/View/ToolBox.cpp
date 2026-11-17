@@ -30,6 +30,8 @@
 #include "View/ToolController.h"
 
 #include <cassert>
+#include <algorithm>
+#include <kdl/vector_utils.h>
 #include <string>
 #include <utility>
 
@@ -222,7 +224,7 @@ bool ToolBox::cancel(ToolChain* chain)
 
   if (anyToolActive())
   {
-    deactivateAllTools();
+    deactivateTool(*m_modalToolStack.back());
     return true;
   }
 
@@ -235,39 +237,14 @@ void ToolBox::suppressWhileActive(Tool& suppressedTool, Tool& primaryTool)
   m_suppressedTools[&primaryTool].push_back(&suppressedTool);
 }
 
-bool ToolBox::anyToolActive() const
-{
-  return m_modalTool != nullptr;
+void ToolBox::addExclusiveToolGroup(std::initializer_list<Tool*> tools) {m_exclusiveToolGroups.emplace_back(tools);}
+bool ToolBox::anyToolActive() const {return !m_modalToolStack.empty();}
+Tool* ToolBox::activeTool() {return m_modalToolStack.empty()?nullptr:m_modalToolStack.back();}
+void ToolBox::toggleTool(Tool& tool) {
+    if(std::find(m_modalToolStack.begin(),m_modalToolStack.end(),&tool)!=m_modalToolStack.end()) deactivateTool(tool);
+    else activateTool(tool);
 }
-
-Tool* ToolBox::activeTool()
-{
-  return m_modalTool;
-}
-
-void ToolBox::toggleTool(Tool& tool)
-{
-  if (&tool == m_modalTool)
-  {
-    deactivateTool(*m_modalTool);
-  }
-  else
-  {
-    if (m_modalTool)
-    {
-      deactivateTool(*m_modalTool);
-    }
-    activateTool(tool);
-  }
-}
-
-void ToolBox::deactivateAllTools()
-{
-  if (m_modalTool)
-  {
-    deactivateTool(*m_modalTool);
-  }
-}
+void ToolBox::deactivateAllTools() {while(!m_modalToolStack.empty()) deactivateTool(*m_modalToolStack.back());}
 
 bool ToolBox::enabled() const
 {
@@ -308,44 +285,34 @@ void ToolBox::renderTools(
   }
 }
 
-void ToolBox::activateTool(Tool& tool)
-{
-  if (tool.activate())
-  {
-    auto it = m_suppressedTools.find(&tool);
-    if (it != std::end(m_suppressedTools))
-    {
-      for (auto* suppress : it->second)
-      {
-        suppress->deactivate();
-        toolDeactivatedNotifier(*suppress);
-      }
-    }
-
-    m_modalTool = &tool;
-    toolActivatedNotifier(tool);
-  }
+std::vector<Tool*> ToolBox::currentlySuppressedTools() const {
+    std::vector<Tool*> result;
+    for(const auto& [primary,tools]:m_suppressedTools) if(primary->active()) result=kdl::vec_concat(std::move(result),tools);
+    return kdl::vec_sort_and_remove_duplicates(std::move(result));
 }
-
-void ToolBox::deactivateTool(Tool& tool)
-{
-  if (dragging())
-  {
-    cancelMouseDrag();
-  }
-
-  auto it = m_suppressedTools.find(&tool);
-  if (it != std::end(m_suppressedTools))
-  {
-    for (auto* suppress : it->second)
-    {
-      suppress->activate();
-      toolActivatedNotifier(*suppress);
+void ToolBox::activateTool(Tool& tool) {
+    auto excluded=std::vector<Tool*>{};
+    if(m_exclusiveToolGroups.empty()) excluded=m_modalToolStack;
+    for(const auto& group:m_exclusiveToolGroups) if(std::find(group.begin(),group.end(),&tool)!=group.end())
+        for(auto* other:m_modalToolStack) if(std::find(group.begin(),group.end(),other)!=group.end()) excluded.push_back(other);
+    excluded=kdl::vec_sort_and_remove_duplicates(std::move(excluded));
+    for(auto* other:excluded) if(other->active()) deactivateTool(*other);
+    const auto previous=currentlySuppressedTools();
+    if(tool.activate()) {
+        for(auto* other:currentlySuppressedTools()) if(std::find(previous.begin(),previous.end(),other)==previous.end() && other->active()) {
+            other->deactivate();toolDeactivatedNotifier(*other);
+        }
+        m_modalToolStack.push_back(&tool);toolActivatedNotifier(tool);
     }
-  }
-
-  tool.deactivate();
-  m_modalTool = nullptr;
-  toolDeactivatedNotifier(tool);
+}
+void ToolBox::deactivateTool(Tool& tool) {
+    if(dragging()) cancelMouseDrag();
+    const auto previous=currentlySuppressedTools();
+    tool.deactivate();m_modalToolStack.erase(std::remove(m_modalToolStack.begin(),m_modalToolStack.end(),&tool),m_modalToolStack.end());
+    toolDeactivatedNotifier(tool);
+    const auto current=currentlySuppressedTools();
+    for(auto* other:previous) if(std::find(current.begin(),current.end(),other)==current.end() && !other->active()) {
+        other->activate();toolActivatedNotifier(*other);
+    }
 }
 } // namespace TrenchBroom::View

@@ -76,7 +76,7 @@ class Lasso;
 
 class MapDocument;
 
-template<typename H> class VertexToolBase : public Tool {
+template<typename H> class VertexToolBase : public Tool, public BrushComponentSelection {
   public:
     enum class MoveResult {
       Continue, Deny, Cancel
@@ -100,7 +100,22 @@ template<typename H> class VertexToolBase : public Tool {
     }
 
   public:
-    ~VertexToolBase() override = default;
+    ~VertexToolBase() override {if(auto document=m_document.lock()) document->clearComponentSelection(this);}
+    std::vector<vm::vec3> selectedVertexPositions() const override {
+        const auto handles=handleManager().selectedHandles();
+        auto vertices=std::vector<vm::vec3>{};H::get_vertices(handles.begin(),handles.end(),std::back_inserter(vertices));
+        kdl::vec_sort_and_remove_duplicates(vertices);return vertices;
+    }
+    bool transformSelection(const std::string& name,const vm::mat4x4& transformation) override {
+        auto handles=handleManager().selectedHandles();if(handles.empty()) return false;
+        auto document=kdl::mem_lock(m_document);
+        if constexpr(std::is_same_v<H,vm::vec3>) return document->transformVertices(std::move(handles),transformation,name).success;
+        else if constexpr(std::is_same_v<H,vm::segment3>) return document->transformEdges(std::move(handles),transformation,name);
+        else return document->transformFaces(std::move(handles),transformation,name);
+    }
+    void notifyToolHandleSelectionChanged() {
+        kdl::mem_lock(m_document)->componentSelectionChanged();Tool::notifyToolHandleSelectionChanged();
+    }
 
   public:
     const Grid &grid() const { return kdl::mem_lock(m_document)->grid(); }
@@ -389,10 +404,12 @@ template<typename H> class VertexToolBase : public Tool {
         handleManager().clear();
         handleManager().addHandles(std::begin(brushes), std::end(brushes));
 
+        kdl::mem_lock(m_document)->setComponentSelection(this);
         return true;
     }
 
     bool doDeactivate() override {
+        kdl::mem_lock(m_document)->clearComponentSelection(this);
         m_notifierConnection.disconnect();
         handleManager().clear();
         return true;
@@ -437,6 +454,7 @@ template<typename H> class VertexToolBase : public Tool {
             addHandles(vertexCommand);
             selectNewHandlePositions(vertexCommand);
             --m_ignoreChangeNotifications;
+            notifyToolHandleSelectionChanged();
         }
     }
 
@@ -445,6 +463,7 @@ template<typename H> class VertexToolBase : public Tool {
             addHandles(vertexCommand);
             selectOldHandlePositions(vertexCommand);
             --m_ignoreChangeNotifications;
+            notifyToolHandleSelectionChanged();
         }
     }
 

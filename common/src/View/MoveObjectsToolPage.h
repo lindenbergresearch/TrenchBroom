@@ -28,6 +28,7 @@
 class QAbstractButton;
 
 class QLineEdit;
+class QLabel;
 
 namespace TrenchBroom {
 namespace View {

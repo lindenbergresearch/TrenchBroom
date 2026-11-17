@@ -46,7 +46,9 @@ const Grid& CreateBrushesToolBase::grid() const
   return kdl::mem_lock(m_document)->grid();
 }
 
-void CreateBrushesToolBase::createBrushes()
+bool CreateBrushesToolBase::hasBrushes() const { return !m_brushNodes.empty(); }
+
+bool CreateBrushesToolBase::createBrushes(std::optional<std::string> groupName)
 {
   if (!m_brushNodes.empty())
   {
@@ -59,11 +61,15 @@ void CreateBrushesToolBase::createBrushes()
     auto transaction = Transaction{document, "Create Brush"};
     document->deselectAll();
     auto addedNodes = document->addNodes({{document->parentForNodes(), nodesToAdd}});
+    if(addedNodes.empty()) { transaction.cancel(); return false; }
     document->selectNodes(addedNodes);
-    transaction.commit();
+    if(groupName && addedNodes.size()>1 && !document->groupSelection(*groupName)) { transaction.cancel(); return false; }
+    if(!transaction.commit()) return false;
 
     doBrushesWereCreated();
+    return true;
   }
+  return false;
 }
 
 void CreateBrushesToolBase::clearBrushes()

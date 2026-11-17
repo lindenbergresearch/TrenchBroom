@@ -1847,7 +1847,7 @@ template<typename T, typename FP, typename VP> class Polyhedron {
      */
     std::optional<Seam> createSeamForHorizon(const vm::vec<T, 3> &position, T planeEpsilon);
 
-    void visitFace(const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, T planeEpsilon);
+    bool visitFace(const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, T planeEpsilon);
 
     /**
      * Splits this polyhedron along the given seam. The edges of the seam must be oriented

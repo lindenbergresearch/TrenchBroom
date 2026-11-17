@@ -23,6 +23,11 @@
 #include "Exceptions.h"
 #include "FloatType.h"
 #include "Model/BrushFace.h"
+#include "Model/BrushBuilder.h"
+#include "Model/WorldNode.h"
+#include "Renderer/Camera.h"
+#include <vm/intersection.h>
+#include <ranges>
 #include "Model/BrushGeometry.h"
 #include "Model/BrushNode.h"
 #include "Model/Hit.h"
@@ -145,69 +150,269 @@ std::optional<EdgeInfo> findClosestHorizonEdge(const std::vector<Model::Node *> 
     }
     return result;
 }
+std::vector<Model::BrushFaceHandle> collectCoincidentFaces(
+  const std::vector<Model::Node*>& nodes,
+  const Model::BrushFaceHandle& faceHandle,
+  const bool normalSign)
+{
+  auto result = std::vector<Model::BrushFaceHandle>{};
+
+  const auto& referenceFace = faceHandle.face();
+  const auto referencePlane =
+    normalSign ? referenceFace.boundary() : referenceFace.boundary().flip();
+  const auto referencePolygon = referenceFace.polygon();
+
+  for (auto* node : nodes)
+  {
+    node->accept(kdl::overload(
+      [](Model::WorldNode*) {},
+      [](Model::LayerNode*) {},
+      [](Model::GroupNode*) {},
+      [](Model::EntityNode*) {},
+      [&](Model::BrushNode* brushNode) {
+        const auto& brush = brushNode->brush();
+        for (size_t i = 0; i < brush.faceCount(); ++i)
+        {
+          const auto& face = brush.face(i);
+          if (!face.coplanarWith(referencePlane))
+          {
+            continue;
+          }
+
+          // Same-normal coplanar faces may belong to the same logical surface even when
+          // they don't overlap (e.g. two brushes forming a floor, touching edge to edge).
+          // Opposing-normal faces are only a genuine touching seam if their polygons
+          // actually overlap in space -- otherwise they just happen to share a plane.
+          if (
+            !normalSign
+            && !vm::polygons_overlap(
+              referencePolygon, face.polygon(), referenceFace.boundary().normal))
+          {
+            continue;
+          }
+
+          result.emplace_back(brushNode, i);
+        }
+      },
+      [](Model::PatchNode*) {}));
+  }
+
+  return result;
+}
+
+std::vector<Model::BrushFaceHandle> collectOpposingFaces(
+  const std::vector<Model::Node*>& nodes, const Model::BrushFaceHandle& faceHandle)
+{
+  return collectCoincidentFaces(nodes, faceHandle, false);
+}
+
+std::vector<EdgeInfo> findHorizonEdges(
+  const std::vector<Model::Node*>& nodes, const vm::ray3& pickRay)
+{
+  auto result = std::vector<EdgeInfo>{};
+  for (auto* node : nodes)
+  {
+    node->accept(kdl::overload(
+      [](Model::WorldNode*) {},
+      [](Model::LayerNode*) {},
+      [](Model::GroupNode*) {},
+      [](Model::EntityNode*) {},
+      [&](Model::BrushNode* brushNode) {
+        for (const auto* edge : brushNode->brush().edges())
+        {
+          if (auto edgeInfo = getEdgeInfo(edge, brushNode, pickRay))
+          {
+            result.push_back(std::move(*edgeInfo));
+          }
+        }
+      },
+      [](Model::PatchNode*) {}));
+  }
+  return result;
+}
+
+bool edgeHandleWinsOverFace(
+  const Renderer::Camera& camera,
+  const vm::ray3& pickRay,
+  const EdgeInfo& edgeInfo,
+  const Model::Hit& faceHit)
+{
+  const auto edgeDistance = camera.pickLineSegmentHandle(
+    pickRay, edgeInfo.segment, pref(Preferences::HandleRadius));
+  assert(!vm::is_nan(edgeDistance));
+
+  const auto faceHandle = hitToFaceHandle(faceHit);
+  const auto hitIsAdjacentFace =
+    faceHandle
+    && (*faceHandle == edgeInfo.leftFaceHandle || *faceHandle == edgeInfo.rightFaceHandle);
+  return hitIsAdjacentFace || edgeDistance <= faceHit.distance();
+}
+
+bool hasOverlappingEdgeInOtherBrush(
+  const std::vector<Model::Node*>& nodes,
+  const Model::BrushNode* excludeBrush,
+  const vm::segment3& segment)
+{
+  auto eligibleNodes =
+    nodes | std::views::filter([&](const auto* node) { return node != excludeBrush; });
+
+  return std::ranges::any_of(eligibleNodes, [&](const auto* node) {
+    return node->accept(kdl::overload(
+      [](const Model::WorldNode*) { return false; },
+      [](const Model::LayerNode*) { return false; },
+      [](const Model::GroupNode*) { return false; },
+      [](const Model::EntityNode*) { return false; },
+      [&](const Model::BrushNode* brushNode) {
+        return std::ranges::any_of(brushNode->brush().edges(), [&](const auto* edge) {
+          return vm::segments_overlap(segment, edge->segment(), vm::C::almost_zero());
+        });
+      },
+      [](const Model::PatchNode*) { return false; }));
+  });
+}
+
+std::optional<EdgeInfo> selectOverridingEdge(
+  const std::vector<Model::Node*>& nodes,
+  const Renderer::Camera& camera,
+  const vm::ray3& pickRay,
+  const std::vector<EdgeInfo>& edgeInfos,
+  const Model::Hit& faceHit)
+{
+  auto eligible = edgeInfos | std::views::filter([&](const auto& edgeInfo) {
+                    return !vm::is_nan(camera.pickLineSegmentHandle(
+                             pickRay, edgeInfo.segment, pref(Preferences::HandleRadius)))
+                           && hasOverlappingEdgeInOtherBrush(
+                             nodes, edgeInfo.leftFaceHandle.node(), edgeInfo.segment);
+                  });
+
+  if (eligible.empty())
+  {
+    return std::nullopt;
+  }
+
+  const auto& winner = *std::ranges::min_element(eligible, [](const auto& a, const auto& b){ return a.dist.distance<b.dist.distance; });
+  return edgeHandleWinsOverFace(camera, pickRay, winner, faceHit) ? std::optional{winner}
+                                                                  : std::nullopt;
+}
 } // namespace
 
-Model::Hit ExtrudeTool::pick2D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const {
-    using namespace Model::HitFilters;
+Model::Hit ExtrudeTool::pick2D(
+  const vm::ray3& pickRay,
+  const Renderer::Camera& camera,
+  const Model::PickResult& pickResult) const
+{
+  using namespace Model::HitFilters;
 
-    auto document = kdl::mem_lock(m_document);
-    const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && selected());
-    if (hit.isMatch()) {
-        return Model::Hit::NoHit;
-    }
-
-    const auto edgeInfo = findClosestHorizonEdge(document->selectedNodes().nodes(), pickRay);
-    if (!edgeInfo) {
-        return Model::Hit::NoHit;
-    }
-
-    const auto [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] = *edgeInfo;
+  const auto makeEdgeHit = [&](const EdgeInfo& edgeInfo) -> Model::Hit {
+    const auto& [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] =
+      edgeInfo;
     const auto hitPoint = vm::point_at_distance(pickRay, distance.position1);
     const auto handlePosition = vm::point_at_distance(segment, distance.position2);
 
-    // Select the face that is perpendicular to the view direction or the back facing one.
-    if (leftDot >= -vm::C::almost_zero() && !vm::is_zero(rightDot, vm::C::almost_zero())) {
-        return {
-            ExtrudeHitType, distance.position1, hitPoint, ExtrudeHitData{
-                leftFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition
-            }};
+    // Select the face that is perpendicular to the view direction or the back facing
+    // one.
+    if (
+      leftDot >= -vm::C::almost_zero() && !vm::is_zero(rightDot, vm::C::almost_zero()))
+    {
+      return {
+        ExtrudeHitType,
+        distance.position1,
+        hitPoint,
+        ExtrudeHitData{
+          leftFaceHandle,
+          vm::plane3{handlePosition, pickRay.direction},
+          handlePosition}};
     }
     return {
-        ExtrudeHitType, distance.position1, hitPoint, ExtrudeHitData{
-            rightFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition
-        }};
+      ExtrudeHitType,
+      distance.position1,
+      hitPoint,
+      ExtrudeHitData{
+        rightFaceHandle, vm::plane3{handlePosition, pickRay.direction}, handlePosition}};
+  };
+
+  const auto& hit = pickResult.first(type(Model::BrushNode::BrushHitType) && selected());
+
+  if (hit.isMatch())
+  {
+    // The cursor is over a brush face. Only engage if a horizon edge handle is grabbed.
+    const auto& nodes = kdl::mem_lock(m_document)->selectedNodes().nodes();
+    const auto edgeInfos = findHorizonEdges(nodes, pickRay);
+    if (
+      const auto edgeInfo = selectOverridingEdge(nodes, camera, pickRay, edgeInfos, hit))
+    {
+      return makeEdgeHit(*edgeInfo);
+    }
+    return Model::Hit::NoHit;
+  }
+
+  const auto edgeInfo =
+    findClosestHorizonEdge(kdl::mem_lock(m_document)->selectedNodes().nodes(), pickRay);
+  if (!edgeInfo)
+  {
+    return Model::Hit::NoHit;
+  }
+  return makeEdgeHit(*edgeInfo);
 }
 
-Model::Hit ExtrudeTool::pick3D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const {
-    using namespace Model::HitFilters;
+Model::Hit ExtrudeTool::pick3D(
+  const vm::ray3& pickRay,
+  const Renderer::Camera& camera,
+  const Model::PickResult& pickResult) const
+{
+  using namespace Model::HitFilters;
 
-    auto document = kdl::mem_lock(m_document);
-
-    const auto &hit = pickResult.first(type(Model::BrushNode::BrushHitType) && selected());
-    if (const auto faceHandle = hitToFaceHandle(hit)) {
-        return {
-            ExtrudeHitType, hit.distance(), hit.hitPoint(), ExtrudeHitData{
-                *faceHandle, vm::line3{hit.hitPoint(), faceHandle->face().normal()}, hit.hitPoint()
-            }};
-    }
-
-    const auto edgeInfo = findClosestHorizonEdge(document->selectedNodes().nodes(), pickRay);
-    if (!edgeInfo) {
-        return Model::Hit::NoHit;
-    }
-
-    const auto [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] = *edgeInfo;
+  const auto makeEdgeHit = [&](const EdgeInfo& edgeInfo) -> Model::Hit {
+    const auto& [leftFaceHandle, rightFaceHandle, leftDot, rightDot, segment, distance] =
+      edgeInfo;
     const auto hitPoint = vm::point_at_distance(pickRay, distance.position1);
     const auto handlePosition = vm::point_at_distance(segment, distance.position2);
 
     // choose the face that we are seeing from behind
     const auto dragFaceHandle = leftDot > rightDot ? leftFaceHandle : rightFaceHandle;
-    const auto referenceFaceHandle = leftDot > rightDot ? rightFaceHandle : leftFaceHandle;
+    const auto referenceFaceHandle =
+      leftDot > rightDot ? rightFaceHandle : leftFaceHandle;
 
     return {
-        ExtrudeHitType, distance.position1, hitPoint, ExtrudeHitData{
-            dragFaceHandle, vm::plane3{handlePosition, referenceFaceHandle.face().normal()}, handlePosition
-        }};
+      ExtrudeHitType,
+      distance.position1,
+      hitPoint,
+      ExtrudeHitData{
+        dragFaceHandle,
+        vm::plane3{handlePosition, referenceFaceHandle.face().normal()},
+        handlePosition}};
+  };
+
+  const auto& hit = pickResult.first(type(Model::BrushNode::BrushHitType) && selected());
+  const auto faceHandle = hitToFaceHandle(hit);
+
+  if (faceHandle)
+  {
+    // The cursor is over a brush face. Prefer it unless a horizon edge handle is grabbed.
+    const auto& nodes = kdl::mem_lock(m_document)->selectedNodes().nodes();
+    const auto edgeInfos = findHorizonEdges(nodes, pickRay);
+    if (
+      const auto edgeInfo = selectOverridingEdge(nodes, camera, pickRay, edgeInfos, hit))
+    {
+      return makeEdgeHit(*edgeInfo);
+    }
+    return {
+      ExtrudeHitType,
+      hit.distance(),
+      hit.hitPoint(),
+      ExtrudeHitData{
+        *faceHandle,
+        vm::line3{hit.hitPoint(), faceHandle->face().normal()},
+        hit.hitPoint()}};
+  }
+
+  const auto edgeInfo =
+    findClosestHorizonEdge(kdl::mem_lock(m_document)->selectedNodes().nodes(), pickRay);
+  if (!edgeInfo)
+  {
+    return Model::Hit::NoHit;
+  }
+  return makeEdgeHit(*edgeInfo);
 }
 
 const std::vector<ExtrudeDragHandle> &ExtrudeTool::proposedDragHandles() const {
@@ -215,25 +420,8 @@ const std::vector<ExtrudeDragHandle> &ExtrudeTool::proposedDragHandles() const {
 }
 
 namespace {
-std::vector<Model::BrushFaceHandle> collectCoplanarFaces(const std::vector<Model::Node *> &nodes, const Model::BrushFaceHandle &faceHandle) {
-    auto result = std::vector<Model::BrushFaceHandle>{};
-
-    const auto &referenceFace = faceHandle.face();
-    for (auto *node : nodes) {
-        node->accept(kdl::overload([](Model::WorldNode *) {}, [](Model::LayerNode *) {}, [](Model::GroupNode *) {}, [](Model::EntityNode *) {}, [&](Model::BrushNode *brushNode) {
-            const auto &brush = brushNode->brush();
-            for (size_t i = 0; i < brush.faceCount(); ++i) {
-                const auto &face = brush.face(i);
-                if (!face.coplanarWith(referenceFace.boundary())) {
-                    continue;
-                }
-
-                result.emplace_back(brushNode, i);
-            }
-        }, [](Model::PatchNode *) {}));
-    }
-
-    return result;
+std::vector<Model::BrushFaceHandle> collectCoplanarFaces(const std::vector<Model::Node*>& nodes,const Model::BrushFaceHandle& face) {
+    return collectCoincidentFaces(nodes,face,true);
 }
 
 std::vector<ExtrudeDragHandle> getDragHandles(const std::vector<Model::Node *> &nodes, const Model::Hit &hit) {
@@ -244,7 +432,7 @@ std::vector<ExtrudeDragHandle> getDragHandles(const std::vector<Model::Node *> &
     assert(hit.hasType(ExtrudeTool::ExtrudeHitType));
     const auto &data = hit.target<const ExtrudeHitData &>();
 
-    return kdl::vec_transform(collectCoplanarFaces(nodes, data.face), [](const auto &handle) { return ExtrudeDragHandle{handle}; });
+    return kdl::vec_transform(kdl::vec_concat(collectCoplanarFaces(nodes,data.face),collectOpposingFaces(nodes,data.face)), [](const auto &handle) { return ExtrudeDragHandle{handle}; });
 }
 } // namespace
 
@@ -479,6 +667,46 @@ bool ExtrudeTool::extrude(const vm::vec3 &handleDelta, ExtrudeDragState &dragSta
 
     dragState.currentDragFaces = getDragFaces(m_proposedDragHandles);
 
+    return true;
+}
+
+
+void ExtrudeTool::beginStamp() {
+    assert(!m_dragging);
+    m_dragging=true;
+    kdl::mem_lock(m_document)->startTransaction("Stamp Brushes",TransactionScope::LongRunning);
+}
+bool ExtrudeTool::stamp(const vm::vec3& delta,ExtrudeDragState& state) {
+    assert(m_dragging);
+    if(state.initialDragHandles.empty()) return false;
+    for(const auto& handle:state.initialDragHandles)
+        if(vm::dot(handle.faceNormal(),delta)<=0.0) return false;
+    auto document=kdl::mem_lock(m_document);
+    auto owners=std::vector<std::unique_ptr<Model::BrushNode>>{};
+    auto nodes=std::map<Model::Node*,std::vector<Model::Node*>>{};
+    auto dragFaces=std::vector<Model::BrushFaceHandle>{};
+    for(const auto& handle:state.initialDragHandles) {
+        const auto& face=handle.faceAtDragStart();
+        auto points=face.vertexPositions();
+        const auto count=points.size(); points.reserve(count*2);
+        for(size_t i=0;i<count;++i) points.push_back(points[i]+delta);
+        const Model::BrushBuilder builder(document->world()->mapFormat(),document->worldBounds(),face.attributes());
+        auto result=builder.createBrush(points,face.attributes().textureName());
+        if(result.is_error()) {document->error()<<"Could not stamp brush: "<<std::get<Error>(result.error());return false;}
+        auto brush=std::move(result).value();
+        brush.cloneFaceAttributesFrom(handle.brushAtDragStart);
+        auto node=std::make_unique<Model::BrushNode>(std::move(brush));
+        if(const auto index=node->brush().findFace(handle.faceNormal())) dragFaces.emplace_back(node.get(),*index);
+        nodes[handle.faceHandle.node()->parent()].push_back(node.get());
+        owners.push_back(std::move(node));
+    }
+    document->rollbackTransaction();
+    document->deselectAll();
+    for(auto& owner:owners) owner.release();
+    const auto added=document->addNodes(std::move(nodes));
+    if(added.empty()) {state.currentDragFaces.clear();state.totalDelta=vm::vec3::zero();return false;}
+    document->selectNodes(added);
+    state.currentDragFaces=std::move(dragFaces);state.totalDelta=delta;
     return true;
 }
 

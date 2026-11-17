@@ -18,6 +18,7 @@
  */
 
 #pragma once
+#include "View/BrushComponentSelection.h"
 
 #include "FloatType.h"
 #include "Model/Game.h"
@@ -129,6 +130,8 @@ struct PortalFile {
 };
 
 class MapDocument : public Model::MapFacade, public Logger {
+    BrushComponentSelection* m_componentSelection=nullptr;
+
 public:
     static const vm::bbox3 DefaultWorldBounds;
     static const std::string DefaultDocumentName;
@@ -178,6 +181,7 @@ protected:
     std::unique_ptr<RepeatStack> m_repeatStack;
 
 public: // notification
+    Notifier<> componentSelectionDidChangeNotifier;
     Notifier<Command &> commandDoNotifier;
     Notifier<Command &> commandDoneNotifier;
     Notifier<Command &> commandDoFailedNotifier;
@@ -729,6 +733,16 @@ public:
 
 public: // modifying vertices, declared in MapFacade interface
     bool snapVertices(FloatType snapTo) override;
+
+    void setComponentSelection(BrushComponentSelection* selection);
+    void clearComponentSelection(const BrushComponentSelection* selection);
+    void componentSelectionChanged();
+    bool hasSelectedComponents() const;
+    vm::bbox3 transformationBounds(bool padZeroExtent=false) const;
+
+    MoveVerticesResult transformVertices(std::vector<vm::vec3> vertexPositions, const vm::mat4x4 &transformation, const std::string& commandName);
+    bool transformEdges(std::vector<vm::segment3> edgePositions, const vm::mat4x4 &transformation, const std::string& commandName);
+    bool transformFaces(std::vector<vm::polygon3> facePositions, const vm::mat4x4 &transformation, const std::string& commandName);
 
     MoveVerticesResult moveVertices(std::vector<vm::vec3> vertexPositions, const vm::vec3& delta) override;
 

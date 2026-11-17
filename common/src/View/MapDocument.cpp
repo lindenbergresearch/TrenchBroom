@@ -2279,7 +2279,31 @@ bool MapDocument::swapNodeContents(const std::string &commandName, std::vector<s
     return swapNodeContents(commandName, std::move(nodesToSwap), std::move(changedLinkedGroups));
 }
 
+void MapDocument::setComponentSelection(BrushComponentSelection* selection) {
+    ensure(!m_componentSelection || m_componentSelection==selection,"Another component tool is active");
+    m_componentSelection=selection;componentSelectionChanged();
+}
+void MapDocument::clearComponentSelection(const BrushComponentSelection* selection) {
+    if(m_componentSelection==selection) {m_componentSelection=nullptr;componentSelectionChanged();}
+}
+void MapDocument::componentSelectionChanged() {componentSelectionDidChangeNotifier();}
+bool MapDocument::hasSelectedComponents() const {return m_componentSelection && !m_componentSelection->selectedVertexPositions().empty();}
+vm::bbox3 MapDocument::transformationBounds(bool padZeroExtent) const {
+    const auto objectBounds=selectionBounds();
+    if(!m_componentSelection) return objectBounds;
+    const auto points=m_componentSelection->selectedVertexPositions();
+    if(points.empty()) return objectBounds;
+    vm::bbox3::builder builder;for(const auto& point:points) builder.add(point);
+    auto bounds=builder.bounds();
+    if(padZeroExtent) for(size_t axis=0;axis<3;++axis) if(vm::is_zero(bounds.size()[axis],vm::C::almost_zero())) {
+        if(bounds.min[axis]-objectBounds.min[axis]>objectBounds.max[axis]-bounds.max[axis]) bounds.min[axis]=objectBounds.min[axis];
+        else bounds.max[axis]=objectBounds.max[axis];
+    }
+    return bounds;
+}
+
 bool MapDocument::transformObjects(const std::string &commandName, const vm::mat4x4 &transformation) {
+    if(m_componentSelection) return m_componentSelection->transformSelection(commandName,transformation);
     auto nodesToTransform = std::vector<Model::Node *>{};
     auto entitiesToTransform = std::unordered_map<Model::EntityNodeBase *, size_t>{};
 
@@ -2890,6 +2914,19 @@ bool MapDocument::snapVertices(const FloatType snapTo) {
 }
 
 MapDocument::MoveVerticesResult MapDocument::moveVertices(std::vector<vm::vec3> vertexPositions, const vm::vec3 &delta) {
+    const auto name=kdl::str_plural(vertexPositions.size(), "Move Brush Vertex", "Move Brush Vertices");
+    return transformVertices(std::move(vertexPositions),vm::translation_matrix(delta),name);
+}
+bool MapDocument::moveEdges(std::vector<vm::segment3> edgePositions, const vm::vec3 &delta) {
+    const auto name=kdl::str_plural(edgePositions.size(), "Move Brush Edge", "Move Brush Edges");
+    return transformEdges(std::move(edgePositions),vm::translation_matrix(delta),name);
+}
+bool MapDocument::moveFaces(std::vector<vm::polygon3> facePositions, const vm::vec3 &delta) {
+    const auto name=kdl::str_plural(facePositions.size(), "Move Brush Face", "Move Brush Faces");
+    return transformFaces(std::move(facePositions),vm::translation_matrix(delta),name);
+}
+
+MapDocument::MoveVerticesResult MapDocument::transformVertices(std::vector<vm::vec3> vertexPositions, const vm::mat4x4 &transformation, const std::string& commandName) {
     auto newVertexPositions = std::vector<vm::vec3>{};
     auto newNodes = applyToNodeContents(m_selectedNodes.nodes(), kdl::overload([](Model::Layer &) { return true; }, [](Model::Group &) { return true; }, [](Model::Entity &) { return true; }, [&](Model::Brush &brush) {
         const auto verticesToMove = kdl::vec_filter(vertexPositions, [&](const auto &vertex) { return brush.hasVertex(vertex); });
@@ -2897,12 +2934,12 @@ MapDocument::MoveVerticesResult MapDocument::moveVertices(std::vector<vm::vec3> 
             return true;
         }
 
-        if (!brush.canMoveVertices(m_worldBounds, verticesToMove, delta)) {
+        if (!brush.canTransformVertices(m_worldBounds, verticesToMove, transformation)) {
             return false;
         }
 
-        return brush.moveVertices(m_worldBounds, verticesToMove, delta, pref(Preferences::UVLock)).transform([&]() {
-            auto newPositions = brush.findClosestVertexPositions(verticesToMove + delta);
+        return brush.transformVertices(m_worldBounds, verticesToMove, transformation, pref(Preferences::UVLock)).transform([&]() {
+            auto newPositions = brush.findClosestVertexPositions(transformation * verticesToMove);
             newVertexPositions = kdl::vec_concat(std::move(newVertexPositions), std::move(newPositions));
         }).if_error([&](auto e) { error() << "Could not move brush vertices: " << e.msg; }).is_success();
     }, [](Model::BezierPatch &) { return true; }));
@@ -2910,7 +2947,6 @@ MapDocument::MoveVerticesResult MapDocument::moveVertices(std::vector<vm::vec3> 
     if (newNodes) {
         kdl::vec_sort_and_remove_duplicates(newVertexPositions);
 
-        const auto commandName = kdl::str_plural(vertexPositions.size(), "Move Brush Vertex", "Move Brush Vertices");
         auto transaction = Transaction{*this, commandName};
 
         const auto changedLinkedGroups = collectContainingGroups(kdl::vec_transform(*newNodes, [](const auto &p) { return p.first; }));
@@ -2937,7 +2973,7 @@ MapDocument::MoveVerticesResult MapDocument::moveVertices(std::vector<vm::vec3> 
     return MoveVerticesResult(false, false);
 }
 
-bool MapDocument::moveEdges(std::vector<vm::segment3> edgePositions, const vm::vec3 &delta) {
+bool MapDocument::transformEdges(std::vector<vm::segment3> edgePositions, const vm::mat4x4 &transformation, const std::string& commandName) {
     auto newEdgePositions = std::vector<vm::segment3>{};
     auto newNodes = applyToNodeContents(m_selectedNodes.nodes(), kdl::overload([](Model::Layer &) { return true; }, [](Model::Group &) { return true; }, [](Model::Entity &) { return true; }, [&](Model::Brush &brush) {
         const auto edgesToMove = kdl::vec_filter(edgePositions, [&](const auto &edge) { return brush.hasEdge(edge); });
@@ -2945,12 +2981,12 @@ bool MapDocument::moveEdges(std::vector<vm::segment3> edgePositions, const vm::v
             return true;
         }
 
-        if (!brush.canMoveEdges(m_worldBounds, edgesToMove, delta)) {
+        if (!brush.canTransformEdges(m_worldBounds, edgesToMove, transformation)) {
             return false;
         }
 
-        return brush.moveEdges(m_worldBounds, edgesToMove, delta, pref(Preferences::UVLock)).transform([&]() {
-            auto newPositions = brush.findClosestEdgePositions(kdl::vec_transform(edgesToMove, [&](const auto &edge) { return edge.translate(delta); }));
+        return brush.transformEdges(m_worldBounds, edgesToMove, transformation, pref(Preferences::UVLock)).transform([&]() {
+            auto newPositions = brush.findClosestEdgePositions(kdl::vec_transform(edgesToMove, [&](const auto &edge) { return edge.transform(transformation); }));
             newEdgePositions = kdl::vec_concat(std::move(newEdgePositions), std::move(newPositions));
         }).if_error([&](auto e) { error() << "Could not move brush edges: " << e.msg; }).is_success();
     }, [](Model::BezierPatch &) { return true; }));
@@ -2958,7 +2994,6 @@ bool MapDocument::moveEdges(std::vector<vm::segment3> edgePositions, const vm::v
     if (newNodes) {
         kdl::vec_sort_and_remove_duplicates(newEdgePositions);
 
-        const auto commandName = kdl::str_plural(edgePositions.size(), "Move Brush Edge", "Move Brush Edges");
         auto transaction = Transaction{*this, commandName};
 
         const auto changedLinkedGroups = collectContainingGroups(kdl::vec_transform(*newNodes, [](const auto &p) { return p.first; }));
@@ -2977,7 +3012,7 @@ bool MapDocument::moveEdges(std::vector<vm::segment3> edgePositions, const vm::v
     return false;
 }
 
-bool MapDocument::moveFaces(std::vector<vm::polygon3> facePositions, const vm::vec3 &delta) {
+bool MapDocument::transformFaces(std::vector<vm::polygon3> facePositions, const vm::mat4x4 &transformation, const std::string& commandName) {
     auto newFacePositions = std::vector<vm::polygon3>{};
     auto newNodes = applyToNodeContents(m_selectedNodes.nodes(), kdl::overload([](Model::Layer &) { return true; }, [](Model::Group &) { return true; }, [](Model::Entity &) { return true; }, [&](Model::Brush &brush) {
         const auto facesToMove = kdl::vec_filter(facePositions, [&](const auto &face) { return brush.hasFace(face); });
@@ -2985,12 +3020,12 @@ bool MapDocument::moveFaces(std::vector<vm::polygon3> facePositions, const vm::v
             return true;
         }
 
-        if (!brush.canMoveFaces(m_worldBounds, facesToMove, delta)) {
+        if (!brush.canTransformFaces(m_worldBounds, facesToMove, transformation)) {
             return false;
         }
 
-        return brush.moveFaces(m_worldBounds, facesToMove, delta, pref(Preferences::UVLock)).transform([&]() {
-            auto newPositions = brush.findClosestFacePositions(kdl::vec_transform(facesToMove, [&](const auto &face) { return face.translate(delta); }));
+        return brush.transformFaces(m_worldBounds, facesToMove, transformation, pref(Preferences::UVLock)).transform([&]() {
+            auto newPositions = brush.findClosestFacePositions(kdl::vec_transform(facesToMove, [&](const auto &face) { return face.transform(transformation); }));
             newFacePositions = kdl::vec_concat(std::move(newFacePositions), std::move(newPositions));
         }).if_error([&](auto e) { error() << "Could not move brush faces: " << e.msg; }).is_success();
     }, [](Model::BezierPatch &) { return true; }));
@@ -2998,7 +3033,6 @@ bool MapDocument::moveFaces(std::vector<vm::polygon3> facePositions, const vm::v
     if (newNodes) {
         kdl::vec_sort_and_remove_duplicates(newFacePositions);
 
-        const auto commandName = kdl::str_plural(facePositions.size(), "Move Brush Face", "Move Brush Faces");
         auto transaction = Transaction{*this, commandName};
 
         auto changedLinkedGroups = collectContainingGroups(kdl::vec_transform(*newNodes, [](const auto &p) { return p.first; }));

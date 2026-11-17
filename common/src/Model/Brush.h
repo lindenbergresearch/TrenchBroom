@@ -175,6 +175,13 @@ class Brush {
     std::vector<const BrushFace *> incidentFaces(const BrushVertex *vertex) const;
 
     // vertex operations
+    bool canTransformVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertices, const vm::mat4x4 &transformation) const;
+    Result<void> transformVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::mat4x4 &transformation, bool uvLock = false);
+    bool canTransformEdges(const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::mat4x4 &transformation) const;
+    Result<void> transformEdges(const vm::bbox3 &worldBounds, const std::vector<vm::segment3> &edgePositions, const vm::mat4x4 &transformation, bool uvLock = false);
+    bool canTransformFaces(const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::mat4x4 &transformation) const;
+    Result<void> transformFaces(const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::mat4x4 &transformation, bool uvLock = false);
+
     bool canMoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertices, const vm::vec3 &delta) const;
 
     Result<void> moveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, bool uvLock = false);
@@ -202,23 +209,23 @@ class Brush {
     Result<void> moveFaces(const vm::bbox3 &worldBounds, const std::vector<vm::polygon3> &facePositions, const vm::vec3 &delta, bool uvLock = false);
 
   private:
-    struct CanMoveVerticesResult {
+    struct CanTransformVerticesResult {
       public:
         bool success;
         std::unique_ptr<BrushGeometry> geometry;
 
       private:
-        CanMoveVerticesResult(bool s, BrushGeometry &&g);
+        CanTransformVerticesResult(bool s, BrushGeometry &&g);
 
       public:
-        static CanMoveVerticesResult rejectVertexMove();
+        static CanTransformVerticesResult rejectVertexMove();
 
-        static CanMoveVerticesResult acceptVertexMove(BrushGeometry &&result);
+        static CanTransformVerticesResult acceptVertexMove(BrushGeometry &&result);
     };
 
-    CanMoveVerticesResult doCanMoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, vm::vec3 delta, bool allowVertexRemoval) const;
+    CanTransformVerticesResult doCanTransformVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, vm::mat4x4 transformation, bool allowVertexRemoval) const;
 
-    Result<void> doMoveVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::vec3 &delta, bool lockTexture);
+    Result<void> doTransformVertices(const vm::bbox3 &worldBounds, const std::vector<vm::vec3> &vertexPositions, const vm::mat4x4 &transformation, bool lockTexture);
 
     /**
      * Tries to find 3 vertices in `left` and `right` that are related according to the

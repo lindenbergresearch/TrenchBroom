@@ -1230,3 +1230,30 @@ QTextEdit#CrashLogView, QTextEdit#CrashStackTraceView {
     margin: 0;
     padding: 0;
 }
+
+
+/* === BRUSH SHAPE TOOL === */
+QWidget#ShapeToolPage {
+    padding: 2px;
+}
+QStackedWidget#ShapeToolParameters {
+    border: none;
+    background: transparent;
+}
+QWidget#ShapeToolPage QSpinBox, QWidget#ShapeToolPage QDoubleSpinBox {
+    min-width: 64px;
+}
+QWidget#ShapeToolPage QSpinBox#ShapeRockSeed {
+    min-width: 110px;
+}
+QWidget#ShapeToolPage QToolButton {
+    qproperty-iconSize: 20px 20px;
+    padding: 3px;
+}
+QWidget#ShapeToolPage QToolButton:checked {
+    background-color: #MIDLIGHT_COLOR;
+    border: 1px solid #HIGHLIGHT_COLOR;
+}
+QWidget#ShapeToolPage QPushButton#ShapeToolApply {
+    padding: 4px 10px;
+}

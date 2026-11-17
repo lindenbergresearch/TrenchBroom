@@ -205,6 +205,7 @@ extern Preference<bool> EnableAnisotropicFilter;
 extern Preference<float> AnisotropicFilterValue;
 extern Preference<bool> TextureLock;
 extern Preference<bool> UVLock;
+extern Preference<bool> GroupBrushesCreatedByShapeTool;
 
 /* --- FONTS ----------------------------------------- */
 extern Preference<Path> RendererFontPath;

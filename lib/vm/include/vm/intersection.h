@@ -24,12 +24,43 @@
 #include "vm/bbox.h"
 #include "vm/line.h"
 #include "vm/plane.h"
+#include "vm/polygon.h"
+#include "vm/segment.h"
 #include "vm/ray.h"
 #include "vm/scalar.h"
 #include "vm/util.h"
 #include "vm/vec.h"
 
 namespace vm {
+
+template <typename T, size_t S>
+bool segments_overlap(const segment<T, S>& lhs, const segment<T, S>& rhs, const T epsilon)
+{
+  const auto axis = lhs.end() - lhs.start();
+  const auto length = vm::length(axis);
+  if (length < epsilon)
+  {
+    return false;
+  }
+
+  const auto direction = axis / length;
+  const auto project = [&](const vec<T, S>& p) {
+    return dot(p - lhs.start(), direction);
+  };
+  const auto on_line = [&](const vec<T, S>& p, const T t) {
+    return is_equal(p, lhs.start() + direction * t, epsilon);
+  };
+
+  const auto t0 = project(rhs.start());
+  const auto t1 = project(rhs.end());
+  if (!on_line(rhs.start(), t0) || !on_line(rhs.end(), t1))
+  {
+    return false;
+  }
+
+  const auto overlap = min(length, max(t0, t1)) - max(T(0), min(t0, t1));
+  return overlap > epsilon;
+}
 
 namespace detail {
 /**
@@ -649,6 +680,41 @@ constexpr std::vector<vec<T, 3>> polygon_clip_by_plane(
     }
 
     return result;
+}
+
+template <typename T>
+bool polygons_overlap(
+  const polygon<T, 3>& lhs, const polygon<T, 3>& rhs, const vec<T, 3>& normal)
+{
+  const auto& lhsVertices = lhs.vertices();
+  assert(lhsVertices.size() >= 3);
+  const auto center = lhs.center();
+
+  auto clipped = rhs.vertices();
+  for (size_t i = 0; i < lhsVertices.size(); ++i)
+  {
+    const auto& v0 = lhsVertices[i];
+    const auto& v1 = lhsVertices[succ(i, lhsVertices.size())];
+
+    auto edgeNormal = cross(normal, v1 - v0);
+    if (dot(edgeNormal, center - v0) > T(0))
+    {
+      edgeNormal = -edgeNormal;
+    }
+
+    const auto edgePlane = plane<T, 3>{v0, normalize(edgeNormal)};
+    clipped = polygon_clip_by_plane(edgePlane, std::begin(clipped), std::end(clipped));
+    // Once the clipped vertex count drops below 3, the remaining intersection area is
+    // provably zero (a convex region's area can only shrink, never grow, as it is
+    // intersected against further half-planes), so bail out early -- this also avoids
+    // violating polygon_clip_by_plane's precondition of >= 3 input vertices.
+    if (clipped.size() < 3)
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**

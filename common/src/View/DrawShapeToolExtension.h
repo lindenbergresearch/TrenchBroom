@@ -18,49 +18,56 @@
  */
 
 #pragma once
-
 #include "Model/Brush.h"
 #include "Notifier.h"
 #include "Result.h"
-
-#include "vm/util.h"
-
+#include "View/DrawShapeToolParameters.h"
+#include <array>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
 
-class QWidget;
-
-namespace TrenchBroom::View
-{
+namespace TrenchBroom::View {
 class MapDocument;
+enum class DrawShapeKind { Cuboid, Stairs, Arch, Cylinder, Cone, UVSphere, IcoSphere, Rock };
+inline constexpr auto DrawShapeKinds = std::array{DrawShapeKind::Cuboid, DrawShapeKind::Stairs,   DrawShapeKind::Arch,      DrawShapeKind::Cylinder,
+                                                  DrawShapeKind::Cone,   DrawShapeKind::UVSphere, DrawShapeKind::IcoSphere, DrawShapeKind::Rock};
 
-class DrawShapeToolExtension
-{
-public:
-  virtual ~DrawShapeToolExtension();
-  virtual const std::string& name() const = 0;
-  virtual QWidget* createToolPage(QWidget* parent = nullptr) = 0;
-  virtual Result<std::vector<Model::Brush>> createBrushes(
-    const vm::bbox3& bounds, vm::axis::type axis, const MapDocument& document) const = 0;
+class DrawShapeToolExtension {
+  protected:
+    DrawShapeKind m_kind;
+    DrawShapeToolParameters& m_parameters;
+
+  public:
+    DrawShapeToolExtension(DrawShapeKind kind, DrawShapeToolParameters& parameters);
+    virtual ~DrawShapeToolExtension();
+    DrawShapeKind kind() const { return m_kind; }
+    virtual const std::string& name() const;
+    virtual const std::filesystem::path& iconPath() const;
+    virtual Result<std::vector<Model::Brush>> createBrushes(const vm::bbox3& bounds, vm::axis::type axis, const MapDocument& document) const;
+    virtual void brushesWereCreated();
 };
 
-class DrawShapeToolExtensionManager
-{
-public:
-  Notifier<size_t> currentExtensionDidChangeNotifier;
+class DrawShapeToolExtensionManager {
+    std::weak_ptr<MapDocument> m_document;
+    DrawShapeToolParameters m_parameters;
+    std::vector<std::unique_ptr<DrawShapeToolExtension>> m_extensions;
+    size_t m_currentExtensionIndex = 0;
 
-  explicit DrawShapeToolExtensionManager(
-    std::vector<std::unique_ptr<DrawShapeToolExtension>> extensions);
-
-  const std::vector<DrawShapeToolExtension*> extensions() const;
-
-  DrawShapeToolExtension& currentExtension();
-  bool setCurrentExtensionIndex(size_t currentExtensionIndex);
-
-private:
-  std::vector<std::unique_ptr<DrawShapeToolExtension>> m_extensions;
-  size_t m_currentExtensionIndex = 0;
+  public:
+    Notifier<size_t> currentExtensionDidChangeNotifier;
+    Notifier<vm::axis::type> applyParametersNotifier;
+    explicit DrawShapeToolExtensionManager(std::weak_ptr<MapDocument> document);
+    std::shared_ptr<MapDocument> document() const;
+    DrawShapeToolParameters& parameters() { return m_parameters; }
+    std::vector<DrawShapeToolExtension*> extensions() const;
+    DrawShapeToolExtension& currentExtension();
+    const DrawShapeToolExtension& currentExtension() const;
+    bool setCurrentExtensionIndex(size_t index);
+    bool setCurrentExtension(DrawShapeKind kind);
+    bool canApplySelection() const;
+    Result<std::vector<Model::Brush>> createBrushes(const vm::bbox3& bounds, vm::axis::type viewAxis) const;
+    void brushesWereCreated();
 };
-
 } // namespace TrenchBroom::View

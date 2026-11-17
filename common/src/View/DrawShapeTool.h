@@ -25,7 +25,9 @@
 
 #include "vm/util.h"
 
+#include "NotifierConnection.h"
 #include <memory>
+#include <optional>
 
 namespace TrenchBroom::View {
 class MapDocument;
@@ -34,13 +36,20 @@ class DrawShapeTool : public CreateBrushesToolBase {
   public:
     explicit DrawShapeTool(std::weak_ptr<MapDocument> document);
 
-    void update(const vm::bbox3 &bounds, vm::axis::type axis);
+    void update(const vm::bbox3& bounds, vm::axis::type axis);
 
     bool cancel();
+    bool createBrushes();
+    bool applyParameters(vm::axis::type viewAxis = vm::axis::z);
+    DrawShapeToolExtensionManager& extensionManager() { return m_extensionManager; }
 
   private:
     DrawShapeToolExtensionManager m_extensionManager;
+    std::optional<vm::bbox3> m_previewBounds;
+    vm::axis::type m_viewAxis = vm::axis::z;
+    NotifierConnection m_connections;
+    void doBrushesWereCreated() override;
 
-    QWidget *doCreatePage(QWidget *parent) override;
+    QWidget* doCreatePage(QWidget* parent) override;
 };
 } // namespace TrenchBroom::View

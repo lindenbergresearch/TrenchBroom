@@ -222,6 +222,8 @@ void MapViewToolBox::createTools(
     m_edgeTool = std::make_unique<EdgeTool>(document);
     m_faceTool = std::make_unique<FaceTool>(document);
 
+    addExclusiveToolGroup({&assembleBrushTool(),&rotateObjectsTool(),&scaleObjectsTool(),&shearObjectsTool(),&clipTool()});
+    addExclusiveToolGroup({&assembleBrushTool(),&vertexTool(),&edgeTool(),&faceTool(),&clipTool()});
     suppressWhileActive(moveObjectsTool(), assembleBrushTool());
     suppressWhileActive(extrudeTool(), assembleBrushTool());
     suppressWhileActive(drawShapeTool(), assembleBrushTool());
@@ -311,9 +313,9 @@ void MapViewToolBox::updateToolPage() {
     auto document = kdl::mem_lock(m_document);
     if (auto *activeTool = this->activeTool()) {
         activeTool->showPage();
-    } else if (document->hasSelection()) {
-        moveObjectsTool().showPage();
     } else {
+        // Keep shape parameters and Apply reachable while inspecting a selection.
+        // The shape page also contains the existing Quick Move controls.
         drawShapeTool().showPage();
     }
 }

@@ -28,6 +28,7 @@
 #include "Model/HitFilter.h"
 #include "Model/ModelUtils.h"
 #include "Model/Node.h"
+#include "Model/WorldNode.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "Renderer/RenderContext.h"
@@ -224,6 +225,19 @@ bool SelectionTool::mouseDoubleClick(const InputState &inputState) {
     auto document = kdl::mem_lock(m_document);
     const auto &editorContext = document->editorContext();
 
+
+    if(inputState.modifierKeysDown(ModifierKeys::MKShift | ModifierKeys::MKAlt)) {
+        if(!inputState.mouseButtonsPressed(MouseButtons::MBLeft) || !editorContext.canChangeSelection()) return false;
+        const auto& hit=firstHit(inputState,type(Model::BrushNode::BrushHitType));
+        if(const auto face=Model::hitToFaceHandle(hit);face && editorContext.selectable(face->node(),face->face())) {
+            const auto region=Model::collectConnectedCoplanarFaces(*face,editorContext,*document->world());
+            auto transaction=Transaction{document,"Select Connected Coplanar Faces"};
+            if(isMultiClick(inputState)) {if(document->hasSelectedNodes()) document->convertToFaceSelection();}
+            else document->deselectAll();
+            document->selectBrushFaces(region);transaction.commit();
+        }
+        return true;
+    }
     if (!handleClick(inputState, editorContext)) {
         return false;
     }

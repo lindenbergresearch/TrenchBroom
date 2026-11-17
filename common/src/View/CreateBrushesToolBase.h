@@ -23,6 +23,8 @@
 #include "View/Tool.h"
 
 #include <memory>
+#include <optional>
+#include <string>
 
 namespace TrenchBroom::Model
 {
@@ -57,7 +59,8 @@ public:
 public:
   const Grid& grid() const;
 
-  void createBrushes();
+  bool createBrushes(std::optional<std::string> groupName=std::nullopt);
+  bool hasBrushes() const;
   void clearBrushes();
   void cancel();
 

@@ -18,63 +18,103 @@
  */
 
 #include "DrawShapeToolPage.h"
-
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QStackedLayout>
-
-#include "View/DrawShapeToolExtension.h"
+#include "IO/ResourceUtils.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
+#include "Renderer/Camera.h"
+#include "View/DrawShapeToolExtensions.h"
 #include "View/MapDocument.h"
-#include "View/ViewConstants.h"
-
-#include "kdl/memory_utils.h"
-
-#include "vm/vec.h"
-#include "vm/vec_io.h"
+#include "View/MoveObjectsToolPage.h"
+#include "View/MapFrame.h"
+#include "View/MapView2D.h"
+#include "View/QtUtils.h"
+#include <QBoxLayout>
+#include <QComboBox>
+#include <QLabel>
+#include <QMenu>
+#include <QPushButton>
+#include <QSignalBlocker>
+#include <QStackedWidget>
+#include <QToolButton>
 
 namespace TrenchBroom::View {
-
-DrawShapeToolPage::DrawShapeToolPage(
-    std::weak_ptr<MapDocument> document,
-    DrawShapeToolExtensionManager &extensionManager,
-    QWidget *parent)
-    : QWidget{parent}, m_document{std::move(document)} {
-    createGui(extensionManager);
-    m_notifierConnection += extensionManager.currentExtensionDidChangeNotifier.connect(
-        this, &DrawShapeToolPage::currentExtensionDidChange);
-}
-
-void DrawShapeToolPage::createGui(DrawShapeToolExtensionManager &extensionManager) {
-    auto *label = new QLabel{tr("Shape")};
-    m_extensions = new QComboBox{};
-    m_extensionPages = new QStackedLayout{};
-
-    for (auto *extension : extensionManager.extensions()) {
-        m_extensions->addItem(QString::fromStdString(extension->name()));
-        m_extensionPages->addWidget(extension->createToolPage());
+DrawShapeToolPage::DrawShapeToolPage(std::weak_ptr<MapDocument>, DrawShapeToolExtensionManager& manager, QWidget* parent) : QWidget(parent), m_manager(manager) {
+    setObjectName("ShapeToolPage");
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    m_quickMove=new MoveObjectsToolPage(manager.document());
+    layout->addWidget(m_quickMove);
+    auto* toolbar = new QHBoxLayout;
+    toolbar->setContentsMargins(0, 0, 0, 0);
+    toolbar->addWidget(new QLabel(tr("Shape")));
+    m_shapes = createBitmapButton(manager.currentExtension().iconPath(), tr("Choose brush shape"));
+    m_shapes->setObjectName("ShapeToolChoose");
+    m_shapes->setPopupMode(QToolButton::InstantPopup);
+    auto* menu = new QMenu(m_shapes);
+    const auto extensions = manager.extensions();
+    for (size_t i = 0; i < extensions.size(); ++i) {
+        auto* action = menu->addAction(IO::loadSVGIcon(extensions[i]->iconPath(), 20), QString::fromStdString(extensions[i]->name()));
+        action->setIconVisibleInMenu(true);
+        connect(action, &QAction::triggered, this, [this, i] { m_manager.setCurrentExtensionIndex(i); });
     }
-
-    auto *layout = new QHBoxLayout();
-    layout->setContentsMargins(QMargins{});
-    layout->setSpacing(LayoutConstants::MediumHMargin);
-
-    layout->addWidget(label, 0, Qt::AlignVCenter);
-    layout->addWidget(m_extensions, 0, Qt::AlignVCenter);
-    layout->addLayout(m_extensionPages);
-    layout->addStretch(2);
-
-    setLayout(layout);
-
-    connect(
-        m_extensions, QOverload<int>::of(&QComboBox::activated), this, [&](const auto index) {
-            extensionManager.setCurrentExtensionIndex(size_t(index));
-        });
+    m_shapes->setMenu(menu);
+    toolbar->addWidget(m_shapes);
+    m_group = createBitmapToggleButton("Group.svg", tr("Group the created brushes when a shape has several parts"));
+    m_group->setObjectName("ShapeToolGroup");
+    toolbar->addWidget(m_group);
+    m_axisLabel = new QLabel(tr("Axis"));
+    m_axis = new QComboBox;
+    m_axis->setObjectName("ShapeToolAxis");
+    m_axis->addItems({tr("View"), tr("X"), tr("Y"), tr("Z")});
+    toolbar->addWidget(m_axisLabel);
+    toolbar->addWidget(m_axis);
+    toolbar->addStretch();
+    m_apply = new QPushButton(tr("Apply to Selection"));
+    m_apply->setObjectName("ShapeToolApply");
+    m_apply->setToolTip(tr("Replace selected, editable brushes in the same container with this shape. Matching face attributes are preserved. Linked groups must be unlinked first."));
+    toolbar->addWidget(m_apply);
+    layout->addLayout(toolbar);
+    m_pages = new QStackedWidget;
+    m_pages->setObjectName("ShapeToolParameters");
+    for (const auto* extension : extensions)
+        m_pages->addWidget(new DrawShapeToolExtensionPage(extension->kind(), manager.parameters()));
+    layout->addWidget(m_pages);
+    connect(m_group, &QToolButton::toggled, this, [](bool value) { setPref(Preferences::GroupBrushesCreatedByShapeTool, value); });
+    connect(m_axis, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            [this](int index) { m_manager.parameters().setAxis(index == 0 ? std::nullopt : std::optional{vm::axis::type(index - 1)}); });
+    connect(m_apply, &QPushButton::clicked, this, [this] {
+        auto axis = vm::axis::z;
+        if (auto* frame = findMapFrame(this))
+            if (auto* view = dynamic_cast<MapView2D*>(frame->currentMapViewBase())) axis = vm::find_abs_max_component(view->camera().direction());
+        m_manager.applyParametersNotifier(axis);
+    });
+    m_connections += manager.currentExtensionDidChangeNotifier.connect([this](size_t) { refresh(); });
+    m_connections += manager.parameters().parametersDidChangeNotifier.connect([this] { refresh(); });
+    auto doc = manager.document();
+    m_connections += doc->selectionDidChangeNotifier.connect([this](const auto&) { refresh(); });
+    m_connections += doc->documentWasNewedNotifier.connect([this](auto*) { refresh(); });
+    m_connections += doc->documentWasLoadedNotifier.connect([this](auto*) { refresh(); });
+    m_connections += doc->nodesDidChangeNotifier.connect([this](const auto&) { refresh(); });
+    m_connections += doc->nodeLockingDidChangeNotifier.connect([this](const auto&) { refresh(); });
+    m_connections += doc->nodeVisibilityDidChangeNotifier.connect([this](const auto&) { refresh(); });
+    m_connections += PreferenceManager::instance().preferenceDidChangeNotifier.connect([this](const auto& path) {
+        if (path == Preferences::GroupBrushesCreatedByShapeTool.path()) refresh();
+    });
+    refresh();
 }
-
-void DrawShapeToolPage::currentExtensionDidChange(size_t index) {
-    m_extensions->setCurrentIndex(int(index));
-    m_extensionPages->setCurrentIndex(m_extensions->currentIndex());
+void DrawShapeToolPage::refresh() {
+    m_quickMove->setVisible(m_manager.document()->hasSelectedNodes());
+    const auto& extension = m_manager.currentExtension();
+    m_shapes->setIcon(IO::loadSVGIcon(extension.iconPath(), 20));
+    m_shapes->setToolTip(QString::fromStdString(extension.name()));
+    m_pages->setCurrentIndex(int(extension.kind()));
+    const QSignalBlocker a(m_group), b(m_axis);
+    m_group->setChecked(pref(Preferences::GroupBrushesCreatedByShapeTool));
+    m_axis->setCurrentIndex(m_manager.parameters().axis() ? int(*m_manager.parameters().axis()) + 1 : 0);
+    const auto kind = extension.kind();
+    const bool axial = kind == DrawShapeKind::Cylinder || kind == DrawShapeKind::Cone || kind == DrawShapeKind::UVSphere || kind == DrawShapeKind::Arch;
+    m_axis->setVisible(axial);
+    m_axisLabel->setVisible(axial);
+    m_apply->setEnabled(m_manager.canApplySelection());
 }
-
 } // namespace TrenchBroom::View

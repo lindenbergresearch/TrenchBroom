@@ -32,6 +32,7 @@
 #include "Model/PickResult.h"
 #include "Model/WorldNode.h"
 #include "Renderer/PerspectiveCamera.h"
+#include "Renderer/OrthographicCamera.h"
 #include "TestLogger.h"
 #include "TestUtils.h"
 #include "View/ExtrudeTool.h"
@@ -54,6 +55,16 @@
 namespace TrenchBroom::View {
 
 namespace {
+Renderer::PerspectiveCamera extrudeTestPerspectiveCamera(const vm::ray3& ray) {
+    const auto direction=vm::vec3f{vm::normalize(ray.direction)};
+    const auto up=vm::abs(direction.z())<0.9f?vm::vec3f{0,0,1}:vm::vec3f{0,1,0};
+    return Renderer::PerspectiveCamera{90,1,8000,{0,0,1920,1080},vm::vec3f{ray.origin},direction,up};
+}
+Renderer::OrthographicCamera extrudeTestOrthographicCamera(const vm::ray3& ray) {
+    const auto direction=vm::vec3f{vm::normalize(ray.direction)};
+    const auto up=vm::abs(direction.z())<0.9f?vm::vec3f{0,0,1}:vm::vec3f{0,1,0};
+    return Renderer::OrthographicCamera{1,8000,{0,0,1920,1080},vm::vec3f{ray.origin},direction,up};
+}
 vm::vec3 n(const vm::vec3 &v) {
     return vm::normalize(v);
 }
@@ -100,7 +111,7 @@ size()
 
 == 1);
 
-const auto hit = tool.pick2D(pickRay, pickResult);
+const auto hit = tool.pick2D(pickRay, extrudeTestOrthographicCamera(pickRay), pickResult);
 CHECK_FALSE(hit
 .
 
@@ -126,7 +137,8 @@ const auto [origin, direction, expectedFaceNormal, expectedHitPoint, expectedDra
 CAPTURE(brushBounds, origin, direction
 );
 
-const auto hit = tool.pick2D(vm::ray3{origin, vm::normalize(direction)}, {});
+const auto pickRay=vm::ray3{origin,vm::normalize(direction)};
+const auto hit=tool.pick2D(pickRay,extrudeTestOrthographicCamera(pickRay),{});
 
 CHECK(hit
 .
@@ -222,7 +234,7 @@ size()
 
 == 1);
 
-const auto hit = tool.pick3D(pickRay, pickResult);
+const auto hit = tool.pick3D(pickRay, extrudeTestPerspectiveCamera(pickRay), pickResult);
 
 CHECK(hit
 .
@@ -307,7 +319,8 @@ const auto [origin, direction, expectedFaceNormal, expectedHitPoint, expectedDra
 CAPTURE(brushBounds, origin, direction
 );
 
-const auto hit = tool.pick3D(vm::ray3{origin, vm::normalize(direction)}, {});
+const auto pickRay=vm::ray3{origin,vm::normalize(direction)};
+const auto hit=tool.pick3D(pickRay,extrudeTestPerspectiveCamera(pickRay),{});
 
 CHECK(hit
 .
@@ -367,7 +380,7 @@ static Model::PickResult performPick(View::MapDocument &document, ExtrudeTool &t
     auto pickResult = Model::PickResult::byDistance();
     document.pick(pickRay, pickResult); // populate pickResult
 
-    const auto hit = tool.pick3D(pickRay, pickResult);
+    const auto hit = tool.pick3D(pickRay, extrudeTestPerspectiveCamera(pickRay), pickResult);
     CHECK(hit.type() == ExtrudeTool::ExtrudeHitType);
     CHECK_FALSE(vm::is_nan(hit.hitPoint()));
 

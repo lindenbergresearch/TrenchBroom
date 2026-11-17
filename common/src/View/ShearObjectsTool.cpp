@@ -128,7 +128,7 @@ void ShearObjectsTool::pick3D(const vm::ray3 &pickRay, const Renderer::Camera &c
 
 vm::bbox3 ShearObjectsTool::bounds() const {
     auto document = kdl::mem_lock(m_document);
-    return document->selectionBounds();
+    return document->transformationBounds(true);
 }
 
 // used for rendering
@@ -199,7 +199,11 @@ void ShearObjectsTool::shearByDelta(const vm::vec3 &delta) {
 
     if (!vm::is_zero(delta, vm::C::almost_zero())) {
         const BBoxSide side = m_dragStartHit.target<BBoxSide>();
-        document->shearObjects(bounds(), side.normal, delta);
+        document->rollbackTransaction();
+        if(!document->shearObjects(m_bboxAtDragStart,side.normal,m_dragCumulativeDelta)) {
+            m_dragCumulativeDelta=m_dragCumulativeDelta-delta;
+            if(!vm::is_zero(m_dragCumulativeDelta,vm::C::almost_zero())) document->shearObjects(m_bboxAtDragStart,side.normal,m_dragCumulativeDelta);
+        }
     }
 }
 

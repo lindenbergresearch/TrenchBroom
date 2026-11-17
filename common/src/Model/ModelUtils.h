@@ -43,6 +43,7 @@ class EntityNode;
 class LayerNode;
 
 class EditorContext;
+class WorldNode;
 
 HitType::Type nodeHitType();
 
@@ -77,6 +78,8 @@ std::vector<Node *> collectSelectableNodes(const std::vector<Node *> &nodes, con
 std::vector<BrushFaceHandle> collectSelectedBrushFaces(const std::vector<Node *> &nodes);
 
 std::vector<BrushFaceHandle> collectSelectableBrushFaces(const std::vector<Node *> &nodes, const EditorContext &editorContext);
+
+std::vector<BrushFaceHandle> collectConnectedCoplanarFaces(const BrushFaceHandle& startFace,const EditorContext& context,const WorldNode& world);
 
 vm::bbox3 computeLogicalBounds(const std::vector<Node *> &nodes, const vm::bbox3 &defaultBounds = vm::bbox3());
 

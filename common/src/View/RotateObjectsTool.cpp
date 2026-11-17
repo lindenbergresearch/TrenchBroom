@@ -76,7 +76,7 @@ void RotateObjectsTool::setRotationCenter(const vm::vec3 &position) {
 
 void RotateObjectsTool::resetRotationCenter() {
     auto document = kdl::mem_lock(m_document);
-    const auto &bounds = document->selectionBounds();
+    const auto &bounds = document->transformationBounds();
     const auto position = document->grid().snap(bounds.center());
     setRotationCenter(position);
 }

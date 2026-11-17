@@ -62,7 +62,7 @@ const Tool &ExtrudeToolController::tool() const {
 
 void ExtrudeToolController::pick(const InputState &inputState, Model::PickResult &pickResult) {
     if (handleInput(inputState)) {
-        const Model::Hit hit = doPick(inputState.pickRay(), pickResult);
+        const Model::Hit hit = doPick(inputState.pickRay(), inputState.camera(), pickResult);
         if (hit.isMatch()) {
             pickResult.addHit(hit);
         }
@@ -276,6 +276,157 @@ auto createMoveDragTracker(ExtrudeTool &tool, const InputState &inputState, cons
             tool.proposedDragHandles(), ExtrudeTool::getDragFaces(tool.proposedDragHandles())
         }}, inputState, initialHandlePosition, hit.hitPoint());
 }
+struct StampDragDelegate : public HandleDragTrackerDelegate
+{
+  ExtrudeTool& m_tool;
+  ExtrudeDragState m_stampDragState;
+
+  StampDragDelegate(ExtrudeTool& tool, ExtrudeDragState stampDragState)
+    : m_tool{tool}
+    , m_stampDragState{std::move(stampDragState)}
+  {
+  }
+
+  DragHandlePicker makeCanonicalHandlePicker(
+    const vm::plane3& plane,
+    const vm::vec3& initialHandlePosition,
+    const vm::vec3& handleOffset)
+  {
+    return
+      [planeHandlePicker = makePlaneHandlePicker(plane, handleOffset),
+       faceNormal = m_stampDragState.initialDragHandles.front().faceNormal(),
+       initialHandlePosition](const InputState& inputState_) -> std::optional<vm::vec3> {
+        if (const auto pointOnPlane = planeHandlePicker(inputState_))
+        {
+          const auto moveDelta = *pointOnPlane - initialHandlePosition;
+          const auto canonicalMoveDistance = vm::dot(moveDelta, faceNormal);
+          return initialHandlePosition + canonicalMoveDistance * faceNormal;
+        }
+        return std::nullopt;
+      };
+  }
+
+  auto makePicker(
+    const InputState& inputState,
+    const vm::vec3& initialHandlePosition,
+    const vm::vec3& handleOffset)
+  {
+    using namespace Model::HitFilters;
+
+    const auto& hit = inputState.pickResult().first(type(ExtrudeTool::ExtrudeHitType));
+    assert(hit.isMatch());
+
+    const auto& hitData = hit.target<ExtrudeHitData>();
+    return std::visit(
+      kdl::overload(
+        [&](const vm::line3& line) { return makeLineHandlePicker(line, handleOffset); },
+        [&](const vm::plane3& plane) {
+          return makeCanonicalHandlePicker(plane, initialHandlePosition, handleOffset);
+        }),
+      hitData.dragReference);
+  }
+
+  HandlePositionProposer start(
+    const InputState& inputState,
+    const vm::vec3& initialHandlePosition,
+    const vm::vec3& handleOffset) override
+  {
+    auto picker = makePicker(inputState, initialHandlePosition, handleOffset);
+    auto snapper = [&](
+                     const InputState&,
+                     const DragState& dragState,
+                     const vm::vec3& proposedHandlePosition) {
+      auto& grid = m_tool.grid();
+      if (!grid.snap())
+      {
+        return proposedHandlePosition;
+      }
+
+      const auto moveDelta = proposedHandlePosition - dragState.initialHandlePosition;
+      if(vm::is_zero(moveDelta,vm::C::almost_zero())) return dragState.initialHandlePosition;
+      const auto moveDirection = vm::normalize(moveDelta);
+      const auto moveDistance = vm::dot(moveDelta, moveDirection);
+
+      // Every vertex of every dragged face is translated straight along moveDirection
+      // by the same distance (see stampBrushes()), so snap by finding, for each such
+      // vertex, where its own straight-line trajectory crosses a grid plane -- not by
+      // sliding it along an adjacent edge, which is what snapMoveDistanceForFace does.
+      auto snappedMoveDistance = std::numeric_limits<double>::max();
+      for (const auto& dragHandle : m_stampDragState.initialDragHandles)
+      {
+        for (const auto& vertexPosition : dragHandle.faceAtDragStart().vertexPositions())
+        {
+          const auto line = vm::line3{vertexPosition, moveDirection};
+          const auto snappedDistanceForVertex = grid.snapToGridPlane(line, moveDistance);
+          if (
+            vm::abs(snappedDistanceForVertex - moveDistance)
+            < vm::abs(snappedMoveDistance - moveDistance))
+          {
+            snappedMoveDistance = snappedDistanceForVertex;
+          }
+        }
+      }
+
+      return dragState.initialHandlePosition + snappedMoveDistance * moveDirection;
+    };
+
+    return makeHandlePositionProposer(std::move(picker), std::move(snapper));
+  }
+
+  DragStatus drag(
+    const InputState&,
+    const DragState& dragState,
+    const vm::vec3& proposedHandlePosition) override
+  {
+    const auto handleDelta = proposedHandlePosition - dragState.initialHandlePosition;
+    if (
+      vm::is_equal(handleDelta, m_stampDragState.totalDelta, vm::C::almost_zero())
+      || m_tool.stamp(handleDelta, m_stampDragState))
+    {
+      return DragStatus::Continue;
+    }
+    return DragStatus::Deny;
+  }
+
+  void end(const InputState& inputState, const DragState&) override
+  {
+    m_tool.commit(m_stampDragState);
+    m_tool.updateProposedDragHandles(inputState.pickResult());
+  }
+
+  void cancel(const DragState&) override { m_tool.cancel(); }
+
+  void setRenderOptions(
+    const InputState&, Renderer::RenderContext& renderContext) const override
+  {
+    renderContext.setForceShowSelectionGuide();
+  }
+
+  void render(
+    const InputState&,
+    const DragState&,
+    Renderer::RenderContext&,
+    Renderer::RenderBatch& renderBatch) const override
+  {
+    auto edgeRenderer = buildEdgeRenderer(m_stampDragState.currentDragFaces);
+    edgeRenderer.renderOnTop(renderBatch, pref(Preferences::ExtrudeHandleColor));
+  }
+};
+
+auto createStampDragTracker(
+  ExtrudeTool& tool, const InputState& inputState, const Model::Hit& hit)
+{
+  const auto initialHandlePosition = hit.target<ExtrudeHitData>().initialHandlePosition;
+
+  return createHandleDragTracker(
+    StampDragDelegate{
+      tool,
+      {tool.proposedDragHandles(),
+       ExtrudeTool::getDragFaces(tool.proposedDragHandles())}},
+    inputState,
+    initialHandlePosition,
+    hit.hitPoint());
+}
 } // namespace
 
 std::unique_ptr<DragTracker> ExtrudeToolController::acceptMouseDrag(const InputState &inputState) {
@@ -294,7 +445,9 @@ std::unique_ptr<DragTracker> ExtrudeToolController::acceptMouseDrag(const InputS
 
     const auto &hit = inputState.pickResult().first(type(ExtrudeTool::ExtrudeHitType));
     if (hit.isMatch()) {
-        if (inputState.modifierKeysDown(ModifierKeys::MKAlt)) {
+        if (inputState.modifierKeysDown(ModifierKeys::MKAlt) && inputState.modifierKeysDown(ModifierKeys::MKCtrlCmd)) {
+            m_tool.beginStamp(); return createStampDragTracker(m_tool,inputState,hit);
+        } else if (inputState.modifierKeysDown(ModifierKeys::MKAlt)) {
             if (inputState.camera().orthographicProjection()) {
                 m_tool.beginMove();
                 return createMoveDragTracker(m_tool, inputState, hit);
@@ -328,22 +481,22 @@ bool ExtrudeToolController::handleInput(const InputState &inputState) const {
 ExtrudeToolController2D::ExtrudeToolController2D(ExtrudeTool &tool) : ExtrudeToolController{tool} {
 }
 
-Model::Hit ExtrudeToolController2D::doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) {
-    return m_tool.pick2D(pickRay, pickResult);
+Model::Hit ExtrudeToolController2D::doPick(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) {
+    return m_tool.pick2D(pickRay, camera, pickResult);
 }
 
 bool ExtrudeToolController2D::doHandleInput(const InputState &inputState) const {
-    return (inputState.modifierKeysPressed(ModifierKeys::MKShift) || inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd) || inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKAlt));
+    return (inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKAlt | ModifierKeys::MKCtrlCmd) || inputState.modifierKeysPressed(ModifierKeys::MKShift) || inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd) || inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKAlt));
 }
 
 ExtrudeToolController3D::ExtrudeToolController3D(ExtrudeTool &tool) : ExtrudeToolController{tool} {
 }
 
-Model::Hit ExtrudeToolController3D::doPick(const vm::ray3 &pickRay, const Model::PickResult &pickResult) {
-    return m_tool.pick3D(pickRay, pickResult);
+Model::Hit ExtrudeToolController3D::doPick(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) {
+    return m_tool.pick3D(pickRay, camera, pickResult);
 }
 
 bool ExtrudeToolController3D::doHandleInput(const InputState &inputState) const {
-    return (inputState.modifierKeysPressed(ModifierKeys::MKShift) || inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd));
+    return (inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKAlt | ModifierKeys::MKCtrlCmd) || inputState.modifierKeysPressed(ModifierKeys::MKShift) || inputState.modifierKeysPressed(ModifierKeys::MKShift | ModifierKeys::MKCtrlCmd));
 }
 } // namespace TrenchBroom::View

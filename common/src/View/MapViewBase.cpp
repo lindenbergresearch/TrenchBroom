@@ -834,14 +834,17 @@ ActionContext::Type MapViewBase::actionContext() const {
         toolContext = ActionContext::AssembleBrushTool;
     } else if (m_toolBox.clipToolActive()) {
         toolContext = ActionContext::ClipTool;
-    } else if (m_toolBox.anyVertexToolActive()) {
-        toolContext = ActionContext::AnyVertexTool;
     } else if (m_toolBox.rotateObjectsToolActive()) {
         toolContext = ActionContext::RotateTool;
     } else if (m_toolBox.scaleObjectsToolActive()) {
         toolContext = ActionContext::ScaleTool;
     } else if (m_toolBox.shearObjectsToolActive()) {
         toolContext = ActionContext::ShearTool;
+    }
+
+    if(m_toolBox.anyVertexToolActive()) {
+        if(toolContext==ActionContext::NoTool) toolContext=ActionContext::AnyVertexTool;
+        else toolContext|=ActionContext::AnyVertexTool;
     }
 
     ActionContext::Type selectionContext = ActionContext::NoSelection;

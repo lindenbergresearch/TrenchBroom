@@ -60,7 +60,8 @@ class ToolBox : public QObject
 private:
   std::unique_ptr<DragTracker> m_dragTracker;
   std::unique_ptr<DropTracker> m_dropTracker;
-  Tool* m_modalTool = nullptr;
+  std::vector<Tool*> m_modalToolStack;
+  std::vector<std::vector<Tool*>> m_exclusiveToolGroups;
 
   std::map<Tool*, std::vector<Tool*>> m_suppressedTools;
 
@@ -118,6 +119,7 @@ public: // tool management
    */
   void suppressWhileActive(Tool& suppressedTool, Tool& primaryTool);
 
+  void addExclusiveToolGroup(std::initializer_list<Tool*> tools);
   bool anyToolActive() const;
   Tool* activeTool();
   void toggleTool(Tool& tool);
@@ -139,6 +141,7 @@ public: // rendering
     Renderer::RenderBatch& renderBatch);
 
 private:
+  std::vector<Tool*> currentlySuppressedTools() const;
   void activateTool(Tool& tool);
   void deactivateTool(Tool& tool);
 };

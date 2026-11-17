@@ -129,9 +129,9 @@ class ExtrudeTool : public Tool {
 
     const Grid &grid() const;
 
-    Model::Hit pick2D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const;
+    Model::Hit pick2D(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) const;
 
-    Model::Hit pick3D(const vm::ray3 &pickRay, const Model::PickResult &pickResult) const;
+    Model::Hit pick3D(const vm::ray3 &pickRay, const Renderer::Camera& camera, const Model::PickResult &pickResult) const;
 
     /**
      * Returns the current proposed drag handles as per the last call to
@@ -149,6 +149,9 @@ class ExtrudeTool : public Tool {
     void beginExtrude();
 
     bool extrude(const vm::vec3 &faceDelta, ExtrudeDragState &dragState);
+
+    void beginStamp();
+    bool stamp(const vm::vec3& delta, ExtrudeDragState& dragState);
 
     void beginMove();
 

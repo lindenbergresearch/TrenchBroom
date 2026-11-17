@@ -26,6 +26,11 @@
 #include "Model/EditorContext.h"
 #include "Model/NodeQueries.h"
 #include "Polyhedron.h"
+#include "Model/WorldNode.h"
+#include "octree.h"
+#include <vm/intersection.h>
+#include <kdl/vector_set.h>
+#include <unordered_map>
 
 #include "kdl/vector_utils.h"
 
@@ -254,6 +259,42 @@ std::vector<EntityNode *> filterEntityNodes(const std::vector<Node *> &nodes) {
         node->accept(kdl::overload([](WorldNode *) {}, [](LayerNode *) {}, [](GroupNode *) {}, [&](EntityNode *entityNode) { result.push_back(entityNode); }, [](BrushNode *) {}, [](PatchNode *) {}));
     }
     return result;
+}
+
+
+std::vector<BrushFaceHandle> collectConnectedCoplanarFaces(const BrushFaceHandle& startFace,const EditorContext& context,const WorldNode& world) {
+    if(!context.selectable(startFace.node(),startFace.face())) return {};
+    constexpr auto epsilon=vm::C::almost_zero();
+    struct Candidate { BrushFaceHandle handle;std::vector<vm::segment3> edges;vm::bbox3 bounds; };
+    const auto candidate=[](const BrushFaceHandle& handle) {
+        vm::bbox3::builder bounds;
+        for(const auto& point:handle.face().vertexPositions()) bounds.add(point);
+        auto edges=std::vector<vm::segment3>{};
+        for(const auto* edge:handle.face().edges()) edges.push_back(edge->segment());
+        return Candidate{handle,std::move(edges),bounds.bounds().expand(epsilon)};
+    };
+    const auto sharesEdge=[](const Candidate& a,const Candidate& b) {
+        for(const auto& first:a.edges) for(const auto& second:b.edges)
+            if(vm::segments_overlap(first,second,epsilon)) return true;
+        return false;
+    };
+    auto cache=std::unordered_map<Node*,std::vector<BrushFaceHandle>>{};
+    auto visited=kdl::vector_set<BrushFaceHandle>{startFace};
+    auto pending=std::vector<Candidate>{candidate(startFace)};
+    auto region=std::vector<BrushFaceHandle>{};
+    while(!pending.empty()) {
+        auto current=std::move(pending.back());pending.pop_back();region.push_back(current.handle);
+        for(auto* node:world.nodeTree().find_intersectors(current.bounds)) {
+            auto [it,inserted]=cache.emplace(node,std::vector<BrushFaceHandle>{});
+            if(inserted) for(const auto& handle:collectSelectableBrushFaces({node},context))
+                if(handle.face().coplanarWith(startFace.face().boundary())) it->second.push_back(handle);
+            for(const auto& handle:it->second) if(!visited.count(handle)) {
+                auto next=candidate(handle);
+                if(current.bounds.intersects(next.bounds) && sharesEdge(current,next)) {visited.insert(handle);pending.push_back(std::move(next));}
+            }
+        }
+    }
+    return region;
 }
 
 } // namespace TrenchBroom::Model

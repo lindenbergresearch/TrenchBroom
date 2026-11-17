@@ -222,6 +222,7 @@ class ScaleObjectsTool : public Tool {
     bool m_resizing;
     AnchorPos m_anchorPos;
     vm::bbox3 m_bboxAtDragStart;
+    vm::bbox3 m_scaledBounds;
     Model::Hit m_dragStartHit; // contains the drag type (side/edge/corner)
     vm::vec3 m_dragCumulativeDelta;
     ProportionalAxes m_proportionalAxes;

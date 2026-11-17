@@ -106,6 +106,8 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/Model/BezierPatch.cpp
     ${COMMON_SOURCE_DIR}/Model/Brush.cpp
     ${COMMON_SOURCE_DIR}/Model/BrushBuilder.cpp
+    ${COMMON_SOURCE_DIR}/Model/CircleShape.cpp
+    ${COMMON_SOURCE_DIR}/Model/RockFormation.cpp
     ${COMMON_SOURCE_DIR}/Model/BrushFace.cpp
     ${COMMON_SOURCE_DIR}/Model/BrushFaceAttributes.cpp
     ${COMMON_SOURCE_DIR}/Model/BrushFaceHandle.cpp
@@ -338,6 +340,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolController3D.cpp
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolExtension.cpp
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolExtensions.cpp
+    ${COMMON_SOURCE_DIR}/View/DrawShapeToolGenerators.cpp
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolPage.cpp
     ${COMMON_SOURCE_DIR}/View/DropTracker.cpp
     ${COMMON_SOURCE_DIR}/View/EdgeTool.cpp
@@ -641,6 +644,9 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/Model/BezierPatch.h
     ${COMMON_SOURCE_DIR}/Model/Brush.h
     ${COMMON_SOURCE_DIR}/Model/BrushBuilder.h
+    ${COMMON_SOURCE_DIR}/Model/CircleShape.h
+    ${COMMON_SOURCE_DIR}/Model/RockFormation.h
+    ${COMMON_SOURCE_DIR}/Model/ShapeUtils.h
     ${COMMON_SOURCE_DIR}/Model/BrushFace.h
     ${COMMON_SOURCE_DIR}/Model/BrushFaceAttributes.h
     ${COMMON_SOURCE_DIR}/Model/BrushFaceHandle.h
@@ -847,6 +853,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/Autosaver.h
     ${COMMON_SOURCE_DIR}/View/BorderLine.h
     ${COMMON_SOURCE_DIR}/View/BorderPanel.h
+    ${COMMON_SOURCE_DIR}/View/BrushComponentSelection.h
     ${COMMON_SOURCE_DIR}/View/BrushVertexCommands.h
     ${COMMON_SOURCE_DIR}/View/CameraAnimation.h
     ${COMMON_SOURCE_DIR}/View/CameraLinkHelper.h
@@ -902,6 +909,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolExtension.h
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolExtensions.h
     ${COMMON_SOURCE_DIR}/View/DrawShapeToolPage.h
+    ${COMMON_SOURCE_DIR}/View/DrawShapeToolParameters.h
     ${COMMON_SOURCE_DIR}/View/DropTracker.h
     ${COMMON_SOURCE_DIR}/View/EdgeTool.h
     ${COMMON_SOURCE_DIR}/View/EdgeToolController.h

@@ -599,7 +599,7 @@ void ScaleObjectsTool::pick3D(const vm::ray3 &pickRay, const Renderer::Camera &c
 
 vm::bbox3 ScaleObjectsTool::bounds() const {
     auto document = kdl::mem_lock(m_document);
-    return document->selectionBounds();
+    return m_resizing?m_scaledBounds:document->transformationBounds(true);
 }
 
 // used for rendering
@@ -841,6 +841,7 @@ void ScaleObjectsTool::startScaleWithHit(const Model::Hit &hit) {
     ensure(!m_resizing, "must not be resizing already");
 
     m_bboxAtDragStart = bounds();
+    m_scaledBounds=m_bboxAtDragStart;
     m_dragStartHit = hit;
     m_dragCumulativeDelta = vm::vec3::zero();
 
@@ -859,7 +860,9 @@ void ScaleObjectsTool::scaleByDelta(const vm::vec3 &delta) {
     const auto newBox = moveBBoxForHit(m_bboxAtDragStart, m_dragStartHit, m_dragCumulativeDelta, m_proportionalAxes, m_anchorPos);
 
     if (!newBox.is_empty()) {
-        document->scaleObjects(bounds(), newBox);
+        document->rollbackTransaction();
+        m_scaledBounds=m_bboxAtDragStart;
+        if(document->scaleObjects(m_bboxAtDragStart, newBox)) m_scaledBounds=newBox;
     }
 }
 

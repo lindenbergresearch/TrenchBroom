@@ -21,7 +21,9 @@
 
 #include "BrushFaceAttributes.h"
 #include "FloatType.h"
+#include "Model/CircleShape.h"
 #include "Model/Polyhedron3.h"
+#include "Model/RockFormation.h"
 #include "Result.h"
 
 #include "vm/bbox.h"
@@ -39,8 +41,8 @@ class ModelFactory;
 enum class MapFormat;
 
 enum class RadiusMode {
-  ToEdge,
-  ToVertex,
+    ToEdge,
+    ToVertex,
 };
 
 class BrushBuilder {
@@ -49,46 +51,46 @@ class BrushBuilder {
     const BrushFaceAttributes m_defaultAttribs;
 
   public:
-    BrushBuilder(MapFormat mapFormat, const vm::bbox3 &worldBounds);
+    BrushBuilder(MapFormat mapFormat, const vm::bbox3& worldBounds);
 
-    BrushBuilder(MapFormat mapFormat, const vm::bbox3 &worldBounds, BrushFaceAttributes defaultAttribs);
+    BrushBuilder(MapFormat mapFormat, const vm::bbox3& worldBounds, BrushFaceAttributes defaultAttribs);
 
-    Result<Brush> createCube(FloatType size, const std::string &textureName) const;
+    Result<Brush> createCube(FloatType size, const std::string& textureName) const;
 
-    Result<Brush> createCube(FloatType size, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture) const;
+    Result<Brush> createCube(FloatType size, const std::string& leftTexture, const std::string& rightTexture, const std::string& frontTexture, const std::string& backTexture,
+                             const std::string& topTexture, const std::string& bottomTexture) const;
 
-    Result<Brush> createCuboid(const vm::vec3 &size, const std::string &textureName) const;
+    Result<Brush> createCuboid(const vm::vec3& size, const std::string& textureName) const;
 
-    Result<Brush> createCuboid(const vm::vec3 &size, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture) const;
+    Result<Brush> createCuboid(const vm::vec3& size, const std::string& leftTexture, const std::string& rightTexture, const std::string& frontTexture, const std::string& backTexture,
+                               const std::string& topTexture, const std::string& bottomTexture) const;
 
-    Result<Brush> createCuboid(const vm::bbox3 &bounds, const std::string &textureName) const;
+    Result<Brush> createCuboid(const vm::bbox3& bounds, const std::string& textureName) const;
 
-    Result<Brush> createCuboid(const vm::bbox3 &bounds, const std::string &leftTexture, const std::string &rightTexture, const std::string &frontTexture, const std::string &backTexture, const std::string &topTexture, const std::string &bottomTexture) const;
+    Result<Brush> createCuboid(const vm::bbox3& bounds, const std::string& leftTexture, const std::string& rightTexture, const std::string& frontTexture, const std::string& backTexture,
+                               const std::string& topTexture, const std::string& bottomTexture) const;
 
-    Result<Brush> createCylinder(const vm::bbox3 &bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string &textureName) const;
+    Result<Brush> createCylinder(const vm::bbox3& bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string& textureName) const;
 
-    Result<std::vector<Brush>> createHollowCylinder(
-        const vm::bbox3 &bounds,
-        FloatType thickness,
-        size_t numSides,
-        RadiusMode radiusMode,
-        vm::axis::type axis,
-        const std::string &textureName) const;
+    Result<std::vector<Brush>> createHollowCylinder(const vm::bbox3& bounds, FloatType thickness, size_t numSides, RadiusMode radiusMode, vm::axis::type axis,
+                                                    const std::string& textureName) const;
 
-    Result<Brush> createCone(const vm::bbox3 &bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string &textureName) const;
+    Result<Brush> createCone(const vm::bbox3& bounds, size_t numSides, RadiusMode radiusMode, vm::axis::type axis, const std::string& textureName) const;
 
-    Result<Brush> createUVSphere(
-        const vm::bbox3& bounds,
-        size_t numSides,
-        size_t numRings,
-        RadiusMode radiusMode,
-        vm::axis::type axis,
-        const std::string& textureName) const;
+    Result<Brush> createUVSphere(const vm::bbox3& bounds, size_t numSides, size_t numRings, RadiusMode radiusMode, vm::axis::type axis, const std::string& textureName) const;
 
-    Result<Brush> createIcoSphere(const vm::bbox3 &bounds, size_t iterations, const std::string &textureName) const;
+    Result<Brush> createCylinder(const vm::bbox3& bounds, const CircleShape& circle, vm::axis::type axis, const std::string& texture) const;
+    Result<std::vector<Brush>> createHollowCylinder(const vm::bbox3& bounds, double thickness, const CircleShape& circle, vm::axis::type axis, const std::string& texture) const;
+    Result<Brush> createCone(const vm::bbox3& bounds, const CircleShape& circle, vm::axis::type axis, const std::string& texture) const;
+    Result<Brush> createUvSphere(const vm::bbox3& bounds, const CircleShape& circle, size_t rings, vm::axis::type axis, const std::string& texture) const;
+    Result<std::vector<Brush>> createArch(const vm::bbox3& bounds, double thickness, const CircleShape& circle, vm::axis::type axis, const std::string& texture) const;
+    Result<std::vector<Brush>> createSpandrelForArch(const vm::bbox3& bounds, double thickness, const CircleShape& circle, vm::axis::type axis, const std::string& texture) const;
+    Result<std::vector<Brush>> createRockFormation(const vm::bbox3& bounds, RockType type, double detail, uint32_t seed, const std::string& texture) const;
 
-    Result<Brush> createBrush(const std::vector<vm::vec3> &points, const std::string &textureName) const;
+    Result<Brush> createIcoSphere(const vm::bbox3& bounds, size_t iterations, const std::string& textureName) const;
 
-    Result<Brush> createBrush(const Polyhedron3 &polyhedron, const std::string &textureName) const;
+    Result<Brush> createBrush(const std::vector<vm::vec3>& points, const std::string& textureName) const;
+
+    Result<Brush> createBrush(const Polyhedron3& polyhedron, const std::string& textureName) const;
 };
 } // namespace TrenchBroom::Model

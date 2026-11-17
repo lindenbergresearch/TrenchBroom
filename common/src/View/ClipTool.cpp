@@ -322,6 +322,7 @@ class PointClipStrategy : public ClipStrategy {
     }
 
     void renderHighlight(Renderer::RenderContext &renderContext, Renderer::RenderBatch &renderBatch, const size_t index) {
+        if (index >= m_points.size()) return;
         auto renderService = Renderer::RenderService{renderContext, renderBatch};
         renderService.setForegroundColor(pref(Preferences::SelectedHandleColor));
         renderService.renderHandleHighlight(vm::vec3f(m_points[index].point));

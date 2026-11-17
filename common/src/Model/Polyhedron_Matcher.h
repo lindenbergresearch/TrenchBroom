@@ -27,7 +27,8 @@
 #include "kdl/vector_utils.h"
 
 #include <limits>
-#include <map>
+#include <kdl/flat_map.h>
+#include <kdl/flat_set.h>
 #include <vector>
 
 namespace TrenchBroom {
@@ -67,10 +68,10 @@ template<typename P> class PolyhedronMatcher {
     using V = vm::vec<typename P::FloatType, 3u>;
     using Vertex = typename P::Vertex;
     using VertexList = typename P::VertexList;
-    using VertexSet = std::set<Vertex *>;
+    using VertexSet = kdl::flat_set<Vertex *>;
     using HalfEdge = typename P::HalfEdge;
     using Face = typename P::Face;
-    using VMap = std::map<V, V>;
+    using VMap = kdl::flat_map<V, V>;
 
     using VertexRelation = kdl::binary_relation<Vertex *, Vertex *>;
 

@@ -365,11 +365,12 @@ template<typename T, typename FP, typename VP> class Polyhedron<T, FP, VP>::Seam
      *
      * @param edge the edge to append, must not be null
      */
-    void push_back(Edge *edge) {
+    bool push_back(Edge *edge) {
         assert(edge != nullptr);
         assert(empty() || edge != last());
-        assert(checkEdge(edge));
+        if (!checkEdge(edge)) return false;
         m_edges.push_back(edge);
+        return true;
     }
 
     /**
@@ -540,27 +541,28 @@ template<typename T, typename FP, typename VP> std::optional<typename Polyhedron
     Seam seam;
 
     std::unordered_set<Face *> visitedFaces{initialVisibleFace};
-    visitFace(position, initialVisibleFace->boundary().front(), visitedFaces, seam, planeEpsilon);
+    if (!visitFace(position, initialVisibleFace->boundary().front(), visitedFaces, seam, planeEpsilon)) return std::nullopt;
 
     return seam;
 }
 
-template<typename T, typename FP, typename VP> void Polyhedron<T, FP, VP>::visitFace(const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, const T planeEpsilon) {
+template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::visitFace(const vm::vec<T, 3> &position, HalfEdge *initialBoundaryEdge, std::unordered_set<Face *> &visitedFaces, Seam &seam, const T planeEpsilon) {
     HalfEdge *currentBoundaryEdge = initialBoundaryEdge;
     do {
         Face *neighbour = currentBoundaryEdge->twin()->face();
         if (neighbour->plane().point_status(position, planeEpsilon) != vm::plane_status::below) {
             if (visitedFaces.insert(neighbour).second) {
-                visitFace(position, currentBoundaryEdge->twin(), visitedFaces, seam, planeEpsilon);
+                if (!visitFace(position, currentBoundaryEdge->twin(), visitedFaces, seam, planeEpsilon)) return false;
             }
         } else {
             Edge *edge = currentBoundaryEdge->edge();
             edge->makeSecondEdge(currentBoundaryEdge);
-            seam.push_back(edge);
+            if (!seam.push_back(edge)) return false;
         }
 
         currentBoundaryEdge = currentBoundaryEdge->next();
     } while (currentBoundaryEdge != initialBoundaryEdge);
+    return true;
 }
 
 template<typename T, typename FP, typename VP> void Polyhedron<T, FP, VP>::split(const Seam &seam) {
@@ -665,7 +667,7 @@ template<typename T, typename FP, typename VP> typename Polyhedron<T, FP, VP>::F
 
 template<typename T, typename FP, typename VP> bool Polyhedron<T, FP, VP>::checkSeamForWeaving(const Seam &seam, const vm::vec<T, 3> &position) const {
     assert(seam.size() >= 3);
-    assert(!seam.hasMultipleLoops());
+    if (seam.hasMultipleLoops()) return false;
     assert(!empty() && !point() && !edge());
 
     for (auto *edge : seam) {

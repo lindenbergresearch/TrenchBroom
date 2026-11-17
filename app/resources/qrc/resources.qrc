@@ -5,5 +5,16 @@
         <file alias="down.svg">../graphics/images/Down.svg</file>
 
 
+        <file alias="images/ShapeTool_UVSphere.svg">../graphics/images/ShapeTool_UVSphere.svg</file>
+        <file alias="images/ShapeTool_Cone.svg">../graphics/images/ShapeTool_Cone.svg</file>
+        <file alias="images/ShapeTool_Stairs.svg">../graphics/images/ShapeTool_Stairs.svg</file>
+        <file alias="images/ShapeTool_Rock.svg">../graphics/images/ShapeTool_Rock.svg</file>
+        <file alias="images/ShapeTool_Arch.svg">../graphics/images/ShapeTool_Arch.svg</file>
+        <file alias="images/ShapeTool_IcoSphere.svg">../graphics/images/ShapeTool_IcoSphere.svg</file>
+        <file alias="images/ShapeTool_Cylinder.svg">../graphics/images/ShapeTool_Cylinder.svg</file>
+        <file alias="images/ShapeTool_Cuboid.svg">../graphics/images/ShapeTool_Cuboid.svg</file>
+        <file alias="images/CircleEdgeAligned.svg">../graphics/images/CircleEdgeAligned.svg</file>
+        <file alias="images/CircleVertexAligned.svg">../graphics/images/CircleVertexAligned.svg</file>
+        <file alias="images/CircleScalable.svg">../graphics/images/CircleScalable.svg</file>
     </qresource>
 </RCC>
