@@ -199,6 +199,7 @@ set(TEST_FIXTURE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/fixture")
 add_library(common-test-utils OBJECT ${COMMON_TEST_UTILS_SOURCE})
 set_compiler_config(common-test-utils)
 target_include_directories(common-test-utils PUBLIC ${COMMON_TEST_SOURCE_DIR})
+target_compile_definitions(common-test-utils PUBLIC TB_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
 target_link_libraries(common-test-utils PRIVATE common Catch2::Catch2 Qt6::Test)
 
 macro(configure_test_target TARGET)

@@ -8,12 +8,13 @@
 #include "IO/WadFileSystem.h"
 #include "IO/ZipFileSystem.h"
 #include "kdl/path_utils.h"
+#include "TestSourcePath.h"
 
 #include <catch2/catch.hpp>
 
 namespace TrenchBroom::IO {
 namespace {
-    std::filesystem::path archiveNameFixture(const char* name) { return std::filesystem::path{__FILE__}.parent_path().parent_path().parent_path() / "fixture/IO/ArchiveNames" / name; }
+    std::filesystem::path archiveNameFixture(const char* name) { return testSourceRoot() / "common/test/fixture/IO/ArchiveNames" / name; }
     template <typename FS> void checkLegacyArchiveName(const char* fixture, const char* suffix) {
         auto file = Disk::openFile(archiveNameFixture(fixture));
         REQUIRE(file.is_success());

@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "Model/GameConfig.h"
 #include "Model/GameFileSystem.h"
+#include "TestSourcePath.h"
 
 #include <QTemporaryDir>
 #include <catch2/catch.hpp>
@@ -24,7 +25,7 @@ TEST_CASE("Game asset reload refreshes backing directories before shader discove
     };
     write("id1/textures/old.png", "dummy");
     write("id1/scripts/old.shader", "textures/old { qer_editorimage textures/old.png }");
-    const auto fixture = std::filesystem::path{__FILE__}.parent_path().parent_path().parent_path() / "fixture/IO/ArchiveNames/non_utf8_filename.zip";
+    const auto fixture = testSourceRoot() / "common/test/fixture/IO/ArchiveNames/non_utf8_filename.zip";
     std::filesystem::copy_file(fixture, root / "id1/pak0.pk3");
     Model::GameConfig config;
     config.fileSystemConfig.searchPath = "id1";

@@ -35,7 +35,9 @@ set(regression_sources
 add_executable(tb-regression-tests EXCLUDE_FROM_ALL ${regression_sources})
 target_link_libraries(tb-regression-tests PRIVATE common Catch2::Catch2 Qt6::Test)
 target_include_directories(tb-regression-tests PRIVATE ../test/src)
-target_compile_definitions(tb-regression-tests PRIVATE CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS=1)
+target_compile_definitions(tb-regression-tests PRIVATE
+    CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS=1
+    TB_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
 set_target_properties(tb-regression-tests PROPERTIES
     AUTOMOC ON
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/regression")
