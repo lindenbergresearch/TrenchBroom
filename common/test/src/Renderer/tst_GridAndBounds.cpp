@@ -9,7 +9,7 @@
 #include "Renderer/PerspectiveCamera.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/Shaders.h"
-#include "View/GLContextManager.h"
+#include "View/MapView/GLContextManager.h"
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>

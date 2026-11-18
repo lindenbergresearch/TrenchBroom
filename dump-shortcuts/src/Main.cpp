@@ -26,7 +26,7 @@
 #include "KeyStrings.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
-#include "View/Actions.h"
+#include "View/Actions/Actions.h"
 
 #include <array>
 #include <filesystem>

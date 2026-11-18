@@ -32,9 +32,9 @@
 #include "Renderer/RenderContext.h"
 #include "Renderer/Shaders.h"
 #include "Renderer/SkyRenderer.h"
-#include "View/GLContextManager.h"
-#include "View/MapDocumentCommandFacade.h"
-#include "View/ViewEditor.h"
+#include "View/MapView/GLContextManager.h"
+#include "View/Document/MapDocumentCommandFacade.h"
+#include "View/Inspector/ViewSettings/ViewEditor.h"
 #include <QCheckBox>
 #include <QDir>
 #include <QOffscreenSurface>

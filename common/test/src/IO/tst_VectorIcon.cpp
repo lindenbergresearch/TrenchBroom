@@ -1,7 +1,7 @@
 #include "IO/PathQt.h"
 #include "IO/ResourceUtils.h"
 #include "IO/VectorIcon.h"
-#include "View/QtUtils.h"
+#include "View/Theme/QtUtils.h"
 
 #include <QApplication>
 #include <QElapsedTimer>

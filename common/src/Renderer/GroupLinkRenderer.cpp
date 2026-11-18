@@ -27,7 +27,7 @@
 #include "Model/WorldNode.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
-#include "View/MapDocument.h"
+#include "View/Document/MapDocument.h"
 
 #include "kdl/memory_utils.h"
 

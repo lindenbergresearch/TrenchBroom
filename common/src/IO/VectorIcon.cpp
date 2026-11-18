@@ -1,7 +1,7 @@
 #include "VectorIcon.h"
 
 #include "Ensure.h"
-#include "ThemeManager.h"
+#include "View/Theme/ThemeManager.h"
 #include "IO/PathQt.h"
 #include "IO/SystemPaths.h"
 

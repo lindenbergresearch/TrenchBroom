@@ -25,7 +25,7 @@
 #include "IO/SystemPaths.h"
 #include "PreferenceManager.h"
 #include "TrenchBroomApp.h"
-#include "View/RenderView.h"
+#include "View/MapView/RenderView.h"
 #include "Preferences.h"
 
 using namespace TrenchBroom;

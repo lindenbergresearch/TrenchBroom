@@ -20,7 +20,7 @@
 #pragma once
 
 #include <vm/vec.h>
-#include "View/QtUtils.h"
+#include "View/Theme/QtUtils.h"
 
 #include <optional>
 #include <string>

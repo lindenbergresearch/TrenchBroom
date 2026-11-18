@@ -28,7 +28,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "Model/WorldNode.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
-#include "View/MapDocument.h"
+#include "View/Document/MapDocument.h"
 
 #include "kdl/memory_utils.h"
 #include "kdl/overload.h"

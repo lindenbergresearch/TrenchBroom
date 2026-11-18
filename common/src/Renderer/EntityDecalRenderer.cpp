@@ -31,7 +31,7 @@
 #include "Model/Polyhedron_Face.h"
 #include "Model/TexCoordSystem.h"
 #include "Model/WorldNode.h"
-#include "View/MapDocument.h"
+#include "View/Document/MapDocument.h"
 #include "octree.h"
 
 #include "kdl/memory_utils.h"

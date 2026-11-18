@@ -34,8 +34,8 @@
 #include "Model/ParaxialTexCoordSystem.h"
 #include "Model/PatchNode.h"
 #include "TestLogger.h"
-#include "View/MapDocument.h"
-#include "View/MapDocumentCommandFacade.h"
+#include "View/Document/MapDocument.h"
+#include "View/Document/MapDocumentCommandFacade.h"
 
 #include <kdl/result.h>
 #include <kdl/string_compare.h>

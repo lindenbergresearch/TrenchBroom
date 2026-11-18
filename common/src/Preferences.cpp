@@ -20,7 +20,7 @@
 #include "Preferences.h"
 #include <QKeySequence>
 #include <QSurfaceFormat>
-#include "View/MapViewLayout.h"
+#include "View/MapView/MapViewLayout.h"
 
 #include <vm/util.h>
 #include <Logger.h>

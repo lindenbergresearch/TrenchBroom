@@ -27,7 +27,7 @@
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "QtPrettyPrinters.h"
-#include "View/Actions.h"
+#include "View/Actions/Actions.h"
 
 #include <kdl/vector_utils.h>
 

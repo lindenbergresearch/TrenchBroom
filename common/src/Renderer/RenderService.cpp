@@ -33,7 +33,7 @@
 #include "Renderer/RenderUtils.h"
 #include "Renderer/TextAnchor.h"
 #include "Renderer/TextRenderer.h"
-#include "View/QtUtils.h"
+#include "View/Theme/QtUtils.h"
 
 #include <vm/forward.h>
 #include <vm/polygon.h>

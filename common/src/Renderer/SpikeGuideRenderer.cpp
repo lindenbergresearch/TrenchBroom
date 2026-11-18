@@ -35,7 +35,7 @@
 #include "Renderer/Shaders.h"
 #include "Renderer/RenderService.h"
 #include "Renderer/TextAnchor.h"
-#include "View/MapDocument.h"
+#include "View/Document/MapDocument.h"
 
 #include <vm/forward.h>
 #include <vm/ray.h>

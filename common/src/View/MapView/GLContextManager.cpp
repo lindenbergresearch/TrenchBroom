@@ -1,0 +1,133 @@
+/*
+ Copyright (C) 2010-2017 Kristian Duske
+
+ This file is part of TrenchBroom.
+
+ TrenchBroom is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ TrenchBroom is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "View/MapView/GLContextManager.h"
+
+#include "Error.h"
+#include "Exceptions.h"
+#include "Renderer/FontManager.h"
+#include "Renderer/GL.h"
+#include "Renderer/Shader.h"
+#include "Renderer/ShaderManager.h"
+#include "Renderer/Shaders.h"
+#include "Renderer/Vbo.h"
+
+#include "kdl/result.h"
+#include "kdl/result_fold.h"
+#include "kdl/vector_utils.h"
+
+#include <sstream>
+#include <string>
+
+#include "Logger.h"
+
+namespace TrenchBroom::View {
+std::string GLContextManager::GLVendor = "unknown";
+std::string GLContextManager::GLRenderer = "unknown";
+std::string GLContextManager::GLVersion = "unknown";
+
+bool GLContextManager::s_hasInitialized = false;
+
+GLContextManager::GLContextManager()
+    : m_shaderManager(std::make_unique<Renderer::ShaderManager>()),
+      m_vboManager(std::make_unique<Renderer::VboManager>(m_shaderManager.get())),
+      m_fontManager(std::make_unique<Renderer::FontManager>()) {}
+
+GLContextManager::~GLContextManager() = default;
+
+bool GLContextManager::initialized() const { return m_initialized; }
+
+float GLContextManager::maxAnisotropy() const { return m_maxAnisotropy; }
+
+static void initializeGlew() {
+    glewExperimental = GL_TRUE;
+
+    const GLenum glewState = glewInit();
+    if (glewState != GLEW_OK) {
+        auto str = std::stringstream();
+        str << "Error initializing GLEW: " << glewGetErrorString(glewState);
+        throw RenderException(str.str());
+    }
+}
+
+bool GLContextManager::initialize() {
+    using namespace Renderer::Shaders;
+    auto logger = defaultQtLogger;
+
+    if (!m_initialized) {
+        logger.info() << "Initializing OpenGL:";
+
+        initializeGlew();
+
+        if (GLEW_EXT_texture_filter_anisotropic) {
+            glAssert(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &m_maxAnisotropy));
+            logger.info() << "OpenGL: " << "using anisotropic filtering: " << m_maxAnisotropy << "x";
+        }
+
+        GLVendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+        GLRenderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        GLVersion = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+
+        kdl::fold_results(
+            kdl::vec_transform(
+                std::vector{
+                    Grid2DShader,
+                    VaryingPCShader,
+                    VaryingPUniformCShader,
+                    SelectionBoundsShader,
+                    SelectionGuideShader,
+                    MiniMapEdgeShader,
+                    EntityModelShader,
+                    FaceShader,
+                    SkyboxShader,
+                    PatchShader,
+                    EdgeShader,
+                    ColoredTextShader,
+                    TextBackgroundShader,
+                    TextureBrowserShader,
+                    TextureBrowserBorderShader,
+                    HandleShader,
+                    ColoredHandleShader,
+                    CompassShader,
+                    CompassOutlineShader,
+                    CompassBackgroundShader,
+                    LinkLineShader,
+                    LinkArrowShader,
+                    TriangleShader,
+                    UVViewShader,
+                }, [&](const auto &shaderConfig) { return m_shaderManager->loadProgram(shaderConfig); }
+            )
+        ).transform_error([&](const auto &e) { throw RenderException{e.msg}; });
+
+        // Each editor frame has its own shader and buffer managers.
+        m_initialized = true;
+        s_hasInitialized = true;
+        return true;
+    }
+
+    return false;
+}
+
+
+
+Renderer::VboManager &GLContextManager::vboManager() { return *m_vboManager; }
+Renderer::FontManager &GLContextManager::fontManager() { return *m_fontManager; }
+Renderer::ShaderManager &GLContextManager::shaderManager() { return *m_shaderManager; }
+
+}

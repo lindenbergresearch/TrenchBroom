@@ -32,7 +32,7 @@
 #include "Renderer/RenderBatch.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/Shaders.h"
-#include "View/MapDocument.h"
+#include "View/Document/MapDocument.h"
 #include <QOpenGLContext>
 #include <QPointer>
 #include <algorithm>

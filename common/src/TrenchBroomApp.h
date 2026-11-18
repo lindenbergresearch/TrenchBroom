@@ -22,8 +22,8 @@
 #include <QApplication>
 
 #include "Notifier.h"
-#include "QSSBuilder.h"
-#include "View/MapFrame.h"
+#include "View/Theme/QSSBuilder.h"
+#include "View/App/MapFrame.h"
 #include "StringUtils.h"
 
 #include <chrono>

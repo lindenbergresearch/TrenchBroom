@@ -25,7 +25,7 @@
 
 #include "Macros.h"
 #include "Logger.h"
-#include "View/KeyboardShortcut.h"
+#include "View/Actions/KeyboardShortcut.h"
 
 #include "vm/forward.h"
 

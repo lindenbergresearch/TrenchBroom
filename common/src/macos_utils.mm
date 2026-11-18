@@ -68,7 +68,7 @@ void setWindowTitleBarColor(QMainWindow* mainWindow, QColor color) {
     setWindowTitleBarColor(window, color);
 }
 
-#include "View/FloatingInspectorTool.h"
+#include "View/Inspector/FloatingInspectorTool.h"
 #include <QPointer>
 
 namespace TrenchBroom::View {

@@ -38,7 +38,7 @@
 #include "IO/SystemPaths.h"
 #include "Preferences.h"
 #include "Logger.h"
-#include "View/Actions.h"
+#include "View/Actions/Actions.h"
 
 #include <string>
 #include <vector>

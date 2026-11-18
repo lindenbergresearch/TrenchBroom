@@ -42,8 +42,8 @@
 #include "Renderer/RenderContext.h"
 #include "Renderer/RenderUtils.h"
 #include "Renderer/LightingOcclusion.h"
-#include "View/MapDocument.h"
-#include "View/Selection.h"
+#include "View/Document/MapDocument.h"
+#include "View/Document/Selection.h"
 
 #include <kdl/memory_utils.h>
 #include <kdl/overload.h>

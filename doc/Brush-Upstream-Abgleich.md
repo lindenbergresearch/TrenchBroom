@@ -33,7 +33,7 @@ Der Upstream-Fix [d292f5bdc](https://github.com/TrenchBroom/TrenchBroom/commit/d
 
 Der Release-Fall muss nicht unmittelbar abstürzen: `MapDocument::csgConvexMerge` prüft `closed()` und lehnt diese Hülle ab. Die Geometrieberechnung ist dennoch fehlerhaft. Der isolierte Versuch zeigt, dass die Korrektur ohne Übernahme der neuen Speicherverwaltung möglich ist.
 
-Betroffene Stellen: [Polyhedron_ConvexHull.h](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/Polyhedron_ConvexHull.h:367), [Polyhedron.h](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/Polyhedron.h:1850), [CSG Convex Merge](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/MapDocument.cpp:2415).
+Betroffene Stellen: [Polyhedron_ConvexHull.h](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/Polyhedron_ConvexHull.h:367), [Polyhedron.h](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/Polyhedron.h:1850), [CSG Convex Merge](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/Document/MapDocument.cpp:2415).
 
 Bei der Umsetzung zusätzlich den Upstream-Map-Test mit `csgConvexMergeCrash.map` übernehmen; der isolierte Punkt-Test ersetzt diesen Integrationstest nicht.
 
@@ -56,7 +56,7 @@ Dieser Wert ist über die aktuelle Oberfläche erreichbar: Die Wandstärke kann 
 
 Upstream prüft in `makeHollowCylinderInnerCircle`, ob eine Querabmessung kleiner oder gleich der doppelten Wandstärke ist. In diesem Fall werden Keilsegmente ohne offenen Innenraum erzeugt. Diese Behandlung lässt sich unabhängig vom zusätzlichen skalierbaren Kreismodus übernehmen. Alternativ könnte der Fork den ungültigen Wert mit einem verständlichen Fehler zurückweisen; die Upstream-Variante erhält die Vorschau innerhalb der gewünschten Außenkontur.
 
-Quellen: [lokale Innenkontur](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/BrushBuilder.cpp:325), [aktuelle UI-Grenze](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/DrawShapeToolExtensions.cpp:136), [Upstream-Behandlung](</Users/patricklindenberg/Development/origin trenchbroom/TrenchBroom/lib/TbMdlLib/src/BrushBuilder.cpp:210>).
+Quellen: [lokale Innenkontur](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/BrushBuilder.cpp:325), [aktuelle UI-Grenze](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/Tools/Brush/DrawShapeToolExtensions.cpp:136), [Upstream-Behandlung](</Users/patricklindenberg/Development/origin trenchbroom/TrenchBroom/lib/TbMdlLib/src/BrushBuilder.cpp:210>).
 
 ### 1.3 Ico-Sphäre: Genauigkeit 0 verletzt den Generatorvertrag
 
@@ -68,7 +68,7 @@ Mit aktiven Assertions führt der vorhandene 0-Pfad zum Abbruch. Im geprüften R
 
 Empfehlung: Den UI-Fix übernehmen und bei einer Überarbeitung auch am öffentlichen Builder-Einstieg ungültige Parameter über `Result` behandeln. Eine bewusste Unterstützung von 0 wäre eine andere Designentscheidung und müsste den Generatorvertrag samt Tests entsprechend ändern.
 
-Quellen: [Spinbox](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/DrawShapeToolExtensions.cpp:240), [Mesh-Vertrag](/Users/patricklindenberg/Development/TrenchBroom/common/src/Renderer/RenderUtils.h:127).
+Quellen: [Spinbox](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/Tools/Brush/DrawShapeToolExtensions.cpp:240), [Mesh-Vertrag](/Users/patricklindenberg/Development/TrenchBroom/common/src/Renderer/RenderUtils.h:127).
 
 ### 1.4 Clip-Werkzeug: veralteter Trefferindex
 
@@ -76,7 +76,7 @@ Quellen: [Spinbox](/Users/patricklindenberg/Development/TrenchBroom/common/src/V
 
 `PointClipStrategy::renderHighlight` greift ungeprüft auf `m_points[index]` zu. Wird ein Clip-Punkt entfernt, kann ein noch gespeicherter Treffer auf einen inzwischen ungültigen Index zeigen. Die Upstream-Korrektur [4634850a5](https://github.com/TrenchBroom/TrenchBroom/commit/4634850a583725e91a31a017a64f3956cec69b77) prüft `index < m_points.size()` vor der Hervorhebung.
 
-Diese Prüfung fehlt noch in [ClipTool.cpp](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/ClipTool.cpp:324) und ist unabhängig von den großen Upstream-Umbauten übertragbar.
+Diese Prüfung fehlt noch in [ClipTool.cpp](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/Tools/Brush/ClipTool.cpp:324) und ist unabhängig von den großen Upstream-Umbauten übertragbar.
 
 ## 2. Neue Funktionen, die sich sinnvoll übernehmen lassen
 
@@ -150,7 +150,7 @@ Quelle: [2227f89e4](https://github.com/TrenchBroom/TrenchBroom/commit/2227f89e4f
 | Shift-Alt-Merge, `e6016a7cd` | Upstream korrigiert den Zugriff nach einer Änderung des Hit-/Handle-Datentyps. Der alte Fork speichert an dieser Stelle noch direkt `vm::vec3` und liest ihn passend aus. Kein entsprechender Datentypfehler nachgewiesen. |
 | Ganze Brushes verschieben, drehen, skalieren und scheren | Diese Funktionen sind schon vorhanden. Der neue Mehrwert liegt insbesondere bei ausgewählten Teilkomponenten, nicht bei einer erstmaligen Unterstützung kompletter Objekte. |
 
-Quellen im Fork: [UV-Übernahme](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/BrushFace.cpp:181), [Kommando-Collate](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/BrushVertexCommands.cpp:95), [Vertex-Merge](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/VertexToolController.cpp:99).
+Quellen im Fork: [UV-Übernahme](/Users/patricklindenberg/Development/TrenchBroom/common/src/Model/BrushFace.cpp:181), [Kommando-Collate](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/Commands/BrushVertexCommands.cpp:95), [Vertex-Merge](/Users/patricklindenberg/Development/TrenchBroom/common/src/View/Tools/Vertex/VertexToolController.cpp:99).
 
 ## 5. Optimierungen und größere Grundlagenänderungen
 
