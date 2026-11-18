@@ -20,6 +20,13 @@ Copyright (C) 2010-2017 Kristian Duske
 
 #include "StringUtils.h"
 
+#include <QString>
+
+#include <algorithm>
+#include <cstdarg>
+#include <cstdint>
+#include <cstdio>
+
 static const char FILL_CHAR = ' ';
 
 namespace TrenchBroom {

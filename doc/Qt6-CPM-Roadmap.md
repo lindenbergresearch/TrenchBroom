@@ -43,6 +43,8 @@ in `af78068ba` dokumentiert. Referenz vor der eigentlichen Qt6-Portierung war
   vcpkg-Build-Verzeichnisse werden vor einer inkompatiblen Wiederverwendung
   zurückgewiesen. Ein zweites Verzeichnis wurde mit CLions CMake offline aus
   dem gemeinsamen CPM-Quellcache konfiguriert.
+- Für den CI-Build ohne vorkompilierte Header wurden bisher verdeckte fehlende
+  direkte Header-Abhängigkeiten ergänzt; das betrifft keine UI-/Map-Funktion.
 - **223 Regressionstests / 75.793 Assertions erfolgreich.** Enthalten sind
   vorhandene Prüfungen für Themes, Fonts/SVG/DPI, Actions/Toolbars, Docking,
   Layer-Selektion, Prefabs, WAD-Properties, History/Undo, Ansichten und Caches.

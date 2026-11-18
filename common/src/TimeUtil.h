@@ -19,6 +19,8 @@ Copyright (C) 2010-2017 Kristian Duske
 
 #pragma once
 
+#include <cstdint>
+
 namespace TrenchBroom {
 
 class TimeUtil {

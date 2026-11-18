@@ -38,6 +38,7 @@
 
 #include "vm/bbox_io.h"
 
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -127,7 +128,7 @@ std::vector<const LayerNode *> WorldNode::customLayersUserSorted() const {
 }
 
 void WorldNode::createDefaultLayer() {
-    m_defaultLayer = new LayerNode{Layer{"Default Layer", true(defaultLayer)}};
+    m_defaultLayer = new LayerNode{Layer{"Default Layer", true}};
     addChild(m_defaultLayer);
     assert(m_defaultLayer->layer().sortIndex() == Layer::defaultLayerSortIndex());
 }

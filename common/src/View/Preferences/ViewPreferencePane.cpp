@@ -32,6 +32,7 @@
 #include <QFontMetrics>
 #include <QFrame>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPushButton>

@@ -19,6 +19,8 @@
 
 #include "EntityNodeIndex.h"
 
+#include <QString>
+
 #include "Macros.h"
 #include "Model/Entity.h"
 #include "Model/EntityNodeBase.h"

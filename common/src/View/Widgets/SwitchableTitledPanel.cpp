@@ -20,6 +20,7 @@
 #include "View/Widgets/SwitchableTitledPanel.h"
 
 #include <QBoxLayout>
+#include <QIODevice>
 #include <QStackedLayout>
 
 #include "View/Theme/QtUtils.h"

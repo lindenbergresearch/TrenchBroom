@@ -19,6 +19,11 @@
 
 #pragma once
 
+#include <QPointF>
+
+#include <cstddef>
+#include <vector>
+
 namespace TrenchBroom::View {
 struct BoxFilter {
     std::vector<QPointF *> samples;

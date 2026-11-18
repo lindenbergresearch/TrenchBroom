@@ -32,6 +32,8 @@
 
 #include <array>
 
+class QString;
+
 // FIXME: should this be moved to Model?
 namespace TrenchBroom {
 namespace Model {

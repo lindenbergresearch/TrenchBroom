@@ -26,6 +26,7 @@
 #include <QApplication>
 #include <QRegularExpression>
 #include <QChildEvent>
+#include <QCheckBox>
 #include <QClipboard>
 #include <QComboBox>
 #include <QDockWidget>

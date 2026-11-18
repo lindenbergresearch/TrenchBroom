@@ -1,6 +1,10 @@
 #pragma once
 
-#include "string"
+#include <string>
+#include <utility>
+#include <vector>
+
+class QString;
 
 namespace TrenchBroom {
 /**

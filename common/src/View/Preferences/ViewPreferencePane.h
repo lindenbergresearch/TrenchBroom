@@ -26,6 +26,7 @@
 class QCheckBox;
 
 class QComboBox;
+class QLineEdit;
 class QSpinBox;
 
 namespace TrenchBroom::View {

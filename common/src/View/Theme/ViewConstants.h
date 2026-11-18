@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <QMargins>
+
 class QColor;
 
 class QFont;

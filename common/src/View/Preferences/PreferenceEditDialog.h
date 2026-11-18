@@ -1,6 +1,10 @@
 #pragma once
 
 #include <QDialog>
+#include <QHBoxLayout>
+#include <QLabel>
+
+class QPushButton;
 
 #include "PreferenceManager.h"
 #include "Preferences.h"

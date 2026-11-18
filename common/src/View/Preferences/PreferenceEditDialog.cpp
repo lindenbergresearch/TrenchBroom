@@ -1,6 +1,8 @@
 #include "View/Preferences/PreferenceEditDialog.h"
 
 #include <QFileDialog>
+#include <QCheckBox>
+#include <QLineEdit>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>

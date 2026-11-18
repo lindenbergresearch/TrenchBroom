@@ -4,6 +4,9 @@
 #include "View/Preferences/PreferencePane.h"
 
 class QWidget;
+class QLabel;
+class QPushButton;
+class QHBoxLayout;
 
 class QTableView;
 

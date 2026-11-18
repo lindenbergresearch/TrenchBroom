@@ -19,6 +19,7 @@
 
 #include "Model/CircleShape.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace TrenchBroom::Model {

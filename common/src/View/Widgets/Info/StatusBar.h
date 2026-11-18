@@ -20,6 +20,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QLabel>
 
 #include "View/Widgets/TBWidget.h"
 #include "View/MapView/MapView.h"
