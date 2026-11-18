@@ -21,11 +21,28 @@
 #include "IO/VectorIcon.h"
 #include "View/Theme/ThemeManager.h"
 #include "View/Theme/QtUtils.h"
+#include "View/Preferences/FontUtils.h"
+#include "PreferenceManager.h"
+#include "Preferences.h"
 
+#include <QApplication>
+#include <QAbstractButton>
+#include <QAbstractItemView>
+#include <QAbstractSpinBox>
+#include <QComboBox>
 #include <QEvent>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QMenuBar>
 #include <QPainter>
+#include <QPlainTextEdit>
+#include <QTextEdit>
+#include <QTextDocument>
+#include <QTabBar>
 #include <QStyleOption>
+#include <utility>
 
 namespace TrenchBroom::View {
 namespace {
@@ -34,8 +51,88 @@ bool isStyledPopup(const QWidget* widget) {
 }
 }
 
-TrenchBroomProxyStyle::TrenchBroomProxyStyle(const QString& key) : QProxyStyle(key) {}
-TrenchBroomProxyStyle::TrenchBroomProxyStyle(QStyle* style) : QProxyStyle(style) {}
+TrenchBroomProxyStyle::TrenchBroomProxyStyle(const QString& key) : QProxyStyle(key) { initializeTypography(); }
+TrenchBroomProxyStyle::TrenchBroomProxyStyle(QStyle* style) : QProxyStyle(style) { initializeTypography(); }
+
+void TrenchBroomProxyStyle::initializeTypography() {
+    m_typographyTimer.setSingleShot(true);
+    connect(&m_typographyTimer, &QTimer::timeout, this, [this] {
+        const auto pending = std::exchange(m_pendingTypography, {});
+        for (const auto& widget : pending) if (widget) {
+            widget->setProperty("tbTypographyQueued", false);
+            updateTypography(widget);
+        }
+    });
+}
+
+void TrenchBroomProxyStyle::queueTypography(QWidget* widget) {
+    if (m_updatingTypography || widget->property("tbTypographyQueued").toBool()) return;
+    widget->setProperty("tbTypographyQueued", true);
+    m_pendingTypography.append(widget);
+    m_typographyTimer.start(0);
+}
+
+void TrenchBroomProxyStyle::updateTypography(QWidget* widget) {
+    if (!widget || m_updatingTypography || !PreferenceManager::isInitialized()) return;
+    const bool active = pref(Preferences::UIGlobalTypography);
+    if (!active && !widget->property("tbTypographyManaged").toBool()) return;
+    const auto textWidget = qobject_cast<QLabel*>(widget) || qobject_cast<QAbstractButton*>(widget)
+        || qobject_cast<QLineEdit*>(widget) || qobject_cast<QAbstractItemView*>(widget)
+        || qobject_cast<QAbstractSpinBox*>(widget) || qobject_cast<QComboBox*>(widget)
+        || qobject_cast<QMenu*>(widget) || qobject_cast<QMenuBar*>(widget)
+        || qobject_cast<QGroupBox*>(widget) || qobject_cast<QTabBar*>(widget)
+        || qobject_cast<QTextEdit*>(widget) || qobject_cast<QPlainTextEdit*>(widget)
+        || widget->objectName() == "ItemCellStyle" || widget->objectName() == "LayerTreeRow";
+    if (!textWidget) return;
+    auto font = widget->font();
+    if (active) {
+        // Rich-text formats resolve bold/italic per fragment. Do not make a
+        // default weight variation override those document-owned formats.
+        bool weightAxis = !qobject_cast<QTextEdit*>(widget) && !qobject_cast<QPlainTextEdit*>(widget);
+        if (const auto* label = qobject_cast<QLabel*>(widget))
+            weightAxis = label->textFormat() == Qt::PlainText
+                || (label->textFormat() == Qt::AutoText && !Qt::mightBeRichText(label->text()));
+        font = styledTextFont(font, listFontSettings(), weightAxis);
+    } else {
+        font.unsetVariableAxis("wght");
+        font.unsetVariableAxis("opsz");
+        QFont axisMask;
+        axisMask.setVariableAxis("wght", 400);
+        font.setResolveMask(font.resolveMask() & ~axisMask.resolveMask());
+    }
+    widget->setProperty("tbTypographyManaged", active);
+    if (font == widget->font() && font.resolveMask() == widget->font().resolveMask()) return;
+    m_updatingTypography = true;
+    const QPointer<QWidget> guard{widget};
+    widget->setFont(font);
+    if (guard) {
+        guard->updateGeometry();
+        guard->update();
+    }
+    m_updatingTypography = false;
+}
+
+void TrenchBroomProxyStyle::refreshTypography() {
+    QList<QPointer<QWidget>> widgets;
+    for (auto* widget : QApplication::allWidgets()) widgets.append(widget);
+    for (const auto& widget : widgets) if (widget) updateTypography(widget);
+}
+
+void TrenchBroomProxyStyle::drawItemText(QPainter* painter, const QRect& rect, const int flags,
+    const QPalette& palette, const bool enabled, const QString& text, const QPalette::ColorRole role) const {
+    if (!PreferenceManager::isInitialized() || !pref(Preferences::UIGlobalTypography)) {
+        QProxyStyle::drawItemText(painter, rect, flags, palette, enabled, text, role);
+        return;
+    }
+    const auto settings = listFontSettings();
+    painter->save();
+    painter->setFont(styledTextFont(painter->font(), settings));
+    painter->setRenderHint(QPainter::TextAntialiasing);
+    painter->setRenderHint(QPainter::VerticalSubpixelPositioning, settings.subpixelPositioning);
+    // Keep Qt's wrapping, alignment and mnemonic handling for standard controls.
+    QProxyStyle::drawItemText(painter, rect, flags, palette, enabled, text, role);
+    painter->restore();
+}
 
 QPixmap TrenchBroomProxyStyle::generatedIconPixmap(QIcon::Mode mode, const QPixmap& pixmap, const QStyleOption* option) const {
     return mode == QIcon::Disabled ? IO::disabledIconPixmap(pixmap) : QProxyStyle::generatedIconPixmap(mode,pixmap,option);
@@ -43,6 +140,8 @@ QPixmap TrenchBroomProxyStyle::generatedIconPixmap(QIcon::Mode mode, const QPixm
 
 void TrenchBroomProxyStyle::polish(QWidget* widget) {
     QProxyStyle::polish(widget);
+    widget->installEventFilter(this);
+    if (PreferenceManager::isInitialized() && pref(Preferences::UIGlobalTypography)) queueTypography(widget);
     if (!isStyledPopup(widget)) return;
     if (auto* menu = qobject_cast<QMenu*>(widget);
         menu && !menu->findChild<QObject*>("ContextMenuPolicy",Qt::FindDirectChildrenOnly)) {
@@ -67,6 +166,13 @@ void TrenchBroomProxyStyle::unpolish(QWidget* widget) {
 }
 
 bool TrenchBroomProxyStyle::eventFilter(QObject* watched, QEvent* event) {
+    if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange
+        || event->type() == QEvent::Show || event->type() == QEvent::PolishRequest) {
+        if (auto* widget = qobject_cast<QWidget*>(watched); PreferenceManager::isInitialized()
+            &&
+            widget && (pref(Preferences::UIGlobalTypography) || widget->property("tbTypographyManaged").toBool()))
+            queueTypography(widget);
+    }
     if (event->type() == QEvent::Show || event->type() == QEvent::Resize || event->type() == QEvent::StyleChange) {
         if (auto* widget = qobject_cast<QWidget*>(watched); isStyledPopup(widget)) {
             // Remove stale binary masks when a reused tooltip changes text or size.

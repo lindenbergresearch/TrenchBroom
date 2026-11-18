@@ -34,6 +34,7 @@
 #include <QFontMetricsF>
 #include <QFontInfo>
 #include <QFrame>
+#include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QLocale>
@@ -41,6 +42,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QSet>
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QUrl>
@@ -122,20 +124,20 @@ static_assert(0 == brightnessToUI(brightnessFromUI(0)));
 } // namespace
 
 class FontComparisonPreview : public QFrame {
-    const std::filesystem::path m_path;
     QFont m_titleFont;
     QFont m_detailFont;
     ListFontSettings m_settings;
+    qreal m_detailOpacity = 1;
 
 public:
-    explicit FontComparisonPreview(std::filesystem::path path, QWidget* parent)
-        : QFrame(parent), m_path(std::move(path)) {
+    explicit FontComparisonPreview(QWidget* parent) : QFrame(parent) {
         setProperty("fontPreview", true);
         setBackgroundRole(QPalette::Base);
         setAutoFillBackground(true);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        refresh();
     }
+
+    QString family() const { return QFontInfo{m_titleFont}.family(); }
 
     QString description() const {
         const auto axes = fontCapabilities(m_titleFont);
@@ -147,11 +149,17 @@ public:
             : tr("Weight %1 · Optical size unavailable").arg(weight);
     }
 
-    void refresh() {
-        m_settings = listFontSettings();
-        const auto base = loadFont(m_path, uiFontPixelSize());
+    void refresh(const std::filesystem::path& path, const int size, const int minimum,
+                 const qreal opacity, const ListFontSettings& settings) {
+        m_settings = settings;
+        m_detailOpacity = std::clamp(opacity, 0.0, 1.0);
+        const auto base = loadFont(path, std::max(size, minimum));
         m_titleFont = listTextFont(base, m_settings);
-        m_detailFont = listTextFont(detailFont(base), m_settings);
+        auto detail = base;
+        detail.setPixelSize(std::max(minimum, base.pixelSize() - 2));
+        detail.setWeight(QFont::Normal);
+        detail.setStyleName({});
+        m_detailFont = listTextFont(detail, m_settings);
         setProperty("previewTitleFont", m_titleFont);
         setProperty("previewDetailFont", m_detailFont);
         setAccessibleDescription(tr("Title %1 pixels, details %2 pixels. %3")
@@ -179,7 +187,7 @@ protected:
         auto row = QRectF(bounds.left(), bounds.top(), bounds.width(), titleMetrics.height());
         painter.setPen(palette().color(QPalette::Text));
         paintTextLine(painter, row, tr("Group Main Hall"), m_titleFont, m_settings.subpixelPositioning);
-        painter.setOpacity(std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f));
+        painter.setOpacity(m_detailOpacity);
         for (const auto& text : {tr("6 brushes · 32 faces · stone_wall"), tr("Position 128, 64, 32 · light 100")}) {
             row = QRectF(bounds.left(), row.bottom() + LayoutConstants::MediumVMargin, bounds.width(), detailMetrics.height());
             paintTextLine(painter, row, text, m_detailFont, m_settings.subpixelPositioning);
@@ -189,7 +197,7 @@ protected:
 
 ViewPreferencePane::ViewPreferencePane(QWidget *parent) : PreferencePane{parent} {
     createGui();
-    bindEvents();
+    doUpdateControls();
 }
 
 void ViewPreferencePane::createGui() {
@@ -298,6 +306,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_rendererFontCombo->setEditable(false);
 
     m_UIFontCombo = new QComboBox;
+    m_UIFontCombo->setObjectName("UIFontFamily");
     m_UIFontCombo->setEditable(false);
 
     m_ConsoleFontCombo = new QComboBox;
@@ -309,8 +318,10 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_UIFontCombo->addItem(tr("System font"), QStringLiteral("[system]"));
 
     const auto fontsPath = IO::SystemPaths::findResourceDirectories(std::filesystem::path("fonts").parent_path());
-    if (!fontsPath.empty()) {
-        const auto filesystem = IO::DiskFileSystem(fontsPath.back());
+    QSet<QString> listedFonts;
+    for (const auto& root : fontsPath) {
+        if (!QDir(IO::pathAsQString(root)).exists("fonts")) continue;
+        const auto filesystem = IO::DiskFileSystem(root);
         const auto result = filesystem.find("fonts", IO::TraversalMode::Recursive,
             IO::makeExtensionPathMatcher({".ttf", ".otf"}));
         if (result.is_success()) {
@@ -319,6 +330,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
             for (const auto& path : files) {
                 const auto label = "[" + IO::pathAsQString(path.filename()) + "]";
                 const auto value = IO::pathAsQString(path);
+                if (listedFonts.contains(value)) continue;
+                listedFonts.insert(value);
                 m_rendererFontCombo->addItem(label, value);
                 m_UIFontCombo->addItem(label, value);
                 m_ConsoleFontCombo->addItem(label, value);
@@ -346,6 +359,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_rendererFontSizeCombo->setValidator(new QIntValidator{1, 96, m_rendererFontSizeCombo});
 
     m_UIFontSizeCombo = new QComboBox{};
+    m_UIFontSizeCombo->setObjectName("UIFontSize");
     m_UIFontSizeCombo->setEditable(false);
     m_UIFontSizeCombo->setToolTip(tr("Sets the UI font size in logical screen pixels."));
     m_UIFontSizeCombo->addItems(fontSizesSmall);
@@ -366,12 +380,12 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     m_listFontWeight = new QSpinBox;
     m_listFontWeight->setObjectName("UIListFontWeight");
-    m_listFontWeight->setAccessibleName(tr("List text weight"));
+    m_listFontWeight->setAccessibleName(tr("Text weight"));
     m_listFontWeight->setRange(0, 1000);
     m_listFontWeight->setSingleStep(25);
     m_listFontWeight->setSpecialValueText(tr("Font default"));
     m_listFontWeight->setKeyboardTracking(false);
-    m_listFontWeight->setToolTip(tr("Fine-tunes list text weight. Variable fonts support intermediate weights; other fonts use the closest available face. Stylesheet emphasis is preserved."));
+    m_listFontWeight->setToolTip(tr("Fine-tunes UI text weight. Variable fonts support intermediate weights; other fonts use the closest available face. Stylesheet emphasis is preserved."));
     m_listOpticalSize = new QDoubleSpinBox;
     m_listOpticalSize->setObjectName("UIListOpticalSize");
     m_listOpticalSize->setAccessibleName(tr("Optical size"));
@@ -393,34 +407,40 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 
     auto* comparison = new QWidget;
     comparison->setObjectName("UIFontComparison");
-    auto* comparisonLayout = new QHBoxLayout(comparison);
+    auto* comparisonLayout = new QGridLayout(comparison);
     comparisonLayout->setContentsMargins(0, 0, 0, 0);
     comparisonLayout->setSpacing(LayoutConstants::MediumHMargin);
-    const auto addPreview = [&](const QString& title, const std::filesystem::path& path,
-                               const QString& name, const QString& buttonText, QLabel*& info) {
-        auto* column = new QVBoxLayout;
+    const auto addPreview = [&](const int column, const QString& title, const QString& name, QLabel*& info,
+                               QLabel** selectedHeading = nullptr) {
         auto* heading = new QLabel(title);
         heading->setProperty("fontPreviewHeading", true);
-        auto* preview = new FontComparisonPreview(path, comparison);
+        auto* header = new QHBoxLayout;
+        header->addWidget(heading, 1);
+        if (selectedHeading) {
+            *selectedHeading = heading;
+            m_applyFont = new QPushButton(tr("Apply"));
+            m_applyFont->setObjectName("UIFontApply");
+            m_applyFont->setAutoDefault(false);
+            m_applyFont->setToolTip(tr("Apply the previewed font settings throughout the interface."));
+            connect(m_applyFont, &QPushButton::clicked, this, &ViewPreferencePane::applyFontDraft);
+            header->addWidget(m_applyFont);
+        }
+        auto* preview = new FontComparisonPreview(comparison);
         preview->setObjectName(name);
         preview->setAccessibleName(title);
         info = new QLabel(preview->description());
         info->setObjectName(name + "Info");
         info->setProperty("fontPreviewInfo", true);
         info->setWordWrap(true);
-        auto* button = new QPushButton(buttonText);
-        button->setObjectName(name + "Apply");
-        connect(button, &QPushButton::clicked, this, [this, path] { applyUIFont(path); });
-        column->addWidget(heading);
-        column->addWidget(preview);
-        column->addWidget(info);
-        column->addWidget(button);
-        comparisonLayout->addLayout(column, 1);
+        comparisonLayout->addLayout(header, 0, column);
+        comparisonLayout->addWidget(preview, 1, column);
+        comparisonLayout->addWidget(info, 2, column);
+        comparisonLayout->setColumnStretch(column, 1);
         return preview;
     };
-    m_systemFontPreview = addPreview(tr("System font"), "[system]", "UIFontPreview_System", tr("Use system font"), m_systemFontInfo);
-    m_interFontPreview = addPreview(tr("Inter Variable"), "fonts/InterVariable.ttf", "UIFontPreview_Inter", tr("Use Inter Variable"), m_interFontInfo);
-    auto* comparisonScope = new QLabel(tr("Fine tuning applies to these previews and the Layer tree. Font family and size apply throughout the UI."));
+    m_systemFontPreview = addPreview(0, tr("System font"), "UIFontPreview_System", m_systemFontInfo);
+    m_selectedFontPreview = addPreview(1, tr("Selected font"), "UIFontPreview_Selected", m_selectedFontInfo, &m_selectedFontHeading);
+    auto* comparisonScope = new QLabel(tr("Changes affect only these samples. Apply uses them throughout the interface."));
     comparisonScope->setObjectName("UIFontComparisonScope");
     comparisonScope->setWordWrap(true);
 
@@ -480,9 +500,9 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow("UI Font", m_UIFontCombo, m_UIFontSizeCombo);
     layout->addRow(tr("Minimum UI size"), m_UIFontMinimumSize);
     layout->addRow(tr("Detail text opacity"), m_UIDetailTextOpacity);
-    layout->addSection(tr("List text comparison"));
+    layout->addSection(tr("Font comparison"));
     layout->addRow(comparisonScope);
-    layout->addRow(tr("List text weight"), m_listFontWeight);
+    layout->addRow(tr("Text weight"), m_listFontWeight);
     layout->addRow(tr("Optical size"), m_listOpticalSize);
     layout->addRow(tr("Line spacing"), m_listTypoLineMetrics);
     layout->addRow(tr("Text positioning"), m_listTextPosition);
@@ -659,17 +679,21 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::TextureMagFilter);
     prefs.resetToDefault(Preferences::TextureBrowserIconSize);
     prefs.resetToDefault(Preferences::RendererFontSize);
-    prefs.resetToDefault(Preferences::UIFontSize);
-    prefs.resetToDefault(Preferences::UIFontMinimumSize);
-    prefs.resetToDefault(Preferences::UIDetailTextOpacity);
-    prefs.resetToDefault(Preferences::UIListFontWeight);
-    prefs.resetToDefault(Preferences::UIListOpticalSize);
-    prefs.resetToDefault(Preferences::UIListTypoLineMetrics);
-    prefs.resetToDefault(Preferences::UIListSubpixelPositioning);
     prefs.resetToDefault(Preferences::RendererFontPath);
-    prefs.resetToDefault(Preferences::UIFontPath);
     prefs.resetToDefault(Preferences::ConsoleFontPath);
     prefs.resetToDefault(Preferences::ConsoleFontSize);
+
+    // Reset typography in the draft too; only Apply changes the global font.
+    selectFont(*m_UIFontCombo, Preferences::UIFontPath.defaultValue());
+    selectFontSize(*m_UIFontSizeCombo, Preferences::UIFontSize.defaultValue());
+    m_UIFontMinimumSize->setValue(Preferences::UIFontMinimumSize.defaultValue());
+    m_UIDetailTextOpacity->setValue(qRound(100 * Preferences::UIDetailTextOpacity.defaultValue()));
+    m_listFontWeight->setValue(Preferences::UIListFontWeight.defaultValue());
+    m_listOpticalSize->setValue(Preferences::UIListOpticalSize.defaultValue());
+    m_listTypoLineMetrics->setChecked(Preferences::UIListTypoLineMetrics.defaultValue());
+    m_listTextPosition->setCurrentIndex(Preferences::UIListSubpixelPositioning.defaultValue() ? 1 : 0);
+    m_fontDraftDirty = true;
+    updateFontPreviews();
 
     reloadUIStyle();
     bindEvents();
@@ -732,22 +756,22 @@ void ViewPreferencePane::doUpdateControls() {
     m_ToolbarIconSizeCombo->setCurrentIndex(iconSize);
 
     selectFontSize(*m_rendererFontSizeCombo, pref(Preferences::RendererFontSize));
-    selectFontSize(*m_UIFontSizeCombo, pref(Preferences::UIFontSize));
     selectFontSize(*m_ConsoleFontSizeCombo, pref(Preferences::ConsoleFontSize));
     selectFont(*m_rendererFontCombo, pref(Preferences::RendererFontPath));
-    selectFont(*m_UIFontCombo, pref(Preferences::UIFontPath));
     selectFont(*m_ConsoleFontCombo, pref(Preferences::ConsoleFontPath));
-    {
+    if (!m_fontDraftDirty) {
+        selectFont(*m_UIFontCombo, pref(Preferences::UIFontPath));
+        selectFontSize(*m_UIFontSizeCombo, pref(Preferences::UIFontSize));
         const QSignalBlocker minimumBlocker(m_UIFontMinimumSize);
         const QSignalBlocker opacityBlocker(m_UIDetailTextOpacity);
         m_UIFontMinimumSize->setValue(pref(Preferences::UIFontMinimumSize));
         m_UIDetailTextOpacity->setValue(qRound(std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f) * 100.0f));
+        const auto settings = listFontSettings();
+        m_listFontWeight->setValue(settings.weight);
+        m_listOpticalSize->setValue(settings.opticalSize);
+        m_listTypoLineMetrics->setChecked(settings.typoLineMetrics);
+        m_listTextPosition->setCurrentIndex(settings.subpixelPositioning ? 1 : 0);
     }
-    const auto listSettings = listFontSettings();
-    m_listFontWeight->setValue(listSettings.weight);
-    m_listOpticalSize->setValue(listSettings.opticalSize);
-    m_listTypoLineMetrics->setChecked(listSettings.typoLineMetrics);
-    m_listTextPosition->setCurrentIndex(listSettings.subpixelPositioning ? 1 : 0);
     updateFontPreviews();
 
     bindEvents();
@@ -898,49 +922,72 @@ void ViewPreferencePane::renderFontFileChanged(const int index) {
 void ViewPreferencePane::reloadUIStyle() {
     // Apply once after the current control/popup has finished processing input.
     // The app reloads only font faces/sizes that actually changed.
-    TrenchBroomApp::instance().requestThemeRefresh(30);
+    if (auto* app = dynamic_cast<TrenchBroomApp*>(qApp)) app->requestThemeRefresh(30);
 }
 
 void ViewPreferencePane::updateFontPreviews() {
-    m_systemFontPreview->refresh();
-    m_interFontPreview->refresh();
+    const auto size = std::clamp(m_UIFontSizeCombo->currentText().toInt(), 1, 96);
+    const auto minimum = m_UIFontMinimumSize->value();
+    const auto opacity = m_UIDetailTextOpacity->value() / 100.0;
+    const ListFontSettings settings{m_listFontWeight->value(), m_listOpticalSize->value(),
+        m_listTypoLineMetrics->isChecked(), m_listTextPosition->currentIndex() == 1};
+    m_systemFontPreview->refresh("[system]", size, minimum, opacity, settings);
+    m_selectedFontPreview->refresh(IO::pathFromQString(m_UIFontCombo->currentData().toString()),
+        size, minimum, opacity, settings);
     m_systemFontInfo->setText(m_systemFontPreview->description());
-    m_interFontInfo->setText(m_interFontPreview->description());
+    m_selectedFontInfo->setText(m_selectedFontPreview->description());
+    const auto title = tr("Selected font: %1").arg(m_selectedFontPreview->family());
+    m_selectedFontHeading->setText(title);
+    m_selectedFontHeading->setWordWrap(true);
+    m_selectedFontPreview->setAccessibleName(title);
+    m_applyFont->setEnabled(m_fontDraftDirty || !pref(Preferences::UIGlobalTypography));
 }
 
-void ViewPreferencePane::editorUIListFontWeightChanged(const int value) {
-    PreferenceManager::instance().set(Preferences::UIListFontWeight, value);
+void ViewPreferencePane::editorUIListFontWeightChanged(const int) {
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 
-void ViewPreferencePane::editorUIListOpticalSizeChanged(const double value) {
-    PreferenceManager::instance().set(Preferences::UIListOpticalSize, float(value));
+void ViewPreferencePane::editorUIListOpticalSizeChanged(const double) {
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 
-void ViewPreferencePane::editorUIListTypoMetricsChanged(const bool value) {
-    PreferenceManager::instance().set(Preferences::UIListTypoLineMetrics, value);
+void ViewPreferencePane::editorUIListTypoMetricsChanged(const bool) {
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 
-void ViewPreferencePane::editorUIListTextPositionChanged(const int value) {
-    PreferenceManager::instance().set(Preferences::UIListSubpixelPositioning, value == 1);
+void ViewPreferencePane::editorUIListTextPositionChanged(const int) {
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 
-void ViewPreferencePane::applyUIFont(const std::filesystem::path& path) {
-    PreferenceManager::instance().set(Preferences::UIFontPath, path);
-    selectFont(*m_UIFontCombo, path);
+void ViewPreferencePane::applyFontDraft() {
+    m_UIFontMinimumSize->interpretText();
+    m_listFontWeight->interpretText();
+    m_listOpticalSize->interpretText();
+    auto& prefs = PreferenceManager::instance();
+    prefs.set(Preferences::UIFontPath, IO::pathFromQString(m_UIFontCombo->currentData().toString()));
+    prefs.set(Preferences::UIFontSize, std::clamp(m_UIFontSizeCombo->currentText().toInt(), 1, 96));
+    prefs.set(Preferences::UIFontMinimumSize, m_UIFontMinimumSize->value());
+    prefs.set(Preferences::UIDetailTextOpacity, float(m_UIDetailTextOpacity->value()) / 100.0f);
+    prefs.set(Preferences::UIListFontWeight, m_listFontWeight->value());
+    prefs.set(Preferences::UIListOpticalSize, float(m_listOpticalSize->value()));
+    prefs.set(Preferences::UIListTypoLineMetrics, m_listTypoLineMetrics->isChecked());
+    prefs.set(Preferences::UIListSubpixelPositioning, m_listTextPosition->currentIndex() == 1);
+    prefs.set(Preferences::UIGlobalTypography, true);
+    prefs.saveChanges();
+    m_fontDraftDirty = false;
     reloadUIStyle();
     updateFontPreviews();
 }
 
 void ViewPreferencePane::editorUIFontSizeChanged(const QString &text) {
     bool ok;
-    const auto value = text.toInt(&ok);
+    text.toInt(&ok);
     if (!ok) return;
-    PreferenceManager::instance().set(Preferences::UIFontSize, value);
-    reloadUIStyle();
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 
@@ -948,24 +995,21 @@ void ViewPreferencePane::editorUIFontFileChanged(const int index) {
     if (index < 0) return;
     auto path = IO::pathFromQString(m_UIFontCombo->itemData(index).toString());
     if (path == "[default]") {
-        auto& prefs = PreferenceManager::instance();
-        prefs.resetToDefault(Preferences::UIFontPath);
-        prefs.resetToDefault(Preferences::UIFontSize);
-        selectFontSize(*m_UIFontSizeCombo, pref(Preferences::UIFontSize));
-        path = pref(Preferences::UIFontPath);
+        selectFontSize(*m_UIFontSizeCombo, Preferences::UIFontSize.defaultValue());
+        path = Preferences::UIFontPath.defaultValue();
     }
-    applyUIFont(path);
-}
-
-void ViewPreferencePane::editorUIFontMinimumSizeChanged(const int value) {
-    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, value);
-    reloadUIStyle();
+    selectFont(*m_UIFontCombo, path);
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 
-void ViewPreferencePane::editorUIDetailTextOpacityChanged(const int value) {
-    PreferenceManager::instance().set(Preferences::UIDetailTextOpacity, float(value) / 100.0f);
-    reloadUIStyle();
+void ViewPreferencePane::editorUIFontMinimumSizeChanged(const int) {
+    m_fontDraftDirty = true;
+    updateFontPreviews();
+}
+
+void ViewPreferencePane::editorUIDetailTextOpacityChanged(const int) {
+    m_fontDraftDirty = true;
     updateFontPreviews();
 }
 

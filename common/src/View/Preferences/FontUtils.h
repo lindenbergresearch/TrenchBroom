@@ -30,8 +30,7 @@ struct FontCapabilities {
 };
 FontCapabilities fontCapabilities(const QFont& font);
 
-// Fine tuning applies to custom list text and its matching preferences preview.
-// Keep axes off QApplication's font: inherited axes override explicit QSS weights.
+// Widget/QSS fonts resolve their own weight before variations are applied.
 struct ListFontSettings {
     int weight = 0; // 0: the selected font / stylesheet's weight
     qreal opticalSize = 0; // 0: automatic, in typographic points
@@ -40,6 +39,8 @@ struct ListFontSettings {
 };
 ListFontSettings listFontSettings();
 QFont listTextFont(QFont font, const ListFontSettings& settings, bool preserveEmphasis = false);
+// Resolve variations from an already styled font, retaining heading weights.
+QFont styledTextFont(QFont font, const ListFontSettings& settings, bool weightAxis = true);
 qreal logicalFontPixelSize(const QFont& font);
 QPointF textLineBaseline(const QPainter& painter, const QRectF& rect,
     const QFontMetricsF& metrics, bool subpixelPositioning);

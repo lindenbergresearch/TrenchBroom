@@ -233,6 +233,7 @@ Preference<int> UIListFontWeight("Editor/UI List font weight", 0);
 Preference<float> UIListOpticalSize("Editor/UI List optical size", 0.0f);
 Preference<bool> UIListTypoLineMetrics("Editor/UI List typographic line metrics", false);
 Preference<bool> UIListSubpixelPositioning("Editor/UI List subpixel text positioning", false);
+Preference<bool> UIGlobalTypography("Editor/UI Global typography", false);
 Preference<int> PreferencesWindowWidth("Editor/Dialogs/Preferences width", 1100);
 Preference<int> PreferencesWindowHeight("Editor/Dialogs/Preferences height", 800);
 Preference<int> ViewDetailsWindowWidth("Editor/Dialogs/View details width", 820);
@@ -424,6 +425,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &GridUnitSystem, &TextureMinFilter, &TextureMagFilter,
         &TextureLock, &UVLock, &GroupBrushesCreatedByShapeTool, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &UIFontMinimumSize, &UIDetailTextOpacity,
         &UIListFontWeight, &UIListOpticalSize, &UIListTypoLineMetrics, &UIListSubpixelPositioning,
+        &UIGlobalTypography,
         &PreferencesWindowWidth, &PreferencesWindowHeight, &ViewDetailsWindowWidth, &ViewDetailsWindowHeight, &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
         &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,

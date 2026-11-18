@@ -130,14 +130,24 @@ QWidget#ItemCellStyle { qproperty-overrideTextColor: false; }
 QWidget#ItemCellStyle[cellContext="entityProperties"] { qproperty-overrideTextColor: true; }
 
 /* ==== TYPOGRAPHY ==== */
-/* Preferences -> View: matching system/Inter Variable list samples. Preview
-   text uses the comparison settings; headings/status inherit normal UI roles. */
+/* Global defaults also cover controls without a semantic text role. Qt's
+   stylesheet font cache can otherwise retain a platform font after Apply.
+   More specific roles below keep their own sizes, emphasis and mono fonts. */
+QWidget {
+    font-family: ${family.ui};
+    font-size: ${length.font.ui};
+    font-weight: ${weight.ui};
+    font-style: ${keyword.font.ui};
+}
+/* Preferences -> View: system/selected-font samples use the local draft.
+   Apply commits typography globally; headings/status retain normal UI roles. */
 QFrame[fontPreview="true"] {
     background-color: ${color.base};
     border: 1px solid ${color.midlight};
     border-radius: 6px;
 }
 QLabel[fontPreviewHeading="true"] { font-weight: 600; }
+QPushButton#UIFontApply { min-width: 0; padding: 3px 8px; }
 QLabel[fontPreviewInfo="true"], QLabel#UIFontComparisonScope {
     font-size: ${length.font.small};
     color: ${color.text.detail};

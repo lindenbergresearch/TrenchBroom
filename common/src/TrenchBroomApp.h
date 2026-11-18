@@ -137,6 +137,7 @@ class TrenchBroomApp : public QApplication {
     QMap<QString, QString> m_themeFileStamps;
     std::filesystem::path m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath;
     int m_loadedUIFontSize = 0, m_loadedConsoleFontSize = 0, m_loadedRenderFontSize = 0;
+    QString m_loadedUITypography;
     MapFrame *m_currentMapFrame;
     SignalHandler m_signalHandler;
 

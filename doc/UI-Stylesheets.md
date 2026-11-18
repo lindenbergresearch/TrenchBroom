@@ -108,26 +108,33 @@ ANSI-Formatierungen aus externen Programmen und explizit als Daten übergebene
 Farben behalten ihre Bedeutung. Sie werden beim Wechsel der internen Meldungsfarben
 nicht ersetzt. Die Undo-Historie der Map ist von der Ausgabeformatierung unabhängig.
 
-## Schriftvergleich und Listentext unter Qt6
+## Schriftvergleich und globale Typografie unter Qt6
 
-Unter **Preferences → View → List text comparison** stehen Systemschrift und
-Inter Variable nebeneinander. Beide verwenden dieselbe UI-Größe, Mindestgröße,
-Detail-Deckkraft und Textpositionierung. Die Anzeige unter jedem Muster nennt
-das verwendete Gewicht und die tatsächlich unterstützte optische Größe.
+Unter **Preferences → View → Font comparison** stehen links die Systemschrift
+und rechts die aktuell im Feld **UI Font** gewählte Schrift. Der rechte Titel
+nennt die tatsächlich aufgelöste Familie, auch bei fehlenden Font-Dateien.
+Beide Muster verwenden dieselbe UI-Größe, Mindestgröße, Detail-Deckkraft und
+Textpositionierung. Unter jedem Muster stehen Gewicht und optische Größe.
 
-Die Schaltflächen wählen die Schriftfamilie für die gesamte Oberfläche. Die
-zusätzliche Feinabstimmung gilt für die beiden Muster und den **Layer-Baum**:
+Schriftwahl und alle Typografie-Regler ändern zunächst ausschließlich die
+Muster. Der Entwurf bleibt beim Wechsel zwischen Einstellungsreitern erhalten;
+Schließen ohne **Apply** verwirft ihn. Der kleine **Apply**-Button neben dem
+rechten Titel übernimmt und speichert alle Werte gemeinsam für die Oberfläche.
+Auch „Restore Defaults“ setzt die Schriftwerte zunächst nur im Entwurf zurück.
 
 | Einstellung | Bedeutung / Standard |
 | --- | --- |
-| List text weight | `Font default` (gespeichert als 0) übernimmt den Schriftschnitt. Zwischengewichte wie 450 verwenden bei variablen Fonts die echte `wght`-Achse; sonst wird der nächste verfügbare Schnitt verwendet. Abweichende QSS-Gewichte für hervorgehobene Zeilen bleiben erhalten. |
+| Text weight | `Font default` (0) übernimmt den Schriftschnitt. Zwischengewichte wie 450 verwenden bei variablen Fonts die echte `wght`-Achse; sonst wird der nächste verfügbare Schnitt verwendet. Abweichende QSS-Gewichte bleiben erhalten. |
 | Optical size | `Automatic` (0) folgt der Punktgröße jeder Textzeile. Manuelle Werte werden auf den Bereich der `opsz`-Achse begrenzt. Ohne diese Achse bleibt die Schrift unverändert. |
 | Line spacing | Typografische Zeilenmetriken optional verwenden; standardmäßig aus. Bei Fonts, die diese bereits vorgeben, entsteht kein Unterschied. |
-| Text positioning | Standard: `Pixel aligned`. Die Grundlinie wird nach Einbezug von Skalierung und Verschiebung am physischen Pixelraster ausgerichtet. `Subpixel positioning` erlaubt gebrochene Grundlinien mit ungehintetem Text; je nach Darstellung entstehen zusätzliche Glyphenvarianten im Qt-Cache. |
+| Text positioning | Standard: `Pixel aligned`. Selbst gezeichnete Textgrundlinien werden nach Skalierung und Verschiebung am physischen Pixelraster ausgerichtet. `Subpixel positioning` erlaubt gebrochene Grundlinien mit ungehintetem Text; je nach Darstellung entstehen zusätzliche Glyphenvarianten im Qt-Cache. Standard-Controls behalten Qt-Layout, Umbruch und Tastaturkürzel. |
 
-Die Werte sind als `Editor/UI List …` in den Preferences gespeichert. Änderungen
-berechnen Schriftmetriken und Zeilenlayout neu; ein Neuaufbau des Layer-Baums oder
-ein globales QSS-Reload für jeden Gewichtsschritt ist nicht erforderlich.
+Die bisherigen Schlüssel `Editor/UI List …` bleiben kompatibel. Das interne
+Flag `Editor/UI Global typography` wird beim ersten Apply gesetzt, damit bereits
+gespeicherte Listen-Feinabstimmungen nicht ungefragt global aktiv werden.
+Während der Vorschau werden weder Preferences geändert noch globale Stylesheets
+neu geladen. Apply bündelt die Aktualisierung; der Layer-Baum passt seine
+Zeilenmetriken an, ohne seine Knoten neu aufzubauen.
 
 Inter Variable **4.1** liegt unverändert mit SIL-OFL-Lizenz im Font-Verzeichnis.
 Die Familie `Inter Variable` ist von der vorhandenen älteren Familie `Inter`
@@ -136,19 +143,22 @@ Quelle, Prüfsummen und Lizenz stehen in `InterVariable-README.md` und
 `InterVariable-LICENSE.txt`. Bestehende Font-Dateien und gespeicherte Auswahlen
 bleiben verfügbar.
 
-Die Variationsachsen werden an Schriftkopien für die selbst gezeichneten Zeilen
-gesetzt. Sie werden nicht auf die geerbte QApplication-Schrift übertragen, weil
-eine geerbte `wght`-Achse sonst beispielsweise ein späteres QSS-`font-weight: bold`
-überstimmen kann. Dadurch bleiben die bisherigen Gewichtungen anderer Widgets
-und die QSS-Rollen erhalten. Die OpenGL-Schriftatlanten des Map-Renderers folgen
-weiterhin ihren eigenen Renderer-Fonteinstellungen.
+Die globale QApplication-Schrift bleibt ohne Variationsachsen. Der gemeinsame
+Widget-Stil setzt diese erst nach dem Auflösen der jeweiligen QSS-Schrift und
+berücksichtigt Änderungen an bestehenden sowie neu erzeugten Controls. So kann
+eine geerbte `wght`-Achse keine fette Überschrift überstimmen. Größen und Familien
+bleiben weiterhin vererbt. Rich-Text-Labels und Textdokumente behalten die
+Gewichtungen ihrer einzelnen Textabschnitte und verwenden dafür Qt-Fontmatching.
+Die OpenGL-Schriftatlanten des Map-Renderers und die Console-Schrift haben
+weiterhin ihre eigenen Familien- und Größen-Einstellungen.
 
-Das Muster übernimmt Rahmen, Hintergrund und Beschriftungsstil aus `base.qss`:
+Die Vergleichsansicht übernimmt ihr Aussehen aus `base.qss`:
 
 - `QFrame[fontPreview="true"]`: Musterfläche und Rahmen.
 - `QLabel[fontPreviewHeading="true"]`: Überschrift über dem Muster.
 - `QLabel[fontPreviewInfo="true"]`: verwendetes Gewicht / optische Größe.
 - `QLabel#UIFontComparisonScope`: Erläuterung zum Geltungsbereich.
+- `QPushButton#UIFontApply`: kompakte Apply-Schaltfläche.
 
 Der Layer-Baum verwendet weiterhin `QWidget#LayerTreeRow` mit seinen Typ- und
 Zustandsselektoren. Farben, Abstände, Detailfarbe und Mindesthöhe bleiben dort

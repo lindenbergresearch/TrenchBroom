@@ -445,6 +445,11 @@ void TrenchBroomApp::loadStyle() {
 }
 
 void TrenchBroomApp::refreshThemeFonts() {
+    const auto typography = listFontSettings();
+    const auto typographyKey = pref(Preferences::UIGlobalTypography)
+        ? QString{"%1/%2/%3/%4"}.arg(typography.weight).arg(typography.opticalSize)
+            .arg(typography.typoLineMetrics).arg(typography.subpixelPositioning) : QString{};
+    if (m_loadedUITypography != typographyKey) m_loadedUIFontSize = 0;
     const auto refresh = [&](auto& loadedPath, auto& loadedSize, QFont& font, const auto& path, const int size) {
         if (loadedPath == path && loadedSize == size) return;
         font = loadFont(path, size);
@@ -452,6 +457,8 @@ void TrenchBroomApp::refreshThemeFonts() {
         loadedSize = size;
     };
     refresh(m_loadedUIFontPath, m_loadedUIFontSize, m_UI_Font, pref(Preferences::UIFontPath), uiFontPixelSize());
+    if (pref(Preferences::UIGlobalTypography)) m_UI_Font = listTextFont(m_UI_Font, typography);
+    m_loadedUITypography = typographyKey;
     refresh(m_loadedConsoleFontPath, m_loadedConsoleFontSize, m_ConsoleFont, pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
     refresh(m_loadedRenderFontPath, m_loadedRenderFontSize, m_RenderFont, pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
 }
@@ -742,19 +749,20 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
     if (m_themeRefreshTimer) m_themeRefreshTimer->stop();
     const auto previousFonts = std::make_tuple(m_UI_Font, m_ConsoleFont, m_RenderFont,
         m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
-        m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize);
+        m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize, m_loadedUITypography);
     if (reloadFonts) refreshThemeFonts();
     if (reloadStyleSheets) {
         if (!loadStyleSheets()) {
             std::tie(m_UI_Font, m_ConsoleFont, m_RenderFont,
                 m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
-                m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize) = previousFonts;
+                m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize, m_loadedUITypography) = previousFonts;
         }
     }
     else {
         const auto uiFont = fontForStyleSheet(m_UI_Font);
         if (QApplication::font() != uiFont) QApplication::setFont(uiFont);
     }
+    if (auto* proxy = dynamic_cast<TrenchBroomProxyStyle*>(m_proxyStyle)) proxy->refreshTypography();
 }
 
 const QFont &TrenchBroomApp::getUIFont() const {

@@ -28,6 +28,7 @@ class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
 class QLabel;
+class QPushButton;
 class QLineEdit;
 class QSpinBox;
 
@@ -65,9 +66,12 @@ class ViewPreferencePane : public PreferencePane {
     QCheckBox *m_listTypoLineMetrics = nullptr;
     QComboBox *m_listTextPosition = nullptr;
     QLabel *m_systemFontInfo = nullptr;
-    QLabel *m_interFontInfo = nullptr;
+    QLabel *m_selectedFontInfo = nullptr;
+    QLabel *m_selectedFontHeading = nullptr;
+    QPushButton *m_applyFont = nullptr;
+    bool m_fontDraftDirty = false;
     FontComparisonPreview *m_systemFontPreview = nullptr;
-    FontComparisonPreview *m_interFontPreview = nullptr;
+    FontComparisonPreview *m_selectedFontPreview = nullptr;
     QComboBox *m_ConsoleFontSizeCombo = nullptr;
     QComboBox *m_ConsoleFontCombo = nullptr;
     QComboBox *m_ToolbarIconSizeCombo = nullptr;
@@ -81,7 +85,7 @@ class ViewPreferencePane : public PreferencePane {
     void reloadUIStyle();
 
     void updateFontPreviews();
-    void applyUIFont(const std::filesystem::path& path);
+    void applyFontDraft();
 
     QWidget *createViewPreferences();
 

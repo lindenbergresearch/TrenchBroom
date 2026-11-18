@@ -123,6 +123,8 @@ QFont detailFont(const QFont &source, qreal reduction) {
 QFont fontForStyleSheet(QFont font) {
     // Qt 5's named font face otherwise overrides family/weight/style from QSS.
     font.setStyleName({});
+    font.unsetVariableAxis("wght");
+    font.unsetVariableAxis("opsz");
     return font;
 }
 
@@ -152,7 +154,8 @@ ListFontSettings listFontSettings() {
 
 QFont listTextFont(QFont font, const ListFontSettings& settings, const bool preserveEmphasis) {
     const auto axes = fontCapabilities(font);
-    const auto keepWeight = preserveEmphasis && font.weight() != QGuiApplication::font().weight();
+    const auto keepWeight = preserveEmphasis && font.weight() != QFont::Normal
+        && font.weight() != QGuiApplication::font().weight();
     auto weight = int(font.weight());
     if (settings.weight > 0 && !keepWeight)
         weight = std::clamp(settings.weight, 1, 1000);
@@ -178,6 +181,30 @@ QFont listTextFont(QFont font, const ListFontSettings& settings, const bool pres
     font.setStyleStrategy(QFont::StyleStrategy(strategy));
     if (settings.subpixelPositioning) font.setHintingPreference(QFont::PreferNoHinting);
     return font;
+}
+
+QFont styledTextFont(QFont font, const ListFontSettings& settings, const bool weightAxis) {
+    // Work from the final QSS weight; never carry a parent's variation into a
+    // bold heading or rich-text fragment. Keep unrelated axes such as width.
+    font.unsetVariableAxis("wght");
+    font.unsetVariableAxis("opsz");
+    auto resolved = settings;
+    resolved.weight = 0;
+    const auto originalWeight = font.weight();
+    const auto originalStyleName = font.styleName();
+    const auto originalMask = font.resolveMask();
+    auto tuned = listTextFont(font, resolved);
+    if (!weightAxis) tuned.unsetVariableAxis("wght");
+    // Changing the variation must not make inherited family/size/weight local.
+    // FontChange will then continue to propagate future application changes.
+    QFont axisMask;
+    axisMask.setVariableAxis("wght", 400);
+    const auto variationsMask = axisMask.resolveMask();
+    tuned.setWeight(originalWeight);
+    tuned.setStyleName(originalStyleName);
+    tuned.setResolveMask((originalMask & ~variationsMask)
+        | (tuned.variableAxisTags().isEmpty() ? 0 : variationsMask));
+    return tuned;
 }
 
 qreal logicalFontPixelSize(const QFont& font) {

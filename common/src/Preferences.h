@@ -229,6 +229,7 @@ extern Preference<int> UIListFontWeight;
 extern Preference<float> UIListOpticalSize;
 extern Preference<bool> UIListTypoLineMetrics;
 extern Preference<bool> UIListSubpixelPositioning;
+extern Preference<bool> UIGlobalTypography;
 extern Preference<int> PreferencesWindowWidth;
 extern Preference<int> PreferencesWindowHeight;
 extern Preference<int> ViewDetailsWindowWidth;
