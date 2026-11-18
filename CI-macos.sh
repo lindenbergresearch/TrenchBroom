@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-# Qt remains on 5.15 for migration milestone A. Native libraries are built
+# Qt 6 is installed separately. Native libraries are built
 # by CPM with the same compiler, architecture and deployment target as the app.
 TB_SOURCE_DIR=$(cd "$(dirname "$0")" && pwd)
-TB_BUILD_DIR=${TB_BUILD_DIR:-"$TB_SOURCE_DIR/cmake-build-cpm-qt5"}
-TB_QT_PREFIX=${TB_QT_PREFIX:-"$(brew --prefix qt@5)"}
+TB_BUILD_DIR=${TB_BUILD_DIR:-"$TB_SOURCE_DIR/cmake-build-cpm-qt6"}
+TB_QT_PREFIX=${TB_QT_PREFIX:-"$(brew --prefix qt@6)"}
 TB_BUILD_TYPE=Release
 TB_ASAN=OFF
 if [[ ${TB_DEBUG_BUILD:-false} == true ]]; then

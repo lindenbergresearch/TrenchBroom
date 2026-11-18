@@ -19,19 +19,20 @@ jobs:
       # Don't cancel the macOS build if the Linux build fails, etc.
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04, macos-11, windows-2019]
-        tb-build-type: [release]
-        tb-arch: [default-arch]
-        exclude:
-          - os: windows-2019
-            tb-arch: default-arch
         include:
-          - os: macos-11
-            tb-build-type: asan
-          - os: windows-2019
+          - os: ubuntu-24.04
+            tb-build-type: release
             tb-arch: x64
-          - os: windows-2019
-            tb-arch: Win32
+          - os: macos-15
+            tb-build-type: release
+            tb-arch: arm64
+          - os: macos-15
+            tb-build-type: asan
+            tb-arch: arm64
+          - os: windows-2022
+            tb-build-type: release
+            tb-arch: x64
+            qt-arch: win64_msvc2022_64
     env:
       # Record pull request head commit SHA
       TB_PULL_REQUEST_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -39,10 +40,10 @@ jobs:
     steps:
       # See: https://github.com/actions/checkout
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # The remaining vcpkg submodule is only a migration reference.
+          # CPM fetches dependencies; no repository submodules are needed.
           submodules: false
 
       # CMake 3.28+ is required by CPM's SYSTEM / EXCLUDE_FROM_ALL handling.
@@ -57,22 +58,18 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           sudo apt update
-          sudo apt install build-essential libxi-dev libxrandr-dev libxxf86vm-dev freeglut3-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libglm-dev pandoc cmake p7zip-full ninja-build xvfb libglew-dev libfreeimage-dev libfreetype6-dev libtinyxml2-dev libassimp-dev
+          sudo apt install build-essential libxi-dev libxrandr-dev libxxf86vm-dev freeglut3-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev zlib1g-dev libfontconfig1-dev pandoc p7zip-full ninja-build ccache xvfb
 
-      - name: Install Qt5 on Ubuntu 22.04
-        if: ${{ matrix.os == 'ubuntu-22.04' }}
-        run: |
-          sudo apt update
-          sudo apt install qtbase5-dev libqt5svg5-dev
-
-      - name: Install Qt5 on Ubuntu 20.04
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
-        run: |
-          sudo apt update
-          sudo apt install qt5-default libqt5svg5-dev
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.1'
+          arch: ${{ matrix.qt-arch }}
+          modules: 'qtmultimedia'
+          cache: true
 
       - name: Install Pandoc (Windows)
-        if: ${{ matrix.os == 'windows-2019' }}
+        if: ${{ matrix.os == 'windows-2022' }}
         run: |
           # Chocolatey was taking 3 minutes to install pandoc; just install it directly
           Invoke-WebRequest 'https://github.com/jgm/pandoc/releases/download/2.11.3.1/pandoc-2.11.3.1-windows-x86_64.zip' -OutFile 'pandoc.zip'
@@ -84,24 +81,10 @@ jobs:
           # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#environment-files
           echo "$tb_pandoc_path" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Install Qt on Windows (x64)
-        if: ${{ matrix.os == 'windows-2019' && matrix.tb-arch == 'x64' }}
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '5.15.2'
-          arch: 'win64_msvc2019_64'
-
-      - name: Install Qt on Windows (Win32)
-        if: ${{ matrix.os == 'windows-2019' && matrix.tb-arch == 'Win32' }}
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '5.15.2'
-          arch: 'win32_msvc2019'
-
       - name: Install macOS dependencies
-        if: ${{ matrix.os == 'macos-11' }}
+        if: ${{ matrix.os == 'macos-15' }}
         run: |
-          brew install cmake p7zip pandoc qt@5 ninja ccache
+          brew install cmake p7zip pandoc ninja ccache
 
       # Native dependencies now come from pinned CPM sources. Keeping sources
       # and compiler results separate permits clean build directories without
@@ -123,21 +106,18 @@ jobs:
         run: ./CI-linux.sh
 
       - name: macOS build
-        if: ${{ matrix.os == 'macos-11' }}
+        if: ${{ matrix.os == 'macos-15' }}
         run: |
           if [ '${{ matrix.tb-build-type }}' = 'asan' ]; then
             export TB_DEBUG_BUILD=true
           fi
-          TB_BUILD_DIR="$PWD/build" ./CI-macos.sh
+          TB_BUILD_DIR="$PWD/build" TB_QT_PREFIX="$QT_ROOT_DIR" ./CI-macos.sh
 
       - name: Windows build
-        if: ${{ matrix.os == 'windows-2019' }}
-        # NOTE: docs at https://github.com/jurplel/install-qt-action
-        # mention that it sets a Qt5_DIR environment variable.
-        # Our script expects it in QT5_INSTALL_DIR
-        # NOTE: cmd.exe /c = run a command and terminate
+        if: ${{ matrix.os == 'windows-2022' }}
+        # Qt 6 uses MSVC 2022 and x64; the former Win32/Qt5 job is retired.
         run: |
-          $Env:QT5_INSTALL_DIR = $env:Qt5_DIR
+          $Env:QT6_INSTALL_DIR = $env:QT_ROOT_DIR
           cmd.exe /c CI-windows.bat
         env:
           TB_ARCH: ${{ matrix.tb-arch }}
@@ -148,27 +128,17 @@ jobs:
 
       # win64
       - name: Upload win64 artifact
-        uses: actions/upload-artifact@v3
-        if: ${{ matrix.os == 'windows-2019' && matrix.tb-arch == 'x64' }}
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.os == 'windows-2022' && matrix.tb-arch == 'x64' }}
         with:
           name: win64
           path: |
             cmakebuild/*.7z
             cmakebuild/*.7z.md5
 
-      # win32
-      - name: Upload win32 artifact
-        uses: actions/upload-artifact@v3
-        if: ${{ matrix.os == 'windows-2019' && matrix.tb-arch == 'Win32' }}
-        with:
-          name: win32
-          path: |
-            cmakebuild/*.7z
-            cmakebuild/*.7z.md5
-
       # Linux
       - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         with:
           name: linux
@@ -178,8 +148,8 @@ jobs:
 
       # macOS
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v3
-        if: ${{ matrix.os == 'macos-11' && matrix.tb-build-type != 'asan' }}
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.os == 'macos-15' && matrix.tb-build-type != 'asan' }}
         with:
           name: macos
           path: |
@@ -206,7 +176,7 @@ jobs:
 
       - name: Upload compiled manual
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-20.04' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-24.04' }}
         with:
           # I've created a SSH key pair following https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-create-ssh-deploy-key
           # The TrenchBroom/TrenchBroom repo has a repository secret ACTIONS_DEPLOY_KEY set to the SSH private key
