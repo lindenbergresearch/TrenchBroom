@@ -1,5 +1,5 @@
-# Same dependency mechanism as upstream TrenchBroom. Keep Qt separate until
-# the next migration milestone. URL hashes and versions live in dependencies/.
+# Same dependency mechanism as upstream TrenchBroom. Qt is installed separately;
+# URL hashes and versions for the native libraries live in dependencies/.
 if(NOT DEFINED CPM_SOURCE_CACHE AND NOT DEFINED ENV{CPM_SOURCE_CACHE})
     set(CPM_SOURCE_CACHE "${CMAKE_SOURCE_DIR}/.cache/cpm" CACHE PATH "CPM source cache directory")
 endif()

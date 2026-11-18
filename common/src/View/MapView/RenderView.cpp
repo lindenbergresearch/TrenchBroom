@@ -145,15 +145,14 @@ void RenderView::keyReleaseEvent(QKeyEvent *event) {
 }
 
 QMouseEvent RenderView::mouseEventWithFullPrecisionLocalPos(const QWidget *widget, const QMouseEvent *event) {
-    // The localPos of a Qt mouse event is only in integer coordinates, but window pos
-    // and screen pos have full precision. We can't directly map the windowPos because
-    // mapTo takes QPoint, so we just map the origin and subtract that.
-    QPointF localPos = event->windowPos() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
+    // Preserve subpixel coordinates relative to the editor and retain the
+    // pointing device when forwarding a smoothed event to the input recorder.
+    QPointF localPos = event->scenePosition() - QPointF(widget->mapTo(widget->window(), QPoint(0, 0)));
 
     m_boxFilter.add(new QPointF(localPos.x(), localPos.y()));
 
     return QMouseEvent(
-        event->type(), m_boxFilter.average(), event->windowPos(), event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source()
+        event->type(), m_boxFilter.average(), event->scenePosition(), event->globalPosition(), event->button(), event->buttons(), event->modifiers(), event->pointingDevice()
     );
 }
 

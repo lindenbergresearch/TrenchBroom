@@ -45,11 +45,11 @@ ThemeValue ThemeValue::keyword(const QString &value) {
 
 bool ThemeValue::isValid() const {
     const auto numeric =
-        value.type() == QVariant::Double || value.type() == QVariant::Int || value.type() == QVariant::UInt ||
-        value.type() == QVariant::LongLong || value.type() == QVariant::ULongLong;
+        value.typeId() == QMetaType::Double || value.typeId() == QMetaType::Int || value.typeId() == QMetaType::UInt ||
+        value.typeId() == QMetaType::LongLong || value.typeId() == QMetaType::ULongLong;
     switch (type) {
         case Type::Color:
-            return value.type() == QVariant::Color && value.value<QColor>().isValid();
+            return value.typeId() == QMetaType::QColor && value.value<QColor>().isValid();
         case Type::Length:
             return numeric && std::isfinite(value.toDouble()) && value.toDouble() >= 0 && value.toDouble() <= 4096;
         case Type::Number:
@@ -58,10 +58,10 @@ bool ThemeValue::isValid() const {
             return numeric && std::isfinite(value.toDouble()) && std::floor(value.toDouble()) == value.toDouble() &&
                    value.toDouble() >= 0 && value.toDouble() <= 1000;
         case Type::FontFamily:
-            return value.type() == QVariant::String && !value.toString().isEmpty() &&
+            return value.typeId() == QMetaType::QString && !value.toString().isEmpty() &&
                    !value.toString().contains(QRegularExpression{"[\\r\\n\\x00]"});
         case Type::Keyword:
-            return value.type() == QVariant::String &&
+            return value.typeId() == QMetaType::QString &&
                    QRegularExpression{"^[A-Za-z][A-Za-z0-9_-]*$"}.match(value.toString()).hasMatch();
     }
     return false;
@@ -324,11 +324,7 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
                                                             {"renderer", &renderer}};
     for (const auto &[name, font] : fonts) {
         values.insert(QStringLiteral("family.") + name, ThemeValue::family(font->family()));
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        values.insert(QStringLiteral("weight.") + name, ThemeValue::weight(font->weight() * 8));
-#else
         values.insert(QStringLiteral("weight.") + name, ThemeValue::weight(font->weight()));
-#endif
         values.insert(QStringLiteral("keyword.font.") + name, ThemeValue::keyword(fontStyle(*font)));
     }
     return snapshot;
@@ -508,7 +504,7 @@ bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &defi
         const auto input = entry->second.value("value");
         auto value = ThemeValue{entry->first, input};
         const auto string = input.toString();
-        if (input.type() == QVariant::String && string.startsWith("${") && string.endsWith('}')) {
+        if (input.typeId() == QMetaType::QString && string.startsWith("${") && string.endsWith('}')) {
             const auto reference = string.mid(2, string.size() - 3);
             if (!resolveValue(reference)) {
                 errors << location + "unresolved reference '" + reference + "'";
@@ -521,15 +517,15 @@ bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &defi
                 resolving.remove(name);
                 return false;
             }
-        } else if (entry->first == ThemeValue::Type::Color && input.type() == QVariant::String) {
+        } else if (entry->first == ThemeValue::Type::Color && input.typeId() == QMetaType::QString) {
             value = ThemeValue::color(QColor{string});
         } else if (entry->first == ThemeValue::Type::Color ||
                    ((entry->first == ThemeValue::Type::Length || entry->first == ThemeValue::Type::Number ||
                      entry->first == ThemeValue::Type::FontWeight) &&
-                    input.type() != QVariant::Double && input.type() != QVariant::Int &&
-                    input.type() != QVariant::LongLong) ||
+                    input.typeId() != QMetaType::Double && input.typeId() != QMetaType::Int &&
+                    input.typeId() != QMetaType::LongLong) ||
                    ((entry->first == ThemeValue::Type::FontFamily || entry->first == ThemeValue::Type::Keyword) &&
-                    input.type() != QVariant::String)) {
+                    input.typeId() != QMetaType::QString)) {
             errors << location + "value has the wrong type";
             resolving.remove(name);
             return false;

@@ -43,7 +43,8 @@
 #include <QString>
 #include <QStringBuilder>
 #include <QTableView>
-#include <QTextCodec>
+#include <QStringDecoder>
+#include <QStringEncoder>
 #include <QToolBar>
 #include <QToolButton>
 #include <QWindow>
@@ -63,16 +64,7 @@
 #include <TrenchBroomApp.h>
 
 
-// QDesktopWidget was deprecated in Qt 5.10 and we should use QGuiApplication::screenAt
-// in 5.10 and above Used in centerOnScreen
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-
 #include <QGuiApplication>
-
-#else
-#include <QApplication>
-#include <QDesktopWidget>
-#endif
 
 namespace TrenchBroom {namespace View {
     void prepareContextMenu(QMenu& menu) {
@@ -252,15 +244,11 @@ namespace TrenchBroom {namespace View {
     }
 
     void centerOnScreen(QWidget* window) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
-        const auto* screen = QGuiApplication::screenAt(window->mapToGlobal({window->width() / 2, 0}));
+        const auto* screen = QGuiApplication::screenAt(window->mapToGlobal(QPoint{window->width() / 2, 0}));
         if (screen == nullptr) {
             return;
         }
         const auto screenGeometry = screen->availableGeometry();
-#else
-        const auto screenGeometry = QApplication::desktop()->availableGeometry(window);
-#endif
         window->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, window->size(), screenGeometry));
     }
 
@@ -598,33 +586,30 @@ namespace TrenchBroom {namespace View {
         dialog->activateWindow();
     }
 
-    static QTextCodec* codecForEncoding(const MapTextEncoding encoding) {
+    static QStringConverter::Encoding codecForEncoding(const MapTextEncoding encoding) {
         switch (encoding) {
             case MapTextEncoding::Quake:
                 // Quake uses the full 1-255 range for its bitmap font.
                 // So using a "just assume UTF-8" approach would not work here.
                 // See: https://github.com/TrenchBroom/TrenchBroom/issues/3122
-                return QTextCodec::codecForLocale();
+                return QStringConverter::System;
             case MapTextEncoding::Iso88591:
-                return QTextCodec::codecForName("ISO 8859-1");
+                return QStringConverter::Latin1;
             case MapTextEncoding::Utf8:
-                return QTextCodec::codecForName("UTF-8");
+                return QStringConverter::Utf8;
                 switchDefault();
         }
     }
 
     QString mapStringToUnicode(const MapTextEncoding encoding, const std::string& string) {
-        auto* codec = codecForEncoding(encoding);
-        ensure(codec != nullptr, "null codec");
-
-        return codec->toUnicode(QByteArray::fromStdString(string));
+        auto decoder = QStringDecoder{codecForEncoding(encoding)};
+        return decoder(QByteArrayView{string.data(), qsizetype(string.size())});
     }
 
     std::string mapStringFromUnicode(const MapTextEncoding encoding, const QString& string) {
-        auto* codec = codecForEncoding(encoding);
-        ensure(codec != nullptr, "null codec");
-
-        return codec->fromUnicode(string).toStdString();
+        auto encoder = QStringEncoder{codecForEncoding(encoding)};
+        const QByteArray bytes = encoder(string);
+        return bytes.toStdString();
     }
 
     QString nativeModifierLabel(const int modifier) {

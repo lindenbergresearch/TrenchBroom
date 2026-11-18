@@ -68,7 +68,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     makeInfo(infoLabel);
 
     m_table->setSortingEnabled(true);
-    m_table->sortByColumn(0);
+    m_table->sortByColumn(0, Qt::AscendingOrder);
 
     auto *infoAndSearchLayout = new QHBoxLayout();
     infoAndSearchLayout->setContentsMargins(0, LayoutConstants::MediumHMargin, 0, LayoutConstants::WideHMargin);

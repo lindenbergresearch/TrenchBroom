@@ -284,7 +284,7 @@ PrefabBrowser::PrefabBrowser(std::weak_ptr<MapDocument> document, MapView* mapVi
         setFolder(QUrl::fromPercentEncoding(link.mid(1).toUtf8()));
     });
     navigation->addWidget(up); navigation->addWidget(m_location, 1);
-    auto* goUp = new QShortcut(QKeySequence(Qt::ALT + Qt::Key_Up), tiles);
+    auto* goUp = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_Up), tiles);
     connect(goUp, &QShortcut::activated, m_up, &QAction::trigger);
     m_status = new QLabel;
     m_status->setObjectName("PrefabStatus");

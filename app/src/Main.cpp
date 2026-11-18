@@ -18,11 +18,14 @@
  */
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QString>
 #include <QtGlobal>
 
 #include "IO/SystemPaths.h"
+#include "IO/PathQt.h"
 #include "PreferenceManager.h"
 #include "TrenchBroomApp.h"
 #include "View/MapView/RenderView.h"
@@ -35,7 +38,7 @@ extern void qt_set_sequence_auto_mnemonic(bool b);
 /**
  * Set OpenGL defaults
  * Needs to be done here before QApplication is created
- * (see: https://doc.qt.io/qt-5/qsurfaceformat.html#setDefaultFormat)
+ * (see: https://doc.qt.io/qt-6/qsurfaceformat.html#setDefaultFormat)
  */
 static void setupFormatOptions() {
     QSurfaceFormat format;
@@ -55,14 +58,10 @@ int main(int argc, char *argv[]) {
     QSettings::setDefaultFormat(QSettings::IniFormat);
 
     // Set up Hi DPI scaling
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     // Enables non-integer scaling (e.g. 150% scaling on Windows)
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-#endif
 
     // Workaround bug in Qt's Ctrl+Click = RMB emulation (a macOS feature.)
     // In Qt 5.13.0 / macOS 10.14.6, Ctrl+trackpad click+Drag produces no mouse events at
@@ -79,8 +78,12 @@ int main(int argc, char *argv[]) {
     if (argc > 1) {
         for (int i = 1; i < argc; i++) {
             if (strcmp(argv[i], "--portable") == 0) {
-                IO::SystemPaths::setPortable();
-                QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QString("./config"));
+                // setupFormatOptions reads preferences before QApplication has
+                // initialized applicationDirPath(). Resolve that directory now.
+                const auto executable = QStandardPaths::findExecutable(QString::fromLocal8Bit(argv[0]));
+                const auto directory = QFileInfo{executable.isEmpty() ? QString::fromLocal8Bit(argv[0]) : executable}.absolutePath();
+                IO::SystemPaths::setPortable(true, IO::pathFromQString(directory));
+                QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, IO::pathAsQString(IO::SystemPaths::userDataDirectory()));
             }
         }
     }

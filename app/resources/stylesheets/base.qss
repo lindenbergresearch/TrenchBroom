@@ -745,7 +745,7 @@ TrenchBroom--View--SemanticTextEdit {
     qproperty-errorColor: ${color.log.error};
     qproperty-successColor: ${color.text};
     qproperty-systemColor: ${color.text};
-    qproperty-systemFontWeight: 75;
+    qproperty-systemFontWeight: 700;
 }
 TrenchBroom--View--SemanticTextEdit#CompilationOutput {
     qproperty-infoColor: #0eceef;

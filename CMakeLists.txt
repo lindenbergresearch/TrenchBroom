@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.28)
 if(CMAKE_TOOLCHAIN_FILE MATCHES "(^|[/\\\\])vcpkg([/\\\\]|\\.cmake)")
     message(FATAL_ERROR
         "This build directory uses the old vcpkg toolchain. Configure a fresh "
-        "directory with the qt5-cpm preset; see Build.md.")
+        "directory with the qt6-cpm preset; see Build.md.")
 endif()
 
 # Fix warning with Ninja and cotire (see https://github.com/sakra/cotire/issues/81)
@@ -22,6 +22,11 @@ if(POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)
 endif()
 
+# Qt 5 and Qt 6 autogen files and plugin paths must stay in separate caches.
+if(DEFINED Qt5Core_DIR AND NOT DEFINED Qt6Core_DIR)
+    message(FATAL_ERROR "This is a Qt5 build directory. Use a fresh directory with the qt6-cpm preset; see Build.md.")
+endif()
+
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
@@ -36,6 +41,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
+# Default editor deployment target. The installed Qt binaries may require a
+# newer OS; use a matching Qt SDK when distributing to older macOS versions.
+if(CMAKE_HOST_APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "Minimum macOS deployment version")
+endif()
 
 # Using C and CXX because GLEW is C
 project(TrenchBroom LANGUAGES C CXX)
@@ -108,15 +119,11 @@ include(cmake/Dependencies.cmake)
 
 # Find Qt and OpenGL
 find_package(OpenGL REQUIRED)
-find_package(Qt5 5.15 COMPONENTS Core Widgets Svg Multimedia Network Test REQUIRED)
+find_package(Qt6 6.10 COMPONENTS Core Widgets Svg Multimedia Network Test OpenGL OpenGLWidgets REQUIRED)
+include(cmake/QtDeployment.cmake)
 
-# Qt will warn about API's that were deprecated after 5.9.5.
-# Since we're not raising our minimum Qt version, and can't use the replacement
-# API's, disable these warnings.
-add_compile_definitions(QT_NO_DEPRECATED_WARNINGS=1)
 
-# Find threads lib, needed to work around a gtest bug, see: https://stackoverflow.com/questions/21116622/undefined-reference-to-pthread-key-create-linker-error
-# The googletest target links to this
+# The editor and native dependencies use threads.
 find_package(Threads)
 
 # Populate version variables using git

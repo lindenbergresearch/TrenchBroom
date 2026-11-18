@@ -154,16 +154,14 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
             message(STATUS "macdeployqt requested")
 
             # Get macdeployqt path (hack)
-            get_target_property(TB_QMAKE_PATH Qt5::qmake IMPORTED_LOCATION)
+            get_target_property(TB_QMAKE_PATH Qt6::qmake IMPORTED_LOCATION)
             string(REPLACE "qmake" "macdeployqt" TB_MACDEPLOYQT_PATH "${TB_QMAKE_PATH}")
 
-            # Homebrew's Qt image plugins also depend on WebP dylibs. Their
-            # @rpath dependencies need an explicit search path during deployment.
-            find_library(TB_QT_WEBP_LIBRARY NAMES webp)
-            set(TB_MACDEPLOYQT_LIBRARY_PATH "")
-            if(TB_QT_WEBP_LIBRARY)
-                get_filename_component(TB_MACDEPLOYQT_LIBRARY_PATH "${TB_QT_WEBP_LIBRARY}" DIRECTORY)
-            endif()
+            # Always use the library prefix belonging to this Qt installation.
+            # Homebrew's separately packaged modules/plugins share this path.
+            execute_process(COMMAND "${TB_QMAKE_PATH}" -query QT_INSTALL_LIBS
+                OUTPUT_VARIABLE TB_MACDEPLOYQT_LIBRARY_PATH OUTPUT_STRIP_TRAILING_WHITESPACE
+                COMMAND_ERROR_IS_FATAL ANY)
             # Resource-only edits also invalidate the bundle's resource seal.
             set_property(TARGET ${APP_TARGET_NAME} APPEND PROPERTY LINK_DEPENDS
                          "${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeployMacBundle.cmake" ${APP_SOURCE})
@@ -175,6 +173,7 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
                                COMMAND ${CMAKE_COMMAND}
                                        "-DTB_APP_BUNDLE=$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../.."
+                                       "-DTB_APP_EXECUTABLE=$<TARGET_FILE:${APP_TARGET_NAME}>"
                                        "-DTB_MACDEPLOYQT=${TB_MACDEPLOYQT_PATH}"
                                        "-DTB_MACDEPLOYQT_LIBRARY_PATH=${TB_MACDEPLOYQT_LIBRARY_PATH}"
                                        "-DTB_CODESIGN_IDENTITY=${TB_MAC_CODESIGN_IDENTITY}"
@@ -191,30 +190,8 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
                            COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/DocIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}"
                            COMMAND ${CMAKE_COMMAND} -E copy "${APP_RESOURCE_DIR}/win32/icons/WindowIcon.ico" "${CMAKE_CURRENT_BINARY_DIR}")
 
-        # Copy DLLs to app directory
-        add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Multimedia>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Network>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/platforms"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/styles")
-        foreach (MEDIA_PLUGIN DSServicePlugin WMFServicePlugin)
-            if (TARGET Qt5::${MEDIA_PLUGIN})
-                add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/mediaservice"
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::${MEDIA_PLUGIN}>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/mediaservice")
-            endif ()
-        endforeach ()
-        if (TARGET Qt5::QWindowsAudioPlugin)
-            add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/audio"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsAudioPlugin>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/audio")
-        endif ()
+        tb_deploy_windows_qt(${APP_TARGET_NAME})
+
     endif ()
 
     # Generate a small stripped PDB for release builds so we get stack traces with symbols
@@ -341,13 +318,9 @@ if (WIN32)
         endforeach()
     ]])
 
-    #Qt plugins
-    install(FILES
-            $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>
-            DESTINATION platforms COMPONENT TrenchBroom)
-    install(FILES
-            $<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>
-            DESTINATION styles COMPONENT TrenchBroom)
+    # Include Qt's selected platform/style/image/media plugins and codec DLLs.
+    install(DIRECTORY "$<TARGET_FILE_DIR:TrenchBroom>/"
+            DESTINATION . COMPONENT TrenchBroom FILES_MATCHING PATTERN "*.dll")
 
     #Manual
     install(FILES ${INDEX_OUTPUT_PATH} DESTINATION manual COMPONENT TrenchBroom)
@@ -417,7 +390,6 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # The following dependencies were generated by running with CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON and dumping the list of dependencies with dpkg-deb --info <debfile>,
     # and making the following modification(s)
     # - remove libgcc-s1 (>= 3.0)
-    # set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.27), libgl1, libqt5core5a (>= 5.9.0~beta), libqt5gui5 (>= 5.6.0~beta), libqt5svg5 (>= 5.6.0~beta), libqt5widgets5 (>= 5.7.0), libstdc++6 (>= 7)")
     set(CPACK_DEBIAN_PACKAGE_SECTION "games")
     set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://kristianduske.com/trenchbroom/")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_BINARY_DIR}/linux/postinst;${CMAKE_CURRENT_BINARY_DIR}/linux/prerm;${CMAKE_CURRENT_BINARY_DIR}/linux/postrm")

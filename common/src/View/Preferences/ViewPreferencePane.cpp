@@ -317,8 +317,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         }
     }
 
-    const QFontDatabase database;
-    for (const auto& family : database.families()) {
+    for (const auto& family : QFontDatabase::families()) {
         m_UIFontCombo->addItem(family, family);
         m_ConsoleFontCombo->addItem(family, family);
     }

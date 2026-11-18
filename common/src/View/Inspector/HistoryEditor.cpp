@@ -3,6 +3,7 @@
 #include "View/Document/MapDocument.h"
 
 #include <QDateTime>
+#include <QLocale>
 #include <QHeaderView>
 #include <QSignalBlocker>
 #include <QTimer>
@@ -75,7 +76,7 @@ void HistoryEditor::refresh() {
             item->setText(1, time.toString("HH:mm:ss"));
             item->setData(0, Qt::UserRole, qulonglong(i + 1));
             item->setIcon(0, entry.applied ? m_undo->icon() : m_redo->icon());
-            item->setToolTip(0, tr("%1\n%2\nDouble-click to return to this state").arg(entry.applied ? tr("Applied") : tr("Available for redo"), time.toString(Qt::DefaultLocaleLongDate)));
+            item->setToolTip(0, tr("%1\n%2\nDouble-click to return to this state").arg(entry.applied ? tr("Applied") : tr("Available for redo"), QLocale{}.toString(time, QLocale::LongFormat)));
         }
         if (entry.applied) current = item;
     }

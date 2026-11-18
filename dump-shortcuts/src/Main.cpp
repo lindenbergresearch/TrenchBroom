@@ -93,7 +93,7 @@ static QString toString(const QKeySequence& keySequence)
 
   if (keySequence.count() > 0)
   {
-    const int keyWithModifier = keySequence[0];
+    const int keyWithModifier = keySequence[0].toCombined();
     const int key = keyWithModifier & ~(static_cast<int>(Qt::KeyboardModifierMask));
 
     const QString keyPortableText =
@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
   }
 
   QTextStream out(&file);
-  out.setCodec("UTF-8");
+  out.setEncoding(QStringConverter::Utf8);
 
   // A build helper must not load the developer's personal editor preferences.
   TrenchBroom::IO::SystemPaths::setPortable();

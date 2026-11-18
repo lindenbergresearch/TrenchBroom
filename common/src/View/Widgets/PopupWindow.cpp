@@ -21,7 +21,6 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QWindow>
 #include <QScreen>
 #include "Preferences.h"
@@ -36,7 +35,7 @@ PopupWindow::PopupWindow(QWidget *parent) : QWidget(parent, Qt::Popup) {
 }
 
 void PopupWindow::positionTouchingWidget(QWidget *refWidget) {
-    const QRect screenGeom = QApplication::desktop()->availableGeometry(refWidget);
+    const QRect screenGeom = refWidget->screen()->availableGeometry();
     const QRect refWidgetRectOnScreen = QRect(refWidget->mapToGlobal(QPoint(0, 0)), refWidget->size());
     const QSize ourSize = size();
 

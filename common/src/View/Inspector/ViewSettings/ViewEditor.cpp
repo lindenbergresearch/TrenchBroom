@@ -269,8 +269,8 @@ void ViewEditor::bindEvents() {
     connect(m_selectionBoundsDashSize, &SliderWithLabel::valueChanged, this, &ViewEditor::dashSizeChanged);
     connect(m_selectionBoundsIntersectionSize, &SliderWithLabel::valueChanged, this, &ViewEditor::intersectionMarkerSizeChanged);
 
-    connect(m_renderModeRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::faceRenderModeChanged);
-    connect(m_entityLinkRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::entityLinkModeChanged);
+    connect(m_renderModeRadioGroup, &QButtonGroup::idClicked, this, &ViewEditor::faceRenderModeChanged);
+    connect(m_entityLinkRadioGroup, &QButtonGroup::idClicked, this, &ViewEditor::entityLinkModeChanged);
     connect(m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged);
 }
 
@@ -302,8 +302,8 @@ void ViewEditor::unBindEvents() {
     disconnect(m_selectionBoundsDashSize, &SliderWithLabel::valueChanged, this, &ViewEditor::dashSizeChanged);
     disconnect(m_selectionBoundsIntersectionSize, &SliderWithLabel::valueChanged, this, &ViewEditor::intersectionMarkerSizeChanged);
 
-    disconnect(m_renderModeRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::faceRenderModeChanged);
-    disconnect(m_entityLinkRadioGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &ViewEditor::entityLinkModeChanged);
+    disconnect(m_renderModeRadioGroup, &QButtonGroup::idClicked, this, &ViewEditor::faceRenderModeChanged);
+    disconnect(m_entityLinkRadioGroup, &QButtonGroup::idClicked, this, &ViewEditor::entityLinkModeChanged);
     disconnect(m_showSoftBoundsCheckBox, &QAbstractButton::clicked, this, &ViewEditor::showSoftMapBoundsChanged);
 }
 

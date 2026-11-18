@@ -110,13 +110,12 @@ void EntityPropertyTable::keyPressEvent(QKeyEvent *event) {
 /**
  * The decorations (padlock icon for locked cells) goes on the right of the text
  */
-QStyleOptionViewItem EntityPropertyTable::viewOptions() const {
-    auto options = QTableView::viewOptions();
-    options.decorationPosition = QStyleOptionViewItem::Right;
+void EntityPropertyTable::initViewItemOption(QStyleOptionViewItem* options) const {
+    QTableView::initViewItemOption(options);
+    options->decorationPosition = QStyleOptionViewItem::Right;
     // Qt high-dpi bug: if we don't specify the size explicitly Qt, sees the larger
     // pixmap in the QIcon and tries to draw the icon larger than its actual 12x12 size.
-    options.decorationSize = QSize{12, 12};
-    return options;
+    options->decorationSize = QSize{12, 12};
 }
 
 /**

@@ -51,6 +51,7 @@
 
 #include <catch2/catch.hpp>
 #include <kdl/vector_utils.h>
+#include <kdl/result.h>
 #include <vm/mat_ext.h>
 
 #include <sstream>

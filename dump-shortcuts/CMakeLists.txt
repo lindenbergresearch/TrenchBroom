@@ -16,15 +16,4 @@ set_compiler_config(dump-shortcuts)
 # Organize files into IDE folders
 source_group(TREE "${COMMON_TEST_SOURCE_DIR}" FILES ${COMMON_TEST_SOURCE})
 
-if(WIN32)
-    # Copy DLLs to app directory
-    add_custom_command(TARGET dump-shortcuts POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "$<TARGET_FILE_DIR:dump-shortcuts>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:dump-shortcuts>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:dump-shortcuts>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Svg>" "$<TARGET_FILE_DIR:dump-shortcuts>"
-        COMMAND ${CMAKE_COMMAND} -E make_directory    "$<TARGET_FILE_DIR:dump-shortcuts>/platforms"
-        COMMAND ${CMAKE_COMMAND} -E make_directory    "$<TARGET_FILE_DIR:dump-shortcuts>/styles"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsIntegrationPlugin>" "$<TARGET_FILE_DIR:dump-shortcuts>/platforms"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::QWindowsVistaStylePlugin>" "$<TARGET_FILE_DIR:dump-shortcuts>/styles")
-endif()
+tb_deploy_windows_qt(dump-shortcuts)

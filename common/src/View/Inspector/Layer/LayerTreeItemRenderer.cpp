@@ -76,7 +76,7 @@ void LayerTreeItemRenderer::paint(QPainter &painter, const QStyleOptionViewItem 
                                   rect.top() + (rect.height() - textHeight) / 2.0, textWidth, titleMetrics.height());
 
     painter.setRenderHint(QPainter::TextAntialiasing);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::Antialiasing);
     painter.setFont(option.font);
     painter.setPen(textColor);
     painter.drawText(titleRect,

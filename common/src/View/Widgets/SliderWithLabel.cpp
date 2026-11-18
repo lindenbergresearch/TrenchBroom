@@ -88,11 +88,11 @@ QString SliderWithLabel::getValueLabel(const int value) {
         // use decimal numbers if factor is set != zero
         float factorized = float(value) * m_factor;
         QString fmt = m_format.isEmpty() ? "%.2f" : m_format;
-        labelText = labelText.sprintf(fmt.toStdString().c_str(), factorized);
+        labelText = QString::asprintf(fmt.toStdString().c_str(), factorized);
     } else {
         // use int by default, if factor == zero
         QString fmt = m_format.isEmpty() ? "%d" : m_format;
-        labelText = labelText.sprintf(fmt.toStdString().c_str(), value);;
+        labelText = QString::asprintf(fmt.toStdString().c_str(), value);;
     }
 
     return labelText;

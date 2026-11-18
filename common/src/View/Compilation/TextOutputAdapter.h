@@ -33,15 +33,15 @@ namespace TrenchBroom {
 namespace View {
 
 namespace Ascii {
-static QChar ESC = 0x1b; // Escape character
-static QChar BEL = 0x07; // Terminal bell
-static QChar BS = 0x08;  // Backspace
-static QChar HT = 0x09;  // Horizontal TAB
-static QChar LF = 0x0A;  // Linefeed (newline)
-static QChar VT = 0x0B;  // Vertical TAB
-static QChar FF = 0x0C;  // Form-feed (also: New page NP)
-static QChar CR = 0x0D;  // Carriage return
-static QChar DEL = 0x7F; // Delete character
+static const QChar ESC{char16_t(0x1b)}; // Escape character
+static const QChar BEL{char16_t(0x07)}; // Terminal bell
+static const QChar BS{char16_t(0x08)};  // Backspace
+static const QChar HT{char16_t(0x09)};  // Horizontal TAB
+static const QChar LF{char16_t(0x0A)};  // Linefeed (newline)
+static const QChar VT{char16_t(0x0B)};  // Vertical TAB
+static const QChar FF{char16_t(0x0C)};  // Form-feed (also: New page NP)
+static const QChar CR{char16_t(0x0D)};  // Carriage return
+static const QChar DEL{char16_t(0x7F)}; // Delete character
 
 // start and end indicator bytes
 static QChar SCREEN_CMD_START = '[';

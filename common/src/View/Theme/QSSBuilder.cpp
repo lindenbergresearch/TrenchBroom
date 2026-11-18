@@ -79,7 +79,7 @@ bool QSSBuilder::update(const ThemeValues& values) {
     for (auto i = 0; i < m_text.size();) {
         const auto c = m_text[i];
         if (inComment) {
-            if (m_text.midRef(i, 2) == "*/") {
+            if (QStringView{m_text}.mid(i, 2) == u"*/") {
                 output += "*/";
                 i += 2;
                 inComment = false;
@@ -87,13 +87,13 @@ bool QSSBuilder::update(const ThemeValues& values) {
                 output += m_text[i++];
             continue;
         }
-        if (quote.isNull() && m_text.midRef(i, 2) == "/*") {
+        if (quote.isNull() && QStringView{m_text}.mid(i, 2) == u"/*") {
             output += "/*";
             i += 2;
             inComment = true;
             continue;
         }
-        if (quote.isNull() && m_text.midRef(i, 4).compare(QStringLiteral("url("), Qt::CaseInsensitive) == 0) {
+        if (quote.isNull() && QStringView{m_text}.mid(i, 4).compare(u"url(", Qt::CaseInsensitive) == 0) {
             output += m_text.mid(i, 4);
             i += 4;
             inUrl = true;
@@ -104,7 +104,7 @@ bool QSSBuilder::update(const ThemeValues& values) {
             i += 2;
             continue;
         }
-        if (m_text.midRef(i, 2) == "${") {
+        if (QStringView{m_text}.mid(i, 2) == u"${") {
             const auto end = m_text.indexOf('}', i + 2);
             if (end < 0) {
                 report(i, "Unclosed theme placeholder");

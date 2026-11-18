@@ -172,8 +172,8 @@ void InputEventRecorder::recordEvent(const QKeyEvent &qEvent) {
 void InputEventRecorder::recordEvent(const QMouseEvent &qEvent) {
     auto type = getEventType(qEvent);
     auto button = getButton(qEvent);
-    const auto posX = static_cast<float>(qEvent.localPos().x());
-    const auto posY = static_cast<float>(qEvent.localPos().y());
+    const auto posX = static_cast<float>(qEvent.position().x());
+    const auto posY = static_cast<float>(qEvent.position().y());
 
     const auto wheelAxis = MouseEvent::WheelAxis::None;
     const float scrollDistance = 0.0f;
@@ -259,8 +259,8 @@ QPointF InputEventRecorder::scrollLinesForEvent(const QWheelEvent &qtEvent) {
 void InputEventRecorder::recordEvent(const QWheelEvent &qtEvent) {
     // These are the mouse X and Y position, not the wheel delta, in points relative to top
     // left of widget.
-    const auto posX = static_cast<float>(qtEvent.x());
-    const auto posY = static_cast<float>(qtEvent.y());
+    const auto posX = static_cast<float>(qtEvent.position().x());
+    const auto posY = static_cast<float>(qtEvent.position().y());
 
     // Number of "lines" to scroll
     QPointF scrollDistance = scrollLinesForEvent(qtEvent);

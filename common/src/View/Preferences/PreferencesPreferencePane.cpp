@@ -175,6 +175,6 @@ bool PreferencesPreferencePane::doValidate() {
 }
 
 void PreferencesPreferencePane::updateLabel() {
-    infoLabel->setText(tr("Number of preferences found: ") + QString{}.sprintf("%d", m_proxy->rowCount(m_proxy->index(0, 0))));
+    infoLabel->setText(tr("Number of preferences found: ") + QString::asprintf("%d", m_proxy->rowCount(m_proxy->index(0, 0))));
 }
 } // namespace TrenchBroom::View

@@ -268,17 +268,12 @@ public:
         painter->drawPixmap(rect, rasterize(rect.size() * scale, scale, mode, state));
     }
 
-    void virtual_hook(const int id, void* data) override {
-        if (id == IsNullHook) {
-            *static_cast<bool*>(data) = !m_sources->off && !m_sources->on;
-        } else if (id == ScaledPixmapHook) {
-            // In Qt 5 the size passed to this hook is already in physical pixels.
-            auto& request = *static_cast<ScaledPixmapArgument*>(data);
-            request.pixmap = rasterize(request.size, request.scale, request.mode, request.state);
-        } else {
-            QIconEngine::virtual_hook(id, data);
-        }
+    bool isNull() override { return !m_sources->off && !m_sources->on; }
+
+    QPixmap scaledPixmap(const QSize& size, QIcon::Mode mode, QIcon::State state, qreal scale) override {
+        return rasterize(size * scale, scale, mode, state);
     }
+
 };
 
 VectorIcon IconCache::load(const std::filesystem::path& path) {

@@ -199,12 +199,7 @@ template<typename... Args> void checkEventQueue(InputEventRecorder &r, Args &&..
 }
 
 inline QWheelEvent makeWheelEvent(const QPoint &angleDelta) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
-    return QWheelEvent({}, {}, {}, angleDelta, Qt::NoButton, 0, Qt::ScrollUpdate, false);
-#else
-    return QWheelEvent(
-      {}, {}, {}, angleDelta, 0, Qt::Orientation::Horizontal, Qt::NoButton, 0);
-#endif
+    return QWheelEvent({}, {}, {}, angleDelta, Qt::NoButton, Qt::NoModifier, Qt::ScrollUpdate, false);
 }
 
 TEST_CASE("InputEventRecorderTest.recordKeyEvents")
@@ -212,10 +207,10 @@ TEST_CASE("InputEventRecorderTest.recordKeyEvents")
 InputEventRecorder r;
 
 r.
-recordEvent(QKeyEvent(QEvent::KeyPress, 0, 0, 0, 0)
+recordEvent(QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier)
 );
 r.
-recordEvent(QKeyEvent(QEvent::KeyRelease, 0, 0, 0, 0)
+recordEvent(QKeyEvent(QEvent::KeyRelease, 0, Qt::NoModifier)
 );
 
 checkEventQueue(r, KeyEvent(KeyEvent::Type::Down), KeyEvent(KeyEvent::Type::Up)
@@ -227,10 +222,10 @@ TEST_CASE("InputEventRecorderTest.recordLeftClick")
 InputEventRecorder r;
 
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -243,16 +238,16 @@ TEST_CASE("InputEventRecorderTest.recordLeftDoubleClick")
 InputEventRecorder r;
 
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonDblClick, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonDblClick, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -268,7 +263,7 @@ r.
 recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::MetaModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -281,10 +276,10 @@ TEST_CASE("InputEventRecorderTest.recordRightClick")
 InputEventRecorder r;
 
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::RightButton, Qt::RightButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::RightButton, Qt::RightButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::RightButton, Qt::RightButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {2.0f, 5.0f}, {}, {}, Qt::RightButton, Qt::RightButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -299,11 +294,11 @@ InputEventRecorder r;
 using namespace std::chrono_literals;
 r.
 recordEvent(
-    QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::NoButton, Qt::NoButton, 0)
+    QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::NoButton, Qt::NoButton, Qt::NoModifier)
 );
 r.
 recordEvent(
-    QMouseEvent(QEvent::MouseMove, {12.0f, 8.0f}, {}, {}, Qt::NoButton, Qt::NoButton, 0)
+    QMouseEvent(QEvent::MouseMove, {12.0f, 8.0f}, {}, {}, Qt::NoButton, Qt::NoButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -408,13 +403,13 @@ InputEventRecorder r;
 
 using namespace std::chrono_literals;
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseMove, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseMove, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -428,14 +423,14 @@ InputEventRecorder r;
 
 using namespace std::chrono_literals;
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseMove, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseMove, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 std::this_thread::sleep_for(200ms);
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {4.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -449,13 +444,13 @@ InputEventRecorder r;
 
 using namespace std::chrono_literals;
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -469,14 +464,14 @@ InputEventRecorder r;
 
 using namespace std::chrono_literals;
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 std::this_thread::sleep_for(200ms);
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
@@ -490,21 +485,40 @@ InputEventRecorder r;
 
 using namespace std::chrono_literals;
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonPress, {2.0f, 5.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseMove, {6.0f, 3.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 std::this_thread::sleep_for(200ms);
 r.
-recordEvent(QMouseEvent(QEvent::MouseMove, {12.0f, 8.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseMove, {12.0f, 8.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 r.
-recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {12.0f, 8.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, 0)
+recordEvent(QMouseEvent(QEvent::MouseButtonRelease, {12.0f, 8.0f}, {}, {}, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier)
 );
 
 checkEventQueue(
     r, MouseEvent(MouseEvent::Type::Down, MouseEvent::Button::Left, MouseEvent::WheelAxis::None, 2, 5, 0.0f), MouseEvent(MouseEvent::Type::DragStart, MouseEvent::Button::Left, MouseEvent::WheelAxis::None, 2, 5, 0.0f), MouseEvent(MouseEvent::Type::Drag, MouseEvent::Button::Left, MouseEvent::WheelAxis::None, 12, 8, 0.0f), MouseEvent(MouseEvent::Type::DragEnd, MouseEvent::Button::Left, MouseEvent::WheelAxis::None, 12, 8, 0.0f), MouseEvent(MouseEvent::Type::Up, MouseEvent::Button::Left, MouseEvent::WheelAxis::None, 12, 8, 0.0f)
 );
-}} // namespace View
+}TEST_CASE("InputEventRecorder preserves fractional mouse coordinates", "[qt6][input]") {
+    InputEventRecorder recorder;
+    const QPointF point{2.125, 5.75};
+    recorder.recordEvent(QMouseEvent{QEvent::MouseMove, point, point, point,
+        Qt::NoButton, Qt::NoButton, Qt::NoModifier});
+    checkEventQueue(recorder, MouseEvent{MouseEvent::Type::Motion, MouseEvent::Button::None,
+        MouseEvent::WheelAxis::None, 2.125f, 5.75f, 0.0f});
+}
+
+TEST_CASE("InputEventRecorder preserves fractional wheel coordinates", "[qt6][input]") {
+    InputEventRecorder recorder;
+    const QPointF point{2.125, 5.75};
+    const QWheelEvent event{point, point, {}, {0, 120}, Qt::NoButton, Qt::NoModifier, Qt::ScrollUpdate, false};
+    const auto lines = float(InputEventRecorder::scrollLinesForEvent(event).y());
+    recorder.recordEvent(event);
+    checkEventQueue(recorder, MouseEvent{MouseEvent::Type::Scroll, MouseEvent::Button::None,
+        MouseEvent::WheelAxis::Vertical, 2.125f, 5.75f, lines});
+}
+
+} // namespace View
 } // namespace TrenchBroom

@@ -48,7 +48,7 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
             case Index:
-                return QString{}.sprintf("%d", index.row());
+                return QString::asprintf("%d", index.row());
             case Context:
                 return QString::fromStdString(kdl::path_front(preferenceBase->path()).string());
             case Path:
@@ -143,20 +143,20 @@ StringTuple3 PreferenceModel::getInfo(PreferenceBase *preferenceBase) const {
 
     if (Preference<float> *preference = dynamic_cast<Preference<float> *>(preferenceBase)) {
         name = "float";
-        value = QString{}.sprintf("%f", pref(*preference));
-        defaultValue = QString{}.sprintf("%f", preference->defaultValue());
+        value = QString::asprintf("%f", pref(*preference));
+        defaultValue = QString::asprintf("%f", preference->defaultValue());
     }
 
     if (Preference<double> *preference = dynamic_cast<Preference<double> *>(preferenceBase)) {
         name = "double";
-        value = QString{}.sprintf("%f", pref(*preference));
-        defaultValue = QString{}.sprintf("%f", preference->defaultValue());
+        value = QString::asprintf("%f", pref(*preference));
+        defaultValue = QString::asprintf("%f", preference->defaultValue());
     }
 
     if (Preference<int> *preference = dynamic_cast<Preference<int> *>(preferenceBase)) {
         name = "int";
-        value = QString{}.sprintf("%d", pref(*preference)); // yvonne.lehmann@plus.aok.de
-        defaultValue = QString{}.sprintf("%d", preference->defaultValue());
+        value = QString::asprintf("%d", pref(*preference)); // yvonne.lehmann@plus.aok.de
+        defaultValue = QString::asprintf("%d", preference->defaultValue());
     }
 
     if (Preference<Color> *preference = dynamic_cast<Preference<Color> *>(preferenceBase)) {

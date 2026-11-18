@@ -19,12 +19,14 @@
 #include "View/Inspector/ViewSettings/ViewEditor.h"
 
 #include <QCheckBox>
+#include <QElapsedTimer>
+#include <QTest>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QMediaPlayer>
-#include <QMediaPlaylist>
+#include <QAudioOutput>
 #include <QTabWidget>
 #include <QTemporaryDir>
 #include <QTextBlock>
@@ -314,28 +316,70 @@ TEST_CASE_METHOD(BrushUpstreamTest, "Audio selection preview stops and follows o
     auto* player = preview.findChild<QMediaPlayer*>();
     REQUIRE(player);
     document->selectNodes({entity});
-    REQUIRE(player->playlist()->mediaCount() == 1);
-    CHECK(player->playlist()->playbackMode() == QMediaPlaylist::CurrentItemOnce);
-    const auto url = player->playlist()->currentMedia().canonicalUrl();
+    REQUIRE(!player->source().isEmpty());
+    CHECK(player->loops() == QMediaPlayer::Once);
+    const auto url = player->source();
     CHECK(QFile::exists(url.toLocalFile()));
     setPref(Preferences::LoopEntityAudio, true);
     PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::LoopEntityAudio.path());
-    CHECK(player->playlist()->playbackMode() == QMediaPlaylist::CurrentItemInLoop);
-    CHECK(player->playlist()->currentMedia().canonicalUrl() == url);
+    CHECK(player->loops() == QMediaPlayer::Infinite);
+    CHECK(player->source() == url);
     document->selectNodes({other});
-    CHECK(player->playlist()->isEmpty());
+    CHECK(player->source().isEmpty());
     CHECK_FALSE(QFile::exists(url.toLocalFile()));
     document->deselectAll();
     document->selectNodes({entity});
-    REQUIRE(player->playlist()->mediaCount() == 1);
+    REQUIRE(!player->source().isEmpty());
     setPref(Preferences::PreviewEntityAudio, false);
     PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::PreviewEntityAudio.path());
-    CHECK(player->playlist()->isEmpty());
+    CHECK(player->source().isEmpty());
     setPref(Preferences::PreviewEntityAudio, true);
     PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::PreviewEntityAudio.path());
-    REQUIRE(player->playlist()->mediaCount() == 1);
+    REQUIRE(!player->source().isEmpty());
     document->deleteObjects();
-    CHECK(player->playlist()->isEmpty());
+    CHECK(player->source().isEmpty());
+}
+
+TEST_CASE_METHOD(BrushUpstreamTest, "Native audio preview completes once and resumes in a loop", "[.native-audio][audio]") {
+    const TemporarilySetPref enabled{Preferences::PreviewEntityAudio, true};
+    const TemporarilySetPref loop{Preferences::LoopEntityAudio, false};
+    const TemporarilySetPref volume{Preferences::EntityAudioVolume, 0};
+    QTemporaryDir folder;
+    writeExtensionFile(folder.path() + "/sound/native.wav", silentWave());
+    game->setGamePath(std::filesystem::path{folder.path().toStdString()}, logger);
+    newMap();
+    auto* entity = new Model::EntityNode{{}, {{"classname", "target_speaker"}, {"noise", "native.wav"}}};
+    document->addNodes({{document->world()->defaultLayer(), {entity}}});
+    EntityAudioPreview preview{document};
+    auto* player = preview.findChild<QMediaPlayer*>();
+    auto* output = preview.findChild<QAudioOutput*>();
+    REQUIRE(player);
+    REQUIRE(output);
+    document->selectNodes({entity});
+    REQUIRE(output->volume() == 0.0f);
+    const auto source = player->source();
+    REQUIRE_FALSE(source.isEmpty());
+    const auto waitFor = [](auto predicate, int timeout) {
+        QElapsedTimer timer;
+        timer.start();
+        while (!predicate() && timer.elapsed() < timeout) QTest::qWait(10);
+        return predicate();
+    };
+    INFO(player->errorString().toStdString());
+    REQUIRE(waitFor([&] { return player->duration() > 0; }, 5000));
+    REQUIRE(waitFor([&] { return player->mediaStatus() == QMediaPlayer::EndOfMedia; }, 8000));
+    CHECK(player->error() == QMediaPlayer::NoError);
+    CHECK(player->source() == source);
+    setPref(Preferences::LoopEntityAudio, true);
+    PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::LoopEntityAudio.path());
+    REQUIRE(waitFor([&] { return player->playbackState() == QMediaPlayer::PlayingState; }, 5000));
+    QTest::qWait(4500);
+    CHECK(player->playbackState() == QMediaPlayer::PlayingState);
+    CHECK(player->source() == source);
+    CHECK(player->error() == QMediaPlayer::NoError);
+    document->deselectAll();
+    CHECK(player->source().isEmpty());
+    CHECK_FALSE(QFile::exists(source.toLocalFile()));
 }
 
 TEST_CASE_METHOD(BrushUpstreamTest, "Audio preview controls persist and disable dependent options", "[entity-extensions][audio]") {
@@ -377,7 +421,7 @@ TEST_CASE_METHOD(BrushUpstreamTest, "Destroying an active audio preview removes 
     auto* player = preview->findChild<QMediaPlayer*>();
     REQUIRE(player);
     document->selectNodes({entity});
-    const auto path = player->playlist()->currentMedia().canonicalUrl().toLocalFile();
+    const auto path = player->source().toLocalFile();
     REQUIRE(QFile::exists(path));
     preview.reset();
     CHECK_FALSE(QFile::exists(path));

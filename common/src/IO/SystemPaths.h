@@ -47,7 +47,9 @@ std::vector<std::filesystem::path> findResourceDirectories(const std::filesystem
 
 void setPortable();
 
-void setPortable(bool newState);
+// Supply the executable directory when enabling portable mode before the
+// QApplication exists (e.g. while reading the initial OpenGL preferences).
+void setPortable(bool newState, std::filesystem::path executableDirectory = {});
 
 bool isPortable();
 } // namespace TrenchBroom::IO::SystemPaths

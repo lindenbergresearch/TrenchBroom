@@ -91,7 +91,7 @@ namespace {
             auto firstString = true;
             auto inComment = previousBlockState() == 1;
             while (i < text.size()) {
-                if (inComment || text.midRef(i, 2) == "/*") {
+                if (inComment || QStringView{text}.mid(i, 2) == u"/*") {
                     const auto end = text.indexOf("*/", i + (inComment ? 0 : 2));
                     paint(i, end < 0 ? text.size() - i : end + 2 - i, m_editor.commentColor());
                     if (end < 0) {
@@ -100,7 +100,7 @@ namespace {
                     }
                     i = end + 2;
                     inComment = false;
-                } else if (text.midRef(i, 2) == "//") {
+                } else if (QStringView{text}.mid(i, 2) == u"//") {
                     paint(i, text.size() - i, m_editor.commentColor());
                     return;
                 } else if (text[i] == '"') {
@@ -111,7 +111,7 @@ namespace {
                         else if (text[i++] == '"')
                             break;
                     }
-                    paint(start, std::min(i, text.size()) - start, !m_fgd && firstString ? m_editor.propertyColor() : m_editor.stringColor());
+                    paint(start, std::min(i, int(text.size())) - start, !m_fgd && firstString ? m_editor.propertyColor() : m_editor.stringColor());
                     firstString = false;
                 } else if (text[i].isLetter() || text[i] == '@' || text[i] == '_') {
                     const auto start = i++;

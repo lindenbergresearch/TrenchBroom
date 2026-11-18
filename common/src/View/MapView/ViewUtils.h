@@ -25,7 +25,7 @@ class QWidget;
 
 class QString;
 
-class QStringList;
+#include <QStringList>
 
 namespace TrenchBroom {
 class Logger;

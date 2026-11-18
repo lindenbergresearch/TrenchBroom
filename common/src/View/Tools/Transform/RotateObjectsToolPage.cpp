@@ -106,7 +106,7 @@ void RotateObjectsToolPage::createGui() {
 
     m_updateAnglePropertyAfterTransformCheckBox = new QCheckBox{tr("Update entity properties")};
 
-    connect(m_recentlyUsedCentersList, QOverload<const QString &>::of(&QComboBox::activated), this, &RotateObjectsToolPage::centerChanged);
+    connect(m_recentlyUsedCentersList, &QComboBox::textActivated, this, &RotateObjectsToolPage::centerChanged);
     connect(m_resetCenterButton, &QAbstractButton::clicked, this, &RotateObjectsToolPage::resetCenterClicked);
     connect(m_angle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &RotateObjectsToolPage::angleChanged);
     connect(m_rotateButton, &QAbstractButton::clicked, this, &RotateObjectsToolPage::rotateClicked);

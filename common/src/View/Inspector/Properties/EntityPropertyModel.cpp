@@ -652,7 +652,7 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
         if (!row.multi()) {
             const auto paths = mapStringToUnicode(document->encoding(), row.value()).split(';', Qt::SkipEmptyParts);
             QStringList names;
-            const auto visibleCount = std::min(2, paths.size());
+            const auto visibleCount = std::min(qsizetype{2}, paths.size());
             for (int i = 0; i < visibleCount; ++i) {
                 auto path = paths[i];
                 path.replace('\\', '/');

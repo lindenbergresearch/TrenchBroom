@@ -7,10 +7,10 @@
   },
   "configurePresets": [
     {
-      "name": "qt5-cpm",
-      "displayName": "Qt 5 / CPM (migration reference)",
+      "name": "qt6-cpm",
+      "displayName": "Qt 6 / CPM",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/cmake-build-cpm-qt5",
+      "binaryDir": "${sourceDir}/cmake-build-cpm-qt6",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": true,
@@ -21,12 +21,29 @@
           "value": false
         }
       }
+    },
+    {
+      "name": "qt6-cpm-debug",
+      "displayName": "Qt 6 / CPM (Debug)",
+      "inherits": "qt6-cpm",
+      "binaryDir": "${sourceDir}/cmake-build-cpm-qt6-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     }
   ],
   "buildPresets": [
     {
-      "name": "qt5-cpm",
-      "configurePreset": "qt5-cpm",
+      "name": "qt6-cpm",
+      "configurePreset": "qt6-cpm",
+      "targets": [
+        "TrenchBroom",
+        "tb-regression-tests"
+      ]
+    },
+    {
+      "name": "qt6-cpm-debug",
+      "configurePreset": "qt6-cpm-debug",
       "targets": [
         "TrenchBroom",
         "tb-regression-tests"
@@ -35,8 +52,20 @@
   ],
   "testPresets": [
     {
-      "name": "qt5-cpm",
-      "configurePreset": "qt5-cpm",
+      "name": "qt6-cpm",
+      "configurePreset": "qt6-cpm",
+      "filter": {
+        "include": {
+          "name": "^tb-regression-tests$"
+        }
+      },
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "qt6-cpm-debug",
+      "configurePreset": "qt6-cpm-debug",
       "filter": {
         "include": {
           "name": "^tb-regression-tests$"

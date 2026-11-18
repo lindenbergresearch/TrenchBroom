@@ -272,7 +272,6 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     setQuitOnLastWindowClosed(false);
     #ifndef QT_NO_SESSIONMANAGER
     // Cocoa commits the session before sending Quit. Close editor frames before their palettes.
-    setFallbackSessionManagementEnabled(false);
     connect(this, &QGuiApplication::commitDataRequest, this, [this](QSessionManager& session) {
         if (session.allowsInteraction()) {
             if (!m_frameManager->closeAllFrames()) {

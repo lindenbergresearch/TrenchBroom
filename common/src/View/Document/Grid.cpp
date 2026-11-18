@@ -48,7 +48,7 @@ const QString Grid::asString(const int size) {
     auto gridSize = actualSize(size) / getScaleFactor();
     auto suffix = isMetric() ? "m" : "";
     QString str;
-    str = str.sprintf("%.1f%s", gridSize, suffix);
+    str = QString::asprintf("%.1f%s", gridSize, suffix);
 
     return str;
 }

@@ -48,7 +48,7 @@ class EntityPropertyTable : public QTableView {
 
     void keyPressEvent(QKeyEvent *event) override;
 
-    QStyleOptionViewItem viewOptions() const override;
+    void initViewItemOption(QStyleOptionViewItem* options) const override;
 
     void keyboardSearch(const QString &search) override;
 

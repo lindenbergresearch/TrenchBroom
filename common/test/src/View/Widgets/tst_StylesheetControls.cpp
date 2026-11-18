@@ -57,7 +57,7 @@ TEST_CASE("QSS styles existing messages while preserving external ANSI output", 
     output.pushSystemMessage("Error\n", MessageStyle::Error);
     output << "\033[32mExternal\033[0m\n";
     CHECK(characterFormat(edit, 0).foreground().color() == QColor("#cc1122"));
-    CHECK(characterFormat(edit, 0).fontWeight() == 75);
+    CHECK(characterFormat(edit, 0).fontWeight() == QFont::Bold);
     const auto ansi = characterFormat(edit, 6).foreground().color();
     CHECK_FALSE(characterFormat(edit, 6).hasProperty(SemanticTextEdit::RoleProperty));
     for (int i = 0; i < 300; ++i)
@@ -66,7 +66,7 @@ TEST_CASE("QSS styles existing messages while preserving external ANSI output", 
     for (int i = 0; i < 20; ++i)
         QApplication::processEvents();
     CHECK(characterFormat(edit, 0).foreground().color() == QColor("#2255bb"));
-    CHECK(characterFormat(edit, 0).fontWeight() == 50);
+    CHECK(characterFormat(edit, 0).fontWeight() == QFont::Normal);
     CHECK(characterFormat(edit, edit.toPlainText().lastIndexOf("Error")).foreground().color() == QColor("#2255bb"));
     CHECK(characterFormat(edit, 6).foreground().color() == ansi);
     CHECK(edit.font().pixelSize() == 19);
@@ -149,7 +149,7 @@ TEST_CASE("SVG picker grid and preview dimensions follow a stylesheet override",
     QApplication::processEvents();
     CHECK(grid->iconSize() == QSize(64, 64));
     CHECK(grid->gridSize() == QSize(144, 112));
-    REQUIRE(preview->pixmap());
-    CHECK(preview->pixmap()->width() / preview->pixmap()->devicePixelRatioF() == Approx(preview->contentsRect().width()));
+    REQUIRE_FALSE(preview->pixmap().isNull());
+    CHECK(preview->pixmap().width() / preview->pixmap().devicePixelRatioF() == Approx(preview->contentsRect().width()));
 }
 } // namespace TrenchBroom::View

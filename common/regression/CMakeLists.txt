@@ -3,6 +3,9 @@
 set(regression_sources
     Main.cpp
     tst_Dependencies.cpp
+    tst_Qt6.cpp
+    ../test/src/View/Input/tst_InputEvent.cpp
+    ../test/src/View/Prefabs/tst_Prefab.cpp
     ../test/src/TestPreferenceManager.cpp
     ../test/src/View/Document/tst_BulkSelection.cpp
     ../test/src/IO/tst_ArchiveNames.cpp
@@ -30,7 +33,7 @@ set(regression_sources
     ../test/src/View/Inspector/Properties/tst_WadProperty.cpp
 )
 add_executable(tb-regression-tests EXCLUDE_FROM_ALL ${regression_sources})
-target_link_libraries(tb-regression-tests PRIVATE common Catch2::Catch2 Qt5::Test)
+target_link_libraries(tb-regression-tests PRIVATE common Catch2::Catch2 Qt6::Test)
 target_include_directories(tb-regression-tests PRIVATE ../test/src)
 target_compile_definitions(tb-regression-tests PRIVATE CATCH_CONFIG_ENABLE_ALL_STRINGMAKERS=1)
 set_target_properties(tb-regression-tests PROPERTIES
@@ -50,19 +53,12 @@ foreach(resource cursor defaults fonts games shader stylesheets)
             "${APP_RESOURCE_DIR}/${resource}" "$<TARGET_FILE_DIR:tb-regression-tests>/${resource}")
 endforeach()
 add_dependencies(tb-regression-tests tb-regression-resources)
-if(WIN32)
+tb_deploy_windows_qt(tb-regression-tests)
+if(WIN32 AND TARGET Qt6::QOffscreenIntegrationPlugin)
     add_custom_command(TARGET tb-regression-tests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:tb-regression-tests>/platforms"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_RUNTIME_DLLS:tb-regression-tests> "$<TARGET_FILE_DIR:tb-regression-tests>"
-        COMMAND_EXPAND_LISTS)
-    foreach(plugin QWindowsIntegrationPlugin QOffscreenIntegrationPlugin)
-        if(TARGET Qt5::${plugin})
-            add_custom_command(TARGET tb-regression-tests POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:tb-regression-tests>/platforms"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "$<TARGET_FILE:Qt5::${plugin}>" "$<TARGET_FILE_DIR:tb-regression-tests>/platforms")
-        endif()
-    endforeach()
+            "$<TARGET_FILE:Qt6::QOffscreenIntegrationPlugin>" "$<TARGET_FILE_DIR:tb-regression-tests>/platforms")
 endif()
 add_test(NAME tb-regression-tests COMMAND tb-regression-tests)
 set_tests_properties(tb-regression-tests PROPERTIES

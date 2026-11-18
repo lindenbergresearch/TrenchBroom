@@ -24,6 +24,7 @@
 #include <QMenuBar>
 
 #include <QApplication>
+#include <QRegularExpression>
 #include <QChildEvent>
 #include <QClipboard>
 #include <QComboBox>
@@ -1376,7 +1377,7 @@ void MapFrame::selectByLineNumber() {
         }
 
         auto positions = std::vector<size_t>{};
-        for (const auto &token : string.split(QRegExp{"[, ]"})) {
+        for (const auto &token : string.split(QRegularExpression{"[, ]"})) {
             bool ok;
             const auto position = token.toLong(&ok);
             if (ok && position > 0) {

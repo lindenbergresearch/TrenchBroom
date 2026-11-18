@@ -14,6 +14,7 @@
 #include <QRawFont>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 
 namespace TrenchBroom::View {
@@ -24,9 +25,8 @@ QFont fileFont(const QString &path) {
     static QHash<QString, QFont> fonts;
     if (const auto found = fonts.constFind(path); found != fonts.cend()) return found.value();
 
-    QFontDatabase database;
-    const auto id = database.addApplicationFont(path);
-    const auto families = database.applicationFontFamilies(id);
+    const auto id = QFontDatabase::addApplicationFont(path);
+    const auto families = QFontDatabase::applicationFontFamilies(id);
     auto font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
 
     if (!families.isEmpty()) {
@@ -34,7 +34,7 @@ QFont fileFont(const QString &path) {
         const auto raw = QRawFont(path, 26.0, QFont::PreferNoHinting);
         if (raw.isValid()) {
             font.setStyleName(raw.styleName());
-            font.setWeight(raw.weight());
+            font.setWeight(QFont::Weight(raw.weight()));
             font.setStyle(raw.style());
         }
     } else {
@@ -50,13 +50,24 @@ int minimumSize() {
 }
 }
 
+QFont::Weight normalizedFontWeight(int weight) {
+    if (weight >= 0 && weight <= 99) {
+        constexpr std::array legacy{0, 12, 25, 50, 57, 63, 75, 81, 87, 99};
+        constexpr std::array css{100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
+        const auto next = std::lower_bound(legacy.begin(), legacy.end(), weight);
+        const auto index = size_t(next - legacy.begin());
+        if (index == 0 || *next == weight) return QFont::Weight(css[index]);
+        const auto fraction = qreal(weight - legacy[index - 1]) / (legacy[index] - legacy[index - 1]);
+        return QFont::Weight(qRound(css[index - 1] + fraction * (css[index] - css[index - 1])));
+    }
+    return QFont::Weight(std::clamp(weight, 1, 1000));
+}
+
 QFont loadFont(const std::filesystem::path &path, int pixelSize) {
     auto font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
     if (!path.empty() && path != "[system]") {
         const auto name = IO::pathAsQString(path);
-        const QFontDatabase database;
-
-        if (database.hasFamily(name)) {
+        if (QFontDatabase::hasFamily(name)) {
             font = QFont(name);
         } else {
             const auto file = IO::SystemPaths::findResourceFile(path);

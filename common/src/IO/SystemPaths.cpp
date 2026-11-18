@@ -29,11 +29,13 @@
 #include "IO/PathQt.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace TrenchBroom::IO::SystemPaths {
 
 bool portableState = false;
+std::filesystem::path portableExecutableDirectory;
 
 bool isPortable() {
     return portableState;
@@ -43,8 +45,9 @@ void setPortable() {
     setPortable(true);
 }
 
-void setPortable(bool newState) {
+void setPortable(bool newState, std::filesystem::path executableDirectory) {
     portableState = newState;
+    portableExecutableDirectory = std::move(executableDirectory);
 }
 
 std::filesystem::path appDirectory() {
@@ -53,7 +56,7 @@ std::filesystem::path appDirectory() {
 
 std::filesystem::path userDataDirectory() {
     if (isPortable()) {
-        return appDirectory() / "config";
+        return (portableExecutableDirectory.empty() ? appDirectory() : portableExecutableDirectory) / "config";
     }
 #if defined __linux__ || defined __FreeBSD__
     // Compatibility with wxWidgets

@@ -13,7 +13,7 @@
 #include <optional>
 
 class QMediaPlayer;
-class QMediaPlaylist;
+class QAudioOutput;
 class QWidget;
 
 namespace TrenchBroom::Model {
@@ -35,7 +35,7 @@ class EntityAudioPreview : public QObject {
     std::weak_ptr<MapDocument> m_document;
     QPointer<LayerListBox> m_tree;
     QMediaPlayer* m_player;
-    QMediaPlaylist* m_playlist;
+    QAudioOutput* m_audioOutput;
     QTemporaryDir m_directory;
     QString m_temporaryFile;
     const Model::EntityNode* m_selected = nullptr;

@@ -17,7 +17,7 @@
 #include <QEvent>
 #include <QFile>
 #include <QMediaPlayer>
-#include <QMediaPlaylist>
+#include <QAudioOutput>
 #include <QTemporaryFile>
 #include <QTimer>
 #include <QUrl>
@@ -89,10 +89,11 @@ Result<QByteArray> readEntityAudio(const MapDocument& document, const std::files
 }
 
 EntityAudioPreview::EntityAudioPreview(std::weak_ptr<MapDocument> document, QWidget* parent)
-    : QObject{parent}, m_document{std::move(document)}, m_player{new QMediaPlayer{this}}, m_playlist{new QMediaPlaylist{this}} {
+    : QObject{parent}, m_document{std::move(document)}, m_player{new QMediaPlayer{this}}, m_audioOutput{new QAudioOutput{this}} {
     setObjectName("entityAudioPreview");
     m_player->setObjectName("entityAudioPlayer");
-    m_player->setPlaylist(m_playlist);
+    m_audioOutput->setObjectName("entityAudioOutput");
+    m_player->setAudioOutput(m_audioOutput);
     if (parent) {
         parent->installEventFilter(this);
         m_tree = parent->findChild<LayerListBox*>();
@@ -119,7 +120,7 @@ EntityAudioPreview::EntityAudioPreview(std::weak_ptr<MapDocument> document, QWid
     connect(qApp, &QGuiApplication::applicationStateChanged, this, [this](const auto state) {
         if (state != Qt::ApplicationActive) stop();
     });
-    connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this, [this](const auto error) {
+    connect(m_player, &QMediaPlayer::errorOccurred, this, [this](const auto error, const QString&) {
         if (error != QMediaPlayer::NoError)
             if (const auto doc = m_document.lock()) doc->logger().warn() << "Audio preview: " << m_player->errorString().toStdString();
     });
@@ -129,7 +130,7 @@ EntityAudioPreview::~EntityAudioPreview() {
     stop();
     // Release backend file handles before the temporary directory is removed.
     delete m_player;
-    delete m_playlist;
+    delete m_audioOutput;
 }
 
 bool EntityAudioPreview::windowActive() const {
@@ -141,7 +142,7 @@ bool EntityAudioPreview::windowActive() const {
 
 void EntityAudioPreview::stop() {
     m_player->stop();
-    m_playlist->clear();
+    m_player->setSource({});
     if (!m_temporaryFile.isEmpty()) {
         QFile::remove(m_temporaryFile);
         m_temporaryFile.clear();
@@ -160,13 +161,13 @@ void EntityAudioPreview::refresh() {
     const auto* node = m_treeSelection && m_tree ? m_tree->singleSelectedTreeNode() : selected.size() == 1 ? selected.front() : nullptr;
     const auto* entity = dynamic_cast<const Model::EntityNode*>(node);
     const auto path = entity ? entityAudioPath(entity->entity()) : std::nullopt;
-    m_playlist->setPlaybackMode(pref(Preferences::LoopEntityAudio) ? QMediaPlaylist::CurrentItemInLoop : QMediaPlaylist::CurrentItemOnce);
-    m_player->setVolume(std::clamp(pref(Preferences::EntityAudioVolume), 0, 100));
+    m_player->setLoops(pref(Preferences::LoopEntityAudio) ? QMediaPlayer::Infinite : QMediaPlayer::Once);
+    m_audioOutput->setVolume(std::clamp(pref(Preferences::EntityAudioVolume), 0, 100) / 100.0f);
     if (entity == m_selected && path.value_or(std::filesystem::path{}) == m_path) {
-        // Some backends clear the active playlist item after a single pass, so
-        // the media status is already NoMedia rather than EndOfMedia here.
-        if (path && pref(Preferences::LoopEntityAudio) && m_player->state() == QMediaPlayer::StoppedState && m_player->error() == QMediaPlayer::NoError && m_playlist->mediaCount() == 1) {
-            m_playlist->setCurrentIndex(0);
+        // Enabling looping after the one-shot preview ended should resume it,
+        // without reloading the resource or creating another temporary file.
+        if (path && pref(Preferences::LoopEntityAudio) && m_player->playbackState() == QMediaPlayer::StoppedState && m_player->error() == QMediaPlayer::NoError && !m_player->source().isEmpty()) {
+            m_player->setPosition(0);
             m_player->play();
         }
         return;
@@ -189,8 +190,7 @@ void EntityAudioPreview::refresh() {
     m_temporaryFile = file.fileName();
     file.setAutoRemove(false);
     file.close();
-    m_playlist->addMedia(QUrl::fromLocalFile(m_temporaryFile));
-    m_playlist->setCurrentIndex(0);
+    m_player->setSource(QUrl::fromLocalFile(m_temporaryFile));
     m_player->play();
 }
 

@@ -325,7 +325,7 @@ PrefabAssetPaths PrefabLibrary::materializeAssets(const PrefabInfo& info) const 
             const auto digest = checkedDigest(asset);
             const auto cache = asset.value("Cache").toString();
             const auto prefix = ".wad-cache/" + digest + '/';
-            if (!cache.startsWith(prefix) || cache.midRef(prefix.size()).contains('/')
+            if (!cache.startsWith(prefix) || QStringView{cache}.mid(prefix.size()).contains(u'/')
                 || normalizedPath(cache.mid(prefix.size())) != cache.mid(prefix.size())) fail("Invalid shared WAD reference");
             checkParents(m_root, cache);
             const auto path = m_root + '/' + cache;

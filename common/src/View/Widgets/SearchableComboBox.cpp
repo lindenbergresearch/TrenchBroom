@@ -61,7 +61,7 @@ namespace {
                     match.setFontWeight(QFont::Bold);
                     if (m_combo.matchForeground().isValid()) match.setForeground(m_combo.matchForeground());
                     if (m_combo.matchBackground().isValid()) match.setBackground(m_combo.matchBackground());
-                    formats.push_back({offset, query.size(), match});
+                    formats.push_back({int(offset), int(query.size()), match});
                 }
             }
             layout.setFormats(formats);

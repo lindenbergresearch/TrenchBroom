@@ -1,4 +1,5 @@
 #include "View/Widgets/Info/SemanticTextEdit.h"
+#include "View/Preferences/FontUtils.h"
 
 #include <QElapsedTimer>
 #include <QEvent>
@@ -27,7 +28,7 @@ void SemanticTextEdit::setMessageColor(MessageStyle role, QColor color) {
 }
 
 void SemanticTextEdit::setSystemFontWeight(int weight) {
-    weight = std::clamp(weight, 0, 99);
+    weight = normalizedFontWeight(weight);
     if (weight == m_systemFontWeight) return;
     m_systemFontWeight = weight;
     scheduleRestyle();
