@@ -23,6 +23,7 @@
 #include <QTextStream>
 
 #include "IO/PathQt.h"
+#include "IO/SystemPaths.h"
 #include "KeyStrings.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
@@ -237,7 +238,14 @@ int main(int argc, char* argv[])
   QTextStream out(&file);
   out.setCodec("UTF-8");
 
+  // A build helper must not load the developer's personal editor preferences.
+  TrenchBroom::IO::SystemPaths::setPortable();
   TrenchBroom::PreferenceManager::createInstance<TrenchBroom::AppPreferenceManager>();
+
+  if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
+  {
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+  }
 
   // QKeySequence requires that an application instance is created!
   QApplication app(argc, argv);

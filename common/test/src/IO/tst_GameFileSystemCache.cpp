@@ -1,3 +1,5 @@
+#include "Error.h"
+#include <kdl/result.h>
 #include "IO/DiskFileSystem.h"
 #include "IO/PathInfo.h"
 #include "IO/PathQt.h"

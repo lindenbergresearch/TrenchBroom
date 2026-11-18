@@ -1,3 +1,4 @@
+#include "PreferenceManager.h"
 #include "View/Tools/Brush/BrushUpstreamTest.h"
 #include "Preferences.h"
 #include "View/Preferences/ViewPreferencePane.h"

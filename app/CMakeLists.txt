@@ -157,8 +157,29 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
             get_target_property(TB_QMAKE_PATH Qt5::qmake IMPORTED_LOCATION)
             string(REPLACE "qmake" "macdeployqt" TB_MACDEPLOYQT_PATH "${TB_QMAKE_PATH}")
 
+            # Homebrew's Qt image plugins also depend on WebP dylibs. Their
+            # @rpath dependencies need an explicit search path during deployment.
+            find_library(TB_QT_WEBP_LIBRARY NAMES webp)
+            set(TB_MACDEPLOYQT_LIBRARY_PATH "")
+            if(TB_QT_WEBP_LIBRARY)
+                get_filename_component(TB_MACDEPLOYQT_LIBRARY_PATH "${TB_QT_WEBP_LIBRARY}" DIRECTORY)
+            endif()
+            # Resource-only edits also invalidate the bundle's resource seal.
+            set_property(TARGET ${APP_TARGET_NAME} APPEND PROPERTY LINK_DEPENDS
+                         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeployMacBundle.cmake" ${APP_SOURCE})
+            if(${SHOULD_BUILD_MANUAL})
+                set_property(TARGET ${APP_TARGET_NAME} APPEND PROPERTY LINK_DEPENDS
+                             ${INDEX_OUTPUT_PATH} ${DOC_MANUAL_TARGET_FILES_ABSOLUTE}
+                             ${DOC_MANUAL_SHORTCUTS_JS_TARGET_ABSOLUTE} ${DOC_MANUAL_TARGET_IMAGE_FILES_ABSOLUTE})
+            endif()
             add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                               COMMAND "${TB_MACDEPLOYQT_PATH}" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../..")
+                               COMMAND ${CMAKE_COMMAND}
+                                       "-DTB_APP_BUNDLE=$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../.."
+                                       "-DTB_MACDEPLOYQT=${TB_MACDEPLOYQT_PATH}"
+                                       "-DTB_MACDEPLOYQT_LIBRARY_PATH=${TB_MACDEPLOYQT_LIBRARY_PATH}"
+                                       "-DTB_CODESIGN_IDENTITY=${TB_MAC_CODESIGN_IDENTITY}"
+                                       -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeployMacBundle.cmake"
+                               VERBATIM)
         endif ()
     endif ()
 
@@ -172,13 +193,6 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
 
         # Copy DLLs to app directory
         add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:assimp::assimp>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freeimage::FreeImage>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:freetype>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:tinyxml2::tinyxml2>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:miniz::miniz>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:fmt::fmt>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:GLEW::GLEW>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Widgets>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Gui>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt5::Core>" "$<TARGET_FILE_DIR:${APP_TARGET_NAME}>"

@@ -1,3 +1,6 @@
+#include "Error.h"
+#include "PreferenceManager.h"
+#include <kdl/result.h>
 #include "TestSourcePath.h"
 #include "Error.h"
 #include "IO/GameConfigParser.h"

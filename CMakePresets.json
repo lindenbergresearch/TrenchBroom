@@ -1,0 +1,50 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "qt5-cpm",
+      "displayName": "Qt 5 / CPM (migration reference)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/cmake-build-cpm-qt5",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+        "TB_ENABLE_CCACHE": true,
+        "TB_BUILD_REGRESSION_TESTS": true,
+        "TB_RUN_MACDEPLOYQT": {
+          "type": "BOOL",
+          "value": false
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "qt5-cpm",
+      "configurePreset": "qt5-cpm",
+      "targets": [
+        "TrenchBroom",
+        "tb-regression-tests"
+      ]
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "qt5-cpm",
+      "configurePreset": "qt5-cpm",
+      "filter": {
+        "include": {
+          "name": "^tb-regression-tests$"
+        }
+      },
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

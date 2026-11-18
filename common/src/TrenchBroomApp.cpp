@@ -329,6 +329,7 @@ TrenchBroomApp::~TrenchBroomApp() {
 
 void TrenchBroomApp::parseCommandLineAndShowFrame() {
     auto parser = QCommandLineParser{};
+    parser.addOption({"portable", "Store settings next to the executable."});
     parser.process(*this);
     openFilesOrWelcomeFrame(parser.positionalArguments());
 }

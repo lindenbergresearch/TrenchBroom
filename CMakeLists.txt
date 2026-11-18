@@ -1,6 +1,12 @@
-# Using target_link_library to link an object library to qt requires 3.12
-# 3.14 is required for generator expressions in install(CODE)
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.28)
+
+# A vcpkg-configured build directory cannot safely be reused with CPM. Check
+# before project() loads the cached toolchain and installs any packages.
+if(CMAKE_TOOLCHAIN_FILE MATCHES "(^|[/\\\\])vcpkg([/\\\\]|\\.cmake)")
+    message(FATAL_ERROR
+        "This build directory uses the old vcpkg toolchain. Configure a fresh "
+        "directory with the qt5-cpm preset; see Build.md.")
+endif()
 
 # Fix warning with Ninja and cotire (see https://github.com/sakra/cotire/issues/81)
 if(POLICY CMP0058)
@@ -16,15 +22,6 @@ if(POLICY CMP0063)
     cmake_policy(SET CMP0063 NEW)
 endif()
 
-# Set policy CMP0167 to NEW for Boost handling
-if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)
-endif()
-
-# Specify vcpkg toolchain for dependency management
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
-set(VCPKG_OVERLAY_PORTS "${CMAKE_SOURCE_DIR}/vcpkg-overlay-ports/freeimage;${CMAKE_SOURCE_DIR}/vcpkg-overlay-ports/openexr")
-
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
@@ -38,21 +35,21 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT T
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # Using C and CXX because GLEW is C
-project(TrenchBroom C CXX OBJCXX)
+project(TrenchBroom LANGUAGES C CXX)
+if(APPLE)
+    enable_language(OBJCXX)
+endif()
 
-# Configure CCache if available and requested
-if(TB_ENABLE_CCACHE)
-    find_program(CCACHE_PATH ccache)
-
-    if(CCACHE_PATH)
-        message(STATUS "Found ccache: ${CCACHE_PATH}")
-
-        set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PATH}")
-        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PATH}")
-    endif(CCACHE_PATH)
-endif(TB_ENABLE_CCACHE)
+option(TB_ENABLE_CCACHE "Use ccache when available" ON)
+option(TB_BUILD_REGRESSION_TESTS "Provide the focused migration regression target" ON)
+option(TB_RUN_MACDEPLOYQT "Bundle Qt frameworks and plugins on macOS" OFF)
+if(APPLE)
+    set(TB_MAC_CODESIGN_IDENTITY "-" CACHE STRING "macOS signing identity; - signs local builds ad hoc")
+endif()
+include(cmake/CompilerCache.cmake)
 
 # Compiler detection
 set(COMPILER_IS_CLANG FALSE)
@@ -107,28 +104,11 @@ if(NOT PANDOC_PATH)
     endif()
 endif()
 
-# Prevent overriding the parent project's compiler/linker settings on Windows
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Prevent gtest from being installed
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-
-find_package(assimp CONFIG REQUIRED)
-find_package(freeimage CONFIG REQUIRED)
-find_package(freetype CONFIG REQUIRED)
-find_package(Catch2 CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(miniz CONFIG REQUIRED)
-find_package(tinyxml2 CONFIG REQUIRED)
-
-#find_package(Boost REQUIRED COMPONENTS stacktrace_basic stacktrace_noop)
-#include_directories(${Boost_INCLUDE_DIRS})
-#link_directories(${Boost_LIBRARY_DIRS})
+include(cmake/Dependencies.cmake)
 
 # Find Qt and OpenGL
 find_package(OpenGL REQUIRED)
-find_package(Qt5 COMPONENTS Core Widgets Svg Multimedia Test REQUIRED)
+find_package(Qt5 5.15 COMPONENTS Core Widgets Svg Multimedia Network Test REQUIRED)
 
 # Qt will warn about API's that were deprecated after 5.9.5.
 # Since we're not raising our minimum Qt version, and can't use the replacement
@@ -148,11 +128,13 @@ set(APP_BUILD_TYPE "${CMAKE_BUILD_TYPE}")
 set(APP_DIR "${CMAKE_SOURCE_DIR}/app")
 set(APP_RESOURCE_DIR "${APP_DIR}/resources")
 
+enable_testing()
 add_subdirectory(lib)
 add_subdirectory(dump-shortcuts)
 add_subdirectory(return-exitCode)
 add_subdirectory(common)
 add_subdirectory(app)
 
-# Link Boost libraries to the relevant targets
-#target_link_libraries(app PRIVATE Boost::stacktrace_basic Boost::stacktrace_noop)
+if(TB_BUILD_REGRESSION_TESTS)
+    add_subdirectory(common/regression)
+endif()

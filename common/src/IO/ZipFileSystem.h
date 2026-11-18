@@ -22,7 +22,7 @@
 #include "IO/ImageFileSystem.h"
 #include "Result.h"
 
-#include <miniz/miniz.h>
+#include <miniz.h>
 
 #include <mutex>
 

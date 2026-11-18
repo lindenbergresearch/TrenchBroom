@@ -1,3 +1,6 @@
+#include "Error.h"
+#include "PreferenceManager.h"
+#include <kdl/result.h>
 #include "View/Tools/Brush/BrushUpstreamTest.h"
 
 #include "Assets/EntityDefinition.h"
