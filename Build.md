@@ -1,174 +1,140 @@
-# Building TrenchBroom
+# Building this TrenchBroom fork
 
-Follow these instructions if you want to get started developing on TrenchBroom.
+The first Qt 6 migration milestone uses **CPM.cmake with Qt 5.15**. Qt 6 is the
+next milestone; installing Qt 6 alone is not sufficient to build this revision.
+The migration status and estimates are in [Qt6-CPM-Roadmap.md](doc/Qt6-CPM-Roadmap.md).
 
-To see how releases of TrenchBroom are packaged, consult our CI scripts instead.
+## Prerequisites
 
-## All Platforms
+- A C++20 compiler and its platform SDK.
+- CMake **3.28 or newer**, Ninja, Git and Pandoc.
+- Qt **5.15** with Core, Widgets, SVG, Multimedia, Network and Test.
+- OpenGL development libraries and zlib (provided by the macOS SDK).
+- Optional: `ccache` for reusing compiler results.
 
-First, clone the TrenchBroom repository. `--recursive` is needed because we use git submodules:
+Qt and system OpenGL are installed separately. CPM downloads and builds Assimp,
+Catch2, fmt, FreeImage, FreeType, GLEW, miniz and tinyxml2 from verified source
+archives. Exact versions, source URLs and SHA-256 hashes are in
+[`cmake/dependencies/`](cmake/dependencies). Catch2 intentionally remains on
+version 2. FreeImage uses the CMake-enabled fork used by original TrenchBroom.
+Boost is not required by this fork's source code.
 
-```bash
-git clone --recursive https://github.com/TrenchBroom/TrenchBroom.git
+The old vcpkg submodule, manifest and overlays remain as a migration reference.
+They are **not used by the new build**; there is no need to initialize that
+submodule. Use a **fresh build directory**. Reusing a directory configured with
+the former vcpkg toolchain is rejected before CMake loads the toolchain.
+
+## macOS (validated on Apple Silicon)
+
+Install Xcode / Command Line Tools, and the build tools, for example:
+
+```sh
+brew install cmake ninja pandoc qt@5 ccache
 ```
 
-If you have an existing git clone, you can update submodules using:
+Configure, build and run the migration regression suite from the repository root:
 
-```bash
-git submodule update --init --recursive
+```sh
+cmake --preset qt5-cpm \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+  -DTB_RUN_MACDEPLOYQT=ON
+cmake --build --preset qt5-cpm --parallel 8
+ctest --preset qt5-cpm
+open cmake-build-cpm-qt5/app/TrenchBroom.app
 ```
 
-## Dependencies
+`TB_RUN_MACDEPLOYQT=ON` copies Qt frameworks and plugins into the app bundle,
+then signs and verifies the generated bundle. The default
+`TB_MAC_CODESIGN_IDENTITY=-` uses a local ad-hoc signature without a certificate.
+Finder metadata is removed only from the generated bundle before signing.
+Deployment errors are treated as build failures, even when Qt 5's deployment
+tool returns a zero exit code.
 
-TrenchBroom uses [vcpkg](https://vcpkg.io/) to manage build dependencies except for Qt. vcpkg is
-integrated into TrenchBroom's build system and will download and build all dependencies once during
-Cmake's configure phase. This is an automatic process, but it can take a little while when it
-happens for the first time.
+For faster development builds it can be omitted; the resulting app then uses
+the installed Qt. The preset does not hardcode a Homebrew path, architecture or
+SDK. Set `CMAKE_OSX_DEPLOYMENT_TARGET` / `CMAKE_OSX_ARCHITECTURES` explicitly when
+needed; CPM libraries are built with the same settings as the editor.
 
----
+The equivalent scripted build is:
 
-## Windows
-
-### Prerequisites
-
-In order to develop, debug and compile TrenchBroom, you need to install tools listed below.
-
-#### Visual Studio 2019
-
-Download [VS 2019](https://visualstudio.microsoft.com/vs/) and install it.
-
-You'll also need to install these dependencies using Visual Studio Installer (included with main installer):
-
-- Workloads
-  - **Desktop development with C++**
-  
-#### Project dependencies
-
-- Download and install [Qt](https://www.qt.io/download) for MSVC 2017 32-bit and/or 64-bit
-  - **Important**: You have to create a personal account
-  - Minimum required version is `5.12`
-- Download and install latest version of [CMake](http://www.cmake.org) for Windows
-  - Make sure to add `cmake` as [global or user environment variable](https://knowledge.autodesk.com/support/shotgrid/learn-explore/caas/CloudHelp/cloudhelp/ENU/SG-RV/files/rv-knowledge-base/SG-RV-rv-knowledge-base-rv-setting-global-variables-windows-html-html.html)
-- Download and install latest version of [pandoc](http://www.pandoc.org)
-
-### Project configuration with cmake
-
-Create a subdirectory in TrenchBroom directory called `build`.
-
-Open a command prompt and change directory to `build`:
-
-```bash
-cd <path/to/TrenchBroom>/build
+```sh
+TB_PACKAGE=false ./CI-macos.sh
 ```
 
-Then, execute this command to configure the project:
+`CI-macos.sh` also accepts `TB_BUILD_DIR`, `TB_QT_PREFIX`, `TB_DEBUG_BUILD=true`
+and `CMAKE_BUILD_PARALLEL_LEVEL`. Packaging is enabled by default for release
+builds. These commands build the editor and focused regression suite rather
+than the unmaintained older test/benchmark targets.
 
-- For 32-bit:
-```bash
-cmake .. -G "Visual Studio 16 2019" -T v142 -A Win32 -DCMAKE_PREFIX_PATH="C:\Qt\5.13.0\msvc2017"
+## Caches and repeat builds
+
+Two independent caches are used by default:
+
+| Cache | Default directory | Purpose |
+| --- | --- | --- |
+| CPM | `.cache/cpm` | Downloaded/extracted, pinned dependency sources |
+| ccache | `.cache/ccache` | Compiler results, when `ccache` is installed |
+
+Both directories are ignored by Git. They survive removal of a build directory.
+A new build still configures and links its own targets; source caching alone
+does not reuse compiled libraries. `ccache` validates compiler options, headers
+and SDK inputs before returning a cached result. CMake's precompiled-header
+builds may be uncacheable; `-DTB_SUPPRESS_PCH=ON` trades PCH compilation speed for
+broader compiler-cache reuse.
+
+Override the source cache with `-DCPM_SOURCE_CACHE=/path/to/cache` (or the
+`CPM_SOURCE_CACHE` environment variable on the initial configure). Override the
+compiler cache with `-DTB_CCACHE_DIR=/path/to/cache`. Disable the compiler launcher
+with `-DTB_ENABLE_CCACHE=OFF`. No cache is needed for correctness.
+
+```sh
+CCACHE_DIR="$PWD/.cache/ccache" ccache --show-stats
 ```
 
-- For 64-bit:
-```bash
-cmake .. -G "Visual Studio 16 2019" -T v142 -A x64 -DCMAKE_PREFIX_PATH="C:\Qt\5.13.0\msvc2017_64"
+An initial configure needs network access. Once the pinned sources are present,
+a fresh build directory can be configured offline:
+
+```sh
+cmake -S . -B cmake-build-cpm-offline -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)" \
+  -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 ```
 
-> **Note**: Make sure to specify the correct Qt as `CMAKE_PREFIX_PATH` value.
+Do not edit files inside the shared source cache. Changes to dependencies should
+be explicit patches or new version/hash pins, so subsequent builds are repeatable.
 
-### Build and debug TrenchBroom
+## Regression targets
 
-To build and debug TrenchBroom, press `F5` key. After a success compilation process, TrenchBroom should automatically be opened in `Debug` mode.
+`tb-regression-tests` is a checked-in, focused migration suite, including existing
+regressions for themes, fonts/icons, editor actions/toolbars, Inspector docking,
+Layer selection, WAD properties, History/Undo, view state and archive caches.
+Additional checks exercise the real image/model/font loaders after the CPM change.
+The runner uses isolated temporary settings and Qt's offscreen platform through
+CTest. It does not change the editor's saved settings.
 
----
+To run a subset:
 
-## Linux
-
-### Prerequisites
-
-In order to develop, debug and compile TrenchBroom, you need to install tools listed below.
-
-#### Project dependencies
-
-TrenchBroom depends on:
-
-If you have a debian-based distribution, open a command prompt and execute this command to install required dependencies:
-
-```bash
-sudo apt-get install g++ qt5-default libqt5svg5-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev libglew-dev libxrandr-dev build-essential libglm-dev libxxf86vm-dev libfreetype6-dev libfreeimage-dev libtinyxml2-dev pandoc cmake p7zip-full ninja-build curl
+```sh
+QT_QPA_PLATFORM=offscreen \
+  cmake-build-cpm-qt5/regression/tb-regression-tests '[dependencies]'
 ```
 
-### Build TrenchBroom
+The historical `common/test` and benchmark targets remain disabled: several of
+their files still use older project APIs. This suite is not a claim that all old
+tests have been ported. Native Cocoa/OpenGL checks are separate from offscreen
+checks and remain necessary for the later Qt 6 renderer migration.
 
-Create a subdirectory in TrenchBroom directory called `build`.
+## Windows and Linux
 
-Open a command prompt and change directory to `build`:
+The CMake dependency definitions and static library targets are shared across
+platforms. A separately installed Qt 5.15 prefix can be supplied with
+`CMAKE_PREFIX_PATH` when using the `qt5-cpm` preset (Ninja requires the appropriate
+compiler environment). Linux additionally needs the OpenGL/X11 and zlib development
+packages, and Qt Multimedia development files.
 
-```bash
-cd <path/to/TrenchBroom>/build
-```
-
-Then, execute this command to configure the project:
-
-```bash
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="cmake/packages"
-cmake --build . --target TrenchBroom
-```
-
-> **Note**: You can replace `Debug` with `Release` if you want to create a release build.
-
----
-
-## Mac OS X
-
-### Prerequisites
-
-In order to develop, debug and compile TrenchBroom, you need to install tools listed below.
-
-#### Xcode
-
-Download Xcode from the App Store.
-
-#### Project dependencies
-
-Open a command prompt and execute this command to install required dependencies:
-
-```bash
-brew install cmake qt pandoc python pkg-config
-```
-
-Finally, build the project:
-
-```bash
-mkdir build-xcode
-cd build-xcode
-cmake .. -GXcode -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
-open TrenchBroom.xcodeproj
-```
-
-> **Note**: Don't enable `Address Sanitizer` in Xcode; it breaks rebuilding of the project (see [#1373](https://github.com/kduske/TrenchBroom/issues/1373)).
-
----
-
-## How to release
-
-Open a new command prompt.
-
-Generate a changelog:
-
-```bash
-git log --oneline --decorate <LAST_REL_TAG>..HEAD
-```
-
-> **Note**: `<LAST_REL_TAG>` is replaced by whatever tag marks the last release. The generated log is then manually cleaned up.
-
-Then, tag your changes:
-
-```bash
-git tag -a v2019.1 -m "This tag marks TrenchBroom 2019.1."
-```
-
-And finally, push the tagged release:
-
-```bash
-git push origin v2019.1
-```
+Windows/Linux compilation, packaging and the older CI scripts have not been
+validated in this macOS migration milestone. Their full update and platform
+checks are separate roadmap work; do not use this milestone as a release claim
+for those platforms. The CI cache step already uses CPM sources / compiler results
+instead of bootstrapping vcpkg.

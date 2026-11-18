@@ -90,7 +90,7 @@ TrenchBroom is a modern cross-platform level editor for Quake-engine based games
 - [Assimp](https://www.assimp.org/)
 - [Catch2](https://github.com/catchorg/Catch2)
 - [CMake](https://cmake.org/)
-- [vcpkg](https://www.vcpkg.io/)
+- [CPM.cmake](https://github.com/cpm-cmake/CPM.cmake)
 - [Pandoc](https://www.pandoc.org/)
 - Quake icons by [Th3 ProphetMan](https://www.deviantart.com/th3-prophetman)
 - Hexen 2 icon by [thedoctor45](https://www.deviantart.com/thedoctor45)
