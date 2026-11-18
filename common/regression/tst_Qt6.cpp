@@ -67,6 +67,14 @@ TEST_CASE("Map UTF8 encoding preserves non-BMP text and embedded nulls", "[qt6][
     CHECK(mapStringFromUnicode(MapTextEncoding::Utf8, {}).empty());
 }
 
+TEST_CASE("Map value conversion preserves Qt5 handling of incomplete characters", "[qt6][encoding]") {
+    const auto bytes = QByteArray{"target_\xE2\x82"};
+    CHECK(mapStringToUnicode(MapTextEncoding::Utf8, bytes.toStdString()) == QString::fromUtf8(bytes));
+    auto text = QStringLiteral("target_");
+    text += QChar{char16_t(0xD800)};
+    CHECK(mapStringFromUnicode(MapTextEncoding::Utf8, text) == text.toUtf8().toStdString());
+}
+
 TEST_CASE("Quake map encoding retains the native locale conversion", "[qt6][encoding]") {
     const auto text = QString::fromUtf8("map_name äöü");
     const auto bytes = text.toLocal8Bit();

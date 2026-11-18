@@ -602,7 +602,10 @@ namespace TrenchBroom {namespace View {
     }
 
     QString mapStringToUnicode(const MapTextEncoding encoding, const std::string& string) {
-        auto decoder = QStringDecoder{codecForEncoding(encoding)};
+        // Each call is a complete map value, rather than a streaming chunk.
+        // Report truncated sequences as replacement characters instead of
+        // keeping trailing bytes in a converter that is about to be destroyed.
+        auto decoder = QStringDecoder{codecForEncoding(encoding), QStringConverter::Flag::Stateless};
         return decoder(QByteArrayView{string.data(), qsizetype(string.size())});
     }
 

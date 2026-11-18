@@ -68,6 +68,22 @@ QPixmap loadPixmapResource(const std::filesystem::path &imagePath) {
 
     // extract directory
     const auto path = QDir::cleanPath(pathAsQString(imagePath));
+    if (QFileInfo{path}.suffix().compare("svg", Qt::CaseInsensitive) == 0) {
+        // Qt6's QPixmap SVG loader defaults to density 1. Use the shared vector
+        // engine so even bitmap callers receive a raster at the current DPI.
+        auto vectorPath = imagePath;
+        if (!imagePath.is_absolute() && !path.startsWith(":/")) {
+            for (const auto& directory : ResourceSearchPaths) {
+                const auto resolved = SystemPaths::findResourceFile(std::filesystem::path{directory} / imagePath);
+                if (!resolved.empty()) {
+                    vectorPath = resolved;
+                    break;
+                }
+            }
+        }
+        const auto vector = VectorIcon{vectorPath};
+        return vector.icon().pixmap(vector.defaultSize());
+    }
     const auto cacheKey = "tb/resource/" + path;
 
     QPixmap pixmap;
