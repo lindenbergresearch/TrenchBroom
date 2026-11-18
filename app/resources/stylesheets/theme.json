@@ -1,36 +1,41 @@
 {
-    "version": 1,
-    "colors": {
-        "source.background": "#282b30",
-        "source.selection.background": "#475d79",
-        "source.selection.text": "#ffffff",
-        "source.border": "#44494f",
-        "syntax.keyword": "#8fc6ee",
-        "syntax.string": "#a9cb91",
-        "syntax.number": "#dab985",
-        "syntax.comment": "#828b96",
-        "syntax.property": "#c8ade8",
-        "layer.hidden.text": "#8397ad",
-        "layer.locked.text": "#d4a16b",
-        "layer.hiddenLocked.text": "#ae8ba8",
-        "layer.hidden.selectedText": "#bfd7ee",
-        "layer.locked.selectedText": "#f0c393",
-        "layer.hiddenLocked.selectedText": "#dfbcda",
-        "toolbutton.checked": "#346792",
-        "shapePalette.background": "#dc1a1d22",
-        "shapePalette.border": "#418c96aa",
-        "shapePalette.hover.background": "#327887a0",
-        "shapePalette.hover.border": "#5a96aac8"
-    },
-    "lengths": {
-        "radius.menu": 12,
-        "radius.tooltip": 8,
-        "radius.border": 4,
-        "border": 2
-    },
-    "numbers": {
-        "icon.brightness": 0.72,
-        "icon.disabledBrightness": 0.35,
-        "icon.disabledOpacity": 1
-    }
+  "version": 1,
+  "colors": {
+    "source.background": "#282b30",
+    "source.selection.background": "#475d79",
+    "source.selection.text": "#ffffff",
+    "source.border": "#44494f",
+
+    "syntax.keyword": "#4da6e7",
+    "syntax.string": "#3cc649",
+    "syntax.number": "#f3e499",
+    "syntax.comment": "#60666f",
+    "syntax.property": "#d95176",
+
+
+    "layer.hidden.text": "#8397ad",
+    "layer.locked.text": "#d4a16b",
+    "layer.hiddenLocked.text": "#ae8ba8",
+    "layer.hidden.selectedText": "#bfd7ee",
+    "layer.locked.selectedText": "#f0c393",
+    "layer.hiddenLocked.selectedText": "#dfbcda",
+
+    "toolbutton.checked": "#346792",
+
+    "shapePalette.background": "#dc1a1dD2",
+    "shapePalette.border": "#418c96aa",
+    "shapePalette.hover.background": "#327887a0",
+    "shapePalette.hover.border": "#5a96aac8"
+  },
+  "lengths": {
+    "radius.menu": 12,
+    "radius.tooltip": 8,
+    "radius.border": 4,
+    "border": 2
+  },
+  "numbers": {
+    "icon.brightness": 0.72,
+    "icon.disabledBrightness": 0.35,
+    "icon.disabledOpacity": 1
+  }
 }

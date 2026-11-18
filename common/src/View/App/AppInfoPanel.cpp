@@ -44,16 +44,16 @@ void AppInfoPanel::createGui() {
     QLabel* appIcon = new QLabel{this};
     appIcon->setPixmap(scaledImage);
 
-    TrenchBroomApp::instance().loadFont("fonts/rabanera.ttf", uiFontPixelSize());
+    TrenchBroomApp::instance().loadFont("fonts/BebasNeue-Regular.ttf", uiFontPixelSize());
 
     QLabel* appName = new QLabel{QApplication::applicationName(), this};
     setTextStyleRole(appName,"brand");
 
     BorderLine* appLine = new BorderLine{BorderLine::Direction::Horizontal};
-    QLabel* appClaim = new QLabel{tr("Level Editor")};
+    QLabel* appClaim = new QLabel{tr("Experimental Level Editor")};
     makeEmphasized(appClaim);
 
-    QLabel* appHint = new QLabel{tr("eXperimental Version")};
+    QLabel* appHint = new QLabel{tr("Version")};
     makeEmphasized(appHint);
 
     ClickableLabel* version = new ClickableLabel{tr("Version ") % getBuildVersion()};

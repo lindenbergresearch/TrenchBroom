@@ -178,8 +178,8 @@ QWidget#ItemCellStyle[cellContext="entityProperties"] { qproperty-overrideTextCo
 }
 
 *[uiTextRole="brand"] {
-    font-family: "Rabanera";
-    font-size: 32px;
+    font-family: "Bebas Neue";
+    font-size: 30px;
     color: ${color.text.highlighted};
 }
 
@@ -1188,17 +1188,19 @@ QTabBar#InspectorToolTabs {
 }
 
 QTabBar#InspectorToolTabs::tab {
-    background-color: rgba(0, 0, 0, 0);
+    background-color: rgba(200, 200, 200, 10);
     color: ${color.text};
-    border: none;
-    margin-top: 0px;
-    margin-bottom: 0;
+    border: 1px solid ${color.dark};
+    border-top: 2px;
+    border-bottom: 2px;
+    margin-top: 1px;
+    margin-bottom: 1px;
     padding: 2px;
-    padding-bottom: 4px;
-    padding-top: 4px;
+    padding-bottom: 3px;
+    padding-top: 2px;
     min-height: 16px;
     max-height: 28px;
-    font-size: ${length.font.subtitle};
+    font-size: ${length.font.small};
 }
 
 QTabBar#InspectorToolTabs::tab:hover {
@@ -1208,7 +1210,8 @@ QTabBar#InspectorToolTabs::tab:hover {
 QTabBar#InspectorToolTabs::tab:selected {
     color: ${color.text.highlighted};
     background-color: ${color.light};
-    text-style: bold;
+    font-weight: bold;
+    font-size: ${length.font.subtitle};
 }
 
 QTabBar#InfoPanelTabBar::tab {
