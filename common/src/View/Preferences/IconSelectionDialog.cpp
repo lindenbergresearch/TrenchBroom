@@ -1,4 +1,6 @@
 #include "View/Preferences/IconSelectionDialog.h"
+#include <QEvent>
+#include <QTimer>
 
 #include "IO/PathQt.h"
 #include "IO/ResourceUtils.h"
@@ -63,15 +65,13 @@ IconSelectionDialog::IconSelectionDialog(const QString& currentIcon, QWidget* pa
     m_icons->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_icons->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_icons->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    m_icons->setIconSize(QSize{40, 40});
-    m_icons->setGridSize(QSize{112, 86});
     m_icons->setUniformItemSizes(true);
     m_icons->setWordWrap(false);
     m_icons->setTextElideMode(Qt::ElideRight);
 
     m_preview = new QLabel;
     m_preview->setObjectName("EditorIconPreview");
-    m_preview->setFixedSize(56, 56);
+    m_preview->installEventFilter(this);
     m_preview->setAlignment(Qt::AlignCenter);
     m_name = new QLabel;
     m_name->setObjectName("EditorIconName");
@@ -129,6 +129,11 @@ QString IconSelectionDialog::selectedIcon() const {
     return item && !item->isHidden() ? item->data(Qt::UserRole).toString() : QString{};
 }
 
+bool IconSelectionDialog::eventFilter(QObject* watched, QEvent* event) {
+    if (watched == m_preview && (event->type() == QEvent::Resize || event->type() == QEvent::StyleChange)) QTimer::singleShot(0, this, [this] { updateSelection(); });
+    return QDialog::eventFilter(watched, event);
+}
+
 void IconSelectionDialog::accept() {
     if (!selectedIcon().isEmpty()) QDialog::accept();
 }
@@ -156,12 +161,13 @@ void IconSelectionDialog::updateSelection() {
     m_preview->clear();
     if (!name.isEmpty()) {
         const auto ratio = m_preview->devicePixelRatioF();
-        QPixmap pixmap{QSize{qRound(48 * ratio), qRound(48 * ratio)}};
+        const auto logicalSize = m_preview->contentsRect().size().expandedTo(QSize{1, 1});
+        QPixmap pixmap{logicalSize * ratio};
         pixmap.setDevicePixelRatio(ratio);
         pixmap.fill(Qt::transparent);
         {
             QPainter painter{&pixmap};
-            IO::loadSVGIcon(IO::pathFromQString(name), 48).paint(&painter, QRect{0, 0, 48, 48});
+            IO::loadSVGIcon(IO::pathFromQString(name), 48).paint(&painter, QRect{QPoint{}, logicalSize});
         }
         m_preview->setPixmap(pixmap);
     }

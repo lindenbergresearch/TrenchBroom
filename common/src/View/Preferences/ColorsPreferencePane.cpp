@@ -18,6 +18,7 @@
  */
 
 #include "View/Preferences/ColorsPreferencePane.h"
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 
 #include <QHeaderView>
 #include <QLabel>
@@ -38,6 +39,7 @@ ColorsPreferencePane::ColorsPreferencePane(QWidget *parent) : PreferencePane(par
     m_proxy->setFilterKeyColumn(-1); // Filter based on all columns
 
     m_table = new QTableView();
+    m_table->setItemDelegate(new StyledItemDelegate("colors", m_table));
     m_table->setCornerButtonEnabled(false);
     m_table->setModel(m_proxy);
 

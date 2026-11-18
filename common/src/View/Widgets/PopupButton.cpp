@@ -33,9 +33,9 @@ PopupButton::PopupButton(const QString &caption, QWidget *parent, const QIcon &i
     m_button = new QToolButton();
     m_button->setText(caption);
     m_button->setCheckable(true);
-    m_button->setIconSize(QSize{12, 12});
     makeSubTitle(m_button);
     m_button->setObjectName("toolButton_borderless");
+    m_button->setProperty("popupButton", true);
     m_window = new PopupWindow(this);
 
     auto *sizer = new QHBoxLayout();

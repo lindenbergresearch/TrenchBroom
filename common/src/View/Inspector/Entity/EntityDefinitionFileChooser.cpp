@@ -75,8 +75,8 @@ EntityDefinitionFileChooser::EntityDefinitionFileChooser(std::weak_ptr<MapDocume
 
 void EntityDefinitionFileChooser::createGui() {
     auto *builtinPanel = new TitledPanel{tr("Builtin"), false, true};
-    builtinPanel->setBackgroundRole(QPalette::Base);
-    builtinPanel->setAutoFillBackground(true);
+    builtinPanel->setAttribute(Qt::WA_StyledBackground);
+    builtinPanel->setProperty("uiSurface", "base");
 
     m_builtin = new SingleSelectionListWidget{};
     m_builtin->setAllowDeselectAll(false);
@@ -88,8 +88,8 @@ void EntityDefinitionFileChooser::createGui() {
     builtinPanel->getPanel()->setLayout(builtinLayout);
 
     auto *externalPanel = new TitledPanel{tr("External"), false, true};
-    externalPanel->setBackgroundRole(QPalette::Base);
-    externalPanel->setAutoFillBackground(true);
+    externalPanel->setAttribute(Qt::WA_StyledBackground);
+    externalPanel->setProperty("uiSurface", "base");
 
     m_externalLabel = new QLabel{tr("use builtin")};
     m_externalLabel->setObjectName("EntityDefinitionExternalPath");

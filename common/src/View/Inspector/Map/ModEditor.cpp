@@ -57,8 +57,8 @@ ModEditor::ModEditor(std::weak_ptr<MapDocument> document, QWidget *parent)
 
 void ModEditor::createGui() {
     auto *availableModContainer = new TitledPanel("Available", false, true);
-    availableModContainer->setBackgroundRole(QPalette::Base);
-    availableModContainer->setAutoFillBackground(true);
+    availableModContainer->setAttribute(Qt::WA_StyledBackground);
+    availableModContainer->setProperty("uiSurface", "base");
 
     m_availableModList = new QListWidget();
     m_availableModList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -74,8 +74,8 @@ void ModEditor::createGui() {
     m_filterBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     auto *enabledModContainer = new TitledPanel("Enabled", false, true);
-    enabledModContainer->setBackgroundRole(QPalette::Base);
-    enabledModContainer->setAutoFillBackground(true);
+    enabledModContainer->setAttribute(Qt::WA_StyledBackground);
+    enabledModContainer->setProperty("uiSurface", "base");
 
     m_enabledModList = new QListWidget();
     m_enabledModList->setSelectionMode(QAbstractItemView::ExtendedSelection);

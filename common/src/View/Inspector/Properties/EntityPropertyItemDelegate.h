@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <QStyledItemDelegate>
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 
 class QLineEdit;
 
@@ -31,8 +31,8 @@ class EntityPropertyModel;
 
 class EntityPropertyTable;
 
-class EntityPropertyItemDelegate : public QStyledItemDelegate {
-  Q_OBJECT
+class EntityPropertyItemDelegate : public StyledItemDelegate {
+    Q_OBJECT
   private:
     EntityPropertyTable *m_table;
     const EntityPropertyModel *m_model;

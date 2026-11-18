@@ -274,6 +274,13 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
     values.insert("number.text.detailOpacity", ThemeValue::number(opacity));
     values.insert("color.error", ThemeValue::color(View::toQColor(pref(Preferences::UIErrorColor))));
     values.insert("color.warning", ThemeValue::color(View::toQColor(pref(Preferences::UIWarningColor))));
+    const std::pair<const char*, Preference<Color>*> logColors[] = {{"trace", &Preferences::LogTraceColor},
+                                                                    {"debug", &Preferences::LogDebugColor},
+                                                                    {"info", &Preferences::LogInfoColor},
+                                                                    {"warning", &Preferences::LogWarningColor},
+                                                                    {"error", &Preferences::LogErrorColor}};
+    for (const auto& [name, preference] : logColors)
+        values.insert(QStringLiteral("color.log.") + name, ThemeValue::color(View::toQColor(pref(*preference))));
 
     const std::pair<const char *, Preference<Color> *> iconColors[] = {{"layer", &Preferences::LayerTreeLayerIconColor},
                                                                        {"group", &Preferences::LayerTreeGroupIconColor},
@@ -384,12 +391,17 @@ const QMap<QString, QString> &ThemeManager::legacyNames() {
 }
 
 bool ThemeManager::isRelevantPreference(const std::filesystem::path &path) {
-    const PreferenceBase *preferences[] = {&Preferences::UIBrightness,
+    const PreferenceBase* preferences[] = {&Preferences::UIBrightness,
                                            &Preferences::UIHighlightColor,
                                            &Preferences::UIWindowTintColor,
                                            &Preferences::UITextColor,
                                            &Preferences::UIErrorColor,
                                            &Preferences::UIWarningColor,
+                                           &Preferences::LogTraceColor,
+                                           &Preferences::LogDebugColor,
+                                           &Preferences::LogInfoColor,
+                                           &Preferences::LogWarningColor,
+                                           &Preferences::LogErrorColor,
                                            &Preferences::UIDetailTextOpacity,
                                            &Preferences::UIFontPath,
                                            &Preferences::UIFontSize,

@@ -18,6 +18,7 @@
  */
 
 #include "View/Inspector/Properties/EntityPropertyModel.h"
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 
 #include <QBrush>
 #include <QByteArray>
@@ -41,7 +42,6 @@
 #include "Model/ModelUtils.h"
 #include "Model/WorldNode.h"
 #include "View/Document/MapDocument.h"
-#include "View/Preferences/FontUtils.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Theme/ViewConstants.h"
 
@@ -636,53 +636,14 @@ QVariant EntityPropertyModel::data(const QModelIndex &index, const int role) con
         return QVariant{};
     }
 
-    if (role == Qt::ForegroundRole) {
-        if (row.isDefault() || row.subset()) {
-            return QVariant(
-                QBrush(row.keyMutable() ? Colors::defaultText() : Colors::defaultText())
-            );
-        }
-
-        if (index.column() == ColumnValue) {
-            if (row.multi()) {
-                return QVariant(QBrush(Colors::highlight()));
-            }
-
-            return QVariant(QBrush(Colors::defaultText()));
-        }
-
-
-        return QVariant(QBrush(Colors::highlightText()));
-    }
-
-    if (role == Qt::FontRole) {
-        if (row.isDefault()) {
-            auto font = QFont{};
-            font.setItalic(false);
-            return QVariant(font);
-        }
-
-        if (!row.keyMutable()) {
-            auto font = QFont{};
-            font.setItalic(true);
-            return QVariant(font);
-        }
-
-        if (index.column() == ColumnValue) {
-            if (row.multi()) {
-                auto font = QFont{};
-                font.setItalic(false);
-                return QVariant(font);
-            }
-
-            auto font = QFont{};
-            font.setPixelSize(uiFontPixelSize());
-            return QVariant(font);
-        }
-
-        auto font = QFont{};
-        font.setBold(true);
-        return QVariant(font);
+    if (role == StyledItemDelegate::TextStyleRole) return index.column() == ColumnValue ? QStringLiteral("value") : QStringLiteral("key");
+    if (role == StyledItemDelegate::TextStatesRole) {
+        QStringList states;
+        if (row.isDefault()) states << "default";
+        if (row.subset()) states << "subset";
+        if (!row.keyMutable()) states << "readonly";
+        if (row.multi()) states << "mixed";
+        return states;
     }
 
     if (index.column() == ColumnValue && (role == Qt::DisplayRole || role == SingleLineRole)

@@ -1,4 +1,5 @@
 #include "View/Compilation/TextConsoleTabPage.h"
+#include "View/Widgets/Info/SemanticTextEdit.h"
 
 #include <QStackedLayout>
 #include <QTextEdit>
@@ -16,7 +17,8 @@ namespace TrenchBroom {
 namespace View {
 
 View::TextConsoleTabPage::TextConsoleTabPage(QWidget *parent) : TabBookPage(parent) {
-    m_consoleWidget = new QTextEdit();
+    m_consoleWidget = new SemanticTextEdit();
+    m_consoleWidget->setObjectName("ProcessOutput");
     m_consoleWidget->setReadOnly(true);
     m_consoleWidget->setWordWrapMode(QTextOption::NoWrap);
 

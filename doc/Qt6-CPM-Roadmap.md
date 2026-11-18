@@ -104,7 +104,7 @@ gehören zur Abnahme. [CPM zu Cache und Einschränkungen](https://github.com/cpm
 
 ### Qt und die eigenen Erweiterungen
 
-- **Textkodierung:** `View/QtUtils.cpp` verwendet `QTextCodec`. Quake-Strings und
+- **Textkodierung:** `View/Theme/QtUtils.cpp` verwendet `QTextCodec`. Quake-Strings und
   8-Bit-Zeichen müssen beim Lesen und Schreiben erhalten bleiben. Weitere
   Fundstellen sind `QRegExp`, `midRef` und `QTextStream::setCodec` in MapFrame,
   QSSBuilder, PrefabLibrary, NodeSourceDialog und dump-shortcuts.

@@ -1,4 +1,5 @@
 #include "View/Preferences/PreferencesPreferencePane.h"
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 
 #include <QHeaderView>
 #include <QLabel>
@@ -20,6 +21,7 @@ PreferencesPreferencePane::PreferencesPreferencePane(QWidget *parent) : Preferen
     m_proxy->setFilterKeyColumn(-1); // Filter based on all columns
 
     m_table = new QTableView();
+    m_table->setItemDelegate(new StyledItemDelegate("preferences", m_table));
     m_table->setObjectName("QTableView_PreferencesPreferencePane");
     m_table->setCornerButtonEnabled(false);
     m_table->setModel(m_proxy);

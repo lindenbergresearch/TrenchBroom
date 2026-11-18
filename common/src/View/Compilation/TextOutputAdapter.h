@@ -25,7 +25,7 @@
 #include <QScrollBar>
 #include <QTextEdit>
 
-#include <TrenchBroomApp.h>
+#include "View/Widgets/Info/SemanticTextEdit.h"
 
 class QTextEdit;
 
@@ -62,25 +62,23 @@ class TextOutputAdapter {
   public:
     explicit TextOutputAdapter(QTextEdit *textEdit);
 
-    template<typename T> void pushSystemMessage(const T &t, const QColor &color = QColor{"#FFFFFF"}) {
-        QScrollBar *scrollBar = m_textEdit->verticalScrollBar();
-        const bool wasAtBottom = (scrollBar->value() >= scrollBar->maximum());
+    template <typename T> void pushSystemMessage(const T& value, MessageStyle role = MessageStyle::System) {
         QString string;
         QTextStream stream(&string);
-        stream << t;
+        stream << value;
+        insertSystemMessage(string, SemanticTextEdit::messageFormat(*m_textEdit, role, true));
+    }
 
-        auto format = QTextCharFormat{};
-        auto font = TrenchBroomApp::instance().getConsoleFont();
-        font.setBold(true);
-        format.setFont(font);
-        format.setForeground(QBrush{color});
-        m_insertionCursor.insertText(string, format);
-
-        scrollBar->setValue(scrollBar->maximum());
-
-        if (wasAtBottom) {
-            m_textEdit->verticalScrollBar()->setValue(m_textEdit->verticalScrollBar()->maximum());
-        }
+    // Explicit colors are data, for example output supplied by an external tool.
+    template <typename T> void pushSystemMessage(const T& value, const QColor& color) {
+        QString string;
+        QTextStream stream(&string);
+        stream << value;
+        auto format = SemanticTextEdit::messageFormat(*m_textEdit, MessageStyle::System, true);
+        format.clearProperty(SemanticTextEdit::RoleProperty);
+        format.clearProperty(SemanticTextEdit::EmphasisProperty);
+        format.setForeground(color);
+        insertSystemMessage(string, format);
     }
 
     /**
@@ -96,6 +94,7 @@ class TextOutputAdapter {
     }
 
   private:
+    void insertSystemMessage(const QString& string, const QTextCharFormat& format);
     void appendString(const QString &string);
 
     QTextCharFormat &decodeVT100Command(const QString &string, QTextCharFormat &format);

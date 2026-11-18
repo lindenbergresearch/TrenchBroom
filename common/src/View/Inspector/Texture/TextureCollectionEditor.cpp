@@ -112,8 +112,8 @@ bool TextureCollectionEditor::canReloadTextureCollections() const {
  */
 void TextureCollectionEditor::createGui() {
     auto *availableCollectionsContainer = new TitledPanel{"Available", false, true};
-    availableCollectionsContainer->setBackgroundRole(QPalette::Base);
-    availableCollectionsContainer->setAutoFillBackground(true);
+    availableCollectionsContainer->setAttribute(Qt::WA_StyledBackground);
+    availableCollectionsContainer->setProperty("uiSurface", "base");
 
     m_availableCollectionsList = new QListWidget{};
     m_availableCollectionsList->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -125,8 +125,8 @@ void TextureCollectionEditor::createGui() {
     availableCollectionsContainer->getPanel()->setLayout(availableCollectionsContainerLayout);
 
     auto *enabledCollectionsContainer = new TitledPanel{"Enabled", false, true};
-    enabledCollectionsContainer->setBackgroundRole(QPalette::Base);
-    enabledCollectionsContainer->setAutoFillBackground(true);
+    enabledCollectionsContainer->setAttribute(Qt::WA_StyledBackground);
+    enabledCollectionsContainer->setProperty("uiSurface", "base");
 
     m_enabledCollectionsList = new QListWidget{};
     m_enabledCollectionsList->setSelectionMode(QAbstractItemView::ExtendedSelection);

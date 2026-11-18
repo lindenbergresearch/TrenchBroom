@@ -61,7 +61,6 @@ namespace {
         toolbar->setProperty("inspectorToolbar", true);
         toolbar->setMovable(false);
         toolbar->setFloatable(false);
-        toolbar->setIconSize({16, 16});
     }
 } // namespace
 
@@ -71,7 +70,6 @@ EditorCustomizationPreferencePane::EditorCustomizationPreferencePane(bool toolba
     setObjectName(toolbarMode ? "EditorToolbarPreferences" : "EditorActionsPreferences");
     m_list->setObjectName("EditorConfigurationList");
     m_list->setProperty("preferencesList", true);
-    m_list->setIconSize({24, 24});
     m_filter->setPlaceholderText(tr("Search…"));
     m_filter->setObjectName("EditorConfigurationSearch");
     m_list->setUniformItemSizes(true);
@@ -313,7 +311,6 @@ void EditorCustomizationPreferencePane::createToolbarForm() {
     m_assigned = new QListWidget;
     m_assigned->setObjectName("EditorToolbarAssignedActions");
     m_assigned->setProperty("preferencesList", true);
-    m_assigned->setIconSize({24, 24});
     m_assigned->setUniformItemSizes(true);
     m_assigned->setTextElideMode(Qt::ElideRight);
     m_assigned->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

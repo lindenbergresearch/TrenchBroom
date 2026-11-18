@@ -28,8 +28,8 @@ TitledPanel::TitledPanel(const QString& title, QWidget* parent, const bool boldT
     m_panel = new QWidget();
 
     if (fillBackground) {
-        m_panel->setAutoFillBackground(true);
-        m_panel->setBackgroundRole(QPalette::Window);
+        m_panel->setAttribute(Qt::WA_StyledBackground);
+        m_panel->setProperty("uiSurface", "window");
     }
 
     auto* layout = new QVBoxLayout();

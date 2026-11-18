@@ -35,20 +35,19 @@
 
 namespace TrenchBroom {
 namespace View {
-EntityPropertyItemDelegate::EntityPropertyItemDelegate(EntityPropertyTable *table, const EntityPropertyModel *model, const QSortFilterProxyModel *proxyModel, QWidget *parent)
-    : QStyledItemDelegate(parent), m_table(table), m_model(model), m_proxyModel(proxyModel) {
-}
+    EntityPropertyItemDelegate::EntityPropertyItemDelegate(EntityPropertyTable* table, const EntityPropertyModel* model, const QSortFilterProxyModel* proxyModel, QWidget* parent)
+        : StyledItemDelegate("entityProperties", parent), m_table(table), m_model(model), m_proxyModel(proxyModel) {}
 
-void EntityPropertyItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
-    QStyledItemDelegate::initStyleOption(option, index);
-    if (index.data(EntityPropertyModel::SingleLineRole).toBool()) {
-        option->features.setFlag(QStyleOptionViewItem::WrapText, false);
-        option->textElideMode = Qt::ElideRight;
+    void EntityPropertyItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const {
+        StyledItemDelegate::initStyleOption(option, index);
+        if (index.data(EntityPropertyModel::SingleLineRole).toBool()) {
+            option->features.setFlag(QStyleOptionViewItem::WrapText, false);
+            option->textElideMode = Qt::ElideRight;
+        }
     }
-}
 
 QWidget *EntityPropertyItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    auto *editor = QStyledItemDelegate::createEditor(parent, option, index);
+    auto* editor = StyledItemDelegate::createEditor(parent, option, index);
     auto *lineEdit = dynamic_cast<QLineEdit *>(editor);
     if (lineEdit != nullptr) {
         setupCompletions(lineEdit, index);

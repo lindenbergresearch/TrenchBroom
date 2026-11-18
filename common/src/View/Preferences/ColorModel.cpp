@@ -18,13 +18,13 @@
  */
 
 #include "View/Preferences/ColorModel.h"
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 #include "View/Theme/ThemeManager.h"
 
 #include <QColorDialog>
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
-#include "View/Preferences/FontUtils.h"
 #include "View/Theme/QtUtils.h"
 #include "TrenchBroomApp.h"
 
@@ -112,15 +112,7 @@ QVariant ColorModel::data(const QModelIndex &index, const int role) const {
         }
     }
 
-    // font role
-    if (role == Qt::FontRole) {
-        // default
-        if (index.column() == Value || index.column() == Default) {
-            auto font = TrenchBroomApp::instance().getConsoleFont();
-            font.setPixelSize(uiFontPixelSize());
-            return font;
-        }
-    }
+    if (role == StyledItemDelegate::TextStyleRole && (index.column() == Value || index.column() == Default)) return QStringLiteral("value");
 
     // set foreground color
     if (role == Qt::ForegroundRole) {

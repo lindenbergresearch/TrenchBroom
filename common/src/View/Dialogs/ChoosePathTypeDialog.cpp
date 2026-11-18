@@ -62,8 +62,6 @@ void ChoosePathTypeDialog::createGui(const std::filesystem::path &absPath, const
     infoText->setMaximumWidth(370);
     infoText->setWordWrap(true);
 
-    auto boldFont = infoText->font();
-    boldFont.setBold(true);
 
     m_absRadio = new QRadioButton{tr("Absolute")};
     makeEmphasized(m_absRadio);

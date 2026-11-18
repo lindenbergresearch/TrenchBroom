@@ -37,6 +37,21 @@ ColorTable::ColorTable(const int cellSize, QWidget *parent) : QWidget(parent), m
     setSizePolicy(sizePolicy);
 }
 
+void ColorTable::setSelectionWidth(int width) {
+    m_selectionWidth = std::clamp(width, 0, 16);
+    update();
+}
+void ColorTable::setCellSize(int size) {
+    m_cellSize = std::clamp(size, 2, 256);
+    updateGeometry();
+    update();
+}
+void ColorTable::setCellSpacing(int spacing) {
+    m_cellSpacing = std::clamp(spacing, 0, 32);
+    updateGeometry();
+    update();
+}
+
 void ColorTable::setColors(const std::vector<QColor> &colors) {
     m_colors = colors;
     m_selectedColors.clear();
@@ -67,9 +82,9 @@ void ColorTable::paintEvent(QPaintEvent * /* event */) {
                 const auto &color = *it;
 
                 if (std::find(std::begin(m_selectedColors), std::end(m_selectedColors), color) != std::end(m_selectedColors)) {
-                    dc.setPen(QColor(Qt::red));
-                    dc.setBrush(QColor(Qt::red));
-                    dc.drawRect(x - 1, y - 1, m_cellSize + 2, m_cellSize + 2);
+                    dc.setPen(Qt::NoPen);
+                    dc.setBrush(selectionColor());
+                    dc.drawRect(x - m_selectionWidth, y - m_selectionWidth, m_cellSize + 2 * m_selectionWidth, m_cellSize + 2 * m_selectionWidth);
                 }
 
                 dc.setPen(color);

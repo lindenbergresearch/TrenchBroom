@@ -403,8 +403,6 @@ namespace TrenchBroom {namespace View {
         auto* button = new QToolButton{parent};
         // Vector icons have no finite list of raster sizes. Widget dimensions are
         // logical pixels; the icon engine handles the output device's density.
-        button->setIconSize(QSize(16, 16));
-        button->setMinimumSize(button->iconSize());
         button->setToolTip(tooltip);
         button->setIcon(icon);
         button->setObjectName("toolButton_borderless");

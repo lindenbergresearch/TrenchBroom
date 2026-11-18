@@ -18,6 +18,7 @@
  */
 
 #include "View/Compilation/CompilationDialog.h"
+#include "View/Widgets/Info/SemanticTextEdit.h"
 
 #include <QApplication>
 #include <QCloseEvent>
@@ -64,7 +65,8 @@ void CompilationDialog::createGui() {
     m_profileManager = new CompilationProfileManager{document, compilationConfig};
 
     auto *outputPanel = new TitledPanel{"Output"};
-    m_output = new QTextEdit{};
+    m_output = new SemanticTextEdit{};
+    m_output->setObjectName("CompilationOutput");
     m_output->setReadOnly(true);
     makeMono(m_output);
 

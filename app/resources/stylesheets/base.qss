@@ -22,6 +22,10 @@
  * Schnellfinder: sichtbarer Programmteil -> Suchbegriff in dieser Datei
  * ------------------------------------------------------------------
  * Gemeinsame Schriftrollen, Titel, Detailtext  -> TYPOGRAPHY, uiTextRole, uiEmphasized
+ * Fonts/Farben einzelner Tabellenzellen        -> ITEM CELL STYLES, ItemCellStyle
+ * Konsole und Compiler-Meldungen               -> CONSOLE AND PROCESS OUTPUT, SemanticTextEdit
+ * Trennlinien, Panel-Rahmen, Tab-Markierung     -> SEPARATORS, BorderPanel, TabSelectionIndicator
+ * Farbverlauf im Property-Smart-Editor          -> ColorTable
  * Untere Statusleiste des MapEditors           -> STATUSBAR, StatusBar_RightLayout
  * Linke/rechte Inspector-Bereiche              -> INSPECTOR, Inspector_LeftStack
  * Docking-Titel und schwebende Werkzeuge       -> INSPECTOR HEADERS, InspectorToolTitle
@@ -80,6 +84,50 @@ QPlainTextEdit#nodeSourceText {
     qproperty-commentColor: ${color.syntax.comment};
     qproperty-propertyColor: ${color.syntax.property};
 }
+
+/* ==== ITEM CELL STYLES ==== */
+/* Property/Preferences/Colors/Issues tables share one hidden proxy per cell role.
+   cellContext: entityProperties/preferences/colors/issues; cellRole: key/value/
+   hidden. cellStates contains default/readonly/mixed/subset for entity properties.
+   Font changes apply to existing rows. Optional
+   qproperty-overrideTextColor: true lets `color` override the model's foreground;
+   keep it false for cells whose color represents data, such as color preferences. */
+QWidget#ItemCellStyle,
+QWidget#StyledCellEditor {
+    font-family: ${family.ui};
+    font-size: ${length.font.ui};
+    font-weight: ${weight.ui};
+    font-style: ${keyword.font.ui};
+}
+QWidget#ItemCellStyle[cellContext="entityProperties"],
+QWidget#StyledCellEditor[cellContext="entityProperties"] {
+    color: ${color.text.highlighted};
+}
+QWidget#ItemCellStyle[cellContext="entityProperties"][cellRole="key"],
+QWidget#StyledCellEditor[cellContext="entityProperties"][cellRole="key"] { font-weight: bold; }
+QWidget#ItemCellStyle[cellContext="entityProperties"][cellRole="value"],
+QWidget#StyledCellEditor[cellContext="entityProperties"][cellRole="value"] { color: ${color.text}; }
+QWidget#ItemCellStyle[cellContext="entityProperties"][cellStates~="readonly"],
+QWidget#StyledCellEditor[cellContext="entityProperties"][cellStates~="readonly"] { font-style: italic; font-weight: normal; }
+QWidget#ItemCellStyle[cellContext="entityProperties"][cellRole="value"][cellStates~="mixed"],
+QWidget#StyledCellEditor[cellContext="entityProperties"][cellRole="value"][cellStates~="mixed"] { color: ${color.highlight}; font-weight: normal; }
+QWidget#ItemCellStyle[cellContext="entityProperties"][cellStates~="subset"],
+QWidget#StyledCellEditor[cellContext="entityProperties"][cellStates~="subset"] { color: ${color.text.disabled}; }
+QWidget#ItemCellStyle[cellContext="entityProperties"][cellStates~="default"],
+QWidget#StyledCellEditor[cellContext="entityProperties"][cellStates~="default"] {
+    color: ${color.text.disabled}; font-style: normal; font-weight: normal;
+}
+QWidget#ItemCellStyle[cellContext="issues"][cellRole="hidden"],
+QWidget#StyledCellEditor[cellContext="issues"][cellRole="hidden"] { font-style: italic; }
+QWidget#ItemCellStyle[cellContext="preferences"][cellRole="value"],
+QWidget#StyledCellEditor[cellContext="preferences"][cellRole="value"],
+QWidget#ItemCellStyle[cellContext="colors"][cellRole="value"],
+QWidget#StyledCellEditor[cellContext="colors"][cellRole="value"] {
+    font-family: ${family.console};
+}
+
+QWidget#ItemCellStyle { qproperty-overrideTextColor: false; }
+QWidget#ItemCellStyle[cellContext="entityProperties"] { qproperty-overrideTextColor: true; }
 
 /* ==== TYPOGRAPHY ==== */
 /* Gemeinsame Rollen für QtUtils::makeTitle/makeInfo/makeSmall/makeMono usw.
@@ -609,6 +657,31 @@ QWidget#PrefabCard[selected="true"] QWidget#PrefabDimensions {
 /* ==== SPLITTER ==== */
 /* Verschiebbare Trennbereiche zwischen Editor-/Inspector- und Preferences-Panes. */
 
+/* ==== SEPARATORS, PANEL BORDERS AND TAB INDICATORS ==== */
+/* BorderLine: orientation is horizontal/vertical, separatorWeight normal/strong.
+   `thickness` controls its size hint; min-/max-height/width can override it too.
+   BorderPanel selects the required edges in C++, while QSS owns width and color. */
+QFrame#borderLine {
+    border: none;
+    background-color: ${color.midlight};
+    margin: 0px;
+    padding: 0px;
+    qproperty-thickness: 1;
+}
+QFrame#borderLine[separatorWeight="strong"] { qproperty-thickness: 2; }
+TrenchBroom--View--BorderPanel {
+    background-color: ${color.window};
+    qproperty-borderColor: ${color.midlight};
+    qproperty-borderWidth: 1;
+}
+QWidget#TabSelectionIndicator {
+    min-height: 6px;
+    max-height: 6px;
+    background-color: transparent;
+}
+QWidget#TabSelectionIndicator[selected="true"] { background-color: ${color.highlight}; }
+
+/* ==== SPLITTER ==== */
 QSplitter {
     padding: 0px;
     margin: 0px;
@@ -654,6 +727,31 @@ QTextEdit {
     margin-top: 2px;
     margin-left: 0px;
     margin-bottom: 2px;
+}
+
+/* ==== CONSOLE AND PROCESS OUTPUT ==== */
+/* Rich-text logging and compiler system messages use semantic roles. Changing
+   these properties also recolors existing tagged messages in small batches.
+   Fonts inherit this widget's QSS; ANSI colors from external tools retain their
+   original meaning. Log defaults remain connected to Preferences -> Colors. */
+TrenchBroom--View--SemanticTextEdit {
+    font-family: ${family.console};
+    font-size: ${length.font.console};
+    color: ${color.text};
+    qproperty-traceColor: ${color.log.trace};
+    qproperty-debugColor: ${color.log.debug};
+    qproperty-infoColor: ${color.log.info};
+    qproperty-warningColor: ${color.log.warning};
+    qproperty-errorColor: ${color.log.error};
+    qproperty-successColor: ${color.text};
+    qproperty-systemColor: ${color.text};
+    qproperty-systemFontWeight: 75;
+}
+TrenchBroom--View--SemanticTextEdit#CompilationOutput {
+    qproperty-infoColor: #0eceef;
+    qproperty-warningColor: #cccd00;
+    qproperty-errorColor: #ff3824;
+    qproperty-successColor: #00ff00;
 }
 
 /* ==== COMBO-BOX ==== */
@@ -850,6 +948,7 @@ QToolBar#MapFrameToolBar::separator {
 }
 
 QToolBar#ToolBar_PreferenceDialog {
+    qproperty-iconSize: 32px 32px;
     text-align: center;
 }
 
@@ -873,6 +972,7 @@ QToolButton#InspectorToolToolbar {
 
 
 QToolButton#ToolButton_PreferenceDialog {
+    min-width: 80px;
     margin: 6px;
     padding: 4px;
     margin-bottom: 10px;
@@ -1630,6 +1730,7 @@ QLabel#EditorConfigurationError { color: ${color.text}; padding: 8px; background
 QListWidget#EditorIconGrid {
     border: none;
     qproperty-iconSize: 40px 40px;
+    qproperty-gridSize: 112px 86px;
 }
 
 QListWidget#EditorIconGrid::item {
@@ -1642,6 +1743,8 @@ QListWidget#EditorIconGrid::item:hover:!selected {
 }
 
 QLabel#EditorIconPreview {
+    min-width: 48px; max-width: 48px;
+    min-height: 48px; max-height: 48px;
     background-color: ${color.base};
     border: 1px solid ${color.midlight};
     border-radius: ${length.radius.border};
@@ -1697,3 +1800,22 @@ QFrame#BrushShapePalette QToolButton:checked {
 QFrame#BrushShapePalette QToolButton:pressed {
     background-color: ${color.highlight};
 }
+
+/* Palette cells display actual map colors; their selected outline and geometry
+   are UI presentation and can be changed here. */
+TrenchBroom--View--ColorTable {
+    qproperty-cellSize: 15;
+    qproperty-cellSpacing: 2;
+    qproperty-selectionColor: #ff0000;
+    qproperty-selectionWidth: 1;
+}
+
+/* ==== SHARED ICON SIZES ==== */
+/* These are presentation sizes. User-configured sizes of editor toolbars,
+   Layer nodes and Prefab zoom continue to come from their controls. */
+QToolButton#toolButton_borderless { qproperty-iconSize: 16px 16px; }
+QToolButton#toolButton_borderless[popupButton="true"] { qproperty-iconSize: 12px 12px; }
+QListWidget#EditorConfigurationList, QListWidget#EditorToolbarAssignedActions { qproperty-iconSize: 24px 24px; }
+QPushButton#WelcomeWindow_Button_Left,
+QPushButton#WelcomeWindow_Button_Middle,
+QPushButton#WelcomeWindow_Button_Right { qproperty-iconSize: 20px 20px; }

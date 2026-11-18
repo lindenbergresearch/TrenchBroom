@@ -38,7 +38,6 @@ void FormWithSectionsLayout::addSection(const QString &title, const QString &inf
     if (rowCount() > 0) {
         auto *lineLayout = new QVBoxLayout();
         auto border = new BorderLine(BorderLine::Direction::Horizontal, 2);
-        border->setForegroundRole(QPalette::Midlight);
 
         lineLayout->setContentsMargins(WideHMargin, WideHMargin, WideHMargin, NoMargin);
         lineLayout->addWidget(border);

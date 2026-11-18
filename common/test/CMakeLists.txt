@@ -130,6 +130,7 @@ set(COMMON_TEST_SOURCE
         "${COMMON_TEST_SOURCE_DIR}/View/Widgets/tst_SearchableComboBox.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/Preferences/tst_IconSelectionDialog.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/Widgets/tst_SliderWithLabel.cpp"
+        "${COMMON_TEST_SOURCE_DIR}/View/Widgets/tst_StylesheetControls.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/Tools/Brush/tst_ExtrudeTool.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/Preferences/tst_FontUtils.cpp"
         "${COMMON_TEST_SOURCE_DIR}/View/Theme/tst_Theme.cpp"

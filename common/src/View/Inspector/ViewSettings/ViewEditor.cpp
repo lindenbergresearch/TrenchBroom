@@ -185,8 +185,8 @@ void EntityDefinitionCheckBoxList::createGui() {
 
     auto *scrollArea = new QScrollArea();
     scrollArea->setContentsMargins(0, 0, 0, 0);
-    scrollArea->setBackgroundRole(QPalette::Base);
-    scrollArea->setAutoFillBackground(true);
+    scrollArea->setAttribute(Qt::WA_StyledBackground);
+    scrollArea->setProperty("uiSurface", "base");
     scrollArea->setWidget(scrollWidget);
 
     auto *showAllButton = new QPushButton(tr("Show all"));

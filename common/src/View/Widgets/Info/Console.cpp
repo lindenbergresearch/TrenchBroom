@@ -18,6 +18,7 @@
  */
 
 #include "View/Widgets/Info/Console.h"
+#include "View/Widgets/Info/SemanticTextEdit.h"
 
 #include <QScrollBar>
 #include <QTextEdit>
@@ -26,12 +27,11 @@
 #include "FileLogger.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
-#include "TrenchBroomApp.h"
-#include "View/Theme/QtUtils.h"
 
 namespace TrenchBroom::View {
 Console::Console(QWidget* parent) : TabBookPage(parent) {
-    m_textView = new QTextEdit();
+    m_textView = new SemanticTextEdit();
+    m_textView->setObjectName("ConsoleOutput");
     m_textView->setReadOnly(true);
     m_textView->setWordWrapMode(QTextOption::NoWrap);
 
@@ -53,30 +53,27 @@ void Console::doLog(const LogLevel level, const LogMessage* message) {
 }
 
 void Console::logToConsole(const LogLevel level, const QString& message) const {
-    // NOTE: QPalette::Text is the correct color role for contrast against QPalette::Base
-    // which is the background of text entry widgets
-    QTextCharFormat format;
+    auto role = MessageStyle::Normal;
     switch (level) {
-        case LogLevel::Trace:
-            format.setForeground(QBrush(toQColor(pref(Preferences::LogTraceColor))));
-            break;
-        case LogLevel::Debug:
-            format.setForeground(QBrush(toQColor(pref(Preferences::LogDebugColor))));
-            break;
-        case LogLevel::Info:
-            format.setForeground(QBrush(toQColor(pref(Preferences::LogInfoColor))));
-            break;
-        case LogLevel::Warn:
-            format.setForeground(QBrush(toQColor(pref(Preferences::LogWarningColor))));
-            break;
-        case LogLevel::Error:
-            format.setForeground(QBrush(toQColor(pref(Preferences::LogErrorColor))));
-            break;
-        case LogLevel::None:
-            break;
+    case LogLevel::Trace:
+        role = MessageStyle::Trace;
+        break;
+    case LogLevel::Debug:
+        role = MessageStyle::Debug;
+        break;
+    case LogLevel::Info:
+        role = MessageStyle::Info;
+        break;
+    case LogLevel::Warn:
+        role = MessageStyle::Warning;
+        break;
+    case LogLevel::Error:
+        role = MessageStyle::Error;
+        break;
+    case LogLevel::None:
+        break;
     }
-
-    format.setFont(TrenchBroomApp::instance().getConsoleFont());
+    const auto format = SemanticTextEdit::messageFormat(*m_textView, role);
     QTextCursor cursor(m_textView->document());
     cursor.movePosition(QTextCursor::MoveOperation::End);
     cursor.insertText(message, format);

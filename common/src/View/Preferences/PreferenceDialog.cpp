@@ -51,7 +51,6 @@ namespace TrenchBroom {
 namespace View {
 const QString PreferenceDialog::WINDOW_TITLE = "Editor Preferences";
 const QSize PreferenceDialog::ICON_SIZE = QSize{32, 32};
-const int PreferenceDialog::ICON_WIDTH = int(float(ICON_SIZE.width()) * 2.5f);
 
 PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent)
     : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr), m_buttonBox(nullptr) {
@@ -92,7 +91,6 @@ void PreferenceDialog::createGui() {
     m_toolBar->setObjectName("ToolBar_PreferenceDialog");
     m_toolBar->setFloatable(false);
     m_toolBar->setMovable(false);
-    m_toolBar->setIconSize(ICON_SIZE);
     m_toolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     makeEmphasized(m_toolBar);
 
@@ -136,7 +134,6 @@ void PreferenceDialog::createGui() {
     for (auto *button : m_toolBar->findChildren<QToolButton *>()) {
         button->installEventFilter(this);
         button->setCheckable(true);
-        button->setMinimumWidth(ICON_WIDTH);
         button->setObjectName("ToolButton_PreferenceDialog");
         makeEmphasized(makeSubTitle(button));
     }

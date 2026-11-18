@@ -22,19 +22,38 @@
 #include <QBoxLayout>
 #include <QColorDialog>
 #include <QPushButton>
+#include <QFrame>
+#include <QPainter>
 
 #include "View/Theme/ViewConstants.h"
 #include "View/Theme/QtUtils.h"
 
 namespace TrenchBroom {
 namespace View {
+    namespace {
+        class ColorSwatch : public QFrame {
+            QColor m_color;
+
+          public:
+            void setColor(QColor color) {
+                m_color = color;
+                update();
+            }
+
+          protected:
+            void paintEvent(QPaintEvent* event) override {
+                QFrame::paintEvent(event);
+                QPainter painter(this);
+                painter.fillRect(contentsRect(), m_color);
+            }
+        };
+    } // namespace
 ColorButton::ColorButton(QWidget *parent) : QWidget(parent), m_colorIndicator(nullptr), m_button(nullptr) {
-    m_colorIndicator = new QWidget();
+    m_colorIndicator = new ColorSwatch();
     m_button = new QPushButton("...");
 
     m_colorIndicator->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
     m_colorIndicator->setObjectName("ColorSwatch");
-    m_colorIndicator->setAutoFillBackground(true);
 
     auto *layout = new QHBoxLayout();
     layout->setContentsMargins(QMargins());
@@ -56,8 +75,8 @@ ColorButton::ColorButton(QWidget *parent) : QWidget(parent), m_colorIndicator(nu
 void ColorButton::setColor(const QColor &color) {
     if (color != m_color) {
         m_color = color;
-        // The swatch displays a data value; its frame and dimensions come from base.qss.
-        m_colorIndicator->setStyleSheet("background-color: " + toStyleSheetRGBA(m_color) + ";");
+        // The value is data; the swatch frame and spacing are styled by QSS.
+        static_cast<ColorSwatch*>(m_colorIndicator)->setColor(m_color);
 
         update();
         emit colorChanged(m_color);

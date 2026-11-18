@@ -21,13 +21,21 @@
 
 #include <QPainter>
 #include <QPalette>
+#include <QStyle>
+#include <QStyleOption>
+#include <algorithm>
 
 #include "View/Theme/QtUtils.h"
 
 namespace TrenchBroom {
 namespace View {
 BorderPanel::BorderPanel(const Sides borders, const int thickness, QWidget *parent) : QWidget(parent), m_borders(borders), m_thickness(thickness) {
-    setForegroundRole(QPalette::Midlight);
+    setAttribute(Qt::WA_StyledBackground);
+}
+
+void BorderPanel::setBorderWidth(int width) {
+    m_thickness = std::clamp(width, 0, 32);
+    update();
 }
 
 void BorderPanel::paintEvent(QPaintEvent * /*event*/) {
@@ -39,11 +47,12 @@ void BorderPanel::paintEvent(QPaintEvent * /*event*/) {
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(palette().color(backgroundRole()));
-    painter.drawRect(r);
+    QStyleOption option;
+    option.initFrom(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &option, &painter, this);
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(palette().color(foregroundRole()));
+    painter.setBrush(borderColor());
     if ((m_borders & LeftSide) != 0) {
         painter.drawRect(QRectF(r.topLeft(), QSizeF(thickness, r.height())));
     }

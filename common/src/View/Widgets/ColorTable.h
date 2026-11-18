@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QColor>
 
 #include <vector>
 
@@ -29,39 +30,56 @@ namespace TrenchBroom {
 namespace View {
 class ColorTable : public QWidget {
   Q_OBJECT
-  private:
-    int m_cellSize;
-    int m_cellSpacing;
-    std::vector<QColor> m_colors;
-    std::vector<QColor> m_selectedColors;
+  Q_PROPERTY(QColor selectionColor READ selectionColor WRITE setSelectionColor)
+  Q_PROPERTY(int selectionWidth READ selectionWidth WRITE setSelectionWidth)
+  Q_PROPERTY(int cellSize READ cellSize WRITE setCellSize)
+  Q_PROPERTY(int cellSpacing READ cellSpacing WRITE setCellSpacing)
+private:
+  int m_cellSize;
+  int m_cellSpacing;
+  QColor m_selectionColor;
+  int m_selectionWidth = 1;
+  std::vector<QColor> m_colors;
+  std::vector<QColor> m_selectedColors;
 
-  public:
-    explicit ColorTable(int cellSize, QWidget *parent = nullptr);
+public:
+  explicit ColorTable(int cellSize, QWidget* parent = nullptr);
 
-    void setColors(const std::vector<QColor> &colors);
+  void setColors(const std::vector<QColor>& colors);
+  QColor selectionColor() const { return m_selectionColor.isValid() ? m_selectionColor : palette().color(QPalette::Highlight); }
+  int selectionWidth() const { return m_selectionWidth; }
+  int cellSize() const { return m_cellSize; }
+  int cellSpacing() const { return m_cellSpacing; }
+  void setSelectionColor(QColor color) {
+      m_selectionColor = color;
+      update();
+  }
+  void setSelectionWidth(int width);
+  void setCellSize(int size);
+  void setCellSpacing(int spacing);
 
-    void setSelection(const std::vector<QColor> &colors);
+  void setSelection(const std::vector<QColor>& colors);
 
-  protected: // QWidget overrides
-    void paintEvent(QPaintEvent *event) override;
+protected: // QWidget overrides
+  void paintEvent(QPaintEvent* event) override;
 
-    void mouseReleaseEvent(QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
 
-  public: // QWidget overrides
-    bool hasHeightForWidth() const override;
+public: // QWidget overrides
+  bool hasHeightForWidth() const override;
 
-    int heightForWidth(int w) const override;
+  int heightForWidth(int w) const override;
 
-  private:
-    int computeCols(int width) const;
+private:
+  int computeCols(int width) const;
 
-    int computeRows(int cols) const;
+  int computeRows(int cols) const;
 
-    int computeHeight(int rows) const;
+  int computeHeight(int rows) const;
 
-  signals:
+signals:
 
-    void colorTableSelected(QColor color);
+  void colorTableSelected(QColor color);
 };
 } // namespace View
 } // namespace TrenchBroom

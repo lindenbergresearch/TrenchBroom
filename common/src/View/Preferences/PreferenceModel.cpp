@@ -1,11 +1,10 @@
 #include "View/Preferences/PreferenceModel.h"
-#include "View/Preferences/FontUtils.h"
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "View/Theme/QtUtils.h"
 #include "Logger.h"
-#include "TrenchBroomApp.h"
 
 #include <kdl/path_utils.h>
 
@@ -65,15 +64,7 @@ QVariant PreferenceModel::data(const QModelIndex &index, int role) const {
         }
     }
 
-    // font role
-    if (role == Qt::FontRole) {
-        // default
-        if (index.column() == Value || index.column() == Default) {
-            auto font = TrenchBroomApp::instance().getConsoleFont();
-            font.setPixelSize(uiFontPixelSize());
-            return font;
-        }
-    }
+    if (role == StyledItemDelegate::TextStyleRole && (index.column() == Value || index.column() == Default)) return QStringLiteral("value");
 
     // set foreground color
     if (role == Qt::ForegroundRole) {

@@ -18,6 +18,7 @@
  */
 
 #include "View/Widgets/Info/IssueBrowserView.h"
+#include "View/Widgets/Lists/StyledItemDelegate.h"
 
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -57,6 +58,8 @@ void IssueBrowserView::createGui() {
 
     m_tableView = new QTableView{nullptr};
     m_tableView->setModel(m_tableModel);
+    m_tableView->setObjectName("IssueTable");
+    m_tableView->setItemDelegate(new StyledItemDelegate("issues", m_tableView));
     m_tableView->verticalHeader()->setVisible(false);
     m_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
     m_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -314,13 +317,8 @@ QVariant IssueBrowserModel::data(const QModelIndex &index, const int role) const
         } else {
             return QVariant{QString::fromStdString(issue->description())};
         }
-    } else if (role == Qt::FontRole) {
-        if (issue->hidden()) {
-            // hidden issues are italic
-            auto italicFont = QFont{};
-            italicFont.setItalic(true);
-            return QVariant{italicFont};
-        }
+    } else if (role == StyledItemDelegate::TextStyleRole && issue->hidden()) {
+        return QStringLiteral("hidden");
     }
 
     return QVariant{};

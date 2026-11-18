@@ -337,6 +337,10 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/Compilation/CompilationRunner.cpp
     ${COMMON_SOURCE_DIR}/View/Compilation/CompilationTaskListBox.cpp
     ${COMMON_SOURCE_DIR}/View/Compilation/CompilationVariables.cpp
+    ${COMMON_SOURCE_DIR}/View/Widgets/Info/SemanticTextEdit.h
+    ${COMMON_SOURCE_DIR}/View/Widgets/Info/SemanticTextEdit.cpp
+    ${COMMON_SOURCE_DIR}/View/Widgets/Lists/StyledItemDelegate.h
+    ${COMMON_SOURCE_DIR}/View/Widgets/Lists/StyledItemDelegate.cpp
     ${COMMON_SOURCE_DIR}/View/Widgets/Info/Console.cpp
     ${COMMON_SOURCE_DIR}/View/Widgets/ContainerBar.cpp
     ${COMMON_SOURCE_DIR}/View/Widgets/Lists/ControlListBox.cpp

@@ -27,6 +27,7 @@ class IconSelectionDialog : public QDialog {
     static QStringList availableIcons();
     QString selectedIcon() const;
     void accept() override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
 };
 
 } // namespace TrenchBroom::View

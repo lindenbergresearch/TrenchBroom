@@ -25,13 +25,20 @@ namespace TrenchBroom {
 namespace View {
 class BorderLine : public QFrame {
   Q_OBJECT
-  public:
-    enum class Direction {
-      Horizontal, Vertical
-    };
+  Q_PROPERTY(int thickness READ thickness WRITE setThickness)
+public:
+  enum class Direction { Horizontal, Vertical };
 
-  public:
-    explicit BorderLine(Direction direction = Direction::Horizontal, int thickness = 1, QWidget *parent = nullptr);
+public:
+  explicit BorderLine(Direction direction = Direction::Horizontal, int thickness = 1, QWidget* parent = nullptr);
+  int thickness() const { return m_thickness; }
+  void setThickness(int thickness);
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override { return sizeHint(); }
+
+private:
+  Direction m_direction;
+  int m_thickness;
 };
 } // namespace View
 } // namespace TrenchBroom

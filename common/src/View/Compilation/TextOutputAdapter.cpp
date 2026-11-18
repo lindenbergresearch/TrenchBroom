@@ -53,6 +53,13 @@ TextOutputAdapter::TextOutputAdapter(QTextEdit *textEdit) {
     m_insertionCursor.movePosition(QTextCursor::End);
 }
 
+void TextOutputAdapter::insertSystemMessage(const QString& string, const QTextCharFormat& format) {
+    auto* scrollBar = m_textEdit->verticalScrollBar();
+    const auto wasAtBottom = scrollBar->value() >= scrollBar->maximum();
+    m_insertionCursor.insertText(string, format);
+    if (wasAtBottom) scrollBar->setValue(scrollBar->maximum());
+}
+
 void TextOutputAdapter::appendString(const QString &string) {
     QScrollBar *scrollBar = m_textEdit->verticalScrollBar();
     const bool wasAtBottom = (scrollBar->value() >= scrollBar->maximum());

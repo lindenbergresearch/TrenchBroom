@@ -104,26 +104,22 @@ QWidget *WelcomeWindow::createAppPanel() {
     m_createNewDocumentButton->setToolTip("Create a new map document.");
     m_createNewDocumentButton->setObjectName("WelcomeWindow_Button_Left");
     m_createNewDocumentButton->setIcon(IO::loadSVGIcon("note_add_2.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
-    m_createNewDocumentButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
 
 
     m_openOtherDocumentButton = new QPushButton{this};
     m_openOtherDocumentButton->setToolTip("Open an existing map document.");
     m_openOtherDocumentButton->setObjectName("WelcomeWindow_Button_Middle");
     m_openOtherDocumentButton->setIcon(IO::loadSVGIcon("folder_open.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
-    m_openOtherDocumentButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
 
     m_openSettingsButton = new QPushButton{this};
     m_openSettingsButton->setToolTip("Setup TrenchBroom.");
     m_openSettingsButton->setObjectName("WelcomeWindow_Button_Middle");
     m_openSettingsButton->setIcon(IO::loadSVGIcon("build_circle.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
-    m_openSettingsButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
 
     m_quitApplicationButton = new QPushButton{this};
     m_quitApplicationButton->setToolTip("Quit TrenchBroom.");
     m_quitApplicationButton->setObjectName("WelcomeWindow_Button_Right");
     m_quitApplicationButton->setIcon(IO::loadSVGIcon("power_settings_circle.svg", WELCOME_WINDOW_BUTTON_SIZE.width()));
-    m_quitApplicationButton->setIconSize(WELCOME_WINDOW_BUTTON_SIZE);
 
     connect(m_createNewDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::createNewDocument);
     connect(m_openOtherDocumentButton, &QPushButton::clicked, this, &WelcomeWindow::openOtherDocument);

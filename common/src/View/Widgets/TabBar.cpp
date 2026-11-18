@@ -49,8 +49,8 @@ TabBarButton::TabBarButton(const QString &label, QWidget *parent)
     outerLayout->addWidget(m_indicator);
 
     makeEmphasized(m_label);
-    m_indicator->setFixedHeight(LayoutConstants::MediumVMargin);
-    m_indicator->setAutoFillBackground(true);
+    m_indicator->setObjectName("TabSelectionIndicator");
+    m_indicator->setAttribute(Qt::WA_StyledBackground);
 
     setLayout(outerLayout);
 }
@@ -65,12 +65,8 @@ void TabBarButton::mousePressEvent(QMouseEvent *) {
 }
 
 void TabBarButton::updateState() {
-    QPalette pal;
-    if (m_pressed) {
-        m_indicator->setBackgroundRole(QPalette::Highlight);
-    } else {
-        m_indicator->setBackgroundRole(QPalette::NoRole);
-    }
+    m_indicator->setProperty("selected", m_pressed);
+    repolishWidget(m_indicator);
 }
 
 // TabBar
