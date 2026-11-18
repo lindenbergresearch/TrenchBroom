@@ -96,9 +96,13 @@ TrenchBroom--View--SemanticTextEdit#CompilationOutput {
     qproperty-errorColor: #ef6670;
     qproperty-warningColor: #dfbb65;
     qproperty-successColor: #77c899;
-    qproperty-systemFontWeight: 75; /* Qt5: 50 normal, 75 fett */
+    qproperty-systemFontWeight: 700; /* Qt6/CSS: 400 normal, 700 fett */
 }
 ```
+
+`systemFontWeight` verwendet die Qt6-/CSS-Skala von 100 bis 900. Persönliche
+Stylesheets mit früheren Qt5-Werten (z. B. 50 oder 75) werden weiterhin korrekt
+in normale bzw. fette Schrift umgerechnet.
 
 ANSI-Formatierungen aus externen Programmen und explizit als Daten übergebene
 Farben behalten ihre Bedeutung. Sie werden beim Wechsel der internen Meldungsfarben
