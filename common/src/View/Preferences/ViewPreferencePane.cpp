@@ -26,13 +26,17 @@
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QDir>
+#include <QDoubleSpinBox>
 #include <QFile>
 #include <QFileDialog>
 #include <QFontDatabase>
 #include <QFontMetrics>
+#include <QFontMetricsF>
+#include <QFontInfo>
 #include <QFrame>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocale>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPushButton>
@@ -121,60 +125,64 @@ class FontComparisonPreview : public QFrame {
     const std::filesystem::path m_path;
     QFont m_titleFont;
     QFont m_detailFont;
+    ListFontSettings m_settings;
 
 public:
     explicit FontComparisonPreview(std::filesystem::path path, QWidget* parent)
         : QFrame(parent), m_path(std::move(path)) {
-        setFrameShape(QFrame::StyledPanel);
+        setProperty("fontPreview", true);
         setBackgroundRole(QPalette::Base);
         setAutoFillBackground(true);
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         refresh();
     }
 
+    QString description() const {
+        const auto axes = fontCapabilities(m_titleFont);
+        const auto weight = m_titleFont.isVariableAxisSet("wght")
+            ? qRound(m_titleFont.variableAxisValue("wght")) : QFontInfo{m_titleFont}.weight();
+        return axes.opticalSize
+            ? tr("Weight %1 · Optical size %2 pt").arg(weight)
+                .arg(QLocale{}.toString(m_titleFont.variableAxisValue("opsz"), 'f', 1))
+            : tr("Weight %1 · Optical size unavailable").arg(weight);
+    }
+
     void refresh() {
-        m_titleFont = loadFont(m_path, uiFontPixelSize());
-        m_detailFont = detailFont(m_titleFont);
-        m_detailFont.setBold(false);
-        setAccessibleDescription(tr("Title %1 pixels, details %2 pixels")
-            .arg(m_titleFont.pixelSize()).arg(m_detailFont.pixelSize()));
+        m_settings = listFontSettings();
+        const auto base = loadFont(m_path, uiFontPixelSize());
+        m_titleFont = listTextFont(base, m_settings);
+        m_detailFont = listTextFont(detailFont(base), m_settings);
+        setProperty("previewTitleFont", m_titleFont);
+        setProperty("previewDetailFont", m_detailFont);
+        setAccessibleDescription(tr("Title %1 pixels, details %2 pixels. %3")
+            .arg(logicalFontPixelSize(m_titleFont)).arg(logicalFontPixelSize(m_detailFont)).arg(description()));
         updateGeometry();
         update();
     }
 
     QSize sizeHint() const override {
-        const auto title = QFontMetrics(m_titleFont);
-        const auto detail = QFontMetrics(m_detailFont);
-        return {220, title.height() + 2 * detail.height() + 4 * LayoutConstants::MediumVMargin + 2 * frameWidth()};
+        const QFontMetricsF title{m_titleFont}, detail{m_detailFont};
+        return {220, int(std::ceil(title.height() + 2 * detail.height()
+            + 4 * LayoutConstants::MediumVMargin + 2 * frameWidth()))};
     }
 
-    QSize minimumSizeHint() const override {
-        return {160, sizeHint().height()};
-    }
+    QSize minimumSizeHint() const override { return {160, sizeHint().height()}; }
 
 protected:
     void paintEvent(QPaintEvent* event) override {
         QFrame::paintEvent(event);
         QPainter painter(this);
-        painter.setRenderHint(QPainter::TextAntialiasing);
-        const auto bounds = contentsRect().marginsRemoved(QMargins{
+        const auto bounds = QRectF(contentsRect()).marginsRemoved(QMarginsF{
             LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin,
             LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin});
-        const auto titleMetrics = QFontMetrics(m_titleFont);
-        const auto detailMetrics = QFontMetrics(m_detailFont);
-        auto row = QRect(bounds.left(), bounds.top(), bounds.width(), titleMetrics.height());
+        const QFontMetricsF titleMetrics{m_titleFont}, detailMetrics{m_detailFont};
+        auto row = QRectF(bounds.left(), bounds.top(), bounds.width(), titleMetrics.height());
         painter.setPen(palette().color(QPalette::Text));
-        painter.setFont(m_titleFont);
-        painter.drawText(row, Qt::AlignLeft | Qt::AlignVCenter,
-            titleMetrics.elidedText(tr("Group Main Hall"), Qt::ElideRight, row.width()));
-
-        painter.setFont(m_detailFont);
+        paintTextLine(painter, row, tr("Group Main Hall"), m_titleFont, m_settings.subpixelPositioning);
         painter.setOpacity(std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f));
         for (const auto& text : {tr("6 brushes · 32 faces · stone_wall"), tr("Position 128, 64, 32 · light 100")}) {
-            row.setTop(row.bottom() + 1 + LayoutConstants::MediumVMargin);
-            row.setHeight(detailMetrics.height());
-            painter.drawText(row, Qt::AlignLeft | Qt::AlignVCenter,
-                detailMetrics.elidedText(text, Qt::ElideRight, row.width()));
+            row = QRectF(bounds.left(), row.bottom() + LayoutConstants::MediumVMargin, bounds.width(), detailMetrics.height());
+            paintTextLine(painter, row, text, m_detailFont, m_settings.subpixelPositioning);
         }
     }
 };
@@ -356,28 +364,65 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_UIDetailTextOpacity->setAccessibleName(tr("Detail text opacity"));
     m_UIDetailTextOpacity->setToolTip(tr("Sets the visibility of secondary information such as object counts and texture names."));
 
+    m_listFontWeight = new QSpinBox;
+    m_listFontWeight->setObjectName("UIListFontWeight");
+    m_listFontWeight->setAccessibleName(tr("List text weight"));
+    m_listFontWeight->setRange(0, 1000);
+    m_listFontWeight->setSingleStep(25);
+    m_listFontWeight->setSpecialValueText(tr("Font default"));
+    m_listFontWeight->setKeyboardTracking(false);
+    m_listFontWeight->setToolTip(tr("Fine-tunes list text weight. Variable fonts support intermediate weights; other fonts use the closest available face. Stylesheet emphasis is preserved."));
+    m_listOpticalSize = new QDoubleSpinBox;
+    m_listOpticalSize->setObjectName("UIListOpticalSize");
+    m_listOpticalSize->setAccessibleName(tr("Optical size"));
+    m_listOpticalSize->setRange(0, 144);
+    m_listOpticalSize->setDecimals(1);
+    m_listOpticalSize->setSingleStep(1);
+    m_listOpticalSize->setSpecialValueText(tr("Automatic"));
+    m_listOpticalSize->setSuffix(tr(" pt"));
+    m_listOpticalSize->setKeyboardTracking(false);
+    m_listOpticalSize->setToolTip(tr("Automatic follows each text size. Values are limited to the selected font's supported optical range; fonts without optical sizing remain unchanged."));
+    m_listTypoLineMetrics = new QCheckBox(tr("Use typographic line spacing"));
+    m_listTypoLineMetrics->setObjectName("UIListTypoLineMetrics");
+    m_listTypoLineMetrics->setToolTip(tr("Uses the font's preferred line spacing. Some fonts already use these metrics."));
+    m_listTextPosition = new QComboBox;
+    m_listTextPosition->setObjectName("UIListTextPosition");
+    m_listTextPosition->setAccessibleName(tr("Text positioning"));
+    m_listTextPosition->addItems({tr("Pixel aligned"), tr("Subpixel positioning")});
+    m_listTextPosition->setToolTip(tr("Pixel alignment places text baselines on physical screen pixels. Subpixel positioning uses unhinted text and permits fractional baselines."));
+
     auto* comparison = new QWidget;
+    comparison->setObjectName("UIFontComparison");
     auto* comparisonLayout = new QHBoxLayout(comparison);
     comparisonLayout->setContentsMargins(0, 0, 0, 0);
     comparisonLayout->setSpacing(LayoutConstants::MediumHMargin);
     const auto addPreview = [&](const QString& title, const std::filesystem::path& path,
-                               const QString& name, const QString& buttonText) {
+                               const QString& name, const QString& buttonText, QLabel*& info) {
         auto* column = new QVBoxLayout;
         auto* heading = new QLabel(title);
+        heading->setProperty("fontPreviewHeading", true);
         auto* preview = new FontComparisonPreview(path, comparison);
         preview->setObjectName(name);
         preview->setAccessibleName(title);
+        info = new QLabel(preview->description());
+        info->setObjectName(name + "Info");
+        info->setProperty("fontPreviewInfo", true);
+        info->setWordWrap(true);
         auto* button = new QPushButton(buttonText);
         button->setObjectName(name + "Apply");
         connect(button, &QPushButton::clicked, this, [this, path] { applyUIFont(path); });
         column->addWidget(heading);
         column->addWidget(preview);
+        column->addWidget(info);
         column->addWidget(button);
         comparisonLayout->addLayout(column, 1);
         return preview;
     };
-    m_systemFontPreview = addPreview(tr("System font"), "[system]", "UIFontPreview_System", tr("Use system font"));
-    m_interFontPreview = addPreview(tr("Inter"), "fonts/Inter-Regular.otf", "UIFontPreview_Inter", tr("Use Inter"));
+    m_systemFontPreview = addPreview(tr("System font"), "[system]", "UIFontPreview_System", tr("Use system font"), m_systemFontInfo);
+    m_interFontPreview = addPreview(tr("Inter Variable"), "fonts/InterVariable.ttf", "UIFontPreview_Inter", tr("Use Inter Variable"), m_interFontInfo);
+    auto* comparisonScope = new QLabel(tr("Fine tuning applies to these previews and the Layer tree. Font family and size apply throughout the UI."));
+    comparisonScope->setObjectName("UIFontComparisonScope");
+    comparisonScope->setWordWrap(true);
 
     m_ConsoleFontSizeCombo = new QComboBox{};
     m_ConsoleFontSizeCombo->setEditable(false);
@@ -435,7 +480,14 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow("UI Font", m_UIFontCombo, m_UIFontSizeCombo);
     layout->addRow(tr("Minimum UI size"), m_UIFontMinimumSize);
     layout->addRow(tr("Detail text opacity"), m_UIDetailTextOpacity);
+    layout->addSection(tr("List text comparison"));
+    layout->addRow(comparisonScope);
+    layout->addRow(tr("List text weight"), m_listFontWeight);
+    layout->addRow(tr("Optical size"), m_listOpticalSize);
+    layout->addRow(tr("Line spacing"), m_listTypoLineMetrics);
+    layout->addRow(tr("Text positioning"), m_listTextPosition);
     layout->addRow(comparison);
+    layout->addSection(tr("Other fonts"));
     layout->addRow("Console Font", m_ConsoleFontCombo, m_ConsoleFontSizeCombo);
     layout->addRow("Renderer Font", m_rendererFontCombo, m_rendererFontSizeCombo);
 
@@ -538,6 +590,10 @@ void ViewPreferencePane::bindEvents() {
     connect(m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged);
     connect(m_UIFontMinimumSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &ViewPreferencePane::editorUIFontMinimumSizeChanged);
     connect(m_UIDetailTextOpacity, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorUIDetailTextOpacityChanged);
+    connect(m_listFontWeight, &QSpinBox::valueChanged, this, &ViewPreferencePane::editorUIListFontWeightChanged);
+    connect(m_listOpticalSize, &QDoubleSpinBox::valueChanged, this, &ViewPreferencePane::editorUIListOpticalSizeChanged);
+    connect(m_listTypoLineMetrics, &QCheckBox::toggled, this, &ViewPreferencePane::editorUIListTypoMetricsChanged);
+    connect(m_listTextPosition, &QComboBox::currentIndexChanged, this, &ViewPreferencePane::editorUIListTextPositionChanged);
     connect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
     connect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
     connect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
@@ -566,6 +622,10 @@ void ViewPreferencePane::unBindEvents() {
     disconnect(m_UIFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorUIFontSizeChanged);
     disconnect(m_UIFontMinimumSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &ViewPreferencePane::editorUIFontMinimumSizeChanged);
     disconnect(m_UIDetailTextOpacity, &SliderWithLabel::valueChanged, this, &ViewPreferencePane::editorUIDetailTextOpacityChanged);
+    disconnect(m_listFontWeight, nullptr, this, nullptr);
+    disconnect(m_listOpticalSize, nullptr, this, nullptr);
+    disconnect(m_listTypoLineMetrics, nullptr, this, nullptr);
+    disconnect(m_listTextPosition, nullptr, this, nullptr);
     disconnect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
     disconnect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
     disconnect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
@@ -602,6 +662,10 @@ void ViewPreferencePane::doResetToDefaults() {
     prefs.resetToDefault(Preferences::UIFontSize);
     prefs.resetToDefault(Preferences::UIFontMinimumSize);
     prefs.resetToDefault(Preferences::UIDetailTextOpacity);
+    prefs.resetToDefault(Preferences::UIListFontWeight);
+    prefs.resetToDefault(Preferences::UIListOpticalSize);
+    prefs.resetToDefault(Preferences::UIListTypoLineMetrics);
+    prefs.resetToDefault(Preferences::UIListSubpixelPositioning);
     prefs.resetToDefault(Preferences::RendererFontPath);
     prefs.resetToDefault(Preferences::UIFontPath);
     prefs.resetToDefault(Preferences::ConsoleFontPath);
@@ -679,6 +743,11 @@ void ViewPreferencePane::doUpdateControls() {
         m_UIFontMinimumSize->setValue(pref(Preferences::UIFontMinimumSize));
         m_UIDetailTextOpacity->setValue(qRound(std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f) * 100.0f));
     }
+    const auto listSettings = listFontSettings();
+    m_listFontWeight->setValue(listSettings.weight);
+    m_listOpticalSize->setValue(listSettings.opticalSize);
+    m_listTypoLineMetrics->setChecked(listSettings.typoLineMetrics);
+    m_listTextPosition->setCurrentIndex(listSettings.subpixelPositioning ? 1 : 0);
     updateFontPreviews();
 
     bindEvents();
@@ -835,6 +904,28 @@ void ViewPreferencePane::reloadUIStyle() {
 void ViewPreferencePane::updateFontPreviews() {
     m_systemFontPreview->refresh();
     m_interFontPreview->refresh();
+    m_systemFontInfo->setText(m_systemFontPreview->description());
+    m_interFontInfo->setText(m_interFontPreview->description());
+}
+
+void ViewPreferencePane::editorUIListFontWeightChanged(const int value) {
+    PreferenceManager::instance().set(Preferences::UIListFontWeight, value);
+    updateFontPreviews();
+}
+
+void ViewPreferencePane::editorUIListOpticalSizeChanged(const double value) {
+    PreferenceManager::instance().set(Preferences::UIListOpticalSize, float(value));
+    updateFontPreviews();
+}
+
+void ViewPreferencePane::editorUIListTypoMetricsChanged(const bool value) {
+    PreferenceManager::instance().set(Preferences::UIListTypoLineMetrics, value);
+    updateFontPreviews();
+}
+
+void ViewPreferencePane::editorUIListTextPositionChanged(const int value) {
+    PreferenceManager::instance().set(Preferences::UIListSubpixelPositioning, value == 1);
+    updateFontPreviews();
 }
 
 void ViewPreferencePane::applyUIFont(const std::filesystem::path& path) {

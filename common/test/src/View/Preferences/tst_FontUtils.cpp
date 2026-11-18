@@ -6,20 +6,27 @@
 #include "View/Widgets/Lists/ControlListBox.h"
 #include "View/Widgets/ElidedLabel.h"
 #include "View/Preferences/FontUtils.h"
+#include "View/Preferences/ViewPreferencePane.h"
 #include "View/Inspector/Layer/LayerTreeItemRenderer.h"
 #include "View/Theme/QtUtils.h"
 
 #include <QApplication>
 #include <QFile>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QFontDatabase>
 #include <QFontMetricsF>
 #include <QImage>
 #include <QLabel>
 #include <QListWidget>
+#include <QLocale>
 #include <QPainter>
+#include <QPainterPath>
 #include <QRawFont>
 #include <QScopeGuard>
 #include <QStandardItemModel>
+#include <QSpinBox>
 #include <QTemporaryDir>
 #include <QVBoxLayout>
 
@@ -35,12 +42,20 @@ class FontSettingsScope {
     const int m_size = pref(Preferences::UIFontSize);
     const int m_minimum = pref(Preferences::UIFontMinimumSize);
     const float m_opacity = pref(Preferences::UIDetailTextOpacity);
+    const int m_weight = pref(Preferences::UIListFontWeight);
+    const float m_opticalSize = pref(Preferences::UIListOpticalSize);
+    const bool m_typoMetrics = pref(Preferences::UIListTypoLineMetrics);
+    const bool m_subpixel = pref(Preferences::UIListSubpixelPositioning);
 
 public:
     FontSettingsScope() {
         auto& prefs = PreferenceManager::instance();
         prefs.set(Preferences::UIFontSize, 13);
         prefs.set(Preferences::UIFontMinimumSize, 11);
+        prefs.set(Preferences::UIListFontWeight, 0);
+        prefs.set(Preferences::UIListOpticalSize, 0.0f);
+        prefs.set(Preferences::UIListTypoLineMetrics, false);
+        prefs.set(Preferences::UIListSubpixelPositioning, false);
     }
 
     ~FontSettingsScope() {
@@ -48,6 +63,10 @@ public:
         prefs.set(Preferences::UIFontSize, m_size);
         prefs.set(Preferences::UIFontMinimumSize, m_minimum);
         prefs.set(Preferences::UIDetailTextOpacity, m_opacity);
+        prefs.set(Preferences::UIListFontWeight, m_weight);
+        prefs.set(Preferences::UIListOpticalSize, m_opticalSize);
+        prefs.set(Preferences::UIListTypoLineMetrics, m_typoMetrics);
+        prefs.set(Preferences::UIListSubpixelPositioning, m_subpixel);
     }
 };
 
@@ -306,4 +325,143 @@ TEST_CASE_METHOD(FontSettingsScope, "Tree details use the minimum font and saved
         CHECK(detailAlpha(0.0f) == 0);
     }
 }
+TEST_CASE_METHOD(FontSettingsScope, "List font tuning changes outlines at intermediate weights and optical sizes", "[fonts][typography]") {
+    const auto base = loadFont(fontFile("InterVariable.ttf"), 20);
+    const auto axes = fontCapabilities(base);
+    REQUIRE(axes.weight);
+    REQUIRE(axes.opticalSize);
+    CHECK(axes.weight->minimum == 100);
+    CHECK(axes.weight->maximum == 900);
+    CHECK(axes.opticalSize->minimum == 14);
+    CHECK(axes.opticalSize->maximum == 32);
+    const auto outline = [](const QFont& font) {
+        const auto raw = QRawFont::fromFont(font);
+        REQUIRE(raw.isValid());
+        const auto glyphs = raw.glyphIndexesForString("e");
+        REQUIRE(glyphs.size() == 1);
+        return raw.pathForGlyph(glyphs.front());
+    };
+    const auto regular = listTextFont(base, {400, 14});
+    const auto intermediate = listTextFont(base, {450, 14});
+    const auto medium = listTextFont(base, {500, 14});
+    CHECK(intermediate.variableAxisValue("wght") == 450);
+    CHECK(outline(intermediate) != outline(regular));
+    CHECK(outline(intermediate) != outline(medium));
+    CHECK(outline(listTextFont(base, {450, 32})) != outline(intermediate));
+    const auto clamped = listTextFont(base, {1000, 200, true});
+    CHECK(clamped.variableAxisValue("wght") == 900);
+    CHECK(clamped.variableAxisValue("opsz") == 32);
+    CHECK(bool(clamped.styleStrategy() & QFont::PreferTypoLineMetrics));
+    CHECK(listTextFont(base, {}).variableAxisValue("opsz") >= 14);
+    auto heading = base;
+    heading.setBold(true);
+    CHECK(listTextFont(heading, {450, 14}, true).variableAxisValue("wght") == 700);
+    CHECK(listTextFont(base, {450, 14}, true).variableAxisValue("wght") == 450);
+    const auto staticFont = loadFont(fontFile("Inter-Regular.otf"), 13);
+    REQUIRE_FALSE(fontCapabilities(staticFont).opticalSize);
+    CHECK_FALSE(listTextFont(staticFont, {450, 25}).isVariableAxisSet("opsz"));
+    // Variation settings never leak into the application font or raw font cache.
+    CHECK_FALSE(base.isVariableAxisSet("wght"));
+    CHECK_FALSE(loadFont(fontFile("InterVariable.ttf"), 20).isVariableAxisSet("opsz"));
+}
+
+TEST_CASE_METHOD(FontSettingsScope, "List text baselines align to physical pixels at fractional display scales", "[fonts][typography]") {
+    const auto font = loadFont(fontFile("InterVariable.ttf"), 13);
+    const QFontMetricsF metrics{font};
+    const QRectF rect{1.2, 2.3, 140, 37.4};
+    for (const auto density : {1.0, 1.25, 1.5, 2.0}) {
+        CAPTURE(density);
+        QImage image(400, 200, QImage::Format_ARGB32_Premultiplied);
+        image.setDevicePixelRatio(density);
+        QPainter painter(&image);
+        painter.translate(0.17, 0.31);
+        painter.scale(1.15, 1.07);
+        const auto transform = painter.deviceTransform();
+        const auto free = textLineBaseline(painter, rect, metrics, true);
+        CHECK(free.x() == Approx(rect.left()));
+        CHECK(free.y() == Approx(rect.top() + (rect.height() - metrics.height()) / 2 + metrics.ascent()));
+        const auto aligned = transform.map(textLineBaseline(painter, rect, metrics, false));
+        CHECK(aligned.x() == Approx(std::round(aligned.x())));
+        CHECK(aligned.y() == Approx(std::round(aligned.y())));
+        CHECK(std::abs(aligned.x() - transform.map(free).x()) <= 0.5);
+        CHECK(std::abs(aligned.y() - transform.map(free).y()) <= 0.5);
+        CHECK(painter.deviceTransform() == transform);
+    }
+}
+
+TEST_CASE_METHOD(FontSettingsScope, "List typography controls update saved values and the matching Inter preview", "[fonts][typography]") {
+    ViewPreferencePane pane{nullptr};
+    pane.updateControls();
+    auto* weight = pane.findChild<QSpinBox*>("UIListFontWeight");
+    auto* optical = pane.findChild<QDoubleSpinBox*>("UIListOpticalSize");
+    auto* metrics = pane.findChild<QCheckBox*>("UIListTypoLineMetrics");
+    auto* position = pane.findChild<QComboBox*>("UIListTextPosition");
+    auto* inter = pane.findChild<QWidget*>("UIFontPreview_Inter");
+    auto* system = pane.findChild<QWidget*>("UIFontPreview_System");
+    auto* status = pane.findChild<QLabel*>("UIFontPreview_InterInfo");
+    REQUIRE(weight); REQUIRE(optical); REQUIRE(metrics); REQUIRE(position);
+    REQUIRE(inter); REQUIRE(system); REQUIRE(status);
+    CHECK(weight->value() == 0);
+    CHECK(optical->value() == 0);
+    weight->setValue(450);
+    optical->setValue(24);
+    metrics->setChecked(true);
+    position->setCurrentIndex(1);
+    CHECK(pref(Preferences::UIListFontWeight) == 450);
+    CHECK(pref(Preferences::UIListOpticalSize) == 24.0f);
+    CHECK(pref(Preferences::UIListTypoLineMetrics));
+    CHECK(pref(Preferences::UIListSubpixelPositioning));
+    const auto title = inter->property("previewTitleFont").value<QFont>();
+    const auto detail = inter->property("previewDetailFont").value<QFont>();
+    CHECK(title.variableAxisValue("wght") == 450);
+    CHECK(detail.variableAxisValue("wght") == 450);
+    CHECK(title.variableAxisValue("opsz") == 24);
+    CHECK(status->text().contains("450"));
+    CHECK(status->text().contains(QLocale{}.toString(24.0, 'f', 1)));
+    CHECK(logicalFontPixelSize(title) == logicalFontPixelSize(system->property("previewTitleFont").value<QFont>()));
+    CHECK(logicalFontPixelSize(detail) == logicalFontPixelSize(system->property("previewDetailFont").value<QFont>()));
+    pane.updateControls();
+    weight->setValue(475);
+    CHECK(inter->property("previewTitleFont").value<QFont>().variableAxisValue("wght") == 475);
+    CHECK(pref(Preferences::UIListFontWeight) == 475);
+}
+
+TEST_CASE_METHOD(FontSettingsScope, "Layer rows use exact list weights while retaining stylesheet emphasis", "[fonts][typography]") {
+    const auto originalFont = QApplication::font();
+    const auto restore = qScopeGuard([&] { QApplication::setFont(originalFont); });
+    auto base = loadFont(fontFile("InterVariable.ttf"), 20);
+    base.setWeight(QFont::Medium);
+    base.setStyleName({});
+    base.setHintingPreference(QFont::PreferNoHinting);
+    QApplication::setFont(base);
+    CHECK(listTextFont(base, {450, 14}, true).variableAxisValue("wght") == 450);
+    auto heading = base;
+    heading.setWeight(QFont::Bold);
+    CHECK(listTextFont(heading, {450, 14}, true).variableAxisValue("wght") == 700);
+
+    LayerTreeGroupRenderer renderer;
+    QStandardItemModel model(1, 1);
+    const auto index = model.index(0, 0);
+    model.setData(index, "6 brushes · 32 faces · stone_wall", LayerTreeItemDelegate::DetailRole);
+    QStyleOptionViewItem option;
+    option.font = base;
+    option.text = "Group Main Hall";
+    option.state = QStyle::State_Enabled | QStyle::State_Active;
+    option.palette.setColor(QPalette::Active, QPalette::Text, Qt::white);
+    option.rect = QRect(0, 0, 420, 90);
+    const auto render = [&](int weight) {
+        PreferenceManager::instance().set(Preferences::UIListFontWeight, weight);
+        QImage image(option.rect.size(), QImage::Format_ARGB32_Premultiplied);
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        renderer.paint(painter, option, index);
+        painter.end();
+        return image;
+    };
+    const auto regular = render(400);
+    const auto intermediate = render(450);
+    CHECK(intermediate != regular);
+    CHECK(intermediate != render(700));
+}
+
 } // namespace TrenchBroom::View

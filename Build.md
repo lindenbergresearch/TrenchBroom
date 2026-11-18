@@ -139,10 +139,10 @@ History/Undo, view state and archive caches. Qt6-specific checks cover map text
 encodings (including incomplete characters), legacy QSS font weights, shortcut serialization and fractional input
 coordinates. Dependency checks exercise the real image/model/font loaders.
 
-CTest runs **223 test cases / 75,793 assertions** with isolated temporary settings
+CTest runs **227 test cases / 75,879 assertions** with isolated temporary settings
 and the offscreen Qt platform. It does not change personal editor settings.
 The font/vector-icon/Qt6 subset also passes with `QT_SCALE_FACTOR=1.5` and `2`
-(29 cases / 3,240 assertions at each scale).
+(33 cases / 3,326 assertions at each scale).
 To run a subset:
 
 ```sh

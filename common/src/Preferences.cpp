@@ -229,6 +229,10 @@ Preference<int> BrowserFontSize("Browser/Font size", 12);
 Preference<int> UIFontSize("Editor/UI Font size", 13);
 Preference<int> UIFontMinimumSize("Editor/UI Minimum font size", 11);
 Preference<float> UIDetailTextOpacity("Editor/UI Detail text opacity", 0.85f);
+Preference<int> UIListFontWeight("Editor/UI List font weight", 0);
+Preference<float> UIListOpticalSize("Editor/UI List optical size", 0.0f);
+Preference<bool> UIListTypoLineMetrics("Editor/UI List typographic line metrics", false);
+Preference<bool> UIListSubpixelPositioning("Editor/UI List subpixel text positioning", false);
 Preference<int> PreferencesWindowWidth("Editor/Dialogs/Preferences width", 1100);
 Preference<int> PreferencesWindowHeight("Editor/Dialogs/Preferences height", 800);
 Preference<int> ViewDetailsWindowWidth("Editor/Dialogs/View details width", 820);
@@ -418,7 +422,9 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &OccludedHandleColor, &SelectedHandleColor, &OccludedSelectedHandleColor, &ClipHandleColor, &ClipFaceColor, &ExtrudeHandleColor, &RotateHandleRadius, &RotateHandleColor, &ScaleHandleColor,
         &ScaleFillColor, &ScaleOutlineColor, &ScaleOutlineDimAlpha, &ShearFillColor, &ShearOutlineColor, &MoveTraceColor, &OccludedMoveTraceColor, &MoveIndicatorOutlineColor, &MoveIndicatorFillColor,
         &AngleIndicatorColor, &TextureSeamColor, &Brightness, &FaceAutoBrightness, &GridLineWidth, &GridAlpha, &GridMajorDivisionSize, &GridColor2D, &GridUnitSystem, &TextureMinFilter, &TextureMagFilter,
-        &TextureLock, &UVLock, &GroupBrushesCreatedByShapeTool, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &UIFontMinimumSize, &UIDetailTextOpacity, &PreferencesWindowWidth, &PreferencesWindowHeight, &ViewDetailsWindowWidth, &ViewDetailsWindowHeight, &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
+        &TextureLock, &UVLock, &GroupBrushesCreatedByShapeTool, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &UIFontMinimumSize, &UIDetailTextOpacity,
+        &UIListFontWeight, &UIListOpticalSize, &UIListTypoLineMetrics, &UIListSubpixelPositioning,
+        &PreferencesWindowWidth, &PreferencesWindowHeight, &ViewDetailsWindowWidth, &ViewDetailsWindowHeight, &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
         &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,

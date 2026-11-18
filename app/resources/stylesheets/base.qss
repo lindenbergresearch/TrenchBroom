@@ -130,6 +130,19 @@ QWidget#ItemCellStyle { qproperty-overrideTextColor: false; }
 QWidget#ItemCellStyle[cellContext="entityProperties"] { qproperty-overrideTextColor: true; }
 
 /* ==== TYPOGRAPHY ==== */
+/* Preferences -> View: matching system/Inter Variable list samples. Preview
+   text uses the comparison settings; headings/status inherit normal UI roles. */
+QFrame[fontPreview="true"] {
+    background-color: ${color.base};
+    border: 1px solid ${color.midlight};
+    border-radius: 6px;
+}
+QLabel[fontPreviewHeading="true"] { font-weight: 600; }
+QLabel[fontPreviewInfo="true"], QLabel#UIFontComparisonScope {
+    font-size: ${length.font.small};
+    color: ${color.text.detail};
+}
+
 /* Gemeinsame Rollen für QtUtils::makeTitle/makeInfo/makeSmall/makeMono usw.
    uiTextRole: small/info/subtitle/title/header/dialogTitle/brand.
    uiEmphasized und uiItalic steuern Gewicht und Kursivschrift; uiFontFamily="console"

@@ -251,11 +251,15 @@ void LayerListBox::connectObservers() {
             setGroupingThreshold(pref(Preferences::LayerTreeGroupingThreshold));
         else if (path == Preferences::LayerTreeSyncSelection.path())
             setSelectionSyncEnabled(pref(Preferences::LayerTreeSyncSelection));
-        else if (path == Preferences::UIFontMinimumSize.path()) {
+        else if (path == Preferences::UIFontMinimumSize.path()
+            || path == Preferences::UIListFontWeight.path()
+            || path == Preferences::UIListOpticalSize.path()
+            || path == Preferences::UIListTypoLineMetrics.path()) {
             scheduleDelayedItemsLayout();
             viewport()->update();
         }
-        else if (path == Preferences::UIDetailTextOpacity.path()) viewport()->update();
+        else if (path == Preferences::UIDetailTextOpacity.path()
+            || path == Preferences::UIListSubpixelPositioning.path()) viewport()->update();
         else if (LayerTreeItemDelegate::isIconColorPreference(path)) {
             if (!ThemeManager::instance().current().values.isEmpty()) return;
             // Change decorations only: keep the selection, expansion and scroll

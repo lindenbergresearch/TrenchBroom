@@ -26,6 +26,8 @@
 class QCheckBox;
 
 class QComboBox;
+class QDoubleSpinBox;
+class QLabel;
 class QLineEdit;
 class QSpinBox;
 
@@ -58,6 +60,12 @@ class ViewPreferencePane : public PreferencePane {
     QComboBox *m_UIFontCombo = nullptr;
     QSpinBox *m_UIFontMinimumSize = nullptr;
     SliderWithLabel *m_UIDetailTextOpacity = nullptr;
+    QSpinBox *m_listFontWeight = nullptr;
+    QDoubleSpinBox *m_listOpticalSize = nullptr;
+    QCheckBox *m_listTypoLineMetrics = nullptr;
+    QComboBox *m_listTextPosition = nullptr;
+    QLabel *m_systemFontInfo = nullptr;
+    QLabel *m_interFontInfo = nullptr;
     FontComparisonPreview *m_systemFontPreview = nullptr;
     FontComparisonPreview *m_interFontPreview = nullptr;
     QComboBox *m_ConsoleFontSizeCombo = nullptr;
@@ -130,6 +138,10 @@ class ViewPreferencePane : public PreferencePane {
     void editorUIFontMinimumSizeChanged(int value);
 
     void editorUIDetailTextOpacityChanged(int value);
+    void editorUIListFontWeightChanged(int value);
+    void editorUIListOpticalSizeChanged(double value);
+    void editorUIListTypoMetricsChanged(bool value);
+    void editorUIListTextPositionChanged(int value);
 
     void editorConsoleFontSizeChanged(const QString &text);
 

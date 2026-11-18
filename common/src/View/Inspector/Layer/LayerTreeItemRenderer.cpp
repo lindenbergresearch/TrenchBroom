@@ -63,8 +63,10 @@ void LayerTreeItemRenderer::paint(QPainter &painter, const QStyleOptionViewItem 
     option.icon.paint(&painter, iconRect, Qt::AlignCenter, !enabled ? QIcon::Disabled : selected ? QIcon::Selected
                                                                                                  : QIcon::Normal);
 
-    const auto infoFont = detailFont(option.font, layout.detailFontReduction);
-    const auto titleMetrics = QFontMetricsF(option.font);
+    const auto settings = listFontSettings();
+    const auto titleFont = listTextFont(option.font, settings, true);
+    const auto infoFont = listTextFont(detailFont(option.font, layout.detailFontReduction), settings);
+    const auto titleMetrics = QFontMetricsF(titleFont);
     const auto infoMetrics = QFontMetricsF(infoFont);
 
     const auto info = index.data(LayerTreeItemDelegate::DetailRole).toString();
@@ -77,27 +79,24 @@ void LayerTreeItemRenderer::paint(QPainter &painter, const QStyleOptionViewItem 
 
     painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setFont(option.font);
     painter.setPen(textColor);
-    painter.drawText(titleRect,
-                     Qt::AlignLeft | Qt::AlignVCenter, titleMetrics.elidedText(option.text, Qt::ElideRight, textWidth));
+    paintTextLine(painter, titleRect, option.text, titleFont, settings.subpixelPositioning);
 
     if (!info.isEmpty()) {
         auto infoColor = layout.detailColor.isValid() ? layout.detailColor : textColor;
         const auto opacity = std::clamp(
             layout.detailOpacity < 0 ? qreal(pref(Preferences::UIDetailTextOpacity)) : layout.detailOpacity, 0.0, 1.0);
         infoColor.setAlphaF(infoColor.alphaF() * opacity);
-        painter.setFont(infoFont);
         painter.setPen(infoColor);
         const auto infoRect = QRectF(textX, titleRect.bottom() + layout.lineSpacing, textWidth, infoMetrics.height());
-        painter.drawText(infoRect,
-                         Qt::AlignLeft | Qt::AlignVCenter, infoMetrics.elidedText(info, Qt::ElideRight, textWidth));
+        paintTextLine(painter, infoRect, info, infoFont, settings.subpixelPositioning);
     }
 }
 
 QSize LayerTreeItemRenderer::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index, const LayerTreeItemLayout &layout) const {
-    const auto titleMetrics = QFontMetricsF(option.font);
-    const auto infoMetrics = QFontMetricsF(detailFont(option.font, layout.detailFontReduction));
+    const auto settings = listFontSettings();
+    const auto titleMetrics = QFontMetricsF(listTextFont(option.font, settings, true));
+    const auto infoMetrics = QFontMetricsF(listTextFont(detailFont(option.font, layout.detailFontReduction), settings));
     const auto info = index.data(LayerTreeItemDelegate::DetailRole).toString();
     const auto textHeight = titleMetrics.height() + (info.isEmpty() ? 0 : layout.lineSpacing + infoMetrics.height());
     const auto textWidth = std::max(titleMetrics.horizontalAdvance(option.text), infoMetrics.horizontalAdvance(info));
