@@ -147,6 +147,13 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
         # Set the path to the plist template
         set_target_properties(${APP_TARGET_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${APP_RESOURCE_DIR}/mac/TrenchBroom-Info.plist")
 
+        # Changing deployment mode must relink even with Makefiles, where a
+        # changed POST_BUILD command alone does not invalidate the executable.
+        set(TB_MAC_DEPLOYMENT_MODE_FILE "${CMAKE_CURRENT_BINARY_DIR}/${APP_TARGET_NAME}-qt-deployment.txt")
+        file(CONFIGURE OUTPUT "${TB_MAC_DEPLOYMENT_MODE_FILE}"
+             CONTENT "TB_RUN_MACDEPLOYQT=@TB_RUN_MACDEPLOYQT@\n" @ONLY)
+        set_property(TARGET ${APP_TARGET_NAME} APPEND PROPERTY LINK_DEPENDS "${TB_MAC_DEPLOYMENT_MODE_FILE}")
+
         # If requested, run macdeployqt which copies the Qt frameworks into the TrenchBroom.app bundle
         # and modifies the TrenchBroom executable to refer to these private copies of the framework instead
         # of the ones in /usr/local. This is slow so only do it if requested.
@@ -178,6 +185,16 @@ macro(configure_app_target APP_TARGET_NAME SHOULD_BUILD_MANUAL)
                                        "-DTB_MACDEPLOYQT_LIBRARY_PATH=${TB_MACDEPLOYQT_LIBRARY_PATH}"
                                        "-DTB_CODESIGN_IDENTITY=${TB_MAC_CODESIGN_IDENTITY}"
                                        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeployMacBundle.cmake"
+                               VERBATIM)
+        else()
+            # Reusing a previously deployed bundle must not mix the installed
+            # Qt with old, bundle-relative plugins/frameworks or qt.conf.
+            set_property(TARGET ${APP_TARGET_NAME} APPEND PROPERTY LINK_DEPENDS
+                         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/PrepareMacDevelopmentBundle.cmake")
+            add_custom_command(TARGET ${APP_TARGET_NAME} POST_BUILD
+                               COMMAND ${CMAKE_COMMAND}
+                                       "-DTB_APP_BUNDLE=$<TARGET_FILE_DIR:${APP_TARGET_NAME}>/../.."
+                                       -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/PrepareMacDevelopmentBundle.cmake"
                                VERBATIM)
         endif ()
     endif ()
@@ -269,6 +286,13 @@ configure_app_target(TrenchBroom YES)
 add_executable(TrenchBroom-nomanual WIN32 MACOSX_BUNDLE EXCLUDE_FROM_ALL)
 target_sources(TrenchBroom-nomanual PRIVATE ${APP_SOURCE})
 configure_app_target(TrenchBroom-nomanual NO)
+
+if(TB_BUILD_REGRESSION_TESTS)
+    add_test(NAME tb-mac-development-bundle
+             COMMAND ${CMAKE_COMMAND}
+                     "-DTB_TEST_ROOT=${CMAKE_CURRENT_BINARY_DIR}/mac-development-bundle-test"
+                     -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tests/TestMacDevelopmentBundle.cmake")
+endif()
 
 # Common CPack configuration
 set(APP_PACKAGE_FILE_NAME "TrenchBroom-${APP_PLATFORM_NAME}-${GIT_DESCRIBE}-${CMAKE_BUILD_TYPE}")

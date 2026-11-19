@@ -34,27 +34,35 @@ Install Xcode / Command Line Tools and the build tools, for example:
 brew install cmake ninja pandoc qt@6 ccache
 ```
 
-Configure, build and run the migration regression suite from the repository root:
+Configure a fast development build and run the migration regression suite from
+the repository root:
 
 ```sh
 cmake --preset qt6-cpm \
   -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6)" \
-  -DTB_RUN_MACDEPLOYQT=ON
+  -DTB_RUN_MACDEPLOYQT=OFF
 cmake --build --preset qt6-cpm --parallel 8
 ctest --preset qt6-cpm
 open cmake-build-cpm-qt6/app/TrenchBroom.app
 ```
 
-`TB_RUN_MACDEPLOYQT=ON` copies Qt frameworks and plugins into the app bundle,
+`TB_RUN_MACDEPLOYQT=OFF` uses the installed Qt. When reusing a previously
+deployed app bundle, the build automatically removes its generated frameworks,
+plugins, `qt.conf` and old bundle resource signature. Application resources remain
+intact. Changing deployment mode forces a relink, including with Makefiles.
+
+For an app bundle to distribute, reconfigure with `-DTB_RUN_MACDEPLOYQT=ON`
+and build again. This copies Qt frameworks and plugins into the app bundle,
 resolves transitive plugin dependencies, then signs and verifies the generated
 bundle. The default `TB_MAC_CODESIGN_IDENTITY=-` creates a local ad-hoc signature
 without a certificate. Deployment errors fail the build, even when macdeployqt
 returns zero. Each deployment replaces its generated framework/plugin output;
 source resources and the installed Qt are never modified.
 
-For faster development builds, omit deployment; the app then uses the installed
-Qt. The presets do not hardcode a Homebrew prefix or architecture. Qt5 and Qt6
-builds must have different directories. `qt6-cpm-debug` is the corresponding
+Full deployment runs after each relink and is much slower than linking alone.
+Keep it disabled in daily CLion builds. The presets do not hardcode a Homebrew
+prefix or architecture. Qt5 and Qt6 builds must have different directories.
+`qt6-cpm-debug` is the corresponding
 Debug configure/build/test preset.
 
 The editor defaults to `CMAKE_OSX_DEPLOYMENT_TARGET=14.0`. **A lower compiler
@@ -67,7 +75,8 @@ supports macOS 13+; that does not describe every Homebrew binary. Set
 `CMAKE_OSX_ARCHITECTURES` explicitly when needed. Intel/universal builds and
 notarization are separate validation work.
 
-The equivalent scripted build is:
+The scripted CI build, which includes Qt deployment even without a package
+archive, is:
 
 ```sh
 TB_PACKAGE=false ./CI-macos.sh
@@ -86,7 +95,7 @@ Use the `qt6-cpm` / `qt6-cpm-debug` presets, or create corresponding profiles:
 | Generator | Ninja |
 | Build type | Release |
 | Build directory | `cmake-build-cpm-qt6` (fresh; Debug uses a separate directory) |
-| CMake options | `-DCMAKE_PREFIX_PATH=/opt/homebrew/opt/qt` |
+| CMake options | `-DCMAKE_PREFIX_PATH=/opt/homebrew/opt/qt -DTB_RUN_MACDEPLOYQT=OFF` |
 | CMake toolchain file | None; remove the former vcpkg option |
 
 The prefix must point to **Qt6**, replacing any previous `qt@5` prefix. A separate
@@ -143,6 +152,9 @@ CTest runs **228 test cases / 75,948 assertions** with isolated temporary settin
 and the offscreen Qt platform. It does not change personal editor settings.
 The font/vector-icon/Qt6 subset also passes with `QT_SCALE_FACTOR=1.5` and `2`
 (34 cases / 3,395 assertions at each scale).
+The additional CMake test `tb-mac-development-bundle` checks removal of stale Qt
+deployment output, preservation of app resources, repeated cleanup and symlink safety.
+
 To run a subset:
 
 ```sh
