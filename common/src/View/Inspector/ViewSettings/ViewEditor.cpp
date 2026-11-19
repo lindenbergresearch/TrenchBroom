@@ -488,11 +488,20 @@ QWidget *ViewEditor::createSelectionBoundsPanel(QWidget *parent) {
     layout->addSpacing(LayoutConstants::WideVMargin);
 
     m_selectionBoundsDashSize = new SliderWithLabel(1, 128, 0.0f, "%d u", 0, 45, this);
+    m_selectionBoundsAnimationSpeed = new SliderWithLabel(0, 200, 0.0f, "%d%%", 0, 45, this);
+    m_selectionBoundsAnimationSpeed->setObjectName("BoundsAnimationSpeed");
+    m_selectionBoundsAnimationSpeed->setToolTip(tr("Speed of the outward-moving dashes and solid-guide pulse. 0% disables animation; 100% moves dashes at 32 pixels per second."));
+    connect(m_selectionBoundsAnimationSpeed, &SliderWithLabel::valueChanged, this,
+            [](int value) { setPref(Preferences::SelectionBoundsAnimationSpeed, value / 100.f); });
     m_selectionBoundsIntersectionSize = new SliderWithLabel(2, 20, 0.0f, "%dpx", 0, 45, this);
     m_selectionBoundsWidth = new SliderWithLabel(10, 300, 10e-3f, "%.1f px", 0, 45, this);
 
     layout->addWidget(new QLabel{"Dash size"});
     layout->addWidget(m_selectionBoundsDashSize);
+    layout->addSpacing(LayoutConstants::WideVMargin);
+
+    layout->addWidget(new QLabel{tr("Guide animation speed")});
+    layout->addWidget(m_selectionBoundsAnimationSpeed);
     layout->addSpacing(LayoutConstants::WideVMargin);
 
     layout->addWidget(new QLabel{"Intersection marker size"});
@@ -956,6 +965,13 @@ void ViewEditor::refreshSelectionBoundsPanel() {
     m_selectionBoundsIntersectionMode->setChecked(pref(Preferences::SelectionBoundsIntersectionMode));
     m_selectionBoundsUseDashedBounds->setChecked(pref(Preferences::SelectionBoundsDashedLines));
     m_selectionBoundsAlwaysShowOnSelected->setChecked(pref(Preferences::AlwaysShowSelectionBounds));
+    {
+        const QSignalBlocker blocker(m_selectionBoundsAnimationSpeed);
+        const auto speed = pref(Preferences::SelectionBoundsAnimationSpeed);
+        m_selectionBoundsAnimationSpeed->setValue(std::isfinite(speed)
+            ? qRound(std::clamp(speed, 0.f, 2.f) * 100.f)
+            : qRound(Preferences::SelectionBoundsAnimationSpeed.defaultValue() * 100.f));
+    }
 
     auto dashSize = pref(Preferences::SelectionBoundsDashedSize);
     m_selectionBoundsDashSize->setValue(static_cast<int>(dashSize));
@@ -1082,6 +1098,7 @@ void ViewEditor::restoreDefaultsClicked() {
     prefs.resetToDefault(Preferences::ObjectBoundsOnHover);
     prefs.resetToDefault(Preferences::SelectionBoundsDashedLines);
     prefs.resetToDefault(Preferences::SelectionBoundsDashedSize);
+    prefs.resetToDefault(Preferences::SelectionBoundsAnimationSpeed);
     prefs.resetToDefault(Preferences::SelectionBoundsLineWidth);
     prefs.resetToDefault(Preferences::SelectionBoundsPointSize);
     prefs.resetToDefault(Preferences::ShowObjectBoundsSelectionBounds);

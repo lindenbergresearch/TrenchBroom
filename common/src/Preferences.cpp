@@ -147,7 +147,7 @@ Preference<float> SelectionBoundsFillAlpha("Renderer/Selection bounds fill alpha
 Preference<float> SelectionBoundsLineWidth("Renderer/Selection bounds line width", 1.75f);
 Preference<float> SelectionBoundsPointSize("Renderer/Selection bounds point size", 10.0f);
 // Speed 1: 32 logical pixels/second for dashes, one pulse/second for solid guides.
-Preference<float> SelectionBoundsAnimationSpeed("Renderer/Selection bounds animation speed", 1.0f);
+Preference<float> SelectionBoundsAnimationSpeed("Renderer/Selection bounds animation speed", 0.25f);
 Preference<Color> SelectionBoundsPointColor("Renderer/Selection bounds point color", Color(1.0f, 0.0f, 0.0f, 0.6f));
 Preference<int> SelectionBoundsPattern("Renderer/Selection bounds pattern", 0x6666);
 Preference<bool> SelectionBoundsDashedLines("Renderer/Selection bounds dashed lines", true);

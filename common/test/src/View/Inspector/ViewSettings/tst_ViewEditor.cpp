@@ -164,6 +164,7 @@ TEST_CASE_METHOD(ViewEditorTest, "View settings retain their page when rebuilt a
 
 TEST_CASE_METHOD(ViewEditorTest, "Bounds controls persist independent markers range hover and distance labels", "[view-editor][annotations]") {
     const auto corners = TemporarilySetPref{Preferences::SelectionBoundsCornerMarkers, true};
+    const auto animation = TemporarilySetPref{Preferences::SelectionBoundsAnimationSpeed, 1.f};
     const auto length = TemporarilySetPref{Preferences::SelectionBoundsGuideLength, 1024.f};
     const auto range = TemporarilySetPref{Preferences::SelectionBoundsGuideDistance, 0.f};
     const auto distances = TemporarilySetPref{Preferences::SelectionBoundsShowDistances, false};
@@ -173,6 +174,15 @@ TEST_CASE_METHOD(ViewEditorTest, "Bounds controls persist independent markers ra
     const auto hover = TemporarilySetPref{Preferences::ObjectBoundsOnHover, false};
     const auto color = TemporarilySetPref{Preferences::SelectionBoundsDistanceColor, Color{1, 1, 0, 1}};
     newMap();
+    auto* speed = control<SliderWithLabel>("BoundsAnimationSpeed");
+    CHECK(speed->value() == 100);
+    speed->setValue(10);
+    CHECK(pref(Preferences::SelectionBoundsAnimationSpeed) == Approx(0.1f));
+    speed->setValue(0);
+    CHECK(pref(Preferences::SelectionBoundsAnimationSpeed) == 0.f);
+    setPref(Preferences::SelectionBoundsAnimationSpeed, 0.5f);
+    PreferenceManager::instance().preferenceDidChangeNotifier(Preferences::SelectionBoundsAnimationSpeed.path());
+    CHECK(speed->value() == 50);
     control<QCheckBox>("BoundsCornerMarkers")->click();
     CHECK_FALSE(pref(Preferences::SelectionBoundsCornerMarkers));
     control<QCheckBox>("ObjectBoundsOnHover")->click();
@@ -193,6 +203,8 @@ TEST_CASE_METHOD(ViewEditorTest, "Bounds controls persist independent markers ra
     CHECK(pref(Preferences::SelectionBoundsDistanceColor) == Color(QColor("#88ccff")));
     control<QPushButton>("ViewSettingsReset")->click();
     CHECK(pref(Preferences::SelectionBoundsCornerMarkers) == Preferences::SelectionBoundsCornerMarkers.defaultValue());
+    CHECK(pref(Preferences::SelectionBoundsAnimationSpeed) == Preferences::SelectionBoundsAnimationSpeed.defaultValue());
+    CHECK(speed->value() == qRound(100 * Preferences::SelectionBoundsAnimationSpeed.defaultValue()));
     CHECK(pref(Preferences::SelectionBoundsGuideLength) == Preferences::SelectionBoundsGuideLength.defaultValue());
     CHECK(pref(Preferences::SelectionBoundsGuideDistance) == Preferences::SelectionBoundsGuideDistance.defaultValue());
     CHECK(pref(Preferences::SelectionBoundsShowDistances) == Preferences::SelectionBoundsShowDistances.defaultValue());

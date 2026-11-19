@@ -1,4 +1,4 @@
-# Kameras, History und Fenstergrößen
+# Kameras, Hilfslinien, History und Fenstergrößen
 
 ## Ansichten wechseln
 
@@ -7,6 +7,15 @@ Selektion. Jede Kamera behält Position, Blickrichtung und Zoom. Auch beim Wechs
 zwischen Ein-, Zwei-, Drei- und Vier-Pane-Layouts werden die Zustände pro
 Perspektiv-/Achsenansicht übernommen. Verknüpfte 2D-Kameras bleiben verknüpft.
 Der explizite Befehl **Focus Camera on Selection** behält seine Funktion.
+
+## Animation der Selektions-Hilfslinien
+
+**View Settings → Grid & Bounds → Selection Bounds → Guide animation speed** regelt die Bewegung
+der gestrichelten Hilfslinien zwischen 0 und 200 %. 0 % deaktiviert die Animation;
+100 % entsprechen 32 logischen Pixeln pro Sekunde. Die langsamere Vorgabe ist
+25 % (8 Pixel pro Sekunde). Gespeicherte Werte bleiben kompatibel.
+Bei durchgezogenen Hilfslinien steuert derselbe Regler das Pulsieren.
+**Reset** stellt auch diese Geschwindigkeit zurück auf die Vorgabe.
 
 ## History
 

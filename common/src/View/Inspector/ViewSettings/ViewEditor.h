@@ -133,6 +133,7 @@ class ViewEditor : public QWidget {
     QCheckBox *m_selectionBoundsIntersectionMode;
     QCheckBox *m_selectionBoundsShowObjectBounds;
     SliderWithLabel *m_selectionBoundsDashSize;
+    SliderWithLabel *m_selectionBoundsAnimationSpeed = nullptr;
     SliderWithLabel *m_selectionBoundsWidth;
     SliderWithLabel *m_selectionBoundsIntersectionSize;
 
