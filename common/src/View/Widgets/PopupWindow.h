@@ -25,6 +25,11 @@ namespace TrenchBroom {
 namespace View {
 class PopupWindow : public QWidget {
   Q_OBJECT
+  Q_PROPERTY(int initialWidth MEMBER m_initialWidth)
+  Q_PROPERTY(int initialHeight MEMBER m_initialHeight)
+  private:
+    int m_initialWidth = 0;
+    int m_initialHeight = 0;
   public:
     explicit PopupWindow(QWidget *parent = nullptr);
 

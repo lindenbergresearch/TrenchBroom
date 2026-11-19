@@ -23,8 +23,6 @@
 #include <QDebug>
 #include <QWindow>
 #include <QScreen>
-#include "Preferences.h"
-#include "PreferenceManager.h"
 #include <algorithm>
 
 namespace TrenchBroom {
@@ -52,9 +50,12 @@ void PopupWindow::closeEvent(QCloseEvent *) {
 }
 
 void PopupWindow::showEvent(QShowEvent *) {
-    if (objectName() == "ViewDetailsPopup") {
+    ensurePolished();
+    if (m_initialWidth > 0 || m_initialHeight > 0) {
         const auto available = screen()->availableGeometry().size() - QSize(32, 32);
-        resize(QSize(std::clamp(pref(Preferences::ViewDetailsWindowWidth), 480, 3840), std::clamp(pref(Preferences::ViewDetailsWindowHeight), 360, 2160)).boundedTo(available));
+        const auto preferred = QSize(m_initialWidth > 0 ? m_initialWidth : sizeHint().width(),
+                                     m_initialHeight > 0 ? m_initialHeight : sizeHint().height());
+        resize(preferred.boundedTo(available));
     }
     emit visibilityChanged(true);
 }

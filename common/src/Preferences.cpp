@@ -234,10 +234,6 @@ Preference<float> UIListOpticalSize("Editor/UI List optical size", 0.0f);
 Preference<bool> UIListTypoLineMetrics("Editor/UI List typographic line metrics", false);
 Preference<bool> UIListSubpixelPositioning("Editor/UI List subpixel text positioning", false);
 Preference<bool> UIGlobalTypography("Editor/UI Global typography", false);
-Preference<int> PreferencesWindowWidth("Editor/Dialogs/Preferences width", 1100);
-Preference<int> PreferencesWindowHeight("Editor/Dialogs/Preferences height", 800);
-Preference<int> ViewDetailsWindowWidth("Editor/Dialogs/View details width", 820);
-Preference<int> ViewDetailsWindowHeight("Editor/Dialogs/View details height", 760);
 Preference<bool> ContextMenuIcons("Editor/Context menu icons", true);
 Preference<bool> ContextMenuShortcuts("Editor/Context menu shortcuts", true);
 Preference<int> ConsoleFontSize("Editor/Console Font size", 13);
@@ -426,7 +422,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &TextureLock, &UVLock, &GroupBrushesCreatedByShapeTool, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &UIFontMinimumSize, &UIDetailTextOpacity,
         &UIListFontWeight, &UIListOpticalSize, &UIListTypoLineMetrics, &UIListSubpixelPositioning,
         &UIGlobalTypography,
-        &PreferencesWindowWidth, &PreferencesWindowHeight, &ViewDetailsWindowWidth, &ViewDetailsWindowHeight, &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
+        &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
         &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,

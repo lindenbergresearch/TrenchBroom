@@ -40,11 +40,25 @@ können in base.qss gezielt gestaltet werden.
 
 ## Dialoggrößen
 
-Unter **Preferences → View → Dialog Sizes** lassen sich die anfänglichen Breiten
-und Höhen von **Preferences** und **View Settings** einstellen. Standardwerte:
-1100 × 800 bzw. 820 × 760 logische Pixel. Die Größe wird auf die verfügbare
-Bildschirmfläche begrenzt. Popups berücksichtigen auch Bildschirme mit negativen
-Desktop-Koordinaten.
+Die Anfangsgrößen von **Preferences** und **View Settings** stehen ausschließlich
+in **base.qss**, im Abschnitt `INITIAL DIALOG SIZES`:
+
+```css
+QDialog#PreferenceDialog {
+    qproperty-initialWidth: 1100;
+    qproperty-initialHeight: 800;
+}
+QWidget#ViewDetailsPopup {
+    qproperty-initialWidth: 820;
+    qproperty-initialHeight: 760;
+}
+```
+
+Die Werte sind logische Pixel. Sie legen keine feste oder minimale Fenstergröße
+fest; die Fenster bleiben größenveränderbar und werden auf die verfügbare
+Bildschirmfläche begrenzt. In Preferences gibt es dafür keine Eingabefelder mehr;
+alte gespeicherte Größen-Preferences werden nicht mehr ausgewertet. Popups
+berücksichtigen auch Bildschirme mit negativen Desktop-Koordinaten.
 
 ## Splitter
 

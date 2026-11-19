@@ -21,6 +21,7 @@
  *
  * Schnellfinder: sichtbarer Programmteil -> Suchbegriff in dieser Datei
  * ------------------------------------------------------------------
+ * Anfangsgrößen Preferences / View Settings    -> INITIAL DIALOG SIZES, qproperty-initialWidth/Height
  * Gemeinsame Schriftrollen, Titel, Detailtext  -> TYPOGRAPHY, uiTextRole, uiEmphasized
  * Fonts/Farben einzelner Tabellenzellen        -> ITEM CELL STYLES, ItemCellStyle
  * Konsole und Compiler-Meldungen               -> CONSOLE AND PROCESS OUTPUT, SemanticTextEdit
@@ -52,6 +53,19 @@
  * gestaltet. Das Zustands-Overlay im 3D-Editor besitzt zusätzlich seine eigene
  * Theme-Konfiguration und QSS-Datei; siehe doc/Theme-Verwaltung.md.
  */
+
+/* ==== INITIAL DIALOG SIZES ==== */
+/* Logical pixels for the initial size, not minimum/maximum constraints.
+   These are theme settings; Preferences exposes no size controls. Both windows
+   limit their requested size to the available screen area. */
+QDialog#PreferenceDialog {
+    qproperty-initialWidth: 1100;
+    qproperty-initialHeight: 800;
+}
+QWidget#ViewDetailsPopup {
+    qproperty-initialWidth: 820;
+    qproperty-initialHeight: 760;
+}
 
 /* ==== OBJECT SOURCE VIEWER ==== */
 /* Read-only-Dialog aus dem Layer-Inspektor: Map-Ausschnitt bzw. Entity-Definition.

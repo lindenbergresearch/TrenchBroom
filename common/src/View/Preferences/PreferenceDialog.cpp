@@ -43,7 +43,6 @@
 #include "View/Preferences/PreferencesPreferencePane.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Preferences/ViewPreferencePane.h"
-#include "macos_utils.h"
 
 #include <filesystem>
 
@@ -54,13 +53,16 @@ const QSize PreferenceDialog::ICON_SIZE = QSize{32, 32};
 
 PreferenceDialog::PreferenceDialog(std::shared_ptr<MapDocument> document, QWidget *parent)
     : QDialog(parent), m_document(std::move(document)), m_toolBar(nullptr), m_stackedWidget(nullptr), m_buttonBox(nullptr) {
+    setObjectName("PreferenceDialog");
     setWindowTitle(WINDOW_TITLE);
     setWindowIconTB(this);
     createGui();
     switchToPane(PrefPane_First);
-    setObjectName("PreferenceDialog");
+    ensurePolished();
     const auto available = screen()->availableGeometry().size() - QSize(40, 40);
-    resize(QSize(std::clamp(pref(Preferences::PreferencesWindowWidth), 480, 3840), std::clamp(pref(Preferences::PreferencesWindowHeight), 360, 2160)).boundedTo(available));
+    const auto preferred = QSize(m_initialWidth > 0 ? m_initialWidth : sizeHint().width(),
+                                 m_initialHeight > 0 ? m_initialHeight : sizeHint().height());
+    resize(preferred.boundedTo(available));
 }
 
 void PreferenceDialog::closeEvent(QCloseEvent *event) {
@@ -263,9 +265,6 @@ void PreferenceDialog::highlightToolButton(QString buttonName, bool highlighted)
     }
 }
 
-void PreferenceDialog::paintEvent(QPaintEvent *event) {
-    QWidget::paintEvent(event);
-    setWindowTitleBarColor(this->windowHandle(), QPalette{}.color(QPalette::ColorRole::Window));
-}
+
 } // namespace View
 } // namespace TrenchBroom

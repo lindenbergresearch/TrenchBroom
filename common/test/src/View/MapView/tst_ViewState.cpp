@@ -14,6 +14,7 @@
 #include <QApplication>
 #include <QLabel>
 #include <QScreen>
+#include <QScopeGuard>
 #include <QSpinBox>
 #include <map>
 #include <tuple>
@@ -96,30 +97,35 @@ TEST_CASE("Splitter exposes styled grips and restores collapsed sizes", "[view-s
     splitter.expand();
     CHECK(splitter.sizes() == before);
 }
-TEST_CASE_METHOD(BrushUpstreamTest, "Dialog size settings are editable and bound to the available screen", "[view-state]") {
-    const auto prefWidth = TemporarilySetPref{Preferences::PreferencesWindowWidth, 900};
-    const auto prefHeight = TemporarilySetPref{Preferences::PreferencesWindowHeight, 680};
-    const auto viewWidth = TemporarilySetPref{Preferences::ViewDetailsWindowWidth, 640};
-    const auto viewHeight = TemporarilySetPref{Preferences::ViewDetailsWindowHeight, 480};
+TEST_CASE_METHOD(BrushUpstreamTest, "Dialog sizes are controlled by QSS and bounded to the available screen", "[view-state][theme]") {
+    const auto originalStyle = qApp->styleSheet();
+    const auto restore = qScopeGuard([&] { qApp->setStyleSheet(originalStyle); });
+    qApp->setStyleSheet(R"(
+        QDialog#PreferenceDialog { qproperty-initialWidth: 900; qproperty-initialHeight: 680; }
+        QWidget#ViewDetailsPopup { qproperty-initialWidth: 640; qproperty-initialHeight: 500; }
+    )");
     ViewPreferencePane pane;
-    auto* width = pane.findChild<QSpinBox*>("PreferencesWindowWidth");
-    auto* height = pane.findChild<QSpinBox*>("ViewDetailsWindowHeight");
-    REQUIRE(width);
-    REQUIRE(height);
-    CHECK(width->value() == 900);
-    CHECK(height->value() == 480);
-    width->setValue(1024);
-    height->setValue(500);
-    CHECK(pref(Preferences::PreferencesWindowWidth) == 1024);
-    CHECK(pref(Preferences::ViewDetailsWindowHeight) == 500);
+    for (const auto* name : {"PreferencesWindowWidth", "PreferencesWindowHeight",
+                             "ViewDetailsWindowWidth", "ViewDetailsWindowHeight"})
+        CHECK_FALSE(pane.findChild<QSpinBox*>(name));
     PreferenceDialog dialog(document);
-    CHECK(dialog.width() == std::min(1024, dialog.screen()->availableGeometry().width() - 40));
+    CHECK(dialog.property("initialWidth").toInt() == 900);
+    CHECK(dialog.property("initialHeight").toInt() == 680);
+    CHECK(dialog.width() == std::min(900, dialog.screen()->availableGeometry().width() - 40));
     CHECK(dialog.height() == std::min(680, dialog.screen()->availableGeometry().height() - 40));
+    dialog.resize(950, 700); // Initial dimensions do not impose a fixed size.
+    CHECK(dialog.width() == 950);
+    CHECK(dialog.height() == 700);
     PopupWindow popup;
     popup.setObjectName("ViewDetailsPopup");
     popup.show();
     QApplication::processEvents();
     CHECK(popup.size() == QSize(640, 500).boundedTo(popup.screen()->availableGeometry().size() - QSize(32, 32)));
+    popup.setStyleSheet("QWidget#ViewDetailsPopup { qproperty-initialWidth: 5000; qproperty-initialHeight: 5000; }");
+    popup.hide();
+    popup.show();
+    QApplication::processEvents();
+    CHECK(popup.size() == popup.screen()->availableGeometry().size() - QSize(32, 32));
     QLabel reference;
     reference.resize(100, 30);
     reference.move(-500, -500);

@@ -40,7 +40,11 @@ class PreferencePane;
 
 class PreferenceDialog : public QDialog {
   Q_OBJECT
+  Q_PROPERTY(int initialWidth MEMBER m_initialWidth)
+  Q_PROPERTY(int initialHeight MEMBER m_initialHeight)
   private:
+    int m_initialWidth = 0;
+    int m_initialHeight = 0;
     enum PrefPane {
       PrefPane_First = 0, PrefPane_Games = 0, PrefPane_View = 1, PrefPane_Colors = 2, PrefPane_Mouse = 3, PrefPane_Keyboard = 4,
       PrefPane_EditorActions = 5, PrefPane_EditorToolbar = 6, PrefPane_Advanced = 7, PrefPane_Last = 8
@@ -62,11 +66,6 @@ class PreferenceDialog : public QDialog {
     void closeEvent(QCloseEvent *event) override;
 
     bool eventFilter(QObject *o, QEvent *e) override;
-
-  private:
-
-  protected:
-    void paintEvent(QPaintEvent *event) override;
 
   private:
 
