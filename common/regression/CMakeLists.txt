@@ -32,6 +32,12 @@ set(regression_sources
     ../test/src/View/Compilation/tst_TextOutputAdapter.cpp
     ../test/src/View/Inspector/Properties/tst_WadProperty.cpp
 )
+if(APPLE)
+    list(APPEND regression_sources tst_MacWindowStyle.mm)
+    # This native test uses ARC; do not reuse the C++ suite's non-ARC PCH.
+    set_source_files_properties(tst_MacWindowStyle.mm PROPERTIES
+        COMPILE_OPTIONS "-fobjc-arc" SKIP_PRECOMPILE_HEADERS ON)
+endif()
 add_executable(tb-regression-tests EXCLUDE_FROM_ALL ${regression_sources})
 target_link_libraries(tb-regression-tests PRIVATE common Catch2::Catch2 Qt6::Test)
 target_include_directories(tb-regression-tests PRIVATE ../test/src)

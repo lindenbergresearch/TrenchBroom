@@ -30,9 +30,15 @@ class TrenchBroomProxyStyle : public QProxyStyle {
     bool m_updatingTypography = false;
     QTimer m_typographyTimer;
     QList<QPointer<QWidget>> m_pendingTypography;
-    void initializeTypography();
+    void initializePolicies();
     void queueTypography(QWidget* widget);
     void updateTypography(QWidget* widget);
+#ifdef __APPLE__
+    QTimer m_titleBarTimer;
+    QList<QPointer<QWidget>> m_pendingTitleBars;
+    void queueTitleBar(QWidget* widget);
+    void refreshTitleBars();
+#endif
 public:
     static constexpr int MenuCornerRadius = 12;
     static constexpr int ToolTipCornerRadius = 8;

@@ -183,11 +183,6 @@ void WelcomeWindow::openSettings() {
     app.openPreferences();
 }
 
-void WelcomeWindow::paintEvent(QPaintEvent *event) {
-    QWidget::paintEvent(event);
-    setWindowTitleBarColor(this->windowHandle(), QPalette{}.color(QPalette::ColorRole::Window));
-}
-
 void WelcomeWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         m_dragging = true;

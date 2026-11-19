@@ -24,6 +24,9 @@
 #include "View/Preferences/FontUtils.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#ifdef __APPLE__
+#include "macos_utils.h"
+#endif
 
 #include <QApplication>
 #include <QAbstractButton>
@@ -51,10 +54,10 @@ bool isStyledPopup(const QWidget* widget) {
 }
 }
 
-TrenchBroomProxyStyle::TrenchBroomProxyStyle(const QString& key) : QProxyStyle(key) { initializeTypography(); }
-TrenchBroomProxyStyle::TrenchBroomProxyStyle(QStyle* style) : QProxyStyle(style) { initializeTypography(); }
+TrenchBroomProxyStyle::TrenchBroomProxyStyle(const QString& key) : QProxyStyle(key) { initializePolicies(); }
+TrenchBroomProxyStyle::TrenchBroomProxyStyle(QStyle* style) : QProxyStyle(style) { initializePolicies(); }
 
-void TrenchBroomProxyStyle::initializeTypography() {
+void TrenchBroomProxyStyle::initializePolicies() {
     m_typographyTimer.setSingleShot(true);
     connect(&m_typographyTimer, &QTimer::timeout, this, [this] {
         const auto pending = std::exchange(m_pendingTypography, {});
@@ -63,7 +66,34 @@ void TrenchBroomProxyStyle::initializeTypography() {
             updateTypography(widget);
         }
     });
+#ifdef __APPLE__
+    m_titleBarTimer.setSingleShot(true);
+    connect(&m_titleBarTimer, &QTimer::timeout, this, [this] {
+        const auto pending = std::exchange(m_pendingTitleBars, {});
+        for (const auto& widget : pending)
+            if (widget && widget->isVisible() && widget->windowHandle())
+                setWindowTitleBarColor(widget->windowHandle(), widget->palette().color(QPalette::Active, QPalette::Window));
+    });
+    // Tool panels can take native focus while Qt still considers their parent
+    // active. Refresh both windows, after Cocoa/Qt finish changing activation.
+    connect(qApp, &QGuiApplication::focusWindowChanged, this, [this] { refreshTitleBars(); });
+    connect(qApp, &QGuiApplication::applicationStateChanged, this, [this] { refreshTitleBars(); });
+#endif
 }
+
+#ifdef __APPLE__
+void TrenchBroomProxyStyle::queueTitleBar(QWidget* widget) {
+    if (QGuiApplication::platformName() != "cocoa" || !widget || !widget->isWindow()
+        || widget->windowFlags().testFlag(Qt::FramelessWindowHint)
+        || widget->windowType() == Qt::Popup || widget->windowType() == Qt::ToolTip) return;
+    if (!m_pendingTitleBars.contains(widget)) m_pendingTitleBars.append(widget);
+    m_titleBarTimer.start(0);
+}
+
+void TrenchBroomProxyStyle::refreshTitleBars() {
+    for (auto* widget : QApplication::topLevelWidgets()) queueTitleBar(widget);
+}
+#endif
 
 void TrenchBroomProxyStyle::queueTypography(QWidget* widget) {
     if (m_updatingTypography || widget->property("tbTypographyQueued").toBool()) return;
@@ -141,6 +171,9 @@ QPixmap TrenchBroomProxyStyle::generatedIconPixmap(QIcon::Mode mode, const QPixm
 void TrenchBroomProxyStyle::polish(QWidget* widget) {
     QProxyStyle::polish(widget);
     widget->installEventFilter(this);
+#ifdef __APPLE__
+    queueTitleBar(widget);
+#endif
     if (PreferenceManager::isInitialized() && pref(Preferences::UIGlobalTypography)) queueTypography(widget);
     if (!isStyledPopup(widget)) return;
     if (auto* menu = qobject_cast<QMenu*>(widget);
@@ -166,6 +199,13 @@ void TrenchBroomProxyStyle::unpolish(QWidget* widget) {
 }
 
 bool TrenchBroomProxyStyle::eventFilter(QObject* watched, QEvent* event) {
+#ifdef __APPLE__
+    if (event->type() == QEvent::Show || event->type() == QEvent::WindowActivate
+        || event->type() == QEvent::WindowDeactivate || event->type() == QEvent::PaletteChange
+        || event->type() == QEvent::ApplicationPaletteChange || event->type() == QEvent::StyleChange
+        || event->type() == QEvent::WinIdChange)
+        queueTitleBar(qobject_cast<QWidget*>(watched));
+#endif
     if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange
         || event->type() == QEvent::Show || event->type() == QEvent::PolishRequest) {
         if (auto* widget = qobject_cast<QWidget*>(watched); PreferenceManager::isInitialized()

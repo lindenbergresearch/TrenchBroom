@@ -1,5 +1,6 @@
 #include "macos_utils.h"
 #include <QMainWindow>
+#include <QGuiApplication>
 #include <QWindow>
 #include <AppKit/AppKit.h>
 
@@ -18,10 +19,7 @@
  */
 void setWindowTitleBarColor(QWindow* window, QColor color) {
 
-    if (!window) {
-        qWarning("Failed to retrieve QWindow handle.");
-        return;
-    }
+    if (!window || !color.isValid() || QGuiApplication::platformName() != "cocoa") return;
 
     // Retrieve the native QNSView handle from the Qt window ID
     WId nativeId = window->winId();
@@ -42,8 +40,13 @@ void setWindowTitleBarColor(QWindow* window, QColor color) {
 
     // Set the title bar to appear transparent and apply the background color
     if (@available(macOS 10.14, *)) {
-        [nsWindow setTitlebarAppearsTransparent:YES];
-        [nsWindow setBackgroundColor:nsColor];
+        if (!nsWindow.titlebarAppearsTransparent) nsWindow.titlebarAppearsTransparent = YES;
+        if (![nsWindow.backgroundColor isEqual:nsColor]) nsWindow.backgroundColor = nsColor;
+        // Native title text and inactive chrome must follow the editor theme,
+        // independently of the system appearance or the focused tool panel.
+        NSAppearanceName name = color.lightnessF() < 0.5 ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua;
+        if (![nsWindow.appearance.name isEqualToString:name])
+            nsWindow.appearance = [NSAppearance appearanceNamed:name];
     } else {
         qWarning("setTitlebarAppearsTransparent is not available on macOS < 10.14.");
     }

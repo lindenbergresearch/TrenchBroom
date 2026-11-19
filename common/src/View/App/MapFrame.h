@@ -599,9 +599,6 @@ class MapFrame : public QMainWindow {
 
   private:
     void triggerAutosave();
-
-  protected:
-    void paintEvent(QPaintEvent *event) override;
 };
 
 class DebugPaletteWindow : public QDialog {

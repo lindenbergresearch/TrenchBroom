@@ -33,7 +33,6 @@
 #include "Preferences.h"
 #include "View/Theme/QSSBuilder.h"
 #include "Logger.h"
-#include "macos_utils.h"
 #include "Result.h"
 #include "Version.h"
 #include "TrenchBroomStackWalker.h"

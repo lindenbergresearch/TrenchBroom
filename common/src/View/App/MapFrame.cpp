@@ -103,7 +103,6 @@
 #include "View/MapView/SwitchableMapViewContainer.h"
 #include "View/Tools/Vertex/VertexTool.h"
 #include "View/MapView/ViewUtils.h"
-#include "macos_utils.h"
 
 #include <kdl/overload.h>
 #include <kdl/string_utils.h>
@@ -2124,11 +2123,6 @@ void MapFrame::debugToggleShowFPS() {
     auto &prefs = PreferenceManager::instance();
     prefs.set(Preferences::ShowFPS, !pref(Preferences::ShowFPS));
     logger().debug() << "Toggle debug info: " << (pref(Preferences::ShowFPS) ? "ON" : "OFF");
-}
-
-void MapFrame::paintEvent(QPaintEvent *event) {
-    QWidget::paintEvent(event);
-    setWindowTitleBarColor(this->windowHandle(), QPalette{}.color(QPalette::ColorRole::Window));
 }
 
 // DebugPaletteWindow

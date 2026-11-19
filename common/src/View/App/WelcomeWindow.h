@@ -22,7 +22,6 @@
 #include <QMainWindow>
 
 #include <filesystem>
-#include "macos_utils.h"
 
 class QPushButton;
 
@@ -55,7 +54,6 @@ class WelcomeWindow : public QMainWindow {
     void openDocument(const std::filesystem::path &path);
 
   protected:
-    void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
