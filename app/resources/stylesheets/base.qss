@@ -541,31 +541,34 @@ QWidget[inspectorDropHighlight="false"] {
     qproperty-windowOpacity: 1;
 }
 
-/* ==== HISTORY ==== */
+/* ==== HISTORY AND MAP LOAD DIAGNOSTICS ==== */
 /* History uses the same ItemCellStyle delegate as the property/preferences
    tables. Editor-only steps are collapsed tree groups; colors and fonts stay
    theme-owned. These named rules override the generic tree selection below. */
-QTreeWidget#HistoryList {
+QTreeWidget#HistoryList, QTreeWidget#MapLoadDiagnosticsList {
     background-color: ${color.base};
     color: ${color.text};
     border: none;
     outline: none;
 }
-QTreeWidget#HistoryList::item {
+QTreeWidget#HistoryList::item, QTreeWidget#MapLoadDiagnosticsList::item {
     min-height: 22px;
     padding: 3px 6px;
     border: none;
     border-radius: 0;
 }
-QTreeWidget#HistoryList::item:selected:active {
+QTreeWidget#HistoryList::item:selected:active,
+QTreeWidget#MapLoadDiagnosticsList::item:selected:active {
     background-color: ${color.highlight};
     color: ${color.text.highlighted};
 }
-QTreeWidget#HistoryList::item:selected:!active {
+QTreeWidget#HistoryList::item:selected:!active,
+QTreeWidget#MapLoadDiagnosticsList::item:selected:!active {
     background-color: ${color.highlight.dark};
     color: ${color.text.highlighted};
 }
-QWidget#ItemCellStyle[cellContext="history"] {
+QWidget#ItemCellStyle[cellContext="history"],
+QWidget#ItemCellStyle[cellContext="loadDiagnostics"] {
     qproperty-overrideTextColor: true;
 }
 QWidget#ItemCellStyle[cellContext="history"][cellRole="time"] {
@@ -575,6 +578,19 @@ QWidget#ItemCellStyle[cellContext="history"][cellRole="time"] {
 QWidget#ItemCellStyle[cellContext="history"][cellRole="stateGroup"],
 QWidget#ItemCellStyle[cellContext="history"][cellStates~="redo"] { color: ${color.text.detail}; }
 QWidget#ItemCellStyle[cellContext="history"][cellStates~="current"] { font-weight: bold; }
+QWidget#ItemCellStyle[cellContext="loadDiagnostics"][cellRole="warning"] { color: ${color.warning}; }
+QWidget#ItemCellStyle[cellContext="loadDiagnostics"][cellRole="error"] { color: ${color.error}; }
+QDialog#MapLoadDiagnosticsDialog {
+    qproperty-initialWidth: 820;
+    qproperty-initialHeight: 460;
+}
+/* The selected diagnostic is shown in full here; text can be copied. */
+QPlainTextEdit#MapLoadDiagnosticsMessage {
+    min-height: 72px;
+    max-height: 120px;
+    background-color: ${color.base};
+    border: 1px solid ${color.midlight};
+}
 
 /* ==== LIST ROWS ==== */
 /* controlListBox_listWidget wird u.a. unter Preferences -> Games verwendet.

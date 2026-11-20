@@ -26,6 +26,7 @@ set(regression_sources
     ../test/src/View/Inspector/tst_Inspector.cpp
     ../test/src/View/Actions/tst_ContextMenuActions.cpp
     ../test/src/View/Inspector/tst_History.cpp
+    ../test/src/View/App/tst_MapLoadDiagnostics.cpp
     ../test/src/View/MapView/tst_ViewState.cpp
     ../test/src/View/Commands/tst_CommandProcessor.cpp
     ../test/src/View/Widgets/tst_StylesheetControls.cpp

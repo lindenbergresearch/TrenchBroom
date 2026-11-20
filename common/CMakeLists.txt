@@ -297,6 +297,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/Commands/AddRemoveNodesCommand.cpp
     ${COMMON_SOURCE_DIR}/View/MapView/Animation.cpp
     ${COMMON_SOURCE_DIR}/View/App/AppInfoPanel.cpp
+    ${COMMON_SOURCE_DIR}/View/App/MapLoadDiagnosticsDialog.cpp
     ${COMMON_SOURCE_DIR}/View/Document/Autosaver.cpp
     ${COMMON_SOURCE_DIR}/View/Widgets/BorderLine.cpp
     ${COMMON_SOURCE_DIR}/View/Widgets/BorderPanel.cpp
@@ -879,6 +880,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/Commands/AddRemoveNodesCommand.h
     ${COMMON_SOURCE_DIR}/View/MapView/Animation.h
     ${COMMON_SOURCE_DIR}/View/App/AppInfoPanel.h
+    ${COMMON_SOURCE_DIR}/View/App/MapLoadDiagnosticsDialog.h
     ${COMMON_SOURCE_DIR}/View/Document/Autosaver.h
     ${COMMON_SOURCE_DIR}/View/Widgets/BorderLine.h
     ${COMMON_SOURCE_DIR}/View/Widgets/BorderPanel.h

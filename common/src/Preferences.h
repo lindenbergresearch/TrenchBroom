@@ -232,6 +232,7 @@ extern Preference<bool> UIListSubpixelPositioning;
 extern Preference<bool> UIGlobalTypography;
 extern Preference<bool> ContextMenuIcons;
 extern Preference<bool> ContextMenuShortcuts;
+extern Preference<bool> ShowMapLoadDiagnostics;
 extern Preference<int> ConsoleFontSize;
 
 Renderer::FontDescriptor getDefaultRenderFont();

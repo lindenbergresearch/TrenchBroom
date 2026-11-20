@@ -50,6 +50,7 @@
 #include "StringUtils.h"
 #include "Exceptions.h"
 #include "FileLogger.h"
+#include "View/App/MapLoadDiagnosticsDialog.h"
 #include "IO/ExportOptions.h"
 #include "IO/PathQt.h"
 #include "IO/SystemPaths.h"
@@ -966,7 +967,10 @@ void MapFrame::revertDocument() {
         const auto mapFormat = m_document->world()->mapFormat();
         const auto game = m_document->game();
         const auto path = m_document->path();
-        m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path).transform_error([&](auto e) { m_document->error() << "Failed to revert document: " << e.msg; });
+        const ScopedDiagnosticLog diagnostics(pref(Preferences::ShowMapLoadDiagnostics));
+        m_document->loadDocument(mapFormat, MapDocument::DefaultWorldBounds, game, path)
+            .transform([&] { showMapLoadDiagnostics(path, diagnostics.messages(), this); })
+            .transform_error([&](auto e) { m_document->error() << "Failed to revert document: " << e.msg; });
     }
 }
 

@@ -47,6 +47,7 @@
 #include "View/App/GetVersion.h"
 #include "View/Document/MapDocument.h"
 #include "View/App/MapFrame.h"
+#include "View/App/MapLoadDiagnosticsDialog.h"
 #include "View/MapView/MapViewBase.h"
 #include "View/Preferences/PreferenceDialog.h"
 #include "View/Theme/QtUtils.h"
@@ -504,6 +505,7 @@ void TrenchBroomApp::updateRecentDocument(const std::filesystem::path &path) {
 }
 
 bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
+    const ScopedDiagnosticLog diagnostics(pref(Preferences::ShowMapLoadDiagnostics));
     const auto checkFileExists = [&]() {
         return IO::Disk::pathInfo(path) == IO::PathInfo::File ? Result<void>{} : Result<void>{
             Error{"'" + path.string() + "' not found"}};
@@ -512,7 +514,7 @@ bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
     auto *frame = static_cast<MapFrame *>(nullptr);
     try {
         auto &gameFactory = Model::GameFactory::instance();
-        return checkFileExists().or_else([&](const auto &e) {
+        const auto loaded = checkFileExists().or_else([&](const auto &e) {
             m_recentDocuments->removePath(path);
             return Result<void>{e};
         }).and_then([&]() { return gameFactory.detectGame(path); }).and_then([&](const auto &gameNameAndMapFormat) {
@@ -539,6 +541,8 @@ bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
             logger().error() << e.msg.c_str();
             return false;
         }).value();
+        if (loaded && frame) showMapLoadDiagnostics(path, diagnostics.messages(), frame);
+        return loaded;
     } catch (const Exception &e) {
         if (frame) {
             frame->close();

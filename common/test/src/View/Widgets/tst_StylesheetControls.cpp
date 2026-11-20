@@ -17,6 +17,7 @@
 #include <QTableView>
 #include <QTextBlock>
 #include <QToolButton>
+#include <QTreeWidget>
 #include <catch2/catch.hpp>
 
 namespace TrenchBroom::View {
@@ -40,7 +41,7 @@ namespace {
     class CellDelegate : public StyledItemDelegate {
       public:
         using StyledItemDelegate::StyledItemDelegate;
-        QStyleOptionViewItem options(QTableView& view, const QModelIndex& index) const {
+        QStyleOptionViewItem options(QAbstractItemView& view, const QModelIndex& index) const {
             QStyleOptionViewItem option;
             option.initFrom(&view);
             option.widget = &view;
@@ -135,6 +136,30 @@ TEST_CASE("Shared controls get sizes borders and icons from QSS", "[qss-controls
     const auto swatchImage = swatch->grab().toImage();
     REQUIRE_FALSE(swatchImage.isNull());
     CHECK(swatchImage.pixelColor(swatchImage.rect().center()) == QColor("#34cc56"));
+}
+TEST_CASE("History and diagnostic rows use shared theme fonts and semantic QSS colors", "[qss-controls][history][load-diagnostics]") {
+    QTreeWidget view;
+    view.setObjectName("HistoryList");
+    view.setColumnCount(2);
+    auto* row = new QTreeWidgetItem(&view, {"Move objects", "12:00:00"});
+    row->setData(0, StyledItemDelegate::TextStyleRole, "action");
+    row->setData(0, StyledItemDelegate::TextStatesRole, QStringList{"current"});
+    row->setData(1, StyledItemDelegate::TextStyleRole, "time");
+    view.setStyleSheet(controlStyleSheet());
+    view.ensurePolished();
+    CellDelegate history("history", &view);
+    const auto index = view.model()->index(0, 0);
+    CHECK(history.options(view, index).font.bold());
+    view.setStyleSheet(controlStyleSheet() + "\nQWidget#ItemCellStyle[cellContext=\"history\"][cellRole=\"time\"] { font-size: 19px; color: #12ab34; }");
+    const auto time = history.options(view, view.model()->index(0, 1));
+    CHECK(time.font.pixelSize() == 19);
+    CHECK(time.palette.color(QPalette::Text) == QColor("#12ab34"));
+    row->setData(0, StyledItemDelegate::TextStyleRole, "error");
+    row->setData(0, StyledItemDelegate::TextStatesRole, QStringList{});
+    view.setObjectName("MapLoadDiagnosticsList");
+    view.setStyleSheet(controlStyleSheet() + "\nQWidget#ItemCellStyle[cellContext=\"loadDiagnostics\"][cellRole=\"error\"] { color: #bc1234; }");
+    CellDelegate diagnostics("loadDiagnostics", &view);
+    CHECK(diagnostics.options(view, index).palette.color(QPalette::Text) == QColor("#bc1234"));
 }
 TEST_CASE("SVG picker grid and preview dimensions follow a stylesheet override", "[qss-controls]") {
     IconSelectionDialog dialog("Group.svg");

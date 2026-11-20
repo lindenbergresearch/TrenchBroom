@@ -22,6 +22,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <vector>
 
 #include <QString>
 #include <type_traits>
@@ -112,6 +113,23 @@ struct LogMessage {
     * @return The formatted log-message.
     */
    inline QString format(bool detailed = true, bool colored = true) const;
+};
+
+// Captures warnings/errors produced in a synchronous operation, independently
+// of console filtering. Forwarding one message through proxy loggers records it
+// once. Nested operations and exceptions restore the previous capture scope.
+class ScopedDiagnosticLog {
+    ScopedDiagnosticLog* m_previous;
+    bool m_enabled;
+    std::vector<LogMessage> m_messages;
+    static void record(LogLevel level, const QString& text);
+    friend class Logger;
+public:
+    explicit ScopedDiagnosticLog(bool enabled = true);
+    ~ScopedDiagnosticLog();
+    ScopedDiagnosticLog(const ScopedDiagnosticLog&) = delete;
+    ScopedDiagnosticLog& operator=(const ScopedDiagnosticLog&) = delete;
+    const std::vector<LogMessage>& messages() const { return m_messages; }
 };
 
 /**

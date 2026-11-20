@@ -480,6 +480,11 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow(tr("Icons"),m_contextMenuIcons);
     layout->addRow(tr("Shortcuts"),m_contextMenuShortcuts);
 
+    layout->addSection(tr("Map Loading"));
+    m_showLoadDiagnostics = new QCheckBox(tr("Show warnings and errors after loading a map"));
+    m_showLoadDiagnostics->setObjectName("ShowMapLoadDiagnostics");
+    layout->addRow(tr("Load summary"), m_showLoadDiagnostics);
+
     layout->addSection("Fonts");
     layout->addRow("UI Font", m_UIFontCombo, m_UIFontSizeCombo);
     layout->addRow(tr("Minimum UI size"), m_UIFontMinimumSize);
@@ -572,6 +577,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
 }
 
 void ViewPreferencePane::bindEvents() {
+    connect(m_showLoadDiagnostics, &QCheckBox::toggled, this, [](bool value) { setPref(Preferences::ShowMapLoadDiagnostics, value); });
     connect(m_contextMenuIcons,&QCheckBox::toggled,this,[](bool value) { setPref(Preferences::ContextMenuIcons,value); });
     connect(m_contextMenuShortcuts,&QCheckBox::toggled,this,[](bool value) { setPref(Preferences::ContextMenuShortcuts,value); });
     connect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
@@ -604,6 +610,7 @@ void ViewPreferencePane::bindEvents() {
 }
 
 void ViewPreferencePane::unBindEvents() {
+    disconnect(m_showLoadDiagnostics, nullptr, this, nullptr);
     disconnect(m_contextMenuIcons,nullptr,this,nullptr);
     disconnect(m_contextMenuShortcuts,nullptr,this,nullptr);
     disconnect(m_layoutCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::layoutChanged);
@@ -643,6 +650,7 @@ void ViewPreferencePane::doResetToDefaults() {
     unBindEvents();
 
     auto &prefs = PreferenceManager::instance();
+    prefs.resetToDefault(Preferences::ShowMapLoadDiagnostics);
     prefs.resetToDefault(Preferences::MapViewLayout);
     prefs.resetToDefault(Preferences::Link2DCameras);
     prefs.resetToDefault(Preferences::Brightness);
@@ -682,6 +690,7 @@ void ViewPreferencePane::doResetToDefaults() {
 void ViewPreferencePane::doUpdateControls() {
     unBindEvents();
 
+    m_showLoadDiagnostics->setChecked(pref(Preferences::ShowMapLoadDiagnostics));
     m_layoutCombo->setCurrentIndex(pref(Preferences::MapViewLayout));
     m_link2dCameras->setChecked(pref(Preferences::Link2DCameras));
     m_UIBrightnessSlider->setValue(brightnessToUI(pref(Preferences::UIBrightness)));

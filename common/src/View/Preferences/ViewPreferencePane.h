@@ -52,6 +52,7 @@ class ViewPreferencePane : public PreferencePane {
     QSpinBox *m_maxFPS = nullptr;
     QCheckBox *m_showContextOverlay = nullptr;
     QCheckBox *m_contextMenuIcons = nullptr;
+    QCheckBox *m_showLoadDiagnostics = nullptr;
     QCheckBox *m_contextMenuShortcuts = nullptr;
     QLineEdit *m_contextOverlayTheme = nullptr;
     QComboBox *m_textureBrowserIconSizeCombo = nullptr;

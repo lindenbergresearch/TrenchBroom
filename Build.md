@@ -144,11 +144,11 @@ explicit patches or new version/hash pins so subsequent builds are repeatable.
 
 `tb-regression-tests` includes existing regressions for themes, fonts/icons,
 actions/toolbars, Inspector docking, Layer selection, Prefabs, WAD properties,
-History/Undo, view state and archive caches. Qt6-specific checks cover map text
+History/Undo, map load diagnostics, view state and archive caches. Qt6-specific checks cover map text
 encodings (including incomplete characters), legacy QSS font weights, shortcut serialization and fractional input
 coordinates. Dependency checks exercise the real image/model/font loaders.
 
-CTest runs **228 test cases / 75,958 assertions** with isolated temporary settings
+CTest runs **238 test cases / 76,086 assertions** with isolated temporary settings
 and the offscreen Qt platform. It does not change personal editor settings.
 The font/vector-icon/Qt6 subset also passes with `QT_SCALE_FACTOR=1.5` and `2`
 (34 cases / 3,395 assertions at each scale).
@@ -174,6 +174,8 @@ These exercise context lifetime, floating OpenGL widgets, and real audio decodin
 once/loop playback and stop/temporary-file cleanup. The audio test is muted.
 The title-bar test changes focus between a main window and a floating Inspector,
 checks light/dark palettes with painting disabled, and recreates the native tool window.
+It also tests delayed Cocoa chrome resets, font registration and font/stylesheet
+changes against the authoritative theme color.
 Additional native smoke checks use the actual editor, property editing, Inspector
 docking/floating, theme changes and SVG selection. The historical `common/test`
 and benchmark targets remain disabled because several files use older project

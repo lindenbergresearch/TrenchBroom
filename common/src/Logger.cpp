@@ -27,6 +27,26 @@
 #include <QMessageBox>
 
 namespace TrenchBroom {
+namespace {
+thread_local ScopedDiagnosticLog* diagnosticLog = nullptr;
+thread_local unsigned logDispatchDepth = 0;
+struct LogDispatch {
+    bool outermost = logDispatchDepth++ == 0;
+    ~LogDispatch() { --logDispatchDepth; }
+};
+}
+
+ScopedDiagnosticLog::ScopedDiagnosticLog(bool enabled) : m_previous(diagnosticLog), m_enabled(enabled) {
+    if (enabled) diagnosticLog = this;
+}
+ScopedDiagnosticLog::~ScopedDiagnosticLog() {
+    if (m_enabled) diagnosticLog = m_previous;
+}
+void ScopedDiagnosticLog::record(LogLevel level, const QString& text) {
+    if (level != LogLevel::Warn && level != LogLevel::Error) return;
+    for (auto* scope = diagnosticLog; scope; scope = scope->m_previous)
+        scope->m_messages.push_back(LogMessage{level, text});
+}
 /* ------------------------------------------------------------------------------------------- */
 
 
@@ -134,6 +154,8 @@ void Logger::log(const LogLevel level, const std::string &message) {
 }
 
 void Logger::log(const LogLevel level, const LogMessage *message) {
+    const LogDispatch dispatch;
+    if (dispatch.outermost && message) ScopedDiagnosticLog::record(level, message->message);
     // call subclass implementation
     if (canLog(level)) doLog(level, message);
 
@@ -147,6 +169,8 @@ void Logger::log(const LogLevel level, const LogMessage *message) {
 }
 
 void Logger::log(const LogLevel level, const QString &message) {
+    const LogDispatch dispatch;
+    if (dispatch.outermost) ScopedDiagnosticLog::record(level, message);
     if (!canLog(level)) return;
 
     // create log-message

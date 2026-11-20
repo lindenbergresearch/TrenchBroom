@@ -51,6 +51,28 @@ können in base.qss gezielt gestaltet werden. Die History verwendet den gemeinsa
 Tabellen-Delegate. Unter `ItemCellStyle[cellContext="history"]` gibt es die Rollen
 `action`, `time` und `stateGroup` sowie die Zustände `current` und `redo`.
 
+## Ladehinweise
+
+**Preferences → View → Map Loading → Load summary** schaltet die automatische
+Zusammenfassung von Warnungen und Fehlern nach erfolgreichem Laden einer Map ein
+oder aus. Die Vorgabe ist eingeschaltet. Auch beim erneuten Laden über **Revert**
+wird sie berücksichtigt. Ohne Warnungen oder Fehler erscheint kein Dialog;
+fehlgeschlagene Ladevorgänge behalten ihren bisherigen Fehlerdialog.
+
+Die Zusammenfassung ist rein informativ und blockiert den Editor nicht. Sie zeigt
+Dateipfad, Gesamtzahlen und die vollständigen Meldungen. Identische Meldungen
+gleicher Schwere werden mit einer Anzahl zusammengefasst. Unter der Liste steht
+die ausgewählte Meldung vollständig, mehrzeilig und kopierbar. Die Erfassung ist vom
+eingestellten Console-Loglevel unabhängig und erfasst synchron während des Ladens
+gemeldete Diagnosen; spätere Meldungen aus der Bearbeitung gehören nicht dazu.
+Direkt im Dialog kann die automatische Anzeige ebenfalls abgeschaltet werden.
+
+In **base.qss** sind `#MapLoadDiagnosticsDialog` (einschließlich
+`qproperty-initialWidth`/`qproperty-initialHeight`), `#MapLoadDiagnosticsSummary`,
+`#MapLoadDiagnosticsList` und `#MapLoadDiagnosticsMessage` anpassbar. Die Tabellenrollen unter
+`ItemCellStyle[cellContext="loadDiagnostics"]` heißen `warning`, `error`,
+`message` und `count`.
+
 ## Dialoggrößen
 
 Die Anfangsgrößen von **Preferences** und **View Settings** stehen ausschließlich

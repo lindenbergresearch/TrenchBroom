@@ -236,6 +236,7 @@ Preference<bool> UIListSubpixelPositioning("Editor/UI List subpixel text positio
 Preference<bool> UIGlobalTypography("Editor/UI Global typography", false);
 Preference<bool> ContextMenuIcons("Editor/Context menu icons", true);
 Preference<bool> ContextMenuShortcuts("Editor/Context menu shortcuts", true);
+Preference<bool> ShowMapLoadDiagnostics("Editor/Show map load diagnostics", true);
 Preference<int> ConsoleFontSize("Editor/Console Font size", 13);
 
 Renderer::FontDescriptor getDefaultRenderFont() {
@@ -422,7 +423,7 @@ const std::vector<PreferenceBase *> &staticPreferences() {
         &TextureLock, &UVLock, &GroupBrushesCreatedByShapeTool, &RendererFontPath, &UIFontPath, &ConsoleFontPath, &RendererFontSize, &BrowserFontSize, &UIFontSize, &UIFontMinimumSize, &UIDetailTextOpacity,
         &UIListFontWeight, &UIListOpticalSize, &UIListTypoLineMetrics, &UIListSubpixelPositioning,
         &UIGlobalTypography,
-        &ContextMenuIcons, &ContextMenuShortcuts, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
+        &ContextMenuIcons, &ContextMenuShortcuts, &ShowMapLoadDiagnostics, &ConsoleFontSize, &ToolBarIconsSize, &BrowserTextColor, &BrowserSubTextColor,
         &BrowserBackgroundColor, &BrowserGroupBackgroundColor, &TextureBrowserIconSize, &TextureBrowserDefaultColor, &TextureBrowserSelectedColor, &TextureBrowserUsedColor, &UIHighlightColor, &UITextColor,
         &UIWindowTintColor, &UIBrightness, &LogInfoColor, &LogDebugColor, &LogWarningColor, &LogErrorColor, &CameraLookSpeed, &CameraLookSmoothing, &CameraLookInvertH, &CameraLookInvertV, &CameraPanSpeed,
         &CameraPanInvertH, &CameraPanInvertV, &CameraMouseWheelInvert, &CameraMoveSpeed, &CameraEnableAltMove, &CameraAltMoveInvert, &CameraMoveInCursorDir, &CameraFov, &CameraFlyMoveSpeed, &Link2DCameras,
