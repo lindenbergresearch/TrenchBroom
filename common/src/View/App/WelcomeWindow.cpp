@@ -40,7 +40,7 @@ static constexpr QSize WELCOME_WINDOW_BUTTON_SIZE = QSize{20, 20};
 WelcomeWindow::WelcomeWindow() :
     QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{
     nullptr}, m_openOtherDocumentButton{nullptr} {
-    setUnifiedTitleAndToolBarOnMac(true);
+    setObjectName("WelcomeWindow");
     createGui();
 }
 
@@ -50,6 +50,9 @@ void WelcomeWindow::createGui() {
 
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
     setWindowModality(Qt::ApplicationModal);
+    // Unified native title/toolbars enable translucency in Qt 6. This window
+    // has neither; paint its complete surface through the shared QSS role.
+    setDefaultWindowColor(this);
 
     m_recentDocumentListBox = new RecentDocumentListBox{};
     m_recentDocumentListBox->setToolTip("Double-click on a file to open it");
@@ -73,6 +76,8 @@ void WelcomeWindow::createGui() {
 
 
     auto *container = new QWidget{};
+    container->setObjectName("WelcomeContent");
+    setDefaultWindowColor(container);
     auto *outerLayout = new QVBoxLayout{};
 
     outerLayout->setContentsMargins(
@@ -98,6 +103,8 @@ void WelcomeWindow::createGui() {
 
 QWidget *WelcomeWindow::createAppPanel() {
     auto *appPanel = new QWidget{};
+    appPanel->setObjectName("WelcomeAppPanel");
+    setDefaultWindowColor(appPanel);
     auto *infoPanel = new AppInfoPanel{appPanel};
 
     m_createNewDocumentButton = new QPushButton{this};

@@ -17,6 +17,26 @@ Darstellung hängt dadurch vom Stylesheet ab, während C++ die Funktion und den
 Zustand liefert. Der aktuelle Lader verwendet weiterhin `stylesheets/base.qss`;
 eine Auswahloberfläche für mehrere Theme-Dateien ist ein eigener späterer Schritt.
 
+## Welcome-Fenster und kleine Texte
+
+Das rahmenlose Welcome-Fenster verwendet eine deckende `uiSurface="window"`-Fläche.
+Der macOS-Modus für eine vereinte Titel-/Werkzeugleiste wird hier nicht aktiviert:
+Er setzt in Qt6 transparente Fensterattribute, obwohl dieses Fenster keine
+native Titelleiste oder Toolbar besitzt. `#WelcomeWindow`, `#WelcomeContent` und
+`#WelcomeAppPanel` können gezielt über QSS gestaltet werden; die vorhandene
+Fenster-Hintergrundrolle liefert die Vorgabe.
+
+Die Versionszeilen im Welcome-Bereich sind normale Qt-Labels (`uiTextRole="info"`).
+Der Layer-Baum zeichnet seine Zeilen selbst. Beide verwenden die gewählte
+UI-Schrift und die kleineren Detailgrößen; mit aktivierter Subpixelpositionierung
+kann der Layer-Text jedoch auf gebrochenen physischen Pixelpositionen liegen.
+Gerade bei kleinen Schriften auf Displays ohne Retina-Skalierung kann das weicher
+wirken als das Qt-Label-Layout. **Preferences → View → Text positioning →
+Pixel aligned**, anschließend **Apply**, richtet die gezeichneten Grundlinien
+am physischen Pixelraster aus. Schrift und Deckkraft sind davon unabhängig.
+Die [Qt-Dokumentation zu VerticalSubpixelPositioning](https://doc.qt.io/qt-6.10/qpainter.html#RenderHint-enum)
+beschreibt diese zusätzliche vertikale Positionierung und ihre Grenzen.
+
 ## Neu bzw. erweitert über QSS steuerbar
 
 | Bereich | Selektor / Eigenschaften |
