@@ -541,6 +541,41 @@ QWidget[inspectorDropHighlight="false"] {
     qproperty-windowOpacity: 1;
 }
 
+/* ==== HISTORY ==== */
+/* History uses the same ItemCellStyle delegate as the property/preferences
+   tables. Editor-only steps are collapsed tree groups; colors and fonts stay
+   theme-owned. These named rules override the generic tree selection below. */
+QTreeWidget#HistoryList {
+    background-color: ${color.base};
+    color: ${color.text};
+    border: none;
+    outline: none;
+}
+QTreeWidget#HistoryList::item {
+    min-height: 22px;
+    padding: 3px 6px;
+    border: none;
+    border-radius: 0;
+}
+QTreeWidget#HistoryList::item:selected:active {
+    background-color: ${color.highlight};
+    color: ${color.text.highlighted};
+}
+QTreeWidget#HistoryList::item:selected:!active {
+    background-color: ${color.highlight.dark};
+    color: ${color.text.highlighted};
+}
+QWidget#ItemCellStyle[cellContext="history"] {
+    qproperty-overrideTextColor: true;
+}
+QWidget#ItemCellStyle[cellContext="history"][cellRole="time"] {
+    color: ${color.text.detail};
+    font-size: ${length.font.small};
+}
+QWidget#ItemCellStyle[cellContext="history"][cellRole="stateGroup"],
+QWidget#ItemCellStyle[cellContext="history"][cellStates~="redo"] { color: ${color.text.detail}; }
+QWidget#ItemCellStyle[cellContext="history"][cellStates~="current"] { font-weight: bold; }
+
 /* ==== LIST ROWS ==== */
 /* controlListBox_listWidget wird u.a. unter Preferences -> Games verwendet.
    preferencesList="true" verbindet neue Preferences-Listen mit derselben Fläche.

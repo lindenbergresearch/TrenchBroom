@@ -775,6 +775,7 @@ public: // command processing
     void undoCommand();
 
     void redoCommand();
+    void clearCommandHistory();
 
     bool canRepeatCommands() const;
 

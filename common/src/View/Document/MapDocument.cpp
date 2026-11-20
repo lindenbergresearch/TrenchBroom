@@ -3199,6 +3199,12 @@ void MapDocument::redoCommand() {
     m_repeatStack->clear();
 }
 
+void MapDocument::clearCommandHistory() {
+    // Preserve the map and its modified/saved state. Undo and redo are both
+    // unavailable during an active transaction, when clearing is unsafe.
+    if (canUndoCommand() || canRedoCommand()) doClearCommandProcessor();
+}
+
 bool MapDocument::canRepeatCommands() const {
     return m_repeatStack->size() > 0u;
 }

@@ -41,6 +41,7 @@ class UndoableCommand : public Command {
   public:
     virtual ~UndoableCommand();
     std::chrono::system_clock::time_point timestamp() const { return m_timestamp; }
+    virtual bool modifiesDocument() const { return m_modificationCount != 0; }
 
     std::unique_ptr<CommandResult> performDo(MapDocumentCommandFacade *document) override;
 

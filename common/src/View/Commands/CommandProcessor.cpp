@@ -73,6 +73,10 @@ class CommandProcessor::TransactionCommand : public UndoableCommand {
         : UndoableCommand(std::move(name), false), m_commands{std::move(commands)}, m_commandDoNotifier{i_commandDoNotifier}, m_commandDoneNotifier{i_commandDoneNotifier}, m_commandUndoNotifier{i_commandUndoNotifier}, m_commandUndoneNotifier{i_commandUndoneNotifier} {
     }
 
+    bool modifiesDocument() const override {
+        return std::any_of(m_commands.begin(), m_commands.end(), [](const auto& command) { return command->modifiesDocument(); });
+    }
+
   private:
     std::unique_ptr<CommandResult> doPerformDo(MapDocumentCommandFacade *document) override {
         for (auto &command : m_commands) {
@@ -128,9 +132,9 @@ CommandHistory CommandProcessor::history() const {
     CommandHistory result;
     result.reserve(m_undoStack.size() + m_redoStack.size());
     for (const auto& command : m_undoStack)
-        result.push_back({command->name(), command->timestamp(), true});
+        result.push_back({command->name(), command->timestamp(), true, command->modifiesDocument()});
     for (auto it = m_redoStack.rbegin(); it != m_redoStack.rend(); ++it)
-        result.push_back({(*it)->name(), (*it)->timestamp(), false});
+        result.push_back({(*it)->name(), (*it)->timestamp(), false, (*it)->modifiesDocument()});
     return result;
 }
 

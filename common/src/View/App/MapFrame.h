@@ -230,10 +230,6 @@ class MapFrame : public QMainWindow {
 
     void documentModificationStateDidChange();
 
-    void transactionDone(const std::string &);
-
-    void transactionUndone(const std::string &);
-
     void preferenceDidChange(const std::filesystem::path &path);
 
     void gridDidChange();

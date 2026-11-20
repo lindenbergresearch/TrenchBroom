@@ -766,8 +766,9 @@ void MapFrame::connectObservers() {
     m_notifierConnection += m_document->documentWasLoadedNotifier.connect(this, &MapFrame::documentDidChange);
     m_notifierConnection += m_document->documentWasSavedNotifier.connect(this, &MapFrame::documentDidChange);
     m_notifierConnection += m_document->documentModificationStateDidChangeNotifier.connect(this, &MapFrame::documentModificationStateDidChange);
-    m_notifierConnection += m_document->transactionDoneNotifier.connect(this, &MapFrame::transactionDone);
-    m_notifierConnection += m_document->transactionUndoneNotifier.connect(this, &MapFrame::transactionUndone);
+    // This notification runs after the undo/redo stacks change, including when
+    // history is cleared without modifying the document.
+    m_notifierConnection += m_document->commandHistoryDidChangeNotifier.connect(this, &MapFrame::updateUndoRedoActions);
     m_notifierConnection += m_document->selectionDidChangeNotifier.connect(this, &MapFrame::selectionDidChange);
     m_notifierConnection += m_document->currentLayerDidChangeNotifier.connect(this, &MapFrame::currentLayerDidChange);
     m_notifierConnection += m_document->groupWasOpenedNotifier.connect(this, &MapFrame::groupWasOpened);
@@ -806,26 +807,6 @@ void MapFrame::documentDidChange(View::MapDocument *) {
 void MapFrame::documentModificationStateDidChange() {
     updateTitleDelayed();
     updateStatusBar();
-}
-
-void MapFrame::transactionDone(const std::string & /* name */) {
-    QTimer::singleShot(0, this, [this]() {
-        // FIXME: Delaying this with QTimer::singleShot is a hack to work around the lack of
-        // a notification that's called _after_ the CommandProcessor undo/redo stacks are
-        // modified.
-        //
-        // The current transactionDoneNotifier is called after the transaction executes, but
-        // before it's pushed onto the undo stack, but we need to read the undo stack in
-        // updateUndoRedoActions(), so this QTimer::singleShot is needed for now.
-        updateUndoRedoActions();
-    });
-}
-
-void MapFrame::transactionUndone(const std::string & /* name */) {
-    QTimer::singleShot(0, this, [this]() {
-        // FIXME: see MapFrame::transactionDone
-        updateUndoRedoActions();
-    });
 }
 
 void MapFrame::preferenceDidChange(const std::filesystem::path &path) {
