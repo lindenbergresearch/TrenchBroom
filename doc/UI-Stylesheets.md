@@ -180,10 +180,55 @@ Die Vergleichsansicht übernimmt ihr Aussehen aus `base.qss`:
 - `QLabel#UIFontComparisonScope`: Erläuterung zum Geltungsbereich.
 - `QPushButton#UIFontApply`: kompakte Apply-Schaltfläche.
 
-Der Layer-Baum verwendet weiterhin `QWidget#LayerTreeRow` mit seinen Typ- und
-Zustandsselektoren. Farben, Abstände, Detailfarbe und Mindesthöhe bleiben dort
-konfigurierbar. Variable Schriftmetriken werden auch beim Ermitteln der
-Zeilenhöhe und Textbreite berücksichtigt.
+Der Layer-Baum verwendet `QWidget#LayerTreeRow` mit seinen Typ- und
+Zustandsselektoren. Jede wiederverwendbare Zeilenvorlage enthält drei echte
+QLabels; die Anzahl dieser Widgets hängt von Typen/Zuständen ab, nicht von der
+Anzahl der Map-Objekte:
+
+- `QLabel#LayerTreeTitle`: Titel auf der oberen Zeile.
+- `QLabel#LayerTreeDetail`: Zusatzinformationen auf der unteren Zeile.
+- `QLabel#LayerTreeAddendum`: Ergänzung hinter dem Titel, auf derselben Zeile.
+
+Schriftart, Schriftgröße, Gewicht, Farbe einschließlich Alpha, Hintergrund,
+Rahmen und Padding sind für alle drei Labels unabhängig konfigurierbar.
+Die Addendum-Ausrichtung gilt für den verbleibenden Platz hinter dem Titel:
+
+```css
+QLabel#LayerTreeTitle { font-size: 14px; font-weight: bold; }
+QLabel#LayerTreeDetail { font-size: 11px; color: rgba(180, 190, 200, 180); }
+QLabel#LayerTreeAddendum {
+    font-size: 12px;
+    qproperty-alignment: 'AlignRight | AlignVCenter';
+}
+/* Statt AlignRight sind AlignLeft und AlignHCenter möglich. */
+QWidget#LayerTreeRow[nodeType="entity"] QLabel#LayerTreeAddendum {
+    font-style: italic;
+}
+```
+
+Typen (`layer`, `group`, `entity`, `brush`, `patch`, `typeGroup`) und Zustände
+(`selected`, `hidden`, `locked`, `currentLayer`) bleiben am Elternwidget
+abfragbar. Eigene Textfarben können über dieselben Elternselektoren auch pro
+Zustand angepasst werden. Ohne eigene Label-Farbregel werden die bisherigen
+Zeilenfarben für Auswahl, gesperrte und ausgeblendete Knoten übernommen.
+
+Abstände, Icongröße und Mindesthöhe bleiben unter `#LayerTreeRow` konfigurierbar.
+`qproperty-addendumSpacing` bestimmt den Abstand zwischen Titel und Addendum.
+Die bisherigen `detailFontReduction`, `detailColor` und `detailOpacity` bleiben
+als Vorgaben erhalten; eine eigene Font-/Farbregel am Detail-QLabel hat Vorrang.
+`detailOpacity = -1` verwendet weiterhin die globale Deckkraft für Detailtext.
+Die Standardgrößen verwenden die Theme-Längen `font.ui`, `font.small` und
+`font.tiny`; diese berücksichtigen die konfigurierte Mindestschriftgröße.
+
+Titel und Addendum werden bei Platzmangel separat gekürzt und überlappen sich
+nicht. Die Zeilenhöhe berücksichtigt alle drei Label-Schriftgrößen und Padding.
+Vollständige Angaben bleiben im Tooltip und für Screenreader erhalten.
+
+Die Inhalte liefert weiterhin die jeweilige `LayerTreeItemRenderer`-Unterklasse
+über `LayerTreeItemContent` (`title`, `detail`, `addendum`, `icon`). Standardmäßig
+enthält das Addendum z.B. den aktiven Layerstatus, den Status einer offenen
+Gruppe, den Entity-Targetnamen, die Brush-/Patch-Nummer oder die Anzahl einer
+virtuellen Typgruppe.
 
 ## Grenzen und bewusst im Code verbleibende Aufgaben
 

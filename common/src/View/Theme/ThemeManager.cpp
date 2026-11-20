@@ -312,6 +312,7 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
     length("font.ui", View::uiFontPixelSize());
     length("font.subtitle", View::uiFontPixelSize(-1));
     length("font.small", View::uiFontPixelSize(-2));
+    length("font.tiny", View::uiFontPixelSize(-4));
     length("font.title", qRound(View::uiFontPixelSize() * 1.4));
     length("font.header", View::uiFontPixelSize() * 2);
     length("font.dialogTitle", qRound(View::uiFontPixelSize() * 1.4) + 2);

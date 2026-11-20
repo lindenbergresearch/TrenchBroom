@@ -357,7 +357,11 @@ QTableWidget {
 /* ==== LAYER TREE ==== */
 /* Werkzeug Layers: hierarchische Einträge für Layer, Gruppen, Entities, Brushes
    und virtuelle Typgruppen. LayerTreeRow ist eine Zeichenvorlage des Delegates;
-   es wird nicht für jeden Map-Knoten ein eigenes QWidget erzeugt. */
+   es wird nicht für jeden Map-Knoten ein eigenes QWidget erzeugt.
+   Jede Vorlage enthält drei echte QLabels: LayerTreeTitle (oben),
+   LayerTreeDetail (darunter), LayerTreeAddendum (oben hinter dem Titel).
+   Schrift, Farbe, Hintergrund, Rahmen und padding sind je Label anpassbar.
+   Typ/Zustand lassen sich über den Elternselektor LayerTreeRow einschränken. */
 
 /* The layer tree paints the selection once across the entire row. */
 QTreeWidget#LayerTree {
@@ -400,6 +404,7 @@ QWidget#LayerTreeRow {
     qproperty-contentIconSize: 24;
     qproperty-iconSpacing: 4;
     qproperty-lineSpacing: 0;
+    qproperty-addendumSpacing: 8;
     qproperty-detailFontReduction: 2;
     qproperty-detailOpacity: -1;
     qproperty-detailColor: ${color.text};
@@ -407,6 +412,40 @@ QWidget#LayerTreeRow {
     qproperty-rowInsetX: 2;
     qproperty-rowInsetY: 1;
 }
+
+QLabel#LayerTreeTitle, QLabel#LayerTreeDetail, QLabel#LayerTreeAddendum {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+}
+QLabel#LayerTreeTitle {
+    font-size: ${length.font.ui};
+    qproperty-alignment: 'AlignLeft | AlignVCenter';
+}
+QLabel#LayerTreeDetail {
+    font-size: ${length.font.small};
+    font-weight: normal;
+    qproperty-alignment: 'AlignLeft | AlignVCenter';
+}
+/* AlignLeft / AlignHCenter / AlignRight position the addendum in the space
+   after the title. Keep AlignVCenter for the shared upper line. Long titles
+   and addenda are elided separately so they never overlap. */
+QLabel#LayerTreeAddendum {
+    font-size: ${length.font.small};
+    qproperty-alignment: 'AlignRight | AlignVCenter';
+}
+QWidget#LayerTreeRow[nodeType="brush"] QLabel#LayerTreeTitle,
+QWidget#LayerTreeRow[nodeType="patch"] QLabel#LayerTreeTitle {
+    font-size: ${length.font.small};
+}
+QWidget#LayerTreeRow[nodeType="brush"] QLabel#LayerTreeDetail,
+QWidget#LayerTreeRow[nodeType="patch"] QLabel#LayerTreeDetail {
+    font-size: ${length.font.tiny};
+}
+QWidget#LayerTreeRow[currentLayer="true"] QLabel#LayerTreeTitle { font-weight: bold; }
+QWidget#LayerTreeRow[hidden="true"] QLabel { font-style: italic; }
 
 QWidget#LayerTreeRow[nodeType="layer"] {
     qproperty-paddingTop: 6;

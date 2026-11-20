@@ -148,7 +148,7 @@ History/Undo, map load diagnostics, view state and archive caches. Qt6-specific 
 encodings (including incomplete characters), legacy QSS font weights, shortcut serialization and fractional input
 coordinates. Dependency checks exercise the real image/model/font loaders.
 
-CTest runs **238 test cases / 76,086 assertions** with isolated temporary settings
+CTest runs **241 test cases / 76,122 assertions** with isolated temporary settings
 and the offscreen Qt platform. It does not change personal editor settings.
 The font/vector-icon/Qt6 subset also passes with `QT_SCALE_FACTOR=1.5` and `2`
 (34 cases / 3,395 assertions at each scale).
@@ -162,12 +162,12 @@ QT_QPA_PLATFORM=offscreen \
   cmake-build-cpm-qt6/regression/tb-regression-tests '[qt6]'
 ```
 
-Four additional native tests need a logged-in desktop, OpenGL and an audio
+Five additional native tests need a logged-in desktop, OpenGL and an audio
 backend. They are hidden from the offscreen suite and have also passed locally:
 
 ```sh
 QT_QPA_PLATFORM=cocoa \
-  cmake-build-cpm-qt6/regression/tb-regression-tests '[.native-gl],[.native-audio],[.native-titlebar]'
+  cmake-build-cpm-qt6/regression/tb-regression-tests '[.native-gl],[.native-audio],[.native-titlebar],[.native-layer-labels]'
 ```
 
 These exercise context lifetime, floating OpenGL widgets, and real audio decoding,
@@ -176,6 +176,9 @@ The title-bar test changes focus between a main window and a floating Inspector,
 checks light/dark palettes with painting disabled, and recreates the native tool window.
 It also tests delayed Cocoa chrome resets, font registration and font/stylesheet
 changes against the authoritative theme color.
+The Layer QLabel test checks opaque title, detail and addendum text in a visible
+native tree. A separate native editor preview covers the shipped theme and all
+three addendum alignments.
 Additional native smoke checks use the actual editor, property editing, Inspector
 docking/floating, theme changes and SVG selection. The historical `common/test`
 and benchmark targets remain disabled because several files use older project

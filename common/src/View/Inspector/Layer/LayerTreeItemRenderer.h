@@ -10,16 +10,19 @@
 #include <map>
 
 class QTreeWidgetItem;
+class QLabel;
 
 namespace TrenchBroom::Model {
 class Node;
 }
 
 namespace TrenchBroom::View {
+class LayerTreeRowStyle;
 struct LayerTreeItemContent {
     QString title;
     QString detail;
     const char* icon;
+    QString addendum;
 };
 
 struct LayerTreeItemLayout {
@@ -31,6 +34,8 @@ struct LayerTreeItemLayout {
     qreal detailOpacity = -1;
     QColor detailColor;
     int minimumHeight = 0;
+    int addendumSpacing = 8;
+    LayerTreeRowStyle* textStyle = nullptr;
 };
 
 // A small, shared style proxy for each type/state combination, never a widget
@@ -51,22 +56,35 @@ class LayerTreeRowStyle : public QWidget {
     Q_PROPERTY(int minimumRowHeight MEMBER minimumRowHeight)
     Q_PROPERTY(int rowInsetX MEMBER rowInsetX)
     Q_PROPERTY(int rowInsetY MEMBER rowInsetY)
+    Q_PROPERTY(int addendumSpacing MEMBER addendumSpacing)
 public:
     explicit LayerTreeRowStyle(QWidget* parent);
-    LayerTreeItemLayout itemLayout() const;
+    LayerTreeItemLayout itemLayout();
+    void prepareText(const QStyleOptionViewItem& option, const QModelIndex& index, const LayerTreeItemLayout& layout);
+    QLabel& titleLabel() const;
+    QLabel& detailLabel() const;
+    QLabel& addendumLabel() const;
     int paddingLeft = 0, paddingTop = 0, paddingRight = 0, paddingBottom = 0;
     int contentIconSize = 20, iconSpacing = 0, lineSpacing = 0;
     qreal detailFontReduction = 2, detailOpacity = -1;
     QColor detailColor;
     int minimumRowHeight = 0, rowInsetX = 0, rowInsetY = 0;
+    int addendumSpacing = 8;
+private:
+    std::array<QLabel*, 3> m_labels;
+    std::array<QFont, 3> m_baseFonts;
+    std::array<QPalette, 3> m_basePalettes;
+    bool m_textInitialized = false;
 };
 
 // Each node type owns its content and layout. Types can also replace paint() and
 // sizeHint() for a completely different presentation without changing the tree.
 // Painting uses cached item data, so only visible rows need to be rendered.
 class LayerTreeItemRenderer {
+    mutable std::unique_ptr<LayerTreeRowStyle> m_defaultTextStyle;
+    LayerTreeRowStyle& textStyle(const QStyleOptionViewItem& option, const QModelIndex& index, const LayerTreeItemLayout& layout) const;
 public:
-    LayerTreeItemRenderer() = default;
+    LayerTreeItemRenderer();
 
     virtual ~LayerTreeItemRenderer();
 
@@ -121,7 +139,7 @@ public:
 class LayerTreeItemDelegate : public QStyledItemDelegate {
 public:
     // Qt::UserRole remains reserved for the tree's node reference.
-    enum Role { DetailRole = Qt::UserRole + 1, RendererRole, TypeGroupRole, EntityClassRole, IconSourceRole, HiddenRole, LockedRole, CurrentLayerRole };
+    enum Role { DetailRole = Qt::UserRole + 1, RendererRole, TypeGroupRole, EntityClassRole, IconSourceRole, HiddenRole, LockedRole, CurrentLayerRole, AddendumRole };
     enum Type { Layer, Group, Entity, Brush, Patch, TypeCount };
 
     explicit LayerTreeItemDelegate(QObject* parent = nullptr);

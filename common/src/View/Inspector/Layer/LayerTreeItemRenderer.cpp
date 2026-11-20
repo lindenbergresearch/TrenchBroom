@@ -15,7 +15,9 @@
 
 #include <QApplication>
 #include <QFontMetricsF>
+#include <QLabel>
 #include <QPainter>
+#include <QPixmap>
 #include <QStyle>
 #include <QTreeWidgetItem>
 
@@ -35,76 +37,155 @@ const std::array<const char*, LayerTreeItemDelegate::TypeCount> iconThemeNames{
     "color.icon.layer", "color.icon.group", "color.icon.entity", "color.icon.brush", "color.icon.patch"
 };
 
+void paintLabel(QPainter& painter, QLabel& label, const QRect& rect, qreal opacity = 1) {
+    if (rect.isEmpty() || label.text().isEmpty()) return;
+    const auto text = label.text();
+    label.setGeometry(rect);
+    const auto width = std::max(0, label.contentsRect().width() - 2 * label.margin() - std::max(0, label.indent()));
+    label.setText(label.fontMetrics().elidedText(text, Qt::ElideRight, width));
+    // Qt 6/macOS can omit opaque QLabel text when render() shares an active
+    // viewport's painter. Isolate the widget paint at the target's actual
+    // device scale before compositing it, without resizing a rasterized image.
+    const auto ratio = painter.device()->devicePixelRatioF();
+    QPixmap buffer(QSize(int(std::ceil(rect.width() * ratio)), int(std::ceil(rect.height() * ratio))));
+    buffer.setDevicePixelRatio(ratio);
+    buffer.fill(Qt::transparent);
+    label.render(&buffer, QPoint{}, QRegion{}, QWidget::DrawChildren);
+    painter.save();
+    painter.setClipRect(rect, Qt::IntersectClip);
+    painter.setOpacity(painter.opacity() * opacity);
+    painter.drawPixmap(rect.topLeft(), buffer);
+    painter.restore();
+    label.setText(text);
+}
+
+int upperLineHeight(const LayerTreeRowStyle& style) {
+    return std::max(style.titleLabel().sizeHint().height(),
+        style.addendumLabel().text().isEmpty() ? 0 : style.addendumLabel().sizeHint().height());
+}
+
 }
 
 LayerTreeRowStyle::LayerTreeRowStyle(QWidget *parent) : QWidget(parent) {
     setObjectName("LayerTreeRow");
     hide();
     setAttribute(Qt::WA_TransparentForMouseEvents);
+    const std::array<const char*, 3> names{"LayerTreeTitle", "LayerTreeDetail", "LayerTreeAddendum"};
+    for (size_t i = 0; i < m_labels.size(); ++i) {
+        auto* label = m_labels[i] = new QLabel(this);
+        label->setObjectName(names[i]);
+        label->setTextFormat(Qt::PlainText);
+        label->setWordWrap(false);
+        label->setAlignment((i == 2 ? Qt::AlignRight : Qt::AlignLeft) | Qt::AlignVCenter);
+        label->setAttribute(Qt::WA_TransparentForMouseEvents);
+        label->setAttribute(Qt::WA_NoSystemBackground);
+    }
 }
 
-LayerTreeItemLayout LayerTreeRowStyle::itemLayout() const {
+LayerTreeItemLayout LayerTreeRowStyle::itemLayout() {
     return {{std::max(0, paddingLeft), std::max(0, paddingTop), std::max(0, paddingRight), std::max(0, paddingBottom)},
             std::max(0, contentIconSize), std::max(0, iconSpacing), std::max(0, lineSpacing),
-            std::max(qreal(0), detailFontReduction), detailOpacity, detailColor, std::max(0, minimumRowHeight)};
+            std::max(qreal(0), detailFontReduction), detailOpacity, detailColor, std::max(0, minimumRowHeight),
+            std::max(0, addendumSpacing), this};
 }
 
+QLabel& LayerTreeRowStyle::titleLabel() const { return *m_labels[0]; }
+QLabel& LayerTreeRowStyle::detailLabel() const { return *m_labels[1]; }
+QLabel& LayerTreeRowStyle::addendumLabel() const { return *m_labels[2]; }
+
+void LayerTreeRowStyle::prepareText(const QStyleOptionViewItem& option, const QModelIndex& index, const LayerTreeItemLayout& layout) {
+    const auto settings = listFontSettings();
+    const std::array<QFont, 3> fonts{
+        listTextFont(option.font, settings, true),
+        listTextFont(detailFont(option.font, layout.detailFontReduction), settings),
+        listTextFont(option.font, settings, true)};
+    const std::array<QString, 3> texts{option.text, index.data(LayerTreeItemDelegate::DetailRole).toString(),
+        index.data(LayerTreeItemDelegate::AddendumRole).toString()};
+    const auto enabled = bool(option.state & QStyle::State_Enabled);
+    const auto group = !enabled ? QPalette::Disabled : option.state & QStyle::State_Active ? QPalette::Active : QPalette::Inactive;
+    for (size_t i = 0; i < m_labels.size(); ++i) {
+        auto& label = *m_labels[i];
+        // These defaults also support older row-level QSS properties. A rule
+        // targeting an individual QLabel takes precedence through Qt's style.
+        if (!m_textInitialized || m_baseFonts[i] != fonts[i]) {
+            m_baseFonts[i] = fonts[i];
+            label.setFont(fonts[i]);
+        }
+        auto palette = option.palette;
+        const auto color = i == 1 && layout.detailColor.isValid() ? layout.detailColor : palette.color(group, QPalette::Text);
+        palette.setColor(QPalette::WindowText, color);
+        if (!m_textInitialized || m_basePalettes[i] != palette) {
+            m_basePalettes[i] = palette;
+            label.setPalette(palette);
+        }
+        label.setEnabled(enabled);
+        label.ensurePolished();
+        label.setText(texts[i]);
+    }
+    m_textInitialized = true;
+}
+
+LayerTreeItemRenderer::LayerTreeItemRenderer() = default;
 LayerTreeItemRenderer::~LayerTreeItemRenderer() = default;
 
+LayerTreeRowStyle& LayerTreeItemRenderer::textStyle(const QStyleOptionViewItem& option, const QModelIndex& index, const LayerTreeItemLayout& layout) const {
+    if (!layout.textStyle && !m_defaultTextStyle) m_defaultTextStyle = std::make_unique<LayerTreeRowStyle>(nullptr);
+    auto& style = layout.textStyle ? *layout.textStyle : *m_defaultTextStyle;
+    style.prepareText(option, index, layout);
+    return style;
+}
+
 void LayerTreeItemRenderer::paint(QPainter &painter, const QStyleOptionViewItem &option, const QModelIndex &index, const LayerTreeItemLayout &layout) const {
-    const auto rect = QRectF(option.rect).marginsRemoved(QMarginsF(layout.margins));
-    const auto iconRect = QRect(qRound(rect.left()), qRound(
+    const auto rect = option.rect.marginsRemoved(layout.margins);
+    const auto iconRect = QRect(rect.left(), qRound(
         rect.center().y() - layout.iconSize / 2.0), layout.iconSize, layout.iconSize);
     const auto enabled = bool(option.state & QStyle::State_Enabled);
     const auto selected = bool(option.state & QStyle::State_Selected);
-    const auto group = !enabled ? QPalette::Disabled : (option.state & QStyle::State_Active ? QPalette::Active
-                                                                                            : QPalette::Inactive);
-    const auto textColor = option.palette.color(group, QPalette::Text);
     option.icon.paint(&painter, iconRect, Qt::AlignCenter, !enabled ? QIcon::Disabled : selected ? QIcon::Selected
                                                                                                  : QIcon::Normal);
 
-    const auto settings = listFontSettings();
-    const auto titleFont = listTextFont(option.font, settings, true);
-    const auto infoFont = listTextFont(detailFont(option.font, layout.detailFontReduction), settings);
-    const auto titleMetrics = QFontMetricsF(titleFont);
-    const auto infoMetrics = QFontMetricsF(infoFont);
-
-    const auto info = index.data(LayerTreeItemDelegate::DetailRole).toString();
-    const auto textHeight = titleMetrics.height() + (info.isEmpty() ? 0 : layout.lineSpacing + infoMetrics.height());
+    auto& style = textStyle(option, index, layout);
+    auto& title = style.titleLabel();
+    auto& detail = style.detailLabel();
+    auto& addendum = style.addendumLabel();
+    const auto upperHeight = upperLineHeight(style);
+    const auto textHeight = upperHeight + (detail.text().isEmpty() ? 0 : layout.lineSpacing + detail.sizeHint().height());
     const auto textX = rect.left() + layout.iconSize + layout.iconSpacing;
 
-    const auto textWidth = std::max(0.0, rect.right() - textX);
-    const auto titleRect = QRectF(textX,
-                                  rect.top() + (rect.height() - textHeight) / 2.0, textWidth, titleMetrics.height());
+    const auto textWidth = std::max(0, rect.right() + 1 - textX);
+    const auto textY = rect.top() + (rect.height() - textHeight) / 2;
+    auto titleWidth = textWidth;
+    auto gap = 0;
+    if (!addendum.text().isEmpty()) {
+        gap = std::min(layout.addendumSpacing, textWidth);
+        const auto reserve = std::min(addendum.sizeHint().width(), (textWidth - gap) / 2);
+        titleWidth = std::min(title.sizeHint().width(), textWidth - gap - reserve);
+    }
 
     painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(textColor);
-    paintTextLine(painter, titleRect, option.text, titleFont, settings.subpixelPositioning);
-
-    if (!info.isEmpty()) {
-        auto infoColor = layout.detailColor.isValid() ? layout.detailColor : textColor;
+    painter.setRenderHint(QPainter::VerticalSubpixelPositioning, listFontSettings().subpixelPositioning);
+    paintLabel(painter, title, QRect(textX, textY, titleWidth, upperHeight));
+    if (!addendum.text().isEmpty())
+        paintLabel(painter, addendum, QRect(textX + titleWidth + gap, textY, textWidth - titleWidth - gap, upperHeight));
+    if (!detail.text().isEmpty()) {
         const auto opacity = std::clamp(
             layout.detailOpacity < 0 ? qreal(pref(Preferences::UIDetailTextOpacity)) : layout.detailOpacity, 0.0, 1.0);
-        infoColor.setAlphaF(infoColor.alphaF() * opacity);
-        painter.setPen(infoColor);
-        const auto infoRect = QRectF(textX, titleRect.bottom() + layout.lineSpacing, textWidth, infoMetrics.height());
-        paintTextLine(painter, infoRect, info, infoFont, settings.subpixelPositioning);
+        paintLabel(painter, detail, QRect(textX, textY + upperHeight + layout.lineSpacing, textWidth, detail.sizeHint().height()), opacity);
     }
 }
 
 QSize LayerTreeItemRenderer::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index, const LayerTreeItemLayout &layout) const {
-    const auto settings = listFontSettings();
-    const auto titleMetrics = QFontMetricsF(listTextFont(option.font, settings, true));
-    const auto infoMetrics = QFontMetricsF(listTextFont(detailFont(option.font, layout.detailFontReduction), settings));
-    const auto info = index.data(LayerTreeItemDelegate::DetailRole).toString();
-    const auto textHeight = titleMetrics.height() + (info.isEmpty() ? 0 : layout.lineSpacing + infoMetrics.height());
-    const auto textWidth = std::max(titleMetrics.horizontalAdvance(option.text), infoMetrics.horizontalAdvance(info));
+    auto& style = textStyle(option, index, layout);
+    const auto& title = style.titleLabel();
+    const auto& detail = style.detailLabel();
+    const auto& addendum = style.addendumLabel();
+    const auto textHeight = upperLineHeight(style) + (detail.text().isEmpty() ? 0 : layout.lineSpacing + detail.sizeHint().height());
+    const auto upperWidth = title.sizeHint().width() + (addendum.text().isEmpty() ? 0 : layout.addendumSpacing + addendum.sizeHint().width());
+    const auto textWidth = std::max(upperWidth, detail.text().isEmpty() ? 0 : detail.sizeHint().width());
     return {
-        int(std::ceil(
-            layout.margins.left() + layout.iconSize + layout.iconSpacing + textWidth + layout.margins.right())),
-        std::max(layout.minimumHeight, int(std::ceil(
-            layout.margins.top() + std::max(qreal(layout.iconSize), textHeight) + layout.margins.bottom())))
+        layout.margins.left() + layout.iconSize + layout.iconSpacing + textWidth + layout.margins.right(),
+        std::max(layout.minimumHeight, layout.margins.top() + std::max(layout.iconSize, textHeight) + layout.margins.bottom())
     };
 }
 
@@ -122,12 +203,15 @@ void LayerTreeItemDelegate::updateItem(QTreeWidgetItem &item, const Model::Node 
 
     item.setText(0, data.title);
     item.setData(0, DetailRole, data.detail);
+    item.setData(0, AddendumRole, data.addendum);
     item.setData(0, RendererRole, int(type));
     item.setData(0, HiddenRole, !node.visible());
     item.setData(0, LockedRole, node.locked());
     item.setData(0, CurrentLayerRole, active);
     item.setData(0, Qt::AccessibleDescriptionRole, data.detail);
-    item.setToolTip(0, data.detail.isEmpty() ? data.title : data.title + "\n" + data.detail);
+    const auto heading = data.title + (data.addendum.isEmpty() ? QString{} : " " + data.addendum);
+    item.setData(0, Qt::AccessibleTextRole, heading);
+    item.setToolTip(0, data.detail.isEmpty() ? heading : heading + "\n" + data.detail);
     item.setData(0, IconSourceRole, QString::fromLatin1(data.icon));
     updateIcon(item);
 }
@@ -179,7 +263,9 @@ void LayerTreeItemDelegate::updateTypeGroup(QTreeWidgetItem &item, const Type ty
     };
 
     const auto name = entityClass.isEmpty() ? names[type] : entityClass == "light" ? tr("Lights") : entityClass;
-    item.setText(0, tr("%1 (%2)").arg(name).arg(count));
+    item.setText(0, name);
+    item.setData(0, AddendumRole, tr("(%1)").arg(count));
+    item.setData(0, Qt::AccessibleTextRole, tr("%1 (%2)").arg(name).arg(count));
     item.setData(0, DetailRole, tr("Type group · select all members"));
     item.setData(0, RendererRole, int(Group));
     item.setData(0, TypeGroupRole, int(type));

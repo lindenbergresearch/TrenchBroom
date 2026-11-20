@@ -11,11 +11,9 @@ LayerTreeItemContent LayerTreeEntityRenderer::content(const Model::Node &node, i
     if (node.hasChildren()) detail += QObject::tr(" · %1 geometry objects").arg(node.childCount());
     else {
         const auto &origin = entity.origin();
-        detail += QObject::tr(" · at %1×%2×%3)").arg(origin.x()).arg(origin.y()).arg(origin.z());
+        detail += QObject::tr(" · at %1×%2×%3").arg(origin.x()).arg(origin.y()).arg(origin.z());
     }
-    if (const auto *targetname = entity.property("targetname")) {
-        if (!targetname->empty()) detail = QString::fromStdString(*targetname) + " · " + detail;
-    }
-    return {QString::fromStdString(entity.classname()), detail, "explicit.svg"};
+    const auto* targetname = entity.property("targetname");
+    return {QString::fromStdString(entity.classname()), detail, "explicit.svg", targetname ? QString::fromStdString(*targetname) : QString{}};
 }
 } // namespace TrenchBroom::View

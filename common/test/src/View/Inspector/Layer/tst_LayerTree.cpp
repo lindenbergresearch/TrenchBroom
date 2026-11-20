@@ -28,6 +28,7 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QImage>
+#include <QLabel>
 #include <QPainter>
 #include <QFile>
 #include <QMouseEvent>
@@ -815,21 +816,24 @@ TEST_CASE_METHOD(LayerTreeTest, "LayerTree groups light families and entity clas
     flush();
     auto* lightBucket = item(lights.front())->parent();
     REQUIRE(lightBucket != item(nested));
-    CHECK(lightBucket->text(0) == "Lights (6)");
+    CHECK(lightBucket->text(0) == "Lights");
+    CHECK(lightBucket->data(0, LayerTreeItemDelegate::AddendumRole).toString() == "(6)");
     CHECK(lightBucket->childCount() == 6);
-    CHECK(lightBucket->parent()->text(0) == "Entities (7)");
+    CHECK(lightBucket->parent()->text(0) == "Entities");
+    CHECK(lightBucket->parent()->data(0, LayerTreeItemDelegate::AddendumRole).toString() == "(7)");
     CHECK(lightBucket->parent()->parent() == item(nested));
-    CHECK(item(monsters.front())->parent()->text(0) == "monster_ogre (6)");
+    CHECK(item(monsters.front())->parent()->text(0) == "monster_ogre");
+    CHECK(item(monsters.front())->parent()->data(0, LayerTreeItemDelegate::AddendumRole).toString() == "(6)");
     tree->setCurrentItem(lightBucket, 0, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
     CHECK(document->selectedNodes().nodes().size() == 6);
     for (auto* node : lights) CHECK(node->selected());
     select(lights.front());
     document->setProperty("classname", "info_player_start");
     flush();
-    CHECK(item(lights.back())->parent()->text(0) == "Entities (7)"); // Five lights remain flat.
+    CHECK(item(lights.back())->parent()->text(0) == "Entities"); // Five lights remain flat.
     document->undoCommand();
     flush();
-    CHECK(item(lights.front())->parent()->text(0) == "Lights (6)");
+    CHECK(item(lights.front())->parent()->text(0) == "Lights");
     document->hide({lights.front()});
     document->lock({lights.back()});
     tree->setCurrentItem(item(lights[1])->parent(), 0, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
@@ -963,5 +967,138 @@ TEST_CASE_METHOD(LayerTreeTest, "Layer detail color and disclosure size can be c
     const auto row = tree->visualItemRect(item(group));
     clickAt(tree->viewport(),QPoint(row.left()-tree->indentation()/2,row.center().y()));
     CHECK_FALSE(item(group)->isExpanded());
+}
+TEST_CASE_METHOD(LayerTreeTest, "Layer types supply independent title detail and addendum content", "[LayerTree][layer-labels]") {
+    CHECK(item(layer)->text(0) == "Default Layer");
+    CHECK(item(layer)->data(0, LayerTreeItemDelegate::AddendumRole).toString() == "Active layer");
+    CHECK_FALSE(item(layer)->data(0, LayerTreeItemDelegate::DetailRole).toString().contains("Active layer"));
+    CHECK(item(a)->text(0) == "Brush");
+    CHECK(item(a)->data(0, LayerTreeItemDelegate::AddendumRole).toString().startsWith('#'));
+    CHECK(item(a)->data(0, LayerTreeItemDelegate::DetailRole).toString().contains("6 faces"));
+    document->selectNodes({entity});
+    document->setProperty("targetname", "door <main>");
+    flush();
+    CHECK(item(entity)->text(0) == "func_detail");
+    CHECK(item(entity)->data(0, LayerTreeItemDelegate::AddendumRole).toString() == "door <main>");
+    CHECK_FALSE(item(entity)->data(0, LayerTreeItemDelegate::DetailRole).toString().contains("door <main>"));
+    CHECK(item(entity)->data(0, Qt::AccessibleTextRole).toString() == "func_detail door <main>");
+    CHECK(item(entity)->toolTip(0).contains("door <main>"));
+}
+
+TEST_CASE("Layer labels retain independent QSS styles and align within a non-overlapping upper line", "[LayerTree][layer-labels]") {
+    QTreeWidget view;
+    auto* delegate = new LayerTreeItemDelegate(&view);
+    view.setItemDelegate(delegate);
+    const QString rules = R"(
+        QWidget#LayerTreeRow { color: #123456; font-size: 17px; qproperty-contentIconSize: 0;
+            qproperty-iconSpacing: 0; qproperty-lineSpacing: 3; qproperty-detailOpacity: 1; qproperty-addendumSpacing: 12; }
+        QLabel#LayerTreeTitle { color: #ee2233; font-size: 21px; font-weight: bold; background: transparent; border: none; }
+        QLabel#LayerTreeDetail { color: #2255ee; font-size: 12px; background: transparent; border: none; }
+        QLabel#LayerTreeAddendum { color: #22cc55; font-size: 16px; background: transparent; border: none;
+            qproperty-alignment: 'AlignRight | AlignVCenter'; }
+    )";
+    view.setStyleSheet(rules);
+    auto* item = new QTreeWidgetItem(&view, {"MMMM"});
+    item->setData(0, LayerTreeItemDelegate::DetailRole, "Detail text");
+    item->setData(0, LayerTreeItemDelegate::AddendumRole, "Addendum");
+    item->setData(0, LayerTreeItemDelegate::RendererRole, int(LayerTreeItemDelegate::Group));
+    const auto index = view.model()->index(0, 0);
+    QStyleOptionViewItem option;
+    option.initFrom(&view);
+    option.state |= QStyle::State_Enabled | QStyle::State_Active;
+    option.rect = QRect(0, 0, 600, 100);
+    const auto render = [&] {
+        QImage image(option.rect.size(), QImage::Format_ARGB32_Premultiplied);
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        delegate->paint(&painter, option, index);
+        return image;
+    };
+    const auto bounds = [](const QImage& image, const QColor& color) {
+        QRect result;
+        for (int y = 0; y < image.height(); ++y)
+            for (int x = 0; x < image.width(); ++x)
+                if (image.pixelColor(x, y) == color) result = result.united(QRect(x, y, 1, 1));
+        return result;
+    };
+    const auto image = render();
+    const auto styles = view.findChildren<LayerTreeRowStyle*>();
+    REQUIRE(styles.size() == 1);
+    auto& style = *styles.front();
+    CHECK(style.findChildren<QLabel*>().size() == 3);
+    CHECK(style.titleLabel().font().pixelSize() == 21);
+    CHECK(style.detailLabel().font().pixelSize() == 12);
+    CHECK(style.addendumLabel().font().pixelSize() == 16);
+    REQUIRE_FALSE(bounds(image, QColor("#ee2233")).isEmpty());
+    REQUIRE_FALSE(bounds(image, QColor("#2255ee")).isEmpty());
+    const auto right = bounds(image, QColor("#22cc55"));
+    REQUIRE_FALSE(right.isEmpty());
+    CHECK(style.titleLabel().geometry().top() == style.addendumLabel().geometry().top());
+    CHECK(style.detailLabel().geometry().top() > style.titleLabel().geometry().bottom());
+    CHECK(style.addendumLabel().geometry().left() - style.titleLabel().geometry().right() == 13);
+    view.setStyleSheet(rules + "\nQLabel#LayerTreeAddendum { qproperty-alignment: 'AlignLeft | AlignVCenter'; }");
+    const auto left = bounds(render(), QColor("#22cc55"));
+    view.setStyleSheet(rules + "\nQLabel#LayerTreeAddendum { qproperty-alignment: 'AlignHCenter | AlignVCenter'; }");
+    const auto center = bounds(render(), QColor("#22cc55"));
+    CHECK(left.left() < center.left());
+    CHECK(center.left() < right.left());
+    item->setText(0, "<b>A long title that must remain plain text</b>");
+    item->setData(0, LayerTreeItemDelegate::AddendumRole, "A very long addendum");
+    option.rect.setWidth(90);
+    render();
+    CHECK(style.titleLabel().textFormat() == Qt::PlainText);
+    CHECK(style.titleLabel().text() == item->text(0));
+    CHECK_FALSE(style.titleLabel().geometry().intersects(style.addendumLabel().geometry()));
+    CHECK(style.addendumLabel().geometry().right() < option.rect.right() + 1);
+    const auto height = delegate->sizeHint(option, index).height();
+    view.setStyleSheet(rules + "\nQLabel#LayerTreeAddendum { font-size: 42px; padding: 4px; }");
+    CHECK(delegate->sizeHint(option, index).height() > height);
+}
+
+TEST_CASE("Layer text widgets are reused across many scene rows", "[LayerTree][layer-labels]") {
+    QTreeWidget view;
+    auto* delegate = new LayerTreeItemDelegate(&view);
+    view.setItemDelegate(delegate);
+    QStyleOptionViewItem option;
+    option.initFrom(&view);
+    option.rect = QRect(0, 0, 300, 60);
+    option.state |= QStyle::State_Enabled;
+    QImage image(option.rect.size(), QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&image);
+    for (int i = 0; i < 300; ++i) {
+        auto* item = new QTreeWidgetItem(&view, {QString("Brush %1").arg(i)});
+        item->setData(0, LayerTreeItemDelegate::RendererRole, int(LayerTreeItemDelegate::Brush));
+        item->setData(0, LayerTreeItemDelegate::AddendumRole, QString::number(i));
+        delegate->paint(&painter, option, view.model()->index(i, 0));
+    }
+    CHECK(view.findChildren<LayerTreeRowStyle*>().size() == 1);
+    CHECK(view.findChildren<QLabel*>().size() == 3);
+}
+TEST_CASE_METHOD(LayerTreeTest, "Native layer rows show all opaque QLabel texts", "[.native-layer-labels]") {
+    REQUIRE(QGuiApplication::platformName() == "cocoa");
+    tree->setStyleSheet(R"(
+        QWidget#LayerTreeRow { color: #ee2233; background: transparent;
+            border-bottom: 1px solid #223344; border-radius: 6px;
+            qproperty-detailColor: #2255ee; qproperty-detailOpacity: 1; }
+        QLabel#LayerTreeTitle { font-size: 18px; background: transparent; border: none; }
+        QLabel#LayerTreeDetail { font-size: 13px; background: transparent; border: none; }
+        QLabel#LayerTreeAddendum { font-size: 13px; background: transparent; border: none; }
+    )");
+    tree->setSelectionSyncEnabled(false);
+    showEditor();
+    tree->expandAll();
+    flush();
+    const auto shot = tree->viewport()->grab().toImage();
+    const auto ratio = shot.devicePixelRatio();
+    const auto row = tree->visualItemRect(item(a));
+    const auto contains = [&](const QColor& expected, const QRect& area) {
+        for (int y = qRound(area.top() * ratio); y < qRound((area.bottom() + 1) * ratio); ++y)
+            for (int x = qRound(area.left() * ratio); x < qRound((area.right() + 1) * ratio); ++x)
+                if (shot.pixelColor(x, y) == expected) return true;
+        return false;
+    };
+    CHECK(contains(QColor("#ee2233"), QRect(row.topLeft(), row.size() / 2)));
+    CHECK(contains(QColor("#2255ee"), row.adjusted(0, row.height() / 2, 0, 0)));
+    CHECK(contains(QColor("#ee2233"), row.adjusted(row.width() / 2, 0, 0, -row.height() / 2)));
 }
 } // namespace TrenchBroom::View
