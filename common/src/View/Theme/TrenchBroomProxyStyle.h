@@ -51,6 +51,7 @@ public:
     void polish(QWidget* widget) override;
     void unpolish(QWidget* widget) override;
     void refreshTypography();
+    void refreshWindowChrome();
     void drawItemText(QPainter* painter, const QRect& rect, int flags,
         const QPalette& palette, bool enabled, const QString& text,
         QPalette::ColorRole role = QPalette::NoRole) const override;

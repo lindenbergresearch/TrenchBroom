@@ -3,6 +3,49 @@
 #include <QGuiApplication>
 #include <QWindow>
 #include <AppKit/AppKit.h>
+#include <objc/runtime.h>
+
+// Qt/Cocoa may reset native chrome during font registration or stylesheet
+// changes, after QWidget's activation/style events have already been handled.
+// Keep the desired appearance on the native window and reapply it after Cocoa
+// updates. The association owns the observer; the back-reference stays weak.
+@interface TBWindowTitleBarStyle : NSObject
+@property(nonatomic, weak) NSWindow* window;
+@property(nonatomic, strong) NSColor* color;
+@property(nonatomic, copy) NSAppearanceName appearanceName;
+@property(nonatomic) BOOL applying;
+- (instancetype)initWithWindow:(NSWindow*)window;
+- (void)windowUpdated:(NSNotification*)notification;
+- (void)apply;
+@end
+
+@implementation TBWindowTitleBarStyle
+- (instancetype)initWithWindow:(NSWindow*)window {
+    if ((self = [super init])) {
+        self.window = window;
+        auto* center = NSNotificationCenter.defaultCenter;
+        for (auto name : {NSWindowDidUpdateNotification, NSWindowDidBecomeKeyNotification,
+                          NSWindowDidResignKeyNotification, NSWindowDidBecomeMainNotification,
+                          NSWindowDidResignMainNotification})
+            [center addObserver:self selector:@selector(windowUpdated:) name:name object:window];
+    }
+    return self;
+}
+- (void)dealloc { [NSNotificationCenter.defaultCenter removeObserver:self]; }
+- (void)windowUpdated:(NSNotification*)notification { [self apply]; }
+- (void)apply {
+    NSWindow* window = self.window;
+    if (!window || !self.color || self.applying) return;
+    self.applying = YES;
+    if (!window.titlebarAppearsTransparent) window.titlebarAppearsTransparent = YES;
+    if (![window.backgroundColor isEqual:self.color]) window.backgroundColor = self.color;
+    if (![window.appearance.name isEqualToString:self.appearanceName])
+        window.appearance = [NSAppearance appearanceNamed:self.appearanceName];
+    self.applying = NO;
+}
+@end
+
+static char titleBarStyleKey;
 
 /**
  * @brief Sets the title bar color of a QMainWindow on macOS.
@@ -40,13 +83,14 @@ void setWindowTitleBarColor(QWindow* window, QColor color) {
 
     // Set the title bar to appear transparent and apply the background color
     if (@available(macOS 10.14, *)) {
-        if (!nsWindow.titlebarAppearsTransparent) nsWindow.titlebarAppearsTransparent = YES;
-        if (![nsWindow.backgroundColor isEqual:nsColor]) nsWindow.backgroundColor = nsColor;
-        // Native title text and inactive chrome must follow the editor theme,
-        // independently of the system appearance or the focused tool panel.
-        NSAppearanceName name = color.lightnessF() < 0.5 ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua;
-        if (![nsWindow.appearance.name isEqualToString:name])
-            nsWindow.appearance = [NSAppearance appearanceNamed:name];
+        TBWindowTitleBarStyle* style = objc_getAssociatedObject(nsWindow, &titleBarStyleKey);
+        if (!style) {
+            style = [[TBWindowTitleBarStyle alloc] initWithWindow:nsWindow];
+            objc_setAssociatedObject(nsWindow, &titleBarStyleKey, style, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        style.color = nsColor;
+        style.appearanceName = color.lightnessF() < 0.5 ? NSAppearanceNameDarkAqua : NSAppearanceNameAqua;
+        [style apply];
     } else {
         qWarning("setTitlebarAppearsTransparent is not available on macOS < 10.14.");
     }

@@ -72,12 +72,14 @@ void TrenchBroomProxyStyle::initializePolicies() {
         const auto pending = std::exchange(m_pendingTitleBars, {});
         for (const auto& widget : pending)
             if (widget && widget->isVisible() && widget->windowHandle())
-                setWindowTitleBarColor(widget->windowHandle(), widget->palette().color(QPalette::Active, QPalette::Window));
+                setWindowTitleBarColor(widget->windowHandle(), ThemeManager::instance().color(
+                    "color.window", widget->palette().color(QPalette::Active, QPalette::Window)));
     });
     // Tool panels can take native focus while Qt still considers their parent
     // active. Refresh both windows, after Cocoa/Qt finish changing activation.
     connect(qApp, &QGuiApplication::focusWindowChanged, this, [this] { refreshTitleBars(); });
     connect(qApp, &QGuiApplication::applicationStateChanged, this, [this] { refreshTitleBars(); });
+    connect(qApp, &QGuiApplication::fontDatabaseChanged, this, [this] { refreshTitleBars(); });
 #endif
 }
 
@@ -94,6 +96,12 @@ void TrenchBroomProxyStyle::refreshTitleBars() {
     for (auto* widget : QApplication::topLevelWidgets()) queueTitleBar(widget);
 }
 #endif
+
+void TrenchBroomProxyStyle::refreshWindowChrome() {
+#ifdef __APPLE__
+    refreshTitleBars();
+#endif
+}
 
 void TrenchBroomProxyStyle::queueTypography(QWidget* widget) {
     if (m_updatingTypography || widget->property("tbTypographyQueued").toBool()) return;
@@ -203,8 +211,9 @@ bool TrenchBroomProxyStyle::eventFilter(QObject* watched, QEvent* event) {
     if (event->type() == QEvent::Show || event->type() == QEvent::WindowActivate
         || event->type() == QEvent::WindowDeactivate || event->type() == QEvent::PaletteChange
         || event->type() == QEvent::ApplicationPaletteChange || event->type() == QEvent::StyleChange
-        || event->type() == QEvent::WinIdChange)
-        queueTitleBar(qobject_cast<QWidget*>(watched));
+        || event->type() == QEvent::WinIdChange || event->type() == QEvent::FontChange
+        || event->type() == QEvent::ApplicationFontChange || event->type() == QEvent::ThemeChange)
+        if (auto* widget = qobject_cast<QWidget*>(watched)) queueTitleBar(widget->window());
 #endif
     if (event->type() == QEvent::FontChange || event->type() == QEvent::StyleChange
         || event->type() == QEvent::Show || event->type() == QEvent::PolishRequest) {

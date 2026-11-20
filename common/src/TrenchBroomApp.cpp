@@ -761,7 +761,10 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
         const auto uiFont = fontForStyleSheet(m_UI_Font);
         if (QApplication::font() != uiFont) QApplication::setFont(uiFont);
     }
-    if (auto* proxy = dynamic_cast<TrenchBroomProxyStyle*>(m_proxyStyle)) proxy->refreshTypography();
+    if (auto* proxy = dynamic_cast<TrenchBroomProxyStyle*>(m_proxyStyle)) {
+        proxy->refreshTypography();
+        proxy->refreshWindowChrome();
+    }
 }
 
 const QFont &TrenchBroomApp::getUIFont() const {

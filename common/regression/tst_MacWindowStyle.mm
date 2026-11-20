@@ -1,8 +1,11 @@
 #include "View/Inspector/FloatingInspectorTool.h"
 #include "View/Theme/TrenchBroomProxyStyle.h"
+#include "View/Theme/ThemeManager.h"
+#include "TestSourcePath.h"
 
 #include <QApplication>
 #include <QLineEdit>
+#include <QFontDatabase>
 #include <QMainWindow>
 #include <QScopeGuard>
 #include <QStyleFactory>
@@ -50,14 +53,20 @@ TEST_CASE("Native title bars follow focus and theme changes without repainting",
     const auto originalPalette = qApp->palette();
     const auto originalSheet = qApp->styleSheet();
     const auto originalStyle = qApp->style()->objectName();
+    const auto originalFont = qApp->font();
+    const auto originalTheme = ThemeManager::instance().current();
     const auto restore = qScopeGuard([&] {
+        ThemeManager::instance().publish(originalTheme);
         qApp->setStyleSheet({});
         qApp->setStyle(QStyleFactory::create(originalStyle));
         qApp->setPalette(originalPalette);
+        qApp->setFont(originalFont);
         qApp->setStyleSheet(originalSheet);
     });
+    ThemeManager::instance().publish({});
     qApp->setStyleSheet({});
-    qApp->setStyle(new TrenchBroomProxyStyle("Fusion"));
+    auto* proxy = new TrenchBroomProxyStyle("Fusion");
+    qApp->setStyle(proxy);
     auto palette = originalPalette;
     const QColor dark("#203040"), light("#dce3e8");
     palette.setColor(QPalette::Window, dark);
@@ -95,5 +104,35 @@ TEST_CASE("Native title bars follow focus and theme changes without repainting",
     tool.show();
     QTest::qWait(150);
     checkTitleBar(tool, light);
+    // Cocoa can reset chrome after Qt's queued style/focus work has finished.
+    // A native window update must restore it without another QWidget event.
+    for (QWidget* window : {static_cast<QWidget*>(&editor), static_cast<QWidget*>(&tool)}) {
+        nativeWindow(*window).titlebarAppearsTransparent = NO;
+        nativeWindow(*window).backgroundColor = NSColor.brownColor;
+        nativeWindow(*window).appearance = [NSAppearance appearanceNamed:NSAppearanceNameDarkAqua];
+        [nativeWindow(*window) update];
+        checkTitleBar(*window, light);
+    }
+    auto font = originalFont;
+    font.setPointSize(17);
+    qApp->setFont(font);
+    tool.findChild<QLineEdit*>()->setFont(QFont("Menlo", 14));
+    qApp->setStyleSheet("QLineEdit { font-size: 18px; } QMainWindow { background-color: #987654; }");
+    const auto fontId = QFontDatabase::addApplicationFont(QString::fromStdString(
+        (testSourceRoot() / "app/resources/fonts/bebas-neue/BebasNeue-Regular.ttf").string()));
+    REQUIRE(fontId >= 0);
+    const auto removeFont = qScopeGuard([&] { QFontDatabase::removeApplicationFont(fontId); });
+    // A native-derived widget palette must not overwrite the theme's desired
+    // chrome color during font selection or stylesheet replacement.
+    auto theme = originalTheme;
+    theme.values["color.window"] = ThemeValue::color(dark);
+    ThemeManager::instance().publish(std::move(theme));
+    proxy->refreshWindowChrome();
+    QTest::qWait(150);
+    checkTitleBar(editor, dark);
+    checkTitleBar(tool, dark);
+    nativeWindow(editor).backgroundColor = NSColor.brownColor;
+    [nativeWindow(editor) update];
+    checkTitleBar(editor, dark);
 }
 }
