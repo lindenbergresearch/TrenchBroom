@@ -137,31 +137,40 @@ StandardMapParser::StandardMapParser(std::string_view str, const Model::MapForma
 StandardMapParser::~StandardMapParser() = default;
 
 void StandardMapParser::parseEntities(ParserStatus &status) {
-    auto token = m_tokenizer.peekToken();
-    while (token.type() != QuakeMapToken::Eof) {
-        expect(QuakeMapToken::OBrace, token);
-        parseEntity(status);
-        token = m_tokenizer.peekToken();
-    }
+    status.setSource(m_tokenizer.source());
+    try {
+        auto token = m_tokenizer.peekToken();
+        while (token.type() != QuakeMapToken::Eof) {
+            expect(QuakeMapToken::OBrace, token);
+            parseEntity(status);
+            token = m_tokenizer.peekToken();
+        }
+    } catch (const ParserException& e) { throw status.withContext(e); }
 }
 
 void StandardMapParser::parseBrushesOrPatches(ParserStatus &status) {
-    auto token = m_tokenizer.peekToken();
-    while (token.type() != QuakeMapToken::Eof) {
-        expect(QuakeMapToken::OBrace, token);
-        parseBrushOrBrushPrimitiveOrPatch(status);
-        token = m_tokenizer.peekToken();
-    }
+    status.setSource(m_tokenizer.source());
+    try {
+        auto token = m_tokenizer.peekToken();
+        while (token.type() != QuakeMapToken::Eof) {
+            expect(QuakeMapToken::OBrace, token);
+            parseBrushOrBrushPrimitiveOrPatch(status);
+            token = m_tokenizer.peekToken();
+        }
+    } catch (const ParserException& e) { throw status.withContext(e); }
 }
 
 void StandardMapParser::parseBrushFaces(ParserStatus &status) {
-    auto token = m_tokenizer.peekToken();
-    while (token.type() != QuakeMapToken::Eof) {
-        expect(QuakeMapToken::OParenthesis, token);
-        // TODO 2427: detect the face type when parsing Quake3 map faces!
-        parseFace(status, false);
-        token = m_tokenizer.peekToken();
-    }
+    status.setSource(m_tokenizer.source());
+    try {
+        auto token = m_tokenizer.peekToken();
+        while (token.type() != QuakeMapToken::Eof) {
+            expect(QuakeMapToken::OParenthesis, token);
+            // TODO 2427: detect the face type when parsing Quake3 map faces!
+            parseFace(status, false);
+            token = m_tokenizer.peekToken();
+        }
+    } catch (const ParserException& e) { throw status.withContext(e); }
 }
 
 void StandardMapParser::reset() {

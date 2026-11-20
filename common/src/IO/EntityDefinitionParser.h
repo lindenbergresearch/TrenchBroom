@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -43,9 +44,11 @@ std::vector<EntityDefinitionClassInfo> resolveInheritance(ParserStatus &status, 
 class EntityDefinitionParser {
   private:
     Color m_defaultEntityColor;
+    std::string_view m_sourceText;
+    std::string m_sourceName;
 
   public:
-    explicit EntityDefinitionParser(const Color &defaultEntityColor);
+    explicit EntityDefinitionParser(const Color &defaultEntityColor, std::string_view source = {}, std::string sourceName = {});
 
     virtual ~EntityDefinitionParser();
 

@@ -24,6 +24,7 @@
 #include "Assets/ModelDefinition.h"
 #include "Color.h"
 #include "FloatType.h"
+#include "IO/ParserStatus.h"
 
 #include "kdl/reflection_decl.h"
 
@@ -64,6 +65,7 @@ struct EntityDefinitionClassInfo {
 
   // Origin of this class, rather than the attributes inherited from its base classes.
   std::optional<Assets::EntityDefinitionSource> source;
+  std::optional<ParserStatus::SourceLocation> location;
 
   kdl_reflect_decl(EntityDefinitionClassInfo, type, line, column, name, description, color, size, modelDefinition, decalDefinition, propertyDefinitions, superClasses);
 };

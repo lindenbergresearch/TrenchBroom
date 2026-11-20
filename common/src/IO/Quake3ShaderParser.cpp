@@ -109,14 +109,17 @@ Quake3ShaderParser::Quake3ShaderParser(std::string_view str) : m_tokenizer{std::
 }
 
 std::vector<Assets::Quake3Shader> Quake3ShaderParser::parse(ParserStatus &status) {
-    auto result = std::vector<Assets::Quake3Shader>{};
-    while (!m_tokenizer.peekToken(Quake3ShaderToken::Eol).hasType(Quake3ShaderToken::Eof)) {
-        auto shader = Assets::Quake3Shader{};
-        parseTexture(shader, status);
-        parseBody(shader, status);
-        result.push_back(shader);
-    }
-    return result;
+    const auto source = status.scopedSource(m_tokenizer.source());
+    try {
+        auto result = std::vector<Assets::Quake3Shader>{};
+        while (!m_tokenizer.peekToken(Quake3ShaderToken::Eol).hasType(Quake3ShaderToken::Eof)) {
+            auto shader = Assets::Quake3Shader{};
+            parseTexture(shader, status);
+            parseBody(shader, status);
+            result.push_back(shader);
+        }
+        return result;
+    } catch (const ParserException& e) { throw status.withContext(e); }
 }
 
 void Quake3ShaderParser::parseBody(Assets::Quake3Shader &shader, ParserStatus &status) {

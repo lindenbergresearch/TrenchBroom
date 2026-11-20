@@ -129,7 +129,7 @@ FgdTokenizer::Token FgdTokenizer::emitToken() {
 }
 
 FgdParser::FgdParser(const std::string_view str, const Color &defaultEntityColor, const std::filesystem::path &path)
-    : EntityDefinitionParser{defaultEntityColor}, m_tokenizer{FgdTokenizer{str}} {
+    : EntityDefinitionParser{defaultEntityColor, str, path.string()}, m_tokenizer{FgdTokenizer{str}} {
     if (!path.empty() && path.is_absolute()) {
         m_fs = std::make_unique<DiskFileSystem>(path.parent_path());
         pushIncludePath(path.filename());
@@ -188,6 +188,8 @@ std::vector<EntityDefinitionClassInfo> FgdParser::parseClassInfos(ParserStatus &
         parseClassInfoOrInclude(status, classInfos);
         token = m_tokenizer.peekToken();
     }
+    for (auto& info : classInfos)
+        if (!info.location) info.location = status.location(info.line, info.column);
     return classInfos;
 }
 
@@ -795,7 +797,10 @@ std::vector<EntityDefinitionClassInfo> FgdParser::handleInclude(ParserStatus &st
         const auto pushIncludePath = PushIncludePath{*this, filePath};
         auto reader = file->reader().buffer();
         m_tokenizer.replaceState(reader.stringView());
-        return parseClassInfos(status);
+        const auto absolute = m_fs->makeAbsolute(filePath);
+        const auto source = status.scopedSource(reader.stringView(), absolute.is_success() ? absolute.value().string() : filePath.string());
+        try { return parseClassInfos(status); }
+        catch (const ParserException& e) { throw status.withContext(e); }
     }).transform_error([&](auto e) {
         status.error(m_tokenizer.line(), fmt::format("Failed to parse included file: {}", e.msg));
         return std::vector<EntityDefinitionClassInfo>{};

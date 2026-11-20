@@ -144,11 +144,11 @@ explicit patches or new version/hash pins so subsequent builds are repeatable.
 
 `tb-regression-tests` includes existing regressions for themes, fonts/icons,
 actions/toolbars, Inspector docking, Layer selection, Prefabs, WAD properties,
-History/Undo, map load diagnostics, view state and archive caches. Qt6-specific checks cover map text
+History/Undo, map load diagnostics, parser source excerpts, view state and archive caches. Qt6-specific checks cover map text
 encodings (including incomplete characters), legacy QSS font weights, shortcut serialization and fractional input
 coordinates. Dependency checks exercise the real image/model/font loaders.
 
-CTest runs **241 test cases / 76,122 assertions** with isolated temporary settings
+CTest runs **252 test cases / 76,212 assertions** with isolated temporary settings
 and the offscreen Qt platform. It does not change personal editor settings.
 The font/vector-icon/Qt6 subset also passes with `QT_SCALE_FACTOR=1.5` and `2`
 (34 cases / 3,395 assertions at each scale).

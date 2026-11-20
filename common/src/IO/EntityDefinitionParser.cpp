@@ -18,6 +18,7 @@
  */
 
 #include "EntityDefinitionParser.h"
+#include "Exceptions.h"
 
 #include "Assets/EntityDefinition.h"
 #include "Assets/ModelDefinition.h"
@@ -35,8 +36,8 @@
 namespace TrenchBroom::IO {
 static const auto DefaultSize = vm::bbox3(-8, +8);
 
-EntityDefinitionParser::EntityDefinitionParser(const Color &defaultEntityColor) : m_defaultEntityColor{
-    defaultEntityColor} {
+EntityDefinitionParser::EntityDefinitionParser(const Color &defaultEntityColor, std::string_view source, std::string sourceName)
+    : m_defaultEntityColor{defaultEntityColor}, m_sourceText(source), m_sourceName(std::move(sourceName)) {
 }
 
 EntityDefinitionParser::~EntityDefinitionParser() {}
@@ -154,7 +155,7 @@ static void inheritAttributes(EntityDefinitionClassInfo &inheritingClass, const 
  */
 template<typename F> static void inheritFromAndRecurse(ParserStatus &status, EntityDefinitionClassInfo &inheritingClass, const EntityDefinitionClassInfo &superClass, const F &findClassInfos, std::unordered_set<std::string> &visited) {
     if (!visited.insert(superClass.name).second) {
-        status.error(inheritingClass.line, inheritingClass.column, "Entity definition class hierarchy contains a cycle");
+        status.error(inheritingClass.location ? *inheritingClass.location : status.location(inheritingClass.line, inheritingClass.column), "Entity definition class hierarchy contains a cycle");
         return;
     }
 
@@ -228,7 +229,7 @@ template<typename F> static void findSuperClassesAndInheritFrom(ParserStatus &st
     for (const auto &nextSuperClassName : classWithSuperClasses.superClasses) {
         const auto *nextSuperClass = selectSuperClass(findClassInfos(nextSuperClassName));
         if (nextSuperClass == nullptr) {
-            status.error(classWithSuperClasses.line, classWithSuperClasses.column,
+            status.error(classWithSuperClasses.location ? *classWithSuperClasses.location : status.location(classWithSuperClasses.line, classWithSuperClasses.column),
                          "No matching super class found for '" + nextSuperClassName + "'");
         } else {
             inheritFromAndRecurse(status, inheritingClass, *nextSuperClass, findClassInfos, visited);
@@ -278,9 +279,9 @@ static std::vector<EntityDefinitionClassInfo> filterRedundantClasses(ParserStatu
         const auto classMask = getMask(classInfo.type);
 
         if (classMask & seenMask) {
-            status.warn(classInfo.line, classInfo.column, "Duplicate class info '" + classInfo.name + "'");
+            status.warn(classInfo.location ? *classInfo.location : status.location(classInfo.line, classInfo.column), "Duplicate class info '" + classInfo.name + "'");
         } else if ((seenMask & baseClassMask) || (seenMask != 0 && (classMask & baseClassMask))) {
-            status.warn(classInfo.line, classInfo.column, "Redundant class info '" + classInfo.name + "'");
+            status.warn(classInfo.location ? *classInfo.location : status.location(classInfo.line, classInfo.column), "Redundant class info '" + classInfo.name + "'");
         } else {
             result.push_back(classInfo);
             seenMask |= classMask;
@@ -372,8 +373,14 @@ std::vector<std::unique_ptr<Assets::EntityDefinition>> createDefinitions(ParserS
 } // namespace
 
 std::vector<std::unique_ptr<Assets::EntityDefinition>> EntityDefinitionParser::parseDefinitions(ParserStatus &status) {
-    const auto classInfos = parseClassInfos(status);
-    return createDefinitions(status, classInfos, m_defaultEntityColor);
+    std::optional<ParserStatus::SourceScope> source;
+    if (m_sourceText.data()) source.emplace(status, m_sourceText, m_sourceName);
+    try {
+        auto classInfos = parseClassInfos(status);
+        for (auto& info : classInfos)
+            if (!info.location) info.location = status.location(info.line, info.column);
+        return createDefinitions(status, classInfos, m_defaultEntityColor);
+    } catch (const ParserException& e) { throw status.withContext(e); }
 }
 
 } // namespace TrenchBroom::IO

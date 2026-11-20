@@ -474,7 +474,7 @@ std::vector<EntityDefinitionClassInfo> parseClassInfosFromDocument(const tinyxml
 
 } // namespace
 
-EntParser::EntParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser{defaultEntityColor}, m_str{str} {
+EntParser::EntParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser{defaultEntityColor, str}, m_str{str} {
 }
 
 std::vector<EntityDefinitionClassInfo> EntParser::parseClassInfos(ParserStatus &status) {

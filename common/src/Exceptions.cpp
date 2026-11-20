@@ -31,10 +31,17 @@ const char *Exception::what() const noexcept {
     return m_msg.c_str();
 }
 
-ParserException::ParserException(const size_t line, const size_t column, const std::string &str) : Exception(buildMessage(line, column, str)) {
+ParserException::ParserException(const size_t line, const size_t column, const std::string &str) : Exception(buildMessage(line, column, str)), m_line(line), m_column(column), m_reason(str) {
 }
 
-ParserException::ParserException(const size_t line, const std::string &str) : Exception(buildMessage(line, str)) {
+ParserException::ParserException(const size_t line, const std::string &str) : Exception(buildMessage(line, str)), m_line(line), m_reason(str) {
+}
+
+ParserException ParserException::withSourceContext(std::string message) const {
+    auto result = *this;
+    result.m_msg = std::move(message);
+    result.m_hasSourceContext = true;
+    return result;
 }
 
 std::string ParserException::buildMessage(const size_t line, const size_t column, const std::string &str) {

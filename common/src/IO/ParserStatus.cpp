@@ -25,9 +25,57 @@
 #include <cassert>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <iomanip>
+#include <algorithm>
+#include <QString>
 
 namespace TrenchBroom {
 namespace IO {
+struct ParserStatus::Source {
+    std::string text;
+    std::string name;
+    std::vector<size_t> lines{0};
+    Source(std::string_view input, std::string sourceName) : text(input), name(std::move(sourceName)) {
+        for (size_t i = 0; i < text.size(); ++i) {
+            if (text[i] == '\r') {
+                if (i + 1 < text.size() && text[i + 1] == '\n') ++i;
+                lines.push_back(i + 1);
+            } else if (text[i] == '\n') lines.push_back(i + 1);
+        }
+    }
+};
+
+void ParserStatus::setSource(std::string_view text, std::string name) {
+    if (name.empty()) name = m_source && m_source->text == text ? m_source->name : m_prefix;
+    // Repeated map-format attempts can share the same owned text and index.
+    if (m_source && m_source->name == name && m_source->text == text) return;
+    m_source = std::make_shared<Source>(text, std::move(name));
+}
+ParserStatus::SourceScope::SourceScope(ParserStatus& status, std::string_view text, std::string name)
+    : m_status(status), m_previous(status.m_source) { status.setSource(text, std::move(name)); }
+ParserStatus::SourceScope::~SourceScope() { m_status.m_source = std::move(m_previous); }
+ParserStatus::SourceScope ParserStatus::scopedSource(std::string_view text, std::string name) {
+    return SourceScope(*this, text, std::move(name));
+}
+ParserStatus::SourceLocation ParserStatus::location(size_t line, size_t column) const {
+    auto result = SourceLocation{line, column, m_source ? m_source->name : m_prefix, {}, false};
+    if (m_source && line > 0 && line <= m_source->lines.size()) {
+        const auto start = m_source->lines[line - 1];
+        const auto end = m_source->text.find_first_of("\r\n", start);
+        result.sourceLine = m_source->text.substr(start, end == std::string::npos ? end : end - start);
+        result.hasSourceLine = true;
+    }
+    return result;
+}
+ParserException ParserStatus::withContext(const ParserException& exception) const {
+    if (exception.hasSourceContext() || !exception.line()) return exception;
+    const auto here = location(exception.line(), exception.column());
+    return here.hasSourceLine ? exception.withSourceContext(buildMessage(here, exception.reason())) : exception;
+}
+void ParserStatus::warn(const SourceLocation& here, const std::string& message) { doLog(LogLevel::Warn, buildMessage(here, message)); }
+void ParserStatus::error(const SourceLocation& here, const std::string& message) { doLog(LogLevel::Error, buildMessage(here, message)); }
+
 ParserStatus::ParserStatus(Logger &logger, const std::string &prefix) : m_logger(logger), m_prefix(prefix) {
 }
 
@@ -106,11 +154,38 @@ void ParserStatus::log(const LogLevel level, const size_t line, const size_t col
 }
 
 std::string ParserStatus::buildMessage(const size_t line, const size_t column, const std::string &str) const {
+    return buildMessage(location(line, column), str);
+}
+
+std::string ParserStatus::buildMessage(const SourceLocation& here, const std::string& str) const {
     std::stringstream msg;
-    if (!m_prefix.empty()) {
-        msg << m_prefix << ": ";
+    if (!here.hasSourceLine) {
+        if (!here.sourceName.empty()) msg << here.sourceName << ": ";
+        msg << str << " (line " << here.line;
+        if (here.column) msg << ", column " << here.column;
+        msg << ")";
+        return msg.str();
     }
-    msg << str << " (line " << line << ", column " << column << ")";
+    if (!here.sourceName.empty()) {
+        msg << here.sourceName << ':' << here.line;
+        if (here.column) msg << ':' << here.column;
+    } else {
+        msg << "line " << here.line;
+        if (here.column) msg << ", column " << here.column;
+    }
+    const auto width = std::to_string(here.line).size();
+    msg << ": " << str << '\n' << std::setw(int(width)) << here.line << " | " << here.sourceLine;
+    if (here.column) {
+        msg << '\n' << std::string(width, ' ') << " | ";
+        // Tokenizer columns are byte offsets. Keep tabs and count UTF-8
+        // characters rather than their bytes when aligning the caret.
+        const auto prefix = QString::fromUtf8(here.sourceLine.data(), qsizetype(std::min(here.column - 1, here.sourceLine.size())));
+        for (auto c : prefix.toUcs4()) {
+            if (c == '\t') msg << '\t';
+            else if (QChar::category(c) != QChar::Mark_NonSpacing && QChar::category(c) != QChar::Mark_Enclosing) msg << ' ';
+        }
+        msg << '^';
+    }
     return msg.str();
 }
 
@@ -119,12 +194,7 @@ void ParserStatus::log(const LogLevel level, const size_t line, const std::strin
 }
 
 std::string ParserStatus::buildMessage(const size_t line, const std::string &str) const {
-    std::stringstream msg;
-    if (!m_prefix.empty()) {
-        msg << m_prefix << ": ";
-    }
-    msg << str << " (line " << line << ")";
-    return msg.str();
+    return buildMessage(location(line), str);
 }
 
 void ParserStatus::log(const LogLevel level, const std::string &str) {

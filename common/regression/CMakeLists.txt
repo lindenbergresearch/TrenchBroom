@@ -9,6 +9,7 @@ set(regression_sources
     ../test/src/TestPreferenceManager.cpp
     ../test/src/View/Document/tst_BulkSelection.cpp
     ../test/src/IO/tst_ArchiveNames.cpp
+    ../test/src/IO/tst_ParserStatus.cpp
     ../test/src/IO/tst_DiskCache.cpp
     ../test/src/IO/tst_GameFileSystemCache.cpp
     ../test/src/Renderer/tst_Annotations.cpp

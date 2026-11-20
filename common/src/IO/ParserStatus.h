@@ -20,23 +20,52 @@
 #pragma once
 
 #include <string>
+#include <string_view>
+#include <memory>
 
 namespace TrenchBroom {
 class Logger;
+class ParserException;
 
 enum class LogLevel;
 
 namespace IO {
 class ParserStatus {
+    struct Source;
   private:
     Logger &m_logger;
     std::string m_prefix;
+    std::shared_ptr<const Source> m_source;
 
   protected:
     explicit ParserStatus(Logger &logger, const std::string &prefix);
 
   public:
     virtual ~ParserStatus();
+
+    // Owned source excerpts remain valid after the parser/input is destroyed.
+    struct SourceLocation {
+        size_t line = 0;
+        size_t column = 0;
+        std::string sourceName;
+        std::string sourceLine;
+        bool hasSourceLine = false;
+    };
+    class SourceScope {
+        ParserStatus& m_status;
+        std::shared_ptr<const Source> m_previous;
+    public:
+        SourceScope(ParserStatus& status, std::string_view text, std::string name);
+        ~SourceScope();
+        SourceScope(const SourceScope&) = delete;
+        SourceScope& operator=(const SourceScope&) = delete;
+    };
+    void setSource(std::string_view text, std::string name = {});
+    SourceScope scopedSource(std::string_view text, std::string name = {});
+    SourceLocation location(size_t line, size_t column = 0) const;
+    ParserException withContext(const ParserException& exception) const;
+    void warn(const SourceLocation& location, const std::string& message);
+    void error(const SourceLocation& location, const std::string& message);
 
   public:
     void progress(double progress);
@@ -75,6 +104,7 @@ class ParserStatus {
     void log(LogLevel level, size_t line, size_t column, const std::string &str);
 
     std::string buildMessage(size_t line, size_t column, const std::string &str) const;
+    std::string buildMessage(const SourceLocation& location, const std::string& str) const;
 
     void log(LogLevel level, size_t line, const std::string &str);
 

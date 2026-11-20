@@ -176,7 +176,7 @@ Result<std::unique_ptr<WorldNode>> GameImpl::doNewMap(const MapFormat format, co
 }
 
 Result<std::unique_ptr<WorldNode>> GameImpl::doLoadMap(const MapFormat format, const vm::bbox3 &worldBounds, const std::filesystem::path &path, Logger &logger) const {
-    auto parserStatus = IO::SimpleParserStatus{logger};
+    auto parserStatus = IO::SimpleParserStatus{logger, path.string()};
     return IO::Disk::openFile(path).transform([&](auto file) {
         auto fileReader = file->reader().buffer();
         if (format == MapFormat::Unknown) {
@@ -325,6 +325,7 @@ Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>> GameImpl::loadEnt
     if (kdl::ci::str_is_equal(".fgd", extension)) {
         return IO::Disk::openFile(path).transform([&](auto file) {
             auto reader = file->reader().buffer();
+            const auto source = status.scopedSource(reader.stringView(), path.string());
             auto parser = IO::FgdParser{reader.stringView(), defaultColor, path};
             return parser.parseDefinitions(status);
         });
@@ -333,6 +334,7 @@ Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>> GameImpl::loadEnt
     if (kdl::ci::str_is_equal(".def", extension)) {
         return IO::Disk::openFile(path).transform([&](auto file) {
             auto reader = file->reader().buffer();
+            const auto source = status.scopedSource(reader.stringView(), path.string());
             auto parser = IO::DefParser{reader.stringView(), defaultColor};
             return parser.parseDefinitions(status);
         });
@@ -341,6 +343,7 @@ Result<std::vector<std::unique_ptr<Assets::EntityDefinition>>> GameImpl::loadEnt
     if (kdl::ci::str_is_equal(".ent", extension)) {
         return IO::Disk::openFile(path).transform([&](auto file) {
             auto reader = file->reader().buffer();
+            const auto source = status.scopedSource(reader.stringView(), path.string());
             auto parser = IO::EntParser{reader.stringView(), defaultColor};
             return parser.parseDefinitions(status);
         });

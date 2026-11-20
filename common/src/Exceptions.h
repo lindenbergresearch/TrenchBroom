@@ -46,12 +46,20 @@ class EntityAttributeException : public Exception {
 };
 
 class ParserException : public Exception {
+    size_t m_line = 0, m_column = 0;
+    std::string m_reason;
+    bool m_hasSourceContext = false;
   public:
     using Exception::Exception;
 
     ParserException(size_t line, size_t column, const std::string &str = "");
 
     explicit ParserException(size_t line, const std::string &str = "");
+    size_t line() const { return m_line; }
+    size_t column() const { return m_column; }
+    const std::string& reason() const { return m_reason; }
+    bool hasSourceContext() const { return m_hasSourceContext; }
+    ParserException withSourceContext(std::string message) const;
 
   private:
     static std::string buildMessage(size_t line, size_t column, const std::string &str);

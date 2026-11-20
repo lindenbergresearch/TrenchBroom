@@ -141,7 +141,7 @@ class TokenizerBase {
 
     void errorIfEof() const {
         if (eof()) {
-            throw ParserException("Unexpected end of file");
+            throw ParserException(line(), column(), "Unexpected end of file");
         }
     }
 
@@ -155,6 +155,7 @@ class TokenizerBase {
     size_t line() const { return m_state.line; }
 
     size_t column() const { return m_state.column; }
+    std::string_view source() const { return m_begin ? std::string_view(m_begin, size_t(m_end - m_begin)) : std::string_view{}; }
 
   public:
     void reset() {

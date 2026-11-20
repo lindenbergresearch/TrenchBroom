@@ -134,7 +134,7 @@ DefTokenizer::Token DefTokenizer::emitToken() {
     return Token{DefToken::Eof, nullptr, nullptr, length(), line(), column()};
 }
 
-DefParser::DefParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser{defaultEntityColor}, m_tokenizer{DefTokenizer(str)} {
+DefParser::DefParser(std::string_view str, const Color &defaultEntityColor) : EntityDefinitionParser{defaultEntityColor, str}, m_tokenizer{DefTokenizer(str)} {
 }
 
 DefParser::TokenNameMap DefParser::tokenNames() const {
