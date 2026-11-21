@@ -507,7 +507,7 @@ std::unique_ptr<Assets::PropertyDefinition> FgdParser::parsePropertyDefinition(P
         return parseFlagsPropertyDefinition(status, std::move(propertyKey));
     }
 
-    status.debug(line, column, fmt::format("Unknown property definition type '{}' for property '{}'", typeName, propertyKey));
+    status.warn(line, column, fmt::format("Unknown property definition type '{}' for property '{}'", typeName, propertyKey));
     return parseUnknownPropertyDefinition(status, std::move(propertyKey));
 }
 

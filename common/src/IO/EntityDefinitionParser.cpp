@@ -350,18 +350,6 @@ std::vector<std::unique_ptr<Assets::EntityDefinition>> createDefinitions(ParserS
 
     auto result = std::vector<std::unique_ptr<Assets::EntityDefinition>>{};
     for (auto classInfo : resolvedClasses) {
-        DefaultQtLogger().debug() <<
-                                  "Entity Classinfo: [[ " << classInfo.name <<
-                                  "]] | type: '" << classInfo.type << "' " <<
-                                  QObject::tr("| center: %1 %2 %3")
-                                      .arg(classInfo.size.value_or(DefaultSize).center().v[0])
-                                      .arg(classInfo.size.value_or(DefaultSize).center().v[1])
-                                      .arg(classInfo.size.value_or(DefaultSize).center().v[2])
-                                  << " | desc: »" << classInfo.description.value_or("-no descr-") << "« | line: " << classInfo.line
-                                  << " | color: "
-                                  << classInfo.color.value_or("-").toString()
-                                  << " | #" << classInfo.propertyDefinitions.size();
-
         if (auto definition = createDefinition(std::move(classInfo), defaultEntityColor)) {
             result.push_back(std::move(definition));
         }
