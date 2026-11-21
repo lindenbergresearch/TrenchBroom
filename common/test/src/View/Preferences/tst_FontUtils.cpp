@@ -26,6 +26,7 @@
 #include <QStyleFactory>
 #include <QStyledItemDelegate>
 #include <QTreeView>
+#include <QTreeWidget>
 #include <QTextEdit>
 #include <QListWidget>
 #include <QLocale>
@@ -628,6 +629,77 @@ TEST_CASE_METHOD(FontSettingsScope, "Layer rows use exact list weights while ret
     const auto intermediate = render(450);
     CHECK(intermediate != regular);
     CHECK(intermediate != render(700));
+}
+
+TEST_CASE_METHOD(FontSettingsScope, "Layer QSS families apply before Preferences Apply with stylesheet propagation", "[fonts][layer-qss-fonts]") {
+    const bool globalTypography = GENERATE(false, true);
+    PreferenceManager::instance().set(Preferences::UIGlobalTypography, globalTypography);
+    const auto originalFont = QApplication::font();
+    const auto originalSheet = qApp->styleSheet();
+    const auto originalStyle = qApp->style()->objectName();
+    const auto propagation = QApplication::testAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
+    const auto restore = qScopeGuard([&] {
+        qApp->setStyleSheet({});
+        qApp->setStyle(QStyleFactory::create(originalStyle));
+        QApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, propagation);
+        QApplication::setFont(originalFont);
+        qApp->setStyleSheet(originalSheet);
+    });
+    QApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
+    qApp->setStyleSheet({});
+    qApp->setStyle(new TrenchBroomProxyStyle("Fusion"));
+    auto body = fontForStyleSheet(loadFont(fontFile("Inter-Regular.otf"), 13));
+    const auto mono = loadFont(fontFile("JetBrainsMono/JetBrainsMono-Regular.ttf"), 13).family();
+    REQUIRE(mono == "JetBrains Mono");
+    QApplication::setFont(body);
+    const auto rules = QString(R"(
+        QWidget { font-family: "%1"; font-size: 13px; }
+        QWidget#LayerTreeRow { font-size: 17px; }
+        QLabel#LayerTreeTitle { font-family: "%1"; font-size: 16px; }
+        QLabel#LayerTreeDetail { font-family: "%2"; font-size: 11px; }
+        QLabel#LayerTreeAddendum { font-family: "%2"; font-size: 12px; }
+    )").arg(body.family(), mono);
+    qApp->setStyleSheet(rules);
+    QTreeWidget tree;
+    auto* delegate = new LayerTreeItemDelegate(&tree);
+    tree.setItemDelegate(delegate);
+    auto* item = new QTreeWidgetItem(&tree, {"Node"});
+    item->setData(0, LayerTreeItemDelegate::DetailRole, "iiiiWWWW");
+    item->setData(0, LayerTreeItemDelegate::AddendumRole, "#123");
+    QStyleOptionViewItem option;
+    option.initFrom(&tree);
+    option.rect = QRect(0, 0, 400, 70);
+    const auto index = tree.model()->index(0, 0);
+    const auto check = [&] {
+        delegate->sizeHint(option, index);
+        QImage image(option.rect.size(), QImage::Format_ARGB32_Premultiplied);
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        delegate->paint(&painter, option, index);
+        for (const auto* row : tree.findChildren<LayerTreeRowStyle*>()) {
+            CHECK(QFontInfo(row->titleLabel().font()).family() == body.family());
+            CHECK(QFontInfo(row->detailLabel().font()).family() == mono);
+            CHECK(QFontInfo(row->addendumLabel().font()).family() == mono);
+            CHECK(row->detailLabel().font().pixelSize() == 11);
+            const QFontMetricsF metrics(row->detailLabel().font());
+            CHECK(metrics.horizontalAdvance('i') == Approx(metrics.horizontalAdvance('W')).margin(0.01));
+        }
+    };
+    for (auto type : {LayerTreeItemDelegate::Layer, LayerTreeItemDelegate::Entity, LayerTreeItemDelegate::Brush}) {
+        item->setData(0, LayerTreeItemDelegate::RendererRole, int(type));
+        check(); // No event-loop/font-Apply refresh before the first render.
+    }
+    body.setPixelSize(20);
+    QApplication::setFont(body);
+    flushFontLayout();
+    check();
+    qApp->setStyleSheet(rules + "\nQWidget#LayerTreeRow { font-size: 23px; }");
+    flushFontLayout();
+    check(); // Changing row defaults must not replace the labels' own fonts.
+    qApp->setStyleSheet(rules + QString("\nQLabel#LayerTreeDetail { font-family: \"%1\"; }").arg(body.family()));
+    delegate->sizeHint(option, index);
+    for (const auto* row : tree.findChildren<LayerTreeRowStyle*>())
+        CHECK(QFontInfo(row->detailLabel().font()).family() == body.family());
 }
 
 } // namespace TrenchBroom::View

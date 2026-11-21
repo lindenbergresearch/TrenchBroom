@@ -105,21 +105,26 @@ void LayerTreeRowStyle::prepareText(const QStyleOptionViewItem& option, const QM
     const auto group = !enabled ? QPalette::Disabled : option.state & QStyle::State_Active ? QPalette::Active : QPalette::Inactive;
     for (size_t i = 0; i < m_labels.size(); ++i) {
         auto& label = *m_labels[i];
-        // These defaults also support older row-level QSS properties. A rule
-        // targeting an individual QLabel takes precedence through Qt's style.
-        if (!m_textInitialized || m_baseFonts[i] != fonts[i]) {
-            m_baseFonts[i] = fonts[i];
-            label.setFont(fonts[i]);
-        }
+        const auto fontChanged = !m_textInitialized || m_baseFonts[i] != fonts[i];
         auto palette = option.palette;
         const auto color = i == 1 && layout.detailColor.isValid() ? layout.detailColor : palette.color(group, QPalette::Text);
         palette.setColor(QPalette::WindowText, color);
-        if (!m_textInitialized || m_basePalettes[i] != palette) {
-            m_basePalettes[i] = palette;
-            label.setPalette(palette);
-        }
+        const auto paletteChanged = !m_textInitialized || m_basePalettes[i] != palette;
         label.setEnabled(enabled);
         label.ensurePolished();
+        // The row may already have polished its child labels. With Qt's
+        // stylesheet propagation enabled, setting defaults afterwards replaces
+        // their QSS fonts. Unpolish first (it also restores the old palette),
+        // then set defaults and apply the label's rules before measuring it.
+        // Unchanged rows do not need a repolish.
+        if (fontChanged || paletteChanged) {
+            label.style()->unpolish(&label);
+            label.setFont(fonts[i]);
+            label.setPalette(palette);
+            label.style()->polish(&label);
+            m_baseFonts[i] = fonts[i];
+            m_basePalettes[i] = palette;
+        }
         label.setText(texts[i]);
     }
     m_textInitialized = true;

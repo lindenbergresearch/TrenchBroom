@@ -148,7 +148,7 @@ History/Undo, map load diagnostics, parser source excerpts, view state and archi
 encodings (including incomplete characters), legacy QSS font weights, shortcut serialization and fractional input
 coordinates. Dependency checks exercise the real image/model/font loaders.
 
-CTest runs **252 test cases / 76,212 assertions** with isolated temporary settings
+CTest runs **253 test cases / 76,340 assertions** with isolated temporary settings
 and the offscreen Qt platform. It does not change personal editor settings.
 The font/vector-icon/Qt6 subset also passes with `QT_SCALE_FACTOR=1.5` and `2`
 (34 cases / 3,395 assertions at each scale).

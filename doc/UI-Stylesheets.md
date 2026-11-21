@@ -191,6 +191,9 @@ Anzahl der Map-Objekte:
 
 Schriftart, Schriftgröße, Gewicht, Farbe einschließlich Alpha, Hintergrund,
 Rahmen und Padding sind für alle drei Labels unabhängig konfigurierbar.
+Diese Regeln gelten bereits beim ersten Zeichnen und nach dem Neuladen der QSS,
+unabhängig von **Preferences → View → Fonts → Apply**. Der Apply-Button übernimmt
+die globale Schriftkonfiguration; er wird für Label-Regeln im Stylesheet nicht benötigt.
 Die Addendum-Ausrichtung gilt für den verbleibenden Platz hinter dem Titel:
 
 ```css
