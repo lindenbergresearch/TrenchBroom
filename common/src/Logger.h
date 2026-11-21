@@ -26,7 +26,7 @@
 
 #include <QString>
 #include <type_traits>
-
+#include "QDateTime"
 #include "Chrono.h"
 
 class QString;
@@ -68,23 +68,23 @@ static std::map<LogLevel, LogLevelAttr> levelAttributes = {
 };
 // @formatter:on
 
-typedef std::chrono::high_resolution_clock::time_point TimePoint;
-typedef std::chrono::high_resolution_clock Clock;
+//typedef std::chrono::high_resolution_clock::time_point TimePoint;
+//typedef std::chrono::high_resolution_clock Clock;
 
 struct TimeStamp {
-   long delta;
-   TimePoint time;
+   const long delta;
+   const QDateTime qDateTime;
 
-   TimeStamp() : delta(Chrono::nanoTime()), time(Clock::now()) {};
+   TimeStamp() : delta(Chrono::nanoTime()), qDateTime(QDateTime::currentDateTime()) {};
 
 
-   QString deltaFmt() {
+   QString getDeltaTime(QString format = QString { "%1h:%2m:%3s:%4ms" }) {
        long milliseconds = std::lround(double(delta) * 10e-6);
        long seconds = milliseconds / 1000;
        long minutes = seconds / 60;
        long hours = minutes / 60;
 
-       QString formattedTime = QString("%1h:%2m:%3s:%4ms")
+       QString formattedTime = format
            .arg(hours)
            .arg(minutes % 60)
            .arg(seconds % 60)
@@ -93,6 +93,9 @@ struct TimeStamp {
        return formattedTime;
    }
 
+   QString getDateTime(QString format = QString { "yyyy/MM/dd hh:mm.ss.zzz" }) const {
+       return qDateTime.toString(format);
+   }
 };
 
 
@@ -102,7 +105,7 @@ struct TimeStamp {
 struct LogMessage {
    LogLevel level;
    QString message;
-   double time = Chrono::time();
+   TimeStamp timestamp{};
    uint8_t group = 0x00;
 
 
@@ -119,17 +122,20 @@ struct LogMessage {
 // of console filtering. Forwarding one message through proxy loggers records it
 // once. Nested operations and exceptions restore the previous capture scope.
 class ScopedDiagnosticLog {
-    ScopedDiagnosticLog* m_previous;
+    ScopedDiagnosticLog *m_previous;
     bool m_enabled;
     std::vector<LogMessage> m_messages;
-    static void record(LogLevel level, const QString& text);
+    static void record(LogLevel level, const QString &text);
+
     friend class Logger;
-public:
+
+  public:
     explicit ScopedDiagnosticLog(bool enabled = true);
     ~ScopedDiagnosticLog();
-    ScopedDiagnosticLog(const ScopedDiagnosticLog&) = delete;
-    ScopedDiagnosticLog& operator=(const ScopedDiagnosticLog&) = delete;
-    const std::vector<LogMessage>& messages() const { return m_messages; }
+    ScopedDiagnosticLog(const ScopedDiagnosticLog &) = delete;
+    ScopedDiagnosticLog &operator=(const ScopedDiagnosticLog &) = delete;
+
+    const std::vector<LogMessage> &messages() const { return m_messages; }
 };
 
 /**

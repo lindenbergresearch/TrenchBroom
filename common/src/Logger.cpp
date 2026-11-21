@@ -25,28 +25,34 @@
 #include <QString>
 #include <string>
 #include <QMessageBox>
+#include "QDateTime"
 
 namespace TrenchBroom {
 namespace {
-thread_local ScopedDiagnosticLog* diagnosticLog = nullptr;
+thread_local ScopedDiagnosticLog *diagnosticLog = nullptr;
 thread_local unsigned logDispatchDepth = 0;
+
 struct LogDispatch {
-    bool outermost = logDispatchDepth++ == 0;
-    ~LogDispatch() { --logDispatchDepth; }
+   bool outermost = logDispatchDepth++ == 0;
+
+   ~LogDispatch() { --logDispatchDepth; }
 };
 }
 
 ScopedDiagnosticLog::ScopedDiagnosticLog(bool enabled) : m_previous(diagnosticLog), m_enabled(enabled) {
     if (enabled) diagnosticLog = this;
 }
+
 ScopedDiagnosticLog::~ScopedDiagnosticLog() {
     if (m_enabled) diagnosticLog = m_previous;
 }
-void ScopedDiagnosticLog::record(LogLevel level, const QString& text) {
+
+void ScopedDiagnosticLog::record(LogLevel level, const QString &text) {
     if (level != LogLevel::Warn && level != LogLevel::Error) return;
-    for (auto* scope = diagnosticLog; scope; scope = scope->m_previous)
+    for (auto *scope = diagnosticLog; scope; scope = scope->m_previous)
         scope->m_messages.push_back(LogMessage{level, text});
 }
+
 /* ------------------------------------------------------------------------------------------- */
 
 
@@ -155,17 +161,20 @@ void Logger::log(const LogLevel level, const std::string &message) {
 
 void Logger::log(const LogLevel level, const LogMessage *message) {
     const LogDispatch dispatch;
+
     if (dispatch.outermost && message) ScopedDiagnosticLog::record(level, message->message);
+
+
     // call subclass implementation
     if (canLog(level)) doLog(level, message);
 
-//    if (level == LogLevel::Error) {
-//        QString content = "The following error occurred while running:\n\n" +
-//                          message->format(true, false) +
-//                          "\n\nSee console for more information.";
-//
-//        QMessageBox::critical(nullptr, "TrenchBroom", content, QMessageBox::Ok);
-//    }
+    if (level == LogLevel::Error) {
+        QString content = "The following error occurred while running:\n\n" +
+                          (message ? message->format(true, false) : "") +
+                          "\n\nSee console for more information.";
+
+        QMessageBox::critical(nullptr, "TrenchBroom", content, QMessageBox::Ok);
+    }
 }
 
 void Logger::log(const LogLevel level, const QString &message) {
@@ -239,19 +248,26 @@ void DefaultQtLogger::setColoredOut(const bool mColoredOut) {
 
 /* ------------------------------------------------------------------------------------------- */
 
+
+
 QString LogMessage::format(const bool detailed, const bool colored) const {
     auto [label, format] = levelAttributes[level];
     auto msgStr = colored ? format : QString{};
 
     if (detailed) {
-        msgStr += QString::fromStdString(
-            stringf(
-                "[%09.3f] %s %s",
-                time,
-                label.toStdString().c_str(),
-                message.toStdString().c_str()
-            )
-        );
+        const QString detailedFormat { "[%1] %2 %3" };
+
+        msgStr +=  detailedFormat.arg(timestamp.getDateTime()).arg(label).arg(message);
+//
+//
+//        msgStr += QString::fromStdString(
+//            stringf(
+//                "[%09.3f] %s %s",
+//                ,
+//                label.toStdString().c_str(),
+//                message.toStdString().c_str()
+//            )
+//        );
     } else {
         // just the plain message without details
         msgStr += message;
