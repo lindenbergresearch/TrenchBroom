@@ -32,6 +32,7 @@
 #include "PreferenceManager.h"
 #include "View/Document/MapDocument.h"
 #include "View/Dialogs/NodeSourceDialog.h"
+#include "View/Inspector/Layer/LayerDetailText.h"
 #include "View/Inspector/Layer/LayerTreeItemRenderer.h"
 #include "View/App/MapFrame.h"
 #include "View/MapView/MapView.h"
@@ -258,7 +259,8 @@ void LayerListBox::connectObservers() {
             scheduleDelayedItemsLayout();
             viewport()->update();
         }
-        else if (path == Preferences::UIDetailTextOpacity.path()
+        else if (path == layerDetailTextRendererPreference().path()
+            || path == Preferences::UIDetailTextOpacity.path()
             || path == Preferences::UIListSubpixelPositioning.path()) viewport()->update();
         else if (LayerTreeItemDelegate::isIconColorPreference(path)) {
             if (!ThemeManager::instance().current().values.isEmpty()) return;

@@ -16,6 +16,7 @@
 #include "Model/GroupNode.h"
 #include "Model/LayerNode.h"
 #include "Model/WorldNode.h"
+#include "View/Inspector/Layer/LayerDetailText.h"
 #include "View/Inspector/Layer/LayerEditor.h"
 #include "View/Inspector/Layer/LayerListBox.h"
 #include "View/Inspector/Layer/LayerTreeItemRenderer.h"
@@ -41,6 +42,8 @@
 #include <QSpinBox>
 #include <kdl/result.h>
 #include <catch2/catch.hpp>
+
+#include <algorithm>
 
 namespace TrenchBroom::View {
 namespace {
@@ -1074,6 +1077,104 @@ TEST_CASE("Layer text widgets are reused across many scene rows", "[LayerTree][l
     CHECK(view.findChildren<LayerTreeRowStyle*>().size() == 1);
     CHECK(view.findChildren<QLabel*>().size() == 3);
 }
+
+TEST_CASE_METHOD(LayerTreeTest, "The Layer toolbar switches only the detail text rasterizer", "[LayerTree][layer-detail-renderer]") {
+    const auto restore = TemporarilySetPref{layerDetailTextRendererPreference(), int(LayerDetailTextRenderer::Qt)};
+    auto* button = editor->findChild<QToolButton*>("layerDetailTextRenderer");
+    REQUIRE(button);
+    REQUIRE(button->menu());
+    const auto actionFor = [&](LayerDetailTextRenderer renderer) {
+        for (auto* action : button->menu()->actions()) {
+            if (action->isCheckable() && action->data().toInt() == int(renderer)) return action;
+        }
+        return static_cast<QAction*>(nullptr);
+    };
+    auto* qt = actionFor(LayerDetailTextRenderer::Qt);
+    auto* bitmap = actionFor(LayerDetailTextRenderer::FontStashBitmap);
+    auto* sdf = actionFor(LayerDetailTextRenderer::FontStashSdf);
+    REQUIRE(qt);
+    REQUIRE(bitmap);
+    REQUIRE(sdf);
+    CHECK(qt->isChecked());
+
+    tree->setStyleSheet(R"(
+        QLabel#LayerTreeDetail { font-size: 13px; color: #6688cc; padding: 1px; }
+        QLabel#LayerTreeTitle { font-size: 18px; }
+    )");
+    auto* row = item(group);
+    REQUIRE(row);
+    const auto detailText = QStringLiteral("Nested brushes \u00b7 32 \u00d7 64");
+    row->setData(0, LayerTreeItemDelegate::DetailRole, detailText);
+    select(group);
+    const auto index = tree->indexFromItem(row, 0);
+    auto option = QStyleOptionViewItem{};
+    option.initFrom(tree);
+    option.rect = QRect(0, 0, 350, 64);
+    option.state |= QStyle::State_Enabled | QStyle::State_Active;
+    const auto* delegate = tree->itemDelegate();
+    const auto size = delegate->sizeHint(option, index);
+    const auto ratio = GENERATE(1.0, 2.0);
+    const auto render = [&] {
+        auto image = QImage(option.rect.size() * ratio, QImage::Format_ARGB32_Premultiplied);
+        image.setDevicePixelRatio(ratio);
+        image.fill(Qt::transparent);
+        auto painter = QPainter(&image);
+        delegate->paint(&painter, option, index);
+        return image;
+    };
+
+    // Prime the native widget paint before comparing the rasterizers.
+    render();
+    const auto native = render();
+    const auto labels = tree->findChildren<QLabel*>("LayerTreeDetail");
+    const auto detailLabel = std::ranges::find_if(labels, [&](const auto* label) { return label->text() == detailText; });
+    REQUIRE(detailLabel != labels.end());
+    const auto* detail = *detailLabel;
+    const auto detailY = qRound(detail->geometry().top() * ratio);
+    CAPTURE(detailY, ratio);
+    REQUIRE(detailY > 0);
+    REQUIRE(detailY < native.height());
+    const auto upper = QRect(0, 0, native.width(), detailY);
+    bitmap->trigger();
+    const auto renderedBitmap = render();
+    CHECK(layerDetailTextRenderer() == LayerDetailTextRenderer::FontStashBitmap);
+    CHECK(bitmap->isChecked());
+    CHECK_FALSE(qt->isChecked());
+    CHECK(renderedBitmap != native);
+    CHECK(renderedBitmap.copy(upper) == native.copy(upper));
+
+    sdf->trigger();
+    const auto renderedSdf = render();
+    CHECK(layerDetailTextRenderer() == LayerDetailTextRenderer::FontStashSdf);
+    CHECK(sdf->isChecked());
+    CHECK_FALSE(bitmap->isChecked());
+    CHECK(renderedSdf != native);
+    CHECK(renderedSdf != renderedBitmap);
+    CHECK(renderedSdf.copy(upper) == native.copy(upper));
+    CHECK(delegate->sizeHint(option, index) == size);
+    CHECK(row->isSelected());
+    CHECK(group->selected());
+
+    // The alternative rasterizer retains the label's QSS foreground and
+    // produces actual glyph pixels at the target device scale.
+    for (const auto renderer : {LayerDetailTextRenderer::FontStashBitmap, LayerDetailTextRenderer::FontStashSdf}) {
+        const auto text = renderLayerDetailText(*detail, renderer, ratio);
+        REQUIRE_FALSE(text.isNull());
+        CHECK(text.devicePixelRatio() == ratio);
+        auto hasStyledColor = false;
+        for (auto y = 0; y < text.height(); ++y) {
+            for (auto x = 0; x < text.width(); ++x) {
+                if (text.pixelColor(x, y) == QColor("#6688cc")) hasStyledColor = true;
+            }
+        }
+        CHECK(hasStyledColor);
+    }
+
+    qt->trigger();
+    CHECK(layerDetailTextRenderer() == LayerDetailTextRenderer::Qt);
+    CHECK(render() == native);
+}
+
 TEST_CASE_METHOD(LayerTreeTest, "Native layer rows show all opaque QLabel texts", "[.native-layer-labels]") {
     REQUIRE(QGuiApplication::platformName() == "cocoa");
     tree->setStyleSheet(R"(

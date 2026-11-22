@@ -19,6 +19,7 @@
 
 #include "View/Inspector/Layer/LayerEditor.h"
 
+#include <QActionGroup>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -39,6 +40,7 @@
 #include "IO/ResourceUtils.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
+#include "View/Inspector/Layer/LayerDetailText.h"
 #include "View/Inspector/Layer/LayerListBox.h"
 #include "View/Document/MapDocument.h"
 #include "View/Theme/QtUtils.h"
@@ -486,6 +488,44 @@ void LayerEditor::createGui() {
     m_sourceButton = createBitmapButton("Source.svg", tr("Show source of the selected object (MAP / FGD)"));
     m_sourceButton->setObjectName("layerShowSource");
     connect(m_sourceButton, &QAbstractButton::clicked, m_layerList, &LayerListBox::showSelectedSource);
+
+    auto* textRendererButton = createBitmapButton("custom_typography.svg", tr("Detail text renderer"));
+    textRendererButton->setObjectName("layerDetailTextRenderer");
+    textRendererButton->setAccessibleName(tr("Detail text renderer"));
+    textRendererButton->setPopupMode(QToolButton::InstantPopup);
+    auto* textRendererMenu = new QMenu(textRendererButton);
+    textRendererMenu->addSection(tr("Detail text renderer"));
+    auto* textRenderers = new QActionGroup(textRendererMenu);
+    const auto addTextRenderer = [&](LayerDetailTextRenderer renderer, const QString& name) {
+        auto* action = textRendererMenu->addAction(name);
+        action->setData(int(renderer));
+        action->setCheckable(true);
+        textRenderers->addAction(action);
+    };
+    addTextRenderer(LayerDetailTextRenderer::Qt, tr("Qt"));
+    addTextRenderer(LayerDetailTextRenderer::FontStashBitmap, tr("FontStash Bitmap"));
+    addTextRenderer(LayerDetailTextRenderer::FontStashSdf, tr("FontStash SDF"));
+    textRendererButton->setMenu(textRendererMenu);
+
+    connect(textRenderers, &QActionGroup::triggered, this, [](const QAction* action) {
+        setPref(layerDetailTextRendererPreference(), action->data().toInt());
+    });
+    const auto updateTextRendererButton = [textRenderers, textRendererButton] {
+        const auto current = int(layerDetailTextRenderer());
+        for (auto* action : textRenderers->actions()) {
+            if (action->data().toInt() == current) {
+                action->setChecked(true);
+                textRendererButton->setToolTip(tr("Detail text renderer (%1)").arg(action->text()));
+                break;
+            }
+        }
+    };
+    updateTextRendererButton();
+    m_notifierConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect(
+        [updateTextRendererButton](const auto& path) {
+            if (path == layerDetailTextRendererPreference().path()) updateTextRendererButton();
+        });
+
     toolbar->addWidget(m_addLayerButton);
     toolbar->addWidget(m_removeLayerButton);
     toolbar->addWidget(m_moveLayerUpButton);
@@ -493,6 +533,7 @@ void LayerEditor::createGui() {
     toolbar->addWidget(m_groupByTypeButton);
     toolbar->addWidget(m_syncSelectionButton);
     toolbar->addWidget(m_sourceButton);
+    toolbar->addWidget(textRendererButton);
 
     auto *sizer = new QVBoxLayout();
     sizer->setContentsMargins(0, 0, 0, 0);

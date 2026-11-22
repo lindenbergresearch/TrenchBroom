@@ -425,6 +425,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerEditor.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerInspector.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerListBox.cpp
+    ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerDetailText.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeItemRenderer.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeLayerRenderer.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeGroupRenderer.cpp
@@ -1002,6 +1003,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerEditor.h
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerInspector.h
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerListBox.h
+    ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerDetailText.h
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeItemRenderer.h
     ${COMMON_SOURCE_DIR}/View/Widgets/LimitedKeySequenceEdit.h
     ${COMMON_SOURCE_DIR}/View/Actions/MainMenuBuilder.h
@@ -1134,6 +1136,7 @@ add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
 set_target_properties(common PROPERTIES AUTOMOC TRUE)
 target_include_directories(common PUBLIC ${COMMON_SOURCE_DIR})
 target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt6::Widgets Qt6::Svg Qt6::Multimedia Qt6::OpenGLWidgets fmt::fmt assimp::assimp)
+target_link_libraries(common PRIVATE fontstash-rasterizer)
 
 # use precompiled headers on CMake 3.16 or later
 if (NOT TB_SUPPRESS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
