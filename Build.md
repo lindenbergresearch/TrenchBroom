@@ -13,6 +13,11 @@ Migration results and estimates are in [Qt6-CPM-Roadmap.md](doc/Qt6-CPM-Roadmap.
 - OpenGL development libraries and zlib (provided by the macOS SDK).
 - Optional: `ccache` for reusing compiler results.
 
+Global FontStash rasterization in Qt Widgets uses the `GuiPrivate` and
+`WidgetsPrivate` development modules from the matching Qt SDK. Builds without
+these modules use Qt for standard widget text and still provide the SDF
+comparison and the editor's SDF text.
+
 Qt and system OpenGL are installed separately. CPM downloads and builds Assimp,
 Catch2, fmt, FreeImage, FreeType, GLEW, miniz and tinyxml2 from verified source
 archives. Exact versions, source URLs and SHA-256 hashes are in

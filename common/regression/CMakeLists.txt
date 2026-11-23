@@ -4,6 +4,7 @@ set(regression_sources
     Main.cpp
     tst_Dependencies.cpp
     tst_Qt6.cpp
+    tst_SdfText.cpp
     ../test/src/View/Input/tst_InputEvent.cpp
     ../test/src/View/Prefabs/tst_Prefab.cpp
     ../test/src/TestPreferenceManager.cpp

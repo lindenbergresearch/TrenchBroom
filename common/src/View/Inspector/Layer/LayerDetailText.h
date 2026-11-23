@@ -9,7 +9,7 @@ template <typename T> class Preference;
 
 namespace View {
 
-enum class LayerDetailTextRenderer { Qt = 0, FontStashBitmap = 1, FontStashSdf = 2 };
+enum class LayerDetailTextRenderer { Application = -1, Qt = 0, FontStashBitmap = 1, FontStashSdf = 2 };
 
 Preference<int>& layerDetailTextRendererPreference();
 LayerDetailTextRenderer layerDetailTextRenderer();

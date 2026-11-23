@@ -19,9 +19,12 @@
 
 #include "FontManager.h"
 
+#include "FontStashPreferences.h"
 #include "Renderer/FontDescriptor.h"
 #include "Renderer/FreeTypeFontFactory.h"
 #include "Renderer/TextureFont.h"
+
+#include <QOpenGLContext>
 
 #include <string>
 #include <memory>
@@ -34,14 +37,20 @@ FontManager::FontManager() : m_factory(std::make_unique<FreeTypeFontFactory>()) 
 FontManager::~FontManager() = default;
 
 void FontManager::clearCache() {
-    m_cache.clear();
+    // A preferences change can arrive without the rendering context current.
+    m_clearPending = true;
 }
 
 TextureFont &FontManager::font(const FontDescriptor &fontDescriptor) {
-    auto [it, inserted] = m_cache.try_emplace(fontDescriptor, nullptr);
-    if (inserted) {
-        it->second = m_factory->createFont(fontDescriptor);
+    const auto& sdf = fontStashPreferences().sdf;
+    const auto atlasSettings = std::tuple{sdf.unitsPerPixel, double(sdf.distancePerTexel), sdf.padding};
+    if (m_cache.empty() || ((m_clearPending || m_atlasSettings != atlasSettings) && QOpenGLContext::currentContext())) {
+        m_cache.clear();
+        m_atlasSettings = atlasSettings;
+        m_clearPending = false;
     }
+    auto it = m_cache.find(fontDescriptor);
+    if (it == m_cache.end()) it = m_cache.emplace(fontDescriptor, m_factory->createFont(fontDescriptor)).first;
     return *it->second;
 }
 

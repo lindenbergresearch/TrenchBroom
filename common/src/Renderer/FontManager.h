@@ -24,7 +24,9 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
+#include <tuple>
 
 namespace TrenchBroom {
 namespace Renderer {
@@ -38,6 +40,8 @@ class FontManager {
   private:
     std::unique_ptr<FontFactory> m_factory;
     std::map<FontDescriptor, std::unique_ptr<TextureFont>> m_cache;
+    std::optional<std::tuple<int, double, int>> m_atlasSettings;
+    bool m_clearPending = false;
 
   public:
     FontManager();

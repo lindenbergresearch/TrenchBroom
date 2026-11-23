@@ -21,8 +21,30 @@
 
 varying vec4 vertexColor;
 uniform sampler2D Texture;
+uniform float SdfDistancePerTexel;
+uniform float SdfAtlasSize;
+uniform float SdfTextWeight;
+
+float sampleCoverage(vec2 uv, float width) {
+    return clamp((texture2D(Texture, uv).r - 0.5) / width + SdfTextWeight, 0.0, 1.0);
+}
 
 void main() {
-    vec4 texel = texture2D(Texture, gl_TexCoord[0].st);
-    gl_FragColor = vec4(vertexColor.r, vertexColor.g, vertexColor.b, vertexColor.a * texel.r);
+    vec2 uv = gl_TexCoord[0].st;
+    float coverage;
+    if (SdfDistancePerTexel > 0.0) {
+        // The atlas is in texels and TexCoord is normalized. Limit the ramp
+        // so fully exterior texels stay transparent even for tiny labels.
+        vec2 dx = dFdx(uv);
+        vec2 dy = dFdy(uv);
+        float width = clamp(max(length(dx), length(dy)) * SdfAtlasSize
+            * (SdfDistancePerTexel / 255.0) * SdfTextWeight, 0.001, 0.5 / SdfTextWeight);
+        dx *= 0.25;
+        dy *= 0.25;
+        coverage = 0.25 * (sampleCoverage(uv + dx + dy, width) + sampleCoverage(uv + dx - dy, width)
+            + sampleCoverage(uv - dx + dy, width) + sampleCoverage(uv - dx - dy, width));
+    } else {
+        coverage = texture2D(Texture, uv).r;
+    }
+    gl_FragColor = vec4(vertexColor.rgb, vertexColor.a * coverage);
 }

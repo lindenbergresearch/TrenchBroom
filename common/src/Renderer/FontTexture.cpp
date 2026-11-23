@@ -23,6 +23,7 @@
 #include "Macros.h"
 
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <memory>
 
@@ -87,7 +88,8 @@ void FontTexture::deactivate() {
 }
 
 size_t FontTexture::computeTextureSize(const size_t cellCount, const size_t cellSize, const size_t margin) const {
-    const size_t minTextureSize = margin + cellCount * (cellSize + margin);
+    const auto cellsPerSide = static_cast<size_t>(std::ceil(std::sqrt(double(cellCount))));
+    const size_t minTextureSize = margin + cellsPerSide * (cellSize + margin);
     size_t textureSize = 1;
     while (textureSize < minTextureSize)
         textureSize = textureSize << 1;

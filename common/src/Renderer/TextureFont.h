@@ -29,6 +29,8 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom {
 namespace Renderer {
+class ActiveShader;
+
 class AttrString;
 
 class FontGlyph;
@@ -43,9 +45,11 @@ class TextureFont {
 
     unsigned char m_firstChar;
     unsigned char m_charCount;
+    float m_sdfDistancePerTexel;
 
   public:
-    TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, int lineHeight, unsigned char firstChar, unsigned char charCount);
+    TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, int lineHeight,
+                unsigned char firstChar, unsigned char charCount, float sdfDistancePerTexel = 0);
 
     ~TextureFont();
 
@@ -60,6 +64,7 @@ class TextureFont {
     vm::vec2f measure(const std::string &string) const;
 
     void activate();
+    void setShaderUniforms(ActiveShader& shader) const;
 
     void deactivate();
 };

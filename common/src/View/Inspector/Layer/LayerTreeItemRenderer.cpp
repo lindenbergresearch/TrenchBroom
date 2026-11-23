@@ -13,6 +13,7 @@
 #include "View/Inspector/Layer/LayerDetailText.h"
 #include "View/Preferences/FontUtils.h"
 #include "View/Theme/QtUtils.h"
+#include "View/Theme/WidgetTextPaint.h"
 
 #include <QApplication>
 #include <QFontMetricsF>
@@ -39,7 +40,7 @@ const std::array<const char*, LayerTreeItemDelegate::TypeCount> iconThemeNames{
 };
 
 void paintLabel(QPainter& painter, QLabel& label, const QRect& rect, qreal opacity = 1,
-                LayerDetailTextRenderer renderer = LayerDetailTextRenderer::Qt) {
+                LayerDetailTextRenderer renderer = LayerDetailTextRenderer::Application) {
     if (rect.isEmpty() || label.text().isEmpty()) return;
     const auto text = label.text();
     label.setGeometry(rect);
@@ -54,7 +55,12 @@ void paintLabel(QPainter& painter, QLabel& label, const QRect& rect, qreal opaci
     QPixmap buffer(QSize(int(std::ceil(rect.width() * ratio)), int(std::ceil(rect.height() * ratio))));
     buffer.setDevicePixelRatio(ratio);
     buffer.fill(Qt::transparent);
-    label.render(&buffer, QPoint{}, QRegion{}, QWidget::DrawChildren);
+    if (renderer == LayerDetailTextRenderer::Application) {
+        label.render(&buffer, QPoint{}, QRegion{}, QWidget::DrawChildren);
+    } else {
+        const auto useQt = ScopedQtTextPaint{};
+        label.render(&buffer, QPoint{}, QRegion{}, QWidget::DrawChildren);
+    }
     if (!detailImage.isNull()) {
         auto bufferPainter = QPainter(&buffer);
         bufferPainter.drawImage(QPoint{}, detailImage);

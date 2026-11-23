@@ -20,6 +20,7 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 #include "Error.h"
 #include "Exceptions.h"
+#include "FontStashPreferences.h"
 #include "Logger.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
@@ -34,11 +35,51 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "Renderer/FontTexture.h"
 #include "Renderer/TextureFont.h"
 
+#include FT_OUTLINE_H
+
+#include <QPainterPath>
+
 #include <algorithm>
 #include <string>
+#include <type_traits>
 
 namespace TrenchBroom {
 namespace Renderer {
+namespace {
+
+QPointF outlinePoint(const FT_Vector* point) {
+    return {qreal(point->x) / 64, -qreal(point->y) / 64};
+}
+
+QPainterPath outlinePath(FT_Outline& outline) {
+    const auto functions = FT_Outline_Funcs{
+        [](const FT_Vector* point, void* data) {
+            auto& path = *static_cast<QPainterPath*>(data);
+            path.closeSubpath();
+            path.moveTo(outlinePoint(point));
+            return 0;
+        },
+        [](const FT_Vector* point, void* data) {
+            static_cast<QPainterPath*>(data)->lineTo(outlinePoint(point));
+            return 0;
+        },
+        [](const FT_Vector* control, const FT_Vector* point, void* data) {
+            static_cast<QPainterPath*>(data)->quadTo(outlinePoint(control), outlinePoint(point));
+            return 0;
+        },
+        [](const FT_Vector* a, const FT_Vector* b, const FT_Vector* point, void* data) {
+            static_cast<QPainterPath*>(data)->cubicTo(outlinePoint(a), outlinePoint(b), outlinePoint(point));
+            return 0;
+        },
+        0, 0};
+    auto path = QPainterPath{};
+    if (FT_Outline_Decompose(&outline, &functions, &path) != 0) return {};
+    path.closeSubpath();
+    return path;
+}
+
+}
+
 FreeTypeFontFactory::FreeTypeFontFactory() : m_library(nullptr) {
     FT_Error error = FT_Init_FreeType(&m_library);
     if (error != 0) {
@@ -59,24 +100,24 @@ std::unique_ptr<TextureFont> FreeTypeFontFactory::doCreateFont(const FontDescrip
 
     try {
         auto [face, bufferedReader] = loadFont(fontDescriptor);
+        const auto faceGuard = std::unique_ptr<std::remove_pointer_t<FT_Face>, decltype(&FT_Done_Face)>(face, &FT_Done_Face);
         auto font = buildFont(face, fontDescriptor.minChar(), fontDescriptor.charCount(), fontDescriptor.lineHeightOffs());
-        FT_Done_Face(face);
 
         // NOTE: bufferedReader is returned from loadFont() just to keep the buffer from
         // being deallocated until after we call FT_Done_Face
         unused(bufferedReader);
 
         return font;
-    } catch (RenderException exception) {
+    } catch (const RenderException& exception) {
         auto fontPath = Preferences::RendererFontPath.defaultValue();
-        auto fd = new FontDescriptor(fontPath, (size_t) pref(Preferences::RendererFontSize));
+        const auto fd = FontDescriptor(fontPath, size_t(pref(Preferences::RendererFontSize)));
 
         defaultQtLogger.warn() << exception.what();
-        defaultQtLogger.warn() << "fallback to default font: " << fd->name();
+        defaultQtLogger.warn() << "fallback to default font: " << fd.name();
 
-        auto [face, bufferedReader] = loadFont(*fd);
-        auto font = buildFont(face, fd->minChar(), fd->charCount(),fd->lineHeightOffs());
-        FT_Done_Face(face);
+        auto [face, bufferedReader] = loadFont(fd);
+        const auto faceGuard = std::unique_ptr<std::remove_pointer_t<FT_Face>, decltype(&FT_Done_Face)>(face, &FT_Done_Face);
+        auto font = buildFont(face, fd.minChar(), fd.charCount(), fd.lineHeightOffs());
 
         // NOTE: bufferedReader is returned from loadFont() just to keep the buffer from
         // being deallocated until after we call FT_Done_Face
@@ -111,23 +152,65 @@ std::pair<FT_Face, IO::BufferedReader> FreeTypeFontFactory::loadFont(const FontD
 std::unique_ptr<TextureFont> FreeTypeFontFactory::buildFont(FT_Face face, const unsigned char firstChar, const unsigned char charCount, size_t lineHeightOffs) {
     const Metrics metrics = computeMetrics(face, firstChar, charCount, lineHeightOffs);
 
-    std::unique_ptr<FontTexture> texture = std::make_unique<FontTexture>(charCount, metrics.cellSize, metrics.lineHeight);
-    FontGlyphBuilder glyphBuilder(metrics.maxAscend, metrics.cellSize, 3, *texture);
+    if (FT_IS_SCALABLE(face) && !FT_HAS_COLOR(face) && face->size->metrics.y_ppem > 0) {
+        if (auto font = buildSdfFont(face, firstChar, charCount, metrics)) return font;
+    }
+
+    constexpr auto gutter = size_t{3};
+    auto texture = std::make_unique<FontTexture>(charCount, metrics.cellSize, gutter);
+    FontGlyphBuilder glyphBuilder(metrics.maxAscend, metrics.cellSize, gutter, *texture);
 
     FT_GlyphSlot glyph = face->glyph;
     std::vector<FontGlyph> glyphs;
-    for (unsigned char c = firstChar; c < firstChar + charCount; ++c) {
+    for (auto c = int(firstChar); c < int(firstChar) + charCount; ++c) {
         FT_Error error = FT_Load_Char(face, static_cast<FT_ULong>(c), FT_LOAD_RENDER);
         if (error != 0) {
             glyphs.push_back(FontGlyph(0, 0, 0, 0, 0));
         } else {
-            glyphs.push_back(glyphBuilder.createGlyph(static_cast<size_t>(glyph->bitmap_left), static_cast<size_t>(glyph->bitmap_top), static_cast<size_t>(glyph->bitmap.width), static_cast<size_t>(glyph->bitmap.rows), static_cast<size_t>(
-                glyph->advance.x
-                    >> 6), reinterpret_cast<char *>(glyph->bitmap.buffer), static_cast<size_t>(glyph->bitmap.pitch)));
+            glyphs.push_back(glyphBuilder.createGlyph(glyph->bitmap_left, glyph->bitmap_top,
+                glyph->bitmap.width, glyph->bitmap.rows, size_t(glyph->advance.x >> 6),
+                reinterpret_cast<const char*>(glyph->bitmap.buffer), glyph->bitmap.pitch));
         }
     }
 
     return std::make_unique<TextureFont>(std::move(texture), glyphs, static_cast<int>(metrics.lineHeight), firstChar, charCount);
+}
+
+std::unique_ptr<TextureFont> FreeTypeFontFactory::buildSdfFont(FT_Face face, unsigned char firstChar,
+                                                              unsigned char charCount, const Metrics& metrics) {
+    const auto settings = fontStashPreferences().sdf;
+    const auto atlasScale = std::min(4.0, 64.0 / face->size->metrics.y_ppem);
+    // A tuning change may regenerate the texture while vertex buffers still
+    // reference it. Reserve the same cell bounds and UVs for every padding value.
+    const auto padding = FontStash::MaximumSdfSettings.padding;
+    const auto cellSize = size_t(qCeil(qreal(metrics.cellSize) * atlasScale) + 2 * padding);
+    const auto baseline = size_t(qRound(qreal(metrics.maxAscend) * atlasScale) + padding);
+    constexpr auto gutter = size_t{2};
+    auto texture = std::make_unique<FontTexture>(charCount, cellSize, gutter);
+    auto builder = FontGlyphBuilder(baseline, cellSize, gutter, *texture,
+        float(1 / atlasScale), float(-padding / atlasScale));
+    auto glyphs = std::vector<FontGlyph>{};
+    glyphs.reserve(charCount);
+    for (auto c = int(firstChar); c < int(firstChar) + charCount; ++c) {
+        const auto character = FT_ULong(c);
+        if (FT_Load_Char(face, character, FT_LOAD_DEFAULT) != 0) return nullptr;
+        const auto advance = size_t(std::max<FT_Pos>(0, face->glyph->advance.x >> 6));
+        if (FT_Load_Char(face, character, FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING) != 0
+            || face->glyph->format != FT_GLYPH_FORMAT_OUTLINE) return nullptr;
+        auto mask = FontStash::GlyphMask{};
+        if (face->glyph->outline.n_points > 0) {
+            const auto outline = outlinePath(face->glyph->outline);
+            if (!outline.isEmpty()) {
+                mask = FontStash::glyphSdf(outline, atlasScale, settings);
+                if (mask.pixels.isNull()) return nullptr;
+            }
+        }
+        glyphs.push_back(builder.createGlyph(padding + mask.origin.x(), -mask.origin.y(),
+            size_t(mask.pixels.width()), size_t(mask.pixels.height()), advance,
+            reinterpret_cast<const char*>(mask.pixels.constBits()), mask.pixels.bytesPerLine()));
+    }
+    return std::make_unique<TextureFont>(std::move(texture), glyphs, int(metrics.lineHeight),
+        firstChar, charCount, float(settings.distancePerTexel));
 }
 
 FreeTypeFontFactory::Metrics FreeTypeFontFactory::computeMetrics(FT_Face face, const unsigned char firstChar, const unsigned char charCount,size_t lineHeightOffs) const {
@@ -138,7 +221,7 @@ FreeTypeFontFactory::Metrics FreeTypeFontFactory::computeMetrics(FT_Face face, c
     int maxDescend = 0;
     int lineHeight = 0;
 
-    for (unsigned char c = firstChar; c < firstChar + charCount; ++c) {
+    for (auto c = int(firstChar); c < int(firstChar) + charCount; ++c) {
         FT_Error error = FT_Load_Char(face, static_cast<FT_ULong>(c), FT_LOAD_RENDER);
         if (error != 0) {
             continue;

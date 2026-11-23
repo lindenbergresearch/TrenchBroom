@@ -24,38 +24,42 @@
 
 namespace TrenchBroom {
 namespace Renderer {
-FontGlyph::FontGlyph(const size_t x, const size_t y, const size_t w, const size_t h, const size_t a)
-    : m_x(static_cast<float>(x)), m_y(static_cast<float>(y)), m_w(static_cast<float>(w)), m_h(static_cast<float>(h)), m_a(static_cast<int>(a)) {
+FontGlyph::FontGlyph(const size_t x, const size_t y, const size_t w, const size_t h, const size_t a,
+                     const float displayScale, const float displayOffset)
+    : m_x(static_cast<float>(x)), m_y(static_cast<float>(y)), m_w(static_cast<float>(w)), m_h(static_cast<float>(h)),
+      m_a(static_cast<int>(a)), m_displayScale(displayScale), m_displayOffset(displayOffset) {
 }
 
 void FontGlyph::appendVertices(std::vector<vm::vec2f> &vertices, const int xOffset, const int yOffset, const size_t textureSize, const bool clockwise) const {
-    const auto fxOffset = static_cast<float>(xOffset);
-    const auto fyOffset = static_cast<float>(yOffset);
+    const auto fxOffset = static_cast<float>(xOffset) + m_displayOffset;
+    const auto fyOffset = static_cast<float>(yOffset) + m_displayOffset;
+    const auto displayWidth = m_w * m_displayScale;
+    const auto displayHeight = m_h * m_displayScale;
     const auto ftextureSize = static_cast<float>(textureSize);
 
     if (clockwise) {
         vertices.push_back(vm::vec2f(fxOffset, fyOffset));
         vertices.push_back(vm::vec2f(m_x, m_y + m_h) / ftextureSize);
 
-        vertices.push_back(vm::vec2f(fxOffset, fyOffset + m_h));
+        vertices.push_back(vm::vec2f(fxOffset, fyOffset + displayHeight));
         vertices.push_back(vm::vec2f(m_x, m_y) / ftextureSize);
 
-        vertices.push_back(vm::vec2f(fxOffset + m_w, fyOffset + m_h));
+        vertices.push_back(vm::vec2f(fxOffset + displayWidth, fyOffset + displayHeight));
         vertices.push_back(vm::vec2f(m_x + m_w, m_y) / ftextureSize);
 
-        vertices.push_back(vm::vec2f(fxOffset + m_w, fyOffset));
+        vertices.push_back(vm::vec2f(fxOffset + displayWidth, fyOffset));
         vertices.push_back(vm::vec2f(m_x + m_w, m_y + m_h) / ftextureSize);
     } else {
         vertices.push_back(vm::vec2f(fxOffset, fyOffset));
         vertices.push_back(vm::vec2f(m_x, m_y + m_h) / ftextureSize);
 
-        vertices.push_back(vm::vec2f(fxOffset + m_w, fyOffset));
+        vertices.push_back(vm::vec2f(fxOffset + displayWidth, fyOffset));
         vertices.push_back(vm::vec2f(m_x + m_w, m_y + m_h) / ftextureSize);
 
-        vertices.push_back(vm::vec2f(fxOffset + m_w, fyOffset + m_h));
+        vertices.push_back(vm::vec2f(fxOffset + displayWidth, fyOffset + displayHeight));
         vertices.push_back(vm::vec2f(m_x + m_w, m_y) / ftextureSize);
 
-        vertices.push_back(vm::vec2f(fxOffset, fyOffset + m_h));
+        vertices.push_back(vm::vec2f(fxOffset, fyOffset + displayHeight));
         vertices.push_back(vm::vec2f(m_x, m_y) / ftextureSize);
     }
 }

@@ -49,6 +49,7 @@
 #include <QtGlobal>
 
 #include "Error.h"
+#include "FontStashPreferences.h"
 #include "IO/DiskFileSystem.h"
 #include "IO/File.h"
 #include "IO/PathInfo.h"
@@ -62,10 +63,12 @@
 #include "View/Widgets/ColorButton.h"
 #include "View/Overlay/ContextOverlay.h"
 #include "View/Preferences/FontUtils.h"
+#include "View/Theme/FontStashText.h"
 #include "View/Widgets/FormWithSectionsLayout.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Widgets/SliderWithLabel.h"
 #include "View/Theme/ViewConstants.h"
+#include "View/Theme/WidgetTextPaint.h"
 
 #include <kdl/overload.h>
 
@@ -127,6 +130,7 @@ class FontComparisonPreview : public QFrame {
     QFont m_titleFont;
     QFont m_detailFont;
     ListFontSettings m_settings;
+    std::optional<FontStash::SdfSettings> m_sdf;
     qreal m_detailOpacity = 1;
 
 public:
@@ -138,6 +142,11 @@ public:
     }
 
     QString family() const { return QFontInfo{m_titleFont}.family(); }
+
+    void setSdf(const std::optional<FontStash::SdfSettings>& settings) {
+        m_sdf = settings;
+        update();
+    }
 
     QString description() const {
         const auto axes = fontCapabilities(m_titleFont);
@@ -156,7 +165,8 @@ public:
         const auto base = loadFont(path, std::max(size, minimum));
         m_titleFont = listTextFont(base, m_settings);
         auto detail = base;
-        detail.setPixelSize(std::max(minimum, base.pixelSize() - 2));
+        if (base.pointSizeF() > 0) detail.setPointSizeF(std::max(qreal(minimum), base.pointSizeF() - 2));
+        else detail.setPixelSize(std::max(minimum, base.pixelSize() - 2));
         detail.setWeight(QFont::Normal);
         detail.setStyleName({});
         m_detailFont = listTextFont(detail, m_settings);
@@ -178,19 +188,35 @@ public:
 
 protected:
     void paintEvent(QPaintEvent* event) override {
+        const auto useQt = ScopedQtTextPaint{};
         QFrame::paintEvent(event);
         QPainter painter(this);
         const auto bounds = QRectF(contentsRect()).marginsRemoved(QMarginsF{
             LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin,
             LayoutConstants::MediumHMargin, LayoutConstants::MediumVMargin});
         const QFontMetricsF titleMetrics{m_titleFont}, detailMetrics{m_detailFont};
+        const auto drawLine = [&](const QRectF& row, const QString& text, const QFont& font) {
+            if (m_sdf && !row.isEmpty()) {
+                const auto ratio = devicePixelRatioF();
+                const auto metrics = QFontMetricsF(font, this);
+                const auto elided = metrics.elidedText(text, Qt::ElideRight, row.width());
+                const auto pixels = QSize(qCeil(row.width() * ratio), qCeil(row.height() * ratio));
+                const auto image = fontStashTextLine(*this, elided, font, painter.pen().color(),
+                    QRectF(QPointF{}, row.size()), pixels, ratio, Qt::AlignLeft | Qt::AlignVCenter, &*m_sdf);
+                if (!image.isNull()) {
+                    painter.drawImage(row.topLeft(), image);
+                    return;
+                }
+            }
+            paintTextLine(painter, row, text, font, m_settings.subpixelPositioning);
+        };
         auto row = QRectF(bounds.left(), bounds.top(), bounds.width(), titleMetrics.height());
         painter.setPen(palette().color(QPalette::Text));
-        paintTextLine(painter, row, tr("Group Main Hall"), m_titleFont, m_settings.subpixelPositioning);
+        drawLine(row, tr("Group Main Hall"), m_titleFont);
         painter.setOpacity(m_detailOpacity);
         for (const auto& text : {tr("6 brushes · 32 faces · stone_wall"), tr("Position 128, 64, 32 · light 100")}) {
             row = QRectF(bounds.left(), row.bottom() + LayoutConstants::MediumVMargin, bounds.width(), detailMetrics.height());
-            paintTextLine(painter, row, text, m_detailFont, m_settings.subpixelPositioning);
+            drawLine(row, text, m_detailFont);
         }
     }
 };
@@ -405,19 +431,57 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     m_listTextPosition->addItems({tr("Pixel aligned"), tr("Subpixel positioning")});
     m_listTextPosition->setToolTip(tr("Pixel alignment places text baselines on physical screen pixels. Subpixel positioning uses unhinted text and permits fractional baselines."));
 
+    m_textRenderer = new QComboBox;
+    m_textRenderer->setObjectName("UITextRenderer");
+    m_textRenderer->addItem(tr("FontStash SDF"), true);
+    m_textRenderer->addItem(tr("Qt"), false);
+    if (!widgetFontStashAvailable()) {
+        m_textRenderer->setToolTip(tr("This build supports SDF in the preview and in the editor. Global Qt widget painting requires the matching Qt private headers."));
+    }
+
+    const auto minSdf = FontStash::MinimumSdfSettings;
+    const auto maxSdf = FontStash::MaximumSdfSettings;
+    m_sdfTextWeight = new QDoubleSpinBox;
+    m_sdfTextWeight->setObjectName("SdfTextWeight");
+    m_sdfTextWeight->setRange(minSdf.textWeight, maxSdf.textWeight);
+    m_sdfTextWeight->setDecimals(2);
+    m_sdfTextWeight->setSingleStep(0.01);
+    m_sdfTextWeight->setKeyboardTracking(false);
+    m_sdfTextWeight->setToolTip(tr("Adjusts the coverage at the glyph edge and the width of its antialiasing ramp."));
+    m_sdfUnitsPerPixel = new QSpinBox;
+    m_sdfUnitsPerPixel->setObjectName("SdfUnitsPerPixel");
+    m_sdfUnitsPerPixel->setRange(minSdf.unitsPerPixel, maxSdf.unitsPerPixel);
+    m_sdfUnitsPerPixel->setKeyboardTracking(false);
+    m_sdfUnitsPerPixel->setToolTip(tr("Controls the precision of glyph outline coordinates in the distance field."));
+    m_sdfDistancePerTexel = new QDoubleSpinBox;
+    m_sdfDistancePerTexel->setObjectName("SdfDistancePerTexel");
+    m_sdfDistancePerTexel->setRange(minSdf.distancePerTexel, maxSdf.distancePerTexel);
+    m_sdfDistancePerTexel->setDecimals(1);
+    m_sdfDistancePerTexel->setSingleStep(1.0);
+    m_sdfDistancePerTexel->setKeyboardTracking(false);
+    m_sdfDistancePerTexel->setToolTip(tr("Controls the distance field's range and quantization."));
+    m_sdfPadding = new QSpinBox;
+    m_sdfPadding->setObjectName("SdfPadding");
+    m_sdfPadding->setRange(minSdf.padding, maxSdf.padding);
+    m_sdfPadding->setKeyboardTracking(false);
+    m_sdfPadding->setSuffix(tr(" texels"));
+    m_sdfPadding->setToolTip(tr("Sets the amount of distance field reserved around each glyph."));
+    m_compareSameFont = new QCheckBox(tr("Compare the same font on both sides"));
+    m_compareSameFont->setObjectName("UIFontCompareSameFont");
+
     auto* comparison = new QWidget;
     comparison->setObjectName("UIFontComparison");
     auto* comparisonLayout = new QGridLayout(comparison);
     comparisonLayout->setContentsMargins(0, 0, 0, 0);
     comparisonLayout->setSpacing(LayoutConstants::MediumHMargin);
     const auto addPreview = [&](const int column, const QString& title, const QString& name, QLabel*& info,
-                               QLabel** selectedHeading = nullptr) {
+                               QLabel*& previewHeading) {
         auto* heading = new QLabel(title);
+        previewHeading = heading;
         heading->setProperty("fontPreviewHeading", true);
         auto* header = new QHBoxLayout;
         header->addWidget(heading, 1);
-        if (selectedHeading) {
-            *selectedHeading = heading;
+        if (column == 1) {
             m_applyFont = new QPushButton(tr("Apply"));
             m_applyFont->setObjectName("UIFontApply");
             m_applyFont->setAutoDefault(false);
@@ -438,8 +502,8 @@ QWidget *ViewPreferencePane::createViewPreferences() {
         comparisonLayout->setColumnStretch(column, 1);
         return preview;
     };
-    m_systemFontPreview = addPreview(0, tr("System font"), "UIFontPreview_System", m_systemFontInfo);
-    m_selectedFontPreview = addPreview(1, tr("Selected font"), "UIFontPreview_Selected", m_selectedFontInfo, &m_selectedFontHeading);
+    m_systemFontPreview = addPreview(0, tr("System font (Qt)"), "UIFontPreview_System", m_systemFontInfo, m_systemFontHeading);
+    m_selectedFontPreview = addPreview(1, tr("Selected font"), "UIFontPreview_Selected", m_selectedFontInfo, m_selectedFontHeading);
     auto* comparisonScope = new QLabel(tr("Changes affect only these samples. Apply uses them throughout the interface."));
     comparisonScope->setObjectName("UIFontComparisonScope");
     comparisonScope->setWordWrap(true);
@@ -495,6 +559,13 @@ QWidget *ViewPreferencePane::createViewPreferences() {
     layout->addRow(tr("Optical size"), m_listOpticalSize);
     layout->addRow(tr("Line spacing"), m_listTypoLineMetrics);
     layout->addRow(tr("Text positioning"), m_listTextPosition);
+    layout->addSection(tr("FontStash SDF"));
+    layout->addRow(tr("UI text renderer"), m_textRenderer);
+    layout->addRow(tr("SDF text weight"), m_sdfTextWeight);
+    layout->addRow(tr("Units per pixel"), m_sdfUnitsPerPixel);
+    layout->addRow(tr("Distance per texel"), m_sdfDistancePerTexel);
+    layout->addRow(tr("Glyph padding"), m_sdfPadding);
+    layout->addRow(m_compareSameFont);
     layout->addRow(comparison);
     layout->addSection(tr("Other fonts"));
     layout->addRow("Console Font", m_ConsoleFontCombo, m_ConsoleFontSizeCombo);
@@ -604,6 +675,12 @@ void ViewPreferencePane::bindEvents() {
     connect(m_listOpticalSize, &QDoubleSpinBox::valueChanged, this, &ViewPreferencePane::editorUIListOpticalSizeChanged);
     connect(m_listTypoLineMetrics, &QCheckBox::toggled, this, &ViewPreferencePane::editorUIListTypoMetricsChanged);
     connect(m_listTextPosition, &QComboBox::currentIndexChanged, this, &ViewPreferencePane::editorUIListTextPositionChanged);
+    connect(m_textRenderer, &QComboBox::currentIndexChanged, this, &ViewPreferencePane::updateSdfPreview);
+    connect(m_sdfTextWeight, &QDoubleSpinBox::valueChanged, this, &ViewPreferencePane::updateSdfPreview);
+    connect(m_sdfUnitsPerPixel, &QSpinBox::valueChanged, this, &ViewPreferencePane::updateSdfPreview);
+    connect(m_sdfDistancePerTexel, &QDoubleSpinBox::valueChanged, this, &ViewPreferencePane::updateSdfPreview);
+    connect(m_sdfPadding, &QSpinBox::valueChanged, this, &ViewPreferencePane::updateSdfPreview);
+    connect(m_compareSameFont, &QCheckBox::toggled, this, &ViewPreferencePane::updateFontPreviews);
     connect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
     connect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
     connect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
@@ -637,6 +714,12 @@ void ViewPreferencePane::unBindEvents() {
     disconnect(m_listOpticalSize, nullptr, this, nullptr);
     disconnect(m_listTypoLineMetrics, nullptr, this, nullptr);
     disconnect(m_listTextPosition, nullptr, this, nullptr);
+    disconnect(m_textRenderer, nullptr, this, nullptr);
+    disconnect(m_sdfTextWeight, nullptr, this, nullptr);
+    disconnect(m_sdfUnitsPerPixel, nullptr, this, nullptr);
+    disconnect(m_sdfDistancePerTexel, nullptr, this, nullptr);
+    disconnect(m_sdfPadding, nullptr, this, nullptr);
+    disconnect(m_compareSameFont, nullptr, this, nullptr);
     disconnect(m_ConsoleFontCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorConsoleFontFileChanged);
     disconnect(m_ConsoleFontSizeCombo, &QComboBox::currentTextChanged, this, &ViewPreferencePane::editorConsoleFontSizeChanged);
     disconnect(m_ToolbarIconSizeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ViewPreferencePane::editorToolbarIconSizeChanged);
@@ -680,6 +763,7 @@ void ViewPreferencePane::doResetToDefaults() {
     m_listOpticalSize->setValue(Preferences::UIListOpticalSize.defaultValue());
     m_listTypoLineMetrics->setChecked(Preferences::UIListTypoLineMetrics.defaultValue());
     m_listTextPosition->setCurrentIndex(Preferences::UIListSubpixelPositioning.defaultValue() ? 1 : 0);
+    setSdfControls(FontStashPreferences{});
     m_fontDraftDirty = true;
     updateFontPreviews();
 
@@ -750,6 +834,7 @@ void ViewPreferencePane::doUpdateControls() {
         m_listTypoLineMetrics->setChecked(settings.typoLineMetrics);
         m_listTextPosition->setCurrentIndex(settings.subpixelPositioning ? 1 : 0);
     }
+    if (!m_sdfDraftDirty) setSdfControls(fontStashPreferences());
     updateFontPreviews();
 
     bindEvents();
@@ -909,16 +994,45 @@ void ViewPreferencePane::updateFontPreviews() {
     const auto opacity = m_UIDetailTextOpacity->value() / 100.0;
     const ListFontSettings settings{m_listFontWeight->value(), m_listOpticalSize->value(),
         m_listTypoLineMetrics->isChecked(), m_listTextPosition->currentIndex() == 1};
-    m_systemFontPreview->refresh("[system]", size, minimum, opacity, settings);
-    m_selectedFontPreview->refresh(IO::pathFromQString(m_UIFontCombo->currentData().toString()),
-        size, minimum, opacity, settings);
+    const auto path = IO::pathFromQString(m_UIFontCombo->currentData().toString());
+    const auto sameFont = m_compareSameFont->isChecked();
+    m_systemFontPreview->refresh(sameFont ? path : std::filesystem::path{"[system]"}, size, minimum, opacity, settings);
+    m_selectedFontPreview->refresh(path, size, minimum, opacity, settings);
+    const auto referenceTitle = sameFont ? tr("Selected font (Qt)") : tr("System font (Qt)");
+    m_systemFontHeading->setText(referenceTitle);
+    m_systemFontHeading->setWordWrap(true);
+    m_systemFontPreview->setAccessibleName(referenceTitle);
     m_systemFontInfo->setText(m_systemFontPreview->description());
     m_selectedFontInfo->setText(m_selectedFontPreview->description());
-    const auto title = tr("Selected font: %1").arg(m_selectedFontPreview->family());
+    updateSdfPreview();
+}
+
+FontStashPreferences ViewPreferencePane::sdfDraft() const {
+    return {m_textRenderer->currentData().toBool(), {
+        m_sdfTextWeight->value(), m_sdfUnitsPerPixel->value(),
+        m_sdfDistancePerTexel->value(), m_sdfPadding->value()}};
+}
+
+void ViewPreferencePane::setSdfControls(const FontStashPreferences& settings) {
+    m_textRenderer->setCurrentIndex(m_textRenderer->findData(settings.enabled));
+    m_sdfTextWeight->setValue(settings.sdf.textWeight);
+    m_sdfUnitsPerPixel->setValue(settings.sdf.unitsPerPixel);
+    m_sdfDistancePerTexel->setValue(settings.sdf.distancePerTexel);
+    m_sdfPadding->setValue(settings.sdf.padding);
+}
+
+void ViewPreferencePane::updateSdfPreview() {
+    const auto draft = sdfDraft();
+    m_sdfDraftDirty = draft != fontStashPreferences();
+    for (auto* control : std::array<QWidget*, 4>{m_sdfTextWeight, m_sdfUnitsPerPixel, m_sdfDistancePerTexel, m_sdfPadding})
+        control->setEnabled(draft.enabled);
+    m_selectedFontPreview->setSdf(draft.enabled ? std::optional{draft.sdf} : std::nullopt);
+    const auto title = tr("Selected font: %1 (%2)").arg(m_selectedFontPreview->family(),
+        draft.enabled ? tr("FontStash SDF") : tr("Qt"));
     m_selectedFontHeading->setText(title);
     m_selectedFontHeading->setWordWrap(true);
     m_selectedFontPreview->setAccessibleName(title);
-    m_applyFont->setEnabled(m_fontDraftDirty || !pref(Preferences::UIGlobalTypography));
+    m_applyFont->setEnabled(m_fontDraftDirty || m_sdfDraftDirty || !pref(Preferences::UIGlobalTypography));
 }
 
 void ViewPreferencePane::editorUIListFontWeightChanged(const int) {
@@ -945,19 +1059,30 @@ void ViewPreferencePane::applyFontDraft() {
     m_UIFontMinimumSize->interpretText();
     m_listFontWeight->interpretText();
     m_listOpticalSize->interpretText();
-    auto& prefs = PreferenceManager::instance();
-    prefs.set(Preferences::UIFontPath, IO::pathFromQString(m_UIFontCombo->currentData().toString()));
-    prefs.set(Preferences::UIFontSize, std::clamp(m_UIFontSizeCombo->currentText().toInt(), 1, 96));
-    prefs.set(Preferences::UIFontMinimumSize, m_UIFontMinimumSize->value());
-    prefs.set(Preferences::UIDetailTextOpacity, float(m_UIDetailTextOpacity->value()) / 100.0f);
-    prefs.set(Preferences::UIListFontWeight, m_listFontWeight->value());
-    prefs.set(Preferences::UIListOpticalSize, float(m_listOpticalSize->value()));
-    prefs.set(Preferences::UIListTypoLineMetrics, m_listTypoLineMetrics->isChecked());
-    prefs.set(Preferences::UIListSubpixelPositioning, m_listTextPosition->currentIndex() == 1);
-    prefs.set(Preferences::UIGlobalTypography, true);
-    prefs.saveChanges();
-    m_fontDraftDirty = false;
-    reloadUIStyle();
+
+    m_sdfTextWeight->interpretText();
+    m_sdfUnitsPerPixel->interpretText();
+    m_sdfDistancePerTexel->interpretText();
+    m_sdfPadding->interpretText();
+
+    // An SDF-only change repaints the widgets without rebuilding the theme or
+    // changing any of the typography settings.
+    if (m_fontDraftDirty || (!m_sdfDraftDirty && !pref(Preferences::UIGlobalTypography))) {
+        auto& prefs = PreferenceManager::instance();
+        prefs.set(Preferences::UIFontPath, IO::pathFromQString(m_UIFontCombo->currentData().toString()));
+        prefs.set(Preferences::UIFontSize, std::clamp(m_UIFontSizeCombo->currentText().toInt(), 1, 96));
+        prefs.set(Preferences::UIFontMinimumSize, m_UIFontMinimumSize->value());
+        prefs.set(Preferences::UIDetailTextOpacity, float(m_UIDetailTextOpacity->value()) / 100.0f);
+        prefs.set(Preferences::UIListFontWeight, m_listFontWeight->value());
+        prefs.set(Preferences::UIListOpticalSize, float(m_listOpticalSize->value()));
+        prefs.set(Preferences::UIListTypoLineMetrics, m_listTypoLineMetrics->isChecked());
+        prefs.set(Preferences::UIListSubpixelPositioning, m_listTextPosition->currentIndex() == 1);
+        prefs.set(Preferences::UIGlobalTypography, true);
+        prefs.saveChanges();
+        m_fontDraftDirty = false;
+        reloadUIStyle();
+    }
+    if (m_sdfDraftDirty) applyFontStashPreferences(sdfDraft());
     updateFontPreviews();
 }
 

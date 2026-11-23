@@ -502,6 +502,7 @@ void LayerEditor::createGui() {
         action->setCheckable(true);
         textRenderers->addAction(action);
     };
+    addTextRenderer(LayerDetailTextRenderer::Application, tr("Application default"));
     addTextRenderer(LayerDetailTextRenderer::Qt, tr("Qt"));
     addTextRenderer(LayerDetailTextRenderer::FontStashBitmap, tr("FontStash Bitmap"));
     addTextRenderer(LayerDetailTextRenderer::FontStashSdf, tr("FontStash SDF"));

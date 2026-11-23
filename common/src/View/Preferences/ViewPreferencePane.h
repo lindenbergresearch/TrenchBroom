@@ -32,6 +32,8 @@ class QPushButton;
 class QLineEdit;
 class QSpinBox;
 
+namespace TrenchBroom { struct FontStashPreferences; }
+
 namespace TrenchBroom::View {
 class FontComparisonPreview;
 class SliderWithLabel;
@@ -66,11 +68,19 @@ class ViewPreferencePane : public PreferencePane {
     QDoubleSpinBox *m_listOpticalSize = nullptr;
     QCheckBox *m_listTypoLineMetrics = nullptr;
     QComboBox *m_listTextPosition = nullptr;
+    QComboBox *m_textRenderer = nullptr;
+    QDoubleSpinBox *m_sdfTextWeight = nullptr;
+    QSpinBox *m_sdfUnitsPerPixel = nullptr;
+    QDoubleSpinBox *m_sdfDistancePerTexel = nullptr;
+    QSpinBox *m_sdfPadding = nullptr;
+    QCheckBox *m_compareSameFont = nullptr;
+    QLabel *m_systemFontHeading = nullptr;
     QLabel *m_systemFontInfo = nullptr;
     QLabel *m_selectedFontInfo = nullptr;
     QLabel *m_selectedFontHeading = nullptr;
     QPushButton *m_applyFont = nullptr;
     bool m_fontDraftDirty = false;
+    bool m_sdfDraftDirty = false;
     FontComparisonPreview *m_systemFontPreview = nullptr;
     FontComparisonPreview *m_selectedFontPreview = nullptr;
     QComboBox *m_ConsoleFontSizeCombo = nullptr;
@@ -86,6 +96,9 @@ class ViewPreferencePane : public PreferencePane {
     void reloadUIStyle();
 
     void updateFontPreviews();
+    void updateSdfPreview();
+    FontStashPreferences sdfDraft() const;
+    void setSdfControls(const FontStashPreferences& settings);
     void applyFontDraft();
 
     QWidget *createViewPreferences();

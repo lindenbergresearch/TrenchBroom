@@ -19,6 +19,8 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 #include "TextureFont.h"
 
 #include "AttrString.h"
+#include "FontStashPreferences.h"
+#include "Renderer/ActiveShader.h"
 #include "Renderer/FontGlyph.h"
 #include "Renderer/FontTexture.h"
 
@@ -31,8 +33,11 @@ along with TrenchBroom. If not, see <http://www.gnu.org/licenses/>.
 
 namespace TrenchBroom {
 namespace Renderer {
-TextureFont::TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs, const int lineHeight, const unsigned char firstChar, const unsigned char charCount)
-    : m_texture(std::move(texture)), m_glyphs(glyphs), m_lineHeight(lineHeight), m_firstChar(firstChar), m_charCount(charCount) {
+TextureFont::TextureFont(std::unique_ptr<FontTexture> texture, const std::vector<FontGlyph> &glyphs,
+                         const int lineHeight, const unsigned char firstChar, const unsigned char charCount,
+                         const float sdfDistancePerTexel)
+    : m_texture(std::move(texture)), m_glyphs(glyphs), m_lineHeight(lineHeight), m_firstChar(firstChar),
+      m_charCount(charCount), m_sdfDistancePerTexel(sdfDistancePerTexel) {
 }
 
 TextureFont::~TextureFont() = default;
@@ -204,6 +209,15 @@ vm::vec2f TextureFont::measure(const std::string &string) const {
 
 void TextureFont::activate() {
     m_texture->activate();
+}
+
+void TextureFont::setShaderUniforms(ActiveShader& shader) const {
+    shader.set("Texture", 0);
+    shader.set("SdfDistancePerTexel", m_sdfDistancePerTexel);
+    if (m_sdfDistancePerTexel > 0) {
+        shader.set("SdfAtlasSize", float(m_texture->size()));
+        shader.set("SdfTextWeight", float(fontStashPreferences().sdf.textWeight));
+    }
 }
 
 void TextureFont::deactivate() {

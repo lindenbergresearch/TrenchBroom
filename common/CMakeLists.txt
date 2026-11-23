@@ -30,6 +30,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/Error.cpp
     ${COMMON_SOURCE_DIR}/Exceptions.cpp
     ${COMMON_SOURCE_DIR}/FileLogger.cpp
+    ${COMMON_SOURCE_DIR}/FontStashPreferences.cpp
     ${COMMON_SOURCE_DIR}/IO/AseParser.cpp
     ${COMMON_SOURCE_DIR}/IO/AssimpParser.cpp
     ${COMMON_SOURCE_DIR}/IO/BrushFaceReader.cpp
@@ -275,6 +276,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/Thread.cpp
     ${COMMON_SOURCE_DIR}/View/Theme/QSSBuilder.cpp
     ${COMMON_SOURCE_DIR}/View/Theme/ThemeManager.cpp
+    ${COMMON_SOURCE_DIR}/View/Theme/FontStashText.cpp
     ${COMMON_SOURCE_DIR}/TrenchBroomApp.cpp
     ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.cpp
     ${COMMON_SOURCE_DIR}/Uuid.cpp
@@ -871,8 +873,11 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/Result.h
     ${COMMON_SOURCE_DIR}/Thread.h
     ${COMMON_SOURCE_DIR}/TrenchBroomApp.h
+    ${COMMON_SOURCE_DIR}/FontStashPreferences.h
     ${COMMON_SOURCE_DIR}/View/Theme/QSSBuilder.h
     ${COMMON_SOURCE_DIR}/View/Theme/ThemeManager.h
+    ${COMMON_SOURCE_DIR}/View/Theme/FontStashText.h
+    ${COMMON_SOURCE_DIR}/View/Theme/WidgetTextPaint.h
     ${COMMON_SOURCE_DIR}/TrenchBroomStackWalker.h
     ${COMMON_SOURCE_DIR}/Uuid.h
     ${COMMON_SOURCE_DIR}/View/Dialogs/AboutDialog.h
@@ -1136,7 +1141,20 @@ add_library(common OBJECT ${COMMON_SOURCE} ${COMMON_HEADER})
 set_target_properties(common PROPERTIES AUTOMOC TRUE)
 target_include_directories(common PUBLIC ${COMMON_SOURCE_DIR})
 target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::miniz freeimage::FreeImage freetype OpenGL::GL Qt6::Widgets Qt6::Svg Qt6::Multimedia Qt6::OpenGLWidgets fmt::fmt assimp::assimp)
-target_link_libraries(common PRIVATE fontstash-rasterizer)
+target_link_libraries(common PUBLIC fontstash-rasterizer)
+
+# Isolate the Qt-private paint hook from the rest of the application. SDKs
+# without these headers still support the SDF preview and Layer comparison.
+find_package(Qt6GuiPrivate ${Qt6_VERSION} EXACT QUIET)
+find_package(Qt6WidgetsPrivate ${Qt6_VERSION} EXACT QUIET)
+add_library(tb-widget-text-paint STATIC ${COMMON_SOURCE_DIR}/View/Theme/WidgetTextPaint.cpp)
+target_include_directories(tb-widget-text-paint PRIVATE ${COMMON_SOURCE_DIR})
+target_link_libraries(tb-widget-text-paint PRIVATE Qt6::Widgets fontstash-rasterizer)
+if(TARGET Qt6::GuiPrivate AND TARGET Qt6::WidgetsPrivate)
+    target_compile_definitions(tb-widget-text-paint PRIVATE TB_QT_WIDGET_FONTSTASH)
+    target_link_libraries(tb-widget-text-paint PRIVATE Qt6::GuiPrivate Qt6::WidgetsPrivate)
+endif()
+target_link_libraries(common PRIVATE tb-widget-text-paint)
 
 # use precompiled headers on CMake 3.16 or later
 if (NOT TB_SUPPRESS_PCH AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")

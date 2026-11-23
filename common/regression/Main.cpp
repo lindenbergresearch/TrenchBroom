@@ -26,17 +26,31 @@
 #include "Model/GameFactory.h"
 #include "TestPreferenceManager.h"
 #include "TestSourcePath.h"
+#include "View/Theme/WidgetTextPaint.h"
 
 #include <QApplication>
 #include <QSettings>
 #include <QTemporaryDir>
+
+namespace {
+class RegressionApplication : public QApplication {
+public:
+    using QApplication::QApplication;
+
+    bool notify(QObject* receiver, QEvent* event) override {
+        if (property("testFontStashWidgetPaint").toBool())
+            return TrenchBroom::View::notifyWidgetTextPaint(*this, receiver, event);
+        return QApplication::notify(receiver, event);
+    }
+};
+}
 
 int main(int argc, char** argv) {
     using namespace TrenchBroom;
     IO::SystemPaths::setPortable();
     PreferenceManager::createInstance<TestPreferenceManager>();
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
-    QApplication app(argc, argv);
+    RegressionApplication app(argc, argv);
     QTemporaryDir settings;
     if (!settings.isValid()) return 2;
     QCoreApplication::setOrganizationName("TrenchBroomRegression");

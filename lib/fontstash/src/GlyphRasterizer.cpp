@@ -41,11 +41,8 @@ float fontstashAcos(float x) {
 namespace TrenchBroom::FontStash {
 namespace {
 
-constexpr auto unitsPerPixel = 32.0;
-constexpr auto distancePerTexel = 32.0;
-constexpr auto sdfPadding = 5; // Four distance texels and one guard texel.
-
-stbtt_vertex vertex(unsigned char type, const QPointF& end, const QPointF& control = {}, const QPointF& second = {}) {
+stbtt_vertex vertex(int unitsPerPixel, unsigned char type, const QPointF& end,
+                    const QPointF& control = {}, const QPointF& second = {}) {
     // Qt outlines are y-down and stb uses y-up coordinates.
     return {
         short(qRound(end.x() * unitsPerPixel)), short(qRound(-end.y() * unitsPerPixel)),
@@ -56,12 +53,12 @@ stbtt_vertex vertex(unsigned char type, const QPointF& end, const QPointF& contr
 
 // Qt expresses quadratic segments as cubics. Recover their control point
 // exactly and approximate other cubics to subtexel accuracy for the SDF solver.
-void appendSdfCurve(std::vector<stbtt_vertex>& vertices, const QPointF& start,
+void appendSdfCurve(std::vector<stbtt_vertex>& vertices, int unitsPerPixel, const QPointF& start,
                     const QPointF& a, const QPointF& b, const QPointF& end) {
     const auto first = (3 * a - start) / 2;
     const auto second = (3 * b - end) / 2;
     if ((first - second).manhattanLength() <= 0.75) {
-        vertices.push_back(vertex(STBTT_vcurve, end, (first + second) / 2));
+        vertices.push_back(vertex(unitsPerPixel, STBTT_vcurve, end, (first + second) / 2));
         return;
     }
 
@@ -71,11 +68,11 @@ void appendSdfCurve(std::vector<stbtt_vertex>& vertices, const QPointF& start,
     const auto innerLeft = (left + center) / 2;
     const auto innerRight = (center + right) / 2;
     const auto mid = (innerLeft + innerRight) / 2;
-    appendSdfCurve(vertices, start, left, innerLeft, mid);
-    appendSdfCurve(vertices, mid, innerRight, right, end);
+    appendSdfCurve(vertices, unitsPerPixel, start, left, innerLeft, mid);
+    appendSdfCurve(vertices, unitsPerPixel, mid, innerRight, right, end);
 }
 
-std::vector<stbtt_vertex> outlineVertices(const QPainterPath& outline, qreal scale, bool sdf) {
+std::vector<stbtt_vertex> outlineVertices(const QPainterPath& outline, qreal scale, int unitsPerPixel, bool sdf) {
     auto vertices = std::vector<stbtt_vertex>{};
     vertices.reserve(outline.elementCount());
     auto start = QPointF{};
@@ -85,46 +82,48 @@ std::vector<stbtt_vertex> outlineVertices(const QPainterPath& outline, qreal sca
         const auto element = outline.elementAt(i);
         const auto point = QPointF(element) * scale;
         if (element.isMoveTo()) {
-            if (previous != start) vertices.push_back(vertex(STBTT_vline, start));
-            vertices.push_back(vertex(STBTT_vmove, point));
+            if (previous != start) vertices.push_back(vertex(unitsPerPixel, STBTT_vline, start));
+            vertices.push_back(vertex(unitsPerPixel, STBTT_vmove, point));
             start = previous = point;
         } else if (element.isLineTo()) {
-            vertices.push_back(vertex(STBTT_vline, point));
+            vertices.push_back(vertex(unitsPerPixel, STBTT_vline, point));
             previous = point;
         } else if (element.isCurveTo()) {
             const auto control = QPointF(outline.elementAt(++i)) * scale;
             const auto end = QPointF(outline.elementAt(++i)) * scale;
-            if (sdf) appendSdfCurve(vertices, previous, point, control, end);
-            else vertices.push_back(vertex(STBTT_vcubic, end, point, control));
+            if (sdf) appendSdfCurve(vertices, unitsPerPixel, previous, point, control, end);
+            else vertices.push_back(vertex(unitsPerPixel, STBTT_vcubic, end, point, control));
             previous = end;
         }
     }
 
-    if (previous != start) vertices.push_back(vertex(STBTT_vline, start));
+    if (previous != start) vertices.push_back(vertex(unitsPerPixel, STBTT_vline, start));
     return vertices;
 }
 
-GlyphMask rasterize(const QPainterPath& outline, qreal scale, QPointF phase, bool sdf) {
+GlyphMask rasterize(const QPainterPath& outline, qreal scale, QPointF phase, const SdfSettings* sdf) {
     const auto bounds = QTransform::fromScale(scale, scale).mapRect(outline.controlPointRect());
     // Bound both allocations and work for unusual glyphs from user fonts.
-    const auto limit = 256;
+    const auto unitsPerPixel = sdf ? sdf->unitsPerPixel : SdfSettings{}.unitsPerPixel;
+    // The quadratic control point can reach up to twice the cubic's extent.
+    constexpr auto limit = 16383.0 / MaximumSdfSettings.unitsPerPixel;
     if (bounds.isEmpty() || !QRectF(-limit, -limit, 2 * limit, 2 * limit).contains(bounds)
         || outline.elementCount() > 1024) return {};
     const auto rect = bounds.translated(phase).toAlignedRect();
-    if (rect.width() > limit || rect.height() > limit) return {};
-    auto vertices = outlineVertices(outline, scale, sdf);
+    if (rect.width() > 256 || rect.height() > 256) return {};
+    auto vertices = outlineVertices(outline, scale, unitsPerPixel, sdf != nullptr);
     if (vertices.empty() || vertices.size() > 1536) return {};
 
-    auto pixels = QImage(
-        rect.size() + (sdf ? QSize(sdfPadding * 2, sdfPadding * 2) : QSize(0, 0)),
-        QImage::Format_Alpha8);
+    const auto padding = sdf ? sdf->padding : 0;
+    const auto atlasRect = rect.adjusted(-padding, -padding, padding, padding);
+    auto pixels = QImage(atlasRect.size(), QImage::Format_Alpha8);
     if (pixels.isNull()) return {};
+
     if (sdf) {
-        const auto atlasRect = rect.adjusted(-sdfPadding, -sdfPadding, sdfPadding, sdfPadding);
         const auto data = std::unique_ptr<unsigned char, decltype(&std::free)>{stbtt__GetShapeSDF(
-            vertices.data(), int(vertices.size()), float(1 / unitsPerPixel),
+            vertices.data(), int(vertices.size()), 1.0f / float(unitsPerPixel),
             atlasRect.x(), atlasRect.y(), atlasRect.right() + 1, atlasRect.bottom() + 1,
-            127, float(distancePerTexel), nullptr), &std::free};
+            127, float(sdf->distancePerTexel), nullptr), &std::free};
         if (!data) return {};
         for (auto y = 0; y < pixels.height(); ++y) {
             std::memcpy(pixels.scanLine(y), data.get() + y * pixels.width(), size_t(pixels.width()));
@@ -133,10 +132,10 @@ GlyphMask rasterize(const QPainterPath& outline, qreal scale, QPointF phase, boo
     }
 
     pixels.fill(0);
-    auto bitmap = stbtt__bitmap{pixels.width(), pixels.height(), int(pixels.bytesPerLine()), pixels.bits()};
+    auto bitmap = stbtt__bitmap{ pixels.width(), pixels.height(), int(pixels.bytesPerLine()), pixels.bits()};
     stbtt_Rasterize(
-        &bitmap, 0.35f, vertices.data(), int(vertices.size()), float(1 / unitsPerPixel),
-        float(1 / unitsPerPixel), float(phase.x()), float(phase.y()), rect.x(), rect.y(), 1, nullptr);
+        &bitmap, 0.35f, vertices.data(), int(vertices.size()), 1.0f / float(unitsPerPixel),
+        1.0f / float(unitsPerPixel), float(phase.x()), float(phase.y()), rect.x(), rect.y(), 1, nullptr);
     return {std::move(pixels), rect.topLeft()};
 }
 
@@ -155,23 +154,42 @@ qreal sampleDistance(const QImage& pixels, qreal x, qreal y) {
 }
 
 GlyphMask glyphBitmap(const QPainterPath& outline, qreal scale, QPointF phase) {
-    return rasterize(outline, scale, phase, false);
+    return rasterize(outline, scale, phase, nullptr);
 }
 
-GlyphMask glyphSdf(const QPainterPath& outline, qreal scale) {
-    return rasterize(outline, scale, {}, true);
+SdfSettings validatedSdfSettings(SdfSettings settings) {
+    constexpr auto defaults = SdfSettings{};
+    const auto min = MinimumSdfSettings;
+    const auto max = MaximumSdfSettings;
+    settings.textWeight = std::isfinite(settings.textWeight)
+        ? std::clamp(settings.textWeight, min.textWeight, max.textWeight) : defaults.textWeight;
+    settings.unitsPerPixel = std::clamp(settings.unitsPerPixel, min.unitsPerPixel, max.unitsPerPixel);
+    settings.distancePerTexel = std::isfinite(settings.distancePerTexel)
+        ? std::clamp(settings.distancePerTexel, min.distancePerTexel, max.distancePerTexel) : defaults.distancePerTexel;
+    settings.padding = std::clamp(settings.padding, min.padding, max.padding);
+    return settings;
 }
 
-GlyphMask sampleGlyphSdf(const GlyphMask& sdf, qreal scale, QPointF phase) {
+GlyphMask glyphSdf(const QPainterPath& outline, qreal scale, const SdfSettings& settings) {
+    return rasterize(outline, scale, {}, &settings);
+}
+
+qreal sdfAtlasScale(qreal pixelSize, qreal deviceScale, const SdfSettings& settings) {
+    // Limit downsampling so the coverage ramp reaches zero at the exterior.
+    const auto maxDownsample = std::min(4.0, 127.5 / (settings.distancePerTexel * settings.textWeight * settings.textWeight));
+    return std::min(64.0 / pixelSize, maxDownsample * deviceScale);
+}
+
+GlyphMask sampleGlyphSdf(const GlyphMask& sdf, qreal scale, QPointF phase, const SdfSettings& settings) {
     const auto bounds = QRectF(QPointF(sdf.origin) * scale + phase, QSizeF(sdf.pixels.size()) * scale).toAlignedRect();
     auto pixels = QImage(bounds.size(), QImage::Format_Alpha8);
     if (pixels.isNull()) return {};
 
     // CPU version of PlugData's superSDF shader. Use the same four samples
     // per device pixel and the same edge weight before compositing in Qt.
-    const auto slope = scale / (0.75 * distancePerTexel);
+    const auto slope = scale / (settings.textWeight * settings.distancePerTexel);
     const auto coverage = [&](qreal x, qreal y) {
-        return std::clamp((sampleDistance(sdf.pixels, x, y) - 127.5) * slope + 0.75, 0.0, 1.0);
+        return std::clamp((sampleDistance(sdf.pixels, x, y) - 127.5) * slope + settings.textWeight, 0.0, 1.0);
     };
     const auto quarterPixel = 0.25 / scale;
     for (auto y = 0; y < pixels.height(); ++y) {

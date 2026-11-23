@@ -37,14 +37,18 @@ class FontGlyphBuilder {
 
     size_t m_x;
     size_t m_y;
+    float m_displayScale;
+    float m_displayOffset;
 
   public:
-    FontGlyphBuilder(size_t maxAscend, size_t cellSize, size_t margin, FontTexture &texture);
+    FontGlyphBuilder(size_t maxAscend, size_t cellSize, size_t margin, FontTexture &texture,
+                     float displayScale = 1, float displayOffset = 0);
 
-    FontGlyph createGlyph(size_t left, size_t top, size_t width, size_t height, size_t advance, const char *glyphBuffer, size_t pitch);
+    FontGlyph createGlyph(ptrdiff_t left, ptrdiff_t top, size_t width, size_t height, size_t advance,
+                          const char *glyphBuffer, ptrdiff_t pitch);
 
   private:
-    void drawGlyph(size_t left, size_t top, size_t width, size_t height, const char *glyphBuffer, size_t pitch);
+    void drawGlyph(ptrdiff_t left, ptrdiff_t top, size_t width, size_t height, const char *glyphBuffer, ptrdiff_t pitch);
 };
 } // namespace Renderer
 } // namespace TrenchBroom

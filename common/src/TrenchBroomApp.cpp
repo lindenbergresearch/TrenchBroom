@@ -23,6 +23,7 @@
 
 #include "Error.h"
 #include "Exceptions.h"
+#include "FontStashPreferences.h"
 #include "IO/DiskIO.h"
 #include "IO/PathInfo.h"
 #include "IO/PathQt.h"
@@ -52,6 +53,7 @@
 #include "View/Preferences/PreferenceDialog.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Theme/TrenchBroomProxyStyle.h"
+#include "View/Theme/WidgetTextPaint.h"
 #include "View/App/RecentDocuments.h"
 #include "View/App/WelcomeWindow.h"
 
@@ -245,6 +247,11 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     });
     m_themeConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect([this](const auto& path) {
         if (ThemeManager::isRelevantPreference(path)) queueThemeRefresh();
+        if (path == fontStashPreference().path()) {
+            for (auto* widget : QApplication::allWidgets()) {
+                if (widget->isVisible()) widget->update();
+            }
+        }
     });
     m_themeWatcher = new QFileSystemWatcher{this};
     connect(m_themeWatcher, &QFileSystemWatcher::fileChanged, this, [this] { queueThemeRefresh(); });
@@ -664,7 +671,7 @@ bool TrenchBroomApp::notify(QObject *receiver, QEvent *event) {
 #ifdef _MSC_VER
     __try
     {
-      return QApplication::notify(receiver, event);
+      return View::notifyWidgetTextPaint(*this, receiver, event);
 
       // We have to choose between capturing the stack trace (using __try/__except) and
       // getting the C++ exception object (using C++ try/catch) - take the stack trace.
@@ -676,7 +683,7 @@ bool TrenchBroomApp::notify(QObject *receiver, QEvent *event) {
     }
 #else
     try {
-        return QApplication::notify(receiver, event);
+        return View::notifyWidgetTextPaint(*this, receiver, event);
     } catch (const std::exception &e) {
         // Unfortunately we can't portably get the stack trace of the exception itself
         TrenchBroom::View::reportCrashAndExit("<uncaught exception>", SignalType(0xEC, "SIGEXCEPT", e.what()));

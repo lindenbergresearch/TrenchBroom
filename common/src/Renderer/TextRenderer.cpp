@@ -296,7 +296,7 @@ void TextRenderer::render(EntryCollection &collection, RenderContext &renderCont
     glAssert(glEnable(GL_TEXTURE_2D));
 
     ActiveShader textShader(renderContext.shaderManager(), Shaders::ColoredTextShader);
-    textShader.set("Texture", 0);
+    font.setShaderUniforms(textShader);
     font.activate();
     collection.textArray.render(PrimType::Quads);
     font.deactivate();

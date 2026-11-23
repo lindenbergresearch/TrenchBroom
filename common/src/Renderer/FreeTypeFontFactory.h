@@ -48,6 +48,8 @@ class FreeTypeFontFactory : public FontFactory {
     std::pair<FT_Face, IO::BufferedReader> loadFont(const FontDescriptor &fontDescriptor);
 
     std::unique_ptr<TextureFont> buildFont(FT_Face face, unsigned char firstChar, unsigned char charCount,size_t lineHeightOffs);
+    std::unique_ptr<TextureFont> buildSdfFont(FT_Face face, unsigned char firstChar, unsigned char charCount,
+                                              const Metrics& metrics);
 
     Metrics computeMetrics(FT_Face face, unsigned char firstChar, unsigned char charCount,size_t lineHeightOffs) const;
 };

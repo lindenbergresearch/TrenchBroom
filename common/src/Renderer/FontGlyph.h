@@ -32,9 +32,11 @@ class FontGlyph {
     float m_w;
     float m_h;
     int m_a;
+    float m_displayScale;
+    float m_displayOffset;
 
   public:
-    FontGlyph(size_t x, size_t y, size_t w, size_t h, size_t a);
+    FontGlyph(size_t x, size_t y, size_t w, size_t h, size_t a, float displayScale = 1, float displayOffset = 0);
 
     void appendVertices(std::vector<vm::vec2f> &vertices, int xOffset, int yOffset, size_t textureSize, bool clockwise) const;
 

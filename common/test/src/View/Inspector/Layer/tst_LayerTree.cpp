@@ -1079,7 +1079,7 @@ TEST_CASE("Layer text widgets are reused across many scene rows", "[LayerTree][l
 }
 
 TEST_CASE_METHOD(LayerTreeTest, "The Layer toolbar switches only the detail text rasterizer", "[LayerTree][layer-detail-renderer]") {
-    const auto restore = TemporarilySetPref{layerDetailTextRendererPreference(), int(LayerDetailTextRenderer::Qt)};
+    const auto restore = TemporarilySetPref{layerDetailTextRendererPreference(), int(LayerDetailTextRenderer::Application)};
     auto* button = editor->findChild<QToolButton*>("layerDetailTextRenderer");
     REQUIRE(button);
     REQUIRE(button->menu());
@@ -1092,9 +1092,13 @@ TEST_CASE_METHOD(LayerTreeTest, "The Layer toolbar switches only the detail text
     auto* qt = actionFor(LayerDetailTextRenderer::Qt);
     auto* bitmap = actionFor(LayerDetailTextRenderer::FontStashBitmap);
     auto* sdf = actionFor(LayerDetailTextRenderer::FontStashSdf);
+    auto* application = actionFor(LayerDetailTextRenderer::Application);
     REQUIRE(qt);
     REQUIRE(bitmap);
     REQUIRE(sdf);
+    REQUIRE(application);
+    CHECK(application->isChecked());
+    qt->trigger();
     CHECK(qt->isChecked());
 
     tree->setStyleSheet(R"(

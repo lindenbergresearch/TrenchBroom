@@ -51,7 +51,7 @@ void TextEntityRenderer::renderVertexCache(VertexCache &vertexCache, RenderConte
     glAssert(glEnable(GL_TEXTURE_2D));
 
     ActiveShader textShader(renderContext.shaderManager(), Shaders::ColoredTextShader);
-    textShader.set("Texture", 0);
+    font.setShaderUniforms(textShader);
     font.activate();
     vertexCache.m_textVertices.render(PrimType::Quads);
     font.deactivate();
