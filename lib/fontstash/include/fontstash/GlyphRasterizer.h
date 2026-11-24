@@ -32,7 +32,6 @@ struct GlyphMask {
     QPoint origin;
 };
 
-GlyphMask glyphBitmap(const QPainterPath& outline, qreal scale, QPointF phase);
 GlyphMask glyphSdf(const QPainterPath& outline, qreal scale, const SdfSettings& settings = {});
 
 // Convert the atlas texels to coverage at the target device's pixel centers.

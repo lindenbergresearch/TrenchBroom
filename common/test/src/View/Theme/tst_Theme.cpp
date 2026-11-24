@@ -188,8 +188,8 @@ TEST_CASE("Theme JSON diagnostics reject schema and syntax errors", "[theme]") {
 }
 
 TEST_CASE("The shipped stylesheet and theme compile with existing preferences", "[theme]") {
-    const TemporarilySetPref minimum{Preferences::UIFontMinimumSize, 17};
-    const TemporarilySetPref size{Preferences::UIFontSize, 13};
+    const TemporarilySetPref minimum{Preferences::UIFontMinimumSize, 17.0f};
+    const TemporarilySetPref size{Preferences::UIFontSize, 13.0f};
     const TemporarilySetPref opacity{Preferences::UIDetailTextOpacity, 0.6f};
     const QFont font{"Inter"};
     ThemeSnapshot theme;

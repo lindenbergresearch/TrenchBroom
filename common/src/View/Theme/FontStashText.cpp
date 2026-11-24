@@ -7,8 +7,6 @@
 #include <QPointer>
 #include <QTextLayout>
 
-#include <optional>
-
 namespace TrenchBroom::View {
 namespace {
 
@@ -17,15 +15,14 @@ struct GlyphKey {
     quint32 index;
     qreal scale;
     QPointF phase;
-    std::optional<FontStash::SdfSettings> sdf;
+    FontStash::SdfSettings sdf;
+    int rotation;
 
     bool operator==(const GlyphKey&) const = default;
 
     friend size_t qHash(const GlyphKey& key, size_t seed) {
-        auto hash = qHashMulti(seed, key.font, key.index, key.scale, key.phase.x(), key.phase.y());
-        if (const auto& sdf = key.sdf)
-            hash = qHashMulti(hash, sdf->textWeight, sdf->unitsPerPixel, sdf->distancePerTexel, sdf->padding);
-        return hash;
+        return qHashMulti(seed, key.font, key.index, key.scale, key.phase.x(), key.phase.y(), key.rotation,
+            key.sdf.textWeight, key.sdf.unitsPerPixel, key.sdf.distancePerTexel, key.sdf.padding);
     }
 };
 
@@ -39,13 +36,14 @@ class GlyphCache : public QObject {
     }
 
     FontStashGlyph field(const GlyphKey& key) {
-        auto atlasSettings = *key.sdf;
+        auto atlasSettings = key.sdf;
         const auto atlasScale = FontStash::sdfAtlasScale(key.font.pixelSize(), key.scale, atlasSettings);
         // Weight affects sampling. Distance, padding and precision affect the field itself.
         atlasSettings.textWeight = FontStash::SdfSettings{}.textWeight;
-        const auto atlasKey = GlyphKey{key.font, key.index, atlasScale, {}, atlasSettings};
+        const auto atlasKey = GlyphKey{key.font, key.index, atlasScale, {}, atlasSettings, key.rotation};
         if (const auto* glyph = m_atlas.object(atlasKey)) return *glyph;
-        const auto outline = key.font.pathForGlyph(key.index);
+        auto outline = key.font.pathForGlyph(key.index);
+        if (key.rotation != 0) outline = QTransform().rotate(key.rotation).map(outline);
         const auto glyph = FontStashGlyph{FontStash::glyphSdf(outline, atlasScale, atlasSettings), outline.isEmpty()};
         insert(m_atlas, atlasKey, glyph);
         return glyph;
@@ -61,16 +59,10 @@ public:
 
     FontStashGlyph mask(const GlyphKey& key) {
         if (const auto* cached = m_masks.object(key)) return *cached;
-        auto glyph = FontStashGlyph{};
-        if (key.sdf) {
-            glyph = field(key);
-            if (!glyph.mask.pixels.isNull()) {
-                const auto scale = FontStash::sdfAtlasScale(key.font.pixelSize(), key.scale, *key.sdf);
-                glyph.mask = FontStash::sampleGlyphSdf(glyph.mask, key.scale / scale, key.phase, *key.sdf);
-            }
-        } else {
-            const auto outline = key.font.pathForGlyph(key.index);
-            glyph = {FontStash::glyphBitmap(outline, key.scale, key.phase), outline.isEmpty()};
+        auto glyph = field(key);
+        if (!glyph.mask.pixels.isNull()) {
+            const auto scale = FontStash::sdfAtlasScale(key.font.pixelSize(), key.scale, key.sdf);
+            glyph.mask = FontStash::sampleGlyphSdf(glyph.mask, key.scale / scale, key.phase, key.sdf);
         }
         insert(m_masks, key, glyph);
         return glyph;
@@ -99,18 +91,18 @@ void compositeGlyph(QImage& image, const FontStash::GlyphMask& glyph, const QRec
 } // namespace
 
 FontStashGlyph fontStashGlyph(const QRawFont& font, quint32 glyph, QPointF baseline,
-                            qreal deviceScale, const FontStash::SdfSettings* sdf) {
+                            qreal deviceScale, const FontStash::SdfSettings& sdf, int rotation) {
     const auto position = QPointF(qRound(baseline.x() * 4) / 4.0, qRound(baseline.y() * 4) / 4.0);
     const auto origin = QPoint(qFloor(position.x()), qFloor(position.y()));
     const auto phase = position - QPointF(origin);
-    auto result = glyphCache().mask({font, glyph, deviceScale, phase, sdf ? std::optional{*sdf} : std::nullopt});
+    auto result = glyphCache().mask({font, glyph, deviceScale, phase, sdf, rotation});
     result.mask.origin += origin;
     return result;
 }
 
 QImage fontStashTextLine(const QPaintDevice& fontDevice, const QString& text, const QFont& font,
                          QColor color, const QRectF& content, QSize imageSize, qreal deviceScale,
-                         Qt::Alignment alignment, const FontStash::SdfSettings* sdf) {
+                         Qt::Alignment alignment, const FontStash::SdfSettings& sdf) {
     if (text.isEmpty() || content.isEmpty()) return {};
     auto layout = QTextLayout(text, font, &fontDevice);
     auto options = QTextOption(alignment);

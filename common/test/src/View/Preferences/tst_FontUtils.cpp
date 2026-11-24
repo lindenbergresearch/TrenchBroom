@@ -18,6 +18,7 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFontDatabase>
+#include <QFontInfo>
 #include <QFontMetricsF>
 #include <QImage>
 #include <QLabel>
@@ -50,8 +51,8 @@ namespace {
 class FontSettingsScope {
     const std::filesystem::path m_path = pref(Preferences::UIFontPath);
     const bool m_global = pref(Preferences::UIGlobalTypography);
-    const int m_size = pref(Preferences::UIFontSize);
-    const int m_minimum = pref(Preferences::UIFontMinimumSize);
+    const float m_size = pref(Preferences::UIFontSize);
+    const float m_minimum = pref(Preferences::UIFontMinimumSize);
     const float m_opacity = pref(Preferences::UIDetailTextOpacity);
     const int m_weight = pref(Preferences::UIListFontWeight);
     const float m_opticalSize = pref(Preferences::UIListOpticalSize);
@@ -62,9 +63,9 @@ public:
     FontSettingsScope() {
         auto& prefs = PreferenceManager::instance();
         prefs.set(Preferences::UIGlobalTypography, false);
-        prefs.set(Preferences::UIFontSize, 13);
+        prefs.set(Preferences::UIFontSize, 13.0f);
         prefs.set(Preferences::UIDetailTextOpacity, 0.8f);
-        prefs.set(Preferences::UIFontMinimumSize, 11);
+        prefs.set(Preferences::UIFontMinimumSize, 11.0f);
         prefs.set(Preferences::UIListFontWeight, 0);
         prefs.set(Preferences::UIListOpticalSize, 0.0f);
         prefs.set(Preferences::UIListTypoLineMetrics, false);
@@ -114,11 +115,11 @@ private:
 };
 }
 
-TEST_CASE_METHOD(FontSettingsScope, "UI font roles respect the saved minimum and pixel sizes", "[fonts]") {
+TEST_CASE_METHOD(FontSettingsScope, "UI font roles respect the saved minimum and preserve point sizes", "[fonts]") {
     CHECK(uiFontPixelSize() == 13);
     CHECK(uiFontPixelSize(-2) == 11);
     CHECK(uiFontPixelSize(-20) == 11);
-    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 16);
+    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 16.0f);
     CHECK(uiFontPixelSize() == 16);
     CHECK(uiFontPixelSize(5) == 18);
 
@@ -128,21 +129,21 @@ TEST_CASE_METHOD(FontSettingsScope, "UI font roles respect the saved minimum and
     pixels.setItalic(true);
     pixels.setUnderline(true);
     const auto adjusted = adjustedFont(pixels, -3);
-    CHECK(adjusted.pixelSize() == 19);
+    CHECK(adjusted.pointSizeF() == Approx(std::max(16.0, QFontInfo(pixels).pointSizeF() - 3)));
     CHECK(adjusted.weight() == pixels.weight());
     CHECK(adjusted.italic());
     CHECK(adjusted.underline());
     CHECK(adjusted.family() == pixels.family());
     CHECK(detailFont(pixels, 3).weight() == QFont::Normal);
-    CHECK(detailFont(pixels, 100).pixelSize() == 16);
+    CHECK(detailFont(pixels, 100).pointSizeF() == 16);
     CHECK(pixels.pixelSize() == 22);
 
     QFont points;
     points.setPointSizeF(22.5);
     points.setItalic(true);
     const auto normalized = adjustedFont(points, 0);
-    REQUIRE(normalized.pixelSize() > 16);
-    CHECK(detailFont(points, 2).pixelSize() == normalized.pixelSize() - 2);
+    CHECK(normalized.pointSizeF() == Approx(22.5));
+    CHECK(detailFont(points, 2).pointSizeF() == Approx(20.5));
     CHECK(normalized.italic());
     CHECK(points.pointSizeF() == Approx(22.5));
 }
@@ -151,8 +152,8 @@ TEST_CASE_METHOD(FontSettingsScope, "A missing font preserves requested size and
     QTemporaryDir directory;
     REQUIRE(directory.isValid());
     const auto file = IO::pathFromQString(directory.filePath("late-font.otf"));
-    CHECK(loadFont(file, 19).pixelSize() == 19);
-    CHECK(loadFont(file, 25).pixelSize() == 25);
+    CHECK(loadFont(file, 19).pointSizeF() == 19);
+    CHECK(loadFont(file, 25).pointSizeF() == 25);
 
     REQUIRE(QFile::copy(IO::pathAsQString(fontFile("Inter-SemiBold.otf")), IO::pathAsQString(file)));
     const QRawFont expected(IO::pathAsQString(file), 19);
@@ -195,10 +196,10 @@ TEST_CASE_METHOD(FontSettingsScope, "Existing small labels and headings follow l
     QLabel title("Existing heading");
     makeItalic(makeSmall(&detail));
     setTextStyleRole(&title,"dialogTitle");
-    CHECK(detail.font().pixelSize() == 11);
+    CHECK(detail.font().pixelSize() == 12);
     CHECK(title.font().pixelSize() == 20);
 
-    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 16);
+    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 16.0f);
     const auto system = loadFont("[system]", 16);
     applyTypography(system);
     CHECK(detail.font().pixelSize() == 16);
@@ -208,9 +209,9 @@ TEST_CASE_METHOD(FontSettingsScope, "Existing small labels and headings follow l
     CHECK(title.font().pixelSize() == 24);
     CHECK(title.font().bold());
 
-    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 11);
+    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 11.0f);
     applyTypography(inter);
-    CHECK(detail.font().pixelSize() == 11);
+    CHECK(detail.font().pixelSize() == 12);
     CHECK(detail.font().family() == inter.family());
     CHECK(detail.font().italic());
     CHECK(title.font().pixelSize() == 20);
@@ -232,14 +233,14 @@ TEST_CASE_METHOD(FontSettingsScope, "File fonts retain their own face when the f
         auto loaded = loadFont(source, 18);
         const auto actual = QRawFont::fromFont(loaded);
         REQUIRE(actual.isValid());
-        CHECK(loaded.pixelSize() == 18);
+        CHECK(loaded.pointSizeF() == 18);
         CHECK(actual.familyName() == expected.familyName());
         CHECK(actual.weight() == expected.weight());
         CHECK(actual.style() == expected.style());
 
         loaded.setPixelSize(31);
         const auto smaller = loadFont(source.parent_path() / "." / source.filename(), 14);
-        CHECK(smaller.pixelSize() == 14);
+        CHECK(smaller.pointSizeF() == 14);
         CHECK(QRawFont::fromFont(smaller).weight() == expected.weight());
     }
 
@@ -247,7 +248,7 @@ TEST_CASE_METHOD(FontSettingsScope, "File fonts retain their own face when the f
     const QFontDatabase database;
     REQUIRE(database.hasFamily(family));
     CHECK(loadFont(IO::pathFromQString(family), 17).family() == family);
-    CHECK(loadFont(IO::pathFromQString(family), 17).pixelSize() == 17);
+    CHECK(loadFont(IO::pathFromQString(family), 17).pointSizeF() == 17);
 }
 
 TEST_CASE_METHOD(FontSettingsScope, "Font changes resize existing widget list rows", "[fonts]") {
@@ -304,7 +305,7 @@ TEST_CASE_METHOD(FontSettingsScope, "Tree details use the minimum font and saved
     QStyleOptionViewItem option;
     option.text = "Title";
     option.font.setPointSizeF(12.5);
-    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 16);
+    PreferenceManager::instance().set(Preferences::UIFontMinimumSize, 16.0f);
     const auto minimumTextHeight = QFontMetricsF(option.font).height() + QFontMetricsF(detailFont(option.font)).height();
     CHECK(renderer.sizeHint(option, index).height() >= int(std::ceil(minimumTextHeight)));
 
@@ -447,8 +448,8 @@ TEST_CASE_METHOD(FontSettingsScope, "Font comparison stages the selected font an
     const auto title = selected->property("previewTitleFont").value<QFont>();
     const auto detail = selected->property("previewDetailFont").value<QFont>();
     CHECK(title.family() == "Inter Variable");
-    CHECK(title.pixelSize() == 16);
-    CHECK(detail.pixelSize() == 15);
+    CHECK(title.pointSizeF() == 16);
+    CHECK(detail.pointSizeF() == 15);
     CHECK(title.variableAxisValue("wght") == 450);
     CHECK(detail.variableAxisValue("wght") == 450);
     CHECK(title.variableAxisValue("opsz") == 24);
@@ -522,7 +523,7 @@ TEST_CASE_METHOD(FontSettingsScope, "Global typography respects styled weights a
         CAPTURE(widget->metaObject()->className());
         CHECK(widget->font().variableAxisValue("wght") == 450);
         CHECK(widget->font().variableAxisValue("opsz") == 24);
-        CHECK(widget->font().pixelSize() == 16);
+        CHECK(widget->font().pointSizeF() == 16);
         CHECK(bool(widget->font().styleStrategy() & QFont::PreferTypoLineMetrics));
     }
     CHECK(bold->font().weight() == QFont::Bold);

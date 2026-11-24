@@ -2,6 +2,8 @@
 
 #include <QApplication>
 #include <QEvent>
+#include <QImage>
+#include <QPainter>
 
 #ifdef TB_QT_WIDGET_FONTSTASH
 #include "FontStashPreferences.h"
@@ -15,7 +17,9 @@
 #include <private/qrawfont_p.h>
 #include <private/qwidget_p.h>
 
+#include <cmath>
 #include <cstring>
+#include <optional>
 #endif
 
 namespace TrenchBroom::View {
@@ -25,6 +29,28 @@ thread_local bool useQtText = false;
 
 #ifdef TB_QT_WIDGET_FONTSTASH
 
+struct GlyphTransform {
+    qreal scale;
+    int rotation;
+};
+
+std::optional<GlyphTransform> glyphTransform(const QTransform& matrix, const QFontEngine& engine) {
+    if (useQtText || engine.isColorFont() || engine.type() == QFontEngine::Multi
+        || (engine.fontDef.styleStrategy & QFont::NoAntialias)
+        || !engine.isSmoothlyScalable || !matrix.isAffine()) return {};
+
+    const auto quarterTurn = qFuzzyIsNull(matrix.m11()) && qFuzzyIsNull(matrix.m22())
+        && qFuzzyCompare(matrix.m12(), -matrix.m21());
+    const auto axesAligned = qFuzzyIsNull(matrix.m12()) && qFuzzyIsNull(matrix.m21())
+        && qFuzzyCompare(matrix.m11(), matrix.m22());
+    const auto scale = std::abs(quarterTurn ? matrix.m12() : matrix.m11());
+    if ((!quarterTurn && !axesAligned) || scale <= 0
+        || engine.fontDef.pixelSize <= 0 || engine.fontDef.pixelSize * scale > 256) return {};
+
+    const auto rotation = quarterTurn ? (matrix.m12() < 0 ? -90 : 90) : (matrix.m11() < 0 ? 180 : 0);
+    return GlyphTransform{scale, rotation};
+}
+
 class WidgetTextEngine : public QRasterPaintEngine {
     FontStash::SdfSettings m_settings;
 
@@ -32,13 +58,16 @@ public:
     WidgetTextEngine(QPaintDevice& device, const FontStash::SdfSettings& settings)
         : QRasterPaintEngine(&device), m_settings(settings) {}
 
+    bool shouldDrawCachedGlyphs(QFontEngine* engine, const QTransform& matrix) const override {
+        // Some Qt font engines decline bitmap caching for rotated text, but
+        // FontStash can rasterize their outlines with the rotation applied.
+        return glyphTransform(matrix, *engine).has_value()
+            || QRasterPaintEngine::shouldDrawCachedGlyphs(engine, matrix);
+    }
+
     bool drawCachedGlyphs(int count, const glyph_t* glyphs, const QFixedPoint* positions, QFontEngine* engine) override {
-        const auto& matrix = state()->matrix;
-        const auto scale = matrix.m11();
-        if (useQtText || engine->isColorFont() || engine->type() == QFontEngine::Multi
-            || (engine->fontDef.styleStrategy & QFont::NoAntialias)
-            || matrix.type() > QTransform::TxScale || scale <= 0 || !qFuzzyCompare(scale, matrix.m22())
-            || engine->fontDef.pixelSize <= 0 || engine->fontDef.pixelSize * scale > 256) {
+        const auto transform = glyphTransform(state()->matrix, *engine);
+        if (!transform) {
             return QRasterPaintEngine::drawCachedGlyphs(count, glyphs, positions, engine);
         }
 
@@ -47,9 +76,10 @@ public:
         auto font = QRawFont{};
         QRawFontPrivate::get(font)->setFontEngine(engine);
         for (auto i = 0; i < count; ++i) {
-            const auto glyph = fontStashGlyph(font, glyphs[i], positions[i].toPointF(), scale, &m_settings);
+            const auto glyph = fontStashGlyph(font, glyphs[i], positions[i].toPointF(),
+                transform->scale, m_settings, transform->rotation);
             if (glyph.mask.pixels.isNull()) {
-                QRasterPaintEngine::drawCachedGlyphs(1, glyphs + i, positions + i, engine);
+                if (!glyph.emptyOutline) QRasterPaintEngine::drawCachedGlyphs(1, glyphs + i, positions + i, engine);
                 continue;
             }
             const auto& pixels = glyph.mask.pixels;
@@ -100,6 +130,21 @@ bool widgetFontStashAvailable() {
 #else
     return false;
 #endif
+}
+
+void renderWidgetText(QWidget& widget, QImage& target, QWidget::RenderFlags flags) {
+    // QWidget::render with a painter uses that painter throughout its widget
+    // subtree. This also works for a label drawn inside another paint event.
+#ifdef TB_QT_WIDGET_FONTSTASH
+    if (widgetFontStashAvailable() && !useQtText && fontStashPreferences().enabled) {
+        auto device = WidgetTextDevice(target, fontStashPreferences().sdf);
+        auto painter = QPainter(&device);
+        widget.render(&painter, {}, {}, flags);
+        return;
+    }
+#endif
+    auto painter = QPainter(&target);
+    widget.render(&painter, {}, {}, flags);
 }
 
 bool notifyWidgetTextPaint(QApplication& app, QObject* receiver, QEvent* event) {

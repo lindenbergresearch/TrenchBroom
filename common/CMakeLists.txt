@@ -427,7 +427,6 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerEditor.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerInspector.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerListBox.cpp
-    ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerDetailText.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeItemRenderer.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeLayerRenderer.cpp
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeGroupRenderer.cpp
@@ -1008,7 +1007,6 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerEditor.h
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerInspector.h
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerListBox.h
-    ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerDetailText.h
     ${COMMON_SOURCE_DIR}/View/Inspector/Layer/LayerTreeItemRenderer.h
     ${COMMON_SOURCE_DIR}/View/Widgets/LimitedKeySequenceEdit.h
     ${COMMON_SOURCE_DIR}/View/Actions/MainMenuBuilder.h
@@ -1144,7 +1142,7 @@ target_link_libraries(common PUBLIC tinyxml2::tinyxml2 kdl vm GLEW::GLEW miniz::
 target_link_libraries(common PUBLIC fontstash-rasterizer)
 
 # Isolate the Qt-private paint hook from the rest of the application. SDKs
-# without these headers still support the SDF preview and Layer comparison.
+# without these headers still support SDF previews and OpenGL text.
 find_package(Qt6GuiPrivate ${Qt6_VERSION} EXACT QUIET)
 find_package(Qt6WidgetsPrivate ${Qt6_VERSION} EXACT QUIET)
 add_library(tb-widget-text-paint STATIC ${COMMON_SOURCE_DIR}/View/Theme/WidgetTextPaint.cpp)

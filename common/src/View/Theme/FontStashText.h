@@ -14,14 +14,12 @@ struct FontStashGlyph {
 };
 
 // The mask origin is in physical pixels, including the supplied baseline.
-// Pass a null settings pointer for the bitmap comparison mode.
 FontStashGlyph fontStashGlyph(const QRawFont& font, quint32 glyph, QPointF baseline,
-                             qreal deviceScale, const FontStash::SdfSettings* sdf);
+                             qreal deviceScale, const FontStash::SdfSettings& sdf, int rotation = 0);
 
-// Paint one shaped line into its own raster buffer. Used for the independent
-// Preferences samples and for the explicit Layer comparison modes.
+// Paint one shaped line into its own raster buffer for the Preferences sample.
 QImage fontStashTextLine(const QPaintDevice& fontDevice, const QString& text, const QFont& font,
                          QColor color, const QRectF& content, QSize imageSize, qreal deviceScale,
-                         Qt::Alignment alignment, const FontStash::SdfSettings* sdf);
+                         Qt::Alignment alignment, const FontStash::SdfSettings& sdf);
 
 } // namespace TrenchBroom::View

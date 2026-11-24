@@ -202,7 +202,7 @@ protected:
                 const auto elided = metrics.elidedText(text, Qt::ElideRight, row.width());
                 const auto pixels = QSize(qCeil(row.width() * ratio), qCeil(row.height() * ratio));
                 const auto image = fontStashTextLine(*this, elided, font, painter.pen().color(),
-                    QRectF(QPointF{}, row.size()), pixels, ratio, Qt::AlignLeft | Qt::AlignVCenter, &*m_sdf);
+                    QRectF(QPointF{}, row.size()), pixels, ratio, Qt::AlignLeft | Qt::AlignVCenter, *m_sdf);
                 if (!image.isNull()) {
                     painter.drawImage(row.topLeft(), image);
                     return;

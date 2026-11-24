@@ -10,7 +10,6 @@
 #include "View/Theme/ThemeManager.h"
 #include "TrenchBroomApp.h"
 #include "Preferences.h"
-#include "View/Inspector/Layer/LayerDetailText.h"
 #include "View/Preferences/FontUtils.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Theme/WidgetTextPaint.h"
@@ -19,7 +18,6 @@
 #include <QFontMetricsF>
 #include <QLabel>
 #include <QPainter>
-#include <QPixmap>
 #include <QStyle>
 #include <QTreeWidgetItem>
 
@@ -39,8 +37,7 @@ const std::array<const char*, LayerTreeItemDelegate::TypeCount> iconThemeNames{
     "color.icon.layer", "color.icon.group", "color.icon.entity", "color.icon.brush", "color.icon.patch"
 };
 
-void paintLabel(QPainter& painter, QLabel& label, const QRect& rect, qreal opacity = 1,
-                LayerDetailTextRenderer renderer = LayerDetailTextRenderer::Application) {
+void paintLabel(QPainter& painter, QLabel& label, const QRect& rect, qreal opacity = 1) {
     if (rect.isEmpty() || label.text().isEmpty()) return;
     const auto text = label.text();
     label.setGeometry(rect);
@@ -50,25 +47,15 @@ void paintLabel(QPainter& painter, QLabel& label, const QRect& rect, qreal opaci
     // viewport's painter. Isolate the widget paint at the target's actual
     // device scale before compositing it, without resizing a rasterized image.
     const auto ratio = painter.device()->devicePixelRatioF();
-    const auto detailImage = renderLayerDetailText(label, renderer, ratio);
-    if (!detailImage.isNull()) label.setText({});
-    QPixmap buffer(QSize(int(std::ceil(rect.width() * ratio)), int(std::ceil(rect.height() * ratio))));
+    auto buffer = QImage(QSize(int(std::ceil(rect.width() * ratio)), int(std::ceil(rect.height() * ratio))),
+        QImage::Format_ARGB32_Premultiplied);
     buffer.setDevicePixelRatio(ratio);
     buffer.fill(Qt::transparent);
-    if (renderer == LayerDetailTextRenderer::Application) {
-        label.render(&buffer, QPoint{}, QRegion{}, QWidget::DrawChildren);
-    } else {
-        const auto useQt = ScopedQtTextPaint{};
-        label.render(&buffer, QPoint{}, QRegion{}, QWidget::DrawChildren);
-    }
-    if (!detailImage.isNull()) {
-        auto bufferPainter = QPainter(&buffer);
-        bufferPainter.drawImage(QPoint{}, detailImage);
-    }
+    renderWidgetText(label, buffer, QWidget::DrawChildren);
     painter.save();
     painter.setClipRect(rect, Qt::IntersectClip);
     painter.setOpacity(painter.opacity() * opacity);
-    painter.drawPixmap(rect.topLeft(), buffer);
+    painter.drawImage(rect.topLeft(), buffer);
     painter.restore();
     label.setText(text);
 }
@@ -191,7 +178,7 @@ void LayerTreeItemRenderer::paint(QPainter &painter, const QStyleOptionViewItem 
         const auto opacity = std::clamp(
             layout.detailOpacity < 0 ? qreal(pref(Preferences::UIDetailTextOpacity)) : layout.detailOpacity, 0.0, 1.0);
         paintLabel(painter, detail, QRect(textX, textY + upperHeight + layout.lineSpacing, textWidth, detail.sizeHint().height()),
-            opacity, layerDetailTextRenderer());
+            opacity);
     }
 }
 

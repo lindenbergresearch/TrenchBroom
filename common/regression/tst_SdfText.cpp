@@ -7,6 +7,7 @@
 #include "Renderer/GL.h"
 #include "Renderer/Shaders.h"
 #include "Renderer/TextureFont.h"
+#include "View/Inspector/Layer/LayerTreeItemRenderer.h"
 #include "View/MapView/GLContextManager.h"
 #include "View/Preferences/ViewPreferencePane.h"
 #include "View/Theme/WidgetTextPaint.h"
@@ -15,16 +16,22 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QMenu>
 #include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QOpenGLFramebufferObject>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QScopeGuard>
 #include <QSpinBox>
+#include <QTabBar>
 #include <QTextEdit>
+#include <QToolButton>
+#include <QTreeWidget>
 #include <QVBoxLayout>
 #include <catch2/catch.hpp>
 
@@ -105,17 +112,43 @@ TEST_CASE("Qt widget SDF keeps native layout and editing", "[sdf-text]") {
     rich->setHtml("<b>Bold</b> and <i>italic</i>");
     auto* combo = new QComboBox(&panel);
     combo->addItem("Active texture");
-    const auto widgets = QList<QWidget*>{label, button, input, list, rich, combo};
+    auto* spin = new QSpinBox(&panel);
+    spin->setValue(128);
+    auto* check = new QCheckBox("Show selection", &panel);
+    auto* radio = new QRadioButton("Relative paths", &panel);
+    auto* group = new QGroupBox("Shape parameters", &panel);
+    auto* tool = new QToolButton(&panel);
+    tool->setText("Open inspector");
+    auto* tabs = new QTabBar(&panel);
+    tabs->setObjectName("HorizontalTabs");
+    tabs->addTab("Properties");
+    auto* sideTabs = new QTabBar(&panel);
+    sideTabs->setObjectName("VerticalTabs");
+    sideTabs->setShape(QTabBar::RoundedWest);
+    sideTabs->addTab("Inspector");
+    auto* richLabel = new QLabel("<b>Brush</b> · <i>6 faces</i>", &panel);
+    auto* layer = new QTreeWidget(&panel);
+    layer->setHeaderHidden(true);
+    layer->setItemDelegate(new LayerTreeItemDelegate(layer));
+    auto* row = new QTreeWidgetItem(layer, {QStringLiteral("World group")});
+    row->setData(0, LayerTreeItemDelegate::DetailRole, "32 entities and 11 brushes");
+    row->setData(0, LayerTreeItemDelegate::AddendumRole, "Active");
+    const auto widgets = QList<QWidget*>{
+        label, button, input, list, rich, combo, spin, check, radio, group, tool, tabs, sideTabs, richLabel, layer};
     for (auto* widget : widgets) layout->addWidget(widget);
-    panel.resize(420, 460);
+    auto menu = QMenu(&panel);
+    menu.setStyleSheet("QMenu::item { padding: 3px 24px; }");
+    menu.addAction("Focus &selection");
+    menu.resize(menu.sizeHint());
+    panel.resize(420, 850);
     layout->activate();
     {
         const auto useQt = ScopedQtTextPaint{};
         panel.grab();
     }
     const auto html = rich->toHtml();
-    for (auto* widget : widgets) {
-        CAPTURE(widget->metaObject()->className());
+    for (auto* widget : widgets + QList<QWidget*>{&menu}) {
+        CAPTURE(widget->metaObject()->className(), widget->objectName());
         const auto size = widget->size();
         const auto qt = [&] {
             const auto useQt = ScopedQtTextPaint{};
