@@ -224,16 +224,23 @@ void IconCatalog::assignNames(Logger& logger) {
     for (auto it = aliases.cbegin(); it != aliases.cend(); ++it) m_svgAliases.insert(it.key(), m_byName.value(it.value()));
 }
 
-QIcon IconCatalog::icon(const QString& name) const {
-    const auto it = m_byName.constFind(name);
-    if (it == m_byName.cend()) return {};
-    const auto index = it.value();
+VectorIcon IconCatalog::sourceIcon(qsizetype index) const {
     const auto& entry = m_entries[index];
-    if (!entry.svgPath.isEmpty()) return VectorIcon(pathFromQString(entry.svgPath)).icon();
+    if (!entry.svgPath.isEmpty()) return VectorIcon(pathFromQString(entry.svgPath));
     if (const auto* cached = m_glyphIcons.object(index)) return *cached;
-    const auto icon = VectorIcon::glyphIcon(entry.font, entry.glyph);
-    m_glyphIcons.insert(index, new QIcon(icon));
+    const auto icon = VectorIcon::fromGlyph(entry.font, entry.glyph);
+    m_glyphIcons.insert(index, new VectorIcon(icon));
     return icon;
+}
+
+QIcon IconCatalog::icon(const QString& name, const IconStyle& style, const QString& themeColor) const {
+    const auto it = m_byName.constFind(name);
+    return it == m_byName.cend() ? QIcon{} : sourceIcon(it.value()).styledIcon(style, themeColor);
+}
+
+QSize IconCatalog::sourceSize(const QString& name, int glyphExtent) const {
+    const auto it = m_byName.constFind(name);
+    return it == m_byName.cend() ? QSize{} : sourceIcon(it.value()).sourceSize(glyphExtent);
 }
 
 QString IconCatalog::canonicalName(const QString& nameOrPath) const {

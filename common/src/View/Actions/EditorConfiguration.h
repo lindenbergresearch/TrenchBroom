@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IO/IconStyle.h"
+
 #include <QJsonObject>
 #include <QKeySequence>
 #include <QMap>
@@ -16,6 +18,7 @@ enum class EditorToolbarArrangement { Sequential, Parallel };
 
 struct EditorActionDefinition {
     QString id, label, command, icon, tooltip, menuPath = "Editor Actions";
+    IO::IconStyle iconStyle;
     std::optional<QKeySequence> shortcut;
     int targets = EditorToolbarTarget;
     int order = 10000, toolbarGroup = 100;

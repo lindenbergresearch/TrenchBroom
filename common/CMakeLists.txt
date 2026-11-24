@@ -623,6 +623,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/IO/GameEngineConfigWriter.h
     ${COMMON_SOURCE_DIR}/IO/IdPakFileSystem.h
     ${COMMON_SOURCE_DIR}/IO/IconCatalog.h
+    ${COMMON_SOURCE_DIR}/IO/IconStyle.h
     ${COMMON_SOURCE_DIR}/IO/ImageFileSystem.h
     ${COMMON_SOURCE_DIR}/IO/ImageLoader.h
     ${COMMON_SOURCE_DIR}/IO/ImageLoaderImpl.h

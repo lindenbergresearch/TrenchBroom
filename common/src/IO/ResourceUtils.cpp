@@ -121,16 +121,16 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, const int size) {
     return VectorIcon(imagePath).icon();
 }
 
-QIcon loadIcon(const std::filesystem::path& nameOrPath, const int size) {
+QIcon loadIcon(const std::filesystem::path& nameOrPath, const int size, const IconStyle& style, const QString& themeColor) {
     if (size <= 0 || nameOrPath.empty()) return {};
     const auto name = pathAsGenericQString(nameOrPath);
     if (nameOrPath.has_parent_path() || name.startsWith(":/")
         || QFileInfo(name).suffix().compare("svg", Qt::CaseInsensitive) == 0) {
-        const auto icon = loadSVGIcon(nameOrPath, size);
+        const auto icon = VectorIcon(nameOrPath).styledIcon(style, themeColor);
         if (!icon.isNull()) return icon;
     }
     const auto& catalog = IconCatalog::instance();
-    return catalog.icon(catalog.canonicalName(name));
+    return catalog.icon(catalog.canonicalName(name), style, themeColor);
 }
 
 QCursor loadCursorFile(const std::filesystem::path &imagePath) {

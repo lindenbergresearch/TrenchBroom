@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "IO/IconStyle.h"
+
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -68,7 +70,8 @@ QCursor loadCursorFile(const std::filesystem::path &imagePath);
  */
 QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size);
 
-// Resolve a global icon name or a legacy SVG resource path.
-QIcon loadIcon(const std::filesystem::path& nameOrPath, int size);
+// Resolve a global icon name or a legacy SVG resource path. An optional theme
+// color is resolved at paint time and takes precedence over the style color.
+QIcon loadIcon(const std::filesystem::path& nameOrPath, int size, const IconStyle& style = {}, const QString& themeColor = {});
 
 } // namespace TrenchBroom::IO

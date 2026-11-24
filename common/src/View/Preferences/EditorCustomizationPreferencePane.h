@@ -19,6 +19,7 @@ class EditorCustomizationPreferencePane : public PreferencePane {
     bool m_toolbarMode, m_loading = false, m_dirty = false, m_shortcutDirty = false;
     QString m_currentId;
     EditorConfiguration m_displayed;
+    IO::IconStyle m_iconStyle;
     NotifierConnection m_connection;
     QListWidget* m_list;
     QLineEdit *m_filter, *m_label, *m_icon = nullptr, *m_tooltip = nullptr, *m_menu = nullptr;

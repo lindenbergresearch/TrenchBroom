@@ -28,6 +28,7 @@ namespace {
             m_configured = true;
             m_label = definition.label;
             m_iconPath = IO::pathFromQString(definition.icon);
+            m_iconStyle = definition.iconStyle;
             m_statusTip = definition.tooltip;
             m_targets = definition.targets;
             m_commandId = definition.command;

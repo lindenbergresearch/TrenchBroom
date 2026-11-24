@@ -321,6 +321,7 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
     length("font.ui", View::uiFontPixelSize());
     length("font.subtitle", View::uiFontPixelSize(-1.0));
     length("font.small", View::uiFontPixelSize(-1.2));
+    length("font.iconPicker", std::max(1.0, View::uiFontPixelSize() - 2.0));
     length("font.tiny", View::uiFontPixelSize(-3.3));
     length("font.title", (View::uiFontPixelSize() * 1.35));
     length("font.header", View::uiFontPixelSize() * 1.85);

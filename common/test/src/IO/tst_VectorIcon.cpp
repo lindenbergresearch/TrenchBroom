@@ -124,6 +124,32 @@ TEST_CASE_METHOD(VectorIconTest, "VectorIcon preserves color transparency and as
     CHECK(transformed == paintIcon(icon, QSize(48, 24), 2.0).convertToFormat(transformed.format()));
 }
 
+TEST_CASE_METHOD(VectorIconTest, "VectorIcon applies individual appearance without mixing cached variants", "[VectorIcon]") {
+    const auto path = write("styled.svg", R"(<svg xmlns="http://www.w3.org/2000/svg" width="48" height="24" viewBox="0 0 16 8"><rect width="16" height="8" fill="#243268" fill-opacity="0.5"/></svg>)");
+    solid("styled_on.svg", "#ffffff");
+    solid("styled_off.svg", "#0000ff");
+    const auto vector = VectorIcon(path);
+    CHECK(vector.defaultSize() == QSize(16, 16));
+    CHECK(vector.sourceSize(12) == QSize(48, 24));
+    const auto style = IconStyle{.color = QColor("#808000"), .brightness = 0.6, .opacity = 0.4};
+    const auto styled = loadIcon(path, 32, style);
+    const auto pixel = paintIcon(styled, {32, 32}, 2.0).pixelColor(32, 32);
+    CHECK(pixel.red() == Approx(153).margin(2));
+    CHECK(pixel.green() == Approx(153).margin(2));
+    CHECK(pixel.blue() == 0);
+    CHECK(pixel.alpha() == Approx(102).margin(1));
+    CHECK(styled.cacheKey() == vector.styledIcon(style).cacheKey());
+    CHECK(styled.cacheKey() != vector.icon().cacheKey());
+
+    auto translucent = style;
+    translucent.opacity = 0;
+    CHECK(paintIcon(vector.styledIcon(translucent), {32, 32}, 2.0).pixelColor(32, 32).alpha() == 0);
+    CHECK(paintIcon(vector.icon(), {32, 32}, 2.0).pixelColor(32, 32) == QColor(Qt::blue));
+
+    const auto sourceAlpha = write("styled-source.svg", R"(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><rect width="8" height="8" fill-opacity="0.5"/></svg>)");
+    CHECK(paintIcon(loadIcon(sourceAlpha, 32, style), {32, 32}, 2.0).pixelColor(32, 32).alpha() == Approx(51).margin(1));
+}
+
 TEST_CASE_METHOD(VectorIconTest, "VectorIcon tints keep alpha and do not mix cached colors", "[VectorIcon]") {
     const auto source = write("tint.svg", R"(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8" fill="#203c81" fill-opacity="0.5"/></svg>)");
     const VectorIcon vector(source);

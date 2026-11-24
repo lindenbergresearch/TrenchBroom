@@ -1886,7 +1886,8 @@ QFrame#EditorToolbarSeparator { color: ${color.mid}; background: transparent; bo
 /* Preferences -> Editor Actions / Editor Toolbar: rechte Formularbreite,
    Shortcut-Feld und linke Listen bzw. die Elements-Liste. Die Toolbars nutzen
    inspectorToolbar="true"; Checkboxen/SpinBoxen/Dropdowns nutzen die Basis oben.
-   EditorIconGrid/-Preview/-Name/-Count gehören zum Dialog Choose icon.... */
+   EditorIconGrid/-Preview/-Name/-Count gehören zur Icon-Auswahl. Die
+   Beschriftung verwendet length.font.iconPicker (UI-Schriftgröße minus 2). */
 
 /* Shared preference form width; FormWithSectionsLayout supplies the same
    section headers and field margins used by View preferences. */
@@ -1908,6 +1909,7 @@ QLabel#EditorConfigurationError { color: ${color.text}; padding: 8px; background
 /* Icon picker tiles inherit list surfaces and selection states above. */
 QListView#EditorIconGrid {
     border: none;
+    font-size: ${length.font.iconPicker};
     qproperty-iconSize: 40px 40px;
     qproperty-gridSize: 112px 86px;
 }
@@ -1932,6 +1934,7 @@ QLabel#EditorIconPreview {
 
 QLabel#EditorIconName {
     color: ${color.text.highlighted};
+    font-size: ${length.font.iconPicker};
 }
 
 QLabel#EditorIconCount {

@@ -129,6 +129,20 @@ void normalizeIconBrightness(QImage& image, qreal sourceBrightness, qreal target
     }
 }
 
+namespace {
+QSize fitIconSize(QSizeF aspect, const QSize& bounds) {
+    if (bounds.isEmpty()) return {};
+    if (aspect.isEmpty()) return bounds;
+    aspect.scale(QSizeF(bounds), Qt::KeepAspectRatio);
+    return {std::clamp(qRound(aspect.width()), 1, bounds.width()),
+            std::clamp(qRound(aspect.height()), 1, bounds.height())};
+}
+
+qreal unitValue(qreal value, qreal fallback) {
+    return std::isfinite(value) ? std::clamp(value, 0.0, 1.0) : fallback;
+}
+} // namespace
+
 QPixmap disabledIconPixmap(const QPixmap& source) {
     if (source.isNull()) return {};
     const auto& settings = IconAppearance::instance();
@@ -150,6 +164,7 @@ struct VectorIcon::Sources {
     std::shared_ptr<QSvgRenderer> off;
     quint64 id;
     qreal onBrightness = 0, offBrightness = 0;
+    QSize svgSize;
     QRawFont font;
     quint32 glyph = 0;
     QRectF glyphBounds;
@@ -169,10 +184,12 @@ struct VectorIcon::Sources {
         offPath += "_off.svg";
         on = loadSvg(onPath);
         off = loadSvg(offPath);
-        if (!on || !off) {
-            const auto base = loadSvg(path);
-            if (!on) on = base ? base : off;
-            if (!off) off = base ? base : on;
+        const auto base = loadSvg(path);
+        if (!on) on = base ? base : off;
+        if (!off) off = base ? base : on;
+        if (const auto& original = base ? base : off) {
+            svgSize = original->defaultSize();
+            if (svgSize.isEmpty()) svgSize = original->viewBoxF().size().toSize();
         }
         const auto measure = [](QSvgRenderer* renderer) {
             if (!renderer) return qreal(0);
@@ -221,8 +238,8 @@ struct VectorIcon::Sources {
 
 class VectorIcon::Engine : public QIconEngine {
     std::shared_ptr<Sources> m_sources;
-    QColor m_tint;
-    QString m_colorName;
+    IconStyle m_style;
+    QString m_themeColor;
 
     QPixmap rasterize(const QSize& requestedPixels, const qreal devicePixelRatio, const QIcon::Mode mode, const QIcon::State state) {
         ensureGuiThread();
@@ -232,14 +249,19 @@ class VectorIcon::Engine : public QIconEngine {
         // Include density even for identical pixel dimensions: the pixmap's
         // logical size differs. Generated states also depend on theme/style.
         const auto& settings = IconAppearance::instance();
-        const auto tint = m_colorName.isEmpty() ? m_tint : ThemeManager::instance().color(m_colorName, m_tint);
-        auto key = QString("tb/vector/%1/%2x%3/%4/%5/%6/%7/%8/%9/%10/%11/%12/%13")
+        const auto tint = m_themeColor.isEmpty() ? m_style.color : ThemeManager::instance().color(m_themeColor, m_style.color);
+        const auto normalizeBrightness = settings.normalizeBrightness() || m_style.brightness.has_value();
+        const auto brightness = unitValue(m_style.brightness.value_or(settings.brightness()), settings.brightness());
+        const auto opacity = unitValue(m_style.opacity.value_or(1.0), 1.0);
+        const auto generateMode = !tint.isValid() && !m_style.brightness;
+        auto key = QString("tb/vector/%1/%2x%3/%4/%5/%6/%7/%8/%9/%10/%11/%12/%13/%14/%15")
             .arg(m_sources->id).arg(pixels.width()).arg(pixels.height())
             .arg(devicePixelRatio, 0, 'g', 17).arg(int(mode)).arg(int(state))
             .arg(qApp->palette().cacheKey()).arg(quintptr(qApp->style()))
             .arg(tint.isValid() ? qint64(tint.rgba()) : -1)
             .arg(settings.disabledBrightness(),0,'g',17).arg(settings.disabledOpacity(),0,'g',17)
-            .arg(settings.normalizeBrightness()).arg(settings.brightness(),0,'g',17);
+            .arg(normalizeBrightness).arg(brightness, 0, 'g', 17)
+            .arg(opacity, 0, 'g', 17).arg(generateMode);
         const auto isGlyph = m_sources->isGlyph();
         const auto fontSettings = isGlyph ? fontStashPreferences() : FontStashPreferences{};
         const auto glyphColor = tint.isValid() ? tint : qApp->palette().color(QPalette::WindowText);
@@ -255,7 +277,7 @@ class VectorIcon::Engine : public QIconEngine {
         // logical pixels, sharpening or fixed-size per-state buffers.
         // Keep extra precision until brightness is applied: boosting a dark
         // icon must not turn low-alpha antialiasing pixels into dark fringes.
-        QImage image(pixels, settings.normalizeBrightness() ? QImage::Format_RGBA64_Premultiplied : QImage::Format_ARGB32_Premultiplied);
+        QImage image(pixels, normalizeBrightness ? QImage::Format_RGBA64_Premultiplied : QImage::Format_ARGB32_Premultiplied);
         if (image.isNull()) return {};
         image.fill(Qt::transparent);
         {
@@ -271,15 +293,20 @@ class VectorIcon::Engine : public QIconEngine {
                 }
             }
         }
-        if (settings.normalizeBrightness()) {
+        if (normalizeBrightness) {
             const auto peak = isGlyph ? glyphColor.valueF() : tint.isValid() ? tint.valueF() : m_sources->brightness(state);
-            normalizeIconBrightness(image, peak, settings.brightness());
+            normalizeIconBrightness(image, peak, brightness);
+        }
+        if (opacity < 1.0) {
+            QPainter painter(&image);
+            painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+            painter.fillRect(image.rect(), QColor::fromRgbF(0, 0, 0, float(opacity)));
         }
         pixmap = QPixmap::fromImage(image);
         pixmap.setDevicePixelRatio(devicePixelRatio);
         // Keep explicitly configured colors distinguishable on selected rows.
         if (mode == QIcon::Disabled) pixmap = disabledIconPixmap(pixmap);
-        else if (mode != QIcon::Normal && !tint.isValid()) {
+        else if (mode != QIcon::Normal && generateMode) {
             QStyleOption option;
             option.palette = qApp->palette();
             pixmap = qApp->style()->generatedIconPixmap(mode, pixmap, &option);
@@ -290,10 +317,10 @@ class VectorIcon::Engine : public QIconEngine {
     }
 
 public:
-    Engine(std::shared_ptr<Sources> sources, const QColor& tint, const QString& colorName = {})
-        : m_sources(std::move(sources)), m_tint(tint), m_colorName(colorName) {}
+    Engine(std::shared_ptr<Sources> sources, const IconStyle& style, const QString& themeColor)
+        : m_sources(std::move(sources)), m_style(style), m_themeColor(themeColor) {}
 
-    QIconEngine* clone() const override { return new Engine(m_sources, m_tint, m_colorName); }
+    QIconEngine* clone() const override { return new Engine(m_sources, m_style, m_themeColor); }
     QString key() const override { return "TrenchBroomVectorIcon"; }
 
     QSize actualSize(const QSize& size, QIcon::Mode, const QIcon::State state) override {
@@ -302,10 +329,7 @@ public:
         if (!renderer || size.isEmpty()) return {};
         auto aspect = QSizeF(renderer->defaultSize());
         if (aspect.isEmpty()) aspect = renderer->viewBoxF().size();
-        if (aspect.isEmpty()) return size;
-        aspect.scale(QSizeF(size), Qt::KeepAspectRatio);
-        return QSize(std::clamp(qRound(aspect.width()), 1, size.width()),
-            std::clamp(qRound(aspect.height()), 1, size.height()));
+        return fitIconSize(aspect, size);
     }
 
     QPixmap pixmap(const QSize& size, const QIcon::Mode mode, const QIcon::State state) override {
@@ -330,13 +354,13 @@ public:
 
 VectorIcon IconCache::load(const std::filesystem::path& path) {
     ensureGuiThread();
-    if (path.empty()) return VectorIcon(nullptr, QColor{});
+    if (path.empty()) return VectorIcon(nullptr, {});
     // Cache resource lookups as well as parsed SVGs. No filesystem access on
     // cache hits; lexical normalization merges equivalent request paths.
     const auto cleanPath = QDir::cleanPath(pathAsQString(path));
     const auto key = QStringLiteral("source/") + cleanPath;
     if (const auto* icon = icons().object(key)) return *icon;
-    const auto result = VectorIcon(std::make_shared<VectorIcon::Sources>(pathFromQString(cleanPath)), QColor{});
+    const auto result = VectorIcon(std::make_shared<VectorIcon::Sources>(pathFromQString(cleanPath)), {});
     // Null results are bounded, too, and can be retried after resetCache().
     icons().insert(key, new VectorIcon(result));
     return result;
@@ -348,41 +372,44 @@ void IconCache::setMaxEntries(const int count) { ensureGuiThread(); icons().setM
 void IconCache::resetCache() { ensureGuiThread(); icons().clear(); }
 
 VectorIcon::VectorIcon(const std::filesystem::path& path) : VectorIcon(IconCache::load(path)) {}
-VectorIcon::VectorIcon(std::shared_ptr<Sources> sources, const QColor& tint, const QString& colorName)
+VectorIcon::VectorIcon(std::shared_ptr<Sources> sources, const IconStyle& style, const QString& themeColor)
     : m_sources(std::move(sources)),
       m_icon(m_sources && (m_sources->isGlyph() || m_sources->on || m_sources->off)
-          ? QIcon(new Engine(m_sources, tint, colorName)) : QIcon{}) {}
+          ? QIcon(new Engine(m_sources, style, themeColor)) : QIcon{}) {}
 
-QIcon VectorIcon::glyphIcon(const QRawFont& font, const quint32 glyphIndex) {
+VectorIcon VectorIcon::fromGlyph(const QRawFont& font, const quint32 glyphIndex) {
     ensureGuiThread();
-    if (!font.isValid()) return {};
-    return VectorIcon(std::make_shared<Sources>(font, glyphIndex), QColor{}).icon();
+    if (!font.isValid()) return VectorIcon(nullptr, {});
+    return VectorIcon(std::make_shared<Sources>(font, glyphIndex), {});
 }
 
 QIcon VectorIcon::icon() const { return m_icon; }
 QIcon VectorIcon::themedIcon(const QString& colorName, const QColor& fallback) const {
-    ensureGuiThread();
-    if (colorName.isEmpty() || m_icon.isNull()) return icon(fallback);
-    const auto key = QStringLiteral("theme/%1/%2/%3").arg(m_sources->id).arg(colorName).arg(fallback.isValid() ? qint64(fallback.rgba()) : -1);
-    if (const auto* cached = icons().object(key)) return cached->m_icon;
-    auto result = VectorIcon{m_sources, fallback, colorName};
-    icons().insert(key, new VectorIcon(result));
-    return result.m_icon;
+    return styledIcon({.color = fallback}, colorName);
 }
 QIcon VectorIcon::icon(const QColor& tint) const {
+    return styledIcon({.color = tint});
+}
+QIcon VectorIcon::styledIcon(const IconStyle& style, const QString& themeColor) const {
     ensureGuiThread();
-    if (!tint.isValid() || m_icon.isNull()) return m_icon;
-    // Tinted variants share the SVG sources, with the same bounded LRU as
-    // untinted icons. Each variant also has a distinct raster cache key.
-    const auto rgba = tint.rgba();
-    const auto key = QStringLiteral("tint/%1/%2").arg(m_sources->id).arg(rgba);
+    if (m_icon.isNull() || (style == IconStyle{} && themeColor.isEmpty())) return m_icon;
+    // Styled variants share the parsed SVG or glyph with the original.
+    const auto key = QStringLiteral("styled/%1/%2/%3/%4/%5").arg(m_sources->id)
+        .arg(style.color.isValid() ? qint64(style.color.rgba()) : -1)
+        .arg(style.brightness.value_or(-1.0), 0, 'g', 17).arg(style.opacity.value_or(-1.0), 0, 'g', 17)
+        .arg(themeColor);
     if (const auto* cached = icons().object(key)) return cached->m_icon;
-    const auto result = VectorIcon(m_sources, QColor::fromRgba(rgba));
+    const auto result = VectorIcon(m_sources, style, themeColor);
     icons().insert(key, new VectorIcon(result));
     return result.m_icon;
 }
 
 QSize VectorIcon::defaultSize() const { return m_sources && m_sources->off ? m_sources->off->defaultSize() : QSize{}; }
+QSize VectorIcon::sourceSize(int glyphExtent) const {
+    if (!m_sources) return {};
+    if (m_sources->isGlyph()) return fitIconSize(m_sources->glyphBounds.size(), {glyphExtent, glyphExtent});
+    return m_sources->svgSize;
+}
 bool VectorIcon::isValid() const { return !m_icon.isNull(); }
 
 } // namespace TrenchBroom::IO

@@ -60,7 +60,7 @@ EditorToolbarPanel::EditorToolbarPanel(const EditorToolbarDefinition& definition
         button->setFocusPolicy(Qt::NoFocus);
         button->setCursor(Qt::PointingHandCursor);
         button->setAccessibleName(action->label());
-        button->setIcon(action->hasIcon() ? IO::loadIcon(action->iconPath(), definition.iconSize) : IO::loadSVGIcon("document.svg", definition.iconSize));
+        button->setIcon(action->hasIcon() ? action->icon(definition.iconSize) : IO::loadSVGIcon("document.svg", definition.iconSize));
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setText(action->label());
         button->setToolTip(tooltip(*action));

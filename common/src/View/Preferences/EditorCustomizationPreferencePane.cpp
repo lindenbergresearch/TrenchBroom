@@ -48,7 +48,7 @@ namespace {
         value->setObjectName(name);
         return value;
     }
-    QIcon actionIcon(const EditorActionDefinition& action) { return IO::loadIcon(IO::pathFromQString(action.icon), 24); }
+    QIcon actionIcon(const EditorActionDefinition& action) { return IO::loadIcon(IO::pathFromQString(action.icon), 24, action.iconStyle); }
     FormWithSectionsLayout* sectionForm(QWidget* widget) {
         auto* layout = new FormWithSectionsLayout{widget};
         layout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
@@ -210,9 +210,10 @@ void EditorCustomizationPreferencePane::createActionForm() {
     iconRow->addWidget(m_icon);
     iconRow->addWidget(browse);
     connect(browse, &QPushButton::clicked, this, [this] {
-        IconSelectionDialog dialog{IO::IconCatalog::instance(), m_icon->text(), this};
+        IconSelectionDialog dialog{IO::IconCatalog::instance(), m_icon->text(), m_iconStyle, this};
         if (dialog.exec() == QDialog::Accepted) {
             m_icon->setText(dialog.selectedIcon());
+            m_iconStyle = dialog.iconStyle();
             m_dirty = true;
             commit();
         }
@@ -421,6 +422,7 @@ void EditorCustomizationPreferencePane::loadCurrent() {
         m_command->lineEdit()->setCursorPosition(0);
         m_shortcut->setKeySequence(manager.action(a.id)->keySequence());
         m_icon->setText(a.icon);
+        m_iconStyle = a.iconStyle;
         m_tooltip->setText(a.tooltip);
         m_menu->setText(a.menuPath);
         for (size_t i = 0; i < m_targets.size(); ++i)
@@ -557,6 +559,7 @@ bool EditorCustomizationPreferencePane::commit() {
         a.label = m_label->text().trimmed();
         a.enabled = m_enabled->isChecked();
         a.icon = m_icon->text().trimmed();
+        a.iconStyle = m_iconStyle;
         a.tooltip = m_tooltip->text();
         a.menuPath = m_menu->text().trimmed();
         // Search queries are transient. Only confirmed model IDs change commands.

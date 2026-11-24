@@ -130,6 +130,7 @@ TEST_CASE("Editor configuration roundtrips overrides and keeps untouched default
     auto config = defaults;
     config.actions["select"].label = "Move and select";
     config.actions["select"].shortcut = QKeySequence{"Ctrl+K"};
+    config.actions["select"].iconStyle = {.color = QColor("#db4827"), .brightness = 0.0, .opacity = 0.42};
     config.toolbars[0].edge = EditorToolbarEdge::Bottom;
     config.arrangements[3] = EditorToolbarArrangement::Parallel;
     const auto bytes = editorConfigurationJson(config, &defaults);
@@ -144,6 +145,11 @@ TEST_CASE("Editor configuration roundtrips overrides and keeps untouched default
     CHECK(read.actions["select"].label == "Move and select");
     CHECK(read.actions["select"].tooltip == "New release tooltip");
     CHECK(read.arrangements[3] == EditorToolbarArrangement::Parallel);
+
+    auto styledDefaults = defaults;
+    styledDefaults.actions["select"].iconStyle = config.actions["select"].iconStyle;
+    REQUIRE(readEditorConfiguration(editorConfigurationJson(defaults, &styledDefaults), styledDefaults, {"select"}, read, errors));
+    CHECK(read == defaults);
 }
 
 TEST_CASE("Invalid editor configuration is rejected without partial changes", "[editor-configuration]") {
@@ -151,6 +157,9 @@ TEST_CASE("Invalid editor configuration is rejected without partial changes", "[
     for (const auto* bytes : {"{", R"({"version":2})", R"({"version":1.5})", R"({"version":1,"unknown":1})", R"({"version":1,"actions":[{"id":"select","iconPath":"x"}]})",
                               R"({"version":1,"actions":[{"id":"select","shortcut":"Ctrl+NotAKey"}]})", R"({"version":1,"actions":[{"id":"select","command":"shell:delete"}]})",
                               R"({"version":1,"actions":[{"id":"select","targets":["unknown"]}]})", R"({"version":1,"actions":[{"id":"select","label":""}]})",
+                              R"({"version":1,"actions":[{"id":"select","iconStyle":{"color":"xyz"}}]})",
+                              R"({"version":1,"actions":[{"id":"select","iconStyle":{"brightness":"0.8"}}]})",
+                              R"({"version":1,"actions":[{"id":"select","iconStyle":{"opacity":1.5}}]})",
                               R"({"version":1,"actions":[{"id":"select"},{"id":"select"}]})", R"({"version":1,"actions":[{"id":"select","menuPath":"A//B"}]})",
                               R"({"version":1,"toolbars":[{"id":"t","label":"Tools","edge":"left","iconSize":12,"minimumIconSize":24,"actions":["select"]}]})",
                               R"({"version":1,"toolbars":[{"id":"t","label":"Tools","edge":"left","actions":["missing"]}]})", R"({"version":1,"sides":{"left":"unknown"}})"}) {

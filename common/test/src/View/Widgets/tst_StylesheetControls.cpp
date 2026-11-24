@@ -3,6 +3,7 @@
 #include "View/Theme/QSSBuilder.h"
 #include "View/Theme/ThemeManager.h"
 #include "View/Compilation/TextOutputAdapter.h"
+#include "View/Preferences/FontUtils.h"
 #include "View/Preferences/IconSelectionDialog.h"
 #include "View/Widgets/BorderLine.h"
 #include "View/Widgets/BorderPanel.h"
@@ -176,6 +177,7 @@ TEST_CASE("Icon picker grid and preview dimensions follow a stylesheet override"
     QApplication::processEvents();
     CHECK(grid->iconSize() == QSize(64, 64));
     CHECK(grid->gridSize() == QSize(144, 112));
+    CHECK(grid->font().pixelSize() == qRound(std::max(1.0, uiFontPixelSize() - 2.0)));
     REQUIRE_FALSE(preview->pixmap().isNull());
     CHECK(preview->pixmap().width() / preview->pixmap().devicePixelRatioF() == Approx(preview->contentsRect().width()));
 }

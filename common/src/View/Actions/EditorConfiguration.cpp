@@ -20,6 +20,11 @@ QJsonObject editorActionJson(const EditorActionDefinition& a) {
     QJsonObject object{{"id", a.id},         {"label", a.label}, {"command", a.command},           {"icon", a.icon},      {"tooltip", a.tooltip}, {"menuPath", a.menuPath},
                        {"targets", targets}, {"order", a.order}, {"toolbarGroup", a.toolbarGroup}, {"enabled", a.enabled}};
     if (a.shortcut) object.insert("shortcut", a.shortcut->toString(QKeySequence::PortableText));
+    auto iconStyle = QJsonObject{};
+    if (a.iconStyle.color.isValid()) iconStyle.insert("color", a.iconStyle.color.name(QColor::HexArgb));
+    if (a.iconStyle.brightness) iconStyle.insert("brightness", *a.iconStyle.brightness);
+    if (a.iconStyle.opacity) iconStyle.insert("opacity", *a.iconStyle.opacity);
+    if (!iconStyle.isEmpty()) object.insert("iconStyle", iconStyle);
     return object;
 }
 
@@ -44,6 +49,7 @@ QByteArray editorConfigurationJson(const EditorConfiguration& config, const Edit
             for (const auto& key : base.keys())
                 if (key != "id" && object.value(key) == base.value(key)) object.remove(key);
             if (!action.shortcut && base.contains("shortcut")) object.insert("shortcut", QJsonValue{});
+            if (action.iconStyle == IO::IconStyle{} && base.contains("iconStyle")) object.insert("iconStyle", QJsonObject{});
             if (object.size() == 1) continue;
         }
         actions.append(object);
@@ -93,7 +99,7 @@ bool readEditorConfiguration(const QByteArray& bytes, const EditorConfiguration&
         for (const auto& value : root["actions"].toArray()) {
             if (!value.isObject()) return fail("Invalid action entry");
             const auto object = value.toObject();
-            if (!knownFields(object, {"id", "label", "command", "icon", "tooltip", "menuPath", "shortcut", "targets", "order", "toolbarGroup", "enabled"}, "actions/")) return false;
+            if (!knownFields(object, {"id", "label", "command", "icon", "iconStyle", "tooltip", "menuPath", "shortcut", "targets", "order", "toolbarGroup", "enabled"}, "actions/")) return false;
             const auto id = object["id"].toString();
             if (id.isEmpty() || id.size() > 512 || id.contains(QChar::Null) || ids.contains(id)) return fail("Invalid or duplicate action ID: " + id);
             ids.insert(id);
@@ -103,6 +109,22 @@ bool readEditorConfiguration(const QByteArray& bytes, const EditorConfiguration&
                 if (!object.contains(pair.first)) continue;
                 if (!object[pair.first].isString() || object[pair.first].toString().contains(QChar::Null)) return fail("Invalid action field: " + id + "/" + pair.first);
                 *pair.second = object[pair.first].toString();
+            }
+            if (object.contains("iconStyle")) {
+                if (!object["iconStyle"].isObject()) return fail("Invalid icon style: " + id);
+                const auto style = object["iconStyle"].toObject();
+                if (!knownFields(style, {"color", "brightness", "opacity"}, "actions/" + id + "/iconStyle/")) return false;
+                action.iconStyle = {};
+                if (style.contains("color")) {
+                    action.iconStyle.color = QColor::fromString(style["color"].toString());
+                    if (!action.iconStyle.color.isValid()) return fail("Invalid icon color: " + id);
+                }
+                for (const auto& pair : {std::pair{"brightness", &action.iconStyle.brightness}, {"opacity", &action.iconStyle.opacity}}) {
+                    if (!style.contains(pair.first)) continue;
+                    const auto amount = style[pair.first].toDouble(-1.0);
+                    if (!std::isfinite(amount) || amount < 0 || amount > 1) return fail("Invalid icon style value: " + id + "/" + pair.first);
+                    *pair.second = amount;
+                }
             }
             if (action.label.trimmed().isEmpty() || !commands.contains(action.command)) return fail("Unknown command or empty action label: " + id);
             const auto menu = action.menuPath.split('/');

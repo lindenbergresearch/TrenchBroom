@@ -1,7 +1,7 @@
 #include "View/Inspector/Layer/LayerTreeItemRenderer.h"
 
 #include "IO/PathQt.h"
-#include "IO/VectorIcon.h"
+#include "IO/ResourceUtils.h"
 #include "Model/BrushNode.h"
 #include "Model/EntityNode.h"
 #include "Model/GroupNode.h"
@@ -236,7 +236,7 @@ void LayerTreeItemDelegate::updateIcon(QTreeWidgetItem &item, const std::filesys
 
     const auto source = IO::pathFromQString(item.data(0, IconSourceRole).toString());
     const auto name = item.data(0, TypeGroupRole).isValid() ? "color.icon.typeGroup" : iconThemeNames[type];
-    item.setIcon(0, IO::VectorIcon(source).themedIcon(QString::fromLatin1(name), toQColor(pref(color))));
+    item.setIcon(0, IO::loadIcon(source, 16, {.color = toQColor(pref(color))}, QString::fromLatin1(name)));
 }
 
 void LayerTreeItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {

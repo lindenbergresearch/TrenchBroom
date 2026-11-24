@@ -82,6 +82,7 @@ class Action {
     ActionContext::Type m_actionContext;
     QKeySequence m_defaultShortcut;
     std::filesystem::path m_iconPath;
+    IO::IconStyle m_iconStyle;
     QString m_statusTip;
     bool m_configured = false;
     bool m_enabledByConfiguration = true;
@@ -122,6 +123,7 @@ class Action {
     bool hasIcon() const;
 
     const std::filesystem::path &iconPath() const;
+    QIcon icon(int size, const IO::IconStyle& overrides = {}) const;
 
     const QString &statusTip() const;
 

@@ -22,7 +22,6 @@
 
 #include <QMenuBar>
 
-#include "IO/ResourceUtils.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
 #include "View/App/MapFrame.h"
@@ -36,7 +35,7 @@ MenuBuilderBase::~MenuBuilderBase() = default;
 
 void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tAction) {
     qAction->setText(tAction->label()); qAction->setCheckable(tAction->checkable()); qAction->setStatusTip(tAction->statusTip());
-    qAction->setIcon(tAction->hasIcon() ? IO::loadIcon(tAction->iconPath(), pref(Preferences::ToolBarIconsSize)) : QIcon{});
+    qAction->setIcon(tAction->icon(pref(Preferences::ToolBarIconsSize)));
     qAction->setProperty("tbActionId", QString::fromStdString(tAction->preferencePath().generic_string()));
     if (!tAction->keySequence().isEmpty()) {
         const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label(), tAction->keySequence().toString(QKeySequence::NativeText));

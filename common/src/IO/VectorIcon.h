@@ -18,15 +18,15 @@
  */
 #pragma once
 
+#include "IO/IconStyle.h"
+
 #include <QIcon>
-#include <QColor>
 #include <QWidget>
 #include <filesystem>
 #include <memory>
 
 class QRawFont;
 
-class QColor;
 class QImage;
 
 namespace TrenchBroom::IO {
@@ -92,23 +92,28 @@ private:
 class VectorIcon {
 public:
     explicit VectorIcon(const std::filesystem::path& path);
-    static QIcon glyphIcon(const QRawFont& font, quint32 glyphIndex);
+    static VectorIcon fromGlyph(const QRawFont& font, quint32 glyphIndex);
     QIcon icon() const;
     // Reuse the parsed SVG and preserve its shape/alpha, replacing the painted
     // colors with the supplied tint. An invalid color returns the original.
     QIcon icon(const QColor& tint) const;
+    // An optional theme color takes precedence over the requested tint
+    // and is resolved whenever the icon is painted.
+    QIcon styledIcon(const IconStyle& style, const QString& themeColor = {}) const;
     // The color is resolved while painting, so an existing icon follows theme
     // changes without rebuilding every item in a large tree.
     QIcon themedIcon(const QString& colorName, const QColor& fallback = {}) const;
     // Intrinsic SVG size in logical pixels, for callers that need a bitmap.
     QSize defaultSize() const;
+    // Source SVG dimensions, or the outline fitted inside a glyphExtent square.
+    QSize sourceSize(int glyphExtent) const;
     bool isValid() const;
 
 private:
     friend class IconCache;
     struct Sources;
     class Engine;
-    VectorIcon(std::shared_ptr<Sources> sources, const QColor& tint, const QString& colorName = {});
+    VectorIcon(std::shared_ptr<Sources> sources, const IconStyle& style, const QString& themeColor = {});
     std::shared_ptr<Sources> m_sources;
     QIcon m_icon;
 };
