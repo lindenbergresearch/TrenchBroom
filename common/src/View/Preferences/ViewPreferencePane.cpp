@@ -354,6 +354,7 @@ QWidget *ViewPreferencePane::createViewPreferences() {
             auto files = result.value();
             std::sort(files.begin(), files.end());
             for (const auto& path : files) {
+                if (IO::pathAsGenericQString(path).startsWith("fonts/icons/")) continue;
                 const auto label = "[" + IO::pathAsQString(path.filename()) + "]";
                 const auto value = IO::pathAsQString(path);
                 if (listedFonts.contains(value)) continue;

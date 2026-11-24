@@ -49,7 +49,7 @@ namespace View {
 QAction* addContextMenuAction(QMenu& menu, const Action& action, const std::function<void()>& execute, bool enabled) {
     auto label = action.label();
     if (!action.keySequence().isEmpty()) label += '\t' + action.keySequence().toString(QKeySequence::NativeText);
-    auto* result = menu.addAction(action.hasIcon() ? IO::loadSVGIcon(action.iconPath(),16) : QIcon{},
+    auto* result = menu.addAction(action.hasIcon() ? IO::loadIcon(action.iconPath(), 16) : QIcon{},
         pref(Preferences::ContextMenuShortcuts) ? label : action.label());
     result->setProperty("tbContextFullLabel",label);
     result->setProperty("tbActionId", IO::pathAsQString(action.preferencePath()));

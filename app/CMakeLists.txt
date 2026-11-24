@@ -15,14 +15,27 @@ if (APPLE)
     set_source_files_properties(${MACOSX_ICON_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
     # Configure button bitmaps etc.
-    file(GLOB_RECURSE MACOSX_IMAGE_FILES CONFIGURE_DEPENDS "${APP_RESOURCE_DIR}/graphics/images/*")
-    set(APP_SOURCE ${APP_SOURCE} ${MACOSX_IMAGE_FILES})
-    set_source_files_properties(${MACOSX_IMAGE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/images)
+    set(IMAGE_ROOT "${APP_RESOURCE_DIR}/graphics/images")
+    file(GLOB_RECURSE MACOSX_IMAGE_FILES RELATIVE "${IMAGE_ROOT}" CONFIGURE_DEPENDS "${IMAGE_ROOT}/*")
+    foreach(IMAGE_FILE IN LISTS MACOSX_IMAGE_FILES)
+        get_filename_component(IMAGE_DIR "${IMAGE_FILE}" DIRECTORY)
+        list(APPEND APP_SOURCE "${IMAGE_ROOT}/${IMAGE_FILE}")
+        set_source_files_properties("${IMAGE_ROOT}/${IMAGE_FILE}"
+            PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/images/${IMAGE_DIR}")
+    endforeach()
 
     # Configure fonts
-    file(GLOB_RECURSE MACOSX_FONT_FILES "${APP_RESOURCE_DIR}/fonts/*.*")
-    set(APP_SOURCE ${APP_SOURCE} ${MACOSX_FONT_FILES})
-    set_source_files_properties(${MACOSX_FONT_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/fonts)
+    set(FONT_ROOT "${APP_RESOURCE_DIR}/fonts")
+    file(GLOB_RECURSE MACOSX_FONT_FILES RELATIVE "${FONT_ROOT}" CONFIGURE_DEPENDS "${FONT_ROOT}/*.*")
+    foreach(FONT_FILE IN LISTS MACOSX_FONT_FILES)
+        set(FONT_LOCATION Resources/fonts)
+        if(FONT_FILE MATCHES "^icons/")
+            get_filename_component(ICON_FONT_DIR "${FONT_FILE}" DIRECTORY)
+            set(FONT_LOCATION "Resources/fonts/${ICON_FONT_DIR}")
+        endif()
+        list(APPEND APP_SOURCE "${FONT_ROOT}/${FONT_FILE}")
+        set_source_files_properties("${FONT_ROOT}/${FONT_FILE}" PROPERTIES MACOSX_PACKAGE_LOCATION "${FONT_LOCATION}")
+    endforeach()
 
     # Configure cursor
     file(GLOB_RECURSE MACOSX_CURSOR_FILES RELATIVE ${APP_RESOURCE_DIR}/cursor "${APP_RESOURCE_DIR}/cursor/*.*")

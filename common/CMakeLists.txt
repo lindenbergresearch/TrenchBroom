@@ -59,6 +59,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/IO/GameEngineConfigParser.cpp
     ${COMMON_SOURCE_DIR}/IO/GameEngineConfigWriter.cpp
     ${COMMON_SOURCE_DIR}/IO/IdPakFileSystem.cpp
+    ${COMMON_SOURCE_DIR}/IO/IconCatalog.cpp
     ${COMMON_SOURCE_DIR}/IO/ImageFileSystem.cpp
     ${COMMON_SOURCE_DIR}/IO/ImageLoader.cpp
     ${COMMON_SOURCE_DIR}/IO/ImageLoaderImpl.cpp
@@ -621,6 +622,7 @@ set(COMMON_HEADER
     ${COMMON_SOURCE_DIR}/IO/GameEngineConfigParser.h
     ${COMMON_SOURCE_DIR}/IO/GameEngineConfigWriter.h
     ${COMMON_SOURCE_DIR}/IO/IdPakFileSystem.h
+    ${COMMON_SOURCE_DIR}/IO/IconCatalog.h
     ${COMMON_SOURCE_DIR}/IO/ImageFileSystem.h
     ${COMMON_SOURCE_DIR}/IO/ImageLoader.h
     ${COMMON_SOURCE_DIR}/IO/ImageLoaderImpl.h

@@ -6,6 +6,7 @@
 #include "View/Actions/Actions.h"
 #include "View/Widgets/FormWithSectionsLayout.h"
 #include "View/Preferences/IconSelectionDialog.h"
+#include "IO/IconCatalog.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Widgets/SearchableComboBox.h"
 #include "View/Theme/ViewConstants.h"
@@ -47,7 +48,7 @@ namespace {
         value->setObjectName(name);
         return value;
     }
-    QIcon actionIcon(const EditorActionDefinition& action) { return action.icon.isEmpty() ? QIcon{} : IO::loadSVGIcon(IO::pathFromQString(action.icon), 24); }
+    QIcon actionIcon(const EditorActionDefinition& action) { return IO::loadIcon(IO::pathFromQString(action.icon), 24); }
     FormWithSectionsLayout* sectionForm(QWidget* widget) {
         auto* layout = new FormWithSectionsLayout{widget};
         layout->setContentsMargins(LayoutConstants::MediumHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideHMargin, LayoutConstants::WideVMargin);
@@ -200,6 +201,7 @@ void EditorCustomizationPreferencePane::createActionForm() {
     });
     m_icon = new QLineEdit;
     m_icon->setObjectName("EditorActionIcon");
+    m_icon->setToolTip(tr("Use a catalog icon name or an SVG file path."));
     watch(m_icon);
     auto* browse = new QPushButton{tr("Choose icon…")};
     browse->setAutoDefault(false);
@@ -208,7 +210,7 @@ void EditorCustomizationPreferencePane::createActionForm() {
     iconRow->addWidget(m_icon);
     iconRow->addWidget(browse);
     connect(browse, &QPushButton::clicked, this, [this] {
-        IconSelectionDialog dialog{m_icon->text(), this};
+        IconSelectionDialog dialog{IO::IconCatalog::instance(), m_icon->text(), this};
         if (dialog.exec() == QDialog::Accepted) {
             m_icon->setText(dialog.selectedIcon());
             m_dirty = true;
@@ -241,7 +243,7 @@ void EditorCustomizationPreferencePane::createActionForm() {
     form->addRow(tr("Enabled"), m_enabled);
     form->addRow(tr("Command"), m_command);
     form->addRow(tr("Shortcut"), m_shortcut);
-    form->addRow(tr("SVG icon"), iconRow);
+    form->addRow(tr("Icon"), iconRow);
     form->addRow(tr("Tooltip"), m_tooltip);
     form->addSection(tr("Display targets"));
     form->addRow(tr("Show in"), targets);

@@ -1,6 +1,8 @@
 #include "VectorIcon.h"
 
 #include "Ensure.h"
+#include "FontStashPreferences.h"
+#include "View/Theme/FontStashText.h"
 #include "View/Theme/ThemeManager.h"
 #include "IO/PathQt.h"
 #include "IO/SystemPaths.h"
@@ -10,9 +12,11 @@
 #include <QColor>
 #include <QDir>
 #include <QFileInfo>
+#include <QGlyphRun>
 #include <QIconEngine>
 #include <QImage>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPixmapCache>
 #include <QRgba64>
 #include <QPointer>
@@ -146,10 +150,19 @@ struct VectorIcon::Sources {
     std::shared_ptr<QSvgRenderer> off;
     quint64 id;
     qreal onBrightness = 0, offBrightness = 0;
+    QRawFont font;
+    quint32 glyph = 0;
+    QRectF glyphBounds;
 
-    explicit Sources(const std::filesystem::path& path) {
+    static quint64 nextId() {
         static quint64 nextId = 0; // GUI thread only; never recycled on cache reset.
-        id = ++nextId;
+        return ++nextId;
+    }
+
+    Sources(const QRawFont& raw, const quint32 index)
+        : id(nextId()), font(raw), glyph(index), glyphBounds(raw.pathForGlyph(index).boundingRect()) {}
+
+    explicit Sources(const std::filesystem::path& path) : id(nextId()) {
         auto onPath = path.parent_path() / path.stem();
         auto offPath = onPath;
         onPath += "_on.svg";
@@ -178,6 +191,32 @@ struct VectorIcon::Sources {
 
     QSvgRenderer* renderer(const QIcon::State state) const { return (state == QIcon::On ? on : off).get(); }
     qreal brightness(const QIcon::State state) const { return state == QIcon::On ? onBrightness : offBrightness; }
+    bool isGlyph() const { return font.isValid() && !glyphBounds.isEmpty(); }
+
+    void renderGlyph(QPainter& painter, const QSize& pixels, const QColor& color, const FontStashPreferences& prefs) const {
+        const auto margin = std::min(1.0, std::min(pixels.width(), pixels.height()) / 4.0);
+        const auto available = QRectF(QPointF{}, QSizeF(pixels)).adjusted(margin, margin, -margin, -margin);
+        const auto scale = std::min(available.width() / glyphBounds.width(), available.height() / glyphBounds.height());
+        const auto baseline = available.center() - glyphBounds.center() * scale;
+        if (prefs.enabled) {
+            const auto raster = View::fontStashGlyph(font, glyph, baseline, scale, prefs.sdf);
+            if (!raster.mask.pixels.isNull()) {
+                painter.drawImage(raster.mask.origin, raster.mask.pixels);
+                painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                painter.fillRect(QRect(QPoint{}, pixels), color);
+                return;
+            }
+        }
+        QGlyphRun run;
+        run.setRawFont(font);
+        run.setGlyphIndexes({glyph});
+        run.setPositions({QPointF{}});
+        painter.setRenderHint(QPainter::TextAntialiasing);
+        painter.setPen(color);
+        painter.translate(baseline);
+        painter.scale(scale, scale);
+        painter.drawGlyphRun(QPointF{}, run);
+    }
 };
 
 class VectorIcon::Engine : public QIconEngine {
@@ -194,13 +233,21 @@ class VectorIcon::Engine : public QIconEngine {
         // logical size differs. Generated states also depend on theme/style.
         const auto& settings = IconAppearance::instance();
         const auto tint = m_colorName.isEmpty() ? m_tint : ThemeManager::instance().color(m_colorName, m_tint);
-        const auto key = QString("tb/vector/%1/%2x%3/%4/%5/%6/%7/%8/%9/%10/%11/%12/%13")
+        auto key = QString("tb/vector/%1/%2x%3/%4/%5/%6/%7/%8/%9/%10/%11/%12/%13")
             .arg(m_sources->id).arg(pixels.width()).arg(pixels.height())
             .arg(devicePixelRatio, 0, 'g', 17).arg(int(mode)).arg(int(state))
             .arg(qApp->palette().cacheKey()).arg(quintptr(qApp->style()))
             .arg(tint.isValid() ? qint64(tint.rgba()) : -1)
             .arg(settings.disabledBrightness(),0,'g',17).arg(settings.disabledOpacity(),0,'g',17)
             .arg(settings.normalizeBrightness()).arg(settings.brightness(),0,'g',17);
+        const auto isGlyph = m_sources->isGlyph();
+        const auto fontSettings = isGlyph ? fontStashPreferences() : FontStashPreferences{};
+        const auto glyphColor = tint.isValid() ? tint : qApp->palette().color(QPalette::WindowText);
+        if (isGlyph) {
+            key += QString("/%1/%2/%3/%4/%5").arg(fontSettings.enabled)
+                .arg(fontSettings.sdf.textWeight, 0, 'g', 17).arg(fontSettings.sdf.unitsPerPixel)
+                .arg(fontSettings.sdf.distancePerTexel, 0, 'g', 17).arg(fontSettings.sdf.padding);
+        }
         QPixmap pixmap;
         if (QPixmapCache::find(key, &pixmap)) return pixmap;
 
@@ -214,14 +261,18 @@ class VectorIcon::Engine : public QIconEngine {
         {
             QPainter painter(&image);
             painter.setRenderHint(QPainter::Antialiasing);
-            m_sources->renderer(state)->render(&painter, QRectF(QPointF(), QSizeF(pixels)));
-            if (tint.isValid()) {
-                painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-                painter.fillRect(image.rect(), tint);
+            if (isGlyph) {
+                m_sources->renderGlyph(painter, pixels, glyphColor, fontSettings);
+            } else {
+                m_sources->renderer(state)->render(&painter, QRectF(QPointF(), QSizeF(pixels)));
+                if (tint.isValid()) {
+                    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                    painter.fillRect(image.rect(), tint);
+                }
             }
         }
         if (settings.normalizeBrightness()) {
-            const auto peak = tint.isValid() ? tint.valueF() : m_sources->brightness(state);
+            const auto peak = isGlyph ? glyphColor.valueF() : tint.isValid() ? tint.valueF() : m_sources->brightness(state);
             normalizeIconBrightness(image, peak, settings.brightness());
         }
         pixmap = QPixmap::fromImage(image);
@@ -246,6 +297,7 @@ public:
     QString key() const override { return "TrenchBroomVectorIcon"; }
 
     QSize actualSize(const QSize& size, QIcon::Mode, const QIcon::State state) override {
+        if (m_sources->isGlyph()) return size;
         const auto* renderer = m_sources->renderer(state);
         if (!renderer || size.isEmpty()) return {};
         auto aspect = QSizeF(renderer->defaultSize());
@@ -268,7 +320,7 @@ public:
         painter->drawPixmap(rect, rasterize(rect.size() * scale, scale, mode, state));
     }
 
-    bool isNull() override { return !m_sources->off && !m_sources->on; }
+    bool isNull() override { return !m_sources->isGlyph() && !m_sources->off && !m_sources->on; }
 
     QPixmap scaledPixmap(const QSize& size, QIcon::Mode mode, QIcon::State state, qreal scale) override {
         return rasterize(size * scale, scale, mode, state);
@@ -298,7 +350,14 @@ void IconCache::resetCache() { ensureGuiThread(); icons().clear(); }
 VectorIcon::VectorIcon(const std::filesystem::path& path) : VectorIcon(IconCache::load(path)) {}
 VectorIcon::VectorIcon(std::shared_ptr<Sources> sources, const QColor& tint, const QString& colorName)
     : m_sources(std::move(sources)),
-      m_icon(m_sources && (m_sources->on || m_sources->off) ? QIcon(new Engine(m_sources, tint, colorName)) : QIcon{}) {}
+      m_icon(m_sources && (m_sources->isGlyph() || m_sources->on || m_sources->off)
+          ? QIcon(new Engine(m_sources, tint, colorName)) : QIcon{}) {}
+
+QIcon VectorIcon::glyphIcon(const QRawFont& font, const quint32 glyphIndex) {
+    ensureGuiThread();
+    if (!font.isValid()) return {};
+    return VectorIcon(std::make_shared<Sources>(font, glyphIndex), QColor{}).icon();
+}
 
 QIcon VectorIcon::icon() const { return m_icon; }
 QIcon VectorIcon::themedIcon(const QString& colorName, const QColor& fallback) const {

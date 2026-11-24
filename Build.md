@@ -18,6 +18,24 @@ Global FontStash rasterization in Qt Widgets uses the `GuiPrivate` and
 these modules use Qt for standard widget text and still provide the SDF
 font preview and the editor's SDF text.
 
+### Icon fonts
+
+The icon catalog scans `fonts/icons` and its subdirectories for TrueType fonts.
+Use `fonts/icons/icon-fonts.json` in the application resources or user data
+directory to select and order the fonts explicitly. Paths in the list are
+relative to `fonts/icons` and can include subdirectories.
+
+```json
+{
+  "fonts": ["IconFont.ttf", "MaterialDesignIconsDesktop.ttf"]
+}
+```
+
+An empty list disables font icons. Restart the editor after changing the list.
+The catalog uses SVG basenames and internal glyph names. Duplicate names receive
+a numeric suffix in index order. The icon picker searches both the names and
+their source files, and actions can use existing SVG paths or catalog names.
+
 Qt and system OpenGL are installed separately. CPM downloads and builds Assimp,
 Catch2, fmt, FreeImage, FreeType, GLEW, miniz and tinyxml2 from verified source
 archives. Exact versions, source URLs and SHA-256 hashes are in

@@ -68,4 +68,7 @@ QCursor loadCursorFile(const std::filesystem::path &imagePath);
  */
 QIcon loadSVGIcon(const std::filesystem::path &imagePath, int size);
 
+// Resolve a global icon name or a legacy SVG resource path.
+QIcon loadIcon(const std::filesystem::path& nameOrPath, int size);
+
 } // namespace TrenchBroom::IO

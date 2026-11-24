@@ -1,3 +1,4 @@
+#include "IO/IconCatalog.h"
 #include "TestSourcePath.h"
 #include "View/Theme/QSSBuilder.h"
 #include "View/Theme/ThemeManager.h"
@@ -11,6 +12,7 @@
 #include "View/Theme/QtUtils.h"
 #include <QApplication>
 #include <QLabel>
+#include <QListView>
 #include <QListWidget>
 #include <QStandardItemModel>
 #include <QStyleOptionViewItem>
@@ -161,11 +163,11 @@ TEST_CASE("History and diagnostic rows use shared theme fonts and semantic QSS c
     CellDelegate diagnostics("loadDiagnostics", &view);
     CHECK(diagnostics.options(view, index).palette.color(QPalette::Text) == QColor("#bc1234"));
 }
-TEST_CASE("SVG picker grid and preview dimensions follow a stylesheet override", "[qss-controls]") {
-    IconSelectionDialog dialog("Group.svg");
-    dialog.setStyleSheet(controlStyleSheet() + "\nQListWidget#EditorIconGrid { qproperty-iconSize: 64px 64px; qproperty-gridSize: 144px 112px; }\nQLabel#EditorIconPreview { min-width: "
+TEST_CASE("Icon picker grid and preview dimensions follow a stylesheet override", "[qss-controls]") {
+    IconSelectionDialog dialog(IO::IconCatalog::instance(), "Group.svg");
+    dialog.setStyleSheet(controlStyleSheet() + "\nQListView#EditorIconGrid { qproperty-iconSize: 64px 64px; qproperty-gridSize: 144px 112px; }\nQLabel#EditorIconPreview { min-width: "
                                                "96px; max-width: 96px; min-height: 96px; max-height: 96px; }");
-    auto* grid = dialog.findChild<QListWidget*>("EditorIconGrid");
+    auto* grid = dialog.findChild<QListView*>("EditorIconGrid");
     auto* preview = dialog.findChild<QLabel*>("EditorIconPreview");
     REQUIRE(grid);
     REQUIRE(preview);

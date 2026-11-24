@@ -23,6 +23,7 @@
 #include "Ensure.h"
 #include "IO/File.h"
 #include "IO/FileSystem.h"
+#include "IO/IconCatalog.h"
 #include "IO/PathQt.h"
 #include "IO/ReadFreeImageTexture.h"
 #include "IO/SystemPaths.h"
@@ -118,6 +119,18 @@ QIcon loadSVGIcon(const std::filesystem::path &imagePath, const int size) {
     // size. QIcon::paint/pixmap and the widget's iconSize specify the output.
     if (size <= 0) return {};
     return VectorIcon(imagePath).icon();
+}
+
+QIcon loadIcon(const std::filesystem::path& nameOrPath, const int size) {
+    if (size <= 0 || nameOrPath.empty()) return {};
+    const auto name = pathAsGenericQString(nameOrPath);
+    if (nameOrPath.has_parent_path() || name.startsWith(":/")
+        || QFileInfo(name).suffix().compare("svg", Qt::CaseInsensitive) == 0) {
+        const auto icon = loadSVGIcon(nameOrPath, size);
+        if (!icon.isNull()) return icon;
+    }
+    const auto& catalog = IconCatalog::instance();
+    return catalog.icon(catalog.canonicalName(name));
 }
 
 QCursor loadCursorFile(const std::filesystem::path &imagePath) {

@@ -660,7 +660,7 @@ QPlainTextEdit#MapLoadDiagnosticsMessage {
 /* Preference lists share the same surface as the Games list. Selection states
    below apply to all item views, including searchable combo-box popups. */
 QListWidget#controlListBox_listWidget,
-QListWidget[preferencesList="true"] {
+QListView[preferencesList="true"] {
     background-color: ${color.base};
     alternate-background-color: ${color.base.alternate};
     color: ${color.text};
@@ -1905,19 +1905,19 @@ QListWidget#EditorConfigurationList::item, QListWidget#EditorToolbarAssignedActi
 }
 QLabel#EditorConfigurationError { color: ${color.text}; padding: 8px; background: ${color.base.alternate}; border-radius: ${length.radius.border}; }
 
-/* SVG picker tiles inherit list surfaces and selection states above. */
-QListWidget#EditorIconGrid {
+/* Icon picker tiles inherit list surfaces and selection states above. */
+QListView#EditorIconGrid {
     border: none;
     qproperty-iconSize: 40px 40px;
     qproperty-gridSize: 112px 86px;
 }
 
-QListWidget#EditorIconGrid::item {
+QListView#EditorIconGrid::item {
     padding: 4px;
     border-radius: ${length.radius.border};
 }
 
-QListWidget#EditorIconGrid::item:hover:!selected {
+QListView#EditorIconGrid::item:hover:!selected {
     background-color: ${color.base.alternate};
 }
 

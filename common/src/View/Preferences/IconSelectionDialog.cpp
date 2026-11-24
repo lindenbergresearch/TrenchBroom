@@ -1,49 +1,59 @@
 #include "View/Preferences/IconSelectionDialog.h"
-#include <QEvent>
-#include <QTimer>
 
-#include "IO/PathQt.h"
-#include "IO/ResourceUtils.h"
-#include "IO/SystemPaths.h"
+#include "IO/IconCatalog.h"
 #include "View/Theme/QtUtils.h"
 #include "View/Theme/ViewConstants.h"
 
+#include <QAbstractListModel>
 #include <QDialogButtonBox>
-#include <QDir>
-#include <QDirIterator>
-#include <QFileInfo>
+#include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QListWidget>
+#include <QListView>
 #include <QPainter>
 #include <QPushButton>
-#include <QSet>
+#include <QSortFilterProxyModel>
+#include <QTimer>
 #include <QVBoxLayout>
 
-#include <algorithm>
-
 namespace TrenchBroom::View {
+namespace {
 
-QStringList IconSelectionDialog::availableIcons() {
-    QSet<QString> names;
-    for (const auto& path : IO::SystemPaths::findResourceDirectories("images")) {
-        const auto directory = QDir{IO::pathAsQString(path)};
-        auto files = QDirIterator{directory.absolutePath(), QDir::Files | QDir::Readable, QDirIterator::Subdirectories};
-        while (files.hasNext()) {
-            const auto file = files.next();
-            if (QFileInfo(file).suffix().compare("svg", Qt::CaseInsensitive) == 0) names.insert(directory.relativeFilePath(file));
+constexpr auto SearchRole = Qt::UserRole + 1;
+
+class IconListModel : public QAbstractListModel {
+    const IO::IconCatalog& m_catalog;
+
+public:
+    IconListModel(const IO::IconCatalog& catalog, QObject* parent) : QAbstractListModel(parent), m_catalog(catalog) {}
+
+    int rowCount(const QModelIndex& parent = {}) const override {
+        return parent.isValid() ? 0 : int(m_catalog.entries().size());
+    }
+
+    QVariant data(const QModelIndex& index, int role) const override {
+        if (!index.isValid() || index.row() < 0 || index.row() >= rowCount()) return {};
+        const auto& entry = m_catalog.entries()[index.row()];
+        switch (role) {
+            case Qt::DisplayRole:
+            case Qt::UserRole:
+                return entry.name;
+            case Qt::DecorationRole:
+                return m_catalog.icon(entry.name);
+            case Qt::ToolTipRole:
+            case SearchRole:
+                return entry.name + '\n' + entry.source;
+            default:
+                return {};
         }
     }
-    auto result = names.values();
-    std::sort(result.begin(), result.end(), [](const auto& a, const auto& b) {
-        const auto comparison = QString::compare(a, b, Qt::CaseInsensitive);
-        return comparison == 0 ? a < b : comparison < 0;
-    });
-    return result;
-}
+};
 
-IconSelectionDialog::IconSelectionDialog(const QString& currentIcon, QWidget* parent) : QDialog{parent} {
+} // namespace
+
+IconSelectionDialog::IconSelectionDialog(const IO::IconCatalog& catalog, const QString& currentIcon, QWidget* parent)
+    : QDialog{parent}, m_catalog(catalog) {
     setObjectName("EditorIconSelection");
     setWindowTitle(tr("Choose icon"));
     setWindowIconTB(this);
@@ -55,7 +65,7 @@ IconSelectionDialog::IconSelectionDialog(const QString& currentIcon, QWidget* pa
     m_filter->setPlaceholderText(tr("Search icons…"));
     m_filter->setClearButtonEnabled(true);
 
-    m_icons = new QListWidget;
+    m_icons = new QListView;
     m_icons->setObjectName("EditorIconGrid");
     m_icons->setProperty("preferencesList", true);
     m_icons->setViewMode(QListView::IconMode);
@@ -66,6 +76,7 @@ IconSelectionDialog::IconSelectionDialog(const QString& currentIcon, QWidget* pa
     m_icons->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_icons->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     m_icons->setUniformItemSizes(true);
+    m_icons->setLayoutMode(QListView::Batched);
     m_icons->setWordWrap(false);
     m_icons->setTextElideMode(Qt::ElideRight);
 
@@ -96,37 +107,30 @@ IconSelectionDialog::IconSelectionDialog(const QString& currentIcon, QWidget* pa
     layout->addLayout(preview);
     layout->addWidget(m_buttons);
 
-    auto selectedName = QDir::cleanPath(currentIcon);
-    if (QFileInfo(currentIcon).isAbsolute()) {
-        for (const auto& path : IO::SystemPaths::findResourceDirectories("images")) {
-            const auto relative = QDir(IO::pathAsQString(path)).relativeFilePath(currentIcon);
-            if (!relative.startsWith("../") && !QDir::isAbsolutePath(relative)) {
-                selectedName = relative;
-                break;
-            }
-        }
-    }
-    QListWidgetItem* current = nullptr;
-    for (const auto& name : availableIcons()) {
-        auto* item = new QListWidgetItem{IO::loadSVGIcon(IO::pathFromQString(name), 40), QFileInfo(name).completeBaseName(), m_icons};
-        item->setData(Qt::UserRole, name);
-        item->setToolTip(name);
-        if (name == selectedName) current = item;
-    }
+    // The model asks for a QIcon only when Qt needs it for a tile. Filtering
+    // thousands of glyph names doesn't rasterize the fonts or load the SVGs.
+    auto* model = new IconListModel(m_catalog, this);
+    m_results = new QSortFilterProxyModel(this);
+    m_results->setSourceModel(model);
+    m_results->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_results->setFilterRole(SearchRole);
+    m_icons->setModel(m_results);
+    const auto matches = model->match(model->index(0), Qt::UserRole, m_catalog.canonicalName(currentIcon),
+        1, Qt::MatchExactly);
+    const auto current = matches.isEmpty() ? m_results->index(0, 0) : m_results->mapFromSource(matches.front());
     connect(m_filter, &QLineEdit::textChanged, this, &IconSelectionDialog::filterIcons);
-    connect(m_icons, &QListWidget::currentItemChanged, this, [this] { updateSelection(); });
-    connect(m_icons, &QListWidget::itemActivated, this, [this] { accept(); });
+    connect(m_icons->selectionModel(), &QItemSelectionModel::currentChanged, this, [this] { updateSelection(); });
+    connect(m_icons, &QListView::activated, this, [this] { accept(); });
     connect(m_buttons, &QDialogButtonBox::accepted, this, &IconSelectionDialog::accept);
     connect(m_buttons, &QDialogButtonBox::rejected, this, &IconSelectionDialog::reject);
-    m_icons->setCurrentItem(current ? current : m_icons->item(0));
-    if (current) m_icons->scrollToItem(current, QAbstractItemView::PositionAtCenter);
+    m_icons->setCurrentIndex(current);
+    if (current.isValid()) m_icons->scrollTo(current, QAbstractItemView::PositionAtCenter);
     filterIcons({});
     m_filter->setFocus();
 }
 
 QString IconSelectionDialog::selectedIcon() const {
-    const auto* item = m_icons->currentItem();
-    return item && !item->isHidden() ? item->data(Qt::UserRole).toString() : QString{};
+    return m_icons->currentIndex().data(Qt::UserRole).toString();
 }
 
 bool IconSelectionDialog::eventFilter(QObject* watched, QEvent* event) {
@@ -139,19 +143,9 @@ void IconSelectionDialog::accept() {
 }
 
 void IconSelectionDialog::filterIcons(const QString& filter) {
-    auto visible = 0;
-    QListWidgetItem* first = nullptr;
-    for (auto i = 0; i < m_icons->count(); ++i) {
-        auto* item = m_icons->item(i);
-        const auto matches = item->data(Qt::UserRole).toString().contains(filter.trimmed(), Qt::CaseInsensitive);
-        item->setHidden(!matches);
-        if (matches) {
-            ++visible;
-            if (!first) first = item;
-        }
-    }
-    if (!m_icons->currentItem() || m_icons->currentItem()->isHidden()) m_icons->setCurrentItem(first);
-    m_count->setText(tr("%1 of %2 icons").arg(visible).arg(m_icons->count()));
+    m_results->setFilterFixedString(filter.trimmed());
+    if (!m_icons->currentIndex().isValid()) m_icons->setCurrentIndex(m_results->index(0, 0));
+    m_count->setText(tr("%1 of %2 icons").arg(m_results->rowCount()).arg(m_catalog.entries().size()));
     updateSelection();
 }
 
@@ -167,7 +161,7 @@ void IconSelectionDialog::updateSelection() {
         pixmap.fill(Qt::transparent);
         {
             QPainter painter{&pixmap};
-            IO::loadSVGIcon(IO::pathFromQString(name), 48).paint(&painter, QRect{QPoint{}, logicalSize});
+            m_catalog.icon(name).paint(&painter, QRect{QPoint{}, logicalSize});
         }
         m_preview->setPixmap(pixmap);
     }

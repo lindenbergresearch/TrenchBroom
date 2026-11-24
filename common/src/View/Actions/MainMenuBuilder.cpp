@@ -36,7 +36,7 @@ MenuBuilderBase::~MenuBuilderBase() = default;
 
 void MenuBuilderBase::updateActionKeySeqeunce(QAction *qAction, const Action *tAction) {
     qAction->setText(tAction->label()); qAction->setCheckable(tAction->checkable()); qAction->setStatusTip(tAction->statusTip());
-    qAction->setIcon(tAction->hasIcon() ? IO::loadSVGIcon(tAction->iconPath(), pref(Preferences::ToolBarIconsSize)) : QIcon{});
+    qAction->setIcon(tAction->hasIcon() ? IO::loadIcon(tAction->iconPath(), pref(Preferences::ToolBarIconsSize)) : QIcon{});
     qAction->setProperty("tbActionId", QString::fromStdString(tAction->preferencePath().generic_string()));
     if (!tAction->keySequence().isEmpty()) {
         const QString tooltip = QObject::tr("%1 (%2)").arg(tAction->label(), tAction->keySequence().toString(QKeySequence::NativeText));
@@ -60,13 +60,6 @@ QAction *MenuBuilderBase::findOrCreateQAction(const Action *tAction) {
 
     auto *qAction = new QAction(tAction->label(), m_owner);
     qAction->setProperty("tbRegisteredAction",true);
-    qAction->setCheckable(tAction->checkable());
-    if (tAction->hasIcon()) {
-        auto size = pref(Preferences::ToolBarIconsSize);
-        qAction->setIcon(IO::loadSVGIcon(tAction->iconPath(), size));
-    }
-
-    qAction->setStatusTip(tAction->statusTip());
     updateActionKeySeqeunce(qAction, tAction);
 
     const auto &triggerFn = m_triggerFn;

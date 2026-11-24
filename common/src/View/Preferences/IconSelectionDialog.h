@@ -1,19 +1,23 @@
 #pragma once
 
 #include <QDialog>
-#include <QStringList>
 
 class QDialogButtonBox;
 class QLabel;
 class QLineEdit;
-class QListWidget;
+class QListView;
+class QSortFilterProxyModel;
+
+namespace TrenchBroom::IO { class IconCatalog; }
 
 namespace TrenchBroom::View {
 
-/** Chooses an SVG from the editor's icon resources without storing absolute paths. */
+/** Chooses a globally named SVG or font glyph. */
 class IconSelectionDialog : public QDialog {
     Q_OBJECT
-    QListWidget* m_icons;
+    const IO::IconCatalog& m_catalog;
+    QListView* m_icons;
+    QSortFilterProxyModel* m_results;
     QLineEdit* m_filter;
     QLabel *m_preview, *m_name, *m_count;
     QDialogButtonBox* m_buttons;
@@ -22,9 +26,8 @@ class IconSelectionDialog : public QDialog {
     void updateSelection();
 
   public:
-    explicit IconSelectionDialog(const QString& currentIcon, QWidget* parent = nullptr);
+    IconSelectionDialog(const IO::IconCatalog& catalog, const QString& currentIcon, QWidget* parent = nullptr);
 
-    static QStringList availableIcons();
     QString selectedIcon() const;
     void accept() override;
     bool eventFilter(QObject* watched, QEvent* event) override;

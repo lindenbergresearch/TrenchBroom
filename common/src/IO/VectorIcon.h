@@ -24,6 +24,8 @@
 #include <filesystem>
 #include <memory>
 
+class QRawFont;
+
 class QColor;
 class QImage;
 
@@ -81,7 +83,7 @@ private:
 };
 
 /**
- * A resolution-independent SVG icon. A base.svg may have base_on.svg and
+ * A resolution-independent SVG or outline glyph icon. A base.svg may have base_on.svg and
  * base_off.svg variants, mapped to QIcon::On and Off (not enabled/disabled).
  * Relative paths resolve in the application's images resources; absolute paths
  * and Qt resource paths are also supported. Missing/invalid files yield a null
@@ -90,6 +92,7 @@ private:
 class VectorIcon {
 public:
     explicit VectorIcon(const std::filesystem::path& path);
+    static QIcon glyphIcon(const QRawFont& font, quint32 glyphIndex);
     QIcon icon() const;
     // Reuse the parsed SVG and preserve its shape/alpha, replacing the painted
     // colors with the supplied tint. An invalid color returns the original.
