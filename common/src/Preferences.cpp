@@ -224,10 +224,12 @@ Preference<bool> GroupBrushesCreatedByShapeTool("Editor/Group brushes created by
 Preference<Path> RendererFontPath("Renderer/Font name", "fonts/Inter-SemiBold.otf");
 Preference<Path> UIFontPath("Editor/UI Font name", "fonts/Inter-Regular.otf");
 Preference<Path> ConsoleFontPath("Editor/Console Font name", "fonts/JetBrainsMono/JetBrainsMono-Regular.ttf");
-Preference<int> RendererFontSize("Renderer/Font size", 12);
-Preference<int> BrowserFontSize("Browser/Font size", 12);
-Preference<int> UIFontSize("Editor/UI Font size", 13);
-Preference<int> UIFontMinimumSize("Editor/UI Minimum font size", 11);
+
+Preference<float> RendererFontSize("Renderer/Font size", 12.0f);
+Preference<float> BrowserFontSize("Browser/Font size", 12.0f);
+Preference<float> UIFontSize("Editor/UI Font size", 13.0f);
+
+Preference<float> UIFontMinimumSize("Editor/UI Minimum font size", 11.0f);
 Preference<float> UIDetailTextOpacity("Editor/UI Detail text opacity", 0.85f);
 Preference<int> UIListFontWeight("Editor/UI List font weight", 0);
 Preference<float> UIListOpticalSize("Editor/UI List optical size", 0.0f);
@@ -237,7 +239,7 @@ Preference<bool> UIGlobalTypography("Editor/UI Global typography", false);
 Preference<bool> ContextMenuIcons("Editor/Context menu icons", true);
 Preference<bool> ContextMenuShortcuts("Editor/Context menu shortcuts", true);
 Preference<bool> ShowMapLoadDiagnostics("Editor/Show map load diagnostics", true);
-Preference<int> ConsoleFontSize("Editor/Console Font size", 13);
+Preference<float> ConsoleFontSize("Editor/Console Font size", 13.0f);
 
 Renderer::FontDescriptor getDefaultRenderFont() {
     return Renderer::FontDescriptor(

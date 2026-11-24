@@ -20,27 +20,27 @@
 
 namespace TrenchBroom {
 ThemeValue ThemeValue::color(const QColor &value) {
-    return {Type::Color, value};
+    return { Type::Color, value };
 }
 
 ThemeValue ThemeValue::length(qreal value) {
-    return {Type::Length, value};
+    return { Type::Length, value };
 }
 
 ThemeValue ThemeValue::number(qreal value) {
-    return {Type::Number, value};
+    return { Type::Number, value };
 }
 
 ThemeValue ThemeValue::family(const QString &value) {
-    return {Type::FontFamily, value};
+    return { Type::FontFamily, value };
 }
 
 ThemeValue ThemeValue::weight(int value) {
-    return {Type::FontWeight, value};
+    return { Type::FontWeight, value };
 }
 
 ThemeValue ThemeValue::keyword(const QString &value) {
-    return {Type::Keyword, value};
+    return { Type::Keyword, value };
 }
 
 bool ThemeValue::isValid() const {
@@ -59,16 +59,17 @@ bool ThemeValue::isValid() const {
                    value.toDouble() >= 0 && value.toDouble() <= 1000;
         case Type::FontFamily:
             return value.typeId() == QMetaType::QString && !value.toString().isEmpty() &&
-                   !value.toString().contains(QRegularExpression{"[\\r\\n\\x00]"});
+                   !value.toString().contains(QRegularExpression { "[\\r\\n\\x00]" });
         case Type::Keyword:
             return value.typeId() == QMetaType::QString &&
-                   QRegularExpression{"^[A-Za-z][A-Za-z0-9_-]*$"}.match(value.toString()).hasMatch();
+                   QRegularExpression { "^[A-Za-z][A-Za-z0-9_-]*$" }.match(value.toString()).hasMatch();
     }
     return false;
 }
 
 QString ThemeValue::toStyleSheet(const bool insideQuotes) const {
     if (!isValid()) return {};
+
     const auto decimal = [](const double value) {
         if (value == 0) return QStringLiteral("0");
         // CSS numeric values should not depend on scientific-notation support.
@@ -120,7 +121,7 @@ QPalette preferencePalette() {
     const auto highlightColor = toQColor(hl_color, brightness);
 
     // Build an initial palette based on the button color
-    auto palette = QPalette{windowColor};
+    auto palette = QPalette { windowColor };
 
     // Window colors
     palette.setColor(QPalette::Active, QPalette::Window, windowColor.lighter(int(130.f * contrast)));
@@ -169,12 +170,12 @@ QPalette preferencePalette() {
 
     // Highlight (selected list box row, selected grid cell background, selected tab text)
     palette.setColor(QPalette::Active, QPalette::Highlight, highlightColor);
-    palette.setColor(QPalette::Inactive, QPalette::Highlight, windowColor.lighter(int(200.f * contrast)));
-    palette.setColor(QPalette::Disabled, QPalette::Highlight, windowColor.lighter(int(100.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::Highlight, highlightColor.darker(int(200.f * contrast)));
+    palette.setColor(QPalette::Disabled, QPalette::Highlight, highlightColor.darker(int(100.f * contrast)));
 
     // Text of highlighted elements
     palette.setColor(QPalette::Active, QPalette::HighlightedText, textColor.lighter(int(150.f * contrast)));
-    palette.setColor(QPalette::Inactive, QPalette::HighlightedText, textColor.lighter(int(150.f * contrast)));
+    palette.setColor(QPalette::Inactive, QPalette::HighlightedText, textColor.darker(int(100.f * contrast)));
     palette.setColor(QPalette::Disabled, QPalette::HighlightedText, textColor.darker(int(130.f * contrast)));
 
     return palette;
@@ -186,12 +187,14 @@ struct DefinitionType {
    ThemeValue::Type type;
 };
 
-const DefinitionType definitionTypes[] = {{"colors", "color.", ThemeValue::Type::Color},
-                                          {"lengths", "length.", ThemeValue::Type::Length},
-                                          {"numbers", "number.", ThemeValue::Type::Number},
-                                          {"fontFamilies", "family.", ThemeValue::Type::FontFamily},
-                                          {"fontWeights", "weight.", ThemeValue::Type::FontWeight},
-                                          {"keywords", "keyword.", ThemeValue::Type::Keyword}};
+const DefinitionType definitionTypes[] = {
+    { "colors", "color.", ThemeValue::Type::Color },
+    { "lengths", "length.", ThemeValue::Type::Length },
+    { "numbers", "number.", ThemeValue::Type::Number },
+    { "fontFamilies", "family.", ThemeValue::Type::FontFamily },
+    { "fontWeights", "weight.", ThemeValue::Type::FontWeight },
+    { "keywords", "keyword.", ThemeValue::Type::Keyword }
+};
 
 bool preferenceBound(const QString &name) {
     return name.startsWith("color.") || name.startsWith("length.font.") || name.startsWith("family.") ||
@@ -204,7 +207,7 @@ QString fontStyle(const QFont &font) {
 }
 
 bool readFile(const std::filesystem::path &path, const bool optional, ThemeDefinitions &definitions, QStringList &errors) {
-    QFile file{IO::pathAsQString(path)};
+    QFile file { IO::pathAsQString(path) };
 
     if (optional && !QFileInfo::exists(file.fileName())) return true;
     if (!file.open(QIODevice::ReadOnly)) {
@@ -228,7 +231,7 @@ ThemeManager &ThemeManager::instance() {
 }
 
 ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &console, const QFont &renderer) {
-    auto snapshot = ThemeSnapshot{};
+    auto snapshot = ThemeSnapshot {};
     snapshot.palette = preferencePalette();
     auto &values = snapshot.values;
 
@@ -274,22 +277,28 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
     values.insert("number.text.detailOpacity", ThemeValue::number(opacity));
     values.insert("color.error", ThemeValue::color(View::toQColor(pref(Preferences::UIErrorColor))));
     values.insert("color.warning", ThemeValue::color(View::toQColor(pref(Preferences::UIWarningColor))));
-    const std::pair<const char*, Preference<Color>*> logColors[] = {{"trace", &Preferences::LogTraceColor},
-                                                                    {"debug", &Preferences::LogDebugColor},
-                                                                    {"info", &Preferences::LogInfoColor},
-                                                                    {"warning", &Preferences::LogWarningColor},
-                                                                    {"error", &Preferences::LogErrorColor}};
-    for (const auto& [name, preference] : logColors)
+
+    const std::pair<const char *, Preference<Color> *> logColors[] = {
+        { "trace", &Preferences::LogTraceColor },
+        { "debug", &Preferences::LogDebugColor },
+        { "info", &Preferences::LogInfoColor },
+        { "warning", &Preferences::LogWarningColor },
+        { "error", &Preferences::LogErrorColor }
+    };
+
+    for (const auto &[name, preference] : logColors)
         values.insert(QStringLiteral("color.log.") + name, ThemeValue::color(View::toQColor(pref(*preference))));
 
-    const std::pair<const char *, Preference<Color> *> iconColors[] = {{"layer", &Preferences::LayerTreeLayerIconColor},
-                                                                       {"group", &Preferences::LayerTreeGroupIconColor},
-                                                                       {"entity",
-                                                                        &Preferences::LayerTreeEntityIconColor},
-                                                                       {"brush", &Preferences::LayerTreeBrushIconColor},
-                                                                       {"patch", &Preferences::LayerTreePatchIconColor},
-                                                                       {"typeGroup",
-                                                                        &Preferences::LayerTreeTypeGroupIconColor}};
+    const std::pair<const char *, Preference<Color> *> iconColors[] = {
+        { "layer", &Preferences::LayerTreeLayerIconColor },
+        { "group", &Preferences::LayerTreeGroupIconColor },
+        { "entity",
+          &Preferences::LayerTreeEntityIconColor },
+        { "brush", &Preferences::LayerTreeBrushIconColor },
+        { "patch", &Preferences::LayerTreePatchIconColor },
+        { "typeGroup",
+          &Preferences::LayerTreeTypeGroupIconColor }};
+
     for (const auto &[name, preference] : iconColors)
         values.insert(QStringLiteral("color.icon.") + name, ThemeValue::color(View::toQColor(pref(*preference))));
 
@@ -310,19 +319,19 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
     length("margin.wide", LayoutConstants::WideHMargin);
 
     length("font.ui", View::uiFontPixelSize());
-    length("font.subtitle", View::uiFontPixelSize(-1));
-    length("font.small", View::uiFontPixelSize(-2));
-    length("font.tiny", View::uiFontPixelSize(-4));
-    length("font.title", qRound(View::uiFontPixelSize() * 1.4));
-    length("font.header", View::uiFontPixelSize() * 2);
-    length("font.dialogTitle", qRound(View::uiFontPixelSize() * 1.4) + 2);
+    length("font.subtitle", View::uiFontPixelSize(-1.0));
+    length("font.small", View::uiFontPixelSize(-1.2));
+    length("font.tiny", View::uiFontPixelSize(-3.3));
+    length("font.title", (View::uiFontPixelSize() * 1.35));
+    length("font.header", View::uiFontPixelSize() * 1.85);
+    length("font.dialogTitle", (View::uiFontPixelSize() * 1.4) + 2.0);
 
-    length("font.console", std::clamp(pref(Preferences::ConsoleFontSize), 1, 256));
-    length("font.renderer", std::clamp(pref(Preferences::RendererFontSize), 1, 256));
+    length("font.console", std::clamp(pref(Preferences::ConsoleFontSize), 1.0f, 256.0f));
+    length("font.renderer", std::clamp(pref(Preferences::RendererFontSize), 1.0f, 256.0f));
     length("icon.toolbar", std::clamp(pref(Preferences::ToolBarIconsSize), 1, 256));
 
-    const std::pair<const char *, const QFont *> fonts[] = {{"ui", &ui}, {"console", &console},
-                                                            {"renderer", &renderer}};
+    const std::pair<const char *, const QFont *> fonts[] = {{ "ui", &ui }, { "console", &console },
+                                                            { "renderer", &renderer }};
     for (const auto &[name, font] : fonts) {
         values.insert(QStringLiteral("family.") + name, ThemeValue::family(font->family()));
         values.insert(QStringLiteral("weight.") + name, ThemeValue::weight(font->weight()));
@@ -332,100 +341,103 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
 }
 
 const QMap<QString, QString> &ThemeManager::legacyNames() {
-    static const QMap<QString, QString> names = {{"TEXT_COLOR", "color.text"},
-                                                 {"DISABLED_TEXT_COLOR", "color.text.disabled"},
-                                                 {"DISABLED_BUTTON_COLOR", "color.button.disabled"},
-                                                 {"HIGHLIGHTED_TEXT_COLOR", "color.text.highlighted"},
-                                                 {"BRIGHT_TEXT_COLOR", "color.text.bright"},
-                                                 {"PLACEHOLDER_TEXT_COLOR", "color.text.placeholder"},
-                                                 {"WINDOW_COLOR", "color.window"},
-                                                 {"BUTTON_COLOR", "color.button"},
-                                                 {"BUTTON_TEXT_COLOR", "color.text.button"},
-                                                 {"BASE_COLOR", "color.base"},
-                                                 {"ALTERNATE_BASE_COLOR", "color.base.alternate"},
-                                                 {"LIGHT_COLOR", "color.light"},
-                                                 {"MIDLIGHT_COLOR", "color.midlight"},
-                                                 {"MIDHALF_COLOR", "color.midhalf"},
-                                                 {"MID_COLOR", "color.mid"},
-                                                 {"DARK_COLOR", "color.dark"},
-                                                 {"SHADOW_COLOR", "color.shadow"},
-                                                 {"BRIGHT_HIGHLIGHT_COLOR", "color.highlight.bright"},
-                                                 {"LIGHT_HIGHLIGHT_COLOR", "color.highlight.light"},
-                                                 {"HIGHLIGHT_COLOR", "color.highlight"},
-                                                 {"MID_HIGHLIGHT_COLOR", "color.highlight.mid"},
-                                                 {"DARK_HIGHLIGHT_COLOR", "color.highlight.dark"},
-                                                 {"BORDER_RADIUS", "length.radius.border"},
-                                                 {"BORDER_SIZE", "length.border"},
-                                                 {"MENU_CORNER_RADIUS", "length.radius.menu"},
-                                                 {"TOOLTIP_CORNER_RADIUS", "length.radius.tooltip"},
-                                                 {"NARROW_H_MARGIN", "length.margin.narrow.h"},
-                                                 {"NARROW_V_MARGIN", "length.margin.narrow.v"},
-                                                 {"NARROW_MARGIN", "length.margin.narrow"},
-                                                 {"MEDIUM_H_MARGIN", "length.margin.medium.h"},
-                                                 {"MEDIUM_V_MARGIN", "length.margin.medium.v"},
-                                                 {"MEDIUM_MARGIN", "length.margin.medium"},
-                                                 {"WIDE_H_MARGIN", "length.margin.wide.h"},
-                                                 {"WIDE_V_MARGIN", "length.margin.wide.v"},
-                                                 {"WIDE_MARGIN", "length.margin.wide"},
-                                                 {"UI_FONT_SIZE", "length.font.ui"},
-                                                 {"UI_MID_FONT_SIZE", "length.font.subtitle"},
-                                                 {"UI_SMALL_FONT_SIZE", "length.font.small"},
-                                                 {"UI_TITLE_FONT_SIZE", "length.font.title"},
-                                                 {"UI_HEADER_FONT_SIZE", "length.font.header"},
-                                                 {"UI_DIALOG_TITLE_FONT_SIZE", "length.font.dialogTitle"},
-                                                 {"UI_FONT_FAMILY", "family.ui"},
-                                                 {"UI_FONT_WEIGHT", "weight.ui"},
-                                                 {"UI_FONT_STYLE", "keyword.font.ui"},
-                                                 {"CONSOLE_FONT_FAMILY", "family.console"},
-                                                 {"CONSOLE_FONT_WEIGHT", "weight.console"},
-                                                 {"CONSOLE_FONT_STYLE", "keyword.font.console"},
-                                                 {"CONSOLE_FONT_SIZE", "length.font.console"},
-                                                 {"RENDER_FONT_SIZE", "length.font.renderer"},
-                                                 {"TOOLBAR_ICON_SIZE", "length.icon.toolbar"},
-                                                 {"UI_DETAIL_TEXT_COLOR", "color.text.detail"},
-                                                 {"UI_ERROR_COLOR", "color.error"}};
+    static const QMap<QString, QString> names =
+        {{ "TEXT_COLOR", "color.text" },
+         { "DISABLED_TEXT_COLOR", "color.text.disabled" },
+         { "DISABLED_BUTTON_COLOR", "color.button.disabled" },
+         { "HIGHLIGHTED_TEXT_COLOR", "color.text.highlighted" },
+         { "BRIGHT_TEXT_COLOR", "color.text.bright" },
+         { "PLACEHOLDER_TEXT_COLOR", "color.text.placeholder" },
+         { "WINDOW_COLOR", "color.window" },
+         { "BUTTON_COLOR", "color.button" },
+         { "BUTTON_TEXT_COLOR", "color.text.button" },
+         { "BASE_COLOR", "color.base" },
+         { "ALTERNATE_BASE_COLOR", "color.base.alternate" },
+         { "LIGHT_COLOR", "color.light" },
+         { "MIDLIGHT_COLOR", "color.midlight" },
+         { "MIDHALF_COLOR", "color.midhalf" },
+         { "MID_COLOR", "color.mid" },
+         { "DARK_COLOR", "color.dark" },
+         { "SHADOW_COLOR", "color.shadow" },
+         { "BRIGHT_HIGHLIGHT_COLOR", "color.highlight.bright" },
+         { "LIGHT_HIGHLIGHT_COLOR", "color.highlight.light" },
+         { "HIGHLIGHT_COLOR", "color.highlight" },
+         { "MID_HIGHLIGHT_COLOR", "color.highlight.mid" },
+         { "DARK_HIGHLIGHT_COLOR", "color.highlight.dark" },
+         { "BORDER_RADIUS", "length.radius.border" },
+         { "BORDER_SIZE", "length.border" },
+         { "MENU_CORNER_RADIUS", "length.radius.menu" },
+         { "TOOLTIP_CORNER_RADIUS", "length.radius.tooltip" },
+         { "NARROW_H_MARGIN", "length.margin.narrow.h" },
+         { "NARROW_V_MARGIN", "length.margin.narrow.v" },
+         { "NARROW_MARGIN", "length.margin.narrow" },
+         { "MEDIUM_H_MARGIN", "length.margin.medium.h" },
+         { "MEDIUM_V_MARGIN", "length.margin.medium.v" },
+         { "MEDIUM_MARGIN", "length.margin.medium" },
+         { "WIDE_H_MARGIN", "length.margin.wide.h" },
+         { "WIDE_V_MARGIN", "length.margin.wide.v" },
+         { "WIDE_MARGIN", "length.margin.wide" },
+         { "UI_FONT_SIZE", "length.font.ui" },
+         { "UI_MID_FONT_SIZE", "length.font.subtitle" },
+         { "UI_SMALL_FONT_SIZE", "length.font.small" },
+         { "UI_TITLE_FONT_SIZE", "length.font.title" },
+         { "UI_HEADER_FONT_SIZE", "length.font.header" },
+         { "UI_DIALOG_TITLE_FONT_SIZE", "length.font.dialogTitle" },
+         { "UI_FONT_FAMILY", "family.ui" },
+         { "UI_FONT_WEIGHT", "weight.ui" },
+         { "UI_FONT_STYLE", "keyword.font.ui" },
+         { "CONSOLE_FONT_FAMILY", "family.console" },
+         { "CONSOLE_FONT_WEIGHT", "weight.console" },
+         { "CONSOLE_FONT_STYLE", "keyword.font.console" },
+         { "CONSOLE_FONT_SIZE", "length.font.console" },
+         { "RENDER_FONT_SIZE", "length.font.renderer" },
+         { "TOOLBAR_ICON_SIZE", "length.icon.toolbar" },
+         { "UI_DETAIL_TEXT_COLOR", "color.text.detail" },
+         { "UI_ERROR_COLOR", "color.error" }};
     return names;
 }
 
 bool ThemeManager::isRelevantPreference(const std::filesystem::path &path) {
-    const PreferenceBase* preferences[] = {&Preferences::UIBrightness,
-                                           &Preferences::UIHighlightColor,
-                                           &Preferences::UIWindowTintColor,
-                                           &Preferences::UITextColor,
-                                           &Preferences::UIErrorColor,
-                                           &Preferences::UIWarningColor,
-                                           &Preferences::LogTraceColor,
-                                           &Preferences::LogDebugColor,
-                                           &Preferences::LogInfoColor,
-                                           &Preferences::LogWarningColor,
-                                           &Preferences::LogErrorColor,
-                                           &Preferences::UIDetailTextOpacity,
-                                           &Preferences::UIFontPath,
-                                           &Preferences::UIFontSize,
-                                           &Preferences::UIFontMinimumSize,
-                                           &Preferences::UIListFontWeight,
-                                           &Preferences::UIListOpticalSize,
-                                           &Preferences::UIListTypoLineMetrics,
-                                           &Preferences::UIListSubpixelPositioning,
-                                           &Preferences::UIGlobalTypography,
-                                           &Preferences::ConsoleFontPath,
-                                           &Preferences::ConsoleFontSize,
-                                           &Preferences::RendererFontPath,
-                                           &Preferences::RendererFontSize,
-                                           &Preferences::ToolBarIconsSize,
-                                           &Preferences::LayerTreeLayerIconColor,
-                                           &Preferences::LayerTreeGroupIconColor,
-                                           &Preferences::LayerTreeEntityIconColor,
-                                           &Preferences::LayerTreeBrushIconColor,
-                                           &Preferences::LayerTreePatchIconColor,
-                                           &Preferences::LayerTreeTypeGroupIconColor};
+    const PreferenceBase *preferences[] = {
+        &Preferences::UIBrightness,
+        &Preferences::UIHighlightColor,
+        &Preferences::UIWindowTintColor,
+        &Preferences::UITextColor,
+        &Preferences::UIErrorColor,
+        &Preferences::UIWarningColor,
+        &Preferences::LogTraceColor,
+        &Preferences::LogDebugColor,
+        &Preferences::LogInfoColor,
+        &Preferences::LogWarningColor,
+        &Preferences::LogErrorColor,
+        &Preferences::UIDetailTextOpacity,
+        &Preferences::UIFontPath,
+        &Preferences::UIFontSize,
+        &Preferences::UIFontMinimumSize,
+        &Preferences::UIListFontWeight,
+        &Preferences::UIListOpticalSize,
+        &Preferences::UIListTypoLineMetrics,
+        &Preferences::UIListSubpixelPositioning,
+        &Preferences::UIGlobalTypography,
+        &Preferences::ConsoleFontPath,
+        &Preferences::ConsoleFontSize,
+        &Preferences::RendererFontPath,
+        &Preferences::RendererFontSize,
+        &Preferences::ToolBarIconsSize,
+        &Preferences::LayerTreeLayerIconColor,
+        &Preferences::LayerTreeGroupIconColor,
+        &Preferences::LayerTreeEntityIconColor,
+        &Preferences::LayerTreeBrushIconColor,
+        &Preferences::LayerTreePatchIconColor,
+        &Preferences::LayerTreeTypeGroupIconColor };
+
     return std::any_of(std::begin(preferences), std::end(preferences), [&](const auto *preference) {
         return path == preference->path();
     });
 }
 
 bool ThemeManager::readDefinition(const QByteArray &bytes, const QString &source, ThemeDefinitions &definitions, QStringList &errors) {
-    auto parseError = QJsonParseError{};
+    auto parseError = QJsonParseError {};
     const auto document = QJsonDocument::fromJson(bytes, &parseError);
 
     if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
@@ -462,14 +474,14 @@ bool ThemeManager::readDefinition(const QByteArray &bytes, const QString &source
         // look for well-defined constant definitions
         const auto entries = section.value().toObject();
         for (auto entry = entries.begin(); entry != entries.end(); ++entry) {
-            if (!QRegularExpression{
-                "^[a-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)*$"}.match(entry.key()).hasMatch()) {
+            if (!QRegularExpression {
+                "^[a-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)*$" }.match(entry.key()).hasMatch()) {
                 errors << source + ": invalid theme name '" + entry.key() + "'";
                 continue;
             }
 
-            candidate[section.key()][entry.key()] = QVariantMap{{"value", entry.value().toVariant()},
-                                                                {"source", source}};
+            candidate[section.key()][entry.key()] = QVariantMap {{ "value", entry.value().toVariant() },
+                                                                 { "source", source }};
         }
     }
 
@@ -481,35 +493,42 @@ bool ThemeManager::readDefinition(const QByteArray &bytes, const QString &source
 
 bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &definitions, QStringList &errors) {
     auto result = snapshot.values;
-    auto raw = QMap<QString, std::pair<ThemeValue::Type, QVariantMap>>{};
+    auto raw = QMap<QString, std::pair<ThemeValue::Type, QVariantMap>> {};
     for (const auto &type : definitionTypes) {
+
         const auto entries = definitions.value(type.section);
         for (auto it = entries.cbegin(); it != entries.cend(); ++it) {
+
             const auto name = QString::fromLatin1(type.prefix) + it.key();
             if (result.contains(name) && preferenceBound(name)) {
                 errors
                     << it.value().toMap().value("source").toString() + ": '" + name + "' is controlled by Preferences";
                 continue;
             }
-            raw.insert(name, {type.type, it.value().toMap()});
+
+            raw.insert(name, { type.type, it.value().toMap() });
         }
     }
-    auto resolving = QSet<QString>{};
-    auto resolved = QSet<QString>{};
+    auto resolving = QSet<QString> {};
+    auto resolved = QSet<QString> {};
     std::function<bool(const QString &)> resolveValue;
     resolveValue = [&](const QString &name) {
         if (resolved.contains(name)) return true;
         const auto entry = raw.constFind(name);
+
         if (entry == raw.cend()) return result.contains(name);
         const auto location = entry->second.value("source").toString() + ": " + name + ": ";
+
         if (resolving.contains(name) || resolving.size() >= 128) {
             errors << location + "cyclic or excessively deep theme reference";
             return false;
         }
+
         resolving.insert(name);
         const auto input = entry->second.value("value");
-        auto value = ThemeValue{entry->first, input};
+        auto value = ThemeValue { entry->first, input };
         const auto string = input.toString();
+
         if (input.typeId() == QMetaType::QString && string.startsWith("${") && string.endsWith('}')) {
             const auto reference = string.mid(2, string.size() - 3);
             if (!resolveValue(reference)) {
@@ -517,6 +536,7 @@ bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &defi
                 resolving.remove(name);
                 return false;
             }
+
             value = result.value(reference);
             if (value.type != entry->first) {
                 errors << location + "reference has the wrong value type";
@@ -524,7 +544,7 @@ bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &defi
                 return false;
             }
         } else if (entry->first == ThemeValue::Type::Color && input.typeId() == QMetaType::QString) {
-            value = ThemeValue::color(QColor{string});
+            value = ThemeValue::color(QColor { string });
         } else if (entry->first == ThemeValue::Type::Color ||
                    ((entry->first == ThemeValue::Type::Length || entry->first == ThemeValue::Type::Number ||
                      entry->first == ThemeValue::Type::FontWeight) &&
@@ -534,6 +554,7 @@ bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &defi
                     input.typeId() != QMetaType::QString)) {
             errors << location + "value has the wrong type";
             resolving.remove(name);
+
             return false;
         }
         if (!value.isValid() || ((name == "number.icon.brightness" || name == "number.icon.disabledOpacity" ||
@@ -549,29 +570,33 @@ bool ThemeManager::resolve(ThemeSnapshot &snapshot, const ThemeDefinitions &defi
         resolving.remove(name);
         return true;
     };
+
     for (auto it = raw.cbegin(); it != raw.cend(); ++it)
         resolveValue(it.key());
     if (!errors.isEmpty()) return false;
+
     snapshot.values = std::move(result);
+
     return true;
 }
 
 bool ThemeManager::prepare(const QFont &ui, const QFont &console, const QFont &renderer, const std::filesystem::path &defaults, const std::filesystem::path &overrides, ThemeSnapshot &result,
                            QStringList &errors) {
     errors.clear();
-    auto definitions = ThemeDefinitions{};
+    auto definitions = ThemeDefinitions {};
     if (!readFile(defaults, false, definitions, errors) ||
         (!overrides.empty() && !readFile(overrides, true, definitions, errors)))
         return false;
     auto candidate = preferenceValues(ui, console, renderer);
     if (!resolve(candidate, definitions, errors)) return false;
     result = std::move(candidate);
+
     return true;
 }
 
 bool ThemeManager::publish(ThemeSnapshot snapshot) {
     if (snapshot.values == m_current.values && snapshot.palette == m_current.palette) return false;
-    auto changed = QStringList{};
+    auto changed = QStringList {};
     for (auto it = snapshot.values.cbegin(); it != snapshot.values.cend(); ++it)
         if (!m_current.values.contains(it.key()) || m_current.values.value(it.key()) != it.value()) changed << it.key();
     for (auto it = m_current.values.cbegin(); it != m_current.values.cend(); ++it)
@@ -579,6 +604,7 @@ bool ThemeManager::publish(ThemeSnapshot snapshot) {
     m_current = std::move(snapshot);
     ++m_revision;
     themeDidChangeNotifier(changed);
+
     return true;
 }
 

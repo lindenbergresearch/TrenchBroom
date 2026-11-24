@@ -220,10 +220,10 @@ extern Preference<bool> GroupBrushesCreatedByShapeTool;
 extern Preference<Path> RendererFontPath;
 extern Preference<Path> UIFontPath;
 extern Preference<Path> ConsoleFontPath;
-extern Preference<int> RendererFontSize;
-extern Preference<int> BrowserFontSize;
-extern Preference<int> UIFontSize;
-extern Preference<int> UIFontMinimumSize;
+extern Preference<float> RendererFontSize;
+extern Preference<float> BrowserFontSize;
+extern Preference<float> UIFontSize;
+extern Preference<float> UIFontMinimumSize;
 extern Preference<float> UIDetailTextOpacity;
 extern Preference<int> UIListFontWeight;
 extern Preference<float> UIListOpticalSize;
@@ -233,7 +233,7 @@ extern Preference<bool> UIGlobalTypography;
 extern Preference<bool> ContextMenuIcons;
 extern Preference<bool> ContextMenuShortcuts;
 extern Preference<bool> ShowMapLoadDiagnostics;
-extern Preference<int> ConsoleFontSize;
+extern Preference<float> ConsoleFontSize;
 
 Renderer::FontDescriptor getDefaultRenderFont();
 

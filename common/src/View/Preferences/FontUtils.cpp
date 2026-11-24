@@ -23,8 +23,8 @@
 
 namespace TrenchBroom::View {
 namespace {
-QCache<QString, FontCapabilities>& capabilitiesCache() {
-    static QCache<QString, FontCapabilities> cache{128};
+QCache<QString, FontCapabilities> &capabilitiesCache() {
+    static QCache<QString, FontCapabilities> cache { 128 };
     return cache;
 }
 
@@ -41,7 +41,7 @@ QFont fileFont(const QString &path) {
 
     if (!families.isEmpty()) {
         font = QFont(families.front());
-        const auto raw = QRawFont(path, 26.0, QFont::PreferNoHinting);
+        const auto raw = QRawFont(path, 11.0, QFont::PreferDefaultHinting);
         if (raw.isValid()) {
             font.setStyleName(raw.styleName());
             font.setWeight(QFont::Weight(raw.weight()));
@@ -55,15 +55,15 @@ QFont fileFont(const QString &path) {
     return font;
 }
 
-int minimumSize() {
-    return std::clamp(pref(Preferences::UIFontMinimumSize), 8, 32);
+qreal minimumSize() {
+    return std::clamp(qreal(pref(Preferences::UIFontMinimumSize)), 8.0, 32.0);
 }
 }
 
 QFont::Weight normalizedFontWeight(int weight) {
     if (weight >= 0 && weight <= 99) {
-        constexpr std::array legacy{0, 12, 25, 50, 57, 63, 75, 81, 87, 99};
-        constexpr std::array css{100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
+        constexpr std::array legacy { 0, 12, 25, 50, 57, 63, 75, 81, 87, 99 };
+        constexpr std::array css { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
         const auto next = std::lower_bound(legacy.begin(), legacy.end(), weight);
         const auto index = size_t(next - legacy.begin());
         if (index == 0 || *next == weight) return QFont::Weight(css[index]);
@@ -89,25 +89,29 @@ QFont loadFont(const std::filesystem::path &path, int pixelSize) {
         }
     }
 
-    font.setPixelSize(std::clamp(pixelSize, 1, 256));
-    font.setHintingPreference(QFont::PreferNoHinting);
-    font.setStyleStrategy(QFont::PreferAntialias);
+    font.setHintingPreference(QFont::PreferDefaultHinting);
+    font.setPointSizeF(pixelSize);
+//    font.setStyleStrategy(QFont::PreferAntialias);
 
-    defaultQtLogger.info() << "Loading font: " << font.family() << " style: " << font.styleName() << " hinting: "
-                           << font.hintingPreference() << " -> " << font.toString();
-
+    defaultQtLogger.info() <<
+                           "Loading font: " << font.family() <<
+                           " style: " << font.styleName() <<
+                           " hinting: " << font.hintingPreference() <<
+                           " weight: " << font.weight() <<
+                           " size: " << font.pixelSize() << "px / " << font.pointSizeF() << "pt ";
     return font;
 }
 
-int uiFontPixelSize(int adjustment) {
-    return std::clamp(std::clamp(pref(Preferences::UIFontSize), 1, 96) + adjustment, minimumSize(), 256);
+qreal uiFontPixelSize(qreal adjustment) {
+    return std::clamp(std::clamp(qreal(pref(Preferences::UIFontSize)), 1.0, 96.0) + adjustment, minimumSize(), 256.0);
 }
 
 QFont adjustedFont(const QFont &source, qreal pixelDelta) {
     auto font = source;
-    const auto resolved = font.pixelSize() > 0 ? font.pixelSize() : QFontInfo(font).pixelSize();
-    const auto size = std::clamp(qreal(std::max(1, resolved)) + pixelDelta, qreal(minimumSize()), 256.0);
-    font.setPixelSize(qRound(size));
+    const auto resolved = font.pointSizeF() > 0 ? font.pointSizeF() : QFontInfo(font).pointSizeF();
+    const auto size = std::clamp(std::max(1.0, resolved) + pixelDelta, qreal(minimumSize()), 256.0);
+    font.setPointSizeF(size);
+
     return font;
 }
 
@@ -128,34 +132,38 @@ QFont fontForStyleSheet(QFont font) {
     return font;
 }
 
-FontCapabilities fontCapabilities(const QFont& font) {
+FontCapabilities fontCapabilities(const QFont &font) {
     // Axes belong to a face, independent of its size/current variation values.
     const auto key = font.family() + '/' + font.styleName() + '/'
-        + QString::number(font.weight()) + '/' + QString::number(font.style());
-    auto& cache = capabilitiesCache();
-    if (const auto* found = cache.object(key)) return *found;
+                     + QString::number(font.weight()) + '/' + QString::number(font.style());
+
+    auto &cache = capabilitiesCache();
+    if (const auto *found = cache.object(key)) return *found;
     FontCapabilities result;
-    for (const auto& axis : QFontInfo{font}.variableAxes()) {
-        const FontAxisRange range{axis.minimumValue(), axis.maximumValue(), axis.defaultValue()};
+
+    for (const auto &axis : QFontInfo { font }.variableAxes()) {
+        const FontAxisRange range { axis.minimumValue(), axis.maximumValue(), axis.defaultValue() };
         if (!std::isfinite(range.minimum) || !std::isfinite(range.maximum) || range.minimum > range.maximum) continue;
-        if (axis.tag() == QFont::Tag{"wght"}) result.weight = range;
-        else if (axis.tag() == QFont::Tag{"opsz"}) result.opticalSize = range;
+        if (axis.tag() == QFont::Tag { "wght" }) result.weight = range;
+        else if (axis.tag() == QFont::Tag { "opsz" }) result.opticalSize = range;
     }
-    cache.insert(key, new FontCapabilities{result});
+
+    cache.insert(key, new FontCapabilities { result });
+
     return result;
 }
 
 ListFontSettings listFontSettings() {
-    return {std::clamp(pref(Preferences::UIListFontWeight), 0, 1000),
-        std::isfinite(pref(Preferences::UIListOpticalSize))
-            ? std::clamp(qreal(pref(Preferences::UIListOpticalSize)), 0.0, 144.0) : 0.0,
-        pref(Preferences::UIListTypoLineMetrics), pref(Preferences::UIListSubpixelPositioning)};
+    return { std::clamp(pref(Preferences::UIListFontWeight), 0, 1000),
+             std::isfinite(pref(Preferences::UIListOpticalSize))
+             ? std::clamp(qreal(pref(Preferences::UIListOpticalSize)), 0.0, 144.0) : 0.0,
+             pref(Preferences::UIListTypoLineMetrics), pref(Preferences::UIListSubpixelPositioning) };
 }
 
-QFont listTextFont(QFont font, const ListFontSettings& settings, const bool preserveEmphasis) {
+QFont listTextFont(QFont font, const ListFontSettings &settings, const bool preserveEmphasis) {
     const auto axes = fontCapabilities(font);
     const auto keepWeight = preserveEmphasis && font.weight() != QFont::Normal
-        && font.weight() != QGuiApplication::font().weight();
+                            && font.weight() != QGuiApplication::font().weight();
     auto weight = int(font.weight());
     if (settings.weight > 0 && !keepWeight)
         weight = std::clamp(settings.weight, 1, 1000);
@@ -170,20 +178,20 @@ QFont listTextFont(QFont font, const ListFontSettings& settings, const bool pres
         font.setWeight(QFont::Weight(weight));
     }
     if (axes.opticalSize) {
-        const auto points = font.pointSizeF() > 0 ? font.pointSizeF() : QFontInfo{font}.pointSizeF();
+        const auto points = font.pointSizeF() > 0 ? font.pointSizeF() : QFontInfo { font }.pointSizeF();
         const auto opticalSize = std::isfinite(settings.opticalSize) && settings.opticalSize > 0
-            ? settings.opticalSize : points;
+                                 ? settings.opticalSize : points;
         font.setVariableAxis("opsz", float(std::clamp(opticalSize, axes.opticalSize->minimum, axes.opticalSize->maximum)));
     }
     const auto strategy = settings.typoLineMetrics
-        ? int(font.styleStrategy()) | QFont::PreferTypoLineMetrics
-        : int(font.styleStrategy()) & ~QFont::PreferTypoLineMetrics;
+                          ? int(font.styleStrategy()) | QFont::PreferTypoLineMetrics
+                          : int(font.styleStrategy()) & ~QFont::PreferTypoLineMetrics;
     font.setStyleStrategy(QFont::StyleStrategy(strategy));
     if (settings.subpixelPositioning) font.setHintingPreference(QFont::PreferNoHinting);
     return font;
 }
 
-QFont styledTextFont(QFont font, const ListFontSettings& settings, const bool weightAxis) {
+QFont styledTextFont(QFont font, const ListFontSettings &settings, const bool weightAxis) {
     // Work from the final QSS weight; never carry a parent's variation into a
     // bold heading or rich-text fragment. Keep unrelated axes such as width.
     font.unsetVariableAxis("wght");
@@ -203,17 +211,17 @@ QFont styledTextFont(QFont font, const ListFontSettings& settings, const bool we
     tuned.setWeight(originalWeight);
     tuned.setStyleName(originalStyleName);
     tuned.setResolveMask((originalMask & ~variationsMask)
-        | (tuned.variableAxisTags().isEmpty() ? 0 : variationsMask));
+                         | (tuned.variableAxisTags().isEmpty() ? 0 : variationsMask));
     return tuned;
 }
 
-qreal logicalFontPixelSize(const QFont& font) {
-    return font.pixelSize() > 0 ? qreal(font.pixelSize()) : qreal(QFontInfo{font}.pixelSize());
+qreal logicalFontPixelSize(const QFont &font) {
+    return font.pixelSize() > 0 ? qreal(font.pixelSize()) : qreal(QFontInfo { font }.pixelSize());
 }
 
-QPointF textLineBaseline(const QPainter& painter, const QRectF& rect,
-    const QFontMetricsF& metrics, const bool subpixelPositioning) {
-    const QPointF baseline{rect.left(), rect.top() + (rect.height() - metrics.height()) / 2.0 + metrics.ascent()};
+QPointF textLineBaseline(const QPainter &painter, const QRectF &rect,
+                         const QFontMetricsF &metrics, const bool subpixelPositioning) {
+    const QPointF baseline { rect.left(), rect.top() + (rect.height() - metrics.height()) / 2.0 + metrics.ascent() };
     if (subpixelPositioning) return baseline;
     // Snap after the device transform: half a logical pixel is a whole physical
     // pixel on Retina, and translated/fractionally scaled painters also work.
@@ -222,17 +230,20 @@ QPointF textLineBaseline(const QPainter& painter, const QRectF& rect,
     const auto inverse = transform.inverted(&invertible);
     if (!invertible) return baseline;
     const auto device = transform.map(baseline);
-    return inverse.map(QPointF{qreal(qRound(device.x())), qreal(qRound(device.y()))});
+    return inverse.map(QPointF { qreal(qRound(device.x())), qreal(qRound(device.y())) });
 }
 
-void paintTextLine(QPainter& painter, const QRectF& rect, const QString& text,
-    const QFont& font, const bool subpixelPositioning) {
+void paintTextLine(QPainter &painter, const QRectF &rect, const QString &text,
+                   const QFont &font, const bool subpixelPositioning) {
+
     painter.setFont(font);
     painter.setRenderHint(QPainter::TextAntialiasing);
     painter.setRenderHint(QPainter::VerticalSubpixelPositioning, subpixelPositioning);
-    const QFontMetricsF metrics{font};
+
+    const QFontMetricsF metrics { font };
     const auto baseline = textLineBaseline(painter, rect, metrics, subpixelPositioning);
+
     painter.drawText(baseline,
-        metrics.elidedText(text, Qt::ElideRight, std::max(qreal(0), rect.right() - baseline.x())));
+                     metrics.elidedText(text, Qt::ElideRight, std::max(qreal(0), rect.right() - baseline.x())));
 }
 }

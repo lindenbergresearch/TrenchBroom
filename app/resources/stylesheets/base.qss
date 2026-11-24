@@ -25,8 +25,8 @@
  * Gemeinsame Schriftrollen, Titel, Detailtext  -> TYPOGRAPHY, uiTextRole, uiEmphasized
  * Fonts/Farben einzelner Tabellenzellen        -> ITEM CELL STYLES, ItemCellStyle
  * Konsole und Compiler-Meldungen               -> CONSOLE AND PROCESS OUTPUT, SemanticTextEdit
- * Trennlinien, Panel-Rahmen, Tab-Markierung     -> SEPARATORS, BorderPanel, TabSelectionIndicator
- * Farbverlauf im Property-Smart-Editor          -> ColorTable
+ * Trennlinien, Panel-Rahmen, Tab-Markierung    -> SEPARATORS, BorderPanel, TabSelectionIndicator
+ * Farbverlauf im Property-Smart-Editor         -> ColorTable
  * Untere Statusleiste des MapEditors           -> STATUSBAR, StatusBar_RightLayout
  * Linke/rechte Inspector-Bereiche              -> INSPECTOR, Inspector_LeftStack
  * Docking-Titel und schwebende Werkzeuge       -> INSPECTOR HEADERS, InspectorToolTitle
@@ -62,6 +62,7 @@ QDialog#PreferenceDialog {
     qproperty-initialWidth: 1100;
     qproperty-initialHeight: 800;
 }
+
 QWidget#ViewDetailsPopup {
     qproperty-initialWidth: 820;
     qproperty-initialHeight: 760;
@@ -76,7 +77,7 @@ QDialog#nodeSourceDialog {
 }
 
 QLabel#nodeSourceLocation {
-    color: ${color.text.detail};
+    color: ${color.midlight};
     font-size: ${length.font.small};
 }
 
@@ -90,7 +91,7 @@ QPlainTextEdit#nodeSourceText {
     selection-background-color: ${color.source.selection.background};
     selection-color: ${color.source.selection.text};
     border: 1px solid ${color.source.border};
-    border-radius: 4px;
+    border-radius: 12px;
     padding: 8px;
     qproperty-keywordColor: ${color.syntax.keyword};
     qproperty-stringColor: ${color.syntax.string};
@@ -113,28 +114,38 @@ QWidget#StyledCellEditor {
     font-weight: ${weight.ui};
     font-style: ${keyword.font.ui};
 }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"],
 QWidget#StyledCellEditor[cellContext="entityProperties"] {
     color: ${color.text.highlighted};
 }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"][cellRole="key"],
 QWidget#StyledCellEditor[cellContext="entityProperties"][cellRole="key"] { font-weight: bold; }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"][cellRole="value"],
 QWidget#StyledCellEditor[cellContext="entityProperties"][cellRole="value"] { color: ${color.text}; }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"][cellStates~="readonly"],
 QWidget#StyledCellEditor[cellContext="entityProperties"][cellStates~="readonly"] { font-style: italic; font-weight: normal; }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"][cellRole="value"][cellStates~="mixed"],
 QWidget#StyledCellEditor[cellContext="entityProperties"][cellRole="value"][cellStates~="mixed"] { color: ${color.highlight}; font-weight: normal; }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"][cellStates~="subset"],
 QWidget#StyledCellEditor[cellContext="entityProperties"][cellStates~="subset"] { color: ${color.text.disabled}; }
+
 QWidget#ItemCellStyle[cellContext="entityProperties"][cellStates~="default"],
 QWidget#StyledCellEditor[cellContext="entityProperties"][cellStates~="default"] {
     color: ${color.text.disabled}; font-style: normal; font-weight: normal;
 }
+
 QWidget#ItemCellStyle[cellContext="issues"][cellRole="hidden"],
 QWidget#StyledCellEditor[cellContext="issues"][cellRole="hidden"] { font-style: italic; }
+
 QWidget#ItemCellStyle[cellContext="preferences"][cellRole="value"],
 QWidget#StyledCellEditor[cellContext="preferences"][cellRole="value"],
+
 QWidget#ItemCellStyle[cellContext="colors"][cellRole="value"],
 QWidget#StyledCellEditor[cellContext="colors"][cellRole="value"] {
     font-family: ${family.console};
@@ -160,6 +171,7 @@ QFrame[fontPreview="true"] {
     border: 1px solid ${color.midlight};
     border-radius: 6px;
 }
+
 QLabel[fontPreviewHeading="true"] { font-weight: 600; }
 QPushButton#UIFontApply { min-width: 0; padding: 3px 8px; }
 QLabel[fontPreviewInfo="true"], QLabel#UIFontComparisonScope {
@@ -372,7 +384,7 @@ QTreeWidget#LayerTree {
     /* Disclosure chevrons; indentation controls their clickable column. */
     qproperty-branchIndicatorSize: 6;
     qproperty-branchIndicatorColor: ${color.light};
-    qproperty-branchIndicatorLineWidth: 3.5;
+    qproperty-branchIndicatorLineWidth: 3.0;
 }
 
 QTreeWidget#LayerTree::item,
@@ -389,7 +401,7 @@ QTreeWidget#LayerTree::item:hover {
    detailOpacity = -1 uses the UI detail-opacity preference; 0..1 overrides it.
    An optional qproperty-detailColor overrides the secondary line's color. */
 QWidget#LayerTreeRow {
-    color: ${color.text};
+    color: ${color.text.highlighted};
     background: transparent;
 
     border: none;
@@ -415,17 +427,20 @@ QWidget#LayerTreeRow {
 
 QLabel#LayerTreeTitle, QLabel#LayerTreeDetail, QLabel#LayerTreeAddendum {
     background: transparent;
-    border: none;
     border-radius: 0;
     padding: 0;
     margin: 0;
 }
+
 QLabel#LayerTreeTitle {
     font-size: ${length.font.ui};
     qproperty-alignment: 'AlignLeft | AlignVCenter';
 }
+
 QLabel#LayerTreeDetail {
     font-size: ${length.font.small};
+/*    font-family: "JetBrains Mono";*/
+/*    font-size: 12px;*/
     font-weight: normal;
     qproperty-alignment: 'AlignLeft | AlignVCenter';
 }
@@ -434,16 +449,21 @@ QLabel#LayerTreeDetail {
    and addenda are elided separately so they never overlap. */
 QLabel#LayerTreeAddendum {
     font-size: ${length.font.small};
-    qproperty-alignment: 'AlignRight | AlignVCenter';
+    color: ${color.highlight.bright};
+    font-weight: bold;
+    qproperty-alignment: 'AlignLeft | AlignVCenter';
 }
+
 QWidget#LayerTreeRow[nodeType="brush"] QLabel#LayerTreeTitle,
 QWidget#LayerTreeRow[nodeType="patch"] QLabel#LayerTreeTitle {
     font-size: ${length.font.small};
 }
+
 QWidget#LayerTreeRow[nodeType="brush"] QLabel#LayerTreeDetail,
 QWidget#LayerTreeRow[nodeType="patch"] QLabel#LayerTreeDetail {
-    font-size: ${length.font.tiny};
+/*    font-family: "JetBrains Mono";*/
 }
+
 QWidget#LayerTreeRow[currentLayer="true"] QLabel#LayerTreeTitle { font-weight: bold; }
 QWidget#LayerTreeRow[hidden="true"] QLabel { font-style: italic; }
 
@@ -458,12 +478,12 @@ QWidget#LayerTreeRow[nodeType="entity"] {
 }
 
 QWidget#LayerTreeRow[nodeType="brush"], QWidget#LayerTreeRow[nodeType="patch"] {
-    qproperty-contentIconSize: 18;
-    qproperty-paddingTop: 2;
-    qproperty-paddingBottom: 2;
-    qproperty-detailFontReduction: 2;
+    qproperty-contentIconSize: 22;
+    qproperty-paddingTop: 3;
+    qproperty-paddingBottom: 3;
+    qproperty-detailFontReduction: 1;
     font-size: ${length.font.small};
-    border-radius: 3px;
+    border-radius: 4px;
 
 
 }
@@ -812,19 +832,20 @@ QWidget#TabSelectionIndicator[selected="true"] { background-color: ${color.highl
 QSplitter {
     padding: 0px;
     margin: 0px;
+    width: 4px;
     background-color: ${color.dark};
-    qproperty-handleWidth: 8;
+    qproperty-handleWidth: 4;
     border: none;
 }
 
 /* Splitter handles: width/background apply to all splitters. The custom editor
    handles additionally expose the color, spacing and diameter of their grip dots. */
-QSplitter::handle { background-color: ${color.dark}; }
-QSplitter::handle:hover { background-color: ${color.midlight}; }
+QSplitter::handle { background-color: ${color.dark}; color: white; }
+QSplitter::handle:hover { background-color: ${color.highlight} }
 TrenchBroom--View--SplitterHandle {
-    qproperty-gripColor: ${color.mid};
-    qproperty-gripSpacing: 5;
-    qproperty-gripDotSize: 2;
+    qproperty-gripColor: ${color.light};
+    qproperty-gripSpacing: 6;
+    qproperty-gripDotSize: 3;
 }
 
 /* ==== CHECKBOX ==== */
@@ -834,6 +855,34 @@ TrenchBroom--View--SplitterHandle {
 /* All preferences, including the editor customization panes, use this surface. */
 QCheckBox {
     background: transparent;
+}
+
+QCheckBox {
+  background-color: #19232D;
+  color: #DFE1E2;
+  spacing: 4px;
+  outline: none;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+QCheckBox:focus {
+  border: none;
+}
+
+QCheckBox QWidget:disabled {
+  background-color: #19232D;
+  color: #788D9C;
+}
+
+QCheckBox::indicator {
+  margin-left: 2px;
+  height: 14px;
+  width: 14px;
+}
+
+QCheckBox::indicator:checked {
+    background-color: ${color.highlight};
 }
 
 QCheckBox#entityDefinition_checkboxWidget {
@@ -887,10 +936,10 @@ TrenchBroom--View--SemanticTextEdit#CompilationOutput {
    Textur-Browser-Filter. Die gefilterte Command-/Action-Suche steht unter EDIT FIELD. */
 
 QComboBox {
-    min-height: 16px;
+    min-height: 18px;
     min-width: 50px;
     padding-right: 8px;
-    background-color: ${color.mid};
+    background-color: ${color.dark};
     border: 1px solid ${color.midlight};
     border-radius: ${length.radius.border};
 }
@@ -1317,12 +1366,12 @@ QTabBar#InspectorToolTabs {
 QTabBar#InspectorToolTabs::tab {
     background-color: rgba(200, 200, 200, 10);
     color: ${color.text};
-    border: 1px solid ${color.dark};
+    border: 1px solid ${color.shadow};
     border-top: 2px;
     border-bottom: 2px;
     margin-top: 1px;
     margin-bottom: 1px;
-    padding: 2px;
+    padding: 4px;
     padding-bottom: 3px;
     padding-top: 2px;
     min-height: 16px;
@@ -1338,7 +1387,6 @@ QTabBar#InspectorToolTabs::tab:selected {
     color: ${color.text.highlighted};
     background-color: ${color.light};
     font-weight: bold;
-    font-size: ${length.font.subtitle};
 }
 
 QTabBar#InfoPanelTabBar::tab {
@@ -1463,6 +1511,7 @@ QToolButton {
     border-radius: 2px;
     padding: 3px;
     border: 1px solid ${color.midlight};
+    background-color: ${color.mid};
     margin-left: 0px;
     margin-right: 0px;
     margin-bottom: 0px;
@@ -1474,12 +1523,12 @@ QToolButton:disabled {
 
 QToolButton:checked {
       background-color: ${color.midlight};
-      border-color: ${color.midlight};
+      border-color: ${color.light};
       color: ${color.text.highlighted};
 }
 
 QToolButton:hover {
-    color: ${color.text};
+/*    color: ${color.text};*/
 }
 
 QToolButton:pressed {
@@ -1488,7 +1537,7 @@ QToolButton:pressed {
 
 QToolButton:selected {
     background: ${color.dark};
-    color: ${color.text};
+    color: ${color.text.highlighted};
 }
 
 QToolButton[popupMode="0"] {

@@ -1,17 +1,16 @@
 {
   "version": 1,
   "colors": {
-    "source.background": "#282b30",
-    "source.selection.background": "#475d79",
+    "source.background": "#151921",
+    "source.selection.background": "#4f86cd",
     "source.selection.text": "#ffffff",
-    "source.border": "#44494f",
+    "source.border": "#182432",
 
-    "syntax.keyword": "#4da6e7",
-    "syntax.string": "#3cc649",
-    "syntax.number": "#f3e499",
-    "syntax.comment": "#60666f",
-    "syntax.property": "#d95176",
-
+    "syntax.keyword": "#278ed9",
+    "syntax.string": "#0d892a",
+    "syntax.number": "#f1e8b6",
+    "syntax.comment": "#4b5961",
+    "syntax.property": "#e04871",
 
     "layer.hidden.text": "#8397ad",
     "layer.locked.text": "#d4a16b",

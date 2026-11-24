@@ -22,7 +22,6 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QHBoxLayout>
-#include <QScreen>
 #include <QPushButton>
 
 #include "IO/PathQt.h"
@@ -38,16 +37,14 @@ namespace TrenchBroom::View {
 static constexpr QSize WELCOME_WINDOW_BUTTON_SIZE = QSize{20, 20};
 
 WelcomeWindow::WelcomeWindow() :
-    QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr}, m_createNewDocumentButton{
-    nullptr}, m_openOtherDocumentButton{nullptr} {
+    QMainWindow{nullptr, Qt::Window}, m_recentDocumentListBox{nullptr},
+    m_createNewDocumentButton{nullptr}, m_openOtherDocumentButton{nullptr} {
     setObjectName("WelcomeWindow");
     createGui();
 }
 
 void WelcomeWindow::createGui() {
     setWindowIconTB(this);
-    //setWindowTitle("Welcome to " + QGuiApplication::applicationName());
-
     setWindowFlags(Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
     setWindowModality(Qt::ApplicationModal);
     // Unified native title/toolbars enable translucency in Qt 6. This window
@@ -193,7 +190,7 @@ void WelcomeWindow::openSettings() {
 void WelcomeWindow::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         m_dragging = true;
-        m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+        m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
         event->accept();
     }
 }
@@ -207,7 +204,7 @@ void WelcomeWindow::mouseReleaseEvent(QMouseEvent *event) {
 
 void WelcomeWindow::mouseMoveEvent(QMouseEvent *event) {
     if (m_dragging && event->buttons() & Qt::LeftButton) {
-        move(event->globalPos() - m_dragPosition);
+        move(event->globalPosition().toPoint() - m_dragPosition);
         event->accept();
     }
 }

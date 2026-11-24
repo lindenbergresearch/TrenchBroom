@@ -3,6 +3,11 @@
 #include <QImage>
 #include <QPointF>
 
+// --------------------------------------------------------------------
+// uncomment to use precise trigonometric functions for glyph computing
+// #define SDF_USE_PRECISE_TRIG
+// --------------------------------------------------------------------
+
 class QPainterPath;
 
 namespace TrenchBroom::FontStash {

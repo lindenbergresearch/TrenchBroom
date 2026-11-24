@@ -144,10 +144,6 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     // manually called the corresponding QWidget methods.
     setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
     setAttribute(Qt::AA_Use96Dpi);
-    setAttribute(Qt::AA_UseHighDpiPixmaps);
-
-    // Don't show icons in menus, they are scaled down and don't look very good.
-    setAttribute(Qt::AA_DontShowIconsInMenus);
 
     m_signalHandler = SignalHandler();
 
@@ -171,7 +167,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
         logger().info() << "Debug Mode    : enabled";
     }
 
-    logger().info() << "-";
+    logger().info() << "----------------------------------------------------------";
 
     std::string colorSpace{};
     switch (pref(Preferences::RendererColorSpace)) {
@@ -209,7 +205,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     logger().info() << "MSAA Samples  : " << pref(Preferences::RendererSamples);
     logger().info() << "Swap Behavior : " << swapBehavior;
     logger().info() << "Swap Interval : " << pref(Preferences::RendererSwapInterval);
-    logger().info() << "-";
+    logger().info() << "----------------------------------------------------------";
 
     // Needs to be "" otherwise Qt adds this to the paths returned by QStandardPaths
     // which would cause preferences to move from where they were with wx

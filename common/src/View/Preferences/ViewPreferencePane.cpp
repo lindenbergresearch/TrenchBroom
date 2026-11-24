@@ -960,7 +960,8 @@ void ViewPreferencePane::textureBrowserIconSizeChanged(const int index) {
 
 void ViewPreferencePane::rendererFontSizeChanged(const QString &str) {
     bool ok;
-    const auto value = str.toInt(&ok);
+    const auto value = str.toFloat(&ok);
+
     if (ok) {
         auto &prefs = PreferenceManager::instance();
         prefs.set(Preferences::RendererFontSize, value);
@@ -1070,8 +1071,8 @@ void ViewPreferencePane::applyFontDraft() {
     if (m_fontDraftDirty || (!m_sdfDraftDirty && !pref(Preferences::UIGlobalTypography))) {
         auto& prefs = PreferenceManager::instance();
         prefs.set(Preferences::UIFontPath, IO::pathFromQString(m_UIFontCombo->currentData().toString()));
-        prefs.set(Preferences::UIFontSize, std::clamp(m_UIFontSizeCombo->currentText().toInt(), 1, 96));
-        prefs.set(Preferences::UIFontMinimumSize, m_UIFontMinimumSize->value());
+        prefs.set(Preferences::UIFontSize, std::clamp(m_UIFontSizeCombo->currentText().toFloat(), 1.0f, 96.0f));
+        prefs.set(Preferences::UIFontMinimumSize, float(m_UIFontMinimumSize->value()));
         prefs.set(Preferences::UIDetailTextOpacity, float(m_UIDetailTextOpacity->value()) / 100.0f);
         prefs.set(Preferences::UIListFontWeight, m_listFontWeight->value());
         prefs.set(Preferences::UIListOpticalSize, float(m_listOpticalSize->value()));
@@ -1118,7 +1119,7 @@ void ViewPreferencePane::editorUIDetailTextOpacityChanged(const int) {
 
 void ViewPreferencePane::editorConsoleFontSizeChanged(const QString &text) {
     bool ok;
-    const auto value = text.toInt(&ok);
+    const auto value = text.toFloat(&ok);
 
     if (ok) {
         auto &prefs = PreferenceManager::instance();
