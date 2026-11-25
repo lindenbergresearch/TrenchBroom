@@ -40,10 +40,9 @@ class PopupButton : public QWidget {
     QWidget *GetPopupWindow() const;
 
     void setIcon(const std::string &iconName);
+    void setPopupVisible(bool visible);
 
   private:
-    void buttonClicked(bool checked);
-
     void popupVisibilityChanged(bool visible);
 };
 } // namespace View

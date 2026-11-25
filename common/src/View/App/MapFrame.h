@@ -159,7 +159,7 @@ class MapFrame : public QMainWindow {
   private:
     SignalDelayer *m_updateTitleSignalDelayer;
     SignalDelayer *m_updateActionStateSignalDelayer;
-    QPointer<LayerListBox> m_prefabSelectionTree;
+    QPointer<LayerListBox> m_activeLayerTree;
     SignalDelayer *m_updateStatusBarSignalDelayer;
 
   public:
@@ -179,17 +179,20 @@ class MapFrame : public QMainWindow {
     void updateActionState();
     void saveSelectionAsPrefab();
     bool canSaveSelectionAsPrefab() const;
+    void showSelectionSource();
+    bool canShowSelectionSource() const;
 
     void cameraDidChange(const Renderer::Camera *camera) const;
 
   private: // title bar contents
-    LayerListBox* prefabSelectionTree() const;
+    LayerListBox* activeLayerTree() const;
     void updateTitle();
 
     void updateTitleDelayed();
 
   private: // menu bar
     void createMenus();
+    void triggerAction(const Action& action);
 
     void updateShortcuts();
 
@@ -522,6 +525,7 @@ class MapFrame : public QMainWindow {
     void showAll();
 
     void revealInspectorTool(const QString& id);
+    void showViewSettings();
 
     void toggleToolbar();
 

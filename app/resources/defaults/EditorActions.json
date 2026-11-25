@@ -211,6 +211,7 @@
             "menuPath": "Editor Actions",
             "order": 10000,
             "targets": [
+                "popupMenu",
                 "editorToolbar"
             ],
             "toolbarGroup": 100,

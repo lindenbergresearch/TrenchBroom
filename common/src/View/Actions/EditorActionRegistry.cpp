@@ -12,10 +12,8 @@
 #include <set>
 
 namespace TrenchBroom::View {
-namespace {
-    class ConfiguredAction : public Action {
+    class ConfiguredAction final : public Action {
         const Action* m_command;
-        bool m_enabled = true;
 
       public:
         ConfiguredAction(const EditorActionDefinition& definition, const Action& command)
@@ -34,23 +32,25 @@ namespace {
             m_commandId = definition.command;
             m_configuredShortcut = definition.shortcut;
             m_actionContext = command.actionContext();
-            m_enabled = definition.enabled;
             m_enabledByConfiguration = definition.enabled;
             m_command = &command;
         }
         void retire() {
-            m_enabled = m_enabledByConfiguration = false;
+            m_enabledByConfiguration = false;
             m_targets = 0;
             m_configuredShortcut = QKeySequence{};
         }
-        void execute(ActionExecutionContext& context) const override {
-            if (enabled(context)) m_command->execute(context);
-        }
-        bool enabled(ActionExecutionContext& context) const override { return m_enabled && m_command->enabled(context); }
         bool checkable() const override { return m_command->checkable(); }
-        bool checked(ActionExecutionContext& context) const override { return checkable() && m_command->checked(context); }
+
+      private:
+        // Action applies the command's scope and the presentation's enabled
+        // flag before dispatch. Evaluate the native predicate once.
+        void doExecute(ActionExecutionContext& context) const override { m_command->doExecute(context); }
+        bool canExecute(ActionExecutionContext& context) const override { return m_command->canExecute(context); }
+        bool doChecked(ActionExecutionContext& context) const override { return m_command->doChecked(context); }
     };
 
+namespace {
     class DefinitionVisitor : public MenuVisitor {
         EditorConfiguration& m_config;
         bool m_toolbar;
@@ -104,6 +104,10 @@ const Action* ActionManager::action(const QString& id) const {
     const auto it = m_actions.find(IO::pathFromQString(id));
     return it == m_actions.end() ? nullptr : it->second.get();
 }
+
+bool ActionManager::affectsActionState(const std::filesystem::path& preference) const {
+    return m_actionStatePreferences.contains(preference);
+}
 bool ActionManager::isBuiltin(const QString& id) const {
     return m_defaults.actions.contains(id);
 }
@@ -122,7 +126,10 @@ void ActionManager::initializeConfiguration() {
     visitMainMenu(menus);
     visitToolBarActions(toolbar);
     for (const auto* id :
-         {"Menu/Edit/Group", "Menu/Edit/Ungroup", "Menu/Edit/Create Linked Duplicate", "Menu/Edit/Select Linked Groups", "Menu/Edit/Separate Linked Groups", SaveSelectionAsPrefabActionPath})
+         {"Menu/Edit/Group", "Menu/Edit/Ungroup", "Menu/Edit/Create Linked Duplicate", "Menu/Edit/Select Linked Groups",
+          "Menu/Edit/Separate Linked Groups", SaveSelectionAsPrefabActionPath, RenameGroupsCommandPath,
+          HideSelectedLayersCommandPath, IsolateSelectedLayersCommandPath, SelectAllInSelectedLayersCommandPath,
+          MakeStructuralCommandPath})
         if (m_defaults.actions.contains(id)) m_defaults.actions[id].targets |= PopupMenuTarget;
     EditorToolbarDefinition shapes;
     shapes.id = "brush-shapes";

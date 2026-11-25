@@ -333,6 +333,7 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
 
   public: // make structural
     void makeStructural();
+    bool canMakeStructural() const;
 
   public: // entity definitions
     void toggleEntityDefinitionVisible(const Assets::EntityDefinition *definition);
@@ -340,45 +341,9 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     void createEntity(const Assets::EntityDefinition *definition);
 
   public: // view filters
-    void toggleShowEntityClassnames();
-
-    void toggleShowGroupBounds();
-
-    void toggleShowBrushEntityBounds();
-
-    void toggleShowPointEntityBounds();
-
-    void toggleShowPointEntities();
-
-    void toggleShowPointEntityModels();
-
-    void toggleShowBrushes();
-
-    void showTextures();
-
-    void hideTextures();
-
-    void hideFaces();
-
-    void toggleShadeFaces();
-
-    void toggleShowFog();
-
     void logAnisotropyInfo();
 
     void toggleAnisotropy();
-
-    void toggleShowEdges();
-
-    void toggleEnableLightning();
-
-    void showAllEntityLinks();
-
-    void showTransitivelySelectedEntityLinks();
-
-    void showDirectlySelectedEntityLinks();
-
-    void hideAllEntityLinks();
 
     bool event(QEvent *event) override;
 
@@ -464,8 +429,6 @@ class MapViewBase : public RenderView, public MapView, public ToolBoxConnector, 
     QMenu *makeEntityGroupsMenu(Assets::EntityDefinitionType type);
 
     bool canMergeGroups() const;
-
-    bool canMakeStructural() const;
 
   private: // subclassing interface
     virtual vm::vec3 doGetMoveDirection(vm::direction direction) const = 0;

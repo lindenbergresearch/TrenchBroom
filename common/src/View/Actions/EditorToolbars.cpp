@@ -1,5 +1,6 @@
 #include "View/Actions/EditorToolbars.h"
 #include "IO/ResourceUtils.h"
+#include "PreferenceManager.h"
 #include "View/Actions/Actions.h"
 #include "View/Tools/Brush/DrawShapeTool.h"
 #include "View/Document/MapDocument.h"
@@ -175,7 +176,13 @@ EditorToolbars::EditorToolbars(MapViewToolBox& tools, MapViewBase& view) : QObje
     m_connections += document->documentWasClearedNotifier.connect(refresh);
     m_connections += document->selectionDidChangeNotifier.connect(refresh);
     m_connections += document->nodesDidChangeNotifier.connect(refresh);
+    m_connections += document->currentLayerDidChangeNotifier.connect(refresh);
+    m_connections += document->nodeVisibilityDidChangeNotifier.connect(refresh);
+    m_connections += document->textureCollectionsDidChangeNotifier.connect(refresh);
     m_connections += document->editorContextDidChangeNotifier.connect(refresh);
+    m_connections += PreferenceManager::instance().preferenceDidChangeNotifier.connect([refresh](const auto& path) {
+        if (ActionManager::instance().affectsActionState(path)) refresh();
+    });
     auto* timer = new QTimer{this};
     timer->setInterval(150);
     connect(timer, &QTimer::timeout, this, [this] {

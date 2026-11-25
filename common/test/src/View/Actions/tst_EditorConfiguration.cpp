@@ -297,6 +297,85 @@ TEST_CASE_METHOD(EditorConfigTest, "Configured actions keep stable identities an
     CHECK(action->keySequence().isEmpty());
 }
 
+TEST_CASE("Command execution checks the active scope before evaluating its predicate", "[editor-commands]") {
+    auto invocations = 0;
+    auto predicateCalls = 0;
+    auto allowed = false;
+    const auto run = [&](ActionExecutionContext&) { ++invocations; };
+    const auto predicate = [&](ActionExecutionContext&) { ++predicateCalls; return allowed; };
+    const auto checked = [](ActionExecutionContext&) { return true; };
+    const auto scope = ActionContext::View3D | ActionContext::AnyOrNoTool | ActionContext::AnyOrNoSelection;
+    const auto viewCommand = LambdaAction("Test/3D", "3D command", scope, QKeySequence{}, run, predicate, checked, true, {}, {});
+    const auto globalCommand = LambdaAction("Test/Global", "Global command", ActionContext::Any, QKeySequence{}, run, predicate, checked, true, {}, {});
+    auto noMap = ActionExecutionContext(nullptr, nullptr);
+    CHECK_FALSE(noMap.hasActionContext(scope));
+    viewCommand.execute(noMap);
+    CHECK_FALSE(viewCommand.checked(noMap));
+    CHECK(predicateCalls == 0);
+    globalCommand.execute(noMap);
+    CHECK(predicateCalls == 1);
+    CHECK(invocations == 0);
+    allowed = true;
+    globalCommand.execute(noMap);
+    CHECK(predicateCalls == 2);
+    CHECK(invocations == 1);
+}
+
+TEST_CASE_METHOD(EditorConfigTest, "A single configurable texture toggle coexists with explicit texture commands", "[editor-commands]") {
+    const auto show = QStringLiteral("Controls/Map view/View Filter > Show textures");
+    const auto hide = QStringLiteral("Controls/Map view/View Filter > Hide textures");
+    const auto* toggle = manager.action(ToggleTexturesCommandPath);
+    REQUIRE(toggle);
+    CHECK(toggle->checkable());
+    auto noMap = ActionExecutionContext(nullptr, nullptr);
+    CHECK_FALSE(toggle->enabled(noMap));
+    CHECK_FALSE(toggle->checked(noMap));
+    REQUIRE(manager.command(show));
+    REQUIRE(manager.command(hide));
+    const auto& defaults = manager.defaultConfiguration().actions;
+    CHECK(defaults.value(ToggleTexturesCommandPath).targets & MainMenuTarget);
+    CHECK(defaults.value(ToggleTexturesCommandPath).menuPath == "View/Display");
+    CHECK_FALSE(defaults.value(show).targets & MainMenuTarget);
+    CHECK_FALSE(defaults.value(hide).targets & MainMenuTarget);
+
+    auto config = manager.configuration();
+    auto alias = EditorActionDefinition{};
+    alias.id = "User/textures";
+    alias.label = "Textures";
+    alias.command = ToggleTexturesCommandPath;
+    alias.icon = "visibility.svg";
+    alias.targets = MainToolbarTarget | PopupMenuTarget | EditorToolbarTarget;
+    config.actions.insert(alias.id, alias);
+    apply(config);
+    const auto* configured = manager.action(alias.id);
+    REQUIRE(configured);
+    CHECK(configured->commandId() == ToggleTexturesCommandPath);
+    CHECK(configured->checkable());
+    CHECK_FALSE(configured->enabled(noMap));
+    CHECK_FALSE(configured->icon(20).isNull());
+
+    const auto previous = pref(Preferences::FaceRenderMode);
+    configured->execute(noMap);
+    CHECK(pref(Preferences::FaceRenderMode) == previous);
+    CHECK(manager.affectsActionState(Preferences::FaceRenderMode.path()));
+    CHECK(manager.affectsActionState(Preferences::EntityLinkMode.path()));
+    CHECK(manager.affectsActionState(Preferences::ShadeFaces.path()));
+}
+
+TEST_CASE("New inspector and layer commands are available for action assignments", "[editor-commands]") {
+    const auto& manager = ActionManager::instance();
+    auto noMap = ActionExecutionContext(nullptr, nullptr);
+    for (const auto* id : {RenameGroupsCommandPath, HideSelectedLayersCommandPath, IsolateSelectedLayersCommandPath,
+            SelectAllInSelectedLayersCommandPath, ShowViewSettingsCommandPath, "Menu/View/Show Selection Source",
+            "Menu/View/Show History", "Menu/View/Show Map Search", "Menu/View/Show Texture Browser"}) {
+        CAPTURE(id);
+        const auto* command = manager.command(id);
+        REQUIRE(command);
+        CHECK_FALSE(command->enabled(noMap));
+        CHECK(manager.defaultConfiguration().actions.value(id).targets & EditorToolbarTarget);
+    }
+}
+
 TEST_CASE_METHOD(EditorConfigTest, "Toolbar-only changes do not rebuild menus or shortcut bindings", "[editor-configuration]") {
     editorEvents();
     int all = 0, actions = 0;

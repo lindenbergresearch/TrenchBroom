@@ -19,6 +19,8 @@
 
 #include "View/App/MapFrame.h"
 #include "View/Inspector/Layer/LayerListBox.h"
+#include "View/Dialogs/NodeSourceDialog.h"
+#include "View/Inspector/ViewSettings/ViewEditor.h"
 #include "View/Prefabs/PrefabUtils.h"
 #include <QMenu>
 #include <QMenuBar>
@@ -250,8 +252,7 @@ void MapFrame::updateTitleDelayed() {
 
 void MapFrame::createMenus() {
     MainMenuBuilder menuBuilder(*menuBar(), m_actionMap, [this](const Action &action) {
-        ActionExecutionContext context(this, currentMapViewBase());
-        action.execute(context);
+        triggerAction(action);
     });
 
     const auto &actionManager = ActionManager::instance();
@@ -266,6 +267,13 @@ void MapFrame::createMenus() {
     m_redoAction = findAction("Menu/Edit/Redo");
 
     addRecentDocumentsMenu();
+}
+
+void MapFrame::triggerAction(const Action& action) {
+    const auto lifetime = QPointer<MapFrame>(this);
+    auto context = ActionExecutionContext(this, currentMapViewBase());
+    action.execute(context);
+    if (lifetime) lifetime->updateActionStateDelayed();
 }
 
 void MapFrame::updateShortcuts() {
@@ -286,6 +294,9 @@ void MapFrame::updateActionState() {
     ActionExecutionContext context(this, currentMapViewBase());
 
     for (auto [tAction, qAction] : m_actionMap) {
+        // Context menus and editor toolbars evaluate commands for their own
+        // viewport. Avoid running their predicates for unused window actions.
+        if (!(tAction->targets() & (MainMenuTarget | MainToolbarTarget))) continue;
         if ((qAction == m_undoAction && tAction->commandId() == "Menu/Edit/Undo") || (qAction == m_redoAction && tAction->commandId() == "Menu/Edit/Redo")) {
             // These are handled specially for performance reasons.
             continue;
@@ -298,24 +309,41 @@ void MapFrame::updateActionState() {
     }
 }
 
-LayerListBox* MapFrame::prefabSelectionTree() const {
+LayerListBox* MapFrame::activeLayerTree() const {
     // focusWidget() also remembers the target while this window is inactive,
     // e.g. after closing a floating inspector or returning from a popup.
     for (auto* owner = focusWidget(); owner; owner = owner->parentWidget())
         if (auto* tree = qobject_cast<LayerListBox*>(owner)) return tree;
-    return m_prefabSelectionTree.data();
+    return m_activeLayerTree.data();
 }
 
 bool MapFrame::canSaveSelectionAsPrefab() const {
-    const auto* tree = prefabSelectionTree();
+    const auto* tree = activeLayerTree();
     return m_document->world() && (tree ? tree->hasPrefabSelection()
         : m_document->hasSelectedNodes() || m_document->hasSelectedBrushFaces());
 }
 
 void MapFrame::saveSelectionAsPrefab() {
     if (!canSaveSelectionAsPrefab()) return;
-    const auto* tree = prefabSelectionTree();
+    const auto* tree = activeLayerTree();
     savePrefabDialog(m_document,tree ? tree->selectedTreeNodes() : prefabSelection(*m_document),this);
+}
+
+bool MapFrame::canShowSelectionSource() const {
+    if (!m_document->world()) return false;
+    if (const auto* tree = activeLayerTree()) return tree->canShowSelectedSource();
+    return m_document->selectedNodes().nodes().size() == 1;
+}
+
+void MapFrame::showSelectionSource() {
+    if (!canShowSelectionSource()) return;
+    if (auto* tree = activeLayerTree()) {
+        tree->showSelectedSource();
+    } else {
+        const auto* node = m_document->selectedNodes().nodes().front();
+        auto* dialog = new NodeSourceDialog(*m_document, *node, this);
+        dialog->show();
+    }
 }
 
 void MapFrame::updateActionStateDelayed() {
@@ -482,8 +510,7 @@ void MapFrame::createToolBar() {
     //   makeSmall(m_toolBar);
 
     ToolBarBuilder toolsBuilder(*m_toolBar, m_actionMap, [this](const Action &action) {
-        ActionExecutionContext context(this, currentMapViewBase());
-        action.execute(context);
+        triggerAction(action);
     });
 
     auto &actionManager = ActionManager::instance();
@@ -770,6 +797,8 @@ void MapFrame::connectObservers() {
     // This notification runs after the undo/redo stacks change, including when
     // history is cleared without modifying the document.
     m_notifierConnection += m_document->commandHistoryDidChangeNotifier.connect(this, &MapFrame::updateUndoRedoActions);
+    m_notifierConnection += m_document->commandHistoryDidChangeNotifier.connect(this, &MapFrame::updateActionStateDelayed);
+    m_notifierConnection += m_document->textureCollectionsDidChangeNotifier.connect(this, &MapFrame::updateActionStateDelayed);
     m_notifierConnection += m_document->selectionDidChangeNotifier.connect(this, &MapFrame::selectionDidChange);
     m_notifierConnection += m_document->currentLayerDidChangeNotifier.connect(this, &MapFrame::currentLayerDidChange);
     m_notifierConnection += m_document->groupWasOpenedNotifier.connect(this, &MapFrame::groupWasOpened);
@@ -819,6 +848,7 @@ void MapFrame::preferenceDidChange(const std::filesystem::path &path) {
     if (path == Preferences::MapViewLayout.path()) {
         m_mapView->switchToMapView(static_cast<MapViewLayout>(pref(Preferences::MapViewLayout)));
     }
+    if (ActionManager::instance().affectsActionState(path)) updateActionStateDelayed();
 
     updateShortcuts();
     updateStatusBar();
@@ -851,6 +881,7 @@ void MapFrame::selectionDidChange(const Selection &) {
 }
 
 void MapFrame::currentLayerDidChange(const TrenchBroom::Model::LayerNode *) {
+    updateActionStateDelayed();
     updateStatusBarDelayed();
 }
 
@@ -863,12 +894,14 @@ void MapFrame::groupWasClosed(Model::GroupNode *) {
 }
 
 void MapFrame::nodeVisibilityDidChange(const std::vector<Model::Node *> &) {
+    updateActionStateDelayed();
     updateStatusBarDelayed();
 }
 
 void MapFrame::editorContextDidChange() {
     // e.g. changing the view filters may cause the number of hidden brushes/entities to
     // change
+    updateActionStateDelayed();
     updateStatusBarDelayed();
 }
 
@@ -883,6 +916,8 @@ void MapFrame::portalFileDidChange() {
 void MapFrame::bindEvents() {
     connect(m_autosaveTimer, &QTimer::timeout, this, &MapFrame::triggerAutosave);
     connect(qApp, &QApplication::focusChanged, this, &MapFrame::focusChange);
+    if (auto* tree = m_inspector->findChild<LayerListBox*>())
+        connect(tree, &QTreeWidget::itemSelectionChanged, this, &MapFrame::updateActionStateDelayed);
     connect(m_gridChoice, QOverload<int>::of(&QComboBox::activated), this, [this](const int index) { setGridSize(index + Grid::MinSize); });
     connect(QApplication::clipboard(), &QClipboard::dataChanged, this, [this]() {
         // update the "Paste" menu items
@@ -1784,6 +1819,10 @@ void MapFrame::revealInspectorTool(const QString& id) {
     m_inspector->revealTool(id);
 }
 
+void MapFrame::showViewSettings() {
+    if (auto* editor = m_mapView->findChild<ViewPopupEditor*>()) editor->showPopup();
+}
+
 void MapFrame::toggleToolbar() {
     m_toolBar->setVisible(!m_toolBar->isVisible());
 }
@@ -1964,9 +2003,9 @@ void MapFrame::focusChange(QWidget * /* oldFocus */, QWidget *newFocus) {
     if (!newFocus || findMapFrame(newFocus) != this) return;
 
     if (!qobject_cast<QMenu*>(newFocus) && !qobject_cast<QMenuBar*>(newFocus)) {
-        m_prefabSelectionTree.clear();
+        m_activeLayerTree.clear();
         for (auto* owner = newFocus; owner; owner = owner->parentWidget()) {
-            if (auto* tree = qobject_cast<LayerListBox*>(owner)) { m_prefabSelectionTree = tree; break; }
+            if (auto* tree = qobject_cast<LayerListBox*>(owner)) { m_activeLayerTree = tree; break; }
         }
     }
 

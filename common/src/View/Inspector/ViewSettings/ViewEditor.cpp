@@ -1221,5 +1221,9 @@ ViewPopupEditor::ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *p
 
     setLayout(sizer);
 }
+
+void ViewPopupEditor::showPopup() {
+    m_button->setPopupVisible(true);
+}
 } // namespace View
 } // namespace TrenchBroom

@@ -33,6 +33,8 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -44,6 +46,7 @@ class EntityDefinition;
 }
 
 namespace Model {
+class LayerNode;
 class SmartTag;
 }
 
@@ -54,12 +57,23 @@ class MapFrame;
 
 class MapViewBase;
 inline constexpr auto SaveSelectionAsPrefabActionPath = "Menu/Edit/Save Selection as Prefab";
+inline constexpr auto ToggleTexturesCommandPath = "Controls/Map view/View Filter > Toggle textures";
+inline constexpr auto RenameGroupsCommandPath = "Menu/Edit/Rename Groups";
+inline constexpr auto MakeStructuralCommandPath = "Controls/Map view/Make structural";
+inline constexpr auto HideSelectedLayersCommandPath = "Menu/View/Layers/Hide Layers of Selection";
+inline constexpr auto IsolateSelectedLayersCommandPath = "Menu/View/Layers/Isolate Layers of Selection";
+inline constexpr auto SelectAllInSelectedLayersCommandPath = "Menu/View/Layers/Select All in Layers of Selection";
+inline constexpr auto ShowViewSettingsCommandPath = "Menu/View/Show View Settings";
 
 class ActionExecutionContext {
-  private:
-    ActionContext::Type m_actionContext;
+    friend class Action;
+
+    ActionContext::Type m_actionContext = 0;
     MapFrame *m_frame;
     MapViewBase *m_mapView;
+    std::optional<std::vector<Model::LayerNode*>> m_selectedLayers;
+
+    void refresh();
 
   public:
     ActionExecutionContext(MapFrame *mapFrame, MapViewBase *mapView);
@@ -73,9 +87,12 @@ class ActionExecutionContext {
     MapViewBase *view();
 
     MapDocument *document();
+    const std::vector<Model::LayerNode*>& selectedLayers();
 };
 
 class Action {
+    friend class ConfiguredAction;
+
   protected:
     QString m_label;
     std::filesystem::path m_preferencePath;
@@ -89,6 +106,10 @@ class Action {
     int m_targets = MainMenuTarget | PopupMenuTarget | MainToolbarTarget | EditorToolbarTarget;
     std::optional<QKeySequence> m_configuredShortcut;
     QString m_commandId;
+
+    virtual void doExecute(ActionExecutionContext& context) const = 0;
+    virtual bool canExecute(ActionExecutionContext& context) const = 0;
+    virtual bool doChecked(ActionExecutionContext& context) const = 0;
 
   public:
     Action(const std::filesystem::path &preferencePath, const QString &label, ActionContext::Type actionContext, const QKeySequence &defaultShortcut, const std::filesystem::path &iconPath, const QString &statusTip);
@@ -112,13 +133,13 @@ class Action {
 
     void resetKeySequence() const;
 
-    virtual void execute(ActionExecutionContext &context) const = 0;
+    void execute(ActionExecutionContext &context) const;
 
-    virtual bool enabled(ActionExecutionContext &context) const = 0;
+    bool enabled(ActionExecutionContext &context) const;
 
     virtual bool checkable() const = 0;
 
-    virtual bool checked(ActionExecutionContext &context) const = 0;
+    bool checked(ActionExecutionContext &context) const;
 
     bool hasIcon() const;
 
@@ -150,22 +171,12 @@ template<class ExecuteFn, class EnabledFn, class CheckedFn> class LambdaAction :
         : Action(preferencePath, label, actionContext, defaultShortcut, iconPath, statusTip), m_execute(execute), m_enabled(enabled), m_checked(checked), m_checkable(checkable) {
     }
 
-    void execute(ActionExecutionContext &context) const override {
-        if (enabled(context)) {
-            m_execute(context);
-        }
-    }
-
-    bool enabled(ActionExecutionContext &context) const override {
-        return context.hasActionContext(m_actionContext) && m_enabled(context);
-    }
-
     bool checkable() const override { return m_checkable; }
 
-    bool checked(ActionExecutionContext &context) const override {
-        assert(checkable());
-        return m_checked(context);
-    }
+  private:
+    void doExecute(ActionExecutionContext& context) const override { m_execute(context); }
+    bool canExecute(ActionExecutionContext& context) const override { return m_enabled(context); }
+    bool doChecked(ActionExecutionContext& context) const override { return m_checked(context); }
 };
 
 class Menu;
@@ -280,6 +291,7 @@ class ActionManager {
     std::map<std::filesystem::path, std::unique_ptr<Action>> m_commands;
     std::vector<std::unique_ptr<Menu>> m_nativeMenus;
     EditorConfiguration m_defaults, m_configuration;
+    std::set<std::filesystem::path> m_actionStatePreferences;
     NotifierConnection m_configurationConnection;
     bool m_configurationPending = false;
     bool m_actionsPending = false;
@@ -303,6 +315,7 @@ class ActionManager {
     QStringList commandIds() const;
     const Action* command(const QString& id) const;
     const Action* action(const QString& id) const;
+    bool affectsActionState(const std::filesystem::path& preference) const;
     bool isBuiltin(const QString& id) const;
     bool setConfiguration(const EditorConfiguration& configuration, QStringList& errors);
     bool reloadConfiguration();
@@ -342,6 +355,9 @@ class ActionManager {
     void initialize();
 
     void createViewActions();
+    void createDisplayActions();
+    void createSelectionActions();
+    void createInspectorActions();
 
     void createMenu();
 

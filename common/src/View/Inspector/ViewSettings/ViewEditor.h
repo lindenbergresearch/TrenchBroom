@@ -276,6 +276,7 @@ class ViewPopupEditor : public QWidget {
 
   public:
     explicit ViewPopupEditor(std::weak_ptr<MapDocument> document, QWidget *parent = nullptr);
+    void showPopup();
 };
 } // namespace View
 } // namespace TrenchBroom

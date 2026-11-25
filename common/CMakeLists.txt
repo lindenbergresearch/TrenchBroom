@@ -285,6 +285,7 @@ set(COMMON_SOURCE
     ${COMMON_SOURCE_DIR}/View/Actions/ActionContext.cpp
     ${COMMON_SOURCE_DIR}/View/Actions/Actions.cpp
     ${COMMON_SOURCE_DIR}/View/Actions/EditorActionRegistry.cpp
+    ${COMMON_SOURCE_DIR}/View/Actions/EditorCommands.cpp
     ${COMMON_SOURCE_DIR}/View/Actions/EditorConfiguration.cpp
     ${COMMON_SOURCE_DIR}/View/Actions/EditorConfiguration.h
     ${COMMON_SOURCE_DIR}/View/Preferences/EditorCustomizationPreferencePane.cpp

@@ -28,6 +28,7 @@
 
 #include "Assets/EntityDefinition.h"
 #include "Model/EntityProperties.h"
+#include "Model/ModelUtils.h"
 #include "Model/Tag.h"
 #include "PreferenceManager.h"
 #include "Preferences.h"
@@ -41,7 +42,6 @@
 #include <vm/util.h>
 
 #include <cassert>
-#include <set>
 #include <string>
 
 namespace TrenchBroom {
@@ -65,12 +65,16 @@ QAction* addContextMenuAction(QMenu& menu, const Action& action, const std::func
 // ActionExecutionContext
 
 ActionExecutionContext::ActionExecutionContext(MapFrame *mapFrame, MapViewBase *mapView)
-    : m_actionContext(
-    mapView != nullptr ? mapView->actionContext() : ActionContext::Any), // cache here for performance reasons
-      m_frame(mapFrame), m_mapView(mapView) {
+    : m_frame(mapFrame), m_mapView(mapView) {
     if (m_frame != nullptr) {
         assert(m_mapView != nullptr);
     }
+    refresh();
+}
+
+void ActionExecutionContext::refresh() {
+    m_actionContext = hasDocument() && m_mapView ? m_mapView->actionContext() : ActionContext::Type{0};
+    m_selectedLayers.reset();
 }
 
 bool ActionExecutionContext::hasDocument() const {
@@ -78,14 +82,8 @@ bool ActionExecutionContext::hasDocument() const {
 }
 
 bool ActionExecutionContext::hasActionContext(const ActionContext::Type actionContext) const {
-    if (actionContext == ActionContext::Any || m_actionContext == ActionContext::Any) {
-        return true;
-    }
-
-    if (hasDocument()) {
-        return actionContextMatches(m_actionContext, actionContext);
-    }
-    return false;
+    return actionContext == ActionContext::Any ||
+        (hasDocument() && actionContextMatches(m_actionContext, actionContext));
 }
 
 MapFrame *ActionExecutionContext::frame() {
@@ -102,6 +100,12 @@ MapViewBase *ActionExecutionContext::view() {
 MapDocument *ActionExecutionContext::document() {
     assert(hasDocument());
     return m_frame->document().get();
+}
+
+const std::vector<Model::LayerNode*>& ActionExecutionContext::selectedLayers() {
+    if (!m_selectedLayers)
+        m_selectedLayers = Model::collectContainingLayersUserSorted(document()->selectedNodes().nodes());
+    return *m_selectedLayers;
 }
 
 // Action
@@ -122,6 +126,19 @@ const std::filesystem::path &Action::preferencePath() const {
 
 ActionContext::Type Action::actionContext() const {
     return m_actionContext;
+}
+
+void Action::execute(ActionExecutionContext& context) const {
+    context.refresh();
+    if (enabled(context)) doExecute(context);
+}
+
+bool Action::enabled(ActionExecutionContext& context) const {
+    return m_enabledByConfiguration && context.hasActionContext(m_actionContext) && canExecute(context);
+}
+
+bool Action::checked(ActionExecutionContext& context) const {
+    return checkable() && context.hasActionContext(m_actionContext) && doChecked(context);
 }
 
 QKeySequence Action::keySequence() const {
@@ -326,27 +343,7 @@ void ActionManager::visitToolBarActions(MenuVisitor &visitor) const {
 }
 
 void ActionManager::visitMapViewActions(const ActionVisitor &visitor) const {
-    class Visitor : public MenuVisitor {
-      public:
-        std::set<const Action *> menuActions;
-
-        void visit(const Menu &menu) override { menu.visitEntries(*this); }
-
-        void visit(const MenuSeparatorItem &) override {}
-
-        void visit(const MenuActionItem &item) override {
-            const Action *tAction = &item.action();
-            menuActions.insert(tAction);
-        }
-    };
-
-    // Gather the set of all Actions that are used in menus/toolbars
-    Visitor v;
-    visitMainMenu(v);
-    visitToolBarActions(v);
-
     for (const auto &[path, actionPtr] : m_actions) {
-        unused(path);
         const Action *tAction = actionPtr.get();
         if (m_configuration.actions.contains(IO::pathAsQString(path)) && (tAction->targets() & (MainMenuTarget | MainToolbarTarget)) == 0) {
             // This action is not used in a menu, so visit it
@@ -378,6 +375,9 @@ void ActionManager::resetAllKeySequences() const {
 }
 
 void ActionManager::initialize() {
+    createDisplayActions();
+    createSelectionActions();
+    createInspectorActions();
     createViewActions();
     createMenu();
     createToolbar();
@@ -765,120 +765,13 @@ void ActionManager::createViewActions() {
 
     /* ========== Tag Actions ========== */
     createAction(
-        std::filesystem::path{"Controls/Map view/Make structural"}, QObject::tr("Make Structural"),
+        MakeStructuralCommandPath, QObject::tr("Make Structural"),
         ActionContext::AnyView | ActionContext::NodeSelection | ActionContext::AnyOrNoTool, QKeySequence(
             Qt::ALT | Qt::Key_S), [](
             ActionExecutionContext &context
-        ) { context.view()->makeStructural(); }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-
-    /* ========== View / Filter Actions ========== */
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show entity classnames"
-        }, QObject::tr("Toggle Show Entity Classnames"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowEntityClassnames(); }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show group bounds"}, QObject::tr("Toggle Show Group Bounds"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowGroupBounds(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show brush entity bounds"
-        }, QObject::tr("Toggle Show Brush Entity Bounds"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) {
-            context.view()->toggleShowBrushEntityBounds();
-        }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show point entity bounds"
-        }, QObject::tr("Toggle Show Point Entity Bounds"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) {
-            context.view()->toggleShowPointEntityBounds();
-        }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show point entities"}, QObject::tr("Toggle Show Point Entities"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowPointEntities(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show point entity models"
-        }, QObject::tr("Toggle Show Point Entity Models"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) {
-            context.view()->toggleShowPointEntityModels();
-        }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Toggle show brushes"}, QObject::tr("Toggle Show Brushes"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowBrushes(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(std::filesystem::path{
-        "Controls/Map view/View Filter > Show textures"}, QObject::tr("Show Textures"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->showTextures(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
-    createAction(std::filesystem::path{
-        "Controls/Map view/View Filter > Hide textures"}, QObject::tr("Hide Textures"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->hideTextures(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
-    createAction(std::filesystem::path{
-        "Controls/Map view/View Filter > Hide faces"}, QObject::tr("Hide Faces"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->hideFaces(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Shade faces"}, QObject::tr("Toggle Shade Faces"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShadeFaces(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(std::filesystem::path{
-        "Controls/Map view/View Filter > Use fog"}, QObject::tr("Toggle Show Fog"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowFog(); }, [](ActionExecutionContext &context) { return context.hasDocument(); });
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Use anisotropy filter"}, QObject::tr("Enable Anisotropy Filtering"), ActionContext::Any, QKeySequence(
-            Qt::CTRL | Qt::SHIFT |
-            Qt::Key_A), [](ActionExecutionContext &context) { context.view()->toggleAnisotropy(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Use Lightning"
-        }, QObject::tr("Use lightning (experimental)"), ActionContext::Any, Qt::CTRL |
-                                                                            Qt::ALT |
-                                                                            Qt::Key_L, [](ActionExecutionContext &context) {
-            context.view()->toggleEnableLightning();
-        }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Show edges"}, QObject::tr("Toggle Show Edges"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->toggleShowEdges(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Show all entity links"}, QObject::tr("Show All Entity Links"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->showAllEntityLinks(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Show transitively selected entity links"
-        }, QObject::tr("Show Transitively Selected Entity Links"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) {
-            context.view()->showTransitivelySelectedEntityLinks();
-        }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Show directly selected entity links"
-        }, QObject::tr("Show Directly Selected Entity Links"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) {
-            context.view()->showDirectlySelectedEntityLinks();
-        }, [](ActionExecutionContext &context) { return context.hasDocument(); }
-    );
-    createAction(
-        std::filesystem::path{
-            "Controls/Map view/View Filter > Hide entity links"}, QObject::tr("Hide All Entity Links"), ActionContext::Any, QKeySequence(), [](ActionExecutionContext &context) { context.view()->hideAllEntityLinks(); }, [](
-            ActionExecutionContext &context
-        ) { return context.hasDocument(); }
+        ) { context.view()->makeStructural(); }, [](ActionExecutionContext &context) {
+            return context.hasDocument() && context.view()->canMakeStructural();
+        }
     );
 
     /* ========== Misc Actions ========== */
@@ -1390,6 +1283,9 @@ void ActionManager::createEditMenu() { /* ========== Edit Menu ========== */
 
 void ActionManager::createViewMenu() {
     auto &viewMenu = createMainMenu("View");
+    auto &displayMenu = viewMenu.addMenu("Display");
+    displayMenu.addItem(existingAction(ToggleTexturesCommandPath));
+    displayMenu.addItem(existingAction(ShowViewSettingsCommandPath));
     auto &gridMenu = viewMenu.addMenu("Grid");
     gridMenu.addItem(
         createMenuAction(

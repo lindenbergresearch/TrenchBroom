@@ -30,6 +30,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QMimeData>
+#include <QSet>
 #include <QShortcut>
 #include <QString>
 #include <QtGlobal>
@@ -135,10 +136,6 @@ void MapViewBase::setIsCurrent(const bool isCurrent) {
 }
 
 
-void MapViewBase::toggleEnableLightning() {
-    togglePref(Preferences::EnableLightning);
-}
-
 Renderer::Camera &MapViewBase::camera() {
     return doGetCamera();
 }
@@ -225,6 +222,7 @@ void MapViewBase::selectionDidChange(const Selection &) {
 }
 
 void MapViewBase::textureCollectionsDidChange() {
+    updateActionStatesDelayed();
     triggerFrameSwap();
 
 
@@ -246,6 +244,7 @@ void MapViewBase::modsDidChange() {
 }
 
 void MapViewBase::editorContextDidChange() {
+    updateActionStatesDelayed();
     triggerFrameSwap();
 
 
@@ -276,6 +275,7 @@ void MapViewBase::preferenceDidChange(const std::filesystem::path &path) {
     }
 
     updateActionBindings();
+    if (ActionManager::instance().affectsActionState(path)) updateActionStatesDelayed();
     triggerFrameSwap();
 
 
@@ -320,15 +320,20 @@ void MapViewBase::createActions() {
 }
 
 void MapViewBase::updateActionBindings() {
+    auto changed = false;
     for (auto &[shortcut, action] : m_shortcuts) {
-        shortcut->setKey(action->keySequence());
+        const auto key = action->keySequence();
+        if (shortcut->key() == key) continue;
+        shortcut->setKey(key);
+        changed = true;
     }
+    if (changed) updateActionStatesDelayed();
 }
 
 void MapViewBase::updateActionStates() {
     auto context = ActionExecutionContext{findMapFrame(this), this};
     for (auto &[shortcut, action] : m_shortcuts) {
-        shortcut->setEnabled(hasFocus() && action->enabled(context));
+        shortcut->setEnabled(hasFocus() && !shortcut->key().isEmpty() && action->enabled(context));
     }
 }
 
@@ -729,54 +734,6 @@ void MapViewBase::createEntity(const Assets::EntityDefinition *definition) {
     }
 }
 
-void MapViewBase::toggleShowEntityClassnames() {
-    togglePref(Preferences::ShowEntityClassnames);
-}
-
-void MapViewBase::toggleShowGroupBounds() {
-    togglePref(Preferences::ShowGroupBounds);
-}
-
-void MapViewBase::toggleShowBrushEntityBounds() {
-    togglePref(Preferences::ShowBrushEntityBounds);
-}
-
-void MapViewBase::toggleShowPointEntityBounds() {
-    togglePref(Preferences::ShowPointEntityBounds);
-}
-
-void MapViewBase::toggleShowPointEntities() {
-    togglePref(Preferences::ShowPointEntities);
-}
-
-void MapViewBase::toggleShowPointEntityModels() {
-    togglePref(Preferences::ShowPointEntityModels);
-}
-
-void MapViewBase::toggleShowBrushes() {
-    togglePref(Preferences::ShowBrushes);
-}
-
-void MapViewBase::showTextures() {
-    setPref(Preferences::FaceRenderMode, Preferences::faceRenderModeTextured());
-}
-
-void MapViewBase::hideTextures() {
-    setPref(Preferences::FaceRenderMode, Preferences::faceRenderModeFlat());
-}
-
-void MapViewBase::hideFaces() {
-    setPref(Preferences::FaceRenderMode, Preferences::faceRenderModeSkip());
-}
-
-void MapViewBase::toggleShadeFaces() {
-    togglePref(Preferences::ShadeFaces);
-}
-
-void MapViewBase::toggleShowFog() {
-    togglePref(Preferences::ShowFog);
-}
-
 void MapViewBase::logAnisotropyInfo() {
     bool enableAnisotropy = pref(Preferences::EnableAnisotropicFilter);
 
@@ -791,26 +748,6 @@ void MapViewBase::toggleAnisotropy() {
     togglePref(Preferences::EnableAnisotropicFilter);
     logAnisotropyInfo();
     findMapFrame(this)->reloadTextureCollections();
-}
-
-void MapViewBase::toggleShowEdges() {
-    togglePref(Preferences::ShowEdges);
-}
-
-void MapViewBase::showAllEntityLinks() {
-    setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeAll());
-}
-
-void MapViewBase::showTransitivelySelectedEntityLinks() {
-    setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeTransitive());
-}
-
-void MapViewBase::showDirectlySelectedEntityLinks() {
-    setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeDirect());
-}
-
-void MapViewBase::hideAllEntityLinks() {
-    setPref(Preferences::FaceRenderMode, Preferences::entityLinkModeNone());
 }
 
 bool MapViewBase::event(QEvent *event) {
@@ -1124,6 +1061,9 @@ void MapViewBase::showPopupMenuForSelection(const QPoint &globalPosition, QActio
 }
 
 void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromInspector, QAction* deleteAction, QAction* sourceAction) {
+    auto* mapFrame = findMapFrame(this);
+    auto context = ActionExecutionContext{mapFrame, this};
+    if (!context.hasDocument()) return;
     const QPointer<MapViewBase> lifetime{this};
     const auto previous = m_popupFromInspector;
     m_popupFromInspector = fromInspector;
@@ -1139,33 +1079,30 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
     auto *newGroup = findNewGroupForObjects(nodes);
     auto *mergeGroup = findGroupToMergeGroupsInto(document->selectedNodes());
 
-    auto *mapFrame = findMapFrame(this);
-
     auto menu = new QMenu{this};
     const QPointer<QMenu> menuLifetime{menu};
     connect(menu, &QMenu::aboutToShow, menu, [menu] { menu->setProperty("tbMenuOpen", true); });
     connect(menu, &QMenu::aboutToHide, menu, [menu] { menu->setProperty("tbMenuOpen", false); });
 
-    // A tree click can change selection and open this menu in the same event.
-    mapFrame->updateActionState();
-    const auto addMainMenuAction = [&](const auto &path) -> QAction * {
-        auto *groupAction = mapFrame->findAction(path);
-        assert(groupAction != nullptr);
-        const auto& action = *ActionManager::instance().actionsMap().at(path);
-        if (action.targets() & PopupMenuTarget) menu->addAction(groupAction);
-        return groupAction;
+    auto& actions = ActionManager::instance();
+    auto present = QSet<QString>{};
+    const auto addRegisteredAction = [&](const QString& id) {
+        present.insert(id);
+        const auto* action = actions.action(id);
+        if (!action || !(action->targets() & PopupMenuTarget)) return;
+        auto* item = addContextMenuAction(*menu, *action, [this, action] { triggerAction(*action); }, action->enabled(context));
+        item->setChecked(action->checked(context));
     };
 
-    addMainMenuAction("Menu/Edit/Group");
-    addMainMenuAction("Menu/Edit/Ungroup");
+    addRegisteredAction("Menu/Edit/Group");
+    addRegisteredAction("Menu/Edit/Ungroup");
 
     auto *mergeGroupAction = menu->addAction(mergeGroup
                                              ? tr("Merge Groups into %1").arg(QString::fromStdString(mergeGroup->name()))
                                              : tr("Merge Groups"), this, &MapViewBase::mergeSelectedGroups);
     mergeGroupAction->setEnabled(canMergeGroups());
 
-    auto *renameAction = menu->addAction(tr("Rename Groups"), mapFrame, &MapFrame::renameSelectedGroups);
-    renameAction->setEnabled(mapFrame->canRenameSelectedGroups());
+    addRegisteredAction(RenameGroupsCommandPath);
 
     if (newGroup && canReparentNodes(nodes, newGroup)) {
         menu->addAction(tr("Add Objects to Group %1").arg(QString::fromStdString(newGroup->name())), this, &MapViewBase::addSelectedObjectsToGroup);
@@ -1177,17 +1114,15 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
 
     // Linked group operations
 
-    addMainMenuAction("Menu/Edit/Create Linked Duplicate");
-    addMainMenuAction("Menu/Edit/Select Linked Groups");
-    addMainMenuAction("Menu/Edit/Separate Linked Groups");
-    const auto* prefabAction = ActionManager::instance().actionsMap().at(SaveSelectionAsPrefabActionPath).get();
-    ActionExecutionContext prefabContext{mapFrame, this};
-    addContextMenuAction(*menu, *prefabAction, [this, prefabAction] { triggerAction(*prefabAction); }, prefabAction->enabled(prefabContext));
+    addRegisteredAction("Menu/Edit/Create Linked Duplicate");
+    addRegisteredAction("Menu/Edit/Select Linked Groups");
+    addRegisteredAction("Menu/Edit/Separate Linked Groups");
+    addRegisteredAction(SaveSelectionAsPrefabActionPath);
     menu->addSeparator();
 
     // Layer operations
 
-    const auto selectedObjectLayers = Model::collectContainingLayersUserSorted(nodes);
+    const auto& selectedObjectLayers = context.selectedLayers();
 
     auto *moveSelectionTo = menu->addMenu(tr("Move to Layer"));
     for (auto *layerNode : document->world()->allLayersUserSorted()) {
@@ -1218,27 +1153,21 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
         }
     }
 
-    auto *hideLayersAction = menu->addAction(tr("Hide Layers"), this, [=]() { document->hideLayers(selectedObjectLayers); });
-    hideLayersAction->setEnabled(document->canHideLayers(selectedObjectLayers));
-    auto *isolateLayersAction = menu->addAction(tr("Isolate Layers"), this, [=]() { document->isolateLayers(selectedObjectLayers); });
-    isolateLayersAction->setEnabled(document->canIsolateLayers(selectedObjectLayers));
-    auto *selectAllInLayersAction = menu->addAction(tr("Select All in Layers"), this, [=]() {
-        document->selectAllInLayers(selectedObjectLayers);
-    });
-    selectAllInLayersAction->setEnabled(document->canSelectAllInLayers(selectedObjectLayers));
+    addRegisteredAction(HideSelectedLayersCommandPath);
+    addRegisteredAction(IsolateSelectedLayersCommandPath);
+    addRegisteredAction(SelectAllInSelectedLayersCommandPath);
 
     menu->addSeparator();
 
     if (document->selectedNodes().hasOnlyBrushes()) {
-        auto *moveToWorldAction = menu->addAction(tr("Make Structural"), this, &MapViewBase::makeStructural);
-        moveToWorldAction->setEnabled(canMakeStructural());
+        addRegisteredAction(MakeStructuralCommandPath);
 
         const auto isEntity = newBrushParent->accept(kdl::overload([](const Model::WorldNode *) { return false; }, [](const Model::LayerNode *) { return false; }, [](const Model::GroupNode *) { return false; }, [](const Model::EntityNode *) { return true; }, [](const Model::BrushNode *) { return false; }, [](const Model::PatchNode *) { return false; }));
 
         if (isEntity) {
             menu->addAction(tr("Move Brushes to Entity: '%1'").arg(QString::fromStdString(newBrushParent->name())), this, &MapViewBase::moveSelectedBrushesToEntity);
         }
-    }
+    } else present.insert(MakeStructuralCommandPath);
 
     menu->addSeparator();
 
@@ -1259,17 +1188,11 @@ void MapViewBase::showPopupMenu(const QPoint &globalPosition, const bool fromIns
     if (sourceAction) { menu->addSeparator(); menu->addAction(sourceAction); }
     if (deleteAction) { menu->addSeparator(); menu->addAction(deleteAction); }
 
-    auto context = ActionExecutionContext{mapFrame, this};
-    QStringList present;
-    for (auto* action : menu->actions()) present << action->property("tbActionId").toString();
     auto added = false;
-    for (const auto& definition : ActionManager::instance().configuration().actions) {
+    for (const auto& definition : actions.configuration().actions) {
         if (!(definition.targets & PopupMenuTarget) || present.contains(definition.id)) continue;
-        const auto* action = ActionManager::instance().action(definition.id);
-        if (!action) continue;
         if (!added) { menu->addSeparator(); added = true; }
-        auto* qtAction = addContextMenuAction(*menu, *action, [this, action] { triggerAction(*action); }, action->enabled(context));
-        if (action->checkable()) qtAction->setChecked(action->checked(context));
+        addRegisteredAction(definition.id);
     }
 
     menu->exec(globalPosition);
@@ -1591,7 +1514,7 @@ bool MapViewBase::canMergeGroups() const {
 
 bool MapViewBase::canMakeStructural() const {
     auto document = kdl::mem_lock(m_document);
-    if (document->selectedNodes().hasOnlyBrushes()) {
+    if (document->selectedNodes().hasBrushes()) {
         const auto &brushes = document->selectedNodes().brushes();
         return std::any_of(brushes.begin(), brushes.end(), [&](const auto *brush) {
             return brush->hasAnyTag() || brush->entity() != document->world() || brush->anyFaceHasAnyTag();
