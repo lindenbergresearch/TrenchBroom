@@ -136,7 +136,7 @@ class TrenchBroomApp : public QApplication {
     QFileSystemWatcher* m_themeWatcher = nullptr;
     QMap<QString, QString> m_themeFileStamps;
     std::filesystem::path m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath;
-    int m_loadedUIFontSize = 0, m_loadedConsoleFontSize = 0, m_loadedRenderFontSize = 0;
+    float m_loadedUIFontSize = 0, m_loadedConsoleFontSize = 0, m_loadedRenderFontSize = 0;
     QString m_loadedUITypography;
     MapFrame *m_currentMapFrame;
     SignalHandler m_signalHandler;
@@ -173,7 +173,7 @@ class TrenchBroomApp : public QApplication {
     void reloadStyle(bool reloadFonts = false, bool reloadStyleSheets = true);
     // Restart the pending refresh to combine a burst of appearance edits.
     void requestThemeRefresh(int delayMs = 0);
-    QFont loadFont(const std::filesystem::path &path, int size) const;
+    QFont loadFont(const std::filesystem::path &path, float size) const;
     std::vector<std::filesystem::path> recentDocuments() const;
     void addRecentDocumentMenu(QMenu &menu);
     void removeRecentDocumentMenu(QMenu &menu);

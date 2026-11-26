@@ -60,8 +60,11 @@
 #ifdef __APPLE__
 
 #include "View/Actions/MainMenuBuilder.h"
+
 #ifndef QT_NO_SESSIONMANAGER
+
 #include <QSessionManager>
+
 #endif
 
 #endif
@@ -137,7 +140,7 @@ LONG WINAPI TrenchBroomUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionPt
 #endif
 
 
-TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv} {
+TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication { argc, argv } {
     using namespace std::chrono_literals;
 
     // When this flag is enabled, font and palette changes propagate as though the user had
@@ -169,7 +172,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     logger().info() << "----------------------------------------------------------";
 
-    std::string colorSpace{};
+    std::string colorSpace {};
     switch (pref(Preferences::RendererColorSpace)) {
         case QSurfaceFormat::ColorSpace::DefaultColorSpace:
             colorSpace = "DefaultColorSpace";
@@ -181,7 +184,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
             colorSpace = "UnknownColorSpace";
     }
 
-    std::string swapBehavior{};
+    std::string swapBehavior {};
     switch (pref(Preferences::RendererSwapBehavior)) {
         case QSurfaceFormat::SwapBehavior::SingleBuffer:
             swapBehavior = "SingleBuffer";
@@ -235,21 +238,21 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     /* ------------------------------------------------------------------------------------------- */
 
-    m_themeRefreshTimer = new QTimer{this};
+    m_themeRefreshTimer = new QTimer { this };
     m_themeRefreshTimer->setSingleShot(true);
     connect(m_themeRefreshTimer, &QTimer::timeout, this, [this] {
         reloadStyle(true, true);
         watchThemeFiles();
     });
-    m_themeConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect([this](const auto& path) {
+    m_themeConnection += PreferenceManager::instance().preferenceDidChangeNotifier.connect([this](const auto &path) {
         if (ThemeManager::isRelevantPreference(path)) queueThemeRefresh();
         if (path == fontStashPreference().path()) {
-            for (auto* widget : QApplication::allWidgets()) {
+            for (auto *widget : QApplication::allWidgets()) {
                 if (widget->isVisible()) widget->update();
             }
         }
     });
-    m_themeWatcher = new QFileSystemWatcher{this};
+    m_themeWatcher = new QFileSystemWatcher { this };
     connect(m_themeWatcher, &QFileSystemWatcher::fileChanged, this, [this] { queueThemeRefresh(); });
     connect(m_themeWatcher, &QFileSystemWatcher::directoryChanged, this, [this] {
         // A preferences save in the same directory is not a theme change.
@@ -266,16 +269,16 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
     connect(m_recentDocuments.get(), &RecentDocuments::loadDocument, this, [this](const std::filesystem::path &path) { openDocument(path); });
     connect(m_recentDocuments.get(), &RecentDocuments::didChange, this, &TrenchBroomApp::recentDocumentsDidChange);
     m_recentDocuments->reload();
-    m_recentDocumentsReloadTimer = new QTimer{};
+    m_recentDocumentsReloadTimer = new QTimer {};
     connect(m_recentDocumentsReloadTimer, &QTimer::timeout, m_recentDocuments.get(), &RecentDocuments::reload);
     m_recentDocumentsReloadTimer->start(1s);
 
 
     #ifdef __APPLE__
     setQuitOnLastWindowClosed(false);
-    #ifndef QT_NO_SESSIONMANAGER
+      #ifndef QT_NO_SESSIONMANAGER
     // Cocoa commits the session before sending Quit. Close editor frames before their palettes.
-    connect(this, &QGuiApplication::commitDataRequest, this, [this](QSessionManager& session) {
+    connect(this, &QGuiApplication::commitDataRequest, this, [this](QSessionManager &session) {
         if (session.allowsInteraction()) {
             if (!m_frameManager->closeAllFrames()) {
                 session.cancel();
@@ -283,16 +286,16 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
             session.release();
         }
     }, Qt::DirectConnection);
-    #endif
+      #endif
 
     // The parentless macOS menu bar must outlive startup and its registered recent menu.
     m_defaultMenuBar = std::make_unique<QMenuBar>();
-    auto actionMap = std::map<const Action *, QAction *>{};
+    auto actionMap = std::map<const Action *, QAction *> {};
 
-    auto menuBuilder = MainMenuBuilder{
+    auto menuBuilder = MainMenuBuilder {
         *m_defaultMenuBar, actionMap,
         [](const Action &action) {
-            auto context = ActionExecutionContext{nullptr, nullptr};
+            auto context = ActionExecutionContext { nullptr, nullptr };
             action.execute(context);
         }
     };
@@ -302,7 +305,7 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
 
     addRecentDocumentMenu(*menuBuilder.recentDocumentsMenu);
 
-    auto context = ActionExecutionContext{nullptr, nullptr};
+    auto context = ActionExecutionContext { nullptr, nullptr };
     for (auto [tbAction, qtAction] : actionMap) {
         qtAction->setEnabled(tbAction->enabled(context));
         if (qtAction->isCheckable()) {
@@ -310,16 +313,23 @@ TrenchBroomApp::TrenchBroomApp(int &argc, char **argv) : QApplication{argc, argv
         }
     }
     m_themeConnection += ActionManager::instance().actionsDidChangeNotifier.connect([this] {
-        const auto menus = m_defaultMenuBar->findChildren<QMenu*>(QString{}, Qt::FindDirectChildrenOnly);
-        m_defaultMenuBar->clear(); for (auto* menu : menus) delete menu;
-        const auto oldActions = m_defaultMenuBar->findChildren<QAction*>(QString{}, Qt::FindDirectChildrenOnly);
-        for (auto* action : oldActions) delete action;
-        auto bindings = std::map<const Action*, QAction*>{};
-        MainMenuBuilder builder{*m_defaultMenuBar, bindings, [](const Action& action) { ActionExecutionContext context{nullptr, nullptr}; action.execute(context); }};
+        const auto menus = m_defaultMenuBar->findChildren<QMenu *>(QString {}, Qt::FindDirectChildrenOnly);
+        m_defaultMenuBar->clear();
+        for (auto *menu : menus) delete menu;
+        const auto oldActions = m_defaultMenuBar->findChildren<QAction *>(QString {}, Qt::FindDirectChildrenOnly);
+        for (auto *action : oldActions) delete action;
+        auto bindings = std::map<const Action *, QAction *> {};
+        MainMenuBuilder builder { *m_defaultMenuBar, bindings, [](const Action &action) {
+            ActionExecutionContext context { nullptr, nullptr };
+            action.execute(context);
+        }};
         ActionManager::instance().visitMainMenu(builder);
         if (builder.recentDocumentsMenu) addRecentDocumentMenu(*builder.recentDocumentsMenu);
-        ActionExecutionContext context{nullptr, nullptr};
-        for (const auto& [action, qt] : bindings) { qt->setEnabled(action->enabled(context)); if (qt->isCheckable()) qt->setChecked(action->checked(context)); }
+        ActionExecutionContext context { nullptr, nullptr };
+        for (const auto &[action, qt] : bindings) {
+            qt->setEnabled(action->enabled(context));
+            if (qt->isCheckable()) qt->setChecked(action->checked(context));
+        }
     });
     #endif
 }
@@ -330,8 +340,8 @@ TrenchBroomApp::~TrenchBroomApp() {
 }
 
 void TrenchBroomApp::parseCommandLineAndShowFrame() {
-    auto parser = QCommandLineParser{};
-    parser.addOption({"portable", "Store settings next to the executable."});
+    auto parser = QCommandLineParser {};
+    parser.addOption({ "portable", "Store settings next to the executable." });
     parser.process(*this);
     openFilesOrWelcomeFrame(parser.positionalArguments());
 }
@@ -343,13 +353,16 @@ FrameManager *TrenchBroomApp::frameManager() {
 bool TrenchBroomApp::loadStyleSheets() {
     m_qssLoadedSuccessful = true;
     m_qssErrors.clear();
+
     const auto path = IO::SystemPaths::findResourceFile("stylesheets/base.qss");
     const auto defaults = IO::SystemPaths::findResourceFile("stylesheets/theme.json");
     const auto overrides = IO::SystemPaths::userDataDirectory() / "theme.json";
-    auto snapshot = ThemeSnapshot{};
-    auto errors = QStringList{};
-    const auto report = [&](const QStringList& messages) {
-        for (const auto& message : messages) logger().error() << message.toStdString();
+
+    auto snapshot = ThemeSnapshot {};
+    auto errors = QStringList {};
+
+    const auto report = [&](const QStringList &messages) {
+        for (const auto &message : messages) logger().error() << message.toStdString();
     };
 
     if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, overrides, snapshot, errors)) {
@@ -358,7 +371,10 @@ bool TrenchBroomApp::loadStyleSheets() {
         // Live edits keep the complete last valid theme instead.
         if (!ThemeManager::instance().current().values.isEmpty()) return false;
         errors.clear();
-        if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, {}, snapshot, errors)) { report(errors); return false; }
+        if (!ThemeManager::prepare(m_UI_Font, m_ConsoleFont, m_RenderFont, defaults, {}, snapshot, errors)) {
+            report(errors);
+            return false;
+        }
     }
 
     if (!m_qssBuilder.loadFile(path) || !m_qssBuilder.update(snapshot.values)) {
@@ -370,47 +386,47 @@ bool TrenchBroomApp::loadStyleSheets() {
     const auto oldPalette = palette();
     const auto oldFont = font();
     const auto uiFont = fontForStyleSheet(m_UI_Font);
-    const auto& current = ThemeManager::instance().current();
+    const auto &current = ThemeManager::instance().current();
     const auto paletteChanged = current.values.isEmpty() || current.palette != snapshot.palette;
     const auto styleChanged = oldStyle != m_qssBuilder.getRenderedText();
     if (styleChanged || paletteChanged || oldFont != uiFont) {
         // Keep the replacement atomic on screen, including floating tools and
         // Preferences. Preserve windows whose updates were already disabled.
         std::vector<QPointer<QWidget>> frozen;
-        for (auto* window : topLevelWidgets()) {
+        for (auto *window : topLevelWidgets()) {
             if (window->isVisible() && window->updatesEnabled()) {
                 frozen.emplace_back(window);
                 window->setUpdatesEnabled(false);
             }
         }
-        const auto restoreUpdates = qScopeGuard([&] {
-            for (const auto& window : frozen)
-                if (window) window->setUpdatesEnabled(true);
-        });
+
         // Qt reports parsing errors lazily. Only capture actual QSS diagnostics;
         // unrelated warnings (fonts, drivers, etc.) are not stylesheet failures.
-        const auto handler = [](QtMsgType type, const QMessageLogContext&, const QString& message) {
+        const auto handler = [](QtMsgType type, const QMessageLogContext &, const QString &message) {
             // Qt versions/builds report these diagnostics at different levels.
             if ((type == QtDebugMsg || type == QtWarningMsg) && (message.contains("stylesheet", Qt::CaseInsensitive)
-                || message.startsWith("Unknown property", Qt::CaseInsensitive))) {
-                if (std::find(APP.m_qssErrors.begin(), APP.m_qssErrors.end(), message) == APP.m_qssErrors.end()) APP.m_qssErrors.push_back(message);
+                                                                 ||
+                                                                 message.startsWith("Unknown property", Qt::CaseInsensitive))) {
+                if (std::find(APP.m_qssErrors.begin(), APP.m_qssErrors.end(), message) == APP.m_qssErrors.end())
+                    APP.m_qssErrors.push_back(message);
                 APP.m_qssLoadedSuccessful = false;
             } else {
                 fprintf(stderr, "%s\n", message.toUtf8().constData());
             }
         };
+
         const auto oldHandler = qInstallMessageHandler(handler);
-        const auto restoreHandler = qScopeGuard([&] { qInstallMessageHandler(oldHandler); });
         const auto reportErrors = [&] {
             // Our logger itself uses Qt logging. Restore the handler before
             // reporting, so diagnostics cannot append to the list being read.
             qInstallMessageHandler(oldHandler);
             const auto diagnostics = m_qssErrors;
-            for (const auto& message : diagnostics) logger().error() << path.string() << ": " << message.toStdString();
+            for (const auto &message : diagnostics) logger().error() << path.string() << ": " << message.toStdString();
         };
+
         if (styleChanged) {
             // Check the candidate before modifying the live application.
-            auto probe = QMenu{};
+            auto probe = QMenu {};
             probe.setStyleSheet(m_qssBuilder.getRenderedText());
             probe.ensurePolished();
             probe.style()->polish(&probe);
@@ -423,6 +439,7 @@ bool TrenchBroomApp::loadStyleSheets() {
             // wrapper keeps our base proxy style but polishes each widget once.
             if (!oldStyle.isEmpty()) setStyleSheet({});
         }
+
         if (paletteChanged) setPalette(snapshot.palette);
         if (oldFont != uiFont) QApplication::setFont(uiFont);
         if (styleChanged) setStyleSheet(m_qssBuilder.getRenderedText());
@@ -435,6 +452,7 @@ bool TrenchBroomApp::loadStyleSheets() {
             return false;
         }
     }
+
     ThemeManager::instance().publish(std::move(snapshot));
     return true;
 }
@@ -442,25 +460,31 @@ bool TrenchBroomApp::loadStyleSheets() {
 void TrenchBroomApp::loadStyle() {
     // Keep the base style and its popup policies alive across theme changes.
     if (!m_proxyStyle) {
-        m_proxyStyle = new TrenchBroomProxyStyle{"Fusion"};
+        m_proxyStyle = new TrenchBroomProxyStyle { "Fusion" };
         setStyle(m_proxyStyle);
     }
 }
 
 void TrenchBroomApp::refreshThemeFonts() {
     const auto typography = listFontSettings();
-    const auto typographyKey = pref(Preferences::UIGlobalTypography)
-        ? QString{"%1/%2/%3/%4"}.arg(typography.weight).arg(typography.opticalSize)
-            .arg(typography.typoLineMetrics).arg(typography.subpixelPositioning) : QString{};
+    const auto typographyKey =
+        pref(Preferences::UIGlobalTypography)
+        ? QString { "%1/%2/%3/%4" }.arg(typography.weight).arg(typography.opticalSize)
+            .arg(typography.typoLineMetrics).arg(typography.subpixelPositioning) : QString {};
+
     if (m_loadedUITypography != typographyKey) m_loadedUIFontSize = 0;
-    const auto refresh = [&](auto& loadedPath, auto& loadedSize, QFont& font, const auto& path, const int size) {
+    const auto refresh = [&](auto &loadedPath, auto &loadedSize, QFont &font, const auto &path, const float size) {
         if (loadedPath == path && loadedSize == size) return;
         font = loadFont(path, size);
         loadedPath = path;
         loadedSize = size;
     };
+
     refresh(m_loadedUIFontPath, m_loadedUIFontSize, m_UI_Font, pref(Preferences::UIFontPath), uiFontPixelSize());
-    if (pref(Preferences::UIGlobalTypography)) m_UI_Font = listTextFont(m_UI_Font, typography);
+
+    if (pref(Preferences::UIGlobalTypography))
+        m_UI_Font = listTextFont(m_UI_Font, typography);
+
     m_loadedUITypography = typographyKey;
     refresh(m_loadedConsoleFontPath, m_loadedConsoleFontSize, m_ConsoleFont, pref(Preferences::ConsoleFontPath), pref(Preferences::ConsoleFontSize));
     refresh(m_loadedRenderFontPath, m_loadedRenderFontSize, m_RenderFont, pref(Preferences::RendererFontPath), pref(Preferences::RendererFontSize));
@@ -479,13 +503,18 @@ void TrenchBroomApp::watchThemeFiles() {
         IO::SystemPaths::findResourceFile("stylesheets/theme.json"),
         IO::SystemPaths::userDataDirectory() / "theme.json"
     };
-    for (const auto& path : paths) {
+    for (const auto &path : paths) {
         if (path.empty()) continue;
-        const auto file = QFileInfo{IO::pathAsQString(path)};
-        m_themeFileStamps[file.absoluteFilePath()] = file.exists()
-            ? QString::number(file.size()) + '/' + QString::number(file.lastModified().toMSecsSinceEpoch()) : QString{};
+        const auto file = QFileInfo { IO::pathAsQString(path) };
+        m_themeFileStamps[file.absoluteFilePath()] =
+            file.exists()
+            ? QString::number(file.size()) + '/' +
+              QString::number(file.lastModified().toMSecsSinceEpoch())
+            : QString {};
+
         if (file.exists() && !m_themeWatcher->files().contains(file.absoluteFilePath()))
             m_themeWatcher->addPath(file.absoluteFilePath());
+
         if (QFileInfo::exists(file.absolutePath()) && !m_themeWatcher->directories().contains(file.absolutePath()))
             m_themeWatcher->addPath(file.absolutePath());
     }
@@ -510,8 +539,8 @@ void TrenchBroomApp::updateRecentDocument(const std::filesystem::path &path) {
 bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
     const ScopedDiagnosticLog diagnostics(pref(Preferences::ShowMapLoadDiagnostics));
     const auto checkFileExists = [&]() {
-        return IO::Disk::pathInfo(path) == IO::PathInfo::File ? Result<void>{} : Result<void>{
-            Error{"'" + path.string() + "' not found"}};
+        return IO::Disk::pathInfo(path) == IO::PathInfo::File ? Result<void> {} : Result<void> {
+            Error { "'" + path.string() + "' not found" }};
     };
 
     auto *frame = static_cast<MapFrame *>(nullptr);
@@ -519,13 +548,13 @@ bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
         auto &gameFactory = Model::GameFactory::instance();
         const auto loaded = checkFileExists().or_else([&](const auto &e) {
             m_recentDocuments->removePath(path);
-            return Result<void>{e};
+            return Result<void> { e };
         }).and_then([&]() { return gameFactory.detectGame(path); }).and_then([&](const auto &gameNameAndMapFormat) {
             auto [gameName, mapFormat] = gameNameAndMapFormat;
 
             if (gameName.empty() || mapFormat == Model::MapFormat::Unknown) {
                 if (!GameDialog::showOpenDocumentDialog(nullptr, gameName, mapFormat)) {
-                    return Result<bool>{false};
+                    return Result<bool> { false };
                 }
             }
 
@@ -562,7 +591,7 @@ bool TrenchBroomApp::openDocument(const std::filesystem::path &path) {
 }
 
 void TrenchBroomApp::openPreferences() {
-    auto dialog = PreferenceDialog{topDocument()};
+    auto dialog = PreferenceDialog { topDocument() };
     dialog.exec();
 }
 
@@ -571,7 +600,7 @@ void TrenchBroomApp::openAbout() {
 }
 
 bool TrenchBroomApp::initializeGameFactory() {
-    const auto gamePathConfig = Model::GamePathConfig{
+    const auto gamePathConfig = Model::GamePathConfig {
         IO::SystemPaths::findResourceDirectories("games"), IO::SystemPaths::userDataDirectory() / "games",
     };
     auto &gameFactory = Model::GameFactory::instance();
@@ -588,7 +617,7 @@ bool TrenchBroomApp::initializeGameFactory() {
 bool TrenchBroomApp::newDocument() {
     auto *frame = static_cast<MapFrame *>(nullptr);
     try {
-        auto gameName = std::string{};
+        auto gameName = std::string {};
         auto mapFormat = Model::MapFormat::Unknown;
         if (!GameDialog::showNewDocumentDialog(nullptr, gameName, mapFormat)) {
             return false;
@@ -648,14 +677,14 @@ void TrenchBroomApp::debugShowCrashReportDialog() {
     const auto mapPath = IO::SystemPaths::userDataDirectory() / "crashreport.map";
     const auto logPath = IO::SystemPaths::userDataDirectory() / "crashreport.log";
 
-    auto *report = new CrashReport{
+    auto *report = new CrashReport {
         SignalType(0xEC, "SIGDEBUG", "Call debug crash report"),
         repPath,
         logPath,
         mapPath
     };
 
-    auto dialog = CrashDialog{report};
+    auto dialog = CrashDialog { report };
     dialog.exec();
 }
 
@@ -695,7 +724,7 @@ bool TrenchBroomApp::event(QEvent *event) {
 #ifdef __APPLE__
     if (event->type() == QEvent::FileOpen) {
         const auto *openEvent = static_cast<QFileOpenEvent *>(event);
-        const auto path = std::filesystem::path{openEvent->file().toStdString()};
+        const auto path = std::filesystem::path { openEvent->file().toStdString() };
         if (openDocument(path)) {
             closeWelcomeWindow();
             return true;
@@ -711,7 +740,7 @@ bool TrenchBroomApp::event(QEvent *event) {
 }
 
 void TrenchBroomApp::openFilesOrWelcomeFrame(const QStringList &fileNames) {
-    const auto filesToOpen = useSDI() && !fileNames.empty() ? QStringList{fileNames.front()} : fileNames;
+    const auto filesToOpen = useSDI() && !fileNames.empty() ? QStringList { fileNames.front() } : fileNames;
 
     auto anyDocumentOpened = false;
     for (const auto &fileName : filesToOpen) {
@@ -754,21 +783,20 @@ void TrenchBroomApp::reloadStyle(bool reloadFonts, bool reloadStyleSheets) {
     // refresh, so it cannot repeat the same work on the next event-loop turn.
     if (m_themeRefreshTimer) m_themeRefreshTimer->stop();
     const auto previousFonts = std::make_tuple(m_UI_Font, m_ConsoleFont, m_RenderFont,
-        m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
-        m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize, m_loadedUITypography);
+                                               m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
+                                               m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize, m_loadedUITypography);
     if (reloadFonts) refreshThemeFonts();
     if (reloadStyleSheets) {
         if (!loadStyleSheets()) {
             std::tie(m_UI_Font, m_ConsoleFont, m_RenderFont,
-                m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
-                m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize, m_loadedUITypography) = previousFonts;
+                     m_loadedUIFontPath, m_loadedConsoleFontPath, m_loadedRenderFontPath,
+                     m_loadedUIFontSize, m_loadedConsoleFontSize, m_loadedRenderFontSize, m_loadedUITypography) = previousFonts;
         }
-    }
-    else {
+    } else {
         const auto uiFont = fontForStyleSheet(m_UI_Font);
         if (QApplication::font() != uiFont) QApplication::setFont(uiFont);
     }
-    if (auto* proxy = dynamic_cast<TrenchBroomProxyStyle*>(m_proxyStyle)) {
+    if (auto *proxy = dynamic_cast<TrenchBroomProxyStyle *>(m_proxyStyle)) {
         proxy->refreshTypography();
         proxy->refreshWindowChrome();
     }
@@ -786,7 +814,7 @@ const QFont &TrenchBroomApp::getRenderFont() const {
     return m_RenderFont;
 }
 
-QFont TrenchBroomApp::loadFont(const std::filesystem::path& path, int size) const {
+QFont TrenchBroomApp::loadFont(const std::filesystem::path &path, float size) const {
     return View::loadFont(path, size);
 }
 
@@ -811,7 +839,7 @@ void TrenchBroomApp::setQProxyStyle(QProxyStyle *proxyStyle) {
 }
 
 std::stringstream makeCrashReport(const std::string &stacktrace, const std::string &reason) {
-    auto ss = std::stringstream{};
+    auto ss = std::stringstream {};
 
     ss << std::endl;
     ss << "Reason              : " << reason << std::endl;
@@ -844,7 +872,7 @@ std::filesystem::path findCrashReportBasePath() {
         return document->path().parent_path() / (document->path().stem().string() + "-" + prefix);
     } else {
         const auto documentsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation).toStdString();
-        return std::filesystem::path{documentsPath} / prefix;
+        return std::filesystem::path { documentsPath } / prefix;
     }
 }
 
@@ -877,7 +905,7 @@ void reportCrashAndExit(const std::string &stacktrace, const SignalType &signalT
     defaultQtLogger.error() << "FATAL: Abort due to application failure: " << signalType.name << ":";
 
     std::string line;
-    std::string report{};
+    std::string report {};
     auto ss = makeCrashReport(stacktrace, signalType.name);
 
     while (std::getline(ss, line)) {
@@ -907,12 +935,12 @@ void reportCrashAndExit(const std::string &stacktrace, const SignalType &signalT
             doc->saveDocumentTo(mapPath);
             defaultQtLogger.error() << "wrote map to " << mapPath.string();
         } else {
-            mapPath = std::filesystem::path{};
+            mapPath = std::filesystem::path {};
         }
 
         // Copy the log file
         if (!QFile::copy(IO::pathAsQString(IO::SystemPaths::logFilePath()), IO::pathAsQString(logPath))) {
-            logPath = std::filesystem::path{};
+            logPath = std::filesystem::path {};
         }
 
         if (crashReportGuiEnabled) {
@@ -922,7 +950,7 @@ void reportCrashAndExit(const std::string &stacktrace, const SignalType &signalT
             auto crashReport = new CrashReport(signalType, repPath, mapPath, logPath);
             crashReport->stackTrace = QString::fromStdString(ss.str());
 
-            auto dialog = CrashDialog{crashReport};
+            auto dialog = CrashDialog { crashReport };
             dialog.setWindowFlag(Qt::Tool, true);
             dialog.exec();
         }
