@@ -292,6 +292,7 @@ QStatusBar {
     border-top: 1px solid ${color.midlight};
     background: ${color.window};
     min-height: 26px;
+    font-size: ${length.font.small};
     background-color: ${color.window};
 }
 
@@ -321,7 +322,6 @@ QWidget#StatusBarWidget {
     border: none;
     margin: 0px;
     color: ${color.text};
-    font-size: ${length.font.subtitle};
     text-align: center;
 }
 
@@ -691,7 +691,7 @@ QWidget#ImageListBoxItemRenderer_m_titleLabel {
 QWidget#ImageListBoxItemRenderer_m_subtitleLabel,
 QLabel#SearchListBoxItemRenderer_m_infoText {
     color: ${color.text.detail};
-    font-size: ${length.font.small};
+    font-size: 15px;
     border: none;
 }
 
@@ -832,8 +832,8 @@ QWidget#TabSelectionIndicator[selected="true"] { background-color: ${color.highl
 QSplitter {
     padding: 0px;
     margin: 0px;
-    width: 4px;
-    background-color: ${color.dark};
+    width: 2px;
+    background-color: ${color.midlight};
     qproperty-handleWidth: 4;
     border: none;
 }
@@ -849,40 +849,9 @@ TrenchBroom--View--SplitterHandle {
 }
 
 /* ==== CHECKBOX ==== */
-/* Alle Checkboxen verwenden diese gemeinsame Basis, auch View und die Editor-
-   Konfiguration. entityDefinition_... sind gezielte Ausnahmen der Entity-Auswahl. */
-
-/* All preferences, including the editor customization panes, use this surface. */
-QCheckBox {
-    background: transparent;
-}
 
 QCheckBox {
-  background-color: #19232D;
-  color: #DFE1E2;
-  spacing: 4px;
-  outline: none;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-QCheckBox:focus {
-  border: none;
-}
-
-QCheckBox QWidget:disabled {
-  background-color: #19232D;
-  color: #788D9C;
-}
-
-QCheckBox::indicator {
-  margin-left: 2px;
-  height: 14px;
-  width: 14px;
-}
-
-QCheckBox::indicator:checked {
-    background-color: ${color.highlight};
+    min-height: 20px;
 }
 
 QCheckBox#entityDefinition_checkboxWidget {
@@ -895,7 +864,6 @@ QCheckBox#entityDefinition_groupCheckboxWidget {
 }
 
 /* ==== TEXT-EDIT ==== */
-
 QTextEdit {
     border: none;
     background-color: ${color.shadow};
@@ -937,8 +905,11 @@ TrenchBroom--View--SemanticTextEdit#CompilationOutput {
 
 QComboBox {
     min-height: 18px;
+    padding: 2px;
     min-width: 50px;
     padding-right: 8px;
+    padding-left: 4px;
+    padding-bottom: 3px;
     background-color: ${color.dark};
     border: 1px solid ${color.midlight};
     border-radius: ${length.radius.border};
@@ -951,10 +922,9 @@ QComboBox QLineEdit:focus,
 QAbstractSpinBox QLineEdit,
 QAbstractSpinBox QLineEdit:focus {
     background-color: transparent;
-    border: none;
+    min-height: 18px;
     border-radius: 0;
-    padding: 0;
-    min-height: 0;
+    padding: 2px;
 }
 
 QComboBox#ToolBar_GridChoice {
@@ -978,7 +948,8 @@ QComboBox#ToolBar_GridChoice::item {
 }
 
 QComboBox QAbstractItemView {
-    padding: 0px;
+    padding: 4px;
+    min-height: 20px;
     margin: 4px;
     border: 1px solid ${color.mid};
     border-radius: ${length.radius.border};
@@ -1000,6 +971,7 @@ QComboBox#ToolBar_GridChoice::item:selected:active {
 QComboBox::drop-down {
     padding-left: 2px;
     min-width: 14px;
+    min-height: 18px;
     background-color: ${color.midlight};
     border-left: none;
     border-right: 2px solid ${color.midlight};
@@ -1029,28 +1001,35 @@ QComboBox#TextureBrowser_smallComboBox {
    qproperty-match...-Farben markieren den Suchbegriff in beiden Zeilen. */
 
 QLineEdit {
-    padding: 2px 0px 2px 2px;
+    padding: 4px 2px 2px 2px;
     min-height: 20px;
     border: 1px solid ${color.midlight};
-    border-radius: 4px;
+    border-radius: ${length.radius.border};
 }
 
+
+/* ==== SPIN BOX ==== */
 /* Spin fields share the same input surface in every preferences pane. */
 QAbstractSpinBox {
     background-color: ${color.base};
     color: ${color.text};
     padding: 2px;
-    min-height: 20px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    min-height: 18px;
     border: 1px solid ${color.midlight};
-    border-radius: 4px;
+    border-radius: ${length.radius.border};
 }
+
 QAbstractSpinBox:focus {
     border-color: ${color.highlight};
 }
+
 QAbstractSpinBox:disabled {
     background-color: ${color.dark};
     color: ${color.text.disabled};
 }
+
 QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
     subcontrol-origin: border;
     width: 16px;
@@ -1058,13 +1037,15 @@ QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
     border-left: 1px solid ${color.midlight};
     background: transparent;
 }
+
 QAbstractSpinBox::up-button { subcontrol-position: top right; }
 QAbstractSpinBox::down-button { subcontrol-position: bottom right; }
 QAbstractSpinBox::up-button:hover, QAbstractSpinBox::down-button:hover {
     background-color: ${color.midlight};
 }
-QAbstractSpinBox::up-arrow { image: url(":up.svg"); width: 10px; height: 10px; }
-QAbstractSpinBox::down-arrow { image: url(":down.svg"); width: 10px; height: 10px; }
+
+QAbstractSpinBox::up-arrow { image: url(":up.svg"); width: 12px; height: 12px; }
+QAbstractSpinBox::down-arrow { image: url(":down.svg"); width: 12px; height: 12px; }
 
 /* The searchable selectors use one filtered popup for typing and the arrow. */
 QComboBox[searchable="true"] {

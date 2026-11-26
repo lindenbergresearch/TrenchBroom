@@ -57,9 +57,9 @@
             style="fill:#3f3f3f;fill-opacity:1"
             id="Layer_1">
         <path
-                style="fill:#3f3f3f;fill-opacity:1"
+                style="fill:#d1d1d1;fill-opacity:1"
                 d="M12,11 L4,11 L8,5"
-                fill="#494949"
+                fill="#999999"
                 id="path79"/>
     </g>
 </svg>
