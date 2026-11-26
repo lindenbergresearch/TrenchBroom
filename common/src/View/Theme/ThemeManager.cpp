@@ -241,63 +241,63 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
         values.insert("color." + name, ThemeValue::color(result));
     };
 
-    /** text color shades */
-    color("text", QPalette::WindowText);
-    color("text.disabled", QPalette::WindowText, QPalette::Disabled);
-    color("text.highlighted", QPalette::HighlightedText);
-    color("text.bright", QPalette::BrightText);
-    color("text.placeholder", QPalette::PlaceholderText);
-    color("button.disabled", QPalette::Button, QPalette::Disabled);
+    //@formatter:off
+    /*! text color shades */
+    color("text",               QPalette::WindowText);
+    color("text.disabled",      QPalette::WindowText,           QPalette::Disabled);
+    color("text.highlighted",   QPalette::HighlightedText);
+    color("text.bright",        QPalette::BrightText);
+    color("text.placeholder",   QPalette::PlaceholderText);
+    color("button.disabled",    QPalette::Button,               QPalette::Disabled);
 
-    /** basic color shades */
-    color("window", QPalette::Window);
-    color("button", QPalette::Button);
-    color("text.button", QPalette::ButtonText);
-    color("base", QPalette::Base);
-    color("base.alternate", QPalette::AlternateBase);
-    color("light", QPalette::Light);
-    color("midlight", QPalette::Midlight);
-    color("midhalf", QPalette::Mid, QPalette::Active, 150);
-    color("mid", QPalette::Mid);
-    color("dark", QPalette::Dark);
-    color("shadow", QPalette::Shadow);
+    /*! basic color shades */
+    color("window",             QPalette::Window);
+    color("button",             QPalette::Button);
+    color("text.button",        QPalette::ButtonText);
+    color("base",               QPalette::Base);
+    color("base.alternate",     QPalette::AlternateBase);
+    color("light",              QPalette::Light);
+    color("midlight",           QPalette::Midlight);
+    color("midhalf",            QPalette::Mid,                  QPalette::Active, 150);
+    color("mid",                QPalette::Mid);
+    color("dark",               QPalette::Dark);
+    color("shadow",             QPalette::Shadow);
 
-    /** highlight color shades */
-    color("highlight.bright", QPalette::Highlight, QPalette::Active, 130);
-    color("highlight.light", QPalette::Highlight, QPalette::Active, 80);
-    color("highlight", QPalette::Highlight);
-    color("highlight.mid", QPalette::Highlight, QPalette::Active, -180);
-    color("highlight.dark", QPalette::Highlight, QPalette::Active, -200);
+    /*! highlight color shades */
+    color("highlight.bright",   QPalette::Highlight,            QPalette::Active, 130);
+    color("highlight.light",    QPalette::Highlight,            QPalette::Active, 80);
+    color("highlight",          QPalette::Highlight);
+    color("highlight.mid",      QPalette::Highlight,            QPalette::Active, -180);
+    color("highlight.dark",     QPalette::Highlight,            QPalette::Active, -200);
 
     auto detail = values["color.text"].value.value<QColor>();
     const auto opacity = std::clamp(pref(Preferences::UIDetailTextOpacity), 0.0f, 1.0f);
 
     detail.setAlphaF(detail.alphaF() * opacity);
-    values.insert("color.text.detail", ThemeValue::color(detail));
-    values.insert("number.text.detailOpacity", ThemeValue::number(opacity));
-    values.insert("color.error", ThemeValue::color(View::toQColor(pref(Preferences::UIErrorColor))));
-    values.insert("color.warning", ThemeValue::color(View::toQColor(pref(Preferences::UIWarningColor))));
+    values.insert("color.text.detail",          ThemeValue::color(detail));
+    values.insert("number.text.detailOpacity",  ThemeValue::number(opacity));
+    values.insert("color.error",                ThemeValue::color(View::toQColor(pref(Preferences::UIErrorColor))));
+    values.insert("color.warning",              ThemeValue::color(View::toQColor(pref(Preferences::UIWarningColor))));
 
     const std::pair<const char *, Preference<Color> *> logColors[] = {
-        { "trace", &Preferences::LogTraceColor },
-        { "debug", &Preferences::LogDebugColor },
-        { "info", &Preferences::LogInfoColor },
-        { "warning", &Preferences::LogWarningColor },
-        { "error", &Preferences::LogErrorColor }
+        { "trace",      &Preferences::LogTraceColor },
+        { "debug",      &Preferences::LogDebugColor },
+        { "info",       &Preferences::LogInfoColor },
+        { "warning",    &Preferences::LogWarningColor },
+        { "error",      &Preferences::LogErrorColor }
     };
 
     for (const auto &[name, preference] : logColors)
         values.insert(QStringLiteral("color.log.") + name, ThemeValue::color(View::toQColor(pref(*preference))));
 
     const std::pair<const char *, Preference<Color> *> iconColors[] = {
-        { "layer", &Preferences::LayerTreeLayerIconColor },
-        { "group", &Preferences::LayerTreeGroupIconColor },
-        { "entity",
-          &Preferences::LayerTreeEntityIconColor },
-        { "brush", &Preferences::LayerTreeBrushIconColor },
-        { "patch", &Preferences::LayerTreePatchIconColor },
-        { "typeGroup",
-          &Preferences::LayerTreeTypeGroupIconColor }};
+        { "layer",      &Preferences::LayerTreeLayerIconColor },
+        { "group",      &Preferences::LayerTreeGroupIconColor },
+        { "entity",     &Preferences::LayerTreeEntityIconColor },
+        { "brush",      &Preferences::LayerTreeBrushIconColor },
+        { "patch",      &Preferences::LayerTreePatchIconColor },
+        { "typeGroup",  &Preferences::LayerTreeTypeGroupIconColor }
+    };
 
     for (const auto &[name, preference] : iconColors)
         values.insert(QStringLiteral("color.icon.") + name, ThemeValue::color(View::toQColor(pref(*preference))));
@@ -306,38 +306,48 @@ ThemeSnapshot ThemeManager::preferenceValues(const QFont &ui, const QFont &conso
         values.insert("length." + name, ThemeValue::length(value));
     };
 
-    length("radius.menu", 12);
-    length("radius.tooltip", 8);
-    length("margin.narrow.h", LayoutConstants::NarrowHMargin);
-    length("margin.narrow.v", LayoutConstants::NarrowVMargin);
-    length("margin.medium.h", LayoutConstants::MediumHMargin);
-    length("margin.medium.v", LayoutConstants::MediumVMargin);
-    length("margin.wide.h", LayoutConstants::WideHMargin);
-    length("margin.wide.v", LayoutConstants::WideVMargin);
-    length("margin.narrow", LayoutConstants::NarrowHMargin);
-    length("margin.medium", LayoutConstants::MediumHMargin);
-    length("margin.wide", LayoutConstants::WideHMargin);
+    length("radius.menu",       12);
+    length("radius.tooltip",     8);
+    length("margin.narrow.h",   LayoutConstants::NarrowHMargin);
+    length("margin.narrow.v",   LayoutConstants::NarrowVMargin);
+    length("margin.medium.h",   LayoutConstants::MediumHMargin);
+    length("margin.medium.v",   LayoutConstants::MediumVMargin);
+    length("margin.wide.h",     LayoutConstants::WideHMargin);
+    length("margin.wide.v",     LayoutConstants::WideVMargin);
+    length("margin.narrow",     LayoutConstants::NarrowHMargin);
+    length("margin.medium",     LayoutConstants::MediumHMargin);
+    length("margin.wide",       LayoutConstants::WideHMargin);
 
-    length("font.ui", View::uiFontPixelSize());
-    length("font.subtitle", View::uiFontPixelSize(-1.0));
-    length("font.small", View::uiFontPixelSize(-1.2));
-    length("font.iconPicker", std::max(1.0, View::uiFontPixelSize() - 2.0));
-    length("font.tiny", View::uiFontPixelSize(-3.3));
-    length("font.title", (View::uiFontPixelSize() * 1.35));
-    length("font.header", View::uiFontPixelSize() * 1.85);
-    length("font.dialogTitle", (View::uiFontPixelSize() * 1.4) + 2.0);
+    length("font.ui",           View::uiFontPixelSize());
+    length("font.subtitle",     View::uiFontPixelSize(-2));
+    length("font.small",        View::uiFontPixelSize(-2.5));
+    length("font.iconPicker",   View::uiFontPixelSize(-2.1));
+    length("font.tiny",         View::uiFontPixelSize(-3.33));
+    length("font.title",        View::uiFontPixelSize() * 1.25);
+    length("font.header",       View::uiFontPixelSize() * 1.85);
+    length("font.dialogTitle",  View::uiFontPixelSize() * 1.4 + 2.0);
 
-    length("font.console", std::clamp(pref(Preferences::ConsoleFontSize), 1.0f, 256.0f));
-    length("font.renderer", std::clamp(pref(Preferences::RendererFontSize), 1.0f, 256.0f));
-    length("icon.toolbar", std::clamp(pref(Preferences::ToolBarIconsSize), 1, 256));
+    length("font.console",      std::clamp(pref(Preferences::ConsoleFontSize),  1.0f,   256.0f));
+    length("font.renderer",     std::clamp(pref(Preferences::RendererFontSize), 1.0f,   256.0f));
+    length("icon.toolbar",      std::clamp(pref(Preferences::ToolBarIconsSize), 1,      256));
 
-    const std::pair<const char *, const QFont *> fonts[] = {{ "ui", &ui }, { "console", &console },
-                                                            { "renderer", &renderer }};
+    const std::pair<const char *, const QFont *> fonts[] = {
+        { "ui",         &ui         },
+        { "console",    &console    },
+        { "renderer",   &renderer   }
+    };
+
     for (const auto &[name, font] : fonts) {
-        values.insert(QStringLiteral("family.") + name, ThemeValue::family(font->family()));
-        values.insert(QStringLiteral("weight.") + name, ThemeValue::weight(font->weight()));
+        values.insert(QStringLiteral("family.")       + name, ThemeValue::family(font->family()));
+        values.insert(QStringLiteral("weight.")       + name, ThemeValue::weight(font->weight()));
         values.insert(QStringLiteral("keyword.font.") + name, ThemeValue::keyword(fontStyle(*font)));
     }
+
+    for (const auto &[key, value] : values.asKeyValueRange()) {
+        defaultQtLogger.trace() << "TE configuration key: " << key << " -> '" << value.toStyleSheet() << "'";
+    }
+
+    //@formatter:on
     return snapshot;
 }
 
