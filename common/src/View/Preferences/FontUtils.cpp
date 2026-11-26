@@ -73,7 +73,7 @@ QFont::Weight normalizedFontWeight(int weight) {
     return QFont::Weight(std::clamp(weight, 1, 1000));
 }
 
-QFont loadFont(const std::filesystem::path &path, int pixelSize) {
+QFont loadFont(const std::filesystem::path &path, float pixelSize) {
     auto font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
     if (!path.empty() && path != "[system]") {
         const auto name = IO::pathAsQString(path);
@@ -91,25 +91,25 @@ QFont loadFont(const std::filesystem::path &path, int pixelSize) {
 
     font.setHintingPreference(QFont::PreferDefaultHinting);
     font.setPointSizeF(pixelSize);
-//    font.setStyleStrategy(QFont::PreferAntialias);
 
-    defaultQtLogger.info() <<
-                           "Loading font: " << font.family() <<
-                           " style: " << font.styleName() <<
-                           " hinting: " << font.hintingPreference() <<
-                           " weight: " << font.weight() <<
-                           " size: " << font.pixelSize() << "px / " << font.pointSizeF() << "pt ";
+    defaultQtLogger.info()
+        << "Loading font: '" << font.family() <<
+        "' style: " << font.styleName() <<
+        " weight: " << font.weight() <<
+        " size: " << font.pointSizeF() << "pt ";
+
     return font;
 }
 
 qreal uiFontPixelSize(qreal adjustment) {
-    return std::clamp(std::clamp(qreal(pref(Preferences::UIFontSize)), 1.0, 96.0) + adjustment, minimumSize(), 256.0);
+    return std::clamp(qreal(pref(Preferences::UIFontSize)) + adjustment, minimumSize(), 256.0);
 }
 
 QFont adjustedFont(const QFont &source, qreal pixelDelta) {
     auto font = source;
     const auto resolved = font.pointSizeF() > 0 ? font.pointSizeF() : QFontInfo(font).pointSizeF();
-    const auto size = std::clamp(std::max(1.0, resolved) + pixelDelta, qreal(minimumSize()), 256.0);
+
+    const auto size = std::clamp(resolved + pixelDelta, qreal(minimumSize()), 256.0);
     font.setPointSizeF(size);
 
     return font;
@@ -124,18 +124,23 @@ QFont detailFont(const QFont &source, qreal reduction) {
     return font;
 }
 
+
 QFont fontForStyleSheet(QFont font) {
     // Qt 5's named font face otherwise overrides family/weight/style from QSS.
     font.setStyleName({});
-    font.unsetVariableAxis("wght");
-    font.unsetVariableAxis("opsz");
+    font.unsetVariableAxis(QFONT_TAG_ID_WEIGHT);
+    font.unsetVariableAxis(QFONT_TAG_ID_OPTICAL_SIZE);
+
     return font;
 }
 
 FontCapabilities fontCapabilities(const QFont &font) {
     // Axes belong to a face, independent of its size/current variation values.
-    const auto key = font.family() + '/' + font.styleName() + '/'
-                     + QString::number(font.weight()) + '/' + QString::number(font.style());
+    const auto key =
+        font.family() + '/' +
+        font.styleName() + '/' +
+        QString::number(font.weight()) + '/' +
+        QString::number(font.style());
 
     auto &cache = capabilitiesCache();
     if (const auto *found = cache.object(key)) return *found;
@@ -144,69 +149,79 @@ FontCapabilities fontCapabilities(const QFont &font) {
     for (const auto &axis : QFontInfo { font }.variableAxes()) {
         const FontAxisRange range { axis.minimumValue(), axis.maximumValue(), axis.defaultValue() };
         if (!std::isfinite(range.minimum) || !std::isfinite(range.maximum) || range.minimum > range.maximum) continue;
-        if (axis.tag() == QFont::Tag { "wght" }) result.weight = range;
-        else if (axis.tag() == QFont::Tag { "opsz" }) result.opticalSize = range;
+        if (axis.tag() == QFont::Tag { QFONT_TAG_ID_WEIGHT }) result.weight = range;
+        else if (axis.tag() == QFont::Tag { QFONT_TAG_ID_OPTICAL_SIZE }) result.opticalSize = range;
     }
 
     cache.insert(key, new FontCapabilities { result });
-
     return result;
 }
 
 ListFontSettings listFontSettings() {
-    return { std::clamp(pref(Preferences::UIListFontWeight), 0, 1000),
-             std::isfinite(pref(Preferences::UIListOpticalSize))
-             ? std::clamp(qreal(pref(Preferences::UIListOpticalSize)), 0.0, 144.0) : 0.0,
-             pref(Preferences::UIListTypoLineMetrics), pref(Preferences::UIListSubpixelPositioning) };
+    return {
+        std::clamp(pref(Preferences::UIListFontWeight), 0, 1000),
+        std::isfinite(pref(Preferences::UIListOpticalSize))
+        ? std::clamp(qreal(pref(Preferences::UIListOpticalSize)), 0.0, 144.0) : 0.0,
+        pref(Preferences::UIListTypoLineMetrics), pref(Preferences::UIListSubpixelPositioning)
+    };
 }
 
 QFont listTextFont(QFont font, const ListFontSettings &settings, const bool preserveEmphasis) {
     const auto axes = fontCapabilities(font);
-    const auto keepWeight = preserveEmphasis && font.weight() != QFont::Normal
-                            && font.weight() != QGuiApplication::font().weight();
+    const auto keepWeight =
+        preserveEmphasis && font.weight() != QFont::Normal
+        && font.weight() != QGuiApplication::font().weight();
+
     auto weight = int(font.weight());
     if (settings.weight > 0 && !keepWeight)
         weight = std::clamp(settings.weight, 1, 1000);
+
     if (axes.weight) {
         weight = qRound(std::clamp(qreal(weight), axes.weight->minimum, axes.weight->maximum));
         font.setStyleName({});
         font.setWeight(QFont::Weight(weight));
         // setWeight alone matches named faces and can round 450 back to 400.
-        font.setVariableAxis("wght", float(weight));
+        font.setVariableAxis(QFONT_TAG_ID_WEIGHT, float(weight));
     } else if (settings.weight > 0 && !keepWeight) {
         font.setStyleName({});
         font.setWeight(QFont::Weight(weight));
     }
+
     if (axes.opticalSize) {
         const auto points = font.pointSizeF() > 0 ? font.pointSizeF() : QFontInfo { font }.pointSizeF();
-        const auto opticalSize = std::isfinite(settings.opticalSize) && settings.opticalSize > 0
-                                 ? settings.opticalSize : points;
-        font.setVariableAxis("opsz", float(std::clamp(opticalSize, axes.opticalSize->minimum, axes.opticalSize->maximum)));
+        const auto opticalSize =
+            std::isfinite(settings.opticalSize) && settings.opticalSize > 0
+            ? settings.opticalSize : points;
+
+        font.setVariableAxis(QFONT_TAG_ID_OPTICAL_SIZE, float(std::clamp(opticalSize, axes.opticalSize->minimum, axes.opticalSize->maximum)));
     }
+
     const auto strategy = settings.typoLineMetrics
                           ? int(font.styleStrategy()) | QFont::PreferTypoLineMetrics
                           : int(font.styleStrategy()) & ~QFont::PreferTypoLineMetrics;
+
     font.setStyleStrategy(QFont::StyleStrategy(strategy));
     if (settings.subpixelPositioning) font.setHintingPreference(QFont::PreferNoHinting);
+
     return font;
 }
 
 QFont styledTextFont(QFont font, const ListFontSettings &settings, const bool weightAxis) {
     // Work from the final QSS weight; never carry a parent's variation into a
     // bold heading or rich-text fragment. Keep unrelated axes such as width.
-    font.unsetVariableAxis("wght");
-    font.unsetVariableAxis("opsz");
+    font.unsetVariableAxis(QFONT_TAG_ID_WEIGHT);
+    font.unsetVariableAxis(QFONT_TAG_ID_OPTICAL_SIZE);
     auto resolved = settings;
     resolved.weight = 0;
     const auto originalWeight = font.weight();
     const auto originalStyleName = font.styleName();
     const auto originalMask = font.resolveMask();
     auto tuned = listTextFont(font, resolved);
-    if (!weightAxis) tuned.unsetVariableAxis("wght");
+    if (!weightAxis) tuned.unsetVariableAxis(QFONT_TAG_ID_WEIGHT);
     // Changing the variation must not make inherited family/size/weight local.
     // FontChange will then continue to propagate future application changes.
     QFont axisMask;
-    axisMask.setVariableAxis("wght", 400);
+    axisMask.setVariableAxis(QFONT_TAG_ID_WEIGHT, 400);
     const auto variationsMask = axisMask.resolveMask();
     tuned.setWeight(originalWeight);
     tuned.setStyleName(originalStyleName);

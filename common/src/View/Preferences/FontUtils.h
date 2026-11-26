@@ -13,11 +13,15 @@ class QPainter;
 class QRectF;
 
 namespace TrenchBroom::View {
+
+static const QFont::Tag QFONT_TAG_ID_WEIGHT = "wght";
+static const QFont::Tag QFONT_TAG_ID_OPTICAL_SIZE = "opsz";
+
 // Sizes are logical pixels. Qt applies the display's device pixel ratio.
 // CSS/OpenType weights are 1..1000 in Qt 6. Retain old theme properties
 // expressed as Qt 5 weights (0..99), mapping the named weights exactly.
 QFont::Weight normalizedFontWeight(int weight);
-QFont loadFont(const std::filesystem::path &path, int pixelSize);
+QFont loadFont(const std::filesystem::path &path, float pixelSize);
 qreal uiFontPixelSize(qreal adjustment = 0);
 QFont adjustedFont(const QFont &font, qreal pixelDelta);
 QFont detailFont(const QFont &font, qreal reduction = 2.0);
